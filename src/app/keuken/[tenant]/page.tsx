@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
-import { getTenantSettings, updateOrderStatus } from '@/lib/admin-api'
+import { getTenantSettings, updateOrderStatus, isWebshopOrder } from '@/lib/admin-api'
+import { formatOrderScheduleDetail } from '@/lib/format-order-schedule'
 import { useLanguage } from '@/i18n'
 import Link from 'next/link'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
@@ -579,7 +580,9 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
           </div>
         ) : (
           <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-            {orders.map((order) => (
+            {orders.map((order) => {
+              const schedLine = formatOrderScheduleDetail(order, locale)
+              return (
               <motion.div
                 key={order.id}
                 layout
@@ -608,14 +611,27 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                   </span>
                 </div>
 
-                <div className="px-3 py-2 text-sm font-medium text-gray-800 bg-gray-50 border-b border-gray-100 text-center">
-                  {orderTypeLabelShort(order)}
-                </div>
-
-                {(order.scheduled_date || order.scheduled_time) && (
-                  <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 text-gray-800 text-sm font-medium text-center">
-                    📅 {order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit' }) : ''}{order.scheduled_time ? ` om ${order.scheduled_time}` : ''}
+                {isWebshopOrder(order) ? (
+                  <div className="px-3 py-2 bg-gray-50 border-b border-gray-100 text-center">
+                    <div className="text-sm font-bold text-gray-900">{t('shopDisplay.onlineOrder')}</div>
+                    <div className="text-xs sm:text-sm text-gray-700 mt-1 leading-snug">
+                      {(order.order_type === 'delivery' || order.order_type === 'DELIVERY')
+                        ? t('shopDisplay.delivery')
+                        : t('shopDisplay.pickup')}
+                      {schedLine ? ` · ${schedLine}` : ''}
+                    </div>
                   </div>
+                ) : (
+                  <>
+                    <div className="px-3 py-2 text-sm font-medium text-gray-800 bg-gray-50 border-b border-gray-100 text-center">
+                      {orderTypeLabelShort(order)}
+                    </div>
+                    {(order.scheduled_date || order.scheduled_time) && (
+                      <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 text-gray-800 text-sm font-medium text-center">
+                        📅 {order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit' }) : ''}{order.scheduled_time ? ` om ${order.scheduled_time}` : ''}
+                      </div>
+                    )}
+                  </>
                 )}
 
                 <div className="p-3">
@@ -674,7 +690,8 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                   </button>
                 </div>
               </motion.div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>
@@ -704,7 +721,19 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                     <p className="text-sm font-medium text-white/85 mt-1 uppercase tracking-wide">
                       {kitchenHeaderStatus(selectedOrder.status)}
                     </p>
-                    <p className="text-sm text-white/70 mt-2">{orderTypeLabelShort(selectedOrder)} · {getTimeSince(selectedOrder.created_at)}</p>
+                    <p className="text-sm text-white/70 mt-2">
+                      {(() => {
+                        const sched = formatOrderScheduleDetail(selectedOrder, locale)
+                        if (!isWebshopOrder(selectedOrder)) {
+                          return `${orderTypeLabelShort(selectedOrder)} · ${getTimeSince(selectedOrder.created_at)}`
+                        }
+                        const ch =
+                          selectedOrder.order_type === 'delivery' || selectedOrder.order_type === 'DELIVERY'
+                            ? t('shopDisplay.delivery')
+                            : t('shopDisplay.pickup')
+                        return `${t('shopDisplay.onlineOrder')} · ${ch}${sched ? ` · ${sched}` : ''}`
+                      })()}
+                    </p>
                   </div>
                   <button
                     type="button"
@@ -718,15 +747,16 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
               </div>
 
               <div className="p-6">
-                {(selectedOrder.scheduled_date || selectedOrder.scheduled_time) && (
-                  <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-4 text-center">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Gewenst tijdstip</p>
-                    <p className="text-lg font-semibold text-gray-900 mt-1">
-                      {selectedOrder.scheduled_date ? new Date(selectedOrder.scheduled_date).toLocaleDateString('nl-BE', { weekday: 'long', day: '2-digit', month: 'long' }) : ''}
-                      {selectedOrder.scheduled_time ? ` om ${selectedOrder.scheduled_time}` : ''}
-                    </p>
-                  </div>
-                )}
+                {(() => {
+                  const schedStr = formatOrderScheduleDetail(selectedOrder, locale)
+                  if (!schedStr) return null
+                  return (
+                    <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-4 text-center">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">{t('shopDisplay.desiredTimeLabel')}</p>
+                      <p className="text-lg font-semibold text-gray-900 mt-1">{schedStr}</p>
+                    </div>
+                  )
+                })()}
 
                 <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-4">
                   <div className="flex flex-wrap items-start justify-between gap-4">

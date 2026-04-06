@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { getTenantSettings, updateOrderStatus, TenantSettings, approveWebshopOrder, completeWebshopOrder, isWebshopOrder } from '@/lib/admin-api'
+import { formatOrderScheduleDetail } from '@/lib/format-order-schedule'
 import { useLanguage } from '@/i18n'
 import Link from 'next/link'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
@@ -822,6 +823,17 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   })
 
+  const selectedScheduleDetail = useMemo(
+    () =>
+      selectedOrder
+        ? formatOrderScheduleDetail(
+            { scheduled_date: selectedOrder.scheduled_date, scheduled_time: selectedOrder.scheduled_time },
+            locale
+          )
+        : null,
+    [selectedOrder, locale]
+  )
+
   if (loading) {
     return (
       <div
@@ -1054,7 +1066,15 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             </div>
           ) : (
             <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
-              {sortedActiveOrders.map((order) => (
+              {sortedActiveOrders.map((order) => {
+                const schedLine = isWebshopOrder(order)
+                  ? formatOrderScheduleDetail(
+                      { scheduled_date: order.scheduled_date, scheduled_time: order.scheduled_time },
+                      locale
+                    )
+                  : null
+                const hideInnerScheduleBox = isWebshopOrder(order) && !!schedLine
+                return (
                 <motion.div
                   key={order.id}
                   layout
@@ -1082,9 +1102,19 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                     </span>
                   </div>
 
+                  {isWebshopOrder(order) && (
+                    <div className="px-3 py-2 bg-gray-50 border-b border-gray-100 text-center">
+                      <div className="text-sm font-bold text-gray-900">{tx('onlineOrder')}</div>
+                      <div className="text-xs text-gray-700 mt-0.5 leading-snug">
+                        {order.order_type === 'delivery' ? tx('delivery') : tx('pickup')}
+                        {schedLine ? ` · ${schedLine}` : ''}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Order Content */}
                   <div className="p-3 bg-white text-gray-900">
-                    {(order.scheduled_date || order.scheduled_time) && (
+                    {!hideInnerScheduleBox && (order.scheduled_date || order.scheduled_time) && (
                       <div className="mb-2 px-2 py-1.5 bg-gray-100 border border-gray-200 rounded text-gray-800 font-medium text-sm text-center">
                         📅 {order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit' }) : ''}{order.scheduled_time ? ` om ${order.scheduled_time}` : ''}
                       </div>
@@ -1095,9 +1125,11 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                     </div>
 
                     <div className="flex flex-wrap items-center gap-1 mb-2">
-                      <span className="px-2 py-0.5 rounded-md text-xs font-medium text-gray-700 bg-gray-100 border border-gray-200">
-                        {order.order_type === 'delivery' ? tx('delivery') : tx('pickup')}
-                      </span>
+                      {!isWebshopOrder(order) && (
+                        <span className="px-2 py-0.5 rounded-md text-xs font-medium text-gray-700 bg-gray-100 border border-gray-200">
+                          {order.order_type === 'delivery' ? tx('delivery') : tx('pickup')}
+                        </span>
+                      )}
                       <span className="px-2 py-0.5 rounded-md text-xs font-medium text-gray-700 bg-gray-100 border border-gray-200">
                         {order.payment_status === 'paid' ? tx('paid') : tx('notPaid')}
                       </span>
@@ -1119,7 +1151,8 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                     </div>
                   </div>
                 </motion.div>
-              ))}
+                )
+              })}
             </div>
           )
         ) : (
@@ -1169,6 +1202,12 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                   <div>
                     <h2 className="text-3xl font-semibold tracking-tight text-white tabular-nums">#{selectedOrder.order_number}</h2>
                     <p className="text-sm font-medium text-white/85 mt-1 uppercase tracking-wide">{getStatusLabel(selectedOrder.status)}</p>
+                    {isWebshopOrder(selectedOrder) && (
+                      <p className="text-sm text-white/90 mt-2 font-semibold leading-snug normal-case">
+                        {tx('onlineOrder')} · {selectedOrder.order_type === 'delivery' ? tx('delivery') : tx('pickup')}
+                        {selectedScheduleDetail ? ` · ${selectedScheduleDetail}` : ''}
+                      </p>
+                    )}
                   </div>
                   <button
                     type="button"
@@ -1183,14 +1222,10 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
               {/* Content */}
               <div className="p-6">
-                {/* Geplande datum/tijd */}
-                {(selectedOrder.scheduled_date || selectedOrder.scheduled_time) && (
+                {selectedScheduleDetail && (
                   <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-4 text-center">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Gewenst tijdstip</p>
-                    <p className="text-lg font-semibold text-gray-900 mt-1">
-                      {selectedOrder.scheduled_date ? new Date(selectedOrder.scheduled_date).toLocaleDateString('nl-BE', { weekday: 'long', day: '2-digit', month: 'long' }) : ''}
-                      {selectedOrder.scheduled_time ? ` om ${selectedOrder.scheduled_time}` : ''}
-                    </p>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">{tx('desiredTimeLabel')}</p>
+                    <p className="text-lg font-semibold text-gray-900 mt-1">{selectedScheduleDetail}</p>
                   </div>
                 )}
 
@@ -1216,17 +1251,20 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                   )}
                 </div>
 
-                {/* Type & Payment */}
+                {/* Online bestelling + betaling */}
                 <div className="flex gap-3 mb-4">
                   <div className="flex-1 rounded-lg p-3 text-center border border-gray-200 bg-white">
-                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{tx('order')}</p>
-                    <p className="font-semibold text-gray-900 mt-1">{selectedOrder.order_type === 'delivery' ? tx('delivery') : tx('pickup')}</p>
+                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{tx('onlineOrder')}</p>
+                    <p className="font-semibold text-gray-900 mt-1 leading-snug">
+                      {selectedOrder.order_type === 'delivery' ? tx('delivery') : tx('pickup')}
+                    </p>
                   </div>
                   <div className="flex-1 rounded-lg p-3 text-center border border-gray-200 bg-white">
-                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{tx('paid')}</p>
+                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{tx('paymentHeading')}</p>
                     <p className="font-semibold text-gray-900 mt-1">{selectedOrder.payment_status === 'paid' ? tx('paid') : tx('notPaid')}</p>
                   </div>
                 </div>
+
 
                 {/* Items */}
                 <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-4">

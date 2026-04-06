@@ -4,6 +4,7 @@ import { useLanguage } from '@/i18n'
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getOrders, updateOrderStatus, confirmOrder, approveWebshopOrder, completeWebshopOrder, rejectOrder, Order, getTenantSettings, TenantSettings, addLoyaltyPoints, isWebshopOrder } from '@/lib/admin-api'
+import { formatOrderScheduleDetail } from '@/lib/format-order-schedule'
 import { supabase } from '@/lib/supabase'
 import { getSoundsEnabled } from '@/lib/sounds'
 import { getAuthHeaders } from '@/lib/auth-headers'
@@ -63,13 +64,13 @@ const getPaymentMethodLabels = (t: (key: string) => string): Record<string, stri
 })
 
 export default function BestellingenPage({ params }: { params: { tenant: string } }) {
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
   
   // Memoized configs with translations
   const statusConfig = useMemo(() => getStatusConfig(t), [t])
   const paymentStatusConfig = useMemo(() => getPaymentStatusConfig(t), [t])
   const paymentMethodLabels = useMemo(() => getPaymentMethodLabels(t), [t])
-  
+
   const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('active')
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
@@ -79,6 +80,21 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   const [archiveOrders, setArchiveOrders] = useState<Order[]>([])
   const [archiveLoading, setArchiveLoading] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+
+  const selectedScheduleLabel = useMemo(
+    () =>
+      selectedOrder
+        ? formatOrderScheduleDetail(
+            {
+              scheduled_date: (selectedOrder as any).scheduled_date,
+              scheduled_time: (selectedOrder as any).scheduled_time,
+            },
+            locale
+          )
+        : null,
+    [selectedOrder, locale]
+  )
+
   const [updatingId, setUpdatingId] = useState<string | null>(null)
   const [kitchenMode, setKitchenMode] = useState(false)
   const [tenantSettings, setTenantSettings] = useState<TenantSettings | null>(null)
@@ -1049,18 +1065,46 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                   status === 'new' ? 'ring-2 ring-red-500 animate-pulse' : ''
                 }`}
               >
-                {/* AFHALEN / LEVERING — groot en centraal */}
-                <div className={`w-full text-center py-2 mb-3 rounded-xl font-black text-xl tracking-wide ${
-                  order.order_type === 'pickup' || order.order_type === 'PICKUP' ? 'bg-blue-100 text-blue-700' :
-                  order.order_type === 'DINE_IN' ? 'bg-gray-100 text-gray-700' :
-                  order.order_type === 'TAKEAWAY' ? 'bg-amber-100 text-amber-700' :
-                  'bg-purple-100 text-purple-700'
+                {/* Webshop: online bestelling + moment; kassa: kanaal */}
+                <div className={`w-full text-center py-2 mb-3 rounded-xl tracking-wide ${
+                  isWebshopOrder(order)
+                    ? 'bg-slate-100 text-slate-900'
+                    : order.order_type === 'pickup' || order.order_type === 'PICKUP'
+                      ? 'bg-blue-100 text-blue-700'
+                      : order.order_type === 'DINE_IN'
+                        ? 'bg-gray-100 text-gray-700'
+                        : order.order_type === 'TAKEAWAY'
+                          ? 'bg-amber-100 text-amber-700'
+                          : 'bg-purple-100 text-purple-700'
                 }`}>
-                  {order.order_type === 'pickup' || order.order_type === 'PICKUP' ? '🛍️ AFHALEN' :
-                   order.order_type === 'DINE_IN' ? '🍽️ KASSA - TER PLAATSE' :
-                   order.order_type === 'TAKEAWAY' ? '📦 KASSA - AFHALEN' :
-                   order.order_type === 'DELIVERY' ? '🚗 KASSA - LEVERING' :
-                   '🚗 LEVERING'}
+                  {isWebshopOrder(order) ? (
+                    <>
+                      <div className="font-black text-xl">{t('shopDisplay.onlineOrder')}</div>
+                      <div className="text-sm sm:text-base font-semibold mt-1 leading-snug">
+                        {(order.order_type === 'delivery' || order.order_type === 'DELIVERY')
+                          ? t('ordersPage.orderType.delivery')
+                          : t('ordersPage.orderType.pickup')}
+                        {(() => {
+                          const sl = formatOrderScheduleDetail(
+                            {
+                              scheduled_date: (order as any).scheduled_date,
+                              scheduled_time: (order as any).scheduled_time,
+                            },
+                            locale
+                          )
+                          return sl ? ` · ${sl}` : ''
+                        })()}
+                      </div>
+                    </>
+                  ) : (
+                    <span className="font-black text-xl">
+                      {order.order_type === 'pickup' || order.order_type === 'PICKUP' ? '🛍️ AFHALEN' :
+                       order.order_type === 'DINE_IN' ? '🍽️ KASSA - TER PLAATSE' :
+                       order.order_type === 'TAKEAWAY' ? '📦 KASSA - AFHALEN' :
+                       order.order_type === 'DELIVERY' ? '🚗 KASSA - LEVERING' :
+                       '🚗 LEVERING'}
+                    </span>
+                  )}
                 </div>
 
                 <div className="flex items-start justify-between mb-4">
@@ -1268,8 +1312,16 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                   <span className={`px-4 py-2 rounded-full text-sm font-bold ${statusConfig[selectedOrder.status]?.bg || 'bg-gray-100'} ${statusConfig[selectedOrder.status]?.text || 'text-gray-700'}`}>
                     {statusConfig[selectedOrder.status]?.label || selectedOrder.status}
                   </span>
-                  <span className={`px-4 py-2 rounded-full text-sm font-medium ${selectedOrder.order_type === 'pickup' || selectedOrder.order_type === 'PICKUP' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
-                    {selectedOrder.order_type === 'pickup' || selectedOrder.order_type === 'PICKUP' ? `🛍️ ${t('ordersPage.orderType.pickup')}` : `🚗 ${t('ordersPage.orderType.delivery')}`}
+                  <span className={`px-4 py-2 rounded-full text-sm font-medium ${isWebshopOrder(selectedOrder) ? 'bg-slate-100 text-slate-800' : selectedOrder.order_type === 'pickup' || selectedOrder.order_type === 'PICKUP' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
+                    {isWebshopOrder(selectedOrder)
+                      ? `${t('shopDisplay.onlineOrder')} · ${
+                          selectedOrder.order_type === 'pickup' || selectedOrder.order_type === 'PICKUP'
+                            ? t('ordersPage.orderType.pickup')
+                            : t('ordersPage.orderType.delivery')
+                        }${selectedScheduleLabel ? ` · ${selectedScheduleLabel}` : ''}`
+                      : selectedOrder.order_type === 'pickup' || selectedOrder.order_type === 'PICKUP'
+                        ? `🛍️ ${t('ordersPage.orderType.pickup')}`
+                        : `🚗 ${t('ordersPage.orderType.delivery')}`}
                   </span>
                   {selectedOrder.payment_status && (
                     <span className={`px-4 py-2 rounded-full text-sm font-bold ${paymentStatusConfig[selectedOrder.payment_status]?.bg || 'bg-gray-100'} ${paymentStatusConfig[selectedOrder.payment_status]?.text || 'text-gray-700'}`}>
@@ -1284,15 +1336,10 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                 </div>
 
                 {/* Geplande datum/tijd — PROMINENT tonen als aanwezig */}
-                {((selectedOrder as any).scheduled_date || (selectedOrder as any).scheduled_time) && (
+                {selectedScheduleLabel && (
                   <div className="bg-orange-50 border-2 border-orange-300 rounded-xl p-4">
-                    <p className="text-sm text-orange-600 font-semibold mb-1">📅 Gewenst tijdstip</p>
-                    <p className="text-2xl font-black text-orange-700">
-                      {(selectedOrder as any).scheduled_date
-                        ? new Date((selectedOrder as any).scheduled_date).toLocaleDateString('nl-BE', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })
-                        : ''}
-                      {(selectedOrder as any).scheduled_time ? ` om ${(selectedOrder as any).scheduled_time}` : ''}
-                    </p>
+                    <p className="text-sm text-orange-600 font-semibold mb-1">📅 {t('shopDisplay.desiredTimeLabel')}</p>
+                    <p className="text-2xl font-black text-orange-700">{selectedScheduleLabel}</p>
                   </div>
                 )}
 
