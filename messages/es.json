@@ -4421,7 +4421,9 @@
     "faq7Q": "Se almacenan mis datos de forma segura?",
     "faq7A": "Si, todos tus datos se almacenan cifrados en servidores seguros dentro de la UE. Cumplimos con todos los requisitos del RGPD.",
     "faq8Q": "Puedo usar la app en varios dispositivos?",
-    "faq8A": "Si, puedes iniciar sesion en un numero ilimitado de dispositivos. Tu panel se sincroniza automaticamente entre todos los dispositivos."
+    "faq8A": "Si, puedes iniciar sesion en un numero ilimitado de dispositivos. Tu panel se sincroniza automaticamente entre todos los dispositivos.",
+    "faq9Q": "Quien es el dueno del sistema?",
+    "faq9A": "Vysion es propietario del hardware: la caja, la impresora y el cajon portamonedas. Si es cliente Premium durante 24 meses, pasara a ser automaticamente propietario del hardware tras 24 meses sin coste adicional."
   },
   "resellersPage": {
     "badge": "Programa de Socios",

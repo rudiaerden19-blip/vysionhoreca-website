@@ -4421,7 +4421,9 @@
     "faq7Q": "I miei dati sono memorizzati in modo sicuro?",
     "faq7A": "Si, tutti i tuoi dati sono crittografati e memorizzati su server sicuri all interno dell UE. Rispettiamo tutti i requisiti del GDPR.",
     "faq8Q": "Posso usare l app su piu dispositivi?",
-    "faq8A": "Si, puoi accedere su un numero illimitato di dispositivi. La tua dashboard si sincronizza automaticamente tra tutti i dispositivi."
+    "faq8A": "Si, puoi accedere su un numero illimitato di dispositivi. La tua dashboard si sincronizza automaticamente tra tutti i dispositivi.",
+    "faq9Q": "Chi e il proprietario del sistema?",
+    "faq9A": "Vysion e proprietario dell hardware: cassa, stampante e cassetto contanti. Se sei cliente Premium per 24 mesi, diventi automaticamente proprietario dell hardware dopo 24 mesi senza costi aggiuntivi."
   },
   "resellersPage": {
     "badge": "Programma Partner",

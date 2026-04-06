@@ -4444,7 +4444,9 @@
     "faq7Q": "Werden meine Daten sicher gespeichert?",
     "faq7A": "Ja, alle Ihre Daten werden verschluesselt auf sicheren Servern innerhalb der EU gespeichert. Wir erfuellen alle DSGVO-Anforderungen.",
     "faq8Q": "Kann ich die App auf mehreren Geraeten nutzen?",
-    "faq8A": "Ja, Sie koennen sich auf einer unbegrenzten Anzahl von Geraeten anmelden. Ihr Dashboard synchronisiert sich automatisch zwischen allen Geraeten."
+    "faq8A": "Ja, Sie koennen sich auf einer unbegrenzten Anzahl von Geraeten anmelden. Ihr Dashboard synchronisiert sich automatisch zwischen allen Geraeten.",
+    "faq9Q": "Wem gehoert das System?",
+    "faq9A": "Vysion ist Eigentuemer der Hardware: Kasse, Drucker und Geldlade. Wenn Sie 24 Monate lang Premium-Kunde sind, werden Sie nach Ablauf dieser 24 Monate automatisch Eigentuemer der Hardware ohne zusaetzliche Zahlung."
   },
   "resellersPage": {
     "badge": "Partnerprogramm",

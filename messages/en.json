@@ -4649,7 +4649,9 @@
     "faq7Q": "Is my data stored securely?",
     "faq7A": "Yes, all your data is encrypted and stored on secure servers within the EU. We comply with all GDPR requirements.",
     "faq8Q": "Can I use the app on multiple devices?",
-    "faq8A": "Yes, you can log in on unlimited devices. Your dashboard synchronizes automatically between all devices."
+    "faq8A": "Yes, you can log in on unlimited devices. Your dashboard synchronizes automatically between all devices.",
+    "faq9Q": "Who owns the system?",
+    "faq9A": "Vysion owns the hardware—the POS, printer and cash drawer. If you are a Premium customer for 24 consecutive months, you automatically become the owner of the hardware after 24 months with no additional payment."
   },
   "resellersPage": {
     "badge": "Partner Program",

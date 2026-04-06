@@ -4443,7 +4443,9 @@
     "faq7Q": "Mes donnees sont-elles stockees en securite?",
     "faq7A": "Oui, toutes vos donnees sont chiffrees et stockees sur des serveurs securises au sein de l UE. Nous respectons toutes les exigences du RGPD.",
     "faq8Q": "Puis-je utiliser l application sur plusieurs appareils?",
-    "faq8A": "Oui, vous pouvez vous connecter sur un nombre illimite d appareils. Votre tableau de bord se synchronise automatiquement entre tous les appareils."
+    "faq8A": "Oui, vous pouvez vous connecter sur un nombre illimite d appareils. Votre tableau de bord se synchronise automatiquement entre tous les appareils.",
+    "faq9Q": "A qui appartient le systeme?",
+    "faq9A": "Vysion est proprietaire du materiel : la caisse, l imprimante et le tiroir-caisse. Si vous etes client Premium pendant 24 mois, vous devenez automatiquement proprietaire du materiel apres 24 mois, sans frais supplementaires."
   },
   "resellersPage": {
     "badge": "Programme Partenaire",

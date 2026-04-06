@@ -4649,7 +4649,9 @@
     "faq7Q": "Worden mijn gegevens veilig bewaard?",
     "faq7A": "Ja, al je gegevens worden versleuteld opgeslagen op beveiligde servers binnen de EU. We voldoen aan alle GDPR-vereisten.",
     "faq8Q": "Kan ik de app op meerdere apparaten gebruiken?",
-    "faq8A": "Ja, je kunt inloggen op onbeperkt aantal apparaten. Je dashboard synchroniseert automatisch tussen alle apparaten."
+    "faq8A": "Ja, je kunt inloggen op onbeperkt aantal apparaten. Je dashboard synchroniseert automatisch tussen alle apparaten.",
+    "faq9Q": "Wie is eigenaar van het systeem?",
+    "faq9A": "Vysion is eigenaar van de hardware: de kassa, printer en geldlade. Als u klant bent met een Premium-account gedurende 24 maanden, wordt u na 24 maanden automatisch eigenaar van de hardware zonder enige bijbetaling."
   },
   "resellersPage": {
     "badge": "Partner Programma",

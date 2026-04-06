@@ -17,6 +17,7 @@ export default function SupportPage() {
     { question: t('supportPage.faq6Q'), answer: t('supportPage.faq6A') },
     { question: t('supportPage.faq7Q'), answer: t('supportPage.faq7A') },
     { question: t('supportPage.faq8Q'), answer: t('supportPage.faq8A') },
+    { question: t('supportPage.faq9Q'), answer: t('supportPage.faq9A') },
   ]
 
   return (
