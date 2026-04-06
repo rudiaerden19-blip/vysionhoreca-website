@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { ensureDeliverySettingsForTenant } from '@/lib/tenant-defaults'
+import { DEFAULT_ENABLED_ALLERGEN_IDS } from '@/lib/allergens-defaults'
 import {
   isProtectedTenant,
   isAdminTenant,
@@ -209,16 +210,33 @@ export default function SuperAdminDashboard() {
     }
 
     // 3. Create tenant_settings
-    const { error: settingsError } = await supabase
-      .from('tenant_settings')
-      .insert({
+    let settingsError = (
+      await supabase.from('tenant_settings').insert({
         tenant_slug: slug,
         business_name: newTenant.business_name,
         email: newTenant.email,
         phone: newTenant.phone,
         primary_color: '#FF6B35',
         secondary_color: '#1a1a2e',
+        allergens_config: DEFAULT_ENABLED_ALLERGEN_IDS,
       })
+    ).error
+
+    if (
+      settingsError &&
+      /allergens_config|schema cache|PGRST204|column/i.test(settingsError.message)
+    ) {
+      settingsError = (
+        await supabase.from('tenant_settings').insert({
+          tenant_slug: slug,
+          business_name: newTenant.business_name,
+          email: newTenant.email,
+          phone: newTenant.phone,
+          primary_color: '#FF6B35',
+          secondary_color: '#1a1a2e',
+        })
+      ).error
+    }
 
     if (settingsError) {
       alert('Fout bij aanmaken: ' + settingsError.message)

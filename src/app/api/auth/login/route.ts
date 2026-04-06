@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'
 import { loginRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
+import { DEFAULT_ENABLED_ALLERGEN_IDS } from '@/lib/allergens-defaults'
 
 // Legacy SHA-256 hash for backward compatibility
 async function hashPasswordLegacy(password: string): Promise<string> {
@@ -283,16 +284,33 @@ export async function POST(request: NextRequest) {
         .eq('slug', tenantSlug)
         .maybeSingle()
 
-      const { error: settingsError } = await supabase
-        .from('tenant_settings')
-        .insert({
+      let settingsError = (
+        await supabase.from('tenant_settings').insert({
           tenant_slug: tenantSlug,
           business_name: tenantInfo?.name || profile.name || tenantSlug,
           email: tenantInfo?.email || profile.email,
           phone: tenantInfo?.phone || '',
           primary_color: '#FF6B35',
           secondary_color: '#1a1a2e',
+          allergens_config: DEFAULT_ENABLED_ALLERGEN_IDS,
         })
+      ).error
+
+      if (
+        settingsError &&
+        /allergens_config|schema cache|PGRST204|column/i.test(settingsError.message)
+      ) {
+        settingsError = (
+          await supabase.from('tenant_settings').insert({
+            tenant_slug: tenantSlug,
+            business_name: tenantInfo?.name || profile.name || tenantSlug,
+            email: tenantInfo?.email || profile.email,
+            phone: tenantInfo?.phone || '',
+            primary_color: '#FF6B35',
+            secondary_color: '#1a1a2e',
+          })
+        ).error
+      }
 
       if (settingsError) {
         logger.error('Failed to auto-create tenant_settings', { requestId, tenantSlug, error: settingsError.message })

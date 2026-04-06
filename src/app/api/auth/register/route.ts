@@ -7,6 +7,7 @@ import { registerRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-lim
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
 import { ensureDeliverySettingsForTenant } from '@/lib/tenant-defaults'
+import { DEFAULT_ENABLED_ALLERGEN_IDS } from '@/lib/allergens-defaults'
 import {
   isMissingPostTrialModulesColumnError,
   withoutPostTrialModulesConfirmed,
@@ -197,16 +198,33 @@ export async function POST(request: NextRequest) {
     // ========================================
     // 3. CREATE TENANT SETTINGS (shop settings)
     // ========================================
-    const { error: settingsError } = await supabase
-      .from('tenant_settings')
-      .insert({
+    let settingsError = (
+      await supabase.from('tenant_settings').insert({
         tenant_slug: tenantSlug,
         business_name: businessName.trim(),
         email: emailLower,
         phone: phone.trim(),
         primary_color: '#FF6B35',
         secondary_color: '#1a1a2e',
+        allergens_config: DEFAULT_ENABLED_ALLERGEN_IDS,
       })
+    ).error
+
+    if (
+      settingsError &&
+      /allergens_config|schema cache|PGRST204|column/i.test(settingsError.message)
+    ) {
+      settingsError = (
+        await supabase.from('tenant_settings').insert({
+          tenant_slug: tenantSlug,
+          business_name: businessName.trim(),
+          email: emailLower,
+          phone: phone.trim(),
+          primary_color: '#FF6B35',
+          secondary_color: '#1a1a2e',
+        })
+      ).error
+    }
 
     if (settingsError) {
       logger.warn('Error creating tenant_settings', { requestId, error: settingsError.message, tenantSlug })

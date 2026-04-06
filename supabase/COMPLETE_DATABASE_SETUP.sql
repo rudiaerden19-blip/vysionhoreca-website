@@ -105,6 +105,9 @@ CREATE TABLE IF NOT EXISTS tenant_settings (
   stripe_public_key TEXT,
   gift_cards_enabled BOOLEAN DEFAULT false,
   
+  -- EU-allergenen: welke id's actief zijn voor deze zaak (NULL = app-defaults na migratie)
+  allergens_config TEXT[],
+
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

@@ -203,6 +203,8 @@ export interface TenantSettings {
   image_display_mode?: 'cover' | 'contain'
   // Donker thema voor webshop
   dark_mode?: boolean
+  /** Welke EU-allergenen-id's actief zijn voor deze zaak (admin producten / kassa); null = app-defaults */
+  allergens_config?: string[] | null
 }
 
 export async function getTenantSettings(tenantSlug: string, signal?: AbortSignal): Promise<TenantSettings | null> {
@@ -239,6 +241,33 @@ export async function getTenantSettings(tenantSlug: string, signal?: AbortSignal
     fetchTenantSettings,
     CACHE_TTL.TENANT_SETTINGS
   )
+}
+
+/** Slaat EU-allergenen aan/uit per tenant op; invalidates tenant_settings cache. */
+export async function saveTenantAllergensConfig(
+  tenantSlug: string,
+  enabledIds: string[]
+): Promise<{ ok: boolean; error?: string }> {
+  const { data, error } = await supabase
+    .from('tenant_settings')
+    .update({ allergens_config: enabledIds })
+    .eq('tenant_slug', tenantSlug)
+    .select('tenant_slug')
+
+  if (error) {
+    console.error('saveTenantAllergensConfig:', error.message)
+    return { ok: false, error: error.message }
+  }
+  if (!data || data.length === 0) {
+    return {
+      ok: false,
+      error:
+        'Geen tenant_settings bijgewerkt. Voer supabase/tenant_settings_allergens_config.sql uit en controleer of deze tenant een instellingenrij heeft.',
+    }
+  }
+
+  cache.invalidate(cacheKey('tenant_settings', tenantSlug))
+  return { ok: true }
 }
 
 export async function saveTenantSettings(settings: Partial<TenantSettings> & { tenant_slug: string }): Promise<boolean> {

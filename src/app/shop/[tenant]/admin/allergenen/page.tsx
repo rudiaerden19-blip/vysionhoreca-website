@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useLanguage } from '@/i18n'
 import { supabase } from '@/lib/supabase'
+import { saveTenantAllergensConfig } from '@/lib/admin-api'
 
 const DEFAULT_ALLERGENS = [
   { id: 'gluten', icon: '🌾', enabled: true },
@@ -27,14 +28,22 @@ export default function AllergenenPage({ params }: { params: { tenant: string } 
   const [allergens, setAllergens] = useState(DEFAULT_ALLERGENS)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   useEffect(() => {
+    setLoadError(null)
     supabase
       .from('tenant_settings')
       .select('allergens_config')
       .eq('tenant_slug', params.tenant)
-      .single()
-      .then(({ data }) => {
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (error) {
+          console.error('allergenen load:', error.message)
+          setLoadError(error.message)
+          return
+        }
         if (data?.allergens_config && Array.isArray(data.allergens_config)) {
           setAllergens(
             DEFAULT_ALLERGENS.map(def => ({
@@ -51,22 +60,37 @@ export default function AllergenenPage({ params }: { params: { tenant: string } 
       a.id === id ? { ...a, enabled: !a.enabled } : a
     ))
     setSaved(false)
+    setSaveError(null)
   }
 
   const handleSave = async () => {
     setSaving(true)
+    setSaveError(null)
     const enabledIds = allergens.filter(a => a.enabled).map(a => a.id)
-    await supabase
-      .from('tenant_settings')
-      .update({ allergens_config: enabledIds })
-      .eq('tenant_slug', params.tenant)
+    const { ok, error } = await saveTenantAllergensConfig(params.tenant, enabledIds)
     setSaving(false)
+    if (!ok) {
+      setSaveError(error ?? 'Opslaan mislukt')
+      return
+    }
     setSaved(true)
     setTimeout(() => setSaved(false), 2500)
   }
 
   return (
     <div className="max-w-3xl mx-auto">
+      {(loadError || saveError) && (
+        <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+          {saveError || loadError}
+          {[/allergens_config|column.*does not exist|schema cache/i].some((re) =>
+            re.test(`${loadError || ''} ${saveError || ''}`)
+          ) ? (
+            <span className="block mt-1 text-red-700">
+              Voer in Supabase het script <code className="rounded bg-red-100 px-1">supabase/tenant_settings_allergens_config.sql</code> uit.
+            </span>
+          ) : null}
+        </div>
+      )}
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t('adminPages.allergenen.title')}</h1>
