@@ -8,15 +8,15 @@ export default function Navigation() {
   const langRef = useRef<HTMLDivElement>(null)
   const { locale, setLocale, t, locales, localeNames, localeFlags } = useLanguage()
 
-  // Close dropdown when clicking outside
+  // Sluit taalmenu bij klik/tik buiten (pointerdown: betrouwbaarder op iPad dan mousedown)
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    function handlePointerOutside(event: PointerEvent) {
       if (langRef.current && !langRef.current.contains(event.target as Node)) {
         setIsLangOpen(false)
       }
     }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    document.addEventListener('pointerdown', handlePointerOutside, true)
+    return () => document.removeEventListener('pointerdown', handlePointerOutside, true)
   }, [])
 
   const handleLanguageSelect = (langCode: Locale) => {
@@ -24,27 +24,37 @@ export default function Navigation() {
     setIsLangOpen(false)
   }
 
+  /** iPad/iOS: geen statische :hover — eerste tik moet direct navigeren. Hover alleen bij echte muis. */
+  const navLinkClass =
+    'inline-flex items-center min-h-11 rounded-lg px-3 py-2 -mx-1 text-gray-300 transition-colors cursor-pointer touch-manipulation [-webkit-tap-highlight-color:transparent] active:text-white [@media(hover:hover)]:hover:text-white'
+
+  const navLinkClassMobile =
+    'inline-flex items-center min-h-12 w-full rounded-lg px-3 py-3 text-gray-300 transition-colors cursor-pointer touch-manipulation [-webkit-tap-highlight-color:transparent] active:text-white [@media(hover:hover)]:hover:text-white'
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-dark/95 backdrop-blur-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <div className="flex items-center">
-            <a href="/" className="text-2xl font-bold">
+            <a
+              href="/"
+              className="inline-flex min-h-11 items-center rounded-lg px-2 text-2xl font-bold touch-manipulation [-webkit-tap-highlight-color:transparent]"
+            >
               <span className="text-accent">Vysion</span>
               <span className="text-gray-400 font-normal ml-1">horeca</span>
             </a>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-6 ml-12">
-            <a href="/" className="text-gray-300 hover:text-white transition-colors">{t('nav.home')}</a>
-            <a href="/videos" className="text-gray-300 hover:text-white transition-colors">{t('nav.videos')}</a>
-            <a href="/#prijzen" className="text-gray-300 hover:text-white transition-colors">{t('nav.pricing')}</a>
-            <a href="/over-ons" className="text-gray-300 hover:text-white transition-colors">{t('nav.about')}</a>
-            <a href="/abonnementen" className="text-gray-300 hover:text-white transition-colors">{t('nav.subscriptions')}</a>
-            <a href="/support" className="text-gray-300 hover:text-white transition-colors">{t('nav.support')}</a>
-            <a href="/resellers" className="text-gray-300 hover:text-white transition-colors">{t('nav.resellers')}</a>
+          <div className="hidden md:flex items-center gap-1 ml-12">
+            <a href="/" className={navLinkClass}>{t('nav.home')}</a>
+            <a href="/videos" className={navLinkClass}>{t('nav.videos')}</a>
+            <a href="/#prijzen" className={navLinkClass}>{t('nav.pricing')}</a>
+            <a href="/over-ons" className={navLinkClass}>{t('nav.about')}</a>
+            <a href="/abonnementen" className={navLinkClass}>{t('nav.subscriptions')}</a>
+            <a href="/support" className={navLinkClass}>{t('nav.support')}</a>
+            <a href="/resellers" className={navLinkClass}>{t('nav.resellers')}</a>
           </div>
 
           {/* CTA Buttons */}
@@ -52,8 +62,9 @@ export default function Navigation() {
             {/* Language Selector */}
             <div className="relative" ref={langRef}>
               <button
+                type="button"
                 onClick={() => setIsLangOpen(!isLangOpen)}
-                className="flex items-center gap-2 text-white hover:text-accent transition-colors px-3 py-2 rounded-lg hover:bg-white/10"
+                className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg px-3 text-white transition-colors touch-manipulation [-webkit-tap-highlight-color:transparent] active:bg-white/15 active:text-accent [@media(hover:hover)]:hover:bg-white/10 [@media(hover:hover)]:hover:text-accent"
               >
                 <span className="text-xl">{localeFlags[locale]}</span>
                 <svg 
@@ -71,9 +82,10 @@ export default function Navigation() {
                 <div className="absolute right-0 mt-2 w-48 bg-dark rounded-xl shadow-home-image border border-gray-700 py-2 z-50">
                   {locales.map((langCode) => (
                     <button
+                      type="button"
                       key={langCode}
                       onClick={() => handleLanguageSelect(langCode)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors ${
+                      className={`w-full flex items-center gap-3 px-4 py-3 touch-manipulation transition-colors active:bg-white/10 [@media(hover:hover)]:hover:bg-white/10 ${
                         locale === langCode ? 'text-accent' : 'text-white'
                       }`}
                     >
@@ -90,12 +102,18 @@ export default function Navigation() {
               )}
             </div>
 
-            <a href="/login" className="text-white hover:text-accent transition-colors">{t('nav.login')}</a>
+            <a
+              href="/login"
+              className="inline-flex min-h-11 items-center rounded-lg px-3 py-2 text-white transition-colors touch-manipulation [-webkit-tap-highlight-color:transparent] active:text-accent [@media(hover:hover)]:hover:text-accent"
+            >
+              {t('nav.login')}
+            </a>
           </div>
 
           {/* Mobile menu button */}
-          <button 
-            className="md:hidden text-white p-2"
+          <button
+            type="button"
+            className="md:hidden flex h-11 w-11 shrink-0 items-center justify-center text-white touch-manipulation [-webkit-tap-highlight-color:transparent]"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label={t('ui.ariaToggleMenu')}
           >
@@ -112,14 +130,14 @@ export default function Navigation() {
         {/* Mobile menu */}
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-700">
-            <div className="flex flex-col space-y-4">
-              <a href="/" className="text-gray-300 hover:text-white transition-colors">{t('nav.home')}</a>
-              <a href="/videos" className="text-gray-300 hover:text-white transition-colors">{t('nav.videos')}</a>
-              <a href="/#prijzen" className="text-gray-300 hover:text-white transition-colors">{t('nav.pricing')}</a>
-              <a href="/over-ons" className="text-gray-300 hover:text-white transition-colors">{t('nav.about')}</a>
-              <a href="/abonnementen" className="text-gray-300 hover:text-white transition-colors">{t('nav.subscriptions')}</a>
-              <a href="/support" className="text-gray-300 hover:text-white transition-colors">{t('nav.support')}</a>
-              <a href="/resellers" className="text-gray-300 hover:text-white transition-colors">{t('nav.resellers')}</a>
+            <div className="flex flex-col gap-1">
+              <a href="/" className={navLinkClassMobile}>{t('nav.home')}</a>
+              <a href="/videos" className={navLinkClassMobile}>{t('nav.videos')}</a>
+              <a href="/#prijzen" className={navLinkClassMobile}>{t('nav.pricing')}</a>
+              <a href="/over-ons" className={navLinkClassMobile}>{t('nav.about')}</a>
+              <a href="/abonnementen" className={navLinkClassMobile}>{t('nav.subscriptions')}</a>
+              <a href="/support" className={navLinkClassMobile}>{t('nav.support')}</a>
+              <a href="/resellers" className={navLinkClassMobile}>{t('nav.resellers')}</a>
 
               {/* Mobile Language Selector */}
               <div className="border-t border-gray-700 pt-4">
@@ -127,12 +145,13 @@ export default function Navigation() {
                 <div className="grid grid-cols-3 gap-2">
                   {locales.map((langCode) => (
                     <button
+                      type="button"
                       key={langCode}
                       onClick={() => handleLanguageSelect(langCode)}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+                      className={`flex min-h-11 items-center justify-center gap-2 rounded-lg px-3 py-2 touch-manipulation transition-colors active:opacity-90 ${ 
                         locale === langCode 
                           ? 'bg-accent text-white shadow-home-btn' 
-                          : 'bg-white/10 text-gray-300 hover:bg-white/20 shadow-home-float'
+                          : 'bg-white/10 text-gray-300 shadow-home-float [@media(hover:hover)]:hover:bg-white/20'
                       }`}
                     >
                       <span>{localeFlags[langCode]}</span>
@@ -142,7 +161,7 @@ export default function Navigation() {
                 </div>
               </div>
 
-              <a href="/login" className="text-gray-300 hover:text-white transition-colors">{t('nav.login')}</a>
+              <a href="/login" className={navLinkClassMobile}>{t('nav.login')}</a>
             </div>
           </div>
         )}
