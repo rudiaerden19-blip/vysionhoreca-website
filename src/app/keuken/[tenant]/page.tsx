@@ -287,12 +287,12 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   }
 
   async function handleAllReady() {
-    await Promise.all(orders.map(o => updateOrderStatus(o.id, 'ready')))
+    await Promise.all(orders.map(o => updateOrderStatus(params.tenant, o.id, 'ready')))
     setOrders([])
   }
 
   async function handleReady(order: Order) {
-    await updateOrderStatus(order.id, 'ready')
+    await updateOrderStatus(params.tenant, order.id, 'ready')
     
     // Send WhatsApp notification that order is ready
     console.log('🔔 handleReady called, customer_phone:', order.customer_phone)

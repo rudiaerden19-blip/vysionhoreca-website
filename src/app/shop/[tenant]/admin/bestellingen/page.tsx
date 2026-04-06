@@ -3,7 +3,7 @@
 import { useLanguage } from '@/i18n'
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { getOrders, updateOrderStatus, confirmOrder, approveWebshopOrder, completeWebshopOrder, rejectOrder, Order, getTenantSettings, TenantSettings, addLoyaltyPoints, isWebshopOrder } from '@/lib/admin-api'
+import { getOrders, updateOrderStatus, confirmOrder, approveWebshopOrder, completeWebshopOrder, Order, getTenantSettings, TenantSettings, addLoyaltyPoints, isWebshopOrder } from '@/lib/admin-api'
 import { formatOrderScheduleDetail } from '@/lib/format-order-schedule'
 import { supabase } from '@/lib/supabase'
 import { getSoundsEnabled } from '@/lib/sounds'
@@ -238,7 +238,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
 
   const handleUpdateStatus = async (orderId: string, newStatus: string) => {
     setUpdatingId(orderId)
-    const success = await updateOrderStatus(orderId, newStatus)
+    const success = await updateOrderStatus(params.tenant, orderId, newStatus)
     if (success) {
       const order = orders.find(o => o.id === orderId)
       setOrders(prev => prev.map(o => 
@@ -293,7 +293,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     if (!order.id) return
     setUpdatingId(order.id)
     if (isWebshopOrder(order)) {
-      const success = await completeWebshopOrder(order.id)
+      const success = await completeWebshopOrder(params.tenant, order.id)
       if (success) {
         const now = new Date().toISOString()
         setOrders(prev => prev.map(o =>
@@ -312,7 +312,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         ))
       }
     } else {
-      const success = await updateOrderStatus(order.id, 'completed')
+      const success = await updateOrderStatus(params.tenant, order.id, 'completed')
       if (success) {
         setOrders(prev => prev.map(o =>
           o.id === order.id ? { ...o, status: 'completed', completed_at: new Date().toISOString() } : o
@@ -332,8 +332,8 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
       (window as any).stopOrderAlarm()
     }
     const success = web
-      ? await approveWebshopOrder(order.id)
-      : await confirmOrder(order.id)
+      ? await approveWebshopOrder(params.tenant, order.id)
+      : await confirmOrder(params.tenant, order.id)
     if (success) {
       const now = new Date().toISOString()
       setOrders(prev => prev.map(o =>

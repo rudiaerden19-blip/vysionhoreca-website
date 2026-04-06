@@ -137,6 +137,7 @@ export async function POST(request: NextRequest) {
         rejected_at: new Date().toISOString(),
       })
       .eq('id', orderId)
+      .eq('tenant_slug', order.tenant_slug as string)
 
     if (updateError) {
       console.error('❌ Failed to update order:', updateError)

@@ -445,10 +445,10 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   async function handleApprove(order: Order) {
     const web = isWebshopOrder(order)
     if (web) {
-      const ok = await approveWebshopOrder(order.id)
+      const ok = await approveWebshopOrder(params.tenant, order.id)
       if (!ok) return
     } else {
-      await updateOrderStatus(order.id, 'confirmed')
+      await updateOrderStatus(params.tenant, order.id, 'confirmed')
     }
     await sendOrderStatusEmail(order, 'confirmed')
     setNewOrderIds(prev => {
@@ -462,7 +462,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   }
 
   async function handleReject(order: Order) {
-    await updateOrderStatus(order.id, 'rejected', rejectReason, rejectNotes)
+    await updateOrderStatus(params.tenant, order.id, 'rejected', rejectReason, rejectNotes)
     await sendOrderStatusEmail(order, 'rejected', rejectReason, rejectNotes)
     setNewOrderIds(prev => {
       const next = new Set(prev)
@@ -479,9 +479,9 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
   async function handleComplete(order: Order) {
     if (isWebshopOrder(order)) {
-      await completeWebshopOrder(order.id)
+      await completeWebshopOrder(params.tenant, order.id)
     } else {
-      await updateOrderStatus(order.id, 'completed')
+      await updateOrderStatus(params.tenant, order.id, 'completed')
     }
     setSelectedOrder(null)
     loadData()
@@ -490,14 +490,16 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   async function handleCompleteAll() {
     await Promise.all(
       activeOrders.map(async (o) =>
-        isWebshopOrder(o) ? completeWebshopOrder(o.id) : updateOrderStatus(o.id, 'completed')
+        isWebshopOrder(o)
+          ? completeWebshopOrder(params.tenant, o.id)
+          : updateOrderStatus(params.tenant, o.id, 'completed')
       )
     )
     loadData()
   }
 
   async function handleReady(order: Order) {
-    await updateOrderStatus(order.id, 'ready')
+    await updateOrderStatus(params.tenant, order.id, 'ready')
     setSelectedOrder(null)
   }
 
