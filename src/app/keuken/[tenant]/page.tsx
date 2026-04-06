@@ -451,7 +451,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   if (loading) {
     return (
       <div
-        className="min-h-[100dvh] bg-gray-900 flex items-center justify-center"
+        className="min-h-[100dvh] bg-[#e3e3e3] flex items-center justify-center"
         style={{
           paddingTop: 'env(safe-area-inset-top, 0px)',
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
@@ -469,14 +469,14 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
 
   return (
     <div
-      className="flex min-h-0 h-[100dvh] max-h-[100dvh] max-w-[100vw] flex-col overflow-hidden bg-gray-900 text-white"
+      className="flex min-h-0 h-[100dvh] max-h-[100dvh] max-w-[100vw] flex-col overflow-hidden bg-[#e3e3e3] text-gray-900"
       style={{
         paddingTop: 'env(safe-area-inset-top, 0px)',
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
       }}
     >
       {/* Header */}
-      <header className="shrink-0 bg-blue-600 px-4 py-3">
+      <header className="shrink-0 bg-blue-600 px-4 py-3 text-white">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-2 sm:gap-3">
             <Link
@@ -581,7 +581,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                className={`bg-gray-800 rounded-2xl overflow-hidden cursor-pointer transition-all ${
+                className={`bg-gray-800 text-white rounded-2xl overflow-hidden cursor-pointer transition-all ${
                   newOrderIds.has(order.id)
                     ? 'ring-4 ring-blue-500 shadow-[0_0_40px_rgba(59,130,246,0.6)]'
                     : 'hover:ring-2 hover:ring-gray-600'

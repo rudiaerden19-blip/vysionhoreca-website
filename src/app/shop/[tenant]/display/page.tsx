@@ -841,7 +841,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   if (loading) {
     return (
       <div
-        className="min-h-[100dvh] bg-gray-900 flex items-center justify-center"
+        className="min-h-[100dvh] bg-[#e3e3e3] flex items-center justify-center"
         style={{
           paddingTop: 'env(safe-area-inset-top, 0px)',
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
@@ -859,7 +859,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
   return (
     <div
-      className="flex min-h-0 h-[100dvh] max-h-[100dvh] max-w-[100vw] flex-col overflow-hidden bg-gray-900 text-white"
+      className="flex min-h-0 h-[100dvh] max-h-[100dvh] max-w-[100vw] flex-col overflow-hidden bg-[#e3e3e3] text-gray-900"
       style={{
         width: '100%',
         paddingTop: 'env(safe-area-inset-top, 0px)',
@@ -917,7 +917,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
       </AnimatePresence>
 
       {/* Header */}
-      <header className="shrink-0 bg-gray-800 border-b border-gray-700 px-4 py-3">
+      <header className="shrink-0 bg-gray-800 border-b border-gray-700 px-4 py-3 text-white">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-2 sm:gap-3">
             <Link
@@ -947,8 +947,8 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
               🖥️
             </div>
             <div className="min-w-0">
-              <h1 className="truncate text-lg font-bold sm:text-xl">{tx('title')}</h1>
-              <p className="truncate text-gray-400 text-xs sm:text-sm">{business?.business_name}</p>
+              <h1 className="truncate text-lg font-bold sm:text-xl text-white">{tx('title')}</h1>
+              <p className="truncate text-gray-300 text-xs sm:text-sm">{business?.business_name}</p>
             </div>
           </div>
 
@@ -1009,7 +1009,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             {/* Reserveringen knop */}
             <button
               onClick={() => setShowReservationsModal(true)}
-              className="px-3 py-2 bg-orange-600 hover:bg-orange-500 rounded-xl text-sm font-bold relative"
+              className="px-3 py-2 bg-orange-600 hover:bg-orange-500 rounded-xl text-sm font-bold text-white relative"
             >
               📅 Reserveringen
               {reservations.length > 0 && (
@@ -1030,13 +1030,13 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
       </header>
 
       {/* Tabs */}
-      <div className="shrink-0 bg-gray-800/50 px-4 py-2 flex gap-2 items-center">
+      <div className="shrink-0 border-b border-gray-300 bg-[#d8d8d8] px-4 py-2 flex gap-2 items-center">
         <button
           onClick={() => setActiveTab('active')}
           className={`px-4 py-2 rounded-lg font-bold transition-colors ${
             activeTab === 'active' 
               ? 'bg-orange-500 text-white' 
-              : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+              : 'bg-white/90 text-gray-700 shadow-sm hover:bg-white'
           }`}
         >
           {tx('active')} ({activeOrders.length})
@@ -1046,7 +1046,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
           className={`px-4 py-2 rounded-lg font-bold transition-colors ${
             activeTab === 'completed' 
               ? 'bg-gray-500 text-white' 
-              : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+              : 'bg-white/90 text-gray-700 shadow-sm hover:bg-white'
           }`}
         >
           {tx('completed')} ({completedOrders.length})
@@ -1099,7 +1099,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                   </div>
 
                   {/* Order Content */}
-                  <div className="p-3 bg-gray-800">
+                  <div className="p-3 bg-gray-800 text-white">
                     {(order.scheduled_date || order.scheduled_time) && (
                       <div className="mb-2 px-2 py-1 bg-yellow-500 text-black rounded font-bold text-sm text-center">
                         📅 {order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit' }) : ''}{order.scheduled_time ? ` om ${order.scheduled_time}` : ''}
@@ -1147,7 +1147,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             {completedOrders.slice(0, 50).map((order) => (
               <div
                 key={order.id}
-                className="bg-gray-800/50 rounded-xl p-3 cursor-pointer hover:bg-gray-700/50 transition-colors"
+                className="bg-gray-800/50 text-white rounded-xl p-3 cursor-pointer hover:bg-gray-700/50 transition-colors"
                 onClick={() => setSelectedOrder(order)}
               >
                 <div className="flex items-center justify-between mb-2">
