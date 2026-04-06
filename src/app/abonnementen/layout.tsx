@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: 'Abonnementen | Vysion Horeca',
-    description: 'Transparante abonnementen voor uw horeca — Starter of Pro, maandelijks of jaarlijks.',
+    description: 'Transparante abonnementen voor uw horeca — Pro of Premium, maandelijks of jaarlijks.',
     url: '/abonnementen',
     images: [{ url: '/images/kassa-platform-1.png' }],
   },
