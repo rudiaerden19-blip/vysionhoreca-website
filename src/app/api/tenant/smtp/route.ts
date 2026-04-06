@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     .from('tenant_settings')
     .select('smtp_host, smtp_port, smtp_user, smtp_password, smtp_from_name')
     .eq('tenant_slug', tenantSlug)
-    .single()
+    .maybeSingle()
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
@@ -59,25 +59,32 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Server fout' }, { status: 500 })
   }
 
-  const updateData: Record<string, unknown> = {
-    smtp_host,
+  // Upsert: bij nieuwe tenants bestaat er nog geen tenant_settings-rij; pure .update()
+  // wijzigde 0 rijen zonder fout — dan leek opslaan te werken maar bleef alles leeg.
+  const row: Record<string, unknown> = {
+    tenant_slug: tenantSlug,
+    smtp_host: smtp_host ?? null,
     smtp_port: smtp_port || 465,
-    smtp_user,
-    smtp_from_name,
+    smtp_user: smtp_user ?? null,
+    smtp_from_name: smtp_from_name ?? null,
+  }
+  if (smtp_password && String(smtp_password).trim() !== '') {
+    row.smtp_password = smtp_password
   }
 
-  // Wachtwoord alleen updaten als er een nieuw wachtwoord meegegeven wordt
-  if (smtp_password && smtp_password.trim() !== '') {
-    updateData.smtp_password = smtp_password
-  }
-
-  const { error } = await supabase
+  const { error, data } = await supabase
     .from('tenant_settings')
-    .update(updateData)
-    .eq('tenant_slug', tenantSlug)
+    .upsert(row, { onConflict: 'tenant_slug' })
+    .select('tenant_slug')
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+  if (!data?.length) {
+    return NextResponse.json(
+      { error: 'Kon SMTP-instellingen niet opslaan (geen rij terug)' },
+      { status: 500 }
+    )
   }
 
   return NextResponse.json({ success: true })
