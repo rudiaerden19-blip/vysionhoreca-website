@@ -5,6 +5,7 @@ import { useLanguage } from '@/i18n'
 import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
+import { orderCountsTowardRevenueAndZReport } from '@/lib/admin-api'
 
 interface OrderItem {
   name?: string
@@ -90,25 +91,28 @@ export default function PopulairPage({ params }: { params: { tenant: string } })
 
     try {
       // Fetch current period orders
-      const { data: currentOrders } = await supabase
+      const { data: currentRaw } = await supabase
         .from('orders')
-        .select('items, created_at')
+        .select('items, created_at, status, order_type, payment_status')
         .eq('tenant_slug', params.tenant)
         .gte('created_at', startDate.toISOString())
         .not('status', 'in', '("cancelled","rejected")')
 
       // Fetch previous period orders for trend calculation
-      const { data: previousOrders } = await supabase
+      const { data: previousRaw } = await supabase
         .from('orders')
-        .select('items, created_at')
+        .select('items, created_at, status, order_type, payment_status')
         .eq('tenant_slug', params.tenant)
         .gte('created_at', previousStartDate.toISOString())
         .lt('created_at', previousEndDate.toISOString())
         .not('status', 'in', '("cancelled","rejected")')
 
+      const currentOrders = (currentRaw || []).filter((o) => orderCountsTowardRevenueAndZReport(o))
+      const previousOrders = (previousRaw || []).filter((o) => orderCountsTowardRevenueAndZReport(o))
+
       // Process current period
-      const currentStats = processOrders(currentOrders || [])
-      const previousStats = processOrders(previousOrders || [])
+      const currentStats = processOrders(currentOrders)
+      const previousStats = processOrders(previousOrders)
 
       // Calculate trends and create product list
       const popularProducts: PopularProduct[] = Object.entries(currentStats)

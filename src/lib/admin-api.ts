@@ -1722,6 +1722,22 @@ export function isWebshopOrder(order: Pick<Order, 'order_type'>): boolean {
   return !isKassaPosOrder(order)
 }
 
+/**
+ * Dashboard, Z-rapport, rapporten, analyse: online omzet vanaf zaak bevestigt (confirmed+).
+ * Kassa-POS: alleen daadwerkelijk betaalde orders (completed flow).
+ * Geannuleerd/afgewezen: nooit.
+ */
+export function orderCountsTowardRevenueAndZReport(
+  order: Pick<Order, 'order_type' | 'status' | 'payment_status'>
+): boolean {
+  const st = (order.status || '').toString().toLowerCase()
+  if (['cancelled', 'rejected'].includes(st)) return false
+  if (isWebshopOrder(order)) {
+    return ['confirmed', 'preparing', 'ready', 'completed', 'delivered'].includes(st)
+  }
+  return (order.payment_status || '').toString().toLowerCase() === 'paid'
+}
+
 export async function getOrders(tenantSlug: string, status?: string, dateFrom?: string, dateTo?: string): Promise<Order[]> {
   let query = supabase
     .from('orders')
@@ -1751,11 +1767,12 @@ export async function getOrders(tenantSlug: string, status?: string, dateFrom?: 
   return data || []
 }
 
-export async function getOrderWithItems(orderId: string): Promise<Order | null> {
+export async function getOrderWithItems(tenantSlug: string, orderId: string): Promise<Order | null> {
   const { data: order, error } = await supabase
     .from('orders')
     .select('*')
     .eq('id', orderId)
+    .eq('tenant_slug', tenantSlug)
     .single()
   
   if (error || !order) {
@@ -1772,9 +1789,10 @@ export async function getOrderWithItems(orderId: string): Promise<Order | null> 
 }
 
 export async function updateOrderStatus(
-  id: string, 
-  status: Order['status'], 
-  rejectionReason?: string, 
+  tenantSlug: string,
+  id: string,
+  status: Order['status'],
+  rejectionReason?: string,
   rejectionNotes?: string
 ): Promise<boolean> {
   if (!supabase) {
@@ -1792,12 +1810,14 @@ export async function updateOrderStatus(
     updateData.rejection_notes = rejectionNotes
   }
   
-  console.log('Updating order status:', id, status)
+  console.log('Updating order status:', tenantSlug, id, status)
   
-  const { error } = await supabase
+  const { data: updated, error } = await supabase
     .from('orders')
     .update(updateData)
     .eq('id', id)
+    .eq('tenant_slug', tenantSlug)
+    .select('created_at')
   
   if (error) {
     console.error('Error updating order status:', JSON.stringify(error, null, 2))
@@ -1806,21 +1826,15 @@ export async function updateOrderStatus(
     console.error('Error details:', error.details)
     return false
   }
+  if (!updated?.length) {
+    console.warn('updateOrderStatus: geen rij bijgewerkt (verkeerde tenant of id?)')
+    return false
+  }
   console.log('Order status updated successfully')
   
   // AUTOMATISCH: Update Z-rapport wanneer order completed wordt
   if (status === 'completed') {
-    // Haal de order op om tenant_slug te krijgen
-    const { data: order } = await supabase
-      .from('orders')
-      .select('tenant_slug, created_at')
-      .eq('id', id)
-      .single()
-    
-    if (order) {
-      // Roep de automatische Z-rapport update aan
-      await autoUpdateZReport(order.tenant_slug, new Date(order.created_at).toISOString().split('T')[0])
-    }
+    await autoUpdateZReport(tenantSlug, new Date(updated[0].created_at).toISOString().split('T')[0])
   }
   
   return true
@@ -1865,22 +1879,23 @@ async function autoUpdateZReport(tenantSlug: string, date: string): Promise<void
     const { startUTC, endUTC } = getZRapportDateBounds(date)
     console.log(`autoUpdateZReport: Query van ${startUTC} tot ${endUTC}`)
     
-    // Haal alle betaalde orders op voor deze dag (betaald = kassa + geaccepteerde online)
-    const { data: orders, error: ordersError } = await supabase
+    // Webshop: vanaf bevestigd; kassa: betaald (zelfde regel als Z-rapportpagina)
+    const { data: ordersRaw, error: ordersError } = await supabase
       .from('orders')
-      .select('id, total, payment_method')
+      .select('id, total, payment_method, order_type, status, payment_status')
       .eq('tenant_slug', tenantSlug)
       .gte('created_at', startUTC)
       .lte('created_at', endUTC)
-      .eq('payment_status', 'paid')
       .not('status', 'in', '("cancelled","rejected","CANCELLED","REJECTED")')
-    
+
     if (ordersError) {
       console.error('autoUpdateZReport: Fout bij ophalen orders:', ordersError)
       return
     }
-    
-    console.log(`autoUpdateZReport: ${orders?.length || 0} betaalde orders gevonden`)
+
+    const orders = (ordersRaw || []).filter((o) => orderCountsTowardRevenueAndZReport(o))
+
+    console.log(`autoUpdateZReport: ${orders?.length || 0} orders voor rapport`)
     
     if (!orders || orders.length === 0) {
       console.log('autoUpdateZReport: Geen betaalde orders, skip update')
@@ -2012,31 +2027,29 @@ async function autoUpdateZReport(tenantSlug: string, date: string): Promise<void
 }
 
 // Confirm order (goedkeuren)
-export async function confirmOrder(id: string): Promise<boolean> {
+export async function confirmOrder(tenantSlug: string, id: string): Promise<boolean> {
   if (!supabase) return false
   
-  const { error } = await supabase
+  const { data: updated, error } = await supabase
     .from('orders')
     .update({
       status: 'confirmed',
       confirmed_at: new Date().toISOString()
     })
     .eq('id', id)
+    .eq('tenant_slug', tenantSlug)
+    .select('created_at')
   
   if (error) {
     console.error('Error confirming order:', error)
     return false
   }
-
-  // Update z-rapport automatisch bij acceptatie
-  const { data: order } = await supabase
-    .from('orders')
-    .select('tenant_slug, created_at')
-    .eq('id', id)
-    .single()
-  if (order) {
-    await autoUpdateZReport(order.tenant_slug, new Date(order.created_at).toISOString().split('T')[0])
+  if (!updated?.length) {
+    console.warn('confirmOrder: geen rij bijgewerkt')
+    return false
   }
+
+  await autoUpdateZReport(tenantSlug, new Date(updated[0].created_at).toISOString().split('T')[0])
 
   return true
 }
@@ -2046,13 +2059,14 @@ export async function confirmOrder(id: string): Promise<boolean> {
  * Alleen Stripe-webhook (`checkout.session.completed`) zet `paid` voor online betalingen;
  * cash blijft `pending` tot afronden (zie completeWebshopOrder).
  */
-export async function approveWebshopOrder(id: string): Promise<boolean> {
+export async function approveWebshopOrder(tenantSlug: string, id: string): Promise<boolean> {
   if (!supabase) return false
 
   const { data: order, error: fetchError } = await supabase
     .from('orders')
     .select('tenant_slug, created_at, payment_status, order_type, status')
     .eq('id', id)
+    .eq('tenant_slug', tenantSlug)
     .single()
 
   if (fetchError || !order) {
@@ -2075,14 +2089,23 @@ export async function approveWebshopOrder(id: string): Promise<boolean> {
     confirmed_at: new Date().toISOString(),
   }
 
-  const { error } = await supabase.from('orders').update(updates).eq('id', id)
+  const { data: updated, error } = await supabase
+    .from('orders')
+    .update(updates)
+    .eq('id', id)
+    .eq('tenant_slug', tenantSlug)
+    .select('id')
 
   if (error) {
     console.error('approveWebshopOrder:', error)
     return false
   }
+  if (!updated?.length) {
+    console.warn('approveWebshopOrder: geen rij bijgewerkt')
+    return false
+  }
 
-  await autoUpdateZReport(order.tenant_slug, new Date(order.created_at).toISOString().split('T')[0])
+  await autoUpdateZReport(tenantSlug, new Date(order.created_at).toISOString().split('T')[0])
   return true
 }
 
@@ -2091,13 +2114,14 @@ export async function approveWebshopOrder(id: string): Promise<boolean> {
  * `paid` voor online betaalmethode alleen als webhook dat al zette; nooit pending→paid voor online.
  * Cash bij afhaal: bij afronden nog pending → markeer paid (ontvangen bij afhalen).
  */
-export async function completeWebshopOrder(id: string): Promise<boolean> {
+export async function completeWebshopOrder(tenantSlug: string, id: string): Promise<boolean> {
   if (!supabase) return false
 
   const { data: order, error: fetchError } = await supabase
     .from('orders')
     .select('tenant_slug, created_at, payment_status, order_type, status, payment_method')
     .eq('id', id)
+    .eq('tenant_slug', tenantSlug)
     .single()
 
   if (fetchError || !order) {
@@ -2126,26 +2150,36 @@ export async function completeWebshopOrder(id: string): Promise<boolean> {
     updates.payment_status = 'paid'
   }
 
-  const { error } = await supabase.from('orders').update(updates).eq('id', id)
+  const { data: updated, error } = await supabase
+    .from('orders')
+    .update(updates)
+    .eq('id', id)
+    .eq('tenant_slug', tenantSlug)
+    .select('id')
 
   if (error) {
     console.error('completeWebshopOrder:', error)
     return false
   }
+  if (!updated?.length) {
+    console.warn('completeWebshopOrder: geen rij bijgewerkt')
+    return false
+  }
 
-  await autoUpdateZReport(order.tenant_slug, new Date(order.created_at).toISOString().split('T')[0])
+  await autoUpdateZReport(tenantSlug, new Date(order.created_at).toISOString().split('T')[0])
   return true
 }
 
 // Reject order (weigeren)
 export async function rejectOrder(
-  id: string, 
-  reason: string, 
+  tenantSlug: string,
+  id: string,
+  reason: string,
   notes?: string
 ): Promise<boolean> {
   if (!supabase) return false
   
-  const { error } = await supabase
+  const { data: updated, error } = await supabase
     .from('orders')
     .update({ 
       status: 'rejected',
@@ -2154,9 +2188,15 @@ export async function rejectOrder(
       rejected_at: new Date().toISOString()
     })
     .eq('id', id)
+    .eq('tenant_slug', tenantSlug)
+    .select('id')
   
   if (error) {
     console.error('Error rejecting order:', error)
+    return false
+  }
+  if (!updated?.length) {
+    console.warn('rejectOrder: geen rij bijgewerkt')
     return false
   }
   return true
@@ -2191,18 +2231,20 @@ export async function getSalesStats(tenantSlug: string, period: 'today' | 'week'
       break
   }
   
-  const { data, error } = await supabase
+  const { data: raw, error } = await supabase
     .from('orders')
-    .select('total, status')
+    .select('total, status, order_type, payment_status')
     .eq('tenant_slug', tenantSlug)
     .gte('created_at', startDate.toISOString())
     .not('status', 'eq', 'cancelled')
-  
-  if (error || !data) {
+
+  if (error || !raw) {
     console.error('Error fetching sales stats:', error)
     return { total_orders: 0, total_revenue: 0, average_order: 0, orders_by_status: {} }
   }
-  
+
+  const data = raw.filter((o) => orderCountsTowardRevenueAndZReport(o))
+
   const total_orders = data.length
   const total_revenue = data.reduce((sum, o) => sum + (o.total || 0), 0)
   const average_order = total_orders > 0 ? total_revenue / total_orders : 0
@@ -2219,28 +2261,30 @@ export async function getDailyRevenue(tenantSlug: string, days: number = 7): Pro
   const startDate = new Date()
   startDate.setDate(startDate.getDate() - days)
   
-  const { data, error } = await supabase
+  const { data: raw, error } = await supabase
     .from('orders')
-    .select('total, created_at')
+    .select('total, created_at, status, order_type, payment_status')
     .eq('tenant_slug', tenantSlug)
     .gte('created_at', startDate.toISOString())
     .not('status', 'eq', 'cancelled')
-  
-  if (error || !data) {
+
+  if (error || !raw) {
     console.error('Error fetching daily revenue:', error)
     return []
   }
-  
+
+  const data = raw.filter((o) => orderCountsTowardRevenueAndZReport(o))
+
   // Group by date
   const dailyData: Record<string, { revenue: number; orders: number }> = {}
-  
+
   for (let i = 0; i < days; i++) {
     const date = new Date()
     date.setDate(date.getDate() - i)
     const dateKey = date.toISOString().split('T')[0]
     dailyData[dateKey] = { revenue: 0, orders: 0 }
   }
-  
+
   data.forEach(order => {
     const dateKey = order.created_at.split('T')[0]
     if (dailyData[dateKey]) {
@@ -3048,17 +3092,19 @@ export async function calculateMonthlyReport(
   const { startUTC } = getDateBoundsForBelgium(startDateStr)
   const { endUTC } = getDateBoundsForBelgium(endDateStr)
   
-  // 1. Get online shop revenue from orders
-  const { data: ordersData } = await supabase
+  // 1. Omzet uit orders-tabel (webshop vanaf bevestigd; POS alleen betaald)
+  const { data: ordersDataRaw } = await supabase
     .from('orders')
-    .select('total, status, payment_method')
+    .select('total, status, payment_method, order_type')
     .eq('tenant_slug', tenantSlug)
     .gte('created_at', startUTC)
     .lte('created_at', endUTC)
     .not('status', 'in', '("cancelled","rejected")')
-  
-  const onlineRevenue = ordersData?.reduce((sum, o) => sum + (o.total || 0), 0) || 0
-  const onlineOrders = ordersData?.length || 0
+
+  const ordersData = (ordersDataRaw || []).filter((o) => orderCountsTowardRevenueAndZReport(o))
+
+  const onlineRevenue = ordersData.reduce((sum, o) => sum + (o.total || 0), 0)
+  const onlineOrders = ordersData.length
   
   // 2. Get manual kassa revenue
   const dailySales = await getDailySales(tenantSlug, year, month)

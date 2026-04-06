@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
-import { getTenantSettings } from '@/lib/admin-api'
+import { getTenantSettings, orderCountsTowardRevenueAndZReport } from '@/lib/admin-api'
 import PinGate from '@/components/PinGate'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -156,15 +156,8 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
 
   useEffect(() => { loadData() }, [loadData])
 
-  // ── Order classification ──
-  // Kassa: status=completed (altijd betaald op de kassa)
-  // Online: payment_status=paid OR status in completed/delivered
-  // Uitgesloten: geannuleerd/afgewezen
-  const isValidOrder = (o: Order) =>
-    !['cancelled','rejected'].includes(o.status) && (
-      o.payment_status === 'paid' ||
-      ['completed','delivered'].includes(o.status)
-    )
+  // ── Order classification ── (gelijk aan admin-dashboard en Z-rapport)
+  const isValidOrder = (o: Order) => orderCountsTowardRevenueAndZReport(o)
   const isKassaOrder = (o: Order) => KASSA_TYPES.includes(o.order_type)
   const isOnlineOrder = (o: Order) => !KASSA_TYPES.includes(o.order_type)
 

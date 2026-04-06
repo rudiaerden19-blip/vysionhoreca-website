@@ -3,7 +3,12 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
-import { getTenantSettings, getZRapportDateBounds, getBelgiumDateString } from '@/lib/admin-api'
+import {
+  getTenantSettings,
+  getZRapportDateBounds,
+  getBelgiumDateString,
+  orderCountsTowardRevenueAndZReport,
+} from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
 
@@ -114,17 +119,19 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     // KRITIEK: Fiscale daggrens = 00:00 tot 12:00 de VOLGENDE dag (GKS compliant)
     const { startUTC, endUTC } = getZRapportDateBounds(selectedDate)
 
-    const { data: orders } = await supabase
+    const { data: ordersRaw } = await supabase
       .from('orders')
       .select('*')
       .eq('tenant_slug', params.tenant)
       .gte('created_at', startUTC)
       .lte('created_at', endUTC)
-      // Betaalde orders: kassa (completed+paid) + geaccepteerde online (confirmed+paid)
-      .eq('payment_status', 'paid')
       .not('status', 'in', '("cancelled","rejected","CANCELLED","REJECTED")')
 
-    if (orders) {
+    const orders = (ordersRaw || []).filter((o) =>
+      orderCountsTowardRevenueAndZReport(o)
+    )
+
+    if (orders.length) {
       let total = 0
       let cashPayments = 0
       let onlinePayments = 0
@@ -161,6 +168,20 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         onlinePayments,
         cardPayments,
         orderIds,
+      })
+    } else {
+      setStats({
+        date: selectedDate,
+        orderCount: 0,
+        subtotal: 0,
+        taxLow: 0,
+        taxMid: 0,
+        taxHigh: 0,
+        total: 0,
+        cashPayments: 0,
+        onlinePayments: 0,
+        cardPayments: 0,
+        orderIds: [],
       })
     }
 

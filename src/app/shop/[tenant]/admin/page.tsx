@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
-import { getTenantSettings } from '@/lib/admin-api'
+import { getTenantSettings, orderCountsTowardRevenueAndZReport } from '@/lib/admin-api'
 import PinGate from '@/components/PinGate'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
 import { isSuperAdminLoggedIn } from '@/lib/auth-headers'
@@ -118,11 +118,8 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
 
     const allOrdersList = allOrders || []
 
-    // Alleen betaalde orders voor omzetcijfers (geaccepteerd of kassaverkoop)
-    const paidOrders = allOrdersList.filter(o =>
-      o.payment_status === 'paid' &&
-      !['cancelled', 'rejected', 'CANCELLED', 'REJECTED'].includes(o.status || '')
-    )
+    // Webshop: omzet vanaf bevestigd; kassa: alleen betaald (zelfde als Z-rapport/rapporten)
+    const paidOrders = allOrdersList.filter(o => orderCountsTowardRevenueAndZReport(o))
 
     // Today's stats
     const todayOrders = paidOrders.filter(o => new Date(o.created_at) >= today)
