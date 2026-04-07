@@ -3088,6 +3088,9 @@
       "deleteFailed": "فشل الحذف"
     }
   },
+  "kassaReceipt": {
+    "helpedBy": "خدمك {name}"
+  },
   "staffClock": {
     "buttonTitle": "تسجيل دخول أو خروج",
     "modalTitle": "بصمة الموظفين",

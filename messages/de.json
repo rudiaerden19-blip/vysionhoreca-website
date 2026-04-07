@@ -2588,6 +2588,9 @@
       "deleteFailed": "Löschen fehlgeschlagen"
     }
   },
+  "kassaReceipt": {
+    "helpedBy": "Sie wurden von {name} bedient"
+  },
   "staffClock": {
     "buttonTitle": "Ein- oder ausstempeln",
     "modalTitle": "Zeiterfassung Kasse",

@@ -3088,6 +3088,9 @@
       "deleteFailed": "Error al eliminar"
     }
   },
+  "kassaReceipt": {
+    "helpedBy": "Le ha atendido {name}"
+  },
   "staffClock": {
     "buttonTitle": "Fichar entrada o salida",
     "modalTitle": "Fichaje del personal",

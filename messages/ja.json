@@ -3088,6 +3088,9 @@
       "deleteFailed": "削除に失敗"
     }
   },
+  "kassaReceipt": {
+    "helpedBy": "担当：{name}"
+  },
   "staffClock": {
     "buttonTitle": "出勤または退勤",
     "modalTitle": "スタッフ打刻",

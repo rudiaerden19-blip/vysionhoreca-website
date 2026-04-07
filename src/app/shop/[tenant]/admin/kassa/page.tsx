@@ -574,6 +574,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     orderType: OrderType
     tableNumber: string
     createdAt: Date
+    /** Medewerker in verkoopmodus (klok) op moment van betalen */
+    helpedByStaffName?: string | null
   } | null>(null)
   const [tenantInfo, setTenantInfo] = useState<TenantSettings | null>(null)
 
@@ -1096,7 +1098,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       }
     }
 
-    setLastOrder({ orderNumber, items: [...cart], total, paymentMethod: method, orderType, tableNumber, createdAt })
+    setLastOrder({
+      orderNumber,
+      items: [...cart],
+      total,
+      paymentMethod: method,
+      orderType,
+      tableNumber,
+      createdAt,
+      helpedByStaffName: activeKassaStaff?.name?.trim() || null,
+    })
 
     if (tableNumber) clearTableAfterPayment(tableNumber)
 
@@ -1105,6 +1116,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setShowPaymentModal(false)
     setShowSuccessModal(true)
   }
+
+  const escapeReceiptHtml = (s: string) =>
+    s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 
   const printReceipt = (order: typeof lastOrder) => {
     if (!order) return
@@ -1158,6 +1172,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       <div class="row total"><span>TOTAAL</span><span>€${order.total.toFixed(2)}</span></div>
       <div class="divider"></div>
       <div class="center small">Betaald met: ${payLabel}</div>
+      ${order.helpedByStaffName ? `<div class="divider"></div><div class="center bold">${t('kassaReceipt.helpedBy').replace('{name}', escapeReceiptHtml(order.helpedByStaffName))}</div>` : ''}
       <div class="divider"></div>
       <div class="center small">
         ${tenantInfo?.btw_number ? `BTW: ${tenantInfo.btw_number}<br/>` : ''}
@@ -2464,6 +2479,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   <div className="text-center mt-3 text-xs">
                     <p>Betaald met: {payLabel}</p>
                   </div>
+                  {lastOrder.helpedByStaffName && (
+                    <div className="text-center mt-3 text-sm font-semibold text-gray-800 px-1">
+                      {t('kassaReceipt.helpedBy').replace('{name}', lastOrder.helpedByStaffName)}
+                    </div>
+                  )}
                   <div className="border-t-2 border-dashed border-gray-400 my-3" />
                   <div className="text-center text-xs">
                     {tenantInfo?.btw_number && <p>BTW: {tenantInfo.btw_number}</p>}

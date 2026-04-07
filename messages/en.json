@@ -3504,6 +3504,9 @@
       "deleteFailed": "Delete failed"
     }
   },
+  "kassaReceipt": {
+    "helpedBy": "You were helped by {name}"
+  },
   "staffClock": {
     "buttonTitle": "Clock in or out",
     "modalTitle": "Staff clock",

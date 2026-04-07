@@ -2588,6 +2588,9 @@
       "deleteFailed": "Échec de la suppression"
     }
   },
+  "kassaReceipt": {
+    "helpedBy": "Vous avez été servi par {name}"
+  },
   "staffClock": {
     "buttonTitle": "Pointer entrée ou sortie",
     "modalTitle": "Pointage personnel",

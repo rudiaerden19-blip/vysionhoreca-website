@@ -3504,6 +3504,9 @@
       "deleteFailed": "Verwijderen mislukt"
     }
   },
+  "kassaReceipt": {
+    "helpedBy": "U bent geholpen door medewerker {name}"
+  },
   "staffClock": {
     "buttonTitle": "In- of uitklokken",
     "modalTitle": "Personeel klok",

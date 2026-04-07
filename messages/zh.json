@@ -3088,6 +3088,9 @@
       "deleteFailed": "删除失败"
     }
   },
+  "kassaReceipt": {
+    "helpedBy": "为您服务：{name}"
+  },
   "staffClock": {
     "buttonTitle": "上班或下班打卡",
     "modalTitle": "员工打卡",

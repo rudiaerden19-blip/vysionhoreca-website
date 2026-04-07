@@ -3088,6 +3088,9 @@
       "deleteFailed": "Eliminazione fallita"
     }
   },
+  "kassaReceipt": {
+    "helpedBy": "Sei stato servito da {name}"
+  },
   "staffClock": {
     "buttonTitle": "Timbratura entrata o uscita",
     "modalTitle": "Timbratura personale",
