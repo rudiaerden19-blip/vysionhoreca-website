@@ -2620,6 +2620,8 @@
     "noOrdersToday": "Heute keine Verkäufe auf Ihren Namen.",
     "summaryClose": "Schließen",
     "close": "Schließen",
+    "mandatoryBanner": "Mindestens eine Person ist eingestempelt. Tippe auf Verkauf in der jeweiligen Zeile, um zu kassieren oder andere Bildschirme zu nutzen.",
+    "mandatoryFooter": "Du kannst dieses Fenster schließen, sobald du Verkauf gewählt hast.",
     "successIn": "Eingestempelt.",
     "successOut": "Ausgestempelt.",
     "errors": {

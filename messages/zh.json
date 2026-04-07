@@ -3120,6 +3120,8 @@
     "noOrdersToday": "今日您名下无销售。",
     "summaryClose": "关闭",
     "close": "关闭",
+    "mandatoryBanner": "至少有一名员工已上班打卡。请点击该行上的“销售”以收银或前往其他界面。",
+    "mandatoryFooter": "选择“销售”后即可关闭此窗口。",
     "successIn": "已记录上班。",
     "successOut": "已记录下班。",
     "errors": {

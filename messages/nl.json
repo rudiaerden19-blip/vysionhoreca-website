@@ -3536,6 +3536,8 @@
     "noOrdersToday": "Geen verkopen op jouw naam vandaag.",
     "summaryClose": "Sluiten",
     "close": "Sluiten",
+    "mandatoryBanner": "Er is minstens één medewerker ingeklokt. Tik op Verkoop bij die persoon om te verkopen of om naar andere schermen te gaan.",
+    "mandatoryFooter": "Je kunt dit venster sluiten zodra je Verkoop hebt gekozen.",
     "successIn": "Ingeklokt.",
     "successOut": "Uitgeklokt.",
     "errors": {

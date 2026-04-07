@@ -3120,6 +3120,8 @@
     "noOrdersToday": "Nessuna vendita a tuo nome oggi.",
     "summaryClose": "Chiudi",
     "close": "Chiudi",
+    "mandatoryBanner": "Almeno un collaboratore è timbrato in entrata. Tocca Vendite sulla sua riga per incassare o usare altre schermate.",
+    "mandatoryFooter": "Puoi chiudere questa finestra dopo aver scelto Vendite.",
     "successIn": "Entrata registrata.",
     "successOut": "Uscita registrata.",
     "errors": {

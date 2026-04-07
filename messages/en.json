@@ -3536,6 +3536,8 @@
     "noOrdersToday": "No sales on your name today.",
     "summaryClose": "Close",
     "close": "Close",
+    "mandatoryBanner": "At least one team member is clocked in. Tap Sales on their row to ring up orders or use other screens.",
+    "mandatoryFooter": "You can close this window after choosing Sales.",
     "successIn": "Clocked in.",
     "successOut": "Clocked out.",
     "errors": {
