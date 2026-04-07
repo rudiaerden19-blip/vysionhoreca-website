@@ -152,7 +152,6 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
         { id: 'sm_rpt_z', icon: '🧾', label: 'Z-Rapporten (GKS)', href: `${baseUrl}/z-rapport` },
         { id: 'sm_rpt_analyse', icon: '📈', label: 'Bedrijfsanalyse', href: `${baseUrl}/analyse` },
         { id: 'sm_rpt_verkoop', icon: '💹', label: 'Verkoop', href: `${baseUrl}/verkoop` },
-        { id: 'sm_rpt_dashboard', icon: '📊', label: 'Dashboard', href: `${baseUrl}` },
         { id: 'sm_rpt_populair', icon: '🔥', label: 'Populaire items', href: `${baseUrl}/populair` },
       ],
     },
