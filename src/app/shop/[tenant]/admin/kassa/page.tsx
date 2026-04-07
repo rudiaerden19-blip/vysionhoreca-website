@@ -1234,6 +1234,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     clearCart()
     setTableNumber('')
     setShowPaymentModal(false)
+    // Volgende klant: opnieuw Verkoop kiezen via klok (anders product-popup).
+    if (tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly) {
+      setActiveKassaStaff(null)
+    }
     setShowSuccessModal(true)
   }
 
