@@ -1299,17 +1299,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           })()}
         </div>
 
-        <Link
-          href={baseUrl}
-          prefetch={false}
-          className="relative z-20 flex shrink-0 items-center gap-2 rounded-xl bg-orange-500 px-3 py-2 text-sm font-bold text-white shadow-md transition-colors hover:bg-orange-400"
-        >
-          <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          {t('adminLayout.back')}
-        </Link>
-
         {/* Tenant naam */}
         <div className="flex-1 flex items-center justify-center">
           <span className="text-red-700 font-medium text-xl tracking-normal">
