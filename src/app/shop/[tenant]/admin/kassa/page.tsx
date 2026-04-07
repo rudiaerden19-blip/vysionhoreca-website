@@ -43,6 +43,79 @@ interface CartItem {
 
 type OrderType = 'DINE_IN' | 'TAKEAWAY' | 'DELIVERY'
 
+/** Analoge klok met wijzers (live) — gebruikt op numpad voor personeelsklok */
+function KassaAnalogClock({ size = 80 }: { size?: number }) {
+  const [now, setNow] = useState(() => new Date())
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(new Date()), 1000)
+    return () => window.clearInterval(id)
+  }, [])
+  const h = now.getHours()
+  const m = now.getMinutes()
+  const s = now.getSeconds()
+  const hDeg = ((h % 12) + m / 60 + s / 3600) * 30 - 90
+  const mDeg = (m + s / 60) * 6 - 90
+  const sDeg = s * 6 - 90
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 100 100"
+      className="select-none"
+      aria-hidden
+    >
+      <circle cx="50" cy="50" r="47" fill="#ffffff" stroke="#1e293b" strokeWidth="2.5" />
+      {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => (
+        <line
+          key={i}
+          x1="50"
+          y1="6"
+          x2="50"
+          y2="14"
+          stroke="#475569"
+          strokeWidth={i % 3 === 0 ? 2.2 : 1.2}
+          strokeLinecap="round"
+          transform={`rotate(${i * 30} 50 50)`}
+        />
+      ))}
+      <g transform={`rotate(${hDeg} 50 50)`}>
+        <line
+          x1="50"
+          y1="50"
+          x2="50"
+          y2="32"
+          stroke="#0f172a"
+          strokeWidth="4"
+          strokeLinecap="round"
+        />
+      </g>
+      <g transform={`rotate(${mDeg} 50 50)`}>
+        <line
+          x1="50"
+          y1="50"
+          x2="50"
+          y2="22"
+          stroke="#334155"
+          strokeWidth="2.8"
+          strokeLinecap="round"
+        />
+      </g>
+      <g transform={`rotate(${sDeg} 50 50)`}>
+        <line
+          x1="50"
+          y1="52"
+          x2="50"
+          y2="20"
+          stroke="#dc2626"
+          strokeWidth="1.2"
+          strokeLinecap="round"
+        />
+      </g>
+      <circle cx="50" cy="50" r="4" fill="#0f172a" />
+    </svg>
+  )
+}
+
 function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const tenant = params.tenant
   const router = useRouter()
@@ -1500,18 +1573,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           {soundsOn ? '🔔' : '🔕'}
         </button>
 
-        {tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly && (
-          <button
-            type="button"
-            onClick={openStaffClockModal}
-            className="w-9 h-9 rounded-lg flex items-center justify-center text-lg transition-colors bg-white/10 text-white hover:bg-white/20"
-            title={t('staffClock.buttonTitle')}
-            aria-label={t('staffClock.buttonTitle')}
-          >
-            🕐
-          </button>
-        )}
-
         {activeKassaStaff && !demoViewOnly && (
           <div className="hidden sm:flex items-center gap-1.5 max-w-[10rem] md:max-w-xs rounded-lg bg-emerald-600/90 text-white text-xs font-bold px-2 py-1.5">
             <span className="truncate" title={activeKassaStaff.name}>
@@ -1823,13 +1884,24 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         <div className="flex-1 overflow-y-auto px-3 pt-2 flex flex-col">
           {cart.length === 0 ? (
             <div className="flex flex-col flex-1">
-              <div className="bg-[#e3e3e3] rounded-xl px-4 py-3 mb-3">
+              <div className="bg-[#e3e3e3] rounded-xl px-3 py-2.5 mb-3 flex items-center gap-3 min-h-[5.5rem]">
+                {tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? (
+                  <button
+                    type="button"
+                    onClick={openStaffClockModal}
+                    className="shrink-0 rounded-xl bg-white p-1 shadow-md border-2 border-slate-300 hover:border-[#3C4D6B] hover:bg-slate-50 active:scale-[0.98] transition-all"
+                    title={t('staffClock.buttonTitle')}
+                    aria-label={t('staffClock.buttonTitle')}
+                  >
+                    <KassaAnalogClock size={76} />
+                  </button>
+                ) : null}
                 <input
                   type="text"
                   value={numpadValue}
                   readOnly
                   placeholder="0.00"
-                  className="w-full text-right text-3xl font-bold bg-transparent border-none outline-none text-black"
+                  className={`min-w-0 text-right text-3xl font-bold bg-transparent border-none outline-none text-black ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1' : 'w-full'}`}
                 />
               </div>
               <div className="grid grid-cols-4 grid-rows-4 gap-2 flex-1">
@@ -1859,6 +1931,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </div>
           ) : (
             <div className="space-y-2">
+              {tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly && (
+                <div className="flex justify-start pb-1">
+                  <button
+                    type="button"
+                    onClick={openStaffClockModal}
+                    className="rounded-xl bg-[#e3e3e3] p-1.5 shadow-sm border-2 border-slate-300 hover:border-[#3C4D6B] active:scale-[0.98] transition-all"
+                    title={t('staffClock.buttonTitle')}
+                    aria-label={t('staffClock.buttonTitle')}
+                  >
+                    <KassaAnalogClock size={64} />
+                  </button>
+                </div>
+              )}
               {cart.map(item => {
                 const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
                 return (
