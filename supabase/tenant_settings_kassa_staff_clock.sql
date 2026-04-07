@@ -5,4 +5,4 @@ ALTER TABLE tenant_settings
   ADD COLUMN IF NOT EXISTS kassa_staff_clock_enabled BOOLEAN NOT NULL DEFAULT false;
 
 COMMENT ON COLUMN tenant_settings.kassa_staff_clock_enabled IS
-  'Als true: kassa toont in/uitklokken met medewerker-PIN; schrijft naar timesheet_entries (WORKED).';
+  'Als true: kassa toont personeelklok (PIN); sessies in staff_clock_sessions; orders.kassa_staff_id bij Verkoop.';
