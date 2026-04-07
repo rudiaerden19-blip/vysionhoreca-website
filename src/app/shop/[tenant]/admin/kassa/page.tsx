@@ -577,11 +577,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   } | null>(null)
   const [tenantInfo, setTenantInfo] = useState<TenantSettings | null>(null)
 
-  // Opties modal
+  // Opties modal (editingCartKey = bestaande winkelmandregel aanpassen)
   const [optionsModal, setOptionsModal] = useState<{
     product: MenuProduct
     options: ProductOption[]
     selected: SelectedChoice[]
+    editingCartKey?: string
   } | null>(null)
 
   // Blokkeer body scroll (iPad Safari fix)
@@ -772,6 +773,22 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
   }
 
+  /** Open opties-modal om toppings/sauzen van een mandregel te wijzigen (alle tenants). */
+  const openEditCartItem = async (item: CartItem) => {
+    if (demoViewOnly) return
+    const pid = item.product.id
+    if (!pid || String(pid).startsWith('custom-')) return
+    if (!productsWithOptions.includes(pid)) return
+    const opts = await getOptionsForProduct(pid)
+    playClick()
+    setOptionsModal({
+      product: item.product,
+      options: opts,
+      selected: item.choices?.length ? [...item.choices] : [],
+      editingCartKey: item.cartKey,
+    })
+  }
+
   const toggleChoice = (option: ProductOption, choice: ProductOptionChoice) => {
     setOptionsModal(prev => {
       if (!prev) return prev
@@ -799,7 +816,40 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     if (!optionsModal) return
     const missing = optionsModal.options.filter(o => o.required && !optionsModal.selected.find(s => s.optionId === o.id))
     if (missing.length > 0) { playClick(); alert(`Kies een ${missing[0].name}`); return }
-    addToCart(optionsModal.product, optionsModal.selected)
+
+    const { product, selected, editingCartKey } = optionsModal
+
+    if (editingCartKey) {
+      playAddToCart()
+      const oldQty = cart.find(i => i.cartKey === editingCartKey)?.quantity ?? 1
+      const cartKey =
+        selected.length > 0
+          ? `${product.id}-${selected.map(c => c.choiceId).sort().join('-')}`
+          : product.id!
+
+      setCart(prev => {
+        const without = prev.filter(i => i.cartKey !== editingCartKey)
+        const existing = without.find(i => i.cartKey === cartKey)
+        let updated: CartItem[]
+        if (existing) {
+          updated = without.map(i =>
+            i.cartKey === cartKey ? { ...i, quantity: i.quantity + oldQty } : i
+          )
+        } else {
+          updated = [...without, { product, quantity: oldQty, choices: selected, cartKey }]
+        }
+        if (tableNumber) {
+          const newOrders = { ...tableOrders, [tableNumber]: updated }
+          setTableOrders(newOrders)
+          localStorage.setItem(tableOrdersKey, JSON.stringify(newOrders))
+          updateTableStatus(tableNumber, updated.length > 0)
+        }
+        syncTableOrder(updated)
+        return updated
+      })
+    } else {
+      addToCart(product, selected)
+    }
     setOptionsModal(null)
   }
 
@@ -1666,15 +1716,33 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     </div>
                     <div className="flex items-center gap-1.5">
                       <button
+                        type="button"
                         onClick={() => updateQty(item.cartKey, item.quantity - 1)}
                         className="w-8 h-8 rounded-lg bg-red-500 text-white font-bold text-base flex items-center justify-center hover:bg-red-600 transition-colors active:scale-95"
+                        aria-label={item.quantity === 1 ? 'Verwijderen' : 'Minder'}
                       >
                         {item.quantity === 1 ? '🗑' : '−'}
                       </button>
+                      {!demoViewOnly &&
+                        item.product.id &&
+                        !String(item.product.id).startsWith('custom-') &&
+                        productsWithOptions.includes(item.product.id) && (
+                          <button
+                            type="button"
+                            onClick={() => void openEditCartItem(item)}
+                            className="w-8 h-8 rounded-lg bg-amber-500 text-white text-sm flex items-center justify-center hover:bg-amber-600 transition-colors active:scale-95"
+                            title="Opties wijzigen"
+                            aria-label="Opties wijzigen"
+                          >
+                            ✏️
+                          </button>
+                        )}
                       <span className="w-6 text-center font-bold text-base">{item.quantity}</span>
                       <button
+                        type="button"
                         onClick={() => updateQty(item.cartKey, item.quantity + 1)}
                         className="w-8 h-8 rounded-lg bg-[#3C4D6B] text-white font-bold text-base flex items-center justify-center hover:bg-[#2D3A52] transition-colors active:scale-95"
+                        aria-label="Meer"
                       >
                         +
                       </button>
@@ -1769,12 +1837,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 <img src={optionsModal.product.image_url} alt={optionsModal.product.name} className="w-14 h-14 rounded-xl object-cover flex-shrink-0" />
               )}
               <div className="flex-1 min-w-0">
-                <p className="font-bold text-lg truncate">{optionsModal.product.name}</p>
+                <p className="font-bold text-lg truncate">
+                  {optionsModal.editingCartKey ? '✏️ ' : ''}
+                  {optionsModal.product.name}
+                </p>
                 <p className="text-[#3C4D6B] font-bold">
                   €{(optionsModal.product.price + optionsModal.selected.reduce((s, c) => s + c.price, 0)).toFixed(2)}
                 </p>
               </div>
-              <button onClick={() => setOptionsModal(null)} className="p-2 hover:bg-gray-100 rounded-xl">✕</button>
+              <button type="button" onClick={() => setOptionsModal(null)} className="p-2 hover:bg-gray-100 rounded-xl" aria-label="Sluiten">✕</button>
             </div>
 
             {/* Opties */}
@@ -1818,9 +1889,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
             {/* Footer */}
             <div className="p-4 border-t flex gap-3 bg-gray-50">
-              <button onClick={() => setOptionsModal(null)} className="flex-1 py-3 rounded-xl bg-white border border-gray-200 font-semibold text-gray-600 hover:bg-gray-100 transition-colors">Annuleer</button>
-              <button onClick={confirmOptions} className="flex-[2] py-3.5 rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold text-lg shadow-md transition-colors">
-                Toevoegen — €{(optionsModal.product.price + optionsModal.selected.reduce((s, c) => s + c.price, 0)).toFixed(2)}
+              <button type="button" onClick={() => setOptionsModal(null)} className="flex-1 py-3 rounded-xl bg-white border border-gray-200 font-semibold text-gray-600 hover:bg-gray-100 transition-colors">Annuleer</button>
+              <button type="button" onClick={confirmOptions} className="flex-[2] py-3.5 rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold text-lg shadow-md transition-colors">
+                {optionsModal.editingCartKey ? 'Opslaan' : 'Toevoegen'} — €
+                {(optionsModal.product.price + optionsModal.selected.reduce((s, c) => s + c.price, 0)).toFixed(2)}
               </button>
             </div>
           </div>
