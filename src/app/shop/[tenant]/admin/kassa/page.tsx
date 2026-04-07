@@ -4,7 +4,19 @@ import { Suspense, useState, useEffect, useLayoutEffect, useRef, useMemo, useCal
 import { flushSync } from 'react-dom'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { MenuProduct, MenuCategory, ProductOption, ProductOptionChoice, getMenuCategories, getMenuProducts, getProductsWithOptions, getOptionsForProduct, getTenantSettings, TenantSettings } from '@/lib/admin-api'
+import {
+  MenuProduct,
+  MenuCategory,
+  ProductOption,
+  ProductOptionChoice,
+  getMenuCategories,
+  getMenuProducts,
+  getProductsWithOptions,
+  getOptionsForProduct,
+  getTenantSettings,
+  TenantSettings,
+  syncZReportAfterOrder,
+} from '@/lib/admin-api'
 import KassaFloorPlan from '@/components/KassaFloorPlan'
 import KassaReservationsView from '@/components/KassaReservationsView'
 import { supabase } from '@/lib/supabase'
@@ -1072,7 +1084,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           const remaining: object[] = []
           for (const order of freshQueue) {
             const { error } = await supabase.from('orders').insert(order)
-            if (error) remaining.push(order)
+            if (error) {
+              remaining.push(order)
+            } else {
+              const o = order as { tenant_slug?: string; created_at?: string }
+              if (o.tenant_slug && o.created_at) {
+                void syncZReportAfterOrder(o.tenant_slug, o.created_at)
+              }
+            }
           }
           localStorage.setItem(offlineQueueKey, JSON.stringify(remaining))
         }
@@ -1165,6 +1184,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     // Probeer Supabase, bij netwerkfout: sla op in offline queue
     const { error } = await supabase.from('orders').insert(orderPayload)
+    if (!error) {
+      void syncZReportAfterOrder(tenant, createdAt.toISOString())
+    }
     if (error) {
       const isNetworkError = !navigator.onLine || error.message?.includes('fetch') || error.message?.includes('network')
       if (isNetworkError) {

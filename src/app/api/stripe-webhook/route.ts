@@ -3,6 +3,8 @@ import Stripe from 'stripe'
 import nodemailer from 'nodemailer'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
+import { regenerateZReportForDate } from '@/lib/admin-api'
+import { getBelgiumDateString } from '@/lib/belgium-date-bounds'
 
 export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID()
@@ -108,6 +110,18 @@ export async function POST(request: NextRequest) {
           .eq('tenant_slug', tenantSlug)
 
         logger.info('Order payment completed via Stripe', { requestId, orderId, tenantSlug })
+
+        const { data: paidOrder } = await supabase
+          .from('orders')
+          .select('created_at')
+          .eq('id', orderId)
+          .eq('tenant_slug', tenantSlug)
+          .maybeSingle()
+
+        if (paidOrder?.created_at) {
+          const dayYmd = getBelgiumDateString(new Date(paidOrder.created_at as string))
+          await regenerateZReportForDate(supabase, tenantSlug, dayYmd)
+        }
       }
 
       // ── Reservatie voorschot ──────────────────────────────────────

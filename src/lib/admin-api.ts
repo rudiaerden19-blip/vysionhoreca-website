@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { cache, CACHE_TTL, cacheKey } from './cache'
 import { buildDefaultDeliverySettingsRow } from '@/lib/tenant-defaults'
 import { DEMO_TENANT_SLUG } from '@/lib/demo-links'
@@ -1751,9 +1752,11 @@ export function isWebshopOrder(order: Pick<Order, 'order_type'>): boolean {
 }
 
 /**
- * Dashboard, Z-rapport, rapporten, analyse: online omzet vanaf zaak bevestigt (confirmed+).
- * Kassa-POS: alleen daadwerkelijk betaalde orders (completed flow).
- * Geannuleerd/afgewezen: nooit.
+ * Dashboard, Z-rapport, rapporten, bedrijfsanalyse, verkoop: zelfde bron van waarheid.
+ *
+ * - Webshop/online: telt zodra de zaak bevestigt (confirmed+) OF zodra online betaald (paid) — niet pas bij "afronden".
+ * - Fysieke kassa (POS): telt zodra op "Betalen" (payment_status paid).
+ * - Geannuleerd / geweigerd: nooit.
  */
 export function orderCountsTowardRevenueAndZReport(
   order: Pick<Order, 'order_type' | 'status' | 'payment_status'>
@@ -1761,7 +1764,12 @@ export function orderCountsTowardRevenueAndZReport(
   const st = (order.status || '').toString().toLowerCase()
   if (['cancelled', 'rejected'].includes(st)) return false
   if (isWebshopOrder(order)) {
-    return ['confirmed', 'preparing', 'ready', 'completed', 'delivered'].includes(st)
+    if (['confirmed', 'preparing', 'ready', 'completed', 'delivered'].includes(st)) {
+      return true
+    }
+    const ps = (order.payment_status || '').toString().toLowerCase()
+    if (ps === 'paid') return true
+    return false
   }
   return (order.payment_status || '').toString().toLowerCase() === 'paid'
 }
@@ -1859,12 +1867,16 @@ export async function updateOrderStatus(
     return false
   }
   console.log('Order status updated successfully')
-  
-  // AUTOMATISCH: Update Z-rapport wanneer order completed wordt
-  if (status === 'completed') {
-    await autoUpdateZReport(tenantSlug, new Date(updated[0].created_at).toISOString().split('T')[0])
+
+  const s = String(status).toLowerCase()
+  if (
+    ['completed', 'confirmed', 'preparing', 'ready', 'delivered', 'rejected', 'cancelled'].includes(
+      s
+    )
+  ) {
+    await syncZReportAfterOrder(tenantSlug, updated[0].created_at as string)
   }
-  
+
   return true
 }
 
@@ -1893,22 +1905,22 @@ async function generateSimpleHash(input: string): Promise<string> {
   return Math.abs(hash).toString(16).padStart(16, '0')
 }
 
-// AUTOMATISCH: Update Z-rapport voor een specifieke dag
-async function autoUpdateZReport(tenantSlug: string, date: string): Promise<void> {
-  if (!supabase) {
-    console.error('autoUpdateZReport: Supabase niet beschikbaar')
-    return
-  }
-  
-  console.log(`autoUpdateZReport: Start voor ${tenantSlug} op ${date}`)
-  
+/**
+ * Herbereken en upsert één Z-rapportdag (fiscale dag België).
+ * Gebruikt door kassa, bevestigingen, Stripe-webhook (server client).
+ */
+export async function regenerateZReportForDate(
+  client: SupabaseClient,
+  tenantSlug: string,
+  date: string
+): Promise<void> {
+  console.log(`regenerateZReportForDate: Start voor ${tenantSlug} op ${date}`)
+
   try {
-    // KRITIEK: Gebruik fiscale dag grenzen (identiek aan z-rapport pagina, 36u venster)
     const { startUTC, endUTC } = getZRapportDateBounds(date)
-    console.log(`autoUpdateZReport: Query van ${startUTC} tot ${endUTC}`)
-    
-    // Webshop: vanaf bevestigd; kassa: betaald (zelfde regel als Z-rapportpagina)
-    const { data: ordersRaw, error: ordersError } = await supabase
+    console.log(`regenerateZReportForDate: Query van ${startUTC} tot ${endUTC}`)
+
+    const { data: ordersRaw, error: ordersError } = await client
       .from('orders')
       .select('id, total, payment_method, order_type, status, payment_status')
       .eq('tenant_slug', tenantSlug)
@@ -1917,40 +1929,38 @@ async function autoUpdateZReport(tenantSlug: string, date: string): Promise<void
       .not('status', 'in', '("cancelled","rejected","CANCELLED","REJECTED")')
 
     if (ordersError) {
-      console.error('autoUpdateZReport: Fout bij ophalen orders:', ordersError)
+      console.error('regenerateZReportForDate: Fout bij ophalen orders:', ordersError)
       return
     }
 
     const orders = (ordersRaw || []).filter((o) => orderCountsTowardRevenueAndZReport(o))
 
-    console.log(`autoUpdateZReport: ${orders?.length || 0} orders voor rapport`)
-    
+    console.log(`regenerateZReportForDate: ${orders?.length || 0} orders voor rapport`)
+
     if (!orders || orders.length === 0) {
-      console.log('autoUpdateZReport: Geen betaalde orders, skip update')
+      console.log('regenerateZReportForDate: Geen tellende orders, skip upsert (bestaand Z-rapport ongewijzigd)')
       return
     }
-    
-    // Haal tenant settings op voor BTW
-    const { data: settings } = await supabase
+
+    const { data: settings } = await client
       .from('tenant_settings')
       .select('btw_percentage, business_name, address, btw_number')
       .eq('tenant_slug', tenantSlug)
       .single()
-    
+
     const btwPercentage = settings?.btw_percentage || 6
-    
-    // Bereken totalen
+
     let total = 0
     let cashPayments = 0
     let onlinePayments = 0
     let cardPayments = 0
     const orderIds: string[] = []
-    
-    orders.forEach(order => {
+
+    orders.forEach((order) => {
       orderIds.push(order.id)
       const orderTotal = order.total || 0
       total += orderTotal
-      
+
       const paymentMethod = (order.payment_method || '').toLowerCase()
       if (paymentMethod === 'cash' || paymentMethod === 'contant') {
         cashPayments += orderTotal
@@ -1960,68 +1970,27 @@ async function autoUpdateZReport(tenantSlug: string, date: string): Promise<void
         onlinePayments += orderTotal
       }
     })
-    
+
     const taxRate = btwPercentage / 100
     const subtotal = total / (1 + taxRate)
     const tax = total - subtotal
-    
-    // Genereer hash
+
     const hashInput = JSON.stringify({
       tenant: tenantSlug,
       date: date,
       orderCount: orders.length,
       total: Math.round(total * 100),
       orderIds: orderIds.sort(),
-      version: 'v1'
+      version: 'v1',
     })
     const reportHash = await generateSimpleHash(hashInput)
-    
-    console.log(`autoUpdateZReport: Upsert z_report voor ${tenantSlug}, ${date}, total: €${total.toFixed(2)}`)
-    
-    // Upsert Z-rapport
-    const { error: upsertError } = await supabase
+
+    console.log(`regenerateZReportForDate: Upsert z_report voor ${tenantSlug}, ${date}, total: €${total.toFixed(2)}`)
+
+    const { error: upsertError } = await client
       .from('z_reports')
-      .upsert({
-        tenant_slug: tenantSlug,
-        report_date: date,
-        order_count: orders.length,
-        subtotal: subtotal,
-        tax_low: btwPercentage === 6 ? tax : 0,
-        tax_mid: btwPercentage === 12 ? tax : 0,
-        tax_high: btwPercentage === 21 ? tax : 0,
-        total: total,
-        cash_payments: cashPayments,
-        card_payments: cardPayments,
-        online_payments: onlinePayments,
-        btw_percentage: btwPercentage,
-        business_name: settings?.business_name,
-        business_address: settings?.address,
-        btw_number: settings?.btw_number,
-        order_ids: orderIds,
-        report_hash: reportHash,
-        generated_at: new Date().toISOString(),
-      }, {
-        onConflict: 'tenant_slug,report_date',
-        ignoreDuplicates: false
-      })
-    
-    if (upsertError) {
-      console.error('autoUpdateZReport: Fout bij upsert:', upsertError)
-      
-      // Probeer insert als fallback (voor als unique constraint niet bestaat)
-      console.log('autoUpdateZReport: Probeer delete+insert als fallback...')
-      
-      // Delete bestaand rapport voor deze dag
-      await supabase
-        .from('z_reports')
-        .delete()
-        .eq('tenant_slug', tenantSlug)
-        .eq('report_date', date)
-      
-      // Insert nieuw rapport
-      const { error: insertError } = await supabase
-        .from('z_reports')
-        .insert({
+      .upsert(
+        {
           tenant_slug: tenantSlug,
           report_date: date,
           order_count: orders.length,
@@ -2040,18 +2009,66 @@ async function autoUpdateZReport(tenantSlug: string, date: string): Promise<void
           order_ids: orderIds,
           report_hash: reportHash,
           generated_at: new Date().toISOString(),
-        })
-      
+        },
+        {
+          onConflict: 'tenant_slug,report_date',
+          ignoreDuplicates: false,
+        }
+      )
+
+    if (upsertError) {
+      console.error('regenerateZReportForDate: Fout bij upsert:', upsertError)
+
+      await client.from('z_reports').delete().eq('tenant_slug', tenantSlug).eq('report_date', date)
+
+      const { error: insertError } = await client.from('z_reports').insert({
+        tenant_slug: tenantSlug,
+        report_date: date,
+        order_count: orders.length,
+        subtotal: subtotal,
+        tax_low: btwPercentage === 6 ? tax : 0,
+        tax_mid: btwPercentage === 12 ? tax : 0,
+        tax_high: btwPercentage === 21 ? tax : 0,
+        total: total,
+        cash_payments: cashPayments,
+        card_payments: cardPayments,
+        online_payments: onlinePayments,
+        btw_percentage: btwPercentage,
+        business_name: settings?.business_name,
+        business_address: settings?.address,
+        btw_number: settings?.btw_number,
+        order_ids: orderIds,
+        report_hash: reportHash,
+        generated_at: new Date().toISOString(),
+      })
+
       if (insertError) {
-        console.error('autoUpdateZReport: Fallback insert ook gefaald:', insertError)
+        console.error('regenerateZReportForDate: Fallback insert ook gefaald:', insertError)
         return
       }
     }
-    
-    console.log(`✅ Z-rapport automatisch bijgewerkt voor ${tenantSlug} op ${date}: ${orders.length} bestellingen, €${total.toFixed(2)}`)
+
+    console.log(
+      `✅ Z-rapport bijgewerkt voor ${tenantSlug} op ${date}: ${orders.length} bestellingen, €${total.toFixed(2)}`
+    )
   } catch (error) {
-    console.error('autoUpdateZReport: Onverwachte fout:', error)
+    console.error('regenerateZReportForDate: Onverwachte fout:', error)
   }
+}
+
+// AUTOMATISCH: Update Z-rapport voor een specifieke dag (browser Supabase)
+async function autoUpdateZReport(tenantSlug: string, date: string): Promise<void> {
+  if (!supabase) {
+    console.error('autoUpdateZReport: Supabase niet beschikbaar')
+    return
+  }
+  await regenerateZReportForDate(supabase, tenantSlug, date)
+}
+
+/** Herbereken opgeslagen Z-rapportdag (België) na order — kassa-betaling, bevestiging, weigeren, … */
+export async function syncZReportAfterOrder(tenantSlug: string, orderCreatedAt: string): Promise<void> {
+  const dayYmd = getBelgiumDateString(new Date(orderCreatedAt))
+  await autoUpdateZReport(tenantSlug, dayYmd)
 }
 
 // Confirm order (goedkeuren)
@@ -2077,15 +2094,15 @@ export async function confirmOrder(tenantSlug: string, id: string): Promise<bool
     return false
   }
 
-  await autoUpdateZReport(tenantSlug, new Date(updated[0].created_at).toISOString().split('T')[0])
+  await syncZReportAfterOrder(tenantSlug, updated[0].created_at as string)
 
   return true
 }
 
 /**
- * Webshop: goedkeuren → confirmed — payment_status niet aanpassen.
- * Alleen Stripe-webhook (`checkout.session.completed`) zet `paid` voor online betalingen;
- * cash blijft `pending` tot afronden (zie completeWebshopOrder).
+ * Webshop: goedkeuren → confirmed — payment_status niet aanpassen (cash).
+ * Online: Stripe-webhook zet `paid` — telt dan al in rapporten vóór bevestiging.
+ * Rapportage gebruikt orderCountsTowardRevenueAndZReport (confirmed+ of paid).
  */
 export async function approveWebshopOrder(tenantSlug: string, id: string): Promise<boolean> {
   if (!supabase) return false
@@ -2133,7 +2150,7 @@ export async function approveWebshopOrder(tenantSlug: string, id: string): Promi
     return false
   }
 
-  await autoUpdateZReport(tenantSlug, new Date(order.created_at).toISOString().split('T')[0])
+  await syncZReportAfterOrder(tenantSlug, order.created_at as string)
   return true
 }
 
@@ -2194,7 +2211,7 @@ export async function completeWebshopOrder(tenantSlug: string, id: string): Prom
     return false
   }
 
-  await autoUpdateZReport(tenantSlug, new Date(order.created_at).toISOString().split('T')[0])
+  await syncZReportAfterOrder(tenantSlug, order.created_at as string)
   return true
 }
 
@@ -2217,7 +2234,7 @@ export async function rejectOrder(
     })
     .eq('id', id)
     .eq('tenant_slug', tenantSlug)
-    .select('id')
+    .select('created_at')
   
   if (error) {
     console.error('Error rejecting order:', error)
@@ -2227,6 +2244,7 @@ export async function rejectOrder(
     console.warn('rejectOrder: geen rij bijgewerkt')
     return false
   }
+  await syncZReportAfterOrder(tenantSlug, updated[0].created_at as string)
   return true
 }
 
@@ -3120,24 +3138,39 @@ export async function calculateMonthlyReport(
   const { startUTC } = getDateBoundsForBelgium(startDateStr)
   const { endUTC } = getDateBoundsForBelgium(endDateStr)
   
-  // 1. Omzet uit orders-tabel (webshop vanaf bevestigd; POS alleen betaald)
-  const { data: ordersDataRaw } = await supabase
+  // 1. Omzet uit orders-tabel (zelfde regels als dashboard / Z-rapport / rapporten).
+  //    payment_status MOET in .select: voor POS (DINE_IN/TAKEAWAY/DELIVERY) is orderCountsTowardRevenueAndZReport
+  //    afhankelijk van payment_status === 'paid'. Zonder veld vielen alle kassa-orders weg → lege bedrijfsanalyse.
+  const { data: ordersDataRaw, error: ordersMonthlyErr } = await supabase
     .from('orders')
-    .select('total, status, payment_method, order_type')
+    .select('total, status, payment_method, order_type, payment_status')
     .eq('tenant_slug', tenantSlug)
     .gte('created_at', startUTC)
     .lte('created_at', endUTC)
     .not('status', 'in', '("cancelled","rejected")')
 
+  if (ordersMonthlyErr) {
+    console.error('calculateMonthlyReport: orders query', ordersMonthlyErr)
+  }
+
   const ordersData = (ordersDataRaw || []).filter((o) => orderCountsTowardRevenueAndZReport(o))
 
-  const onlineRevenue = ordersData.reduce((sum, o) => sum + (o.total || 0), 0)
-  const onlineOrders = ordersData.length
-  
-  // 2. Get manual kassa revenue
+  const onlineOrderRows = ordersData.filter((o) => isWebshopOrder(o))
+  const kassaOrderRows = ordersData.filter((o) => isKassaPosOrder(o))
+
+  const onlineRevenue = onlineOrderRows.reduce((sum, o) => sum + (Number(o.total) || 0), 0)
+  const onlineOrders = onlineOrderRows.length
+
+  const kassaRevenueFromOrders = kassaOrderRows.reduce((sum, o) => sum + (Number(o.total) || 0), 0)
+  const kassaOrdersFromOrders = kassaOrderRows.length
+
+  // 2. Handmatige kassa-dagtotalen (daily_sales) — bovenop echte POS-orders uit orders-tabel
   const dailySales = await getDailySales(tenantSlug, year, month)
-  const kassaRevenue = dailySales.reduce((sum, d) => sum + (d.total_revenue || 0), 0)
-  const kassaOrders = dailySales.reduce((sum, d) => sum + (d.order_count || 0), 0)
+  const kassaRevenueFromManual = dailySales.reduce((sum, d) => sum + (Number(d.total_revenue) || 0), 0)
+  const kassaOrdersFromManual = dailySales.reduce((sum, d) => sum + (Number(d.order_count) || 0), 0)
+
+  const kassaRevenue = kassaRevenueFromOrders + kassaRevenueFromManual
+  const kassaOrders = kassaOrdersFromOrders + kassaOrdersFromManual
   
   // 3. Get fixed costs
   const fixedCosts = await getFixedCosts(tenantSlug)
