@@ -1180,9 +1180,9 @@ export default function KassaReservationsView({
   const shellFixed = isAdminPagePresentation
     ? 'flex h-[calc(100dvh-3.5rem)] min-h-0 w-full max-w-full flex-col overflow-hidden bg-white'
     : 'fixed inset-0 z-50 flex min-h-0 flex-col overflow-hidden bg-white h-[100dvh] max-h-[100dvh]'
-  const backLabel = closeButtonLabel ?? 'Kassa'
   const toast = useToast()
   const { t } = useLanguage()
+  const backLabel = closeButtonLabel ?? t('adminLayout.pos')
   const rk = useCallback((key: string, rep?: Record<string, string>) => {
     let out = t(`reservationKassa.${key}`)
     if (rep) {
@@ -2699,7 +2699,7 @@ export default function KassaReservationsView({
                   className="flex-1 py-2 px-3 rounded-lg bg-[#3C4D6B] text-white text-sm font-medium hover:bg-[#4A5D7B] transition-colors flex items-center justify-center gap-1"
                 >
                   <UtensilsCrossed size={16} />
-                  Naar Kassa
+                  {t('adminLayout.pos')}
                 </button>
               )}
               <button
@@ -2986,7 +2986,7 @@ export default function KassaReservationsView({
                               {allowKassaHandoff && (
                                 <button onClick={e => { e.stopPropagation(); handleStartOrder(r) }}
                                   className="text-[10px] px-2 py-1 rounded-md bg-[#3C4D6B] text-white font-medium hover:bg-[#4a5d7b] transition-colors">
-                                  Naar Kassa
+                                  {t('adminLayout.pos')}
                                 </button>
                               )}
                               <button onClick={e => { e.stopPropagation(); handleComplete(r) }}
@@ -3651,7 +3651,7 @@ export default function KassaReservationsView({
                                   )}
                                   {r.status === 'CHECKED_IN' && allowKassaHandoff && (
                                     <button onClick={() => handleStartOrder(r)} className="min-h-[44px] rounded-xl bg-emerald-500 active:bg-emerald-700 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-1">
-                                      <UtensilsCrossed size={15} /> Kassa
+                                      <UtensilsCrossed size={15} /> {t('adminLayout.pos')}
                                     </button>
                                   )}
                                   {r.status === 'CHECKED_IN' && (
@@ -6475,6 +6475,7 @@ function ReservationDetailModal({
 }: ReservationDetailModalProps) {
   const status = STATUS_CONFIG[reservation.status]
   const [showTableSelect, setShowTableSelect] = useState(false)
+  const { t } = useLanguage()
 
   return (
     <div
@@ -6622,7 +6623,7 @@ function ReservationDetailModal({
               className="w-full py-3 rounded-xl bg-[#3C4D6B] text-white font-bold hover:bg-[#4A5D7B] transition-colors flex items-center justify-center gap-2"
             >
               <UtensilsCrossed size={18} />
-              Naar Kassa
+              {t('adminLayout.pos')}
             </button>
           )}
 
