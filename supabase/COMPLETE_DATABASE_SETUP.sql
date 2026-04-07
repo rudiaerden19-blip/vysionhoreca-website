@@ -107,6 +107,8 @@ CREATE TABLE IF NOT EXISTS tenant_settings (
   
   -- EU-allergenen: welke id's actief zijn voor deze zaak (NULL = app-defaults na migratie)
   allergens_config TEXT[],
+  -- In-/uitklokken op kassa met medewerker-PIN (zie ook tenant_settings_kassa_staff_clock.sql)
+  kassa_staff_clock_enabled BOOLEAN NOT NULL DEFAULT false,
 
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()

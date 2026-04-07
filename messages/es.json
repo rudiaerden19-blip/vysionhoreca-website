@@ -3077,10 +3077,40 @@
       "freelance": "Autónomo",
       "intern": "Becario"
     },
+    "kassaClock": {
+      "title": "Fichar en la caja",
+      "description": "El personal puede fichar entrada y salida en la TPV con su PIN. Los tiempos aparecen en el registro horario.",
+      "toggle": "Permitir fichar en la caja"
+    },
     "alerts": {
       "nameAndPinRequired": "Introduce nombre y PIN",
       "confirmDelete": "¿Seguro que quieres eliminar:",
       "deleteFailed": "Error al eliminar"
+    }
+  },
+  "staffClock": {
+    "buttonTitle": "Fichar entrada o salida",
+    "modalTitle": "Fichaje del personal",
+    "pinLabel": "PIN",
+    "pinPlaceholder": "Introduce el PIN",
+    "pinRequired": "Introduce tu PIN.",
+    "clockIn": "Entrada",
+    "clockOut": "Salida",
+    "close": "Cerrar",
+    "successIn": "Entrada registrada.",
+    "successOut": "Salida registrada.",
+    "errors": {
+      "bad_request": "Solicitud no válida",
+      "disabled": "Función desactivada. Actívala en Personal.",
+      "bad_pin": "PIN incorrecto",
+      "already_in": "Sigues fichado. Ficha salida primero.",
+      "day_complete": "Ya fichaste entrada y salida hoy.",
+      "not_in": "No hay entrada hoy.",
+      "already_out": "Ya fichaste la salida hoy.",
+      "server": "Algo salió mal. Inténtalo de nuevo.",
+      "server_config": "Servidor no configurado.",
+      "invalid_json": "Datos no válidos",
+      "unknown": "Algo salió mal."
     }
   },
   "analysePage": {

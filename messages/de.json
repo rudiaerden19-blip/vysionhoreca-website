@@ -2577,10 +2577,40 @@
       "freelance": "Freiberufler",
       "intern": "Praktikant"
     },
+    "kassaClock": {
+      "title": "Einstempeln an der Kasse",
+      "description": "Mitarbeiter können sich an der Kasse mit ihrer PIN ein- und ausstempeln. Die Zeiten erscheinen in der Zeiterfassung.",
+      "toggle": "Ein-/Ausstempeln an der Kasse erlauben"
+    },
     "alerts": {
       "nameAndPinRequired": "Name und PIN eingeben",
       "confirmDelete": "Möchten Sie wirklich löschen:",
       "deleteFailed": "Löschen fehlgeschlagen"
+    }
+  },
+  "staffClock": {
+    "buttonTitle": "Ein- oder ausstempeln",
+    "modalTitle": "Zeiterfassung Kasse",
+    "pinLabel": "PIN",
+    "pinPlaceholder": "PIN eingeben",
+    "pinRequired": "Bitte PIN eingeben.",
+    "clockIn": "Einstempeln",
+    "clockOut": "Ausstempeln",
+    "close": "Schließen",
+    "successIn": "Eingestempelt.",
+    "successOut": "Ausgestempelt.",
+    "errors": {
+      "bad_request": "Ungültige Anfrage",
+      "disabled": "Diese Funktion ist aus. Aktivieren Sie sie unter Personal.",
+      "bad_pin": "Falsche PIN",
+      "already_in": "Sie sind noch eingestempelt. Bitte zuerst ausstempeln.",
+      "day_complete": "Heute bereits ein- und ausgestempelt.",
+      "not_in": "Heute noch nicht eingestempelt.",
+      "already_out": "Heute bereits ausgestempelt.",
+      "server": "Etwas ist schiefgelaufen. Bitte erneut versuchen.",
+      "server_config": "Server nicht konfiguriert.",
+      "invalid_json": "Ungültige Daten",
+      "unknown": "Etwas ist schiefgelaufen."
     }
   },
   "analysePage": {

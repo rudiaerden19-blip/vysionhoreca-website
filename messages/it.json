@@ -3077,10 +3077,40 @@
       "freelance": "Freelance",
       "intern": "Stagista"
     },
+    "kassaClock": {
+      "title": "Timbratura in cassa",
+      "description": "Il personale può timbrare entrata e uscita in cassa con il PIN. Gli orari compaiono nella registrazione ore.",
+      "toggle": "Consenti timbratura in cassa"
+    },
     "alerts": {
       "nameAndPinRequired": "Inserisci nome e PIN",
       "confirmDelete": "Sei sicuro di voler eliminare:",
       "deleteFailed": "Eliminazione fallita"
+    }
+  },
+  "staffClock": {
+    "buttonTitle": "Timbratura entrata o uscita",
+    "modalTitle": "Timbratura personale",
+    "pinLabel": "PIN",
+    "pinPlaceholder": "Inserisci PIN",
+    "pinRequired": "Inserisci il PIN.",
+    "clockIn": "Entrata",
+    "clockOut": "Uscita",
+    "close": "Chiudi",
+    "successIn": "Entrata registrata.",
+    "successOut": "Uscita registrata.",
+    "errors": {
+      "bad_request": "Richiesta non valida",
+      "disabled": "Funzione disattivata. Attivala in Personale.",
+      "bad_pin": "PIN errato",
+      "already_in": "Sei ancora in servizio. Timbra prima l'uscita.",
+      "day_complete": "Oggi hai già timbrato entrata e uscita.",
+      "not_in": "Nessuna entrata oggi.",
+      "already_out": "Uscita già timbrata oggi.",
+      "server": "Qualcosa è andato storto. Riprova.",
+      "server_config": "Server non configurato.",
+      "invalid_json": "Dati non validi",
+      "unknown": "Qualcosa è andato storto."
     }
   },
   "analysePage": {

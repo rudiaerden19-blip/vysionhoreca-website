@@ -3077,10 +3077,40 @@
       "freelance": "مستقل",
       "intern": "متدرب"
     },
+    "kassaClock": {
+      "title": "تسجيل الحضور على الصندوق",
+      "description": "يمكن للموظفين تسجيل الدخول والخروج على نقطة البيع برمز PIN. تظهر الأوقات في سجل الساعات.",
+      "toggle": "السماح بتسجيل الدخول/الخروج على الصندوق"
+    },
     "alerts": {
       "nameAndPinRequired": "أدخل الاسم ورمز PIN",
       "confirmDelete": "هل أنت متأكد من الحذف:",
       "deleteFailed": "فشل الحذف"
+    }
+  },
+  "staffClock": {
+    "buttonTitle": "تسجيل دخول أو خروج",
+    "modalTitle": "بصمة الموظفين",
+    "pinLabel": "رمز PIN",
+    "pinPlaceholder": "أدخل PIN",
+    "pinRequired": "يرجى إدخال PIN.",
+    "clockIn": "دخول",
+    "clockOut": "خروج",
+    "close": "إغلاق",
+    "successIn": "تم تسجيل الدخول.",
+    "successOut": "تم تسجيل الخروج.",
+    "errors": {
+      "bad_request": "طلب غير صالح",
+      "disabled": "الميزة معطلة. فعّلها من قسم الموظفين.",
+      "bad_pin": "رمز PIN خاطئ",
+      "already_in": "ما زلت مسجلاً دخولك. سجّل الخروج أولاً.",
+      "day_complete": "تم تسجيل الدخول والخروج اليوم.",
+      "not_in": "لم يُسجَّل دخول اليوم.",
+      "already_out": "تم تسجيل الخروج اليوم.",
+      "server": "حدث خطأ. حاول مرة أخرى.",
+      "server_config": "الخادم غير مهيأ.",
+      "invalid_json": "بيانات غير صالحة",
+      "unknown": "حدث خطأ."
     }
   },
   "analysePage": {

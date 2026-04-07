@@ -2577,10 +2577,40 @@
       "freelance": "Freelance",
       "intern": "Stagiaire"
     },
+    "kassaClock": {
+      "title": "Pointage à la caisse",
+      "description": "Le personnel peut pointer à la caisse avec son PIN. Les heures apparaissent dans la feuille de temps.",
+      "toggle": "Autoriser le pointage entrée/sortie à la caisse"
+    },
     "alerts": {
       "nameAndPinRequired": "Entrez nom et PIN",
       "confirmDelete": "Êtes-vous sûr de vouloir supprimer:",
       "deleteFailed": "Échec de la suppression"
+    }
+  },
+  "staffClock": {
+    "buttonTitle": "Pointer entrée ou sortie",
+    "modalTitle": "Pointage personnel",
+    "pinLabel": "PIN",
+    "pinPlaceholder": "Saisir le PIN",
+    "pinRequired": "Saisissez votre PIN.",
+    "clockIn": "Entrée",
+    "clockOut": "Sortie",
+    "close": "Fermer",
+    "successIn": "Entrée enregistrée.",
+    "successOut": "Sortie enregistrée.",
+    "errors": {
+      "bad_request": "Requête invalide",
+      "disabled": "Fonction désactivée. Activez-la dans Personnel.",
+      "bad_pin": "PIN incorrect",
+      "already_in": "Vous êtes encore en service. Pointez d'abord la sortie.",
+      "day_complete": "Déjà pointé entrée et sortie aujourd'hui.",
+      "not_in": "Pas d'entrée enregistrée aujourd'hui.",
+      "already_out": "Déjà pointé la sortie aujourd'hui.",
+      "server": "Une erreur s'est produite. Réessayez.",
+      "server_config": "Serveur non configuré.",
+      "invalid_json": "Données invalides",
+      "unknown": "Une erreur s'est produite."
     }
   },
   "analysePage": {

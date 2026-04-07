@@ -8,7 +8,9 @@ import { useParams } from 'next/navigation'
 import { 
   getStaff, 
   saveStaff, 
-  deleteStaff, 
+  deleteStaff,
+  getTenantSettings,
+  saveTenantKassaStaffClockEnabled,
   Staff, 
   StaffRole,
   ContractType
@@ -52,6 +54,9 @@ export default function PersoneelPage() {
   const [showContractModal, setShowContractModal] = useState(false)
   const [editingStaff, setEditingStaff] = useState<Staff | null>(null)
   const [showInactive, setShowInactive] = useState(false)
+  const [kassaClockEnabled, setKassaClockEnabled] = useState(false)
+  const [kassaClockLoading, setKassaClockLoading] = useState(true)
+  const [kassaClockSaving, setKassaClockSaving] = useState(false)
   
   const [formData, setFormData] = useState<Partial<Staff>>({
     name: '',
@@ -79,6 +84,33 @@ export default function PersoneelPage() {
     loadStaff()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tenant])
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      setKassaClockLoading(true)
+      const s = await getTenantSettings(tenant)
+      if (!cancelled) {
+        setKassaClockEnabled(!!s?.kassa_staff_clock_enabled)
+        setKassaClockLoading(false)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [tenant])
+
+  async function toggleKassaClock() {
+    const next = !kassaClockEnabled
+    setKassaClockSaving(true)
+    const res = await saveTenantKassaStaffClockEnabled(tenant, next)
+    setKassaClockSaving(false)
+    if (res.ok) {
+      setKassaClockEnabled(next)
+    } else {
+      alert(res.error || t('adminPages.common.saveFailed'))
+    }
+  }
 
   async function loadStaff() {
     setLoading(true)
@@ -261,6 +293,41 @@ export default function PersoneelPage() {
         <div className="bg-white rounded-2xl p-5 shadow-sm">
           <div className="text-3xl font-bold text-green-600 mb-1">{staff.filter(s => s.role === 'EMPLOYEE').length}</div>
           <div className="text-sm text-gray-500">{t('personeelPage.roles.employees')}</div>
+        </div>
+      </div>
+
+      {/* Kassa: in-/uitklokken met PIN */}
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <h2 className="text-lg font-bold text-gray-900">{t('personeelPage.kassaClock.title')}</h2>
+            <p className="mt-1 text-sm text-gray-600">{t('personeelPage.kassaClock.description')}</p>
+          </div>
+          <div className="flex shrink-0 items-center gap-3">
+            {kassaClockLoading ? (
+              <span className="text-sm text-gray-400">…</span>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={kassaClockEnabled}
+                  disabled={kassaClockSaving}
+                  onClick={() => void toggleKassaClock()}
+                  className={`relative h-8 w-14 rounded-full transition-colors duration-200 disabled:opacity-50 ${
+                    kassaClockEnabled ? 'bg-emerald-500' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`absolute top-0.5 left-0.5 h-7 w-7 rounded-full bg-white shadow transition-transform duration-200 ${
+                      kassaClockEnabled ? 'translate-x-6' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+                <span className="text-sm font-medium text-gray-700">{t('personeelPage.kassaClock.toggle')}</span>
+              </>
+            )}
+          </div>
         </div>
       </div>
 

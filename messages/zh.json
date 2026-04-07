@@ -3077,10 +3077,40 @@
       "freelance": "自由职业",
       "intern": "实习生"
     },
+    "kassaClock": {
+      "title": "在收银机打卡",
+      "description": "员工可使用个人PIN在收银端打卡上下班，时间会显示在工时登记中。",
+      "toggle": "允许在收银机打卡上下班"
+    },
     "alerts": {
       "nameAndPinRequired": "请输入姓名和PIN码",
       "confirmDelete": "确定要删除吗：",
       "deleteFailed": "删除失败"
+    }
+  },
+  "staffClock": {
+    "buttonTitle": "上班或下班打卡",
+    "modalTitle": "员工打卡",
+    "pinLabel": "PIN",
+    "pinPlaceholder": "输入PIN",
+    "pinRequired": "请输入PIN。",
+    "clockIn": "上班",
+    "clockOut": "下班",
+    "close": "关闭",
+    "successIn": "已记录上班。",
+    "successOut": "已记录下班。",
+    "errors": {
+      "bad_request": "请求无效",
+      "disabled": "此功能已关闭。请在人员设置中开启。",
+      "bad_pin": "PIN错误",
+      "already_in": "尚未下班，请先打下班卡。",
+      "day_complete": "今日已打过上班和下班卡。",
+      "not_in": "今日尚未打上班卡。",
+      "already_out": "今日已打下班卡。",
+      "server": "出错了，请重试。",
+      "server_config": "服务器未配置。",
+      "invalid_json": "数据无效",
+      "unknown": "出错了。"
     }
   },
   "analysePage": {

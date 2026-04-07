@@ -577,6 +577,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   } | null>(null)
   const [tenantInfo, setTenantInfo] = useState<TenantSettings | null>(null)
 
+  const [staffClockOpen, setStaffClockOpen] = useState(false)
+  const [staffClockPin, setStaffClockPin] = useState('')
+  const [staffClockBusy, setStaffClockBusy] = useState(false)
+  const [staffClockMessage, setStaffClockMessage] = useState<{ type: 'ok' | 'err'; text: string } | null>(null)
+
   // Opties modal (editingCartKey = bestaande winkelmandregel aanpassen)
   const [optionsModal, setOptionsModal] = useState<{
     product: MenuProduct
@@ -1188,6 +1193,61 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     window.location.href = `/login?next=${encodeURIComponent(next)}`
   }
 
+  const staffClockErrorText = (code: string) => {
+    const key = `staffClock.errors.${code}`
+    const msg = t(key)
+    return msg === key ? t('staffClock.errors.unknown') : msg
+  }
+
+  const submitStaffClock = async (action: 'in' | 'out') => {
+    const pin = staffClockPin.trim()
+    if (!pin) {
+      playClick()
+      setStaffClockMessage({ type: 'err', text: t('staffClock.pinRequired') })
+      return
+    }
+    setStaffClockBusy(true)
+    setStaffClockMessage(null)
+    try {
+      const res = await fetch('/api/kassa/staff-clock', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tenant_slug: tenant, pin, action }),
+      })
+      const data = (await res.json()) as {
+        ok?: boolean
+        error?: string
+        staffName?: string
+        clock_in?: string
+        clock_out?: string
+      }
+      if (data.ok) {
+        playSuccess()
+        const who = data.staffName ? ` — ${data.staffName}` : ''
+        const timeBit =
+          action === 'in'
+            ? data.clock_in
+              ? ` (${data.clock_in})`
+              : ''
+            : data.clock_out
+              ? ` (${data.clock_out})`
+              : ''
+        setStaffClockMessage({
+          type: 'ok',
+          text:
+            (action === 'in' ? t('staffClock.successIn') : t('staffClock.successOut')) + who + timeBit,
+        })
+        setStaffClockPin('')
+      } else {
+        playClick()
+        setStaffClockMessage({ type: 'err', text: staffClockErrorText(data.error || 'unknown') })
+      }
+    } catch {
+      setStaffClockMessage({ type: 'err', text: t('staffClock.errors.server') })
+    }
+    setStaffClockBusy(false)
+  }
+
   // ── Geluid activatie scherm (exact donor) — toon elke sessie ───────────
   if (showSoundActivation && !soundActivated && !demoViewOnly) {
     return (
@@ -1352,6 +1412,23 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           title={soundsOn ? 'Geluid aan' : 'Geluid uit'}>
           {soundsOn ? '🔔' : '🔕'}
         </button>
+
+        {tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly && (
+          <button
+            type="button"
+            onClick={() => {
+              playClick()
+              setStaffClockOpen(true)
+              setStaffClockPin('')
+              setStaffClockMessage(null)
+            }}
+            className="w-9 h-9 rounded-lg flex items-center justify-center text-lg transition-colors bg-white/10 text-white hover:bg-white/20"
+            title={t('staffClock.buttonTitle')}
+            aria-label={t('staffClock.buttonTitle')}
+          >
+            🕐
+          </button>
+        )}
 
         {/* Taal */}
         <div ref={langRef} className="relative z-20">
@@ -1809,6 +1886,72 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 Wissel naar {switchConfirm}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {staffClockOpen && (
+        <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6 flex flex-col gap-4">
+            <div className="flex items-center justify-between gap-2">
+              <h2 className="font-bold text-lg text-gray-900">{t('staffClock.modalTitle')}</h2>
+              <button
+                type="button"
+                onClick={() => {
+                  playClick()
+                  setStaffClockOpen(false)
+                }}
+                className="p-2 hover:bg-gray-100 rounded-xl text-gray-500"
+                aria-label={t('staffClock.close')}
+              >
+                ✕
+              </button>
+            </div>
+            <label className="block text-sm font-medium text-gray-700">{t('staffClock.pinLabel')}</label>
+            <input
+              type="password"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              value={staffClockPin}
+              onChange={(e) => setStaffClockPin(e.target.value.replace(/\D/g, '').slice(0, 12))}
+              placeholder={t('staffClock.pinPlaceholder')}
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-lg font-mono tracking-widest"
+            />
+            {staffClockMessage && (
+              <p
+                className={`text-sm font-medium ${staffClockMessage.type === 'ok' ? 'text-emerald-600' : 'text-red-600'}`}
+              >
+                {staffClockMessage.text}
+              </p>
+            )}
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                disabled={staffClockBusy}
+                onClick={() => void submitStaffClock('in')}
+                className="py-3 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-700 disabled:opacity-50 transition-colors"
+              >
+                {t('staffClock.clockIn')}
+              </button>
+              <button
+                type="button"
+                disabled={staffClockBusy}
+                onClick={() => void submitStaffClock('out')}
+                className="py-3 rounded-xl bg-[#3C4D6B] text-white font-bold hover:bg-[#2D3A52] disabled:opacity-50 transition-colors"
+              >
+                {t('staffClock.clockOut')}
+              </button>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                playClick()
+                setStaffClockOpen(false)
+              }}
+              className="py-2.5 rounded-xl bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 transition-colors"
+            >
+              {t('staffClock.close')}
+            </button>
           </div>
         </div>
       )}

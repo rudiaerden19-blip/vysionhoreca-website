@@ -3493,10 +3493,40 @@
       "freelance": "Freelance",
       "intern": "Stagiair"
     },
+    "kassaClock": {
+      "title": "Inklokken op de kassa",
+      "description": "Medewerkers kunnen in de kassa met hun persoonlijke PIN in- en uitklokken. Tijden verschijnen in Urenregistratie.",
+      "toggle": "In- en uitklokken op de kassa toestaan"
+    },
     "alerts": {
       "nameAndPinRequired": "Vul naam en PIN in",
       "confirmDelete": "Weet je zeker dat je wilt verwijderen:",
       "deleteFailed": "Verwijderen mislukt"
+    }
+  },
+  "staffClock": {
+    "buttonTitle": "In- of uitklokken",
+    "modalTitle": "Personeel klok",
+    "pinLabel": "PIN",
+    "pinPlaceholder": "PIN invoeren",
+    "pinRequired": "Vul je PIN in.",
+    "clockIn": "Inklokken",
+    "clockOut": "Uitklokken",
+    "close": "Sluiten",
+    "successIn": "Ingeklokt.",
+    "successOut": "Uitgeklokt.",
+    "errors": {
+      "bad_request": "Ongeldige aanvraag",
+      "disabled": "Deze functie staat uit. Zet hem aan bij Personeel.",
+      "bad_pin": "Verkeerde PIN",
+      "already_in": "Je bent nog ingeklokt. Klok eerst uit.",
+      "day_complete": "Voor vandaag is al in- en uitgeklokt.",
+      "not_in": "Nog niet ingeklokt vandaag.",
+      "already_out": "Je bent al uitgeklokt vandaag.",
+      "server": "Er ging iets mis. Probeer opnieuw.",
+      "server_config": "Server niet geconfigureerd.",
+      "invalid_json": "Ongeldige data",
+      "unknown": "Er ging iets mis."
     }
   },
   "analysePage": {

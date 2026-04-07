@@ -205,6 +205,8 @@ export interface TenantSettings {
   dark_mode?: boolean
   /** Welke EU-allergenen-id's actief zijn voor deze zaak (admin producten / kassa); null = app-defaults */
   allergens_config?: string[] | null
+  /** Medewerkers mogen op de kassa met PIN in-/uitklokken (instelling: Personeel) */
+  kassa_staff_clock_enabled?: boolean
 }
 
 export async function getTenantSettings(tenantSlug: string, signal?: AbortSignal): Promise<TenantSettings | null> {
@@ -266,6 +268,32 @@ export async function saveTenantAllergensConfig(
     }
   }
 
+  cache.invalidate(cacheKey('tenant_settings', tenantSlug))
+  return { ok: true }
+}
+
+/** Zet in-/uitklokken op de kassa aan of uit (module Personeel). */
+export async function saveTenantKassaStaffClockEnabled(
+  tenantSlug: string,
+  enabled: boolean
+): Promise<{ ok: boolean; error?: string }> {
+  const { data, error } = await supabase
+    .from('tenant_settings')
+    .update({ kassa_staff_clock_enabled: enabled })
+    .eq('tenant_slug', tenantSlug)
+    .select('tenant_slug')
+
+  if (error) {
+    console.error('saveTenantKassaStaffClockEnabled:', error.message)
+    return { ok: false, error: error.message }
+  }
+  if (!data || data.length === 0) {
+    return {
+      ok: false,
+      error:
+        'Geen tenant_settings bijgewerkt. Voer supabase/tenant_settings_kassa_staff_clock.sql uit en controleer of deze tenant een instellingenrij heeft.',
+    }
+  }
   cache.invalidate(cacheKey('tenant_settings', tenantSlug))
   return { ok: true }
 }

@@ -3493,10 +3493,40 @@
       "freelance": "Freelance",
       "intern": "Intern"
     },
+    "kassaClock": {
+      "title": "Clock in on POS",
+      "description": "Staff can clock in and out on the POS with their PIN. Times appear in Time registration.",
+      "toggle": "Allow clock in/out on POS"
+    },
     "alerts": {
       "nameAndPinRequired": "Enter name and PIN",
       "confirmDelete": "Are you sure you want to delete:",
       "deleteFailed": "Delete failed"
+    }
+  },
+  "staffClock": {
+    "buttonTitle": "Clock in or out",
+    "modalTitle": "Staff clock",
+    "pinLabel": "PIN",
+    "pinPlaceholder": "Enter PIN",
+    "pinRequired": "Enter your PIN.",
+    "clockIn": "Clock in",
+    "clockOut": "Clock out",
+    "close": "Close",
+    "successIn": "Clocked in.",
+    "successOut": "Clocked out.",
+    "errors": {
+      "bad_request": "Invalid request",
+      "disabled": "This feature is off. Enable it under Staff.",
+      "bad_pin": "Wrong PIN",
+      "already_in": "You are still clocked in. Clock out first.",
+      "day_complete": "Already clocked in and out today.",
+      "not_in": "Not clocked in today.",
+      "already_out": "Already clocked out today.",
+      "server": "Something went wrong. Try again.",
+      "server_config": "Server not configured.",
+      "invalid_json": "Invalid data",
+      "unknown": "Something went wrong."
     }
   },
   "analysePage": {

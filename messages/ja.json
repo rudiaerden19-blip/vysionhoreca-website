@@ -3077,10 +3077,40 @@
       "freelance": "フリーランス",
       "intern": "インターン"
     },
+    "kassaClock": {
+      "title": "レジでの出退勤",
+      "description": "スタッフはPINでレジから出勤・退勤できます。記録は勤怠に反映されます。",
+      "toggle": "レジでの出退勤を許可する"
+    },
     "alerts": {
       "nameAndPinRequired": "名前とPINを入力",
       "confirmDelete": "削除してもよろしいですか：",
       "deleteFailed": "削除に失敗"
+    }
+  },
+  "staffClock": {
+    "buttonTitle": "出勤または退勤",
+    "modalTitle": "スタッフ打刻",
+    "pinLabel": "PIN",
+    "pinPlaceholder": "PINを入力",
+    "pinRequired": "PINを入力してください。",
+    "clockIn": "出勤",
+    "clockOut": "退勤",
+    "close": "閉じる",
+    "successIn": "出勤を記録しました。",
+    "successOut": "退勤を記録しました。",
+    "errors": {
+      "bad_request": "無効なリクエスト",
+      "disabled": "機能がオフです。スタッフ設定で有効にしてください。",
+      "bad_pin": "PINが違います",
+      "already_in": "まだ出勤中です。先に退勤してください。",
+      "day_complete": "本日はすでに出勤・退勤済みです。",
+      "not_in": "本日はまだ出勤していません。",
+      "already_out": "本日はすでに退勤済みです。",
+      "server": "エラーが発生しました。もう一度お試しください。",
+      "server_config": "サーバーが設定されていません。",
+      "invalid_json": "無効なデータ",
+      "unknown": "エラーが発生しました。"
     }
   },
   "analysePage": {
