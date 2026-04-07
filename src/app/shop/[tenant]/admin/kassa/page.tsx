@@ -69,9 +69,10 @@ function KassaAnalogClock({ size = 80 }: { size?: number }) {
     return () => window.clearInterval(id)
   }, [])
   const { h, m, s } = getWallClockHms(now, KASSA_DISPLAY_TIMEZONE)
-  const hDeg = ((h % 12) + m / 60 + s / 3600) * 30 - 90
-  const mDeg = (m + s / 60) * 6 - 90
-  const sDeg = s * 6 - 90
+  /* Wijzers zijn getekend naar 12 uur (naar y=32); positieve rotate = met de klok mee in SVG. */
+  const hDeg = ((h % 12) + m / 60 + s / 3600) * 30
+  const mDeg = (m + s / 60) * 6
+  const sDeg = s * 6
   return (
     <svg
       width={size}
