@@ -356,15 +356,6 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
             enabledModulesJson={enabledModulesJson}
             loading={modulesLoading}
           />
-          <Link
-            href={`${baseUrl}/`}
-            className="flex shrink-0 items-center gap-2 rounded-xl bg-orange-500 px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-orange-400"
-          >
-            <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            <span>{t('adminLayout.back')}</span>
-          </Link>
           {!modulesLoading && (isSuperAdminLoggedIn() || moduleAccess['kassa']) && (
             <Link
               href={

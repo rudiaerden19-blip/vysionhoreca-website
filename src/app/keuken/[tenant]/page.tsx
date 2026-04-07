@@ -485,15 +485,6 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
       <header className="shrink-0 bg-blue-600 px-4 py-3 text-white">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-            <Link
-              href={adminBase}
-              className="flex shrink-0 items-center gap-2 rounded-xl bg-orange-500 px-3 py-2 text-sm font-bold text-white shadow-md transition-colors hover:bg-orange-400"
-            >
-              <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              {t('adminLayout.back')}
-            </Link>
             {kassaEntryHref && (
               <Link
                 href={kassaEntryHref}
