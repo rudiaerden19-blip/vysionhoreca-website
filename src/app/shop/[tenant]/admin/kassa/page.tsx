@@ -578,9 +578,25 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [tenantInfo, setTenantInfo] = useState<TenantSettings | null>(null)
 
   const [staffClockOpen, setStaffClockOpen] = useState(false)
-  const [staffClockPin, setStaffClockPin] = useState('')
+  const [staffClockList, setStaffClockList] = useState<
+    { id: string; name: string; hasOpenSession: boolean }[]
+  >([])
+  const [staffClockListLoading, setStaffClockListLoading] = useState(false)
   const [staffClockBusy, setStaffClockBusy] = useState(false)
-  const [staffClockMessage, setStaffClockMessage] = useState<{ type: 'ok' | 'err'; text: string } | null>(null)
+  const [staffClockPinModal, setStaffClockPinModal] = useState<{
+    staffId: string
+    staffName: string
+    action: 'in' | 'out'
+  } | null>(null)
+  const [staffClockPinInput, setStaffClockPinInput] = useState('')
+  const [staffClockPinError, setStaffClockPinError] = useState<string | null>(null)
+  const [staffClockSummary, setStaffClockSummary] = useState<{
+    staffName: string
+    total: number
+    orderCount: number
+    orders: { order_number: number; total: number }[]
+  } | null>(null)
+  const [activeKassaStaff, setActiveKassaStaff] = useState<{ id: string; name: string } | null>(null)
 
   // Opties modal (editingCartKey = bestaande winkelmandregel aanpassen)
   const [optionsModal, setOptionsModal] = useState<{
@@ -1043,6 +1059,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       subtotal: Math.round(subtotal * 100) / 100,
       tax: Math.round(tax * 100) / 100,
       total: total,
+      kassa_staff_id: activeKassaStaff?.id ?? null,
       items: cart.map(i => ({
         product_id: i.product.id,
         name: i.product.name,
@@ -1199,53 +1216,90 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return msg === key ? t('staffClock.errors.unknown') : msg
   }
 
-  const submitStaffClock = async (action: 'in' | 'out') => {
-    const pin = staffClockPin.trim()
+  const loadStaffClockList = async () => {
+    setStaffClockListLoading(true)
+    try {
+      const res = await fetch(`/api/kassa/staff-clock?tenant_slug=${encodeURIComponent(tenant)}`)
+      const data = (await res.json()) as {
+        ok?: boolean
+        staff?: { id: string; name: string; hasOpenSession: boolean }[]
+      }
+      if (data.ok && data.staff) setStaffClockList(data.staff)
+      else setStaffClockList([])
+    } catch {
+      setStaffClockList([])
+    }
+    setStaffClockListLoading(false)
+  }
+
+  const openStaffClockModal = () => {
+    playClick()
+    setStaffClockOpen(true)
+    setStaffClockPinModal(null)
+    setStaffClockPinInput('')
+    setStaffClockPinError(null)
+    void loadStaffClockList()
+  }
+
+  const submitStaffClockPin = async () => {
+    const modal = staffClockPinModal
+    if (!modal) return
+    const pin = staffClockPinInput.trim()
     if (!pin) {
       playClick()
-      setStaffClockMessage({ type: 'err', text: t('staffClock.pinRequired') })
+      setStaffClockPinError(t('staffClock.pinRequired'))
       return
     }
     setStaffClockBusy(true)
-    setStaffClockMessage(null)
+    setStaffClockPinError(null)
     try {
       const res = await fetch('/api/kassa/staff-clock', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tenant_slug: tenant, pin, action }),
+        body: JSON.stringify({
+          tenant_slug: tenant,
+          staff_id: modal.staffId,
+          pin,
+          action: modal.action,
+        }),
       })
       const data = (await res.json()) as {
         ok?: boolean
         error?: string
         staffName?: string
-        clock_in?: string
-        clock_out?: string
+        summary?: { total: number; order_count: number; orders: { order_number: number; total: number }[] }
       }
       if (data.ok) {
         playSuccess()
-        const who = data.staffName ? ` — ${data.staffName}` : ''
-        const timeBit =
-          action === 'in'
-            ? data.clock_in
-              ? ` (${data.clock_in})`
-              : ''
-            : data.clock_out
-              ? ` (${data.clock_out})`
-              : ''
-        setStaffClockMessage({
-          type: 'ok',
-          text:
-            (action === 'in' ? t('staffClock.successIn') : t('staffClock.successOut')) + who + timeBit,
-        })
-        setStaffClockPin('')
+        setStaffClockPinModal(null)
+        setStaffClockPinInput('')
+        if (modal.action === 'out' && activeKassaStaff?.id === modal.staffId) {
+          setActiveKassaStaff(null)
+        }
+        if (modal.action === 'out' && data.summary !== undefined) {
+          setStaffClockSummary({
+            staffName: data.staffName || modal.staffName,
+            total: data.summary.total,
+            orderCount: data.summary.order_count,
+            orders: data.summary.orders || [],
+          })
+        }
+        void loadStaffClockList()
       } else {
         playClick()
-        setStaffClockMessage({ type: 'err', text: staffClockErrorText(data.error || 'unknown') })
+        setStaffClockPinError(staffClockErrorText(data.error || 'unknown'))
       }
     } catch {
-      setStaffClockMessage({ type: 'err', text: t('staffClock.errors.server') })
+      setStaffClockPinError(t('staffClock.errors.server'))
     }
     setStaffClockBusy(false)
+  }
+
+  const startStaffSales = (s: { id: string; name: string }) => {
+    playSuccess()
+    setActiveKassaStaff({ id: s.id, name: s.name })
+    setStaffClockOpen(false)
+    setStaffClockPinModal(null)
   }
 
   // ── Geluid activatie scherm (exact donor) — toon elke sessie ───────────
@@ -1416,18 +1470,31 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly && (
           <button
             type="button"
-            onClick={() => {
-              playClick()
-              setStaffClockOpen(true)
-              setStaffClockPin('')
-              setStaffClockMessage(null)
-            }}
+            onClick={openStaffClockModal}
             className="w-9 h-9 rounded-lg flex items-center justify-center text-lg transition-colors bg-white/10 text-white hover:bg-white/20"
             title={t('staffClock.buttonTitle')}
             aria-label={t('staffClock.buttonTitle')}
           >
             🕐
           </button>
+        )}
+
+        {activeKassaStaff && !demoViewOnly && (
+          <div className="hidden sm:flex items-center gap-1.5 max-w-[10rem] md:max-w-xs rounded-lg bg-emerald-600/90 text-white text-xs font-bold px-2 py-1.5">
+            <span className="truncate" title={activeKassaStaff.name}>
+              🛒 {activeKassaStaff.name}
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                playClick()
+                setActiveKassaStaff(null)
+              }}
+              className="shrink-0 rounded bg-white/20 px-1.5 py-0.5 hover:bg-white/30"
+            >
+              ×
+            </button>
+          </div>
         )}
 
         {/* Taal */}
@@ -1891,15 +1958,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       )}
 
       {staffClockOpen && (
-        <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6 flex flex-col gap-4">
-            <div className="flex items-center justify-between gap-2">
+        <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] shadow-2xl flex flex-col overflow-hidden z-[61]">
+            <div className="flex items-center justify-between gap-2 border-b border-gray-100 px-4 py-3">
               <h2 className="font-bold text-lg text-gray-900">{t('staffClock.modalTitle')}</h2>
               <button
                 type="button"
                 onClick={() => {
                   playClick()
                   setStaffClockOpen(false)
+                  setStaffClockPinModal(null)
                 }}
                 className="p-2 hover:bg-gray-100 rounded-xl text-gray-500"
                 aria-label={t('staffClock.close')}
@@ -1907,50 +1975,173 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 ✕
               </button>
             </div>
-            <label className="block text-sm font-medium text-gray-700">{t('staffClock.pinLabel')}</label>
-            <input
-              type="password"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              value={staffClockPin}
-              onChange={(e) => setStaffClockPin(e.target.value.replace(/\D/g, '').slice(0, 12))}
-              placeholder={t('staffClock.pinPlaceholder')}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-lg font-mono tracking-widest"
-            />
-            {staffClockMessage && (
-              <p
-                className={`text-sm font-medium ${staffClockMessage.type === 'ok' ? 'text-emerald-600' : 'text-red-600'}`}
-              >
-                {staffClockMessage.text}
-              </p>
-            )}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              {staffClockListLoading ? (
+                <div className="py-12 text-center text-gray-500">{t('staffClock.loadingList')}</div>
+              ) : staffClockList.length === 0 ? (
+                <div className="py-10 text-center text-gray-500">{t('staffClock.noStaff')}</div>
+              ) : (
+                staffClockList.map((s) => (
+                  <div
+                    key={s.id}
+                    className="rounded-xl border border-gray-200 bg-gray-50/80 p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+                  >
+                    <div className="min-w-0">
+                      <p className="font-bold text-gray-900 text-lg truncate">{s.name}</p>
+                      {s.hasOpenSession ? (
+                        <p className="text-xs font-semibold text-emerald-600 mt-0.5">{t('staffClock.statusClockedIn')}</p>
+                      ) : (
+                        <p className="text-xs text-gray-500 mt-0.5">{t('staffClock.statusClockedOut')}</p>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 shrink-0 sm:min-w-[280px]">
+                      <button
+                        type="button"
+                        disabled={staffClockBusy}
+                        onClick={() => {
+                          playClick()
+                          setStaffClockPinModal({ staffId: s.id, staffName: s.name, action: 'in' })
+                          setStaffClockPinInput('')
+                          setStaffClockPinError(null)
+                        }}
+                        className="py-2.5 px-2 rounded-xl bg-emerald-600 text-white text-sm font-bold hover:bg-emerald-700 disabled:opacity-50"
+                      >
+                        {t('staffClock.clockInCode')}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={staffClockBusy || !s.hasOpenSession}
+                        onClick={() => {
+                          playClick()
+                          setStaffClockPinModal({ staffId: s.id, staffName: s.name, action: 'out' })
+                          setStaffClockPinInput('')
+                          setStaffClockPinError(null)
+                        }}
+                        className="py-2.5 px-2 rounded-xl bg-[#3C4D6B] text-white text-sm font-bold hover:bg-[#2D3A52] disabled:opacity-40 disabled:grayscale"
+                      >
+                        {t('staffClock.clockOutCode')}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={!s.hasOpenSession}
+                        onClick={() => startStaffSales(s)}
+                        className="py-2.5 px-2 rounded-xl bg-amber-500 text-white text-sm font-bold hover:bg-amber-600 disabled:opacity-40 disabled:grayscale"
+                        title={s.hasOpenSession ? t('staffClock.salesHint') : t('staffClock.salesNeedsClock')}
+                      >
+                        {t('staffClock.sales')}
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+            <div className="border-t border-gray-100 p-3">
               <button
                 type="button"
-                disabled={staffClockBusy}
-                onClick={() => void submitStaffClock('in')}
-                className="py-3 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-700 disabled:opacity-50 transition-colors"
+                onClick={() => {
+                  playClick()
+                  setStaffClockOpen(false)
+                  setStaffClockPinModal(null)
+                }}
+                className="w-full py-2.5 rounded-xl bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 transition-colors"
               >
-                {t('staffClock.clockIn')}
-              </button>
-              <button
-                type="button"
-                disabled={staffClockBusy}
-                onClick={() => void submitStaffClock('out')}
-                className="py-3 rounded-xl bg-[#3C4D6B] text-white font-bold hover:bg-[#2D3A52] disabled:opacity-50 transition-colors"
-              >
-                {t('staffClock.clockOut')}
+                {t('staffClock.close')}
               </button>
             </div>
+          </div>
+
+          {staffClockPinModal && (
+            <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4">
+              <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-5 flex flex-col gap-3">
+                <p className="font-bold text-gray-900">
+                  {(staffClockPinModal.action === 'in'
+                    ? t('staffClock.pinTitleIn')
+                    : t('staffClock.pinTitleOut')
+                  ).replace('{name}', staffClockPinModal.staffName)}
+                </p>
+                <input
+                  type="password"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  value={staffClockPinInput}
+                  onChange={(e) => setStaffClockPinInput(e.target.value.replace(/\D/g, '').slice(0, 12))}
+                  placeholder={t('staffClock.pinPlaceholder')}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 text-lg font-mono tracking-widest"
+                />
+                {staffClockPinError && <p className="text-sm font-medium text-red-600">{staffClockPinError}</p>}
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    disabled={staffClockBusy}
+                    onClick={() => {
+                      playClick()
+                      setStaffClockPinModal(null)
+                    }}
+                    className="flex-1 py-2.5 rounded-xl bg-gray-100 text-gray-700 font-semibold"
+                  >
+                    {t('staffClock.cancel')}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={staffClockBusy}
+                    onClick={() => void submitStaffClockPin()}
+                    className="flex-1 py-2.5 rounded-xl bg-[#3C4D6B] text-white font-bold disabled:opacity-50"
+                  >
+                    {t('staffClock.confirmPin')}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {staffClockSummary && (
+        <div className="fixed inset-0 bg-black/60 z-[65] flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl p-6 flex flex-col gap-4 max-h-[85vh] overflow-hidden">
+            <h2 className="font-bold text-xl text-gray-900">{t('staffClock.summaryTitle')}</h2>
+            <p className="text-gray-600 text-sm">
+              {t('staffClock.summaryIntro').replace('{name}', staffClockSummary.staffName)}
+            </p>
+            <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-4 text-center">
+              <p className="text-sm text-emerald-800 font-medium">{t('staffClock.summaryTotalLabel')}</p>
+              <p className="text-3xl font-black text-emerald-700">€{staffClockSummary.total.toFixed(2)}</p>
+              <p className="text-xs text-emerald-700 mt-1">
+                {t('staffClock.summaryOrderCount').replace('{count}', String(staffClockSummary.orderCount))}
+              </p>
+            </div>
+            {staffClockSummary.orders.length > 0 && (
+              <div className="flex-1 overflow-y-auto border border-gray-100 rounded-xl max-h-48">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 sticky top-0">
+                    <tr>
+                      <th className="text-left p-2 font-semibold text-gray-700">#</th>
+                      <th className="text-right p-2 font-semibold text-gray-700">{t('staffClock.summaryAmount')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {staffClockSummary.orders.map((o) => (
+                      <tr key={o.order_number} className="border-t border-gray-100">
+                        <td className="p-2 font-mono">{o.order_number}</td>
+                        <td className="p-2 text-right font-medium">€{o.total.toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            {staffClockSummary.orders.length === 0 && (
+              <p className="text-sm text-gray-500 text-center py-2">{t('staffClock.noOrdersToday')}</p>
+            )}
             <button
               type="button"
               onClick={() => {
                 playClick()
-                setStaffClockOpen(false)
+                setStaffClockSummary(null)
               }}
-              className="py-2.5 rounded-xl bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 transition-colors"
+              className="w-full py-3 rounded-xl bg-[#3C4D6B] text-white font-bold hover:bg-[#2D3A52]"
             >
-              {t('staffClock.close')}
+              {t('staffClock.summaryClose')}
             </button>
           </div>
         </div>

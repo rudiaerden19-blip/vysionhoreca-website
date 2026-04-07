@@ -314,6 +314,7 @@ export default function SuperAdminDashboard() {
     await supabase.from('reservations').delete().eq('tenant_slug', slug)
     await supabase.from('gift_cards').delete().eq('tenant_slug', slug)
     await supabase.from('team_members').delete().eq('tenant_slug', slug)
+    await supabase.from('staff_clock_sessions').delete().eq('tenant_slug', slug)
     await supabase.from('staff').delete().eq('tenant_slug', slug)
     await supabase.from('timesheet_entries').delete().eq('tenant_slug', slug)
     await supabase.from('monthly_timesheets').delete().eq('tenant_slug', slug)

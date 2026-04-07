@@ -16,6 +16,7 @@ const TABLES_DELETE_IN_ORDER = [
   'loyalty_redemptions',
   'order_groups',
   'orders',
+  'staff_clock_sessions',
   'customers',
   'shop_customers',
   'loyalty_rewards',
