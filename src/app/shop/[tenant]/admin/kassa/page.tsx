@@ -43,16 +43,32 @@ interface CartItem {
 
 type OrderType = 'DINE_IN' | 'TAKEAWAY' | 'DELIVERY'
 
-/** Analoge klok met wijzers (live) — gebruikt op numpad voor personeelsklok */
+/** Wandtijd in een IANA-zone (kassa = altijd België, los van verkeerde PC-tijdzone). */
+function getWallClockHms(date: Date, timeZone: string): { h: number; m: number; s: number } {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone,
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }).formatToParts(date)
+  const n = (type: Intl.DateTimeFormatPartTypes) =>
+    Number(parts.find((p) => p.type === type)?.value ?? 0)
+  return { h: n('hour'), m: n('minute'), s: n('second') }
+}
+
+const KASSA_DISPLAY_TIMEZONE = 'Europe/Brussels'
+
+/** Analoge klok met wijzers (live) — echte tijd + tik opent personeelsklok */
 function KassaAnalogClock({ size = 80 }: { size?: number }) {
   const [now, setNow] = useState(() => new Date())
-  useEffect(() => {
-    const id = window.setInterval(() => setNow(new Date()), 1000)
+  useLayoutEffect(() => {
+    const tick = () => setNow(new Date())
+    tick()
+    const id = window.setInterval(tick, 1000)
     return () => window.clearInterval(id)
   }, [])
-  const h = now.getHours()
-  const m = now.getMinutes()
-  const s = now.getSeconds()
+  const { h, m, s } = getWallClockHms(now, KASSA_DISPLAY_TIMEZONE)
   const hDeg = ((h % 12) + m / 60 + s / 3600) * 30 - 90
   const mDeg = (m + s / 60) * 6 - 90
   const sDeg = s * 6 - 90
