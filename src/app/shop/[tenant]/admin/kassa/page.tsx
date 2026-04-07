@@ -244,8 +244,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [isOnline, setIsOnline] = useState<boolean | null>(null)
   const [langOpen, setLangOpen] = useState(false)
   const langRef = useRef<HTMLDivElement>(null)
-  /** Gezet na requiresStaffSelectionForSale (staffklok); gebruikt in addToCart e.d. vóór die variabele in de bron. */
-  const ensureStaffSelectedForSaleRef = useRef<() => boolean>(() => true)
+  /** Alleen bij product/opties: toon korte popup als verkoopmedewerker verplicht is. */
+  const blockSaleWithoutStaffIfNeededRef = useRef<() => boolean>(() => false)
 
   // ── Nieuwe bestelling alarm (exact donor) ────────────────────────────────
   const [newOrderAlert, setNewOrderAlert] = useState<{id: string; orderNumber: number; total: number} | null>(null)
@@ -659,7 +659,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   // "Naar tafel" knop: sla bestelling op en leeg de kassa voor volgende tafel
   const parkOrder = () => {
     if (!tableNumber || cart.length === 0) return
-    if (!ensureStaffSelectedForSaleRef.current()) return
     saveCartToTable(tableNumber, cart)
     setCart([])
     setTableNumber('')
@@ -692,6 +691,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [staffClockListLoading, setStaffClockListLoading] = useState(false)
   /** Minstens één GET staff-lijst afgerond terwijl klok aan staat (voorkomt korte “niemand ingeklokt”-race). */
   const [staffClockListHydrated, setStaffClockListHydrated] = useState(false)
+  const [productStaffGatePopupOpen, setProductStaffGatePopupOpen] = useState(false)
   const [staffClockBusy, setStaffClockBusy] = useState(false)
   const [staffClockPinModal, setStaffClockPinModal] = useState<{
     staffId: string
@@ -881,7 +881,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }
 
   const addToCart = (product: MenuProduct, choices: SelectedChoice[] = []) => {
-    if (!ensureStaffSelectedForSaleRef.current()) return
     playAddToCart()
     const cartKey = choices.length > 0
       ? `${product.id}-${choices.map(c => c.choiceId).sort().join('-')}`
@@ -897,7 +896,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }
 
   const handleProductClick = async (product: MenuProduct) => {
-    if (!ensureStaffSelectedForSaleRef.current()) return
+    if (blockSaleWithoutStaffIfNeededRef.current()) return
     if (productsWithOptions.includes(product.id!)) {
       const opts = await getOptionsForProduct(product.id!)
       setOptionsModal({ product, options: opts, selected: [] })
@@ -947,11 +946,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const confirmOptions = () => {
     if (!optionsModal) return
-    if (!ensureStaffSelectedForSaleRef.current()) return
     const missing = optionsModal.options.filter(o => o.required && !optionsModal.selected.find(s => s.optionId === o.id))
     if (missing.length > 0) { playClick(); alert(`Kies een ${missing[0].name}`); return }
 
     const { product, selected, editingCartKey } = optionsModal
+    if (!editingCartKey && blockSaleWithoutStaffIfNeededRef.current()) return
 
     if (editingCartKey) {
       playAddToCart()
@@ -1044,7 +1043,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }
 
   const addCustomAmount = () => {
-    if (!ensureStaffSelectedForSaleRef.current()) return
     const amount = parseFloat(numpadValue)
     if (amount > 0) {
       const custom: MenuProduct = {
@@ -1148,7 +1146,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const completePayment = async (method: PaymentMethodType) => {
     if (cart.length === 0) return
-    if (!ensureStaffSelectedForSaleRef.current()) return
     playCashRegister()
     setTimeout(() => playSuccess(), 400)
     const vatRate = tenantInfo?.btw_percentage ?? 6
@@ -1485,30 +1482,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     ]
   )
 
-  ensureStaffSelectedForSaleRef.current = () => {
-    if (!requiresStaffSelectionForSale) return true
+  const blockSaleWithoutStaffIfNeeded = useCallback((): boolean => {
+    if (!requiresStaffSelectionForSale) return false
     playClick()
-    openStaffClockModal()
-    return false
-  }
+    setProductStaffGatePopupOpen(true)
+    return true
+  }, [requiresStaffSelectionForSale])
 
-  const staffBlockAutoOpenRef = useRef(false)
-  useEffect(() => {
-    if (!requiresStaffSelectionForSale) {
-      staffBlockAutoOpenRef.current = false
-      return
-    }
-    if (staffClockPinModal) return
-    if (staffBlockAutoOpenRef.current) return
-    staffBlockAutoOpenRef.current = true
-    setStaffClockOpen(true)
-    void loadStaffClockList({ background: staffClockList.length > 0 })
-  }, [
-    requiresStaffSelectionForSale,
-    staffClockPinModal,
-    staffClockList.length,
-    loadStaffClockList,
-  ])
+  blockSaleWithoutStaffIfNeededRef.current = blockSaleWithoutStaffIfNeeded
 
   // ── Geluid activatie scherm (exact donor) — toon elke sessie ───────────
   if (showSoundActivation && !soundActivated && !demoViewOnly) {
@@ -1572,10 +1553,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   <Link
                     href={baseUrl}
                     prefetch={false}
-                    onClick={(e) => {
-                      if (!ensureStaffSelectedForSaleRef.current()) {
-                        e.preventDefault()
-                      }
+                    onClick={() => {
                       setHamburgerOpen(false)
                       setHamburgerSubOpen(null)
                     }}
@@ -1608,10 +1586,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       <span>{activeMod.icon}</span> {activeMod.label}
                     </div>
                     {activeMod.items.map(item => (
-                      <Link key={item.id} href={item.href} prefetch={item.href === baseUrl ? false : undefined} onClick={(e) => {
-                        if (!ensureStaffSelectedForSaleRef.current()) {
-                          e.preventDefault()
-                        }
+                      <Link key={item.id} href={item.href} prefetch={item.href === baseUrl ? false : undefined} onClick={() => {
                         setHamburgerOpen(false)
                         setHamburgerSubOpen(null)
                       }}
@@ -1665,9 +1640,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* Onlinescherm */}
         {effectiveAccess['online-bestellingen'] && (
           <Link href={`/shop/${tenant}/display`}
-            onClick={(e) => {
-              if (!ensureStaffSelectedForSaleRef.current()) e.preventDefault()
-            }}
             className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors">
             <span className="text-lg">🖥️</span>
             <span>Onlinescherm</span>
@@ -1677,9 +1649,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* Keukenscherm */}
         {effectiveAccess['online-bestellingen'] && (
           <Link href={`/keuken/${tenant}`}
-            onClick={(e) => {
-              if (!ensureStaffSelectedForSaleRef.current()) e.preventDefault()
-            }}
             className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors">
             <span className="text-lg">👨‍🍳</span>
             <span>Keukenscherm</span>
@@ -1800,10 +1769,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     return (
                       <button
                         key={cat.id}
-                        onClick={() => {
-                          if (!ensureStaffSelectedForSaleRef.current()) return
-                          setSelectedCategory(cat)
-                        }}
+                        onClick={() => setSelectedCategory(cat)}
                         className="aspect-square relative rounded-xl overflow-hidden active:scale-95 transition-transform"
                         style={{ backgroundColor: '#3C4D6B', boxShadow: '0 8px 30px rgba(0,0,0,0.35)' }}
                       >
@@ -2160,7 +2126,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <button
             onClick={() => {
               if (cart.length === 0) return
-              if (!ensureStaffSelectedForSaleRef.current()) return
               playCheckout()
               setShowPaymentModal(true)
             }}
@@ -2208,29 +2173,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] shadow-2xl flex flex-col overflow-hidden z-[61]">
             <div className="flex items-center justify-between gap-3 border-b border-gray-100 px-5 py-4">
               <h2 className="font-bold text-xl text-gray-900">{t('staffClock.modalTitle')}</h2>
-              {!requiresStaffSelectionForSale ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    playClick()
-                    setStaffClockOpen(false)
-                    setStaffClockPinModal(null)
-                  }}
-                  className="p-2 hover:bg-gray-100 rounded-xl text-gray-500"
-                  aria-label={t('staffClock.close')}
-                >
-                  ✕
-                </button>
-              ) : (
-                <span className="w-10 shrink-0" aria-hidden />
-              )}
+              <button
+                type="button"
+                onClick={() => {
+                  playClick()
+                  setStaffClockOpen(false)
+                  setStaffClockPinModal(null)
+                }}
+                className="p-2 hover:bg-gray-100 rounded-xl text-gray-500"
+                aria-label={t('staffClock.close')}
+              >
+                ✕
+              </button>
             </div>
             <div className="flex-1 overflow-y-auto p-5 space-y-4">
-              {requiresStaffSelectionForSale && (
-                <div className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900">
-                  {t('staffClock.mandatoryBanner')}
-                </div>
-              )}
               {staffClockListLoading && staffClockList.length === 0 ? (
                 <div className="py-12 text-center text-gray-500">{t('staffClock.loadingList')}</div>
               ) : staffClockList.length === 0 ? (
@@ -2296,21 +2252,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               )}
             </div>
             <div className="border-t border-gray-100 p-4">
-              {requiresStaffSelectionForSale ? (
-                <p className="text-center text-sm font-medium text-gray-600 px-2">{t('staffClock.mandatoryFooter')}</p>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => {
-                    playClick()
-                    setStaffClockOpen(false)
-                    setStaffClockPinModal(null)
-                  }}
-                  className="w-full min-h-[44px] py-3 rounded-xl bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 transition-colors"
-                >
-                  {t('staffClock.close')}
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => {
+                  playClick()
+                  setStaffClockOpen(false)
+                  setStaffClockPinModal(null)
+                }}
+                className="w-full min-h-[44px] py-3 rounded-xl bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 transition-colors"
+              >
+                {t('staffClock.close')}
+              </button>
             </div>
           </div>
 
@@ -2406,6 +2358,37 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               className="w-full py-3 rounded-xl bg-[#3C4D6B] text-white font-bold hover:bg-[#2D3A52]"
             >
               {t('staffClock.summaryClose')}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Alleen bij tik op product (zonder Verkoop): korte hint, geen module-blokkade */}
+      {productStaffGatePopupOpen && (
+        <div
+          className="fixed inset-0 z-[85] flex items-center justify-center bg-black/50 p-4"
+          onClick={() => setProductStaffGatePopupOpen(false)}
+          role="presentation"
+        >
+          <div
+            className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="product-staff-gate-title"
+          >
+            <p id="product-staff-gate-title" className="text-center text-base font-semibold leading-snug text-gray-900">
+              {t('staffClock.productTapRequiresStaff')}
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                playClick()
+                setProductStaffGatePopupOpen(false)
+              }}
+              className="mt-5 w-full min-h-[48px] rounded-xl bg-[#3C4D6B] font-bold text-white transition-colors hover:bg-[#2D3A52]"
+            >
+              {t('staffClock.close')}
             </button>
           </div>
         </div>
@@ -2767,7 +2750,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         <div
           className="fixed inset-0 z-[200] bg-orange-500 flex flex-col items-center justify-center animate-pulse cursor-pointer"
           onClick={() => {
-            if (!ensureStaffSelectedForSaleRef.current()) return
             // Voeg toe aan dismissed zodat polling dit order niet opnieuw toont
             if (newOrderAlert) {
               dismissedOrderIdsRef.current = [...dismissedOrderIdsRef.current, newOrderAlert.id]

@@ -3120,8 +3120,7 @@
     "noOrdersToday": "Sin ventas a tu nombre hoy.",
     "summaryClose": "Cerrar",
     "close": "Cerrar",
-    "mandatoryBanner": "Al menos un empleado ha fichado la entrada. Pulsa Venta en su fila para cobrar o ir a otras pantallas.",
-    "mandatoryFooter": "Podrás cerrar esta ventana cuando hayas elegido Venta.",
+    "productTapRequiresStaff": "Pulsa el reloj y elige Venta para un empleado. Después podrás añadir el producto.",
     "successIn": "Entrada registrada.",
     "successOut": "Salida registrada.",
     "errors": {

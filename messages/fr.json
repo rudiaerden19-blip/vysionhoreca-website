@@ -2620,8 +2620,7 @@
     "noOrdersToday": "Aucune vente à votre nom aujourd'hui.",
     "summaryClose": "Fermer",
     "close": "Fermer",
-    "mandatoryBanner": "Au moins un collaborateur est pointé en entrée. Appuie sur Vente sur sa ligne pour encaisser ou accéder aux autres écrans.",
-    "mandatoryFooter": "Tu pourras fermer cette fenêtre après avoir choisi Vente.",
+    "productTapRequiresStaff": "Appuie sur l’horloge, puis choisis Vente pour un collaborateur. Ensuite tu pourras ajouter le produit.",
     "successIn": "Entrée enregistrée.",
     "successOut": "Sortie enregistrée.",
     "errors": {

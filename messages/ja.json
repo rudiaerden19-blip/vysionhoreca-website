@@ -3120,8 +3120,7 @@
     "noOrdersToday": "本日、あなた名義の売上はありません。",
     "summaryClose": "閉じる",
     "close": "閉じる",
-    "mandatoryBanner": "少なくとも1人が出勤打刻済みです。その行の「販売」をタップしてレジ操作や他画面へ進んでください。",
-    "mandatoryFooter": "「販売」を選ぶとこの画面を閉じられます。",
+    "productTapRequiresStaff": "時計をタップし、スタッフの「販売」を選んでください。その後に商品を追加できます。",
     "successIn": "出勤を記録しました。",
     "successOut": "退勤を記録しました。",
     "errors": {
