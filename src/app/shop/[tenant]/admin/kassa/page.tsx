@@ -1,6 +1,7 @@
 'use client'
 
 import { Suspense, useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } from 'react'
+import { flushSync } from 'react-dom'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { MenuProduct, MenuCategory, ProductOption, ProductOptionChoice, getMenuCategories, getMenuProducts, getProductsWithOptions, getOptionsForProduct, getTenantSettings, TenantSettings } from '@/lib/admin-api'
@@ -1320,10 +1321,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }
 
   const startStaffSales = (s: { id: string; name: string }) => {
-    playSuccess()
-    setActiveKassaStaff({ id: s.id, name: s.name })
-    setStaffClockOpen(false)
-    setStaffClockPinModal(null)
+    flushSync(() => {
+      setActiveKassaStaff({ id: s.id, name: s.name })
+      setStaffClockOpen(false)
+      setStaffClockPinModal(null)
+      setStaffClockPinInput('')
+      setStaffClockPinError(null)
+    })
+    try {
+      playSuccess()
+    } catch {
+      /* geluid optioneel — modal moet altijd dicht */
+    }
   }
 
   // ── Geluid activatie scherm (exact donor) — toon elke sessie ───────────
@@ -2050,7 +2059,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       <button
                         type="button"
                         disabled={!s.hasOpenSession}
-                        onClick={() => startStaffSales(s)}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          startStaffSales(s)
+                        }}
                         className="min-h-[44px] py-3 px-4 rounded-xl bg-amber-500 text-white text-sm font-bold hover:bg-amber-600 disabled:opacity-40 disabled:grayscale"
                         title={s.hasOpenSession ? t('staffClock.salesHint') : t('staffClock.salesNeedsClock')}
                       >
