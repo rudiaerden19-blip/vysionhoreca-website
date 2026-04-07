@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react'
+import { Suspense, useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { MenuProduct, MenuCategory, ProductOption, ProductOptionChoice, getMenuCategories, getMenuProducts, getProductsWithOptions, getOptionsForProduct, getTenantSettings, TenantSettings } from '@/lib/admin-api'
@@ -1231,21 +1231,30 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return msg === key ? t('staffClock.errors.unknown') : msg
   }
 
-  const loadStaffClockList = async () => {
-    setStaffClockListLoading(true)
+  const loadStaffClockList = useCallback(async (opts?: { background?: boolean }) => {
+    const background = opts?.background === true
+    if (!background) setStaffClockListLoading(true)
     try {
-      const res = await fetch(`/api/kassa/staff-clock?tenant_slug=${encodeURIComponent(tenant)}`)
+      const res = await fetch(`/api/kassa/staff-clock?tenant_slug=${encodeURIComponent(tenant)}`, {
+        cache: 'no-store',
+      })
       const data = (await res.json()) as {
         ok?: boolean
         staff?: { id: string; name: string; hasOpenSession: boolean }[]
       }
       if (data.ok && data.staff) setStaffClockList(data.staff)
-      else setStaffClockList([])
+      else if (!background) setStaffClockList([])
     } catch {
-      setStaffClockList([])
+      if (!background) setStaffClockList([])
+    } finally {
+      if (!background) setStaffClockListLoading(false)
     }
-    setStaffClockListLoading(false)
-  }
+  }, [tenant])
+
+  useEffect(() => {
+    if (!tenantInfo?.kassa_staff_clock_enabled || demoViewOnly) return
+    void loadStaffClockList({ background: true })
+  }, [tenant, tenantInfo?.kassa_staff_clock_enabled, demoViewOnly, loadStaffClockList])
 
   const openStaffClockModal = () => {
     playClick()
@@ -1253,7 +1262,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setStaffClockPinModal(null)
     setStaffClockPinInput('')
     setStaffClockPinError(null)
-    void loadStaffClockList()
+    void loadStaffClockList({ background: staffClockList.length > 0 })
   }
 
   const submitStaffClockPin = async () => {
@@ -1299,7 +1308,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             orders: data.summary.orders || [],
           })
         }
-        void loadStaffClockList()
+        void loadStaffClockList({ background: true })
       } else {
         playClick()
         setStaffClockPinError(staffClockErrorText(data.error || 'unknown'))
@@ -1974,9 +1983,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
       {staffClockOpen && (
         <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] shadow-2xl flex flex-col overflow-hidden z-[61]">
-            <div className="flex items-center justify-between gap-2 border-b border-gray-100 px-4 py-3">
-              <h2 className="font-bold text-lg text-gray-900">{t('staffClock.modalTitle')}</h2>
+          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] shadow-2xl flex flex-col overflow-hidden z-[61]">
+            <div className="flex items-center justify-between gap-3 border-b border-gray-100 px-5 py-4">
+              <h2 className="font-bold text-xl text-gray-900">{t('staffClock.modalTitle')}</h2>
               <button
                 type="button"
                 onClick={() => {
@@ -1990,8 +1999,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 ✕
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-4 space-y-3">
-              {staffClockListLoading ? (
+            <div className="flex-1 overflow-y-auto p-5 space-y-4">
+              {staffClockListLoading && staffClockList.length === 0 ? (
                 <div className="py-12 text-center text-gray-500">{t('staffClock.loadingList')}</div>
               ) : staffClockList.length === 0 ? (
                 <div className="py-10 text-center text-gray-500">{t('staffClock.noStaff')}</div>
@@ -1999,17 +2008,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 staffClockList.map((s) => (
                   <div
                     key={s.id}
-                    className="rounded-xl border border-gray-200 bg-gray-50/80 p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+                    className="rounded-xl border border-gray-200 bg-gray-50/80 p-4 sm:p-5 flex flex-col gap-4"
                   >
-                    <div className="min-w-0">
-                      <p className="font-bold text-gray-900 text-lg truncate">{s.name}</p>
+                    <div className="min-w-0 space-y-1">
+                      <p className="font-bold text-gray-900 text-base sm:text-lg break-words leading-snug">
+                        {s.name}
+                      </p>
                       {s.hasOpenSession ? (
-                        <p className="text-xs font-semibold text-emerald-600 mt-0.5">{t('staffClock.statusClockedIn')}</p>
+                        <p className="text-sm font-semibold text-emerald-600">{t('staffClock.statusClockedIn')}</p>
                       ) : (
-                        <p className="text-xs text-gray-500 mt-0.5">{t('staffClock.statusClockedOut')}</p>
+                        <p className="text-sm text-gray-500">{t('staffClock.statusClockedOut')}</p>
                       )}
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 shrink-0 sm:min-w-[280px]">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
                       <button
                         type="button"
                         disabled={staffClockBusy}
@@ -2019,7 +2030,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           setStaffClockPinInput('')
                           setStaffClockPinError(null)
                         }}
-                        className="py-2.5 px-2 rounded-xl bg-emerald-600 text-white text-sm font-bold hover:bg-emerald-700 disabled:opacity-50"
+                        className="min-h-[44px] py-3 px-4 rounded-xl bg-emerald-600 text-white text-sm font-bold hover:bg-emerald-700 disabled:opacity-50"
                       >
                         {t('staffClock.clockInCode')}
                       </button>
@@ -2032,7 +2043,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           setStaffClockPinInput('')
                           setStaffClockPinError(null)
                         }}
-                        className="py-2.5 px-2 rounded-xl bg-[#3C4D6B] text-white text-sm font-bold hover:bg-[#2D3A52] disabled:opacity-40 disabled:grayscale"
+                        className="min-h-[44px] py-3 px-4 rounded-xl bg-[#3C4D6B] text-white text-sm font-bold hover:bg-[#2D3A52] disabled:opacity-40 disabled:grayscale"
                       >
                         {t('staffClock.clockOutCode')}
                       </button>
@@ -2040,7 +2051,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                         type="button"
                         disabled={!s.hasOpenSession}
                         onClick={() => startStaffSales(s)}
-                        className="py-2.5 px-2 rounded-xl bg-amber-500 text-white text-sm font-bold hover:bg-amber-600 disabled:opacity-40 disabled:grayscale"
+                        className="min-h-[44px] py-3 px-4 rounded-xl bg-amber-500 text-white text-sm font-bold hover:bg-amber-600 disabled:opacity-40 disabled:grayscale"
                         title={s.hasOpenSession ? t('staffClock.salesHint') : t('staffClock.salesNeedsClock')}
                       >
                         {t('staffClock.sales')}
@@ -2050,7 +2061,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 ))
               )}
             </div>
-            <div className="border-t border-gray-100 p-3">
+            <div className="border-t border-gray-100 p-4">
               <button
                 type="button"
                 onClick={() => {
@@ -2058,7 +2069,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   setStaffClockOpen(false)
                   setStaffClockPinModal(null)
                 }}
-                className="w-full py-2.5 rounded-xl bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 transition-colors"
+                className="w-full min-h-[44px] py-3 rounded-xl bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 transition-colors"
               >
                 {t('staffClock.close')}
               </button>

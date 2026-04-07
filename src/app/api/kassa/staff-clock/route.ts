@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
-import { getBelgiumDateString, getDateBoundsForBelgium } from '@/lib/admin-api'
+import { getBelgiumDateString, getDateBoundsForBelgium } from '@/lib/belgium-date-bounds'
+
+export const dynamic = 'force-dynamic'
 
 function normalizeHmFromTs(iso: string): string {
   const d = new Date(iso)
@@ -39,23 +41,27 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ ok: false, error: 'disabled' }, { status: 403 })
   }
 
-  const { data: staffList, error: staffErr } = await supabase
-    .from('staff')
-    .select('id, name')
-    .eq('tenant_slug', tenant_slug)
-    .eq('is_active', true)
-    .order('name', { ascending: true })
+  const [staffResult, sessionsResult] = await Promise.all([
+    supabase
+      .from('staff')
+      .select('id, name')
+      .eq('tenant_slug', tenant_slug)
+      .eq('is_active', true)
+      .order('name', { ascending: true }),
+    supabase
+      .from('staff_clock_sessions')
+      .select('staff_id')
+      .eq('tenant_slug', tenant_slug)
+      .is('clock_out_at', null),
+  ])
+
+  const { data: staffList, error: staffErr } = staffResult
+  const { data: openSessions, error: sessErr } = sessionsResult
 
   if (staffErr) {
     console.error('staff-clock GET staff', staffErr)
     return NextResponse.json({ ok: false, error: 'server' }, { status: 500 })
   }
-
-  const { data: openSessions, error: sessErr } = await supabase
-    .from('staff_clock_sessions')
-    .select('staff_id')
-    .eq('tenant_slug', tenant_slug)
-    .is('clock_out_at', null)
 
   if (sessErr) {
     console.error('staff-clock GET sessions', sessErr)
