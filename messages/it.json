@@ -3280,6 +3280,8 @@
       "cancel": "Annulla",
       "save": "Salva",
       "saving": "Salvataggio...",
+      "delete": "Elimina",
+      "deleting": "Eliminazione…",
       "actions": "Azioni",
       "total": "Totale",
       "fillNameAndAmount": "Inserisci nome e importo",

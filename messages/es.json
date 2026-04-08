@@ -3280,6 +3280,8 @@
       "cancel": "Cancelar",
       "save": "Guardar",
       "saving": "Guardando...",
+      "delete": "Eliminar",
+      "deleting": "Eliminando…",
       "actions": "Acciones",
       "total": "Total",
       "fillNameAndAmount": "Introduzca nombre e importe",

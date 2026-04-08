@@ -2780,6 +2780,8 @@
       "cancel": "Annuler",
       "save": "Enregistrer",
       "saving": "Enregistrement...",
+      "delete": "Supprimer",
+      "deleting": "Suppression…",
       "actions": "Actions",
       "total": "Total",
       "fillNameAndAmount": "Entrez un nom et un montant",

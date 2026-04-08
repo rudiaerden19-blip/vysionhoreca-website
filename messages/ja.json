@@ -3280,6 +3280,8 @@
       "cancel": "キャンセル",
       "save": "保存",
       "saving": "保存中...",
+      "delete": "削除",
+      "deleting": "削除中…",
       "actions": "アクション",
       "total": "合計",
       "fillNameAndAmount": "名前と金額を入力してください",

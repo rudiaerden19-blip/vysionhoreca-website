@@ -3280,6 +3280,8 @@
       "cancel": "إلغاء",
       "save": "حفظ",
       "saving": "جاري الحفظ...",
+      "delete": "حذف",
+      "deleting": "جاري الحذف…",
       "actions": "الإجراءات",
       "total": "المجموع",
       "fillNameAndAmount": "أدخل الاسم والمبلغ",

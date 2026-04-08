@@ -210,6 +210,12 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
     target_average_ticket: 0,
   })
 
+  /** iPad/Safari: native confirm() werkt hier vaak niet; eigen modal. */
+  const [deleteConfirm, setDeleteConfirm] = useState<
+    { type: 'kassa' | 'fixed' | 'variable'; id: string } | null
+  >(null)
+  const [deleteWorking, setDeleteWorking] = useState(false)
+
   // Load data
   useEffect(() => {
     loadData()
@@ -323,11 +329,8 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
     setSaving(false)
   }
 
-  const handleDeleteKassa = async (id: string) => {
-    if (confirm(t('analysePage.kassa.confirmDelete'))) {
-      await deleteDailySales(id)
-      loadData()
-    }
+  const handleDeleteKassa = (id: string) => {
+    setDeleteConfirm({ type: 'kassa', id })
   }
 
   // Fixed cost handlers
@@ -374,11 +377,8 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
     setSaving(false)
   }
 
-  const handleDeleteFixed = async (id: string) => {
-    if (confirm(t('analysePage.fixed.confirmDelete'))) {
-      await deleteFixedCost(id)
-      loadData()
-    }
+  const handleDeleteFixed = (id: string) => {
+    setDeleteConfirm({ type: 'fixed', id })
   }
 
   // Variable cost handlers
@@ -429,10 +429,21 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
     setSaving(false)
   }
 
-  const handleDeleteVariable = async (id: string) => {
-    if (confirm(t('analysePage.variable.confirmDelete'))) {
-      await deleteVariableCost(id)
-      loadData()
+  const handleDeleteVariable = (id: string) => {
+    setDeleteConfirm({ type: 'variable', id })
+  }
+
+  const executeDeleteConfirm = async () => {
+    if (!deleteConfirm) return
+    setDeleteWorking(true)
+    try {
+      if (deleteConfirm.type === 'kassa') await deleteDailySales(deleteConfirm.id)
+      else if (deleteConfirm.type === 'fixed') await deleteFixedCost(deleteConfirm.id)
+      else await deleteVariableCost(deleteConfirm.id)
+      setDeleteConfirm(null)
+      await loadData()
+    } finally {
+      setDeleteWorking(false)
     }
   }
 
@@ -882,14 +893,16 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                       <td className="px-4 py-3 text-right text-gray-600">{sale.order_count}</td>
                       <td className="px-4 py-3 text-center">
                         <button
+                          type="button"
                           onClick={() => openKassaModal(sale)}
-                          className="text-blue-500 hover:text-blue-700 mr-2"
+                          className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center touch-manipulation text-blue-500 hover:text-blue-700 mr-2"
                         >
                           ✏️
                         </button>
                         <button
+                          type="button"
                           onClick={() => handleDeleteKassa(sale.id!)}
-                          className="text-red-500 hover:text-red-700"
+                          className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center touch-manipulation text-red-500 hover:text-red-700"
                         >
                           🗑️
                         </button>
@@ -971,34 +984,38 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                   />
                   <div className="flex gap-2 mt-4">
                     <button
+                      type="button"
                       onClick={() => openFixedModal(cost)}
-                      className="flex-1 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200"
+                      className="flex-1 min-h-[44px] touch-manipulation px-3 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200"
                     >
                       ✏️ {t('analysePage.fixed.edit')}
                     </button>
                     {(cost as FixedCost & { pdf_url?: string }).pdf_url ? (
                       <button
+                        type="button"
                         onClick={() => openPdfBlob((cost as FixedCost & { pdf_url?: string }).pdf_url!)}
-                        className="px-3 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium hover:bg-green-200"
+                        className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center px-3 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium hover:bg-green-200"
                         title="Bekijk factuur"
                       >
                         📄
                       </button>
                     ) : (
                       <button
+                        type="button"
                         onClick={() => {
                           setAttachingFixedId(cost.id!)
                           setTimeout(() => attachPdfFixedRef.current?.click(), 50)
                         }}
-                        className="px-3 py-2 bg-gray-100 text-gray-400 rounded-lg text-sm font-medium hover:bg-blue-100 hover:text-blue-600"
+                        className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center px-3 py-2 bg-gray-100 text-gray-400 rounded-lg text-sm font-medium hover:bg-blue-100 hover:text-blue-600"
                         title="PDF factuur koppelen"
                       >
                         📎
                       </button>
                     )}
                     <button
+                      type="button"
                       onClick={() => handleDeleteFixed(cost.id!)}
-                      className="px-3 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-medium hover:bg-red-200"
+                      className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center px-3 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-medium hover:bg-red-200"
                     >
                       🗑️
                     </button>
@@ -1088,33 +1105,37 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                           />
                           {(cost as VariableCost & { pdf_url?: string }).pdf_url ? (
                             <button
+                              type="button"
                               onClick={() => openPdfBlob((cost as VariableCost & { pdf_url?: string }).pdf_url!)}
-                              className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 mr-1"
+                              className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center rounded-lg bg-green-100 text-green-700 hover:bg-green-200 mr-1"
                               title="Bekijk factuur PDF"
                             >
                               📄
                             </button>
                           ) : (
                             <button
+                              type="button"
                               onClick={() => {
                                 setAttachingId(cost.id!)
                                 setTimeout(() => attachPdfRef.current?.click(), 50)
                               }}
-                              className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 text-gray-400 hover:bg-blue-100 hover:text-blue-600 mr-1"
+                              className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center rounded-lg bg-gray-100 text-gray-400 hover:bg-blue-100 hover:text-blue-600 mr-1"
                               title="PDF factuur koppelen"
                             >
                               📎
                             </button>
                           )}
                           <button
+                            type="button"
                             onClick={() => openVariableModal(cost)}
-                            className="text-blue-500 hover:text-blue-700 mr-1"
+                            className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center text-blue-500 hover:text-blue-700 mr-1"
                           >
                             ✏️
                           </button>
                           <button
+                            type="button"
                             onClick={() => handleDeleteVariable(cost.id!)}
-                            className="text-red-500 hover:text-red-700"
+                            className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center text-red-500 hover:text-red-700"
                           >
                             🗑️
                           </button>
@@ -1627,6 +1648,62 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                     {saving ? t('analysePage.common.saving') : `💾 ${t('analysePage.common.save')}`}
                   </button>
                 </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {deleteConfirm && (
+          <motion.div
+            className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <button
+              type="button"
+              aria-label={t('analysePage.common.cancel')}
+              className="absolute inset-0 bg-black/50 touch-manipulation"
+              disabled={deleteWorking}
+              onClick={() => !deleteWorking && setDeleteConfirm(null)}
+            />
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="analyse-delete-confirm-title"
+              initial={{ scale: 0.96, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.96, opacity: 0 }}
+              className="relative z-10 w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <p
+                id="analyse-delete-confirm-title"
+                className="text-center text-base font-medium leading-snug text-gray-800"
+              >
+                {deleteConfirm.type === 'kassa' && t('analysePage.kassa.confirmDelete')}
+                {deleteConfirm.type === 'fixed' && t('analysePage.fixed.confirmDelete')}
+                {deleteConfirm.type === 'variable' && t('analysePage.variable.confirmDelete')}
+              </p>
+              <div className="mt-6 flex gap-3">
+                <button
+                  type="button"
+                  disabled={deleteWorking}
+                  className="flex-1 min-h-[48px] touch-manipulation rounded-xl border border-gray-200 font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                  onClick={() => setDeleteConfirm(null)}
+                >
+                  {t('analysePage.common.cancel')}
+                </button>
+                <button
+                  type="button"
+                  disabled={deleteWorking}
+                  className="flex-1 min-h-[48px] touch-manipulation rounded-xl bg-red-600 font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+                  onClick={() => void executeDeleteConfirm()}
+                >
+                  {deleteWorking ? t('analysePage.common.deleting') : t('analysePage.common.delete')}
+                </button>
               </div>
             </motion.div>
           </motion.div>

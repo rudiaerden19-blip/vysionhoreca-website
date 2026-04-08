@@ -3280,6 +3280,8 @@
       "cancel": "取消",
       "save": "保存",
       "saving": "保存中...",
+      "delete": "删除",
+      "deleting": "正在删除…",
       "actions": "操作",
       "total": "合计",
       "fillNameAndAmount": "请输入名称和金额",
