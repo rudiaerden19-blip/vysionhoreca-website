@@ -1305,31 +1305,104 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       </div>
     </body></html>`
 
-    // iPad-safe print via blob URL + verborgen iframe
-    try {
-      const blob = new Blob([html], { type: 'text/html' })
-      const url = URL.createObjectURL(blob)
-      const iframe = document.createElement('iframe')
-      iframe.style.position = 'fixed'
-      iframe.style.top = '-9999px'
-      iframe.style.left = '-9999px'
-      iframe.style.width = '80mm'
-      iframe.style.height = '1px'
-      iframe.src = url
-      document.body.appendChild(iframe)
-      iframe.onload = () => {
-        setTimeout(() => {
-          iframe.contentWindow?.print()
-          setTimeout(() => {
-            document.body.removeChild(iframe)
-            URL.revokeObjectURL(url)
-          }, 1000)
-        }, 300)
+    /**
+     * Blob-URL in een iframe wordt in Chromium/Safari vaak als cross-origin gezien →
+     * SecurityError bij contentWindow.print(). srcdoc erft de origin van de parent.
+     */
+    let printStarted = false
+    const cleanupIframe = (el: HTMLIFrameElement) => {
+      try {
+        el.remove()
+      } catch {
+        /* ignore */
       }
-    } catch {
-      // Fallback: window.open voor browsers die blob niet ondersteunen
-      const w = window.open('', '_blank', 'width=400,height=600')
-      if (w) { w.document.write(html); w.document.close() }
+    }
+
+    const tryPrintWindow = (w: Window | null | undefined): boolean => {
+      if (!w) return false
+      try {
+        w.focus()
+        w.print()
+        return true
+      } catch {
+        return false
+      }
+    }
+
+    const fallbackBlobOrBlankWindow = () => {
+      try {
+        const blob = new Blob([html], { type: 'text/html;charset=utf-8' })
+        const url = URL.createObjectURL(blob)
+        // Geen noopener: anders is window.open null in sommige browsers en kunnen we niet printen.
+        const w = window.open(url, '_blank', 'width=420,height=640')
+        if (w) {
+          const finish = () => {
+            try {
+              URL.revokeObjectURL(url)
+            } catch {
+              /* ignore */
+            }
+            try {
+              w.close()
+            } catch {
+              /* ignore */
+            }
+          }
+          w.addEventListener(
+            'load',
+            () => {
+              setTimeout(() => {
+                tryPrintWindow(w)
+                setTimeout(finish, 1200)
+              }, 150)
+            },
+            { once: true }
+          )
+          return
+        }
+        URL.revokeObjectURL(url)
+      } catch {
+        /* try blank */
+      }
+      const w = window.open('', '_blank', 'width=420,height=640')
+      if (!w) return
+      try {
+        w.document.open()
+        w.document.write(html)
+        w.document.close()
+        setTimeout(() => tryPrintWindow(w), 200)
+      } catch {
+        /* ignore */
+      }
+    }
+
+    const iframe = document.createElement('iframe')
+    iframe.setAttribute('aria-hidden', 'true')
+    iframe.style.cssText =
+      'position:fixed;inset:0;width:0;height:0;border:0;opacity:0;pointer-events:none;z-index:-1'
+    iframe.srcdoc = html
+    document.body.appendChild(iframe)
+
+    const runSrcdocPrint = () => {
+      if (printStarted) return
+      if (tryPrintWindow(iframe.contentWindow)) {
+        printStarted = true
+        setTimeout(() => cleanupIframe(iframe), 1500)
+        return
+      }
+      printStarted = true
+      cleanupIframe(iframe)
+      fallbackBlobOrBlankWindow()
+    }
+
+    if (iframe.contentDocument?.readyState === 'complete') {
+      setTimeout(runSrcdocPrint, 50)
+    } else {
+      iframe.onload = () => setTimeout(runSrcdocPrint, 100)
+      setTimeout(() => {
+        if (!iframe.isConnected || printStarted) return
+        if (iframe.contentDocument?.readyState === 'complete') runSrcdocPrint()
+      }, 800)
     }
   }
 
@@ -2732,10 +2805,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               {/* Knoppen */}
               <div className="p-4 border-t flex gap-3">
                 <button
+                  type="button"
                   onClick={() => { printReceipt(lastOrder); setShowSuccessModal(false) }}
-                  className="flex-1 py-3 rounded-xl bg-gray-100 font-semibold text-gray-700 flex items-center justify-center gap-2"
+                  className="flex-1 py-3 rounded-xl bg-gray-100 font-semibold text-gray-700 flex items-center justify-center gap-2 touch-manipulation min-h-[44px]"
                 >
-                  🖨️ printReceipt
+                  🖨️ {t('kassaReceipt.print')}
                 </button>
                 <button
                   onClick={() => setShowSuccessModal(false)}

@@ -3089,7 +3089,8 @@
     }
   },
   "kassaReceipt": {
-    "helpedBy": "Sei stato servito da {name}"
+    "helpedBy": "Sei stato servito da {name}",
+    "print": "Stampa scontrino"
   },
   "staffClock": {
     "buttonTitle": "Timbratura entrata o uscita",

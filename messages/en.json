@@ -3505,7 +3505,8 @@
     }
   },
   "kassaReceipt": {
-    "helpedBy": "You were helped by {name}"
+    "helpedBy": "You were helped by {name}",
+    "print": "Print receipt"
   },
   "staffClock": {
     "buttonTitle": "Clock in or out",

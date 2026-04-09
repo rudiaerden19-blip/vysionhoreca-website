@@ -2589,7 +2589,8 @@
     }
   },
   "kassaReceipt": {
-    "helpedBy": "Sie wurden von {name} bedient"
+    "helpedBy": "Sie wurden von {name} bedient",
+    "print": "Beleg drucken"
   },
   "staffClock": {
     "buttonTitle": "Ein- oder ausstempeln",

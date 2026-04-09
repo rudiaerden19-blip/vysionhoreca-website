@@ -3089,7 +3089,8 @@
     }
   },
   "kassaReceipt": {
-    "helpedBy": "为您服务：{name}"
+    "helpedBy": "为您服务：{name}",
+    "print": "打印小票"
   },
   "staffClock": {
     "buttonTitle": "上班或下班打卡",

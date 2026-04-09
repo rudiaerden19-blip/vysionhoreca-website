@@ -2589,7 +2589,8 @@
     }
   },
   "kassaReceipt": {
-    "helpedBy": "Vous avez été servi par {name}"
+    "helpedBy": "Vous avez été servi par {name}",
+    "print": "Imprimer le ticket"
   },
   "staffClock": {
     "buttonTitle": "Pointer entrée ou sortie",

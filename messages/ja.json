@@ -3089,7 +3089,8 @@
     }
   },
   "kassaReceipt": {
-    "helpedBy": "担当：{name}"
+    "helpedBy": "担当：{name}",
+    "print": "レシートを印刷"
   },
   "staffClock": {
     "buttonTitle": "出勤または退勤",

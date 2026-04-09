@@ -3089,7 +3089,8 @@
     }
   },
   "kassaReceipt": {
-    "helpedBy": "Le ha atendido {name}"
+    "helpedBy": "Le ha atendido {name}",
+    "print": "Imprimir ticket"
   },
   "staffClock": {
     "buttonTitle": "Fichar entrada o salida",

@@ -3505,7 +3505,8 @@
     }
   },
   "kassaReceipt": {
-    "helpedBy": "U bent geholpen door medewerker {name}"
+    "helpedBy": "U bent geholpen door medewerker {name}",
+    "print": "Bon afdrukken"
   },
   "staffClock": {
     "buttonTitle": "In- of uitklokken",

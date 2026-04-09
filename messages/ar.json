@@ -3089,7 +3089,8 @@
     }
   },
   "kassaReceipt": {
-    "helpedBy": "خدمك {name}"
+    "helpedBy": "خدمك {name}",
+    "print": "طباعة الإيصال"
   },
   "staffClock": {
     "buttonTitle": "تسجيل دخول أو خروج",
