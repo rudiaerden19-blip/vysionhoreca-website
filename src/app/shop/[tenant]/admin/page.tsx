@@ -6,7 +6,12 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
-import { getTenantSettings, orderCountsTowardRevenueAndZReport } from '@/lib/admin-api'
+import {
+  fetchAllTenantOrdersForDashboard,
+  getTenantSettings,
+  orderCountsTowardRevenueAndZReport,
+  type Order,
+} from '@/lib/admin-api'
 import PinGate from '@/components/PinGate'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
 import { isSuperAdminLoggedIn } from '@/lib/auth-headers'
@@ -109,25 +114,23 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
     weekAgo.setDate(weekAgo.getDate() - 7)
     const weekAgoISO = weekAgo.toISOString()
 
-    // Fetch all orders
-    const { data: allOrders } = await supabase
-      .from('orders')
-      .select('*')
-      .eq('tenant_slug', params.tenant)
-      .order('created_at', { ascending: false })
-
-    const allOrdersList = allOrders || []
+    const allOrdersList = (await fetchAllTenantOrdersForDashboard(
+      params.tenant
+    )) as unknown as Order[]
 
     // Webshop: omzet vanaf bevestigd; kassa: alleen betaald (zelfde als Z-rapport/rapporten)
     const paidOrders = allOrdersList.filter(o => orderCountsTowardRevenueAndZReport(o))
 
     // Today's stats
-    const todayOrders = paidOrders.filter(o => new Date(o.created_at) >= today)
+    const todayOrders = paidOrders.filter(
+      (o) => o.created_at && new Date(o.created_at) >= today
+    )
     const todayOrdersCount = todayOrders.length
     const todayRevenue = todayOrders.reduce((sum, o) => sum + (o.total || 0), 0)
 
     // Yesterday's stats
-    const yesterdayOrders = paidOrders.filter(o => {
+    const yesterdayOrders = paidOrders.filter((o) => {
+      if (!o.created_at) return false
       const date = new Date(o.created_at)
       return date >= yesterday && date < today
     })
@@ -135,7 +138,9 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
     const yesterdayRevenue = yesterdayOrders.reduce((sum, o) => sum + (o.total || 0), 0)
 
     // Week stats
-    const weekOrders = paidOrders.filter(o => new Date(o.created_at) >= weekAgo)
+    const weekOrders = paidOrders.filter(
+      (o) => o.created_at && new Date(o.created_at) >= weekAgo
+    )
     const weekOrdersCount = weekOrders.length
     const weekRevenue = weekOrders.reduce((sum, o) => sum + (o.total || 0), 0)
 
@@ -145,14 +150,15 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
     ).length
 
     // Recent orders (last 5, alle statussen voor weergave)
-    const recentOrdersData = allOrdersList.slice(0, 5).map(o => ({
-      id: o.id,
-      order_number: o.order_number || `#${o.id.slice(-4)}`,
+    const recentOrdersData = allOrdersList.slice(0, 5).map((o) => ({
+      id: o.id!,
+      order_number:
+        o.order_number != null ? String(o.order_number) : `#${(o.id || '').slice(-4)}`,
       customer_name: o.customer_name || 'Onbekend',
       total: o.total || 0,
       status: o.status || 'new',
-      created_at: o.created_at,
-      items: o.items || []
+      created_at: o.created_at || '',
+      items: o.items || [],
     }))
 
     // Popular items — alleen van betaalde orders

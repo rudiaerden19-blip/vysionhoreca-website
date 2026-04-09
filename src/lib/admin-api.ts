@@ -1774,6 +1774,101 @@ export function orderCountsTowardRevenueAndZReport(
   return (order.payment_status || '').toString().toLowerCase() === 'paid'
 }
 
+/** PostgREST/Supabase cap (~1000 rows per request zonder range): analytics moet alle rijen binnen het venster ophalen. */
+const ORDERS_ANALYTICS_PAGE_SIZE = 1000
+const ORDERS_ANALYTICS_MAX_PAGES = 500
+
+const ANALYTICS_ORDER_STATUS_EXCLUDE =
+  '("cancelled","rejected","CANCELLED","REJECTED")' as const
+
+/**
+ * Haalt alle orders voor tenant binnen [startUTC, endUTC] op (stabiele sortering voor range-paginatie).
+ * Gebruikt voor maandrapport, Z-herberekening, verkoopstats — voorkomt stilzwijgend afsnijden na 1000 orders.
+ */
+async function fetchAllOrdersInCreatedAtRange(
+  client: SupabaseClient,
+  tenantSlug: string,
+  startUTC: string,
+  endUTC: string,
+  selectColumns: string
+): Promise<Record<string, unknown>[]> {
+  const all: Record<string, unknown>[] = []
+  let from = 0
+  for (let page = 0; page < ORDERS_ANALYTICS_MAX_PAGES; page++) {
+    const { data, error } = await client
+      .from('orders')
+      .select(selectColumns)
+      .eq('tenant_slug', tenantSlug)
+      .gte('created_at', startUTC)
+      .lte('created_at', endUTC)
+      .not('status', 'in', ANALYTICS_ORDER_STATUS_EXCLUDE)
+      .order('created_at', { ascending: true })
+      .order('id', { ascending: true })
+      .range(from, from + ORDERS_ANALYTICS_PAGE_SIZE - 1)
+
+    if (error) {
+      console.error('fetchAllOrdersInCreatedAtRange:', error)
+      break
+    }
+    const chunk = (data || []) as unknown as Record<string, unknown>[]
+    all.push(...chunk)
+    if (chunk.length < ORDERS_ANALYTICS_PAGE_SIZE) break
+    from += ORDERS_ANALYTICS_PAGE_SIZE
+  }
+  return all
+}
+
+/** Nieuwste orders eerst; geen impliciete 1000-limiet (PostgREST). */
+async function fetchAllTenantOrdersNewestFirst(
+  tenantSlug: string,
+  selectColumns: string
+): Promise<Record<string, unknown>[]> {
+  const all: Record<string, unknown>[] = []
+  let from = 0
+  for (let page = 0; page < ORDERS_ANALYTICS_MAX_PAGES; page++) {
+    const { data, error } = await supabase
+      .from('orders')
+      .select(selectColumns)
+      .eq('tenant_slug', tenantSlug)
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
+      .range(from, from + ORDERS_ANALYTICS_PAGE_SIZE - 1)
+
+    if (error) {
+      console.error('fetchAllTenantOrdersNewestFirst:', error)
+      break
+    }
+    const chunk = (data || []) as unknown as Record<string, unknown>[]
+    all.push(...chunk)
+    if (chunk.length < ORDERS_ANALYTICS_PAGE_SIZE) break
+    from += ORDERS_ANALYTICS_PAGE_SIZE
+  }
+  return all
+}
+
+/** Client: Z-rapport / dagvenster — zelfde paginatie als server-side regenerateZReportForDate. */
+export async function fetchAllTenantOrdersInCreatedAtRange(
+  tenantSlug: string,
+  startUTC: string,
+  endUTC: string,
+  selectColumns: string
+): Promise<Record<string, unknown>[]> {
+  return fetchAllOrdersInCreatedAtRange(supabase, tenantSlug, startUTC, endUTC, selectColumns)
+}
+
+/** Admin startdashboard: alle orders voor tenant (volledige rijen). */
+export async function fetchAllTenantOrdersForDashboard(tenantSlug: string): Promise<Record<string, unknown>[]> {
+  return fetchAllTenantOrdersNewestFirst(tenantSlug, '*')
+}
+
+/** Rapporten-UI: alle orders (nieuwste eerst), zonder 3000-limiet. */
+export async function fetchAllOrdersForRapporten(tenantSlug: string): Promise<Record<string, unknown>[]> {
+  return fetchAllTenantOrdersNewestFirst(
+    tenantSlug,
+    'id,order_number,status,payment_status,payment_method,order_type,total,subtotal,tax,discount_amount,created_at,customer_name,customer_email,items'
+  )
+}
+
 export async function getOrders(tenantSlug: string, status?: string, dateFrom?: string, dateTo?: string): Promise<Order[]> {
   let query = supabase
     .from('orders')
@@ -1920,20 +2015,21 @@ export async function regenerateZReportForDate(
     const { startUTC, endUTC } = getZRapportDateBounds(date)
     console.log(`regenerateZReportForDate: Query van ${startUTC} tot ${endUTC}`)
 
-    const { data: ordersRaw, error: ordersError } = await client
-      .from('orders')
-      .select('id, total, payment_method, order_type, status, payment_status')
-      .eq('tenant_slug', tenantSlug)
-      .gte('created_at', startUTC)
-      .lte('created_at', endUTC)
-      .not('status', 'in', '("cancelled","rejected","CANCELLED","REJECTED")')
+    const ordersRaw = await fetchAllOrdersInCreatedAtRange(
+      client,
+      tenantSlug,
+      startUTC,
+      endUTC,
+      'id, total, payment_method, order_type, status, payment_status'
+    )
 
-    if (ordersError) {
-      console.error('regenerateZReportForDate: Fout bij ophalen orders:', ordersError)
-      return
-    }
-
-    const orders = (ordersRaw || []).filter((o) => orderCountsTowardRevenueAndZReport(o))
+    const orders = ordersRaw.filter((o) =>
+      orderCountsTowardRevenueAndZReport(
+        o as Pick<Order, 'order_type' | 'status' | 'payment_status'>
+      )
+    ) as Array<
+      Pick<Order, 'id' | 'total' | 'payment_method' | 'order_type' | 'status' | 'payment_status'> & { id: string }
+    >
 
     console.log(`regenerateZReportForDate: ${orders?.length || 0} orders voor rapport`)
 
@@ -2277,27 +2373,29 @@ export async function getSalesStats(tenantSlug: string, period: 'today' | 'week'
       break
   }
   
-  const { data: raw, error } = await supabase
-    .from('orders')
-    .select('total, status, order_type, payment_status')
-    .eq('tenant_slug', tenantSlug)
-    .gte('created_at', startDate.toISOString())
-    .not('status', 'eq', 'cancelled')
+  const endISO = now.toISOString()
+  const raw = await fetchAllOrdersInCreatedAtRange(
+    supabase,
+    tenantSlug,
+    startDate.toISOString(),
+    endISO,
+    'total, status, order_type, payment_status'
+  )
 
-  if (error || !raw) {
-    console.error('Error fetching sales stats:', error)
-    return { total_orders: 0, total_revenue: 0, average_order: 0, orders_by_status: {} }
-  }
-
-  const data = raw.filter((o) => orderCountsTowardRevenueAndZReport(o))
+  const data = raw.filter((o) =>
+    orderCountsTowardRevenueAndZReport(
+      o as Pick<Order, 'order_type' | 'status' | 'payment_status'>
+    )
+  ) as Array<Pick<Order, 'total' | 'status' | 'order_type' | 'payment_status'>>
 
   const total_orders = data.length
-  const total_revenue = data.reduce((sum, o) => sum + (o.total || 0), 0)
+  const total_revenue = data.reduce((sum, o) => sum + (Number(o.total) || 0), 0)
   const average_order = total_orders > 0 ? total_revenue / total_orders : 0
   
   const orders_by_status: Record<string, number> = {}
   data.forEach(o => {
-    orders_by_status[o.status] = (orders_by_status[o.status] || 0) + 1
+    const st = String(o.status ?? '')
+    orders_by_status[st] = (orders_by_status[st] || 0) + 1
   })
   
   return { total_orders, total_revenue, average_order, orders_by_status }
@@ -2307,19 +2405,20 @@ export async function getDailyRevenue(tenantSlug: string, days: number = 7): Pro
   const startDate = new Date()
   startDate.setDate(startDate.getDate() - days)
   
-  const { data: raw, error } = await supabase
-    .from('orders')
-    .select('total, created_at, status, order_type, payment_status')
-    .eq('tenant_slug', tenantSlug)
-    .gte('created_at', startDate.toISOString())
-    .not('status', 'eq', 'cancelled')
+  const endNow = new Date()
+  const raw = await fetchAllOrdersInCreatedAtRange(
+    supabase,
+    tenantSlug,
+    startDate.toISOString(),
+    endNow.toISOString(),
+    'total, created_at, status, order_type, payment_status'
+  )
 
-  if (error || !raw) {
-    console.error('Error fetching daily revenue:', error)
-    return []
-  }
-
-  const data = raw.filter((o) => orderCountsTowardRevenueAndZReport(o))
+  const data = raw.filter((o) =>
+    orderCountsTowardRevenueAndZReport(
+      o as Pick<Order, 'order_type' | 'status' | 'payment_status'>
+    )
+  ) as Array<Pick<Order, 'total' | 'created_at' | 'status' | 'order_type' | 'payment_status'>>
 
   // Group by date
   const dailyData: Record<string, { revenue: number; orders: number }> = {}
@@ -2332,7 +2431,9 @@ export async function getDailyRevenue(tenantSlug: string, days: number = 7): Pro
   }
 
   data.forEach(order => {
-    const dateKey = order.created_at.split('T')[0]
+    const ca = order.created_at
+    if (!ca) return
+    const dateKey = String(ca).split('T')[0]
     if (dailyData[dateKey]) {
       dailyData[dateKey].revenue += order.total || 0
       dailyData[dateKey].orders += 1
@@ -3141,19 +3242,19 @@ export async function calculateMonthlyReport(
   // 1. Omzet uit orders-tabel (zelfde regels als dashboard / Z-rapport / rapporten).
   //    payment_status MOET in .select: voor POS (DINE_IN/TAKEAWAY/DELIVERY) is orderCountsTowardRevenueAndZReport
   //    afhankelijk van payment_status === 'paid'. Zonder veld vielen alle kassa-orders weg → lege bedrijfsanalyse.
-  const { data: ordersDataRaw, error: ordersMonthlyErr } = await supabase
-    .from('orders')
-    .select('total, status, payment_method, order_type, payment_status')
-    .eq('tenant_slug', tenantSlug)
-    .gte('created_at', startUTC)
-    .lte('created_at', endUTC)
-    .not('status', 'in', '("cancelled","rejected")')
+  const ordersDataRaw = await fetchAllOrdersInCreatedAtRange(
+    supabase,
+    tenantSlug,
+    startUTC,
+    endUTC,
+    'total, status, payment_method, order_type, payment_status'
+  )
 
-  if (ordersMonthlyErr) {
-    console.error('calculateMonthlyReport: orders query', ordersMonthlyErr)
-  }
-
-  const ordersData = (ordersDataRaw || []).filter((o) => orderCountsTowardRevenueAndZReport(o))
+  const ordersData = ordersDataRaw.filter((o) =>
+    orderCountsTowardRevenueAndZReport(
+      o as Pick<Order, 'order_type' | 'status' | 'payment_status'>
+    )
+  )
 
   const onlineOrderRows = ordersData.filter((o) => isWebshopOrder(o))
   const kassaOrderRows = ordersData.filter((o) => isKassaPosOrder(o))

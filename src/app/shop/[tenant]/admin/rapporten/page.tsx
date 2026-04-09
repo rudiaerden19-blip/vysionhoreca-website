@@ -2,7 +2,11 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
-import { getTenantSettings, orderCountsTowardRevenueAndZReport } from '@/lib/admin-api'
+import {
+  fetchAllOrdersForRapporten,
+  getTenantSettings,
+  orderCountsTowardRevenueAndZReport,
+} from '@/lib/admin-api'
 import PinGate from '@/components/PinGate'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -131,24 +135,24 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
 
   const loadData = useCallback(async () => {
     setLoading(true)
-    const [{ data: ordersData, error: ordersError }, { data: zData }, info] = await Promise.all([
-      supabase.from('orders')
-        .select('id,order_number,status,payment_status,payment_method,order_type,total,subtotal,tax,discount_amount,created_at,customer_name,customer_email,items')
-        .eq('tenant_slug', tenant)
-        .order('created_at', { ascending: false })
-        .limit(3000),
+    const [ordersData, { data: zData }, info] = await Promise.all([
+      fetchAllOrdersForRapporten(tenant),
       supabase.from('z_reports').select('*').eq('tenant_slug', tenant).order('report_date', { ascending: false }),
       getTenantSettings(tenant),
     ])
-    if (ordersError) console.error('Rapporten orders error:', ordersError)
-    setOrders((ordersData||[]).map(o => ({
-      ...o,
-      items: parseOrderItems(o.items),
-      discount_amount: Number(o.discount_amount) || 0,
-      tax: Number(o.tax) || 0,
-      subtotal: Number(o.subtotal) || 0,
-      total: Number(o.total) || 0,
-    })))
+    setOrders(
+      (ordersData || []).map((o) => {
+        const row = o as Record<string, unknown>
+        return {
+          ...row,
+          items: parseOrderItems(row.items),
+          discount_amount: Number(row.discount_amount) || 0,
+          tax: Number(row.tax) || 0,
+          subtotal: Number(row.subtotal) || 0,
+          total: Number(row.total) || 0,
+        } as Order
+      })
+    )
     setZReports(zData||[])
     setTenantInfo(info as TenantInfo)
     setLoading(false)

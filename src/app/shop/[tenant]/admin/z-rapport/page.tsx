@@ -4,10 +4,12 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import {
+  fetchAllTenantOrdersInCreatedAtRange,
   getTenantSettings,
   getZRapportDateBounds,
   getBelgiumDateString,
   orderCountsTowardRevenueAndZReport,
+  type Order,
 } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
@@ -119,17 +121,18 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     // KRITIEK: Fiscale daggrens = 00:00 tot 12:00 de VOLGENDE dag (GKS compliant)
     const { startUTC, endUTC } = getZRapportDateBounds(selectedDate)
 
-    const { data: ordersRaw } = await supabase
-      .from('orders')
-      .select('*')
-      .eq('tenant_slug', params.tenant)
-      .gte('created_at', startUTC)
-      .lte('created_at', endUTC)
-      .not('status', 'in', '("cancelled","rejected","CANCELLED","REJECTED")')
-
-    const orders = (ordersRaw || []).filter((o) =>
-      orderCountsTowardRevenueAndZReport(o)
+    const ordersRaw = await fetchAllTenantOrdersInCreatedAtRange(
+      params.tenant,
+      startUTC,
+      endUTC,
+      '*'
     )
+
+    const orders = ordersRaw.filter((o) =>
+      orderCountsTowardRevenueAndZReport(
+        o as Pick<Order, 'order_type' | 'status' | 'payment_status'>
+      )
+    ) as unknown as Order[]
 
     if (orders.length) {
       let total = 0
@@ -138,8 +141,8 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       let cardPayments = 0
       const orderIds: string[] = []
 
-      orders.forEach(order => {
-        orderIds.push(order.id)
+      orders.forEach((order) => {
+        if (order.id) orderIds.push(order.id)
         const orderTotal = order.total || 0
         total += orderTotal
         const paymentMethod = (order.payment_method || '').toLowerCase()
