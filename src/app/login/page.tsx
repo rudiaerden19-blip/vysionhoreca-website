@@ -182,8 +182,6 @@ export default function LoginPage() {
 
       persistTenantSessionWithToday(tenant as Record<string, unknown>)
 
-      try { sessionStorage.removeItem(`vysion_welcomed_${tenant.tenant_slug}`) } catch { /* ignore */ }
-
       const safeNext = normalizeLoginNextPath(nextParam, tenant.tenant_slug)
       const fallbackAfterLogin = `/shop/${tenant.tenant_slug}/admin`
 

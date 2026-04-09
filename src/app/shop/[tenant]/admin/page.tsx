@@ -14,7 +14,7 @@ import {
 } from '@/lib/admin-api'
 import PinGate from '@/components/PinGate'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
-import { isSuperAdminLoggedIn } from '@/lib/auth-headers'
+import { isOwnerSessionFreshForTenant, isSuperAdminLoggedIn } from '@/lib/auth-headers'
 
 interface DashboardStats {
   todayOrders: number
@@ -45,10 +45,13 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
   const { moduleAccess } = useTenantModuleFlags(params.tenant)
   const [businessName, setBusinessName] = useState<string>('')
 
-  // Welkomstpagina: zaak-eigenaren bij eerste bezoek; superadmin slaat dit over (anders paarse splash + verkeerde doorlink naar subdomein).
+  // Welkomstpagina: eerste sessiebezoek zonder ENTER op /welkom. Na wachtwoord-login is de eigenaar
+  // al geïdentificeerd — niet opnieuw forceren (anders: login wiste vlag + kassa zet ze niet → Overzicht → splash).
   useEffect(() => {
     try {
-      if (typeof window !== 'undefined' && isSuperAdminLoggedIn()) return
+      if (typeof window === 'undefined') return
+      if (isSuperAdminLoggedIn()) return
+      if (isOwnerSessionFreshForTenant(params.tenant)) return
       const key = `vysion_welcomed_${params.tenant}`
       const seen = sessionStorage.getItem(key)
       if (!seen) {
