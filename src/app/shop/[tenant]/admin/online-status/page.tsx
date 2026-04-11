@@ -3,7 +3,11 @@
 import { useLanguage } from '@/i18n'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
-import { getAuthHeaders } from '@/lib/auth-headers'
+import {
+  clearTenantOwnerSession,
+  getAuthHeaders,
+  redirectToShopOwnerLogin,
+} from '@/lib/auth-headers'
 
 const REASONS = [
   { key: 'volzet',   icon: '🔴', labelKey: 'reasonVolzet',   descKey: 'reasonVolzetDesc' },
@@ -57,9 +61,18 @@ export default function OnlineStatusPage({ params }: { params: { tenant: string 
       headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
       body: JSON.stringify({ tenant: params.tenant, ...payload }),
     })
-    const json = await res.json()
+    const json = (await res.json().catch(() => ({}))) as { error?: string }
     if (!res.ok || json.error) {
       const msg = json.error ?? 'Onbekende fout'
+      if (
+        /ongeldige sessie|niet ingelogd|log opnieuw|invalid session|not logged in|log in again/i.test(
+          String(msg)
+        )
+      ) {
+        clearTenantOwnerSession()
+        redirectToShopOwnerLogin(params.tenant)
+        return false
+      }
       setSaveError(msg)
       if (msg.includes('does not exist') || msg.includes('migration')) {
         setNeedsMigration(true)

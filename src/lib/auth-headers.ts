@@ -44,8 +44,8 @@ export function getAuthHeaders(): Record<string, string> {
         email?: string
         tenant_slug?: string
       }
-      headers['x-business-id'] = tenant.business_id || tenant.id || ''
-      headers['x-auth-email'] = tenant.email || ''
+      headers['x-business-id'] = String(tenant.business_id || tenant.id || '').trim()
+      headers['x-auth-email'] = String(tenant.email || '').trim()
       headers['x-tenant-slug'] = tenant.tenant_slug || ''
     } catch {
       localStorage.removeItem('vysion_tenant')
@@ -238,6 +238,16 @@ export function normalizeLoginNextPath(
   return null
 }
 
+/** Verwijdert zaak-sessie uit localStorage (verouderde id/e-mail). Superadmin ongemoeid. */
+export function clearTenantOwnerSession(): void {
+  if (typeof window === 'undefined') return
+  try {
+    localStorage.removeItem('vysion_tenant')
+  } catch {
+    /* ignore */
+  }
+}
+
 /**
  * Zelfde vorm als admin-layout bij redirect naar login: browserpad (evt. `/admin/…` op subdomein)
  * → intern canoniek `/shop/{tenant}/…` voor `?next=`.
@@ -253,6 +263,64 @@ export function buildShopInternalReturnPath(
     return `/shop/${tenantSlug}/admin${path === '/admin' ? '' : path.slice('/admin'.length)}${search}`
   }
   return `${path}${search}`
+}
+
+function stripSaHandoffQuery(search: string): string {
+  if (!search || search === '?') return ''
+  const raw = search.startsWith('?') ? search.slice(1) : search
+  const p = new URLSearchParams(raw)
+  p.delete('sa_handoff')
+  const s = p.toString()
+  return s ? `?${s}` : ''
+}
+
+/**
+ * Volledige navigatie naar /login met canonieke `next` (zelfde als admin-layout).
+ */
+export function redirectToShopOwnerLogin(tenantSlug: string): void {
+  if (typeof window === 'undefined') return
+  const clean = stripSaHandoffQuery(window.location.search)
+  const next = buildShopInternalReturnPath(
+    tenantSlug,
+    window.location.pathname,
+    clean
+  )
+  window.location.assign(
+    `${window.location.origin}/login?next=${encodeURIComponent(next)}`
+  )
+}
+
+export type VerifyShopAdminSessionResult = 'ok' | 'auth_failed' | 'network_error'
+
+/**
+ * Controleert headers tegen de database (owner of superadmin).
+ * Bij `auth_failed`: geen netwerkfout — caller kan `clearTenantOwnerSession` + opnieuw proberen.
+ */
+export async function verifyShopAdminApiSession(
+  tenantSlug: string
+): Promise<VerifyShopAdminSessionResult> {
+  if (typeof window === 'undefined') return 'network_error'
+
+  const sleep = (ms: number) => new Promise<void>(r => setTimeout(r, ms))
+
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const res = await fetch('/api/auth/verify-tenant-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        body: JSON.stringify({ tenant: tenantSlug }),
+        cache: 'no-store',
+      })
+      const data = (await res.json().catch(() => ({}))) as { ok?: boolean }
+      if (res.ok && data.ok === true) return 'ok'
+      if (res.status === 403 || res.status === 401) return 'auth_failed'
+      if (attempt < 2) await sleep(350 * (attempt + 1))
+    } catch {
+      if (attempt < 2) await sleep(350 * (attempt + 1))
+      else return 'network_error'
+    }
+  }
+  return 'auth_failed'
 }
 
 /**

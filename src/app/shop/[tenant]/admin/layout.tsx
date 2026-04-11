@@ -27,8 +27,11 @@ import PostTrialModulePickerModal from '@/components/PostTrialModulePickerModal'
 import { AdminHamburgerMenu } from '@/components/AdminHamburgerMenu'
 import {
   buildShopInternalReturnPath,
+  clearTenantOwnerSession,
   isSuperAdminLoggedIn,
   isOwnerSessionFreshForTenant,
+  redirectToShopOwnerLogin,
+  verifyShopAdminApiSession,
 } from '@/lib/auth-headers'
 import {
   mirrorSuperadminSessionFromCookieToLocalStorage,
@@ -57,7 +60,8 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   const [tenantExists, setTenantExists] = useState<boolean | null>(null)
   const [loading, setLoading] = useState(true)
   /** Na mount: superadmin (platform) óf zaak-eigenaar met wachtwoord vandaag. Klanten zonder geldige `vysion_tenant` blijven naar /login — géén automatische tenant-sessie via cookies. */
-  const [adminAccess, setAdminAccess] = useState<'pending' | 'ok' | 'login'>('pending')
+  /** `verifying` = client dacht ingelogd; wacht op `/api/auth/verify-tenant-session` (zelfde regels als schrijf-API’s). */
+  const [adminAccess, setAdminAccess] = useState<'pending' | 'verifying' | 'ok' | 'login'>('pending')
   const baseUrl = `/shop/${params.tenant}/admin`
   const {
     moduleAccess,
@@ -166,7 +170,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
 
     if (hasAccess) {
       if (fromSaHandoff) removeHandoffFromAddressBar()
-      setAdminAccess('ok')
+      setAdminAccess('verifying')
       return
     }
 
@@ -178,12 +182,12 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
         mirrorSuperadminSessionFromCookieToLocalStorage()
         if (isSuperAdminLoggedIn() || isOwnerSessionFreshForTenant(params.tenant)) {
           removeHandoffFromAddressBar()
-          setAdminAccess('ok')
+          setAdminAccess('verifying')
         } else if (peekSuperadminFromBrowserCookie()) {
           mirrorSuperadminSessionFromCookieToLocalStorage()
           if (isSuperAdminLoggedIn() || isOwnerSessionFreshForTenant(params.tenant)) {
             removeHandoffFromAddressBar()
-            setAdminAccess('ok')
+            setAdminAccess('verifying')
           } else {
             goTenantLogin()
           }
@@ -199,6 +203,57 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
 
     goTenantLogin()
   }, [loading, tenantExists, params.tenant, demoPublicUnauthenticated])
+
+  /** Server moet dezelfde sessie zien als schrijf-API’s; ruimt verouderde `vysion_tenant` op bij mismatch. */
+  useEffect(() => {
+    if (adminAccess !== 'verifying') return
+    if (demoPublicUnauthenticated) return
+    if (typeof window === 'undefined') return
+
+    let cancelled = false
+
+    const finishLogin = () => {
+      if (cancelled) return
+      setAdminAccess('login')
+      redirectToShopOwnerLogin(params.tenant)
+    }
+
+    void (async () => {
+      let outcome = await verifyShopAdminApiSession(params.tenant)
+      if (cancelled) return
+
+      if (outcome === 'ok') {
+        setAdminAccess('ok')
+        return
+      }
+
+      if (outcome === 'network_error') {
+        console.error('[admin] verify-tenant-session unreachable after retries; allowing UI')
+        setAdminAccess('ok')
+        return
+      }
+
+      clearTenantOwnerSession()
+      mirrorSuperadminSessionFromCookieToLocalStorage()
+      outcome = await verifyShopAdminApiSession(params.tenant)
+      if (cancelled) return
+
+      if (outcome === 'ok') {
+        setAdminAccess('ok')
+        return
+      }
+      if (outcome === 'network_error') {
+        setAdminAccess('ok')
+        return
+      }
+
+      finishLogin()
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [adminAccess, params.tenant, demoPublicUnauthenticated])
 
   /**
    * Welkom-splash (/welkom) wordt getoond vanuit admin/page als `vysion_welcomed_*` ontbreekt.
