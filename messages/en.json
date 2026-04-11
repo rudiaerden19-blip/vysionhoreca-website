@@ -4007,6 +4007,7 @@
     "fillAllFields": "Please fill in all required fields",
     "invalidEmail": "Please enter a valid email address",
     "reservationError": "Something went wrong. Please try again or call us.",
+    "reservationSlotTooSoon": "That date and time are in the past or too soon. Please choose a future time.",
     "joinOurTeam": "Join our team",
     "lookingForStaff": "We are looking for staff",
     "interested": "Interested? Contact us:",

@@ -4007,6 +4007,7 @@
     "fillAllFields": "Vul alle verplichte velden in",
     "invalidEmail": "Vul een geldig e-mailadres in",
     "reservationError": "Er ging iets mis. Probeer opnieuw of bel ons.",
+    "reservationSlotTooSoon": "Die datum en tijd liggen in het verleden of te dichtbij. Kies een tijdstip in de toekomst.",
     "joinOurTeam": "Kom bij ons team",
     "lookingForStaff": "Wij zoeken personeel",
     "interested": "Interesse? Neem contact op:",

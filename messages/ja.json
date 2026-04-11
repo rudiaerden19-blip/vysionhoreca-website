@@ -3628,6 +3628,7 @@
     "fillAllFields": "必須項目をすべて入力してください",
     "invalidEmail": "有効なメールアドレスを入力してください",
     "reservationError": "エラーが発生しました。もう一度お試しいただくか、お電話ください。",
+    "reservationSlotTooSoon": "その日時は過去か、予約できないほど近すぎます。未来の日時を選んでください。",
     "joinOurTeam": "チームに参加しませんか",
     "lookingForStaff": "スタッフ募集中",
     "interested": "興味がありますか？お問い合わせください：",

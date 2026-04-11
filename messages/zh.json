@@ -3628,6 +3628,7 @@
     "fillAllFields": "请填写所有必填项",
     "invalidEmail": "请输入有效的电子邮箱",
     "reservationError": "出错了。请重试或致电我们。",
+    "reservationSlotTooSoon": "该日期和时间已过去或太近。请选择之后的时间。",
     "joinOurTeam": "加入我们的团队",
     "lookingForStaff": "招聘中",
     "interested": "有兴趣？联系我们：",

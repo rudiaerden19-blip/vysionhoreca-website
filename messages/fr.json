@@ -3128,6 +3128,7 @@
     "fillAllFields": "Veuillez remplir tous les champs obligatoires",
     "invalidEmail": "Veuillez entrer une adresse email valide",
     "reservationError": "Une erreur s'est produite. Veuillez réessayer ou nous appeler.",
+    "reservationSlotTooSoon": "Cette date et cette heure sont passées ou trop proches. Choisissez un moment ultérieur.",
     "joinOurTeam": "Rejoignez notre équipe",
     "lookingForStaff": "Nous recherchons du personnel",
     "interested": "Intéressé ? Contactez-nous :",

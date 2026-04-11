@@ -7,6 +7,11 @@ import Image from 'next/image'
 import { getTenantSettings, getOpeningHours, getDeliverySettings, getMenuProducts, createReservation, getTenantTexts, getVisibleReviews, getActivePromotions, getShopStatus, TenantSettings, OpeningHour, DeliverySettings, MenuProduct, TenantTexts, Review as DbReview, Promotion, ShopStatus } from '@/lib/admin-api'
 import { parseImageZoomSettings } from '@/components/ImageZoomPicker'
 import { supabase } from '@/lib/supabase'
+import {
+  isPublicReservationSlotTooSoon,
+  maxReservationDateYmd,
+  minReservationDateYmd,
+} from '@/lib/reservation-datetime'
 import { useLanguage } from '@/i18n'
 
 const MarketingDemoSessionPrime = dynamic(
@@ -228,6 +233,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   const [availableTimes, setAvailableTimes] = useState<string[]>([])
   const [selectedDayClosed, setSelectedDayClosed] = useState(false)
   const [depositSettings, setDepositSettings] = useState<{ required: boolean; amount: number }>({ required: false, amount: 0 })
+  const [publicReservationRules, setPublicReservationRules] = useState({
+    minAdvanceHours: 2,
+    maxAdvanceDays: 60,
+  })
 
   // Generate time slots based on opening hours for selected date
   const generateTimeSlots = (date: string, openingHours: Record<string, { open?: string; close?: string; closed?: boolean; hasBreak?: boolean; breakStart?: string; breakEnd?: string }>) => {
@@ -323,7 +332,18 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       setReservationError(t('shopPage.invalidEmail'))
       return
     }
-    
+
+    if (
+      isPublicReservationSlotTooSoon(
+        reservationForm.date,
+        reservationForm.time,
+        publicReservationRules.minAdvanceHours
+      )
+    ) {
+      setReservationError(t('shopPage.reservationSlotTooSoon'))
+      return
+    }
+
     setReservationSubmitting(true)
     setReservationError('')
     
@@ -408,6 +428,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           const required = !!(data.deposit_required ?? data.depositRequired ?? false)
           const amount = Number(data.deposit_amount ?? data.depositAmount ?? 0)
           setDepositSettings({ required, amount })
+          setPublicReservationRules({
+            minAdvanceHours: Number(data.min_advance_hours ?? data.minAdvanceHours ?? 2) || 2,
+            maxAdvanceDays: Number(data.max_advance_days ?? data.maxAdvanceDays ?? 60) || 60,
+          })
         }
       })
   }, [params.tenant])
@@ -1362,7 +1386,8 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                           generateTimeSlots(newDate, business.opening_hours)
                         }
                       }}
-                      min={new Date().toISOString().split('T')[0]}
+                      min={minReservationDateYmd(publicReservationRules.minAdvanceHours)}
+                      max={maxReservationDateYmd(publicReservationRules.maxAdvanceDays)}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     />
                     {selectedDayClosed && reservationForm.date && (

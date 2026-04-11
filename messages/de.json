@@ -3128,6 +3128,7 @@
     "fillAllFields": "Bitte füllen Sie alle Pflichtfelder aus",
     "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
     "reservationError": "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut oder rufen Sie uns an.",
+    "reservationSlotTooSoon": "Dieses Datum und diese Uhrzeit liegen in der Vergangenheit oder zu nahe. Bitte wählen Sie einen späteren Zeitpunkt.",
     "joinOurTeam": "Werden Sie Teil unseres Teams",
     "lookingForStaff": "Wir suchen Personal",
     "interested": "Interesse? Kontaktieren Sie uns:",

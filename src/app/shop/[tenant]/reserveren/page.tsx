@@ -7,6 +7,12 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
+import {
+  isPublicReservationSlotTooSoon,
+  localCalendarDateString,
+  maxReservationDateYmd,
+  minReservationDateYmd,
+} from '@/lib/reservation-datetime'
 import { CalendarDays, Clock, Users, Phone, Mail, MessageSquare, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface TenantInfo {
@@ -124,7 +130,7 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
       for (let m = 0; m < 60; m += slotInterval) {
         const time = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`
         // Check of tijd in de toekomst ligt als vandaag geselecteerd
-        if (selectedDate === now.toISOString().split('T')[0]) {
+        if (selectedDate === localCalendarDateString(now)) {
           const slotTime = new Date()
           slotTime.setHours(h, m, 0)
           const minTime = new Date(now.getTime() + (settings.minAdvanceHours || 2) * 60 * 60 * 1000)
@@ -136,19 +142,10 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
     return slots
   }
 
-  // Min datum (vandaag + minAdvanceHours)
-  const getMinDate = () => {
-    const d = new Date()
-    if (settings.minAdvanceHours >= 24) d.setDate(d.getDate() + 1)
-    return d.toISOString().split('T')[0]
-  }
+  /** Eerste kalenderdag waarop (nu + minAdvanceHours) nog binnen opening valt — lokaal, geen UTC-shift. */
+  const getMinDate = () => minReservationDateYmd(settings.minAdvanceHours)
 
-  // Max datum
-  const getMaxDate = () => {
-    const d = new Date()
-    d.setDate(d.getDate() + (settings.maxAdvanceDays || 60))
-    return d.toISOString().split('T')[0]
-  }
+  const getMaxDate = () => maxReservationDateYmd(settings.maxAdvanceDays || 60)
 
   const handleSubmit = async () => {
     if (!formData.guest_name.trim()) { setError('Naam is verplicht'); return }
@@ -156,6 +153,18 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
     if (!formData.reservation_time) { setError('Tijd is verplicht'); return }
     if (!formData.guest_phone && !formData.guest_email) {
       setError('Telefoon of email is verplicht'); return
+    }
+    if (
+      isPublicReservationSlotTooSoon(
+        formData.reservation_date,
+        formData.reservation_time,
+        settings.minAdvanceHours
+      )
+    ) {
+      setError(
+        'Deze datum en tijd liggen in het verleden of binnen de minimale vooruit. Kies een later tijdstip.'
+      )
+      return
     }
     setError('')
     setLoading(true)
