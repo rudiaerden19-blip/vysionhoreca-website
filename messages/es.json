@@ -845,6 +845,8 @@
       "add": "Añadir",
       "cancel": "Cancelar",
       "confirmDelete": "¿Seguro que quieres eliminar este ingrediente?",
+      "confirmDeleteAllFirst": "AVISO: vas a eliminar TODOS los {count} ingredientes. Esta acción no se puede deshacer. ¿Continuar?",
+      "confirmDeleteAllLast": "Último aviso: se eliminarán permanentemente todos los ingredientes. ¿Continuar?",
       "noIngredientsFound": "No se encontraron ingredientes",
       "noIngredientsYet": "Aún no hay ingredientes añadidos",
       "totalIngredients": "ingredientes en total",
@@ -2118,6 +2120,7 @@
     "dbNotConnected": "Base de datos no conectada",
     "unknownError": "Error desconocido",
     "confirmDeletePhoto": "¿Seguro que quieres eliminar esta foto?",
+    "confirmDeleteManyPhotos": "¿Eliminar {count} foto(s)?",
     "deleteDbError": "Error al eliminar de la base de datos",
     "deleteErrorPrefix": "Error al eliminar:",
     "selectedImageAlt": "Imagen seleccionada",
@@ -3512,6 +3515,8 @@
     "soldGiftCards": "Tarjetas Regalo Vendidas",
     "totalValue": "Valor Total",
     "redeemed": "Canjeadas",
+    "confirmCashReceived": "¿Pago en efectivo recibido? Esto activará la tarjeta regalo.",
+    "activateFailed": "Error al activar",
     "remaining": "Restantes",
     "noGiftCards": "Aún no se han vendido tarjetas regalo",
     "noGiftCardsDesc": "Cuando los clientes compren tarjetas regalo, aparecerán aquí",
@@ -4307,7 +4312,8 @@
     "productRequired": "Elige un producto para esta promoción",
     "create": "Crear",
     "free": "GRATIS",
-    "loading": "Cargando..."
+    "loading": "Cargando...",
+    "confirmDeletePromo": "¿Seguro que quieres eliminar esta promoción?"
   },
   "kostenInstellingenPage": {
     "title": "Configuración de Márgenes",

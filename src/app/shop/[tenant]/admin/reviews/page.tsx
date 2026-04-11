@@ -5,9 +5,11 @@ import { useLanguage } from '@/i18n'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getReviews, replyToReview, toggleReviewVisible, deleteReview, Review } from '@/lib/admin-api'
+import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 
 export default function ReviewsPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
+  const { ask, ConfirmModal } = useAdminConfirm(t)
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
   const [replyingTo, setReplyingTo] = useState<string | null>(null)
@@ -37,8 +39,8 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm(t('common.delete') + '?')) return
-    
+    if (!(await ask(t('common.delete') + '?'))) return
+
     const success = await deleteReview(id)
     if (success) {
       setReviews(prev => prev.filter(r => r.id !== id))
@@ -106,6 +108,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
 
   return (
     <div className="max-w-4xl mx-auto">
+      <ConfirmModal />
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t('marketingReviews.title')}</h1>

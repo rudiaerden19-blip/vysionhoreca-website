@@ -6,10 +6,12 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { getTenantSettings, getCustomer, getCustomerOrders, updateCustomer, getLoyaltyRewards, redeemReward, deleteCustomerAccount, Customer, Order, TenantSettings, LoyaltyReward } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
+import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 
 export default function AccountPage({ params }: { params: { tenant: string } }) {
   const router = useRouter()
   const { t, locale, localeNames } = useLanguage()
+  const { ask, ConfirmModal } = useAdminConfirm(t)
   const [loading, setLoading] = useState(true)
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [orders, setOrders] = useState<Order[]>([])
@@ -108,8 +110,8 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
   const handleRedeem = async (reward: LoyaltyReward) => {
     if (!customer || (customer.loyalty_points || 0) < reward.points_required) return
     
-    if (!confirm(t('accountPage.confirmRedeem').replace('{points}', String(reward.points_required)).replace('{reward}', reward.name))) return
-    
+    if (!(await ask(t('accountPage.confirmRedeem').replace('{points}', String(reward.points_required)).replace('{reward}', reward.name)))) return
+
     setRedeeming(reward.id!)
     const success = await redeemReward(customer.id!, reward.id!, reward.points_required, params.tenant)
     
@@ -166,6 +168,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
 
   return (
     <div style={{ width: '100vw', maxWidth: '100vw', overflowX: 'clip' }} className="min-h-screen bg-gray-50">
+      <ConfirmModal />
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">

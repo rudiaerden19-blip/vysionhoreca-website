@@ -1087,6 +1087,8 @@
       "add": "Add",
       "cancel": "Cancel",
       "confirmDelete": "Are you sure you want to delete this ingredient?",
+      "confirmDeleteAllFirst": "WARNING: you are about to delete ALL {count} ingredients. This cannot be undone. Continue?",
+      "confirmDeleteAllLast": "Final warning: all ingredients will be permanently deleted. Continue?",
       "noIngredientsFound": "No ingredients found",
       "noIngredientsYet": "No ingredients added yet",
       "totalIngredients": "ingredients in total",
@@ -2360,6 +2362,7 @@
     "dbNotConnected": "Database not connected",
     "unknownError": "Unknown error",
     "confirmDeletePhoto": "Are you sure you want to delete this photo?",
+    "confirmDeleteManyPhotos": "Delete {count} photo(s)?",
     "deleteDbError": "Error removing from database",
     "deleteErrorPrefix": "Error while deleting:",
     "selectedImageAlt": "Selected image"
@@ -3891,6 +3894,8 @@
     "soldGiftCards": "Sold Gift Cards",
     "totalValue": "Total Value",
     "redeemed": "Redeemed",
+    "confirmCashReceived": "Cash payment received? This will activate the gift card.",
+    "activateFailed": "Activation failed",
     "remaining": "Remaining",
     "noGiftCards": "No gift cards sold yet",
     "noGiftCardsDesc": "When customers buy gift cards, they will appear here",
@@ -4529,7 +4534,8 @@
     "productRequired": "Choose a product for this promotion",
     "create": "Create",
     "free": "FREE",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "confirmDeletePromo": "Are you sure you want to delete this promotion?"
   },
   "kostenInstellingenPage": {
     "title": "Margin Settings",

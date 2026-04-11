@@ -5,6 +5,7 @@ import { useLanguage } from '@/i18n'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getQrCodes, saveQrCode, deleteQrCode, QrCode } from '@/lib/admin-api'
+import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 
 const getQrTypes = (t: (key: string) => string) => [
   { id: 'menu', name: t('marketingQr.types.menu'), icon: '📋', description: t('marketingQr.types.menuDesc') },
@@ -15,6 +16,7 @@ const getQrTypes = (t: (key: string) => string) => [
 
 export default function QrCodesPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
+  const { ask, ConfirmModal } = useAdminConfirm(t)
   const [qrCodes, setQrCodes] = useState<QrCode[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -91,7 +93,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
       alert('QR-code kon niet worden herkend. Vernieuw de pagina en probeer opnieuw.')
       return
     }
-    if (!confirm(t('marketingQr.confirmDelete'))) return
+    if (!(await ask(t('marketingQr.confirmDelete')))) return
 
     const success = await deleteQrCode(id)
     if (success) {
@@ -175,6 +177,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
 
   return (
     <div className="max-w-4xl mx-auto">
+      <ConfirmModal />
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t('marketingQr.title')}</h1>

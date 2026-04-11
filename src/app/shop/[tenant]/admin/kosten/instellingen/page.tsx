@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
+import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 
 interface CostCategory {
   id: string
@@ -15,6 +16,7 @@ interface CostCategory {
 
 export default function CostSettingsPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
+  const { ask, ConfirmModal } = useAdminConfirm(t)
   const [categories, setCategories] = useState<CostCategory[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -86,8 +88,8 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
   }
 
   async function deleteCategory(id: string) {
-    if (!confirm(t('kostenInstellingenPage.deleteConfirm'))) return
-    
+    if (!(await ask(t('kostenInstellingenPage.deleteConfirm')))) return
+
     await supabase.from('cost_categories').delete().eq('id', id)
     setCategories(prev => prev.filter(c => c.id !== id))
   }
@@ -102,6 +104,7 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
 
   return (
     <div className="space-y-6">
+      <ConfirmModal />
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>

@@ -845,6 +845,8 @@
       "add": "添加",
       "cancel": "取消",
       "confirmDelete": "确定删除此原料？",
+      "confirmDeleteAllFirst": "警告：您即将删除全部 {count} 条原料记录，此操作无法撤销。是否继续？",
+      "confirmDeleteAllLast": "最后确认：所有原料将被永久删除。是否继续？",
       "noIngredientsFound": "未找到原料",
       "noIngredientsYet": "尚未添加原料",
       "totalIngredients": "个原料",
@@ -2118,6 +2120,7 @@
     "dbNotConnected": "数据库未连接",
     "unknownError": "未知错误",
     "confirmDeletePhoto": "确定要删除这张照片吗？",
+    "confirmDeleteManyPhotos": "删除 {count} 张照片？",
     "deleteDbError": "从数据库删除失败",
     "deleteErrorPrefix": "删除时出错：",
     "selectedImageAlt": "所选图片",
@@ -3512,6 +3515,8 @@
     "soldGiftCards": "已售礼品卡",
     "totalValue": "总价值",
     "redeemed": "已使用",
+    "confirmCashReceived": "已收到现金付款？这将激活礼品卡。",
+    "activateFailed": "激活失败",
     "remaining": "剩余",
     "noGiftCards": "还没有售出礼品卡",
     "noGiftCardsDesc": "当客户购买礼品卡时，它们会显示在这里",
@@ -4307,7 +4312,8 @@
     "productRequired": "请为此促销选择产品",
     "create": "创建",
     "free": "免费",
-    "loading": "加载中..."
+    "loading": "加载中...",
+    "confirmDeletePromo": "确定要删除此促销吗？"
   },
   "kostenInstellingenPage": {
     "title": "利润率设置",

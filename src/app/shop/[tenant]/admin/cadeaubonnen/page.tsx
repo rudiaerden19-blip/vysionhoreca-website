@@ -6,9 +6,11 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { getGiftCards, GiftCard, getTenantSettings, saveTenantSettings, TenantSettings } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
+import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 
 export default function CadeaubonnenPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
+  const { ask, ConfirmModal } = useAdminConfirm(t)
   const [giftCards, setGiftCards] = useState<GiftCard[]>([])
   const [settings, setSettings] = useState<TenantSettings | null>(null)
   const [loading, setLoading] = useState(true)
@@ -106,6 +108,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
 
   return (
     <div className="max-w-4xl mx-auto pb-24">
+      <ConfirmModal />
       {/* Floating Save Button */}
       {activeTab === 'instellingen' && (
         <motion.button
@@ -337,8 +340,8 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
                     {card.status === 'pending_cash' && (
                       <button
                         onClick={async () => {
-                          if (!confirm('Cash betaling ontvangen? Dit activeert de cadeaubon.')) return
-                          
+                          if (!(await ask(t('websiteGiftCards.confirmCashReceived')))) return
+
                           const { error } = await supabase
                             .from('gift_cards')
                             .update({ status: 'paid' })
@@ -347,7 +350,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
                           if (!error) {
                             loadData()
                           } else {
-                            alert('Activeren mislukt')
+                            alert(t('websiteGiftCards.activateFailed'))
                           }
                         }}
                         className="px-3 py-1 bg-green-500 hover:bg-green-600 text-white text-sm font-medium rounded-lg transition-colors"

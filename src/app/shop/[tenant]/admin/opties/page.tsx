@@ -27,6 +27,7 @@ import {
   ProductOptionChoice 
 } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
+import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 
 // Sortable Choice Component
 function SortableChoice({ 
@@ -119,6 +120,7 @@ function SortableChoice({
 
 export default function OptiesPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
+  const { ask, ConfirmModal } = useAdminConfirm(t)
   const [options, setOptions] = useState<ProductOption[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -275,13 +277,12 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
   }
 
   const handleDelete = async (id: string) => {
-    if (confirm(t('adminPages.opties.confirmDelete'))) {
-      const success = await deleteProductOption(id)
-      if (success) {
-        setOptions(prev => prev.filter(o => o.id !== id))
-      } else {
-        setError(t('adminPages.opties.deleteFailed'))
-      }
+    if (!(await ask(t('adminPages.opties.confirmDelete')))) return
+    const success = await deleteProductOption(id)
+    if (success) {
+      setOptions(prev => prev.filter(o => o.id !== id))
+    } else {
+      setError(t('adminPages.opties.deleteFailed'))
     }
   }
 
@@ -302,6 +303,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
 
   return (
     <div className="max-w-4xl mx-auto">
+      <ConfirmModal />
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>

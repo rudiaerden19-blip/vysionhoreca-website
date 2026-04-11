@@ -11,6 +11,7 @@ import {
   orderPaymentMethodBucket,
   type Order,
 } from '@/lib/admin-api'
+import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 
 type KasboekManualLine = {
   id: string
@@ -79,6 +80,7 @@ function ymd(d: Date): string {
 
 export default function KasboekPage({ params }: { params: { tenant: string } }) {
   const { t, locale } = useLanguage()
+  const { ask, ConfirmModal } = useAdminConfirm(t)
   const tenantSlug = params.tenant
   const [tab, setTab] = useState<'manual' | 'reference'>('manual')
 
@@ -284,7 +286,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
   }
 
   const deleteLine = async (id: string) => {
-    if (!confirm(t('kasboekPage.confirmDelete'))) return
+    if (!(await ask(t('kasboekPage.confirmDelete')))) return
     const { error } = await supabase
       .from('tenant_kasboek_manual_lines')
       .delete()
@@ -321,6 +323,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
 
   return (
     <div className="mx-auto max-w-5xl">
+      <ConfirmModal />
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">{t('kasboekPage.title')}</h1>
         <p className="text-gray-600">{t('kasboekPage.subtitleManual')}</p>

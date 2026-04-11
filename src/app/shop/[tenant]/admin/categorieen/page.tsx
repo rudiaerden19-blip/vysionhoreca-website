@@ -5,9 +5,11 @@ import { motion, Reorder } from 'framer-motion'
 import { getMenuCategories, saveMenuCategory, deleteMenuCategory, MenuCategory } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
+import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 
 export default function CategorieenPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
+  const { ask, ConfirmModal } = useAdminConfirm(t)
   const [categories, setCategories] = useState<MenuCategory[]>([])
   const [editingId, setEditingId] = useState<string | null>(null)
   const [newCategory, setNewCategory] = useState('')
@@ -35,13 +37,12 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
   }
 
   const handleDelete = async (id: string) => {
-    if (confirm(t('adminPages.categorieen.confirmDelete'))) {
-      const success = await deleteMenuCategory(id, params.tenant)
-      if (success) {
-        setCategories(prev => prev.filter(c => c.id !== id))
-      } else {
-        setError(t('adminPages.categorieen.deleteFailed'))
-      }
+    if (!(await ask(t('adminPages.categorieen.confirmDelete')))) return
+    const success = await deleteMenuCategory(id, params.tenant)
+    if (success) {
+      setCategories(prev => prev.filter(c => c.id !== id))
+    } else {
+      setError(t('adminPages.categorieen.deleteFailed'))
     }
   }
 
@@ -111,6 +112,7 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
   return (
     <PinGate tenant={params.tenant}>
     <div className="max-w-3xl mx-auto">
+      <ConfirmModal />
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t('adminPages.categorieen.title')}</h1>

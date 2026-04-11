@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
+import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 
 interface MediaItem {
   id: string
@@ -24,6 +25,7 @@ interface MediaPickerProps {
 
 export default function MediaPicker({ tenantSlug, value, onChange, label }: MediaPickerProps) {
   const { t } = useLanguage()
+  const { ask, ConfirmModal } = useAdminConfirm(t)
   const [isOpen, setIsOpen] = useState(false)
   const [media, setMedia] = useState<MediaItem[]>([])
   const [categories, setCategories] = useState<string[]>([])
@@ -220,11 +222,11 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
   // Verwijder foto uit media bibliotheek (werkt voor alle tenants)
   const deleteMedia = async (e: React.MouseEvent, item: MediaItem) => {
     e.stopPropagation() // Voorkom selectie van de foto
-    
-    if (!confirm(t('mediaPicker.confirmDeletePhoto'))) {
+
+    if (!(await ask(t('mediaPicker.confirmDeletePhoto')))) {
       return
     }
-    
+
     setDeletingId(item.id)
     
     try {
@@ -282,6 +284,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
 
   return (
     <div>
+      <ConfirmModal />
       {label && (
         <label className="block text-sm font-medium text-gray-700 mb-2">
           {label}

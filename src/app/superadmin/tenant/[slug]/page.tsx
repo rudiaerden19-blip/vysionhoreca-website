@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
@@ -19,6 +19,7 @@ import {
   withoutPostTrialModulesConfirmed,
 } from '@/lib/supabase-post-trial-column'
 import { mirrorSuperadminSessionFromCookieToLocalStorage } from '@/lib/superadmin-cookies'
+import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 
 interface TenantDetails {
   id: string
@@ -66,6 +67,12 @@ export default function TenantDetailPage() {
   const router = useRouter()
   const params = useParams()
   const slug = params.slug as string
+  const superadminConfirmT = useCallback((key: string) => {
+    if (key === 'adminPages.common.confirm') return 'Bevestigen'
+    if (key === 'adminPages.common.cancel') return 'Annuleren'
+    return key
+  }, [])
+  const { ask, ConfirmModal } = useAdminConfirm(superadminConfirmT)
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -268,7 +275,7 @@ export default function TenantDetailPage() {
 
   async function handleCancelSubscription() {
     if (!subscription?.id) return
-    if (!confirm('Weet je zeker dat je dit abonnement wilt opzeggen?')) return
+    if (!(await ask('Weet je zeker dat je dit abonnement wilt opzeggen?'))) return
 
     await supabase
       .from('subscriptions')
@@ -314,6 +321,7 @@ export default function TenantDetailPage() {
 
   return (
     <div className="min-h-screen bg-slate-900">
+      <ConfirmModal />
       {/* Header */}
       <header className="bg-slate-800 border-b border-slate-700 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">

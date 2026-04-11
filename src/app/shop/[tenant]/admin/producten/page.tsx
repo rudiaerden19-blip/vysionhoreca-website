@@ -34,6 +34,7 @@ import {
 import MediaPicker from '@/components/MediaPicker'
 import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
+import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 
 const ALLERGEN_IDS = [
   { id: 'gluten', icon: '🌾' },
@@ -207,6 +208,7 @@ function SortableProductCard({
 
 export default function ProductenPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
+  const { ask, ConfirmModal } = useAdminConfirm(t)
   const [products, setProducts] = useState<MenuProduct[]>([])
   const [categories, setCategories] = useState<MenuCategory[]>([])
   const [availableOptions, setAvailableOptions] = useState<ProductOption[]>([])
@@ -288,13 +290,12 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
   }
 
   const handleDelete = async (id: string) => {
-    if (confirm(t('adminPages.producten.confirmDelete'))) {
-      const success = await deleteMenuProduct(id)
-      if (success) {
-        setProducts(prev => prev.filter(p => p.id !== id))
-      } else {
-        setError(t('adminPages.producten.deleteFailed'))
-      }
+    if (!(await ask(t('adminPages.producten.confirmDelete')))) return
+    const success = await deleteMenuProduct(id)
+    if (success) {
+      setProducts(prev => prev.filter(p => p.id !== id))
+    } else {
+      setError(t('adminPages.producten.deleteFailed'))
     }
   }
 
@@ -472,6 +473,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
   return (
       <PinGate tenant={params.tenant}>
       <div className="max-w-6xl mx-auto">
+      <ConfirmModal />
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>

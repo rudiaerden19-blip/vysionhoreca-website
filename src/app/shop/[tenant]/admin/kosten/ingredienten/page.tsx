@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
+import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 import { searchSupplierProducts, getSupplierProductCategories, SupplierProduct } from '@/lib/admin-api'
 
 interface Ingredient {
@@ -37,6 +38,7 @@ const unitOptions = [
 
 export default function IngredientsPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
+  const { ask, ConfirmModal } = useAdminConfirm(t)
   const [ingredients, setIngredients] = useState<Ingredient[]>([])
   const [categories, setCategories] = useState<CostCategory[]>([])
   const [loading, setLoading] = useState(true)
@@ -491,8 +493,8 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
   }
 
   async function deleteIngredient(id: string) {
-    if (!confirm('Weet je zeker dat je dit ingrediënt wilt verwijderen?')) return
-    
+    if (!(await ask(t('dashboard.ingredients.confirmDelete')))) return
+
     await supabase.from('ingredients').delete().eq('id', id).eq('tenant_slug', params.tenant)
     setIngredients(prev => prev.filter(i => i.id !== id))
   }
@@ -660,20 +662,11 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
 
   async function deleteAllIngredients() {
     if (!businessId) return
-    
-    const confirmed = window.confirm(
-      `⚠️ WAARSCHUWING!\n\nJe staat op het punt om ALLE ${ingredients.length} ingrediënten te verwijderen.\n\nDit kan niet ongedaan worden gemaakt!\n\nWeet je het zeker?`
-    )
-    
-    if (!confirmed) return
-    
-    // Double confirm
-    const doubleConfirm = window.confirm(
-      `🚨 LAATSTE WAARSCHUWING!\n\nAlle ingrediënten worden PERMANENT verwijderd.\n\nTyp OK om door te gaan.`
-    )
-    
-    if (!doubleConfirm) return
-    
+
+    const firstMsg = t('dashboard.ingredients.confirmDeleteAllFirst').replace('{count}', String(ingredients.length))
+    if (!(await ask(firstMsg))) return
+    if (!(await ask(t('dashboard.ingredients.confirmDeleteAllLast')))) return
+
     try {
       const { error } = await supabase
         .from('ingredients')
@@ -693,6 +686,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
+        <ConfirmModal />
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
       </div>
     )
@@ -700,6 +694,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
 
   return (
     <div className="space-y-6">
+      <ConfirmModal />
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>

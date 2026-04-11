@@ -6,9 +6,11 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { getPromotions, savePromotion, togglePromotionActive, deletePromotion, Promotion, getTenantSettings, saveTenantSettings, getMenuProducts, MenuProduct } from '@/lib/admin-api'
 import MediaPicker from '@/components/MediaPicker'
 import Image from 'next/image'
+import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 
 export default function PromotiesPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
+  const { ask, ConfirmModal } = useAdminConfirm(t)
   const [promos, setPromos] = useState<Promotion[]>([])
   const [products, setProducts] = useState<MenuProduct[]>([])
   const [loading, setLoading] = useState(true)
@@ -68,8 +70,8 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Weet je zeker dat je deze promotie wilt verwijderen?')) return
-    
+    if (!(await ask(t('promotiesPage.confirmDeletePromo')))) return
+
     const success = await deletePromotion(id)
     if (success) {
       setPromos(prev => prev.filter(p => p.id !== id))
@@ -172,6 +174,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
 
   return (
     <div className="max-w-4xl mx-auto px-2 sm:px-0">
+      <ConfirmModal />
       {/* Header - responsive */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <div>

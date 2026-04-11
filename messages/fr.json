@@ -845,6 +845,8 @@
       "add": "Ajouter",
       "cancel": "Annuler",
       "confirmDelete": "Supprimer cet ingrédient ?",
+      "confirmDeleteAllFirst": "ATTENTION : vous allez supprimer TOUS les {count} ingrédients. Cette action est irréversible. Continuer ?",
+      "confirmDeleteAllLast": "Dernier avertissement : tous les ingrédients seront définitivement supprimés. Continuer ?",
       "noIngredientsFound": "Aucun ingrédient trouvé",
       "noIngredientsYet": "Aucun ingrédient ajouté",
       "totalIngredients": "ingrédients au total",
@@ -1618,6 +1620,7 @@
     "dbNotConnected": "Base de données non connectée",
     "unknownError": "Erreur inconnue",
     "confirmDeletePhoto": "Supprimer cette photo ?",
+    "confirmDeleteManyPhotos": "Supprimer {count} photo(s) ?",
     "deleteDbError": "Erreur lors de la suppression en base",
     "deleteErrorPrefix": "Erreur lors de la suppression :",
     "selectedImageAlt": "Image sélectionnée",
@@ -3012,6 +3015,8 @@
     "soldGiftCards": "Cartes Cadeaux Vendues",
     "totalValue": "Valeur Totale",
     "redeemed": "Utilisées",
+    "confirmCashReceived": "Paiement en espèces reçu ? Cela activera la carte cadeau.",
+    "activateFailed": "Activation échouée",
     "remaining": "Restantes",
     "noGiftCards": "Aucune carte cadeau vendue",
     "noGiftCardsDesc": "Lorsque les clients achètent des cartes cadeaux, elles apparaîtront ici",
@@ -4330,7 +4335,8 @@
     "productRequired": "Choisissez un produit pour cette promotion",
     "create": "Créer",
     "free": "GRATUIT",
-    "loading": "Chargement..."
+    "loading": "Chargement...",
+    "confirmDeletePromo": "Supprimer cette promotion ?"
   },
   "kostenInstellingenPage": {
     "title": "Paramètres de Marge",

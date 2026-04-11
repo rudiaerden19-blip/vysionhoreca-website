@@ -845,6 +845,8 @@
       "add": "Hinzufügen",
       "cancel": "Abbrechen",
       "confirmDelete": "Diese Zutat wirklich löschen?",
+      "confirmDeleteAllFirst": "WARNUNG: Sie sind dabei, ALLE {count} Zutaten zu löschen. Dies kann nicht rückgängig gemacht werden. Fortfahren?",
+      "confirmDeleteAllLast": "Letzte Warnung: Alle Zutaten werden dauerhaft gelöscht. Fortfahren?",
       "noIngredientsFound": "Keine Zutaten gefunden",
       "noIngredientsYet": "Noch keine Zutaten hinzugefügt",
       "totalIngredients": "Zutaten gesamt",
@@ -1618,6 +1620,7 @@
     "dbNotConnected": "Datenbank nicht verbunden",
     "unknownError": "Unbekannter Fehler",
     "confirmDeletePhoto": "Dieses Foto wirklich löschen?",
+    "confirmDeleteManyPhotos": "{count} Foto(s) löschen?",
     "deleteDbError": "Fehler beim Löschen in der Datenbank",
     "deleteErrorPrefix": "Fehler beim Löschen:",
     "selectedImageAlt": "Ausgewähltes Bild",
@@ -3012,6 +3015,8 @@
     "soldGiftCards": "Verkaufte Geschenkkarten",
     "totalValue": "Gesamtwert",
     "redeemed": "Eingelöst",
+    "confirmCashReceived": "Barzahlung erhalten? Dadurch wird die Geschenkkarte aktiviert.",
+    "activateFailed": "Aktivierung fehlgeschlagen",
     "remaining": "Verbleibend",
     "noGiftCards": "Noch keine Geschenkkarten verkauft",
     "noGiftCardsDesc": "Wenn Kunden Geschenkkarten kaufen, erscheinen sie hier",
@@ -4330,7 +4335,8 @@
     "productRequired": "Wählen Sie ein Produkt für diese Aktion",
     "create": "Erstellen",
     "free": "GRATIS",
-    "loading": "Wird geladen..."
+    "loading": "Wird geladen...",
+    "confirmDeletePromo": "Diese Promotion wirklich löschen?"
   },
   "kostenInstellingenPage": {
     "title": "Margen-Einstellungen",

@@ -845,6 +845,8 @@
       "add": "追加",
       "cancel": "キャンセル",
       "confirmDelete": "この材料を削除しますか？",
+      "confirmDeleteAllFirst": "警告: 材料をすべて（{count}件）削除しようとしています。元に戻せません。続行しますか？",
+      "confirmDeleteAllLast": "最終確認: すべての材料が完全に削除されます。続行しますか？",
       "noIngredientsFound": "材料が見つかりません",
       "noIngredientsYet": "まだ材料がありません",
       "totalIngredients": "件の材料",
@@ -2118,6 +2120,7 @@
     "dbNotConnected": "データベースに接続されていません",
     "unknownError": "不明なエラー",
     "confirmDeletePhoto": "この写真を削除しますか？",
+    "confirmDeleteManyPhotos": "写真を{count}枚削除しますか？",
     "deleteDbError": "データベースからの削除に失敗しました",
     "deleteErrorPrefix": "削除エラー:",
     "selectedImageAlt": "選択した画像",
@@ -3512,6 +3515,8 @@
     "soldGiftCards": "販売済みギフトカード",
     "totalValue": "合計金額",
     "redeemed": "使用済み",
+    "confirmCashReceived": "現金の支払いを受け取りましたか？ギフトカードが有効になります。",
+    "activateFailed": "有効化に失敗しました",
     "remaining": "残額",
     "noGiftCards": "まだギフトカードは販売されていません",
     "noGiftCardsDesc": "お客様がギフトカードを購入すると、ここに表示されます",
@@ -4307,7 +4312,8 @@
     "productRequired": "このプロモーションの製品を選択してください",
     "create": "作成",
     "free": "無料",
-    "loading": "読み込み中..."
+    "loading": "読み込み中...",
+    "confirmDeletePromo": "このプロモーションを削除しますか？"
   },
   "kostenInstellingenPage": {
     "title": "利益率設定",

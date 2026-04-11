@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { getTenantSettings, saveTenantSettings, TenantSettings } from '@/lib/admin-api'
+import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 
 // =====================================================
 // AUTOMATISCHE IMAGE RESIZE FUNCTIE
@@ -90,6 +91,7 @@ interface MediaItem {
 
 export default function MediaPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
+  const { ask, ConfirmModal } = useAdminConfirm(t)
   const [media, setMedia] = useState<MediaItem[]>([])
   const [categories, setCategories] = useState<string[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string>('alle')
@@ -247,7 +249,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
     e.preventDefault()
     e.stopPropagation()
 
-    if (!confirm('Weet je zeker dat je deze foto wilt verwijderen?')) return
+    if (!(await ask(t('mediaPicker.confirmDeletePhoto')))) return
 
     try {
       // Verwijder uit storage
@@ -278,7 +280,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
   }
 
   const deleteSelected = async () => {
-    if (!confirm(`${selectedItems.length} foto('s) verwijderen?`)) return
+    if (!(await ask(t('mediaPicker.confirmDeleteManyPhotos').replace('{count}', String(selectedItems.length))))) return
 
     for (const id of selectedItems) {
       const item = media.find(m => m.id === id)
@@ -321,6 +323,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
 
   return (
     <div className="max-w-6xl mx-auto">
+      <ConfirmModal />
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>

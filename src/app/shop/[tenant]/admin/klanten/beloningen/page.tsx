@@ -6,9 +6,11 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { getLoyaltyRewards, saveLoyaltyReward, deleteLoyaltyReward, LoyaltyReward } from '@/lib/admin-api'
+import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 
 export default function BeloningenPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
+  const { ask, ConfirmModal } = useAdminConfirm(t)
   const [rewards, setRewards] = useState<LoyaltyReward[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -84,7 +86,7 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm(t('rewardsPage.confirmDelete'))) return
+    if (!(await ask(t('rewardsPage.confirmDelete')))) return
     await deleteLoyaltyReward(id)
     setRewards(rewards.filter(r => r.id !== id))
   }
@@ -117,6 +119,7 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
 
   return (
     <div className="max-w-4xl mx-auto">
+      <ConfirmModal />
       <div className="flex items-center justify-between mb-8">
         <div>
           <div className="flex items-center gap-3 mb-2">

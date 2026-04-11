@@ -1087,6 +1087,8 @@
       "add": "Toevoegen",
       "cancel": "Annuleren",
       "confirmDelete": "Weet je zeker dat je dit ingrediënt wilt verwijderen?",
+      "confirmDeleteAllFirst": "WAARSCHUWING: je staat op het punt om ALLE {count} ingrediënten te verwijderen. Dit kan niet ongedaan worden gemaakt. Doorgaan?",
+      "confirmDeleteAllLast": "Laatste waarschuwing: alle ingrediënten worden definitief gewist. Doorgaan?",
       "noIngredientsFound": "Geen ingrediënten gevonden",
       "noIngredientsYet": "Nog geen ingrediënten toegevoegd",
       "totalIngredients": "ingrediënten in totaal",
@@ -2360,6 +2362,7 @@
     "dbNotConnected": "Database niet verbonden",
     "unknownError": "Onbekende fout",
     "confirmDeletePhoto": "Weet je zeker dat je deze foto wilt verwijderen?",
+    "confirmDeleteManyPhotos": "{count} foto('s) verwijderen?",
     "deleteDbError": "Fout bij verwijderen uit database",
     "deleteErrorPrefix": "Fout bij verwijderen:",
     "selectedImageAlt": "Geselecteerde afbeelding"
@@ -3891,6 +3894,8 @@
     "soldGiftCards": "Verkochte Cadeaubonnen",
     "totalValue": "Totale Waarde",
     "redeemed": "Ingewisseld",
+    "confirmCashReceived": "Cashbetaling ontvangen? Hiermee activeer je de cadeaubon.",
+    "activateFailed": "Activeren mislukt",
     "remaining": "Resterend",
     "noGiftCards": "Nog geen cadeaubonnen verkocht",
     "noGiftCardsDesc": "Zodra klanten cadeaubonnen kopen, verschijnen ze hier",
@@ -4529,7 +4534,8 @@
     "productRequired": "Kies een product voor deze promotie",
     "create": "Aanmaken",
     "free": "GRATIS",
-    "loading": "Laden..."
+    "loading": "Laden...",
+    "confirmDeletePromo": "Weet je zeker dat je deze promotie wilt verwijderen?"
   },
   "kostenInstellingenPage": {
     "title": "Marge Instellingen",

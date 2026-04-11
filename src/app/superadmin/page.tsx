@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -19,6 +19,7 @@ import {
   withoutPostTrialModulesConfirmed,
 } from '@/lib/supabase-post-trial-column'
 import { clearSuperadminSessionCookies, mirrorSuperadminSessionFromCookieToLocalStorage } from '@/lib/superadmin-cookies'
+import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 
 interface Tenant {
   id: string
@@ -51,6 +52,12 @@ interface PlatformStats {
 
 export default function SuperAdminDashboard() {
   const router = useRouter()
+  const superadminConfirmT = useCallback((key: string) => {
+    if (key === 'adminPages.common.confirm') return 'Bevestigen'
+    if (key === 'adminPages.common.cancel') return 'Annuleren'
+    return key
+  }, [])
+  const { ask, ConfirmModal } = useAdminConfirm(superadminConfirmT)
   const [loading, setLoading] = useState(true)
   const [adminName, setAdminName] = useState('')
   const [tenants, setTenants] = useState<Tenant[]>([])
@@ -270,7 +277,7 @@ export default function SuperAdminDashboard() {
       ? `Weet je zeker dat je ${tenant.business_name} wilt deblokkeren?`
       : `Weet je zeker dat je ${tenant.business_name} wilt blokkeren? De shop wordt ontoegankelijk.`
     
-    if (!confirm(confirmMsg)) return
+    if (!(await ask(confirmMsg))) return
 
     await supabase
       .from('tenant_settings')
@@ -340,7 +347,7 @@ export default function SuperAdminDashboard() {
       return
     }
 
-    if (!confirm(`Betalingsherinnering sturen naar ${tenant.email}?`)) return
+    if (!(await ask(`Betalingsherinnering sturen naar ${tenant.email}?`))) return
 
     try {
       const response = await fetch('/api/send-payment-reminder', {
@@ -411,7 +418,7 @@ export default function SuperAdminDashboard() {
       return
     }
 
-    if (!confirm(`Weet je zeker dat je ${expiredTrials.length} verlopen trial(s) wilt verwijderen? Dit kan niet ongedaan worden!`)) {
+    if (!(await ask(`Weet je zeker dat je ${expiredTrials.length} verlopen trial(s) wilt verwijderen? Dit kan niet ongedaan worden!`))) {
       return
     }
 
@@ -506,6 +513,7 @@ export default function SuperAdminDashboard() {
 
   return (
     <div className="min-h-screen bg-slate-900">
+      <ConfirmModal />
       {/* Header */}
       <header className="bg-slate-800 border-b border-slate-700 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">

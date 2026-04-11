@@ -845,6 +845,8 @@
       "add": "إضافة",
       "cancel": "إلغاء",
       "confirmDelete": "هل تريد حذف هذا المكون؟",
+      "confirmDeleteAllFirst": "تحذير: أنت على وشك حذف جميع المكونات ({count}). لا يمكن التراجع عن هذا الإجراء. هل تريد المتابعة؟",
+      "confirmDeleteAllLast": "تأكيد أخير: سيتم حذف جميع المكونات نهائياً. هل تريد المتابعة؟",
       "noIngredientsFound": "لا توجد مكونات",
       "noIngredientsYet": "لم تُضف مكونات بعد",
       "totalIngredients": "مكونات في المجموع",
@@ -2118,6 +2120,7 @@
     "dbNotConnected": "قاعدة البيانات غير متصلة",
     "unknownError": "خطأ غير معروف",
     "confirmDeletePhoto": "هل تريد حذف هذه الصورة؟",
+    "confirmDeleteManyPhotos": "حذف {count} صورة/صور؟",
     "deleteDbError": "خطأ أثناء الحذف من قاعدة البيانات",
     "deleteErrorPrefix": "خطأ أثناء الحذف:",
     "selectedImageAlt": "الصورة المحددة",
@@ -3512,6 +3515,8 @@
     "soldGiftCards": "بطاقات الهدايا المباعة",
     "totalValue": "القيمة الإجمالية",
     "redeemed": "المستخدمة",
+    "confirmCashReceived": "تم استلام الدفع نقداً؟ سيتم تفعيل بطاقة الهدية.",
+    "activateFailed": "فشل التفعيل",
     "remaining": "المتبقية",
     "noGiftCards": "لم تُباع بطاقات هدايا بعد",
     "noGiftCardsDesc": "عندما يشتري العملاء بطاقات هدايا، ستظهر هنا",
@@ -4307,7 +4312,8 @@
     "productRequired": "اختر منتجاً لهذه الترقية",
     "create": "إنشاء",
     "free": "مجاني",
-    "loading": "جاري التحميل..."
+    "loading": "جاري التحميل...",
+    "confirmDeletePromo": "هل تريد حذف هذا العرض الترويجي؟"
   },
   "kostenInstellingenPage": {
     "title": "إعدادات هامش الربح",

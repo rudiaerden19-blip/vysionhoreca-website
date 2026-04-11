@@ -4,6 +4,7 @@ import { useLanguage } from '@/i18n'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams } from 'next/navigation'
+import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 import { 
   getActiveStaff,
   getTimesheetEntries,
@@ -65,6 +66,7 @@ const formatHours = (hours: number | undefined | null): string => {
 
 export default function UrenPage() {
   const { t } = useLanguage()
+  const { ask, ConfirmModal } = useAdminConfirm(t)
   const params = useParams()
   const rawTenant = params?.tenant
   const tenant = (Array.isArray(rawTenant) ? rawTenant[0] : rawTenant) ?? ''
@@ -277,14 +279,15 @@ export default function UrenPage() {
     }
   }
 
-  async function handleDeleteEntry(entry: TimesheetEntry) {
-    if (!entry.id) return
-    if (!confirm(t('urenPage.confirmDeleteHours'))) return
-    
+  async function handleDeleteEntry(entry: TimesheetEntry): Promise<boolean> {
+    if (!entry.id) return false
+    if (!(await ask(t('urenPage.confirmDeleteHours')))) return false
+
     const success = await deleteTimesheetEntry(entry.id)
     if (success) {
       loadData()
     }
+    return !!success
   }
 
   function openBulkConfirmApprove() {
@@ -633,6 +636,7 @@ Met vriendelijke groeten`,
 
   return (
     <div className="relative space-y-6 print:space-y-4">
+      <ConfirmModal />
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4 print:hidden">
         <div>
@@ -1317,10 +1321,13 @@ Met vriendelijke groeten`,
             <div className="p-6 border-t flex gap-3 justify-between">
               {editingEntry ? (
                 <button
-                  onClick={() => {
-                    handleDeleteEntry(editingEntry)
-                    setShowEntryModal(false)
-                    setEditingEntry(null)
+                  type="button"
+                  onClick={async () => {
+                    const ok = await handleDeleteEntry(editingEntry)
+                    if (ok) {
+                      setShowEntryModal(false)
+                      setEditingEntry(null)
+                    }
                   }}
                   className="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition"
                 >

@@ -2,6 +2,7 @@
 
 import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
+import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
@@ -41,6 +42,7 @@ const getContractTypes = (t: (key: string) => string): { id: ContractType; label
 
 export default function PersoneelPage() {
   const { t } = useLanguage()
+  const { ask, ConfirmModal } = useAdminConfirm(t)
   const params = useParams()
   const tenant = params.tenant as string
   
@@ -229,8 +231,8 @@ export default function PersoneelPage() {
 
   async function handleDelete(member: Staff) {
     if (!member.id) return
-    if (!confirm(`${t('personeelPage.alerts.confirmDelete')} ${member.name}?`)) return
-    
+    if (!(await ask(`${t('personeelPage.alerts.confirmDelete')} ${member.name}?`))) return
+
     const success = await deleteStaff(member.id)
     if (success) {
       loadStaff()
@@ -261,6 +263,7 @@ export default function PersoneelPage() {
   return (
       <PinGate tenant={tenant}>
       <div className="space-y-6">
+      <ConfirmModal />
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

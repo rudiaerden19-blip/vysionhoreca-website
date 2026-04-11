@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
+import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 import { searchSupplierProducts, SupplierProduct } from '@/lib/admin-api'
 
 interface Product {
@@ -48,6 +49,7 @@ interface ProductCostData {
 
 export default function ProductCostsPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
+  const { ask, ConfirmModal } = useAdminConfirm(t)
   const [products, setProducts] = useState<Product[]>([])
   const [ingredients, setIngredients] = useState<Ingredient[]>([])
   const [productIngredients, setProductIngredients] = useState<ProductIngredient[]>([])
@@ -607,6 +609,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
 
   return (
     <div className="space-y-6">
+      <ConfirmModal />
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">📊 {t('dashboard.productCosts.title')}</h1>
@@ -1174,7 +1177,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                         <button
                           onClick={async (e) => {
                             e.stopPropagation()
-                            if (!confirm(t('dashboard.productCosts.confirmReset'))) return
+                            if (!(await ask(t('dashboard.productCosts.confirmReset')))) return
                             for (const pi of pc.ingredients) {
                               await supabase.from('product_ingredients').delete().eq('id', pi.id)
                             }

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { getAuthHeaders } from '@/lib/auth-headers'
 import { useLanguage } from '@/i18n'
+import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 
 interface OrderGroup {
   id: string
@@ -28,6 +29,7 @@ interface OrderGroup {
 
 export default function GroupsPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
+  const { ask, ConfirmModal } = useAdminConfirm(t)
   const [groups, setGroups] = useState<OrderGroup[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -133,7 +135,7 @@ export default function GroupsPage({ params }: { params: { tenant: string } }) {
   }
 
   async function archiveGroup(id: string) {
-    if (!confirm(t('groupsModule.groups.archiveConfirm'))) return
+    if (!(await ask(t('groupsModule.groups.archiveConfirm')))) return
     await fetch(`/api/groups?id=${id}`, { method: 'DELETE', headers: getAuthHeaders() })
     loadGroups()
   }
@@ -149,6 +151,7 @@ export default function GroupsPage({ params }: { params: { tenant: string } }) {
   if (!featureEnabled) {
     return (
       <div className="max-w-4xl mx-auto">
+        <ConfirmModal />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -194,6 +197,7 @@ export default function GroupsPage({ params }: { params: { tenant: string } }) {
 
   return (
     <div className="max-w-6xl mx-auto">
+      <ConfirmModal />
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">👥 {t('groupsModule.groups.pageTitle')}</h1>

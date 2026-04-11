@@ -6,9 +6,11 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getTeamMembers, saveTeamMember, deleteTeamMember, TeamMember } from '@/lib/admin-api'
 import MediaPicker from '@/components/MediaPicker'
+import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 
 export default function TeamPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
+  const { ask, ConfirmModal } = useAdminConfirm(t)
   const [members, setMembers] = useState<TeamMember[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -50,8 +52,8 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm(t('websiteTeam.confirmDelete'))) return
-    
+    if (!(await ask(t('websiteTeam.confirmDelete')))) return
+
     const success = await deleteTeamMember(id)
     if (success) {
       setMembers(prev => prev.filter(m => m.id !== id))
@@ -103,6 +105,7 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
 
   return (
     <div className="max-w-4xl mx-auto">
+      <ConfirmModal />
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
