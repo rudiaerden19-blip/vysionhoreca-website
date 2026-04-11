@@ -1,5 +1,20 @@
 -- Handmatig digitaal kasboek per tenant (inkomsten / uitgaven per regel).
 -- Bewaar gegevens minstens 7 jaar (archief/backup); geen automatische purge in app.
+--
+-- Let op: sommige projecten hebben deze helper nog niet in public — dan faalt de trigger.
+-- Daarom definiëren we de functie hier idempotent (CREATE OR REPLACE).
+
+CREATE OR REPLACE FUNCTION public.update_updated_at_column()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY INVOKER
+SET search_path = public
+AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$;
 
 CREATE TABLE IF NOT EXISTS public.tenant_kasboek_manual_lines (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
