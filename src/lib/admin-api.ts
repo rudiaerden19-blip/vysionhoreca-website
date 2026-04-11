@@ -1774,6 +1774,19 @@ export function orderCountsTowardRevenueAndZReport(
   return (order.payment_status || '').toString().toLowerCase() === 'paid'
 }
 
+/**
+ * Contant ontvangen voor digitaal kasboek (kassa-POS). Alleen cash/contant telt als volledig contantbedrag.
+ * (Gesplitste betalingen: later uitbreidbaar met expliciete cash-kolom op orders.)
+ */
+export function posOrderCashAmountForKasboek(
+  order: Pick<Order, 'total' | 'payment_method'>
+): number {
+  const total = Number(order.total) || 0
+  const pm = (order.payment_method || '').toLowerCase()
+  if (pm === 'cash' || pm === 'contant') return total
+  return 0
+}
+
 /** PostgREST/Supabase cap (~1000 rows per request zonder range): analytics moet alle rijen binnen het venster ophalen. */
 const ORDERS_ANALYTICS_PAGE_SIZE = 1000
 const ORDERS_ANALYTICS_MAX_PAGES = 500

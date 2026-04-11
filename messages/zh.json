@@ -4960,6 +4960,21 @@
     "searchNoBookings": "未找到预订",
     "freeTable": "此时段和人数没有空桌。"
   },
+  "kasboekPage": {
+    "title": "电子现金账簿",
+    "subtitle": "来自实体收银机的现金营业额（按门店）。仅已付款小票；卡与线上支付不在此列表。",
+    "loading": "加载中…",
+    "empty": "该时间段内没有现金收银销售。",
+    "disclaimer": "此概览按门店（租户）并基于收银小票。手动抽屉支出与零钱补充将在后续版本提供；请按会计师建议保留实地清点记录。",
+    "colWhen": "日期时间",
+    "colReceipt": "小票",
+    "colDescription": "摘要",
+    "colCashIn": "实收现金",
+    "colBalance": "余额（累计）",
+    "period30": "30 天",
+    "period60": "60 天",
+    "period90": "90 天"
+  },
   "adminLayout": {
     "loading": "加载中...",
     "redirectLogin": "正在跳转到登录…",
@@ -4974,7 +4989,8 @@
     "lock": "锁定",
     "session": "会话",
     "login": "登录",
-    "logout": "退出登录"
+    "logout": "退出登录",
+    "digitalCashBookSubmenu": "电子现金账簿"
   },
   "voiceOrder": {
     "title": "语音点餐",

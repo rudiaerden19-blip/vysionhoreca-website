@@ -4960,6 +4960,21 @@
     "searchNoBookings": "予約が見つかりません",
     "freeTable": "この時間・人数に空いているテーブルはありません。"
   },
+  "kasboekPage": {
+    "title": "デジタル現金出納帳",
+    "subtitle": "店舗の実レジからの現金売上（テナントごと）。支払済みの伝票のみ。カードとオンラインはここに含まれません。",
+    "loading": "読み込み中…",
+    "empty": "この期間に現金のレジ売上はありません。",
+    "disclaimer": "この一覧は店舗（テナント）ごとで、レジの伝票に基づきます。手動の引出しや釣銭補充は今後のバージョンで追加予定です。会計士の指示に従い、実地カウントの記録を保管してください。",
+    "colWhen": "日時",
+    "colReceipt": "伝票",
+    "colDescription": "摘要",
+    "colCashIn": "現金入金",
+    "colBalance": "残高（累計）",
+    "period30": "30日",
+    "period60": "60日",
+    "period90": "90日"
+  },
   "adminLayout": {
     "loading": "読み込み中...",
     "redirectLogin": "ログインへリダイレクト中...",
@@ -4974,7 +4989,8 @@
     "lock": "ロック",
     "session": "セッション",
     "login": "ログイン",
-    "logout": "ログアウト"
+    "logout": "ログアウト",
+    "digitalCashBookSubmenu": "デジタル現金出納帳"
   },
   "voiceOrder": {
     "title": "音声注文",

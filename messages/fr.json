@@ -4983,6 +4983,21 @@
     "searchNoBookings": "Aucune réservation trouvée",
     "freeTable": "Aucune table libre pour cette heure et cette taille de groupe."
   },
+  "kasboekPage": {
+    "title": "Livre de caisse numérique",
+    "subtitle": "Encaissements en espèces depuis votre caisse physique (par établissement). Tickets payés uniquement ; carte et en ligne ne figurent pas ici.",
+    "loading": "Chargement…",
+    "empty": "Aucune vente en espèces à la caisse sur cette période.",
+    "disclaimer": "Cet aperçu est par établissement (tenant) et basé sur vos tickets de caisse. Les sorties de caisse manuelles et le réapprovisionnement en monnaie suivront dans une version ultérieure ; conservez vos justificatifs de comptage selon l’avis de votre expert-comptable.",
+    "colWhen": "Date et heure",
+    "colReceipt": "Ticket",
+    "colDescription": "Description",
+    "colCashIn": "Espèces encaissées",
+    "colBalance": "Solde (cumulé)",
+    "period30": "30 jours",
+    "period60": "60 jours",
+    "period90": "90 jours"
+  },
   "adminLayout": {
     "loading": "Chargement...",
     "redirectLogin": "Redirection vers la connexion...",
@@ -4997,7 +5012,8 @@
     "lock": "Verrouiller",
     "session": "Session",
     "login": "Connexion",
-    "logout": "Déconnexion"
+    "logout": "Déconnexion",
+    "digitalCashBookSubmenu": "Livre de caisse numérique"
   },
   "voiceOrder": {
     "title": "Commande vocale",

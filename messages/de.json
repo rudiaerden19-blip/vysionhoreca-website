@@ -4983,6 +4983,21 @@
     "searchNoBookings": "Keine Buchungen gefunden",
     "freeTable": "Kein freier Tisch für diese Zeit und Personenzahl."
   },
+  "kasboekPage": {
+    "title": "Digitales Kassenbuch",
+    "subtitle": "Barumsatz aus Ihrer physischen Kasse (pro Betrieb). Nur bezahlte Bons; Karte und Online erscheinen hier nicht.",
+    "loading": "Laden…",
+    "empty": "Keine Barverkäufe an der Kasse in diesem Zeitraum.",
+    "disclaimer": "Diese Übersicht gilt pro Betrieb (Tenant) und basiert auf Ihren Kassenbons. Manuelle Auszahlungen und Wechselgeld-Nachfüllungen folgen in einer späteren Version; bewahren Sie physische Zählnachweise gemäß Steuerberatung auf.",
+    "colWhen": "Datum und Uhrzeit",
+    "colReceipt": "Bon",
+    "colDescription": "Beschreibung",
+    "colCashIn": "Bar erhalten",
+    "colBalance": "Saldo (laufend)",
+    "period30": "30 Tage",
+    "period60": "60 Tage",
+    "period90": "90 Tage"
+  },
   "adminLayout": {
     "loading": "Laden...",
     "redirectLogin": "Weiterleitung zur Anmeldung...",
@@ -4997,7 +5012,8 @@
     "lock": "Sperren",
     "session": "Sitzung",
     "login": "Anmelden",
-    "logout": "Abmelden"
+    "logout": "Abmelden",
+    "digitalCashBookSubmenu": "Digitales Kassenbuch"
   },
   "voiceOrder": {
     "title": "Sprachbestellung",

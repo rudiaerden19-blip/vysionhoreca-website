@@ -138,7 +138,7 @@ export function AdminHamburgerMenu({
                   className="flex items-center gap-3 border-b border-gray-100 px-4 py-3 text-sm text-gray-700 transition-colors hover:bg-blue-50"
                 >
                   <span>{item.icon}</span>
-                  <span>{item.label}</span>
+                  <span>{item.labelKey ? t(item.labelKey) : item.label}</span>
                 </Link>
               ))}
               {activeMod.rowKey === 'account' && (

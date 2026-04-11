@@ -417,7 +417,8 @@ export function adminPathToModule(pathname: string, tenantSlug: string): AdminMo
     rest.startsWith('/z-rapport') ||
     rest.startsWith('/analyse') ||
     rest.startsWith('/populair') ||
-    rest.startsWith('/verkoop')
+    rest.startsWith('/verkoop') ||
+    rest.startsWith('/kasboek')
   ) {
     return { kind: 'module', module: 'rapporten' }
   }

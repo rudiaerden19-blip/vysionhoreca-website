@@ -7,7 +7,10 @@ export const SUBMENU_IDS_ALWAYS_ON = new Set<string>(['sm_abonnement'])
 export type AdminHamburgerItem = {
   id: string
   icon: string
+  /** Fallback als `labelKey` ontbreekt of vertaling niet geladen is */
   label: string
+  /** Optioneel: vertaalde label via `useLanguage` in AdminHamburgerMenu */
+  labelKey?: string
   href: string
 }
 
@@ -153,6 +156,13 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
         { id: 'sm_rpt_analyse', icon: '📈', label: 'Bedrijfsanalyse', href: `${baseUrl}/analyse` },
         { id: 'sm_rpt_verkoop', icon: '💹', label: 'Verkoop', href: `${baseUrl}/verkoop` },
         { id: 'sm_rpt_populair', icon: '🔥', label: 'Populaire items', href: `${baseUrl}/populair` },
+        {
+          id: 'sm_rpt_kasboek',
+          icon: '📒',
+          label: 'Digitaal kasboek',
+          labelKey: 'adminLayout.digitalCashBookSubmenu',
+          href: `${baseUrl}/kasboek`,
+        },
       ],
     },
     {

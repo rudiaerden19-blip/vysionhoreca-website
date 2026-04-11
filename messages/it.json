@@ -4960,6 +4960,21 @@
     "searchNoBookings": "Nessuna prenotazione trovata",
     "freeTable": "Nessun tavolo libero per questo orario e gruppo."
   },
+  "kasboekPage": {
+    "title": "Libro cassa digitale",
+    "subtitle": "Incassi in contanti dal POS fisico (per attività). Solo scontrini pagati; carta e online non compaiono qui.",
+    "loading": "Caricamento…",
+    "empty": "Nessuna vendita in contanti al POS in questo periodo.",
+    "disclaimer": "Questa vista è per attività (tenant) e si basa sugli scontrini del POS. Uscite di cassa manuali e rifornimenti resto arriveranno in una versione successiva; conserva le prove di conteggio come consigliato dal commercialista.",
+    "colWhen": "Data e ora",
+    "colReceipt": "Scontrino",
+    "colDescription": "Descrizione",
+    "colCashIn": "Contanti incassati",
+    "colBalance": "Saldo (progressivo)",
+    "period30": "30 giorni",
+    "period60": "60 giorni",
+    "period90": "90 giorni"
+  },
   "adminLayout": {
     "loading": "Caricamento...",
     "redirectLogin": "Reindirizzamento al login...",
@@ -4974,7 +4989,8 @@
     "lock": "Blocca",
     "session": "Sessione",
     "login": "Accedi",
-    "logout": "Esci"
+    "logout": "Esci",
+    "digitalCashBookSubmenu": "Libro cassa digitale"
   },
   "voiceOrder": {
     "title": "Ordine vocale",

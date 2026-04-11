@@ -4917,6 +4917,21 @@
     "searchNoBookings": "Geen reserveringen gevonden",
     "freeTable": "Geen vrije tafel beschikbaar voor dit tijdstip en deze groepsgrootte."
   },
+  "kasboekPage": {
+    "title": "Digitaal kasboek",
+    "subtitle": "Contante kassa-omzet uit je fysieke kassa (per zaak). Alleen betaalde bonnen; kaart en online staan niet in dit overzicht.",
+    "loading": "Laden…",
+    "empty": "Geen contante kassa-verkopen in deze periode.",
+    "disclaimer": "Dit overzicht is per zaak (tenant) en gebaseerd op je kassabonnen. Handmatige uitgifte of wisselgeld uit de lade volgt in een latere versie; bewaar je fysieke telbewijzen volgens je accountantsadvies.",
+    "colWhen": "Datum en tijd",
+    "colReceipt": "Bon",
+    "colDescription": "Omschrijving",
+    "colCashIn": "Contant ontvangen",
+    "colBalance": "Saldo (lopend)",
+    "period30": "30 dagen",
+    "period60": "60 dagen",
+    "period90": "90 dagen"
+  },
   "adminLayout": {
     "loading": "Laden...",
     "redirectLogin": "Doorverwijzen naar inloggen...",
@@ -4931,7 +4946,8 @@
     "lock": "Vergrendel",
     "session": "Sessie",
     "login": "Inloggen",
-    "logout": "Uitloggen"
+    "logout": "Uitloggen",
+    "digitalCashBookSubmenu": "Digitaal kasboek"
   },
   "voiceOrder": {
     "title": "Spraakbestelling",

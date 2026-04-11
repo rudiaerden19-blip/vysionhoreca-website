@@ -4917,6 +4917,21 @@
     "searchNoBookings": "No bookings found",
     "freeTable": "No free table for this time and party size."
   },
+  "kasboekPage": {
+    "title": "Digital cash book",
+    "subtitle": "Cash register takings from your physical POS (per business). Paid tickets only; card and online payments are not listed here.",
+    "loading": "Loading…",
+    "empty": "No cash POS sales in this period.",
+    "disclaimer": "This overview is per business (tenant) and based on your POS receipts. Manual drawer payouts and float top-ups will follow in a later version; keep physical count records as advised by your accountant.",
+    "colWhen": "Date and time",
+    "colReceipt": "Receipt",
+    "colDescription": "Description",
+    "colCashIn": "Cash received",
+    "colBalance": "Running balance",
+    "period30": "30 days",
+    "period60": "60 days",
+    "period90": "90 days"
+  },
   "adminLayout": {
     "loading": "Loading...",
     "redirectLogin": "Redirecting to sign-in…",
@@ -4931,7 +4946,8 @@
     "lock": "Lock",
     "session": "Session",
     "login": "Log in",
-    "logout": "Log out"
+    "logout": "Log out",
+    "digitalCashBookSubmenu": "Digital cash book"
   },
   "voiceOrder": {
     "title": "Voice order",

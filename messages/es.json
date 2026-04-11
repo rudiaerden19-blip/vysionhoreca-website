@@ -4960,6 +4960,21 @@
     "searchNoBookings": "No se encontraron reservas",
     "freeTable": "No hay mesa libre para esta hora y tamaño del grupo."
   },
+  "kasboekPage": {
+    "title": "Libro de caja digital",
+    "subtitle": "Ingresos en efectivo desde tu TPV físico (por negocio). Solo tickets pagados; tarjeta y online no aparecen aquí.",
+    "loading": "Cargando…",
+    "empty": "No hay ventas en efectivo en el TPV en este periodo.",
+    "disclaimer": "Esta vista es por negocio (tenant) y se basa en los tickets del TPV. Los pagos manuales desde caja y el relleno de cambio llegarán en una versión posterior; guarda los recuentos físicos según indique tu asesor.",
+    "colWhen": "Fecha y hora",
+    "colReceipt": "Ticket",
+    "colDescription": "Descripción",
+    "colCashIn": "Efectivo cobrado",
+    "colBalance": "Saldo (acumulado)",
+    "period30": "30 días",
+    "period60": "60 días",
+    "period90": "90 días"
+  },
   "adminLayout": {
     "loading": "Cargando...",
     "redirectLogin": "Redirigiendo al inicio de sesión...",
@@ -4974,7 +4989,8 @@
     "lock": "Bloquear",
     "session": "Sesión",
     "login": "Iniciar sesión",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "digitalCashBookSubmenu": "Libro de caja digital"
   },
   "voiceOrder": {
     "title": "Pedido por voz",
