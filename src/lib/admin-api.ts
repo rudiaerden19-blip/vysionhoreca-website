@@ -208,6 +208,9 @@ export interface TenantSettings {
   allergens_config?: string[] | null
   /** Medewerkers mogen op de kassa met PIN in-/uitklokken (instelling: Personeel) */
   kassa_staff_clock_enabled?: boolean
+  /** Beginsaldo handmatig kasboek (optioneel) */
+  kasboek_opening_balance?: number
+  kasboek_opening_balance_date?: string | null
 }
 
 export async function getTenantSettings(tenantSlug: string, signal?: AbortSignal): Promise<TenantSettings | null> {
@@ -1774,17 +1777,16 @@ export function orderCountsTowardRevenueAndZReport(
   return (order.payment_status || '').toString().toLowerCase() === 'paid'
 }
 
-/**
- * Contant ontvangen voor digitaal kasboek (kassa-POS). Alleen cash/contant telt als volledig contantbedrag.
- * (Gesplitste betalingen: later uitbreidbaar met expliciete cash-kolom op orders.)
- */
-export function posOrderCashAmountForKasboek(
-  order: Pick<Order, 'total' | 'payment_method'>
-): number {
-  const total = Number(order.total) || 0
+/** Zelfde indeling als Z-rapport / omzet: contant, kaart, overig (online). */
+export type OrderPaymentBucket = 'cash' | 'card' | 'online'
+
+export function orderPaymentMethodBucket(
+  order: Pick<Order, 'payment_method'>
+): OrderPaymentBucket {
   const pm = (order.payment_method || '').toLowerCase()
-  if (pm === 'cash' || pm === 'contant') return total
-  return 0
+  if (pm === 'cash' || pm === 'contant') return 'cash'
+  if (pm === 'card' || pm === 'pin' || pm === 'kaart') return 'card'
+  return 'online'
 }
 
 /** PostgREST/Supabase cap (~1000 rows per request zonder range): analytics moet alle rijen binnen het venster ophalen. */

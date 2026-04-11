@@ -322,6 +322,7 @@ export default function SuperAdminDashboard() {
     await supabase.from('fixed_costs').delete().eq('tenant_slug', slug)
     await supabase.from('variable_costs').delete().eq('tenant_slug', slug)
     await supabase.from('business_targets').delete().eq('tenant_slug', slug)
+    await supabase.from('tenant_kasboek_manual_lines').delete().eq('tenant_slug', slug)
     await supabase.from('z_reports').delete().eq('tenant_slug', slug)
     await supabase.from('subscriptions').delete().eq('tenant_slug', slug)
     await supabase.from('tenant_settings').delete().eq('id', tenant.id)

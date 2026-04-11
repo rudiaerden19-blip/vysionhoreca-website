@@ -26,6 +26,7 @@ const TABLES_DELETE_IN_ORDER = [
   'reviews',
   'promotions',
   'daily_sales',
+  'tenant_kasboek_manual_lines',
   'timesheet_entries',
   'monthly_timesheets',
   'leave_requests',
