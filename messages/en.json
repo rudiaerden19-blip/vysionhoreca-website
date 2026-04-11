@@ -3354,6 +3354,7 @@
     "confirmDeleteHours": "Are you sure you want to delete these hours?",
     "confirmApproveAll": "Approve all hours for this month?",
     "confirmCloseMonth": "Close month? After closing, hours can no longer be changed.",
+    "pageNotReady": "The page is not ready yet. Refresh the page or wait a moment and try again.",
     "reopenReasonRequired": "Please enter a reason for reopening",
     "reopenFailed": "Reopen failed",
     "reopenWarning": "After reopening, hours can be modified again. This will be logged for administration.",

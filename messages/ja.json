@@ -2929,6 +2929,7 @@
     "confirmDeleteHours": "この勤務時間を削除してもよろしいですか？",
     "confirmApproveAll": "この月のすべての時間を承認しますか？",
     "confirmCloseMonth": "月を締めますか？締めた後は時間を変更できません。",
+    "pageNotReady": "ページの準備がまだできていません。更新するか、少し待ってからもう一度お試しください。",
     "reopenReasonRequired": "再開の理由を入力してください",
     "reopenFailed": "再開に失敗しました",
     "reopenWarning": "再開後、勤務時間を再度変更できます。これは管理用に記録されます。",

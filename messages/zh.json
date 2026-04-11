@@ -2929,6 +2929,7 @@
     "confirmDeleteHours": "确定要删除这些工时吗？",
     "confirmApproveAll": "批准本月所有工时？",
     "confirmCloseMonth": "关闭月份？关闭后无法再修改工时。",
+    "pageNotReady": "页面尚未就绪。请刷新页面或稍候再试。",
     "reopenReasonRequired": "请输入重新开放的原因",
     "reopenFailed": "重新开放失败",
     "reopenWarning": "重新打开后，可以再次修改工时。这将被记录以供管理使用。",

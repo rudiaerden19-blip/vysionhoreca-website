@@ -87,6 +87,8 @@ export default function UrenPage() {
   const [showEntryModal, setShowEntryModal] = useState(false)
   const [showEmailModal, setShowEmailModal] = useState(false)
   const [showReopenModal, setShowReopenModal] = useState(false)
+  /** iOS Safari: vermijd window.confirm — eigen dialoog voor goedkeuren / maand afsluiten. */
+  const [bulkConfirm, setBulkConfirm] = useState<null | 'approve' | 'close'>(null)
   const [reopenReason, setReopenReason] = useState('')
   const [selectedDate, setSelectedDate] = useState<string>('')
   const [entryForm, setEntryForm] = useState<Partial<TimesheetEntry>>({
@@ -285,10 +287,27 @@ export default function UrenPage() {
     }
   }
 
-  async function handleApproveAll() {
-    const staff = selectedStaffRef.current
+  function openBulkConfirmApprove() {
+    const staff = selectedStaffRef.current ?? selectedStaff
+    if (!staff?.id || !tenant) {
+      alert(t('urenPage.pageNotReady'))
+      return
+    }
+    setBulkConfirm('approve')
+  }
+
+  function openBulkConfirmClose() {
+    const staff = selectedStaffRef.current ?? selectedStaff
+    if (!staff?.id || !tenant) {
+      alert(t('urenPage.pageNotReady'))
+      return
+    }
+    setBulkConfirm('close')
+  }
+
+  async function executeBulkApprove() {
+    const staff = selectedStaffRef.current ?? selectedStaff
     if (!staff?.id || !tenant) return
-    if (!confirm(t('urenPage.confirmApproveAll'))) return
 
     setSaving(true)
     try {
@@ -312,10 +331,9 @@ export default function UrenPage() {
     }
   }
 
-  async function handleCloseMonth() {
-    const staff = selectedStaffRef.current
+  async function executeBulkClose() {
+    const staff = selectedStaffRef.current ?? selectedStaff
     if (!staff?.id || !tenant) return
-    if (!confirm(t('urenPage.confirmCloseMonth'))) return
 
     setSaving(true)
     try {
@@ -339,22 +357,25 @@ export default function UrenPage() {
     }
     
     setSaving(true)
-    const success = await reopenMonthlyTimesheet(
-      tenant, 
-      staff.id, 
-      selectedYear, 
-      selectedMonth, 
-      staff.id,
-      reopenReason.trim()
-    )
-    setSaving(false)
-    
-    if (success) {
-      setShowReopenModal(false)
-      setReopenReason('')
-      loadData()
-    } else {
-      alert(t('urenPage.reopenFailed'))
+    try {
+      const success = await reopenMonthlyTimesheet(
+        tenant,
+        staff.id,
+        selectedYear,
+        selectedMonth,
+        staff.id,
+        reopenReason.trim()
+      )
+
+      if (success) {
+        setShowReopenModal(false)
+        setReopenReason('')
+        loadData()
+      } else {
+        alert(t('urenPage.reopenFailed'))
+      }
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -611,7 +632,7 @@ Met vriendelijke groeten`,
   }
 
   return (
-    <div className="space-y-6 print:space-y-4">
+    <div className="relative space-y-6 print:space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4 print:hidden">
         <div>
@@ -646,8 +667,8 @@ Met vriendelijke groeten`,
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white rounded-xl p-4 shadow-sm border flex flex-wrap gap-4 items-center print:hidden">
+      {/* Filters — z-index i.v.m. stacking op tablets; knoppen touch-vriendelijk */}
+      <div className="relative z-[5] bg-white rounded-xl p-4 shadow-sm border flex flex-wrap gap-4 items-center print:hidden">
         <div>
           <label className="block text-xs text-gray-500 mb-1">{t('urenPage.employee')}</label>
           <select
@@ -691,9 +712,9 @@ Met vriendelijke groeten`,
 
         <button
           type="button"
-          onClick={handleApproveAll}
+          onClick={openBulkConfirmApprove}
           disabled={isMonthClosed || saving}
-          className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition disabled:opacity-50"
+          className="relative z-[6] min-h-[44px] shrink-0 touch-manipulation px-4 py-2 [-webkit-tap-highlight-color:transparent] bg-green-500 text-white rounded-lg hover:bg-green-600 transition disabled:opacity-50"
         >
           ✓ {t('urenPage.approveAll')}
         </button>
@@ -702,21 +723,62 @@ Met vriendelijke groeten`,
             type="button"
             onClick={() => setShowReopenModal(true)}
             disabled={saving}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+            className="relative z-[6] min-h-[44px] shrink-0 touch-manipulation px-4 py-2 [-webkit-tap-highlight-color:transparent] bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
           >
             🔓 {t('urenPage.reopenMonth')}
           </button>
         ) : (
           <button
             type="button"
-            onClick={handleCloseMonth}
+            onClick={openBulkConfirmClose}
             disabled={saving}
-            className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition disabled:opacity-50"
+            className="relative z-[6] min-h-[44px] shrink-0 touch-manipulation px-4 py-2 [-webkit-tap-highlight-color:transparent] bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition disabled:opacity-50"
           >
             🔒 {t('urenPage.closeMonth')}
           </button>
         )}
       </div>
+
+      {bulkConfirm && (
+        <div className="fixed inset-0 z-[60] flex touch-manipulation items-center justify-center bg-black/50 p-4 [-webkit-tap-highlight-color:transparent]">
+          <div className="w-full max-w-md rounded-xl bg-white shadow-xl">
+            <div className="border-b p-6">
+              <h2 className="text-xl font-bold text-gray-800">{t('adminPages.common.confirm')}</h2>
+              <p className="mt-2 text-sm text-gray-600">
+                {bulkConfirm === 'approve'
+                  ? t('urenPage.confirmApproveAll')
+                  : t('urenPage.confirmCloseMonth')}
+              </p>
+              <p className="mt-1 text-xs text-gray-500">
+                {selectedStaff?.name} — {MONTHS[selectedMonth - 1]} {selectedYear}
+              </p>
+            </div>
+            <div className="flex justify-end gap-3 border-t p-6">
+              <button
+                type="button"
+                disabled={saving}
+                onClick={() => setBulkConfirm(null)}
+                className="min-h-[44px] touch-manipulation rounded-lg bg-gray-100 px-4 py-2 text-gray-700 [-webkit-tap-highlight-color:transparent] transition hover:bg-gray-200 disabled:opacity-50"
+              >
+                {t('adminPages.common.cancel')}
+              </button>
+              <button
+                type="button"
+                disabled={saving}
+                onClick={async () => {
+                  const kind = bulkConfirm
+                  setBulkConfirm(null)
+                  if (kind === 'approve') await executeBulkApprove()
+                  else if (kind === 'close') await executeBulkClose()
+                }}
+                className="min-h-[44px] touch-manipulation rounded-lg bg-blue-600 px-6 py-2 text-white [-webkit-tap-highlight-color:transparent] transition hover:bg-blue-700 disabled:opacity-50"
+              >
+                {saving ? `${t('adminPages.common.saving')}...` : t('adminPages.common.confirm')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Print Header */}
       <div className="hidden print:block print-report">
@@ -1060,7 +1122,7 @@ Met vriendelijke groeten`,
 
       {/* Entry Modal */}
       {showEntryModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[60] flex touch-manipulation items-center justify-center bg-black/50 p-4 [-webkit-tap-highlight-color:transparent]">
           <div className="bg-white rounded-xl w-full max-w-md shadow-xl">
             <div className="p-6 border-b">
               <h2 className="text-xl font-bold text-gray-800">
@@ -1290,8 +1352,11 @@ Met vriendelijke groeten`,
         </div>
       )}
 
-      {/* Hidden PDF Content for Download */}
-      <div className="absolute left-[-9999px] top-0">
+      {/* Hidden PDF Content for Download — geen pointer-events (tablet/WebKit) */}
+      <div
+        className="pointer-events-none absolute left-[-9999px] top-0 select-none"
+        aria-hidden
+      >
         <div ref={pdfRef} className="bg-white p-6" style={{ fontFamily: 'Arial, sans-serif', width: '180mm', maxWidth: '180mm' }}>
           {/* PDF Header */}
           <div className="border-b-2 border-gray-800 pb-3 mb-4">
@@ -1514,7 +1579,7 @@ Met vriendelijke groeten`,
 
       {/* Reopen Month Modal */}
       {showReopenModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[60] flex touch-manipulation items-center justify-center bg-black/50 p-4 [-webkit-tap-highlight-color:transparent]">
           <div className="bg-white rounded-xl w-full max-w-md shadow-xl">
             <div className="p-6 border-b">
               <h2 className="text-xl font-bold text-gray-800">
@@ -1586,7 +1651,7 @@ Met vriendelijke groeten`,
 
       {/* Email Modal */}
       {showEmailModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[60] flex touch-manipulation items-center justify-center bg-black/50 p-4 [-webkit-tap-highlight-color:transparent]">
           <div className="bg-white rounded-xl w-full max-w-lg shadow-xl">
             <div className="p-6 border-b">
               <h2 className="text-xl font-bold text-gray-800">

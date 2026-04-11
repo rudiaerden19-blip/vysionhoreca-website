@@ -3354,6 +3354,7 @@
     "confirmDeleteHours": "Weet je zeker dat je deze uren wilt verwijderen?",
     "confirmApproveAll": "Alle uren voor deze maand goedkeuren?",
     "confirmCloseMonth": "Maand afsluiten? Na afsluiting kunnen uren niet meer worden gewijzigd.",
+    "pageNotReady": "De pagina is nog niet klaar. Vernieuw de pagina of wacht even en probeer opnieuw.",
     "reopenReasonRequired": "Vul een reden in voor het heropenen",
     "reopenFailed": "Heropenen mislukt",
     "reopenWarning": "Na heropenen kunnen uren weer worden gewijzigd. Dit wordt gelogd voor de administratie.",

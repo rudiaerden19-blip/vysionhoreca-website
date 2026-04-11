@@ -2429,6 +2429,7 @@
     "confirmDeleteHours": "Sind Sie sicher, dass Sie diese Stunden löschen möchten?",
     "confirmApproveAll": "Alle Stunden für diesen Monat genehmigen?",
     "confirmCloseMonth": "Monat abschließen? Nach dem Abschluss können Stunden nicht mehr geändert werden.",
+    "pageNotReady": "Die Seite ist noch nicht bereit. Aktualisieren Sie die Seite oder warten Sie kurz und versuchen Sie es erneut.",
     "reopenReasonRequired": "Bitte geben Sie einen Grund für das Wiederöffnen ein",
     "reopenFailed": "Wiederöffnen fehlgeschlagen",
     "reopenWarning": "Nach dem Wiederöffnen können die Stunden wieder geändert werden. Dies wird für die Verwaltung protokolliert.",

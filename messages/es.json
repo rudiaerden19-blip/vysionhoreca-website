@@ -2929,6 +2929,7 @@
     "confirmDeleteHours": "¿Estás seguro de que quieres eliminar estas horas?",
     "confirmApproveAll": "¿Aprobar todas las horas de este mes?",
     "confirmCloseMonth": "¿Cerrar mes? Después del cierre, las horas no se pueden modificar.",
+    "pageNotReady": "La página aún no está lista. Actualice la página o espere un momento e inténtelo de nuevo.",
     "reopenReasonRequired": "Por favor ingresa un motivo para reabrir",
     "reopenFailed": "Error al reabrir",
     "reopenWarning": "Después de reabrir, las horas pueden modificarse nuevamente. Esto quedará registrado para la administración.",
