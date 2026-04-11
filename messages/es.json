@@ -3020,6 +3020,7 @@
   "personeelPage": {
     "title": "Personal",
     "subtitle": "Gestiona tus empleados y sus datos",
+    "submenuInOutClocking": "Entrada / salida",
     "addEmployee": "Añadir empleado",
     "addFirstEmployee": "Añadir primer empleado",
     "noEmployees": "Sin empleados aún",
@@ -3093,8 +3094,6 @@
     }
   },
   "inklokkenPage": {
-    "menuRowTitle": "Fichaje",
-    "menuItemOverview": "Fichaje",
     "title": "Fichaje",
     "subtitle": "Activa o desactiva el fichaje en la TPV y deja que el personal fiche aquí con su PIN.",
     "disabledHint": "Activa arriba «Permitir fichar en la caja». Sin esta opción nadie puede fichar.",

@@ -3020,6 +3020,7 @@
   "personeelPage": {
     "title": "スタッフ",
     "subtitle": "従業員とその情報を管理",
+    "submenuInOutClocking": "出勤／退勤",
     "addEmployee": "従業員を追加",
     "addFirstEmployee": "最初の従業員を追加",
     "noEmployees": "まだ従業員がいません",
@@ -3093,8 +3094,6 @@
     }
   },
   "inklokkenPage": {
-    "menuRowTitle": "出退勤",
-    "menuItemOverview": "出退勤",
     "title": "出退勤",
     "subtitle": "レジでの出退勤をオン／オフにし、スタッフがここでPINで打刻できるようにします。",
     "disabledHint": "上で「レジでの出退勤を許可する」をオンにしてください。この設定がオフのときは打刻できません。",

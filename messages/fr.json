@@ -2520,6 +2520,7 @@
   "personeelPage": {
     "title": "Personnel",
     "subtitle": "Gérez vos employés et leurs informations",
+    "submenuInOutClocking": "Entrée / sortie",
     "addEmployee": "Ajouter employé",
     "addFirstEmployee": "Ajouter premier employé",
     "noEmployees": "Pas encore d'employés",
@@ -2593,8 +2594,6 @@
     }
   },
   "inklokkenPage": {
-    "menuRowTitle": "Pointage",
-    "menuItemOverview": "Pointage",
     "title": "Pointage",
     "subtitle": "Activez ou désactivez le pointage à la caisse et faites pointer le personnel ici avec son PIN.",
     "disabledHint": "Activez ci-dessus « Autoriser le pointage entrée/sortie à la caisse ». Sans cette option, personne ne peut pointer.",

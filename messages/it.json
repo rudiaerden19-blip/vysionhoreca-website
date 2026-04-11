@@ -3020,6 +3020,7 @@
   "personeelPage": {
     "title": "Personale",
     "subtitle": "Gestisci i tuoi dipendenti e i loro dati",
+    "submenuInOutClocking": "Entrata / uscita",
     "addEmployee": "Aggiungi dipendente",
     "addFirstEmployee": "Aggiungi primo dipendente",
     "noEmployees": "Nessun dipendente ancora",
@@ -3093,8 +3094,6 @@
     }
   },
   "inklokkenPage": {
-    "menuRowTitle": "Timbratura",
-    "menuItemOverview": "Timbratura",
     "title": "Timbratura",
     "subtitle": "Attiva o disattiva la timbratura in cassa e fai timbrare il personale qui con il PIN.",
     "disabledHint": "Attiva sopra «Consenti timbratura in cassa». Senza questa opzione nessuno può timbrare.",

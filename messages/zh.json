@@ -3020,6 +3020,7 @@
   "personeelPage": {
     "title": "员工",
     "subtitle": "管理您的员工及其信息",
+    "submenuInOutClocking": "上下班打卡",
     "addEmployee": "添加员工",
     "addFirstEmployee": "添加第一位员工",
     "noEmployees": "暂无员工",
@@ -3093,8 +3094,6 @@
     }
   },
   "inklokkenPage": {
-    "menuRowTitle": "打卡",
-    "menuItemOverview": "打卡",
     "title": "打卡",
     "subtitle": "开启或关闭收银端打卡，并让员工在此用PIN打卡上下班。",
     "disabledHint": "请在上方开启「允许在收银机打卡上下班」。未开启时无法打卡。",

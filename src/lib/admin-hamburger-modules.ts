@@ -121,24 +121,15 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
       label: 'Personeel',
       items: [
         { id: 'sm_personeel_team', icon: '👤', label: 'Medewerkers', href: `${baseUrl}/personeel` },
-        { id: 'sm_personeel_uren', icon: '⏱️', label: 'Urenregistratie', href: `${baseUrl}/uren` },
-        { id: 'sm_personeel_vacatures', icon: '📋', label: 'Vacatures', href: `${baseUrl}/vacatures` },
-      ],
-    },
-    {
-      rowKey: 'inklokken',
-      key: 'personeel',
-      icon: '⏰',
-      label: 'Inklokken',
-      labelKey: 'inklokkenPage.menuRowTitle',
-      items: [
         {
-          id: 'sm_inklokken_overview',
+          id: 'sm_personeel_inuitklokken',
           icon: '⏰',
-          label: 'Inklokken',
-          labelKey: 'inklokkenPage.menuItemOverview',
+          label: 'In/uitklokken',
+          labelKey: 'personeelPage.submenuInOutClocking',
           href: `${baseUrl}/inklokken`,
         },
+        { id: 'sm_personeel_uren', icon: '⏱️', label: 'Urenregistratie', href: `${baseUrl}/uren` },
+        { id: 'sm_personeel_vacatures', icon: '📋', label: 'Vacatures', href: `${baseUrl}/vacatures` },
       ],
     },
     {

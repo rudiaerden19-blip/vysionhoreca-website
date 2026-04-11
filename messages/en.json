@@ -3436,6 +3436,7 @@
   "personeelPage": {
     "title": "Staff",
     "subtitle": "Manage your employees and their details",
+    "submenuInOutClocking": "Clock in/out",
     "addEmployee": "Add employee",
     "addFirstEmployee": "Add first employee",
     "noEmployees": "No employees yet",
@@ -3509,8 +3510,6 @@
     }
   },
   "inklokkenPage": {
-    "menuRowTitle": "Clock in/out",
-    "menuItemOverview": "Clock in/out",
     "title": "Clock in/out",
     "subtitle": "Allow clocking on the POS, and clock staff in or out here with a PIN.",
     "disabledHint": "Turn on “Allow clock in/out on POS” above. You can still change the setting here; staff clock in/out needs this to be enabled.",

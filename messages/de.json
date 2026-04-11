@@ -2520,6 +2520,7 @@
   "personeelPage": {
     "title": "Personal",
     "subtitle": "Verwalten Sie Ihre Mitarbeiter und deren Daten",
+    "submenuInOutClocking": "Ein-/Ausstempeln",
     "addEmployee": "Mitarbeiter hinzufügen",
     "addFirstEmployee": "Ersten Mitarbeiter hinzufügen",
     "noEmployees": "Noch keine Mitarbeiter",
@@ -2593,8 +2594,6 @@
     }
   },
   "inklokkenPage": {
-    "menuRowTitle": "Ein-/Ausstempeln",
-    "menuItemOverview": "Ein-/Ausstempeln",
     "title": "Ein-/Ausstempeln",
     "subtitle": "Ein-/Ausstempeln an der Kasse aktivieren oder deaktivieren und Mitarbeiter hier mit PIN ein- und ausstempeln.",
     "disabledHint": "Aktivieren Sie oben „Ein-/Ausstempeln an der Kasse erlauben“. Ohne diese Option kann niemand ein- oder ausstempeln.",
