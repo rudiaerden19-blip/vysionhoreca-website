@@ -111,7 +111,9 @@ export function AdminHamburgerMenu({
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-lg">{mod.icon}</span>
-                    <span className="text-sm font-semibold text-gray-700">{mod.label}</span>
+                    <span className="text-sm font-semibold text-gray-700">
+                      {mod.labelKey ? t(mod.labelKey) : mod.label}
+                    </span>
                   </div>
                   <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -127,7 +129,8 @@ export function AdminHamburgerMenu({
               style={{ width: 220 }}
             >
               <div className="sticky top-0 flex items-center gap-2 rounded-t-2xl bg-[#1e293b] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white">
-                <span>{activeMod.icon}</span> {activeMod.label}
+                <span>{activeMod.icon}</span>{' '}
+                {activeMod.labelKey ? t(activeMod.labelKey) : activeMod.label}
               </div>
               {activeMod.items.map((item) => (
                 <Link

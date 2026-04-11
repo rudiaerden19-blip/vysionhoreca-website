@@ -3092,6 +3092,16 @@
       "deleteFailed": "Eliminazione fallita"
     }
   },
+  "inklokkenPage": {
+    "menuRowTitle": "Timbratura",
+    "menuItemOverview": "Timbratura",
+    "title": "Timbratura",
+    "subtitle": "Attiva o disattiva la timbratura in cassa e fai timbrare il personale qui con il PIN.",
+    "disabledHint": "Attiva sopra «Consenti timbratura in cassa». Senza questa opzione nessuno può timbrare.",
+    "clockIntro": "I dipendenti sotto possono timbrare entrata e uscita con il PIN (come in cassa). Gli orari compaiono nella registrazione ore.",
+    "goToKassaSales": "Apri cassa per le vendite",
+    "refreshList": "Aggiorna elenco"
+  },
   "kassaReceipt": {
     "helpedBy": "Sei stato servito da {name}",
     "print": "Stampa scontrino"
@@ -3130,7 +3140,7 @@
     "successOut": "Uscita registrata.",
     "errors": {
       "bad_request": "Richiesta non valida",
-      "disabled": "Funzione disattivata. Attivala in Personale.",
+      "disabled": "Funzione disattivata. Attiva «Consenti timbratura in cassa» da Menu → Timbratura.",
       "bad_pin": "PIN errato",
       "already_in": "Sei ancora in servizio. Timbra prima l'uscita.",
       "day_complete": "Oggi hai già timbrato entrata e uscita.",

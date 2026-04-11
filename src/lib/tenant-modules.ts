@@ -406,7 +406,12 @@ export function adminPathToModule(pathname: string, tenantSlug: string): AdminMo
   if (rest.startsWith('/reserveringen')) {
     return { kind: 'module', module: 'reservaties' }
   }
-  if (rest.startsWith('/personeel') || rest.startsWith('/uren') || rest.startsWith('/vacatures')) {
+  if (
+    rest.startsWith('/personeel') ||
+    rest.startsWith('/uren') ||
+    rest.startsWith('/vacatures') ||
+    rest.startsWith('/inklokken')
+  ) {
     return { kind: 'module', module: 'personeel' }
   }
   if (rest.startsWith('/kosten')) {

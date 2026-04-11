@@ -20,6 +20,8 @@ export type AdminHamburgerModule = {
   key: TenantModuleId
   icon: string
   label: string
+  /** Optioneel: vertaalde titel van de submenu-rij (admin hamburger). */
+  labelKey?: string
   items: AdminHamburgerItem[]
 }
 
@@ -121,6 +123,22 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
         { id: 'sm_personeel_team', icon: '👤', label: 'Medewerkers', href: `${baseUrl}/personeel` },
         { id: 'sm_personeel_uren', icon: '⏱️', label: 'Urenregistratie', href: `${baseUrl}/uren` },
         { id: 'sm_personeel_vacatures', icon: '📋', label: 'Vacatures', href: `${baseUrl}/vacatures` },
+      ],
+    },
+    {
+      rowKey: 'inklokken',
+      key: 'personeel',
+      icon: '⏰',
+      label: 'Inklokken',
+      labelKey: 'inklokkenPage.menuRowTitle',
+      items: [
+        {
+          id: 'sm_inklokken_overview',
+          icon: '⏰',
+          label: 'Inklokken',
+          labelKey: 'inklokkenPage.menuItemOverview',
+          href: `${baseUrl}/inklokken`,
+        },
       ],
     },
     {

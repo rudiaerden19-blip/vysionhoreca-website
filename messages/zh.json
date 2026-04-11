@@ -3092,6 +3092,16 @@
       "deleteFailed": "删除失败"
     }
   },
+  "inklokkenPage": {
+    "menuRowTitle": "打卡",
+    "menuItemOverview": "打卡",
+    "title": "打卡",
+    "subtitle": "开启或关闭收银端打卡，并让员工在此用PIN打卡上下班。",
+    "disabledHint": "请在上方开启「允许在收银机打卡上下班」。未开启时无法打卡。",
+    "clockIntro": "下列员工可使用PIN打卡上下班（与收银端相同）。时间会显示在工时登记中。",
+    "goToKassaSales": "打开收银端进行销售",
+    "refreshList": "刷新列表"
+  },
   "kassaReceipt": {
     "helpedBy": "为您服务：{name}",
     "print": "打印小票"
@@ -3130,7 +3140,7 @@
     "successOut": "已记录下班。",
     "errors": {
       "bad_request": "请求无效",
-      "disabled": "此功能已关闭。请在人员设置中开启。",
+      "disabled": "此功能已关闭。请在菜单 → 打卡中开启「允许在收银机打卡上下班」。",
       "bad_pin": "PIN错误",
       "already_in": "尚未下班，请先打下班卡。",
       "day_complete": "今日已打过上班和下班卡。",

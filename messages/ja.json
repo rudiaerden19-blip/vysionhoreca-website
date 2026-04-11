@@ -3092,6 +3092,16 @@
       "deleteFailed": "削除に失敗"
     }
   },
+  "inklokkenPage": {
+    "menuRowTitle": "出退勤",
+    "menuItemOverview": "出退勤",
+    "title": "出退勤",
+    "subtitle": "レジでの出退勤をオン／オフにし、スタッフがここでPINで打刻できるようにします。",
+    "disabledHint": "上で「レジでの出退勤を許可する」をオンにしてください。この設定がオフのときは打刻できません。",
+    "clockIntro": "下のスタッフはPINで出勤・退勤できます（レジと同じ）。記録は勤怠に反映されます。",
+    "goToKassaSales": "売上のためレジを開く",
+    "refreshList": "一覧を更新"
+  },
   "kassaReceipt": {
     "helpedBy": "担当：{name}",
     "print": "レシートを印刷"
@@ -3130,7 +3140,7 @@
     "successOut": "退勤を記録しました。",
     "errors": {
       "bad_request": "無効なリクエスト",
-      "disabled": "機能がオフです。スタッフ設定で有効にしてください。",
+      "disabled": "機能がオフです。メニュー → 出退勤で「レジでの出退勤を許可する」をオンにしてください。",
       "bad_pin": "PINが違います",
       "already_in": "まだ出勤中です。先に退勤してください。",
       "day_complete": "本日はすでに出勤・退勤済みです。",

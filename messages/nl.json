@@ -3508,6 +3508,16 @@
       "deleteFailed": "Verwijderen mislukt"
     }
   },
+  "inklokkenPage": {
+    "menuRowTitle": "Inklokken",
+    "menuItemOverview": "Inklokken",
+    "title": "Inklokken",
+    "subtitle": "Schakel inklokken op de kassa in of uit en laat medewerkers hier met hun PIN in- en uitklokken.",
+    "disabledHint": "Zet hierboven «In- en uitklokken op de kassa toestaan» aan. Zonder deze optie kan niemand in- of uitklokken.",
+    "clockIntro": "Onderstaande medewerkers kunnen met hun PIN in- en uitklokken (zelfde werking als op de kassa). Tijden komen in Urenregistratie.",
+    "goToKassaSales": "Naar kassa voor verkoop",
+    "refreshList": "Lijst vernieuwen"
+  },
   "kassaReceipt": {
     "helpedBy": "U bent geholpen door medewerker {name}",
     "print": "Bon afdrukken"
@@ -3546,7 +3556,7 @@
     "successOut": "Uitgeklokt.",
     "errors": {
       "bad_request": "Ongeldige aanvraag",
-      "disabled": "Deze functie staat uit. Zet hem aan bij Personeel.",
+      "disabled": "Deze functie staat uit. Zet «In- en uitklokken op de kassa toestaan» aan via Menu → Inklokken.",
       "bad_pin": "Verkeerde PIN",
       "already_in": "Je bent nog ingeklokt. Klok eerst uit.",
       "day_complete": "Voor vandaag is al in- en uitgeklokt.",

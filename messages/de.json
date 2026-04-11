@@ -2592,6 +2592,16 @@
       "deleteFailed": "Löschen fehlgeschlagen"
     }
   },
+  "inklokkenPage": {
+    "menuRowTitle": "Ein-/Ausstempeln",
+    "menuItemOverview": "Ein-/Ausstempeln",
+    "title": "Ein-/Ausstempeln",
+    "subtitle": "Ein-/Ausstempeln an der Kasse aktivieren oder deaktivieren und Mitarbeiter hier mit PIN ein- und ausstempeln.",
+    "disabledHint": "Aktivieren Sie oben „Ein-/Ausstempeln an der Kasse erlauben“. Ohne diese Option kann niemand ein- oder ausstempeln.",
+    "clockIntro": "Die unten aufgeführten Mitarbeiter können sich mit ihrer PIN ein- und ausstempeln (wie an der Kasse). Die Zeiten erscheinen in der Zeiterfassung.",
+    "goToKassaSales": "Zur Kasse für Verkauf",
+    "refreshList": "Liste aktualisieren"
+  },
   "kassaReceipt": {
     "helpedBy": "Sie wurden von {name} bedient",
     "print": "Beleg drucken"
@@ -2630,7 +2640,7 @@
     "successOut": "Ausgestempelt.",
     "errors": {
       "bad_request": "Ungültige Anfrage",
-      "disabled": "Diese Funktion ist aus. Aktivieren Sie sie unter Personal.",
+      "disabled": "Diese Funktion ist aus. Aktivieren Sie «Ein-/Ausstempeln an der Kasse erlauben» unter Menü → Ein-/Ausstempeln.",
       "bad_pin": "Falsche PIN",
       "already_in": "Sie sind noch eingestempelt. Bitte zuerst ausstempeln.",
       "day_complete": "Heute bereits ein- und ausgestempelt.",

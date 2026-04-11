@@ -3092,6 +3092,16 @@
       "deleteFailed": "Error al eliminar"
     }
   },
+  "inklokkenPage": {
+    "menuRowTitle": "Fichaje",
+    "menuItemOverview": "Fichaje",
+    "title": "Fichaje",
+    "subtitle": "Activa o desactiva el fichaje en la TPV y deja que el personal fiche aquí con su PIN.",
+    "disabledHint": "Activa arriba «Permitir fichar en la caja». Sin esta opción nadie puede fichar.",
+    "clockIntro": "El personal indicado puede fichar entrada y salida con su PIN (igual que en la TPV). Los tiempos aparecen en el registro horario.",
+    "goToKassaSales": "Abrir TPV para ventas",
+    "refreshList": "Actualizar lista"
+  },
   "kassaReceipt": {
     "helpedBy": "Le ha atendido {name}",
     "print": "Imprimir ticket"
@@ -3130,7 +3140,7 @@
     "successOut": "Salida registrada.",
     "errors": {
       "bad_request": "Solicitud no válida",
-      "disabled": "Función desactivada. Actívala en Personal.",
+      "disabled": "Función desactivada. Activa «Permitir fichar en la caja» en Menú → Fichaje.",
       "bad_pin": "PIN incorrecto",
       "already_in": "Sigues fichado. Ficha salida primero.",
       "day_complete": "Ya fichaste entrada y salida hoy.",

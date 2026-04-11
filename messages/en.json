@@ -3508,6 +3508,16 @@
       "deleteFailed": "Delete failed"
     }
   },
+  "inklokkenPage": {
+    "menuRowTitle": "Clock in/out",
+    "menuItemOverview": "Clock in/out",
+    "title": "Clock in/out",
+    "subtitle": "Allow clocking on the POS, and clock staff in or out here with a PIN.",
+    "disabledHint": "Turn on “Allow clock in/out on POS” above. You can still change the setting here; staff clock in/out needs this to be enabled.",
+    "clockIntro": "Staff listed below can clock in and out with their PIN (same as on the POS). Times appear in Time registration.",
+    "goToKassaSales": "Open POS for sales",
+    "refreshList": "Refresh list"
+  },
   "kassaReceipt": {
     "helpedBy": "You were helped by {name}",
     "print": "Print receipt"
@@ -3546,7 +3556,7 @@
     "successOut": "Clocked out.",
     "errors": {
       "bad_request": "Invalid request",
-      "disabled": "This feature is off. Enable it under Staff.",
+      "disabled": "This feature is off. Turn on «Allow clock in/out on POS» under Menu → Clock in/out.",
       "bad_pin": "Wrong PIN",
       "already_in": "You are still clocked in. Clock out first.",
       "day_complete": "Already clocked in and out today.",
