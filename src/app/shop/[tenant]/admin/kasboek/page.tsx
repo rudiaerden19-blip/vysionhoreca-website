@@ -19,6 +19,8 @@ type KasboekManualLine = {
   description: string
   inkomsten: number
   uitgaven: number
+  line_source?: string
+  order_id?: string | null
   created_at: string
   updated_at: string
 }
@@ -248,10 +250,17 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
       description: formDesc.trim(),
       inkomsten: ink,
       uitgaven: uit,
+      line_source: 'manual' as const,
+      order_id: null as null,
     }
 
     const q = editingId
-      ? supabase.from('tenant_kasboek_manual_lines').update(row).eq('id', editingId).eq('tenant_slug', tenantSlug)
+      ? supabase
+          .from('tenant_kasboek_manual_lines')
+          .update(row)
+          .eq('id', editingId)
+          .eq('tenant_slug', tenantSlug)
+          .eq('line_source', 'manual')
       : supabase.from('tenant_kasboek_manual_lines').insert(row)
 
     const { error } = await q
@@ -266,6 +275,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
   }
 
   const startEdit = (l: KasboekManualLine) => {
+    if ((l.line_source || 'manual') === 'order') return
     setEditingId(l.id)
     setFormDate(l.line_date)
     setFormDesc(l.description)
@@ -275,7 +285,12 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
 
   const deleteLine = async (id: string) => {
     if (!confirm(t('kasboekPage.confirmDelete'))) return
-    const { error } = await supabase.from('tenant_kasboek_manual_lines').delete().eq('id', id).eq('tenant_slug', tenantSlug)
+    const { error } = await supabase
+      .from('tenant_kasboek_manual_lines')
+      .delete()
+      .eq('id', id)
+      .eq('tenant_slug', tenantSlug)
+      .eq('line_source', 'manual')
     if (!error) await load()
   }
 
@@ -310,6 +325,9 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
         <h1 className="text-2xl font-bold text-gray-900">{t('kasboekPage.title')}</h1>
         <p className="text-gray-600">{t('kasboekPage.subtitleManual')}</p>
         <p className="mt-2 text-sm text-gray-500">{t('kasboekPage.retentionNote')}</p>
+        <p className="mt-3 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-950">
+          {t('kasboekPage.autoSyncNote')}
+        </p>
       </div>
 
       <div className="mb-6 flex flex-wrap gap-2 rounded-xl bg-gray-100 p-1">
@@ -457,42 +475,69 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
               <thead className="border-b border-gray-200 bg-gray-50 text-xs font-semibold uppercase text-gray-600">
                 <tr>
                   <th className="px-4 py-3">{t('kasboekPage.colDate')}</th>
+                  <th className="px-4 py-3">{t('kasboekPage.colSource')}</th>
                   <th className="px-4 py-3">{t('kasboekPage.colDescription')}</th>
                   <th className="px-4 py-3 text-right">{t('kasboekPage.colIncome')}</th>
                   <th className="px-4 py-3 text-right">{t('kasboekPage.colExpense')}</th>
                   <th className="px-4 py-3 text-right">{t('kasboekPage.colBalance')}</th>
-                  <th className="px-4 py-3 w-28" />
+                  <th className="w-28 px-4 py-3" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {displayLines.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-4 py-10 text-center text-gray-500">
+                    <td colSpan={7} className="px-4 py-10 text-center text-gray-500">
                       {t('kasboekPage.emptyMonth')}
                     </td>
                   </tr>
                 ) : (
-                  displayLines.map((r) => (
-                    <tr key={r.id} className="hover:bg-gray-50/80">
-                      <td className="whitespace-nowrap px-4 py-3 text-gray-800">{fmtDate(r.line_date)}</td>
-                      <td className="max-w-[280px] px-4 py-3 text-gray-800">{r.description}</td>
-                      <td className="px-4 py-3 text-right font-mono text-emerald-700">
-                        {Number(r.inkomsten) > 0 ? fmtMoney(Number(r.inkomsten)) : '—'}
-                      </td>
-                      <td className="px-4 py-3 text-right font-mono text-rose-700">
-                        {Number(r.uitgaven) > 0 ? fmtMoney(Number(r.uitgaven)) : '—'}
-                      </td>
-                      <td className="px-4 py-3 text-right font-mono font-semibold text-gray-900">{fmtMoney(r.saldo)}</td>
-                      <td className="px-4 py-3 text-right">
-                        <button type="button" className="text-blue-600 hover:underline text-xs mr-2" onClick={() => startEdit(r)}>
-                          {t('kasboekPage.edit')}
-                        </button>
-                        <button type="button" className="text-red-600 hover:underline text-xs" onClick={() => void deleteLine(r.id)}>
-                          {t('kasboekPage.delete')}
-                        </button>
-                      </td>
-                    </tr>
-                  ))
+                  displayLines.map((r) => {
+                    const isOrder = (r.line_source || 'manual') === 'order'
+                    return (
+                      <tr key={r.id} className={`hover:bg-gray-50/80 ${isOrder ? 'bg-slate-50/60' : ''}`}>
+                        <td className="whitespace-nowrap px-4 py-3 text-gray-800">{fmtDate(r.line_date)}</td>
+                        <td className="whitespace-nowrap px-4 py-3">
+                          {isOrder ? (
+                            <span className="rounded-full bg-sky-100 px-2 py-0.5 text-xs font-semibold text-sky-900">
+                              {t('kasboekPage.rowBadgeOrder')}
+                            </span>
+                          ) : (
+                            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
+                              {t('kasboekPage.rowBadgeManual')}
+                            </span>
+                          )}
+                        </td>
+                        <td className="max-w-[220px] px-4 py-3 text-gray-800">{r.description}</td>
+                        <td className="px-4 py-3 text-right font-mono text-emerald-700">
+                          {Number(r.inkomsten) > 0 ? fmtMoney(Number(r.inkomsten)) : '—'}
+                        </td>
+                        <td className="px-4 py-3 text-right font-mono text-rose-700">
+                          {Number(r.uitgaven) > 0 ? fmtMoney(Number(r.uitgaven)) : '—'}
+                        </td>
+                        <td className="px-4 py-3 text-right font-mono font-semibold text-gray-900">{fmtMoney(r.saldo)}</td>
+                        <td className="px-4 py-3 text-right">
+                          {!isOrder && (
+                            <>
+                              <button
+                                type="button"
+                                className="mr-2 text-xs text-blue-600 hover:underline"
+                                onClick={() => startEdit(r)}
+                              >
+                                {t('kasboekPage.edit')}
+                              </button>
+                              <button
+                                type="button"
+                                className="text-xs text-red-600 hover:underline"
+                                onClick={() => void deleteLine(r.id)}
+                              >
+                                {t('kasboekPage.delete')}
+                              </button>
+                            </>
+                          )}
+                        </td>
+                      </tr>
+                    )
+                  })
                 )}
               </tbody>
             </table>
