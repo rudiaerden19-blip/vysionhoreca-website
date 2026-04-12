@@ -4894,6 +4894,23 @@
     "cta": "Voir un exemple de site restaurant",
     "ctaFrituur": "Voir un exemple friterie / takeaway"
   },
+  "vysionBeest": {
+    "imageAlt": "Caisse Vysion professionnelle à double écran tactile",
+    "eyebrow": "La bête Vysion",
+    "headline": "La « bête » Vysion : puissance maximale, pleine propriété",
+    "intro": "Optez pour du matériel qui accélère votre établissement et devient, après 24 mois, vraiment **votre propriété**. Fini la location sans fin : un investissement dans l’avenir de votre entreprise.",
+    "specsHeading": "Des spécifications qui font la différence",
+    "specSpeed": "**Vitesse inégalée** : grâce au **processeur Intel Core i5** et **8 Go de RAM**, vous traitez les transactions instantanément, sans à-coups — avec 10 ou 10 000 produits.",
+    "specDualTitle": "Double interaction",
+    "specDualMain": "**Écran principal 15 pouces** : pour vous et votre équipe. Lumineux, réactif et pensé pour un usage intensif.",
+    "specDualCustomer": "**Écran client 11,5 pouces** : pour vos clients. Affichez la commande, des offres ou le paiement par QR code.",
+    "specStorage": "**Stockage fiable** : le **SSD 128 Go** démarre la caisse en quelques secondes et garde vos données accessibles ultra-rapidement.",
+    "worksHeading": "Pourquoi ce système convient à tous",
+    "worksLead": "Ce n’est pas une simple tablette sur pied, mais un poste industriel professionnel. Boulangerie, prêt-à-porter, café ou boutique en ligne : le matériel suit votre rythme.",
+    "worksBullet1": "**Offre transparente** : pas de frais cachés. Après 24 mois, fin du financement — la machine est 100 % à vous.",
+    "worksBullet2": "**Adapté à tous les secteurs** : un design épuré, professionnel sur tout comptoir.",
+    "quote": "Arrêtez de louer, commencez à posséder. Choisissez la puissance d’un poste i5."
+  },
   "platform": {
     "sectionTitle": "Notre plateforme",
     "sectionSubtitle1": "Essayez le système complet vous-même (gratuit)",

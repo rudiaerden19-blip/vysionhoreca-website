@@ -4871,6 +4871,23 @@
     "cta": "Ver ejemplo de web de restaurante",
     "ctaFrituur": "Ver ejemplo de sitio tipo frituur / para llevar"
   },
+  "vysionBeest": {
+    "imageAlt": "TPV profesional Vysion con doble pantalla táctil",
+    "eyebrow": "La bestia Vysion",
+    "headline": "La « bestia » Vysion: máxima potencia, propiedad total",
+    "intro": "Elija hardware que no solo acelere su negocio, sino que, tras 24 meses, sea de verdad **su propiedad**. Sin alquiler interminable: una inversión en el futuro de su empresa.",
+    "specsHeading": "Especificaciones que marcan la diferencia",
+    "specSpeed": "**Velocidad sin igual**: con **procesador Intel Core i5** y **8 GB de RAM**, procesa transacciones al instante y sin tirones — tenga 10 o 10.000 productos.",
+    "specDualTitle": "Doble interacción",
+    "specDualMain": "**Pantalla principal de 15 pulgadas**: para usted y su equipo. Nítida, reactiva y pensada para un uso diario intenso.",
+    "specDualCustomer": "**Pantalla de cliente de 11,5 pulgadas**: para sus clientes. Muestre el pedido, promociones o cobre con código QR.",
+    "specStorage": "**Almacenamiento fiable**: el **SSD de 128 GB** arranca la caja en segundos y mantiene sus datos seguros y ultrarrápidos.",
+    "worksHeading": "Por qué este sistema sirve para todos",
+    "worksLead": "No es una tablet simple en un soporte, sino un puesto industrial profesional. Panadería, moda, cafetería u tienda online: el hardware sigue su ritmo.",
+    "worksBullet1": "**Trato honesto**: sin costes ocultos. A los 24 meses termina el pago aplazado: la máquina es 100 % suya.",
+    "worksBullet2": "**Multi-sector**: un diseño limpio y profesional en cualquier mostrador.",
+    "quote": "Deje de alquilar, empiece a poseer. Elija la potencia de un puesto i5."
+  },
   "platform": {
     "sectionTitle": "Nuestra plataforma",
     "sectionSubtitle1": "Pruebe el sistema completo usted mismo (gratis)",

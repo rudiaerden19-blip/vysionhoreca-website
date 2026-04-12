@@ -4871,6 +4871,23 @@
     "cta": "Vedi esempio di sito ristorante",
     "ctaFrituur": "Vedi esempio frituur / asporto"
   },
+  "vysionBeest": {
+    "imageAlt": "Cassa Vysion professionale con doppio touchscreen",
+    "eyebrow": "La bestia Vysion",
+    "headline": "La «bestia» Vysion: potenza massima, proprietà totale",
+    "intro": "Scegli hardware che non solo accelera l’attività, ma dopo 24 mesi è davvero **di tua proprietà**. Niente affitto infinito: un investimento nel futuro della tua azienda.",
+    "specsHeading": "Specifiche che fanno la differenza",
+    "specSpeed": "**Velocità senza pari**: grazie al **processore Intel Core i5** e **8 GB di RAM** gestisci le transazioni in un attimo, senza rallentamenti — con 10 o 10.000 prodotti.",
+    "specDualTitle": "Doppia interazione",
+    "specDualMain": "**Display principale da 15 pollici**: per te e il team. Luminoso, reattivo e pensato per un uso quotidiano intenso.",
+    "specDualCustomer": "**Display cliente da 11,5 pollici**: per i clienti. Mostra l’ordine, le promo o il pagamento tramite QR code.",
+    "specStorage": "**Archiviazione affidabile**: l’**SSD da 128 GB** fa avviare la cassa in pochi secondi e mantiene i dati sicuri e rapidissimi.",
+    "worksHeading": "Perché questo sistema funziona per tutti",
+    "worksLead": "Non è un tablet su un supporto, ma una workstation industriale professionale. Panificio, abbigliamento, bar o shop online: l’hardware segue il tuo ritmo.",
+    "worksBullet1": "**Offerta chiara**: nessun costo nascosto. Dopo 24 mesi finisce il piano rateale: la macchina è 100% tua.",
+    "worksBullet2": "**Adatto a ogni settore**: design pulito e professionale su ogni bancone.",
+    "quote": "Smetti di noleggiare, inizia a possedere. Scegli la potenza di una workstation i5."
+  },
   "platform": {
     "sectionTitle": "La nostra piattaforma",
     "sectionSubtitle1": "Prova il sistema completo tu stesso (gratis)",

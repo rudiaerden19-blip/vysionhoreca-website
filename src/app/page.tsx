@@ -13,6 +13,7 @@ import {
 } from '@/components'
 
 const PlatformGridSection = dynamic(() => import('@/components/PlatformGridSection'), { loading: () => null })
+const VysionBeestSection = dynamic(() => import('@/components/VysionBeestSection'), { loading: () => null })
 const HardwareSection = dynamic(() => import('@/components/HardwareSection'), { loading: () => null })
 const ContactPageSection = dynamic(() => import('@/components/ContactPageSection'), { loading: () => null })
 import { useLanguage } from '@/i18n'
@@ -1405,6 +1406,7 @@ export default function HomePage() {
       <HomeLandingHero onStickyNavChange={setStickyNav} />
       <WhyVysionSection />
       <GratisWebsiteBannerSection />
+      <VysionBeestSection />
       <PlatformGridSection />
       <HardwareSection />
       <StatsAndLiveDemoSection />

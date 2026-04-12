@@ -4894,6 +4894,23 @@
     "cta": "Beispiel-Restaurantwebsite ansehen",
     "ctaFrituur": "Beispiel-Imbiss/Frituur-Website ansehen"
   },
+  "vysionBeest": {
+    "imageAlt": "Professionelle Vysion-Kasse mit doppeltem Touchscreen",
+    "eyebrow": "Das Vysion-Biest",
+    "headline": "Das Vysion-„Biest“: maximale Leistung, volles Eigentum",
+    "intro": "Entscheiden Sie sich für Hardware, die Ihren Betrieb nicht nur beschleunigt, sondern nach 24 Monaten wirklich **Ihr Eigentum** ist. Keine endlose Miete — eine Investition in die Zukunft Ihres Unternehmens.",
+    "specsHeading": "Spezifikationen, die den Unterschied machen",
+    "specSpeed": "**Enorme Geschwindigkeit**: Dank **Intel Core i5-Prozessor** und **8 GB RAM** bearbeiten Sie Transaktionen blitzschnell und ruckelfrei — egal ob 10 oder 10.000 Artikel im System.",
+    "specDualTitle": "Doppelte Interaktion",
+    "specDualMain": "**15-Zoll-Hauptdisplay**: für Sie und Ihr Team. Hell, responsiv und für intensiven Tageseinsatz gebaut.",
+    "specDualCustomer": "**11,5-Zoll-Kundendisplay**: für Ihre Gäste. Bestellung zeigen, Aktionen präsentieren oder per QR-Code bezahlen lassen.",
+    "specStorage": "**Zuverlässiger Speicher**: die **128 GB SSD** sorgt für Start in Sekunden und schnellen, sicheren Datenzugriff.",
+    "worksHeading": "Warum dieses System für jeden funktioniert",
+    "worksLead": "Kein einfaches Tablet auf einem Ständer, sondern eine professionelle, industrielle Workstation. Bäckerei, Modegeschäft, Café oder Onlineshop — die Hardware hält Ihr Tempo mit.",
+    "worksBullet1": "**Faire Abmachung**: keine versteckten Kosten. Nach 24 Monaten endet die Ratenzahlung — die Maschine ist 100 % Ihre.",
+    "worksBullet2": "**Branchenfreundlich**: das klare Design wirkt professionell an jeder Theke.",
+    "quote": "Schluss mit Mieten, starten mit Besitzen. Entscheiden Sie sich für die Kraft einer i5-Workstation."
+  },
   "platform": {
     "sectionTitle": "Unsere Plattform",
     "sectionSubtitle1": "Testen Sie das komplette System selbst (kostenlos)",

@@ -335,6 +335,23 @@
     "cta": "View example restaurant website",
     "ctaFrituur": "View example takeaway (frituur) site"
   },
+  "vysionBeest": {
+    "imageAlt": "Professional Vysion POS workstation with dual touchscreens",
+    "eyebrow": "The Vysion beast",
+    "headline": "The Vysion \"beast\": maximum power, full ownership",
+    "intro": "Choose hardware that not only speeds up your business, but after 24 months is truly **your property**. No endless renting — an investment in your company’s future.",
+    "specsHeading": "Specifications that make the difference",
+    "specSpeed": "**Blazing speed**: thanks to the **Intel Core i5 processor** and **8 GB RAM**, you process transactions instantly, without stutter — whether you have 10 or 10,000 products.",
+    "specDualTitle": "Dual interaction",
+    "specDualMain": "**15-inch main display**: for you and your staff. Bright, responsive and built for intensive daily use.",
+    "specDualCustomer": "**11.5-inch customer display**: for your customers. Show the order, promotions, or let them pay via QR code.",
+    "specStorage": "**Reliable storage**: the **128 GB SSD** means your till boots in seconds and your data stays safe and lightning-fast to access.",
+    "worksHeading": "Why this system works for everyone",
+    "worksLead": "This is not a simple tablet on a stand, but a professional, industrial workstation. Whether you run a bakery, clothing store, café or online shop: the hardware keeps up with your pace.",
+    "worksBullet1": "**Fair deal**: no hidden costs. After 24 months payments stop and the machine is 100% yours.",
+    "worksBullet2": "**Sector-friendly**: the clean design looks professional on every counter.",
+    "quote": "Stop renting, start owning. Choose the power of an i5 workstation."
+  },
   "platform": {
     "sectionTitle": "Our platform",
     "sectionSubtitle1": "Try the full system yourself (free)",
