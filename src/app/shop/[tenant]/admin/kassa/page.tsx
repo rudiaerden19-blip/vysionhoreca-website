@@ -1571,23 +1571,23 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   // ── Geluid activatie scherm (exact donor) — toon elke sessie ───────────
   if (showSoundActivation && !soundActivated && !demoViewOnly) {
     return (
-      <div className="fixed inset-0 z-[200] bg-gradient-to-br from-[#2D3A52] to-[#5A7BA8] flex flex-col items-center justify-center p-8">
-        <div className="text-white text-center max-w-md">
-          <div className="text-8xl mb-8">🔔</div>
-          <h1 className="text-4xl font-bold mb-4">Activeer Geluid</h1>
-          <p className="text-xl text-white mb-8">
+      <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-[#e3e3e3] p-8">
+        <div className="max-w-md text-center text-gray-900">
+          <div className="mb-8 text-8xl">🔔</div>
+          <h1 className="mb-4 text-4xl font-bold text-gray-900">Activeer Geluid</h1>
+          <p className="mb-8 text-xl text-gray-700">
             Klik op de knop om geluid en meldingen te activeren voor nieuwe bestellingen.
             <br /><br />
-            <strong>Dit doe je maar 1 keer per dag.</strong>
+            <strong className="text-gray-900">Dit doe je maar 1 keer per dag.</strong>
           </p>
           <button
             onClick={activateSound}
-            className="w-full py-6 bg-green-500 hover:bg-green-600 text-white text-2xl font-bold rounded-2xl shadow-2xl transform hover:scale-105 transition-all flex items-center justify-center gap-4"
+            className="flex w-full transform items-center justify-center gap-4 rounded-2xl bg-green-500 py-6 text-2xl font-bold text-white shadow-lg transition-all hover:scale-105 hover:bg-green-600"
           >
             <span className="text-4xl">🔊</span>
             ACTIVEER GELUID
           </button>
-          <p className="text-white/80 mt-6 text-sm">
+          <p className="mt-6 text-sm text-gray-600">
             💡 Zonder activatie kunnen nieuwe bestellingen geen alarm afspelen.
           </p>
         </div>
