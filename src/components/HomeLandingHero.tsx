@@ -204,7 +204,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
           <p className="text-xl sm:text-2xl md:text-[1.65rem] font-bold text-white tracking-tight text-balance leading-snug">
             {t('heroLanding.ctaModulesHeadline')}
           </p>
-          <p className="mt-2 text-base sm:text-lg text-white/88 font-medium text-balance leading-snug">
+          <p className="mt-2 text-base sm:text-lg font-semibold text-accent text-balance leading-snug">
             {t('heroLanding.ctaModulesSubline')}
           </p>
           <div className="mt-4 sm:mt-5 pt-4 sm:pt-5 border-t border-white/20">
