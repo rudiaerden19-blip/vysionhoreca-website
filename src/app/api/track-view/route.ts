@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import crypto from 'crypto'
+import { checkRateLimit, getClientIP, trackViewRateLimiter } from '@/lib/rate-limit'
+import { parseJsonBody, jsonServerError } from '@/lib/api-request'
+import { trackViewBodySchema } from '@/lib/api-schemas'
 
 // Common bot user agents to filter out
 const BOT_PATTERNS = [
@@ -24,13 +27,21 @@ function hashIP(ip: string): string {
 
 export async function POST(request: NextRequest) {
   try {
+    const clientIP = getClientIP(request)
+    const rl = await checkRateLimit(trackViewRateLimiter, clientIP)
+    if (!rl.success) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+    }
+
+    const parsed = await parseJsonBody(request, trackViewBodySchema)
+    if (!parsed.ok) return parsed.response
+
+    const { page_path, referrer } = parsed.data
+
     const supabase = getServerSupabaseClient()
     if (!supabase) {
       return NextResponse.json({ error: 'Database not configured' }, { status: 500 })
     }
-
-    const body = await request.json()
-    const { page_path, referrer } = body
 
     // Get user agent and IP from headers
     const user_agent = request.headers.get('user-agent') || null
@@ -66,8 +77,8 @@ export async function POST(request: NextRequest) {
     const { error } = await supabase
       .from('page_views')
       .insert({
-        page_path: page_path || '/',
-        referrer: referrer || null,
+        page_path: page_path,
+        referrer: referrer ?? null,
         user_agent,
         country,
         visitor_hash: visitorHash
@@ -81,6 +92,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Track view error:', error)
-    return NextResponse.json({ error: 'Server error' }, { status: 500 })
+    return jsonServerError('Server error')
   }
 }

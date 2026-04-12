@@ -36,7 +36,8 @@
     "react-dom": "^18",
     "recharts": "^3.8.0",
     "stripe": "^20.2.0",
-    "unpdf": "^1.4.0"
+    "unpdf": "^1.4.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@playwright/test": "^1.59.1",

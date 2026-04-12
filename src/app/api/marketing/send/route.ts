@@ -2,41 +2,50 @@ import { NextRequest, NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
+import { apiRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
+import { parseJsonBody, jsonServerError } from '@/lib/api-request'
+import { marketingSendSchema } from '@/lib/api-schemas'
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
 
 export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID()
   
   try {
-    const { 
-      tenantSlug, 
-      recipients, 
-      subject, 
-      message, 
-      includePromo, 
-      promoCode, 
-      promoDiscount,
-      businessName 
-    } = await request.json()
-
-    if (!tenantSlug || !recipients || !subject || !message) {
+    const clientIP = getClientIP(request)
+    const rl = await checkRateLimit(apiRateLimiter, `marketing:${clientIP}`)
+    if (!rl.success) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
+        { error: 'Te veel verzoeken. Probeer het later opnieuw.' },
+        { status: 429 }
       )
     }
+
+    const parsed = await parseJsonBody(request, marketingSendSchema)
+    if (!parsed.ok) return parsed.response
+
+    const {
+      tenantSlug,
+      recipients,
+      subject,
+      message,
+      includePromo,
+      promoCode,
+      promoDiscount,
+      businessName,
+    } = parsed.data
 
     // Verify user is logged in via any auth header
     const businessId = request.headers.get('x-business-id')
     const superadminId = request.headers.get('x-superadmin-id')
     if (!businessId && !superadminId) {
       return NextResponse.json({ error: 'Niet ingelogd' }, { status: 401 })
-    }
-
-    if (recipients.length === 0) {
-      return NextResponse.json(
-        { error: 'No recipients' },
-        { status: 400 }
-      )
     }
 
     // Haal tenant SMTP instellingen op
@@ -85,9 +94,9 @@ export async function POST(request: NextRequest) {
       promoHtml = `
         <div style="background: linear-gradient(135deg, #F97316, #FB923C); color: white; padding: 20px; border-radius: 12px; text-align: center; margin: 20px 0;">
           <p style="margin: 0; font-size: 14px;">🎁 EXCLUSIEVE KORTING</p>
-          <p style="margin: 10px 0; font-size: 32px; font-weight: bold;">${promoDiscount}% KORTING</p>
+          <p style="margin: 10px 0; font-size: 32px; font-weight: bold;">${escapeHtml(String(promoDiscount ?? ''))}% KORTING</p>
           <p style="margin: 0; font-size: 12px;">Gebruik code:</p>
-          <p style="margin: 10px 0; font-size: 24px; font-weight: bold; background: white; color: #F97316; padding: 10px 20px; border-radius: 8px; display: inline-block;">${promoCode}</p>
+          <p style="margin: 10px 0; font-size: 24px; font-weight: bold; background: white; color: #F97316; padding: 10px 20px; border-radius: 8px; display: inline-block;">${escapeHtml(promoCode ?? '')}</p>
         </div>
       `
     }
@@ -99,7 +108,7 @@ export async function POST(request: NextRequest) {
     const results: PromiseSettledResult<string>[] = []
     
     for (let i = 0; i < recipients.length; i++) {
-      const recipient = recipients[i] as { email: string; name: string }
+      const recipient = recipients[i]
       
       // Voeg kleine vertraging toe tussen emails (500ms per email)
       if (i > 0) {
@@ -107,7 +116,8 @@ export async function POST(request: NextRequest) {
       }
       
       try {
-        const personalizedMessage = message.replace(/Beste klant/g, `Beste ${recipient.name}`)
+        const safeName = recipient.name?.trim() || 'klant'
+        const personalizedMessage = message.replace(/Beste klant/g, `Beste ${safeName}`)
         
         const htmlContent = `
 <!DOCTYPE html>
@@ -120,13 +130,13 @@ export async function POST(request: NextRequest) {
   <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
     <!-- Header met logo/naam -->
     <div style="background: linear-gradient(135deg, #1e3a5f 0%, #2d4a6f 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
-      <h1 style="color: white; margin: 0; font-size: 24px;">${businessName || 'Vysion Horeca'}</h1>
+      <h1 style="color: white; margin: 0; font-size: 24px;">${escapeHtml(businessName || 'Vysion Horeca')}</h1>
     </div>
     
     <!-- Content -->
     <div style="background: white; padding: 30px; border-radius: 0 0 12px 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
       ${personalizedMessage.split('\n').map((line: string) => 
-        line.trim() ? `<p style="margin: 0 0 15px 0; color: #333; line-height: 1.6; font-size: 15px;">${line}</p>` : '<br>'
+        line.trim() ? `<p style="margin: 0 0 15px 0; color: #333; line-height: 1.6; font-size: 15px;">${escapeHtml(line)}</p>` : '<br>'
       ).join('')}
       
       ${promoHtml}
@@ -143,7 +153,7 @@ export async function POST(request: NextRequest) {
     <!-- Footer met unsubscribe -->
     <div style="text-align: center; padding: 20px; color: #888; font-size: 12px;">
       <p style="margin: 0 0 10px 0;">
-        Je ontvangt deze email omdat je klant bent bij ${businessName || 'ons'}.
+        Je ontvangt deze email omdat je klant bent bij ${escapeHtml(businessName || 'ons')}.
       </p>
       <p style="margin: 0 0 10px 0;">
         <a href="${unsubscribeUrl}" style="color: #888; text-decoration: underline;">
@@ -151,7 +161,7 @@ export async function POST(request: NextRequest) {
         </a>
       </p>
       <p style="margin: 0; color: #aaa;">
-        © ${new Date().getFullYear()} ${businessName || 'Vysion Horeca'} | Powered by Vysion Horeca
+        © ${new Date().getFullYear()} ${escapeHtml(businessName || 'Vysion Horeca')} | Powered by Vysion Horeca
       </p>
     </div>
   </div>
@@ -195,7 +205,7 @@ export async function POST(request: NextRequest) {
         message: message,
         recipient_count: successCount,
         promo_code: includePromo ? promoCode : null,
-        promo_discount: includePromo ? parseInt(promoDiscount) : null,
+        promo_discount: includePromo && promoDiscount != null ? promoDiscount : null,
         status: failedCount === 0 ? 'sent' : 'partial',
         sent_at: new Date().toISOString(),
       })
@@ -219,9 +229,6 @@ export async function POST(request: NextRequest) {
       requestId, 
       error: error instanceof Error ? error.message : 'Unknown error' 
     })
-    return NextResponse.json(
-      { error: 'Failed to send emails' },
-      { status: 500 }
-    )
+    return jsonServerError('Failed to send emails')
   }
 }

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { apiRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
+import { parseJsonBody, jsonServerError } from '@/lib/api-request'
+import { resendVerificationBodySchema } from '@/lib/api-schemas'
 import nodemailer from 'nodemailer'
 import crypto from 'crypto'
 
@@ -17,14 +19,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { email } = await request.json()
-
-    if (!email) {
-      return NextResponse.json(
-        { error: 'Email is verplicht' },
-        { status: 400 }
-      )
-    }
+    const parsedBody = await parseJsonBody(request, resendVerificationBodySchema)
+    if (!parsedBody.ok) return parsedBody.response
+    const { email } = parsedBody.data
 
     const supabase = getServerSupabaseClient()
     if (!supabase) {
@@ -34,7 +31,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const emailLower = email.trim().toLowerCase()
+    const emailLower = email
 
     // Check if email exists and is not verified
     const { data: profile } = await supabase
@@ -87,10 +84,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Resend verification error:', error)
-    return NextResponse.json(
-      { error: 'Er is een fout opgetreden' },
-      { status: 500 }
-    )
+    return jsonServerError()
   }
 }
 

@@ -1,5 +1,11 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import {
+  checkRateLimit,
+  getClientIP,
+  isApiMiddlewareRateLimitExempt,
+  middlewareApiRateLimiter,
+} from '@/lib/rate-limit'
 import { DEMO_TENANT_SLUG } from '@/lib/demo-links'
 import { isKioskSearchParams, KIOSK_COOKIE, KIOSK_REQUEST_HEADER } from '@/lib/kiosk-mode'
 import { VYSION_SUPERADMIN_COOKIE } from '@/lib/superadmin-cookies'
@@ -130,9 +136,25 @@ function rewriteMenuAsKiosk(request: NextRequest, menuPathname: string): NextRes
   return res
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const url = request.nextUrl.clone()
   const pathname = url.pathname
+
+  /** Globale API-rate-limit (Edge): voorkomt massale POST/GET tegen alle eindpunten. Webhooks/cron/health uitgesloten. */
+  if (
+    pathname.startsWith('/api/') &&
+    request.method !== 'OPTIONS' &&
+    !isApiMiddlewareRateLimitExempt(pathname)
+  ) {
+    const ip = getClientIP(request)
+    const rl = await checkRateLimit(middlewareApiRateLimiter, `mw:${ip}`)
+    if (!rl.success) {
+      return NextResponse.json(
+        { error: 'Te veel verzoeken. Probeer het later opnieuw.' },
+        { status: 429, headers: { 'Retry-After': '60' } }
+      )
+    }
+  }
 
   /** Superadmin: no CDN/browser cache — users were seeing stale UI zonder Modules-knop. */
   if (pathname.startsWith('/superadmin')) {
@@ -283,5 +305,6 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/api/:path*',
   ],
 }

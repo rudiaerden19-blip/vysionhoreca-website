@@ -4,6 +4,8 @@ import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
 import nodemailer from 'nodemailer'
 import { registerRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
+import { parseJsonBody } from '@/lib/api-request'
+import { registerBodySchema } from '@/lib/api-schemas'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
 import { ensureDeliverySettingsForTenant } from '@/lib/tenant-defaults'
@@ -35,21 +37,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { businessName, email, phone, password } = await request.json()
+    const parsedBody = await parseJsonBody(request, registerBodySchema)
+    if (!parsedBody.ok) return parsedBody.response
 
-    if (!businessName || !email || !phone || !password) {
-      return NextResponse.json(
-        { error: 'Alle velden zijn verplicht' },
-        { status: 400 }
-      )
-    }
-
-    if (password.length < 8) {
-      return NextResponse.json(
-        { error: 'Wachtwoord moet minimaal 8 tekens zijn' },
-        { status: 400 }
-      )
-    }
+    const { businessName, email, phone, password } = parsedBody.data
 
     const supabase = getServerSupabaseClient()
     if (!supabase) {
@@ -60,7 +51,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const emailLower = email.trim().toLowerCase()
+    const emailLower = email
 
     // Check if email already exists
     const { data: existingTenant } = await supabase

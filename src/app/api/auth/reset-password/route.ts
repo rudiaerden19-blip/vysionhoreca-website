@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { apiRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
+import { parseJsonBody, jsonServerError } from '@/lib/api-request'
+import { resetPasswordBodySchema } from '@/lib/api-schemas'
+import { z } from 'zod'
 import bcrypt from 'bcryptjs'
 
 // Force dynamic rendering - GET endpoint uses request.url
@@ -19,21 +22,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { token, password } = await request.json()
-
-    if (!token || !password) {
-      return NextResponse.json(
-        { error: 'Token en wachtwoord zijn verplicht' },
-        { status: 400 }
-      )
-    }
-
-    if (password.length < 8) {
-      return NextResponse.json(
-        { error: 'Wachtwoord moet minimaal 8 tekens zijn' },
-        { status: 400 }
-      )
-    }
+    const parsedBody = await parseJsonBody(request, resetPasswordBodySchema)
+    if (!parsedBody.ok) return parsedBody.response
+    const { token, password } = parsedBody.data
 
     const supabase = getServerSupabaseClient()
     if (!supabase) {
@@ -113,25 +104,27 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Reset password error:', error)
-    return NextResponse.json(
-      { error: 'Er is een fout opgetreden' },
-      { status: 500 }
-    )
+    return jsonServerError()
   }
 }
 
 // GET endpoint to verify token is valid (for frontend)
+const resetTokenQuerySchema = z.object({
+  token: z.string().trim().min(32).max(128),
+})
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const token = searchParams.get('token')
-
-    if (!token) {
+    const tokenRaw = searchParams.get('token')
+    const q = resetTokenQuerySchema.safeParse({ token: tokenRaw ?? '' })
+    if (!q.success) {
       return NextResponse.json(
-        { valid: false, error: 'Token ontbreekt' },
+        { valid: false, error: 'Token ontbreekt of ongeldig' },
         { status: 400 }
       )
     }
+    const { token } = q.data
 
     const supabase = getServerSupabaseClient()
     if (!supabase) {

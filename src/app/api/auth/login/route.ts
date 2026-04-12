@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import { loginRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
+import { parseJsonBody } from '@/lib/api-request'
+import { loginBodySchema } from '@/lib/api-schemas'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
 import { DEFAULT_ENABLED_ALLERGEN_IDS } from '@/lib/allergens-defaults'
@@ -63,18 +65,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const body = await request.json()
-    const email = body.email as string
-    const password = body.password as string
-    const targetTenantSlugRaw =
-      typeof body.target_tenant_slug === 'string' ? body.target_tenant_slug.trim().toLowerCase() : ''
+    const parsedBody = await parseJsonBody(request, loginBodySchema)
+    if (!parsedBody.ok) return parsedBody.response
 
-    if (!email || !password) {
-      return NextResponse.json(
-        { error: 'Email en wachtwoord zijn verplicht' },
-        { status: 400 }
-      )
-    }
+    const emailLower = parsedBody.data.email
+    const password = parsedBody.data.password
+    const targetTenantSlugRaw = parsedBody.data.target_tenant_slug
 
     const supabase = getServerSupabaseClient()
     if (!supabase) {
@@ -84,8 +80,6 @@ export async function POST(request: NextRequest) {
         { status: 503 }
       )
     }
-
-    const emailLower = email.trim().toLowerCase()
 
     const dummySaHash =
       '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4uSl9.y5zq5z5z5z'

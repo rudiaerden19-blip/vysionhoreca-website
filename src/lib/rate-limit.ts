@@ -51,6 +51,46 @@ export const apiRateLimiter = redis
     })
   : null
 
+/** Eerste verdedigingslinie in Edge middleware: alle /api (behalve exempt) — 120/min per IP */
+export const middlewareApiRateLimiter = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(120, '1 m'),
+      prefix: 'ratelimit:api-mw',
+    })
+  : null
+
+/** Partneraanvraag formulier (publiek POST) */
+export const partnerApplicationRateLimiter = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(5, '1 h'),
+      prefix: 'ratelimit:partner-application',
+    })
+  : null
+
+/** Publieke analytics POST */
+export const trackViewRateLimiter = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(30, '1 m'),
+      prefix: 'ratelimit:track-view',
+    })
+  : null
+
+const API_MW_EXEMPT_PREFIXES = [
+  '/api/stripe-webhook',
+  '/api/subscription-webhook',
+  '/api/whatsapp/webhook',
+  '/api/cron/',
+  '/api/health',
+  '/api/print-proxy',
+] as const
+
+export function isApiMiddlewareRateLimitExempt(pathname: string): boolean {
+  return API_MW_EXEMPT_PREFIXES.some((p) => pathname === p || pathname.startsWith(p))
+}
+
 // Log once at startup if rate limiting is not configured
 if (!isConfigured && process.env.NODE_ENV === 'production') {
   console.warn('[SECURITY WARNING] Rate limiting not configured - UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN required')
