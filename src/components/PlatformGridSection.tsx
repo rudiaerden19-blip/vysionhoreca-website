@@ -7,9 +7,15 @@ import {
   Calculator,
   CalendarDays,
   ChefHat,
+  Coffee,
+  Croissant,
+  ExternalLink,
+  Flame,
   Globe,
   MessageCircle,
+  Milk,
   Monitor,
+  Rocket,
   ShoppingBag,
   Store,
   Wallet,
@@ -36,6 +42,11 @@ const ICONS: Record<string, LucideIcon> = {
   bedrijfsanalyse: BarChart3,
   kostencalculator: Calculator,
 }
+
+const ctaIconClass =
+  'h-[1.05rem] w-[1.05rem] shrink-0 sm:h-[1.15rem] sm:w-[1.15rem] stroke-[2.25]'
+
+const ctaExternalIconClass = 'h-4 w-4 shrink-0 opacity-70 sm:h-[1.05rem] sm:w-[1.05rem]'
 
 const cardShellClasses =
   'group flex min-h-[300px] sm:min-h-[320px] flex-col overflow-hidden rounded-2xl border border-gray-200/60 bg-[#f4f4f4] text-center shadow-home-card transition-all duration-300 hover:z-10 hover:-translate-y-0.5 hover:border-accent/55 hover:shadow-[0_12px_40px_-6px_rgba(232,90,60,0.55),0_28px_70px_-12px_rgba(232,90,60,0.42),0_0_0_1px_rgba(232,90,60,0.2),0_0_60px_8px_rgba(232,90,60,0.28)] active:z-10 active:-translate-y-0.5 active:border-accent/60 active:shadow-[0_12px_40px_-6px_rgba(232,90,60,0.6),0_28px_70px_-12px_rgba(232,90,60,0.48),0_0_0_1px_rgba(232,90,60,0.22),0_0_72px_10px_rgba(232,90,60,0.32)]'
@@ -108,25 +119,30 @@ export default function PlatformGridSection() {
           <div className="mt-5 flex flex-col items-stretch justify-center gap-3 sm:mt-6 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-4">
             <a
               href={`/registreer?lang=${locale}`}
-              className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:min-w-[200px] sm:text-base"
+              className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:min-w-[200px] sm:text-base"
             >
+              <Rocket className={ctaIconClass} aria-hidden />
               {t('heroLanding.ctaStartFree')}
             </a>
             <a
               href={DEMO_HERO_LIVE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-[48px] items-center justify-center rounded-full border-2 border-gray-900 bg-white px-6 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:min-w-[200px] sm:text-base"
+              className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full border-2 border-gray-900 bg-white px-6 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:min-w-[200px] sm:text-base"
             >
-              {t('platform.gridDemoCta')}
+              <Flame className={ctaIconClass} aria-hidden />
+              <span className="min-w-0">{t('platform.gridDemoCta')}</span>
+              <ExternalLink className={ctaExternalIconClass} aria-hidden />
             </a>
             <a
               href={DEMO_ONLINE_SHOP_MENU_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-[48px] items-center justify-center rounded-full border-2 border-gray-900 bg-white px-6 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:min-w-[200px] sm:text-base"
+              className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full border-2 border-gray-900 bg-white px-6 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:min-w-[200px] sm:text-base"
             >
-              {t('platform.gridDemoShopCta')}
+              <ShoppingBag className={ctaIconClass} aria-hidden />
+              <span className="min-w-0">{t('platform.gridDemoShopCta')}</span>
+              <ExternalLink className={ctaExternalIconClass} aria-hidden />
             </a>
           </div>
           <div className="mt-3 flex flex-col items-stretch justify-center gap-3 sm:mt-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-4">
@@ -134,25 +150,31 @@ export default function PlatformGridSection() {
               href={DEMO_CAFE_MENU_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-[48px] items-center justify-center rounded-full border-2 border-gray-900 bg-white px-6 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:min-w-[200px] sm:text-base"
+              className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full border-2 border-gray-900 bg-white px-6 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:min-w-[200px] sm:text-base"
             >
-              {t('platform.gridDemoCafeCta')}
+              <Coffee className={ctaIconClass} aria-hidden />
+              <span className="min-w-0">{t('platform.gridDemoCafeCta')}</span>
+              <ExternalLink className={ctaExternalIconClass} aria-hidden />
             </a>
             <a
               href={DEMO_BAKERY_MENU_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-[48px] items-center justify-center rounded-full border-2 border-gray-900 bg-white px-6 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:min-w-[200px] sm:text-base"
+              className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full border-2 border-gray-900 bg-white px-6 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:min-w-[200px] sm:text-base"
             >
-              {t('platform.gridDemoBakeryCta')}
+              <Croissant className={ctaIconClass} aria-hidden />
+              <span className="min-w-0">{t('platform.gridDemoBakeryCta')}</span>
+              <ExternalLink className={ctaExternalIconClass} aria-hidden />
             </a>
             <a
               href={DEMO_SHOWCASE_CREMERIE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-[48px] items-center justify-center rounded-full border-2 border-gray-900 bg-white px-6 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:min-w-[200px] sm:text-base"
+              className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full border-2 border-gray-900 bg-white px-6 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:min-w-[200px] sm:text-base"
             >
-              {t('platform.gridDemoCremerieCta')}
+              <Milk className={ctaIconClass} aria-hidden />
+              <span className="min-w-0">{t('platform.gridDemoCremerieCta')}</span>
+              <ExternalLink className={ctaExternalIconClass} aria-hidden />
             </a>
           </div>
         </div>
