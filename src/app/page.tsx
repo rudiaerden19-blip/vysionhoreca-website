@@ -1339,7 +1339,7 @@ function TestimonialSection() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const { t } = useLanguage()
   
-  const testimonialKeys = [1, 2, 3, 4, 5, 6, 7]
+  const testimonialKeys = [1, 2, 3, 4, 5, 6, 7, 8]
   
   const goToPrev = () => {
     setCurrentSlide((prev) => (prev - 1 + testimonialKeys.length) % testimonialKeys.length)
