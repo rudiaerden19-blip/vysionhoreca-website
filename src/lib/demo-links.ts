@@ -94,6 +94,20 @@ export const DEMO_KASSA_URL = `${DEMO_ORDER_SITE_URL}/admin/kassa?${DEMO_KASSA_P
 export const DEMO_ONLINE_SHOP_MENU_URL =
   `https://www.vysionhoreca.com/shop/${DEMO_TENANT_SLUG}/menu` as const
 
+const MARKETING_SHOP_BASE = 'https://www.vysionhoreca.com/shop' as const
+
+/** Showcase: restaurant/café — zelfde tenant als gratis-websitevoorbeeld. */
+export const DEMO_CAFE_MENU_URL = `${MARKETING_SHOP_BASE}/restaurantdekorf/menu` as const
+
+/**
+ * Tweede voorbeeldzaak (publiek menu). Label op de site: “bakker”; slug kan hier
+ * worden vervangen door een echte bakkerij-showcase zodra die vast staat.
+ */
+export const DEMO_BAKERY_MENU_URL = `${MARKETING_SHOP_BASE}/skippsbv/menu` as const
+
+/** Digitale menukaart op dezelfde restaurant-showcase (ander scherm dan /menu). */
+export const DEMO_SHOWCASE_MENUKAART_URL = `${MARKETING_SHOP_BASE}/restaurantdekorf/menukaart` as const
+
 export function isPublicDemoKassaSearch(search: string): boolean {
   const q = search.startsWith('?') ? search.slice(1) : search
   const sp = new URLSearchParams(q)

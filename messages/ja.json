@@ -74,7 +74,7 @@
   "heroLanding": {
     "logoTagline": "あなたの飲食プラットフォーム",
     "title": "あなたのプラットフォームで稼ぐ",
-    "subtitleLead": "あらゆる業種に対応",
+    "subtitleLead": "あらゆる業種のために作られています",
     "subtitle": "レジ・注文・予約をひとつのシステムに。",
     "ctaStartFree": "無料で始める",
     "ctaViewDemo": "デモを見る",
@@ -4879,6 +4879,9 @@
     "gridTrustLine": "インストール不要 · ブラウザですぐ体験 · 実店舗さながら",
     "gridDemoCta": "デモPOSを見る",
     "gridDemoShopCta": "デモオンラインショップを見る",
+    "gridDemoCafeCta": "カフェのデモを見る",
+    "gridDemoBakeryCta": "ベーカリーのデモを見る",
+    "gridDemoMenukaartCta": "デジタルメニューデモを見る",
     "detailCta": "無料で試す",
     "detailBack": "一覧に戻る",
     "notFoundTitle": "ページが見つかりません",

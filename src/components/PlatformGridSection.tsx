@@ -16,7 +16,13 @@ import {
 } from 'lucide-react'
 import { useLanguage } from '@/i18n'
 import { PLATFORM_PAGES } from '@/lib/platform-pages'
-import { DEMO_HERO_LIVE_URL, DEMO_ONLINE_SHOP_MENU_URL } from '@/lib/demo-links'
+import {
+  DEMO_BAKERY_MENU_URL,
+  DEMO_CAFE_MENU_URL,
+  DEMO_HERO_LIVE_URL,
+  DEMO_ONLINE_SHOP_MENU_URL,
+  DEMO_SHOWCASE_MENUKAART_URL,
+} from '@/lib/demo-links'
 
 const ICONS: Record<string, LucideIcon> = {
   kassasysteem: Store,
@@ -121,6 +127,32 @@ export default function PlatformGridSection() {
               className="inline-flex min-h-[48px] items-center justify-center rounded-full border-2 border-gray-900 bg-white px-6 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:min-w-[200px] sm:text-base"
             >
               {t('platform.gridDemoShopCta')}
+            </a>
+          </div>
+          <div className="mt-3 flex flex-col items-stretch justify-center gap-3 sm:mt-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-4">
+            <a
+              href={DEMO_CAFE_MENU_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-[48px] items-center justify-center rounded-full border-2 border-gray-900 bg-white px-6 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:min-w-[200px] sm:text-base"
+            >
+              {t('platform.gridDemoCafeCta')}
+            </a>
+            <a
+              href={DEMO_BAKERY_MENU_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-[48px] items-center justify-center rounded-full border-2 border-gray-900 bg-white px-6 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:min-w-[200px] sm:text-base"
+            >
+              {t('platform.gridDemoBakeryCta')}
+            </a>
+            <a
+              href={DEMO_SHOWCASE_MENUKAART_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-[48px] items-center justify-center rounded-full border-2 border-gray-900 bg-white px-6 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:min-w-[200px] sm:text-base"
+            >
+              {t('platform.gridDemoMenukaartCta')}
             </a>
           </div>
         </div>
