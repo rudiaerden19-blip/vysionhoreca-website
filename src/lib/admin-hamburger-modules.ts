@@ -74,6 +74,13 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
           labelKey: itemLabelKey('sm_orders_groepen'),
           href: `${baseUrl}/groepen`,
         },
+        {
+          id: 'sm_orders_school_shop',
+          icon: '🏫',
+          label: 'Schoolbestelling',
+          labelKey: itemLabelKey('sm_orders_school_shop'),
+          href: `${baseUrl}/groepen/school-shop`,
+        },
       ],
     },
     {
