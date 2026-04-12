@@ -2605,6 +2605,7 @@
     "statusRejected": "RIFIUTATO",
     "delivery": "Consegna",
     "pickup": "Ritiro",
+    "dineIn": "Al tavolo",
     "onlineOrder": "Ordine online",
     "paymentHeading": "Pagamento",
     "desiredTimeLabel": "Orario richiesto",

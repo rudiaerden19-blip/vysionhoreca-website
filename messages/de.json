@@ -2105,6 +2105,7 @@
     "statusRejected": "ABGELEHNT",
     "delivery": "Lieferung",
     "pickup": "Abholung",
+    "dineIn": "Vor Ort",
     "onlineOrder": "Online-Bestellung",
     "paymentHeading": "Zahlung",
     "desiredTimeLabel": "Gewünschter Zeitpunkt",

@@ -9,6 +9,7 @@ import { useLanguage } from '@/i18n'
 import Link from 'next/link'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
 import { getAdminKassaEntryHref } from '@/lib/tenant-modules'
+import { shopDisplayOrderTypeKey, nlBrowserPrintOrderTypeBanner } from '@/lib/shop-display-order-type'
 import { 
   activateAudioForIOS,
   prewarmAudio,
@@ -77,6 +78,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   
   // Translation helper for shopDisplay keys
   const tx = (key: string) => t(`shopDisplay.${key}`)
+  const orderTypeLabel = (orderType: string) => tx(shopDisplayOrderTypeKey(orderType))
   
   // Rejection reasons with translated labels
   const REJECTION_REASONS = [
@@ -630,7 +632,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
           <div class="divider"></div>
           
           <div class="order-number">#${order.order_number}</div>
-          <div class="order-type">${order.order_type === 'delivery' ? '🚗 LEVERING' : '🛍️ AFHALEN'}</div>
+          <div class="order-type">${nlBrowserPrintOrderTypeBanner(order.order_type)}</div>
           ${(order.scheduled_date || order.scheduled_time) ? `
           <div style="margin: 8px 0; padding: 6px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; text-align: center; font-weight: bold; font-size: 13px;">
             📅 ${order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''}${order.scheduled_time ? ' om ' + order.scheduled_time : ''}
@@ -714,7 +716,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
           <div class="header">
             <div style="font-size: 14px; font-weight: bold;">KEUKEN BON</div>
             <div class="order-number">#${order.order_number}</div>
-            <div class="order-type">${order.order_type === 'delivery' ? '🚗 LEVERING' : '🛍️ AFHALEN'}</div>
+            <div class="order-type">${nlBrowserPrintOrderTypeBanner(order.order_type)}</div>
             ${(order.scheduled_date || order.scheduled_time) ? `
             <div style="margin: 6px 0; padding: 5px; background: #000; color: #fff; font-size: 16px; font-weight: bold;">
               📅 ${order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit' }) : ''}${order.scheduled_time ? ' om ' + order.scheduled_time : ''}
@@ -1099,7 +1101,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                     <div className="px-3 py-2 bg-gray-50 border-b border-gray-100 text-center">
                       <div className="text-sm font-bold text-gray-900">{tx('onlineOrder')}</div>
                       <div className="text-xs text-gray-700 mt-0.5 leading-snug">
-                        {order.order_type === 'delivery' ? tx('delivery') : tx('pickup')}
+                        {orderTypeLabel(order.order_type)}
                         {schedLine ? ` · ${schedLine}` : ''}
                       </div>
                     </div>
@@ -1120,7 +1122,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                     <div className="flex flex-wrap items-center gap-1 mb-2">
                       {!isWebshopOrder(order) && (
                         <span className="px-2 py-0.5 rounded-md text-xs font-medium text-gray-700 bg-gray-100 border border-gray-200">
-                          {order.order_type === 'delivery' ? tx('delivery') : tx('pickup')}
+                          {orderTypeLabel(order.order_type)}
                         </span>
                       )}
                       <span className="px-2 py-0.5 rounded-md text-xs font-medium text-gray-700 bg-gray-100 border border-gray-200">
@@ -1199,7 +1201,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                     <p className="text-sm font-medium text-white/85 mt-1 uppercase tracking-wide">{getStatusLabel(selectedOrder.status)}</p>
                     {isWebshopOrder(selectedOrder) && (
                       <p className="text-sm text-white/90 mt-2 font-semibold leading-snug normal-case">
-                        {tx('onlineOrder')} · {selectedOrder.order_type === 'delivery' ? tx('delivery') : tx('pickup')}
+                        {tx('onlineOrder')} · {orderTypeLabel(selectedOrder.order_type)}
                         {selectedScheduleDetail ? ` · ${selectedScheduleDetail}` : ''}
                       </p>
                     )}
@@ -1251,7 +1253,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                   <div className="flex-1 rounded-lg p-3 text-center border border-gray-200 bg-white">
                     <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{tx('onlineOrder')}</p>
                     <p className="font-semibold text-gray-900 mt-1 leading-snug">
-                      {selectedOrder.order_type === 'delivery' ? tx('delivery') : tx('pickup')}
+                      {orderTypeLabel(selectedOrder.order_type)}
                     </p>
                   </div>
                   <div className="flex-1 rounded-lg p-3 text-center border border-gray-200 bg-white">

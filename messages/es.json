@@ -2605,6 +2605,7 @@
     "statusRejected": "RECHAZADO",
     "delivery": "Entrega",
     "pickup": "Recoger",
+    "dineIn": "En el local",
     "onlineOrder": "Pedido online",
     "paymentHeading": "Pago",
     "desiredTimeLabel": "Hora deseada",

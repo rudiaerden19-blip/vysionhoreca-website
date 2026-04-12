@@ -9,6 +9,7 @@ import { useLanguage } from '@/i18n'
 import Link from 'next/link'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
 import { getAdminKassaEntryHref } from '@/lib/tenant-modules'
+import { shopDisplayOrderTypeKey } from '@/lib/shop-display-order-type'
 import { 
   activateAudioForIOS,
   prewarmAudio,
@@ -448,10 +449,11 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   }
 
   const orderTypeLabelShort = (order: Order) => {
-    if (order.order_type === 'delivery' || order.order_type === 'DELIVERY') return `🚗 ${tx('delivery')}`
-    if (order.order_type === 'DINE_IN') return '🍽️ Ter plaatse'
-    if (order.order_type === 'TAKEAWAY') return '📦 Afhalen'
-    return `🛍️ ${tx('pickup')}`
+    const key = shopDisplayOrderTypeKey(order.order_type)
+    if (key === 'delivery') return `🚗 ${t('shopDisplay.delivery')}`
+    if (key === 'dineIn') return `🍽️ ${t('shopDisplay.dineIn')}`
+    if ((order.order_type || '').toString().toUpperCase() === 'TAKEAWAY') return `📦 ${t('shopDisplay.pickup')}`
+    return `🛍️ ${t('shopDisplay.pickup')}`
   }
 
   if (loading) {
@@ -606,9 +608,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                   <div className="px-3 py-2 bg-gray-50 border-b border-gray-100 text-center">
                     <div className="text-sm font-bold text-gray-900">{t('shopDisplay.onlineOrder')}</div>
                     <div className="text-xs sm:text-sm text-gray-700 mt-1 leading-snug">
-                      {(order.order_type === 'delivery' || order.order_type === 'DELIVERY')
-                        ? t('shopDisplay.delivery')
-                        : t('shopDisplay.pickup')}
+                      {t(`shopDisplay.${shopDisplayOrderTypeKey(order.order_type)}`)}
                       {schedLine ? ` · ${schedLine}` : ''}
                     </div>
                   </div>
@@ -720,10 +720,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                         if (!isWebshopOrder(selectedOrder)) {
                           return `${orderTypeLabelShort(selectedOrder)} · ${getTimeSince(selectedOrder.created_at)}`
                         }
-                        const ch =
-                          selectedOrder.order_type === 'delivery' || selectedOrder.order_type === 'DELIVERY'
-                            ? t('shopDisplay.delivery')
-                            : t('shopDisplay.pickup')
+                        const ch = t(`shopDisplay.${shopDisplayOrderTypeKey(selectedOrder.order_type)}`)
                         return `${t('shopDisplay.onlineOrder')} · ${ch}${sched ? ` · ${sched}` : ''}`
                       })()}
                     </p>

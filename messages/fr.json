@@ -2105,6 +2105,7 @@
     "statusRejected": "REFUSÉ",
     "delivery": "Livraison",
     "pickup": "À emporter",
+    "dineIn": "Sur place",
     "onlineOrder": "Commande en ligne",
     "paymentHeading": "Paiement",
     "desiredTimeLabel": "Heure souhaitée",

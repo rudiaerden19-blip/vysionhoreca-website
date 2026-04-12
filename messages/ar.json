@@ -2605,6 +2605,7 @@
     "statusRejected": "مرفوض",
     "delivery": "توصيل",
     "pickup": "استلام",
+    "dineIn": "داخل المطعم",
     "onlineOrder": "طلب عبر الإنترنت",
     "paymentHeading": "الدفع",
     "desiredTimeLabel": "الوقت المطلوب",

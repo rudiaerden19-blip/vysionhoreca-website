@@ -2866,6 +2866,7 @@
     "statusRejected": "GEWEIGERD",
     "delivery": "Levering",
     "pickup": "Afhalen",
+    "dineIn": "Ter plaatse",
     "onlineOrder": "Online bestelling",
     "paymentHeading": "Betaling",
     "desiredTimeLabel": "Gewenst tijdstip",

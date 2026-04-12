@@ -2605,6 +2605,7 @@
     "statusRejected": "已拒绝",
     "delivery": "配送",
     "pickup": "自取",
+    "dineIn": "堂食",
     "onlineOrder": "在线订单",
     "paymentHeading": "付款",
     "desiredTimeLabel": "期望时间",

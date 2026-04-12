@@ -2866,6 +2866,7 @@
     "statusRejected": "REJECTED",
     "delivery": "Delivery",
     "pickup": "Pickup",
+    "dineIn": "Dine in",
     "onlineOrder": "Online order",
     "paymentHeading": "Payment",
     "desiredTimeLabel": "Requested time",

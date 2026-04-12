@@ -2605,6 +2605,7 @@
     "statusRejected": "拒否",
     "delivery": "配達",
     "pickup": "テイクアウト",
+    "dineIn": "店内",
     "onlineOrder": "オンライン注文",
     "paymentHeading": "お支払い",
     "desiredTimeLabel": "ご希望の日時",
