@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { readSchoolShopSession, clearSchoolShopSession, type SchoolShopSession } from '@/lib/school-shop-session'
 import { isKioskSearchParams, kioskShopHref } from '@/lib/kiosk-mode'
 import {
   getTenantSettings,
@@ -55,7 +54,6 @@ export default function CheckoutPageClient({
 }) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const schoolWeekParam = searchParams.get('school_week')
   const isKiosk = initialKiosk || isKioskSearchParams(searchParams)
   const shop = (key: Parameters<typeof kioskShopHref>[1]) =>
     kioskShopHref(params.tenant, key, { kiosk: isKiosk, shortUrls: shortKioskUrls })
@@ -92,8 +90,6 @@ export default function CheckoutPageClient({
   const [whatsappPhone, setWhatsappPhone] = useState<string | null>(null) // Phone from WhatsApp link
   const [businessWhatsApp, setBusinessWhatsApp] = useState<string>('') // Business WhatsApp number
   const [radiusConfirmed] = useState(true)
-  const [schoolShopCtx, setSchoolShopCtx] = useState<SchoolShopSession | null>(null)
-  const [schoolClass, setSchoolClass] = useState('')
 
   const primaryColor = tenantSettings?.primary_color || '#FF6B35'
   
@@ -131,34 +127,9 @@ export default function CheckoutPageClient({
 
   useEffect(() => {
     loadData()
+    loadCart()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
-
-  useEffect(() => {
-    if (!schoolWeekParam) {
-      setSchoolShopCtx(null)
-      loadCartPlain()
-      return
-    }
-    const sess = readSchoolShopSession(params.tenant)
-    if (!sess || sess.weekId !== schoolWeekParam) {
-      router.replace(`/shop/${params.tenant}/school-shop`)
-      return
-    }
-    setSchoolShopCtx(sess)
-    const raw = localStorage.getItem(`cart_${params.tenant}`)
-    if (!raw) {
-      setCart([])
-      return
-    }
-    try {
-      const parsed = JSON.parse(raw) as CartItem[]
-      const allowed = new Set(sess.productIds)
-      setCart(parsed.filter((c) => allowed.has(c.id)))
-    } catch {
-      setCart([])
-    }
-  }, [params.tenant, schoolWeekParam, router])
 
   function firstAvailableScheduledDate(status: ShopStatus | null, closings: ExceptionalClosing[]): string {
     const todayB = getBelgiumDateString()
@@ -233,7 +204,8 @@ export default function CheckoutPageClient({
     setLoading(false)
   }
 
-  function loadCartPlain() {
+  function loadCart() {
+    // Load cart from localStorage
     const savedCart = localStorage.getItem(`cart_${params.tenant}`)
     if (savedCart) {
       try {
@@ -271,20 +243,6 @@ export default function CheckoutPageClient({
   const discount = promoDiscount
   const total = subtotal + deliveryFee - discount
 
-  const schoolOrderPastDeadline =
-    !!schoolShopCtx && Date.now() >= new Date(schoolShopCtx.orderDeadline).getTime()
-
-  const hasSchoolOnlinePayment =
-    !!schoolShopCtx &&
-    ['bancontact', 'visa', 'mastercard', 'paypal', 'ideal'].some((m) =>
-      enabledPaymentMethods.includes(m)
-    )
-
-  useEffect(() => {
-    if (!schoolShopCtx) return
-    if (hasSchoolOnlinePayment) setPaymentMethod('online')
-  }, [schoolShopCtx, hasSchoolOnlinePayment])
-
   const canSubmit = () => {
     if (!customerInfo.name || !customerInfo.phone) return false
     if (orderType === 'delivery' && (!customerInfo.address || !customerInfo.postal_code || !customerInfo.city)) return false
@@ -295,12 +253,6 @@ export default function CheckoutPageClient({
     if (orderType === 'delivery' && deliverySettings?.min_order_amount && subtotal < deliverySettings.min_order_amount) return false
     // Radius bevestiging verplicht bij bezorging
     if (orderType === 'delivery' && !radiusConfirmed) return false
-    if (schoolOrderPastDeadline) return false
-    if (schoolShopCtx) {
-      if (!schoolClass.trim()) return false
-      if (!hasSchoolOnlinePayment) return false
-      if (paymentMethod === 'cash') return false
-    }
     return true
   }
 
@@ -311,10 +263,6 @@ export default function CheckoutPageClient({
       return t('checkoutPage.dateInClosingPeriod')
     if (!customerInfo.name) return t('checkoutPage.fillName')
     if (!customerInfo.phone) return t('checkoutPage.fillPhone')
-    if (schoolOrderPastDeadline) return t('schoolShop.menuClosed')
-    if (schoolShopCtx && !schoolClass.trim()) return t('schoolShop.errorFillClass')
-    if (schoolShopCtx && !hasSchoolOnlinePayment) return t('schoolShop.errorNoOnlinePayment')
-    if (schoolShopCtx && paymentMethod === 'cash') return t('schoolShop.errorSchoolOnline')
     if (orderType === 'delivery') {
       if (!customerInfo.address) return t('checkoutPage.fillAddress')
       if (!customerInfo.postal_code) return t('checkoutPage.fillPostalCode')
@@ -382,30 +330,6 @@ export default function CheckoutPageClient({
     setSubmitting(true)
     
     try {
-      if (schoolShopCtx) {
-        if (Date.now() >= new Date(schoolShopCtx.orderDeadline).getTime()) {
-          alert(t('schoolShop.menuClosed'))
-          setSubmitting(false)
-          return
-        }
-        const vr = await fetch('/api/school-shop/validate-order', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            tenant_slug: params.tenant,
-            week_id: schoolShopCtx.weekId,
-            access_code: schoolShopCtx.accessCode,
-            items: cart.map((c) => ({ id: c.id, name: c.name, quantity: c.quantity })),
-          }),
-        })
-        if (!vr.ok) {
-          const j = (await vr.json().catch(() => ({}))) as { error?: string }
-          alert(j.error || t('checkoutPage.somethingWentWrong'))
-          setSubmitting(false)
-          return
-        }
-      }
-
       // Get next order number for this tenant
       // We need the HIGHEST valid order number, not just the most recent
       const { data: orders } = await supabase
@@ -449,15 +373,7 @@ export default function CheckoutPageClient({
           customer_email: customerInfo.email || null,
           customer_phone: customerInfo.phone,
           customer_address: orderType === 'delivery' ? `${customerInfo.address}, ${customerInfo.postal_code} ${customerInfo.city}` : null,
-          customer_notes: (() => {
-            const tail = (customerInfo.notes || '').trim()
-            if (schoolShopCtx) {
-              const head = `Klas: ${schoolClass.trim()}`
-              return tail ? `${head}\n${tail}` : head
-            }
-            return tail || null
-          })(),
-          school_shop_week_id: schoolShopCtx?.weekId ?? null,
+          customer_notes: customerInfo.notes || null,
           order_type: orderType,
           scheduled_date: scheduledDate || null,  // Date for pickup/delivery
           scheduled_time: scheduledTime || null,  // Time for pickup/delivery
@@ -504,7 +420,6 @@ export default function CheckoutPageClient({
       
       // Voor online betalingen (bancontact/kaart): doorsturen naar Stripe
       const isOnlinePayment = paymentMethod !== 'cash'
-      let redirectedToStripe = false
       if (isOnlinePayment) {
         try {
           const stripeRes = await fetch('/api/stripe/create-checkout', {
@@ -520,20 +435,13 @@ export default function CheckoutPageClient({
           const stripeData = await stripeRes.json()
           if (stripeData.url) {
             localStorage.removeItem(`cart_${params.tenant}`)
-            if (schoolShopCtx) clearSchoolShopSession(params.tenant)
             window.location.href = stripeData.url
-            redirectedToStripe = true
             return
           }
+          // Als Stripe niet geconfigureerd is, gewoon doorgaan als cash
         } catch {
-          // Stripe niet beschikbaar
+          // Stripe niet beschikbaar, doorgaan zonder
         }
-      }
-
-      if (schoolShopCtx && isOnlinePayment && !redirectedToStripe) {
-        alert(t('schoolShop.stripeRequired'))
-        setSubmitting(false)
-        return
       }
 
       // IMPORTANT: Set success state FIRST before anything else
@@ -542,10 +450,6 @@ export default function CheckoutPageClient({
       
       // Then clear cart from localStorage (state blijft zodat we geen "empty cart" zien)
       localStorage.removeItem(`cart_${params.tenant}`)
-      if (schoolShopCtx) {
-        clearSchoolShopSession(params.tenant)
-        setSchoolShopCtx(null)
-      }
       
       // Send WhatsApp confirmation and redirect back to WhatsApp
       if (customerInfo.phone) {
@@ -659,15 +563,6 @@ export default function CheckoutPageClient({
     )
   }
 
-  const todayBrussels = getBelgiumDateString()
-  const minDatePicker = shopStatus?.canOrder ? todayBrussels : addDaysToBelgiumYMD(todayBrussels, 1)
-  const maxDatePicker = addDaysToBelgiumYMD(todayBrussels, 30)
-
-  const shopMenuHref =
-    schoolShopCtx && !schoolOrderPastDeadline
-      ? `${shop('menu')}${shop('menu').includes('?') ? '&' : '?'}school_week=${encodeURIComponent(schoolShopCtx.weekId)}`
-      : shop('menu')
-
   // Empty cart
   if (cart.length === 0) {
     return (
@@ -677,7 +572,7 @@ export default function CheckoutPageClient({
           <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('checkoutPage.emptyCart')}</h1>
           <p className="text-gray-500 mb-6">{t('checkoutPage.emptyCartDesc')}</p>
           <Link
-            href={shopMenuHref}
+            href={shop('menu')}
             style={{ backgroundColor: primaryColor }}
             className="inline-block text-white font-bold py-4 px-8 rounded-2xl hover:opacity-90 transition-colors"
           >
@@ -688,6 +583,10 @@ export default function CheckoutPageClient({
     )
   }
 
+  const todayBrussels = getBelgiumDateString()
+  const minDatePicker = shopStatus?.canOrder ? todayBrussels : addDaysToBelgiumYMD(todayBrussels, 1)
+  const maxDatePicker = addDaysToBelgiumYMD(todayBrussels, 30)
+
   return (
     <div
       style={{ width: '100vw', maxWidth: '100vw', overflowX: 'clip' }}
@@ -697,7 +596,7 @@ export default function CheckoutPageClient({
       <header className="sticky top-0 z-50 bg-white shadow-sm">
         <div className="px-4 py-3 flex items-center justify-between max-w-2xl mx-auto">
           <Link
-            href={shopMenuHref}
+            href={shop('menu')}
             className="flex items-center gap-1.5 text-gray-500 hover:text-gray-700 transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -719,30 +618,6 @@ export default function CheckoutPageClient({
         <div className="space-y-4 sm:space-y-6">
           {/* Left Column - Forms */}
           <div className="space-y-4 sm:space-y-6">
-            {schoolShopCtx && (
-              <div
-                className={`rounded-xl border p-4 text-sm ${
-                  schoolOrderPastDeadline
-                    ? 'border-red-200 bg-red-50 text-red-900'
-                    : 'border-amber-200 bg-amber-50 text-amber-950'
-                }`}
-              >
-                {schoolOrderPastDeadline
-                  ? t('schoolShop.menuClosed')
-                  : t('schoolShop.menuBanner')
-                      .replace('{title}', schoolShopCtx.title)
-                      .replace(
-                        '{deadline}',
-                        new Date(schoolShopCtx.orderDeadline).toLocaleString(undefined, {
-                          weekday: 'long',
-                          day: 'numeric',
-                          month: 'long',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })
-                      )}
-              </div>
-            )}
             {/* Order Type */}
             <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
               <h2 className="text-lg font-bold text-gray-900 mb-4">{t('checkoutPage.howReceiveOrder')}</h2>
@@ -910,21 +785,6 @@ export default function CheckoutPageClient({
                   </div>
                 </div>
 
-                {schoolShopCtx && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t('schoolShop.checkoutClass')} <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={schoolClass}
-                      onChange={(e) => setSchoolClass(e.target.value)}
-                      placeholder={t('schoolShop.checkoutClassPlaceholder')}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all"
-                    />
-                  </div>
-                )}
-
                 {orderType === 'delivery' && (
                   <>
                     <div>
@@ -984,7 +844,7 @@ export default function CheckoutPageClient({
               <h2 className="text-lg font-bold text-gray-900 mb-4">{t('checkoutPage.paymentMethod')}</h2>
               <div className="grid grid-cols-2 gap-2 sm:gap-4">
                 {/* Cash optie - alleen tonen als ingeschakeld */}
-                {enabledPaymentMethods.includes('cash') && !schoolShopCtx && (
+                {enabledPaymentMethods.includes('cash') && (
                   <button
                     onClick={() => setPaymentMethod('cash')}
                     style={paymentMethod === 'cash' ? { borderColor: primaryColor, backgroundColor: `${primaryColor}10` } : {}}

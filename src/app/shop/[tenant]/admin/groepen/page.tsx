@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { getAuthHeaders } from '@/lib/auth-headers'
@@ -211,14 +210,6 @@ export default function GroupsPage({ params }: { params: { tenant: string } }) {
           {t('groupsModule.groups.newGroup')}
         </button>
       </div>
-
-      <Link
-        href={`/shop/${params.tenant}/admin/groepen/school-shop`}
-        className="mb-6 block rounded-2xl border border-indigo-200 bg-indigo-50 p-4 hover:bg-indigo-100/80 transition-colors"
-      >
-        <div className="font-semibold text-indigo-900">{t('schoolShop.groupsCardTitle')}</div>
-        <p className="text-sm text-indigo-800 mt-1">{t('schoolShop.groupsCardDesc')}</p>
-      </Link>
 
       {loading ? (
         <div className="text-center py-12">

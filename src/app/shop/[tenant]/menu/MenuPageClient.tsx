@@ -7,7 +7,6 @@ import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { isKioskSearchParams, kioskShopHref } from '@/lib/kiosk-mode'
 import { getMenuCategories, getMenuProducts, getAllMenuProductOptionsForTenant, getTenantSettings, getActivePromotions, getExceptionalClosings, ExceptionalClosing, MenuCategory, MenuProduct, ProductOption, ProductOptionChoice, Promotion } from '@/lib/admin-api'
-import { readSchoolShopSession, type SchoolShopSession } from '@/lib/school-shop-session'
 import { useLanguage } from '@/i18n'
 
 const VoiceOrderButton = dynamic(() => import('@/components/VoiceOrderButton'), { ssr: false })
@@ -238,19 +237,15 @@ export default function MenuPageClient({
 }) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const schoolWeekParam = searchParams.get('school_week')
   const isKiosk = initialKiosk || isKioskSearchParams(searchParams)
   /** Tafelkiosk: minder netwerk, DOM en GPU-belasting */
   const lite = isKiosk
   const shop = (key: Parameters<typeof kioskShopHref>[1]) =>
     kioskShopHref(params.tenant, key, { kiosk: isKiosk, shortUrls: shortKioskUrls })
   const { t, locale, setLocale, locales, localeNames, localeFlags } = useLanguage()
-  const schoolDeadlineLocale =
-    locale === 'nl' ? 'nl-BE' : locale === 'ar' ? 'ar' : locale === 'zh' ? 'zh-CN' : locale
   const [showLanguageMenu, setShowLanguageMenu] = useState(false)
   const [categories, setCategories] = useState<MenuCategory[]>([])
   const [menuItems, setMenuItems] = useState<MenuItem[]>([])
-  const [schoolSession, setSchoolSession] = useState<SchoolShopSession | null>(null)
   const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState<string>('')
   const [cart, setCart] = useState<CartItem[]>([])
@@ -274,25 +269,6 @@ export default function MenuPageClient({
   const isScrollingToSection = useRef(false)
   const activeCategoryRef = useRef(activeCategory)
   activeCategoryRef.current = activeCategory
-
-  useEffect(() => {
-    if (!schoolWeekParam) {
-      setSchoolSession(null)
-      return
-    }
-    const s = readSchoolShopSession(params.tenant)
-    if (!s || s.weekId !== schoolWeekParam) {
-      router.replace(`/shop/${params.tenant}/school-shop`)
-      return
-    }
-    setSchoolSession(s)
-  }, [schoolWeekParam, params.tenant, router])
-
-  useEffect(() => {
-    if (!schoolSession) return
-    const allowed = new Set(schoolSession.productIds)
-    setCart((prev) => prev.filter((c) => allowed.has(c.item.id)))
-  }, [schoolSession])
 
   // Fetch manual offline status (kiosk: iets uitstellen zodat menu-data eerst de main thread krijgt)
   useEffect(() => {
@@ -358,6 +334,43 @@ export default function MenuPageClient({
       }
     }
   }, [params.tenant, setLocale])
+
+  // Scroll spy - update active category (lage prioriteit zodat tikken voorrang hebben)
+  useEffect(() => {
+    const handleScroll = () => {
+      if (isScrollingToSection.current) return
+
+      const headerHeight = 130
+      let currentSection = ''
+
+      sectionRefs.current.forEach((el, categoryId) => {
+        const rect = el.getBoundingClientRect()
+        if (rect.top <= headerHeight + 50 && rect.bottom > headerHeight) {
+          currentSection = categoryId
+        }
+      })
+
+      if (currentSection && currentSection !== activeCategoryRef.current) {
+        startTransition(() => setActiveCategory(currentSection))
+      }
+    }
+
+    let ticking = false
+    const scrollListener = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          handleScroll()
+          ticking = false
+        })
+        ticking = true
+      }
+    }
+
+    window.addEventListener('scroll', scrollListener, { passive: true })
+    handleScroll()
+
+    return () => window.removeEventListener('scroll', scrollListener)
+  }, [categories, promotions])
 
   // Handler voor categorie klikken - scrollt naar sectie
   const handleCategoryChange = (categoryId: string) => {
@@ -544,11 +557,7 @@ export default function MenuPageClient({
 
   const addToCart = () => {
     if (!selectedItem) return
-    if (schoolSession) {
-      if (Date.now() >= new Date(schoolSession.orderDeadline).getTime()) return
-      if (!schoolSession.productIds.includes(selectedItem.id)) return
-    }
-
+    
     // Build selected options array
     const selectedOpts: { option: ProductOption; choice: ProductOptionChoice }[] = []
     productOptions.forEach(option => {
@@ -600,42 +609,6 @@ export default function MenuPageClient({
   const cartTotal = cart.reduce((sum, c) => sum + (c.totalPrice * c.quantity), 0)
   const cartCount = cart.reduce((sum, c) => sum + c.quantity, 0)
 
-  const schoolAllowedSet = useMemo(() => {
-    if (!schoolSession?.productIds?.length) return null
-    return new Set(schoolSession.productIds)
-  }, [schoolSession])
-
-  const visibleMenuItems = useMemo(() => {
-    if (!schoolAllowedSet) return menuItems
-    return menuItems.filter((i) => schoolAllowedSet.has(i.id))
-  }, [menuItems, schoolAllowedSet])
-
-  const schoolDeadlinePassed = useMemo(
-    () => !!(schoolSession && Date.now() >= new Date(schoolSession.orderDeadline).getTime()),
-    [schoolSession]
-  )
-
-  const onProductSelect = useCallback(
-    (item: MenuItem) => {
-      if (schoolSession) {
-        if (schoolDeadlinePassed) return
-        if (!schoolAllowedSet?.has(item.id)) return
-      }
-      selectProduct(item)
-    },
-    [schoolSession, schoolDeadlinePassed, schoolAllowedSet, selectProduct]
-  )
-
-  const goToCheckout = useCallback(() => {
-    const base = kioskShopHref(params.tenant, 'checkout', { kiosk: isKiosk, shortUrls: shortKioskUrls })
-    if (schoolSession && !schoolDeadlinePassed) {
-      const sep = base.includes('?') ? '&' : '?'
-      router.push(`${base}${sep}school_week=${encodeURIComponent(schoolSession.weekId)}`)
-    } else {
-      router.push(base)
-    }
-  }, [schoolSession, schoolDeadlinePassed, router, params.tenant, isKiosk, shortKioskUrls])
-
   const productsWithOptionsSet = useMemo(() => new Set(productsWithOptions), [productsWithOptions])
 
   // Theme classes voor dark mode
@@ -659,43 +632,6 @@ export default function MenuPageClient({
     text: theme.text,
     textLight: theme.textLight,
   }), [theme.card, theme.imageBg, theme.text, theme.textLight])
-
-  // Scroll spy - na visibleMenuItems (schoolfilter) zodat secties kloppen
-  useEffect(() => {
-    const handleScroll = () => {
-      if (isScrollingToSection.current) return
-
-      const headerHeight = 130
-      let currentSection = ''
-
-      sectionRefs.current.forEach((el, categoryId) => {
-        const rect = el.getBoundingClientRect()
-        if (rect.top <= headerHeight + 50 && rect.bottom > headerHeight) {
-          currentSection = categoryId
-        }
-      })
-
-      if (currentSection && currentSection !== activeCategoryRef.current) {
-        startTransition(() => setActiveCategory(currentSection))
-      }
-    }
-
-    let ticking = false
-    const scrollListener = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          handleScroll()
-          ticking = false
-        })
-        ticking = true
-      }
-    }
-
-    window.addEventListener('scroll', scrollListener, { passive: true })
-    handleScroll()
-
-    return () => window.removeEventListener('scroll', scrollListener)
-  }, [categories, promotions, visibleMenuItems])
 
   if (loading) {
     return (
@@ -811,42 +747,10 @@ export default function MenuPageClient({
           </div>
         )}
 
-        {schoolSession && (
-          <div className={`border-b ${theme.border}`}>
-            <div className="max-w-4xl mx-auto px-3 sm:px-4 py-2">
-              <div
-                className={`rounded-lg px-3 py-2 text-xs sm:text-sm font-medium leading-snug ${
-                  schoolDeadlinePassed ? 'bg-red-50 text-red-900 border border-red-200' : ''
-                }`}
-                style={
-                  schoolDeadlinePassed
-                    ? undefined
-                    : { backgroundColor: primaryColor + '28', borderLeft: `4px solid ${primaryColor}` }
-                }
-              >
-                {schoolDeadlinePassed
-                  ? t('schoolShop.menuClosed')
-                  : t('schoolShop.menuBanner')
-                      .replace('{title}', schoolSession.title)
-                      .replace(
-                        '{deadline}',
-                        new Date(schoolSession.orderDeadline).toLocaleString(schoolDeadlineLocale, {
-                          weekday: 'long',
-                          day: 'numeric',
-                          month: 'long',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })
-                      )}
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Categories Bar */}
         <div className="max-w-4xl mx-auto px-4">
           <div className={`flex ${lite ? 'gap-3' : 'gap-2'} py-3 overflow-x-auto scrollbar-hide`} style={{ WebkitOverflowScrolling: 'touch' }}>
-            {!schoolSession && promotionsEnabled && promotions.length > 0 && (
+            {promotionsEnabled && promotions.length > 0 && (
               <button
                 onClick={() => handleCategoryChange('promo')}
                 className={`rounded-full font-medium whitespace-nowrap touch-manipulation ${lite ? 'min-h-[52px] px-6 py-3 text-base active:opacity-90' : 'px-5 py-2.5 transition-colors active:scale-95 shadow-[0_4px_14px_rgba(0,0,0,0.35)]'} ${
@@ -858,7 +762,7 @@ export default function MenuPageClient({
                 🎁 {t('menuPage.promotions')}
               </button>
             )}
-            {visibleMenuItems.some(i => i.is_popular) && (
+            {menuItems.some(i => i.is_popular) && (
               <button
                 onClick={() => handleCategoryChange('popular')}
                 style={activeCategory === 'popular' ? { backgroundColor: primaryColor } : {}}
@@ -893,7 +797,7 @@ export default function MenuPageClient({
       <div ref={menuContentRef} className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8 pb-28 sm:pb-32 space-y-8">
 
         {/* Promoties sectie */}
-        {!schoolSession && promotionsEnabled && promotions.length > 0 && (
+        {promotionsEnabled && promotions.length > 0 && (
           <section 
             ref={setSectionRef('promo')} 
             data-category-id="promo"
@@ -909,8 +813,8 @@ export default function MenuPageClient({
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
               {promotions.map((promo) => {
-                const linkedProduct = promo.product_id
-                  ? visibleMenuItems.find((item) => item.id === promo.product_id)
+                const linkedProduct = promo.product_id 
+                  ? menuItems.find(item => item.id === promo.product_id)
                   : null
                 const promoPrice = promo.type === 'fixedPrice' ? promo.value : 
                                    promo.type === 'percentage' && linkedProduct ? linkedProduct.price * (1 - promo.value / 100) :
@@ -966,7 +870,7 @@ export default function MenuPageClient({
         )}
 
         {/* Populair sectie */}
-        {visibleMenuItems.some(i => i.is_popular) && (
+        {menuItems.some(i => i.is_popular) && (
           <section 
             ref={setSectionRef('popular')} 
             data-category-id="popular"
@@ -981,7 +885,7 @@ export default function MenuPageClient({
               </div>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
-              {visibleMenuItems.filter(i => i.is_popular).map((item) => (
+              {menuItems.filter(i => i.is_popular).map((item) => (
                 <MenuProductCard
                   key={`popular-${item.id}`}
                   item={item}
@@ -989,7 +893,7 @@ export default function MenuPageClient({
                   primaryColor={primaryColor}
                   theme={cardTheme}
                   hasLinkedOptions={productsWithOptionsSet.has(item.id)}
-                  onSelect={onProductSelect}
+                  onSelect={selectProduct}
                   t={t}
                   lite={lite}
                 />
@@ -1000,7 +904,7 @@ export default function MenuPageClient({
 
         {/* Categorie secties */}
         {categories.map((category) => {
-          const categoryItems = visibleMenuItems.filter(i => i.category_id === category.id)
+          const categoryItems = menuItems.filter(i => i.category_id === category.id)
           if (categoryItems.length === 0) return null
           return (
             <section 
@@ -1024,7 +928,7 @@ export default function MenuPageClient({
                     primaryColor={primaryColor}
                     theme={cardTheme}
                     hasLinkedOptions={productsWithOptionsSet.has(item.id)}
-                    onSelect={onProductSelect}
+                    onSelect={selectProduct}
                     t={t}
                     lite={lite}
                   />
@@ -1035,7 +939,7 @@ export default function MenuPageClient({
         })}
 
         {/* Geen producten message */}
-        {visibleMenuItems.length === 0 && promotions.length === 0 && (
+        {menuItems.length === 0 && promotions.length === 0 && (
           <div className="text-center py-20">
             <span className="text-6xl mb-4 block">🍟</span>
             <h2 className={`text-2xl font-bold ${theme.text} mb-2`}>{t('menuPage.noProducts')}</h2>
@@ -1191,19 +1095,8 @@ export default function MenuPageClient({
                 <button
                   type="button"
                   onClick={addToCart}
-                  disabled={
-                    !selectedItem.is_available ||
-                    !canAddToCart() ||
-                    (!!schoolSession && schoolDeadlinePassed)
-                  }
-                  style={{
-                    backgroundColor:
-                      selectedItem.is_available &&
-                      canAddToCart() &&
-                      !(schoolSession && schoolDeadlinePassed)
-                        ? primaryColor
-                        : undefined,
-                  }}
+                  disabled={!selectedItem.is_available || !canAddToCart()}
+                  style={{ backgroundColor: selectedItem.is_available && canAddToCart() ? primaryColor : undefined }}
                   className={`w-full disabled:bg-gray-300 text-white font-bold rounded-2xl transition-colors flex items-center justify-center gap-2 hover:opacity-90 touch-manipulation ${lite ? 'py-5 text-lg min-h-[58px]' : 'py-4'}`}
                 >
                   <span>🛒</span>
@@ -1216,9 +1109,9 @@ export default function MenuPageClient({
       )}
 
       {/* Voice Order — zwaar op zwakke tablets; uit op kiosk */}
-      {!lite && !schoolSession && (
+      {!lite && (
       <VoiceOrderButton
-        products={visibleMenuItems.map(item => ({
+        products={menuItems.map(item => ({
           id: item.id,
           name: item.name,
           price: item.price,
@@ -1230,7 +1123,7 @@ export default function MenuPageClient({
         onOrderConfirmed={(items) => {
           // Add matched products to cart
           items.forEach(matchedItem => {
-            const menuItem = visibleMenuItems.find(m => m.id === matchedItem.product_id)
+            const menuItem = menuItems.find(m => m.id === matchedItem.product_id)
             if (menuItem) {
               // Combine modifications and extras into notes
               const noteParts: string[] = []
@@ -1252,7 +1145,9 @@ export default function MenuPageClient({
             }
           })
         }}
-        onGoToCheckout={goToCheckout}
+        onGoToCheckout={() => {
+          router.push(shop('checkout'))
+        }}
         translations={{
           listening: 'Luisteren...',
           processing: 'Verwerken...',
@@ -1382,9 +1277,8 @@ export default function MenuPageClient({
                     type="button"
                     onClick={() => {
                       setCartOpen(false)
-                      goToCheckout()
+                      router.push(shop('checkout'))
                     }}
-                    disabled={!!schoolSession && schoolDeadlinePassed}
                     style={{ backgroundColor: primaryColor }}
                     className={`w-full text-white font-bold rounded-2xl transition-colors hover:opacity-90 touch-manipulation ${lite ? 'py-5 text-lg min-h-[58px]' : 'py-4'}`}
                   >
