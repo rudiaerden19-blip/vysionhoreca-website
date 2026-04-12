@@ -497,6 +497,11 @@
         "quote": "I've never had such a fast POS system. They even update overnight - I just press OK in the morning and the features I requested are already there!",
         "author": "James T.",
         "role": "Fish & Chips Owner"
+      },
+      "7": {
+        "quote": "我的面包店里从未有过如此快速的收银机。起初我不相信24个月后硬件会归我所有，但整整24个月后，我收到了明确提示：恭喜，硬件收银机及配件现已成为您的财产。",
+        "author": "Bakkerij de Vliet",
+        "role": "面包店"
       }
     }
   },
