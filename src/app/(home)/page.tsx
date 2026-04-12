@@ -1127,6 +1127,8 @@ function IndustrySection() {
 
   const current = industries[activeTab]
   const hasMultipleImages = current.images.length > 1
+  const industryTabLabel = t(`industry.${activeTab}.tab`)
+  const industryAltBase = `${t('industry.imageAltPrefix')} ${industryTabLabel}`
 
   const openLightbox = (index: number) => {
     setLightboxIndex(index)
@@ -1214,7 +1216,7 @@ function IndustrySection() {
                     >
                       <Image
                         src={img}
-                        alt={`${t(`industry.${activeTab}.tab`)} ${idx + 1}`}
+                        alt={`${industryAltBase} (${idx + 1})`}
                         fill
                         sizes="(max-width: 1024px) 33vw, 200px"
                         loading="lazy"
@@ -1253,7 +1255,7 @@ function IndustrySection() {
               /* Single image for other tabs */
               <Image
                 src={current.images[0]}
-                alt={activeTab}
+                alt={industryAltBase}
                 width={900}
                 height={1200}
                 sizes="(min-width: 1024px) 660px, 90vw"
@@ -1291,7 +1293,7 @@ function IndustrySection() {
             >
               <Image
                 src={current.images[lightboxIndex]}
-                alt={activeTab}
+                alt={`${industryAltBase} — ${lightboxIndex + 1} / ${current.images.length}`}
                 fill
                 sizes="100vw"
                 priority

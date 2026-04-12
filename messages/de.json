@@ -413,6 +413,7 @@
   },
   "industry": {
     "sectionTitle": "Extra in Ihrem Abonnement enthalten",
+    "imageAltPrefix": "Vysion Kassenlayout für",
     "invoicing": {
       "tab": "Rechnungsstellung",
       "title": "Schnelle und professionelle Rechnungsstellung.",
@@ -5431,6 +5432,49 @@
       "sm_rpt_populair": "Beliebte Artikel",
       "sm_inst_betaling": "Zahlungsarten",
       "sm_abonnement": "Abonnement"
+    }
+  },
+  "sectorPages": {
+    "breadcrumb": "Branchen",
+    "bakkerij": {
+      "h1": "Schnellstes Kassensystem für Bäckereien | i5-Power & 9 Sprachen | Vysion",
+      "intro": "Bäckerei-Layout: Intel i5 („Das Biest“) für Morgenspitzen, 9 Sprachen fürs Team, nach 24 Monaten gehört die Hardware Ihnen — das Kassensystem Belgien und die Niederlande.",
+      "body1": "Sie wollen die schnellste Kasse bei Brunch und Wochenendstress? Touchscreen-POS, Bondrucker, Software ohne Hänger. Kasse kaufen oder leasen: ein Paket, klare Kosten.",
+      "body2": "Für Bäcker mit Fokus auf Tempo und Marge. Eigentum nach 24 Monaten statt endloses Mieten — belgisches Kassensystem zum Dranbleiben.",
+      "imageAlt": "Vysion Kassenlayout für Bäckerei",
+      "cta": "Kostenlos starten"
+    },
+    "horecaSnack": {
+      "h1": "Gastro-Kasse für Café, Imbiss & Kebab | Vysion All-in-One",
+      "intro": "Schnell bestellen und kassieren: i5-Hardware, 9 Sprachen, Margenkontrolle — die Gastro-Kasse für Café, Frittenbude, Kebab und Sandwichbar.",
+      "body1": "Nachtschicht oder Mittagsansturm: die schnellste Kasse an der Theke. Kasse kaufen mit Software, Hardware und Online-Bestellplattform — ideal als Kassensystem Belgien.",
+      "body2": "Von Sandwich bis Kebab: Bestellungen, Bestand, Zahlung im Blick. Kostenlos testen und i5-Leistung statt langsamer Kassen spüren.",
+      "imageAlt": "Vysion Kassenlayout für Café, Imbiss und Kebab",
+      "cta": "Kostenlos starten"
+    },
+    "kapper": {
+      "h1": "Kassensystem für Friseur & Salon | Stilvoll & schnell | Vysion",
+      "intro": "Upgrade für Ihren Salon: professionelle i5-Kasse, schnelles Bezahlen, 9 Sprachen, nach 24 Monaten gehört die Hardware Ihnen.",
+      "body1": "Keine Schlange an der Rezeption während voller Stühle. Schnellste Kassenabwicklung, klare Kauf-/Mietmodelle — Kassensystem Belgien & Niederlande.",
+      "body2": "Termine, Verkauf und Trinkgeld in einem Überblick. Vysion gratis testen — stilvolle, schnelle Kasse mit Premium-Hardware.",
+      "imageAlt": "Vysion Kassenlayout für Friseur und Salon",
+      "cta": "Kostenlos starten"
+    },
+    "retail": {
+      "h1": "Retail-Kasse & Bestand | Das i5-„Biest“ für Shops | Vysion",
+      "intro": "Bestand auf leistungsstarker i5-Hardware (8 GB RAM), Touchscreen-POS und Website-Integration — Retail-Kasse, die mitwächst.",
+      "body1": "Schnelle Retail-Kasse: Bestand und Verkauf auf einem Bildschirm. Kasse kaufen mit Margen- und Tempo-Fokus — Kassensystem Belgien für Läden.",
+      "body2": "Vom Barcode bis Tagesabschluss: weniger Fehler, mehr Tempo. Eigentum nach 24 Monaten — Schluss mit nutzlosem Mieten.",
+      "imageAlt": "Vysion Kassenlayout für Retail und Laden",
+      "cta": "Kostenlos starten"
+    },
+    "hardwarePlatform": {
+      "h1": "Gratis Online-Plattform & i5-Kassenhardware | Das Vysion-Angebot",
+      "intro": "High-End-i5-Kasse, 44 Videoanleitungen, 9 Sprachen, Hardware-Eigentum nach 24 Monaten — aufhören, sinnlos zu mieten.",
+      "body1": "Online-Bestellplattform, Webshop und Kasse vereint. Kasse kaufen oder mit klarem Abo starten — schnellste Kasse dank i5 und SSD.",
+      "body2": "Kostenlos testen, transparente Preise, Kassensystem Belgien & Niederlande für Wachstum — das Vysion-Angebot entdecken.",
+      "imageAlt": "Vysion Kassenlayout für Hardware und Plattform",
+      "cta": "Kostenlos starten"
     }
   }
 }

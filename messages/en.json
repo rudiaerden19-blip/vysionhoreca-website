@@ -694,6 +694,7 @@
   },
   "industry": {
     "sectionTitle": "Extra included in your subscription",
+    "imageAltPrefix": "Vysion POS layout for",
     "invoicing": {
       "tab": "Invoicing",
       "title": "Fast and professional invoicing.",
@@ -5365,6 +5366,49 @@
       "sm_rpt_populair": "Popular items",
       "sm_inst_betaling": "Payment methods",
       "sm_abonnement": "Subscription"
+    }
+  },
+  "sectorPages": {
+    "breadcrumb": "Sectors",
+    "bakkerij": {
+      "h1": "Fastest POS for Bakeries | i5 Power & 9 Languages | Vysion",
+      "intro": "Bakery-focused checkout layout: Intel i5 ('The Beast') for morning rush speed, 9 languages for your team, and you own the hardware after 24 months — the POS system Belgium and the Netherlands rely on.",
+      "body1": "Need the fastest checkout for busy brunch and weekend peaks? Touchscreen POS, receipt printer and software that stay responsive. Buying a POS or leasing stays clear: one package, no install surprises.",
+      "body2": "Built for bakers who care about margin and pace. Ownership after 24 months beats renting forever — the Belgium POS platform you can grow on.",
+      "imageAlt": "Vysion POS layout for bakery",
+      "cta": "Start free — 14-day trial"
+    },
+    "horecaSnack": {
+      "h1": "Hospitality POS for Café, Chip Shop & Kebab | Vysion All-in-One",
+      "intro": "Fast order and payment flow: i5 hardware, 9 languages for multilingual crews, margin control — the hospitality POS for cafés, chip shops, kebab and sandwich bars.",
+      "body1": "Late-night rush or lunch peak: you want the fastest checkout. Buy a POS with software, hardware and online ordering in one stack — ideal as a Belgium POS for dine-in and takeaway.",
+      "body2": "From sandwich bar to kebab: keep orders, stock and payments in view. Try free and feel why founders pick i5 power over sluggish kit.",
+      "imageAlt": "Vysion POS layout for café, chip shop and kebab",
+      "cta": "Start free"
+    },
+    "kapper": {
+      "h1": "POS for Hair Salons | Stylish & Fast | Vysion",
+      "intro": "Give your salon the upgrade: professional i5 POS, smooth payments, 9 languages for your team, and you own the hardware after 24 months.",
+      "body1": "No queues at the desk while chairs are full. The fastest checkout flow keeps your day on track. Buy or lease a POS with clear terms — Belgium & Netherlands salons.",
+      "body2": "Combine appointments, retail and tips in one view. Try Vysion free and discover stylish, fast checkout with premium hardware.",
+      "imageAlt": "Vysion POS layout for hair salon",
+      "cta": "Start free"
+    },
+    "retail": {
+      "h1": "Retail POS & Stock Control | The i5 'Beast' for Shops | Vysion",
+      "intro": "Run stock on powerful i5 hardware (8 GB RAM), touchscreen POS and free website integration — retail checkout that scales with you.",
+      "body1": "Want a fast retail POS? Merge stock and sales on one screen. Buying a POS with margin insight and queue speed — the Belgium retail system for shops.",
+      "body2": "From barcode to closing: fewer errors, more speed. Own premium hardware after 24 months — stop renting without upside.",
+      "imageAlt": "Vysion POS layout for retail and shops",
+      "cta": "Start free"
+    },
+    "hardwarePlatform": {
+      "h1": "Free Online Platform & i5 POS Hardware | The Vysion Deal",
+      "intro": "Built for operators: high-end i5 POS, 44 video tutorials, 9 languages, and hardware ownership after 24 months — stop pointless renting.",
+      "body1": "Combine online ordering, webshop and checkout in one ecosystem. Buy a POS or start on a clear plan — fastest checkout with i5 and SSD.",
+      "body2": "Free trial, transparent pricing, and the Belgium & Netherlands POS platform founders pick for growth — discover the Vysion deal.",
+      "imageAlt": "Vysion POS layout for hardware and platform",
+      "cta": "Start free"
     }
   }
 }
