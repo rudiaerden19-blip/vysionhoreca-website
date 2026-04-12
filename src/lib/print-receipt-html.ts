@@ -351,3 +351,174 @@ export function printReceiptHtmlDocument(html: string): void {
     }, 800)
   }
 }
+
+/** Minimale order-vorm voor `/api/print-proxy` en lokale :3001 print-server (zelfde als onlinescherm). */
+export type KassaThermalOrderPayload = {
+  order_number: number
+  customer_name: string
+  customer_phone?: string
+  customer_email?: string
+  customer_address?: string
+  order_type: string
+  payment_status: string
+  payment_method: string
+  items: Array<{
+    quantity: number
+    product_name: string
+    name: string
+    price: number
+    total_price: number
+    options?: Array<{ name: string; price?: number }>
+  }>
+  subtotal: number
+  delivery_fee: number
+  discount: number
+  total: number
+  tax: number
+  notes: string | null
+  created_at: string
+}
+
+export type KassaThermalBusinessPayload = {
+  name?: string
+  address?: string
+  city?: string
+  postalCode?: string
+  phone?: string
+  email?: string
+  btw_number?: string
+  btw_percentage: number
+}
+
+export function buildKassaThermalOrderPayload(opts: {
+  orderNumber: number
+  customerName: string
+  orderType: string
+  paymentMethod: string
+  subtotal: number
+  tax: number
+  total: number
+  notes: string | null
+  createdAtIso: string
+  items: Array<{
+    product: { name: string; price: number }
+    quantity: number
+    choices?: Array<{ choiceName: string; price: number }>
+  }>
+}): KassaThermalOrderPayload {
+  const items = opts.items.map((i) => {
+    const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
+    const unit = i.product.price + choicesTotal
+    const total_price = unit * i.quantity
+    return {
+      quantity: i.quantity,
+      product_name: i.product.name,
+      name: i.product.name,
+      price: unit,
+      total_price,
+      options: (i.choices || []).map((c) => ({ name: c.choiceName, price: c.price })),
+    }
+  })
+  return {
+    order_number: opts.orderNumber,
+    customer_name: opts.customerName,
+    order_type: opts.orderType,
+    payment_status: 'paid',
+    payment_method: opts.paymentMethod,
+    items,
+    subtotal: opts.subtotal,
+    delivery_fee: 0,
+    discount: 0,
+    total: opts.total,
+    tax: opts.tax,
+    notes: opts.notes,
+    created_at: opts.createdAtIso,
+  }
+}
+
+/** Zelfde pad als onlinescherm: Vercel/host → `/api/print-proxy` → `http://{ip}:3001/print` (werkt enkel als de server het LAN-IP kan bereiken, bv. self-hosted). */
+export async function tryKassaCustomerThermalViaProxy(opts: {
+  printerIP: string
+  order: KassaThermalOrderPayload
+  businessInfo: KassaThermalBusinessPayload
+}): Promise<boolean> {
+  try {
+    const response = await fetch('/api/print-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        printerIP: opts.printerIP,
+        order: opts.order,
+        businessInfo: opts.businessInfo,
+        printType: 'customer',
+      }),
+    })
+    const data = (await response.json()) as { success?: boolean }
+    return response.ok && !!data.success
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Probeer rechtstreeks vanuit de browser naar `http://{printerIP}:3001/print` (lokale print-server / iPad-app).
+ * Werkt alleen als de pagina **niet** mixed-content blokkeert (typisch: site over HTTP op hetzelfde LAN, of speciale kiosk-setup).
+ * Vanaf HTTPS naar een privé-IP blokkeert de browser dit meestal — dan val je terug op HTML-print.
+ */
+export async function tryKassaCustomerThermalDirectLan(opts: {
+  printerIP: string
+  order: KassaThermalOrderPayload
+  businessInfo: KassaThermalBusinessPayload
+}): Promise<boolean> {
+  try {
+    const response = await fetch(`http://${opts.printerIP}:3001/print`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        order: opts.order,
+        businessInfo: opts.businessInfo,
+        printType: 'customer',
+      }),
+    })
+    if (!response.ok) return false
+    try {
+      const data = (await response.json()) as { success?: boolean }
+      return !!data.success
+    } catch {
+      return response.ok
+    }
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Volgorde: bij offline eerst direct LAN (als ingesteld), online via print-proxy, anders HTML-bon.
+ */
+export async function printKassaReceiptThermalThenHtml(opts: {
+  printerIP: string | null
+  isOnline: boolean
+  htmlReceipt: string
+  order: KassaThermalOrderPayload
+  businessInfo: KassaThermalBusinessPayload
+}): Promise<void> {
+  const ip = opts.printerIP?.trim()
+  if (ip) {
+    if (!opts.isOnline) {
+      const okDirect = await tryKassaCustomerThermalDirectLan({
+        printerIP: ip,
+        order: opts.order,
+        businessInfo: opts.businessInfo,
+      })
+      if (okDirect) return
+    } else {
+      const okProxy = await tryKassaCustomerThermalViaProxy({
+        printerIP: ip,
+        order: opts.order,
+        businessInfo: opts.businessInfo,
+      })
+      if (okProxy) return
+    }
+  }
+  printReceiptHtmlDocument(opts.htmlReceipt)
+}

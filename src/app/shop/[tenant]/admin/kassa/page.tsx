@@ -31,12 +31,19 @@ import {
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
 import {
   appLocaleToBcp47,
+  buildKassaThermalOrderPayload,
   escapeReceiptHtml,
   getSavedLanPrinterIp,
   KASSA_PRINT_RECEIPT_STYLES,
-  printReceiptHtmlDocument,
+  printKassaReceiptThermalThenHtml,
   printStaffSalesSummaryReceipt,
 } from '@/lib/print-receipt-html'
+import {
+  offlineDbGetOrderQueue,
+  offlineDbLoadMenuSnapshot,
+  offlineDbSaveMenuSnapshot,
+  offlineDbSetOrderQueue,
+} from '@/lib/kassa-offline-db'
 import PostTrialModulePickerModal from '@/components/PostTrialModulePickerModal'
 import { AccountMenuSessionBlock } from '@/components/AccountMenuSessionBlock'
 import {
@@ -247,6 +254,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [numpadValue, setNumpadValue] = useState('')
   const [soundsOn, setSoundsOn] = useState(true)
   const [isOnline, setIsOnline] = useState<boolean | null>(null)
+  const flushOfflineOrdersRef = useRef<() => Promise<void>>(async () => {})
   const [langOpen, setLangOpen] = useState(false)
   const langRef = useRef<HTMLDivElement>(null)
   /** Alleen bij product/opties: toon korte popup als verkoopmedewerker verplicht is. */
@@ -764,7 +772,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const loadMenu = async () => {
     setMenuLoading(true)
 
-    // Laad meteen uit cache als beschikbaar (ook als online – snellere first render)
+    // 1) IndexedDB (meest recente snapshot na eerdere sessie)
+    try {
+      const snap = await offlineDbLoadMenuSnapshot(tenant)
+      if (snap) {
+        setCategories(JSON.parse(snap.categoriesJson))
+        setProducts(JSON.parse(snap.productsJson))
+        setProductsWithOptions(JSON.parse(snap.productsWithOptionsJson))
+        setMenuLoading(false)
+      }
+    } catch {
+      /* ignore */
+    }
+
+    // 2) localStorage-cache (legacy / migratie)
     try {
       const cachedCats = localStorage.getItem(CACHE_CATS)
       const cachedProds = localStorage.getItem(CACHE_PRODS)
@@ -775,9 +796,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         setProductsWithOptions(JSON.parse(cachedOpts))
         setMenuLoading(false)
       }
-    } catch { /* geen geldige cache */ }
+    } catch {
+      /* geen geldige cache */
+    }
 
-    // Probeer van Supabase te laden (ook als we net uit cache laadden: refresh op achtergrond)
+    // 3) Supabase (online refresh)
     try {
       const [cats, prods, withOpts] = await Promise.all([
         getMenuCategories(tenant),
@@ -789,12 +812,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       setCategories(activeCats)
       setProducts(activeProds)
       setProductsWithOptions(withOpts)
-      // Cache opslaan voor offline gebruik
-      localStorage.setItem(CACHE_CATS, JSON.stringify(activeCats))
-      localStorage.setItem(CACHE_PRODS, JSON.stringify(activeProds))
-      localStorage.setItem(CACHE_OPTS, JSON.stringify(withOpts))
+      const catsJson = JSON.stringify(activeCats)
+      const prodsJson = JSON.stringify(activeProds)
+      const optsJson = JSON.stringify(withOpts)
+      localStorage.setItem(CACHE_CATS, catsJson)
+      localStorage.setItem(CACHE_PRODS, prodsJson)
+      localStorage.setItem(CACHE_OPTS, optsJson)
+      void offlineDbSaveMenuSnapshot(tenant, {
+        categoriesJson: catsJson,
+        productsJson: prodsJson,
+        productsWithOptionsJson: optsJson,
+      })
     } catch {
-      // Netwerkfout – cache is al geladen hierboven, geen extra actie nodig
+      // Netwerkfout – cache hierboven is voldoende
     }
     setMenuLoading(false)
   }
@@ -1082,52 +1112,102 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const offlineQueueKey = `vysion_offline_orders_${tenant}`
 
-  // Retry offline queue bij reconnect
-  // Web Locks API zorgt dat bij meerdere open tabs slechts 1 tab de wachtrij verwerkt.
-  // De andere tab wacht, ziet daarna een lege wachtrij en doet niets.
-  useEffect(() => {
-    const retryQueue = async () => {
-      const raw = localStorage.getItem(offlineQueueKey)
-      if (!raw) return
-      try {
-        const queue: object[] = JSON.parse(raw)
-        if (queue.length === 0) return
-
-        const processQueue = async () => {
-          // Lees wachtrij opnieuw binnen het slot (andere tab kan hem al leeg gemaakt hebben)
-          const freshRaw = localStorage.getItem(offlineQueueKey)
-          if (!freshRaw) return
-          const freshQueue: object[] = JSON.parse(freshRaw)
-          if (freshQueue.length === 0) return
-
-          const remaining: object[] = []
-          for (const order of freshQueue) {
-            const { error } = await supabase.from('orders').insert(order)
-            if (error) {
-              remaining.push(order)
-            } else {
-              const o = order as { tenant_slug?: string; created_at?: string }
-              if (o.tenant_slug && o.created_at) {
-                void syncZReportAfterOrder(o.tenant_slug, o.created_at)
-              }
-            }
-          }
-          localStorage.setItem(offlineQueueKey, JSON.stringify(remaining))
-        }
-
-        // Web Locks API beschikbaar (alle moderne browsers)
-        if ('locks' in navigator) {
-          await (navigator as any).locks.request(`vysion_queue_${tenant}`, processQueue)
-        } else {
-          // Fallback zonder locking (enkeltab-scenario of oudere browser)
-          await processQueue()
-        }
-      } catch { /* empty */ }
+  const mergeOfflineQueues = useCallback(async (): Promise<object[]> => {
+    let fromIdb: object[] = []
+    try {
+      fromIdb = await offlineDbGetOrderQueue(tenant)
+    } catch {
+      fromIdb = []
     }
-    window.addEventListener('online', retryQueue)
-    retryQueue() // ook bij pagina laden
-    return () => window.removeEventListener('online', retryQueue)
+    let fromLs: object[] = []
+    const raw = localStorage.getItem(offlineQueueKey)
+    if (raw) {
+      try {
+        fromLs = JSON.parse(raw)
+      } catch {
+        fromLs = []
+      }
+    }
+    const byOrderNum = new Map<number, object>()
+    for (const o of [...fromLs, ...fromIdb]) {
+      const n = (o as { order_number?: number }).order_number
+      if (typeof n === 'number') byOrderNum.set(n, o)
+    }
+    const merged = [...byOrderNum.values()]
+    if (merged.length > 0) {
+      try {
+        await offlineDbSetOrderQueue(tenant, merged)
+        localStorage.setItem(offlineQueueKey, JSON.stringify(merged))
+      } catch {
+        /* ignore */
+      }
+    }
+    return merged
   }, [tenant, offlineQueueKey])
+
+  /** IndexedDB + localStorage wachtrij naar Supabase; Web Locks = één tab tegelijk. */
+  const flushOfflineOrders = useCallback(async () => {
+    const processQueue = async () => {
+      const freshQueue = await mergeOfflineQueues()
+      if (freshQueue.length === 0) return
+
+      const remaining: object[] = []
+      for (const order of freshQueue) {
+        const { error } = await supabase.from('orders').insert(order)
+        if (error) {
+          remaining.push(order)
+        } else {
+          const o = order as { tenant_slug?: string; created_at?: string }
+          if (o.tenant_slug && o.created_at) {
+            void syncZReportAfterOrder(o.tenant_slug, o.created_at)
+          }
+        }
+      }
+      try {
+        await offlineDbSetOrderQueue(tenant, remaining)
+        localStorage.setItem(offlineQueueKey, JSON.stringify(remaining))
+      } catch {
+        /* ignore */
+      }
+    }
+
+    try {
+      if ('locks' in navigator) {
+        await (navigator as any).locks.request(`vysion_queue_${tenant}`, processQueue)
+      } else {
+        await processQueue()
+      }
+    } catch {
+      /* empty */
+    }
+  }, [tenant, mergeOfflineQueues, offlineQueueKey])
+
+  useEffect(() => {
+    flushOfflineOrdersRef.current = flushOfflineOrders
+  }, [flushOfflineOrders])
+
+  // Retry offline queue bij reconnect + bij laden; Background Sync stuurt ook flush via postMessage
+  useEffect(() => {
+    const onOnline = () => void flushOfflineOrdersRef.current()
+    window.addEventListener('online', onOnline)
+    void flushOfflineOrdersRef.current()
+    return () => window.removeEventListener('online', onOnline)
+  }, [tenant])
+
+  useEffect(() => {
+    const sw = navigator.serviceWorker
+    if (!sw?.addEventListener) return
+    const handler = (ev: MessageEvent) => {
+      if (ev.data?.type === 'VYSION_FLUSH_OFFLINE_ORDERS') void flushOfflineOrdersRef.current()
+    }
+    sw.addEventListener('message', handler as EventListener)
+    return () => sw.removeEventListener('message', handler as EventListener)
+  }, [])
+
+  useEffect(() => {
+    if (typeof navigator === 'undefined' || !navigator.storage?.persist) return
+    void navigator.storage.persist().catch(() => {})
+  }, [tenant])
 
   const clearTableAfterPayment = (tblNr: string) => {
     const updated = { ...tableOrders }
@@ -1214,22 +1294,31 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       const isNetworkError = !navigator.onLine || error.message?.includes('fetch') || error.message?.includes('network')
       if (isNetworkError) {
         // Gebruik Web Locks om race conditions bij gelijktijdige tabs te voorkomen
-        const addToQueue = () => {
-          const raw = localStorage.getItem(offlineQueueKey)
-          const queue = raw ? JSON.parse(raw) : []
-          // Dubbele order voorkomen (zelfde order_number al in wachtrij?)
+        const addToQueue = async () => {
+          const queue = await mergeOfflineQueues()
           if (!queue.some((o: any) => o.order_number === orderPayload.order_number)) {
             queue.push(orderPayload)
+            await offlineDbSetOrderQueue(tenant, queue)
             localStorage.setItem(offlineQueueKey, JSON.stringify(queue))
+          }
+          try {
+            const reg = await navigator.serviceWorker?.ready
+            if (reg && 'sync' in reg) {
+              await (reg as ServiceWorkerRegistration & { sync: { register: (tag: string) => Promise<void> } }).sync.register(
+                'vysion-offline-orders',
+              )
+            }
+          } catch {
+            /* Background Sync niet ondersteund (Safari) — online-event doet flush */
           }
         }
         if ('locks' in navigator) {
           await (navigator as any).locks.request(`vysion_queue_${tenant}`, async () => addToQueue())
         } else {
-          addToQueue()
+          await addToQueue()
         }
         alert(
-          t('kassaApp.offlineOrderQueuedAlert').replace('{orderNumber}', String(orderNumber)),
+          `${t('kassaApp.offlineModeActive')}\n\n${t('kassaApp.offlineOrderQueuedAlert').replace('{orderNumber}', String(orderNumber))}`,
         )
       } else {
         console.error('Supabase order insert error:', error)
@@ -1259,7 +1348,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setShowSuccessModal(true)
   }
 
-  const printReceipt = (order: typeof lastOrder) => {
+  const printReceipt = async (order: typeof lastOrder) => {
     if (!order) return
     const vatRate = tenantInfo?.btw_percentage ?? 6
     const subtotal = order.total / (1 + vatRate / 100)
@@ -1324,7 +1413,43 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       </div>
     </body></html>`
 
-    printReceiptHtmlDocument(html)
+    const thermalOrder = buildKassaThermalOrderPayload({
+      orderNumber: order.orderNumber,
+      customerName:
+        order.tableNumber != null && order.tableNumber !== ''
+          ? t('kassaReceipt.tableLabel').replace(/\{number\}/g, String(order.tableNumber))
+          : t('kassaApp.walkInCustomerName'),
+      orderType: order.orderType,
+      paymentMethod: order.paymentMethod,
+      subtotal,
+      tax,
+      total: order.total,
+      notes: order.tableNumber
+        ? t('kassaReceipt.tableLabel').replace(/\{number\}/g, String(order.tableNumber))
+        : null,
+      createdAtIso: order.createdAt.toISOString(),
+      items: order.items,
+    })
+
+    const biz = tenantInfo
+    const businessInfo = {
+      name: biz?.business_name,
+      address: biz?.address,
+      city: biz?.city,
+      postalCode: biz?.postal_code,
+      phone: biz?.phone,
+      email: biz?.email,
+      btw_number: biz?.btw_number,
+      btw_percentage: biz?.btw_percentage ?? 6,
+    }
+
+    await printKassaReceiptThermalThenHtml({
+      printerIP: getSavedLanPrinterIp(tenant),
+      isOnline: isOnline === true,
+      htmlReceipt: html,
+      order: thermalOrder,
+      businessInfo,
+    })
   }
 
   const printStaffClockSalesSummary = async () => {
@@ -1724,6 +1849,24 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           {soundsOn ? '🔔' : '🔕'}
         </button>
 
+        {isOnline !== null && (
+          <div
+            className={`flex max-w-[10rem] items-center gap-1 rounded-lg px-2 py-1.5 text-[11px] font-bold leading-tight sm:max-w-none sm:text-xs ${
+              isOnline ? 'bg-emerald-600/95 text-white' : 'bg-red-600/95 text-white'
+            }`}
+            title={isOnline ? t('kassaApp.onlineModeLiveTitle') : t('kassaApp.offlineModeActive')}
+            role="status"
+            aria-live="polite"
+          >
+            <span className="text-base leading-none" aria-hidden>
+              ☁️
+            </span>
+            <span className="line-clamp-2 sm:line-clamp-1">
+              {isOnline ? t('kassaApp.onlineModeLive') : t('kassaApp.offlineModeActive')}
+            </span>
+          </div>
+        )}
+
         {activeKassaStaff && !demoViewOnly && (
           <div className="hidden sm:flex items-center gap-1.5 max-w-[10rem] md:max-w-xs rounded-lg bg-emerald-600/90 text-white text-xs font-bold px-2 py-1.5">
             <span className="truncate" title={activeKassaStaff.name}>
@@ -1774,9 +1917,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
       {/* ── Offline / PWA banner ── */}
       {isOnline === false && (
-        <div className="flex-shrink-0 bg-red-600 text-white text-xs font-semibold flex items-center justify-center gap-2 py-1 px-4">
-          <span>📴</span>
-          <span>{t('kassaApp.offlineBanner')}</span>
+        <div className="flex-shrink-0 bg-red-700 text-white text-xs font-semibold flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-1.5 px-4 text-center">
+          <span className="font-bold">{t('kassaApp.offlineModeActive')}</span>
+          <span className="opacity-95 font-normal">{t('kassaApp.offlineBanner')}</span>
         </div>
       )}
       {installPrompt && !isInstalled && (
@@ -2853,7 +2996,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <div className="p-4 border-t flex gap-3">
                 <button
                   type="button"
-                  onClick={() => { printReceipt(lastOrder); setShowSuccessModal(false) }}
+                  onClick={() => {
+                    void printReceipt(lastOrder).finally(() => setShowSuccessModal(false))
+                  }}
                   className="flex-1 py-3 rounded-xl bg-gray-100 font-semibold text-gray-700 flex items-center justify-center gap-2 touch-manipulation min-h-[44px]"
                 >
                   🖨️ {t('kassaReceipt.print')}

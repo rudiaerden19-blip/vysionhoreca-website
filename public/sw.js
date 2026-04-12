@@ -1,22 +1,53 @@
 // Vysion Kassa – Service Worker
-// Zorgt voor offline werking van de kassa app + cache van productafbeeldingen (externe URL's)
+// Offline: kassa-app + statische assets + sector-marketingpagina’s; productafbeeldingen (externe URL's)
 
-const CACHE = 'vysion-kassa-v10'
-const STATIC_CACHE = 'vysion-static-v10'
-const IMAGE_CACHE = 'vysion-images-v2'
+const CACHE = 'vysion-kassa-v11'
+const STATIC_CACHE = 'vysion-static-v11'
+const IMAGE_CACHE = 'vysion-images-v3'
 
-// Bij installatie: skip waiting zodat de nieuwe SW meteen actief wordt
-self.addEventListener('install', () => self.skipWaiting())
+/** Eerste install: marketing-sectoren + start zodat PWA na één online bezoek ook zonder net start. */
+const PRECACHE_SAME_ORIGIN = [
+  '/',
+  '/manifest.json',
+  '/manifest',
+  '/favicon.svg',
+  '/sectoren/bakkerij',
+  '/sectoren/cafe',
+  '/sectoren/frituur',
+  '/sectoren/kebab',
+  '/sectoren/kapper',
+  '/sectoren/retail',
+]
 
-// Bij activatie: oude caches verwijderen + clients overnemen
+self.addEventListener('install', event => {
+  event.waitUntil(
+    (async () => {
+      try {
+        const cache = await caches.open(STATIC_CACHE)
+        await Promise.all(
+          PRECACHE_SAME_ORIGIN.map(url =>
+            fetch(url, { credentials: 'same-origin' })
+              .then(r => {
+                if (r.ok) return cache.put(url, r.clone())
+              })
+              .catch(() => {})
+          )
+        )
+      } catch {
+        /* precache is best-effort */
+      }
+      await self.skipWaiting()
+    })()
+  )
+})
+
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(
-        keys
-          .filter(k => k !== CACHE && k !== STATIC_CACHE && k !== IMAGE_CACHE)
-          .map(k => caches.delete(k))
-      ))
+    caches
+      .keys()
+      .then(keys =>
+        Promise.all(keys.filter(k => k !== CACHE && k !== STATIC_CACHE && k !== IMAGE_CACHE).map(k => caches.delete(k)))
+      )
       .then(() => self.clients.claim())
   )
 })
@@ -25,7 +56,6 @@ function isSupabaseHost(hostname) {
   return hostname.includes('supabase.co') || hostname.includes('supabase.in')
 }
 
-/** Supabase REST/Auth/etc.: niet via SW — alleen Storage-objecten cachen we als afbeelding. */
 function isSupabaseNonStorageRequest(url) {
   return isSupabaseHost(url.hostname) && !url.pathname.includes('/storage/v1/')
 }
@@ -45,7 +75,6 @@ function shouldStoreImageResponse(url, request, response) {
   return false
 }
 
-/** Externe GET: cache-first in IMAGE_CACHE; alleen afbeeldingen wegschrijven. */
 function cacheFirstExternalImage(request, url) {
   return caches.open(IMAGE_CACHE).then(cache =>
     cache.match(request).then(cached => {
@@ -62,29 +91,40 @@ function cacheFirstExternalImage(request, url) {
   )
 }
 
+/** Background Sync: client-tab krijgt flush-opdracht (Supabase zit in de pagina, niet in de SW). */
+self.addEventListener('sync', event => {
+  if (event.tag === 'vysion-offline-orders') {
+    event.waitUntil(
+      self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clients => {
+        clients.forEach(c => {
+          try {
+            c.postMessage({ type: 'VYSION_FLUSH_OFFLINE_ORDERS' })
+          } catch {
+            /* ignore */
+          }
+        })
+      })
+    )
+  }
+})
+
 self.addEventListener('fetch', event => {
   const { request } = event
   const url = new URL(request.url)
 
-  // Alleen GET-verzoeken via http(s)
   if (request.method !== 'GET' || !url.protocol.startsWith('http')) return
 
-  // Supabase API / auth: altijd live, niet cachen
   if (isSupabaseNonStorageRequest(url)) return
 
-  // QR-service: nooit via SW (cache-first brak SVG/QR op shop-landingspagina’s)
   if (url.hostname === 'api.qrserver.com' || url.hostname.endsWith('.qrserver.com')) return
 
-  // Externe hosts: cache-first voor afbeeldingen (Supabase Storage, CDN, prefetch, …)
   if (url.hostname !== self.location.hostname) {
     event.respondWith(cacheFirstExternalImage(request, url))
     return
   }
 
-  // Eigen API-routes: altijd live
   if (url.pathname.startsWith('/api/')) return
 
-  // Next.js build assets: network-first — cache-first liet oude superadmin-JS eeuwig zien na deploy
   if (url.pathname.startsWith('/_next/static/') || url.pathname.startsWith('/_next/image')) {
     event.respondWith(
       fetch(request)
@@ -103,7 +143,6 @@ self.addEventListener('fetch', event => {
     return
   }
 
-  // Statische publieke bestanden: cache-first
   if (
     url.pathname === '/manifest.json' ||
     url.pathname === '/manifest' ||
@@ -126,13 +165,11 @@ self.addEventListener('fetch', event => {
     return
   }
 
-  // Platform superadmin: NOOIT via SW cachen — oude HTML/JS gaf "ontbrekende knoppen" na deploy
   if (url.pathname === '/superadmin' || url.pathname.startsWith('/superadmin/')) {
     event.respondWith(fetch(request, { cache: 'no-store' }))
     return
   }
 
-  // App-pagina's (kassa, admin, shop): network-first → cache als fallback
   event.respondWith(
     fetch(request)
       .then(response => {
@@ -144,7 +181,6 @@ self.addEventListener('fetch', event => {
       .catch(() =>
         caches.match(request).then(cached => {
           if (cached) return cached
-          // Fallback offline-pagina
           return new Response(
             `<!DOCTYPE html>
 <html lang="nl">
@@ -164,7 +200,7 @@ self.addEventListener('fetch', event => {
   <h1>📴</h1>
   <h2>Offline</h2>
   <p>Geen internetverbinding. Zodra u terug online bent, wordt de kassa automatisch herladen.</p>
-  <p>Offline bestellingen worden bewaard en automatisch verstuurd bij reconnect.</p>
+  <p>Offline bestellingen worden bewaard en automatisch verstuurd bij reconnect (of via achtergrond-sync).</p>
   <div class="badge">Vysion Kassa</div>
   <button onclick="location.reload()">↺ Opnieuw proberen</button>
 </body>
