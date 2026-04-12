@@ -4874,6 +4874,9 @@
   },
   "vysionBeest": {
     "imageAlt": "TPV Vysion de doble pantalla: frontal, pantalla cliente y vista lateral",
+    "imageAlt1": "TPV táctil de doble pantalla, vista frontal",
+    "imageAlt2": "TPV de doble pantalla con pantalla cliente, vista de escritorio",
+    "imageAlt3": "Vista general: tres ángulos del terminal, doble pantalla y base",
     "eyebrow": "La bestia Vysion",
     "headline": "La « bestia » Vysion: máxima potencia, propiedad total",
     "intro": "Elija hardware que no solo acelere su negocio, sino que, tras 24 meses, sea de verdad **su propiedad**. Sin alquiler interminable: una inversión en el futuro de su empresa.",

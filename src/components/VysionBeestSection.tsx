@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { Fragment } from 'react'
 import { useLanguage } from '@/i18n'
 
@@ -21,14 +22,13 @@ function InlineBold({ text }: { text: string }) {
   )
 }
 
-const BEEST_PRODUCT_SRC = '/images/vysion-beest-product.png'
+const BEEST_IMAGES = ['/images/vysion-beest-1.png', '/images/vysion-beest-2.png', '/images/vysion-beest-3.png'] as const
 
-/** Horizontale composite (3 weergaven) → drie verticale stroken, elk goed zichtbaar. */
-const BEEST_STRIP_POSITIONS = ['0%', '50%', '100%'] as const
+const BEEST_ALT_KEYS = ['vysionBeest.imageAlt1', 'vysionBeest.imageAlt2', 'vysionBeest.imageAlt3'] as const
 
 /**
  * Marketing: hardware-USP tussen gratis-websitebanner en platformgrid.
- * Productbeeld: `/public/images/vysion-beest-product.png` (driedubbele productweergave).
+ * Drie losse productfoto’s (`vysion-beest-1..3.png`), gelijk formaat kader, onder elkaar.
  */
 export default function VysionBeestSection() {
   const { t } = useLanguage()
@@ -41,23 +41,21 @@ export default function VysionBeestSection() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-2 lg:gap-12 xl:gap-16">
           <div className="order-2 mx-auto w-full max-w-xl lg:order-1 lg:mx-0 lg:max-w-none lg:pr-2">
-            <div
-              className="flex flex-col gap-4 sm:gap-5"
-              role="group"
-              aria-label={t('vysionBeest.imageAlt')}
-            >
-              {BEEST_STRIP_POSITIONS.map((pos, i) => (
+            <div className="flex flex-col gap-4 sm:gap-5">
+              {BEEST_IMAGES.map((src, i) => (
                 <div
-                  key={i}
-                  className="relative w-full min-h-[220px] overflow-hidden rounded-xl bg-gray-50 ring-1 ring-gray-100 shadow-sm sm:min-h-[260px] md:min-h-[280px] lg:min-h-[240px] xl:min-h-[280px]"
-                  style={{
-                    backgroundImage: `url(${BEEST_PRODUCT_SRC})`,
-                    backgroundSize: '300% 100%',
-                    backgroundPosition: `${pos} center`,
-                    backgroundRepeat: 'no-repeat',
-                  }}
-                  aria-hidden
-                />
+                  key={src}
+                  className="relative aspect-[5/4] w-full overflow-hidden rounded-xl bg-gray-50 ring-1 ring-gray-100 shadow-sm"
+                >
+                  <Image
+                    src={src}
+                    alt={t(BEEST_ALT_KEYS[i])}
+                    fill
+                    sizes="(min-width: 1024px) 42vw, (min-width: 640px) 90vw, 100vw"
+                    className="object-contain object-center p-3 sm:p-4"
+                    priority={i === 0}
+                  />
+                </div>
               ))}
             </div>
           </div>
