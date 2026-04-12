@@ -2997,7 +2997,10 @@
     "cancel": "Cancel",
     "rejected": "Rejected",
     "justNow": "Just now",
-    "min": "min"
+    "min": "min",
+    "printerInvalidIp": "Enter a valid local IPv4 address (e.g. 192.168.1.50). No hostname or cloud address.",
+    "printerIpPlaceholder": "192.168.1.50",
+    "printFailedAfterRetries": "Printing failed after several attempts: {error}"
   },
   "kitchenDisplay": {
     "title": "KITCHEN DISPLAY",

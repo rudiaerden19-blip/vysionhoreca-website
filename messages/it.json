@@ -2698,7 +2698,10 @@
     "cancel": "Annulla",
     "rejected": "Rifiutato",
     "justNow": "Proprio ora",
-    "min": "min"
+    "min": "min",
+    "printerInvalidIp": "Inserisci un indirizzo IPv4 locale valido (es. 192.168.1.50). Nessun nome host o indirizzo cloud.",
+    "printerIpPlaceholder": "192.168.1.50",
+    "printFailedAfterRetries": "Stampa non riuscita dopo più tentativi: {error}"
   },
   "kitchenDisplay": {
     "title": "DISPLAY CUCINA",

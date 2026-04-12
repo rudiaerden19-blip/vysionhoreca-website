@@ -2698,7 +2698,10 @@
     "cancel": "取消",
     "rejected": "已拒绝",
     "justNow": "刚刚",
-    "min": "分钟"
+    "min": "分钟",
+    "printerInvalidIp": "请输入有效的本地 IPv4 地址（例如 192.168.1.50）。不能使用主机名或云端地址。",
+    "printerIpPlaceholder": "192.168.1.50",
+    "printFailedAfterRetries": "多次尝试后打印仍失败：{error}"
   },
   "kitchenDisplay": {
     "title": "厨房显示",

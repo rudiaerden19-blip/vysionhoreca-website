@@ -2698,7 +2698,10 @@
     "cancel": "キャンセル",
     "rejected": "拒否済み",
     "justNow": "たった今",
-    "min": "分"
+    "min": "分",
+    "printerInvalidIp": "有効なローカルIPv4アドレスを入力してください（例: 192.168.1.50）。ホスト名やクラウドアドレスは使えません。",
+    "printerIpPlaceholder": "192.168.1.50",
+    "printFailedAfterRetries": "複数回試行後も印刷に失敗しました: {error}"
   },
   "kitchenDisplay": {
     "title": "キッチンディスプレイ",

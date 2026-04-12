@@ -1,3 +1,5 @@
+import { normalizeLanPrinterIp, postDirectLanPrintWithRetries, postPrintProxyOnce } from '@/lib/printer-lan'
+
 /** Escape text for HTML receipts (names, addresses, notes). */
 export function escapeReceiptHtml(s: string): string {
   return s
@@ -27,10 +29,12 @@ export const KASSA_PRINT_RECEIPT_STYLES = `
       @media print { body { width:auto; -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
 `.trim()
 
-/** Zelfde sleutel als shop display / keuken (`printer_ip_{tenant}`) voor iPad print-server. */
+/** Opgeslagen IPv4 voor print-server (geen hostnaam). */
 export function getSavedLanPrinterIp(tenantSlug: string): string | null {
   if (typeof window === 'undefined') return null
-  return localStorage.getItem(`printer_ip_${tenantSlug}`)
+  const raw = localStorage.getItem(`printer_ip_${tenantSlug}`)
+  if (!raw) return null
+  return normalizeLanPrinterIp(raw)
 }
 
 export function appLocaleToBcp47(locale: string): string {
@@ -148,22 +152,13 @@ async function tryStaffSummaryThermalPrint(opts: {
     btw_percentage: vat,
   }
 
-  try {
-    const response = await fetch('/api/print-proxy', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        printerIP: opts.printerIP,
-        order,
-        businessInfo,
-        printType: 'customer',
-      }),
-    })
-    const data = (await response.json()) as { success?: boolean; error?: string }
-    return response.ok && !!data.success
-  } catch {
-    return false
-  }
+  const res = await postPrintProxyOnce({
+    printerIP: opts.printerIP,
+    order,
+    businessInfo,
+    printType: 'customer',
+  })
+  return res.success
 }
 
 /**
@@ -442,22 +437,13 @@ export async function tryKassaCustomerThermalViaProxy(opts: {
   order: KassaThermalOrderPayload
   businessInfo: KassaThermalBusinessPayload
 }): Promise<boolean> {
-  try {
-    const response = await fetch('/api/print-proxy', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        printerIP: opts.printerIP,
-        order: opts.order,
-        businessInfo: opts.businessInfo,
-        printType: 'customer',
-      }),
-    })
-    const data = (await response.json()) as { success?: boolean }
-    return response.ok && !!data.success
-  } catch {
-    return false
-  }
+  const res = await postPrintProxyOnce({
+    printerIP: opts.printerIP,
+    order: opts.order,
+    businessInfo: opts.businessInfo,
+    printType: 'customer',
+  })
+  return res.success
 }
 
 /**
@@ -470,26 +456,14 @@ export async function tryKassaCustomerThermalDirectLan(opts: {
   order: KassaThermalOrderPayload
   businessInfo: KassaThermalBusinessPayload
 }): Promise<boolean> {
-  try {
-    const response = await fetch(`http://${opts.printerIP}:3001/print`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        order: opts.order,
-        businessInfo: opts.businessInfo,
-        printType: 'customer',
-      }),
-    })
-    if (!response.ok) return false
-    try {
-      const data = (await response.json()) as { success?: boolean }
-      return !!data.success
-    } catch {
-      return response.ok
-    }
-  } catch {
-    return false
-  }
+  return postDirectLanPrintWithRetries({
+    printerIP: opts.printerIP,
+    body: {
+      order: opts.order,
+      businessInfo: opts.businessInfo,
+      printType: 'customer',
+    },
+  })
 }
 
 /**

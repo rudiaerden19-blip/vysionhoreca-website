@@ -17,6 +17,12 @@ import {
   isAudioActivatedThisSession,
   markAudioActivated
 } from '@/lib/sounds'
+import {
+  fetchPrinterOnlineViaProxy,
+  normalizeLanPrinterIp,
+  postPrintProxyOnce,
+  startPrinterLanHeartbeat,
+} from '@/lib/printer-lan'
 
 interface Order {
   id: string
@@ -52,6 +58,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   
   // Translation helper for kitchenDisplay keys
   const tx = (key: string) => t(`kitchenDisplay.${key}`)
+  const txShop = (key: string) => t(`shopDisplay.${key}`)
   
   const [orders, setOrders] = useState<Order[]>([])
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
@@ -86,72 +93,80 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
       prewarmAudio()
     }
     
-    // Load printer IP
-    const savedIP = localStorage.getItem(`printer_ip_${params.tenant}`)
+    const raw = localStorage.getItem(`printer_ip_${params.tenant}`)
+    const savedIP = raw ? normalizeLanPrinterIp(raw) : null
     if (savedIP) {
+      if (raw && savedIP !== raw.trim()) {
+        localStorage.setItem(`printer_ip_${params.tenant}`, savedIP)
+      }
       setPrinterIP(savedIP)
-      checkPrinterStatus(savedIP)
+      void checkPrinterStatus(savedIP)
+    } else if (raw) {
+      localStorage.removeItem(`printer_ip_${params.tenant}`)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant, audioActivated])
 
-  // Check printer status via server proxy
+  useEffect(() => {
+    if (!printerIP) return
+    return startPrinterLanHeartbeat({
+      printerIP,
+      onResult: (online) => setPrinterStatus(online ? 'online' : 'offline'),
+    })
+  }, [printerIP])
+
   async function checkPrinterStatus(ip: string) {
-    try {
-      const response = await fetch(`/api/print-proxy?printerIP=${encodeURIComponent(ip)}`)
-      const data = await response.json()
-      setPrinterStatus(data.status === 'online' ? 'online' : 'offline')
-    } catch {
-      setPrinterStatus('offline')
-    }
+    const ok = await fetchPrinterOnlineViaProxy(ip)
+    setPrinterStatus(ok ? 'online' : 'offline')
   }
 
   function savePrinterIP(ip: string) {
-    localStorage.setItem(`printer_ip_${params.tenant}`, ip)
-    setPrinterIP(ip)
-    checkPrinterStatus(ip)
+    const n = normalizeLanPrinterIp(ip)
+    if (!n) {
+      alert(txShop('printerInvalidIp'))
+      return
+    }
+    localStorage.setItem(`printer_ip_${params.tenant}`, n)
+    setPrinterIP(n)
+    void checkPrinterStatus(n)
     setShowPrinterSettings(false)
   }
 
-  // Print to thermal printer via server proxy
   async function printToThermal(order: Order) {
     if (!printerIP) return false
     console.log('🖨️ Sending kitchen receipt to printer...')
     try {
-      const response = await fetch('/api/print-proxy', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          printerIP,
-          order: {
-            order_number: order.order_number,
-            customer_name: order.customer_name,
-            customer_phone: order.customer_phone,
-            order_type: order.order_type,
-            items: order.items,
-            total: order.total,
-            notes: order.customer_notes,
-            created_at: order.created_at,
-          },
-          businessInfo: {
-            name: business?.business_name,
-            address: business?.address,
-            phone: business?.phone,
-            btw_number: business?.btw_number,
-          },
-          printType: 'kitchen',
-        }),
+      const res = await postPrintProxyOnce({
+        printerIP,
+        order: {
+          order_number: order.order_number,
+          customer_name: order.customer_name,
+          customer_phone: order.customer_phone,
+          order_type: order.order_type,
+          items: order.items,
+          total: order.total,
+          notes: order.customer_notes,
+          created_at: order.created_at,
+        },
+        businessInfo: {
+          name: business?.business_name,
+          address: business?.address,
+          phone: business?.phone,
+          btw_number: business?.btw_number,
+        },
+        printType: 'kitchen',
       })
-      const data = await response.json()
-      if (response.ok && data.success) {
+      if (res.success) {
         console.log('✅ Kitchen receipt printed')
         return true
-      } else {
-        console.error('❌ Print failed:', data.error)
-        return false
       }
-    } catch (error) {
+      console.error('❌ Print failed:', res.error)
+      alert(txShop('printFailedAfterRetries').replace('{error}', res.error))
+      return false
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error)
       console.error('❌ Print error:', error)
+      alert(txShop('printFailedAfterRetries').replace('{error}', msg))
       return false
     }
   }
@@ -845,16 +860,19 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
               <p className="text-gray-600 text-sm text-center mb-6">Verbind met de Vysion Print iPad app</p>
 
               <div className="mb-6">
-                <label className="block text-sm text-gray-600 mb-2 font-medium">iPad IP-adres</label>
+                <label className="block text-sm text-gray-600 mb-2 font-medium">Lokaal IPv4-adres (print-server)</label>
                 <input
                   type="text"
+                  inputMode="decimal"
+                  autoComplete="off"
+                  spellCheck={false}
                   defaultValue={printerIP || ''}
-                  placeholder="bijv. 192.168.1.100"
+                  placeholder={txShop('printerIpPlaceholder')}
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400"
                   id="keuken-printer-ip-input"
                 />
                 <p className="text-xs text-gray-500 mt-2">
-                  Je vindt dit IP-adres in de Vysion Print app op de iPad
+                  Alleen privé IPv4 (192.168.x.x, 10.x of 172.16–31.x). Geen hostnaam.
                 </p>
               </div>
 
@@ -906,7 +924,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
               {printerIP && (
                 <button
                   type="button"
-                  onClick={() => checkPrinterStatus(printerIP)}
+                  onClick={() => void checkPrinterStatus(printerIP)}
                   className="w-full mt-3 py-3 rounded-lg font-semibold border border-gray-300 bg-white hover:bg-gray-50 text-gray-800"
                 >
                   Verbinding testen

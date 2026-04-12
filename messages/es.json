@@ -2698,7 +2698,10 @@
     "cancel": "Cancelar",
     "rejected": "Rechazado",
     "justNow": "Ahora mismo",
-    "min": "min"
+    "min": "min",
+    "printerInvalidIp": "Introduce una IPv4 local válida (p. ej. 192.168.1.50). Sin nombre de host ni dirección en la nube.",
+    "printerIpPlaceholder": "192.168.1.50",
+    "printFailedAfterRetries": "Impresión fallida tras varios intentos: {error}"
   },
   "kitchenDisplay": {
     "title": "PANTALLA DE COCINA",

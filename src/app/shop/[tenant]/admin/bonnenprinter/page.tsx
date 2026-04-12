@@ -49,13 +49,13 @@ export default function BonnenprinterPage() {
           <h2 className="text-lg font-bold text-gray-900">Printer verbinden</h2>
         </div>
         <p className="text-gray-600 text-sm">
-          Zorg dat uw bonnenprinter op hetzelfde WiFi netwerk zit als uw iPad.
+          Zorg dat iPad en printer op hetzelfde WiFi zitten. Stel in het onlinescherm het <strong>lokale IPv4-adres</strong> van de print-server in (bijv. 192.168.1.50) — geen hostnaam.
         </p>
         <div className="space-y-3">
           {[
             { title: 'Zelfde WiFi netwerk', desc: 'iPad en printer moeten op hetzelfde netwerk zitten' },
             { title: 'Thermische bonnenprinter', desc: 'Epson, Star of andere ESC/POS compatibele printers' },
-            { title: 'Automatische detectie', desc: 'De app zoekt automatisch naar uw printer (poort 9100)' },
+            { title: 'Vast IP-adres', desc: 'Vul in het onlinescherm het IPv4-adres in van het toestel waar Vysion Print op draait (print-server op poort 3001).' },
           ].map(({ title, desc }) => (
             <div key={title} className="flex items-start gap-3">
               <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -2698,7 +2698,10 @@
     "cancel": "إلغاء",
     "rejected": "مرفوض",
     "justNow": "الآن",
-    "min": "د"
+    "min": "د",
+    "printerInvalidIp": "أدخل عنوان IPv4 محليًا صالحًا (مثل 192.168.1.50). لا أسماء مضيفين ولا عناوين سحابية.",
+    "printerIpPlaceholder": "192.168.1.50",
+    "printFailedAfterRetries": "فشل الطباعة بعد عدة محاولات: {error}"
   },
   "kitchenDisplay": {
     "title": "شاشة المطبخ",

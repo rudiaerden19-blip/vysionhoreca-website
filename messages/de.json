@@ -2198,7 +2198,10 @@
     "cancel": "Abbrechen",
     "rejected": "Abgelehnt",
     "justNow": "Gerade eben",
-    "min": "Min"
+    "min": "Min",
+    "printerInvalidIp": "Geben Sie eine gültige lokale IPv4-Adresse ein (z. B. 192.168.1.50). Kein Hostname oder Cloud-Adresse.",
+    "printerIpPlaceholder": "192.168.1.50",
+    "printFailedAfterRetries": "Drucken nach mehreren Versuchen fehlgeschlagen: {error}"
   },
   "kitchenDisplay": {
     "title": "KÜCHEN-ANZEIGE",

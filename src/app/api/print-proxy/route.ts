@@ -1,45 +1,60 @@
 import { NextRequest, NextResponse } from 'next/server'
+import {
+  isPrivateLanIpv4,
+  PRINT_PROXY_PRINT_TIMEOUT_MS,
+  PRINT_PROXY_STATUS_TIMEOUT_MS,
+  PRINTER_LAN_PRINT_SERVER_PORT,
+  PRINTER_POST_MAX_ATTEMPTS,
+  PRINTER_POST_RETRY_DELAY_MS,
+} from '@/lib/printer-lan'
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((r) => setTimeout(r, ms))
+}
 
 /**
- * SECURITY: Validate that the IP is a private/local network IP
- * This prevents SSRF attacks where attackers could reach internal services
+ * Naar de lokale print-server (iPad/Vysion Print). Alleen IPv4 op private ranges.
+ * 3 pogingen, 1 s tussenpauze, ruime timeout per poging (WiFi/Starlink).
  */
-function isPrivateIP(ip: string): boolean {
-  // Remove any port if present
-  const cleanIP = ip.split(':')[0]
-  
-  // Check for localhost
-  if (cleanIP === 'localhost' || cleanIP === '127.0.0.1') {
-    return true
+async function forwardPrintToLanServer(printerIP: string, body: object): Promise<Response> {
+  let lastResponse: Response | null = null
+  let lastErr: unknown
+  for (let attempt = 0; attempt < PRINTER_POST_MAX_ATTEMPTS; attempt++) {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), PRINT_PROXY_PRINT_TIMEOUT_MS)
+    try {
+      const response = await fetch(`http://${printerIP}:${PRINTER_LAN_PRINT_SERVER_PORT}/print`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      })
+      clearTimeout(timeoutId)
+      lastResponse = response
+      if (response.ok) return response
+    } catch (e: unknown) {
+      clearTimeout(timeoutId)
+      lastErr = e
+      lastResponse = null
+    }
+    if (attempt < PRINTER_POST_MAX_ATTEMPTS - 1) {
+      await sleep(PRINTER_POST_RETRY_DELAY_MS)
+    }
   }
-  
-  // Parse IP octets
-  const parts = cleanIP.split('.')
-  if (parts.length !== 4) {
-    return false
+  if (lastResponse) return lastResponse
+  throw lastErr instanceof Error ? lastErr : new Error('Print failed')
+}
+
+async function forwardStatusToLanServer(printerIP: string): Promise<Response> {
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), PRINT_PROXY_STATUS_TIMEOUT_MS)
+  try {
+    return await fetch(`http://${printerIP}:${PRINTER_LAN_PRINT_SERVER_PORT}/status`, {
+      signal: controller.signal,
+    })
+  } finally {
+    clearTimeout(timeoutId)
   }
-  
-  const octets = parts.map(p => parseInt(p, 10))
-  if (octets.some(o => isNaN(o) || o < 0 || o > 255)) {
-    return false
-  }
-  
-  const [a, b] = octets
-  
-  // Private IP ranges:
-  // 10.0.0.0 - 10.255.255.255 (Class A)
-  if (a === 10) return true
-  
-  // 172.16.0.0 - 172.31.255.255 (Class B)
-  if (a === 172 && b >= 16 && b <= 31) return true
-  
-  // 192.168.0.0 - 192.168.255.255 (Class C)
-  if (a === 192 && b === 168) return true
-  
-  // Link-local 169.254.x.x - BLOCK this as it includes cloud metadata endpoints
-  if (a === 169 && b === 254) return false
-  
-  return false
 }
 
 export async function POST(request: NextRequest) {
@@ -47,30 +62,19 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { printerIP, order, businessInfo, printType } = body
 
-    if (!printerIP) {
+    if (!printerIP || typeof printerIP !== 'string') {
       return NextResponse.json({ error: 'No printer IP provided' }, { status: 400 })
     }
 
-    // SECURITY: Validate that printer IP is on a private network
-    if (!isPrivateIP(printerIP)) {
-      console.error(`🚫 Print proxy blocked: ${printerIP} is not a private IP`)
-      return NextResponse.json({ error: 'Invalid printer IP - must be on local network' }, { status: 403 })
+    const clean = printerIP.split(':')[0].trim()
+    if (!isPrivateLanIpv4(clean)) {
+      console.error(`🚫 Print proxy blocked: ${printerIP} is not a private IPv4`)
+      return NextResponse.json({ error: 'Invalid printer IP - use local IPv4 only (e.g. 192.168.x.x)' }, { status: 403 })
     }
 
-    console.log(`🖨️ Print proxy: sending ${printType} receipt to ${printerIP}`)
+    console.log(`🖨️ Print proxy: sending ${printType} receipt to ${clean}`)
 
-    // Forward request to iPad print server
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
-
-    const response = await fetch(`http://${printerIP}:3001/print`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ order, businessInfo, printType }),
-      signal: controller.signal,
-    })
-
-    clearTimeout(timeoutId)
+    const response = await forwardPrintToLanServer(clean, { order, businessInfo, printType })
 
     if (response.ok) {
       console.log(`✅ Print successful`)
@@ -80,18 +84,21 @@ export async function POST(request: NextRequest) {
       console.error(`❌ Print failed: ${errorText}`)
       return NextResponse.json({ error: errorText }, { status: response.status })
     }
-  } catch (error: any) {
-    console.error('❌ Print proxy error:', error.message)
-    
-    if (error.name === 'AbortError') {
-      return NextResponse.json({ error: 'Printer timeout - check if iPad app is running' }, { status: 504 })
+  } catch (error: unknown) {
+    const err = error as { name?: string; message?: string }
+    console.error('❌ Print proxy error:', err?.message)
+
+    if (err?.name === 'AbortError') {
+      return NextResponse.json(
+        { error: 'Printer timeout — check WiFi, Starlink, or iPad print app' },
+        { status: 504 },
+      )
     }
-    
-    return NextResponse.json({ error: error.message || 'Print failed' }, { status: 500 })
+
+    return NextResponse.json({ error: err?.message || 'Print failed' }, { status: 500 })
   }
 }
 
-// Also handle printer status check
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
@@ -101,27 +108,19 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'No printer IP provided' }, { status: 400 })
     }
 
-    // SECURITY: Validate that printer IP is on a private network
-    if (!isPrivateIP(printerIP)) {
+    const clean = printerIP.split(':')[0].trim()
+    if (!isPrivateLanIpv4(clean)) {
       return NextResponse.json({ error: 'Invalid printer IP' }, { status: 403 })
     }
 
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 3000)
-
-    const response = await fetch(`http://${printerIP}:3001/status`, {
-      signal: controller.signal,
-    })
-
-    clearTimeout(timeoutId)
+    const response = await forwardStatusToLanServer(clean)
 
     if (response.ok) {
       const data = await response.json()
       return NextResponse.json({ status: 'online', ...data })
-    } else {
-      return NextResponse.json({ status: 'offline' }, { status: 200 })
     }
-  } catch (error) {
+    return NextResponse.json({ status: 'offline' }, { status: 200 })
+  } catch {
     return NextResponse.json({ status: 'offline' }, { status: 200 })
   }
 }

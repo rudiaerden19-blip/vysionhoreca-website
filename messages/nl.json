@@ -2997,7 +2997,10 @@
     "cancel": "Annuleren",
     "rejected": "Geweigerd",
     "justNow": "Zojuist",
-    "min": "min"
+    "min": "min",
+    "printerInvalidIp": "Voer een geldig lokaal IPv4-adres in (bijv. 192.168.1.50). Geen hostnaam of cloud-adres.",
+    "printerIpPlaceholder": "192.168.1.50",
+    "printFailedAfterRetries": "Printen mislukt na meerdere pogingen: {error}"
   },
   "kitchenDisplay": {
     "title": "KEUKEN DISPLAY",

@@ -17,6 +17,12 @@ import {
   isAudioActivatedThisSession,
   markAudioActivated
 } from '@/lib/sounds'
+import {
+  fetchPrinterOnlineViaProxy,
+  normalizeLanPrinterIp,
+  postPrintProxyOnce,
+  startPrinterLanHeartbeat,
+} from '@/lib/printer-lan'
 
 interface Order {
   id: string
@@ -140,14 +146,29 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     }
   }, [params.tenant, audioActivated])
 
-  // Load printer IP from localStorage and check status
+  // Load printer IP from localStorage and check status (alleen genormaliseerd IPv4)
   useEffect(() => {
-    const savedIP = localStorage.getItem(`printer_ip_${params.tenant}`)
+    const raw = localStorage.getItem(`printer_ip_${params.tenant}`)
+    const savedIP = raw ? normalizeLanPrinterIp(raw) : null
     if (savedIP) {
+      if (raw && savedIP !== raw.trim()) {
+        localStorage.setItem(`printer_ip_${params.tenant}`, savedIP)
+      }
       setPrinterIP(savedIP)
-      checkPrinterStatus(savedIP)
+      void checkPrinterStatus(savedIP)
+    } else if (raw) {
+      localStorage.removeItem(`printer_ip_${params.tenant}`)
     }
   }, [params.tenant])
+
+  // Heartbeat naar print-server (:3001/status) zodat WiFi/print-app niet “inslaapt”
+  useEffect(() => {
+    if (!printerIP) return
+    return startPrinterLanHeartbeat({
+      printerIP,
+      onResult: (online) => setPrinterStatus(online ? 'online' : 'offline'),
+    })
+  }, [printerIP])
 
   // Load pending reservations
   useEffect(() => {
@@ -184,30 +205,22 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     }
   }
 
-  // Check printer status via server proxy (avoids mixed content)
   async function checkPrinterStatus(ip: string) {
-    try {
-      const response = await fetch(`/api/print-proxy?printerIP=${encodeURIComponent(ip)}`)
-      const data = await response.json()
-      
-      if (data.status === 'online') {
-        setPrinterStatus('online')
-        console.log('🖨️ Printer online:', ip)
-      } else {
-        setPrinterStatus('offline')
-        console.log('🖨️ Printer offline:', ip)
-      }
-    } catch (error) {
-      setPrinterStatus('offline')
-      console.log('🖨️ Printer check failed:', error)
-    }
+    const ok = await fetchPrinterOnlineViaProxy(ip)
+    setPrinterStatus(ok ? 'online' : 'offline')
+    if (ok) console.log('🖨️ Printer online:', ip)
+    else console.log('🖨️ Printer offline:', ip)
   }
 
-  // Save printer IP
   function savePrinterIP(ip: string) {
-    localStorage.setItem(`printer_ip_${params.tenant}`, ip)
-    setPrinterIP(ip)
-    checkPrinterStatus(ip)
+    const n = normalizeLanPrinterIp(ip)
+    if (!n) {
+      alert(tx('printerInvalidIp'))
+      return
+    }
+    localStorage.setItem(`printer_ip_${params.tenant}`, n)
+    setPrinterIP(n)
+    void checkPrinterStatus(n)
     setShowPrinterSettings(false)
   }
 
@@ -507,11 +520,9 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
   // Print to thermal printer via server proxy (avoids HTTPS/HTTP mixed content)
   async function printToThermal(order: Order, type: 'customer' | 'kitchen') {
-    // Check if running inside Vysion Print iPad app
     const isInVysionApp = typeof window !== 'undefined' && (window as any)._vysionPrintApp === true
-    
-    // In Vysion app, we don't need printerIP - the WebView handles it
-    if (!printerIP && !isInVysionApp) {
+
+    if (!printerIP) {
       console.log('🖨️ No printer IP configured')
       return false
     }
@@ -519,61 +530,54 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     console.log(`🖨️ Sending ${type} receipt to printer...${isInVysionApp ? ' (via Vysion app)' : ''}`)
 
     try {
-      // Calculate tax amount based on BTW percentage
       const btwPercentage = business?.btw_percentage || 6
       const totalAmount = order.total || 0
       const taxAmount = totalAmount - (totalAmount / (1 + btwPercentage / 100))
-      
-      const response = await fetch('/api/print-proxy', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          printerIP,
-          order: {
-            order_number: order.order_number,
-            customer_name: order.customer_name,
-            customer_phone: order.customer_phone,
-            customer_email: order.customer_email,
-            customer_address: order.delivery_address,
-            order_type: order.order_type,
-            payment_status: order.payment_status,
-            payment_method: order.payment_method,
-            items: order.items,
-            subtotal: order.subtotal,
-            delivery_fee: order.delivery_fee,
-            discount: order.discount_amount,
-            total: order.total,
-            tax: taxAmount,
-            notes: order.customer_notes,
-            created_at: order.created_at,
-          },
-          businessInfo: {
-            name: business?.business_name,
-            address: business?.address,
-            city: business?.city,
-            postalCode: business?.postal_code,
-            phone: business?.phone,
-            email: business?.email,
-            btw_number: business?.btw_number,
-            btw_percentage: business?.btw_percentage || 6,
-          },
-          printType: type,
-        }),
+
+      const res = await postPrintProxyOnce({
+        printerIP,
+        order: {
+          order_number: order.order_number,
+          customer_name: order.customer_name,
+          customer_phone: order.customer_phone,
+          customer_email: order.customer_email,
+          customer_address: order.delivery_address,
+          order_type: order.order_type,
+          payment_status: order.payment_status,
+          payment_method: order.payment_method,
+          items: order.items,
+          subtotal: order.subtotal,
+          delivery_fee: order.delivery_fee,
+          discount: order.discount_amount,
+          total: order.total,
+          tax: taxAmount,
+          notes: order.customer_notes,
+          created_at: order.created_at,
+        },
+        businessInfo: {
+          name: business?.business_name,
+          address: business?.address,
+          city: business?.city,
+          postalCode: business?.postal_code,
+          phone: business?.phone,
+          email: business?.email,
+          btw_number: business?.btw_number,
+          btw_percentage: business?.btw_percentage || 6,
+        },
+        printType: type,
       })
 
-      const data = await response.json()
-
-      if (response.ok && data.success) {
+      if (res.success) {
         console.log(`✅ ${type} bon geprint via iPad`)
         return true
-      } else {
-        console.error('❌ Print failed:', data.error || 'Unknown error')
-        alert(`Print mislukt: ${data.error || 'Controleer of de iPad app draait'}`)
-        return false
       }
-    } catch (error: any) {
+      console.error('❌ Print failed:', res.error)
+      alert(tx('printFailedAfterRetries').replace('{error}', res.error))
+      return false
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error)
       console.error('❌ Print error:', error)
-      alert(`Print error: ${error.message}`)
+      alert(tx('printFailedAfterRetries').replace('{error}', msg))
       return false
     }
   }
@@ -1442,16 +1446,19 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
               <p className="text-gray-400 text-center mb-6">Verbind met de Vysion Print iPad app</p>
 
               <div className="mb-6">
-                <label className="block text-sm text-gray-400 mb-2">iPad IP Adres</label>
+                <label className="block text-sm text-gray-400 mb-2">Lokaal IPv4-adres (print-server / iPad)</label>
                 <input
                   type="text"
+                  inputMode="decimal"
+                  autoComplete="off"
+                  spellCheck={false}
                   defaultValue={printerIP || ''}
-                  placeholder="bijv. 192.168.1.100"
+                  placeholder={tx('printerIpPlaceholder')}
                   className="w-full px-4 py-3 bg-gray-700 rounded-xl border-none text-white placeholder-gray-500"
                   id="printer-ip-input"
                 />
                 <p className="text-xs text-gray-500 mt-2">
-                  Je vindt dit IP adres in de Vysion Print app op de iPad
+                  Alleen een privé IPv4 (192.168.x.x, 10.x of 172.16–31.x). Geen hostnaam — hetzelfde netwerk als deze pc.
                 </p>
               </div>
 
@@ -1504,7 +1511,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
               {printerIP && (
                 <button
-                  onClick={() => checkPrinterStatus(printerIP)}
+                  onClick={() => void checkPrinterStatus(printerIP)}
                   className="w-full mt-4 py-3 bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 rounded-xl font-bold"
                 >
                   🔄 Verbinding Testen
