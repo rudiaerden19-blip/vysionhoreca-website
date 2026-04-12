@@ -375,6 +375,7 @@
     "pro": {
       "name": "Vysion Premium",
       "allOfStarter": "Starter的所有功能，加上：",
+      "hardwareIncluded": "含硬件",
       "features": {
         "1": "包含POS授权",
         "2": "SEO可见性",

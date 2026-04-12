@@ -375,6 +375,7 @@
     "pro": {
       "name": "Vysion Premium",
       "allOfStarter": "كل مميزات Starter، بالإضافة إلى:",
+      "hardwareIncluded": "يتضمن العتاد (الأجهزة)",
       "features": {
         "1": "ترخيص نقاط البيع مشمول",
         "2": "ظهور في محركات البحث SEO",

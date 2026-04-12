@@ -375,6 +375,7 @@
     "pro": {
       "name": "Vysion Premium",
       "allOfStarter": "Starterのすべて、さらに:",
+      "hardwareIncluded": "ハードウェア込み",
       "features": {
         "1": "POSライセンス込み",
         "2": "SEO可視性",

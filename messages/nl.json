@@ -656,6 +656,7 @@
     "pro": {
       "name": "Vysion Premium",
       "allOfStarter": "Alles van Pro, plus:",
+      "hardwareIncluded": "Hardware inbegrepen",
       "features": {
         "1": "Kassa licentie inbegrepen",
         "2": "SEO vindbaarheid",

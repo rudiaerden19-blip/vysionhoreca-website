@@ -103,12 +103,9 @@ export default function VysionBeestSection() {
             </div>
           </div>
           <div ref={textColRef} className="order-1 lg:order-2 lg:min-w-0">
-            <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-accent">
-              {t('vysionBeest.eyebrow')}
-            </p>
             <h2
               id="vysion-beest-heading"
-              className="mb-4 text-2xl font-bold leading-tight tracking-tight text-gray-900 sm:text-3xl lg:text-[1.85rem] xl:text-4xl"
+              className="mb-4 text-2xl font-bold leading-tight tracking-tight text-accent sm:text-3xl lg:text-[1.85rem] xl:text-4xl"
             >
               {t('vysionBeest.headline')}
             </h2>
@@ -123,7 +120,7 @@ export default function VysionBeestSection() {
               </li>
               <li>
                 <p className="mb-2 font-bold text-gray-900">{t('vysionBeest.specDualTitle')}</p>
-                <ul className="ml-0 list-none space-y-3 border-l-2 border-gray-200 pl-4">
+                <ul className="ml-0 list-none space-y-3 border-l-[3px] border-accent pl-4 sm:border-l-4">
                   <li>
                     <InlineBold text={t('vysionBeest.specDualMain')} />
                   </li>

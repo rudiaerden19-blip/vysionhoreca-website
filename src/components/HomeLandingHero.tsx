@@ -75,11 +75,11 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
       {/* Top bar */}
       <header className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 sm:pt-4 pb-1">
         <div className="flex items-start justify-between gap-4">
-          <a href="/" className="group shrink-0 leading-none">
+          <a href="/" className="group inline-flex shrink-0 flex-col items-center leading-none">
             <span className="block text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-accent">
               Vysion
             </span>
-            <span className="block text-base sm:text-lg md:text-xl text-white font-medium mt-1">
+            <span className="mt-1 block text-center text-base font-medium text-white sm:text-lg md:text-xl">
               {t('heroLanding.logoTagline')}
             </span>
           </a>

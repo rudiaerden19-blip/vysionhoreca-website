@@ -8,7 +8,6 @@ import {
   Navigation,
   Footer,
   CookieBanner,
-  HomeCornerStamp,
   HomeLandingHero,
 } from '@/components'
 
@@ -477,6 +476,9 @@ function PromoMarqueeBand() {
 }
 
 // Pricing Section
+/** Premium-kaart: reserveringsregel staat onder de titel; niet dubbel in de lijst. */
+const PREMIUM_CARD_FEATURES = [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12] as const
+
 function PricingSection() {
   const { t, locale } = useLanguage()
   const [isYearly, setIsYearly] = useState(false)
@@ -581,25 +583,30 @@ function PricingSection() {
             </div>
           </div>
 
-          {/* Pro (Premium): outer = observe target + stamp; inner = clip voor afgeronde hoeken */}
+          {/* Pro (Premium) */}
           <div id="pricing-premium-card" className="relative">
             <div className="bg-white rounded-2xl border-2 border-gray-900 shadow-home-card overflow-hidden transition-shadow hover:shadow-home-image relative">
               <div className="absolute top-4 right-4 bg-accent text-white text-[11px] font-semibold px-3 py-1 rounded-full uppercase tracking-wide z-20">
                 {t('pricing.popular')}
               </div>
               <div className="p-6 lg:p-8">
-                <div className="flex items-center gap-3 mb-5 pr-16">
-                  <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center">
-                    <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
-                      />
-                    </svg>
+                <div className="mb-5 pr-16">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center">
+                      <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+                        />
+                      </svg>
+                    </div>
+                    <h3 className="text-xl font-bold text-accent">{t('pricing.pro.name')}</h3>
                   </div>
-                  <h3 className="text-xl font-bold text-accent">{t('pricing.pro.name')}</h3>
+                  <p className="mt-2 text-center text-sm font-semibold text-accent sm:text-base">
+                    {t('pricing.pro.features.9')}
+                  </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 mb-2">
                   <span className="text-lg text-gray-400 line-through">
@@ -608,15 +615,29 @@ function PricingSection() {
                   </span>
                   <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-0.5 rounded-md">-23%</span>
                 </div>
-                <div className="flex items-baseline mb-6">
+                <div className="flex items-baseline mb-4">
                   <span className="text-4xl sm:text-5xl font-bold text-gray-900 tabular-nums">€{proPrice}</span>
                   <span className="text-accent font-medium ml-2">{periodLabel}</span>
+                </div>
+                <div className="mb-6 flex items-start gap-3">
+                  <svg
+                    className="mt-0.5 h-5 w-5 flex-shrink-0 text-accent"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-sm font-medium leading-snug text-gray-800 sm:text-base">
+                    {t('pricing.pro.hardwareIncluded')}
+                  </span>
                 </div>
 
                 <p className="text-gray-700 mb-4 text-sm sm:text-base font-medium">{t('pricing.pro.allOfStarter')}</p>
 
                 <ul className="space-y-3 mb-8">
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => (
+                  {PREMIUM_CARD_FEATURES.map((i) => (
                     <li key={i} className="flex items-start gap-3">
                       <svg
                         className="w-5 h-5 text-accent mt-0.5 flex-shrink-0"
@@ -640,13 +661,6 @@ function PricingSection() {
                 <p className="text-center text-accent text-sm mt-3 font-medium">{t('pricing.cancelAnytime')}</p>
               </div>
             </div>
-            {/* Onsichtbaar anker bij CTA/stempel — animatie start pas als dit blok echt in beeld is */}
-            <div
-              id="pricing-premium-stamp-anchor"
-              className="pointer-events-none absolute bottom-[6.5rem] left-3 right-3 h-16 opacity-0"
-              aria-hidden
-            />
-            <HomeCornerStamp />
           </div>
         </div>
 

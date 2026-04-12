@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { Navigation, Footer, CookieBanner, HomeCornerStamp, SubscriptionsTermsPopup } from '@/components'
+import { Navigation, Footer, CookieBanner, SubscriptionsTermsPopup } from '@/components'
 import { useLanguage } from '@/i18n'
 
 const LIFESTYLE_IMAGE = '/images/abonnement-vysion-pro-lifestyle.png'
@@ -15,6 +15,8 @@ const GALLERY_IMAGES = [
 ]
 
 type LightboxState = { src: string; alt: string } | null
+
+const PREMIUM_CARD_FEATURES = [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12] as const
 
 export default function AbonnementenPage() {
   const { t, locale } = useLanguage()
@@ -285,18 +287,23 @@ export default function AbonnementenPage() {
                   {t('pricing.popular')}
                 </div>
                 <div className="p-6 sm:p-8 lg:p-10">
-                  <div className="flex items-center gap-3 mb-5 pr-16">
-                    <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center">
-                      <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
-                        />
-                      </svg>
+                  <div className="mb-5 pr-16">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center">
+                        <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+                          />
+                        </svg>
+                      </div>
+                      <h3 className="text-xl font-bold text-accent">{t('pricing.pro.name')}</h3>
                     </div>
-                    <h3 className="text-xl font-bold text-accent">{t('pricing.pro.name')}</h3>
+                    <p className="mt-2 text-center text-sm font-semibold text-accent sm:text-base">
+                      {t('pricing.pro.features.9')}
+                    </p>
                   </div>
                 <div className="flex flex-wrap items-center gap-2 mb-2">
                   <span className="text-lg text-gray-400 line-through">
@@ -318,11 +325,25 @@ export default function AbonnementenPage() {
                     {t('pricing.perMonth')}
                   </p>
                 )}
+                <div className="mb-6 flex items-start gap-3">
+                  <svg
+                    className="mt-0.5 h-5 w-5 flex-shrink-0 text-accent"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-sm font-medium leading-snug text-gray-800 sm:text-base">
+                    {t('pricing.pro.hardwareIncluded')}
+                  </span>
+                </div>
 
                 <p className="text-gray-700 mb-4 text-sm sm:text-base font-medium">{t('pricing.pro.allOfStarter')}</p>
 
                 <ul className="space-y-3.5 sm:space-y-4 mb-8 sm:mb-10">
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => (
+                  {PREMIUM_CARD_FEATURES.map((i) => (
                     <li key={i} className="flex items-start gap-3">
                       <svg
                         className="w-5 h-5 text-accent mt-0.5 flex-shrink-0"
@@ -348,17 +369,6 @@ export default function AbonnementenPage() {
                 <p className="text-center text-accent text-sm mt-3 font-medium">{t('pricing.cancelAnytime')}</p>
                 </div>
               </div>
-              <div
-                id="abonnementen-premium-stamp-anchor"
-                className="pointer-events-none absolute bottom-[6.5rem] left-3 right-3 h-16 opacity-0"
-                aria-hidden
-              />
-              <HomeCornerStamp
-                observeAnchorId="abonnementen-premium-stamp-anchor"
-                arcTopKey="subscriptionsPage.premiumStampTop"
-                arcBottomKey="subscriptionsPage.premiumStampBottom"
-                centerWordKey="subscriptionsPage.premiumStampCenter"
-              />
             </div>
             <div className="lg:pt-2 lg:pl-2 lg:mt-[2cm]">
               <p className="text-3xl sm:text-4xl font-bold text-accent leading-tight mb-6 sm:mb-8">
