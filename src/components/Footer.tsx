@@ -49,7 +49,7 @@ export default function Footer() {
                   className="text-accent hover:underline block"
                   aria-label={t('footer.linkHorecaAria')}
                 >
-                  www.vysionhoreca.com
+                  {t('footer.websiteLinkLabel')}
                 </a>
                 <a
                   href="https://www.webvysion.tech"

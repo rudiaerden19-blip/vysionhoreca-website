@@ -810,7 +810,7 @@
     }
   },
   "footer": {
-    "description": "Vysion Horeca is een onderdeel van de Vysion Group International. Cloud-horecasoftware voor België en Nederland: touchscreen kassa (POS), reserveringsplatform met zaalplattegrond, online bestelplatform en webshop, keukenscherm, kostprijsberekening, urenregistratie en bedrijfsanalyse, geschikt voor restaurant, brasserie, café en frituur.",
+    "description": "Vysion is een onderdeel van de Vysion Group International. Cloudsoftware voor België en Nederland: touchscreen kassa (POS), reserveringsplatform met zaalplattegrond, online bestelplatform en webshop, keukenscherm, kostprijsberekening, urenregistratie en bedrijfsanalyse — van restaurant en café tot bakkerij, winkel en dienstverlener.",
     "address": "Adres:",
     "product": "Product",
     "features": "Functies & platform",
@@ -829,15 +829,16 @@
     "navProductAria": "Product: snel naar functies, prijzen en nieuws",
     "navCompanyAria": "Bedrijf: over ons, contact en beleid",
     "featuresLinkTitle": "Overzicht van kassa, reserveringen, online bestellen en alle modules",
-    "pricingLinkTitle": "Abonnementen en prijzen voor horecasoftware",
-    "updatesLinkTitle": "Productnieuws en updates van Vysion Horeca",
+    "pricingLinkTitle": "Abonnementen en prijzen voor het platform",
+    "updatesLinkTitle": "Productnieuws en updates van Vysion",
     "supportLinkTitle": "Hulp, handleidingen en technische ondersteuning",
-    "aboutLinkTitle": "Meer over Vysion Horeca en het team",
+    "aboutLinkTitle": "Meer over Vysion en het team",
     "contactLinkTitle": "Neem contact op met Vysion: demo of vraag",
     "privacyLinkTitle": "Privacybeleid en verwerking van gegevens",
     "legalLinkTitle": "Algemene voorwaarden en juridische documenten",
     "linkAppsAria": "Vysion Apps, opent in een nieuw venster",
-    "linkHorecaAria": "Vysion Horeca, officiële website, nieuw venster",
+    "linkHorecaAria": "Officiële Vysion-website, nieuw venster",
+    "websiteLinkLabel": "Officiële website",
     "linkWebvysionAria": "Web Vysion, opent in een nieuw venster"
   },
   "stop": {
@@ -960,17 +961,17 @@
   "about": {
     "heroTitle": "Over",
     "heroTitleAccent": "Vysion",
-    "heroTitleEnd": "Horeca",
+    "heroTitleEnd": "",
     "heroSubtitle": "Gebouwd vanuit de praktijk. Niet vanuit een kantoor.",
     "story": {
       "title": "Ons verhaal",
-      "p1": "Vysion Horeca is ontstaan uit echte ervaring. Als horecaondernemers liepen we tegen hetzelfde probleem aan als jij: te veel systemen, te veel kosten en te weinig overzicht.",
+      "p1": "Vysion is ontstaan uit echte ervaring. Als ondernemers liepen we tegen hetzelfde probleem aan als jij: te veel systemen, te veel kosten en te weinig overzicht.",
       "p2": "We betaalden elke maand voor losse tools: een bestelplatform, boekhouding, betalingen en analyses; alles apart, niets dat écht samenwerkte. De kosten liepen op. Het gedoe ook.",
-      "p3": "Dus besloten we het anders te doen. We bouwden één slim platform, met het bestelplatform als hart, en alles wat je daarnaast nodig hebt gewoon inbegrepen. Geen overbodige functies. Geen losse abonnementen. Gewoon een eerlijk systeem dat werkt voor horecaondernemers."
+      "p3": "Dus besloten we het anders te doen. We bouwden één slim platform, met het bestelplatform als hart, en alles wat je daarnaast nodig hebt gewoon inbegrepen. Geen overbodige functies. Geen losse abonnementen. Gewoon een eerlijk systeem dat werkt voor ondernemers zoals jij."
     },
     "facts": {
       "founded": "Opgericht in 2013",
-      "foundedDesc": "Door horecaondernemers met meer dan 15 jaar ervaring",
+      "foundedDesc": "Door ondernemers met meer dan 15 jaar ervaring",
       "location": "Gevestigd in België",
       "locationDesc": "Pelt, Limburg - het hart van de Benelux",
       "countries": "Actief in 20+ landen",
@@ -978,7 +979,7 @@
     },
     "mission": {
       "title": "Onze missie",
-      "subtitle": "Horecaondernemers laten focussen op wat ze het beste doen: gasten verwelkomen en geweldige ervaringen creëren. De rest regelen wij.",
+      "subtitle": "Ondernemers laten focussen op wat ze het beste doen: klanten verwelkomen en geweldige ervaringen creëren. De rest regelen wij.",
       "reliability": {
         "title": "Betrouwbaarheid",
         "description": "99.9% uptime. Je software werkt altijd, ook als het internet even wegvalt."
@@ -1013,16 +1014,16 @@
     },
     "company": {
       "title": "Vysion Group International",
-      "p1": "Vysion Horeca is een onderdeel van de Vysion Group International, een technologiebedrijf gespecialiseerd in software voor de horeca- en retailsector.",
-      "p2": "Naast Vysion Horeca ontwikkelen we ook custom applicaties en digitale oplossingen voor bedrijven die hun processen willen automatiseren.",
-      "happyBusinesses": "Tevreden horecazaken",
+      "p1": "Vysion is een onderdeel van de Vysion Group International, een technologiebedrijf gespecialiseerd in software voor retail en dienstverlening.",
+      "p2": "We ontwikkelen ook maatwerk-apps en digitale oplossingen voor bedrijven die hun processen willen automatiseren.",
+      "happyBusinesses": "Tevreden zaken",
       "processedMonthly": "Verwerkt per maand",
       "supportAvailable": "Support beschikbaar",
       "statBusinesses": "1321",
       "statVolume": "€250.000"
     },
     "ctaTitle": "Klaar om te starten?",
-    "ctaSubtitle": "Probeer Vysion Horeca 14 dagen gratis. Geen creditcard nodig.",
+    "ctaSubtitle": "Probeer Vysion 14 dagen gratis. Geen creditcard nodig.",
     "ctaPrimary": "Start gratis proefperiode",
     "ctaSecondary": "Neem contact op"
   },

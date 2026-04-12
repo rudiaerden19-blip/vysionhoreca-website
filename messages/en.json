@@ -810,7 +810,7 @@
     }
   },
   "footer": {
-    "description": "Vysion Horeca is part of Vysion Group International. Cloud hospitality software for Belgium and the Netherlands: touchscreen POS, table reservations with floor plans, online ordering and webshop, kitchen display, recipe costing, time tracking and business analytics — for restaurants, cafés and takeaways.",
+    "description": "Vysion is part of Vysion Group International. Cloud software for Belgium and the Netherlands: touchscreen POS, table reservations with floor plans, online ordering and webshop, kitchen display, recipe costing, time tracking and business analytics — from restaurants and cafés to shops and service businesses.",
     "address": "Address:",
     "product": "Product",
     "features": "Features & platform",
@@ -829,15 +829,16 @@
     "navProductAria": "Product — features, pricing and news",
     "navCompanyAria": "Company — about, contact and policies",
     "featuresLinkTitle": "POS, reservations, online ordering and all product modules",
-    "pricingLinkTitle": "Plans and pricing for hospitality software",
-    "updatesLinkTitle": "Product news and updates from Vysion Horeca",
+    "pricingLinkTitle": "Plans and pricing for the platform",
+    "updatesLinkTitle": "Product news and updates from Vysion",
     "supportLinkTitle": "Help centre and technical support",
-    "aboutLinkTitle": "About Vysion Horeca and Vysion Group",
+    "aboutLinkTitle": "About Vysion and Vysion Group",
     "contactLinkTitle": "Contact Vysion — demo or sales enquiry",
     "privacyLinkTitle": "Privacy policy and data processing",
     "legalLinkTitle": "Terms of use and legal information",
     "linkAppsAria": "Vysion Apps — opens in a new tab",
-    "linkHorecaAria": "Vysion Horeca — official website, new tab",
+    "linkHorecaAria": "Official Vysion website — new tab",
+    "websiteLinkLabel": "Official website",
     "linkWebvysionAria": "Web Vysion — opens in a new tab"
   },
   "stop": {
@@ -960,17 +961,17 @@
   "about": {
     "heroTitle": "About",
     "heroTitleAccent": "Vysion",
-    "heroTitleEnd": "Horeca",
+    "heroTitleEnd": "",
     "heroSubtitle": "Built from practice. Not from an office.",
     "story": {
       "title": "Our story",
-      "p1": "Vysion Horeca was born from real experience. As hospitality entrepreneurs, we ran into the same problem as you: too many systems, too many costs and too little overview.",
+      "p1": "Vysion was born from real experience. As entrepreneurs, we ran into the same problem as you: too many systems, too many costs and too little overview.",
       "p2": "We paid every month for separate tools: an ordering platform, accounting, payments and analytics — all separate, nothing that really worked together. The costs added up. So did the hassle.",
-      "p3": "So we decided to do it differently. We built one smart platform, with the ordering platform at its heart, and everything you need alongside it simply included. No unnecessary features. No separate subscriptions. Just an honest system that works for hospitality entrepreneurs."
+      "p3": "So we decided to do it differently. We built one smart platform, with the ordering platform at its heart, and everything you need alongside it simply included. No unnecessary features. No separate subscriptions. Just an honest system that works for entrepreneurs like you."
     },
     "facts": {
       "founded": "Founded in 2013",
-      "foundedDesc": "By hospitality entrepreneurs with more than 15 years of experience",
+      "foundedDesc": "By entrepreneurs with more than 15 years of experience",
       "location": "Based in Belgium",
       "locationDesc": "Pelt, Limburg - the heart of the Benelux",
       "countries": "Active in 20+ countries",
@@ -978,7 +979,7 @@
     },
     "mission": {
       "title": "Our mission",
-      "subtitle": "Let hospitality entrepreneurs focus on what they do best: welcoming guests and creating great experiences. We take care of the rest.",
+      "subtitle": "Let entrepreneurs focus on what they do best: welcoming customers and creating great experiences. We take care of the rest.",
       "reliability": {
         "title": "Reliability",
         "description": "99.9% uptime. Your software always works, even when the internet drops."
@@ -1013,16 +1014,16 @@
     },
     "company": {
       "title": "Vysion Group International",
-      "p1": "Vysion Horeca is part of Vysion Group International, a technology company specialized in software for the hospitality and retail sector.",
-      "p2": "Besides Vysion Horeca, we also develop custom applications and digital solutions for companies that want to automate their processes.",
-      "happyBusinesses": "Happy hospitality businesses",
+      "p1": "Vysion is part of Vysion Group International, a technology company specialized in software for retail and service businesses.",
+      "p2": "We also develop custom applications and digital solutions for companies that want to automate their processes.",
+      "happyBusinesses": "Happy businesses",
       "processedMonthly": "Processed per month",
       "supportAvailable": "Support available",
       "statBusinesses": "1321",
       "statVolume": "€250,000"
     },
     "ctaTitle": "Ready to start?",
-    "ctaSubtitle": "Try Vysion Horeca 14 days free. No credit card required.",
+    "ctaSubtitle": "Try Vysion 14 days free. No credit card required.",
     "ctaPrimary": "Start free trial",
     "ctaSecondary": "Get in touch"
   },

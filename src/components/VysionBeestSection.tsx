@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { Fragment } from 'react'
 import { useLanguage } from '@/i18n'
 
@@ -22,6 +21,11 @@ function InlineBold({ text }: { text: string }) {
   )
 }
 
+const BEEST_PRODUCT_SRC = '/images/vysion-beest-product.png'
+
+/** Horizontale composite (3 weergaven) → drie verticale stroken, elk goed zichtbaar. */
+const BEEST_STRIP_POSITIONS = ['0%', '50%', '100%'] as const
+
 /**
  * Marketing: hardware-USP tussen gratis-websitebanner en platformgrid.
  * Productbeeld: `/public/images/vysion-beest-product.png` (driedubbele productweergave).
@@ -37,15 +41,24 @@ export default function VysionBeestSection() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-2 lg:gap-12 xl:gap-16">
           <div className="order-2 mx-auto w-full max-w-xl lg:order-1 lg:mx-0 lg:max-w-none lg:pr-2">
-            <div className="relative aspect-[5/2] w-full overflow-hidden rounded-xl bg-gray-50 ring-1 ring-gray-100 shadow-sm sm:aspect-[8/3]">
-              <Image
-                src="/images/vysion-beest-product.png"
-                alt={t('vysionBeest.imageAlt')}
-                fill
-                sizes="(max-width: 1024px) 100vw, 48vw"
-                className="object-contain object-center p-2 sm:p-4"
-                priority={false}
-              />
+            <div
+              className="flex flex-col gap-4 sm:gap-5"
+              role="group"
+              aria-label={t('vysionBeest.imageAlt')}
+            >
+              {BEEST_STRIP_POSITIONS.map((pos, i) => (
+                <div
+                  key={i}
+                  className="relative w-full min-h-[220px] overflow-hidden rounded-xl bg-gray-50 ring-1 ring-gray-100 shadow-sm sm:min-h-[260px] md:min-h-[280px] lg:min-h-[240px] xl:min-h-[280px]"
+                  style={{
+                    backgroundImage: `url(${BEEST_PRODUCT_SRC})`,
+                    backgroundSize: '300% 100%',
+                    backgroundPosition: `${pos} center`,
+                    backgroundRepeat: 'no-repeat',
+                  }}
+                  aria-hidden
+                />
+              ))}
             </div>
           </div>
           <div className="order-1 lg:order-2 lg:min-w-0">

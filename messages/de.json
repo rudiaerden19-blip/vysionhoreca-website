@@ -532,7 +532,7 @@
     }
   },
   "footer": {
-    "description": "Vysion Horeca ist Teil der Vysion Group International. Cloud-Gastronomie-Software für Belgien und die Niederlande: Touchscreen-Kasse (POS), Reservierungen mit Saalplan, Online-Bestellung und Webshop, Küchendisplay, Rezeptkosten, Zeiterfassung und Analysen — für Restaurant, Café und Imbiss.",
+    "description": "Vysion ist Teil der Vysion Group International. Cloud-Software für Belgien und die Niederlande: Touchscreen-Kasse (POS), Reservierungen mit Saalplan, Online-Bestellung und Webshop, Küchendisplay, Rezeptkosten, Zeiterfassung und Analysen — von Restaurant und Café bis Einzelhandel und Dienstleister.",
     "address": "Adresse:",
     "product": "Produkt",
     "features": "Funktionen & Plattform",
@@ -551,15 +551,16 @@
     "navProductAria": "Produkt — Funktionen, Preise, Neuigkeiten",
     "navCompanyAria": "Unternehmen — Über uns, Kontakt, Richtlinien",
     "featuresLinkTitle": "Kasse, Reservierungen, Online-Bestellung und Module",
-    "pricingLinkTitle": "Abonnements und Preise für Gastro-Software",
-    "updatesLinkTitle": "Produktnews von Vysion Horeca",
+    "pricingLinkTitle": "Abonnements und Preise für die Plattform",
+    "updatesLinkTitle": "Produktnews von Vysion",
     "supportLinkTitle": "Hilfe und technischer Support",
-    "aboutLinkTitle": "Über Vysion Horeca",
+    "aboutLinkTitle": "Über Vysion",
     "contactLinkTitle": "Kontakt zu Vysion — Demo oder Anfrage",
     "privacyLinkTitle": "Datenschutzerklärung",
     "legalLinkTitle": "AGB und rechtliche Hinweise",
     "linkAppsAria": "Vysion Apps — neues Fenster",
-    "linkHorecaAria": "Offizielle Vysion-Horeca-Website — neues Fenster",
+    "linkHorecaAria": "Offizielle Vysion-Website — neues Fenster",
+    "websiteLinkLabel": "Offizielle Website",
     "linkWebvysionAria": "Web Vysion — neues Fenster"
   },
   "stop": {
@@ -682,17 +683,17 @@
   "about": {
     "heroTitle": "Über",
     "heroTitleAccent": "Vysion",
-    "heroTitleEnd": "Horeca",
+    "heroTitleEnd": "",
     "heroSubtitle": "Aus der Praxis gebaut. Nicht aus einem Büro.",
     "story": {
       "title": "Unsere Geschichte",
-      "p1": "Vysion Horeca wurde aus echter Erfahrung geboren. Als Gastronomen stießen wir auf dasselbe Problem wie Sie: zu viele Systeme, zu viele Kosten und zu wenig Überblick.",
+      "p1": "Vysion wurde aus echter Erfahrung geboren. Als Unternehmer stießen wir auf dasselbe Problem wie Sie: zu viele Systeme, zu viele Kosten und zu wenig Überblick.",
       "p2": "Wir zahlten jeden Monat für separate Tools: eine Bestellplattform, Buchhaltung, Zahlungen und Analysen — alles separat, nichts das wirklich zusammenarbeitete. Die Kosten stiegen. Der Aufwand auch.",
-      "p3": "Also haben wir beschlossen, es anders zu machen. Wir haben eine intelligente Plattform gebaut, mit der Bestellplattform als Herzstück, und alles was Sie daneben brauchen einfach inklusive. Keine überflüssigen Funktionen. Keine separaten Abonnements. Einfach ein ehrliches System das für Gastronomen funktioniert."
+      "p3": "Also haben wir beschlossen, es anders zu machen. Wir haben eine intelligente Plattform gebaut, mit der Bestellplattform als Herzstück, und alles was Sie daneben brauchen einfach inklusive. Keine überflüssigen Funktionen. Keine separaten Abonnements. Einfach ein ehrliches System, das für Unternehmer wie Sie funktioniert."
     },
     "facts": {
       "founded": "Gegründet 2013",
-      "foundedDesc": "Von Gastronomen mit mehr als 15 Jahren Erfahrung",
+      "foundedDesc": "Von Unternehmern mit mehr als 15 Jahren Erfahrung",
       "location": "Sitz in Belgien",
       "locationDesc": "Pelt, Limburg - das Herz der Benelux",
       "countries": "Aktiv in 20+ Ländern",
@@ -700,7 +701,7 @@
     },
     "mission": {
       "title": "Unsere Mission",
-      "subtitle": "Gastronomen sich auf das konzentrieren lassen, was sie am besten können: Gäste begrüßen und großartige Erlebnisse schaffen. Den Rest erledigen wir.",
+      "subtitle": "Unternehmer auf das konzentrieren lassen, was sie am besten können: Kunden begrüßen und großartige Erlebnisse schaffen. Den Rest erledigen wir.",
       "reliability": {
         "title": "Zuverlässigkeit",
         "description": "99,9% Verfügbarkeit. Ihre Software funktioniert immer, auch wenn das Internet ausfällt."
@@ -735,16 +736,16 @@
     },
     "company": {
       "title": "Vysion Group International",
-      "p1": "Vysion Horeca ist Teil der Vysion Group International, einem Technologieunternehmen, das auf Software für den Gastronomie- und Einzelhandelssektor spezialisiert ist.",
-      "p2": "Neben Vysion Horeca entwickeln wir auch maßgeschneiderte Anwendungen und digitale Lösungen für Unternehmen, die ihre Prozesse automatisieren möchten.",
-      "happyBusinesses": "Zufriedene Gastronomiebetriebe",
+      "p1": "Vysion ist Teil der Vysion Group International, einem Technologieunternehmen, das auf Software für Einzelhandel und Dienstleistungen spezialisiert ist.",
+      "p2": "Wir entwickeln auch maßgeschneiderte Anwendungen und digitale Lösungen für Unternehmen, die ihre Prozesse automatisieren möchten.",
+      "happyBusinesses": "Zufriedene Betriebe",
       "processedMonthly": "Pro Monat verarbeitet",
       "supportAvailable": "Support verfügbar",
       "statBusinesses": "1321",
       "statVolume": "250.000 €"
     },
     "ctaTitle": "Bereit zum Starten?",
-    "ctaSubtitle": "Testen Sie Vysion Horeca 14 Tage kostenlos. Keine Kreditkarte erforderlich.",
+    "ctaSubtitle": "Testen Sie Vysion 14 Tage kostenlos. Keine Kreditkarte erforderlich.",
     "ctaPrimary": "Kostenlose Testversion starten",
     "ctaSecondary": "Kontaktieren Sie uns"
   },

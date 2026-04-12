@@ -21,7 +21,18 @@ export default function OverOnsPage() {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 drop-shadow-sm">
-              {t('about.heroTitle')} <span className="text-accent">{t('about.heroTitleAccent')}</span> {t('about.heroTitleEnd')}
+              {(() => {
+                const start = t('about.heroTitle').trim()
+                const brand = t('about.heroTitleAccent').trim()
+                const end = t('about.heroTitleEnd').trim()
+                return (
+                  <>
+                    {start ? <>{start} </> : null}
+                    {brand ? <span className="text-accent">{brand}</span> : null}
+                    {end ? <> {end}</> : null}
+                  </>
+                )
+              })()}
             </h1>
             <p className="text-xl text-gray-200 max-w-3xl mx-auto">
               {t('about.heroSubtitle')}

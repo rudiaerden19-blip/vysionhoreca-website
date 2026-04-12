@@ -532,7 +532,7 @@
     }
   },
   "footer": {
-    "description": "Vysion Horeca fait partie de Vysion Group International. Logiciel cloud pour l’horeca en Belgique et aux Pays-Bas : caisse tactile (POS), réservations avec plan de salle, commande en ligne et boutique, écran cuisine, coûts de recettes, pointage et analyses — restaurants, cafés et friteries.",
+    "description": "Vysion fait partie de Vysion Group International. Logiciel cloud en Belgique et aux Pays-Bas : caisse tactile (POS), réservations avec plan de salle, commande en ligne et boutique, écran cuisine, coûts de recettes, pointage et analyses — des restaurants et cafés aux commerces et services.",
     "address": "Adresse:",
     "product": "Produit",
     "features": "Fonctionnalités & plateforme",
@@ -551,15 +551,16 @@
     "navProductAria": "Produit — fonctionnalités, tarifs et actualités",
     "navCompanyAria": "Entreprise — à propos, contact et politiques",
     "featuresLinkTitle": "Caisse, réservations, commande en ligne et modules",
-    "pricingLinkTitle": "Offres et tarifs du logiciel horeca",
-    "updatesLinkTitle": "Actualités produit Vysion Horeca",
+    "pricingLinkTitle": "Offres et tarifs de la plateforme",
+    "updatesLinkTitle": "Actualités produit Vysion",
     "supportLinkTitle": "Aide et support technique",
-    "aboutLinkTitle": "À propos de Vysion Horeca",
+    "aboutLinkTitle": "À propos de Vysion",
     "contactLinkTitle": "Contacter Vysion — démo ou question",
     "privacyLinkTitle": "Politique de confidentialité",
     "legalLinkTitle": "Conditions et informations légales",
     "linkAppsAria": "Vysion Apps — s’ouvre dans un nouvel onglet",
-    "linkHorecaAria": "Site officiel Vysion Horeca — nouvel onglet",
+    "linkHorecaAria": "Site officiel Vysion — nouvel onglet",
+    "websiteLinkLabel": "Site officiel",
     "linkWebvysionAria": "Web Vysion — nouvel onglet"
   },
   "stop": {
