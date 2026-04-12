@@ -176,7 +176,7 @@ export default function LoginPage() {
       const tenant = data.tenant
 
       if (!tenant.tenant_slug) {
-        setError('Geen tenant gevonden. Neem contact op met support.')
+        setError(t('login.tenantNotFound'))
         setIsLoading(false)
         return
       }

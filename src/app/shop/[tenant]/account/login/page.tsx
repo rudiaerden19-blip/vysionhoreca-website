@@ -109,7 +109,7 @@ export default function LoginPage({ params }: { params: { tenant: string } }) {
               onChange={(e) => setPassword(e.target.value)}
               required
               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all"
-              placeholder="••••••••"
+              placeholder={t('accountPage.passwordPlaceholderMasked')}
             />
           </div>
 
@@ -154,7 +154,7 @@ export default function LoginPage({ params }: { params: { tenant: string } }) {
             href={`/shop/${params.tenant}`}
             className="text-gray-400 text-sm hover:text-gray-600"
           >
-            ← Terug naar winkel
+            ← {t('accountPage.backToShop')}
           </Link>
         </div>
       </motion.div>

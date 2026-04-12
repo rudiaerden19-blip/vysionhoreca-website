@@ -311,7 +311,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
           </div>
 
           <p className="text-xs text-gray-400">
-            <span className="text-red-500">*</span> = verplicht veld
+            {t('accountPage.requiredFieldLegend')}
           </p>
 
           <motion.button
@@ -360,7 +360,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
         </div>
 
         <p className="text-xs text-gray-400 text-center mt-6">
-          Door te registreren ga je akkoord met de voorwaarden en privacybeleid.
+          {t('accountPage.registerTermsNotice')}
         </p>
       </motion.div>
     </div>

@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
+import { useLanguage } from '@/i18n'
 
 export type TableShape = 'ROUND' | 'SQUARE' | 'RECTANGLE'
 export type TableStatus = 'FREE' | 'OCCUPIED' | 'UNPAID'
@@ -22,12 +23,6 @@ const STATUS_COLORS: Record<TableStatus, string> = {
   OCCUPIED: '#3b82f6',
   UNPAID: '#f59e0b',
 }
-const STATUS_LABELS: Record<TableStatus, string> = {
-  FREE: 'Vrij',
-  OCCUPIED: 'Bezet',
-  UNPAID: 'Onbetaald',
-}
-
 interface SimpleCartItem {
   product: { name: string; price: number }
   quantity: number
@@ -70,7 +65,21 @@ export interface DecorItem {
   stool2?: string
 }
 
-function DecorSVG({ item, isSelected, orderedStools = new Set(), stoolStatuses = {}, getStoolStatus }: { item: DecorItem; isSelected: boolean; orderedStools?: Set<string>; stoolStatuses?: Record<string, TableStatus>; getStoolStatus?: (id: string) => TableStatus }) {
+function DecorSVG({
+  item,
+  isSelected,
+  orderedStools = new Set(),
+  stoolStatuses = {},
+  getStoolStatus,
+  barLabel = 'BAR',
+}: {
+  item: DecorItem
+  isSelected: boolean
+  orderedStools?: Set<string>
+  stoolStatuses?: Record<string, TableStatus>
+  getStoolStatus?: (id: string) => TableStatus
+  barLabel?: string
+}) {
   if (item.type === 'plant') {
     return (
       <svg width={80} height={100} style={{ overflow: 'visible' }}>
@@ -136,7 +145,7 @@ function DecorSVG({ item, isSelected, orderedStools = new Set(), stoolStatuses =
       {/* Rand bovenop */}
       <rect x={0} y={stoolR * 2 + 6} width={bw} height={8} rx={3} fill="#888" opacity={0.5} />
       {/* Label */}
-      <text x={bw / 2} y={stoolR * 2 + 6 + bh / 2 + 5} textAnchor="middle" fill="rgba(255,255,255,0.6)" fontSize={11} fontWeight="bold">TOOG</text>
+      <text x={bw / 2} y={stoolR * 2 + 6 + bh / 2 + 5} textAnchor="middle" fill="rgba(255,255,255,0.6)" fontSize={11} fontWeight="bold">{barLabel}</text>
       {/* Kruk 1 */}
       <circle cx={bw * 0.28} cy={stoolR + 2} r={stoolR} fill={stool1Color} stroke="rgba(0,0,0,0.4)" strokeWidth={2} />
       <circle cx={bw * 0.28} cy={stoolR + 2} r={stoolR - 5} fill="rgba(255,255,255,0.25)" />
@@ -344,6 +353,15 @@ function TableSVG({ table, isSelected, onClick, effectiveStatus }: {
 }
 
 export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOrders = {} }: Props) {
+  const { t } = useLanguage()
+  const statusLabels = useMemo(
+    () => ({
+      FREE: t('kassaApp.tableStatusFree'),
+      OCCUPIED: t('kassaApp.tableStatusOccupied'),
+      UNPAID: t('kassaApp.tableStatusUnpaid'),
+    }),
+    [t],
+  )
   const storageKey = `vysion_tables_${tenant}`
   const [tables, setTables] = useState<KassaTable[]>([])
   const [selected, setSelected] = useState<KassaTable | null>(null)
@@ -786,9 +804,11 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
       {/* Header */}
       <div className="h-14 flex-shrink-0 bg-[#16213e] border-b border-white/10 flex items-center justify-between px-4">
         <div className="flex items-center gap-3">
-          <h2 className="text-white font-bold text-lg">Kies Tafel</h2>
+          <h2 className="text-white font-bold text-lg">{t('kassaApp.pickTableTitle')}</h2>
           <span className="text-white/50 text-sm">
-            {tables.filter(t => t.status === 'FREE').length}/{tables.length} vrij
+            {t('kassaApp.floorPlanFreeCount')
+              .replace('{free}', String(tables.filter((tbl) => tbl.status === 'FREE').length))
+              .replace('{total}', String(tables.length))}
           </span>
         </div>
         <div className="flex gap-2 items-center">
@@ -796,32 +816,32 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
             <>
               <button onClick={() => setShowAddModal(true)}
                 className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-semibold transition-colors">
-                🪑 Tafel
+                {t('kassaApp.floorPlanAddTable')}
               </button>
               <button onClick={openAddBarModal}
                 className="px-4 py-2 bg-amber-700 hover:bg-amber-800 text-white rounded-lg text-sm font-semibold transition-colors">
-                🍺 Toogstuk
+                {t('kassaApp.floorPlanAddBar')}
               </button>
               <button onClick={() => addDecor('plant')}
                 className="px-4 py-2 bg-green-700 hover:bg-green-800 text-white rounded-lg text-sm font-semibold transition-colors">
-                🌿 Plant
+                {t('kassaApp.floorPlanAddPlant')}
               </button>
             </>
           )}
           <button
             onClick={() => setIsLocked(prev => !prev)}
-            title={isLocked ? 'Ontgrendelen om tafels te verplaatsen' : 'Vergrendelen'}
+            title={isLocked ? t('kassaApp.floorPlanLockTitleLocked') : t('kassaApp.floorPlanLockTitleUnlocked')}
             className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 ${
               isLocked
                 ? 'bg-orange-500 hover:bg-orange-600 text-white'
                 : 'bg-yellow-400 hover:bg-yellow-500 text-gray-900'
             }`}
           >
-            {isLocked ? '🔒 Vergrendeld' : '🔓 Bewerken'}
+            {isLocked ? t('kassaApp.floorPlanLocked') : t('kassaApp.floorPlanEditing')}
           </button>
           <button onClick={onClose}
             className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-semibold transition-colors">
-            ✕ Sluiten
+            ✕ {t('kassaApp.closeAria')}
           </button>
         </div>
       </div>
@@ -885,7 +905,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
               onPointerCancel={(e) => { e.stopPropagation(); handlePointerCancel(e) }}
               onClick={(e) => e.stopPropagation()}
             >
-              <DecorSVG item={d} isSelected={selectedDecor?.id === d.id} orderedStools={new Set(Object.keys(tableOrders).filter(k => (tableOrders[k] || []).length > 0))} stoolStatuses={stoolStatuses} getStoolStatus={getStoolStatus} />
+              <DecorSVG item={d} isSelected={selectedDecor?.id === d.id} orderedStools={new Set(Object.keys(tableOrders).filter(k => (tableOrders[k] || []).length > 0))} stoolStatuses={stoolStatuses} getStoolStatus={getStoolStatus} barLabel={t('kassaApp.floorPlanBarLabel')} />
             </div>
           ))}
 
@@ -1002,7 +1022,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                         <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold" style={{ backgroundColor: STATUS_COLORS[status] }}>{stoolId}</div>
                         <span className="text-white font-bold text-sm">Kruk {stoolId}</span>
                       </div>
-                      <span className="text-xs font-semibold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: STATUS_COLORS[status] }}>{STATUS_LABELS[status]}</span>
+                      <span className="text-xs font-semibold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: STATUS_COLORS[status] }}>{statusLabels[status]}</span>
                     </div>
                     {/* Bestellingen */}
                     <div className="p-3">
@@ -1046,7 +1066,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                               ? { backgroundColor: STATUS_COLORS['UNPAID'] + '33', color: STATUS_COLORS['UNPAID'], border: `2px solid ${STATUS_COLORS['UNPAID']}` }
                               : { backgroundColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.5)' }
                             }>
-                            {STATUS_LABELS[s]}{warnUnpaid ? ' ⚠️' : ''}
+                            {statusLabels[s as TableStatus]}{warnUnpaid ? ' ⚠️' : ''}
                           </button>
                         )
                       })}
@@ -1145,7 +1165,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                 <div>
                   <div className="flex items-center gap-2 mb-0.5">
                     <h3 className="text-white font-bold text-xl">Tafel {selected.number}</h3>
-                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: STATUS_COLORS[effectiveStatus] }}>{STATUS_LABELS[effectiveStatus]}</span>
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: STATUS_COLORS[effectiveStatus] }}>{statusLabels[effectiveStatus]}</span>
                   </div>
                   <p className="text-white/40 text-xs">{selected.seats} plaatsen</p>
                 </div>
@@ -1232,7 +1252,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                           ? { backgroundColor: STATUS_COLORS['UNPAID'] + '33', color: STATUS_COLORS['UNPAID'], border: `2px solid ${STATUS_COLORS['UNPAID']}` }
                           : { backgroundColor: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)' }
                       }>
-                      {STATUS_LABELS[s]}{warnUnpaid ? ' ⚠️' : ''}
+                      {statusLabels[s as TableStatus]}{warnUnpaid ? ' ⚠️' : ''}
                     </button>
                   )
                 })}
@@ -1261,7 +1281,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
         {(Object.entries(STATUS_COLORS) as [TableStatus, string][]).map(([s, c]) => (
           <div key={s} className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: c }} />
-            <span>{STATUS_LABELS[s]}</span>
+            <span>{statusLabels[s as TableStatus]}</span>
           </div>
         ))}
         {isLocked

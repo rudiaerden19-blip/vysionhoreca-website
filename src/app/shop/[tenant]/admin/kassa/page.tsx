@@ -385,8 +385,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             startAlarm()
             try {
               if ('Notification' in window && Notification.permission === 'granted') {
-                new Notification('🔔 NIEUWE BESTELLING!', {
-                  body: `Bestelling #${newOrderOnes[0].order_number} is binnengekomen!`,
+                new Notification(t('kassaApp.pushNewOrderTitle'), {
+                  body: t('kassaApp.pushNewOrderBody').replace(
+                    '{orderNumber}',
+                    String(newOrderOnes[0].order_number),
+                  ),
                   icon: '/favicon.ico',
                   requireInteraction: true,
                   tag: 'new-order',
@@ -418,8 +421,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             startAlarm()
             try {
               if ('Notification' in window && Notification.permission === 'granted') {
-                new Notification('📅 Nieuwe reservatie!', {
-                  body: 'Er is een nieuwe reservatie binnengekomen.',
+                new Notification(t('kassaApp.pushNewReservationTitle'), {
+                  body: t('kassaApp.pushNewReservationBody'),
                   icon: '/favicon.ico',
                   requireInteraction: true,
                   tag: 'new-reservation',
@@ -459,7 +462,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     check()
     const interval = setInterval(check, 3000)
     return () => clearInterval(interval)
-  }, [tenant, startAlarm, stopAlarm, demoViewOnly])
+  }, [tenant, startAlarm, stopAlarm, demoViewOnly, t])
 
   // Menu
   const [categories, setCategories] = useState<MenuCategory[]>([])
@@ -955,7 +958,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const confirmOptions = () => {
     if (!optionsModal) return
     const missing = optionsModal.options.filter(o => o.required && !optionsModal.selected.find(s => s.optionId === o.id))
-    if (missing.length > 0) { playClick(); alert(`Kies een ${missing[0].name}`); return }
+    if (missing.length > 0) {
+      playClick()
+      alert(t('kassaApp.optionChoosePrompt').replace('{name}', missing[0].name))
+      return
+    }
 
     const { product, selected, editingCartKey } = optionsModal
     if (!editingCartKey && blockSaleWithoutStaffIfNeededRef.current()) return
@@ -1177,12 +1184,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const orderPayload = {
       tenant_slug: tenant,
       order_number: orderNumber,
-      customer_name: tableNumber ? `Tafel ${tableNumber}` : 'Kassa',
+      customer_name: tableNumber
+        ? t('kassaReceipt.tableLabel').replace(/\{number\}/g, String(tableNumber))
+        : t('kassaApp.walkInCustomerName'),
       status: 'confirmed',
       payment_status: 'paid',
       payment_method: method,
       order_type: orderType,
-      customer_notes: tableNumber ? `Tafel ${tableNumber}` : null,
+      customer_notes: tableNumber
+        ? t('kassaReceipt.tableLabel').replace(/\{number\}/g, String(tableNumber))
+        : null,
       subtotal: Math.round(subtotal * 100) / 100,
       tax: Math.round(tax * 100) / 100,
       total: total,
@@ -1220,7 +1231,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         } else {
           addToQueue()
         }
-        alert(`⚠️ Geen internetverbinding. Order #${orderNumber} is lokaal opgeslagen en wordt automatisch verstuurd zodra je weer online bent.`)
+        alert(
+          t('kassaApp.offlineOrderQueuedAlert').replace('{orderNumber}', String(orderNumber)),
+        )
       } else {
         console.error('Supabase order insert error:', error)
       }
@@ -1255,45 +1268,62 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const subtotal = order.total / (1 + vatRate / 100)
     const tax = order.total - subtotal
     const orderTypeLabel =
-      order.orderType === 'DINE_IN' ? '🍽️ Hier Opeten' :
-      order.orderType === 'TAKEAWAY' ? '📦 Afhalen' : '🚗 Bezorgen'
+      order.orderType === 'DINE_IN'
+        ? `🍽️ ${t('kassaReceipt.orderTypeDineIn')}`
+        : order.orderType === 'TAKEAWAY'
+          ? `📦 ${t('kassaReceipt.orderTypeTakeaway')}`
+          : `🚗 ${t('kassaReceipt.orderTypeDelivery')}`
     const payLabel =
-      order.paymentMethod === 'CASH' ? 'Contant' :
-      order.paymentMethod === 'CARD' ? 'PIN/Kaart' :
-      order.paymentMethod === 'IDEAL' ? 'iDEAL' : 'Bancontact'
+      order.paymentMethod === 'CASH'
+        ? t('kassaApp.payCash')
+        : order.paymentMethod === 'CARD'
+          ? t('kassaApp.payCard')
+          : order.paymentMethod === 'IDEAL'
+            ? t('kassaApp.payIdeal')
+            : t('kassaApp.payBancontact')
+    const docTitle = `${t('kassaReceipt.receiptNo')}${order.orderNumber}`
+    const bizName = escapeReceiptHtml(tenantInfo?.business_name || t('kassaApp.defaultBusinessName'))
+    const dateStr = order.createdAt.toLocaleString(appLocaleToBcp47(locale), {
+      day: '2-digit',
+      month: '2-digit',
+      year: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+    const vatRowLabel = escapeReceiptHtml(t('kassaReceipt.vat').replace('{rate}', String(vatRate)))
 
-    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>Bon #${order.orderNumber}</title><style>${KASSA_PRINT_RECEIPT_STYLES}</style></head><body>
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${escapeReceiptHtml(docTitle)}</title><style>${KASSA_PRINT_RECEIPT_STYLES}</style></head><body>
       <div class="center">
-        <div class="bold big">${tenantInfo?.business_name || 'Vysion Horeca'}</div>
-        ${tenantInfo?.address ? `<div class="small">${tenantInfo.address}</div>` : ''}
-        ${(tenantInfo?.postal_code || tenantInfo?.city) ? `<div class="small">${tenantInfo.postal_code ?? ''} ${tenantInfo.city ?? ''}</div>` : ''}
-        ${tenantInfo?.phone ? `<div class="small">Tel: ${tenantInfo.phone}</div>` : ''}
+        <div class="bold big">${bizName}</div>
+        ${tenantInfo?.address ? `<div class="small">${escapeReceiptHtml(tenantInfo.address)}</div>` : ''}
+        ${tenantInfo?.postal_code || tenantInfo?.city ? `<div class="small">${escapeReceiptHtml(tenantInfo.postal_code ?? '')} ${escapeReceiptHtml(tenantInfo.city ?? '')}</div>` : ''}
+        ${tenantInfo?.phone ? `<div class="small">${escapeReceiptHtml(t('kassaReceipt.telPrefix'))} ${escapeReceiptHtml(tenantInfo.phone)}</div>` : ''}
       </div>
       <div class="divider"></div>
-      <div class="center order-type">${orderTypeLabel}${order.tableNumber ? `<br/>TAFEL ${order.tableNumber}` : ''}</div>
+      <div class="center order-type">${escapeReceiptHtml(orderTypeLabel)}${order.tableNumber ? `<br/>${escapeReceiptHtml(t('kassaReceipt.tablePrefix'))} ${escapeReceiptHtml(String(order.tableNumber))}` : ''}</div>
       <div class="row small">
-        <span>Bon #${order.orderNumber}</span>
-        <span>${order.createdAt.toLocaleString('nl-NL', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' })}</span>
+        <span>${escapeReceiptHtml(t('kassaReceipt.receiptNo'))}${order.orderNumber}</span>
+        <span>${escapeReceiptHtml(dateStr)}</span>
       </div>
       <div class="divider-solid"></div>
       ${order.items.map(i => {
         const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
         const lineTotal = (i.product.price + choicesTotal) * i.quantity
-        return `<div class="row"><span>${i.quantity}x ${i.product.name}</span><span>€${lineTotal.toFixed(2)}</span></div>
-        ${(i.choices || []).map(c => `<div class="row small" style="margin-left:15px;color:#666;"><span>+ ${c.choiceName}</span><span>${c.price > 0 ? '€' + c.price.toFixed(2) : ''}</span></div>`).join('')}`
+        return `<div class="row"><span>${i.quantity}x ${escapeReceiptHtml(i.product.name)}</span><span>€${lineTotal.toFixed(2)}</span></div>
+        ${(i.choices || []).map(c => `<div class="row small" style="margin-left:15px;color:#666;"><span>+ ${escapeReceiptHtml(c.choiceName)}</span><span>${c.price > 0 ? '€' + c.price.toFixed(2) : ''}</span></div>`).join('')}`
       }).join('')}
       <div class="divider-solid"></div>
-      <div class="row"><span>Subtotaal</span><span>€${subtotal.toFixed(2)}</span></div>
-      <div class="row"><span>BTW (${vatRate}%)</span><span>€${tax.toFixed(2)}</span></div>
-      <div class="row total"><span>TOTAAL</span><span>€${order.total.toFixed(2)}</span></div>
+      <div class="row"><span>${escapeReceiptHtml(t('kassaReceipt.subtotal'))}</span><span>€${subtotal.toFixed(2)}</span></div>
+      <div class="row"><span>${vatRowLabel}</span><span>€${tax.toFixed(2)}</span></div>
+      <div class="row total"><span>${escapeReceiptHtml(t('kassaReceipt.total'))}</span><span>€${order.total.toFixed(2)}</span></div>
       <div class="divider"></div>
-      <div class="center small">Betaald met: ${payLabel}</div>
+      <div class="center small">${escapeReceiptHtml(t('kassaReceipt.paidWith'))} ${escapeReceiptHtml(payLabel)}</div>
       ${order.helpedByStaffName ? `<div class="divider"></div><div class="center bold">${t('kassaReceipt.helpedBy').replace('{name}', escapeReceiptHtml(order.helpedByStaffName))}</div>` : ''}
       <div class="divider"></div>
       <div class="center small">
-        ${tenantInfo?.btw_number ? `BTW: ${tenantInfo.btw_number}<br/>` : ''}
-        Bedankt voor uw bezoek!
-        ${tenantInfo?.website ? `<br/>${tenantInfo.website}` : ''}
+        ${tenantInfo?.btw_number ? `${escapeReceiptHtml(t('kassaReceipt.businessVatLabel').replace('{vatNumber}', tenantInfo.btw_number))}<br/>` : ''}
+        ${escapeReceiptHtml(t('kassaReceipt.thanks'))}
+        ${tenantInfo?.website ? `<br/>${escapeReceiptHtml(tenantInfo.website)}` : ''}
       </div>
     </body></html>`
 
@@ -1511,27 +1541,38 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   blockSaleWithoutStaffIfNeededRef.current = blockSaleWithoutStaffIfNeeded
 
+  const paymentMethodOptions = useMemo(
+    () =>
+      [
+        { method: 'CASH' as const, label: t('kassaApp.payCash'), icon: '💵', color: '#10b981' },
+        { method: 'CARD' as const, label: t('kassaApp.payCard'), icon: '💳', color: '#3b82f6' },
+        { method: 'IDEAL' as const, label: t('kassaApp.payIdeal'), icon: '📱', color: '#ec4899' },
+        { method: 'BANCONTACT' as const, label: t('kassaApp.payBancontact'), icon: '🏦', color: '#f59e0b' },
+      ] as const,
+    [t],
+  )
+
   // ── Geluid activatie scherm (exact donor) — toon elke sessie ───────────
   if (showSoundActivation && !soundActivated && !demoViewOnly) {
     return (
       <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-[#e3e3e3] p-8">
         <div className="max-w-md text-center text-gray-900">
           <div className="mb-8 text-8xl">🔔</div>
-          <h1 className="mb-4 text-4xl font-bold text-gray-900">Activeer Geluid</h1>
+          <h1 className="mb-4 text-4xl font-bold text-gray-900">{t('kassaApp.soundTitle')}</h1>
           <p className="mb-8 text-xl text-gray-700">
-            Klik op de knop om geluid en meldingen te activeren voor nieuwe bestellingen.
+            {t('kassaApp.soundBody')}
             <br /><br />
-            <strong className="text-gray-900">Dit doe je maar 1 keer per dag.</strong>
+            <strong className="text-gray-900">{t('kassaApp.soundOncePerDay')}</strong>
           </p>
           <button
             onClick={activateSound}
             className="flex w-full transform items-center justify-center gap-4 rounded-2xl bg-green-500 py-6 text-2xl font-bold text-white shadow-lg transition-all hover:scale-105 hover:bg-green-600"
           >
             <span className="text-4xl">🔊</span>
-            ACTIVEER GELUID
+            {t('kassaApp.soundActivateButton').toUpperCase()}
           </button>
           <p className="mt-6 text-sm text-gray-600">
-            💡 Zonder activatie kunnen nieuwe bestellingen geen alarm afspelen.
+            💡 {t('kassaApp.soundHintFooter')}
           </p>
         </div>
       </div>
@@ -1558,7 +1599,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <button onClick={() => { setHamburgerOpen(!hamburgerOpen); setHamburgerSubOpen(null) }}
             className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-colors ${hamburgerOpen ? 'bg-orange-600 text-white' : 'bg-orange-500 hover:bg-orange-400 text-white'}`}>
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
-            <span className="font-bold text-sm">Menu</span>
+            <span className="font-bold text-sm">{t('kassaApp.hamburgerMenu')}</span>
           </button>
           {hamburgerOpen && (() => {
             const modules = filteredHamburgerModules
@@ -1631,7 +1672,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* Tenant naam */}
         <div className="flex flex-1 items-center justify-center">
           <span className="truncate text-center text-xl font-medium tracking-normal text-white">
-            {tenantInfo?.business_name || tenant.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+            {tenantInfo?.business_name ||
+              tenant.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
           </span>
         </div>
 
@@ -1648,7 +1690,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             className="relative flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors"
           >
             <span className="text-lg">📅</span>
-            <span>Reserveringen</span>
+            <span>{t('kassaApp.navReservations')}</span>
             {pendingReservCount > 0 && (
               <span className="absolute -top-2 -right-2 bg-red-600 text-white text-sm font-black rounded-full min-w-[26px] h-7 flex items-center justify-center px-1.5 shadow-lg border-2 border-white">
                 {pendingReservCount}
@@ -1662,7 +1704,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <Link href={`/shop/${tenant}/display`}
             className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors">
             <span className="text-lg">🖥️</span>
-            <span>Onlinescherm</span>
+            <span>{t('kassaApp.navShopDisplay')}</span>
           </Link>
         )}
 
@@ -1671,14 +1713,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <Link href={`/keuken/${tenant}`}
             className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors">
             <span className="text-lg">👨‍🍳</span>
-            <span>Keukenscherm</span>
+            <span>{t('kassaApp.navKitchenDisplay')}</span>
           </Link>
         )}
 
         {/* Geluid */}
         <button onClick={toggleSound}
           className={`w-9 h-9 rounded-lg flex items-center justify-center text-xl transition-colors ${soundsOn ? 'bg-green-500/80 text-white' : 'bg-white/10 text-white/60'}`}
-          title={soundsOn ? 'Geluid aan' : 'Geluid uit'}>
+          title={soundsOn ? t('kassaApp.soundOnTitle') : t('kassaApp.soundOffTitle')}>
           {soundsOn ? '🔔' : '🔕'}
         </button>
 
@@ -1725,7 +1767,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         <button onClick={handleLogout}
           className="flex items-center gap-1.5 px-3 py-2 bg-red-600/80 hover:bg-red-600 rounded-lg text-white text-sm font-bold transition-colors ml-1">
           <span className="text-lg">🚪</span>
-          <span>Uitloggen</span>
+          <span>{t('kassaApp.logout')}</span>
         </button>
 
       </div>
@@ -1734,14 +1776,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       {isOnline === false && (
         <div className="flex-shrink-0 bg-red-600 text-white text-xs font-semibold flex items-center justify-center gap-2 py-1 px-4">
           <span>📴</span>
-          <span>Offline – menu geladen uit cache. Bestellingen worden bewaard en verstuurd bij reconnect.</span>
+          <span>{t('kassaApp.offlineBanner')}</span>
         </div>
       )}
       {installPrompt && !isInstalled && (
         <div className="flex-shrink-0 bg-orange-500 text-white text-xs font-semibold flex items-center justify-between gap-2 py-1.5 px-4">
-          <span>📲 Installeer de Kassa als app voor volledig offline gebruik</span>
+          <span>📲 {t('kassaApp.pwaInstallBanner')}</span>
           <div className="flex gap-2">
-            <button onClick={handleInstallPWA} className="bg-white text-orange-600 px-3 py-0.5 rounded-full text-xs font-bold hover:bg-orange-50">Installeer</button>
+            <button onClick={handleInstallPWA} className="bg-white text-orange-600 px-3 py-0.5 rounded-full text-xs font-bold hover:bg-orange-50">{t('kassaApp.install')}</button>
             <button onClick={() => setInstallPrompt(null)} className="text-white/70 hover:text-white text-lg leading-none">×</button>
           </div>
         </div>
@@ -1773,14 +1815,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           {/* Grid */}
           <div className="flex-1 overflow-y-auto p-4">
             {menuLoading ? (
-              <div className="flex items-center justify-center h-full text-gray-400 text-lg">Laden...</div>
+              <div className="flex items-center justify-center h-full text-gray-400 text-lg">{t('kassaApp.loading')}</div>
             ) : !selectedCategory ? (
               /* Categorieën grid — 4 kolommen */
               categories.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-gray-400">
                   <span className="text-5xl mb-3">📂</span>
-                  <p className="font-semibold">Nog geen categorieën</p>
-                  <p className="text-sm mt-1">Voeg categorieën toe via het Online Platform</p>
+                  <p className="font-semibold">{t('kassaApp.noCategoriesTitle')}</p>
+                  <p className="text-sm mt-1">{t('kassaApp.noCategoriesHint')}</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-4 gap-4">
@@ -1813,7 +1855,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 return filtered.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-gray-400">
                     <span className="text-5xl mb-3">🍽️</span>
-                    <p className="font-semibold">Geen producten in deze categorie</p>
+                    <p className="font-semibold">{t('kassaApp.noProductsInCategory')}</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-4 gap-4">
@@ -1869,9 +1911,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             >
               {tableNumber
                 ? kassaStools.some(s => s.stoolNumber === tableNumber)
-                  ? `🍺 Kruk ${tableNumber}`
-                  : `🪑 Tafel ${tableNumber}`
-                : 'Kies tafel...'}
+                  ? `🍺 ${t('kassaApp.stoolWord')} ${tableNumber}`
+                  : `🪑 ${t('kassaApp.tableWord')} ${tableNumber}`
+                : t('kassaApp.pickTablePlaceholder')}
             </button>
 
             {/* Tafel picker popup */}
@@ -1880,38 +1922,42 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 <div className="fixed inset-0 z-40" onClick={() => setShowTablePicker(false)} />
                 <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
                   <div className="p-3 border-b bg-gray-50">
-                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wider text-center">Kies tafel</p>
+                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wider text-center">{t('kassaApp.pickTableTitle')}</p>
                   </div>
                   {kassaTables.length === 0 && kassaStools.length === 0 ? (
                     <div className="p-4 text-center text-gray-400 text-sm">
-                      Nog geen tafels aangemaakt
+                      {t('kassaApp.noTablesYet')}
                     </div>
                   ) : (
                     <>
                       {kassaTables.length > 0 && (
                         <div className="p-2 grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
-                          {kassaTables.map(t => (
+                          {kassaTables.map((tbl) => (
                             <button
-                              key={t.id}
-                              onClick={() => switchToTable(t.number)}
+                              key={tbl.id}
+                              onClick={() => switchToTable(tbl.number)}
                               className={`py-3 rounded-xl font-bold text-sm transition-colors border-2 relative ${
-                                tableNumber === t.number
+                                tableNumber === tbl.number
                                   ? 'bg-[#3C4D6B] text-white border-[#3C4D6B]'
-                                  : t.status === 'FREE'
+                                  : tbl.status === 'FREE'
                                   ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'
-                                  : t.status === 'UNPAID'
+                                  : tbl.status === 'UNPAID'
                                   ? 'bg-amber-50 text-amber-700 border-amber-300 hover:bg-amber-100'
                                   : 'bg-blue-50 text-blue-700 border-blue-300 hover:bg-blue-100'
                               }`}
                             >
                               <div className="text-lg">🪑</div>
-                              <div>{t.number}</div>
+                              <div>{tbl.number}</div>
                               <div className="text-[10px] opacity-70">
-                                {t.status === 'FREE' ? 'Vrij' : t.status === 'OCCUPIED' ? 'Bezet' : 'Onbetaald'}
+                                {tbl.status === 'FREE'
+                                  ? t('kassaApp.tableStatusFree')
+                                  : tbl.status === 'OCCUPIED'
+                                    ? t('kassaApp.tableStatusOccupied')
+                                    : t('kassaApp.tableStatusUnpaid')}
                               </div>
-                              {tableOrders[t.number] && tableOrders[t.number].length > 0 && (
+                              {tableOrders[tbl.number] && tableOrders[tbl.number].length > 0 && (
                                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
-                                  {tableOrders[t.number].length}
+                                  {tableOrders[tbl.number].length}
                                 </span>
                               )}
                             </button>
@@ -1921,7 +1967,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       {kassaStools.length > 0 && (
                         <>
                           <div className="px-3 py-1.5 bg-amber-50 border-t border-amber-100 flex items-center gap-2">
-                            <span className="text-xs font-bold text-amber-700 uppercase tracking-wider">🍺 Barkrukken</span>
+                            <span className="text-xs font-bold text-amber-700 uppercase tracking-wider">🍺 {t('kassaApp.stoolsSection')}</span>
                           </div>
                           <div className="p-2 grid grid-cols-3 gap-2 max-h-36 overflow-y-auto">
                             {kassaStools.map(s => (
@@ -1939,7 +1985,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                                 <div className="text-lg">🍺</div>
                                 <div>{s.stoolNumber}</div>
                                 <div className="text-[10px] opacity-70">
-                                  {tableOrders[s.stoolNumber]?.length > 0 ? 'Bezet' : 'Vrij'}
+                                  {tableOrders[s.stoolNumber]?.length > 0
+                                    ? t('kassaApp.tableStatusOccupied')
+                                    : t('kassaApp.tableStatusFree')}
                                 </div>
                                 {tableOrders[s.stoolNumber]?.length > 0 && (
                                   <span className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
@@ -1959,14 +2007,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                         onClick={() => { setTableNumber(''); setShowTablePicker(false) }}
                         className="flex-1 py-2 rounded-xl bg-red-50 text-red-600 font-semibold text-sm hover:bg-red-100 transition-colors"
                       >
-                        ✕ Geen tafel
+                        ✕ {t('kassaApp.clearTable')}
                       </button>
                     )}
                     <button
                       onClick={() => { setShowTablePicker(false); setShowFloorPlan(true) }}
                       className="flex-1 py-2 rounded-xl bg-[#3C4D6B] text-white font-semibold text-sm hover:bg-[#2D3A52] transition-colors"
                     >
-                      🗺️ Plattegrond
+                      🗺️ {t('kassaApp.floorPlan')}
                     </button>
                   </div>
                 </div>
@@ -1984,9 +2032,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             'bg-blue-600 text-white'
           }`}
         >
-          {orderType === 'DINE_IN' && `🍽️ HIER OPETEN${tableNumber ? ` • Tafel ${tableNumber}` : ''}`}
-          {orderType === 'TAKEAWAY' && '📦 AFHALEN'}
-          {orderType === 'DELIVERY' && '🚗 LEVERING'}
+          {orderType === 'DINE_IN' &&
+            `🍽️ ${t('kassaApp.orderTypeDineIn').toUpperCase()}${tableNumber ? t('kassaApp.orderTypeWithTable').replace(/\{number\}/g, String(tableNumber)) : ''}`}
+          {orderType === 'TAKEAWAY' && `📦 ${t('kassaApp.orderTypeTakeaway').toUpperCase()}`}
+          {orderType === 'DELIVERY' && `🚗 ${t('kassaApp.orderTypeDelivery').toUpperCase()}`}
         </button>
 
         {/* Cart of Numpad */}
@@ -2009,7 +2058,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   type="text"
                   value={numpadValue}
                   readOnly
-                  placeholder="0.00"
+                  placeholder={t('kassaApp.numpadPlaceholder')}
                   className={`min-w-0 text-right text-3xl font-bold bg-transparent border-none outline-none text-black ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1' : 'w-full'}`}
                 />
               </div>
@@ -2034,7 +2083,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   onClick={addCustomAmount}
                   className="mt-3 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-lg transition-colors"
                 >
-                  + €{parseFloat(numpadValue || '0').toFixed(2)} toevoegen
+                  {t('kassaApp.addAmount').replace(
+                    '{amount}',
+                    parseFloat(numpadValue || '0').toFixed(2),
+                  )}
                 </button>
               )}
             </div>
@@ -2076,7 +2128,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                         type="button"
                         onClick={() => updateQty(item.cartKey, item.quantity - 1)}
                         className="w-8 h-8 rounded-lg bg-red-500 text-white font-bold text-base flex items-center justify-center hover:bg-red-600 transition-colors active:scale-95"
-                        aria-label={item.quantity === 1 ? 'Verwijderen' : 'Minder'}
+                        aria-label={
+                          item.quantity === 1 ? t('kassaApp.ariaRemoveLine') : t('kassaApp.ariaDecreaseQty')
+                        }
                       >
                         {item.quantity === 1 ? '🗑' : '−'}
                       </button>
@@ -2088,8 +2142,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                             type="button"
                             onClick={() => void openEditCartItem(item)}
                             className="w-8 h-8 rounded-lg bg-amber-500 text-white text-sm flex items-center justify-center hover:bg-amber-600 transition-colors active:scale-95"
-                            title="Opties wijzigen"
-                            aria-label="Opties wijzigen"
+                            title={t('kassaApp.ariaEditOptions')}
+                            aria-label={t('kassaApp.ariaEditOptions')}
                           >
                             ✏️
                           </button>
@@ -2099,7 +2153,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                         type="button"
                         onClick={() => updateQty(item.cartKey, item.quantity + 1)}
                         className="w-8 h-8 rounded-lg bg-[#3C4D6B] text-white font-bold text-base flex items-center justify-center hover:bg-[#2D3A52] transition-colors active:scale-95"
-                        aria-label="Meer"
+                        aria-label={t('kassaApp.ariaIncreaseQty')}
                       >
                         +
                       </button>
@@ -2114,17 +2168,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* Totaal + knoppen */}
         <div className="border-t border-gray-200 p-3 space-y-2">
           <div className="flex justify-between items-center py-2 border-b border-gray-100">
-            <span className="font-bold text-gray-700 text-lg">Totaal</span>
+            <span className="font-bold text-gray-700 text-lg">{t('kassaApp.cartTotal')}</span>
             <span className="font-bold text-[#3C4D6B] text-2xl">€{total.toFixed(2)}</span>
           </div>
           <div className="grid grid-cols-3 gap-2">
             <button className="flex flex-col items-center gap-1 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl transition-colors">
               <span className="text-xl">💰</span>
-              <span className="text-xs font-semibold">Lade open</span>
+              <span className="text-xs font-semibold">{t('kassaApp.drawerOpen')}</span>
             </button>
             <button className="flex flex-col items-center gap-1 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl transition-colors">
               <span className="text-xl">🖨️</span>
-              <span className="text-xs font-semibold">Print opnieuw</span>
+              <span className="text-xs font-semibold">{t('kassaApp.printAgain')}</span>
             </button>
             <button
               onClick={clearCart}
@@ -2132,7 +2186,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               className="flex flex-col items-center gap-1 py-3 bg-rose-500 hover:bg-rose-600 text-white rounded-xl transition-colors disabled:opacity-40"
             >
               <span className="text-xl">🗑️</span>
-              <span className="text-xs font-semibold">Verwijder</span>
+              <span className="text-xs font-semibold">{t('kassaApp.remove')}</span>
             </button>
           </div>
           {orderType === 'DINE_IN' && tableNumber && cart.length > 0 && (
@@ -2140,7 +2194,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               onClick={parkOrder}
               className="w-full py-3 rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold text-base transition-colors flex items-center justify-center gap-2"
             >
-              🪑 Naar tafel {tableNumber}
+              🪑 {t('kassaApp.parkToTable').replace(/\{number\}/g, String(tableNumber))}
             </button>
           )}
           <button
@@ -2152,7 +2206,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             disabled={cart.length === 0}
             className="w-full py-5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xl transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
           >
-            💳 Afrekenen
+            💳 {t('kassaApp.checkout')}
           </button>
         </div>
         </div>
@@ -2164,10 +2218,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6 flex flex-col gap-4">
             <div className="text-center">
               <div className="text-4xl mb-2">🪑</div>
-              <h2 className="font-bold text-xl text-gray-800">Tafel wisselen?</h2>
+              <h2 className="font-bold text-xl text-gray-800">{t('kassaApp.switchTableTitle')}</h2>
               <p className="text-gray-500 mt-1 text-sm">
-                Je hebt nog items op tafel <strong>{tableNumber}</strong>.<br/>
-                Die bestelling wordt opgeslagen. Wil je verder naar tafel <strong>{switchConfirm}</strong>?
+                {t('kassaApp.switchTableBody')
+                  .replace(/\{current\}/g, String(tableNumber ?? ''))
+                  .replace(/\{next\}/g, String(switchConfirm ?? ''))}
               </p>
             </div>
             <div className="flex gap-3">
@@ -2175,13 +2230,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 onClick={() => setSwitchConfirm(null)}
                 className="flex-1 py-3 rounded-xl bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 transition-colors"
               >
-                Annuleer
+                {t('kassaApp.cancel')}
               </button>
               <button
                 onClick={() => doSwitchToTable(switchConfirm)}
                 className="flex-1 py-3 rounded-xl bg-[#3C4D6B] text-white font-bold hover:bg-[#2D3A52] transition-colors"
               >
-                Wissel naar {switchConfirm}
+                {t('kassaApp.switchToTable').replace(/\{number\}/g, String(switchConfirm))}
               </button>
             </div>
           </div>
@@ -2434,14 +2489,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               )}
               <div className="flex-1 min-w-0">
                 <p className="font-bold text-lg truncate">
-                  {optionsModal.editingCartKey ? '✏️ ' : ''}
+                  {optionsModal.editingCartKey ? t('kassaApp.optionsEditPrefix') : ''}
                   {optionsModal.product.name}
                 </p>
                 <p className="text-[#3C4D6B] font-bold">
                   €{(optionsModal.product.price + optionsModal.selected.reduce((s, c) => s + c.price, 0)).toFixed(2)}
                 </p>
               </div>
-              <button type="button" onClick={() => setOptionsModal(null)} className="p-2 hover:bg-gray-100 rounded-xl" aria-label="Sluiten">✕</button>
+              <button type="button" onClick={() => setOptionsModal(null)} className="p-2 hover:bg-gray-100 rounded-xl" aria-label={t('kassaApp.closeAria')}>✕</button>
             </div>
 
             {/* Opties */}
@@ -2450,8 +2505,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 <div key={option.id}>
                   <div className="flex items-center gap-2 mb-3">
                     <p className="font-bold text-base text-gray-900">{option.name}</p>
-                    {option.required && <span className="text-xs bg-red-50 text-red-500 border border-red-200 px-2 py-0.5 rounded-full font-semibold">Verplicht</span>}
-                    {option.type === 'multiple' && <span className="text-xs bg-blue-50 text-blue-500 border border-blue-200 px-2 py-0.5 rounded-full">Meerdere mogelijk</span>}
+                    {option.required && <span className="text-xs bg-red-50 text-red-500 border border-red-200 px-2 py-0.5 rounded-full font-semibold">{t('kassaApp.optionRequired')}</span>}
+                    {option.type === 'multiple' && <span className="text-xs bg-blue-50 text-blue-500 border border-blue-200 px-2 py-0.5 rounded-full">{t('kassaApp.optionMultiple')}</span>}
                   </div>
                   <div className="grid grid-cols-3 gap-2">
                     {(option.choices || []).map(choice => {
@@ -2473,7 +2528,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           )}
                           <span className={`text-center leading-tight font-semibold ${isSelected ? 'text-[#3C4D6B]' : 'text-gray-800'}`}>{choice.name}</span>
                           <span className={`text-xs font-bold mt-1 ${choice.price > 0 ? 'text-amber-500' : 'text-green-500'}`}>
-                            {choice.price > 0 ? `+€${choice.price.toFixed(2)}` : 'Gratis'}
+                            {choice.price > 0 ? `+€${choice.price.toFixed(2)}` : t('kassaApp.optionFree')}
                           </span>
                         </button>
                       )
@@ -2485,9 +2540,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
             {/* Footer */}
             <div className="p-4 border-t flex gap-3 bg-gray-50">
-              <button type="button" onClick={() => setOptionsModal(null)} className="flex-1 py-3 rounded-xl bg-white border border-gray-200 font-semibold text-gray-600 hover:bg-gray-100 transition-colors">Annuleer</button>
+              <button type="button" onClick={() => setOptionsModal(null)} className="flex-1 py-3 rounded-xl bg-white border border-gray-200 font-semibold text-gray-600 hover:bg-gray-100 transition-colors">{t('kassaApp.cancel')}</button>
               <button type="button" onClick={confirmOptions} className="flex-[2] py-3.5 rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold text-lg shadow-md transition-colors">
-                {optionsModal.editingCartKey ? 'Opslaan' : 'Toevoegen'} — €
+                {optionsModal.editingCartKey ? t('kassaApp.optionsSave') : t('kassaApp.optionsAdd')} — €
                 {(optionsModal.product.price + optionsModal.selected.reduce((s, c) => s + c.price, 0)).toFixed(2)}
               </button>
             </div>
@@ -2518,9 +2573,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <span className="text-4xl shrink-0" aria-hidden>📅</span>
           <div className="min-w-0">
             <p className="font-black text-xl md:text-2xl leading-tight">
-              {pendingReservCount} reservatie{pendingReservCount !== 1 ? 's' : ''} wacht{pendingReservCount === 1 ? '' : 'en'} op goedkeuring
+              {pendingReservCount === 1
+                ? t('kassaApp.reservationsOneWaiting')
+                : t('kassaApp.reservationsManyWaiting').replace(/\{count\}/g, String(pendingReservCount))}
             </p>
-            <p className="text-base font-semibold opacity-95 mt-1">Tik hier om te bekijken</p>
+            <p className="text-base font-semibold opacity-95 mt-1">{t('kassaApp.tapToView')}</p>
           </div>
         </div>
       )}
@@ -2539,21 +2596,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
             <div className="p-4 border-b flex justify-between items-center">
-              <h3 className="text-xl font-semibold">Betalen</h3>
+              <h3 className="text-xl font-semibold">{t('kassaApp.payTitle')}</h3>
               <button onClick={() => setShowPaymentModal(false)} className="p-2 rounded-lg hover:bg-gray-100 text-2xl">✕</button>
             </div>
             <div className="p-6">
               <div className="text-center mb-6">
-                <p className="text-gray-500">Te betalen</p>
+                <p className="text-gray-500">{t('kassaApp.toPay')}</p>
                 <p className="text-5xl font-bold text-[#3C4D6B]">€{total.toFixed(2)}</p>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                {([
-                  { method: 'CASH' as const, label: 'Contant', icon: '💵', color: '#10b981' },
-                  { method: 'CARD' as const, label: 'PIN/Kaart', icon: '💳', color: '#3b82f6' },
-                  { method: 'IDEAL' as const, label: 'iDEAL', icon: '📱', color: '#ec4899' },
-                  { method: 'BANCONTACT' as const, label: 'Bancontact', icon: '🏦', color: '#f59e0b' },
-                ] as const).map(pm => (
+                {paymentMethodOptions.map((pm) => (
                   <button
                     key={pm.method}
                     onClick={() => completePayment(pm.method)}
@@ -2571,7 +2623,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   style={{ borderColor: '#8b5cf6' }}
                 >
                   <span className="text-4xl">👛</span>
-                  <span style={{ color: '#8b5cf6' }}>Gesplitst Betalen</span>
+                  <span style={{ color: '#8b5cf6' }}>{t('kassaApp.splitPay')}</span>
                 </button>
               </div>
             </div>
@@ -2585,45 +2637,45 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <div className="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
             <div className="p-4 border-b flex justify-between items-center">
               <h3 className="text-xl font-semibold flex items-center gap-2">
-                <span className="text-purple-500">👛</span> Gesplitst Betalen
+                <span className="text-purple-500">👛</span> {t('kassaApp.splitPayTitle')}
               </h3>
               <button onClick={() => { setShowSplitModal(false); setShowPaymentModal(true) }} className="p-2 rounded-lg hover:bg-gray-100 text-2xl">✕</button>
             </div>
             <div className="p-6 space-y-5">
               {/* Totaal */}
               <div className="text-center p-4 bg-gray-50 rounded-xl">
-                <p className="text-gray-500">Totaal te betalen</p>
+                <p className="text-gray-500">{t('kassaApp.totalToPay')}</p>
                 <p className="text-4xl font-bold text-[#3C4D6B]">€{total.toFixed(2)}</p>
               </div>
               {/* Contant */}
               <div className="space-y-1">
-                <label className="flex items-center gap-2 text-gray-500 text-sm">💵 Contant bedrag</label>
+                <label className="flex items-center gap-2 text-gray-500 text-sm">💵 {t('kassaApp.splitCashLabel')}</label>
                 <input
                   type="number"
                   value={splitCash || ''}
                   onChange={(e) => { const v = parseFloat(e.target.value) || 0; setSplitCash(v); setSplitCard(Math.max(0, total - v)) }}
                   className="w-full px-4 py-4 text-2xl font-bold rounded-xl bg-white border-2 border-green-400 focus:border-green-500 outline-none"
-                  placeholder="0.00" step="0.01" min="0"
+                  placeholder={t('kassaApp.numpadPlaceholder')} step="0.01" min="0"
                 />
               </div>
               {/* Kaart */}
               <div className="space-y-1">
-                <label className="flex items-center gap-2 text-gray-500 text-sm">💳 Kaart bedrag</label>
+                <label className="flex items-center gap-2 text-gray-500 text-sm">💳 {t('kassaApp.splitCardLabel')}</label>
                 <input
                   type="number"
                   value={splitCard || ''}
                   onChange={(e) => { const v = parseFloat(e.target.value) || 0; setSplitCard(v); setSplitCash(Math.max(0, total - v)) }}
                   className="w-full px-4 py-4 text-2xl font-bold rounded-xl bg-white border-2 border-blue-400 focus:border-blue-500 outline-none"
-                  placeholder="0.00" step="0.01" min="0"
+                  placeholder={t('kassaApp.numpadPlaceholder')} step="0.01" min="0"
                 />
               </div>
               {/* Snelle knoppen */}
               <div className="grid grid-cols-3 gap-2">
                 {[
-                  { label: '50/50', cash: total / 2, card: total / 2 },
-                  { label: '100% 💵', cash: total, card: 0 },
-                  { label: '100% 💳', cash: 0, card: total },
-                ].map(opt => (
+                  { label: t('kassaApp.split5050'), cash: total / 2, card: total / 2 },
+                  { label: t('kassaApp.split100Cash'), cash: total, card: 0 },
+                  { label: t('kassaApp.split100Card'), cash: 0, card: total },
+                ].map((opt) => (
                   <button key={opt.label} onClick={() => { setSplitCash(opt.cash); setSplitCard(opt.card) }}
                     className="py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-sm font-semibold transition-colors">
                     {opt.label}
@@ -2634,8 +2686,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               {Math.abs(total - splitCash - splitCard) > 0.01 && (
                 <div className={`p-3 rounded-xl text-center text-sm font-semibold ${(total - splitCash - splitCard) > 0 ? 'bg-red-100 text-red-600' : 'bg-yellow-100 text-yellow-700'}`}>
                   {(total - splitCash - splitCard) > 0
-                    ? `Nog te betalen: €${(total - splitCash - splitCard).toFixed(2)}`
-                    : `Te veel: €${Math.abs(total - splitCash - splitCard).toFixed(2)}`}
+                    ? t('kassaApp.splitRemainOwed').replace(
+                        '{amount}',
+                        (total - splitCash - splitCard).toFixed(2),
+                      )
+                    : t('kassaApp.splitOverpaid').replace(
+                        '{amount}',
+                        Math.abs(total - splitCash - splitCard).toFixed(2),
+                      )}
                 </div>
               )}
               {/* Bevestigen */}
@@ -2644,7 +2702,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 disabled={Math.abs(total - splitCash - splitCard) > 0.01}
                 className="w-full py-4 rounded-xl bg-purple-500 hover:bg-purple-600 text-white font-bold text-lg disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
-                ✓ Betalen €{(splitCash + splitCard).toFixed(2)}
+                {t('kassaApp.splitConfirm').replace('{amount}', (splitCash + splitCard).toFixed(2))}
               </button>
             </div>
           </div>
@@ -2657,20 +2715,35 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         const subtotal = lastOrder.total / (1 + vatRate / 100)
         const tax = lastOrder.total - subtotal
         const orderTypeLabel =
-          lastOrder.orderType === 'DINE_IN' ? '🍽️ Hier Opeten' :
-          lastOrder.orderType === 'TAKEAWAY' ? '📦 Afhalen' : '🚗 Bezorgen'
+          lastOrder.orderType === 'DINE_IN'
+            ? `🍽️ ${t('kassaReceipt.orderTypeDineIn')}`
+            : lastOrder.orderType === 'TAKEAWAY'
+              ? `📦 ${t('kassaReceipt.orderTypeTakeaway')}`
+              : `🚗 ${t('kassaReceipt.orderTypeDelivery')}`
         const payLabel =
-          lastOrder.paymentMethod === 'CASH' ? 'Contant' :
-          lastOrder.paymentMethod === 'CARD' ? 'PIN/Kaart' :
-          lastOrder.paymentMethod === 'IDEAL' ? 'iDEAL' : 'Bancontact'
+          lastOrder.paymentMethod === 'CASH'
+            ? t('kassaApp.payCash')
+            : lastOrder.paymentMethod === 'CARD'
+              ? t('kassaApp.payCard')
+              : lastOrder.paymentMethod === 'IDEAL'
+                ? t('kassaApp.payIdeal')
+                : t('kassaApp.payBancontact')
+        const successDateStr = lastOrder.createdAt.toLocaleString(appLocaleToBcp47(locale), {
+          day: '2-digit',
+          month: '2-digit',
+          year: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+        })
+        const successVatLabel = t('kassaReceipt.vat').replace('{rate}', String(vatRate))
         return (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 overflow-y-auto">
             <div className="bg-white rounded-2xl overflow-hidden max-w-md w-full my-4 shadow-2xl">
               {/* Header */}
               <div className="p-4 bg-emerald-500 text-white text-center">
                 <div className="w-16 h-16 rounded-full bg-white/20 mx-auto mb-2 flex items-center justify-center text-4xl">✓</div>
-                <h3 className="text-xl font-bold">Betaling Geslaagd!</h3>
-                <p className="opacity-80">Bestelling #{lastOrder.orderNumber}</p>
+                <h3 className="text-xl font-bold">{t('kassaApp.successTitle')}</h3>
+                <p className="opacity-80">{t('kassaApp.successOrderLine').replace(/\{number\}/g, String(lastOrder.orderNumber))}</p>
               </div>
 
               {/* Kassabon — exact zelfde als referentie */}
@@ -2678,24 +2751,35 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 <div className="bg-white text-black p-4 rounded-lg max-w-[300px] mx-auto font-mono text-sm">
                   {/* Header */}
                   <div className="text-center mb-4">
-                    <h1 className="font-bold text-lg">{tenantInfo?.business_name || 'Vysion Horeca'}</h1>
+                    <h1 className="font-bold text-lg">{tenantInfo?.business_name || t('kassaApp.defaultBusinessName')}</h1>
                     {tenantInfo?.address && <p className="text-xs">{tenantInfo.address}</p>}
                     {(tenantInfo?.postal_code || tenantInfo?.city) && (
                       <p className="text-xs">{tenantInfo?.postal_code} {tenantInfo?.city}</p>
                     )}
-                    {tenantInfo?.phone && <p className="text-xs">Tel: {tenantInfo.phone}</p>}
+                    {tenantInfo?.phone && (
+                      <p className="text-xs">
+                        {t('kassaReceipt.telPrefix')} {tenantInfo.phone}
+                      </p>
+                    )}
                   </div>
                   <div className="border-t-2 border-dashed border-gray-400 my-3" />
                   {/* Besteltype */}
                   <div className="text-center mb-3">
                     <p className="font-bold text-lg">{orderTypeLabel}</p>
-                    {lastOrder.tableNumber && <p className="font-bold">Tafel {lastOrder.tableNumber}</p>}
+                    {lastOrder.tableNumber && (
+                      <p className="font-bold">
+                        {t('kassaReceipt.tableLabel').replace(/\{number\}/g, String(lastOrder.tableNumber))}
+                      </p>
+                    )}
                   </div>
                   {/* Bon info */}
                   <div className="text-xs mb-3">
                     <div className="flex justify-between">
-                      <span>Bon #{lastOrder.orderNumber}</span>
-                      <span>{lastOrder.createdAt.toLocaleString('nl-NL', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' })}</span>
+                      <span>
+                        {t('kassaReceipt.receiptNo')}
+                        {lastOrder.orderNumber}
+                      </span>
+                      <span>{successDateStr}</span>
                     </div>
                   </div>
                   <div className="border-t border-gray-300 my-2" />
@@ -2730,15 +2814,24 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   <div className="border-t border-gray-300 my-3" />
                   {/* Totalen */}
                   <div className="space-y-1 text-sm">
-                    <div className="flex justify-between"><span>Subtotaal</span><span>€{subtotal.toFixed(2)}</span></div>
-                    <div className="flex justify-between"><span>BTW ({vatRate}%)</span><span>€{tax.toFixed(2)}</span></div>
+                    <div className="flex justify-between">
+                      <span>{t('kassaReceipt.subtotal')}</span>
+                      <span>€{subtotal.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>{successVatLabel}</span>
+                      <span>€{tax.toFixed(2)}</span>
+                    </div>
                     <div className="flex justify-between font-bold text-lg border-t border-gray-400 pt-2 mt-2">
-                      <span>TOTAAL</span><span>€{lastOrder.total.toFixed(2)}</span>
+                      <span>{t('kassaReceipt.total')}</span>
+                      <span>€{lastOrder.total.toFixed(2)}</span>
                     </div>
                   </div>
                   {/* Betaalmethode */}
                   <div className="text-center mt-3 text-xs">
-                    <p>Betaald met: {payLabel}</p>
+                    <p>
+                      {t('kassaReceipt.paidWith')} {payLabel}
+                    </p>
                   </div>
                   {lastOrder.helpedByStaffName && (
                     <div className="text-center mt-3 text-sm font-semibold text-gray-800 px-1">
@@ -2747,8 +2840,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   )}
                   <div className="border-t-2 border-dashed border-gray-400 my-3" />
                   <div className="text-center text-xs">
-                    {tenantInfo?.btw_number && <p>BTW: {tenantInfo.btw_number}</p>}
-                    <p className="mt-2">Bedankt voor uw bezoek!</p>
+                    {tenantInfo?.btw_number && (
+                      <p>{t('kassaReceipt.businessVatLabel').replace('{vatNumber}', tenantInfo.btw_number)}</p>
+                    )}
+                    <p className="mt-2">{t('kassaReceipt.thanks')}</p>
                     {tenantInfo?.website && <p className="mt-1">{tenantInfo.website}</p>}
                   </div>
                 </div>
@@ -2767,7 +2862,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   onClick={() => setShowSuccessModal(false)}
                   className="flex-1 py-3 rounded-xl bg-[#3C4D6B] text-white font-bold"
                 >
-                  Sluiten
+                  {t('kassaApp.successClose')}
                 </button>
               </div>
             </div>
@@ -2791,11 +2886,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         >
           <div className="text-white text-center px-8">
             <div className="text-6xl mb-4">🔔</div>
-            <h1 className="text-4xl md:text-6xl font-bold mb-4">NIEUWE BESTELLING!</h1>
+            <h1 className="text-4xl md:text-6xl font-bold mb-4">{t('kassaApp.newOrderSplashTitle')}</h1>
             <div className="text-3xl md:text-5xl font-bold mb-6">#{newOrderAlert.orderNumber}</div>
             <div className="text-2xl md:text-4xl mb-8">€{newOrderAlert.total.toFixed(2)}</div>
-            <div className="text-xl opacity-80 mt-8">👆 Klik om te bekijken</div>
-            <p className="text-white/60 mt-4 text-sm">Geluid stopt na accepteren of weigeren</p>
+            <div className="text-xl opacity-80 mt-8">{t('kassaApp.newOrderSplashTap')}</div>
+            <p className="text-white/60 mt-4 text-sm">{t('kassaApp.newOrderSoundNote')}</p>
           </div>
         </div>
       )}
@@ -2805,11 +2900,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 }
 
 export default function KassaAdminPage(props: { params: { tenant: string } }) {
+  const { t } = useLanguage()
   return (
     <Suspense
       fallback={
         <div className="min-h-[100dvh] flex items-center justify-center bg-[#e3e3e3] text-gray-600">
-          Laden…
+          {t('kassaApp.suspenseLoading')}
         </div>
       }
     >
