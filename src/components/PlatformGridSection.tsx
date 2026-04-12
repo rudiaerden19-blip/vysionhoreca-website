@@ -21,7 +21,7 @@ import {
   DEMO_CAFE_MENU_URL,
   DEMO_HERO_LIVE_URL,
   DEMO_ONLINE_SHOP_MENU_URL,
-  DEMO_SHOWCASE_MENUKAART_URL,
+  DEMO_SHOWCASE_CREMERIE_URL,
 } from '@/lib/demo-links'
 
 const ICONS: Record<string, LucideIcon> = {
@@ -147,12 +147,12 @@ export default function PlatformGridSection() {
               {t('platform.gridDemoBakeryCta')}
             </a>
             <a
-              href={DEMO_SHOWCASE_MENUKAART_URL}
+              href={DEMO_SHOWCASE_CREMERIE_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex min-h-[48px] items-center justify-center rounded-full border-2 border-gray-900 bg-white px-6 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:min-w-[200px] sm:text-base"
             >
-              {t('platform.gridDemoMenukaartCta')}
+              {t('platform.gridDemoCremerieCta')}
             </a>
           </div>
         </div>

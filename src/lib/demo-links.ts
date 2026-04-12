@@ -105,8 +105,8 @@ export const DEMO_CAFE_MENU_URL = `${MARKETING_SHOP_BASE}/restaurantdekorf/menu`
  */
 export const DEMO_BAKERY_MENU_URL = `${MARKETING_SHOP_BASE}/skippsbv/menu` as const
 
-/** Digitale menukaart op dezelfde restaurant-showcase (ander scherm dan /menu). */
-export const DEMO_SHOWCASE_MENUKAART_URL = `${MARKETING_SHOP_BASE}/restaurantdekorf/menukaart` as const
+/** Voorbeelddemo (nu: digitale menukaart restaurant-showcase); URL aanpasbaar naar echte crèmerie-showcase. */
+export const DEMO_SHOWCASE_CREMERIE_URL = `${MARKETING_SHOP_BASE}/restaurantdekorf/menukaart` as const
 
 export function isPublicDemoKassaSearch(search: string): boolean {
   const q = search.startsWith('?') ? search.slice(1) : search
