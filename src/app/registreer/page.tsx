@@ -341,7 +341,7 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="businessName" className="block text-sm font-medium text-gray-300 mb-2">
-                {t('register.businessName')} *
+                {t('register.businessName')} <span className="text-red-500">*</span>
               </label>
               <input
                 id="businessName"
@@ -357,7 +357,7 @@ export default function RegisterPage() {
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                {t('register.email')} *
+                {t('register.email')} <span className="text-red-500">*</span>
               </label>
               <input
                 id="email"
@@ -373,7 +373,7 @@ export default function RegisterPage() {
 
             <div>
               <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-2">
-                {t('register.phone')} *
+                {t('register.phone')} <span className="text-red-500">*</span>
               </label>
               <input
                 id="phone"
@@ -389,7 +389,7 @@ export default function RegisterPage() {
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-                {t('register.password')} *
+                {t('register.password')} <span className="text-red-500">*</span>
               </label>
               <input
                 id="password"
@@ -405,7 +405,7 @@ export default function RegisterPage() {
 
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-2">
-                {t('register.confirmPassword')} *
+                {t('register.confirmPassword')} <span className="text-red-500">*</span>
               </label>
               <input
                 id="confirmPassword"
