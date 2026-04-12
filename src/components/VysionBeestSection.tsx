@@ -22,9 +22,15 @@ function InlineBold({ text }: { text: string }) {
   )
 }
 
+const BEEST_IMAGES = [
+  '/images/vysion-beest-stack-1.png',
+  '/images/vysion-beest-stack-2.png',
+  '/images/vysion-beest-stack-3.png',
+] as const
+
 /**
  * Marketing: hardware-USP tussen gratis-websitebanner en platformgrid.
- * Afbeelding: `/public/images/vysion-beest-workstation.png`.
+ * Drie productfoto’s verticaal (`/public/images/vysion-beest-stack-*.png`).
  */
 export default function VysionBeestSection() {
   const { t } = useLanguage()
@@ -35,19 +41,28 @@ export default function VysionBeestSection() {
       aria-labelledby="vysion-beest-heading"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-14 xl:gap-16">
-          <div className="order-2 lg:order-1">
-            <div className="relative mx-auto aspect-[4/3] w-full max-w-xl lg:mx-0 lg:max-w-none">
-              <Image
-                src="/images/vysion-beest-workstation.png"
-                alt={t('vysionBeest.imageAlt')}
-                fill
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-contain object-center"
-              />
-            </div>
+        <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-2 lg:gap-12 xl:gap-16">
+          <div className="order-2 flex w-full max-w-xl flex-col gap-5 sm:gap-6 lg:order-1 lg:max-w-md xl:max-w-lg lg:mx-0 mx-auto">
+            {BEEST_IMAGES.map((src, index) => {
+              const altKey =
+                index === 0 ? 'vysionBeest.imageAlt1' : index === 1 ? 'vysionBeest.imageAlt2' : 'vysionBeest.imageAlt3'
+              return (
+                <div
+                  key={src}
+                  className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-gray-50 ring-1 ring-gray-100 shadow-sm"
+                >
+                  <Image
+                    src={src}
+                    alt={t(altKey)}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 38vw"
+                    className="object-contain object-center p-2 sm:p-3"
+                  />
+                </div>
+              )
+            })}
           </div>
-          <div className="order-1 lg:order-2">
+          <div className="order-1 lg:order-2 lg:min-w-0">
             <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-accent">
               {t('vysionBeest.eyebrow')}
             </p>

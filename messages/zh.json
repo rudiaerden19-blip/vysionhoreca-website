@@ -4872,7 +4872,9 @@
     "ctaFrituur": "查看快餐/炸薯店示例站"
   },
   "vysionBeest": {
-    "imageAlt": "配备双触摸屏的专业 Vysion 收银工作站",
+    "imageAlt1": "Vysion 收银机：正面双触屏",
+    "imageAlt2": "Vysion 收银机：顾客侧第二屏",
+    "imageAlt3": "Vysion 工作站：侧面与稳固底座",
     "eyebrow": "Vysion 猛兽",
     "headline": "Vysion「猛兽」：强劲性能，完全自有",
     "intro": "选择不仅能加速门店运营、更在 24 个月后真正**归您所有**的硬件。告别无休止租赁，为企业未来投资。",
