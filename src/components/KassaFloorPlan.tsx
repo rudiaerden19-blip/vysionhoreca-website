@@ -945,10 +945,10 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
           {tables.length === 0 && (
             <div className="absolute inset-0 flex flex-col items-center justify-center text-white/40">
               <span className="text-6xl mb-4">🪑</span>
-              <p className="text-lg font-semibold">Nog geen tafels</p>
+              <p className="text-lg font-semibold">{t('kassaApp.floorPlanNoTablesYet')}</p>
               <button onClick={() => setShowAddModal(true)}
                 className="mt-4 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold transition-colors">
-                + Voeg tafel toe
+                {t('kassaApp.floorPlanAddTableButton')}
               </button>
             </div>
           )}
@@ -999,7 +999,11 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
         {selectedDecor && !selected && (
           <div className="w-80 bg-[#16213e] border-l border-white/10 flex flex-col overflow-y-auto">
             <div className="p-4 border-b border-white/10 flex justify-between items-center">
-              <h3 className="text-white font-bold text-lg">{selectedDecor.type === 'plant' ? '🌿 Plant' : '🍺 Toogstuk'}</h3>
+              <h3 className="text-white font-bold text-lg">
+                {selectedDecor.type === 'plant'
+                  ? t('kassaApp.floorPlanSidebarTitlePlant')
+                  : t('kassaApp.floorPlanSidebarTitleBar')}
+              </h3>
               <button onClick={() => setSelectedDecor(null)} className="text-white/50 hover:text-white text-xl">✕</button>
             </div>
 
@@ -1020,7 +1024,9 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                     <div className="flex items-center justify-between px-3 py-2" style={{ backgroundColor: STATUS_COLORS[status] + '33', borderLeft: `4px solid ${STATUS_COLORS[status]}` }}>
                       <div className="flex items-center gap-2">
                         <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold" style={{ backgroundColor: STATUS_COLORS[status] }}>{stoolId}</div>
-                        <span className="text-white font-bold text-sm">Kruk {stoolId}</span>
+                        <span className="text-white font-bold text-sm">
+                          {t('kassaApp.floorPlanStoolHeading').replace(/\{id\}/g, stoolId)}
+                        </span>
                       </div>
                       <span className="text-xs font-semibold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: STATUS_COLORS[status] }}>{statusLabels[status]}</span>
                     </div>
@@ -1043,12 +1049,12 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                             )
                           })}
                           <div className="flex justify-between pt-1 border-t border-white/10 mt-1">
-                            <span className="text-white/50 text-xs">Totaal</span>
+                            <span className="text-white/50 text-xs">{t('kassaApp.cartTotal')}</span>
                             <span className="text-white text-xs font-bold">€{total.toFixed(2)}</span>
                           </div>
                         </div>
                       ) : (
-                        <p className="text-white/30 text-xs">Geen openstaande bestelling</p>
+                        <p className="text-white/30 text-xs">{t('kassaApp.floorPlanNoOpenOrder')}</p>
                       )}
                     </div>
                     {/* Status knoppen */}
@@ -1076,7 +1082,10 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                       <button
                         onClick={() => { onSelectTable(stoolId); onClose() }}
                         className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-base transition-colors">
-                        🛒 {items.length > 0 ? `Toevoegen aan ${stoolId}` : `Nieuwe bestelling ${stoolId}`}
+                        🛒{' '}
+                        {items.length > 0
+                          ? t('kassaApp.floorPlanAddToStool').replace(/\{id\}/g, stoolId)
+                          : t('kassaApp.floorPlanNewOrderStool').replace(/\{id\}/g, stoolId)}
                       </button>
                     </div>
                   </div>
@@ -1086,14 +1095,16 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
               return (
                 <>
                   <div className="p-4 border-b border-white/10 flex-1 overflow-y-auto">
-                    <p className="text-white/50 text-xs uppercase tracking-wider mb-3">Barkrukken</p>
+                    <p className="text-white/50 text-xs uppercase tracking-wider mb-3">{t('kassaApp.stoolsSection')}</p>
                     <StoolPanel stoolId={s1} items={items1} total={total1} />
                     <StoolPanel stoolId={s2} items={items2} total={total2} />
                   </div>
                   <div className="p-4 border-b border-white/10 space-y-2">
-                    <p className="text-white/50 text-xs uppercase tracking-wider mb-1">Kruk nummers bewerken</p>
+                    <p className="text-white/50 text-xs uppercase tracking-wider mb-1">
+                      {t('kassaApp.floorPlanEditStoolNumbersTitle')}
+                    </p>
                     <div className="flex gap-2 items-center">
-                      <span className="text-white/60 text-xs w-14">Kruk 1:</span>
+                      <span className="text-white/60 text-xs w-14">{t('kassaApp.floorPlanStool1Label')}</span>
                       <input
                         value={editStoolVals.s1}
                         onChange={e => setEditStoolVals(prev => ({ ...prev, s1: e.target.value }))}
@@ -1101,7 +1112,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                       />
                     </div>
                     <div className="flex gap-2 items-center">
-                      <span className="text-white/60 text-xs w-14">Kruk 2:</span>
+                      <span className="text-white/60 text-xs w-14">{t('kassaApp.floorPlanStool2Label')}</span>
                       <input
                         value={editStoolVals.s2}
                         onChange={e => setEditStoolVals(prev => ({ ...prev, s2: e.target.value }))}
@@ -1117,7 +1128,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                         setSelectedDecor({ ...selectedDecor, stool1: editStoolVals.s1 || 'K?', stool2: editStoolVals.s2 || 'K?' })
                       }}
                       className="w-full py-1.5 rounded-lg bg-blue-500/30 text-blue-300 hover:bg-blue-500/50 text-sm font-semibold transition-colors">
-                      💾 Opslaan
+                      {t('kassaApp.floorPlanSaveBarStools')}
                     </button>
                   </div>
                 </>
@@ -1127,20 +1138,20 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
             {!isLocked && (
               <>
                 <div className="p-4 border-b border-white/10">
-                  <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Draaien</p>
+                  <p className="text-white/50 text-xs uppercase tracking-wider mb-2">{t('kassaApp.floorPlanRotateTitle')}</p>
                   <div className="flex gap-2">
                     <button onClick={() => rotateDecor(selectedDecor.id, -45)}
                       className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-lg">↺</button>
                     <button onClick={() => rotateDecor(selectedDecor.id, 45)}
                       className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-lg">↻</button>
                     <button onClick={() => rotateDecor(selectedDecor.id, -selectedDecor.rotation)}
-                      className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-semibold">Reset</button>
+                      className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-semibold">{t('kassaApp.floorPlanResetBtn')}</button>
                   </div>
                 </div>
                 <div className="p-4 mt-auto">
                   <button onClick={() => deleteDecor(selectedDecor.id)}
                     className="w-full py-2 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30 text-sm font-semibold">
-                    🗑 Verwijder
+                    {t('kassaApp.floorPlanDeleteDecor')}
                   </button>
                 </div>
               </>
@@ -1164,17 +1175,21 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
               <div className="p-4 border-b border-white/10 flex justify-between items-center" style={{ borderLeft: `4px solid ${STATUS_COLORS[effectiveStatus]}` }}>
                 <div>
                   <div className="flex items-center gap-2 mb-0.5">
-                    <h3 className="text-white font-bold text-xl">Tafel {selected.number}</h3>
+                    <h3 className="text-white font-bold text-xl">
+                      {t('kassaApp.floorPlanTableHeader').replace(/\{number\}/g, selected.number)}
+                    </h3>
                     <span className="text-xs font-semibold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: STATUS_COLORS[effectiveStatus] }}>{statusLabels[effectiveStatus]}</span>
                   </div>
-                  <p className="text-white/40 text-xs">{selected.seats} plaatsen</p>
+                  <p className="text-white/40 text-xs">
+                    {t('kassaApp.floorPlanSeatsLine').replace(/\{count\}/g, String(selected.seats))}
+                  </p>
                 </div>
                 <button onClick={() => setSelected(null)} className="text-white/50 hover:text-white text-xl">✕</button>
               </div>
 
               {/* Bestellingen */}
               <div className="flex-1 overflow-y-auto p-4 border-b border-white/10">
-                <p className="text-white/50 text-xs uppercase tracking-wider mb-3">Bestelling</p>
+                <p className="text-white/50 text-xs uppercase tracking-wider mb-3">{t('kassaApp.floorPlanOrderHeading')}</p>
                 {hasItems ? (
                   <div className="space-y-2">
                     {items.map((item, i) => {
@@ -1206,33 +1221,33 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                     })}
                     {/* Totaal */}
                     <div className="flex justify-between items-center pt-2 border-t border-white/10 mt-2">
-                      <span className="text-white/60 text-sm font-semibold">Totaal</span>
+                      <span className="text-white/60 text-sm font-semibold">{t('kassaApp.cartTotal')}</span>
                       <span className="text-white font-bold text-lg">€{totalPrice.toFixed(2)}</span>
                     </div>
                   </div>
                 ) : (
-                  <p className="text-white/30 text-sm text-center py-6">Geen openstaande bestelling</p>
+                  <p className="text-white/30 text-sm text-center py-6">{t('kassaApp.floorPlanNoOpenOrder')}</p>
                 )}
               </div>
 
               {/* Rotatie — alleen in bewerkmodus */}
               {!isLocked && (
                 <div className="p-4 border-b border-white/10">
-                  <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Draaien</p>
+                  <p className="text-white/50 text-xs uppercase tracking-wider mb-2">{t('kassaApp.floorPlanRotateTitle')}</p>
                   <div className="flex gap-2">
                     <button onClick={() => rotate(selected.id, -45)}
                       className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-lg transition-colors">↺</button>
                     <button onClick={() => rotate(selected.id, 45)}
                       className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-lg transition-colors">↻</button>
                     <button onClick={() => rotate(selected.id, -selected.rotation)}
-                      className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-colors">Reset</button>
+                      className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-colors">{t('kassaApp.floorPlanResetBtn')}</button>
                   </div>
                 </div>
               )}
 
               {/* Status toggle */}
               <div className="p-4 border-b border-white/10 space-y-2">
-                <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Status</p>
+                <p className="text-white/50 text-xs uppercase tracking-wider mb-2">{t('kassaApp.floorPlanStatusHeading')}</p>
                 {(['FREE', 'OCCUPIED', 'UNPAID'] as TableStatus[]).map(s => {
                   const isActive = effectiveStatus === s
                   // ONBETAALD warning als BEZET met items
@@ -1262,12 +1277,12 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                 <button
                   onClick={() => { onSelectTable(selected.number); onClose() }}
                   className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition-colors">
-                  🛒 {hasItems ? 'Toevoegen aan bestelling' : 'Nieuwe bestelling'}
+                  🛒 {hasItems ? t('kassaApp.floorPlanAddToOrderTable') : t('kassaApp.floorPlanNewOrderTable')}
                 </button>
                 {!isLocked && (
                   <button onClick={() => deleteTable(selected.id)}
                     className="w-full py-2 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30 text-sm font-semibold transition-colors">
-                    🗑 Verwijder tafel
+                    {t('kassaApp.floorPlanDeleteTableBtn')}
                   </button>
                 )}
               </div>
@@ -1284,10 +1299,11 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
             <span>{statusLabels[s as TableStatus]}</span>
           </div>
         ))}
-        {isLocked
-          ? <span className="text-orange-400/70 ml-4 text-xs">🔒 Vergrendeld — klik op &quot;Bewerken&quot; om tafels te verplaatsen</span>
-          : <span className="text-yellow-400/70 ml-4 text-xs">🔓 Bewerkmodus — sleep om te verplaatsen • ↺↻ om te draaien</span>
-        }
+        {isLocked ? (
+          <span className="text-orange-400/70 ml-4 text-xs">{t('kassaApp.floorPlanLegendLocked')}</span>
+        ) : (
+          <span className="text-yellow-400/70 ml-4 text-xs">{t('kassaApp.floorPlanLegendEditMode')}</span>
+        )}
       </div>
       </div>
 
@@ -1296,38 +1312,38 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 p-4 touch-manipulation">
           <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl" role="dialog" aria-modal="true">
             <div className="p-4 border-b flex justify-between items-center">
-              <h3 className="font-bold text-lg">🍺 Toogstuk toevoegen</h3>
+              <h3 className="font-bold text-lg">{t('kassaApp.floorPlanModalAddBarTitle')}</h3>
               <button type="button" onClick={() => setShowAddBarModal(false)} className="min-h-[44px] min-w-[44px] touch-manipulation text-2xl text-gray-400 hover:text-gray-700">✕</button>
             </div>
             <div className="p-5 space-y-4">
-              <p className="text-sm text-gray-500">Geef een nummer aan elke barkruk van dit toogstuk.</p>
+              <p className="text-sm text-gray-500">{t('kassaApp.floorPlanModalAddBarIntro')}</p>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-600 mb-1">Kruk 1 nummer *</label>
+                  <label className="block text-sm font-semibold text-gray-600 mb-1">{t('kassaApp.floorPlanModalStool1Label')}</label>
                   <input
                     autoFocus
                     value={addStool1}
                     onChange={e => setAddStool1(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && confirmAddBar()}
                     className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-amber-500 outline-none text-xl font-bold text-center"
-                    placeholder="bv. K1"
+                    placeholder={t('kassaApp.floorPlanPlaceholderStoolExample')}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-600 mb-1">Kruk 2 nummer *</label>
+                  <label className="block text-sm font-semibold text-gray-600 mb-1">{t('kassaApp.floorPlanModalStool2Label')}</label>
                   <input
                     value={addStool2}
                     onChange={e => setAddStool2(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && confirmAddBar()}
                     className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-amber-500 outline-none text-xl font-bold text-center"
-                    placeholder="bv. K2"
+                    placeholder={t('kassaApp.floorPlanPlaceholderStoolExample')}
                   />
                 </div>
               </div>
             </div>
             <div className="flex gap-3 border-t p-4">
-              <button type="button" onClick={() => setShowAddBarModal(false)} className="min-h-[44px] flex-1 touch-manipulation rounded-xl bg-gray-100 py-3 font-semibold text-gray-700">Annuleer</button>
-              <button type="button" onClick={confirmAddBar} className="min-h-[44px] flex-[2] touch-manipulation rounded-xl bg-amber-600 py-3 font-bold text-white transition-colors hover:bg-amber-700">Toevoegen</button>
+              <button type="button" onClick={() => setShowAddBarModal(false)} className="min-h-[44px] flex-1 touch-manipulation rounded-xl bg-gray-100 py-3 font-semibold text-gray-700">{t('kassaApp.cancel')}</button>
+              <button type="button" onClick={confirmAddBar} className="min-h-[44px] flex-[2] touch-manipulation rounded-xl bg-amber-600 py-3 font-bold text-white transition-colors hover:bg-amber-700">{t('kassaApp.optionsAdd')}</button>
             </div>
           </div>
         </div>
@@ -1338,19 +1354,19 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 p-4 touch-manipulation">
           <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl" role="dialog" aria-modal="true">
             <div className="p-4 border-b flex justify-between items-center">
-              <h3 className="font-bold text-lg">Tafel toevoegen</h3>
+              <h3 className="font-bold text-lg">{t('kassaApp.floorPlanModalAddTableTitle')}</h3>
               <button type="button" onClick={() => setShowAddModal(false)} className="min-h-[44px] min-w-[44px] touch-manipulation text-2xl text-gray-400 hover:text-gray-700">✕</button>
             </div>
             <div className="p-5 space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-600 mb-1">Tafelnummer *</label>
+                <label className="block text-sm font-semibold text-gray-600 mb-1">{t('kassaApp.floorPlanModalTableNumberLabel')}</label>
                 <input autoFocus value={addNumber} onChange={e => setAddNumber(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && addTable()}
                   className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#3C4D6B] outline-none text-xl font-bold text-center"
-                  placeholder="bv. 1, 2A, Toog" />
+                  placeholder={t('kassaApp.floorPlanModalTableNumberPlaceholder')} />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-600 mb-2">Aantal plaatsen</label>
+                <label className="block text-sm font-semibold text-gray-600 mb-2">{t('kassaApp.floorPlanModalSeatLabel')}</label>
                 <div className="grid grid-cols-5 gap-2">
                   {[2, 4, 6, 8, 10].map(n => (
                     <button key={n} type="button" onClick={() => setAddSeats(n)}
@@ -1361,9 +1377,15 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-600 mb-2">Vorm</label>
+                <label className="block text-sm font-semibold text-gray-600 mb-2">{t('kassaApp.floorPlanShapeLabel')}</label>
                 <div className="grid grid-cols-3 gap-2">
-                  {([['SQUARE', '⬛ Vierkant'], ['ROUND', '⭕ Rond'], ['RECTANGLE', '▬ Rechthoek']] as const).map(([s, label]) => (
+                  {(
+                    [
+                      ['SQUARE', t('kassaApp.floorPlanShapeSquare')] as const,
+                      ['ROUND', t('kassaApp.floorPlanShapeRound')] as const,
+                      ['RECTANGLE', t('kassaApp.floorPlanShapeRectangle')] as const,
+                    ] as const
+                  ).map(([s, label]) => (
                     <button key={s} type="button" onClick={() => setAddShape(s)}
                       className={`min-h-[44px] touch-manipulation rounded-xl py-2 text-xs font-bold transition-colors ${addShape === s ? 'bg-[#3C4D6B] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
                       {label}
@@ -1373,8 +1395,8 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
               </div>
             </div>
             <div className="flex gap-3 border-t p-4">
-              <button type="button" onClick={() => setShowAddModal(false)} className="min-h-[44px] flex-1 touch-manipulation rounded-xl bg-gray-100 py-3 font-semibold text-gray-700">Annuleer</button>
-              <button type="button" onClick={addTable} className="min-h-[44px] flex-[2] touch-manipulation rounded-xl bg-emerald-500 py-3 font-bold text-white transition-colors hover:bg-emerald-600">Toevoegen</button>
+              <button type="button" onClick={() => setShowAddModal(false)} className="min-h-[44px] flex-1 touch-manipulation rounded-xl bg-gray-100 py-3 font-semibold text-gray-700">{t('kassaApp.cancel')}</button>
+              <button type="button" onClick={addTable} className="min-h-[44px] flex-[2] touch-manipulation rounded-xl bg-emerald-500 py-3 font-bold text-white transition-colors hover:bg-emerald-600">{t('kassaApp.optionsAdd')}</button>
             </div>
           </div>
         </div>

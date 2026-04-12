@@ -23,6 +23,7 @@ import {
   SUBMENU_IDS_ALWAYS_ON,
 } from '@/lib/admin-hamburger-modules'
 import { mirrorSuperadminSessionFromCookieToLocalStorage } from '@/lib/superadmin-cookies'
+import { useLanguage } from '@/i18n'
 
 interface TenantsCoreRow {
   slug: string
@@ -55,6 +56,7 @@ export default function SuperadminTenantModulesPage() {
   const router = useRouter()
   const params = useParams()
   const slug = params.slug as string
+  const { t } = useLanguage()
   const baseUrl = `/shop/${slug}/admin`
 
   const hamburgerByKey = useMemo(() => {
@@ -323,7 +325,7 @@ export default function SuperadminTenantModulesPage() {
                         >
                           <span className="text-sm text-slate-200">
                             <span className="mr-2">{it.icon}</span>
-                            {it.label}
+                            {it.labelKey ? t(it.labelKey) : it.label}
                           </span>
                           <ModuleSlider
                             checked={!!subToggles[it.id] && parentOn}

@@ -1632,7 +1632,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           className={`w-full flex items-center justify-between px-4 py-3 transition-colors ${hamburgerSubOpen === mod.rowKey ? 'bg-blue-50' : 'hover:bg-gray-50'}`}>
                           <div className="flex items-center gap-3">
                             <span className="text-lg">{mod.icon}</span>
-                            <span className="font-semibold text-sm text-gray-700">{mod.label}</span>
+                            <span className="font-semibold text-sm text-gray-700">
+                              {mod.labelKey ? t(mod.labelKey) : mod.label}
+                            </span>
                           </div>
                           <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                         </button>
@@ -1644,7 +1646,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 {activeMod && (
                   <div className="ml-2 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-y-auto self-start" style={{ width: 220, maxHeight: '85vh' }}>
                     <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider sticky top-0 rounded-t-2xl flex items-center gap-2">
-                      <span>{activeMod.icon}</span> {activeMod.label}
+                      <span>{activeMod.icon}</span>{' '}
+                      {activeMod.labelKey ? t(activeMod.labelKey) : activeMod.label}
                     </div>
                     {activeMod.items.map(item => (
                       <Link key={item.id} href={item.href} prefetch={item.href === baseUrl ? false : undefined} onClick={() => {
@@ -1653,7 +1656,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       }}
                         className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 border-b border-gray-100 text-sm text-gray-700 transition-colors">
                         <span>{item.icon}</span>
-                        <span>{item.label}</span>
+                        <span>{item.labelKey ? t(item.labelKey) : item.label}</span>
                       </Link>
                     ))}
                     {activeMod.rowKey === 'account' && (
