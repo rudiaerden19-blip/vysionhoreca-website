@@ -177,29 +177,29 @@ export default function RegisterPage() {
 
   if (success && showInstallPopup) {
     return (
-      <main className="min-h-screen bg-dark flex flex-col">
+      <main className="min-h-screen flex flex-col bg-[#e3e3e3]">
         <div className="flex-1 flex items-center justify-center px-4 py-12">
           <div className="w-full max-w-lg">
             {/* Success checkmark */}
             <div className="text-center mb-8">
               <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h2 className="text-2xl font-bold text-white mb-2">{t('register.successTitle')}</h2>
-              <p className="text-gray-400">Account aangemaakt! Installeer nu de app.</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('register.successTitle')}</h2>
+              <p className="text-gray-600">Account aangemaakt! Installeer nu de app.</p>
             </div>
 
             {/* Install App Card */}
-            <div className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-2xl p-8">
+            <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
               <div className="text-center mb-6">
                 {/* Blue V Icon */}
                 <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/30">
                   <span className="text-5xl font-bold text-white">V</span>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">Installeer Vysion Bestelplatform</h3>
-                <p className="text-gray-400 text-sm">Download de app op uw tablet voor de beste ervaring</p>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Installeer Vysion Bestelplatform</h3>
+                <p className="text-gray-600 text-sm">Download de app op uw tablet voor de beste ervaring</p>
               </div>
 
               {/* Download Buttons */}
@@ -266,10 +266,10 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="min-h-screen bg-dark flex flex-col">
+    <main className="min-h-screen flex flex-col bg-[#e3e3e3]">
       {/* Header */}
       <header className="p-6 flex items-center justify-between">
-        <Link href="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
+        <Link href="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
@@ -280,7 +280,7 @@ export default function RegisterPage() {
         <div className="relative" ref={langRef}>
           <button
             onClick={() => setIsLangOpen(!isLangOpen)}
-            className="flex items-center gap-2 text-white hover:text-accent transition-colors px-3 py-2 rounded-lg hover:bg-white/10 bg-white/5 border border-gray-700"
+            className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-800 transition-colors hover:border-gray-400 hover:bg-gray-50"
           >
             <span className="text-xl">{localeFlags[locale]}</span>
             <span className="text-sm hidden sm:inline">{localeNames[locale]}</span>
@@ -296,13 +296,13 @@ export default function RegisterPage() {
 
           {/* Dropdown */}
           {isLangOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-dark rounded-xl shadow-2xl border border-gray-700 py-2 z-50">
+            <div className="absolute right-0 z-50 mt-2 w-48 rounded-xl border border-gray-200 bg-white py-2 shadow-xl">
               {locales.map((langCode) => (
                 <button
                   key={langCode}
                   onClick={() => handleLanguageSelect(langCode)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors ${
-                    locale === langCode ? 'text-accent' : 'text-white'
+                  className={`flex w-full items-center gap-3 px-4 py-3 transition-colors hover:bg-gray-100 ${
+                    locale === langCode ? 'text-accent' : 'text-gray-800'
                   }`}
                 >
                   <span className="text-xl">{localeFlags[langCode]}</span>
@@ -327,20 +327,20 @@ export default function RegisterPage() {
             <Link href="/">
               <span className="text-3xl font-bold">
                 <span className="text-accent">Vysion</span>
-                <span className="text-gray-400 font-normal ml-1">horeca</span>
+                <span className="ml-1 font-normal text-gray-600">horeca</span>
               </span>
             </Link>
-            <p className="text-gray-400 mt-3">
+            <p className="mt-3 text-gray-800">
               {t('register.title')}
             </p>
-            <p className="text-gray-500 text-sm mt-1">
+            <p className="mt-1 text-sm text-gray-600">
               {t('register.subtitle')}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="businessName" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="businessName" className="mb-2 block text-sm font-medium text-gray-800">
                 {t('register.businessName')} <span className="text-red-500">*</span>
               </label>
               <input
@@ -351,12 +351,12 @@ export default function RegisterPage() {
                 onChange={handleChange}
                 required
                 placeholder={t('register.businessNamePlaceholder')}
-                className="w-full px-4 py-3 bg-white/10 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all"
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition-all placeholder:text-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/25"
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="email" className="mb-2 block text-sm font-medium text-gray-800">
                 {t('register.email')} <span className="text-red-500">*</span>
               </label>
               <input
@@ -367,12 +367,12 @@ export default function RegisterPage() {
                 onChange={handleChange}
                 required
                 placeholder={t('register.emailPlaceholder')}
-                className="w-full px-4 py-3 bg-white/10 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all"
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition-all placeholder:text-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/25"
               />
             </div>
 
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="phone" className="mb-2 block text-sm font-medium text-gray-800">
                 {t('register.phone')} <span className="text-red-500">*</span>
               </label>
               <input
@@ -383,12 +383,12 @@ export default function RegisterPage() {
                 onChange={handleChange}
                 required
                 placeholder={t('register.phonePlaceholder')}
-                className="w-full px-4 py-3 bg-white/10 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all"
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition-all placeholder:text-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/25"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="password" className="mb-2 block text-sm font-medium text-gray-800">
                 {t('register.password')} <span className="text-red-500">*</span>
               </label>
               <input
@@ -399,12 +399,12 @@ export default function RegisterPage() {
                 onChange={handleChange}
                 required
                 placeholder={t('register.passwordPlaceholder')}
-                className="w-full px-4 py-3 bg-white/10 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all"
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition-all placeholder:text-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/25"
               />
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="confirmPassword" className="mb-2 block text-sm font-medium text-gray-800">
                 {t('register.confirmPassword')} <span className="text-red-500">*</span>
               </label>
               <input
@@ -415,12 +415,12 @@ export default function RegisterPage() {
                 onChange={handleChange}
                 required
                 placeholder={t('register.confirmPasswordPlaceholder')}
-                className="w-full px-4 py-3 bg-white/10 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all"
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition-all placeholder:text-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/25"
               />
             </div>
 
             {error && (
-              <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+              <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
                 {error}
               </div>
             )}
@@ -447,9 +447,9 @@ export default function RegisterPage() {
             </button>
 
             <div className="text-center">
-              <p className="text-gray-400 text-sm">
+              <p className="text-sm text-gray-600">
                 {t('register.alreadyHaveAccount')}{' '}
-                <Link href={`/login?lang=${locale}`} className="text-accent hover:text-accent/80 transition-colors">
+                <Link href={`/login?lang=${locale}`} className="font-medium text-accent hover:text-accent/80 transition-colors">
                   {t('register.loginLink')}
                 </Link>
               </p>
@@ -459,7 +459,7 @@ export default function RegisterPage() {
       </div>
 
       {/* Footer */}
-      <footer className="p-6 text-center text-gray-500 text-sm">
+      <footer className="p-6 text-center text-sm text-gray-600">
         © {new Date().getFullYear()} Vysion Group. {t('login.copyright')}
       </footer>
     </main>
