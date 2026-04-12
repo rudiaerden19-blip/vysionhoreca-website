@@ -193,7 +193,7 @@ const SUCCESS_STORY_CARDS = [
 ] as const
 
 function StatsAndLiveDemoSection() {
-  const { t, locale } = useLanguage()
+  const { t } = useLanguage()
 
   const stats = [
     { value: 250_000, prefix: '', suffix: '+', labelKey: 'stats.processed' },
@@ -276,46 +276,6 @@ function StatsAndLiveDemoSection() {
               ))}
             </div>
           </div>
-        </div>
-      </div>
-
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center mt-10 sm:mt-12 md:mt-14 pt-[2cm]">
-        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-          {t('liveDemo.title')}
-        </h2>
-
-        <p className="text-lg sm:text-xl text-gray-600 mb-8">
-          {t('liveDemo.subtitle')}
-        </p>
-        <div className="flex flex-col items-stretch justify-center gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-5">
-          <a
-            href={`/registreer?lang=${locale}`}
-            className="inline-flex min-h-[52px] items-center justify-center rounded-full bg-accent px-8 py-4 text-center text-base font-bold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:px-10 sm:py-5 sm:text-lg"
-          >
-            {t('heroLanding.ctaStartFree')}
-          </a>
-          <a
-            href={DEMO_HERO_LIVE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full border-2 border-gray-900 bg-white px-8 py-4 text-base font-bold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:px-10 sm:py-5 sm:text-lg"
-          >
-            <span>{t('platform.gridDemoCta')}</span>
-            <svg className="h-5 w-5 sm:h-6 sm:w-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
-          </a>
-          <a
-            href={DEMO_ONLINE_SHOP_MENU_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full border-2 border-gray-900 bg-white px-8 py-4 text-base font-bold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:px-10 sm:py-5 sm:text-lg"
-          >
-            <span>{t('platform.gridDemoShopCta')}</span>
-            <svg className="h-5 w-5 sm:h-6 sm:w-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
-          </a>
         </div>
       </div>
     </section>
