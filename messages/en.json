@@ -859,6 +859,24 @@
     "accept": "Accept",
     "decline": "Decline"
   },
+  "sectorModal": {
+    "title": "Choose your sector and discover a solution tailored to you",
+    "sectors": {
+      "frituur": "Chip shop / fry shop",
+      "broodjeszaak": "Sandwich shop",
+      "kebabzaak": "Kebab shop",
+      "cafe": "Café",
+      "kapper": "Hair salon",
+      "beauty_salon": "Beauty salon",
+      "nagelstudio": "Nail studio",
+      "retail": "Retail",
+      "drankenhandel": "Drinks / off-licence",
+      "foodtruck": "Food truck",
+      "ijssalon": "Ice cream parlour",
+      "marktkramen": "Market stalls",
+      "other": "Other"
+    }
+  },
   "login": {
     "backToHome": "Back to home",
     "selectBusiness": "Select your business to log in",

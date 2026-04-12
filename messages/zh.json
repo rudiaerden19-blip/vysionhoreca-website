@@ -601,6 +601,24 @@
     "accept": "接受",
     "decline": "拒绝"
   },
+  "sectorModal": {
+    "title": "选择您的行业，探索为您量身定制的方案",
+    "sectors": {
+      "frituur": "炸薯条 / 小吃店",
+      "broodjeszaak": "三明治店",
+      "kebabzaak": "烤肉卷饼店",
+      "cafe": "咖啡馆",
+      "kapper": "美发",
+      "beauty_salon": "美容院",
+      "nagelstudio": "美甲店",
+      "retail": "零售",
+      "drankenhandel": "饮料零售",
+      "foodtruck": "餐车",
+      "ijssalon": "冰淇淋店",
+      "marktkramen": "市场摊位",
+      "other": "其他"
+    }
+  },
   "login": {
     "backToHome": "返回首页",
     "selectBusiness": "选择您的商户登录",

@@ -601,6 +601,24 @@
     "accept": "Accetta",
     "decline": "Rifiuta"
   },
+  "sectorModal": {
+    "title": "Scegli il tuo settore e scopri una soluzione su misura",
+    "sectors": {
+      "frituur": "Friggitoria",
+      "broodjeszaak": "Panineria",
+      "kebabzaak": "Kebab",
+      "cafe": "Caffè / bar",
+      "kapper": "Parrucchiere",
+      "beauty_salon": "Centro estetico",
+      "nagelstudio": "Centro unghie",
+      "retail": "Retail",
+      "drankenhandel": "Bevande (negozio)",
+      "foodtruck": "Food truck",
+      "ijssalon": "Gelateria",
+      "marktkramen": "Banchi di mercato",
+      "other": "Altro"
+    }
+  },
   "login": {
     "backToHome": "Torna alla home",
     "selectBusiness": "Seleziona la tua attività per accedere",

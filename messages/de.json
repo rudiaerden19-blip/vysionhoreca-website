@@ -601,6 +601,24 @@
     "accept": "Akzeptieren",
     "decline": "Ablehnen"
   },
+  "sectorModal": {
+    "title": "Wählen Sie Ihre Branche und entdecken Sie Ihre maßgeschneiderte Lösung",
+    "sectors": {
+      "frituur": "Imbiss / Frittenbude",
+      "broodjeszaak": "Sandwichladen",
+      "kebabzaak": "Döner / Kebab",
+      "cafe": "Café",
+      "kapper": "Friseur",
+      "beauty_salon": "Kosmetikstudio",
+      "nagelstudio": "Nagelstudio",
+      "retail": "Einzelhandel",
+      "drankenhandel": "Getränkefachhandel",
+      "foodtruck": "Foodtruck",
+      "ijssalon": "Eisdiele",
+      "marktkramen": "Marktstände",
+      "other": "Sonstiges"
+    }
+  },
   "login": {
     "backToHome": "Zurück zur Startseite",
     "selectBusiness": "Wählen Sie Ihren Betrieb zum Anmelden",

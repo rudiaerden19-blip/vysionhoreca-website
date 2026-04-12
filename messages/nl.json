@@ -859,6 +859,24 @@
     "accept": "Accepteren",
     "decline": "Weigeren"
   },
+  "sectorModal": {
+    "title": "Kies uw sector en ontdek uw oplossing op maat",
+    "sectors": {
+      "frituur": "Frituur",
+      "broodjeszaak": "Broodjeszaak",
+      "kebabzaak": "Kebabzaak",
+      "cafe": "Café",
+      "kapper": "Kapper",
+      "beauty_salon": "Schoonheidssalon",
+      "nagelstudio": "Nagelstudio",
+      "retail": "Retail",
+      "drankenhandel": "Drankenhandel",
+      "foodtruck": "Foodtruck",
+      "ijssalon": "IJssalon",
+      "marktkramen": "Marktkramen",
+      "other": "Andere"
+    }
+  },
   "login": {
     "backToHome": "Terug naar home",
     "selectBusiness": "Selecteer je zaak om in te loggen",

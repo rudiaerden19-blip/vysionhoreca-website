@@ -601,6 +601,24 @@
     "accept": "قبول",
     "decline": "رفض"
   },
+  "sectorModal": {
+    "title": "اختر قطاعك واكتشف الحل المناسب لك",
+    "sectors": {
+      "frituur": "مطعم بطاطس / مقليات",
+      "broodjeszaak": "محل سندويشات",
+      "kebabzaak": "مطعم كباب",
+      "cafe": "مقهى",
+      "kapper": "صالون حلاقة / تجميل شعر",
+      "beauty_salon": "صالون تجميل",
+      "nagelstudio": "صالون أظافر",
+      "retail": "تجزئة",
+      "drankenhandel": "مشروبات (بيع بالتجزئة)",
+      "foodtruck": "شاحنة طعام",
+      "ijssalon": "محل آيس كريم",
+      "marktkramen": "أكشاك السوق",
+      "other": "أخرى"
+    }
+  },
   "login": {
     "backToHome": "العودة للرئيسية",
     "selectBusiness": "اختر عملك لتسجيل الدخول",

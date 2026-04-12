@@ -601,6 +601,24 @@
     "accept": "同意する",
     "decline": "拒否する"
   },
+  "sectorModal": {
+    "title": "業種を選び、最適なソリューションを見つけましょう",
+    "sectors": {
+      "frituur": "フライショップ",
+      "broodjeszaak": "サンドイッチ店",
+      "kebabzaak": "ケバブ店",
+      "cafe": "カフェ",
+      "kapper": "美容院（ヘア）",
+      "beauty_salon": "エステサロン",
+      "nagelstudio": "ネイルサロン",
+      "retail": "小売",
+      "drankenhandel": "飲料販売",
+      "foodtruck": "キッチンカー",
+      "ijssalon": "アイスクリーム店",
+      "marktkramen": "市場の屋台",
+      "other": "その他"
+    }
+  },
   "login": {
     "backToHome": "ホームに戻る",
     "selectBusiness": "ログインするビジネスを選択",

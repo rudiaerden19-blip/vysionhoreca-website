@@ -6,6 +6,7 @@ import '@/lib/silence-console-prod' // Silence console.log in production
 import { GlobalAutoCapitalize } from '@/components/GlobalAutoCapitalize'
 import { PageViewTracker } from '@/components/PageViewTracker'
 import { PWARegister } from '@/components/PWARegister'
+import SectorChoiceGate from '@/components/SectorChoiceGate'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -162,6 +163,7 @@ export default function RootLayout({
           <PWARegister />
           <GlobalAutoCapitalize />
           <PageViewTracker />
+          <SectorChoiceGate />
           {children}
         </LanguageProvider>
       </body>
