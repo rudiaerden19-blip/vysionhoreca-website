@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { Fragment } from 'react'
+import { Fragment, useLayoutEffect, useRef, useState } from 'react'
 import { useLanguage } from '@/i18n'
 
 /** Zet `**vet**` in vertaalstrings om naar <strong>. */
@@ -31,7 +31,39 @@ const BEEST_ALT_KEYS = ['vysionBeest.imageAlt1', 'vysionBeest.imageAlt2', 'vysio
  * Drie losse productfoto’s (`vysion-beest-1..3.png`), gelijk formaat kader, onder elkaar.
  */
 export default function VysionBeestSection() {
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
+  const textColRef = useRef<HTMLDivElement>(null)
+  /** Op lg: hoogte beeldstapel = tekstkolom, zodat de derde foto niet onder de copy uitsteekt. */
+  const [textColPx, setTextColPx] = useState<number | null>(null)
+
+  useLayoutEffect(() => {
+    const el = textColRef.current
+    if (!el) return
+
+    const mq = window.matchMedia('(min-width: 1024px)')
+    const update = () => {
+      if (!mq.matches) {
+        setTextColPx(null)
+        return
+      }
+      setTextColPx(el.offsetHeight)
+    }
+
+    update()
+    const ro = new ResizeObserver(() => {
+      requestAnimationFrame(update)
+    })
+    ro.observe(el)
+    mq.addEventListener('change', update)
+    window.addEventListener('resize', update)
+    return () => {
+      ro.disconnect()
+      mq.removeEventListener('change', update)
+      window.removeEventListener('resize', update)
+    }
+  }, [locale])
+
+  const lockStackToText = textColPx != null
 
   return (
     <section
@@ -40,26 +72,37 @@ export default function VysionBeestSection() {
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-2 lg:gap-12 xl:gap-16">
-          <div className="order-2 mx-auto w-full max-w-xl lg:order-1 lg:mx-0 lg:max-w-none lg:pr-2">
-            <div className="flex flex-col gap-4 sm:gap-5">
+          <div
+            className="order-2 mx-auto w-full max-w-xl lg:order-1 lg:mx-0 lg:max-w-none lg:pr-2"
+            style={
+              lockStackToText && textColPx != null
+                ? { height: textColPx, maxHeight: textColPx }
+                : undefined
+            }
+          >
+            <div
+              className={`flex h-full flex-col gap-3 sm:gap-4 ${lockStackToText ? 'min-h-0' : ''}`}
+            >
               {BEEST_IMAGES.map((src, i) => (
                 <div
                   key={src}
-                  className="relative aspect-[5/4] w-full overflow-hidden rounded-xl bg-gray-50 ring-1 ring-gray-100 shadow-sm"
+                  className={`relative w-full overflow-hidden rounded-xl bg-gray-50 ring-1 ring-gray-100 shadow-sm ${
+                    lockStackToText ? 'min-h-0 flex-1 basis-0' : 'aspect-[5/4]'
+                  }`}
                 >
                   <Image
                     src={src}
                     alt={t(BEEST_ALT_KEYS[i])}
                     fill
                     sizes="(min-width: 1024px) 42vw, (min-width: 640px) 90vw, 100vw"
-                    className="object-contain object-center p-3 sm:p-4"
+                    className={`object-contain object-center ${lockStackToText ? 'p-1.5 sm:p-2' : 'p-3 sm:p-4'}`}
                     priority={i === 0}
                   />
                 </div>
               ))}
             </div>
           </div>
-          <div className="order-1 lg:order-2 lg:min-w-0">
+          <div ref={textColRef} className="order-1 lg:order-2 lg:min-w-0">
             <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-accent">
               {t('vysionBeest.eyebrow')}
             </p>
