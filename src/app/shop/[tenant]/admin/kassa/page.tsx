@@ -1686,8 +1686,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
 
         {/* Tenant naam */}
-        <div className="flex-1 flex items-center justify-center">
-          <span className="text-red-700 font-medium text-xl tracking-normal">
+        <div className="flex flex-1 items-center justify-center">
+          <span className="truncate text-center text-xl font-medium tracking-normal text-white">
             {tenantInfo?.business_name || tenant.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
           </span>
         </div>

@@ -58,6 +58,12 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   const router = useRouter()
   const { t } = useLanguage()
   const [tenantExists, setTenantExists] = useState<boolean | null>(null)
+  const [adminHeaderTitle, setAdminHeaderTitle] = useState(() =>
+    params.tenant
+      .split('-')
+      .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ')
+  )
   const [loading, setLoading] = useState(true)
   /** Na mount: superadmin (platform) óf zaak-eigenaar met wachtwoord vandaag. Klanten zonder geldige `vysion_tenant` blijven naar /login — géén automatische tenant-sessie via cookies. */
   /** `verifying` = client dacht ingelogd; wacht op `/api/auth/verify-tenant-session` (zelfde regels als schrijf-API’s). */
@@ -78,8 +84,15 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   useEffect(() => {
     async function checkTenant() {
       setLoading(true)
+      const fromSlug = params.tenant
+        .split('-')
+        .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' ')
+      setAdminHeaderTitle(fromSlug)
       const tenantData = await getTenantSettings(params.tenant)
       setTenantExists(tenantData !== null)
+      const bn = tenantData?.business_name?.trim()
+      setAdminHeaderTitle(bn || fromSlug)
       setLoading(false)
     }
     checkTenant()
@@ -432,8 +445,8 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
 
         {/* Tenant naam midden */}
         <div className="flex min-w-0 flex-1 items-center justify-center px-1">
-          <span className="truncate text-center text-sm font-medium tracking-normal text-red-400 sm:text-base">
-            {params.tenant.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+          <span className="truncate text-center text-sm font-medium tracking-normal text-white sm:text-base">
+            {adminHeaderTitle}
           </span>
         </div>
 

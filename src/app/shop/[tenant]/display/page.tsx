@@ -937,7 +937,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             </div>
             <div className="min-w-0">
               <h1 className="truncate text-lg font-bold sm:text-xl text-white">{tx('title')}</h1>
-              <p className="truncate text-gray-300 text-xs sm:text-sm">{business?.business_name}</p>
+              <p className="truncate text-xs text-white/95 sm:text-sm">{business?.business_name}</p>
             </div>
           </div>
 

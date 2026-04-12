@@ -501,7 +501,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
             </div>
             <div className="min-w-0">
               <h1 className="truncate text-lg font-bold sm:text-xl">{tx('title')}</h1>
-              <p className="truncate text-blue-200 text-xs sm:text-sm">{business?.business_name}</p>
+              <p className="truncate text-xs text-white/95 sm:text-sm">{business?.business_name}</p>
             </div>
           </div>
 
