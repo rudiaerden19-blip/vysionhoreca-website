@@ -4,8 +4,9 @@ import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useLanguage } from '@/i18n'
 import {
-  buildStaffSalesSummaryReceiptHtml,
-  printReceiptHtmlDocument,
+  appLocaleToBcp47,
+  getSavedLanPrinterIp,
+  printStaffSalesSummaryReceipt,
   type StaffSalesSummaryReceiptBusiness,
 } from '@/lib/print-receipt-html'
 
@@ -28,6 +29,8 @@ type Props = {
   onStartSales?: (staff: { id: string; name: string }) => void
   /** Koptekst op afgedrukt dagoverzicht (zaak). */
   receiptBusiness?: StaffSalesSummaryReceiptBusiness
+  /** BTW-% voor thermische bon via print-proxy (zelfde als kassa). */
+  btwPercentage?: number
 }
 
 export function AdminStaffClockPanel({
@@ -36,6 +39,7 @@ export function AdminStaffClockPanel({
   kassaHref,
   onStartSales,
   receiptBusiness,
+  btwPercentage = 6,
 }: Props) {
   const { t, locale } = useLanguage()
   const [staffList, setStaffList] = useState<StaffRow[]>([])
@@ -122,18 +126,27 @@ export function AdminStaffClockPanel({
 
   const kassaLink = useMemo(() => kassaHref || `/shop/${tenantSlug}/admin/kassa`, [kassaHref, tenantSlug])
 
-  const printSalesSummary = () => {
+  const printSalesSummary = async () => {
     if (!summary) return
+    const introLine = t('staffClock.summaryIntro').replace('{name}', summary.staffName)
     const printedLine = t('staffClock.summaryReceiptPrinted').replace(
       '{date}',
-      new Date().toLocaleString(locale, { dateStyle: 'short', timeStyle: 'short' })
+      new Date().toLocaleString(appLocaleToBcp47(locale), {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
     )
-    const html = buildStaffSalesSummaryReceiptHtml({
+    await printStaffSalesSummaryReceipt({
+      savedPrinterIp: getSavedLanPrinterIp(tenantSlug),
+      btwPercentage,
       business: receiptBusiness,
       labels: {
         docTitle: `${t('staffClock.summaryTitle')} — ${summary.staffName}`,
         heading: t('staffClock.summaryTitle'),
-        introLine: t('staffClock.summaryIntro').replace('{name}', summary.staffName),
+        introLine,
         totalLabel: t('staffClock.summaryTotalLabel'),
         orderCountLine: t('staffClock.summaryOrderCount').replace('{count}', String(summary.orderCount)),
         columnAmount: t('staffClock.summaryAmount'),
@@ -142,8 +155,11 @@ export function AdminStaffClockPanel({
       },
       total: summary.total,
       orders: summary.orders,
+      staffName: summary.staffName,
+      summaryHeading: t('staffClock.summaryTitle'),
+      introLine,
+      printedLine,
     })
-    printReceiptHtmlDocument(html)
   }
 
   useEffect(() => {
@@ -306,7 +322,7 @@ export function AdminStaffClockPanel({
             <div className="flex flex-col gap-2 sm:flex-row">
               <button
                 type="button"
-                onClick={() => printSalesSummary()}
+                onClick={() => void printSalesSummary()}
                 className="flex-1 min-h-[44px] rounded-xl border-2 border-[#3C4D6B] bg-white py-3 font-bold text-[#3C4D6B] hover:bg-slate-50"
               >
                 {t('staffClock.summaryPrint')}

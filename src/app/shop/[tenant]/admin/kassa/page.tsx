@@ -30,9 +30,12 @@ import {
 } from '@/lib/admin-hamburger-modules'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
 import {
-  buildStaffSalesSummaryReceiptHtml,
+  appLocaleToBcp47,
   escapeReceiptHtml,
+  getSavedLanPrinterIp,
+  KASSA_PRINT_RECEIPT_STYLES,
   printReceiptHtmlDocument,
+  printStaffSalesSummaryReceipt,
 } from '@/lib/print-receipt-html'
 import PostTrialModulePickerModal from '@/components/PostTrialModulePickerModal'
 import { AccountMenuSessionBlock } from '@/components/AccountMenuSessionBlock'
@@ -1259,20 +1262,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       order.paymentMethod === 'CARD' ? 'PIN/Kaart' :
       order.paymentMethod === 'IDEAL' ? 'iDEAL' : 'Bancontact'
 
-    const html = `<!DOCTYPE html><html><head><title>Bon #${order.orderNumber}</title><style>
-      * { margin:0;padding:0;box-sizing:border-box; }
-      body { font-family:'Courier New',monospace;font-size:12px;width:80mm;padding:10px; }
-      .center { text-align:center; }
-      .bold { font-weight:bold; }
-      .big { font-size:16px; }
-      .small { font-size:10px; }
-      .divider { border-top:1px dashed #000;margin:8px 0; }
-      .divider-solid { border-top:1px solid #000;margin:8px 0; }
-      .row { display:flex;justify-content:space-between;margin:2px 0; }
-      .total { font-size:18px;font-weight:bold;margin-top:8px; }
-      .order-type { font-size:20px;font-weight:bold;margin:10px 0;padding:8px;border:2px solid #000; }
-      @media print { body { width:auto; } }
-    </style></head><body>
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>Bon #${order.orderNumber}</title><style>${KASSA_PRINT_RECEIPT_STYLES}</style></head><body>
       <div class="center">
         <div class="bold big">${tenantInfo?.business_name || 'Vysion Horeca'}</div>
         ${tenantInfo?.address ? `<div class="small">${tenantInfo.address}</div>` : ''}
@@ -1310,7 +1300,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     printReceiptHtmlDocument(html)
   }
 
-  const printStaffClockSalesSummary = () => {
+  const printStaffClockSalesSummary = async () => {
     if (!staffClockSummary) return
     playClick()
     const s = staffClockSummary
@@ -1321,18 +1311,29 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           postalCode: tenantInfo.postal_code,
           city: tenantInfo.city,
           phone: tenantInfo.phone,
+          email: tenantInfo.email,
+          btw_number: tenantInfo.btw_number,
         }
       : undefined
+    const introLine = t('staffClock.summaryIntro').replace('{name}', s.staffName)
     const printedLine = t('staffClock.summaryReceiptPrinted').replace(
       '{date}',
-      new Date().toLocaleString(locale, { dateStyle: 'short', timeStyle: 'short' })
+      new Date().toLocaleString(appLocaleToBcp47(locale), {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
     )
-    const html = buildStaffSalesSummaryReceiptHtml({
+    await printStaffSalesSummaryReceipt({
+      savedPrinterIp: getSavedLanPrinterIp(tenant),
+      btwPercentage: tenantInfo?.btw_percentage ?? 6,
       business: biz,
       labels: {
         docTitle: `${t('staffClock.summaryTitle')} — ${s.staffName}`,
         heading: t('staffClock.summaryTitle'),
-        introLine: t('staffClock.summaryIntro').replace('{name}', s.staffName),
+        introLine,
         totalLabel: t('staffClock.summaryTotalLabel'),
         orderCountLine: t('staffClock.summaryOrderCount').replace('{count}', String(s.orderCount)),
         columnAmount: t('staffClock.summaryAmount'),
@@ -1341,8 +1342,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       },
       total: s.total,
       orders: s.orders,
+      staffName: s.staffName,
+      summaryHeading: t('staffClock.summaryTitle'),
+      introLine,
+      printedLine,
     })
-    printReceiptHtmlDocument(html)
   }
 
   const handleLogout = () => {
@@ -2368,7 +2372,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <div className="flex flex-col gap-2 sm:flex-row">
               <button
                 type="button"
-                onClick={() => printStaffClockSalesSummary()}
+                onClick={() => void printStaffClockSalesSummary()}
                 className="flex-1 min-h-[44px] py-3 rounded-xl border-2 border-[#3C4D6B] bg-white text-[#3C4D6B] font-bold hover:bg-slate-50"
               >
                 {t('staffClock.summaryPrint')}

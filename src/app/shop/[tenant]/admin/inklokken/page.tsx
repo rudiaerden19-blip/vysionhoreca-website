@@ -14,6 +14,7 @@ export default function InklokkenPage({ params }: { params: { tenant: string } }
   const [kassaClockLoading, setKassaClockLoading] = useState(true)
   const [kassaClockSaving, setKassaClockSaving] = useState(false)
   const [receiptBusiness, setReceiptBusiness] = useState<StaffSalesSummaryReceiptBusiness | undefined>()
+  const [receiptBtwPct, setReceiptBtwPct] = useState(6)
 
   useEffect(() => {
     let cancelled = false
@@ -29,7 +30,10 @@ export default function InklokkenPage({ params }: { params: { tenant: string } }
             postalCode: s.postal_code,
             city: s.city,
             phone: s.phone,
+            email: s.email,
+            btw_number: s.btw_number,
           })
+          setReceiptBtwPct(s.btw_percentage ?? 6)
         } else {
           setReceiptBusiness(undefined)
         }
@@ -96,7 +100,12 @@ export default function InklokkenPage({ params }: { params: { tenant: string } }
         </div>
 
         {kassaClockEnabled ? (
-          <AdminStaffClockPanel tenantSlug={tenant} showSalesButton={false} receiptBusiness={receiptBusiness} />
+          <AdminStaffClockPanel
+            tenantSlug={tenant}
+            showSalesButton={false}
+            receiptBusiness={receiptBusiness}
+            btwPercentage={receiptBtwPct}
+          />
         ) : (
           <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
             {t('inklokkenPage.disabledHint')}
