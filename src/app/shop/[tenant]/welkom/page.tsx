@@ -24,8 +24,8 @@ export default function WelkomPage({ params }: { params: { tenant: string } }) {
   }, [params.tenant, router])
 
   useEffect(() => {
-    const t1 = setTimeout(() => setShowTitle(true), 300)
-    const t2 = setTimeout(() => setShowButton(true), 3300)
+    const t1 = setTimeout(() => setShowTitle(true), 200)
+    const t2 = setTimeout(() => setShowButton(true), 1000)
     return () => {
       clearTimeout(t1)
       clearTimeout(t2)
@@ -56,10 +56,10 @@ export default function WelkomPage({ params }: { params: { tenant: string } }) {
         }`}
       >
         <h1
-          className="text-[clamp(2.75rem,10vw,5.5rem)] font-black leading-none tracking-tight text-gray-900"
+          className="text-[clamp(2rem,8vw,4.5rem)] font-black leading-tight tracking-tight text-gray-900"
           style={{ letterSpacing: '-0.02em' }}
         >
-          Vysion
+          Vysion-Horeca
         </h1>
         <p className="mt-3 text-[clamp(1rem,3vw,1.5rem)] font-light uppercase tracking-[0.35em] text-gray-500">
           2026
@@ -76,7 +76,7 @@ export default function WelkomPage({ params }: { params: { tenant: string } }) {
       </p>
 
       <div
-        className={`transition-opacity duration-1000 ease-out ${
+        className={`transition-opacity duration-500 ease-out ${
           showButton ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
         }`}
       >
