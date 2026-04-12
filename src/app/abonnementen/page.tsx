@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { Navigation, Footer, CookieBanner, SubscriptionsTermsPopup } from '@/components'
+import { Navigation, Footer, CookieBanner, HomeCornerStamp, SubscriptionsTermsPopup } from '@/components'
 import { useLanguage } from '@/i18n'
 
 const LIFESTYLE_IMAGE = '/images/abonnement-vysion-pro-lifestyle.png'
@@ -369,6 +369,17 @@ export default function AbonnementenPage() {
                 <p className="text-center text-accent text-sm mt-3 font-medium">{t('pricing.cancelAnytime')}</p>
                 </div>
               </div>
+              <div
+                id="abonnementen-premium-stamp-anchor"
+                className="pointer-events-none absolute bottom-[6.5rem] left-3 right-3 h-16 opacity-0"
+                aria-hidden
+              />
+              <HomeCornerStamp
+                observeAnchorId="abonnementen-premium-stamp-anchor"
+                arcTopKey="subscriptionsPage.premiumStampTop"
+                arcBottomKey="subscriptionsPage.premiumStampBottom"
+                centerWordKey="subscriptionsPage.premiumStampCenter"
+              />
             </div>
             <div className="lg:pt-2 lg:pl-2 lg:mt-[2cm]">
               <p className="text-3xl sm:text-4xl font-bold text-accent leading-tight mb-6 sm:mb-8">

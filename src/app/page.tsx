@@ -8,6 +8,7 @@ import {
   Navigation,
   Footer,
   CookieBanner,
+  HomeCornerStamp,
   HomeLandingHero,
 } from '@/components'
 
@@ -661,6 +662,12 @@ function PricingSection() {
                 <p className="text-center text-accent text-sm mt-3 font-medium">{t('pricing.cancelAnytime')}</p>
               </div>
             </div>
+            <div
+              id="pricing-premium-stamp-anchor"
+              className="pointer-events-none absolute bottom-[6.5rem] left-3 right-3 h-16 opacity-0"
+              aria-hidden
+            />
+            <HomeCornerStamp />
           </div>
         </div>
 

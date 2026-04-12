@@ -438,7 +438,8 @@ input[type="number"] {
 }
 
 .home-stamp-wrap.home-stamp-visible {
-  animation: home-stamp-slam 0.58s cubic-bezier(0.2, 0.95, 0.35, 1) forwards;
+  /* Korte vertraging vóór slam/fade — voelt rustiger aan bij scroll-in */
+  animation: home-stamp-slam 0.58s cubic-bezier(0.2, 0.95, 0.35, 1) 0.22s forwards;
 }
 
 @keyframes home-stamp-slam {
@@ -461,7 +462,7 @@ input[type="number"] {
 
 @media (prefers-reduced-motion: reduce) {
   .home-stamp-wrap.home-stamp-visible {
-    animation: home-stamp-slam-reduced 0.01s forwards;
+    animation: home-stamp-slam-reduced 0.01s 0s forwards;
   }
 }
 
