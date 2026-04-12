@@ -196,6 +196,9 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
         <p className="mt-4 sm:mt-5 text-lg sm:text-xl md:text-2xl text-white font-semibold max-w-2xl leading-snug">
           {t('heroLanding.subtitleLead')}
         </p>
+        <p className="mt-3 sm:mt-4 text-base sm:text-lg text-white/85 max-w-2xl leading-relaxed">
+          {t('heroLanding.subtitle')}
+        </p>
         <div
           className="mt-8 sm:mt-10 md:mt-12 w-full max-w-lg sm:max-w-xl mx-auto rounded-2xl border border-white/25 bg-white/[0.07] backdrop-blur-md px-5 py-6 sm:px-8 sm:py-7 shadow-[0_12px_40px_rgba(0,0,0,0.4)] ring-1 ring-white/10"
           role="region"

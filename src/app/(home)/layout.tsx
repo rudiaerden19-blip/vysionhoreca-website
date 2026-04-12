@@ -6,7 +6,7 @@ const siteUrl = 'https://www.vysionhoreca.com'
 const HOME_TITLE =
   'Horeca kassa, online bestelplatform & hardware | Gratis proberen | Vysion'
 const HOME_DESCRIPTION =
-  'Vysion: touchscreen horeca kassa (POS), online bestelplatform en webshop, premium kassahardware (Intel i5). 14 dagen gratis kassa software — reserveringen, keukenscherm, WhatsApp, 9 talen. België & Nederland.'
+  'Zoek je een horeca kassa, online bestelplatform of gratis uitproberen? Vysion: touchscreen POS, webshop, premium kassahardware (Intel i5). 14 dagen gratis — reserveringen, keukenscherm, WhatsApp, 9 talen. België & Nederland.'
 
 export const metadata: Metadata = {
   title: {
@@ -25,6 +25,10 @@ export const metadata: Metadata = {
     'WhatsApp bestellen restaurant',
     'keukenscherm',
     'horeca software België',
+    'horeca kassa gratis',
+    'gratis horeca kassa',
+    'kassa en bestelplatform',
+    'horeca bestelplatform gratis proberen',
   ],
   alternates: {
     canonical: '/',

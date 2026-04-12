@@ -64,6 +64,8 @@ const organizationJsonLd = {
       '@id': `${siteUrl}/#website`,
       url: siteUrl,
       name: 'Vysion Horeca',
+      description:
+        'Zoek je horeca kassa, online bestelplatform of gratis uitproberen? Vysion combineert POS, bestellen, hardware en reserveringen voor België en Nederland.',
       publisher: { '@id': `${siteUrl}/#organization` },
       inLanguage: 'nl-BE',
     },
@@ -104,6 +106,13 @@ export const metadata: Metadata = {
     'horeca software België',
     'frituur software',
     'restaurant software',
+    'horeca kassa gratis',
+    'gratis horeca software',
+    'horeca POS gratis proberen',
+    'kassa en bestelplatform',
+    'online bestelplatform restaurant',
+    'horeca bestellen online',
+    'touchscreen kassa gratis trial',
   ],
   /** Web App Manifest: zie <link rel="manifest"> in <head> (Next metadata zou crossOrigin=use-credentials zetten → soms geen Install op Android). */
   other: {
