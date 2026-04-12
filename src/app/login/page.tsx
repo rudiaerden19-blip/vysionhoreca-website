@@ -3,6 +3,7 @@
 import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { motion } from 'framer-motion'
 import { useLanguage, Locale } from '@/i18n'
 import {
   persistTenantSessionWithToday,
@@ -203,10 +204,10 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-dark flex flex-col">
+    <main className="min-h-screen flex flex-col bg-[#e3e3e3]">
       {/* Header */}
       <header className="p-6 flex items-center justify-between">
-        <Link href="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
+        <Link href="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
@@ -217,7 +218,7 @@ export default function LoginPage() {
         <div className="relative" ref={langRef}>
           <button
             onClick={() => setIsLangOpen(!isLangOpen)}
-            className="flex items-center gap-2 text-white hover:text-accent transition-colors px-3 py-2 rounded-lg hover:bg-white/10 bg-white/5 border border-gray-700"
+            className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-800 transition-colors hover:border-gray-400 hover:bg-gray-50"
           >
             <span className="text-xl">{localeFlags[locale]}</span>
             <span className="text-sm hidden sm:inline">{localeNames[locale]}</span>
@@ -233,13 +234,13 @@ export default function LoginPage() {
 
           {/* Dropdown */}
           {isLangOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-dark rounded-xl shadow-2xl border border-gray-700 py-2 z-50">
+            <div className="absolute right-0 z-50 mt-2 w-48 rounded-xl border border-gray-200 bg-white py-2 shadow-xl">
               {locales.map((langCode) => (
                 <button
                   key={langCode}
                   onClick={() => handleLanguageSelect(langCode)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors ${
-                    locale === langCode ? 'text-accent' : 'text-white'
+                  className={`flex w-full items-center gap-3 px-4 py-3 transition-colors hover:bg-gray-100 ${
+                    locale === langCode ? 'text-accent' : 'text-gray-800'
                   }`}
                 >
                   <span className="text-xl">{localeFlags[langCode]}</span>
@@ -264,18 +265,18 @@ export default function LoginPage() {
             <Link href="/">
               <span className="text-3xl font-bold">
                 <span className="text-accent">Vysion</span>
-                <span className="text-gray-400 font-normal ml-1">horeca</span>
+                <span className="ml-1 font-normal text-gray-600">horeca</span>
               </span>
             </Link>
-            <p className="text-gray-400 mt-3">
+            <p className="mt-3 text-gray-800">
               {t('login.logInToAccount')}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off" method="post">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                  {t('login.emailAddress')}
+                <label htmlFor="email" className="mb-2 block text-sm font-medium text-gray-800">
+                  {t('login.emailAddress')} <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="email"
@@ -288,13 +289,13 @@ export default function LoginPage() {
                   autoCorrect="off"
                   spellCheck={false}
                   placeholder={t('login.emailPlaceholder')}
-                  className="w-full px-4 py-3 bg-white/10 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all"
+                  className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition-all placeholder:text-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/25"
                 />
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-                  {t('login.password')}
+                <label htmlFor="password" className="mb-2 block text-sm font-medium text-gray-800">
+                  {t('login.password')} <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="password"
@@ -305,12 +306,12 @@ export default function LoginPage() {
                   required
                   autoComplete="off"
                   placeholder=""
-                  className="w-full px-4 py-3 bg-white/10 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all"
+                  className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition-all placeholder:text-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/25"
                 />
               </div>
 
               {error && (
-                <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+                <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
                   {error}
                 </div>
               )}
@@ -318,37 +319,50 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading || !email || !password}
-                className="w-full bg-accent hover:bg-accent/90 disabled:bg-accent/50 text-white py-4 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+                aria-busy={isLoading}
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-accent py-4 font-semibold text-white transition-colors hover:bg-accent/90 disabled:bg-accent/50"
               >
-                {isLoading ? t('login.loggingIn') : `${t('login.loginButton')} →`}
+                {isLoading ? (
+                  <>
+                    <motion.span
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                      className="inline-block h-5 w-5 shrink-0 rounded-full border-2 border-white border-t-transparent"
+                      aria-hidden
+                    />
+                    <span>{t('login.loggingIn')}</span>
+                  </>
+                ) : (
+                  <span>{`${t('login.loginButton')} →`}</span>
+                )}
               </button>
 
               <Link
                 href="/login/forgot-password"
-                className="w-full block text-center text-accent hover:text-accent/80 transition-colors text-sm"
+                className="block w-full text-center text-sm font-medium text-accent transition-colors hover:text-accent/80"
               >
                 {t('login.forgotPassword')}
               </Link>
             </form>
 
           {/* Help Links */}
-          <div className="space-y-4 mt-8">
+          <div className="mt-8 space-y-4">
               <Link
                 href="/login/troubleshooting"
-                className="flex items-center justify-between w-full px-4 py-3 bg-white/5 hover:bg-white/10 border border-gray-700 rounded-lg transition-colors group"
+                className="group flex w-full items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-sm transition-colors hover:border-gray-300 hover:bg-gray-50"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-accent/20 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/15">
+                    <svg className="h-5 w-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
                   </div>
                   <div>
-                    <p className="text-white font-medium">{t('login.troubleshooting.title')}</p>
-                    <p className="text-sm text-gray-400">{t('login.troubleshooting.subtitle')}</p>
+                    <p className="font-medium text-gray-900">{t('login.troubleshooting.title')}</p>
+                    <p className="text-sm text-gray-600">{t('login.troubleshooting.subtitle')}</p>
                   </div>
                 </div>
-                <svg className="w-5 h-5 text-gray-500 group-hover:text-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-5 w-5 text-gray-400 transition-colors group-hover:text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
@@ -357,7 +371,7 @@ export default function LoginPage() {
       </div>
 
       {/* Footer */}
-      <footer className="p-6 text-center text-gray-500 text-sm">
+      <footer className="p-6 text-center text-sm text-gray-600">
         © {new Date().getFullYear()} Vysion Group. {t('login.copyright')}
       </footer>
     </main>
