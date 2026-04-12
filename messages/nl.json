@@ -3551,6 +3551,8 @@
     "summaryAmount": "Bedrag",
     "noOrdersToday": "Geen verkopen op jouw naam vandaag.",
     "summaryClose": "Sluiten",
+    "summaryPrint": "Afdrukken",
+    "summaryReceiptPrinted": "Afgedrukt: {date}",
     "close": "Sluiten",
     "productTapRequiresStaff": "Druk op de klok en kies Verkoop bij een medewerker. Daarna kun je het product toevoegen.",
     "successIn": "Ingeklokt.",

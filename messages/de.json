@@ -2635,6 +2635,8 @@
     "summaryAmount": "Betrag",
     "noOrdersToday": "Heute keine Verkäufe auf Ihren Namen.",
     "summaryClose": "Schließen",
+    "summaryPrint": "Drucken",
+    "summaryReceiptPrinted": "Gedruckt: {date}",
     "close": "Schließen",
     "productTapRequiresStaff": "Tippe auf die Uhr und wähle Verkauf bei einem Mitarbeiter. Danach kannst du das Produkt hinzufügen.",
     "successIn": "Eingestempelt.",

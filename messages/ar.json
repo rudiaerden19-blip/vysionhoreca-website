@@ -3135,6 +3135,8 @@
     "summaryAmount": "المبلغ",
     "noOrdersToday": "لا مبيعات باسمك اليوم.",
     "summaryClose": "إغلاق",
+    "summaryPrint": "طباعة",
+    "summaryReceiptPrinted": "طُبع في: {date}",
     "close": "إغلاق",
     "productTapRequiresStaff": "اضغط الساعة ثم اختر «مبيعات» لأحد الموظفين. بعدها يمكنك إضافة المنتج.",
     "successIn": "تم تسجيل الدخول.",

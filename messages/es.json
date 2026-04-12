@@ -3135,6 +3135,8 @@
     "summaryAmount": "Importe",
     "noOrdersToday": "Sin ventas a tu nombre hoy.",
     "summaryClose": "Cerrar",
+    "summaryPrint": "Imprimir",
+    "summaryReceiptPrinted": "Impreso: {date}",
     "close": "Cerrar",
     "productTapRequiresStaff": "Pulsa el reloj y elige Venta para un empleado. Después podrás añadir el producto.",
     "successIn": "Entrada registrada.",

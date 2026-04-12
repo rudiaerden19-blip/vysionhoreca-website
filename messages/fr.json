@@ -2635,6 +2635,8 @@
     "summaryAmount": "Montant",
     "noOrdersToday": "Aucune vente à votre nom aujourd'hui.",
     "summaryClose": "Fermer",
+    "summaryPrint": "Imprimer",
+    "summaryReceiptPrinted": "Imprimé : {date}",
     "close": "Fermer",
     "productTapRequiresStaff": "Appuie sur l’horloge, puis choisis Vente pour un collaborateur. Ensuite tu pourras ajouter le produit.",
     "successIn": "Entrée enregistrée.",

@@ -4,6 +4,7 @@ import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
 import { AdminStaffClockPanel } from '@/components/AdminStaffClockPanel'
 import { getTenantSettings, saveTenantKassaStaffClockEnabled } from '@/lib/admin-api'
+import type { StaffSalesSummaryReceiptBusiness } from '@/lib/print-receipt-html'
 import { useEffect, useState } from 'react'
 
 export default function InklokkenPage({ params }: { params: { tenant: string } }) {
@@ -12,6 +13,7 @@ export default function InklokkenPage({ params }: { params: { tenant: string } }
   const [kassaClockEnabled, setKassaClockEnabled] = useState(false)
   const [kassaClockLoading, setKassaClockLoading] = useState(true)
   const [kassaClockSaving, setKassaClockSaving] = useState(false)
+  const [receiptBusiness, setReceiptBusiness] = useState<StaffSalesSummaryReceiptBusiness | undefined>()
 
   useEffect(() => {
     let cancelled = false
@@ -20,6 +22,17 @@ export default function InklokkenPage({ params }: { params: { tenant: string } }
       const s = await getTenantSettings(tenant)
       if (!cancelled) {
         setKassaClockEnabled(!!s?.kassa_staff_clock_enabled)
+        if (s) {
+          setReceiptBusiness({
+            name: s.business_name,
+            address: s.address,
+            postalCode: s.postal_code,
+            city: s.city,
+            phone: s.phone,
+          })
+        } else {
+          setReceiptBusiness(undefined)
+        }
         setKassaClockLoading(false)
       }
     })()
@@ -83,7 +96,7 @@ export default function InklokkenPage({ params }: { params: { tenant: string } }
         </div>
 
         {kassaClockEnabled ? (
-          <AdminStaffClockPanel tenantSlug={tenant} showSalesButton={false} />
+          <AdminStaffClockPanel tenantSlug={tenant} showSalesButton={false} receiptBusiness={receiptBusiness} />
         ) : (
           <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
             {t('inklokkenPage.disabledHint')}

@@ -3135,6 +3135,8 @@
     "summaryAmount": "Importo",
     "noOrdersToday": "Nessuna vendita a tuo nome oggi.",
     "summaryClose": "Chiudi",
+    "summaryPrint": "Stampa",
+    "summaryReceiptPrinted": "Stampato: {date}",
     "close": "Chiudi",
     "productTapRequiresStaff": "Tocca l’orologio e scegli Vendite per un collaboratore. Poi potrai aggiungere il prodotto.",
     "successIn": "Entrata registrata.",

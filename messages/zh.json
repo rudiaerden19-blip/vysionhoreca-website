@@ -3135,6 +3135,8 @@
     "summaryAmount": "金额",
     "noOrdersToday": "今日您名下无销售。",
     "summaryClose": "关闭",
+    "summaryPrint": "打印",
+    "summaryReceiptPrinted": "打印时间：{date}",
     "close": "关闭",
     "productTapRequiresStaff": "请先点击时钟，再为员工选择“销售”，之后即可添加商品。",
     "successIn": "已记录上班。",

@@ -3551,6 +3551,8 @@
     "summaryAmount": "Amount",
     "noOrdersToday": "No sales on your name today.",
     "summaryClose": "Close",
+    "summaryPrint": "Print",
+    "summaryReceiptPrinted": "Printed: {date}",
     "close": "Close",
     "productTapRequiresStaff": "Tap the clock, then choose Sales for a team member. You can add the product after that.",
     "successIn": "Clocked in.",

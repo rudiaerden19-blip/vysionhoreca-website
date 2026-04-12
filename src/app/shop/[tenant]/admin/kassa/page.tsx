@@ -29,6 +29,11 @@ import {
   filterHamburgerModulesForAccess,
 } from '@/lib/admin-hamburger-modules'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
+import {
+  buildStaffSalesSummaryReceiptHtml,
+  escapeReceiptHtml,
+  printReceiptHtmlDocument,
+} from '@/lib/print-receipt-html'
 import PostTrialModulePickerModal from '@/components/PostTrialModulePickerModal'
 import { AccountMenuSessionBlock } from '@/components/AccountMenuSessionBlock'
 import {
@@ -1241,9 +1246,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setShowSuccessModal(true)
   }
 
-  const escapeReceiptHtml = (s: string) =>
-    s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-
   const printReceipt = (order: typeof lastOrder) => {
     if (!order) return
     const vatRate = tenantInfo?.btw_percentage ?? 6
@@ -1305,105 +1307,42 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       </div>
     </body></html>`
 
-    /**
-     * Blob-URL in een iframe wordt in Chromium/Safari vaak als cross-origin gezien →
-     * SecurityError bij contentWindow.print(). srcdoc erft de origin van de parent.
-     */
-    let printStarted = false
-    const cleanupIframe = (el: HTMLIFrameElement) => {
-      try {
-        el.remove()
-      } catch {
-        /* ignore */
-      }
-    }
+    printReceiptHtmlDocument(html)
+  }
 
-    const tryPrintWindow = (w: Window | null | undefined): boolean => {
-      if (!w) return false
-      try {
-        w.focus()
-        w.print()
-        return true
-      } catch {
-        return false
-      }
-    }
-
-    const fallbackBlobOrBlankWindow = () => {
-      try {
-        const blob = new Blob([html], { type: 'text/html;charset=utf-8' })
-        const url = URL.createObjectURL(blob)
-        // Geen noopener: anders is window.open null in sommige browsers en kunnen we niet printen.
-        const w = window.open(url, '_blank', 'width=420,height=640')
-        if (w) {
-          const finish = () => {
-            try {
-              URL.revokeObjectURL(url)
-            } catch {
-              /* ignore */
-            }
-            try {
-              w.close()
-            } catch {
-              /* ignore */
-            }
-          }
-          w.addEventListener(
-            'load',
-            () => {
-              setTimeout(() => {
-                tryPrintWindow(w)
-                setTimeout(finish, 1200)
-              }, 150)
-            },
-            { once: true }
-          )
-          return
+  const printStaffClockSalesSummary = () => {
+    if (!staffClockSummary) return
+    playClick()
+    const s = staffClockSummary
+    const biz = tenantInfo
+      ? {
+          name: tenantInfo.business_name,
+          address: tenantInfo.address,
+          postalCode: tenantInfo.postal_code,
+          city: tenantInfo.city,
+          phone: tenantInfo.phone,
         }
-        URL.revokeObjectURL(url)
-      } catch {
-        /* try blank */
-      }
-      const w = window.open('', '_blank', 'width=420,height=640')
-      if (!w) return
-      try {
-        w.document.open()
-        w.document.write(html)
-        w.document.close()
-        setTimeout(() => tryPrintWindow(w), 200)
-      } catch {
-        /* ignore */
-      }
-    }
-
-    const iframe = document.createElement('iframe')
-    iframe.setAttribute('aria-hidden', 'true')
-    iframe.style.cssText =
-      'position:fixed;inset:0;width:0;height:0;border:0;opacity:0;pointer-events:none;z-index:-1'
-    iframe.srcdoc = html
-    document.body.appendChild(iframe)
-
-    const runSrcdocPrint = () => {
-      if (printStarted) return
-      if (tryPrintWindow(iframe.contentWindow)) {
-        printStarted = true
-        setTimeout(() => cleanupIframe(iframe), 1500)
-        return
-      }
-      printStarted = true
-      cleanupIframe(iframe)
-      fallbackBlobOrBlankWindow()
-    }
-
-    if (iframe.contentDocument?.readyState === 'complete') {
-      setTimeout(runSrcdocPrint, 50)
-    } else {
-      iframe.onload = () => setTimeout(runSrcdocPrint, 100)
-      setTimeout(() => {
-        if (!iframe.isConnected || printStarted) return
-        if (iframe.contentDocument?.readyState === 'complete') runSrcdocPrint()
-      }, 800)
-    }
+      : undefined
+    const printedLine = t('staffClock.summaryReceiptPrinted').replace(
+      '{date}',
+      new Date().toLocaleString(locale, { dateStyle: 'short', timeStyle: 'short' })
+    )
+    const html = buildStaffSalesSummaryReceiptHtml({
+      business: biz,
+      labels: {
+        docTitle: `${t('staffClock.summaryTitle')} — ${s.staffName}`,
+        heading: t('staffClock.summaryTitle'),
+        introLine: t('staffClock.summaryIntro').replace('{name}', s.staffName),
+        totalLabel: t('staffClock.summaryTotalLabel'),
+        orderCountLine: t('staffClock.summaryOrderCount').replace('{count}', String(s.orderCount)),
+        columnAmount: t('staffClock.summaryAmount'),
+        noOrdersLine: t('staffClock.noOrdersToday'),
+        printedLine,
+      },
+      total: s.total,
+      orders: s.orders,
+    })
+    printReceiptHtmlDocument(html)
   }
 
   const handleLogout = () => {
@@ -2426,16 +2365,25 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             {staffClockSummary.orders.length === 0 && (
               <p className="text-sm text-gray-500 text-center py-2">{t('staffClock.noOrdersToday')}</p>
             )}
-            <button
-              type="button"
-              onClick={() => {
-                playClick()
-                setStaffClockSummary(null)
-              }}
-              className="w-full py-3 rounded-xl bg-[#3C4D6B] text-white font-bold hover:bg-[#2D3A52]"
-            >
-              {t('staffClock.summaryClose')}
-            </button>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <button
+                type="button"
+                onClick={() => printStaffClockSalesSummary()}
+                className="flex-1 min-h-[44px] py-3 rounded-xl border-2 border-[#3C4D6B] bg-white text-[#3C4D6B] font-bold hover:bg-slate-50"
+              >
+                {t('staffClock.summaryPrint')}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  playClick()
+                  setStaffClockSummary(null)
+                }}
+                className="flex-1 min-h-[44px] py-3 rounded-xl bg-[#3C4D6B] text-white font-bold hover:bg-[#2D3A52]"
+              >
+                {t('staffClock.summaryClose')}
+              </button>
+            </div>
           </div>
         </div>
       )}

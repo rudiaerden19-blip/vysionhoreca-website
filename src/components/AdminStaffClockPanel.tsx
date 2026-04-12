@@ -3,6 +3,11 @@
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useLanguage } from '@/i18n'
+import {
+  buildStaffSalesSummaryReceiptHtml,
+  printReceiptHtmlDocument,
+  type StaffSalesSummaryReceiptBusiness,
+} from '@/lib/print-receipt-html'
 
 type StaffRow = { id: string; name: string; hasOpenSession: boolean }
 
@@ -21,6 +26,8 @@ type Props = {
   showSalesButton?: boolean
   kassaHref?: string | null
   onStartSales?: (staff: { id: string; name: string }) => void
+  /** Koptekst op afgedrukt dagoverzicht (zaak). */
+  receiptBusiness?: StaffSalesSummaryReceiptBusiness
 }
 
 export function AdminStaffClockPanel({
@@ -28,8 +35,9 @@ export function AdminStaffClockPanel({
   showSalesButton = false,
   kassaHref,
   onStartSales,
+  receiptBusiness,
 }: Props) {
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
   const [staffList, setStaffList] = useState<StaffRow[]>([])
   const [listLoading, setListLoading] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -113,6 +121,30 @@ export function AdminStaffClockPanel({
   }
 
   const kassaLink = useMemo(() => kassaHref || `/shop/${tenantSlug}/admin/kassa`, [kassaHref, tenantSlug])
+
+  const printSalesSummary = () => {
+    if (!summary) return
+    const printedLine = t('staffClock.summaryReceiptPrinted').replace(
+      '{date}',
+      new Date().toLocaleString(locale, { dateStyle: 'short', timeStyle: 'short' })
+    )
+    const html = buildStaffSalesSummaryReceiptHtml({
+      business: receiptBusiness,
+      labels: {
+        docTitle: `${t('staffClock.summaryTitle')} — ${summary.staffName}`,
+        heading: t('staffClock.summaryTitle'),
+        introLine: t('staffClock.summaryIntro').replace('{name}', summary.staffName),
+        totalLabel: t('staffClock.summaryTotalLabel'),
+        orderCountLine: t('staffClock.summaryOrderCount').replace('{count}', String(summary.orderCount)),
+        columnAmount: t('staffClock.summaryAmount'),
+        noOrdersLine: t('staffClock.noOrdersToday'),
+        printedLine,
+      },
+      total: summary.total,
+      orders: summary.orders,
+    })
+    printReceiptHtmlDocument(html)
+  }
 
   useEffect(() => {
     void loadList()
@@ -271,13 +303,22 @@ export function AdminStaffClockPanel({
             ) : (
               <p className="py-2 text-center text-sm text-gray-500">{t('staffClock.noOrdersToday')}</p>
             )}
-            <button
-              type="button"
-              onClick={() => setSummary(null)}
-              className="w-full rounded-xl bg-[#3C4D6B] py-3 font-bold text-white hover:bg-[#2D3A52]"
-            >
-              {t('staffClock.summaryClose')}
-            </button>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <button
+                type="button"
+                onClick={() => printSalesSummary()}
+                className="flex-1 min-h-[44px] rounded-xl border-2 border-[#3C4D6B] bg-white py-3 font-bold text-[#3C4D6B] hover:bg-slate-50"
+              >
+                {t('staffClock.summaryPrint')}
+              </button>
+              <button
+                type="button"
+                onClick={() => setSummary(null)}
+                className="flex-1 min-h-[44px] rounded-xl bg-[#3C4D6B] py-3 font-bold text-white hover:bg-[#2D3A52]"
+              >
+                {t('staffClock.summaryClose')}
+              </button>
+            </div>
           </div>
         </div>
       )}
