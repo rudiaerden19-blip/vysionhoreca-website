@@ -184,6 +184,7 @@ export default function SuperAdminDashboard() {
       trial_ends_at: trialEndsAt,
       enabled_modules: null as null,
       post_trial_modules_confirmed: false,
+      feature_group_orders: true,
     }
     let { error: tenantsError } = await supabase.from('tenants').insert(tenantInsert)
 

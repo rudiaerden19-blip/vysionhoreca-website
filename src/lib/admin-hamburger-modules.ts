@@ -542,7 +542,6 @@ export function isSubmenuEnabledInTenantConfig(
 export function filterHamburgerModulesForAccess(
   modules: AdminHamburgerModule[],
   effectiveAccess: Record<TenantModuleId, boolean>,
-  effectiveGroupOrders: boolean,
   effectiveLabelPrinting: boolean,
   enabledModulesJson: Record<string, boolean> | null
 ): AdminHamburgerModule[] {
@@ -559,7 +558,6 @@ export function filterHamburgerModulesForAccess(
     .map((m) => ({
       ...m,
       items: m.items.filter((item) => {
-        if (item.href.includes('/groepen') && !effectiveGroupOrders) return false
         if (item.href.includes('/labels') && !effectiveLabelPrinting) return false
         let parentOn = effectiveAccess[m.key]
         if (m.key === 'website') {

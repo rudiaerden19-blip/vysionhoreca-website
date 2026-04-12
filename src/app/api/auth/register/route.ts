@@ -140,6 +140,7 @@ export async function POST(request: NextRequest) {
       trial_ends_at: trialEndsAt.toISOString(),
       enabled_modules: null as null,
       post_trial_modules_confirmed: false,
+      feature_group_orders: true,
     }
 
     let { data: tenant, error: tenantError } = await supabase

@@ -19,14 +19,12 @@ import { isSuperAdminLoggedIn } from '@/lib/auth-headers'
 export function AdminHamburgerMenu({
   tenantSlug,
   moduleAccess,
-  featureGroupOrders,
   featureLabelPrinting,
   enabledModulesJson,
   loading,
 }: {
   tenantSlug: string
   moduleAccess: Record<TenantModuleId, boolean>
-  featureGroupOrders: boolean
   featureLabelPrinting: boolean
   enabledModulesJson: Record<string, boolean> | null
   loading: boolean
@@ -39,11 +37,10 @@ export function AdminHamburgerMenu({
     const superOk = typeof window !== 'undefined' && isSuperAdminLoggedIn()
     const access =
       loading || superOk ? allTenantModulesTrue() : moduleAccess
-    const g = loading || superOk ? true : featureGroupOrders
     const l = loading || superOk ? true : featureLabelPrinting
     const json = loading || superOk ? null : enabledModulesJson
-    return filterHamburgerModulesForAccess(all, access, g, l, json)
-  }, [baseUrl, tenantSlug, loading, moduleAccess, featureGroupOrders, featureLabelPrinting, enabledModulesJson])
+    return filterHamburgerModulesForAccess(all, access, l, json)
+  }, [baseUrl, tenantSlug, loading, moduleAccess, featureLabelPrinting, enabledModulesJson])
 
   const [open, setOpen] = useState(false)
   const [subOpen, setSubOpen] = useState<string | null>(null)

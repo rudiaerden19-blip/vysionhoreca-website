@@ -72,7 +72,6 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   const {
     moduleAccess,
     enabledModulesJson,
-    featureGroupOrders,
     featureLabelPrinting,
     loading: modulesLoading,
     needsPostTrialModulePicker,
@@ -419,7 +418,6 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
           <AdminHamburgerMenu
             tenantSlug={params.tenant}
             moduleAccess={moduleAccess}
-            featureGroupOrders={featureGroupOrders}
             featureLabelPrinting={featureLabelPrinting}
             enabledModulesJson={enabledModulesJson}
             loading={modulesLoading}

@@ -215,5 +215,5 @@ CREATE TRIGGER order_groups_updated_at
 -- ============================================
 -- ADD GROUP ORDERS FEATURE FLAG TO TENANTS
 -- ============================================
-ALTER TABLE tenants ADD COLUMN IF NOT EXISTS feature_group_orders BOOLEAN DEFAULT false;
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS feature_group_orders BOOLEAN DEFAULT true;
 ALTER TABLE tenants ADD COLUMN IF NOT EXISTS group_orders_price DECIMAL(10,2) DEFAULT 10.00; -- €10/maand extra

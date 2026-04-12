@@ -171,7 +171,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const {
     moduleAccess,
     enabledModulesJson,
-    featureGroupOrders,
     featureLabelPrinting,
     loading: moduleFlagsLoading,
     needsPostTrialModulePicker,
@@ -179,7 +178,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   } = useTenantModuleFlags(tenant)
   const effectiveAccess =
     demoViewOnly || moduleFlagsLoading ? allTenantModulesTrue() : moduleAccess
-  const effectiveGroupOrders = demoViewOnly || moduleFlagsLoading ? true : featureGroupOrders
   const effectiveLabelPrinting = demoViewOnly || moduleFlagsLoading ? true : featureLabelPrinting
   const effectiveJson =
     demoViewOnly || moduleFlagsLoading ? null : enabledModulesJson
@@ -189,11 +187,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return filterHamburgerModulesForAccess(
       all,
       effectiveAccess,
-      effectiveGroupOrders,
       effectiveLabelPrinting,
       effectiveJson
     )
-  }, [baseUrl, tenant, effectiveAccess, effectiveGroupOrders, effectiveLabelPrinting, effectiveJson])
+  }, [baseUrl, tenant, effectiveAccess, effectiveLabelPrinting, effectiveJson])
 
   const [navOpen, setNavOpen] = useState(false)
   const [kassaOpen, setKassaOpen] = useState(false)
