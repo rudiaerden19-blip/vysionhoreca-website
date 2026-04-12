@@ -17,28 +17,30 @@ export default function WelkomPage({ params }: { params: { tenant: string } }) {
     if (!isSuperAdminLoggedIn()) return
     try {
       sessionStorage.setItem(`vysion_welcomed_${params.tenant}`, 'true')
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     router.replace(`/shop/${params.tenant}/admin`)
   }, [params.tenant, router])
 
   useEffect(() => {
-    // Start fade-in title na korte delay
     const t1 = setTimeout(() => setShowTitle(true), 300)
-    // Knop fade-in 3 seconden na titel
     const t2 = setTimeout(() => setShowButton(true), 3300)
-    return () => { clearTimeout(t1); clearTimeout(t2) }
+    return () => {
+      clearTimeout(t1)
+      clearTimeout(t2)
+    }
   }, [])
 
   const handleEnter = () => {
     try {
-      // Markeer welkom als gezien in deze sessie
       sessionStorage.setItem(`vysion_welcomed_${params.tenant}`, 'true')
-      // Wis audio-activatie zodat geluidsscherm opnieuw verschijnt in kassa
       sessionStorage.removeItem(`vysion_kassa_audio_ok_${params.tenant}`)
       sessionStorage.removeItem(`vysion_audio_activated_${params.tenant}`)
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     const target = getTenantUrl(params.tenant, '/admin/kassa')
-    // Hoofddomein / preview: blijf op zelfde host (/shop/…); geen harde jump naar *.ordervysion.com (breekt superadmin-sessie op www).
     if (target.startsWith('/')) {
       router.push(target)
     } else {
@@ -47,140 +49,45 @@ export default function WelkomPage({ params }: { params: { tenant: string } }) {
   }
 
   return (
-    <div
-      className="fixed inset-0 flex flex-col items-center justify-center select-none"
-      style={{
-        background: 'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)',
-      }}
-    >
-      {/* Achtergrond sterren effect */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {Array.from({ length: 60 }).map((_, i) => (
-          <div
-            key={i}
-            className="absolute rounded-full bg-white"
-            style={{
-              width: Math.random() * 3 + 1,
-              height: Math.random() * 3 + 1,
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              opacity: Math.random() * 0.6 + 0.2,
-              animation: `twinkle ${Math.random() * 3 + 2}s ease-in-out infinite alternate`,
-              animationDelay: `${Math.random() * 3}s`,
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Gloed achter logo */}
+    <div className="fixed inset-0 flex select-none flex-col items-center justify-center bg-[#e3e3e3] px-6">
       <div
-        className="absolute rounded-full pointer-events-none"
-        style={{
-          width: 400,
-          height: 400,
-          background: 'radial-gradient(circle, rgba(249,115,22,0.15) 0%, transparent 70%)',
-          transition: 'opacity 2s ease',
-          opacity: showTitle ? 1 : 0,
-        }}
-      />
-
-      {/* Vysion logo / naam */}
-      <div
-        style={{
-          transition: 'opacity 2s ease, transform 2s ease',
-          opacity: showTitle ? 1 : 0,
-          transform: showTitle ? 'translateY(0px)' : 'translateY(20px)',
-          textAlign: 'center',
-          marginBottom: 16,
-        }}
+        className={`mb-3 text-center transition-all duration-1000 ease-out ${
+          showTitle ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+        }`}
       >
-        <div
-          style={{
-            fontSize: 'clamp(52px, 10vw, 96px)',
-            fontWeight: 900,
-            letterSpacing: '-2px',
-            background: 'linear-gradient(135deg, #ffffff 0%, #f97316 60%, #ffffff 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            lineHeight: 1.1,
-          }}
+        <h1
+          className="text-[clamp(2.75rem,10vw,5.5rem)] font-black leading-none tracking-tight text-gray-900"
+          style={{ letterSpacing: '-0.02em' }}
         >
           Vysion
-        </div>
-        <div
-          style={{
-            fontSize: 'clamp(18px, 3vw, 28px)',
-            fontWeight: 300,
-            color: 'rgba(255,255,255,0.5)',
-            letterSpacing: '8px',
-            textTransform: 'uppercase',
-            marginTop: 4,
-          }}
-        >
+        </h1>
+        <p className="mt-3 text-[clamp(1rem,3vw,1.5rem)] font-light uppercase tracking-[0.35em] text-gray-500">
           2026
-        </div>
+        </p>
       </div>
 
-      {/* Subtitel */}
-      <div
-        style={{
-          transition: 'opacity 2s ease',
-          transitionDelay: '0.5s',
-          opacity: showTitle ? 1 : 0,
-          color: 'rgba(255,255,255,0.35)',
-          fontSize: 16,
-          letterSpacing: '2px',
-          textTransform: 'uppercase',
-          marginBottom: 64,
-        }}
+      <p
+        className={`mb-14 text-center text-sm font-semibold uppercase tracking-[0.2em] text-gray-600 transition-opacity duration-1000 ease-out ${
+          showTitle ? 'opacity-100' : 'opacity-0'
+        }`}
+        style={{ transitionDelay: showTitle ? '200ms' : '0ms' }}
       >
         Horeca Platform
-      </div>
+      </p>
 
-      {/* Enter knop — fade in na 3 seconden */}
       <div
-        style={{
-          transition: 'opacity 3s ease',
-          opacity: showButton ? 1 : 0,
-          pointerEvents: showButton ? 'auto' : 'none',
-        }}
+        className={`transition-opacity duration-1000 ease-out ${
+          showButton ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
+        }`}
       >
         <button
+          type="button"
           onClick={handleEnter}
-          style={{
-            padding: '18px 64px',
-            fontSize: 20,
-            fontWeight: 700,
-            letterSpacing: '4px',
-            textTransform: 'uppercase',
-            color: 'white',
-            background: 'linear-gradient(135deg, #f97316, #ea580c)',
-            border: 'none',
-            borderRadius: 16,
-            cursor: 'pointer',
-            boxShadow: '0 8px 40px rgba(249,115,22,0.4)',
-            transition: 'transform 0.2s, box-shadow 0.2s',
-          }}
-          onMouseEnter={e => {
-            ;(e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.05)'
-            ;(e.currentTarget as HTMLButtonElement).style.boxShadow = '0 12px 50px rgba(249,115,22,0.6)'
-          }}
-          onMouseLeave={e => {
-            ;(e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'
-            ;(e.currentTarget as HTMLButtonElement).style.boxShadow = '0 8px 40px rgba(249,115,22,0.4)'
-          }}
+          className="rounded-xl bg-accent px-12 py-4 text-base font-bold uppercase tracking-[0.2em] text-white shadow-md transition hover:bg-accent/90 hover:shadow-lg active:scale-[0.98]"
         >
           Enter
         </button>
       </div>
-
-      <style>{`
-        @keyframes twinkle {
-          0% { opacity: 0.2; transform: scale(1); }
-          100% { opacity: 0.8; transform: scale(1.4); }
-        }
-      `}</style>
     </div>
   )
 }
