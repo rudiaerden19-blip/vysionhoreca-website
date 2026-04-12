@@ -244,6 +244,10 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
           </Reorder.Group>
         )}
       </motion.div>
+
+      <p className="mt-6 text-center text-sm text-gray-500">
+        {t('adminPages.categorieen.saveReminder')}
+      </p>
     </div>
     </PinGate>
   )

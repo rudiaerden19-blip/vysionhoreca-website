@@ -1853,7 +1853,8 @@
       "addFailed": "Hinzufügen fehlgeschlagen",
       "saveFailed": "Einige Kategorien konnten nicht gespeichert werden",
       "visible": "Sichtbar",
-      "hidden": "Ausgeblendet"
+      "hidden": "Ausgeblendet",
+      "saveReminder": "(Klicken Sie immer auf die Schaltfläche Speichern)"
     },
     "producten": {
       "title": "Produkte",

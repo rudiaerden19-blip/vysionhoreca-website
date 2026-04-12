@@ -2353,7 +2353,8 @@
       "addFailed": "Error al añadir",
       "saveFailed": "No se pudieron guardar algunas categorías",
       "visible": "Visible",
-      "hidden": "Oculto"
+      "hidden": "Oculto",
+      "saveReminder": "(Pulse siempre el botón Guardar)"
     },
     "producten": {
       "title": "Productos",

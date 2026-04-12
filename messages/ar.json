@@ -2353,7 +2353,8 @@
       "addFailed": "فشلت الإضافة",
       "saveFailed": "تعذر حفظ بعض الفئات",
       "visible": "ظاهر",
-      "hidden": "مخفي"
+      "hidden": "مخفي",
+      "saveReminder": "(اضغط دائمًا على زر الحفظ)"
     },
     "producten": {
       "title": "المنتجات",

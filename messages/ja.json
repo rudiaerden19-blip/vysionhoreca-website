@@ -2353,7 +2353,8 @@
       "addFailed": "追加に失敗しました",
       "saveFailed": "一部のカテゴリを保存できませんでした",
       "visible": "表示",
-      "hidden": "非表示"
+      "hidden": "非表示",
+      "saveReminder": "（必ず「保存」ボタンを押してください）"
     },
     "producten": {
       "title": "商品",

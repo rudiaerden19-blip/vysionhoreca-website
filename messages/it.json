@@ -2353,7 +2353,8 @@
       "addFailed": "Aggiunta non riuscita",
       "saveFailed": "Impossibile salvare alcune categorie",
       "visible": "Visibile",
-      "hidden": "Nascosto"
+      "hidden": "Nascosto",
+      "saveReminder": "(Premi sempre il pulsante Salva)"
     },
     "producten": {
       "title": "Prodotti",

@@ -2353,7 +2353,8 @@
       "addFailed": "添加失败",
       "saveFailed": "部分分类无法保存",
       "visible": "可见",
-      "hidden": "隐藏"
+      "hidden": "隐藏",
+      "saveReminder": "（请务必点击「保存」按钮）"
     },
     "producten": {
       "title": "产品",

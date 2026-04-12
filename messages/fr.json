@@ -1853,7 +1853,8 @@
       "addFailed": "Échec de l'ajout",
       "saveFailed": "Certaines catégories n'ont pas pu être enregistrées",
       "visible": "Visible",
-      "hidden": "Masqué"
+      "hidden": "Masqué",
+      "saveReminder": "(Cliquez toujours sur le bouton Enregistrer)"
     },
     "producten": {
       "title": "Produits",

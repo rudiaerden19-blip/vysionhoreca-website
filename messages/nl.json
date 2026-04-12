@@ -2614,7 +2614,8 @@
       "addFailed": "Toevoegen mislukt",
       "saveFailed": "Sommige categorieën konden niet worden opgeslagen",
       "visible": "Zichtbaar",
-      "hidden": "Verborgen"
+      "hidden": "Verborgen",
+      "saveReminder": "(druk altijd op de knop opslaan)"
     },
     "producten": {
       "title": "Producten",

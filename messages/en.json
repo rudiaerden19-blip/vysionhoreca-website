@@ -2614,7 +2614,8 @@
       "addFailed": "Add failed",
       "saveFailed": "Some categories could not be saved",
       "visible": "Visible",
-      "hidden": "Hidden"
+      "hidden": "Hidden",
+      "saveReminder": "(Always click the Save button)"
     },
     "producten": {
       "title": "Products",
