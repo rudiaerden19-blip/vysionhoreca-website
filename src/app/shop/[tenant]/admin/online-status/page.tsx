@@ -249,7 +249,7 @@ ALTER TABLE shop_offline_status
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 z-[130] flex items-center justify-center bg-black/60 p-4"
             onClick={() => setShowPopup(false)}
           >
             <motion.div

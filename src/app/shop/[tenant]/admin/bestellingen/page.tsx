@@ -698,7 +698,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   // Kitchen Mode - Fullscreen tablet view
   if (kitchenMode) {
     return (
-      <div className="fixed inset-0 bg-gray-900 z-50 overflow-auto">
+      <div className="fixed inset-0 z-[130] overflow-auto bg-gray-900">
         {/* Header */}
         <div className="bg-gray-800 p-4 flex items-center justify-between sticky top-0 z-10">
           <div className="flex items-center gap-4">
@@ -1303,7 +1303,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 z-[130] flex items-center justify-center bg-black/50 p-4"
             onClick={() => setSelectedOrder(null)}
           >
             <motion.div
@@ -1479,7 +1479,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 z-[130] flex items-center justify-center bg-black/50 p-4"
             onClick={() => {
               setRejectingOrder(null)
               setRejectOrderError(null)

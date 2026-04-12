@@ -42,7 +42,7 @@ export function useAdminConfirm(t: (key: string) => string) {
   function ConfirmModal() {
     if (!pending) return null
     return (
-      <div className="fixed inset-0 z-[120] flex touch-manipulation items-center justify-center bg-black/50 p-4 [-webkit-tap-highlight-color:transparent]">
+      <div className="fixed inset-0 z-[135] flex touch-manipulation items-center justify-center bg-black/50 p-4 [-webkit-tap-highlight-color:transparent]">
         <div className="w-full max-w-md rounded-xl bg-white shadow-xl">
           <div className="border-b p-6">
             <h2 className="text-xl font-bold text-gray-800">{t('adminPages.common.confirm')}</h2>

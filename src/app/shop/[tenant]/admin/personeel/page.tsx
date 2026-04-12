@@ -386,7 +386,7 @@ export default function PersoneelPage() {
 
       {/* Add/Edit Staff Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[130] flex items-center justify-center bg-black/50 p-4">
           <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl">
             <div className="p-6 border-b">
               <h2 className="text-xl font-bold text-gray-900">
@@ -507,7 +507,7 @@ export default function PersoneelPage() {
 
       {/* Contract Modal */}
       {showContractModal && editingStaff && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[130] flex items-center justify-center bg-black/50 p-4">
           <div className="bg-white rounded-xl w-full max-w-md shadow-xl">
             <div className="p-6 border-b">
               <h2 className="text-xl font-bold text-gray-800">

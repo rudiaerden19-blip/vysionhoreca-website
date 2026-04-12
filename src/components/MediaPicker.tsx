@@ -453,7 +453,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 z-[130] flex items-center justify-center bg-black/50 p-4"
             onClick={() => setIsOpen(false)}
           >
             <motion.div

@@ -744,7 +744,7 @@ Met vriendelijke groeten`,
       </div>
 
       {bulkConfirm && (
-        <div className="fixed inset-0 z-[60] flex touch-manipulation items-center justify-center bg-black/50 p-4 [-webkit-tap-highlight-color:transparent]">
+        <div className="fixed inset-0 z-[130] flex touch-manipulation items-center justify-center bg-black/50 p-4 [-webkit-tap-highlight-color:transparent]">
           <div className="w-full max-w-md rounded-xl bg-white shadow-xl">
             <div className="border-b p-6">
               <h2 className="text-xl font-bold text-gray-800">{t('adminPages.common.confirm')}</h2>
@@ -1126,7 +1126,7 @@ Met vriendelijke groeten`,
 
       {/* Entry Modal */}
       {showEntryModal && (
-        <div className="fixed inset-0 z-[60] flex touch-manipulation items-center justify-center bg-black/50 p-4 [-webkit-tap-highlight-color:transparent]">
+        <div className="fixed inset-0 z-[130] flex touch-manipulation items-center justify-center bg-black/50 p-4 [-webkit-tap-highlight-color:transparent]">
           <div className="bg-white rounded-xl w-full max-w-md shadow-xl">
             <div className="p-6 border-b">
               <h2 className="text-xl font-bold text-gray-800">
@@ -1586,7 +1586,7 @@ Met vriendelijke groeten`,
 
       {/* Reopen Month Modal */}
       {showReopenModal && (
-        <div className="fixed inset-0 z-[60] flex touch-manipulation items-center justify-center bg-black/50 p-4 [-webkit-tap-highlight-color:transparent]">
+        <div className="fixed inset-0 z-[130] flex touch-manipulation items-center justify-center bg-black/50 p-4 [-webkit-tap-highlight-color:transparent]">
           <div className="bg-white rounded-xl w-full max-w-md shadow-xl">
             <div className="p-6 border-b">
               <h2 className="text-xl font-bold text-gray-800">
@@ -1658,7 +1658,7 @@ Met vriendelijke groeten`,
 
       {/* Email Modal */}
       {showEmailModal && (
-        <div className="fixed inset-0 z-[60] flex touch-manipulation items-center justify-center bg-black/50 p-4 [-webkit-tap-highlight-color:transparent]">
+        <div className="fixed inset-0 z-[130] flex touch-manipulation items-center justify-center bg-black/50 p-4 [-webkit-tap-highlight-color:transparent]">
           <div className="bg-white rounded-xl w-full max-w-lg shadow-xl">
             <div className="p-6 border-b">
               <h2 className="text-xl font-bold text-gray-800">

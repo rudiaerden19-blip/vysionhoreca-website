@@ -409,7 +409,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
       />
       {!demoPublicUnauthenticated && <TrialBanner tenantSlug={params.tenant} />}
 
-      {/* ── Slanke blauwe topbalk (zelfde stijl als kassa) ── */}
+      {/* ── Slanke blauwe topbalk (zelfde stijl als kassa). Z-index 100 — modals/dialoog: min. z-[130] zodat ze boven deze balk blijven (iPad). ── */}
       <div
         className="fixed top-0 left-0 right-0 z-[100] flex items-center gap-2 bg-[#1e293b] px-2 sm:px-3"
         style={{ height: 56 }}
