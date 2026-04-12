@@ -3,17 +3,20 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Gratis account aanmaken',
   description:
-    'Start 14 dagen gratis met Vysion Horeca: kassa, reserveringsplatform, online bestelplatform, keukenscherm en analysetools voor je zaak. Registreer in enkele minuten.',
+    'Gratis kassa en software 14 dagen uitproberen: touchscreen POS, online bestelplatform, kassahardware-opties, reserveringen, keukenscherm en analyse. Registreer in enkele minuten.',
   keywords: [
     'vysion horeca registratie',
-    'horeca software gratis proberen',
+    'gratis kassa',
     'gratis kassa software',
+    'horeca software gratis proberen',
+    'online bestelplatform gratis',
+    'kassa trial',
     'restaurant software trial',
   ],
   openGraph: {
     title: 'Gratis starten | Vysion Horeca',
     description:
-      'Probeer kassa, reserveringen en online bestellen 14 dagen gratis.',
+      'Gratis kassa, bestelplatform en modules 14 dagen — start vandaag.',
     url: '/registreer',
     images: [{ url: '/images/online-order-platform-1.png' }],
   },

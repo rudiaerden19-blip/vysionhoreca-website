@@ -3,9 +3,10 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Support & contact',
   description:
-    'Hulp bij Vysion Horeca: ondersteuning voor kassa, reserveringsplatform, online bestellen en andere modules. Contact en veelgestelde vragen.',
+    'Support voor Vysion Horeca: horeca kassa, online bestelplatform, kassahardware, reserveringen en andere modules. Contact en veelgestelde vragen.',
   openGraph: {
     title: 'Support | Vysion Horeca',
+    description: 'Hulp bij kassa, bestelplatform, hardware en account.',
     url: '/support',
   },
   alternates: {

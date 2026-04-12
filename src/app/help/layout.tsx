@@ -3,9 +3,10 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Helpcentrum',
   description:
-    'Help en uitleg over Vysion Horeca: kassa, bestellingen, reserveringen en instellingen.',
+    'Help bij Vysion Horeca: horeca kassa (POS), online bestelplatform, hardware, bestellingen, reserveringen en instellingen.',
   openGraph: {
     title: 'Help | Vysion Horeca',
+    description: 'Handleidingen voor kassa, bestelplatform en overige modules.',
     url: '/help',
   },
   alternates: {

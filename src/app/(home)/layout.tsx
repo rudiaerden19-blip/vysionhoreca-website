@@ -2,17 +2,30 @@ import type { Metadata } from 'next'
 
 const siteUrl = 'https://www.vysionhoreca.com'
 
-/** SEO voor homepage (/): bakkerij-focus + Google snippet. */
+/** SEO homepage (/): kernzoektermen kassa, bestelplatform, hardware, gratis proberen. */
 const HOME_TITLE =
-  'Snelste Kassasysteem voor Bakkers | i5 Kracht & 9 Talen | Vysion'
+  'Horeca kassa, online bestelplatform & hardware | Gratis proberen | Vysion'
 const HOME_DESCRIPTION =
-  'Ontdek de Vysion kassa voor de bakkerij. Razendsnel door i5 processor, 9 talen ondersteuning en na 24 maanden volledig jouw eigendom. Bekijk de video uitleg!'
+  'Vysion: touchscreen horeca kassa (POS), online bestelplatform en webshop, premium kassahardware (Intel i5). 14 dagen gratis kassa software — reserveringen, keukenscherm, WhatsApp, 9 talen. België & Nederland.'
 
 export const metadata: Metadata = {
   title: {
     absolute: HOME_TITLE,
   },
   description: HOME_DESCRIPTION,
+  keywords: [
+    'horeca kassa',
+    'gratis kassa',
+    'online bestelplatform',
+    'bestelplatform horeca',
+    'kassahardware',
+    'touchscreen kassa',
+    'POS software horeca',
+    'kassa software gratis proberen',
+    'WhatsApp bestellen restaurant',
+    'keukenscherm',
+    'horeca software België',
+  ],
   alternates: {
     canonical: '/',
   },

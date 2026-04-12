@@ -3,11 +3,11 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Over Vysion Horeca',
   description:
-    'Leer Vysion Horeca kennen: het alles-in-één platform voor horeca-ondernemers met kassa, reserveringsplatform, online bestellen en praktische tools om slimmer te werken.',
+    'Vysion Horeca: alles-in-één voor ondernemers — touchscreen kassa (POS), online bestelplatform, kassahardware, reserveringen, keukenscherm en analyses. België & Nederland.',
   openGraph: {
     title: 'Over ons | Vysion Horeca',
     description:
-      'Software gebouwd voor horeca: van kassa en reserveringen tot analyse.',
+      'Van horeca kassa en bestelplatform tot hardware en analyse — één team.',
     url: '/over-ons',
     images: [{ url: '/images/reservation-platform-1.png' }],
   },

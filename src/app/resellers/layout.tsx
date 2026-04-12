@@ -3,9 +3,10 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Resellers & partners',
   description:
-    'Partnerprogramma en resellers voor Vysion Horeca horecasoftware.',
+    'Partnerprogramma voor Vysion Horeca: kassa, online bestelplatform, hardware en horecasoftware voor resellers.',
   openGraph: {
     title: 'Resellers | Vysion Horeca',
+    description: 'Partnerschap rond kassa, bestelplatform en hardware.',
     url: '/resellers',
   },
   alternates: {

@@ -36,7 +36,7 @@ const organizationJsonLd = {
       url: siteUrl,
       logo: `${siteUrl}/favicon.svg`,
       description:
-        'Alles-in-één horecasoftware: kassa (POS), reserveringsplatform, online bestelplatform, keukenscherm, kostencalculator, urenregistratie en bedrijfsanalyse voor België en Nederland.',
+        'Horeca kassa (POS), online bestelplatform en kassahardware: alles-in-één met reserveringsplatform, keukenscherm, WhatsApp-bestellen, kosten en analyse. Gratis uitproberen — België en Nederland.',
       address: {
         '@type': 'PostalAddress',
         streetAddress: 'Siberiëstraat 24',
@@ -74,22 +74,26 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
     default:
-      'Vysion Horeca | Horeca kassa, reserveringsplatform & online bestelplatform',
+      'Vysion Horeca | Horeca kassa, online bestelplatform, hardware POS & gratis proberen',
     template: '%s | Vysion Horeca',
   },
   description:
-    'Alles-in-één voor horeca en frituur: touchscreen kassa (POS), reserveringsplatform met plattegrond, online bestelplatform, keukenscherm, WhatsApp-bestellen, kostencalculator, urenregistratie, loonadministratie en bedrijfsanalyse. Bancontact, iDEAL, 14 dagen gratis proefperiode. België & Nederland.',
+    'Touchscreen horeca kassa (POS), online bestelplatform en webshop, premium kassahardware en software in één pakket. Gratis kassa 14 dagen uitproberen. Reserveringsplatform, keukenscherm, WhatsApp-bestellen, kosten en analyse. Bancontact, iDEAL. België & Nederland.',
   keywords: [
     'horeca kassa',
+    'gratis kassa',
+    'gratis kassa software',
     'kassasysteem horeca',
-    'POS horeca',
+    'kassahardware',
     'touchscreen kassa',
+    'POS horeca',
+    'online bestelplatform',
+    'horeca bestelplatform',
+    'online bestellen horeca',
+    'bestelsysteem restaurant',
     'reserveringsplatform',
     'online reserveren restaurant',
     'tafels reserveren',
-    'online bestelplatform',
-    'online bestellen horeca',
-    'bestelsysteem restaurant',
     'keukenscherm',
     'kitchen display',
     'WhatsApp bestellen',
@@ -119,9 +123,9 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title:
-      'Vysion Horeca | Kassa, reserveringsplatform, online bestellen & meer',
+      'Vysion Horeca | Horeca kassa, bestelplatform, hardware & gratis proberen',
     description:
-      'Complete horecasoftware: kassa, reserveringen, online bestellen, keukenscherm, kosten, uren en analyse. Probeer gratis.',
+      'Kassa (POS), online bestelplatform en kassahardware — reserveringen, keukenscherm en analyse. Start 14 dagen gratis.',
     type: 'website',
     locale: 'nl_BE',
     url: siteUrl,
@@ -131,9 +135,9 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title:
-      'Vysion Horeca | Kassa, reserveringsplatform & online bestelplatform',
+      'Vysion Horeca | Horeca kassa, bestelplatform, hardware & gratis proberen',
     description:
-      'Horeca kassa, reserveringen, online bestellen, keukenscherm en analyses — één platform.',
+      'Touchscreen kassa, online bestelplatform en hardware POS — 14 dagen gratis. België & Nederland.',
     images: ['/images/online-order-platform-1.png'],
   },
   robots: {
