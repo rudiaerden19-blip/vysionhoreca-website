@@ -42,7 +42,6 @@ export default function Navigation() {
               className="inline-flex min-h-11 items-center rounded-lg px-2 text-2xl font-bold touch-manipulation [-webkit-tap-highlight-color:transparent]"
             >
               <span className="text-accent">Vysion</span>
-              <span className="text-gray-400 font-normal ml-1">horeca</span>
             </a>
           </div>
 

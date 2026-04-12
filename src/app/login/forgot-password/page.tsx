@@ -61,7 +61,6 @@ export default function ForgotPasswordPage() {
             <Link href="/">
               <span className="text-3xl font-bold">
                 <span className="text-accent">Vysion</span>
-                <span className="text-gray-400 font-normal ml-1">horeca</span>
               </span>
             </Link>
             <p className="text-gray-400 mt-3">Wachtwoord vergeten</p>

@@ -144,7 +144,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <Link href="/" className="flex items-center gap-2">
               <span className="text-xl font-bold">
                 <span className="text-accent">Vysion</span>
-                <span className="text-gray-400 font-normal ml-1">horeca</span>
               </span>
             </Link>
             <p className="text-gray-500 text-sm mt-1">{t('dashboard.title')}</p>

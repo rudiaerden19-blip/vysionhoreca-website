@@ -332,7 +332,7 @@ async function sendVerificationEmail(email: string, name: string, token: string)
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="text-align: center; margin-bottom: 30px;">
-          <h1 style="color: #F97316; margin: 0;">Vysion<span style="color: #666; font-weight: normal;">horeca</span></h1>
+          <h1 style="color: #F97316; margin: 0;">Vysion</h1>
         </div>
         
         <h2 style="color: #333;">Welkom ${name}!</h2>

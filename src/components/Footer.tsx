@@ -16,7 +16,6 @@ export default function Footer() {
               <div className="mb-4">
                 <span className="text-2xl font-bold">
                   <span className="text-accent">Vysion</span>
-                  <span className="text-gray-400 font-normal ml-1">horeca</span>
                 </span>
               </div>
               <p className="text-gray-400 max-w-lg leading-relaxed">

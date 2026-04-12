@@ -327,7 +327,6 @@ export default function RegisterPage() {
             <Link href="/">
               <span className="text-3xl font-bold">
                 <span className="text-accent">Vysion</span>
-                <span className="ml-1 font-normal text-gray-600">horeca</span>
               </span>
             </Link>
             <p className="mt-3 text-gray-800">
