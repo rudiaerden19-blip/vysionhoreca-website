@@ -5436,45 +5436,69 @@
   },
   "sectorPages": {
     "breadcrumb": "Secteurs",
-    "bakkerij": {
-      "h1": "Caisse la plus rapide pour boulangers | Puissance i5 & 9 langues | Vysion",
-      "intro": "Mise en caisse pensée boulangerie : Intel i5 (« La Bête ») pour les pics du matin, 9 langues, propriété du matériel après 24 mois — le système de caisse Belgique et Pays-Bas.",
-      "body1": "Vous voulez la caisse la plus rapide aux brunchs chargés ? POS tactile, imprimante, logiciel fluide. Acheter une caisse ou louer : un forfait clair.",
-      "body2": "Pour les boulangers qui veulent marge et rythme. Propriété après 24 mois plutôt que louer sans fin — système de caisse Belgique solide.",
-      "imageAlt": "Disposition caisse Vysion pour boulangerie",
-      "cta": "Commencer gratuitement"
+    "hardwareBeest": {
+      "title": "Vysion i5 double écran : « La Bête »",
+      "specProcessor": "🚀 Processeur : Intel i5 Core (vitesse inégalée)",
+      "specMemory": "🧠 Mémoire : 8 Go RAM + 128 Go SSD",
+      "specScreens": "🖥️ Écrans : 15\" principal + 11,5\" client",
+      "specLanguages": "🌍 Langues : 9 langues (dont arabe, chinois, japonais)",
+      "specIncluded": "🖨️ Inclus : imprimante intégrée + 5 rouleaux de papier offerts",
+      "blackVariantTitle": "Également en noir",
+      "demoCta": "Demandez votre démo gratuite — Retrait immédiat dans notre magasin en Belgique"
     },
-    "horecaSnack": {
-      "h1": "Caisse horeca pour café, friterie & kebab | Vysion tout-en-un",
-      "intro": "Encaissement et commandes rapides : matériel i5, 9 langues pour équipes multilingues, maîtrise des marges — la caisse horeca pour café, friterie, kebab et sandwicherie.",
-      "body1": "Rush du soir ou midi : la caisse la plus rapide au comptoir. Acheter une caisse avec logiciel, matériel et commande en ligne — système de caisse Belgique idéal.",
-      "body2": "Du snack au kebab : commandes, stock, paiements sous contrôle. Essayez gratuitement et sentez la puissance i5.",
-      "imageAlt": "Disposition caisse Vysion pour café, friterie et kebab",
-      "cta": "Commencer gratuitement"
+    "bakkerij": {
+      "h1": "Caisse la plus rapide pour boulangers | i5 & 9 langues | Vysion",
+      "intro": "Mise en caisse boulangerie : Intel i5 pour les pics du matin, 9 langues, propriété du matériel après 24 mois — le système de caisse Belgique et Pays-Bas.",
+      "body1": "Brunch chargé ou week-end : POS tactile, imprimante, logiciel réactif. Acheter ou louer : un forfait clair, sans mauvaises surprises.",
+      "body2": "Pour les boulangers qui veulent marge et rythme. Propriété après 24 mois plutôt que location sans fin — la caisse belge pour grandir.",
+      "imageAlt": "Mise en caisse Vysion pour boulangerie",
+      "cta": "Commencer gratuitement — essai 14 jours",
+      "ownership24": "Arrêtez de louer. Après 24 mois, cette caisse i5 est 100 % à vous."
+    },
+    "cafe": {
+      "h1": "Caisse restauration pour cafés | i5 double écran & 9 langues | Vysion",
+      "intro": "Rythme café = caisse rapide : matériel i5, 9 langues pour équipes multilingues, vision des marges — la caisse pour brasserie, coffee shop et déjeuner.",
+      "body1": "Rush du matin ou terrasse : la caisse la plus rapide au comptoir. Salle, à emporter et commande en ligne — idéal en Belgique pour cafés chargés.",
+      "body2": "Moins de saisies, moins d’erreurs, plus de couverts. Essayez Vysion gratuitement — puissance i5 et propriété après 24 mois.",
+      "imageAlt": "Mise en caisse Vysion pour café et brasserie",
+      "cta": "Commencer gratuitement",
+      "ownership24": "Arrêtez de louer. Après 24 mois, cette caisse i5 est 100 % à vous."
+    },
+    "frituur": {
+      "h1": "Caisse friterie | Checkout i5 le plus rapide | Vysion",
+      "intro": "Pics friterie et événements : votre caisse doit suivre. Intel i5, double écran client, 9 langues — pour la file, l’huile et le tempo.",
+      "body1": "Commandes, sauces et accompagnements sans ralentissement. POS tactile, imprimante intégrée et commande en ligne — la caisse friterie Belgique & Pays-Bas.",
+      "body2": "Files courtes, marges serrées. Démarrez gratuitement, testez en boutique, matériel à vous après 24 mois.",
+      "imageAlt": "Mise en caisse Vysion pour friterie et snack",
+      "cta": "Commencer gratuitement",
+      "ownership24": "Arrêtez de louer. Après 24 mois, cette caisse i5 est 100 % à vous."
+    },
+    "kebab": {
+      "h1": "Caisse kebab & sandwicherie | Puissance i5 | Vysion",
+      "intro": "Soirées chargées et sandwichs à la chaîne : i5 et 9 langues gardent l’équipe rapide — la caisse kebab, döner et sandwicherie.",
+      "body1": "Salle, à emporter et livraison sans chaos. Flux de caisse rapide avec tickets clairs — système Belgique pour fort débit.",
+      "body2": "Moins de stress au comptoir, plus de contrôle sur le CA. Essayez gratuitement et voyez pourquoi les pros choisissent l’i5.",
+      "imageAlt": "Mise en caisse Vysion pour kebab et sandwicherie",
+      "cta": "Commencer gratuitement",
+      "ownership24": "Arrêtez de louer. Après 24 mois, cette caisse i5 est 100 % à vous."
     },
     "kapper": {
-      "h1": "Système de caisse salons & coiffure | Élégant & rapide | Vysion",
-      "intro": "Valorisez votre salon : caisse i5 pro, encaissement fluide, 9 langues, matériel à vous après 24 mois.",
-      "body1": "Pas de file à l’accueil quand les fauteuils sont pleins. La caisse la plus rapide, achat ou location clairs — système Belgique & Pays-Bas.",
-      "body2": "Rendez-vous, ventes et pourboires dans une vue. Essayez Vysion gratuitement — checkout rapide et matériel premium.",
-      "imageAlt": "Disposition caisse Vysion pour salon de coiffure",
-      "cta": "Commencer gratuitement"
+      "h1": "Caisse salons de coiffure | Élégant & rapide | Vysion",
+      "intro": "La caisse pro i5, paiements fluides, 9 langues pour l’équipe, propriété du matériel après 24 mois — l’upgrade pour votre salon.",
+      "body1": "Pas de file à l’accueil quand les fauteuils sont pleins. Le flux le plus rapide garde la journée sous contrôle — salons Belgique & Pays-Bas.",
+      "body2": "Rendez-vous, vente et pourboires dans une vue. Essayez Vysion gratuitement — checkout premium.",
+      "imageAlt": "Mise en caisse Vysion pour salon de coiffure",
+      "cta": "Commencer gratuitement",
+      "ownership24": "Arrêtez de louer. Après 24 mois, cette caisse i5 est 100 % à vous."
     },
     "retail": {
-      "h1": "Caisse retail & stocks | L'i5 « Bête » pour magasins | Vysion",
-      "intro": "Stocks sur i5 puissant (8 Go RAM), POS tactile et site intégré — caisse retail qui grandit avec vous.",
-      "body1": "Caisse retail rapide : stock et vente sur un écran. Acheter une caisse avec marges et file rapide — système Belgique pour magasins.",
-      "body2": "Du code-bar à la clôture : moins d’erreurs, plus de vitesse. Propriété du matériel après 24 mois.",
-      "imageAlt": "Disposition caisse Vysion pour retail et magasin",
-      "cta": "Commencer gratuitement"
-    },
-    "hardwarePlatform": {
-      "h1": "Plateforme en ligne gratuite & matériel i5 | Offre Vysion",
-      "intro": "POS i5 haut de gamme, 44 vidéos, 9 langues, propriété du matériel après 24 mois — fini la location sans intérêt.",
-      "body1": "Commande en ligne, boutique web et caisse réunies. Acheter une caisse ou démarrer avec un abonnement clair — rapidité i5 + SSD.",
-      "body2": "Essai gratuit, tarifs transparents, système Belgique & Pays-Bas choisi pour croître — découvrez l’offre Vysion.",
-      "imageAlt": "Disposition caisse Vysion pour matériel et plateforme",
-      "cta": "Commencer gratuitement"
+      "h1": "Caisse retail & stock | L'i5 « Bête » pour magasins | Vysion",
+      "intro": "Stock sur i5 (8 Go RAM), POS tactile et intégration site gratuite — la caisse retail qui grandit avec vous.",
+      "body1": "Caisse retail rapide : stock et vente sur un écran. Achat de caisse avec marges et vitesse — système belge pour magasins.",
+      "body2": "Du code-barres à la clôture : moins d’erreurs, plus de rythme. Matériel premium à vous après 24 mois — fini la location sans gain.",
+      "imageAlt": "Mise en caisse Vysion pour retail et magasin",
+      "cta": "Commencer gratuitement",
+      "ownership24": "Arrêtez de louer. Après 24 mois, cette caisse i5 est 100 % à vous."
     }
   }
 }

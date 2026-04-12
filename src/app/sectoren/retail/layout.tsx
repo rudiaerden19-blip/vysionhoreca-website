@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     absolute: "Retail Kassa & Voorraadbeheer | Het i5 'Beest' voor Winkels | Vysion",
   },
   description:
-    'Winkelvoorraad op krachtige i5-kassa (8 GB RAM), touchscreen POS, gratis website-integratie. Snelste retail kassa — kassa kopen, kassasysteem België & Nederland, eigendom na 24 maanden.',
+    'Winkelvoorraad op krachtige i5-kassa (8 GB RAM), touchscreen POS, gratis website-integratie. Stop met huren. Na 24 maanden is deze i5 kassa 100% jouw eigendom. Snelste retail kassa — kassasysteem België & Nederland.',
   keywords: [
     'retail kassa',
     'winkel kassa',

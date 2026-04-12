@@ -5370,21 +5370,51 @@
   },
   "sectorPages": {
     "breadcrumb": "Sectoren",
+    "hardwareBeest": {
+      "title": "Intel i5 dual-screen: 'Het Beest'",
+      "specProcessor": "🚀 Processor: Intel i5 Core (ongeëvenaarde snelheid)",
+      "specMemory": "🧠 Geheugen: 8 GB RAM + 128 GB SSD",
+      "specScreens": "🖥️ Schermen: 15\" hoofdscherm + 11,5\" klantendisplay",
+      "specLanguages": "🌍 Talen: 9 talen (o.a. Arabisch, Chinees, Japans)",
+      "specIncluded": "🖨️ Inclusief: ingebouwde printer + 5 rollen papier gratis",
+      "blackVariantTitle": "Ook verkrijgbaar in zwart",
+      "demoCta": "Vraag nu je gratis demo aan - Direct leverbaar uit onze winkel in België"
+    },
     "bakkerij": {
       "h1": "Snelste Kassasysteem voor Bakkers | i5 Kracht & 9 Talen | Vysion",
       "intro": "Specifieke kassa-layout voor bakkers: Intel i5 (‘Het Beest’) voor pieksnelheid in de ochtend, 9 talen voor je team, en na 24 maanden is de hardware van jou — dé keuze als je een sterk kassasysteem België en Nederland zoekt.",
       "body1": "Wil je de snelste kassa tijdens drukke brunches en weekenddrukte? Bij ons combineer je touchscreen POS, bonprinter en software die niet traag wordt. Kassa kopen of leasen wordt helder: één pakket, zonder verrassingen na installatie.",
       "body2": "Vysion is gebouwd voor bakkers die marges en tempo willen houden. Onze deal met eigendom na 24 maanden maakt het verschil t.o.v. eindeloos huren — het kassasysteem België waar je op kunt bouwen.",
       "imageAlt": "Vysion kassa layout voor bakkerij",
-      "cta": "Start gratis — 14 dagen proberen"
+      "cta": "Start gratis — 14 dagen proberen",
+      "ownership24": "Stop met huren. Na 24 maanden is deze i5 kassa 100% jouw eigendom."
     },
-    "horecaSnack": {
-      "h1": "Horeca Kassa voor Café, Frituur & Kebab | Vysion All-in-One",
-      "intro": "Razendsnel bestellen en afrekenen: i5-hardware (‘Het Beest’), 9 talen voor meertalig personeel en grip op je marge — dé horeca kassa voor café, frituur, kebab en broodjesbar.",
-      "body1": "Snachts druk of middagrush: je wilt de snelste kassa aan de toonbank. Kassa kopen met software, hardware en online bestelplatform in één aanpak — ideaal als kassasysteem België voor takeaway en zaal.",
-      "body2": "Van broodjesbar tot kebabzaak: houd overzicht op orders, stock en afrekenen. Probeer gratis en ervaar waarom ondernemers kiezen voor i5-kracht in plaats van traag materiaal.",
-      "imageAlt": "Vysion kassa layout voor café, frituur en kebab",
-      "cta": "Start gratis"
+    "cafe": {
+      "h1": "Horeca Kassa voor Cafés | i5 Dual-Screen & 9 Talen | Vysion",
+      "intro": "Café-ritme vraagt een razendsnelle kassa: i5-hardware (‘Het Beest’), 9 talen voor meertalig personeel en overzicht op je marge — de horeca kassa voor brasserie, koffiebar en lunchroom.",
+      "body1": "Ochtendrush of terrasweer: je wilt de snelste kassa aan de bar. Combineer zaal, takeaway en online bestellen in één flow — ideaal als kassasysteem België voor cafés met drukke pieken.",
+      "body2": "Minder tikken, minder fouten, meer bedieningen per uur. Probeer Vysion gratis en ervaar i5-kracht met duidelijke voorwaarden en eigendom na 24 maanden.",
+      "imageAlt": "Vysion kassa layout voor café en brasserie",
+      "cta": "Start gratis",
+      "ownership24": "Stop met huren. Na 24 maanden is deze i5 kassa 100% jouw eigendom."
+    },
+    "frituur": {
+      "h1": "Frituur Kassa | Snelste i5 Checkout | Vysion",
+      "intro": "Frituurpieken en festivals: jouw kassa moet mee. Intel i5 (‘Het Beest’), dubbel scherm voor de klant, 9 talen voor je team — gebouwd voor drukte, olie en tempo.",
+      "body1": "Bestellen, sauzen, bijgerechten: alles vlot invoeren zonder vastlopers. Touchscreen POS, ingebouwde printer en online bestelplatform in één aanpak — dé frituur kassa voor België en Nederland.",
+      "body2": "Houd wachtrijen kort en marges strak. Start gratis, test in je zaak, en kies voor hardware die na 24 maanden van jou is.",
+      "imageAlt": "Vysion kassa layout voor frituur en snackbar",
+      "cta": "Start gratis",
+      "ownership24": "Stop met huren. Na 24 maanden is deze i5 kassa 100% jouw eigendom."
+    },
+    "kebab": {
+      "h1": "Kebab & Broodjesbar Kassa | i5 Kracht | Vysion",
+      "intro": "Late-night druk en broodjes in het kwadraat: met i5-hardware (‘Het Beest’) en 9 talen blijft je team snel — de kassa voor kebab, döner en broodjesbar.",
+      "body1": "Combineer zaal, afhaal en bezorging zonder chaos. De snelste kassa-flow met duidelijke tickets en bonnen — kassasysteem België voor horeca met hoge doorzet.",
+      "body2": "Minder stress aan de toonbank, meer controle op omzet. Probeer gratis en ontdek waarom ondernemers kiezen voor i5 in plaats van traag materiaal.",
+      "imageAlt": "Vysion kassa layout voor kebab en broodjesbar",
+      "cta": "Start gratis",
+      "ownership24": "Stop met huren. Na 24 maanden is deze i5 kassa 100% jouw eigendom."
     },
     "kapper": {
       "h1": "Kassasysteem voor Kappers & Salons | Stijlvol & Snel | Vysion",
@@ -5392,7 +5422,8 @@
       "body1": "In de stoel wil je geen wachtrij aan de balie. Met de snelste kassa-flow blijft je planning strak. Kassa kopen of leasen met duidelijke voorwaarden — het kassasysteem België en Nederland voor salons.",
       "body2": "Combineer afspraken, producten en fooi in één overzicht. Probeer Vysion gratis en ontdek stijlvolle, snelle checkout met premium hardware.",
       "imageAlt": "Vysion kassa layout voor kapper en salon",
-      "cta": "Start gratis"
+      "cta": "Start gratis",
+      "ownership24": "Stop met huren. Na 24 maanden is deze i5 kassa 100% jouw eigendom."
     },
     "retail": {
       "h1": "Retail Kassa & Voorraadbeheer | Het i5 'Beest' voor Winkels | Vysion",
@@ -5400,15 +5431,8 @@
       "body1": "Wie een snelle retail kassa wil, combineert voorraad en verkoop in één scherm. Kassa kopen met zicht op marges en snelheid aan de kassa — dé keuze als kassasysteem België voor winkels.",
       "body2": "Van barcode tot einddag: minder fouten, meer tempo. Eigendom na 24 maanden op premium hardware — stop met huren zonder voordeel.",
       "imageAlt": "Vysion kassa layout voor retail en winkel",
-      "cta": "Start gratis"
-    },
-    "hardwarePlatform": {
-      "h1": "Gratis Online Platform & i5 Kassa Hardware | De Vysion Deal",
-      "intro": "Beste platform voor ondernemers: high-end i5-kassa (‘Het Beest’), 44 video-instructies, 9 talen, en na 24 maanden ben jij eigenaar van de hardware — stop met zinloos huren.",
-      "body1": "Combineer online bestelplatform, webshop en kassa in één ecosysteem. Kassa kopen of starten met een helder abonnement: de snelste kassa-ervaring dankzij i5 en SSD.",
-      "body2": "Gratis uitproberen, transparante prijzen, en het kassasysteem België en Nederland dat ondernemers kiezen voor groei — ontdek de Vysion-deal.",
-      "imageAlt": "Vysion kassa layout voor hardware en platform",
-      "cta": "Start gratis"
+      "cta": "Start gratis",
+      "ownership24": "Stop met huren. Na 24 maanden is deze i5 kassa 100% jouw eigendom."
     }
   }
 }

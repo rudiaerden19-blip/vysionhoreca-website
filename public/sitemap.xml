@@ -122,31 +122,37 @@
   </url>
   <url>
     <loc>https://www.vysionhoreca.com/sectoren/bakkerij</loc>
-    <lastmod>2026-04-12</lastmod>
+    <lastmod>2026-04-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://www.vysionhoreca.com/sectoren/cafe-frituur-kebab</loc>
-    <lastmod>2026-04-12</lastmod>
+    <loc>https://www.vysionhoreca.com/sectoren/cafe</loc>
+    <lastmod>2026-04-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://www.vysionhoreca.com/sectoren/frituur</loc>
+    <lastmod>2026-04-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://www.vysionhoreca.com/sectoren/kebab</loc>
+    <lastmod>2026-04-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.vysionhoreca.com/sectoren/kapper</loc>
-    <lastmod>2026-04-12</lastmod>
+    <lastmod>2026-04-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.vysionhoreca.com/sectoren/retail</loc>
-    <lastmod>2026-04-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://www.vysionhoreca.com/sectoren/hardware-en-platform</loc>
-    <lastmod>2026-04-12</lastmod>
+    <lastmod>2026-04-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>

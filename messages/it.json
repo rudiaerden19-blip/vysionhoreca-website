@@ -5413,45 +5413,69 @@
   },
   "sectorPages": {
     "breadcrumb": "Settori",
-    "bakkerij": {
-      "h1": "Cassa più veloce per panetterie | Potenza i5 e 9 lingue | Vysion",
-      "intro": "Layout cassa per panetteria: Intel i5 («La Bestia») per picchi mattutini, 9 lingue, hardware tuo dopo 24 mesi — sistema cassa Belgio e Paesi Bassi.",
-      "body1": "Vuoi la cassa più veloce nei brunch affollati? POS touchscreen, stampante, software reattivo. Comprare cassa o noleggio: un pacchetto chiaro.",
-      "body2": "Per panettieri attenti a margini e ritmo. Proprietà dopo 24 mesi invece di noleggiare all’infinito — sistema cassa Belgio solido.",
-      "imageAlt": "Layout cassa Vysion per panetteria",
-      "cta": "Inizia gratis"
+    "hardwareBeest": {
+      "title": "Vysion i5 dual-screen: 'La Bestia'",
+      "specProcessor": "🚀 Processore: Intel i5 Core (velocità senza pari)",
+      "specMemory": "🧠 Memoria: 8 GB RAM + 128 GB SSD",
+      "specScreens": "🖥️ Schermi: 15\" operatore + 11,5\" cliente",
+      "specLanguages": "🌍 Lingue: 9 lingue (tra cui arabo, cinese, giapponese)",
+      "specIncluded": "🖨️ Incluso: stampante integrata + 5 rotoli di carta gratis",
+      "blackVariantTitle": "Disponibile anche in nero",
+      "demoCta": "Richiedi ora la demo gratuita — Ritiro immediato nel nostro negozio in Belgio"
     },
-    "horecaSnack": {
-      "h1": "Cassa horeca per café, friggitoria e kebab | Vysion tutto-in-uno",
-      "intro": "Ordini e incassi veloci: hardware i5, 9 lingue per staff multilingue, controllo margini — cassa horeca per café, friggitoria, kebab e paninoteca.",
-      "body1": "Picco notturno o pranzo: la cassa più veloce al banco. Comprare cassa con software, hardware e ordini online — sistema Belgio ideale.",
-      "body2": "Dal panino al kebab: ordini, magazzino, pagamenti sotto controllo. Prova gratis e senti la potenza i5.",
-      "imageAlt": "Layout cassa Vysion per café, friggitoria e kebab",
-      "cta": "Inizia gratis"
+    "bakkerij": {
+      "h1": "Cassa più veloce per panetterie | i5 e 9 lingue | Vysion",
+      "intro": "Layout cassa per panetteria: Intel i5 per il picco mattutino, 9 lingue per il team, proprietà hardware dopo 24 mesi — il POS Belgio e Paesi Bassi.",
+      "body1": "Brunch o weekend intenso? POS touch, stampante e software reattivo. Acquisto o leasing: un pacchetto chiaro, zero sorprese.",
+      "body2": "Per chi vuole margine e ritmo. Proprietà dopo 24 mesi batte l’affitto infinito — il POS belga su cui crescere.",
+      "imageAlt": "Layout cassa Vysion per panetteria",
+      "cta": "Inizia gratis — prova 14 giorni",
+      "ownership24": "Smetti di noleggiare. Dopo 24 mesi questa cassa i5 è 100% tua."
+    },
+    "cafe": {
+      "h1": "Cassa ristorazione per caffè | i5 dual-screen e 9 lingue | Vysion",
+      "intro": "Il ritmo del bar chiede cassa veloce: hardware i5, 9 lingue per team multilingue, margini sotto controllo — POS per brasserie, coffee bar e pranzo.",
+      "body1": "Picco mattutino o terrazza piena: la cassa più veloce al banco. Sala, asporto e ordini online in un flusso — ideale in Belgio per bar affollati.",
+      "body2": "Meno tocchi, meno errori, più coperti. Prova Vysion gratis — potenza i5 e proprietà dopo 24 mesi.",
+      "imageAlt": "Layout cassa Vysion per caffè e brasserie",
+      "cta": "Inizia gratis",
+      "ownership24": "Smetti di noleggiare. Dopo 24 mesi questa cassa i5 è 100% tua."
+    },
+    "frituur": {
+      "h1": "Cassa friggitoria | Checkout i5 più veloce | Vysion",
+      "intro": "Picchi da friggitoria ed eventi: la cassa deve reggere. Intel i5, doppio schermo cliente, 9 lingue — per code, olio e ritmo.",
+      "body1": "Ordini, salse e contorni senza rallentamenti. POS touch, stampante integrata e ordini online — cassa friggitoria Belgio e Paesi Bassi.",
+      "body2": "Code corte, margini stretti. Inizia gratis, prova in negozio, hardware tuo dopo 24 mesi.",
+      "imageAlt": "Layout cassa Vysion per friggitoria e snack",
+      "cta": "Inizia gratis",
+      "ownership24": "Smetti di noleggiare. Dopo 24 mesi questa cassa i5 è 100% tua."
+    },
+    "kebab": {
+      "h1": "Cassa kebab & panineria | Potenza i5 | Vysion",
+      "intro": "Sere piene e panini al massimo: i5 e 9 lingue tengono il team veloce — POS per kebab, döner e panineria.",
+      "body1": "Sala, asporto e consegna senza caos. Flusso cassa rapido con scontrini chiari — POS Belgio per alto throughput.",
+      "body2": "Meno stress al bancone, più controllo sui ricavi. Prova gratis e scopri perché si sceglie i5.",
+      "imageAlt": "Layout cassa Vysion per kebab e panineria",
+      "cta": "Inizia gratis",
+      "ownership24": "Smetti di noleggiare. Dopo 24 mesi questa cassa i5 è 100% tua."
     },
     "kapper": {
       "h1": "Cassa per parrucchieri e saloni | Elegante e veloce | Vysion",
-      "intro": "Valore al salone: cassa i5 professionale, incasso fluido, 9 lingue, hardware tuo dopo 24 mesi.",
-      "body1": "Niente code in reception con poltrone piene. Cassa più veloce; acquisto o noleggio chiari — sistema Belgio e Paesi Bassi.",
-      "body2": "Appuntamenti, vendite e mance in una vista. Prova Vysion gratis — checkout rapido con hardware premium.",
-      "imageAlt": "Layout cassa Vysion per parrucchiere e salone",
-      "cta": "Inizia gratis"
+      "intro": "Cassa i5 professionale, pagamenti fluidi, 9 lingue per il team, proprietà hardware dopo 24 mesi — l’upgrade per il tuo salone.",
+      "body1": "Niente code in reception con poltrone piene. Il flusso più veloce tiene la giornata in carreggiata — saloni Belgio e Paesi Bassi.",
+      "body2": "Appuntamenti, vendita e mance in un’unica vista. Prova Vysion gratis — checkout premium.",
+      "imageAlt": "Layout cassa Vysion per salone",
+      "cta": "Inizia gratis",
+      "ownership24": "Smetti di noleggiare. Dopo 24 mesi questa cassa i5 è 100% tua."
     },
     "retail": {
-      "h1": "Cassa retail e scorte | L'i5 «Bestia» per negozi | Vysion",
-      "intro": "Scorte su i5 potente (8 GB RAM), POS touchscreen e integrazione web — cassa retail che scala con te.",
-      "body1": "Cassa retail veloce: scorte e vendite su uno schermo. Comprare cassa con margini e coda agile — sistema Belgio per negozi.",
-      "body2": "Dal barcode alla chiusura: meno errori, più velocità. Proprietà hardware dopo 24 mesi.",
+      "h1": "Cassa retail & magazzino | L'i5 'Bestia' per negozi | Vysion",
+      "intro": "Magazzino su i5 (8 GB RAM), POS touch e integrazione web gratuita — retail che scala con te.",
+      "body1": "Cassa retail veloce: magazzino e vendita su uno schermo. Acquisto POS con margini e velocità — sistema belga per negozi.",
+      "body2": "Dal barcode alla chiusura: meno errori, più ritmo. Hardware premium tuo dopo 24 mesi — niente affitto senza vantaggio.",
       "imageAlt": "Layout cassa Vysion per retail e negozio",
-      "cta": "Inizia gratis"
-    },
-    "hardwarePlatform": {
-      "h1": "Piattaforma online gratuita e hardware cassa i5 | Offerta Vysion",
-      "intro": "Cassa i5 top, 44 video, 9 lingue, proprietà hardware dopo 24 mesi — basta noleggi inutili.",
-      "body1": "Ordini online, webshop e cassa unificati. Comprare cassa o iniziare con piano chiaro — massima velocità con i5 e SSD.",
-      "body2": "Prova gratis, prezzi trasparenti, sistema Belgio e Paesi Bassi per crescere — scopri l’offerta Vysion.",
-      "imageAlt": "Layout cassa Vysion per hardware e piattaforma",
-      "cta": "Inizia gratis"
+      "cta": "Inizia gratis",
+      "ownership24": "Smetti di noleggiare. Dopo 24 mesi questa cassa i5 è 100% tua."
     }
   }
 }

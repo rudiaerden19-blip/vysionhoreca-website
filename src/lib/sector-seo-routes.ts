@@ -1,10 +1,5 @@
 /** i18n-sleutel onder sectorPages.* in messages/*.json */
-export type SectorPageContentKey =
-  | 'bakkerij'
-  | 'horecaSnack'
-  | 'kapper'
-  | 'retail'
-  | 'hardwarePlatform'
+export type SectorPageContentKey = 'bakkerij' | 'cafe' | 'frituur' | 'kebab' | 'kapper' | 'retail'
 
 /** Marketing SEO-routes onder /sectoren/… — image per sector voor hero. */
 export const SECTOR_SEO_ROUTES = {
@@ -13,10 +8,20 @@ export const SECTOR_SEO_ROUTES = {
     imageSrc: '/images/kassa-platform-3.png',
     sectorKey: 'bakkerij',
   },
-  cafeFrituurKebab: {
-    path: '/sectoren/cafe-frituur-kebab',
+  cafe: {
+    path: '/sectoren/cafe',
     imageSrc: '/images/online-order-platform-1.png',
-    sectorKey: 'horecaSnack',
+    sectorKey: 'cafe',
+  },
+  frituur: {
+    path: '/sectoren/frituur',
+    imageSrc: '/images/online-order-platform-1.png',
+    sectorKey: 'frituur',
+  },
+  kebab: {
+    path: '/sectoren/kebab',
+    imageSrc: '/images/online-order-platform-1.png',
+    sectorKey: 'kebab',
   },
   kapper: {
     path: '/sectoren/kapper',
@@ -27,11 +32,6 @@ export const SECTOR_SEO_ROUTES = {
     path: '/sectoren/retail',
     imageSrc: '/images/kassa-platform-4.png',
     sectorKey: 'retail',
-  },
-  hardwarePlatform: {
-    path: '/sectoren/hardware-en-platform',
-    imageSrc: '/images/vysion-beest-product.png',
-    sectorKey: 'hardwarePlatform',
   },
 } as const satisfies Record<
   string,

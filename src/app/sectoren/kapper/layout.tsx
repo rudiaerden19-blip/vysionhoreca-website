@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     absolute: 'Kassasysteem voor Kappers & Salons | Stijlvol & Snel | Vysion',
   },
   description:
-    'Salon-upgrade: professionele i5-kassa (Het Beest), eenvoudig afrekenen, 9 talen, na 24 maanden hardware van jou. Snelste kassa voor salons — kassa kopen of proef, kassasysteem België & Nederland.',
+    'Salon-upgrade: professionele i5-kassa (Het Beest), eenvoudig afrekenen, 9 talen, na 24 maanden hardware van jou. Stop met huren. Na 24 maanden is deze i5 kassa 100% jouw eigendom. Snelste kassa voor salons — kassasysteem België & Nederland.',
   keywords: [
     'kapper kassa',
     'salon kassa',

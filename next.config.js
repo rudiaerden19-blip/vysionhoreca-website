@@ -139,6 +139,16 @@ const nextConfig = {
         destination: 'https://www.vysionhoreca.com/:path*',
         permanent: true,
       },
+      {
+        source: '/sectoren/cafe-frituur-kebab',
+        destination: '/sectoren/cafe',
+        permanent: true,
+      },
+      {
+        source: '/sectoren/hardware-en-platform',
+        destination: '/sectoren/retail',
+        permanent: true,
+      },
     ]
   },
 }

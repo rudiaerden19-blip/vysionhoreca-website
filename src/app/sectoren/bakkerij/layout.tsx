@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     absolute: 'Snelste Kassasysteem voor Bakkers | i5 Kracht & 9 Talen | Vysion',
   },
   description:
-    'Specifieke kassa-layout voor bakkers: Intel i5 (Het Beest) voor ochtenddrukte, 9 talen, na 24 maanden eigendom van hardware. Snelste kassa, kassa kopen of proef — kassasysteem België & Nederland.',
+    'Specifieke kassa-layout voor bakkers: Intel i5 (Het Beest) voor ochtenddrukte, 9 talen, na 24 maanden eigendom van hardware. Stop met huren. Na 24 maanden is deze i5 kassa 100% jouw eigendom. Snelste kassa — kassasysteem België & Nederland.',
   keywords: [
     'bakkerij kassa',
     'snelste kassa',

@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Navigation, Footer, CookieBanner } from '@/components'
+import HardwareBeestSection from '@/components/HardwareBeestSection'
 import type { SectorPageContentKey } from '@/lib/sector-seo-routes'
 import { useLanguage } from '@/i18n'
 
@@ -30,8 +31,13 @@ export default function SectorSeoPage({ sectorKey, imageSrc }: Props) {
             <p className="mt-6 text-lg sm:text-xl text-gray-700 leading-relaxed text-balance">
               {t(`${p}.intro`)}
             </p>
+            <p className="mx-auto mt-8 max-w-3xl text-lg font-semibold leading-relaxed text-gray-900 text-balance sm:text-xl">
+              {t(`${p}.ownership24`)}
+            </p>
           </div>
         </section>
+
+        <HardwareBeestSection />
 
         <section className="pb-6 px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl mx-auto relative aspect-[4/3] w-full rounded-2xl overflow-hidden shadow-home-image border border-gray-200 bg-white">
