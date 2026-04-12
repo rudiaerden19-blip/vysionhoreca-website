@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { motion } from 'framer-motion'
 import { useLanguage, Locale } from '@/i18n'
 import { persistTenantSessionWithToday } from '@/lib/auth-headers'
 
@@ -427,9 +428,22 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={isLoading}
+              aria-busy={isLoading}
               className="w-full bg-accent hover:bg-accent/90 disabled:bg-accent/50 text-white py-4 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
             >
-              {isLoading ? t('register.registering') : `${t('register.registerButton')} →`}
+              {isLoading ? (
+                <>
+                  <motion.span
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                    className="inline-block h-5 w-5 shrink-0 rounded-full border-2 border-white border-t-transparent"
+                    aria-hidden
+                  />
+                  <span>{t('register.registering')}</span>
+                </>
+              ) : (
+                <span>{`${t('register.registerButton')} →`}</span>
+              )}
             </button>
 
             <div className="text-center">
