@@ -572,18 +572,18 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
-            <span>🎠</span> Hero Slider Foto's
+            <span>🎠</span> {t('adminPages.profiel.heroSliderTitle')}
           </h2>
           <p className="text-gray-500 text-sm mb-6">
-            Deze foto's worden getoond als slideshow bovenaan je website. 
-            <span className="text-blue-600 font-medium"> Gebruik de zoom slider om in/uit te zoomen en sleep om te positioneren.</span>
+            {t('adminPages.profiel.heroSliderIntro')}{' '}
+            <span className="text-blue-600 font-medium">{t('adminPages.profiel.heroSliderZoomHint')}</span>
           </p>
           
           <div className="grid md:grid-cols-3 gap-6">
             <div>
               <ImageZoomPicker
                 tenantSlug={params.tenant}
-                label="Slide 1"
+                label={t('ui.slideLabel').replace('{{n}}', '1')}
                 value={parseImageZoomSettings(formData.cover_image_1)}
                 onChange={(settings) => {
                   setFormData(prev => ({ ...prev, cover_image_1: stringifyImageZoomSettings(settings) }))
@@ -594,7 +594,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
             <div>
               <ImageZoomPicker
                 tenantSlug={params.tenant}
-                label="Slide 2"
+                label={t('ui.slideLabel').replace('{{n}}', '2')}
                 value={parseImageZoomSettings(formData.cover_image_2)}
                 onChange={(settings) => {
                   setFormData(prev => ({ ...prev, cover_image_2: stringifyImageZoomSettings(settings) }))
@@ -605,7 +605,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
             <div>
               <ImageZoomPicker
                 tenantSlug={params.tenant}
-                label="Slide 3"
+                label={t('ui.slideLabel').replace('{{n}}', '3')}
                 value={parseImageZoomSettings(formData.cover_image_3)}
                 onChange={(settings) => {
                   setFormData(prev => ({ ...prev, cover_image_3: stringifyImageZoomSettings(settings) }))
@@ -624,9 +624,9 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
-            <span>👥</span> Over Ons Foto
+            <span>👥</span> {t('adminPages.profiel.aboutPhotoTitle')}
           </h2>
-          <p className="text-gray-500 text-sm mb-6">Deze foto wordt getoond naast de "Over Ons" sectie</p>
+          <p className="text-gray-500 text-sm mb-6">{t('adminPages.profiel.aboutPhotoDesc')}</p>
           
           <MediaPicker
             tenantSlug={params.tenant}
@@ -646,15 +646,15 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
-            <span>🏆</span> Best Verkochte Producten
+            <span>🏆</span> {t('adminPages.profiel.topSellersTitle')}
           </h2>
-          <p className="text-gray-500 text-sm mb-6">Toon je 3 populairste producten op de homepage</p>
+          <p className="text-gray-500 text-sm mb-6">{t('adminPages.profiel.topSellersDesc')}</p>
           
           <div className="grid md:grid-cols-3 gap-6">
             <div>
               <ImageZoomPicker
                 tenantSlug={params.tenant}
-                label="Product 1"
+                label={t('ui.productLabel').replace('{{n}}', '1')}
                 value={parseImageZoomSettings(formData.top_seller_1)}
                 onChange={(settings) => {
                   setFormData(prev => ({ ...prev, top_seller_1: stringifyImageZoomSettings(settings) }))
@@ -665,7 +665,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
             <div>
               <ImageZoomPicker
                 tenantSlug={params.tenant}
-                label="Product 2"
+                label={t('ui.productLabel').replace('{{n}}', '2')}
                 value={parseImageZoomSettings(formData.top_seller_2)}
                 onChange={(settings) => {
                   setFormData(prev => ({ ...prev, top_seller_2: stringifyImageZoomSettings(settings) }))
@@ -676,7 +676,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
             <div>
               <ImageZoomPicker
                 tenantSlug={params.tenant}
-                label="Product 3"
+                label={t('ui.productLabel').replace('{{n}}', '3')}
                 value={parseImageZoomSettings(formData.top_seller_3)}
                 onChange={(settings) => {
                   setFormData(prev => ({ ...prev, top_seller_3: stringifyImageZoomSettings(settings) }))
@@ -695,28 +695,30 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
-            <span>⭐</span> Onze Specialiteiten
+            <span>⭐</span> {t('adminPages.profiel.specialtiesTitle')}
           </h2>
-          <p className="text-gray-500 text-sm mb-6">Highlight 3 specialiteiten met foto en titel</p>
+          <p className="text-gray-500 text-sm mb-6">{t('adminPages.profiel.specialtiesDesc')}</p>
           
           <div className="space-y-6">
             {/* Specialty 1 */}
             <div className="border border-gray-200 rounded-xl p-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Specialiteit 1</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('adminPages.profiel.specialtyLabel').replace('{{n}}', '1')}
+              </label>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Titel</label>
+                  <label className="block text-xs text-gray-500 mb-1">{t('adminPages.profiel.fieldTitle')}</label>
                   <input
                     type="text"
                     name="specialty_1_title"
                     value={formData.specialty_1_title || ''}
                     onChange={handleChange}
-                    placeholder="bijv. Huisgemaakte Pasta"
+                    placeholder={t('ui.exampleDishPlaceholder')}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Foto</label>
+                  <label className="block text-xs text-gray-500 mb-1">{t('adminPages.profiel.fieldPhoto')}</label>
                   <ImageZoomPicker
                     tenantSlug={params.tenant}
                     value={parseImageZoomSettings(formData.specialty_1_image)}
@@ -731,21 +733,23 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
 
             {/* Specialty 2 */}
             <div className="border border-gray-200 rounded-xl p-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Specialiteit 2</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('adminPages.profiel.specialtyLabel').replace('{{n}}', '2')}
+              </label>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Titel</label>
+                  <label className="block text-xs text-gray-500 mb-1">{t('adminPages.profiel.fieldTitle')}</label>
                   <input
                     type="text"
                     name="specialty_2_title"
                     value={formData.specialty_2_title || ''}
                     onChange={handleChange}
-                    placeholder="bijv. Verse Visgerechten"
+                    placeholder={t('ui.exampleFishPlaceholder')}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Foto</label>
+                  <label className="block text-xs text-gray-500 mb-1">{t('adminPages.profiel.fieldPhoto')}</label>
                   <ImageZoomPicker
                     tenantSlug={params.tenant}
                     value={parseImageZoomSettings(formData.specialty_2_image)}
@@ -760,21 +764,23 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
 
             {/* Specialty 3 */}
             <div className="border border-gray-200 rounded-xl p-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Specialiteit 3</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('adminPages.profiel.specialtyLabel').replace('{{n}}', '3')}
+              </label>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Titel</label>
+                  <label className="block text-xs text-gray-500 mb-1">{t('adminPages.profiel.fieldTitle')}</label>
                   <input
                     type="text"
                     name="specialty_3_title"
                     value={formData.specialty_3_title || ''}
                     onChange={handleChange}
-                    placeholder="bijv. Ambachtelijk Brood"
+                    placeholder={t('ui.exampleBreadPlaceholder')}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Foto</label>
+                  <label className="block text-xs text-gray-500 mb-1">{t('adminPages.profiel.fieldPhoto')}</label>
                   <ImageZoomPicker
                     tenantSlug={params.tenant}
                     value={parseImageZoomSettings(formData.specialty_3_image)}
@@ -797,26 +803,26 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
-            <span>📧</span> Email Marketing Instellingen
+            <span>📧</span> {t('adminPages.profiel.emailMarketingTitle')}
           </h2>
           <p className="text-gray-500 text-sm mb-6">
-            Vul hier jouw eigen emailgegevens in. Marketing emails worden dan verstuurd vanuit jouw eigen emailadres.
+            {t('adminPages.profiel.emailMarketingDesc')}
           </p>
 
           <div className="space-y-4">
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Jouw naam / bedrijfsnaam</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('adminPages.profiel.smtpFromNameLabel')}</label>
                 <input
                   type="text"
                   value={smtpData.smtp_from_name}
                   onChange={e => setSmtpData(prev => ({ ...prev, smtp_from_name: e.target.value }))}
-                  placeholder="bijv. Frituur Ronny"
+                  placeholder={t('ui.exampleBusinessPlaceholder')}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Emailadres</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('adminPages.profiel.smtpEmailLabel')}</label>
                 <input
                   type="email"
                   value={smtpData.smtp_user}
@@ -831,35 +837,37 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                       setSmtpDetected(null)
                     }
                   }}
-                  placeholder="info@jouwzaak.be"
+                  placeholder={t('ui.exampleShopEmailPlaceholder')}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 />
                 {smtpDetected && (
-                  <p className="text-xs text-green-600 mt-1">✓ Server automatisch gevonden: {smtpDetected}</p>
+                  <p className="text-xs text-green-600 mt-1">
+                    {t('adminPages.profiel.smtpServerDetected').replace('{{host}}', smtpDetected)}
+                  </p>
                 )}
                 {smtpData.smtp_user && !smtpDetected && (
-                  <p className="text-xs text-gray-500 mt-1">Onbekende provider — vul SMTP server hieronder in.</p>
+                  <p className="text-xs text-gray-500 mt-1">{t('adminPages.profiel.smtpUnknownProvider')}</p>
                 )}
               </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Wachtwoord
+                {t('adminPages.profiel.smtpPasswordLabel')}
                 {smtpPasswordSet && (
-                  <span className="ml-2 text-xs text-green-600 font-normal">✓ Wachtwoord is ingesteld</span>
+                  <span className="ml-2 text-xs text-green-600 font-normal">{t('adminPages.profiel.smtpPasswordSetBadge')}</span>
                 )}
               </label>
               <input
                 type="password"
                 value={smtpData.smtp_password}
                 onChange={e => setSmtpData(prev => ({ ...prev, smtp_password: e.target.value }))}
-                placeholder={smtpPasswordSet ? 'Laat leeg om huidig wachtwoord te behouden' : 'Voer wachtwoord in'}
+                placeholder={smtpPasswordSet ? t('adminPages.profiel.smtpPasswordKeepPlaceholder') : t('adminPages.profiel.smtpPasswordPlaceholder')}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
               {smtpData.smtp_user?.includes('@gmail.com') && (
                 <p className="text-xs text-amber-600 mt-1">
-                  ⚠️ Gmail vereist een App-wachtwoord. Maak dit aan via: Google Account → Beveiliging → App-wachtwoorden.
+                  {t('adminPages.profiel.smtpGmailWarning')}
                 </p>
               )}
             </div>
@@ -867,17 +875,17 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
             {smtpData.smtp_user && !smtpDetected && (
               <div className="grid md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-xl">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">SMTP server (vraag aan je provider)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('adminPages.profiel.smtpServerLabel')}</label>
                   <input
                     type="text"
                     value={smtpData.smtp_host}
                     onChange={e => setSmtpData(prev => ({ ...prev, smtp_host: e.target.value }))}
-                    placeholder="bijv. smtp.mijnprovider.be"
+                    placeholder={t('ui.exampleSmtpPlaceholder')}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-all"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Poort</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('adminPages.profiel.smtpPortLabel')}</label>
                   <input
                     type="number"
                     value={smtpData.smtp_port}
@@ -898,7 +906,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
               disabled={smtpSaving}
               className="w-full bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
             >
-              {smtpSaving ? '⏳ Opslaan...' : smtpSaved ? '✓ Opgeslagen!' : '💾 Email instellingen opslaan'}
+              {smtpSaving ? t('adminPages.profiel.smtpSaveSaving') : smtpSaved ? t('adminPages.profiel.smtpSaveSaved') : t('adminPages.profiel.smtpSaveButton')}
             </button>
           </div>
         </motion.div>

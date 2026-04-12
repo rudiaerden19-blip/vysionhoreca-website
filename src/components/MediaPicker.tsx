@@ -418,7 +418,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
               onClick={clearImage}
               className="text-red-500 hover:text-red-600 text-sm"
             >
-              ✕ Verwijderen
+              ✕ {t('adminPages.common.delete')}
             </button>
           )}
           

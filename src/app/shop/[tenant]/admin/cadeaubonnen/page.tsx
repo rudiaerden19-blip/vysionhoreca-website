@@ -68,7 +68,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     } else {
-      alert('Opslaan mislukt')
+      alert(t('adminPages.common.saveFailed'))
     }
     
     setSaving(false)
@@ -85,13 +85,13 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
   }
 
   const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'paid': return 'Actief'
-      case 'used': return 'Gebruikt'
-      case 'expired': return 'Verlopen'
-      case 'pending_cash': return 'Wacht op cash'
-      default: return 'In afwachting'
+    const key: Record<string, string> = {
+      paid: 'websiteGiftCards.statusPaid',
+      used: 'websiteGiftCards.statusUsed',
+      expired: 'websiteGiftCards.statusExpired',
+      pending_cash: 'websiteGiftCards.statusPendingCash',
     }
+    return t(key[status] ?? 'websiteGiftCards.statusPending')
   }
 
   if (loading) {
@@ -248,14 +248,14 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
               className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-2xl p-6"
             >
               <h3 className="font-semibold text-blue-900 mb-4 flex items-center gap-2">
-                <span>👁️</span> Preview op website
+                <span>👁️</span> {t('websiteGiftCards.adminPreviewHeading')}
               </h3>
               <div className="bg-white rounded-xl p-6 shadow-sm text-center">
-                <p className="text-sm text-blue-600 font-medium uppercase tracking-wider">Het perfecte cadeau</p>
-                <h4 className="text-2xl font-bold text-gray-900 mt-1">Geef iemand een verrassing</h4>
-                <p className="text-gray-600 mt-2">Bestel een cadeaubon en verras iemand met een heerlijke maaltijd</p>
-                <button className="mt-4 px-6 py-3 bg-blue-600 text-white font-medium rounded-xl">
-                  🎁 Cadeaubon bestellen
+                <p className="text-sm text-blue-600 font-medium uppercase tracking-wider">{t('shopPage.perfectGift')}</p>
+                <h4 className="text-2xl font-bold text-gray-900 mt-1">{t('shopPage.giftCardTitle')}</h4>
+                <p className="text-gray-600 mt-2">{t('websiteGiftCards.adminPreviewBody')}</p>
+                <button type="button" className="mt-4 px-6 py-3 bg-blue-600 text-white font-medium rounded-xl">
+                  🎁 {t('shopPage.orderGiftCard')}
                 </button>
               </div>
             </motion.div>
@@ -332,7 +332,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
                     <div>
                       <p className="font-mono font-bold text-gray-900">{card.code}</p>
                       <p className="text-sm text-gray-500">
-                        {card.recipient_email} • {card.occasion || 'Geen gelegenheid'}
+                        {card.recipient_email} • {card.occasion || t('websiteGiftCards.noOccasion')}
                       </p>
                     </div>
                   </div>
@@ -355,7 +355,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
                         }}
                         className="px-3 py-1 bg-green-500 hover:bg-green-600 text-white text-sm font-medium rounded-lg transition-colors"
                       >
-                        ✓ Cash ontvangen
+                        {t('websiteGiftCards.cashReceived')}
                       </button>
                     )}
                     <div className="text-right">

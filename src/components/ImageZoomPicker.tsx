@@ -108,7 +108,7 @@ export default function ImageZoomPicker({ tenantSlug, value, onChange, label }: 
           {/* Preview - toont exact hoe de hero slider eruit ziet */}
           <div className="relative">
             <p className="text-xs text-gray-500 mb-2">
-              👁️ Live preview (zoals het op je website wordt getoond)
+              {t('ui.imageZoomPickerLivePreview')}
             </p>
             <div
               ref={containerRef}
@@ -125,7 +125,7 @@ export default function ImageZoomPicker({ tenantSlug, value, onChange, label }: 
               {/* Deze preview toont exact hoe de foto op de website verschijnt */}
               <Image
                 src={settings.url}
-                alt="Preview"
+                alt={t('ui.imageZoomPickerAlt')}
                 fill
                 className="object-cover"
                 style={{
@@ -151,10 +151,10 @@ export default function ImageZoomPicker({ tenantSlug, value, onChange, label }: 
           {/* Zoom Slider - van 50% (uitgezoomd) tot 150% (ingezoomd) */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-gray-600 font-medium">🔍 Zoom</span>
+              <span className="text-xs text-gray-600 font-medium">{t('ui.imageZoomPickerZoomLabel')}</span>
               <span className="text-xs text-gray-500 font-mono">
-                {Math.round(settings.zoom * 100)}% 
-                {settings.zoom < 1 ? ' (uitgezoomd)' : settings.zoom > 1 ? ' (ingezoomd)' : ' (normaal)'}
+                {Math.round(settings.zoom * 100)}%{' '}
+                {settings.zoom < 1 ? t('ui.imageZoomPickerZoomedOut') : settings.zoom > 1 ? t('ui.imageZoomPickerZoomedIn') : t('ui.imageZoomPickerZoomNormal')}
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -183,15 +183,15 @@ export default function ImageZoomPicker({ tenantSlug, value, onChange, label }: 
               </button>
             </div>
             <div className="flex justify-between text-xs text-gray-400 mt-1">
-              <span>← Meer zien</span>
-              <span>Minder zien →</span>
+              <span>{t('ui.imageZoomPickerLegendZoomWide')}</span>
+              <span>{t('ui.imageZoomPickerLegendZoomTight')}</span>
             </div>
           </div>
           
           {/* Verticale positie slider - altijd tonen */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-gray-600 font-medium">↕️ Verticale positie</span>
+              <span className="text-xs text-gray-600 font-medium">{t('ui.imageZoomPickerVertical')}</span>
               <span className="text-xs text-gray-500 font-mono">{settings.positionY}%</span>
             </div>
             <input
@@ -204,15 +204,15 @@ export default function ImageZoomPicker({ tenantSlug, value, onChange, label }: 
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
             />
             <div className="flex justify-between text-xs text-gray-400 mt-1">
-              <span>Bovenkant (plafond)</span>
-              <span>Onderkant (tafels)</span>
+              <span>{t('ui.imageZoomPickerVerticalTop')}</span>
+              <span>{t('ui.imageZoomPickerVerticalBottom')}</span>
             </div>
           </div>
 
           {/* Horizontale positie slider */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-gray-600 font-medium">↔️ Horizontale positie</span>
+              <span className="text-xs text-gray-600 font-medium">{t('ui.imageZoomPickerHorizontal')}</span>
               <span className="text-xs text-gray-500 font-mono">{settings.positionX}%</span>
             </div>
             <input
@@ -225,8 +225,8 @@ export default function ImageZoomPicker({ tenantSlug, value, onChange, label }: 
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
             />
             <div className="flex justify-between text-xs text-gray-400 mt-1">
-              <span>Links</span>
-              <span>Rechts</span>
+              <span>{t('ui.imageZoomPickerHorizontalLeft')}</span>
+              <span>{t('ui.imageZoomPickerHorizontalRight')}</span>
             </div>
           </div>
           
@@ -235,7 +235,7 @@ export default function ImageZoomPicker({ tenantSlug, value, onChange, label }: 
             onClick={() => onChange({ ...settings, zoom: 1, positionX: 50, positionY: 50 })}
             className="w-full py-2 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            ↺ Reset naar midden
+            {t('ui.imageZoomPickerReset')}
           </button>
         </div>
       )}
