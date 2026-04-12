@@ -130,6 +130,17 @@ const nextConfig = {
   async rewrites() {
     return [{ source: '/manifest.json', destination: '/manifest' }]
   },
+  /** Apex zonder www → canoniek op www (minder dubbele URL’s in Search Console). */
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'vysionhoreca.com' }],
+        destination: 'https://www.vysionhoreca.com/:path*',
+        permanent: true,
+      },
+    ]
+  },
 }
 
 module.exports = withSentryConfig(nextConfig, {
