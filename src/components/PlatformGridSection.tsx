@@ -116,7 +116,8 @@ export default function PlatformGridSection() {
           <p className="text-sm sm:text-base text-gray-600 leading-snug">
             {t('platform.gridTrustLine')}
           </p>
-          <div className="mt-5 flex flex-col items-stretch justify-center gap-3 sm:mt-6 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-4">
+          <div className="mt-[2cm] flex flex-col gap-3 sm:gap-4">
+          <div className="flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-4">
             <a
               href={`/registreer?lang=${locale}`}
               className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:min-w-[200px] sm:text-base"
@@ -145,7 +146,7 @@ export default function PlatformGridSection() {
               <ExternalLink className={ctaExternalIconClass} aria-hidden />
             </a>
           </div>
-          <div className="mt-3 flex flex-col items-stretch justify-center gap-3 sm:mt-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-4">
+          <div className="flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-4">
             <a
               href={DEMO_CAFE_MENU_URL}
               target="_blank"
@@ -176,6 +177,7 @@ export default function PlatformGridSection() {
               <span className="min-w-0">{t('platform.gridDemoCremerieCta')}</span>
               <ExternalLink className={ctaExternalIconClass} aria-hidden />
             </a>
+          </div>
           </div>
         </div>
       </div>
