@@ -477,8 +477,8 @@ function PromoMarqueeBand() {
 }
 
 // Pricing Section
-/** Premium-kaart: reserveringsregel staat onder de titel; niet dubbel in de lijst. */
-const PREMIUM_CARD_FEATURES = [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12] as const
+/** Premium-kaart: alle Pro+-features in de vinkjeslijst (incl. reserveringsplatform). */
+const PREMIUM_CARD_FEATURES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const
 
 function PricingSection() {
   const { t, locale } = useLanguage()
@@ -605,9 +605,6 @@ function PricingSection() {
                     </div>
                     <h3 className="text-xl font-bold text-accent">{t('pricing.pro.name')}</h3>
                   </div>
-                  <p className="mt-2 text-center text-sm font-semibold text-accent sm:text-base">
-                    {t('pricing.pro.features.9')}
-                  </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 mb-2">
                   <span className="text-lg text-gray-400 line-through">
@@ -648,7 +645,15 @@ function PricingSection() {
                       >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span className="text-gray-600 text-sm sm:text-base leading-snug">{t(`pricing.pro.features.${i}`)}</span>
+                      <span
+                        className={
+                          i === 9
+                            ? 'text-accent text-sm sm:text-base font-semibold leading-snug'
+                            : 'text-gray-600 text-sm sm:text-base leading-snug'
+                        }
+                      >
+                        {t(`pricing.pro.features.${i}`)}
+                      </span>
                     </li>
                   ))}
                 </ul>
