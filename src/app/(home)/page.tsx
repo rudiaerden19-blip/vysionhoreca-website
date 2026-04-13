@@ -645,13 +645,7 @@ function PricingSection() {
                       >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span
-                        className={
-                          i === 9
-                            ? 'text-accent text-sm sm:text-base font-semibold leading-snug'
-                            : 'text-gray-600 text-sm sm:text-base leading-snug'
-                        }
-                      >
+                      <span className="text-gray-600 text-sm sm:text-base leading-snug">
                         {t(`pricing.pro.features.${i}`)}
                       </span>
                     </li>
