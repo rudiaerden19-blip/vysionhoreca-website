@@ -2016,16 +2016,28 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           <img
                             src={catImage}
                             alt={cat.name}
-                            className="pointer-events-none absolute inset-0 h-full w-full object-contain object-center"
+                            className="pointer-events-none absolute inset-0 h-full w-full object-cover object-center"
                           />
                         ) : null}
-                        <div
-                          className="pointer-events-none absolute bottom-0 left-0 right-0 h-[46%] bg-gradient-to-t from-black/80 via-black/25 to-transparent"
-                          aria-hidden
-                        />
                         <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center justify-end p-1.5 pb-2 sm:p-2">
-                          {cat.icon && <span className="text-lg sm:text-xl md:text-2xl mb-0.5 drop-shadow">{cat.icon}</span>}
-                          <span className="text-center text-sm font-bold text-white drop-shadow-lg sm:text-base md:text-lg lg:text-xl leading-tight line-clamp-2">
+                          {cat.icon && (
+                            <span
+                              className={`mb-0.5 text-lg sm:text-xl md:text-2xl ${
+                                catImage
+                                  ? 'text-white [filter:drop-shadow(0_2px_4px_rgba(0,0,0,.85))]'
+                                  : 'text-gray-800'
+                              }`}
+                            >
+                              {cat.icon}
+                            </span>
+                          )}
+                          <span
+                            className={`text-center text-sm font-bold leading-tight line-clamp-2 sm:text-base md:text-lg lg:text-xl ${
+                              catImage
+                                ? 'text-white [text-shadow:0_2px_8px_rgba(0,0,0,.9),0_1px_2px_rgba(0,0,0,1)]'
+                                : 'text-gray-900'
+                            }`}
+                          >
                             {cat.name}
                           </span>
                         </div>
@@ -2055,40 +2067,50 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                         <button
                           key={product.id}
                           onClick={() => handleProductClick(product)}
-                          className="flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden rounded-xl bg-white text-left active:scale-95 transition-transform relative"
+                          className="relative h-full min-h-0 w-full min-w-0 overflow-hidden rounded-xl bg-neutral-100 text-left active:scale-95 transition-transform"
                           style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.35)' }}
                         >
-                          <div className="relative min-h-0 flex-1 w-full min-w-0 overflow-hidden bg-neutral-100">
-                            {product.image_url ? (
-                              <img
-                                src={product.image_url}
-                                alt={product.name}
-                                className="absolute inset-0 h-full w-full object-contain object-center"
-                              />
-                            ) : (
-                              <span className="absolute inset-0 flex items-center justify-center text-4xl text-gray-300">
-                                🍽️
-                              </span>
-                            )}
-                            {inCart > 0 && (
-                              <div className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-emerald-500 text-white text-xs font-bold flex items-center justify-center shadow-md">
-                                {inCart}
-                              </div>
-                            )}
-                            {hasOpts && (
-                              <div className="absolute top-1.5 left-1.5 bg-amber-400 text-white text-xs font-bold px-1.5 py-0.5 rounded-md shadow">
-                                ⚙️
-                              </div>
-                            )}
-                          </div>
-                          <div className="shrink-0 border-t border-gray-100 px-1.5 py-1">
-                            <p className="line-clamp-2 text-xs font-bold leading-tight text-gray-800 sm:text-sm">
+                          {product.image_url ? (
+                            <img
+                              src={product.image_url}
+                              alt={product.name}
+                              className="pointer-events-none absolute inset-0 h-full w-full object-cover object-center"
+                            />
+                          ) : (
+                            <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-neutral-100 text-4xl text-gray-300">
+                              🍽️
+                            </span>
+                          )}
+                          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-1.5 pb-1.5 pt-1 sm:pb-2">
+                            <p
+                              className={`line-clamp-2 text-xs font-bold leading-tight sm:text-sm ${
+                                product.image_url
+                                  ? 'text-white [text-shadow:0_2px_8px_rgba(0,0,0,.9),0_1px_2px_rgba(0,0,0,1)]'
+                                  : 'text-gray-900'
+                              }`}
+                            >
                               {product.name}
                             </p>
-                            <p className="mt-0.5 text-sm font-bold text-emerald-600 sm:text-base">
+                            <p
+                              className={`mt-0.5 text-sm font-bold sm:text-base ${
+                                product.image_url
+                                  ? 'text-emerald-300 [text-shadow:0_2px_6px_rgba(0,0,0,.85),0_1px_2px_rgba(0,0,0,1)]'
+                                  : 'text-emerald-600'
+                              }`}
+                            >
                               €{product.price.toFixed(2)}
                             </p>
                           </div>
+                          {inCart > 0 && (
+                            <div className="absolute top-1.5 right-1.5 z-20 w-6 h-6 rounded-full bg-emerald-500 text-white text-xs font-bold flex items-center justify-center shadow-md">
+                              {inCart}
+                            </div>
+                          )}
+                          {hasOpts && (
+                            <div className="absolute top-1.5 left-1.5 z-20 bg-amber-400 text-white text-xs font-bold px-1.5 py-0.5 rounded-md shadow">
+                              ⚙️
+                            </div>
+                          )}
                         </button>
                       )
                     })}
