@@ -2021,10 +2021,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                             />
                           </div>
                         ) : null}
-                        <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center justify-end p-1.5 pb-2 sm:p-2">
+                        <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center justify-end px-2 pb-2 pt-4 sm:px-3 sm:pb-3 sm:pt-5">
                           {cat.icon && (
                             <span
-                              className={`mb-0.5 text-lg sm:text-xl md:text-2xl ${
+                              className={`mb-1 text-xl sm:text-2xl md:text-3xl ${
                                 catImage
                                   ? 'text-white [filter:drop-shadow(0_2px_4px_rgba(0,0,0,.85))]'
                                   : 'text-gray-800'
@@ -2034,7 +2034,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                             </span>
                           )}
                           <span
-                            className={`text-center text-sm font-bold leading-tight line-clamp-2 sm:text-base md:text-lg lg:text-xl ${
+                            className={`text-center text-base font-extrabold leading-tight line-clamp-2 sm:text-lg md:text-2xl lg:text-3xl tracking-tight ${
                               catImage
                                 ? 'text-white [text-shadow:0_2px_8px_rgba(0,0,0,.9),0_1px_2px_rgba(0,0,0,1)]'
                                 : 'text-gray-900'
