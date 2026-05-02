@@ -2020,15 +2020,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                               className="pointer-events-none absolute inset-0 block h-full min-h-0 w-full select-none object-cover object-center !h-full !w-full !max-w-none"
                             />
                             <div
-                              className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[5.25rem] bg-gradient-to-t from-neutral-950/92 via-neutral-950/45 to-transparent"
+                              className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-32 bg-gradient-to-t from-neutral-950/[0.94] via-neutral-950/55 to-transparent sm:h-36"
                               aria-hidden
                             />
-                            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2 pt-10 sm:px-2.5 sm:pb-2.5">
-                              <div className="flex flex-col items-center gap-1 text-center">
+                            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2.5 pt-12 sm:px-3 sm:pb-3 sm:pt-14">
+                              <div className="flex flex-col items-center gap-1.5 text-center">
                                 {cat.icon ? (
-                                  <span className="text-base text-white drop-shadow sm:text-lg md:text-xl">{cat.icon}</span>
+                                  <span className="text-2xl text-amber-200 drop-shadow-[0_2px_4px_rgba(0,0,0,.95)] sm:text-3xl md:text-4xl">
+                                    {cat.icon}
+                                  </span>
                                 ) : null}
-                                <span className="line-clamp-2 text-base font-extrabold leading-tight tracking-tight text-white drop-shadow-[0_1px_2px_rgba(0,0,0,.95)] sm:text-lg md:text-xl lg:text-2xl">
+                                <span className="line-clamp-2 text-xl font-black leading-tight tracking-tight text-amber-50 [text-shadow:0_0_1px_rgba(0,0,0,1),0_2px_4px_rgba(0,0,0,.98),0_4px_18px_rgba(0,0,0,.85)] sm:text-2xl md:text-3xl lg:text-4xl">
                                   {cat.name}
                                 </span>
                               </div>
@@ -2039,8 +2041,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                             <div className="pointer-events-none flex h-full w-full flex-col items-center justify-center gap-3 bg-neutral-100 pt-10 pb-20">
                               {cat.icon ? <span className="text-5xl text-neutral-700">{cat.icon}</span> : null}
                             </div>
-                            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 border-t border-neutral-200 bg-neutral-50/95 px-2 pb-2 pt-2 sm:pb-2.5">
-                              <span className="block text-center text-base font-extrabold leading-tight text-neutral-900 sm:text-lg md:text-xl">
+                            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 border-t border-neutral-200 bg-neutral-50/95 px-2 pb-2.5 pt-2 sm:px-3 sm:pb-3 sm:pt-2.5">
+                              <span className="block text-center text-xl font-black leading-snug text-neutral-950 sm:text-2xl md:text-3xl">
                                 {cat.name}
                               </span>
                             </div>
@@ -2083,14 +2085,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                                 className="pointer-events-none absolute inset-0 block h-full min-h-0 w-full select-none object-cover object-center !h-full !w-full !max-w-none"
                               />
                               <div
-                                className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[5.75rem] bg-gradient-to-t from-neutral-950/92 via-neutral-950/45 to-transparent"
+                                className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-36 bg-gradient-to-t from-neutral-950/[0.94] via-neutral-950/55 to-transparent sm:h-[8.75rem]"
                                 aria-hidden
                               />
-                              <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2 pt-10 sm:px-2.5 sm:pb-2.5">
-                                <p className="line-clamp-2 text-base font-extrabold leading-tight tracking-tight text-white drop-shadow-[0_1px_2px_rgba(0,0,0,.95)] sm:text-lg md:text-xl">
+                              <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2.5 pt-12 sm:px-3 sm:pb-3 sm:pt-14">
+                                <p className="line-clamp-2 text-xl font-black leading-snug tracking-tight text-amber-50 [text-shadow:0_0_1px_rgba(0,0,0,1),0_2px_4px_rgba(0,0,0,.98),0_4px_18px_rgba(0,0,0,.85)] sm:text-2xl md:text-3xl">
                                   {product.name}
                                 </p>
-                                <p className="mt-0.5 text-lg font-bold text-emerald-300 drop-shadow-[0_1px_2px_rgba(0,0,0,.9)] sm:text-xl md:text-2xl">
+                                <p className="mt-1 text-2xl font-black tabular-nums text-emerald-300 [text-shadow:0_0_1px_rgba(0,0,0,1),0_2px_6px_rgba(0,0,0,.95)] sm:text-3xl md:text-4xl">
                                   €{product.price.toFixed(2)}
                                 </p>
                               </div>
@@ -2100,11 +2102,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                               <div className="pointer-events-none flex h-full w-full items-center justify-center bg-neutral-100 pb-28 pt-10">
                                 <span className="text-5xl text-neutral-300">🍽️</span>
                               </div>
-                              <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 border-t border-neutral-200 bg-neutral-50/95 px-2 py-2 sm:pb-2.5">
-                                <p className="line-clamp-2 text-base font-extrabold text-neutral-900 sm:text-lg md:text-xl">
+                              <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 border-t border-neutral-200 bg-neutral-50/95 px-2 pb-2.5 pt-2 sm:px-3 sm:pb-3 sm:pt-2.5">
+                                <p className="line-clamp-2 text-xl font-black leading-snug text-neutral-950 sm:text-2xl md:text-3xl">
                                   {product.name}
                                 </p>
-                                <p className="mt-0.5 text-lg font-bold text-emerald-600 sm:text-xl md:text-2xl">
+                                <p className="mt-1 text-2xl font-black tabular-nums text-emerald-700 sm:text-3xl md:text-4xl">
                                   €{product.price.toFixed(2)}
                                 </p>
                               </div>
