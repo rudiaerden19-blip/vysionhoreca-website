@@ -1965,7 +1965,10 @@
       "imageCover": "Groß",
       "imageContain": "Vollständig",
       "noProductsFound": "Keine Produkte gefunden",
-      "adjustFilters": "Filter anpassen oder neues Produkt hinzufügen"
+      "adjustFilters": "Filter anpassen oder neues Produkt hinzufügen",
+      "kassaImageZoom": "Kachel-Zoom Kasse",
+      "kassaImageZoomHint": "Nur Kassenansicht. Höher = stärker zoomen (z. B. Flaschen besser auf der Kachel).",
+      "kassaImageZoomPreview": "Vorschau für die Kasse"
     },
     "opties": {
       "title": "Optionen & Extras",

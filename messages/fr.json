@@ -1965,7 +1965,10 @@
       "imageCover": "Grand",
       "imageContain": "Complet",
       "noProductsFound": "Aucun produit trouvé",
-      "adjustFilters": "Modifiez les filtres ou ajoutez un produit"
+      "adjustFilters": "Modifiez les filtres ou ajoutez un produit",
+      "kassaImageZoom": "Zoom tuile caisse",
+      "kassaImageZoomHint": "Uniquement l’écran caisse. Plus = zoom avant pour mieux cadrer (ex. bouteilles).",
+      "kassaImageZoomPreview": "Aperçu caisse approximatif"
     },
     "opties": {
       "title": "Options & Extras",

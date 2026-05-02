@@ -2465,7 +2465,10 @@
       "imageCover": "Grande",
       "imageContain": "Completo",
       "noProductsFound": "No se encontraron productos",
-      "adjustFilters": "Ajusta los filtros o añade un producto nuevo"
+      "adjustFilters": "Ajusta los filtros o añade un producto nuevo",
+      "kassaImageZoom": "Zoom azulejo TP",
+      "kassaImageZoomHint": "Solo en la vista TPV. Más alto = más zoom para cuadrar botellas u objetos altos.",
+      "kassaImageZoomPreview": "Vista previa aproximada"
     },
     "opties": {
       "title": "Opciones y Extras",

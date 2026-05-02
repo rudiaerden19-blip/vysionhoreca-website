@@ -234,6 +234,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     promo_price: undefined,
     allergens: [],
     image_display_mode: null,
+    kassa_image_zoom: 1,
     print_label: false,
   })
 
@@ -374,6 +375,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
       promo_price: undefined,
       allergens: [],
       image_display_mode: null,
+      kassa_image_zoom: 1,
       print_label: false,
     })
     setSelectedOptionIds([])
@@ -427,6 +429,10 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
       sort_order: editingProduct?.sort_order || products.length,
       allergens: formData.allergens || [],
       image_display_mode: formData.image_display_mode || null,
+      kassa_image_zoom:
+        typeof formData.kassa_image_zoom === 'number' && Number.isFinite(formData.kassa_image_zoom)
+          ? Math.min(1.85, Math.max(1, formData.kassa_image_zoom))
+          : 1,
       print_label: formData.print_label ?? false,
     }
 
@@ -700,6 +706,67 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                     value={formData.image_url || ''}
                     onChange={(url) => setFormData(prev => ({ ...prev, image_url: url }))}
                   />
+                  {!!formData.image_url?.trim() && (
+                    <div className="space-y-3 rounded-xl border border-gray-100 bg-gray-50/80 p-4">
+                      <div>
+                        <label className="mb-1 block text-sm font-medium text-gray-800">
+                          {t('adminPages.producten.kassaImageZoom')}
+                        </label>
+                        <p className="text-xs text-gray-600">{t('adminPages.producten.kassaImageZoomHint')}</p>
+                      </div>
+                      <p className="text-xs font-medium text-gray-500">
+                        {t('adminPages.producten.kassaImageZoomPreview')}
+                      </p>
+                      <div className="relative mx-auto aspect-[4/5] w-full max-w-[200px] overflow-hidden rounded-xl bg-neutral-300 ring-2 ring-neutral-400/30">
+                        <img
+                          src={formData.image_url}
+                          alt=""
+                          className="h-full w-full object-cover object-center"
+                          style={{
+                            transform: `scale(${
+                              typeof formData.kassa_image_zoom === 'number' &&
+                              Number.isFinite(formData.kassa_image_zoom)
+                                ? Math.min(1.85, Math.max(1, formData.kassa_image_zoom))
+                                : 1
+                            })`,
+                            transformOrigin: 'center 78%',
+                          }}
+                        />
+                      </div>
+                      <input
+                        type="range"
+                        min={1}
+                        max={1.85}
+                        step={0.05}
+                        value={
+                          typeof formData.kassa_image_zoom === 'number' &&
+                          Number.isFinite(formData.kassa_image_zoom)
+                            ? Math.min(1.85, Math.max(1, formData.kassa_image_zoom))
+                            : 1
+                        }
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            kassa_image_zoom: parseFloat(e.target.value),
+                          }))
+                        }
+                        className="w-full accent-orange-500"
+                      />
+                      <div className="flex justify-between text-xs text-gray-500">
+                        <span>100%</span>
+                        <span>
+                          {Math.round(
+                            (typeof formData.kassa_image_zoom === 'number' &&
+                            Number.isFinite(formData.kassa_image_zoom)
+                              ? Math.min(1.85, Math.max(1, formData.kassa_image_zoom))
+                              : 1) * 100
+                          )}
+                          %
+                        </span>
+                        <span>185%</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* ── SECTIE 3: Status toggles ── */}

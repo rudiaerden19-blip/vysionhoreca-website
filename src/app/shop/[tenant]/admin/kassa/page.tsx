@@ -2070,6 +2070,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     {filtered.map(product => {
                       const inCart = cart.filter(i => i.product.id === product.id).reduce((s, i) => s + i.quantity, 0)
                       const hasOpts = productsWithOptions.includes(product.id!)
+                      const kioskZoom =
+                        typeof product.kassa_image_zoom === 'number' &&
+                        Number.isFinite(product.kassa_image_zoom) &&
+                        product.kassa_image_zoom >= 1
+                          ? Math.min(1.85, product.kassa_image_zoom)
+                          : 1
                       return (
                         <button
                           key={product.id}
@@ -2079,11 +2085,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                         >
                           {product.image_url ? (
                             <>
-                              <img
-                                src={product.image_url}
-                                alt={product.name}
-                                className="pointer-events-none absolute inset-0 block h-full min-h-0 w-full select-none object-cover object-center !h-full !w-full !max-w-none"
-                              />
+                              <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                                <img
+                                  src={product.image_url}
+                                  alt={product.name}
+                                  style={{
+                                    transform: `scale(${kioskZoom})`,
+                                    transformOrigin: 'center 78%',
+                                  }}
+                                  className="pointer-events-none block h-full min-h-0 w-full select-none object-cover object-center !h-full !w-full !max-w-none"
+                                />
+                              </div>
                               <div
                                 className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-36 bg-gradient-to-t from-neutral-950/[0.94] via-neutral-950/55 to-transparent sm:h-[8.75rem]"
                                 aria-hidden

@@ -2465,7 +2465,10 @@
       "imageCover": "كبير",
       "imageContain": "كامل",
       "noProductsFound": "لم يُعثر على منتجات",
-      "adjustFilters": "عدّل المرشحات أو أضف منتجاً جديداً"
+      "adjustFilters": "عدّل المرشحات أو أضف منتجاً جديداً",
+      "kassaImageZoom": "تكبير مربع الكاشير",
+      "kassaImageZoomHint": "لشاشة نقطة البيع فقط. كلما زادت القيمة زاد التكبير لملاءمة الصور الطويلة (مثل الزجاجات).",
+      "kassaImageZoomPreview": "معاينة تقريبية للكاشير"
     },
     "opties": {
       "title": "الخيارات والإضافات",

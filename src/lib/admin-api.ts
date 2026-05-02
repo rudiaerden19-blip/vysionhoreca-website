@@ -768,6 +768,8 @@ export interface MenuProduct {
   allergens: string[]
   image_display_mode?: 'cover' | 'contain' | null  // null = gebruik tenant instelling
   print_label?: boolean  // Print sticker/label for this product
+  /** Zoom op kassa-tegel (≥1): object-cover framing; UI begrenst 1..1.85 */
+  kassa_image_zoom?: number | null
   track_stock?: boolean
   stock_quantity?: number
   low_stock_threshold?: number
@@ -796,7 +798,15 @@ export async function getMenuProducts(tenantSlug: string, signal?: AbortSignal):
 }
 
 export async function saveMenuProduct(product: MenuProduct): Promise<{ data: MenuProduct | null; error?: string }> {
-  const { is_promo, promo_price, image_display_mode, print_label, ...baseProduct } = product
+  const { is_promo, promo_price, image_display_mode, print_label, kassa_image_zoom, ...baseProduct } =
+    product
+
+  const zoomClamped =
+    kassa_image_zoom != null &&
+    typeof kassa_image_zoom === 'number' &&
+    Number.isFinite(kassa_image_zoom)
+      ? Math.min(1.85, Math.max(1, kassa_image_zoom))
+      : undefined
 
   const fullProduct = {
     ...baseProduct,
@@ -804,6 +814,7 @@ export async function saveMenuProduct(product: MenuProduct): Promise<{ data: Men
     ...(promo_price !== undefined && { promo_price }),
     ...(image_display_mode !== undefined && { image_display_mode }),
     ...(print_label !== undefined && { print_label }),
+    ...(zoomClamped !== undefined && { kassa_image_zoom: zoomClamped }),
   }
 
   const { data, error } = await supabase
@@ -812,7 +823,10 @@ export async function saveMenuProduct(product: MenuProduct): Promise<{ data: Men
     .select()
     .single()
 
-  if (!error) return { data }
+  if (!error) {
+    cache.invalidate(cacheKey('menu_products', product.tenant_slug))
+    return { data }
+  }
 
   // Fallback zonder optionele kolommen
   console.warn('Falling back, error was:', error.message)
@@ -826,6 +840,7 @@ export async function saveMenuProduct(product: MenuProduct): Promise<{ data: Men
     console.error('Error saving menu product:', fallbackError)
     return { data: null, error: fallbackError.message }
   }
+  cache.invalidate(cacheKey('menu_products', product.tenant_slug))
   return { data: fallbackData }
 }
 

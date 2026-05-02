@@ -2465,7 +2465,10 @@
       "imageCover": "Grande",
       "imageContain": "Completo",
       "noProductsFound": "Nessun prodotto trovato",
-      "adjustFilters": "Modifica i filtri o aggiungi un nuovo prodotto"
+      "adjustFilters": "Modifica i filtri o aggiungi un nuovo prodotto",
+      "kassaImageZoom": "Zoom riquadro cassa",
+      "kassaImageZoomHint": "Solo schermo cassa. Più alto = più zoom per bottiglie o foto molto verticali.",
+      "kassaImageZoomPreview": "Anteprima approssimativa"
     },
     "opties": {
       "title": "Opzioni ed Extra",

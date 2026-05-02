@@ -2764,7 +2764,10 @@
       "imageCover": "Groot",
       "imageContain": "Volledig",
       "noProductsFound": "Geen producten gevonden",
-      "adjustFilters": "Pas je filters aan of voeg een nieuw product toe"
+      "adjustFilters": "Pas je filters aan of voeg een nieuw product toe",
+      "kassaImageZoom": "Zoom kassa-tegel",
+      "kassaImageZoomHint": "Alleen op het kassascherm. Hoger percentage = meer inzoomen om lange foto’s (bijv. flessen) beter op de tegel te krijgen.",
+      "kassaImageZoomPreview": "Voorbeeld hoe het er op de kassa uitziet"
     },
     "opties": {
       "title": "Opties & Extra's",
