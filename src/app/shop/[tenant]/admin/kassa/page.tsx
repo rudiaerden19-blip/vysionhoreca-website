@@ -2013,13 +2013,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                         className="relative h-full min-h-0 w-full min-w-0 overflow-hidden rounded-xl border border-neutral-200/90 bg-neutral-100 active:scale-95 transition-transform shadow-[0_8px_30px_rgba(0,0,0,0.35)]"
                       >
                         {catImage ? (
-                          <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-neutral-100">
-                            <img
-                              src={catImage}
-                              alt={cat.name}
-                              className="max-h-full max-w-full object-contain object-center"
-                            />
-                          </div>
+                          <img
+                            src={catImage}
+                            alt={cat.name}
+                            className="pointer-events-none absolute inset-0 h-full w-full object-cover object-center"
+                          />
                         ) : null}
                         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 pb-2 sm:pb-3">
                           {catImage ? (
@@ -2081,13 +2079,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.35)' }}
                         >
                           {product.image_url ? (
-                            <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-neutral-100">
-                              <img
-                                src={product.image_url}
-                                alt={product.name}
-                                className="max-h-full max-w-full object-contain object-center"
-                              />
-                            </div>
+                            <img
+                              src={product.image_url}
+                              alt={product.name}
+                              className="pointer-events-none absolute inset-0 h-full w-full object-cover object-center"
+                            />
                           ) : (
                             <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-neutral-100 text-4xl text-gray-300">
                               🍽️
