@@ -2766,7 +2766,7 @@
       "noProductsFound": "No products found",
       "adjustFilters": "Adjust your filters or add a new product",
       "kassaImageZoom": "POS tile zoom",
-      "kassaImageZoomHint": "POS screen only. A higher value zooms in so tall shots (e.g. bottles) fit the tile better.",
+      "kassaImageZoomHint": "POS screen only. Under 100% zooms out to show more of the photo; above 100% zooms in for a tighter crop.",
       "kassaImageZoomPreview": "Approximate kiosk preview"
     },
     "opties": {

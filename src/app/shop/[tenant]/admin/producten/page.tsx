@@ -27,9 +27,12 @@ import {
   getProductOptions,
   getProductOptionLinks,
   saveProductOptionLinks,
-  MenuProduct, 
+  MenuProduct,
   MenuCategory,
-  ProductOption
+  ProductOption,
+  clampKassaProductImageZoom,
+  KASSA_PRODUCT_IMAGE_ZOOM_MIN,
+  KASSA_PRODUCT_IMAGE_ZOOM_MAX,
 } from '@/lib/admin-api'
 import MediaPicker from '@/components/MediaPicker'
 import { useLanguage } from '@/i18n'
@@ -343,6 +346,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
   }
 
   const openEditModal = async (product: MenuProduct) => {
+    setError('')
     // Reload categories in case new ones were added
     const freshCategories = await getMenuCategories(params.tenant)
     setCategories(freshCategories)
@@ -359,6 +363,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
   }
 
   const openAddModal = async () => {
+    setError('')
     // Reload categories in case new ones were added
     const freshCategories = await getMenuCategories(params.tenant)
     setCategories(freshCategories)
@@ -387,6 +392,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     setEditingProduct(null)
     setFormData({})
     setSelectedOptionIds([])
+    setError('')
   }
 
   const toggleOptionSelection = (optionId: string) => {
@@ -414,46 +420,51 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     setSaving(true)
     setError('')
 
-    const productData: MenuProduct = {
-      id: editingProduct?.id,
-      tenant_slug: params.tenant,
-      category_id: formData.category_id || null,
-      name: formData.name || '',
-      description: formData.description || '',
-      price: formData.price || 0,
-      image_url: formData.image_url || '',
-      is_active: formData.is_active ?? true,
-      is_popular: formData.is_popular ?? false,
-      is_promo: formData.is_promo ?? false,
-      promo_price: formData.is_promo ? (formData.promo_price || 0) : undefined,
-      sort_order: editingProduct?.sort_order || products.length,
-      allergens: formData.allergens || [],
-      image_display_mode: formData.image_display_mode || null,
-      kassa_image_zoom:
-        typeof formData.kassa_image_zoom === 'number' && Number.isFinite(formData.kassa_image_zoom)
-          ? Math.min(1.85, Math.max(1, formData.kassa_image_zoom))
-          : 1,
-      print_label: formData.print_label ?? false,
-    }
+    try {
+      const productData: MenuProduct = {
+        id: editingProduct?.id,
+        tenant_slug: params.tenant,
+        category_id: formData.category_id || null,
+        name: formData.name || '',
+        description: formData.description || '',
+        price: formData.price || 0,
+        image_url: formData.image_url || '',
+        is_active: formData.is_active ?? true,
+        is_popular: formData.is_popular ?? false,
+        is_promo: formData.is_promo ?? false,
+        promo_price: formData.is_promo ? (formData.promo_price || 0) : undefined,
+        sort_order: editingProduct?.sort_order || products.length,
+        allergens: formData.allergens || [],
+        image_display_mode: formData.image_display_mode || null,
+        kassa_image_zoom: clampKassaProductImageZoom(formData.kassa_image_zoom as number),
+        print_label: formData.print_label ?? false,
+      }
 
-    const { data: result, error: saveError } = await saveMenuProduct(productData)
-    
-    if (result) {
-      // Save option links
+      const { data: result, error: saveError } = await saveMenuProduct(productData)
+
+      if (!result) {
+        setError(saveError || t('adminPages.producten.saveFailed'))
+        return
+      }
+
       if (result.id) {
         await saveProductOptionLinks(result.id, selectedOptionIds, params.tenant)
       }
-      
+
       if (editingProduct) {
-        setProducts(prev => prev.map(p => p.id === result.id ? result : p))
+        setProducts((prev) => prev.map((p) => (p.id === result.id ? result : p)))
       } else {
-        setProducts(prev => [...prev, result])
+        setProducts((prev) => [...prev, result])
       }
       closeModal()
-    } else {
-      setError(saveError || t('adminPages.producten.saveFailed'))
+    } catch (e) {
+      console.error('saveMenuProduct failed', e)
+      setError(
+        e instanceof Error ? e.message : t('adminPages.producten.saveFailed')
+      )
+    } finally {
+      setSaving(false)
     }
-    setSaving(false)
   }
 
   const getCategoryName = (categoryId: string | null) => {
@@ -620,12 +631,18 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                     {editingProduct ? t('adminPages.producten.editProduct') : t('adminPages.producten.newProduct')}
                   </h2>
                   <button
+                    type="button"
                     onClick={closeModal}
                     className="p-2 hover:bg-gray-100 rounded-lg"
                   >
                     ✕
                   </button>
                 </div>
+                {error ? (
+                  <p className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                    {error}
+                  </p>
+                ) : null}
               </div>
 
               <div className="p-6 space-y-6">
@@ -723,27 +740,17 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                           alt=""
                           className="h-full w-full object-cover object-center"
                           style={{
-                            transform: `scale(${
-                              typeof formData.kassa_image_zoom === 'number' &&
-                              Number.isFinite(formData.kassa_image_zoom)
-                                ? Math.min(1.85, Math.max(1, formData.kassa_image_zoom))
-                                : 1
-                            })`,
+                            transform: `scale(${clampKassaProductImageZoom(formData.kassa_image_zoom as number)})`,
                             transformOrigin: 'center 78%',
                           }}
                         />
                       </div>
                       <input
                         type="range"
-                        min={1}
-                        max={1.85}
+                        min={KASSA_PRODUCT_IMAGE_ZOOM_MIN}
+                        max={KASSA_PRODUCT_IMAGE_ZOOM_MAX}
                         step={0.05}
-                        value={
-                          typeof formData.kassa_image_zoom === 'number' &&
-                          Number.isFinite(formData.kassa_image_zoom)
-                            ? Math.min(1.85, Math.max(1, formData.kassa_image_zoom))
-                            : 1
-                        }
+                        value={clampKassaProductImageZoom(formData.kassa_image_zoom as number)}
                         onChange={(e) =>
                           setFormData((prev) => ({
                             ...prev,
@@ -753,17 +760,9 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                         className="w-full accent-orange-500"
                       />
                       <div className="flex justify-between text-xs text-gray-500">
-                        <span>100%</span>
-                        <span>
-                          {Math.round(
-                            (typeof formData.kassa_image_zoom === 'number' &&
-                            Number.isFinite(formData.kassa_image_zoom)
-                              ? Math.min(1.85, Math.max(1, formData.kassa_image_zoom))
-                              : 1) * 100
-                          )}
-                          %
-                        </span>
-                        <span>185%</span>
+                        <span>{Math.round(KASSA_PRODUCT_IMAGE_ZOOM_MIN * 100)}%</span>
+                        <span>{Math.round(clampKassaProductImageZoom(formData.kassa_image_zoom as number) * 100)}%</span>
+                        <span>{Math.round(KASSA_PRODUCT_IMAGE_ZOOM_MAX * 100)}%</span>
                       </div>
                     </div>
                   )}
@@ -890,12 +889,14 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
               {/* Footer */}
               <div className="p-6 border-t bg-gray-50 flex justify-end gap-4">
                 <button
+                  type="button"
                   onClick={closeModal}
                   className="px-6 py-3 rounded-xl font-medium text-gray-600 hover:bg-gray-200 transition-colors"
                 >
                   {t('adminPages.common.cancel')}
                 </button>
-                <button 
+                <button
+                  type="button"
                   onClick={handleSave}
                   disabled={saving}
                   className="px-6 py-3 bg-blue-700 hover:bg-blue-800 text-white rounded-xl font-medium transition-colors flex items-center gap-2"

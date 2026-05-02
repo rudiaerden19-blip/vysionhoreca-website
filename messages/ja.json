@@ -2467,7 +2467,7 @@
       "noProductsFound": "商品が見つかりません",
       "adjustFilters": "フィルターを変更するか新しい商品を追加してください",
       "kassaImageZoom": "POSタイルの拡大",
-      "kassaImageZoomHint": "レジ画面のみ。値を上げるとボトルなど縦長の写真をタイルに合わせやすくします。",
+      "kassaImageZoomHint": "レジ画面のみ。100%未満で縮小表示（写真的に範囲が広がります）、100%超で拡大・トリミング強めになります。",
       "kassaImageZoomPreview": "プレビュー（目安）"
     },
     "opties": {

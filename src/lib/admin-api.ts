@@ -768,11 +768,20 @@ export interface MenuProduct {
   allergens: string[]
   image_display_mode?: 'cover' | 'contain' | null  // null = gebruik tenant instelling
   print_label?: boolean  // Print sticker/label for this product
-  /** Zoom op kassa-tegel (≥1): object-cover framing; UI begrenst 1..1.85 */
+  /** Zoom op kassa-tegel: 1 = standaard, <1 uitzoomen, >1 inzoomen (clamp in app). */
   kassa_image_zoom?: number | null
   track_stock?: boolean
   stock_quantity?: number
   low_stock_threshold?: number
+}
+
+/** `<1` laat meer van de foto zien; `>1` snijdt strakker bij (object-cover). */
+export const KASSA_PRODUCT_IMAGE_ZOOM_MIN = 0.65
+export const KASSA_PRODUCT_IMAGE_ZOOM_MAX = 1.85
+
+export function clampKassaProductImageZoom(n: number | null | undefined): number {
+  if (n == null || typeof n !== 'number' || !Number.isFinite(n)) return 1
+  return Math.min(KASSA_PRODUCT_IMAGE_ZOOM_MAX, Math.max(KASSA_PRODUCT_IMAGE_ZOOM_MIN, n))
 }
 
 export async function getMenuProducts(tenantSlug: string, signal?: AbortSignal): Promise<MenuProduct[]> {
@@ -802,10 +811,8 @@ export async function saveMenuProduct(product: MenuProduct): Promise<{ data: Men
     product
 
   const zoomClamped =
-    kassa_image_zoom != null &&
-    typeof kassa_image_zoom === 'number' &&
-    Number.isFinite(kassa_image_zoom)
-      ? Math.min(1.85, Math.max(1, kassa_image_zoom))
+    kassa_image_zoom != null && typeof kassa_image_zoom === 'number' && Number.isFinite(kassa_image_zoom)
+      ? clampKassaProductImageZoom(kassa_image_zoom)
       : undefined
 
   const fullProduct = {

@@ -16,6 +16,7 @@ import {
   getTenantSettings,
   TenantSettings,
   syncZReportAfterOrder,
+  clampKassaProductImageZoom,
 } from '@/lib/admin-api'
 import KassaFloorPlan from '@/components/KassaFloorPlan'
 import KassaReservationsView from '@/components/KassaReservationsView'
@@ -2070,12 +2071,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     {filtered.map(product => {
                       const inCart = cart.filter(i => i.product.id === product.id).reduce((s, i) => s + i.quantity, 0)
                       const hasOpts = productsWithOptions.includes(product.id!)
-                      const kioskZoom =
-                        typeof product.kassa_image_zoom === 'number' &&
-                        Number.isFinite(product.kassa_image_zoom) &&
-                        product.kassa_image_zoom >= 1
-                          ? Math.min(1.85, product.kassa_image_zoom)
-                          : 1
+                      const kioskZoom = clampKassaProductImageZoom(product.kassa_image_zoom)
                       return (
                         <button
                           key={product.id}

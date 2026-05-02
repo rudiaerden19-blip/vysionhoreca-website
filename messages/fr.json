@@ -1967,7 +1967,7 @@
       "noProductsFound": "Aucun produit trouvé",
       "adjustFilters": "Modifiez les filtres ou ajoutez un produit",
       "kassaImageZoom": "Zoom tuile caisse",
-      "kassaImageZoomHint": "Uniquement l’écran caisse. Plus = zoom avant pour mieux cadrer (ex. bouteilles).",
+      "kassaImageZoomHint": "Écran caisse uniquement. Sous 100% = dézoom (plus de photo visible). Au-dessus = zoom avant pour un cadrage plus serré.",
       "kassaImageZoomPreview": "Aperçu caisse approximatif"
     },
     "opties": {

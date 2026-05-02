@@ -2467,7 +2467,7 @@
       "noProductsFound": "未找到产品",
       "adjustFilters": "调整筛选或添加新产品",
       "kassaImageZoom": "收银图块缩放",
-      "kassaImageZoomHint": "仅在收银界面生效。数值越高放大越多，更适合竖构图（例如酒瓶）。",
+      "kassaImageZoomHint": "仅收银端。低于 100% 为缩小显示（可见更多画面）；高于 100% 为放大、裁切更紧。",
       "kassaImageZoomPreview": "收银效果预览（示意）"
     },
     "opties": {

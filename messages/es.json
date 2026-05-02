@@ -2467,7 +2467,7 @@
       "noProductsFound": "No se encontraron productos",
       "adjustFilters": "Ajusta los filtros o añade un producto nuevo",
       "kassaImageZoom": "Zoom azulejo TP",
-      "kassaImageZoomHint": "Solo en la vista TPV. Más alto = más zoom para cuadrar botellas u objetos altos.",
+      "kassaImageZoomHint": "Solo vista TPV. Por debajo del 100% = alejar (más foto visible). Por encima = acercar para un encuadre más ajustado.",
       "kassaImageZoomPreview": "Vista previa aproximada"
     },
     "opties": {

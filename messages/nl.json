@@ -2766,7 +2766,7 @@
       "noProductsFound": "Geen producten gevonden",
       "adjustFilters": "Pas je filters aan of voeg een nieuw product toe",
       "kassaImageZoom": "Zoom kassa-tegel",
-      "kassaImageZoomHint": "Alleen op het kassascherm. Hoger percentage = meer inzoomen om lange foto’s (bijv. flessen) beter op de tegel te krijgen.",
+      "kassaImageZoomHint": "Alleen op het kassascherm. Onder 100% = uitzoomen (meer van de foto zichtbaar). Boven 100% = inzoomen voor strakkere uitsnede.",
       "kassaImageZoomPreview": "Voorbeeld hoe het er op de kassa uitziet"
     },
     "opties": {
