@@ -2010,20 +2010,24 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       <button
                         key={cat.id}
                         onClick={() => setSelectedCategory(cat)}
-                        className="relative h-full min-h-0 w-full min-w-0 overflow-hidden rounded-xl active:scale-95 transition-transform"
-                        style={{ backgroundColor: '#3C4D6B', boxShadow: '0 8px 30px rgba(0,0,0,0.35)' }}
+                        className="relative h-full min-h-0 w-full min-w-0 overflow-hidden rounded-xl border border-neutral-200/90 bg-neutral-100 active:scale-95 transition-transform shadow-[0_8px_30px_rgba(0,0,0,0.35)]"
                       >
-                        {catImage && (
-                          <img
-                            src={catImage}
-                            alt={cat.name}
-                            className="absolute inset-0 h-full w-full object-contain object-center"
-                          />
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                        <div className="absolute inset-0 flex flex-col items-center justify-end p-1.5 sm:p-2">
-                          {cat.icon && <span className="text-lg sm:text-xl md:text-2xl mb-0.5">{cat.icon}</span>}
-                          <span className="font-bold text-white text-sm sm:text-base md:text-lg lg:text-xl text-center leading-tight drop-shadow-lg line-clamp-2">
+                        {catImage ? (
+                          <div className="absolute inset-0 flex items-center justify-center bg-neutral-100 p-2">
+                            <img
+                              src={catImage}
+                              alt={cat.name}
+                              className="max-h-full max-w-full object-contain object-center"
+                            />
+                          </div>
+                        ) : null}
+                        <div
+                          className="pointer-events-none absolute bottom-0 left-0 right-0 h-[46%] bg-gradient-to-t from-black/80 via-black/25 to-transparent"
+                          aria-hidden
+                        />
+                        <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center justify-end p-1.5 pb-2 sm:p-2">
+                          {cat.icon && <span className="text-lg sm:text-xl md:text-2xl mb-0.5 drop-shadow">{cat.icon}</span>}
+                          <span className="text-center text-sm font-bold text-white drop-shadow-lg sm:text-base md:text-lg lg:text-xl leading-tight line-clamp-2">
                             {cat.name}
                           </span>
                         </div>
@@ -2056,15 +2060,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           className="flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden rounded-xl bg-white text-left active:scale-95 transition-transform relative"
                           style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.35)' }}
                         >
-                          <div className="relative min-h-0 flex-1 w-full overflow-hidden bg-gray-100">
+                          <div className="relative flex min-h-0 flex-1 w-full items-center justify-center overflow-hidden bg-neutral-100 p-1.5">
                             {product.image_url ? (
                               <img
                                 src={product.image_url}
                                 alt={product.name}
-                                className="h-full w-full object-contain object-center"
+                                className="max-h-full max-w-full object-contain object-center"
                               />
                             ) : (
-                              <span className="flex h-full w-full items-center justify-center text-4xl text-gray-300">
+                              <span className="flex h-full min-h-[3rem] w-full items-center justify-center text-4xl text-gray-300">
                                 🍽️
                               </span>
                             )}
