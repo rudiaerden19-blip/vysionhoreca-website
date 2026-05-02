@@ -1702,13 +1702,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }
 
   return (
-    <div className="flex flex-col" style={{ height: '100dvh' }} data-testid="kassa-app">
+    <div
+      className="flex min-h-0 flex-col overflow-hidden h-[100svh] max-h-[100svh] supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh]"
+      data-testid="kassa-app"
+    >
       <PostTrialModulePickerModal
         tenantSlug={tenant}
         open={needsPostTrialModulePicker && !demoViewOnly}
         onConfirmed={refetchModules}
       />
-      <div className="flex flex-col bg-[#e3e3e3] overflow-hidden flex-1 min-h-0">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[#e3e3e3]">
 
       {/* ── Blauwe navigatiebalk — volledige breedte ── */}
       <div className="flex-shrink-0 bg-[#1e293b] flex items-center px-3 gap-2 relative z-30" style={{ height: 68 }}>
@@ -1933,7 +1936,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       )}
 
       {/* ── Body: midden + rechts ── */}
-      <div className="flex flex-1 overflow-hidden min-h-0">
+      <div className="flex min-h-0 flex-1 overflow-hidden w-full">
 
         {/* ── Midden: categorieën / producten ── */}
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
@@ -1956,7 +1959,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           )}
 
           {/* Grid — min-h-0 nodig: anders groeit de flex-child mee met alle tegels en wordt onderaan afgekapt zonder scroll */}
-          <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4">
+          <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4 touch-pan-y [overflow-anchor:none]">
             {menuLoading ? (
               <div className="flex items-center justify-center h-full text-gray-400 text-lg">{t('kassaApp.loading')}</div>
             ) : !selectedCategory ? (
@@ -1968,7 +1971,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   <p className="text-sm mt-1">{t('kassaApp.noCategoriesHint')}</p>
                 </div>
               ) : (
-                <div className="grid gap-3 sm:gap-4 [grid-template-columns:repeat(auto-fill,minmax(15rem,1fr))]">
+                <div className="grid gap-3 sm:gap-4 pb-6 [grid-template-columns:repeat(auto-fill,minmax(15rem,1fr))]">
                   {categories.map(cat => {
                     const catImage = products.find(p => p.category_id === cat.id && p.image_url)?.image_url
                     return (
@@ -2003,7 +2006,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     <p className="font-semibold">{t('kassaApp.noProductsInCategory')}</p>
                   </div>
                 ) : (
-                  <div className="grid gap-3 sm:gap-4 [grid-template-columns:repeat(auto-fill,minmax(15rem,1fr))]">
+                  <div className="grid gap-3 sm:gap-4 pb-6 [grid-template-columns:repeat(auto-fill,minmax(15rem,1fr))]">
                     {filtered.map(product => {
                       const inCart = cart.filter(i => i.product.id === product.id).reduce((s, i) => s + i.quantity, 0)
                       const hasOpts = productsWithOptions.includes(product.id!)
@@ -2045,11 +2048,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
 
         {/* ── Rechts: numpad / cart ── */}
-        <div className="w-80 sm:w-96 lg:w-[380px] bg-white border-l border-gray-200 flex flex-col flex-shrink-0 min-h-0 overflow-hidden">
+        <div className="w-80 sm:w-96 lg:w-[380px] bg-white border-l border-gray-200 flex flex-col flex-shrink-0 min-h-0 min-w-0 overflow-hidden">
 
         {/* Tafel knop */}
         {orderType === 'DINE_IN' && (
-          <div className="px-3 pt-3 relative">
+          <div className="px-3 pt-3 relative shrink-0">
             <button
               onClick={() => setShowTablePicker(p => !p)}
               className="w-full py-3 rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold text-base transition-colors"
@@ -2170,8 +2173,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         {/* Besteltype banner */}
         <button
+          type="button"
           onClick={cycleOrderType}
-          className={`mx-3 mt-2 py-3 rounded-xl font-bold text-lg uppercase tracking-wide transition-colors ${
+          className={`mx-3 mt-2 shrink-0 py-3 rounded-xl font-bold text-lg uppercase tracking-wide transition-colors ${
             orderType === 'DINE_IN' ? 'bg-[#3C4D6B] text-white' :
             orderType === 'TAKEAWAY' ? 'bg-amber-500 text-black' :
             'bg-blue-600 text-white'
@@ -2184,9 +2188,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </button>
 
         {/* Cart of Numpad */}
-        <div className="flex-1 overflow-y-auto px-3 pt-2 flex flex-col">
+        <div className="flex-1 min-h-0 overflow-y-auto px-3 pt-2 flex flex-col touch-pan-y">
           {cart.length === 0 ? (
-            <div className="flex flex-col flex-1">
+            <div className="flex flex-col flex-1 min-h-0">
               <div className="bg-[#e3e3e3] rounded-xl px-3 py-2.5 mb-3 flex items-center gap-3 min-h-[5.5rem]">
                 {tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? (
                   <button
@@ -2207,7 +2211,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   className={`min-w-0 text-right text-3xl font-bold bg-transparent border-none outline-none text-black ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1' : 'w-full'}`}
                 />
               </div>
-              <div className="grid grid-cols-4 grid-rows-4 gap-2 flex-1">
+              <div className="grid grid-cols-4 grid-rows-4 gap-2 flex-1 min-h-0">
                 {['7','8','9','+','4','5','6','-','1','2','3','×','C','0','.','='].map(key => (
                   <button
                     key={key}
@@ -2311,7 +2315,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
 
         {/* Totaal + knoppen */}
-        <div className="border-t border-gray-200 p-3 space-y-2">
+        <div className="flex-shrink-0 border-t border-gray-200 p-3 space-y-2">
           <div className="flex justify-between items-center py-2 border-b border-gray-100">
             <span className="font-bold text-gray-700 text-lg">{t('kassaApp.cartTotal')}</span>
             <span className="font-bold text-[#3C4D6B] text-2xl">€{total.toFixed(2)}</span>
