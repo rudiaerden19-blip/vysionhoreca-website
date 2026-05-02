@@ -510,6 +510,9 @@ export function collectAllSubmenuIds(): string[] {
 
 export function getSubmenuIdForPathname(pathname: string, tenantSlug: string): string | null {
   const baseUrl = `/shop/${tenantSlug}/admin`
+  const pathNoQuery = pathname.split('?')[0].replace(/\/+$/, '')
+  if (pathNoQuery === `${baseUrl}/kassa`) return null
+
   const modules = buildHamburgerModules(baseUrl, tenantSlug)
   let best: { id: string; len: number } | null = null
   for (const mod of modules) {

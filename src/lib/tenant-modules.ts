@@ -267,6 +267,13 @@ export function normalizeShopAdminPathname(pathname: string, tenantSlug: string)
   return pathname
 }
 
+/** Verkoopscherm `/shop/:slug/admin/kassa` — geen onderdeel van hamburger-submenu-toggles (die gelden voor beheerlijst onder /pincode/producten …). */
+export function isShopAdminKassaPosPath(pathnameNormalized: string, tenantSlug: string): boolean {
+  const base = `/shop/${tenantSlug}/admin/kassa`
+  const p = pathnameNormalized.split('?')[0].replace(/\/+$/, '')
+  return p === base
+}
+
 /**
  * Bestemming voor de admin-topbalk «terug naar kassa» — het verkoopscherm.
  * Submenu’s (categorieën, producten, …) gelden voor de hamburger-setup, niet voor toegang tot `/kassa`.

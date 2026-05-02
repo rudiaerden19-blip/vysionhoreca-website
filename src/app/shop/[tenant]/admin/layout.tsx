@@ -12,6 +12,7 @@ import {
   getAdminKassaEntryHref,
   getFirstAccessibleAdminPath,
   hasModuleAccessForPathname,
+  isShopAdminKassaPosPath,
   normalizeShopAdminPathname,
   submenuParentAllowedForSubmenuId,
   type TenantModuleId,
@@ -76,6 +77,13 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     needsPostTrialModulePicker,
     refetch: refetchModules,
   } = useTenantModuleFlags(params.tenant)
+
+  const adminPosHref =
+    getAdminKassaEntryHref(
+      params.tenant,
+      isSuperAdminLoggedIn() ? allTenantModulesTrue() : moduleAccess,
+      isSuperAdminLoggedIn() ? null : enabledModulesJson
+    ) ?? `${baseUrl}/kassa`
 
   const showLockButton = LOCK_PAGES.some(p => adminPath.includes(`/admin/${p}`))
 
@@ -298,6 +306,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     }
     const subId = getSubmenuIdForPathname(adminPath, params.tenant)
     if (
+      !isShopAdminKassaPosPath(adminPath, params.tenant) &&
       subId &&
       !isSubmenuForcedOn(subId) &&
       !isSubmenuEnabledInTenantConfig(
@@ -411,13 +420,21 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
           {!modulesLoading && (isSuperAdminLoggedIn() || moduleAccess['kassa']) && (
             <Link
               prefetch={false}
-              href={
-                getAdminKassaEntryHref(
-                  params.tenant,
-                  isSuperAdminLoggedIn() ? allTenantModulesTrue() : moduleAccess,
-                  isSuperAdminLoggedIn() ? null : enabledModulesJson
-                ) ?? `${baseUrl}/kassa`
-              }
+              scroll={false}
+              href={adminPosHref}
+              onClick={(ev) => {
+                if (typeof window === 'undefined') return
+                const coarsePointer = typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches
+                const likelyTouchUa = /\bTablet\b|Mobile|iPad|iPhone|Android\b/i.test(navigator.userAgent)
+                if (!coarsePointer && !likelyTouchUa) return
+                ev.preventDefault()
+                try {
+                  const u = new URL(adminPosHref, window.location.origin)
+                  window.location.assign(u.pathname + u.search + u.hash)
+                } catch {
+                  window.location.href = adminPosHref
+                }
+              }}
               className="touch-manipulation [-webkit-tap-highlight-color:transparent] flex shrink-0 items-center gap-2 rounded-xl bg-orange-500 px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-orange-400"
             >
               <span className="text-base leading-none" aria-hidden>
