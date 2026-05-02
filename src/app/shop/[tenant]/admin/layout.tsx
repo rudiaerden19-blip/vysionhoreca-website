@@ -12,7 +12,6 @@ import {
   getAdminKassaEntryHref,
   getFirstAccessibleAdminPath,
   hasModuleAccessForPathname,
-  isKassaPosScreenEnabled,
   normalizeShopAdminPathname,
   submenuParentAllowedForSubmenuId,
   type TenantModuleId,
@@ -360,7 +359,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     )
   }
 
-  // Kassa POS: geen layout wrapper; module uit of alleen pincode (geen POS-submenu) → niet op /kassa laten
+  // Kassa POS: geen layout-wrapper; submodule-toggles blokkeren /kassa niet meer (verkoopscherm = altijd beschikbaar bij kassa-module).
   if (adminPath.includes('/kassa')) {
     if (demoPublicUnauthenticated) {
       return <>{children}</>
@@ -372,19 +371,6 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
       return <>{children}</>
     }
     if (!modulesLoading && moduleAccess['kassa'] === false) {
-      return (
-        <RedirectToFirstAccessibleModule
-          tenant={params.tenant}
-          access={moduleAccess}
-          enabledModulesJson={enabledModulesJson}
-        />
-      )
-    }
-    if (
-      !modulesLoading &&
-      moduleAccess['kassa'] &&
-      !isKassaPosScreenEnabled(enabledModulesJson, true)
-    ) {
       return (
         <RedirectToFirstAccessibleModule
           tenant={params.tenant}
@@ -424,6 +410,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
           />
           {!modulesLoading && (isSuperAdminLoggedIn() || moduleAccess['kassa']) && (
             <Link
+              prefetch={false}
               href={
                 getAdminKassaEntryHref(
                   params.tenant,
@@ -431,7 +418,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
                   isSuperAdminLoggedIn() ? null : enabledModulesJson
                 ) ?? `${baseUrl}/kassa`
               }
-              className="flex shrink-0 items-center gap-2 rounded-xl bg-orange-500 px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-orange-400"
+              className="touch-manipulation [-webkit-tap-highlight-color:transparent] flex shrink-0 items-center gap-2 rounded-xl bg-orange-500 px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-orange-400"
             >
               <span className="text-base leading-none" aria-hidden>
                 🧾
