@@ -2010,33 +2010,42 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       <button
                         key={cat.id}
                         onClick={() => setSelectedCategory(cat)}
-                        className="group relative flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden rounded-xl border border-neutral-200/90 bg-white active:scale-95 transition-transform shadow-[0_8px_30px_rgba(0,0,0,0.35)]"
+                        className="group relative h-full min-h-0 w-full min-w-0 overflow-hidden rounded-xl border border-neutral-200/90 bg-neutral-100 shadow-[0_8px_30px_rgba(0,0,0,0.35)] active:scale-95 transition-transform"
                       >
                         {catImage ? (
-                          <div className="pointer-events-none relative flex min-h-0 flex-1 w-full items-center justify-center bg-white p-2 sm:p-2.5">
+                          <>
                             <img
                               src={catImage}
                               alt={cat.name}
-                              className="pointer-events-none block max-h-full max-w-full select-none object-contain object-center"
+                              className="pointer-events-none absolute inset-0 block h-full min-h-0 w-full select-none object-cover object-center !h-full !w-full !max-w-none"
                             />
-                          </div>
+                            <div
+                              className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[5.25rem] bg-gradient-to-t from-neutral-950/92 via-neutral-950/45 to-transparent"
+                              aria-hidden
+                            />
+                            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2 pt-10 sm:px-2.5 sm:pb-2.5">
+                              <div className="flex flex-col items-center gap-1 text-center">
+                                {cat.icon ? (
+                                  <span className="text-base text-white drop-shadow sm:text-lg md:text-xl">{cat.icon}</span>
+                                ) : null}
+                                <span className="line-clamp-2 text-base font-extrabold leading-tight tracking-tight text-white drop-shadow-[0_1px_2px_rgba(0,0,0,.95)] sm:text-lg md:text-xl lg:text-2xl">
+                                  {cat.name}
+                                </span>
+                              </div>
+                            </div>
+                          </>
                         ) : (
-                          <div className="flex min-h-0 flex-1 items-center justify-center bg-neutral-100">
-                            {cat.icon ? (
-                              <span className="text-5xl text-gray-700">{cat.icon}</span>
-                            ) : null}
-                          </div>
+                          <>
+                            <div className="pointer-events-none flex h-full w-full flex-col items-center justify-center gap-3 bg-neutral-100 pt-10 pb-20">
+                              {cat.icon ? <span className="text-5xl text-neutral-700">{cat.icon}</span> : null}
+                            </div>
+                            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 border-t border-neutral-200 bg-neutral-50/95 px-2 pb-2 pt-2 sm:pb-2.5">
+                              <span className="block text-center text-base font-extrabold leading-tight text-neutral-900 sm:text-lg md:text-xl">
+                                {cat.name}
+                              </span>
+                            </div>
+                          </>
                         )}
-                        <div className="pointer-events-none shrink-0 border-t border-black/10 bg-neutral-900 px-2 py-2 sm:py-2.5">
-                          <div className="flex flex-col items-center justify-center gap-1 text-center">
-                            {cat.icon && catImage ? (
-                              <span className="text-lg text-white sm:text-xl md:text-2xl">{cat.icon}</span>
-                            ) : null}
-                            <span className="line-clamp-2 text-base font-extrabold leading-tight tracking-tight text-white sm:text-lg md:text-xl lg:text-2xl">
-                              {cat.name}
-                            </span>
-                          </div>
-                        </div>
                       </button>
                     )
                   })}
@@ -2063,30 +2072,44 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                         <button
                           key={product.id}
                           onClick={() => handleProductClick(product)}
-                          className="group relative flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden rounded-xl bg-white text-left active:scale-95 transition-transform"
+                          className="group relative h-full min-h-0 w-full min-w-0 overflow-hidden rounded-xl bg-neutral-100 text-left active:scale-95 transition-transform"
                           style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.35)' }}
                         >
                           {product.image_url ? (
-                            <div className="pointer-events-none relative flex min-h-0 flex-1 w-full items-center justify-center bg-white p-2 sm:p-2.5">
+                            <>
                               <img
                                 src={product.image_url}
                                 alt={product.name}
-                                className="pointer-events-none block max-h-full max-w-full select-none object-contain object-center"
+                                className="pointer-events-none absolute inset-0 block h-full min-h-0 w-full select-none object-cover object-center !h-full !w-full !max-w-none"
                               />
-                            </div>
+                              <div
+                                className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[5.75rem] bg-gradient-to-t from-neutral-950/92 via-neutral-950/45 to-transparent"
+                                aria-hidden
+                              />
+                              <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2 pt-10 sm:px-2.5 sm:pb-2.5">
+                                <p className="line-clamp-2 text-base font-extrabold leading-tight tracking-tight text-white drop-shadow-[0_1px_2px_rgba(0,0,0,.95)] sm:text-lg md:text-xl">
+                                  {product.name}
+                                </p>
+                                <p className="mt-0.5 text-lg font-bold text-emerald-300 drop-shadow-[0_1px_2px_rgba(0,0,0,.9)] sm:text-xl md:text-2xl">
+                                  €{product.price.toFixed(2)}
+                                </p>
+                              </div>
+                            </>
                           ) : (
-                            <div className="flex min-h-0 flex-1 items-center justify-center bg-neutral-100">
-                              <span className="text-4xl text-gray-300">🍽️</span>
-                            </div>
+                            <>
+                              <div className="pointer-events-none flex h-full w-full items-center justify-center bg-neutral-100 pb-28 pt-10">
+                                <span className="text-5xl text-neutral-300">🍽️</span>
+                              </div>
+                              <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 border-t border-neutral-200 bg-neutral-50/95 px-2 py-2 sm:pb-2.5">
+                                <p className="line-clamp-2 text-base font-extrabold text-neutral-900 sm:text-lg md:text-xl">
+                                  {product.name}
+                                </p>
+                                <p className="mt-0.5 text-lg font-bold text-emerald-600 sm:text-xl md:text-2xl">
+                                  €{product.price.toFixed(2)}
+                                </p>
+                              </div>
+                            </>
                           )}
-                          <div className="pointer-events-none shrink-0 border-t border-black/10 bg-neutral-900 px-2 py-2 sm:py-2.5">
-                            <p className="line-clamp-2 text-base font-extrabold leading-tight tracking-tight text-white sm:text-lg md:text-xl">
-                              {product.name}
-                            </p>
-                            <p className="mt-0.5 text-lg font-bold text-emerald-400 sm:text-xl md:text-2xl">
-                              €{product.price.toFixed(2)}
-                            </p>
-                          </div>
                           {inCart > 0 && (
                             <div className="absolute top-1.5 right-1.5 z-20 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-xs font-bold text-white shadow-md">
                               {inCart}
