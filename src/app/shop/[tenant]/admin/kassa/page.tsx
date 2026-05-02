@@ -1955,12 +1955,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </button>
           )}
 
-          {/* Grid */}
-          <div className="flex-1 overflow-y-auto p-4">
+          {/* Grid — min-h-0 nodig: anders groeit de flex-child mee met alle tegels en wordt onderaan afgekapt zonder scroll */}
+          <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4">
             {menuLoading ? (
               <div className="flex items-center justify-center h-full text-gray-400 text-lg">{t('kassaApp.loading')}</div>
             ) : !selectedCategory ? (
-              /* Categorieën: auto-kolommen — op brede desktop meer tegels, op tablet vergelijkbaar met voorheen */
+              /* Categorieën: grotere minimumtegel (~15rem), meer kolommen op breed scherm; verticaal scrollen */
               categories.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-gray-400">
                   <span className="text-5xl mb-3">📂</span>
@@ -1968,7 +1968,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   <p className="text-sm mt-1">{t('kassaApp.noCategoriesHint')}</p>
                 </div>
               ) : (
-                <div className="grid gap-2 sm:gap-3 grid-cols-[repeat(auto-fill,minmax(10rem,1fr))]">
+                <div className="grid gap-3 sm:gap-4 [grid-template-columns:repeat(auto-fill,minmax(15rem,1fr))]">
                   {categories.map(cat => {
                     const catImage = products.find(p => p.category_id === cat.id && p.image_url)?.image_url
                     return (
@@ -2003,7 +2003,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     <p className="font-semibold">{t('kassaApp.noProductsInCategory')}</p>
                   </div>
                 ) : (
-                  <div className="grid gap-2 sm:gap-3 grid-cols-[repeat(auto-fill,minmax(10rem,1fr))]">
+                  <div className="grid gap-3 sm:gap-4 [grid-template-columns:repeat(auto-fill,minmax(15rem,1fr))]">
                     {filtered.map(product => {
                       const inCart = cart.filter(i => i.product.id === product.id).reduce((s, i) => s + i.quantity, 0)
                       const hasOpts = productsWithOptions.includes(product.id!)
