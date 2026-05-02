@@ -2021,12 +2021,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                             />
                           </div>
                         ) : null}
-                        <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center justify-end px-2 pb-2 pt-4 sm:px-3 sm:pb-3 sm:pt-5">
+                        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 pb-2 sm:pb-3">
+                          {catImage ? (
+                            <div
+                              className="absolute inset-x-0 bottom-0 z-0 h-[58%] min-h-[7rem] rounded-b-xl bg-gradient-to-t from-black/90 via-black/55 to-transparent"
+                              aria-hidden
+                            />
+                          ) : null}
+                          <div className="relative z-[2] flex flex-col items-center justify-end px-2 pb-0 pt-6 sm:px-3 sm:pt-8">
                           {cat.icon && (
                             <span
                               className={`mb-1 text-xl sm:text-2xl md:text-3xl ${
                                 catImage
-                                  ? 'text-white [filter:drop-shadow(0_2px_4px_rgba(0,0,0,.85))]'
+                                  ? 'text-white [filter:drop-shadow(0_1px_0_rgba(0,0,0,.95))_drop-shadow(0_2px_6px_rgba(0,0,0,.9))]'
                                   : 'text-gray-800'
                               }`}
                             >
@@ -2036,12 +2043,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           <span
                             className={`text-center text-base font-extrabold leading-tight line-clamp-2 sm:text-lg md:text-2xl lg:text-3xl tracking-tight ${
                               catImage
-                                ? 'text-white [text-shadow:0_2px_8px_rgba(0,0,0,.9),0_1px_2px_rgba(0,0,0,1)]'
+                                ? 'text-white [text-shadow:0_1px_0_rgba(0,0,0,.95),0_2px_4px_rgba(0,0,0,.95),0_4px_14px_rgba(0,0,0,.75)]'
                                 : 'text-gray-900'
                             }`}
                           >
                             {cat.name}
                           </span>
+                          </div>
                         </div>
                       </button>
                     )
@@ -2085,11 +2093,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                               🍽️
                             </span>
                           )}
-                          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2 pt-4 sm:px-3 sm:pb-3 sm:pt-5">
+                          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 pb-2 sm:pb-3 text-left">
+                            {product.image_url ? (
+                              <div
+                                className="absolute inset-x-0 bottom-0 z-0 h-[58%] min-h-[7rem] rounded-b-xl bg-gradient-to-t from-black/90 via-black/55 to-transparent"
+                                aria-hidden
+                              />
+                            ) : null}
+                            <div className="relative z-[2] px-2 pb-0 pt-6 sm:px-3 sm:pt-8">
                             <p
                               className={`line-clamp-2 text-base font-extrabold leading-tight sm:text-lg md:text-xl lg:text-2xl tracking-tight ${
                                 product.image_url
-                                  ? 'text-white [text-shadow:0_2px_8px_rgba(0,0,0,.9),0_1px_2px_rgba(0,0,0,1)]'
+                                  ? 'text-white [text-shadow:0_1px_0_rgba(0,0,0,.95),0_2px_4px_rgba(0,0,0,.95),0_4px_14px_rgba(0,0,0,.75)]'
                                   : 'text-gray-900'
                               }`}
                             >
@@ -2098,12 +2113,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                             <p
                               className={`mt-1 text-lg font-bold sm:text-xl md:text-2xl ${
                                 product.image_url
-                                  ? 'text-emerald-300 [text-shadow:0_2px_6px_rgba(0,0,0,.85),0_1px_2px_rgba(0,0,0,1)]'
+                                  ? 'text-emerald-200 [text-shadow:0_1px_0_rgba(0,0,0,.92),0_2px_6px_rgba(0,0,0,.92),0_0_12px_rgba(0,0,0,.45)]'
                                   : 'text-emerald-600'
                               }`}
                             >
                               €{product.price.toFixed(2)}
                             </p>
+                            </div>
                           </div>
                           {inCart > 0 && (
                             <div className="absolute top-1.5 right-1.5 z-20 w-6 h-6 rounded-full bg-emerald-500 text-white text-xs font-bold flex items-center justify-center shadow-md">
