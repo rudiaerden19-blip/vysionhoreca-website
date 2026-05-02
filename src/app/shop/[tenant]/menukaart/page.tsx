@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Image from 'next/image'
-import { getTenantSettings, getMenuCategories, getMenuProducts, TenantSettings, MenuCategory, MenuProduct } from '@/lib/admin-api'
+import { getTenantSettings, getMenuCategories, getMenuProducts, TenantSettings, MenuCategory, MenuProduct, compareMenuProductsBySortOrder } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
 
 export default function MenukaartPage({ params }: { params: { tenant: string } }) {
@@ -33,7 +33,7 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
       
       setSettings(settingsData)
       setCategories(categoriesData.sort((a, b) => a.sort_order - b.sort_order))
-      setProducts(productsData.filter(p => p.is_active).sort((a, b) => a.sort_order - b.sort_order))
+      setProducts(productsData.filter(p => p.is_active).sort(compareMenuProductsBySortOrder))
       setLoading(false)
     }
     loadData()

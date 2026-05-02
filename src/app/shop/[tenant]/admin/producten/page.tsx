@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   DndContext, 
@@ -33,6 +33,7 @@ import {
   clampKassaProductImageZoom,
   KASSA_PRODUCT_IMAGE_ZOOM_MIN,
   KASSA_PRODUCT_IMAGE_ZOOM_MAX,
+  compareMenuProductsBySortOrder,
 } from '@/lib/admin-api'
 import MediaPicker from '@/components/MediaPicker'
 import { useLanguage } from '@/i18n'
@@ -258,16 +259,20 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     loadData()
   }, [params.tenant])
 
-  const filteredProducts = products.filter(p => {
-    const category = categories.find(c => c.id === p.category_id)
-    const matchesCategory = selectedCategory === 'Promoties' 
-      ? (p as any).is_promo === true
-      : selectedCategory === 'Alle'
-        ? true
-        : category?.name === selectedCategory
-    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase())
-    return matchesCategory && matchesSearch
-  })
+  const filteredProducts = useMemo(() => {
+    const filt = products.filter((p) => {
+      const category = categories.find((c) => c.id === p.category_id)
+      const matchesCategory =
+        selectedCategory === 'Promoties'
+          ? (p as { is_promo?: boolean }).is_promo === true
+          : selectedCategory === 'Alle'
+            ? true
+            : category?.name === selectedCategory
+      const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase())
+      return matchesCategory && matchesSearch
+    })
+    return [...filt].sort(compareMenuProductsBySortOrder)
+  }, [products, categories, selectedCategory, searchQuery])
 
   const toggleAvailable = async (id: string) => {
     const product = products.find(p => p.id === id)
@@ -315,34 +320,44 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     })
   )
 
-  // Handle drag end
+  // Herneem volgorde zoals in admin: sort_order is per categorie; bij "Alle" globaal genummerd.
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event
-    
     if (!over || active.id === over.id) return
-    
-    const oldIndex = filteredProducts.findIndex(p => p.id === active.id)
-    const newIndex = filteredProducts.findIndex(p => p.id === over.id)
-    
+    if (searchQuery.trim()) return
+
+    let scopeList: MenuProduct[]
+    if (selectedCategory === 'Alle') {
+      scopeList = [...products].sort(compareMenuProductsBySortOrder)
+    } else if (selectedCategory === 'Promoties') {
+      scopeList = [...products.filter((p) => (p as { is_promo?: boolean }).is_promo)].sort(
+        compareMenuProductsBySortOrder
+      )
+    } else {
+      const cat = categories.find((c) => c.name === selectedCategory)
+      if (!cat?.id) return
+      scopeList = [...products.filter((p) => p.category_id === cat.id)].sort(
+        compareMenuProductsBySortOrder
+      )
+    }
+
+    const oldIndex = scopeList.findIndex((p) => p.id === active.id)
+    const newIndex = scopeList.findIndex((p) => p.id === over.id)
     if (oldIndex === -1 || newIndex === -1) return
-    
-    // Reorder locally first for instant feedback
-    const newOrder = arrayMove(filteredProducts, oldIndex, newIndex)
-    
-    // Update sort_order for all affected products
+
+    const newOrder = arrayMove(scopeList, oldIndex, newIndex)
     const updates = newOrder.map((product, index) => ({
       ...product,
-      sort_order: index
+      sort_order: index,
     }))
-    
-    // Update state immediately
-    setProducts(prev => {
-      const otherProducts = prev.filter(p => !newOrder.find(np => np.id === p.id))
-      return [...updates, ...otherProducts].sort((a, b) => a.sort_order - b.sort_order)
+
+    setProducts((prev) => {
+      const byId = new Map(updates.map((u) => [u.id!, u]))
+      const merged = prev.map((p) => (byId.has(p.id!) ? byId.get(p.id!)! : p))
+      return merged.sort(compareMenuProductsBySortOrder)
     })
-    
-    // Save to database in background
-    Promise.all(updates.map(p => saveMenuProduct(p)))
+
+    void Promise.all(updates.map((p) => saveMenuProduct(p)))
   }
 
   const openEditModal = async (product: MenuProduct) => {

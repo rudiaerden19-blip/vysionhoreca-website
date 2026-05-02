@@ -6,7 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { isKioskSearchParams, kioskShopHref } from '@/lib/kiosk-mode'
-import { getMenuCategories, getMenuProducts, getAllMenuProductOptionsForTenant, getTenantSettings, getActivePromotions, getExceptionalClosings, ExceptionalClosing, MenuCategory, MenuProduct, ProductOption, ProductOptionChoice, Promotion } from '@/lib/admin-api'
+import { getMenuCategories, getMenuProducts, getAllMenuProductOptionsForTenant, getTenantSettings, getActivePromotions, getExceptionalClosings, ExceptionalClosing, MenuCategory, MenuProduct, ProductOption, ProductOptionChoice, Promotion, compareMenuProductsBySortOrder } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
 
 const VoiceOrderButton = dynamic(() => import('@/components/VoiceOrderButton'), { ssr: false })
@@ -25,6 +25,8 @@ interface MenuItem {
   promo_price?: number
   allergens: string[]
   image_display_mode?: 'cover' | 'contain' | null
+  /** Volgorde binnen categorie (= admin sleepvolgorde) */
+  sort_order: number
 }
 
 interface CartItem {
@@ -478,6 +480,8 @@ export default function MenuPageClient({
             promo_price: p.promo_price,
             allergens: p.allergens || [],
             image_display_mode: p.image_display_mode || null,
+            sort_order:
+              typeof p.sort_order === 'number' ? p.sort_order : Number(p.sort_order) || 0,
           }
         })
 
@@ -885,7 +889,9 @@ export default function MenuPageClient({
               </div>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
-              {menuItems.filter(i => i.is_popular).map((item) => (
+              {[...menuItems.filter(i => i.is_popular)]
+                .sort(compareMenuProductsBySortOrder)
+                .map((item) => (
                 <MenuProductCard
                   key={`popular-${item.id}`}
                   item={item}
@@ -904,7 +910,9 @@ export default function MenuPageClient({
 
         {/* Categorie secties */}
         {categories.map((category) => {
-          const categoryItems = menuItems.filter(i => i.category_id === category.id)
+          const categoryItems = [...menuItems.filter(i => i.category_id === category.id)].sort(
+            compareMenuProductsBySortOrder
+          )
           if (categoryItems.length === 0) return null
           return (
             <section 

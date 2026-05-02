@@ -17,6 +17,7 @@ import {
   TenantSettings,
   syncZReportAfterOrder,
   clampKassaProductImageZoom,
+  compareMenuProductsBySortOrder,
 } from '@/lib/admin-api'
 import KassaFloorPlan from '@/components/KassaFloorPlan'
 import KassaReservationsView from '@/components/KassaReservationsView'
@@ -2057,7 +2058,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             ) : (
               /* Producten: zelfde 4×3 viewport-grid als categorieën */
               (() => {
-                const filtered = products.filter(p => p.category_id === selectedCategory.id)
+                const filtered = products
+                  .filter(p => p.category_id === selectedCategory.id)
+                  .sort(compareMenuProductsBySortOrder)
                 return filtered.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-gray-400">
                     <span className="text-5xl mb-3">🍽️</span>

@@ -792,6 +792,23 @@ export function clampKassaProductImageZoom(raw: unknown): number {
   return Math.min(KASSA_PRODUCT_IMAGE_ZOOM_MAX, Math.max(KASSA_PRODUCT_IMAGE_ZOOM_MIN, n))
 }
 
+/** Lees sort_order uit DB (mag string zijn uit PostgREST). */
+export function menuProductSortOrderValue(raw: unknown): number {
+  if (raw === null || raw === undefined || raw === '') return 0
+  const n = typeof raw === 'number' ? raw : parseFloat(String(raw).replace(',', '.'))
+  return Number.isFinite(n) ? n : 0
+}
+
+/** Vergelijk producten zoals ze op het scherm moeten verschijnen: sort_order, dan id voor stabiliteit */
+export function compareMenuProductsBySortOrder(
+  a: { sort_order?: unknown; id?: string },
+  b: { sort_order?: unknown; id?: string }
+): number {
+  const d = menuProductSortOrderValue(a.sort_order) - menuProductSortOrderValue(b.sort_order)
+  if (d !== 0) return d
+  return String(a.id ?? '').localeCompare(String(b.id ?? ''))
+}
+
 export async function getMenuProducts(tenantSlug: string, signal?: AbortSignal): Promise<MenuProduct[]> {
   return cache.getOrFetch(
     cacheKey('menu_products', tenantSlug),
