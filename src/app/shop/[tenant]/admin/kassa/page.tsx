@@ -476,6 +476,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [menuLoading, setMenuLoading] = useState(true)
   const [productsWithOptions, setProductsWithOptions] = useState<string[]>([])
 
+  /** Menu-paneel: 4×3 volle tegels in het zicht; rijhoogte = f(scrollport). gap-4 = 16px. */
+  const kassaMenuScrollRef = useRef<HTMLDivElement>(null)
+  const [kassaMenuRowPx, setKassaMenuRowPx] = useState(168)
+
   const [showReservations, setShowReservations] = useState(false)
   const [pendingReservCount, setPendingReservCount] = useState(0)
   const [showFloorPlan, setShowFloorPlan] = useState(false)
@@ -486,6 +490,28 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [tableOrders, setTableOrders] = useState<Record<string, CartItem[]>>({})
 
   const tableOrdersKey = `vysion_table_orders_${tenant}`
+
+  const KASSA_MENU_VISIBLE_ROWS = 3
+  const KASSA_MENU_GRID_GAP_PX = 16
+
+  useLayoutEffect(() => {
+    const el = kassaMenuScrollRef.current
+    if (!el || typeof ResizeObserver === 'undefined') return
+    const measure = () => {
+      const st = getComputedStyle(el)
+      const pt = parseFloat(st.paddingTop) || 0
+      const pb = parseFloat(st.paddingBottom) || 0
+      const innerH = el.clientHeight - pt - pb
+      if (innerH <= 0) return
+      const rowH =
+        (innerH - (KASSA_MENU_VISIBLE_ROWS - 1) * KASSA_MENU_GRID_GAP_PX) / KASSA_MENU_VISIBLE_ROWS
+      setKassaMenuRowPx(Math.max(80, Math.floor(rowH)))
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [selectedCategory, menuLoading])
 
   // Laad tafels + barkrukken + openstaande bestellingen (localStorage + Supabase sync)
 
@@ -1959,11 +1985,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           )}
 
           {/* Grid — min-h-0 nodig: anders groeit de flex-child mee met alle tegels en wordt onderaan afgekapt zonder scroll */}
-          <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4 touch-pan-y [overflow-anchor:none]">
+          <div
+            ref={kassaMenuScrollRef}
+            className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4 touch-pan-y [overflow-anchor:none]"
+          >
             {menuLoading ? (
               <div className="flex items-center justify-center h-full text-gray-400 text-lg">{t('kassaApp.loading')}</div>
             ) : !selectedCategory ? (
-              /* Categorieën: grotere minimumtegel (~15rem), meer kolommen op breed scherm; verticaal scrollen */
+              /* Categorieën: vaste 4 kolommen; rijhoogte = (scrollport − gaps) / 3 → altijd 12 volle tegels zichtbaar, rest scrollen */
               categories.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-gray-400">
                   <span className="text-5xl mb-3">📂</span>
@@ -1971,14 +2000,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   <p className="text-sm mt-1">{t('kassaApp.noCategoriesHint')}</p>
                 </div>
               ) : (
-                <div className="grid gap-3 sm:gap-4 pb-6 [grid-template-columns:repeat(auto-fill,minmax(15rem,1fr))]">
+                <div
+                  className="grid w-full grid-cols-4 gap-4 pb-8"
+                  style={{ gridAutoRows: `${kassaMenuRowPx}px` }}
+                >
                   {categories.map(cat => {
                     const catImage = products.find(p => p.category_id === cat.id && p.image_url)?.image_url
                     return (
                       <button
                         key={cat.id}
                         onClick={() => setSelectedCategory(cat)}
-                        className="aspect-square relative rounded-xl overflow-hidden active:scale-95 transition-transform"
+                        className="relative h-full min-h-0 w-full min-w-0 overflow-hidden rounded-xl active:scale-95 transition-transform"
                         style={{ backgroundColor: '#3C4D6B', boxShadow: '0 8px 30px rgba(0,0,0,0.35)' }}
                       >
                         {catImage && (
@@ -1997,7 +2029,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 </div>
               )
             ) : (
-              /* Producten grid — zelfde auto-fill als categorieën */
+              /* Producten: zelfde 4×3 viewport-grid als categorieën */
               (() => {
                 const filtered = products.filter(p => p.category_id === selectedCategory.id)
                 return filtered.length === 0 ? (
@@ -2006,7 +2038,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     <p className="font-semibold">{t('kassaApp.noProductsInCategory')}</p>
                   </div>
                 ) : (
-                  <div className="grid gap-3 sm:gap-4 pb-6 [grid-template-columns:repeat(auto-fill,minmax(15rem,1fr))]">
+                  <div
+                    className="grid w-full grid-cols-4 gap-4 pb-8"
+                    style={{ gridAutoRows: `${kassaMenuRowPx}px` }}
+                  >
                     {filtered.map(product => {
                       const inCart = cart.filter(i => i.product.id === product.id).reduce((s, i) => s + i.quantity, 0)
                       const hasOpts = productsWithOptions.includes(product.id!)
@@ -2014,27 +2049,36 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                         <button
                           key={product.id}
                           onClick={() => handleProductClick(product)}
-                          className="flex flex-col bg-white rounded-xl overflow-hidden active:scale-95 transition-transform relative"
+                          className="flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden rounded-xl bg-white text-left active:scale-95 transition-transform relative"
                           style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.35)' }}
                         >
-                          <div className="aspect-square w-full bg-gray-100 flex items-center justify-center overflow-hidden">
-                            {product.image_url
-                              ? <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
-                              : <span className="text-4xl text-gray-300">🍽️</span>
-                            }
+                          <div className="relative min-h-0 flex-1 w-full overflow-hidden bg-gray-100">
+                            {product.image_url ? (
+                              <img
+                                src={product.image_url}
+                                alt={product.name}
+                                className="h-full w-full object-cover"
+                              />
+                            ) : (
+                              <span className="flex h-full w-full items-center justify-center text-4xl text-gray-300">
+                                🍽️
+                              </span>
+                            )}
+                            {inCart > 0 && (
+                              <div className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-emerald-500 text-white text-xs font-bold flex items-center justify-center shadow-md">
+                                {inCart}
+                              </div>
+                            )}
+                            {hasOpts && (
+                              <div className="absolute top-1.5 left-1.5 bg-amber-400 text-white text-xs font-bold px-1.5 py-0.5 rounded-md shadow">
+                                ⚙️
+                              </div>
+                            )}
                           </div>
-                          {/* In-cart badge */}
-                          {inCart > 0 && (
-                            <div className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-emerald-500 text-white text-xs font-bold flex items-center justify-center shadow-md">
-                              {inCart}
-                            </div>
-                          )}
-                          {/* Opties indicator */}
-                          {hasOpts && (
-                            <div className="absolute top-1.5 left-1.5 bg-amber-400 text-white text-xs font-bold px-1.5 py-0.5 rounded-md shadow">⚙️</div>
-                          )}
-                          <div className="p-2 text-left">
-                            <p className="font-bold text-sm text-gray-800 leading-tight line-clamp-2">{product.name}</p>
+                          <div className="shrink-0 border-t border-gray-100 p-2">
+                            <p className="font-bold text-sm text-gray-800 leading-tight line-clamp-2">
+                              {product.name}
+                            </p>
                             <p className="text-emerald-600 font-bold text-base mt-0.5">€{product.price.toFixed(2)}</p>
                           </div>
                         </button>
