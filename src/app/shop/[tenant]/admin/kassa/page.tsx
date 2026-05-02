@@ -2013,13 +2013,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                         className="relative h-full min-h-0 w-full min-w-0 overflow-hidden rounded-xl border border-neutral-200/90 bg-neutral-100 active:scale-95 transition-transform shadow-[0_8px_30px_rgba(0,0,0,0.35)]"
                       >
                         {catImage ? (
-                          <div className="absolute inset-0 flex items-center justify-center bg-neutral-100 p-2">
-                            <img
-                              src={catImage}
-                              alt={cat.name}
-                              className="max-h-full max-w-full object-contain object-center"
-                            />
-                          </div>
+                          <img
+                            src={catImage}
+                            alt={cat.name}
+                            className="pointer-events-none absolute inset-0 h-full w-full object-contain object-center"
+                          />
                         ) : null}
                         <div
                           className="pointer-events-none absolute bottom-0 left-0 right-0 h-[46%] bg-gradient-to-t from-black/80 via-black/25 to-transparent"
@@ -2060,15 +2058,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           className="flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden rounded-xl bg-white text-left active:scale-95 transition-transform relative"
                           style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.35)' }}
                         >
-                          <div className="relative flex min-h-0 flex-1 w-full items-center justify-center overflow-hidden bg-neutral-100 p-1.5">
+                          <div className="relative min-h-0 flex-1 w-full min-w-0 overflow-hidden bg-neutral-100">
                             {product.image_url ? (
                               <img
                                 src={product.image_url}
                                 alt={product.name}
-                                className="max-h-full max-w-full object-contain object-center"
+                                className="absolute inset-0 h-full w-full object-contain object-center"
                               />
                             ) : (
-                              <span className="flex h-full min-h-[3rem] w-full items-center justify-center text-4xl text-gray-300">
+                              <span className="absolute inset-0 flex items-center justify-center text-4xl text-gray-300">
                                 🍽️
                               </span>
                             )}
@@ -2083,11 +2081,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                               </div>
                             )}
                           </div>
-                          <div className="shrink-0 border-t border-gray-100 p-2">
-                            <p className="font-bold text-sm text-gray-800 leading-tight line-clamp-2">
+                          <div className="shrink-0 border-t border-gray-100 px-1.5 py-1">
+                            <p className="line-clamp-2 text-xs font-bold leading-tight text-gray-800 sm:text-sm">
                               {product.name}
                             </p>
-                            <p className="text-emerald-600 font-bold text-base mt-0.5">€{product.price.toFixed(2)}</p>
+                            <p className="mt-0.5 text-sm font-bold text-emerald-600 sm:text-base">
+                              €{product.price.toFixed(2)}
+                            </p>
                           </div>
                         </button>
                       )
