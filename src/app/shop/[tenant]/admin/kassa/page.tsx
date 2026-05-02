@@ -1960,7 +1960,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             {menuLoading ? (
               <div className="flex items-center justify-center h-full text-gray-400 text-lg">{t('kassaApp.loading')}</div>
             ) : !selectedCategory ? (
-              /* Categorieën grid — 4 kolommen */
+              /* Categorieën: auto-kolommen — op brede desktop meer tegels, op tablet vergelijkbaar met voorheen */
               categories.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-gray-400">
                   <span className="text-5xl mb-3">📂</span>
@@ -1968,7 +1968,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   <p className="text-sm mt-1">{t('kassaApp.noCategoriesHint')}</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-4 gap-4">
+                <div className="grid gap-2 sm:gap-3 grid-cols-[repeat(auto-fill,minmax(10rem,1fr))]">
                   {categories.map(cat => {
                     const catImage = products.find(p => p.category_id === cat.id && p.image_url)?.image_url
                     return (
@@ -1982,9 +1982,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           <img src={catImage} alt={cat.name} className="absolute inset-0 w-full h-full object-cover" />
                         )}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                        <div className="absolute inset-0 flex flex-col items-center justify-end p-2">
-                          {cat.icon && <span className="text-2xl mb-0.5">{cat.icon}</span>}
-                          <span className="font-bold text-white text-xl text-center leading-tight drop-shadow-lg">{cat.name}</span>
+                        <div className="absolute inset-0 flex flex-col items-center justify-end p-1.5 sm:p-2">
+                          {cat.icon && <span className="text-lg sm:text-xl md:text-2xl mb-0.5">{cat.icon}</span>}
+                          <span className="font-bold text-white text-sm sm:text-base md:text-lg lg:text-xl text-center leading-tight drop-shadow-lg line-clamp-2">
+                            {cat.name}
+                          </span>
                         </div>
                       </button>
                     )
@@ -1992,7 +1994,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 </div>
               )
             ) : (
-              /* Producten grid — 4 kolommen */
+              /* Producten grid — zelfde auto-fill als categorieën */
               (() => {
                 const filtered = products.filter(p => p.category_id === selectedCategory.id)
                 return filtered.length === 0 ? (
@@ -2001,7 +2003,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     <p className="font-semibold">{t('kassaApp.noProductsInCategory')}</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-4 gap-4">
+                  <div className="grid gap-2 sm:gap-3 grid-cols-[repeat(auto-fill,minmax(10rem,1fr))]">
                     {filtered.map(product => {
                       const inCart = cart.filter(i => i.product.id === product.id).reduce((s, i) => s + i.quantity, 0)
                       const hasOpts = productsWithOptions.includes(product.id!)
