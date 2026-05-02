@@ -3635,7 +3635,7 @@
     "total": "TOTAAL",
     "paidWith": "Betaald met:",
     "thanks": "Bedankt voor uw bezoek!",
-    "orderTypeDineIn": "Hier opeten",
+    "orderTypeDineIn": "Ter plaatse",
     "orderTypeTakeaway": "Afhalen",
     "orderTypeDelivery": "Bezorgen",
     "businessVatLabel": "BTW: {vatNumber}"
@@ -3674,7 +3674,7 @@
     "floorPlan": "Plattegrond",
     "tableWord": "Tafel",
     "stoolWord": "Kruk",
-    "orderTypeDineIn": "Hier opeten",
+    "orderTypeDineIn": "Ter plaatse",
     "orderTypeTakeaway": "Afhalen",
     "orderTypeDelivery": "Levering",
     "orderTypeWithTable": " • Tafel {number}",
