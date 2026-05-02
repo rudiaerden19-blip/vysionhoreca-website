@@ -139,8 +139,12 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'menu_products' AND column_name = 'promo_price') THEN
     ALTER TABLE menu_products ADD COLUMN promo_price DECIMAL(10,2);
   END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'menu_products' AND column_name = 'kassa_image_zoom') THEN
+    ALTER TABLE menu_products ADD COLUMN kassa_image_zoom DOUBLE PRECISION DEFAULT 1.0;
+  END IF;
 END $$;
 
+UPDATE menu_products SET kassa_image_zoom = 1.0 WHERE kassa_image_zoom IS NULL;
 -- ORDERS - Fix ontbrekende kolommen
 DO $$ 
 BEGIN
