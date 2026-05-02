@@ -2014,7 +2014,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                         style={{ backgroundColor: '#3C4D6B', boxShadow: '0 8px 30px rgba(0,0,0,0.35)' }}
                       >
                         {catImage && (
-                          <img src={catImage} alt={cat.name} className="absolute inset-0 w-full h-full object-cover" />
+                          <img
+                            src={catImage}
+                            alt={cat.name}
+                            className="absolute inset-0 h-full w-full object-contain object-center"
+                          />
                         )}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                         <div className="absolute inset-0 flex flex-col items-center justify-end p-1.5 sm:p-2">
@@ -2057,7 +2061,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                               <img
                                 src={product.image_url}
                                 alt={product.name}
-                                className="h-full w-full object-cover"
+                                className="h-full w-full object-contain object-center"
                               />
                             ) : (
                               <span className="flex h-full w-full items-center justify-center text-4xl text-gray-300">
