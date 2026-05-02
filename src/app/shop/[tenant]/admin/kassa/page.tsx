@@ -478,9 +478,23 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [menuLoading, setMenuLoading] = useState(true)
   const [productsWithOptions, setProductsWithOptions] = useState<string[]>([])
 
+  /** gap-4 = 16px; 3 rijen categorieën in view. */
+  const KASSA_MENU_VISIBLE_ROWS = 3
+  const KASSA_MENU_GRID_GAP_PX = 16
+
+  function computeInitialKassaMenuRowPx(): number {
+    if (typeof window === 'undefined') return 220
+    const vh = window.visualViewport?.height ?? window.innerHeight
+    const overhead = 68 + 56
+    const innerApprox = Math.max(0, vh - overhead - 48)
+    const row =
+      (innerApprox - (KASSA_MENU_VISIBLE_ROWS - 1) * KASSA_MENU_GRID_GAP_PX) / KASSA_MENU_VISIBLE_ROWS
+    return Math.max(140, Math.floor(row))
+  }
+
   /** Menu-paneel: 4×3 volle tegels in het zicht; rijhoogte = f(scrollport). gap-4 = 16px. */
   const kassaMenuScrollRef = useRef<HTMLDivElement>(null)
-  const [kassaMenuRowPx, setKassaMenuRowPx] = useState(168)
+  const [kassaMenuRowPx, setKassaMenuRowPx] = useState(computeInitialKassaMenuRowPx)
 
   const [showReservations, setShowReservations] = useState(false)
   const [pendingReservCount, setPendingReservCount] = useState(0)
@@ -492,9 +506,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [tableOrders, setTableOrders] = useState<Record<string, CartItem[]>>({})
 
   const tableOrdersKey = `vysion_table_orders_${tenant}`
-
-  const KASSA_MENU_VISIBLE_ROWS = 3
-  const KASSA_MENU_GRID_GAP_PX = 16
 
   useLayoutEffect(() => {
     const el = kassaMenuScrollRef.current
@@ -1741,14 +1752,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       />
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[#e3e3e3]">
 
-      {/* ── Blauwe navigatiebalk — volledige breedte ── */}
-      <div className="flex-shrink-0 bg-[#1e293b] flex items-center px-3 gap-2 relative z-30" style={{ height: 68 }}>
+      {/* ── Blauwe navigatiebalk — volledige breedte (overflow: uitlog buiten scrollcluster = altijd klikbaar, alle tenants) ── */}
+      <div
+        className="relative z-30 flex min-h-[68px] w-full min-w-0 shrink-0 items-center gap-2 bg-[#1e293b] px-2 sm:px-3"
+        style={{ height: 68 }}
+      >
 
         {/* Backdrop sluit alles */}
         {(hamburgerOpen || flyoutOpen) && <div className="fixed inset-0 z-10" onClick={() => { setHamburgerOpen(false); setHamburgerSubOpen(null); setFlyoutOpen(null) }} />}
 
-        {/* ── LINKS: Hamburger menu ── */}
-        <div className="relative z-20">
+        {/* ── LINKS: hamburger ── */}
+        <div className="relative z-20 flex shrink-0 items-center gap-2">
           <button onClick={() => { setHamburgerOpen(!hamburgerOpen); setHamburgerSubOpen(null) }}
             className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-colors ${hamburgerOpen ? 'bg-orange-600 text-white' : 'bg-orange-500 hover:bg-orange-400 text-white'}`}>
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
@@ -1825,122 +1839,130 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           })()}
         </div>
 
-        {/* Tenant naam */}
-        <div className="flex flex-1 items-center justify-center">
-          <span className="truncate text-center text-xl font-medium tracking-normal text-white">
+        {/* Tenant naam (min-w-0 + truncate zodat de balk niet over de viewport loopt onder overflow-hidden) */}
+        <div className="flex min-w-0 flex-1 basis-0 items-center justify-center px-1 sm:px-2">
+          <span className="max-w-full truncate text-center text-base font-medium tracking-normal text-white sm:text-lg md:text-xl" title={(tenantInfo?.business_name ?? tenant)}>
             {tenantInfo?.business_name ||
               tenant.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
           </span>
         </div>
 
-        {/* ── RECHTS ── */}
+        {/* ── Compacte tools: scrollt horizontaal indien nodig; uitlog staat hiernaast als vaste knop ── */}
+        <div
+          className="flex max-h-[68px] min-w-0 flex-[1.25] basis-0 flex-nowrap items-center justify-end gap-1 overflow-x-auto overflow-y-hidden [-webkit-overflow-scrolling:touch] [scrollbar-width:thin]"
+        >
 
-        {/* Reserveringen */}
-        {effectiveAccess.reservaties && (
-          <button
-            onClick={() => {
-              newReservAlertRef.current = null
-              setNewReservAlert(null)
-              setShowReservations(true)
-            }}
-            className="relative flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors"
-          >
-            <span className="text-lg">📅</span>
-            <span>{t('kassaApp.navReservations')}</span>
-            {pendingReservCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-sm font-black rounded-full min-w-[26px] h-7 flex items-center justify-center px-1.5 shadow-lg border-2 border-white">
-                {pendingReservCount}
-              </span>
-            )}
-          </button>
-        )}
-
-        {/* Onlinescherm */}
-        {effectiveAccess['online-bestellingen'] && (
-          <Link href={`/shop/${tenant}/display`}
-            className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors">
-            <span className="text-lg">🖥️</span>
-            <span>{t('kassaApp.navShopDisplay')}</span>
-          </Link>
-        )}
-
-        {/* Keukenscherm */}
-        {effectiveAccess['online-bestellingen'] && (
-          <Link href={`/keuken/${tenant}`}
-            className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors">
-            <span className="text-lg">👨‍🍳</span>
-            <span>{t('kassaApp.navKitchenDisplay')}</span>
-          </Link>
-        )}
-
-        {/* Geluid */}
-        <button onClick={toggleSound}
-          className={`w-9 h-9 rounded-lg flex items-center justify-center text-xl transition-colors ${soundsOn ? 'bg-green-500/80 text-white' : 'bg-white/10 text-white/60'}`}
-          title={soundsOn ? t('kassaApp.soundOnTitle') : t('kassaApp.soundOffTitle')}>
-          {soundsOn ? '🔔' : '🔕'}
-        </button>
-
-        {isOnline !== null && (
-          <div
-            className={`flex max-w-[10rem] items-center gap-1 rounded-lg px-2 py-1.5 text-[11px] font-bold leading-tight sm:max-w-none sm:text-xs ${
-              isOnline ? 'bg-emerald-600/95 text-white' : 'bg-red-600/95 text-white'
-            }`}
-            title={isOnline ? t('kassaApp.onlineModeLiveTitle') : t('kassaApp.offlineModeActive')}
-            role="status"
-            aria-live="polite"
-          >
-            <span className="text-base leading-none" aria-hidden>
-              ☁️
-            </span>
-            <span className="line-clamp-2 sm:line-clamp-1">
-              {isOnline ? t('kassaApp.onlineModeLive') : t('kassaApp.offlineModeActive')}
-            </span>
-          </div>
-        )}
-
-        {activeKassaStaff && !demoViewOnly && (
-          <div className="hidden sm:flex items-center gap-1.5 max-w-[10rem] md:max-w-xs rounded-lg bg-emerald-600/90 text-white text-xs font-bold px-2 py-1.5">
-            <span className="truncate" title={activeKassaStaff.name}>
-              🛒 {activeKassaStaff.name}
-            </span>
+          {effectiveAccess.reservaties && (
             <button
               type="button"
               onClick={() => {
-                playClick()
-                setActiveKassaStaff(null)
+                newReservAlertRef.current = null
+                setNewReservAlert(null)
+                setShowReservations(true)
               }}
-              className="shrink-0 rounded bg-white/20 px-1.5 py-0.5 hover:bg-white/30"
+              className="relative inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-xl bg-white/10 px-2 py-2 text-xs font-bold text-white transition-colors hover:bg-white/20 sm:gap-1.5 sm:px-3 sm:text-sm"
             >
-              ×
+              <span className="text-base sm:text-lg" aria-hidden>📅</span>
+              <span>{t('kassaApp.navReservations')}</span>
+              {pendingReservCount > 0 && (
+                <span className="absolute -right-1 -top-1.5 flex h-7 min-w-[26px] items-center justify-center rounded-full border-2 border-white bg-red-600 px-1.5 text-sm font-black text-white shadow-lg sm:-right-2 sm:-top-2">
+                  {pendingReservCount}
+                </span>
+              )}
             </button>
-          </div>
-        )}
+          )}
 
-        {/* Taal */}
-        <div ref={langRef} className="relative z-20">
-          <button onClick={() => setLangOpen(o => !o)}
-            className="flex items-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl font-medium text-white transition-colors">
-            <span className="text-2xl">{localeFlags[locale]}</span>
-            <span className="text-sm font-bold">{(localeNames[locale] || '').slice(0, 3).toUpperCase()}</span>
-            <svg className={`w-4 h-4 transition-transform ${langOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+          {effectiveAccess['online-bestellingen'] && (
+            <Link
+              href={`/shop/${tenant}/display`}
+              className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-xl bg-white/10 px-2 py-2 text-xs font-bold text-white transition-colors hover:bg-white/20 sm:gap-1.5 sm:px-3 sm:text-sm"
+            >
+              <span className="text-base sm:text-lg" aria-hidden>🖥️</span>
+              <span>{t('kassaApp.navShopDisplay')}</span>
+            </Link>
+          )}
+
+          {effectiveAccess['online-bestellingen'] && (
+            <Link
+              href={`/keuken/${tenant}`}
+              className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-xl bg-white/10 px-2 py-2 text-xs font-bold text-white transition-colors hover:bg-white/20 sm:gap-1.5 sm:px-3 sm:text-sm"
+            >
+              <span className="text-base sm:text-lg" aria-hidden>👨‍🍳</span>
+              <span>{t('kassaApp.navKitchenDisplay')}</span>
+            </Link>
+          )}
+
+          <button
+            type="button"
+            onClick={toggleSound}
+            className={`inline-flex size-9 shrink-0 items-center justify-center rounded-lg text-xl transition-colors ${soundsOn ? 'bg-green-500/80 text-white' : 'bg-white/10 text-white/60'}`}
+            title={soundsOn ? t('kassaApp.soundOnTitle') : t('kassaApp.soundOffTitle')}
+          >
+            <span aria-hidden>{soundsOn ? '🔔' : '🔕'}</span>
           </button>
-          {langOpen && (
-            <div className="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-xl border border-gray-200 z-50 min-w-[160px] overflow-hidden">
-              {locales.map(lang => (
-                <button key={lang} onClick={() => { setLocale(lang); setLangOpen(false) }}
-                  className={`w-full flex items-center gap-2 px-4 py-2.5 hover:bg-gray-50 transition-colors text-sm ${locale === lang ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700'}`}>
-                  <span>{localeFlags[lang]}</span>
-                  <span>{localeNames[lang]}</span>
-                </button>
-              ))}
+
+          {isOnline !== null && (
+            <div
+              className={`inline-flex max-w-[10rem] shrink-0 items-center gap-1 rounded-lg px-2 py-1.5 text-[11px] font-bold leading-tight sm:max-w-none sm:text-xs ${
+                isOnline ? 'bg-emerald-600/95 text-white' : 'bg-red-600/95 text-white'
+              }`}
+              title={isOnline ? t('kassaApp.onlineModeLiveTitle') : t('kassaApp.offlineModeActive')}
+              role="status"
+              aria-live="polite"
+            >
+              <span className="text-base leading-none" aria-hidden>☁️</span>
+              <span className="line-clamp-2 sm:line-clamp-1">{isOnline ? t('kassaApp.onlineModeLive') : t('kassaApp.offlineModeActive')}</span>
             </div>
           )}
+
+          {activeKassaStaff && !demoViewOnly && (
+            <div className="hidden max-w-[10rem] shrink-0 items-center gap-1.5 rounded-lg bg-emerald-600/90 px-2 py-1.5 text-xs font-bold text-white sm:flex md:max-w-xs">
+              <span className="truncate" title={activeKassaStaff.name}>
+                🛒 {activeKassaStaff.name}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  playClick()
+                  setActiveKassaStaff(null)
+                }}
+                className="shrink-0 rounded bg-white/20 px-1.5 py-0.5 hover:bg-white/30"
+              >
+                ×
+              </button>
+            </div>
+          )}
+
+          <div ref={langRef} className="relative z-20 shrink-0">
+            <button
+              type="button"
+              onClick={() => setLangOpen(o => !o)}
+              className="inline-flex items-center gap-1 whitespace-nowrap rounded-xl bg-white/10 px-2 py-2 font-medium text-white transition-colors hover:bg-white/20 sm:gap-2 sm:px-3"
+            >
+              <span className="text-xl sm:text-2xl">{localeFlags[locale]}</span>
+              <span className="text-xs font-bold sm:text-sm">{(localeNames[locale] || '').slice(0, 3).toUpperCase()}</span>
+              <svg className={`size-4 shrink-0 transition-transform ${langOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+            </button>
+            {langOpen && (
+              <div className="absolute right-0 top-full z-50 mt-1 min-w-[160px] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl">
+                {locales.map(lang => (
+                  <button key={lang} type="button" onClick={() => { setLocale(lang); setLangOpen(false) }}
+                    className={`flex w-full items-center gap-2 px-4 py-2.5 text-sm transition-colors hover:bg-gray-50 ${locale === lang ? 'bg-blue-50 font-semibold text-blue-600' : 'text-gray-700'}`}>
+                    <span>{localeFlags[lang]}</span>
+                    <span>{localeNames[lang]}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Uitloggen */}
-        <button onClick={handleLogout}
-          className="flex items-center gap-1.5 px-3 py-2 bg-red-600/80 hover:bg-red-600 rounded-lg text-white text-sm font-bold transition-colors ml-1">
-          <span className="text-lg">🚪</span>
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="relative z-20 inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg bg-red-600/80 px-2 py-2 text-xs font-bold text-white transition-colors hover:bg-red-600 sm:gap-1.5 sm:px-3 sm:text-sm"
+        >
+          <span className="text-base sm:text-lg" aria-hidden>🚪</span>
           <span>{t('kassaApp.logout')}</span>
         </button>
 
