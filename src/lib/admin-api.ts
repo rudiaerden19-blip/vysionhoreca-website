@@ -775,12 +775,20 @@ export interface MenuProduct {
   low_stock_threshold?: number
 }
 
-/** `<1` laat meer van de foto zien; `>1` snijdt strakker bij (object-cover). */
 export const KASSA_PRODUCT_IMAGE_ZOOM_MIN = 0.65
 export const KASSA_PRODUCT_IMAGE_ZOOM_MAX = 1.85
 
-export function clampKassaProductImageZoom(n: number | null | undefined): number {
-  if (n == null || typeof n !== 'number' || !Number.isFinite(n)) return 1
+/** `<1` laat meer van de foto zien; `>1` snijdt strakker bij (object-cover).
+ * Supabase/postgres kan deze waarde als string teruggeven — altijd eerst naar number parsen. */
+export function clampKassaProductImageZoom(raw: unknown): number {
+  if (raw === undefined || raw === null || raw === '') return 1
+  const n =
+    typeof raw === 'number'
+      ? raw
+      : typeof raw === 'string'
+        ? parseFloat(raw.replace(',', '.'))
+        : NaN
+  if (!Number.isFinite(n)) return 1
   return Math.min(KASSA_PRODUCT_IMAGE_ZOOM_MAX, Math.max(KASSA_PRODUCT_IMAGE_ZOOM_MIN, n))
 }
 
@@ -800,20 +808,27 @@ export async function getMenuProducts(tenantSlug: string, signal?: AbortSignal):
         console.error('Error fetching menu products:', error)
         return []
       }
-      return data || []
+      return normalizeMenuProductsFromDb(data)
     },
     CACHE_TTL.MENU_PRODUCTS
   )
+}
+
+/** Coerce `kassa_image_zoom` naar number voor UI en saves (strings uit PostgREST). */
+function normalizeMenuProductsFromDb(rows: MenuProduct[] | null): MenuProduct[] {
+  const list = rows || []
+  return list.map((row) => ({
+    ...row,
+    kassa_image_zoom: clampKassaProductImageZoom((row as { kassa_image_zoom?: unknown }).kassa_image_zoom),
+  }))
 }
 
 export async function saveMenuProduct(product: MenuProduct): Promise<{ data: MenuProduct | null; error?: string }> {
   const { is_promo, promo_price, image_display_mode, print_label, kassa_image_zoom, ...baseProduct } =
     product
 
-  const zoomClamped =
-    kassa_image_zoom != null && typeof kassa_image_zoom === 'number' && Number.isFinite(kassa_image_zoom)
-      ? clampKassaProductImageZoom(kassa_image_zoom)
-      : undefined
+  const zoomForDb =
+    kassa_image_zoom === undefined ? undefined : clampKassaProductImageZoom(kassa_image_zoom)
 
   const fullProduct = {
     ...baseProduct,
@@ -821,7 +836,7 @@ export async function saveMenuProduct(product: MenuProduct): Promise<{ data: Men
     ...(promo_price !== undefined && { promo_price }),
     ...(image_display_mode !== undefined && { image_display_mode }),
     ...(print_label !== undefined && { print_label }),
-    ...(zoomClamped !== undefined && { kassa_image_zoom: zoomClamped }),
+    ...(zoomForDb !== undefined && { kassa_image_zoom: zoomForDb }),
   }
 
   const { data, error } = await supabase
@@ -830,9 +845,28 @@ export async function saveMenuProduct(product: MenuProduct): Promise<{ data: Men
     .select()
     .single()
 
+  const errMsgRaw = error?.message ?? ''
+  const zoomColumnProbablyMissing =
+    /kassa_image_zoom/i.test(errMsgRaw) && /schema|column|PGRST\d+/i.test(errMsgRaw)
+
   if (!error) {
     cache.invalidate(cacheKey('menu_products', product.tenant_slug))
-    return { data }
+    const d = data as MenuProduct
+    return {
+      data: {
+        ...d,
+        kassa_image_zoom: clampKassaProductImageZoom((d as { kassa_image_zoom?: unknown }).kassa_image_zoom),
+      },
+    }
+  }
+
+  if (zoomColumnProbablyMissing) {
+    cache.invalidate(cacheKey('menu_products', product.tenant_slug))
+    return {
+      data: null,
+      error:
+        'De databasekolom voor kassa-zoom ontbreekt. Voer de migratie uit (menu_products.kassa_image_zoom) en probeer opnieuw.',
+    }
   }
 
   // Fallback zonder optionele kolommen
@@ -848,7 +882,13 @@ export async function saveMenuProduct(product: MenuProduct): Promise<{ data: Men
     return { data: null, error: fallbackError.message }
   }
   cache.invalidate(cacheKey('menu_products', product.tenant_slug))
-  return { data: fallbackData }
+  const fb = fallbackData as MenuProduct
+  return {
+    data: {
+      ...fb,
+      kassa_image_zoom: clampKassaProductImageZoom((fb as { kassa_image_zoom?: unknown }).kassa_image_zoom),
+    },
+  }
 }
 
 export async function deleteMenuProduct(id: string): Promise<boolean> {
