@@ -39,6 +39,22 @@ export function getTenantUrl(tenantSlug: string, path: string = ''): string {
 }
 
 /**
+ * Volledige pagina-navigatie naar een klant-route (logout, login redirect, enz.).
+ * iPad Safari + tenant-subdomein: `/shop/:slug/account` staat niet in de adresbalk — `router.push` faalt daar vaak stil.
+ */
+export function assignTenantHref(tenantSlug: string, pathSuffix: string = '/'): void {
+  if (typeof window === 'undefined') return
+  const normalized =
+    pathSuffix === '' || pathSuffix === '/'
+      ? ''
+      : pathSuffix.startsWith('/')
+        ? pathSuffix
+        : `/${pathSuffix}`
+  const href = getTenantUrl(tenantSlug, normalized)
+  window.location.assign(href && href.startsWith('/') ? href : '/')
+}
+
+/**
  * Get full tenant URL with protocol and domain
  * For subdomain: https://www.naamzaak.ordervysion.com
  * For path: https://www.vysionhoreca.com/shop/naamzaak

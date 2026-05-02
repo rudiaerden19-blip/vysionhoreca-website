@@ -3,12 +3,11 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { getTenantSettings, registerCustomer, TenantSettings } from '@/lib/admin-api'
+import { assignTenantHref } from '@/lib/tenant-url'
 import { useLanguage } from '@/i18n'
 
 export default function RegisterPage({ params }: { params: { tenant: string } }) {
-  const router = useRouter()
   const { t } = useLanguage()
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -36,7 +35,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
   async function loadData() {
     const customerId = localStorage.getItem(`customer_${params.tenant}`)
     if (customerId) {
-      router.push(`/shop/${params.tenant}/account`)
+      assignTenantHref(params.tenant, '/account')
       return
     }
 
@@ -123,7 +122,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
     
     if (result.success && result.customer) {
       localStorage.setItem(`customer_${params.tenant}`, result.customer.id!)
-      router.push(`/shop/${params.tenant}/account`)
+      assignTenantHref(params.tenant, '/account')
     } else {
       setGeneralError(result.error || t('accountPage.registrationFailed'))
     }

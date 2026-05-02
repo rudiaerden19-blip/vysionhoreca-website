@@ -3,13 +3,12 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { getTenantSettings, getCustomer, getCustomerOrders, updateCustomer, getLoyaltyRewards, redeemReward, deleteCustomerAccount, Customer, Order, TenantSettings, LoyaltyReward } from '@/lib/admin-api'
+import { assignTenantHref } from '@/lib/tenant-url'
 import { useLanguage } from '@/i18n'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 
 export default function AccountPage({ params }: { params: { tenant: string } }) {
-  const router = useRouter()
   const { t, locale, localeNames } = useLanguage()
   const { ask, ConfirmModal } = useAdminConfirm(t)
   const [loading, setLoading] = useState(true)
@@ -36,7 +35,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
     // Check if logged in via localStorage
     const customerId = localStorage.getItem(`customer_${params.tenant}`)
     if (!customerId) {
-      router.push(`/shop/${params.tenant}/account/login`)
+      assignTenantHref(params.tenant, '/account/login')
       return
     }
 
@@ -48,7 +47,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
 
     if (!customerData) {
       localStorage.removeItem(`customer_${params.tenant}`)
-      router.push(`/shop/${params.tenant}/account/login`)
+      assignTenantHref(params.tenant, '/account/login')
       return
     }
 
@@ -74,7 +73,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
 
   const handleLogout = () => {
     localStorage.removeItem(`customer_${params.tenant}`)
-    router.push(`/shop/${params.tenant}`)
+    assignTenantHref(params.tenant, '/')
   }
 
   // GDPR: Account verwijderen
@@ -87,7 +86,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
     if (success) {
       localStorage.removeItem(`customer_${params.tenant}`)
       alert(t('accountPage.accountDeleted'))
-      router.push(`/shop/${params.tenant}`)
+      assignTenantHref(params.tenant, '/')
     } else {
       alert(t('accountPage.deleteError'))
     }
