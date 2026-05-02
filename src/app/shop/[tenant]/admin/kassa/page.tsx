@@ -2085,9 +2085,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                               🍽️
                             </span>
                           )}
-                          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-1.5 pb-1.5 pt-1 sm:pb-2">
+                          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2 pt-4 sm:px-3 sm:pb-3 sm:pt-5">
                             <p
-                              className={`line-clamp-2 text-xs font-bold leading-tight sm:text-sm ${
+                              className={`line-clamp-2 text-base font-extrabold leading-tight sm:text-lg md:text-xl lg:text-2xl tracking-tight ${
                                 product.image_url
                                   ? 'text-white [text-shadow:0_2px_8px_rgba(0,0,0,.9),0_1px_2px_rgba(0,0,0,1)]'
                                   : 'text-gray-900'
@@ -2096,7 +2096,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                               {product.name}
                             </p>
                             <p
-                              className={`mt-0.5 text-sm font-bold sm:text-base ${
+                              className={`mt-1 text-lg font-bold sm:text-xl md:text-2xl ${
                                 product.image_url
                                   ? 'text-emerald-300 [text-shadow:0_2px_6px_rgba(0,0,0,.85),0_1px_2px_rgba(0,0,0,1)]'
                                   : 'text-emerald-600'
