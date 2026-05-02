@@ -1805,6 +1805,11 @@ export interface Order {
   tax?: number
   total: number
   payment_method?: string
+  /** Kassa gesplitste betaling (EUR); alleen bij payment_method SPLIT */
+  payment_split_cash?: number | null
+  payment_split_card?: number | null
+  /** Idempotente checkout-sleutel (kassa offline retry) */
+  kassa_client_uuid?: string | null
   payment_status?: string
   requested_date?: string
   requested_time?: string
@@ -1856,16 +1861,45 @@ export function orderCountsTowardRevenueAndZReport(
   return (order.payment_status || '').toString().toLowerCase() === 'paid'
 }
 
-/** Zelfde indeling als Z-rapport / omzet: contant, kaart, overig (online). */
-export type OrderPaymentBucket = 'cash' | 'card' | 'online'
+/** Zelfde indeling als Z-rapport / omzet: contant, kaart, overig (online), gesplitst. */
+export type OrderPaymentBucket = 'cash' | 'card' | 'online' | 'split'
 
 export function orderPaymentMethodBucket(
   order: Pick<Order, 'payment_method'>
 ): OrderPaymentBucket {
   const pm = (order.payment_method || '').toLowerCase()
+  if (pm === 'split') return 'split'
   if (pm === 'cash' || pm === 'contant') return 'cash'
   if (pm === 'card' || pm === 'pin' || pm === 'kaart') return 'card'
   return 'online'
+}
+
+/**
+ * Verdeelt één order over Z-rapport / kasbuckets (contant, kaart, online).
+ * Gesplitste kassa-betalingen gebruiken payment_split_*; anders payment_method + totaal.
+ */
+export function distributeOrderPaymentForZRaport(order: {
+  total?: unknown
+  payment_method?: unknown
+  payment_split_cash?: unknown
+  payment_split_card?: unknown
+}): { cash: number; card: number; online: number } {
+  const orderTotal = Number(order.total) || 0
+  const pm = String(order.payment_method || '').toLowerCase()
+  if (pm === 'split') {
+    const sc = Number(order.payment_split_cash)
+    const sd = Number(order.payment_split_card)
+    if (Number.isFinite(sc) && Number.isFinite(sd)) {
+      return { cash: sc, card: sd, online: 0 }
+    }
+  }
+  if (pm === 'cash' || pm === 'contant') {
+    return { cash: orderTotal, card: 0, online: 0 }
+  }
+  if (pm === 'card' || pm === 'pin' || pm === 'kaart') {
+    return { cash: 0, card: orderTotal, online: 0 }
+  }
+  return { cash: 0, card: 0, online: orderTotal }
 }
 
 /** PostgREST/Supabase cap (~1000 rows per request zonder range): analytics moet alle rijen binnen het venster ophalen. */
@@ -2114,7 +2148,7 @@ export async function regenerateZReportForDate(
       tenantSlug,
       startUTC,
       endUTC,
-      'id, total, payment_method, order_type, status, payment_status'
+      'id, total, payment_method, payment_split_cash, payment_split_card, order_type, status, payment_status'
     )
 
     const orders = ordersRaw.filter((o) =>
@@ -2122,7 +2156,17 @@ export async function regenerateZReportForDate(
         o as Pick<Order, 'order_type' | 'status' | 'payment_status'>
       )
     ) as Array<
-      Pick<Order, 'id' | 'total' | 'payment_method' | 'order_type' | 'status' | 'payment_status'> & { id: string }
+      Pick<
+        Order,
+        | 'id'
+        | 'total'
+        | 'payment_method'
+        | 'payment_split_cash'
+        | 'payment_split_card'
+        | 'order_type'
+        | 'status'
+        | 'payment_status'
+      > & { id: string }
     >
 
     console.log(`regenerateZReportForDate: ${orders?.length || 0} orders voor rapport`)
@@ -2151,14 +2195,10 @@ export async function regenerateZReportForDate(
       const orderTotal = order.total || 0
       total += orderTotal
 
-      const paymentMethod = (order.payment_method || '').toLowerCase()
-      if (paymentMethod === 'cash' || paymentMethod === 'contant') {
-        cashPayments += orderTotal
-      } else if (paymentMethod === 'card' || paymentMethod === 'pin' || paymentMethod === 'kaart') {
-        cardPayments += orderTotal
-      } else {
-        onlinePayments += orderTotal
-      }
+      const d = distributeOrderPaymentForZRaport(order)
+      cashPayments += d.cash
+      cardPayments += d.card
+      onlinePayments += d.online
     })
 
     const taxRate = btwPercentage / 100
@@ -3341,7 +3381,7 @@ export async function calculateMonthlyReport(
     tenantSlug,
     startUTC,
     endUTC,
-    'total, status, payment_method, order_type, payment_status'
+    'total, status, payment_method, payment_split_cash, payment_split_card, order_type, payment_status'
   )
 
   const ordersData = ordersDataRaw.filter((o) =>

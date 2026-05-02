@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import {
+  distributeOrderPaymentForZRaport,
   fetchAllTenantOrdersInCreatedAtRange,
   getTenantSettings,
   getZRapportDateBounds,
@@ -145,14 +146,10 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         if (order.id) orderIds.push(order.id)
         const orderTotal = order.total || 0
         total += orderTotal
-        const paymentMethod = (order.payment_method || '').toLowerCase()
-        if (paymentMethod === 'cash' || paymentMethod === 'contant') {
-          cashPayments += orderTotal
-        } else if (paymentMethod === 'card' || paymentMethod === 'pin' || paymentMethod === 'kaart') {
-          cardPayments += orderTotal
-        } else {
-          onlinePayments += orderTotal
-        }
+        const d = distributeOrderPaymentForZRaport(order)
+        cashPayments += d.cash
+        cardPayments += d.card
+        onlinePayments += d.online
       })
 
       const taxRate = btwPercentage / 100

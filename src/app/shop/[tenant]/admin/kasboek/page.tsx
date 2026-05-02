@@ -37,6 +37,8 @@ type OrderRow = Pick<
   | 'customer_notes'
   | 'total'
   | 'payment_method'
+  | 'payment_split_cash'
+  | 'payment_split_card'
   | 'order_type'
   | 'status'
   | 'payment_status'
@@ -60,7 +62,12 @@ export type KasboekLedgerRow = {
   receiptRef: string
   description: string
   channelKey: 'kasboekPage.channelPos' | 'kasboekPage.channelOnline' | 'kasboekPage.channelPurchase'
-  paymentKey: 'kasboekPage.payCash' | 'kasboekPage.payCard' | 'kasboekPage.payOnline' | null
+  paymentKey:
+    | 'kasboekPage.payCash'
+    | 'kasboekPage.payCard'
+    | 'kasboekPage.payOnline'
+    | 'kasboekPage.paySplit'
+    | null
   amountSigned: number
   runningBalance: number
 }
@@ -631,7 +638,7 @@ function KasboekReferenceTab({
       supabase
         .from('orders')
         .select(
-          'id, created_at, order_number, customer_name, customer_notes, total, payment_method, order_type, status, payment_status'
+          'id, created_at, order_number, customer_name, customer_notes, total, payment_method, payment_split_cash, payment_split_card, order_type, status, payment_status'
         )
         .eq('tenant_slug', tenantSlug)
         .gte('created_at', startIso)
@@ -660,7 +667,9 @@ function KasboekReferenceTab({
             ? ('kasboekPage.payCash' as const)
             : bucket === 'card'
               ? ('kasboekPage.payCard' as const)
-              : ('kasboekPage.payOnline' as const)
+              : bucket === 'split'
+                ? ('kasboekPage.paySplit' as const)
+                : ('kasboekPage.payOnline' as const)
         return {
           id: `o-${o.id}`,
           occurredAt: o.created_at || new Date().toISOString(),

@@ -216,6 +216,7 @@ export async function POST(request: NextRequest) {
     .from('staff_clock_sessions')
     .update({ clock_out_at: nowIso, updated_at: nowIso })
     .eq('id', session.id)
+    .eq('tenant_slug', tenant_slug)
 
   if (upErr) {
     console.error('staff-clock out update', upErr)

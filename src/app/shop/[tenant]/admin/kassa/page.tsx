@@ -55,6 +55,24 @@ import {
 } from '@/lib/demo-links'
 import { buildShopInternalReturnPath } from '@/lib/auth-headers'
 
+function isLikelyOfflineOrNetworkSupabaseError(error: { message?: string } | null | undefined): boolean {
+  if (typeof navigator !== 'undefined' && !navigator.onLine) return true
+  const m = (error?.message || '').toLowerCase()
+  return (
+    m.includes('fetch') ||
+    m.includes('network') ||
+    m.includes('failed to fetch') ||
+    m.includes('load failed')
+  )
+}
+
+/** Postgres unique violation op kassa_client_uuid → order bestaat al (retry na offline sync). */
+function isDuplicateKassaClientUuidError(error: { code?: string; message?: string } | null | undefined): boolean {
+  if (!error || error.code !== '23505') return false
+  const msg = (error.message || '').toLowerCase()
+  return msg.includes('kassa_client') || msg.includes('idx_orders_tenant_kassa')
+}
+
 interface SelectedChoice {
   optionId: string
   optionName: string
@@ -506,6 +524,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [tableOrders, setTableOrders] = useState<Record<string, CartItem[]>>({})
 
   const tableOrdersKey = `vysion_table_orders_${tenant}`
+  const persistTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
+
+  useEffect(() => {
+    return () => {
+      const timers = persistTimersRef.current
+      for (const k of Object.keys(timers)) {
+        clearTimeout(timers[k])
+        delete timers[k]
+      }
+    }
+  }, [])
 
   useLayoutEffect(() => {
     const el = kassaMenuScrollRef.current
@@ -628,8 +657,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   fromSupabase[row.table_number] = row.items as CartItem[]
                 }
               })
-              setTableOrders(fromSupabase)
-              localStorage.setItem(tableOrdersKey, JSON.stringify(fromSupabase))
+              setTableOrders(prev => {
+                const merged = { ...prev, ...fromSupabase }
+                localStorage.setItem(tableOrdersKey, JSON.stringify(merged))
+                return merged
+              })
             })
         }
       )
@@ -638,6 +670,46 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       void supabase.removeChannel(ordersChannel).catch(() => {})
     }
   }, [tenant, tableOrdersKey])
+
+  const cancelPersistTimer = (tblNr: string) => {
+    const timers = persistTimersRef.current
+    const prev = timers[tblNr]
+    if (prev) {
+      clearTimeout(prev)
+      delete timers[tblNr]
+    }
+  }
+
+  const persistOpenOrderRowToSupabase = async (tblNr: string, items: CartItem[]) => {
+    await supabase
+      .from('orders')
+      .delete()
+      .eq('tenant_slug', tenant)
+      .eq('table_number', tblNr)
+      .eq('status', 'open')
+    if (items.length === 0) return
+    await supabase.from('orders').insert({
+      tenant_slug: tenant,
+      order_number: 0,
+      status: 'open',
+      payment_status: 'pending',
+      order_type: 'DINE_IN',
+      table_number: tblNr,
+      subtotal: 0,
+      tax: 0,
+      total: 0,
+      items: items as unknown as Record<string, unknown>[],
+      created_at: new Date().toISOString(),
+    })
+  }
+
+  const schedulePersistOpenOrder = (tblNr: string, items: CartItem[]) => {
+    cancelPersistTimer(tblNr)
+    persistTimersRef.current[tblNr] = setTimeout(() => {
+      delete persistTimersRef.current[tblNr]
+      void persistOpenOrderRowToSupabase(tblNr, items)
+    }, 420)
+  }
 
   // Sla cart op voor huidige tafel
   const updateTableStatus = (tblNr: string, occupied: boolean) => {
@@ -657,34 +729,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }
 
   const saveCartToTable = (tblNr: string, items: CartItem[]) => {
-    const updated = { ...tableOrders, [tblNr]: items }
-    setTableOrders(updated)
-    localStorage.setItem(tableOrdersKey, JSON.stringify(updated))
+    cancelPersistTimer(tblNr)
+    setTableOrders(prev => {
+      const updated = { ...prev, [tblNr]: items }
+      localStorage.setItem(tableOrdersKey, JSON.stringify(updated))
+      return updated
+    })
     updateTableStatus(tblNr, items.length > 0)
-    // Sync open bestelling naar Supabase voor cross-device toegang
-    supabase
-      .from('orders')
-      .delete()
-      .eq('tenant_slug', tenant)
-      .eq('table_number', tblNr)
-      .eq('status', 'open')
-      .then(() => {
-        if (items.length > 0) {
-          supabase.from('orders').insert({
-            tenant_slug: tenant,
-            order_number: 0,
-            status: 'open',
-            payment_status: 'pending',
-            order_type: 'DINE_IN',
-            table_number: tblNr,
-            subtotal: 0,
-            tax: 0,
-            total: 0,
-            items: items as unknown as Record<string, unknown>[],
-            created_at: new Date().toISOString(),
-          })
-        }
-      })
+    void persistOpenOrderRowToSupabase(tblNr, items)
   }
 
   // Bevestiging popup voor tafel wisselen
@@ -722,15 +774,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   // Betaling
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
-  type PaymentMethodType = 'CASH' | 'CARD' | 'IDEAL' | 'BANCONTACT'
+  type PaymentMethodType = 'CASH' | 'CARD' | 'IDEAL' | 'BANCONTACT' | 'SPLIT'
   const [showSplitModal, setShowSplitModal] = useState(false)
   const [splitCash, setSplitCash] = useState(0)
   const [splitCard, setSplitCard] = useState(0)
   const [lastOrder, setLastOrder] = useState<{
     orderNumber: number
+    /** Offline wachtrij: korte referentie tot sync */
+    checkoutReference?: string
     items: CartItem[]
     total: number
     paymentMethod: PaymentMethodType
+    splitCash?: number
+    splitCard?: number
     orderType: OrderType
     tableNumber: string
     createdAt: Date
@@ -950,11 +1006,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }
 
   // ── Cart ─────────────────────────────────────────────────────────────────
-  const syncTableOrder = (updatedCart: CartItem[]) => {
-    if (!tableNumber) return
-    const newOrders = { ...tableOrders, [tableNumber]: updatedCart }
-    setTableOrders(newOrders)
-    localStorage.setItem(tableOrdersKey, JSON.stringify(newOrders))
+  const syncTableOrder = (tblNr: string | '', updatedCart: CartItem[]) => {
+    if (!tblNr) return
+    setTableOrders(prev => {
+      const next = { ...prev, [tblNr]: updatedCart }
+      localStorage.setItem(tableOrdersKey, JSON.stringify(next))
+      return next
+    })
+    schedulePersistOpenOrder(tblNr, updatedCart)
   }
 
   const addToCart = (product: MenuProduct, choices: SelectedChoice[] = []) => {
@@ -967,7 +1026,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       const updated = existing
         ? prev.map(i => i.cartKey === cartKey ? { ...i, quantity: i.quantity + 1 } : i)
         : [...prev, { product, quantity: 1, choices, cartKey }]
-      syncTableOrder(updated)
+      if (tableNumber) {
+        syncTableOrder(tableNumber, updated)
+      }
       return updated
     })
   }
@@ -1053,12 +1114,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           updated = [...without, { product, quantity: oldQty, choices: selected, cartKey }]
         }
         if (tableNumber) {
-          const newOrders = { ...tableOrders, [tableNumber]: updated }
-          setTableOrders(newOrders)
-          localStorage.setItem(tableOrdersKey, JSON.stringify(newOrders))
           updateTableStatus(tableNumber, updated.length > 0)
         }
-        syncTableOrder(updated)
+        syncTableOrder(tableNumber, updated)
         return updated
       })
     } else {
@@ -1074,11 +1132,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         ? prev.filter(i => i.cartKey !== cartKey)
         : prev.map(i => i.cartKey === cartKey ? { ...i, quantity: qty } : i)
       if (tableNumber) {
-        const newOrders = { ...tableOrders, [tableNumber]: updated }
-        setTableOrders(newOrders)
-        localStorage.setItem(tableOrdersKey, JSON.stringify(newOrders))
-        // Zet tafel status bij via centrale functie
         updateTableStatus(tableNumber, updated.length > 0)
+        syncTableOrder(tableNumber, updated)
       }
       return updated
     })
@@ -1088,9 +1143,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     playRemove()
     setCart([])
     if (tableNumber) {
-      const newOrders = { ...tableOrders, [tableNumber]: [] }
-      setTableOrders(newOrders)
-      localStorage.setItem(tableOrdersKey, JSON.stringify(newOrders))
+      syncTableOrder(tableNumber, [])
+      updateTableStatus(tableNumber, false)
     }
   }
   const total = cart.reduce((sum, i) => {
@@ -1167,12 +1221,21 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         fromLs = []
       }
     }
-    const byOrderNum = new Map<number, object>()
+    const byUuid = new Map<string, object>()
+    const legacyNum = new Map<number, object>()
     for (const o of [...fromLs, ...fromIdb]) {
-      const n = (o as { order_number?: number }).order_number
-      if (typeof n === 'number') byOrderNum.set(n, o)
+      const row = o as { kassa_client_uuid?: string; order_number?: number }
+      const u = row.kassa_client_uuid
+      if (typeof u === 'string' && u.length > 0) {
+        byUuid.set(u, o)
+      } else if (typeof row.order_number === 'number') {
+        legacyNum.set(row.order_number, o)
+      } else {
+        const fallbackKey = `legacy:${String((row as { created_at?: string }).created_at ?? '')}:${String((row as { total?: number }).total ?? '')}`
+        byUuid.set(fallbackKey, o)
+      }
     }
-    const merged = [...byOrderNum.values()]
+    const merged = [...byUuid.values(), ...legacyNum.values()]
     if (merged.length > 0) {
       try {
         await offlineDbSetOrderQueue(tenant, merged)
@@ -1193,14 +1256,21 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       const remaining: object[] = []
       for (const order of freshQueue) {
         const { error } = await supabase.from('orders').insert(order)
-        if (error) {
-          remaining.push(order)
-        } else {
+        if (!error) {
           const o = order as { tenant_slug?: string; created_at?: string }
           if (o.tenant_slug && o.created_at) {
             void syncZReportAfterOrder(o.tenant_slug, o.created_at)
           }
+          continue
         }
+        if (isDuplicateKassaClientUuidError(error)) {
+          const o = order as { tenant_slug?: string; created_at?: string }
+          if (o.tenant_slug && o.created_at) {
+            void syncZReportAfterOrder(o.tenant_slug, o.created_at)
+          }
+          continue
+        }
+        remaining.push(order)
       }
       try {
         await offlineDbSetOrderQueue(tenant, remaining)
@@ -1249,6 +1319,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [tenant])
 
   const clearTableAfterPayment = (tblNr: string) => {
+    cancelPersistTimer(tblNr)
     const updated = { ...tableOrders }
     delete updated[tblNr]
     setTableOrders(updated)
@@ -1275,41 +1346,42 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       .eq('status', 'open')
   }
 
-  const completePayment = async (method: PaymentMethodType) => {
+  const completePayment = async (
+    method: PaymentMethodType,
+    splitAmounts?: { cash: number; card: number },
+  ) => {
     if (cart.length === 0) return
-    playCashRegister()
-    setTimeout(() => playSuccess(), 400)
+
+    if (method === 'SPLIT') {
+      const sc = splitAmounts?.cash ?? 0
+      const sd = splitAmounts?.card ?? 0
+      if (Math.abs(total - sc - sd) > 0.02) return
+    }
+
     const vatRate = tenantInfo?.btw_percentage ?? 6
     const subtotal = total / (1 + vatRate / 100)
     const tax = total - subtotal
     const createdAt = new Date()
+    const kassa_client_uuid =
+      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : `${tenant}-${createdAt.getTime()}-${Math.random().toString(36).slice(2, 12)}`
 
-    // Lokaal ordernummer berekenen (werkt ook offline)
-    let orderNumber = Date.now() % 100000
-    try {
-      const { data: lastOrderRow } = await supabase
-        .from('orders')
-        .select('order_number')
-        .eq('tenant_slug', tenant)
-        .order('order_number', { ascending: false })
-        .limit(1)
-        .single()
-      orderNumber = (lastOrderRow?.order_number ?? 1000) + 1
-    } catch { /* offline: gebruik timestamp-gebaseerd nummer */ }
+    const shortRef = kassa_client_uuid.replace(/-/g, '').slice(-10).toUpperCase()
 
-    const orderPayload = {
+    const customerTableLabel = tableNumber
+      ? t('kassaReceipt.tableLabel').replace(/\{number\}/g, String(tableNumber))
+      : null
+
+    const orderPayload: Record<string, unknown> = {
       tenant_slug: tenant,
-      order_number: orderNumber,
-      customer_name: tableNumber
-        ? t('kassaReceipt.tableLabel').replace(/\{number\}/g, String(tableNumber))
-        : t('kassaApp.walkInCustomerName'),
+      kassa_client_uuid,
+      customer_name: customerTableLabel ?? t('kassaApp.walkInCustomerName'),
       status: 'confirmed',
       payment_status: 'paid',
-      payment_method: method,
+      payment_method: method === 'SPLIT' ? 'SPLIT' : method,
       order_type: orderType,
-      customer_notes: tableNumber
-        ? t('kassaReceipt.tableLabel').replace(/\{number\}/g, String(tableNumber))
-        : null,
+      customer_notes: customerTableLabel,
       subtotal: Math.round(subtotal * 100) / 100,
       tax: Math.round(tax * 100) / 100,
       total: total,
@@ -1324,51 +1396,81 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       created_at: createdAt.toISOString(),
     }
 
-    // Probeer Supabase, bij netwerkfout: sla op in offline queue
-    const { error } = await supabase.from('orders').insert(orderPayload)
-    if (!error) {
-      void syncZReportAfterOrder(tenant, createdAt.toISOString())
+    if (method === 'SPLIT' && splitAmounts) {
+      orderPayload.payment_split_cash = Math.round(splitAmounts.cash * 100) / 100
+      orderPayload.payment_split_card = Math.round(splitAmounts.card * 100) / 100
     }
-    if (error) {
-      const isNetworkError = !navigator.onLine || error.message?.includes('fetch') || error.message?.includes('network')
-      if (isNetworkError) {
-        // Gebruik Web Locks om race conditions bij gelijktijdige tabs te voorkomen
-        const addToQueue = async () => {
-          const queue = await mergeOfflineQueues()
-          if (!queue.some((o: any) => o.order_number === orderPayload.order_number)) {
-            queue.push(orderPayload)
-            await offlineDbSetOrderQueue(tenant, queue)
-            localStorage.setItem(offlineQueueKey, JSON.stringify(queue))
-          }
-          try {
-            const reg = await navigator.serviceWorker?.ready
-            if (reg && 'sync' in reg) {
-              await (reg as ServiceWorkerRegistration & { sync: { register: (tag: string) => Promise<void> } }).sync.register(
-                'vysion-offline-orders',
-              )
-            }
-          } catch {
-            /* Background Sync niet ondersteund (Safari) — online-event doet flush */
-          }
+
+    const { data: insertedRow, error } = await supabase
+      .from('orders')
+      .insert(orderPayload as never)
+      .select('order_number')
+      .maybeSingle()
+
+    let allocatedOrderNumber = 0
+    let queuedOffline = false
+
+    if (!error && insertedRow?.order_number != null) {
+      allocatedOrderNumber = Number(insertedRow.order_number)
+      void syncZReportAfterOrder(tenant, createdAt.toISOString())
+      playCashRegister()
+      setTimeout(() => playSuccess(), 400)
+    } else if (error && isLikelyOfflineOrNetworkSupabaseError(error)) {
+      const addToQueue = async () => {
+        const queue = await mergeOfflineQueues()
+        if (
+          !queue.some(
+            (o: unknown) =>
+              (o as { kassa_client_uuid?: string }).kassa_client_uuid === kassa_client_uuid,
+          )
+        ) {
+          queue.push(orderPayload)
+          await offlineDbSetOrderQueue(tenant, queue)
+          localStorage.setItem(offlineQueueKey, JSON.stringify(queue))
         }
-        if ('locks' in navigator) {
-          await (navigator as any).locks.request(`vysion_queue_${tenant}`, async () => addToQueue())
-        } else {
-          await addToQueue()
+        try {
+          const reg = await navigator.serviceWorker?.ready
+          if (reg && 'sync' in reg) {
+            await (
+              reg as ServiceWorkerRegistration & {
+                sync: { register: (tag: string) => Promise<void> }
+              }
+            ).sync.register('vysion-offline-orders')
+          }
+        } catch {
+          /* Background Sync niet ondersteund */
         }
-        alert(
-          `${t('kassaApp.offlineModeActive')}\n\n${t('kassaApp.offlineOrderQueuedAlert').replace('{orderNumber}', String(orderNumber))}`,
+      }
+      if ('locks' in navigator) {
+        await (navigator as Navigator & { locks: LockManager }).locks.request(
+          `vysion_queue_${tenant}`,
+          async () => {
+            await addToQueue()
+          },
         )
       } else {
-        console.error('Supabase order insert error:', error)
+        await addToQueue()
       }
+      queuedOffline = true
+      alert(`${t('kassaApp.offlineModeActive')}\n\n${t('kassaApp.offlineOrderQueuedAlert').replace('{ref}', shortRef)}`)
+      playCashRegister()
+      setTimeout(() => playSuccess(), 400)
+    } else {
+      console.error('Supabase order insert error:', error)
+      alert(
+        `${t('kassaApp.orderPersistFailedTitle')}\n\n${t('kassaApp.orderPersistFailedBody')}${error?.message ? `\n\n(${error.message})` : ''}`,
+      )
+      return
     }
 
     setLastOrder({
-      orderNumber,
+      orderNumber: allocatedOrderNumber,
+      checkoutReference: queuedOffline ? shortRef : undefined,
       items: [...cart],
       total,
       paymentMethod: method,
+      splitCash: method === 'SPLIT' ? splitAmounts?.cash : undefined,
+      splitCard: method === 'SPLIT' ? splitAmounts?.card : undefined,
       orderType,
       tableNumber,
       createdAt,
@@ -1380,7 +1482,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     clearCart()
     setTableNumber('')
     setShowPaymentModal(false)
-    // Volgende klant: opnieuw Verkoop kiezen via klok (anders product-popup).
+    setShowSplitModal(false)
     if (tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly) {
       setActiveKassaStaff(null)
     }
@@ -1398,15 +1500,36 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         : order.orderType === 'TAKEAWAY'
           ? `📦 ${t('kassaReceipt.orderTypeTakeaway')}`
           : `🚗 ${t('kassaReceipt.orderTypeDelivery')}`
+    const receiptRefDisplay =
+      order.checkoutReference ??
+      (order.orderNumber > 0 ? String(order.orderNumber) : '—')
+
     const payLabel =
-      order.paymentMethod === 'CASH'
-        ? t('kassaApp.payCash')
-        : order.paymentMethod === 'CARD'
-          ? t('kassaApp.payCard')
-          : order.paymentMethod === 'IDEAL'
-            ? t('kassaApp.payIdeal')
-            : t('kassaApp.payBancontact')
-    const docTitle = `${t('kassaReceipt.receiptNo')}${order.orderNumber}`
+      order.paymentMethod === 'SPLIT'
+        ? t('kassaReceipt.paidSplit')
+            .replace('{cash}', (order.splitCash ?? 0).toFixed(2))
+            .replace('{card}', (order.splitCard ?? 0).toFixed(2))
+        : order.paymentMethod === 'CASH'
+          ? t('kassaApp.payCash')
+          : order.paymentMethod === 'CARD'
+            ? t('kassaApp.payCard')
+            : order.paymentMethod === 'IDEAL'
+              ? t('kassaApp.payIdeal')
+              : t('kassaApp.payBancontact')
+
+    let thermalOrderNumber = order.orderNumber
+    if (thermalOrderNumber <= 0 && order.checkoutReference) {
+      const raw = order.checkoutReference.replace(/\D/g, '').slice(-8)
+      const n = parseInt(raw || '0', 10)
+      thermalOrderNumber = Number.isFinite(n) && n > 0 ? (n % 800000) + 100000 : 100000
+    }
+
+    const thermalPaymentLabel =
+      order.paymentMethod === 'SPLIT'
+        ? `Split €${(order.splitCash ?? 0).toFixed(2)} / €${(order.splitCard ?? 0).toFixed(2)}`
+        : order.paymentMethod
+
+    const docTitle = `${t('kassaReceipt.receiptNo')}${receiptRefDisplay}`
     const bizName = escapeReceiptHtml(tenantInfo?.business_name || t('kassaApp.defaultBusinessName'))
     const dateStr = order.createdAt.toLocaleString(appLocaleToBcp47(locale), {
       day: '2-digit',
@@ -1427,7 +1550,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       <div class="divider"></div>
       <div class="center order-type">${escapeReceiptHtml(orderTypeLabel)}${order.tableNumber ? `<br/>${escapeReceiptHtml(t('kassaReceipt.tablePrefix'))} ${escapeReceiptHtml(String(order.tableNumber))}` : ''}</div>
       <div class="row small">
-        <span>${escapeReceiptHtml(t('kassaReceipt.receiptNo'))}${order.orderNumber}</span>
+        <span>${escapeReceiptHtml(t('kassaReceipt.receiptNo'))}${escapeReceiptHtml(receiptRefDisplay)}</span>
         <span>${escapeReceiptHtml(dateStr)}</span>
       </div>
       <div class="divider-solid"></div>
@@ -1453,13 +1576,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     </body></html>`
 
     const thermalOrder = buildKassaThermalOrderPayload({
-      orderNumber: order.orderNumber,
+      orderNumber: thermalOrderNumber,
       customerName:
         order.tableNumber != null && order.tableNumber !== ''
           ? t('kassaReceipt.tableLabel').replace(/\{number\}/g, String(order.tableNumber))
           : t('kassaApp.walkInCustomerName'),
       orderType: order.orderType,
-      paymentMethod: order.paymentMethod,
+      paymentMethod: thermalPaymentLabel,
       subtotal,
       tax,
       total: order.total,
@@ -2965,7 +3088,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               )}
               {/* Bevestigen */}
               <button
-                onClick={() => { if (Math.abs(total - splitCash - splitCard) < 0.01) { completePayment('CASH'); setShowSplitModal(false) } }}
+                onClick={() => {
+                  if (Math.abs(total - splitCash - splitCard) < 0.01) {
+                    void completePayment('SPLIT', { cash: splitCash, card: splitCard })
+                  }
+                }}
                 disabled={Math.abs(total - splitCash - splitCard) > 0.01}
                 className="w-full py-4 rounded-xl bg-purple-500 hover:bg-purple-600 text-white font-bold text-lg disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
@@ -2987,14 +3114,22 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             : lastOrder.orderType === 'TAKEAWAY'
               ? `📦 ${t('kassaReceipt.orderTypeTakeaway')}`
               : `🚗 ${t('kassaReceipt.orderTypeDelivery')}`
+        const receiptRefSuccess =
+          lastOrder.checkoutReference ??
+          (lastOrder.orderNumber > 0 ? String(lastOrder.orderNumber) : '—')
+
         const payLabel =
-          lastOrder.paymentMethod === 'CASH'
-            ? t('kassaApp.payCash')
-            : lastOrder.paymentMethod === 'CARD'
-              ? t('kassaApp.payCard')
-              : lastOrder.paymentMethod === 'IDEAL'
-                ? t('kassaApp.payIdeal')
-                : t('kassaApp.payBancontact')
+          lastOrder.paymentMethod === 'SPLIT'
+            ? t('kassaReceipt.paidSplit')
+                .replace('{cash}', (lastOrder.splitCash ?? 0).toFixed(2))
+                .replace('{card}', (lastOrder.splitCard ?? 0).toFixed(2))
+            : lastOrder.paymentMethod === 'CASH'
+              ? t('kassaApp.payCash')
+              : lastOrder.paymentMethod === 'CARD'
+                ? t('kassaApp.payCard')
+                : lastOrder.paymentMethod === 'IDEAL'
+                  ? t('kassaApp.payIdeal')
+                  : t('kassaApp.payBancontact')
         const successDateStr = lastOrder.createdAt.toLocaleString(appLocaleToBcp47(locale), {
           day: '2-digit',
           month: '2-digit',
@@ -3010,7 +3145,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <div className="p-4 bg-emerald-500 text-white text-center">
                 <div className="w-16 h-16 rounded-full bg-white/20 mx-auto mb-2 flex items-center justify-center text-4xl">✓</div>
                 <h3 className="text-xl font-bold">{t('kassaApp.successTitle')}</h3>
-                <p className="opacity-80">{t('kassaApp.successOrderLine').replace(/\{number\}/g, String(lastOrder.orderNumber))}</p>
+                <p className="opacity-80">
+                  {lastOrder.checkoutReference
+                    ? t('kassaApp.successCheckoutRef').replace('{ref}', lastOrder.checkoutReference)
+                    : t('kassaApp.successOrderLine').replace(/\{number\}/g, String(lastOrder.orderNumber))}
+                </p>
               </div>
 
               {/* Kassabon — exact zelfde als referentie */}
@@ -3044,7 +3183,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     <div className="flex justify-between">
                       <span>
                         {t('kassaReceipt.receiptNo')}
-                        {lastOrder.orderNumber}
+                        {receiptRefSuccess}
                       </span>
                       <span>{successDateStr}</span>
                     </div>

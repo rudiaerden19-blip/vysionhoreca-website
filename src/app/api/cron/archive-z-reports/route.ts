@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
-import { getDateBoundsForBelgium, getBelgiumDateString } from '@/lib/admin-api'
+import {
+  distributeOrderPaymentForZRaport,
+  getDateBoundsForBelgium,
+  getBelgiumDateString,
+} from '@/lib/admin-api'
 
 // Vercel Cron Job - runs daily at midnight
 // Configure in vercel.json: { "crons": [{ "path": "/api/cron/archive-z-reports", "schedule": "0 0 * * *" }] }
@@ -48,7 +52,7 @@ export async function GET(request: NextRequest) {
 
     const { data: allOrders, error: ordersError } = await supabase
       .from('orders')
-      .select('id, tenant_slug, total, payment_method')
+      .select('id, tenant_slug, total, payment_method, payment_split_cash, payment_split_card')
       .gte('created_at', startUTC)
       .lte('created_at', endUTC)
       .eq('status', 'completed')
@@ -129,14 +133,10 @@ export async function GET(request: NextRequest) {
           const orderTotal = order.total || 0
           total += orderTotal
 
-          const paymentMethod = (order.payment_method || '').toLowerCase()
-          if (paymentMethod === 'cash' || paymentMethod === 'contant') {
-            cashPayments += orderTotal
-          } else if (paymentMethod === 'card' || paymentMethod === 'pin' || paymentMethod === 'kaart') {
-            cardPayments += orderTotal
-          } else {
-            onlinePayments += orderTotal
-          }
+          const d = distributeOrderPaymentForZRaport(order)
+          cashPayments += d.cash
+          cardPayments += d.card
+          onlinePayments += d.online
         })
 
         const taxRate = btwPercentage / 100
