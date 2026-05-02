@@ -2016,7 +2016,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           <img
                             src={catImage}
                             alt={cat.name}
-                            className="pointer-events-none absolute inset-0 h-full w-full object-cover object-center"
+                            className="pointer-events-none absolute inset-0 block object-cover object-center !h-full !w-full !max-w-none select-none min-h-0"
                           />
                         ) : null}
                         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 pb-2 sm:pb-3">
@@ -2082,7 +2082,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                             <img
                               src={product.image_url}
                               alt={product.name}
-                              className="pointer-events-none absolute inset-0 h-full w-full object-cover object-center"
+                              className="pointer-events-none absolute inset-0 block object-cover object-center !h-full !w-full !max-w-none select-none min-h-0"
                             />
                           ) : (
                             <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-neutral-100 text-4xl text-gray-300">
