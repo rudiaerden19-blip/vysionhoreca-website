@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
+import { trackError } from '@/lib/monitoring'
 
 // Plan pricing in cents (monthly)
 const planPrices: Record<string, number> = {
@@ -148,6 +149,7 @@ export async function POST(request: NextRequest) {
       requestId, 
       error: error instanceof Error ? error.message : 'Unknown error' 
     })
+    trackError(error, { requestId, route: '/api/create-subscription-checkout' })
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Er ging iets mis bij het aanmaken van de betaling' },
       { status: 500 }

@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
+import { logger } from '@/lib/logger'
+import { trackError } from '@/lib/monitoring'
 
 export async function POST(request: NextRequest) {
+  const requestId = crypto.randomUUID()
+  let tenantSlugLog: string | undefined
+
   try {
     const { orderId, tenantSlug, successUrl, cancelUrl } = await request.json()
+    tenantSlugLog = tenantSlug
 
     if (!orderId || !tenantSlug) {
       return NextResponse.json({ error: 'orderId en tenantSlug zijn verplicht' }, { status: 400 })
@@ -87,8 +93,14 @@ export async function POST(request: NextRequest) {
     })
 
     return NextResponse.json({ url: session.url, sessionId: session.id })
-  } catch (error: any) {
-    console.error('Stripe checkout error:', error)
-    return NextResponse.json({ error: error.message || 'Stripe fout' }, { status: 500 })
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Stripe fout'
+    logger.error('Stripe checkout error', {
+      requestId,
+      error: message,
+      tenantSlug: tenantSlugLog,
+    })
+    trackError(error, { requestId, route: '/api/stripe/create-checkout', tenantSlug: tenantSlugLog })
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

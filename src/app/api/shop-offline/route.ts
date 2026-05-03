@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+
+import { logger } from '@/lib/logger'
+import { trackError } from '@/lib/monitoring'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 
 const supabaseAdmin = createClient(
@@ -41,9 +44,11 @@ async function ensureTable() {
       tableReady = true
       return true
     }
-    console.error('exec_sql error:', rpcError.message)
+    logger.warn('shop-offline exec_sql RPC error', { message: rpcError.message })
   } catch (e) {
-    console.error('exec_sql threw:', e)
+    logger.error('shop-offline exec_sql threw', {
+      error: e instanceof Error ? e.message : String(e),
+    })
   }
 
   return false
@@ -107,7 +112,12 @@ export async function POST(request: NextRequest) {
     )
 
   if (error) {
-    console.error('shop-offline upsert error:', error.message)
+    logger.error('shop-offline upsert error', { tenant, error: error.message })
+    trackError(new Error(error.message), {
+      route: '/api/shop-offline',
+      phase: 'upsert',
+      tenant,
+    })
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 

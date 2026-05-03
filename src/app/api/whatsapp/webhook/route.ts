@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
+import { logger } from '@/lib/logger'
+import { trackError } from '@/lib/monitoring'
+
 // Supabase client with service role for server operations
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -65,6 +68,7 @@ export async function GET(request: NextRequest) {
 // MESSAGE HANDLER (POST)
 // =====================================================
 export async function POST(request: NextRequest) {
+  const requestId = crypto.randomUUID()
   try {
     const body = await request.json()
     console.log('📩 Incoming webhook:', JSON.stringify(body, null, 2))
@@ -152,7 +156,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ status: 'ok' })
 
   } catch (error) {
-    console.error('❌ Webhook error:', error)
+    logger.error('WhatsApp webhook error', {
+      requestId,
+      error: error instanceof Error ? error.message : String(error),
+    })
+    trackError(error, { requestId, route: '/api/whatsapp/webhook' })
     return NextResponse.json({ status: 'error' }, { status: 500 })
   }
 }

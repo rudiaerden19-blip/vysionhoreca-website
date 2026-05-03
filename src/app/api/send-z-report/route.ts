@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
 
+import { logger } from '@/lib/logger'
+import { trackError } from '@/lib/monitoring'
+
 export async function POST(request: NextRequest) {
+  const requestId = crypto.randomUUID()
   try {
     const body = await request.json()
     const {
@@ -129,7 +133,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true })
 
   } catch (error) {
-    console.error('Error sending Z-report email:', error)
+    logger.error('send-z-report error', {
+      requestId,
+      error: error instanceof Error ? error.message : String(error),
+    })
+    trackError(error, { requestId, route: '/api/send-z-report' })
     return NextResponse.json(
       { error: 'Fout bij versturen e-mail', message: error instanceof Error ? error.message : 'Onbekende fout' },
       { status: 500 }
