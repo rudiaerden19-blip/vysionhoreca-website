@@ -25,7 +25,10 @@ export function KassaProductOptionsModal({
   const { t } = useLanguage()
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+    <div
+      data-testid="kassa-options-modal"
+      className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"
+    >
       <div className="bg-white rounded-2xl w-full max-w-lg max-h-[80vh] flex flex-col shadow-2xl overflow-hidden">
         <div className="flex items-center gap-3 p-4 border-b">
           {model.product.image_url && (
@@ -110,6 +113,7 @@ export function KassaProductOptionsModal({
         <div className="p-4 border-t flex gap-3 bg-gray-50">
           <button
             type="button"
+            data-testid="kassa-options-cancel"
             onClick={onClose}
             className="flex-1 py-3 rounded-xl bg-white border border-gray-200 font-semibold text-gray-600 hover:bg-gray-100 transition-colors"
           >
@@ -117,6 +121,7 @@ export function KassaProductOptionsModal({
           </button>
           <button
             type="button"
+            data-testid="kassa-options-confirm"
             onClick={onConfirm}
             className="flex-[2] py-3.5 rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold text-lg shadow-md transition-colors"
           >

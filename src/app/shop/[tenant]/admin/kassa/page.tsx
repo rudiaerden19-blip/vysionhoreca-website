@@ -1960,10 +1960,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           {/* Grid — min-h-0 nodig: anders groeit de flex-child mee met alle tegels en wordt onderaan afgekapt zonder scroll */}
           <div
             ref={kassaMenuScrollRef}
+            data-testid="kassa-menu-scroll"
             className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4 touch-pan-y [overflow-anchor:none]"
           >
             {menuLoading ? (
-              <div className="flex items-center justify-center h-full text-gray-400 text-lg">{t('kassaApp.loading')}</div>
+              <div data-testid="kassa-menu-loading" className="flex items-center justify-center h-full text-gray-400 text-lg">{t('kassaApp.loading')}</div>
             ) : !selectedCategory ? (
               /* Categorieën: vaste 4 kolommen; rijhoogte = (scrollport − gaps) / 3 → altijd 12 volle tegels zichtbaar, rest scrollen */
               categories.length === 0 ? (
@@ -1974,6 +1975,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 </div>
               ) : (
                 <div
+                  data-testid="kassa-category-grid"
                   className="grid w-full grid-cols-4 gap-4 pb-8"
                   style={{ gridAutoRows: `${kassaMenuRowPx}px` }}
                 >
@@ -2039,6 +2041,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   </div>
                 ) : (
                   <div
+                    data-testid="kassa-product-grid"
                     className="grid w-full grid-cols-4 gap-4 pb-8"
                     style={{ gridAutoRows: `${kassaMenuRowPx}px` }}
                   >
@@ -2296,6 +2299,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               </div>
               {numpadValue && parseFloat(numpadValue) > 0 && (
                 <button
+                  type="button"
+                  data-testid="kassa-add-custom-amount"
                   onClick={addCustomAmount}
                   className="mt-3 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-lg transition-colors"
                 >
@@ -2321,6 +2326,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   </button>
                 </div>
               )}
+              <div data-testid="kassa-cart-lines">
               {cart.map(item => {
                 const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
                 return (
@@ -2377,6 +2383,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   </div>
                 )
               })}
+              </div>
             </div>
           )}
         </div>
