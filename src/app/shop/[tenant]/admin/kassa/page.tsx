@@ -15,7 +15,6 @@ import {
   getOptionsForProduct,
   getTenantSettings,
   TenantSettings,
-  syncZReportAfterOrder,
   clampKassaProductImageZoom,
   compareMenuProductsBySortOrder,
 } from '@/lib/admin-api'
@@ -58,6 +57,7 @@ import {
   isLikelyOfflineOrNetworkSupabaseError,
 } from '@/lib/kassa-supabase-guards'
 import { fetchOrderNumberByKassaClientUuid } from '@/lib/kassa-fetch-order-number'
+import { syncZReportAfterOrderSafe } from '@/lib/kassa-z-sync-safe'
 import { KassaAnalogClock } from '@/components/kassa/KassaAnalogClock'
 import { KassaRegisterSuspenseFallback } from '@/components/KassaRegisterSuspenseFallback'
 import type {
@@ -76,6 +76,12 @@ import type { KassaPayOption } from '@/components/kassa/KassaPaymentModal'
 import { KassaPaymentModal } from '@/components/kassa/KassaPaymentModal'
 import { KassaSplitPaymentModal } from '@/components/kassa/KassaSplitPaymentModal'
 import { KassaSuccessReceiptModal } from '@/components/kassa/KassaSuccessReceiptModal'
+import { KassaProductOptionsModal } from '@/components/kassa/KassaProductOptionsModal'
+import {
+  KassaProductStaffGatePopup,
+  KassaStaffClockModal,
+  KassaStaffSalesSummaryModal,
+} from '@/components/kassa/KassaStaffClockUi'
 
 function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const tenant = params.tenant
@@ -1217,7 +1223,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     let queuedOffline = false
 
     const finishSuccessPath = () => {
-      void syncZReportAfterOrder(tenant, createdAt.toISOString())
+      syncZReportAfterOrderSafe(tenant, createdAt.toISOString())
       playCashRegister()
       setTimeout(() => playSuccess(), 400)
     }
@@ -2453,312 +2459,67 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
       )}
 
-      {staffClockOpen && (
-        <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] shadow-2xl flex flex-col overflow-hidden z-[61]">
-            <div className="flex items-center justify-between gap-3 border-b border-gray-100 px-5 py-4">
-              <h2 className="font-bold text-xl text-gray-900">{t('staffClock.modalTitle')}</h2>
-              <button
-                type="button"
-                onClick={() => {
-                  playClick()
-                  setStaffClockOpen(false)
-                  setStaffClockPinModal(null)
-                }}
-                className="p-2 hover:bg-gray-100 rounded-xl text-gray-500"
-                aria-label={t('staffClock.close')}
-              >
-                ✕
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto p-5 space-y-4">
-              {staffClockListLoading && staffClockList.length === 0 ? (
-                <div className="py-12 text-center text-gray-500">{t('staffClock.loadingList')}</div>
-              ) : staffClockList.length === 0 ? (
-                <div className="py-10 text-center text-gray-500">{t('staffClock.noStaff')}</div>
-              ) : (
-                staffClockList.map((s) => (
-                  <div
-                    key={s.id}
-                    className="rounded-xl border border-gray-200 bg-gray-50/80 p-4 sm:p-5 flex flex-col gap-4"
-                  >
-                    <div className="min-w-0 space-y-1">
-                      <p className="font-bold text-gray-900 text-base sm:text-lg break-words leading-snug">
-                        {s.name}
-                      </p>
-                      {s.hasOpenSession ? (
-                        <p className="text-sm font-semibold text-emerald-600">{t('staffClock.statusClockedIn')}</p>
-                      ) : (
-                        <p className="text-sm text-gray-500">{t('staffClock.statusClockedOut')}</p>
-                      )}
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
-                      <button
-                        type="button"
-                        disabled={staffClockBusy}
-                        onClick={() => {
-                          playClick()
-                          setStaffClockPinModal({ staffId: s.id, staffName: s.name, action: 'in' })
-                          setStaffClockPinInput('')
-                          setStaffClockPinError(null)
-                        }}
-                        className="min-h-[44px] py-3 px-4 rounded-xl bg-emerald-600 text-white text-sm font-bold hover:bg-emerald-700 disabled:opacity-50"
-                      >
-                        {t('staffClock.clockInCode')}
-                      </button>
-                      <button
-                        type="button"
-                        disabled={staffClockBusy || !s.hasOpenSession}
-                        onClick={() => {
-                          playClick()
-                          setStaffClockPinModal({ staffId: s.id, staffName: s.name, action: 'out' })
-                          setStaffClockPinInput('')
-                          setStaffClockPinError(null)
-                        }}
-                        className="min-h-[44px] py-3 px-4 rounded-xl bg-[#3C4D6B] text-white text-sm font-bold hover:bg-[#2D3A52] disabled:opacity-40 disabled:grayscale"
-                      >
-                        {t('staffClock.clockOutCode')}
-                      </button>
-                      <button
-                        type="button"
-                        disabled={!s.hasOpenSession}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          startStaffSales(s)
-                        }}
-                        className="min-h-[44px] py-3 px-4 rounded-xl bg-amber-500 text-white text-sm font-bold hover:bg-amber-600 disabled:opacity-40 disabled:grayscale"
-                        title={s.hasOpenSession ? t('staffClock.salesHint') : t('staffClock.salesNeedsClock')}
-                      >
-                        {t('staffClock.sales')}
-                      </button>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-            <div className="border-t border-gray-100 p-4">
-              <button
-                type="button"
-                onClick={() => {
-                  playClick()
-                  setStaffClockOpen(false)
-                  setStaffClockPinModal(null)
-                }}
-                className="w-full min-h-[44px] py-3 rounded-xl bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 transition-colors"
-              >
-                {t('staffClock.close')}
-              </button>
-            </div>
-          </div>
+      <KassaStaffClockModal
+        open={staffClockOpen}
+        listLoading={staffClockListLoading}
+        staffList={staffClockList}
+        busy={staffClockBusy}
+        pinModal={staffClockPinModal}
+        pinInput={staffClockPinInput}
+        pinError={staffClockPinError}
+        onClose={() => {
+          playClick()
+          setStaffClockOpen(false)
+          setStaffClockPinModal(null)
+        }}
+        onPinInputChange={setStaffClockPinInput}
+        onStartClockIn={(s) => {
+          playClick()
+          setStaffClockPinModal({ staffId: s.id, staffName: s.name, action: 'in' })
+          setStaffClockPinInput('')
+          setStaffClockPinError(null)
+        }}
+        onStartClockOut={(s) => {
+          playClick()
+          setStaffClockPinModal({ staffId: s.id, staffName: s.name, action: 'out' })
+          setStaffClockPinInput('')
+          setStaffClockPinError(null)
+        }}
+        onSales={(s) => startStaffSales(s)}
+        onPinCancel={() => {
+          playClick()
+          setStaffClockPinModal(null)
+        }}
+        onPinConfirm={() => void submitStaffClockPin()}
+      />
 
-          {staffClockPinModal && (
-            <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4">
-              <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-5 flex flex-col gap-3">
-                <p className="font-bold text-gray-900">
-                  {(staffClockPinModal.action === 'in'
-                    ? t('staffClock.pinTitleIn')
-                    : t('staffClock.pinTitleOut')
-                  ).replace('{name}', staffClockPinModal.staffName)}
-                </p>
-                <input
-                  type="password"
-                  inputMode="numeric"
-                  autoComplete="one-time-code"
-                  value={staffClockPinInput}
-                  onChange={(e) => setStaffClockPinInput(e.target.value.replace(/\D/g, '').slice(0, 12))}
-                  placeholder={t('staffClock.pinPlaceholder')}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 text-lg font-mono tracking-widest"
-                />
-                {staffClockPinError && <p className="text-sm font-medium text-red-600">{staffClockPinError}</p>}
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    disabled={staffClockBusy}
-                    onClick={() => {
-                      playClick()
-                      setStaffClockPinModal(null)
-                    }}
-                    className="flex-1 py-2.5 rounded-xl bg-gray-100 text-gray-700 font-semibold"
-                  >
-                    {t('staffClock.cancel')}
-                  </button>
-                  <button
-                    type="button"
-                    disabled={staffClockBusy}
-                    onClick={() => void submitStaffClockPin()}
-                    className="flex-1 py-2.5 rounded-xl bg-[#3C4D6B] text-white font-bold disabled:opacity-50"
-                  >
-                    {t('staffClock.confirmPin')}
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+      {staffClockSummary ? (
+        <KassaStaffSalesSummaryModal
+          summary={staffClockSummary}
+          onPrint={() => void printStaffClockSalesSummary()}
+          onClose={() => {
+            playClick()
+            setStaffClockSummary(null)
+          }}
+        />
+      ) : null}
 
-      {staffClockSummary && (
-        <div className="fixed inset-0 bg-black/60 z-[65] flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl p-6 flex flex-col gap-4 max-h-[85vh] overflow-hidden">
-            <h2 className="font-bold text-xl text-gray-900">{t('staffClock.summaryTitle')}</h2>
-            <p className="text-gray-600 text-sm">
-              {t('staffClock.summaryIntro').replace('{name}', staffClockSummary.staffName)}
-            </p>
-            <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-4 text-center">
-              <p className="text-sm text-emerald-800 font-medium">{t('staffClock.summaryTotalLabel')}</p>
-              <p className="text-3xl font-black text-emerald-700">€{staffClockSummary.total.toFixed(2)}</p>
-              <p className="text-xs text-emerald-700 mt-1">
-                {t('staffClock.summaryOrderCount').replace('{count}', String(staffClockSummary.orderCount))}
-              </p>
-            </div>
-            {staffClockSummary.orders.length > 0 && (
-              <div className="flex-1 overflow-y-auto border border-gray-100 rounded-xl max-h-48">
-                <table className="w-full text-sm">
-                  <thead className="bg-gray-50 sticky top-0">
-                    <tr>
-                      <th className="text-left p-2 font-semibold text-gray-700">#</th>
-                      <th className="text-right p-2 font-semibold text-gray-700">{t('staffClock.summaryAmount')}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {staffClockSummary.orders.map((o) => (
-                      <tr key={o.order_number} className="border-t border-gray-100">
-                        <td className="p-2 font-mono">{o.order_number}</td>
-                        <td className="p-2 text-right font-medium">€{o.total.toFixed(2)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-            {staffClockSummary.orders.length === 0 && (
-              <p className="text-sm text-gray-500 text-center py-2">{t('staffClock.noOrdersToday')}</p>
-            )}
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <button
-                type="button"
-                onClick={() => void printStaffClockSalesSummary()}
-                className="flex-1 min-h-[44px] py-3 rounded-xl border-2 border-[#3C4D6B] bg-white text-[#3C4D6B] font-bold hover:bg-slate-50"
-              >
-                {t('staffClock.summaryPrint')}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  playClick()
-                  setStaffClockSummary(null)
-                }}
-                className="flex-1 min-h-[44px] py-3 rounded-xl bg-[#3C4D6B] text-white font-bold hover:bg-[#2D3A52]"
-              >
-                {t('staffClock.summaryClose')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <KassaProductStaffGatePopup
+        open={productStaffGatePopupOpen}
+        onDismiss={() => {
+          playClick()
+          setProductStaffGatePopupOpen(false)
+        }}
+      />
 
-      {/* Alleen bij tik op product (zonder Verkoop): korte hint, geen module-blokkade */}
-      {productStaffGatePopupOpen && (
-        <div
-          className="fixed inset-0 z-[85] flex items-center justify-center bg-black/50 p-4"
-          onClick={() => setProductStaffGatePopupOpen(false)}
-          role="presentation"
-        >
-          <div
-            className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="product-staff-gate-title"
-          >
-            <p id="product-staff-gate-title" className="text-center text-base font-semibold leading-snug text-gray-900">
-              {t('staffClock.productTapRequiresStaff')}
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                playClick()
-                setProductStaffGatePopupOpen(false)
-              }}
-              className="mt-5 w-full min-h-[48px] rounded-xl bg-[#3C4D6B] font-bold text-white transition-colors hover:bg-[#2D3A52]"
-            >
-              {t('staffClock.close')}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* ── Opties Modal ── */}
-      {optionsModal && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[80vh] flex flex-col shadow-2xl overflow-hidden">
-            {/* Header */}
-            <div className="flex items-center gap-3 p-4 border-b">
-              {optionsModal.product.image_url && (
-                <img src={optionsModal.product.image_url} alt={optionsModal.product.name} className="w-14 h-14 rounded-xl object-cover flex-shrink-0" />
-              )}
-              <div className="flex-1 min-w-0">
-                <p className="font-bold text-lg truncate">
-                  {optionsModal.editingCartKey ? t('kassaApp.optionsEditPrefix') : ''}
-                  {optionsModal.product.name}
-                </p>
-                <p className="text-[#3C4D6B] font-bold">
-                  €{(optionsModal.product.price + optionsModal.selected.reduce((s, c) => s + c.price, 0)).toFixed(2)}
-                </p>
-              </div>
-              <button type="button" onClick={() => setOptionsModal(null)} className="p-2 hover:bg-gray-100 rounded-xl" aria-label={t('kassaApp.closeAria')}>✕</button>
-            </div>
-
-            {/* Opties */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-5">
-              {optionsModal.options.map(option => (
-                <div key={option.id}>
-                  <div className="flex items-center gap-2 mb-3">
-                    <p className="font-bold text-base text-gray-900">{option.name}</p>
-                    {option.required && <span className="text-xs bg-red-50 text-red-500 border border-red-200 px-2 py-0.5 rounded-full font-semibold">{t('kassaApp.optionRequired')}</span>}
-                    {option.type === 'multiple' && <span className="text-xs bg-blue-50 text-blue-500 border border-blue-200 px-2 py-0.5 rounded-full">{t('kassaApp.optionMultiple')}</span>}
-                  </div>
-                  <div className="grid grid-cols-3 gap-2">
-                    {(option.choices || []).map(choice => {
-                      const isSelected = optionsModal.selected.some(s => s.choiceId === choice.id)
-                      return (
-                        <button
-                          key={choice.id}
-                          onClick={() => toggleChoice(option, choice)}
-                          className={`relative flex flex-col items-center justify-center px-2 py-3 rounded-xl border-2 text-sm font-medium transition-all ${
-                            isSelected
-                              ? 'border-[#3C4D6B] bg-[#3C4D6B]/10 ring-2 ring-[#3C4D6B] scale-[1.03]'
-                              : 'border-gray-200 hover:border-[#3C4D6B] bg-white text-gray-700'
-                          }`}
-                        >
-                          {isSelected && (
-                            <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-[#3C4D6B] flex items-center justify-center">
-                              <span className="text-white text-xs font-bold">✓</span>
-                            </div>
-                          )}
-                          <span className={`text-center leading-tight font-semibold ${isSelected ? 'text-[#3C4D6B]' : 'text-gray-800'}`}>{choice.name}</span>
-                          <span className={`text-xs font-bold mt-1 ${choice.price > 0 ? 'text-amber-500' : 'text-green-500'}`}>
-                            {choice.price > 0 ? `+€${choice.price.toFixed(2)}` : t('kassaApp.optionFree')}
-                          </span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Footer */}
-            <div className="p-4 border-t flex gap-3 bg-gray-50">
-              <button type="button" onClick={() => setOptionsModal(null)} className="flex-1 py-3 rounded-xl bg-white border border-gray-200 font-semibold text-gray-600 hover:bg-gray-100 transition-colors">{t('kassaApp.cancel')}</button>
-              <button type="button" onClick={confirmOptions} className="flex-[2] py-3.5 rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold text-lg shadow-md transition-colors">
-                {optionsModal.editingCartKey ? t('kassaApp.optionsSave') : t('kassaApp.optionsAdd')} — €
-                {(optionsModal.product.price + optionsModal.selected.reduce((s, c) => s + c.price, 0)).toFixed(2)}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {optionsModal ? (
+        <KassaProductOptionsModal
+          model={optionsModal}
+          onClose={() => setOptionsModal(null)}
+          onToggleChoice={toggleChoice}
+          onConfirm={confirmOptions}
+        />
+      ) : null}
 
       {/* ── Plattegrond / Tafelkeuze ── */}
       {showFloorPlan && (

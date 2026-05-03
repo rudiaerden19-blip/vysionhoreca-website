@@ -2,12 +2,13 @@
  * Merge IndexedDB + localStorage offline order queues and flush to Supabase (Web Locks).
  */
 
-import { syncZReportAfterOrder } from '@/lib/admin-api'
 import {
   offlineDbGetOrderQueue,
   offlineDbSetOrderQueue,
 } from '@/lib/kassa-offline-db'
+import { mergeOfflineOrderQueueRows } from '@/lib/kassa-offline-order-queue-merge'
 import { isDuplicateKassaClientUuidError } from '@/lib/kassa-supabase-guards'
+import { syncZReportAfterOrderSafe } from '@/lib/kassa-z-sync-safe'
 import { supabase } from '@/lib/supabase'
 
 export function offlineOrdersQueueStorageKey(tenantSlug: string): string {
@@ -31,21 +32,7 @@ export async function mergeOfflineOrderQueues(tenantSlug: string): Promise<objec
       fromLs = []
     }
   }
-  const byUuid = new Map<string, object>()
-  const legacyNum = new Map<number, object>()
-  for (const o of [...fromLs, ...fromIdb]) {
-    const row = o as { kassa_client_uuid?: string; order_number?: number }
-    const u = row.kassa_client_uuid
-    if (typeof u === 'string' && u.length > 0) {
-      byUuid.set(u, o)
-    } else if (typeof row.order_number === 'number') {
-      legacyNum.set(row.order_number, o)
-    } else {
-      const fallbackKey = `legacy:${String((row as { created_at?: string }).created_at ?? '')}:${String((row as { total?: number }).total ?? '')}`
-      byUuid.set(fallbackKey, o)
-    }
-  }
-  const merged = [...byUuid.values(), ...legacyNum.values()]
+  const merged = mergeOfflineOrderQueueRows(fromLs, fromIdb)
   if (merged.length > 0) {
     try {
       await offlineDbSetOrderQueue(tenantSlug, merged)
@@ -70,14 +57,14 @@ export async function flushOfflineOrdersToSupabase(tenantSlug: string): Promise<
       if (!error) {
         const o = order as { tenant_slug?: string; created_at?: string }
         if (o.tenant_slug && o.created_at) {
-          void syncZReportAfterOrder(o.tenant_slug, o.created_at)
+          syncZReportAfterOrderSafe(o.tenant_slug, o.created_at)
         }
         continue
       }
       if (isDuplicateKassaClientUuidError(error)) {
         const o = order as { tenant_slug?: string; created_at?: string }
         if (o.tenant_slug && o.created_at) {
-          void syncZReportAfterOrder(o.tenant_slug, o.created_at)
+          syncZReportAfterOrderSafe(o.tenant_slug, o.created_at)
         }
         continue
       }
