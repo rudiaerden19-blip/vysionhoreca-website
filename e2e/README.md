@@ -26,6 +26,8 @@ Je app moet Supabase/kassa-data kunnen laden. Zonder deze waarden in **`.env.loc
 
 (Kopieer dezelfde waarden als voor een normale `npm run dev`; voor volledige API-routes heb je ook `SUPABASE_SERVICE_ROLE_KEY` nodig, maar voor de kassa-smoke in de browser zijn vooral de twee `NEXT_PUBLIC_*`-variabelen nodig.)
 
+Snel starten: kopieer `.env.local.example` naar `.env.local` en vul de drie Supabase-regels in (zie comments in dat bestand).
+
 De kassa-smoke heeft een langere **testtimeout** (120s) zodat cold start van `npm run dev` niet op 30s breekt.
 
 **Optie A — alles in één** (Playwright start zelf `npm run dev` als er nog niets draait):
