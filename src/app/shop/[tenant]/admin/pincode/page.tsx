@@ -1,9 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function PincodePage({ params }: { params: { tenant: string } }) {
   const tenant = params.tenant
+  const router = useRouter()
+  const adminOverviewHref = `/shop/${tenant}/admin`
 
   const [hasPin, setHasPin] = useState<boolean | null>(null)
   const [justSaved, setJustSaved] = useState(false)
@@ -20,6 +23,16 @@ export default function PincodePage({ params }: { params: { tenant: string } }) 
       .then(r => r.json())
       .then(d => { setHasPin(d.hasPin); setStep(d.hasPin ? 'change-current' : 'set') })
   }, [tenant])
+
+  /** Na succes: kort bevestigen, dan overal hetzelfde naar admin-overzicht (alle tenants). */
+  useEffect(() => {
+    if (!justSaved) return
+    const redirectMs = 1400
+    const id = window.setTimeout(() => {
+      router.replace(adminOverviewHref)
+    }, redirectMs)
+    return () => window.clearTimeout(id)
+  }, [justSaved, router, adminOverviewHref])
 
   const savePin = async (pin: string, opts: { currentPin?: string } = {}) => {
     setSaving(true)
@@ -75,14 +88,18 @@ export default function PincodePage({ params }: { params: { tenant: string } }) 
 
         {justSaved ? (
           <div className="text-center">
-            <div className="bg-green-50 border border-green-200 rounded-xl p-5 mb-6 text-green-700 font-semibold">
+            <div className="bg-green-50 border border-green-200 rounded-xl p-5 mb-4 text-green-700 font-semibold">
               ✓ {success}
             </div>
+            <p className="text-sm text-gray-500 mb-4">
+              Je wordt automatisch doorgestuurd naar het overzicht…
+            </p>
             <button
-              onClick={() => setJustSaved(false)}
-              className="px-6 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold transition-colors"
+              type="button"
+              onClick={() => router.replace(adminOverviewHref)}
+              className="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-semibold transition-colors"
             >
-              PIN wijzigen
+              Nu naar overzicht
             </button>
           </div>
         ) : (
