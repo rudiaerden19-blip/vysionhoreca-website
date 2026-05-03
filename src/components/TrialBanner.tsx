@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { isAdminTenant } from '@/lib/protected-tenants'
 
 interface TrialBannerProps {
@@ -25,9 +26,14 @@ const getSupabase = () => {
 }
 
 export default function TrialBanner({ tenantSlug }: TrialBannerProps) {
+  const pathname = usePathname()
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [loading, setLoading] = useState(true)
   const [dismissed, setDismissed] = useState(false)
+
+  const adminAbonnementPath = `/shop/${tenantSlug}/admin/abonnement`
+  const onSubscriptionPage =
+    pathname === adminAbonnementPath || pathname?.startsWith(`${adminAbonnementPath}/`)
   
   // Check if admin tenant (before hooks finish)
   const isAdmin = isAdminTenant(tenantSlug)
@@ -105,8 +111,11 @@ export default function TrialBanner({ tenantSlug }: TrialBannerProps) {
   // Show nothing if more than 3 days left
   if (!isExpired && daysLeft > 3) return null
 
-  // Expired - show blocking overlay
+  // Expired - show blocking overlay (niet op de abonnement-pagina: zelfde URL → Link doet niets; zaak moet daar kunnen afrekenen)
   if (isExpired) {
+    if (onSubscriptionPage) {
+      return null
+    }
     return (
       <div className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8 text-center">
@@ -134,7 +143,7 @@ export default function TrialBanner({ tenantSlug }: TrialBannerProps) {
           </div>
 
           <Link
-            href={`/shop/${tenantSlug}/admin/abonnement`}
+            href={adminAbonnementPath}
             className="block w-full bg-orange-500 text-white font-semibold py-4 px-6 rounded-xl hover:bg-orange-600 transition-colors mb-3"
           >
             Abonnement kiezen
@@ -170,7 +179,7 @@ export default function TrialBanner({ tenantSlug }: TrialBannerProps) {
         
         <div className="flex items-center gap-2">
           <Link
-            href={`/shop/${tenantSlug}/admin/abonnement`}
+            href={adminAbonnementPath}
             className="bg-white text-orange-600 font-semibold px-5 py-2 rounded-lg hover:bg-orange-50 transition-colors"
           >
             Abonnement kiezen
