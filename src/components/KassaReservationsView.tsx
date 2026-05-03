@@ -62,6 +62,11 @@ import {
 import { ContactsView } from '@/components/kassa-reservations/ContactsView'
 import { RapportenView } from '@/components/kassa-reservations/RapportenView'
 import { ReservationTableSVG } from '@/components/kassa-reservations/ReservationTableSVG'
+import {
+  KASSA_DEFAULT_RESERVATION_SETTINGS,
+  KASSA_STATUS_CONFIG,
+  mapReservationSettingsFromDb,
+} from '@/components/kassa-reservations/kassa-reservations-constants'
 
 
 // ---- Props ----
@@ -78,109 +83,6 @@ interface KassaReservationsViewProps {
   allowKassaHandoff?: boolean
 }
 
-// ---- Status config (exact kopie) ----
-const STATUS_CONFIG: Record<ReservationStatus, { label: string; color: string; bgColor: string; icon: React.ReactNode }> = {
-  PENDING: { label: 'In afwachting', color: '#f59e0b', bgColor: 'rgba(245, 158, 11, 0.15)', icon: <Clock size={14} /> },
-  CONFIRMED: { label: 'Bevestigd', color: '#3b82f6', bgColor: 'rgba(59, 130, 246, 0.15)', icon: <CheckCircle2 size={14} /> },
-  CHECKED_IN: { label: 'Ingecheckt', color: '#22c55e', bgColor: 'rgba(34, 197, 94, 0.15)', icon: <UserCheck size={14} /> },
-  COMPLETED: { label: 'Afgerond', color: '#6b7280', bgColor: 'rgba(107, 114, 128, 0.15)', icon: <CheckCircle2 size={14} /> },
-  NO_SHOW: { label: 'No-show', color: '#ef4444', bgColor: 'rgba(239, 68, 68, 0.15)', icon: <UserX size={14} /> },
-  CANCELLED: { label: 'Geannuleerd', color: '#6b7280', bgColor: 'rgba(107, 114, 128, 0.15)', icon: <XCircle size={14} /> },
-  WAITLIST: { label: 'Wachtlijst', color: '#8b5cf6', bgColor: 'rgba(139, 92, 246, 0.15)', icon: <Clock size={14} /> },
-}
-
-// ---- Default settings ----
-const DEFAULT_SETTINGS: ReservationSettings = {
-  isEnabled: true,
-  acceptOnline: false,
-  maxPartySize: 12,
-  defaultDurationMinutes: 90,
-  bufferMinutes: 15,
-  slotDurationMinutes: 30,
-  maxReservationsPerSlot: 0,
-  maxCoversPerSlot: 0,
-  minAdvanceHours: 2,
-  maxAdvanceDays: 60,
-  kitchenCapacityEnabled: false,
-  kitchenMaxCoversPer15min: 20,
-  closedDays: [],
-  shifts: [
-    { id: '1', name: 'Lunch', startTime: '12:00', endTime: '15:00', isActive: false },
-    { id: '2', name: 'Diner', startTime: '18:00', endTime: '23:00', isActive: false },
-  ],
-  cancellationDeadlineHours: 24,
-  cancellationMessage: 'Annulering is niet meer mogelijk, het afgesproken tijdstip is verstreken.',
-  reviewLink: '',
-  autoSendReview: false,
-  depositRequired: false,
-  depositAmount: 10,
-  noShowProtection: false,
-  noShowFee: 25,
-  bookingPageEnabled: true,
-  autoConfirm: false,
-  floorplanFloorOnly: false,
-}
-
-/** Robuuste conversie Supabase → UI (numeriek uit string, ontbrekende kolommen) */
-function numFromDb(v: unknown, fallback: number): number {
-  if (typeof v === 'number' && Number.isFinite(v)) return v
-  if (typeof v === 'string' && v.trim() !== '') {
-    const n = Number(v)
-    if (Number.isFinite(n)) return n
-  }
-  return fallback
-}
-
-function boolFromDb(v: unknown, fallback: boolean): boolean {
-  if (typeof v === 'boolean') return v
-  if (v === 't' || v === 'true' || v === 1) return true
-  if (v === 'f' || v === 'false' || v === 0) return false
-  return fallback
-}
-
-function mapReservationSettingsFromDb(data: Record<string, unknown>): Partial<ReservationSettings> {
-  const safeParseJSON = (val: unknown, fallback: unknown) => {
-    if (val == null) return fallback
-    if (typeof val !== 'string') return val ?? fallback
-    try { return JSON.parse(val) } catch { return fallback }
-  }
-  const closedRaw = safeParseJSON(data.closed_days, DEFAULT_SETTINGS.closedDays)
-  const closedDays = Array.isArray(closedRaw)
-    ? closedRaw.map((x) => (typeof x === 'number' ? x : Number(x))).filter((x) => Number.isFinite(x))
-    : DEFAULT_SETTINGS.closedDays
-  const shiftsRaw = safeParseJSON(data.shifts, DEFAULT_SETTINGS.shifts)
-  const shifts = Array.isArray(shiftsRaw) ? (shiftsRaw as Shift[]) : DEFAULT_SETTINGS.shifts
-
-  return {
-    isEnabled: boolFromDb(data.is_enabled, DEFAULT_SETTINGS.isEnabled),
-    acceptOnline: boolFromDb(data.accept_online, DEFAULT_SETTINGS.acceptOnline),
-    maxPartySize: numFromDb(data.max_party_size, DEFAULT_SETTINGS.maxPartySize),
-    defaultDurationMinutes: numFromDb(data.default_duration_minutes, DEFAULT_SETTINGS.defaultDurationMinutes),
-    bufferMinutes: numFromDb(data.buffer_minutes, DEFAULT_SETTINGS.bufferMinutes),
-    slotDurationMinutes: numFromDb(data.slot_duration_minutes, DEFAULT_SETTINGS.slotDurationMinutes),
-    maxReservationsPerSlot: numFromDb(data.max_reservations_per_slot, DEFAULT_SETTINGS.maxReservationsPerSlot),
-    maxCoversPerSlot: numFromDb(data.max_covers_per_slot, DEFAULT_SETTINGS.maxCoversPerSlot),
-    minAdvanceHours: numFromDb(data.min_advance_hours, DEFAULT_SETTINGS.minAdvanceHours),
-    maxAdvanceDays: numFromDb(data.max_advance_days, DEFAULT_SETTINGS.maxAdvanceDays),
-    kitchenCapacityEnabled: boolFromDb(data.kitchen_capacity_enabled, DEFAULT_SETTINGS.kitchenCapacityEnabled),
-    kitchenMaxCoversPer15min: numFromDb(data.kitchen_max_covers_per_15min, DEFAULT_SETTINGS.kitchenMaxCoversPer15min),
-    closedDays,
-    shifts,
-    cancellationDeadlineHours: numFromDb(data.cancellation_deadline_hours, DEFAULT_SETTINGS.cancellationDeadlineHours),
-    cancellationMessage: typeof data.cancellation_message === 'string'
-      ? data.cancellation_message
-      : DEFAULT_SETTINGS.cancellationMessage,
-    reviewLink: typeof data.review_link === 'string' ? data.review_link : DEFAULT_SETTINGS.reviewLink,
-    autoSendReview: boolFromDb(data.auto_send_review, DEFAULT_SETTINGS.autoSendReview),
-    depositRequired: boolFromDb(data.deposit_required, DEFAULT_SETTINGS.depositRequired),
-    depositAmount: numFromDb(data.deposit_amount, DEFAULT_SETTINGS.depositAmount),
-    noShowProtection: boolFromDb(data.no_show_protection, DEFAULT_SETTINGS.noShowProtection),
-    noShowFee: numFromDb(data.no_show_fee, DEFAULT_SETTINGS.noShowFee),
-    bookingPageEnabled: boolFromDb(data.booking_page_enabled, DEFAULT_SETTINGS.bookingPageEnabled),
-    autoConfirm: boolFromDb(data.auto_confirm, DEFAULT_SETTINGS.autoConfirm),
-    floorplanFloorOnly: boolFromDb(data.floorplan_floor_only, DEFAULT_SETTINGS.floorplanFloorOnly),
-  }
-}
 
 // ---- Toast simple ----
 function useToast() {
@@ -349,11 +251,11 @@ export default function KassaReservationsView({
     return { year: d.getFullYear(), month: d.getMonth() }
   })
   const [reservationSettings, setReservationSettings] = useState<ReservationSettings>(() => {
-    if (typeof window === 'undefined') return DEFAULT_SETTINGS
+    if (typeof window === 'undefined') return KASSA_DEFAULT_RESERVATION_SETTINGS
     try {
       const saved = localStorage.getItem(`reservationSettings_${tenant}`)
-      return saved ? { ...DEFAULT_SETTINGS, ...JSON.parse(saved) } : DEFAULT_SETTINGS
-    } catch { return DEFAULT_SETTINGS }
+      return saved ? { ...KASSA_DEFAULT_RESERVATION_SETTINGS, ...JSON.parse(saved) } : KASSA_DEFAULT_RESERVATION_SETTINGS
+    } catch { return KASSA_DEFAULT_RESERVATION_SETTINGS }
   })
   // Tenant info for emails
   const [businessInfo, setBusinessInfo] = useState({ name: '', phone: '', email: '' })
@@ -427,11 +329,11 @@ export default function KassaReservationsView({
 
         if (data && typeof data === 'object') {
           const fromDB = mapReservationSettingsFromDb(data as Record<string, unknown>)
-          const merged = { ...DEFAULT_SETTINGS, ...fromDB, ...localData }
+          const merged = { ...KASSA_DEFAULT_RESERVATION_SETTINGS, ...fromDB, ...localData }
           setReservationSettings(merged)
           try { localStorage.setItem(`reservationSettings_${tenant}`, JSON.stringify(merged)) } catch {}
         } else {
-          const merged = { ...DEFAULT_SETTINGS, ...localData }
+          const merged = { ...KASSA_DEFAULT_RESERVATION_SETTINGS, ...localData }
           setReservationSettings(merged)
         }
       } catch (err) {
@@ -1658,7 +1560,7 @@ export default function KassaReservationsView({
 
   // ---- Render card (exact kopie) ----
   const renderReservationCard = (reservation: Reservation) => {
-    const status = STATUS_CONFIG[reservation.status]
+    const status = KASSA_STATUS_CONFIG[reservation.status]
     const guest = guestProfiles.find(g => g.id === (reservation.guest_phone || reservation.guest_email || reservation.guest_name))
 
     return (
@@ -1991,7 +1893,7 @@ export default function KassaReservationsView({
                   <div className="p-6 text-center text-gray-400 text-sm">Geen reservaties vandaag</div>
                 )}
                 {todayReservations.filter(r => r.status !== 'WAITLIST').map(r => {
-                  const status = STATUS_CONFIG[r.status]
+                  const status = KASSA_STATUS_CONFIG[r.status]
                   const isSelected = selectedReservation?.id === r.id
                   const guest = guestProfiles.find(g => g.phone === r.guest_phone || g.email === r.guest_email)
                   return (
@@ -2682,8 +2584,8 @@ export default function KassaReservationsView({
                                 {/* Naam + status */}
                                 <div className="flex items-center justify-between">
                                   <p className="text-gray-900 font-bold text-lg">{r.guest_name}</p>
-                                  <span className="text-sm font-semibold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: STATUS_CONFIG[r.status]?.color }}>
-                                    {STATUS_CONFIG[r.status]?.label || r.status}
+                                  <span className="text-sm font-semibold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: KASSA_STATUS_CONFIG[r.status]?.color }}>
+                                    {KASSA_STATUS_CONFIG[r.status]?.label || r.status}
                                   </span>
                                 </div>
                                 {/* Details */}
@@ -4744,7 +4646,7 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
                   {/* Reservaties in deze tijdslot */}
                   <div className="divide-y divide-gray-100">
                     {group.map(r => {
-                      const sc = STATUS_CONFIG[r.status]
+                      const sc = KASSA_STATUS_CONFIG[r.status]
                       return (
                         <div
                           key={r.id}
@@ -4853,7 +4755,7 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
                   </div>
                   <div className="space-y-0.5">
                     {dayRes.slice(0, 3).map(r => {
-                      const sc = STATUS_CONFIG[r.status]
+                      const sc = KASSA_STATUS_CONFIG[r.status]
                       return (
                         <div key={r.id} className="text-[10px] rounded px-1 py-0.5 font-medium truncate leading-tight"
                           style={{ backgroundColor: sc.bgColor, color: sc.color }}>
@@ -5534,7 +5436,7 @@ function ReservationDetailModal({
   tables,
   guestProfile,
 }: ReservationDetailModalProps) {
-  const status = STATUS_CONFIG[reservation.status]
+  const status = KASSA_STATUS_CONFIG[reservation.status]
   const [showTableSelect, setShowTableSelect] = useState(false)
   const { t } = useLanguage()
 

@@ -14,6 +14,7 @@ import {
   isMissingPostTrialModulesColumnError,
   withoutPostTrialModulesConfirmed,
 } from '@/lib/supabase-post-trial-column'
+import { slugifyBusinessNameForTenant } from '@/lib/register-tenant-slug'
 
 // Secure password hashing with bcrypt
 async function hashPassword(password: string): Promise<string> {
@@ -67,17 +68,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Generate tenant_slug from business name
-    // Remove ALL spaces and special characters - slug is lowercase letters and numbers only
-    let tenantSlug = businessName
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]/g, '')      // Remove everything except lowercase letters and numbers
-    
-    // Safety check - if somehow empty or too short, create fallback
-    if (!tenantSlug || tenantSlug.length < 2) {
-      tenantSlug = 'shop' + Date.now().toString(36)
-    }
+    let tenantSlug = slugifyBusinessNameForTenant(businessName)
 
     // Check if slug already exists, add number if needed
     const { data: existingSlug } = await supabase
