@@ -15,6 +15,7 @@ const WHATSAPP_API_VERSION = 'v24.0'
 const WHATSAPP_API_URL = `https://graph.facebook.com/${WHATSAPP_API_VERSION}`
 
 async function sendWhatsAppRejectionInBackground(params: {
+  requestId?: string
   tenantSlug: string
   order: {
     customer_phone: string | null
@@ -22,13 +23,21 @@ async function sendWhatsAppRejectionInBackground(params: {
   }
   rejectionReason: string
 }) {
-  const { tenantSlug, order, rejectionReason } = params
+  const { requestId, tenantSlug, order, rejectionReason } = params
   if (!order.customer_phone) {
-    console.log('⚠️ No customer phone, skipping WhatsApp')
+    logger.info('Order reject: skip WhatsApp (no customer phone)', {
+      requestId,
+      tenantSlug,
+      orderNumber: order.order_number,
+    })
     return
   }
 
-  console.log('📱 Sending WhatsApp rejection to:', order.customer_phone)
+  logger.info('Order reject: sending WhatsApp rejection', {
+    requestId,
+    tenantSlug,
+    orderNumber: order.order_number,
+  })
 
   let waSettings: { phone_number_id: string; access_token: string } | null = null
   for (const v of tenantSlugLookupVariants(tenantSlug)) {
@@ -45,7 +54,7 @@ async function sendWhatsAppRejectionInBackground(params: {
   }
 
   if (!waSettings) {
-    console.log('⚠️ No WhatsApp settings found for tenant')
+    logger.warn('Order reject: no WhatsApp settings for tenant', { requestId, tenantSlug })
     return
   }
 
@@ -91,10 +100,19 @@ Neem contact op met ${businessName} voor meer informatie. Onze excuses voor het 
   })
 
   if (waResponse.ok) {
-    console.log('✅ WhatsApp rejection sent to:', formattedPhone)
+    logger.info('Order reject: WhatsApp rejection sent', {
+      requestId,
+      tenantSlug,
+      orderNumber: order.order_number,
+    })
   } else {
-    const error = await waResponse.text()
-    console.error('❌ WhatsApp API error:', error)
+    const errorBody = await waResponse.text()
+    logger.warn('Order reject: WhatsApp API error', {
+      requestId,
+      tenantSlug,
+      status: waResponse.status,
+      bodyPreview: errorBody.slice(0, 500),
+    })
   }
 }
 
@@ -185,6 +203,7 @@ export async function POST(request: NextRequest) {
      * en de browser werd nooit “ok”, dus ook geen tweede stap. Nu fire-and-forget.
      */
     void sendWhatsAppRejectionInBackground({
+      requestId,
       tenantSlug,
       order: {
         customer_phone: order.customer_phone,
