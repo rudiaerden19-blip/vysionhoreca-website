@@ -71,6 +71,10 @@ export async function GET(request: NextRequest) {
     .maybeSingle()
 
   if (error) {
+    logger.warn('shop-offline GET select error', {
+      tenant,
+      error: error.message,
+    })
     return NextResponse.json({ is_offline: false, offline_reason: null, offline_message: null })
   }
 

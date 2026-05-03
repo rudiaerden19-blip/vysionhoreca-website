@@ -2,12 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
+import { trackError } from '@/lib/monitoring'
 
 export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID()
-  
+  let tenantSlugLog: string | undefined
+
   try {
     const { tenantSlug, invoiceId, description } = await request.json()
+    tenantSlugLog = tenantSlug
 
     if (!tenantSlug || !invoiceId) {
       return NextResponse.json(
@@ -108,6 +111,11 @@ export async function POST(request: NextRequest) {
     logger.error('Invoice checkout error', { 
       requestId, 
       error: error instanceof Error ? error.message : 'Unknown error' 
+    })
+    trackError(error, {
+      requestId,
+      route: '/api/create-invoice-checkout',
+      tenantSlug: tenantSlugLog,
     })
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Er ging iets mis' },

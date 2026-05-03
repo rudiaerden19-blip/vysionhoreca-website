@@ -3,6 +3,8 @@ import { createClient } from '@supabase/supabase-js'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 import { sendCustomerRejectionEmail } from '@/lib/customer-rejection-email'
 import { tenantSlugLookupVariants } from '@/lib/tenant-slug-resolve'
+import { logger } from '@/lib/logger'
+import { trackError } from '@/lib/monitoring'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -97,11 +99,15 @@ Neem contact op met ${businessName} voor meer informatie. Onze excuses voor het 
 }
 
 export async function POST(request: NextRequest) {
+  const requestId = crypto.randomUUID()
+  let tenantSlugLog: string | undefined
+
   try {
     const body = await request.json()
-    console.log('📨 Order reject API called with:', JSON.stringify(body))
+    logger.info('Order reject API request', { requestId, orderId: body?.orderId, tenantSlug: body?.tenantSlug })
 
     const { orderId, tenantSlug, rejectionReason, rejectionNotes } = body
+    tenantSlugLog = tenantSlug
 
     if (!orderId || !tenantSlug || !rejectionReason) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -119,7 +125,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (orderError || !order) {
-      console.error('❌ Order not found:', orderError)
+      logger.warn('Order reject: order not found', { requestId, orderId, error: orderError?.message })
       return NextResponse.json({ error: 'Order not found' }, { status: 404 })
     }
 
@@ -140,11 +146,17 @@ export async function POST(request: NextRequest) {
       .eq('tenant_slug', order.tenant_slug as string)
 
     if (updateError) {
-      console.error('❌ Failed to update order:', updateError)
+      logger.error('Order reject: DB update failed', { requestId, orderId, error: updateError.message })
+      trackError(new Error(updateError.message), {
+        requestId,
+        route: '/api/orders/reject',
+        phase: 'update',
+        orderId,
+      })
       return NextResponse.json({ error: 'Failed to reject order' }, { status: 500 })
     }
 
-    console.log('✅ Order rejected:', orderId)
+    logger.info('Order rejected', { requestId, orderId })
 
     /** Klantmail direct op de server — niet afhankelijk van een tweede browser-call. */
     let emailSent = false
@@ -158,9 +170,13 @@ export async function POST(request: NextRequest) {
       })
       emailSent = mailRes.sent
       if (!mailRes.sent) emailError = mailRes.error
-      if (emailError) console.warn('⚠️ Rejection e-mail:', emailError)
+      if (emailError) logger.warn('Order reject: email issue', { requestId, emailError })
     } catch (mailErr) {
-      console.error('❌ Rejection e-mail exception:', mailErr)
+      logger.error('Order reject: email exception', {
+        requestId,
+        error: mailErr instanceof Error ? mailErr.message : String(mailErr),
+      })
+      trackError(mailErr, { requestId, route: '/api/orders/reject', phase: 'rejection_email' })
       emailError = 'E-mail versturen mislukt'
     }
 
@@ -175,7 +191,12 @@ export async function POST(request: NextRequest) {
         order_number: order.order_number,
       },
       rejectionReason,
-    }).catch((e) => console.error('WhatsApp rejection background:', e))
+    }).catch((e) =>
+      logger.warn('Order reject: WhatsApp background failed', {
+        requestId,
+        error: e instanceof Error ? e.message : String(e),
+      })
+    )
 
     return NextResponse.json({
       success: true,
@@ -183,7 +204,11 @@ export async function POST(request: NextRequest) {
       ...(emailError ? { emailError } : {}),
     })
   } catch (error: unknown) {
-    console.error('❌ Order reject error:', error)
+    logger.error('Order reject error', {
+      requestId,
+      error: error instanceof Error ? error.message : String(error),
+    })
+    trackError(error, { requestId, route: '/api/orders/reject', tenantSlug: tenantSlugLog })
     const message = error instanceof Error ? error.message : 'Unknown error'
     return NextResponse.json({ error: message }, { status: 500 })
   }
