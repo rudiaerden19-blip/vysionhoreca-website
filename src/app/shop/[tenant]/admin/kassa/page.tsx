@@ -54,24 +54,13 @@ import {
   publicDemoSessionMatchesTenant,
 } from '@/lib/demo-links'
 import { buildShopInternalReturnPath } from '@/lib/auth-headers'
-
-function isLikelyOfflineOrNetworkSupabaseError(error: { message?: string } | null | undefined): boolean {
-  if (typeof navigator !== 'undefined' && !navigator.onLine) return true
-  const m = (error?.message || '').toLowerCase()
-  return (
-    m.includes('fetch') ||
-    m.includes('network') ||
-    m.includes('failed to fetch') ||
-    m.includes('load failed')
-  )
-}
-
-/** Postgres unique violation op kassa_client_uuid → order bestaat al (retry na offline sync). */
-function isDuplicateKassaClientUuidError(error: { code?: string; message?: string } | null | undefined): boolean {
-  if (!error || error.code !== '23505') return false
-  const msg = (error.message || '').toLowerCase()
-  return msg.includes('kassa_client') || msg.includes('idx_orders_tenant_kassa')
-}
+import {
+  isDuplicateKassaClientUuidError,
+  isLikelyOfflineOrNetworkSupabaseError,
+} from '@/lib/kassa-supabase-guards'
+import { fetchOrderNumberByKassaClientUuid } from '@/lib/kassa-fetch-order-number'
+import { KassaAnalogClock } from '@/components/kassa/KassaAnalogClock'
+import { KassaRegisterSuspenseFallback } from '@/components/KassaRegisterSuspenseFallback'
 
 interface SelectedChoice {
   optionId: string
@@ -89,96 +78,6 @@ interface CartItem {
 }
 
 type OrderType = 'DINE_IN' | 'TAKEAWAY' | 'DELIVERY'
-
-/** Wandtijd in een IANA-zone (kassa = altijd België, los van verkeerde PC-tijdzone). */
-function getWallClockHms(date: Date, timeZone: string): { h: number; m: number; s: number } {
-  const parts = new Intl.DateTimeFormat('en-GB', {
-    timeZone,
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false,
-  }).formatToParts(date)
-  const n = (type: Intl.DateTimeFormatPartTypes) =>
-    Number(parts.find((p) => p.type === type)?.value ?? 0)
-  return { h: n('hour'), m: n('minute'), s: n('second') }
-}
-
-const KASSA_DISPLAY_TIMEZONE = 'Europe/Brussels'
-
-/** Analoge klok met wijzers (live) — echte tijd + tik opent personeelsklok */
-function KassaAnalogClock({ size = 80 }: { size?: number }) {
-  const [now, setNow] = useState(() => new Date())
-  useLayoutEffect(() => {
-    const tick = () => setNow(new Date())
-    tick()
-    const id = window.setInterval(tick, 1000)
-    return () => window.clearInterval(id)
-  }, [])
-  const { h, m, s } = getWallClockHms(now, KASSA_DISPLAY_TIMEZONE)
-  /* Wijzers zijn getekend naar 12 uur (naar y=32); positieve rotate = met de klok mee in SVG. */
-  const hDeg = ((h % 12) + m / 60 + s / 3600) * 30
-  const mDeg = (m + s / 60) * 6
-  const sDeg = s * 6
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 100 100"
-      className="select-none"
-      aria-hidden
-    >
-      <circle cx="50" cy="50" r="47" fill="#ffffff" stroke="#1e293b" strokeWidth="2.5" />
-      {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => (
-        <line
-          key={i}
-          x1="50"
-          y1="6"
-          x2="50"
-          y2="14"
-          stroke="#475569"
-          strokeWidth={i % 3 === 0 ? 2.2 : 1.2}
-          strokeLinecap="round"
-          transform={`rotate(${i * 30} 50 50)`}
-        />
-      ))}
-      <g transform={`rotate(${hDeg} 50 50)`}>
-        <line
-          x1="50"
-          y1="50"
-          x2="50"
-          y2="32"
-          stroke="#0f172a"
-          strokeWidth="4"
-          strokeLinecap="round"
-        />
-      </g>
-      <g transform={`rotate(${mDeg} 50 50)`}>
-        <line
-          x1="50"
-          y1="50"
-          x2="50"
-          y2="22"
-          stroke="#334155"
-          strokeWidth="2.8"
-          strokeLinecap="round"
-        />
-      </g>
-      <g transform={`rotate(${sDeg} 50 50)`}>
-        <line
-          x1="50"
-          y1="52"
-          x2="50"
-          y2="20"
-          stroke="#dc2626"
-          strokeWidth="1.2"
-          strokeLinecap="round"
-        />
-      </g>
-      <circle cx="50" cy="50" r="4" fill="#0f172a" />
-    </svg>
-  )
-}
 
 function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const tenant = params.tenant
@@ -681,26 +580,37 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }
 
   const persistOpenOrderRowToSupabase = async (tblNr: string, items: CartItem[]) => {
-    await supabase
-      .from('orders')
-      .delete()
-      .eq('tenant_slug', tenant)
-      .eq('table_number', tblNr)
-      .eq('status', 'open')
-    if (items.length === 0) return
-    await supabase.from('orders').insert({
-      tenant_slug: tenant,
-      order_number: 0,
-      status: 'open',
-      payment_status: 'pending',
-      order_type: 'DINE_IN',
-      table_number: tblNr,
-      subtotal: 0,
-      tax: 0,
-      total: 0,
-      items: items as unknown as Record<string, unknown>[],
-      created_at: new Date().toISOString(),
-    })
+    const run = async (attempt: number): Promise<void> => {
+      const { error: delErr } = await supabase
+        .from('orders')
+        .delete()
+        .eq('tenant_slug', tenant)
+        .eq('table_number', tblNr)
+        .eq('status', 'open')
+      if (delErr && !isLikelyOfflineOrNetworkSupabaseError(delErr)) {
+        console.warn('[kassa] open order delete failed:', delErr.message)
+      }
+      if (items.length === 0) return
+      const { error: insErr } = await supabase.from('orders').insert({
+        tenant_slug: tenant,
+        order_number: 0,
+        status: 'open',
+        payment_status: 'pending',
+        order_type: 'DINE_IN',
+        table_number: tblNr,
+        subtotal: 0,
+        tax: 0,
+        total: 0,
+        items: items as unknown as Record<string, unknown>[],
+        created_at: new Date().toISOString(),
+      })
+      if (!insErr) return
+      console.warn('[kassa] open order insert failed:', insErr.message)
+      if (attempt < 2 && isLikelyOfflineOrNetworkSupabaseError(insErr)) {
+        window.setTimeout(() => void run(attempt + 1), 650 * (attempt + 1))
+      }
+    }
+    await run(0)
   }
 
   const schedulePersistOpenOrder = (tblNr: string, items: CartItem[]) => {
@@ -1282,7 +1192,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     try {
       if ('locks' in navigator) {
-        await (navigator as any).locks.request(`vysion_queue_${tenant}`, processQueue)
+        await (navigator as Navigator & { locks: LockManager }).locks.request(
+          `vysion_queue_${tenant}`,
+          processQueue,
+        )
       } else {
         await processQueue()
       }
@@ -1410,11 +1323,26 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     let allocatedOrderNumber = 0
     let queuedOffline = false
 
-    if (!error && insertedRow?.order_number != null) {
-      allocatedOrderNumber = Number(insertedRow.order_number)
+    const finishSuccessPath = () => {
       void syncZReportAfterOrder(tenant, createdAt.toISOString())
       playCashRegister()
       setTimeout(() => playSuccess(), 400)
+    }
+
+    if (!error && insertedRow?.order_number != null) {
+      allocatedOrderNumber = Number(insertedRow.order_number)
+      finishSuccessPath()
+    } else if (!error && insertedRow?.order_number == null) {
+      allocatedOrderNumber = await fetchOrderNumberByKassaClientUuid(supabase, tenant, kassa_client_uuid)
+      if (allocatedOrderNumber <= 0) {
+        console.error('Kassa: insert OK but order_number not resolved', { insertedRow, kassa_client_uuid })
+        alert(`${t('kassaApp.orderPersistFailedTitle')}\n\n${t('kassaApp.orderPersistFailedBody')}`)
+        return
+      }
+      finishSuccessPath()
+    } else if (error && isDuplicateKassaClientUuidError(error)) {
+      allocatedOrderNumber = await fetchOrderNumberByKassaClientUuid(supabase, tenant, kassa_client_uuid)
+      finishSuccessPath()
     } else if (error && isLikelyOfflineOrNetworkSupabaseError(error)) {
       const addToQueue = async () => {
         const queue = await mergeOfflineQueues()
@@ -3308,15 +3236,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 }
 
 export default function KassaAdminPage(props: { params: { tenant: string } }) {
-  const { t } = useLanguage()
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-[100dvh] flex items-center justify-center bg-[#e3e3e3] text-gray-600">
-          {t('kassaApp.suspenseLoading')}
-        </div>
-      }
-    >
+    <Suspense fallback={<KassaRegisterSuspenseFallback />}>
       <KassaAdminPageInner {...props} />
     </Suspense>
   )
