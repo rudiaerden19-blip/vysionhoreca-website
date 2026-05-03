@@ -5,6 +5,7 @@ import { logger } from '@/lib/logger'
 import { apiRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
 import { parseJsonBody, jsonServerError } from '@/lib/api-request'
 import { marketingSendSchema } from '@/lib/api-schemas'
+import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 
 function escapeHtml(s: string): string {
   return s
@@ -41,11 +42,12 @@ export async function POST(request: NextRequest) {
       businessName,
     } = parsed.data
 
-    // Verify user is logged in via any auth header
-    const businessId = request.headers.get('x-business-id')
-    const superadminId = request.headers.get('x-superadmin-id')
-    if (!businessId && !superadminId) {
-      return NextResponse.json({ error: 'Niet ingelogd' }, { status: 401 })
+    const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
+    if (!access.authorized) {
+      return NextResponse.json(
+        { error: access.error || 'Forbidden' },
+        { status: access.error?.includes('ingelogd') ? 401 : 403 }
+      )
     }
 
     // Haal tenant SMTP instellingen op

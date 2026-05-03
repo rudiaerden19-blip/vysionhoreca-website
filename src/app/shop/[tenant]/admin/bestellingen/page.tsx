@@ -252,8 +252,9 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         try {
           await fetch('/api/send-order-status', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
             body: JSON.stringify({
+              tenantSlug: params.tenant,
               // Customer info
               customerEmail: order.customer_email,
               customerName: order.customer_name,
@@ -369,8 +370,9 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         try {
           await fetch('/api/send-order-status', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
             body: JSON.stringify({
+              tenantSlug: params.tenant,
               // Customer info
               customerEmail: order.customer_email,
               customerName: order.customer_name,

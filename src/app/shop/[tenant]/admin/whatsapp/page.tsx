@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { useLanguage } from '@/i18n'
 import Link from 'next/link'
 import QRCode from '@/components/QRCode'
+import { getAuthHeaders } from '@/lib/auth-headers'
 
 interface WhatsAppSettings {
   id?: string
@@ -49,7 +50,9 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
 
   async function loadSettings() {
     try {
-      const response = await fetch(`/api/whatsapp/settings?tenant=${params.tenant}`)
+      const response = await fetch(`/api/whatsapp/settings?tenant=${params.tenant}`, {
+        headers: { ...getAuthHeaders() },
+      })
       const result = await response.json()
 
       if (result.data) {
@@ -76,7 +79,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
 
       const response = await fetch('/api/whatsapp/settings', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify(saveData)
       })
 
@@ -259,7 +262,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
           </button>
         </div>
         <p className="text-gray-400 text-sm mt-3">
-          Verify Token: <code className="bg-gray-800 px-2 py-1 rounded">{process.env.WHATSAPP_VERIFY_TOKEN || 'vysion_whatsapp_verify_2024'}</code>
+          {t('whatsappPage.verifyTokenHint')}
         </p>
       </div>
 

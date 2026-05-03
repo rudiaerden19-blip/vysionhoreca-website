@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { createHmac, timingSafeEqual } from 'node:crypto'
 
 import { logger } from '@/lib/logger'
 import { trackError } from '@/lib/monitoring'
@@ -20,6 +21,22 @@ const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.vysionhoreca.co
 // Message deduplication - prevent processing same message twice
 const processedMessages = new Map<string, number>()
 const MESSAGE_CACHE_TTL = 60000 // 1 minute
+
+function verifyMetaWebhookSignature(
+  rawBody: string,
+  signatureHeader: string | null,
+  appSecret: string
+): boolean {
+  if (!signatureHeader?.startsWith('sha256=')) return false
+  const expectedHex = createHmac('sha256', appSecret).update(rawBody, 'utf8').digest('hex')
+  const receivedHex = signatureHeader.slice(7)
+  if (expectedHex.length !== receivedHex.length) return false
+  try {
+    return timingSafeEqual(Buffer.from(expectedHex, 'hex'), Buffer.from(receivedHex, 'hex'))
+  } catch {
+    return false
+  }
+}
 
 // Clean old messages from cache periodically
 function cleanMessageCache() {
@@ -53,11 +70,15 @@ export async function GET(request: NextRequest) {
 
   console.log('🔔 Webhook verification request:', { mode, token, challenge })
 
-  const verifyToken = process.env.WHATSAPP_VERIFY_TOKEN || 'vysion_whatsapp_verify_2024'
+  const verifyToken = process.env.WHATSAPP_VERIFY_TOKEN?.trim()
 
-  if (mode === 'subscribe' && token === verifyToken) {
+  if (mode === 'subscribe' && token && verifyToken && token === verifyToken) {
     console.log('✅ Webhook verified successfully')
     return new NextResponse(challenge, { status: 200 })
+  }
+
+  if (mode === 'subscribe' && !verifyToken) {
+    logger.warn('WHATSAPP_VERIFY_TOKEN not set; rejecting Meta webhook verification')
   }
 
   console.log('❌ Webhook verification failed')
@@ -70,7 +91,25 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID()
   try {
-    const body = await request.json()
+    const rawBody = await request.text()
+    const appSecret = process.env.WHATSAPP_APP_SECRET?.trim()
+    if (appSecret) {
+      const sig = request.headers.get('x-hub-signature-256')
+      if (!verifyMetaWebhookSignature(rawBody, sig, appSecret)) {
+        logger.warn('WhatsApp webhook: invalid or missing X-Hub-Signature-256', { requestId })
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+    } else if (process.env.NODE_ENV === 'production') {
+      logger.warn('WHATSAPP_APP_SECRET not set; webhook POST is not signature-verified', { requestId })
+    }
+
+    let body: any
+    try {
+      body = JSON.parse(rawBody)
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
+    }
+
     console.log('📩 Incoming webhook:', JSON.stringify(body, null, 2))
 
     // Process message entries

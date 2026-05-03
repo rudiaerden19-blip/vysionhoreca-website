@@ -4520,6 +4520,7 @@
     "setupStep5": "Configurez l'URL webhook ci-dessous dans votre app Meta",
     "webhookTitle": "URL Webhook (copier vers Meta)",
     "webhookCopied": "URL Webhook copiée !",
+    "verifyTokenHint": "Définissez WHATSAPP_VERIFY_TOKEN dans votre environnement d’hébergement (ex. Vercel). Pour des raisons de sécurité, il n’apparaît pas sur cette page.",
     "apiSettings": "Paramètres API",
     "showTokens": "Afficher",
     "hideTokens": "Masquer",

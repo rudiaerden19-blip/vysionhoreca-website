@@ -4757,6 +4757,7 @@
     "setupStep5": "Configureer de webhook URL hieronder in je Meta app",
     "webhookTitle": "Webhook URL (kopieer naar Meta)",
     "webhookCopied": "Webhook URL gekopieerd!",
+    "verifyTokenHint": "Stel WHATSAPP_VERIFY_TOKEN in bij je hosting (Vercel). Om veiligheidsredenen staat die niet op deze pagina.",
     "apiSettings": "API Instellingen",
     "showTokens": "Tonen",
     "hideTokens": "Verbergen",

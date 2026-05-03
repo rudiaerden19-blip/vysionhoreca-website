@@ -10,13 +10,14 @@ import Link from 'next/link'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
 import { getAdminKassaEntryHref } from '@/lib/tenant-modules'
 import { shopDisplayOrderTypeKey, nlBrowserPrintOrderTypeBanner } from '@/lib/shop-display-order-type'
-import { 
+import {
   activateAudioForIOS,
   prewarmAudio,
   playOrderNotification,
   isAudioActivatedThisSession,
   markAudioActivated
 } from '@/lib/sounds'
+import { getAuthHeaders } from '@/lib/auth-headers'
 import {
   fetchPrinterOnlineViaProxy,
   normalizeLanPrinterIp,
@@ -413,8 +414,9 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     try {
       const response = await fetch('/api/send-order-status', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify({
+          tenantSlug: params.tenant,
           // Customer info
           customerEmail: order.customer_email,
           customerName: order.customer_name,

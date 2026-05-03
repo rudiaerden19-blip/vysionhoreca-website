@@ -4497,6 +4497,7 @@
     "setupStep5": "在您的Meta应用中配置以下Webhook URL",
     "webhookTitle": "Webhook URL（复制到Meta）",
     "webhookCopied": "Webhook URL已复制！",
+    "verifyTokenHint": "请在托管环境（如 Vercel）中设置 WHATSAPP_VERIFY_TOKEN。出于安全考虑，本页不显示该值。",
     "apiSettings": "API设置",
     "showTokens": "显示",
     "hideTokens": "隐藏",

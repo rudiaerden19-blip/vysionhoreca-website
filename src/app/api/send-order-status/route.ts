@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
-import { getServerSupabaseClient } from '@/lib/supabase-server'
-import { tenantExistsInDb } from '@/lib/tenant-slug-resolve'
+import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 
 interface OrderItem {
   name?: string
@@ -17,18 +16,18 @@ interface OrderItem {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    
-    // SECURITY: Verify the request comes from a valid tenant
-    const tenantSlug = body.tenantSlug
-    if (tenantSlug) {
-      const supabase = getServerSupabaseClient()
-      if (supabase) {
-        const ok = await tenantExistsInDb(supabase, tenantSlug)
-        if (!ok) {
-          return NextResponse.json({ error: 'Invalid tenant' }, { status: 403 })
-        }
-      }
+
+    const tenantSlug = body.tenantSlug as string | undefined
+    if (!tenantSlug || typeof tenantSlug !== 'string') {
+      return NextResponse.json({ error: 'tenantSlug is required' }, { status: 400 })
     }
+
+    const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
+    if (!access.authorized) {
+      const st = access.error?.includes('ingelogd') ? 401 : 403
+      return NextResponse.json({ error: access.error || 'Forbidden' }, { status: st })
+    }
+
     const { 
       customerEmail, 
       customerName,

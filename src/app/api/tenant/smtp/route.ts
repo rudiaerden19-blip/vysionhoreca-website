@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
+import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 
 // GET: haal SMTP instellingen op (zonder wachtwoord)
 export async function GET(request: NextRequest) {
@@ -10,10 +11,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'tenant vereist' }, { status: 400 })
   }
 
-  const businessId = request.headers.get('x-business-id')
-  const superadminId = request.headers.get('x-superadmin-id')
-  if (!businessId && !superadminId) {
-    return NextResponse.json({ error: 'Niet ingelogd' }, { status: 401 })
+  const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
+  if (!access.authorized) {
+    return NextResponse.json({ error: access.error || 'Forbidden' }, { status: access.error?.includes('ingelogd') ? 401 : 403 })
   }
 
   const supabase = getServerSupabaseClient()
@@ -42,16 +42,15 @@ export async function GET(request: NextRequest) {
 
 // POST: sla SMTP instellingen op (inclusief wachtwoord)
 export async function POST(request: NextRequest) {
-  const businessId = request.headers.get('x-business-id')
-  const superadminId = request.headers.get('x-superadmin-id')
-  if (!businessId && !superadminId) {
-    return NextResponse.json({ error: 'Niet ingelogd' }, { status: 401 })
-  }
-
   const { tenantSlug, smtp_host, smtp_port, smtp_user, smtp_password, smtp_from_name } = await request.json()
 
   if (!tenantSlug) {
     return NextResponse.json({ error: 'tenant vereist' }, { status: 400 })
+  }
+
+  const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
+  if (!access.authorized) {
+    return NextResponse.json({ error: access.error || 'Forbidden' }, { status: access.error?.includes('ingelogd') ? 401 : 403 })
   }
 
   const supabase = getServerSupabaseClient()

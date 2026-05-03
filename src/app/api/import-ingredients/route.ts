@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
+import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 
 // POST /api/import-ingredients
 // Body: { tenant_slug: string, ingredients: Array<{ name, price, unit?, supplier?, article_nr? }> }
@@ -16,6 +17,11 @@ export async function POST(request: NextRequest) {
 
     if (!tenant_slug) {
       return NextResponse.json({ error: 'tenant_slug is required' }, { status: 400 })
+    }
+
+    const access = await verifyTenantOrSuperAdmin(request, tenant_slug)
+    if (!access.authorized) {
+      return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
     }
 
     if (!ingredients || !Array.isArray(ingredients) || ingredients.length === 0) {
