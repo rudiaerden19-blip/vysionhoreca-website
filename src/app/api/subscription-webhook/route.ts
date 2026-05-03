@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
+import { logger } from '@/lib/logger'
+import { trackError } from '@/lib/monitoring'
 import {
   isMissingPostTrialModulesColumnError,
   withoutPostTrialModulesConfirmed,
@@ -16,11 +18,12 @@ interface StripeInvoiceExtended extends Stripe.Invoice {
 }
 
 export async function POST(request: NextRequest) {
+  const requestId = crypto.randomUUID()
   try {
     // Validate Supabase configuration
     const supabase = getServerSupabaseClient()
     if (!supabase) {
-      console.error('Subscription webhook failed: Supabase not configured')
+      logger.error('Subscription webhook failed: Supabase not configured', { requestId })
       return NextResponse.json(
         { error: 'Database not configured' },
         { status: 503 }
@@ -37,7 +40,7 @@ export async function POST(request: NextRequest) {
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
 
     if (!stripeSecretKey || !webhookSecret) {
-      console.error('Missing Stripe configuration')
+      logger.error('Subscription webhook: missing Stripe configuration', { requestId })
       return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
     }
 
@@ -47,8 +50,9 @@ export async function POST(request: NextRequest) {
 
     try {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret)
-    } catch (err: any) {
-      console.error('Webhook signature verification failed:', err.message)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err)
+      logger.warn('Subscription webhook: signature verification failed', { requestId, error: msg })
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
     }
 
@@ -61,7 +65,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (existingEvent) {
-      console.log(`Webhook event ${event.id} already processed, skipping`)
+      logger.info('Subscription webhook: duplicate event skipped', { requestId, eventId: event.id })
       return NextResponse.json({ received: true, duplicate: true })
     }
 
@@ -97,7 +101,11 @@ export async function POST(request: NextRequest) {
               })
               .eq('id', invoiceId)
 
-            console.log(`Invoice ${invoiceId} paid for ${tenantSlug}`)
+            logger.info('Subscription webhook: invoice paid', {
+              requestId,
+              invoiceId,
+              tenantSlug,
+            })
 
             // Check if there are any remaining unpaid invoices
             const { data: unpaidInvoices } = await supabase
@@ -124,7 +132,10 @@ export async function POST(request: NextRequest) {
                 })
                 .eq('slug', tenantSlug)
 
-              console.log(`Subscription reactivated for ${tenantSlug} - all invoices paid`)
+              logger.info('Subscription webhook: subscription reactivated', {
+                requestId,
+                tenantSlug,
+              })
             }
           }
         }
@@ -192,7 +203,10 @@ export async function POST(request: NextRequest) {
                 .eq('slug', tenantSlug)
             }
 
-            console.log(`Subscription activated for ${tenantSlug}`)
+            logger.info('Subscription webhook: subscription activated', {
+              requestId,
+              tenantSlug,
+            })
           }
         }
         break
@@ -223,7 +237,10 @@ export async function POST(request: NextRequest) {
               })
               .eq('id', sub.id)
 
-            console.log(`Invoice paid for ${sub.tenant_slug}`)
+            logger.info('Subscription webhook: invoice paid for tenant', {
+              requestId,
+              tenant_slug: sub.tenant_slug,
+            })
           }
         }
         break
@@ -249,7 +266,10 @@ export async function POST(request: NextRequest) {
               })
               .eq('id', sub.id)
 
-            console.log(`Payment failed for ${sub.tenant_slug}`)
+            logger.info('Subscription webhook: payment failed', {
+              requestId,
+              tenant_slug: sub.tenant_slug,
+            })
             
             // Send email notification about failed payment
             if (sub.tenant_slug) {
@@ -272,7 +292,12 @@ export async function POST(request: NextRequest) {
                   })
                 }
               } catch (emailError) {
-                console.error('Failed to send payment failed email:', emailError)
+                logger.warn('Subscription webhook: payment failed email error', {
+                  requestId,
+                  tenant_slug: sub.tenant_slug,
+                  error:
+                    emailError instanceof Error ? emailError.message : String(emailError),
+                })
               }
             }
           }
@@ -298,7 +323,10 @@ export async function POST(request: NextRequest) {
             })
             .eq('id', sub.id)
 
-          console.log(`Subscription cancelled for ${sub.tenant_slug}`)
+          logger.info('Subscription webhook: subscription cancelled', {
+            requestId,
+            tenant_slug: sub.tenant_slug,
+          })
         }
         break
       }
@@ -327,21 +355,30 @@ export async function POST(request: NextRequest) {
             })
             .eq('id', sub.id)
 
-          console.log(`Subscription updated for ${sub.tenant_slug}: ${status}`)
+          logger.info('Subscription webhook: subscription updated', {
+            requestId,
+            tenant_slug: sub.tenant_slug,
+            status,
+          })
         }
         break
       }
 
       default:
-        console.log(`Unhandled event type: ${event.type}`)
+        logger.info('Subscription webhook: unhandled event type', {
+          requestId,
+          eventType: event.type,
+        })
     }
 
     return NextResponse.json({ received: true })
 
-  } catch (error: any) {
-    console.error('Webhook error:', error)
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error)
+    logger.error('Subscription webhook error', { requestId, error: message })
+    trackError(error, { requestId, route: '/api/subscription-webhook' })
     return NextResponse.json(
-      { error: error?.message || 'Webhook handler failed' },
+      { error: message || 'Webhook handler failed' },
       { status: 500 }
     )
   }

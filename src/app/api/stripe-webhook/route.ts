@@ -3,6 +3,7 @@ import Stripe from 'stripe'
 import nodemailer from 'nodemailer'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
+import { trackError } from '@/lib/monitoring'
 import { regenerateZReportForDate } from '@/lib/admin-api'
 import { getBelgiumDateString } from '@/lib/belgium-date-bounds'
 
@@ -174,6 +175,7 @@ export async function POST(request: NextRequest) {
       error: error instanceof Error ? error.message : 'Unknown error',
       duration: Date.now() - startTime 
     })
+    trackError(error, { requestId, route: '/api/stripe-webhook' })
     return NextResponse.json(
       { error: 'Webhook processing failed' },
       { status: 500 }
