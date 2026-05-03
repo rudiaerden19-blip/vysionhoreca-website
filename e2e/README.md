@@ -19,7 +19,14 @@ npx playwright install chromium
 
 ## Draaien
 
-Je app moet Supabase/kassa-data kunnen laden (`.env.local` zoals bij `npm run dev`).
+Je app moet Supabase/kassa-data kunnen laden. Zonder deze waarden in **`.env.local`** (projectroot) bouwt de dev-server wel, maar de **kassa-e2e** vindt geen `kassa-app` (client gebruikt dan geen Supabase-client):
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+(Kopieer dezelfde waarden als voor een normale `npm run dev`; voor volledige API-routes heb je ook `SUPABASE_SERVICE_ROLE_KEY` nodig, maar voor de kassa-smoke in de browser zijn vooral de twee `NEXT_PUBLIC_*`-variabelen nodig.)
+
+De kassa-smoke heeft een langere **testtimeout** (120s) zodat cold start van `npm run dev` niet op 30s breekt.
 
 **Optie A — alles in één** (Playwright start zelf `npm run dev` als er nog niets draait):
 
