@@ -72,6 +72,7 @@ import {
   mergeOfflineOrderQueues,
   offlineOrdersQueueStorageKey,
 } from '@/lib/kassa-offline-order-queue'
+import { useKassaOfflineFlushBridge } from '@/lib/use-kassa-offline-flush-bridge'
 import type { KassaPayOption } from '@/components/kassa/KassaPaymentModal'
 import { KassaPaymentModal } from '@/components/kassa/KassaPaymentModal'
 import { KassaSplitPaymentModal } from '@/components/kassa/KassaSplitPaymentModal'
@@ -1103,32 +1104,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setOrderType(types[(types.indexOf(orderType) + 1) % types.length])
   }
 
-  useEffect(() => {
-    flushOfflineOrdersRef.current = () => flushOfflineOrdersToSupabase(tenant)
-  }, [tenant])
-
-  // Retry offline queue bij reconnect + bij laden; Background Sync stuurt ook flush via postMessage
-  useEffect(() => {
-    const onOnline = () => void flushOfflineOrdersRef.current()
-    window.addEventListener('online', onOnline)
-    void flushOfflineOrdersRef.current()
-    return () => window.removeEventListener('online', onOnline)
-  }, [tenant])
-
-  useEffect(() => {
-    const sw = navigator.serviceWorker
-    if (!sw?.addEventListener) return
-    const handler = (ev: MessageEvent) => {
-      if (ev.data?.type === 'VYSION_FLUSH_OFFLINE_ORDERS') void flushOfflineOrdersRef.current()
-    }
-    sw.addEventListener('message', handler as EventListener)
-    return () => sw.removeEventListener('message', handler as EventListener)
-  }, [])
-
-  useEffect(() => {
-    if (typeof navigator === 'undefined' || !navigator.storage?.persist) return
-    void navigator.storage.persist().catch(() => {})
-  }, [tenant])
+  useKassaOfflineFlushBridge(tenant, flushOfflineOrdersRef)
 
   const clearTableAfterPayment = (tblNr: string) => {
     cancelPersistTimer(tblNr)
