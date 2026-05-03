@@ -41,7 +41,6 @@ import {
   printStaffSalesSummaryReceipt,
 } from '@/lib/print-receipt-html'
 import {
-  offlineDbGetOrderQueue,
   offlineDbLoadMenuSnapshot,
   offlineDbSaveMenuSnapshot,
   offlineDbSetOrderQueue,
@@ -61,26 +60,26 @@ import {
 import { fetchOrderNumberByKassaClientUuid } from '@/lib/kassa-fetch-order-number'
 import { KassaAnalogClock } from '@/components/kassa/KassaAnalogClock'
 import { KassaRegisterSuspenseFallback } from '@/components/KassaRegisterSuspenseFallback'
-
-interface SelectedChoice {
-  optionId: string
-  optionName: string
-  choiceId: string
-  choiceName: string
-  price: number
-}
-
-interface CartItem {
-  product: MenuProduct
-  quantity: number
-  choices?: SelectedChoice[]
-  cartKey: string
-}
-
-type OrderType = 'DINE_IN' | 'TAKEAWAY' | 'DELIVERY'
+import type {
+  KassaCartItem as CartItem,
+  KassaSelectedChoice as SelectedChoice,
+  KassaRegisterOrderType as OrderType,
+  KassaPaymentMethod as PaymentMethodType,
+  KassaLastOrderReceipt,
+} from '@/lib/kassa-cart-types'
+import {
+  flushOfflineOrdersToSupabase,
+  mergeOfflineOrderQueues,
+  offlineOrdersQueueStorageKey,
+} from '@/lib/kassa-offline-order-queue'
+import type { KassaPayOption } from '@/components/kassa/KassaPaymentModal'
+import { KassaPaymentModal } from '@/components/kassa/KassaPaymentModal'
+import { KassaSplitPaymentModal } from '@/components/kassa/KassaSplitPaymentModal'
+import { KassaSuccessReceiptModal } from '@/components/kassa/KassaSuccessReceiptModal'
 
 function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const tenant = params.tenant
+  const offlineQueueKey = offlineOrdersQueueStorageKey(tenant)
   const router = useRouter()
   const searchParams = useSearchParams()
   const demoFromUrl =
@@ -684,25 +683,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   // Betaling
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
-  type PaymentMethodType = 'CASH' | 'CARD' | 'IDEAL' | 'BANCONTACT' | 'SPLIT'
   const [showSplitModal, setShowSplitModal] = useState(false)
   const [splitCash, setSplitCash] = useState(0)
   const [splitCard, setSplitCard] = useState(0)
-  const [lastOrder, setLastOrder] = useState<{
-    orderNumber: number
-    /** Offline wachtrij: korte referentie tot sync */
-    checkoutReference?: string
-    items: CartItem[]
-    total: number
-    paymentMethod: PaymentMethodType
-    splitCash?: number
-    splitCard?: number
-    orderType: OrderType
-    tableNumber: string
-    createdAt: Date
-    /** Medewerker in verkoopmodus (klok) op moment van betalen */
-    helpedByStaffName?: string | null
-  } | null>(null)
+  const [lastOrder, setLastOrder] = useState<KassaLastOrderReceipt | null>(null)
   const [tenantInfo, setTenantInfo] = useState<TenantSettings | null>(null)
 
   const [staffClockOpen, setStaffClockOpen] = useState(false)
@@ -1113,100 +1097,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setOrderType(types[(types.indexOf(orderType) + 1) % types.length])
   }
 
-  const offlineQueueKey = `vysion_offline_orders_${tenant}`
-
-  const mergeOfflineQueues = useCallback(async (): Promise<object[]> => {
-    let fromIdb: object[] = []
-    try {
-      fromIdb = await offlineDbGetOrderQueue(tenant)
-    } catch {
-      fromIdb = []
-    }
-    let fromLs: object[] = []
-    const raw = localStorage.getItem(offlineQueueKey)
-    if (raw) {
-      try {
-        fromLs = JSON.parse(raw)
-      } catch {
-        fromLs = []
-      }
-    }
-    const byUuid = new Map<string, object>()
-    const legacyNum = new Map<number, object>()
-    for (const o of [...fromLs, ...fromIdb]) {
-      const row = o as { kassa_client_uuid?: string; order_number?: number }
-      const u = row.kassa_client_uuid
-      if (typeof u === 'string' && u.length > 0) {
-        byUuid.set(u, o)
-      } else if (typeof row.order_number === 'number') {
-        legacyNum.set(row.order_number, o)
-      } else {
-        const fallbackKey = `legacy:${String((row as { created_at?: string }).created_at ?? '')}:${String((row as { total?: number }).total ?? '')}`
-        byUuid.set(fallbackKey, o)
-      }
-    }
-    const merged = [...byUuid.values(), ...legacyNum.values()]
-    if (merged.length > 0) {
-      try {
-        await offlineDbSetOrderQueue(tenant, merged)
-        localStorage.setItem(offlineQueueKey, JSON.stringify(merged))
-      } catch {
-        /* ignore */
-      }
-    }
-    return merged
-  }, [tenant, offlineQueueKey])
-
-  /** IndexedDB + localStorage wachtrij naar Supabase; Web Locks = één tab tegelijk. */
-  const flushOfflineOrders = useCallback(async () => {
-    const processQueue = async () => {
-      const freshQueue = await mergeOfflineQueues()
-      if (freshQueue.length === 0) return
-
-      const remaining: object[] = []
-      for (const order of freshQueue) {
-        const { error } = await supabase.from('orders').insert(order)
-        if (!error) {
-          const o = order as { tenant_slug?: string; created_at?: string }
-          if (o.tenant_slug && o.created_at) {
-            void syncZReportAfterOrder(o.tenant_slug, o.created_at)
-          }
-          continue
-        }
-        if (isDuplicateKassaClientUuidError(error)) {
-          const o = order as { tenant_slug?: string; created_at?: string }
-          if (o.tenant_slug && o.created_at) {
-            void syncZReportAfterOrder(o.tenant_slug, o.created_at)
-          }
-          continue
-        }
-        remaining.push(order)
-      }
-      try {
-        await offlineDbSetOrderQueue(tenant, remaining)
-        localStorage.setItem(offlineQueueKey, JSON.stringify(remaining))
-      } catch {
-        /* ignore */
-      }
-    }
-
-    try {
-      if ('locks' in navigator) {
-        await (navigator as Navigator & { locks: LockManager }).locks.request(
-          `vysion_queue_${tenant}`,
-          processQueue,
-        )
-      } else {
-        await processQueue()
-      }
-    } catch {
-      /* empty */
-    }
-  }, [tenant, mergeOfflineQueues, offlineQueueKey])
-
   useEffect(() => {
-    flushOfflineOrdersRef.current = flushOfflineOrders
-  }, [flushOfflineOrders])
+    flushOfflineOrdersRef.current = () => flushOfflineOrdersToSupabase(tenant)
+  }, [tenant])
 
   // Retry offline queue bij reconnect + bij laden; Background Sync stuurt ook flush via postMessage
   useEffect(() => {
@@ -1345,7 +1238,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       finishSuccessPath()
     } else if (error && isLikelyOfflineOrNetworkSupabaseError(error)) {
       const addToQueue = async () => {
-        const queue = await mergeOfflineQueues()
+        const queue = await mergeOfflineOrderQueues(tenant)
         if (
           !queue.some(
             (o: unknown) =>
@@ -1753,14 +1646,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   blockSaleWithoutStaffIfNeededRef.current = blockSaleWithoutStaffIfNeeded
 
-  const paymentMethodOptions = useMemo(
-    () =>
-      [
-        { method: 'CASH' as const, label: t('kassaApp.payCash'), icon: '💵', color: '#10b981' },
-        { method: 'CARD' as const, label: t('kassaApp.payCard'), icon: '💳', color: '#3b82f6' },
-        { method: 'IDEAL' as const, label: t('kassaApp.payIdeal'), icon: '📱', color: '#ec4899' },
-        { method: 'BANCONTACT' as const, label: t('kassaApp.payBancontact'), icon: '🏦', color: '#f59e0b' },
-      ] as const,
+  const paymentMethodOptions = useMemo<KassaPayOption[]>(
+    () => [
+      { method: 'CASH', label: t('kassaApp.payCash'), icon: '💵', color: '#10b981' },
+      { method: 'CARD', label: t('kassaApp.payCard'), icon: '💳', color: '#3b82f6' },
+      { method: 'IDEAL', label: t('kassaApp.payIdeal'), icon: '📱', color: '#ec4899' },
+      { method: 'BANCONTACT', label: t('kassaApp.payBancontact'), icon: '🏦', color: '#f59e0b' },
+    ],
     [t],
   )
 
@@ -2909,302 +2801,51 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         />
       )}
 
-      {/* ── Betaalmodal ── */}
-      {showPaymentModal && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
-            <div className="p-4 border-b flex justify-between items-center">
-              <h3 className="text-xl font-semibold">{t('kassaApp.payTitle')}</h3>
-              <button onClick={() => setShowPaymentModal(false)} className="p-2 rounded-lg hover:bg-gray-100 text-2xl">✕</button>
-            </div>
-            <div className="p-6">
-              <div className="text-center mb-6">
-                <p className="text-gray-500">{t('kassaApp.toPay')}</p>
-                <p className="text-5xl font-bold text-[#3C4D6B]">€{total.toFixed(2)}</p>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                {paymentMethodOptions.map((pm) => (
-                  <button
-                    key={pm.method}
-                    onClick={() => completePayment(pm.method)}
-                    className="flex flex-col items-center justify-center h-32 gap-3 rounded-xl border-2 bg-gray-50 hover:scale-[1.02] transition-transform font-semibold text-lg"
-                    style={{ borderColor: pm.color }}
-                  >
-                    <span className="text-4xl">{pm.icon}</span>
-                    <span style={{ color: pm.color }}>{pm.label}</span>
-                  </button>
-                ))}
-                {/* Gesplitst Betalen — volle breedte */}
-                <button
-                  onClick={() => { setSplitCash(0); setSplitCard(total); setShowSplitModal(true); setShowPaymentModal(false) }}
-                  className="col-span-2 flex flex-col items-center justify-center h-32 gap-3 rounded-xl border-2 bg-gray-50 hover:scale-[1.02] transition-transform font-semibold text-lg"
-                  style={{ borderColor: '#8b5cf6' }}
-                >
-                  <span className="text-4xl">👛</span>
-                  <span style={{ color: '#8b5cf6' }}>{t('kassaApp.splitPay')}</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* ── Betaalmodal / split / succes ── */}
+      <KassaPaymentModal
+        open={showPaymentModal}
+        total={total}
+        options={paymentMethodOptions}
+        onClose={() => setShowPaymentModal(false)}
+        onPay={(method) => void completePayment(method)}
+        onOpenSplit={() => {
+          setSplitCash(0)
+          setSplitCard(total)
+          setShowSplitModal(true)
+          setShowPaymentModal(false)
+        }}
+      />
 
-      {/* ── Gesplitst Betalen modal ── */}
-      {showSplitModal && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
-            <div className="p-4 border-b flex justify-between items-center">
-              <h3 className="text-xl font-semibold flex items-center gap-2">
-                <span className="text-purple-500">👛</span> {t('kassaApp.splitPayTitle')}
-              </h3>
-              <button onClick={() => { setShowSplitModal(false); setShowPaymentModal(true) }} className="p-2 rounded-lg hover:bg-gray-100 text-2xl">✕</button>
-            </div>
-            <div className="p-6 space-y-5">
-              {/* Totaal */}
-              <div className="text-center p-4 bg-gray-50 rounded-xl">
-                <p className="text-gray-500">{t('kassaApp.totalToPay')}</p>
-                <p className="text-4xl font-bold text-[#3C4D6B]">€{total.toFixed(2)}</p>
-              </div>
-              {/* Contant */}
-              <div className="space-y-1">
-                <label className="flex items-center gap-2 text-gray-500 text-sm">💵 {t('kassaApp.splitCashLabel')}</label>
-                <input
-                  type="number"
-                  value={splitCash || ''}
-                  onChange={(e) => { const v = parseFloat(e.target.value) || 0; setSplitCash(v); setSplitCard(Math.max(0, total - v)) }}
-                  className="w-full px-4 py-4 text-2xl font-bold rounded-xl bg-white border-2 border-green-400 focus:border-green-500 outline-none"
-                  placeholder={t('kassaApp.numpadPlaceholder')} step="0.01" min="0"
-                />
-              </div>
-              {/* Kaart */}
-              <div className="space-y-1">
-                <label className="flex items-center gap-2 text-gray-500 text-sm">💳 {t('kassaApp.splitCardLabel')}</label>
-                <input
-                  type="number"
-                  value={splitCard || ''}
-                  onChange={(e) => { const v = parseFloat(e.target.value) || 0; setSplitCard(v); setSplitCash(Math.max(0, total - v)) }}
-                  className="w-full px-4 py-4 text-2xl font-bold rounded-xl bg-white border-2 border-blue-400 focus:border-blue-500 outline-none"
-                  placeholder={t('kassaApp.numpadPlaceholder')} step="0.01" min="0"
-                />
-              </div>
-              {/* Snelle knoppen */}
-              <div className="grid grid-cols-3 gap-2">
-                {[
-                  { label: t('kassaApp.split5050'), cash: total / 2, card: total / 2 },
-                  { label: t('kassaApp.split100Cash'), cash: total, card: 0 },
-                  { label: t('kassaApp.split100Card'), cash: 0, card: total },
-                ].map((opt) => (
-                  <button key={opt.label} onClick={() => { setSplitCash(opt.cash); setSplitCard(opt.card) }}
-                    className="py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-sm font-semibold transition-colors">
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-              {/* Resterende indicator */}
-              {Math.abs(total - splitCash - splitCard) > 0.01 && (
-                <div className={`p-3 rounded-xl text-center text-sm font-semibold ${(total - splitCash - splitCard) > 0 ? 'bg-red-100 text-red-600' : 'bg-yellow-100 text-yellow-700'}`}>
-                  {(total - splitCash - splitCard) > 0
-                    ? t('kassaApp.splitRemainOwed').replace(
-                        '{amount}',
-                        (total - splitCash - splitCard).toFixed(2),
-                      )
-                    : t('kassaApp.splitOverpaid').replace(
-                        '{amount}',
-                        Math.abs(total - splitCash - splitCard).toFixed(2),
-                      )}
-                </div>
-              )}
-              {/* Bevestigen */}
-              <button
-                onClick={() => {
-                  if (Math.abs(total - splitCash - splitCard) < 0.01) {
-                    void completePayment('SPLIT', { cash: splitCash, card: splitCard })
-                  }
-                }}
-                disabled={Math.abs(total - splitCash - splitCard) > 0.01}
-                className="w-full py-4 rounded-xl bg-purple-500 hover:bg-purple-600 text-white font-bold text-lg disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-              >
-                {t('kassaApp.splitConfirm').replace('{amount}', (splitCash + splitCard).toFixed(2))}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <KassaSplitPaymentModal
+        open={showSplitModal}
+        total={total}
+        splitCash={splitCash}
+        splitCard={splitCard}
+        setSplitCash={setSplitCash}
+        setSplitCard={setSplitCard}
+        onCloseBack={() => {
+          setShowSplitModal(false)
+          setShowPaymentModal(true)
+        }}
+        onConfirm={() => void completePayment('SPLIT', { cash: splitCash, card: splitCard })}
+      />
 
-      {/* ── Succes modal met kassabon ── */}
-      {showSuccessModal && lastOrder && (() => {
-        const vatRate = tenantInfo?.btw_percentage ?? 6
-        const subtotal = lastOrder.total / (1 + vatRate / 100)
-        const tax = lastOrder.total - subtotal
-        const orderTypeLabel =
-          lastOrder.orderType === 'DINE_IN'
-            ? `🍽️ ${t('kassaReceipt.orderTypeDineIn')}`
-            : lastOrder.orderType === 'TAKEAWAY'
-              ? `📦 ${t('kassaReceipt.orderTypeTakeaway')}`
-              : `🚗 ${t('kassaReceipt.orderTypeDelivery')}`
-        const receiptRefSuccess =
-          lastOrder.checkoutReference ??
-          (lastOrder.orderNumber > 0 ? String(lastOrder.orderNumber) : '—')
-
-        const payLabel =
-          lastOrder.paymentMethod === 'SPLIT'
-            ? t('kassaReceipt.paidSplit')
-                .replace('{cash}', (lastOrder.splitCash ?? 0).toFixed(2))
-                .replace('{card}', (lastOrder.splitCard ?? 0).toFixed(2))
-            : lastOrder.paymentMethod === 'CASH'
-              ? t('kassaApp.payCash')
-              : lastOrder.paymentMethod === 'CARD'
-                ? t('kassaApp.payCard')
-                : lastOrder.paymentMethod === 'IDEAL'
-                  ? t('kassaApp.payIdeal')
-                  : t('kassaApp.payBancontact')
-        const successDateStr = lastOrder.createdAt.toLocaleString(appLocaleToBcp47(locale), {
-          day: '2-digit',
-          month: '2-digit',
-          year: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit',
-        })
-        const successVatLabel = t('kassaReceipt.vat').replace('{rate}', String(vatRate))
-        return (
-          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 overflow-y-auto">
-            <div className="bg-white rounded-2xl overflow-hidden max-w-md w-full my-4 shadow-2xl">
-              {/* Header */}
-              <div className="p-4 bg-emerald-500 text-white text-center">
-                <div className="w-16 h-16 rounded-full bg-white/20 mx-auto mb-2 flex items-center justify-center text-4xl">✓</div>
-                <h3 className="text-xl font-bold">{t('kassaApp.successTitle')}</h3>
-                <p className="opacity-80">
-                  {lastOrder.checkoutReference
-                    ? t('kassaApp.successCheckoutRef').replace('{ref}', lastOrder.checkoutReference)
-                    : t('kassaApp.successOrderLine').replace(/\{number\}/g, String(lastOrder.orderNumber))}
-                </p>
-              </div>
-
-              {/* Kassabon — exact zelfde als referentie */}
-              <div className="p-4 max-h-[50vh] overflow-y-auto">
-                <div className="bg-white text-black p-4 rounded-lg max-w-[300px] mx-auto font-mono text-sm">
-                  {/* Header */}
-                  <div className="text-center mb-4">
-                    <h1 className="font-bold text-lg">{tenantInfo?.business_name || t('kassaApp.defaultBusinessName')}</h1>
-                    {tenantInfo?.address && <p className="text-xs">{tenantInfo.address}</p>}
-                    {(tenantInfo?.postal_code || tenantInfo?.city) && (
-                      <p className="text-xs">{tenantInfo?.postal_code} {tenantInfo?.city}</p>
-                    )}
-                    {tenantInfo?.phone && (
-                      <p className="text-xs">
-                        {t('kassaReceipt.telPrefix')} {tenantInfo.phone}
-                      </p>
-                    )}
-                  </div>
-                  <div className="border-t-2 border-dashed border-gray-400 my-3" />
-                  {/* Besteltype */}
-                  <div className="text-center mb-3">
-                    <p className="font-bold text-lg">{orderTypeLabel}</p>
-                    {lastOrder.tableNumber && (
-                      <p className="font-bold">
-                        {t('kassaReceipt.tableLabel').replace(/\{number\}/g, String(lastOrder.tableNumber))}
-                      </p>
-                    )}
-                  </div>
-                  {/* Bon info */}
-                  <div className="text-xs mb-3">
-                    <div className="flex justify-between">
-                      <span>
-                        {t('kassaReceipt.receiptNo')}
-                        {receiptRefSuccess}
-                      </span>
-                      <span>{successDateStr}</span>
-                    </div>
-                  </div>
-                  <div className="border-t border-gray-300 my-2" />
-                  {/* Items */}
-                  <div className="space-y-2">
-                    {lastOrder.items.map((item, idx) => {
-                      const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
-                      const lineTotal = (item.product.price + choicesTotal) * item.quantity
-                      return (
-                        <div key={idx}>
-                          <div className="flex justify-between">
-                            <div className="flex-1">
-                              <span className="font-medium">{item.quantity}x</span>{' '}
-                              <span>{item.product.name}</span>
-                            </div>
-                            <span>€{lineTotal.toFixed(2)}</span>
-                          </div>
-                          {(item.choices || []).length > 0 && (
-                            <div className="ml-4 text-xs text-gray-600">
-                              {(item.choices || []).map((c, ci) => (
-                                <div key={ci} className="flex justify-between">
-                                  <span>+ {c.choiceName}</span>
-                                  {c.price > 0 && <span>€{c.price.toFixed(2)}</span>}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      )
-                    })}
-                  </div>
-                  <div className="border-t border-gray-300 my-3" />
-                  {/* Totalen */}
-                  <div className="space-y-1 text-sm">
-                    <div className="flex justify-between">
-                      <span>{t('kassaReceipt.subtotal')}</span>
-                      <span>€{subtotal.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>{successVatLabel}</span>
-                      <span>€{tax.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between font-bold text-lg border-t border-gray-400 pt-2 mt-2">
-                      <span>{t('kassaReceipt.total')}</span>
-                      <span>€{lastOrder.total.toFixed(2)}</span>
-                    </div>
-                  </div>
-                  {/* Betaalmethode */}
-                  <div className="text-center mt-3 text-xs">
-                    <p>
-                      {t('kassaReceipt.paidWith')} {payLabel}
-                    </p>
-                  </div>
-                  {lastOrder.helpedByStaffName && (
-                    <div className="text-center mt-3 text-sm font-semibold text-gray-800 px-1">
-                      {t('kassaReceipt.helpedBy').replace('{name}', lastOrder.helpedByStaffName)}
-                    </div>
-                  )}
-                  <div className="border-t-2 border-dashed border-gray-400 my-3" />
-                  <div className="text-center text-xs">
-                    {tenantInfo?.btw_number && (
-                      <p>{t('kassaReceipt.businessVatLabel').replace('{vatNumber}', tenantInfo.btw_number)}</p>
-                    )}
-                    <p className="mt-2">{t('kassaReceipt.thanks')}</p>
-                    {tenantInfo?.website && <p className="mt-1">{tenantInfo.website}</p>}
-                  </div>
-                </div>
-              </div>
-
-              {/* Knoppen */}
-              <div className="p-4 border-t flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    void printReceipt(lastOrder).finally(() => setShowSuccessModal(false))
-                  }}
-                  className="flex-1 py-3 rounded-xl bg-gray-100 font-semibold text-gray-700 flex items-center justify-center gap-2 touch-manipulation min-h-[44px]"
-                >
-                  🖨️ {t('kassaReceipt.print')}
-                </button>
-                <button
-                  onClick={() => setShowSuccessModal(false)}
-                  className="flex-1 py-3 rounded-xl bg-[#3C4D6B] text-white font-bold"
-                >
-                  {t('kassaApp.successClose')}
-                </button>
-              </div>
-            </div>
-          </div>
-        )
-      })()}
+      {lastOrder ? (
+        <KassaSuccessReceiptModal
+          open={showSuccessModal}
+          order={lastOrder}
+          tenantInfo={tenantInfo}
+          locale={locale}
+          onClose={() => setShowSuccessModal(false)}
+          onPrint={async () => {
+            try {
+              await printReceipt(lastOrder)
+            } finally {
+              setShowSuccessModal(false)
+            }
+          }}
+        />
+      ) : null}
 
       {/* ── ORANJE SCHERM: Nieuwe online bestelling (exact donor) ── */}
       {newOrderAlert && !demoViewOnly && (
