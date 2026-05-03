@@ -19,88 +19,20 @@ function throwIfSupabaseFetchAborted(error: { message?: string } | null | undefi
   }
 }
 
-// =====================================================
-// TIMEZONE HELPER - KRITIEK VOOR CORRECTE DATUMS
-// België gebruikt CET (UTC+1) in winter, CEST (UTC+2) in zomer
-// =====================================================
+// Belgium calendar / Z-rapport bounds — single implementation in `belgium-date-bounds.ts`
+// (light routes import that module directly to avoid pulling in admin-api).
+import {
+  addDaysToBelgiumYMD,
+  getBelgiumDateString,
+  getDateBoundsForBelgium,
+  getZRapportDateBounds,
+} from './belgium-date-bounds'
 
-/**
- * Converteert een lokale datum (YYYY-MM-DD) naar UTC start/eind tijden
- * voor de Europe/Brussels timezone.
- * 
- * Dit is KRITIEK voor correcte dagelijkse rapporten!
- * Een bestelling om 00:30 lokale tijd moet bij de juiste dag horen.
- */
-export function getDateBoundsForBelgium(dateStr: string): { startUTC: string; endUTC: string } {
-  // Parse the date string
-  const [year, month, day] = dateStr.split('-').map(Number)
-  
-  // Create a date at noon on the given day to determine DST status
-  // We use noon to avoid edge cases around DST transitions
-  const noonLocal = new Date(year, month - 1, day, 12, 0, 0)
-  
-  // Get the timezone offset for this specific date
-  // getTimezoneOffset returns minutes, negative for timezones ahead of UTC
-  const offsetMinutes = noonLocal.getTimezoneOffset()
-  
-  // However, we're running on Vercel which is in UTC, so we need to
-  // calculate the Belgium offset explicitly
-  // Belgium is UTC+1 in winter (CET) and UTC+2 in summer (CEST)
-  
-  // Check if date is in DST (last Sunday of March to last Sunday of October)
-  const isDST = isBelgiumDST(year, month, day)
-  const belgiumOffsetHours = isDST ? 2 : 1
-  
-  // Start of day in Belgium (00:00:00) = (00:00:00 - offset) in UTC
-  // Example: Feb 1, 00:00:00 CET (UTC+1) = Jan 31, 23:00:00 UTC
-  const startHourUTC = 24 - belgiumOffsetHours // Previous day hour in UTC
-  const startDate = new Date(Date.UTC(year, month - 1, day - 1, startHourUTC, 0, 0))
-  
-  // End of day in Belgium (23:59:59) = (23:59:59 - offset) in UTC
-  // Example: Feb 1, 23:59:59 CET (UTC+1) = Feb 1, 22:59:59 UTC
-  const endHourUTC = 23 - belgiumOffsetHours
-  const endDate = new Date(Date.UTC(year, month - 1, day, endHourUTC, 59, 59))
-  
-  return {
-    startUTC: startDate.toISOString(),
-    endUTC: endDate.toISOString()
-  }
-}
-
-/**
- * Check if a date is in Belgian Daylight Saving Time (CEST)
- * DST runs from last Sunday of March at 02:00 to last Sunday of October at 03:00
- */
-function isBelgiumDST(year: number, month: number, day: number): boolean {
-  // Find last Sunday of March
-  const marchLast = new Date(year, 2, 31) // March 31
-  const marchLastSunday = 31 - marchLast.getDay()
-  
-  // Find last Sunday of October
-  const octLast = new Date(year, 9, 31) // October 31
-  const octLastSunday = 31 - octLast.getDay()
-  
-  // Create date objects for DST boundaries
-  const dstStart = new Date(year, 2, marchLastSunday, 2, 0, 0) // March last Sunday 02:00
-  const dstEnd = new Date(year, 9, octLastSunday, 3, 0, 0) // October last Sunday 03:00
-  
-  const checkDate = new Date(year, month - 1, day, 12, 0, 0) // Noon on the check date
-  
-  return checkDate >= dstStart && checkDate < dstEnd
-}
-
-/**
- * Get the current date in Belgium timezone as YYYY-MM-DD string
- */
-export function getBelgiumDateString(date: Date = new Date()): string {
-  return date.toLocaleDateString('sv-SE', { timeZone: 'Europe/Brussels' })
-}
-
-/** Voeg dagen toe aan een YYYY-MM-DD (kalender in Europe/Brussels). */
-export function addDaysToBelgiumYMD(ymd: string, days: number): string {
-  const [y, m, d] = ymd.split('-').map(Number)
-  const dt = new Date(Date.UTC(y, m - 1, d + days))
-  return dt.toLocaleDateString('sv-SE', { timeZone: 'Europe/Brussels' })
+export {
+  addDaysToBelgiumYMD,
+  getBelgiumDateString,
+  getDateBoundsForBelgium,
+  getZRapportDateBounds,
 }
 
 /** Of een kalenderdag binnen een uitzonderlijke sluiting valt (inclusief periode date … date_end). */
@@ -110,31 +42,6 @@ export function isDateInExceptionalClosing(dateStr: string, closings: Exceptiona
     const end = c.date_end && c.date_end >= c.date ? c.date_end : c.date
     return dateStr >= c.date && dateStr <= end
   })
-}
-
-/**
- * Fiscale dag grenzen voor Z-Rapport (GKS compliant)
- * Een fiscale dag loopt van 00:00 tot 12:00 de VOLGENDE dag.
- * Dit zorgt dat nachtbestellingen (bv. 01:00u) bij de juiste dag horen.
- * De eigenaar kan de dag afsluiten na zijn shift (uiterlijk 12u de volgende dag).
- */
-export function getZRapportDateBounds(dateStr: string): { startUTC: string; endUTC: string } {
-  const [year, month, day] = dateStr.split('-').map(Number)
-
-  const isDST = isBelgiumDST(year, month, day)
-  const belgiumOffsetHours = isDST ? 2 : 1
-
-  // Start: 00:00 Belgium time = (24 - offset) UTC van de vorige dag
-  const startDate = new Date(Date.UTC(year, month - 1, day - 1, 24 - belgiumOffsetHours, 0, 0))
-
-  // Einde: 12:00 (noon) Belgium time VAN DE VOLGENDE DAG
-  // Nachtorders tot 12u de volgende dag horen bij deze fiscale dag
-  const endDate = new Date(Date.UTC(year, month - 1, day + 1, 12 - belgiumOffsetHours, 0, 0))
-
-  return {
-    startUTC: startDate.toISOString(),
-    endUTC: endDate.toISOString(),
-  }
 }
 
 // =====================================================
