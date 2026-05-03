@@ -3,6 +3,7 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from "@sentry/nextjs";
+import { getSentryTracesSampleRate } from "@/lib/sentry-traces-sample-rate";
 
 /** Chromium / service worker / extension noise; not actionable app code (no match in repo or deps). */
 function isMatchingIdUpdateNoise(value: unknown): boolean {
@@ -50,8 +51,7 @@ function isBenignAbortError(value: unknown): boolean {
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 
-  // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
-  tracesSampleRate: 1,
+  tracesSampleRate: getSentryTracesSampleRate(),
 
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,

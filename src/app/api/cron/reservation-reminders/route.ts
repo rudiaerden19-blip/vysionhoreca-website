@@ -1,19 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireCronSecret } from '@/lib/cron-auth'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
+import { logger } from '@/lib/logger'
 import nodemailer from 'nodemailer'
 
 // Vercel Cron Job - runs daily at 10:00 AM
 // Stuurt herinnering naar gasten met reservatie morgen
 
 export async function GET(request: NextRequest) {
+  const requestId = crypto.randomUUID()
   try {
-    const authHeader = request.headers.get('authorization')
-    const cronSecret = process.env.CRON_SECRET
-    if (process.env.NODE_ENV === 'production' && cronSecret) {
-      if (authHeader !== `Bearer ${cronSecret}`) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-      }
-    }
+    const cronDenied = requireCronSecret(request, {
+      requestId,
+      route: '/api/cron/reservation-reminders',
+    })
+    if (cronDenied) return cronDenied
 
     const supabase = getServerSupabaseClient()
     if (!supabase) return NextResponse.json({ error: 'DB not configured' }, { status: 503 })
@@ -87,14 +88,25 @@ export async function GET(request: NextRequest) {
         })
         sent++
       } catch (err) {
-        console.error(`Reminder email failed for ${r.guest_email}:`, err)
+        logger.warn('Reservation reminder email failed', {
+          requestId,
+          guestEmail: r.guest_email,
+          error: err instanceof Error ? err.message : String(err),
+        })
       }
     }
 
-    console.log(`Reservation reminders: ${sent}/${reservations.length} sent`)
+    logger.info('Reservation reminders cron done', {
+      requestId,
+      sent,
+      total: reservations.length,
+    })
     return NextResponse.json({ success: true, sent, total: reservations.length })
   } catch (error) {
-    console.error('Reservation reminders cron error:', error)
+    logger.error('Reservation reminders cron error', {
+      requestId,
+      error: error instanceof Error ? error.message : String(error),
+    })
     return NextResponse.json({ error: 'Cron failed' }, { status: 500 })
   }
 }

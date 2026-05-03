@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireCronSecret } from '@/lib/cron-auth'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
 import {
@@ -15,17 +16,11 @@ export async function GET(request: NextRequest) {
   const startTime = Date.now()
   
   try {
-    // Verify cron secret for security
-    const authHeader = request.headers.get('authorization')
-    const cronSecret = process.env.CRON_SECRET
-    
-    // Allow without secret in development, require in production
-    if (process.env.NODE_ENV === 'production' && cronSecret) {
-      if (authHeader !== `Bearer ${cronSecret}`) {
-        logger.warn('Cron job unauthorized: invalid secret', { requestId })
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-      }
-    }
+    const cronDenied = requireCronSecret(request, {
+      requestId,
+      route: '/api/cron/archive-z-reports',
+    })
+    if (cronDenied) return cronDenied
 
     const supabase = getServerSupabaseClient()
     if (!supabase) {

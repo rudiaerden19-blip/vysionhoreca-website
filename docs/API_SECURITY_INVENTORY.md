@@ -9,7 +9,7 @@ Legenda **auth-type:**
 |--------|-----------|
 | `public` | Geen login; bedoeld voor publiek of webhooks |
 | `rate_limit` | Publiek maar IP-rate-limit (Upstash) waar geconfigureerd |
-| `cron_secret` | `Authorization` moet matchen `CRON_SECRET` |
+| `cron_secret` | Production: `CRON_SECRET` verplicht (anders **503**); `Authorization: Bearer <CRON_SECRET>`. Lokaal / `NODE_ENV`≠production: geen check. |
 | `stripe_sig` | Stripe-handtekening |
 | `header_tenant` | `x-business-id` + `x-auth-email` (zie `verifyTenantAccess`) |
 | `superadmin`/`maint` | Superadmin-headers en/of `x-internal-maintenance-secret` + `INTERNAL_MAINTENANCE_SECRET` |

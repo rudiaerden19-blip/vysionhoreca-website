@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireCronSecret } from '@/lib/cron-auth'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
 import { runHourlyDemoTenantReset } from '@/lib/hourly-demo-tenant-reset'
@@ -11,15 +12,11 @@ export async function GET(request: NextRequest) {
   const started = Date.now()
 
   try {
-    const authHeader = request.headers.get('authorization')
-    const cronSecret = process.env.CRON_SECRET
-
-    if (process.env.NODE_ENV === 'production' && cronSecret) {
-      if (authHeader !== `Bearer ${cronSecret}`) {
-        logger.warn('reset-demo-tenant cron unauthorized', { requestId })
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-      }
-    }
+    const cronDenied = requireCronSecret(request, {
+      requestId,
+      route: '/api/cron/reset-demo-tenant',
+    })
+    if (cronDenied) return cronDenied
 
     const supabase = getServerSupabaseClient()
     if (!supabase) {

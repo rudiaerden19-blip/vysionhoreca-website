@@ -1,30 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireCronSecret } from '@/lib/cron-auth'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
+import { logger } from '@/lib/logger'
 import nodemailer from 'nodemailer'
 
 // Vercel Cron Job - runs daily at 9:00 AM
 // Configure in vercel.json: { "crons": [{ "path": "/api/cron/subscription-reminders", "schedule": "0 9 * * *" }] }
 
 export async function GET(request: NextRequest) {
+  const requestId = crypto.randomUUID()
   try {
-    // Verify cron secret for security
-    const authHeader = request.headers.get('authorization')
-    const cronSecret = process.env.CRON_SECRET
-    
-    // Allow without secret in development, require in production
-    if (process.env.NODE_ENV === 'production' && cronSecret) {
-      if (authHeader !== `Bearer ${cronSecret}`) {
-        console.error('Subscription reminder cron unauthorized')
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-      }
-    }
+    const cronDenied = requireCronSecret(request, {
+      requestId,
+      route: '/api/cron/subscription-reminders',
+    })
+    if (cronDenied) return cronDenied
 
     const supabase = getServerSupabaseClient()
     if (!supabase) {
       return NextResponse.json({ error: 'Database not configured' }, { status: 503 })
     }
 
-    console.log('Starting subscription reminder cron job...')
+    logger.info('Subscription reminder cron started', { requestId })
 
     // Calculate date 3 days from now
     const today = new Date()
@@ -38,7 +35,10 @@ export async function GET(request: NextRequest) {
     const threeDaysFromNowEnd = new Date(threeDaysFromNow)
     threeDaysFromNowEnd.setHours(23, 59, 59, 999)
 
-    console.log(`Looking for subscriptions expiring on: ${threeDaysFromNow.toISOString().split('T')[0]}`)
+    logger.info('Subscription reminder: lookup window', {
+      requestId,
+      date: threeDaysFromNow.toISOString().split('T')[0],
+    })
 
     // Find subscriptions that expire in exactly 3 days
     const { data: expiringSubscriptions, error } = await supabase
@@ -49,12 +49,12 @@ export async function GET(request: NextRequest) {
       .lte('next_payment_at', threeDaysFromNowEnd.toISOString())
 
     if (error) {
-      console.error('Error fetching expiring subscriptions:', error)
+      logger.error('Subscription reminder: DB fetch failed', { requestId, error: error.message })
       return NextResponse.json({ error: 'Database error' }, { status: 500 })
     }
 
     if (!expiringSubscriptions || expiringSubscriptions.length === 0) {
-      console.log('No subscriptions expiring in 3 days')
+      logger.info('Subscription reminder: none expiring in 3 days', { requestId })
       return NextResponse.json({ 
         success: true, 
         message: 'No subscriptions expiring soon',
@@ -63,7 +63,10 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    console.log(`Found ${expiringSubscriptions.length} subscriptions expiring in 3 days`)
+    logger.info('Subscription reminder: tenants to notify', {
+      requestId,
+      count: expiringSubscriptions.length,
+    })
 
     // Setup email transporter
     const transporter = nodemailer.createTransport({
@@ -92,7 +95,10 @@ export async function GET(request: NextRequest) {
         const businessName = tenantSettings?.business_name || subscription.tenant_slug
 
         if (!email) {
-          console.log(`No email for ${subscription.tenant_slug}, skipping`)
+          logger.info('Subscription reminder: skip tenant (no email)', {
+            requestId,
+            tenant_slug: subscription.tenant_slug,
+          })
           continue
         }
 
@@ -181,16 +187,25 @@ export async function GET(request: NextRequest) {
           html: emailHtml,
         })
 
-        console.log(`✅ Reminder sent to ${email} for ${subscription.tenant_slug}`)
+        logger.info('Subscription reminder sent', {
+          requestId,
+          tenant_slug: subscription.tenant_slug,
+          to: email,
+        })
         sent++
 
       } catch (emailError) {
-        console.error(`❌ Failed to send reminder to ${subscription.tenant_slug}:`, emailError)
+        logger.warn('Subscription reminder send failed', {
+          requestId,
+          tenant_slug: subscription.tenant_slug,
+          error:
+            emailError instanceof Error ? emailError.message : String(emailError),
+        })
         failed++
       }
     }
 
-    console.log(`Subscription reminder cron completed: ${sent} sent, ${failed} failed`)
+    logger.info('Subscription reminder cron completed', { requestId, sent, failed })
 
     return NextResponse.json({
       success: true,
@@ -200,7 +215,10 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Subscription reminder cron error:', error)
+    logger.error('Subscription reminder cron error', {
+      requestId,
+      error: error instanceof Error ? error.message : String(error),
+    })
     return NextResponse.json({ 
       error: 'Cron job failed', 
       details: error instanceof Error ? error.message : 'Unknown error'
