@@ -134,7 +134,7 @@ export function RapportenView({
             <select
               value={rMonth}
               onChange={(e) => setRMonth(Number(e.target.value))}
-              className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-orange-400"
+              className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-[#3C4D6B]"
             >
               {MONTHS.map((m, i) => (
                 <option key={i} value={i}>
@@ -145,7 +145,7 @@ export function RapportenView({
             <select
               value={rYear}
               onChange={(e) => setRYear(Number(e.target.value))}
-              className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-orange-400"
+              className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-[#3C4D6B]"
             >
               {[2024, 2025, 2026, 2027].map((y) => (
                 <option key={y} value={y}>
@@ -202,7 +202,7 @@ export function RapportenView({
           </div>
           <span className="text-sm font-semibold text-gray-500">Totaal: {totalGuests}</span>
         </div>
-        <AreaChart data={guestsByDay} max={maxGuests} color="#f97316" />
+        <AreaChart data={guestsByDay} max={maxGuests} color="#3C4D6B" />
         <div className="mt-1 flex justify-between px-2">
           {xIdxs.map((i) => (
             <span key={i} className="text-xs text-gray-400">
@@ -211,7 +211,7 @@ export function RapportenView({
           ))}
         </div>
         <div className="mt-3 flex items-center gap-2">
-          <div className="h-3 w-3 rounded-full bg-orange-400" />
+          <div className="h-3 w-3 rounded-full bg-[#6b7d9e]" />
           <span className="text-xs text-gray-500">Handmatig / kassa</span>
         </div>
       </div>
@@ -271,14 +271,14 @@ export function RapportenView({
               .slice(0, 5)
               .map((g, i) => (
                 <div key={g.id} className="flex items-center gap-3">
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-orange-200 bg-orange-50 text-xs font-bold text-orange-600">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#bcc8dc] bg-[#f2f5fa] text-xs font-bold text-[#3C4D6B]">
                     {i + 1}
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-gray-800">{g.name}</p>
                     <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-gray-100">
                       <div
-                        className="h-full rounded-full bg-orange-400"
+                        className="h-full rounded-full bg-[#6b7d9e]"
                         style={{
                           width: `${Math.min(
                             100,

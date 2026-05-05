@@ -31,7 +31,7 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
   if (modulesLoading) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-orange-500 border-t-transparent" />
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#3C4D6B] border-t-transparent" />
       </div>
     )
   }
