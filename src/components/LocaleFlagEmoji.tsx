@@ -1,37 +1,34 @@
 import type { Locale } from '@/i18n/config'
-import { localeFlags } from '@/i18n/config'
 
 /**
- * Vlag-emoji + ISO-taalcode (nl, en, …).
- * Op Windows tonen regional-indicator vlag-emoji’s vaak niet; de code blijft dan leesbaar.
+ * Taal-badge (ISO-code alleen) — géén vlag-emoji: op Windows is dat vaak een leeg vakje.
+ * Gebruik `className` voor contrast op lichte/donkere balk (bv. text-white op kassa-header).
  */
 export function LocaleFlagEmoji({ locale, className }: { locale: Locale; className?: string }) {
+  const code = locale.toUpperCase()
   return (
-    <span className={`inline-flex items-center gap-0.5 leading-none ${className ?? ''}`}>
-      <span className="vysion-locale-emoji shrink-0" aria-hidden>
-        {localeFlags[locale]}
-      </span>
-      <span className="shrink-0 text-[10px] font-extrabold uppercase leading-none tracking-tight sm:text-[11px]">
-        {locale}
-      </span>
+    <span
+      className={`inline-flex h-8 min-w-[2.75rem] shrink-0 items-center justify-center rounded-lg border border-current/30 bg-black/15 px-2 text-center text-[11px] font-extrabold uppercase leading-none tracking-wide sm:min-w-[3rem] sm:text-xs ${className ?? ''}`}
+      aria-hidden
+    >
+      {code}
     </span>
   )
 }
 
-/** Emoji + iets grotere taalcode — geen dubbele code t.o.v. LocaleFlagEmoji. */
-export function LocaleFlagWithCode({ locale, className, codeClassName }: {
+/** Zelfde zichtbare badge; extra wrapper voor shop/marketing die aparte code-kleur wilde. */
+export function LocaleFlagWithCode({
+  locale,
+  className,
+  codeClassName,
+}: {
   locale: Locale
   className?: string
   codeClassName?: string
 }) {
   return (
     <span className={`inline-flex items-center gap-1 ${className ?? ''}`}>
-      <span className="vysion-locale-emoji leading-none" aria-hidden>
-        {localeFlags[locale]}
-      </span>
-      <span className={`text-[0.7rem] font-bold uppercase tabular-nums sm:text-xs ${codeClassName ?? ''}`}>
-        {locale}
-      </span>
+      <LocaleFlagEmoji locale={locale} className={codeClassName} />
     </span>
   )
 }

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Keyboard from 'simple-keyboard'
 import 'simple-keyboard/build/css/index.css'
+import './touch-keyboard-overrides.css'
 
 /** Zet localStorage `vysion_touch_keyboard_off` op "1" om het schermtoetsenbord uit te zetten (debug). */
 const STORAGE_OFF = 'vysion_touch_keyboard_off'
@@ -250,7 +251,7 @@ export function TouchScreenKeyboard() {
       aria-hidden={!visible}
     >
       <div className="flex items-center justify-between gap-2 border-b border-gray-700 px-2 py-1">
-        <span className="text-xs text-gray-400">Schermtoetsenbord</span>
+        <span className="text-xs font-semibold text-gray-300">Vysion toetsenbord</span>
         <button
           type="button"
           className="rounded px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-800"

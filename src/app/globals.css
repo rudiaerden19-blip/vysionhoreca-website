@@ -486,28 +486,4 @@ input[type="number"] {
   }
 }
 
-/* Schermtoetsenbord (simple-keyboard) — donker paneel onderaan touch/kiosk */
-.vysion-touch-keyboard .hg-theme-default {
-  background: rgb(17 24 39);
-  border-radius: 0;
-  padding: 0.25rem 0;
-}
-
-.vysion-touch-keyboard .hg-button {
-  background: rgb(55 65 81);
-  border-bottom-color: rgb(31 41 55);
-  color: rgb(243 244 246);
-  box-shadow:
-    0 1px 0 rgb(31 41 55),
-    inset 0 1px 0 rgb(75 85 99);
-}
-
-.vysion-touch-keyboard .hg-button:active,
-.vysion-touch-keyboard .hg-button.hg-activeButton {
-  background: rgb(99 102 241);
-  border-bottom-color: rgb(79 70 229);
-}
-
-.vysion-touch-keyboard .hg-standardBtn.hg-button {
-  max-height: none;
-}
+/* Vysion touch-keyboard: zie src/components/touch-keyboard-overrides.css (import na simple-keyboard) */
