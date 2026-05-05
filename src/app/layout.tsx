@@ -7,8 +7,6 @@ import { GlobalAutoCapitalize } from '@/components/GlobalAutoCapitalize'
 import { PageViewTracker } from '@/components/PageViewTracker'
 import { PWARegister } from '@/components/PWARegister'
 import SectorChoiceGate from '@/components/SectorChoiceGate'
-import { TouchScreenKeyboard } from '@/components/TouchScreenKeyboard'
-
 const inter = Inter({ 
   subsets: ['latin'],
   display: 'swap',
@@ -178,7 +176,6 @@ export default function RootLayout({
           <GlobalAutoCapitalize />
           <PageViewTracker />
           <SectorChoiceGate />
-          <TouchScreenKeyboard />
           {children}
         </LanguageProvider>
       </body>

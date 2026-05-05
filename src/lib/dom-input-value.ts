@@ -6,7 +6,7 @@
  *   React zet dan bij de volgende commit de oude `value` prop terug → “typt niks”.
  */
 
-/** Zelfde attribuut als TouchScreenKeyboard: velden met schermtoetsenbord niet dubbel muteren (o.a. autocap). */
+/** Optioneel: zet op het element om GlobalAutoCapitalize over te slaan (legacy / scripts). */
 export const ATTR_VYSION_KB_MANAGED = 'data-vysion-kb-managed'
 
 type ValueTracking = { setValue: (v: string) => void }
