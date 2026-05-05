@@ -1926,7 +1926,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         <button
           type="button"
           onClick={() => setLogoutSoftwareConfirmOpen(true)}
-          className="relative z-20 inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg bg-red-600/80 px-2 py-2 text-xs font-bold text-white transition-colors hover:bg-red-600 sm:gap-1.5 sm:px-3 sm:text-sm"
+          className="relative z-20 inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg bg-[#58CCFF] px-2 py-2 text-xs font-bold text-black transition-colors hover:bg-[#47c6fe] sm:gap-1.5 sm:px-3 sm:text-sm"
         >
           <span className="text-base sm:text-lg" aria-hidden>🚪</span>
           <span>{t('kassaApp.logout')}</span>
