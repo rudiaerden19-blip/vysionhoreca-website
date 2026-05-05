@@ -21,6 +21,13 @@ function getValueTracker(el: HTMLInputElement | HTMLTextAreaElement): ValueTrack
 export function setNativeInputValue(el: HTMLInputElement | HTMLTextAreaElement, value: string) {
   const previous = el.value
   el.value = value
+  if (el.value !== value) {
+    const proto = el instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype
+    const setter = Object.getOwnPropertyDescriptor(proto, 'value')?.set
+    if (setter) {
+      ;(setter as (this: typeof el, v: string) => void).call(el, value)
+    }
+  }
   const tracker = getValueTracker(el)
   if (tracker) {
     try {

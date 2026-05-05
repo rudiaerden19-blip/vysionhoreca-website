@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { usePathname } from 'next/navigation'
 import Keyboard from 'simple-keyboard'
 import 'simple-keyboard/build/css/index.css'
 import './touch-keyboard-overrides.css'
@@ -8,6 +10,11 @@ import { ATTR_VYSION_KB_MANAGED, setNativeInputValue } from '@/lib/dom-input-val
 import { LAYOUT_AZERTY, LAYOUT_QWERTY } from './touch-keyboard-layouts'
 
 const STORAGE_LAYOUT = 'vysion_touch_keyboard_layout'
+
+/** Kassa/POS: altijd schermtoetsenbord (+ listeners), ook als het apparaat geen touch API meldt. */
+function isShopAdminKassaPath(pathname: string | null): boolean {
+  return typeof pathname === 'string' && pathname.includes('/admin/kassa')
+}
 
 function readSavedLayoutVariant(): 'qwerty' | 'azerty' {
   if (typeof window === 'undefined') return 'qwerty'
@@ -119,6 +126,7 @@ function sanitizeNumberString(raw: string): string {
  * mogen focus/handler nooit volledig wegblijven (dat gaf “typt nergens iets”).
  */
 export function TouchScreenKeyboard() {
+  const pathname = usePathname()
   const wrapRef = useRef<HTMLDivElement | null>(null)
   const keyboardRootRef = useRef<HTMLDivElement | null>(null)
   const keyboardRef = useRef<InstanceType<typeof Keyboard> | null>(null)
@@ -129,8 +137,18 @@ export function TouchScreenKeyboard() {
   const [touchMode, setTouchMode] = useState(false)
 
   useEffect(() => {
-    setTouchMode(shouldOfferTouchKeyboard())
-  }, [])
+    try {
+      if (typeof window !== 'undefined' && localStorage.getItem(STORAGE_OFF) === '1') {
+        setTouchMode(false)
+        return
+      }
+    } catch {
+      /* private mode */
+    }
+    const env = shouldOfferTouchKeyboard()
+    const kassa = isShopAdminKassaPath(pathname)
+    setTouchMode(env || kassa)
+  }, [pathname])
 
   useLayoutEffect(() => {
     if (!touchMode) return
@@ -306,10 +324,11 @@ export function TouchScreenKeyboard() {
 
   if (!touchMode) return null
 
-  return (
+  const panel = (
     <div
       ref={wrapRef}
-      className={`vysion-touch-keyboard fixed inset-x-0 bottom-0 z-[99990] flex flex-col border-t border-gray-700 bg-gray-900/98 shadow-[0_-4px_24px_rgba(0,0,0,0.35)] backdrop-blur-sm select-none ${
+      style={{ zIndex: 2147483646 }}
+      className={`vysion-touch-keyboard fixed inset-x-0 bottom-0 flex flex-col border-t border-gray-700 bg-gray-900/98 shadow-[0_-4px_24px_rgba(0,0,0,0.35)] backdrop-blur-sm select-none ${
         visible ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-full opacity-0'
       } transition-transform duration-200 ease-out`}
       aria-hidden={!visible}
@@ -380,4 +399,7 @@ export function TouchScreenKeyboard() {
       />
     </div>
   )
+
+  if (typeof document === 'undefined') return null
+  return createPortal(panel, document.body)
 }
