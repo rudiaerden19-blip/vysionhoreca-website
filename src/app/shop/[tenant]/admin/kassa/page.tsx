@@ -63,6 +63,7 @@ import {
   isLikelyOfflineOrNetworkSupabaseError,
 } from '@/lib/kassa-supabase-guards'
 import { fetchOrderNumberByKassaClientUuid } from '@/lib/kassa-fetch-order-number'
+import { formatKassaNumpadHeaderDate } from '@/lib/format-kassa-header-date'
 import { syncZReportAfterOrderSafe } from '@/lib/kassa-z-sync-safe'
 import { KassaAnalogClock } from '@/components/kassa/KassaAnalogClock'
 import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
@@ -185,6 +186,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [orderType, setOrderType] = useState<OrderType>('DINE_IN')
   const [tableNumber, setTableNumber] = useState('')
   const [numpadValue, setNumpadValue] = useState('')
+  /** Minuut-update zodat de datum in de lege numpad-balk rond middernacht klopt. */
+  const [numpadBarDate, setNumpadBarDate] = useState(() => new Date())
+  useEffect(() => {
+    const id = window.setInterval(() => setNumpadBarDate(new Date()), 60_000)
+    return () => window.clearInterval(id)
+  }, [])
+  const numpadHeaderDateLabel = useMemo(
+    () => formatKassaNumpadHeaderDate(numpadBarDate, locale),
+    [numpadBarDate, locale],
+  )
   const [soundsOn, setSoundsOn] = useState(true)
   const [isOnline, setIsOnline] = useState<boolean | null>(null)
   const flushOfflineOrdersRef = useRef<() => Promise<void>>(async () => {})
@@ -2288,13 +2299,25 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     <KassaAnalogClock size={76} />
                   </button>
                 ) : null}
-                <input
-                  type="text"
-                  value={numpadValue}
-                  readOnly
-                  placeholder={t('kassaApp.numpadPlaceholder')}
-                  className={`min-w-0 text-right text-3xl font-bold bg-transparent border-none outline-none text-black ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1' : 'w-full'}`}
-                />
+                <div
+                  className={`min-w-0 flex flex-col justify-center ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1' : 'w-full'}`}
+                >
+                  {numpadValue === '' ? (
+                    <p
+                      className="text-right text-lg font-bold leading-tight text-gray-600 sm:text-xl md:text-2xl"
+                      aria-live="polite"
+                    >
+                      {numpadHeaderDateLabel}
+                    </p>
+                  ) : (
+                    <input
+                      type="text"
+                      value={numpadValue}
+                      readOnly
+                      className="w-full min-w-0 border-none bg-transparent text-right text-3xl font-bold text-black outline-none"
+                    />
+                  )}
+                </div>
               </div>
               <div className="grid grid-cols-4 grid-rows-4 gap-2 flex-1 min-h-0">
                 {['7','8','9','+','4','5','6','-','1','2','3','×','C','0','.','='].map(key => (
