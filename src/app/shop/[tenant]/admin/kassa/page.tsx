@@ -2094,7 +2094,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                                 <p className="line-clamp-2 text-lg font-black leading-snug tracking-tight text-amber-50 [text-shadow:0_0_1px_rgba(0,0,0,1),0_2px_4px_rgba(0,0,0,.98),0_4px_18px_rgba(0,0,0,.85)] sm:text-xl md:text-2xl">
                                   {product.name}
                                 </p>
-                                <p className="mt-1 text-xl font-black tabular-nums text-emerald-300 [text-shadow:0_0_1px_rgba(0,0,0,1),0_2px_6px_rgba(0,0,0,.95)] sm:text-2xl md:text-3xl">
+                                <p className="mt-1 text-xl font-black tabular-nums text-[#58CCFF] [text-shadow:0_0_1px_rgba(0,0,0,1),0_2px_6px_rgba(0,0,0,.95)] sm:text-2xl md:text-3xl">
                                   €{product.price.toFixed(2)}
                                 </p>
                               </div>
@@ -2108,7 +2108,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                                 <p className="line-clamp-2 text-lg font-black leading-snug text-neutral-950 sm:text-xl md:text-2xl">
                                   {product.name}
                                 </p>
-                                <p className="mt-1 text-xl font-black tabular-nums text-emerald-700 sm:text-2xl md:text-3xl">
+                                <p className="mt-1 text-xl font-black tabular-nums text-[#58CCFF] sm:text-2xl md:text-3xl">
                                   €{product.price.toFixed(2)}
                                 </p>
                               </div>
