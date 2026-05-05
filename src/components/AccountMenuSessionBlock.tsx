@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useLanguage } from '@/i18n'
 import {
   buildShopInternalReturnPath,
@@ -15,6 +15,7 @@ import {
   setTerminalLogout,
   type OwnerLogoutLanding,
 } from '@/lib/session-broadcast'
+import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
 
 /**
  * Onder Account in het admin-/kassa-hamburgermenu: Inloggen of Uitloggen.
@@ -37,8 +38,9 @@ export function AccountMenuSessionBlock({
   }, [tenantSlug, pathname, searchKey])
   const ownerHere = typeof window !== 'undefined' && isOwnerSessionForTenant(tenantSlug)
   const superHere = typeof window !== 'undefined' && isSuperAdminLoggedIn()
+  const [logoutSoftwareConfirmOpen, setLogoutSoftwareConfirmOpen] = useState(false)
 
-  const handleLogout = () => {
+  const performLogout = () => {
     const landing: OwnerLogoutLanding =
       superHere && !ownerHere ? 'superadmin-login' : 'tenant-login'
     applyFullStaffLogoutCleanup()
@@ -65,7 +67,7 @@ export function AccountMenuSessionBlock({
       {ownerHere || superHere ? (
         <button
           type="button"
-          onClick={handleLogout}
+          onClick={() => setLogoutSoftwareConfirmOpen(true)}
           className="flex w-full items-center gap-3 border-b border-gray-100 px-4 py-3 text-left text-sm font-semibold text-red-700 transition-colors hover:bg-red-50"
         >
           <span aria-hidden>🚪</span>
@@ -82,6 +84,14 @@ export function AccountMenuSessionBlock({
           <span>{t('adminLayout.login')}</span>
         </Link>
       )}
+      <LogoutSoftwareConfirmModal
+        open={logoutSoftwareConfirmOpen}
+        onCancel={() => setLogoutSoftwareConfirmOpen(false)}
+        onConfirm={() => {
+          setLogoutSoftwareConfirmOpen(false)
+          performLogout()
+        }}
+      />
     </>
   )
 }

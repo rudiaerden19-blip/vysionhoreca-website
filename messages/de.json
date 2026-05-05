@@ -5362,7 +5362,13 @@
     "session": "Sitzung",
     "login": "Anmelden",
     "logout": "Abmelden",
-    "digitalCashBookSubmenu": "Digitales Kassenbuch"
+    "digitalCashBookSubmenu": "Digitales Kassenbuch",
+    "logoutSoftwareConfirm": {
+      "title": "Software beenden?",
+      "message": "Möchten Sie die Software wirklich beenden? Sie werden abgemeldet und geöffnete Fenster werden geschlossen, sofern Ihr Browser dies zulässt.",
+      "yes": "Ja",
+      "no": "Nein"
+    }
   },
   "voiceOrder": {
     "title": "Sprachbestellung",

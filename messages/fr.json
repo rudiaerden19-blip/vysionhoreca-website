@@ -5362,7 +5362,13 @@
     "session": "Session",
     "login": "Connexion",
     "logout": "Déconnexion",
-    "digitalCashBookSubmenu": "Livre de caisse numérique"
+    "digitalCashBookSubmenu": "Livre de caisse numérique",
+    "logoutSoftwareConfirm": {
+      "title": "Fermer le logiciel ?",
+      "message": "Voulez-vous vraiment fermer le logiciel ? Vous serez déconnecté et les fenêtres ouvertes se fermeront si votre navigateur l’autorise.",
+      "yes": "Oui",
+      "no": "Non"
+    }
   },
   "voiceOrder": {
     "title": "Commande vocale",

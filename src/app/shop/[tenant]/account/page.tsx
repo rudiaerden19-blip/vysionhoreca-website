@@ -8,6 +8,7 @@ import { assignTenantHref } from '@/lib/tenant-url'
 import { redirectCustomerLogoutUI } from '@/lib/session-broadcast'
 import { useLanguage } from '@/i18n'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
+import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
 
 export default function AccountPage({ params }: { params: { tenant: string } }) {
   const { t, locale, localeNames } = useLanguage()
@@ -24,6 +25,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [deleteConfirmText, setDeleteConfirmText] = useState('')
+  const [logoutSoftwareConfirmOpen, setLogoutSoftwareConfirmOpen] = useState(false)
 
   const primaryColor = tenantSettings?.primary_color || '#FF6B35'
 
@@ -72,7 +74,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
     setLoading(false)
   }
 
-  const handleLogout = () => {
+  const performLogout = () => {
     redirectCustomerLogoutUI(params.tenant)
   }
 
@@ -167,6 +169,14 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
   return (
     <div style={{ width: '100vw', maxWidth: '100vw', overflowX: 'clip' }} className="min-h-screen bg-gray-50">
       <ConfirmModal />
+      <LogoutSoftwareConfirmModal
+        open={logoutSoftwareConfirmOpen}
+        onCancel={() => setLogoutSoftwareConfirmOpen(false)}
+        onConfirm={() => {
+          setLogoutSoftwareConfirmOpen(false)
+          performLogout()
+        }}
+      />
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -177,7 +187,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
             <span>{t('accountPage.backToMenu')}</span>
           </Link>
           <h1 className="font-bold text-xl text-gray-900">{t('accountPage.myAccount')}</h1>
-          <button onClick={handleLogout} className="text-red-500 font-medium">
+          <button onClick={() => setLogoutSoftwareConfirmOpen(true)} className="text-red-500 font-medium">
             {t('accountPage.logout')}
           </button>
         </div>

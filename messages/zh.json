@@ -5339,7 +5339,13 @@
     "session": "会话",
     "login": "登录",
     "logout": "退出登录",
-    "digitalCashBookSubmenu": "电子现金账簿"
+    "digitalCashBookSubmenu": "电子现金账簿",
+    "logoutSoftwareConfirm": {
+      "title": "关闭软件？",
+      "message": "确定要关闭软件吗？您将退出登录；若浏览器允许，将尝试关闭已打开的窗口。",
+      "yes": "是",
+      "no": "否"
+    }
   },
   "voiceOrder": {
     "title": "语音点餐",

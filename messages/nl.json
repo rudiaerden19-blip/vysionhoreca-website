@@ -5296,7 +5296,13 @@
     "session": "Sessie",
     "login": "Inloggen",
     "logout": "Uitloggen",
-    "digitalCashBookSubmenu": "Digitaal kasboek"
+    "digitalCashBookSubmenu": "Digitaal kasboek",
+    "logoutSoftwareConfirm": {
+      "title": "Software afsluiten?",
+      "message": "Bent u zeker dat u de software wilt afsluiten? U wordt afgemeld en open schermen worden gesloten voor zover uw browser dit toestaat.",
+      "yes": "Ja",
+      "no": "Nee"
+    }
   },
   "voiceOrder": {
     "title": "Spraakbestelling",

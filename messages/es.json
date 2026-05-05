@@ -5339,7 +5339,13 @@
     "session": "Sesión",
     "login": "Iniciar sesión",
     "logout": "Cerrar sesión",
-    "digitalCashBookSubmenu": "Libro de caja digital"
+    "digitalCashBookSubmenu": "Libro de caja digital",
+    "logoutSoftwareConfirm": {
+      "title": "¿Cerrar el software?",
+      "message": "¿Seguro que quiere cerrar el software? Se cerrará la sesión y las ventanas abiertas se cerrarán si el navegador lo permite.",
+      "yes": "Sí",
+      "no": "No"
+    }
   },
   "voiceOrder": {
     "title": "Pedido por voz",

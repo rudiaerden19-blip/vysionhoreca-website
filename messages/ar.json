@@ -5339,7 +5339,13 @@
     "session": "جلسة",
     "login": "تسجيل الدخول",
     "logout": "تسجيل الخروج",
-    "digitalCashBookSubmenu": "دفتر النقدية الرقمي"
+    "digitalCashBookSubmenu": "دفتر النقدية الرقمي",
+    "logoutSoftwareConfirm": {
+      "title": "إغلاق البرنامج؟",
+      "message": "هل أنت متأكد أنك تريد إغلاق البرنامج؟ ستُسجَّل خروجك وقد تُغلق النوافذ المفتوحة إذا سمح المتصفح بذلك.",
+      "yes": "نعم",
+      "no": "لا"
+    }
   },
   "voiceOrder": {
     "title": "طلب صوتي",

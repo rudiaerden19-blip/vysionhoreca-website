@@ -5296,7 +5296,13 @@
     "session": "Session",
     "login": "Log in",
     "logout": "Log out",
-    "digitalCashBookSubmenu": "Digital cash book"
+    "digitalCashBookSubmenu": "Digital cash book",
+    "logoutSoftwareConfirm": {
+      "title": "Close the software?",
+      "message": "Are you sure you want to close the software? You will be signed out and open windows will close if your browser allows it.",
+      "yes": "Yes",
+      "no": "No"
+    }
   },
   "voiceOrder": {
     "title": "Voice order",

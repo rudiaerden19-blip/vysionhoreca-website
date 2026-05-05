@@ -89,6 +89,7 @@ import {
   KassaStaffClockModal,
   KassaStaffSalesSummaryModal,
 } from '@/components/kassa/KassaStaffClockUi'
+import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
 
 function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const tenant = params.tenant
@@ -187,6 +188,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [isOnline, setIsOnline] = useState<boolean | null>(null)
   const flushOfflineOrdersRef = useRef<() => Promise<void>>(async () => {})
   const [langOpen, setLangOpen] = useState(false)
+  const [logoutSoftwareConfirmOpen, setLogoutSoftwareConfirmOpen] = useState(false)
   const langRef = useRef<HTMLDivElement>(null)
   /** Alleen bij product/opties: toon korte popup als verkoopmedewerker verplicht is. */
   const blockSaleWithoutStaffIfNeededRef = useRef<() => boolean>(() => false)
@@ -1490,7 +1492,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     })
   }
 
-  const handleLogout = () => {
+  const performLogout = () => {
     if (demoViewOnly) {
       clearPublicDemoSession()
       window.location.replace(`/shop/${tenant}/admin/kassa?demo=bekijk`)
@@ -1691,6 +1693,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       className="flex min-h-0 flex-col overflow-hidden h-[100svh] max-h-[100svh] supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh]"
       data-testid="kassa-app"
     >
+      <LogoutSoftwareConfirmModal
+        open={logoutSoftwareConfirmOpen}
+        onCancel={() => setLogoutSoftwareConfirmOpen(false)}
+        onConfirm={() => {
+          setLogoutSoftwareConfirmOpen(false)
+          performLogout()
+        }}
+      />
       <PostTrialModulePickerModal
         tenantSlug={tenant}
         open={needsPostTrialModulePicker && !demoViewOnly}
@@ -1908,7 +1918,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         <button
           type="button"
-          onClick={handleLogout}
+          onClick={() => setLogoutSoftwareConfirmOpen(true)}
           className="relative z-20 inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg bg-red-600/80 px-2 py-2 text-xs font-bold text-white transition-colors hover:bg-red-600 sm:gap-1.5 sm:px-3 sm:text-sm"
         >
           <span className="text-base sm:text-lg" aria-hidden>🚪</span>
