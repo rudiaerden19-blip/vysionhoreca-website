@@ -226,8 +226,7 @@ export function TouchScreenKeyboard() {
     const mountKeyboard = () => {
       const onChange = (str: string) => {
         const el = activeRef.current
-        const inst = keyboardRef.current
-        if (!el || !inst) return
+        if (!el) return
         const text = typeof str === 'string' ? str : String(str ?? '')
         if (document.activeElement !== el) {
           try {
@@ -241,8 +240,9 @@ export function TouchScreenKeyboard() {
           out = sanitizeNumberString(text)
         }
         setNativeInputValue(el, out)
+        const inst = keyboardRef.current
         try {
-          inst.setInput(out, undefined, true)
+          inst?.setInput(out, undefined, true)
         } catch {
           /* noop */
         }

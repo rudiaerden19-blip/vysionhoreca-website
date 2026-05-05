@@ -37,5 +37,14 @@ export function setNativeInputValue(el: HTMLInputElement | HTMLTextAreaElement, 
     }
   }
 
+  // InputEvent treedt beter op in de React 18-onChange-keten dan een kale `Event` (o.a. webview/kiosk).
+  if (typeof InputEvent === 'function') {
+    try {
+      el.dispatchEvent(new InputEvent('input', { bubbles: true, cancelable: true }))
+      return
+    } catch {
+      /* val terug op Event */
+    }
+  }
   el.dispatchEvent(new Event('input', { bubbles: true }))
 }
