@@ -22,12 +22,16 @@ export function LoginKassaCloseHintModal({
       {/* Alleen pijl: onder typische adresbalk / tabstrip, naar echte browsersluitknop boven */}
       {/* Geen nep-kruisje (anders tikken gebruikers fout op een knop die niets doet). */}
       <div
-        className="pointer-events-none fixed right-6 top-[calc(env(safe-area-inset-top,0px)+3.5rem)] z-[245] flex flex-col items-center sm:right-10 md:top-[calc(env(safe-area-inset-top,0px)+4.5rem)]"
+        className="pointer-events-none fixed z-[245] flex flex-col items-end"
+        style={{
+          top: 'calc(env(safe-area-inset-top, 0px) + 2px)',
+          right: 'max(2px, env(safe-area-inset-right, 0px))',
+        }}
         aria-hidden
       >
         <svg
           viewBox="0 0 64 112"
-          className="h-[6.75rem] w-14 text-orange-400 drop-shadow-[0_2px_6px_rgba(0,0,0,.5)] motion-safe:animate-[pulse_2s_ease-in-out_infinite] sm:h-32 sm:w-16"
+          className="h-24 w-[3.25rem] text-orange-400 drop-shadow-[0_2px_6px_rgba(0,0,0,.5)] motion-safe:animate-[pulse_2s_ease-in-out_infinite] sm:h-28 sm:w-14"
           fill="none"
         >
           <path
