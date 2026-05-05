@@ -40,11 +40,20 @@ const IGNORE_INPUT_TYPES = new Set([
   'week',
 ])
 
+const ATTR_KB_MANAGED = 'data-vysion-kb-managed'
+
 function isEligibleInput(
   el: EventTarget | null,
 ): el is HTMLInputElement | HTMLTextAreaElement {
   if (!el || !(el instanceof HTMLElement)) return false
   if (el.closest('[data-no-touch-keyboard]')) return false
+  // Door ons readOnly + inputMode gezet om het systeemtoetsenbord te blokkeren
+  if (el.getAttribute(ATTR_KB_MANAGED) === '1') {
+    if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
+      return !el.disabled
+    }
+    return false
+  }
   if (el instanceof HTMLTextAreaElement) {
     return !el.readOnly && !el.disabled
   }
@@ -54,6 +63,47 @@ function isEligibleInput(
     return true
   }
   return false
+}
+
+type SuppressedFieldState = { inputMode: string; readOnly: boolean }
+
+const suppressedFieldState = new WeakMap<HTMLInputElement | HTMLTextAreaElement, SuppressedFieldState>()
+
+function tryHideSystemVirtualKeyboard() {
+  try {
+    const nav = navigator as Navigator & { virtualKeyboard?: { hide?: () => void } }
+    nav.virtualKeyboard?.hide?.()
+  } catch {
+    /* noop */
+  }
+}
+
+/** Blokkeert Windows-/systeem-touchtoetsenbord; alleen het Vysion-schermtoetsenbord vult in. */
+function suppressOsTouchKeyboard(el: HTMLInputElement | HTMLTextAreaElement) {
+  if (suppressedFieldState.has(el)) return
+  const inputMode =
+    'inputMode' in el && typeof (el as HTMLInputElement).inputMode === 'string'
+      ? (el as HTMLInputElement).inputMode
+      : ''
+  suppressedFieldState.set(el, { inputMode, readOnly: el.readOnly })
+  el.setAttribute(ATTR_KB_MANAGED, '1')
+  if ('inputMode' in el) {
+    (el as HTMLInputElement).inputMode = 'none'
+  }
+  el.readOnly = true
+  tryHideSystemVirtualKeyboard()
+}
+
+function restoreOsTouchKeyboard(el: HTMLInputElement | HTMLTextAreaElement | null) {
+  if (!el) return
+  const prev = suppressedFieldState.get(el)
+  if (!prev) return
+  suppressedFieldState.delete(el)
+  el.removeAttribute(ATTR_KB_MANAGED)
+  if ('inputMode' in el) {
+    (el as HTMLInputElement).inputMode = prev.inputMode
+  }
+  el.readOnly = prev.readOnly
 }
 
 /** Sync waarde naar React-gecontroleerde velden. */
@@ -139,11 +189,13 @@ export function TouchScreenKeyboard() {
           const a = document.activeElement
           if (!isEligibleInput(a) && !wrapRef.current?.contains(a ?? null)) {
             setVisible(false)
+            restoreOsTouchKeyboard(activeRef.current)
             activeRef.current = null
           }
         }, 0)
         return
       }
+      suppressOsTouchKeyboard(t)
       activeRef.current = t
       const inst = keyboardRef.current
       if (!inst) return
@@ -156,10 +208,32 @@ export function TouchScreenKeyboard() {
       setVisible(true)
     }
 
+    const onFocusOut = (ev: FocusEvent) => {
+      const t = ev.target
+      if (!(t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement)) return
+      if (t.getAttribute(ATTR_KB_MANAGED) !== '1') return
+      const related = ev.relatedTarget as Node | null
+      if (wrapRef.current && related && wrapRef.current.contains(related)) {
+        return
+      }
+      requestAnimationFrame(() => {
+        if (document.activeElement === t) return
+        if (wrapRef.current?.contains(document.activeElement)) return
+        if (activeRef.current === t) {
+          activeRef.current = null
+          setVisible(false)
+        }
+        restoreOsTouchKeyboard(t)
+      })
+    }
+
     document.addEventListener('focusin', onFocusIn, true)
+    document.addEventListener('focusout', onFocusOut, true)
 
     return () => {
       document.removeEventListener('focusin', onFocusIn, true)
+      document.removeEventListener('focusout', onFocusOut, true)
+      restoreOsTouchKeyboard(activeRef.current)
       kb.destroy()
       keyboardRef.current = null
     }
@@ -182,8 +256,13 @@ export function TouchScreenKeyboard() {
           className="rounded px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-800"
           onMouseDown={(e) => e.preventDefault()}
           onClick={() => {
+            const a = activeRef.current
             setVisible(false)
-            activeRef.current?.blur()
+            if (a) {
+              restoreOsTouchKeyboard(a)
+              activeRef.current = null
+              a.blur()
+            }
           }}
         >
           Sluiten
