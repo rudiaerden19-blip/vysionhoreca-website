@@ -40,6 +40,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [hasNextInUrl, setHasNextInUrl] = useState(false)
   const [isLangOpen, setIsLangOpen] = useState(false)
   const langRef = useRef<HTMLDivElement>(null)
 
@@ -111,6 +112,17 @@ export default function LoginPage() {
       setLocale(langParam)
     }
   }, [setLocale, locales])
+
+  // ?next=/shop/… bindt login aan één zaak (API); verwijder die parameter om elders in te loggen.
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      const raw = new URLSearchParams(window.location.search).get('next')?.trim()
+      setHasNextInUrl(Boolean(raw))
+    } catch {
+      setHasNextInUrl(false)
+    }
+  }, [])
 
   // Geen programmatische e-mail/wachtwoord: alle tenants gebruiken /login; autofill alleen via browser
   // (Chrome: instellingen → wachtwoorden / opgeslagen gegevens voor dit domein wissen indien nodig).
@@ -270,6 +282,17 @@ export default function LoginPage() {
             <p className="mt-3 text-gray-800">
               {t('login.logInToAccount')}
             </p>
+            {hasNextInUrl ? (
+              <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-left text-sm text-amber-950">
+                <p className="leading-snug">{t('login.nextParamLocksShopHint')}</p>
+                <Link
+                  href="/login"
+                  className="mt-3 inline-flex font-semibold text-accent underline decoration-accent/70 underline-offset-2 hover:no-underline"
+                >
+                  {t('login.openLoginWithoutShop')} →
+                </Link>
+              </div>
+            ) : null}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off" method="post">

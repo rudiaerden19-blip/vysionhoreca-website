@@ -664,6 +664,8 @@
       "title": "¿Problemas para iniciar sesión?",
       "subtitle": "Consulta nuestra guía de solución de problemas"
     },
+    "nextParamLocksShopHint": "Esta página aún tiene un negocio fijo en la barra de dirección (?next= …). Solo se aceptará ese negocio al iniciar sesión. Para otras credenciales, abra abajo el inicio de sesión sin ese parámetro.",
+    "openLoginWithoutShop": "Abrir inicio de sesión sin negocio fijo",
     "copyright": "Todos los derechos reservados."
   },
   "register": {

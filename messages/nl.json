@@ -945,6 +945,8 @@
       "title": "Problemen met inloggen?",
       "subtitle": "Bekijk onze troubleshooting gids"
     },
+    "nextParamLocksShopHint": "Deze pagina heeft in de adresbalk nog een vaste zaak staan (?next=…). Daarmee wordt alleen die zaak aanvaard na inloggen. Voor andere inloggegevens gebruik hieronder een schone login.",
+    "openLoginWithoutShop": "Open inlogpagina zonder vaste zaak",
     "copyright": "Alle rechten voorbehouden."
   },
   "register": {

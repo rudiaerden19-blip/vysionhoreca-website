@@ -664,6 +664,8 @@
       "title": "Probleme bei der Anmeldung?",
       "subtitle": "Lesen Sie unsere Fehlerbehebungsanleitung"
     },
+    "nextParamLocksShopHint": "Diese Adresse enthält noch einen fest zugewiesenen Betrieb (?next= …). Nur dieser Betrieb wird nach der Anmeldung akzeptiert. Für andere Zugangsdaten nutzen Sie unten eine saubere Login-Seite.",
+    "openLoginWithoutShop": "Anmelden ohne festen Betrieb öffnen",
     "copyright": "Alle Rechte vorbehalten."
   },
   "register": {

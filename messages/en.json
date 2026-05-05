@@ -945,6 +945,8 @@
       "title": "Problems logging in?",
       "subtitle": "Check our troubleshooting guide"
     },
+    "nextParamLocksShopHint": "This page still pins one business in the address bar (?next=…). After login only that shop is accepted. To use different credentials, open a clean login below.",
+    "openLoginWithoutShop": "Open login without a fixed shop",
     "copyright": "All rights reserved."
   },
   "register": {

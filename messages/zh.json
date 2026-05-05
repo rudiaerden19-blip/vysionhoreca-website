@@ -664,6 +664,8 @@
       "title": "登录遇到问题？",
       "subtitle": "查看我们的故障排除指南"
     },
+    "nextParamLocksShopHint": "地址栏仍然固定了某个商户（?next= …）。登录后仅允许该商户。若要使用其他账号，请点击下方链接打开不含该参数的登录页。",
+    "openLoginWithoutShop": "打开不固定商户的登录页",
     "copyright": "版权所有。"
   },
   "register": {
