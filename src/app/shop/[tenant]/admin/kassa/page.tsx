@@ -1782,8 +1782,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           })()}
         </div>
 
-        {/* Tenant naam (min-w-0 + truncate zodat de balk niet over de viewport loopt onder overflow-hidden) */}
-        <div className="flex min-w-0 flex-1 basis-0 items-center justify-center px-1 sm:px-2">
+        {/* Tenant naam (min-w-0 + truncate …); z-20 nodig zodat hamburger-backdrop z-10 deze niet bedekt */}
+        <div className="relative z-20 flex min-w-0 flex-1 basis-0 items-center justify-center px-1 sm:px-2">
           <span className="max-w-full truncate text-center text-base font-medium tracking-normal text-white sm:text-lg md:text-xl" title={(tenantInfo?.business_name ?? tenant)}>
             {tenantInfo?.business_name ||
               tenant.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
@@ -1792,7 +1792,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         {/* ── Compacte tools: scrollt horizontaal indien nodig; uitlog staat hiernaast als vaste knop ── */}
         <div
-          className="flex max-h-[68px] min-w-0 flex-[1.25] basis-0 flex-nowrap items-center justify-end gap-1 overflow-x-auto overflow-y-hidden [-webkit-overflow-scrolling:touch] [scrollbar-width:thin]"
+          className="relative z-20 flex max-h-[68px] min-w-0 flex-[1.25] basis-0 flex-nowrap items-center justify-end gap-1 overflow-x-auto overflow-y-hidden [-webkit-overflow-scrolling:touch] [scrollbar-width:thin]"
         >
 
           {effectiveAccess.reservaties && (
