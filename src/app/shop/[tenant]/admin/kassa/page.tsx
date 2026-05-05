@@ -1708,7 +1708,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* ── LINKS: hamburger ── */}
         <div className="relative z-20 flex shrink-0 items-center gap-2">
           <button onClick={() => { setHamburgerOpen(!hamburgerOpen); setHamburgerSubOpen(null) }}
-            className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-colors ${hamburgerOpen ? 'bg-orange-600 text-white' : 'bg-orange-500 hover:bg-orange-400 text-white'}`}>
+            className={`flex items-center gap-2 rounded-xl px-3 py-2 transition-colors ${hamburgerOpen ? 'bg-[#2D3A52] text-white' : 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'}`}>
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
             <span className="font-bold text-sm">{t('kassaApp.hamburgerMenu')}</span>
           </button>
@@ -1923,10 +1923,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
       )}
       {installPrompt && !isInstalled && (
-        <div className="flex-shrink-0 bg-orange-500 text-white text-xs font-semibold flex items-center justify-between gap-2 py-1.5 px-4">
+        <div className="flex-shrink-0 bg-[#3C4D6B] text-white text-xs font-semibold flex items-center justify-between gap-2 py-1.5 px-4">
           <span>📲 {t('kassaApp.pwaInstallBanner')}</span>
           <div className="flex gap-2">
-            <button onClick={handleInstallPWA} className="bg-white text-orange-600 px-3 py-0.5 rounded-full text-xs font-bold hover:bg-orange-50">{t('kassaApp.install')}</button>
+            <button onClick={handleInstallPWA} className="rounded-full bg-white px-3 py-0.5 text-xs font-bold text-[#3C4D6B] hover:bg-slate-100">{t('kassaApp.install')}</button>
             <button onClick={() => setInstallPrompt(null)} className="text-white/70 hover:text-white text-lg leading-none">×</button>
           </div>
         </div>
@@ -2286,8 +2286,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     onClick={() => handleNumpad(key)}
                     className={`rounded-xl font-bold text-2xl transition-colors active:scale-95 shadow-sm ${
                       key === 'C' ? 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
-                      : key === '=' ? 'bg-emerald-500 text-white hover:bg-emerald-600'
-                      : ['+','-','×'].includes(key) ? 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
+                      : ['+','-','×','='].includes(key) ? 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
                       : 'bg-[#e3e3e3] text-black hover:bg-gray-200'
                     }`}
                   >
