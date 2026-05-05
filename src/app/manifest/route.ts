@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getTenantSettings } from '@/lib/admin-api'
-import { normalizeThemeColorHex } from '@/lib/theme-color'
+import { TENANT_APP_SHELL_THEME_COLOR } from '@/lib/theme-color'
 import { tenantSlugFromOrdervysionHost } from '@/lib/tenant-slug-from-host'
 
 const DEFAULT_NAME = 'Vysion Horeca'
@@ -25,15 +25,13 @@ export async function GET(request: NextRequest) {
 
   let name = DEFAULT_NAME
   let short_name = DEFAULT_SHORT
-  let theme_color = '#ffffff'
-  let background_color = '#ffffff'
+  const theme_color = TENANT_APP_SHELL_THEME_COLOR
+  const background_color = '#ffffff'
 
   if (slug) {
     try {
       const settings = await getTenantSettings(slug)
       if (settings) {
-        theme_color = normalizeThemeColorHex(settings.primary_color)
-        background_color = theme_color
         const bn = settings.business_name?.trim()
         if (bn) {
           name = bn

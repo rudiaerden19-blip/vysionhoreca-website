@@ -8,6 +8,7 @@ import { PageViewTracker } from '@/components/PageViewTracker'
 import { PWARegister } from '@/components/PWARegister'
 import SectorChoiceGate from '@/components/SectorChoiceGate'
 import { OsTouchKeyboardAssist } from '@/components/OsTouchKeyboardAssist'
+import { TENANT_APP_SHELL_THEME_COLOR } from '@/lib/theme-color'
 const inter = Inter({ 
   subsets: ['latin'],
   display: 'swap',
@@ -19,8 +20,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   /** Pinch-zoom toegestaan (iPhone/iPad, toegankelijkheid); layout blijft responsive via CSS. */
   maximumScale: 5,
-  /** Lichte systeembalk (Android Chrome); oranje theme viel te hard op bij witte shop-header. */
-  themeColor: '#ffffff',
+  /** Donkerblauwe systeembalk (Android Safari/Chrome) — overal dezelfde als shop/tenant-shell. */
+  themeColor: TENANT_APP_SHELL_THEME_COLOR,
 }
 
 const siteUrl = 'https://www.vysionhoreca.com'
