@@ -14,13 +14,14 @@ const localeTag: Record<Locale, string> = {
 }
 
 /**
- * Tekst in de lege numpad-balk: „maandag 01 sept 2026” (locale-afhankelijk).
+ * Tekst in de kassa-datumbalk (compact): „wo 06 mei 2026” — weekdag afgekort,
+ * dag/maand/jaar nog steeds uit dezelfde `Date`.
  * Geen vaste string — `date` bepaalt weekdag en dag tegelijk.
  */
 export function formatKassaNumpadHeaderDate(date: Date, locale: Locale): string {
   const tag = localeTag[locale] ?? 'en-GB'
   const fmt = new Intl.DateTimeFormat(tag, {
-    weekday: 'long',
+    weekday: 'short',
     day: '2-digit',
     month: 'short',
     year: 'numeric',
