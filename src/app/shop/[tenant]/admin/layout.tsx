@@ -421,7 +421,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
           {!modulesLoading && (isSuperAdminLoggedIn() || moduleAccess['kassa']) && (
             <a
               href={adminPosHref}
-              className="touch-manipulation [-webkit-tap-highlight-color:transparent] flex shrink-0 items-center gap-2 rounded-xl bg-orange-500 px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-orange-400 no-underline"
+              className="touch-manipulation [-webkit-tap-highlight-color:transparent] flex shrink-0 items-center gap-2 rounded-xl bg-[#58CCFF] px-3 py-2 text-sm font-bold text-[#063042] shadow-md transition-colors hover:bg-[#47c6fe] no-underline"
             >
               <span className="text-base leading-none" aria-hidden>
                 🧾

@@ -942,7 +942,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             {kassaEntryHref && (
               <Link
                 href={kassaEntryHref}
-                className="flex shrink-0 items-center gap-2 rounded-xl bg-orange-500 px-3 py-2 text-sm font-bold text-white shadow-md transition-colors hover:bg-orange-400"
+                className="flex shrink-0 items-center gap-2 rounded-xl bg-[#58CCFF] px-3 py-2 text-sm font-bold text-[#063042] shadow-md transition-colors hover:bg-[#47c6fe]"
               >
                 <span className="text-base leading-none" aria-hidden>
                   🧾

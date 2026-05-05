@@ -64,9 +64,7 @@ export function AdminHamburgerMenu({
           setSubOpen(null)
         }}
         className={`flex min-h-[44px] min-w-[44px] items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold shadow-md transition-colors ${
-          open
-            ? 'bg-orange-600 text-white'
-            : 'bg-orange-500 text-white hover:bg-orange-400'
+          open ? 'bg-[#47c6fe] text-[#063042]' : 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
         }`}
         aria-expanded={open}
         aria-haspopup="true"
