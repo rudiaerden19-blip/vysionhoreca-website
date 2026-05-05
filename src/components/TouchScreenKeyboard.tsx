@@ -120,6 +120,33 @@ function sanitizeNumberString(raw: string): string {
   return parts[0] + '.' + parts.slice(1).join('')
 }
 
+/** simple-keyboard: elk veld krijgt buffer + caret + maxLength; oude opties blijven anders hangen (`handleMaxLength` → géén onChange). */
+function syncSimpleKeyboardInstToField(
+  inst: InstanceType<typeof Keyboard>,
+  el: HTMLInputElement | HTMLTextAreaElement,
+) {
+  inst.setInput(el.value ?? '', undefined, true)
+  const rawMax = el.getAttribute('maxlength')
+  let maxLen: number | undefined
+  if (rawMax != null && rawMax !== '') {
+    const n = parseInt(rawMax, 10)
+    if (!Number.isNaN(n) && n > 0) maxLen = n
+  }
+  inst.setOptions({ maxLength: maxLen } as { maxLength: number | undefined })
+  const len = (el.value ?? '').length
+  try {
+    inst.setCaretPosition(len, len)
+  } catch {
+    /* noop */
+  }
+  try {
+    const k = inst as unknown as { maxLengthReached?: boolean }
+    k.maxLengthReached = false
+  } catch {
+    /* noop */
+  }
+}
+
 /**
  * Globaal schermtoetsenbord voor touch / kiosk.
  * Document-listeners staan los van simple-keyboard mount: als de host-ref één frame ontbreekt,
@@ -171,12 +198,7 @@ export function TouchScreenKeyboard() {
       activeRef.current = t
       const inst = keyboardRef.current
       if (inst) {
-        inst.setInput(t.value, undefined, true)
-        const max = t.getAttribute('maxlength')
-        if (max != null && max !== '') {
-          const n = parseInt(max, 10)
-          if (!Number.isNaN(n)) inst.setOptions({ maxLength: n })
-        }
+        syncSimpleKeyboardInstToField(inst, t)
       }
       setVisible(true)
     }
@@ -239,10 +261,13 @@ export function TouchScreenKeyboard() {
         if (el instanceof HTMLInputElement && el.type === 'number') {
           out = sanitizeNumberString(text)
         }
-        // Direct flushen — anders kan React batching/programmeerbare DOM achterlijken op controlled inputs (kiosk).
-        flushSync(() => {
+        try {
+          flushSync(() => {
+            setNativeInputValue(el, out)
+          })
+        } catch {
           setNativeInputValue(el, out)
-        })
+        }
         const inst = keyboardRef.current
         try {
           inst?.setInput(out, undefined, true)
@@ -264,8 +289,6 @@ export function TouchScreenKeyboard() {
           theme: 'hg-theme-default hg-layout-default',
           layout: layoutVariant === 'azerty' ? LAYOUT_AZERTY : LAYOUT_QWERTY,
           layoutName: 'default',
-          /** Voorkomt conflicten tussen caret in React-dom en keyboard buffer (anders soms géén onChange / lege invoer). */
-          disableCaretPositioning: true,
           preventMouseDownDefault: true,
           preventMouseUpDefault: true,
           autoUseTouchEvents: true,
@@ -284,12 +307,7 @@ export function TouchScreenKeyboard() {
         keyboardRef.current = kb
         const el = activeRef.current
         if (el) {
-          kb.setInput(el.value, undefined, true)
-          const max = el.getAttribute('maxlength')
-          if (max != null && max !== '') {
-            const n = parseInt(max, 10)
-            if (!Number.isNaN(n)) kb.setOptions({ maxLength: n })
-          }
+          syncSimpleKeyboardInstToField(kb, el)
         }
       }
 
@@ -324,7 +342,7 @@ export function TouchScreenKeyboard() {
       layoutName: 'default',
     })
     const el = activeRef.current
-    if (el) kb.setInput(el.value, undefined, true)
+    if (el) syncSimpleKeyboardInstToField(kb, el)
   }, [touchMode, layoutVariant])
 
   if (!touchMode) return null
