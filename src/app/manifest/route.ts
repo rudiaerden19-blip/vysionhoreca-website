@@ -6,6 +6,19 @@ import { tenantSlugFromOrdervysionHost } from '@/lib/tenant-slug-from-host'
 const DEFAULT_NAME = 'Vysion Horeca'
 const DEFAULT_SHORT = 'Vysion'
 
+/** Zaak heeft nog geen *.ordervysion subdomein → ze werken via www.vysionhoreca.com/shop/{slug}; PWA op hoofddomein moet nog steeds naar /login. */
+function isVysionMainPortalHost(host: string): boolean {
+  const h = host.split(':')[0].toLowerCase()
+  return (
+    h === 'vysionhoreca.com' ||
+    h === 'www.vysionhoreca.com' ||
+    h === 'ordervysion.com' ||
+    h === 'www.ordervysion.com' ||
+    h === 'localhost' ||
+    h === '127.0.0.1'
+  )
+}
+
 export async function GET(request: NextRequest) {
   const host = request.headers.get('host') || ''
   const slug = tenantSlugFromOrdervysionHost(host)
@@ -32,8 +45,9 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  /** Tenant-subdomein (*.ordervysion.com): PWA-start naar tenant-/staff-login op bureau/icoon. Apex/marketing: gewoon home. */
-  const startUrl = slug ? '/login' : '/'
+  /** Tenant-subdomein óf Vysion-hoofddomein: icoon → staff-login (zelfde /login voor path-based tenants zonder eigen URL). */
+  const openLoginFirst = !!(slug || isVysionMainPortalHost(host))
+  const startUrl = openLoginFirst ? '/login' : '/'
 
   const manifest = {
     name,
@@ -69,7 +83,7 @@ export async function GET(request: NextRequest) {
       },
     ],
     shortcuts: [
-      ...(slug
+      ...(openLoginFirst
         ? [
             {
               name: 'Inloggen',
