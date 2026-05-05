@@ -2315,8 +2315,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     key={key}
                     onClick={() => handleNumpad(key)}
                     className={`rounded-xl font-bold text-2xl transition-colors active:scale-95 shadow-sm ${
-                      key === 'C' ? 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
-                      : ['+','-','×','='].includes(key) ? 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
+                      key === 'C' ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
+                      : ['+','-','×','='].includes(key) ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
                       : 'bg-[#e3e3e3] text-black hover:bg-gray-200'
                     }`}
                   >
