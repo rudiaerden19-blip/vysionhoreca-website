@@ -18,7 +18,7 @@ export function normalizeThemeColorHex(input: string | null | undefined, fallbac
 }
 
 /**
- * Browser/PWA-systeembalk: een trede donkerder dan primaire knoopkleur (#3C4D6B),
- * omdat iOS/Android `theme-color` visueel vaak licht oppoetsen — zo sluit het aan bij de +/−/×-knoppen.
+ * Browser/PWA-systeembalk: donker slate-blauw (kassa-titelbalk #1e293b).
+ * Mobiele browsers verhelderen `theme-color`; eerder #3C4D6B / #2D3A52 bleek nog te licht.
  */
-export const TENANT_APP_SHELL_THEME_COLOR = '#2d3a52' as const
+export const TENANT_APP_SHELL_THEME_COLOR = '#1e293b' as const
