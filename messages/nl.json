@@ -945,8 +945,8 @@
       "title": "Problemen met inloggen?",
       "subtitle": "Bekijk onze troubleshooting gids"
     },
-    "nextParamLocksShopHint": "Deze pagina heeft in de adresbalk nog een vaste zaak staan (?next=…). Daarmee wordt alleen die zaak aanvaard na inloggen. Voor andere inloggegevens gebruik hieronder een schone login.",
-    "openLoginWithoutShop": "Open inlogpagina zonder vaste zaak",
+    "nextParamLocksShopHint": "De adresbalk kan nog ?next=… bevatten. Dat blokkeert niet: na inloggen ga je automatisch naar het dashboard van het account bij dit e-mailadres.",
+    "openLoginWithoutShop": "Inlogpagina zonder adresparameters",
     "copyright": "Alle rechten voorbehouden."
   },
   "register": {

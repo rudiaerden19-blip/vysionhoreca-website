@@ -664,8 +664,8 @@
       "title": "Problemi di accesso?",
       "subtitle": "Consulta la nostra guida alla risoluzione dei problemi"
     },
-    "nextParamLocksShopHint": "Questa pagina ha ancora un’attività fissata nella barra degli indirizzi (?next= …). Solo quell’attività viene accettata dopo l’accesso. Per altre credenziali apri qui sotto l’accesso senza quel parametro.",
-    "openLoginWithoutShop": "Apri accesso senza attività fissa",
+    "nextParamLocksShopHint": "La barra degli indirizzi può ancora contenere ?next=. Non blocca l’accesso: dopo il login verrai reindirizzato alla dashboard dell’account associato a questa email.",
+    "openLoginWithoutShop": "Apri accesso senza parametri nell’URL",
     "copyright": "Tutti i diritti riservati."
   },
   "register": {

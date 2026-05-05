@@ -6,6 +6,7 @@ import { loginBodySchema } from '@/lib/api-schemas'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
 import { DEFAULT_ENABLED_ALLERGEN_IDS } from '@/lib/allergens-defaults'
+import { tenantSlugFromOrdervysionHost } from '@/lib/tenant-slug-from-host'
 
 // Legacy SHA-256 hash for backward compatibility
 async function hashPasswordLegacy(password: string): Promise<string> {
@@ -205,19 +206,26 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (targetTenantSlugRaw && TARGET_SLUG_RE.test(targetTenantSlugRaw)) {
-      if (normTenant(profile.tenant_slug || '') !== normTenant(targetTenantSlugRaw)) {
-        logger.warn('Login geweigerd: account past niet bij gevraagde tenant', {
-          requestId,
-          email: emailLower,
-          profileTenant: profile.tenant_slug,
-          targetTenantSlugRaw,
-        })
-        return NextResponse.json(
-          { error: 'Dit account hoort niet bij deze zaak. Controleer e-mail of open de juiste winkel-URL.' },
-          { status: 403 }
-        )
-      }
+    /** Subdomein *.ordervysion.com: localStorage hoort bij die host — geen andere-tenant-login hier (sessie breekt). Op www/host zonder slug: vrij; ?next= wordt client herberekend naar /shop/{ eigen slug }. */
+    const loginHostHeader = request.headers.get('host') || ''
+    const hostTenantSlugLock = tenantSlugFromOrdervysionHost(loginHostHeader)
+    if (
+      hostTenantSlugLock &&
+      normTenant(profile.tenant_slug || '') !== normTenant(hostTenantSlugLock)
+    ) {
+      logger.warn('Login geweigerd: tenant-subdomein ≠ accounttenant (gebruik www-login)', {
+        requestId,
+        email: emailLower,
+        profileTenant: profile.tenant_slug,
+        hostTenantSlugLock,
+      })
+      return NextResponse.json(
+        {
+          error:
+            'Je zit op de site van een andere zaak (subdomein). Ga naar www.vysionhoreca.com/login om op elke zaak in te loggen, of gebruik het subdomein van jouw eigen zaak.',
+        },
+        { status: 403 }
+      )
     }
 
     // Auto-upgrade legacy passwords to bcrypt

@@ -664,8 +664,8 @@
       "title": "Probleme bei der Anmeldung?",
       "subtitle": "Lesen Sie unsere Fehlerbehebungsanleitung"
     },
-    "nextParamLocksShopHint": "Diese Adresse enthält noch einen fest zugewiesenen Betrieb (?next= …). Nur dieser Betrieb wird nach der Anmeldung akzeptiert. Für andere Zugangsdaten nutzen Sie unten eine saubere Login-Seite.",
-    "openLoginWithoutShop": "Anmelden ohne festen Betrieb öffnen",
+    "nextParamLocksShopHint": "Die Adresszeile kann noch ?next= enthalten. Das blockiert die Anmeldung nicht: danach leiten wir automatisch zum Dashboard des Kontos dieser E-Mail-Adresse.",
+    "openLoginWithoutShop": "Anmeldeseite ohne URL-Parameter",
     "copyright": "Alle Rechte vorbehalten."
   },
   "register": {
