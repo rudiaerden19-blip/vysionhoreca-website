@@ -17,5 +17,8 @@ export function normalizeThemeColorHex(input: string | null | undefined, fallbac
   return fallback
 }
 
-/** Vaste `theme-color` voor app-shell, marketing en PWA-manifest: donkerblauw (geen tenant primary / oranje systeembalk). */
-export const TENANT_APP_SHELL_THEME_COLOR = '#3C4D6B' as const
+/**
+ * Browser/PWA-systeembalk: een trede donkerder dan primaire knoopkleur (#3C4D6B),
+ * omdat iOS/Android `theme-color` visueel vaak licht oppoetsen — zo sluit het aan bij de +/−/×-knoppen.
+ */
+export const TENANT_APP_SHELL_THEME_COLOR = '#2d3a52' as const
