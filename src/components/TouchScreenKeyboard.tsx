@@ -4,6 +4,20 @@ import { useEffect, useRef, useState } from 'react'
 import Keyboard from 'simple-keyboard'
 import 'simple-keyboard/build/css/index.css'
 import './touch-keyboard-overrides.css'
+import { LAYOUT_AZERTY, LAYOUT_QWERTY } from './touch-keyboard-layouts'
+
+const STORAGE_LAYOUT = 'vysion_touch_keyboard_layout'
+
+function readSavedLayoutVariant(): 'qwerty' | 'azerty' {
+  if (typeof window === 'undefined') return 'qwerty'
+  try {
+    const s = localStorage.getItem(STORAGE_LAYOUT)
+    if (s === 'azerty' || s === 'qwerty') return s
+  } catch {
+    /* ignore */
+  }
+  return 'qwerty'
+}
 
 /** Zet localStorage `vysion_touch_keyboard_off` op "1" om het schermtoetsenbord uit te zetten (debug). */
 const STORAGE_OFF = 'vysion_touch_keyboard_off'
@@ -79,7 +93,11 @@ function tryHideSystemVirtualKeyboard() {
   }
 }
 
-/** Blokkeert Windows-/systeem-touchtoetsenbord; alleen het Vysion-schermtoetsenbord vult in. */
+/**
+ * Blokkeert systeem-touchtoetsenbord (inputMode none).
+ * Geen blijvend readOnly: React negeert dan vaak geprogrammeerde input — we zetten readOnly
+ * alleen kort uit in setNativeValue.
+ */
 function suppressOsTouchKeyboard(el: HTMLInputElement | HTMLTextAreaElement) {
   if (suppressedFieldState.has(el)) return
   const inputMode =
@@ -107,8 +125,14 @@ function restoreOsTouchKeyboard(el: HTMLInputElement | HTMLTextAreaElement | nul
   el.readOnly = prev.readOnly
 }
 
-/** Sync waarde naar React-gecontroleerde velden (ook readOnly + controlled). */
+/**
+ * Sync naar React-controlled velden. Tijdelijk readOnly uit als dat door ons gezet was —
+ * anders negeert React 18/19 de input voor gecontroleerde componenten.
+ */
 function setNativeValue(el: HTMLInputElement | HTMLTextAreaElement, value: string) {
+  const managed = el.getAttribute(ATTR_KB_MANAGED) === '1'
+  if (managed) el.readOnly = false
+
   const proto =
     el instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype
   const setter = Object.getOwnPropertyDescriptor(proto, 'value')?.set
@@ -116,6 +140,12 @@ function setNativeValue(el: HTMLInputElement | HTMLTextAreaElement, value: strin
   else el.value = value
   el.dispatchEvent(new Event('input', { bubbles: true }))
   el.dispatchEvent(new Event('change', { bubbles: true }))
+
+  if (managed) {
+    queueMicrotask(() => {
+      if (el.getAttribute(ATTR_KB_MANAGED) === '1') el.readOnly = true
+    })
+  }
 }
 
 /** Basis sanitizer voor type="number" (Geen letters in de waarde string). */
@@ -137,6 +167,7 @@ export function TouchScreenKeyboard() {
   const activeRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null)
   /** Windows-touch: tik op toets geeft vaak focusout met relatedTarget=null — niet sluiten/i refocus. */
   const pointerOnKeyboardUntilMs = useRef(0)
+  const [layoutVariant, setLayoutVariant] = useState<'qwerty' | 'azerty'>(readSavedLayoutVariant)
   const [visible, setVisible] = useState(false)
   const [touchMode, setTouchMode] = useState(false)
 
@@ -151,9 +182,10 @@ export function TouchScreenKeyboard() {
 
     const kb = new Keyboard(root, {
       theme: 'hg-theme-default hg-layout-default',
+      layout: layoutVariant === 'azerty' ? LAYOUT_AZERTY : LAYOUT_QWERTY,
+      layoutName: 'default',
       preventMouseDownDefault: true,
       preventMouseUpDefault: true,
-      stopMouseDownPropagation: true,
       autoUseTouchEvents: true,
       newLineOnEnter: true,
       mergeDisplay: true,
@@ -269,6 +301,18 @@ export function TouchScreenKeyboard() {
     }
   }, [touchMode])
 
+  useEffect(() => {
+    if (!touchMode) return
+    const kb = keyboardRef.current
+    if (!kb) return
+    kb.setOptions({
+      layout: layoutVariant === 'azerty' ? LAYOUT_AZERTY : LAYOUT_QWERTY,
+      layoutName: 'default',
+    })
+    const el = activeRef.current
+    if (el) kb.setInput(el.value, undefined, true)
+  }, [touchMode, layoutVariant])
+
   if (!touchMode) return null
 
   return (
@@ -279,24 +323,65 @@ export function TouchScreenKeyboard() {
       } transition-transform duration-200 ease-out`}
       aria-hidden={!visible}
     >
-      <div className="flex items-center justify-between gap-2 border-b border-gray-700 px-2 py-1">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-700 px-2 py-1.5">
         <span className="text-xs font-semibold text-gray-300">Vysion toetsenbord</span>
-        <button
-          type="button"
-          className="rounded px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-800"
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={() => {
-            const a = activeRef.current
-            setVisible(false)
-            if (a) {
-              restoreOsTouchKeyboard(a)
-              activeRef.current = null
-              a.blur()
-            }
-          }}
-        >
-          Sluiten
-        </button>
+        <div className="flex flex-1 flex-wrap items-center justify-center gap-1.5 sm:justify-end">
+          <span className="hidden text-[11px] text-gray-500 sm:inline">Indeling:</span>
+          <button
+            type="button"
+            className={`touch-manipulation rounded-lg px-3 py-2 text-xs font-bold ${
+              layoutVariant === 'qwerty'
+                ? 'bg-indigo-600 text-white'
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+            }`}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => {
+              setLayoutVariant('qwerty')
+              try {
+                localStorage.setItem(STORAGE_LAYOUT, 'qwerty')
+              } catch {
+                /* noop */
+              }
+            }}
+          >
+            QWERTY
+          </button>
+          <button
+            type="button"
+            className={`touch-manipulation rounded-lg px-3 py-2 text-xs font-bold ${
+              layoutVariant === 'azerty'
+                ? 'bg-indigo-600 text-white'
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+            }`}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => {
+              setLayoutVariant('azerty')
+              try {
+                localStorage.setItem(STORAGE_LAYOUT, 'azerty')
+              } catch {
+                /* noop */
+              }
+            }}
+          >
+            AZERTY
+          </button>
+          <button
+            type="button"
+            className="touch-manipulation rounded-lg px-3 py-2 text-sm font-medium text-white hover:bg-gray-800"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => {
+              const a = activeRef.current
+              setVisible(false)
+              if (a) {
+                restoreOsTouchKeyboard(a)
+                activeRef.current = null
+                a.blur()
+              }
+            }}
+          >
+            Sluiten
+          </button>
+        </div>
       </div>
       <div
         ref={keyboardRootRef}
