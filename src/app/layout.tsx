@@ -7,6 +7,7 @@ import { GlobalAutoCapitalize } from '@/components/GlobalAutoCapitalize'
 import { PageViewTracker } from '@/components/PageViewTracker'
 import { PWARegister } from '@/components/PWARegister'
 import SectorChoiceGate from '@/components/SectorChoiceGate'
+import { OsTouchKeyboardAssist } from '@/components/OsTouchKeyboardAssist'
 const inter = Inter({ 
   subsets: ['latin'],
   display: 'swap',
@@ -174,6 +175,7 @@ export default function RootLayout({
         <LanguageProvider>
           <PWARegister />
           <GlobalAutoCapitalize />
+          <OsTouchKeyboardAssist />
           <PageViewTracker />
           <SectorChoiceGate />
           {children}
