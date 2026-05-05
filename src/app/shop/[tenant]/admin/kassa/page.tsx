@@ -2300,23 +2300,21 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   </button>
                 ) : null}
                 <div
-                  className={`min-w-0 flex flex-col justify-center ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1' : 'w-full'}`}
+                  className={`min-w-0 flex flex-col justify-center gap-1 ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1' : 'w-full'}`}
                 >
-                  {numpadValue === '' ? (
-                    <p
-                      className="text-right text-lg font-bold leading-tight text-gray-600 sm:text-xl md:text-2xl"
-                      aria-live="polite"
-                    >
-                      {numpadHeaderDateLabel}
-                    </p>
-                  ) : (
-                    <input
-                      type="text"
-                      value={numpadValue}
-                      readOnly
-                      className="w-full min-w-0 border-none bg-transparent text-right text-3xl font-bold text-black outline-none"
-                    />
-                  )}
+                  <p
+                    className="text-right text-sm font-semibold leading-tight text-gray-600 sm:text-base"
+                    aria-live="polite"
+                  >
+                    {numpadHeaderDateLabel}
+                  </p>
+                  <input
+                    type="text"
+                    value={numpadValue}
+                    readOnly
+                    aria-label={t('kassaApp.numpadPlaceholder')}
+                    className="w-full min-w-0 border-none bg-transparent text-right text-2xl font-bold text-black outline-none sm:text-3xl"
+                  />
                 </div>
               </div>
               <div className="grid grid-cols-4 grid-rows-4 gap-2 flex-1 min-h-0">
@@ -2350,19 +2348,27 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </div>
           ) : (
             <div className="space-y-2">
-              {tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly && (
-                <div className="flex justify-start pb-1">
+              <div
+                className={`flex min-h-[3rem] items-center gap-3 rounded-xl bg-[#e3e3e3] px-3 py-2 ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? '' : 'justify-end'}`}
+              >
+                {tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? (
                   <button
                     type="button"
                     onClick={openStaffClockModal}
-                    className="rounded-xl bg-[#e3e3e3] p-1.5 shadow-sm border-2 border-slate-300 hover:border-[#3C4D6B] active:scale-[0.98] transition-all"
+                    className="shrink-0 rounded-xl bg-white p-1.5 shadow-sm border-2 border-slate-300 hover:border-[#3C4D6B] active:scale-[0.98] transition-all"
                     title={t('staffClock.buttonTitle')}
                     aria-label={t('staffClock.buttonTitle')}
                   >
                     <KassaAnalogClock size={64} />
                   </button>
-                </div>
-              )}
+                ) : null}
+                <p
+                  className={`min-w-0 text-right text-sm font-semibold leading-tight text-gray-700 sm:text-base ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1' : 'w-full'}`}
+                  aria-live="polite"
+                >
+                  {numpadHeaderDateLabel}
+                </p>
+              </div>
               <div data-testid="kassa-cart-lines">
               {cart.map(item => {
                 const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
