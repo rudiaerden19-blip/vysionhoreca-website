@@ -664,8 +664,6 @@
       "title": "Probleme bei der Anmeldung?",
       "subtitle": "Lesen Sie unsere Fehlerbehebungsanleitung"
     },
-    "nextParamLocksShopHint": "Die Adresszeile kann noch ?next= enthalten. Das blockiert die Anmeldung nicht: danach leiten wir automatisch zum Dashboard des Kontos dieser E-Mail-Adresse.",
-    "openLoginWithoutShop": "Anmeldeseite ohne URL-Parameter",
     "copyright": "Alle Rechte vorbehalten."
   },
   "register": {

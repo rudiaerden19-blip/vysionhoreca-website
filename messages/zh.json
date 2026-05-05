@@ -664,8 +664,6 @@
       "title": "登录遇到问题？",
       "subtitle": "查看我们的故障排除指南"
     },
-    "nextParamLocksShopHint": "地址栏仍可含有 ?next=，这不会阻止登录；登录后将跳转到与此邮箱绑定的账户控制台。",
-    "openLoginWithoutShop": "打开没有 URL 参数的登录页",
     "copyright": "版权所有。"
   },
   "register": {

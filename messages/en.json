@@ -945,8 +945,6 @@
       "title": "Problems logging in?",
       "subtitle": "Check our troubleshooting guide"
     },
-    "nextParamLocksShopHint": "The address bar may still include ?next=. That no longer blocks login: after sign-in you are redirected to the dashboard for the account tied to this email.",
-    "openLoginWithoutShop": "Open login without URL parameters",
     "copyright": "All rights reserved."
   },
   "register": {

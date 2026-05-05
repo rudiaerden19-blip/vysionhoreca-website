@@ -945,8 +945,6 @@
       "title": "Problemen met inloggen?",
       "subtitle": "Bekijk onze troubleshooting gids"
     },
-    "nextParamLocksShopHint": "De adresbalk kan nog ?next=… bevatten. Dat blokkeert niet: na inloggen ga je automatisch naar het dashboard van het account bij dit e-mailadres.",
-    "openLoginWithoutShop": "Inlogpagina zonder adresparameters",
     "copyright": "Alle rechten voorbehouden."
   },
   "register": {

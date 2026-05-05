@@ -664,8 +664,6 @@
       "title": "Problèmes de connexion?",
       "subtitle": "Consultez notre guide de dépannage"
     },
-    "nextParamLocksShopHint": "La barre d’adresse peut encore contenir ?next=. Cela ne bloque pas : après connexion vous êtes redirigé vers le tableau de bord du compte associé à cet e-mail.",
-    "openLoginWithoutShop": "Page de connexion sans paramètres d’URL",
     "copyright": "Tous droits réservés."
   },
   "register": {

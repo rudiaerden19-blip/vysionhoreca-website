@@ -664,8 +664,6 @@
       "title": "¿Problemas para iniciar sesión?",
       "subtitle": "Consulta nuestra guía de solución de problemas"
     },
-    "nextParamLocksShopHint": "La barra de direcciones puede incluir aún ?next=. Eso ya no bloquea el acceso: tras iniciar sesión irá al panel de la cuenta vinculada a este correo.",
-    "openLoginWithoutShop": "Abrir login sin parámetros en la URL",
     "copyright": "Todos los derechos reservados."
   },
   "register": {
