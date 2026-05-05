@@ -107,7 +107,7 @@ function restoreOsTouchKeyboard(el: HTMLInputElement | HTMLTextAreaElement | nul
   el.readOnly = prev.readOnly
 }
 
-/** Sync waarde naar React-gecontroleerde velden. */
+/** Sync waarde naar React-gecontroleerde velden (ook readOnly + controlled). */
 function setNativeValue(el: HTMLInputElement | HTMLTextAreaElement, value: string) {
   const proto =
     el instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype
@@ -135,6 +135,8 @@ export function TouchScreenKeyboard() {
   const keyboardRootRef = useRef<HTMLDivElement | null>(null)
   const keyboardRef = useRef<InstanceType<typeof Keyboard> | null>(null)
   const activeRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null)
+  /** Windows-touch: tik op toets geeft vaak focusout met relatedTarget=null — niet sluiten/i refocus. */
+  const pointerOnKeyboardUntilMs = useRef(0)
   const [visible, setVisible] = useState(false)
   const [touchMode, setTouchMode] = useState(false)
 
@@ -151,6 +153,7 @@ export function TouchScreenKeyboard() {
       theme: 'hg-theme-default hg-layout-default',
       preventMouseDownDefault: true,
       preventMouseUpDefault: true,
+      stopMouseDownPropagation: true,
       autoUseTouchEvents: true,
       newLineOnEnter: true,
       mergeDisplay: true,
@@ -166,6 +169,13 @@ export function TouchScreenKeyboard() {
         const el = activeRef.current
         const inst = keyboardRef.current
         if (!el || !inst) return
+        if (document.activeElement !== el) {
+          try {
+            el.focus({ preventScroll: true })
+          } catch {
+            /* noop */
+          }
+        }
         let out = str
         if (el instanceof HTMLInputElement && el.type === 'number') {
           out = sanitizeNumberString(str)
@@ -217,7 +227,15 @@ export function TouchScreenKeyboard() {
       if (wrapRef.current && related && wrapRef.current.contains(related)) {
         return
       }
-      requestAnimationFrame(() => {
+      window.setTimeout(() => {
+        if (Date.now() < pointerOnKeyboardUntilMs.current) {
+          try {
+            t.focus({ preventScroll: true })
+          } catch {
+            /* noop */
+          }
+          return
+        }
         if (document.activeElement === t) return
         if (wrapRef.current?.contains(document.activeElement)) return
         if (activeRef.current === t) {
@@ -225,13 +243,24 @@ export function TouchScreenKeyboard() {
           setVisible(false)
         }
         restoreOsTouchKeyboard(t)
-      })
+      }, 0)
     }
+
+    const markDocPointer = (e: Event) => {
+      const t = e.target
+      if (t instanceof Node && wrapRef.current?.contains(t)) {
+        pointerOnKeyboardUntilMs.current = Date.now() + 750
+      }
+    }
+    document.addEventListener('pointerdown', markDocPointer, true)
+    document.addEventListener('touchstart', markDocPointer, { capture: true, passive: true })
 
     document.addEventListener('focusin', onFocusIn, true)
     document.addEventListener('focusout', onFocusOut, true)
 
     return () => {
+      document.removeEventListener('pointerdown', markDocPointer, true)
+      document.removeEventListener('touchstart', markDocPointer, { capture: true } as AddEventListenerOptions)
       document.removeEventListener('focusin', onFocusIn, true)
       document.removeEventListener('focusout', onFocusOut, true)
       restoreOsTouchKeyboard(activeRef.current)
@@ -245,7 +274,7 @@ export function TouchScreenKeyboard() {
   return (
     <div
       ref={wrapRef}
-      className={`vysion-touch-keyboard fixed inset-x-0 bottom-0 z-[99990] flex flex-col border-t border-gray-700 bg-gray-900/98 shadow-[0_-4px_24px_rgba(0,0,0,0.35)] backdrop-blur-sm ${
+      className={`vysion-touch-keyboard fixed inset-x-0 bottom-0 z-[99990] flex flex-col border-t border-gray-700 bg-gray-900/98 shadow-[0_-4px_24px_rgba(0,0,0,0.35)] backdrop-blur-sm select-none ${
         visible ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-full opacity-0'
       } transition-transform duration-200 ease-out`}
       aria-hidden={!visible}
