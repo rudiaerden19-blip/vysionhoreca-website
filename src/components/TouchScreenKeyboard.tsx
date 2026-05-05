@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import Keyboard from 'simple-keyboard'
 import 'simple-keyboard/build/css/index.css'
 import './touch-keyboard-overrides.css'
+import { setNativeInputValue } from '@/lib/dom-input-value'
 import { LAYOUT_AZERTY, LAYOUT_QWERTY } from './touch-keyboard-layouts'
 
 const STORAGE_LAYOUT = 'vysion_touch_keyboard_layout'
@@ -62,7 +63,7 @@ function isEligibleInput(
 ): el is HTMLInputElement | HTMLTextAreaElement {
   if (!el || !(el instanceof HTMLElement)) return false
   if (el.closest('[data-no-touch-keyboard]')) return false
-  // Door ons readOnly + inputMode gezet om het systeemtoetsenbord te blokkeren
+  // Door ons gemarkeerd om systeemtoetsenbord te beperken (inputMode none)
   if (el.getAttribute(ATTR_KB_MANAGED) === '1') {
     if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
       return !el.disabled
@@ -80,7 +81,7 @@ function isEligibleInput(
   return false
 }
 
-type SuppressedFieldState = { inputMode: string; readOnly: boolean }
+type SuppressedFieldState = { inputMode: string }
 
 const suppressedFieldState = new WeakMap<HTMLInputElement | HTMLTextAreaElement, SuppressedFieldState>()
 
@@ -94,9 +95,8 @@ function tryHideSystemVirtualKeyboard() {
 }
 
 /**
- * Blokkeert systeem-touchtoetsenbord (inputMode none).
- * Geen blijvend readOnly: React negeert dan vaak geprogrammeerde input — we zetten readOnly
- * alleen kort uit in setNativeValue.
+ * Blokkeert vooral het systeem-touchtoetsenbord via inputMode (geen readOnly:
+ * React overschrijft controlled values en negeert events zolang readOnly aan staat).
  */
 function suppressOsTouchKeyboard(el: HTMLInputElement | HTMLTextAreaElement) {
   if (suppressedFieldState.has(el)) return
@@ -104,12 +104,11 @@ function suppressOsTouchKeyboard(el: HTMLInputElement | HTMLTextAreaElement) {
     'inputMode' in el && typeof (el as HTMLInputElement).inputMode === 'string'
       ? (el as HTMLInputElement).inputMode
       : ''
-  suppressedFieldState.set(el, { inputMode, readOnly: el.readOnly })
+  suppressedFieldState.set(el, { inputMode })
   el.setAttribute(ATTR_KB_MANAGED, '1')
   if ('inputMode' in el) {
     (el as HTMLInputElement).inputMode = 'none'
   }
-  el.readOnly = true
   tryHideSystemVirtualKeyboard()
 }
 
@@ -122,33 +121,8 @@ function restoreOsTouchKeyboard(el: HTMLInputElement | HTMLTextAreaElement | nul
   if ('inputMode' in el) {
     (el as HTMLInputElement).inputMode = prev.inputMode
   }
-  el.readOnly = prev.readOnly
 }
 
-/**
- * Sync naar React-controlled velden. Tijdelijk readOnly uit als dat door ons gezet was —
- * anders negeert React 18/19 de input voor gecontroleerde componenten.
- */
-function setNativeValue(el: HTMLInputElement | HTMLTextAreaElement, value: string) {
-  const managed = el.getAttribute(ATTR_KB_MANAGED) === '1'
-  if (managed) el.readOnly = false
-
-  const proto =
-    el instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype
-  const setter = Object.getOwnPropertyDescriptor(proto, 'value')?.set
-  if (setter) setter.call(el, value)
-  else el.value = value
-  el.dispatchEvent(new Event('input', { bubbles: true }))
-  el.dispatchEvent(new Event('change', { bubbles: true }))
-
-  if (managed) {
-    queueMicrotask(() => {
-      if (el.getAttribute(ATTR_KB_MANAGED) === '1') el.readOnly = true
-    })
-  }
-}
-
-/** Basis sanitizer voor type="number" (Geen letters in de waarde string). */
 function sanitizeNumberString(raw: string): string {
   const s = raw.replace(',', '.').replace(/[^\d.\-]/g, '')
   const parts = s.split('.')
@@ -212,7 +186,7 @@ export function TouchScreenKeyboard() {
         if (el instanceof HTMLInputElement && el.type === 'number') {
           out = sanitizeNumberString(str)
         }
-        setNativeValue(el, out)
+        setNativeInputValue(el, out)
         requestAnimationFrame(() => {
           try {
             inst.setInput(el.value)

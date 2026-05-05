@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react'
 
+import { setNativeInputValue } from '@/lib/dom-input-value'
+
 /**
  * Global Auto-Capitalize Component
  * 
@@ -44,14 +46,14 @@ export function GlobalAutoCapitalize() {
       
       // Alleen updaten als er iets veranderd is
       if (newValue !== value) {
-        const cursorPos = target.selectionStart || 0
-        target.value = newValue
-        // Cursor positie behouden
-        target.setSelectionRange(cursorPos, cursorPos)
-        
-        // Trigger change event voor React state updates
-        const event = new Event('input', { bubbles: true })
-        target.dispatchEvent(event)
+        const cursorPos = target.selectionStart ?? 0
+        setNativeInputValue(target, newValue)
+        try {
+          const pos = Math.min(cursorPos, newValue.length)
+          target.setSelectionRange(pos, pos)
+        } catch {
+          /* bv. number/input types zonder selection */
+        }
       }
     }
     
