@@ -31,6 +31,9 @@ function isMarketingSitePath(pathname: string | null): boolean {
   if (pathname.startsWith('/superadmin')) return false
   if (pathname.startsWith('/dashboard')) return false
   if (pathname.startsWith('/keuken')) return false
+  // Staff/auth flows: géén sector-overlay (z-[200]) boven formulier — blokkeerde o.a. taalkiezer op /login
+  if (pathname.startsWith('/login')) return false
+  if (pathname.startsWith('/verify-email')) return false
   return true
 }
 
