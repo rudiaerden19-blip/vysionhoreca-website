@@ -831,11 +831,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
           <button
             onClick={() => setIsLocked(prev => !prev)}
             title={isLocked ? t('kassaApp.floorPlanLockTitleLocked') : t('kassaApp.floorPlanLockTitleUnlocked')}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 ${
-              isLocked
-                ? 'bg-orange-500 hover:bg-orange-600 text-white'
-                : 'bg-yellow-400 hover:bg-yellow-500 text-gray-900'
-            }`}
+            className="flex items-center gap-2 rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-orange-600"
           >
             {isLocked ? t('kassaApp.floorPlanLocked') : t('kassaApp.floorPlanEditing')}
           </button>
@@ -1302,7 +1298,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
         {isLocked ? (
           <span className="text-orange-400/70 ml-4 text-xs">{t('kassaApp.floorPlanLegendLocked')}</span>
         ) : (
-          <span className="text-yellow-400/70 ml-4 text-xs">{t('kassaApp.floorPlanLegendEditMode')}</span>
+          <span className="text-orange-400/70 ml-4 text-xs">{t('kassaApp.floorPlanLegendEditMode')}</span>
         )}
       </div>
       </div>
