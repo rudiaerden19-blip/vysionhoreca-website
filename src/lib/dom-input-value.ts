@@ -3,6 +3,9 @@
  * Zie o.a. https://github.com/facebook/react/issues/10135 — native `value`-setter + interne _valueTracker.
  */
 
+/** Zelfde attribuut als TouchScreenKeyboard: velden met schermtoetsenbord niet dubbel muteren (o.a. autocap). */
+export const ATTR_VYSION_KB_MANAGED = 'data-vysion-kb-managed'
+
 type ValueTracking = { setValue: (v: string) => void }
 
 function getValueTracker(el: HTMLInputElement | HTMLTextAreaElement): ValueTracking | null {
@@ -11,11 +14,8 @@ function getValueTracker(el: HTMLInputElement | HTMLTextAreaElement): ValueTrack
 }
 
 function setValueNative(el: HTMLInputElement | HTMLTextAreaElement, value: string) {
-  const baseProto = el instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype
-  let setter = Object.getOwnPropertyDescriptor(baseProto, 'value')?.set
-  if (!setter) {
-    setter = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(el) as object, 'value')?.set
-  }
+  const proto = el instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype
+  const setter = Object.getOwnPropertyDescriptor(proto, 'value')?.set
   if (setter) {
     setter.call(el, value)
   } else {

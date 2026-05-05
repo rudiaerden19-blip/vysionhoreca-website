@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import Keyboard from 'simple-keyboard'
 import 'simple-keyboard/build/css/index.css'
 import './touch-keyboard-overrides.css'
-import { setNativeInputValue } from '@/lib/dom-input-value'
+import { ATTR_VYSION_KB_MANAGED, setNativeInputValue } from '@/lib/dom-input-value'
 import { LAYOUT_AZERTY, LAYOUT_QWERTY } from './touch-keyboard-layouts'
 
 const STORAGE_LAYOUT = 'vysion_touch_keyboard_layout'
@@ -35,6 +35,8 @@ function shouldOfferTouchKeyboard(): boolean {
   }
   if (navigator.maxTouchPoints > 0) return true
   if (window.matchMedia?.('(pointer: coarse)').matches) return true
+  if (window.matchMedia?.('(any-pointer: coarse)').matches) return true
+  if (window.matchMedia?.('(hover: none)').matches) return true
   return false
 }
 
@@ -56,15 +58,13 @@ const IGNORE_INPUT_TYPES = new Set([
   'week',
 ])
 
-const ATTR_KB_MANAGED = 'data-vysion-kb-managed'
-
 function isEligibleInput(
   el: EventTarget | null,
 ): el is HTMLInputElement | HTMLTextAreaElement {
   if (!el || !(el instanceof HTMLElement)) return false
   if (el.closest('[data-no-touch-keyboard]')) return false
   // Door ons gemarkeerd om systeemtoetsenbord te beperken (inputMode none)
-  if (el.getAttribute(ATTR_KB_MANAGED) === '1') {
+  if (el.getAttribute(ATTR_VYSION_KB_MANAGED) === '1') {
     if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
       return !el.disabled
     }
@@ -105,7 +105,7 @@ function suppressOsTouchKeyboard(el: HTMLInputElement | HTMLTextAreaElement) {
       ? (el as HTMLInputElement).inputMode
       : ''
   suppressedFieldState.set(el, { inputMode })
-  el.setAttribute(ATTR_KB_MANAGED, '1')
+  el.setAttribute(ATTR_VYSION_KB_MANAGED, '1')
   if ('inputMode' in el) {
     (el as HTMLInputElement).inputMode = 'none'
   }
@@ -117,7 +117,7 @@ function restoreOsTouchKeyboard(el: HTMLInputElement | HTMLTextAreaElement | nul
   const prev = suppressedFieldState.get(el)
   if (!prev) return
   suppressedFieldState.delete(el)
-  el.removeAttribute(ATTR_KB_MANAGED)
+  el.removeAttribute(ATTR_VYSION_KB_MANAGED)
   if ('inputMode' in el) {
     (el as HTMLInputElement).inputMode = prev.inputMode
   }
@@ -149,7 +149,7 @@ export function TouchScreenKeyboard() {
     setTouchMode(shouldOfferTouchKeyboard())
   }, [])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!touchMode) return
     const root = keyboardRootRef.current
     if (!root) return
@@ -175,6 +175,7 @@ export function TouchScreenKeyboard() {
         const el = activeRef.current
         const inst = keyboardRef.current
         if (!el || !inst) return
+        const text = typeof str === 'string' ? str : String(str ?? '')
         if (document.activeElement !== el) {
           try {
             el.focus({ preventScroll: true })
@@ -182,18 +183,16 @@ export function TouchScreenKeyboard() {
             /* noop */
           }
         }
-        let out = str
+        let out = text
         if (el instanceof HTMLInputElement && el.type === 'number') {
-          out = sanitizeNumberString(str)
+          out = sanitizeNumberString(text)
         }
         setNativeInputValue(el, out)
-        requestAnimationFrame(() => {
-          try {
-            inst.setInput(el.value)
-          } catch {
-            /* noop */
-          }
-        })
+        try {
+          inst.setInput(out, undefined, true)
+        } catch {
+          /* noop */
+        }
       },
     })
     keyboardRef.current = kb
@@ -228,7 +227,7 @@ export function TouchScreenKeyboard() {
     const onFocusOut = (ev: FocusEvent) => {
       const t = ev.target
       if (!(t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement)) return
-      if (t.getAttribute(ATTR_KB_MANAGED) !== '1') return
+      if (t.getAttribute(ATTR_VYSION_KB_MANAGED) !== '1') return
       const related = ev.relatedTarget as Node | null
       if (wrapRef.current && related && wrapRef.current.contains(related)) {
         return
