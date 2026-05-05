@@ -63,7 +63,6 @@ function isEligibleInput(
 ): el is HTMLInputElement | HTMLTextAreaElement {
   if (!el || !(el instanceof HTMLElement)) return false
   if (el.closest('[data-no-touch-keyboard]')) return false
-  // Door ons gemarkeerd om systeemtoetsenbord te beperken (inputMode none)
   if (el.getAttribute(ATTR_VYSION_KB_MANAGED) === '1') {
     if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
       return !el.disabled
@@ -81,9 +80,8 @@ function isEligibleInput(
   return false
 }
 
-type SuppressedFieldState = { inputMode: string }
-
-const suppressedFieldState = new WeakMap<HTMLInputElement | HTMLTextAreaElement, SuppressedFieldState>()
+/** Velden waarvoor we alleen het Vysion-toetsenbord markeren (geen inputMode-hacks — die breken sommige kiosks). */
+const kbManagedFields = new WeakSet<HTMLInputElement | HTMLTextAreaElement>()
 
 function tryHideSystemVirtualKeyboard() {
   try {
@@ -94,33 +92,18 @@ function tryHideSystemVirtualKeyboard() {
   }
 }
 
-/**
- * Blokkeert vooral het systeem-touchtoetsenbord via inputMode (geen readOnly:
- * React overschrijft controlled values en negeert events zolang readOnly aan staat).
- */
 function suppressOsTouchKeyboard(el: HTMLInputElement | HTMLTextAreaElement) {
-  if (suppressedFieldState.has(el)) return
-  const inputMode =
-    'inputMode' in el && typeof (el as HTMLInputElement).inputMode === 'string'
-      ? (el as HTMLInputElement).inputMode
-      : ''
-  suppressedFieldState.set(el, { inputMode })
+  if (kbManagedFields.has(el)) return
+  kbManagedFields.add(el)
   el.setAttribute(ATTR_VYSION_KB_MANAGED, '1')
-  if ('inputMode' in el) {
-    (el as HTMLInputElement).inputMode = 'none'
-  }
   tryHideSystemVirtualKeyboard()
 }
 
 function restoreOsTouchKeyboard(el: HTMLInputElement | HTMLTextAreaElement | null) {
   if (!el) return
-  const prev = suppressedFieldState.get(el)
-  if (!prev) return
-  suppressedFieldState.delete(el)
+  if (!kbManagedFields.has(el)) return
+  kbManagedFields.delete(el)
   el.removeAttribute(ATTR_VYSION_KB_MANAGED)
-  if ('inputMode' in el) {
-    (el as HTMLInputElement).inputMode = prev.inputMode
-  }
 }
 
 function sanitizeNumberString(raw: string): string {
@@ -131,15 +114,15 @@ function sanitizeNumberString(raw: string): string {
 }
 
 /**
- * Globaal schermtoetsenbord voor touch / kiosk (Windows-tablet zonder fysiek toetsenbord).
- * Staat in de root layout; focus op input/textarea opent het paneel onderaan.
+ * Globaal schermtoetsenbord voor touch / kiosk.
+ * Document-listeners staan los van simple-keyboard mount: als de host-ref één frame ontbreekt,
+ * mogen focus/handler nooit volledig wegblijven (dat gaf “typt nergens iets”).
  */
 export function TouchScreenKeyboard() {
   const wrapRef = useRef<HTMLDivElement | null>(null)
   const keyboardRootRef = useRef<HTMLDivElement | null>(null)
   const keyboardRef = useRef<InstanceType<typeof Keyboard> | null>(null)
   const activeRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null)
-  /** Windows-touch: tik op toets geeft vaak focusout met relatedTarget=null — niet sluiten/i refocus. */
   const pointerOnKeyboardUntilMs = useRef(0)
   const [layoutVariant, setLayoutVariant] = useState<'qwerty' | 'azerty'>(readSavedLayoutVariant)
   const [visible, setVisible] = useState(false)
@@ -151,51 +134,6 @@ export function TouchScreenKeyboard() {
 
   useLayoutEffect(() => {
     if (!touchMode) return
-    const root = keyboardRootRef.current
-    if (!root) return
-
-    const kb = new Keyboard(root, {
-      theme: 'hg-theme-default hg-layout-default',
-      layout: layoutVariant === 'azerty' ? LAYOUT_AZERTY : LAYOUT_QWERTY,
-      layoutName: 'default',
-      preventMouseDownDefault: true,
-      preventMouseUpDefault: true,
-      autoUseTouchEvents: true,
-      newLineOnEnter: true,
-      mergeDisplay: true,
-      display: {
-        '{bksp}': '⌫',
-        '{enter}': '↵',
-        '{shift}': '⇧',
-        '{tab}': 'Tab',
-        '{lock}': 'Caps',
-        '{space}': '␣',
-      },
-      onChange: (str: string) => {
-        const el = activeRef.current
-        const inst = keyboardRef.current
-        if (!el || !inst) return
-        const text = typeof str === 'string' ? str : String(str ?? '')
-        if (document.activeElement !== el) {
-          try {
-            el.focus({ preventScroll: true })
-          } catch {
-            /* noop */
-          }
-        }
-        let out = text
-        if (el instanceof HTMLInputElement && el.type === 'number') {
-          out = sanitizeNumberString(text)
-        }
-        setNativeInputValue(el, out)
-        try {
-          inst.setInput(out, undefined, true)
-        } catch {
-          /* noop */
-        }
-      },
-    })
-    keyboardRef.current = kb
 
     const onFocusIn = (ev: FocusEvent) => {
       const t = ev.target
@@ -214,12 +152,13 @@ export function TouchScreenKeyboard() {
       suppressOsTouchKeyboard(t)
       activeRef.current = t
       const inst = keyboardRef.current
-      if (!inst) return
-      inst.setInput(t.value, undefined, true)
-      const max = t.getAttribute('maxlength')
-      if (max != null && max !== '') {
-        const n = parseInt(max, 10)
-        if (!Number.isNaN(n)) inst.setOptions({ maxLength: n })
+      if (inst) {
+        inst.setInput(t.value, undefined, true)
+        const max = t.getAttribute('maxlength')
+        if (max != null && max !== '') {
+          const n = parseInt(max, 10)
+          if (!Number.isNaN(n)) inst.setOptions({ maxLength: n })
+        }
       }
       setVisible(true)
     }
@@ -257,21 +196,100 @@ export function TouchScreenKeyboard() {
         pointerOnKeyboardUntilMs.current = Date.now() + 750
       }
     }
+
     document.addEventListener('pointerdown', markDocPointer, true)
     document.addEventListener('touchstart', markDocPointer, { capture: true, passive: true })
-
     document.addEventListener('focusin', onFocusIn, true)
     document.addEventListener('focusout', onFocusOut, true)
 
+    let cancelled = false
+    let raf = 0
+
+    const mountKeyboard = () => {
+      const onChange = (str: string) => {
+        const el = activeRef.current
+        const inst = keyboardRef.current
+        if (!el || !inst) return
+        const text = typeof str === 'string' ? str : String(str ?? '')
+        if (document.activeElement !== el) {
+          try {
+            el.focus({ preventScroll: true })
+          } catch {
+            /* noop */
+          }
+        }
+        let out = text
+        if (el instanceof HTMLInputElement && el.type === 'number') {
+          out = sanitizeNumberString(text)
+        }
+        setNativeInputValue(el, out)
+        try {
+          inst.setInput(out, undefined, true)
+        } catch {
+          /* noop */
+        }
+      }
+
+      const tryOnce = (attempt: number) => {
+        if (cancelled) return
+        const root = keyboardRootRef.current
+        if (!root) {
+          if (attempt < 50) {
+            raf = requestAnimationFrame(() => tryOnce(attempt + 1))
+          }
+          return
+        }
+        const kb = new Keyboard(root, {
+          theme: 'hg-theme-default hg-layout-default',
+          layout: layoutVariant === 'azerty' ? LAYOUT_AZERTY : LAYOUT_QWERTY,
+          layoutName: 'default',
+          preventMouseDownDefault: true,
+          preventMouseUpDefault: true,
+          autoUseTouchEvents: true,
+          newLineOnEnter: true,
+          mergeDisplay: true,
+          display: {
+            '{bksp}': '⌫',
+            '{enter}': '↵',
+            '{shift}': '⇧',
+            '{tab}': 'Tab',
+            '{lock}': 'Caps',
+            '{space}': '␣',
+          },
+          onChange,
+        })
+        keyboardRef.current = kb
+        const el = activeRef.current
+        if (el) {
+          kb.setInput(el.value, undefined, true)
+          const max = el.getAttribute('maxlength')
+          if (max != null && max !== '') {
+            const n = parseInt(max, 10)
+            if (!Number.isNaN(n)) kb.setOptions({ maxLength: n })
+          }
+        }
+      }
+
+      tryOnce(0)
+    }
+
+    mountKeyboard()
+
     return () => {
+      cancelled = true
+      if (raf) cancelAnimationFrame(raf)
       document.removeEventListener('pointerdown', markDocPointer, true)
       document.removeEventListener('touchstart', markDocPointer, { capture: true } as AddEventListenerOptions)
       document.removeEventListener('focusin', onFocusIn, true)
       document.removeEventListener('focusout', onFocusOut, true)
       restoreOsTouchKeyboard(activeRef.current)
-      kb.destroy()
-      keyboardRef.current = null
+      const kb = keyboardRef.current
+      if (kb) {
+        kb.destroy()
+        keyboardRef.current = null
+      }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- layoutVariant wordt via aparte effect op kb gezet (setOptions)
   }, [touchMode])
 
   useEffect(() => {

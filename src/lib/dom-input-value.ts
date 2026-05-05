@@ -1,6 +1,8 @@
 /**
  * Programmatisch een `<input>` / `<textarea>` vullen zodat React controlled state meeloopt.
- * Zie o.a. https://github.com/facebook/react/issues/10135 — native `value`-setter + interne _valueTracker.
+ * Patroon: eerst `el.value = …` (via React’s eigen descriptor), daarna `tracker.setValue(vorige)` zodat
+ * `updateValueIfChanged` in react-dom het verschil ziet (zie react-dom `trackValueOnNode` / issue #10135).
+ * Prototype-setter omzeilen gaf op sommige setups een mismatch met de interne tracker.
  */
 
 /** Zelfde attribuut als TouchScreenKeyboard: velden met schermtoetsenbord niet dubbel muteren (o.a. autocap). */
@@ -13,24 +15,12 @@ function getValueTracker(el: HTMLInputElement | HTMLTextAreaElement): ValueTrack
   return t && typeof t.setValue === 'function' ? t : null
 }
 
-function setValueNative(el: HTMLInputElement | HTMLTextAreaElement, value: string) {
-  const proto = el instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype
-  const setter = Object.getOwnPropertyDescriptor(proto, 'value')?.set
-  if (setter) {
-    setter.call(el, value)
-  } else {
-    el.value = value
-  }
-}
-
 /**
- * Zet de DOM-waarde en vuurt één `input`-event (bubble). Geen apart `change`-event:
- * React koppelt `onChange` voor tekstvelden aan `input` en dubbele events kunnen ruis geven.
+ * Zet de DOM-waarde en vuurt één `input`-event (bubble).
  */
 export function setNativeInputValue(el: HTMLInputElement | HTMLTextAreaElement, value: string) {
   const previous = el.value
-  setValueNative(el, value)
-
+  el.value = value
   const tracker = getValueTracker(el)
   if (tracker) {
     try {
