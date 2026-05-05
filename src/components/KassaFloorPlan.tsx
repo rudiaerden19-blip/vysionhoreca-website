@@ -1358,7 +1358,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                 <label className="block text-sm font-semibold text-gray-600 mb-1">{t('kassaApp.floorPlanModalTableNumberLabel')}</label>
                 <input autoFocus value={addNumber} onChange={e => setAddNumber(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && addTable()}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#3C4D6B] outline-none text-xl font-bold text-center"
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#075985] outline-none text-xl font-bold text-center"
                   placeholder={t('kassaApp.floorPlanModalTableNumberPlaceholder')} />
               </div>
               <div>
@@ -1366,7 +1366,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                 <div className="grid grid-cols-5 gap-2">
                   {[2, 4, 6, 8, 10].map(n => (
                     <button key={n} type="button" onClick={() => setAddSeats(n)}
-                      className={`min-h-[44px] touch-manipulation rounded-xl py-2 font-bold transition-colors ${addSeats === n ? 'bg-[#3C4D6B] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+                      className={`min-h-[44px] touch-manipulation rounded-xl py-2 font-bold transition-colors ${addSeats === n ? 'bg-[#58CCFF] text-[#063042]' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
                       {n}
                     </button>
                   ))}
@@ -1383,7 +1383,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                     ] as const
                   ).map(([s, label]) => (
                     <button key={s} type="button" onClick={() => setAddShape(s)}
-                      className={`min-h-[44px] touch-manipulation rounded-xl py-2 text-xs font-bold transition-colors ${addShape === s ? 'bg-[#3C4D6B] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+                      className={`min-h-[44px] touch-manipulation rounded-xl py-2 text-xs font-bold transition-colors ${addShape === s ? 'bg-[#58CCFF] text-[#063042]' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
                       {label}
                     </button>
                   ))}

@@ -108,7 +108,7 @@ export function ContactsView({
             setPage(0)
           }}
           placeholder="Zoek op naam, email of telefoon..."
-          className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-4 text-sm outline-none focus:border-[#3C4D6B]"
+          className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-4 text-sm outline-none focus:border-[#075985]"
         />
       </div>
 
@@ -126,7 +126,7 @@ export function ContactsView({
             type="button"
             disabled={selectedWithEmail.length === 0}
             onClick={() => onBulkPromoMailClick(selectedWithEmail)}
-            className="flex min-h-[44px] items-center gap-2 rounded-xl bg-[#3C4D6B] px-4 py-2 font-bold text-white shadow-sm transition-colors hover:bg-[#2D3A52] disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex min-h-[44px] items-center gap-2 rounded-xl bg-[#58CCFF] px-4 py-2 font-bold text-[#063042] shadow-sm transition-colors hover:bg-[#43bef7] disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Send size={16} />
             Promotie e-mail{selectedWithEmail.length > 0 ? ` (${selectedWithEmail.length})` : ''}
@@ -154,7 +154,7 @@ export function ContactsView({
             style={{
               gridTemplateColumns: GRID_COLS,
               columnGap: '12px',
-              backgroundColor: '#3C4D6B',
+              backgroundColor: '#075985',
             }}
           >
             <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
@@ -163,7 +163,7 @@ export function ContactsView({
                 type="checkbox"
                 checked={allPageSelected}
                 onChange={toggleSelectPage}
-                className="h-5 w-5 cursor-pointer rounded border-white/50 text-[#3C4D6B] focus:ring-2 focus:ring-white/80"
+                className="h-5 w-5 cursor-pointer rounded border-white/50 text-[#075985] focus:ring-2 focus:ring-white/80"
                 title="Selecteer alle contacten op deze pagina"
                 aria-label="Selecteer alle contacten op deze pagina"
               />
@@ -212,7 +212,7 @@ export function ContactsView({
                       type="checkbox"
                       checked={selectedGuestIds.has(guest.id)}
                       onChange={() => toggleSelectRow(guest.id)}
-                      className="h-5 w-5 cursor-pointer rounded border-gray-300 text-[#3C4D6B] focus:ring-[#3C4D6B]"
+                      className="h-5 w-5 cursor-pointer rounded border-gray-300 text-[#075985] focus:ring-[#075985]"
                       aria-label={`Selecteer ${guest.name}`}
                     />
                   </div>
@@ -224,7 +224,7 @@ export function ContactsView({
                   </div>
                   <div className="pr-2 text-sm text-gray-600">
                     {guest.phone ? (
-                      <a href={`tel:${guest.phone}`} className="hover:text-[#3C4D6B] hover:underline">
+                      <a href={`tel:${guest.phone}`} className="hover:text-[#075985] hover:underline">
                         {guest.phone}
                       </a>
                     ) : (
@@ -236,7 +236,7 @@ export function ContactsView({
                       <>
                         <a
                           href={`mailto:${guest.email}`}
-                          className="min-w-0 truncate text-sm text-[#3C4D6B] hover:underline"
+                          className="min-w-0 truncate text-sm text-[#075985] hover:underline"
                           title={guest.email}
                         >
                           {guest.email}
@@ -244,7 +244,7 @@ export function ContactsView({
                         <button
                           type="button"
                           onClick={() => onPromoMailClick(guest)}
-                          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#3C4D6B] text-white shadow-sm transition-colors hover:bg-[#2D3A52] active:bg-[#253247]"
+                          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#58CCFF] text-[#063042] shadow-sm transition-colors hover:bg-[#43bef7] active:bg-[#34ade7]"
                           title="Promotie-e-mail versturen"
                           aria-label={`Promotie-e-mail naar ${guest.name}`}
                         >
