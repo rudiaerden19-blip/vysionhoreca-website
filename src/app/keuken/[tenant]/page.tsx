@@ -7,6 +7,7 @@ import { getTenantSettings, updateOrderStatus, isWebshopOrder } from '@/lib/admi
 import { formatOrderScheduleDetail } from '@/lib/format-order-schedule'
 import { useLanguage } from '@/i18n'
 import Link from 'next/link'
+import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
 import { getAdminKassaEntryHref } from '@/lib/tenant-modules'
 import { shopDisplayOrderTypeKey } from '@/lib/shop-display-order-type'
@@ -48,7 +49,7 @@ interface BusinessSettings {
 }
 
 export default function KeukenDisplayPage({ params }: { params: { tenant: string } }) {
-  const { t, locale } = useLanguage()
+  const { t, locale, setLocale, locales, localeNames } = useLanguage()
   const { moduleAccess, enabledModulesJson, loading: modulesLoading } = useTenantModuleFlags(params.tenant)
   const adminBase = `/shop/${params.tenant}/admin`
   const kassaEntryHref =
@@ -76,6 +77,8 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   const alertIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const printRef = useRef<HTMLDivElement>(null)
   const knownOrderIdsRef = useRef<Set<string>>(new Set())
+  const [keukenLangOpen, setKeukenLangOpen] = useState(false)
+  const keukenLangRef = useRef<HTMLDivElement>(null)
 
   // Update time every second
   useEffect(() => {
@@ -106,6 +109,16 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant, audioActivated])
+
+  useEffect(() => {
+    function handlePointerOutside(e: PointerEvent) {
+      if (keukenLangRef.current && !keukenLangRef.current.contains(e.target as Node)) {
+        setKeukenLangOpen(false)
+      }
+    }
+    document.addEventListener('pointerdown', handlePointerOutside, true)
+    return () => document.removeEventListener('pointerdown', handlePointerOutside, true)
+  }, [])
 
   useEffect(() => {
     if (!printerIP) return
@@ -573,6 +586,45 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
             >
               🖨️ {printerStatus === 'online' ? 'Online' : printerStatus === 'offline' ? 'Offline' : 'Printer'}
             </button>
+
+            <div className="relative z-[130]" ref={keukenLangRef}>
+              <button
+                type="button"
+                onClick={() => setKeukenLangOpen((o) => !o)}
+                className="inline-flex touch-manipulation items-center gap-1 rounded-xl bg-white/10 px-3 py-2 text-sm font-bold text-white hover:bg-white/20"
+                title={t('languageSwitcher.selectLanguage')}
+              >
+                <LocaleFlagEmoji locale={locale} className="text-base text-white" />
+                <svg
+                  className={`size-3.5 shrink-0 transition-transform ${keukenLangOpen ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {keukenLangOpen && (
+                <div className="absolute right-0 top-full z-[130] mt-1 max-h-80 min-w-[180px] overflow-y-auto rounded-xl border border-white/20 bg-blue-800 shadow-xl">
+                  {locales.map((lang) => (
+                    <button
+                      key={lang}
+                      type="button"
+                      onClick={() => {
+                        setLocale(lang)
+                        setKeukenLangOpen(false)
+                      }}
+                      className={`flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm transition-colors hover:bg-white/15 ${
+                        locale === lang ? 'bg-white/20 font-semibold text-white' : 'text-white/95'
+                      }`}
+                    >
+                      <LocaleFlagEmoji locale={lang} />
+                      <span>{localeNames[lang]}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
           </div>
         </div>

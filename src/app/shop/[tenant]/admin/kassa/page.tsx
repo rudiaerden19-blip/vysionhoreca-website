@@ -903,15 +903,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
   }, [tenant])
 
-  // Close language dropdown on outside click
+  // Sluit taalmenu bij tik buiten (pointerdown: betrouwbaar op Windows-touch / Edge)
   useEffect(() => {
-    function handleClick(e: MouseEvent) {
+    function handlePointerOutside(e: PointerEvent) {
       if (langRef.current && !langRef.current.contains(e.target as Node)) {
         setLangOpen(false)
       }
     }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
+    document.addEventListener('pointerdown', handlePointerOutside, true)
+    return () => document.removeEventListener('pointerdown', handlePointerOutside, true)
   }, [])
 
   const toggleSound = () => {
@@ -1793,7 +1793,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         {/* ── Compacte tools: scrollt horizontaal indien nodig; uitlog staat hiernaast als vaste knop ── */}
         <div
-          className="relative z-20 flex max-h-[68px] min-w-0 flex-[1.25] basis-0 flex-nowrap items-center justify-end gap-1 overflow-x-auto overflow-y-hidden [-webkit-overflow-scrolling:touch] [scrollbar-width:thin]"
+          className="relative z-20 flex max-h-[68px] min-w-0 flex-[1.25] basis-0 flex-nowrap items-center justify-end gap-1 overflow-x-auto overflow-y-visible [-webkit-overflow-scrolling:touch] [scrollbar-width:thin]"
         >
 
           {effectiveAccess.reservaties && (
@@ -1881,14 +1881,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <button
               type="button"
               onClick={() => setLangOpen(o => !o)}
-              className="inline-flex items-center gap-1 whitespace-nowrap rounded-xl bg-white/10 px-2 py-2 font-medium text-white transition-colors hover:bg-white/20 sm:gap-2 sm:px-3"
+              className="inline-flex touch-manipulation items-center gap-1 whitespace-nowrap rounded-xl bg-white/10 px-2 py-2 font-medium text-white transition-colors hover:bg-white/20 sm:gap-2 sm:px-3"
             >
-              <LocaleFlagEmoji locale={locale} className="text-xl sm:text-2xl" />
-              <span className="text-xs font-bold sm:text-sm">{(localeNames[locale] || '').slice(0, 3).toUpperCase()}</span>
+              <LocaleFlagEmoji locale={locale} className="text-lg text-white sm:text-xl" />
               <svg className={`size-4 shrink-0 transition-transform ${langOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
             </button>
             {langOpen && (
-              <div className="absolute right-0 top-full z-50 mt-1 min-w-[160px] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl">
+              <div className="absolute right-0 top-full z-[130] mt-1 min-w-[180px] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl">
                 {locales.map(lang => (
                   <button key={lang} type="button" onClick={() => { setLocale(lang); setLangOpen(false) }}
                     className={`flex w-full items-center gap-2 px-4 py-2.5 text-sm transition-colors hover:bg-gray-50 ${locale === lang ? 'bg-blue-50 font-semibold text-blue-600' : 'text-gray-700'}`}>

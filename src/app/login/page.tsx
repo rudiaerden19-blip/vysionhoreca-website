@@ -128,15 +128,15 @@ export default function LoginPage() {
   // Geen programmatische e-mail/wachtwoord: alle tenants gebruiken /login; autofill alleen via browser
   // (Chrome: instellingen → wachtwoorden / opgeslagen gegevens voor dit domein wissen indien nodig).
 
-  // Close dropdown when clicking outside
+  // Sluit taalmenu (pointerdown = betrouwbaar op Windows-touch)
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    function handlePointerOutside(event: PointerEvent) {
       if (langRef.current && !langRef.current.contains(event.target as Node)) {
         setIsLangOpen(false)
       }
     }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    document.addEventListener('pointerdown', handlePointerOutside, true)
+    return () => document.removeEventListener('pointerdown', handlePointerOutside, true)
   }, [])
 
   const handleLanguageSelect = (langCode: Locale) => {

@@ -130,15 +130,14 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
     }
   }, [simulatorItems, simulatorName, simulatorMultiplier, params.tenant, loading])
 
-  // Click outside to close search results
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    function handlePointerOutside(event: PointerEvent) {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
         setShowSearchResults(false)
       }
     }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    document.addEventListener('pointerdown', handlePointerOutside, true)
+    return () => document.removeEventListener('pointerdown', handlePointerOutside, true)
   }, [])
 
   async function loadData() {

@@ -20,13 +20,13 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
   const { locale, setLocale, t, locales, localeNames } = useLanguage()
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    function handlePointerOutside(event: PointerEvent) {
       if (langRef.current && !langRef.current.contains(event.target as Node)) {
         setIsLangOpen(false)
       }
     }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    document.addEventListener('pointerdown', handlePointerOutside, true)
+    return () => document.removeEventListener('pointerdown', handlePointerOutside, true)
   }, [])
 
   useEffect(() => {

@@ -7,6 +7,7 @@ import { getTenantSettings, updateOrderStatus, TenantSettings, approveWebshopOrd
 import { formatOrderScheduleDetail } from '@/lib/format-order-schedule'
 import { useLanguage } from '@/i18n'
 import Link from 'next/link'
+import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
 import { getAdminKassaEntryHref } from '@/lib/tenant-modules'
 import { shopDisplayOrderTypeKey, nlBrowserPrintOrderTypeBanner } from '@/lib/shop-display-order-type'
@@ -75,7 +76,7 @@ interface Reservation {
 }
 
 export default function ShopDisplayPage({ params }: { params: { tenant: string } }) {
-  const { t, locale } = useLanguage()
+  const { t, locale, setLocale, locales, localeNames } = useLanguage()
   const { moduleAccess, enabledModulesJson, loading: modulesLoading } = useTenantModuleFlags(params.tenant)
   const adminBase = `/shop/${params.tenant}/admin`
   const kassaEntryHref =
@@ -117,6 +118,8 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   const [printerStatus, setPrinterStatus] = useState<'unknown' | 'online' | 'offline'>('unknown')
   const [reservations, setReservations] = useState<Reservation[]>([])
   const [showReservationsModal, setShowReservationsModal] = useState(false)
+  const [displayLangOpen, setDisplayLangOpen] = useState(false)
+  const displayLangRef = useRef<HTMLDivElement>(null)
   const alertIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
   
@@ -136,6 +139,16 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
       }
     }
   }, [params.tenant])
+
+  useEffect(() => {
+    function handlePointerOutside(e: PointerEvent) {
+      if (displayLangRef.current && !displayLangRef.current.contains(e.target as Node)) {
+        setDisplayLangOpen(false)
+      }
+    }
+    document.addEventListener('pointerdown', handlePointerOutside, true)
+    return () => document.removeEventListener('pointerdown', handlePointerOutside, true)
+  }, [])
 
   // GELUID ALTIJD AAN bij laden + prewarm audio
   useEffect(() => {
@@ -1022,6 +1035,45 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             >
               👨‍🍳 {tx('kitchen')}
             </Link>
+
+            <div className="relative z-[130]" ref={displayLangRef}>
+              <button
+                type="button"
+                onClick={() => setDisplayLangOpen((o) => !o)}
+                className="inline-flex touch-manipulation items-center gap-1 rounded-xl bg-white/10 px-3 py-2 text-sm font-bold text-white hover:bg-white/20"
+                title={t('languageSwitcher.selectLanguage')}
+              >
+                <LocaleFlagEmoji locale={locale} className="text-base text-white" />
+                <svg
+                  className={`size-3.5 shrink-0 transition-transform ${displayLangOpen ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {displayLangOpen && (
+                <div className="absolute right-0 top-full z-[130] mt-1 max-h-80 min-w-[180px] overflow-y-auto rounded-xl border border-gray-600 bg-gray-900 shadow-xl">
+                  {locales.map((lang) => (
+                    <button
+                      key={lang}
+                      type="button"
+                      onClick={() => {
+                        setLocale(lang)
+                        setDisplayLangOpen(false)
+                      }}
+                      className={`flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm transition-colors hover:bg-white/10 ${
+                        locale === lang ? 'bg-white/15 font-semibold text-white' : 'text-gray-100'
+                      }`}
+                    >
+                      <LocaleFlagEmoji locale={lang} />
+                      <span>{localeNames[lang]}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </header>

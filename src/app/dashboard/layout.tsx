@@ -31,15 +31,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const menuTrans = (key: string) => t(`dashboard.menu.${key}`)
   const layoutTrans = (key: string) => t(`dashboardLayout.${key}`)
 
-  // Close dropdown when clicking outside
+  // Sluit taalmenu (pointerdown: Windows-touch)
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handlePointerOutside = (event: PointerEvent) => {
       if (langDropdownRef.current && !langDropdownRef.current.contains(event.target as Node)) {
         setLangDropdownOpen(false)
       }
     }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    document.addEventListener('pointerdown', handlePointerOutside, true)
+    return () => document.removeEventListener('pointerdown', handlePointerOutside, true)
   }, [])
 
   const navigation = [

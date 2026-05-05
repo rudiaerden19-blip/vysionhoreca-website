@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -116,6 +116,7 @@ const dayKeyMap: Record<string, string> = {
 export default function TenantLandingPage({ params }: { params: { tenant: string } }) {
   const { t, locale, setLocale, locales, localeNames } = useLanguage()
   const [showLanguageMenu, setShowLanguageMenu] = useState(false)
+  const shopLangRef = useRef<HTMLDivElement>(null)
   const [business, setBusiness] = useState<Business | null>(null)
   const [shopStatus, setShopStatus] = useState<ShopStatus | null>(null)
   const [showClosedBanner, setShowClosedBanner] = useState(true)
@@ -170,6 +171,17 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isBlocked, setIsBlocked] = useState(false)
   const [isOwner, setIsOwner] = useState(false)
+
+  // Sluit taalmenu bij tik buiten (Windows-touch)
+  useEffect(() => {
+    function handlePointerOutside(e: PointerEvent) {
+      if (shopLangRef.current && !shopLangRef.current.contains(e.target as Node)) {
+        setShowLanguageMenu(false)
+      }
+    }
+    document.addEventListener('pointerdown', handlePointerOutside, true)
+    return () => document.removeEventListener('pointerdown', handlePointerOutside, true)
+  }, [])
   
   // Check if owner is logged in for this tenant
   useEffect(() => {
@@ -921,7 +933,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             </Link>
 
             {/* Language Switcher */}
-            <div className="relative">
+            <div className="relative" ref={shopLangRef}>
               <button
                 onClick={() => setShowLanguageMenu(!showLanguageMenu)}
                 className="bg-white/20 backdrop-blur-md text-white font-semibold px-3 sm:px-4 py-2 sm:py-2.5 rounded-full text-sm sm:text-base hover:bg-white/30 transition-colors flex items-center gap-1.5"

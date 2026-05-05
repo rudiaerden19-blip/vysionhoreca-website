@@ -37,17 +37,17 @@ export default function RegisterPage() {
     }
   }, [setLocale, locales])
 
-  // Close dropdown when clicking outside
+  // Sluit taalmenu (pointerdown: Windows-touch)
   useEffect(() => {
     if (typeof window === 'undefined') return
-    
-    function handleClickOutside(event: MouseEvent) {
+
+    function handlePointerOutside(event: PointerEvent) {
       if (langRef.current && !langRef.current.contains(event.target as Node)) {
         setIsLangOpen(false)
       }
     }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    document.addEventListener('pointerdown', handlePointerOutside, true)
+    return () => document.removeEventListener('pointerdown', handlePointerOutside, true)
   }, [])
 
   const handleLanguageSelect = (langCode: Locale) => {

@@ -521,30 +521,30 @@ function LanguageSelector() {
   const { locale, setLocale, locales, localeNames } = useLanguage()
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    function handlePointerOutside(event: PointerEvent) {
       if (ref.current && !ref.current.contains(event.target as Node)) {
         setIsOpen(false)
       }
     }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    document.addEventListener('pointerdown', handlePointerOutside, true)
+    return () => document.removeEventListener('pointerdown', handlePointerOutside, true)
   }, [])
 
   return (
     <div ref={ref} className="relative">
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors"
+        className="flex touch-manipulation items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors"
       >
-        <LocaleFlagEmoji locale={locale} className="text-base" />
-        <span className="text-xs font-bold sm:text-sm">{(localeNames[locale] || '').slice(0, 3).toUpperCase()}</span>
+        <LocaleFlagEmoji locale={locale} className="text-base text-white" />
         <svg className={`w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 bg-white rounded-xl shadow-xl border z-50 min-w-[180px] max-h-80 overflow-y-auto">
+        <div className="absolute right-0 mt-2 bg-white rounded-xl shadow-xl border z-[130] min-w-[180px] max-h-80 overflow-y-auto">
           {locales.map((langCode) => (
             <button
               key={langCode}
