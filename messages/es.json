@@ -5346,7 +5346,7 @@
     "digitalCashBookSubmenu": "Libro de caja digital",
     "logoutSoftwareConfirm": {
       "title": "¿Cerrar el software?",
-      "message": "¿Seguro que quiere cerrar el software? Se cerrará la sesión y las ventanas abiertas se cerrarán si el navegador lo permite.",
+      "message": "Al cerrar sesión: ¿seguro que desea cerrar el software?\n\n• Compruebe que sus empleados hayan cerrado sesión.\n• ¿Ha guardado su informe Z?\n• Revise sus ventas.",
       "yes": "Sí",
       "no": "No"
     }

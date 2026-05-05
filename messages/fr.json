@@ -5369,7 +5369,7 @@
     "digitalCashBookSubmenu": "Livre de caisse numérique",
     "logoutSoftwareConfirm": {
       "title": "Fermer le logiciel ?",
-      "message": "Voulez-vous vraiment fermer le logiciel ? Vous serez déconnecté et les fenêtres ouvertes se fermeront si votre navigateur l’autorise.",
+      "message": "Lors de la déconnexion : êtes-vous sûr de vouloir fermer le logiciel ?\n\n• Vérifiez que vos employés sont bien déconnectés.\n• Avez-vous enregistré votre rapport Z ?\n• Contrôlez vos ventes.",
       "yes": "Oui",
       "no": "Non"
     }

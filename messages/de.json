@@ -5369,7 +5369,7 @@
     "digitalCashBookSubmenu": "Digitales Kassenbuch",
     "logoutSoftwareConfirm": {
       "title": "Software beenden?",
-      "message": "Möchten Sie die Software wirklich beenden? Sie werden abgemeldet und geöffnete Fenster werden geschlossen, sofern Ihr Browser dies zulässt.",
+      "message": "Beim Abmelden: Möchten Sie die Software wirklich beenden?\n\n• Prüfen Sie, ob Ihre Mitarbeitenden abgemeldet sind.\n• Haben Sie Ihren Z-Bericht gespeichert?\n• Überprüfen Sie Ihre Verkäufe.",
       "yes": "Ja",
       "no": "Nein"
     }

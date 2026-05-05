@@ -5303,7 +5303,7 @@
     "digitalCashBookSubmenu": "Digitaal kasboek",
     "logoutSoftwareConfirm": {
       "title": "Software afsluiten?",
-      "message": "Bent u zeker dat u de software wilt afsluiten? U wordt afgemeld en open schermen worden gesloten voor zover uw browser dit toestaat.",
+      "message": "Bij uitloggen: bent u zeker dat u de software wilt afsluiten?\n\n• Controleer of uw medewerkers zijn uitgelogd.\n• Heeft u uw Z-rapport opgeslagen?\n• Kijk uw verkopen na.",
       "yes": "Ja",
       "no": "Nee"
     }

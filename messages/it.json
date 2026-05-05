@@ -5346,7 +5346,7 @@
     "digitalCashBookSubmenu": "Libro cassa digitale",
     "logoutSoftwareConfirm": {
       "title": "Chiudere il software?",
-      "message": "Vuoi davvero chiudere il software? Verrai disconnesso e le finestre aperte si chiuderanno se il browser lo consente.",
+      "message": "In caso di disconnessione: sei sicuro di voler chiudere il software?\n\n• Verifica che i colleghi abbiano terminato la sessione.\n• Hai salvato il rapporto Z?\n• Controlla le vendite.",
       "yes": "Sì",
       "no": "No"
     }

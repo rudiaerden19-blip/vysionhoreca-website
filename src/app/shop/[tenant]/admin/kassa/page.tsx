@@ -2288,23 +2288,23 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         <div className="flex-1 min-h-0 overflow-y-auto px-3 pt-2 flex flex-col touch-pan-y">
           {cart.length === 0 ? (
             <div className="flex flex-col flex-1 min-h-0">
-              <div className="mb-3 flex items-center gap-2 rounded-xl bg-[#e3e3e3] px-2 py-1.5">
+              <div className="mb-3 flex items-center gap-2.5 rounded-xl bg-[#e3e3e3] px-2.5 py-2">
                 {tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? (
                   <button
                     type="button"
                     onClick={openStaffClockModal}
-                    className="shrink-0 rounded-lg bg-white p-0.5 shadow-md border border-slate-300 hover:border-[#3C4D6B] hover:bg-slate-50 active:scale-[0.98] transition-all"
+                    className="shrink-0 rounded-xl bg-white p-1 shadow-md border border-slate-300 hover:border-[#3C4D6B] hover:bg-slate-50 active:scale-[0.98] transition-all"
                     title={t('staffClock.buttonTitle')}
                     aria-label={t('staffClock.buttonTitle')}
                   >
-                    <KassaAnalogClock size={58} />
+                    <KassaAnalogClock size={72} />
                   </button>
                 ) : null}
                 <div
                   className={`min-w-0 flex flex-col justify-center gap-0.5 ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1' : 'w-full'}`}
                 >
                   <p
-                    className="truncate whitespace-nowrap text-right text-[10px] font-semibold leading-none tracking-tight text-gray-700 sm:text-[11px]"
+                    className="truncate whitespace-nowrap text-right text-xs font-semibold leading-tight tracking-tight text-gray-700 sm:text-sm"
                     title={numpadHeaderDateLabel}
                     aria-live="polite"
                   >
@@ -2351,21 +2351,21 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           ) : (
               <div className="space-y-2">
               <div
-                className={`flex items-center gap-2 rounded-xl bg-[#e3e3e3] px-2 py-1.5 ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? '' : 'justify-end'}`}
+                className={`flex items-center gap-2.5 rounded-xl bg-[#e3e3e3] px-2.5 py-2 ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? '' : 'justify-end'}`}
               >
                 {tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? (
                   <button
                     type="button"
                     onClick={openStaffClockModal}
-                    className="shrink-0 rounded-lg bg-white p-0.5 shadow-sm border border-slate-300 hover:border-[#3C4D6B] active:scale-[0.98] transition-all"
+                    className="shrink-0 rounded-xl bg-white p-1 shadow-sm border border-slate-300 hover:border-[#3C4D6B] active:scale-[0.98] transition-all"
                     title={t('staffClock.buttonTitle')}
                     aria-label={t('staffClock.buttonTitle')}
                   >
-                    <KassaAnalogClock size={54} />
+                    <KassaAnalogClock size={64} />
                   </button>
                 ) : null}
                 <p
-                  className={`min-w-0 truncate whitespace-nowrap text-right text-[10px] font-semibold leading-none tracking-tight text-gray-700 sm:text-[11px] ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1' : 'w-full'}`}
+                  className={`min-w-0 truncate whitespace-nowrap text-right text-xs font-semibold leading-tight tracking-tight text-gray-700 sm:text-sm ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1' : 'w-full'}`}
                   title={numpadHeaderDateLabel}
                   aria-live="polite"
                 >

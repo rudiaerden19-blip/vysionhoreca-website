@@ -5346,7 +5346,7 @@
     "digitalCashBookSubmenu": "电子现金账簿",
     "logoutSoftwareConfirm": {
       "title": "关闭软件？",
-      "message": "确定要关闭软件吗？您将退出登录；若浏览器允许，将尝试关闭已打开的窗口。",
+      "message": "退出登录时：您确定要关闭软件吗？\n\n• 请确认您的员工已全部退出。\n• 您是否已保存 Z 报表？\n• 请核对您的销售额。",
       "yes": "是",
       "no": "否"
     }

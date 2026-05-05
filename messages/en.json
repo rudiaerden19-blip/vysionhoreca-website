@@ -5303,7 +5303,7 @@
     "digitalCashBookSubmenu": "Digital cash book",
     "logoutSoftwareConfirm": {
       "title": "Close the software?",
-      "message": "Are you sure you want to close the software? You will be signed out and open windows will close if your browser allows it.",
+      "message": "When logging out: are you sure you want to close the software?\n\n• Check that your staff members are logged out.\n• Have you saved your Z report?\n• Review your sales.",
       "yes": "Yes",
       "no": "No"
     }
