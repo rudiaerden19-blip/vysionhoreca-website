@@ -46,23 +46,31 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [isHydrated, setIsHydrated] = useState(false)
 
   useEffect(() => {
-    // Check localStorage for saved language preference
-    const savedLocale = localStorage.getItem('vysion_locale') as Locale | null
-    if (savedLocale && locales.includes(savedLocale)) {
-      setLocaleState(savedLocale)
-    } else {
-      // Try to detect browser language
-      const browserLang = navigator.language.split('-')[0] as Locale
-      if (locales.includes(browserLang)) {
-        setLocaleState(browserLang)
+    try {
+      const savedLocale = localStorage.getItem('vysion_locale') as Locale | null
+      if (savedLocale && locales.includes(savedLocale)) {
+        setLocaleState(savedLocale)
+      } else {
+        const raw = typeof navigator !== 'undefined' ? navigator.language : ''
+        const browserLang = (raw.split('-')[0] || '') as Locale
+        if (browserLang && locales.includes(browserLang)) {
+          setLocaleState(browserLang)
+        }
       }
+    } catch {
+      /* private mode / storage blocked: blijf op defaultLocale */
+    } finally {
+      setIsHydrated(true)
     }
-    setIsHydrated(true)
   }, [])
 
   const setLocale = (newLocale: Locale) => {
     setLocaleState(newLocale)
-    localStorage.setItem('vysion_locale', newLocale)
+    try {
+      localStorage.setItem('vysion_locale', newLocale)
+    } catch {
+      /* private mode */
+    }
     // Update document direction for RTL languages
     document.documentElement.dir = newLocale === 'ar' ? 'rtl' : 'ltr'
     document.documentElement.lang = newLocale
@@ -93,25 +101,21 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     return typeof value === 'string' ? value : key
   }
 
-  // Hide content until language is loaded from localStorage to prevent flash
-  if (!isHydrated) {
-    return (
-      <div style={{ visibility: 'hidden', minHeight: '100vh' }}>
+  // Altijd Provider: voorheen rendeerden we kinderen zónder Provider tot hydration → useLanguage()
+  // viel op de SSR-fallback (setLocale no-op) en taalkiezers werkten niet.
+  return (
+    <LanguageContext.Provider value={{
+      locale,
+      setLocale,
+      t,
+      locales,
+      localeNames,
+      localeFlags,
+    }}>
+      {/* Flash vermijden tot voorkeur uit storage gelezen is */}
+      <div style={{ visibility: isHydrated ? 'visible' : 'hidden', minHeight: '100vh' }}>
         {children}
       </div>
-    )
-  }
-
-  return (
-    <LanguageContext.Provider value={{ 
-      locale, 
-      setLocale, 
-      t, 
-      locales, 
-      localeNames, 
-      localeFlags 
-    }}>
-      {children}
     </LanguageContext.Provider>
   )
 }
