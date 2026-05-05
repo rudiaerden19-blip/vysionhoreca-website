@@ -1,11 +1,24 @@
 import type { Locale } from '@/i18n/config'
 
 /**
- * Taal-badge (ISO-code alleen) — géén vlag-emoji: op Windows is dat vaak een leeg vakje.
- * Gebruik `className` voor contrast op lichte/donkere balk (bv. text-white op kassa-header).
+ * Taal-weergave: `badge` = duidelijke tegel met rand (admin/marketing).
+ * `inline` = alleen ISO-codetekst — op donkere balk naast bv. logout minder „dubbel vak”.
  */
-export function LocaleFlagEmoji({ locale, className }: { locale: Locale; className?: string }) {
+export function LocaleFlagEmoji({
+  locale,
+  className,
+  variant = 'badge',
+}: {
+  locale: Locale
+  className?: string
+  variant?: 'badge' | 'inline'
+}) {
   const code = locale.toUpperCase()
+  if (variant === 'inline') {
+    return (
+      <span className={`shrink-0 font-extrabold uppercase tracking-wide tabular-nums ${className ?? ''}`}>{code}</span>
+    )
+  }
   return (
     <span
       className={`inline-flex h-8 min-w-[2.75rem] shrink-0 items-center justify-center rounded-lg border border-current/30 bg-black/15 px-2 text-center text-[11px] font-extrabold uppercase leading-none tracking-wide sm:min-w-[3rem] sm:text-xs ${className ?? ''}`}

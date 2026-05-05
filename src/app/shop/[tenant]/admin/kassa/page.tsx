@@ -1791,10 +1791,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           </span>
         </div>
 
-        {/* ── Compacte tools: scrollt horizontaal indien nodig; uitlog staat hiernaast als vaste knop ── */}
-        <div
-          className="relative z-20 flex max-h-[68px] min-w-0 flex-[1.25] basis-0 flex-nowrap items-center justify-end gap-1 overflow-x-auto overflow-y-visible [-webkit-overflow-scrolling:touch] [scrollbar-width:thin]"
-        >
+        {/* ── Compacte tools: horizontaal scrollen alleen voor knoppen; taal staat erbuiten (overflow sneed dropdown af) ── */}
+        <div className="relative z-20 flex max-h-[68px] min-w-0 flex-[1.25] basis-0 items-center justify-end gap-1">
+          <div className="flex min-h-0 min-w-0 max-h-[68px] flex-1 flex-nowrap items-center justify-end gap-1 overflow-x-auto overflow-y-hidden [-webkit-overflow-scrolling:touch] [scrollbar-width:thin]">
 
           {effectiveAccess.reservaties && (
             <button
@@ -1877,13 +1876,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </div>
           )}
 
-          <div ref={langRef} className="relative z-20 shrink-0">
+          </div>
+
+          <div ref={langRef} className="relative z-[40] shrink-0">
             <button
               type="button"
+              aria-haspopup="listbox"
+              aria-expanded={langOpen}
+              aria-label={`${t('nav.language')}: ${localeNames[locale]}`}
               onClick={() => setLangOpen(o => !o)}
               className="inline-flex touch-manipulation items-center gap-1 whitespace-nowrap rounded-xl bg-white/10 px-2 py-2 font-medium text-white transition-colors hover:bg-white/20 sm:gap-2 sm:px-3"
             >
-              <LocaleFlagEmoji locale={locale} className="text-lg text-white sm:text-xl" />
+              <LocaleFlagEmoji locale={locale} variant="inline" className="text-sm text-white sm:text-[15px]" />
               <svg className={`size-4 shrink-0 transition-transform ${langOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
             </button>
             {langOpen && (
