@@ -1838,7 +1838,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <button
             type="button"
             onClick={toggleSound}
-            className={`inline-flex size-9 shrink-0 items-center justify-center rounded-lg text-xl transition-colors ${soundsOn ? 'bg-green-500/80 text-white' : 'bg-white/10 text-white/60'}`}
+            className={`inline-flex size-9 shrink-0 items-center justify-center rounded-lg text-xl transition-colors ${soundsOn ? 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]' : 'bg-white/10 text-white/60 hover:bg-white/20'}`}
             title={soundsOn ? t('kassaApp.soundOnTitle') : t('kassaApp.soundOffTitle')}
           >
             <span aria-hidden>{soundsOn ? '🔔' : '🔕'}</span>
@@ -1847,7 +1847,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           {isOnline !== null && (
             <div
               className={`inline-flex max-w-[10rem] shrink-0 items-center gap-1 rounded-lg px-2 py-1.5 text-[11px] font-bold leading-tight sm:max-w-none sm:text-xs ${
-                isOnline ? 'bg-emerald-600/95 text-white' : 'bg-red-600/95 text-white'
+                isOnline ? 'bg-[#3C4D6B] text-white' : 'bg-red-600/95 text-white'
               }`}
               title={isOnline ? t('kassaApp.onlineModeLiveTitle') : t('kassaApp.offlineModeActive')}
               role="status"
