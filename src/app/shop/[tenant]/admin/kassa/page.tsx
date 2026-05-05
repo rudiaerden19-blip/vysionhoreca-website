@@ -765,8 +765,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   // Laad categorieën, producten en welke producten opties hebben
   // Offline: laad uit localStorage-cache; online: laad van Supabase en update cache
-  const loadMenu = async () => {
-    setMenuLoading(true)
+  const loadMenu = async (opts?: { silent?: boolean }) => {
+    const silent = !!opts?.silent
+    if (!silent) setMenuLoading(true)
 
     // 1) IndexedDB (meest recente snapshot na eerdere sessie)
     try {
@@ -848,11 +849,28 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     prefetchProductImageUrls(urls).catch(() => {})
   }, [products, tenantInfo?.logo_url])
 
-  // Herlaad menu wanneer pagina weer focus krijgt (na terugkeren van producten/categorieen pagina)
+  // Tab terug naar voorgrond (Edge/Windows): menu verversen zonder heel het rooster te verbergen —
+  // forceren van menuLoading gaf ±1s "Laden…" bij elke tab-switch.
   useEffect(() => {
-    const onFocus = () => loadMenu()
+    let lastSilentAt = 0
+    const gapMs = 800
+    const refreshSilentThrottled = () => {
+      const now = Date.now()
+      if (now - lastSilentAt < gapMs) return
+      lastSilentAt = now
+      void loadMenu({ silent: true })
+    }
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') refreshSilentThrottled()
+    }
+    const onFocus = () => refreshSilentThrottled()
+    document.addEventListener('visibilitychange', onVisibility)
     window.addEventListener('focus', onFocus)
-    return () => window.removeEventListener('focus', onFocus)
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility)
+      window.removeEventListener('focus', onFocus)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- loadMenu is defined per render above; tenant remount resets listener
   }, [tenant])
 
   // Sound init
