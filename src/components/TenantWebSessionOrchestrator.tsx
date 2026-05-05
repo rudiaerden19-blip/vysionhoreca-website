@@ -11,10 +11,8 @@ import {
   clearShopCustomerSessionLocal,
   readTerminalLogout,
   setTerminalLogout,
-  type CustomerLogoutMessage,
   type OwnerLogoutMessage,
 } from '@/lib/session-broadcast'
-import { getTenantUrl } from '@/lib/tenant-url'
 
 /**
  * Uitloggen op één plaats: andere tabbladen mee opruimen (BroadcastChannel) + lokale „terminal logout”-
@@ -39,13 +37,6 @@ export function TenantWebSessionOrchestrator({ tenantSlug }: { tenantSlug: strin
 
     const p = pathname || ''
 
-    if (stamp.kind === 'customer') {
-      if (p === `/shop/${tenantSlug}/account/login` || p.endsWith('/account/login')) return
-      const path = getTenantUrl(tenantSlug, '/account/login')
-      window.location.replace(`${window.location.origin}${path.startsWith('/') ? path : '/'}`)
-      return
-    }
-
     /* staff zaak-session */
     if (p === '/login') return
     const origin = window.location.origin
@@ -60,18 +51,13 @@ export function TenantWebSessionOrchestrator({ tenantSlug }: { tenantSlug: strin
 
     try {
       bcCustomer = new BroadcastChannel(SHOP_CUSTOMER_LOGOUT_CHANNEL)
-      bcCustomer.onmessage = (ev: MessageEvent) => {
-        const slug =
-          typeof (ev.data as CustomerLogoutMessage | undefined)?.tenantSlug === 'string'
-            ? (ev.data as CustomerLogoutMessage).tenantSlug
-            : tenantSlug
-
-        setTerminalLogout({ kind: 'customer', tenantSlug: slug })
+      bcCustomer.onmessage = () => {
         clearShopCustomerSessionLocal()
-
-        const origin = window.location.origin
-        const path = getTenantUrl(slug, '/account/login')
-        window.location.replace(`${origin}${path.startsWith('/') ? path : '/'}`)
+        try {
+          window.location.replace('about:blank')
+        } catch {
+          window.location.href = 'about:blank'
+        }
       }
     } catch {
       /* geen ondersteuning */

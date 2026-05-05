@@ -1,6 +1,5 @@
 import { clearTenantOwnerSession } from '@/lib/auth-headers'
 import { clearSuperadminSessionCookies } from '@/lib/superadmin-cookies'
-import { getTenantUrl } from '@/lib/tenant-url'
 
 /** Andere tabbladen / webviews op zelfde origin — zelf gedrag bij uitloggen klant */
 export const SHOP_CUSTOMER_LOGOUT_CHANNEL = 'vysion-shop-customer-logout-v1'
@@ -20,11 +19,8 @@ export type OwnerLogoutMessage = {
   ts: number
 }
 
-/** Na uitloggen: volgende keren géén menu/Kassa meer totdan opnieuw ingelogd (PWA kan laatste URL heropenen). */
-export type TerminalLogoutStamp =
-  | { kind: 'customer'; tenantSlug: string }
-  | { kind: 'staff'; tenantSlug: string }
-  | { kind: 'superadmin' }
+/** Na uitloggen (alleen zaak/superadmin): volgende URL’s dwingen naar inlog tot opnieuw sessie. Klant-uitlog gebruikt géén stempel — leeg scherm via about:blank. */
+export type TerminalLogoutStamp = { kind: 'staff'; tenantSlug: string } | { kind: 'superadmin' }
 
 export function setTerminalLogout(stamp: TerminalLogoutStamp): void {
   if (typeof window === 'undefined') return
@@ -49,10 +45,19 @@ export function readTerminalLogout(): TerminalLogoutStamp | null {
   try {
     const raw = localStorage.getItem(TERMINAL_LOGOUT_KEY)
     if (!raw) return null
-    const o = JSON.parse(raw) as Partial<TerminalLogoutStamp> & Record<string, unknown>
-    if (o?.kind === 'superadmin') return { kind: 'superadmin' }
-    if ((o?.kind === 'customer' || o?.kind === 'staff') && typeof o.tenantSlug === 'string' && o.tenantSlug.trim()) {
-      return { kind: o.kind, tenantSlug: o.tenantSlug }
+    const o = JSON.parse(raw) as { kind?: string; tenantSlug?: string }
+    const kind = o?.kind
+    if (kind === 'superadmin') return { kind: 'superadmin' }
+    if (kind === 'staff' && typeof o.tenantSlug === 'string' && o.tenantSlug.trim()) {
+      return { kind: 'staff', tenantSlug: o.tenantSlug }
+    }
+    if (kind === 'customer') {
+      try {
+        localStorage.removeItem(TERMINAL_LOGOUT_KEY)
+      } catch {
+        /* ignore */
+      }
+      return null
     }
     return null
   } catch {
@@ -88,15 +93,19 @@ export function broadcastShopCustomerLogout(tenantSlug: string): void {
   }
 }
 
-/** Klant uitloggen: terminal-stempel + alle tabs + zelfde scherm → account-inlog. */
+/**
+ * Klant uitloggen: alles lokaal weg, andere tabbladen sluiten naar leeg document (geen inlog-UI).
+ * Web/PWA kan het OS-proces niet doden; dit is het maximale “niets meer tonen” binnen dezelfde tab.
+ */
 export function redirectCustomerLogoutUI(tenantSlug: string): void {
   if (typeof window === 'undefined') return
-  setTerminalLogout({ kind: 'customer', tenantSlug })
   broadcastShopCustomerLogout(tenantSlug)
   clearShopCustomerSessionLocal()
-  const origin = window.location.origin
-  const path = getTenantUrl(tenantSlug, '/account/login')
-  window.location.replace(`${origin}${path.startsWith('/') ? path : '/'}`)
+  try {
+    window.location.replace('about:blank')
+  } catch {
+    window.location.href = 'about:blank'
+  }
 }
 
 /** Superadmin + zaak-headers wissen (admin-menu «Uitloggen»). */

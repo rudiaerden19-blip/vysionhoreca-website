@@ -12,7 +12,7 @@ import {
   isSuperAdminLoggedIn,
 } from '@/lib/auth-headers'
 import { clearTerminalLogout, readTerminalLogout } from '@/lib/session-broadcast'
-import { getCurrentTenantSlug as tenantSlugFromLocation, getTenantUrl } from '@/lib/tenant-url'
+import { getCurrentTenantSlug as tenantSlugFromLocation } from '@/lib/tenant-url'
 import {
   withPublicDemoSearchOnKassaPath,
   isMarketingDemoTenantSlug,
@@ -55,11 +55,6 @@ export default function LoginPage() {
     const term = readTerminalLogout()
     if (term?.kind === 'superadmin') {
       window.location.replace(`${origin}/superadmin/login`)
-      return
-    }
-    if (term?.kind === 'customer' && term.tenantSlug) {
-      const path = getTenantUrl(term.tenantSlug, '/account/login')
-      window.location.replace(`${origin}${path.startsWith('/') ? path : '/'}`)
       return
     }
 
