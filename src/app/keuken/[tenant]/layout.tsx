@@ -1,6 +1,7 @@
 import type { Viewport } from 'next'
 import type { ReactNode } from 'react'
 import { TENANT_APP_SHELL_THEME_COLOR } from '@/lib/theme-color'
+import { TenantWebSessionOrchestrator } from '@/components/TenantWebSessionOrchestrator'
 
 export async function generateViewport(): Promise<Viewport> {
   return {
@@ -11,6 +12,17 @@ export async function generateViewport(): Promise<Viewport> {
   }
 }
 
-export default function KeukenTenantLayout({ children }: { children: ReactNode }) {
-  return children
+export default function KeukenTenantLayout({
+  children,
+  params,
+}: {
+  children: ReactNode
+  params: { tenant: string }
+}) {
+  return (
+    <>
+      <TenantWebSessionOrchestrator tenantSlug={params.tenant} />
+      {children}
+    </>
+  )
 }

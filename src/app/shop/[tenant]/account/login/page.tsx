@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { getTenantSettings, loginCustomer, TenantSettings } from '@/lib/admin-api'
 import { assignTenantHref } from '@/lib/tenant-url'
+import { clearTerminalLogout } from '@/lib/session-broadcast'
 import { useLanguage } from '@/i18n'
 
 export default function LoginPage({ params }: { params: { tenant: string } }) {
@@ -44,6 +45,7 @@ export default function LoginPage({ params }: { params: { tenant: string } }) {
     const result = await loginCustomer(params.tenant, email, password)
     
     if (result.success && result.customer) {
+      clearTerminalLogout()
       localStorage.setItem(`customer_${params.tenant}`, result.customer.id!)
       assignTenantHref(params.tenant, '/account')
     } else {

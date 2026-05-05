@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { getTenantSettings, getCustomer, getCustomerOrders, updateCustomer, getLoyaltyRewards, redeemReward, deleteCustomerAccount, Customer, Order, TenantSettings, LoyaltyReward } from '@/lib/admin-api'
 import { assignTenantHref } from '@/lib/tenant-url'
-import { broadcastShopCustomerLogout, clearShopCustomerSessionLocal } from '@/lib/session-broadcast'
+import { redirectCustomerLogoutUI } from '@/lib/session-broadcast'
 import { useLanguage } from '@/i18n'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 
@@ -73,9 +73,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
   }
 
   const handleLogout = () => {
-    clearShopCustomerSessionLocal()
-    broadcastShopCustomerLogout()
-    assignTenantHref(params.tenant, '/', { replace: true })
+    redirectCustomerLogoutUI(params.tenant)
   }
 
   // GDPR: Account verwijderen
@@ -86,10 +84,8 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
     const success = await deleteCustomerAccount(customer.id!, params.tenant)
     
     if (success) {
-      clearShopCustomerSessionLocal()
-      broadcastShopCustomerLogout()
       alert(t('accountPage.accountDeleted'))
-      assignTenantHref(params.tenant, '/', { replace: true })
+      redirectCustomerLogoutUI(params.tenant)
     } else {
       alert(t('accountPage.deleteError'))
     }

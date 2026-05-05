@@ -11,7 +11,8 @@ import {
   internalShopPathToTenantHostPath,
   isSuperAdminLoggedIn,
 } from '@/lib/auth-headers'
-import { getCurrentTenantSlug as tenantSlugFromLocation } from '@/lib/tenant-url'
+import { clearTerminalLogout, readTerminalLogout } from '@/lib/session-broadcast'
+import { getCurrentTenantSlug as tenantSlugFromLocation, getTenantUrl } from '@/lib/tenant-url'
 import {
   withPublicDemoSearchOnKassaPath,
   isMarketingDemoTenantSlug,
@@ -50,6 +51,18 @@ export default function LoginPage() {
   // Niet doen op ander tenant-subdomein met `next` naar frituurnolim (anders blijft de gebruiker de login “kwijt”).
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return
+    const origin = window.location.origin
+    const term = readTerminalLogout()
+    if (term?.kind === 'superadmin') {
+      window.location.replace(`${origin}/superadmin/login`)
+      return
+    }
+    if (term?.kind === 'customer' && term.tenantSlug) {
+      const path = getTenantUrl(term.tenantSlug, '/account/login')
+      window.location.replace(`${origin}${path.startsWith('/') ? path : '/'}`)
+      return
+    }
+
     const params = new URLSearchParams(window.location.search)
     const nextRaw = params.get('next')
 
@@ -183,6 +196,7 @@ export default function LoginPage() {
       }
 
       persistTenantSessionWithToday(tenant as Record<string, unknown>)
+      clearTerminalLogout()
 
       const safeNext = normalizeLoginNextPath(nextParam, tenant.tenant_slug)
       const fallbackAfterLogin = `/shop/${tenant.tenant_slug}/admin`

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { writeSuperadminSessionCookies } from '@/lib/superadmin-cookies'
+import { clearTerminalLogout } from '@/lib/session-broadcast'
 
 export default function SuperAdminLogin() {
   const router = useRouter()
@@ -38,6 +39,7 @@ export default function SuperAdminLogin() {
       localStorage.setItem('superadmin_email', data.admin.email)
       localStorage.setItem('superadmin_name', data.admin.name)
       writeSuperadminSessionCookies(data.admin.id, data.admin.email, data.admin.name || '')
+      clearTerminalLogout()
 
       const nextHandoff =
         typeof window !== 'undefined'

@@ -12,6 +12,7 @@ import {
 import {
   applyFullStaffLogoutCleanup,
   broadcastTenantOwnerLogout,
+  setTerminalLogout,
   type OwnerLogoutLanding,
 } from '@/lib/session-broadcast'
 
@@ -41,6 +42,11 @@ export function AccountMenuSessionBlock({
     const landing: OwnerLogoutLanding =
       superHere && !ownerHere ? 'superadmin-login' : 'tenant-login'
     applyFullStaffLogoutCleanup()
+    if (landing === 'superadmin-login') {
+      setTerminalLogout({ kind: 'superadmin' })
+    } else {
+      setTerminalLogout({ kind: 'staff', tenantSlug })
+    }
     broadcastTenantOwnerLogout({ scope: 'full', tenantSlug, landing })
     onClose()
     const origin = window.location.origin
