@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { useMemo } from 'react'
 import { useLanguage } from '@/i18n'
 import {
@@ -9,7 +9,11 @@ import {
   isOwnerSessionForTenant,
   isSuperAdminLoggedIn,
 } from '@/lib/auth-headers'
-import { clearSuperadminSessionCookies } from '@/lib/superadmin-cookies'
+import {
+  applyFullStaffLogoutCleanup,
+  broadcastTenantOwnerLogout,
+  type OwnerLogoutLanding,
+} from '@/lib/session-broadcast'
 
 /**
  * Onder Account in het admin-/kassa-hamburgermenu: Inloggen of Uitloggen.
@@ -22,7 +26,6 @@ export function AccountMenuSessionBlock({
   onClose: () => void
 }) {
   const { t } = useLanguage()
-  const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const searchKey = searchParams.toString()
@@ -35,20 +38,17 @@ export function AccountMenuSessionBlock({
   const superHere = typeof window !== 'undefined' && isSuperAdminLoggedIn()
 
   const handleLogout = () => {
-    const superOnly = superHere && !ownerHere
-    try {
-      localStorage.removeItem('vysion_tenant')
-      localStorage.removeItem('superadmin_id')
-      localStorage.removeItem('superadmin_email')
-      localStorage.removeItem('superadmin_name')
-      clearSuperadminSessionCookies()
-      sessionStorage.removeItem(`vysion_pin_unlocked_${tenantSlug}`)
-    } catch {
-      /* ignore */
-    }
+    const landing: OwnerLogoutLanding =
+      superHere && !ownerHere ? 'superadmin-login' : 'tenant-login'
+    applyFullStaffLogoutCleanup()
+    broadcastTenantOwnerLogout({ scope: 'full', tenantSlug, landing })
     onClose()
-    router.push(superOnly ? '/superadmin/login' : loginReturnHref)
-    router.refresh()
+    const origin = window.location.origin
+    if (landing === 'superadmin-login') {
+      window.location.replace(`${origin}/superadmin/login`)
+    } else {
+      window.location.replace(`${origin}${loginReturnHref}`)
+    }
   }
 
   return (

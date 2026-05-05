@@ -53,6 +53,10 @@ import {
 } from '@/lib/demo-links'
 import { buildShopInternalReturnPath } from '@/lib/auth-headers'
 import {
+  applyOwnerOnlyLogoutCleanup,
+  broadcastTenantOwnerLogout,
+} from '@/lib/session-broadcast'
+import {
   isDuplicateKassaClientUuidError,
   isLikelyOfflineOrNetworkSupabaseError,
 } from '@/lib/kassa-supabase-guards'
@@ -1486,19 +1490,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('vysion_tenant')
-    try {
-      sessionStorage.removeItem(`vysion_welcomed_${tenant}`)
-      sessionStorage.removeItem(`vysion_kassa_audio_ok_${tenant}`)
-      sessionStorage.removeItem(`vysion_audio_activated_${tenant}`)
-    } catch { /* ignore */ }
     if (demoViewOnly) {
       clearPublicDemoSession()
-      window.location.href = `/shop/${tenant}/admin/kassa?demo=bekijk`
+      window.location.replace(`/shop/${tenant}/admin/kassa?demo=bekijk`)
       return
     }
+    applyOwnerOnlyLogoutCleanup(tenant)
+    broadcastTenantOwnerLogout({ scope: 'owner', tenantSlug: tenant, landing: 'tenant-login' })
     const next = buildShopInternalReturnPath(tenant, window.location.pathname, window.location.search)
-    window.location.href = `/login?next=${encodeURIComponent(next)}`
+    window.location.replace(`${window.location.origin}/login?next=${encodeURIComponent(next)}`)
   }
 
   const staffClockErrorText = (code: string) => {

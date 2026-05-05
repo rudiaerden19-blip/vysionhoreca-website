@@ -2,6 +2,7 @@ import type { Viewport } from 'next'
 import type { ReactNode } from 'react'
 import { TENANT_APP_SHELL_THEME_COLOR } from '@/lib/theme-color'
 import { InstallPWABanner } from '@/components/InstallPWABanner'
+import { ShopTenantSessionBroadcastListener } from '@/components/ShopTenantSessionBroadcastListener'
 
 export async function generateViewport(): Promise<Viewport> {
   return {
@@ -12,9 +13,16 @@ export async function generateViewport(): Promise<Viewport> {
   }
 }
 
-export default function ShopTenantLayout({ children }: { children: ReactNode }) {
+export default function ShopTenantLayout({
+  children,
+  params,
+}: {
+  children: ReactNode
+  params: { tenant: string }
+}) {
   return (
     <>
+      <ShopTenantSessionBroadcastListener tenantSlug={params.tenant} />
       <InstallPWABanner />
       {children}
     </>
