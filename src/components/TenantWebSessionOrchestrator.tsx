@@ -15,6 +15,7 @@ import {
   setTerminalLogout,
   type OwnerLogoutMessage,
 } from '@/lib/session-broadcast'
+import { appendKassaCloseTipToAbsoluteLoginUrl } from '@/lib/shop-login-kassa-tip'
 
 /**
  * Uitloggen op één plaats: andere tabbladen mee opruimen (BroadcastChannel) + lokale „terminal logout”-
@@ -85,7 +86,7 @@ export function TenantWebSessionOrchestrator({ tenantSlug }: { tenantSlug: strin
         const next = buildShopInternalReturnPath(d.tenantSlug, window.location.pathname, search)
         const loginUrl = `${origin}/login?next=${encodeURIComponent(next)}`
         attemptCloseThenOrNavigate(() => {
-          window.location.replace(loginUrl)
+          window.location.replace(appendKassaCloseTipToAbsoluteLoginUrl(loginUrl))
         })
       }
     } catch {

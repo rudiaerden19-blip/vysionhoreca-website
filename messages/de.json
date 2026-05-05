@@ -664,6 +664,10 @@
       "title": "Probleme bei der Anmeldung?",
       "subtitle": "Lesen Sie unsere Fehlerbehebungsanleitung"
     },
+    "kassaCloseHint": {
+      "message": "Tippen Sie oben rechts auf das Kreuz, um Ihre Kasse zu schließen.",
+      "understood": "Verstanden"
+    },
     "copyright": "Alle Rechte vorbehalten."
   },
   "register": {

@@ -664,6 +664,10 @@
       "title": "登录遇到问题？",
       "subtitle": "查看我们的故障排除指南"
     },
+    "kassaCloseHint": {
+      "message": "请点击右上角的关闭交叉按钮退出收银应用。",
+      "understood": "知道了"
+    },
     "copyright": "版权所有。"
   },
   "register": {

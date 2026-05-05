@@ -17,6 +17,9 @@ import {
   type OwnerLogoutLanding,
 } from '@/lib/session-broadcast'
 import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
+import {
+  appendKassaCloseTipToLoginPathHref,
+} from '@/lib/shop-login-kassa-tip'
 
 /**
  * Onder Account in het admin-/kassa-hamburgermenu: Inloggen of Uitloggen.
@@ -59,7 +62,7 @@ export function AccountMenuSessionBlock({
       })
     } else {
       attemptCloseThenOrNavigate(() => {
-        window.location.replace(`${origin}${loginReturnHref}`)
+        window.location.replace(`${origin}${appendKassaCloseTipToLoginPathHref(loginReturnHref)}`)
       })
     }
   }

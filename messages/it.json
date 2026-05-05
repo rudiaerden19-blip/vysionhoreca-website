@@ -664,6 +664,10 @@
       "title": "Problemi di accesso?",
       "subtitle": "Consulta la nostra guida alla risoluzione dei problemi"
     },
+    "kassaCloseHint": {
+      "message": "In alto a destra tocca la croce per chiudere l’app cassa.",
+      "understood": "Ho capito"
+    },
     "copyright": "Tutti i diritti riservati."
   },
   "register": {

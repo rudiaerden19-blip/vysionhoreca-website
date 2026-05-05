@@ -64,6 +64,7 @@ import {
 } from '@/lib/kassa-supabase-guards'
 import { fetchOrderNumberByKassaClientUuid } from '@/lib/kassa-fetch-order-number'
 import { formatKassaNumpadHeaderDate } from '@/lib/format-kassa-header-date'
+import { appendKassaCloseTipToAbsoluteLoginUrl } from '@/lib/shop-login-kassa-tip'
 import { syncZReportAfterOrderSafe } from '@/lib/kassa-z-sync-safe'
 import { KassaAnalogClock } from '@/components/kassa/KassaAnalogClock'
 import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
@@ -1517,7 +1518,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const next = buildShopInternalReturnPath(tenant, window.location.pathname, window.location.search)
     const loginUrl = `${origin}/login?next=${encodeURIComponent(next)}`
     attemptCloseThenOrNavigate(() => {
-      window.location.replace(loginUrl)
+      window.location.replace(appendKassaCloseTipToAbsoluteLoginUrl(loginUrl))
     })
   }
 

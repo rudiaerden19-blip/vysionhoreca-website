@@ -664,6 +664,10 @@
       "title": "Problèmes de connexion?",
       "subtitle": "Consultez notre guide de dépannage"
     },
+    "kassaCloseHint": {
+      "message": "En haut à droite, appuyez sur la croix pour fermer votre caisse.",
+      "understood": "Compris"
+    },
     "copyright": "Tous droits réservés."
   },
   "register": {

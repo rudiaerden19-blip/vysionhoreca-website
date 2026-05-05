@@ -945,6 +945,10 @@
       "title": "Problems logging in?",
       "subtitle": "Check our troubleshooting guide"
     },
+    "kassaCloseHint": {
+      "message": "Tap the cross at the top right to close your register app.",
+      "understood": "Understood"
+    },
     "copyright": "All rights reserved."
   },
   "register": {

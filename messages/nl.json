@@ -945,6 +945,10 @@
       "title": "Problemen met inloggen?",
       "subtitle": "Bekijk onze troubleshooting gids"
     },
+    "kassaCloseHint": {
+      "message": "Druk bovenaan rechts op het kruisje om uw kassa af te sluiten.",
+      "understood": "Begrepen"
+    },
     "copyright": "Alle rechten voorbehouden."
   },
   "register": {

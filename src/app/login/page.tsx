@@ -20,6 +20,8 @@ import {
 } from '@/lib/demo-links'
 import { mirrorSuperadminSessionFromCookieToLocalStorage } from '@/lib/superadmin-cookies'
 import { LocaleFlagEmoji, LocaleFlagWithCode } from '@/components/LocaleFlagEmoji'
+import { LoginKassaCloseHintModal } from '@/components/LoginKassaCloseHintModal'
+import { LOGIN_QUERY_KASSA_CLOSE_TIP } from '@/lib/shop-login-kassa-tip'
 
 /** Zelfde hosts als middleware `exactMainDomains` (+ dev): sessie blijft in localStorage van dit domein. */
 function stayOnMainDomainForShopSession(hostname: string): boolean {
@@ -44,6 +46,7 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [isLangOpen, setIsLangOpen] = useState(false)
   const langRef = useRef<HTMLDivElement>(null)
+  const [showKassaCloseHint, setShowKassaCloseHint] = useState(false)
 
   // Superadmin: gedeelde cookie → mirror in isSuperAdminLoggedIn; direct door naar `next` zonder zaak-wachtwoord.
   // (Zonder dit bleef het tenant-loginformulier zichtbaar tot je handmatig logt.)
@@ -111,6 +114,21 @@ export default function LoginPage() {
     }
     window.location.replace(fixed)
   }, [router])
+
+  /** Na uitloggen POS: `?kassa_sluit_tip=1` — popup over venster sluiten. */
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const p = new URLSearchParams(window.location.search)
+    setShowKassaCloseHint(p.get(LOGIN_QUERY_KASSA_CLOSE_TIP) === '1')
+  }, [])
+
+  const dismissKassaCloseHint = () => {
+    setShowKassaCloseHint(false)
+    const p = new URLSearchParams(window.location.search)
+    p.delete(LOGIN_QUERY_KASSA_CLOSE_TIP)
+    const q = p.toString()
+    router.replace(`/login${q ? `?${q}` : ''}`)
+  }
 
   // Read language from URL parameter on mount
   useEffect(() => {
@@ -215,6 +233,7 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen flex flex-col bg-[#e3e3e3]">
+      <LoginKassaCloseHintModal open={showKassaCloseHint} onDismiss={dismissKassaCloseHint} />
       {/* Header */}
       <header className="p-6 flex items-center justify-between">
         <Link href="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">

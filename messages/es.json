@@ -664,6 +664,10 @@
       "title": "¿Problemas para iniciar sesión?",
       "subtitle": "Consulta nuestra guía de solución de problemas"
     },
+    "kassaCloseHint": {
+      "message": "Arriba a la derecha, pulse la cruz para cerrar la aplicación de caja.",
+      "understood": "Entendido"
+    },
     "copyright": "Todos los derechos reservados."
   },
   "register": {
