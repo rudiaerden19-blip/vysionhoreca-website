@@ -1,7 +1,6 @@
 import type { Viewport } from 'next'
 import type { ReactNode } from 'react'
 import { TENANT_APP_SHELL_THEME_COLOR } from '@/lib/theme-color'
-import { InstallPWABanner } from '@/components/InstallPWABanner'
 
 export async function generateViewport(): Promise<Viewport> {
   return {
@@ -12,11 +11,6 @@ export async function generateViewport(): Promise<Viewport> {
   }
 }
 
-export default function ShopTenantLayout({ children }: { children: ReactNode }) {
-  return (
-    <>
-      <InstallPWABanner />
-      {children}
-    </>
-  )
+export default function KeukenTenantLayout({ children }: { children: ReactNode }) {
+  return children
 }

@@ -1708,7 +1708,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* ── LINKS: hamburger ── */}
         <div className="relative z-20 flex shrink-0 items-center gap-2">
           <button onClick={() => { setHamburgerOpen(!hamburgerOpen); setHamburgerSubOpen(null) }}
-            className={`flex items-center gap-2 rounded-xl px-3 py-2 transition-colors ${hamburgerOpen ? 'bg-[#2D3A52] text-white' : 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'}`}>
+            className={`flex items-center gap-2 rounded-xl px-3 py-2 transition-colors ${hamburgerOpen ? 'bg-orange-600 text-white' : 'bg-orange-500 text-white hover:bg-orange-400'}`}>
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
             <span className="font-bold text-sm">{t('kassaApp.hamburgerMenu')}</span>
           </button>

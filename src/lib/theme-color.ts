@@ -16,3 +16,6 @@ export function normalizeThemeColorHex(input: string | null | undefined, fallbac
   }
   return fallback
 }
+
+/** Vaste `theme-color` voor shop-, kassa- en keukenroutes: donkerblauw i.p.v. tenant primary (vaak oranje). */
+export const TENANT_APP_SHELL_THEME_COLOR = '#3C4D6B' as const
