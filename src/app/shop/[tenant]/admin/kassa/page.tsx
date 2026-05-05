@@ -2393,11 +2393,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <span className="font-bold text-[#3C4D6B] text-2xl">€{total.toFixed(2)}</span>
           </div>
           <div className="grid grid-cols-3 gap-2">
-            <button className="flex flex-col items-center gap-1 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl transition-colors">
+            <button className="flex flex-col items-center gap-1 rounded-xl bg-[#3C4D6B] py-3 text-white transition-colors hover:bg-[#2D3A52]">
               <span className="text-xl">💰</span>
               <span className="text-xs font-semibold">{t('kassaApp.drawerOpen')}</span>
             </button>
-            <button className="flex flex-col items-center gap-1 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl transition-colors">
+            <button className="flex flex-col items-center gap-1 rounded-xl bg-[#3C4D6B] py-3 text-white transition-colors hover:bg-[#2D3A52]">
               <span className="text-xl">🖨️</span>
               <span className="text-xs font-semibold">{t('kassaApp.printAgain')}</span>
             </button>
