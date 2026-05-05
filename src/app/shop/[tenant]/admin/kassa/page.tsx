@@ -1832,7 +1832,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 setNewReservAlert(null)
                 setShowReservations(true)
               }}
-              className="relative inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-xl bg-white/10 px-2 py-2 text-xs font-bold text-white transition-colors hover:bg-white/20 sm:gap-1.5 sm:px-3 sm:text-sm"
+              className="relative inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-xl bg-[#58CCFF] px-2 py-2 text-xs font-bold text-[#063042] transition-colors hover:bg-[#47c6fe] sm:gap-1.5 sm:px-3 sm:text-sm"
             >
               <span className="text-base sm:text-lg" aria-hidden>📅</span>
               <span>{t('kassaApp.navReservations')}</span>
@@ -1847,7 +1847,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           {effectiveAccess['online-bestellingen'] && (
             <Link
               href={`/shop/${tenant}/display`}
-              className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-xl bg-white/10 px-2 py-2 text-xs font-bold text-white transition-colors hover:bg-white/20 sm:gap-1.5 sm:px-3 sm:text-sm"
+              className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-xl bg-[#58CCFF] px-2 py-2 text-xs font-bold text-[#063042] transition-colors hover:bg-[#47c6fe] sm:gap-1.5 sm:px-3 sm:text-sm"
             >
               <span className="text-base sm:text-lg" aria-hidden>🖥️</span>
               <span>{t('kassaApp.navShopDisplay')}</span>
@@ -1857,7 +1857,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           {effectiveAccess['online-bestellingen'] && (
             <Link
               href={`/keuken/${tenant}`}
-              className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-xl bg-white/10 px-2 py-2 text-xs font-bold text-white transition-colors hover:bg-white/20 sm:gap-1.5 sm:px-3 sm:text-sm"
+              className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-xl bg-[#58CCFF] px-2 py-2 text-xs font-bold text-[#063042] transition-colors hover:bg-[#47c6fe] sm:gap-1.5 sm:px-3 sm:text-sm"
             >
               <span className="text-base sm:text-lg" aria-hidden>👨‍🍳</span>
               <span>{t('kassaApp.navKitchenDisplay')}</span>
@@ -1867,7 +1867,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <button
             type="button"
             onClick={toggleSound}
-            className={`inline-flex size-9 shrink-0 items-center justify-center rounded-lg text-xl transition-colors ${soundsOn ? 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]' : 'bg-white/10 text-white/60 hover:bg-white/20'}`}
+            className={`inline-flex size-9 shrink-0 items-center justify-center rounded-lg text-xl transition-colors ${soundsOn ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]' : 'bg-[#58CCFF]/45 text-[#063042]/65 hover:bg-[#58CCFF]/65'}`}
             title={soundsOn ? t('kassaApp.soundOnTitle') : t('kassaApp.soundOffTitle')}
           >
             <span aria-hidden>{soundsOn ? '🔔' : '🔕'}</span>
@@ -1876,7 +1876,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           {isOnline !== null && (
             <div
               className={`inline-flex max-w-[10rem] shrink-0 items-center gap-1 rounded-lg px-2 py-1.5 text-[11px] font-bold leading-tight sm:max-w-none sm:text-xs ${
-                isOnline ? 'bg-[#3C4D6B] text-white' : 'bg-red-600/95 text-white'
+                isOnline ? 'bg-[#58CCFF] text-[#063042]' : 'bg-red-600/95 text-white'
               }`}
               title={isOnline ? t('kassaApp.onlineModeLiveTitle') : t('kassaApp.offlineModeActive')}
               role="status"
@@ -2315,8 +2315,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     key={key}
                     onClick={() => handleNumpad(key)}
                     className={`rounded-xl font-bold text-2xl transition-colors active:scale-95 shadow-sm ${
-                      key === 'C' ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
-                      : ['+','-','×','='].includes(key) ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
+                      key === 'C' ? 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
+                      : ['+','-','×','='].includes(key) ? 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
                       : 'bg-[#e3e3e3] text-black hover:bg-gray-200'
                     }`}
                   >
