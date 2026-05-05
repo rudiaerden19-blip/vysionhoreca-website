@@ -1888,20 +1888,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           )}
 
           {activeKassaStaff && !demoViewOnly && (
-            <div className="hidden max-w-[10rem] shrink-0 items-center gap-1.5 rounded-lg bg-emerald-600/90 px-2 py-1.5 text-xs font-bold text-white sm:flex md:max-w-xs">
+            <div className="hidden max-w-[10rem] shrink-0 items-center rounded-lg bg-emerald-600/90 px-2 py-1.5 text-xs font-bold text-white sm:flex md:max-w-xs">
               <span className="truncate" title={activeKassaStaff.name}>
                 🛒 {activeKassaStaff.name}
               </span>
-              <button
-                type="button"
-                onClick={() => {
-                  playClick()
-                  setActiveKassaStaff(null)
-                }}
-                className="shrink-0 rounded bg-white/20 px-1.5 py-0.5 hover:bg-white/30"
-              >
-                ×
-              </button>
             </div>
           )}
 
