@@ -53,6 +53,7 @@ import {
 } from '@/lib/demo-links'
 import { buildShopInternalReturnPath } from '@/lib/auth-headers'
 import {
+  attemptCloseThenOrNavigate,
   applyOwnerOnlyLogoutCleanup,
   broadcastTenantOwnerLogout,
   setTerminalLogout,
@@ -1501,8 +1502,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     applyOwnerOnlyLogoutCleanup(tenant)
     setTerminalLogout({ kind: 'staff', tenantSlug: tenant })
     broadcastTenantOwnerLogout({ scope: 'owner', tenantSlug: tenant, landing: 'tenant-login' })
+    const origin = window.location.origin
     const next = buildShopInternalReturnPath(tenant, window.location.pathname, window.location.search)
-    window.location.replace(`${window.location.origin}/login?next=${encodeURIComponent(next)}`)
+    const loginUrl = `${origin}/login?next=${encodeURIComponent(next)}`
+    attemptCloseThenOrNavigate(() => {
+      window.location.replace(loginUrl)
+    })
   }
 
   const staffClockErrorText = (code: string) => {

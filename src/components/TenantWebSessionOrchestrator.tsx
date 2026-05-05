@@ -9,6 +9,7 @@ import {
   applyFullStaffLogoutCleanup,
   applyOwnerOnlyLogoutCleanup,
   attemptCloseCurrentWebview,
+  attemptCloseThenOrNavigate,
   clearShopCustomerSessionLocal,
   readTerminalLogout,
   setTerminalLogout,
@@ -74,13 +75,18 @@ export function TenantWebSessionOrchestrator({ tenantSlug }: { tenantSlug: strin
 
         const origin = window.location.origin
         if (d.landing === 'superadmin-login') {
-          window.location.replace(`${origin}/superadmin/login`)
+          attemptCloseThenOrNavigate(() => {
+            window.location.replace(`${origin}/superadmin/login`)
+          })
           return
         }
 
         const search = window.location.search || ''
         const next = buildShopInternalReturnPath(d.tenantSlug, window.location.pathname, search)
-        window.location.replace(`${origin}/login?next=${encodeURIComponent(next)}`)
+        const loginUrl = `${origin}/login?next=${encodeURIComponent(next)}`
+        attemptCloseThenOrNavigate(() => {
+          window.location.replace(loginUrl)
+        })
       }
     } catch {
       /* geen ondersteuning */

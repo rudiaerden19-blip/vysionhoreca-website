@@ -10,6 +10,7 @@ import {
   isSuperAdminLoggedIn,
 } from '@/lib/auth-headers'
 import {
+  attemptCloseThenOrNavigate,
   applyFullStaffLogoutCleanup,
   broadcastTenantOwnerLogout,
   setTerminalLogout,
@@ -53,9 +54,13 @@ export function AccountMenuSessionBlock({
     onClose()
     const origin = window.location.origin
     if (landing === 'superadmin-login') {
-      window.location.replace(`${origin}/superadmin/login`)
+      attemptCloseThenOrNavigate(() => {
+        window.location.replace(`${origin}/superadmin/login`)
+      })
     } else {
-      window.location.replace(`${origin}${loginReturnHref}`)
+      attemptCloseThenOrNavigate(() => {
+        window.location.replace(`${origin}${loginReturnHref}`)
+      })
     }
   }
 

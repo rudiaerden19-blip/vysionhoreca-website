@@ -94,6 +94,15 @@ export function attemptCloseCurrentWebview(): void {
   }
 }
 
+/**
+ * Eerst venster sluiten (kiosk, popup, sommige PWA’s); blijft de tab open, dan pas `fallback` na korte delay.
+ * Zo zie je minder vaak het login-scherm bij “software afsluiten” dan bij directe `location.replace`.
+ */
+export function attemptCloseThenOrNavigate(fallback: () => void, delayMs = 420): void {
+  if (typeof window === 'undefined') return
+  attemptCloseCurrentWebview()
+  window.setTimeout(fallback, delayMs)
+}
 
 export type CustomerLogoutMessage = { type: 'customer-logout'; tenantSlug: string; ts: number }
 
