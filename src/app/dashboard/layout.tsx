@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useLanguage } from '@/i18n'
 import { Locale } from '@/i18n/config'
+import { LocaleFlagEmoji, LocaleFlagWithCode } from '@/components/LocaleFlagEmoji'
 import {
   isSuperAdminLoggedIn,
   isOwnerSessionFreshForTenant,
@@ -26,7 +27,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const langDropdownRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
   const router = useRouter()
-  const { t, locale, setLocale, locales, localeNames, localeFlags } = useLanguage()
+  const { t, locale, setLocale, locales, localeNames } = useLanguage()
   const menuTrans = (key: string) => t(`dashboard.menu.${key}`)
   const layoutTrans = (key: string) => t(`dashboardLayout.${key}`)
 
@@ -235,7 +236,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   onClick={() => setLangDropdownOpen(!langDropdownOpen)}
                   className="flex items-center gap-2 px-3 py-2 bg-[#0f0f0f] rounded-lg text-gray-300 hover:text-white transition-colors"
                 >
-                  <span className="text-xl">{localeFlags[locale]}</span>
+                  <LocaleFlagWithCode locale={locale} codeClassName="text-gray-200" />
                   <svg className={`w-4 h-4 transition-transform ${langDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
@@ -256,7 +257,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             : 'text-gray-300 hover:bg-[#0f0f0f] hover:text-white'
                         }`}
                       >
-                        <span className="text-xl">{localeFlags[lang as Locale]}</span>
+                        <LocaleFlagEmoji locale={lang as Locale} className="text-xl" />
                         <span>{localeNames[lang as Locale]}</span>
                         {locale === lang && (
                           <svg className="w-4 h-4 ml-auto text-accent" fill="currentColor" viewBox="0 0 20 20">

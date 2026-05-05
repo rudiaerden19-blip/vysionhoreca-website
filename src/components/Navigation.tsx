@@ -2,11 +2,13 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useLanguage, Locale } from '@/i18n'
+import { LocaleFlagEmoji, LocaleFlagWithCode } from '@/components/LocaleFlagEmoji'
+
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isLangOpen, setIsLangOpen] = useState(false)
   const langRef = useRef<HTMLDivElement>(null)
-  const { locale, setLocale, t, locales, localeNames, localeFlags } = useLanguage()
+  const { locale, setLocale, t, locales, localeNames } = useLanguage()
 
   // Sluit taalmenu bij klik/tik buiten (pointerdown: betrouwbaarder op iPad dan mousedown)
   useEffect(() => {
@@ -65,7 +67,7 @@ export default function Navigation() {
                 onClick={() => setIsLangOpen(!isLangOpen)}
                 className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg px-3 text-white transition-colors touch-manipulation [-webkit-tap-highlight-color:transparent] active:bg-white/15 active:text-accent [@media(hover:hover)]:hover:bg-white/10 [@media(hover:hover)]:hover:text-accent"
               >
-                <span className="text-xl">{localeFlags[locale]}</span>
+                <LocaleFlagWithCode locale={locale} />
                 <svg 
                   className={`w-4 h-4 transition-transform ${isLangOpen ? 'rotate-180' : ''}`} 
                   fill="none" 
@@ -88,7 +90,7 @@ export default function Navigation() {
                         locale === langCode ? 'text-accent' : 'text-white'
                       }`}
                     >
-                      <span className="text-xl">{localeFlags[langCode]}</span>
+                      <LocaleFlagEmoji locale={langCode} className="text-xl" />
                       <span>{localeNames[langCode]}</span>
                       {locale === langCode && (
                         <svg className="w-5 h-5 ml-auto text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -153,7 +155,7 @@ export default function Navigation() {
                           : 'bg-white/10 text-gray-300 shadow-home-float [@media(hover:hover)]:hover:bg-white/20'
                       }`}
                     >
-                      <span>{localeFlags[langCode]}</span>
+                      <LocaleFlagEmoji locale={langCode} />
                       <span className="text-sm">{langCode.toUpperCase()}</span>
                     </button>
                   ))}

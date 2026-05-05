@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { useLanguage, Locale } from '@/i18n'
+import { LocaleFlagEmoji, LocaleFlagWithCode } from '@/components/LocaleFlagEmoji'
 import SubscriptionsTermsPopup from './SubscriptionsTermsPopup'
 
 type Props = {
@@ -16,7 +17,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isLangOpen, setIsLangOpen] = useState(false)
   const langRef = useRef<HTMLDivElement>(null)
-  const { locale, setLocale, t, locales, localeNames, localeFlags } = useLanguage()
+  const { locale, setLocale, t, locales, localeNames } = useLanguage()
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -99,7 +100,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
                 className="flex items-center gap-1.5 text-white hover:text-white/90 px-2 py-2 rounded-lg hover:bg-white/10 transition-colors"
                 aria-expanded={isLangOpen}
               >
-                <span className="text-lg">{localeFlags[locale]}</span>
+                <LocaleFlagWithCode locale={locale} codeClassName="text-white" />
                 <svg
                   className={`w-4 h-4 transition-transform ${isLangOpen ? 'rotate-180' : ''}`}
                   fill="none"
@@ -120,7 +121,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
                         locale === langCode ? 'text-accent' : 'text-white'
                       }`}
                     >
-                      <span className="text-xl">{localeFlags[langCode]}</span>
+                      <LocaleFlagEmoji locale={langCode} className="text-xl" />
                       <span>{localeNames[langCode]}</span>
                     </button>
                   ))}
@@ -179,7 +180,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
           locale === langCode ? 'bg-accent text-white' : 'bg-white/10 text-white'
         }`}
                   >
-                    {localeFlags[langCode]} {langCode.toUpperCase()}
+                    <LocaleFlagEmoji locale={langCode} className="text-sm" /> {langCode.toUpperCase()}
                   </button>
                 ))}
               </div>

@@ -6,10 +6,11 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useLanguage, Locale } from '@/i18n'
 import { persistTenantSessionWithToday } from '@/lib/auth-headers'
+import { LocaleFlagEmoji, LocaleFlagWithCode } from '@/components/LocaleFlagEmoji'
 
 export default function RegisterPage() {
   const router = useRouter()
-  const { t, locale, setLocale, locales, localeNames, localeFlags } = useLanguage()
+  const { t, locale, setLocale, locales, localeNames } = useLanguage()
   const [formData, setFormData] = useState({
     businessName: '',
     email: '',
@@ -282,8 +283,8 @@ export default function RegisterPage() {
             onClick={() => setIsLangOpen(!isLangOpen)}
             className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-800 transition-colors hover:border-gray-400 hover:bg-gray-50"
           >
-            <span className="text-xl">{localeFlags[locale]}</span>
-            <span className="text-sm hidden sm:inline">{localeNames[locale]}</span>
+            <LocaleFlagWithCode locale={locale} />
+            <span className="hidden sm:inline text-sm text-gray-600">{localeNames[locale]}</span>
             <svg 
               className={`w-4 h-4 transition-transform ${isLangOpen ? 'rotate-180' : ''}`} 
               fill="none" 
@@ -305,7 +306,7 @@ export default function RegisterPage() {
                     locale === langCode ? 'text-accent' : 'text-gray-800'
                   }`}
                 >
-                  <span className="text-xl">{localeFlags[langCode]}</span>
+                  <LocaleFlagEmoji locale={langCode} className="text-xl" />
                   <span>{localeNames[langCode]}</span>
                   {locale === langCode && (
                     <svg className="w-5 h-5 ml-auto text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">

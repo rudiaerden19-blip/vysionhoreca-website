@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Taalkiezers: Windows-Chromium toont vlag-emoji's niet zonder geschikte fontstack (leeg schijnbaar) */
+.vysion-locale-emoji {
+  font-family:
+    'Segoe UI Emoji',
+    'Segoe UI Symbol',
+    'Apple Color Emoji',
+    'Noto Color Emoji',
+    'Twemoji Mozilla',
+    sans-serif;
+  font-style: normal;
+  font-weight: normal;
+}
+
 /* Zichtbare diepte op grijs/wit (marketing homepage) — iets ingetoomd t.o.v. maximum */
 @layer utilities {
   .shadow-home-btn {

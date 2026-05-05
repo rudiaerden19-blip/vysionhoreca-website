@@ -13,6 +13,7 @@ import {
   minReservationDateYmd,
 } from '@/lib/reservation-datetime'
 import { useLanguage } from '@/i18n'
+import { LocaleFlagEmoji, LocaleFlagWithCode } from '@/components/LocaleFlagEmoji'
 
 const MarketingDemoSessionPrime = dynamic(
   () => import('@/components/MarketingDemoSessionPrime').then((mod) => ({ default: mod.MarketingDemoSessionPrime })),
@@ -113,7 +114,7 @@ const dayKeyMap: Record<string, string> = {
 }
 
 export default function TenantLandingPage({ params }: { params: { tenant: string } }) {
-  const { t, locale, setLocale, locales, localeNames, localeFlags } = useLanguage()
+  const { t, locale, setLocale, locales, localeNames } = useLanguage()
   const [showLanguageMenu, setShowLanguageMenu] = useState(false)
   const [business, setBusiness] = useState<Business | null>(null)
   const [shopStatus, setShopStatus] = useState<ShopStatus | null>(null)
@@ -926,7 +927,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 className="bg-white/20 backdrop-blur-md text-white font-semibold px-3 sm:px-4 py-2 sm:py-2.5 rounded-full text-sm sm:text-base hover:bg-white/30 transition-colors flex items-center gap-1.5"
                 title={t('languageSwitcher.selectLanguage')}
               >
-                <span className="text-base sm:text-lg">{localeFlags[locale]}</span>
+                <LocaleFlagWithCode locale={locale} codeClassName="text-white" />
                 <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
@@ -946,7 +947,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                           locale === loc ? 'bg-gray-50 font-medium' : ''
                         }`}
                       >
-                        <span className="text-lg">{localeFlags[loc]}</span>
+                        <LocaleFlagEmoji locale={loc} className="text-lg" />
                         <span className="text-gray-700">{localeNames[loc]}</span>
                         {locale === loc && (
                           <span className="ml-auto text-green-500">✓</span>

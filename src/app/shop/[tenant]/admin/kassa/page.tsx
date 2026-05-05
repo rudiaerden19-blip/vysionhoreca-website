@@ -59,6 +59,7 @@ import {
 import { fetchOrderNumberByKassaClientUuid } from '@/lib/kassa-fetch-order-number'
 import { syncZReportAfterOrderSafe } from '@/lib/kassa-z-sync-safe'
 import { KassaAnalogClock } from '@/components/kassa/KassaAnalogClock'
+import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
 import { KassaRegisterSuspenseFallback } from '@/components/KassaRegisterSuspenseFallback'
 import type {
   KassaCartItem as CartItem,
@@ -98,7 +99,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [tenant, searchParams])
   const demoViewOnly = demoFromUrl || demoFromMarketingSession
   const baseUrl = `/shop/${tenant}/admin`
-  const { t, locale, setLocale, locales, localeNames, localeFlags } = useLanguage()
+  const { t, locale, setLocale, locales, localeNames } = useLanguage()
 
   const {
     moduleAccess,
@@ -1882,7 +1883,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               onClick={() => setLangOpen(o => !o)}
               className="inline-flex items-center gap-1 whitespace-nowrap rounded-xl bg-white/10 px-2 py-2 font-medium text-white transition-colors hover:bg-white/20 sm:gap-2 sm:px-3"
             >
-              <span className="text-xl sm:text-2xl">{localeFlags[locale]}</span>
+              <LocaleFlagEmoji locale={locale} className="text-xl sm:text-2xl" />
               <span className="text-xs font-bold sm:text-sm">{(localeNames[locale] || '').slice(0, 3).toUpperCase()}</span>
               <svg className={`size-4 shrink-0 transition-transform ${langOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
             </button>
@@ -1891,7 +1892,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 {locales.map(lang => (
                   <button key={lang} type="button" onClick={() => { setLocale(lang); setLangOpen(false) }}
                     className={`flex w-full items-center gap-2 px-4 py-2.5 text-sm transition-colors hover:bg-gray-50 ${locale === lang ? 'bg-blue-50 font-semibold text-blue-600' : 'text-gray-700'}`}>
-                    <span>{localeFlags[lang]}</span>
+                    <LocaleFlagEmoji locale={lang} />
                     <span>{localeNames[lang]}</span>
                   </button>
                 ))}

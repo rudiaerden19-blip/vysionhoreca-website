@@ -23,6 +23,7 @@ import {
   isSubmenuForcedOn,
 } from '@/lib/admin-hamburger-modules'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
+import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
 import PostTrialModulePickerModal from '@/components/PostTrialModulePickerModal'
 import { AdminHamburgerMenu } from '@/components/AdminHamburgerMenu'
 import {
@@ -517,7 +518,7 @@ function LockButton({ tenant, afterLockHref }: { tenant: string; afterLockHref: 
 function LanguageSelector() {
   const [isOpen, setIsOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
-  const { locale, setLocale, locales, localeNames, localeFlags } = useLanguage()
+  const { locale, setLocale, locales, localeNames } = useLanguage()
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -535,8 +536,8 @@ function LanguageSelector() {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors"
       >
-        <span className="text-base">{localeFlags[locale]}</span>
-        <span className="hidden sm:inline">{(localeNames[locale] || '').slice(0, 3).toUpperCase()}</span>
+        <LocaleFlagEmoji locale={locale} className="text-base" />
+        <span className="text-xs font-bold sm:text-sm">{(localeNames[locale] || '').slice(0, 3).toUpperCase()}</span>
         <svg className={`w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
@@ -550,7 +551,7 @@ function LanguageSelector() {
               onClick={() => { setLocale(langCode as typeof locale); setIsOpen(false) }}
               className={`w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors ${locale === langCode ? 'bg-blue-50 text-blue-600' : 'text-gray-700'}`}
             >
-              <span className="text-lg">{localeFlags[langCode]}</span>
+              <LocaleFlagEmoji locale={langCode} className="text-lg" />
               <span className="text-sm">{localeNames[langCode]}</span>
               {locale === langCode && (
                 <svg className="w-4 h-4 ml-auto text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
