@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
+import { createPortal, flushSync } from 'react-dom'
 import { usePathname } from 'next/navigation'
 import Keyboard from 'simple-keyboard'
 import 'simple-keyboard/build/css/index.css'
@@ -239,7 +239,10 @@ export function TouchScreenKeyboard() {
         if (el instanceof HTMLInputElement && el.type === 'number') {
           out = sanitizeNumberString(text)
         }
-        setNativeInputValue(el, out)
+        // Direct flushen — anders kan React batching/programmeerbare DOM achterlijken op controlled inputs (kiosk).
+        flushSync(() => {
+          setNativeInputValue(el, out)
+        })
         const inst = keyboardRef.current
         try {
           inst?.setInput(out, undefined, true)
@@ -261,6 +264,8 @@ export function TouchScreenKeyboard() {
           theme: 'hg-theme-default hg-layout-default',
           layout: layoutVariant === 'azerty' ? LAYOUT_AZERTY : LAYOUT_QWERTY,
           layoutName: 'default',
+          /** Voorkomt conflicten tussen caret in React-dom en keyboard buffer (anders soms géén onChange / lege invoer). */
+          disableCaretPositioning: true,
           preventMouseDownDefault: true,
           preventMouseUpDefault: true,
           autoUseTouchEvents: true,

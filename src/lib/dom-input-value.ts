@@ -1,8 +1,9 @@
 /**
  * Programmatisch een `<input>` / `<textarea>` vullen zodat React controlled state meeloopt.
- * Patroon: eerst `el.value = …` (via React’s eigen descriptor), daarna `tracker.setValue(vorige)` zodat
- * `updateValueIfChanged` in react-dom het verschil ziet (zie react-dom `trackValueOnNode` / issue #10135).
- * Prototype-setter omzeilen gaf op sommige setups een mismatch met de interne tracker.
+ * — Zelfde idee als @testing-library/user-event: **HTMLInputElement.prototype.value**-setter,
+ *   daarna `_valueTracker.setValue(vorige)` (react-dom `trackValueOnNode` / issue #10135).
+ * — Rechtstreeks `el.value = …` laat op sommige browsers/kiosks de interne tracker achter;
+ *   React zet dan bij de volgende commit de oude `value` prop terug → “typt niks”.
  */
 
 /** Zelfde attribuut als TouchScreenKeyboard: velden met schermtoetsenbord niet dubbel muteren (o.a. autocap). */
@@ -15,19 +16,31 @@ function getValueTracker(el: HTMLInputElement | HTMLTextAreaElement): ValueTrack
   return t && typeof t.setValue === 'function' ? t : null
 }
 
+function setValueViaNativePrototype(el: HTMLInputElement | HTMLTextAreaElement, value: string): void {
+  const proto =
+    el instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype
+  const setter = Object.getOwnPropertyDescriptor(proto, 'value')?.set as
+    | ((this: typeof el, v: string) => void)
+    | undefined
+  if (setter) {
+    setter.call(el, value)
+  } else {
+    el.value = value
+  }
+}
+
 /**
- * Zet de DOM-waarde en vuurt één `input`-event (bubble).
+ * Zet de DOM-waarde en vuurt één bubbling `input` (klassiek Event — React verwacht deze keten).
  */
 export function setNativeInputValue(el: HTMLInputElement | HTMLTextAreaElement, value: string) {
   const previous = el.value
-  el.value = value
-  if (el.value !== value) {
-    const proto = el instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype
-    const setter = Object.getOwnPropertyDescriptor(proto, 'value')?.set
-    if (setter) {
-      ;(setter as (this: typeof el, v: string) => void).call(el, value)
-    }
+
+  try {
+    setValueViaNativePrototype(el, value)
+  } catch {
+    el.value = value
   }
+
   const tracker = getValueTracker(el)
   if (tracker) {
     try {
@@ -37,14 +50,9 @@ export function setNativeInputValue(el: HTMLInputElement | HTMLTextAreaElement, 
     }
   }
 
-  // InputEvent treedt beter op in de React 18-onChange-keten dan een kale `Event` (o.a. webview/kiosk).
-  if (typeof InputEvent === 'function') {
-    try {
-      el.dispatchEvent(new InputEvent('input', { bubbles: true, cancelable: true }))
-      return
-    } catch {
-      /* val terug op Event */
-    }
+  try {
+    el.dispatchEvent(new Event('input', { bubbles: true }))
+  } catch {
+    /* noop */
   }
-  el.dispatchEvent(new Event('input', { bubbles: true }))
 }
