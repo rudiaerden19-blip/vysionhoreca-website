@@ -32,11 +32,14 @@ export async function GET(request: NextRequest) {
     }
   }
 
+  /** Tenant-subdomein (*.ordervysion.com): PWA-start naar tenant-/staff-login op bureau/icoon. Apex/marketing: gewoon home. */
+  const startUrl = slug ? '/login' : '/'
+
   const manifest = {
     name,
     short_name,
     description: 'Horeca kassa, reserveren, online bestellen — één platform',
-    start_url: '/',
+    start_url: startUrl,
     scope: '/',
     display: 'standalone',
     display_override: ['standalone', 'minimal-ui'],
@@ -66,6 +69,17 @@ export async function GET(request: NextRequest) {
       },
     ],
     shortcuts: [
+      ...(slug
+        ? [
+            {
+              name: 'Inloggen',
+              short_name: 'Login',
+              description: 'Aanmelden zaak',
+              url: '/login',
+              icons: [{ src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' }],
+            },
+          ]
+        : []),
       {
         name: 'Website',
         short_name: 'Home',
