@@ -8,6 +8,7 @@ import {
   TENANT_OWNER_LOGOUT_CHANNEL,
   applyFullStaffLogoutCleanup,
   applyOwnerOnlyLogoutCleanup,
+  attemptCloseCurrentWebview,
   clearShopCustomerSessionLocal,
   readTerminalLogout,
   setTerminalLogout,
@@ -53,11 +54,7 @@ export function TenantWebSessionOrchestrator({ tenantSlug }: { tenantSlug: strin
       bcCustomer = new BroadcastChannel(SHOP_CUSTOMER_LOGOUT_CHANNEL)
       bcCustomer.onmessage = () => {
         clearShopCustomerSessionLocal()
-        try {
-          window.location.replace('about:blank')
-        } catch {
-          window.location.href = 'about:blank'
-        }
+        attemptCloseCurrentWebview()
       }
     } catch {
       /* geen ondersteuning */

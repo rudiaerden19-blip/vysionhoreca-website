@@ -19,7 +19,7 @@ export type OwnerLogoutMessage = {
   ts: number
 }
 
-/** Na uitloggen (alleen zaak/superadmin): volgende URL’s dwingen naar inlog tot opnieuw sessie. Klant-uitlog gebruikt géén stempel — leeg scherm via about:blank. */
+/** Na uitloggen (alleen zaak/superadmin): volgende URL’s dwingen naar inlog tot opnieuw sessie. Klant-uitlog: geen stempel — elk tabblad probeert zich te sluiten (browser beperkt dit). */
 export type TerminalLogoutStamp = { kind: 'staff'; tenantSlug: string } | { kind: 'superadmin' }
 
 export function setTerminalLogout(stamp: TerminalLogoutStamp): void {
@@ -81,6 +81,20 @@ export function clearShopCustomerSessionLocal(): void {
   }
 }
 
+/**
+ * `window.close()` mag alleen bij door script geopende vensters; veel tabbladen/PWA’s weigeren dit.
+ * Wordt op elke klant-uitlog-broadcast aangeroepen zodat elk open tabblad zichzelf sluit **als** de browser het toelaat.
+ */
+export function attemptCloseCurrentWebview(): void {
+  if (typeof window === 'undefined') return
+  try {
+    window.close()
+  } catch {
+    /* Safari/Chrome kunnen blokkeren */
+  }
+}
+
+
 export type CustomerLogoutMessage = { type: 'customer-logout'; tenantSlug: string; ts: number }
 
 export function broadcastShopCustomerLogout(tenantSlug: string): void {
@@ -94,18 +108,14 @@ export function broadcastShopCustomerLogout(tenantSlug: string): void {
 }
 
 /**
- * Klant uitloggen: alles lokaal weg, andere tabbladen sluiten naar leeg document (geen inlog-UI).
- * Web/PWA kan het OS-proces niet doden; dit is het maximale “niets meer tonen” binnen dezelfde tab.
+ * Klant uitloggen: sessie wissen; alle open tabbladen (zelfde origin) proberen zich te sluiten.
+ * Browsers/PWA’s mogen `close()` weigeren voor handmatig geopende tabbladen — dat is een platformlimiet.
  */
 export function redirectCustomerLogoutUI(tenantSlug: string): void {
   if (typeof window === 'undefined') return
   broadcastShopCustomerLogout(tenantSlug)
   clearShopCustomerSessionLocal()
-  try {
-    window.location.replace('about:blank')
-  } catch {
-    window.location.href = 'about:blank'
-  }
+  attemptCloseCurrentWebview()
 }
 
 /** Superadmin + zaak-headers wissen (admin-menu «Uitloggen»). */
