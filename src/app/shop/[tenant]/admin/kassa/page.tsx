@@ -1737,7 +1737,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* ── LINKS: hamburger ── */}
         <div className="relative z-20 flex shrink-0 items-center gap-2">
           <button onClick={() => { setHamburgerOpen(!hamburgerOpen); setHamburgerSubOpen(null) }}
-            className={`flex items-center gap-2 rounded-xl px-3 py-2 transition-colors ${hamburgerOpen ? 'bg-orange-600 text-white' : 'bg-orange-500 text-white hover:bg-orange-400'}`}>
+            className={`flex items-center gap-2 rounded-xl px-3 py-2 transition-colors ${hamburgerOpen ? 'bg-[#47c6fe] text-[#063042]' : 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'}`}>
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
             <span className="font-bold text-sm">{t('kassaApp.hamburgerMenu')}</span>
           </button>
@@ -2431,11 +2431,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <span className="font-bold text-[#3C4D6B] text-2xl">€{total.toFixed(2)}</span>
           </div>
           <div className="grid grid-cols-3 gap-2">
-            <button className="flex flex-col items-center gap-1 rounded-xl bg-[#3C4D6B] py-3 text-white transition-colors hover:bg-[#2D3A52]">
+            <button className="flex flex-col items-center gap-1 rounded-xl bg-[#58CCFF] py-3 text-[#063042] transition-colors hover:bg-[#47c6fe]">
               <span className="text-xl">💰</span>
               <span className="text-xs font-semibold">{t('kassaApp.drawerOpen')}</span>
             </button>
-            <button className="flex flex-col items-center gap-1 rounded-xl bg-[#3C4D6B] py-3 text-white transition-colors hover:bg-[#2D3A52]">
+            <button className="flex flex-col items-center gap-1 rounded-xl bg-[#58CCFF] py-3 text-[#063042] transition-colors hover:bg-[#47c6fe]">
               <span className="text-xl">🖨️</span>
               <span className="text-xs font-semibold">{t('kassaApp.printAgain')}</span>
             </button>
