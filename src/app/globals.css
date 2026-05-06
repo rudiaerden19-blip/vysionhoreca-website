@@ -263,6 +263,19 @@
   --accent: #E85A3C;
 }
 
+/*
+ * Lichtblauwe UI-knoppen (Tailwind arbitrary bg[#58CCFF] en veelgebruikte hover-tinten):
+ * bij ingedrukt donker navy — alle tenants / schermen die die classes gebruiken.
+ */
+@layer components {
+  :is(button, a):active[class*='bg-[#58CCFF]'],
+  :is(button, a):active[class*='bg-[#47c6fe]'],
+  :is(button, a):active[class*='bg-[#43bef7]'] {
+    background-color: #3c4d6b !important;
+    color: #ffffff !important;
+  }
+}
+
 /* ===========================================
    CRITICAL: PREVENT ALL HORIZONTAL OVERFLOW
    =========================================== */
