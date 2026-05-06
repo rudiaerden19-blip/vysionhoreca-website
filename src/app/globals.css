@@ -3,6 +3,11 @@
 @tailwind utilities;
 
 /* Taalkiezers: Windows-Chromium toont vlag-emoji's niet zonder geschikte fontstack (leeg schijnbaar) */
+/* Kassa tafelplan: grabbing-cursor zonder extra React re-renders op elke aanraking */
+body.vysion-floor-plan-grabbing {
+  cursor: grabbing !important;
+}
+
 .vysion-locale-emoji {
   font-family:
     'Segoe UI Emoji',

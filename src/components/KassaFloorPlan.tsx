@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
 
@@ -400,13 +400,57 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
   const dragMoved = useRef(false)
   const pointerStart = useRef({ x: 0, y: 0 })
   const panStart = useRef({ x: 0, y: 0 })
-  const [isDragging, setIsDragging] = useState(false)
-  /** Direct DOM tijdens slepen — geen setState per pointermove (voorkomt “trage” tafel op touch/oude CPU). */
-  const dragNodeRef = useRef<HTMLElement | null>(null)
-  const dragStartPosRef = useRef<{ x: number; y: number } | null>(null)
+  /** Tijdens canvas-pan: React panX/panY is bewust niet synchroon — useLayoutEffect past ze niet toe zolang dit true is. */
+  const canvasPanActiveRef = useRef(false)
+  /** Tijdens tafel/decor-sleep: geen realtime setTables/setDecors (echo van eigen save = race / hapering). */
+  const ignoreFloorRealtimeRef = useRef(false)
+  const floorRectCachedRef = useRef<DOMRect | null>(null)
+  const dragPaintRafRef = useRef<number | null>(null)
+  /** Live % tijdens slepen: max 1 React-update per frame. */
+  const [dragPaint, setDragPaint] = useState<{ id: string; x: number; y: number } | null>(null)
   const pendingDragPctRef = useRef<{ x: number; y: number } | null>(null)
   const innerCanvasRef = useRef<HTMLDivElement | null>(null)
   const canvasPanLiveRef = useRef<{ x: number; y: number } | null>(null)
+  /** Pauzeer localStorage-sync van tables tijdens eender welke vloer-interactie (zoals voorheen isDragging). */
+  const floorPersistPausedRef = useRef(false)
+
+  const setBodyGrabbing = (on: boolean) => {
+    if (typeof document === 'undefined') return
+    document.body.classList.toggle('vysion-floor-plan-grabbing', on)
+  }
+
+  const scheduleDragPaintFromPending = () => {
+    if (dragPaintRafRef.current != null) return
+    dragPaintRafRef.current = requestAnimationFrame(() => {
+      dragPaintRafRef.current = null
+      const p = pendingDragPctRef.current
+      const id = draggingId.current
+      const dt = draggingType.current
+      if (p && id && (dt === 'table' || dt === 'decor')) {
+        setDragPaint({ id, x: p.x, y: p.y })
+      }
+    })
+  }
+
+  const cancelDragPaintRaf = () => {
+    if (dragPaintRafRef.current != null) {
+      cancelAnimationFrame(dragPaintRafRef.current)
+      dragPaintRafRef.current = null
+    }
+  }
+
+  useLayoutEffect(() => {
+    if (canvasPanActiveRef.current) return
+    const floor = floorRef.current
+    const inner = innerCanvasRef.current
+    if (!floor || !inner) return
+    floor.style.backgroundPosition = `${panX}px ${panY}px`
+    inner.style.transform = `translate(${panX}px, ${panY}px)`
+  }, [panX, panY])
+
+  useEffect(() => () => {
+    setBodyGrabbing(false)
+  }, [])
 
   const releaseCapturedPointer = (e: React.PointerEvent) => {
     const cap = pointerCaptureRef.current
@@ -501,6 +545,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
       .on('postgres_changes',
         { event: '*', schema: 'public', table: 'floor_plan_tables', filter: `tenant_slug=eq.${tenant}` },
         ({ new: row }: any) => {
+          if (ignoreFloorRealtimeRef.current) return
           if (row?.data) {
             const fixed = sanitizeTables(row.data as KassaTable[])
             setTables(fixed)
@@ -516,6 +561,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
       .on('postgres_changes',
         { event: '*', schema: 'public', table: 'floor_plan_decor', filter: `tenant_slug=eq.${tenant}` },
         ({ new: row }: any) => {
+          if (ignoreFloorRealtimeRef.current) return
           if (row?.data) {
             const { items, statuses } = parseDecorData(row.data)
             const fixedItems = sanitizeDecors(items)
@@ -542,10 +588,10 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
 
   // Veiligheidsnet voor iPad: sla posities altijd op na elke drag
   useEffect(() => {
-    if (tables.length > 0 && !isDragging) {
+    if (tables.length > 0 && !floorPersistPausedRef.current) {
       localStorage.setItem(storageKey, JSON.stringify(tables))
     }
-  }, [tables, isDragging, storageKey])
+  }, [tables, storageKey])
 
   // Auto-pan: alleen bij allereerste load als er geen opgeslagen pan is
   useEffect(() => {
@@ -714,27 +760,32 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
       pointerStart.current = { x: e.clientX, y: e.clientY }
       panStart.current = { x: panX, y: panY }
       canvasPanLiveRef.current = null
-      setIsDragging(true)
+      floorPersistPausedRef.current = true
+      canvasPanActiveRef.current = true
+      setBodyGrabbing(true)
       return
     }
     takePointerCapture(e.currentTarget as HTMLElement, e.pointerId)
     const floor = floorRef.current
     if (!floor) return
     const rect = floor.getBoundingClientRect()
+    floorRectCachedRef.current = rect
     const item = type === 'table' ? tables.find(t => t.id === id)! : decors.find(d => d.id === id)!
     draggingId.current = id
     draggingType.current = type
     dragMoved.current = false
     pointerStart.current = { x: e.clientX, y: e.clientY }
-    dragNodeRef.current = e.currentTarget as HTMLElement
-    dragStartPosRef.current = { x: item.x, y: item.y }
     pendingDragPctRef.current = null
+    cancelDragPaintRaf()
+    setDragPaint({ id, x: item.x, y: item.y })
+    ignoreFloorRealtimeRef.current = true
+    floorPersistPausedRef.current = true
+    setBodyGrabbing(true)
     // Drag offset: pointer positie minus de schermpositie van de tafel (rekening houdend met pan)
     dragOffset.current = {
       x: e.clientX - rect.left - panX - (item.x / 100) * rect.width,
       y: e.clientY - rect.top - panY - (item.y / 100) * rect.height,
     }
-    setIsDragging(true)
   }
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -759,17 +810,12 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
 
     const floor = floorRef.current
     if (!floor) return
-    const rect = floor.getBoundingClientRect()
+    const rect = floorRectCachedRef.current ?? floor.getBoundingClientRect()
     // Nieuwe % positie = (pointer - offset - pan) / containergrootte
     const x = Math.max(1, Math.min(99, ((e.clientX - rect.left - panX - dragOffset.current.x) / rect.width) * 100))
     const y = Math.max(1, Math.min(99, ((e.clientY - rect.top - panY - dragOffset.current.y) / rect.height) * 100))
     pendingDragPctRef.current = { x, y }
-    const node = dragNodeRef.current
-    if (node) {
-      node.style.left = `${x}%`
-      node.style.top = `${y}%`
-      node.style.zIndex = '40'
-    }
+    scheduleDragPaintFromPending()
   }
 
   const handlePointerUp = (e: React.PointerEvent) => {
@@ -777,6 +823,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
     if (!draggingId.current) return
     if (draggingType.current === 'canvas') {
       const live = canvasPanLiveRef.current
+      canvasPanActiveRef.current = false
       if (live) {
         setPanX(live.x)
         setPanY(live.y)
@@ -784,16 +831,18 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
       }
       canvasPanLiveRef.current = null
       draggingId.current = null
-      setIsDragging(false)
+      floorPersistPausedRef.current = false
+      setBodyGrabbing(false)
       setTimeout(() => { dragMoved.current = false }, 0)
       return
     }
     const id = draggingId.current
     const pct = pendingDragPctRef.current
-    const node = dragNodeRef.current
-    if (node) {
-      node.style.removeProperty('z-index')
-    }
+    cancelDragPaintRaf()
+    ignoreFloorRealtimeRef.current = false
+    floorRectCachedRef.current = null
+    floorPersistPausedRef.current = false
+    setBodyGrabbing(false)
     if (draggingType.current === 'table' && pct) {
       setTables(latest => {
         const next = latest.map(t => (t.id === id ? { ...t, x: pct.x, y: pct.y } : t))
@@ -812,11 +861,9 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
       })
       setSelectedDecor(sel => (sel?.id === id ? { ...sel, x: pct.x, y: pct.y } : sel))
     }
-    dragNodeRef.current = null
-    dragStartPosRef.current = null
+    setDragPaint(null)
     pendingDragPctRef.current = null
     draggingId.current = null
-    setIsDragging(false)
     setTimeout(() => { dragMoved.current = false }, 0)
   }
 
@@ -826,23 +873,24 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
     if (dtype === 'canvas') {
       const rx = panStart.current.x
       const ry = panStart.current.y
+      canvasPanActiveRef.current = false
       const floorEl = floorRef.current
       const innerEl = innerCanvasRef.current
       if (floorEl) floorEl.style.backgroundPosition = `${rx}px ${ry}px`
       if (innerEl) innerEl.style.transform = `translate(${rx}px, ${ry}px)`
       canvasPanLiveRef.current = null
-    } else if (dragNodeRef.current && dragStartPosRef.current) {
-      const s = dragStartPosRef.current
-      const n = dragNodeRef.current
-      n.style.left = `${s.x}%`
-      n.style.top = `${s.y}%`
-      n.style.removeProperty('z-index')
+      floorPersistPausedRef.current = false
+      setBodyGrabbing(false)
+    } else {
+      cancelDragPaintRaf()
+      ignoreFloorRealtimeRef.current = false
+      floorRectCachedRef.current = null
+      floorPersistPausedRef.current = false
+      setBodyGrabbing(false)
+      setDragPaint(null)
     }
-    dragNodeRef.current = null
-    dragStartPosRef.current = null
     pendingDragPctRef.current = null
     draggingId.current = null
-    setIsDragging(false)
     setTimeout(() => { dragMoved.current = false }, 0)
   }
 
@@ -906,8 +954,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
               linear-gradient(to bottom, rgba(200,200,200,0.25) 0px, rgba(200,200,200,0.25) 2px, transparent 2px)
             `,
             backgroundSize: '100px 100px',
-            backgroundPosition: `${panX}px ${panY}px`,
-            cursor: isDragging ? 'grabbing' : 'grab',
+            cursor: 'grab',
             touchAction: 'none',
           }}
           onPointerDown={(e) => {
@@ -920,7 +967,9 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
             pointerStart.current = { x: e.clientX, y: e.clientY }
             panStart.current = { x: panX, y: panY }
             canvasPanLiveRef.current = null
-            setIsDragging(true)
+            floorPersistPausedRef.current = true
+            canvasPanActiveRef.current = true
+            setBodyGrabbing(true)
           }}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
@@ -928,17 +977,20 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
           onClick={() => { if (!dragMoved.current) { setSelected(null); setSelectedDecor(null) } }}
         >
           {/* Inner canvas: posities zijn % van de container, pan verschuift het geheel */}
-          <div ref={innerCanvasRef} style={{ position: 'absolute', inset: 0, transform: `translate(${panX}px, ${panY}px)` }}>
+          <div ref={innerCanvasRef} style={{ position: 'absolute', inset: 0 }}>
 
           {/* Decor items (achtergrond laag) */}
-          {decors.map(d => (
+          {decors.map(d => {
+            const px = dragPaint?.id === d.id ? dragPaint.x : d.x
+            const py = dragPaint?.id === d.id ? dragPaint.y : d.y
+            return (
             <div key={d.id} className="absolute"
               style={{
-                left: `${d.x}%`,
-                top: `${d.y}%`,
+                left: `${px}%`,
+                top: `${py}%`,
                 transform: `translate(-50%, -50%) rotate(${d.rotation}deg)`,
-                zIndex: selectedDecor?.id === d.id ? 9 : 0,
-                cursor: isDragging ? 'grabbing' : 'grab',
+                zIndex: dragPaint?.id === d.id ? 40 : selectedDecor?.id === d.id ? 9 : 0,
+                cursor: 'grab',
                 touchAction: 'none',
               }}
               onPointerDown={(e) => handlePointerDown(e, d.id, 'decor')}
@@ -955,18 +1007,22 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
             >
               <DecorSVG item={d} isSelected={selectedDecor?.id === d.id} orderedStools={new Set(Object.keys(tableOrders).filter(k => (tableOrders[k] || []).length > 0))} stoolStatuses={stoolStatuses} getStoolStatus={getStoolStatus} barLabel={t('kassaApp.floorPlanBarLabel')} />
             </div>
-          ))}
+            )
+          })}
 
-          {tables.map(t => (
+          {tables.map(t => {
+            const px = dragPaint?.id === t.id ? dragPaint.x : t.x
+            const py = dragPaint?.id === t.id ? dragPaint.y : t.y
+            return (
             <div
               key={t.id}
               className="absolute"
               style={{
-                left: `${t.x}%`,
-                top: `${t.y}%`,
+                left: `${px}%`,
+                top: `${py}%`,
                 transform: `translate(-50%, -50%) rotate(${t.rotation}deg)`,
-                zIndex: selected?.id === t.id ? 10 : 1,
-                cursor: isDragging ? 'grabbing' : 'grab',
+                zIndex: dragPaint?.id === t.id ? 40 : selected?.id === t.id ? 10 : 1,
+                cursor: 'grab',
                 touchAction: 'none',
               }}
               onPointerDown={(e) => handlePointerDown(e, t.id, 'table')}
@@ -988,7 +1044,8 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                 effectiveStatus={getTableEffectiveStatus(t.number, t.status)}
               />
             </div>
-          ))}
+            )
+          })}
 
           {tables.length === 0 && (
             <div className="absolute inset-0 flex flex-col items-center justify-center text-white/40">
