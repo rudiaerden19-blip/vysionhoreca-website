@@ -401,6 +401,12 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
   const pointerStart = useRef({ x: 0, y: 0 })
   const panStart = useRef({ x: 0, y: 0 })
   const [isDragging, setIsDragging] = useState(false)
+  /** Direct DOM tijdens slepen — geen setState per pointermove (voorkomt “trage” tafel op touch/oude CPU). */
+  const dragNodeRef = useRef<HTMLElement | null>(null)
+  const dragStartPosRef = useRef<{ x: number; y: number } | null>(null)
+  const pendingDragPctRef = useRef<{ x: number; y: number } | null>(null)
+  const innerCanvasRef = useRef<HTMLDivElement | null>(null)
+  const canvasPanLiveRef = useRef<{ x: number; y: number } | null>(null)
 
   const releaseCapturedPointer = (e: React.PointerEvent) => {
     const cap = pointerCaptureRef.current
@@ -707,6 +713,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
       dragMoved.current = false
       pointerStart.current = { x: e.clientX, y: e.clientY }
       panStart.current = { x: panX, y: panY }
+      canvasPanLiveRef.current = null
       setIsDragging(true)
       return
     }
@@ -719,6 +726,9 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
     draggingType.current = type
     dragMoved.current = false
     pointerStart.current = { x: e.clientX, y: e.clientY }
+    dragNodeRef.current = e.currentTarget as HTMLElement
+    dragStartPosRef.current = { x: item.x, y: item.y }
+    pendingDragPctRef.current = null
     // Drag offset: pointer positie minus de schermpositie van de tafel (rekening houdend met pan)
     dragOffset.current = {
       x: e.clientX - rect.left - panX - (item.x / 100) * rect.width,
@@ -735,13 +745,15 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
     if (dx < 8 && dy < 8) return
     dragMoved.current = true
 
-    // Canvas panning: slepen op lege achtergrond
+    // Canvas panning: slepen op lege achtergrond — alleen style, geen React + geen localStorage tot pointerup
     if (draggingType.current === 'canvas') {
       const newX = panStart.current.x + (e.clientX - pointerStart.current.x)
       const newY = panStart.current.y + (e.clientY - pointerStart.current.y)
-      setPanX(newX)
-      setPanY(newY)
-      try { localStorage.setItem(panKey, JSON.stringify({ x: newX, y: newY })) } catch { /* ignore */ }
+      canvasPanLiveRef.current = { x: newX, y: newY }
+      const floorEl = floorRef.current
+      const innerEl = innerCanvasRef.current
+      if (floorEl) floorEl.style.backgroundPosition = `${newX}px ${newY}px`
+      if (innerEl) innerEl.style.transform = `translate(${newX}px, ${newY}px)`
       return
     }
 
@@ -751,10 +763,12 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
     // Nieuwe % positie = (pointer - offset - pan) / containergrootte
     const x = Math.max(1, Math.min(99, ((e.clientX - rect.left - panX - dragOffset.current.x) / rect.width) * 100))
     const y = Math.max(1, Math.min(99, ((e.clientY - rect.top - panY - dragOffset.current.y) / rect.height) * 100))
-    if (draggingType.current === 'table') {
-      setTables(prev => prev.map(t => t.id === draggingId.current ? { ...t, x, y } : t))
-    } else {
-      setDecors(prev => prev.map(d => d.id === draggingId.current ? { ...d, x, y } : d))
+    pendingDragPctRef.current = { x, y }
+    const node = dragNodeRef.current
+    if (node) {
+      node.style.left = `${x}%`
+      node.style.top = `${y}%`
+      node.style.zIndex = '40'
     }
   }
 
@@ -762,27 +776,45 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
     releaseCapturedPointer(e)
     if (!draggingId.current) return
     if (draggingType.current === 'canvas') {
+      const live = canvasPanLiveRef.current
+      if (live) {
+        setPanX(live.x)
+        setPanY(live.y)
+        try { localStorage.setItem(panKey, JSON.stringify(live)) } catch { /* ignore */ }
+      }
+      canvasPanLiveRef.current = null
       draggingId.current = null
       setIsDragging(false)
       setTimeout(() => { dragMoved.current = false }, 0)
       return
     }
-    // Gebruik functionele update zodat we altijd de NIEUWSTE posities opslaan,
-    // niet de stale closure-waarde van vóór het slepen.
-    if (draggingType.current === 'table') {
-      setTables(latest => {
-        localStorage.setItem(storageKey, JSON.stringify(latest))
-        supabase.from('floor_plan_tables').upsert({ tenant_slug: tenant, data: latest }, { onConflict: 'tenant_slug' })
-        return latest
-      })
-    } else {
-      setDecors(latestDecors => {
-        const payload = { items: latestDecors, stool_statuses: stoolStatuses }
-        localStorage.setItem(decorKey, JSON.stringify(latestDecors))
-        supabase.from('floor_plan_decor').upsert({ tenant_slug: tenant, data: payload }, { onConflict: 'tenant_slug' })
-        return latestDecors
-      })
+    const id = draggingId.current
+    const pct = pendingDragPctRef.current
+    const node = dragNodeRef.current
+    if (node) {
+      node.style.removeProperty('z-index')
     }
+    if (draggingType.current === 'table' && pct) {
+      setTables(latest => {
+        const next = latest.map(t => (t.id === id ? { ...t, x: pct.x, y: pct.y } : t))
+        localStorage.setItem(storageKey, JSON.stringify(next))
+        void supabase.from('floor_plan_tables').upsert({ tenant_slug: tenant, data: next }, { onConflict: 'tenant_slug' })
+        return next
+      })
+      setSelected(sel => (sel?.id === id ? { ...sel, x: pct.x, y: pct.y } : sel))
+    } else if (draggingType.current === 'decor' && pct) {
+      setDecors(latestDecors => {
+        const next = latestDecors.map(d => (d.id === id ? { ...d, x: pct.x, y: pct.y } : d))
+        const payload = { items: next, stool_statuses: stoolStatuses }
+        localStorage.setItem(decorKey, JSON.stringify(next))
+        void supabase.from('floor_plan_decor').upsert({ tenant_slug: tenant, data: payload }, { onConflict: 'tenant_slug' })
+        return next
+      })
+      setSelectedDecor(sel => (sel?.id === id ? { ...sel, x: pct.x, y: pct.y } : sel))
+    }
+    dragNodeRef.current = null
+    dragStartPosRef.current = null
+    pendingDragPctRef.current = null
     draggingId.current = null
     setIsDragging(false)
     setTimeout(() => { dragMoved.current = false }, 0)
@@ -790,6 +822,25 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
 
   const handlePointerCancel = (e: React.PointerEvent) => {
     releaseCapturedPointer(e)
+    const dtype = draggingType.current
+    if (dtype === 'canvas') {
+      const rx = panStart.current.x
+      const ry = panStart.current.y
+      const floorEl = floorRef.current
+      const innerEl = innerCanvasRef.current
+      if (floorEl) floorEl.style.backgroundPosition = `${rx}px ${ry}px`
+      if (innerEl) innerEl.style.transform = `translate(${rx}px, ${ry}px)`
+      canvasPanLiveRef.current = null
+    } else if (dragNodeRef.current && dragStartPosRef.current) {
+      const s = dragStartPosRef.current
+      const n = dragNodeRef.current
+      n.style.left = `${s.x}%`
+      n.style.top = `${s.y}%`
+      n.style.removeProperty('z-index')
+    }
+    dragNodeRef.current = null
+    dragStartPosRef.current = null
+    pendingDragPctRef.current = null
     draggingId.current = null
     setIsDragging(false)
     setTimeout(() => { dragMoved.current = false }, 0)
@@ -868,6 +919,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
             dragMoved.current = false
             pointerStart.current = { x: e.clientX, y: e.clientY }
             panStart.current = { x: panX, y: panY }
+            canvasPanLiveRef.current = null
             setIsDragging(true)
           }}
           onPointerMove={handlePointerMove}
@@ -876,7 +928,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
           onClick={() => { if (!dragMoved.current) { setSelected(null); setSelectedDecor(null) } }}
         >
           {/* Inner canvas: posities zijn % van de container, pan verschuift het geheel */}
-          <div style={{ position: 'absolute', inset: 0, transform: `translate(${panX}px, ${panY}px)` }}>
+          <div ref={innerCanvasRef} style={{ position: 'absolute', inset: 0, transform: `translate(${panX}px, ${panY}px)` }}>
 
           {/* Decor items (achtergrond laag) */}
           {decors.map(d => (
