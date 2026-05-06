@@ -293,11 +293,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     } catch { /* ignore */ }
   }, [demoViewOnly, SESSION_KEY])
 
-  // Poll elke 3s: online bestellingen + reserveringen — één alarm (startAlarm/stopAlarm) zoals voor orders
+  // Poll elke 3s: online bestellingen + reserveringen — één alarm (startAlarm/stopAlarm) zoals voor orders.
+  // Tab verborgen → geen interval (minder CPU op zwakkere kassa-PC's); bij terugkeren meteen één check.
   useEffect(() => {
     if (demoViewOnly) return
     let isFirstOrderCheck = true
     let isFirstReservCheck = true
+    let intervalId: ReturnType<typeof setInterval> | null = null
     const check = async () => {
       try {
         const [{ data: orders }, { data: idRows }, pendingRes] = await Promise.all([
@@ -410,9 +412,32 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         /* ignore */
       }
     }
-    check()
-    const interval = setInterval(check, 3000)
-    return () => clearInterval(interval)
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') {
+        if (intervalId !== null) {
+          clearInterval(intervalId)
+          intervalId = null
+        }
+      } else {
+        void check()
+        if (intervalId === null) {
+          intervalId = setInterval(() => {
+            void check()
+          }, 3000)
+        }
+      }
+    }
+    if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+      void check()
+      intervalId = setInterval(() => {
+        void check()
+      }, 3000)
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility)
+      if (intervalId !== null) clearInterval(intervalId)
+    }
   }, [tenant, startAlarm, stopAlarm, demoViewOnly, t])
 
   // Menu
@@ -421,6 +446,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [selectedCategory, setSelectedCategory] = useState<MenuCategory | null>(null)
   const [menuLoading, setMenuLoading] = useState(true)
   const [productsWithOptions, setProductsWithOptions] = useState<string[]>([])
+  const productIdsWithOptionsSet = useMemo(
+    () => new Set(productsWithOptions),
+    [productsWithOptions],
+  )
 
   /** gap-4 = 16px; 3 rijen categorieën in view. */
   const KASSA_MENU_VISIBLE_ROWS = 3
@@ -975,7 +1004,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const handleProductClick = async (product: MenuProduct) => {
     if (blockSaleWithoutStaffIfNeededRef.current()) return
-    if (productsWithOptions.includes(product.id!)) {
+    if (product.id && productIdsWithOptionsSet.has(product.id)) {
       const opts = await getOptionsForProduct(product.id!)
       setOptionsModal({ product, options: opts, selected: [] })
     } else {
@@ -988,7 +1017,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     if (demoViewOnly) return
     const pid = item.product.id
     if (!pid || String(pid).startsWith('custom-')) return
-    if (!productsWithOptions.includes(pid)) return
+    if (!productIdsWithOptionsSet.has(pid)) return
     const opts = await getOptionsForProduct(pid)
     playClick()
     setOptionsModal({
@@ -1091,6 +1120,36 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
     return sum + (i.product.price + choicesTotal) * i.quantity
   }, 0)
+
+  /** Totaal per product-id voor tegel-badge; vermijdt O(producten × mandregels) bij elke qty-wijziging. */
+  const cartQtyByProductId = useMemo(() => {
+    const m = new Map<string, number>()
+    for (const line of cart) {
+      const id = line.product.id
+      if (!id || String(id).startsWith('custom-')) continue
+      const key = String(id)
+      m.set(key, (m.get(key) ?? 0) + line.quantity)
+    }
+    return m
+  }, [cart])
+
+  /** Eerste productafbeelding per categorie (zelfde volgorde als vroeger: door products-array). */
+  const categoryTileImageUrlByCategoryId = useMemo(() => {
+    const m = new Map<string, string>()
+    for (const p of products) {
+      const cid = p.category_id
+      if (!cid || !p.image_url) continue
+      if (!m.has(cid)) m.set(cid, p.image_url)
+    }
+    return m
+  }, [products])
+
+  const productsInSelectedCategory = useMemo(() => {
+    if (!selectedCategory) return []
+    return products
+      .filter(p => p.category_id === selectedCategory.id)
+      .sort(compareMenuProductsBySortOrder)
+  }, [products, selectedCategory])
 
   // ── Numpad ────────────────────────────────────────────────────────────────
   const handleNumpad = (key: string) => {
@@ -1997,7 +2056,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   style={{ gridAutoRows: `${kassaMenuRowPx}px` }}
                 >
                   {categories.map(cat => {
-                    const catImage = products.find(p => p.category_id === cat.id && p.image_url)?.image_url
+                    const catImage = cat.id ? categoryTileImageUrlByCategoryId.get(cat.id) : undefined
                     return (
                       <button
                         key={cat.id}
@@ -2009,6 +2068,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                             <img
                               src={catImage}
                               alt={cat.name}
+                              decoding="async"
+                              loading="lazy"
                               className="pointer-events-none absolute inset-0 block h-full min-h-0 w-full select-none object-cover object-center !h-full !w-full !max-w-none"
                             />
                             <div
@@ -2047,11 +2108,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               )
             ) : (
               /* Producten: zelfde 4×3 viewport-grid als categorieën */
-              (() => {
-                const filtered = products
-                  .filter(p => p.category_id === selectedCategory.id)
-                  .sort(compareMenuProductsBySortOrder)
-                return filtered.length === 0 ? (
+              productsInSelectedCategory.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-gray-400">
                     <span className="text-5xl mb-3">🍽️</span>
                     <p className="font-semibold">{t('kassaApp.noProductsInCategory')}</p>
@@ -2062,9 +2119,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     className="grid w-full grid-cols-4 gap-4 pb-8"
                     style={{ gridAutoRows: `${kassaMenuRowPx}px` }}
                   >
-                    {filtered.map(product => {
-                      const inCart = cart.filter(i => i.product.id === product.id).reduce((s, i) => s + i.quantity, 0)
-                      const hasOpts = productsWithOptions.includes(product.id!)
+                    {productsInSelectedCategory.map(product => {
+                      const inCart = product.id
+                        ? (cartQtyByProductId.get(String(product.id)) ?? 0)
+                        : 0
+                      const hasOpts = product.id ? productIdsWithOptionsSet.has(product.id) : false
                       const kioskZoom = clampKassaProductImageZoom(product.kassa_image_zoom)
                       return (
                         <button
@@ -2079,6 +2138,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                                 <img
                                   src={product.image_url}
                                   alt={product.name}
+                                  decoding="async"
+                                  loading="lazy"
                                   style={{
                                     transform: `scale(${kioskZoom})`,
                                     transformOrigin: 'center 78%',
@@ -2129,7 +2190,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     })}
                   </div>
                 )
-              })()
             )}
           </div>
         </div>
@@ -2370,6 +2430,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     {/* Productfoto */}
                     {item.product.image_url ? (
                       <img src={item.product.image_url} alt={item.product.name}
+                        decoding="async"
+                        loading="lazy"
                         className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
                     ) : (
                       <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 text-xl">🍽️</div>
@@ -2395,7 +2457,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       {!demoViewOnly &&
                         item.product.id &&
                         !String(item.product.id).startsWith('custom-') &&
-                        productsWithOptions.includes(item.product.id) && (
+                        productIdsWithOptionsSet.has(item.product.id) && (
                           <button
                             type="button"
                             onClick={() => void openEditCartItem(item)}
