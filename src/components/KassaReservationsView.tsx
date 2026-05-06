@@ -198,6 +198,10 @@ export default function KassaReservationsView({
   const panLockedTableId = useRef<string | null>(null) // tafel-id als panning gestart op tafel in locked mode
   const panMoved = useRef(false) // heeft de pan bewogen (vs. tap)
   const canvasRef = useRef<HTMLDivElement>(null)
+  /** Tafelverslepen: direct DOM tijdens move — geen setFloorPlanTablesDB per pointermove. */
+  const floorDragTableElRef = useRef<HTMLElement | null>(null)
+  const floorPendingDragPctRef = useRef<{ x: number; y: number } | null>(null)
+  const floorDragStartPctRef = useRef<{ x: number; y: number } | null>(null)
   /** Horizontaal scrollende tijdlijn — nodig voor correcte resize (pixels ↔ minuten) */
   const timelineGridScrollRef = useRef<HTMLDivElement>(null)
   /** Zelfde als LABEL_W in de tijdlijn-UI (kolom “Tafel”) */
@@ -863,6 +867,9 @@ export default function KassaReservationsView({
     floorDraggingId.current = id
     floorDragMoved.current = false
     floorPointerStart.current = { x: e.clientX, y: e.clientY }
+    floorDragTableElRef.current = tableEl
+    floorDragStartPctRef.current = { x: table.x, y: table.y }
+    floorPendingDragPctRef.current = null
     canvas.setPointerCapture(e.pointerId)
     setIsDraggingFloor(true)
   }
@@ -894,7 +901,13 @@ export default function KassaReservationsView({
     const worldY = mouseWorldY - floorDragOffset.current.y
     const x = Math.max(1, Math.min(99, (worldX / WORLD_W) * 100))
     const y = Math.max(1, Math.min(99, (worldY / WORLD_H) * 100))
-    setFloorPlanTablesDB(prev => prev.map(t => t.id === floorDraggingId.current ? { ...t, x, y } : t))
+    floorPendingDragPctRef.current = { x, y }
+    const node = floorDragTableElRef.current
+    if (node) {
+      node.style.left = `${(x / 100) * WORLD_W}px`
+      node.style.top = `${(y / 100) * WORLD_H}px`
+      node.style.zIndex = '40'
+    }
   }
 
   const handleFloorPointerUp = async (e: React.PointerEvent<HTMLDivElement>) => {
@@ -914,6 +927,24 @@ export default function KassaReservationsView({
     }
     if (!floorDraggingId.current) return
     const id = floorDraggingId.current
+
+    if (e.type === 'pointercancel') {
+      const el = floorDragTableElRef.current
+      const start = floorDragStartPctRef.current
+      if (el && start) {
+        el.style.left = `${(start.x / 100) * WORLD_W}px`
+        el.style.top = `${(start.y / 100) * WORLD_H}px`
+        el.style.removeProperty('z-index')
+      }
+      floorDraggingId.current = null
+      setIsDraggingFloor(false)
+      floorDragMoved.current = false
+      floorDragTableElRef.current = null
+      floorPendingDragPctRef.current = null
+      floorDragStartPctRef.current = null
+      return
+    }
+
     const wasTap = !floorDragMoved.current
     floorDraggingId.current = null
     setIsDraggingFloor(false)
@@ -922,8 +953,18 @@ export default function KassaReservationsView({
       const table = floorPlanTablesDB.find(t => t.id === id) || null
       setSelectedFloorTable(prev => prev?.id === id ? null : table)
     } else {
-      await saveFloorPlan(floorPlanTablesDB)
+      const pct = floorPendingDragPctRef.current
+      if (pct) {
+        const next = floorPlanTablesDB.map(t => (t.id === id ? { ...t, x: pct.x, y: pct.y } : t))
+        await saveFloorPlan(next)
+        setSelectedFloorTable(prev => (prev?.id === id ? { ...prev, x: pct.x, y: pct.y } : prev))
+      }
     }
+    const el = floorDragTableElRef.current
+    if (el) el.style.removeProperty('z-index')
+    floorDragTableElRef.current = null
+    floorPendingDragPctRef.current = null
+    floorDragStartPctRef.current = null
   }
 
   // ---- Derived data ----

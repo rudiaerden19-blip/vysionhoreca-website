@@ -1,6 +1,7 @@
 'use client'
 
 import { Suspense, useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } from 'react'
+import dynamic from 'next/dynamic'
 import { flushSync } from 'react-dom'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -18,8 +19,6 @@ import {
   clampKassaProductImageZoom,
   compareMenuProductsBySortOrder,
 } from '@/lib/admin-api'
-import KassaFloorPlan from '@/components/KassaFloorPlan'
-import KassaReservationsView from '@/components/KassaReservationsView'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
 import { getSoundsEnabled, setSoundsEnabled, playClick, playAddToCart, playRemove, playSuccess, playCashRegister, playCheckout, initAudio, prewarmAudio, playOrderNotification, activateAudioForIOS } from '@/lib/sounds'
@@ -93,6 +92,23 @@ import {
   KassaStaffSalesSummaryModal,
 } from '@/components/kassa/KassaStaffClockUi'
 import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
+
+const KassaFloorPlan = dynamic(() => import('@/components/KassaFloorPlan'), {
+  ssr: false,
+  loading: () => (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/25" aria-hidden>
+      <div className="h-10 w-10 animate-spin rounded-full border-2 border-[#3C4D6B] border-t-transparent" />
+    </div>
+  ),
+})
+const KassaReservationsView = dynamic(() => import('@/components/KassaReservationsView'), {
+  ssr: false,
+  loading: () => (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/25" aria-hidden>
+      <div className="h-10 w-10 animate-spin rounded-full border-2 border-[#3C4D6B] border-t-transparent" />
+    </div>
+  ),
+})
 
 function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const tenant = params.tenant
