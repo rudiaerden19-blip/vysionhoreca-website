@@ -225,7 +225,7 @@ function StatsAndLiveDemoSection() {
         <p className="text-center text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] xl:text-6xl font-bold text-accent tracking-tight leading-tight mb-5 sm:mb-6 md:mb-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {t('liveDemo.clientsLead')}
         </p>
-        <div className="relative w-[100vw] max-w-[100vw] left-1/2 -translate-x-1/2 bg-[#E3E3E3] py-8 sm:py-10 md:py-12">
+        <div className="relative w-full bg-[#E3E3E3] py-8 sm:py-10 md:py-12">
           <div className="partner-marquee-viewport">
             <div className="partner-marquee-track">
               {[0, 1].map((dup) => (
@@ -1004,14 +1004,14 @@ function TableKioskSection() {
             onClick={() => setKioskLightboxOpen(false)}
           >
             <div
-              className="relative flex h-[100dvh] w-full max-w-[100vw] items-center justify-center sm:inline-flex sm:h-auto sm:max-h-[min(85vh,920px)] sm:w-auto sm:max-w-full"
+              className="relative flex h-[100dvh] w-full max-w-full min-w-0 items-center justify-center sm:inline-flex sm:h-auto sm:max-h-[min(85vh,920px)] sm:w-auto sm:max-w-full"
               onClick={(e) => e.stopPropagation()}
             >
               {/* eslint-disable-next-line @next/next/no-img-element -- lightbox: native img op ware grootte */}
               <img
                 src={TABLE_KIOSK_SLIDES[kioskSlide]}
                 alt={`${t('ui.lightboxImageAlt')}: ${t('tableKiosk.imageAlt')} (${kioskSlide + 1} / ${kioskCount})`}
-                className="block h-auto max-h-[100dvh] w-auto max-w-[100vw] object-contain sm:max-h-[min(85vh,920px)] sm:max-w-[calc(100vw-3rem)] sm:rounded-lg sm:shadow-2xl"
+                className="block h-auto max-h-[100dvh] w-auto max-w-full object-contain sm:max-h-[min(85vh,920px)] sm:max-w-[calc(100%-3rem)] sm:rounded-lg sm:shadow-2xl"
               />
               <button
                 type="button"
