@@ -76,10 +76,10 @@ export function AdminHamburgerMenu({
       </button>
 
       {open && (
-        <div className="absolute left-0 top-full z-[120] mt-1 flex">
+        <div className="absolute left-0 top-full z-[120] mt-1 flex max-w-none">
           <div
-            className="max-h-[85vh] overflow-y-auto rounded-2xl border border-gray-100 bg-white shadow-2xl"
-            style={{ width: 240 }}
+            className="max-h-[85vh] max-w-none shrink-0 overflow-y-auto rounded-2xl border border-gray-100 bg-white shadow-2xl"
+            style={{ width: 240, maxWidth: 'none' }}
           >
             <div className="sticky top-0 rounded-t-2xl bg-[#1e293b] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white">
               {t('adminLayout.menu')}
@@ -120,8 +120,8 @@ export function AdminHamburgerMenu({
 
           {activeMod && (
             <div
-              className="ml-2 max-h-[85vh] self-start overflow-y-auto rounded-2xl border border-gray-100 bg-white shadow-2xl"
-              style={{ width: 220 }}
+              className="ml-2 max-h-[85vh] max-w-none shrink-0 self-start overflow-y-auto rounded-2xl border border-gray-100 bg-white shadow-2xl"
+              style={{ width: 220, maxWidth: 'none' }}
             >
               <div className="sticky top-0 flex items-center gap-2 rounded-t-2xl bg-[#1e293b] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white">
                 <span>{activeMod.icon}</span>{' '}

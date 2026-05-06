@@ -285,10 +285,9 @@
   box-sizing: border-box;
 }
 
-/* Force block elements to respect parent width (geen 100vw → zelfde reden als body) */
-div, section, article, header, footer, main, nav, aside, form {
-  max-width: 100%;
-}
+/* Geen globale max-width op alle div’s: absolute flyouts (admin hamburger, modals) zouden
+   tot parent-breedte (b.v. alleen de MENU-knop) worden geknipt — zichtbare tekst/submenu’s kapot.
+   Horizontale scroll: html/body overflow-x clip + body width 100%. */
 
 html {
   margin: 0;
