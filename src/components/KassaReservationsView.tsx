@@ -2369,7 +2369,7 @@ export default function KassaReservationsView({
                 >
                   {floorOnlyMode && (
                     <div
-                      className="absolute right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-[35] flex max-w-[calc(100vw-1.5rem)] flex-row flex-wrap items-center justify-end gap-2"
+                      className="absolute right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-[35] flex max-w-[calc(100%-1.5rem)] flex-row flex-wrap items-center justify-end gap-2"
                       onPointerDown={e => e.stopPropagation()}
                     >
                       <button

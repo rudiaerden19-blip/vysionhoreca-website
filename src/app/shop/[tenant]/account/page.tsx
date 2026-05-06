@@ -167,7 +167,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
   }
 
   return (
-    <div style={{ width: '100vw', maxWidth: '100vw', overflowX: 'clip' }} className="min-h-screen bg-gray-50">
+    <div style={{ width: '100%', maxWidth: '100%', overflowX: 'clip' }} className="min-h-screen bg-gray-50">
       <ConfirmModal />
       <LogoutSoftwareConfirmModal
         open={logoutSoftwareConfirmOpen}

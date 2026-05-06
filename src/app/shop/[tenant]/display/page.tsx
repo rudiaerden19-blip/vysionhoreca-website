@@ -860,7 +860,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   if (loading) {
     return (
       <div
-        className="min-h-[100dvh] bg-[#e3e3e3] flex items-center justify-center"
+        className="min-h-[100dvh] w-full min-w-0 max-w-full bg-[#e3e3e3] flex items-center justify-center"
         style={{
           paddingTop: 'env(safe-area-inset-top, 0px)',
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
@@ -878,7 +878,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
   return (
     <div
-      className="flex min-h-0 h-[100dvh] max-h-[100dvh] max-w-[100vw] flex-col overflow-hidden bg-[#e3e3e3] text-gray-900"
+      className="flex min-h-0 h-[100dvh] max-h-[100dvh] w-full min-w-0 max-w-full flex-col overflow-hidden bg-[#e3e3e3] text-gray-900"
       style={{
         width: '100%',
         paddingTop: 'env(safe-area-inset-top, 0px)',

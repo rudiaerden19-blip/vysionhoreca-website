@@ -393,7 +393,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   }
 
   return (
-    <div style={{ maxWidth: '100vw', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-100">
+    <div style={{ maxWidth: '100%', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-100">
       <PostTrialModulePickerModal
         tenantSlug={params.tenant}
         open={

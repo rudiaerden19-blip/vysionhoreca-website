@@ -888,7 +888,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   const todayHours = business.opening_hours[getDayName()]
 
   return (
-    <div style={{ width: '100vw', maxWidth: '100vw', overflowX: 'clip' }} className="min-h-screen bg-white">
+    <div style={{ width: '100%', maxWidth: '100%', overflowX: 'clip' }} className="min-h-screen bg-white">
       <MarketingDemoSessionPrime tenant={params.tenant} />
       {/* Fixed Header - Clean & Compact */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-black/30 backdrop-blur-md">

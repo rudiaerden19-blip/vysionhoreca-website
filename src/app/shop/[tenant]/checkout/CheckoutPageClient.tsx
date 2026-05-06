@@ -589,7 +589,7 @@ export default function CheckoutPageClient({
 
   return (
     <div
-      style={{ width: '100vw', maxWidth: '100vw', overflowX: 'clip' }}
+      style={{ width: '100%', maxWidth: '100%', overflowX: 'clip' }}
       className={`min-h-screen bg-gray-50${isKiosk ? ' kiosk-touch-ui' : ''}`}
     >
       {/* Header */}

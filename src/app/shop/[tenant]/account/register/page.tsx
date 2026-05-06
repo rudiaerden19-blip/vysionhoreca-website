@@ -144,7 +144,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
   }
 
   return (
-    <div style={{ maxWidth: '100vw', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-50 flex items-center justify-center p-3 sm:p-4">
+    <div style={{ maxWidth: '100%', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-50 flex items-center justify-center p-3 sm:p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
