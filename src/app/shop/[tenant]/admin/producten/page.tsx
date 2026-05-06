@@ -5,9 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { 
   DndContext, 
   closestCenter, 
-  KeyboardSensor, 
-  PointerSensor, 
-  useSensor, 
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
   useSensors,
   DragEndEvent 
 } from '@dnd-kit/core'
@@ -101,7 +102,7 @@ function SortableProductCard({
       <div 
         {...attributes} 
         {...listeners}
-        className="bg-gray-50 px-4 py-2 cursor-grab active:cursor-grabbing flex items-center justify-center gap-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors border-b"
+        className="touch-none select-none bg-gray-50 px-4 py-2 cursor-grab active:cursor-grabbing flex items-center justify-center gap-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors border-b"
       >
         <span className="text-lg">⠿</span>
         <span className="text-xs font-medium">Sleep om te verplaatsen</span>
@@ -113,7 +114,8 @@ function SortableProductCard({
           <img
             src={product.image_url}
             alt={product.name}
-            className="w-full h-full object-cover"
+            draggable={false}
+            className="w-full h-full object-cover pointer-events-none"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-5xl bg-gray-50">
@@ -308,12 +310,12 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     }
   }
 
-  // Drag & drop sensors
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
+    useSensor(MouseSensor, {
+      activationConstraint: { distance: 5 },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 200, tolerance: 6 },
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
