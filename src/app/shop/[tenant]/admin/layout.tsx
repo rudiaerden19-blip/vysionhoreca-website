@@ -50,8 +50,8 @@ interface AdminLayoutProps {
   params: { tenant: string }
 }
 
-// Vergrendel-knop in topbalk op deze admin-subroutes — niet op dashboard/rapporten/analyse/Z-rapport.
-const LOCK_PAGES = ['categorieen', 'producten']
+// Vergrendel-knop in topbalk op deze admin-subroutes — niet op dashboard/rapporten/producten/…
+const LOCK_PAGES = ['categorieen']
 
 export default function AdminLayout({ children, params }: AdminLayoutProps) {
   const pathname = usePathname()
