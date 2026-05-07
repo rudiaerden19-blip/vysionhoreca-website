@@ -4889,7 +4889,7 @@
     },
     "posQuality": {
       "title": "Hardware premium di alta qualità",
-      "body": "Hardware e software di qualità molto elevata. Risparmia su installazione e costi del personale. Spesso oltre il 30% al mese. L’hardware include doppio schermo, processore Intel Core i5, SSD da 128 GB e 8 GB di RAM."
+      "body": "Hardware e software di qualità molto elevata. Risparmia su installazione e costi del personale. Spesso oltre il 30% al mese. L’hardware include doppio schermo, processore Intel Core i7, SSD da 128 GB e 16 GB di RAM."
     },
     "foodtrucksOffline": {
       "title": "Food truck e offline",
@@ -4911,7 +4911,7 @@
     "headline": "La «bestia» Vysion: potenza massima, proprietà totale",
     "intro": "Scegli hardware che non solo accelera l’attività, ma dopo 24 mesi è davvero **di tua proprietà**. Niente affitto infinito: un investimento nel futuro della tua azienda.",
     "specsHeading": "Specifiche che fanno la differenza",
-    "specSpeed": "**Velocità senza pari**: grazie al **processore Intel Core i5** e **8 GB di RAM** gestisci le transazioni in un attimo, senza rallentamenti — con 10 o 10.000 prodotti.",
+    "specSpeed": "**Velocità senza pari**: grazie al **processore Intel Core i7** e **16 GB di RAM** gestisci le transazioni in un attimo, senza rallentamenti — con 10 o 10.000 prodotti.",
     "specDualTitle": "Doppia interazione",
     "specDualMain": "**Display principale da 15 pollici**: per te e il team. Luminoso, reattivo e pensato per un uso quotidiano intenso.",
     "specDualCustomer": "**Display cliente da 11,5 pollici**: per i clienti. Mostra l’ordine, le promo o il pagamento tramite QR code.",
@@ -4920,7 +4920,7 @@
     "worksLead": "Non è un tablet su un supporto, ma una workstation industriale professionale. Panificio, abbigliamento, bar o shop online: l’hardware segue il tuo ritmo.",
     "worksBullet1": "**Offerta chiara**: nessun costo nascosto. Dopo 24 mesi finisce il piano rateale: la macchina è 100% tua.",
     "worksBullet2": "**Adatto a ogni settore**: design pulito e professionale su ogni bancone.",
-    "quote": "Smetti di noleggiare, inizia a possedere. Scegli la potenza di una workstation i5."
+    "quote": "Smetti di noleggiare, inizia a possedere. Scegli la potenza di una workstation i7."
   },
   "platform": {
     "sectionTitle": "La nostra piattaforma",
@@ -5439,9 +5439,9 @@
   "sectorPages": {
     "breadcrumb": "Settori",
     "hardwareBeest": {
-      "title": "Vysion i5 dual-screen: 'La Bestia'",
-      "specProcessor": "🚀 Processore: Intel i5 Core (velocità senza pari)",
-      "specMemory": "🧠 Memoria: 8 GB RAM + 128 GB SSD",
+      "title": "Vysion i7 dual-screen: 'La Bestia'",
+      "specProcessor": "🚀 Processore: Intel i7 Core (velocità senza pari)",
+      "specMemory": "🧠 Memoria: 16 GB RAM + 128 GB SSD",
       "specScreens": "🖥️ Schermi: 15\" operatore + 11,5\" cliente",
       "specLanguages": "🌍 Lingue: 9 lingue (tra cui arabo, cinese, giapponese)",
       "specIncluded": "🖨️ Incluso: stampante integrata + 5 rotoli di carta gratis",
@@ -5449,58 +5449,58 @@
       "demoCta": "Richiedi ora la demo gratuita — Ritiro immediato nel nostro negozio in Belgio"
     },
     "bakkerij": {
-      "h1": "Cassa più veloce per panetterie | i5 e 9 lingue | Vysion",
-      "intro": "Layout cassa per panetteria: Intel i5 per il picco mattutino, 9 lingue per il team, proprietà hardware dopo 24 mesi — il POS Belgio e Paesi Bassi.",
+      "h1": "Cassa più veloce per panetterie | i7 e 9 lingue | Vysion",
+      "intro": "Layout cassa per panetteria: Intel i7 per il picco mattutino, 9 lingue per il team, proprietà hardware dopo 24 mesi — il POS Belgio e Paesi Bassi.",
       "body1": "Brunch o weekend intenso? POS touch, stampante e software reattivo. Acquisto o leasing: un pacchetto chiaro, zero sorprese.",
       "body2": "Per chi vuole margine e ritmo. Proprietà dopo 24 mesi batte l’affitto infinito — il POS belga su cui crescere.",
       "imageAlt": "Layout cassa Vysion per panetteria",
       "cta": "Inizia gratis — prova 14 giorni",
-      "ownership24": "Smetti di noleggiare. Dopo 24 mesi questa cassa i5 è 100% tua."
+      "ownership24": "Smetti di noleggiare. Dopo 24 mesi questa cassa i7 è 100% tua."
     },
     "cafe": {
-      "h1": "Cassa ristorazione per caffè | i5 dual-screen e 9 lingue | Vysion",
-      "intro": "Il ritmo del bar chiede cassa veloce: hardware i5, 9 lingue per team multilingue, margini sotto controllo — POS per brasserie, coffee bar e pranzo.",
+      "h1": "Cassa ristorazione per caffè | i7 dual-screen e 9 lingue | Vysion",
+      "intro": "Il ritmo del bar chiede cassa veloce: hardware i7, 9 lingue per team multilingue, margini sotto controllo — POS per brasserie, coffee bar e pranzo.",
       "body1": "Picco mattutino o terrazza piena: la cassa più veloce al banco. Sala, asporto e ordini online in un flusso — ideale in Belgio per bar affollati.",
-      "body2": "Meno tocchi, meno errori, più coperti. Prova Vysion gratis — potenza i5 e proprietà dopo 24 mesi.",
+      "body2": "Meno tocchi, meno errori, più coperti. Prova Vysion gratis — potenza i7 e proprietà dopo 24 mesi.",
       "imageAlt": "Layout cassa Vysion per caffè e brasserie",
       "cta": "Inizia gratis",
-      "ownership24": "Smetti di noleggiare. Dopo 24 mesi questa cassa i5 è 100% tua."
+      "ownership24": "Smetti di noleggiare. Dopo 24 mesi questa cassa i7 è 100% tua."
     },
     "frituur": {
-      "h1": "Cassa friggitoria | Checkout i5 più veloce | Vysion",
-      "intro": "Picchi da friggitoria ed eventi: la cassa deve reggere. Intel i5, doppio schermo cliente, 9 lingue — per code, olio e ritmo.",
+      "h1": "Cassa friggitoria | Checkout i7 più veloce | Vysion",
+      "intro": "Picchi da friggitoria ed eventi: la cassa deve reggere. Intel i7, doppio schermo cliente, 9 lingue — per code, olio e ritmo.",
       "body1": "Ordini, salse e contorni senza rallentamenti. POS touch, stampante integrata e ordini online — cassa friggitoria Belgio e Paesi Bassi.",
       "body2": "Code corte, margini stretti. Inizia gratis, prova in negozio, hardware tuo dopo 24 mesi.",
       "imageAlt": "Layout cassa Vysion per friggitoria e snack",
       "cta": "Inizia gratis",
-      "ownership24": "Smetti di noleggiare. Dopo 24 mesi questa cassa i5 è 100% tua."
+      "ownership24": "Smetti di noleggiare. Dopo 24 mesi questa cassa i7 è 100% tua."
     },
     "kebab": {
-      "h1": "Cassa kebab & panineria | Potenza i5 | Vysion",
-      "intro": "Sere piene e panini al massimo: i5 e 9 lingue tengono il team veloce — POS per kebab, döner e panineria.",
+      "h1": "Cassa kebab & panineria | Potenza i7 | Vysion",
+      "intro": "Sere piene e panini al massimo: i7 e 9 lingue tengono il team veloce — POS per kebab, döner e panineria.",
       "body1": "Sala, asporto e consegna senza caos. Flusso cassa rapido con scontrini chiari — POS Belgio per alto throughput.",
-      "body2": "Meno stress al bancone, più controllo sui ricavi. Prova gratis e scopri perché si sceglie i5.",
+      "body2": "Meno stress al bancone, più controllo sui ricavi. Prova gratis e scopri perché si sceglie i7.",
       "imageAlt": "Layout cassa Vysion per kebab e panineria",
       "cta": "Inizia gratis",
-      "ownership24": "Smetti di noleggiare. Dopo 24 mesi questa cassa i5 è 100% tua."
+      "ownership24": "Smetti di noleggiare. Dopo 24 mesi questa cassa i7 è 100% tua."
     },
     "kapper": {
       "h1": "Cassa per parrucchieri e saloni | Elegante e veloce | Vysion",
-      "intro": "Cassa i5 professionale, pagamenti fluidi, 9 lingue per il team, proprietà hardware dopo 24 mesi — l’upgrade per il tuo salone.",
+      "intro": "Cassa i7 professionale, pagamenti fluidi, 9 lingue per il team, proprietà hardware dopo 24 mesi — l’upgrade per il tuo salone.",
       "body1": "Niente code in reception con poltrone piene. Il flusso più veloce tiene la giornata in carreggiata — saloni Belgio e Paesi Bassi.",
       "body2": "Appuntamenti, vendita e mance in un’unica vista. Prova Vysion gratis — checkout premium.",
       "imageAlt": "Layout cassa Vysion per salone",
       "cta": "Inizia gratis",
-      "ownership24": "Smetti di noleggiare. Dopo 24 mesi questa cassa i5 è 100% tua."
+      "ownership24": "Smetti di noleggiare. Dopo 24 mesi questa cassa i7 è 100% tua."
     },
     "retail": {
-      "h1": "Cassa retail & magazzino | L'i5 'Bestia' per negozi | Vysion",
-      "intro": "Magazzino su i5 (8 GB RAM), POS touch e integrazione web gratuita — retail che scala con te.",
+      "h1": "Cassa retail & magazzino | L'i7 'Bestia' per negozi | Vysion",
+      "intro": "Magazzino su i7 (16 GB RAM), POS touch e integrazione web gratuita — retail che scala con te.",
       "body1": "Cassa retail veloce: magazzino e vendita su uno schermo. Acquisto POS con margini e velocità — sistema belga per negozi.",
       "body2": "Dal barcode alla chiusura: meno errori, più ritmo. Hardware premium tuo dopo 24 mesi — niente affitto senza vantaggio.",
       "imageAlt": "Layout cassa Vysion per retail e negozio",
       "cta": "Inizia gratis",
-      "ownership24": "Smetti di noleggiare. Dopo 24 mesi questa cassa i5 è 100% tua."
+      "ownership24": "Smetti di noleggiare. Dopo 24 mesi questa cassa i7 è 100% tua."
     }
   }
 }

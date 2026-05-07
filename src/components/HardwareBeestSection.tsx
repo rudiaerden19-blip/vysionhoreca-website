@@ -6,7 +6,7 @@ import { useLanguage } from '@/i18n'
 
 /** Vaste SEO-/alt-tekst zoals afgesproken voor beide productfoto's. */
 export const VYSION_I5_DUAL_SCREEN_IMAGE_ALT =
-  'Vysion i5 Dual-Screen Kassa - Eigendom na 24 maanden - 9 talen ondersteuning'
+  'Vysion i7 Dual-Screen Kassa - Eigendom na 24 maanden - 9 talen ondersteuning'
 
 const SPEC_KEYS = [
   'specProcessor',
@@ -17,7 +17,7 @@ const SPEC_KEYS = [
 ] as const
 
 /**
- * Marketingblok: witte i5-kassa + specs, daarna zwarte variant; onder elke foto een demo-CTA.
+ * Marketingblok: witte i7-kassa + specs, daarna zwarte variant; onder elke foto een demo-CTA.
  * Mobiel: beeld boven tekst (specificaties onder de eerste CTA).
  */
 export default function HardwareBeestSection() {

@@ -4912,7 +4912,7 @@
     },
     "posQuality": {
       "title": "Hochwertige Premium-Hardware",
-      "body": "Unsere Hardware und Software sind von sehr hoher Qualität. Sparen Sie Installations- und Personalkosten. Oft monatlich deutlich über 30 %. Unsere Hardware umfasst eine Doppelbildschirm-Lösung, Intel Core i5-Prozessor, 128 GB SSD und 8 GB RAM."
+      "body": "Unsere Hardware und Software sind von sehr hoher Qualität. Sparen Sie Installations- und Personalkosten. Oft monatlich deutlich über 30 %. Unsere Hardware umfasst eine Doppelbildschirm-Lösung, Intel Core i7-Prozessor, 128 GB SSD und 16 GB RAM."
     },
     "foodtrucksOffline": {
       "title": "Foodtrucks & Offline",
@@ -4934,7 +4934,7 @@
     "headline": "Das Vysion-„Biest“: maximale Leistung, volles Eigentum",
     "intro": "Entscheiden Sie sich für Hardware, die Ihren Betrieb nicht nur beschleunigt, sondern nach 24 Monaten wirklich **Ihr Eigentum** ist. Keine endlose Miete — eine Investition in die Zukunft Ihres Unternehmens.",
     "specsHeading": "Spezifikationen, die den Unterschied machen",
-    "specSpeed": "**Enorme Geschwindigkeit**: Dank **Intel Core i5-Prozessor** und **8 GB RAM** bearbeiten Sie Transaktionen blitzschnell und ruckelfrei — egal ob 10 oder 10.000 Artikel im System.",
+    "specSpeed": "**Enorme Geschwindigkeit**: Dank **Intel Core i7-Prozessor** und **16 GB RAM** bearbeiten Sie Transaktionen blitzschnell und ruckelfrei — egal ob 10 oder 10.000 Artikel im System.",
     "specDualTitle": "Doppelte Interaktion",
     "specDualMain": "**15-Zoll-Hauptdisplay**: für Sie und Ihr Team. Hell, responsiv und für intensiven Tageseinsatz gebaut.",
     "specDualCustomer": "**11,5-Zoll-Kundendisplay**: für Ihre Gäste. Bestellung zeigen, Aktionen präsentieren oder per QR-Code bezahlen lassen.",
@@ -4943,7 +4943,7 @@
     "worksLead": "Kein einfaches Tablet auf einem Ständer, sondern eine professionelle, industrielle Workstation. Bäckerei, Modegeschäft, Café oder Onlineshop — die Hardware hält Ihr Tempo mit.",
     "worksBullet1": "**Faire Abmachung**: keine versteckten Kosten. Nach 24 Monaten endet die Ratenzahlung — die Maschine ist 100 % Ihre.",
     "worksBullet2": "**Branchenfreundlich**: das klare Design wirkt professionell an jeder Theke.",
-    "quote": "Schluss mit Mieten, starten mit Besitzen. Entscheiden Sie sich für die Kraft einer i5-Workstation."
+    "quote": "Schluss mit Mieten, starten mit Besitzen. Entscheiden Sie sich für die Kraft einer i7-Workstation."
   },
   "platform": {
     "sectionTitle": "Unsere Plattform",
@@ -5462,9 +5462,9 @@
   "sectorPages": {
     "breadcrumb": "Branchen",
     "hardwareBeest": {
-      "title": "Vysion i5 Dual-Screen: 'Das Biest'",
-      "specProcessor": "🚀 Prozessor: Intel i5 Core (unglaubliche Geschwindigkeit)",
-      "specMemory": "🧠 Speicher: 8 GB RAM + 128 GB SSD",
+      "title": "Vysion i7 Dual-Screen: 'Das Biest'",
+      "specProcessor": "🚀 Prozessor: Intel i7 Core (unglaubliche Geschwindigkeit)",
+      "specMemory": "🧠 Speicher: 16 GB RAM + 128 GB SSD",
       "specScreens": "🖥️ Displays: 15\" Hauptdisplay + 11,5\" Kundendisplay",
       "specLanguages": "🌍 Sprachen: 9 Sprachen (u. a. Arabisch, Chinesisch, Japanisch)",
       "specIncluded": "🖨️ Inklusive: eingebauter Drucker + 5 gratis Papierrollen",
@@ -5472,58 +5472,58 @@
       "demoCta": "Jetzt kostenlose Demo anfragen — Sofort abholbar in unserem Laden in Belgien"
     },
     "bakkerij": {
-      "h1": "Schnellstes Kassensystem für Bäckereien | i5 & 9 Sprachen | Vysion",
-      "intro": "Kassenlayout für Bäcker: Intel i5 für Morgenspitzen, 9 Sprachen fürs Team, nach 24 Monaten gehört die Hardware Ihnen — das Kassensystem für Belgien und die Niederlande.",
+      "h1": "Schnellstes Kassensystem für Bäckereien | i7 & 9 Sprachen | Vysion",
+      "intro": "Kassenlayout für Bäcker: Intel i7 für Morgenspitzen, 9 Sprachen fürs Team, nach 24 Monaten gehört die Hardware Ihnen — das Kassensystem für Belgien und die Niederlande.",
       "body1": "Sie brauchen die schnellste Kasse bei Brunch und Wochenendstress? Touchscreen-POS, Bonprinter und Software, die mithält. Kaufen oder leasen: ein Paket ohne Überraschungen.",
       "body2": "Für Bäcker, die Marge und Tempo wollen. Eigentum nach 24 Monaten schlägt endloses Mieten — die belgische Kasse zum Wachsen.",
       "imageAlt": "Vysion Kassenlayout für Bäckerei",
       "cta": "Kostenlos starten — 14 Tage testen",
-      "ownership24": "Schluss mit Mieten. Nach 24 Monaten ist diese i5-Kasse zu 100 % Ihr Eigentum."
+      "ownership24": "Schluss mit Mieten. Nach 24 Monaten ist diese i7-Kasse zu 100 % Ihr Eigentum."
     },
     "cafe": {
-      "h1": "Gastronomie-Kasse für Cafés | i5 Dual-Screen & 9 Sprachen | Vysion",
-      "intro": "Café-Takt verlangt eine schnelle Kasse: i5-Hardware, 9 Sprachen für mehrsprachige Teams, Margen im Blick — die Gastro-Kasse für Brasserie, Coffee-Shop und Lunch.",
+      "h1": "Gastronomie-Kasse für Cafés | i7 Dual-Screen & 9 Sprachen | Vysion",
+      "intro": "Café-Takt verlangt eine schnelle Kasse: i7-Hardware, 9 Sprachen für mehrsprachige Teams, Margen im Blick — die Gastro-Kasse für Brasserie, Coffee-Shop und Lunch.",
       "body1": "Morgenstress oder Terrasse: Sie wollen die schnellste Theke. Zusammen mit Abholung und Online-Bestellung — ideal als belgisches Kassensystem für Cafés.",
-      "body2": "Weniger Tippen, weniger Fehler, mehr Umsatz pro Stunde. Vysion kostenlos testen — i5-Leistung mit klaren Konditionen und Eigentum nach 24 Monaten.",
+      "body2": "Weniger Tippen, weniger Fehler, mehr Umsatz pro Stunde. Vysion kostenlos testen — i7-Leistung mit klaren Konditionen und Eigentum nach 24 Monaten.",
       "imageAlt": "Vysion Kassenlayout für Café und Brasserie",
       "cta": "Kostenlos starten",
-      "ownership24": "Schluss mit Mieten. Nach 24 Monaten ist diese i5-Kasse zu 100 % Ihr Eigentum."
+      "ownership24": "Schluss mit Mieten. Nach 24 Monaten ist diese i7-Kasse zu 100 % Ihr Eigentum."
     },
     "frituur": {
-      "h1": "Imbiss-Kasse | Schnellste i5-Kasse | Vysion",
-      "intro": "Imbiss-Spitzen und Events: Ihre Kasse muss mithalten. Intel i5, Doppeldisplay für Gäste, 9 Sprachen fürs Team — für Stress, Öl und Tempo gebaut.",
+      "h1": "Imbiss-Kasse | Schnellste i7-Kasse | Vysion",
+      "intro": "Imbiss-Spitzen und Events: Ihre Kasse muss mithalten. Intel i7, Doppeldisplay für Gäste, 9 Sprachen fürs Team — für Stress, Öl und Tempo gebaut.",
       "body1": "Bestellungen, Soßen und Beilagen ohne Hänger. Touchscreen-POS, eingebauter Drucker und Online-Bestellung — die Imbiss-Kasse für Belgien und die Niederlande.",
       "body2": "Kurze Schlangen, straffe Margen. Kostenlos starten, in Ihrem Laden testen, Hardware nach 24 Monaten besitzen.",
       "imageAlt": "Vysion Kassenlayout für Imbiss und Snack-Bar",
       "cta": "Kostenlos starten",
-      "ownership24": "Schluss mit Mieten. Nach 24 Monaten ist diese i5-Kasse zu 100 % Ihr Eigentum."
+      "ownership24": "Schluss mit Mieten. Nach 24 Monaten ist diese i7-Kasse zu 100 % Ihr Eigentum."
     },
     "kebab": {
-      "h1": "Kebab- & Sandwichbar-Kasse | i5 Power | Vysion",
-      "intro": "Spätschicht und hohe Stückzahlen: i5-Hardware und 9 Sprachen halten Ihr Team schnell — die Kasse für Kebab, Döner und Sandwichbars.",
+      "h1": "Kebab- & Sandwichbar-Kasse | i7 Power | Vysion",
+      "intro": "Spätschicht und hohe Stückzahlen: i7-Hardware und 9 Sprachen halten Ihr Team schnell — die Kasse für Kebab, Döner und Sandwichbars.",
       "body1": "Gastraum, Abholung und Lieferung ohne Chaos. Schnellster Kassenfluss mit klaren Tickets — Gastro-Kasse Belgien für hohen Durchsatz.",
-      "body2": "Weniger Stress an der Theke, mehr Kontrolle über Umsatz. Kostenlos testen und sehen, warum Betreiber i5 wählen.",
+      "body2": "Weniger Stress an der Theke, mehr Kontrolle über Umsatz. Kostenlos testen und sehen, warum Betreiber i7 wählen.",
       "imageAlt": "Vysion Kassenlayout für Kebab und Sandwichbar",
       "cta": "Kostenlos starten",
-      "ownership24": "Schluss mit Mieten. Nach 24 Monaten ist diese i5-Kasse zu 100 % Ihr Eigentum."
+      "ownership24": "Schluss mit Mieten. Nach 24 Monaten ist diese i7-Kasse zu 100 % Ihr Eigentum."
     },
     "kapper": {
       "h1": "Kassensystem für Friseure & Salons | Stilvoll & schnell | Vysion",
-      "intro": "Upgrade für Ihren Salon: professionelle i5-Kasse, reibungslose Zahlungen, 9 Sprachen fürs Team, nach 24 Monaten gehört die Hardware Ihnen.",
+      "intro": "Upgrade für Ihren Salon: professionelle i7-Kasse, reibungslose Zahlungen, 9 Sprachen fürs Team, nach 24 Monaten gehört die Hardware Ihnen.",
       "body1": "Keine Schlange an der Kasse bei vollen Stühlen. Der schnellste Checkout hält den Tag im Plan — Belgien & Niederlande Salons.",
       "body2": "Termine, Verkauf und Trinkgeld in einem Überblick. Vysion kostenlos testen — stilvoller Checkout mit Premium-Hardware.",
       "imageAlt": "Vysion Kassenlayout für Friseursalon",
       "cta": "Kostenlos starten",
-      "ownership24": "Schluss mit Mieten. Nach 24 Monaten ist diese i5-Kasse zu 100 % Ihr Eigentum."
+      "ownership24": "Schluss mit Mieten. Nach 24 Monaten ist diese i7-Kasse zu 100 % Ihr Eigentum."
     },
     "retail": {
-      "h1": "Retail-Kasse & Lager | Das i5 'Biest' für Shops | Vysion",
-      "intro": "Lagerverwaltung auf starker i5-Hardware (8 GB RAM), Touchscreen-POS und kostenlose Website-Integration — Retail-Kasse, die mitwächst.",
+      "h1": "Retail-Kasse & Lager | Das i7 'Biest' für Shops | Vysion",
+      "intro": "Lagerverwaltung auf starker i7-Hardware (16 GB RAM), Touchscreen-POS und kostenlose Website-Integration — Retail-Kasse, die mitwächst.",
       "body1": "Schnelle Retail-Kasse: Lager und Verkauf auf einem Bildschirm. Kasse kaufen mit Margen- und Tempo-Fokus — belgisches System für Shops.",
       "body2": "Vom Barcode bis Tagesabschluss: weniger Fehler, mehr Tempo. Premium-Hardware nach 24 Monaten besitzen — ohne nutzloses Mieten.",
       "imageAlt": "Vysion Kassenlayout für Retail und Shop",
       "cta": "Kostenlos starten",
-      "ownership24": "Schluss mit Mieten. Nach 24 Monaten ist diese i5-Kasse zu 100 % Ihr Eigentum."
+      "ownership24": "Schluss mit Mieten. Nach 24 Monaten ist diese i7-Kasse zu 100 % Ihr Eigentum."
     }
   }
 }

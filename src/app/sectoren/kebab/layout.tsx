@@ -4,29 +4,29 @@ const canonical = '/sectoren/kebab'
 
 export const metadata: Metadata = {
   title: {
-    absolute: 'Kebab & Broodjesbar Kassa | i5 Kracht | Vysion',
+    absolute: 'Kebab & Broodjesbar Kassa | i7 Kracht | Vysion',
   },
   description:
-    'Kebab, döner en broodjesbar: i5 dual-screen kassa, 9 talen, snelle orders. Stop met huren. Na 24 maanden is deze i5 kassa 100% jouw eigendom. Horeca kassa België & Nederland.',
+    'Kebab, döner en broodjesbar: i7 dual-screen kassa, 9 talen, snelle orders. Stop met huren. Na 24 maanden is deze i7 kassa 100% jouw eigendom. Horeca kassa België & Nederland.',
   keywords: [
     'kebab kassa',
     'broodjesbar kassa',
     'horeca kassa',
     'snelste kassa',
     'kassasysteem België',
-    'i5 kassa',
+    'i7 kassa',
   ],
   alternates: { canonical },
   openGraph: {
-    title: 'Kebab & Broodjesbar Kassa | i5 Kracht | Vysion',
-    description: 'Kebab & broodjesbar: i5, 9 talen, snelle checkout. Start gratis.',
+    title: 'Kebab & Broodjesbar Kassa | i7 Kracht | Vysion',
+    description: 'Kebab & broodjesbar: i7, 9 talen, snelle checkout. Start gratis.',
     url: canonical,
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Kebab & Broodjesbar Kassa | i5 Kracht | Vysion',
-    description: 'Kebab POS met i5-kracht. België & Nederland — probeer gratis.',
+    title: 'Kebab & Broodjesbar Kassa | i7 Kracht | Vysion',
+    description: 'Kebab POS met i7-kracht. België & Nederland — probeer gratis.',
   },
 }
 

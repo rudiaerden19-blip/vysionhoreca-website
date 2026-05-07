@@ -4,10 +4,10 @@ const canonical = '/sectoren/retail'
 
 export const metadata: Metadata = {
   title: {
-    absolute: "Retail Kassa & Voorraadbeheer | Het i5 'Beest' voor Winkels | Vysion",
+    absolute: "Retail Kassa & Voorraadbeheer | Het i7 'Beest' voor Winkels | Vysion",
   },
   description:
-    'Winkelvoorraad op krachtige i5-kassa (8 GB RAM), touchscreen POS, gratis website-integratie. Stop met huren. Na 24 maanden is deze i5 kassa 100% jouw eigendom. Snelste retail kassa — kassasysteem België & Nederland.',
+    'Winkelvoorraad op krachtige i7-kassa (16 GB RAM), touchscreen POS, gratis website-integratie. Stop met huren. Na 24 maanden is deze i7 kassa 100% jouw eigendom. Snelste retail kassa — kassasysteem België & Nederland.',
   keywords: [
     'retail kassa',
     'winkel kassa',
@@ -15,19 +15,19 @@ export const metadata: Metadata = {
     'snelste kassa',
     'kassa kopen',
     'kassasysteem België',
-    'i5 kassa',
+    'i7 kassa',
   ],
   alternates: { canonical },
   openGraph: {
-    title: "Retail Kassa & Voorraadbeheer | Het i5 'Beest' voor Winkels | Vysion",
-    description: 'Retail: i5, voorraad, snelle checkout. Kassasysteem België — start gratis.',
+    title: "Retail Kassa & Voorraadbeheer | Het i7 'Beest' voor Winkels | Vysion",
+    description: 'Retail: i7, voorraad, snelle checkout. Kassasysteem België — start gratis.',
     url: canonical,
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Retail Kassa & Voorraadbeheer | Het i5 'Beest' voor Winkels | Vysion",
-    description: 'Retail POS met i5. Kassa kopen of proef — België & Nederland.',
+    title: "Retail Kassa & Voorraadbeheer | Het i7 'Beest' voor Winkels | Vysion",
+    description: 'Retail POS met i7. Kassa kopen of proef — België & Nederland.',
   },
 }
 

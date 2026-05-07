@@ -4889,7 +4889,7 @@
     },
     "posQuality": {
       "title": "Hardware premium de alta calidad",
-      "body": "Nuestro hardware y software son de muy alta calidad. Ahorre en instalación y personal. A menudo más del 30 % al mes. El hardware incluye doble pantalla, procesador Intel Core i5, 128 GB de SSD y 8 GB de RAM."
+      "body": "Nuestro hardware y software son de muy alta calidad. Ahorre en instalación y personal. A menudo más del 30 % al mes. El hardware incluye doble pantalla, procesador Intel Core i7, 128 GB de SSD y 16 GB de RAM."
     },
     "foodtrucksOffline": {
       "title": "Food trucks y sin conexión",
@@ -4911,7 +4911,7 @@
     "headline": "La « bestia » Vysion: máxima potencia, propiedad total",
     "intro": "Elija hardware que no solo acelere su negocio, sino que, tras 24 meses, sea de verdad **su propiedad**. Sin alquiler interminable: una inversión en el futuro de su empresa.",
     "specsHeading": "Especificaciones que marcan la diferencia",
-    "specSpeed": "**Velocidad sin igual**: con **procesador Intel Core i5** y **8 GB de RAM**, procesa transacciones al instante y sin tirones — tenga 10 o 10.000 productos.",
+    "specSpeed": "**Velocidad sin igual**: con **procesador Intel Core i7** y **16 GB de RAM**, procesa transacciones al instante y sin tirones — tenga 10 o 10.000 productos.",
     "specDualTitle": "Doble interacción",
     "specDualMain": "**Pantalla principal de 15 pulgadas**: para usted y su equipo. Nítida, reactiva y pensada para un uso diario intenso.",
     "specDualCustomer": "**Pantalla de cliente de 11,5 pulgadas**: para sus clientes. Muestre el pedido, promociones o cobre con código QR.",
@@ -4920,7 +4920,7 @@
     "worksLead": "No es una tablet simple en un soporte, sino un puesto industrial profesional. Panadería, moda, cafetería u tienda online: el hardware sigue su ritmo.",
     "worksBullet1": "**Trato honesto**: sin costes ocultos. A los 24 meses termina el pago aplazado: la máquina es 100 % suya.",
     "worksBullet2": "**Multi-sector**: un diseño limpio y profesional en cualquier mostrador.",
-    "quote": "Deje de alquilar, empiece a poseer. Elija la potencia de un puesto i5."
+    "quote": "Deje de alquilar, empiece a poseer. Elija la potencia de un puesto i7."
   },
   "platform": {
     "sectionTitle": "Nuestra plataforma",
@@ -5439,9 +5439,9 @@
   "sectorPages": {
     "breadcrumb": "Sectores",
     "hardwareBeest": {
-      "title": "Vysion i5 doble pantalla: 'La Bestia'",
-      "specProcessor": "🚀 Procesador: Intel i5 Core (velocidad sin igual)",
-      "specMemory": "🧠 Memoria: 8 GB RAM + 128 GB SSD",
+      "title": "Vysion i7 doble pantalla: 'La Bestia'",
+      "specProcessor": "🚀 Procesador: Intel i7 Core (velocidad sin igual)",
+      "specMemory": "🧠 Memoria: 16 GB RAM + 128 GB SSD",
       "specScreens": "🖥️ Pantallas: 15\" principal + 11,5\" cliente",
       "specLanguages": "🌍 Idiomas: 9 idiomas (incl. árabe, chino, japonés)",
       "specIncluded": "🖨️ Incluye: impresora integrada + 5 rollos de papel gratis",
@@ -5449,58 +5449,58 @@
       "demoCta": "Pide tu demo gratis — Listo para recoger en nuestra tienda en Bélgica"
     },
     "bakkerij": {
-      "h1": "TPV más rápido para panaderías | i5 y 9 idiomas | Vysion",
-      "intro": "Caja pensada para panadería: Intel i5 para el pico matinal, 9 idiomas para el equipo, propiedad del hardware a los 24 meses — el TPV Bélgica y Países Bajos.",
+      "h1": "TPV más rápido para panaderías | i7 y 9 idiomas | Vysion",
+      "intro": "Caja pensada para panadería: Intel i7 para el pico matinal, 9 idiomas para el equipo, propiedad del hardware a los 24 meses — el TPV Bélgica y Países Bajos.",
       "body1": "¿Brunch o fin de semana a tope? TPV táctil, impresora y software ágil. Comprar o alquilar: un paquete claro, sin sorpresas.",
       "body2": "Para panaderos que cuidan margen y ritmo. Propiedad a los 24 meses frente a alquilar sin fin — el TPV belga para crecer.",
       "imageAlt": "Layout Vysion TPV para panadería",
       "cta": "Empezar gratis — prueba 14 días",
-      "ownership24": "Deja de alquilar. A los 24 meses, este TPV i5 es 100 % tuyo."
+      "ownership24": "Deja de alquilar. A los 24 meses, este TPV i7 es 100 % tuyo."
     },
     "cafe": {
-      "h1": "TPV hostelería para cafeterías | i5 doble pantalla y 9 idiomas | Vysion",
-      "intro": "El ritmo del café exige caja rápida: hardware i5, 9 idiomas para equipos multilingües y control de márgenes — TPV para brasserie, bar de café y lunch.",
+      "h1": "TPV hostelería para cafeterías | i7 doble pantalla y 9 idiomas | Vysion",
+      "intro": "El ritmo del café exige caja rápida: hardware i7, 9 idiomas para equipos multilingües y control de márgenes — TPV para brasserie, bar de café y lunch.",
       "body1": "Rush matinal o terraza llena: la caja más rápida. Sala, para llevar y pedido online en un flujo — ideal en Bélgica para cafés con picos.",
-      "body2": "Menos toques, menos errores, más cubiertos. Prueba Vysion gratis — potencia i5 y propiedad a los 24 meses.",
+      "body2": "Menos toques, menos errores, más cubiertos. Prueba Vysion gratis — potencia i7 y propiedad a los 24 meses.",
       "imageAlt": "Layout Vysion TPV para café y brasserie",
       "cta": "Empezar gratis",
-      "ownership24": "Deja de alquilar. A los 24 meses, este TPV i5 es 100 % tuyo."
+      "ownership24": "Deja de alquilar. A los 24 meses, este TPV i7 es 100 % tuyo."
     },
     "frituur": {
-      "h1": "TPV freiduría | Checkout i5 más rápido | Vysion",
-      "intro": "Picos de freiduría y eventos: tu caja debe aguantar. Intel i5, doble pantalla para el cliente, 9 idiomas — para colas, aceite y ritmo.",
+      "h1": "TPV freiduría | Checkout i7 más rápido | Vysion",
+      "intro": "Picos de freiduría y eventos: tu caja debe aguantar. Intel i7, doble pantalla para el cliente, 9 idiomas — para colas, aceite y ritmo.",
       "body1": "Pedidos, salsas y guarniciones sin bloqueos. TPV táctil, impresora integrada y pedido online — el TPV freiduría Bélgica y Países Bajos.",
       "body2": "Colas cortas, márgenes claros. Empieza gratis, prueba en tu local, hardware tuyo a los 24 meses.",
       "imageAlt": "Layout Vysion TPV para freiduría y snack",
       "cta": "Empezar gratis",
-      "ownership24": "Deja de alquilar. A los 24 meses, este TPV i5 es 100 % tuyo."
+      "ownership24": "Deja de alquilar. A los 24 meses, este TPV i7 es 100 % tuyo."
     },
     "kebab": {
-      "h1": "TPV kebab y bocatería | Potencia i5 | Vysion",
-      "intro": "Noches intensas y bocadillos al máximo: hardware i5 y 9 idiomas mantienen al equipo rápido — TPV para kebab, döner y bocatería.",
+      "h1": "TPV kebab y bocatería | Potencia i7 | Vysion",
+      "intro": "Noches intensas y bocadillos al máximo: hardware i7 y 9 idiomas mantienen al equipo rápido — TPV para kebab, döner y bocatería.",
       "body1": "Sala, recogida y reparto sin caos. Flujo de caja rápido con tickets claros — TPV hostelería Bélgica para alto rendimiento.",
-      "body2": "Menos estrés en mostrador, más control de ingresos. Prueba gratis y ve por qué eligen i5.",
+      "body2": "Menos estrés en mostrador, más control de ingresos. Prueba gratis y ve por qué eligen i7.",
       "imageAlt": "Layout Vysion TPV para kebab y bocatería",
       "cta": "Empezar gratis",
-      "ownership24": "Deja de alquilar. A los 24 meses, este TPV i5 es 100 % tuyo."
+      "ownership24": "Deja de alquilar. A los 24 meses, este TPV i7 es 100 % tuyo."
     },
     "kapper": {
       "h1": "TPV para peluquerías y salones | Elegante y rápido | Vysion",
-      "intro": "TPV i5 profesional, pagos fluidos, 9 idiomas para el equipo, propiedad del hardware a los 24 meses — la mejora para tu salón.",
+      "intro": "TPV i7 profesional, pagos fluidos, 9 idiomas para el equipo, propiedad del hardware a los 24 meses — la mejora para tu salón.",
       "body1": "Sin colas en recepción con sillones llenos. El flujo más rápido mantiene el día ordenado — salones Bélgica y Países Bajos.",
       "body2": "Citas, venta y propinas en una vista. Prueba Vysion gratis — checkout premium.",
       "imageAlt": "Layout Vysion TPV para peluquería",
       "cta": "Empezar gratis",
-      "ownership24": "Deja de alquilar. A los 24 meses, este TPV i5 es 100 % tuyo."
+      "ownership24": "Deja de alquilar. A los 24 meses, este TPV i7 es 100 % tuyo."
     },
     "retail": {
-      "h1": "TPV retail y stock | El i5 'Bestia' para tiendas | Vysion",
-      "intro": "Stock en i5 (8 GB RAM), TPV táctil e integración web gratis — retail que crece contigo.",
+      "h1": "TPV retail y stock | El i7 'Bestia' para tiendas | Vysion",
+      "intro": "Stock en i7 (16 GB RAM), TPV táctil e integración web gratis — retail que crece contigo.",
       "body1": "TPV retail rápido: stock y venta en una pantalla. Comprar TPV con margen y velocidad — sistema belga para tiendas.",
       "body2": "Del código de barras al cierre: menos errores, más ritmo. Hardware premium tuyo a los 24 meses — sin alquilar sin beneficio.",
       "imageAlt": "Layout Vysion TPV para retail y tienda",
       "cta": "Empezar gratis",
-      "ownership24": "Deja de alquilar. A los 24 meses, este TPV i5 es 100 % tuyo."
+      "ownership24": "Deja de alquilar. A los 24 meses, este TPV i7 es 100 % tuyo."
     }
   }
 }

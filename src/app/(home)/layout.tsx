@@ -6,7 +6,7 @@ const siteUrl = 'https://www.vysionhoreca.com'
 const HOME_TITLE =
   'Horeca kassa, online bestelplatform & hardware | Gratis proberen | Vysion'
 const HOME_DESCRIPTION =
-  'Zoek je een horeca kassa, online bestelplatform of gratis uitproberen? Vysion: touchscreen POS, webshop, premium kassahardware (Intel i5). 14 dagen gratis — reserveringen, keukenscherm, WhatsApp, 9 talen. België & Nederland.'
+  'Zoek je een horeca kassa, online bestelplatform of gratis uitproberen? Vysion: touchscreen POS, webshop, premium kassahardware (Intel i7). 14 dagen gratis — reserveringen, keukenscherm, WhatsApp, 9 talen. België & Nederland.'
 
 export const metadata: Metadata = {
   title: {
