@@ -2,12 +2,13 @@
   "name": "vysion-print-agent",
   "version": "1.0.0",
   "private": true,
+  "author": "Vysion Horeca",
   "description": "Lokale USB/Windows bonprinter voor Ordervysion — dubbelklik installer, geen npm op de kassa.",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder --win nsis --publish never"
+    "dist": "electron-builder --win nsis --x64 --publish never"
   },
   "build": {
     "appId": "com.vysionhoreca.printagent",
@@ -24,8 +25,7 @@
     "asarUnpack": ["print-raw.ps1"],
     "nsis": {
       "oneClick": true,
-      "perMachine": false,
-      "allowToChangeInstallationDirectory": true
+      "perMachine": false
     },
     "win": {
       "target": ["nsis"],
