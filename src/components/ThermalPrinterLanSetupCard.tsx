@@ -14,11 +14,12 @@ import {
   THERMAL_PRINTER_IP_SYNC_EVENT,
 } from '@/lib/thermal-printer-sync'
 
-type Props = { tenantSlug: string }
+type Props = { tenantSlug: string; variant?: 'shopLight' | 'dashboardDark' }
 
-export function ThermalPrinterLanSetupCard({ tenantSlug }: Props) {
+export function ThermalPrinterLanSetupCard({ tenantSlug, variant = 'shopLight' }: Props) {
   const { t } = useLanguage()
   const txShop = (key: string) => t(`shopDisplay.${key}`)
+  const isDark = variant === 'dashboardDark'
 
   const [printerIP, setPrinterIP] = useState<string | null>(null)
   const [printerStatus, setPrinterStatus] = useState<'unknown' | 'online' | 'offline'>('unknown')
@@ -94,14 +95,20 @@ export function ThermalPrinterLanSetupCard({ tenantSlug }: Props) {
   }
 
   return (
-    <div className="rounded-2xl border border-orange-200 bg-orange-50/80 p-6 shadow-sm space-y-4">
+    <div
+      className={
+        isDark
+          ? 'rounded-2xl border border-orange-500/35 bg-orange-950/40 p-6 shadow-sm space-y-4'
+          : 'rounded-2xl border border-orange-200 bg-orange-50/80 p-6 shadow-sm space-y-4'
+      }
+    >
       <div className="flex items-start gap-3">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-500 text-lg font-bold text-white">
           1
         </div>
         <div className="min-w-0">
-          <h2 className="text-lg font-bold text-gray-900">Kassa + LAN-printer</h2>
-          <p className="mt-1 text-sm text-gray-700 leading-snug">
+          <h2 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Kassa + LAN-printer</h2>
+          <p className={`mt-1 text-sm leading-snug ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
             Mini‑PC met ethernet naar uw Epson (RJ45). Op deze pc draait de print-service op poort{' '}
             {PRINTER_LAN_PRINT_SERVER_PORT}. Vul hieronder het adres waar de{' '}
             <strong>browser</strong> die service vindt — op <strong>dezelfde kassa-pc</strong> is dat{' '}
@@ -110,8 +117,14 @@ export function ThermalPrinterLanSetupCard({ tenantSlug }: Props) {
         </div>
       </div>
 
-      <div className="rounded-xl border border-gray-200 bg-white p-4 space-y-3">
-        <label className="block text-sm font-medium text-gray-800">
+      <div
+        className={
+          isDark
+            ? 'rounded-xl border border-gray-700 bg-[#141414] p-4 space-y-3'
+            : 'rounded-xl border border-gray-200 bg-white p-4 space-y-3'
+        }
+      >
+        <label className={`block text-sm font-medium ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>
           Print-service adres (IPv4)
           <input
             type="text"
@@ -121,11 +134,15 @@ export function ThermalPrinterLanSetupCard({ tenantSlug }: Props) {
             value={draftIp}
             onChange={(e) => setDraftIp(e.target.value)}
             placeholder={txShop('printerIpPlaceholder')}
-            className="mt-1.5 w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900 placeholder:text-gray-400 tabular-nums"
+            className={
+              isDark
+                ? 'mt-1.5 w-full rounded-xl border border-gray-600 bg-[#0f0f0f] px-4 py-3 text-white placeholder:text-gray-500 tabular-nums'
+                : 'mt-1.5 w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900 placeholder:text-gray-400 tabular-nums'
+            }
             aria-describedby="thermal-setup-hint"
           />
         </label>
-        <p id="thermal-setup-hint" className="text-xs text-gray-600 leading-snug">
+        <p id="thermal-setup-hint" className={`text-xs leading-snug ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
           Privé IPv4 zoals <span className="tabular-nums">127.0.0.1</span>,{' '}
           <span className="tabular-nums">192.168.x.x</span>. Geen hostnaam. De service luistert op poort{' '}
           <span className="tabular-nums">{PRINTER_LAN_PRINT_SERVER_PORT}</span> — niet invullen in dit veld.
@@ -134,10 +151,16 @@ export function ThermalPrinterLanSetupCard({ tenantSlug }: Props) {
         <div
           className={`rounded-xl px-4 py-3 text-sm font-medium ${
             printerStatus === 'online'
-              ? 'bg-emerald-50 text-emerald-900 border border-emerald-200'
+              ? isDark
+                ? 'border border-emerald-700 bg-emerald-950/50 text-emerald-100'
+                : 'bg-emerald-50 text-emerald-900 border border-emerald-200'
               : printerStatus === 'offline'
-                ? 'bg-red-50 text-red-900 border border-red-200'
-                : 'bg-gray-50 text-gray-700 border border-gray-200'
+                ? isDark
+                  ? 'border border-red-800 bg-red-950/40 text-red-100'
+                  : 'bg-red-50 text-red-900 border border-red-200'
+                : isDark
+                  ? 'border border-gray-600 bg-gray-900 text-gray-300'
+                  : 'bg-gray-50 text-gray-700 border border-gray-200'
           }`}
         >
           {printerStatus === 'online' && printerIP && (
@@ -167,14 +190,22 @@ export function ThermalPrinterLanSetupCard({ tenantSlug }: Props) {
               <button
                 type="button"
                 onClick={() => void fetchThermalPrinterOnline(printerIP).then((ok) => setPrinterStatus(ok ? 'online' : 'offline'))}
-                className="rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50"
+                className={
+                  isDark
+                    ? 'rounded-xl border border-gray-600 bg-[#1a1a1a] px-4 py-2.5 text-sm font-semibold text-gray-100 hover:bg-gray-800'
+                    : 'rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50'
+                }
               >
                 Test verbinding
               </button>
               <button
                 type="button"
                 onClick={clearIp}
-                className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50"
+                className={
+                  isDark
+                    ? 'rounded-xl border border-gray-700 bg-[#1a1a1a] px-4 py-2.5 text-sm font-semibold text-gray-400 hover:bg-gray-800'
+                    : 'rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50'
+                }
               >
                 Wissen
               </button>
