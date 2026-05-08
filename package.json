@@ -14,7 +14,9 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:no-server": "PLAYWRIGHT_SKIP_WEBSERVER=1 playwright test",
     "k6:load": "k6 run k6/ordervysion-load.js",
-    "check:supabase-advisor": "node -e \"console.log('Open Supabase Dashboard → Database → Advisors/Linter. Zie supabase/README_RLS_AND_SECURITY_ADVISOR.md')\""
+    "check:supabase-advisor": "node -e \"console.log('Open Supabase Dashboard → Database → Advisors/Linter. Zie supabase/README_RLS_AND_SECURITY_ADVISOR.md')\"",
+    "epson-print:list": "npm run list --prefix epson-print --",
+    "epson-print:test": "npm run print:test --prefix epson-print --"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
