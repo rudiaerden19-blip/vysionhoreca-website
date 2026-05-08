@@ -92,7 +92,20 @@ function listWindowsPrintersSync() {
 
 function createApp(getPrinterName /* () => string | null */) {
   const app = express()
-  app.use(cors({ origin: true }))
+
+  /** Chromium: HTTPS-pagina → localhost mag pas na deze header (Private Network Access). */
+  app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Private-Network', 'true')
+    next()
+  })
+
+  app.use(
+    cors({
+      origin: true,
+      methods: ['GET', 'POST', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Access-Control-Request-Private-Network'],
+    })
+  )
   app.use(express.json({ limit: '512kb' }))
 
   app.get('/health', (_req, res) => {
