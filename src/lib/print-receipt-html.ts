@@ -472,7 +472,10 @@ export async function tryKassaCustomerThermalDirectLan(opts: {
 }
 
 /**
- * Volgorde: offline + niet-loopback → direct LAN; anders → print-proxy of direct localhost :3001 (USB-bridge).
+ * Volgorde:
+ * - **127.0.0.1 / localhost**: altijd direct naar :3001 op deze pc. De Vercel print-proxy bereikt nooit de localhost van de zaak → was pure fallback naar HTML/PDF.
+ * - Anders offline: direct LAN (browser → http://IP:3001).
+ * - Anders online: eerst direct LAN (sommige setups), dan print-proxy (alleen nuttig als de API het LAN kan bereiken).
  */
 export async function printKassaReceiptThermalThenHtml(opts: {
   printerIP: string | null
@@ -484,7 +487,14 @@ export async function printKassaReceiptThermalThenHtml(opts: {
   const raw = opts.printerIP?.trim()
   const ip = raw ? normalizeLanPrinterIp(raw) : null
   if (ip) {
-    if (!opts.isOnline && !isLoopbackThermalPrinterHost(ip)) {
+    if (isLoopbackThermalPrinterHost(ip)) {
+      const ok = await tryKassaCustomerThermalDirectLan({
+        printerIP: ip,
+        order: opts.order,
+        businessInfo: opts.businessInfo,
+      })
+      if (ok) return
+    } else if (!opts.isOnline) {
       const okDirect = await tryKassaCustomerThermalDirectLan({
         printerIP: ip,
         order: opts.order,
@@ -492,6 +502,12 @@ export async function printKassaReceiptThermalThenHtml(opts: {
       })
       if (okDirect) return
     } else {
+      const okDirectFirst = await tryKassaCustomerThermalDirectLan({
+        printerIP: ip,
+        order: opts.order,
+        businessInfo: opts.businessInfo,
+      })
+      if (okDirectFirst) return
       const ok = await tryKassaCustomerThermalViaProxy({
         printerIP: ip,
         order: opts.order,
