@@ -65,6 +65,8 @@ import { fetchOrderNumberByKassaClientUuid } from '@/lib/kassa-fetch-order-numbe
 import { formatKassaNumpadHeaderDate } from '@/lib/format-kassa-header-date'
 import { appendKassaCloseTipToAbsoluteLoginUrl } from '@/lib/shop-login-kassa-tip'
 import { syncZReportAfterOrderSafe } from '@/lib/kassa-z-sync-safe'
+import { fetchThermalPrinterOnline } from '@/lib/printer-lan'
+import { THERMAL_PRINTER_IP_SYNC_EVENT, thermalPrinterIpStorageKey } from '@/lib/thermal-printer-sync'
 import { KassaAnalogClock } from '@/components/kassa/KassaAnalogClock'
 import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
 import { KassaRegisterSuspenseFallback } from '@/components/KassaRegisterSuspenseFallback'
@@ -219,8 +221,38 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [langOpen, setLangOpen] = useState(false)
   const [logoutSoftwareConfirmOpen, setLogoutSoftwareConfirmOpen] = useState(false)
   const langRef = useRef<HTMLDivElement>(null)
+  const [thermalPrinterQuickStatus, setThermalPrinterQuickStatus] = useState<'unset' | 'online' | 'offline'>(
+    'unset',
+  )
   /** Alleen bij product/opties: toon korte popup als verkoopmedewerker verplicht is. */
   const blockSaleWithoutStaffIfNeededRef = useRef<() => boolean>(() => false)
+
+  useEffect(() => {
+    const refresh = () => {
+      const ip = getSavedLanPrinterIp(tenant)
+      if (!ip) {
+        setThermalPrinterQuickStatus('unset')
+        return
+      }
+      void fetchThermalPrinterOnline(ip).then((ok) => setThermalPrinterQuickStatus(ok ? 'online' : 'offline'))
+    }
+    refresh()
+    const onSync = (e: Event) => {
+      const d = (e as CustomEvent<{ tenantSlug?: string }>).detail
+      if (d?.tenantSlug === tenant) refresh()
+    }
+    const onStorage = (ev: StorageEvent) => {
+      if (ev.key === thermalPrinterIpStorageKey(tenant)) refresh()
+    }
+    window.addEventListener(THERMAL_PRINTER_IP_SYNC_EVENT, onSync as EventListener)
+    window.addEventListener('storage', onStorage)
+    const id = window.setInterval(refresh, 45_000)
+    return () => {
+      window.removeEventListener(THERMAL_PRINTER_IP_SYNC_EVENT, onSync as EventListener)
+      window.removeEventListener('storage', onStorage)
+      window.clearInterval(id)
+    }
+  }, [tenant])
 
   // ── Nieuwe bestelling alarm (exact donor) ────────────────────────────────
   const [newOrderAlert, setNewOrderAlert] = useState<{id: string; orderNumber: number; total: number} | null>(null)
@@ -1947,6 +1979,30 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <span>{t('kassaApp.navKitchenDisplay')}</span>
             </Link>
           )}
+
+          <Link
+            href={`/shop/${tenant}/admin/bonnenprinter`}
+            prefetch={false}
+            title={
+              thermalPrinterQuickStatus === 'unset'
+                ? t('kassaApp.thermalPrinterUnsetHint')
+                : thermalPrinterQuickStatus === 'offline'
+                  ? t('kassaApp.thermalPrinterOfflineHint')
+                  : t('kassaApp.thermalPrinterOnlineHint')
+            }
+            className={`inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-xl px-2 py-2 text-xs font-bold text-white transition-colors sm:gap-1.5 sm:px-3 sm:text-sm ${
+              thermalPrinterQuickStatus === 'online'
+                ? 'bg-emerald-700 hover:bg-emerald-800'
+                : thermalPrinterQuickStatus === 'offline'
+                  ? 'bg-amber-600 hover:bg-amber-700'
+                  : 'bg-[#3C4D6B] hover:bg-[#2D3A52]'
+            }`}
+          >
+            <span className="text-base sm:text-lg" aria-hidden>
+              🖨️
+            </span>
+            <span>{t('kassaApp.navBonnenprinter')}</span>
+          </Link>
 
           <button
             type="button"
