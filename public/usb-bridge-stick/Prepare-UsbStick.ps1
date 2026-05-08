@@ -2,6 +2,8 @@
 <#
   Bouwt map VysionUsbBridge-Stick (+ .zip) onder -OutputParent.
 
+  CI: epsonapp/main wordt telkens vers gecloned — bridge-updates (bv. CORS) zitten in nieuwe ZIP na workflow-run.
+
   Standaard (geen -BridgeRoot): download bridge uit GitHub-repo-ZIP — voor lokale pc met internet.
 
   Met -BridgeRoot: gebruik lokale map usb-print-bridge (GitHub Actions).
