@@ -3237,6 +3237,7 @@
     "cartTotal": "Total",
     "drawerOpen": "Abrir cajón",
     "printAgain": "Reimprimir",
+    "printAgentFallbackHint": "Vysion Print Agent غير قيد التشغيل على هذا الجهاز — سيتم فتح الإيصال للطباعة العادية (المتصفح). ثبّت Vysion Print Agent واختر الطابعة من منطقة الإعلامات.",
     "remove": "Eliminar",
     "parkToTable": "A mesa {number}",
     "checkout": "الدفع",

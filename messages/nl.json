@@ -3691,6 +3691,7 @@
     "cartTotal": "Totaal",
     "drawerOpen": "Lade open",
     "printAgain": "Print opnieuw",
+    "printAgentFallbackHint": "Vysion Print Agent niet bereikbaar op deze PC — bon opent voor normale printer (browser). Tip: installeer Vysion Print Agent en kies je Epson in het systeemvak.",
     "remove": "Verwijder",
     "parkToTable": "Naar tafel {number}",
     "checkout": "Afrekenen",

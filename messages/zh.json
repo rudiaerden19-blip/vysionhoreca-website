@@ -3237,6 +3237,7 @@
     "cartTotal": "Total",
     "drawerOpen": "Abrir cajón",
     "printAgain": "Reimprimir",
+    "printAgentFallbackHint": "此电脑上未运行 Vysion Print Agent — 收据将以普通打印方式打开（浏览器）。请安装 Vysion Print Agent 并在系统托盘中选择小票打印机。",
     "remove": "Eliminar",
     "parkToTable": "A mesa {number}",
     "checkout": "结账",

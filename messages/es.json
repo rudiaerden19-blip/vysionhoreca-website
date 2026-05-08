@@ -3237,6 +3237,7 @@
     "cartTotal": "Total",
     "drawerOpen": "Abrir cajón",
     "printAgain": "Reimprimir",
+    "printAgentFallbackHint": "Vysion Print Agent no está activo en este PC — el ticket se abrirá para imprimir con la impresora normal (navegador). Instale Vysion Print Agent y elija la impresora en la bandeja del sistema.",
     "remove": "Eliminar",
     "parkToTable": "A mesa {number}",
     "checkout": "Cobrar",

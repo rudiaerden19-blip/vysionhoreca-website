@@ -2737,6 +2737,7 @@
     "cartTotal": "Total",
     "drawerOpen": "Ouvrir le tiroir",
     "printAgain": "Réimprimer",
+    "printAgentFallbackHint": "Vysion Print Agent n’est pas actif sur ce PC — le ticket s’ouvre pour l’impression normale (navigateur). Installez Vysion Print Agent et choisissez votre imprimante dans la barre des tâches.",
     "remove": "Supprimer",
     "parkToTable": "Vers table {number}",
     "checkout": "Payer",

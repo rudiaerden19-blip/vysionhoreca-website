@@ -3237,6 +3237,7 @@
     "cartTotal": "Total",
     "drawerOpen": "Abrir cajón",
     "printAgain": "Reimprimir",
+    "printAgentFallbackHint": "Vysion Print Agent non è attivo su questo PC — lo scontrino si apre per la stampa normale (browser). Installa Vysion Print Agent e scegli la stampante dall’area di notifica.",
     "remove": "Eliminar",
     "parkToTable": "A mesa {number}",
     "checkout": "Paga",

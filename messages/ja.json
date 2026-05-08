@@ -3237,6 +3237,7 @@
     "cartTotal": "Total",
     "drawerOpen": "Abrir cajón",
     "printAgain": "Reimprimir",
+    "printAgentFallbackHint": "このPCで Vysion Print Agent が動いていません — レシートは通常印刷（ブラウザ）で開きます。Vysion Print Agent をインストールし、タスクバーからレシートプリンタを選んでください。",
     "remove": "Eliminar",
     "parkToTable": "A mesa {number}",
     "checkout": "会計",

@@ -36,6 +36,7 @@ import {
   printReceiptHtmlDocument,
   printStaffSalesSummaryReceipt,
 } from '@/lib/print-receipt-html'
+import { sendToVysionPrintAgent } from '@/lib/vysion-print-agent-client'
 import {
   offlineDbLoadMenuSnapshot,
   offlineDbSaveMenuSnapshot,
@@ -1442,6 +1443,58 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       minute: '2-digit',
     })
     const vatRowLabel = escapeReceiptHtml(t('kassaReceipt.vat').replace('{rate}', String(vatRate)))
+
+    const orderTypePlain =
+      order.orderType === 'DINE_IN'
+        ? t('kassaReceipt.orderTypeDineIn')
+        : order.orderType === 'TAKEAWAY'
+          ? t('kassaReceipt.orderTypeTakeaway')
+          : t('kassaReceipt.orderTypeDelivery')
+
+    const bonLines: string[] = []
+    bonLines.push(tenantInfo?.business_name || t('kassaApp.defaultBusinessName'))
+    if (tenantInfo?.address) bonLines.push(tenantInfo.address)
+    if (tenantInfo?.postal_code || tenantInfo?.city) {
+      bonLines.push(`${tenantInfo.postal_code ?? ''} ${tenantInfo.city ?? ''}`.trim())
+    }
+    if (tenantInfo?.phone) bonLines.push(`${t('kassaReceipt.telPrefix')} ${tenantInfo.phone}`)
+    bonLines.push('--------------------------------')
+    bonLines.push(
+      order.tableNumber
+        ? `${orderTypePlain} | ${t('kassaReceipt.tablePrefix')} ${order.tableNumber}`
+        : orderTypePlain
+    )
+    bonLines.push(`${t('kassaReceipt.receiptNo')}${receiptRefDisplay}  ${dateStr}`)
+    bonLines.push('--------------------------------')
+    for (const i of order.items) {
+      const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
+      const lineTotal = (i.product.price + choicesTotal) * i.quantity
+      bonLines.push(`${i.quantity}x ${i.product.name}  EUR ${lineTotal.toFixed(2)}`)
+      for (const c of i.choices || []) {
+        bonLines.push(`  + ${c.choiceName}${c.price > 0 ? `  EUR ${c.price.toFixed(2)}` : ''}`)
+      }
+    }
+    bonLines.push('--------------------------------')
+    bonLines.push(`${t('kassaReceipt.subtotal')}  EUR ${subtotal.toFixed(2)}`)
+    bonLines.push(`${t('kassaReceipt.vat').replace('{rate}', String(vatRate))}  EUR ${tax.toFixed(2)}`)
+    bonLines.push(`${t('kassaReceipt.total')}  EUR ${order.total.toFixed(2)}`)
+    bonLines.push(`${t('kassaReceipt.paidWith')} ${payLabel}`)
+    if (order.helpedByStaffName) {
+      bonLines.push(t('kassaReceipt.helpedBy').replace('{name}', order.helpedByStaffName))
+    }
+    if (tenantInfo?.btw_number) {
+      bonLines.push(t('kassaReceipt.businessVatLabel').replace('{vatNumber}', tenantInfo.btw_number))
+    }
+    bonLines.push(t('kassaReceipt.thanks'))
+    if (tenantInfo?.website) bonLines.push(tenantInfo.website)
+
+    const agentOk = await sendToVysionPrintAgent({
+      winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
+      bonInhoud: bonLines.join('\n'),
+    })
+    if (agentOk) return
+
+    alert(t('kassaApp.printAgentFallbackHint'))
 
     const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${escapeReceiptHtml(docTitle)}</title><style>${KASSA_PRINT_RECEIPT_STYLES}</style></head><body>
       <div class="center">

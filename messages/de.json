@@ -2737,6 +2737,7 @@
     "cartTotal": "Summe",
     "drawerOpen": "Schublade öffnen",
     "printAgain": "Erneut drucken",
+    "printAgentFallbackHint": "Vysion Print Agent läuft nicht auf diesem PC — der Beleg öffnet sich für den normalen Druck (Browser). Installieren Sie den Vysion Print Agent und wählen Sie den Bondrucker im Infobereich.",
     "remove": "Entfernen",
     "parkToTable": "Zu Tisch {number}",
     "checkout": "Bezahlen",

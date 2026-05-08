@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vysion Print Agent</title>
+  <style>
+    body { font-family: Segoe UI, system-ui, sans-serif; padding: 20px; background: #f4f4f5; margin: 0; }
+    h1 { font-size: 1.1rem; margin: 0 0 8px; }
+    p { color: #444; font-size: 0.9rem; line-height: 1.45; margin: 0 0 16px; }
+    label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.85rem; }
+    select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 0.95rem; margin-bottom: 16px; }
+    button { background: #3c4d6b; color: #fff; border: none; padding: 12px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; width: 100%; font-size: 1rem; }
+    button:hover { background: #2d3a52; }
+    code { background: #e4e4e7; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; }
+    .ok { color: #15803d; font-size: 0.85rem; margin-top: 12px; display: none; }
+    .err { color: #b91c1c; font-size: 0.85rem; margin-top: 12px; display: none; }
+  </style>
+</head>
+<body>
+  <h1>Vysion Print Agent</h1>
+  <p>
+    Kies de bonprinter die Windows al ziet (USB/Ethernet maakt niet uit). De kassa stuurt bonnen naar
+    <code>http://127.0.0.1:9742/print</code> op <strong>deze pc</strong>.
+  </p>
+  <label for="pr">Printer</label>
+  <select id="pr"></select>
+  <button type="button" id="save">Opslaan</button>
+  <div class="ok" id="ok">Opgeslagen. Je kunt dit venster sluiten — de agent blijft in het systeemvak draaien.</div>
+  <div class="err" id="err"></div>
+  <script>
+    const sel = document.getElementById('pr')
+    const ok = document.getElementById('ok')
+    const err = document.getElementById('err')
+
+    async function load() {
+      err.style.display = 'none'
+      const [cfg, plist] = await Promise.all([
+        window.vysionAgent.getConfig(),
+        window.vysionAgent.listPrinters(),
+      ])
+      sel.innerHTML = ''
+      if (!plist.ok || !plist.printers?.length) {
+        err.textContent = plist.error || 'Geen printers gevonden in Windows.'
+        err.style.display = 'block'
+        return
+      }
+      for (const name of plist.printers.sort((a, b) => a.localeCompare(b))) {
+        const o = document.createElement('option')
+        o.value = name
+        o.textContent = name
+        if (cfg.printerName === name) o.selected = true
+        sel.appendChild(o)
+      }
+    }
+
+    document.getElementById('save').onclick = async () => {
+      ok.style.display = 'none'
+      err.style.display = 'none'
+      const printerName = sel.value
+      if (!printerName) {
+        err.textContent = 'Selecteer een printer.'
+        err.style.display = 'block'
+        return
+      }
+      await window.vysionAgent.saveConfig({ printerName })
+      ok.style.display = 'block'
+    }
+
+    load()
+  </script>
+</body>
+</html>

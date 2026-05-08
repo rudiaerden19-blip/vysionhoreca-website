@@ -3691,6 +3691,7 @@
     "cartTotal": "Total",
     "drawerOpen": "Open drawer",
     "printAgain": "Print again",
+    "printAgentFallbackHint": "Vysion Print Agent is not running on this PC — opening receipt for normal printing (browser). Install Vysion Print Agent and select your receipt printer from the system tray.",
     "remove": "Remove",
     "parkToTable": "Send to table {number}",
     "checkout": "Pay",
