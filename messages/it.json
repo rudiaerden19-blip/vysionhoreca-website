@@ -3237,7 +3237,7 @@
     "cartTotal": "Total",
     "drawerOpen": "Abrir cajón",
     "printAgain": "Reimprimir",
-    "printAgentFallbackHint": "Vysion Print Agent non è attivo su questo PC — lo scontrino si apre per la stampa normale (browser). Installa Vysion Print Agent e scegli la stampante dall’area di notifica.",
+    "printAgentFallbackHint": "Vysion Print Agent non è attivo su questo PC — lo scontrino si apre per la stampa normale (browser). Installer: vysionhoreca.com/download/print-agent-windows — poi scegli la stampante dall’area di notifica.",
     "remove": "Eliminar",
     "parkToTable": "A mesa {number}",
     "checkout": "Paga",
@@ -4711,6 +4711,16 @@
       "res-rest-tafel": "Crea un tavolo",
       "res-rest-walkin": "Walk-in"
     }
+  },
+  "printAgentDownloadPage": {
+    "heroTitle": "Print Agent per Windows",
+    "heroSubtitle": "Download ufficiale per la stampante scontrini sul PC cassa",
+    "intro": "Digita vysionhoreca.com nella barra degli indirizzi — senza cercare su Google. Windows o Chrome possono avvisare perché l’installer non è ancora firmato digitalmente presso Microsoft. Il file proviene dal progetto ufficiale Vysion; non è un virus.",
+    "windowsNote": "Solo Windows. Sullo stesso PC della cassa Ordervysion nel browser e della tua Epson.",
+    "downloadCta": "Scarica installer",
+    "releaseNote": "Dettagli tecnici (GitHub)",
+    "safetyTitle": "«Editore sconosciuto», «non sicuro» o SmartScreen?",
+    "safetyBody": "Ulteriori informazioni → Esegui comunque, oppure per il download: Mantieni. È normale senza certificato. Per rimuovere l’avviso serve una build firmata (code signing)."
   },
   "helpPage": {
     "heroTitle": "Aiuto",

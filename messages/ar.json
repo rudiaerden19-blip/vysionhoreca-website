@@ -3237,7 +3237,7 @@
     "cartTotal": "Total",
     "drawerOpen": "Abrir cajón",
     "printAgain": "Reimprimir",
-    "printAgentFallbackHint": "Vysion Print Agent غير قيد التشغيل على هذا الجهاز — سيتم فتح الإيصال للطباعة العادية (المتصفح). ثبّت Vysion Print Agent واختر الطابعة من منطقة الإعلامات.",
+    "printAgentFallbackHint": "Vysion Print Agent غير قيد التشغيل على هذا الجهاز — سيتم فتح الإيصال للطباعة العادية (المتصفح). المثبت: vysionhoreca.com/download/print-agent-windows — ثم اختر الطابعة من منطقة الإعلامات.",
     "remove": "Eliminar",
     "parkToTable": "A mesa {number}",
     "checkout": "الدفع",
@@ -4711,6 +4711,16 @@
       "res-rest-tafel": "إنشاء طاولة",
       "res-rest-walkin": "زوار بدون حجز"
     }
+  },
+  "printAgentDownloadPage": {
+    "heroTitle": "Print Agent لنظام Windows",
+    "heroSubtitle": "تنزيل رسمي لطابعة الإيصالات على جهاز نقطة البيع",
+    "intro": "اكتب vysionhoreca.com في شريط العنوان لفتح هذه الصفحة — دون البحث في Google. قد يُظهر Windows أو Chrome تحذيرًا لأن المثبت غير موقَّع رقميًا لدى Microsoft بعد. الملف من مشروع Vysion الرسمي؛ هذا ليس تنبيهًا للبرمجيات الخبيثة.",
+    "windowsNote": "لأنظمة Windows فقط. ثبّت على نفس جهاز كاشير Ordervysion في المتصفح وطابعة Epson.",
+    "downloadCta": "تنزيل المثبت",
+    "releaseNote": "تفاصيل تقنية (GitHub)",
+    "safetyTitle": "«ناشر غير معروف» أو «غير آمن» أو SmartScreen؟",
+    "safetyBody": "اختر المزيد من المعلومات → تشغيل على أي حالة، أو للتنزيل: الاحتفاظ. هذا طبيعي للمثبتات الجديدة بلا شهادة. لإزالة التحذير نحتاج إصدارًا موقَّعًا (توقيع الكود)."
   },
   "helpPage": {
     "heroTitle": "مساعدة",

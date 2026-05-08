@@ -3691,7 +3691,7 @@
     "cartTotal": "Total",
     "drawerOpen": "Open drawer",
     "printAgain": "Print again",
-    "printAgentFallbackHint": "Vysion Print Agent is not running on this PC — opening receipt for normal printing (browser). Install Vysion Print Agent and select your receipt printer from the system tray.",
+    "printAgentFallbackHint": "Vysion Print Agent is not running on this PC — opening receipt for normal printing (browser). Installer: vysionhoreca.com/download/print-agent-windows — then pick your receipt printer from the system tray.",
     "remove": "Remove",
     "parkToTable": "Send to table {number}",
     "checkout": "Pay",
@@ -4971,6 +4971,16 @@
       "res-rest-tafel": "Create a table",
       "res-rest-walkin": "Walk-in"
     }
+  },
+  "printAgentDownloadPage": {
+    "heroTitle": "Print Agent for Windows",
+    "heroSubtitle": "Official download for your POS receipt printer",
+    "intro": "Type vysionhoreca.com in the address bar and open this page — no Google search needed. Windows or Chrome may warn because the installer is not yet digitally signed with Microsoft. The file still comes from the official Vysion project; that is not the same as malware.",
+    "windowsNote": "Windows only. Install on the same PC as your Ordervysion browser POS and your Epson.",
+    "downloadCta": "Download installer",
+    "releaseNote": "Technical details (GitHub)",
+    "safetyTitle": "“Unknown publisher”, “not secure”, or SmartScreen?",
+    "safetyBody": "Choose More info → Run anyway, or for the download: Keep. That is normal for new installers without a certificate. To remove the warning long-term, we need a signed build (code signing)."
   },
   "helpPage": {
     "heroTitle": "Help",

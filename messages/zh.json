@@ -3237,7 +3237,7 @@
     "cartTotal": "Total",
     "drawerOpen": "Abrir cajón",
     "printAgain": "Reimprimir",
-    "printAgentFallbackHint": "此电脑上未运行 Vysion Print Agent — 收据将以普通打印方式打开（浏览器）。请安装 Vysion Print Agent 并在系统托盘中选择小票打印机。",
+    "printAgentFallbackHint": "此电脑上未运行 Vysion Print Agent — 收据将以普通打印方式打开（浏览器）。安装程序：vysionhoreca.com/download/print-agent-windows — 请在系统托盘中选择小票打印机。",
     "remove": "Eliminar",
     "parkToTable": "A mesa {number}",
     "checkout": "结账",
@@ -4711,6 +4711,16 @@
       "res-rest-tafel": "创建桌位",
       "res-rest-walkin": "临时到店"
     }
+  },
+  "printAgentDownloadPage": {
+    "heroTitle": "Windows 版 Print Agent",
+    "heroSubtitle": "收银小票打印机的官方下载",
+    "intro": "在地址栏输入 vysionhoreca.com 打开此页面 — 无需 Google 搜索。由于安装程序尚未经 Microsoft 代码签名，Windows 或 Chrome 可能发出警告。文件来自官方 Vysion 项目，这与恶意软件提示不同。",
+    "windowsNote": "仅限 Windows。请安装在运行浏览器 Ordervysion 收银台与爱普生打印机的同一台电脑上。",
+    "downloadCta": "下载安装程序",
+    "releaseNote": "技术详情（GitHub）",
+    "safetyTitle": "“未知发布者”“不安全”或 SmartScreen？",
+    "safetyBody": "选择“更多信息”→“仍要运行”，或在下载时选择“保留”。未签名的新安装程序出现这种情况很正常。若要长期消除警告，需要带代码签名的构建版本。"
   },
   "helpPage": {
     "heroTitle": "帮助",

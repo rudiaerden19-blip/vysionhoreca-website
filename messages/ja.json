@@ -3237,7 +3237,7 @@
     "cartTotal": "Total",
     "drawerOpen": "Abrir cajón",
     "printAgain": "Reimprimir",
-    "printAgentFallbackHint": "このPCで Vysion Print Agent が動いていません — レシートは通常印刷（ブラウザ）で開きます。Vysion Print Agent をインストールし、タスクバーからレシートプリンタを選んでください。",
+    "printAgentFallbackHint": "この PC で Vysion Print Agent が動いていません — レシートは通常印刷（ブラウザ）で開きます。インストーラー: vysionhoreca.com/download/print-agent-windows — タスクバーからレシートプリンタを選んでください。",
     "remove": "Eliminar",
     "parkToTable": "A mesa {number}",
     "checkout": "会計",
@@ -4711,6 +4711,16 @@
       "res-rest-tafel": "テーブルを作成",
       "res-rest-walkin": "ウォークイン"
     }
+  },
+  "printAgentDownloadPage": {
+    "heroTitle": "Windows 用 Print Agent",
+    "heroSubtitle": "レジ用レシートプリンタの公式ダウンロード",
+    "intro": "アドレスバーに vysionhoreca.com と入力してこのページを開いてください — Google 検索は不要です。インストーラーが Microsoft でコード署名されていないため、Windows や Chrome が警告を表示することがあります。ファイルは公式の Vysion プロジェクト由来であり、ウイルスとは別の問題です。",
+    "windowsNote": "Windows のみ。ブラウザの Ordervysion レジと Epson と同じ PC にインストールしてください。",
+    "downloadCta": "インストーラーをダウンロード",
+    "releaseNote": "技術情報（GitHub）",
+    "safetyTitle": "「不明な発行元」「安全ではない」または SmartScreen？",
+    "safetyBody": "詳細情報 → とにかく実行、またはダウンロードの保持を選んでください。未署名の新しいインストーラーではよくあることです。警告をなくすにはコード署名付きビルドが必要になります。"
   },
   "helpPage": {
     "heroTitle": "ヘルプ",

@@ -3237,7 +3237,7 @@
     "cartTotal": "Total",
     "drawerOpen": "Abrir cajón",
     "printAgain": "Reimprimir",
-    "printAgentFallbackHint": "Vysion Print Agent no está activo en este PC — el ticket se abrirá para imprimir con la impresora normal (navegador). Instale Vysion Print Agent y elija la impresora en la bandeja del sistema.",
+    "printAgentFallbackHint": "Vysion Print Agent no está activo en este PC — el ticket se abrirá para imprimir con la impresora normal (navegador). Instalador: vysionhoreca.com/download/print-agent-windows — luego elija la impresora en la bandeja del sistema.",
     "remove": "Eliminar",
     "parkToTable": "A mesa {number}",
     "checkout": "Cobrar",
@@ -4711,6 +4711,16 @@
       "res-rest-tafel": "Crear una mesa",
       "res-rest-walkin": "Walk-in"
     }
+  },
+  "printAgentDownloadPage": {
+    "heroTitle": "Print Agent para Windows",
+    "heroSubtitle": "Descarga oficial para la impresora de tickets en el PC de la caja",
+    "intro": "Escriba vysionhoreca.com en la barra de direcciones — sin buscar en Google. Windows o Chrome pueden avisar porque el instalador aún no está firmado digitalmente en Microsoft. El archivo es del proyecto oficial Vysion; no es lo mismo que malware.",
+    "windowsNote": "Solo Windows. Instálelo en el mismo PC que la caja Ordervysion en el navegador y su Epson.",
+    "downloadCta": "Descargar instalador",
+    "releaseNote": "Detalles técnicos (GitHub)",
+    "safetyTitle": "«Desconocido», «no seguro» o SmartScreen?",
+    "safetyBody": "Más información → Ejecutar de todos modos, o en la descarga: Conservar. Es normal sin certificado. Para quitar el aviso de forma estable hace falta una compilación firmada (firma de código)."
   },
   "helpPage": {
     "heroTitle": "Ayuda",

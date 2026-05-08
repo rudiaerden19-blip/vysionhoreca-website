@@ -3691,7 +3691,7 @@
     "cartTotal": "Totaal",
     "drawerOpen": "Lade open",
     "printAgain": "Print opnieuw",
-    "printAgentFallbackHint": "Vysion Print Agent niet bereikbaar op deze PC — bon opent voor normale printer (browser). Tip: installeer Vysion Print Agent en kies je Epson in het systeemvak.",
+    "printAgentFallbackHint": "Vysion Print Agent niet bereikbaar op deze PC — bon opent voor normale printer (browser). Installer: vysionhoreca.com/download/print-agent-windows — daarna Epson in het systeemvak.",
     "remove": "Verwijder",
     "parkToTable": "Naar tafel {number}",
     "checkout": "Afrekenen",
@@ -4971,6 +4971,16 @@
       "res-rest-tafel": "Tafel aanmaken",
       "res-rest-walkin": "Walk-in"
     }
+  },
+  "printAgentDownloadPage": {
+    "heroTitle": "Print Agent voor Windows",
+    "heroSubtitle": "Officiële download voor de bonprinter op je kassa-pc",
+    "intro": "Typ vysionhoreca.com in de adresbalk en ga naar deze pagina — je hoeft niet te zoeken via Google. Windows of Chrome kan een waarschuwing tonen: het installatieprogramma is nog niet digitaal ondertekend bij Microsoft. Het bestand komt uit het officiële Vysion-project — dat is niet hetzelfde als een virusmelding.",
+    "windowsNote": "Alleen Windows. Installeer op dezelfde pc als je Ordervysion-kassa in de browser en je Epson.",
+    "downloadCta": "Download installer",
+    "releaseNote": "Technische details (GitHub)",
+    "safetyTitle": "Melding „onbekend”, „niet veilig” of SmartScreen?",
+    "safetyBody": "Kies Meer info → Toch uitvoeren, of bij download: Behouden. Dat is normaal voor nieuwe installers zonder certificaat. Als je wilt dat die melding verdwijnt, heeft Vysion later een ondertekende versie nodig (code signing)."
   },
   "helpPage": {
     "heroTitle": "Help",
