@@ -18,13 +18,6 @@ import {
   isAudioActivatedThisSession,
   markAudioActivated
 } from '@/lib/sounds'
-import {
-  fetchThermalPrinterOnline,
-  normalizeLanPrinterIp,
-  postThermalPrintJob,
-  startPrinterLanHeartbeat,
-} from '@/lib/printer-lan'
-
 interface Order {
   id: string
   order_number: string
@@ -59,7 +52,6 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   
   // Translation helper for kitchenDisplay keys
   const tx = (key: string) => t(`kitchenDisplay.${key}`)
-  const txShop = (key: string) => t(`shopDisplay.${key}`)
   
   const [orders, setOrders] = useState<Order[]>([])
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
@@ -71,9 +63,6 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   // Check if already activated this session - skip activation screen if so
   const [audioActivated, setAudioActivated] = useState(() => isAudioActivatedThisSession(params.tenant))
   const [newOrderIds, setNewOrderIds] = useState<Set<string>>(new Set())
-  const [printerIP, setPrinterIP] = useState<string | null>(null)
-  const [showPrinterSettings, setShowPrinterSettings] = useState(false)
-  const [printerStatus, setPrinterStatus] = useState<'unknown' | 'online' | 'offline'>('unknown')
   const alertIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const printRef = useRef<HTMLDivElement>(null)
   const knownOrderIdsRef = useRef<Set<string>>(new Set())
@@ -95,18 +84,6 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     if (audioActivated) {
       prewarmAudio()
     }
-    
-    const raw = localStorage.getItem(`printer_ip_${params.tenant}`)
-    const savedIP = raw ? normalizeLanPrinterIp(raw) : null
-    if (savedIP) {
-      if (raw && savedIP !== raw.trim()) {
-        localStorage.setItem(`printer_ip_${params.tenant}`, savedIP)
-      }
-      setPrinterIP(savedIP)
-      void checkPrinterStatus(savedIP)
-    } else if (raw) {
-      localStorage.removeItem(`printer_ip_${params.tenant}`)
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant, audioActivated])
 
@@ -119,71 +96,6 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     document.addEventListener('pointerdown', handlePointerOutside, true)
     return () => document.removeEventListener('pointerdown', handlePointerOutside, true)
   }, [])
-
-  useEffect(() => {
-    if (!printerIP) return
-    return startPrinterLanHeartbeat({
-      printerIP,
-      onResult: (online) => setPrinterStatus(online ? 'online' : 'offline'),
-    })
-  }, [printerIP])
-
-  async function checkPrinterStatus(ip: string) {
-    const ok = await fetchThermalPrinterOnline(ip)
-    setPrinterStatus(ok ? 'online' : 'offline')
-  }
-
-  function savePrinterIP(ip: string) {
-    const n = normalizeLanPrinterIp(ip)
-    if (!n) {
-      alert(txShop('printerInvalidIp'))
-      return
-    }
-    localStorage.setItem(`printer_ip_${params.tenant}`, n)
-    setPrinterIP(n)
-    void checkPrinterStatus(n)
-    setShowPrinterSettings(false)
-  }
-
-  async function printToThermal(order: Order) {
-    if (!printerIP) return false
-    console.log('🖨️ Sending kitchen receipt to printer...')
-    try {
-      const res = await postThermalPrintJob({
-        printerIP,
-        order: {
-          order_number: order.order_number,
-          customer_name: order.customer_name,
-          customer_phone: order.customer_phone,
-          order_type: order.order_type,
-          items: order.items,
-          total: order.total,
-          notes: order.customer_notes,
-          created_at: order.created_at,
-        },
-        businessInfo: {
-          name: business?.business_name,
-          address: business?.address,
-          phone: business?.phone,
-          btw_number: business?.btw_number,
-        },
-        printType: 'kitchen',
-      })
-      if (res.success) {
-        console.log('✅ Kitchen receipt printed')
-        return true
-      }
-      console.error('❌ Print failed:', res.error)
-      alert(txShop('printFailedAfterRetries').replace('{error}', res.error))
-      return false
-    } catch (error: unknown) {
-      const msg = error instanceof Error ? error.message : String(error)
-      console.error('❌ Print error:', error)
-      alert(txShop('printFailedAfterRetries').replace('{error}', msg))
-      return false
-    }
-  }
-
 
   // Continuous alert for new orders - plays every 5 seconds
   // KRITIEK: Altijd proberen geluid te spelen
@@ -362,18 +274,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     setSelectedOrder(null)
   }
 
-  // Main print function - tries thermal first, falls back to browser
-  async function printOrder(order: Order) {
-    // If printer is configured and online, use thermal printer
-    if (printerIP && printerStatus === 'online') {
-      const success = await printToThermal(order)
-      if (success) {
-        console.log('✅ Keukenbon geprint via thermal printer')
-        return
-      }
-    }
-    
-    // Fallback to browser print
+  function printOrder(order: Order) {
     browserPrintOrder(order)
   }
 
@@ -572,20 +473,6 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
             <div className="text-2xl font-mono font-bold">
               {currentTime.toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' })}
             </div>
-
-            {/* Printer Status */}
-            <button
-              onClick={() => setShowPrinterSettings(true)}
-              className={`px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-2 ${
-                printerStatus === 'online' 
-                  ? 'bg-green-500/20 text-green-300' 
-                  : printerStatus === 'offline'
-                  ? 'bg-red-500/20 text-red-300'
-                  : 'bg-white/20 text-white'
-              }`}
-            >
-              🖨️ {printerStatus === 'online' ? 'Online' : printerStatus === 'offline' ? 'Offline' : 'Printer'}
-            </button>
 
             <div className="relative z-[130]" ref={keukenLangRef}>
               <button
@@ -891,101 +778,6 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
         )}
       </AnimatePresence>
 
-      {/* Printer Settings Modal */}
-      <AnimatePresence>
-        {showPrinterSettings && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-            onClick={() => setShowPrinterSettings(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.96, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.96, opacity: 0 }}
-              className="bg-white rounded-2xl max-w-md w-full p-6 border border-gray-200 shadow-2xl text-gray-900"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h2 className="text-xl font-semibold mb-1 text-center">Printer</h2>
-              <p className="text-gray-600 text-sm text-center mb-6">Verbind met de Vysion Print iPad app</p>
-
-              <div className="mb-6">
-                <label className="block text-sm text-gray-600 mb-2 font-medium">Lokaal IPv4-adres (print-server)</label>
-                <input
-                  type="text"
-                  inputMode="decimal"
-                  autoComplete="off"
-                  spellCheck={false}
-                  defaultValue={printerIP || ''}
-                  placeholder={txShop('printerIpPlaceholder')}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400"
-                  id="keuken-printer-ip-input"
-                />
-                <p className="text-xs text-gray-500 mt-2">
-                  Alleen privé IPv4 (192.168.x.x, 10.x of 172.16–31.x). Geen hostnaam.
-                </p>
-              </div>
-
-              <div className={`mb-6 p-4 rounded-lg border ${
-                printerStatus === 'online'
-                  ? 'bg-gray-50 border-gray-200 text-gray-800'
-                  : printerStatus === 'offline'
-                  ? 'bg-gray-50 border-gray-200 text-gray-800'
-                  : 'bg-gray-50 border-gray-200 text-gray-600'
-              }`}>
-                <div className="flex items-center gap-3">
-                  <div>
-                    <p className="font-semibold">
-                      {printerStatus === 'online'
-                        ? 'Printer verbonden'
-                        : printerStatus === 'offline'
-                        ? 'Printer niet bereikbaar'
-                        : 'Nog niet geconfigureerd'}
-                    </p>
-                    {printerIP && (
-                      <p className="text-sm text-gray-600 mt-0.5 tabular-nums">{printerIP}:3001</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowPrinterSettings(false)}
-                  className="flex-1 py-3.5 rounded-lg font-semibold border border-gray-300 bg-white hover:bg-gray-50 text-gray-800"
-                >
-                  Annuleren
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const input = document.getElementById('keuken-printer-ip-input') as HTMLInputElement
-                    if (input?.value) {
-                      savePrinterIP(input.value.trim())
-                    }
-                  }}
-                  className="flex-1 py-3.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-semibold"
-                >
-                  Opslaan
-                </button>
-              </div>
-
-              {printerIP && (
-                <button
-                  type="button"
-                  onClick={() => void checkPrinterStatus(printerIP)}
-                  className="w-full mt-3 py-3 rounded-lg font-semibold border border-gray-300 bg-white hover:bg-gray-50 text-gray-800"
-                >
-                  Verbinding testen
-                </button>
-              )}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   )
 }

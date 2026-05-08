@@ -39,7 +39,6 @@ const SHOP_PATHS = [
   '/admin/rapporten',
   '/admin/z-rapport',
   '/admin/reserveringen',
-  '/admin/bonnenprinter',
   '/admin/pincode',
   '/admin/openingstijden',
   '/admin/levering',

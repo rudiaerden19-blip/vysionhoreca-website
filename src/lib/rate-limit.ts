@@ -84,7 +84,6 @@ const API_MW_EXEMPT_PREFIXES = [
   '/api/whatsapp/webhook',
   '/api/cron/',
   '/api/health',
-  '/api/print-proxy',
 ] as const
 
 export function isApiMiddlewareRateLimitExempt(pathname: string): boolean {

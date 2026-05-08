@@ -5,7 +5,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useLanguage } from '@/i18n'
 import {
   appLocaleToBcp47,
-  getSavedLanPrinterIp,
   printStaffSalesSummaryReceipt,
   type StaffSalesSummaryReceiptBusiness,
 } from '@/lib/print-receipt-html'
@@ -29,8 +28,6 @@ type Props = {
   onStartSales?: (staff: { id: string; name: string }) => void
   /** Koptekst op afgedrukt dagoverzicht (zaak). */
   receiptBusiness?: StaffSalesSummaryReceiptBusiness
-  /** BTW-% voor thermische bon via print-proxy (zelfde als kassa). */
-  btwPercentage?: number
 }
 
 export function AdminStaffClockPanel({
@@ -39,7 +36,6 @@ export function AdminStaffClockPanel({
   kassaHref,
   onStartSales,
   receiptBusiness,
-  btwPercentage = 6,
 }: Props) {
   const { t, locale } = useLanguage()
   const [staffList, setStaffList] = useState<StaffRow[]>([])
@@ -140,8 +136,6 @@ export function AdminStaffClockPanel({
       })
     )
     await printStaffSalesSummaryReceipt({
-      savedPrinterIp: getSavedLanPrinterIp(tenantSlug),
-      btwPercentage,
       business: receiptBusiness,
       labels: {
         docTitle: `${t('staffClock.summaryTitle')} — ${summary.staffName}`,

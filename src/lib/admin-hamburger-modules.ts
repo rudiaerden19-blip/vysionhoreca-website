@@ -126,13 +126,6 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
           href: `${baseUrl}/allergenen`,
         },
         {
-          id: 'sm_kassa_bonnenprinter',
-          icon: '🖨️',
-          label: 'Bonnenprinter',
-          labelKey: itemLabelKey('sm_kassa_bonnenprinter'),
-          href: `${baseUrl}/bonnenprinter`,
-        },
-        {
           id: 'sm_kassa_labels',
           icon: '🏷️',
           label: 'Labels',
@@ -462,13 +455,6 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
           label: 'Betaalmethodes',
           labelKey: itemLabelKey('sm_inst_betaling'),
           href: `${baseUrl}/betaling`,
-        },
-        {
-          id: 'sm_inst_bonprinter_windows',
-          icon: '🖨️',
-          label: 'Bonprinter Windows',
-          labelKey: itemLabelKey('sm_inst_bonprinter_windows'),
-          href: `${baseUrl}/bonprinter-windows`,
         },
         {
           id: 'sm_abonnement',

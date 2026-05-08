@@ -226,7 +226,6 @@ export const KASSA_POS_SUBMENU_IDS = [
   'sm_kassa_opties',
   'sm_kassa_voorraad',
   'sm_kassa_allergenen',
-  'sm_kassa_bonnenprinter',
   'sm_kassa_labels',
 ] as const
 
@@ -384,7 +383,6 @@ export function adminPathToModule(pathname: string, tenantSlug: string): AdminMo
     rest.startsWith('/opties') ||
     rest.startsWith('/voorraad') ||
     rest.startsWith('/allergenen') ||
-    rest.startsWith('/bonnenprinter') ||
     rest.startsWith('/labels')
   ) {
     return { kind: 'module', module: 'kassa' }
@@ -392,7 +390,7 @@ export function adminPathToModule(pathname: string, tenantSlug: string): AdminMo
   if (rest.startsWith('/bestellingen') || rest.startsWith('/groepen')) {
     return { kind: 'module', module: 'online-bestellingen' }
   }
-  if (rest.startsWith('/betaling') || rest.startsWith('/bonprinter-windows')) {
+  if (rest.startsWith('/betaling')) {
     return { kind: 'module', module: 'instellingen' }
   }
   if (

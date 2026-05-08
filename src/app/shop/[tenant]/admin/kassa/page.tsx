@@ -31,11 +31,9 @@ import {
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
 import {
   appLocaleToBcp47,
-  buildKassaThermalOrderPayload,
   escapeReceiptHtml,
-  getSavedLanPrinterIp,
   KASSA_PRINT_RECEIPT_STYLES,
-  printKassaReceiptThermalThenHtml,
+  printReceiptHtmlDocument,
   printStaffSalesSummaryReceipt,
 } from '@/lib/print-receipt-html'
 import {
@@ -65,8 +63,6 @@ import { fetchOrderNumberByKassaClientUuid } from '@/lib/kassa-fetch-order-numbe
 import { formatKassaNumpadHeaderDate } from '@/lib/format-kassa-header-date'
 import { appendKassaCloseTipToAbsoluteLoginUrl } from '@/lib/shop-login-kassa-tip'
 import { syncZReportAfterOrderSafe } from '@/lib/kassa-z-sync-safe'
-import { fetchThermalPrinterOnline } from '@/lib/printer-lan'
-import { THERMAL_PRINTER_IP_SYNC_EVENT, thermalPrinterIpStorageKey } from '@/lib/thermal-printer-sync'
 import { KassaAnalogClock } from '@/components/kassa/KassaAnalogClock'
 import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
 import { KassaRegisterSuspenseFallback } from '@/components/KassaRegisterSuspenseFallback'
@@ -221,38 +217,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [langOpen, setLangOpen] = useState(false)
   const [logoutSoftwareConfirmOpen, setLogoutSoftwareConfirmOpen] = useState(false)
   const langRef = useRef<HTMLDivElement>(null)
-  const [thermalPrinterQuickStatus, setThermalPrinterQuickStatus] = useState<'unset' | 'online' | 'offline'>(
-    'unset',
-  )
   /** Alleen bij product/opties: toon korte popup als verkoopmedewerker verplicht is. */
   const blockSaleWithoutStaffIfNeededRef = useRef<() => boolean>(() => false)
-
-  useEffect(() => {
-    const refresh = () => {
-      const ip = getSavedLanPrinterIp(tenant)
-      if (!ip) {
-        setThermalPrinterQuickStatus('unset')
-        return
-      }
-      void fetchThermalPrinterOnline(ip).then((ok) => setThermalPrinterQuickStatus(ok ? 'online' : 'offline'))
-    }
-    refresh()
-    const onSync = (e: Event) => {
-      const d = (e as CustomEvent<{ tenantSlug?: string }>).detail
-      if (d?.tenantSlug === tenant) refresh()
-    }
-    const onStorage = (ev: StorageEvent) => {
-      if (ev.key === thermalPrinterIpStorageKey(tenant)) refresh()
-    }
-    window.addEventListener(THERMAL_PRINTER_IP_SYNC_EVENT, onSync as EventListener)
-    window.addEventListener('storage', onStorage)
-    const id = window.setInterval(refresh, 45_000)
-    return () => {
-      window.removeEventListener(THERMAL_PRINTER_IP_SYNC_EVENT, onSync as EventListener)
-      window.removeEventListener('storage', onStorage)
-      window.clearInterval(id)
-    }
-  }, [tenant])
 
   // ── Nieuwe bestelling alarm (exact donor) ────────────────────────────────
   const [newOrderAlert, setNewOrderAlert] = useState<{id: string; orderNumber: number; total: number} | null>(null)
@@ -1466,18 +1432,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               ? t('kassaApp.payIdeal')
               : t('kassaApp.payBancontact')
 
-    let thermalOrderNumber = order.orderNumber
-    if (thermalOrderNumber <= 0 && order.checkoutReference) {
-      const raw = order.checkoutReference.replace(/\D/g, '').slice(-8)
-      const n = parseInt(raw || '0', 10)
-      thermalOrderNumber = Number.isFinite(n) && n > 0 ? (n % 800000) + 100000 : 100000
-    }
-
-    const thermalPaymentLabel =
-      order.paymentMethod === 'SPLIT'
-        ? `Split €${(order.splitCash ?? 0).toFixed(2)} / €${(order.splitCard ?? 0).toFixed(2)}`
-        : order.paymentMethod
-
     const docTitle = `${t('kassaReceipt.receiptNo')}${receiptRefDisplay}`
     const bizName = escapeReceiptHtml(tenantInfo?.business_name || t('kassaApp.defaultBusinessName'))
     const dateStr = order.createdAt.toLocaleString(appLocaleToBcp47(locale), {
@@ -1524,43 +1478,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       </div>
     </body></html>`
 
-    const thermalOrder = buildKassaThermalOrderPayload({
-      orderNumber: thermalOrderNumber,
-      customerName:
-        order.tableNumber != null && order.tableNumber !== ''
-          ? t('kassaReceipt.tableLabel').replace(/\{number\}/g, String(order.tableNumber))
-          : t('kassaApp.walkInCustomerName'),
-      orderType: order.orderType,
-      paymentMethod: thermalPaymentLabel,
-      subtotal,
-      tax,
-      total: order.total,
-      notes: order.tableNumber
-        ? t('kassaReceipt.tableLabel').replace(/\{number\}/g, String(order.tableNumber))
-        : null,
-      createdAtIso: order.createdAt.toISOString(),
-      items: order.items,
-    })
-
-    const biz = tenantInfo
-    const businessInfo = {
-      name: biz?.business_name,
-      address: biz?.address,
-      city: biz?.city,
-      postalCode: biz?.postal_code,
-      phone: biz?.phone,
-      email: biz?.email,
-      btw_number: biz?.btw_number,
-      btw_percentage: biz?.btw_percentage ?? 6,
-    }
-
-    await printKassaReceiptThermalThenHtml({
-      printerIP: getSavedLanPrinterIp(tenant),
-      isOnline: isOnline === true,
-      htmlReceipt: html,
-      order: thermalOrder,
-      businessInfo,
-    })
+    printReceiptHtmlDocument(html)
   }
 
   const printStaffClockSalesSummary = async () => {
@@ -1590,8 +1508,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       })
     )
     await printStaffSalesSummaryReceipt({
-      savedPrinterIp: getSavedLanPrinterIp(tenant),
-      btwPercentage: tenantInfo?.btw_percentage ?? 6,
       business: biz,
       labels: {
         docTitle: `${t('staffClock.summaryTitle')} — ${s.staffName}`,
@@ -1979,30 +1895,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <span>{t('kassaApp.navKitchenDisplay')}</span>
             </Link>
           )}
-
-          <Link
-            href={`/shop/${tenant}/admin/bonnenprinter`}
-            prefetch={false}
-            title={
-              thermalPrinterQuickStatus === 'unset'
-                ? t('kassaApp.thermalPrinterUnsetHint')
-                : thermalPrinterQuickStatus === 'offline'
-                  ? t('kassaApp.thermalPrinterOfflineHint')
-                  : t('kassaApp.thermalPrinterOnlineHint')
-            }
-            className={`inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-xl px-2 py-2 text-xs font-bold text-white transition-colors sm:gap-1.5 sm:px-3 sm:text-sm ${
-              thermalPrinterQuickStatus === 'online'
-                ? 'bg-emerald-700 hover:bg-emerald-800'
-                : thermalPrinterQuickStatus === 'offline'
-                  ? 'bg-amber-600 hover:bg-amber-700'
-                  : 'bg-[#3C4D6B] hover:bg-[#2D3A52]'
-            }`}
-          >
-            <span className="text-base sm:text-lg" aria-hidden>
-              🖨️
-            </span>
-            <span>{t('kassaApp.navBonnenprinter')}</span>
-          </Link>
 
           <button
             type="button"

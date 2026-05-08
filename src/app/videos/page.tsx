@@ -67,11 +67,6 @@ const VIDEO_CATEGORY_DEFS = [
     videoKeys: ['groepsbestellingen'] as const,
   },
   {
-    id: 'bonnenprinter',
-    icoon: '🖨️',
-    videoKeys: ['printer'] as const,
-  },
-  {
     id: 'de-website',
     icoon: '🌐',
     videoKeys: ['de-website'] as const,

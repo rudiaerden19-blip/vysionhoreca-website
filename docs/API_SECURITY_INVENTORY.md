@@ -59,7 +59,6 @@ Gebruikt in o.a.: `import-ingredients`, `marketing/send`, `tenant/smtp`, `whatsa
 | partner-application | POST | ja | — | `public` formulier |
 | pin/check, pin/set, pin/verify | POST | ja | ja | varies; pin flow |
 | ping | GET | — | — | `public` |
-| print-proxy | GET,POST | — | printer IP in body/query | SSRF-bescherming: private IP-ranges |
 | reservation-card-auth | * | ja | ja | varies |
 | reservation-deposit | * | ja | ja | Stripe/payment |
 | reservation-sms | * | ja | ja | varies |
