@@ -12,13 +12,22 @@ const EPSON_APP_REPO_ZIP =
 
 const NODEJS_DOWNLOAD_HOME = 'https://nodejs.org/'
 
+/** Statische downloads van deze site (geen tenant in pad). */
+const USB_BUILDER_ZIP_HREF = '/usb-bridge-stick/UsbStickBuilder.zip'
+
 /** NL-only helperteksten (USB-bridge op Windows-kassa). */
 const COPY = {
   title: 'Bonprinter Windows (USB-bridge)',
   lead:
-    'Een website mag om veiligheidsredenen geen software automatisch op je pc installeren. Op deze Windows-kassa zet je de bridge zelf neer: eerst downloaden, dan Node.js als dat nog ontbreekt, daarna config en starten.',
+    'Maak één USB-stick-pakket op een Windows-pc met internet — daarna op elke kassa alleen START.bat (geen aparte Node.js meer nodig op die pc). Handwerk hieronder blijft mogelijk voor wie liever zelf npm gebruikt.',
+  usbHeading: 'USB-stick (aanbevolen)',
+  usbBody:
+    'Download het ZIP-bestand, pak uit op een pc met internet. Dubbelklik MaakUsbStick.bat — na een paar minuten kopieer je map «VysionUsbBridge-Stick» of de gegenereerde .zip naar een USB-stick. Op de kassa: BRIDGE\\config.json invullen en dubbelklik START.bat.',
+  usbZipBtn: 'Download bouwpakket (ZIP)',
+  usbZipHint: 'Bevat MaakUsbStick.bat en Prepare-UsbStick.ps1 — allebei uitpakken in dezelfde map.',
   samePcTip:
     'Gebruik deze uitleg op dezelfde pc als de USB-printer — daar luistert de bridge op 127.0.0.1.',
+  manualHeading: 'Handmatig (ZIP + Node op deze pc)',
   downloadZip: 'Stap 1: download als ZIP',
   downloadZipHint:
     'Pak het ZIP-bestand uit. De bridge zit in de map epsonapp-main/usb-print-bridge (die map verder gebruiken).',
@@ -53,7 +62,20 @@ export default function BonprinterWindowsPage({ params }: { params: { tenant: st
           {COPY.samePcTip}
         </div>
 
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50/90 p-6 shadow-sm space-y-3">
+          <h2 className="text-lg font-bold text-emerald-950">{COPY.usbHeading}</h2>
+          <p className="text-sm text-emerald-950/95">{COPY.usbBody}</p>
+          <a
+            href={USB_BUILDER_ZIP_HREF}
+            className="inline-flex items-center justify-center rounded-xl bg-emerald-700 px-4 py-3 text-center text-sm font-bold text-white shadow-sm transition-colors hover:bg-emerald-800"
+          >
+            {COPY.usbZipBtn}
+          </a>
+          <p className="text-xs text-emerald-900/85">{COPY.usbZipHint}</p>
+        </div>
+
         <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
+          <h2 className="text-base font-bold text-gray-900">{COPY.manualHeading}</h2>
           <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
             <a
               href={EPSON_APP_REPO_ZIP}
