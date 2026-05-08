@@ -1,4 +1,9 @@
-import { normalizeLanPrinterIp, postDirectLanPrintWithRetries, postPrintProxyOnce } from '@/lib/printer-lan'
+import {
+  isLoopbackThermalPrinterHost,
+  normalizeLanPrinterIp,
+  postDirectLanPrintWithRetries,
+  postThermalPrintJob,
+} from '@/lib/printer-lan'
 
 /** Escape text for HTML receipts (names, addresses, notes). */
 export function escapeReceiptHtml(s: string): string {
@@ -152,7 +157,7 @@ async function tryStaffSummaryThermalPrint(opts: {
     btw_percentage: vat,
   }
 
-  const res = await postPrintProxyOnce({
+  const res = await postThermalPrintJob({
     printerIP: opts.printerIP,
     order,
     businessInfo,
@@ -431,13 +436,13 @@ export function buildKassaThermalOrderPayload(opts: {
   }
 }
 
-/** Zelfde pad als onlinescherm: Vercel/host → `/api/print-proxy` → `http://{ip}:3001/print` (werkt enkel als de server het LAN-IP kan bereiken, bv. self-hosted). */
+/** Online (of loopback USB-bridge): proxy naar LAN-print-server, behalve 127.0.0.1 → direct :3001 op deze PC. */
 export async function tryKassaCustomerThermalViaProxy(opts: {
   printerIP: string
   order: KassaThermalOrderPayload
   businessInfo: KassaThermalBusinessPayload
 }): Promise<boolean> {
-  const res = await postPrintProxyOnce({
+  const res = await postThermalPrintJob({
     printerIP: opts.printerIP,
     order: opts.order,
     businessInfo: opts.businessInfo,
@@ -467,7 +472,7 @@ export async function tryKassaCustomerThermalDirectLan(opts: {
 }
 
 /**
- * Volgorde: bij offline eerst direct LAN (als ingesteld), online via print-proxy, anders HTML-bon.
+ * Volgorde: offline + niet-loopback → direct LAN; anders → print-proxy of direct localhost :3001 (USB-bridge).
  */
 export async function printKassaReceiptThermalThenHtml(opts: {
   printerIP: string | null
@@ -476,9 +481,10 @@ export async function printKassaReceiptThermalThenHtml(opts: {
   order: KassaThermalOrderPayload
   businessInfo: KassaThermalBusinessPayload
 }): Promise<void> {
-  const ip = opts.printerIP?.trim()
+  const raw = opts.printerIP?.trim()
+  const ip = raw ? normalizeLanPrinterIp(raw) : null
   if (ip) {
-    if (!opts.isOnline) {
+    if (!opts.isOnline && !isLoopbackThermalPrinterHost(ip)) {
       const okDirect = await tryKassaCustomerThermalDirectLan({
         printerIP: ip,
         order: opts.order,
@@ -486,12 +492,12 @@ export async function printKassaReceiptThermalThenHtml(opts: {
       })
       if (okDirect) return
     } else {
-      const okProxy = await tryKassaCustomerThermalViaProxy({
+      const ok = await tryKassaCustomerThermalViaProxy({
         printerIP: ip,
         order: opts.order,
         businessInfo: opts.businessInfo,
       })
-      if (okProxy) return
+      if (ok) return
     }
   }
   printReceiptHtmlDocument(opts.htmlReceipt)

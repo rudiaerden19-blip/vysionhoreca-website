@@ -50,6 +50,12 @@ export function normalizeLanPrinterIp(raw: string): string | null {
   return h
 }
 
+/** USB-print-bridge op dezelfde PC als de browser (127.0.0.1:3001); niet via Vercel-proxy. */
+export function isLoopbackThermalPrinterHost(host: string): boolean {
+  const h = host.split(':')[0].trim().toLowerCase()
+  return h === '127.0.0.1' || h === 'localhost'
+}
+
 export type PrintProxyPostResult = { success: true } | { success: false; error: string }
 
 /** Eén POST naar `/api/print-proxy` (de route zelf probeert tot 3× naar de print-server). */
@@ -82,6 +88,63 @@ export async function fetchPrinterOnlineViaProxy(printerIP: string): Promise<boo
 }
 
 /**
+ * Status van print-server op :3001. Loopback = direct vanuit browser naar lokale USB-bridge;
+ * anders via `/api/print-proxy` (Vercel kan LAN-IP niet bereiken).
+ */
+export async function fetchThermalPrinterOnline(printerIP: string): Promise<boolean> {
+  const ip = normalizeLanPrinterIp(printerIP)
+  if (!ip) return false
+  if (isLoopbackThermalPrinterHost(ip)) {
+    try {
+      const controller = new AbortController()
+      const t = window.setTimeout(() => controller.abort(), PRINT_PROXY_STATUS_TIMEOUT_MS)
+      const response = await fetch(`http://${ip}:${PRINTER_LAN_PRINT_SERVER_PORT}/status`, {
+        signal: controller.signal,
+      })
+      window.clearTimeout(t)
+      if (!response.ok) return false
+      const data = (await response.json().catch(() => ({}))) as { status?: string }
+      return data.status === 'online'
+    } catch {
+      return false
+    }
+  }
+  return fetchPrinterOnlineViaProxy(ip)
+}
+
+/** Thermische bon: loopback → direct POST :3001; anders → print-proxy (cloud → LAN). */
+export async function postThermalPrintJob(opts: {
+  printerIP: string
+  order: unknown
+  businessInfo: unknown
+  printType: string
+}): Promise<PrintProxyPostResult> {
+  const ip = normalizeLanPrinterIp(opts.printerIP.trim())
+  if (!ip) return { success: false, error: 'Invalid printer IP' }
+  const body = {
+    order: opts.order,
+    businessInfo: opts.businessInfo,
+    printType: opts.printType,
+  }
+  if (isLoopbackThermalPrinterHost(ip)) {
+    const ok = await postDirectLanPrintWithRetries({ printerIP: ip, body })
+    return ok
+      ? { success: true }
+      : {
+          success: false,
+          error:
+            'Lokale print-bridge niet bereikbaar (127.0.0.1:3001). Start usb-print-bridge op deze PC.',
+        }
+  }
+  return postPrintProxyOnce({
+    printerIP: ip,
+    order: opts.order,
+    businessInfo: opts.businessInfo,
+    printType: opts.printType,
+  })
+}
+
+/**
  * Start periodieke heartbeat (status-ping). Ruim altijd op met de returned functie.
  */
 export function startPrinterLanHeartbeat(opts: {
@@ -93,7 +156,7 @@ export function startPrinterLanHeartbeat(opts: {
   const ip = normalizeLanPrinterIp(opts.printerIP)
   if (!ip) return () => {}
   const tick = () => {
-    void fetchPrinterOnlineViaProxy(ip).then(opts.onResult)
+    void fetchThermalPrinterOnline(ip).then(opts.onResult)
   }
   tick()
   const id = window.setInterval(tick, ms)

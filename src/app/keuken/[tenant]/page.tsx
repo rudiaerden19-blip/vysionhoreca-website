@@ -19,9 +19,9 @@ import {
   markAudioActivated
 } from '@/lib/sounds'
 import {
-  fetchPrinterOnlineViaProxy,
+  fetchThermalPrinterOnline,
   normalizeLanPrinterIp,
-  postPrintProxyOnce,
+  postThermalPrintJob,
   startPrinterLanHeartbeat,
 } from '@/lib/printer-lan'
 
@@ -129,7 +129,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   }, [printerIP])
 
   async function checkPrinterStatus(ip: string) {
-    const ok = await fetchPrinterOnlineViaProxy(ip)
+    const ok = await fetchThermalPrinterOnline(ip)
     setPrinterStatus(ok ? 'online' : 'offline')
   }
 
@@ -149,7 +149,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     if (!printerIP) return false
     console.log('🖨️ Sending kitchen receipt to printer...')
     try {
-      const res = await postPrintProxyOnce({
+      const res = await postThermalPrintJob({
         printerIP,
         order: {
           order_number: order.order_number,

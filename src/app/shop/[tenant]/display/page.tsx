@@ -20,9 +20,9 @@ import {
 } from '@/lib/sounds'
 import { getAuthHeaders } from '@/lib/auth-headers'
 import {
-  fetchPrinterOnlineViaProxy,
+  fetchThermalPrinterOnline,
   normalizeLanPrinterIp,
-  postPrintProxyOnce,
+  postThermalPrintJob,
   startPrinterLanHeartbeat,
 } from '@/lib/printer-lan'
 
@@ -220,7 +220,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   }
 
   async function checkPrinterStatus(ip: string) {
-    const ok = await fetchPrinterOnlineViaProxy(ip)
+    const ok = await fetchThermalPrinterOnline(ip)
     setPrinterStatus(ok ? 'online' : 'offline')
     if (ok) console.log('🖨️ Printer online:', ip)
     else console.log('🖨️ Printer offline:', ip)
@@ -549,7 +549,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
       const totalAmount = order.total || 0
       const taxAmount = totalAmount - (totalAmount / (1 + btwPercentage / 100))
 
-      const res = await postPrintProxyOnce({
+      const res = await postThermalPrintJob({
         printerIP,
         order: {
           order_number: order.order_number,
