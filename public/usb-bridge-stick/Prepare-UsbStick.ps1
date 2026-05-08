@@ -139,6 +139,20 @@ pause
   Set-Content -LiteralPath (Join-Path $StickRoot 'START.bat') -Value $startBat -Encoding OEM
   Set-Content -LiteralPath (Join-Path $StickRoot 'LIST-COM.bat') -Value $listBat -Encoding OEM
 
+  $fixBat = @'
+@echo off
+chcp 65001 >nul
+echo Vernieuwen server.mjs van GitHub...
+powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+  "try { Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/rudiaerden19-blip/epsonapp/main/usb-print-bridge/server.mjs' -OutFile '%~dp0BRIDGE\server.mjs' -UseBasicParsing; Write-Host OK } catch { Write-Host FOUT; Write-Host $_.Exception.Message; exit 1 }"
+if errorlevel 1 goto :end
+echo.
+echo Klaar. Start nu START.bat opnieuw.
+:end
+pause
+'@
+  Set-Content -LiteralPath (Join-Path $StickRoot 'FIX-PRINT-CHECK.bat') -Value $fixBat -Encoding OEM
+
   $readme = @'
 Vysion USB-bridge — ALLES-IN-ÉÉN (Windows 64-bit)
 ==================================================
@@ -149,6 +163,11 @@ Vysion USB-bridge — ALLES-IN-ÉÉN (Windows 64-bit)
 4. Ordervysion op deze pc: printer-IP 127.0.0.1
 
 LIST-COM.bat = COM-poorten tonen.
+
+Als Ordervysion «printer niet bereikbaar» zegt terwijl START.bat loopt:
+— STOP START.bat (venster sluiten)
+— dubbelklik FIX-PRINT-CHECK.bat (een keer, internet nodig)
+— START.bat opnieuw
 
 Je hoeft GEEN aparte Node.js te installeren — die zit in de map NODE.
 '@

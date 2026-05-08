@@ -6,3 +6,9 @@ Dubbelklik MaakUsbStick.bat om lokaal te bouwen.
 
 AANBEVOLEN: download de voorgebouwde ZIP van GitHub (Ordervysion → Instellingen → Bonprinter Windows),
 dan hoef je dit NIET — uitpakken op de kassa en START.bat.
+
+---
+
+Heb je al uitgepakt en zegt Ordervysion «printer niet bereikbaar»?
+Download FIX-PRINT-CHECK.bat van dezelfde website-map en zet het naast START.bat en BRIDGE.
+Sluit START.bat, dubbelklik FIX-PRINT-CHECK.bat, daarna START.bat opnieuw.
