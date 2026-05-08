@@ -38,6 +38,7 @@ import {
   printKassaReceiptThermalThenHtml,
   printStaffSalesSummaryReceipt,
 } from '@/lib/print-receipt-html'
+import { fetchThermalPrinterOnline } from '@/lib/printer-lan'
 import {
   offlineDbLoadMenuSnapshot,
   offlineDbSaveMenuSnapshot,
@@ -92,6 +93,27 @@ import {
   KassaStaffSalesSummaryModal,
 } from '@/components/kassa/KassaStaffClockUi'
 import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
+
+const EPSON_USB_PRINT_BRIDGE_TREE =
+  'https://github.com/rudiaerden19-blip/epsonapp/tree/main/usb-print-bridge'
+
+/** Intern (NL): USB-print-bridge — niet via i18n; alleen eigen gebruik. */
+const KASSA_PRINTER_BRIDGE_COPY = {
+  button: 'Bonprinter PC',
+  title: 'Thermische bon op deze PC (USB)',
+  lead: 'Voor een Epson bonprinter via USB op een Windows-kassa draait een kleine bridge-app op dezelfde computer als deze browser (poort 3001).',
+  liOrdervysion:
+    'In Ordervysion: zet het printer-IP op 127.0.0.1 op kassa, ontvangsten- of keukenscherm — alleen op deze PC waar de bridge draait.',
+  liInstall: 'Op Windows: installeer Node.js en kopieer de map usb-print-bridge uit het GitHub-project epsonapp.',
+  liConfig: 'Stel config.json in (COM-poort of Windows-printernaam; zie README in de map).',
+  liRun: 'Voer npm install en npm start uit in die map — de bridge luistert op 127.0.0.1.',
+  repoLink: 'usb-print-bridge op GitHub openen',
+  check: 'Test verbinding met bridge',
+  checking: 'Bezig met testen…',
+  statusOnline: 'Bridge bereikbaar op deze pc',
+  statusOffline: 'Geen bridge bereikbaar — start de app op deze pc of controleer firewall/antivirus',
+  close: 'Sluiten',
+} as const
 
 const KassaFloorPlan = dynamic(() => import('@/components/KassaFloorPlan'), {
   ssr: false,
@@ -218,6 +240,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const flushOfflineOrdersRef = useRef<() => Promise<void>>(async () => {})
   const [langOpen, setLangOpen] = useState(false)
   const [logoutSoftwareConfirmOpen, setLogoutSoftwareConfirmOpen] = useState(false)
+  const [printerBridgeModalOpen, setPrinterBridgeModalOpen] = useState(false)
+  const [printerBridgeProbe, setPrinterBridgeProbe] = useState<
+    'idle' | 'checking' | 'online' | 'offline'
+  >('idle')
   const langRef = useRef<HTMLDivElement>(null)
   /** Alleen bij product/opties: toon korte popup als verkoopmedewerker verplicht is. */
   const blockSaleWithoutStaffIfNeededRef = useRef<() => boolean>(() => false)
@@ -1798,6 +1824,82 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         open={needsPostTrialModulePicker && !demoViewOnly}
         onConfirmed={refetchModules}
       />
+      {printerBridgeModalOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-[125] bg-black/45"
+            role="presentation"
+            aria-hidden
+            onClick={() => {
+              setPrinterBridgeModalOpen(false)
+              setPrinterBridgeProbe('idle')
+            }}
+          />
+          <div
+            className="fixed inset-0 z-[130] flex items-center justify-center p-4 pointer-events-none"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="kassa-printer-bridge-title"
+          >
+            <div className="pointer-events-auto max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-gray-200 bg-white p-5 shadow-2xl">
+              <h2 id="kassa-printer-bridge-title" className="pr-8 text-lg font-bold text-gray-900">
+                {KASSA_PRINTER_BRIDGE_COPY.title}
+              </h2>
+              <p className="mt-3 text-sm text-gray-700">{KASSA_PRINTER_BRIDGE_COPY.lead}</p>
+              <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-gray-700">
+                <li>{KASSA_PRINTER_BRIDGE_COPY.liOrdervysion}</li>
+                <li>{KASSA_PRINTER_BRIDGE_COPY.liInstall}</li>
+                <li>{KASSA_PRINTER_BRIDGE_COPY.liConfig}</li>
+                <li>{KASSA_PRINTER_BRIDGE_COPY.liRun}</li>
+              </ul>
+              <a
+                href={EPSON_USB_PRINT_BRIDGE_TREE}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-flex text-sm font-semibold text-blue-600 underline hover:text-blue-800"
+              >
+                {KASSA_PRINTER_BRIDGE_COPY.repoLink}
+              </a>
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  disabled={printerBridgeProbe === 'checking'}
+                  onClick={async () => {
+                    setPrinterBridgeProbe('checking')
+                    const ok = await fetchThermalPrinterOnline('127.0.0.1')
+                    setPrinterBridgeProbe(ok ? 'online' : 'offline')
+                  }}
+                  className="rounded-xl bg-[#3C4D6B] px-4 py-2 text-sm font-bold text-white hover:bg-[#2D3A52] disabled:opacity-60"
+                >
+                  {printerBridgeProbe === 'checking'
+                    ? KASSA_PRINTER_BRIDGE_COPY.checking
+                    : KASSA_PRINTER_BRIDGE_COPY.check}
+                </button>
+                {printerBridgeProbe === 'online' && (
+                  <span className="text-sm font-semibold text-green-700">
+                    {KASSA_PRINTER_BRIDGE_COPY.statusOnline}
+                  </span>
+                )}
+                {printerBridgeProbe === 'offline' && (
+                  <span className="text-sm font-semibold text-red-700">
+                    {KASSA_PRINTER_BRIDGE_COPY.statusOffline}
+                  </span>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setPrinterBridgeModalOpen(false)
+                  setPrinterBridgeProbe('idle')
+                }}
+                className="mt-5 w-full rounded-xl bg-slate-100 py-2.5 text-sm font-bold text-gray-800 hover:bg-slate-200"
+              >
+                {KASSA_PRINTER_BRIDGE_COPY.close}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[#e3e3e3]">
 
       {/* ── Blauwe navigatiebalk — volledige breedte (overflow: uitlog buiten scrollcluster = altijd klikbaar, alle tenants) ── */}
@@ -1806,8 +1908,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         style={{ height: 68 }}
       >
 
-        {/* Backdrop sluit alles */}
-        {(hamburgerOpen || flyoutOpen) && <div className="fixed inset-0 z-10" onClick={() => { setHamburgerOpen(false); setHamburgerSubOpen(null); setFlyoutOpen(null) }} />}
+        {/* Backdrop sluit menu/flyout (printer-bridge-modal heeft eigen overlay) */}
+        {(hamburgerOpen || flyoutOpen) && (
+          <div
+            className="fixed inset-0 z-10"
+            onClick={() => {
+              setHamburgerOpen(false)
+              setHamburgerSubOpen(null)
+              setFlyoutOpen(null)
+            }}
+          />
+        )}
 
         {/* ── LINKS: hamburger ── */}
         <div className="relative z-20 flex shrink-0 items-center gap-2">
@@ -1938,6 +2049,23 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <span>{t('kassaApp.navKitchenDisplay')}</span>
             </Link>
           )}
+
+          <button
+            type="button"
+            onClick={() => {
+              setHamburgerOpen(false)
+              setHamburgerSubOpen(null)
+              setPrinterBridgeProbe('idle')
+              setPrinterBridgeModalOpen(true)
+            }}
+            className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-xl bg-[#3C4D6B] px-2 py-2 text-xs font-bold text-white transition-colors hover:bg-[#2D3A52] sm:gap-1.5 sm:px-3 sm:text-sm"
+            title={KASSA_PRINTER_BRIDGE_COPY.title}
+          >
+            <span className="text-base sm:text-lg" aria-hidden>
+              🖨️
+            </span>
+            <span>{KASSA_PRINTER_BRIDGE_COPY.button}</span>
+          </button>
 
           <button
             type="button"
