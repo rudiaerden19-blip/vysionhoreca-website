@@ -1,0 +1,68 @@
+# Bouwt op Windows: Vysion Print Agent (Electron NSIS installer).
+# Resultaat: upload artifact + vaste GitHub Release met .exe (één download voor zaken).
+name: Vysion Print Agent — Windows installer
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/vysion-print-agent/**'
+      - '.github/workflows/vysion-print-agent-windows.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build-installer:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: apps/vysion-print-agent
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: apps/vysion-print-agent/package-lock.json
+
+      - name: Install & build NSIS installer
+        shell: pwsh
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: |
+          npm ci
+          npm run dist
+
+      - name: Vaste bestandsnaam (download zonder spaties)
+        shell: pwsh
+        run: |
+          $dist = Join-Path (Get-Location) 'dist'
+          $exe = Get-ChildItem -LiteralPath $dist -Filter '*.exe' | Select-Object -First 1
+          if (-not $exe) { throw 'Geen .exe in dist na electron-builder' }
+          Copy-Item -LiteralPath $exe.FullName -Destination (Join-Path $dist 'Vysion-Print-Agent-Setup.exe') -Force
+
+      - name: Upload installer (workflow artifact)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Vysion-Print-Agent-Windows-Setup
+          path: apps/vysion-print-agent/dist/Vysion-Print-Agent-Setup.exe
+          if-no-files-found: error
+
+      - name: Publish release (vaste download)
+        uses: ncipollo/release-action@v1
+        with:
+          tag: vysion-print-agent-windows
+          name: Vysion Print Agent (Windows)
+          body: |
+            **Installatie (één keer op de kassa-pc)**  
+            Download **`Vysion-Print-Agent-Setup.exe`** hieronder → dubbelklik → installeren → icoon bij de klok → printer kiezen → Ordervysion-kassa in de browser op **dezelfde pc**.
+
+            Directe pagina: https://github.com/${{ github.repository }}/releases/tag/vysion-print-agent-windows
+          artifacts: apps/vysion-print-agent/dist/Vysion-Print-Agent-Setup.exe
+          allowUpdates: true
+          replacesArtifacts: true
+          token: ${{ secrets.GITHUB_TOKEN }}
