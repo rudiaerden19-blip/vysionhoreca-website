@@ -5433,6 +5433,7 @@
       "sm_rpt_verkoop": "Vendite",
       "sm_rpt_populair": "Articoli popolari",
       "sm_inst_betaling": "Metodi di pagamento",
+      "sm_inst_bonprinter_windows": "Stampante scontrini (Windows)",
       "sm_abonnement": "Abbonamento"
     }
   },

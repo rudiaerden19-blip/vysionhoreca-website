@@ -5433,6 +5433,7 @@
       "sm_rpt_verkoop": "Sales",
       "sm_rpt_populair": "Popular items",
       "sm_inst_betaling": "Payment methods",
+      "sm_inst_bonprinter_windows": "طابعة الإيصالات (Windows)",
       "sm_abonnement": "Subscription"
     }
   },

@@ -392,7 +392,7 @@ export function adminPathToModule(pathname: string, tenantSlug: string): AdminMo
   if (rest.startsWith('/bestellingen') || rest.startsWith('/groepen')) {
     return { kind: 'module', module: 'online-bestellingen' }
   }
-  if (rest.startsWith('/betaling')) {
+  if (rest.startsWith('/betaling') || rest.startsWith('/bonprinter-windows')) {
     return { kind: 'module', module: 'instellingen' }
   }
   if (

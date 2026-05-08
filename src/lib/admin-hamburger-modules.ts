@@ -464,6 +464,13 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
           href: `${baseUrl}/betaling`,
         },
         {
+          id: 'sm_inst_bonprinter_windows',
+          icon: '🖨️',
+          label: 'Bonprinter Windows',
+          labelKey: itemLabelKey('sm_inst_bonprinter_windows'),
+          href: `${baseUrl}/bonprinter-windows`,
+        },
+        {
           id: 'sm_abonnement',
           icon: '📦',
           label: 'Abonnement',

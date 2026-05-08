@@ -5456,6 +5456,7 @@
       "sm_rpt_verkoop": "Ventes",
       "sm_rpt_populair": "Articles populaires",
       "sm_inst_betaling": "Moyens de paiement",
+      "sm_inst_bonprinter_windows": "Imprimante tickets (Windows)",
       "sm_abonnement": "Abonnement"
     }
   },
