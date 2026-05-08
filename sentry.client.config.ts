@@ -48,6 +48,29 @@ function isBenignAbortError(value: unknown): boolean {
   );
 }
 
+/** Lokale Vysion Print Agent — fetch faalt vaak als agent uit staat; geen Sentry-issue. */
+function isPrintAgentLocalFetchNoise(value: unknown): boolean {
+  const msg =
+    value instanceof Error
+      ? `${value.name} ${value.message}`
+      : typeof value === "string"
+        ? value
+        : value != null &&
+            typeof value === "object" &&
+            "message" in value &&
+            typeof (value as { message: unknown }).message === "string"
+          ? (value as { message: string }).message
+          : value != null
+            ? String(value)
+            : "";
+  if (!/127\.0\.0\.1:9742|localhost:9742/i.test(msg)) return false;
+  return (
+    /failed to fetch|load failed|networkerror|network request failed|fetch|refused to connect|content security policy/i.test(
+      msg
+    )
+  );
+}
+
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 
@@ -81,6 +104,9 @@ Sentry.init({
 
   beforeSend(event, hint) {
     if (isBenignAbortError(hint.originalException)) {
+      return null;
+    }
+    if (isPrintAgentLocalFetchNoise(hint.originalException)) {
       return null;
     }
     if (isMatchingIdUpdateNoise(hint.originalException)) {
