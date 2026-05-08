@@ -97,21 +97,33 @@ import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmMo
 const EPSON_USB_PRINT_BRIDGE_TREE =
   'https://github.com/rudiaerden19-blip/epsonapp/tree/main/usb-print-bridge'
 
+/** Volledige repo-ZIP; gebruiker pakt map `usb-print-bridge` uit `epsonapp-main`. */
+const EPSON_APP_REPO_ZIP =
+  'https://github.com/rudiaerden19-blip/epsonapp/archive/refs/heads/main.zip'
+
+const NODEJS_DOWNLOAD_HOME = 'https://nodejs.org/'
+
 /** Intern (NL): USB-print-bridge — niet via i18n; alleen eigen gebruik. */
 const KASSA_PRINTER_BRIDGE_COPY = {
   button: 'Bonprinter PC',
   title: 'Thermische bon op deze PC (USB)',
-  lead: 'Voor een Epson bonprinter via USB op een Windows-kassa draait een kleine bridge-app op dezelfde computer als deze browser (poort 3001).',
+  lead:
+    'Een website mag om veiligheidsredenen geen software automatisch op je pc installeren. Op deze Windows-kassa kun je de bridge zelf neerzetten: eerst downloaden, dan Node.js als dat nog ontbreekt, daarna config en starten.',
+  samePcTip: 'Werk op dezelfde pc als deze browser — daar hangt de USB-printer en daar luistert de bridge op 127.0.0.1.',
+  downloadZip: 'Stap 1: download als ZIP',
+  downloadZipHint:
+    'Pak het ZIP-bestand uit. De bridge zit in de map epsonapp-main/usb-print-bridge (die map verder gebruiken).',
+  nodeJsButton: 'Node.js downloadpagina',
+  nodeJsHint: 'Stap 2: installeer Node.js LTS als je dat nog niet hebt; daarna Terug naar deze map in een terminal.',
+  liConfig: 'Stel in usb-print-bridge/config.json in (COM-poort of Windows-printernaam; zie README in die map).',
+  liRun: 'Stap 3: in die map in een terminal: npm install en daarna npm start — de bridge luistert op 127.0.0.1:3001.',
   liOrdervysion:
-    'In Ordervysion: zet het printer-IP op 127.0.0.1 op kassa, ontvangsten- of keukenscherm — alleen op deze PC waar de bridge draait.',
-  liInstall: 'Op Windows: installeer Node.js en kopieer de map usb-print-bridge uit het GitHub-project epsonapp.',
-  liConfig: 'Stel config.json in (COM-poort of Windows-printernaam; zie README in de map).',
-  liRun: 'Voer npm install en npm start uit in die map — de bridge luistert op 127.0.0.1.',
-  repoLink: 'usb-print-bridge op GitHub openen',
-  check: 'Test verbinding met bridge',
+    'In Ordervysion: printer-IP 127.0.0.1 op kassa, ontvangsten- of keukenscherm — alleen op deze pc waar de bridge draait.',
+  repoLink: 'usb-print-bridge op GitHub bekijken',
+  check: 'Test of bridge draait',
   checking: 'Bezig met testen…',
   statusOnline: 'Bridge bereikbaar op deze pc',
-  statusOffline: 'Geen bridge bereikbaar — start de app op deze pc of controleer firewall/antivirus',
+  statusOffline: 'Geen bridge bereikbaar — map gestart? npm install gedaan?',
   close: 'Sluiten',
 } as const
 
@@ -1846,17 +1858,37 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 {KASSA_PRINTER_BRIDGE_COPY.title}
               </h2>
               <p className="mt-3 text-sm text-gray-700">{KASSA_PRINTER_BRIDGE_COPY.lead}</p>
-              <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-gray-700">
-                <li>{KASSA_PRINTER_BRIDGE_COPY.liOrdervysion}</li>
-                <li>{KASSA_PRINTER_BRIDGE_COPY.liInstall}</li>
+              <p className="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-xs font-medium text-amber-950">
+                {KASSA_PRINTER_BRIDGE_COPY.samePcTip}
+              </p>
+              <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                <a
+                  href={EPSON_APP_REPO_ZIP}
+                  className="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-center text-sm font-bold text-white shadow-sm transition-colors hover:bg-emerald-700"
+                >
+                  {KASSA_PRINTER_BRIDGE_COPY.downloadZip}
+                </a>
+                <a
+                  href={NODEJS_DOWNLOAD_HOME}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center rounded-xl border-2 border-[#3C4D6B] bg-white px-4 py-3 text-center text-sm font-bold text-[#1e293b] transition-colors hover:bg-slate-50"
+                >
+                  {KASSA_PRINTER_BRIDGE_COPY.nodeJsButton}
+                </a>
+              </div>
+              <p className="mt-2 text-xs text-gray-600">{KASSA_PRINTER_BRIDGE_COPY.downloadZipHint}</p>
+              <p className="mt-1 text-xs text-gray-600">{KASSA_PRINTER_BRIDGE_COPY.nodeJsHint}</p>
+              <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-gray-700">
                 <li>{KASSA_PRINTER_BRIDGE_COPY.liConfig}</li>
                 <li>{KASSA_PRINTER_BRIDGE_COPY.liRun}</li>
+                <li>{KASSA_PRINTER_BRIDGE_COPY.liOrdervysion}</li>
               </ul>
               <a
                 href={EPSON_USB_PRINT_BRIDGE_TREE}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-4 inline-flex text-sm font-semibold text-blue-600 underline hover:text-blue-800"
+                className="mt-3 inline-flex text-sm font-semibold text-blue-600 underline hover:text-blue-800"
               >
                 {KASSA_PRINTER_BRIDGE_COPY.repoLink}
               </a>
