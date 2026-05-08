@@ -29,13 +29,25 @@ jobs:
           cache: 'npm'
           cache-dependency-path: apps/vysion-print-agent/package-lock.json
 
+      # Zonder WINDOWS_CODESIGN_* secrets: unsigned build (SmartScreen/Chrome blokkeren vaak).
+      # Met secrets: PFX als base64 + wachtwoord → electron-builder tekent de installer.
       - name: Install & build NSIS installer
         shell: pwsh
         env:
-          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+          PFX_B64: ${{ secrets.WINDOWS_CODESIGN_PFX_BASE64 }}
+          CSC_KEY_PASSWORD: ${{ secrets.WINDOWS_CODESIGN_PASSWORD }}
         run: |
+          if ($env:PFX_B64) {
+            $pfxPath = Join-Path (Get-Location) 'codesign.pfx'
+            [IO.File]::WriteAllBytes($pfxPath, [Convert]::FromBase64String($env:PFX_B64))
+            $env:CSC_LINK = (Resolve-Path $pfxPath).Path
+            Remove-Item Env:PFX_B64 -ErrorAction SilentlyContinue
+          } else {
+            $env:CSC_IDENTITY_AUTO_DISCOVERY = 'false'
+          }
           npm ci
           npm run dist
+          if (Test-Path ./codesign.pfx) { Remove-Item -Force ./codesign.pfx }
 
       - name: Vaste bestandsnaam (download zonder spaties)
         shell: pwsh
