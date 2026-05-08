@@ -1,15 +1,29 @@
 #Requires -Version 5.1
 <#
-  Bouwt map VysionUsbBridge-Stick (+ .zip) naast dit script.
-  Draai op Windows x64 met internet. Kopieer daarna de map of ZIP naar een USB-stick.
+  Bouwt map VysionUsbBridge-Stick (+ .zip) onder -OutputParent.
 
-  Op elke kassa-PC: kopieer map naar vaste schijf of laat op stick staan,
-  pas BRIDGE\config.json aan, dubbelklik START.bat.
+  Standaard (geen -BridgeRoot): download bridge uit GitHub-repo-ZIP — voor lokale pc met internet.
+
+  Met -BridgeRoot: gebruik lokale map usb-print-bridge (GitHub Actions).
+
+  Op kassa-PC: ZIP uitpakken, BRIDGE\config.json aanpassen, START.bat — geen aparte Node-installatie.
 #>
+param(
+  [string]$BridgeRoot = '',
+  [string]$OutputParent = ''
+)
+
 $ErrorActionPreference = 'Stop'
 
 $ScriptRoot = $PSScriptRoot
 if (-not $ScriptRoot) { $ScriptRoot = Get-Location }
+
+if (-not $OutputParent) {
+  $OutputParent = $ScriptRoot
+}
+if (-not (Test-Path -LiteralPath $OutputParent)) {
+  New-Item -ItemType Directory -Path $OutputParent -Force | Out-Null
+}
 
 # Pin Node LTS win-x64 (portable ZIP van nodejs.org)
 $NodeVer = 'v22.14.0'
@@ -18,7 +32,7 @@ $NodeUrl = "https://nodejs.org/dist/$NodeVer/$NodeZipName"
 $RepoZipUrl = 'https://github.com/rudiaerden19-blip/epsonapp/archive/refs/heads/main.zip'
 
 $OutFolderName = 'VysionUsbBridge-Stick'
-$StickRoot = Join-Path $ScriptRoot $OutFolderName
+$StickRoot = Join-Path $OutputParent $OutFolderName
 
 $Temp = Join-Path ([System.IO.Path]::GetTempPath()) ('vysion-usb-build-' + [Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $Temp | Out-Null
@@ -27,7 +41,7 @@ function Write-Info($msg) { Write-Host $msg -ForegroundColor Cyan }
 
 try {
   if (-not [Environment]::Is64BitOperatingSystem) {
-    throw 'Gebruik een 64-bit Windows om dit pakket te bouwen (en op de kassa).'
+    throw 'Gebruik 64-bit Windows om dit pakket te bouwen (en op de kassa).'
   }
 
   if (Test-Path -LiteralPath $StickRoot) {
@@ -48,17 +62,26 @@ try {
   $nodeDest = Join-Path $StickRoot 'NODE'
   Move-Item -LiteralPath $innerDir.FullName -Destination $nodeDest
 
-  # --- Bridge uit GitHub-repo-ZIP ---
-  Write-Info 'Download Ordervysion bridge-broncode (epsonapp)...'
-  $repoZip = Join-Path $Temp 'repo.zip'
-  Invoke-WebRequest -Uri $RepoZipUrl -OutFile $repoZip -UseBasicParsing
+  # --- Bridge-bron ---
+  if ($BridgeRoot) {
+    Write-Info "Bridge uit lokale map: $BridgeRoot"
+    if (-not (Test-Path -LiteralPath $BridgeRoot)) {
+      throw "BridgeRoot bestaat niet: $BridgeRoot"
+    }
+    $bridgeSrc = (Resolve-Path -LiteralPath $BridgeRoot).Path
+  }
+  else {
+    Write-Info 'Download Ordervysion bridge-broncode (epsonapp)...'
+    $repoZip = Join-Path $Temp 'repo.zip'
+    Invoke-WebRequest -Uri $RepoZipUrl -OutFile $repoZip -UseBasicParsing
 
-  $repoExtract = Join-Path $Temp 'repo-extract'
-  Expand-Archive -LiteralPath $repoZip -DestinationPath $repoExtract -Force
+    $repoExtract = Join-Path $Temp 'repo-extract'
+    Expand-Archive -LiteralPath $repoZip -DestinationPath $repoExtract -Force
 
-  $bridgeSrc = Join-Path $repoExtract 'epsonapp-main\usb-print-bridge'
-  if (-not (Test-Path -LiteralPath $bridgeSrc)) {
-    throw 'Map usb-print-bridge niet gevonden in repo-ZIP.'
+    $bridgeSrc = Join-Path $repoExtract 'epsonapp-main\usb-print-bridge'
+    if (-not (Test-Path -LiteralPath $bridgeSrc)) {
+      throw 'Map usb-print-bridge niet gevonden in repo-ZIP.'
+    }
   }
 
   $bridgeDest = Join-Path $StickRoot 'BRIDGE'
@@ -86,7 +109,7 @@ setlocal
 set ROOT=%~dp0
 set NODE=%ROOT%NODE\node.exe
 if not exist "%NODE%" (
-  echo Ontbrekende NODE-map. Kopieer de hele stick-map.
+  echo Ontbrekende NODE-map. Kopieer de hele map uit de ZIP.
   pause
   exit /b 1
 )
@@ -115,30 +138,27 @@ pause
   Set-Content -LiteralPath (Join-Path $StickRoot 'LIST-COM.bat') -Value $listBat -Encoding OEM
 
   $readme = @'
-Vysion USB-bridge — stick-pakket
-================================
+Vysion USB-bridge — ALLES-IN-ÉÉN (Windows 64-bit)
+==================================================
 
-Op de kassa-PC (USB-printer hier):
-1. Kopieer deze hele map naar bv. C:\VysionUsbBridge (of werk rechtstreeks vanaf de stick).
-2. Pas BRIDGE\config.json aan (COM-poort of Windows-printernaam — zie README in BRIDGE).
-3. Dubbelklik START.bat — laat het zwarte venster open staan.
-4. In Ordervysion op deze pc: printer-IP 127.0.0.1
+1. Pak deze map uit op de kassa-pc (mag vanaf USB-stick).
+2. Pas BRIDGE\config.json aan (COM-poort of Windows-printernaam).
+3. Dubbelklik START.bat — laat het zwarte venster open.
+4. Ordervysion op deze pc: printer-IP 127.0.0.1
 
-LIST-COM.bat — welke COM-poorten Windows ziet.
+LIST-COM.bat = COM-poorten tonen.
 
-Gebouwd op Windows 64-bit; gebruik hetzelfde type pc op de kassa.
+Je hoeft GEEN aparte Node.js te installeren — die zit in de map NODE.
 '@
   Set-Content -LiteralPath (Join-Path $StickRoot 'LEES-MIJ.txt') -Value $readme -Encoding UTF8
 
   Write-Host ''
   Write-Host "KLAAR: $StickRoot" -ForegroundColor Green
 
-  $zipOut = Join-Path $ScriptRoot ($OutFolderName + '.zip')
+  $zipOut = Join-Path $OutputParent ($OutFolderName + '.zip')
   if (Test-Path -LiteralPath $zipOut) { Remove-Item -LiteralPath $zipOut -Force }
   Compress-Archive -Path $StickRoot -DestinationPath $zipOut -Force
-  Write-Host "ZIP (handig voor mail/upload): $zipOut" -ForegroundColor Green
-  Write-Host ''
-  Write-Host 'Kopieer de map of de ZIP naar je USB-stick.' -ForegroundColor Yellow
+  Write-Host "ZIP: $zipOut" -ForegroundColor Green
 }
 catch {
   Write-Host ''

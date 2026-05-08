@@ -1,0 +1,63 @@
+# Bouwt op echte Windows VM: portable Node + usb-print-bridge + npm ci (native serialport).
+# Publiceert één downloadbare ZIP op een vaste GitHub Release — geen tweede bouwstap voor de zaak.
+name: USB print bridge — Windows alles-in-één ZIP
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/usb-print-bridge-windows-bundle.yml'
+      - 'public/usb-bridge-stick/Prepare-UsbStick.ps1'
+
+permissions:
+  contents: write
+
+jobs:
+  bundle:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout website (script)
+        uses: actions/checkout@v4
+
+      - name: Checkout epsonapp (bridge)
+        uses: actions/checkout@v4
+        with:
+          repository: rudiaerden19-blip/epsonapp
+          ref: main
+          path: epsonapp
+
+      - name: Build bundle
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path dist -Force | Out-Null
+          & "${{ github.workspace }}/public/usb-bridge-stick/Prepare-UsbStick.ps1" `
+            -BridgeRoot "${{ github.workspace }}/epsonapp/usb-print-bridge" `
+            -OutputParent "${{ github.workspace }}/dist"
+          Move-Item -LiteralPath "dist/VysionUsbBridge-Stick.zip" `
+            -Destination "dist/VysionUsbBridge-Windows-AllesInEen.zip" -Force
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VysionUsbBridge-Windows-AllesInEen
+          path: dist/VysionUsbBridge-Windows-AllesInEen.zip
+
+      - name: Publish release (vaste downloadlink)
+        uses: ncipollo/release-action@v1
+        with:
+          tag: usb-bridge-windows-bundle
+          name: USB print bridge — Windows (alles-in-één)
+          body: |
+            **VysionUsbBridge-Windows-AllesInEen.zip** — uitpakken op de kassa-pc (64-bit).
+
+            1. Dubbelklik de ZIP → «Extraheren» / uitpakken naar een map (of USB-stick).
+            2. Open `BRIDGE\config.json` (kopie van voorbeeld staat er al na eerste START) — vul COM of Windows-printernaam in.
+            3. Dubbelklik **START.bat**. Venster open laten.
+            4. Ordervysion: printer-IP **127.0.0.1** op deze pc.
+
+            Geen aparte Node.js-installatie nodig.
+          artifacts: dist/VysionUsbBridge-Windows-AllesInEen.zip
+          allowUpdates: true
+          replacesArtifacts: true
+          token: ${{ secrets.GITHUB_TOKEN }}

@@ -12,19 +12,28 @@ const EPSON_APP_REPO_ZIP =
 
 const NODEJS_DOWNLOAD_HOME = 'https://nodejs.org/'
 
-/** Statische downloads van deze site (geen tenant in pad). */
+/** Voorgebouwd op GitHub Actions (Windows): Node + bridge + node_modules — géén npm bij de zaak. */
+const USB_FULL_INSTALLER_ZIP_HREF =
+  'https://github.com/rudiaerden19-blip/vysionhoreca-website/releases/download/usb-bridge-windows-bundle/VysionUsbBridge-Windows-AllesInEen.zip'
+
+/** Zelf bouwen op pc met internet (klein ZIP met scripts). */
 const USB_BUILDER_ZIP_HREF = '/usb-bridge-stick/UsbStickBuilder.zip'
 
 /** NL-only helperteksten (USB-bridge op Windows-kassa). */
 const COPY = {
   title: 'Bonprinter Windows (USB-bridge)',
   lead:
-    'Maak één USB-stick-pakket op een Windows-pc met internet — daarna op elke kassa alleen START.bat (geen aparte Node.js meer nodig op die pc). Handwerk hieronder blijft mogelijk voor wie liever zelf npm gebruikt.',
-  usbHeading: 'USB-stick (aanbevolen)',
+    'Één ZIP met alles erin (Node + programma). Op de kassa: uitpakken, config aanpassen, START.bat. Geen aparte Node-installatie en geen npm bij jou op de toonbank.',
+  usbHeading: 'Download — alles-in-één (aanbevolen)',
   usbBody:
-    'Download het ZIP-bestand, pak uit op een pc met internet. Dubbelklik MaakUsbStick.bat — na een paar minuten kopieer je map «VysionUsbBridge-Stick» of de gegenereerde .zip naar een USB-stick. Op de kassa: BRIDGE\\config.json invullen en dubbelklik START.bat.',
-  usbZipBtn: 'Download bouwpakket (ZIP)',
-  usbZipHint: 'Bevat MaakUsbStick.bat en Prepare-UsbStick.ps1 — allebei uitpakken in dezelfde map.',
+    'Pak deze ZIP uit op de Windows-kassa (64-bit) of kopieer eerst naar een USB-stick. Open daarna BRIDGE\\config.json (COM of Windows-printernaam), dubbelklik START.bat en laat het venster open. Ordervysion: printer-IP 127.0.0.1 op deze pc.',
+  usbZipBtn: 'Download VysionUsbBridge-Windows-AllesInEen.zip',
+  usbZipHint:
+    'Wordt automatisch gebouwd op GitHub na elke wijziging aan dit onderdeel. Werkt de link nog niet: wacht tot de workflow «USB print bridge» groen is onder GitHub Actions, of gebruik tijdelijk het bouwpakket hieronder.',
+  usbAltHeading: 'Alternatief: zelf bouwen (met internet)',
+  usbAltBody:
+    'Alleen nodig als de grote ZIP nog niet klaar is. Klein ZIP met scripts; op een pc met internet dubbelklik MaakUsbStick.bat.',
+  usbAltBtn: 'Download klein bouwpakket (scripts)',
   samePcTip:
     'Gebruik deze uitleg op dezelfde pc als de USB-printer — daar luistert de bridge op 127.0.0.1.',
   manualHeading: 'Handmatig (ZIP + Node op deze pc)',
@@ -66,12 +75,22 @@ export default function BonprinterWindowsPage({ params }: { params: { tenant: st
           <h2 className="text-lg font-bold text-emerald-950">{COPY.usbHeading}</h2>
           <p className="text-sm text-emerald-950/95">{COPY.usbBody}</p>
           <a
-            href={USB_BUILDER_ZIP_HREF}
-            className="inline-flex items-center justify-center rounded-xl bg-emerald-700 px-4 py-3 text-center text-sm font-bold text-white shadow-sm transition-colors hover:bg-emerald-800"
+            href={USB_FULL_INSTALLER_ZIP_HREF}
+            className="inline-flex w-full items-center justify-center rounded-xl bg-emerald-700 px-4 py-4 text-center text-base font-bold text-white shadow-sm transition-colors hover:bg-emerald-800 sm:w-auto"
           >
             {COPY.usbZipBtn}
           </a>
           <p className="text-xs text-emerald-900/85">{COPY.usbZipHint}</p>
+          <div className="border-t border-emerald-200/80 pt-4 mt-2 space-y-2">
+            <p className="text-sm font-semibold text-emerald-950">{COPY.usbAltHeading}</p>
+            <p className="text-xs text-emerald-900/85">{COPY.usbAltBody}</p>
+            <a
+              href={USB_BUILDER_ZIP_HREF}
+              className="inline-flex items-center justify-center rounded-xl border-2 border-emerald-700 bg-white px-4 py-2.5 text-center text-sm font-bold text-emerald-900 transition-colors hover:bg-emerald-100"
+            >
+              {COPY.usbAltBtn}
+            </a>
+          </div>
         </div>
 
         <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">

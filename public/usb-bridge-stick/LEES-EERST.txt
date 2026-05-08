@@ -2,7 +2,7 @@ Plaats beide bestanden in dezelfde map op een Windows-pc (met internet):
   • MaakUsbStick.bat
   • Prepare-UsbStick.ps1
 
-Dubbelklik daarna MaakUsbStick.bat.
+Dubbelklik MaakUsbStick.bat om lokaal te bouwen.
 
-Je krijgt map VysionUsbBridge-Stick en een ZIP — die zet je op een USB-stick.
-Op de kassa: START.bat (geen aparte Node-installatie nodig).
+AANBEVOLEN: download de voorgebouwde ZIP van GitHub (Ordervysion → Instellingen → Bonprinter Windows),
+dan hoef je dit NIET — uitpakken op de kassa en START.bat.
