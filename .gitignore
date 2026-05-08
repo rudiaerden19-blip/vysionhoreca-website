@@ -37,3 +37,6 @@ next-env.d.ts
 # Supabase CLI (lokaal)
 supabase/.temp/
 
+# Aparte Git-repo (eigen GitHub-remote)
+epson app/
+
