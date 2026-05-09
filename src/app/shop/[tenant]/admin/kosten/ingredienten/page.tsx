@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
+import { authFetch } from '@/lib/auth-headers'
 import { useLanguage } from '@/i18n'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 import { searchSupplierProducts, getSupplierProductCategories, SupplierProduct } from '@/lib/admin-api'
@@ -161,12 +162,12 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
       abortControllerRef.current = new AbortController()
 
       try {
-        const response = await fetch('/api/analyze-invoice', {
+        const response = await authFetch('/api/analyze-invoice', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            image: base64, 
-            mimeType: file.type 
+          body: JSON.stringify({
+            tenantSlug: params.tenant,
+            image: base64,
+            mimeType: file.type,
           }),
           signal: abortControllerRef.current.signal
         })

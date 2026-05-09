@@ -1,4 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
+import { apiRateLimiter, checkRateLimit } from '@/lib/rate-limit'
+import { logger } from '@/lib/logger'
+
+// Strakke limiet: factuur-scans zijn duur en zeldzaam genoeg om streng te
+// rate-limiten. Bij overschrijding krijgt de tenant 429.
+const MAX_IMAGE_MB = 8
 
 export interface InvoiceItem {
   name: string
@@ -20,11 +27,41 @@ export interface AnalyzeInvoiceResponse {
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse<AnalyzeInvoiceResponse>> {
+  const requestId = crypto.randomUUID()
   try {
-    const { image, mimeType } = await request.json()
+    const { image, mimeType, tenantSlug } = await request.json()
 
+    if (!tenantSlug || typeof tenantSlug !== 'string') {
+      return NextResponse.json({ success: false, error: 'tenantSlug ontbreekt' }, { status: 400 })
+    }
     if (!image) {
       return NextResponse.json({ success: false, error: 'Geen afbeelding ontvangen' }, { status: 400 })
+    }
+
+    // ── Auth: alleen ingelogde zaak/superadmin ─────────────────────────────
+    // Zonder check kon iedereen via dit endpoint Gemini-calls triggeren met
+    // de platform GOOGLE_GEMINI_API_KEY = onbeperkte cloudkosten.
+    const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
+    if (!access.authorized) {
+      logger.warn('analyze-invoice: unauthorized', { requestId, tenantSlug })
+      return NextResponse.json(
+        { success: false, error: access.error || 'Niet geautoriseerd' },
+        { status: 403 }
+      )
+    }
+
+    // ── Rate-limit per tenant + actor ──────────────────────────────────────
+    // Factuur-scans zijn zeldzaam en duur. Strenger dan algemene API-bucket.
+    const actorId =
+      request.headers.get('x-business-id') ||
+      request.headers.get('x-superadmin-id') ||
+      'anon'
+    const rl = await checkRateLimit(apiRateLimiter, `analyze-invoice:${tenantSlug}:${actorId}`)
+    if (!rl.success) {
+      return NextResponse.json(
+        { success: false, error: 'Te veel factuurscans. Probeer over 1 minuut opnieuw.' },
+        { status: 429, headers: { 'Retry-After': '60' } }
+      )
     }
 
     const apiKey = process.env.GOOGLE_GEMINI_API_KEY
@@ -33,10 +70,14 @@ export async function POST(request: NextRequest): Promise<NextResponse<AnalyzeIn
       return NextResponse.json({ success: false, error: 'Google Gemini API key niet geconfigureerd.' }, { status: 500 })
     }
 
-    // Check image size (max 20MB base64)
+    // Check image size — strakker dan voorheen (was 20 MB) om cost-bombing
+    // mee te beperken. 8 MB is voldoende voor scherpe factuurfoto's.
     const imageSizeMB = (image.length * 0.75) / (1024 * 1024)
-    if (imageSizeMB > 20) {
-      return NextResponse.json({ success: false, error: 'Afbeelding is te groot (max 20MB).' }, { status: 400 })
+    if (imageSizeMB > MAX_IMAGE_MB) {
+      return NextResponse.json(
+        { success: false, error: `Afbeelding is te groot (max ${MAX_IMAGE_MB}MB).` },
+        { status: 400 }
+      )
     }
 
     console.log(`Analyzing invoice, image size: ${imageSizeMB.toFixed(2)}MB`)
