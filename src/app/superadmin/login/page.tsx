@@ -38,6 +38,12 @@ export default function SuperAdminLogin() {
       localStorage.setItem('superadmin_id', data.admin.id)
       localStorage.setItem('superadmin_email', data.admin.email)
       localStorage.setItem('superadmin_name', data.admin.name)
+      // HMAC sessietoken (sinds 2026-05). Optioneel — server valt terug op
+      // legacy header-mode als het token ontbreekt of SESSION_HMAC_SECRET
+      // niet ingesteld is.
+      if (data.admin.session_token) {
+        localStorage.setItem('superadmin_session_token', data.admin.session_token)
+      }
       writeSuperadminSessionCookies(data.admin.id, data.admin.email, data.admin.name || '')
       clearTerminalLogout()
 

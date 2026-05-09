@@ -152,6 +152,7 @@ export default function SuperAdminDashboard() {
     localStorage.removeItem('superadmin_id')
     localStorage.removeItem('superadmin_email')
     localStorage.removeItem('superadmin_name')
+    localStorage.removeItem('superadmin_session_token')
     clearSuperadminSessionCookies()
     router.push('/superadmin/login')
   }

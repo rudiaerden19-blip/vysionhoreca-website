@@ -7,6 +7,7 @@ import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
 import { DEFAULT_ENABLED_ALLERGEN_IDS } from '@/lib/allergens-defaults'
 import { tenantSlugFromOrdervysionHost } from '@/lib/tenant-slug-from-host'
+import { signSessionToken } from '@/lib/session-token'
 
 // Legacy SHA-256 hash for backward compatibility
 async function hashPasswordLegacy(password: string): Promise<string> {
@@ -159,6 +160,16 @@ export async function POST(request: NextRequest) {
           superadminId: saRow.id,
         })
 
+        const saSessionToken = signSessionToken({
+          kind: 'owner',
+          id: owner.id,
+          email: owner.email,
+          tenantSlug: owner.tenant_slug,
+        })
+        if (!saSessionToken) {
+          logger.warn('Superadmin tenant-login: SESSION_HMAC_SECRET ontbreekt — token niet gezet', { requestId })
+        }
+
         return NextResponse.json({
           tenant: {
             id: owner.id,
@@ -167,6 +178,7 @@ export async function POST(request: NextRequest) {
             business_id: owner.id,
             tenant_slug: owner.tenant_slug,
             email_verified: owner.email_verified || false,
+            session_token: saSessionToken,
           },
           login_via_superadmin: true,
         })
@@ -328,6 +340,16 @@ export async function POST(request: NextRequest) {
       duration: Date.now() - startTime 
     })
 
+    const sessionToken = signSessionToken({
+      kind: 'owner',
+      id: profile.id,
+      email: profile.email,
+      tenantSlug,
+    })
+    if (!sessionToken) {
+      logger.warn('Login: SESSION_HMAC_SECRET ontbreekt — token niet gezet', { requestId })
+    }
+
     return NextResponse.json({
       tenant: {
         id: profile.id,
@@ -335,7 +357,8 @@ export async function POST(request: NextRequest) {
         email: profile.email,
         business_id: profile.id,
         tenant_slug: tenantSlug,
-        email_verified: profile.email_verified || false
+        email_verified: profile.email_verified || false,
+        session_token: sessionToken,
       }
     })
 

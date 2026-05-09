@@ -43,10 +43,16 @@ export function getAuthHeaders(): Record<string, string> {
         id?: string
         email?: string
         tenant_slug?: string
+        session_token?: string
       }
       headers['x-business-id'] = String(tenant.business_id || tenant.id || '').trim()
       headers['x-auth-email'] = String(tenant.email || '').trim()
       headers['x-tenant-slug'] = tenant.tenant_slug || ''
+      // HMAC-getekend sessietoken (sinds 2026-05). Wordt door
+      // verifyTenantAccess gevalideerd vóór de header-fallback. Zonder token
+      // werkt nog steeds de oude (id, email)-flow tijdens de migratie.
+      const tok = String(tenant.session_token || '').trim()
+      if (tok) headers['x-session-token'] = tok
     } catch {
       localStorage.removeItem('vysion_tenant')
     }
@@ -54,6 +60,7 @@ export function getAuthHeaders(): Record<string, string> {
 
   let superadminId = localStorage.getItem('superadmin_id')
   let superadminEmail = localStorage.getItem('superadmin_email')
+  let superadminToken = localStorage.getItem('superadmin_session_token') || ''
   if (!superadminId?.trim() || !superadminEmail?.trim()) {
     const fromCookie = peekSuperadminFromBrowserCookie()
     if (fromCookie) {
@@ -64,6 +71,9 @@ export function getAuthHeaders(): Record<string, string> {
   if (superadminId?.trim() && superadminEmail?.trim()) {
     headers['x-superadmin-id'] = superadminId.trim()
     headers['x-superadmin-email'] = superadminEmail.trim()
+    if (superadminToken.trim()) {
+      headers['x-superadmin-session-token'] = superadminToken.trim()
+    }
   }
 
   return headers

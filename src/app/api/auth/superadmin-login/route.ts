@@ -4,6 +4,7 @@ import { loginRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
 import { superadminCookieDomainForHost } from '@/lib/superadmin-cookies'
+import { signSessionToken } from '@/lib/session-token'
 
 export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID()
@@ -108,12 +109,22 @@ export async function POST(request: NextRequest) {
       duration: Date.now() - startTime 
     })
 
+    const sessionToken = signSessionToken({
+      kind: 'superadmin',
+      id: admin.id,
+      email: admin.email,
+    })
+    if (!sessionToken) {
+      logger.warn('Superadmin login: SESSION_HMAC_SECRET ontbreekt — token niet gezet', { requestId })
+    }
+
     const res = NextResponse.json({
       success: true,
       admin: {
         id: admin.id,
         email: admin.email,
-        name: admin.name
+        name: admin.name,
+        session_token: sessionToken,
       }
     })
 
