@@ -166,6 +166,45 @@ ${itemsList}
 ⏳ *Wacht op bevestiging van de zaak...*
 Je krijgt een bericht zodra de zaak je bestelling bevestigt!`
 
+    // ── Idempotency-lock ───────────────────────────────────────────────────
+    // Voorkomt dubbele bevestigingen als de klant 2× op "bestellen" tikt of
+    // het netwerk een retry doet. Unique key = (tenant_slug, kind, dedupe_key).
+    let dedupRowId: string | null = null
+    try {
+      const ins = await supabaseAdmin
+        .from('whatsapp_send_log')
+        .insert({
+          tenant_slug: tenantSlug,
+          kind: 'confirmation',
+          dedupe_key: orderId,
+          phone: customerPhone,
+        })
+        .select('id')
+        .maybeSingle()
+
+      if (ins.error) {
+        const code = (ins.error as { code?: string }).code
+        const msg = ins.error.message || ''
+        if (code === '23505' || /duplicate key/i.test(msg)) {
+          logger.info('whatsapp/send-confirmation: deduped', { requestId, tenantSlug, orderId })
+          return NextResponse.json({ success: true, deduped: true })
+        }
+        // Andere fout (bv. tabel ontbreekt) → log en verstuur alsnog.
+        logger.warn('whatsapp/send-confirmation: dedup insert non-fatal error', {
+          requestId,
+          code,
+          message: msg,
+        })
+      } else {
+        dedupRowId = (ins.data as { id?: string } | null)?.id ?? null
+      }
+    } catch (e) {
+      logger.warn('whatsapp/send-confirmation: dedup insert threw', {
+        requestId,
+        error: e instanceof Error ? e.message : String(e),
+      })
+    }
+
     // Send the confirmation via WhatsApp
     const response = await fetch(`${WHATSAPP_API_URL}/${tenant.phone_number_id}/messages`, {
       method: 'POST',
@@ -185,6 +224,10 @@ Je krijgt een bericht zodra de zaak je bestelling bevestigt!`
     if (!response.ok) {
       const error = await response.text()
       console.error('❌ WhatsApp API error:', error)
+      // Rollback dedup-row zodat retry mogelijk blijft.
+      if (dedupRowId) {
+        await supabaseAdmin.from('whatsapp_send_log').delete().eq('id', dedupRowId)
+      }
       return NextResponse.json({ error: 'Failed to send WhatsApp message' }, { status: 500 })
     }
 

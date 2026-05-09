@@ -167,6 +167,49 @@ export async function POST(request: NextRequest) {
       .replace(/{businessName}/g, businessName)
       .replace(/{rejectionReason}/g, rejectionReason || 'Niet gespecificeerd')
 
+    // ── Idempotency-lock ───────────────────────────────────────────────────
+    // Voorkomt dubbele berichten als een admin 2× klikt of het netwerk een
+    // request retry'd. Unique key = (tenant_slug, kind, dedupe_key).
+    // Faalt Meta straks: row weer verwijderen zodat een nieuwe poging mag.
+    const dedupeKey = `${orderNumber}:${status}`
+    const dedupKind = `status:${status}`
+    let dedupRowId: string | null = null
+    try {
+      const ins = await supabaseAdmin
+        .from('whatsapp_send_log')
+        .insert({
+          tenant_slug: tenantSlug,
+          kind: dedupKind,
+          dedupe_key: dedupeKey,
+          phone: customerPhone,
+        })
+        .select('id')
+        .maybeSingle()
+
+      if (ins.error) {
+        const code = (ins.error as { code?: string }).code
+        const msg = ins.error.message || ''
+        if (code === '23505' || /duplicate key/i.test(msg)) {
+          logger.info('whatsapp/send-status: deduped', { requestId, tenantSlug, dedupeKey, dedupKind })
+          return NextResponse.json({ success: true, deduped: true })
+        }
+        // Andere fout (bv. tabel ontbreekt nog vóór SQL-migratie). Loggen
+        // en doorgaan zonder dedup zodat de feature niet ineens kapot is.
+        logger.warn('whatsapp/send-status: dedup insert non-fatal error', {
+          requestId,
+          code,
+          message: msg,
+        })
+      } else {
+        dedupRowId = (ins.data as { id?: string } | null)?.id ?? null
+      }
+    } catch (e) {
+      logger.warn('whatsapp/send-status: dedup insert threw', {
+        requestId,
+        error: e instanceof Error ? e.message : String(e),
+      })
+    }
+
     // Send the message via WhatsApp
     const response = await fetch(`${WHATSAPP_API_URL}/${tenant.phone_number_id}/messages`, {
       method: 'POST',
@@ -186,6 +229,10 @@ export async function POST(request: NextRequest) {
     if (!response.ok) {
       const error = await response.text()
       console.error('❌ WhatsApp API error:', error)
+      // Rollback dedup-row zodat een retry mogelijk is.
+      if (dedupRowId) {
+        await supabaseAdmin.from('whatsapp_send_log').delete().eq('id', dedupRowId)
+      }
       return NextResponse.json({ error: 'Failed to send WhatsApp message' }, { status: 500 })
     }
 
