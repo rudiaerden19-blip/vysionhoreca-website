@@ -11,13 +11,14 @@ import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
 import { getAdminKassaEntryHref } from '@/lib/tenant-modules'
 import { shopDisplayOrderTypeKey, nlBrowserPrintOrderTypeBanner } from '@/lib/shop-display-order-type'
-import {
+import { 
   activateAudioForIOS,
   prewarmAudio,
   playOrderNotification,
   isAudioActivatedThisSession,
   markAudioActivated
 } from '@/lib/sounds'
+import { sendToVysionPrintAgent } from '@/lib/vysion-print-agent-client'
 import { getAuthHeaders } from '@/lib/auth-headers'
 
 interface Order {
@@ -666,8 +667,63 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     }, 250)
   }
 
-  function printOrder(order: Order, type: 'customer' | 'kitchen' = 'customer') {
-    browserPrint(order, type)
+  /** Probeer eerst de lokale Vysion Print Agent (ESC/POS bonprinter).
+   *  Lukt niet (agent niet bereikbaar) → val terug op het browser-print venster. */
+  async function printOrder(order: Order, type: 'customer' | 'kitchen' = 'customer') {
+    const items = (order.items || []).map((it: any) => ({
+      quantity: Number(it.quantity) || 1,
+      name: String(it.product_name || it.name || 'Item'),
+      price: Number(it.total_price ?? (it.price ?? 0) * (Number(it.quantity) || 1)) || 0,
+      choices: Array.isArray(it.options)
+        ? it.options.map((o: any) => ({ name: String(o.name || ''), price: Number(o.price || 0) }))
+        : [],
+      notes: it.notes ? String(it.notes) : undefined,
+    }))
+
+    const requestedDateTime = (order as any).scheduled_date
+      ? `${new Date((order as any).scheduled_date).toLocaleDateString('nl-BE')}${(order as any).scheduled_time ? ' ' + (order as any).scheduled_time : ''}`
+      : ''
+
+    const subtotal = items.reduce((s, it: any) => s + (Number(it.price) || 0), 0)
+    const total = Number((order as any).total) || subtotal
+    const vatRate = (business as any)?.btw_percentage ?? 6
+    const tax = total > 0 ? total - total / (1 + vatRate / 100) : 0
+
+    const ok = await sendToVysionPrintAgent({
+      winkelnaam: business?.business_name || '',
+      bonInhoud: '',
+      copies: 1,
+      receiptMode: type === 'kitchen' ? 'keuken' : 'kassa',
+      orderData: {
+        orderNumber: order.order_number,
+        orderType: order.order_type,
+        tableNumber: null,
+        items,
+        subtotal: total - tax,
+        tax,
+        total,
+        paymentMethod: (order as any).payment_method,
+        ...(order.customer_name ? { customerName: order.customer_name } : {}),
+        ...((order as any).customer_phone ? { customerPhone: (order as any).customer_phone } : {}),
+        ...((order as any).customer_address || (order as any).delivery_address
+          ? { customerAddress: (order as any).customer_address || (order as any).delivery_address }
+          : {}),
+        ...((order as any).customer_notes ? { customerNotes: (order as any).customer_notes } : {}),
+        ...(requestedDateTime ? { requestedDateTime } : {}),
+        isOnlineOrder: true,
+      } as any,
+      businessInfo: {
+        name: business?.business_name,
+        address: (business as any)?.address ?? undefined,
+        postalCode: (business as any)?.postal_code ?? undefined,
+        city: (business as any)?.city ?? undefined,
+        phone: (business as any)?.phone ?? undefined,
+        vatNumber: (business as any)?.btw_number ?? undefined,
+        website: (business as any)?.website ?? undefined,
+        vatRate,
+      },
+    })
+    if (!ok) browserPrint(order, type)
   }
 
   /** Kaartkop + modal header: donkerblauw, witte tekst (zelfde op alle tenants) */
