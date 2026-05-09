@@ -3,7 +3,7 @@
 import { useLanguage } from '@/i18n'
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { supabase } from '@/lib/supabase'
+import { adminDb } from '@/lib/admin-db-client'
 import { getTenantSettings } from '@/lib/admin-api'
 import { getAuthHeaders } from '@/lib/auth-headers'
 
@@ -53,35 +53,30 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
 
   async function loadData() {
     setLoading(true)
-    
-    // Load customers with email
-    const { data: customersData } = await supabase
-      .from('shop_customers')
-      .select('*')
-      .eq('tenant_slug', params.tenant)
-      .not('email', 'is', null)
-      .order('created_at', { ascending: false })
-    
-    if (customersData) {
-      setCustomers(customersData)
+
+    // Server-side reads via admin-db-proxy. Anon-key heeft (na lockdown)
+    // geen SELECT op shop_customers / marketing_campaigns.
+    const customersResult = await adminDb.select<Customer[]>('shop_customers', {
+      tenantSlug: params.tenant,
+      not: [['email', 'is', null]],
+      order: { column: 'created_at', ascending: false },
+    })
+    if (customersResult.ok && Array.isArray(customersResult.data)) {
+      setCustomers(customersResult.data)
     }
 
-    // Load business info
     const settings = await getTenantSettings(params.tenant)
     if (settings) {
       setBusinessInfo(settings)
     }
 
-    // Load campaign history
-    const { data: campaignData } = await supabase
-      .from('marketing_campaigns')
-      .select('*')
-      .eq('tenant_slug', params.tenant)
-      .order('sent_at', { ascending: false })
-      .limit(20)
-    
-    if (campaignData) {
-      setCampaigns(campaignData)
+    const campaignsResult = await adminDb.select<CampaignHistory[]>('marketing_campaigns', {
+      tenantSlug: params.tenant,
+      order: { column: 'sent_at', ascending: false },
+      limit: 20,
+    })
+    if (campaignsResult.ok && Array.isArray(campaignsResult.data)) {
+      setCampaigns(campaignsResult.data)
     }
 
     setLoading(false)

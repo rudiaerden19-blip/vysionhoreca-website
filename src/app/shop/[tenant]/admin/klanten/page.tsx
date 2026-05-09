@@ -4,7 +4,7 @@ import { useLanguage } from '@/i18n'
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { supabase } from '@/lib/supabase'
+import { adminDb } from '@/lib/admin-db-client'
 import { Customer } from '@/lib/admin-api'
 
 export default function KlantenPage({ params }: { params: { tenant: string } }) {
@@ -22,28 +22,29 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
   }, [params.tenant])
 
   async function loadCustomers() {
-    const { data, error } = await supabase
-      .from('shop_customers')
-      .select('*')
-      .eq('tenant_slug', params.tenant)
-      .order('created_at', { ascending: false })
-    
-    if (!error && data) {
-      setCustomers(data)
+    // Server-side via admin-db-proxy: anon-key heeft (na lockdown) geen
+    // SELECT op shop_customers — voorkomt cross-tenant klantdata-leak.
+    const result = await adminDb.select<Customer[]>('shop_customers', {
+      tenantSlug: params.tenant,
+      order: { column: 'created_at', ascending: false },
+    })
+    if (result.ok && Array.isArray(result.data)) {
+      setCustomers(result.data)
     }
     setLoading(false)
   }
 
   const handleUpdatePoints = async () => {
     if (!selectedCustomer) return
-    
-    const { error } = await supabase
-      .from('shop_customers')
-      .update({ loyalty_points: newPoints })
-      .eq('id', selectedCustomer.id)
-    
-    if (!error) {
-      setCustomers(prev => prev.map(c => 
+
+    const result = await adminDb.update(
+      'shop_customers',
+      { loyalty_points: newPoints },
+      { id: selectedCustomer.id, tenant_slug: params.tenant }
+    )
+
+    if (result.ok) {
+      setCustomers(prev => prev.map(c =>
         c.id === selectedCustomer.id ? { ...c, loyalty_points: newPoints } : c
       ))
       setSelectedCustomer({ ...selectedCustomer, loyalty_points: newPoints })

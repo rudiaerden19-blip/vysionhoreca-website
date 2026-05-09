@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { getOrders, updateOrderStatus, confirmOrder, approveWebshopOrder, completeWebshopOrder, Order, getTenantSettings, TenantSettings, addLoyaltyPoints, isWebshopOrder } from '@/lib/admin-api'
 import { formatOrderScheduleDetail } from '@/lib/format-order-schedule'
 import { supabase } from '@/lib/supabase'
+import { adminDb } from '@/lib/admin-db-client'
 import { getSoundsEnabled } from '@/lib/sounds'
 import { getAuthHeaders } from '@/lib/auth-headers'
 import { sendToVysionPrintAgent } from '@/lib/vysion-print-agent-client'
@@ -406,16 +407,18 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
       }
       
       // Add loyalty points NOW (after approval) - 1 point per euro
-      // Find customer by email
+      // Find customer by email — server-side, anon-key heeft geen SELECT meer.
       if (order.customer_email && order.total) {
         try {
-          const { data: customer } = await supabase
-            .from('shop_customers')
-            .select('id')
-            .eq('tenant_slug', params.tenant)
-            .eq('email', order.customer_email.toLowerCase())
-            .single()
-          
+          const lookup = await adminDb.select<{ id: string }>('shop_customers', {
+            tenantSlug: params.tenant,
+            select: 'id',
+            match: { email: order.customer_email.toLowerCase() },
+            single: 'maybe',
+          })
+          const customer = lookup.ok && lookup.data && typeof (lookup.data as { id?: string }).id === 'string'
+            ? (lookup.data as { id: string })
+            : null
           if (customer) {
             const points = Math.floor(order.total)
             await addLoyaltyPoints(customer.id, points, order.total)
