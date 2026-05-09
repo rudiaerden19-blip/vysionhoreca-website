@@ -20,9 +20,10 @@ function loadConfig() {
     return {
       printerName: typeof j.printerName === 'string' ? j.printerName : '',
       port: typeof j.port === 'number' ? j.port : PORT,
+      autoStart: typeof j.autoStart === 'boolean' ? j.autoStart : true,
     }
   } catch {
-    return { printerName: '', port: PORT }
+    return { printerName: '', port: PORT, autoStart: true }
   }
 }
 
@@ -71,11 +72,41 @@ function openSettings() {
   })
 }
 
+/** Windows: sta registratie toe zodat de kassa meteen naar localhost:9742 kan praten na herstart. */
+function syncWindowsStartup() {
+  if (process.platform !== 'win32') return
+  try {
+    app.setLoginItemSettings({
+      openAtLogin: config.autoStart !== false,
+      path: process.execPath,
+      args: [],
+    })
+  } catch (e) {
+    console.error('setLoginItemSettings', e)
+  }
+}
+
 function buildTray() {
+  if (tray && !tray.isDestroyed()) {
+    tray.destroy()
+    tray = null
+  }
   const icon = createTrayIcon()
   tray = new Tray(icon)
   tray.setToolTip('Vysion Print Agent')
   const menu = Menu.buildFromTemplate([
+    {
+      label: 'Start automatisch bij Windows-aanmelding',
+      type: 'checkbox',
+      checked: config.autoStart !== false,
+      visible: process.platform === 'win32',
+      click: (item) => {
+        config = { ...config, autoStart: item.checked }
+        saveConfig(config)
+        syncWindowsStartup()
+      },
+    },
+    { type: 'separator', visible: process.platform === 'win32' },
     { label: 'Instellingen…', click: () => openSettings() },
     { type: 'separator' },
     { label: 'Afsluiten', click: () => app.quit() },
@@ -92,14 +123,20 @@ ipcMain.handle('printers:list', () => {
   }
 })
 
-ipcMain.handle('config:get', () => ({ ...config }))
+ipcMain.handle('config:get', () => ({
+  ...config,
+  autoStart: config.autoStart !== false,
+}))
 
 ipcMain.handle('config:save', (_evt, partial) => {
   config = {
     printerName: typeof partial.printerName === 'string' ? partial.printerName : config.printerName,
     port: typeof partial.port === 'number' ? partial.port : config.port,
+    autoStart: typeof partial.autoStart === 'boolean' ? partial.autoStart : config.autoStart,
   }
   saveConfig(config)
+  syncWindowsStartup()
+  buildTray()
   return { ok: true }
 })
 
@@ -114,6 +151,7 @@ if (!gotLock) {
   app.whenReady().then(() => {
     const port = config.port || PORT
     serverHandle = startServer(getPrinterName, port)
+    syncWindowsStartup()
     buildTray()
 
     if (!getPrinterName()) {

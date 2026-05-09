@@ -9,9 +9,13 @@ export type VysionPrintAgentBody = {
   receiptText?: string
 }
 
-export async function sendToVysionPrintAgent(
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+async function postPrintOnce(
   body: VysionPrintAgentBody,
-  origin = DEFAULT_AGENT_ORIGIN
+  origin: string
 ): Promise<boolean> {
   try {
     const init: RequestInit = {
@@ -24,7 +28,6 @@ export async function sendToVysionPrintAgent(
       mode: 'cors',
       credentials: 'omit',
     }
-    // Private Network Access / localhost vanaf https (Experimenteel in sommige browsers)
     ;(init as RequestInit & { targetAddressSpace?: string }).targetAddressSpace = 'local'
 
     const r = await fetch(`${origin.replace(/\/$/, '')}/print`, init)
@@ -33,4 +36,19 @@ export async function sendToVysionPrintAgent(
   } catch {
     return false
   }
+}
+
+export async function sendToVysionPrintAgent(
+  body: VysionPrintAgentBody,
+  origin = DEFAULT_AGENT_ORIGIN
+): Promise<boolean> {
+  const base = origin.replace(/\/$/, '')
+  /** Agent kan net opstarten na login; korte retries voorkomen onnodige HTML-bon. */
+  const attempts = 5
+  const gapMs = 400
+  for (let i = 0; i < attempts; i++) {
+    if (await postPrintOnce(body, base)) return true
+    if (i < attempts - 1) await sleep(gapMs)
+  }
+  return false
 }
