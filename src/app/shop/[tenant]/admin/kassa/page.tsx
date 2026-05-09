@@ -50,7 +50,7 @@ import {
   isMarketingDemoTenantSlug,
   publicDemoSessionMatchesTenant,
 } from '@/lib/demo-links'
-import { buildShopInternalReturnPath } from '@/lib/auth-headers'
+import { authFetch, buildShopInternalReturnPath } from '@/lib/auth-headers'
 import {
   attemptCloseThenOrNavigate,
   applyOwnerOnlyLogoutCleanup,
@@ -1642,7 +1642,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const background = opts?.background === true
     if (!background) setStaffClockListLoading(true)
     try {
-      const res = await fetch(`/api/kassa/staff-clock?tenant_slug=${encodeURIComponent(tenant)}`, {
+      const res = await authFetch(`/api/kassa/staff-clock?tenant_slug=${encodeURIComponent(tenant)}`, {
         cache: 'no-store',
       })
       const data = (await res.json()) as {
@@ -1693,9 +1693,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setStaffClockBusy(true)
     setStaffClockPinError(null)
     try {
-      const res = await fetch('/api/kassa/staff-clock', {
+      const res = await authFetch('/api/kassa/staff-clock', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           tenant_slug: tenant,
           staff_id: modal.staffId,

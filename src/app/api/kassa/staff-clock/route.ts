@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { getBelgiumDateString, getDateBoundsForBelgium } from '@/lib/belgium-date-bounds'
+import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,6 +25,17 @@ export async function GET(request: NextRequest) {
   const tenant_slug = request.nextUrl.searchParams.get('tenant_slug')?.trim()
   if (!tenant_slug) {
     return NextResponse.json({ ok: false, error: 'bad_request' }, { status: 400 })
+  }
+
+  // Personeelsdata = persoonsgegevens. Alleen ingelogde zaak/superadmin
+  // mag ze opvragen — anders kon iedereen met de tenant_slug de namen
+  // van het personeel lezen + zien wie ingeklokt is.
+  const access = await verifyTenantOrSuperAdmin(request, tenant_slug)
+  if (!access.authorized) {
+    return NextResponse.json(
+      { ok: false, error: access.error || 'unauthorized' },
+      { status: 403 }
+    )
   }
 
   const { data: settings, error: settingsErr } = await supabase
@@ -107,6 +119,16 @@ export async function POST(request: NextRequest) {
 
   if (!tenant_slug || !staff_id || !pin || (action !== 'in' && action !== 'out')) {
     return NextResponse.json({ ok: false, error: 'bad_request' }, { status: 400 })
+  }
+
+  // Inklokken/uitklokken alleen door een ingelogde zaak (kassa-context).
+  // PIN-check blijft als tweede slot — zonder PIN faalt het alsnog.
+  const access = await verifyTenantOrSuperAdmin(request, tenant_slug)
+  if (!access.authorized) {
+    return NextResponse.json(
+      { ok: false, error: access.error || 'unauthorized' },
+      { status: 403 }
+    )
   }
 
   const { data: settings, error: settingsErr } = await supabase

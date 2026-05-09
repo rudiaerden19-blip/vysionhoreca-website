@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useLanguage } from '@/i18n'
+import { authFetch } from '@/lib/auth-headers'
 import {
   appLocaleToBcp47,
   printStaffSalesSummaryReceipt,
@@ -59,7 +60,7 @@ export function AdminStaffClockPanel({
     async (opts?: { background?: boolean }) => {
       if (!opts?.background) setListLoading(true)
       try {
-        const res = await fetch(`/api/kassa/staff-clock?tenant_slug=${encodeURIComponent(tenantSlug)}`)
+        const res = await authFetch(`/api/kassa/staff-clock?tenant_slug=${encodeURIComponent(tenantSlug)}`)
         const data = (await res.json()) as { ok?: boolean; staff?: StaffRow[] }
         if (data.ok && data.staff) setStaffList(data.staff)
         else if (!opts?.background) setStaffList([])
@@ -83,9 +84,8 @@ export function AdminStaffClockPanel({
     setBusy(true)
     setPinError(null)
     try {
-      const res = await fetch('/api/kassa/staff-clock', {
+      const res = await authFetch('/api/kassa/staff-clock', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           tenant_slug: tenantSlug,
           staff_id: modal.staffId,
