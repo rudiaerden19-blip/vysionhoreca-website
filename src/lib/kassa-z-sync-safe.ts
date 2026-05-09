@@ -1,12 +1,30 @@
-import { syncZReportAfterOrder } from '@/lib/admin-api'
+import { authFetch } from '@/lib/auth-headers'
+import { getBelgiumDateString } from '@/lib/admin-api'
 
 /**
- * Z-rapport refresh na order — fire-and-forget met `.catch`.
- * Voorkomt unhandled promise rejections als autoUpdateZReport faalt (netwerk/RLS),
- * zonder de betalingsflow te blokkeren.
+ * Z-rapport refresh na order — fire-and-forget naar de server.
+ *
+ * Sinds Phase 1 RLS-lockdown kan de browser niet meer rechtstreeks naar
+ * z_reports schrijven. Daarom roepen we /api/kassa/sync-z-report aan dat
+ * server-side met service-role het rapport opnieuw berekent.
  */
 export function syncZReportAfterOrderSafe(tenantSlug: string, orderCreatedAt: string): void {
-  void syncZReportAfterOrder(tenantSlug, orderCreatedAt).catch((err: unknown) => {
-    console.warn('[kassa] syncZReportAfterOrder failed', tenantSlug, err)
-  })
+  try {
+    const date = getBelgiumDateString(new Date(orderCreatedAt))
+    void authFetch('/api/kassa/sync-z-report', {
+      method: 'POST',
+      body: JSON.stringify({ tenantSlug, date }),
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          const json = await res.json().catch(() => ({}))
+          console.warn('[kassa] syncZReport failed:', res.status, json?.error)
+        }
+      })
+      .catch((err) => {
+        console.warn('[kassa] syncZReport network error:', err)
+      })
+  } catch (err) {
+    console.warn('[kassa] syncZReport setup error:', err)
+  }
 }

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
+import { adminDb } from '@/lib/admin-db-client'
 import {
   distributeOrderPaymentForZRaport,
   fetchAllTenantOrdersInCreatedAtRange,
@@ -219,9 +220,9 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       orderIds: stats.orderIds,
     })
 
-    const { error } = await supabase
-      .from('z_reports')
-      .upsert({
+    const r = await adminDb.upsert(
+      'z_reports',
+      {
         tenant_slug: params.tenant,
         report_date: selectedDate,
         order_count: stats.orderCount,
@@ -240,15 +241,14 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         order_ids: stats.orderIds,
         report_hash: reportHash,
         generated_at: new Date().toISOString(),
-      }, {
-        onConflict: 'tenant_slug,report_date',
-        ignoreDuplicates: false
-      })
+      },
+      { tenantSlug: params.tenant, onConflict: 'tenant_slug,report_date' }
+    )
 
-    if (!error) {
+    if (r.ok) {
       await loadSavedReports()
     } else {
-      alert('Fout bij opslaan: ' + error.message)
+      alert('Fout bij opslaan: ' + (r.error || ''))
     }
 
     setSyncing(false)
@@ -270,9 +270,9 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
 
     const closedAt = new Date().toISOString()
 
-    const { error } = await supabase
-      .from('z_reports')
-      .upsert({
+    const r = await adminDb.upsert(
+      'z_reports',
+      {
         tenant_slug: params.tenant,
         report_date: selectedDate,
         order_count: stats.orderCount,
@@ -293,16 +293,15 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         generated_at: closedAt,
         is_closed: true,   // KRITIEK: Dag definitief afgesloten
         closed_at: closedAt,
-      }, {
-        onConflict: 'tenant_slug,report_date',
-        ignoreDuplicates: false
-      })
+      },
+      { tenantSlug: params.tenant, onConflict: 'tenant_slug,report_date' }
+    )
 
-    if (!error) {
+    if (r.ok) {
       await loadSavedReports()
       setShowCloseConfirm(false)
     } else {
-      alert('Fout bij afsluiten: ' + error.message)
+      alert('Fout bij afsluiten: ' + (r.error || ''))
     }
 
     setClosing(false)
@@ -316,9 +315,9 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     const online = parseFloat(kassaForm.online) || 0
     const total = cash + card + online
 
-    const { error } = await supabase
-      .from('z_reports')
-      .upsert({
+    const r = await adminDb.upsert(
+      'z_reports',
+      {
         tenant_slug: params.tenant,
         report_date: selectedDate,
         // Online orders data (bewaar bestaande waarden via upsert)
@@ -343,17 +342,16 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         manual_online: online || null,
         manual_total: total || null,
         kassa_saved_at: new Date().toISOString(),
-      }, {
-        onConflict: 'tenant_slug,report_date',
-        ignoreDuplicates: false,
-      })
+      },
+      { tenantSlug: params.tenant, onConflict: 'tenant_slug,report_date' }
+    )
 
-    if (!error) {
+    if (r.ok) {
       await loadSavedReports()
       setShowKassaModal(false)
       setKassaForm({ cash: '', card: '', online: '' })
     } else {
-      alert('Fout bij opslaan: ' + error.message)
+      alert('Fout bij opslaan: ' + (r.error || ''))
     }
     setSavingKassa(false)
   }
