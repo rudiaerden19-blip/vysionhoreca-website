@@ -302,7 +302,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
 
   const handleDelete = async (id: string) => {
     if (!(await ask(t('adminPages.producten.confirmDelete')))) return
-    const success = await deleteMenuProduct(id)
+    const success = await deleteMenuProduct(id, params.tenant)
     if (success) {
       setProducts(prev => prev.filter(p => p.id !== id))
     } else {

@@ -4,6 +4,7 @@ import { cache, CACHE_TTL, cacheKey } from './cache'
 import { buildDefaultDeliverySettingsRow } from '@/lib/tenant-defaults'
 import bcrypt from 'bcryptjs'
 import { throwIfSupabaseFetchAborted, isPublicDemoTenantSlug } from './admin-api-internal'
+import { adminDb } from './admin-db-client'
 
 // Belgium calendar / Z-rapport bounds — single implementation in `belgium-date-bounds.ts`
 // (light routes import that module directly to avoid pulling in admin-api).
@@ -264,58 +265,17 @@ export async function saveTenantKassaStaffClockEnabled(
 }
 
 export async function saveTenantSettings(settings: Partial<TenantSettings> & { tenant_slug: string }): Promise<boolean> {
-  // Only include fields that definitely exist in the original database schema
-  const safeSettings = {
-    id: settings.id,
-    tenant_slug: settings.tenant_slug,
-    business_name: settings.business_name,
-    tagline: settings.tagline,
-    description: settings.description,
-    logo_url: settings.logo_url,
-    primary_color: settings.primary_color,
-    secondary_color: settings.secondary_color,
-    email: settings.email,
-    phone: settings.phone,
-    address: settings.address,
-    postal_code: settings.postal_code,
-    city: settings.city,
-    website: settings.website,
-    facebook_url: settings.facebook_url,
-    instagram_url: settings.instagram_url,
-    tiktok_url: settings.tiktok_url,
-    website_url: settings.website_url,
-    about_image: settings.about_image,
-    top_seller_1: settings.top_seller_1,
-    top_seller_2: settings.top_seller_2,
-    top_seller_3: settings.top_seller_3,
-    cover_image_1: settings.cover_image_1,
-    cover_image_2: settings.cover_image_2,
-    cover_image_3: settings.cover_image_3,
-    seo_title: settings.seo_title,
-    seo_description: settings.seo_description,
-    seo_keywords: settings.seo_keywords,
-    seo_og_image: settings.seo_og_image,
+  /** PHASE 1: server-side via /api/admin/db (service-role + audit-log + tenant-verify).
+   *  De whitelist in `admin-db-proxy-spec.ts` zorgt dat alleen tenant_settings
+   *  geüpsert kan worden, en `forbiddenColumns` strip id/created_at automatisch. */
+  const r = await adminDb.upsert('tenant_settings', settings as Record<string, unknown>, {
+    onConflict: 'tenant_slug',
+    tenantSlug: settings.tenant_slug,
+  })
+  if (!r.ok) {
+    console.error('Error saving tenant settings:', r.error)
+    return false
   }
-
-  // First try with all fields
-  const { error } = await supabase
-    .from('tenant_settings')
-    .upsert(settings, { onConflict: 'tenant_slug' })
-  
-  if (error) {
-    // If error, try with only safe/original fields
-    console.warn('Trying save with safe columns only:', error.message)
-    const { error: fallbackError } = await supabase
-      .from('tenant_settings')
-      .upsert(safeSettings, { onConflict: 'tenant_slug' })
-    
-    if (fallbackError) {
-      console.error('Error saving tenant settings:', fallbackError)
-      return false
-    }
-  }
-  
-  // Invalidate cache after successful save
   cache.invalidate(cacheKey('tenant_settings', settings.tenant_slug))
   return true
 }
@@ -370,12 +330,12 @@ export async function getDeliverySettings(tenantSlug: string, signal?: AbortSign
 }
 
 export async function saveDeliverySettings(settings: DeliverySettings): Promise<boolean> {
-  const { error } = await supabase
-    .from('delivery_settings')
-    .upsert(settings, { onConflict: 'tenant_slug' })
-
-  if (error) {
-    console.error('Error saving delivery settings:', error)
+  const r = await adminDb.upsert('delivery_settings', settings as unknown as Record<string, unknown>, {
+    onConflict: 'tenant_slug',
+    tenantSlug: settings.tenant_slug,
+  })
+  if (!r.ok) {
+    console.error('Error saving delivery settings:', r.error)
     return false
   }
   cache.invalidate(cacheKey('delivery_settings', settings.tenant_slug))

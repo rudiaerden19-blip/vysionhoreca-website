@@ -1,6 +1,7 @@
 import { supabase } from './supabase'
 import { cache, CACHE_TTL, cacheKey } from './cache'
 import { throwIfSupabaseFetchAborted } from './admin-api-internal'
+import { adminDb } from './admin-db-client'
 import {
   clampKassaProductImageZoom,
   type MenuProduct,
@@ -40,30 +41,33 @@ export async function getMenuCategories(tenantSlug: string): Promise<MenuCategor
 }
 
 export async function saveMenuCategory(category: MenuCategory): Promise<MenuCategory | null> {
-  const { data, error } = await supabase.from('menu_categories').upsert(category).select().single()
-
-  if (error) {
-    console.error('Error saving menu category:', error)
+  /** PHASE 1: server-side via /api/admin/db.
+   *  De proxy strip 'id'/'created_at' (forbiddenColumns) en valideert tenant_slug. */
+  const r = await adminDb.upsert<MenuCategory[]>(
+    'menu_categories',
+    category as unknown as Record<string, unknown>,
+    { tenantSlug: category.tenant_slug, select: '*' },
+  )
+  if (!r.ok) {
+    console.error('Error saving menu category:', r.error)
     return null
   }
-
   cache.invalidate(cacheKey('menu_categories', category.tenant_slug))
-
-  return data
+  const list = (r.data as unknown as MenuCategory[]) || []
+  return list[0] || null
 }
 
 export async function deleteMenuCategory(id: string, tenantSlug?: string): Promise<boolean> {
-  const { error } = await supabase.from('menu_categories').delete().eq('id', id)
-
-  if (error) {
-    console.error('Error deleting menu category:', error)
+  if (!tenantSlug) {
+    console.error('deleteMenuCategory: tenantSlug verplicht in Phase 1')
     return false
   }
-
-  if (tenantSlug) {
-    cache.invalidate(cacheKey('menu_categories', tenantSlug))
+  const r = await adminDb.delete('menu_categories', { id, tenant_slug: tenantSlug }, { tenantSlug })
+  if (!r.ok) {
+    console.error('Error deleting menu category:', r.error)
+    return false
   }
-
+  cache.invalidate(cacheKey('menu_categories', tenantSlug))
   return true
 }
 
@@ -111,15 +115,18 @@ export async function saveMenuProduct(product: MenuProduct): Promise<{ data: Men
     ...(zoomForDb !== undefined && { kassa_image_zoom: zoomForDb }),
   }
 
-  const { data, error } = await supabase.from('menu_products').upsert(fullProduct).select().single()
+  /** PHASE 1: server-side via /api/admin/db. */
+  const r = await adminDb.upsert<MenuProduct[]>(
+    'menu_products',
+    fullProduct as unknown as Record<string, unknown>,
+    { tenantSlug: product.tenant_slug, select: '*' },
+  )
 
-  const errMsgRaw = error?.message ?? ''
-  const zoomColumnProbablyMissing =
-    /kassa_image_zoom/i.test(errMsgRaw) && /schema|column|PGRST\d+/i.test(errMsgRaw)
-
-  if (!error) {
+  if (r.ok) {
     cache.invalidate(cacheKey('menu_products', product.tenant_slug))
-    const d = data as MenuProduct
+    const list = (r.data as unknown as MenuProduct[]) || []
+    const d = list[0]
+    if (!d) return { data: null, error: 'leeg resultaat' }
     return {
       data: {
         ...d,
@@ -128,42 +135,42 @@ export async function saveMenuProduct(product: MenuProduct): Promise<{ data: Men
     }
   }
 
-  if (zoomColumnProbablyMissing) {
-    cache.invalidate(cacheKey('menu_products', product.tenant_slug))
-    return {
-      data: null,
-      error:
-        'De databasekolom voor kassa-zoom ontbreekt. Voer de migratie uit (menu_products.kassa_image_zoom) en probeer opnieuw.',
+  // Fallback: kolom kassa_image_zoom mist nog in DB? probeer zonder.
+  if (/kassa_image_zoom/i.test(r.error || '')) {
+    const r2 = await adminDb.upsert<MenuProduct[]>(
+      'menu_products',
+      baseProduct as unknown as Record<string, unknown>,
+      { tenantSlug: product.tenant_slug, select: '*' },
+    )
+    if (r2.ok) {
+      cache.invalidate(cacheKey('menu_products', product.tenant_slug))
+      const list = (r2.data as unknown as MenuProduct[]) || []
+      const fb = list[0]
+      if (!fb) return { data: null, error: 'leeg resultaat (fallback)' }
+      return {
+        data: {
+          ...fb,
+          kassa_image_zoom: clampKassaProductImageZoom((fb as { kassa_image_zoom?: unknown }).kassa_image_zoom),
+        },
+      }
     }
+    return { data: null, error: r2.error }
   }
 
-  console.warn('Falling back, error was:', error.message)
-  const { data: fallbackData, error: fallbackError } = await supabase
-    .from('menu_products')
-    .upsert(baseProduct)
-    .select()
-    .single()
-
-  if (fallbackError) {
-    console.error('Error saving menu product:', fallbackError)
-    return { data: null, error: fallbackError.message }
-  }
-  cache.invalidate(cacheKey('menu_products', product.tenant_slug))
-  const fb = fallbackData as MenuProduct
-  return {
-    data: {
-      ...fb,
-      kassa_image_zoom: clampKassaProductImageZoom((fb as { kassa_image_zoom?: unknown }).kassa_image_zoom),
-    },
-  }
+  console.error('Error saving menu product:', r.error)
+  return { data: null, error: r.error }
 }
 
-export async function deleteMenuProduct(id: string): Promise<boolean> {
-  const { error } = await supabase.from('menu_products').delete().eq('id', id)
-
-  if (error) {
-    console.error('Error deleting menu product:', error)
+export async function deleteMenuProduct(id: string, tenantSlug?: string): Promise<boolean> {
+  if (!tenantSlug) {
+    console.error('deleteMenuProduct: tenantSlug verplicht in Phase 1')
     return false
   }
+  const r = await adminDb.delete('menu_products', { id, tenant_slug: tenantSlug }, { tenantSlug })
+  if (!r.ok) {
+    console.error('Error deleting menu product:', r.error)
+    return false
+  }
+  cache.invalidate(cacheKey('menu_products', tenantSlug))
   return true
 }

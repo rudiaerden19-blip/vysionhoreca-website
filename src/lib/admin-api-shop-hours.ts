@@ -6,6 +6,7 @@ import {
 } from './belgium-date-bounds'
 import { throwIfSupabaseFetchAborted, isPublicDemoTenantSlug } from './admin-api-internal'
 import { getExceptionalClosings } from './admin-api-exceptional-closings'
+import { adminDb } from './admin-db-client'
 
 // =====================================================
 // OPENING HOURS & SHOP STATUS
@@ -51,19 +52,18 @@ export async function getOpeningHours(tenantSlug: string, signal?: AbortSignal):
 }
 
 export async function saveOpeningHours(hours: OpeningHour[]): Promise<boolean> {
-  const { error } = await supabase
-    .from('opening_hours')
-    .upsert(hours, { onConflict: 'tenant_slug,day_of_week' })
-
-  if (error) {
-    console.error('Error saving opening hours:', error)
+  if (hours.length === 0) return true
+  /** PHASE 1: server-side via /api/admin/db. */
+  const r = await adminDb.upsert(
+    'opening_hours',
+    hours as unknown as Record<string, unknown>[],
+    { tenantSlug: hours[0].tenant_slug, onConflict: 'tenant_slug,day_of_week' },
+  )
+  if (!r.ok) {
+    console.error('Error saving opening hours:', r.error)
     return false
   }
-
-  if (hours.length > 0) {
-    cache.invalidate(cacheKey('opening_hours', hours[0].tenant_slug))
-  }
-
+  cache.invalidate(cacheKey('opening_hours', hours[0].tenant_slug))
   return true
 }
 
