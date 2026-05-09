@@ -5,19 +5,13 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
-import { ensureDeliverySettingsForTenant } from '@/lib/tenant-defaults'
-import { DEFAULT_ENABLED_ALLERGEN_IDS } from '@/lib/allergens-defaults'
+import { authFetch } from '@/lib/auth-headers'
 import {
   isProtectedTenant,
   isAdminTenant,
   isDemoTenant,
-  getProtectionError,
   donorAdminDisplaySubscription,
 } from '@/lib/protected-tenants'
-import {
-  isMissingPostTrialModulesColumnError,
-  withoutPostTrialModulesConfirmed,
-} from '@/lib/supabase-post-trial-column'
 import { clearSuperadminSessionCookies, mirrorSuperadminSessionFromCookieToLocalStorage } from '@/lib/superadmin-cookies'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 
@@ -169,102 +163,30 @@ export default function SuperAdminDashboard() {
     }
 
     setSaving(true)
-
-    const slug = newTenant.tenant_slug.toLowerCase().replace(/[^a-z0-9]/g, '')
-    const trialEndsAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
-
-    // 1. Create tenants record
-    const tenantInsert = {
-      name: newTenant.business_name,
-      slug: slug,
-      email: newTenant.email || '',
-      phone: newTenant.phone || '',
-      plan: 'starter',
-      subscription_status: 'trial',
-      trial_ends_at: trialEndsAt,
-      enabled_modules: null as null,
-      post_trial_modules_confirmed: false,
-      feature_group_orders: true,
-    }
-    let { error: tenantsError } = await supabase.from('tenants').insert(tenantInsert)
-
-    if (tenantsError && isMissingPostTrialModulesColumnError(tenantsError)) {
-      ;({ error: tenantsError } = await supabase
-        .from('tenants')
-        .insert(withoutPostTrialModulesConfirmed(tenantInsert as Record<string, unknown>)))
-    }
-
-    if (tenantsError) {
-      console.error('Error creating tenants:', tenantsError)
-      // Continue anyway - table might not exist
-    }
-
-    // 2. Create business_profiles record (voor login)
-    if (newTenant.email) {
-      const { error: profileError } = await supabase
-        .from('business_profiles')
-        .insert({
-          name: newTenant.business_name,
-          email: newTenant.email,
-          password_hash: 'RESET_REQUIRED',
-          phone: newTenant.phone || '',
-          tenant_slug: slug,
-        })
-
-      if (profileError) {
-        console.error('Error creating business_profiles:', profileError)
-        // Continue anyway
-      }
-    }
-
-    // 3. Create tenant_settings
-    let settingsError = (
-      await supabase.from('tenant_settings').insert({
-        tenant_slug: slug,
-        business_name: newTenant.business_name,
-        email: newTenant.email,
-        phone: newTenant.phone,
-        primary_color: '#FF6B35',
-        secondary_color: '#1a1a2e',
-        allergens_config: DEFAULT_ENABLED_ALLERGEN_IDS,
+    try {
+      const res = await authFetch('/api/superadmin/tenants', {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'create',
+          tenant: {
+            tenant_slug: newTenant.tenant_slug,
+            business_name: newTenant.business_name,
+            email: newTenant.email || '',
+            phone: newTenant.phone || '',
+          },
+        }),
       })
-    ).error
-
-    if (
-      settingsError &&
-      /allergens_config|schema cache|PGRST204|column/i.test(settingsError.message)
-    ) {
-      settingsError = (
-        await supabase.from('tenant_settings').insert({
-          tenant_slug: slug,
-          business_name: newTenant.business_name,
-          email: newTenant.email,
-          phone: newTenant.phone,
-          primary_color: '#FF6B35',
-          secondary_color: '#1a1a2e',
-        })
-      ).error
-    }
-
-    if (settingsError) {
-      alert('Fout bij aanmaken: ' + settingsError.message)
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        alert('Fout bij aanmaken: ' + (json?.error || `HTTP ${res.status}`))
+        setSaving(false)
+        return
+      }
+    } catch (e) {
+      alert('Netwerkfout bij aanmaken: ' + (e instanceof Error ? e.message : String(e)))
       setSaving(false)
       return
     }
-
-    // 4. Create subscription (trial)
-    await supabase
-      .from('subscriptions')
-      .insert({
-        tenant_slug: slug,
-        plan: 'starter',
-        status: 'trial',
-        price_monthly: 59,
-        trial_started_at: new Date().toISOString(),
-        trial_ends_at: trialEndsAt,
-      })
-
-    await ensureDeliverySettingsForTenant(supabase, slug)
 
     setNewTenant({ tenant_slug: '', business_name: '', email: '', phone: '' })
     setShowNewTenantModal(false)
@@ -274,68 +196,54 @@ export default function SuperAdminDashboard() {
 
   const handleBlockTenant = async (tenant: Tenant) => {
     const isBlocked = tenant.is_blocked
-    const confirmMsg = isBlocked 
+    const confirmMsg = isBlocked
       ? `Weet je zeker dat je ${tenant.business_name} wilt deblokkeren?`
       : `Weet je zeker dat je ${tenant.business_name} wilt blokkeren? De shop wordt ontoegankelijk.`
-    
+
     if (!(await ask(confirmMsg))) return
 
-    await supabase
-      .from('tenant_settings')
-      .update({ is_blocked: !isBlocked })
-      .eq('id', tenant.id)
-
+    const res = await authFetch('/api/superadmin/tenants', {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'block',
+        slug: tenant.tenant_slug,
+        isBlocked: !isBlocked,
+        tenantSettingsId: tenant.id,
+      }),
+    })
+    const json = await res.json().catch(() => ({}))
+    if (!res.ok) {
+      alert('Fout: ' + (json?.error || `HTTP ${res.status}`))
+      return
+    }
     await loadData()
   }
 
   const handleDeleteTenant = async (tenant: Tenant) => {
-    // BESCHERMING: Check of tenant beschermd is
-    if (isProtectedTenant(tenant.tenant_slug)) {
-      alert(getProtectionError(tenant.tenant_slug))
-      setShowDeleteModal(null)
+    setSaving(true)
+    try {
+      const res = await authFetch('/api/superadmin/tenants', {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'delete',
+          slug: tenant.tenant_slug,
+          tenantSettingsId: tenant.id,
+        }),
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        alert('Verwijderen mislukt: ' + (json?.error || `HTTP ${res.status}`))
+        setSaving(false)
+        return
+      }
+      if (Array.isArray(json?.errors) && json.errors.length > 0) {
+        console.warn('[superadmin] cascade-delete partials:', json.errors)
+      }
+    } catch (e) {
+      alert('Netwerkfout bij verwijderen: ' + (e instanceof Error ? e.message : String(e)))
+      setSaving(false)
       return
     }
-
-    setSaving(true)
-
-    // Delete ALL related data from ALL tables
-    const slug = tenant.tenant_slug
-
-    // Delete in order of dependencies - ALLE TABELLEN
-    await supabase.from('order_items').delete().eq('tenant_slug', slug)
-    await supabase.from('orders').delete().eq('tenant_slug', slug)
-    await supabase.from('reviews').delete().eq('tenant_slug', slug)
-    await supabase.from('shop_customers').delete().eq('tenant_slug', slug)
-    await supabase.from('loyalty_rewards').delete().eq('tenant_slug', slug)
-    await supabase.from('loyalty_redemptions').delete().eq('tenant_slug', slug)
-    await supabase.from('promotions').delete().eq('tenant_slug', slug)
-    await supabase.from('qr_codes').delete().eq('tenant_slug', slug)
-    await supabase.from('menu_products').delete().eq('tenant_slug', slug)
-    await supabase.from('menu_categories').delete().eq('tenant_slug', slug)
-    await supabase.from('product_options').delete().eq('tenant_slug', slug)
-    await supabase.from('product_option_choices').delete().eq('tenant_slug', slug)
-    await supabase.from('product_option_links').delete().eq('tenant_slug', slug)
-    await supabase.from('tenant_media').delete().eq('tenant_slug', slug)
-    await supabase.from('tenant_texts').delete().eq('tenant_slug', slug)
-    await supabase.from('delivery_settings').delete().eq('tenant_slug', slug)
-    await supabase.from('opening_hours').delete().eq('tenant_slug', slug)
-    await supabase.from('reservations').delete().eq('tenant_slug', slug)
-    await supabase.from('gift_cards').delete().eq('tenant_slug', slug)
-    await supabase.from('team_members').delete().eq('tenant_slug', slug)
-    await supabase.from('staff_clock_sessions').delete().eq('tenant_slug', slug)
-    await supabase.from('staff').delete().eq('tenant_slug', slug)
-    await supabase.from('timesheet_entries').delete().eq('tenant_slug', slug)
-    await supabase.from('monthly_timesheets').delete().eq('tenant_slug', slug)
-    await supabase.from('daily_sales').delete().eq('tenant_slug', slug)
-    await supabase.from('fixed_costs').delete().eq('tenant_slug', slug)
-    await supabase.from('variable_costs').delete().eq('tenant_slug', slug)
-    await supabase.from('business_targets').delete().eq('tenant_slug', slug)
-    await supabase.from('tenant_kasboek_manual_lines').delete().eq('tenant_slug', slug)
-    await supabase.from('z_reports').delete().eq('tenant_slug', slug)
-    await supabase.from('subscriptions').delete().eq('tenant_slug', slug)
-    await supabase.from('tenant_settings').delete().eq('id', tenant.id)
-    await supabase.from('tenants').delete().eq('slug', slug)
-    await supabase.from('business_profiles').delete().eq('tenant_slug', slug)
 
     setShowDeleteModal(null)
     setSaving(false)

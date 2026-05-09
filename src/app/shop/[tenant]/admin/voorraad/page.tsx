@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
+import { adminDb } from '@/lib/admin-db-client'
 import { getMenuCategories, MenuCategory } from '@/lib/admin-api'
 
 interface Product {
@@ -57,8 +58,18 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
 
   const updateProduct = async (id: string, patch: Partial<Product>) => {
     setSaving(id)
-    await supabase.from('menu_products').update(patch).eq('id', id)
-    setProducts(prev => prev.map(p => p.id === id ? { ...p, ...patch } : p))
+    const r = await adminDb.update(
+      'menu_products',
+      patch as any,
+      { id, tenant_slug: tenant },
+      { tenantSlug: tenant }
+    )
+    if (!r.ok) {
+      console.error('[voorraad] update:', r.error)
+      alert(`Bijwerken mislukt: ${r.error}`)
+    } else {
+      setProducts(prev => prev.map(p => p.id === id ? { ...p, ...patch } : p))
+    }
     setSaving(null)
   }
 

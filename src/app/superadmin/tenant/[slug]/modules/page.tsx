@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter, useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { authFetch } from '@/lib/auth-headers'
 import { isAdminTenant } from '@/lib/protected-tenants'
 import {
   TENANT_MODULE_IDS,
@@ -138,60 +139,43 @@ export default function SuperadminTenantModulesPage() {
   async function handleSave() {
     setSaving(true)
     setSaveMsg(null)
-    const payload: Record<string, boolean> = {}
+
+    let enabledModules: Record<string, boolean> | null
     if (modulesFullAccess) {
-      const fullPayload = { enabled_modules: null, post_trial_modules_confirmed: true }
-      let { error: fullErr } = await supabase.from('tenants').update(fullPayload).eq('slug', slug)
-      if (fullErr && isMissingPostTrialModulesColumnError(fullErr)) {
-        const r = await supabase
-          .from('tenants')
-          .update(withoutPostTrialModulesConfirmed(fullPayload as Record<string, unknown>))
-          .eq('slug', slug)
-        fullErr = r.error
+      enabledModules = null
+    } else {
+      const payload: Record<string, boolean> = {}
+      for (const id of TENANT_MODULE_IDS) {
+        payload[id] = id === 'account' ? true : !!moduleToggles[id]
       }
-      if (fullErr) {
-        setSaving(false)
-        setSaveMsg('err')
-        alert('Opslaan mislukt: ' + fullErr.message)
-        return
+      const seen = new Set<string>()
+      const hmods = buildHamburgerModules(baseUrl, slug)
+      for (const m of hmods) {
+        for (const it of m.items) {
+          if (seen.has(it.id)) continue
+          seen.add(it.id)
+          const parentOn = m.key === 'account' ? true : !!moduleToggles[m.key]
+          if (SUBMENU_IDS_ALWAYS_ON.has(it.id)) payload[it.id] = true
+          else payload[it.id] = parentOn && !!subToggles[it.id]
+        }
       }
-      setSaving(false)
-      setSaveMsg('ok')
-      await loadData()
-      setTimeout(() => setSaveMsg(null), 2500)
-      return
+      enabledModules = payload
     }
 
-    for (const id of TENANT_MODULE_IDS) {
-      payload[id] = id === 'account' ? true : !!moduleToggles[id]
-    }
-    const seen = new Set<string>()
-    const hmods = buildHamburgerModules(baseUrl, slug)
-    for (const m of hmods) {
-      for (const it of m.items) {
-        if (seen.has(it.id)) continue
-        seen.add(it.id)
-        const parentOn = m.key === 'account' ? true : !!moduleToggles[m.key]
-        if (SUBMENU_IDS_ALWAYS_ON.has(it.id)) payload[it.id] = true
-        else payload[it.id] = parentOn && !!subToggles[it.id]
-      }
-    }
-
-    const upd = {
-      enabled_modules: payload,
-      post_trial_modules_confirmed: true,
-    }
-    let { error } = await supabase.from('tenants').update(upd).eq('slug', slug)
-    if (error && isMissingPostTrialModulesColumnError(error)) {
-      ;({ error } = await supabase
-        .from('tenants')
-        .update(withoutPostTrialModulesConfirmed(upd as Record<string, unknown>))
-        .eq('slug', slug))
-    }
+    const res = await authFetch('/api/superadmin/tenants', {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'update_modules',
+        slug,
+        enabledModules,
+        postTrialConfirmed: true,
+      }),
+    })
     setSaving(false)
-    if (error) {
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({}))
       setSaveMsg('err')
-      alert('Opslaan mislukt: ' + error.message)
+      alert('Opslaan mislukt: ' + (json?.error || `HTTP ${res.status}`))
       return
     }
     setSaveMsg('ok')

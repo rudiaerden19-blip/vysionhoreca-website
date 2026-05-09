@@ -5,6 +5,7 @@ import PinGate from '@/components/PinGate'
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
+import { adminDb } from '@/lib/admin-db-client'
 import {
   getDailySales,
   saveDailySales,
@@ -487,7 +488,13 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
     if (file.type !== 'application/pdf') return
     const pdfUrl = await uploadPdfToStorage(file)
     if (!pdfUrl) return
-    await supabase.from('variable_costs').update({ pdf_url: pdfUrl }).eq('id', costId)
+    const r = await adminDb.update(
+      'variable_costs',
+      { pdf_url: pdfUrl },
+      { id: costId, tenant_slug: params.tenant },
+      { tenantSlug: params.tenant }
+    )
+    if (!r.ok) { console.error('[analyse] variable_costs pdf:', r.error); return }
     setVariableCosts(prev => prev.map(c => c.id === costId ? { ...c, pdf_url: pdfUrl } as typeof c : c))
     setAttachingId(null)
     openPdfBlob(pdfUrl)
@@ -497,7 +504,13 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
     if (file.type !== 'application/pdf') return
     const pdfUrl = await uploadPdfToStorage(file)
     if (!pdfUrl) return
-    await supabase.from('fixed_costs').update({ pdf_url: pdfUrl }).eq('id', costId)
+    const r = await adminDb.update(
+      'fixed_costs',
+      { pdf_url: pdfUrl },
+      { id: costId, tenant_slug: params.tenant },
+      { tenantSlug: params.tenant }
+    )
+    if (!r.ok) { console.error('[analyse] fixed_costs pdf:', r.error); return }
     setFixedCosts(prev => prev.map(c => c.id === costId ? { ...c, pdf_url: pdfUrl } as typeof c : c))
     setAttachingFixedId(null)
     openPdfBlob(pdfUrl)

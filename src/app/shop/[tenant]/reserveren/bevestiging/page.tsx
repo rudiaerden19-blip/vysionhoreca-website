@@ -14,22 +14,20 @@ export default function ReservationBevestigingPage({ params }: { params: { tenan
   const [businessName, setBusinessName] = useState('')
 
   useEffect(() => {
-    // Laad tenant kleuren
-    supabase.from('tenants').select('primary_color,name').eq('slug', params.tenant).single()
+    // Laad branding via tenant_settings (publiek leesbaar)
+    supabase
+      .from('tenant_settings')
+      .select('primary_color,business_name')
+      .eq('tenant_slug', params.tenant)
+      .maybeSingle()
       .then(({ data }) => {
         if (data?.primary_color) setPrimaryColor(data.primary_color)
-        if (data?.name) setBusinessName(data.name)
+        if (data?.business_name) setBusinessName(data.business_name)
       })
 
-    if (reservationId && sessionId) {
-      supabase.from('reservations').update({
-        payment_status: 'deposit_paid',
-        stripe_session_id: sessionId,
-        status: 'CONFIRMED',
-      }).eq('id', reservationId).then(() => setDone(true))
-    } else {
-      setDone(true)
-    }
+    // De reservatie wordt server-side bevestigd via Stripe webhook (/api/stripe-webhook).
+    // Deze pagina doet zelf geen DB-mutatie meer (dat lukt anon ook niet meer).
+    setDone(true)
   }, [reservationId, sessionId, params.tenant])
 
   return (

@@ -5,6 +5,7 @@ import { useLanguage } from '@/i18n'
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
+import { adminDb } from '@/lib/admin-db-client'
 import { getTenantSettings, saveTenantSettings, TenantSettings } from '@/lib/admin-api'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 
@@ -258,10 +259,14 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
         const { error: storageErr } = await supabase.storage.from('media').remove([urlParts[1]])
         if (storageErr) console.warn('Storage remove:', storageErr)
       }
-      const { error: dbError } = await supabase.from('tenant_media').delete().eq('id', item.id)
-      if (dbError) {
-        console.error('DB delete:', dbError)
-        alert(`Verwijderen mislukt: ${dbError.message}`)
+      const dbRes = await adminDb.delete(
+        'tenant_media',
+        { id: item.id, tenant_slug: params.tenant },
+        { tenantSlug: params.tenant }
+      )
+      if (!dbRes.ok) {
+        console.error('DB delete:', dbRes.error)
+        alert(`Verwijderen mislukt: ${dbRes.error}`)
         return
       }
 
@@ -290,7 +295,11 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
       if (urlParts[1]) {
         await supabase.storage.from('media').remove([urlParts[1]])
       }
-      await supabase.from('tenant_media').delete().eq('id', id)
+      await adminDb.delete(
+        'tenant_media',
+        { id, tenant_slug: params.tenant },
+        { tenantSlug: params.tenant }
+      )
     }
 
     setSelectedItems([])

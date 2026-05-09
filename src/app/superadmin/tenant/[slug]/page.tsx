@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
+import { authFetch } from '@/lib/auth-headers'
 import { isAdminTenant } from '@/lib/protected-tenants'
 import {
   TENANT_MODULE_IDS,
@@ -14,10 +15,7 @@ import {
   getStarterEnabledModulesRecord,
   parseEnabledModulesJson,
 } from '@/lib/tenant-modules'
-import {
-  isMissingPostTrialModulesColumnError,
-  withoutPostTrialModulesConfirmed,
-} from '@/lib/supabase-post-trial-column'
+import { isMissingPostTrialModulesColumnError } from '@/lib/supabase-post-trial-column'
 import { mirrorSuperadminSessionFromCookieToLocalStorage } from '@/lib/superadmin-cookies'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 
@@ -180,33 +178,25 @@ export default function TenantDetailPage() {
 
   async function handleSaveSubscription() {
     setSaving(true)
-
-    const subscriptionData = {
-      ...subForm,
-      tenant_slug: slug,
-      price_monthly: getPlanPrice(subForm.plan),
+    const res = await authFetch('/api/superadmin/tenants', {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'save_subscription',
+        slug,
+        subscriptionId: subscription?.id,
+        data: {
+          ...subForm,
+          price_monthly: getPlanPrice(subForm.plan),
+        },
+        tenantPlan: subForm.plan,
+      }),
+    })
+    const json = await res.json().catch(() => ({}))
+    if (!res.ok) {
+      alert('Opslaan mislukt: ' + (json?.error || `HTTP ${res.status}`))
+      setSaving(false)
+      return
     }
-
-    if (subscription?.id) {
-      // Update
-      await supabase
-        .from('subscriptions')
-        .update(subscriptionData)
-        .eq('id', subscription.id)
-    } else {
-      // Insert
-      await supabase
-        .from('subscriptions')
-        .insert(subscriptionData)
-    }
-
-    await supabase
-      .from('tenants')
-      .update({
-        plan: subForm.plan,
-      })
-      .eq('slug', slug)
-
     await loadData()
     setShowSubscriptionModal(false)
     setSaving(false)
@@ -214,9 +204,9 @@ export default function TenantDetailPage() {
 
   async function handleSaveModules() {
     setSavingModules(true)
-    let payload: Record<string, unknown>
+    let enabledModules: Record<string, boolean> | null
     if (modulesFullAccess) {
-      payload = { enabled_modules: null, post_trial_modules_confirmed: true }
+      enabledModules = null
     } else {
       const { data: cur } = await supabase
         .from('tenants')
@@ -228,48 +218,41 @@ export default function TenantDetailPage() {
       for (const id of TENANT_MODULE_IDS) {
         merged[id] = !!moduleToggles[id]
       }
-      payload = { enabled_modules: merged, post_trial_modules_confirmed: true }
+      enabledModules = merged
     }
-    let { error } = await supabase.from('tenants').update(payload).eq('slug', slug)
-    if (error && isMissingPostTrialModulesColumnError(error)) {
-      const fallback = withoutPostTrialModulesConfirmed(payload as Record<string, unknown>)
-      ;({ error } = await supabase.from('tenants').update(fallback).eq('slug', slug))
-    }
+
+    const res = await authFetch('/api/superadmin/tenants', {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'update_modules',
+        slug,
+        enabledModules,
+        postTrialConfirmed: true,
+      }),
+    })
+    const json = await res.json().catch(() => ({}))
     setSavingModules(false)
-    if (error) {
-      alert('Modules opslaan mislukt: ' + error.message)
+    if (!res.ok) {
+      alert('Modules opslaan mislukt: ' + (json?.error || `HTTP ${res.status}`))
       return
     }
     await loadData()
   }
 
   async function handleActivateSubscription() {
-    const now = new Date()
-    const nextMonth = new Date(now)
-    nextMonth.setMonth(nextMonth.getMonth() + 1)
-
-    const updates = {
-      status: 'active',
-      subscription_started_at: now.toISOString(),
-      next_payment_at: nextMonth.toISOString(),
+    const res = await authFetch('/api/superadmin/tenants', {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'activate_subscription',
+        slug,
+        subscriptionId: subscription?.id,
+      }),
+    })
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({}))
+      alert('Activeren mislukt: ' + (json?.error || `HTTP ${res.status}`))
+      return
     }
-
-    if (subscription?.id) {
-      await supabase
-        .from('subscriptions')
-        .update(updates)
-        .eq('id', subscription.id)
-    } else {
-      await supabase
-        .from('subscriptions')
-        .insert({
-          tenant_slug: slug,
-          plan: 'starter',
-          price_monthly: 59,
-          ...updates,
-        })
-    }
-
     await loadData()
   }
 
@@ -277,14 +260,19 @@ export default function TenantDetailPage() {
     if (!subscription?.id) return
     if (!(await ask('Weet je zeker dat je dit abonnement wilt opzeggen?'))) return
 
-    await supabase
-      .from('subscriptions')
-      .update({
-        status: 'cancelled',
-        cancelled_at: new Date().toISOString(),
-      })
-      .eq('id', subscription.id)
-
+    const res = await authFetch('/api/superadmin/tenants', {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'cancel_subscription',
+        slug,
+        subscriptionId: subscription.id,
+      }),
+    })
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({}))
+      alert('Opzeggen mislukt: ' + (json?.error || `HTTP ${res.status}`))
+      return
+    }
     await loadData()
   }
 

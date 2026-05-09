@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
+import { adminDb } from '@/lib/admin-db-client'
 import {
   distributeOrderPaymentForZRaport,
   fetchAllOrdersForRapporten,
@@ -353,7 +354,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     const dateStr = now.toISOString().split('T')[0]
     const vatRate = tenantInfo?.btw_percentage ?? 6
 
-    await supabase.from('z_reports').upsert({
+    const zRes = await adminDb.upsert('z_reports', {
       tenant_slug: tenant,
       report_date: dateStr,
       order_count: xData.count,
@@ -368,7 +369,13 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
       btw_percentage: vatRate,
       generated_at: now.toISOString(),
       business_name: tenantInfo?.business_name || tenant,
-    }, { onConflict: 'tenant_slug,report_date' })
+    }, { tenantSlug: tenant, onConflict: 'tenant_slug,report_date' })
+    if (!zRes.ok) {
+      console.error('[rapporten] Z-rapport opslaan mislukt:', zRes.error)
+      alert(`Z-rapport opslaan mislukt: ${zRes.error}`)
+      setZGenerating(false)
+      return
+    }
 
     const newLastZ = now.toISOString()
     setLastZDate(newLastZ)

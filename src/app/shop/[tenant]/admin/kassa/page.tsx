@@ -20,6 +20,7 @@ import {
   compareMenuProductsBySortOrder,
 } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
+import { adminDb } from '@/lib/admin-db-client'
 import { useLanguage } from '@/i18n'
 import { getSoundsEnabled, setSoundsEnabled, playClick, playAddToCart, playRemove, playSuccess, playCashRegister, playCheckout, initAudio, prewarmAudio, playOrderNotification, activateAudioForIOS } from '@/lib/sounds'
 import { prefetchProductImageUrls } from '@/lib/offline-product-images'
@@ -652,14 +653,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const persistOpenOrderRowToSupabase = async (tblNr: string, items: CartItem[]) => {
     const run = async (attempt: number): Promise<void> => {
-      const { error: delErr } = await supabase
-        .from('orders')
-        .delete()
-        .eq('tenant_slug', tenant)
-        .eq('table_number', tblNr)
-        .eq('status', 'open')
-      if (delErr && !isLikelyOfflineOrNetworkSupabaseError(delErr)) {
-        console.warn('[kassa] open order delete failed:', delErr.message)
+      const delRes = await adminDb.delete(
+        'orders',
+        { tenant_slug: tenant, table_number: tblNr, status: 'open' },
+        { tenantSlug: tenant }
+      )
+      if (!delRes.ok) {
+        console.warn('[kassa] open order delete failed:', delRes.error)
       }
       if (items.length === 0) return
       const { error: insErr } = await supabase.from('orders').insert({
@@ -704,8 +704,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       )
       localStorage.setItem(`vysion_tables_${tenant}`, JSON.stringify(updatedTbls))
       setKassaTables(updatedTbls)
-      // Sync naar Supabase zodat plattegrond ook up-to-date is
-      supabase.from('floor_plan_tables').upsert({ tenant_slug: tenant, data: updatedTbls }, { onConflict: 'tenant_slug' })
+      // Sync naar Supabase zodat plattegrond ook up-to-date is (via proxy, fire-and-forget)
+      void adminDb.upsert(
+        'floor_plan_tables',
+        { tenant_slug: tenant, data: updatedTbls } as any,
+        { tenantSlug: tenant, onConflict: 'tenant_slug' }
+      )
     } catch { /* empty */ }
   }
 
@@ -1240,13 +1244,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         }
       }
     } catch { /* empty */ }
-    // Verwijder open order uit Supabase
-    supabase
-      .from('orders')
-      .delete()
-      .eq('tenant_slug', tenant)
-      .eq('table_number', tblNr)
-      .eq('status', 'open')
+    // Verwijder open order uit Supabase (via proxy, fire-and-forget)
+    void adminDb.delete(
+      'orders',
+      { tenant_slug: tenant, table_number: tblNr, status: 'open' },
+      { tenantSlug: tenant }
+    )
   }
 
   const completePayment = async (

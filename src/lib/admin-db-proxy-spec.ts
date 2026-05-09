@@ -114,9 +114,11 @@ export const ADMIN_DB_TABLES: Record<string, AdminDbTableSpec> = {
   // --- Orders / Reservations / Reviews (admin updates) ---
   orders: {
     tenantSlugColumn: 'tenant_slug',
-    allowedOps: ['update'],            // INSERT van orders gaat via klantpaden
+    // INSERT gaat via klantpaden (RLS allow). DELETE alleen voor kassa-flow
+    // (open-order overschrijven). UPDATE voor admin-correcties.
+    allowedOps: ['update', 'delete'],
     forbiddenColumns: ['id', 'created_at', 'tenant_slug'],
-    maxRows: 1,
+    maxRows: 50,
   },
   order_items: {
     tenantSlugColumn: 'tenant_slug',
@@ -189,6 +191,12 @@ export const ADMIN_DB_TABLES: Record<string, AdminDbTableSpec> = {
     allowedOps: ['update', 'delete'],   // INSERT via klantpad (registratie)
     forbiddenColumns: ['id', 'created_at'],
     maxRows: 1,
+  },
+  guest_profiles: {
+    tenantSlugColumn: 'tenant_slug',
+    allowedOps: ['insert', 'update', 'upsert', 'delete'],
+    forbiddenColumns: ['id', 'created_at'],
+    maxRows: 200,
   },
 
   // --- Marketing ---

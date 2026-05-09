@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
+import { adminDb } from '@/lib/admin-db-client'
 import { useLanguage } from '@/i18n'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 import { searchSupplierProducts, SupplierProduct } from '@/lib/admin-api'
@@ -549,37 +550,56 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
   async function addIngredientToProduct() {
     if (!selectedProduct || !addingIngredient || !businessId) return
 
-    
-    const { data } = await supabase
-      .from('product_ingredients')
-      .insert({
+    const r = await adminDb.insert(
+      'product_ingredients',
+      {
         tenant_slug: businessId,
         product_id: selectedProduct,
         ingredient_id: addingIngredient,
-        quantity: addingQuantity
-      })
-      .select()
-      .single()
-
-    if (data) {
-      setProductIngredients(prev => [...prev, data])
+        quantity: addingQuantity,
+      },
+      { tenantSlug: params.tenant, select: '*' }
+    )
+    const inserted = Array.isArray(r.data) ? r.data[0] : r.data
+    if (r.ok && inserted) {
+      setProductIngredients(prev => [...prev, inserted as any])
       setAddingIngredient('')
       setAddingQuantity(1)
+    } else if (!r.ok) {
+      console.error('[kosten/producten] addIngredient:', r.error)
+      alert(`Toevoegen mislukt: ${r.error}`)
     }
   }
 
   async function removeIngredientFromProduct(piId: string) {
-    await supabase.from('product_ingredients').delete().eq('id', piId).eq('tenant_slug', params.tenant)
+    const r = await adminDb.delete(
+      'product_ingredients',
+      { id: piId, tenant_slug: params.tenant },
+      { tenantSlug: params.tenant }
+    )
+    if (!r.ok) { console.error('[kosten/producten] removeIngredient:', r.error); return }
     setProductIngredients(prev => prev.filter(pi => pi.id !== piId))
   }
 
   async function updateIngredientQuantity(piId: string, quantity: number) {
-    await supabase.from('product_ingredients').update({ quantity }).eq('id', piId).eq('tenant_slug', params.tenant)
+    const r = await adminDb.update(
+      'product_ingredients',
+      { quantity },
+      { id: piId, tenant_slug: params.tenant },
+      { tenantSlug: params.tenant }
+    )
+    if (!r.ok) { console.error('[kosten/producten] updateQty:', r.error); return }
     setProductIngredients(prev => prev.map(pi => pi.id === piId ? { ...pi, quantity } : pi))
   }
 
   async function updateProductMultiplier(productId: string, multiplier: number | null) {
-    await supabase.from('menu_products').update({ price_multiplier: multiplier }).eq('id', productId).eq('tenant_slug', params.tenant)
+    const r = await adminDb.update(
+      'menu_products',
+      { price_multiplier: multiplier },
+      { id: productId, tenant_slug: params.tenant },
+      { tenantSlug: params.tenant }
+    )
+    if (!r.ok) { console.error('[kosten/producten] updateMultiplier:', r.error); return }
     setProducts(prev => prev.map(p => p.id === productId ? { ...p, price_multiplier: multiplier } : p))
   }
 
@@ -1178,7 +1198,11 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                             e.stopPropagation()
                             if (!(await ask(t('dashboard.productCosts.confirmReset')))) return
                             for (const pi of pc.ingredients) {
-                              await supabase.from('product_ingredients').delete().eq('id', pi.id)
+                              await adminDb.delete(
+                                'product_ingredients',
+                                { id: pi.id, tenant_slug: params.tenant },
+                                { tenantSlug: params.tenant }
+                              )
                             }
                             setProductIngredients(prev => prev.filter(pi => pi.product_id !== pc.product.id))
                           }}

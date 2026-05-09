@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useLanguage } from '@/i18n'
 import { supabase } from '@/lib/supabase'
+import { adminDb } from '@/lib/admin-db-client'
 import { cache, cacheKey } from '@/lib/cache'
 import {
   isKassaPosOrder,
@@ -263,19 +264,18 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
       order_id: null as null,
     }
 
-    const q = editingId
-      ? supabase
-          .from('tenant_kasboek_manual_lines')
-          .update(row)
-          .eq('id', editingId)
-          .eq('tenant_slug', tenantSlug)
-          .eq('line_source', 'manual')
-      : supabase.from('tenant_kasboek_manual_lines').insert(row)
+    const res = editingId
+      ? await adminDb.update(
+          'tenant_kasboek_manual_lines',
+          row,
+          { id: editingId, tenant_slug: tenantSlug, line_source: 'manual' },
+          { tenantSlug }
+        )
+      : await adminDb.insert('tenant_kasboek_manual_lines', row, { tenantSlug })
 
-    const { error } = await q
-    if (error) {
-      console.error(error)
-      alert(error.message || t('kasboekPage.saveFailed'))
+    if (!res.ok) {
+      console.error('[kasboek]', res.error)
+      alert(res.error || t('kasboekPage.saveFailed'))
     } else {
       resetForm()
       await load()
@@ -294,13 +294,13 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
 
   const deleteLine = async (id: string) => {
     if (!(await ask(t('kasboekPage.confirmDelete')))) return
-    const { error } = await supabase
-      .from('tenant_kasboek_manual_lines')
-      .delete()
-      .eq('id', id)
-      .eq('tenant_slug', tenantSlug)
-      .eq('line_source', 'manual')
-    if (!error) await load()
+    const res = await adminDb.delete(
+      'tenant_kasboek_manual_lines',
+      { id, tenant_slug: tenantSlug, line_source: 'manual' },
+      { tenantSlug }
+    )
+    if (res.ok) await load()
+    else console.error('[kasboek] delete:', res.error)
   }
 
   const shiftMonth = (delta: number) => {

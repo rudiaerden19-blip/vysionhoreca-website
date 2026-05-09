@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
+import { adminDb } from '@/lib/admin-db-client'
 import { useLanguage } from '@/i18n'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 import { searchSupplierProducts, getSupplierProductCategories, SupplierProduct } from '@/lib/admin-api'
@@ -218,18 +219,19 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
     let added = 0
 
     // 1. Save invoice scan to database
-    const { data: invoiceScan } = await supabase
-      .from('invoice_scans')
-      .insert({
+    const invScanRes = await adminDb.insert(
+      'invoice_scans',
+      {
         tenant_slug: businessId,
         supplier: invoiceResults.supplier || null,
         invoice_number: invoiceResults.invoiceNumber || null,
         invoice_date: invoiceResults.invoiceDate || null,
         total_amount: invoiceResults.totalAmount || null,
-        status: 'completed'
-      })
-      .select()
-      .single()
+        status: 'completed',
+      },
+      { tenantSlug: params.tenant, select: '*' }
+    )
+    const invoiceScan = (Array.isArray(invScanRes.data) ? invScanRes.data[0] : invScanRes.data) as any
 
     // 2. Process each item
     let updated = 0
@@ -254,33 +256,73 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
       let ingredientId: string | null = null
 
       if (existingIngredient) {
-        // UPDATE existing ingredient with new price
-        const { data } = await supabase
-          .from('ingredients')
-          .update({
+        const updRes = await adminDb.update(
+          'ingredients',
+          {
             purchase_price: calculatedPricePerUnit,
             units_per_package: effectiveQuantity,
             package_price: item.totalPrice,
             unit: effectiveUnit,
-            notes: invoiceResults.supplier ? `Leverancier: ${invoiceResults.supplier}` : existingIngredient.notes
-          })
-          .eq('id', existingIngredient.id)
-          .eq('tenant_slug', params.tenant)
-          .select()
-          .single()
-
-        if (data) {
-          // Update local state
-          setIngredients(prev => prev.map(ing => 
-            ing.id === existingIngredient.id ? data : ing
+            notes: invoiceResults.supplier ? `Leverancier: ${invoiceResults.supplier}` : existingIngredient.notes,
+          },
+          { id: existingIngredient.id, tenant_slug: params.tenant },
+          { tenantSlug: params.tenant, select: '*' }
+        )
+        const updated_row = Array.isArray(updRes.data) ? updRes.data[0] : updRes.data
+        if (updRes.ok && updated_row) {
+          setIngredients(prev => prev.map(ing =>
+            ing.id === existingIngredient.id ? (updated_row as any) : ing
           ))
-          ingredientId = data.id
+          ingredientId = (updated_row as any).id
           updated++
         }
 
-        // Save invoice item
         if (invoiceScan) {
-          await supabase.from('invoice_scan_items').insert({
+          await adminDb.insert(
+            'invoice_scan_items',
+            {
+              invoice_scan_id: invoiceScan.id,
+              tenant_slug: businessId,
+              name: item.name,
+              quantity: effectiveQuantity,
+              unit: effectiveUnit,
+              price_per_unit: calculatedPricePerUnit,
+              total_price: item.totalPrice,
+              vat_percentage: item.vatPercentage,
+              added_to_ingredients: true,
+              ingredient_id: ingredientId,
+            },
+            { tenantSlug: params.tenant }
+          )
+        }
+        continue
+      }
+
+      // Add NEW ingredient
+      const insRes = await adminDb.insert(
+        'ingredients',
+        {
+          tenant_slug: businessId,
+          name: item.name,
+          unit: effectiveUnit,
+          purchase_price: calculatedPricePerUnit,
+          units_per_package: effectiveQuantity,
+          package_price: item.totalPrice,
+          notes: invoiceResults.supplier ? `Leverancier: ${invoiceResults.supplier}` : null,
+        },
+        { tenantSlug: params.tenant, select: '*' }
+      )
+      const inserted_ing = Array.isArray(insRes.data) ? insRes.data[0] : insRes.data
+      if (insRes.ok && inserted_ing) {
+        setIngredients(prev => [...prev, inserted_ing as any].sort((a: any, b: any) => a.name.localeCompare(b.name)))
+        ingredientId = (inserted_ing as any).id
+        added++
+      }
+
+      if (invoiceScan) {
+        await adminDb.insert(
+          'invoice_scan_items',
+          {
             invoice_scan_id: invoiceScan.id,
             tenant_slug: businessId,
             name: item.name,
@@ -290,47 +332,10 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
             total_price: item.totalPrice,
             vat_percentage: item.vatPercentage,
             added_to_ingredients: true,
-            ingredient_id: ingredientId
-          })
-        }
-        continue
-      }
-
-      // Add NEW ingredient
-      const { data } = await supabase
-        .from('ingredients')
-        .insert({
-          tenant_slug: businessId,
-          name: item.name,
-          unit: effectiveUnit,
-          purchase_price: calculatedPricePerUnit,
-          units_per_package: effectiveQuantity,
-          package_price: item.totalPrice,
-          notes: invoiceResults.supplier ? `Leverancier: ${invoiceResults.supplier}` : null
-        })
-        .select()
-        .single()
-
-      if (data) {
-        setIngredients(prev => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)))
-        ingredientId = data.id
-        added++
-      }
-
-      // Save invoice item to database
-      if (invoiceScan) {
-        await supabase.from('invoice_scan_items').insert({
-          invoice_scan_id: invoiceScan.id,
-          tenant_slug: businessId,
-          name: item.name,
-          quantity: effectiveQuantity,
-          unit: effectiveUnit,
-          price_per_unit: calculatedPricePerUnit,
-          total_price: item.totalPrice,
-          vat_percentage: item.vatPercentage,
-          added_to_ingredients: true,
-          ingredient_id: ingredientId
-        })
+            ingredient_id: ingredientId,
+          },
+          { tenantSlug: params.tenant }
+        )
       }
     }
 
@@ -361,22 +366,24 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
       return
     }
 
-    const { data } = await supabase
-      .from('ingredients')
-      .insert({
+    const r = await adminDb.insert(
+      'ingredients',
+      {
         tenant_slug: businessId,
         name: product.name,
         unit: product.unit || 'stuk',
         purchase_price: product.unit_price,
         units_per_package: product.units_per_package,
         package_price: product.package_price,
-        notes: `Art. #${product.article_number}`
-      })
-      .select()
-      .single()
-
-    if (data) {
-      setIngredients(prev => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)))
+        notes: `Art. #${product.article_number}`,
+      },
+      { tenantSlug: params.tenant, select: '*' }
+    )
+    const inserted = Array.isArray(r.data) ? r.data[0] : r.data
+    if (r.ok && inserted) {
+      setIngredients(prev => [...prev, inserted as any].sort((a: any, b: any) => a.name.localeCompare(b.name)))
+    } else if (!r.ok) {
+      console.error('[ingredients] addFromSupplier:', r.error)
     }
     setAddingProduct(null)
   }
@@ -463,28 +470,31 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
     }
 
     if (editingId) {
-      // Update
-      const { data } = await supabase
-        .from('ingredients')
-        .update(ingredientData)
-        .eq('id', editingId)
-        .eq('tenant_slug', params.tenant)
-        .select()
-        .single()
-
-      if (data) {
-        setIngredients(prev => prev.map(i => i.id === editingId ? data : i))
+      const r = await adminDb.update(
+        'ingredients',
+        ingredientData as any,
+        { id: editingId, tenant_slug: params.tenant },
+        { tenantSlug: params.tenant, select: '*' }
+      )
+      const upd = Array.isArray(r.data) ? r.data[0] : r.data
+      if (r.ok && upd) {
+        setIngredients(prev => prev.map(i => i.id === editingId ? (upd as any) : i))
+      } else if (!r.ok) {
+        console.error('[ingredients] update:', r.error)
+        alert(`Bijwerken mislukt: ${r.error}`)
       }
     } else {
-      // Insert
-      const { data } = await supabase
-        .from('ingredients')
-        .insert(ingredientData)
-        .select()
-        .single()
-
-      if (data) {
-        setIngredients(prev => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)))
+      const r = await adminDb.insert(
+        'ingredients',
+        ingredientData as any,
+        { tenantSlug: params.tenant, select: '*' }
+      )
+      const ins = Array.isArray(r.data) ? r.data[0] : r.data
+      if (r.ok && ins) {
+        setIngredients(prev => [...prev, ins as any].sort((a: any, b: any) => a.name.localeCompare(b.name)))
+      } else if (!r.ok) {
+        console.error('[ingredients] insert:', r.error)
+        alert(`Toevoegen mislukt: ${r.error}`)
       }
     }
 
@@ -495,7 +505,12 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
   async function deleteIngredient(id: string) {
     if (!(await ask(t('dashboard.ingredients.confirmDelete')))) return
 
-    await supabase.from('ingredients').delete().eq('id', id).eq('tenant_slug', params.tenant)
+    const r = await adminDb.delete(
+      'ingredients',
+      { id, tenant_slug: params.tenant },
+      { tenantSlug: params.tenant }
+    )
+    if (!r.ok) { console.error('[ingredients] delete:', r.error); return }
     setIngredients(prev => prev.filter(i => i.id !== id))
   }
 
@@ -620,22 +635,22 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
       // Calculate price per unit
       const pricePerUnit = product.unitsPerBox > 1 ? product.price / product.unitsPerBox : product.price
       
-      const { data } = await supabase
-        .from('ingredients')
-        .insert({
+      const r = await adminDb.insert(
+        'ingredients',
+        {
           tenant_slug: businessId,
           name: product.name,
           unit: 'stuk',
           purchase_price: pricePerUnit,
           units_per_package: product.unitsPerBox,
           package_price: product.price,
-          notes: `Van Zon #${product.articleNr}`
-        })
-        .select()
-        .single()
-      
-      if (data) {
-        newIngredients.push(data)
+          notes: `Van Zon #${product.articleNr}`,
+        },
+        { tenantSlug: params.tenant, select: '*' }
+      )
+      const inserted_v = Array.isArray(r.data) ? r.data[0] : r.data
+      if (r.ok && inserted_v) {
+        newIngredients.push(inserted_v as any)
       }
     }
     

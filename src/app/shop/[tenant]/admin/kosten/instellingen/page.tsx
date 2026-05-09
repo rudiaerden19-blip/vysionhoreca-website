@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
+import { adminDb } from '@/lib/admin-db-client'
 import { useLanguage } from '@/i18n'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 
@@ -68,29 +69,42 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
     if (!multiplierValue || multiplierValue <= 0) return
     
     setSaving(true)
-    
-    const { data } = await supabase
-      .from('cost_categories')
-      .insert({
+
+    const r = await adminDb.insert(
+      'cost_categories',
+      {
         tenant_slug: businessId,
         name: newCategory.name,
-        multiplier: multiplierValue
-      })
-      .select()
-      .single()
-
-    if (data) {
-      setCategories(prev => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)))
+        multiplier: multiplierValue,
+      },
+      { tenantSlug: businessId, select: '*' }
+    )
+    const inserted = Array.isArray(r.data) ? r.data[0] : r.data
+    if (r.ok && inserted) {
+      setCategories(prev => [...prev, inserted as any].sort((a: any, b: any) => a.name.localeCompare(b.name)))
       setNewCategory({ name: '', multiplier: '' })
       setShowAddForm(false)
+    } else if (!r.ok) {
+      console.error('[kosten/instellingen] insert:', r.error)
+      alert(`Toevoegen mislukt: ${r.error}`)
     }
     setSaving(false)
   }
 
   async function deleteCategory(id: string) {
     if (!(await ask(t('kostenInstellingenPage.deleteConfirm')))) return
+    if (!businessId) return
 
-    await supabase.from('cost_categories').delete().eq('id', id)
+    const r = await adminDb.delete(
+      'cost_categories',
+      { id, tenant_slug: businessId },
+      { tenantSlug: businessId }
+    )
+    if (!r.ok) {
+      console.error('[kosten/instellingen] delete:', r.error)
+      alert(`Verwijderen mislukt: ${r.error}`)
+      return
+    }
     setCategories(prev => prev.filter(c => c.id !== id))
   }
 

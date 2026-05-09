@@ -41,6 +41,7 @@ import {
   Minimize2,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { adminDb } from '@/lib/admin-db-client'
 import { getAuthHeaders } from '@/lib/auth-headers'
 import { useLanguage } from '@/i18n'
 
@@ -514,13 +515,14 @@ export default function KassaReservationsView({
       const hh = Math.floor(finalStart / 60) % 24
       const mi = finalStart % 60
       const timeStr = `${String(hh).padStart(2, '0')}:${String(mi).padStart(2, '0')}`
-      const { error } = await supabase
-        .from('reservations')
-        .update({ reservation_time: timeStr })
-        .eq('id', d.id)
-        .eq('tenant_slug', tenant)
-      if (error) {
-        toast.error(rk('startTimeSaveFailedPrefix') + error.message)
+      const r = await adminDb.update(
+        'reservations',
+        { reservation_time: timeStr },
+        { id: d.id, tenant_slug: tenant },
+        { tenantSlug: tenant }
+      )
+      if (!r.ok) {
+        toast.error(rk('startTimeSaveFailedPrefix') + (r.error || ''))
       } else {
         toast.success(`${rk('startTimeLabel')}: ${timeStr}`)
       }
@@ -578,13 +580,14 @@ export default function KassaReservationsView({
       if (!d) return
       const finalDur = d.lastDur
       if (finalDur === d.startDur) return
-      const { error } = await supabase
-        .from('reservations')
-        .update({ duration_minutes: finalDur })
-        .eq('id', d.id)
-        .eq('tenant_slug', tenant)
-      if (error) {
-        toast.error(rk('durationSaveFailedPrefix') + error.message)
+      const r = await adminDb.update(
+        'reservations',
+        { duration_minutes: finalDur },
+        { id: d.id, tenant_slug: tenant },
+        { tenantSlug: tenant }
+      )
+      if (!r.ok) {
+        toast.error(rk('durationSaveFailedPrefix') + (r.error || ''))
       } else {
         toast.success(`${rk('durationLabel')}: ${formatTimelineDurLabel(finalDur)}`)
       }
@@ -738,20 +741,26 @@ export default function KassaReservationsView({
     const newSettings = { ...reservationSettings, ...updates }
     setReservationSettings(newSettings)
     localStorage.setItem(`reservationSettings_${tenant}`, JSON.stringify(newSettings))
-    // Stil opslaan naar Supabase (geen toast — dat doet de expliciete Opslaan knop)
-    supabase.from('reservation_settings').upsert(buildSettingsPayload(newSettings), { onConflict: 'tenant_slug' })
-      .then(({ error }) => {
-        if (error) console.error('[reservation_settings] upsert:', error.message, error)
-      })
+    // Stil opslaan via admin-proxy
+    void adminDb.upsert(
+      'reservation_settings',
+      buildSettingsPayload(newSettings) as any,
+      { tenantSlug: tenant, onConflict: 'tenant_slug' }
+    ).then(r => {
+      if (!r.ok) console.error('[reservation_settings] upsert:', r.error)
+    })
   }
 
   // Expliciet opslaan met toast feedback
   const saveSettingsToSupabase = async () => {
     localStorage.setItem(`reservationSettings_${tenant}`, JSON.stringify(reservationSettings))
-    const { error } = await supabase.from('reservation_settings')
-      .upsert(buildSettingsPayload(reservationSettings), { onConflict: 'tenant_slug' })
-    if (error) {
-      toast.error(rk('settingsSaveFailedPrefix') + error.message)
+    const r = await adminDb.upsert(
+      'reservation_settings',
+      buildSettingsPayload(reservationSettings) as any,
+      { tenantSlug: tenant, onConflict: 'tenant_slug' }
+    )
+    if (!r.ok) {
+      toast.error(rk('settingsSaveFailedPrefix') + (r.error || ''))
     } else {
       toast.success(rk('settingsSaved'))
     }
@@ -765,12 +774,14 @@ export default function KassaReservationsView({
   // ---- Floor plan editor helpers ----
   const saveFloorPlan = async (updated: FloorPlanTable[]) => {
     setFloorPlanTablesDB(updated)
-    const { error } = await supabase
-      .from('floor_plan_tables')
-      .upsert({ tenant_slug: tenant, data: updated }, { onConflict: 'tenant_slug' })
-    if (error) {
-      console.error('[floor_plan_tables] upsert:', error.message)
-      toast.error(rk('floorPlanSaveFailedPrefix') + error.message)
+    const r = await adminDb.upsert(
+      'floor_plan_tables',
+      { tenant_slug: tenant, data: updated } as any,
+      { tenantSlug: tenant, onConflict: 'tenant_slug' }
+    )
+    if (!r.ok) {
+      console.error('[floor_plan_tables] upsert:', r.error)
+      toast.error(rk('floorPlanSaveFailedPrefix') + (r.error || ''))
       const { data: row } = await supabase
         .from('floor_plan_tables')
         .select('data')
@@ -1129,8 +1140,8 @@ export default function KassaReservationsView({
     const updates: Record<string, unknown> = { status: status.toLowerCase(), ...extra }
     if (status === 'CHECKED_IN') updates.checked_in_at = new Date().toISOString()
     if (status === 'COMPLETED') updates.completed_at = new Date().toISOString()
-    const { error } = await supabase.from('reservations').update(updates).eq('id', id).eq('tenant_slug', tenant)
-    if (error) { toast.error(rk('statusUpdateFailedPrefix') + error.message); return }
+    const r = await adminDb.update('reservations', updates, { id, tenant_slug: tenant }, { tenantSlug: tenant })
+    if (!r.ok) { toast.error(rk('statusUpdateFailedPrefix') + (r.error || '')); return }
     await loadReservations()
   }
 
@@ -1339,8 +1350,8 @@ export default function KassaReservationsView({
     // Sla status + eventueel tafelnummer op
     const updates: Record<string, unknown> = { status: 'confirmed' }
     if (assignedTable && !r.table_number) updates.table_number = assignedTable
-    const { error } = await supabase.from('reservations').update(updates).eq('id', r.id).eq('tenant_slug', tenant)
-    if (error) { toast.error(rk('approveFailedPrefix') + error.message); return }
+    const upd = await adminDb.update('reservations', updates, { id: r.id, tenant_slug: tenant }, { tenantSlug: tenant })
+    if (!upd.ok) { toast.error(rk('approveFailedPrefix') + (upd.error || '')); return }
     if (typeof window !== 'undefined') (window as unknown as { stopReservationAlarm?: () => void }).stopReservationAlarm?.()
     await loadReservations()
     await loadGuestProfiles()
@@ -1398,9 +1409,8 @@ export default function KassaReservationsView({
   }
 
   const handleReject = async (r: Reservation) => {
-    const { error } = await supabase.from('reservations')
-      .update({ status: 'cancelled' }).eq('id', r.id).eq('tenant_slug', tenant)
-    if (error) { toast.error(rk('rejectFailedPrefix') + error.message); return }
+    const rej = await adminDb.update('reservations', { status: 'cancelled' }, { id: r.id, tenant_slug: tenant }, { tenantSlug: tenant })
+    if (!rej.ok) { toast.error(rk('rejectFailedPrefix') + (rej.error || '')); return }
     if (typeof window !== 'undefined') (window as unknown as { stopReservationAlarm?: () => void }).stopReservationAlarm?.()
     await loadReservations()
     await loadGuestProfiles()
@@ -1430,48 +1440,55 @@ export default function KassaReservationsView({
     }
   }
 
-  // z6 - VIP/geblokkeerd opslaan in Supabase
+  // z6 - VIP/geblokkeerd opslaan via admin-proxy
   const handleToggleVip = async (guest: GuestProfile) => {
     const newVip = !guest.isVip
-    await supabase.from('guest_profiles').upsert({
-      tenant_slug: tenant,
-      name: guest.name,
-      phone: guest.phone || null,
-      email: guest.email || null,
-      is_vip: newVip,
-      is_blocked: guest.isBlocked,
-      notes: guest.notes || '',
-    }, { onConflict: 'tenant_slug,phone' })
+    await adminDb.upsert(
+      'guest_profiles',
+      {
+        tenant_slug: tenant,
+        name: guest.name,
+        phone: guest.phone || null,
+        email: guest.email || null,
+        is_vip: newVip,
+        is_blocked: guest.isBlocked,
+        notes: guest.notes || '',
+      } as any,
+      { tenantSlug: tenant, onConflict: 'tenant_slug,phone' }
+    )
     await loadGuestProfiles()
     toast.success(newVip ? rk('vipAdded') : rk('vipRemoved'))
   }
 
   const handleToggleBlocked = async (guest: GuestProfile) => {
     const newBlocked = !guest.isBlocked
-    await supabase.from('guest_profiles').upsert({
-      tenant_slug: tenant,
-      name: guest.name,
-      phone: guest.phone || null,
-      email: guest.email || null,
-      is_vip: guest.isVip,
-      is_blocked: newBlocked,
-      notes: guest.notes || '',
-    }, { onConflict: 'tenant_slug,phone' })
+    await adminDb.upsert(
+      'guest_profiles',
+      {
+        tenant_slug: tenant,
+        name: guest.name,
+        phone: guest.phone || null,
+        email: guest.email || null,
+        is_vip: guest.isVip,
+        is_blocked: newBlocked,
+        notes: guest.notes || '',
+      } as any,
+      { tenantSlug: tenant, onConflict: 'tenant_slug,phone' }
+    )
     await loadGuestProfiles()
     toast.success(newBlocked ? rk('guestBlocked') : rk('guestUnblocked'))
   }
 
   const handleAssignTable = async (reservationId: string, tableNumber: string) => {
-    const { error } = await supabase.from('reservations').update({ table_number: tableNumber })
-      .eq('id', reservationId).eq('tenant_slug', tenant)
-    if (error) { toast.error(rk('assignTableFailedPrefix') + error.message); return }
+    const r = await adminDb.update('reservations', { table_number: tableNumber }, { id: reservationId, tenant_slug: tenant }, { tenantSlug: tenant })
+    if (!r.ok) { toast.error(rk('assignTableFailedPrefix') + (r.error || '')); return }
     await loadReservations()
     toast.success(rk('tableAssigned'))
   }
 
   const handleDeleteReservation = async (id: string) => {
-    const { error } = await supabase.from('reservations').delete().eq('id', id).eq('tenant_slug', tenant)
-    if (error) { toast.error(rk('deleteFailedPrefix') + error.message); return }
+    const r = await adminDb.delete('reservations', { id, tenant_slug: tenant }, { tenantSlug: tenant })
+    if (!r.ok) { toast.error(rk('deleteFailedPrefix') + (r.error || '')); return }
     await loadReservations()
     toast.success(rk('reservationDeleted'))
   }
@@ -4211,27 +4228,36 @@ export default function KassaReservationsView({
           bufferMinutes={reservationSettings.bufferMinutes || 0}
           onClose={() => setEditReservation(null)}
           onSave={async (updated) => {
-            const { error } = await supabase.from('reservations').update({
-              customer_name: updated.guest_name,
-              customer_phone: updated.guest_phone || null,
-              customer_email: updated.guest_email || null,
-              reservation_date: updated.reservation_date,
-              reservation_time: updated.reservation_time,
-              party_size: updated.party_size,
-              duration_minutes: updated.duration_minutes,
-              table_number: updated.table_number || null,
-              status: updated.status?.toLowerCase(),
-              special_requests: updated.special_requests || '',
-            }).eq('id', updated.id).eq('tenant_slug', tenant)
-            if (error) { toast.error(rk('saveFailedShort') + error.message); return }
+            const r = await adminDb.update(
+              'reservations',
+              {
+                customer_name: updated.guest_name,
+                customer_phone: updated.guest_phone || null,
+                customer_email: updated.guest_email || null,
+                reservation_date: updated.reservation_date,
+                reservation_time: updated.reservation_time,
+                party_size: updated.party_size,
+                duration_minutes: updated.duration_minutes,
+                table_number: updated.table_number || null,
+                status: updated.status?.toLowerCase(),
+                special_requests: updated.special_requests || '',
+              },
+              { id: updated.id, tenant_slug: tenant },
+              { tenantSlug: tenant }
+            )
+            if (!r.ok) { toast.error(rk('saveFailedShort') + (r.error || '')); return }
             await loadReservations()
             setEditReservation(null)
             toast.success(rk('reservationSaved'))
           }}
           onCancel={async () => {
-            const { error } = await supabase.from('reservations')
-              .update({ status: 'cancelled' }).eq('id', editReservation.id).eq('tenant_slug', tenant)
-            if (error) { toast.error(rk('cancelFailedPrefix') + error.message); return }
+            const r = await adminDb.update(
+              'reservations',
+              { status: 'cancelled' },
+              { id: editReservation.id, tenant_slug: tenant },
+              { tenantSlug: tenant }
+            )
+            if (!r.ok) { toast.error(rk('cancelFailedPrefix') + (r.error || '')); return }
             await loadReservations()
             setEditReservation(null)
             toast.success(rk('reservationCancelled'))
