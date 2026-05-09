@@ -1,10 +1,23 @@
 # RAW ESC/POS naar een Windows-printer (driver zoals Epson TM via USB).
 param(
   [Parameter(Mandatory = $true)][string]$PrinterName,
-  [Parameter(Mandatory = $true)][string]$Base64Data
+  [string]$Base64Data = "",
+  [string]$Base64Path = ""
 )
 
 $ErrorActionPreference = 'Stop'
+
+if ($Base64Path -ne "") {
+  if (-not (Test-Path -LiteralPath $Base64Path)) {
+    Write-Error "Base64Path niet gevonden: $Base64Path"
+    exit 1
+  }
+  $Base64Data = [IO.File]::ReadAllText($Base64Path, [Text.Encoding]::UTF8).Trim()
+}
+if ($Base64Data -eq "") {
+  Write-Error "Geef -Base64Path of -Base64Data op (payload ontbreekt)."
+  exit 1
+}
 
 Add-Type -TypeDefinition @'
 using System;

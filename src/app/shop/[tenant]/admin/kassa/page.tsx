@@ -756,6 +756,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [showSplitModal, setShowSplitModal] = useState(false)
+  /** HTML bon wacht op modal als lokale Print Agent faalt; daarna printReceiptHtmlDocument */
+  const [printAgentFallbackHtml, setPrintAgentFallbackHtml] = useState<string | null>(null)
   const [splitCash, setSplitCash] = useState(0)
   const [splitCard, setSplitCard] = useState(0)
   const [lastOrder, setLastOrder] = useState<KassaLastOrderReceipt | null>(null)
@@ -1488,14 +1490,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     bonLines.push(t('kassaReceipt.thanks'))
     if (tenantInfo?.website) bonLines.push(tenantInfo.website)
 
-    const agentOk = await sendToVysionPrintAgent({
-      winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
-      bonInhoud: bonLines.join('\n'),
-    })
-    if (agentOk) return
-
-    alert(t('kassaApp.printAgentFallbackHint'))
-
     const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${escapeReceiptHtml(docTitle)}</title><style>${KASSA_PRINT_RECEIPT_STYLES}</style></head><body>
       <div class="center">
         <div class="bold big">${bizName}</div>
@@ -1531,7 +1525,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       </div>
     </body></html>`
 
-    printReceiptHtmlDocument(html)
+    const agentOk = await sendToVysionPrintAgent({
+      winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
+      bonInhoud: bonLines.join('\n'),
+    })
+    if (agentOk) return
+
+    setPrintAgentFallbackHtml(html)
   }
 
   const printStaffClockSalesSummary = async () => {
@@ -2721,6 +2721,43 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         }}
         onConfirm={() => void completePayment('SPLIT', { cash: splitCash, card: splitCard })}
       />
+
+      {printAgentFallbackHtml !== null && (
+        <div
+          className="fixed inset-0 z-[220] flex items-center justify-center bg-black/55 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="print-agent-fallback-title"
+        >
+          <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl sm:p-6">
+            <h2 id="print-agent-fallback-title" className="text-lg font-bold text-gray-900">
+              {t('kassaApp.printAgentFallbackModalTitle')}
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-gray-700">
+              {t('kassaApp.printAgentFallbackModalBody')}
+            </p>
+            <a
+              href="https://www.vysionhoreca.com/download/print-agent-windows"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 flex w-full items-center justify-center rounded-xl bg-[#3C4D6B] px-4 py-3 text-center text-sm font-bold text-white hover:bg-[#2D3A52]"
+            >
+              {t('kassaApp.printAgentFallbackModalDownloadLink')}
+            </a>
+            <button
+              type="button"
+              className="mt-3 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm font-semibold text-gray-800 hover:bg-gray-50"
+              onClick={() => {
+                const h = printAgentFallbackHtml
+                setPrintAgentFallbackHtml(null)
+                if (h) printReceiptHtmlDocument(h)
+              }}
+            >
+              {t('kassaApp.printAgentFallbackModalContinue')}
+            </button>
+          </div>
+        </div>
+      )}
 
       {lastOrder ? (
         <KassaSuccessReceiptModal

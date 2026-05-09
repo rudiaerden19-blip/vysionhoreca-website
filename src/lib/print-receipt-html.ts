@@ -13,16 +13,16 @@ export function escapeReceiptHtml(s: string): string {
 export const KASSA_PRINT_RECEIPT_STYLES = `
       * { margin:0;padding:0;box-sizing:border-box; }
       @page { size: 80mm auto; margin: 0; }
-      body { font-family:'Courier New',monospace;font-size:12px;width:80mm;padding:10px;margin:0; }
+      body { font-family:'Courier New',monospace;font-size:10px;width:80mm;padding:8px;margin:0; }
       .center { text-align:center; }
       .bold { font-weight:bold; }
-      .big { font-size:16px; }
-      .small { font-size:10px; }
-      .divider { border-top:1px dashed #000;margin:8px 0; }
-      .divider-solid { border-top:1px solid #000;margin:8px 0; }
-      .row { display:flex;justify-content:space-between;margin:2px 0; }
-      .total { font-size:18px;font-weight:bold;margin-top:8px; }
-      .order-type { font-size:20px;font-weight:bold;margin:10px 0;padding:8px;border:2px solid #000; }
+      .big { font-size:12px; }
+      .small { font-size:9px; }
+      .divider { border-top:1px dashed #000;margin:6px 0; }
+      .divider-solid { border-top:1px solid #000;margin:6px 0; }
+      .row { display:flex;justify-content:space-between;margin:1px 0; }
+      .total { font-size:12px;font-weight:bold;margin-top:6px; }
+      .order-type { font-size:12px;font-weight:bold;margin:6px 0;padding:6px;border:1px solid #000; }
       @media print { body { width:auto; -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
 `.trim()
 

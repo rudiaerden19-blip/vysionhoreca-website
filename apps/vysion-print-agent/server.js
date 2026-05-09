@@ -8,8 +8,11 @@ const cors = require('cors')
 const path = require('path')
 const { spawnSync } = require('child_process')
 const fs = require('fs')
+const os = require('os')
 
 const ESC_INIT = Buffer.from([0x1b, 0x40])
+/** Epson TM-serie: Font B (9×17) — smaller, more columns on 80mm tape */
+const FONT_B = Buffer.from([0x1b, 0x4d, 0x01])
 const FEED_LINES = (n) => Buffer.from([0x1b, 0x64, Math.min(n, 255)])
 /** Veel Epson-modellen: partiele snede */
 const CUT_PARTIAL = Buffer.from([0x1d, 0x56, 0x01])
@@ -25,7 +28,7 @@ function encodeReceiptLine(line) {
 }
 
 function buildEscPosPayload(body) {
-  const chunks = [ESC_INIT]
+  const chunks = [ESC_INIT, FONT_B]
 
   const title = (body.winkelnaam || body.storeName || 'RECEIPT').toString().trim()
   chunks.push(Buffer.from([0x1b, 0x61, 0x01]))
@@ -64,16 +67,37 @@ function printRawWindows(printerName, payloadBuffer) {
     return { ok: false, error: 'print-raw.ps1 niet gevonden (installatie corrupt).' }
   }
   const b64 = payloadBuffer.toString('base64')
-  const r = spawnSync(
-    'powershell.exe',
-    ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', ps1, '-PrinterName', printerName, '-Base64Data', b64],
-    { encoding: 'utf-8', maxBuffer: 8 * 1024 * 1024 }
-  )
-  if (r.status !== 0) {
-    const err = (r.stderr || r.stdout || '').trim() || `exit ${r.status}`
-    return { ok: false, error: err }
+  /** Windows command-line max ~8191 chars; bon base64 overschrijdt dat snel → altijd via temp file */
+  const tmpFile = path.join(os.tmpdir(), `vysion-raw-${process.pid}-${Date.now()}.b64`)
+  try {
+    fs.writeFileSync(tmpFile, b64, 'utf8')
+    const r = spawnSync(
+      'powershell.exe',
+      [
+        '-NoProfile',
+        '-ExecutionPolicy',
+        'Bypass',
+        '-File',
+        ps1,
+        '-PrinterName',
+        printerName,
+        '-Base64Path',
+        tmpFile,
+      ],
+      { encoding: 'utf-8', maxBuffer: 8 * 1024 * 1024 }
+    )
+    if (r.status !== 0) {
+      const err = (r.stderr || r.stdout || '').trim() || `exit ${r.status}`
+      return { ok: false, error: err }
+    }
+    return { ok: true }
+  } finally {
+    try {
+      fs.unlinkSync(tmpFile)
+    } catch {
+      /* ignore */
+    }
   }
-  return { ok: true }
 }
 
 function listWindowsPrintersSync() {
