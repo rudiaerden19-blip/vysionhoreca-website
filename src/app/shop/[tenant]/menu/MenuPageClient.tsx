@@ -1,15 +1,12 @@
 'use client'
 
 import { useState, useEffect, useRef, memo, useMemo, useCallback, startTransition } from 'react'
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { isKioskSearchParams, kioskShopHref } from '@/lib/kiosk-mode'
 import { getMenuCategories, getMenuProducts, getAllMenuProductOptionsForTenant, getTenantSettings, getActivePromotions, getExceptionalClosings, ExceptionalClosing, MenuCategory, MenuProduct, ProductOption, ProductOptionChoice, Promotion, compareMenuProductsBySortOrder } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
-
-const VoiceOrderButton = dynamic(() => import('@/components/VoiceOrderButton'), { ssr: false })
 
 interface MenuItem {
   id: string
@@ -1114,62 +1111,6 @@ export default function MenuPageClient({
               </div>
             </div>
           </div>
-      )}
-
-      {/* Voice Order — zwaar op zwakke tablets; uit op kiosk */}
-      {!lite && (
-      <VoiceOrderButton
-        products={menuItems.map(item => ({
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          category_name: item.category_name,
-        }))}
-        language={locale}
-        primaryColor={primaryColor}
-        darkMode={darkMode}
-        onOrderConfirmed={(items) => {
-          // Add matched products to cart
-          items.forEach(matchedItem => {
-            const menuItem = menuItems.find(m => m.id === matchedItem.product_id)
-            if (menuItem) {
-              // Combine modifications and extras into notes
-              const noteParts: string[] = []
-              if (matchedItem.modifications && matchedItem.modifications.length > 0) {
-                noteParts.push(...matchedItem.modifications)
-              }
-              if (matchedItem.extras && matchedItem.extras.length > 0) {
-                noteParts.push(`+ ${matchedItem.extras.join(', ')}`)
-              }
-              
-              const cartItem: CartItem = {
-                item: menuItem,
-                quantity: matchedItem.quantity,
-                selectedOptions: [],
-                totalPrice: matchedItem.price * matchedItem.quantity,
-                notes: noteParts.length > 0 ? noteParts.join(', ') : undefined,
-              }
-              setCart(prev => [...prev, cartItem])
-            }
-          })
-        }}
-        onGoToCheckout={() => {
-          router.push(shop('checkout'))
-        }}
-        translations={{
-          listening: 'Luisteren...',
-          processing: 'Verwerken...',
-          speakNow: 'Spreek je bestelling in',
-          confirm: 'Bevestigen',
-          cancel: 'Annuleren',
-          retry: 'Opnieuw',
-          total: 'Totaal',
-          noProductsFound: 'Geen producten gevonden. Probeer opnieuw.',
-          orderSummary: 'Je bestelling:',
-          pressToSpeak: 'Druk op de knop om te spreken',
-          releaseToStop: 'Druk nogmaals om te stoppen',
-        }}
-      />
       )}
 
       {/* Cart Button */}
