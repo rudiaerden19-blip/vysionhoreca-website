@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireCronSecret } from '@/lib/cron-auth'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
+import { addDaysToBelgiumYMD, getBelgiumDateString } from '@/lib/belgium-date-bounds'
 import { logger } from '@/lib/logger'
 import nodemailer from 'nodemailer'
 
-// Vercel Cron Job - runs daily at 10:00 AM
-// Stuurt herinnering naar gasten met reservatie morgen
+// Vercel Cron Job — draait dagelijks om 10:00 UTC.
+// Stuurt herinnering naar gasten met reservatie MORGEN (in Brussel-tijd).
 
 export async function GET(request: NextRequest) {
   const requestId = crypto.randomUUID()
@@ -19,10 +20,13 @@ export async function GET(request: NextRequest) {
     const supabase = getServerSupabaseClient()
     if (!supabase) return NextResponse.json({ error: 'DB not configured' }, { status: 503 })
 
-    // Bereken morgen
-    const tomorrow = new Date()
-    tomorrow.setDate(tomorrow.getDate() + 1)
-    const tomorrowStr = tomorrow.toISOString().split('T')[0]
+    // Vroeger: `new Date(); tomorrow.setDate(+1); toISOString().split('T')[0]`.
+    // Dat werkt op UTC-kalender, niet op Brussel. Bij DST-grenzen of als de
+    // cron ooit naar een ander uur verschuift kon "morgen" een dag uit de
+    // bocht gaan. Reservation_date in DB is een Brussel-kalenderdag, dus we
+    // berekenen morgen ook in Brussel-tijdzone.
+    const todayBrussels = getBelgiumDateString()
+    const tomorrowStr = addDaysToBelgiumYMD(todayBrussels, 1)
 
     // Haal alle reservaties op voor morgen met email
     const { data: reservations } = await supabase
