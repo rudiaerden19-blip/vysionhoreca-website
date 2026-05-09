@@ -36,7 +36,7 @@ import {
   printReceiptHtmlDocument,
   printStaffSalesSummaryReceipt,
 } from '@/lib/print-receipt-html'
-import { sendToVysionPrintAgent } from '@/lib/vysion-print-agent-client'
+import { sendToVysionPrintAgent, openCashDrawer } from '@/lib/vysion-print-agent-client'
 import {
   offlineDbLoadMenuSnapshot,
   offlineDbSaveMenuSnapshot,
@@ -2550,7 +2550,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <span className="font-bold text-[#3C4D6B] text-2xl">€{total.toFixed(2)}</span>
           </div>
           <div className="grid grid-cols-3 gap-2">
-            <button className="flex flex-col items-center gap-1 rounded-xl bg-[#58CCFF] py-3 text-[#063042] transition-colors hover:bg-[#47c6fe]">
+            <button
+              type="button"
+              onClick={() => { void openCashDrawer() }}
+              className="flex flex-col items-center gap-1 rounded-xl bg-[#58CCFF] py-3 text-[#063042] transition-colors hover:bg-[#47c6fe]"
+              title={t('kassaApp.drawerOpen')}
+            >
               <span className="text-xl">💰</span>
               <span className="text-xs font-semibold">{t('kassaApp.drawerOpen')}</span>
             </button>

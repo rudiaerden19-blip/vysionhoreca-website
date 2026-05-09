@@ -304,12 +304,17 @@ function buildRichReceipt(body) {
 }
 
 /**
- * Compacte keuken-bon: groot bon-nummer, type, items met opties + opmerkingen.
- * Geen prijzen, BTW, of footer — keuken hoeft alleen te weten WAT er klaar moet.
+ * Volledige keuken-bon — vertaalt 1-op-1 wat het keuken-scherm toont:
+ * groot bonnummer, ordertype, geplande tijd, klantgegevens, items met
+ * alle opties + per-item-opmerkingen, klant-opmerking, en bedrijfsfooter.
+ * Alle items + opties worden DOUBLE_HEIGHT gerenderd zodat de keuken
+ * de bon vanaf de bak kan lezen.
  */
 function buildKitchenReceipt(body) {
-  const { orderData } = body || {}
+  const { orderData, businessInfo, winkelnaam } = body || {}
   const W = 42
+  const sep = '='.repeat(W) + '\n'
+  const sepThin = '-'.repeat(W) + '\n'
   const c = []
 
   c.push(ESC_INIT)
@@ -318,58 +323,113 @@ function buildKitchenReceipt(body) {
   c.push(BOLD_ON)
   c.push(LINE_SPACING_W)
 
+  // ===== HEADER ===== "*** KEUKEN BON ***"
   c.push(Buffer.from('\n', 'latin1'))
   c.push(ALIGN_CENTER)
   c.push(DOUBLE_HEIGHT)
-  c.push(enc('*** KEUKEN ***'))
+  c.push(enc('*** KEUKEN BON ***'))
   c.push(NORMAL_SIZE)
 
+  // GROOT bonnummer (DOUBLE_SIZE = 2x breedte + hoogte)
   c.push(DOUBLE_SIZE)
   c.push(enc(`#${orderData?.orderNumber ?? '?'}`))
   c.push(NORMAL_SIZE)
 
+  // Order type — duidelijk en groot
   c.push(DOUBLE_HEIGHT)
   const orderType = (orderData?.orderType || '').toString().toUpperCase()
   let typeLabel = '>> AFHALEN'
-  if (orderType === 'DINE_IN' || orderType === 'DINE-IN') typeLabel = 'HIER OPETEN'
+  if (orderType === 'DINE_IN' || orderType === 'DINE-IN' || orderType === 'DINEIN') typeLabel = 'HIER OPETEN'
   else if (orderType === 'DELIVERY') typeLabel = '=> BEZORGEN'
   else if (orderType === 'TAKEAWAY' || orderType === 'PICKUP') typeLabel = '>> AFHALEN'
   c.push(enc(typeLabel))
   if (orderData?.tableNumber) c.push(enc(`Tafel ${orderData.tableNumber}`))
   c.push(NORMAL_SIZE)
 
+  // Geplande datum/tijd (📅 LEVEREN OP …)
   if (orderData?.requestedDateTime) {
     c.push(Buffer.from('\n', 'latin1'))
-    c.push(enc(`GEWENST: ${orderData.requestedDateTime}`))
+    c.push(DOUBLE_HEIGHT)
+    c.push(enc(`LEVEREN: ${orderData.requestedDateTime}`))
+    c.push(NORMAL_SIZE)
   }
 
   c.push(Buffer.from('\n', 'latin1'))
-  c.push(Buffer.from('-'.repeat(W) + '\n', 'latin1'))
+  c.push(Buffer.from(sep, 'latin1'))
 
+  // ===== KLANTGEGEVENS =====
   c.push(ALIGN_LEFT)
+  if (orderData?.customerName) {
+    c.push(DOUBLE_HEIGHT)
+    c.push(enc(`Klant: ${orderData.customerName}`))
+    c.push(NORMAL_SIZE)
+  }
+  if (orderData?.customerPhone) c.push(enc(`Tel: ${orderData.customerPhone}`))
+  if (orderData?.customerAddress) c.push(enc(`Adres: ${orderData.customerAddress}`))
+
+  // Aankomsttijd / hoe lang geleden de bestelling binnenkwam
+  const now = new Date().toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' })
+  c.push(enc(`Tijd: ${now}`))
+
+  c.push(Buffer.from('\n', 'latin1'))
+  c.push(Buffer.from(sep, 'latin1'))
+
+  // ===== ITEMS — TE BEREIDEN =====
+  c.push(ALIGN_CENTER)
+  c.push(enc('TE BEREIDEN'))
+  c.push(ALIGN_LEFT)
+  c.push(Buffer.from(sepThin, 'latin1'))
+
   for (const item of (orderData?.items || [])) {
     const qty = parseNumber(item.quantity) || 1
     const name = item.name || 'Item'
+
+    // Naam in DOUBLE_HEIGHT — net als de tegels op het scherm
     c.push(DOUBLE_HEIGHT)
     c.push(enc(`${qty}x ${name}`))
     c.push(NORMAL_SIZE)
+
+    // Opties — ook DOUBLE_HEIGHT zoals het scherm ze toont met "+"
     const choices = item.choices || item.options || []
     for (const ch of choices) {
       const cn = ch.name || ch.optionName || ''
-      if (cn) c.push(enc(`   + ${cn}`))
+      if (!cn) continue
+      c.push(DOUBLE_HEIGHT)
+      c.push(enc(`  + ${cn}`))
+      c.push(NORMAL_SIZE)
     }
+
+    // Item-specifieke opmerking ("zonder ui", etc.)
     if (item.notes) {
-      c.push(enc(`   ! ${item.notes}`))
+      c.push(DOUBLE_HEIGHT)
+      c.push(enc(`  ! ${item.notes}`))
+      c.push(NORMAL_SIZE)
     }
-    c.push(Buffer.from('\n', 'latin1'))
+
+    c.push(Buffer.from(sepThin, 'latin1'))
   }
 
+  // ===== KLANT-OPMERKING (algemeen) =====
   if (orderData?.customerNotes) {
-    c.push(Buffer.from('-'.repeat(W) + '\n', 'latin1'))
+    c.push(Buffer.from('\n', 'latin1'))
+    c.push(ALIGN_CENTER)
     c.push(DOUBLE_HEIGHT)
-    c.push(enc('OPMERKING:'))
+    c.push(enc('!! OPMERKING !!'))
     c.push(NORMAL_SIZE)
+    c.push(ALIGN_LEFT)
+    c.push(DOUBLE_HEIGHT)
     c.push(enc(String(orderData.customerNotes)))
+    c.push(NORMAL_SIZE)
+    c.push(Buffer.from(sep, 'latin1'))
+  }
+
+  // ===== FOOTER (klein) =====
+  const bizName = (businessInfo?.name || winkelnaam || '').toString().trim()
+  if (bizName) {
+    c.push(Buffer.from('\n', 'latin1'))
+    c.push(ALIGN_CENTER)
+    c.push(enc(bizName))
+    if (businessInfo?.phone) c.push(enc(`Tel: ${businessInfo.phone}`))
   }
 
   c.push(NORMAL_SIZE)
@@ -654,6 +714,24 @@ function createApp(getPrinterName /* () => string | null */) {
     }
   })
 
+  app.post('/drawer', (_req, res) => {
+    const printerName = getPrinterName()
+    if (!printerName) {
+      return res.status(400).json({ success: false, error: 'Geen printer geconfigureerd.' })
+    }
+    try {
+      const buf = Buffer.concat([ESC_INIT, DRAWER_KICK])
+      const r = printRawWindows(printerName, buf)
+      if (!r.ok) {
+        console.error('[drawer] →', r.error)
+        return res.status(500).json({ success: false, error: r.error })
+      }
+      return res.json({ success: true })
+    } catch (e) {
+      return res.status(500).json({ success: false, error: String(e?.message || e) })
+    }
+  })
+
   app.post('/print', (req, res) => {
     const printerName = getPrinterName()
     if (!printerName) {
@@ -673,18 +751,22 @@ function createApp(getPrinterName /* () => string | null */) {
         ? Math.min(Math.max(body.copies, 1), 5)
         : 2
 
-      // Kassa-lade openen na de eerste copy (klant betaalt → drawer pulse).
+      // Kassa-lade als APARTE print job vooraf — Epson firmware voert
+      // ESC p betrouwbaarder uit dan wanneer hij na CUT_PARTIAL zit.
       const wantDrawer = body.openDrawer === true
-      const finalPayload = wantDrawer
-        ? Buffer.concat([payload, DRAWER_KICK])
-        : payload
+      if (wantDrawer) {
+        const drawerOnly = Buffer.concat([ESC_INIT, DRAWER_KICK])
+        const dr = printRawWindows(printerName, drawerOnly)
+        if (!dr.ok) {
+          console.error('[print] drawer-kick →', dr.error)
+        }
+        sleepSyncMs(200)
+      }
 
       let lastError = null
       let printedCount = 0
       for (let i = 0; i < copies; i++) {
-        // Alleen 1e bon krijgt drawer-kick; verdere copies zonder.
-        const buf = i === 0 ? finalPayload : payload
-        const result = printRawWindows(printerName, buf)
+        const result = printRawWindows(printerName, payload)
         if (!result.ok) {
           lastError = result.error
           console.error(`[print] copy ${i + 1}/${copies} → ${result.error}`)

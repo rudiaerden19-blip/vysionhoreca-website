@@ -304,9 +304,20 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
         // Extra velden die buildKitchenReceipt gebruikt:
         ...(order.customer_name ? { customerName: order.customer_name } : {}),
         ...(order.customer_phone ? { customerPhone: order.customer_phone } : {}),
+        ...((order as any).customer_address || (order as any).delivery_address
+          ? { customerAddress: (order as any).customer_address || (order as any).delivery_address }
+          : {}),
         ...(order.customer_notes ? { customerNotes: order.customer_notes } : {}),
         ...(requestedDateTime ? { requestedDateTime } : {}),
       } as any,
+      businessInfo: {
+        name: business?.business_name,
+        address: (business as any)?.address ?? undefined,
+        postalCode: (business as any)?.postal_code ?? undefined,
+        city: (business as any)?.city ?? undefined,
+        phone: (business as any)?.phone ?? undefined,
+        vatNumber: (business as any)?.btw_number ?? undefined,
+      },
     })
     if (!ok) browserPrintOrder(order)
   }

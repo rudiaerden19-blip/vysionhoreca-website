@@ -101,3 +101,31 @@ export async function sendToVysionPrintAgent(
   }
   return false
 }
+
+/**
+ * Stuurt enkel een drawer-kick (kassa-lade open) naar de Print Agent.
+ * Gebruikt door de "Lade open"-knop in de kassa-UI.
+ */
+export async function openCashDrawer(origin = DEFAULT_AGENT_ORIGIN): Promise<boolean> {
+  const base = origin.replace(/\/$/, '')
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), 4000)
+  try {
+    const init: RequestInit = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{}',
+      mode: 'cors',
+      credentials: 'omit',
+      signal: controller.signal,
+    }
+    ;(init as RequestInit & { targetAddressSpace?: string }).targetAddressSpace = 'local'
+    const r = await fetch(`${base}/drawer`, init)
+    const data = (await r.json().catch(() => null)) as { success?: boolean } | null
+    return r.ok && data?.success === true
+  } catch {
+    return false
+  } finally {
+    clearTimeout(timer)
+  }
+}

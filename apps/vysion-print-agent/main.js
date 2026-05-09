@@ -274,6 +274,22 @@ ipcMain.handle('agent:request', (_evt, { path: reqPath, method, body }) => {
     return { status: 200, body: { ok: true, printerConfigured: !!getPrinterName() } }
   }
 
+  if (method === 'POST' && reqPath === '/drawer') {
+    const printerName = getPrinterName()
+    if (!printerName) {
+      return { status: 400, body: { success: false, error: 'Geen printer geconfigureerd.' } }
+    }
+    try {
+      const ESC_INIT = Buffer.from([0x1b, 0x40])
+      const buf = Buffer.concat([ESC_INIT, DRAWER_KICK])
+      const r = printRawWindows(printerName, buf)
+      if (r.ok) return { status: 200, body: { success: true } }
+      return { status: 500, body: { success: false, error: r.error } }
+    } catch (e) {
+      return { status: 500, body: { success: false, error: String(e.message || e) } }
+    }
+  }
+
   if (method === 'POST' && reqPath === '/print') {
     const printerName = getPrinterName()
     if (!printerName) {
