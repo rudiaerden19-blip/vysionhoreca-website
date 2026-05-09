@@ -1,5 +1,5 @@
 import { authFetch } from '@/lib/auth-headers'
-import { getBelgiumDateString } from '@/lib/admin-api'
+import { getBelgiumDateString } from '@/lib/belgium-date-bounds'
 
 /**
  * Z-rapport refresh na order — fire-and-forget naar de server.
