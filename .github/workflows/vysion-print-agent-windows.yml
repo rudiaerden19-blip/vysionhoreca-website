@@ -1,15 +1,8 @@
-# Één Setup.exe op GitHub — geen Node/npm op de kassa nodig.
-# Download: repo → Releases → "Vysion Print Agent (Windows)" → Vysion-Print-Agent-Setup.exe
-# Of: Actions → deze workflow → Artifacts.
+# Zie PRINT-AGENT-INSTALL.txt in de repo — directe .exe-link. Alleen bouwen: Run workflow.
 name: Vysion Print Agent — Windows Setup
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'apps/vysion-print-agent/**'
-      - '.github/workflows/vysion-print-agent-windows.yml'
 
 permissions:
   contents: write
