@@ -190,14 +190,16 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   }
 
   const loadSavedReports = async () => {
-    const { data } = await supabase
-      .from('z_reports')
-      .select('id, report_date, order_count, total, generated_at, order_ids, report_hash, is_closed, closed_at, manual_cash, manual_card, manual_online, manual_total, kassa_saved_at')
-      .eq('tenant_slug', params.tenant)
-      .order('report_date', { ascending: false })
-      .limit(400)
-
-    if (data) setSavedReports(data)
+    // Server-side gelezen via /api/admin/db/read (anon-key heeft geen
+    // SELECT-rechten meer op z_reports na Phase 2-lockdown).
+    const result = await adminDb.select<SavedReport[]>('z_reports', {
+      tenantSlug: params.tenant,
+      select:
+        'id, report_date, order_count, total, generated_at, order_ids, report_hash, is_closed, closed_at, manual_cash, manual_card, manual_online, manual_total, kassa_saved_at',
+      order: { column: 'report_date', ascending: false },
+      limit: 400,
+    })
+    if (result.ok && Array.isArray(result.data)) setSavedReports(result.data)
   }
 
   const refreshData = () => {

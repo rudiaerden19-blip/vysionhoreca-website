@@ -139,11 +139,17 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
 
   const loadData = useCallback(async () => {
     setLoading(true)
-    const [ordersData, { data: zData }, info] = await Promise.all([
+    // z_reports gaat via /api/admin/db/read (na Phase 2-lockdown heeft de
+    // anon-key geen SELECT meer op die tabel).
+    const [ordersData, zResult, info] = await Promise.all([
       fetchAllOrdersForRapporten(tenant),
-      supabase.from('z_reports').select('*').eq('tenant_slug', tenant).order('report_date', { ascending: false }),
+      adminDb.select<Array<Record<string, unknown>>>('z_reports', {
+        tenantSlug: tenant,
+        order: { column: 'report_date', ascending: false },
+      }),
       getTenantSettings(tenant),
     ])
+    const zData = zResult.ok && Array.isArray(zResult.data) ? zResult.data : null
     setOrders(
       (ordersData || []).map((o) => {
         const row = o as Record<string, unknown>
@@ -157,7 +163,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
         } as Order
       })
     )
-    setZReports(zData||[])
+    setZReports((zData || []) as unknown as ZReport[])
     setTenantInfo(info as TenantInfo)
     setLoading(false)
   }, [tenant])
