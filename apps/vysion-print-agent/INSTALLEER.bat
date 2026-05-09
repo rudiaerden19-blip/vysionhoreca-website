@@ -4,7 +4,7 @@ title Vysion Print Agent - Installatie
 
 echo.
 echo ============================================
-echo   Vysion Print Agent v1.2.1 - Geerkens drankenhandel
+echo   Vysion Print Agent v1.2.2 - Geerkens drankenhandel
 echo ============================================
 echo.
 
@@ -91,7 +91,7 @@ echo   - GEEN autostart bij Windows-aanmelding
 echo   - Login wordt onthouden (versleuteld op deze PC)
 echo   - Locatie: %DEST%
 echo.
-echo   Check: rechtsklik tray-icoon -^> moet 'v1.2.1' zien.
+echo   Check: rechtsklik tray-icoon -^> moet 'v1.2.2' zien.
 echo ============================================
 echo.
 pause

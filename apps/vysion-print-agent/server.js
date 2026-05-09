@@ -36,9 +36,19 @@ const LINE_SPACING_N  = Buffer.from([ESC, 0x33, 0x1E])
 const CODEPAGE_PC858  = Buffer.from([ESC, 0x74, 0x13])
 /** Euro-byte in PC858. */
 const EURO_BYTE       = 0xd5
-/** Cash-drawer kick (ESC p 0 50 50): pulse op pin 2 ~100ms — standaard voor
- *  bijna alle Epson/Citizen/Star bonprinters met aangesloten kassa-lade. */
-const DRAWER_KICK     = Buffer.from([ESC, 0x70, 0x00, 0x32, 0x32])
+/** Cash-drawer kick — 4 varianten in volgorde gestuurd zodat ÉÉN ervan
+ *  werkt op elke combinatie van printer + drawer + pin (2 of 5):
+ *   1) ESC p 0  : klassiek commando, drawer pin 2
+ *   2) ESC p 1  : klassiek commando, drawer pin 5
+ *   3) DLE DC4 m=1 pin 0 : real-time, pin 2 (Epson TM-T88V vereist soms dit)
+ *   4) DLE DC4 m=1 pin 1 : real-time, pin 5
+ *  Meerdere kicks na elkaar zijn onschadelijk; hoogstens "klikt" hij 2x. */
+const DRAWER_KICK     = Buffer.from([
+  ESC, 0x70, 0x00, 0x32, 0x32,        // ESC p 0 50 50  (pin 2)
+  ESC, 0x70, 0x01, 0x32, 0x32,        // ESC p 1 50 50  (pin 5)
+  0x10, 0x14, 0x01, 0x00, 0x32,       // DLE DC4 1 0 50 (real-time, pin 2)
+  0x10, 0x14, 0x01, 0x01, 0x32,       // DLE DC4 1 1 50 (real-time, pin 5)
+])
 
 /**
  * Encodeer tekst naar bytes voor de printer:
