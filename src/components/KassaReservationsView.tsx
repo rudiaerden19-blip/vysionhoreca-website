@@ -599,14 +599,15 @@ export default function KassaReservationsView({
     window.addEventListener('pointercancel', onUp)
   }
 
-  // Load guest profiles from Supabase (z6)
+  // Load guest profiles via /api/admin/db/read (service-role) — guest_profiles
+  // bevat persoonsgegevens (naam + telefoon) en mag niet via anon-key gelezen.
   const loadGuestProfiles = async () => {
-    const { data } = await supabase
-      .from('guest_profiles')
-      .select('*')
-      .eq('tenant_slug', tenant)
-    if (data) {
-      setGuestProfilesDB(data.map(g => ({
+    const r = await adminDb.select<any[]>('guest_profiles', {
+      tenantSlug: tenant,
+      select: '*',
+    })
+    if (r.ok && Array.isArray(r.data)) {
+      setGuestProfilesDB(r.data.map((g: any) => ({
         id: g.id,
         name: g.name,
         phone: g.phone,

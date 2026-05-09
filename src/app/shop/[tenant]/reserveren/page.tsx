@@ -191,20 +191,24 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
 
       if (insertError) throw insertError
 
-      // Gastprofiel aanmaken of updaten — zodat klant direct zichtbaar is in contacten
+      // Gastprofiel aanmaken of updaten — via server-endpoint omdat anon
+      // sinds Phase 1 RLS-lockdown niet meer rechtstreeks naar guest_profiles
+      // mag schrijven (klantnaam + telefoon zijn persoonsgegevens).
       if (formData.guest_phone || formData.guest_email) {
         try {
-          const conflictCol = formData.guest_phone ? 'tenant_slug,phone' : 'tenant_slug,email'
-          await supabase.from('guest_profiles').upsert({
-            tenant_slug: tenant,
-            name: formData.guest_name,
-            phone: formData.guest_phone || null,
-            email: formData.guest_email || null,
-            total_visits: 1,
-            last_visit: formData.reservation_date,
-          }, { onConflict: conflictCol, ignoreDuplicates: false })
+          await fetch('/api/public/guest-profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tenantSlug: tenant,
+              name: formData.guest_name,
+              phone: formData.guest_phone || null,
+              email: formData.guest_email || null,
+              lastVisit: formData.reservation_date,
+            }),
+          })
         } catch (profileErr) {
-          console.warn('[reserveren] guest_profiles upsert mislukt:', profileErr)
+          console.warn('[reserveren] guest_profile endpoint mislukt:', profileErr)
         }
       }
 
