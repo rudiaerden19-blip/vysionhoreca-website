@@ -18,6 +18,7 @@ import {
   isAudioActivatedThisSession,
   markAudioActivated
 } from '@/lib/sounds'
+import { sendToVysionPrintAgent } from '@/lib/vysion-print-agent-client'
 interface Order {
   id: string
   order_number: string
@@ -274,8 +275,40 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     setSelectedOrder(null)
   }
 
-  function printOrder(order: Order) {
-    browserPrintOrder(order)
+  async function printOrder(order: Order) {
+    /** Probeer eerst de lokale Vysion Print Agent (ESC/POS bonprinter).
+     *  Lukt niet? Val terug op browser-printvenster (HTML). */
+    const items = (order.items || []).map((item: any) => ({
+      quantity: Number(item.quantity) || 1,
+      name: String(item.product_name || item.name || 'Item'),
+      price: 0,
+      choices: (item.options || []).map((o: any) => ({ name: String(o.name || ''), price: 0 })),
+      notes: item.notes ? String(item.notes) : undefined,
+    }))
+    const requestedDateTime = order.scheduled_date
+      ? `${new Date(order.scheduled_date).toLocaleDateString('nl-BE')}${order.scheduled_time ? ' ' + order.scheduled_time : ''}`
+      : ''
+    const ok = await sendToVysionPrintAgent({
+      winkelnaam: business?.business_name || '',
+      bonInhoud: '',
+      copies: 1,
+      receiptMode: 'keuken',
+      orderData: {
+        orderNumber: order.order_number,
+        orderType: order.order_type,
+        tableNumber: null,
+        items,
+        subtotal: 0,
+        tax: 0,
+        total: 0,
+        // Extra velden die buildKitchenReceipt gebruikt:
+        ...(order.customer_name ? { customerName: order.customer_name } : {}),
+        ...(order.customer_phone ? { customerPhone: order.customer_phone } : {}),
+        ...(order.customer_notes ? { customerNotes: order.customer_notes } : {}),
+        ...(requestedDateTime ? { requestedDateTime } : {}),
+      } as any,
+    })
+    if (!ok) browserPrintOrder(order)
   }
 
   function browserPrintOrder(order: Order) {

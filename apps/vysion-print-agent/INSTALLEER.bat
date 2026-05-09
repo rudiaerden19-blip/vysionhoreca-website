@@ -4,7 +4,7 @@ title Vysion Print Agent - Installatie
 
 echo.
 echo ============================================
-echo   Vysion Print Agent v1.1.2 - Installatie
+echo   Vysion Print Agent v1.2.0 - Geerkens drankenhandel
 echo ============================================
 echo.
 
@@ -55,7 +55,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
 echo Op bureaublad: 'Vysion Kassa'
 echo.
 
-echo [5/6] Startmenu + autostart bij Windows...
+echo [5/6] Startmenu-snelkoppeling...
 set "START_MENU=%APPDATA%\Microsoft\Windows\Start Menu\Programs\Vysion"
 if not exist "%START_MENU%" mkdir "%START_MENU%" >nul 2>&1
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
@@ -64,33 +64,34 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "$s.WorkingDirectory = '%DEST%';" ^
   "$s.Description = 'Vysion Kassa + Print Agent';" ^
   "$s.Save();"
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v "VysionPrintAgent" /t REG_SZ /d "\"%EXE%\"" /f >nul
 echo OK.
 echo.
 
-echo [6/6] Agent starten vanaf gebruikersmap (NIET vanaf USB)...
-start "" "%EXE%"
-timeout /t 3 /nobreak >nul
+echo [6/6] Autostart bij Windows-aanmelding UITZETTEN (alle oude varianten)...
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v "VysionPrintAgent" /f >nul 2>&1
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v "Vysion Print Agent" /f >nul 2>&1
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v "vysion-print-agent" /f >nul 2>&1
 
-tasklist /FI "IMAGENAME eq Vysion Print Agent.exe" 2>nul | find /I "Vysion Print Agent.exe" >nul
-if errorlevel 1 (
-  echo *** WAARSCHUWING: agent lijkt niet te draaien.
-  echo *** Dubbelklik 'Vysion Kassa' op bureaublad.
-) else (
-  echo Agent draait nu vanaf %%LOCALAPPDATA%%\VysionPrintAgent
-  echo USB mag uitgetrokken worden zonder problemen.
+REM Force autoStart=false in bestaande config (zonder andere instellingen te overschrijven)
+REM Schrijf UTF-8 zonder BOM, anders breekt JSON.parse in de agent.
+set "CFG=%APPDATA%\vysion-print-agent\config.json"
+if exist "%CFG%" (
+  powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+    "try { $j = Get-Content -Raw '%CFG%' | ConvertFrom-Json; $j.autoStart = $false; $txt = $j | ConvertTo-Json -Depth 6; [System.IO.File]::WriteAllText('%CFG%', $txt, (New-Object System.Text.UTF8Encoding $false)) } catch { }"
 )
-
+echo Klant start de kassa zelf via 'Vysion Kassa' op het bureaublad.
 echo.
+
 echo ============================================
 echo   KLAAR!
 echo.
-echo   - Bureaublad-icoon: 'Vysion Kassa'
+echo   - Bureaublad-icoon: 'Vysion Kassa' (klant dubbelklikt)
 echo   - Startmenu: Vysion -^> Vysion Kassa
-echo   - Autostart bij Windows-aanmelding
+echo   - GEEN autostart bij Windows-aanmelding
+echo   - Login wordt onthouden (versleuteld op deze PC)
 echo   - Locatie: %DEST%
 echo.
-echo   Check: rechtsklik tray-icoon -^> moet 'v1.1.2' zien.
+echo   Check: rechtsklik tray-icoon -^> moet 'v1.2.0' zien.
 echo ============================================
 echo.
 pause

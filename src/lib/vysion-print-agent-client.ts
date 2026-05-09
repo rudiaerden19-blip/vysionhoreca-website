@@ -39,6 +39,10 @@ export type VysionPrintAgentBody = {
   orderData?: VysionPrintAgentOrderData
   businessInfo?: VysionPrintAgentBusinessInfo
   copies?: number
+  /** Open kassa-lade (drawer-kick) na het printen. */
+  openDrawer?: boolean
+  /** "kassa" (default, volledige bon) of "keuken" (compacte keukenbon). */
+  receiptMode?: 'kassa' | 'keuken'
 }
 
 function sleep(ms: number): Promise<void> {
@@ -64,6 +68,8 @@ async function postPrintOnce(
         orderData: body.orderData,
         businessInfo: body.businessInfo,
         copies: body.copies,
+        openDrawer: body.openDrawer === true,
+        receiptMode: body.receiptMode || 'kassa',
       }),
       mode: 'cors',
       credentials: 'omit',

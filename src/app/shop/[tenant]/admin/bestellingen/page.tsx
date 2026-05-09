@@ -8,6 +8,7 @@ import { formatOrderScheduleDetail } from '@/lib/format-order-schedule'
 import { supabase } from '@/lib/supabase'
 import { getSoundsEnabled } from '@/lib/sounds'
 import { getAuthHeaders } from '@/lib/auth-headers'
+import { sendToVysionPrintAgent } from '@/lib/vysion-print-agent-client'
 
 // Parse items from JSONB
 interface OrderItemJson {
@@ -509,16 +510,64 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     setUpdatingId(null)
   }
 
-  // Print receipt function - Officiële kassabon met alle verplichte gegevens
-  const printReceipt = (order: Order) => {
+  // Print receipt function - probeert eerst de lokale Vysion Print Agent (ESC/POS),
+  // valt terug op het HTML browser-print venster als de agent onbereikbaar is.
+  const printReceipt = async (order: Order) => {
     const items = parseItems(order)
-    const printWindow = window.open('', '_blank', 'width=400,height=800')
-    if (!printWindow) return
 
-    // BTW berekening - gebruik percentage uit instellingen of standaard 21%
+    // BTW berekening - gebruik percentage uit instellingen of standaard 6%
     const btwPercentage = tenantSettings?.btw_percentage || 6
     const totalExclBtw = order.total ? order.total / (1 + btwPercentage / 100) : 0
     const btwBedrag = order.total ? order.total - totalExclBtw : 0
+
+    // 1) Probeer Vysion Print Agent (Windows ESC/POS bonprinter)
+    const agentItems = items.map((it: any) => ({
+      quantity: Number(it.quantity) || 1,
+      name: String(it.name || it.product_name || 'Item'),
+      price: Number(it.price ?? it.unit_price ?? 0) * (Number(it.quantity) || 1),
+      choices: Array.isArray(it.options)
+        ? it.options.map((o: any) => ({ name: String(o.name || ''), price: Number(o.price || 0) }))
+        : [],
+    }))
+    const agentOk = await sendToVysionPrintAgent({
+      winkelnaam: tenantSettings?.business_name || 'Horecazaak',
+      bonInhoud: '',
+      copies: 1,
+      receiptMode: 'kassa',
+      orderData: {
+        orderNumber: order.order_number || (order.id?.slice(0, 8) ?? '?'),
+        orderType: order.order_type,
+        tableNumber: null,
+        items: agentItems,
+        subtotal: totalExclBtw,
+        tax: btwBedrag,
+        total: order.total || 0,
+        paymentMethod: order.payment_method,
+        // Extra (rich) velden:
+        ...(order.customer_name ? { customerName: order.customer_name } : {}),
+        ...(order.customer_phone ? { customerPhone: order.customer_phone } : {}),
+        ...(order.customer_address || order.delivery_address
+          ? { customerAddress: order.customer_address || order.delivery_address }
+          : {}),
+        ...(order.customer_notes ? { customerNotes: order.customer_notes } : {}),
+        isOnlineOrder: true,
+      } as any,
+      businessInfo: {
+        name: tenantSettings?.business_name,
+        address: tenantSettings?.address ?? undefined,
+        postalCode: tenantSettings?.postal_code ?? undefined,
+        city: tenantSettings?.city ?? undefined,
+        phone: tenantSettings?.phone ?? undefined,
+        vatNumber: tenantSettings?.btw_number ?? undefined,
+        website: tenantSettings?.website ?? undefined,
+        vatRate: btwPercentage,
+      },
+    })
+    if (agentOk) return
+
+    // 2) Fallback: HTML browser-print
+    const printWindow = window.open('', '_blank', 'width=400,height=800')
+    if (!printWindow) return
 
     const html = `
       <!DOCTYPE html>

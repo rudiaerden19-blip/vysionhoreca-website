@@ -24,37 +24,78 @@ const DOUBLE_SIZE     = Buffer.from([GS,  0x21, 0x11])
 const NORMAL_SIZE     = Buffer.from([GS,  0x21, 0x00])
 const CUT_PARTIAL     = Buffer.from([GS,  0x56, 0x01])
 const FEED_LINES      = (n) => Buffer.from([ESC, 0x64, Math.min(n, 255)])
+/** ESC J n: feed n * 0.125mm — exact controle over witruimte. n = 80 → 10mm = 1cm. */
+const FEED_DOTS       = (n) => Buffer.from([ESC, 0x4a, Math.min(Math.max(n, 0), 255)])
 /** Donkerder printen (double-strike) — bon is dan goed leesbaar. */
 const EMPHASIZE_ON    = Buffer.from([ESC, 0x47, 0x01])
 const EMPHASIZE_OFF   = Buffer.from([ESC, 0x47, 0x00])
 /** Meer ruimte tussen regels zodat tekst niet plakt. */
 const LINE_SPACING_W  = Buffer.from([ESC, 0x33, 0x3C])
 const LINE_SPACING_N  = Buffer.from([ESC, 0x33, 0x1E])
+/** Code page PC858 = Western European met €-teken op 0xD5. */
+const CODEPAGE_PC858  = Buffer.from([ESC, 0x74, 0x13])
+/** Euro-byte in PC858. */
+const EURO_BYTE       = 0xd5
+/** Cash-drawer kick (ESC p 0 50 50): pulse op pin 2 ~100ms — standaard voor
+ *  bijna alle Epson/Citizen/Star bonprinters met aangesloten kassa-lade. */
+const DRAWER_KICK     = Buffer.from([ESC, 0x70, 0x00, 0x32, 0x32])
 
+/**
+ * Encodeer tekst naar bytes voor de printer:
+ * - Strip diakritische tekens (é → e, à → a) zodat we binnen latin1 blijven
+ * - Vervang € door byte 0xD5 (euro in PC858 codepage). De printer is geinit
+ *   met CODEPAGE_PC858 dus deze byte rendert als echt €-teken.
+ * - Andere niet-latin1 chars worden ?
+ * - Voeg \n toe (newline)
+ */
 function enc(text) {
-  const s = (text ?? '')
-    .toString()
-    .normalize('NFD')
-    .replace(/\p{M}/gu, '')
-    .replace(/€/g, 'E')
-    .replace(/[^\x00-\xff]/g, '?')
-  return Buffer.from(`${s}\n`, 'latin1')
+  return Buffer.concat([encInline(text), Buffer.from([0x0a])])
 }
 
-/** Plain text (geen line feed). */
 function encInline(text) {
   const s = (text ?? '')
     .toString()
     .normalize('NFD')
     .replace(/\p{M}/gu, '')
-    .replace(/€/g, 'E')
-    .replace(/[^\x00-\xff]/g, '?')
-  return Buffer.from(s, 'latin1')
+
+  // Build byte-by-byte, replace € with EURO_BYTE
+  const out = []
+  for (const ch of s) {
+    if (ch === '€') {
+      out.push(EURO_BYTE)
+      continue
+    }
+    const code = ch.charCodeAt(0)
+    if (code <= 0xff) {
+      out.push(code)
+    } else {
+      out.push(0x3f) // '?'
+    }
+  }
+  return Buffer.from(out)
 }
 
 function padRow(left, right, width) {
   const pad = Math.max(1, width - left.length - right.length)
   return Buffer.from(`${left}${' '.repeat(pad)}${right}\n`, 'latin1')
+}
+
+/**
+ * Print "label                      € 12.34" — echt euro-teken + spatie + bedrag.
+ * Spatie tussen € en bedrag voor leesbaarheid.
+ */
+function padPrice(label, amount, width) {
+  const num = Number(amount).toFixed(2)
+  // "€ " (2 chars) + bedrag
+  const rightLen = 2 + num.length
+  const pad = Math.max(1, width - label.length - rightLen)
+  return Buffer.concat([
+    encInline(label),
+    Buffer.from(' '.repeat(pad), 'latin1'),
+    Buffer.from([EURO_BYTE, 0x20]), // € + spatie
+    encInline(num),
+    Buffer.from([0x0a]),
+  ])
 }
 
 function parseNumber(value) {
@@ -82,6 +123,7 @@ function buildRichReceipt(body) {
 
   // Init
   c.push(ESC_INIT)
+  c.push(CODEPAGE_PC858)
   c.push(EMPHASIZE_ON)
   c.push(BOLD_ON)
   c.push(LINE_SPACING_W)
@@ -90,8 +132,14 @@ function buildRichReceipt(body) {
   c.push(Buffer.from('\n', 'latin1'))
   c.push(ALIGN_CENTER)
 
-  c.push(DOUBLE_SIZE)
-  c.push(enc(businessInfo?.name || winkelnaam || 'RECEIPT'))
+  // Bedrijfsnaam: naam > 18 chars → alleen DOUBLE_HEIGHT zodat hij op 1 regel past
+  const bizName = (businessInfo?.name || winkelnaam || 'RECEIPT').toString().trim()
+  if (bizName.length > 18) {
+    c.push(DOUBLE_HEIGHT)
+  } else {
+    c.push(DOUBLE_SIZE)
+  }
+  c.push(enc(bizName))
   c.push(NORMAL_SIZE)
 
   if (businessInfo?.address) c.push(enc(businessInfo.address))
@@ -169,15 +217,22 @@ function buildRichReceipt(body) {
     const price = parseNumber(item.price)
 
     c.push(DOUBLE_HEIGHT)
-    c.push(padRow(`${qty}x ${name}`, `E${price.toFixed(2)}`, W))
+    c.push(padPrice(`${qty}x ${name}`, price, W))
     c.push(NORMAL_SIZE)
 
     const choices = item.choices || item.options || []
     for (const ch of choices) {
       const cn = ch.name || ch.optionName || ''
       const cp = parseNumber(ch.price)
-      if (cp > 0) c.push(enc(`   + ${cn}  E${cp.toFixed(2)}`))
-      else c.push(enc(`   + ${cn}`))
+      if (cp > 0) {
+        c.push(Buffer.concat([
+          encInline(`   + ${cn}  `),
+          Buffer.from([EURO_BYTE, 0x20]), // € + spatie
+          enc(cp.toFixed(2)),
+        ]))
+      } else {
+        c.push(enc(`   + ${cn}`))
+      }
     }
 
     c.push(Buffer.from('\n', 'latin1'))
@@ -192,8 +247,8 @@ function buildRichReceipt(body) {
   const vatRate = parseNumber(businessInfo?.vatRate) || 21
 
   c.push(DOUBLE_HEIGHT)
-  c.push(padRow('Subtotaal', `E${subtotal.toFixed(2)}`, W))
-  c.push(padRow(`BTW (${vatRate}%)`, `E${tax.toFixed(2)}`, W))
+  c.push(padPrice('Subtotaal', subtotal, W))
+  c.push(padPrice(`BTW (${vatRate}%)`, tax, W))
   c.push(NORMAL_SIZE)
 
   c.push(Buffer.from('\n', 'latin1'))
@@ -202,7 +257,7 @@ function buildRichReceipt(body) {
   // ==================== TOTAAL ====================
   c.push(Buffer.from('\n', 'latin1'))
   c.push(DOUBLE_HEIGHT)
-  c.push(padRow('TOTAAL', `E${total.toFixed(2)}`, W))
+  c.push(padPrice('TOTAAL', total, W))
   c.push(NORMAL_SIZE)
 
   // ==================== BETAALMETHODE ====================
@@ -236,13 +291,101 @@ function buildRichReceipt(body) {
   c.push(EMPHASIZE_OFF)
   c.push(LINE_SPACING_N)
 
-  c.push(FEED_LINES(6))
+  /**
+   * Cutter zit fysiek ~12-15mm verder dan de print-head op Epson TM-printers.
+   * Om écht 1 cm zichtbare witruimte ONDER 'Bedankt' te krijgen, moeten we
+   * minimaal ~25 mm extra feeden (= 200 dots @ 8 dots/mm).
+   */
+  c.push(FEED_DOTS(160)) // 20 mm
+  c.push(FEED_DOTS(80))  // + 10 mm = 30 mm totaal
+  c.push(CUT_PARTIAL)
+
+  return Buffer.concat(c)
+}
+
+/**
+ * Compacte keuken-bon: groot bon-nummer, type, items met opties + opmerkingen.
+ * Geen prijzen, BTW, of footer — keuken hoeft alleen te weten WAT er klaar moet.
+ */
+function buildKitchenReceipt(body) {
+  const { orderData } = body || {}
+  const W = 42
+  const c = []
+
+  c.push(ESC_INIT)
+  c.push(CODEPAGE_PC858)
+  c.push(EMPHASIZE_ON)
+  c.push(BOLD_ON)
+  c.push(LINE_SPACING_W)
+
+  c.push(Buffer.from('\n', 'latin1'))
+  c.push(ALIGN_CENTER)
+  c.push(DOUBLE_HEIGHT)
+  c.push(enc('*** KEUKEN ***'))
+  c.push(NORMAL_SIZE)
+
+  c.push(DOUBLE_SIZE)
+  c.push(enc(`#${orderData?.orderNumber ?? '?'}`))
+  c.push(NORMAL_SIZE)
+
+  c.push(DOUBLE_HEIGHT)
+  const orderType = (orderData?.orderType || '').toString().toUpperCase()
+  let typeLabel = '>> AFHALEN'
+  if (orderType === 'DINE_IN' || orderType === 'DINE-IN') typeLabel = 'HIER OPETEN'
+  else if (orderType === 'DELIVERY') typeLabel = '=> BEZORGEN'
+  else if (orderType === 'TAKEAWAY' || orderType === 'PICKUP') typeLabel = '>> AFHALEN'
+  c.push(enc(typeLabel))
+  if (orderData?.tableNumber) c.push(enc(`Tafel ${orderData.tableNumber}`))
+  c.push(NORMAL_SIZE)
+
+  if (orderData?.requestedDateTime) {
+    c.push(Buffer.from('\n', 'latin1'))
+    c.push(enc(`GEWENST: ${orderData.requestedDateTime}`))
+  }
+
+  c.push(Buffer.from('\n', 'latin1'))
+  c.push(Buffer.from('-'.repeat(W) + '\n', 'latin1'))
+
+  c.push(ALIGN_LEFT)
+  for (const item of (orderData?.items || [])) {
+    const qty = parseNumber(item.quantity) || 1
+    const name = item.name || 'Item'
+    c.push(DOUBLE_HEIGHT)
+    c.push(enc(`${qty}x ${name}`))
+    c.push(NORMAL_SIZE)
+    const choices = item.choices || item.options || []
+    for (const ch of choices) {
+      const cn = ch.name || ch.optionName || ''
+      if (cn) c.push(enc(`   + ${cn}`))
+    }
+    if (item.notes) {
+      c.push(enc(`   ! ${item.notes}`))
+    }
+    c.push(Buffer.from('\n', 'latin1'))
+  }
+
+  if (orderData?.customerNotes) {
+    c.push(Buffer.from('-'.repeat(W) + '\n', 'latin1'))
+    c.push(DOUBLE_HEIGHT)
+    c.push(enc('OPMERKING:'))
+    c.push(NORMAL_SIZE)
+    c.push(enc(String(orderData.customerNotes)))
+  }
+
+  c.push(NORMAL_SIZE)
+  c.push(BOLD_OFF)
+  c.push(EMPHASIZE_OFF)
+  c.push(LINE_SPACING_N)
+  c.push(FEED_DOTS(160))
+  c.push(FEED_DOTS(80))
   c.push(CUT_PARTIAL)
 
   return Buffer.concat(c)
 }
 
 function buildEscPosPayload(body) {
+  // Keuken-bon mode (geen prijzen, alleen items + notities)
+  if (body && body.receiptMode === 'keuken') return buildKitchenReceipt(body)
   // Gebruik rijke bon als orderData aanwezig is — geeft mooiste resultaat
   if (body && body.orderData) return buildRichReceipt(body)
 
@@ -256,24 +399,23 @@ function buildEscPosPayload(body) {
   const c = []
 
   c.push(ESC_INIT)
+  c.push(CODEPAGE_PC858)
   c.push(EMPHASIZE_ON)
   c.push(BOLD_ON)
   c.push(LINE_SPACING_W)
 
-  // Header: bedrijfsnaam centered. Lange namen (>21 chars) krijgen
+  // Header: bedrijfsnaam centered. Lange namen (>18 chars) krijgen
   // alleen DOUBLE_HEIGHT zodat ze niet over 2 regels breken in DOUBLE_SIZE.
   c.push(Buffer.from('\n', 'latin1'))
   c.push(ALIGN_CENTER)
   const title = (body?.winkelnaam || body?.storeName || 'RECEIPT').toString().trim()
-  if (title.length > 21) {
+  if (title.length > 18) {
     c.push(DOUBLE_HEIGHT)
-    c.push(enc(title))
-    c.push(NORMAL_SIZE)
   } else {
     c.push(DOUBLE_SIZE)
-    c.push(enc(title))
-    c.push(NORMAL_SIZE)
   }
+  c.push(enc(title))
+  c.push(NORMAL_SIZE)
   c.push(Buffer.from('\n', 'latin1'))
   c.push(ALIGN_LEFT)
 
@@ -321,8 +463,8 @@ function buildEscPosPayload(body) {
       c.push(Buffer.from('\n', 'latin1'))
     }
 
-    // De regel zelf
-    c.push(enc(line))
+    // De regel zelf — zet "EUR 2.50" en "E2.50" / "E 2.50" om naar echte €
+    c.push(encWithEuro(line))
 
     // Na ITEM-lijn (1x ..., 2x ...): lege regel zodat items niet plakken
     if (RE_ITEM.test(trimmed)) {
@@ -336,10 +478,41 @@ function buildEscPosPayload(body) {
   c.push(EMPHASIZE_OFF)
   c.push(LINE_SPACING_N)
 
-  // Voldoende papier vóór de cut zodat "Bedankt" niet wordt afgesneden
-  c.push(FEED_LINES(8))
+  /**
+   * Cutter-offset compensatie: 30 mm totaal feed → ~15 mm zichtbare ruimte
+   * ONDER 'Bedankt' op een typische Epson TM.
+   */
+  c.push(FEED_DOTS(160)) // 20 mm
+  c.push(FEED_DOTS(80))  // + 10 mm
   c.push(CUT_PARTIAL)
   return Buffer.concat(c)
+}
+
+/**
+ * Encode een tekstregel waarbij voorvallen van "EUR ", "EUR" of een losse "E"
+ * vóór een geldbedrag (E12.34 / E 12.34) worden omgezet naar het echte
+ * euro-byte (0xD5 in PC858). Hierdoor toont de printer het €-teken,
+ * ook als de website in z'n platte tekst nog "EUR" of "E" gebruikt.
+ */
+function encWithEuro(line) {
+  const s = (line ?? '').toString()
+  /**
+   * Strategie: vervang elke euro-aanduiding (€, EUR, los E voor cijfer) door
+   * een tijdelijk markeerteken (0xFE) + spatie. Daarna byte-encode, en swap
+   * 0xFE → EURO_BYTE (0xD5). Zo komt er ALTIJD spatie tussen € en bedrag.
+   */
+  const MARKER = '\u00FE'
+  let replaced = s
+    .replace(/€\s*/g, MARKER + ' ')
+    .replace(/\bEUR\s*/gi, MARKER + ' ')
+    .replace(/(^|[\s(])E(?=\s?-?\d)/g, '$1' + MARKER + ' ')
+    // Verwijder dubbele spaties die door de replace kunnen ontstaan
+    .replace(/  +/g, ' ')
+  const buf = encInline(replaced)
+  for (let i = 0; i < buf.length; i++) {
+    if (buf[i] === 0xfe) buf[i] = EURO_BYTE
+  }
+  return Buffer.concat([buf, Buffer.from([0x0a])])
 }
 
 function getPrintScriptPath() {
@@ -500,10 +673,18 @@ function createApp(getPrinterName /* () => string | null */) {
         ? Math.min(Math.max(body.copies, 1), 5)
         : 2
 
+      // Kassa-lade openen na de eerste copy (klant betaalt → drawer pulse).
+      const wantDrawer = body.openDrawer === true
+      const finalPayload = wantDrawer
+        ? Buffer.concat([payload, DRAWER_KICK])
+        : payload
+
       let lastError = null
       let printedCount = 0
       for (let i = 0; i < copies; i++) {
-        const result = printRawWindows(printerName, payload)
+        // Alleen 1e bon krijgt drawer-kick; verdere copies zonder.
+        const buf = i === 0 ? finalPayload : payload
+        const result = printRawWindows(printerName, buf)
         if (!result.ok) {
           lastError = result.error
           console.error(`[print] copy ${i + 1}/${copies} → ${result.error}`)
@@ -514,7 +695,7 @@ function createApp(getPrinterName /* () => string | null */) {
       }
 
       if (printedCount === copies) {
-        return res.json({ success: true, message: 'OK', copies: printedCount })
+        return res.json({ success: true, message: 'OK', copies: printedCount, drawer: wantDrawer })
       }
       return res.status(500).json({
         success: false,
@@ -546,4 +727,5 @@ module.exports = {
   printRawWindows,
   listWindowsPrintersSync,
   sleepSyncMs,
+  DRAWER_KICK,
 }

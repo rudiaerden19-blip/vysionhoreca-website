@@ -1525,10 +1525,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       </div>
     </body></html>`
 
+    /** Kassa-lade alleen openen bij contante betaling — PIN/online hebben dat niet nodig. */
+    const isCash = ['CASH', 'cash', 'CONTANT', 'contant'].includes(String(order.paymentMethod || ''))
+
     const agentOk = await sendToVysionPrintAgent({
       winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
       bonInhoud: bonLines.join('\n'),
       copies: 2,
+      openDrawer: isCash,
+      receiptMode: 'kassa',
       orderData: {
         orderNumber: order.orderNumber,
         orderType: order.orderType,

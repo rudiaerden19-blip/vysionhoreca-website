@@ -50,3 +50,94 @@ window.fetch = async function (input, init) {
 
   return _originalFetch(input, init)
 }
+
+/* -------------------------------------------------------------------------
+ * Login-onthouden (autofill)
+ * Bewaart email + wachtwoord versleuteld via Electron safeStorage
+ * en vult ze automatisch in zodra een login-formulier verschijnt.
+ * ------------------------------------------------------------------------- */
+;(function setupAutofill() {
+  let lastFilledNode = null
+  let savePending = false
+
+  function findFields(root) {
+    const scope = root || document
+    const email =
+      scope.querySelector('input[type="email"]') ||
+      scope.querySelector('input[name*="email" i]') ||
+      scope.querySelector('input[id*="email" i]')
+    const password = scope.querySelector('input[type="password"]')
+    return { email, password }
+  }
+
+  /** React/Next.js inputs negeren `el.value = ...`; we moeten via de native setter. */
+  function setReactValue(el, value) {
+    try {
+      const proto = Object.getPrototypeOf(el)
+      const desc = Object.getOwnPropertyDescriptor(proto, 'value')
+      if (desc && desc.set) desc.set.call(el, value)
+      else el.value = value
+    } catch { el.value = value }
+    el.dispatchEvent(new Event('input', { bubbles: true }))
+    el.dispatchEvent(new Event('change', { bubbles: true }))
+  }
+
+  async function tryFill() {
+    const { email, password } = findFields()
+    if (!email || !password) return
+    if (lastFilledNode === password && (email.value || password.value)) return
+    let creds = null
+    try { creds = await ipcRenderer.invoke('kassa-creds:load') } catch { creds = null }
+    if (!creds || !creds.email || !creds.password) return
+    if (!email.value) setReactValue(email, creds.email)
+    if (!password.value) setReactValue(password, creds.password)
+    lastFilledNode = password
+  }
+
+  function maybeSaveFrom(scope) {
+    const { email, password } = findFields(scope)
+    if (!email || !password) return
+    const e = (email.value || '').trim()
+    const p = password.value || ''
+    if (!e || !p) return
+    if (savePending) return
+    savePending = true
+    Promise.resolve(ipcRenderer.invoke('kassa-creds:save', { email: e, password: p }))
+      .finally(() => { savePending = false })
+  }
+
+  function attachListeners() {
+    document.addEventListener('submit', (ev) => {
+      const f = ev.target
+      if (f && f.tagName === 'FORM') maybeSaveFrom(f)
+    }, true)
+    document.addEventListener('click', (ev) => {
+      const t = ev.target
+      if (!t || !t.closest) return
+      const btn = t.closest('button, [role="button"], input[type="submit"]')
+      if (!btn) return
+      const form = btn.closest('form')
+      maybeSaveFrom(form || document)
+    }, true)
+    document.addEventListener('keydown', (ev) => {
+      if (ev.key !== 'Enter') return
+      const t = ev.target
+      if (!t || !(t instanceof HTMLInputElement)) return
+      const form = t.closest('form')
+      maybeSaveFrom(form || document)
+    }, true)
+  }
+
+  function init() {
+    attachListeners()
+    tryFill()
+    const obs = new MutationObserver(() => { tryFill() })
+    try { obs.observe(document.documentElement, { childList: true, subtree: true }) } catch {}
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init, { once: true })
+  } else {
+    init()
+  }
+})()
