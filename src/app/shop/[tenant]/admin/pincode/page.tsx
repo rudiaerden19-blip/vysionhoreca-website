@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { authFetch } from '@/lib/auth-headers'
 
 export default function PincodePage({ params }: { params: { tenant: string } }) {
   const tenant = params.tenant
@@ -37,9 +38,12 @@ export default function PincodePage({ params }: { params: { tenant: string } }) 
   const savePin = async (pin: string, opts: { currentPin?: string } = {}) => {
     setSaving(true)
     setError('')
-    const res = await fetch('/api/pin/set', {
+    // authFetch zet x-business-id/x-auth-email/x-session-token mee zodat
+    // de eerste-keer-PIN-set door de server-side verifyTenantOrSuperAdmin
+    // wordt geaccepteerd. Voor wijzig-pad (currentPin) heeft de server zijn
+    // eigen rate-limit + bcrypt-vergelijking — auth is dan niet vereist.
+    const res = await authFetch('/api/pin/set', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ tenant, pin, currentPin: opts.currentPin }),
     })
     const data = await res.json()

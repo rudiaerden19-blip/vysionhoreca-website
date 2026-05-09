@@ -78,6 +78,25 @@ export const trackViewRateLimiter = redis
     })
   : null
 
+/** PIN-verify per IP: 5 per minuut. Voorkomt brute-force op 4-cijferige PIN. */
+export const pinVerifyIpRateLimiter = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(5, '1 m'),
+      prefix: 'ratelimit:pin-verify-ip',
+    })
+  : null
+
+/** PIN-verify per tenant: 30 per uur — extra slot zodat distributed brute-force
+ *  via verschillende IPs ook wordt afgekapt. */
+export const pinVerifyTenantRateLimiter = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(30, '1 h'),
+      prefix: 'ratelimit:pin-verify-tenant',
+    })
+  : null
+
 const API_MW_EXEMPT_PREFIXES = [
   '/api/stripe-webhook',
   '/api/subscription-webhook',
