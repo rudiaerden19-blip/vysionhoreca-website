@@ -115,15 +115,14 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
     const yEnd = `${viewYear}-12-31`
 
     const [linesRes, settingsRes] = await Promise.all([
-      supabase
-        .from('tenant_kasboek_manual_lines')
-        .select('*')
-        .eq('tenant_slug', tenantSlug)
-        .gte('line_date', yStart)
-        .lte('line_date', yEnd)
-        .order('line_date', { ascending: true })
-        .order('created_at', { ascending: true })
-        .limit(8000),
+      adminDb.select<KasboekManualLine[]>('tenant_kasboek_manual_lines', {
+        tenantSlug,
+        select: '*',
+        gte: { line_date: yStart },
+        lte: { line_date: yEnd },
+        order: { column: 'line_date', ascending: true },
+        limit: 5000,
+      }),
       supabase
         .from('tenant_settings')
         .select('kasboek_opening_balance, kasboek_opening_balance_date')
@@ -131,11 +130,11 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
         .maybeSingle(),
     ])
 
-    if (linesRes.error && linesRes.error.code !== 'PGRST116' && !linesRes.error.message?.includes('does not exist')) {
+    if (!linesRes.ok) {
       console.error('kasboek lines', linesRes.error)
     }
 
-    const lines = (linesRes.data || []) as KasboekManualLine[]
+    const lines = (linesRes.ok && Array.isArray(linesRes.data) ? linesRes.data : []) as KasboekManualLine[]
     setYearLines(lines)
 
     const ob = Number((settingsRes.data as { kasboek_opening_balance?: number } | null)?.kasboek_opening_balance) || 0
@@ -635,6 +634,7 @@ function KasboekReferenceTab({
     const endYmd = endIso.slice(0, 10)
 
     const [ordersRes, costsRes] = await Promise.all([
+      // orders is publiek leesbaar (klantpad) — blijft via supabase
       supabase
         .from('orders')
         .select(
@@ -644,18 +644,19 @@ function KasboekReferenceTab({
         .gte('created_at', startIso)
         .order('created_at', { ascending: true })
         .limit(4000),
-      supabase
-        .from('variable_costs')
-        .select('id, date, amount, description, supplier, category, invoice_number, created_at')
-        .eq('tenant_slug', tenantSlug)
-        .gte('date', startYmd)
-        .lte('date', endYmd)
-        .order('date', { ascending: true })
-        .limit(2000),
+      // variable_costs = commercieel gevoelig → via read-proxy
+      adminDb.select<VariableCostRow[]>('variable_costs', {
+        tenantSlug,
+        select: 'id, date, amount, description, supplier, category, invoice_number, created_at',
+        gte: { date: startYmd },
+        lte: { date: endYmd },
+        order: { column: 'date', ascending: true },
+        limit: 2000,
+      }),
     ])
 
     const orderList = (ordersRes.data || []) as OrderRow[]
-    const costList = (costsRes.data || []) as VariableCostRow[]
+    const costList = (costsRes.ok && Array.isArray(costsRes.data) ? costsRes.data : []) as VariableCostRow[]
 
     const orderRows: KasboekLedgerRow[] = orderList
       .filter((o) => orderCountsTowardRevenueAndZReport(o))

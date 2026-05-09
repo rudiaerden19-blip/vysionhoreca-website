@@ -36,26 +36,25 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
     // Use tenant_slug directly
     setBusinessId(params.tenant)
 
-    // Load categories
-    const { data: cats } = await supabase
-      .from('cost_categories')
-      .select('*')
-      .eq('tenant_slug', params.tenant)
-      .order('name')
-
-    if (cats) {
-      setCategories(cats)
+    const catsRes = await adminDb.select<any[]>('cost_categories', {
+      tenantSlug: params.tenant,
+      select: '*',
+      order: { column: 'name', ascending: true },
+    })
+    if (catsRes.ok && Array.isArray(catsRes.data)) {
+      setCategories(catsRes.data)
     }
 
     setLoading(false)
   }
 
   async function updateMultiplier(id: string, multiplier: number) {
-    await supabase
-      .from('cost_categories')
-      .update({ multiplier })
-      .eq('id', id)
-
+    await adminDb.update(
+      'cost_categories',
+      { multiplier },
+      { id, tenant_slug: params.tenant },
+      { tenantSlug: params.tenant }
+    )
     setCategories(prev => prev.map(c => c.id === id ? { ...c, multiplier } : c))
   }
 

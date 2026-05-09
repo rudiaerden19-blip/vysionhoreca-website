@@ -201,7 +201,7 @@ export default function PersoneelPage() {
     if (!member.id) return
     if (!(await ask(`${t('personeelPage.alerts.confirmDelete')} ${member.name}?`))) return
 
-    const success = await deleteStaff(member.id)
+    const success = await deleteStaff(member.id, tenant)
     if (success) {
       loadStaff()
     } else {

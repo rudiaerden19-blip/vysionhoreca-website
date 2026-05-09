@@ -113,19 +113,13 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
   useEffect(() => {
     if (!loading && simulatorItems.length > 0) {
       const timeoutId = setTimeout(async () => {
-        try {
-          await supabase
-            .from('cost_settings')
-            .upsert({
-              tenant_slug: params.tenant,
-              simulator_items: simulatorItems,
-              simulator_name: simulatorName,
-              simulator_multiplier: parseFloat(simulatorMultiplier.replace(',', '.')) || 3,
-              updated_at: new Date().toISOString()
-            }, { onConflict: 'tenant_slug' })
-        } catch (e) {
-          console.error('Failed to save simulator data:', e)
-        }
+        await adminDb.upsert('cost_settings', {
+          tenant_slug: params.tenant,
+          simulator_items: simulatorItems,
+          simulator_name: simulatorName,
+          simulator_multiplier: parseFloat(simulatorMultiplier.replace(',', '.')) || 3,
+          updated_at: new Date().toISOString(),
+        }, { tenantSlug: params.tenant, onConflict: 'tenant_slug' })
       }, 1000)
       return () => clearTimeout(timeoutId)
     }
@@ -146,34 +140,34 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
     // Use tenant_slug directly
     setBusinessId(params.tenant)
 
-    // Load all data in parallel
+    // menu_products is publiek leesbaar (anon allowed) — blijft via supabase.
+    // ingredients / cost_categories / product_ingredients / cost_settings zijn
+    // commercieel gevoelig en gaan via de read-proxy (service-role).
     const [productsRes, ingredientsRes, categoriesRes, productIngsRes] = await Promise.all([
       supabase.from('menu_products').select('id, name, price, category_id, price_multiplier').eq('tenant_slug', params.tenant).order('name'),
-      supabase.from('ingredients').select('*').eq('tenant_slug', params.tenant).order('name'),
-      supabase.from('cost_categories').select('*').eq('tenant_slug', params.tenant),
-      supabase.from('product_ingredients').select('*').eq('tenant_slug', params.tenant)
+      adminDb.select<any[]>('ingredients', { tenantSlug: params.tenant, select: '*', order: { column: 'name', ascending: true } }),
+      adminDb.select<any[]>('cost_categories', { tenantSlug: params.tenant, select: '*' }),
+      adminDb.select<any[]>('product_ingredients', { tenantSlug: params.tenant, select: '*' }),
     ])
 
     if (productsRes.data) setProducts(productsRes.data)
-    if (ingredientsRes.data) setIngredients(ingredientsRes.data)
-    if (categoriesRes.data) setCategories(categoriesRes.data)
-    if (productIngsRes.data) setProductIngredients(productIngsRes.data)
+    if (ingredientsRes.ok && Array.isArray(ingredientsRes.data)) setIngredients(ingredientsRes.data)
+    if (categoriesRes.ok && Array.isArray(categoriesRes.data)) setCategories(categoriesRes.data)
+    if (productIngsRes.ok && Array.isArray(productIngsRes.data)) setProductIngredients(productIngsRes.data)
 
-    // Calculate average multiplier
-    if (categoriesRes.data && categoriesRes.data.length > 0) {
-      const avg = categoriesRes.data.reduce((sum, c) => sum + c.multiplier, 0) / categoriesRes.data.length
+    if (categoriesRes.ok && Array.isArray(categoriesRes.data) && categoriesRes.data.length > 0) {
+      const avg = categoriesRes.data.reduce((sum: number, c: any) => sum + c.multiplier, 0) / categoriesRes.data.length
       setDefaultMultiplier(avg)
     }
 
-    // Load cost settings - try Supabase first, fallback to localStorage
     try {
-      const { data: costSettings, error } = await supabase
-        .from('cost_settings')
-        .select('*')
-        .eq('tenant_slug', params.tenant)
-        .maybeSingle()
-      
-      if (costSettings && !error) {
+      const csRes = await adminDb.select<any>('cost_settings', {
+        tenantSlug: params.tenant,
+        select: '*',
+        single: 'maybe',
+      })
+      const costSettings = csRes.ok ? (csRes.data as any) : null
+      if (costSettings) {
         // Load from Supabase
         setStandardPrices({
           saus: costSettings.saus?.toString() || '0.12',
@@ -221,29 +215,24 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
     setLoading(false)
   }
 
-  // Save standard prices to Supabase
   async function saveStandardPrices() {
     setSavingStandardPrices(true)
-    try {
-      const { error } = await supabase
-        .from('cost_settings')
-        .upsert({
-          tenant_slug: params.tenant,
-          saus: parseFloat(standardPrices.saus.replace(',', '.')) || 0.12,
-          sla: parseFloat(standardPrices.sla.replace(',', '.')) || 0.13,
-          tomaat: parseFloat(standardPrices.tomaat.replace(',', '.')) || 0.14,
-          ei: parseFloat(standardPrices.ei.replace(',', '.')) || 0.12,
-          potje_saus: parseFloat(standardPrices.potje_saus.replace(',', '.')) || 0.16,
-          verpakking: parseFloat(standardPrices.verpakking.replace(',', '.')) || 0.30,
-          kosten_per_stuk: parseFloat(standardPrices.kosten_per_stuk.replace(',', '.')) || 0.40,
-          updated_at: new Date().toISOString()
-        }, { onConflict: 'tenant_slug' })
-      
-      if (error) throw error
+    const r = await adminDb.upsert('cost_settings', {
+      tenant_slug: params.tenant,
+      saus: parseFloat(standardPrices.saus.replace(',', '.')) || 0.12,
+      sla: parseFloat(standardPrices.sla.replace(',', '.')) || 0.13,
+      tomaat: parseFloat(standardPrices.tomaat.replace(',', '.')) || 0.14,
+      ei: parseFloat(standardPrices.ei.replace(',', '.')) || 0.12,
+      potje_saus: parseFloat(standardPrices.potje_saus.replace(',', '.')) || 0.16,
+      verpakking: parseFloat(standardPrices.verpakking.replace(',', '.')) || 0.30,
+      kosten_per_stuk: parseFloat(standardPrices.kosten_per_stuk.replace(',', '.')) || 0.40,
+      updated_at: new Date().toISOString(),
+    }, { tenantSlug: params.tenant, onConflict: 'tenant_slug' })
+    if (r.ok) {
       setStandardPricesSaved(true)
       setTimeout(() => setStandardPricesSaved(false), 2000)
-    } catch (e) {
-      console.error('Failed to save standard prices:', e)
+    } else {
+      console.error('Failed to save standard prices:', r.error)
     }
     setSavingStandardPrices(false)
   }
@@ -257,19 +246,14 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
     let ingredient = ingredients.find(i => i.name.toLowerCase() === name.toLowerCase())
     
     if (!ingredient) {
-      // Create new ingredient
-      const { data: newIng } = await supabase
-        .from('ingredients')
-        .insert({
-          tenant_slug: businessId,
-          name: name,
-          unit: 'stuk',
-          purchase_price: price,
-          notes: 'Standaardprijs'
-        })
-        .select()
-        .single()
-      
+      const insRes = await adminDb.insert<any[]>('ingredients', {
+        tenant_slug: businessId,
+        name: name,
+        unit: 'stuk',
+        purchase_price: price,
+        notes: 'Standaardprijs',
+      }, { tenantSlug: businessId, select: '*' })
+      const newIng = insRes.ok && Array.isArray(insRes.data) ? insRes.data[0] : null
       if (newIng) {
         ingredient = newIng
         setIngredients(prev => [...prev, newIng].sort((a, b) => a.name.localeCompare(b.name)))
@@ -277,24 +261,18 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
     }
 
     if (ingredient) {
-      // Check if already added to this product
       const alreadyAdded = productIngredients.some(
         pi => pi.product_id === productId && pi.ingredient_id === ingredient!.id
       )
 
       if (!alreadyAdded) {
-        // Add to product
-        const { data: pi } = await supabase
-          .from('product_ingredients')
-          .insert({
-            tenant_slug: businessId,
-            product_id: productId,
-            ingredient_id: ingredient.id,
-            quantity: 1
-          })
-          .select()
-          .single()
-
+        const piRes = await adminDb.insert<any[]>('product_ingredients', {
+          tenant_slug: businessId,
+          product_id: productId,
+          ingredient_id: ingredient.id,
+          quantity: 1,
+        }, { tenantSlug: businessId, select: '*' })
+        const pi = piRes.ok && Array.isArray(piRes.data) ? piRes.data[0] : null
         if (pi) {
           setProductIngredients(prev => [...prev, pi])
         }
@@ -421,70 +399,49 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
     
     console.log('Adding database ingredient:', product.name)
 
-    // ALTIJD nieuw ingrediënt aanmaken met de juiste naam
-    const { data: newIng } = await supabase
-      .from('ingredients')
-      .insert({
-        tenant_slug: businessId,
-        name: product.name,
-        unit: product.unit || 'stuk',
-        purchase_price: product.unit_price || 0,
-        units_per_package: product.units_per_package || 1,
-        package_price: product.package_price || 0,
-        notes: product.article_number ? `Art. #${product.article_number}` : ''
-      })
-      .select()
-      .single()
-
+    const ingRes = await adminDb.insert<any[]>('ingredients', {
+      tenant_slug: businessId,
+      name: product.name,
+      unit: product.unit || 'stuk',
+      purchase_price: product.unit_price || 0,
+      units_per_package: product.units_per_package || 1,
+      package_price: product.package_price || 0,
+      notes: product.article_number ? `Art. #${product.article_number}` : '',
+    }, { tenantSlug: businessId, select: '*' })
+    const newIng = ingRes.ok && Array.isArray(ingRes.data) ? ingRes.data[0] : null
     if (!newIng) {
-      console.error('Failed to create ingredient')
+      console.error('Failed to create ingredient:', ingRes.error)
       return
     }
-    
+
     const ingredientId = newIng.id
     setIngredients(prev => [...prev, newIng].sort((a, b) => a.name.localeCompare(b.name)))
 
-    // Add to product
-    const { data: pi } = await supabase
-      .from('product_ingredients')
-      .insert({
-        tenant_slug: businessId,
-        product_id: productId,
-        ingredient_id: ingredientId,
-        quantity: addingQuantity
-      })
-      .select()
-      .single()
+    const piRes = await adminDb.insert<any[]>('product_ingredients', {
+      tenant_slug: businessId,
+      product_id: productId,
+      ingredient_id: ingredientId,
+      quantity: addingQuantity,
+    }, { tenantSlug: businessId, select: '*' })
+    const pi = piRes.ok && Array.isArray(piRes.data) ? piRes.data[0] : null
+    if (pi) setProductIngredients(prev => [...prev, pi])
 
-    if (pi) {
-      setProductIngredients(prev => [...prev, pi])
-    }
-
-    // Reset search
     setIngredientSearch('')
     setSearchResults({ own: [], database: [] })
     setShowSearchResults(false)
     setAddingQuantity(1)
   }
 
-  // Add own ingredient directly
   async function addOwnIngredient(ingredient: Ingredient, productId: string) {
     if (!businessId) return
-
-    const { data: pi } = await supabase
-      .from('product_ingredients')
-      .insert({
-        tenant_slug: businessId,
-        product_id: productId,
-        ingredient_id: ingredient.id,
-        quantity: addingQuantity
-      })
-      .select()
-      .single()
-
-    if (pi) {
-      setProductIngredients(prev => [...prev, pi])
-    }
+    const piRes = await adminDb.insert<any[]>('product_ingredients', {
+      tenant_slug: businessId,
+      product_id: productId,
+      ingredient_id: ingredient.id,
+      quantity: addingQuantity,
+    }, { tenantSlug: businessId, select: '*' })
+    const pi = piRes.ok && Array.isArray(piRes.data) ? piRes.data[0] : null
+    if (pi) setProductIngredients(prev => [...prev, pi])
 
     // Reset search
     setIngredientSearch('')

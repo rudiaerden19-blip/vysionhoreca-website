@@ -393,23 +393,19 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
     // Use tenant_slug directly
     setBusinessId(params.tenant)
 
-    // Load categories
-    const { data: cats } = await supabase
-      .from('cost_categories')
-      .select('*')
-      .eq('tenant_slug', params.tenant)
-      .order('name')
+    const catsRes = await adminDb.select<any[]>('cost_categories', {
+      tenantSlug: params.tenant,
+      select: '*',
+      order: { column: 'name', ascending: true },
+    })
+    if (catsRes.ok && Array.isArray(catsRes.data)) setCategories(catsRes.data)
 
-    if (cats) setCategories(cats)
-
-    // Load ingredients
-    const { data: ings } = await supabase
-      .from('ingredients')
-      .select('*')
-      .eq('tenant_slug', params.tenant)
-      .order('name')
-
-    if (ings) setIngredients(ings)
+    const ingsRes = await adminDb.select<any[]>('ingredients', {
+      tenantSlug: params.tenant,
+      select: '*',
+      order: { column: 'name', ascending: true },
+    })
+    if (ingsRes.ok && Array.isArray(ingsRes.data)) setIngredients(ingsRes.data)
 
     setLoading(false)
   }
@@ -683,13 +679,12 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
     if (!(await ask(t('dashboard.ingredients.confirmDeleteAllLast')))) return
 
     try {
-      const { error } = await supabase
-        .from('ingredients')
-        .delete()
-        .eq('tenant_slug', businessId)
-      
-      if (error) throw error
-      
+      const r = await adminDb.delete(
+        'ingredients',
+        { tenant_slug: businessId },
+        { tenantSlug: businessId }
+      )
+      if (!r.ok) throw new Error(r.error || 'delete failed')
       setIngredients([])
       alert('✅ Alle ingrediënten zijn verwijderd.')
     } catch (error) {

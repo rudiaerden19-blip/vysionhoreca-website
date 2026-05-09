@@ -276,11 +276,23 @@ export const ADMIN_DB_TABLES: Record<string, AdminDbTableSpec> = {
     forbiddenColumns: ['id', 'created_at'],
     maxRows: 50,
   },
+  cost_settings: {
+    tenantSlugColumn: 'tenant_slug',
+    allowedOps: ['insert', 'update', 'upsert'],
+    forbiddenColumns: ['id', 'created_at'],
+    maxRows: 1,
+  },
   tenant_kasboek_manual_lines: {
     tenantSlugColumn: 'tenant_slug',
     allowedOps: ['insert', 'update', 'delete'],
     forbiddenColumns: ['id', 'created_at'],
     maxRows: 100,
+  },
+  tenant_kasboek_orders: {
+    tenantSlugColumn: 'tenant_slug',
+    allowedOps: ['insert', 'update', 'upsert', 'delete'],
+    forbiddenColumns: ['id', 'created_at'],
+    maxRows: 500,
   },
 
   // --- Z-rapport (handmatige correctie alleen) ---

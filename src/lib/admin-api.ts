@@ -1611,30 +1611,25 @@ export interface DailySales {
 
 export async function getDailySales(tenantSlug: string, year: number, month: number): Promise<DailySales[]> {
   const startDate = `${year}-${String(month).padStart(2, '0')}-01`
-  const lastDay = new Date(year, month, 0).getDate() // Get actual last day of month
+  const lastDay = new Date(year, month, 0).getDate()
   const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
-  
-  const { data, error } = await supabase
-    .from('daily_sales')
-    .select('*')
-    .eq('tenant_slug', tenantSlug)
-    .gte('date', startDate)
-    .lte('date', endDate)
-    .order('date', { ascending: true })
-  
-  if (error) {
-    console.error('Error fetching daily sales:', error)
+
+  const r = await adminDb.select<DailySales[]>('daily_sales', {
+    tenantSlug,
+    select: '*',
+    gte: { date: startDate },
+    lte: { date: endDate },
+    order: { column: 'date', ascending: true },
+  })
+  if (!r.ok) {
+    console.error('Error fetching daily sales:', r.error)
     return []
   }
-  return data || []
+  return r.data || []
 }
 
 export async function saveDailySales(sales: DailySales): Promise<boolean> {
   const totalRevenue = (sales.cash_revenue || 0) + (sales.card_revenue || 0)
-  
-  console.log('💾 Saving daily sales:', { ...sales, total_revenue: totalRevenue })
-  
-  // Build the record without undefined id to avoid upsert issues
   const record: Record<string, unknown> = {
     tenant_slug: sales.tenant_slug,
     date: sales.date,
@@ -1643,37 +1638,28 @@ export async function saveDailySales(sales: DailySales): Promise<boolean> {
     total_revenue: totalRevenue,
     order_count: sales.order_count || 0,
     notes: sales.notes || null,
-    updated_at: new Date().toISOString()
+    updated_at: new Date().toISOString(),
   }
-  
-  // Only include id if it exists (for updates)
-  if (sales.id) {
-    record.id = sales.id
-  }
-  
-  const { data, error } = await supabase
-    .from('daily_sales')
-    .upsert(record, { onConflict: 'tenant_slug,date' })
-    .select()
-  
-  if (error) {
-    console.error('❌ Error saving daily sales:', error)
-    alert(`Fout bij opslaan: ${error.message}`)
+  // We laten 'id' weg zodat de proxy 'm strip via forbiddenColumns; upsert
+  // gebruikt onConflict op (tenant_slug, date) om de juiste rij te raken.
+
+  const r = await adminDb.upsert('daily_sales', record, {
+    tenantSlug: sales.tenant_slug,
+    onConflict: 'tenant_slug,date',
+    select: '*',
+  })
+  if (!r.ok) {
+    console.error('Error saving daily sales:', r.error)
+    alert(`Fout bij opslaan: ${r.error}`)
     return false
   }
-  
-  console.log('✅ Daily sales saved:', data)
   return true
 }
 
-export async function deleteDailySales(id: string): Promise<boolean> {
-  const { error } = await supabase
-    .from('daily_sales')
-    .delete()
-    .eq('id', id)
-  
-  if (error) {
-    console.error('Error deleting daily sales:', error)
+export async function deleteDailySales(id: string, tenantSlug: string): Promise<boolean> {
+  const r = await adminDb.delete('daily_sales', { id, tenant_slug: tenantSlug }, { tenantSlug })
+  if (!r.ok) {
+    console.error('Error deleting daily sales:', r.error)
     return false
   }
   return true
@@ -1721,72 +1707,56 @@ export interface FixedCost {
 }
 
 export async function getFixedCosts(tenantSlug: string): Promise<FixedCost[]> {
-  const { data, error } = await supabase
-    .from('fixed_costs')
-    .select('*')
-    .eq('tenant_slug', tenantSlug)
-    .order('category', { ascending: true })
-  
-  if (error) {
-    console.error('Error fetching fixed costs:', error)
+  const r = await adminDb.select<FixedCost[]>('fixed_costs', {
+    tenantSlug,
+    select: '*',
+    order: { column: 'category', ascending: true },
+  })
+  if (!r.ok) {
+    console.error('Error fetching fixed costs:', r.error)
     return []
   }
-  return data || []
+  return r.data || []
 }
 
 export async function saveFixedCost(cost: FixedCost): Promise<FixedCost | null> {
-  if (cost.id) {
-    const { data, error } = await supabase
-      .from('fixed_costs')
-      .update({
-        category: cost.category,
-        name: cost.name,
-        amount: cost.amount,
-        notes: cost.notes,
-        is_active: cost.is_active,
-        pdf_url: cost.pdf_url || null,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', cost.id)
-      .select()
-      .single()
-    
-    if (error) {
-      console.error('Error updating fixed cost:', error)
-      return null
-    }
-    return data
-  } else {
-    const { data, error } = await supabase
-      .from('fixed_costs')
-      .insert({
-        tenant_slug: cost.tenant_slug,
-        category: cost.category,
-        name: cost.name,
-        amount: cost.amount,
-        notes: cost.notes,
-        is_active: cost.is_active ?? true,
-        pdf_url: cost.pdf_url || null,
-      })
-      .select()
-      .single()
-    
-    if (error) {
-      console.error('Error creating fixed cost:', error)
-      return null
-    }
-    return data
+  const payload = {
+    category: cost.category,
+    name: cost.name,
+    amount: cost.amount,
+    notes: cost.notes,
+    is_active: cost.is_active,
+    pdf_url: cost.pdf_url || null,
   }
+  if (cost.id) {
+    const r = await adminDb.update<FixedCost[]>(
+      'fixed_costs',
+      { ...payload, updated_at: new Date().toISOString() },
+      { id: cost.id, tenant_slug: cost.tenant_slug },
+      { tenantSlug: cost.tenant_slug, select: '*' }
+    )
+    if (!r.ok) {
+      console.error('Error updating fixed cost:', r.error)
+      return null
+    }
+    return Array.isArray(r.data) ? r.data[0] || null : (r.data as any) || null
+  }
+  const r = await adminDb.insert<FixedCost[]>(
+    'fixed_costs',
+    { ...payload, tenant_slug: cost.tenant_slug, is_active: cost.is_active ?? true },
+    { tenantSlug: cost.tenant_slug, select: '*' }
+  )
+  if (!r.ok) {
+    console.error('Error creating fixed cost:', r.error)
+    return null
+  }
+  return Array.isArray(r.data) ? r.data[0] || null : (r.data as any) || null
 }
 
-export async function deleteFixedCost(id: string): Promise<boolean> {
-  const { error } = await supabase
-    .from('fixed_costs')
-    .delete()
-    .eq('id', id)
-  
-  if (error) {
-    console.error('Error deleting fixed cost:', error)
+export async function deleteFixedCost(id: string, tenantSlug: string): Promise<boolean> {
+  const r = await adminDb.delete('fixed_costs', { id, tenant_slug: tenantSlug }, { tenantSlug })
+  if (!r.ok) {
+    console.error('Error deleting fixed cost:', r.error)
     return false
   }
   return true
@@ -1829,95 +1799,76 @@ export interface VariableCost {
 
 export async function getVariableCosts(tenantSlug: string, year: number, month: number): Promise<VariableCost[]> {
   const startDate = `${year}-${String(month).padStart(2, '0')}-01`
-  const lastDay = new Date(year, month, 0).getDate() // Get actual last day of month
+  const lastDay = new Date(year, month, 0).getDate()
   const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
-  
-  const { data, error } = await supabase
-    .from('variable_costs')
-    .select('*')
-    .eq('tenant_slug', tenantSlug)
-    .gte('date', startDate)
-    .lte('date', endDate)
-    .order('date', { ascending: false })
-  
-  if (error) {
-    console.error('Error fetching variable costs:', error)
+
+  const r = await adminDb.select<VariableCost[]>('variable_costs', {
+    tenantSlug,
+    select: '*',
+    gte: { date: startDate },
+    lte: { date: endDate },
+    order: { column: 'date', ascending: false },
+  })
+  if (!r.ok) {
+    console.error('Error fetching variable costs:', r.error)
     return []
   }
-  return data || []
+  return r.data || []
 }
 
 export async function getAllVariableCosts(tenantSlug: string): Promise<VariableCost[]> {
-  const { data, error } = await supabase
-    .from('variable_costs')
-    .select('*')
-    .eq('tenant_slug', tenantSlug)
-    .order('date', { ascending: false })
-  
-  if (error) {
-    console.error('Error fetching all variable costs:', error)
+  const r = await adminDb.select<VariableCost[]>('variable_costs', {
+    tenantSlug,
+    select: '*',
+    order: { column: 'date', ascending: false },
+  })
+  if (!r.ok) {
+    console.error('Error fetching all variable costs:', r.error)
     return []
   }
-  return data || []
+  return r.data || []
 }
 
 export async function saveVariableCost(cost: VariableCost): Promise<VariableCost | null> {
-  if (cost.id) {
-    const { data, error } = await supabase
-      .from('variable_costs')
-      .update({
-        category: cost.category,
-        description: cost.description,
-        supplier: cost.supplier,
-        invoice_number: cost.invoice_number,
-        amount: cost.amount,
-        date: cost.date,
-        notes: cost.notes,
-        pdf_url: cost.pdf_url || null,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', cost.id)
-      .select()
-      .single()
-    
-    if (error) {
-      console.error('Error updating variable cost:', error)
-      return null
-    }
-    return data
-  } else {
-    const { data, error } = await supabase
-      .from('variable_costs')
-      .insert({
-        tenant_slug: cost.tenant_slug,
-        category: cost.category,
-        description: cost.description,
-        supplier: cost.supplier,
-        invoice_number: cost.invoice_number,
-        amount: cost.amount,
-        date: cost.date,
-        notes: cost.notes,
-        pdf_url: cost.pdf_url || null,
-      })
-      .select()
-      .single()
-    
-    if (error) {
-      console.error('Error creating variable cost:', error)
-      return null
-    }
-    return data
+  const payload = {
+    category: cost.category,
+    description: cost.description,
+    supplier: cost.supplier,
+    invoice_number: cost.invoice_number,
+    amount: cost.amount,
+    date: cost.date,
+    notes: cost.notes,
+    pdf_url: cost.pdf_url || null,
   }
+  if (cost.id) {
+    const r = await adminDb.update<VariableCost[]>(
+      'variable_costs',
+      { ...payload, updated_at: new Date().toISOString() },
+      { id: cost.id, tenant_slug: cost.tenant_slug },
+      { tenantSlug: cost.tenant_slug, select: '*' }
+    )
+    if (!r.ok) {
+      console.error('Error updating variable cost:', r.error)
+      return null
+    }
+    return Array.isArray(r.data) ? r.data[0] || null : (r.data as any) || null
+  }
+  const r = await adminDb.insert<VariableCost[]>(
+    'variable_costs',
+    { ...payload, tenant_slug: cost.tenant_slug },
+    { tenantSlug: cost.tenant_slug, select: '*' }
+  )
+  if (!r.ok) {
+    console.error('Error creating variable cost:', r.error)
+    return null
+  }
+  return Array.isArray(r.data) ? r.data[0] || null : (r.data as any) || null
 }
 
-export async function deleteVariableCost(id: string): Promise<boolean> {
-  const { error } = await supabase
-    .from('variable_costs')
-    .delete()
-    .eq('id', id)
-  
-  if (error) {
-    console.error('Error deleting variable cost:', error)
+export async function deleteVariableCost(id: string, tenantSlug: string): Promise<boolean> {
+  const r = await adminDb.delete('variable_costs', { id, tenant_slug: tenantSlug }, { tenantSlug })
+  if (!r.ok) {
+    console.error('Error deleting variable cost:', r.error)
     return false
   }
   return true
@@ -1939,14 +1890,12 @@ export interface BusinessTargets {
 }
 
 export async function getBusinessTargets(tenantSlug: string): Promise<BusinessTargets> {
-  const { data, error } = await supabase
-    .from('business_targets')
-    .select('*')
-    .eq('tenant_slug', tenantSlug)
-    .single()
-  
-  if (error || !data) {
-    // Return defaults
+  const r = await adminDb.select<BusinessTargets>('business_targets', {
+    tenantSlug,
+    select: '*',
+    single: 'maybe',
+  })
+  if (!r.ok || !r.data) {
     return {
       tenant_slug: tenantSlug,
       target_profit_margin: 25,
@@ -1956,19 +1905,16 @@ export async function getBusinessTargets(tenantSlug: string): Promise<BusinessTa
       target_average_ticket: 15,
     }
   }
-  return data
+  return r.data as BusinessTargets
 }
 
 export async function saveBusinessTargets(targets: BusinessTargets): Promise<boolean> {
-  const { error } = await supabase
-    .from('business_targets')
-    .upsert({
-      ...targets,
-      updated_at: new Date().toISOString()
-    }, { onConflict: 'tenant_slug' })
-  
-  if (error) {
-    console.error('Error saving business targets:', error)
+  const r = await adminDb.upsert('business_targets', {
+    ...targets,
+    updated_at: new Date().toISOString(),
+  }, { tenantSlug: targets.tenant_slug, onConflict: 'tenant_slug' })
+  if (!r.ok) {
+    console.error('Error saving business targets:', r.error)
     return false
   }
   return true
@@ -2234,123 +2180,96 @@ export interface Staff {
 }
 
 export async function getStaff(tenantSlug: string): Promise<Staff[]> {
-  const { data, error } = await supabase
-    .from('staff')
-    .select('*')
-    .eq('tenant_slug', tenantSlug)
-    .order('name', { ascending: true })
-  
-  if (error) {
-    console.error('Error fetching staff:', error)
+  const r = await adminDb.select<Staff[]>('staff', {
+    tenantSlug,
+    select: '*',
+    order: { column: 'name', ascending: true },
+  })
+  if (!r.ok) {
+    console.error('Error fetching staff:', r.error)
     return []
   }
-  return data || []
+  return r.data || []
 }
 
 export async function getActiveStaff(tenantSlug: string): Promise<Staff[]> {
-  const { data, error } = await supabase
-    .from('staff')
-    .select('*')
-    .eq('tenant_slug', tenantSlug)
-    .eq('is_active', true)
-    .order('name', { ascending: true })
-  
-  if (error) {
-    console.error('Error fetching active staff:', error)
+  const r = await adminDb.select<Staff[]>('staff', {
+    tenantSlug,
+    select: '*',
+    match: { is_active: true },
+    order: { column: 'name', ascending: true },
+  })
+  if (!r.ok) {
+    console.error('Error fetching active staff:', r.error)
     return []
   }
-  return data || []
+  return r.data || []
 }
 
 export async function saveStaff(staff: Staff): Promise<Staff | null> {
-  if (staff.id) {
-    const { data, error } = await supabase
-      .from('staff')
-      .update({
-        name: staff.name,
-        email: staff.email,
-        phone: staff.phone,
-        pin: staff.pin,
-        role: staff.role,
-        color: staff.color,
-        contract_type: staff.contract_type,
-        hours_per_week: staff.hours_per_week,
-        hourly_rate: staff.hourly_rate,
-        contract_start: staff.contract_start,
-        contract_end: staff.contract_end,
-        contract_notes: staff.contract_notes,
-        commute_distance_km: staff.commute_distance_km,
-        has_meal_vouchers: staff.has_meal_vouchers,
-        km_rate: staff.km_rate,
-        is_active: staff.is_active,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', staff.id)
-      .select()
-      .single()
-    
-    if (error) {
-      console.error('Error updating staff:', error)
-      return null
-    }
-    return data
-  } else {
-    const { data, error } = await supabase
-      .from('staff')
-      .insert({
-        tenant_slug: staff.tenant_slug,
-        name: staff.name,
-        email: staff.email,
-        phone: staff.phone,
-        pin: staff.pin,
-        role: staff.role,
-        color: staff.color,
-        contract_type: staff.contract_type,
-        hours_per_week: staff.hours_per_week,
-        hourly_rate: staff.hourly_rate,
-        contract_start: staff.contract_start,
-        contract_end: staff.contract_end,
-        contract_notes: staff.contract_notes,
-        commute_distance_km: staff.commute_distance_km,
-        has_meal_vouchers: staff.has_meal_vouchers,
-        km_rate: staff.km_rate,
-        is_active: staff.is_active ?? true,
-      })
-      .select()
-      .single()
-    
-    if (error) {
-      console.error('Error creating staff:', error)
-      return null
-    }
-    return data
+  const payload = {
+    name: staff.name,
+    email: staff.email,
+    phone: staff.phone,
+    pin: staff.pin,
+    role: staff.role,
+    color: staff.color,
+    contract_type: staff.contract_type,
+    hours_per_week: staff.hours_per_week,
+    hourly_rate: staff.hourly_rate,
+    contract_start: staff.contract_start,
+    contract_end: staff.contract_end,
+    contract_notes: staff.contract_notes,
+    commute_distance_km: staff.commute_distance_km,
+    has_meal_vouchers: staff.has_meal_vouchers,
+    km_rate: staff.km_rate,
+    is_active: staff.is_active,
   }
+  if (staff.id) {
+    const r = await adminDb.update<Staff[]>(
+      'staff',
+      { ...payload, updated_at: new Date().toISOString() },
+      { id: staff.id, tenant_slug: staff.tenant_slug },
+      { tenantSlug: staff.tenant_slug, select: '*' }
+    )
+    if (!r.ok) {
+      console.error('Error updating staff:', r.error)
+      return null
+    }
+    return Array.isArray(r.data) ? r.data[0] || null : (r.data as any) || null
+  }
+  const r = await adminDb.insert<Staff[]>(
+    'staff',
+    { ...payload, tenant_slug: staff.tenant_slug, is_active: staff.is_active ?? true },
+    { tenantSlug: staff.tenant_slug, select: '*' }
+  )
+  if (!r.ok) {
+    console.error('Error creating staff:', r.error)
+    return null
+  }
+  return Array.isArray(r.data) ? r.data[0] || null : (r.data as any) || null
 }
 
-export async function deleteStaff(id: string): Promise<boolean> {
-  const { error } = await supabase
-    .from('staff')
-    .delete()
-    .eq('id', id)
-  
-  if (error) {
-    console.error('Error deleting staff:', error)
+export async function deleteStaff(id: string, tenantSlug: string): Promise<boolean> {
+  const r = await adminDb.delete('staff', { id, tenant_slug: tenantSlug }, { tenantSlug })
+  if (!r.ok) {
+    console.error('Error deleting staff:', r.error)
     return false
   }
   return true
 }
 
 export async function verifyStaffPin(tenantSlug: string, pin: string): Promise<Staff | null> {
-  const { data, error } = await supabase
-    .from('staff')
-    .select('*')
-    .eq('tenant_slug', tenantSlug)
-    .eq('pin', pin)
-    .eq('is_active', true)
-    .single()
-  
-  if (error) return null
-  return data
+  // PIN-verificatie hoort eigenlijk server-side te draaien (timing-safe compare,
+  // rate-limit). Voor nu via read-proxy zodat anon de staff-tabel niet kan zien.
+  const r = await adminDb.select<Staff[]>('staff', {
+    tenantSlug,
+    select: '*',
+    match: { pin, is_active: true },
+    single: 'one',
+  })
+  if (!r.ok) return null
+  return (r.data as any) || null
 }
 
 // =====================================================
@@ -2409,24 +2328,22 @@ export async function getTimesheetEntries(
   month: number
 ): Promise<TimesheetEntry[]> {
   const startDate = `${year}-${String(month).padStart(2, '0')}-01`
-  // Get last day of month correctly
   const lastDay = new Date(year, month, 0).getDate()
   const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
-  
-  const { data, error } = await supabase
-    .from('timesheet_entries')
-    .select('*')
-    .eq('tenant_slug', tenantSlug)
-    .eq('staff_id', staffId)
-    .gte('date', startDate)
-    .lte('date', endDate)
-    .order('date', { ascending: true })
-  
-  if (error) {
-    console.error('Error fetching timesheet entries:', error)
+
+  const r = await adminDb.select<TimesheetEntry[]>('timesheet_entries', {
+    tenantSlug,
+    select: '*',
+    match: { staff_id: staffId },
+    gte: { date: startDate },
+    lte: { date: endDate },
+    order: { column: 'date', ascending: true },
+  })
+  if (!r.ok) {
+    console.error('Error fetching timesheet entries:', r.error)
     return []
   }
-  return data || []
+  return r.data || []
 }
 
 export async function getAllTimesheetEntries(
@@ -2436,20 +2353,19 @@ export async function getAllTimesheetEntries(
 ): Promise<TimesheetEntry[]> {
   const startDate = `${year}-${String(month).padStart(2, '0')}-01`
   const endDate = `${year}-${String(month).padStart(2, '0')}-31`
-  
-  const { data, error } = await supabase
-    .from('timesheet_entries')
-    .select('*')
-    .eq('tenant_slug', tenantSlug)
-    .gte('date', startDate)
-    .lte('date', endDate)
-    .order('date', { ascending: true })
-  
-  if (error) {
-    console.error('Error fetching all timesheet entries:', error)
+
+  const r = await adminDb.select<TimesheetEntry[]>('timesheet_entries', {
+    tenantSlug,
+    select: '*',
+    gte: { date: startDate },
+    lte: { date: endDate },
+    order: { column: 'date', ascending: true },
+  })
+  if (!r.ok) {
+    console.error('Error fetching all timesheet entries:', r.error)
     return []
   }
-  return data || []
+  return r.data || []
 }
 
 export async function saveTimesheetEntry(entry: TimesheetEntry): Promise<TimesheetEntry | null> {
@@ -2479,44 +2395,35 @@ export async function saveTimesheetEntry(entry: TimesheetEntry): Promise<Timeshe
     updated_at: new Date().toISOString(),
   }
   
-  // Als we een ID hebben, update die specifieke entry
   if (entry.id) {
-    const { data, error } = await supabase
-      .from('timesheet_entries')
-      .update(entryData)
-      .eq('id', entry.id)
-      .select()
-      .single()
-    
-    if (error) {
-      console.error('Error updating timesheet entry:', error)
+    const r = await adminDb.update<TimesheetEntry[]>(
+      'timesheet_entries',
+      entryData,
+      { id: entry.id, tenant_slug: entry.tenant_slug },
+      { tenantSlug: entry.tenant_slug, select: '*' }
+    )
+    if (!r.ok) {
+      console.error('Error updating timesheet entry:', r.error)
       return null
     }
-    return data
+    return Array.isArray(r.data) ? r.data[0] || null : (r.data as any) || null
   }
-  
-  // Anders insert nieuwe entry
-  const { data, error } = await supabase
-    .from('timesheet_entries')
-    .insert(entryData)
-    .select()
-    .single()
-  
-  if (error) {
-    console.error('Error saving timesheet entry:', error)
+
+  const r = await adminDb.insert<TimesheetEntry[]>('timesheet_entries', entryData, {
+    tenantSlug: entry.tenant_slug,
+    select: '*',
+  })
+  if (!r.ok) {
+    console.error('Error saving timesheet entry:', r.error)
     return null
   }
-  return data
+  return Array.isArray(r.data) ? r.data[0] || null : (r.data as any) || null
 }
 
-export async function deleteTimesheetEntry(id: string): Promise<boolean> {
-  const { error } = await supabase
-    .from('timesheet_entries')
-    .delete()
-    .eq('id', id)
-  
-  if (error) {
-    console.error('Error deleting timesheet entry:', error)
+export async function deleteTimesheetEntry(id: string, tenantSlug: string): Promise<boolean> {
+  const r = await adminDb.delete('timesheet_entries', { id, tenant_slug: tenantSlug }, { tenantSlug })
+  if (!r.ok) {
+    console.error('Error deleting timesheet entry:', r.error)
     return false
   }
   return true
@@ -2529,24 +2436,40 @@ export async function approveTimesheetEntries(
   month: number,
   approvedById: string
 ): Promise<boolean> {
+  // De write-proxy ondersteunt geen gte/lte WHERE; we lezen eerst de IDs op
+  // (read-proxy heeft wel gte/lte) en updaten daarna per ID.
   const startDate = `${year}-${String(month).padStart(2, '0')}-01`
   const lastDay = new Date(year, month, 0).getDate()
   const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
-  
-  const { error } = await supabase
-    .from('timesheet_entries')
-    .update({ 
-      is_approved: true, 
-      approved_by: approvedById,
-      approved_at: new Date().toISOString()
-    })
-    .eq('tenant_slug', tenantSlug)
-    .eq('staff_id', staffId)
-    .gte('date', startDate)
-    .lte('date', endDate)
-  
-  if (error) {
-    console.error('Error approving timesheet entries:', error)
+
+  const idsRes = await adminDb.select<Array<{ id: string }>>('timesheet_entries', {
+    tenantSlug,
+    select: 'id',
+    match: { staff_id: staffId },
+    gte: { date: startDate },
+    lte: { date: endDate },
+  })
+  if (!idsRes.ok) {
+    console.error('Error fetching timesheet entries to approve:', idsRes.error)
+    return false
+  }
+  const ids = (idsRes.data || []).map((r) => r.id)
+  if (ids.length === 0) return true
+
+  const approvedAt = new Date().toISOString()
+  const results = await Promise.all(
+    ids.map((id) =>
+      adminDb.update(
+        'timesheet_entries',
+        { is_approved: true, approved_by: approvedById, approved_at: approvedAt },
+        { id, tenant_slug: tenantSlug },
+        { tenantSlug }
+      )
+    )
+  )
+  const failed = results.filter((r) => !r.ok)
+  if (failed.length > 0) {
+    console.error('Error approving timesheet entries:', failed.map((r) => r.error))
     return false
   }
   return true
@@ -2589,20 +2512,17 @@ export async function getMonthlyTimesheet(
   year: number, 
   month: number
 ): Promise<MonthlyTimesheet | null> {
-  const { data, error } = await supabase
-    .from('monthly_timesheets')
-    .select('*')
-    .eq('tenant_slug', tenantSlug)
-    .eq('staff_id', staffId)
-    .eq('year', year)
-    .eq('month', month)
-    .maybeSingle()
-
-  if (error) {
-    console.error('getMonthlyTimesheet:', error)
+  const r = await adminDb.select<MonthlyTimesheet>('monthly_timesheets', {
+    tenantSlug,
+    select: '*',
+    match: { staff_id: staffId, year, month },
+    single: 'maybe',
+  })
+  if (!r.ok) {
+    console.error('getMonthlyTimesheet:', r.error)
     return null
   }
-  return data
+  return (r.data as any) || null
 }
 
 export async function generateMonthlyTimesheet(
@@ -2611,15 +2531,15 @@ export async function generateMonthlyTimesheet(
   year: number, 
   month: number
 ): Promise<MonthlyTimesheet | null> {
-  // Get all entries for this month
   const entries = await getTimesheetEntries(tenantSlug, staffId, year, month)
-  
-  // Get staff info for contracted hours
-  const { data: staff } = await supabase
-    .from('staff')
-    .select('hours_per_week')
-    .eq('id', staffId)
-    .single()
+
+  const staffRes = await adminDb.select<Array<{ hours_per_week?: number }>>('staff', {
+    tenantSlug,
+    select: 'hours_per_week',
+    match: { id: staffId },
+    single: 'maybe',
+  })
+  const staff = (staffRes.ok ? (staffRes.data as any) : null) as { hours_per_week?: number } | null
   
   // Calculate hours by absence type
   const totals: Record<string, number> = {
@@ -2676,17 +2596,16 @@ export async function generateMonthlyTimesheet(
     is_closed: false,
   }
   
-  const { data, error } = await supabase
-    .from('monthly_timesheets')
-    .upsert(timesheetData, { onConflict: 'tenant_slug,staff_id,year,month' })
-    .select()
-    .single()
-  
-  if (error) {
-    console.error('Error generating monthly timesheet:', error)
+  const r = await adminDb.upsert<MonthlyTimesheet[]>(
+    'monthly_timesheets',
+    timesheetData as unknown as Record<string, unknown>,
+    { tenantSlug, onConflict: 'tenant_slug,staff_id,year,month', select: '*' }
+  )
+  if (!r.ok) {
+    console.error('Error generating monthly timesheet:', r.error)
     return null
   }
-  return data
+  return Array.isArray(r.data) ? r.data[0] || null : (r.data as any) || null
 }
 
 export async function closeMonthlyTimesheet(
@@ -2702,25 +2621,21 @@ export async function closeMonthlyTimesheet(
     return null
   }
 
-  const { data, error } = await supabase
-    .from('monthly_timesheets')
-    .update({
+  const r = await adminDb.update<MonthlyTimesheet[]>(
+    'monthly_timesheets',
+    {
       is_closed: true,
       closed_by: closedById,
       closed_at: new Date().toISOString(),
-    })
-    .eq('tenant_slug', tenantSlug)
-    .eq('staff_id', staffId)
-    .eq('year', year)
-    .eq('month', month)
-    .select()
-    .single()
-
-  if (error) {
-    console.error('Error closing monthly timesheet:', error)
+    },
+    { tenant_slug: tenantSlug, staff_id: staffId, year, month },
+    { tenantSlug, select: '*' }
+  )
+  if (!r.ok) {
+    console.error('Error closing monthly timesheet:', r.error)
     return null
   }
-  return data
+  return Array.isArray(r.data) ? r.data[0] || null : (r.data as any) || null
 }
 
 export async function markTimesheetExported(
@@ -2729,16 +2644,14 @@ export async function markTimesheetExported(
   year: number, 
   month: number
 ): Promise<boolean> {
-  const { error } = await supabase
-    .from('monthly_timesheets')
-    .update({ exported_at: new Date().toISOString() })
-    .eq('tenant_slug', tenantSlug)
-    .eq('staff_id', staffId)
-    .eq('year', year)
-    .eq('month', month)
-  
-  if (error) {
-    console.error('Error marking timesheet exported:', error)
+  const r = await adminDb.update(
+    'monthly_timesheets',
+    { exported_at: new Date().toISOString() },
+    { tenant_slug: tenantSlug, staff_id: staffId, year, month },
+    { tenantSlug }
+  )
+  if (!r.ok) {
+    console.error('Error marking timesheet exported:', r.error)
     return false
   }
   return true
@@ -2752,21 +2665,19 @@ export async function reopenMonthlyTimesheet(
   reopenedById: string,
   reason: string
 ): Promise<boolean> {
-  const { error } = await supabase
-    .from('monthly_timesheets')
-    .update({ 
+  const r = await adminDb.update(
+    'monthly_timesheets',
+    {
       is_closed: false,
       reopened_at: new Date().toISOString(),
       reopened_by: reopenedById,
       reopen_reason: reason,
-    })
-    .eq('tenant_slug', tenantSlug)
-    .eq('staff_id', staffId)
-    .eq('year', year)
-    .eq('month', month)
-  
-  if (error) {
-    console.error('Error reopening monthly timesheet:', error)
+    },
+    { tenant_slug: tenantSlug, staff_id: staffId, year, month },
+    { tenantSlug }
+  )
+  if (!r.ok) {
+    console.error('Error reopening monthly timesheet:', r.error)
     return false
   }
   return true

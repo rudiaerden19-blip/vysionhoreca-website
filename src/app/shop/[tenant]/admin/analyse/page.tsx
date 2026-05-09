@@ -438,9 +438,9 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
     if (!deleteConfirm) return
     setDeleteWorking(true)
     try {
-      if (deleteConfirm.type === 'kassa') await deleteDailySales(deleteConfirm.id)
-      else if (deleteConfirm.type === 'fixed') await deleteFixedCost(deleteConfirm.id)
-      else await deleteVariableCost(deleteConfirm.id)
+      if (deleteConfirm.type === 'kassa') await deleteDailySales(deleteConfirm.id, params.tenant)
+      else if (deleteConfirm.type === 'fixed') await deleteFixedCost(deleteConfirm.id, params.tenant)
+      else await deleteVariableCost(deleteConfirm.id, params.tenant)
       setDeleteConfirm(null)
       await loadData()
     } finally {

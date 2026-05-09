@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { adminDb } from '@/lib/admin-db-client'
 import { useLanguage } from '@/i18n'
 
 export default function AnalysePage() {
@@ -26,12 +27,15 @@ export default function AnalysePage() {
       
       const [ordersRes, costsRes] = await Promise.all([
         supabase.from('orders').select('*').eq('tenant_slug', tenant.tenant_slug),
-        supabase.from('fixed_costs').select('*').eq('business_id', tenant.business_id),
+        adminDb.select<any[]>('fixed_costs', {
+          tenantSlug: tenant.tenant_slug,
+          select: '*',
+        }),
       ])
 
       if (ordersRes.error) throw ordersRes.error
       setOrders(ordersRes.data || [])
-      setFixedCosts(costsRes.data || [])
+      setFixedCosts(costsRes.ok && Array.isArray(costsRes.data) ? costsRes.data : [])
     } catch (error) {
       console.error('Error fetching data:', error)
     } finally {

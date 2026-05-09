@@ -283,7 +283,7 @@ export default function UrenPage() {
     if (!entry.id) return false
     if (!(await ask(t('urenPage.confirmDeleteHours')))) return false
 
-    const success = await deleteTimesheetEntry(entry.id)
+    const success = await deleteTimesheetEntry(entry.id, tenant)
     if (success) {
       loadData()
     }
