@@ -25,61 +25,43 @@ jobs:
         working-directory: apps/vysion-print-agent
         run: npm ci
 
-      - name: Bouw installer (.exe)
+      - name: Bouw installer + portable map
         working-directory: apps/vysion-print-agent
         run: npm run dist
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
 
-      - name: Bouw portable map (geen installatie nodig)
-        working-directory: apps/vysion-print-agent
-        run: npx electron-builder --dir --win --x64
+      - name: Toon dist-inhoud (debug)
+        shell: pwsh
+        run: Get-ChildItem "apps/vysion-print-agent/dist" -Recurse -Depth 1 | Select-Object FullName
 
-      - name: Maak START.bat voor portable versie
+      - name: Maak USB ZIP van portable map
         shell: pwsh
         run: |
-          $portableDir = Get-ChildItem "apps/vysion-print-agent/dist/win-unpacked" -ErrorAction SilentlyContinue
-          if (-not $portableDir) {
-            $portableDir = Get-ChildItem "apps/vysion-print-agent/dist" -Directory | Where-Object { $_.Name -like "*unpacked*" } | Select-Object -First 1
+          $dist = "apps/vysion-print-agent/dist"
+
+          # electron-builder --nsis maakt altijd een win-unpacked map naast de Setup.exe
+          $unpacked = Join-Path $dist "win-unpacked"
+          if (-not (Test-Path $unpacked)) {
+            # Fallback: zoek map met "unpacked" in naam
+            $found = Get-ChildItem $dist -Directory | Where-Object { $_.Name -like "*unpacked*" } | Select-Object -First 1
+            if ($found) { $unpacked = $found.FullName }
+            else { throw "Geen win-unpacked map gevonden. Controleer de dist-inhoud hierboven." }
           }
-          $targetDir = "apps/vysion-print-agent/dist/VysionPrintAgent-USB"
+
+          $targetDir = Join-Path $dist "VysionPrintAgent-USB"
           New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
+          Copy-Item -Path "$unpacked\*" -Destination $targetDir -Recurse -Force
 
-          # Kopieer portable map
-          Copy-Item -Path "apps/vysion-print-agent/dist/win-unpacked/*" -Destination $targetDir -Recurse -Force
-
-          # Maak START.bat
-          $startBat = @'
-@echo off
-chcp 65001 >nul
-echo.
-echo  Vysion Print Agent wordt gestart...
-echo  Sluit dit venster NIET — de agent draait in de achtergrond.
-echo.
-start "" "%~dp0Vysion Print Agent.exe"
-'@
+          $startBat = "@echo off`r`nchcp 65001 >nul`r`necho.`r`necho  Vysion Print Agent wordt gestart...`r`necho  Het icoon verschijnt rechtsonder in de taakbalk.`r`necho.`r`nstart `"`" `"%~dp0Vysion Print Agent.exe`"`r`n"
           Set-Content -LiteralPath "$targetDir\START.bat" -Value $startBat -Encoding OEM
 
-          # Maak LEES-MIJ.txt
-          $readme = @'
-Vysion Print Agent — USB Versie (geen installatie nodig)
-=========================================================
-
-1. Kopieer deze hele map naar de kassa-pc (bureau of C:\VysionPrint)
-2. Dubbelklik START.bat  -OF-  dubbelklik "Vysion Print Agent.exe"
-3. Het Vysion icoon verschijnt rechtsonder in de taakbalk
-4. Klik op het icoon → kies de juiste Epson printer → Opslaan
-5. Klaar! De kassa print nu automatisch via USB
-
-TIP: Zet een snelkoppeling van START.bat in de Windows Autostart-map
-     zodat de agent automatisch start bij Windows aanmelden.
-     (Win+R → shell:startup → snelkoppeling plakken)
-
-GEEN INTERNET NODIG na het kopiëren van deze map.
-'@
+          $readme = "Vysion Print Agent - USB versie`r`n================================`r`n`r`n1. Kopieer deze map naar de kassa-pc (bv. C:\VysionPrint)`r`n2. Dubbelklik START.bat`r`n3. Vysion icoon rechtsonder -> kies Epson printer -> Opslaan`r`n4. Klaar! Geen installatie nodig.`r`n`r`nAutostart: snelkoppeling van START.bat in shell:startup plaatsen.`r`n"
           Set-Content -LiteralPath "$targetDir\LEES-MIJ.txt" -Value $readme -Encoding UTF8
 
-          # Maak ZIP
-          Compress-Archive -Path "$targetDir\*" -DestinationPath "apps/vysion-print-agent/dist/Vysion-Print-Agent-USB.zip" -Force
-          Write-Host "USB ZIP klaar" -ForegroundColor Green
+          $zipPath = Join-Path $dist "Vysion-Print-Agent-USB.zip"
+          Compress-Archive -Path "$targetDir\*" -DestinationPath $zipPath -Force
+          Write-Host "USB ZIP klaar: $zipPath" -ForegroundColor Green
 
       - name: Vaste bestandsnaam installer
         shell: pwsh
