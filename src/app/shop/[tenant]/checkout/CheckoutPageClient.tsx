@@ -330,45 +330,15 @@ export default function CheckoutPageClient({
     setSubmitting(true)
     
     try {
-      // Get next order number for this tenant
-      // We need the HIGHEST valid order number, not just the most recent
-      const { data: orders } = await supabase
-        .from('orders')
-        .select('order_number')
-        .eq('tenant_slug', params.tenant)
-        .order('order_number', { ascending: false })
-        .limit(10)
-      
-      // Find the highest VALID order number (must be a reasonable integer)
-      let highestValidNum = 1000
-      if (orders && orders.length > 0) {
-        for (const order of orders) {
-          // Parse as integer, handle strings and numbers
-          const num = typeof order.order_number === 'string' 
-            ? parseInt(order.order_number, 10) 
-            : Number(order.order_number)
-          
-          // Only accept reasonable order numbers (1001-9999)
-          if (!isNaN(num) && num >= 1001 && num <= 9999 && num > highestValidNum) {
-            highestValidNum = num
-          }
-        }
-      }
-      
-      // Next order number (max 9999, then wrap to 1001)
-      let nextOrderNumber = highestValidNum + 1
-      if (nextOrderNumber > 9999) {
-        nextOrderNumber = 1001
-      }
-      
-      console.log(`📦 Nieuw bestelnummer: ${nextOrderNumber} (hoogste gevonden: ${highestValidNum})`)
-
-      // Create order (business_id is optional - we use tenant_slug for identification)
+      // Ordernummer wordt server-side atomair toegekend door
+      // `orders_assign_webshop_order_number` (BEFORE INSERT trigger). De trigger
+      // overschrijft `order_number = 0` met een per-tenant volgnummer
+      // (`tenant_order_sequences`). Race-safe; geen client-side MAX+1 meer.
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
           tenant_slug: params.tenant,
-          order_number: nextOrderNumber,
+          order_number: 0,
           customer_name: customerInfo.name,
           customer_email: customerInfo.email || null,
           customer_phone: customerInfo.phone,
