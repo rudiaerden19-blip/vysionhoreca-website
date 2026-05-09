@@ -2,11 +2,43 @@
 
 const DEFAULT_AGENT_ORIGIN = 'http://127.0.0.1:9742'
 
+export type VysionPrintAgentItem = {
+  quantity: number
+  name: string
+  price: number
+  choices?: { name: string; price: number }[]
+}
+
+export type VysionPrintAgentOrderData = {
+  orderNumber: number | string
+  orderType?: string
+  tableNumber?: number | string | null
+  items: VysionPrintAgentItem[]
+  subtotal: number
+  tax: number
+  total: number
+  paymentMethod?: string
+}
+
+export type VysionPrintAgentBusinessInfo = {
+  name?: string
+  address?: string
+  postalCode?: string
+  city?: string
+  phone?: string
+  vatNumber?: string
+  website?: string
+  vatRate?: number
+}
+
 export type VysionPrintAgentBody = {
   winkelnaam?: string
   storeName?: string
   bonInhoud: string
   receiptText?: string
+  orderData?: VysionPrintAgentOrderData
+  businessInfo?: VysionPrintAgentBusinessInfo
+  copies?: number
 }
 
 function sleep(ms: number): Promise<void> {

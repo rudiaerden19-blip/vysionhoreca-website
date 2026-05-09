@@ -1528,6 +1528,32 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const agentOk = await sendToVysionPrintAgent({
       winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
       bonInhoud: bonLines.join('\n'),
+      copies: 2,
+      orderData: {
+        orderNumber: order.orderNumber,
+        orderType: order.orderType,
+        tableNumber: order.tableNumber || null,
+        items: order.items.map(i => ({
+          quantity: i.quantity,
+          name: i.product.name,
+          price: (i.product.price + (i.choices || []).reduce((s, c) => s + c.price, 0)) * i.quantity,
+          choices: (i.choices || []).map(c => ({ name: c.choiceName, price: c.price })),
+        })),
+        subtotal,
+        tax,
+        total: order.total,
+        paymentMethod: order.paymentMethod,
+      },
+      businessInfo: {
+        name: tenantInfo?.business_name,
+        address: tenantInfo?.address ?? undefined,
+        postalCode: tenantInfo?.postal_code ?? undefined,
+        city: tenantInfo?.city ?? undefined,
+        phone: tenantInfo?.phone ?? undefined,
+        vatNumber: tenantInfo?.btw_number ?? undefined,
+        website: tenantInfo?.website ?? undefined,
+        vatRate: tenantInfo?.btw_percentage ?? 6,
+      },
     })
     if (agentOk) return
 
