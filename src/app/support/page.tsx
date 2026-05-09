@@ -1,6 +1,7 @@
 'use client'
 
 import { Navigation, Footer } from '@/components'
+import Link from 'next/link'
 import { useState } from 'react'
 import { useLanguage } from '@/i18n/LanguageContext'
 
@@ -34,6 +35,34 @@ export default function SupportPage() {
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
               {t('supportPage.heroSubtitle')}
             </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-gray-100 bg-white py-12">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col gap-6 rounded-2xl bg-[#E3E3E3] p-6 md:flex-row md:items-center md:justify-between md:p-8">
+            <div className="flex gap-4">
+              <div
+                className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-[#3C4D6B] text-2xl text-white"
+                aria-hidden
+              >
+                🖨️
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">Bonprinter op de kassa (Windows)</h2>
+                <p className="mt-2 max-w-2xl text-gray-600">
+                  Vysion Print Agent koppelt je Epson aan de browser-kassa. Officiële download — op de Windows-pc bij
+                  de printer.
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/download/print-agent-windows"
+              className="inline-flex shrink-0 justify-center whitespace-nowrap rounded-xl bg-accent px-6 py-3 text-center font-bold text-white hover:opacity-95"
+            >
+              Download Print Agent
+            </Link>
           </div>
         </div>
       </section>
