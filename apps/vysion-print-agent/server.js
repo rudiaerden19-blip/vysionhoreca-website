@@ -36,19 +36,11 @@ const LINE_SPACING_N  = Buffer.from([ESC, 0x33, 0x1E])
 const CODEPAGE_PC858  = Buffer.from([ESC, 0x74, 0x13])
 /** Euro-byte in PC858. */
 const EURO_BYTE       = 0xd5
-/** Cash-drawer kick — 4 varianten in volgorde gestuurd zodat ÉÉN ervan
- *  werkt op elke combinatie van printer + drawer + pin (2 of 5):
- *   1) ESC p 0  : klassiek commando, drawer pin 2
- *   2) ESC p 1  : klassiek commando, drawer pin 5
- *   3) DLE DC4 m=1 pin 0 : real-time, pin 2 (Epson TM-T88V vereist soms dit)
- *   4) DLE DC4 m=1 pin 1 : real-time, pin 5
- *  Meerdere kicks na elkaar zijn onschadelijk; hoogstens "klikt" hij 2x. */
-const DRAWER_KICK     = Buffer.from([
-  ESC, 0x70, 0x00, 0x32, 0x32,        // ESC p 0 50 50  (pin 2)
-  ESC, 0x70, 0x01, 0x32, 0x32,        // ESC p 1 50 50  (pin 5)
-  0x10, 0x14, 0x01, 0x00, 0x32,       // DLE DC4 1 0 50 (real-time, pin 2)
-  0x10, 0x14, 0x01, 0x01, 0x32,       // DLE DC4 1 1 50 (real-time, pin 5)
-])
+/** Cash-drawer kick: ESC p 0 50 50 — pulse op pin 2 (~100ms).
+ *  Dit is exact het commando dat de Epson APD driver-test gebruikt.
+ *  Voor TM-T88V: als RAW write deze bytes filtert door APD, gebruiken we
+ *  het GDI ExtEscape PASSTHROUGH-pad (zie open-drawer.ps1). */
+const DRAWER_KICK     = Buffer.from([ESC, 0x70, 0x00, 0x32, 0x32])
 
 /**
  * Encodeer tekst naar bytes voor de printer:
@@ -585,68 +577,98 @@ function encWithEuro(line) {
   return Buffer.concat([buf, Buffer.from([0x0a])])
 }
 
-function getPrintScriptPath() {
+function getScriptPath(scriptName) {
   try {
     const { app } = require('electron')
     if (app?.isPackaged && process.resourcesPath) {
-      const unpacked = path.join(process.resourcesPath, 'app.asar.unpacked', 'print-raw.ps1')
+      const unpacked = path.join(process.resourcesPath, 'app.asar.unpacked', scriptName)
       if (fs.existsSync(unpacked)) return unpacked
     }
   } catch {
     /* niet-Electron context */
   }
-  return path.join(__dirname, 'print-raw.ps1')
+  return path.join(__dirname, scriptName)
 }
 
-function printRawWindows(printerName, payloadBuffer) {
+function getPrintScriptPath() { return getScriptPath('print-raw.ps1') }
+function getDrawerScriptPath() { return getScriptPath('open-drawer.ps1') }
+
+/** Open de kassa-lade via PASSTHROUGH-escape (GDI) + RAW-write fallback.
+ *  Werkt op Epson APD die normale RAW drawer-bytes filtert. */
+function openCashDrawerWindows(printerName) {
+  const ps1 = getDrawerScriptPath()
+  if (!fs.existsSync(ps1)) {
+    return { ok: false, error: 'open-drawer.ps1 niet gevonden.' }
+  }
+  const r = spawnSync(
+    'powershell.exe',
+    ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', ps1, '-PrinterName', printerName],
+    { encoding: 'utf-8', maxBuffer: 1024 * 1024, timeout: 8000, windowsHide: true }
+  )
+  if (r.error) return { ok: false, error: String(r.error.message || r.error) }
+  if (r.status !== 0) {
+    const err = (r.stderr || r.stdout || '').trim() || `exit ${r.status}`
+    return { ok: false, error: err }
+  }
+  return { ok: true, info: (r.stdout || '').trim() }
+}
+
+/**
+ * Stuurt RAW ESC/POS bytes naar een Windows-printer met automatische retry.
+ *
+ *   1) Als attempt 1 faalt en de fout lijkt op "printer offline" of timeout
+ *      → wacht 800ms, probeer opnieuw met ESC @ (init) gependeld vooraan
+ *      zodat een hangende printer-buffer reset wordt
+ *   2) Tot maximaal 3 attempts, daarna ok=false
+ *
+ * Dit voorkomt dat 1 hapering (briefly disconnect, kabel-storing) een hele
+ * bestelling laat stuksluipen.
+ */
+function printRawWindows(printerName, payloadBuffer, attempt = 1) {
   const ps1 = getPrintScriptPath()
   if (!fs.existsSync(ps1)) {
     return { ok: false, error: 'print-raw.ps1 niet gevonden (installatie corrupt).' }
   }
-  const b64 = payloadBuffer.toString('base64')
-  /**
-   * Windows command-line max ~8191 chars; bon base64 overschrijdt dat snel → altijd via temp file.
-   * Random suffix voorkomt collisions bij snelle opeenvolgende prints (bv. copies=2 + 2e bestelling).
-   */
+  // Bij retry: prepend ESC @ zodat printer-firmware-buffer leeg start.
+  const buf = attempt === 1
+    ? payloadBuffer
+    : Buffer.concat([Buffer.from([0x1b, 0x40]), payloadBuffer])
+
+  const b64 = buf.toString('base64')
   const rand = crypto.randomBytes(8).toString('hex')
   const tmpFile = path.join(os.tmpdir(), `vysion-raw-${process.pid}-${Date.now()}-${rand}.b64`)
   try {
     fs.writeFileSync(tmpFile, b64, 'utf8')
     const r = spawnSync(
       'powershell.exe',
-      [
-        '-NoProfile',
-        '-ExecutionPolicy',
-        'Bypass',
-        '-File',
-        ps1,
-        '-PrinterName',
-        printerName,
-        '-Base64Path',
-        tmpFile,
-      ],
-      {
-        encoding: 'utf-8',
-        maxBuffer: 8 * 1024 * 1024,
-        /** Hard timeout: voorkomt dat een hangende PowerShell de hele agent blokkeert. */
-        timeout: 15000,
-        windowsHide: true,
-      }
+      ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', ps1, '-PrinterName', printerName, '-Base64Path', tmpFile],
+      { encoding: 'utf-8', maxBuffer: 8 * 1024 * 1024, timeout: 15000, windowsHide: true }
     )
     if (r.error) {
-      return { ok: false, error: String(r.error.message || r.error) }
+      const errMsg = String(r.error.message || r.error)
+      if (attempt < 3) {
+        console.warn(`[print] attempt ${attempt} fout: ${errMsg} — retry…`)
+        // 800ms wachten zodat USB-spool-driver kan recoveren
+        const end = Date.now() + 800
+        while (Date.now() < end) { /* sync wait */ }
+        return printRawWindows(printerName, payloadBuffer, attempt + 1)
+      }
+      return { ok: false, error: errMsg, attempts: attempt }
     }
     if (r.status !== 0) {
-      const err = (r.stderr || r.stdout || '').trim() || `exit ${r.status}`
-      return { ok: false, error: err }
+      const errOut = (r.stderr || r.stdout || '').trim() || `exit ${r.status}`
+      if (attempt < 3) {
+        console.warn(`[print] attempt ${attempt} status ${r.status}: ${errOut} — retry…`)
+        const end = Date.now() + 800
+        while (Date.now() < end) { /* sync wait */ }
+        return printRawWindows(printerName, payloadBuffer, attempt + 1)
+      }
+      return { ok: false, error: errOut, attempts: attempt }
     }
-    return { ok: true }
+    if (attempt > 1) console.info(`[print] gelukt na retry ${attempt}`)
+    return { ok: true, attempts: attempt }
   } finally {
-    try {
-      fs.unlinkSync(tmpFile)
-    } catch {
-      /* ignore */
-    }
+    try { fs.unlinkSync(tmpFile) } catch { /* ignore */ }
   }
 }
 
@@ -730,13 +752,13 @@ function createApp(getPrinterName /* () => string | null */) {
       return res.status(400).json({ success: false, error: 'Geen printer geconfigureerd.' })
     }
     try {
-      const buf = Buffer.concat([ESC_INIT, DRAWER_KICK])
-      const r = printRawWindows(printerName, buf)
+      // Gebruik PASSTHROUGH-escape (werkt op Epson APD); fallback in script naar RAW.
+      const r = openCashDrawerWindows(printerName)
       if (!r.ok) {
         console.error('[drawer] →', r.error)
         return res.status(500).json({ success: false, error: r.error })
       }
-      return res.json({ success: true })
+      return res.json({ success: true, info: r.info })
     } catch (e) {
       return res.status(500).json({ success: false, error: String(e?.message || e) })
     }
@@ -761,15 +783,13 @@ function createApp(getPrinterName /* () => string | null */) {
         ? Math.min(Math.max(body.copies, 1), 5)
         : 2
 
-      // Kassa-lade als APARTE print job vooraf — Epson firmware voert
-      // ESC p betrouwbaarder uit dan wanneer hij na CUT_PARTIAL zit.
+      // Kassa-lade via PASSTHROUGH-escape (driver pad dat APD niet filtert).
+      // Wordt vóór de bon-print verstuurd zodat de lade meteen opengaat
+      // wanneer de klant betaalt.
       const wantDrawer = body.openDrawer === true
       if (wantDrawer) {
-        const drawerOnly = Buffer.concat([ESC_INIT, DRAWER_KICK])
-        const dr = printRawWindows(printerName, drawerOnly)
-        if (!dr.ok) {
-          console.error('[print] drawer-kick →', dr.error)
-        }
+        const dr = openCashDrawerWindows(printerName)
+        if (!dr.ok) console.error('[print] drawer-kick →', dr.error)
         sleepSyncMs(200)
       }
 
@@ -809,6 +829,15 @@ function startServer(getPrinterName, port = 9742) {
   const srv = app.listen(port, '127.0.0.1', () => {
     console.log(`Vysion Print Agent luistert op http://127.0.0.1:${port}`)
   })
+  // Robuuster: bij EADDRINUSE niet crashen — log netjes en blijf draaien zonder
+  // server (de IPC-bridge in main.js werkt nog wel voor de Electron-kassa).
+  srv.on('error', (e) => {
+    if (e && e.code === 'EADDRINUSE') {
+      console.error(`[server] poort ${port} reeds in gebruik door andere instance.`)
+    } else {
+      console.error('[server] error', e)
+    }
+  })
   return srv
 }
 
@@ -817,6 +846,7 @@ module.exports = {
   startServer,
   buildEscPosPayload,
   printRawWindows,
+  openCashDrawerWindows,
   listWindowsPrintersSync,
   sleepSyncMs,
   DRAWER_KICK,

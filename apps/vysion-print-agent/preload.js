@@ -5,4 +5,7 @@ contextBridge.exposeInMainWorld('vysionAgent', {
   getConfig: () => ipcRenderer.invoke('config:get'),
   saveConfig: (partial) => ipcRenderer.invoke('config:save', partial),
   openKassa: () => ipcRenderer.invoke('kassa:open'),
+  testPrint: () => ipcRenderer.invoke('printer:test'),
+  testDrawer: () => ipcRenderer.invoke('printer:testDrawer'),
+  diagnose: () => ipcRenderer.invoke('agent:diagnose'),
 })
