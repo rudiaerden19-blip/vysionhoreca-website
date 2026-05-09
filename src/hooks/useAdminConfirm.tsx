@@ -55,26 +55,89 @@ export function useAdminConfirm(t: (key: string) => string) {
 
   function ConfirmModal() {
     if (!pending || !mounted || typeof document === 'undefined') return null
+    // Bewust ALLES inline-styled met max z-index. Tailwind classes worden
+    // soms door parent stacking contexts of cached layers verslagen; inline
+    // styles zijn lokaal en winnen altijd. zIndex 2147483647 = INT_MAX,
+    // hoger kan technisch niet.
+    const overlayStyle: React.CSSProperties = {
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      zIndex: 2147483647,
+      backgroundColor: 'rgba(0,0,0,0.55)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '1rem',
+      pointerEvents: 'auto',
+      WebkitTapHighlightColor: 'transparent',
+      touchAction: 'manipulation',
+    }
+    const cardStyle: React.CSSProperties = {
+      width: '100%',
+      maxWidth: '28rem',
+      borderRadius: '0.75rem',
+      backgroundColor: 'white',
+      boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
+      overflow: 'hidden',
+    }
+    const headerStyle: React.CSSProperties = {
+      borderBottom: '1px solid rgb(229,231,235)',
+      padding: '1.5rem',
+    }
+    const footerStyle: React.CSSProperties = {
+      display: 'flex',
+      justifyContent: 'flex-end',
+      gap: '0.75rem',
+      borderTop: '1px solid rgb(229,231,235)',
+      padding: '1.5rem',
+    }
+    const cancelBtnStyle: React.CSSProperties = {
+      minHeight: 44,
+      borderRadius: '0.5rem',
+      backgroundColor: 'rgb(243,244,246)',
+      color: 'rgb(55,65,81)',
+      padding: '0.5rem 1rem',
+      fontWeight: 500,
+      cursor: 'pointer',
+      border: 0,
+    }
+    const confirmBtnStyle: React.CSSProperties = {
+      minHeight: 44,
+      borderRadius: '0.5rem',
+      backgroundColor: 'rgb(37,99,235)',
+      color: 'white',
+      padding: '0.5rem 1.5rem',
+      fontWeight: 500,
+      cursor: 'pointer',
+      border: 0,
+    }
+
     const node = (
-      <div className="fixed inset-0 z-[135] flex touch-manipulation items-center justify-center bg-black/50 p-4 [-webkit-tap-highlight-color:transparent]">
-        <div className="w-full max-w-md rounded-xl bg-white shadow-xl">
-          <div className="border-b p-6">
-            <h2 className="text-xl font-bold text-gray-800">{t('adminPages.common.confirm')}</h2>
-            <p className="mt-2 whitespace-pre-wrap text-sm text-gray-600">{pending.message}</p>
-          </div>
-          <div className="flex justify-end gap-3 border-t p-6">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="min-h-[44px] touch-manipulation rounded-lg bg-gray-100 px-4 py-2 text-gray-700 [-webkit-tap-highlight-color:transparent] transition hover:bg-gray-200"
+      <div style={overlayStyle} data-admin-confirm-portal="v2">
+        <div style={cardStyle} onClick={(e) => e.stopPropagation()}>
+          <div style={headerStyle}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'rgb(31,41,55)' }}>
+              {t('adminPages.common.confirm')}
+            </h2>
+            <p
+              style={{
+                marginTop: '0.5rem',
+                whiteSpace: 'pre-wrap',
+                fontSize: '0.875rem',
+                color: 'rgb(75,85,99)',
+              }}
             >
+              {pending.message}
+            </p>
+          </div>
+          <div style={footerStyle}>
+            <button type="button" onClick={onCancel} style={cancelBtnStyle}>
               {t('adminPages.common.cancel')}
             </button>
-            <button
-              type="button"
-              onClick={onConfirm}
-              className="min-h-[44px] touch-manipulation rounded-lg bg-blue-600 px-6 py-2 text-white [-webkit-tap-highlight-color:transparent] transition hover:bg-blue-700"
-            >
+            <button type="button" onClick={onConfirm} style={confirmBtnStyle}>
               {t('adminPages.common.confirm')}
             </button>
           </div>
