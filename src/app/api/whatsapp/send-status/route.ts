@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
+import { apiRateLimiter, checkRateLimit } from '@/lib/rate-limit'
+import { logger } from '@/lib/logger'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -75,15 +78,42 @@ Neem contact op met {businessName} voor meer informatie. Onze excuses voor het o
 }
 
 export async function POST(request: NextRequest) {
+  const requestId = crypto.randomUUID()
   try {
     const body = await request.json()
     console.log('📨 WhatsApp send-status called with:', JSON.stringify(body))
-    
+
     const { tenantSlug, customerPhone, orderNumber, status, rejectionReason } = body
 
     if (!tenantSlug || !customerPhone || !orderNumber || !status) {
       console.log('❌ Missing required fields:', { tenantSlug, customerPhone, orderNumber, status })
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    }
+
+    // ── Auth: alleen ingelogde zaak-eigenaar of superadmin ─────────────────
+    // Status-updates worden aangeroepen vanuit admin/bestellingen, keuken
+    // en kassa — allemaal achter de admin-login. Zonder deze check kon
+    // iedereen via dit endpoint spam sturen via de tenant's WhatsApp-token.
+    const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
+    if (!access.authorized) {
+      logger.warn('whatsapp/send-status: unauthorized', { requestId, tenantSlug })
+      return NextResponse.json(
+        { error: access.error || 'Niet geautoriseerd' },
+        { status: 403 }
+      )
+    }
+
+    // ── Rate-limit per tenant (extra defense-in-depth) ─────────────────────
+    const actorId =
+      request.headers.get('x-business-id') ||
+      request.headers.get('x-superadmin-id') ||
+      'anon'
+    const rl = await checkRateLimit(apiRateLimiter, `wa-status:${tenantSlug}:${actorId}`)
+    if (!rl.success) {
+      return NextResponse.json(
+        { error: 'Te veel statusberichten. Probeer over 1 minuut opnieuw.' },
+        { status: 429, headers: { 'Retry-After': '60' } }
+      )
     }
 
     // Normalize tenant slug (remove hyphens for database lookup)

@@ -424,11 +424,14 @@ export default function CheckoutPageClient({
       // Send WhatsApp confirmation and redirect back to WhatsApp
       if (customerInfo.phone) {
         try {
-          // First send the confirmation message
+          // First send the confirmation message.
+          // Server valideert orderId+tenantSlug+customerPhone tegen DB en
+          // weigert oude orders (>15 min) — voorkomt spam via dit endpoint.
           await fetch('/api/whatsapp/send-confirmation', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+              orderId: order.id,
               tenantSlug: params.tenant,
               customerPhone: customerInfo.phone,
               orderNumber: order.order_number,

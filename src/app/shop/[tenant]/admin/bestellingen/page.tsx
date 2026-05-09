@@ -8,7 +8,7 @@ import { formatOrderScheduleDetail } from '@/lib/format-order-schedule'
 import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
 import { getSoundsEnabled } from '@/lib/sounds'
-import { getAuthHeaders } from '@/lib/auth-headers'
+import { authFetch, getAuthHeaders } from '@/lib/auth-headers'
 import { sendToVysionPrintAgent } from '@/lib/vysion-print-agent-client'
 
 // Parse items from JSONB
@@ -352,9 +352,8 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
       // Send WhatsApp confirmation to customer
       if (order.customer_phone) {
         try {
-          await fetch('/api/whatsapp/send-status', {
+          await authFetch('/api/whatsapp/send-status', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               tenantSlug: params.tenant,
               customerPhone: order.customer_phone,

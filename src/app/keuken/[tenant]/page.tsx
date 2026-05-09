@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { getTenantSettings, updateOrderStatus, isWebshopOrder } from '@/lib/admin-api'
+import { authFetch } from '@/lib/auth-headers'
 import { formatOrderScheduleDetail } from '@/lib/format-order-schedule'
 import { useLanguage } from '@/i18n'
 import Link from 'next/link'
@@ -240,9 +241,8 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     console.log('🔔 handleReady called, customer_phone:', order.customer_phone)
     if (order.customer_phone) {
       try {
-        const response = await fetch('/api/whatsapp/send-status', {
+        const response = await authFetch('/api/whatsapp/send-status', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             tenantSlug: params.tenant,
             customerPhone: order.customer_phone,
