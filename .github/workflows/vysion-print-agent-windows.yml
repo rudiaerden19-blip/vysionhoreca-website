@@ -1,4 +1,6 @@
-# Zie PRINT-AGENT-INSTALL.txt in de repo — directe .exe-link. Alleen bouwen: Run workflow.
+# Bouwt twee versies:
+#   1. Vysion-Print-Agent-Setup.exe  — klassieke installer (voor als SmartScreen toelaat)
+#   2. Vysion-Print-Agent-USB.zip    — portable map, geen installatie, rechtstreeks van USB stick
 name: Vysion Print Agent — Windows Setup
 
 on:
@@ -19,13 +21,67 @@ jobs:
           cache: 'npm'
           cache-dependency-path: apps/vysion-print-agent/package-lock.json
 
-      - name: npm ci & electron-builder
+      - name: npm ci
         working-directory: apps/vysion-print-agent
-        run: |
-          npm ci
-          npm run dist
+        run: npm ci
 
-      - name: Vaste bestandsnaam (website-downloadlink)
+      - name: Bouw installer (.exe)
+        working-directory: apps/vysion-print-agent
+        run: npm run dist
+
+      - name: Bouw portable map (geen installatie nodig)
+        working-directory: apps/vysion-print-agent
+        run: npx electron-builder --dir --win --x64
+
+      - name: Maak START.bat voor portable versie
+        shell: pwsh
+        run: |
+          $portableDir = Get-ChildItem "apps/vysion-print-agent/dist/win-unpacked" -ErrorAction SilentlyContinue
+          if (-not $portableDir) {
+            $portableDir = Get-ChildItem "apps/vysion-print-agent/dist" -Directory | Where-Object { $_.Name -like "*unpacked*" } | Select-Object -First 1
+          }
+          $targetDir = "apps/vysion-print-agent/dist/VysionPrintAgent-USB"
+          New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
+
+          # Kopieer portable map
+          Copy-Item -Path "apps/vysion-print-agent/dist/win-unpacked/*" -Destination $targetDir -Recurse -Force
+
+          # Maak START.bat
+          $startBat = @'
+@echo off
+chcp 65001 >nul
+echo.
+echo  Vysion Print Agent wordt gestart...
+echo  Sluit dit venster NIET — de agent draait in de achtergrond.
+echo.
+start "" "%~dp0Vysion Print Agent.exe"
+'@
+          Set-Content -LiteralPath "$targetDir\START.bat" -Value $startBat -Encoding OEM
+
+          # Maak LEES-MIJ.txt
+          $readme = @'
+Vysion Print Agent — USB Versie (geen installatie nodig)
+=========================================================
+
+1. Kopieer deze hele map naar de kassa-pc (bureau of C:\VysionPrint)
+2. Dubbelklik START.bat  -OF-  dubbelklik "Vysion Print Agent.exe"
+3. Het Vysion icoon verschijnt rechtsonder in de taakbalk
+4. Klik op het icoon → kies de juiste Epson printer → Opslaan
+5. Klaar! De kassa print nu automatisch via USB
+
+TIP: Zet een snelkoppeling van START.bat in de Windows Autostart-map
+     zodat de agent automatisch start bij Windows aanmelden.
+     (Win+R → shell:startup → snelkoppeling plakken)
+
+GEEN INTERNET NODIG na het kopiëren van deze map.
+'@
+          Set-Content -LiteralPath "$targetDir\LEES-MIJ.txt" -Value $readme -Encoding UTF8
+
+          # Maak ZIP
+          Compress-Archive -Path "$targetDir\*" -DestinationPath "apps/vysion-print-agent/dist/Vysion-Print-Agent-USB.zip" -Force
+          Write-Host "USB ZIP klaar" -ForegroundColor Green
+
+      - name: Vaste bestandsnaam installer
         shell: pwsh
         run: |
           $dist = "apps/vysion-print-agent/dist"
@@ -38,20 +94,34 @@ jobs:
           name: Vysion-Print-Agent-Setup
           path: apps/vysion-print-agent/dist/Vysion-Print-Agent-Setup.exe
 
-      - name: Release bijwerken (zelfde tag als downloadpagina)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Vysion-Print-Agent-USB
+          path: apps/vysion-print-agent/dist/Vysion-Print-Agent-USB.zip
+
+      - name: Release bijwerken
         uses: ncipollo/release-action@v1
         with:
           tag: vysion-print-agent-windows
           name: Vysion Print Agent (Windows)
           body: |
-            **Vysion-Print-Agent-Setup.exe**
+            ## Vysion Print Agent — Windows
 
-            1. Download hieronder.
-            2. Installeren; agent draait bij de klok.
-            3. Icoon → juiste Epson kiezen.
+            ### 🥇 Aanbevolen: USB versie (geen SmartScreen blokkering)
+            **→ Download `Vysion-Print-Agent-USB.zip`**
+            1. ZIP uitpakken op USB stick "usb disk" of rechtstreeks op de pc
+            2. Dubbelklik `START.bat`
+            3. Vysion icoon rechtsonder → kies Epson printer → Opslaan
+            4. Klaar — geen installatie nodig!
 
+            ### Klassieke installer (als SmartScreen toelaat)
+            Download `Vysion-Print-Agent-Setup.exe` en voer uit.
+
+            ---
             Build van branch `main` (GitHub Actions).
-          artifacts: apps/vysion-print-agent/dist/Vysion-Print-Agent-Setup.exe
+          artifacts: >
+            apps/vysion-print-agent/dist/Vysion-Print-Agent-Setup.exe,
+            apps/vysion-print-agent/dist/Vysion-Print-Agent-USB.zip
           allowUpdates: true
           replacesArtifacts: true
           token: ${{ secrets.GITHUB_TOKEN }}

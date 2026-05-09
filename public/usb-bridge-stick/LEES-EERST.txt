@@ -1,14 +1,43 @@
-Plaats beide bestanden in dezelfde map op een Windows-pc (met internet):
-  • MaakUsbStick.bat
-  • Prepare-UsbStick.ps1
+Vysion Print Agent — USB Stick installatie
+==========================================
 
-Dubbelklik MaakUsbStick.bat om lokaal te bouwen.
+STAP 1: Download de USB versie (ZIP)
+-------------------------------------
+Ga naar deze link op een pc MET internet (bijv. uw eigen laptop):
+  https://github.com/rudiaerden19-blip/vysionhoreca-website/releases/tag/vysion-print-agent-windows
 
-AANBEVOLEN: download de voorgebouwde ZIP van GitHub (Ordervysion → Instellingen → Bonprinter Windows),
-dan hoef je dit NIET — uitpakken op de kassa en START.bat.
+Download: Vysion-Print-Agent-USB.zip
+(GEEN installer .exe nodig — Edge blokkeert die niet)
 
----
 
-Heb je al uitgepakt en zegt Ordervysion «printer niet bereikbaar»?
-Download FIX-PRINT-CHECK.bat van dezelfde website-map en zet het naast START.bat en BRIDGE.
-Sluit START.bat, dubbelklik FIX-PRINT-CHECK.bat, daarna START.bat opnieuw.
+STAP 2: Kopieer naar USB stick "usb disk"
+------------------------------------------
+1. Steek de USB stick in (label: "usb disk")
+2. Pak de ZIP uit op de USB stick
+3. U heeft nu een map "VysionPrintAgent" op de USB stick
+
+
+STAP 3: Installeren op de kassa-pc
+------------------------------------
+1. Steek de USB stick in de kassa-pc
+2. Open de map VysionPrintAgent op de USB stick
+3. Dubbelklik START.bat
+4. Het Vysion icoontje verschijnt rechtsonder in de taakbalk
+5. Klik op het icoontje → kies de Epson TM-T88V printer → Opslaan
+6. Klaar! De kassa print nu automatisch via USB
+
+
+AUTOMATISCH STARTEN BIJ WINDOWS AANMELDEN
+------------------------------------------
+1. Kopieer de map VysionPrintAgent naar C:\VysionPrint op de kassa-pc
+2. Klik rechts op START.bat → Snelkoppeling maken
+3. Druk Win+R → typ: shell:startup → Enter
+4. Plak de snelkoppeling in die map
+
+
+PROBLEMEN?
+----------
+Printer niet bereikbaar na START.bat?
+→ Controleer of de Epson TM-T88V driver geïnstalleerd is in Windows
+→ Printers & scanners → zoek "EPSON TM-T88V" → als niet aanwezig: installeer Epson driver
+→ Klik Vysion icoon → kies juiste printernaam → Opslaan
