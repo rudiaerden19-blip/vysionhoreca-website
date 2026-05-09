@@ -18,7 +18,7 @@
   </style>
 </head>
 <body>
-  <h1>Vysion Print Agent</h1>
+  <h1>Vysion Print Agent <span id="version" style="font-weight:400;color:#666;font-size:0.85rem;"></span></h1>
   <p>
     <strong>Geen installer?</strong> Open op deze pc (geen Google nodig): <br />
     <a href="https://www.vysionhoreca.com/download/print-agent-windows" target="_blank" rel="noopener noreferrer">vysionhoreca.com/download/print-agent-windows</a><br />
@@ -31,13 +31,17 @@
   </p>
   <label for="pr">Printer</label>
   <select id="pr"></select>
-  <button type="button" id="save">Opslaan</button>
-  <div class="ok" id="ok">Opgeslagen. Je kunt dit venster sluiten — de agent blijft in het systeemvak draaien.</div>
+  <label for="kassaUrl" style="margin-top:8px;">Kassa URL</label>
+  <input type="url" id="kassaUrl" placeholder="https://vysionhoreca.vercel.app/shop/jouwtenant/admin/kassa"
+    style="width:100%;padding:10px;border-radius:8px;border:1px solid #ccc;font-size:0.9rem;margin-bottom:16px;box-sizing:border-box;" />
+  <button type="button" id="save">Opslaan &amp; Open Kassa</button>
+  <div class="ok" id="ok">Opgeslagen! Kassa opent automatisch.</div>
   <div class="err" id="err"></div>
   <script>
     const sel = document.getElementById('pr')
     const ok = document.getElementById('ok')
     const err = document.getElementById('err')
+    const urlInput = document.getElementById('kassaUrl')
 
     async function load() {
       err.style.display = 'none'
@@ -45,6 +49,9 @@
         window.vysionAgent.getConfig(),
         window.vysionAgent.listPrinters(),
       ])
+      if (cfg.kassaUrl) urlInput.value = cfg.kassaUrl
+      const ver = document.getElementById('version')
+      if (ver && cfg.agentVersion) ver.textContent = `v${cfg.agentVersion}`
       sel.innerHTML = ''
       if (!plist.ok || !plist.printers?.length) {
         err.textContent = plist.error || 'Geen printers gevonden in Windows.'
@@ -69,8 +76,15 @@
         err.style.display = 'block'
         return
       }
-      await window.vysionAgent.saveConfig({ printerName })
+      const kassaUrl = urlInput.value.trim()
+      if (!kassaUrl) {
+        err.textContent = 'Vul de kassa URL in.'
+        err.style.display = 'block'
+        return
+      }
+      await window.vysionAgent.saveConfig({ printerName, kassaUrl })
       ok.style.display = 'block'
+      setTimeout(() => window.vysionAgent.openKassa(), 800)
     }
 
     load()

@@ -49,16 +49,25 @@ async function postPrintOnce(
   body: VysionPrintAgentBody,
   origin: string
 ): Promise<boolean> {
+  /** Hard timeout zodat een hangende agent de UI niet 30s vastzet. */
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), 6000)
   try {
     const init: RequestInit = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         winkelnaam: body.winkelnaam ?? body.storeName,
+        storeName: body.storeName ?? body.winkelnaam,
         bonInhoud: body.bonInhoud ?? body.receiptText ?? '',
+        receiptText: body.receiptText ?? body.bonInhoud ?? '',
+        orderData: body.orderData,
+        businessInfo: body.businessInfo,
+        copies: body.copies,
       }),
       mode: 'cors',
       credentials: 'omit',
+      signal: controller.signal,
     }
     ;(init as RequestInit & { targetAddressSpace?: string }).targetAddressSpace = 'local'
 
@@ -67,6 +76,8 @@ async function postPrintOnce(
     return r.ok && data?.success === true
   } catch {
     return false
+  } finally {
+    clearTimeout(timer)
   }
 }
 
