@@ -2191,9 +2191,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* ── LINKS: hamburger ── */}
         <div className="relative z-20 flex shrink-0 items-center gap-2">
           <button onClick={() => { setHamburgerOpen(!hamburgerOpen); setHamburgerSubOpen(null) }}
-            className={`flex items-center gap-2 rounded-xl px-3 py-2 transition-colors ${hamburgerOpen ? 'bg-[#47c6fe] text-[#063042]' : 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'}`}>
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
-            <span className="font-bold text-sm">{t('kassaApp.hamburgerMenu')}</span>
+            className={`flex items-center gap-2 rounded-xl px-2 py-2 transition-colors sm:px-3 ${hamburgerOpen ? 'bg-[#47c6fe] text-[#063042]' : 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'}`}
+            type="button"
+            title={t('kassaApp.hamburgerMenu')}
+            aria-expanded={hamburgerOpen}
+          >
+            <svg className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+            <span className="hidden font-bold text-sm min-[1100px]:inline">{t('kassaApp.hamburgerMenu')}</span>
           </button>
           {hamburgerOpen && (() => {
             const modules = filteredHamburgerModules
@@ -2266,17 +2270,21 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           })()}
         </div>
 
-        {/* Tenant naam (min-w-0 + truncate …); z-20 nodig zodat hamburger-backdrop z-10 deze niet bedekt */}
-        <div className="relative z-20 flex min-w-0 flex-1 basis-0 items-center justify-center px-1 sm:px-2">
-          <span className="max-w-full truncate text-center text-base font-medium tracking-normal text-white sm:text-lg md:text-xl" title={(tenantInfo?.business_name ?? tenant)}>
+        {/* Tenant naam — max-breedte op smaller scherm zodat toolknoppen ruimte + scroll krijgen */}
+        <div className="relative z-20 flex min-w-0 max-w-[min(42vw,12rem)] shrink items-center justify-center px-1 sm:max-w-[min(38vw,16rem)] sm:px-2 md:max-w-[min(34vw,20rem)] lg:max-w-md xl:max-w-none xl:flex-1 xl:basis-0 xl:justify-center">
+          <span className="max-w-full truncate text-center text-sm font-medium tracking-normal text-white sm:text-base md:text-lg lg:text-xl" title={(tenantInfo?.business_name ?? tenant)}>
             {tenantInfo?.business_name ||
               tenant.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
           </span>
         </div>
 
-        {/* ── Compacte tools: horizontaal scrollen alleen voor knoppen; taal staat erbuiten (overflow sneed dropdown af) ── */}
-        <div className="relative z-20 flex max-h-[68px] min-w-0 flex-[1.25] basis-0 items-center justify-end gap-1">
-          <div className="flex min-h-0 min-w-0 max-h-[68px] flex-1 flex-nowrap items-center justify-end gap-1 overflow-x-auto overflow-y-hidden [-webkit-overflow-scrolling:touch] [scrollbar-width:thin]">
+        {/* ── Tools: scrollbare strip met inhoud links uitgelijnd (justify-end + overflow knipte “Reserveringen” weg op 15") ── */}
+        <div className="relative z-20 flex max-h-[68px] min-w-0 flex-1 basis-0 items-center gap-1">
+          <nav
+            aria-label={t('kassaApp.quickLinksAria')}
+            className="flex min-h-0 min-w-0 max-h-[68px] flex-1 overflow-x-auto overflow-y-hidden overscroll-x-contain py-0.5 [-webkit-overflow-scrolling:touch] [scrollbar-width:thin]"
+          >
+            <div className="flex w-max min-w-0 flex-nowrap items-center gap-1 pr-0.5">
 
           {effectiveAccess.reservaties && (
             <button
@@ -2286,10 +2294,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 setNewReservAlert(null)
                 setShowReservations(true)
               }}
+              title={t('kassaApp.navReservations')}
               className="relative inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-xl bg-[#3C4D6B] px-2 py-2 text-xs font-bold text-white transition-colors hover:bg-[#2D3A52] sm:gap-1.5 sm:px-3 sm:text-sm"
             >
               <span className="text-base sm:text-lg" aria-hidden>📅</span>
-              <span>{t('kassaApp.navReservations')}</span>
+              <span className="hidden min-[1536px]:inline">{t('kassaApp.navReservations')}</span>
               {pendingReservCount > 0 && (
                 <span className="absolute -right-1 -top-1.5 flex h-7 min-w-[26px] items-center justify-center rounded-full border-2 border-white bg-red-600 px-1.5 text-sm font-black text-white shadow-lg sm:-right-2 sm:-top-2">
                   {pendingReservCount}
@@ -2308,27 +2317,29 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <span className="text-base sm:text-lg" aria-hidden>
                 👤
               </span>
-              <span>{t('kassaApp.openCustomerDisplay')}</span>
+              <span className="hidden min-[1536px]:inline">{t('kassaApp.openCustomerDisplay')}</span>
             </button>
           )}
 
           {effectiveAccess['online-bestellingen'] && (
             <Link
               href={`/shop/${tenant}/display`}
+              title={t('kassaApp.navShopDisplay')}
               className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-xl bg-[#3C4D6B] px-2 py-2 text-xs font-bold text-white transition-colors hover:bg-[#2D3A52] sm:gap-1.5 sm:px-3 sm:text-sm"
             >
               <span className="text-base sm:text-lg" aria-hidden>🖥️</span>
-              <span>{t('kassaApp.navShopDisplay')}</span>
+              <span className="hidden min-[1536px]:inline">{t('kassaApp.navShopDisplay')}</span>
             </Link>
           )}
 
           {effectiveAccess['online-bestellingen'] && (
             <Link
               href={`/keuken/${tenant}`}
+              title={t('kassaApp.navKitchenDisplay')}
               className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-xl bg-[#3C4D6B] px-2 py-2 text-xs font-bold text-white transition-colors hover:bg-[#2D3A52] sm:gap-1.5 sm:px-3 sm:text-sm"
             >
               <span className="text-base sm:text-lg" aria-hidden>👨‍🍳</span>
-              <span>{t('kassaApp.navKitchenDisplay')}</span>
+              <span className="hidden min-[1536px]:inline">{t('kassaApp.navKitchenDisplay')}</span>
             </Link>
           )}
 
@@ -2363,7 +2374,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </div>
           )}
 
-          </div>
+            </div>
+          </nav>
 
           <div ref={langRef} className="relative z-[40] shrink-0">
             <button
@@ -2394,10 +2406,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         <button
           type="button"
           onClick={() => setLogoutSoftwareConfirmOpen(true)}
+          title={t('kassaApp.logout')}
           className="relative z-20 inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg bg-[#58CCFF] px-2 py-2 text-xs font-bold text-black transition-colors hover:bg-[#47c6fe] sm:gap-1.5 sm:px-3 sm:text-sm"
         >
           <span className="text-base sm:text-lg" aria-hidden>🚪</span>
-          <span>{t('kassaApp.logout')}</span>
+          <span className="hidden min-[1536px]:inline">{t('kassaApp.logout')}</span>
         </button>
 
       </div>
