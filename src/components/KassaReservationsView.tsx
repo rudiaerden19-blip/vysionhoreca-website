@@ -676,6 +676,7 @@ export default function KassaReservationsView({
       const adminRes = await adminDb.select<{ data?: unknown } | null>('floor_plan_tables', {
         tenantSlug: tenant,
         select: 'data',
+        match: { plan_zone: 'inside' },
         single: 'maybe',
       })
 
@@ -691,6 +692,7 @@ export default function KassaReservationsView({
           .from('floor_plan_tables')
           .select('data')
           .eq('tenant_slug', tenant)
+          .eq('plan_zone', 'inside')
           .maybeSingle()
         if (error) {
           console.error('[floor_plan_tables] load error:', error.message)
@@ -795,8 +797,8 @@ export default function KassaReservationsView({
     setFloorPlanTablesDB(updated)
     const r = await adminDb.upsert(
       'floor_plan_tables',
-      { tenant_slug: tenant, data: updated } as any,
-      { tenantSlug: tenant, onConflict: 'tenant_slug' }
+      { tenant_slug: tenant, plan_zone: 'inside', data: updated } as any,
+      { tenantSlug: tenant, onConflict: 'tenant_slug,plan_zone' },
     )
     if (!r.ok) {
       console.error('[floor_plan_tables] upsert:', r.error)
@@ -805,6 +807,7 @@ export default function KassaReservationsView({
         .from('floor_plan_tables')
         .select('data')
         .eq('tenant_slug', tenant)
+        .eq('plan_zone', 'inside')
         .maybeSingle()
       const raw = row?.data
       setFloorPlanTablesDB(Array.isArray(raw) ? (raw as FloorPlanTable[]) : [])

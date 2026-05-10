@@ -37,6 +37,7 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
       const adminRes = await adminDb.select<{ data?: unknown } | null>('floor_plan_tables', {
         tenantSlug: params.tenant,
         select: 'data',
+        match: { plan_zone: 'inside' },
         single: 'maybe',
       })
       let merged = false
@@ -50,6 +51,7 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
           .from('floor_plan_tables')
           .select('data')
           .eq('tenant_slug', params.tenant)
+          .eq('plan_zone', 'inside')
           .maybeSingle()
         if (!error) {
           if (data == null) applyPayload([])

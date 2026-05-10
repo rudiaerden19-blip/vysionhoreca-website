@@ -93,6 +93,15 @@ import {
 import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
 import { parseFloorPlanTablesJson, sanitizeFloorPlanTables, type FloorPlanTable } from '@/lib/kassa-floor-plan-tables'
 import {
+  FLOOR_PLAN_ZONE_INSIDE,
+  FLOOR_PLAN_ZONE_TERRACE,
+  migrateLegacyTableOrdersKeys,
+  normalizeFloorPlanZone,
+  parseTableOrderMapKey,
+  tableOrderMapKey,
+  type FloorPlanZone,
+} from '@/lib/kassa-floor-plan-zone'
+import {
   kassaCustomerDisplayChannelName,
   type KassaCustomerDisplayMessage,
   type KassaCustomerDisplayLine,
@@ -127,16 +136,23 @@ function stoolsFromFloorDecorPayload(data: unknown): { stoolNumber: string; segm
   return out
 }
 
+const KASSA_FLOOR_ZONES: FloorPlanZone[] = [FLOOR_PLAN_ZONE_INSIDE, FLOOR_PLAN_ZONE_TERRACE]
+
+function floorPlanTablesLocalStorageKey(tenantSlug: string, zone: FloorPlanZone): string {
+  return zone === FLOOR_PLAN_ZONE_INSIDE ? `vysion_tables_${tenantSlug}` : `vysion_tables_terrace_${tenantSlug}`
+}
+
 /** Open kassa-tafelorders: alleen rijen uit Supabase — geen merge met oude localStorage. */
 function buildOpenTableOrdersMapFromRows(
-  data: { table_number: string | null; items: unknown }[] | null | undefined
+  data: { table_number: string | null; items: unknown; floor_plan_zone?: string | null }[] | null | undefined,
 ): Record<string, CartItem[]> {
   const out: Record<string, CartItem[]> = {}
   if (!data?.length) return out
   for (const row of data) {
     const tn = row.table_number
     if (tn != null && String(tn) !== '' && row.items != null) {
-      out[String(tn)] = row.items as CartItem[]
+      const zone = normalizeFloorPlanZone(row.floor_plan_zone)
+      out[tableOrderMapKey(zone, String(tn))] = row.items as CartItem[]
     }
   }
   return out
@@ -161,7 +177,7 @@ function mergeOpenTableOrdersServerWithPendingLocal(
 }
 
 /** Rijen uit DB voor buildOpenTableOrdersMapFromRows — zelfde bron als adminDb-insert (service role). */
-type OpenTableOrderRow = { table_number: string | null; items: unknown }
+type OpenTableOrderRow = { table_number: string | null; items: unknown; floor_plan_zone?: string | null }
 
 /**
  * Open tafelmanden: lees via admin-proxy (service role), net als schrijven — alle kassa-pc's zien identieke data.
@@ -170,7 +186,7 @@ type OpenTableOrderRow = { table_number: string | null; items: unknown }
 async function fetchOpenTableOrdersForTenant(tenantSlug: string): Promise<OpenTableOrderRow[] | null> {
   const adminRes = await adminDb.select<OpenTableOrderRow[]>('orders', {
     tenantSlug: tenantSlug,
-    select: 'table_number, items',
+    select: 'table_number, items, floor_plan_zone',
     match: { status: 'open' },
     limit: 500,
   })
@@ -182,7 +198,7 @@ async function fetchOpenTableOrdersForTenant(tenantSlug: string): Promise<OpenTa
   }
   const { data, error } = await supabase
     .from('orders')
-    .select('table_number, items')
+    .select('table_number, items, floor_plan_zone')
     .eq('tenant_slug', tenantSlug)
     .eq('status', 'open')
     .limit(500)
@@ -627,8 +643,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [pendingReservCount, setPendingReservCount] = useState(0)
   const [showFloorPlan, setShowFloorPlan] = useState(false)
   const [showTablePicker, setShowTablePicker] = useState(false)
-  const [kassaTables, setKassaTables] = useState<FloorPlanTable[]>([])
-  const [kassaStools, setKassaStools] = useState<{ stoolNumber: string; segmentId: string }[]>([])
+  const [pickerBrowseZone, setPickerBrowseZone] = useState<FloorPlanZone>(FLOOR_PLAN_ZONE_INSIDE)
+  const [dineInFloorZone, setDineInFloorZone] = useState<FloorPlanZone>(FLOOR_PLAN_ZONE_INSIDE)
+  const [kassaTablesByZone, setKassaTablesByZone] = useState<Record<FloorPlanZone, FloorPlanTable[]>>({
+    inside: [],
+    terrace: [],
+  })
+  const [kassaStoolsByZone, setKassaStoolsByZone] = useState<
+    Record<FloorPlanZone, { stoolNumber: string; segmentId: string }[]>
+  >({
+    inside: [],
+    terrace: [],
+  })
   // Openstaande bestellingen per tafel: { "1": CartItem[], "2": CartItem[], ... }
   const [tableOrders, setTableOrders] = useState<Record<string, CartItem[]>>({})
 
@@ -677,63 +703,82 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   // Laad tafels + barkrukken + openstaande bestellingen (localStorage + Supabase sync)
 
   useEffect(() => {
-    const applyKassaTablesPayload = (raw: unknown) => {
+    const applyKassaTablesPayloadForZone = (zone: FloorPlanZone, raw: unknown) => {
       const parsed = parseFloorPlanTablesJson(raw)
       if (parsed === null) return false
       const fixed = sanitizeFloorPlanTables(parsed)
-      setKassaTables(fixed)
-      localStorage.setItem(`vysion_tables_${tenant}`, JSON.stringify(fixed))
+      setKassaTablesByZone((prev) => ({ ...prev, [zone]: fixed }))
+      localStorage.setItem(floorPlanTablesLocalStorageKey(tenant, zone), JSON.stringify(fixed))
       return true
     }
 
-    const raw = localStorage.getItem(`vysion_tables_${tenant}`)
-    if (raw) {
-      try { setKassaTables(JSON.parse(raw)) } catch { /* empty */ }
+    for (const zone of KASSA_FLOOR_ZONES) {
+      const lsRaw = localStorage.getItem(floorPlanTablesLocalStorageKey(tenant, zone))
+      if (lsRaw) {
+        try {
+          const parsed = JSON.parse(lsRaw)
+          if (Array.isArray(parsed)) setKassaTablesByZone((p) => ({ ...p, [zone]: parsed }))
+        } catch {
+          /* empty */
+        }
+      }
     }
 
     void (async () => {
-      const adminRes = await adminDb.select<{ data?: unknown } | null>('floor_plan_tables', {
-        tenantSlug: tenant,
-        select: 'data',
-        single: 'maybe',
-      })
-      let merged = false
-      if (adminRes.ok) {
-        const row = adminRes.data as { data?: unknown } | null | undefined
-        if (row == null) merged = applyKassaTablesPayload([])
-        else merged = applyKassaTablesPayload(row.data)
-      }
-      if (!merged) {
-        const { data, error } = await supabase
-          .from('floor_plan_tables')
-          .select('data')
-          .eq('tenant_slug', tenant)
-          .maybeSingle()
-        if (!error) {
-          if (data == null) applyKassaTablesPayload([])
-          else applyKassaTablesPayload(data.data)
+      for (const zone of KASSA_FLOOR_ZONES) {
+        const adminRes = await adminDb.select<{ data?: unknown } | null>('floor_plan_tables', {
+          tenantSlug: tenant,
+          select: 'data',
+          match: { plan_zone: zone },
+          single: 'maybe',
+        })
+        let merged = false
+        if (adminRes.ok) {
+          const row = adminRes.data as { data?: unknown } | null | undefined
+          if (row == null) merged = applyKassaTablesPayloadForZone(zone, [])
+          else merged = applyKassaTablesPayloadForZone(zone, row.data)
+        }
+        if (!merged) {
+          const { data, error } = await supabase
+            .from('floor_plan_tables')
+            .select('data')
+            .eq('tenant_slug', tenant)
+            .eq('plan_zone', zone)
+            .maybeSingle()
+          if (!error) {
+            if (data == null) applyKassaTablesPayloadForZone(zone, [])
+            else applyKassaTablesPayloadForZone(zone, data.data)
+          }
         }
       }
     })()
 
-    // Barkrukken: Supabase is bron (lege DB ⇒ lege lijst op alle pc's)
-    void supabase
-      .from('floor_plan_decor')
-      .select('data')
-      .eq('tenant_slug', tenant)
-      .maybeSingle()
-      .then(({ data }) => {
+    void (async () => {
+      for (const zone of KASSA_FLOOR_ZONES) {
+        const { data } = await supabase
+          .from('floor_plan_decor')
+          .select('data')
+          .eq('tenant_slug', tenant)
+          .eq('plan_zone', zone)
+          .maybeSingle()
         if (data?.data == null) {
-          setKassaStools([])
-          return
+          setKassaStoolsByZone((p) => ({ ...p, [zone]: [] }))
+        } else {
+          setKassaStoolsByZone((p) => ({
+            ...p,
+            [zone]: stoolsFromFloorDecorPayload(data.data),
+          }))
         }
-        setKassaStools(stoolsFromFloorDecorPayload(data.data))
-      })
+      }
+    })()
 
-    // Openstaande tafelorders: eerst cache voor snelle paint, daarna ALTIJD overschrijven met Supabase
     const ordersRaw = localStorage.getItem(tableOrdersKey)
     if (ordersRaw) {
-      try { setTableOrders(JSON.parse(ordersRaw)) } catch { /* empty */ }
+      try {
+        setTableOrders(migrateLegacyTableOrdersKeys(JSON.parse(ordersRaw)))
+      } catch {
+        /* empty */
+      }
     }
 
     void fetchOpenTableOrdersForTenant(tenant).then(applyOpenOrdersFromServerRows)
@@ -748,10 +793,23 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'floor_plan_tables', filter: `tenant_slug=eq.${tenant}` },
-        (payload: { eventType?: string; new?: { data?: unknown } }) => {
+        (payload: {
+          eventType?: string
+          new?: { data?: unknown; plan_zone?: string }
+          old?: { plan_zone?: string }
+        }) => {
+          const meta = payload.eventType === 'DELETE' ? payload.old : payload.new
+          const rawZone = meta?.plan_zone
+          if (
+            payload.eventType === 'DELETE' &&
+            (rawZone == null || String(rawZone).trim() === '')
+          ) {
+            return
+          }
+          const zone = normalizeFloorPlanZone(rawZone)
           if (payload.eventType === 'DELETE') {
-            setKassaTables([])
-            localStorage.setItem(`vysion_tables_${tenant}`, JSON.stringify([]))
+            setKassaTablesByZone((prev) => ({ ...prev, [zone]: [] }))
+            localStorage.setItem(floorPlanTablesLocalStorageKey(tenant, zone), JSON.stringify([]))
             return
           }
           const row = payload.new
@@ -759,9 +817,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           const parsed = parseFloorPlanTablesJson(row.data)
           if (parsed === null) return
           const fixed = sanitizeFloorPlanTables(parsed)
-          setKassaTables(fixed)
-          localStorage.setItem(`vysion_tables_${tenant}`, JSON.stringify(fixed))
-        }
+          const applyZone = normalizeFloorPlanZone(row.plan_zone)
+          setKassaTablesByZone((prev) => ({ ...prev, [applyZone]: fixed }))
+          localStorage.setItem(floorPlanTablesLocalStorageKey(tenant, applyZone), JSON.stringify(fixed))
+        },
       )
       .subscribe()
     return () => {
@@ -784,20 +843,33 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         (
           payload: {
             eventType?: string
-            new?: { data?: unknown }
-          }
+            new?: { data?: unknown; plan_zone?: string }
+            old?: { plan_zone?: string }
+          },
         ) => {
+          const meta = payload.eventType === 'DELETE' ? payload.old : payload.new
+          const rawZone = meta?.plan_zone
+          if (
+            payload.eventType === 'DELETE' &&
+            (rawZone == null || String(rawZone).trim() === '')
+          ) {
+            return
+          }
+          const zone = normalizeFloorPlanZone(rawZone)
           if (payload.eventType === 'DELETE') {
-            setKassaStools([])
+            setKassaStoolsByZone((prev) => ({ ...prev, [zone]: [] }))
             return
           }
           const row = payload.new
           if (row?.data == null) {
-            setKassaStools([])
+            setKassaStoolsByZone((prev) => ({ ...prev, [zone]: [] }))
             return
           }
-          setKassaStools(stoolsFromFloorDecorPayload(row.data))
-        }
+          setKassaStoolsByZone((prev) => ({
+            ...prev,
+            [zone]: stoolsFromFloorDecorPayload(row.data),
+          }))
+        },
       )
       .subscribe()
     return () => {
@@ -824,12 +896,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   /** Als WebSockets/realtime op een werkstation vastzitten (firewall, slaapstand, print-kiosk),
    *  halen we dezelfde bron nog eens binnen bij terugkeren naar het venster + periodiek. */
   useEffect(() => {
-    const applyKassaTablesPayload = (raw: unknown) => {
+    const applyKassaTablesPayloadForZone = (zone: FloorPlanZone, raw: unknown) => {
       const parsed = parseFloorPlanTablesJson(raw)
       if (parsed === null) return false
       const fixed = sanitizeFloorPlanTables(parsed)
-      setKassaTables(fixed)
-      localStorage.setItem(`vysion_tables_${tenant}`, JSON.stringify(fixed))
+      setKassaTablesByZone((prev) => ({ ...prev, [zone]: fixed }))
+      localStorage.setItem(floorPlanTablesLocalStorageKey(tenant, zone), JSON.stringify(fixed))
       return true
     }
 
@@ -839,42 +911,52 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     const pullFloorAndDecor = () => {
       void (async () => {
-        const adminRes = await adminDb.select<{ data?: unknown } | null>('floor_plan_tables', {
-          tenantSlug: tenant,
-          select: 'data',
-          single: 'maybe',
-        })
-        let merged = false
-        if (adminRes.ok) {
-          const row = adminRes.data as { data?: unknown } | null | undefined
-          if (row == null) merged = applyKassaTablesPayload([])
-          else merged = applyKassaTablesPayload(row.data)
-        }
-        if (!merged) {
-          const { data, error } = await supabase
-            .from('floor_plan_tables')
-            .select('data')
-            .eq('tenant_slug', tenant)
-            .maybeSingle()
-          if (!error) {
-            if (data == null) applyKassaTablesPayload([])
-            else applyKassaTablesPayload(data.data)
+        for (const zone of KASSA_FLOOR_ZONES) {
+          const adminRes = await adminDb.select<{ data?: unknown } | null>('floor_plan_tables', {
+            tenantSlug: tenant,
+            select: 'data',
+            match: { plan_zone: zone },
+            single: 'maybe',
+          })
+          let merged = false
+          if (adminRes.ok) {
+            const row = adminRes.data as { data?: unknown } | null | undefined
+            if (row == null) merged = applyKassaTablesPayloadForZone(zone, [])
+            else merged = applyKassaTablesPayloadForZone(zone, row.data)
+          }
+          if (!merged) {
+            const { data, error } = await supabase
+              .from('floor_plan_tables')
+              .select('data')
+              .eq('tenant_slug', tenant)
+              .eq('plan_zone', zone)
+              .maybeSingle()
+            if (!error) {
+              if (data == null) applyKassaTablesPayloadForZone(zone, [])
+              else applyKassaTablesPayloadForZone(zone, data.data)
+            }
           }
         }
       })()
 
-      void supabase
-        .from('floor_plan_decor')
-        .select('data')
-        .eq('tenant_slug', tenant)
-        .maybeSingle()
-        .then(({ data }) => {
+      void (async () => {
+        for (const zone of KASSA_FLOOR_ZONES) {
+          const { data } = await supabase
+            .from('floor_plan_decor')
+            .select('data')
+            .eq('tenant_slug', tenant)
+            .eq('plan_zone', zone)
+            .maybeSingle()
           if (data?.data == null) {
-            setKassaStools([])
-            return
+            setKassaStoolsByZone((p) => ({ ...p, [zone]: [] }))
+          } else {
+            setKassaStoolsByZone((p) => ({
+              ...p,
+              [zone]: stoolsFromFloorDecorPayload(data.data),
+            }))
           }
-          setKassaStools(stoolsFromFloorDecorPayload(data.data))
-        })
+        }
+      })()
     }
 
     const pullAll = () => {
@@ -904,21 +986,25 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
   }, [tenant, applyOpenOrdersFromServerRows])
 
-  const cancelPersistTimer = (tblNr: string) => {
+  const cancelPersistTimer = (slotKey: string) => {
     const timers = persistTimersRef.current
-    const prev = timers[tblNr]
+    const prev = timers[slotKey]
     if (prev) {
       clearTimeout(prev)
-      delete timers[tblNr]
+      delete timers[slotKey]
     }
   }
 
-  const persistOpenOrderRowToSupabase = async (tblNr: string, items: CartItem[]) => {
+  const persistOpenOrderRowToSupabase = async (
+    zone: FloorPlanZone,
+    tblNr: string,
+    items: CartItem[],
+  ) => {
     const run = async (attempt: number): Promise<void> => {
       const delRes = await adminDb.delete(
         'orders',
-        { tenant_slug: tenant, table_number: tblNr, status: 'open' },
-        { tenantSlug: tenant }
+        { tenant_slug: tenant, table_number: tblNr, status: 'open', floor_plan_zone: zone },
+        { tenantSlug: tenant },
       )
       if (!delRes.ok) {
         console.warn('[kassa] open order delete failed:', delRes.error)
@@ -932,13 +1018,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           payment_status: 'pending',
           order_type: 'DINE_IN',
           table_number: tblNr,
+          floor_plan_zone: zone,
           subtotal: 0,
           tax: 0,
           total: 0,
           items: items as unknown as Record<string, unknown>[],
           created_at: new Date().toISOString(),
         },
-        { tenantSlug: tenant }
+        { tenantSlug: tenant },
       )
       if (insRes.ok) return
       console.warn('[kassa] open order insert failed:', insRes.error)
@@ -949,65 +1036,74 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     await run(0)
   }
 
-  const schedulePersistOpenOrder = (tblNr: string, items: CartItem[]) => {
-    cancelPersistTimer(tblNr)
-    persistTimersRef.current[tblNr] = setTimeout(() => {
-      delete persistTimersRef.current[tblNr]
-      void persistOpenOrderRowToSupabase(tblNr, items)
+  const schedulePersistOpenOrder = (zone: FloorPlanZone, tblNr: string, items: CartItem[]) => {
+    const slotKey = tableOrderMapKey(zone, tblNr)
+    cancelPersistTimer(slotKey)
+    persistTimersRef.current[slotKey] = setTimeout(() => {
+      delete persistTimersRef.current[slotKey]
+      void persistOpenOrderRowToSupabase(zone, tblNr, items)
     }, 420)
   }
 
-  // Sla cart op voor huidige tafel
-  const updateTableStatus = (tblNr: string, occupied: boolean) => {
-    const tablesRaw = localStorage.getItem(`vysion_tables_${tenant}`)
+  const updateTableStatus = (tblNr: string, occupied: boolean, zone: FloorPlanZone) => {
+    const lsKey = floorPlanTablesLocalStorageKey(tenant, zone)
+    const tablesRaw = localStorage.getItem(lsKey)
     if (!tablesRaw) return
     try {
       const tbls = JSON.parse(tablesRaw)
       const newStatus = occupied ? 'OCCUPIED' : 'FREE'
       const updatedTbls = tbls.map((t: { number: string; status: string }) =>
-        t.number === tblNr ? { ...t, status: newStatus } : t
+        t.number === tblNr ? { ...t, status: newStatus } : t,
       )
-      localStorage.setItem(`vysion_tables_${tenant}`, JSON.stringify(updatedTbls))
-      setKassaTables(updatedTbls)
-      // Sync naar Supabase zodat plattegrond ook up-to-date is (via proxy, fire-and-forget)
+      localStorage.setItem(lsKey, JSON.stringify(updatedTbls))
+      setKassaTablesByZone((prev) => ({ ...prev, [zone]: updatedTbls }))
       void adminDb.upsert(
         'floor_plan_tables',
-        { tenant_slug: tenant, data: updatedTbls } as any,
-        { tenantSlug: tenant, onConflict: 'tenant_slug' }
+        { tenant_slug: tenant, plan_zone: zone, data: updatedTbls } as any,
+        { tenantSlug: tenant, onConflict: 'tenant_slug,plan_zone' },
       )
-    } catch { /* empty */ }
+    } catch {
+      /* empty */
+    }
   }
 
-  const saveCartToTable = (tblNr: string, items: CartItem[]) => {
-    cancelPersistTimer(tblNr)
-    setTableOrders(prev => {
-      const updated = { ...prev, [tblNr]: items }
+  const saveCartToTable = (zone: FloorPlanZone, tblNr: string, items: CartItem[]) => {
+    const slotKey = tableOrderMapKey(zone, tblNr)
+    cancelPersistTimer(slotKey)
+    setTableOrders((prev) => {
+      const updated = { ...prev, [slotKey]: items }
       localStorage.setItem(tableOrdersKey, JSON.stringify(updated))
       return updated
     })
-    updateTableStatus(tblNr, items.length > 0)
-    void persistOpenOrderRowToSupabase(tblNr, items)
+    updateTableStatus(tblNr, items.length > 0, zone)
+    void persistOpenOrderRowToSupabase(zone, tblNr, items)
   }
 
   // Bevestiging popup voor tafel wisselen
   const [switchConfirm, setSwitchConfirm] = useState<string | null>(null)
 
   const switchToTable = (newTableNr: string) => {
-    if (tableNumber && cart.length > 0 && tableNumber !== newTableNr) {
-      // Vraag bevestiging voordat je wisselt
-      setSwitchConfirm(newTableNr)
+    const zone = pickerBrowseZone
+    if (
+      tableNumber &&
+      cart.length > 0 &&
+      (tableNumber !== newTableNr || dineInFloorZone !== zone)
+    ) {
+      setSwitchConfirm(tableOrderMapKey(zone, newTableNr))
       return
     }
-    doSwitchToTable(newTableNr)
+    doSwitchToTable(newTableNr, zone)
   }
 
-  const doSwitchToTable = (newTableNr: string) => {
+  const doSwitchToTable = (newTableNr: string, zone: FloorPlanZone) => {
     if (tableNumber && cart.length > 0) {
-      saveCartToTable(tableNumber, cart)
+      saveCartToTable(dineInFloorZone, tableNumber, cart)
     }
-    const existingOrder = tableOrders[newTableNr] || []
+    const slotKey = tableOrderMapKey(zone, newTableNr)
+    const existingOrder = tableOrders[slotKey] || []
     setCart(existingOrder)
     setTableNumber(newTableNr)
+    setDineInFloorZone(zone)
     setOrderType('DINE_IN')
     setShowTablePicker(false)
     setSwitchConfirm(null)
@@ -1016,9 +1112,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   // "Naar tafel" knop: sla bestelling op en leeg de kassa voor volgende tafel
   const parkOrder = () => {
     if (!tableNumber || cart.length === 0) return
-    saveCartToTable(tableNumber, cart)
+    saveCartToTable(dineInFloorZone, tableNumber, cart)
     setCart([])
     setTableNumber('')
+    setDineInFloorZone(FLOOR_PLAN_ZONE_INSIDE)
   }
 
   // Betaling
@@ -1310,12 +1407,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   // ── Cart ─────────────────────────────────────────────────────────────────
   const syncTableOrder = (tblNr: string | '', updatedCart: CartItem[]) => {
     if (!tblNr) return
-    setTableOrders(prev => {
-      const next = { ...prev, [tblNr]: updatedCart }
+    const zone = dineInFloorZone
+    const slotKey = tableOrderMapKey(zone, tblNr)
+    setTableOrders((prev) => {
+      const next = { ...prev, [slotKey]: updatedCart }
       localStorage.setItem(tableOrdersKey, JSON.stringify(next))
       return next
     })
-    schedulePersistOpenOrder(tblNr, updatedCart)
+    schedulePersistOpenOrder(zone, tblNr, updatedCart)
   }
 
   const addToCart = (product: MenuProduct, choices: SelectedChoice[] = []) => {
@@ -1416,9 +1515,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           updated = [...without, { product, quantity: oldQty, choices: selected, cartKey }]
         }
         if (tableNumber) {
-          updateTableStatus(tableNumber, updated.length > 0)
+          updateTableStatus(tableNumber, updated.length > 0, dineInFloorZone)
+          syncTableOrder(tableNumber, updated)
         }
-        syncTableOrder(tableNumber, updated)
         return updated
       })
     } else {
@@ -1434,7 +1533,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         ? prev.filter(i => i.cartKey !== cartKey)
         : prev.map(i => i.cartKey === cartKey ? { ...i, quantity: qty } : i)
       if (tableNumber) {
-        updateTableStatus(tableNumber, updated.length > 0)
+        updateTableStatus(tableNumber, updated.length > 0, dineInFloorZone)
         syncTableOrder(tableNumber, updated)
       }
       return updated
@@ -1446,13 +1545,31 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setCart([])
     if (tableNumber) {
       syncTableOrder(tableNumber, [])
-      updateTableStatus(tableNumber, false)
+      updateTableStatus(tableNumber, false, dineInFloorZone)
     }
   }
   const total = cart.reduce((sum, i) => {
     const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
     return sum + (i.product.price + choicesTotal) * i.quantity
   }, 0)
+
+  const pickerTables = kassaTablesByZone[pickerBrowseZone]
+  const pickerStools = kassaStoolsByZone[pickerBrowseZone]
+
+  const switchConfirmParsed = switchConfirm ? parseTableOrderMapKey(switchConfirm) : null
+  const switchConfirmDisplay =
+    switchConfirmParsed != null
+      ? switchConfirmParsed.zone === FLOOR_PLAN_ZONE_TERRACE
+        ? `${switchConfirmParsed.tableNumber} (${t('kassaApp.floorZoneTerrace')})`
+        : switchConfirmParsed.tableNumber
+      : ''
+
+  const dineInTableBannerSuffix =
+    tableNumber
+      ? `${t('kassaApp.orderTypeWithTable').replace(/\{number\}/g, String(tableNumber))}${
+          dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE ? ` (${t('kassaApp.floorZoneTerraceShort')})` : ''
+        }`
+      : ''
 
   const openKlantschermWindow = useCallback(() => {
     if (typeof window === 'undefined') return
@@ -1665,15 +1782,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   useKassaOfflineFlushBridge(tenant, flushOfflineOrdersRef)
 
-  const clearTableAfterPayment = (tblNr: string) => {
-    cancelPersistTimer(tblNr)
+  const clearTableAfterPayment = (zone: FloorPlanZone, tblNr: string) => {
+    const slotKey = tableOrderMapKey(zone, tblNr)
+    cancelPersistTimer(slotKey)
     const updated = { ...tableOrders }
-    delete updated[tblNr]
+    delete updated[slotKey]
     setTableOrders(updated)
     localStorage.setItem(tableOrdersKey, JSON.stringify(updated))
-    updateTableStatus(tblNr, false)
-    // Stoel/kruk status resetten (K1, K2, ...) — auto-VRIJ via getStoolStatus maar ook localStorage cleanen
-    const stoolStatusKey = `vysion_stool_status_${tenant}`
+    updateTableStatus(tblNr, false, zone)
+    const stoolStatusKey =
+      zone === FLOOR_PLAN_ZONE_INSIDE
+        ? `vysion_stool_status_${tenant}`
+        : `vysion_stool_status_terrace_${tenant}`
     try {
       const raw = localStorage.getItem(stoolStatusKey)
       if (raw) {
@@ -1683,12 +1803,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           localStorage.setItem(stoolStatusKey, JSON.stringify(statuses))
         }
       }
-    } catch { /* empty */ }
-    // Verwijder open order uit Supabase (via proxy, fire-and-forget)
+    } catch {
+      /* empty */
+    }
     void adminDb.delete(
       'orders',
-      { tenant_slug: tenant, table_number: tblNr, status: 'open' },
-      { tenantSlug: tenant }
+      { tenant_slug: tenant, table_number: tblNr, status: 'open', floor_plan_zone: zone },
+      { tenantSlug: tenant },
     )
   }
 
@@ -1715,9 +1836,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     const shortRef = kassa_client_uuid.replace(/-/g, '').slice(-10).toUpperCase()
 
-    const customerTableLabel = tableNumber
-      ? t('kassaReceipt.tableLabel').replace(/\{number\}/g, String(tableNumber))
-      : null
+    const customerTableLabel =
+      tableNumber
+        ? (() => {
+            let lbl = t('kassaReceipt.tableLabel').replace(/\{number\}/g, String(tableNumber))
+            if (orderType === 'DINE_IN' && dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE) {
+              lbl = `${lbl} (${t('kassaApp.floorZoneTerrace')})`
+            }
+            return lbl
+          })()
+        : null
 
     const orderPayload: Record<string, unknown> = {
       tenant_slug: tenant,
@@ -1740,6 +1868,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         options: (i.choices || []).map((c: any) => ({ name: c.choiceName || c.name || '', price: c.price || 0 })),
       })),
       created_at: createdAt.toISOString(),
+    }
+
+    if (orderType === 'DINE_IN' && tableNumber) {
+      orderPayload.table_number = tableNumber
+      orderPayload.floor_plan_zone = dineInFloorZone
     }
 
     if (method === 'SPLIT' && splitAmounts) {
@@ -1849,14 +1982,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       splitCard: method === 'SPLIT' ? splitAmounts?.card : undefined,
       orderType,
       tableNumber,
+      floorPlanZone: orderType === 'DINE_IN' && tableNumber ? dineInFloorZone : undefined,
       createdAt,
       helpedByStaffName: activeKassaStaff?.name?.trim() || null,
     })
 
-    if (tableNumber) clearTableAfterPayment(tableNumber)
+    if (tableNumber && orderType === 'DINE_IN') clearTableAfterPayment(dineInFloorZone, tableNumber)
 
     clearCart()
     setTableNumber('')
+    setDineInFloorZone(FLOOR_PLAN_ZONE_INSIDE)
     setShowPaymentModal(false)
     setShowSplitModal(false)
     if (tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly) {
@@ -1911,6 +2046,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           ? t('kassaReceipt.orderTypeTakeaway')
           : t('kassaReceipt.orderTypeDelivery')
 
+    const terraceSuffix =
+      order.orderType === 'DINE_IN' && order.floorPlanZone === FLOOR_PLAN_ZONE_TERRACE
+        ? ` (${t('kassaApp.floorZoneTerrace')})`
+        : ''
+
     const bonLines: string[] = []
     bonLines.push(tenantInfo?.business_name || t('kassaApp.defaultBusinessName'))
     if (tenantInfo?.address) bonLines.push(tenantInfo.address)
@@ -1921,8 +2061,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     bonLines.push('--------------------------------')
     bonLines.push(
       order.tableNumber
-        ? `${orderTypePlain} | ${t('kassaReceipt.tablePrefix')} ${order.tableNumber}`
-        : orderTypePlain
+        ? `${orderTypePlain} | ${t('kassaReceipt.tablePrefix')} ${order.tableNumber}${terraceSuffix}`
+        : orderTypePlain,
     )
     bonLines.push(`${t('kassaReceipt.receiptNo')}${receiptRefDisplay}  ${dateStr}`)
     bonLines.push('--------------------------------')
@@ -1956,7 +2096,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         ${tenantInfo?.phone ? `<div class="small">${escapeReceiptHtml(t('kassaReceipt.telPrefix'))} ${escapeReceiptHtml(tenantInfo.phone)}</div>` : ''}
       </div>
       <div class="divider"></div>
-      <div class="center order-type">${escapeReceiptHtml(orderTypeLabel)}${order.tableNumber ? `<br/>${escapeReceiptHtml(t('kassaReceipt.tablePrefix'))} ${escapeReceiptHtml(String(order.tableNumber))}` : ''}</div>
+      <div class="center order-type">${escapeReceiptHtml(orderTypeLabel)}${order.tableNumber ? `<br/>${escapeReceiptHtml(t('kassaReceipt.tablePrefix'))} ${escapeReceiptHtml(String(order.tableNumber))}${escapeReceiptHtml(terraceSuffix)}` : ''}</div>
       <div class="row small">
         <span>${escapeReceiptHtml(t('kassaReceipt.receiptNo'))}${escapeReceiptHtml(receiptRefDisplay)}</span>
         <span>${escapeReceiptHtml(dateStr)}</span>
@@ -2739,9 +2879,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               className="w-full py-3 rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold text-base transition-colors"
             >
               {tableNumber
-                ? kassaStools.some(s => s.stoolNumber === tableNumber)
-                  ? `🍺 ${t('kassaApp.stoolWord')} ${tableNumber}`
-                  : `🪑 ${t('kassaApp.tableWord')} ${tableNumber}`
+                ? kassaStoolsByZone[dineInFloorZone].some((s) => s.stoolNumber === tableNumber)
+                  ? `🍺 ${t('kassaApp.stoolWord')} ${tableNumber}${
+                      dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE ? ` · ${t('kassaApp.floorZoneTerraceShort')}` : ''
+                    }`
+                  : `🪑 ${t('kassaApp.tableWord')} ${tableNumber}${
+                      dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE ? ` · ${t('kassaApp.floorZoneTerraceShort')}` : ''
+                    }`
                 : t('kassaApp.pickTablePlaceholder')}
             </button>
 
@@ -2750,23 +2894,47 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setShowTablePicker(false)} />
                 <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
+                  <div className="flex gap-2 border-b border-gray-100 bg-white p-2">
+                    <button
+                      type="button"
+                      onClick={() => setPickerBrowseZone(FLOOR_PLAN_ZONE_INSIDE)}
+                      className={`flex-1 rounded-xl py-2 text-sm font-bold transition-colors ${
+                        pickerBrowseZone === FLOOR_PLAN_ZONE_INSIDE
+                          ? 'bg-[#3C4D6B] text-white shadow-sm'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      {t('kassaApp.floorZoneInside')}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPickerBrowseZone(FLOOR_PLAN_ZONE_TERRACE)}
+                      className={`flex-1 rounded-xl py-2 text-sm font-bold transition-colors ${
+                        pickerBrowseZone === FLOOR_PLAN_ZONE_TERRACE
+                          ? 'bg-emerald-600 text-white shadow-sm'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      {t('kassaApp.floorZoneTerrace')}
+                    </button>
+                  </div>
                   <div className="p-3 border-b bg-gray-50">
                     <p className="text-xs font-bold text-gray-500 uppercase tracking-wider text-center">{t('kassaApp.pickTableTitle')}</p>
                   </div>
-                  {kassaTables.length === 0 && kassaStools.length === 0 ? (
+                  {pickerTables.length === 0 && pickerStools.length === 0 ? (
                     <div className="p-4 text-center text-gray-400 text-sm">
                       {t('kassaApp.noTablesYet')}
                     </div>
                   ) : (
                     <>
-                      {kassaTables.length > 0 && (
+                      {pickerTables.length > 0 && (
                         <div className="p-2 grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
-                          {kassaTables.map((tbl) => (
+                          {pickerTables.map((tbl) => (
                             <button
                               key={tbl.id}
                               onClick={() => switchToTable(tbl.number)}
                               className={`py-3 rounded-xl font-bold text-sm transition-colors border-2 relative ${
-                                tableNumber === tbl.number
+                                tableNumber === tbl.number && dineInFloorZone === pickerBrowseZone
                                   ? 'bg-[#3C4D6B] text-white border-[#3C4D6B]'
                                   : tbl.status === 'FREE'
                                   ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'
@@ -2784,29 +2952,30 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                                     ? t('kassaApp.tableStatusOccupied')
                                     : t('kassaApp.tableStatusUnpaid')}
                               </div>
-                              {tableOrders[tbl.number] && tableOrders[tbl.number].length > 0 && (
+                              {(tableOrders[tableOrderMapKey(pickerBrowseZone, tbl.number)]?.length ?? 0) > 0 && (
                                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
-                                  {tableOrders[tbl.number].length}
+                                  {tableOrders[tableOrderMapKey(pickerBrowseZone, tbl.number)]!.length}
                                 </span>
                               )}
                             </button>
                           ))}
                         </div>
                       )}
-                      {kassaStools.length > 0 && (
+                      {pickerStools.length > 0 && (
                         <>
                           <div className="px-3 py-1.5 bg-amber-50 border-t border-amber-100 flex items-center gap-2">
                             <span className="text-xs font-bold text-amber-700 uppercase tracking-wider">🍺 {t('kassaApp.stoolsSection')}</span>
                           </div>
                           <div className="p-2 grid grid-cols-3 gap-2 max-h-36 overflow-y-auto">
-                            {kassaStools.map(s => (
+                            {pickerStools.map((s) => (
                               <button
                                 key={s.segmentId + s.stoolNumber}
                                 onClick={() => switchToTable(s.stoolNumber)}
                                 className={`py-3 rounded-xl font-bold text-sm transition-colors border-2 relative ${
-                                  tableNumber === s.stoolNumber
+                                  tableNumber === s.stoolNumber && dineInFloorZone === pickerBrowseZone
                                     ? 'bg-[#3C4D6B] text-white border-[#3C4D6B]'
-                                    : tableOrders[s.stoolNumber]?.length > 0
+                                    : (tableOrders[tableOrderMapKey(pickerBrowseZone, s.stoolNumber)]?.length ?? 0) >
+                                      0
                                     ? 'bg-blue-50 text-blue-700 border-blue-300 hover:bg-blue-100'
                                     : 'bg-amber-50 text-amber-700 border-amber-300 hover:bg-amber-100'
                                 }`}
@@ -2814,13 +2983,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                                 <div className="text-lg">🍺</div>
                                 <div>{s.stoolNumber}</div>
                                 <div className="text-[10px] opacity-70">
-                                  {tableOrders[s.stoolNumber]?.length > 0
+                                  {(tableOrders[tableOrderMapKey(pickerBrowseZone, s.stoolNumber)]?.length ?? 0) > 0
                                     ? t('kassaApp.tableStatusOccupied')
                                     : t('kassaApp.tableStatusFree')}
                                 </div>
-                                {tableOrders[s.stoolNumber]?.length > 0 && (
+                                {(tableOrders[tableOrderMapKey(pickerBrowseZone, s.stoolNumber)]?.length ?? 0) > 0 && (
                                   <span className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
-                                    {tableOrders[s.stoolNumber].length}
+                                    {tableOrders[tableOrderMapKey(pickerBrowseZone, s.stoolNumber)]!.length}
                                   </span>
                                 )}
                               </button>
@@ -2833,7 +3002,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   <div className="p-2 border-t bg-gray-50 flex gap-2">
                     {tableNumber && (
                       <button
-                        onClick={() => { setTableNumber(''); setShowTablePicker(false) }}
+                        onClick={() => {
+                          setTableNumber('')
+                          setDineInFloorZone(FLOOR_PLAN_ZONE_INSIDE)
+                          setShowTablePicker(false)
+                        }}
                         className="flex-1 py-2 rounded-xl bg-red-50 text-red-600 font-semibold text-sm hover:bg-red-100 transition-colors"
                       >
                         ✕ {t('kassaApp.clearTable')}
@@ -2863,7 +3036,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           }`}
         >
           {orderType === 'DINE_IN' &&
-            `🍽️ ${t('kassaApp.orderTypeDineIn').toUpperCase()}${tableNumber ? t('kassaApp.orderTypeWithTable').replace(/\{number\}/g, String(tableNumber)) : ''}`}
+            `🍽️ ${t('kassaApp.orderTypeDineIn').toUpperCase()}${dineInTableBannerSuffix}`}
           {orderType === 'TAKEAWAY' && `📦 ${t('kassaApp.orderTypeTakeaway').toUpperCase()}`}
           {orderType === 'DELIVERY' && `🚗 ${t('kassaApp.orderTypeDelivery').toUpperCase()}`}
         </button>
@@ -3082,7 +3255,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <p className="text-gray-500 mt-1 text-sm">
                 {t('kassaApp.switchTableBody')
                   .replace(/\{current\}/g, String(tableNumber ?? ''))
-                  .replace(/\{next\}/g, String(switchConfirm ?? ''))}
+                  .replace(/\{next\}/g, switchConfirmDisplay)}
               </p>
             </div>
             <div className="flex gap-3">
@@ -3093,10 +3266,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 {t('kassaApp.cancel')}
               </button>
               <button
-                onClick={() => doSwitchToTable(switchConfirm)}
+                onClick={() => {
+                  const p = switchConfirm ? parseTableOrderMapKey(switchConfirm) : null
+                  if (p) doSwitchToTable(p.tableNumber, p.zone)
+                }}
                 className="flex-1 py-3 rounded-xl bg-[#3C4D6B] text-white font-bold hover:bg-[#2D3A52] transition-colors"
               >
-                {t('kassaApp.switchToTable').replace(/\{number\}/g, String(switchConfirm))}
+                {t('kassaApp.switchToTable').replace(/\{number\}/g, switchConfirmDisplay)}
               </button>
             </div>
           </div>
@@ -3169,7 +3345,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       {showFloorPlan && (
         <KassaFloorPlan
           tenant={tenant}
-          seedTables={kassaTables}
+          planZone={pickerBrowseZone}
+          seedTables={pickerTables}
           onSelectTable={(nr) => switchToTable(nr)}
           onClose={() => setShowFloorPlan(false)}
           tableOrders={tableOrders}
@@ -3201,9 +3378,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       {showReservations && (
         <KassaReservationsView
           tenant={tenant}
-          kassaTables={kassaTables}
+          kassaTables={kassaTablesByZone.inside}
           onClose={() => setShowReservations(false)}
-          onStartOrder={(tableNr) => { switchToTable(tableNr); setShowReservations(false) }}
+          onStartOrder={(tableNr) => {
+            setPickerBrowseZone(FLOOR_PLAN_ZONE_INSIDE)
+            doSwitchToTable(tableNr, FLOOR_PLAN_ZONE_INSIDE)
+            setShowReservations(false)
+          }}
         />
       )}
 

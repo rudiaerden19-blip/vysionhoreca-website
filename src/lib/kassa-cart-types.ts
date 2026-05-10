@@ -1,4 +1,5 @@
 import type { MenuProduct } from '@/lib/admin-api'
+import type { FloorPlanZone } from '@/lib/kassa-floor-plan-zone'
 
 export interface KassaSelectedChoice {
   optionId: string
@@ -29,6 +30,8 @@ export interface KassaLastOrderReceipt {
   splitCard?: number
   orderType: KassaRegisterOrderType
   tableNumber: string
+  /** Zaalebied voor dine-in (bon / rapportage blijft per tenant; kolom scheidt open manden). */
+  floorPlanZone?: FloorPlanZone
   createdAt: Date
   helpedByStaffName?: string | null
 }

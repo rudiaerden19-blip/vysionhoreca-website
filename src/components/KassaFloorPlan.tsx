@@ -9,6 +9,14 @@ import {
   sanitizeFloorPlanTables,
   type FloorPlanTable,
 } from '@/lib/kassa-floor-plan-tables'
+import {
+  displayNumbersWithOpenOrdersInZone,
+  FLOOR_PLAN_ZONE_INSIDE,
+  FLOOR_PLAN_ZONE_TERRACE,
+  normalizeFloorPlanZone,
+  tableOrderMapKey,
+  type FloorPlanZone,
+} from '@/lib/kassa-floor-plan-zone'
 import { useLanguage } from '@/i18n'
 
 export type TableShape = FloorPlanTable['shape']
@@ -29,6 +37,8 @@ interface SimpleCartItem {
 
 interface Props {
   tenant: string
+  /** Binnen of terras: aparte plattegrond + decor per tenant. */
+  planZone: FloorPlanZone
   onSelectTable: (tableNumber: string) => void
   onClose: () => void
   tableOrders?: Record<string, SimpleCartItem[]>
@@ -349,6 +359,7 @@ function TableSVG({ table, isSelected, onClick, effectiveStatus }: {
 
 export default function KassaFloorPlan({
   tenant,
+  planZone,
   onSelectTable,
   onClose,
   tableOrders = {},
@@ -363,14 +374,23 @@ export default function KassaFloorPlan({
     }),
     [t],
   )
-  const storageKey = `vysion_tables_${tenant}`
+  const storageKey =
+    planZone === FLOOR_PLAN_ZONE_INSIDE
+      ? `vysion_tables_${tenant}`
+      : `vysion_tables_terrace_${tenant}`
+  const decorKey =
+    planZone === FLOOR_PLAN_ZONE_INSIDE ? `vysion_decor_${tenant}` : `vysion_decor_terrace_${tenant}`
+  const stoolStatusKey =
+    planZone === FLOOR_PLAN_ZONE_INSIDE
+      ? `vysion_stool_status_${tenant}`
+      : `vysion_stool_status_terrace_${tenant}`
+
   const [tables, setTables] = useState<KassaTable[]>([])
   const [selected, setSelected] = useState<KassaTable | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
   const [addNumber, setAddNumber] = useState('')
   const [addSeats, setAddSeats] = useState(4)
   const [addShape, setAddShape] = useState<TableShape>('SQUARE')
-  const decorKey = `vysion_decor_${tenant}`
   const [decors, setDecors] = useState<DecorItem[]>([])
   const [selectedDecor, setSelectedDecor] = useState<DecorItem | null>(null)
   const [showAddBarModal, setShowAddBarModal] = useState(false)
@@ -378,7 +398,6 @@ export default function KassaFloorPlan({
   const [addStool2, setAddStool2] = useState('K2')
   const [editStoolVals, setEditStoolVals] = useState({ s1: '', s2: '' })
   // Kruk statussen: { "K1": "FREE"|"OCCUPIED"|"UNPAID", ... }
-  const stoolStatusKey = `vysion_stool_status_${tenant}`
   const [stoolStatuses, setStoolStatuses] = useState<Record<string, TableStatus>>({})
 
   const [isLocked, setIsLocked] = useState(true)
@@ -432,8 +451,8 @@ export default function KassaFloorPlan({
     void adminDb
       .upsert(
         'floor_plan_tables',
-        { tenant_slug: tenant, data } as Record<string, unknown>,
-        { tenantSlug: tenant, onConflict: 'tenant_slug' },
+        { tenant_slug: tenant, plan_zone: planZone, data } as Record<string, unknown>,
+        { tenantSlug: tenant, onConflict: 'tenant_slug,plan_zone' },
       )
       .then((r) => {
         if (!r.ok) console.error('[KassaFloorPlan] floor_plan_tables:', r.error)
@@ -447,8 +466,8 @@ export default function KassaFloorPlan({
     void adminDb
       .upsert(
         'floor_plan_decor',
-        { tenant_slug: tenant, data } as Record<string, unknown>,
-        { tenantSlug: tenant, onConflict: 'tenant_slug' },
+        { tenant_slug: tenant, plan_zone: planZone, data } as Record<string, unknown>,
+        { tenantSlug: tenant, onConflict: 'tenant_slug,plan_zone' },
       )
       .then((r) => {
         if (!r.ok) console.error('[KassaFloorPlan] floor_plan_decor:', r.error)
@@ -531,6 +550,7 @@ export default function KassaFloorPlan({
       const adminRes = await adminDb.select<{ data?: unknown } | null>('floor_plan_tables', {
         tenantSlug: tenant,
         select: 'data',
+        match: { plan_zone: planZone },
         single: 'maybe',
       })
 
@@ -546,6 +566,7 @@ export default function KassaFloorPlan({
           .from('floor_plan_tables')
           .select('data')
           .eq('tenant_slug', tenant)
+          .eq('plan_zone', planZone)
           .maybeSingle()
         if (!tErr) {
           if (tData == null) mergeRemoteTables([])
@@ -582,6 +603,7 @@ export default function KassaFloorPlan({
         .from('floor_plan_decor')
         .select('data')
         .eq('tenant_slug', tenant)
+        .eq('plan_zone', planZone)
         .maybeSingle()
 
       if (!dErr && dData?.data != null) {
@@ -594,25 +616,39 @@ export default function KassaFloorPlan({
       }
     }
     void load()
-  }, [tenant, storageKey, decorKey, stoolStatusKey])
+  }, [tenant, planZone, storageKey, decorKey, stoolStatusKey])
 
   // ── Realtime subscriptions: sync tussen apparaten ────────────────────────
   useEffect(() => {
     const tableChannel = supabase
-      .channel(`fpt_${tenant}`)
+      .channel(`fpt_${tenant}_${planZone}`)
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'floor_plan_tables', filter: `tenant_slug=eq.${tenant}` },
-        (payload: { eventType?: string; new?: { data?: unknown } }) => {
+        (payload: {
+          eventType?: string
+          new?: { data?: unknown; plan_zone?: string }
+          old?: { plan_zone?: string }
+        }) => {
           if (ignoreFloorRealtimeRef.current) return
+          const meta = payload.eventType === 'DELETE' ? payload.old : payload.new
+          const rawZone = meta?.plan_zone
+          if (
+            payload.eventType === 'DELETE' &&
+            (rawZone == null || String(rawZone).trim() === '')
+          ) {
+            return
+          }
+          const z = normalizeFloorPlanZone(rawZone)
+          if (z !== planZone) return
           if (payload.eventType === 'DELETE') {
             setTables([])
             localStorage.setItem(storageKey, JSON.stringify([]))
             return
           }
-          const row = payload.new
-          if (!row) return
-          const parsed = parseFloorPlanTablesJson(row.data)
+          const newRow = payload.new
+          if (!newRow) return
+          const parsed = parseFloorPlanTablesJson(newRow.data)
           if (parsed === null) return
           const fixed = sanitizeTables(parsed)
           setTables(fixed)
@@ -622,14 +658,36 @@ export default function KassaFloorPlan({
       .subscribe()
 
     const decorChannel = supabase
-      .channel(`fpd_${tenant}`)
+      .channel(`fpd_${tenant}_${planZone}`)
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'floor_plan_decor', filter: `tenant_slug=eq.${tenant}` },
-        ({ new: row }: { new?: { data?: unknown } }) => {
+        (payload: {
+          eventType?: string
+          new?: { data?: unknown; plan_zone?: string }
+          old?: { plan_zone?: string }
+        }) => {
           if (ignoreFloorRealtimeRef.current) return
-          if (row?.data) {
-            const { items, statuses } = parseDecorData(row.data)
+          const meta = payload.eventType === 'DELETE' ? payload.old : payload.new
+          const rawZone = meta?.plan_zone
+          if (
+            payload.eventType === 'DELETE' &&
+            (rawZone == null || String(rawZone).trim() === '')
+          ) {
+            return
+          }
+          const z = normalizeFloorPlanZone(rawZone)
+          if (z !== planZone) return
+          if (payload.eventType === 'DELETE') {
+            setDecors([])
+            setStoolStatuses({})
+            localStorage.setItem(decorKey, JSON.stringify([]))
+            localStorage.setItem(stoolStatusKey, JSON.stringify({}))
+            return
+          }
+          const ins = payload.new
+          if (ins?.data) {
+            const { items, statuses } = parseDecorData(ins.data)
             const fixedItems = sanitizeDecors(items)
             setDecors(fixedItems)
             setStoolStatuses(statuses)
@@ -644,7 +702,7 @@ export default function KassaFloorPlan({
       void supabase.removeChannel(tableChannel).catch(() => {})
       void supabase.removeChannel(decorChannel).catch(() => {})
     }
-  }, [tenant, storageKey, decorKey, stoolStatusKey])
+  }, [tenant, planZone, storageKey, decorKey, stoolStatusKey])
 
   useEffect(() => {
     if (selectedDecor?.type === 'bar_segment') {
@@ -685,19 +743,51 @@ export default function KassaFloorPlan({
   // - Geen items → altijd VRIJ (betaald = automatisch vrij)
   // - Items aanwezig + manueel ONBETAALD → ONBETAALD
   // - Items aanwezig, geen override → BEZET
+  const orderedInZone = useMemo(
+    () => displayNumbersWithOpenOrdersInZone(tableOrders, planZone),
+    [tableOrders, planZone],
+  )
+
   const getStoolStatus = (stoolId: string): TableStatus => {
-    const hasItems = (tableOrders[stoolId] || []).length > 0
+    const hasItems = (tableOrders[tableOrderMapKey(planZone, stoolId)] || []).length > 0
     if (!hasItems) return 'FREE'
     if (stoolStatuses[stoolId] === 'UNPAID') return 'UNPAID'
     return 'OCCUPIED'
   }
 
   const getTableEffectiveStatus = (tableNumber: string, storedStatus: TableStatus): TableStatus => {
-    const hasItems = (tableOrders[tableNumber] || []).length > 0
+    const hasItems = (tableOrders[tableOrderMapKey(planZone, tableNumber)] || []).length > 0
     if (!hasItems) return 'FREE'
     if (storedStatus === 'UNPAID') return 'UNPAID'
     return 'OCCUPIED'
   }
+
+  const floorSurfaceStyle = useMemo(() => {
+    if (planZone === FLOOR_PLAN_ZONE_TERRACE) {
+      return {
+        backgroundColor: '#6b9b72',
+        backgroundPosition: '0 0',
+        backgroundImage: `
+          linear-gradient(to right, rgba(255,255,255,0.14) 0px, rgba(255,255,255,0.14) 2px, transparent 2px),
+          linear-gradient(to bottom, rgba(255,255,255,0.14) 0px, rgba(255,255,255,0.14) 2px, transparent 2px)
+        `,
+        backgroundSize: '100px 100px',
+        cursor: 'default',
+        touchAction: 'none' as const,
+      }
+    }
+    return {
+      backgroundColor: '#4a4a4a',
+      backgroundPosition: '0 0',
+      backgroundImage: `
+        linear-gradient(to right, rgba(200,200,200,0.25) 0px, rgba(200,200,200,0.25) 2px, transparent 2px),
+        linear-gradient(to bottom, rgba(200,200,200,0.25) 0px, rgba(200,200,200,0.25) 2px, transparent 2px)
+      `,
+      backgroundSize: '100px 100px',
+      cursor: 'default',
+      touchAction: 'none' as const,
+    }
+  }, [planZone])
 
   const addDecor = (type: DecorType) => {
     const d: DecorItem = { id: makeId(), type, x: 20 + Math.random() * 60, y: 20 + Math.random() * 60, rotation: 0 }
@@ -879,7 +969,12 @@ export default function KassaFloorPlan({
       {/* Header */}
       <div className="h-14 flex-shrink-0 bg-[#e3e3e3] border-b border-gray-300 flex items-center justify-between px-4">
         <div className="flex items-center gap-3">
-          <h2 className="text-gray-900 font-bold text-lg">{t('kassaApp.pickTableTitle')}</h2>
+          <h2 className="text-gray-900 font-bold text-lg">
+            {t('kassaApp.pickTableTitle')}
+            <span className="ml-2 rounded-md bg-gray-200 px-2 py-0.5 text-xs font-semibold text-gray-700">
+              {planZone === FLOOR_PLAN_ZONE_TERRACE ? t('kassaApp.floorZoneTerrace') : t('kassaApp.floorZoneInside')}
+            </span>
+          </h2>
           <span className="text-gray-500 text-sm">
             {t('kassaApp.floorPlanFreeCount')
               .replace('{free}', String(tables.filter((tbl) => tbl.status === 'FREE').length))
@@ -923,17 +1018,7 @@ export default function KassaFloorPlan({
         <div
           ref={floorRef}
           className="floor-plan flex-1 relative overflow-hidden select-none"
-          style={{
-            backgroundColor: '#4a4a4a',
-            backgroundPosition: '0 0',
-            backgroundImage: `
-              linear-gradient(to right, rgba(200,200,200,0.25) 0px, rgba(200,200,200,0.25) 2px, transparent 2px),
-              linear-gradient(to bottom, rgba(200,200,200,0.25) 0px, rgba(200,200,200,0.25) 2px, transparent 2px)
-            `,
-            backgroundSize: '100px 100px',
-            cursor: 'default',
-            touchAction: 'none',
-          }}
+          style={floorSurfaceStyle}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerCancel}
@@ -968,7 +1053,7 @@ export default function KassaFloorPlan({
               onPointerCancel={(e) => { e.stopPropagation(); handlePointerCancel(e) }}
               onClick={(e) => e.stopPropagation()}
             >
-              <DecorSVG item={d} isSelected={selectedDecor?.id === d.id} orderedStools={new Set(Object.keys(tableOrders).filter(k => (tableOrders[k] || []).length > 0))} stoolStatuses={stoolStatuses} getStoolStatus={getStoolStatus} barLabel={t('kassaApp.floorPlanBarLabel')} />
+              <DecorSVG item={d} isSelected={selectedDecor?.id === d.id} orderedStools={orderedInZone} stoolStatuses={stoolStatuses} getStoolStatus={getStoolStatus} barLabel={t('kassaApp.floorPlanBarLabel')} />
             </div>
             )
           })}

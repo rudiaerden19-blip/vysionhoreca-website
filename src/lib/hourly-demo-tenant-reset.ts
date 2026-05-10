@@ -77,42 +77,60 @@ export async function runHourlyDemoTenantReset(
 
   const branding = await applyFrituurNolimDemoBranding(supabase)
 
+  const DEMO_PLAN_ZONES = ['inside', 'terrace'] as const
+
   let floor_plan_tables: HourlyDemoResetResult['floor_plan_tables'] = 'skipped'
   {
-    const { data, error } = await supabase
-      .from('floor_plan_tables')
-      .select('data')
-      .eq('tenant_slug', slug)
-      .maybeSingle()
-    if (error) {
-      floor_plan_tables = 'error'
-    } else if (data?.data != null) {
-      const next = normalizeTablesJson(data.data)
-      const { error: upErr } = await supabase
+    let anyUpdated = false
+    let anyError = false
+    for (const plan_zone of DEMO_PLAN_ZONES) {
+      const { data, error } = await supabase
         .from('floor_plan_tables')
-        .update({ data: next })
+        .select('data')
         .eq('tenant_slug', slug)
-      floor_plan_tables = upErr ? 'error' : 'updated'
+        .eq('plan_zone', plan_zone)
+        .maybeSingle()
+      if (error) {
+        anyError = true
+      } else if (data?.data != null) {
+        const next = normalizeTablesJson(data.data)
+        const { error: upErr } = await supabase
+          .from('floor_plan_tables')
+          .update({ data: next })
+          .eq('tenant_slug', slug)
+          .eq('plan_zone', plan_zone)
+        if (upErr) anyError = true
+        else anyUpdated = true
+      }
     }
+    floor_plan_tables = anyError ? 'error' : anyUpdated ? 'updated' : 'skipped'
   }
 
   let floor_plan_decor: HourlyDemoResetResult['floor_plan_decor'] = 'skipped'
   {
-    const { data, error } = await supabase
-      .from('floor_plan_decor')
-      .select('data')
-      .eq('tenant_slug', slug)
-      .maybeSingle()
-    if (error) {
-      floor_plan_decor = 'error'
-    } else if (data?.data != null) {
-      const next = normalizeDecorJson(data.data)
-      const { error: upErr } = await supabase
+    let anyUpdated = false
+    let anyError = false
+    for (const plan_zone of DEMO_PLAN_ZONES) {
+      const { data, error } = await supabase
         .from('floor_plan_decor')
-        .update({ data: next })
+        .select('data')
         .eq('tenant_slug', slug)
-      floor_plan_decor = upErr ? 'error' : 'updated'
+        .eq('plan_zone', plan_zone)
+        .maybeSingle()
+      if (error) {
+        anyError = true
+      } else if (data?.data != null) {
+        const next = normalizeDecorJson(data.data)
+        const { error: upErr } = await supabase
+          .from('floor_plan_decor')
+          .update({ data: next })
+          .eq('tenant_slug', slug)
+          .eq('plan_zone', plan_zone)
+        if (upErr) anyError = true
+        else anyUpdated = true
+      }
     }
+    floor_plan_decor = anyError ? 'error' : anyUpdated ? 'updated' : 'skipped'
   }
 
   let shop_online: HourlyDemoResetResult['shop_online'] = 'skipped'
