@@ -32,6 +32,8 @@ export type KassaCustomerDisplayMessage =
       businessName: string
       lines: KassaCustomerDisplayLine[]
       totalInclVat: number
+      /** Dine-in: vooraf gelokaliseerd (kassa → BroadcastChannel). */
+      dineInSubtitle?: string
     }
   | {
       v: 1
@@ -43,6 +45,7 @@ export type KassaCustomerDisplayMessage =
       vatRate: number
       vatAmount: number
       totalInclVat: number
+      dineInSubtitle?: string
     }
   | {
       v: 1
@@ -50,6 +53,7 @@ export type KassaCustomerDisplayMessage =
       tenantSlug: string
       businessName: string
       totalInclVat: number
+      dineInSubtitle?: string
     }
 
 export function isKassaCustomerDisplayMessage(x: unknown): x is KassaCustomerDisplayMessage {

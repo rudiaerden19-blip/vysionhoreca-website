@@ -1128,6 +1128,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [customerDisplayThankYou, setCustomerDisplayThankYou] = useState<{
     total: number
     until: number
+    /** Unieke tafelcontext tijdens bedankfase (nummer + zone). */
+    dineInSubtitle?: string
   } | null>(null)
   const customerDisplayBcRef = useRef<BroadcastChannel | null>(null)
   /** HTML bon wacht op modal als lokale Print Agent faalt; daarna printReceiptHtmlDocument */
@@ -1571,6 +1573,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         }`
       : ''
 
+  /** Klantscherm: vooraf gelokaliseerde regel tafel + zone (BroadcastChannel). */
+  const customerDisplayDineInSubtitle = useMemo((): string | undefined => {
+    if (orderType !== 'DINE_IN' || !tableNumber) return undefined
+    const zoneLabel =
+      dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE
+        ? t('kassaApp.floorZoneTerrace')
+        : t('kassaApp.floorZoneInside')
+    return t('kassaCustomerDisplay.dineInTableZoneLine')
+      .replace(/\{number\}/g, String(tableNumber))
+      .replace(/\{zone\}/g, zoneLabel)
+  }, [orderType, tableNumber, dineInFloorZone, t])
+
   const openKlantschermWindow = useCallback(() => {
     if (typeof window === 'undefined') return
     let tok = customerDisplayToken
@@ -1648,6 +1662,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         tenantSlug: tenant,
         businessName,
         totalInclVat: customerDisplayThankYou.total,
+        dineInSubtitle: customerDisplayThankYou.dineInSubtitle,
       }
     } else if (cart.length === 0 && !showPaymentModal && !showSplitModal) {
       msg = { v: 1, phase: 'idle', tenantSlug: tenant, businessName }
@@ -1665,6 +1680,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         vatRate,
         vatAmount,
         totalInclVat,
+        dineInSubtitle: customerDisplayDineInSubtitle,
       }
     } else if (cart.length > 0) {
       msg = {
@@ -1674,6 +1690,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         businessName,
         lines: buildKassaCustomerDisplayLines(cart),
         totalInclVat,
+        dineInSubtitle: customerDisplayDineInSubtitle,
       }
     } else {
       msg = { v: 1, phase: 'idle', tenantSlug: tenant, businessName }
@@ -1697,6 +1714,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     tenantInfo?.business_name,
     tenantInfo?.btw_percentage,
     customerDisplayThankYou,
+    customerDisplayDineInSubtitle,
   ])
 
   /** Totaal per product-id voor tegel-badge; vermijdt O(producten × mandregels) bij elke qty-wijziging. */
@@ -1970,6 +1988,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setCustomerDisplayThankYou({
       total: Math.round(total * 100) / 100,
       until: Date.now() + KASSA_CUSTOMER_DISPLAY_THANK_YOU_MS,
+      dineInSubtitle:
+        orderType === 'DINE_IN' && tableNumber
+          ? t('kassaCustomerDisplay.dineInTableZoneLine')
+              .replace(/\{number\}/g, String(tableNumber))
+              .replace(
+                /\{zone\}/g,
+                dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE
+                  ? t('kassaApp.floorZoneTerrace')
+                  : t('kassaApp.floorZoneInside'),
+              )
+          : undefined,
     })
 
     setLastOrder({
@@ -2871,53 +2900,69 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* ── Rechts: numpad / cart ── */}
         <div className="w-80 sm:w-96 lg:w-[380px] bg-white border-l border-gray-200 flex flex-col flex-shrink-0 min-h-0 min-w-0 overflow-hidden">
 
-        {/* Tafel knop */}
+        {/* Dine-in: één rij — twee halve knoppen (Binnen / Terras). Geen aparte “Kies tafel…”. */}
         {orderType === 'DINE_IN' && (
           <div className="px-3 pt-3 relative shrink-0">
-            <button
-              onClick={() => setShowTablePicker(p => !p)}
-              className="w-full py-3 rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold text-base transition-colors"
-            >
-              {tableNumber
-                ? kassaStoolsByZone[dineInFloorZone].some((s) => s.stoolNumber === tableNumber)
-                  ? `🍺 ${t('kassaApp.stoolWord')} ${tableNumber}${
-                      dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE ? ` · ${t('kassaApp.floorZoneTerraceShort')}` : ''
-                    }`
-                  : `🪑 ${t('kassaApp.tableWord')} ${tableNumber}${
-                      dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE ? ` · ${t('kassaApp.floorZoneTerraceShort')}` : ''
-                    }`
-                : t('kassaApp.pickTablePlaceholder')}
-            </button>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  playClick()
+                  if (showTablePicker && pickerBrowseZone === FLOOR_PLAN_ZONE_INSIDE) {
+                    setShowTablePicker(false)
+                    return
+                  }
+                  setPickerBrowseZone(FLOOR_PLAN_ZONE_INSIDE)
+                  setShowTablePicker(true)
+                }}
+                className={`flex min-h-[48px] flex-1 flex-col items-center justify-center rounded-xl px-2 py-2.5 font-bold transition-colors sm:py-3 ${
+                  pickerBrowseZone === FLOOR_PLAN_ZONE_INSIDE && showTablePicker
+                    ? 'bg-[#3C4D6B] text-white ring-2 ring-[#58CCFF]/55 ring-offset-2 ring-offset-white'
+                    : 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
+                }`}
+              >
+                <span className="text-sm sm:text-base">{t('kassaApp.floorZoneInside')}</span>
+                {tableNumber && dineInFloorZone === FLOOR_PLAN_ZONE_INSIDE ? (
+                  <span className="mt-0.5 text-xs font-semibold opacity-95">
+                    {kassaStoolsByZone[FLOOR_PLAN_ZONE_INSIDE].some((s) => s.stoolNumber === tableNumber)
+                      ? `🍺 ${tableNumber}`
+                      : `🪑 ${tableNumber}`}
+                  </span>
+                ) : null}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  playClick()
+                  if (showTablePicker && pickerBrowseZone === FLOOR_PLAN_ZONE_TERRACE) {
+                    setShowTablePicker(false)
+                    return
+                  }
+                  setPickerBrowseZone(FLOOR_PLAN_ZONE_TERRACE)
+                  setShowTablePicker(true)
+                }}
+                className={`flex min-h-[48px] flex-1 flex-col items-center justify-center rounded-xl px-2 py-2.5 font-bold transition-colors sm:py-3 ${
+                  pickerBrowseZone === FLOOR_PLAN_ZONE_TERRACE && showTablePicker
+                    ? 'bg-emerald-600 text-white ring-2 ring-emerald-300/80 ring-offset-2 ring-offset-white'
+                    : 'bg-emerald-600 text-white hover:bg-emerald-700'
+                }`}
+              >
+                <span className="text-sm sm:text-base">{t('kassaApp.floorZoneTerrace')}</span>
+                {tableNumber && dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE ? (
+                  <span className="mt-0.5 text-xs font-semibold opacity-95">
+                    {kassaStoolsByZone[FLOOR_PLAN_ZONE_TERRACE].some((s) => s.stoolNumber === tableNumber)
+                      ? `🍺 ${tableNumber}`
+                      : `🪑 ${tableNumber}`}
+                  </span>
+                ) : null}
+              </button>
+            </div>
 
             {/* Tafel picker popup */}
             {showTablePicker && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setShowTablePicker(false)} />
                 <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
-                  <div className="flex gap-2 border-b border-gray-100 bg-white p-2">
-                    <button
-                      type="button"
-                      onClick={() => setPickerBrowseZone(FLOOR_PLAN_ZONE_INSIDE)}
-                      className={`flex-1 rounded-xl py-2 text-sm font-bold transition-colors ${
-                        pickerBrowseZone === FLOOR_PLAN_ZONE_INSIDE
-                          ? 'bg-[#3C4D6B] text-white shadow-sm'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {t('kassaApp.floorZoneInside')}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPickerBrowseZone(FLOOR_PLAN_ZONE_TERRACE)}
-                      className={`flex-1 rounded-xl py-2 text-sm font-bold transition-colors ${
-                        pickerBrowseZone === FLOOR_PLAN_ZONE_TERRACE
-                          ? 'bg-emerald-600 text-white shadow-sm'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {t('kassaApp.floorZoneTerrace')}
-                    </button>
-                  </div>
                   <div className="p-3 border-b bg-gray-50">
                     <p className="text-xs font-bold text-gray-500 uppercase tracking-wider text-center">{t('kassaApp.pickTableTitle')}</p>
                   </div>
@@ -3227,7 +3272,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               onClick={parkOrder}
               className="w-full py-3 rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold text-base transition-colors flex items-center justify-center gap-2"
             >
-              🪑 {t('kassaApp.parkToTable').replace(/\{number\}/g, String(tableNumber))}
+              🪑{' '}
+              {t('kassaApp.parkToTable')
+                .replace(/\{number\}/g, String(tableNumber))
+                .replace(
+                  /\{zone\}/g,
+                  dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE
+                    ? t('kassaApp.floorZoneTerrace')
+                    : t('kassaApp.floorZoneInside'),
+                )}
             </button>
           )}
           <button

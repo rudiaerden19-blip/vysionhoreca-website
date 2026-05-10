@@ -211,6 +211,14 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
         >
           {t('kassaCustomerDisplay.thankYouToPay').replace('{amount}', amountStr)}
         </p>
+        {msg.dineInSubtitle ? (
+          <p
+            className="max-w-[96vw] text-[clamp(1.1rem,3.2vw,2rem)] font-semibold leading-snug text-white/80"
+            suppressHydrationWarning
+          >
+            {msg.dineInSubtitle}
+          </p>
+        ) : null}
         <p
           className="max-w-[96vw] text-[clamp(1.35rem,3.8vw,2.75rem)] font-semibold leading-snug text-white/90"
           suppressHydrationWarning
@@ -296,6 +304,11 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
       <header className={`text-center ${d.headerWrap}`}>
         <h1 className={d.businessName}>{msg.businessName}</h1>
         <p className={d.phaseTitle}>{title}</p>
+        {msg.dineInSubtitle ? (
+          <p className="mt-2 text-[clamp(0.95rem,2.4vw,1.35rem)] font-semibold leading-snug text-white/80">
+            {msg.dineInSubtitle}
+          </p>
+        ) : null}
       </header>
 
       {lines.length === 0 ? (
