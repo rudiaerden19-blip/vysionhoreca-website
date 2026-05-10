@@ -3353,6 +3353,7 @@
   "kassaCustomerDisplay": {
     "missingToken": "セッションが無効です。レジからお客様画面を開いてください。",
     "waiting": "レジを待っています…",
+    "clockLoading": "時計を読み込み中…",
     "yourOrder": "ご注文",
     "checkoutTitle": "お会計",
     "subtotalExVat": "小計（税抜）",

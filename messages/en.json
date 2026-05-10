@@ -3807,6 +3807,7 @@
   "kassaCustomerDisplay": {
     "missingToken": "Invalid session. Open the customer display from the register.",
     "waiting": "Waiting for register…",
+    "clockLoading": "Loading clock…",
     "yourOrder": "Your order",
     "checkoutTitle": "Checkout",
     "subtotalExVat": "Subtotal excl. VAT",

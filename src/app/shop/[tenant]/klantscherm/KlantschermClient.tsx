@@ -123,7 +123,19 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
 
   const waitingClock = Boolean(token && (!msg || msg.phase === 'idle'))
 
-  const [now, setNow] = useState(() => new Date())
+  /** Geen `new Date()` tijdens SSR — server-TZ (UTC) gaf verkeerde klok; pas na mount ticken. */
+  const [now, setNow] = useState<Date | null>(null)
+
+  const browserTimeZone =
+    typeof window !== 'undefined'
+      ? (() => {
+          try {
+            return Intl.DateTimeFormat().resolvedOptions().timeZone
+          } catch {
+            return undefined
+          }
+        })()
+      : undefined
 
   useEffect(() => {
     if (!waitingClock) return
@@ -170,15 +182,39 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
   }
 
   if (!msg || msg.phase === 'idle') {
-    const { hours, minutes } = formatKlantschermWaitingClockParts(now, locale)
+    const tzOpts = browserTimeZone ? { timeZone: browserTimeZone } : {}
+
+    if (!now) {
+      return (
+        <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-center bg-black px-[max(0.25rem,env(safe-area-inset-left))] py-[max(0.25rem,env(safe-area-inset-top))] pb-[max(0.25rem,env(safe-area-inset-bottom))] pr-[max(0.25rem,env(safe-area-inset-right))] text-center">
+          <div className="flex max-w-[98vw] flex-col items-center gap-8 sm:gap-12 md:gap-16">
+            <p className="h-[1.2em] min-w-[12ch] animate-pulse rounded-md bg-white/15 text-[clamp(1.25rem,4vw,2.85rem)]">
+              <span className="sr-only">{t('kassaCustomerDisplay.clockLoading')}</span>
+            </p>
+            <div
+              dir="ltr"
+              className="flex flex-row flex-nowrap items-center justify-center gap-[clamp(0.25rem,1.8vw,1rem)] opacity-30 [font-family:var(--font-klantscherm-digital),system-ui,sans-serif]"
+              aria-hidden
+            >
+              <span className="text-[clamp(3.25rem,17vw,13rem)] font-black tabular-nums leading-none tracking-[0.05em]">
+                –
+              </span>
+              <span className="translate-y-[-0.05em] select-none text-[clamp(2rem,12vw,9rem)] leading-none">:</span>
+              <span className="text-[clamp(3.25rem,17vw,13rem)] font-black tabular-nums leading-none tracking-[0.05em]">
+                –
+              </span>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    const { hours, minutes } = formatKlantschermWaitingClockParts(now, locale, tzOpts)
     return (
       <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-center bg-black px-[max(0.25rem,env(safe-area-inset-left))] py-[max(0.25rem,env(safe-area-inset-top))] pb-[max(0.25rem,env(safe-area-inset-bottom))] pr-[max(0.25rem,env(safe-area-inset-right))] text-center">
         <div className="flex max-w-[98vw] flex-col items-center gap-8 sm:gap-12 md:gap-16">
-          <p
-            className="text-[clamp(1.25rem,4vw,2.85rem)] font-medium leading-snug tracking-[0.06em] text-white/90"
-            suppressHydrationWarning
-          >
-            {formatKlantschermWaitingDateLine(now, locale)}
+          <p className="text-[clamp(1.25rem,4vw,2.85rem)] font-medium leading-snug tracking-[0.06em] text-white/90">
+            {formatKlantschermWaitingDateLine(now, locale, tzOpts)}
           </p>
           <div
             dir="ltr"
@@ -187,7 +223,6 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
               textShadow:
                 '0 0 28px rgba(255,255,255,0.4), 0 0 72px rgba(160,200,255,0.14)',
             }}
-            suppressHydrationWarning
           >
             <span className="text-[clamp(3.25rem,17vw,13rem)] font-black tabular-nums leading-none tracking-[0.05em]">
               {hours}

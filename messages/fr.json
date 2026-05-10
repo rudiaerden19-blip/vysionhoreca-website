@@ -2853,6 +2853,7 @@
   "kassaCustomerDisplay": {
     "missingToken": "Session invalide. Ouvrez l’écran client depuis la caisse.",
     "waiting": "En attente de la caisse…",
+    "clockLoading": "Chargement de l’heure…",
     "yourOrder": "Votre commande",
     "checkoutTitle": "Paiement",
     "subtotalExVat": "Sous-total HT",

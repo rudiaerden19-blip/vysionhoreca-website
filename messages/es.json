@@ -3353,6 +3353,7 @@
   "kassaCustomerDisplay": {
     "missingToken": "Sesión no válida. Abra la pantalla cliente desde la caja.",
     "waiting": "Esperando la caja…",
+    "clockLoading": "Cargando reloj…",
     "yourOrder": "Su pedido",
     "checkoutTitle": "Pago",
     "subtotalExVat": "Subtotal sin IVA",

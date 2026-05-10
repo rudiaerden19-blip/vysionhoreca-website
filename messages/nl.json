@@ -3807,6 +3807,7 @@
   "kassaCustomerDisplay": {
     "missingToken": "Ongeldige sessie. Open het klantscherm vanuit de kassa.",
     "waiting": "Wacht op kassa…",
+    "clockLoading": "Klok laden…",
     "yourOrder": "Uw bestelling",
     "checkoutTitle": "Afrekenen",
     "subtotalExVat": "Subtotaal excl. btw",

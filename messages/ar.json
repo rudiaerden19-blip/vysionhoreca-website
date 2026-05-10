@@ -3353,6 +3353,7 @@
   "kassaCustomerDisplay": {
     "missingToken": "جلسة غير صالحة. افتح شاشة العميل من نقطة البيع.",
     "waiting": "في انتظار نقطة البيع…",
+    "clockLoading": "جاري تحميل الساعة…",
     "yourOrder": "طلبك",
     "checkoutTitle": "الدفع",
     "subtotalExVat": "المجموع الفرعي بدون ضريبة",

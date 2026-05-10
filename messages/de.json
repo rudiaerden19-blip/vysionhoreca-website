@@ -2853,6 +2853,7 @@
   "kassaCustomerDisplay": {
     "missingToken": "Ungültige Sitzung. Öffnen Sie die Kundenanzeige von der Kasse aus.",
     "waiting": "Warte auf Kasse…",
+    "clockLoading": "Uhr wird geladen…",
     "yourOrder": "Ihre Bestellung",
     "checkoutTitle": "Zahlung",
     "subtotalExVat": "Zwischensumme ohne MwSt.",

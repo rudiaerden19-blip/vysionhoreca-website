@@ -3353,6 +3353,7 @@
   "kassaCustomerDisplay": {
     "missingToken": "会话无效。请从收银台打开顾客显示屏。",
     "waiting": "等待收银台…",
+    "clockLoading": "正在加载时钟…",
     "yourOrder": "您的订单",
     "checkoutTitle": "结账",
     "subtotalExVat": "不含税小计",
