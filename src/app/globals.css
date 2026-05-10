@@ -32,6 +32,27 @@ html.vysion-klantscherm-root body {
   background: #000000 !important;
   color-scheme: dark !important;
   overflow-x: hidden !important;
+  /* LCD tweede scherm: subpixel-RGB i.p.v. grijs-antialiased — vaak scherper op klassieke panels */
+  -webkit-font-smoothing: auto !important;
+  -moz-osx-font-smoothing: auto !important;
+  text-rendering: geometricPrecision;
+}
+
+/* Hoofdkassa: zelfde lcd-hooks als klantscherm — alleen actief op /admin/kassa (zie pagina useEffect). */
+html.vysion-kassa-root,
+html.vysion-kassa-root body {
+  -webkit-font-smoothing: auto !important;
+  -moz-osx-font-smoothing: auto !important;
+  text-rendering: geometricPrecision;
+}
+
+/* Foto-tegels en thumbnails: scherpere herberekening bij opschalen in Chromium/Edge op klassieke lcd */
+html.vysion-klantscherm-root img,
+html.vysion-klantscherm-root picture img,
+html.vysion-kassa-root img,
+html.vysion-kassa-root picture img {
+  image-rendering: auto;
+  image-rendering: -webkit-optimize-contrast;
 }
 
 @keyframes klantscherm-clock-colon {

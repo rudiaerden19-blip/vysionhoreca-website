@@ -212,6 +212,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setShowSoundActivation(false)
   }
 
+  /** Css-hooks voor scherpere lcd-weergave (globals.css: tekst + afbeeldingen); opruimen bij verlaten kassa */
+  useEffect(() => {
+    const html = document.documentElement
+    const body = document.body
+    html.classList.add('vysion-kassa-root')
+    body.classList.add('vysion-kassa-root')
+    return () => {
+      html.classList.remove('vysion-kassa-root')
+      body.classList.remove('vysion-kassa-root')
+    }
+  }, [])
+
   /** Eerste tik op kassa ontgrendelt audio (sessie al “ok”) zodat poll achtergrond alarm kan afspelen */
   const audioUnlockOnceRef = useRef(false)
   useEffect(() => {
