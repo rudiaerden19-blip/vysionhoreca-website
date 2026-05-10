@@ -10,6 +10,73 @@ import {
 } from '@/lib/tenant-modules'
 import { isAdminTenant } from '@/lib/protected-tenants'
 import { isMissingPostTrialModulesColumnError } from '@/lib/supabase-post-trial-column'
+import { cache, CACHE_TTL, cacheKey } from '@/lib/cache'
+
+type RawModuleFlagRow = {
+  plan?: string | null
+  enabled_modules?: unknown
+  subscription_status?: string | null
+  trial_ends_at?: string | null
+  feature_group_orders?: boolean | null
+  feature_label_printing?: boolean | null
+  post_trial_modules_confirmed?: boolean | null
+} | null
+
+type RawModuleFlagSub = {
+  status?: string | null
+  trial_ends_at?: string | null
+  plan?: string | null
+} | null
+
+/**
+ * Haalt de twee Supabase-queries op die `useTenantModuleFlags` nodig heeft, met een
+ * 60-seconden cache per tenant-slug. Voor admin-modulewissels binnen 60s = 0 round-trips.
+ * Bij plan/blokkade-wijziging in superadmin: invalidateModuleFlags(slug).
+ */
+async function fetchRawModuleFlags(
+  slug: string
+): Promise<{ row: RawModuleFlagRow; sub: RawModuleFlagSub }> {
+  return cache.getOrFetch(
+    cacheKey('tenant_module_flags', slug),
+    async () => {
+      const [tRes, sRes] = await Promise.all([
+        supabase
+          .from('tenants')
+          .select(
+            'plan, enabled_modules, subscription_status, trial_ends_at, feature_group_orders, feature_label_printing, post_trial_modules_confirmed'
+          )
+          .eq('slug', slug)
+          .maybeSingle(),
+        supabase
+          .from('subscriptions')
+          .select('status, trial_ends_at, plan')
+          .eq('tenant_slug', slug)
+          .maybeSingle(),
+      ])
+
+      let row = tRes.data as RawModuleFlagRow
+      if (tRes.error && isMissingPostTrialModulesColumnError(tRes.error)) {
+        const r2 = await supabase
+          .from('tenants')
+          .select(
+            'plan, enabled_modules, subscription_status, trial_ends_at, feature_group_orders, feature_label_printing'
+          )
+          .eq('slug', slug)
+          .maybeSingle()
+        if (!r2.error && r2.data) {
+          row = { ...r2.data, post_trial_modules_confirmed: true } as RawModuleFlagRow
+        }
+      }
+
+      return { row, sub: sRes.data as RawModuleFlagSub }
+    },
+    CACHE_TTL.TENANT_MODULE_FLAGS
+  )
+}
+
+export function invalidateTenantModuleFlags(slug: string) {
+  cache.invalidate(cacheKey('tenant_module_flags', slug))
+}
 
 export interface TenantModuleFlagsResult {
   moduleAccess: Record<TenantModuleId, boolean>
@@ -42,7 +109,10 @@ export function useTenantModuleFlags(tenantSlug: string | undefined): TenantModu
   const [result, setResult] = useState<TenantModuleFlagsResult>(DEFAULT_FLAGS)
   const [tick, setTick] = useState(0)
 
-  const refetch = useCallback(() => setTick((t) => t + 1), [])
+  const refetch = useCallback(() => {
+    if (tenantSlug) invalidateTenantModuleFlags(tenantSlug)
+    setTick((t) => t + 1)
+  }, [tenantSlug])
 
   useEffect(() => {
     if (!tenantSlug || !supabase) {
@@ -67,38 +137,13 @@ export function useTenantModuleFlags(tenantSlug: string | undefined): TenantModu
     let cancelled = false
 
     async function load() {
-      setResult((r) => ({ ...r, loading: true }))
-      const [tRes, sRes] = await Promise.all([
-        supabase
-          .from('tenants')
-          .select(
-            'plan, enabled_modules, subscription_status, trial_ends_at, feature_group_orders, feature_label_printing, post_trial_modules_confirmed'
-          )
-          .eq('slug', slug)
-          .maybeSingle(),
-        supabase
-          .from('subscriptions')
-          .select('status, trial_ends_at, plan')
-          .eq('tenant_slug', slug)
-          .maybeSingle(),
-      ])
-
+      // 60s cache per slug (in-memory, reset bij refresh) → admin-module-wissels binnen
+      // dezelfde sessie zijn 0 round-trips i.p.v. 2 Supabase-queries.
+      const { row: rawRow, sub: rawSub } = await fetchRawModuleFlags(slug)
       if (cancelled) return
 
-      let row = tRes.data
-      if (tRes.error && isMissingPostTrialModulesColumnError(tRes.error)) {
-        const r2 = await supabase
-          .from('tenants')
-          .select(
-            'plan, enabled_modules, subscription_status, trial_ends_at, feature_group_orders, feature_label_printing'
-          )
-          .eq('slug', slug)
-          .maybeSingle()
-        if (!r2.error && r2.data) {
-          row = { ...r2.data, post_trial_modules_confirmed: true }
-        }
-      }
-      let sub = sRes.data
+      let row = rawRow
+      let sub = rawSub
       if (isAdminTenant(slug)) {
         if (row) {
           row = {

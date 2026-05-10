@@ -88,6 +88,7 @@ export const cache = new SimpleCache()
 // Cache TTL constants
 export const CACHE_TTL = {
   TENANT_SETTINGS: 60000,     // 1 minute - rarely changes
+  TENANT_MODULE_FLAGS: 60000, // 1 minute - module-toggles + plan veranderen zelden tijdens een sessie
   MENU_CATEGORIES: 60000,     // 1 minute
   MENU_PRODUCTS: 30000,       // 30 seconds
   OPENING_HOURS: 300000,      // 5 minutes - very static
