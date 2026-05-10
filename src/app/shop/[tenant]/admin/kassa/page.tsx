@@ -96,6 +96,16 @@ import {
   type KassaCustomerDisplayMessage,
   type KassaCustomerDisplayLine,
 } from '@/lib/kassa-customer-display'
+import {
+  buildCustomerDisplayPopupFeatures,
+  heuristicSecondaryBoundsSync,
+  prefetchCustomerDisplayBounds,
+  positionCustomerDisplayWindow,
+  readCachedSecondaryBounds,
+  resolveSecondaryBoundsViaApi,
+  writeCachedSecondaryBounds,
+  applyCustomerDisplayWindowBounds,
+} from '@/lib/kassa-customer-display-window'
 
 function buildKassaCustomerDisplayLines(cart: CartItem[]): KassaCustomerDisplayLine[] {
   return cart.map((i) => {
@@ -937,6 +947,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [tenant])
 
   useEffect(() => {
+    void prefetchCustomerDisplayBounds(window)
+  }, [tenant])
+
+  useEffect(() => {
     if (!customerDisplayToken || typeof BroadcastChannel === 'undefined') {
       customerDisplayBcRef.current?.close()
       customerDisplayBcRef.current = null
@@ -1201,10 +1215,44 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       setCustomerDisplayToken(tok)
     }
     const url = `${window.location.origin}/shop/${tenant}/klantscherm?t=${encodeURIComponent(tok)}`
-    const w = window.open(url, `vysion_klantscherm_${tenant}`, 'popup=yes,width=240,height=160,noopener,noreferrer')
+    const winName = `vysion_klantscherm_${tenant}`
+
+    const cached = readCachedSecondaryBounds()
+    const heuristic = heuristicSecondaryBoundsSync(window.screen)
+    const syncBounds = cached ?? heuristic
+
+    let features =
+      'popup=yes,width=520,height=380,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable=yes'
+    if (syncBounds) {
+      features = buildCustomerDisplayPopupFeatures(syncBounds)
+    }
+
+    const w = window.open(url, winName, features)
     if (!w) {
       window.alert(t('kassaApp.customerDisplayOpenFailed'))
+      return
     }
+
+    if (syncBounds) {
+      applyCustomerDisplayWindowBounds(w, syncBounds)
+    }
+
+    const reposition = async () => {
+      const fresh = await resolveSecondaryBoundsViaApi(window)
+      if (fresh) {
+        writeCachedSecondaryBounds(fresh)
+        await positionCustomerDisplayWindow(w)
+        await new Promise((r) => setTimeout(r, 120))
+        await positionCustomerDisplayWindow(w)
+        return
+      }
+      if (syncBounds) {
+        await positionCustomerDisplayWindow(w)
+        await new Promise((r) => setTimeout(r, 120))
+        await positionCustomerDisplayWindow(w)
+      }
+    }
+    void reposition()
   }, [tenant, customerDisplayToken, t])
 
   useEffect(() => {

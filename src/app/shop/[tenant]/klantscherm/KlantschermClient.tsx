@@ -38,11 +38,14 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
   useEffect(() => {
     if (!token) return
     let cancelled = false
+    const delays = [0, 80, 200, 450, 900]
     const run = async () => {
-      await positionCustomerDisplayWindow(window)
-      if (cancelled) return
-      await new Promise((r) => setTimeout(r, 150))
-      if (!cancelled) await positionCustomerDisplayWindow(window)
+      for (const ms of delays) {
+        if (cancelled) return
+        if (ms > 0) await new Promise((r) => setTimeout(r, ms))
+        if (cancelled) return
+        await positionCustomerDisplayWindow(window)
+      }
     }
     void run()
     return () => {
