@@ -101,6 +101,7 @@ import {
   heuristicSecondaryBoundsSync,
   prefetchCustomerDisplayBounds,
   positionCustomerDisplayWindow,
+  pulseApplyCustomerDisplayBounds,
   readCachedSecondaryBounds,
   resolveSecondaryBoundsViaApi,
   writeCachedSecondaryBounds,
@@ -1235,18 +1236,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     if (syncBounds) {
       applyCustomerDisplayWindowBounds(w, syncBounds)
+      pulseApplyCustomerDisplayBounds(w, syncBounds, 12_000)
     }
 
     const reposition = async () => {
       const fresh = await resolveSecondaryBoundsViaApi(window)
-      if (fresh) {
-        writeCachedSecondaryBounds(fresh)
-        await positionCustomerDisplayWindow(w)
-        await new Promise((r) => setTimeout(r, 120))
-        await positionCustomerDisplayWindow(w)
-        return
-      }
-      if (syncBounds) {
+      const bounds = fresh ?? syncBounds
+      if (fresh) writeCachedSecondaryBounds(fresh)
+      if (bounds && !w.closed) {
+        pulseApplyCustomerDisplayBounds(w, bounds, 12_000)
         await positionCustomerDisplayWindow(w)
         await new Promise((r) => setTimeout(r, 120))
         await positionCustomerDisplayWindow(w)

@@ -98,6 +98,8 @@ export function buildCustomerDisplayPopupFeatures(bounds: ScreenLike): string {
     `top=${top}`,
     `width=${width}`,
     `height=${height}`,
+    /* Edge/Chromium: soms extra viewport; geen garantie */
+    'fullscreen=yes',
     'menubar=no',
     'toolbar=no',
     'location=no',
@@ -144,6 +146,24 @@ function applyBounds(target: Window, s: ScreenLike): boolean {
 /** Direct na window.open aanroepen (zelfde tick); backup voor browsers die features negeren. */
 export function applyCustomerDisplayWindowBounds(target: Window, bounds: ScreenLike): boolean {
   return applyBounds(target, bounds)
+}
+
+/**
+ * Houdt het klantscherm venster op werkgebied-breedte (geen muis op klantscherm).
+ * Herhaalt move/resize enkele seconden tegen browser-chrome die eerst kleiner opent.
+ */
+export function pulseApplyCustomerDisplayBounds(
+  target: Window,
+  bounds: ScreenLike,
+  durationMs = 8000,
+): void {
+  const tick = () => {
+    if (target.closed) return
+    applyCustomerDisplayWindowBounds(target, bounds)
+  }
+  tick()
+  const id = window.setInterval(tick, 180)
+  window.setTimeout(() => clearInterval(id), durationMs)
 }
 
 /** Popup naar gekozen tweede scherm brengen (ná open). */

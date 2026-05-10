@@ -41,3 +41,26 @@ export function formatKassaNumpadHeaderDate(date: Date, locale: Locale): string 
   // Arabisch (Latin digits): verbind met spaties; RTL laat de browser aan.
   return `${weekday} ${day} ${month} ${year}`.replace(/\s+/g, ' ').trim()
 }
+
+/** Klantscherm wachtscherm: weekdag + DD/MM/JJJJ (zelfde locale als kassa). */
+export function formatKlantschermWaitingDateLine(date: Date, locale: Locale): string {
+  const tag = localeTag[locale] ?? 'en-GB'
+  const weekday = new Intl.DateTimeFormat(tag, { weekday: 'long' }).format(date)
+  const rest = new Intl.DateTimeFormat(tag, {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).format(date)
+  const cap = (s: string) => (s.length === 0 ? s : s.charAt(0).toUpperCase() + s.slice(1))
+  return `${cap(weekday)} ${rest}`
+}
+
+/** 24-uurs tijd HH:mm voor klantscherm-klok. */
+export function formatKlantschermWaitingClock(date: Date, locale: Locale): string {
+  const tag = localeTag[locale] ?? 'en-GB'
+  return new Intl.DateTimeFormat(tag, {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(date)
+}

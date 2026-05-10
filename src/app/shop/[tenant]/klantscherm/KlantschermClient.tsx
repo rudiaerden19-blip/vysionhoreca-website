@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useLanguage } from '@/i18n'
 import {
@@ -9,9 +9,13 @@ import {
   type KassaCustomerDisplayMessage,
 } from '@/lib/kassa-customer-display'
 import { positionCustomerDisplayWindow } from '@/lib/kassa-customer-display-window'
+import {
+  formatKlantschermWaitingClock,
+  formatKlantschermWaitingDateLine,
+} from '@/lib/format-kassa-header-date'
 
 export function KlantschermClient({ tenant }: { tenant: string }) {
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
   const searchParams = useSearchParams()
   const token = searchParams.get('t')?.trim() ?? ''
 
@@ -35,7 +39,7 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
     return () => bc.close()
   }, [channelName, tenant])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!token || typeof document === 'undefined') return
     const tryFullscreen = () => {
       if (document.fullscreenElement) return
@@ -44,7 +48,46 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
       if (!req) return
       void req.call(el, { navigationUI: 'hide' }).catch(() => {})
     }
-    const fullscreenTimers = [450, 1200].map((ms) => window.setTimeout(tryFullscreen, ms))
+    tryFullscreen()
+  }, [token])
+
+  useEffect(() => {
+    if (!token || typeof document === 'undefined') return
+    let cleared = false
+    let attempts = 0
+    const maxAttempts = 48
+    const id = window.setInterval(() => {
+      if (cleared) return
+      if (document.fullscreenElement) {
+        window.clearInterval(id)
+        return
+      }
+      attempts += 1
+      if (attempts > maxAttempts) {
+        window.clearInterval(id)
+        return
+      }
+      const el = document.documentElement
+      const req = el.requestFullscreen as ((options?: FullscreenOptions) => Promise<void>) | undefined
+      if (!req) return
+      void req.call(el, { navigationUI: 'hide' }).catch(() => {})
+    }, 220)
+    return () => {
+      cleared = true
+      window.clearInterval(id)
+    }
+  }, [token])
+
+  useEffect(() => {
+    if (!token || typeof document === 'undefined') return
+    const tryLateFullscreen = () => {
+      if (document.fullscreenElement) return
+      const el = document.documentElement
+      const req = el.requestFullscreen as ((options?: FullscreenOptions) => Promise<void>) | undefined
+      if (!req) return
+      void req.call(el, { navigationUI: 'hide' }).catch(() => {})
+    }
+    const fullscreenTimers = [2800, 5200].map((ms) => window.setTimeout(tryLateFullscreen, ms))
     return () => fullscreenTimers.forEach(clearTimeout)
   }, [token])
 
@@ -66,6 +109,18 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
     }
   }, [token])
 
+  const waitingClock = Boolean(token && (!msg || msg.phase === 'idle'))
+
+  const [now, setNow] = useState(() => new Date())
+
+  useEffect(() => {
+    if (!waitingClock) return
+    const tick = () => setNow(new Date())
+    tick()
+    const id = window.setInterval(tick, 1000)
+    return () => window.clearInterval(id)
+  }, [waitingClock])
+
   const formatMoney = (n: number) =>
     new Intl.NumberFormat('nl-BE', { style: 'currency', currency: 'EUR' }).format(n)
 
@@ -83,7 +138,20 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
   if (!msg || msg.phase === 'idle') {
     return (
       <div className={`${shell} items-center justify-center text-center`}>
-        <p className="text-lg opacity-90 sm:text-xl md:text-2xl">{t('kassaCustomerDisplay.waiting')}</p>
+        <div className="flex flex-col items-center gap-2 sm:gap-4">
+          <p
+            className="text-2xl font-semibold leading-tight tracking-tight opacity-95 sm:text-3xl md:text-4xl lg:text-5xl"
+            suppressHydrationWarning
+          >
+            {formatKlantschermWaitingDateLine(now, locale)}
+          </p>
+          <p
+            className="font-black tabular-nums tracking-tight text-5xl sm:text-6xl md:text-7xl lg:text-8xl"
+            suppressHydrationWarning
+          >
+            {formatKlantschermWaitingClock(now, locale)}
+          </p>
+        </div>
       </div>
     )
   }
