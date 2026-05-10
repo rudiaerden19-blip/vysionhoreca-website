@@ -42,7 +42,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
-import { getAuthHeaders } from '@/lib/auth-headers'
+import { getAuthHeaders, authFetch } from '@/lib/auth-headers'
 import { useLanguage } from '@/i18n'
 
 import type {
@@ -101,6 +101,7 @@ function useToast() {
 
 // ---- Email helper ----
 async function sendReservationEmail(data: {
+  tenantSlug: string
   customerEmail: string
   customerName: string
   customerPhone?: string
@@ -119,9 +120,8 @@ async function sendReservationEmail(data: {
   reviewLink?: string
 }) {
   try {
-    await fetch('/api/send-reservation-email', {
+    await authFetch('/api/send-reservation-email', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     })
   } catch { /* Stille fout */ }
@@ -1377,10 +1377,10 @@ export default function KassaReservationsView({
           const { data: td } = await supabase.from('tenants').select('name,phone,email').eq('slug', tenant).single()
           if (td) { bName = td.name || ''; bPhone = td.phone || ''; bEmail = td.email || '' }
         }
-        const res = await fetch('/api/send-reservation-email', {
+        const res = await authFetch('/api/send-reservation-email', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            tenantSlug: tenant,
             customerEmail: emailTo,
             customerName: r.guest_name,
             customerPhone: r.guest_phone,
@@ -1420,10 +1420,10 @@ export default function KassaReservationsView({
     // Stuur weigeringsmail
     if (r.guest_email) {
       try {
-        await fetch('/api/send-reservation-email', {
+        await authFetch('/api/send-reservation-email', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            tenantSlug: tenant,
             customerEmail: r.guest_email,
             customerName: r.guest_name,
             customerPhone: r.guest_phone,
@@ -1590,6 +1590,7 @@ export default function KassaReservationsView({
     // Enkel bevestigingsmail voor NIEUWE reservatie
     if (data.guest_email && inserted) {
       await sendReservationEmail({
+        tenantSlug: tenant,
         customerEmail: data.guest_email,
         customerName: data.guest_name,
         customerPhone: data.guest_phone,

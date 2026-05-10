@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
+import { authFetch } from '@/lib/auth-headers'
 import {
   distributeOrderPaymentForZRaport,
   fetchAllTenantOrdersInCreatedAtRange,
@@ -544,10 +545,10 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     if (!emailAddress || !stats) return
     setSendingEmail(true)
     try {
-      const response = await fetch('/api/send-z-report', {
+      const response = await authFetch('/api/send-z-report', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          tenantSlug: params.tenant,
           to: emailAddress,
           subject: `Z-Rapport ${formatShortDate(selectedDate)} - ${businessInfo?.business_name || params.tenant}`,
           businessName: businessInfo?.business_name || params.tenant,

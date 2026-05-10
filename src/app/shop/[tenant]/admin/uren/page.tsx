@@ -5,6 +5,7 @@ import { useLanguage } from '@/i18n'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
+import { authFetch } from '@/lib/auth-headers'
 import { 
   getActiveStaff,
   getTimesheetEntries,
@@ -559,10 +560,10 @@ Met vriendelijke groeten`,
       const csvContent = [headers, ...rows].map(row => row.join(';')).join('\n')
       
       // Send via API
-      const response = await fetch('/api/send-timesheet', {
+      const response = await authFetch('/api/send-timesheet', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          tenantSlug: tenant,
           to: emailForm.to,
           subject: emailForm.subject,
           message: emailForm.message,

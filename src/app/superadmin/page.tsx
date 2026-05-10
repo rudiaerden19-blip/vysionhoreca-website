@@ -260,9 +260,8 @@ export default function SuperAdminDashboard() {
     if (!(await ask(`Betalingsherinnering sturen naar ${tenant.email}?`))) return
 
     try {
-      const response = await fetch('/api/send-payment-reminder', {
+      const response = await authFetch('/api/send-payment-reminder', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           tenantEmail: tenant.email,
           tenantName: tenant.business_name || tenant.tenant_slug,

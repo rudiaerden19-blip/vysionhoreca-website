@@ -227,6 +227,7 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+              tenantSlug: tenant,
               customerEmail: formData.guest_email,
               customerName: formData.guest_name,
               customerPhone: formData.guest_phone,

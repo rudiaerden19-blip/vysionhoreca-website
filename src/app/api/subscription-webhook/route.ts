@@ -280,14 +280,17 @@ export async function POST(request: NextRequest) {
                   .eq('tenant_slug', sub.tenant_slug)
                   .single()
                 
-                if (settings?.email) {
+                if (settings?.email && process.env.CRON_SECRET) {
                   await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'https://www.vysionhoreca.com'}/api/send-payment-reminder`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'x-cron-secret': process.env.CRON_SECRET,
+                    },
                     body: JSON.stringify({
-                      email: settings.email,
-                      businessName: settings.business_name,
-                      type: 'payment_failed',
+                      tenantEmail: settings.email,
+                      tenantName: settings.business_name,
+                      tenantSlug: sub.tenant_slug,
                     }),
                   })
                 }

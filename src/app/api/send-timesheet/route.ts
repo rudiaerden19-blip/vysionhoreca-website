@@ -1,16 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
 
+import { logger } from '@/lib/logger'
+import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
+import { apiRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
+
 export async function POST(request: NextRequest) {
+  const requestId = crypto.randomUUID()
   try {
     const body = await request.json()
-    const { to, subject, message, csvData, fileName, staffName, month, year } = body
-    
+    const { to, subject, message, csvData, fileName, staffName, month, year, tenantSlug } = body
+
     if (!to || !subject || !csvData) {
       return NextResponse.json({ error: 'Missende velden' }, { status: 400 })
     }
-    
-    // Create transporter with Zoho SMTP
+    if (!tenantSlug || typeof tenantSlug !== 'string') {
+      return NextResponse.json({ error: 'tenantSlug is verplicht' }, { status: 400 })
+    }
+
+    // ── Auth: alleen ingelogde zaak-eigenaar of superadmin ───────────────────
+    const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
+    if (!access.authorized) {
+      const st = access.error?.includes('ingelogd') ? 401 : 403
+      logger.warn('send-timesheet: unauthorized', { requestId, tenantSlug })
+      return NextResponse.json({ error: access.error || 'Geen toegang' }, { status: st })
+    }
+
+    // ── Rate-limit per tenant — voorkomt spam via dezelfde zaak ──────────────
+    const ip = getClientIP(request)
+    const rl = await checkRateLimit(apiRateLimiter, `timesheet:${tenantSlug}:${ip}`)
+    if (!rl.success) {
+      return NextResponse.json(
+        { error: 'Te veel verzoeken. Probeer over enkele seconden opnieuw.' },
+        { status: 429, headers: { 'Retry-After': '60' } }
+      )
+    }
+
     const transporter = nodemailer.createTransport({
       host: 'smtp.zoho.eu',
       port: 465,
@@ -20,8 +45,7 @@ export async function POST(request: NextRequest) {
         pass: process.env.ZOHO_PASSWORD || '',
       },
     })
-    
-    // Create HTML email body
+
     const htmlMessage = `
       <!DOCTYPE html>
       <html>
@@ -58,8 +82,7 @@ export async function POST(request: NextRequest) {
       </body>
       </html>
     `
-    
-    // Send email with attachment
+
     await transporter.sendMail({
       from: `"Vysion Horeca" <${process.env.ZOHO_EMAIL || 'info@vysionhoreca.com'}>`,
       to,
@@ -74,10 +97,13 @@ export async function POST(request: NextRequest) {
         },
       ],
     })
-    
+
     return NextResponse.json({ success: true, message: 'Email verzonden' })
   } catch (error) {
-    console.error('Error sending timesheet email:', error)
+    logger.error('send-timesheet error', {
+      requestId,
+      error: error instanceof Error ? error.message : String(error),
+    })
     return NextResponse.json(
       { error: 'Er is een fout opgetreden bij het verzenden' },
       { status: 500 }

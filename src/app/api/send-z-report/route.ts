@@ -3,6 +3,8 @@ import nodemailer from 'nodemailer'
 
 import { logger } from '@/lib/logger'
 import { trackError } from '@/lib/monitoring'
+import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
+import { apiRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
 
 export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID()
@@ -11,6 +13,7 @@ export async function POST(request: NextRequest) {
     const {
       to,
       subject,
+      tenantSlug,
       businessName,
       businessAddress,
       btwNumber,
@@ -27,6 +30,27 @@ export async function POST(request: NextRequest) {
 
     if (!to) {
       return NextResponse.json({ error: 'E-mailadres is verplicht' }, { status: 400 })
+    }
+    if (!tenantSlug || typeof tenantSlug !== 'string') {
+      return NextResponse.json({ error: 'tenantSlug is verplicht' }, { status: 400 })
+    }
+
+    // ── Auth: alleen ingelogde zaak-eigenaar of superadmin ───────────────────
+    const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
+    if (!access.authorized) {
+      const st = access.error?.includes('ingelogd') ? 401 : 403
+      logger.warn('send-z-report: unauthorized', { requestId, tenantSlug })
+      return NextResponse.json({ error: access.error || 'Geen toegang' }, { status: st })
+    }
+
+    // ── Rate-limit per tenant — voorkomt SMTP-quota verspillen door één zaak ─
+    const ip = getClientIP(request)
+    const rl = await checkRateLimit(apiRateLimiter, `z-report:${tenantSlug}:${ip}`)
+    if (!rl.success) {
+      return NextResponse.json(
+        { error: 'Te veel verzoeken. Probeer over enkele seconden opnieuw.' },
+        { status: 429, headers: { 'Retry-After': '60' } }
+      )
     }
 
     // Create transporter with Zoho SMTP

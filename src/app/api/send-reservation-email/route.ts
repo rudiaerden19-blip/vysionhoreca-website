@@ -1,13 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
 
+import { logger } from '@/lib/logger'
+import { getServerSupabaseClient } from '@/lib/supabase-server'
+import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
+import {
+  apiRateLimiter,
+  reservationEmailIpRateLimiter,
+  reservationEmailTenantRateLimiter,
+  checkRateLimit,
+  getClientIP,
+} from '@/lib/rate-limit'
+
+const ALLOWED_STATUSES = ['confirmed', 'pending', 'cancelled', 'reminder', 'review'] as const
+
+/**
+ * Reservation email — dual-mode:
+ *   - Admin (KassaReservationsView, admin-pages): authFetch met tenant-headers
+ *     → soepelere rate-limit (60/min/tenant).
+ *   - Public gast (/shop/[tenant]/reserveren, /shop/[tenant]): geen auth, MAAR
+ *     tenantSlug verplicht + bestaan-check + strakke rate-limit (5/min/IP,
+ *     60/uur/tenant) tegen SMTP-spam.
+ */
 export async function POST(request: NextRequest) {
+  const requestId = crypto.randomUUID()
   try {
     const body = await request.json()
     const {
+      tenantSlug,
       customerEmail,
       customerName,
-      customerPhone,
       reservationDate,
       reservationTime,
       partySize,
@@ -23,25 +45,64 @@ export async function POST(request: NextRequest) {
       reviewLink,
     } = body
 
-    // 🔍 Logging: toon altijd wie de email triggert
-    console.log('[send-reservation-email] Aangeroepen:', {
-      status,
-      customerEmail,
-      customerName,
-      referer: request.headers.get('referer'),
-      origin: request.headers.get('origin'),
-      userAgent: request.headers.get('user-agent')?.slice(0, 80),
-    })
-
     if (!customerEmail || !customerName) {
       return NextResponse.json({ error: 'Email en naam zijn verplicht' }, { status: 400 })
     }
-
-    // ✅ Enkel toegestane statussen — blokkeer alles anders
-    const allowed = ['confirmed', 'pending', 'cancelled', 'reminder', 'review']
-    if (!allowed.includes(status)) {
-      console.warn('[send-reservation-email] GEBLOKKEERD: ongeldige status:', status)
+    if (!tenantSlug || typeof tenantSlug !== 'string') {
+      return NextResponse.json({ error: 'tenantSlug is verplicht' }, { status: 400 })
+    }
+    if (!ALLOWED_STATUSES.includes(status)) {
+      logger.warn('send-reservation-email: invalid status', { requestId, status, tenantSlug })
       return NextResponse.json({ error: 'Ongeldige status — email niet verstuurd' }, { status: 400 })
+    }
+
+    // ── Tenant moet bestaan — voorkomt willekeurige slugs gebruiken voor spam ─
+    const supabase = getServerSupabaseClient()
+    if (!supabase) {
+      return NextResponse.json({ error: 'Server niet geconfigureerd' }, { status: 503 })
+    }
+    const { data: tenantRow } = await supabase
+      .from('tenants')
+      .select('slug')
+      .eq('slug', tenantSlug)
+      .maybeSingle()
+    if (!tenantRow) {
+      logger.warn('send-reservation-email: unknown tenant', { requestId, tenantSlug })
+      return NextResponse.json({ error: 'Onbekende zaak' }, { status: 404 })
+    }
+
+    // ── Mode-selectie: admin (auth-header) → soepel; gast (publiek) → streng ──
+    const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
+    const ip = getClientIP(request)
+
+    if (access.authorized) {
+      // Admin-flow: 60/min/tenant via generieke api-limiter
+      const rl = await checkRateLimit(apiRateLimiter, `res-email-admin:${tenantSlug}`)
+      if (!rl.success) {
+        return NextResponse.json(
+          { error: 'Te veel verzoeken. Probeer over enkele seconden opnieuw.' },
+          { status: 429, headers: { 'Retry-After': '60' } }
+        )
+      }
+    } else {
+      // Public gast-flow: 5/min/IP + 60/uur/tenant
+      const ipRl = await checkRateLimit(reservationEmailIpRateLimiter, `res-email-ip:${ip}`)
+      if (!ipRl.success) {
+        return NextResponse.json(
+          { error: 'Te veel verzoeken vanaf dit adres. Probeer over een minuut opnieuw.' },
+          { status: 429, headers: { 'Retry-After': '60' } }
+        )
+      }
+      const tenantRl = await checkRateLimit(
+        reservationEmailTenantRateLimiter,
+        `res-email-tenant:${tenantSlug}`
+      )
+      if (!tenantRl.success) {
+        return NextResponse.json(
+          { error: 'Te veel reserveringsmails voor deze zaak. Probeer over een uur opnieuw.' },
+          { status: 429, headers: { 'Retry-After': '3600' } }
+        )
+      }
     }
 
     const transporter = nodemailer.createTransport({
@@ -174,7 +235,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Reservation email error:', error)
+    logger.error('send-reservation-email error', {
+      requestId,
+      error: error instanceof Error ? error.message : String(error),
+    })
     return NextResponse.json({ error: 'Email versturen mislukt' }, { status: 500 })
   }
 }

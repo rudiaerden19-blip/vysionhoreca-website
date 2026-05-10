@@ -97,6 +97,27 @@ export const pinVerifyTenantRateLimiter = redis
     })
   : null
 
+/** Reservation-email per IP: 5 per minuut. Public gast-flow op /reserveren mag
+ *  een mail sturen, maar nooit zoveel dat iemand SMTP-quota of reputatie verbrandt. */
+export const reservationEmailIpRateLimiter = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(5, '1 m'),
+      prefix: 'ratelimit:reservation-email-ip',
+    })
+  : null
+
+/** Reservation-email per tenant: 60 per uur. Distributed-spam afdekking
+ *  (vele IPs naar dezelfde zaak). Geldt zowel voor public gast-flow als
+ *  ingelogde admin-flow. */
+export const reservationEmailTenantRateLimiter = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(60, '1 h'),
+      prefix: 'ratelimit:reservation-email-tenant',
+    })
+  : null
+
 const API_MW_EXEMPT_PREFIXES = [
   '/api/stripe-webhook',
   '/api/subscription-webhook',

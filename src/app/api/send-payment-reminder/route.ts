@@ -1,7 +1,39 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
 
-export async function POST(request: Request) {
+import { logger } from '@/lib/logger'
+import { verifySuperAdminAccess } from '@/lib/verify-tenant-access'
+
+/**
+ * Stuurt een betalingsherinnering naar een tenant.
+ *
+ * Toegangsregels:
+ *   - Superadmin (handmatig vanuit het superadmin-dashboard) — `verifySuperAdminAccess`.
+ *   - Subscription-webhook (server-to-server) — header `x-cron-secret` moet matchen
+ *     `process.env.CRON_SECRET` (zelfde secret als overige cron-routes).
+ *
+ * Anonymous calls worden geweigerd: anders kan iedereen op het internet uit jouw
+ * Zoho-mailbox spam pushen onder de Vysion-naam.
+ */
+export async function POST(request: NextRequest) {
+  const requestId = crypto.randomUUID()
+
+  // ── Auth: superadmin OR cron-secret ────────────────────────────────────────
+  const cronSecret = process.env.CRON_SECRET
+  const headerSecret = request.headers.get('x-cron-secret')
+  const cronOk = !!cronSecret && headerSecret === cronSecret
+
+  let authorized = cronOk
+  if (!authorized) {
+    const sa = await verifySuperAdminAccess(request)
+    authorized = sa.authorized
+  }
+
+  if (!authorized) {
+    logger.warn('send-payment-reminder: unauthorized', { requestId })
+    return NextResponse.json({ error: 'Niet geautoriseerd' }, { status: 403 })
+  }
+
   try {
     const body = await request.json()
     const { tenantEmail, tenantName, tenantSlug } = body
@@ -10,7 +42,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Email en naam zijn verplicht' }, { status: 400 })
     }
 
-    // Zoho SMTP configuratie (zelfde als contact form)
     const transporter = nodemailer.createTransport({
       host: 'smtp.zoho.eu',
       port: 465,
@@ -95,7 +126,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, message: 'Betalingsherinnering verzonden' })
   } catch (error) {
-    console.error('Error sending payment reminder:', error)
+    logger.error('send-payment-reminder error', {
+      requestId,
+      error: error instanceof Error ? error.message : String(error),
+    })
     return NextResponse.json({ error: 'Fout bij verzenden email' }, { status: 500 })
   }
 }
