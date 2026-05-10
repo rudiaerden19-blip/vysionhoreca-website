@@ -64,3 +64,19 @@ export function formatKlantschermWaitingClock(date: Date, locale: Locale): strin
     hour12: false,
   }).format(date)
 }
+
+/** Uren en minuten apart voor grote digitale klok (knipperende dubbele punt). */
+export function formatKlantschermWaitingClockParts(date: Date, locale: Locale): {
+  hours: string
+  minutes: string
+} {
+  const tag = localeTag[locale] ?? 'en-GB'
+  const parts = new Intl.DateTimeFormat(tag, {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).formatToParts(date)
+  const hour = parts.find((p) => p.type === 'hour')?.value ?? '00'
+  const minute = parts.find((p) => p.type === 'minute')?.value ?? '00'
+  return { hours: hour, minutes: minute }
+}

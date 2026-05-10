@@ -20,6 +20,37 @@ body.vysion-floor-plan-grabbing {
   font-weight: normal;
 }
 
+/* Klantscherm: geen witte rand door body/html-defaults; vol zwart canvas */
+html.vysion-klantscherm-root,
+html.vysion-klantscherm-root body {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 100dvh !important;
+  background: #000000 !important;
+  overflow-x: hidden !important;
+}
+
+@keyframes klantscherm-clock-colon {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  50%,
+  95% {
+    opacity: 0.22;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.vysion-klantscherm-clock-colon {
+  animation: klantscherm-clock-colon 1s linear infinite;
+  font-weight: 800;
+}
+
 /* Zichtbare diepte op grijs/wit (marketing homepage) — iets ingetoomd t.o.v. maximum */
 @layer utilities {
   .shadow-home-btn {

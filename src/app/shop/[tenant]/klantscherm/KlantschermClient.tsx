@@ -10,7 +10,7 @@ import {
 } from '@/lib/kassa-customer-display'
 import { positionCustomerDisplayWindow } from '@/lib/kassa-customer-display-window'
 import {
-  formatKlantschermWaitingClock,
+  formatKlantschermWaitingClockParts,
   formatKlantschermWaitingDateLine,
 } from '@/lib/format-kassa-header-date'
 
@@ -25,6 +25,17 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
     if (!token) return null
     return kassaCustomerDisplayChannelName(tenant, token)
   }, [tenant, token])
+
+  useEffect(() => {
+    const html = document.documentElement
+    const body = document.body
+    html.classList.add('vysion-klantscherm-root')
+    body.classList.add('vysion-klantscherm-root')
+    return () => {
+      html.classList.remove('vysion-klantscherm-root')
+      body.classList.remove('vysion-klantscherm-root')
+    }
+  }, [])
 
   useEffect(() => {
     if (!channelName || typeof BroadcastChannel === 'undefined') return
@@ -124,33 +135,52 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
   const formatMoney = (n: number) =>
     new Intl.NumberFormat('nl-BE', { style: 'currency', currency: 'EUR' }).format(n)
 
-  const shell =
-    'box-border flex min-h-[100dvh] w-full max-w-none flex-col bg-black px-3 py-4 text-white sm:px-5 sm:py-6 md:px-8 md:py-8'
+  const shellCart =
+    'box-border flex min-h-0 w-full flex-1 flex-col overflow-y-auto bg-black px-3 py-4 text-white sm:px-5 sm:py-6 md:px-8 md:py-8'
 
   if (!token) {
     return (
-      <div className={`${shell} items-center justify-center text-center`}>
+      <div
+        className={`${shellCart} items-center justify-center text-center`}
+      >
         <p className="text-xl font-semibold sm:text-2xl">{t('kassaCustomerDisplay.missingToken')}</p>
       </div>
     )
   }
 
   if (!msg || msg.phase === 'idle') {
+    const { hours, minutes } = formatKlantschermWaitingClockParts(now, locale)
     return (
-      <div className={`${shell} items-center justify-center text-center`}>
-        <div className="flex flex-col items-center gap-2 sm:gap-4">
+      <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-center bg-black px-[max(0.25rem,env(safe-area-inset-left))] py-[max(0.25rem,env(safe-area-inset-top))] pb-[max(0.25rem,env(safe-area-inset-bottom))] pr-[max(0.25rem,env(safe-area-inset-right))] text-center">
+        <div className="flex max-w-[98vw] flex-col items-center gap-8 sm:gap-12 md:gap-16">
           <p
-            className="text-2xl font-semibold leading-tight tracking-tight opacity-95 sm:text-3xl md:text-4xl lg:text-5xl"
+            className="text-[clamp(1.25rem,4vw,2.85rem)] font-medium leading-snug tracking-[0.06em] text-white/90"
             suppressHydrationWarning
           >
             {formatKlantschermWaitingDateLine(now, locale)}
           </p>
-          <p
-            className="font-black tabular-nums tracking-tight text-5xl sm:text-6xl md:text-7xl lg:text-8xl"
+          <div
+            dir="ltr"
+            className="flex flex-row flex-nowrap items-center justify-center gap-[clamp(0.25rem,1.8vw,1rem)] [font-family:var(--font-klantscherm-digital),system-ui,sans-serif]"
+            style={{
+              textShadow:
+                '0 0 28px rgba(255,255,255,0.4), 0 0 72px rgba(160,200,255,0.14)',
+            }}
             suppressHydrationWarning
           >
-            {formatKlantschermWaitingClock(now, locale)}
-          </p>
+            <span className="text-[clamp(3.25rem,17vw,13rem)] font-black tabular-nums leading-none tracking-[0.05em]">
+              {hours}
+            </span>
+            <span
+              aria-hidden
+              className="vysion-klantscherm-clock-colon translate-y-[-0.05em] select-none text-[clamp(2rem,12vw,9rem)] leading-none text-white"
+            >
+              :
+            </span>
+            <span className="text-[clamp(3.25rem,17vw,13rem)] font-black tabular-nums leading-none tracking-[0.05em]">
+              {minutes}
+            </span>
+          </div>
         </div>
       </div>
     )
@@ -163,7 +193,7 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
       : t('kassaCustomerDisplay.yourOrder')
 
   return (
-    <div className={`${shell} flex-1`}>
+    <div className={shellCart}>
       <header className="mb-6 border-b border-white/25 pb-5 text-center sm:mb-8 sm:pb-6">
         <h1 className="text-3xl font-black tracking-tight sm:text-4xl md:text-5xl">{msg.businessName}</h1>
         <p className="mt-3 text-lg font-semibold text-white/90 sm:text-xl md:text-2xl">{title}</p>
