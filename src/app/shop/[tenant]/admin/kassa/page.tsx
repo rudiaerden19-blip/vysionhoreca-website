@@ -2274,11 +2274,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       />
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[#e3e3e3]">
 
-      {/* ── Blauwe navigatiebalk — volledige breedte (overflow: uitlog buiten scrollcluster = altijd klikbaar, alle tenants) ── */}
-      <div
-        className="relative z-30 flex min-h-[68px] w-full min-w-0 shrink-0 items-center gap-2 bg-[#1e293b] px-2 sm:px-3"
-        style={{ height: 68 }}
-      >
+      {/* ── Blauwe balk: één rij — kleine tenantnaam zodat snelkoppelingen naast elkaar passen zonder horizontale scrollbar ── */}
+      <div className="relative z-30 flex min-h-[52px] w-full min-w-0 shrink-0 items-center gap-1 bg-[#1e293b] px-2 py-1.5 sm:gap-1.5 sm:px-3">
 
         {/* Backdrop sluit menu/flyout (printer-bridge-modal heeft eigen overlay) */}
         {(hamburgerOpen || flyoutOpen) && (
@@ -2292,7 +2289,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           />
         )}
 
-        {/* ── LINKS: hamburger ── */}
+        {/* ── Hamburger ── */}
         <div className="relative z-20 flex shrink-0 items-center gap-2">
           <button onClick={() => { setHamburgerOpen(!hamburgerOpen); setHamburgerSubOpen(null) }}
             className={`flex items-center gap-1.5 rounded-xl px-2 py-1.5 transition-colors sm:gap-2 sm:px-3 ${hamburgerOpen ? 'bg-[#47c6fe] text-[#063042]' : 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'}`}
@@ -2374,21 +2371,21 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           })()}
         </div>
 
-        {/* Tenant naam — max-breedte op smaller scherm zodat toolknoppen ruimte + scroll krijgen */}
-        <div className="relative z-20 flex min-w-0 max-w-[min(42vw,12rem)] shrink items-center justify-center px-1 sm:max-w-[min(38vw,16rem)] sm:px-2 md:max-w-[min(34vw,20rem)] lg:max-w-md xl:max-w-none xl:flex-1 xl:basis-0 xl:justify-center">
-          <span className="max-w-full truncate text-center text-sm font-medium tracking-normal text-white sm:text-base md:text-lg lg:text-xl" title={(tenantInfo?.business_name ?? tenant)}>
+        <div className="relative z-20 flex min-w-0 max-w-[6.5rem] shrink-0 flex-col justify-center px-0.5 sm:max-w-[8.5rem] md:max-w-[11rem] lg:max-w-[13rem]">
+          <span
+            className="max-w-full truncate text-center text-[10px] font-semibold leading-tight tracking-tight text-white/95 sm:text-[11px] md:text-xs"
+            title={(tenantInfo?.business_name ?? tenant)}
+          >
             {tenantInfo?.business_name ||
               tenant.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
           </span>
         </div>
 
-        {/* ── Tools: scrollbare strip met inhoud links uitgelijnd (justify-end + overflow knipte “Reserveringen” weg op 15") ── */}
-        <div className="relative z-20 flex max-h-[68px] min-w-0 flex-1 basis-0 items-center gap-1">
+        <div className="relative z-20 flex min-h-0 min-w-0 flex-1 items-center">
           <nav
             aria-label={t('kassaApp.quickLinksAria')}
-            className="flex min-h-0 min-w-0 max-h-[68px] flex-1 overflow-x-auto overflow-y-hidden overscroll-x-contain py-0.5 [-webkit-overflow-scrolling:touch] [scrollbar-width:thin]"
+            className="flex min-h-0 min-w-0 flex-1 flex-nowrap items-center justify-start gap-0.5 sm:gap-1"
           >
-            <div className="flex w-max min-w-0 flex-nowrap items-center gap-1 pr-0.5">
 
           {effectiveAccess.reservaties && (
             <button
@@ -2399,7 +2396,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 setShowReservations(true)
               }}
               title={t('kassaApp.navReservations')}
-              className="relative inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-xl bg-[#3C4D6B] px-2 py-1.5 font-bold text-white transition-colors hover:bg-[#2D3A52] sm:gap-1.5 sm:px-2.5 sm:py-2"
+              className="relative inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-lg bg-[#3C4D6B] px-1.5 py-1 font-bold text-white transition-colors hover:bg-[#2D3A52] sm:gap-1 sm:px-2 sm:py-1.5"
             >
               <span className="text-sm leading-none sm:text-base" aria-hidden>📅</span>
               <span className="text-[11px] leading-snug sm:text-xs">{t('kassaApp.navReservations')}</span>
@@ -2416,7 +2413,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               type="button"
               onClick={openKlantschermWindow}
               title={t('kassaApp.customerDisplayHint')}
-              className="relative inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-xl bg-[#3C4D6B] px-2 py-1.5 font-bold text-white transition-colors hover:bg-[#2D3A52] sm:gap-1.5 sm:px-2.5 sm:py-2"
+              className="relative inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-lg bg-[#3C4D6B] px-1.5 py-1 font-bold text-white transition-colors hover:bg-[#2D3A52] sm:gap-1 sm:px-2 sm:py-1.5"
             >
               <span className="text-sm leading-none sm:text-base" aria-hidden>
                 👤
@@ -2429,7 +2426,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <Link
               href={`/shop/${tenant}/display`}
               title={t('kassaApp.navShopDisplay')}
-              className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-xl bg-[#3C4D6B] px-2 py-1.5 font-bold text-white transition-colors hover:bg-[#2D3A52] sm:gap-1.5 sm:px-2.5 sm:py-2"
+              className="inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-lg bg-[#3C4D6B] px-1.5 py-1 font-bold text-white transition-colors hover:bg-[#2D3A52] sm:gap-1 sm:px-2 sm:py-1.5"
             >
               <span className="text-sm leading-none sm:text-base" aria-hidden>🖥️</span>
               <span className="text-[11px] leading-snug sm:text-xs">{t('kassaApp.navShopDisplay')}</span>
@@ -2440,7 +2437,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <Link
               href={`/keuken/${tenant}`}
               title={t('kassaApp.navKitchenDisplay')}
-              className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-xl bg-[#3C4D6B] px-2 py-1.5 font-bold text-white transition-colors hover:bg-[#2D3A52] sm:gap-1.5 sm:px-2.5 sm:py-2"
+              className="inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-lg bg-[#3C4D6B] px-1.5 py-1 font-bold text-white transition-colors hover:bg-[#2D3A52] sm:gap-1 sm:px-2 sm:py-1.5"
             >
               <span className="text-sm leading-none sm:text-base" aria-hidden>👨‍🍳</span>
               <span className="text-[11px] leading-snug sm:text-xs">{t('kassaApp.navKitchenDisplay')}</span>
@@ -2450,7 +2447,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <button
             type="button"
             onClick={toggleSound}
-            className={`inline-flex size-9 shrink-0 items-center justify-center rounded-lg text-xl transition-colors ${soundsOn ? 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]' : 'bg-white/10 text-white/60 hover:bg-white/20'}`}
+            className={`inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-lg transition-colors sm:size-9 sm:text-xl ${soundsOn ? 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]' : 'bg-white/10 text-white/60 hover:bg-white/20'}`}
             title={soundsOn ? t('kassaApp.soundOnTitle') : t('kassaApp.soundOffTitle')}
           >
             <span aria-hidden>{soundsOn ? '🔔' : '🔕'}</span>
@@ -2458,28 +2455,27 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
           {isOnline !== null && (
             <div
-              className={`inline-flex max-w-[10rem] shrink-0 items-center gap-1 rounded-lg px-2 py-1.5 text-[11px] font-bold leading-tight sm:max-w-none sm:text-xs ${
+              className={`inline-flex max-w-[5.5rem] shrink-0 items-center gap-0.5 rounded-md px-1.5 py-1 text-[10px] font-bold leading-tight sm:max-w-[7rem] sm:text-[11px] md:max-w-none md:text-xs ${
                 isOnline ? 'bg-[#3C4D6B] text-white' : 'bg-red-600/95 text-white'
               }`}
               title={isOnline ? t('kassaApp.onlineModeLiveTitle') : t('kassaApp.offlineModeActive')}
               role="status"
               aria-live="polite"
             >
-              <span className="text-base leading-none" aria-hidden>☁️</span>
-              <span className="line-clamp-2 sm:line-clamp-1">{isOnline ? t('kassaApp.onlineModeLive') : t('kassaApp.offlineModeActive')}</span>
+              <span className="text-sm leading-none sm:text-base" aria-hidden>☁️</span>
+              <span className="truncate">{isOnline ? t('kassaApp.onlineModeLive') : t('kassaApp.offlineModeActive')}</span>
             </div>
           )}
 
           {activeKassaStaff && !demoViewOnly && (
-            <div className="hidden max-w-[10rem] shrink-0 items-center rounded-lg bg-emerald-600/90 px-2 py-1.5 text-xs font-bold text-white sm:flex md:max-w-xs">
+            <div className="hidden max-w-[7rem] shrink-0 items-center rounded-md bg-emerald-600/90 px-1.5 py-1 text-[10px] font-bold text-white sm:flex md:max-w-[10rem] md:text-xs">
               <span className="truncate" title={activeKassaStaff.name}>
                 🛒 {activeKassaStaff.name}
               </span>
             </div>
           )}
-
-            </div>
           </nav>
+        </div>
 
           <div ref={langRef} className="relative z-[40] shrink-0">
             <button
@@ -2488,7 +2484,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               aria-expanded={langOpen}
               aria-label={`${t('nav.language')}: ${localeNames[locale]}`}
               onClick={() => setLangOpen(o => !o)}
-              className="inline-flex touch-manipulation items-center gap-1 whitespace-nowrap rounded-xl bg-white/10 px-2 py-2 font-medium text-white transition-colors hover:bg-white/20 sm:gap-2 sm:px-3"
+              className="inline-flex touch-manipulation items-center gap-0.5 whitespace-nowrap rounded-lg bg-white/10 px-1.5 py-1.5 font-medium text-white transition-colors hover:bg-white/20 sm:gap-1 sm:rounded-xl sm:px-2 sm:py-2 md:px-3"
             >
               <LocaleFlagEmoji locale={locale} variant="inline" className="text-sm text-white sm:text-[15px]" />
               <svg className={`size-4 shrink-0 transition-transform ${langOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
@@ -2505,16 +2501,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               </div>
             )}
           </div>
-        </div>
 
         <button
           type="button"
           onClick={() => setLogoutSoftwareConfirmOpen(true)}
           title={t('kassaApp.logout')}
-          className="relative z-20 inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg bg-[#58CCFF] px-2 py-1.5 text-xs font-bold text-black transition-colors hover:bg-[#47c6fe] sm:gap-1.5 sm:px-3 sm:py-2 sm:text-sm"
+          className="relative z-20 inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-lg bg-[#58CCFF] px-1.5 py-1 text-[11px] font-bold text-black transition-colors hover:bg-[#47c6fe] sm:gap-1 sm:px-2.5 sm:py-1.5 sm:text-sm"
         >
           <span className="text-sm sm:text-base" aria-hidden>🚪</span>
-          <span className="text-[11px] leading-snug sm:text-sm">{t('kassaApp.logout')}</span>
+          <span className="leading-snug">{t('kassaApp.logout')}</span>
         </button>
 
       </div>
