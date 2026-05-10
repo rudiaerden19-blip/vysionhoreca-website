@@ -36,6 +36,19 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
   }, [channelName, tenant])
 
   useEffect(() => {
+    if (!token || typeof document === 'undefined') return
+    const tryFullscreen = () => {
+      if (document.fullscreenElement) return
+      const el = document.documentElement
+      const req = el.requestFullscreen as ((options?: FullscreenOptions) => Promise<void>) | undefined
+      if (!req) return
+      void req.call(el, { navigationUI: 'hide' }).catch(() => {})
+    }
+    const fullscreenTimers = [450, 1200].map((ms) => window.setTimeout(tryFullscreen, ms))
+    return () => fullscreenTimers.forEach(clearTimeout)
+  }, [token])
+
+  useEffect(() => {
     if (!token) return
     let cancelled = false
     const delays = [0, 80, 200, 450, 900]
@@ -56,21 +69,26 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
   const formatMoney = (n: number) =>
     new Intl.NumberFormat('nl-BE', { style: 'currency', currency: 'EUR' }).format(n)
 
+  const shell =
+    'box-border flex min-h-[100dvh] w-full max-w-none flex-col bg-black px-3 py-4 text-white sm:px-5 sm:py-6 md:px-8 md:py-8'
+
   if (!token) {
     return (
-      <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-black px-6 text-center text-white">
-        <p className="text-xl font-semibold">{t('kassaCustomerDisplay.missingToken')}</p>
+      <div className={`${shell} items-center justify-center text-center`}>
+        <p className="text-xl font-semibold sm:text-2xl">{t('kassaCustomerDisplay.missingToken')}</p>
       </div>
     )
   }
 
   if (!msg || msg.phase === 'idle') {
     return (
-      <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-black px-6 text-center text-white">
+      <div className={`${shell} items-center justify-center text-center`}>
         {msg?.phase === 'idle' && msg.businessName ? (
-          <p className="text-2xl font-bold">{msg.businessName}</p>
+          <p className="text-2xl font-bold sm:text-3xl md:text-4xl">{msg.businessName}</p>
         ) : null}
-        <p className={`text-xl opacity-90 ${msg?.phase === 'idle' && msg.businessName ? 'mt-6' : ''}`}>
+        <p
+          className={`text-lg opacity-90 sm:text-xl md:text-2xl ${msg?.phase === 'idle' && msg.businessName ? 'mt-6' : ''}`}
+        >
           {t('kassaCustomerDisplay.waiting')}
         </p>
       </div>
@@ -84,20 +102,20 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
       : t('kassaCustomerDisplay.yourOrder')
 
   return (
-    <div className="min-h-[100dvh] bg-black px-6 py-8 text-white">
-      <header className="mb-8 border-b border-white/25 pb-6 text-center">
-        <h1 className="text-3xl font-black tracking-tight sm:text-4xl">{msg.businessName}</h1>
-        <p className="mt-3 text-xl font-semibold text-white/90">{title}</p>
+    <div className={`${shell} flex-1`}>
+      <header className="mb-6 border-b border-white/25 pb-5 text-center sm:mb-8 sm:pb-6">
+        <h1 className="text-3xl font-black tracking-tight sm:text-4xl md:text-5xl">{msg.businessName}</h1>
+        <p className="mt-3 text-lg font-semibold text-white/90 sm:text-xl md:text-2xl">{title}</p>
       </header>
 
       {lines.length === 0 ? (
-        <p className="text-center text-xl text-white/70">{t('kassaCustomerDisplay.emptyCartHint')}</p>
+        <p className="text-center text-lg text-white/70 sm:text-xl">{t('kassaCustomerDisplay.emptyCartHint')}</p>
       ) : (
-        <ul className="mx-auto max-w-3xl space-y-4">
+        <ul className="mx-auto w-full max-w-5xl flex-1 space-y-3 sm:space-y-4">
           {lines.map((line, idx) => (
             <li
               key={`${idx}-${line.label}`}
-              className="flex flex-wrap items-baseline justify-between gap-3 border-b border-white/15 pb-4 text-lg sm:text-xl"
+              className="flex flex-wrap items-baseline justify-between gap-3 border-b border-white/15 pb-3 text-base sm:pb-4 sm:text-xl md:text-2xl"
             >
               <span className="min-w-0 flex-1 font-medium leading-snug">
                 <span className="text-white/80">{line.qty} × </span>
@@ -109,16 +127,16 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
         </ul>
       )}
 
-      <footer className="mx-auto mt-12 max-w-3xl border-t border-white/25 pt-8">
+      <footer className="mx-auto mt-auto w-full max-w-5xl border-t border-white/25 pt-6 sm:mt-12 sm:pt-8">
         {msg.phase === 'cart' && (
-          <div className="flex items-center justify-between text-2xl font-black sm:text-3xl">
+          <div className="flex items-center justify-between text-xl font-black sm:text-3xl md:text-4xl">
             <span>{t('kassaCustomerDisplay.totalInclVat')}</span>
             <span className="tabular-nums">{formatMoney(msg.totalInclVat)}</span>
           </div>
         )}
 
         {msg.phase === 'checkout' && (
-          <div className="space-y-4 text-lg sm:text-xl">
+          <div className="space-y-3 text-base sm:space-y-4 sm:text-xl md:text-2xl">
             <div className="flex justify-between text-white/90">
               <span>{t('kassaCustomerDisplay.subtotalExVat')}</span>
               <span className="tabular-nums font-semibold">{formatMoney(msg.subtotalExVat)}</span>
@@ -127,7 +145,7 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
               <span>{t('kassaCustomerDisplay.vatLine').replace('{rate}', String(msg.vatRate))}</span>
               <span className="tabular-nums font-semibold">{formatMoney(msg.vatAmount)}</span>
             </div>
-            <div className="flex justify-between border-t border-white/25 pt-4 text-2xl font-black sm:text-3xl">
+            <div className="flex justify-between border-t border-white/25 pt-4 text-xl font-black sm:text-3xl md:text-4xl">
               <span>{t('kassaCustomerDisplay.totalInclVat')}</span>
               <span className="tabular-nums">{formatMoney(msg.totalInclVat)}</span>
             </div>
