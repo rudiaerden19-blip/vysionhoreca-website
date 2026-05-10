@@ -2517,47 +2517,6 @@ export default function KassaReservationsView({
                   })}
                   </div>{/* einde geschaalde wrapper */}
 
-                  {/* Kompaspad linksonder — hint + knoppen voor canvas panning */}
-                  <div
-                    className="absolute bottom-4 left-4 z-20 select-none"
-                    onPointerDown={e => e.stopPropagation()}
-                    onClick={e => e.stopPropagation()}
-                  >
-                    <div className="grid grid-cols-3 gap-1">
-                      <div />
-                      <button
-                        onPointerDown={e => { e.stopPropagation(); e.preventDefault() }}
-                        onClick={e => { e.stopPropagation(); setPanY((p: number) => p + 80) }}
-                        className="w-10 h-10 rounded-xl text-white flex items-center justify-center text-lg font-bold border border-white/30 transition-colors"
-                        style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}
-                      >▲</button>
-                      <div />
-                      <button
-                        onPointerDown={e => { e.stopPropagation(); e.preventDefault() }}
-                        onClick={e => { e.stopPropagation(); setPanX((p: number) => p + 80) }}
-                        className="w-10 h-10 rounded-xl text-white flex items-center justify-center text-lg font-bold border border-white/30 transition-colors"
-                        style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}
-                      >◀</button>
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.15)' }}>
-                        <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 14 }}>✛</span>
-                      </div>
-                      <button
-                        onPointerDown={e => { e.stopPropagation(); e.preventDefault() }}
-                        onClick={e => { e.stopPropagation(); setPanX((p: number) => p - 80) }}
-                        className="w-10 h-10 rounded-xl text-white flex items-center justify-center text-lg font-bold border border-white/30 transition-colors"
-                        style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}
-                      >▶</button>
-                      <div />
-                      <button
-                        onPointerDown={e => { e.stopPropagation(); e.preventDefault() }}
-                        onClick={e => { e.stopPropagation(); setPanY((p: number) => p - 80) }}
-                        className="w-10 h-10 rounded-xl text-white flex items-center justify-center text-lg font-bold border border-white/30 transition-colors"
-                        style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}
-                      >▼</button>
-                      <div />
-                    </div>
-                  </div>
-
                   {/* Datum kiezer rechtsonder — alleen bij “alleen vloer” (toolbar verborgen) */}
                   {floorOnlyMode && (
                     <div
