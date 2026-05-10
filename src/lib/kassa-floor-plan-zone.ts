@@ -5,6 +5,14 @@ export const FLOOR_PLAN_ZONE_TERRACE = 'terrace' as const
 
 export type FloorPlanZone = typeof FLOOR_PLAN_ZONE_INSIDE | typeof FLOOR_PLAN_ZONE_TERRACE
 
+/** Zelfde volgorde als kassa-plattegrond + reserveringen-editor. */
+export const KASSA_FLOOR_ZONES: FloorPlanZone[] = [FLOOR_PLAN_ZONE_INSIDE, FLOOR_PLAN_ZONE_TERRACE]
+
+/** localStorage — synchroon met kassa-plattegrond (`vysion_tables_*` legacy keys). */
+export function floorPlanTablesLocalStorageKey(tenantSlug: string, zone: FloorPlanZone): string {
+  return zone === FLOOR_PLAN_ZONE_INSIDE ? `vysion_tables_${tenantSlug}` : `vysion_tables_terrace_${tenantSlug}`
+}
+
 export function isFloorPlanZone(s: string): s is FloorPlanZone {
   return s === FLOOR_PLAN_ZONE_INSIDE || s === FLOOR_PLAN_ZONE_TERRACE
 }

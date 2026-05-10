@@ -43,6 +43,13 @@ import {
 import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
 import { parseFloorPlanTablesJson, sanitizeFloorPlanTables } from '@/lib/kassa-floor-plan-tables'
+import {
+  FLOOR_PLAN_ZONE_INSIDE,
+  FLOOR_PLAN_ZONE_TERRACE,
+  floorPlanTablesLocalStorageKey,
+  floorPlanZoneFromRealtimePayload,
+  type FloorPlanZone,
+} from '@/lib/kassa-floor-plan-zone'
 import { getAuthHeaders, authFetch } from '@/lib/auth-headers'
 import { useLanguage } from '@/i18n'
 
@@ -175,9 +182,24 @@ export default function KassaReservationsView({
   const [guestProfilesDB, setGuestProfilesDB] = useState<GuestProfile[]>([])
   const [cancelConfirm, setCancelConfirm] = useState<Reservation | null>(null)
   const [isPro, setIsPro] = useState(false)
-  const [floorPlanTablesDB, setFloorPlanTablesDB] = useState<FloorPlanTable[]>([])
+  const [floorPlanTablesByZone, setFloorPlanTablesByZone] = useState<Record<FloorPlanZone, FloorPlanTable[]>>({
+    [FLOOR_PLAN_ZONE_INSIDE]: [],
+    [FLOOR_PLAN_ZONE_TERRACE]: [],
+  })
+  const [resFloorPlanZone, setResFloorPlanZone] = useState<FloorPlanZone>(FLOOR_PLAN_ZONE_INSIDE)
+  const resFloorPlanZoneRef = useRef<FloorPlanZone>(FLOOR_PLAN_ZONE_INSIDE)
+  useEffect(() => {
+    resFloorPlanZoneRef.current = resFloorPlanZone
+  }, [resFloorPlanZone])
+
+  /** Actieve zaal — zelfde `floor_plan_tables`-rij als kassa per `plan_zone`. */
+  const floorPlanTablesDB = floorPlanTablesByZone[resFloorPlanZone]
+
   // Floor plan editor state
   const [selectedFloorTable, setSelectedFloorTable] = useState<FloorPlanTable | null>(null)
+  useEffect(() => {
+    setSelectedFloorTable(null)
+  }, [resFloorPlanZone])
   const [showAddFloorTable, setShowAddFloorTable] = useState(false)
   const [addFloorNumber, setAddFloorNumber] = useState('')
   const [addFloorSeats, setAddFloorSeats] = useState(4)
@@ -200,7 +222,7 @@ export default function KassaReservationsView({
   const panLockedTableId = useRef<string | null>(null) // tafel-id als panning gestart op tafel in locked mode
   const panMoved = useRef(false) // heeft de pan bewogen (vs. tap)
   const canvasRef = useRef<HTMLDivElement>(null)
-  /** Tafelverslepen: direct DOM tijdens move — geen setFloorPlanTablesDB per pointermove. */
+  /** Tafelverslepen: direct DOM tijdens move — geen React state per pointermove. */
   const floorDragTableElRef = useRef<HTMLElement | null>(null)
   const floorPendingDragPctRef = useRef<{ x: number; y: number } | null>(null)
   const floorDragStartPctRef = useRef<{ x: number; y: number } | null>(null)
@@ -663,47 +685,90 @@ export default function KassaReservationsView({
     return () => clearInterval(tick)
   }, [])
 
-  // Load floor plan tables — admin DB-read eerst (zelfde bron als kassa-plattegrond)
+  // Load beide plattegronden — zelfde `floor_plan_tables`-PK als kassa (`tenant_slug`, `plan_zone`)
   useEffect(() => {
-    const loadFloorTables = async () => {
-      const apply = (raw: unknown): boolean => {
+    const fetchZoneTables = async (zone: FloorPlanZone): Promise<FloorPlanTable[]> => {
+      const toTables = (raw: unknown): FloorPlanTable[] => {
         const parsed = parseFloorPlanTablesJson(raw)
-        if (parsed === null) return false
-        setFloorPlanTablesDB(sanitizeFloorPlanTables(parsed) as FloorPlanTable[])
-        return true
+        if (parsed === null) return []
+        return sanitizeFloorPlanTables(parsed) as FloorPlanTable[]
       }
 
       const adminRes = await adminDb.select<{ data?: unknown } | null>('floor_plan_tables', {
         tenantSlug: tenant,
         select: 'data',
-        match: { plan_zone: 'inside' },
+        match: { plan_zone: zone },
         single: 'maybe',
       })
-
-      let ok = false
       if (adminRes.ok) {
         const row = adminRes.data as { data?: unknown } | null | undefined
-        if (row == null) ok = apply([])
-        else ok = apply(row.data)
+        if (row == null) return toTables([])
+        return toTables(row.data)
       }
-
-      if (!ok) {
-        const { data, error } = await supabase
-          .from('floor_plan_tables')
-          .select('data')
-          .eq('tenant_slug', tenant)
-          .eq('plan_zone', 'inside')
-          .maybeSingle()
-        if (error) {
-          console.error('[floor_plan_tables] load error:', error.message)
-          setFloorPlanTablesDB([])
-          return
-        }
-        if (data == null) apply([])
-        else apply(data.data)
+      const { data, error } = await supabase
+        .from('floor_plan_tables')
+        .select('data')
+        .eq('tenant_slug', tenant)
+        .eq('plan_zone', zone)
+        .maybeSingle()
+      if (error) {
+        console.error('[floor_plan_tables] load error:', zone, error.message)
+        return []
       }
+      if (data == null) return toTables([])
+      return toTables(data.data)
     }
-    void loadFloorTables()
+
+    void (async () => {
+      const [inside, terrace] = await Promise.all([
+        fetchZoneTables(FLOOR_PLAN_ZONE_INSIDE),
+        fetchZoneTables(FLOOR_PLAN_ZONE_TERRACE),
+      ])
+      setFloorPlanTablesByZone({
+        [FLOOR_PLAN_ZONE_INSIDE]: inside,
+        [FLOOR_PLAN_ZONE_TERRACE]: terrace,
+      })
+    })()
+  }, [tenant])
+
+  useEffect(() => {
+    const channel = supabase
+      .channel(`reservations-floor-plan-${tenant}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'floor_plan_tables', filter: `tenant_slug=eq.${tenant}` },
+        (payload: {
+          eventType: string
+          new?: { plan_zone?: string | null; data?: unknown }
+          old?: { plan_zone?: string | null }
+        }) => {
+          const z = floorPlanZoneFromRealtimePayload(payload)
+          if (!z) return
+          if (payload.eventType === 'DELETE') {
+            setFloorPlanTablesByZone((prev) => ({ ...prev, [z]: [] }))
+            try {
+              localStorage.setItem(floorPlanTablesLocalStorageKey(tenant, z), JSON.stringify([]))
+            } catch {
+              /* empty */
+            }
+            return
+          }
+          const parsed = parseFloorPlanTablesJson(payload.new?.data)
+          if (parsed === null) return
+          const fixed = sanitizeFloorPlanTables(parsed) as FloorPlanTable[]
+          setFloorPlanTablesByZone((prev) => ({ ...prev, [z]: fixed }))
+          try {
+            localStorage.setItem(floorPlanTablesLocalStorageKey(tenant, z), JSON.stringify(fixed))
+          } catch {
+            /* empty */
+          }
+        },
+      )
+      .subscribe()
+
+    return () => {
+      void supabase.removeChannel(channel).catch(() => {})
+    }
   }, [tenant])
 
   // Centreer tafels zodra de plattegrond-tab actief wordt (canvas is dan zichtbaar)
@@ -725,7 +790,7 @@ export default function KassaReservationsView({
     }, 50)
     return () => clearTimeout(timer)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [viewMode, floorPlanTablesDB])
+  }, [viewMode, floorPlanTablesDB, resFloorPlanZone, floorZoom])
 
   // Bouw de volledige Supabase payload van huidige instellingen
   const buildSettingsPayload = (s: ReservationSettings) => ({
@@ -794,10 +859,16 @@ export default function KassaReservationsView({
 
   // ---- Floor plan editor helpers ----
   const saveFloorPlan = async (updated: FloorPlanTable[]) => {
-    setFloorPlanTablesDB(updated)
+    const zone = resFloorPlanZoneRef.current
+    setFloorPlanTablesByZone((prev) => ({ ...prev, [zone]: updated }))
+    try {
+      localStorage.setItem(floorPlanTablesLocalStorageKey(tenant, zone), JSON.stringify(updated))
+    } catch {
+      /* empty */
+    }
     const r = await adminDb.upsert(
       'floor_plan_tables',
-      { tenant_slug: tenant, plan_zone: 'inside', data: updated } as any,
+      { tenant_slug: tenant, plan_zone: zone, data: updated } as Record<string, unknown>,
       { tenantSlug: tenant, onConflict: 'tenant_slug,plan_zone' },
     )
     if (!r.ok) {
@@ -807,10 +878,13 @@ export default function KassaReservationsView({
         .from('floor_plan_tables')
         .select('data')
         .eq('tenant_slug', tenant)
-        .eq('plan_zone', 'inside')
+        .eq('plan_zone', zone)
         .maybeSingle()
       const raw = row?.data
-      setFloorPlanTablesDB(Array.isArray(raw) ? (raw as FloorPlanTable[]) : [])
+      const fallback = Array.isArray(raw)
+        ? (sanitizeFloorPlanTables(raw as import('@/lib/kassa-floor-plan-tables').FloorPlanTable[]) as FloorPlanTable[])
+        : []
+      setFloorPlanTablesByZone((prev) => ({ ...prev, [zone]: fallback }))
     }
   }
 
@@ -1017,6 +1091,28 @@ export default function KassaReservationsView({
     reservations.filter(r => r.status === 'WAITLIST' && r.reservation_date === today)
       .sort((a, b) => (a.waitlist_position || 0) - (b.waitlist_position || 0)),
     [reservations, today]
+  )
+
+  const mergedFloorPlanTablesForPicker = useMemo(
+    () => [
+      ...floorPlanTablesByZone[FLOOR_PLAN_ZONE_INSIDE],
+      ...floorPlanTablesByZone[FLOOR_PLAN_ZONE_TERRACE],
+    ],
+    [floorPlanTablesByZone],
+  )
+
+  /** Binnen + terras voor modals en auto-toewijzing (zelfde bron als kassa-DB). */
+  const reservationModalTables = useMemo(
+    () =>
+      mergedFloorPlanTablesForPicker.length > 0
+        ? mergedFloorPlanTablesForPicker.map((t) => ({
+            id: t.id,
+            number: t.number,
+            seats: t.seats,
+            status: 'available' as const,
+          }))
+        : kassaTables,
+    [mergedFloorPlanTablesForPicker, kassaTables],
   )
 
   const todayStats = useMemo(() => ({
@@ -1338,8 +1434,8 @@ export default function KassaReservationsView({
     // Auto-wijs een vrije tafel toe als er nog geen tafel is
     let assignedTable = r.table_number
     if (!assignedTable) {
-      const allTables = (floorPlanTablesDB.length > 0
-        ? [...floorPlanTablesDB].filter(t => t.seats >= r.party_size).sort((a, b) => a.seats - b.seats)
+      const allTables = (mergedFloorPlanTablesForPicker.length > 0
+        ? [...mergedFloorPlanTablesForPicker].filter(t => t.seats >= r.party_size).sort((a, b) => a.seats - b.seats)
         : [...kassaTables].filter(t => t.seats >= r.party_size).sort((a, b) => a.seats - b.seats)
       ).map(t => String(t.number))
 
@@ -2101,7 +2197,32 @@ export default function KassaReservationsView({
                   backgroundSize: '40px 40px',
                 }} />
 
-              {floorPlanTablesDB.length === 0 ? (
+              <div className="absolute top-3 left-3 z-20 flex items-center gap-1 rounded-xl border border-gray-200 bg-white/95 p-1 shadow-md">
+                <button
+                  type="button"
+                  onClick={() => setResFloorPlanZone(FLOOR_PLAN_ZONE_INSIDE)}
+                  className={`rounded-lg px-2.5 py-1.5 text-xs font-bold transition-colors sm:px-3 sm:text-sm ${
+                    resFloorPlanZone === FLOOR_PLAN_ZONE_INSIDE
+                      ? 'bg-[#58CCFF] text-[#063042]'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  Binnen
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setResFloorPlanZone(FLOOR_PLAN_ZONE_TERRACE)}
+                  className={`rounded-lg px-2.5 py-1.5 text-xs font-bold transition-colors sm:px-3 sm:text-sm ${
+                    resFloorPlanZone === FLOOR_PLAN_ZONE_TERRACE
+                      ? 'bg-[#58CCFF] text-[#063042]'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  Terras
+                </button>
+              </div>
+
+              {mergedFloorPlanTablesForPicker.length === 0 ? (
                 <div className="flex items-center justify-center h-full">
                   <div className="text-center bg-white/80 rounded-2xl p-8 shadow-sm">
                     <LayoutGrid size={48} className="mx-auto text-gray-400 mb-3" />
@@ -2253,6 +2374,32 @@ export default function KassaReservationsView({
                     onClick={() => { const d = new Date(selectedDate + 'T12:00:00'); d.setDate(d.getDate() + 1); setSelectedDate(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`) }}
                     className="w-10 h-10 rounded-xl bg-white/60 hover:bg-white/85 active:bg-white flex items-center justify-center transition-colors">
                     <ChevronRight size={22} className="text-[#063042]" />
+                  </button>
+                </div>
+
+                {/* Zaal — dezelfde `plan_zone`-rijen als op de kassa-plattegrond */}
+                <div className="flex items-center gap-1 rounded-2xl border border-gray-200 bg-white p-1 shadow-sm">
+                  <button
+                    type="button"
+                    onClick={() => setResFloorPlanZone(FLOOR_PLAN_ZONE_INSIDE)}
+                    className={`min-h-[40px] rounded-xl px-3 text-sm font-bold transition-colors ${
+                      resFloorPlanZone === FLOOR_PLAN_ZONE_INSIDE
+                        ? 'bg-[#58CCFF] text-[#063042] shadow-sm'
+                        : 'text-gray-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    Binnen
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setResFloorPlanZone(FLOOR_PLAN_ZONE_TERRACE)}
+                    className={`min-h-[40px] rounded-xl px-3 text-sm font-bold transition-colors ${
+                      resFloorPlanZone === FLOOR_PLAN_ZONE_TERRACE
+                        ? 'bg-[#58CCFF] text-[#063042] shadow-sm'
+                        : 'text-gray-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    Terras
                   </button>
                 </div>
 
@@ -2809,8 +2956,8 @@ export default function KassaReservationsView({
           const totalRange = (timeSlots.length + extraSlots.length) * 30
 
           // Tables to show: floor plan tables first, then any table in reservations
-          const tableNumbers = floorPlanTablesDB.length > 0
-            ? floorPlanTablesDB.map(t => t.number)
+          const tableNumbers = mergedFloorPlanTablesForPicker.length > 0
+            ? [...new Set(mergedFloorPlanTablesForPicker.map(t => String(t.number)))]
             : [...new Set(reservations.filter(r => r.table_number).map(r => r.table_number!))]
           const sortedTables = tableNumbers.length > 0 ? tableNumbers : ['(geen tafel)']
 
@@ -4060,10 +4207,7 @@ export default function KassaReservationsView({
           onSave={handleAddReservation}
           rk={rk}
           tables={
-            // Gebruik floor plan tafels zodat nummers matchen; fallback op kassaTables
-            floorPlanTablesDB.length > 0
-              ? floorPlanTablesDB.map(t => ({ id: t.id, number: t.number, seats: t.seats, status: 'available' }))
-              : kassaTables
+            reservationModalTables
           }
           defaultDurationMinutes={reservationSettings.defaultDurationMinutes}
           maxPartySize={reservationSettings.maxPartySize}
@@ -4079,9 +4223,7 @@ export default function KassaReservationsView({
           onClose={() => setShowWalkInModal(false)}
           onSave={handleWalkIn}
           rk={rk}
-          tables={floorPlanTablesDB.length > 0
-            ? floorPlanTablesDB.map(t => ({ id: t.id, number: t.number, seats: t.seats, status: 'available' }))
-            : kassaTables}
+          tables={reservationModalTables}
           reservations={reservations}
         />
       )}
@@ -4110,11 +4252,7 @@ export default function KassaReservationsView({
           onStartOrder={() => { handleStartOrder(selectedReservation); setSelectedReservation(null) }}
           allowKassaHandoff={allowKassaHandoff}
           onEdit={() => { setEditReservation(selectedReservation); setSelectedReservation(null) }}
-          tables={
-            floorPlanTablesDB.length > 0
-              ? floorPlanTablesDB.map(t => ({ id: t.id, number: t.number, seats: t.seats, status: 'available' }))
-              : kassaTables
-          }
+          tables={reservationModalTables}
           guestProfile={guestProfiles.find(g => g.id === (selectedReservation.guest_phone || selectedReservation.guest_email || selectedReservation.guest_name))}
         />
       )}
@@ -4222,9 +4360,7 @@ export default function KassaReservationsView({
       {editReservation && (
         <EditReservationModal
           reservation={editReservation}
-          tables={floorPlanTablesDB.length > 0
-            ? floorPlanTablesDB.map(t => ({ id: t.id, number: t.number, seats: t.seats, status: 'available' }))
-            : kassaTables}
+          tables={reservationModalTables}
           reservations={reservations}
           shifts={reservationSettings.shifts || []}
           bufferMinutes={reservationSettings.bufferMinutes || 0}

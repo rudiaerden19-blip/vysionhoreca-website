@@ -95,7 +95,9 @@ import { parseFloorPlanTablesJson, sanitizeFloorPlanTables, type FloorPlanTable 
 import {
   FLOOR_PLAN_ZONE_INSIDE,
   FLOOR_PLAN_ZONE_TERRACE,
+  floorPlanTablesLocalStorageKey,
   floorPlanZoneFromRealtimePayload,
+  KASSA_FLOOR_ZONES,
   migrateLegacyTableOrdersKeys,
   normalizeFloorPlanZone,
   parseTableOrderMapKey,
@@ -135,12 +137,6 @@ function stoolsFromFloorDecorPayload(data: unknown): { stoolNumber: string; segm
     if (d.stool2) out.push({ stoolNumber: d.stool2, segmentId: sid })
   }
   return out
-}
-
-const KASSA_FLOOR_ZONES: FloorPlanZone[] = [FLOOR_PLAN_ZONE_INSIDE, FLOOR_PLAN_ZONE_TERRACE]
-
-function floorPlanTablesLocalStorageKey(tenantSlug: string, zone: FloorPlanZone): string {
-  return zone === FLOOR_PLAN_ZONE_INSIDE ? `vysion_tables_${tenantSlug}` : `vysion_tables_terrace_${tenantSlug}`
 }
 
 /** Open kassa-tafelorders: alleen rijen uit Supabase — geen merge met oude localStorage. */
