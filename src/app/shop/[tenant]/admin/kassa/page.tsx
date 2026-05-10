@@ -2322,6 +2322,24 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setPrintAgentFallbackHtml(html)
   }
 
+  /** Voorlopige bon zonder afrekenen — alleen als er lijnen in de kar zijn. */
+  const printDraftBonFromCart = () => {
+    if (cart.length === 0) return
+    playClick()
+    const draftOrder: KassaLastOrderReceipt = {
+      orderNumber: 0,
+      items: cart,
+      total,
+      paymentMethod: 'CARD',
+      orderType,
+      tableNumber: tableNumber || '',
+      floorPlanZone: orderType === 'DINE_IN' ? dineInFloorZone : undefined,
+      createdAt: new Date(),
+      helpedByStaffName: activeKassaStaff?.name ?? null,
+    }
+    void printReceipt(draftOrder, { draft: true })
+  }
+
   const printStaffClockSalesSummary = async () => {
     if (!staffClockSummary) return
     playClick()
@@ -2681,18 +2699,22 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
 
         <div className="flex min-w-0 flex-1 items-center gap-1 sm:gap-1.5">
-        <div className="relative z-20 flex min-w-0 max-w-[6.5rem] shrink-0 flex-col justify-center px-0.5 sm:max-w-[8.5rem] md:max-w-[11rem] lg:max-w-[13rem]">
-          <span
-            className="max-w-full truncate text-center text-[10px] font-semibold leading-tight tracking-tight text-white/95 sm:text-[11px] md:text-xs"
-            title={(tenantInfo?.business_name ?? tenant)}
+        <div className="relative z-20 flex min-w-0 max-w-[6.5rem] shrink-0 flex-col justify-center px-0.5 sm:max-w-[8.5rem] md:max-w-[11rem] lg:max-w-[13rem] ml-[2cm]">
+          <button
+            type="button"
+            onClick={printDraftBonFromCart}
+            disabled={cart.length === 0}
+            className="max-w-full truncate rounded-md px-1 py-0.5 text-center text-[10px] font-semibold leading-tight tracking-tight text-white/95 transition-colors hover:bg-white/15 active:bg-white/25 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-transparent sm:text-[11px] md:text-xs"
+            title={t('kassaApp.cartBonTitle')}
+            aria-label={t('kassaApp.cartBonTitle')}
           >
             {tenantInfo?.business_name ||
               tenant.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-          </span>
+          </button>
         </div>
 
-        {/* Alleen snelkoppelingen (nav) naar rechts; tenantnaam blijft links tegen menu */}
-        <div className="relative z-20 flex min-h-0 min-w-0 flex-1 items-center ml-[2cm]">
+        {/* Snelkoppelingen: geen extra ml hier — tenant heeft ml-[2cm], zo blijven deze knoppen op dezelfde horizontale positie */}
+        <div className="relative z-20 flex min-h-0 min-w-0 flex-1 items-center">
           <nav
             aria-label={t('kassaApp.quickLinksAria')}
             className="flex min-h-0 min-w-0 flex-1 flex-nowrap items-center justify-start gap-0.5 sm:gap-1"
@@ -3407,48 +3429,24 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <span className="font-bold text-gray-700 text-lg">{t('kassaApp.cartTotal')}</span>
             <span className="font-bold text-[#3C4D6B] text-2xl">€{total.toFixed(2)}</span>
           </div>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
               onClick={() => { void openCashDrawer() }}
-              className="flex flex-col items-center gap-1 rounded-xl bg-[#58CCFF] py-3 text-[#063042] transition-colors hover:bg-[#47c6fe]"
+              className="flex flex-col items-center justify-center gap-2 rounded-xl bg-[#58CCFF] py-5 text-[#063042] transition-colors hover:bg-[#47c6fe] active:scale-[0.99]"
               title={t('kassaApp.drawerOpen')}
             >
-              <span className="text-xl">💰</span>
-              <span className="text-xs font-semibold">{t('kassaApp.drawerOpen')}</span>
+              <span className="text-3xl leading-none">💰</span>
+              <span className="text-sm font-bold">{t('kassaApp.drawerOpen')}</span>
             </button>
             <button
               type="button"
-              disabled={cart.length === 0}
-              title={t('kassaApp.cartBonTitle')}
-              onClick={() => {
-                if (cart.length === 0) return
-                playClick()
-                const draftOrder: KassaLastOrderReceipt = {
-                  orderNumber: 0,
-                  items: cart,
-                  total,
-                  paymentMethod: 'CARD',
-                  orderType,
-                  tableNumber: tableNumber || '',
-                  floorPlanZone: orderType === 'DINE_IN' ? dineInFloorZone : undefined,
-                  createdAt: new Date(),
-                  helpedByStaffName: activeKassaStaff?.name ?? null,
-                }
-                void printReceipt(draftOrder, { draft: true })
-              }}
-              className="flex flex-col items-center gap-1 rounded-xl bg-[#58CCFF] py-3 text-[#063042] transition-colors hover:bg-[#47c6fe] disabled:opacity-40 disabled:pointer-events-none"
-            >
-              <span className="text-xl">🖨️</span>
-              <span className="text-xs font-semibold">{t('kassaApp.cartBon')}</span>
-            </button>
-            <button
               onClick={clearCart}
               disabled={cart.length === 0}
-              className="flex flex-col items-center gap-1 py-3 bg-rose-500 hover:bg-rose-600 text-white rounded-xl transition-colors disabled:opacity-40"
+              className="flex flex-col items-center justify-center gap-2 rounded-xl bg-rose-500 py-5 text-white transition-colors hover:bg-rose-600 active:scale-[0.99] disabled:opacity-40 disabled:pointer-events-none"
             >
-              <span className="text-xl">🗑️</span>
-              <span className="text-xs font-semibold">{t('kassaApp.remove')}</span>
+              <span className="text-3xl leading-none">🗑️</span>
+              <span className="text-sm font-bold">{t('kassaApp.remove')}</span>
             </button>
           </div>
           {orderType === 'DINE_IN' && tableNumber && cart.length > 0 && (
