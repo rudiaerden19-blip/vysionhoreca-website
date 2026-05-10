@@ -427,6 +427,34 @@ export default function KassaFloorPlan({
     }
   }
 
+  /** Na RLS-lockdown: alleen service_role schrijft — client gebruikt admin-proxy (niet anon upsert). */
+  const persistFloorPlanTablesToBackend = (data: KassaTable[]) => {
+    void adminDb
+      .upsert(
+        'floor_plan_tables',
+        { tenant_slug: tenant, data } as Record<string, unknown>,
+        { tenantSlug: tenant, onConflict: 'tenant_slug' },
+      )
+      .then((r) => {
+        if (!r.ok) console.error('[KassaFloorPlan] floor_plan_tables:', r.error)
+      })
+  }
+
+  const persistFloorPlanDecorToBackend = (data: {
+    items: DecorItem[]
+    stool_statuses: Record<string, TableStatus>
+  }) => {
+    void adminDb
+      .upsert(
+        'floor_plan_decor',
+        { tenant_slug: tenant, data } as Record<string, unknown>,
+        { tenantSlug: tenant, onConflict: 'tenant_slug' },
+      )
+      .then((r) => {
+        if (!r.ok) console.error('[KassaFloorPlan] floor_plan_decor:', r.error)
+      })
+  }
+
   useEffect(() => () => {
     setBodyGrabbing(false)
   }, [])
@@ -482,7 +510,7 @@ export default function KassaFloorPlan({
       setTables(fixed)
       localStorage.setItem(storageKey, JSON.stringify(fixed))
       if (JSON.stringify(fixed) !== JSON.stringify(parsed)) {
-        void supabase.from('floor_plan_tables').upsert({ tenant_slug: tenant, data: fixed }, { onConflict: 'tenant_slug' })
+        persistFloorPlanTablesToBackend(fixed)
       }
       return true
     }
@@ -634,7 +662,7 @@ export default function KassaFloorPlan({
   const save = (updated: KassaTable[]) => {
     setTables(updated)
     localStorage.setItem(storageKey, JSON.stringify(updated))
-    supabase.from('floor_plan_tables').upsert({ tenant_slug: tenant, data: updated }, { onConflict: 'tenant_slug' })
+    persistFloorPlanTablesToBackend(updated)
   }
 
   // Sla decor + huidige krukstatussen samen op (één Supabase-rij, backward-compatible)
@@ -642,7 +670,7 @@ export default function KassaFloorPlan({
     setDecors(updated)
     localStorage.setItem(decorKey, JSON.stringify(updated))
     const payload = { items: updated, stool_statuses: currentStoolStatuses ?? stoolStatuses }
-    supabase.from('floor_plan_decor').upsert({ tenant_slug: tenant, data: payload }, { onConflict: 'tenant_slug' })
+    persistFloorPlanDecorToBackend(payload)
   }
 
   // Sla krukstatus op + sync naar Supabase zodat andere apparaten het zien
@@ -650,7 +678,7 @@ export default function KassaFloorPlan({
     setStoolStatuses(updated)
     localStorage.setItem(stoolStatusKey, JSON.stringify(updated))
     const payload = { items: decors, stool_statuses: updated }
-    supabase.from('floor_plan_decor').upsert({ tenant_slug: tenant, data: payload }, { onConflict: 'tenant_slug' })
+    persistFloorPlanDecorToBackend(payload)
   }
 
   // Effectieve stoel/tafel status:
@@ -719,13 +747,8 @@ export default function KassaFloorPlan({
 
   const addTable = () => {
     if (!addNumber.trim()) return
-    let x = 25 + Math.random() * 50
-    let y = 25 + Math.random() * 50
-    const el = floorRef.current
-    if (el && el.clientWidth > 0 && el.clientHeight > 0) {
-      x = clampPct(50 + (Math.random() - 0.5) * 10)
-      y = clampPct(50 + (Math.random() - 0.5) * 10)
-    }
+    const x = clampPct(50)
+    const y = clampPct(50)
     const t: KassaTable = {
       id: makeId(),
       number: addNumber.trim(),
@@ -814,7 +837,7 @@ export default function KassaFloorPlan({
       setTables(latest => {
         const next = latest.map(t => (t.id === id ? { ...t, x: pct.x, y: pct.y } : t))
         localStorage.setItem(storageKey, JSON.stringify(next))
-        void supabase.from('floor_plan_tables').upsert({ tenant_slug: tenant, data: next }, { onConflict: 'tenant_slug' })
+        persistFloorPlanTablesToBackend(next)
         return next
       })
       setSelected(sel => (sel?.id === id ? { ...sel, x: pct.x, y: pct.y } : sel))
@@ -823,7 +846,7 @@ export default function KassaFloorPlan({
         const next = latestDecors.map(d => (d.id === id ? { ...d, x: pct.x, y: pct.y } : d))
         const payload = { items: next, stool_statuses: stoolStatuses }
         localStorage.setItem(decorKey, JSON.stringify(next))
-        void supabase.from('floor_plan_decor').upsert({ tenant_slug: tenant, data: payload }, { onConflict: 'tenant_slug' })
+        persistFloorPlanDecorToBackend(payload)
         return next
       })
       setSelectedDecor(sel => (sel?.id === id ? { ...sel, x: pct.x, y: pct.y } : sel))

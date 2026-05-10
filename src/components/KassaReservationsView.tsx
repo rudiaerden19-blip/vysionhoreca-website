@@ -818,8 +818,8 @@ export default function KassaReservationsView({
       number: addFloorNumber.trim(),
       seats: addFloorSeats,
       shape: addFloorShape,
-      x: 15 + Math.random() * 60,
-      y: 15 + Math.random() * 60,
+      x: 50,
+      y: 50,
       rotation: 0,
       status: 'FREE',
     }
