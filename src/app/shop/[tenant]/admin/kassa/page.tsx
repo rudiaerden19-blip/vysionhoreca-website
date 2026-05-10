@@ -3127,20 +3127,54 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           </div>
         )}
 
-        {/* Besteltype banner */}
-        <button
-          type="button"
-          onClick={cycleOrderType}
-          className={`mx-3 mt-2 shrink-0 py-3 rounded-xl font-bold text-lg uppercase tracking-wide transition-colors ${
-            orderType === 'DINE_IN' ? 'bg-[#3C4D6B] text-white' :
-            orderType === 'TAKEAWAY' ? 'bg-amber-500 text-black' :
-            'bg-blue-600 text-white'
-          }`}
-        >
-          {orderType === 'DINE_IN' && dineInBannerLabel}
-          {orderType === 'TAKEAWAY' && `📦 ${t('kassaApp.orderTypeTakeaway').toUpperCase()}`}
-          {orderType === 'DELIVERY' && `🚗 ${t('kassaApp.orderTypeDelivery').toUpperCase()}`}
-        </button>
+        {/* Besteltype banner — dine-in met tafel: tafel wissen via kruisje (geen order-type cycle) */}
+        {orderType === 'DINE_IN' && tableNumber ? (
+          <div className="mx-3 mt-2 flex shrink-0 overflow-hidden rounded-xl bg-[#3C4D6B] text-white shadow-sm ring-1 ring-black/10">
+            <button
+              type="button"
+              onClick={() => {
+                playClick()
+                cycleOrderType()
+              }}
+              className="min-w-0 flex-1 py-3 text-center text-lg font-bold uppercase tracking-wide transition-colors hover:bg-[#2D3A52]/95"
+            >
+              {dineInBannerLabel}
+            </button>
+            <button
+              type="button"
+              title={t('kassaApp.clearTableBanner')}
+              aria-label={t('kassaApp.clearTableBanner')}
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                playClick()
+                setTableNumber('')
+              }}
+              className="flex shrink-0 items-center justify-center border-l border-white/20 px-4 text-xl font-bold leading-none transition-colors hover:bg-red-600 active:bg-red-700"
+            >
+              <span aria-hidden>✕</span>
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              playClick()
+              cycleOrderType()
+            }}
+            className={`mx-3 mt-2 shrink-0 rounded-xl py-3 text-lg font-bold uppercase tracking-wide transition-colors ${
+              orderType === 'DINE_IN'
+                ? 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
+                : orderType === 'TAKEAWAY'
+                  ? 'bg-amber-500 text-black hover:bg-amber-400'
+                  : 'bg-blue-600 text-white hover:bg-blue-500'
+            }`}
+          >
+            {orderType === 'DINE_IN' && dineInBannerLabel}
+            {orderType === 'TAKEAWAY' && `📦 ${t('kassaApp.orderTypeTakeaway').toUpperCase()}`}
+            {orderType === 'DELIVERY' && `🚗 ${t('kassaApp.orderTypeDelivery').toUpperCase()}`}
+          </button>
+        )}
 
         {/* Cart of Numpad */}
         <div className="flex-1 min-h-0 overflow-y-auto px-3 pt-2 flex flex-col touch-pan-y">
