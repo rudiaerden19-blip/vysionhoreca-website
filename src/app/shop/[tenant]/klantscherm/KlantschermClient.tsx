@@ -83,14 +83,7 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
   if (!msg || msg.phase === 'idle') {
     return (
       <div className={`${shell} items-center justify-center text-center`}>
-        {msg?.phase === 'idle' && msg.businessName ? (
-          <p className="text-2xl font-bold sm:text-3xl md:text-4xl">{msg.businessName}</p>
-        ) : null}
-        <p
-          className={`text-lg opacity-90 sm:text-xl md:text-2xl ${msg?.phase === 'idle' && msg.businessName ? 'mt-6' : ''}`}
-        >
-          {t('kassaCustomerDisplay.waiting')}
-        </p>
+        <p className="text-lg opacity-90 sm:text-xl md:text-2xl">{t('kassaCustomerDisplay.waiting')}</p>
       </div>
     )
   }
