@@ -205,8 +205,15 @@ export default function KassaReservationsView({
   const [addFloorSeats, setAddFloorSeats] = useState(4)
   const [addFloorShape, setAddFloorShape] = useState<'SQUARE' | 'ROUND' | 'RECTANGLE'>('SQUARE')
   const [isDraggingFloor, setIsDraggingFloor] = useState(false)
+  // Zelfde gedrag als kassa-plattegrond (KassaFloorPlan): standaard vast; ontgrendelen = bewust bewerken.
   const [tablesLocked, setTablesLocked] = useState(() => {
-    try { return localStorage.getItem(`floor_tables_locked_${tenant}`) === 'true' } catch { return false }
+    try {
+      const v = localStorage.getItem(`floor_tables_locked_${tenant}`)
+      if (v == null || v === '') return true
+      return v === 'true'
+    } catch {
+      return true
+    }
   })
   const [floorZoom, setFloorZoom] = useState(1)
   const [panX, setPanX] = useState(0)
