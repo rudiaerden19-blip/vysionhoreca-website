@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
 import {
@@ -454,25 +454,27 @@ export default function KassaFloorPlan({
     }
   }
 
-  /** Na RLS-lockdown: alleen service_role schrijft — client gebruikt admin-proxy (niet anon upsert). */
-  const persistFloorPlanTablesToBackend = (data: KassaTable[]) => {
-    persistFloorTablesInflightRef.current += 1
-    onFloorPlanTablesPersistLifecycle?.(planZone, 'start')
-    void adminDb
-      .upsert(
-        'floor_plan_tables',
-        { tenant_slug: tenant, plan_zone: planZone, data } as Record<string, unknown>,
-        { tenantSlug: tenant, onConflict: 'tenant_slug,plan_zone' },
-      )
-      .then((r) => {
-        if (!r.ok) console.error('[KassaFloorPlan] floor_plan_tables:', r.error)
-        else onFloorPlanTablesPersisted?.(planZone, data)
-      })
-      .finally(() => {
-        persistFloorTablesInflightRef.current -= 1
-        onFloorPlanTablesPersistLifecycle?.(planZone, 'end')
-      })
-  }
+  const persistFloorPlanTablesToBackend = useCallback(
+    (data: KassaTable[]) => {
+      persistFloorTablesInflightRef.current += 1
+      onFloorPlanTablesPersistLifecycle?.(planZone, 'start')
+      void adminDb
+        .upsert(
+          'floor_plan_tables',
+          { tenant_slug: tenant, plan_zone: planZone, data } as Record<string, unknown>,
+          { tenantSlug: tenant, onConflict: 'tenant_slug,plan_zone' },
+        )
+        .then((r) => {
+          if (!r.ok) console.error('[KassaFloorPlan] floor_plan_tables:', r.error)
+          else onFloorPlanTablesPersisted?.(planZone, data)
+        })
+        .finally(() => {
+          persistFloorTablesInflightRef.current -= 1
+          onFloorPlanTablesPersistLifecycle?.(planZone, 'end')
+        })
+    },
+    [tenant, planZone, onFloorPlanTablesPersisted, onFloorPlanTablesPersistLifecycle],
+  )
 
   const persistFloorPlanDecorToBackend = (data: {
     items: DecorItem[]
@@ -646,7 +648,7 @@ export default function KassaFloorPlan({
       }
     }
     void load()
-  }, [tenant, planZone, storageKey, decorKey, stoolStatusKey])
+  }, [tenant, planZone, storageKey, decorKey, stoolStatusKey, persistFloorPlanTablesToBackend])
 
   // ── Realtime subscriptions: sync tussen apparaten ────────────────────────
   useEffect(() => {

@@ -728,11 +728,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   useEffect(() => {
     return () => {
-      const timers = persistTimersRef.current
-      for (const k of Object.keys(timers)) {
-        clearTimeout(timers[k])
-        delete timers[k]
+      const snapshot = { ...persistTimersRef.current }
+      for (const k of Object.keys(snapshot)) {
+        clearTimeout(snapshot[k])
       }
+      persistTimersRef.current = {}
     }
   }, [])
 
@@ -1096,6 +1096,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         console.warn('[kassa] preparing draft delete failed:', delPrep.error)
       }
       if (items.length === 0) return
+      let customerTableLabel = t('kassaReceipt.tableLabel').replace(/\{number\}/g, String(tblNr))
+      if (zone === FLOOR_PLAN_ZONE_TERRACE) {
+        customerTableLabel = `${customerTableLabel} (${t('kassaApp.floorZoneTerrace')})`
+      }
       const insRes = await adminDb.insert(
         'orders',
         {
@@ -1103,6 +1107,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           status: 'open',
           payment_status: 'pending',
           order_type: 'DINE_IN',
+          customer_name: customerTableLabel,
+          customer_notes: customerTableLabel,
           table_number: tblNr,
           floor_plan_zone: zone,
           subtotal: 0,
@@ -1115,7 +1121,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       )
       if (insRes.ok) return
       console.warn('[kassa] open order insert failed:', insRes.error)
-      if (attempt < 2 && (insRes.status === 0 || insRes.status >= 500)) {
+      const errMsg = insRes.error || ''
+      const uniqueOrConflict =
+        insRes.status === 409 || /duplicate|unique|23505/i.test(errMsg)
+      if (attempt < 2 && (insRes.status === 0 || insRes.status >= 500 || uniqueOrConflict)) {
         window.setTimeout(() => void run(attempt + 1), 650 * (attempt + 1))
       }
     }
@@ -1294,7 +1303,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   // Laad categorieën, producten en welke producten opties hebben
   // Offline: laad uit localStorage-cache; online: laad van Supabase en update cache
-  const loadMenu = async (opts?: { silent?: boolean }) => {
+  const loadMenu = useCallback(async (opts?: { silent?: boolean }) => {
     const silent = !!opts?.silent
     if (!silent) setMenuLoading(true)
 
@@ -1353,7 +1362,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       // Netwerkfout – cache hierboven is voldoende
     }
     setMenuLoading(false)
-  }
+  }, [tenant, CACHE_CATS, CACHE_PRODS, CACHE_OPTS])
 
   useEffect(() => {
     loadMenu()
@@ -1364,7 +1373,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       setTenantInfo(s)
       try { localStorage.setItem(CACHE_SETTINGS, JSON.stringify(s)) } catch { /* ignore */ }
     }).catch(() => { /* offline: al geladen uit cache */ })
-  }, [tenant])
+  }, [tenant, loadMenu, CACHE_SETTINGS])
 
   useEffect(() => {
     try {
@@ -1438,8 +1447,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       document.removeEventListener('visibilitychange', onVisibility)
       window.removeEventListener('focus', onFocus)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- loadMenu is defined per render above; tenant remount resets listener
-  }, [tenant])
+  }, [tenant, loadMenu])
 
   // Sound init
   useEffect(() => {
