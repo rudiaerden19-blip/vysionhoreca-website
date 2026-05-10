@@ -2699,7 +2699,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
 
         <div className="flex min-w-0 flex-1 items-center gap-1 sm:gap-1.5">
-        <div className="relative z-20 flex min-w-0 max-w-[6.5rem] shrink-0 flex-col justify-center px-0.5 sm:max-w-[8.5rem] md:max-w-[11rem] lg:max-w-[13rem] ml-[2cm]">
+        <div className="relative z-20 flex min-w-0 max-w-[6.5rem] shrink-0 flex-col justify-center px-0.5 sm:max-w-[8.5rem] md:max-w-[11rem] lg:max-w-[13rem] ml-[1cm]">
           <button
             type="button"
             onClick={printDraftBonFromCart}
@@ -2713,7 +2713,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           </button>
         </div>
 
-        {/* Snelkoppelingen: geen extra ml hier — tenant heeft ml-[2cm], zo blijven deze knoppen op dezelfde horizontale positie */}
+        {/* Snelkoppelingen: geen extra ml hier — tenant heeft ml-[1cm], zo blijven deze knoppen op dezelfde horizontale positie */}
         <div className="relative z-20 flex min-h-0 min-w-0 flex-1 items-center">
           <nav
             aria-label={t('kassaApp.quickLinksAria')}
