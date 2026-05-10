@@ -160,6 +160,39 @@ function mergeOpenTableOrdersServerWithPendingLocal(
   return merged
 }
 
+/** Rijen uit DB voor buildOpenTableOrdersMapFromRows — zelfde bron als adminDb-insert (service role). */
+type OpenTableOrderRow = { table_number: string | null; items: unknown }
+
+/**
+ * Open tafelmanden: lees via admin-proxy (service role), net als schrijven — alle kassa-pc's zien identieke data.
+ * Anon-Supabase alleen als fallback (bv. demo zonder sessie).
+ */
+async function fetchOpenTableOrdersForTenant(tenantSlug: string): Promise<OpenTableOrderRow[] | null> {
+  const adminRes = await adminDb.select<OpenTableOrderRow[]>('orders', {
+    tenantSlug: tenantSlug,
+    select: 'table_number, items',
+    match: { status: 'open' },
+    limit: 500,
+  })
+  if (adminRes.ok && Array.isArray(adminRes.data)) {
+    return adminRes.data
+  }
+  if (!adminRes.ok && adminRes.error) {
+    console.warn('[kassa] open orders admin read failed:', adminRes.error)
+  }
+  const { data, error } = await supabase
+    .from('orders')
+    .select('table_number, items')
+    .eq('tenant_slug', tenantSlug)
+    .eq('status', 'open')
+    .limit(500)
+  if (error) {
+    console.warn('[kassa] open orders anon read failed:', error.message)
+    return null
+  }
+  return (data ?? []) as OpenTableOrderRow[]
+}
+
 function buildKassaCustomerDisplayLines(cart: CartItem[]): KassaCustomerDisplayLine[] {
   return cart.map((i) => {
     const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
@@ -602,6 +635,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const tableOrdersKey = `vysion_table_orders_${tenant}`
   const persistTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
 
+  const applyOpenOrdersFromServerRows = useCallback((rows: OpenTableOrderRow[] | null) => {
+    if (rows === null) return
+    const fromServer = buildOpenTableOrdersMapFromRows(rows)
+    setTableOrders((prev) => {
+      const merged = mergeOpenTableOrdersServerWithPendingLocal(prev, fromServer)
+      localStorage.setItem(tableOrdersKey, JSON.stringify(merged))
+      return merged
+    })
+  }, [tableOrdersKey])
+
   useEffect(() => {
     return () => {
       const timers = persistTimersRef.current
@@ -693,22 +736,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       try { setTableOrders(JSON.parse(ordersRaw)) } catch { /* empty */ }
     }
 
-    void supabase
-      .from('orders')
-      .select('table_number, items')
-      .eq('tenant_slug', tenant)
-      .eq('status', 'open')
-      .then(({ data }) => {
-        const fromSupabase = buildOpenTableOrdersMapFromRows(data ?? null)
-        setTableOrders((prev) => {
-          const merged = mergeOpenTableOrdersServerWithPendingLocal(prev, fromSupabase)
-          localStorage.setItem(tableOrdersKey, JSON.stringify(merged))
-          return merged
-        })
-      })
+    void fetchOpenTableOrdersForTenant(tenant).then(applyOpenOrdersFromServerRows)
     // Geen showTablePicker hier: die toggle triggert bij openen plattegrond en overschreef
     // tableOrders met een lege DB-snapshot vóór persist klaar was.
-  }, [tenant, tableOrdersKey])
+  }, [tenant, tableOrdersKey, applyOpenOrdersFromServerRows])
 
   // ── Realtime sync: tafelstatus tussen apparaten ───────────────────────────
   useEffect(() => {
@@ -781,27 +812,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       .on('postgres_changes',
         { event: '*', schema: 'public', table: 'orders', filter: `tenant_slug=eq.${tenant}` },
         () => {
-          // Herlaad alle open orders bij elke wijziging (insert/update/delete)
-          supabase
-            .from('orders')
-            .select('table_number, items')
-            .eq('tenant_slug', tenant)
-            .eq('status', 'open')
-            .then(({ data }) => {
-              const fromSupabase = buildOpenTableOrdersMapFromRows(data ?? null)
-              setTableOrders((prev) => {
-                const merged = mergeOpenTableOrdersServerWithPendingLocal(prev, fromSupabase)
-                localStorage.setItem(tableOrdersKey, JSON.stringify(merged))
-                return merged
-              })
-            })
+          void fetchOpenTableOrdersForTenant(tenant).then(applyOpenOrdersFromServerRows)
         }
       )
       .subscribe()
     return () => {
       void supabase.removeChannel(ordersChannel).catch(() => {})
     }
-  }, [tenant, tableOrdersKey])
+  }, [tenant, applyOpenOrdersFromServerRows])
 
   /** Als WebSockets/realtime op een werkstation vastzitten (firewall, slaapstand, print-kiosk),
    *  halen we dezelfde bron nog eens binnen bij terugkeren naar het venster + periodiek. */
@@ -816,19 +834,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
 
     const pullOpenOrders = () => {
-      void supabase
-        .from('orders')
-        .select('table_number, items')
-        .eq('tenant_slug', tenant)
-        .eq('status', 'open')
-        .then(({ data }) => {
-          const fromSupabase = buildOpenTableOrdersMapFromRows(data ?? null)
-          setTableOrders((prev) => {
-            const merged = mergeOpenTableOrdersServerWithPendingLocal(prev, fromSupabase)
-            localStorage.setItem(tableOrdersKey, JSON.stringify(merged))
-            return merged
-          })
-        })
+      void fetchOpenTableOrdersForTenant(tenant).then(applyOpenOrdersFromServerRows)
     }
 
     const pullFloorAndDecor = () => {
@@ -883,16 +889,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     document.addEventListener('visibilitychange', onActive)
     window.addEventListener('focus', onActive)
-    const timer = window.setInterval(() => {
-      if (document.visibilityState === 'visible') pullAll()
+    const timerFloor = window.setInterval(() => {
+      if (document.visibilityState === 'visible') pullFloorAndDecor()
     }, 45_000)
+    const timerOrders = window.setInterval(() => {
+      if (document.visibilityState === 'visible') pullOpenOrders()
+    }, 12_000)
 
     return () => {
       document.removeEventListener('visibilitychange', onActive)
       window.removeEventListener('focus', onActive)
-      window.clearInterval(timer)
+      window.clearInterval(timerFloor)
+      window.clearInterval(timerOrders)
     }
-  }, [tenant, tableOrdersKey])
+  }, [tenant, applyOpenOrdersFromServerRows])
 
   const cancelPersistTimer = (tblNr: string) => {
     const timers = persistTimersRef.current
