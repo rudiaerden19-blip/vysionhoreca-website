@@ -106,22 +106,22 @@ export async function POST(request: NextRequest) {
     }
 
     const passwordHash = await hashPassword(password)
-    const trialEndsAt = new Date()
-    trialEndsAt.setDate(trialEndsAt.getDate() + 14)
 
     // ========================================
     // 1. CREATE TENANT (main table)
     // ========================================
+    // Geen proefperiode meer — nieuwe zaak is direct 'active'. Betaling wordt
+    // door superadmin handmatig beheerd via de blokkeer-knop op `tenants.is_blocked`.
     const tenantInsert = {
       name: businessName.trim(),
       slug: tenantSlug,
       email: emailLower,
       phone: phone.trim(),
       plan: 'starter',
-      subscription_status: 'trial',
-      trial_ends_at: trialEndsAt.toISOString(),
+      subscription_status: 'active',
+      trial_ends_at: null as string | null,
       enabled_modules: null as null,
-      post_trial_modules_confirmed: false,
+      post_trial_modules_confirmed: true,
       feature_group_orders: true,
     }
 
@@ -224,10 +224,10 @@ export async function POST(request: NextRequest) {
       .insert({
         tenant_slug: tenantSlug,
         plan: 'starter',
-        status: 'trial',
+        status: 'active',
         price_monthly: 59,
-        trial_started_at: new Date().toISOString(),
-        trial_ends_at: trialEndsAt.toISOString(),
+        trial_started_at: null,
+        trial_ends_at: null,
       })
 
     if (subscriptionError) {
@@ -320,7 +320,7 @@ async function sendVerificationEmail(email: string, name: string, token: string)
         <h2 style="color: #333;">Welkom ${name}!</h2>
         
         <p style="color: #555; line-height: 1.6;">
-          Bedankt voor je registratie bij Vysion Horeca! Je proefperiode van 15 dagen is gestart.
+          Bedankt voor je registratie bij Vysion Horeca!
         </p>
         
         <p style="color: #555; line-height: 1.6;">
@@ -360,7 +360,7 @@ async function sendVerificationEmail(email: string, name: string, token: string)
     text: `
 Welkom ${name}!
 
-Bedankt voor je registratie bij Vysion Horeca! Je proefperiode van 15 dagen is gestart.
+Bedankt voor je registratie bij Vysion Horeca!
 
 Klik op deze link om je emailadres te bevestigen:
 ${verifyUrl}

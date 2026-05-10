@@ -43,7 +43,6 @@ import {
   offlineDbSaveMenuSnapshot,
   offlineDbSetOrderQueue,
 } from '@/lib/kassa-offline-db'
-import PostTrialModulePickerModal from '@/components/PostTrialModulePickerModal'
 import { AccountMenuSessionBlock } from '@/components/AccountMenuSessionBlock'
 import {
   clearPublicDemoSession,
@@ -131,8 +130,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     enabledModulesJson,
     featureLabelPrinting,
     loading: moduleFlagsLoading,
-    needsPostTrialModulePicker,
-    refetch: refetchModules,
   } = useTenantModuleFlags(tenant)
   const effectiveAccess =
     demoViewOnly || moduleFlagsLoading ? allTenantModulesTrue() : moduleAccess
@@ -1826,11 +1823,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           setLogoutSoftwareConfirmOpen(false)
           performLogout()
         }}
-      />
-      <PostTrialModulePickerModal
-        tenantSlug={tenant}
-        open={needsPostTrialModulePicker && !demoViewOnly}
-        onConfirmed={refetchModules}
       />
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[#e3e3e3]">
 

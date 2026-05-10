@@ -166,19 +166,20 @@ export async function POST(req: NextRequest) {
     if (body.action === 'create') {
       const slug = body.tenant.tenant_slug.toLowerCase().replace(/[^a-z0-9]/g, '')
       if (!slug) return NextResponse.json({ error: 'Ongeldige slug' }, { status: 400 })
-      const trialEndsAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
 
       // 1. tenants
+      // Geen proefperiode meer — superadmin maakt zaak direct 'active' aan;
+      // betalingscontrole loopt via de blokkeer-knop op `tenants.is_blocked`.
       const tenantInsert = {
         name: body.tenant.business_name,
         slug,
         email: body.tenant.email || '',
         phone: body.tenant.phone || '',
         plan: 'starter',
-        subscription_status: 'trial',
-        trial_ends_at: trialEndsAt,
+        subscription_status: 'active',
+        trial_ends_at: null as string | null,
         enabled_modules: null as null,
-        post_trial_modules_confirmed: false,
+        post_trial_modules_confirmed: true,
         feature_group_orders: true,
       }
       let { error: tenantsError } = await supabase.from('tenants').insert(tenantInsert)
@@ -240,14 +241,14 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'tenant_settings: ' + settingsError.message }, { status: 400 })
       }
 
-      // 4. subscriptions (trial)
+      // 4. subscriptions
       await supabase.from('subscriptions').insert({
         tenant_slug: slug,
         plan: 'starter',
-        status: 'trial',
+        status: 'active',
         price_monthly: 59,
-        trial_started_at: new Date().toISOString(),
-        trial_ends_at: trialEndsAt,
+        trial_started_at: null,
+        trial_ends_at: null,
       })
 
       // 5. delivery_settings defaults

@@ -3,7 +3,6 @@
 import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import TrialBanner from '@/components/TrialBanner'
 import { useLanguage } from '@/i18n'
 import { getTenantSettings } from '@/lib/admin-api'
 import {
@@ -24,7 +23,6 @@ import {
 } from '@/lib/admin-hamburger-modules'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
 import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
-import PostTrialModulePickerModal from '@/components/PostTrialModulePickerModal'
 import { AdminHamburgerMenu } from '@/components/AdminHamburgerMenu'
 import {
   buildShopInternalReturnPath,
@@ -75,8 +73,6 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     enabledModulesJson,
     featureLabelPrinting,
     loading: modulesLoading,
-    needsPostTrialModulePicker,
-    refetch: refetchModules,
   } = useTenantModuleFlags(params.tenant)
 
   const adminPosHref =
@@ -394,17 +390,6 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
 
   return (
     <div style={{ maxWidth: '100%', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-100">
-      <PostTrialModulePickerModal
-        tenantSlug={params.tenant}
-        open={
-          needsPostTrialModulePicker &&
-          !demoPublicUnauthenticated &&
-          !isSuperAdminLoggedIn()
-        }
-        onConfirmed={refetchModules}
-      />
-      {!demoPublicUnauthenticated && <TrialBanner tenantSlug={params.tenant} />}
-
       {/* ── Slanke blauwe topbalk (zelfde stijl als kassa). Z-index 100 — modals/dialoog: min. z-[130] zodat ze boven deze balk blijven (iPad). ── */}
       <div
         className="fixed top-0 left-0 right-0 z-[100] flex items-center gap-2 bg-[#1e293b] px-2 sm:px-3"
