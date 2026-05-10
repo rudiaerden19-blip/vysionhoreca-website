@@ -44,6 +44,8 @@ interface Props {
   tableOrders?: Record<string, SimpleCartItem[]>
   /** Zelfde lijst als kassa-tafelkiezer — direct tonen tot DB-fetch klaar is (voorkomt lege plattegrond). */
   seedTables?: KassaTable[]
+  /** Na geslaagde upsert: parent-state (`pickerTables`) gelijk trekken — anders overschrijft seed een net toegevoegde terrastafel tot refresh. */
+  onFloorPlanTablesPersisted?: (planZone: FloorPlanZone, tables: KassaTable[]) => void
 }
 
 function makeId() { return Math.random().toString(36).slice(2, 10) }
@@ -364,6 +366,7 @@ export default function KassaFloorPlan({
   onClose,
   tableOrders = {},
   seedTables,
+  onFloorPlanTablesPersisted,
 }: Props) {
   const { t } = useLanguage()
   const statusLabels = useMemo(
@@ -412,6 +415,8 @@ export default function KassaFloorPlan({
   const pointerStart = useRef({ x: 0, y: 0 })
   /** Tijdens tafel/decor-sleep: geen realtime setTables/setDecors (echo van eigen save = race / hapering). */
   const ignoreFloorRealtimeRef = useRef(false)
+  /** Tijdens floor_plan_tables-upsert: geen kortere parent-seed die net toegevoegde tafels weggooit (poll/realtime-race). */
+  const persistFloorTablesInflightRef = useRef(0)
   const floorRectCachedRef = useRef<DOMRect | null>(null)
   const dragPaintRafRef = useRef<number | null>(null)
   /** Live % tijdens slepen: max 1 React-update per frame. */
@@ -448,6 +453,7 @@ export default function KassaFloorPlan({
 
   /** Na RLS-lockdown: alleen service_role schrijft — client gebruikt admin-proxy (niet anon upsert). */
   const persistFloorPlanTablesToBackend = (data: KassaTable[]) => {
+    persistFloorTablesInflightRef.current += 1
     void adminDb
       .upsert(
         'floor_plan_tables',
@@ -456,6 +462,10 @@ export default function KassaFloorPlan({
       )
       .then((r) => {
         if (!r.ok) console.error('[KassaFloorPlan] floor_plan_tables:', r.error)
+        else onFloorPlanTablesPersisted?.(planZone, data)
+      })
+      .finally(() => {
+        persistFloorTablesInflightRef.current -= 1
       })
   }
 
@@ -515,8 +525,23 @@ export default function KassaFloorPlan({
       const incoming = sanitizeTables(seedTables)
       if (prev.length === 0) return incoming
       const prevIds = new Set(prev.map((t) => t.id))
-      if (incoming.some((t) => !prevIds.has(t.id)) || incoming.length !== prev.length) return incoming
-      return prev
+
+      if (incoming.some((t) => !prevIds.has(t.id))) {
+        const byId = new Map<string, KassaTable>()
+        for (const t of prev) byId.set(t.id, t)
+        for (const t of incoming) byId.set(t.id, t)
+        return sanitizeTables([...byId.values()])
+      }
+
+      if (
+        persistFloorTablesInflightRef.current > 0 &&
+        incoming.length < prev.length &&
+        incoming.every((t) => prevIds.has(t.id))
+      ) {
+        return prev
+      }
+
+      return incoming
     })
   }, [seedSignature, seedTables])
 

@@ -1613,6 +1613,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const pickerTables = kassaTablesByZone[pickerBrowseZone]
   const pickerStools = kassaStoolsByZone[pickerBrowseZone]
 
+  const onFloorPlanTablesPersisted = useCallback((zone: FloorPlanZone, tables: FloorPlanTable[]) => {
+    const fixed = sanitizeFloorPlanTables(tables)
+    setKassaTablesByZone((prev) => ({ ...prev, [zone]: fixed }))
+    localStorage.setItem(floorPlanTablesLocalStorageKey(tenant, zone), JSON.stringify(fixed))
+  }, [tenant])
+
   const switchConfirmParsed = switchConfirm ? parseTableOrderMapKey(switchConfirm) : null
   const switchConfirmDisplay =
     switchConfirmParsed != null
@@ -3492,6 +3498,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           tenant={tenant}
           planZone={pickerBrowseZone}
           seedTables={pickerTables}
+          onFloorPlanTablesPersisted={onFloorPlanTablesPersisted}
           onSelectTable={(nr) => switchToTable(nr)}
           onClose={() => setShowFloorPlan(false)}
           tableOrders={tableOrders}
