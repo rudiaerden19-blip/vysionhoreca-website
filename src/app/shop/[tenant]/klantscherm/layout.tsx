@@ -43,7 +43,7 @@ export async function generateViewport(): Promise<Viewport> {
 export default function KlantschermLayout({ children }: { children: ReactNode }) {
   return (
     <div
-      className={`${klantschermDigital.variable} fixed inset-0 z-[2147483646] box-border m-0 flex h-[100dvh] max-h-[100dvh] w-screen max-w-none flex-col overflow-x-hidden overflow-y-auto overscroll-none bg-black p-0 text-white antialiased [-webkit-tap-highlight-color:transparent]`}
+      className={`${klantschermDigital.variable} fixed inset-0 z-[2147483646] box-border m-0 flex h-[100dvh] max-h-[100dvh] w-screen max-w-none flex-col overflow-x-hidden overflow-y-auto overscroll-none bg-black p-0 text-white subpixel-antialiased [-webkit-tap-highlight-color:transparent]`}
     >
       {children}
     </div>

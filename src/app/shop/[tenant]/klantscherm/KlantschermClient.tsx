@@ -186,7 +186,7 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
               <span className="text-[clamp(3.25rem,17vw,13rem)] font-black tabular-nums leading-none tracking-[0.05em]">
                 –
               </span>
-              <span className="translate-y-[-0.05em] select-none text-[clamp(2rem,12vw,9rem)] leading-none">:</span>
+              <span className="select-none text-[clamp(2rem,12vw,9rem)] leading-none">:</span>
               <span className="text-[clamp(3.25rem,17vw,13rem)] font-black tabular-nums leading-none tracking-[0.05em]">
                 –
               </span>
@@ -207,8 +207,9 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
             dir="ltr"
             className="flex flex-row flex-nowrap items-center justify-center gap-[clamp(0.25rem,1.8vw,1rem)] [font-family:var(--font-klantscherm-digital),system-ui,sans-serif]"
             style={{
+              /* Mindere blur dan voorheen: gloed leest sneller “zacht/wazig” op lcd zonder hoge PPI */
               textShadow:
-                '0 0 28px rgba(255,255,255,0.4), 0 0 72px rgba(160,200,255,0.14)',
+                '0 0 12px rgba(255,255,255,0.42), 0 0 28px rgba(160,200,255,0.14), 0 1px 0 rgba(255,255,255,0.08)',
             }}
           >
             <span className="text-[clamp(3.25rem,17vw,13rem)] font-black tabular-nums leading-none tracking-[0.05em]">
@@ -216,7 +217,7 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
             </span>
             <span
               aria-hidden
-              className="vysion-klantscherm-clock-colon translate-y-[-0.05em] select-none text-[clamp(2rem,12vw,9rem)] leading-none text-white"
+              className="vysion-klantscherm-clock-colon select-none text-[clamp(2rem,12vw,9rem)] leading-none text-white"
             >
               :
             </span>
