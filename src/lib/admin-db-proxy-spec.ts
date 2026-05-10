@@ -114,9 +114,8 @@ export const ADMIN_DB_TABLES: Record<string, AdminDbTableSpec> = {
   // --- Orders / Reservations / Reviews (admin updates) ---
   orders: {
     tenantSlugColumn: 'tenant_slug',
-    // INSERT gaat via klantpaden (RLS allow). DELETE alleen voor kassa-flow
-    // (open-order overschrijven). UPDATE voor admin-correcties.
-    allowedOps: ['update', 'delete'],
+    // Open POS carts op tafel: DELETE oude rij + INSERT nieuwe via /api/admin/db (betrouwbaar voor alle tenants).
+    allowedOps: ['insert', 'update', 'delete'],
     forbiddenColumns: ['id', 'created_at', 'tenant_slug'],
     maxRows: 50,
   },

@@ -823,22 +823,25 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         console.warn('[kassa] open order delete failed:', delRes.error)
       }
       if (items.length === 0) return
-      const { error: insErr } = await supabase.from('orders').insert({
-        tenant_slug: tenant,
-        order_number: 0,
-        status: 'open',
-        payment_status: 'pending',
-        order_type: 'DINE_IN',
-        table_number: tblNr,
-        subtotal: 0,
-        tax: 0,
-        total: 0,
-        items: items as unknown as Record<string, unknown>[],
-        created_at: new Date().toISOString(),
-      })
-      if (!insErr) return
-      console.warn('[kassa] open order insert failed:', insErr.message)
-      if (attempt < 2 && isLikelyOfflineOrNetworkSupabaseError(insErr)) {
+      const insRes = await adminDb.insert(
+        'orders',
+        {
+          order_number: 0,
+          status: 'open',
+          payment_status: 'pending',
+          order_type: 'DINE_IN',
+          table_number: tblNr,
+          subtotal: 0,
+          tax: 0,
+          total: 0,
+          items: items as unknown as Record<string, unknown>[],
+          created_at: new Date().toISOString(),
+        },
+        { tenantSlug: tenant }
+      )
+      if (insRes.ok) return
+      console.warn('[kassa] open order insert failed:', insRes.error)
+      if (attempt < 2 && (insRes.status === 0 || insRes.status >= 500)) {
         window.setTimeout(() => void run(attempt + 1), 650 * (attempt + 1))
       }
     }
