@@ -2381,7 +2381,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           })()}
         </div>
 
-        <div className="flex min-w-0 flex-1 items-center gap-1 sm:gap-1.5 ml-[2cm]">
+        <div className="flex min-w-0 flex-1 items-center gap-1 sm:gap-1.5">
         <div className="relative z-20 flex min-w-0 max-w-[6.5rem] shrink-0 flex-col justify-center px-0.5 sm:max-w-[8.5rem] md:max-w-[11rem] lg:max-w-[13rem]">
           <span
             className="max-w-full truncate text-center text-[10px] font-semibold leading-tight tracking-tight text-white/95 sm:text-[11px] md:text-xs"
@@ -2392,7 +2392,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           </span>
         </div>
 
-        <div className="relative z-20 flex min-h-0 min-w-0 flex-1 items-center">
+        {/* Alleen snelkoppelingen (nav) naar rechts; tenantnaam blijft links tegen menu */}
+        <div className="relative z-20 flex min-h-0 min-w-0 flex-1 items-center ml-[2cm]">
           <nav
             aria-label={t('kassaApp.quickLinksAria')}
             className="flex min-h-0 min-w-0 flex-1 flex-nowrap items-center justify-start gap-0.5 sm:gap-1"
