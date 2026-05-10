@@ -1661,6 +1661,10 @@
       "pickup": "お持ち帰り",
       "delivery": "配達"
     },
+    "kassaChannelDineIn": "レジ · 店内",
+    "kassaChannelTakeaway": "レジ · テイクアウト",
+    "kassaChannelDelivery": "レジ · 配達",
+    "dineInSeatDetail": "{tableWord} {number} · {zone}",
     "actions": {
       "approve": "承認",
       "reject": "拒否",

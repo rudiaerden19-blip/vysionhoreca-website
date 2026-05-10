@@ -1955,6 +1955,10 @@
       "pickup": "Afhalen",
       "delivery": "Levering"
     },
+    "kassaChannelDineIn": "Kassa · Ter plaatse",
+    "kassaChannelTakeaway": "Kassa · Afhalen",
+    "kassaChannelDelivery": "Kassa · Levering",
+    "dineInSeatDetail": "{tableWord} {number} · {zone}",
     "actions": {
       "approve": "Goedkeuren",
       "reject": "Weigeren",

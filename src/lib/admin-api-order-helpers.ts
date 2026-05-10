@@ -56,6 +56,9 @@ export interface Order {
   rejection_notes?: string
   created_at?: string
   updated_at?: string
+  /** Dine-in: zaal voor rapportage/trace (inside | terrace); DB default inside */
+  floor_plan_zone?: string | null
+  table_number?: string | number | null
   // Items stored as JSONB in database
   items?: OrderItem[] | { name: string; quantity: number; price: number }[]
 }

@@ -1661,6 +1661,10 @@
       "pickup": "自取",
       "delivery": "配送"
     },
+    "kassaChannelDineIn": "收银 · 堂食",
+    "kassaChannelTakeaway": "收银 · 外带",
+    "kassaChannelDelivery": "收银 · 配送",
+    "dineInSeatDetail": "{tableWord} {number} · {zone}",
     "actions": {
       "approve": "批准",
       "reject": "拒绝",

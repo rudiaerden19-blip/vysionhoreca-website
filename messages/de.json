@@ -1143,6 +1143,10 @@
       "pickup": "Abholung",
       "delivery": "Lieferung"
     },
+    "kassaChannelDineIn": "Kasse · Vor Ort",
+    "kassaChannelTakeaway": "Kasse · Abholung",
+    "kassaChannelDelivery": "Kasse · Lieferung",
+    "dineInSeatDetail": "{tableWord} {number} · {zone}",
     "actions": {
       "approve": "Genehmigen",
       "reject": "Ablehnen",

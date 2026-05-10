@@ -1955,6 +1955,10 @@
       "pickup": "Pickup",
       "delivery": "Delivery"
     },
+    "kassaChannelDineIn": "POS · Dine-in",
+    "kassaChannelTakeaway": "POS · Takeaway",
+    "kassaChannelDelivery": "POS · Delivery",
+    "dineInSeatDetail": "{tableWord} {number} · {zone}",
     "actions": {
       "approve": "Approve",
       "reject": "Reject",

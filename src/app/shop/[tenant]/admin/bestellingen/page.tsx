@@ -10,6 +10,12 @@ import { adminDb } from '@/lib/admin-db-client'
 import { getSoundsEnabled } from '@/lib/sounds'
 import { authFetch, getAuthHeaders } from '@/lib/auth-headers'
 import { sendToVysionPrintAgent } from '@/lib/vysion-print-agent-client'
+import {
+  adminDineInSeatAuditLine,
+  adminOrderChannelBadgeClass,
+  adminPosChannelBadgeLabel,
+  adminWebshopChannelBadgeLabel,
+} from '@/lib/admin-order-display'
 
 // Parse items from JSONB
 interface OrderItemJson {
@@ -815,8 +821,16 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                   <div className="text-right">
                     <p className="text-2xl font-bold">€{order.total?.toFixed(2)}</p>
                     <p className="text-lg">
-                      {order.order_type === 'DINE_IN' ? '🍽️ Kassa - Ter plaatse' : order.order_type === 'TAKEAWAY' ? '📦 Kassa - Afhalen' : order.order_type === 'DELIVERY' ? '🚗 Kassa - Levering' : order.order_type === 'pickup' || order.order_type === 'PICKUP' ? `🛍️ ${t('ordersPage.orderType.pickup')}` : `🚗 ${t('ordersPage.orderType.delivery')}`}
+                      {isWebshopOrder(order)
+                        ? adminWebshopChannelBadgeLabel(order, t)
+                        : adminPosChannelBadgeLabel(order, t)}
                     </p>
+                    {(() => {
+                      const seatLine = adminDineInSeatAuditLine(order, t)
+                      return seatLine ? (
+                        <p className="text-sm font-semibold opacity-90 mt-1">{seatLine}</p>
+                      ) : null
+                    })()}
                   </div>
                 </div>
 
@@ -1127,17 +1141,9 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                 }`}
               >
                 {/* Webshop: online bestelling + moment; kassa: kanaal */}
-                <div className={`w-full text-center py-2 mb-3 rounded-xl tracking-wide ${
-                  isWebshopOrder(order)
-                    ? 'bg-slate-100 text-slate-900'
-                    : order.order_type === 'pickup' || order.order_type === 'PICKUP'
-                      ? 'bg-blue-100 text-blue-700'
-                      : order.order_type === 'DINE_IN'
-                        ? 'bg-gray-100 text-gray-700'
-                        : order.order_type === 'TAKEAWAY'
-                          ? 'bg-amber-100 text-amber-700'
-                          : 'bg-purple-100 text-purple-700'
-                }`}>
+                <div
+                  className={`w-full text-center py-2 mb-3 rounded-xl tracking-wide ${adminOrderChannelBadgeClass(order)}`}
+                >
                   {isWebshopOrder(order) ? (
                     <>
                       <div className="font-black text-xl">{t('shopDisplay.onlineOrder')}</div>
@@ -1159,11 +1165,15 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                     </>
                   ) : (
                     <span className="font-black text-xl">
-                      {order.order_type === 'pickup' || order.order_type === 'PICKUP' ? '🛍️ AFHALEN' :
-                       order.order_type === 'DINE_IN' ? '🍽️ KASSA - TER PLAATSE' :
-                       order.order_type === 'TAKEAWAY' ? '📦 KASSA - AFHALEN' :
-                       order.order_type === 'DELIVERY' ? '🚗 KASSA - LEVERING' :
-                       '🚗 LEVERING'}
+                      {adminPosChannelBadgeLabel(order, t)}
+                      {(() => {
+                        const line = adminDineInSeatAuditLine(order, t)
+                        return line ? (
+                          <span className="block text-sm font-bold mt-1.5 normal-case tracking-tight opacity-95">
+                            {line}
+                          </span>
+                        ) : null
+                      })()}
                     </span>
                   )}
                 </div>
@@ -1388,16 +1398,16 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                   <span className={`px-4 py-2 rounded-full text-sm font-bold ${statusConfig[selectedOrder.status]?.bg || 'bg-gray-100'} ${statusConfig[selectedOrder.status]?.text || 'text-gray-700'}`}>
                     {statusConfig[selectedOrder.status]?.label || selectedOrder.status}
                   </span>
-                  <span className={`px-4 py-2 rounded-full text-sm font-medium ${isWebshopOrder(selectedOrder) ? 'bg-slate-100 text-slate-800' : selectedOrder.order_type === 'pickup' || selectedOrder.order_type === 'PICKUP' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
+                  <span
+                    className={`px-4 py-2 rounded-full text-sm font-medium ${adminOrderChannelBadgeClass(selectedOrder)}`}
+                  >
                     {isWebshopOrder(selectedOrder)
                       ? `${t('shopDisplay.onlineOrder')} · ${
                           selectedOrder.order_type === 'pickup' || selectedOrder.order_type === 'PICKUP'
                             ? t('ordersPage.orderType.pickup')
                             : t('ordersPage.orderType.delivery')
                         }${selectedScheduleLabel ? ` · ${selectedScheduleLabel}` : ''}`
-                      : selectedOrder.order_type === 'pickup' || selectedOrder.order_type === 'PICKUP'
-                        ? `🛍️ ${t('ordersPage.orderType.pickup')}`
-                        : `🚗 ${t('ordersPage.orderType.delivery')}`}
+                      : adminPosChannelBadgeLabel(selectedOrder, t)}
                   </span>
                   {selectedOrder.payment_status && (
                     <span className={`px-4 py-2 rounded-full text-sm font-bold ${paymentStatusConfig[selectedOrder.payment_status]?.bg || 'bg-gray-100'} ${paymentStatusConfig[selectedOrder.payment_status]?.text || 'text-gray-700'}`}>
@@ -1410,6 +1420,17 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                     </span>
                   )}
                 </div>
+
+                {(() => {
+                  if (isWebshopOrder(selectedOrder)) return null
+                  const seatLine = adminDineInSeatAuditLine(selectedOrder, t)
+                  if (!seatLine) return null
+                  return (
+                    <p className="text-sm font-semibold text-gray-800 bg-gray-100 border border-gray-200 px-3 py-2 rounded-lg">
+                      📍 {seatLine}
+                    </p>
+                  )
+                })()}
 
                 {/* Geplande datum/tijd — PROMINENT tonen als aanwezig */}
                 {selectedScheduleLabel && (

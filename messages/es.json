@@ -1664,6 +1664,10 @@
       "pickup": "Recogida",
       "delivery": "Entrega"
     },
+    "kassaChannelDineIn": "Caja · En local",
+    "kassaChannelTakeaway": "Caja · Para llevar",
+    "kassaChannelDelivery": "Caja · Entrega",
+    "dineInSeatDetail": "{tableWord} {number} · {zone}",
     "actions": {
       "approve": "Aprobar",
       "reject": "Rechazar",

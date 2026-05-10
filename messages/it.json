@@ -1664,6 +1664,10 @@
       "pickup": "Ritiro",
       "delivery": "Consegna"
     },
+    "kassaChannelDineIn": "Cassa · Al tavolo",
+    "kassaChannelTakeaway": "Cassa · Asporto",
+    "kassaChannelDelivery": "Cassa · Consegna",
+    "dineInSeatDetail": "{tableWord} {number} · {zone}",
     "actions": {
       "approve": "Approva",
       "reject": "Rifiuta",

@@ -1141,6 +1141,10 @@
       "pickup": "À emporter",
       "delivery": "Livraison"
     },
+    "kassaChannelDineIn": "Caisse · Sur place",
+    "kassaChannelTakeaway": "Caisse · À emporter",
+    "kassaChannelDelivery": "Caisse · Livraison",
+    "dineInSeatDetail": "{tableWord} {number} · {zone}",
     "actions": {
       "approve": "Approuver",
       "reject": "Refuser",

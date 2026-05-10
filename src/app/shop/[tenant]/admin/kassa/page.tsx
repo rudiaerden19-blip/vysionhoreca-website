@@ -1945,9 +1945,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       created_at: createdAt.toISOString(),
     }
 
+    if (orderType === 'DINE_IN') {
+      orderPayload.floor_plan_zone = tableNumber ? dineInFloorZone : FLOOR_PLAN_ZONE_INSIDE
+    }
     if (orderType === 'DINE_IN' && tableNumber) {
       orderPayload.table_number = tableNumber
-      orderPayload.floor_plan_zone = dineInFloorZone
     }
 
     if (method === 'SPLIT' && splitAmounts) {
