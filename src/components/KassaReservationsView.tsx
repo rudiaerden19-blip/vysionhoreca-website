@@ -215,6 +215,11 @@ export default function KassaReservationsView({
       return true
     }
   })
+  /** Altijd actueel in pointer capture handlers (voorkomt slepen na vergrendelen mid-gesture door stale closure). */
+  const tablesLockedRef = useRef(tablesLocked)
+  useEffect(() => {
+    tablesLockedRef.current = tablesLocked
+  }, [tablesLocked])
   const [floorZoom, setFloorZoom] = useState(1)
   const [panX, setPanX] = useState(0)
   const [panY, setPanY] = useState(0)
@@ -959,10 +964,11 @@ export default function KassaReservationsView({
     e.preventDefault()
     const tableEl = (e.target as HTMLElement).closest('[data-table-id]') as HTMLElement | null
     // Vergrendeld of geen tafel → altijd canvas pannen
-    if (!tableEl || tablesLocked) {
+    if (!tableEl || tablesLockedRef.current) {
       isPanning.current = true
       panMoved.current = false
-      panLockedTableId.current = tablesLocked && tableEl ? tableEl.getAttribute('data-table-id') : null
+      panLockedTableId.current =
+        tablesLockedRef.current && tableEl ? tableEl.getAttribute('data-table-id') : null
       panStart.current = { x: e.clientX, y: e.clientY, panX, panY }
       canvasRef.current!.setPointerCapture(e.pointerId)
       return
@@ -1001,7 +1007,7 @@ export default function KassaReservationsView({
       return
     }
     if (!floorDraggingId.current) return
-    if (tablesLocked) return  // vergrendeld — geen verschuiven
+    if (tablesLockedRef.current) return  // vergrendeld — geen verschuiven (ref = actueel tijdens capture)
     const dx = Math.abs(e.clientX - floorPointerStart.current.x)
     const dy = Math.abs(e.clientY - floorPointerStart.current.y)
     if (dx < 4 && dy < 4) return
@@ -1059,10 +1065,28 @@ export default function KassaReservationsView({
       return
     }
 
+    const lockedNow = tablesLockedRef.current
     const wasTap = !floorDragMoved.current
     floorDraggingId.current = null
     setIsDraggingFloor(false)
     floorDragMoved.current = false
+
+    const elCleanup = floorDragTableElRef.current
+    const startPct = floorDragStartPctRef.current
+
+    // Vergrendeld vóór release: nooit coördinaten naar DB schrijven; DOM terug naar startpositie.
+    if (lockedNow && !wasTap) {
+      if (elCleanup && startPct) {
+        elCleanup.style.left = `${(startPct.x / 100) * WORLD_W}px`
+        elCleanup.style.top = `${(startPct.y / 100) * WORLD_H}px`
+        elCleanup.style.removeProperty('z-index')
+      }
+      floorDragTableElRef.current = null
+      floorPendingDragPctRef.current = null
+      floorDragStartPctRef.current = null
+      return
+    }
+
     if (wasTap) {
       const table = floorPlanTablesDB.find(t => t.id === id) || null
       setSelectedFloorTable(prev => prev?.id === id ? null : table)
@@ -2669,7 +2693,11 @@ export default function KassaReservationsView({
                           top: `${(table.y / 100) * WORLD_H}px`,
                           transform: `translate(-50%, -50%) rotate(${table.rotation}deg)`,
                           zIndex: isSelected ? 10 : 1,
-                          cursor: isDraggingFloor ? 'grabbing' : 'grab',
+                          cursor: tablesLocked
+                            ? 'default'
+                            : isDraggingFloor
+                              ? 'grabbing'
+                              : 'grab',
                           touchAction: 'none',
                         }}
                       >
