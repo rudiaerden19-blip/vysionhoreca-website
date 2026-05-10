@@ -3799,7 +3799,20 @@
     "floorPlanShapeSquare": "⬛ Vierkant",
     "floorPlanShapeRound": "⭕ Rond",
     "floorPlanShapeRectangle": "▬ Rechthoek",
-    "floorPlanStatusHeading": "Status"
+    "floorPlanStatusHeading": "Status",
+    "openCustomerDisplay": "Klantscherm",
+    "customerDisplayHint": "Open zwart klantscherm — tweede monitor, volledig scherm (F11).",
+    "customerDisplayOpenFailed": "Kon klantscherm niet openen. Sta pop-ups toe voor deze site."
+  },
+  "kassaCustomerDisplay": {
+    "missingToken": "Ongeldige sessie. Open het klantscherm vanuit de kassa.",
+    "waiting": "Wacht op kassa…",
+    "yourOrder": "Uw bestelling",
+    "checkoutTitle": "Afrekenen",
+    "subtotalExVat": "Subtotaal excl. btw",
+    "vatLine": "Btw {rate}%",
+    "totalInclVat": "Totaal incl. btw",
+    "emptyCartHint": "Geen artikelen"
   },
   "staffClock": {
     "buttonTitle": "In- of uitklokken",

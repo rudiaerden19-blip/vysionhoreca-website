@@ -3345,7 +3345,20 @@
     "floorPlanShapeSquare": "⬛ Cuadrado",
     "floorPlanShapeRound": "⭕ Redondo",
     "floorPlanShapeRectangle": "▬ Rectángulo",
-    "floorPlanStatusHeading": "Estado"
+    "floorPlanStatusHeading": "Estado",
+    "openCustomerDisplay": "Pantalla cliente",
+    "customerDisplayHint": "Abrir pantalla negra para el cliente — segundo monitor, pantalla completa (F11).",
+    "customerDisplayOpenFailed": "No se pudo abrir la pantalla cliente. Permita ventanas emergentes en este sitio."
+  },
+  "kassaCustomerDisplay": {
+    "missingToken": "Sesión no válida. Abra la pantalla cliente desde la caja.",
+    "waiting": "Esperando la caja…",
+    "yourOrder": "Su pedido",
+    "checkoutTitle": "Pago",
+    "subtotalExVat": "Subtotal sin IVA",
+    "vatLine": "IVA {rate}%",
+    "totalInclVat": "Total con IVA",
+    "emptyCartHint": "Sin artículos"
   },
   "staffClock": {
     "buttonTitle": "Fichar entrada o salida",

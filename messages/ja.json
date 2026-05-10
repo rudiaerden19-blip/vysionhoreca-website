@@ -3345,7 +3345,20 @@
     "floorPlanShapeSquare": "⬛ Square",
     "floorPlanShapeRound": "⭕ Round",
     "floorPlanShapeRectangle": "▬ Rectangle",
-    "floorPlanStatusHeading": "状態"
+    "floorPlanStatusHeading": "状態",
+    "openCustomerDisplay": "お客様画面",
+    "customerDisplayHint": "黒背景のお客様画面を開く — セカンドモニター、全画面表示（F11）。",
+    "customerDisplayOpenFailed": "お客様画面を開けませんでした。このサイトのポップアップを許可してください。"
+  },
+  "kassaCustomerDisplay": {
+    "missingToken": "セッションが無効です。レジからお客様画面を開いてください。",
+    "waiting": "レジを待っています…",
+    "yourOrder": "ご注文",
+    "checkoutTitle": "お会計",
+    "subtotalExVat": "小計（税抜）",
+    "vatLine": "消費税 {rate}%",
+    "totalInclVat": "合計（税込）",
+    "emptyCartHint": "商品がありません"
   },
   "staffClock": {
     "buttonTitle": "出勤または退勤",

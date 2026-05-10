@@ -91,6 +91,25 @@ import {
   KassaStaffSalesSummaryModal,
 } from '@/components/kassa/KassaStaffClockUi'
 import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
+import {
+  kassaCustomerDisplayChannelName,
+  type KassaCustomerDisplayMessage,
+  type KassaCustomerDisplayLine,
+} from '@/lib/kassa-customer-display'
+
+function buildKassaCustomerDisplayLines(cart: CartItem[]): KassaCustomerDisplayLine[] {
+  return cart.map((i) => {
+    const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
+    const unit = i.product.price + choicesTotal
+    const choiceNames = (i.choices || []).map((c) => c.choiceName).filter(Boolean)
+    const choicePart = choiceNames.length > 0 ? ` (${choiceNames.join(', ')})` : ''
+    return {
+      label: `${i.product.name}${choicePart}`,
+      qty: i.quantity,
+      lineTotal: Math.round(unit * i.quantity * 100) / 100,
+    }
+  })
+}
 
 const KassaFloorPlan = dynamic(() => import('@/components/KassaFloorPlan'), {
   ssr: false,
@@ -757,6 +776,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [showSplitModal, setShowSplitModal] = useState(false)
+  /** BroadcastChannel-sessie voor tweede scherm (klant); optioneel — geen impact zonder token */
+  const [customerDisplayToken, setCustomerDisplayToken] = useState<string | null>(null)
+  const customerDisplayBcRef = useRef<BroadcastChannel | null>(null)
   /** HTML bon wacht op modal als lokale Print Agent faalt; daarna printReceiptHtmlDocument */
   const [printAgentFallbackHtml, setPrintAgentFallbackHtml] = useState<string | null>(null)
   const [splitCash, setSplitCash] = useState(0)
@@ -904,6 +926,30 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       try { localStorage.setItem(CACHE_SETTINGS, JSON.stringify(s)) } catch { /* ignore */ }
     }).catch(() => { /* offline: al geladen uit cache */ })
   }, [tenant])
+
+  useEffect(() => {
+    try {
+      const tok = sessionStorage.getItem(`vysion_klantscherm_${tenant}`)?.trim()
+      if (tok) setCustomerDisplayToken(tok)
+    } catch {
+      /* ignore */
+    }
+  }, [tenant])
+
+  useEffect(() => {
+    if (!customerDisplayToken || typeof BroadcastChannel === 'undefined') {
+      customerDisplayBcRef.current?.close()
+      customerDisplayBcRef.current = null
+      return
+    }
+    const name = kassaCustomerDisplayChannelName(tenant, customerDisplayToken)
+    customerDisplayBcRef.current?.close()
+    customerDisplayBcRef.current = new BroadcastChannel(name)
+    return () => {
+      customerDisplayBcRef.current?.close()
+      customerDisplayBcRef.current = null
+    }
+  }, [tenant, customerDisplayToken])
 
   // Zorg dat product- en logo-afbeeldingen in de SW image-cache zitten (offline zichtbaar)
   useEffect(() => {
@@ -1138,6 +1184,91 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
     return sum + (i.product.price + choicesTotal) * i.quantity
   }, 0)
+
+  const openKlantschermWindow = useCallback(() => {
+    if (typeof window === 'undefined') return
+    let tok = customerDisplayToken
+    if (!tok) {
+      tok =
+        typeof crypto !== 'undefined' && 'randomUUID' in crypto
+          ? crypto.randomUUID()
+          : `${Date.now()}-${Math.random().toString(36).slice(2)}`
+      try {
+        sessionStorage.setItem(`vysion_klantscherm_${tenant}`, tok)
+      } catch {
+        /* ignore */
+      }
+      setCustomerDisplayToken(tok)
+    }
+    const url = `${window.location.origin}/shop/${tenant}/klantscherm?t=${encodeURIComponent(tok)}`
+    const w = window.open(url, `vysion_klantscherm_${tenant}`, 'noopener,noreferrer')
+    if (!w) {
+      window.alert(t('kassaApp.customerDisplayOpenFailed'))
+    }
+  }, [tenant, customerDisplayToken, t])
+
+  useEffect(() => {
+    const bc = customerDisplayBcRef.current
+    if (!bc || !customerDisplayToken) return
+
+    const businessName =
+      tenantInfo?.business_name ??
+      tenant
+        .split('-')
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' ')
+    const vatRate = tenantInfo?.btw_percentage ?? 6
+    const totalInclVat = Math.round(total * 100) / 100
+
+    let msg: KassaCustomerDisplayMessage
+    if (cart.length === 0 && !showPaymentModal && !showSplitModal) {
+      msg = { v: 1, phase: 'idle', tenantSlug: tenant, businessName }
+    } else if ((showPaymentModal || showSplitModal) && cart.length > 0) {
+      const subtotalExVatRaw = totalInclVat / (1 + vatRate / 100)
+      const subtotalExVat = Math.round(subtotalExVatRaw * 100) / 100
+      const vatAmount = Math.round((totalInclVat - subtotalExVat) * 100) / 100
+      msg = {
+        v: 1,
+        phase: 'checkout',
+        tenantSlug: tenant,
+        businessName,
+        lines: buildKassaCustomerDisplayLines(cart),
+        subtotalExVat,
+        vatRate,
+        vatAmount,
+        totalInclVat,
+      }
+    } else if (cart.length > 0) {
+      msg = {
+        v: 1,
+        phase: 'cart',
+        tenantSlug: tenant,
+        businessName,
+        lines: buildKassaCustomerDisplayLines(cart),
+        totalInclVat,
+      }
+    } else {
+      msg = { v: 1, phase: 'idle', tenantSlug: tenant, businessName }
+    }
+
+    const tmr = window.setTimeout(() => {
+      try {
+        bc.postMessage(msg)
+      } catch {
+        /* ignore */
+      }
+    }, 60)
+    return () => window.clearTimeout(tmr)
+  }, [
+    tenant,
+    customerDisplayToken,
+    cart,
+    total,
+    showPaymentModal,
+    showSplitModal,
+    tenantInfo?.business_name,
+    tenantInfo?.btw_percentage,
+  ])
 
   /** Totaal per product-id voor tegel-badge; vermijdt O(producten × mandregels) bij elke qty-wijziging. */
   const cartQtyByProductId = useMemo(() => {
@@ -1951,6 +2082,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   {pendingReservCount}
                 </span>
               )}
+            </button>
+          )}
+
+          {!demoViewOnly && (
+            <button
+              type="button"
+              onClick={openKlantschermWindow}
+              title={t('kassaApp.customerDisplayHint')}
+              className="relative inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-xl bg-[#3C4D6B] px-2 py-2 text-xs font-bold text-white transition-colors hover:bg-[#2D3A52] sm:gap-1.5 sm:px-3 sm:text-sm"
+            >
+              <span className="text-base sm:text-lg" aria-hidden>
+                👤
+              </span>
+              <span>{t('kassaApp.openCustomerDisplay')}</span>
             </button>
           )}
 

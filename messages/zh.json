@@ -3345,7 +3345,20 @@
     "floorPlanShapeSquare": "⬛ Square",
     "floorPlanShapeRound": "⭕ Round",
     "floorPlanShapeRectangle": "▬ Rectangle",
-    "floorPlanStatusHeading": "状态"
+    "floorPlanStatusHeading": "状态",
+    "openCustomerDisplay": "顾客显示屏",
+    "customerDisplayHint": "打开黑色顾客屏 — 第二显示器，全屏（F11）。",
+    "customerDisplayOpenFailed": "无法打开顾客显示屏。请允许此网站的弹出窗口。"
+  },
+  "kassaCustomerDisplay": {
+    "missingToken": "会话无效。请从收银台打开顾客显示屏。",
+    "waiting": "等待收银台…",
+    "yourOrder": "您的订单",
+    "checkoutTitle": "结账",
+    "subtotalExVat": "不含税小计",
+    "vatLine": "增值税 {rate}%",
+    "totalInclVat": "含税总计",
+    "emptyCartHint": "暂无商品"
   },
   "staffClock": {
     "buttonTitle": "上班或下班打卡",

@@ -2845,7 +2845,20 @@
     "floorPlanShapeSquare": "⬛ Quadrat",
     "floorPlanShapeRound": "⭕ Rund",
     "floorPlanShapeRectangle": "▬ Rechteck",
-    "floorPlanStatusHeading": "Status"
+    "floorPlanStatusHeading": "Status",
+    "openCustomerDisplay": "Kundenanzeige",
+    "customerDisplayHint": "Schwarzen Kundenbildschirm öffnen — zweiter Monitor, Vollbild (F11).",
+    "customerDisplayOpenFailed": "Kundenanzeige konnte nicht geöffnet werden. Pop-ups für diese Website erlauben."
+  },
+  "kassaCustomerDisplay": {
+    "missingToken": "Ungültige Sitzung. Öffnen Sie die Kundenanzeige von der Kasse aus.",
+    "waiting": "Warte auf Kasse…",
+    "yourOrder": "Ihre Bestellung",
+    "checkoutTitle": "Zahlung",
+    "subtotalExVat": "Zwischensumme ohne MwSt.",
+    "vatLine": "MwSt. {rate}%",
+    "totalInclVat": "Gesamt inkl. MwSt.",
+    "emptyCartHint": "Keine Artikel"
   },
   "staffClock": {
     "buttonTitle": "Ein- oder ausstempeln",

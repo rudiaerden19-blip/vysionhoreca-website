@@ -3799,7 +3799,20 @@
     "floorPlanShapeSquare": "⬛ Square",
     "floorPlanShapeRound": "⭕ Round",
     "floorPlanShapeRectangle": "▬ Rectangle",
-    "floorPlanStatusHeading": "Status"
+    "floorPlanStatusHeading": "Status",
+    "openCustomerDisplay": "Customer display",
+    "customerDisplayHint": "Open black customer screen — second monitor, fullscreen (F11).",
+    "customerDisplayOpenFailed": "Could not open customer display. Allow pop-ups for this site."
+  },
+  "kassaCustomerDisplay": {
+    "missingToken": "Invalid session. Open the customer display from the register.",
+    "waiting": "Waiting for register…",
+    "yourOrder": "Your order",
+    "checkoutTitle": "Checkout",
+    "subtotalExVat": "Subtotal excl. VAT",
+    "vatLine": "VAT {rate}%",
+    "totalInclVat": "Total incl. VAT",
+    "emptyCartHint": "No items"
   },
   "staffClock": {
     "buttonTitle": "Clock in or out",

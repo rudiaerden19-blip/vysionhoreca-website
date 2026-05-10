@@ -3345,7 +3345,20 @@
     "floorPlanShapeSquare": "⬛ Square",
     "floorPlanShapeRound": "⭕ Round",
     "floorPlanShapeRectangle": "▬ Rectangle",
-    "floorPlanStatusHeading": "الحالة"
+    "floorPlanStatusHeading": "الحالة",
+    "openCustomerDisplay": "شاشة العميل",
+    "customerDisplayHint": "افتح شاشة العميل السوداء — شاشة ثانية، وضع ملء الشاشة (F11).",
+    "customerDisplayOpenFailed": "تعذّر فتح شاشة العميل. اسمح بالنوافذ المنبثقة لهذا الموقع."
+  },
+  "kassaCustomerDisplay": {
+    "missingToken": "جلسة غير صالحة. افتح شاشة العميل من نقطة البيع.",
+    "waiting": "في انتظار نقطة البيع…",
+    "yourOrder": "طلبك",
+    "checkoutTitle": "الدفع",
+    "subtotalExVat": "المجموع الفرعي بدون ضريبة",
+    "vatLine": "ضريبة القيمة المضافة {rate}%",
+    "totalInclVat": "الإجمالي شامل الضريبة",
+    "emptyCartHint": "لا توجد أصناف"
   },
   "staffClock": {
     "buttonTitle": "تسجيل دخول أو خروج",

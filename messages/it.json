@@ -3345,7 +3345,20 @@
     "floorPlanShapeSquare": "⬛ Quadrato",
     "floorPlanShapeRound": "⭕ Rotondo",
     "floorPlanShapeRectangle": "▬ Rettangolo",
-    "floorPlanStatusHeading": "Stato"
+    "floorPlanStatusHeading": "Stato",
+    "openCustomerDisplay": "Schermo cliente",
+    "customerDisplayHint": "Apri schermo cliente nero — secondo monitor, schermo intero (F11).",
+    "customerDisplayOpenFailed": "Impossibile aprire lo schermo cliente. Consenti i popup per questo sito."
+  },
+  "kassaCustomerDisplay": {
+    "missingToken": "Sessione non valida. Apri lo schermo cliente dalla cassa.",
+    "waiting": "In attesa della cassa…",
+    "yourOrder": "Il suo ordine",
+    "checkoutTitle": "Pagamento",
+    "subtotalExVat": "Subtotale IVA esclusa",
+    "vatLine": "IVA {rate}%",
+    "totalInclVat": "Totale IVA inclusa",
+    "emptyCartHint": "Nessun articolo"
   },
   "staffClock": {
     "buttonTitle": "Timbratura entrata o uscita",
