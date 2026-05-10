@@ -142,6 +142,24 @@ function buildOpenTableOrdersMapFromRows(
   return out
 }
 
+/**
+ * Supabase is bron voor elke tafel die een open order-rij heeft; lokale manden die
+ * nog niet in die snapshot zitten (persist debounce / net gesleept) blijven zichtbaar
+ * tot de server ze teruggeeft.
+ */
+function mergeOpenTableOrdersServerWithPendingLocal(
+  prev: Record<string, CartItem[]>,
+  fromServer: Record<string, CartItem[]>
+): Record<string, CartItem[]> {
+  const merged: Record<string, CartItem[]> = { ...fromServer }
+  for (const [k, v] of Object.entries(prev)) {
+    if (!(k in fromServer) && (v?.length ?? 0) > 0) {
+      merged[k] = v
+    }
+  }
+  return merged
+}
+
 function buildKassaCustomerDisplayLines(cart: CartItem[]): KassaCustomerDisplayLine[] {
   return cart.map((i) => {
     const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
@@ -682,10 +700,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       .eq('status', 'open')
       .then(({ data }) => {
         const fromSupabase = buildOpenTableOrdersMapFromRows(data ?? null)
-        setTableOrders(fromSupabase)
-        localStorage.setItem(tableOrdersKey, JSON.stringify(fromSupabase))
+        setTableOrders((prev) => {
+          const merged = mergeOpenTableOrdersServerWithPendingLocal(prev, fromSupabase)
+          localStorage.setItem(tableOrdersKey, JSON.stringify(merged))
+          return merged
+        })
       })
-  }, [tenant, showTablePicker, tableOrdersKey])
+    // Geen showTablePicker hier: die toggle triggert bij openen plattegrond en overschreef
+    // tableOrders met een lege DB-snapshot vóór persist klaar was.
+  }, [tenant, tableOrdersKey])
 
   // ── Realtime sync: tafelstatus tussen apparaten ───────────────────────────
   useEffect(() => {
@@ -766,8 +789,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             .eq('status', 'open')
             .then(({ data }) => {
               const fromSupabase = buildOpenTableOrdersMapFromRows(data ?? null)
-              setTableOrders(fromSupabase)
-              localStorage.setItem(tableOrdersKey, JSON.stringify(fromSupabase))
+              setTableOrders((prev) => {
+                const merged = mergeOpenTableOrdersServerWithPendingLocal(prev, fromSupabase)
+                localStorage.setItem(tableOrdersKey, JSON.stringify(merged))
+                return merged
+              })
             })
         }
       )
