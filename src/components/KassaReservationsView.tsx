@@ -220,20 +220,39 @@ export default function KassaReservationsView({
   useEffect(() => {
     tablesLockedRef.current = tablesLocked
   }, [tablesLocked])
-  const [floorZoom, setFloorZoom] = useState(1)
-  const [panX, setPanX] = useState(0)
-  const [panY, setPanY] = useState(0)
+  /** Zelfde principe als KassaFloorPlan: tegelpatroon vast op container (geen pan/zoom). */
+  const reservationFloorSurfaceStyle = useMemo(() => {
+    if (resFloorPlanZone === FLOOR_PLAN_ZONE_TERRACE) {
+      return {
+        backgroundColor: '#6b9b72',
+        backgroundPosition: '0 0',
+        backgroundImage: `
+          linear-gradient(to right, rgba(255,255,255,0.14) 0px, rgba(255,255,255,0.14) 2px, transparent 2px),
+          linear-gradient(to bottom, rgba(255,255,255,0.14) 0px, rgba(255,255,255,0.14) 2px, transparent 2px)
+        `,
+        backgroundSize: '100px 100px',
+        cursor: 'default' as const,
+        touchAction: 'none' as const,
+      }
+    }
+    return {
+      backgroundColor: '#e3e3e3',
+      backgroundPosition: '0 0',
+      backgroundImage:
+        'linear-gradient(to right, rgba(0,0,0,0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.07) 1px, transparent 1px)',
+      backgroundSize: '40px 40px',
+      cursor: 'default' as const,
+      touchAction: 'none' as const,
+    }
+  }, [resFloorPlanZone])
   const [resListCollapsed, setResListCollapsed] = useState(false)
 
   const floorDraggingId = useRef<string | null>(null)
   const floorDragOffset = useRef({ x: 0, y: 0 })
   const floorDragMoved = useRef(false)
   const floorPointerStart = useRef({ x: 0, y: 0 })
-  const isPanning = useRef(false)
-  const panStart = useRef({ x: 0, y: 0, panX: 0, panY: 0 })
-  const panLockedTableId = useRef<string | null>(null) // tafel-id als panning gestart op tafel in locked mode
-  const panMoved = useRef(false) // heeft de pan bewogen (vs. tap)
   const canvasRef = useRef<HTMLDivElement>(null)
+  const floorRectCachedRef = useRef<DOMRect | null>(null)
   /** Tafelverslepen: direct DOM tijdens move — geen React state per pointermove. */
   const floorDragTableElRef = useRef<HTMLElement | null>(null)
   const floorPendingDragPctRef = useRef<{ x: number; y: number } | null>(null)
@@ -249,11 +268,6 @@ export default function KassaReservationsView({
     const rect = el.getBoundingClientRect()
     return clientX - rect.left + el.scrollLeft - TIMELINE_LABEL_W
   }, [])
-  const WORLD_W = 2400
-  const WORLD_H = 1600
-  // Pinch-to-zoom
-  const pinchStartDist = useRef<number | null>(null)
-  const pinchStartZoom = useRef(1)
   const addReservationInProgress = useRef(false)  // guard tegen dubbele submit
   const [timelineDate, setTimelineDate] = useState(() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}` })
   const [timelineNow, setTimelineNow] = useState(new Date())
@@ -783,27 +797,6 @@ export default function KassaReservationsView({
     }
   }, [tenant])
 
-  // Centreer tafels zodra de plattegrond-tab actief wordt (canvas is dan zichtbaar)
-  useEffect(() => {
-    if (viewMode !== 'floorplan') return
-    if (floorPlanTablesDB.length === 0) return
-    // Geef React één frame om de canvas te renderen
-    const timer = setTimeout(() => {
-      const canvas = canvasRef.current
-      if (!canvas) return
-      const minX = Math.min(...floorPlanTablesDB.map(t => (t.x / 100) * WORLD_W))
-      const minY = Math.min(...floorPlanTablesDB.map(t => (t.y / 100) * WORLD_H))
-      // SVG-groep steekt ~145px uit rondom het middelpunt (stoelen + tafel)
-      const svgHalfH = 145
-      const svgHalfW = 145
-      // Zet pan zodat de meest linkse/bovenste tafel 40px van de rand staat
-      setPanX(40 + svgHalfW - minX * floorZoom)
-      setPanY(40 + svgHalfH - minY * floorZoom)
-    }, 50)
-    return () => clearTimeout(timer)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [viewMode, floorPlanTablesDB, resFloorPlanZone, floorZoom])
-
   // Bouw de volledige Supabase payload van huidige instellingen
   const buildSettingsPayload = (s: ReservationSettings) => ({
     tenant_slug: tenant,
@@ -925,126 +918,69 @@ export default function KassaReservationsView({
     toast.success(rk('tableRemoved'))
   }
 
-  // Wheel zoom — zoom rond muispositie
-  const handleFloorWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    const canvas = canvasRef.current!
-    const rect = canvas.getBoundingClientRect()
-    const mx = e.clientX - rect.left
-    const my = e.clientY - rect.top
-    const oldZoom = floorZoom
-    const newZoom = Math.min(2, Math.max(0.3, +(oldZoom - e.deltaY * 0.001).toFixed(3)))
-    const scale = newZoom / oldZoom
-    setPanX(px => mx - scale * (mx - px))
-    setPanY(py => my - scale * (my - py))
-    setFloorZoom(newZoom)
-  }
-
-  // Pinch zoom (iPad)
-  const activePointers = useRef<Map<number, { x: number; y: number }>>(new Map())
-  const handleCanvasPinchMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    activePointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY })
-    if (activePointers.current.size >= 2 && pinchStartDist.current !== null) {
-      const pts = Array.from(activePointers.current.values())
-      const dist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y)
-      const ratio = dist / pinchStartDist.current
-      setFloorZoom(Math.min(2, Math.max(0.3, +(pinchStartZoom.current * ratio).toFixed(3))))
-    }
-  }
-
-  // Canvas pointer down — tafel slepen OF achtergrond pannen
-  const handleCanvasPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    activePointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY })
-    if (activePointers.current.size === 2) {
-      const pts = Array.from(activePointers.current.values())
-      pinchStartDist.current = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y)
-      pinchStartZoom.current = floorZoom
+  /** Plattegrond: zelfde model als KassaFloorPlan — raster vast op container (%-posities); vergrendeling alleen blokkeert slepen. */
+  const handleResTablePointerDown = (e: React.PointerEvent, table: FloorPlanTable) => {
+    e.stopPropagation()
+    if (tablesLockedRef.current) {
+      floorDragMoved.current = false
       return
     }
-    e.preventDefault()
-    const tableEl = (e.target as HTMLElement).closest('[data-table-id]') as HTMLElement | null
-    // Vergrendeld of geen tafel → altijd canvas pannen
-    if (!tableEl || tablesLockedRef.current) {
-      isPanning.current = true
-      panMoved.current = false
-      panLockedTableId.current =
-        tablesLockedRef.current && tableEl ? tableEl.getAttribute('data-table-id') : null
-      panStart.current = { x: e.clientX, y: e.clientY, panX, panY }
-      canvasRef.current!.setPointerCapture(e.pointerId)
-      return
-    }
-    // Ontgrendeld + op tafel → tafel slepen
-    const id = tableEl.getAttribute('data-table-id')!
-    const table = floorPlanTablesDB.find(t => t.id === id)
-    if (!table) return
-    const canvas = canvasRef.current!
-    const rect = canvas.getBoundingClientRect()
-    const mouseWorldX = (e.clientX - rect.left - panX) / floorZoom
-    const mouseWorldY = (e.clientY - rect.top - panY) / floorZoom
-    const tableWorldX = (table.x / 100) * WORLD_W
-    const tableWorldY = (table.y / 100) * WORLD_H
-    floorDragOffset.current = { x: mouseWorldX - tableWorldX, y: mouseWorldY - tableWorldY }
-    floorDraggingId.current = id
+    const target = e.currentTarget as HTMLElement
+    target.setPointerCapture(e.pointerId)
+    const floor = canvasRef.current
+    if (!floor) return
+    const rect = floor.getBoundingClientRect()
+    floorRectCachedRef.current = rect
+    floorDraggingId.current = table.id
     floorDragMoved.current = false
     floorPointerStart.current = { x: e.clientX, y: e.clientY }
-    floorDragTableElRef.current = tableEl
+    floorDragTableElRef.current = target
     floorDragStartPctRef.current = { x: table.x, y: table.y }
     floorPendingDragPctRef.current = null
-    canvas.setPointerCapture(e.pointerId)
+    floorDragOffset.current = {
+      x: e.clientX - rect.left - (table.x / 100) * rect.width,
+      y: e.clientY - rect.top - (table.y / 100) * rect.height,
+    }
     setIsDraggingFloor(true)
   }
 
-  const handleFloorPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    // Pinch
-    if (activePointers.current.size >= 2) { handleCanvasPinchMove(e); return }
-
-    if (isPanning.current) {
-      const dx = e.clientX - panStart.current.x
-      const dy = e.clientY - panStart.current.y
-      if (Math.abs(dx) > 6 || Math.abs(dy) > 6) panMoved.current = true
-      setPanX(panStart.current.panX + dx)
-      setPanY(panStart.current.panY + dy)
-      return
-    }
+  const handleResFloorPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!floorDraggingId.current) return
-    if (tablesLockedRef.current) return  // vergrendeld — geen verschuiven (ref = actueel tijdens capture)
+    if (tablesLockedRef.current) return
     const dx = Math.abs(e.clientX - floorPointerStart.current.x)
     const dy = Math.abs(e.clientY - floorPointerStart.current.y)
-    if (dx < 4 && dy < 4) return
+    if (dx < 8 && dy < 8) return
     floorDragMoved.current = true
-    // Mouse → world → percentage
-    const canvas = canvasRef.current!
-    const rect = canvas.getBoundingClientRect()
-    const mouseWorldX = (e.clientX - rect.left - panX) / floorZoom
-    const mouseWorldY = (e.clientY - rect.top - panY) / floorZoom
-    const worldX = mouseWorldX - floorDragOffset.current.x
-    const worldY = mouseWorldY - floorDragOffset.current.y
-    const x = Math.max(1, Math.min(99, (worldX / WORLD_W) * 100))
-    const y = Math.max(1, Math.min(99, (worldY / WORLD_H) * 100))
+    const floor = canvasRef.current
+    if (!floor) return
+    const rect = floorRectCachedRef.current ?? floor.getBoundingClientRect()
+    const x = Math.max(
+      1,
+      Math.min(99, ((e.clientX - rect.left - floorDragOffset.current.x) / rect.width) * 100),
+    )
+    const y = Math.max(
+      1,
+      Math.min(99, ((e.clientY - rect.top - floorDragOffset.current.y) / rect.height) * 100),
+    )
     floorPendingDragPctRef.current = { x, y }
     const node = floorDragTableElRef.current
     if (node) {
-      node.style.left = `${(x / 100) * WORLD_W}px`
-      node.style.top = `${(y / 100) * WORLD_H}px`
+      node.style.left = `${x}%`
+      node.style.top = `${y}%`
       node.style.zIndex = '40'
     }
   }
 
-  const handleFloorPointerUp = async (e: React.PointerEvent<HTMLDivElement>) => {
-    activePointers.current.delete(e.pointerId)
-    if (activePointers.current.size < 2) pinchStartDist.current = null
-    if (isPanning.current) {
-      isPanning.current = false
-      // Tap op tafel in vergrendelde modus → open tafelsidebar
-      if (!panMoved.current && panLockedTableId.current) {
-        const id = panLockedTableId.current
-        const table = floorPlanTablesDB.find(t => t.id === id) || null
-        setSelectedFloorTable(prev => prev?.id === id ? null : table)
+  const finalizeResFloorDrag = async (e: React.PointerEvent) => {
+    const capEl = floorDragTableElRef.current
+    if (capEl) {
+      try {
+        if (capEl.hasPointerCapture(e.pointerId)) capEl.releasePointerCapture(e.pointerId)
+      } catch {
+        /* ignore */
       }
-      panMoved.current = false
-      panLockedTableId.current = null
-      return
     }
+
     if (!floorDraggingId.current) return
     const id = floorDraggingId.current
 
@@ -1052,45 +988,48 @@ export default function KassaReservationsView({
       const el = floorDragTableElRef.current
       const start = floorDragStartPctRef.current
       if (el && start) {
-        el.style.left = `${(start.x / 100) * WORLD_W}px`
-        el.style.top = `${(start.y / 100) * WORLD_H}px`
+        el.style.left = `${start.x}%`
+        el.style.top = `${start.y}%`
         el.style.removeProperty('z-index')
       }
       floorDraggingId.current = null
       setIsDraggingFloor(false)
-      floorDragMoved.current = false
       floorDragTableElRef.current = null
       floorPendingDragPctRef.current = null
       floorDragStartPctRef.current = null
+      floorRectCachedRef.current = null
+      setTimeout(() => {
+        floorDragMoved.current = false
+      }, 0)
       return
     }
 
     const lockedNow = tablesLockedRef.current
-    const wasTap = !floorDragMoved.current
+    const hadDrag = floorDragMoved.current
+
     floorDraggingId.current = null
     setIsDraggingFloor(false)
-    floorDragMoved.current = false
 
     const elCleanup = floorDragTableElRef.current
     const startPct = floorDragStartPctRef.current
 
-    // Vergrendeld vóór release: nooit coördinaten naar DB schrijven; DOM terug naar startpositie.
-    if (lockedNow && !wasTap) {
+    if (lockedNow && hadDrag) {
       if (elCleanup && startPct) {
-        elCleanup.style.left = `${(startPct.x / 100) * WORLD_W}px`
-        elCleanup.style.top = `${(startPct.y / 100) * WORLD_H}px`
+        elCleanup.style.left = `${startPct.x}%`
+        elCleanup.style.top = `${startPct.y}%`
         elCleanup.style.removeProperty('z-index')
       }
       floorDragTableElRef.current = null
       floorPendingDragPctRef.current = null
       floorDragStartPctRef.current = null
+      floorRectCachedRef.current = null
+      setTimeout(() => {
+        floorDragMoved.current = false
+      }, 0)
       return
     }
 
-    if (wasTap) {
-      const table = floorPlanTablesDB.find(t => t.id === id) || null
-      setSelectedFloorTable(prev => prev?.id === id ? null : table)
-    } else {
+    if (hadDrag) {
       const pct = floorPendingDragPctRef.current
       if (pct) {
         const next = floorPlanTablesDB.map(t => (t.id === id ? { ...t, x: pct.x, y: pct.y } : t))
@@ -1098,11 +1037,16 @@ export default function KassaReservationsView({
         setSelectedFloorTable(prev => (prev?.id === id ? { ...prev, x: pct.x, y: pct.y } : prev))
       }
     }
+
     const el = floorDragTableElRef.current
     if (el) el.style.removeProperty('z-index')
     floorDragTableElRef.current = null
     floorPendingDragPctRef.current = null
     floorDragStartPctRef.current = null
+    floorRectCachedRef.current = null
+    setTimeout(() => {
+      floorDragMoved.current = false
+    }, 0)
   }
 
   // ---- Derived data ----
@@ -2584,26 +2528,22 @@ export default function KassaReservationsView({
                 </button>
                 )}
 
-                {/* Canvas */}
+                {/* Canvas — zelfde opzet als KassaFloorPlan: raster vast, tafels in % van het vlak */}
                 <div
                   className="res-floor-canvas flex-1 min-h-0 relative overflow-hidden select-none"
                   ref={canvasRef}
                   style={{
-                    backgroundColor: '#e3e3e3',
-                    backgroundImage: `linear-gradient(to right, rgba(0,0,0,0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.07) 1px, transparent 1px)`,
-                    backgroundSize: `${40 * floorZoom}px ${40 * floorZoom}px`,
-                    backgroundPosition: `${panX}px ${panY}px`,
-                    cursor: isDraggingFloor ? 'grabbing' : isPanning.current ? 'grabbing' : 'grab',
-                    touchAction: 'none',
+                    ...reservationFloorSurfaceStyle,
                     userSelect: 'none',
                     WebkitUserSelect: 'none',
                     overflow: 'hidden',
                   }}
-                  onPointerDown={handleCanvasPointerDown}
-                  onPointerMove={handleFloorPointerMove}
-                  onPointerUp={handleFloorPointerUp}
-                  onPointerCancel={handleFloorPointerUp}
-                  onWheel={handleFloorWheel}
+                  onPointerMove={handleResFloorPointerMove}
+                  onPointerUp={e => void finalizeResFloorDrag(e)}
+                  onPointerCancel={e => void finalizeResFloorDrag(e)}
+                  onClick={() => {
+                    if (!floorDragMoved.current) setSelectedFloorTable(null)
+                  }}
                 >
                   {floorOnlyMode && (
                     <div
@@ -2653,14 +2593,7 @@ export default function KassaReservationsView({
                       </button>
                     </div>
                   )}
-                  {/* Wereld — beweegt via pan+zoom transform, tafels staan vast */}
-                  <div style={{
-                    position: 'absolute',
-                    width: `${WORLD_W}px`,
-                    height: `${WORLD_H}px`,
-                    transform: `translate(${panX}px, ${panY}px) scale(${floorZoom})`,
-                    transformOrigin: '0 0',
-                  }}>
+                  <div className="absolute inset-0">
                   {floorPlanTablesDB.length === 0 && (
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       <div className="text-center bg-white/80 rounded-2xl px-10 py-8 shadow-sm">
@@ -2689,17 +2622,26 @@ export default function KassaReservationsView({
                         data-table-id={table.id}
                         className="absolute"
                         style={{
-                          left: `${(table.x / 100) * WORLD_W}px`,
-                          top: `${(table.y / 100) * WORLD_H}px`,
+                          left: `${table.x}%`,
+                          top: `${table.y}%`,
                           transform: `translate(-50%, -50%) rotate(${table.rotation}deg)`,
                           zIndex: isSelected ? 10 : 1,
-                          cursor: tablesLocked
-                            ? 'default'
-                            : isDraggingFloor
-                              ? 'grabbing'
-                              : 'grab',
+                          cursor: tablesLocked ? 'default' : isDraggingFloor ? 'grabbing' : 'grab',
                           touchAction: 'none',
                         }}
+                        onPointerDown={e => handleResTablePointerDown(e, table)}
+                        onPointerUp={e => {
+                          e.stopPropagation()
+                          void finalizeResFloorDrag(e)
+                          if (!floorDragMoved.current) {
+                            setSelectedFloorTable(prev => (prev?.id === table.id ? null : table))
+                          }
+                        }}
+                        onPointerCancel={e => {
+                          e.stopPropagation()
+                          void finalizeResFloorDrag(e)
+                        }}
+                        onClick={e => e.stopPropagation()}
                       >
                         <div style={{ pointerEvents: 'none' }}>
                           <ReservationTableSVG
@@ -2723,7 +2665,7 @@ export default function KassaReservationsView({
                       </div>
                     )
                   })}
-                  </div>{/* einde geschaalde wrapper */}
+                  </div>
 
                   {/* Datum kiezer rechtsonder — alleen bij “alleen vloer” (toolbar verborgen) */}
                   {floorOnlyMode && (
