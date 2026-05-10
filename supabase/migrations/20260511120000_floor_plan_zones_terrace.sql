@@ -83,6 +83,13 @@ ALTER TABLE public.orders
 COMMENT ON COLUMN public.orders.floor_plan_zone IS
   'Zaalebied voor dine-in tafel/kruk; voorkomt dat binnen tafel 1 = terras tafel 1 (open mand).';
 
+-- POS / open mand: tafelreferentie op orders (sommige DB’s hadden deze kolom nog niet)
+ALTER TABLE public.orders
+  ADD COLUMN IF NOT EXISTS table_number TEXT;
+
+COMMENT ON COLUMN public.orders.table_number IS
+  'Kassa/POS: tafel- of kruklabel voor DINE_IN; samen met floor_plan_zone per zaal.';
+
 -- Dedupe oude dubbele open-rij per tenant+tafel (één rij behouden — nieuwste eerst).
 DELETE FROM public.orders o
 WHERE o.id IN (
