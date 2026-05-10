@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
+import { getSessionHmacStatus, logSessionHmacWarningOnce } from '@/lib/session-token'
 
 /**
  * Health Check Endpoint
@@ -10,7 +11,13 @@ import { getServerSupabaseClient } from '@/lib/supabase-server'
  */
 export async function GET() {
   const startTime = Date.now()
-  
+
+  // Eenmalige stderr-waarschuwing in productie als HMAC-secret ontbreekt.
+  // Voorkomt dat we per ongeluk stilzwijgend op header-mode-fallback draaien.
+  logSessionHmacWarningOnce()
+
+  const authSigningStatus = getSessionHmacStatus()
+
   const health = {
     status: 'healthy' as 'healthy' | 'degraded' | 'unhealthy',
     timestamp: new Date().toISOString(),
@@ -21,6 +28,7 @@ export async function GET() {
       stripe: { status: 'configured' as string },
       email: { status: 'configured' as string },
       redis: { status: 'unknown' as string },
+      auth_signing: { status: authSigningStatus as string },
     },
     environment: process.env.NODE_ENV || 'development',
   }
@@ -67,6 +75,13 @@ export async function GET() {
   if (health.services.database.status === 'error') {
     health.status = 'unhealthy'
   } else if (health.services.database.status === 'not_configured') {
+    health.status = 'degraded'
+  } else if (
+    health.services.auth_signing.status === 'not_configured' ||
+    health.services.auth_signing.status === 'weak'
+  ) {
+    // Header-mode-fallback is dan actief — auth is dan zwakker; markeer
+    // expliciet als degraded zodat monitoring een alarm geeft.
     health.status = 'degraded'
   }
 

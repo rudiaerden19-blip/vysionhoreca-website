@@ -70,6 +70,40 @@ function getSecret(): string | null {
   return s
 }
 
+/**
+ * Health-check helper. Gebruikt door `/api/health` om te tonen of HMAC-auth
+ * actief is. Lekt niets over de inhoud van het secret.
+ */
+export function getSessionHmacStatus(): 'configured' | 'weak' | 'not_configured' {
+  const raw = process.env.SESSION_HMAC_SECRET?.trim()
+  if (!raw) return 'not_configured'
+  if (raw.length < 32) return 'weak'
+  return 'configured'
+}
+
+/**
+ * Eenmalige waarschuwing in productie als HMAC-secret ontbreekt of te kort is.
+ * Logs naar stderr (Vercel Logs) zodat een ontbrekend secret niet meer
+ * stilzwijgend wordt opgevangen door de header-mode-fallback.
+ *
+ * Wordt aangeroepen vanuit de health-route — in elke serverless cold-start
+ * zien we de waarschuwing dan minstens één keer.
+ */
+let _hmacWarningLogged = false
+export function logSessionHmacWarningOnce(): void {
+  if (_hmacWarningLogged) return
+  if (process.env.NODE_ENV !== 'production') return
+  const status = getSessionHmacStatus()
+  if (status === 'configured') return
+  _hmacWarningLogged = true
+  // eslint-disable-next-line no-console
+  console.warn(
+    `[SECURITY] SESSION_HMAC_SECRET ${status} → auth valt terug op legacy ` +
+      `header-mode (x-business-id + x-auth-email). Zet een random secret ` +
+      `van >= 32 bytes in Vercel Project Settings → Environment Variables.`
+  )
+}
+
 function b64url(buf: Buffer): string {
   return buf.toString('base64url')
 }
