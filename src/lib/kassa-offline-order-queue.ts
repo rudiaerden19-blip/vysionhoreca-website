@@ -7,9 +7,11 @@ import {
   offlineDbSetOrderQueue,
 } from '@/lib/kassa-offline-db'
 import { mergeOfflineOrderQueueRows } from '@/lib/kassa-offline-order-queue-merge'
-import { isDuplicateKassaClientUuidError } from '@/lib/kassa-supabase-guards'
+import {
+  isDuplicateKassaClientViolation,
+} from '@/lib/kassa-supabase-guards'
 import { syncZReportAfterOrderSafe } from '@/lib/kassa-z-sync-safe'
-import { supabase } from '@/lib/supabase'
+import { adminDb } from '@/lib/admin-db-client'
 
 export function offlineOrdersQueueStorageKey(tenantSlug: string): string {
   return `vysion_offline_orders_${tenantSlug}`
@@ -53,15 +55,16 @@ export async function flushOfflineOrdersToSupabase(tenantSlug: string): Promise<
 
     const remaining: object[] = []
     for (const order of freshQueue) {
-      const { error } = await supabase.from('orders').insert(order)
-      if (!error) {
+      const row = order as Record<string, unknown>
+      const insRes = await adminDb.insert('orders', row, { tenantSlug: tenantSlug })
+      if (insRes.ok) {
         const o = order as { tenant_slug?: string; created_at?: string }
         if (o.tenant_slug && o.created_at) {
           syncZReportAfterOrderSafe(o.tenant_slug, o.created_at)
         }
         continue
       }
-      if (isDuplicateKassaClientUuidError(error)) {
+      if (isDuplicateKassaClientViolation(insRes.error)) {
         const o = order as { tenant_slug?: string; created_at?: string }
         if (o.tenant_slug && o.created_at) {
           syncZReportAfterOrderSafe(o.tenant_slug, o.created_at)

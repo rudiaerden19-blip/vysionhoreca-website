@@ -1528,20 +1528,26 @@ export default function KassaReservationsView({
     const now = new Date()
     const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`
     const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`
-    const { error } = await supabase.from('reservations').insert([{
-      guest_name: name,
-      customer_name: name,
-      party_size: partySize,
-      reservation_date: dateStr,
-      reservation_time: timeStr,
-      duration_minutes: 90,
-      table_number: tableNumber || null,
-      status: 'checked_in',
-      tenant_slug: tenant,
-      total_spent: 0,
-      notes: 'Walk-in',
-    }])
-    if (error) { toast.error(rk('walkInFailedPrefix') + error.message); return }
+    const ins = await adminDb.insert(
+      'reservations',
+      {
+        guest_name: name,
+        customer_name: name,
+        party_size: partySize,
+        reservation_date: dateStr,
+        reservation_time: timeStr,
+        duration_minutes: 90,
+        table_number: tableNumber || null,
+        status: 'checked_in',
+        total_spent: 0,
+        notes: 'Walk-in',
+      },
+      { tenantSlug: tenant },
+    )
+    if (!ins.ok) {
+      toast.error(rk('walkInFailedPrefix') + (ins.error || ''))
+      return
+    }
     await loadReservations()
     await loadGuestProfiles()
     setShowWalkInModal(false)
@@ -1551,21 +1557,27 @@ export default function KassaReservationsView({
   // Wachtlijst: toevoegen met WAITLIST status + automatische positie
   const handleAddToWaitlist = async (name: string, phone: string, partySize: number, date: string, time: string) => {
     const pos = reservations.filter(r => r.status === 'WAITLIST' && r.reservation_date === date).length + 1
-    const { error } = await supabase.from('reservations').insert([{
-      guest_name: name,
-      guest_phone: phone || null,
-      customer_name: name,
-      customer_phone: phone || null,
-      party_size: partySize,
-      reservation_date: date,
-      reservation_time: time,
-      duration_minutes: 90,
-      status: 'waitlist',
-      waitlist_position: pos,
-      tenant_slug: tenant,
-      total_spent: 0,
-    }])
-    if (error) { toast.error(rk('waitlistFailedPrefix') + error.message); return }
+    const ins = await adminDb.insert(
+      'reservations',
+      {
+        guest_name: name,
+        guest_phone: phone || null,
+        customer_name: name,
+        customer_phone: phone || null,
+        party_size: partySize,
+        reservation_date: date,
+        reservation_time: time,
+        duration_minutes: 90,
+        status: 'waitlist',
+        waitlist_position: pos,
+        total_spent: 0,
+      },
+      { tenantSlug: tenant },
+    )
+    if (!ins.ok) {
+      toast.error(rk('waitlistFailedPrefix') + (ins.error || ''))
+      return
+    }
     await loadReservations()
     await loadGuestProfiles()
     setShowWaitlistModal(false)
@@ -1577,25 +1589,36 @@ export default function KassaReservationsView({
     if (addReservationInProgress.current) return
     addReservationInProgress.current = true
     try {
-    const { data: inserted, error } = await supabase.from('reservations').insert([{
-      guest_name: data.guest_name,
-      guest_phone: data.guest_phone || null,
-      guest_email: data.guest_email || null,
-      customer_name: data.guest_name,
-      customer_phone: data.guest_phone || null,
-      customer_email: data.guest_email || null,
-      party_size: data.party_size,
-      reservation_date: data.reservation_date,
-      reservation_time: data.reservation_time,
-      duration_minutes: data.duration_minutes || 90,
-      table_number: data.table_number || null,
-      notes: data.notes || null,
-      special_requests: data.special_requests || '',
-      status: 'confirmed',
-      tenant_slug: tenant,
-      total_spent: 0,
-    }]).select().single()
-    if (error) { toast.error(rk('createFailedPrefix') + error.message); return }
+    const ins = await adminDb.insert(
+      'reservations',
+      {
+        guest_name: data.guest_name,
+        guest_phone: data.guest_phone || null,
+        guest_email: data.guest_email || null,
+        customer_name: data.guest_name,
+        customer_phone: data.guest_phone || null,
+        customer_email: data.guest_email || null,
+        party_size: data.party_size,
+        reservation_date: data.reservation_date,
+        reservation_time: data.reservation_time,
+        duration_minutes: data.duration_minutes || 90,
+        table_number: data.table_number || null,
+        notes: data.notes || null,
+        special_requests: data.special_requests || '',
+        status: 'confirmed',
+        total_spent: 0,
+      },
+      { tenantSlug: tenant, select: '*' },
+    )
+    if (!ins.ok) {
+      toast.error(rk('createFailedPrefix') + (ins.error || ''))
+      return
+    }
+    const rawInserted = ins.data as unknown
+    const inserted =
+      rawInserted == null
+        ? null
+        : ((Array.isArray(rawInserted) ? rawInserted[0] : rawInserted) as { id?: string } | null)
 
     await loadReservations()
     await loadGuestProfiles()

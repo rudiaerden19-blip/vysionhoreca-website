@@ -57,8 +57,8 @@ import {
   setTerminalLogout,
 } from '@/lib/session-broadcast'
 import {
-  isDuplicateKassaClientUuidError,
-  isLikelyOfflineOrNetworkSupabaseError,
+  isDuplicateKassaClientViolation,
+  isLikelyOfflineOrNetworkPersistFailure,
 } from '@/lib/kassa-supabase-guards'
 import { fetchOrderNumberByKassaClientUuid } from '@/lib/kassa-fetch-order-number'
 import { formatKassaNumpadHeaderDate } from '@/lib/format-kassa-header-date'
@@ -1646,11 +1646,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       orderPayload.payment_split_card = Math.round(splitAmounts.card * 100) / 100
     }
 
-    const { data: insertedRow, error } = await supabase
-      .from('orders')
-      .insert(orderPayload as never)
-      .select('order_number')
-      .maybeSingle()
+    const insRes = await adminDb.insert(
+      'orders',
+      orderPayload as Record<string, unknown>,
+      { tenantSlug: tenant, select: 'order_number' },
+    )
+
+    const insertedRow = (() => {
+      if (!insRes.ok || insRes.data == null) return null
+      const raw = insRes.data as unknown
+      const row = (Array.isArray(raw) ? raw[0] : raw) as { order_number?: number } | undefined
+      return row ?? null
+    })()
 
     let allocatedOrderNumber = 0
     let queuedOffline = false
@@ -1661,10 +1668,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       setTimeout(() => playSuccess(), 400)
     }
 
-    if (!error && insertedRow?.order_number != null) {
+    if (insRes.ok && insertedRow?.order_number != null) {
       allocatedOrderNumber = Number(insertedRow.order_number)
       finishSuccessPath()
-    } else if (!error && insertedRow?.order_number == null) {
+    } else if (insRes.ok && insertedRow?.order_number == null) {
       allocatedOrderNumber = await fetchOrderNumberByKassaClientUuid(supabase, tenant, kassa_client_uuid)
       if (allocatedOrderNumber <= 0) {
         console.error('Kassa: insert OK but order_number not resolved', { insertedRow, kassa_client_uuid })
@@ -1672,10 +1679,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         return
       }
       finishSuccessPath()
-    } else if (error && isDuplicateKassaClientUuidError(error)) {
+    } else if (!insRes.ok && isDuplicateKassaClientViolation(insRes.error)) {
       allocatedOrderNumber = await fetchOrderNumberByKassaClientUuid(supabase, tenant, kassa_client_uuid)
       finishSuccessPath()
-    } else if (error && isLikelyOfflineOrNetworkSupabaseError(error)) {
+    } else if (
+      !insRes.ok &&
+      (insRes.status === 0 || insRes.status >= 500 || isLikelyOfflineOrNetworkPersistFailure(insRes.error))
+    ) {
       const addToQueue = async () => {
         const queue = await mergeOfflineOrderQueues(tenant)
         if (
@@ -1716,9 +1726,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       playCashRegister()
       setTimeout(() => playSuccess(), 400)
     } else {
-      console.error('Supabase order insert error:', error)
+      console.error('Kassa: admin order insert error:', insRes.error)
       alert(
-        `${t('kassaApp.orderPersistFailedTitle')}\n\n${t('kassaApp.orderPersistFailedBody')}${error?.message ? `\n\n(${error.message})` : ''}`,
+        `${t('kassaApp.orderPersistFailedTitle')}\n\n${t('kassaApp.orderPersistFailedBody')}${insRes.error ? `\n\n(${insRes.error})` : ''}`,
       )
       return
     }

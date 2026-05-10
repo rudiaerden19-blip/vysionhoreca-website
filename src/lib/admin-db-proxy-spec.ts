@@ -127,8 +127,9 @@ export const ADMIN_DB_TABLES: Record<string, AdminDbTableSpec> = {
   },
   reservations: {
     tenantSlugColumn: 'tenant_slug',
-    allowedOps: ['update', 'delete'],
-    forbiddenColumns: ['id', 'created_at'],
+    // INSERT: publieke reserveringspagina gebruikt nog anon; kassa/reserverings-module gebruikt adminDb voor betrouwbare sync.
+    allowedOps: ['insert', 'update', 'delete'],
+    forbiddenColumns: ['id', 'created_at', 'tenant_slug'],
     maxRows: 50,
   },
   reviews: {
