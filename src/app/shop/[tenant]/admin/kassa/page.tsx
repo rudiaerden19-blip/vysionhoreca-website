@@ -145,12 +145,28 @@ function floorPlanTablesLocalStorageKey(tenantSlug: string, zone: FloorPlanZone)
 
 /** Open kassa-tafelorders: alleen rijen uit Supabase — geen merge met oude localStorage. */
 function buildOpenTableOrdersMapFromRows(
-  data: { table_number: string | null; items: unknown; floor_plan_zone?: string | null }[] | null | undefined,
+  data:
+    | {
+        table_number: string | null
+        items: unknown
+        floor_plan_zone?: string | null
+        status?: string | null
+        order_type?: string | null
+        payment_status?: string | null
+      }[]
+    | null
+    | undefined,
 ): Record<string, CartItem[]> {
   const out: Record<string, CartItem[]> = {}
   if (!data?.length) return out
   for (const row of data) {
     const tn = row.table_number
+    const st = String(row.status || '').toLowerCase()
+    const ot = String(row.order_type || '').toUpperCase()
+    const ps = String(row.payment_status || '').toLowerCase()
+    if (ot !== 'DINE_IN') continue
+    if (!['open', 'preparing'].includes(st)) continue
+    if (ps === 'paid') continue
     if (tn != null && String(tn) !== '' && row.items != null) {
       const zone = normalizeFloorPlanZone(row.floor_plan_zone)
       out[tableOrderMapKey(zone, String(tn))] = row.items as CartItem[]
@@ -178,36 +194,53 @@ function mergeOpenTableOrdersServerWithPendingLocal(
 }
 
 /** Rijen uit DB voor buildOpenTableOrdersMapFromRows — zelfde bron als adminDb-insert (service role). */
-type OpenTableOrderRow = { table_number: string | null; items: unknown; floor_plan_zone?: string | null }
+type OpenTableOrderRow = {
+  table_number: string | null
+  items: unknown
+  floor_plan_zone?: string | null
+  order_type?: string | null
+  status?: string | null
+  payment_status?: string | null
+}
+
+function isDineInOpenTableDraftRow(row: OpenTableOrderRow): boolean {
+  if (String(row.order_type || '').toUpperCase() !== 'DINE_IN') return false
+  if (row.table_number == null || String(row.table_number).trim() === '') return false
+  const st = String(row.status || '').toLowerCase()
+  if (!['open', 'preparing'].includes(st)) return false
+  if (String(row.payment_status || '').toLowerCase() === 'paid') return false
+  return true
+}
 
 /**
  * Open tafelmanden: lees via admin-proxy (service role), net als schrijven — alle kassa-pc's zien identieke data.
  * Anon-Supabase alleen als fallback (bv. demo zonder sessie).
+ * `preparing` = keuken heeft "klaar" gezet op open mand; mand blijft zichtbaar tot afrekenen.
  */
 async function fetchOpenTableOrdersForTenant(tenantSlug: string): Promise<OpenTableOrderRow[] | null> {
   const adminRes = await adminDb.select<OpenTableOrderRow[]>('orders', {
     tenantSlug: tenantSlug,
-    select: 'table_number, items, floor_plan_zone',
-    match: { status: 'open' },
+    select: 'table_number, items, floor_plan_zone, order_type, payment_status, status',
+    in: { status: ['open', 'preparing'] },
     limit: 500,
   })
   if (adminRes.ok && Array.isArray(adminRes.data)) {
-    return adminRes.data
+    return adminRes.data.filter(isDineInOpenTableDraftRow)
   }
   if (!adminRes.ok && adminRes.error) {
     console.warn('[kassa] open orders admin read failed:', adminRes.error)
   }
   const { data, error } = await supabase
     .from('orders')
-    .select('table_number, items, floor_plan_zone')
+    .select('table_number, items, floor_plan_zone, order_type, payment_status, status')
     .eq('tenant_slug', tenantSlug)
-    .eq('status', 'open')
+    .in('status', ['open', 'preparing'])
     .limit(500)
   if (error) {
     console.warn('[kassa] open orders anon read failed:', error.message)
     return null
   }
-  return (data ?? []) as OpenTableOrderRow[]
+  return ((data ?? []) as OpenTableOrderRow[]).filter(isDineInOpenTableDraftRow)
 }
 
 function buildKassaCustomerDisplayLines(cart: CartItem[]): KassaCustomerDisplayLine[] {
@@ -650,6 +683,27 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     inside: [],
     terrace: [],
   })
+  /** Tijdens plattegrond-upsert: poll/realtime mag geen kortere DB-snapshot over optimistische tafels zetten. */
+  const floorPlanTablesPersistInflightRef = useRef<Partial<Record<FloorPlanZone, number>>>({})
+
+  const applyKassaFloorPlanTablesPayload = useCallback((zone: FloorPlanZone, raw: unknown): boolean => {
+    const parsed = parseFloorPlanTablesJson(raw)
+    if (parsed === null) return false
+    const fixed = sanitizeFloorPlanTables(parsed)
+    setKassaTablesByZone((prev) => {
+      const prevZone = prev[zone]
+      const inflight = floorPlanTablesPersistInflightRef.current[zone] ?? 0
+      if (inflight > 0 && fixed.length < prevZone.length) {
+        const prevIds = new Set(prevZone.map((t) => t.id))
+        if (fixed.every((t) => prevIds.has(t.id))) {
+          return prev
+        }
+      }
+      localStorage.setItem(floorPlanTablesLocalStorageKey(tenant, zone), JSON.stringify(fixed))
+      return { ...prev, [zone]: fixed }
+    })
+    return true
+  }, [tenant])
   const [kassaStoolsByZone, setKassaStoolsByZone] = useState<
     Record<FloorPlanZone, { stoolNumber: string; segmentId: string }[]>
   >({
@@ -704,15 +758,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   // Laad tafels + barkrukken + openstaande bestellingen (localStorage + Supabase sync)
 
   useEffect(() => {
-    const applyKassaTablesPayloadForZone = (zone: FloorPlanZone, raw: unknown) => {
-      const parsed = parseFloorPlanTablesJson(raw)
-      if (parsed === null) return false
-      const fixed = sanitizeFloorPlanTables(parsed)
-      setKassaTablesByZone((prev) => ({ ...prev, [zone]: fixed }))
-      localStorage.setItem(floorPlanTablesLocalStorageKey(tenant, zone), JSON.stringify(fixed))
-      return true
-    }
-
     for (const zone of KASSA_FLOOR_ZONES) {
       const lsRaw = localStorage.getItem(floorPlanTablesLocalStorageKey(tenant, zone))
       if (lsRaw) {
@@ -736,8 +781,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         let merged = false
         if (adminRes.ok) {
           const row = adminRes.data as { data?: unknown } | null | undefined
-          if (row == null) merged = applyKassaTablesPayloadForZone(zone, [])
-          else merged = applyKassaTablesPayloadForZone(zone, row.data)
+          if (row == null) merged = applyKassaFloorPlanTablesPayload(zone, [])
+          else merged = applyKassaFloorPlanTablesPayload(zone, row.data)
         }
         if (!merged) {
           const { data, error } = await supabase
@@ -747,8 +792,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             .eq('plan_zone', zone)
             .maybeSingle()
           if (!error) {
-            if (data == null) applyKassaTablesPayloadForZone(zone, [])
-            else applyKassaTablesPayloadForZone(zone, data.data)
+            if (data == null) applyKassaFloorPlanTablesPayload(zone, [])
+            else applyKassaFloorPlanTablesPayload(zone, data.data)
           }
         }
       }
@@ -785,20 +830,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     void fetchOpenTableOrdersForTenant(tenant).then(applyOpenOrdersFromServerRows)
     // Geen showTablePicker hier: die toggle triggert bij openen plattegrond en overschreef
     // tableOrders met een lege DB-snapshot vóór persist klaar was.
-  }, [tenant, tableOrdersKey, applyOpenOrdersFromServerRows])
+  }, [tenant, tableOrdersKey, applyOpenOrdersFromServerRows, applyKassaFloorPlanTablesPayload])
 
   // ── Realtime sync: tafelstatus tussen apparaten ───────────────────────────
   useEffect(() => {
     const refetchAllFloorPlanTables = () => {
       void (async () => {
-        const applyPayload = (zone: FloorPlanZone, raw: unknown) => {
-          const parsed = parseFloorPlanTablesJson(raw)
-          if (parsed === null) return false
-          const fixed = sanitizeFloorPlanTables(parsed)
-          setKassaTablesByZone((prev) => ({ ...prev, [zone]: fixed }))
-          localStorage.setItem(floorPlanTablesLocalStorageKey(tenant, zone), JSON.stringify(fixed))
-          return true
-        }
         for (const zone of KASSA_FLOOR_ZONES) {
           const adminRes = await adminDb.select<{ data?: unknown } | null>('floor_plan_tables', {
             tenantSlug: tenant,
@@ -809,8 +846,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           let merged = false
           if (adminRes.ok) {
             const row = adminRes.data as { data?: unknown } | null | undefined
-            if (row == null) merged = applyPayload(zone, [])
-            else merged = applyPayload(zone, row.data)
+            if (row == null) merged = applyKassaFloorPlanTablesPayload(zone, [])
+            else merged = applyKassaFloorPlanTablesPayload(zone, row.data)
           }
           if (!merged) {
             const { data, error } = await supabase
@@ -820,8 +857,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               .eq('plan_zone', zone)
               .maybeSingle()
             if (!error) {
-              if (data == null) applyPayload(zone, [])
-              else applyPayload(zone, data.data)
+              if (data == null) applyKassaFloorPlanTablesPayload(zone, [])
+              else applyKassaFloorPlanTablesPayload(zone, data.data)
             }
           }
         }
@@ -844,8 +881,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             return
           }
           if (payload.eventType === 'DELETE') {
-            setKassaTablesByZone((prev) => ({ ...prev, [applyZone]: [] }))
-            localStorage.setItem(floorPlanTablesLocalStorageKey(tenant, applyZone), JSON.stringify([]))
+            void applyKassaFloorPlanTablesPayload(applyZone, [])
             return
           }
           const row = payload.new
@@ -853,18 +889,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             refetchAllFloorPlanTables()
             return
           }
-          const parsed = parseFloorPlanTablesJson(row.data)
-          if (parsed === null) return
-          const fixed = sanitizeFloorPlanTables(parsed)
-          setKassaTablesByZone((prev) => ({ ...prev, [applyZone]: fixed }))
-          localStorage.setItem(floorPlanTablesLocalStorageKey(tenant, applyZone), JSON.stringify(fixed))
+          void applyKassaFloorPlanTablesPayload(applyZone, row.data)
         },
       )
       .subscribe()
     return () => {
       void supabase.removeChannel(tableChannel).catch(() => {})
     }
-  }, [tenant])
+  }, [tenant, applyKassaFloorPlanTablesPayload])
 
   // ── Realtime sync: plattegrond-decor / barkrukken ─────────────────────────
   useEffect(() => {
@@ -951,15 +983,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   /** Als WebSockets/realtime op een werkstation vastzitten (firewall, slaapstand, print-kiosk),
    *  halen we dezelfde bron nog eens binnen bij terugkeren naar het venster + periodiek. */
   useEffect(() => {
-    const applyKassaTablesPayloadForZone = (zone: FloorPlanZone, raw: unknown) => {
-      const parsed = parseFloorPlanTablesJson(raw)
-      if (parsed === null) return false
-      const fixed = sanitizeFloorPlanTables(parsed)
-      setKassaTablesByZone((prev) => ({ ...prev, [zone]: fixed }))
-      localStorage.setItem(floorPlanTablesLocalStorageKey(tenant, zone), JSON.stringify(fixed))
-      return true
-    }
-
     const pullOpenOrders = () => {
       void fetchOpenTableOrdersForTenant(tenant).then(applyOpenOrdersFromServerRows)
     }
@@ -976,8 +999,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           let merged = false
           if (adminRes.ok) {
             const row = adminRes.data as { data?: unknown } | null | undefined
-            if (row == null) merged = applyKassaTablesPayloadForZone(zone, [])
-            else merged = applyKassaTablesPayloadForZone(zone, row.data)
+            if (row == null) merged = applyKassaFloorPlanTablesPayload(zone, [])
+            else merged = applyKassaFloorPlanTablesPayload(zone, row.data)
           }
           if (!merged) {
             const { data, error } = await supabase
@@ -987,8 +1010,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               .eq('plan_zone', zone)
               .maybeSingle()
             if (!error) {
-              if (data == null) applyKassaTablesPayloadForZone(zone, [])
-              else applyKassaTablesPayloadForZone(zone, data.data)
+              if (data == null) applyKassaFloorPlanTablesPayload(zone, [])
+              else applyKassaFloorPlanTablesPayload(zone, data.data)
             }
           }
         }
@@ -1039,7 +1062,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       window.clearInterval(timerFloor)
       window.clearInterval(timerOrders)
     }
-  }, [tenant, applyOpenOrdersFromServerRows])
+  }, [tenant, applyOpenOrdersFromServerRows, applyKassaFloorPlanTablesPayload])
 
   const cancelPersistTimer = (slotKey: string) => {
     const timers = persistTimersRef.current
@@ -1056,13 +1079,21 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     items: CartItem[],
   ) => {
     const run = async (attempt: number): Promise<void> => {
-      const delRes = await adminDb.delete(
+      const delOpen = await adminDb.delete(
         'orders',
         { tenant_slug: tenant, table_number: tblNr, status: 'open', floor_plan_zone: zone },
         { tenantSlug: tenant },
       )
-      if (!delRes.ok) {
-        console.warn('[kassa] open order delete failed:', delRes.error)
+      if (!delOpen.ok) {
+        console.warn('[kassa] open order delete failed:', delOpen.error)
+      }
+      const delPrep = await adminDb.delete(
+        'orders',
+        { tenant_slug: tenant, table_number: tblNr, status: 'preparing', floor_plan_zone: zone },
+        { tenantSlug: tenant },
+      )
+      if (!delPrep.ok) {
+        console.warn('[kassa] preparing draft delete failed:', delPrep.error)
       }
       if (items.length === 0) return
       const insRes = await adminDb.insert(
@@ -1619,6 +1650,22 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     localStorage.setItem(floorPlanTablesLocalStorageKey(tenant, zone), JSON.stringify(fixed))
   }, [tenant])
 
+  const onFloorPlanTablesPersistLifecycle = useCallback((zone: FloorPlanZone, phase: 'start' | 'end') => {
+    if (phase === 'start') {
+      floorPlanTablesPersistInflightRef.current[zone] =
+        (floorPlanTablesPersistInflightRef.current[zone] ?? 0) + 1
+    } else {
+      const n = (floorPlanTablesPersistInflightRef.current[zone] ?? 1) - 1
+      if (n <= 0) {
+        const next = { ...floorPlanTablesPersistInflightRef.current }
+        delete next[zone]
+        floorPlanTablesPersistInflightRef.current = next
+      } else {
+        floorPlanTablesPersistInflightRef.current[zone] = n
+      }
+    }
+  }, [])
+
   const switchConfirmParsed = switchConfirm ? parseTableOrderMapKey(switchConfirm) : null
   const switchConfirmDisplay =
     switchConfirmParsed != null
@@ -1890,6 +1937,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     void adminDb.delete(
       'orders',
       { tenant_slug: tenant, table_number: tblNr, status: 'open', floor_plan_zone: zone },
+      { tenantSlug: tenant },
+    )
+    void adminDb.delete(
+      'orders',
+      { tenant_slug: tenant, table_number: tblNr, status: 'preparing', floor_plan_zone: zone },
       { tenantSlug: tenant },
     )
   }
@@ -3499,6 +3551,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           planZone={pickerBrowseZone}
           seedTables={pickerTables}
           onFloorPlanTablesPersisted={onFloorPlanTablesPersisted}
+          onFloorPlanTablesPersistLifecycle={onFloorPlanTablesPersistLifecycle}
           onSelectTable={(nr) => switchToTable(nr)}
           onClose={() => setShowFloorPlan(false)}
           tableOrders={tableOrders}

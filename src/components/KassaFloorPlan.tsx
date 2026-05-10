@@ -46,6 +46,8 @@ interface Props {
   seedTables?: KassaTable[]
   /** Na geslaagde upsert: parent-state (`pickerTables`) gelijk trekken — anders overschrijft seed een net toegevoegde terrastafel tot refresh. */
   onFloorPlanTablesPersisted?: (planZone: FloorPlanZone, tables: KassaTable[]) => void
+  /** Start/einde van plattegrond-upsert: parent blokkeert poll/realtime die kortere snapshots pusht. */
+  onFloorPlanTablesPersistLifecycle?: (planZone: FloorPlanZone, phase: 'start' | 'end') => void
 }
 
 function makeId() { return Math.random().toString(36).slice(2, 10) }
@@ -367,6 +369,7 @@ export default function KassaFloorPlan({
   tableOrders = {},
   seedTables,
   onFloorPlanTablesPersisted,
+  onFloorPlanTablesPersistLifecycle,
 }: Props) {
   const { t } = useLanguage()
   const statusLabels = useMemo(
@@ -454,6 +457,7 @@ export default function KassaFloorPlan({
   /** Na RLS-lockdown: alleen service_role schrijft — client gebruikt admin-proxy (niet anon upsert). */
   const persistFloorPlanTablesToBackend = (data: KassaTable[]) => {
     persistFloorTablesInflightRef.current += 1
+    onFloorPlanTablesPersistLifecycle?.(planZone, 'start')
     void adminDb
       .upsert(
         'floor_plan_tables',
@@ -466,6 +470,7 @@ export default function KassaFloorPlan({
       })
       .finally(() => {
         persistFloorTablesInflightRef.current -= 1
+        onFloorPlanTablesPersistLifecycle?.(planZone, 'end')
       })
   }
 

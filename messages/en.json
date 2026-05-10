@@ -3031,6 +3031,7 @@
     "notes": "NOTES",
     "printReceipt": "PRINT RECEIPT",
     "markReady": "READY",
+    "statusOpenCart": "Open cart",
     "justNow": "Just now",
     "min": "min"
   },

@@ -21,6 +21,11 @@ import {
 import { sendToVysionPrintAgent } from '@/lib/vysion-print-agent-client'
 import { getAuthHeaders } from '@/lib/auth-headers'
 import { adminDineInSeatAuditLine, dineInSeatLineNl } from '@/lib/admin-order-display'
+import {
+  orderItemDisplayName,
+  orderItemDisplayOptionLines,
+  orderItemLineTotalEur,
+} from '@/lib/order-items-display'
 
 interface Order {
   id: string
@@ -252,9 +257,10 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             ...order,
             items: typeof order.items === 'string' ? JSON.parse(order.items) : order.items || []
           }))
+          const webshopOnly = parsed.filter((o) => isWebshopOrder(o))
           
           // Find TRULY new orders (not in known set AND status is 'new')
-          const trulyNewOrders = parsed.filter(o => 
+          const trulyNewOrders = webshopOnly.filter(o => 
             !knownOrderIdsRef.current.has(o.id) && 
             o.status.toLowerCase() === 'new'
           )
@@ -272,7 +278,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             playOrderNotification()
           }
           
-          setOrders(parsed)
+          setOrders(webshopOnly)
         }
       } catch (error) {
         console.error('Polling error:', error)
@@ -325,12 +331,13 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
           ...order,
           items: typeof order.items === 'string' ? JSON.parse(order.items) : order.items || []
         }))
-        setOrders(parsed)
+        const webshopOnly = parsed.filter((o) => isWebshopOrder(o))
+        setOrders(webshopOnly)
         
         // CRITICAL: Initialize known IDs with ALL current orders
         // This prevents false "new order" alerts on page load
         parsed.forEach(o => knownOrderIdsRef.current.add(o.id))
-        console.log(`📋 Initial load: ${parsed.length} orders, ${knownOrderIdsRef.current.size} known IDs`)
+        console.log(`📋 Initial load: ${webshopOnly.length} webshop orders (${parsed.length} totaal), ${knownOrderIdsRef.current.size} known IDs`)
       }
     } catch (error) {
       console.error('Error loading data:', error)
@@ -490,18 +497,24 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     const printWindow = window.open('', '_blank', 'width=320,height=700')
     if (!printWindow) return
 
-    const itemsHtml = order.items?.map((item: any) => `
+    const itemsHtml = order.items?.map((item: unknown) => {
+      const qty = Number((item as { quantity?: unknown }).quantity) || 1
+      const label = orderItemDisplayName(item)
+      const lineTotal = orderItemLineTotalEur(item)
+      const optLines = orderItemDisplayOptionLines(item)
+      return `
       <tr>
         <td style="padding: 5px 0; font-size: ${type === 'kitchen' ? '16px' : '14px'};">
-          <strong>${item.quantity}x</strong> ${item.product_name || item.name}
-          ${item.options?.map((opt: any) => `<br><span style="color: #666; padding-left: 15px; font-size: 12px;">+ ${opt.name}</span>`).join('') || ''}
-          ${item.notes ? `<br><span style="color: #666; font-style: italic; padding-left: 15px; font-size: 12px;">📝 ${item.notes}</span>` : ''}
+          <strong>${qty}x</strong> ${label}
+          ${optLines.map((line) => `<br><span style="color: #666; padding-left: 15px; font-size: 12px;">+ ${line}</span>`).join('')}
+          ${(item as { notes?: unknown }).notes ? `<br><span style="color: #666; font-style: italic; padding-left: 15px; font-size: 12px;">📝 ${String((item as { notes?: unknown }).notes)}</span>` : ''}
         </td>
         <td style="text-align: right; padding: 5px 0; font-size: ${type === 'kitchen' ? '16px' : '14px'}; vertical-align: top;">
-          €${(item.total_price || item.price * item.quantity)?.toFixed(2)}
+          €${lineTotal.toFixed(2)}
         </td>
       </tr>
-    `).join('') || ''
+    `
+    }).join('') || ''
 
     const nlDineInSeat = dineInSeatLineNl(order.order_type, order.table_number, order.floor_plan_zone)
 
@@ -639,16 +652,21 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
           </div>
 
           <table>
-            ${order.items?.map((item: any) => `
+            ${order.items?.map((item: unknown) => {
+              const qty = Number((item as { quantity?: unknown }).quantity) || 1
+              const label = orderItemDisplayName(item)
+              const optLines = orderItemDisplayOptionLines(item)
+              return `
               <tr>
                 <td>
-                  <strong style="font-size: 20px;">${item.quantity}x</strong> 
-                  <span style="font-size: 18px;">${item.product_name || item.name}</span>
-                  ${item.options?.map((opt: any) => `<br><span style="padding-left: 20px;">+ ${opt.name}</span>`).join('') || ''}
-                  ${item.notes ? `<br><span style="font-style: italic; padding-left: 20px;">📝 ${item.notes}</span>` : ''}
+                  <strong style="font-size: 20px;">${qty}x</strong> 
+                  <span style="font-size: 18px;">${label}</span>
+                  ${optLines.map((line) => `<br><span style="padding-left: 20px;">+ ${line}</span>`).join('')}
+                  ${(item as { notes?: unknown }).notes ? `<br><span style="font-style: italic; padding-left: 20px;">📝 ${String((item as { notes?: unknown }).notes)}</span>` : ''}
                 </td>
               </tr>
-            `).join('') || ''}
+            `
+            }).join('') || ''}
           </table>
 
           ${order.customer_notes ? `
@@ -677,14 +695,12 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   /** Probeer eerst de lokale Vysion Print Agent (ESC/POS bonprinter).
    *  Lukt niet (agent niet bereikbaar) → val terug op het browser-print venster. */
   async function printOrder(order: Order, type: 'customer' | 'kitchen' = 'customer') {
-    const items = (order.items || []).map((it: any) => ({
-      quantity: Number(it.quantity) || 1,
-      name: String(it.product_name || it.name || 'Item'),
-      price: Number(it.total_price ?? (it.price ?? 0) * (Number(it.quantity) || 1)) || 0,
-      choices: Array.isArray(it.options)
-        ? it.options.map((o: any) => ({ name: String(o.name || ''), price: Number(o.price || 0) }))
-        : [],
-      notes: it.notes ? String(it.notes) : undefined,
+    const items = (order.items || []).map((it: unknown) => ({
+      quantity: Number((it as { quantity?: unknown }).quantity) || 1,
+      name: orderItemDisplayName(it) || 'Item',
+      price: orderItemLineTotalEur(it),
+      choices: orderItemDisplayOptionLines(it).map((name) => ({ name, price: 0 })),
+      notes: (it as { notes?: unknown }).notes ? String((it as { notes?: unknown }).notes) : undefined,
     }))
 
     const requestedDateTime = (order as any).scheduled_date
@@ -1109,12 +1125,16 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                     {/* Items — scrollbaar bij lange lijsten */}
                     <div className="mb-2 max-h-40 overflow-y-auto overscroll-y-contain rounded-lg border border-gray-200 bg-white px-2 py-1.5 [scrollbar-gutter:stable]">
                       <div className="text-sm space-y-1">
-                        {order.items?.map((item: any, i: number) => (
+                        {order.items?.map((item: unknown, i: number) => {
+                          const qty = Number((item as { quantity?: unknown }).quantity) || 1
+                          const label = orderItemDisplayName(item)
+                          return (
                           <p key={i} className="text-gray-900 font-semibold leading-snug break-words">
-                            <span className="tabular-nums text-[#0f2744]">{item.quantity}×</span>{' '}
-                            {item.product_name || item.name}
+                            <span className="tabular-nums text-[#0f2744]">{qty}×</span>{' '}
+                            {label}
                           </p>
-                        ))}
+                          )
+                        })}
                       </div>
                     </div>
 
@@ -1258,29 +1278,38 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                 <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-4">
                   <h3 className="font-semibold text-sm uppercase tracking-wide text-gray-600 mb-3">{tx('order')}</h3>
                   <div className="max-h-[min(56vh,26rem)] overflow-y-auto overscroll-y-contain space-y-2 pr-1 rounded-lg border border-gray-200 bg-white p-3 [scrollbar-gutter:stable]">
-                    {selectedOrder.items?.map((item: any, i: number) => (
+                    {selectedOrder.items?.map((item: unknown, i: number) => {
+                      const qty = Number((item as { quantity?: unknown }).quantity) || 1
+                      const label = orderItemDisplayName(item)
+                      const lineTotal = orderItemLineTotalEur(item)
+                      const optLines = orderItemDisplayOptionLines(item)
+                      const noteRaw = (item as { notes?: unknown }).notes
+                      const noteStr =
+                        noteRaw != null && String(noteRaw).trim() !== '' ? String(noteRaw) : ''
+                      return (
                       <div key={i} className="flex items-start justify-between py-2 border-b border-gray-100 last:border-0 gap-3">
                         <div className="flex items-start gap-3 min-w-0">
                           <span className="w-9 h-9 bg-[#0f2744] text-white rounded-md flex items-center justify-center font-bold text-sm shrink-0">
-                            {item.quantity}
+                            {qty}
                           </span>
                           <div>
-                            <span className="font-semibold text-gray-900 text-base">{item.product_name || item.name}</span>
-                            {item.options?.map((opt: any, j: number) => (
+                            <span className="font-semibold text-gray-900 text-base">{label}</span>
+                            {optLines.map((line, j) => (
                               <p key={j} className="text-sm text-gray-800 font-medium mt-0.5 pl-2 border-l-2 border-gray-200">
-                                + {opt.name}
+                                + {line}
                               </p>
                             ))}
-                            {item.notes && (
-                              <p className="text-sm text-gray-700 mt-1 font-medium">Opmerking: {item.notes}</p>
-                            )}
+                            {noteStr ? (
+                              <p className="text-sm text-gray-700 mt-1 font-medium">Opmerking: {noteStr}</p>
+                            ) : null}
                           </div>
                         </div>
                         <span className="font-bold tabular-nums shrink-0 text-gray-900">
-                          €{(item.total_price || item.price * item.quantity)?.toFixed(2)}
+                          €{lineTotal.toFixed(2)}
                         </span>
                       </div>
-                    ))}
+                      )
+                    })}
                   </div>
 
                   <div className="mt-4 pt-4 border-t border-gray-200 space-y-1">

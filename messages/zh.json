@@ -2732,6 +2732,7 @@
     "notes": "备注",
     "printReceipt": "打印收据",
     "markReady": "就绪",
+    "statusOpenCart": "未结账购物车",
     "justNow": "刚刚",
     "min": "分钟"
   },

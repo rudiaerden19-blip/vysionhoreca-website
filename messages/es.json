@@ -2732,6 +2732,7 @@
     "notes": "NOTAS",
     "printReceipt": "IMPRIMIR TICKET",
     "markReady": "LISTO",
+    "statusOpenCart": "Carrito abierto",
     "justNow": "Ahora mismo",
     "min": "min"
   },

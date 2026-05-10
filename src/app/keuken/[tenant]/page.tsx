@@ -20,6 +20,12 @@ import {
   markAudioActivated
 } from '@/lib/sounds'
 import { sendToVysionPrintAgent } from '@/lib/vysion-print-agent-client'
+import { fetchKitchenQueueOrders } from '@/lib/kitchen-queue-orders'
+import {
+  orderItemDisplayName,
+  orderItemDisplayOptionLines,
+  orderItemLineTotalEur,
+} from '@/lib/order-items-display'
 import { adminDineInSeatAuditLine, dineInSeatLineNl } from '@/lib/admin-order-display'
 
 interface Order {
@@ -30,6 +36,7 @@ interface Order {
   order_type: string
   status: string
   total: number
+  payment_status?: string
   items: any[]
   customer_notes?: string
   created_at: string
@@ -135,38 +142,22 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
 
     const pollOrders = async () => {
       try {
-        const { data } = await supabase
-          .from('orders')
-          .select('*')
-          .eq('tenant_slug', params.tenant)
-          .in('status', ['confirmed', 'preparing'])
-          .order('created_at', { ascending: true })
-          .limit(50)
+        if (!supabase) return
+        const parsed = (await fetchKitchenQueueOrders(supabase, params.tenant)) as unknown as Order[]
 
-        if (data) {
-          const parsed = data.map(order => ({
-            ...order,
-            items: typeof order.items === 'string' ? JSON.parse(order.items) : order.items || []
-          }))
-          
-          // Find TRULY new orders (not in known set)
-          const trulyNewOrders = parsed.filter(o => !knownOrderIdsRef.current.has(o.id))
-          
-          // Add ALL current order IDs to known set
-          parsed.forEach(o => knownOrderIdsRef.current.add(o.id))
-          
-          // Alert for truly new orders
-          if (trulyNewOrders.length > 0) {
-            console.log(`👨‍🍳 ${trulyNewOrders.length} nieuwe keuken bestelling(en)!`)
-            trulyNewOrders.forEach(order => {
-              setNewOrderIds(prev => new Set([...prev, order.id]))
-            })
-            // ALTIJD geluid spelen bij nieuwe bestelling
-            playOrderNotification()
-          }
-          
-          setOrders(parsed)
+        const trulyNewOrders = parsed.filter((o) => !knownOrderIdsRef.current.has(o.id))
+
+        parsed.forEach((o) => knownOrderIdsRef.current.add(o.id))
+
+        if (trulyNewOrders.length > 0) {
+          console.log(`👨‍🍳 ${trulyNewOrders.length} nieuwe keuken bestelling(en)!`)
+          trulyNewOrders.forEach((order) => {
+            setNewOrderIds((prev) => new Set([...prev, order.id]))
+          })
+          playOrderNotification()
         }
+
+        setOrders(parsed)
       } catch (error) {
         console.error('Polling error:', error)
       }
@@ -199,26 +190,11 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
         return
       }
 
-      // Alle bevestigde orders — exact zoals donor frituur nolim
-      const { data } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('tenant_slug', params.tenant)
-        .in('status', ['confirmed', 'preparing'])
-        .order('created_at', { ascending: true })
-        .limit(50)
+      const parsed = (await fetchKitchenQueueOrders(supabase, params.tenant)) as unknown as Order[]
+      setOrders(parsed)
 
-      if (data) {
-        const parsed = data.map(order => ({
-          ...order,
-          items: typeof order.items === 'string' ? JSON.parse(order.items) : order.items || []
-        }))
-        setOrders(parsed)
-        
-        // CRITICAL: Initialize known IDs with ALL current orders
-        parsed.forEach(o => knownOrderIdsRef.current.add(o.id))
-        console.log(`👨‍🍳 Initial load: ${parsed.length} keuken orders`)
-      }
+      parsed.forEach((o) => knownOrderIdsRef.current.add(o.id))
+      console.log(`👨‍🍳 Initial load: ${parsed.length} keuken orders`)
     } catch (error) {
       console.error('Error loading data:', error)
     }
@@ -234,61 +210,74 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   }
 
   async function handleAllReady() {
-    await Promise.all(orders.map(o => updateOrderStatus(params.tenant, o.id, 'ready')))
+    await Promise.all(
+      orders.map((o) => {
+        const st = (o.status || '').toLowerCase()
+        const isOpenTab = st === 'open' && (o.order_type || '').toString().toUpperCase() === 'DINE_IN'
+        return updateOrderStatus(params.tenant, o.id, isOpenTab ? 'preparing' : 'ready')
+      }),
+    )
     setOrders([])
   }
 
   async function handleReady(order: Order) {
-    await updateOrderStatus(params.tenant, order.id, 'ready')
-    
-    // Send WhatsApp notification that order is ready
-    console.log('🔔 handleReady called, customer_phone:', order.customer_phone)
-    if (order.customer_phone) {
-      try {
-        const response = await authFetch('/api/whatsapp/send-status', {
-          method: 'POST',
-          body: JSON.stringify({
-            tenantSlug: params.tenant,
-            customerPhone: order.customer_phone,
-            orderNumber: order.order_number,
-            status: 'ready'
-          })
-        })
-        const data = await response.json()
-        if (response.ok) {
-          console.log('✅ WhatsApp ready notification sent successfully:', data)
-        } else {
-          console.error('❌ WhatsApp ready notification failed:', response.status, data)
-        }
-      } catch (err) {
-        console.error('❌ Failed to send WhatsApp ready notification:', err)
-      }
+    const st = (order.status || '').toLowerCase()
+    const isOpenTab = st === 'open' && (order.order_type || '').toString().toUpperCase() === 'DINE_IN'
+
+    if (isOpenTab) {
+      await updateOrderStatus(params.tenant, order.id, 'preparing')
     } else {
-      console.log('⚠️ No customer_phone on order, skipping WhatsApp notification')
+      await updateOrderStatus(params.tenant, order.id, 'ready')
+
+      console.log('🔔 handleReady called, customer_phone:', order.customer_phone)
+      if (order.customer_phone) {
+        try {
+          const response = await authFetch('/api/whatsapp/send-status', {
+            method: 'POST',
+            body: JSON.stringify({
+              tenantSlug: params.tenant,
+              customerPhone: order.customer_phone,
+              orderNumber: order.order_number,
+              status: 'ready',
+            }),
+          })
+          const data = await response.json()
+          if (response.ok) {
+            console.log('✅ WhatsApp ready notification sent successfully:', data)
+          } else {
+            console.error('❌ WhatsApp ready notification failed:', response.status, data)
+          }
+        } catch (err) {
+          console.error('❌ Failed to send WhatsApp ready notification:', err)
+        }
+      } else {
+        console.log('⚠️ No customer_phone on order, skipping WhatsApp notification')
+      }
     }
-    
-    setNewOrderIds(prev => {
+
+    setNewOrderIds((prev) => {
       const next = new Set(prev)
       next.delete(order.id)
       return next
     })
-    // Remove from known IDs so it doesn't show up again
     knownOrderIdsRef.current.delete(order.id)
-    // Remove from orders list immediately
-    setOrders(prev => prev.filter(o => o.id !== order.id))
+    setOrders((prev) => prev.filter((o) => o.id !== order.id))
     setSelectedOrder(null)
   }
 
   async function printOrder(order: Order) {
     /** Probeer eerst de lokale Vysion Print Agent (ESC/POS bonprinter).
      *  Lukt niet? Val terug op browser-printvenster (HTML). */
-    const items = (order.items || []).map((item: any) => ({
-      quantity: Number(item.quantity) || 1,
-      name: String(item.product_name || item.name || 'Item'),
-      price: 0,
-      choices: (item.options || []).map((o: any) => ({ name: String(o.name || ''), price: 0 })),
-      notes: item.notes ? String(item.notes) : undefined,
-    }))
+    const items = (order.items || []).map((item: unknown) => {
+      const optLines = orderItemDisplayOptionLines(item)
+      return {
+        quantity: Number((item as { quantity?: unknown }).quantity) || 1,
+        name: orderItemDisplayName(item) || 'Item',
+        price: orderItemLineTotalEur(item),
+        choices: optLines.map((name) => ({ name, price: 0 })),
+        notes: (item as { notes?: unknown }).notes ? String((item as { notes?: unknown }).notes) : undefined,
+      }
+    })
     const requestedDateTime = order.scheduled_date
       ? `${new Date(order.scheduled_date).toLocaleDateString('nl-BE')}${order.scheduled_time ? ' ' + order.scheduled_time : ''}`
       : ''
@@ -332,16 +321,21 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
 
     const nlDineInSeat = dineInSeatLineNl(order.order_type, order.table_number, order.floor_plan_zone)
 
-    const itemsHtml = order.items?.map((item: any) => `
+    const itemsHtml = order.items?.map((item: unknown) => {
+      const label = orderItemDisplayName(item)
+      const optLines = orderItemDisplayOptionLines(item)
+      const qty = Number((item as { quantity?: unknown }).quantity) || 1
+      return `
       <tr>
-        <td style="font-size: 18px; font-weight: bold; padding: 4px 0;">${item.quantity}x</td>
-        <td style="font-size: 18px; padding: 4px 0;">${item.product_name || item.name}</td>
+        <td style="font-size: 18px; font-weight: bold; padding: 4px 0;">${qty}x</td>
+        <td style="font-size: 18px; padding: 4px 0;">${label}</td>
       </tr>
-      ${item.options?.map((opt: any) => `
-        <tr><td></td><td style="font-size: 14px; color: #666; padding-left: 10px;">+ ${opt.name}</td></tr>
-      `).join('') || ''}
-      ${item.notes ? `<tr><td></td><td style="font-size: 14px; color: #666; font-style: italic; padding-left: 10px;">📝 ${item.notes}</td></tr>` : ''}
-    `).join('') || ''
+      ${optLines.map((line) => `
+        <tr><td></td><td style="font-size: 14px; color: #666; padding-left: 10px;">+ ${line}</td></tr>
+      `).join('')}
+      ${(item as { notes?: unknown }).notes ? `<tr><td></td><td style="font-size: 14px; color: #666; font-style: italic; padding-left: 10px;">📝 ${String((item as { notes?: unknown }).notes)}</td></tr>` : ''}
+    `
+    }).join('') || ''
 
     printWindow.document.write(`
       <!DOCTYPE html>
@@ -424,6 +418,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   /** Statusregel in kaartkop (zelfde vertalingen als shop display, multi-tenant) */
   const kitchenHeaderStatus = (status: string) => {
     const s = status.toLowerCase()
+    if (s === 'open') return tx('statusOpenCart')
     if (s === 'preparing') return t('shopDisplay.statusPreparing')
     return t('shopDisplay.statusKitchen')
   }
@@ -643,24 +638,32 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                   </div>
 
                   <div className="space-y-2 max-h-[min(20rem,48vh)] overflow-y-auto overscroll-y-contain rounded-lg border border-gray-200 bg-white px-2 py-1 [scrollbar-gutter:stable]">
-                    {order.items?.map((item: any, i: number) => (
+                    {order.items?.map((item: unknown, i: number) => {
+                      const label = orderItemDisplayName(item)
+                      const optLines = orderItemDisplayOptionLines(item)
+                      const qty = Number((item as { quantity?: unknown }).quantity) || 1
+                      const noteRaw = (item as { notes?: unknown }).notes
+                      const noteStr =
+                        noteRaw != null && String(noteRaw).trim() !== '' ? String(noteRaw) : ''
+                      return (
                       <div key={i} className="flex items-start gap-3 pb-2 border-b border-gray-100 last:border-0">
                         <span className="w-9 h-9 bg-[#0f2744] text-white rounded-md flex items-center justify-center font-bold text-sm shrink-0">
-                          {item.quantity}
+                          {qty}
                         </span>
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-gray-900 text-sm leading-snug">{item.product_name || item.name}</p>
-                          {item.options?.map((opt: any, j: number) => (
+                          <p className="font-semibold text-gray-900 text-sm leading-snug">{label}</p>
+                          {optLines.map((line, j) => (
                             <p key={j} className="text-sm text-gray-800 font-medium mt-0.5 pl-2 border-l-2 border-gray-200">
-                              + {opt.name}
+                              + {line}
                             </p>
                           ))}
-                          {item.notes && (
-                            <p className="text-sm text-gray-700 mt-0.5 font-medium">Opmerking: {item.notes}</p>
-                          )}
+                          {noteStr ? (
+                            <p className="text-sm text-gray-700 mt-0.5 font-medium">Opmerking: {noteStr}</p>
+                          ) : null}
                         </div>
                       </div>
-                    ))}
+                      )
+                    })}
                   </div>
 
                   {order.customer_notes && (
@@ -786,28 +789,36 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                 <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-4 min-h-0">
                   <h3 className="font-semibold text-sm uppercase tracking-wide text-gray-600 mb-4">{tx('toPrepare')}</h3>
                   <div className="max-h-[min(62vh,32rem)] overflow-y-auto overscroll-y-contain space-y-4 pr-1 rounded-lg border border-gray-200 bg-white p-4 [scrollbar-gutter:stable]">
-                    {selectedOrder.items?.map((item: any, i: number) => (
+                    {selectedOrder.items?.map((item: unknown, i: number) => {
+                      const label = orderItemDisplayName(item)
+                      const optLines = orderItemDisplayOptionLines(item)
+                      const qty = Number((item as { quantity?: unknown }).quantity) || 1
+                      const noteRaw = (item as { notes?: unknown }).notes
+                      const noteStr =
+                        noteRaw != null && String(noteRaw).trim() !== '' ? String(noteRaw) : ''
+                      return (
                       <div key={i} className="flex items-start gap-4 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
                         <span className="w-12 h-12 sm:w-14 sm:h-14 bg-[#0f2744] text-white rounded-lg flex items-center justify-center font-bold text-xl sm:text-2xl shrink-0">
-                          {item.quantity}
+                          {qty}
                         </span>
                         <div className="flex-1 min-w-0">
                           <p className="font-semibold text-xl sm:text-2xl leading-tight text-gray-900">
-                            {item.product_name || item.name}
+                            {label}
                           </p>
-                          {item.options?.map((opt: any, j: number) => (
+                          {optLines.map((line, j) => (
                             <p key={j} className="text-base text-gray-800 font-medium mt-1 pl-3 border-l-2 border-gray-200">
-                              + {opt.name}
+                              + {line}
                             </p>
                           ))}
-                          {item.notes && (
+                          {noteStr ? (
                             <p className="text-base text-gray-800 mt-2 p-2 bg-gray-50 border border-gray-200 rounded-lg font-medium">
-                              Opmerking: {item.notes}
+                              Opmerking: {noteStr}
                             </p>
-                          )}
+                          ) : null}
                         </div>
                       </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 </div>
 

@@ -2732,6 +2732,7 @@
     "notes": "メモ",
     "printReceipt": "伝票印刷",
     "markReady": "準備完了",
+    "statusOpenCart": "未確定のカート",
     "justNow": "たった今",
     "min": "分"
   },

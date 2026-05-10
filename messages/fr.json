@@ -2232,6 +2232,7 @@
     "notes": "NOTES",
     "printReceipt": "IMPRIMER BON",
     "markReady": "PRÊT",
+    "statusOpenCart": "Panier ouvert",
     "justNow": "À l'instant",
     "min": "min"
   },
