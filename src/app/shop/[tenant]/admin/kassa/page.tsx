@@ -260,6 +260,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const newReservAlertRef = useRef<{ id: string } | null>(null)
   const previousReservIdsRef = useRef<string[]>([])
+  /** Backlog bij openen kassa: geen geluid tot er een echte nieuwe reservering bijkomt (ID of hogere pending-teller). */
+  const previousPendingReservCountRef = useRef<number | null>(null)
+  const reservationAlarmLatchedRef = useRef(false)
 
   // Gebruik playOrderNotification uit sounds.ts — zelfde geactiveerde AudioContext als alle andere knoppen
   const stopAlarm = useRef(() => {
@@ -371,6 +374,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         const pendingAndWl = pendingRes.count ?? 0
         setPendingReservCount(pendingAndWl)
 
+        const prevPendingCnt = previousPendingReservCountRef.current
+        if (prevPendingCnt !== null && pendingAndWl > prevPendingCnt) {
+          reservationAlarmLatchedRef.current = true
+        }
+        previousPendingReservCountRef.current = pendingAndWl
+        if (pendingAndWl === 0) {
+          reservationAlarmLatchedRef.current = false
+        }
+
         let newReservOnes: { id: string }[] = []
 
         // ── Orders (zelfde als voorheen, alarm stop/start via gezamenlijke stap onderaan) ──
@@ -415,6 +427,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         if (!isFirstReservCheck) {
           newReservOnes = reservList.filter((r: { id: string }) => !prevReservIds.includes(r.id))
           if (newReservOnes.length > 0) {
+            reservationAlarmLatchedRef.current = true
             startAlarm()
             try {
               if ('Notification' in window && Notification.permission === 'granted') {
@@ -434,13 +447,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           }
         } else {
           isFirstReservCheck = false
-          if (pendingAndWl > 0) startAlarm()
         }
         previousReservIdsRef.current = currentReservIds
 
-        // ── Alarm aan/uit: nieuwe bestelling OF wachtende reservering (zelfde gedrag als alleen orders) ──
+        // ── Alarm aan/uit: nieuwe bestelling OF reservering-alarm na echte nieuwe binnenkomst (niet bij openen met oude backlog) ──
         const needOrderAlarm = list.length > 0
-        const needReservAlarm = pendingAndWl > 0 || newReservOnes.length > 0
+        const needReservAlarm = reservationAlarmLatchedRef.current && pendingAndWl > 0
         if (needOrderAlarm || needReservAlarm) {
           if (!alarmIntervalRef.current) startAlarm()
         } else {
@@ -481,6 +493,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return () => {
       document.removeEventListener('visibilitychange', onVisibility)
       if (intervalId !== null) clearInterval(intervalId)
+      previousPendingReservCountRef.current = null
+      reservationAlarmLatchedRef.current = false
     }
   }, [tenant, startAlarm, stopAlarm, demoViewOnly, t])
 
