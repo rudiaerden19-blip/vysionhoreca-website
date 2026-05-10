@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import type { Viewport } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Orbitron } from 'next/font/google'
 
 const klantschermDigital = Orbitron({
@@ -9,13 +9,34 @@ const klantschermDigital = Orbitron({
   display: 'swap',
 })
 
+/** Minder browser-chrome-hints (echte adresbalk verdwijnt vooral bij volledig scherm). */
+export const metadata: Metadata = {
+  title: 'Klantscherm',
+  robots: { index: false, follow: false },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Klantscherm',
+  },
+  formatDetection: {
+    telephone: false,
+    email: false,
+    address: false,
+    date: false,
+  },
+}
+
 /** Klantscherm vult het popup-/monitorvlak; zwarte systeem-/browseraccenten. */
 export async function generateViewport(): Promise<Viewport> {
   return {
     width: 'device-width',
     initialScale: 1,
     maximumScale: 5,
-    themeColor: '#000000',
+    themeColor: [
+      { media: '(prefers-color-scheme: light)', color: '#000000' },
+      { media: '(prefers-color-scheme: dark)', color: '#000000' },
+    ],
+    viewportFit: 'cover',
   }
 }
 

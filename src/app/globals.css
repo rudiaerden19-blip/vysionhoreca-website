@@ -20,7 +20,8 @@ body.vysion-floor-plan-grabbing {
   font-weight: normal;
 }
 
-/* Klantscherm: geen witte rand door body/html-defaults; vol zwart canvas */
+/* Klantscherm: geen witte rand door body/html-defaults; vol zwart canvas.
+ * color-scheme: hint aan browser voor donkere UI-randen waar ondersteund (geen controle over adresbalktekst zelf). */
 html.vysion-klantscherm-root,
 html.vysion-klantscherm-root body {
   margin: 0 !important;
@@ -29,6 +30,7 @@ html.vysion-klantscherm-root body {
   max-width: none !important;
   min-height: 100dvh !important;
   background: #000000 !important;
+  color-scheme: dark !important;
   overflow-x: hidden !important;
 }
 
