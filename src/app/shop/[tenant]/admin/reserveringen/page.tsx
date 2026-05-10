@@ -4,13 +4,9 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import KassaReservationsView from '@/components/KassaReservationsView'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
-
-interface KassaTable {
-  id: string
-  number: string
-  seats: number
-  status: string
-}
+import { supabase } from '@/lib/supabase'
+import type { KassaTable } from '@/components/kassa-reservations/kassa-reservations-model'
+import { sanitizeFloorPlanTables, type FloorPlanTable } from '@/lib/kassa-floor-plan-tables'
 
 export default function ReserveringenPage({ params }: { params: { tenant: string } }) {
   const router = useRouter()
@@ -26,6 +22,20 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
         /* leeg */
       }
     }
+
+    void supabase
+      .from('floor_plan_tables')
+      .select('data')
+      .eq('tenant_slug', params.tenant)
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (error) return
+        if (data?.data != null && Array.isArray(data.data)) {
+          const fixed = sanitizeFloorPlanTables(data.data as FloorPlanTable[])
+          setKassaTables(fixed as KassaTable[])
+          localStorage.setItem(`vysion_tables_${params.tenant}`, JSON.stringify(fixed))
+        }
+      })
   }, [params.tenant])
 
   if (modulesLoading) {

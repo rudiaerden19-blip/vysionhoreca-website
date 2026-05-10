@@ -91,6 +91,7 @@ import {
   KassaStaffSalesSummaryModal,
 } from '@/components/kassa/KassaStaffClockUi'
 import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
+import { sanitizeFloorPlanTables, type FloorPlanTable } from '@/lib/kassa-floor-plan-tables'
 import {
   kassaCustomerDisplayChannelName,
   type KassaCustomerDisplayMessage,
@@ -543,7 +544,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [pendingReservCount, setPendingReservCount] = useState(0)
   const [showFloorPlan, setShowFloorPlan] = useState(false)
   const [showTablePicker, setShowTablePicker] = useState(false)
-  const [kassaTables, setKassaTables] = useState<{ id: string; number: string; seats: number; status: string }[]>([])
+  const [kassaTables, setKassaTables] = useState<FloorPlanTable[]>([])
   const [kassaStools, setKassaStools] = useState<{ stoolNumber: string; segmentId: string }[]>([])
   // Openstaande bestellingen per tafel: { "1": CartItem[], "2": CartItem[], ... }
   const [tableOrders, setTableOrders] = useState<Record<string, CartItem[]>>({})
@@ -587,6 +588,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     if (raw) {
       try { setKassaTables(JSON.parse(raw)) } catch { /* empty */ }
     }
+
+    void supabase
+      .from('floor_plan_tables')
+      .select('data')
+      .eq('tenant_slug', tenant)
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (error) return
+        if (data?.data != null && Array.isArray(data.data)) {
+          const fixed = sanitizeFloorPlanTables(data.data as FloorPlanTable[])
+          setKassaTables(fixed)
+          localStorage.setItem(`vysion_tables_${tenant}`, JSON.stringify(fixed))
+        }
+      })
 
     // Barkrukken laden uit localStorage
     const decorRaw = localStorage.getItem(`vysion_decor_${tenant}`)
@@ -648,10 +663,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       .channel(`kassa_fpt_${tenant}`)
       .on('postgres_changes',
         { event: '*', schema: 'public', table: 'floor_plan_tables', filter: `tenant_slug=eq.${tenant}` },
-        ({ new: row }: any) => {
-          if (row?.data) {
-            setKassaTables(row.data)
-            localStorage.setItem(`vysion_tables_${tenant}`, JSON.stringify(row.data))
+        ({ new: row }: { new?: { data?: unknown } }) => {
+          if (row?.data != null && Array.isArray(row.data)) {
+            const fixed = sanitizeFloorPlanTables(row.data as FloorPlanTable[])
+            setKassaTables(fixed)
+            localStorage.setItem(`vysion_tables_${tenant}`, JSON.stringify(fixed))
           }
         }
       )

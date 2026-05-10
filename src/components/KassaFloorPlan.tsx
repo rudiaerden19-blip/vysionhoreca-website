@@ -2,21 +2,17 @@
 
 import { useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
+import {
+  clampFloorPlanPct,
+  sanitizeFloorPlanTables,
+  type FloorPlanTable,
+} from '@/lib/kassa-floor-plan-tables'
 import { useLanguage } from '@/i18n'
 
-export type TableShape = 'ROUND' | 'SQUARE' | 'RECTANGLE'
-export type TableStatus = 'FREE' | 'OCCUPIED' | 'UNPAID'
+export type TableShape = FloorPlanTable['shape']
+export type TableStatus = FloorPlanTable['status']
 
-export interface KassaTable {
-  id: string
-  number: string
-  seats: number
-  shape: TableShape
-  x: number
-  y: number
-  rotation: number
-  status: TableStatus
-}
+export type KassaTable = FloorPlanTable
 
 const STATUS_COLORS: Record<TableStatus, string> = {
   FREE: '#22c55e',
@@ -38,16 +34,11 @@ interface Props {
 
 function makeId() { return Math.random().toString(36).slice(2, 10) }
 
-/** Posities zijn % van het canvas (ongeveer 1–99). Corrupte waarden buiten 0–100 worden geneutraliseerd. */
-function clampPct(v: unknown, fallback = 50): number {
-  const n = typeof v === 'number' ? v : parseFloat(String(v))
-  if (!Number.isFinite(n)) return fallback
-  if (n >= 0 && n <= 100) return Math.max(1, Math.min(99, n))
-  return fallback
-}
+/** Zelfde als lib — korte naam in dit bestand */
+const clampPct = clampFloorPlanPct
 
 function sanitizeTables(list: KassaTable[]): KassaTable[] {
-  return list.map(t => ({ ...t, x: clampPct(t.x), y: clampPct(t.y) }))
+  return sanitizeFloorPlanTables(list)
 }
 
 function sanitizeDecors(list: DecorItem[]): DecorItem[] {
@@ -480,61 +471,78 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
     return { items: obj.items || [], statuses: obj.stool_statuses || {} }
   }
 
-  // ── Initieel laden vanuit Supabase ────────────────────────────────────────
+  // ── Initieel laden: localStorage voor snelle eerste paint, daarna altijd Supabase (multi‑pc bron van waarheid)
   useEffect(() => {
     const load = async () => {
-      // Tafels: localStorage eerst (instant), Supabase alleen als localStorage leeg is
-      const localTables = (() => { try { const r = localStorage.getItem(storageKey); return r ? JSON.parse(r) : null } catch { return null } })()
-      if (localTables) {
-        const fixed = sanitizeTables(localTables as KassaTable[])
+      const localTables = (() => {
+        try {
+          const r = localStorage.getItem(storageKey)
+          return r ? JSON.parse(r) : null
+        } catch {
+          return null
+        }
+      })()
+      if (Array.isArray(localTables)) {
+        setTables(sanitizeTables(localTables as KassaTable[]))
+      }
+
+      const { data: tData, error: tErr } = await supabase
+        .from('floor_plan_tables')
+        .select('data')
+        .eq('tenant_slug', tenant)
+        .maybeSingle()
+
+      if (!tErr && tData?.data != null && Array.isArray(tData.data)) {
+        const raw = tData.data as KassaTable[]
+        const fixed = sanitizeTables(raw)
         setTables(fixed)
-        if (JSON.stringify(fixed) !== JSON.stringify(localTables)) {
-          localStorage.setItem(storageKey, JSON.stringify(fixed))
+        localStorage.setItem(storageKey, JSON.stringify(fixed))
+        if (JSON.stringify(fixed) !== JSON.stringify(raw)) {
           void supabase.from('floor_plan_tables').upsert({ tenant_slug: tenant, data: fixed }, { onConflict: 'tenant_slug' })
         }
-      } else {
-        const { data: tData } = await supabase
-          .from('floor_plan_tables')
-          .select('data')
-          .eq('tenant_slug', tenant)
-          .single()
-        if (tData?.data) {
-          const raw = tData.data as KassaTable[]
-          const fixed = sanitizeTables(raw)
-          setTables(fixed)
-          localStorage.setItem(storageKey, JSON.stringify(fixed))
-          if (JSON.stringify(fixed) !== JSON.stringify(raw)) {
-            void supabase.from('floor_plan_tables').upsert({ tenant_slug: tenant, data: fixed }, { onConflict: 'tenant_slug' })
-          }
-        }
       }
-      // Decor: zelfde logica
-      const localDecor = (() => { try { const r = localStorage.getItem(decorKey); return r ? JSON.parse(r) : null } catch { return null } })()
-      const localStoolStatus = (() => { try { const r = localStorage.getItem(stoolStatusKey); return r ? JSON.parse(r) : null } catch { return null } })()
+
+      const localDecor = (() => {
+        try {
+          const r = localStorage.getItem(decorKey)
+          return r ? JSON.parse(r) : null
+        } catch {
+          return null
+        }
+      })()
+      const localStoolStatus = (() => {
+        try {
+          const r = localStorage.getItem(stoolStatusKey)
+          return r ? JSON.parse(r) : null
+        } catch {
+          return null
+        }
+      })()
       if (localDecor) {
         const fixedD = sanitizeDecors(localDecor as DecorItem[])
         setDecors(fixedD)
         if (JSON.stringify(fixedD) !== JSON.stringify(localDecor)) {
           localStorage.setItem(decorKey, JSON.stringify(fixedD))
         }
-        if (localStoolStatus) setStoolStatuses(localStoolStatus)
-      } else {
-        const { data: dData } = await supabase
-          .from('floor_plan_decor')
-          .select('data')
-          .eq('tenant_slug', tenant)
-          .single()
-        if (dData?.data) {
-          const { items, statuses } = parseDecorData(dData.data)
-          const fixedItems = sanitizeDecors(items)
-          setDecors(fixedItems)
-          setStoolStatuses(statuses)
-          localStorage.setItem(decorKey, JSON.stringify(fixedItems))
-          localStorage.setItem(stoolStatusKey, JSON.stringify(statuses))
-        }
+        if (localStoolStatus && typeof localStoolStatus === 'object') setStoolStatuses(localStoolStatus)
+      }
+
+      const { data: dData, error: dErr } = await supabase
+        .from('floor_plan_decor')
+        .select('data')
+        .eq('tenant_slug', tenant)
+        .maybeSingle()
+
+      if (!dErr && dData?.data != null) {
+        const { items, statuses } = parseDecorData(dData.data)
+        const fixedItems = sanitizeDecors(items)
+        setDecors(fixedItems)
+        setStoolStatuses(statuses)
+        localStorage.setItem(decorKey, JSON.stringify(fixedItems))
+        localStorage.setItem(stoolStatusKey, JSON.stringify(statuses))
       }
     }
-    load()
+    void load()
   }, [tenant, storageKey, decorKey, stoolStatusKey])
 
   // ── Realtime subscriptions: sync tussen apparaten ────────────────────────
@@ -546,7 +554,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
         { event: '*', schema: 'public', table: 'floor_plan_tables', filter: `tenant_slug=eq.${tenant}` },
         ({ new: row }: any) => {
           if (ignoreFloorRealtimeRef.current) return
-          if (row?.data) {
+          if (row?.data != null && Array.isArray(row.data)) {
             const fixed = sanitizeTables(row.data as KassaTable[])
             setTables(fixed)
             localStorage.setItem(storageKey, JSON.stringify(fixed))
