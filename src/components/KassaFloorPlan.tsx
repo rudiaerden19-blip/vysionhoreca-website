@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
+import { adminDb } from '@/lib/admin-db-client'
 import {
   clampFloorPlanPct,
+  parseFloorPlanTablesJson,
   sanitizeFloorPlanTables,
   type FloorPlanTable,
 } from '@/lib/kassa-floor-plan-tables'
@@ -30,6 +32,8 @@ interface Props {
   onSelectTable: (tableNumber: string) => void
   onClose: () => void
   tableOrders?: Record<string, SimpleCartItem[]>
+  /** Zelfde lijst als kassa-tafelkiezer — direct tonen tot DB-fetch klaar is (voorkomt lege plattegrond). */
+  seedTables?: KassaTable[]
 }
 
 function makeId() { return Math.random().toString(36).slice(2, 10) }
@@ -343,7 +347,13 @@ function TableSVG({ table, isSelected, onClick, effectiveStatus }: {
   )
 }
 
-export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOrders = {} }: Props) {
+export default function KassaFloorPlan({
+  tenant,
+  onSelectTable,
+  onClose,
+  tableOrders = {},
+  seedTables,
+}: Props) {
   const { t } = useLanguage()
   const statusLabels = useMemo(
     () => ({
@@ -380,7 +390,6 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
   const [panY, setPanY] = useState(() => {
     try { const s = localStorage.getItem(`vysion_floor_pan_${tenant}`); return s ? JSON.parse(s).y : 0 } catch { return 0 }
   })
-  const autoCenteredRef = useRef(false) // Alleen eerste keer auto-centeren
   const floorRef = useRef<HTMLDivElement>(null)
   /** iPad/Safari: altijd releasePointerCapture na drag, anders blijven tikken “vast”. */
   const pointerCaptureRef = useRef<{ pointerId: number; element: HTMLElement } | null>(null)
@@ -404,6 +413,8 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
   const canvasPanLiveRef = useRef<{ x: number; y: number } | null>(null)
   /** Pauzeer localStorage-sync van tables tijdens eender welke vloer-interactie (zoals voorheen isDragging). */
   const floorPersistPausedRef = useRef(false)
+  /** Refit pan wanneer tafel-set verandert (andere pc / realtime). */
+  const lastTablesLayoutKeyRef = useRef('')
 
   const setBodyGrabbing = (on: boolean) => {
     if (typeof document === 'undefined') return
@@ -471,9 +482,44 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
     return { items: obj.items || [], statuses: obj.stool_statuses || {} }
   }
 
-  // ── Initieel laden: localStorage voor snelle eerste paint, daarna altijd Supabase (multi‑pc bron van waarheid)
+  /** Wijzigingen aan welke tafels er zijn (niet alleen slepen) → pan opnieuw centreren. */
+  const tablesLayoutKey = useMemo(
+    () =>
+      `${tables.length}|${tables.map((t) => t.id).sort().join(',')}||${decors.length}|${decors.map((d) => d.id).sort().join(',')}`,
+    [tables, decors]
+  )
+
+  const seedSignature = useMemo(() => JSON.stringify(seedTables ?? []), [seedTables])
+
+  // Zelfde bron als kassa-tafelkiezer — voorkomt lege plattegrond terwijl de lijst wel knoppen heeft
   useEffect(() => {
+    if (!seedTables?.length) return
+    setTables((prev) => {
+      const incoming = sanitizeTables(seedTables)
+      if (prev.length === 0) return incoming
+      const prevIds = new Set(prev.map((t) => t.id))
+      if (incoming.some((t) => !prevIds.has(t.id)) || incoming.length !== prev.length) return incoming
+      return prev
+    })
+  }, [seedSignature, seedTables])
+
+  // ── Laden: cache paint → admin DB-read (betrouwbaar) → fallback anon Supabase ──
+  useEffect(() => {
+    const mergeRemoteTables = (raw: unknown) => {
+      const parsed = parseFloorPlanTablesJson(raw)
+      if (parsed === null) return false
+      const fixed = sanitizeTables(parsed)
+      setTables(fixed)
+      localStorage.setItem(storageKey, JSON.stringify(fixed))
+      if (JSON.stringify(fixed) !== JSON.stringify(parsed)) {
+        void supabase.from('floor_plan_tables').upsert({ tenant_slug: tenant, data: fixed }, { onConflict: 'tenant_slug' })
+      }
+      return true
+    }
+
     const load = async () => {
+      lastTablesLayoutKeyRef.current = ''
+
       const localTables = (() => {
         try {
           const r = localStorage.getItem(storageKey)
@@ -486,19 +532,28 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
         setTables(sanitizeTables(localTables as KassaTable[]))
       }
 
-      const { data: tData, error: tErr } = await supabase
-        .from('floor_plan_tables')
-        .select('data')
-        .eq('tenant_slug', tenant)
-        .maybeSingle()
+      const adminRes = await adminDb.select<{ data?: unknown } | null>('floor_plan_tables', {
+        tenantSlug: tenant,
+        select: 'data',
+        single: 'maybe',
+      })
 
-      if (!tErr && tData?.data != null && Array.isArray(tData.data)) {
-        const raw = tData.data as KassaTable[]
-        const fixed = sanitizeTables(raw)
-        setTables(fixed)
-        localStorage.setItem(storageKey, JSON.stringify(fixed))
-        if (JSON.stringify(fixed) !== JSON.stringify(raw)) {
-          void supabase.from('floor_plan_tables').upsert({ tenant_slug: tenant, data: fixed }, { onConflict: 'tenant_slug' })
+      let merged = false
+      if (adminRes.ok) {
+        const row = adminRes.data as { data?: unknown } | null | undefined
+        if (row == null) merged = mergeRemoteTables([])
+        else merged = mergeRemoteTables(row.data)
+      }
+
+      if (!merged) {
+        const { data: tData, error: tErr } = await supabase
+          .from('floor_plan_tables')
+          .select('data')
+          .eq('tenant_slug', tenant)
+          .maybeSingle()
+        if (!tErr) {
+          if (tData == null) mergeRemoteTables([])
+          else mergeRemoteTables(tData.data)
         }
       }
 
@@ -547,28 +602,35 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
 
   // ── Realtime subscriptions: sync tussen apparaten ────────────────────────
   useEffect(() => {
-    // Tafels: andere tablet verplaatst/voegt tafel toe → update hier
     const tableChannel = supabase
       .channel(`fpt_${tenant}`)
-      .on('postgres_changes',
+      .on(
+        'postgres_changes',
         { event: '*', schema: 'public', table: 'floor_plan_tables', filter: `tenant_slug=eq.${tenant}` },
-        ({ new: row }: any) => {
+        (payload: { eventType?: string; new?: { data?: unknown } }) => {
           if (ignoreFloorRealtimeRef.current) return
-          if (row?.data != null && Array.isArray(row.data)) {
-            const fixed = sanitizeTables(row.data as KassaTable[])
-            setTables(fixed)
-            localStorage.setItem(storageKey, JSON.stringify(fixed))
+          if (payload.eventType === 'DELETE') {
+            setTables([])
+            localStorage.setItem(storageKey, JSON.stringify([]))
+            return
           }
+          const row = payload.new
+          if (!row) return
+          const parsed = parseFloorPlanTablesJson(row.data)
+          if (parsed === null) return
+          const fixed = sanitizeTables(parsed)
+          setTables(fixed)
+          localStorage.setItem(storageKey, JSON.stringify(fixed))
         }
       )
       .subscribe()
 
-    // Decor + krukstatussen: andere tablet wijzigt barkruk/status → update hier
     const decorChannel = supabase
       .channel(`fpd_${tenant}`)
-      .on('postgres_changes',
+      .on(
+        'postgres_changes',
         { event: '*', schema: 'public', table: 'floor_plan_decor', filter: `tenant_slug=eq.${tenant}` },
-        ({ new: row }: any) => {
+        ({ new: row }: { new?: { data?: unknown } }) => {
           if (ignoreFloorRealtimeRef.current) return
           if (row?.data) {
             const { items, statuses } = parseDecorData(row.data)
@@ -601,29 +663,32 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
     }
   }, [tables, storageKey])
 
-  // Auto-pan: alleen bij allereerste load als er geen opgeslagen pan is
-  useEffect(() => {
-    if (tables.length === 0 || !floorRef.current || autoCenteredRef.current) return
-    // Als er al een opgeslagen pan is, niet auto-centeren
-    try {
-      const saved = localStorage.getItem(panKey)
-      if (saved) { autoCenteredRef.current = true; return }
-    } catch { /* ignore */ }
-    autoCenteredRef.current = true
+  // Pan opnieuw centreren als het setje tafels/decor verandert (andere pc / eerste load) — niet bij puur slepen (zelfde id-set)
+  useLayoutEffect(() => {
+    if (tables.length === 0 || !floorRef.current) return
+    if (tablesLayoutKey === lastTablesLayoutKeyRef.current) return
+    lastTablesLayoutKeyRef.current = tablesLayoutKey
+    const floor = floorRef.current
     const all = [...tables, ...decors]
-    const xs = all.map(i => clampPct(i.x))
-    const ys = all.map(i => clampPct(i.y))
+    const xs = all.map((i) => clampPct(i.x))
+    const ys = all.map((i) => clampPct(i.y))
     const centerXpct = (Math.min(...xs) + Math.max(...xs)) / 2
     const centerYpct = (Math.min(...ys) + Math.max(...ys)) / 2
-    const vw = floorRef.current.clientWidth
-    const vh = floorRef.current.clientHeight
+    const vw = floor.clientWidth
+    const vh = floor.clientHeight
     const newPanX = vw / 2 - (centerXpct / 100) * vw
     const newPanY = vh / 2 - (centerYpct / 100) * vh
     setPanX(newPanX)
     setPanY(newPanY)
-    try { localStorage.setItem(panKey, JSON.stringify({ x: newPanX, y: newPanY })) } catch { /* ignore */ }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tables.length])
+    try {
+      localStorage.setItem(panKey, JSON.stringify({ x: newPanX, y: newPanY }))
+    } catch {
+      /* ignore */
+    }
+    floor.style.backgroundPosition = `${newPanX}px ${newPanY}px`
+    const inner = innerCanvasRef.current
+    if (inner) inner.style.transform = `translate(${newPanX}px, ${newPanY}px)`
+  }, [tablesLayoutKey, tables, decors, panKey])
 
   const save = (updated: KassaTable[]) => {
     setTables(updated)

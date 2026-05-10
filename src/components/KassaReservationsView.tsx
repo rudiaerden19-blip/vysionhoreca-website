@@ -42,6 +42,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
+import { parseFloorPlanTablesJson, sanitizeFloorPlanTables } from '@/lib/kassa-floor-plan-tables'
 import { getAuthHeaders, authFetch } from '@/lib/auth-headers'
 import { useLanguage } from '@/i18n'
 
@@ -662,25 +663,42 @@ export default function KassaReservationsView({
     return () => clearInterval(tick)
   }, [])
 
-  // Load floor plan tables from Supabase
+  // Load floor plan tables — admin DB-read eerst (zelfde bron als kassa-plattegrond)
   useEffect(() => {
     const loadFloorTables = async () => {
-      const { data, error } = await supabase
-        .from('floor_plan_tables')
-        .select('data')
-        .eq('tenant_slug', tenant)
-        .maybeSingle()
-      if (error) {
-        console.error('[floor_plan_tables] load error:', error.message)
-        setFloorPlanTablesDB([])
-        return
+      const apply = (raw: unknown): boolean => {
+        const parsed = parseFloorPlanTablesJson(raw)
+        if (parsed === null) return false
+        setFloorPlanTablesDB(sanitizeFloorPlanTables(parsed) as FloorPlanTable[])
+        return true
       }
-      if (data?.data != null) {
-        const raw = data.data as unknown
-        const arr = Array.isArray(raw) ? raw : []
-        setFloorPlanTablesDB(arr as FloorPlanTable[])
-      } else {
-        setFloorPlanTablesDB([])
+
+      const adminRes = await adminDb.select<{ data?: unknown } | null>('floor_plan_tables', {
+        tenantSlug: tenant,
+        select: 'data',
+        single: 'maybe',
+      })
+
+      let ok = false
+      if (adminRes.ok) {
+        const row = adminRes.data as { data?: unknown } | null | undefined
+        if (row == null) ok = apply([])
+        else ok = apply(row.data)
+      }
+
+      if (!ok) {
+        const { data, error } = await supabase
+          .from('floor_plan_tables')
+          .select('data')
+          .eq('tenant_slug', tenant)
+          .maybeSingle()
+        if (error) {
+          console.error('[floor_plan_tables] load error:', error.message)
+          setFloorPlanTablesDB([])
+          return
+        }
+        if (data == null) apply([])
+        else apply(data.data)
       }
     }
     void loadFloorTables()

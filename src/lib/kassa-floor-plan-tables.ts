@@ -26,3 +26,21 @@ export function clampFloorPlanPct(v: unknown, fallback = 50): number {
 export function sanitizeFloorPlanTables(list: FloorPlanTable[]): FloorPlanTable[] {
   return list.map((t) => ({ ...t, x: clampFloorPlanPct(t.x), y: clampFloorPlanPct(t.y) }))
 }
+
+/**
+ * Parse `floor_plan_tables.data` (JSONB-array of per ongeluk dubbel geëncodeerde JSON-string).
+ * `null` = niet herkenbaar als lijst (overschrijf lokale state niet).
+ */
+export function parseFloorPlanTablesJson(raw: unknown): FloorPlanTable[] | null {
+  if (raw == null) return []
+  if (Array.isArray(raw)) return raw as FloorPlanTable[]
+  if (typeof raw === 'string') {
+    try {
+      const p = JSON.parse(raw)
+      return Array.isArray(p) ? (p as FloorPlanTable[]) : null
+    } catch {
+      return null
+    }
+  }
+  return null
+}

@@ -91,7 +91,7 @@ import {
   KassaStaffSalesSummaryModal,
 } from '@/components/kassa/KassaStaffClockUi'
 import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
-import { sanitizeFloorPlanTables, type FloorPlanTable } from '@/lib/kassa-floor-plan-tables'
+import { parseFloorPlanTablesJson, sanitizeFloorPlanTables, type FloorPlanTable } from '@/lib/kassa-floor-plan-tables'
 import {
   kassaCustomerDisplayChannelName,
   type KassaCustomerDisplayMessage,
@@ -616,24 +616,44 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   // Laad tafels + barkrukken + openstaande bestellingen (localStorage + Supabase sync)
 
   useEffect(() => {
+    const applyKassaTablesPayload = (raw: unknown) => {
+      const parsed = parseFloorPlanTablesJson(raw)
+      if (parsed === null) return false
+      const fixed = sanitizeFloorPlanTables(parsed)
+      setKassaTables(fixed)
+      localStorage.setItem(`vysion_tables_${tenant}`, JSON.stringify(fixed))
+      return true
+    }
+
     const raw = localStorage.getItem(`vysion_tables_${tenant}`)
     if (raw) {
       try { setKassaTables(JSON.parse(raw)) } catch { /* empty */ }
     }
 
-    void supabase
-      .from('floor_plan_tables')
-      .select('data')
-      .eq('tenant_slug', tenant)
-      .maybeSingle()
-      .then(({ data, error }) => {
-        if (error) return
-        if (data?.data != null && Array.isArray(data.data)) {
-          const fixed = sanitizeFloorPlanTables(data.data as FloorPlanTable[])
-          setKassaTables(fixed)
-          localStorage.setItem(`vysion_tables_${tenant}`, JSON.stringify(fixed))
-        }
+    void (async () => {
+      const adminRes = await adminDb.select<{ data?: unknown } | null>('floor_plan_tables', {
+        tenantSlug: tenant,
+        select: 'data',
+        single: 'maybe',
       })
+      let merged = false
+      if (adminRes.ok) {
+        const row = adminRes.data as { data?: unknown } | null | undefined
+        if (row == null) merged = applyKassaTablesPayload([])
+        else merged = applyKassaTablesPayload(row.data)
+      }
+      if (!merged) {
+        const { data, error } = await supabase
+          .from('floor_plan_tables')
+          .select('data')
+          .eq('tenant_slug', tenant)
+          .maybeSingle()
+        if (!error) {
+          if (data == null) applyKassaTablesPayload([])
+          else applyKassaTablesPayload(data.data)
+        }
+      }
+    })()
 
     // Barkrukken: Supabase is bron (lege DB ⇒ lege lijst op alle pc's)
     void supabase
@@ -671,14 +691,22 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   useEffect(() => {
     const tableChannel = supabase
       .channel(`kassa_fpt_${tenant}`)
-      .on('postgres_changes',
+      .on(
+        'postgres_changes',
         { event: '*', schema: 'public', table: 'floor_plan_tables', filter: `tenant_slug=eq.${tenant}` },
-        ({ new: row }: { new?: { data?: unknown } }) => {
-          if (row?.data != null && Array.isArray(row.data)) {
-            const fixed = sanitizeFloorPlanTables(row.data as FloorPlanTable[])
-            setKassaTables(fixed)
-            localStorage.setItem(`vysion_tables_${tenant}`, JSON.stringify(fixed))
+        (payload: { eventType?: string; new?: { data?: unknown } }) => {
+          if (payload.eventType === 'DELETE') {
+            setKassaTables([])
+            localStorage.setItem(`vysion_tables_${tenant}`, JSON.stringify([]))
+            return
           }
+          const row = payload.new
+          if (!row) return
+          const parsed = parseFloorPlanTablesJson(row.data)
+          if (parsed === null) return
+          const fixed = sanitizeFloorPlanTables(parsed)
+          setKassaTables(fixed)
+          localStorage.setItem(`vysion_tables_${tenant}`, JSON.stringify(fixed))
         }
       )
       .subscribe()
@@ -2990,6 +3018,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       {showFloorPlan && (
         <KassaFloorPlan
           tenant={tenant}
+          seedTables={kassaTables}
           onSelectTable={(nr) => switchToTable(nr)}
           onClose={() => setShowFloorPlan(false)}
           tableOrders={tableOrders}
