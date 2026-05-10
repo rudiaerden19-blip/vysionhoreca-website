@@ -1621,12 +1621,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         : switchConfirmParsed.tableNumber
       : ''
 
-  const dineInTableBannerSuffix =
+  const dineInBannerLabel =
     tableNumber
-      ? `${t('kassaApp.orderTypeWithTable').replace(/\{number\}/g, String(tableNumber))}${
-          dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE ? ` (${t('kassaApp.floorZoneTerraceShort')})` : ''
+      ? `🍽️ ${t('kassaApp.tableWord')} ${tableNumber}${
+          dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE
+            ? ` (${t('kassaApp.floorZoneTerraceShort')})`
+            : ''
         }`
-      : ''
+      : `🍽️ ${t('kassaApp.orderTypeDineIn').toUpperCase()}`
 
   /** Klantscherm: vooraf gelokaliseerde regel tafel + zone (BroadcastChannel). */
   const customerDisplayDineInSubtitle = useMemo((): string | undefined => {
@@ -3135,8 +3137,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             'bg-blue-600 text-white'
           }`}
         >
-          {orderType === 'DINE_IN' &&
-            `🍽️ ${t('kassaApp.orderTypeDineIn').toUpperCase()}${dineInTableBannerSuffix}`}
+          {orderType === 'DINE_IN' && dineInBannerLabel}
           {orderType === 'TAKEAWAY' && `📦 ${t('kassaApp.orderTypeTakeaway').toUpperCase()}`}
           {orderType === 'DELIVERY' && `🚗 ${t('kassaApp.orderTypeDelivery').toUpperCase()}`}
         </button>
