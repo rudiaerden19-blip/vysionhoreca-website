@@ -61,38 +61,26 @@ export function formatKlantschermWaitingDateLine(
   return `${cap(weekday)} ${rest}`
 }
 
-/** 24-uurs tijd HH:mm voor klantscherm-klok. */
-export function formatKlantschermWaitingClock(date: Date, locale: Locale, opts?: { timeZone?: string }): string {
-  const tag = localeTag[locale] ?? 'en-GB'
-  const tz = opts?.timeZone ? { timeZone: opts.timeZone } : {}
-  return new Intl.DateTimeFormat(tag, {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-    hourCycle: 'h23',
-    ...tz,
-  }).format(date)
+/** 24-uurs tijd HH:mm — altijd systeem-lokale tijd (`getHours`/`getMinutes`), geen Intl-uur (nl-BE + TZ-optie gaf op sommige engines fout uur). */
+export function formatKlantschermWaitingClock(date: Date, _locale: Locale, _opts?: { timeZone?: string }): string {
+  void _locale
+  void _opts
+  const { hours, minutes } = formatKlantschermWaitingClockParts(date, _locale, _opts)
+  return `${hours}:${minutes}`
 }
 
 /** Uren en minuten apart voor grote digitale klok (knipperende dubbele punt). */
 export function formatKlantschermWaitingClockParts(
   date: Date,
-  locale: Locale,
-  opts?: { timeZone?: string },
+  _locale: Locale,
+  _opts?: { timeZone?: string },
 ): {
   hours: string
   minutes: string
 } {
-  const tag = localeTag[locale] ?? 'en-GB'
-  const tz = opts?.timeZone ? { timeZone: opts.timeZone } : {}
-  const parts = new Intl.DateTimeFormat(tag, {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-    hourCycle: 'h23',
-    ...tz,
-  }).formatToParts(date)
-  const hour = parts.find((p) => p.type === 'hour')?.value ?? '00'
-  const minute = parts.find((p) => p.type === 'minute')?.value ?? '00'
-  return { hours: hour, minutes: minute }
+  void _locale
+  void _opts
+  const h = date.getHours()
+  const m = date.getMinutes()
+  return { hours: String(h).padStart(2, '0'), minutes: String(m).padStart(2, '0') }
 }

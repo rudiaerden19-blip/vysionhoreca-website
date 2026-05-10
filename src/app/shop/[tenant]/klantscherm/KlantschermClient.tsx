@@ -126,17 +126,6 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
   /** Geen `new Date()` tijdens SSR — server-TZ (UTC) gaf verkeerde klok; pas na mount ticken. */
   const [now, setNow] = useState<Date | null>(null)
 
-  const browserTimeZone =
-    typeof window !== 'undefined'
-      ? (() => {
-          try {
-            return Intl.DateTimeFormat().resolvedOptions().timeZone
-          } catch {
-            return undefined
-          }
-        })()
-      : undefined
-
   useEffect(() => {
     if (!waitingClock) return
     const tick = () => setNow(new Date())
@@ -182,8 +171,6 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
   }
 
   if (!msg || msg.phase === 'idle') {
-    const tzOpts = browserTimeZone ? { timeZone: browserTimeZone } : {}
-
     if (!now) {
       return (
         <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-center bg-black px-[max(0.25rem,env(safe-area-inset-left))] py-[max(0.25rem,env(safe-area-inset-top))] pb-[max(0.25rem,env(safe-area-inset-bottom))] pr-[max(0.25rem,env(safe-area-inset-right))] text-center">
@@ -209,12 +196,12 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
       )
     }
 
-    const { hours, minutes } = formatKlantschermWaitingClockParts(now, locale, tzOpts)
+    const { hours, minutes } = formatKlantschermWaitingClockParts(now, locale)
     return (
       <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-center bg-black px-[max(0.25rem,env(safe-area-inset-left))] py-[max(0.25rem,env(safe-area-inset-top))] pb-[max(0.25rem,env(safe-area-inset-bottom))] pr-[max(0.25rem,env(safe-area-inset-right))] text-center">
         <div className="flex max-w-[98vw] flex-col items-center gap-8 sm:gap-12 md:gap-16">
           <p className="text-[clamp(1.25rem,4vw,2.85rem)] font-medium leading-snug tracking-[0.06em] text-white/90">
-            {formatKlantschermWaitingDateLine(now, locale, tzOpts)}
+            {formatKlantschermWaitingDateLine(now, locale)}
           </p>
           <div
             dir="ltr"
