@@ -2150,8 +2150,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setShowSuccessModal(true)
   }
 
-  const printReceipt = async (order: typeof lastOrder) => {
+  const printReceipt = async (order: typeof lastOrder, opts?: { draft?: boolean }) => {
     if (!order) return
+    const isDraft = !!opts?.draft
     const vatRate = tenantInfo?.btw_percentage ?? 6
     const subtotal = order.total / (1 + vatRate / 100)
     const tax = order.total - subtotal
@@ -2161,12 +2162,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         : order.orderType === 'TAKEAWAY'
           ? `📦 ${t('kassaReceipt.orderTypeTakeaway')}`
           : `🚗 ${t('kassaReceipt.orderTypeDelivery')}`
-    const receiptRefDisplay =
-      order.checkoutReference ??
-      (order.orderNumber > 0 ? String(order.orderNumber) : '—')
+    const receiptRefDisplay = isDraft
+      ? t('kassaReceipt.draftReceiptRef')
+      : order.checkoutReference ??
+        (order.orderNumber > 0 ? String(order.orderNumber) : '—')
 
-    const payLabel =
-      order.paymentMethod === 'SPLIT'
+    const payLabel = isDraft
+      ? t('kassaReceipt.draftNotPaid')
+      : order.paymentMethod === 'SPLIT'
         ? t('kassaReceipt.paidSplit')
             .replace('{cash}', (order.splitCash ?? 0).toFixed(2))
             .replace('{card}', (order.splitCard ?? 0).toFixed(2))
@@ -2209,6 +2212,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     if (tenantInfo?.phone) bonLines.push(`${t('kassaReceipt.telPrefix')} ${tenantInfo.phone}`)
     bonLines.push('--------------------------------')
+    if (isDraft) {
+      bonLines.push(t('kassaReceipt.draftBanner'))
+      bonLines.push('--------------------------------')
+    }
     bonLines.push(
       order.tableNumber
         ? `${orderTypePlain} | ${t('kassaReceipt.tablePrefix')} ${order.tableNumber}${terraceSuffix}`
@@ -2235,7 +2242,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     if (tenantInfo?.btw_number) {
       bonLines.push(t('kassaReceipt.businessVatLabel').replace('{vatNumber}', tenantInfo.btw_number))
     }
-    bonLines.push(t('kassaReceipt.thanks'))
+    bonLines.push(isDraft ? t('kassaReceipt.draftFooter') : t('kassaReceipt.thanks'))
     if (tenantInfo?.website) bonLines.push(tenantInfo.website)
 
     const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${escapeReceiptHtml(docTitle)}</title><style>${KASSA_PRINT_RECEIPT_STYLES}</style></head><body>
@@ -2246,6 +2253,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         ${tenantInfo?.phone ? `<div class="small">${escapeReceiptHtml(t('kassaReceipt.telPrefix'))} ${escapeReceiptHtml(tenantInfo.phone)}</div>` : ''}
       </div>
       <div class="divider"></div>
+      ${isDraft ? `<div class="center bold">${escapeReceiptHtml(t('kassaReceipt.draftBanner'))}</div><div class="divider-solid"></div>` : ''}
       <div class="center order-type">${escapeReceiptHtml(orderTypeLabel)}${order.tableNumber ? `<br/>${escapeReceiptHtml(t('kassaReceipt.tablePrefix'))} ${escapeReceiptHtml(String(order.tableNumber))}${escapeReceiptHtml(terraceSuffix)}` : ''}</div>
       <div class="row small">
         <span>${escapeReceiptHtml(t('kassaReceipt.receiptNo'))}${escapeReceiptHtml(receiptRefDisplay)}</span>
@@ -2268,18 +2276,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       <div class="divider"></div>
       <div class="center small">
         ${tenantInfo?.btw_number ? `${escapeReceiptHtml(t('kassaReceipt.businessVatLabel').replace('{vatNumber}', tenantInfo.btw_number))}<br/>` : ''}
-        ${escapeReceiptHtml(t('kassaReceipt.thanks'))}
+        ${escapeReceiptHtml(isDraft ? t('kassaReceipt.draftFooter') : t('kassaReceipt.thanks'))}
         ${tenantInfo?.website ? `<br/>${escapeReceiptHtml(tenantInfo.website)}` : ''}
       </div>
     </body></html>`
 
-    /** Kassa-lade alleen openen bij contante betaling — PIN/online hebben dat niet nodig. */
-    const isCash = ['CASH', 'cash', 'CONTANT', 'contant'].includes(String(order.paymentMethod || ''))
+    /** Kassa-lade alleen openen bij contante betaling — PIN/online hebben dat niet nodig. Voorlopige bon: nooit. */
+    const isCash =
+      !isDraft && ['CASH', 'cash', 'CONTANT', 'contant'].includes(String(order.paymentMethod || ''))
 
     const agentOk = await sendToVysionPrintAgent({
       winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
       bonInhoud: bonLines.join('\n'),
-      copies: 2,
+      copies: isDraft ? 1 : 2,
       openDrawer: isCash,
       receiptMode: 'kassa',
       orderData: {
@@ -3408,9 +3417,30 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <span className="text-xl">💰</span>
               <span className="text-xs font-semibold">{t('kassaApp.drawerOpen')}</span>
             </button>
-            <button className="flex flex-col items-center gap-1 rounded-xl bg-[#58CCFF] py-3 text-[#063042] transition-colors hover:bg-[#47c6fe]">
+            <button
+              type="button"
+              disabled={cart.length === 0}
+              title={t('kassaApp.cartBonTitle')}
+              onClick={() => {
+                if (cart.length === 0) return
+                playClick()
+                const draftOrder: KassaLastOrderReceipt = {
+                  orderNumber: 0,
+                  items: cart,
+                  total,
+                  paymentMethod: 'CARD',
+                  orderType,
+                  tableNumber: tableNumber || '',
+                  floorPlanZone: orderType === 'DINE_IN' ? dineInFloorZone : undefined,
+                  createdAt: new Date(),
+                  helpedByStaffName: activeKassaStaff?.name ?? null,
+                }
+                void printReceipt(draftOrder, { draft: true })
+              }}
+              className="flex flex-col items-center gap-1 rounded-xl bg-[#58CCFF] py-3 text-[#063042] transition-colors hover:bg-[#47c6fe] disabled:opacity-40 disabled:pointer-events-none"
+            >
               <span className="text-xl">🖨️</span>
-              <span className="text-xs font-semibold">{t('kassaApp.printAgain')}</span>
+              <span className="text-xs font-semibold">{t('kassaApp.cartBon')}</span>
             </button>
             <button
               onClick={clearCart}

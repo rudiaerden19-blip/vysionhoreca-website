@@ -2694,7 +2694,11 @@
     "orderTypeDineIn": "Vor Ort essen",
     "orderTypeTakeaway": "Abholung",
     "orderTypeDelivery": "Lieferung",
-    "businessVatLabel": "USt: {vatNumber}"
+    "businessVatLabel": "USt: {vatNumber}",
+    "draftReceiptRef": "VORLÄUFIG",
+    "draftNotPaid": "Nicht abgerechnet (keine Buchung)",
+    "draftBanner": "*** VORLÄUFIG — NICHT ABGERECHNET ***",
+    "draftFooter": "Nur zur Information — noch nicht bezahlt."
   },
   "kassaApp": {
     "soundTitle": "Ton aktivieren",
@@ -2746,6 +2750,8 @@
     "addAmount": "+ €{amount} hinzufügen",
     "cartTotal": "Summe",
     "drawerOpen": "Schublade öffnen",
+    "cartBon": "Bon",
+    "cartBonTitle": "Vorläufigen Bon aus aktuellem Warenkorb drucken (ohne Bezahlung)",
     "printAgain": "Erneut drucken",
     "printAgentFallbackModalTitle": "Print Agent nicht erreichbar",
     "printAgentFallbackModalBody": "Der Beleg wird gleich im Browser zum normalen Druck geöffnet. Auf diesem Windows-PC: Vysion Print Agent über den Link installieren, im Infobereich starten und Epson wählen.",

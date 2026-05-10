@@ -3194,7 +3194,11 @@
     "orderTypeDineIn": "店内",
     "orderTypeTakeaway": "テイクアウト",
     "orderTypeDelivery": "配達",
-    "businessVatLabel": "登録番号: {vatNumber}"
+    "businessVatLabel": "登録番号: {vatNumber}",
+    "draftReceiptRef": "案内",
+    "draftNotPaid": "未決済（売上計上なし）",
+    "draftBanner": "*** 案内用 — 未決済 ***",
+    "draftFooter": "ご確認用です — まだお支払いはありません。"
   },
   "kassaApp": {
     "soundTitle": "音を有効にする",
@@ -3245,8 +3249,10 @@
     "orderTypeWithTable": " • テーブル {number}",
     "addAmount": "+ €{amount} を追加",
     "cartTotal": "Total",
-    "drawerOpen": "Abrir cajón",
-    "printAgain": "Reimprimir",
+    "drawerOpen": "ドロワーを開く",
+    "cartBon": "伝票",
+    "cartBonTitle": "現在のカートから案内伝票を印刷（会計しない）",
+    "printAgain": "再印刷",
     "printAgentFallbackModalTitle": "Print Agent に接続できません",
     "printAgentFallbackModalBody": "レシートは次にブラウザで開き、通常印刷されます。この Windows PC では：下のリンクから Vysion Print Agent をインストールし、タスクバーから起動して Epson を選んでください。",
     "printAgentFallbackModalDownloadLink": "Print Agent ダウンロードページ（Windows）",

@@ -3194,7 +3194,11 @@
     "orderTypeDineIn": "堂食",
     "orderTypeTakeaway": "外带",
     "orderTypeDelivery": "配送",
-    "businessVatLabel": "税号: {vatNumber}"
+    "businessVatLabel": "税号: {vatNumber}",
+    "draftReceiptRef": "预览",
+    "draftNotPaid": "未结账（未记账）",
+    "draftBanner": "*** 预览 — 未结账 ***",
+    "draftFooter": "仅供参考 — 尚未付款。"
   },
   "kassaApp": {
     "soundTitle": "启用声音",
@@ -3245,8 +3249,10 @@
     "orderTypeWithTable": " • 桌 {number}",
     "addAmount": "+ 添加 €{amount}",
     "cartTotal": "Total",
-    "drawerOpen": "Abrir cajón",
-    "printAgain": "Reimprimir",
+    "drawerOpen": "打开钱箱",
+    "cartBon": "小票",
+    "cartBonTitle": "打印当前购物车预览小票（不结账）",
+    "printAgain": "重新打印",
     "printAgentFallbackModalTitle": "无法连接 Print Agent",
     "printAgentFallbackModalBody": "收据接下来会在浏览器中打开以便普通打印。在此 Windows 电脑上：通过下方链接安装 Vysion Print Agent，从系统托盘启动并选择爱普生打印机。",
     "printAgentFallbackModalDownloadLink": "Print Agent 下载页面（Windows）",

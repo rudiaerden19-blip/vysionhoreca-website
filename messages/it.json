@@ -3194,7 +3194,11 @@
     "orderTypeDineIn": "Al tavolo",
     "orderTypeTakeaway": "Asporto",
     "orderTypeDelivery": "Consegna",
-    "businessVatLabel": "P. IVA: {vatNumber}"
+    "businessVatLabel": "P. IVA: {vatNumber}",
+    "draftReceiptRef": "PROVVISORIO",
+    "draftNotPaid": "Non saldato (nessuna registrazione)",
+    "draftBanner": "*** PROVVISORIO — NON SALDATO ***",
+    "draftFooter": "Solo informativo — non ancora pagato."
   },
   "kassaApp": {
     "soundTitle": "Attiva audio",
@@ -3245,8 +3249,10 @@
     "orderTypeWithTable": " • Tavolo {number}",
     "addAmount": "+ Aggiungi €{amount}",
     "cartTotal": "Total",
-    "drawerOpen": "Abrir cajón",
-    "printAgain": "Reimprimir",
+    "drawerOpen": "Apri cassetto",
+    "cartBon": "Scontrino",
+    "cartBonTitle": "Stampa scontrino provvisorio dal carrello (senza incasso)",
+    "printAgain": "Stampa di nuovo",
     "printAgentFallbackModalTitle": "Print Agent non raggiungibile",
     "printAgentFallbackModalBody": "Lo scontrino si aprirà nel browser per la stampa normale. Su questo PC Windows: installa Vysion Print Agent dal link sotto, avvialo dall’area di notifica e scegli la Epson.",
     "printAgentFallbackModalDownloadLink": "Pagina download Print Agent (Windows)",

@@ -3648,7 +3648,11 @@
     "orderTypeDineIn": "Dine in",
     "orderTypeTakeaway": "Takeaway",
     "orderTypeDelivery": "Delivery",
-    "businessVatLabel": "VAT: {vatNumber}"
+    "businessVatLabel": "VAT: {vatNumber}",
+    "draftReceiptRef": "DRAFT",
+    "draftNotPaid": "Not settled (no sale recorded)",
+    "draftBanner": "*** DRAFT — NOT SETTLED ***",
+    "draftFooter": "For information only — not paid yet."
   },
   "kassaApp": {
     "soundTitle": "Enable sound",
@@ -3700,6 +3704,8 @@
     "addAmount": "+ Add €{amount}",
     "cartTotal": "Total",
     "drawerOpen": "Open drawer",
+    "cartBon": "Receipt",
+    "cartBonTitle": "Print a draft receipt from the current cart (without checkout)",
     "printAgain": "Print again",
     "printAgentFallbackModalTitle": "Print Agent unreachable",
     "printAgentFallbackModalBody": "The receipt will open next for printing in your browser. On this Windows PC: install Vysion Print Agent via the link below, run it from the system tray, and pick your Epson.",

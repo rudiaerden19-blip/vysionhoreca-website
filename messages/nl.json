@@ -3648,7 +3648,11 @@
     "orderTypeDineIn": "Ter plaatse",
     "orderTypeTakeaway": "Afhalen",
     "orderTypeDelivery": "Bezorgen",
-    "businessVatLabel": "BTW: {vatNumber}"
+    "businessVatLabel": "BTW: {vatNumber}",
+    "draftReceiptRef": "VOORLOPIG",
+    "draftNotPaid": "Niet afgerekend (geen registratie)",
+    "draftBanner": "*** VOORLOPIG — NIET AFGEREKEND ***",
+    "draftFooter": "Enkel ter info — nog niet betaald."
   },
   "kassaApp": {
     "soundTitle": "Activeer geluid",
@@ -3700,6 +3704,8 @@
     "addAmount": "+ €{amount} toevoegen",
     "cartTotal": "Totaal",
     "drawerOpen": "Lade open",
+    "cartBon": "Bon",
+    "cartBonTitle": "Voorlopige bon van de huidige kar printen (zonder afrekenen)",
     "printAgain": "Print opnieuw",
     "printAgentFallbackModalTitle": "Print Agent niet bereikbaar",
     "printAgentFallbackModalBody": "De bon wordt zo geopend voor printen via je browser. Op deze Windows-pc: installeer Vysion Print Agent via de onderstaande link, start hem bij de klok en kies je Epson.",

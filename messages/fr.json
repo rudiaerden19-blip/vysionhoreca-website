@@ -2694,7 +2694,11 @@
     "orderTypeDineIn": "Sur place",
     "orderTypeTakeaway": "À emporter",
     "orderTypeDelivery": "Livraison",
-    "businessVatLabel": "TVA : {vatNumber}"
+    "businessVatLabel": "TVA : {vatNumber}",
+    "draftReceiptRef": "PROVISOIRE",
+    "draftNotPaid": "Non réglé (pas d'enregistrement)",
+    "draftBanner": "*** PROVISOIRE — NON RÉGLÉ ***",
+    "draftFooter": "À titre informatif — pas encore payé."
   },
   "kassaApp": {
     "soundTitle": "Activer le son",
@@ -2746,6 +2750,8 @@
     "addAmount": "+ Ajouter €{amount}",
     "cartTotal": "Total",
     "drawerOpen": "Ouvrir le tiroir",
+    "cartBon": "Ticket",
+    "cartBonTitle": "Imprimer un ticket provisoire du panier (sans encaissement)",
     "printAgain": "Réimprimer",
     "printAgentFallbackModalTitle": "Print Agent inaccessible",
     "printAgentFallbackModalBody": "Le ticket va s’ouvrir dans le navigateur pour une impression classique. Sur ce PC Windows : installez Vysion Print Agent via le lien ci-dessous, lancez-le depuis la barre des tâches et choisissez votre Epson.",
