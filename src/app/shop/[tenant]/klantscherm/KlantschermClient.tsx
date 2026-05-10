@@ -13,6 +13,7 @@ import {
   formatKlantschermWaitingClockParts,
   formatKlantschermWaitingDateLine,
 } from '@/lib/format-kassa-header-date'
+import { appLocaleToBcp47 } from '@/lib/print-receipt-html'
 
 export function KlantschermClient({ tenant }: { tenant: string }) {
   const { t, locale } = useLanguage()
@@ -133,7 +134,7 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
   }, [waitingClock])
 
   const formatMoney = (n: number) =>
-    new Intl.NumberFormat('nl-BE', { style: 'currency', currency: 'EUR' }).format(n)
+    new Intl.NumberFormat(appLocaleToBcp47(locale), { style: 'currency', currency: 'EUR' }).format(n)
 
   const shellCart =
     'box-border flex min-h-0 w-full flex-1 flex-col overflow-y-auto bg-black px-3 py-4 text-white sm:px-5 sm:py-6 md:px-8 md:py-8'
@@ -144,6 +145,26 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
         className={`${shellCart} items-center justify-center text-center`}
       >
         <p className="text-xl font-semibold sm:text-2xl">{t('kassaCustomerDisplay.missingToken')}</p>
+      </div>
+    )
+  }
+
+  if (msg?.phase === 'thankYou') {
+    const amountStr = formatMoney(msg.totalInclVat)
+    return (
+      <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-center gap-10 bg-black px-6 py-8 text-center sm:gap-14 md:gap-16">
+        <p
+          className="max-w-[96vw] text-[clamp(1.75rem,5.5vw,4rem)] font-bold leading-tight tracking-tight text-white"
+          suppressHydrationWarning
+        >
+          {t('kassaCustomerDisplay.thankYouToPay').replace('{amount}', amountStr)}
+        </p>
+        <p
+          className="max-w-[96vw] text-[clamp(1.35rem,3.8vw,2.75rem)] font-semibold leading-snug text-white/90"
+          suppressHydrationWarning
+        >
+          {t('kassaCustomerDisplay.thankYouClosing')}
+        </p>
       </div>
     )
   }

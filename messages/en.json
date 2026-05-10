@@ -3812,7 +3812,9 @@
     "subtotalExVat": "Subtotal excl. VAT",
     "vatLine": "VAT {rate}%",
     "totalInclVat": "Total incl. VAT",
-    "emptyCartHint": "No items"
+    "emptyCartHint": "No items",
+    "thankYouToPay": "Amount due {amount}",
+    "thankYouClosing": "Thank you for your order"
   },
   "staffClock": {
     "buttonTitle": "Clock in or out",

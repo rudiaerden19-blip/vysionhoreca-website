@@ -3358,7 +3358,9 @@
     "subtotalExVat": "Subtotal sin IVA",
     "vatLine": "IVA {rate}%",
     "totalInclVat": "Total con IVA",
-    "emptyCartHint": "Sin artículos"
+    "emptyCartHint": "Sin artículos",
+    "thankYouToPay": "A pagar {amount}",
+    "thankYouClosing": "Gracias por su pedido"
   },
   "staffClock": {
     "buttonTitle": "Fichar entrada o salida",

@@ -3812,7 +3812,9 @@
     "subtotalExVat": "Subtotaal excl. btw",
     "vatLine": "Btw {rate}%",
     "totalInclVat": "Totaal incl. btw",
-    "emptyCartHint": "Geen artikelen"
+    "emptyCartHint": "Geen artikelen",
+    "thankYouToPay": "Te betalen {amount}",
+    "thankYouClosing": "Bedankt voor uw bestelling"
   },
   "staffClock": {
     "buttonTitle": "In- of uitklokken",

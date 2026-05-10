@@ -3358,7 +3358,9 @@
     "subtotalExVat": "Subtotale IVA esclusa",
     "vatLine": "IVA {rate}%",
     "totalInclVat": "Totale IVA inclusa",
-    "emptyCartHint": "Nessun articolo"
+    "emptyCartHint": "Nessun articolo",
+    "thankYouToPay": "Da pagare {amount}",
+    "thankYouClosing": "Grazie per il suo ordine"
   },
   "staffClock": {
     "buttonTitle": "Timbratura entrata o uscita",

@@ -3358,7 +3358,9 @@
     "subtotalExVat": "المجموع الفرعي بدون ضريبة",
     "vatLine": "ضريبة القيمة المضافة {rate}%",
     "totalInclVat": "الإجمالي شامل الضريبة",
-    "emptyCartHint": "لا توجد أصناف"
+    "emptyCartHint": "لا توجد أصناف",
+    "thankYouToPay": "المبلغ المستحق {amount}",
+    "thankYouClosing": "شكرًا لطلبكم"
   },
   "staffClock": {
     "buttonTitle": "تسجيل دخول أو خروج",

@@ -2858,7 +2858,9 @@
     "subtotalExVat": "Zwischensumme ohne MwSt.",
     "vatLine": "MwSt. {rate}%",
     "totalInclVat": "Gesamt inkl. MwSt.",
-    "emptyCartHint": "Keine Artikel"
+    "emptyCartHint": "Keine Artikel",
+    "thankYouToPay": "Zu zahlen {amount}",
+    "thankYouClosing": "Vielen Dank für Ihre Bestellung"
   },
   "staffClock": {
     "buttonTitle": "Ein- oder ausstempeln",

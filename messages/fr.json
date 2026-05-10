@@ -2858,7 +2858,9 @@
     "subtotalExVat": "Sous-total HT",
     "vatLine": "TVA {rate}%",
     "totalInclVat": "Total TTC",
-    "emptyCartHint": "Aucun article"
+    "emptyCartHint": "Aucun article",
+    "thankYouToPay": "À payer {amount}",
+    "thankYouClosing": "Merci pour votre commande"
   },
   "staffClock": {
     "buttonTitle": "Pointer entrée ou sortie",

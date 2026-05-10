@@ -3358,7 +3358,9 @@
     "subtotalExVat": "不含税小计",
     "vatLine": "增值税 {rate}%",
     "totalInclVat": "含税总计",
-    "emptyCartHint": "暂无商品"
+    "emptyCartHint": "暂无商品",
+    "thankYouToPay": "应付 {amount}",
+    "thankYouClosing": "感谢您的订购"
   },
   "staffClock": {
     "buttonTitle": "上班或下班打卡",

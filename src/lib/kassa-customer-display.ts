@@ -9,6 +9,9 @@ export function kassaCustomerDisplayChannelName(tenantSlug: string, sessionToken
   return `${KASSA_CUSTOMER_DISPLAY_CHANNEL_PREFIX}-${tenantSlug}-${sessionToken}`
 }
 
+/** Duur bedankmelding op klantscherm na betaling (daarna weer datum/klok). */
+export const KASSA_CUSTOMER_DISPLAY_THANK_YOU_MS = 10_000
+
 export type KassaCustomerDisplayLine = {
   label: string
   qty: number
@@ -39,6 +42,13 @@ export type KassaCustomerDisplayMessage =
       subtotalExVat: number
       vatRate: number
       vatAmount: number
+      totalInclVat: number
+    }
+  | {
+      v: 1
+      phase: 'thankYou'
+      tenantSlug: string
+      businessName: string
       totalInclVat: number
     }
 

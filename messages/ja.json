@@ -3358,7 +3358,9 @@
     "subtotalExVat": "小計（税抜）",
     "vatLine": "消費税 {rate}%",
     "totalInclVat": "合計（税込）",
-    "emptyCartHint": "商品がありません"
+    "emptyCartHint": "商品がありません",
+    "thankYouToPay": "お支払い {amount}",
+    "thankYouClosing": "ご利用ありがとうございました"
   },
   "staffClock": {
     "buttonTitle": "出勤または退勤",

@@ -95,6 +95,7 @@ import {
   kassaCustomerDisplayChannelName,
   type KassaCustomerDisplayMessage,
   type KassaCustomerDisplayLine,
+  KASSA_CUSTOMER_DISPLAY_THANK_YOU_MS,
 } from '@/lib/kassa-customer-display'
 import {
   buildCustomerDisplayPopupFeatures,
@@ -789,6 +790,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [showSplitModal, setShowSplitModal] = useState(false)
   /** BroadcastChannel-sessie voor tweede scherm (klant); optioneel — geen impact zonder token */
   const [customerDisplayToken, setCustomerDisplayToken] = useState<string | null>(null)
+  /** Korte bedankmelding op klantscherm na betaling */
+  const [customerDisplayThankYou, setCustomerDisplayThankYou] = useState<{
+    total: number
+    until: number
+  } | null>(null)
   const customerDisplayBcRef = useRef<BroadcastChannel | null>(null)
   /** HTML bon wacht op modal als lokale Print Agent faalt; daarna printReceiptHtmlDocument */
   const [printAgentFallbackHtml, setPrintAgentFallbackHtml] = useState<string | null>(null)
@@ -965,6 +971,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       customerDisplayBcRef.current = null
     }
   }, [tenant, customerDisplayToken])
+
+  useEffect(() => {
+    if (!customerDisplayThankYou) return
+    const ms = customerDisplayThankYou.until - Date.now()
+    if (ms <= 0) {
+      setCustomerDisplayThankYou(null)
+      return
+    }
+    const id = window.setTimeout(() => setCustomerDisplayThankYou(null), ms)
+    return () => window.clearTimeout(id)
+  }, [customerDisplayThankYou])
 
   // Zorg dat product- en logo-afbeeldingen in de SW image-cache zitten (offline zichtbaar)
   useEffect(() => {
@@ -1267,7 +1284,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const totalInclVat = Math.round(total * 100) / 100
 
     let msg: KassaCustomerDisplayMessage
-    if (cart.length === 0 && !showPaymentModal && !showSplitModal) {
+    const thankYouActive =
+      customerDisplayThankYou !== null && Date.now() < customerDisplayThankYou.until
+
+    if (thankYouActive && customerDisplayThankYou) {
+      msg = {
+        v: 1,
+        phase: 'thankYou',
+        tenantSlug: tenant,
+        businessName,
+        totalInclVat: customerDisplayThankYou.total,
+      }
+    } else if (cart.length === 0 && !showPaymentModal && !showSplitModal) {
       msg = { v: 1, phase: 'idle', tenantSlug: tenant, businessName }
     } else if ((showPaymentModal || showSplitModal) && cart.length > 0) {
       const subtotalExVatRaw = totalInclVat / (1 + vatRate / 100)
@@ -1314,6 +1342,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     showSplitModal,
     tenantInfo?.business_name,
     tenantInfo?.btw_percentage,
+    customerDisplayThankYou,
   ])
 
   /** Totaal per product-id voor tegel-badge; vermijdt O(producten × mandregels) bij elke qty-wijziging. */
@@ -1557,6 +1586,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       )
       return
     }
+
+    setCustomerDisplayThankYou({
+      total: Math.round(total * 100) / 100,
+      until: Date.now() + KASSA_CUSTOMER_DISPLAY_THANK_YOU_MS,
+    })
 
     setLastOrder({
       orderNumber: allocatedOrderNumber,
