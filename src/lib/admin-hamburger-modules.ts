@@ -433,13 +433,6 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
           labelKey: itemLabelKey('sm_rpt_populair'),
           href: `${baseUrl}/populair`,
         },
-        {
-          id: 'sm_rpt_kasboek',
-          icon: '📒',
-          label: 'Digitaal kasboek',
-          labelKey: 'adminLayout.digitalCashBookSubmenu',
-          href: `${baseUrl}/kasboek`,
-        },
       ],
     },
     {

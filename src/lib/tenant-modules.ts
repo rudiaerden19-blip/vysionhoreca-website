@@ -420,8 +420,7 @@ export function adminPathToModule(pathname: string, tenantSlug: string): AdminMo
     rest.startsWith('/z-rapport') ||
     rest.startsWith('/analyse') ||
     rest.startsWith('/populair') ||
-    rest.startsWith('/verkoop') ||
-    rest.startsWith('/kasboek')
+    rest.startsWith('/verkoop')
   ) {
     return { kind: 'module', module: 'rapporten' }
   }
