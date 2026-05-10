@@ -11,26 +11,61 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { extractText } from 'unpdf'
 
+import { logger } from '@/lib/logger'
+import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
+import { apiRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
+
 export const runtime = 'nodejs'
 export const maxDuration = 30
 
 const GEMINI_URL =
   'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
 
+const MAX_PDF_MB = 8
+
 export async function POST(request: NextRequest) {
+  const requestId = crypto.randomUUID()
   try {
     const formData = await request.formData()
     const file = formData.get('file') as File | null
     const tenantSlug = formData.get('tenant_slug') as string | null
 
     if (!tenantSlug)
-      return NextResponse.json({ success: false, error: 'tenant_slug ontbreekt' }, { status: 401 })
+      return NextResponse.json({ success: false, error: 'tenant_slug ontbreekt' }, { status: 400 })
     if (!file)
       return NextResponse.json({ success: false, error: 'Geen bestand ontvangen' }, { status: 400 })
     if (file.type !== 'application/pdf')
       return NextResponse.json({ success: false, error: 'Alleen PDF bestanden' }, { status: 400 })
-    if (file.size > 10 * 1024 * 1024)
-      return NextResponse.json({ success: false, error: 'Bestand te groot (max 10 MB)' }, { status: 400 })
+    if (file.size > MAX_PDF_MB * 1024 * 1024)
+      return NextResponse.json(
+        { success: false, error: `Bestand te groot (max ${MAX_PDF_MB} MB)` },
+        { status: 400 }
+      )
+
+    // ── Auth: alleen ingelogde zaak/superadmin ─────────────────────────────
+    // Zonder check kon iedereen via dit endpoint Gemini-calls triggeren met
+    // de platform GOOGLE_GEMINI_API_KEY = onbeperkte cloudkosten.
+    const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
+    if (!access.authorized) {
+      logger.warn('analyze-invoice-pdf: unauthorized', { requestId, tenantSlug })
+      return NextResponse.json(
+        { success: false, error: access.error || 'Niet geautoriseerd' },
+        { status: 403 }
+      )
+    }
+
+    // ── Rate-limit per tenant + actor ──────────────────────────────────────
+    const actorId =
+      request.headers.get('x-business-id') ||
+      request.headers.get('x-superadmin-id') ||
+      getClientIP(request)
+    const rl = await checkRateLimit(apiRateLimiter, `analyze-invoice-pdf:${tenantSlug}:${actorId}`)
+    if (!rl.success) {
+      return NextResponse.json(
+        { success: false, error: 'Te veel PDF-scans. Probeer over 1 minuut opnieuw.' },
+        { status: 429, headers: { 'Retry-After': '60' } }
+      )
+    }
 
     // Tekst uitlezen uit PDF
     const uint8Array = new Uint8Array(await file.arrayBuffer())

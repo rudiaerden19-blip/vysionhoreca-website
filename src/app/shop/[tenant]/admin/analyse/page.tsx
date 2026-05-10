@@ -6,6 +6,7 @@ import { useState, useEffect, useMemo, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
+import { getAuthHeaders } from '@/lib/auth-headers'
 import {
   getDailySales,
   saveDailySales,
@@ -524,6 +525,9 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
       const [analysisRes, pdfUrl] = await Promise.all([
         fetch('/api/analyze-invoice-pdf', {
           method: 'POST',
+          // FormData: geen Content-Type meegeven (browser zet boundary).
+          // Auth-headers wel — de route is sinds mei 2026 auth-protected.
+          headers: getAuthHeaders(),
           body: (() => { const f = new FormData(); f.append('file', file); f.append('tenant_slug', params.tenant); return f })(),
         }),
         uploadPdfToStorage(file),
@@ -553,6 +557,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
       const [analysisRes, pdfUrl] = await Promise.all([
         fetch('/api/analyze-invoice-pdf', {
           method: 'POST',
+          headers: getAuthHeaders(),
           body: (() => { const f = new FormData(); f.append('file', file); f.append('tenant_slug', params.tenant); return f })(),
         }),
         uploadPdfToStorage(file),

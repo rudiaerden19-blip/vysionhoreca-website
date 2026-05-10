@@ -61,9 +61,13 @@ export async function GET() {
     status: process.env.STRIPE_SECRET_KEY ? 'configured' : 'not_configured',
   }
 
-  // Check Email (Nodemailer)
+  // Check Email (Nodemailer/Zoho SMTP). EMAIL_HOST werd nergens gelezen — alle
+  // email-routes gebruiken ZOHO_EMAIL + ZOHO_PASSWORD via smtp.zoho.eu.
   health.services.email = {
-    status: process.env.EMAIL_HOST ? 'configured' : 'not_configured',
+    status:
+      process.env.ZOHO_EMAIL && process.env.ZOHO_PASSWORD
+        ? 'configured'
+        : 'not_configured',
   }
 
   // Check Redis (Upstash)
