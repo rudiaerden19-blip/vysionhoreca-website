@@ -45,6 +45,21 @@ export function adminDineInSeatAuditLine(
     .replace('{zone}', zoneLabel)
 }
 
+/** Vaste NL-regel voor keuken/browser-bonnen (monospace, traditioneel BE). */
+export function dineInSeatLineNl(
+  orderType: string | null | undefined,
+  tableNumber: unknown,
+  floorPlanZone: unknown,
+): string {
+  if ((orderType || '').toString() !== 'DINE_IN') return ''
+  if (tableNumber == null || String(tableNumber).trim() === '') return ''
+  const zone = normalizeFloorPlanZone(
+    floorPlanZone == null ? undefined : String(floorPlanZone),
+  )
+  const zlab = zone === FLOOR_PLAN_ZONE_TERRACE ? 'Terras' : 'Binnen'
+  return `Tafel ${tableNumber} · ${zlab}`
+}
+
 /** Tailwind voor order-type badge (lijst + modal). */
 export function adminOrderChannelBadgeClass(order: Order): string {
   if (isWebshopOrder(order)) return 'bg-slate-100 text-slate-800'

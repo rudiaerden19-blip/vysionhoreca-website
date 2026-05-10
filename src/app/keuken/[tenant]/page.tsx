@@ -20,6 +20,8 @@ import {
   markAudioActivated
 } from '@/lib/sounds'
 import { sendToVysionPrintAgent } from '@/lib/vysion-print-agent-client'
+import { adminDineInSeatAuditLine, dineInSeatLineNl } from '@/lib/admin-order-display'
+
 interface Order {
   id: string
   order_number: string
@@ -33,6 +35,8 @@ interface Order {
   created_at: string
   scheduled_date?: string
   scheduled_time?: string
+  table_number?: string | number | null
+  floor_plan_zone?: string | null
 }
 
 interface BusinessSettings {
@@ -326,6 +330,8 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     const printWindow = window.open('', '_blank', 'width=300,height=600')
     if (!printWindow) return
 
+    const nlDineInSeat = dineInSeatLineNl(order.order_type, order.table_number, order.floor_plan_zone)
+
     const itemsHtml = order.items?.map((item: any) => `
       <tr>
         <td style="font-size: 18px; font-weight: bold; padding: 4px 0;">${item.quantity}x</td>
@@ -363,6 +369,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
             <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">*** KEUKEN BON ***</div>
             <div class="order-number">#${order.order_number}</div>
             <div class="order-type">${order.order_type === 'delivery' || order.order_type === 'DELIVERY' ? '🚗 BEZORGEN' : order.order_type === 'DINE_IN' ? '🍽️ TER PLAATSE' : order.order_type === 'TAKEAWAY' ? '📦 AFHALEN' : '🛍️ AFHALEN'}</div>
+            ${nlDineInSeat ? `<div style="font-size: 16px; font-weight: bold; margin-top: 6px;">${nlDineInSeat}</div>` : ''}
             ${(order.scheduled_date || order.scheduled_time) ? `
             <div style="margin: 6px 0; padding: 6px; background: #000; color: #fff; font-size: 16px; font-weight: bold; border-radius: 4px;">
               📅 LEVEREN OP: ${order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''}${order.scheduled_time ? ' om ' + order.scheduled_time : ''}
@@ -573,6 +580,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
           <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
             {orders.map((order) => {
               const schedLine = formatOrderScheduleDetail(order, locale)
+              const dineInSeat = adminDineInSeatAuditLine(order, t)
               return (
               <motion.div
                 key={order.id}
@@ -615,6 +623,11 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                     <div className="px-3 py-2 text-sm font-medium text-gray-800 bg-gray-50 border-b border-gray-100 text-center">
                       {orderTypeLabelShort(order)}
                     </div>
+                    {dineInSeat && (
+                      <div className="px-3 py-1.5 bg-emerald-50 border-b border-emerald-100 text-center text-xs sm:text-sm font-bold text-emerald-900">
+                        {dineInSeat}
+                      </div>
+                    )}
                     {(order.scheduled_date || order.scheduled_time) && (
                       <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 text-gray-800 text-sm font-medium text-center">
                         📅 {order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit' }) : ''}{order.scheduled_time ? ` om ${order.scheduled_time}` : ''}
@@ -722,6 +735,15 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                         return `${t('shopDisplay.onlineOrder')} · ${ch}${sched ? ` · ${sched}` : ''}`
                       })()}
                     </p>
+                    {(() => {
+                      const seat = adminDineInSeatAuditLine(selectedOrder, t)
+                      if (!seat) return null
+                      return (
+                        <p className="text-sm text-white font-semibold mt-2 bg-white/10 px-2 py-1 rounded-md inline-block">
+                          {seat}
+                        </p>
+                      )
+                    })()}
                   </div>
                   <button
                     type="button"

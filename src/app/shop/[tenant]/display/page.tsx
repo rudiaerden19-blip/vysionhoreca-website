@@ -20,6 +20,7 @@ import {
 } from '@/lib/sounds'
 import { sendToVysionPrintAgent } from '@/lib/vysion-print-agent-client'
 import { getAuthHeaders } from '@/lib/auth-headers'
+import { adminDineInSeatAuditLine, dineInSeatLineNl } from '@/lib/admin-order-display'
 
 interface Order {
   id: string
@@ -43,6 +44,8 @@ interface Order {
   scheduled_time?: string
   rejection_reason?: string
   rejection_notes?: string
+  table_number?: string | number | null
+  floor_plan_zone?: string | null
 }
 
 interface BusinessSettings {
@@ -500,6 +503,8 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
       </tr>
     `).join('') || ''
 
+    const nlDineInSeat = dineInSeatLineNl(order.order_type, order.table_number, order.floor_plan_zone)
+
     const customerBon = `
       <!DOCTYPE html>
       <html>
@@ -537,6 +542,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
           
           <div class="order-number">#${order.order_number}</div>
           <div class="order-type">${nlBrowserPrintOrderTypeBanner(order.order_type)}</div>
+          ${nlDineInSeat ? `<div style="text-align:center;font-weight:bold;font-size:13px;margin:6px 0;">${nlDineInSeat}</div>` : ''}
           ${(order.scheduled_date || order.scheduled_time) ? `
           <div style="margin: 8px 0; padding: 6px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; text-align: center; font-weight: bold; font-size: 13px;">
             📅 ${order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''}${order.scheduled_time ? ' om ' + order.scheduled_time : ''}
@@ -621,6 +627,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             <div style="font-size: 14px; font-weight: bold;">KEUKEN BON</div>
             <div class="order-number">#${order.order_number}</div>
             <div class="order-type">${nlBrowserPrintOrderTypeBanner(order.order_type)}</div>
+            ${nlDineInSeat ? `<div style="margin: 8px 0; padding: 6px; background: #ecfdf5; border: 1px solid #10b981; border-radius: 4px; text-align: center; font-weight: bold; font-size: 15px;">${nlDineInSeat}</div>` : ''}
             ${(order.scheduled_date || order.scheduled_time) ? `
             <div style="margin: 6px 0; padding: 5px; background: #000; color: #fff; font-size: 16px; font-weight: bold;">
               📅 ${order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit' }) : ''}${order.scheduled_time ? ' om ' + order.scheduled_time : ''}
@@ -1032,6 +1039,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                     )
                   : null
                 const hideInnerScheduleBox = isWebshopOrder(order) && !!schedLine
+                const dineInSeat = adminDineInSeatAuditLine(order, t)
                 return (
                 <motion.div
                   key={order.id}
@@ -1086,6 +1094,11 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                       {!isWebshopOrder(order) && (
                         <span className="px-2 py-0.5 rounded-md text-xs font-medium text-gray-700 bg-gray-100 border border-gray-200">
                           {orderTypeLabel(order.order_type)}
+                        </span>
+                      )}
+                      {dineInSeat && (
+                        <span className="px-2 py-0.5 rounded-md text-xs font-bold text-emerald-900 bg-emerald-50 border border-emerald-200">
+                          {dineInSeat}
                         </span>
                       )}
                       <span className="px-2 py-0.5 rounded-md text-xs font-medium text-gray-700 bg-gray-100 border border-gray-200">
@@ -1162,11 +1175,26 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                   <div>
                     <h2 className="text-3xl font-semibold tracking-tight text-white tabular-nums">#{selectedOrder.order_number}</h2>
                     <p className="text-sm font-medium text-white/85 mt-1 uppercase tracking-wide">{getStatusLabel(selectedOrder.status)}</p>
-                    {isWebshopOrder(selectedOrder) && (
+                    {isWebshopOrder(selectedOrder) ? (
                       <p className="text-sm text-white/90 mt-2 font-semibold leading-snug normal-case">
                         {tx('onlineOrder')} · {orderTypeLabel(selectedOrder.order_type)}
                         {selectedScheduleDetail ? ` · ${selectedScheduleDetail}` : ''}
                       </p>
+                    ) : (
+                      <>
+                        <p className="text-sm text-white/90 mt-2 font-semibold leading-snug normal-case">
+                          {orderTypeLabel(selectedOrder.order_type)}
+                          {selectedScheduleDetail ? ` · ${selectedScheduleDetail}` : ''}
+                        </p>
+                        {(() => {
+                          const seat = adminDineInSeatAuditLine(selectedOrder, t)
+                          return seat ? (
+                            <p className="text-sm text-white font-bold mt-2 bg-white/15 px-2 py-1 rounded-md inline-block">
+                              {seat}
+                            </p>
+                          ) : null
+                        })()}
+                      </>
                     )}
                   </div>
                   <button
