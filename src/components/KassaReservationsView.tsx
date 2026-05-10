@@ -1265,14 +1265,11 @@ export default function KassaReservationsView({
     // z9 - No-show fee aanrekenen als bescherming actief
     if (reservationSettings.noShowProtection && r.stripe_payment_method_id && r.guest_name) {
       try {
-        await fetch('/api/reservation-card-auth', {
+        await authFetch('/api/reservation-card-auth', {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            paymentMethodId: r.stripe_payment_method_id,
-            amount: reservationSettings.noShowFee || 25,
-            businessName: businessInfo.name,
-            guestName: r.guest_name,
+            tenantSlug: tenant,
+            reservationId: r.id,
           }),
         })
         toast.success(
