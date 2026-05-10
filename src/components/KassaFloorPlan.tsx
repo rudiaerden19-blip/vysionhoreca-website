@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
 import {
@@ -382,26 +382,15 @@ export default function KassaFloorPlan({
   const [stoolStatuses, setStoolStatuses] = useState<Record<string, TableStatus>>({})
 
   const [isLocked, setIsLocked] = useState(true)
-  // Pan offset: verschuift het hele canvas — opgeslagen per tenant in localStorage
-  const panKey = `vysion_floor_pan_${tenant}`
-  const [panX, setPanX] = useState(() => {
-    try { const s = localStorage.getItem(`vysion_floor_pan_${tenant}`); return s ? JSON.parse(s).x : 0 } catch { return 0 }
-  })
-  const [panY, setPanY] = useState(() => {
-    try { const s = localStorage.getItem(`vysion_floor_pan_${tenant}`); return s ? JSON.parse(s).y : 0 } catch { return 0 }
-  })
   const floorRef = useRef<HTMLDivElement>(null)
   /** iPad/Safari: altijd releasePointerCapture na drag, anders blijven tikken “vast”. */
   const pointerCaptureRef = useRef<{ pointerId: number; element: HTMLElement } | null>(null)
 
   const draggingId = useRef<string | null>(null)
-  const draggingType = useRef<'table' | 'decor' | 'canvas'>('table')
+  const draggingType = useRef<'table' | 'decor'>('table')
   const dragOffset = useRef({ x: 0, y: 0 })
   const dragMoved = useRef(false)
   const pointerStart = useRef({ x: 0, y: 0 })
-  const panStart = useRef({ x: 0, y: 0 })
-  /** Tijdens canvas-pan: React panX/panY is bewust niet synchroon — useLayoutEffect past ze niet toe zolang dit true is. */
-  const canvasPanActiveRef = useRef(false)
   /** Tijdens tafel/decor-sleep: geen realtime setTables/setDecors (echo van eigen save = race / hapering). */
   const ignoreFloorRealtimeRef = useRef(false)
   const floorRectCachedRef = useRef<DOMRect | null>(null)
@@ -410,11 +399,8 @@ export default function KassaFloorPlan({
   const [dragPaint, setDragPaint] = useState<{ id: string; x: number; y: number } | null>(null)
   const pendingDragPctRef = useRef<{ x: number; y: number } | null>(null)
   const innerCanvasRef = useRef<HTMLDivElement | null>(null)
-  const canvasPanLiveRef = useRef<{ x: number; y: number } | null>(null)
   /** Pauzeer localStorage-sync van tables tijdens eender welke vloer-interactie (zoals voorheen isDragging). */
   const floorPersistPausedRef = useRef(false)
-  /** Refit pan wanneer tafel-set verandert (andere pc / realtime). */
-  const lastTablesLayoutKeyRef = useRef('')
 
   const setBodyGrabbing = (on: boolean) => {
     if (typeof document === 'undefined') return
@@ -440,15 +426,6 @@ export default function KassaFloorPlan({
       dragPaintRafRef.current = null
     }
   }
-
-  useLayoutEffect(() => {
-    if (canvasPanActiveRef.current) return
-    const floor = floorRef.current
-    const inner = innerCanvasRef.current
-    if (!floor || !inner) return
-    floor.style.backgroundPosition = `${panX}px ${panY}px`
-    inner.style.transform = `translate(${panX}px, ${panY}px)`
-  }, [panX, panY])
 
   useEffect(() => () => {
     setBodyGrabbing(false)
@@ -482,13 +459,6 @@ export default function KassaFloorPlan({
     return { items: obj.items || [], statuses: obj.stool_statuses || {} }
   }
 
-  /** Wijzigingen aan welke tafels er zijn (niet alleen slepen) → pan opnieuw centreren. */
-  const tablesLayoutKey = useMemo(
-    () =>
-      `${tables.length}|${tables.map((t) => t.id).sort().join(',')}||${decors.length}|${decors.map((d) => d.id).sort().join(',')}`,
-    [tables, decors]
-  )
-
   const seedSignature = useMemo(() => JSON.stringify(seedTables ?? []), [seedTables])
 
   // Zelfde bron als kassa-tafelkiezer — voorkomt lege plattegrond terwijl de lijst wel knoppen heeft
@@ -518,8 +488,6 @@ export default function KassaFloorPlan({
     }
 
     const load = async () => {
-      lastTablesLayoutKeyRef.current = ''
-
       const localTables = (() => {
         try {
           const r = localStorage.getItem(storageKey)
@@ -663,33 +631,6 @@ export default function KassaFloorPlan({
     }
   }, [tables, storageKey])
 
-  // Pan opnieuw centreren als het setje tafels/decor verandert (andere pc / eerste load) — niet bij puur slepen (zelfde id-set)
-  useLayoutEffect(() => {
-    if (tables.length === 0 || !floorRef.current) return
-    if (tablesLayoutKey === lastTablesLayoutKeyRef.current) return
-    lastTablesLayoutKeyRef.current = tablesLayoutKey
-    const floor = floorRef.current
-    const all = [...tables, ...decors]
-    const xs = all.map((i) => clampPct(i.x))
-    const ys = all.map((i) => clampPct(i.y))
-    const centerXpct = (Math.min(...xs) + Math.max(...xs)) / 2
-    const centerYpct = (Math.min(...ys) + Math.max(...ys)) / 2
-    const vw = floor.clientWidth
-    const vh = floor.clientHeight
-    const newPanX = vw / 2 - (centerXpct / 100) * vw
-    const newPanY = vh / 2 - (centerYpct / 100) * vh
-    setPanX(newPanX)
-    setPanY(newPanY)
-    try {
-      localStorage.setItem(panKey, JSON.stringify({ x: newPanX, y: newPanY }))
-    } catch {
-      /* ignore */
-    }
-    floor.style.backgroundPosition = `${newPanX}px ${newPanY}px`
-    const inner = innerCanvasRef.current
-    if (inner) inner.style.transform = `translate(${newPanX}px, ${newPanY}px)`
-  }, [tablesLayoutKey, tables, decors, panKey])
-
   const save = (updated: KassaTable[]) => {
     setTables(updated)
     localStorage.setItem(storageKey, JSON.stringify(updated))
@@ -778,17 +719,12 @@ export default function KassaFloorPlan({
 
   const addTable = () => {
     if (!addNumber.trim()) return
-    // Plaats in het midden van het huidige zicht (pan), niet ergens op vaste random % — anders staat de tafel “ver weg”
     let x = 25 + Math.random() * 50
     let y = 25 + Math.random() * 50
     const el = floorRef.current
     if (el && el.clientWidth > 0 && el.clientHeight > 0) {
-      const vw = el.clientWidth
-      const vh = el.clientHeight
-      const cx = ((vw / 2 - panX) / vw) * 100
-      const cy = ((vh / 2 - panY) / vh) * 100
-      x = clampPct(cx + (Math.random() - 0.5) * 10)
-      y = clampPct(cy + (Math.random() - 0.5) * 10)
+      x = clampPct(50 + (Math.random() - 0.5) * 10)
+      y = clampPct(50 + (Math.random() - 0.5) * 10)
     }
     const t: KassaTable = {
       id: makeId(),
@@ -819,25 +755,12 @@ export default function KassaFloorPlan({
     if (sel) setSelected(sel)
   }
 
-  // Pointer events — werkt op iPad (touch) én desktop (mouse)
-  // Posities zijn % (0-100) van de container. Pan verschuift het canvas visueel.
+  // Posities zijn % (0–100) van de container; tegelpatroon blijft vast — alleen tafels/decor verschuiven.
   const handlePointerDown = (e: React.PointerEvent, id: string, type: 'table' | 'decor') => {
     e.stopPropagation()
     if (showAddModal || showAddBarModal) return
-    if (isLocked) {
-      // Vergrendeld: sleep overal (ook op tafels) om canvas te pannen
-      takePointerCapture(e.currentTarget as HTMLElement, e.pointerId)
-      draggingId.current = '__canvas__'
-      draggingType.current = 'canvas'
-      dragMoved.current = false
-      pointerStart.current = { x: e.clientX, y: e.clientY }
-      panStart.current = { x: panX, y: panY }
-      canvasPanLiveRef.current = null
-      floorPersistPausedRef.current = true
-      canvasPanActiveRef.current = true
-      setBodyGrabbing(true)
-      return
-    }
+    if (isLocked) return
+
     takePointerCapture(e.currentTarget as HTMLElement, e.pointerId)
     const floor = floorRef.current
     if (!floor) return
@@ -854,10 +777,9 @@ export default function KassaFloorPlan({
     ignoreFloorRealtimeRef.current = true
     floorPersistPausedRef.current = true
     setBodyGrabbing(true)
-    // Drag offset: pointer positie minus de schermpositie van de tafel (rekening houdend met pan)
     dragOffset.current = {
-      x: e.clientX - rect.left - panX - (item.x / 100) * rect.width,
-      y: e.clientY - rect.top - panY - (item.y / 100) * rect.height,
+      x: e.clientX - rect.left - (item.x / 100) * rect.width,
+      y: e.clientY - rect.top - (item.y / 100) * rect.height,
     }
   }
 
@@ -869,24 +791,11 @@ export default function KassaFloorPlan({
     if (dx < 8 && dy < 8) return
     dragMoved.current = true
 
-    // Canvas panning: slepen op lege achtergrond — alleen style, geen React + geen localStorage tot pointerup
-    if (draggingType.current === 'canvas') {
-      const newX = panStart.current.x + (e.clientX - pointerStart.current.x)
-      const newY = panStart.current.y + (e.clientY - pointerStart.current.y)
-      canvasPanLiveRef.current = { x: newX, y: newY }
-      const floorEl = floorRef.current
-      const innerEl = innerCanvasRef.current
-      if (floorEl) floorEl.style.backgroundPosition = `${newX}px ${newY}px`
-      if (innerEl) innerEl.style.transform = `translate(${newX}px, ${newY}px)`
-      return
-    }
-
     const floor = floorRef.current
     if (!floor) return
     const rect = floorRectCachedRef.current ?? floor.getBoundingClientRect()
-    // Nieuwe % positie = (pointer - offset - pan) / containergrootte
-    const x = Math.max(1, Math.min(99, ((e.clientX - rect.left - panX - dragOffset.current.x) / rect.width) * 100))
-    const y = Math.max(1, Math.min(99, ((e.clientY - rect.top - panY - dragOffset.current.y) / rect.height) * 100))
+    const x = Math.max(1, Math.min(99, ((e.clientX - rect.left - dragOffset.current.x) / rect.width) * 100))
+    const y = Math.max(1, Math.min(99, ((e.clientY - rect.top - dragOffset.current.y) / rect.height) * 100))
     pendingDragPctRef.current = { x, y }
     scheduleDragPaintFromPending()
   }
@@ -894,21 +803,6 @@ export default function KassaFloorPlan({
   const handlePointerUp = (e: React.PointerEvent) => {
     releaseCapturedPointer(e)
     if (!draggingId.current) return
-    if (draggingType.current === 'canvas') {
-      const live = canvasPanLiveRef.current
-      canvasPanActiveRef.current = false
-      if (live) {
-        setPanX(live.x)
-        setPanY(live.y)
-        try { localStorage.setItem(panKey, JSON.stringify(live)) } catch { /* ignore */ }
-      }
-      canvasPanLiveRef.current = null
-      draggingId.current = null
-      floorPersistPausedRef.current = false
-      setBodyGrabbing(false)
-      setTimeout(() => { dragMoved.current = false }, 0)
-      return
-    }
     const id = draggingId.current
     const pct = pendingDragPctRef.current
     cancelDragPaintRaf()
@@ -942,26 +836,12 @@ export default function KassaFloorPlan({
 
   const handlePointerCancel = (e: React.PointerEvent) => {
     releaseCapturedPointer(e)
-    const dtype = draggingType.current
-    if (dtype === 'canvas') {
-      const rx = panStart.current.x
-      const ry = panStart.current.y
-      canvasPanActiveRef.current = false
-      const floorEl = floorRef.current
-      const innerEl = innerCanvasRef.current
-      if (floorEl) floorEl.style.backgroundPosition = `${rx}px ${ry}px`
-      if (innerEl) innerEl.style.transform = `translate(${rx}px, ${ry}px)`
-      canvasPanLiveRef.current = null
-      floorPersistPausedRef.current = false
-      setBodyGrabbing(false)
-    } else {
-      cancelDragPaintRaf()
-      ignoreFloorRealtimeRef.current = false
-      floorRectCachedRef.current = null
-      floorPersistPausedRef.current = false
-      setBodyGrabbing(false)
-      setDragPaint(null)
-    }
+    cancelDragPaintRaf()
+    ignoreFloorRealtimeRef.current = false
+    floorRectCachedRef.current = null
+    floorPersistPausedRef.current = false
+    setBodyGrabbing(false)
+    setDragPaint(null)
     pendingDragPctRef.current = null
     draggingId.current = null
     setTimeout(() => { dragMoved.current = false }, 0)
@@ -1016,40 +896,27 @@ export default function KassaFloorPlan({
 
       {/* Floor + Sidebar */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Floor plan — overflow-hidden, inner canvas verschuift via pan-transform */}
+        {/* Floor plan — tegelpatroon vast; alleen tafels/decor verschuiven */}
         <div
           ref={floorRef}
           className="floor-plan flex-1 relative overflow-hidden select-none"
           style={{
             backgroundColor: '#4a4a4a',
+            backgroundPosition: '0 0',
             backgroundImage: `
               linear-gradient(to right, rgba(200,200,200,0.25) 0px, rgba(200,200,200,0.25) 2px, transparent 2px),
               linear-gradient(to bottom, rgba(200,200,200,0.25) 0px, rgba(200,200,200,0.25) 2px, transparent 2px)
             `,
             backgroundSize: '100px 100px',
-            cursor: 'grab',
+            cursor: 'default',
             touchAction: 'none',
-          }}
-          onPointerDown={(e) => {
-            if (showAddModal || showAddBarModal) return
-            // Tafels/decor gebruiken stopPropagation, dus hier komen alleen events van lege vloer
-            takePointerCapture(e.currentTarget as HTMLElement, e.pointerId)
-            draggingId.current = '__canvas__'
-            draggingType.current = 'canvas'
-            dragMoved.current = false
-            pointerStart.current = { x: e.clientX, y: e.clientY }
-            panStart.current = { x: panX, y: panY }
-            canvasPanLiveRef.current = null
-            floorPersistPausedRef.current = true
-            canvasPanActiveRef.current = true
-            setBodyGrabbing(true)
           }}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerCancel}
           onClick={() => { if (!dragMoved.current) { setSelected(null); setSelectedDecor(null) } }}
         >
-          {/* Inner canvas: posities zijn % van de container, pan verschuift het geheel */}
+          {/* Inner canvas: posities zijn % van de container */}
           <div ref={innerCanvasRef} style={{ position: 'absolute', inset: 0 }}>
 
           {/* Decor items (achtergrond laag) */}
@@ -1132,45 +999,6 @@ export default function KassaFloorPlan({
           )}
           </div>{/* einde inner canvas */}
 
-          {/* Pan hint: pijltjes linksonder */}
-          <div
-            className="absolute bottom-4 left-4 z-20 select-none"
-            onPointerDown={e => e.stopPropagation()}
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="grid grid-cols-3 gap-1" style={{ gridTemplateRows: 'repeat(3, 1fr)' }}>
-              {/* Rij 1: lege cel, omhoog, lege cel */}
-              <div />
-              <button
-                onPointerDown={e => { e.stopPropagation(); e.preventDefault() }}
-                onClick={e => { e.stopPropagation(); const s = 80; setPanY((p: number) => { const n = p + s; try { localStorage.setItem(panKey, JSON.stringify({ x: panX, y: n })) } catch { /* ignore */ } return n }) }}
-                className="w-10 h-10 rounded-xl bg-black/50 hover:bg-black/70 active:bg-black/90 text-white flex items-center justify-center text-lg font-bold transition-colors border border-white/20"
-              >▲</button>
-              <div />
-              {/* Rij 2: links, midden (kompas), rechts */}
-              <button
-                onPointerDown={e => { e.stopPropagation(); e.preventDefault() }}
-                onClick={e => { e.stopPropagation(); const s = 80; setPanX((p: number) => { const n = p + s; try { localStorage.setItem(panKey, JSON.stringify({ x: n, y: panY })) } catch { /* ignore */ } return n }) }}
-                className="w-10 h-10 rounded-xl bg-black/50 hover:bg-black/70 active:bg-black/90 text-white flex items-center justify-center text-lg font-bold transition-colors border border-white/20"
-              >◀</button>
-              <div className="w-10 h-10 rounded-xl bg-black/30 border border-white/10 flex items-center justify-center">
-                <span className="text-white/40 text-xs">✛</span>
-              </div>
-              <button
-                onPointerDown={e => { e.stopPropagation(); e.preventDefault() }}
-                onClick={e => { e.stopPropagation(); const s = 80; setPanX((p: number) => { const n = p - s; try { localStorage.setItem(panKey, JSON.stringify({ x: n, y: panY })) } catch { /* ignore */ } return n }) }}
-                className="w-10 h-10 rounded-xl bg-black/50 hover:bg-black/70 active:bg-black/90 text-white flex items-center justify-center text-lg font-bold transition-colors border border-white/20"
-              >▶</button>
-              {/* Rij 3: lege cel, omlaag, lege cel */}
-              <div />
-              <button
-                onPointerDown={e => { e.stopPropagation(); e.preventDefault() }}
-                onClick={e => { e.stopPropagation(); const s = 80; setPanY((p: number) => { const n = p - s; try { localStorage.setItem(panKey, JSON.stringify({ x: panX, y: n })) } catch { /* ignore */ } return n }) }}
-                className="w-10 h-10 rounded-xl bg-black/50 hover:bg-black/70 active:bg-black/90 text-white flex items-center justify-center text-lg font-bold transition-colors border border-white/20"
-              >▼</button>
-              <div />
-            </div>
-          </div>
         </div>
 
         {/* Decor Sidebar */}
