@@ -3801,7 +3801,7 @@
     "floorPlanShapeRectangle": "▬ Rechthoek",
     "floorPlanStatusHeading": "Status",
     "openCustomerDisplay": "Klantscherm",
-    "customerDisplayHint": "Open zwart klantscherm — tweede monitor, volledig scherm (F11).",
+    "customerDisplayHint": "Probeert automatisch op het tweede scherm te openen. Sta pop-ups toe; Chrome/Edge kan om schermtoestemming vragen. F11 = volledig scherm.",
     "customerDisplayOpenFailed": "Kon klantscherm niet openen. Sta pop-ups toe voor deze site."
   },
   "kassaCustomerDisplay": {

@@ -3347,7 +3347,7 @@
     "floorPlanShapeRectangle": "▬ Rectangle",
     "floorPlanStatusHeading": "状态",
     "openCustomerDisplay": "顾客显示屏",
-    "customerDisplayHint": "打开黑色顾客屏 — 第二显示器，全屏（F11）。",
+    "customerDisplayHint": "尽量自动在第二显示器打开。请允许弹出窗口；Chrome/Edge 可能会请求屏幕权限。F11 全屏。",
     "customerDisplayOpenFailed": "无法打开顾客显示屏。请允许此网站的弹出窗口。"
   },
   "kassaCustomerDisplay": {

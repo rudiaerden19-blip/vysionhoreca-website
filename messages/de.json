@@ -2847,7 +2847,7 @@
     "floorPlanShapeRectangle": "▬ Rechteck",
     "floorPlanStatusHeading": "Status",
     "openCustomerDisplay": "Kundenanzeige",
-    "customerDisplayHint": "Schwarzen Kundenbildschirm öffnen — zweiter Monitor, Vollbild (F11).",
+    "customerDisplayHint": "Versucht automatisch auf dem zweiten Bildschirm zu öffnen. Pop-ups erlauben; Chrome/Edge kann eine Bildschirmberechtigung anfragen. F11 = Vollbild.",
     "customerDisplayOpenFailed": "Kundenanzeige konnte nicht geöffnet werden. Pop-ups für diese Website erlauben."
   },
   "kassaCustomerDisplay": {

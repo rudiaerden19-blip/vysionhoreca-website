@@ -3347,7 +3347,7 @@
     "floorPlanShapeRectangle": "▬ Rettangolo",
     "floorPlanStatusHeading": "Stato",
     "openCustomerDisplay": "Schermo cliente",
-    "customerDisplayHint": "Apri schermo cliente nero — secondo monitor, schermo intero (F11).",
+    "customerDisplayHint": "Prova ad aprirsi automaticamente sul secondo schermo. Consenti i popup; Chrome/Edge può chiedere l’accesso agli schermi. F11 = schermo intero.",
     "customerDisplayOpenFailed": "Impossibile aprire lo schermo cliente. Consenti i popup per questo sito."
   },
   "kassaCustomerDisplay": {

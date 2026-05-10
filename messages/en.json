@@ -3801,7 +3801,7 @@
     "floorPlanShapeRectangle": "▬ Rectangle",
     "floorPlanStatusHeading": "Status",
     "openCustomerDisplay": "Customer display",
-    "customerDisplayHint": "Open black customer screen — second monitor, fullscreen (F11).",
+    "customerDisplayHint": "Tries to open on the second screen automatically. Allow pop-ups; Chrome/Edge may ask for display permission. F11 = fullscreen.",
     "customerDisplayOpenFailed": "Could not open customer display. Allow pop-ups for this site."
   },
   "kassaCustomerDisplay": {

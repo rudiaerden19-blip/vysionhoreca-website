@@ -8,6 +8,7 @@ import {
   kassaCustomerDisplayChannelName,
   type KassaCustomerDisplayMessage,
 } from '@/lib/kassa-customer-display'
+import { positionCustomerDisplayWindow } from '@/lib/kassa-customer-display-window'
 
 export function KlantschermClient({ tenant }: { tenant: string }) {
   const { t } = useLanguage()
@@ -33,6 +34,21 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
     }
     return () => bc.close()
   }, [channelName, tenant])
+
+  useEffect(() => {
+    if (!token) return
+    let cancelled = false
+    const run = async () => {
+      await positionCustomerDisplayWindow(window)
+      if (cancelled) return
+      await new Promise((r) => setTimeout(r, 150))
+      if (!cancelled) await positionCustomerDisplayWindow(window)
+    }
+    void run()
+    return () => {
+      cancelled = true
+    }
+  }, [token])
 
   const formatMoney = (n: number) =>
     new Intl.NumberFormat('nl-BE', { style: 'currency', currency: 'EUR' }).format(n)

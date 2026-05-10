@@ -3347,7 +3347,7 @@
     "floorPlanShapeRectangle": "▬ Rectangle",
     "floorPlanStatusHeading": "الحالة",
     "openCustomerDisplay": "شاشة العميل",
-    "customerDisplayHint": "افتح شاشة العميل السوداء — شاشة ثانية، وضع ملء الشاشة (F11).",
+    "customerDisplayHint": "يحاول الفتح تلقائياً على الشاشة الثانية. اسمح بالنوافذ المنبثقة؛ قد يطلب Chrome/Edge إذناً للشاشات. F11 = ملء الشاشة.",
     "customerDisplayOpenFailed": "تعذّر فتح شاشة العميل. اسمح بالنوافذ المنبثقة لهذا الموقع."
   },
   "kassaCustomerDisplay": {

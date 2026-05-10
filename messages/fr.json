@@ -2847,7 +2847,7 @@
     "floorPlanShapeRectangle": "▬ Rectangle",
     "floorPlanStatusHeading": "Statut",
     "openCustomerDisplay": "Écran client",
-    "customerDisplayHint": "Ouvrir l’écran client noir — deuxième écran, plein écran (F11).",
+    "customerDisplayHint": "Tente d’ouvrir automatiquement sur le deuxième écran. Autorisez les pop-ups ; Chrome/Edge peut demander l’accès aux écrans. F11 = plein écran.",
     "customerDisplayOpenFailed": "Impossible d’ouvrir l’écran client. Autorisez les pop-ups pour ce site."
   },
   "kassaCustomerDisplay": {

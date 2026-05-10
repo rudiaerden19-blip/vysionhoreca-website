@@ -3347,7 +3347,7 @@
     "floorPlanShapeRectangle": "▬ Rectangle",
     "floorPlanStatusHeading": "状態",
     "openCustomerDisplay": "お客様画面",
-    "customerDisplayHint": "黒背景のお客様画面を開く — セカンドモニター、全画面表示（F11）。",
+    "customerDisplayHint": "可能な場合はセカンドスクリーンで自動的に開きます。ポップアップを許可してください。Chrome/Edge は画面アクセスの確認を求めることがあります。F11 で全画面。",
     "customerDisplayOpenFailed": "お客様画面を開けませんでした。このサイトのポップアップを許可してください。"
   },
   "kassaCustomerDisplay": {

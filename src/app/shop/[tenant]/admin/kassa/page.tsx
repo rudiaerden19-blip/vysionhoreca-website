@@ -1201,7 +1201,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       setCustomerDisplayToken(tok)
     }
     const url = `${window.location.origin}/shop/${tenant}/klantscherm?t=${encodeURIComponent(tok)}`
-    const w = window.open(url, `vysion_klantscherm_${tenant}`, 'noopener,noreferrer')
+    const w = window.open(url, `vysion_klantscherm_${tenant}`, 'popup=yes,width=240,height=160,noopener,noreferrer')
     if (!w) {
       window.alert(t('kassaApp.customerDisplayOpenFailed'))
     }
