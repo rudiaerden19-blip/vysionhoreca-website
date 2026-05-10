@@ -13,7 +13,7 @@ import {
   displayNumbersWithOpenOrdersInZone,
   FLOOR_PLAN_ZONE_INSIDE,
   FLOOR_PLAN_ZONE_TERRACE,
-  normalizeFloorPlanZone,
+  floorPlanZoneFromRealtimePayload,
   tableOrderMapKey,
   type FloorPlanZone,
 } from '@/lib/kassa-floor-plan-zone'
@@ -631,16 +631,8 @@ export default function KassaFloorPlan({
           old?: { plan_zone?: string }
         }) => {
           if (ignoreFloorRealtimeRef.current) return
-          const meta = payload.eventType === 'DELETE' ? payload.old : payload.new
-          const rawZone = meta?.plan_zone
-          if (
-            payload.eventType === 'DELETE' &&
-            (rawZone == null || String(rawZone).trim() === '')
-          ) {
-            return
-          }
-          const z = normalizeFloorPlanZone(rawZone)
-          if (z !== planZone) return
+          const z = floorPlanZoneFromRealtimePayload(payload)
+          if (!z || z !== planZone) return
           if (payload.eventType === 'DELETE') {
             setTables([])
             localStorage.setItem(storageKey, JSON.stringify([]))
@@ -668,16 +660,8 @@ export default function KassaFloorPlan({
           old?: { plan_zone?: string }
         }) => {
           if (ignoreFloorRealtimeRef.current) return
-          const meta = payload.eventType === 'DELETE' ? payload.old : payload.new
-          const rawZone = meta?.plan_zone
-          if (
-            payload.eventType === 'DELETE' &&
-            (rawZone == null || String(rawZone).trim() === '')
-          ) {
-            return
-          }
-          const z = normalizeFloorPlanZone(rawZone)
-          if (z !== planZone) return
+          const z = floorPlanZoneFromRealtimePayload(payload)
+          if (!z || z !== planZone) return
           if (payload.eventType === 'DELETE') {
             setDecors([])
             setStoolStatuses({})

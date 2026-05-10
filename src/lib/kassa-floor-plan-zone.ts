@@ -14,6 +14,28 @@ export function normalizeFloorPlanZone(raw: string | null | undefined): FloorPla
   return raw === FLOOR_PLAN_ZONE_TERRACE ? FLOOR_PLAN_ZONE_TERRACE : FLOOR_PLAN_ZONE_INSIDE
 }
 
+/**
+ * Supabase Realtime stuurt bij UPDATE vaak alleen gewijzigde kolommen in `new`.
+ * `plan_zone` hoort bij de PK — gebruik `old.plan_zone` als die in `new` ontbreekt.
+ * Anders zou terras-data per ongeluk onder `inside` gemerged worden.
+ */
+export function floorPlanZoneFromRealtimePayload(payload: {
+  eventType?: string
+  new?: { plan_zone?: string | null }
+  old?: { plan_zone?: string | null }
+}): FloorPlanZone | null {
+  if (payload.eventType === 'DELETE') {
+    const raw = payload.old?.plan_zone
+    if (raw == null || String(raw).trim() === '') return null
+    return normalizeFloorPlanZone(raw)
+  }
+  const raw =
+    payload.new?.plan_zone ??
+    (payload.eventType === 'UPDATE' ? payload.old?.plan_zone : undefined)
+  if (raw == null || String(raw).trim() === '') return null
+  return normalizeFloorPlanZone(raw)
+}
+
 /** Unieke sleutel voor open mand + tableOrders state (zelfde nummer binnen ≠ terras). */
 export function tableOrderMapKey(zone: FloorPlanZone, displayNumber: string): string {
   return `${zone}:${displayNumber}`

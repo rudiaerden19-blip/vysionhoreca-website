@@ -95,6 +95,7 @@ import { parseFloorPlanTablesJson, sanitizeFloorPlanTables, type FloorPlanTable 
 import {
   FLOOR_PLAN_ZONE_INSIDE,
   FLOOR_PLAN_ZONE_TERRACE,
+  floorPlanZoneFromRealtimePayload,
   migrateLegacyTableOrdersKeys,
   normalizeFloorPlanZone,
   parseTableOrderMapKey,
@@ -788,6 +789,45 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   // ── Realtime sync: tafelstatus tussen apparaten ───────────────────────────
   useEffect(() => {
+    const refetchAllFloorPlanTables = () => {
+      void (async () => {
+        const applyPayload = (zone: FloorPlanZone, raw: unknown) => {
+          const parsed = parseFloorPlanTablesJson(raw)
+          if (parsed === null) return false
+          const fixed = sanitizeFloorPlanTables(parsed)
+          setKassaTablesByZone((prev) => ({ ...prev, [zone]: fixed }))
+          localStorage.setItem(floorPlanTablesLocalStorageKey(tenant, zone), JSON.stringify(fixed))
+          return true
+        }
+        for (const zone of KASSA_FLOOR_ZONES) {
+          const adminRes = await adminDb.select<{ data?: unknown } | null>('floor_plan_tables', {
+            tenantSlug: tenant,
+            select: 'data',
+            match: { plan_zone: zone },
+            single: 'maybe',
+          })
+          let merged = false
+          if (adminRes.ok) {
+            const row = adminRes.data as { data?: unknown } | null | undefined
+            if (row == null) merged = applyPayload(zone, [])
+            else merged = applyPayload(zone, row.data)
+          }
+          if (!merged) {
+            const { data, error } = await supabase
+              .from('floor_plan_tables')
+              .select('data')
+              .eq('tenant_slug', tenant)
+              .eq('plan_zone', zone)
+              .maybeSingle()
+            if (!error) {
+              if (data == null) applyPayload(zone, [])
+              else applyPayload(zone, data.data)
+            }
+          }
+        }
+      })()
+    }
+
     const tableChannel = supabase
       .channel(`kassa_fpt_${tenant}`)
       .on(
@@ -798,26 +838,24 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           new?: { data?: unknown; plan_zone?: string }
           old?: { plan_zone?: string }
         }) => {
-          const meta = payload.eventType === 'DELETE' ? payload.old : payload.new
-          const rawZone = meta?.plan_zone
-          if (
-            payload.eventType === 'DELETE' &&
-            (rawZone == null || String(rawZone).trim() === '')
-          ) {
+          const applyZone = floorPlanZoneFromRealtimePayload(payload)
+          if (!applyZone) {
+            refetchAllFloorPlanTables()
             return
           }
-          const zone = normalizeFloorPlanZone(rawZone)
           if (payload.eventType === 'DELETE') {
-            setKassaTablesByZone((prev) => ({ ...prev, [zone]: [] }))
-            localStorage.setItem(floorPlanTablesLocalStorageKey(tenant, zone), JSON.stringify([]))
+            setKassaTablesByZone((prev) => ({ ...prev, [applyZone]: [] }))
+            localStorage.setItem(floorPlanTablesLocalStorageKey(tenant, applyZone), JSON.stringify([]))
             return
           }
           const row = payload.new
-          if (!row) return
+          if (!row) {
+            refetchAllFloorPlanTables()
+            return
+          }
           const parsed = parseFloorPlanTablesJson(row.data)
           if (parsed === null) return
           const fixed = sanitizeFloorPlanTables(parsed)
-          const applyZone = normalizeFloorPlanZone(row.plan_zone)
           setKassaTablesByZone((prev) => ({ ...prev, [applyZone]: fixed }))
           localStorage.setItem(floorPlanTablesLocalStorageKey(tenant, applyZone), JSON.stringify(fixed))
         },
@@ -830,6 +868,27 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   // ── Realtime sync: plattegrond-decor / barkrukken ─────────────────────────
   useEffect(() => {
+    const refetchAllFloorDecor = () => {
+      void (async () => {
+        for (const zone of KASSA_FLOOR_ZONES) {
+          const { data } = await supabase
+            .from('floor_plan_decor')
+            .select('data')
+            .eq('tenant_slug', tenant)
+            .eq('plan_zone', zone)
+            .maybeSingle()
+          if (data?.data == null) {
+            setKassaStoolsByZone((p) => ({ ...p, [zone]: [] }))
+          } else {
+            setKassaStoolsByZone((p) => ({
+              ...p,
+              [zone]: stoolsFromFloorDecorPayload(data.data),
+            }))
+          }
+        }
+      })()
+    }
+
     const decorChannel = supabase
       .channel(`kassa_decor_${tenant}`)
       .on(
@@ -847,15 +906,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             old?: { plan_zone?: string }
           },
         ) => {
-          const meta = payload.eventType === 'DELETE' ? payload.old : payload.new
-          const rawZone = meta?.plan_zone
-          if (
-            payload.eventType === 'DELETE' &&
-            (rawZone == null || String(rawZone).trim() === '')
-          ) {
+          const zone = floorPlanZoneFromRealtimePayload(payload)
+          if (!zone) {
+            refetchAllFloorDecor()
             return
           }
-          const zone = normalizeFloorPlanZone(rawZone)
           if (payload.eventType === 'DELETE') {
             setKassaStoolsByZone((prev) => ({ ...prev, [zone]: [] }))
             return
@@ -3049,7 +3104,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       <button
                         onClick={() => {
                           setTableNumber('')
-                          setDineInFloorZone(FLOOR_PLAN_ZONE_INSIDE)
+                          setDineInFloorZone(pickerBrowseZone)
                           setShowTablePicker(false)
                         }}
                         className="flex-1 py-2 rounded-xl bg-red-50 text-red-600 font-semibold text-sm hover:bg-red-100 transition-colors"
