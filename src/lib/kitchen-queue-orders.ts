@@ -28,6 +28,10 @@ export function isKitchenQueueOrder(o: {
   const ps = (o.payment_status || '').toLowerCase()
 
   if (st === 'confirmed' || st === 'preparing') {
+    // Tafel: na betalen schrijft de kassa een nieuwe rij weg (confirmed + paid). Keuken heeft de open/preparing-mand al gehad — niet opnieuw tonen.
+    if (isKassaPosOrder(o) && ot === 'DINE_IN' && ps === 'paid') {
+      return false
+    }
     if (isKassaPosOrder(o) && ot === 'DINE_IN' && ps !== 'paid' && st === 'preparing') {
       return false
     }
