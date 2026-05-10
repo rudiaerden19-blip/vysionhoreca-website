@@ -110,6 +110,38 @@ import {
   applyCustomerDisplayWindowBounds,
 } from '@/lib/kassa-customer-display-window'
 
+function stoolsFromFloorDecorPayload(data: unknown): { stoolNumber: string; segmentId: string }[] {
+  const rawItems = Array.isArray(data)
+    ? data
+    : data && typeof data === 'object' && Array.isArray((data as { items?: unknown }).items)
+      ? ((data as { items: unknown[] }).items as unknown[])
+      : []
+  const list = rawItems as { id?: string; type?: string; stool1?: string; stool2?: string }[]
+  const out: { stoolNumber: string; segmentId: string }[] = []
+  for (const d of list) {
+    if (d.type !== 'bar_segment') continue
+    const sid = d.id || ''
+    if (d.stool1) out.push({ stoolNumber: d.stool1, segmentId: sid })
+    if (d.stool2) out.push({ stoolNumber: d.stool2, segmentId: sid })
+  }
+  return out
+}
+
+/** Open kassa-tafelorders: alleen rijen uit Supabase — geen merge met oude localStorage. */
+function buildOpenTableOrdersMapFromRows(
+  data: { table_number: string | null; items: unknown }[] | null | undefined
+): Record<string, CartItem[]> {
+  const out: Record<string, CartItem[]> = {}
+  if (!data?.length) return out
+  for (const row of data) {
+    const tn = row.table_number
+    if (tn != null && String(tn) !== '' && row.items != null) {
+      out[String(tn)] = row.items as CartItem[]
+    }
+  }
+  return out
+}
+
 function buildKassaCustomerDisplayLines(cart: CartItem[]): KassaCustomerDisplayLine[] {
   return cart.map((i) => {
     const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
@@ -603,57 +635,35 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         }
       })
 
-    // Barkrukken laden uit localStorage
-    const decorRaw = localStorage.getItem(`vysion_decor_${tenant}`)
-    if (decorRaw) {
-      try {
-        const decors = JSON.parse(decorRaw)
-        const stools = decors
-          .filter((d: { type: string }) => d.type === 'bar_segment')
-          .flatMap((d: { id: string; stool1?: string; stool2?: string }) => [
-            d.stool1 ? { stoolNumber: d.stool1, segmentId: d.id } : null,
-            d.stool2 ? { stoolNumber: d.stool2, segmentId: d.id } : null,
-          ].filter(Boolean))
-        setKassaStools(stools)
-      } catch { /* empty */ }
-    }
-    // Sync barkrukken vanuit Supabase
-    supabase.from('floor_plan_decor').select('data').eq('tenant_slug', tenant).single().then(({ data }) => {
-      if (data?.data) {
-        const stools = (data.data as { id: string; type: string; stool1?: string; stool2?: string }[])
-          .filter(d => d.type === 'bar_segment')
-          .flatMap(d => [
-            d.stool1 ? { stoolNumber: d.stool1, segmentId: d.id } : null,
-            d.stool2 ? { stoolNumber: d.stool2, segmentId: d.id } : null,
-          ].filter(Boolean)) as { stoolNumber: string; segmentId: string }[]
-        if (stools.length > 0) setKassaStools(stools)
-      }
-    })
-    // Laad eerst uit localStorage (snel)
+    // Barkrukken: Supabase is bron (lege DB ⇒ lege lijst op alle pc's)
+    void supabase
+      .from('floor_plan_decor')
+      .select('data')
+      .eq('tenant_slug', tenant)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.data == null) {
+          setKassaStools([])
+          return
+        }
+        setKassaStools(stoolsFromFloorDecorPayload(data.data))
+      })
+
+    // Openstaande tafelorders: eerst cache voor snelle paint, daarna ALTIJD overschrijven met Supabase
     const ordersRaw = localStorage.getItem(tableOrdersKey)
     if (ordersRaw) {
       try { setTableOrders(JSON.parse(ordersRaw)) } catch { /* empty */ }
     }
-    // Sync met Supabase open orders (cross-device)
-    supabase
+
+    void supabase
       .from('orders')
       .select('table_number, items')
       .eq('tenant_slug', tenant)
       .eq('status', 'open')
       .then(({ data }) => {
-        if (!data || data.length === 0) return
-        const fromSupabase: Record<string, CartItem[]> = {}
-        data.forEach(row => {
-          if (row.table_number && row.items) {
-            fromSupabase[row.table_number] = row.items as CartItem[]
-          }
-        })
-        // Merge: Supabase wint bij conflicten (meest recent)
-        setTableOrders(prev => {
-          const merged = { ...prev, ...fromSupabase }
-          localStorage.setItem(tableOrdersKey, JSON.stringify(merged))
-          return merged
-        })
+        const fromSupabase = buildOpenTableOrdersMapFromRows(data ?? null)
+        setTableOrders(fromSupabase)
+        localStorage.setItem(tableOrdersKey, JSON.stringify(fromSupabase))
       })
   }, [tenant, showTablePicker, tableOrdersKey])
 
@@ -677,6 +687,42 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
   }, [tenant])
 
+  // ── Realtime sync: plattegrond-decor / barkrukken ─────────────────────────
+  useEffect(() => {
+    const decorChannel = supabase
+      .channel(`kassa_decor_${tenant}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'floor_plan_decor',
+          filter: `tenant_slug=eq.${tenant}`,
+        },
+        (
+          payload: {
+            eventType?: string
+            new?: { data?: unknown }
+          }
+        ) => {
+          if (payload.eventType === 'DELETE') {
+            setKassaStools([])
+            return
+          }
+          const row = payload.new
+          if (row?.data == null) {
+            setKassaStools([])
+            return
+          }
+          setKassaStools(stoolsFromFloorDecorPayload(row.data))
+        }
+      )
+      .subscribe()
+    return () => {
+      void supabase.removeChannel(decorChannel).catch(() => {})
+    }
+  }, [tenant])
+
   // ── Realtime sync: open bestellingen per tafel tussen apparaten ───────────
   useEffect(() => {
     const ordersChannel = supabase
@@ -691,18 +737,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             .eq('tenant_slug', tenant)
             .eq('status', 'open')
             .then(({ data }) => {
-              if (!data) return
-              const fromSupabase: Record<string, CartItem[]> = {}
-              data.forEach(row => {
-                if (row.table_number && row.items) {
-                  fromSupabase[row.table_number] = row.items as CartItem[]
-                }
-              })
-              setTableOrders(prev => {
-                const merged = { ...prev, ...fromSupabase }
-                localStorage.setItem(tableOrdersKey, JSON.stringify(merged))
-                return merged
-              })
+              const fromSupabase = buildOpenTableOrdersMapFromRows(data ?? null)
+              setTableOrders(fromSupabase)
+              localStorage.setItem(tableOrdersKey, JSON.stringify(fromSupabase))
             })
         }
       )

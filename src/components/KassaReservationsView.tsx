@@ -334,7 +334,7 @@ export default function KassaReservationsView({
 
         if (data && typeof data === 'object') {
           const fromDB = mapReservationSettingsFromDb(data as Record<string, unknown>)
-          const merged = { ...KASSA_DEFAULT_RESERVATION_SETTINGS, ...fromDB, ...localData }
+          const merged = { ...KASSA_DEFAULT_RESERVATION_SETTINGS, ...fromDB }
           setReservationSettings(merged)
           try { localStorage.setItem(`reservationSettings_${tenant}`, JSON.stringify(merged)) } catch {}
         } else {

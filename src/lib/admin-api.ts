@@ -173,6 +173,8 @@ export interface TenantSettings {
   /** Beginsaldo handmatig kasboek (optioneel) */
   kasboek_opening_balance?: number
   kasboek_opening_balance_date?: string | null
+  /** Rapportages X: begin kas (gedeeld op alle apparaten; voorheen localStorage) */
+  report_register_opening_cash?: number
 }
 
 export async function getTenantSettings(tenantSlug: string, signal?: AbortSignal): Promise<TenantSettings | null> {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
 import {
@@ -8,6 +8,8 @@ import {
   fetchAllOrdersForRapporten,
   getTenantSettings,
   orderCountsTowardRevenueAndZReport,
+  saveTenantSettings,
+  type TenantSettings,
 } from '@/lib/admin-api'
 import PinGate from '@/components/PinGate'
 
@@ -116,9 +118,9 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
   // X/Z rapport state
   const [openingCash, setOpeningCash] = useState(0)
   const [closingCash, setClosingCash] = useState(0)
-  const [lastZDate, setLastZDate] = useState<string | null>(null)
   const [showZConfirm, setShowZConfirm] = useState(false)
   const [zGenerating, setZGenerating] = useState(false)
+  const openingCashPersistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Overzicht state
   const [exportPeriod, setExportPeriod] = useState<ExportPeriod>('month')
@@ -129,13 +131,22 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
   // Boekhouding state
   const [selectedZReports, setSelectedZReports] = useState<string[]>([])
 
-  // ── Load data ──
+  const schedulePersistOpeningCash = useCallback(
+    (value: number) => {
+      if (openingCashPersistTimerRef.current) clearTimeout(openingCashPersistTimerRef.current)
+      openingCashPersistTimerRef.current = setTimeout(() => {
+        openingCashPersistTimerRef.current = null
+        void saveTenantSettings({ tenant_slug: tenant, report_register_opening_cash: value })
+      }, 500)
+    },
+    [tenant]
+  )
+
   useEffect(() => {
-    const cash = localStorage.getItem(`rapportages_cash_${tenant}`)
-    const lastZ = localStorage.getItem(`rapportages_lastZ_${tenant}`)
-    if (cash) setOpeningCash(parseFloat(cash)||0)
-    if (lastZ) setLastZDate(lastZ)
-  }, [tenant])
+    return () => {
+      if (openingCashPersistTimerRef.current) clearTimeout(openingCashPersistTimerRef.current)
+    }
+  }, [])
 
   const loadData = useCallback(async () => {
     setLoading(true)
@@ -165,10 +176,68 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     )
     setZReports((zData || []) as unknown as ZReport[])
     setTenantInfo(info as TenantInfo)
+
+    const settings = info as TenantSettings | null
+    let opening = Number(settings?.report_register_opening_cash ?? 0)
+    try {
+      const lsKey = `rapportages_cash_${tenant}`
+      const lsRaw = localStorage.getItem(lsKey)
+      const lsVal = lsRaw != null ? parseFloat(lsRaw) : NaN
+      // Eenmalige migratie van oude browser-only waarde naar tenant_settings
+      if (opening === 0 && Number.isFinite(lsVal) && lsVal !== 0) {
+        opening = lsVal
+        await saveTenantSettings({ tenant_slug: tenant, report_register_opening_cash: lsVal })
+      }
+      localStorage.removeItem(lsKey)
+      localStorage.removeItem(`rapportages_lastZ_${tenant}`)
+    } catch {
+      /* ignore */
+    }
+    setOpeningCash(opening)
+
     setLoading(false)
   }, [tenant])
 
-  useEffect(() => { loadData() }, [loadData])
+  useEffect(() => {
+    void loadData()
+  }, [loadData])
+
+  /** Laatste Z-afsluiting: bron = z_reports (gedeeld), niet localStorage */
+  const lastZGeneratedAt = useMemo(() => {
+    if (!zReports.length) return null
+    let max = ''
+    for (const z of zReports) {
+      const g = z.generated_at || ''
+      if (g > max) max = g
+    }
+    return max || null
+  }, [zReports])
+
+  useEffect(() => {
+    if (!supabase) return
+    const ch = supabase
+      .channel(`rapporten_tenant_settings_${tenant}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'tenant_settings',
+          filter: `tenant_slug=eq.${tenant}`,
+        },
+        (payload) => {
+          const row = payload.new as { report_register_opening_cash?: number | string | null }
+          const v = row?.report_register_opening_cash
+          if (v === undefined || v === null || v === '') return
+          const n = typeof v === 'number' ? v : parseFloat(String(v))
+          if (Number.isFinite(n)) setOpeningCash(n)
+        }
+      )
+      .subscribe()
+    return () => {
+      void supabase.removeChannel(ch).catch(() => {})
+    }
+  }, [tenant])
 
   // ── Order classification ── (gelijk aan admin-dashboard en Z-rapport)
   const isValidOrder = (o: Order) => orderCountsTowardRevenueAndZReport(o)
@@ -335,9 +404,9 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
 
   // ── X-rapport data (sinds laatste Z) ──
   const xOrders = useMemo(() => {
-    const from = lastZDate ? new Date(lastZDate) : startOfDay(new Date())
+    const from = lastZGeneratedAt ? new Date(lastZGeneratedAt) : startOfDay(new Date())
     return validOrders.filter(o => new Date(o.created_at) >= from)
-  }, [validOrders, lastZDate])
+  }, [validOrders, lastZGeneratedAt])
 
   const xData = useMemo(() => {
     const total = xOrders.reduce((s,o)=>s+o.total,0)
@@ -356,6 +425,10 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
   // ── Z-rapport genereren ──
   const generateZReport = async () => {
     setZGenerating(true)
+    if (openingCashPersistTimerRef.current) {
+      clearTimeout(openingCashPersistTimerRef.current)
+      openingCashPersistTimerRef.current = null
+    }
     const now = new Date()
     const dateStr = now.toISOString().split('T')[0]
     const vatRate = tenantInfo?.btw_percentage ?? 6
@@ -383,10 +456,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
       return
     }
 
-    const newLastZ = now.toISOString()
-    setLastZDate(newLastZ)
-    localStorage.setItem(`rapportages_lastZ_${tenant}`, newLastZ)
-    localStorage.setItem(`rapportages_cash_${tenant}`, '0')
+    await saveTenantSettings({ tenant_slug: tenant, report_register_opening_cash: 0 })
     setOpeningCash(0)
     setClosingCash(0)
     setShowZConfirm(false)
@@ -534,7 +604,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     <h1>📋 X-RAPPORT</h1>
     <div class="row"><span>${tenantInfo?.business_name||tenant}</span></div>
     <div class="row"><span>Datum: ${new Date().toLocaleString('nl-NL')}</span></div>
-    ${lastZDate?`<div class="row"><span>Sinds Z: ${new Date(lastZDate).toLocaleString('nl-NL')}</span></div>`:'<div class="row"><span>Nog geen Z-rapport</span></div>'}
+    ${lastZGeneratedAt?`<div class="row"><span>Sinds Z: ${new Date(lastZGeneratedAt).toLocaleString('nl-NL')}</span></div>`:'<div class="row"><span>Nog geen Z-rapport</span></div>'}
     <div class="divider"></div>
     <div class="row"><span>Transacties</span><span>${xData.count}</span></div>
     <div class="row"><span>💵 Contant</span><span>${fmt(xData.cash)}</span></div>
@@ -911,7 +981,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
                 </div>
               </div>
               <p className="text-sm text-blue-400">
-                Sinds laatste Z-rapport: {lastZDate ? new Date(lastZDate).toLocaleString('nl-NL') : 'Nog geen Z-rapport'}
+                Sinds laatste Z-rapport: {lastZGeneratedAt ? new Date(lastZGeneratedAt).toLocaleString('nl-NL') : 'Nog geen Z-rapport'}
               </p>
             </div>
 
@@ -923,7 +993,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
               </div>
               <div className="flex items-center gap-4">
                 <span className="text-2xl font-bold text-gray-900">{fmt(openingCash)}</span>
-                <input type="number" value={openingCash||''} onChange={e=>{const v=parseFloat(e.target.value)||0;setOpeningCash(v);localStorage.setItem(`rapportages_cash_${tenant}`,String(v))}}
+                <input type="number" value={openingCash||''} onChange={e=>{const v=parseFloat(e.target.value)||0;setOpeningCash(v);schedulePersistOpeningCash(v)}}
                   placeholder="0.00" step="0.01" min={0}
                   className="px-3 py-2 rounded-xl bg-gray-100 border border-gray-200 w-36 text-sm focus:outline-none focus:border-blue-300"/>
               </div>

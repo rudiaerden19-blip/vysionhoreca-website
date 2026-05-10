@@ -182,34 +182,89 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
         if (costSettings.simulator_name) setSimulatorName(costSettings.simulator_name)
         if (costSettings.simulator_multiplier) setSimulatorMultiplier(costSettings.simulator_multiplier.toString())
       } else {
-        // Fallback to localStorage
-        const savedPrices = localStorage.getItem(`standard_prices_${params.tenant}`)
-        if (savedPrices) {
-          const parsed = JSON.parse(savedPrices)
-          const stringPrices: any = {}
-          for (const key of Object.keys(parsed)) {
-            stringPrices[key] = typeof parsed[key] === 'number' ? parsed[key].toString() : parsed[key]
-          }
-          setStandardPrices(prev => ({ ...prev, ...stringPrices }))
+        const basePrices = {
+          saus: '0.12',
+          sla: '0.13',
+          tomaat: '0.14',
+          ei: '0.12',
+          potje_saus: '0.16',
+          verpakking: '0.30',
+          kosten_per_stuk: '0.40',
         }
-        const savedSimulator = localStorage.getItem(`simulator_data_${params.tenant}`)
-        if (savedSimulator) {
-          const parsed = JSON.parse(savedSimulator)
-          if (parsed.items) setSimulatorItems(parsed.items)
-          if (parsed.name) setSimulatorName(parsed.name)
-          if (parsed.multiplier) setSimulatorMultiplier(parsed.multiplier)
+        let mergedPrices = { ...basePrices }
+        let simItems: Array<{ name: string; price: number; quantity: number }> = []
+        let simName = ''
+        let simMult = '3'
+        let migrated = false
+        try {
+          const savedPrices = localStorage.getItem(`standard_prices_${params.tenant}`)
+          if (savedPrices) {
+            const parsed = JSON.parse(savedPrices) as Record<string, unknown>
+            for (const key of Object.keys(mergedPrices) as (keyof typeof mergedPrices)[]) {
+              if (parsed[key] != null) {
+                mergedPrices[key] =
+                  typeof parsed[key] === 'number'
+                    ? String(parsed[key])
+                    : String(parsed[key])
+                migrated = true
+              }
+            }
+          }
+          const savedSimulator = localStorage.getItem(`simulator_data_${params.tenant}`)
+          if (savedSimulator) {
+            const parsed = JSON.parse(savedSimulator) as {
+              items?: Array<{ name: string; price: number; quantity: number }>
+              name?: string
+              multiplier?: number | string
+            }
+            if (parsed.items?.length) {
+              simItems = parsed.items
+              migrated = true
+            }
+            if (parsed.name) {
+              simName = parsed.name
+              migrated = true
+            }
+            if (parsed.multiplier != null) {
+              simMult = String(parsed.multiplier)
+              migrated = true
+            }
+          }
+        } catch {
+          /* ignore */
+        }
+
+        if (migrated) {
+          const up = await adminDb.upsert(
+            'cost_settings',
+            {
+              tenant_slug: params.tenant,
+              saus: parseFloat(mergedPrices.saus.replace(',', '.')) || 0.12,
+              sla: parseFloat(mergedPrices.sla.replace(',', '.')) || 0.13,
+              tomaat: parseFloat(mergedPrices.tomaat.replace(',', '.')) || 0.14,
+              ei: parseFloat(mergedPrices.ei.replace(',', '.')) || 0.12,
+              potje_saus: parseFloat(mergedPrices.potje_saus.replace(',', '.')) || 0.16,
+              verpakking: parseFloat(mergedPrices.verpakking.replace(',', '.')) || 0.3,
+              kosten_per_stuk: parseFloat(mergedPrices.kosten_per_stuk.replace(',', '.')) || 0.4,
+              simulator_items: simItems,
+              simulator_name: simName || null,
+              simulator_multiplier: parseFloat(simMult.replace(',', '.')) || 3,
+              updated_at: new Date().toISOString(),
+            },
+            { tenantSlug: params.tenant, onConflict: 'tenant_slug' }
+          )
+          if (up.ok) {
+            setStandardPrices(mergedPrices)
+            if (simItems.length) setSimulatorItems(simItems)
+            if (simName) setSimulatorName(simName)
+            setSimulatorMultiplier(simMult)
+            localStorage.removeItem(`standard_prices_${params.tenant}`)
+            localStorage.removeItem(`simulator_data_${params.tenant}`)
+          }
         }
       }
     } catch (e) {
       console.error('Failed to load cost settings:', e)
-      // Fallback to localStorage on any error
-      try {
-        const savedPrices = localStorage.getItem(`standard_prices_${params.tenant}`)
-        if (savedPrices) {
-          const parsed = JSON.parse(savedPrices)
-          setStandardPrices(prev => ({ ...prev, ...parsed }))
-        }
-      } catch {}
     }
 
     setLoading(false)
