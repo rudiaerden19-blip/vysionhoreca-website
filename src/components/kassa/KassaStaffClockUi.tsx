@@ -1,6 +1,7 @@
 'use client'
 
 import { useLanguage } from '@/i18n'
+import { StaffClockPinPortal } from '@/components/staff-clock/StaffClockPinPortal'
 
 export type KassaStaffClockRow = { id: string; name: string; hasOpenSession: boolean }
 
@@ -13,7 +14,7 @@ export type KassaStaffSummaryState = {
   orders: { order_number: number; total: number }[]
 }
 
-/** Personeelsklok: lijst + PIN-overlay (zelfde stacking als donor-page). */
+/** Personeelsklok: lijst + gedeelde PIN-portal (document.body, focus, Enter = bevestigen). */
 export function KassaStaffClockModal({
   open,
   listLoading,
@@ -46,7 +47,15 @@ export function KassaStaffClockModal({
   onPinConfirm: () => void
 }) {
   const { t } = useLanguage()
+
   if (!open) return null
+
+  const pinTitle =
+    pinModal &&
+    (pinModal.action === 'in' ? t('staffClock.pinTitleIn') : t('staffClock.pinTitleOut')).replace(
+      '{name}',
+      pinModal.staffName,
+    )
 
   return (
     <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-3 sm:p-4">
@@ -126,46 +135,20 @@ export function KassaStaffClockModal({
         </div>
       </div>
 
-      {pinModal && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-5 flex flex-col gap-3">
-            <p className="font-bold text-gray-900">
-              {(pinModal.action === 'in' ? t('staffClock.pinTitleIn') : t('staffClock.pinTitleOut')).replace(
-                '{name}',
-                pinModal.staffName,
-              )}
-            </p>
-            <input
-              type="password"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              value={pinInput}
-              onChange={(e) => onPinInputChange(e.target.value.replace(/\D/g, '').slice(0, 12))}
-              placeholder={t('staffClock.pinPlaceholder')}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-lg font-mono tracking-widest"
-            />
-            {pinError && <p className="text-sm font-medium text-red-600">{pinError}</p>}
-            <div className="flex gap-2">
-              <button
-                type="button"
-                disabled={busy}
-                onClick={onPinCancel}
-                className="flex-1 py-2.5 rounded-xl bg-gray-100 text-gray-700 font-semibold"
-              >
-                {t('staffClock.cancel')}
-              </button>
-              <button
-                type="button"
-                disabled={busy}
-                onClick={onPinConfirm}
-                className="flex-1 py-2.5 rounded-xl bg-[#3C4D6B] text-white font-bold disabled:opacity-50"
-              >
-                {t('staffClock.confirmPin')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <StaffClockPinPortal
+        open={Boolean(pinModal)}
+        titleId="kassa-staff-pin-title"
+        title={pinTitle || ''}
+        placeholder={t('staffClock.pinPlaceholder')}
+        pinValue={pinInput}
+        onPinChange={onPinInputChange}
+        pinError={pinError}
+        busy={busy}
+        cancelLabel={t('staffClock.cancel')}
+        confirmLabel={t('staffClock.confirmPin')}
+        onCancel={onPinCancel}
+        onConfirm={onPinConfirm}
+      />
     </div>
   )
 }

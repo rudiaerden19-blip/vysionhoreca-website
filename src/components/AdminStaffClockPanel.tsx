@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useLanguage } from '@/i18n'
 import { authFetch } from '@/lib/auth-headers'
+import { StaffClockPinPortal } from '@/components/staff-clock/StaffClockPinPortal'
 import {
   appLocaleToBcp47,
   printStaffSalesSummaryReceipt,
@@ -239,44 +240,23 @@ export function AdminStaffClockPanel({
       )}
 
       {pinModal && (
-        <div className="fixed inset-0 z-[120] flex touch-manipulation items-center justify-center bg-black/50 p-4 [-webkit-tap-highlight-color:transparent]">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-2xl flex flex-col gap-3">
-            <p className="font-bold text-gray-900">
-              {(pinModal.action === 'in' ? t('staffClock.pinTitleIn') : t('staffClock.pinTitleOut')).replace(
-                '{name}',
-                pinModal.staffName
-              )}
-            </p>
-            <input
-              type="password"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              value={pinInput}
-              onChange={(e) => setPinInput(e.target.value.replace(/\D/g, '').slice(0, 12))}
-              placeholder={t('staffClock.pinPlaceholder')}
-              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-lg font-mono tracking-widest"
-            />
-            {pinError && <p className="text-sm font-medium text-red-600">{pinError}</p>}
-            <div className="flex gap-2">
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => setPinModal(null)}
-                className="flex-1 rounded-xl bg-gray-100 py-2.5 font-semibold text-gray-700"
-              >
-                {t('staffClock.cancel')}
-              </button>
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => void submitPin()}
-                className="flex-1 rounded-xl bg-[#3C4D6B] py-2.5 font-bold text-white disabled:opacity-50"
-              >
-                {t('staffClock.confirmPin')}
-              </button>
-            </div>
-          </div>
-        </div>
+        <StaffClockPinPortal
+          open
+          titleId="admin-staff-pin-title"
+          title={(pinModal.action === 'in' ? t('staffClock.pinTitleIn') : t('staffClock.pinTitleOut')).replace(
+            '{name}',
+            pinModal.staffName,
+          )}
+          placeholder={t('staffClock.pinPlaceholder')}
+          pinValue={pinInput}
+          onPinChange={setPinInput}
+          pinError={pinError}
+          busy={busy}
+          cancelLabel={t('staffClock.cancel')}
+          confirmLabel={t('staffClock.confirmPin')}
+          onCancel={() => setPinModal(null)}
+          onConfirm={() => void submitPin()}
+        />
       )}
 
       {summary && (
