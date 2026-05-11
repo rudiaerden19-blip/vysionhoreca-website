@@ -1671,6 +1671,8 @@
       "startPreparation": "开始准备",
       "ready": "就绪",
       "complete": "完成",
+      "completeAll": "全部完成",
+      "completeAllConfirm": "是否一次性完成 {count} 笔订单？状态为「新订单」（尚未批准）的将跳过。",
       "printReceipt": "打印小票",
       "close": "关闭",
       "details": "查看详情"

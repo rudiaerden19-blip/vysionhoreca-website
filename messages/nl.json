@@ -1965,6 +1965,8 @@
       "startPreparation": "Start bereiding",
       "ready": "Klaar",
       "complete": "Afronden",
+      "completeAll": "Alles afronden",
+      "completeAllConfirm": "Weet je zeker dat je {count} bestelling(en) wilt afronden? Bestellingen met status «nieuw» (nog niet goedgekeurd) worden overgeslagen.",
       "printReceipt": "Bon printen",
       "details": "Details bekijken",
       "close": "Sluiten"

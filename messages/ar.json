@@ -1672,6 +1672,8 @@
       "startPreparation": "بدء التحضير",
       "ready": "جاهز",
       "complete": "إكمال",
+      "completeAll": "إكمال الكل",
+      "completeAllConfirm": "إكمال {count} طلبًا دفعة واحدة؟ تُتخطى الطلبات «الجديدة» التي لم تُوافَق بعد.",
       "printReceipt": "طباعة الإيصال",
       "close": "إغلاق",
       "details": "عرض التفاصيل"

@@ -1674,6 +1674,8 @@
       "startPreparation": "Inizia preparazione",
       "ready": "Pronto",
       "complete": "Completa",
+      "completeAll": "Completa tutto",
+      "completeAllConfirm": "Completare {count} ordini in una volta? Gli ordini «nuovi» (in attesa di approvazione) vengono ignorati.",
       "printReceipt": "Stampa scontrino",
       "details": "Vedi dettagli",
       "close": "Chiudi"

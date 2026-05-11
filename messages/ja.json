@@ -1671,6 +1671,8 @@
       "startPreparation": "調理開始",
       "ready": "準備完了",
       "complete": "完了",
+      "completeAll": "すべて完了",
+      "completeAllConfirm": "{count} 件の注文を一括で完了しますか？「新規」（未承認）の注文は対象外です。",
       "printReceipt": "レシート印刷",
       "close": "閉じる",
       "details": "詳細を見る"

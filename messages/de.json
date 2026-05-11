@@ -1153,6 +1153,8 @@
       "startPreparation": "Zubereitung starten",
       "ready": "Fertig",
       "complete": "Abschließen",
+      "completeAll": "Alle abschließen",
+      "completeAllConfirm": "{count} Bestellung(en) auf einmal abschließen? Bestellungen mit Status «neu» (noch nicht freigegeben) werden übersprungen.",
       "printReceipt": "Bon drucken",
       "details": "Details anzeigen",
       "close": "Schließen"

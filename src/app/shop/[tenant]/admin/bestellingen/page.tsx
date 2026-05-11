@@ -104,6 +104,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   )
 
   const [updatingId, setUpdatingId] = useState<string | null>(null)
+  const [completingAll, setCompletingAll] = useState(false)
   const [kitchenMode, setKitchenMode] = useState(false)
   const [tenantSettings, setTenantSettings] = useState<TenantSettings | null>(null)
   const [rejectingOrder, setRejectingOrder] = useState<Order | null>(null)
@@ -329,6 +330,31 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
       }
     }
     setUpdatingId(null)
+  }
+
+  /** Zelfde als losse «Afronden»-knop: niet voor new / completed / cancelled / rejected. */
+  const completableOrders = useMemo(
+    () =>
+      orders.filter((o) => {
+        if (!o.id) return false
+        const s = (o.status || '').toLowerCase()
+        return !['new', 'completed', 'cancelled', 'rejected'].includes(s)
+      }),
+    [orders],
+  )
+
+  const handleCompleteAllCompletable = async () => {
+    if (completableOrders.length === 0 || completingAll) return
+    const msg = t('ordersPage.actions.completeAllConfirm').replace('{count}', String(completableOrders.length))
+    if (typeof window !== 'undefined' && !window.confirm(msg)) return
+    setCompletingAll(true)
+    try {
+      for (const order of completableOrders) {
+        await handleMarkOrderComplete(order)
+      }
+    } finally {
+      setCompletingAll(false)
+    }
   }
 
   // Handle confirm order (goedkeuren)
@@ -773,6 +799,20 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             )}
           </div>
           <div className="flex items-center gap-4">
+            <motion.button
+              type="button"
+              whileTap={{ scale: 0.98 }}
+              onClick={() => void handleCompleteAllCompletable()}
+              disabled={completableOrders.length === 0 || completingAll}
+              className="px-4 py-3 rounded-xl text-lg font-bold bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:pointer-events-none text-white"
+            >
+              ✔️{' '}
+              {completingAll
+                ? '…'
+                : completableOrders.length > 0
+                  ? `${t('ordersPage.actions.completeAll')} (${completableOrders.length})`
+                  : t('ordersPage.actions.completeAll')}
+            </motion.button>
             <button
               className="p-4 rounded-xl text-2xl bg-green-500"
             >
@@ -888,7 +928,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                       <motion.button
                         whileTap={{ scale: 0.95 }}
                         onClick={() => handleConfirmOrder(order)}
-                        disabled={updatingId === order.id}
+                        disabled={updatingId === order.id || completingAll}
                         className="p-4 bg-green-600 hover:bg-green-700 text-white rounded-xl text-xl font-bold"
                       >
                         ✓ {t('ordersPage.actions.approve').toUpperCase()}
@@ -899,7 +939,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                           setRejectOrderError(null)
                           setRejectingOrder(order)
                         }}
-                        disabled={updatingId === order.id}
+                        disabled={updatingId === order.id || completingAll}
                         className="p-4 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xl font-bold"
                       >
                         ✕ {t('ordersPage.actions.reject').toUpperCase()}
@@ -910,7 +950,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                     <motion.button
                       whileTap={{ scale: 0.95 }}
                       onClick={() => handleMarkOrderComplete(order)}
-                      disabled={updatingId === order.id}
+                      disabled={updatingId === order.id || completingAll}
                       className="col-span-2 p-4 bg-gray-700 hover:bg-gray-800 text-white rounded-xl text-xl font-bold"
                     >
                       ✔️ {t('ordersPage.actions.complete').toUpperCase()}
@@ -964,6 +1004,21 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             className={`px-4 py-2 rounded-xl font-medium flex items-center gap-2 ${archiveMode ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
           >
             📚 Archief
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => void handleCompleteAllCompletable()}
+            disabled={completableOrders.length === 0 || completingAll}
+            className="px-4 py-2 rounded-xl font-medium flex items-center gap-2 bg-emerald-600 text-white hover:bg-emerald-500 disabled:opacity-40 disabled:pointer-events-none"
+          >
+            ✔️{' '}
+            {completingAll
+              ? '…'
+              : completableOrders.length > 0
+                ? `${t('ordersPage.actions.completeAll')} (${completableOrders.length})`
+                : t('ordersPage.actions.completeAll')}
           </motion.button>
 
           {/* Kitchen mode */}
@@ -1286,7 +1341,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => handleConfirmOrder(order)}
-                        disabled={updatingId === order.id}
+                        disabled={updatingId === order.id || completingAll}
                         className="flex-1 min-w-[140px] bg-green-500 hover:bg-green-600 disabled:bg-green-300 text-white font-medium py-3 rounded-xl transition-colors"
                       >
                         ✓ {t('ordersPage.actions.approve')}
@@ -1298,7 +1353,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                           setRejectOrderError(null)
                           setRejectingOrder(order)
                         }}
-                        disabled={updatingId === order.id}
+                        disabled={updatingId === order.id || completingAll}
                         className="px-6 py-3 bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white font-medium rounded-xl transition-colors"
                       >
                         ✕ {t('ordersPage.actions.reject')}
@@ -1310,7 +1365,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => handleMarkOrderComplete(order)}
-                      disabled={updatingId === order.id}
+                      disabled={updatingId === order.id || completingAll}
                       className="flex-1 min-w-[200px] bg-gray-700 hover:bg-gray-800 disabled:bg-gray-400 text-white font-medium py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
                     >
                       {updatingId === order.id ? (

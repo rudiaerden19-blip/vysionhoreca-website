@@ -1674,6 +1674,8 @@
       "startPreparation": "Iniciar preparación",
       "ready": "Listo",
       "complete": "Completar",
+      "completeAll": "Completar todo",
+      "completeAllConfirm": "¿Completar {count} pedido(s) de una vez? Los pedidos «nuevos» (pendientes de aprobación) no se incluyen.",
       "printReceipt": "Imprimir ticket",
       "details": "Ver detalles",
       "close": "Cerrar"

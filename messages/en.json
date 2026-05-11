@@ -1965,6 +1965,8 @@
       "startPreparation": "Start preparation",
       "ready": "Ready",
       "complete": "Complete",
+      "completeAll": "Complete all",
+      "completeAllConfirm": "Complete {count} order(s) at once? Orders still awaiting approval are skipped.",
       "printReceipt": "Print receipt",
       "details": "View details",
       "close": "Close"

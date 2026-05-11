@@ -1151,6 +1151,8 @@
       "startPreparation": "Commencer préparation",
       "ready": "Prêt",
       "complete": "Terminer",
+      "completeAll": "Tout terminer",
+      "completeAllConfirm": "Terminer {count} commande(s) d’un coup ? Les commandes « nouvelles » (non encore approuvées) sont ignorées.",
       "printReceipt": "Imprimer ticket",
       "details": "Voir détails",
       "close": "Fermer"
