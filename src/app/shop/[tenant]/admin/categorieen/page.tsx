@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, Reorder } from 'framer-motion'
 import {
   getMenuCategories,
+  getMenuProducts,
   saveMenuCategory,
   deleteMenuCategory,
   bulkSaveMenuCategories,
@@ -23,18 +24,39 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
   const [saved, setSaved] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [productCounts, setProductCounts] = useState<Record<string, number>>({})
   const saveInFlightRef = useRef(false)
 
-  // Load data on mount
-  useEffect(() => {
-    async function loadData() {
-      setLoading(true)
-      const data = await getMenuCategories(params.tenant)
-      setCategories(data)
-      setLoading(false)
+  const refreshCategoriesAndProductCounts = useCallback(async () => {
+    const [cats, prods] = await Promise.all([
+      getMenuCategories(params.tenant),
+      getMenuProducts(params.tenant),
+    ])
+    setCategories(cats)
+    const counts: Record<string, number> = {}
+    for (const p of prods) {
+      const cid = p.category_id
+      if (cid == null || cid === '') continue
+      const key = String(cid)
+      counts[key] = (counts[key] ?? 0) + 1
     }
-    loadData()
+    setProductCounts(counts)
   }, [params.tenant])
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      setLoading(true)
+      try {
+        await refreshCategoriesAndProductCounts()
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [refreshCategoriesAndProductCounts])
 
   const toggleVisible = (id: string) => {
     setCategories(prev => prev.map(c => 
@@ -44,10 +66,15 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
   }
 
   const handleDelete = async (id: string) => {
-    if (!(await ask(t('adminPages.categorieen.confirmDelete')))) return
+    const n = productCounts[id] ?? 0
+    const confirmMsg =
+      n > 0
+        ? t('adminPages.categorieen.confirmDeleteHasProducts').replace('{count}', String(n))
+        : t('adminPages.categorieen.confirmDelete')
+    if (!(await ask(confirmMsg))) return
     const success = await deleteMenuCategory(id, params.tenant)
     if (success) {
-      setCategories(prev => prev.filter(c => c.id !== id))
+      await refreshCategoriesAndProductCounts()
     } else {
       setError(t('adminPages.categorieen.deleteFailed'))
     }
@@ -65,7 +92,7 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
       
       const saved = await saveMenuCategory(newCat)
       if (saved) {
-        setCategories(prev => [...prev, saved])
+        await refreshCategoriesAndProductCounts()
         setNewCategory('')
       } else {
         setError(t('adminPages.categorieen.addFailed'))
@@ -94,8 +121,7 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
       }
 
       const bulk = await bulkSaveMenuCategories(params.tenant, categories)
-      const fresh = await getMenuCategories(params.tenant)
-      setCategories(fresh)
+      await refreshCategoriesAndProductCounts()
 
       if (bulk.ok) {
         setSaved(true)
@@ -198,7 +224,9 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
       <motion.div className="bg-white rounded-2xl shadow-sm overflow-hidden">
         <div className="px-4 py-3 border-b bg-gray-50 flex items-center gap-2">
           <span className="text-gray-400 text-sm">☰</span>
-          <p className="text-sm text-gray-500">Sleep om de volgorde aan te passen · klik op naam om te bewerken</p>
+          <p className="text-sm text-gray-500">
+            {t('adminPages.categorieen.dragHintShort')}
+          </p>
         </div>
         {categories.length === 0 ? (
           <div className="p-12 text-center">
@@ -208,7 +236,14 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
           </div>
         ) : (
           <Reorder.Group values={categories} onReorder={setCategories} className="divide-y divide-gray-100">
-            {categories.map((category) => (
+            {categories.map((category) => {
+              const cid = category.id ? String(category.id) : ''
+              const cnt = cid ? (productCounts[cid] ?? 0) : 0
+              const countLabel =
+                cnt === 0
+                  ? t('adminPages.categorieen.productCountZero')
+                  : t('adminPages.categorieen.productCount').replace('{count}', String(cnt))
+              return (
               <Reorder.Item key={category.id} value={category} className="bg-white hover:bg-gray-50 cursor-grab active:cursor-grabbing transition-colors">
                 <div className="flex items-center gap-3 px-4 py-3.5">
                   <span className="text-gray-300 text-lg select-none">⠿</span>
@@ -233,29 +268,37 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
                     </span>
                   )}
 
+                  <span
+                    className="shrink-0 text-xs font-medium text-gray-500 tabular-nums sm:w-36 sm:text-right"
+                    title={t('adminPages.categorieen.productCountTitle')}
+                  >
+                    {countLabel}
+                  </span>
+
                   {/* Zichtbaar toggle */}
                   <button
                     onClick={() => toggleVisible(category.id!)}
                     className={`relative w-10 h-5 rounded-full transition-colors flex-shrink-0 ${category.is_active ? 'bg-green-500' : 'bg-gray-200'}`}
-                    title={category.is_active ? 'Zichtbaar' : 'Verborgen'}
+                    title={category.is_active ? t('adminPages.categorieen.visible') : t('adminPages.categorieen.hidden')}
                   >
                     <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${category.is_active ? 'translate-x-5' : 'translate-x-0'}`} />
                   </button>
 
                   <span className={`text-xs font-medium w-16 text-right ${category.is_active ? 'text-green-600' : 'text-gray-400'}`}>
-                    {category.is_active ? 'Zichtbaar' : 'Verborgen'}
+                    {category.is_active ? t('adminPages.categorieen.visible') : t('adminPages.categorieen.hidden')}
                   </span>
 
                   <button
                     onClick={() => handleDelete(category.id!)}
                     className="p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                    title="Verwijderen"
+                    title={t('adminPages.common.delete')}
                   >
                     🗑️
                   </button>
                 </div>
               </Reorder.Item>
-            ))}
+              )
+            })}
           </Reorder.Group>
         )}
       </motion.div>

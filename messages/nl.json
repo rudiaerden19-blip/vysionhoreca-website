@@ -2718,12 +2718,17 @@
       "dragHint": "💡 Sleep om de volgorde te wijzigen",
       "noItems": "Nog geen categorieën. Voeg je eerste categorie toe!",
       "confirmDelete": "Weet je zeker dat je deze categorie wilt verwijderen?",
+      "confirmDeleteHasProducts": "Let op: {count} product(en) zitten in deze categorie. Verwijderen maakt ze tijdelijk categorieloos tot je ze opnieuw toewijst in Producten. Toch verwijderen?",
       "deleteFailed": "Verwijderen mislukt",
       "addFailed": "Toevoegen mislukt",
       "saveFailed": "Sommige categorieën konden niet worden opgeslagen",
       "visible": "Zichtbaar",
       "hidden": "Verborgen",
-      "saveReminder": "(druk altijd op de knop opslaan)"
+      "saveReminder": "(druk altijd op de knop opslaan)",
+      "dragHintShort": "Sleep voor volgorde · tik op de naam om te wijzigen",
+      "productCount": "{count} producten",
+      "productCountZero": "Geen producten",
+      "productCountTitle": "Aantal producten in deze categorie"
     },
     "producten": {
       "title": "Producten",

@@ -2419,12 +2419,17 @@
       "dragHint": "💡 Trascina per modificare l'ordine",
       "noItems": "Ancora nessuna categoria. Aggiungi la prima!",
       "confirmDelete": "Eliminare questa categoria?",
+      "confirmDeleteHasProducts": "Attenzione: ci sono {count} prodotto/i in questa categoria. Eliminandola resteranno senza categoria finché non li riassegni in Prodotti. Continuare?",
       "deleteFailed": "Eliminazione non riuscita",
       "addFailed": "Aggiunta non riuscita",
       "saveFailed": "Impossibile salvare alcune categorie",
       "visible": "Visibile",
       "hidden": "Nascosto",
-      "saveReminder": "(Premi sempre il pulsante Salva)"
+      "saveReminder": "(Premi sempre il pulsante Salva)",
+      "dragHintShort": "Trascina per ordinare · tocca il nome per modificare",
+      "productCount": "{count} prodotti",
+      "productCountZero": "Nessun prodotto",
+      "productCountTitle": "Prodotti in questa categoria"
     },
     "producten": {
       "title": "Prodotti",

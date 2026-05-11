@@ -2419,12 +2419,17 @@
       "dragHint": "💡 拖动以更改顺序",
       "noItems": "尚无分类，请添加第一个分类！",
       "confirmDelete": "确定删除此分类？",
+      "confirmDeleteHasProducts": "注意：此分类下有 {count} 个商品。删除后商品将暂时没有分类，需在产品页重新分配。继续吗？",
       "deleteFailed": "删除失败",
       "addFailed": "添加失败",
       "saveFailed": "部分分类无法保存",
       "visible": "可见",
       "hidden": "隐藏",
-      "saveReminder": "（请务必点击「保存」按钮）"
+      "saveReminder": "（请务必点击「保存」按钮）",
+      "dragHintShort": "拖动排序 · 点击名称编辑",
+      "productCount": "{count} 个商品",
+      "productCountZero": "无商品",
+      "productCountTitle": "此分类下的商品数量"
     },
     "producten": {
       "title": "产品",

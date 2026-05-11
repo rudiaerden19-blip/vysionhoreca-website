@@ -1919,12 +1919,17 @@
       "dragHint": "💡 Ziehen, um die Reihenfolge zu ändern",
       "noItems": "Noch keine Kategorien. Fügen Sie die erste hinzu!",
       "confirmDelete": "Diese Kategorie wirklich löschen?",
+      "confirmDeleteHasProducts": "Achtung: {count} Produkt(e) sind in dieser Kategorie. Beim Löschen haben sie vorübergehend keine Kategorie, bis Sie sie unter Produkten neu zuweisen. Fortfahren?",
       "deleteFailed": "Löschen fehlgeschlagen",
       "addFailed": "Hinzufügen fehlgeschlagen",
       "saveFailed": "Einige Kategorien konnten nicht gespeichert werden",
       "visible": "Sichtbar",
       "hidden": "Ausgeblendet",
-      "saveReminder": "(Klicken Sie immer auf die Schaltfläche Speichern)"
+      "saveReminder": "(Klicken Sie immer auf die Schaltfläche Speichern)",
+      "dragHintShort": "Ziehen für Reihenfolge · auf den Namen tippen zum Bearbeiten",
+      "productCount": "{count} Produkte",
+      "productCountZero": "Keine Produkte",
+      "productCountTitle": "Anzahl Produkte in dieser Kategorie"
     },
     "producten": {
       "title": "Produkte",

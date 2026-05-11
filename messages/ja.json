@@ -2419,12 +2419,17 @@
       "dragHint": "💡 ドラッグして並び順を変更",
       "noItems": "カテゴリがまだありません。最初のカテゴリを追加してください。",
       "confirmDelete": "このカテゴリを削除しますか？",
+      "confirmDeleteHasProducts": "注意：このカテゴリには{count}件の商品があります。削除すると、商品ページで再割り当てするまでカテゴリーなしになります。続けますか？",
       "deleteFailed": "削除に失敗しました",
       "addFailed": "追加に失敗しました",
       "saveFailed": "一部のカテゴリを保存できませんでした",
       "visible": "表示",
       "hidden": "非表示",
-      "saveReminder": "（必ず「保存」ボタンを押してください）"
+      "saveReminder": "（必ず「保存」ボタンを押してください）",
+      "dragHintShort": "ドラッグで並べ替え · 名前をタップして編集",
+      "productCount": "{count}件の商品",
+      "productCountZero": "商品なし",
+      "productCountTitle": "このカテゴリの商品数"
     },
     "producten": {
       "title": "商品",

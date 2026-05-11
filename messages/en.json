@@ -2718,12 +2718,17 @@
       "dragHint": "💡 Drag to change order",
       "noItems": "No categories yet. Add your first category!",
       "confirmDelete": "Are you sure you want to delete this category?",
+      "confirmDeleteHasProducts": "Warning: {count} product(s) are in this category. Deleting will leave them without a category until you assign them again under Products. Continue?",
       "deleteFailed": "Delete failed",
       "addFailed": "Add failed",
       "saveFailed": "Some categories could not be saved",
       "visible": "Visible",
       "hidden": "Hidden",
-      "saveReminder": "(Always click the Save button)"
+      "saveReminder": "(Always click the Save button)",
+      "dragHintShort": "Drag to reorder · tap the name to edit",
+      "productCount": "{count} products",
+      "productCountZero": "No products",
+      "productCountTitle": "Number of products in this category"
     },
     "producten": {
       "title": "Products",

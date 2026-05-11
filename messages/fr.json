@@ -1919,12 +1919,17 @@
       "dragHint": "💡 Glisser pour modifier l'ordre",
       "noItems": "Pas encore de catégories. Ajoutez la première !",
       "confirmDelete": "Supprimer cette catégorie ?",
+      "confirmDeleteHasProducts": "Attention : {count} produit(s) sont dans cette catégorie. La suppression les laissera sans catégorie jusqu'à réassignation dans Produits. Continuer ?",
       "deleteFailed": "Échec de la suppression",
       "addFailed": "Échec de l'ajout",
       "saveFailed": "Certaines catégories n'ont pas pu être enregistrées",
       "visible": "Visible",
       "hidden": "Masqué",
-      "saveReminder": "(Cliquez toujours sur le bouton Enregistrer)"
+      "saveReminder": "(Cliquez toujours sur le bouton Enregistrer)",
+      "dragHintShort": "Glisser pour l'ordre · appuyez sur le nom pour modifier",
+      "productCount": "{count} produits",
+      "productCountZero": "Aucun produit",
+      "productCountTitle": "Nombre de produits dans cette catégorie"
     },
     "producten": {
       "title": "Produits",

@@ -2419,12 +2419,17 @@
       "dragHint": "💡 Arrastra para cambiar el orden",
       "noItems": "Aún no hay categorías. ¡Añade la primera!",
       "confirmDelete": "¿Seguro que quieres eliminar esta categoría?",
+      "confirmDeleteHasProducts": "Atención: hay {count} producto(s) en esta categoría. Al eliminarla quedarán sin categoría hasta que los reasignes en Productos. ¿Continuar?",
       "deleteFailed": "Error al eliminar",
       "addFailed": "Error al añadir",
       "saveFailed": "No se pudieron guardar algunas categorías",
       "visible": "Visible",
       "hidden": "Oculto",
-      "saveReminder": "(Pulse siempre el botón Guardar)"
+      "saveReminder": "(Pulse siempre el botón Guardar)",
+      "dragHintShort": "Arrastra para ordenar · toca el nombre para editar",
+      "productCount": "{count} productos",
+      "productCountZero": "Sin productos",
+      "productCountTitle": "Productos en esta categoría"
     },
     "producten": {
       "title": "Productos",
