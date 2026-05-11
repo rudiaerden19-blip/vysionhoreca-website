@@ -172,7 +172,8 @@ function DecorSVG({
 function TableSVG({ table, isSelected, onClick, effectiveStatus }: {
   table: KassaTable
   isSelected: boolean
-  onClick: (e?: React.MouseEvent) => void
+  /** Weglaten → click bubbelt naar de wrapper (nodig voor touch-selectie bij vergrendelde plattegrond). */
+  onClick?: (e?: React.MouseEvent) => void
   effectiveStatus?: TableStatus
 }) {
   const seats = table.seats
@@ -280,7 +281,7 @@ function TableSVG({ table, isSelected, onClick, effectiveStatus }: {
     <svg
       width={svgW}
       height={svgH}
-      onClick={onClick}
+      {...(onClick ? { onClick } : {})}
       style={{ cursor: 'pointer', overflow: 'visible', display: 'block' }}
     >
       {/* Chairs — bovenaanzicht echte stoelen */}
@@ -891,12 +892,7 @@ export default function KassaFloorPlan({
   const handlePointerDown = (e: React.PointerEvent, id: string, type: 'table' | 'decor') => {
     e.stopPropagation()
     if (showAddModal || showAddBarModal) return
-    // Vergrendeld: geen slepen, maar wél pointer capture — zonder capture mist iPad/Safari vaak
-    // pointerup op deze tafel/decor en gaat die naar de vloer → geen selectie zichtbaar.
-    if (isLocked) {
-      takePointerCapture(e.currentTarget as HTMLElement, e.pointerId)
-      return
-    }
+    if (isLocked) return
 
     takePointerCapture(e.currentTarget as HTMLElement, e.pointerId)
     const floor = floorRef.current
@@ -1063,19 +1059,25 @@ export default function KassaFloorPlan({
                 transform: `translate(-50%, -50%) rotate(${d.rotation}deg)`,
                 zIndex: dragPaint?.id === d.id ? 40 : selectedDecor?.id === d.id ? 9 : 0,
                 cursor: 'grab',
-                touchAction: 'none',
+                touchAction: isLocked ? ('manipulation' as const) : ('none' as const),
               }}
               onPointerDown={(e) => handlePointerDown(e, d.id, 'decor')}
               onPointerUp={(e) => {
                 e.stopPropagation()
                 handlePointerUp(e)
-                if (!dragMoved.current) {
+                if (!dragMoved.current && !isLocked) {
                   setSelectedDecor(prev => prev?.id === d.id ? null : d)
                   setSelected(null)
                 }
               }}
               onPointerCancel={(e) => { e.stopPropagation(); handlePointerCancel(e) }}
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation()
+                if (modalOpen) return
+                if (!isLocked) return
+                setSelectedDecor(prev => prev?.id === d.id ? null : d)
+                setSelected(null)
+              }}
             >
               <DecorSVG item={d} isSelected={selectedDecor?.id === d.id} orderedStools={orderedInZone} stoolStatuses={stoolStatuses} getStoolStatus={getStoolStatus} barLabel={t('kassaApp.floorPlanBarLabel')} />
             </div>
@@ -1095,24 +1097,29 @@ export default function KassaFloorPlan({
                 transform: `translate(-50%, -50%) rotate(${t.rotation}deg)`,
                 zIndex: dragPaint?.id === t.id ? 40 : selected?.id === t.id ? 10 : 1,
                 cursor: 'grab',
-                touchAction: 'none',
+                touchAction: isLocked ? ('manipulation' as const) : ('none' as const),
               }}
               onPointerDown={(e) => handlePointerDown(e, t.id, 'table')}
               onPointerUp={(e) => {
                 e.stopPropagation()
                 handlePointerUp(e)
-                if (!dragMoved.current) {
+                if (!dragMoved.current && !isLocked) {
                   setSelected(prev => prev?.id === t.id ? null : t)
                   setSelectedDecor(null)
                 }
               }}
               onPointerCancel={(e) => { e.stopPropagation(); handlePointerCancel(e) }}
-              onClick={(e) => { e.stopPropagation() }}
+              onClick={(e) => {
+                e.stopPropagation()
+                if (modalOpen) return
+                if (!isLocked) return
+                setSelected(prev => prev?.id === t.id ? null : t)
+                setSelectedDecor(null)
+              }}
             >
               <TableSVG
                 table={t}
                 isSelected={selected?.id === t.id}
-                onClick={(e) => { e?.stopPropagation() }}
                 effectiveStatus={getTableEffectiveStatus(t.number, t.status)}
               />
             </div>
