@@ -10,6 +10,7 @@ import {
   MenuCategory,
   ProductOption,
   ProductOptionChoice,
+  dedupeCatalogById,
   getMenuCategories,
   getMenuProducts,
   getProductsWithOptions,
@@ -1371,9 +1372,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     try {
       const snap = await offlineDbLoadMenuSnapshot(tenant)
       if (snap) {
-        setCategories(JSON.parse(snap.categoriesJson))
-        setProducts(JSON.parse(snap.productsJson))
-        setProductsWithOptions(JSON.parse(snap.productsWithOptionsJson))
+        setCategories(dedupeCatalogById(JSON.parse(snap.categoriesJson)))
+        setProducts(dedupeCatalogById(JSON.parse(snap.productsJson)))
+        setProductsWithOptions([...new Set(JSON.parse(snap.productsWithOptionsJson) as string[])])
         setMenuLoading(false)
       }
     } catch {
@@ -1386,9 +1387,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       const cachedProds = localStorage.getItem(CACHE_PRODS)
       const cachedOpts = localStorage.getItem(CACHE_OPTS)
       if (cachedCats && cachedProds && cachedOpts) {
-        setCategories(JSON.parse(cachedCats))
-        setProducts(JSON.parse(cachedProds))
-        setProductsWithOptions(JSON.parse(cachedOpts))
+        setCategories(dedupeCatalogById(JSON.parse(cachedCats)))
+        setProducts(dedupeCatalogById(JSON.parse(cachedProds)))
+        setProductsWithOptions([...new Set(JSON.parse(cachedOpts) as string[])])
         setMenuLoading(false)
       }
     } catch {
@@ -1402,8 +1403,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         getMenuProducts(tenant),
         getProductsWithOptions(tenant),
       ])
-      const activeCats = cats.filter(c => c.is_active)
-      const activeProds = prods.filter(p => p.is_active)
+      const activeCats = dedupeCatalogById(cats.filter(c => c.is_active))
+      const activeProds = dedupeCatalogById(prods.filter(p => p.is_active))
       setCategories(activeCats)
       setProducts(activeProds)
       setProductsWithOptions(withOpts)

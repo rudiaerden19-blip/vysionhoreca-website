@@ -7,6 +7,23 @@ import {
   type MenuProduct,
 } from './admin-api-menu-product-helpers'
 
+/** Voorkom dubbele catalogus-items (oude bug / corrupte IndexedDB-cache). */
+export function dedupeCatalogById<T extends { id?: string | null }>(items: T[]): T[] {
+  const seen = new Set<string>()
+  const out: T[] = []
+  for (const item of items) {
+    const id = item.id != null ? String(item.id) : null
+    if (id == null) {
+      out.push(item)
+      continue
+    }
+    if (seen.has(id)) continue
+    seen.add(id)
+    out.push(item)
+  }
+  return out
+}
+
 // =====================================================
 // MENU CATEGORIES & PRODUCTS (catalogus)
 // =====================================================
@@ -34,25 +51,44 @@ export async function getMenuCategories(tenantSlug: string): Promise<MenuCategor
         console.error('Error fetching menu categories:', error)
         return []
       }
-      return data || []
+      return dedupeCatalogById(data || [])
     },
     CACHE_TTL.MENU_CATEGORIES,
   )
 }
 
 export async function saveMenuCategory(category: MenuCategory): Promise<MenuCategory | null> {
-  /** PHASE 1: server-side via /api/admin/db.
-   *  De proxy strip 'id'/'created_at' (forbiddenColumns) en valideert tenant_slug. */
-  const r = await adminDb.upsert<MenuCategory[]>(
-    'menu_categories',
-    category as unknown as Record<string, unknown>,
-    { tenantSlug: category.tenant_slug, select: '*' },
-  )
+  /**
+   * `menu_categories` heeft forbiddenColumns `id`/`created_at` — blind upsert zonder id match triggert
+   * steeds INSERT en verdubbelt categorieën. Bij update: `update` met `{ id, tenant_slug }`; bij nieuw: `insert`.
+   */
+  const tenantSlug = category.tenant_slug
+  const row = {
+    name: category.name,
+    description: category.description ?? '',
+    ...(category.icon !== undefined && { icon: category.icon }),
+    sort_order: category.sort_order,
+    is_active: category.is_active,
+  } satisfies Record<string, unknown>
+
+  const r = category.id
+    ? await adminDb.update<MenuCategory[]>(
+        'menu_categories',
+        row,
+        { id: category.id, tenant_slug: tenantSlug },
+        { tenantSlug, select: '*' },
+      )
+    : await adminDb.insert<MenuCategory[]>(
+        'menu_categories',
+        { ...row, tenant_slug: tenantSlug },
+        { tenantSlug, select: '*' },
+      )
+
   if (!r.ok) {
     console.error('Error saving menu category:', r.error)
     return null
   }
-  cache.invalidate(cacheKey('menu_categories', category.tenant_slug))
+  cache.invalidate(cacheKey('menu_categories', tenantSlug))
   const list = (r.data as unknown as MenuCategory[]) || []
   return list[0] || null
 }
@@ -94,7 +130,7 @@ export async function getMenuProducts(tenantSlug: string, signal?: AbortSignal):
 }
 
 function normalizeMenuProductsFromDb(rows: MenuProduct[] | null): MenuProduct[] {
-  const list = rows || []
+  const list = dedupeCatalogById(rows || [])
   return list.map((row) => ({
     ...row,
     kassa_image_zoom: clampKassaProductImageZoom((row as { kassa_image_zoom?: unknown }).kassa_image_zoom),
@@ -106,27 +142,10 @@ export async function saveMenuProduct(product: MenuProduct): Promise<{ data: Men
 
   const zoomForDb = kassa_image_zoom === undefined ? undefined : clampKassaProductImageZoom(kassa_image_zoom)
 
-  const fullProduct = {
-    ...baseProduct,
-    ...(is_promo !== undefined && { is_promo }),
-    ...(promo_price !== undefined && { promo_price }),
-    ...(image_display_mode !== undefined && { image_display_mode }),
-    ...(print_label !== undefined && { print_label }),
-    ...(zoomForDb !== undefined && { kassa_image_zoom: zoomForDb }),
-  }
-
-  /** PHASE 1: server-side via /api/admin/db. */
-  const r = await adminDb.upsert<MenuProduct[]>(
-    'menu_products',
-    fullProduct as unknown as Record<string, unknown>,
-    { tenantSlug: product.tenant_slug, select: '*' },
-  )
-
-  if (r.ok) {
-    cache.invalidate(cacheKey('menu_products', product.tenant_slug))
-    const list = (r.data as unknown as MenuProduct[]) || []
-    const d = list[0]
+  const wrapOk = (list: MenuProduct[] | undefined): { data: MenuProduct | null; error?: string } => {
+    const d = list?.[0]
     if (!d) return { data: null, error: 'leeg resultaat' }
+    cache.invalidate(cacheKey('menu_products', product.tenant_slug))
     return {
       data: {
         ...d,
@@ -135,25 +154,38 @@ export async function saveMenuProduct(product: MenuProduct): Promise<{ data: Men
     }
   }
 
+  const persist = async (includeZoom: boolean) => {
+    const fullProduct = {
+      ...baseProduct,
+      ...(is_promo !== undefined && { is_promo }),
+      ...(promo_price !== undefined && { promo_price }),
+      ...(image_display_mode !== undefined && { image_display_mode }),
+      ...(print_label !== undefined && { print_label }),
+      ...(includeZoom && zoomForDb !== undefined && { kassa_image_zoom: zoomForDb }),
+    }
+    const tenant = product.tenant_slug
+    const payload = fullProduct as unknown as Record<string, unknown>
+    return product.id
+      ? adminDb.update<MenuProduct[]>(
+          'menu_products',
+          payload,
+          { id: product.id, tenant_slug: tenant },
+          { tenantSlug: tenant, select: '*' },
+        )
+      : adminDb.insert<MenuProduct[]>('menu_products', payload, { tenantSlug: tenant, select: '*' })
+  }
+
+  /** Zelfde als categorieën: geen blind upsert — id wordt door de proxy gestript → zou dubbele rijen geven. */
+  let r = await persist(true)
+
+  if (r.ok) {
+    return wrapOk(r.data as MenuProduct[] | undefined)
+  }
+
   // Fallback: kolom kassa_image_zoom mist nog in DB? probeer zonder.
   if (/kassa_image_zoom/i.test(r.error || '')) {
-    const r2 = await adminDb.upsert<MenuProduct[]>(
-      'menu_products',
-      baseProduct as unknown as Record<string, unknown>,
-      { tenantSlug: product.tenant_slug, select: '*' },
-    )
-    if (r2.ok) {
-      cache.invalidate(cacheKey('menu_products', product.tenant_slug))
-      const list = (r2.data as unknown as MenuProduct[]) || []
-      const fb = list[0]
-      if (!fb) return { data: null, error: 'leeg resultaat (fallback)' }
-      return {
-        data: {
-          ...fb,
-          kassa_image_zoom: clampKassaProductImageZoom((fb as { kassa_image_zoom?: unknown }).kassa_image_zoom),
-        },
-      }
-    }
+    const r2 = await persist(false)
+    if (r2.ok) return wrapOk(r2.data as MenuProduct[] | undefined)
     return { data: null, error: r2.error }
   }
 
