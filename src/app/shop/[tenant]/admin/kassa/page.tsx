@@ -1710,6 +1710,25 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return sum + (i.product.price + choicesTotal) * i.quantity
   }, 0)
 
+  /** Voorlopige bon: bij dine-in + tafel eerst openstaande mand (`tableOrders` / server), anders kar. */
+  const draftBonLineItems = useMemo((): CartItem[] => {
+    if (orderType === 'DINE_IN' && tableNumber) {
+      const k = tableOrderMapKey(dineInFloorZone, tableNumber)
+      const fromTable = tableOrders[k]
+      if (fromTable && fromTable.length > 0) return fromTable
+    }
+    return cart
+  }, [orderType, tableNumber, dineInFloorZone, tableOrders, cart])
+
+  const draftBonTotal = useMemo(
+    () =>
+      draftBonLineItems.reduce((sum, i) => {
+        const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
+        return sum + (i.product.price + choicesTotal) * i.quantity
+      }, 0),
+    [draftBonLineItems],
+  )
+
   const pickerTables = kassaTablesByZone[pickerBrowseZone]
   const pickerStools = kassaStoolsByZone[pickerBrowseZone]
 
@@ -2394,14 +2413,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setPrintAgentFallbackHtml(html)
   }
 
-  /** Voorlopige bon zonder afrekenen — alleen als er lijnen in de kar zijn. */
+  /** Voorlopige bon zonder afrekenen — lijnen uit kar en/of openstaande tafelmand. */
   const printDraftBonFromCart = () => {
-    if (cart.length === 0) return
+    if (draftBonLineItems.length === 0) return
     playClick()
     const draftOrder: KassaLastOrderReceipt = {
       orderNumber: 0,
-      items: cart,
-      total,
+      items: draftBonLineItems,
+      total: draftBonTotal,
       paymentMethod: 'CARD',
       orderType,
       tableNumber: tableNumber || '',
@@ -2792,7 +2811,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <button
             type="button"
             onClick={printDraftBonFromCart}
-            disabled={cart.length === 0}
+            disabled={draftBonLineItems.length === 0}
             className="max-w-full truncate rounded-md px-1 py-0.5 text-center text-[10px] font-semibold leading-tight tracking-tight text-white/95 transition-colors hover:bg-white/15 active:bg-white/25 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-transparent sm:text-[11px] md:text-xs"
             title={t('kassaApp.cartBonTitle')}
             aria-label={t('kassaApp.cartBonTitle')}
@@ -3531,8 +3550,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <button
               type="button"
               onClick={printDraftBonFromCart}
-              disabled={cart.length === 0}
-              className="flex flex-col items-center justify-center gap-2 rounded-xl bg-amber-400 py-5 text-amber-950 transition-colors hover:bg-amber-300 active:scale-[0.99] disabled:opacity-40 disabled:pointer-events-none"
+              disabled={draftBonLineItems.length === 0}
+              className="flex flex-col items-center justify-center gap-2 rounded-xl bg-yellow-400 py-5 text-yellow-950 transition-colors hover:bg-yellow-300 active:scale-[0.99] disabled:opacity-40 disabled:pointer-events-none"
               title={t('kassaApp.cartBonTitle')}
               aria-label={t('kassaApp.cartBonTitle')}
             >
