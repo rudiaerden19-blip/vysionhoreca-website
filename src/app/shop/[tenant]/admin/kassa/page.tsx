@@ -1227,6 +1227,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   // Bevestiging popup voor tafel wisselen
   const [switchConfirm, setSwitchConfirm] = useState<string | null>(null)
+  /** Na plattegrond «Afrekenen»: open betaalmodal zodra doSwitchToTable klaar is (ook ná switch-bevestiging). */
+  const openPaymentAfterFloorPlanSwitchRef = useRef(false)
 
   const switchToTable = (newTableNr: string) => {
     const zone = pickerBrowseZone
@@ -1253,6 +1255,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setOrderType('DINE_IN')
     setShowTablePicker(false)
     setSwitchConfirm(null)
+    if (openPaymentAfterFloorPlanSwitchRef.current) {
+      openPaymentAfterFloorPlanSwitchRef.current = false
+      setShowFloorPlan(false)
+      setShowPaymentModal(true)
+    }
   }
 
   // "Naar tafel" knop: sla bestelling op en leeg de kassa voor volgende tafel
@@ -3576,7 +3583,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </div>
             <div className="flex gap-3">
               <button
-                onClick={() => setSwitchConfirm(null)}
+                onClick={() => {
+                  openPaymentAfterFloorPlanSwitchRef.current = false
+                  setSwitchConfirm(null)
+                }}
                 className="flex-1 py-3 rounded-xl bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 transition-colors"
               >
                 {t('kassaApp.cancel')}
@@ -3674,7 +3684,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           onFloorPlanTablesPersisted={onFloorPlanTablesPersisted}
           onFloorPlanTablesPersistLifecycle={onFloorPlanTablesPersistLifecycle}
           onSelectTable={(nr) => switchToTable(nr)}
-          onClose={() => setShowFloorPlan(false)}
+          onCheckoutTable={(nr) => {
+            playCheckout()
+            openPaymentAfterFloorPlanSwitchRef.current = true
+            switchToTable(nr)
+          }}
+          onClose={() => {
+            openPaymentAfterFloorPlanSwitchRef.current = false
+            setShowFloorPlan(false)
+          }}
           tableOrders={tableOrders}
         />
       )}

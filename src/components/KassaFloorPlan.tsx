@@ -40,6 +40,8 @@ interface Props {
   /** Binnen of terras: aparte plattegrond + decor per tenant. */
   planZone: FloorPlanZone
   onSelectTable: (tableNumber: string) => void
+  /** Open kassa op deze tafel/kruk en ga naar afrekenen (alleen tonen bij open mand). */
+  onCheckoutTable?: (tableNumber: string) => void
   onClose: () => void
   tableOrders?: Record<string, SimpleCartItem[]>
   /** Zelfde lijst als kassa-tafelkiezer — direct tonen tot DB-fetch klaar is (voorkomt lege plattegrond). */
@@ -365,6 +367,7 @@ export default function KassaFloorPlan({
   tenant,
   planZone,
   onSelectTable,
+  onCheckoutTable,
   onClose,
   tableOrders = {},
   seedTables,
@@ -1207,8 +1210,17 @@ export default function KassaFloorPlan({
                         )
                       })}
                     </div>
-                    {/* Bestelling knop */}
-                    <div className="px-3 pb-3">
+                    {/* Afrekenen + bestelling */}
+                    <div className="px-3 pb-3 space-y-2">
+                      {onCheckoutTable && items.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => onCheckoutTable(stoolId)}
+                          className="w-full py-3 rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold text-base transition-colors"
+                        >
+                          💳 {t('kassaApp.floorPlanCheckoutStool').replace(/\{id\}/g, stoolId)}
+                        </button>
+                      )}
                       <button
                         onClick={() => { onSelectTable(stoolId); onClose() }}
                         className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-base transition-colors">
@@ -1404,6 +1416,15 @@ export default function KassaFloorPlan({
               </div>
 
               <div className="p-4 space-y-2">
+                {onCheckoutTable && hasItems && (
+                  <button
+                    type="button"
+                    onClick={() => onCheckoutTable(selected.number)}
+                    className="w-full py-3 rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold transition-colors"
+                  >
+                    💳 {t('kassaApp.floorPlanCheckoutTable')}
+                  </button>
+                )}
                 <button
                   onClick={() => { onSelectTable(selected.number); onClose() }}
                   className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition-colors">

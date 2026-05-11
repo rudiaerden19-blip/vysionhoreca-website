@@ -2847,6 +2847,8 @@
     "floorPlanOrderHeading": "Bestellung",
     "floorPlanAddToOrderTable": "Zur Bestellung hinzufügen",
     "floorPlanNewOrderTable": "Neue Bestellung",
+    "floorPlanCheckoutTable": "Zur Kasse",
+    "floorPlanCheckoutStool": "Zur Kasse {id}",
     "floorPlanDeleteTableBtn": "🗑 Tisch entfernen",
     "floorPlanLegendLocked": "🔒 Gesperrt — auf «Entsperren» tippen, um Tische zu verschieben",
     "floorPlanLegendEditMode": "🔓 Entsperrt — ziehen zum Verschieben • ↺↻ zum Drehen",

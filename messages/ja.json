@@ -3347,6 +3347,8 @@
     "floorPlanOrderHeading": "注文",
     "floorPlanAddToOrderTable": "注文に追加",
     "floorPlanNewOrderTable": "新規注文",
+    "floorPlanCheckoutTable": "お会計",
+    "floorPlanCheckoutStool": "お会計 {id}",
     "floorPlanDeleteTableBtn": "🗑 Remove table",
     "floorPlanLegendLocked": "🔒 ロック中 — テーブルを動かすには「ロック解除」をタップ",
     "floorPlanLegendEditMode": "🔓 解除済み — ドラッグで移動 • ↺↻ で回転",

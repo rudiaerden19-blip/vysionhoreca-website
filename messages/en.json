@@ -3801,6 +3801,8 @@
     "floorPlanOrderHeading": "Order",
     "floorPlanAddToOrderTable": "Add to order",
     "floorPlanNewOrderTable": "New order",
+    "floorPlanCheckoutTable": "Checkout",
+    "floorPlanCheckoutStool": "Checkout {id}",
     "floorPlanDeleteTableBtn": "🗑 Remove table",
     "floorPlanLegendLocked": "🔒 Locked — tap «Unlock» to move tables",
     "floorPlanLegendEditMode": "🔓 Unlocked — drag to move • ↺↻ to rotate",

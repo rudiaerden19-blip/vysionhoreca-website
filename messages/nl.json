@@ -3801,6 +3801,8 @@
     "floorPlanOrderHeading": "Bestelling",
     "floorPlanAddToOrderTable": "Toevoegen aan bestelling",
     "floorPlanNewOrderTable": "Nieuwe bestelling",
+    "floorPlanCheckoutTable": "Afrekenen",
+    "floorPlanCheckoutStool": "Afrekenen {id}",
     "floorPlanDeleteTableBtn": "🗑 Verwijder tafel",
     "floorPlanLegendLocked": "🔒 Vergrendeld — klik op «Ontgrendel» om tafels te verplaatsen",
     "floorPlanLegendEditMode": "🔓 Plan ontgrendeld — sleep om te verplaatsen • ↺↻ om te draaien",

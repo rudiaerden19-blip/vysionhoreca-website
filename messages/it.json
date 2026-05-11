@@ -3347,6 +3347,8 @@
     "floorPlanOrderHeading": "Ordine",
     "floorPlanAddToOrderTable": "Aggiungi all’ordine",
     "floorPlanNewOrderTable": "Nuovo ordine",
+    "floorPlanCheckoutTable": "Incassa",
+    "floorPlanCheckoutStool": "Incassa {id}",
     "floorPlanDeleteTableBtn": "🗑 Rimuovi tavolo",
     "floorPlanLegendLocked": "🔒 Bloccato — tocca «Sblocca» per spostare i tavoli",
     "floorPlanLegendEditMode": "🔓 Sbloccato — trascina per spostare • ↺↻ per ruotare",

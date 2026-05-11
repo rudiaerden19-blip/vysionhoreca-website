@@ -2847,6 +2847,8 @@
     "floorPlanOrderHeading": "Commande",
     "floorPlanAddToOrderTable": "Ajouter à la commande",
     "floorPlanNewOrderTable": "Nouvelle commande",
+    "floorPlanCheckoutTable": "Encaisser",
+    "floorPlanCheckoutStool": "Encaisser {id}",
     "floorPlanDeleteTableBtn": "🗑 Supprimer la table",
     "floorPlanLegendLocked": "🔒 Verrouillé — appuyez sur « Déverrouiller » pour déplacer les tables",
     "floorPlanLegendEditMode": "🔓 Déverrouillé — glisser pour déplacer • ↺↻ pour pivoter",

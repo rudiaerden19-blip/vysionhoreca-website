@@ -3347,6 +3347,8 @@
     "floorPlanOrderHeading": "订单",
     "floorPlanAddToOrderTable": "加入订单",
     "floorPlanNewOrderTable": "新订单",
+    "floorPlanCheckoutTable": "结账",
+    "floorPlanCheckoutStool": "结账 {id}",
     "floorPlanDeleteTableBtn": "🗑 Remove table",
     "floorPlanLegendLocked": "🔒 已锁定 — 点击「解锁」以移动餐桌",
     "floorPlanLegendEditMode": "🔓 已解锁 — 拖动移动 • ↺↻ 旋转",

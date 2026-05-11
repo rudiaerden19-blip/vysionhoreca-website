@@ -3347,6 +3347,8 @@
     "floorPlanOrderHeading": "الطلب",
     "floorPlanAddToOrderTable": "إضافة للطلب",
     "floorPlanNewOrderTable": "طلب جديد",
+    "floorPlanCheckoutTable": "الدفع",
+    "floorPlanCheckoutStool": "الدفع {id}",
     "floorPlanDeleteTableBtn": "🗑 Remove table",
     "floorPlanLegendLocked": "🔒 مقفل — اضغط «فتح القفل» لتحريك الطاولات",
     "floorPlanLegendEditMode": "🔓 غير مقفل — اسحب للتحريك • ↺↻ للدوران",
