@@ -72,6 +72,19 @@ export type { OpeningHour, ShopStatus } from './admin-api-shop-hours'
 export { getOpeningHours, saveOpeningHours, getShopStatus } from './admin-api-shop-hours'
 
 export type { MenuCategory } from './admin-api-menu-catalog'
+import {
+  dedupeCatalogById,
+  invalidateMenuCategoriesCache,
+  normalizeDbSingleRow,
+  getMenuCategories,
+  saveMenuCategory,
+  bulkSaveMenuCategories,
+  deleteMenuCategory,
+  getMenuProducts,
+  saveMenuProduct,
+  deleteMenuProduct,
+} from './admin-api-menu-catalog'
+
 export {
   dedupeCatalogById,
   normalizeDbSingleRow,
@@ -83,7 +96,7 @@ export {
   getMenuProducts,
   saveMenuProduct,
   deleteMenuProduct,
-} from './admin-api-menu-catalog'
+}
 
 import { fetchAllOrdersInCreatedAtRange } from './admin-api-order-operations'
 
@@ -495,62 +508,88 @@ export async function getProductOptions(tenantSlug: string): Promise<ProductOpti
 }
 
 export async function saveProductOption(option: ProductOption): Promise<ProductOption | null> {
-  const { choices, id, ...restData } = option
-  
-  // Only include id if it exists (for updates)
-  const optionData = id ? { id, ...restData } : restData
-  
-  // Save or update the option
-  const { data: savedOption, error } = await supabase
-    .from('product_options')
-    .upsert(optionData)
-    .select()
-    .single()
-  
-  if (error) {
-    console.error('Error saving product option:', error)
+  const { choices = [], tenant_slug } = option
+  const row = {
+    name: option.name,
+    type: option.type,
+    required: option.required ?? false,
+    sort_order: option.sort_order ?? 0,
+    is_active: option.is_active ?? true,
+  }
+
+  /** RLS: schrijven via admin-proxy (`/api/admin/db`), zelfde patroon als `saveMenuCategory`. */
+  const optRes =
+    option.id != null && String(option.id).trim() !== ''
+      ? await adminDb.update<ProductOption[]>(
+          'product_options',
+          row,
+          { id: option.id, tenant_slug },
+          { tenantSlug: tenant_slug, select: '*' },
+        )
+      : await adminDb.insert<ProductOption[]>(
+          'product_options',
+          { ...row, tenant_slug },
+          { tenantSlug: tenant_slug, select: '*' },
+        )
+
+  if (!optRes.ok) {
+    console.error('Error saving product option:', optRes.error)
     return null
   }
 
-  // If we have choices, save them
-  if (choices && choices.length > 0) {
-    // First, delete existing choices for this option
-    await supabase
-      .from('product_option_choices')
-      .delete()
-      .eq('option_id', savedOption.id)
+  const saved = normalizeDbSingleRow<ProductOption>(optRes.data)
+  if (!saved?.id) {
+    console.error('Error saving product option: geen rij terug van server')
+    return null
+  }
+  const savedId = saved.id
 
-    // Then insert new choices (without id to avoid conflicts)
-    const choicesWithOptionId = choices.map((choice, index) => ({
-      name: choice.name,
-      price: choice.price || 0,
-      option_id: savedOption.id,
-      tenant_slug: option.tenant_slug,
-      sort_order: index,
-      is_active: true,
-    }))
-
-    const { error: choicesError } = await supabase
-      .from('product_option_choices')
-      .insert(choicesWithOptionId)
-
-    if (choicesError) {
-      console.error('Error saving option choices:', choicesError)
-    }
+  const delRes = await adminDb.delete(
+    'product_option_choices',
+    { option_id: savedId, tenant_slug },
+    { tenantSlug: tenant_slug },
+  )
+  if (!delRes.ok) {
+    console.error('Error deleting old option choices:', delRes.error)
+    return null
   }
 
-  return { ...savedOption, choices }
+  if (choices.length === 0) {
+    return { ...saved, choices: [] }
+  }
+
+  const choicePayload = choices.map((choice, index) => ({
+    name: choice.name,
+    price:
+      typeof choice.price === 'number' && Number.isFinite(choice.price) ? choice.price : Number(choice.price) || 0,
+    option_id: savedId,
+    sort_order: index,
+    is_active: true as const,
+  }))
+
+  const insRes = await adminDb.insert<ProductOptionChoice[]>(
+    'product_option_choices',
+    choicePayload,
+    { tenantSlug: tenant_slug, select: '*' },
+  )
+  if (!insRes.ok) {
+    console.error('Error saving option choices:', insRes.error)
+    return null
+  }
+  const raw = insRes.data
+  const savedChoices = Array.isArray(raw) ? raw : raw != null ? [raw as ProductOptionChoice] : []
+
+  return { ...saved, choices: savedChoices }
 }
 
-export async function deleteProductOption(id: string): Promise<boolean> {
-  // Choices will be deleted automatically due to CASCADE
-  const { error } = await supabase
-    .from('product_options')
-    .delete()
-    .eq('id', id)
-  
-  if (error) {
-    console.error('Error deleting product option:', error)
+export async function deleteProductOption(id: string, tenantSlug: string): Promise<boolean> {
+  if (!tenantSlug) {
+    console.error('deleteProductOption: tenantSlug verplicht')
+    return false
+  }
+  const r = await adminDb.delete('product_options', { id, tenant_slug: tenantSlug }, { tenantSlug })
+  if (!r.ok) {
+    console.error('Error deleting product option:', r.error)
     return false
   }
   return true
@@ -573,28 +612,27 @@ export async function getProductOptionLinks(productId: string): Promise<string[]
 }
 
 export async function saveProductOptionLinks(productId: string, optionIds: string[], tenantSlug: string): Promise<boolean> {
-  // First delete existing links
-  await supabase
-    .from('product_option_links')
-    .delete()
-    .eq('product_id', productId)
-  
-  // If no options selected, we're done
+  const delRes = await adminDb.delete(
+    'product_option_links',
+    { product_id: productId, tenant_slug: tenantSlug },
+    { tenantSlug },
+  )
+  if (!delRes.ok) {
+    console.error('Error deleting product option links:', delRes.error)
+    return false
+  }
+
   if (optionIds.length === 0) return true
-  
-  // Insert new links
-  const links = optionIds.map(optionId => ({
+
+  const links = optionIds.map((optionId) => ({
     product_id: productId,
     option_id: optionId,
-    tenant_slug: tenantSlug
   }))
-  
-  const { error } = await supabase
-    .from('product_option_links')
-    .insert(links)
-  
-  if (error) {
-    console.error('Error saving product option links:', error)
+
+  const insRes = await adminDb.insert('product_option_links', links, { tenantSlug })
+
+  if (!insRes.ok) {
+    console.error('Error saving product option links:', insRes.error)
     return false
   }
   return true

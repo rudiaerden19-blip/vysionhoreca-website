@@ -2497,6 +2497,7 @@
       "optionNamePlaceholder": "Ej. Tamaño, salsa, extras",
       "choiceNamePlaceholder": "Nombre (ej. Pequeño, mediano, grande)",
       "mustChoose": "Sí, el cliente debe elegir",
+      "optionalChoice": "No, opcional para el cliente",
       "noOptions": "Aún no hay opciones",
       "noOptionsDesc": "Añada opciones como tamaños, salsas o extras",
       "addFirstOption": "+ Añadir primera opción",

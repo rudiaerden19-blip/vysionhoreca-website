@@ -2497,6 +2497,7 @@
       "optionNamePlaceholder": "مثال: الحجم، الصلصة، إضافات",
       "choiceNamePlaceholder": "الاسم (مثال: صغير، متوسط، كبير)",
       "mustChoose": "نعم، يجب على العميل الاختيار",
+      "optionalChoice": "لا، اختياري للعميل",
       "noOptions": "لا خيارات بعد",
       "noOptionsDesc": "أضف خيارات مثل الأحجام أو الصلصات أو الإضافات",
       "addFirstOption": "+ أضف أول خيار",

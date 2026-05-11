@@ -2795,6 +2795,7 @@
       "choiceNamePlaceholder": "Name (e.g. Small, Medium, Large)",
       "required": "Required",
       "mustChoose": "Yes, customer must choose",
+      "optionalChoice": "No, optional for the customer",
       "multiSelect": "Multiple selections allowed",
       "noOptions": "No options yet",
       "noOptionsDesc": "Add options like sizes, sauces or extras",

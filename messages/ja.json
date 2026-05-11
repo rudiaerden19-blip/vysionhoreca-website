@@ -2497,6 +2497,7 @@
       "optionNamePlaceholder": "例：サイズ、ソース、トッピング",
       "choiceNamePlaceholder": "名前（例：小、中、大）",
       "mustChoose": "はい、お客様は必ず選ぶ必要があります",
+      "optionalChoice": "いいえ、お客様の任意です",
       "noOptions": "オプションがまだありません",
       "noOptionsDesc": "サイズ・ソース・トッピングなどのオプションを追加",
       "addFirstOption": "+ 最初のオプションを追加",

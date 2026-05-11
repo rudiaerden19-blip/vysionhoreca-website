@@ -2497,6 +2497,7 @@
       "optionNamePlaceholder": "例：规格、酱料、加料",
       "choiceNamePlaceholder": "名称（例：小、中、大）",
       "mustChoose": "是，顾客必须选择",
+      "optionalChoice": "否，顾客可不选（可选）",
       "noOptions": "尚无选项",
       "noOptionsDesc": "添加规格、酱料或加料等选项",
       "addFirstOption": "+ 添加首个选项",

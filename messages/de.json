@@ -1997,6 +1997,7 @@
       "optionNamePlaceholder": "z. B. Größe, Soße, Extras",
       "choiceNamePlaceholder": "Name (z. B. Klein, Mittel, Groß)",
       "mustChoose": "Ja, Kunde muss wählen",
+      "optionalChoice": "Nein, optional für den Kunden",
       "noOptions": "Noch keine Optionen",
       "noOptionsDesc": "Fügen Sie Optionen wie Größen, Soßen oder Extras hinzu",
       "addFirstOption": "+ Erste Option hinzufügen",

@@ -278,7 +278,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
 
   const handleDelete = async (id: string) => {
     if (!(await ask(t('adminPages.opties.confirmDelete')))) return
-    const success = await deleteProductOption(id)
+    const success = await deleteProductOption(id, params.tenant)
     if (success) {
       setOptions(prev => prev.filter(o => o.id !== id))
     } else {
@@ -510,7 +510,9 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                       onClick={() => setFormData(prev => ({ ...prev, required: !prev.required }))}
                       className={`flex items-center justify-between h-12 px-4 rounded-xl cursor-pointer transition-colors ${formData.required ? 'bg-blue-50 border-2 border-blue-500' : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'}`}
                     >
-                      <span className={`text-sm font-medium ${formData.required ? 'text-blue-700' : 'text-gray-600'}`}>{t('adminPages.opties.mustChoose')}</span>
+                      <span className={`text-sm font-medium ${formData.required ? 'text-blue-700' : 'text-gray-600'}`}>
+                        {formData.required ? t('adminPages.opties.mustChoose') : t('adminPages.opties.optionalChoice')}
+                      </span>
                       <button type="button" className={`relative w-10 h-5 rounded-full transition-colors duration-200 ${formData.required ? 'bg-blue-600' : 'bg-gray-300'}`}>
                         <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 ${formData.required ? 'translate-x-5' : 'translate-x-0'}`} />
                       </button>

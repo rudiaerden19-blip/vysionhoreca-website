@@ -2795,6 +2795,7 @@
       "choiceNamePlaceholder": "Naam (bijv. Klein, Medium, Groot)",
       "required": "Verplicht",
       "mustChoose": "Ja, klant moet kiezen",
+      "optionalChoice": "Nee, optioneel voor de klant",
       "multiSelect": "Meerdere keuzes mogelijk",
       "noOptions": "Nog geen opties",
       "noOptionsDesc": "Voeg opties toe zoals formaten, sauzen of extra's",

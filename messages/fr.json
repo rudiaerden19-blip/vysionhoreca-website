@@ -1997,6 +1997,7 @@
       "optionNamePlaceholder": "ex. Taille, Sauce, Suppléments",
       "choiceNamePlaceholder": "Nom (ex. Petit, Moyen, Grand)",
       "mustChoose": "Oui, le client doit choisir",
+      "optionalChoice": "Non, facultatif pour le client",
       "noOptions": "Pas encore d'options",
       "noOptionsDesc": "Ajoutez des options comme tailles, sauces ou extras",
       "addFirstOption": "+ Ajouter la première option",
