@@ -33,16 +33,29 @@ describe('kitchen-queue-orders', () => {
       ).toBe(false)
     })
 
-    /** Regression: na afrekenen insert kassa confirmed+paid — mag niet terug op keuken. */
-    it('hides paid POS DINE_IN in confirmed (final receipt row)', () => {
+    /** Regression: na afrekenen aan tafel insert kassa confirmed+paid mét tafel — niet dubbel op keuken. */
+    it('hides paid POS DINE_IN in confirmed when table_number set (final receipt row)', () => {
       expect(
         isKitchenQueueOrder({
           status: 'confirmed',
           order_type: 'DINE_IN',
           payment_status: 'paid',
           items: itemsOne,
+          table_number: '5',
         }),
       ).toBe(false)
+    })
+
+    it('shows paid POS DINE_IN counter sale without table (direct ter plaatse verkoop)', () => {
+      expect(
+        isKitchenQueueOrder({
+          status: 'confirmed',
+          order_type: 'DINE_IN',
+          payment_status: 'paid',
+          items: itemsOne,
+          table_number: null,
+        }),
+      ).toBe(true)
     })
 
     it('hides unpaid DINE_IN while preparing (kitchen tapped Klaar, bill open)', () => {

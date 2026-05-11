@@ -1,6 +1,7 @@
 import {
   distributeOrderPaymentForZRaport,
   orderCountsTowardRevenueAndZReport,
+  isWebshopChannelNewOrder,
 } from '@/lib/admin-api-order-helpers'
 
 /** Kernlogica voor omzet/Z-rapport — stabiel houden bij statuswijzigingen. */
@@ -68,5 +69,19 @@ describe('admin-api-order-helpers (Z-rapport / revenue gate)', () => {
         payment_split_card: 60,
       })
     ).toEqual({ cash: 40, card: 60, online: 0 })
+  })
+})
+
+describe('isWebshopChannelNewOrder (kassa alarm alleen web)', () => {
+  it('includes webshop pickup / delivery / group', () => {
+    expect(isWebshopChannelNewOrder({ order_type: 'pickup' })).toBe(true)
+    expect(isWebshopChannelNewOrder({ order_type: 'delivery' })).toBe(true)
+    expect(isWebshopChannelNewOrder({ order_type: 'group' })).toBe(true)
+  })
+
+  it('excludes all POS order types even if lowercased elsewhere', () => {
+    expect(isWebshopChannelNewOrder({ order_type: 'DINE_IN' })).toBe(false)
+    expect(isWebshopChannelNewOrder({ order_type: 'TAKEAWAY' })).toBe(false)
+    expect(isWebshopChannelNewOrder({ order_type: 'DELIVERY' })).toBe(false)
   })
 })

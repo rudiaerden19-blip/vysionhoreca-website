@@ -75,6 +75,17 @@ export function isWebshopOrder(order: Pick<Order, 'order_type'>): boolean {
 }
 
 /**
+ * Orders met status `new` die van het publieke web / groepsmodule komen.
+ * Kassa-POS schrijft bij verkoop direct `confirmed` — die horen dit alarm niet te triggeren.
+ * Let op: `.toLowerCase()` alleen is onvoldoende (`DELIVERY` zou `delivery` worden); daarom eerst POS uitsluiten.
+ */
+export function isWebshopChannelNewOrder(order: { order_type?: string | null | undefined }): boolean {
+  if (isKassaPosOrder({ order_type: order.order_type ?? '' } as Pick<Order, 'order_type'>)) return false
+  const ot = String(order.order_type ?? '').toLowerCase().trim()
+  return ot === 'pickup' || ot === 'delivery' || ot === 'group'
+}
+
+/**
  * Dashboard, Z-rapport, rapporten, bedrijfsanalyse, verkoop: zelfde bron van waarheid.
  *
  * - Webshop/online: telt zodra de zaak bevestigt (confirmed+) OF zodra online betaald (paid) — niet pas bij "afronden".

@@ -79,6 +79,7 @@ import {
   mergeOfflineOrderQueues,
   offlineOrdersQueueStorageKey,
 } from '@/lib/kassa-offline-order-queue'
+import { isWebshopChannelNewOrder } from '@/lib/admin-api-order-helpers'
 import { useKassaOfflineFlushBridge } from '@/lib/use-kassa-offline-flush-bridge'
 import type { KassaPayOption } from '@/components/kassa/KassaPaymentModal'
 import { KassaPaymentModal } from '@/components/kassa/KassaPaymentModal'
@@ -453,7 +454,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       void (async () => {
         try {
           const [o, p] = await Promise.all([
-            supabase.from('orders').select('*', { count: 'exact', head: true }).eq('tenant_slug', tenant).eq('status', 'new'),
+            supabase
+              .from('orders')
+              .select('*', { count: 'exact', head: true })
+              .eq('tenant_slug', tenant)
+              .eq('status', 'new')
+              .in('order_type', ['pickup', 'delivery', 'group']),
             supabase
               .from('reservations')
               .select('*', { count: 'exact', head: true })
@@ -494,7 +500,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         const [{ data: orders }, { data: idRows }, pendingRes] = await Promise.all([
           supabase
             .from('orders')
-            .select('id,order_number,total,status')
+            .select('id,order_number,total,status,order_type')
             .eq('tenant_slug', tenant)
             .eq('status', 'new')
             .order('created_at', { ascending: false })
@@ -512,6 +518,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             .or('status.eq.PENDING,status.eq.pending,status.eq.WAITLIST,status.eq.waitlist'),
         ])
         const list = orders || []
+        /** Alleen webshop/kiosk `new` — kassa-POS schrijft direct `confirmed`; die mogen geen oranje alarm geven. */
+        const webshopNewList = list.filter((o: { order_type?: string | null }) =>
+          isWebshopChannelNewOrder(o),
+        )
         const reservList = idRows || []
         const pendingAndWl = pendingRes.count ?? 0
         setPendingReservCount(pendingAndWl)
@@ -527,11 +537,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         let newReservOnes: { id: string }[] = []
 
-        // ── Orders (zelfde als voorheen, alarm stop/start via gezamenlijke stap onderaan) ──
-        const currentOrderIds = list.map((o: any) => o.id)
+        // ── Orders: alleen webshop-kanaal (pickup / delivery / group) ──
+        const currentOrderIds = webshopNewList.map((o: { id: string }) => o.id)
         const prevOrderIds = previousOrderIdsRef.current
         if (!isFirstOrderCheck) {
-          const newOrderOnes = list.filter((o: any) => !prevOrderIds.includes(o.id))
+          const newOrderOnes = webshopNewList.filter((o: { id: string }) => !prevOrderIds.includes(o.id))
           if (newOrderOnes.length > 0) {
             startAlarm()
             try {
@@ -559,7 +569,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           }
         } else {
           isFirstOrderCheck = false
-          if (list.length > 0) startAlarm()
+          if (webshopNewList.length > 0) startAlarm()
         }
         previousOrderIdsRef.current = currentOrderIds
 
@@ -592,8 +602,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         }
         previousReservIdsRef.current = currentReservIds
 
-        // ── Alarm aan/uit: nieuwe bestelling OF reservering-alarm na echte nieuwe binnenkomst (niet bij openen met oude backlog) ──
-        const needOrderAlarm = list.length > 0
+        // ── Alarm aan/uit: alleen webshop `new` OF reservering-alarm ──
+        const needOrderAlarm = webshopNewList.length > 0
         const needReservAlarm = reservationAlarmLatchedRef.current && pendingAndWl > 0
         if (needOrderAlarm || needReservAlarm) {
           if (!alarmIntervalRef.current) startAlarm()

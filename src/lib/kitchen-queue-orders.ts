@@ -20,6 +20,7 @@ export function isKitchenQueueOrder(o: {
   order_type?: string
   items?: unknown
   payment_status?: string
+  table_number?: string | number | null
 }): boolean {
   const items = Array.isArray(o.items) ? o.items : []
   if (items.length === 0) return false
@@ -28,9 +29,12 @@ export function isKitchenQueueOrder(o: {
   const ps = (o.payment_status || '').toLowerCase()
 
   if (st === 'confirmed' || st === 'preparing') {
-    // Tafel: na betalen schrijft de kassa een nieuwe rij weg (confirmed + paid). Keuken heeft de open/preparing-mand al gehad — niet opnieuw tonen.
+    // Na betalen aan tafel: nieuwe rij confirmed+paid mét tafelnummer — mand stond al op keuken; niet dubbel.
+    // Ter plaatse zonder tafel (counter DINE_IN): wél tonen (geen open mand geweest).
     if (isKassaPosOrder(o) && ot === 'DINE_IN' && ps === 'paid') {
-      return false
+      const tn = o.table_number
+      const hasTable = tn != null && String(tn).trim() !== ''
+      if (hasTable) return false
     }
     if (isKassaPosOrder(o) && ot === 'DINE_IN' && ps !== 'paid' && st === 'preparing') {
       return false
