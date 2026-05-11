@@ -411,7 +411,6 @@ export default function KassaFloorPlan({
   const [stoolStatuses, setStoolStatuses] = useState<Record<string, TableStatus>>({})
 
   const [isLocked, setIsLocked] = useState(true)
-  const floorRef = useRef<HTMLDivElement>(null)
   /** iPad/Safari: altijd releasePointerCapture na drag, anders blijven tikken “vast”. */
   const pointerCaptureRef = useRef<{ pointerId: number; element: HTMLElement } | null>(null)
 
@@ -430,6 +429,9 @@ export default function KassaFloorPlan({
   const [dragPaint, setDragPaint] = useState<{ id: string; x: number; y: number } | null>(null)
   const pendingDragPctRef = useRef<{ x: number; y: number } | null>(null)
   const innerCanvasRef = useRef<HTMLDivElement | null>(null)
+  /** Één gesture-laag: capture op canvas + hit-test (touch/desktop, alle tenants). */
+  const floorGestureRef = useRef<{ pointerId: number; kind: 'table' | 'decor'; id: string } | null>(null)
+  const tapStartedEmptyRef = useRef(false)
   /** Pauzeer localStorage-sync van tables tijdens eender welke vloer-interactie (zoals voorheen isDragging). */
   const floorPersistPausedRef = useRef(false)
 
@@ -888,25 +890,73 @@ export default function KassaFloorPlan({
     if (sel) setSelected(sel)
   }
 
-  // Posities zijn % (0–100) van de container; tegelpatroon blijft vast — alleen tafels/decor verschuiven.
-  const handlePointerDown = (e: React.PointerEvent, id: string, type: 'table' | 'decor') => {
-    e.stopPropagation()
-    if (showAddModal || showAddBarModal) return
-    if (isLocked) return
+  /** Welke tafel/decor ligt visueel bovenaan op dit punt — DOM-stack i.p.v. per-element listeners (touch + muis, alle tenants). */
+  const resolveFloorHit = useCallback((clientX: number, clientY: number): { kind: 'table' | 'decor'; id: string } | null => {
+    const root = innerCanvasRef.current
+    if (!root || typeof document === 'undefined') return null
+    let stack: Element[]
+    try {
+      stack = document.elementsFromPoint(clientX, clientY)
+    } catch {
+      return null
+    }
+    for (const el of stack) {
+      if (!(el instanceof HTMLElement)) continue
+      if (!root.contains(el)) continue
+      const tw = el.closest('[data-vysion-floor-table]')
+      const tid = tw?.getAttribute('data-vysion-floor-table')
+      if (tid) return { kind: 'table', id: tid }
+      const dw = el.closest('[data-vysion-floor-decor]')
+      const did = dw?.getAttribute('data-vysion-floor-decor')
+      if (did) return { kind: 'decor', id: did }
+    }
+    return null
+  }, [])
 
-    takePointerCapture(e.currentTarget as HTMLElement, e.pointerId)
-    const floor = floorRef.current
-    if (!floor) return
-    const rect = floor.getBoundingClientRect()
-    floorRectCachedRef.current = rect
-    const item = type === 'table' ? tables.find(t => t.id === id)! : decors.find(d => d.id === id)!
-    draggingId.current = id
-    draggingType.current = type
+  const canvasPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (showAddModal || showAddBarModal) return
+    const canvas = innerCanvasRef.current
+    if (!canvas) return
+
+    const rect = canvas.getBoundingClientRect()
+    if (
+      e.clientX < rect.left ||
+      e.clientX > rect.right ||
+      e.clientY < rect.top ||
+      e.clientY > rect.bottom
+    ) {
+      return
+    }
+
     dragMoved.current = false
     pointerStart.current = { x: e.clientX, y: e.clientY }
+    floorGestureRef.current = null
+    tapStartedEmptyRef.current = false
+    draggingId.current = null
+
+    const hit = resolveFloorHit(e.clientX, e.clientY)
+
+    if (!hit) {
+      tapStartedEmptyRef.current = true
+      takePointerCapture(canvas, e.pointerId)
+      return
+    }
+
+    floorGestureRef.current = { pointerId: e.pointerId, kind: hit.kind, id: hit.id }
+    takePointerCapture(canvas, e.pointerId)
+
+    if (isLocked) return
+
+    const item =
+      hit.kind === 'table' ? tables.find((t) => t.id === hit.id) : decors.find((d) => d.id === hit.id)
+    if (!item) return
+
+    draggingId.current = hit.id
+    draggingType.current = hit.kind === 'table' ? 'table' : 'decor'
     pendingDragPctRef.current = null
     cancelDragPaintRaf()
-    setDragPaint({ id, x: item.x, y: item.y })
+    floorRectCachedRef.current = rect
+    setDragPaint({ id: hit.id, x: item.x, y: item.y })
     ignoreFloorRealtimeRef.current = true
     floorPersistPausedRef.current = true
     setBodyGrabbing(true)
@@ -916,26 +966,96 @@ export default function KassaFloorPlan({
     }
   }
 
-  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+  const canvasPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (showAddModal || showAddBarModal) return
+    if (isLocked) return
+    const g = floorGestureRef.current
+    if (!g || g.pointerId !== e.pointerId) return
     if (!draggingId.current) return
+
     const dx = Math.abs(e.clientX - pointerStart.current.x)
     const dy = Math.abs(e.clientY - pointerStart.current.y)
     if (dx < 8 && dy < 8) return
     dragMoved.current = true
 
-    const floor = floorRef.current
-    if (!floor) return
-    const rect = floorRectCachedRef.current ?? floor.getBoundingClientRect()
-    const x = Math.max(1, Math.min(99, ((e.clientX - rect.left - dragOffset.current.x) / rect.width) * 100))
-    const y = Math.max(1, Math.min(99, ((e.clientY - rect.top - dragOffset.current.y) / rect.height) * 100))
+    const c = innerCanvasRef.current
+    if (!c) return
+    const r = floorRectCachedRef.current ?? c.getBoundingClientRect()
+    const x = Math.max(1, Math.min(99, ((e.clientX - r.left - dragOffset.current.x) / r.width) * 100))
+    const y = Math.max(1, Math.min(99, ((e.clientY - r.top - dragOffset.current.y) / r.height) * 100))
     pendingDragPctRef.current = { x, y }
     scheduleDragPaintFromPending()
   }
 
-  const handlePointerUp = (e: React.PointerEvent) => {
+  const canvasPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    const wasEmptyTap = tapStartedEmptyRef.current
     releaseCapturedPointer(e)
-    if (!draggingId.current) return
+
+    if (wasEmptyTap) {
+      tapStartedEmptyRef.current = false
+      const dx = Math.abs(e.clientX - pointerStart.current.x)
+      const dy = Math.abs(e.clientY - pointerStart.current.y)
+      if (dx < 8 && dy < 8) {
+        setSelected(null)
+        setSelectedDecor(null)
+      }
+      draggingId.current = null
+      floorGestureRef.current = null
+      setTimeout(() => {
+        dragMoved.current = false
+      }, 0)
+      return
+    }
+
+    const g = floorGestureRef.current
+    if (!g || g.pointerId !== e.pointerId) {
+      tapStartedEmptyRef.current = false
+      floorGestureRef.current = null
+      cancelDragPaintRaf()
+      ignoreFloorRealtimeRef.current = false
+      floorRectCachedRef.current = null
+      floorPersistPausedRef.current = false
+      setBodyGrabbing(false)
+      setDragPaint(null)
+      pendingDragPctRef.current = null
+      draggingId.current = null
+      setTimeout(() => {
+        dragMoved.current = false
+      }, 0)
+      return
+    }
+    floorGestureRef.current = null
+
+    if (isLocked) {
+      cancelDragPaintRaf()
+      ignoreFloorRealtimeRef.current = false
+      floorRectCachedRef.current = null
+      floorPersistPausedRef.current = false
+      setBodyGrabbing(false)
+      setDragPaint(null)
+      pendingDragPctRef.current = null
+      draggingId.current = null
+      if (!dragMoved.current) {
+        if (g.kind === 'table') {
+          const tbl = tables.find((t) => t.id === g.id)
+          if (tbl) {
+            setSelected((prev) => (prev?.id === tbl.id ? null : tbl))
+            setSelectedDecor(null)
+          }
+        } else {
+          const dec = decors.find((d) => d.id === g.id)
+          if (dec) {
+            setSelectedDecor((prev) => (prev?.id === dec.id ? null : dec))
+            setSelected(null)
+          }
+        }
+      }
+      setTimeout(() => {
+        dragMoved.current = false
+      }, 0)
+      return
+    }
+
     const id = draggingId.current
     const pct = pendingDragPctRef.current
     cancelDragPaintRaf()
@@ -943,32 +1063,54 @@ export default function KassaFloorPlan({
     floorRectCachedRef.current = null
     floorPersistPausedRef.current = false
     setBodyGrabbing(false)
-    if (draggingType.current === 'table' && pct) {
-      setTables(latest => {
-        const next = latest.map(t => (t.id === id ? { ...t, x: pct.x, y: pct.y } : t))
-        localStorage.setItem(storageKey, JSON.stringify(next))
-        persistFloorPlanTablesToBackend(next)
-        return next
-      })
-      setSelected(sel => (sel?.id === id ? { ...sel, x: pct.x, y: pct.y } : sel))
-    } else if (draggingType.current === 'decor' && pct) {
-      setDecors(latestDecors => {
-        const next = latestDecors.map(d => (d.id === id ? { ...d, x: pct.x, y: pct.y } : d))
-        const payload = { items: next, stool_statuses: stoolStatuses }
-        localStorage.setItem(decorKey, JSON.stringify(next))
-        persistFloorPlanDecorToBackend(payload)
-        return next
-      })
-      setSelectedDecor(sel => (sel?.id === id ? { ...sel, x: pct.x, y: pct.y } : sel))
+
+    if (dragMoved.current && pct) {
+      if (draggingType.current === 'table' && id) {
+        setTables((latest) => {
+          const next = latest.map((t) => (t.id === id ? { ...t, x: pct.x, y: pct.y } : t))
+          localStorage.setItem(storageKey, JSON.stringify(next))
+          persistFloorPlanTablesToBackend(next)
+          return next
+        })
+        setSelected((sel) => (sel?.id === id ? { ...sel, x: pct.x, y: pct.y } : sel))
+      } else if (draggingType.current === 'decor' && id) {
+        setDecors((latestDecors) => {
+          const next = latestDecors.map((d) => (d.id === id ? { ...d, x: pct.x, y: pct.y } : d))
+          const payload = { items: next, stool_statuses: stoolStatuses }
+          localStorage.setItem(decorKey, JSON.stringify(next))
+          persistFloorPlanDecorToBackend(payload)
+          return next
+        })
+        setSelectedDecor((sel) => (sel?.id === id ? { ...sel, x: pct.x, y: pct.y } : sel))
+      }
+    } else if (!dragMoved.current && id) {
+      if (draggingType.current === 'table') {
+        const tbl = tables.find((t) => t.id === id)
+        if (tbl) {
+          setSelected((prev) => (prev?.id === tbl.id ? null : tbl))
+          setSelectedDecor(null)
+        }
+      } else {
+        const dec = decors.find((d) => d.id === id)
+        if (dec) {
+          setSelectedDecor((prev) => (prev?.id === dec.id ? null : dec))
+          setSelected(null)
+        }
+      }
     }
+
     setDragPaint(null)
     pendingDragPctRef.current = null
     draggingId.current = null
-    setTimeout(() => { dragMoved.current = false }, 0)
+    setTimeout(() => {
+      dragMoved.current = false
+    }, 0)
   }
 
-  const handlePointerCancel = (e: React.PointerEvent) => {
+  const canvasPointerCancel = (e: React.PointerEvent<HTMLDivElement>) => {
     releaseCapturedPointer(e)
+    tapStartedEmptyRef.current = false
+    floorGestureRef.current = null
     cancelDragPaintRaf()
     ignoreFloorRealtimeRef.current = false
     floorRectCachedRef.current = null
@@ -977,7 +1119,9 @@ export default function KassaFloorPlan({
     setDragPaint(null)
     pendingDragPctRef.current = null
     draggingId.current = null
-    setTimeout(() => { dragMoved.current = false }, 0)
+    setTimeout(() => {
+      dragMoved.current = false
+    }, 0)
   }
 
   const modalOpen = showAddModal || showAddBarModal
@@ -1035,48 +1179,31 @@ export default function KassaFloorPlan({
       {/* Floor + Sidebar */}
       <div className="flex flex-1 overflow-hidden">
         {/* Floor plan — tegelpatroon vast; alleen tafels/decor verschuiven */}
-        <div
-          ref={floorRef}
-          className="floor-plan flex-1 relative overflow-hidden select-none"
-          style={floorSurfaceStyle}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerCancel={handlePointerCancel}
-          onClick={() => { if (!dragMoved.current) { setSelected(null); setSelectedDecor(null) } }}
-        >
-          {/* Inner canvas: posities zijn % van de container */}
-          <div ref={innerCanvasRef} style={{ position: 'absolute', inset: 0 }}>
+        <div className="floor-plan flex-1 relative overflow-hidden select-none" style={floorSurfaceStyle}>
+          <div
+            ref={innerCanvasRef}
+            style={{ position: 'absolute', inset: 0, touchAction: 'manipulation' }}
+            onPointerDown={canvasPointerDown}
+            onPointerMove={canvasPointerMove}
+            onPointerUp={canvasPointerUp}
+            onPointerCancel={canvasPointerCancel}
+          >
 
           {/* Decor items (achtergrond laag) */}
           {decors.map(d => {
             const px = dragPaint?.id === d.id ? dragPaint.x : d.x
             const py = dragPaint?.id === d.id ? dragPaint.y : d.y
             return (
-            <div key={d.id} className="absolute"
+            <div key={d.id}
+              data-vysion-floor-decor={d.id}
+              className="absolute"
               style={{
                 left: `${px}%`,
                 top: `${py}%`,
                 transform: `translate(-50%, -50%) rotate(${d.rotation}deg)`,
                 zIndex: dragPaint?.id === d.id ? 40 : selectedDecor?.id === d.id ? 9 : 0,
                 cursor: 'grab',
-                touchAction: isLocked ? ('manipulation' as const) : ('none' as const),
-              }}
-              onPointerDown={(e) => handlePointerDown(e, d.id, 'decor')}
-              onPointerUp={(e) => {
-                e.stopPropagation()
-                handlePointerUp(e)
-                if (!dragMoved.current && !isLocked) {
-                  setSelectedDecor(prev => prev?.id === d.id ? null : d)
-                  setSelected(null)
-                }
-              }}
-              onPointerCancel={(e) => { e.stopPropagation(); handlePointerCancel(e) }}
-              onClick={(e) => {
-                e.stopPropagation()
-                if (modalOpen) return
-                if (!isLocked) return
-                setSelectedDecor(prev => prev?.id === d.id ? null : d)
-                setSelected(null)
+                touchAction: 'none',
               }}
             >
               <DecorSVG item={d} isSelected={selectedDecor?.id === d.id} orderedStools={orderedInZone} stoolStatuses={stoolStatuses} getStoolStatus={getStoolStatus} barLabel={t('kassaApp.floorPlanBarLabel')} />
@@ -1090,6 +1217,7 @@ export default function KassaFloorPlan({
             return (
             <div
               key={t.id}
+              data-vysion-floor-table={t.id}
               className="absolute"
               style={{
                 left: `${px}%`,
@@ -1097,24 +1225,7 @@ export default function KassaFloorPlan({
                 transform: `translate(-50%, -50%) rotate(${t.rotation}deg)`,
                 zIndex: dragPaint?.id === t.id ? 40 : selected?.id === t.id ? 10 : 1,
                 cursor: 'grab',
-                touchAction: isLocked ? ('manipulation' as const) : ('none' as const),
-              }}
-              onPointerDown={(e) => handlePointerDown(e, t.id, 'table')}
-              onPointerUp={(e) => {
-                e.stopPropagation()
-                handlePointerUp(e)
-                if (!dragMoved.current && !isLocked) {
-                  setSelected(prev => prev?.id === t.id ? null : t)
-                  setSelectedDecor(null)
-                }
-              }}
-              onPointerCancel={(e) => { e.stopPropagation(); handlePointerCancel(e) }}
-              onClick={(e) => {
-                e.stopPropagation()
-                if (modalOpen) return
-                if (!isLocked) return
-                setSelected(prev => prev?.id === t.id ? null : t)
-                setSelectedDecor(null)
+                touchAction: 'none',
               }}
             >
               <TableSVG
