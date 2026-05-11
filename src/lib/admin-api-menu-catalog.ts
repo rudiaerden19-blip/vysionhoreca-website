@@ -7,6 +7,17 @@ import {
   type MenuProduct,
 } from './admin-api-menu-product-helpers'
 
+/** Admin-proxy/update kan één rij als object óf als `[rij]` teruggeven (Supabase/PostgREST). */
+export function normalizeDbSingleRow<T>(data: unknown): T | null {
+  if (data == null) return null
+  if (Array.isArray(data)) {
+    const first = data[0]
+    return first != null ? (first as T) : null
+  }
+  if (typeof data === 'object') return data as T
+  return null
+}
+
 /** Voorkom dubbele catalogus-items (oude bug / corrupte IndexedDB-cache). */
 export function dedupeCatalogById<T extends { id?: string | null }>(items: T[]): T[] {
   const seen = new Set<string>()
@@ -57,7 +68,14 @@ export async function getMenuCategories(tenantSlug: string): Promise<MenuCategor
   )
 }
 
-export async function saveMenuCategory(category: MenuCategory): Promise<MenuCategory | null> {
+export function invalidateMenuCategoriesCache(tenantSlug: string): void {
+  cache.invalidate(cacheKey('menu_categories', tenantSlug))
+}
+
+export async function saveMenuCategory(
+  category: MenuCategory,
+  opts?: { skipInvalidate?: boolean },
+): Promise<MenuCategory | null> {
   /**
    * `menu_categories` heeft forbiddenColumns `id`/`created_at` — blind upsert zonder id match triggert
    * steeds INSERT en verdubbelt categorieën. Bij update: `update` met `{ id, tenant_slug }`; bij nieuw: `insert`.
@@ -88,9 +106,10 @@ export async function saveMenuCategory(category: MenuCategory): Promise<MenuCate
     console.error('Error saving menu category:', r.error)
     return null
   }
-  cache.invalidate(cacheKey('menu_categories', tenantSlug))
-  const list = (r.data as unknown as MenuCategory[]) || []
-  return list[0] || null
+  if (!opts?.skipInvalidate) {
+    invalidateMenuCategoriesCache(tenantSlug)
+  }
+  return normalizeDbSingleRow<MenuCategory>(r.data)
 }
 
 export async function deleteMenuCategory(id: string, tenantSlug?: string): Promise<boolean> {
@@ -103,7 +122,7 @@ export async function deleteMenuCategory(id: string, tenantSlug?: string): Promi
     console.error('Error deleting menu category:', r.error)
     return false
   }
-  cache.invalidate(cacheKey('menu_categories', tenantSlug))
+  invalidateMenuCategoriesCache(tenantSlug)
   return true
 }
 
@@ -142,8 +161,8 @@ export async function saveMenuProduct(product: MenuProduct): Promise<{ data: Men
 
   const zoomForDb = kassa_image_zoom === undefined ? undefined : clampKassaProductImageZoom(kassa_image_zoom)
 
-  const wrapOk = (list: MenuProduct[] | undefined): { data: MenuProduct | null; error?: string } => {
-    const d = list?.[0]
+  const wrapOk = (data: unknown): { data: MenuProduct | null; error?: string } => {
+    const d = normalizeDbSingleRow<MenuProduct>(data)
     if (!d) return { data: null, error: 'leeg resultaat' }
     cache.invalidate(cacheKey('menu_products', product.tenant_slug))
     return {
@@ -179,13 +198,13 @@ export async function saveMenuProduct(product: MenuProduct): Promise<{ data: Men
   let r = await persist(true)
 
   if (r.ok) {
-    return wrapOk(r.data as MenuProduct[] | undefined)
+    return wrapOk(r.data)
   }
 
   // Fallback: kolom kassa_image_zoom mist nog in DB? probeer zonder.
   if (/kassa_image_zoom/i.test(r.error || '')) {
     const r2 = await persist(false)
-    if (r2.ok) return wrapOk(r2.data as MenuProduct[] | undefined)
+    if (r2.ok) return wrapOk(r2.data)
     return { data: null, error: r2.error }
   }
 

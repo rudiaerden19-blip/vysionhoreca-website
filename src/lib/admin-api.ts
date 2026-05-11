@@ -74,6 +74,8 @@ export { getOpeningHours, saveOpeningHours, getShopStatus } from './admin-api-sh
 export type { MenuCategory } from './admin-api-menu-catalog'
 export {
   dedupeCatalogById,
+  normalizeDbSingleRow,
+  invalidateMenuCategoriesCache,
   getMenuCategories,
   saveMenuCategory,
   deleteMenuCategory,

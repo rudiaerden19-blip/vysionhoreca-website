@@ -2,7 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import { motion, Reorder } from 'framer-motion'
-import { getMenuCategories, saveMenuCategory, deleteMenuCategory, MenuCategory } from '@/lib/admin-api'
+import {
+  getMenuCategories,
+  saveMenuCategory,
+  deleteMenuCategory,
+  invalidateMenuCategoriesCache,
+  MenuCategory,
+} from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
@@ -76,15 +82,23 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
   const handleSave = async () => {
     setSaving(true)
     setError('')
-    
-    // Save all categories with updated sort order
-    let allSuccess = true
-    for (let i = 0; i < categories.length; i++) {
-      const cat = { ...categories[i], sort_order: i }
-      const result = await saveMenuCategory(cat)
-      if (!result) allSuccess = false
+
+    const missingId = categories.some((c) => !c.id || String(c.id).trim() === '')
+    if (missingId) {
+      setError(t('adminPages.categorieen.saveFailed'))
+      setSaving(false)
+      return
     }
-    
+
+    const results = await Promise.all(
+      categories.map((cat, i) => saveMenuCategory({ ...cat, sort_order: i }, { skipInvalidate: true })),
+    )
+
+    invalidateMenuCategoriesCache(params.tenant)
+    const fresh = await getMenuCategories(params.tenant)
+    setCategories(fresh)
+
+    const allSuccess = results.every((r) => r !== null)
     if (allSuccess) {
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
