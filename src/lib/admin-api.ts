@@ -78,6 +78,7 @@ export {
   invalidateMenuCategoriesCache,
   getMenuCategories,
   saveMenuCategory,
+  bulkSaveMenuCategories,
   deleteMenuCategory,
   getMenuProducts,
   saveMenuProduct,

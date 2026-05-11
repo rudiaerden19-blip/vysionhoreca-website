@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, Reorder } from 'framer-motion'
 import {
   getMenuCategories,
   saveMenuCategory,
   deleteMenuCategory,
-  invalidateMenuCategoriesCache,
+  bulkSaveMenuCategories,
   MenuCategory,
 } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
@@ -23,6 +23,7 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
   const [saved, setSaved] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const saveInFlightRef = useRef(false)
 
   // Load data on mount
   useEffect(() => {
@@ -80,32 +81,32 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
   }
 
   const handleSave = async () => {
+    if (saveInFlightRef.current) return
+    saveInFlightRef.current = true
     setSaving(true)
     setError('')
 
-    const missingId = categories.some((c) => !c.id || String(c.id).trim() === '')
-    if (missingId) {
-      setError(t('adminPages.categorieen.saveFailed'))
+    try {
+      const missingId = categories.some((c) => !c.id || String(c.id).trim() === '')
+      if (missingId) {
+        setError(t('adminPages.categorieen.saveFailed'))
+        return
+      }
+
+      const bulk = await bulkSaveMenuCategories(params.tenant, categories)
+      const fresh = await getMenuCategories(params.tenant)
+      setCategories(fresh)
+
+      if (bulk.ok) {
+        setSaved(true)
+        setTimeout(() => setSaved(false), 3000)
+      } else {
+        setError(bulk.error || t('adminPages.categorieen.saveFailed'))
+      }
+    } finally {
+      saveInFlightRef.current = false
       setSaving(false)
-      return
     }
-
-    const results = await Promise.all(
-      categories.map((cat, i) => saveMenuCategory({ ...cat, sort_order: i }, { skipInvalidate: true })),
-    )
-
-    invalidateMenuCategoriesCache(params.tenant)
-    const fresh = await getMenuCategories(params.tenant)
-    setCategories(fresh)
-
-    const allSuccess = results.every((r) => r !== null)
-    if (allSuccess) {
-      setSaved(true)
-      setTimeout(() => setSaved(false), 3000)
-    } else {
-      setError(t('adminPages.categorieen.saveFailed'))
-    }
-    setSaving(false)
   }
 
   if (loading) {

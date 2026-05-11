@@ -2,6 +2,7 @@ import { supabase } from './supabase'
 import { cache, CACHE_TTL, cacheKey } from './cache'
 import { throwIfSupabaseFetchAborted } from './admin-api-internal'
 import { adminDb } from './admin-db-client'
+import { authFetch, getCurrentTenantSlug } from './auth-headers'
 import {
   clampKassaProductImageZoom,
   type MenuProduct,
@@ -110,6 +111,51 @@ export async function saveMenuCategory(
     invalidateMenuCategoriesCache(tenantSlug)
   }
   return normalizeDbSingleRow<MenuCategory>(r.data)
+}
+
+/**
+ * Categorieën-pagina: één server-call met alleen UPDATE — geen N × admin-db (rate-limit / timeouts).
+ */
+export async function bulkSaveMenuCategories(
+  tenantSlug: string,
+  categoriesInOrder: MenuCategory[],
+): Promise<{ ok: boolean; error?: string }> {
+  const slug = (tenantSlug || getCurrentTenantSlug() || '').trim()
+  if (!slug) return { ok: false, error: 'Niet ingelogd' }
+
+  const categories = categoriesInOrder.map((c, index) => ({
+    id: String(c.id),
+    name: c.name,
+    description: c.description ?? '',
+    sort_order: index,
+    is_active: c.is_active,
+  }))
+
+  for (const row of categories) {
+    if (!row.id || row.id === 'undefined') {
+      return { ok: false, error: 'Categorie mist id — ververs de pagina.' }
+    }
+  }
+
+  try {
+    const res = await authFetch('/api/admin/menu/bulk-save-categories', {
+      method: 'POST',
+      body: JSON.stringify({ tenantSlug: slug, categories }),
+    })
+    let json: { error?: string; ok?: boolean } = {}
+    try {
+      json = await res.json()
+    } catch {
+      /* ignore */
+    }
+    if (!res.ok) {
+      return { ok: false, error: json?.error || `HTTP ${res.status}` }
+    }
+    invalidateMenuCategoriesCache(slug)
+    return { ok: true }
+  } catch (e: unknown) {
+    return { ok: false, error: e instanceof Error ? e.message : String(e) }
+  }
 }
 
 export async function deleteMenuCategory(id: string, tenantSlug?: string): Promise<boolean> {
