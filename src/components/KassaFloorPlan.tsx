@@ -891,7 +891,12 @@ export default function KassaFloorPlan({
   const handlePointerDown = (e: React.PointerEvent, id: string, type: 'table' | 'decor') => {
     e.stopPropagation()
     if (showAddModal || showAddBarModal) return
-    if (isLocked) return
+    // Vergrendeld: geen slepen, maar wél pointer capture — zonder capture mist iPad/Safari vaak
+    // pointerup op deze tafel/decor en gaat die naar de vloer → geen selectie zichtbaar.
+    if (isLocked) {
+      takePointerCapture(e.currentTarget as HTMLElement, e.pointerId)
+      return
+    }
 
     takePointerCapture(e.currentTarget as HTMLElement, e.pointerId)
     const floor = floorRef.current
