@@ -204,6 +204,9 @@ export default function KassaReservationsView({
   const [addFloorNumber, setAddFloorNumber] = useState('')
   const [addFloorSeats, setAddFloorSeats] = useState(4)
   const [addFloorShape, setAddFloorShape] = useState<'SQUARE' | 'ROUND' | 'RECTANGLE'>('SQUARE')
+  /** Zelfde als KassaFloorPlan: iPad/Safari negeert vaak autoFocus op modal → extern toetsenbord typt “ins niets”. */
+  const addFloorNumberInputRef = useRef<HTMLInputElement>(null)
+  const addFloorTableRef = useRef<() => Promise<void>>(async () => {})
   const [isDraggingFloor, setIsDraggingFloor] = useState(false)
   // Zelfde gedrag als kassa-plattegrond (KassaFloorPlan): standaard vast; ontgrendelen = bewust bewerken.
   const [tablesLocked, setTablesLocked] = useState(() => {
@@ -911,6 +914,48 @@ export default function KassaReservationsView({
     setShowAddFloorTable(false)
     toast.success(`${rk('tableAddedPrefix')}${newTable.number} ${rk('tableAddedSuffix')}`)
   }
+
+  addFloorTableRef.current = addFloorTable
+
+  useEffect(() => {
+    if (!showAddFloorTable) return
+    const input = addFloorNumberInputRef.current
+    const raf = requestAnimationFrame(() => input?.focus({ preventScroll: true }))
+    const to = window.setTimeout(() => input?.focus({ preventScroll: true }), 80)
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey || e.altKey) return
+      if (document.activeElement === input) return
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        setShowAddFloorTable(false)
+        return
+      }
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        void addFloorTableRef.current()
+        return
+      }
+      if (e.key === 'Backspace') {
+        e.preventDefault()
+        setAddFloorNumber((prev) => prev.slice(0, -1))
+        input?.focus({ preventScroll: true })
+        return
+      }
+      if (e.key.length === 1) {
+        e.preventDefault()
+        setAddFloorNumber((prev) => prev + e.key)
+        input?.focus({ preventScroll: true })
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown, true)
+    return () => {
+      cancelAnimationFrame(raf)
+      clearTimeout(to)
+      window.removeEventListener('keydown', onKeyDown, true)
+    }
+  }, [showAddFloorTable])
 
   const deleteFloorTable = async (id: string) => {
     await saveFloorPlan(floorPlanTablesDB.filter(t => t.id !== id))
@@ -2869,10 +2914,22 @@ export default function KassaReservationsView({
                     <div className="p-5 space-y-4">
                       <div>
                         <label className="block text-sm font-semibold text-gray-600 mb-1">Tafelnummer *</label>
-                        <input autoFocus value={addFloorNumber} onChange={e => setAddFloorNumber(e.target.value)}
-                          onKeyDown={e => e.key === 'Enter' && addFloorTable()}
+                        <input
+                          ref={addFloorNumberInputRef}
+                          type="text"
+                          inputMode="text"
+                          autoComplete="off"
+                          autoCorrect="off"
+                          autoCapitalize="off"
+                          spellCheck={false}
+                          enterKeyHint="done"
+                          autoFocus
+                          value={addFloorNumber}
+                          onChange={e => setAddFloorNumber(e.target.value)}
+                          onKeyDown={e => e.key === 'Enter' && void addFloorTable()}
                           className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-500 outline-none text-xl font-bold text-center"
-                          placeholder="bv. 1, 2A, Toog" />
+                          placeholder="bv. 1, 2A, Toog"
+                        />
                       </div>
                       <div>
                         <label className="block text-sm font-semibold text-gray-600 mb-2">Aantal plaatsen</label>

@@ -401,6 +401,10 @@ export default function KassaFloorPlan({
   const [addNumber, setAddNumber] = useState('')
   const [addSeats, setAddSeats] = useState(4)
   const [addShape, setAddShape] = useState<TableShape>('SQUARE')
+  /** iPad/Safari + extern toetsenbord: autoFocus faalt vaak → geen focus → cijfers komen nergens terecht. */
+  const addTableNumberInputRef = useRef<HTMLInputElement>(null)
+  const addStool1InputRef = useRef<HTMLInputElement>(null)
+  const addTableRef = useRef<() => void>(() => {})
   const [decors, setDecors] = useState<DecorItem[]>([])
   const [selectedDecor, setSelectedDecor] = useState<DecorItem | null>(null)
   const [showAddBarModal, setShowAddBarModal] = useState(false)
@@ -877,6 +881,60 @@ export default function KassaFloorPlan({
     save([...tables, t])
     setSelected(t)
   }
+
+  addTableRef.current = addTable
+
+  useEffect(() => {
+    if (!showAddModal) return
+    const input = addTableNumberInputRef.current
+    const raf = requestAnimationFrame(() => input?.focus({ preventScroll: true }))
+    const to = window.setTimeout(() => input?.focus({ preventScroll: true }), 80)
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey || e.altKey) return
+      const ae = document.activeElement
+      if (ae === input) return
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        setShowAddModal(false)
+        return
+      }
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        addTableRef.current()
+        return
+      }
+      if (e.key === 'Backspace') {
+        e.preventDefault()
+        setAddNumber((prev) => prev.slice(0, -1))
+        input?.focus({ preventScroll: true })
+        return
+      }
+      if (e.key.length === 1) {
+        e.preventDefault()
+        setAddNumber((prev) => prev + e.key)
+        input?.focus({ preventScroll: true })
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown, true)
+    return () => {
+      cancelAnimationFrame(raf)
+      clearTimeout(to)
+      window.removeEventListener('keydown', onKeyDown, true)
+    }
+  }, [showAddModal])
+
+  useEffect(() => {
+    if (!showAddBarModal) return
+    const input = addStool1InputRef.current
+    const raf = requestAnimationFrame(() => input?.focus({ preventScroll: true }))
+    const to = window.setTimeout(() => input?.focus({ preventScroll: true }), 80)
+    return () => {
+      cancelAnimationFrame(raf)
+      clearTimeout(to)
+    }
+  }, [showAddBarModal])
 
   const deleteTable = (id: string) => {
     save(tables.filter(t => t.id !== id))
@@ -1595,6 +1653,13 @@ export default function KassaFloorPlan({
                 <div>
                   <label className="block text-sm font-semibold text-gray-600 mb-1">{t('kassaApp.floorPlanModalStool1Label')}</label>
                   <input
+                    ref={addStool1InputRef}
+                    type="text"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    enterKeyHint="done"
                     autoFocus
                     value={addStool1}
                     onChange={e => setAddStool1(e.target.value)}
@@ -1606,6 +1671,12 @@ export default function KassaFloorPlan({
                 <div>
                   <label className="block text-sm font-semibold text-gray-600 mb-1">{t('kassaApp.floorPlanModalStool2Label')}</label>
                   <input
+                    type="text"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    enterKeyHint="done"
                     value={addStool2}
                     onChange={e => setAddStool2(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && confirmAddBar()}
@@ -1634,10 +1705,22 @@ export default function KassaFloorPlan({
             <div className="p-5 space-y-4">
               <div>
                 <label className="block text-sm font-semibold text-gray-600 mb-1">{t('kassaApp.floorPlanModalTableNumberLabel')}</label>
-                <input autoFocus value={addNumber} onChange={e => setAddNumber(e.target.value)}
+                <input
+                  ref={addTableNumberInputRef}
+                  type="text"
+                  inputMode="text"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  enterKeyHint="done"
+                  autoFocus
+                  value={addNumber}
+                  onChange={e => setAddNumber(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && addTable()}
                   className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#075985] outline-none text-xl font-bold text-center"
-                  placeholder={t('kassaApp.floorPlanModalTableNumberPlaceholder')} />
+                  placeholder={t('kassaApp.floorPlanModalTableNumberPlaceholder')}
+                />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-600 mb-2">{t('kassaApp.floorPlanModalSeatLabel')}</label>
