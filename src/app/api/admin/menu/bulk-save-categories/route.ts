@@ -21,7 +21,7 @@ const CategoryRowSchema = z.object({
 
 const BodySchema = z.object({
   tenantSlug: z.string().min(1),
-  categories: z.array(CategoryRowSchema).min(1).max(500),
+  categories: z.array(CategoryRowSchema).min(1).max(5000),
 })
 
 export async function POST(req: NextRequest) {

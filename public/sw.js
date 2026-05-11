@@ -1,8 +1,8 @@
 // Vysion Kassa – Service Worker
 // Offline: kassa-app + statische assets + sector-marketingpagina’s; productafbeeldingen (externe URL's)
 
-const CACHE = 'vysion-kassa-v13'
-const STATIC_CACHE = 'vysion-static-v13'
+const CACHE = 'vysion-kassa-v14'
+const STATIC_CACHE = 'vysion-static-v14'
 const IMAGE_CACHE = 'vysion-images-v3'
 
 /** Eerste install: marketing-sectoren + start zodat PWA na één online bezoek ook zonder net start. */
@@ -170,8 +170,9 @@ self.addEventListener('fetch', event => {
     return
   }
 
-  /** Kassa-HTML mag niet uit Cache Storage — anders tonen verschillende pc's verschillende UI na deploy. */
-  if (url.pathname.includes('/admin/kassa')) {
+  /** Alle zaak-admin HTML (categorieën, producten, …): nooit uit Cache Storage — anders blijft oude JS draaien
+   *  die bij “Opslaan” per ongeluk INSERT uitvoerde. Kassa zat hier al onder via /admin/kassa. */
+  if (url.pathname.includes('/admin/')) {
     event.respondWith(fetch(request, { cache: 'no-store' }))
     return
   }

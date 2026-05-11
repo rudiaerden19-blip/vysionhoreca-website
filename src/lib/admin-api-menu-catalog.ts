@@ -142,13 +142,21 @@ export async function bulkSaveMenuCategories(
       method: 'POST',
       body: JSON.stringify({ tenantSlug: slug, categories }),
     })
-    let json: { error?: string; ok?: boolean } = {}
+    const ct = (res.headers.get('content-type') || '').toLowerCase()
+    if (!ct.includes('application/json')) {
+      return {
+        ok: false,
+        error:
+          'Oude pagina uit cache — harde vernieuwen (Ctrl+Shift+R) zodat Opslaan de nieuwe versie gebruikt.',
+      }
+    }
+    let json: { ok?: boolean; error?: string } = {}
     try {
-      json = await res.json()
+      json = (await res.json()) as { ok?: boolean; error?: string }
     } catch {
       /* ignore */
     }
-    if (!res.ok) {
+    if (!res.ok || json.ok !== true) {
       return { ok: false, error: json?.error || `HTTP ${res.status}` }
     }
     invalidateMenuCategoriesCache(slug)
