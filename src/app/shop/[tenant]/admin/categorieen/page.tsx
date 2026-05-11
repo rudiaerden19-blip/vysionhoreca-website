@@ -8,6 +8,7 @@ import {
   saveMenuCategory,
   deleteMenuCategory,
   bulkSaveMenuCategories,
+  dedupeCatalogById,
   MenuCategory,
 } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
@@ -32,7 +33,7 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
       getMenuCategories(params.tenant),
       getMenuProducts(params.tenant),
     ])
-    setCategories(cats)
+    setCategories(dedupeCatalogById(cats))
     const counts: Record<string, number> = {}
     for (const p of prods) {
       const cid = p.category_id
@@ -114,13 +115,18 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
     setError('')
 
     try {
-      const missingId = categories.some((c) => !c.id || String(c.id).trim() === '')
+      const deduped = dedupeCatalogById(categories)
+      if (deduped.length !== categories.length) {
+        setCategories(deduped)
+      }
+
+      const missingId = deduped.some((c) => !c.id || String(c.id).trim() === '')
       if (missingId) {
         setError(t('adminPages.categorieen.saveFailed'))
         return
       }
 
-      const bulk = await bulkSaveMenuCategories(params.tenant, categories)
+      const bulk = await bulkSaveMenuCategories(params.tenant, deduped)
       await refreshCategoriesAndProductCounts()
 
       if (bulk.ok) {

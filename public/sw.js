@@ -1,8 +1,8 @@
 // Vysion Kassa – Service Worker
 // Offline: kassa-app + statische assets + sector-marketingpagina’s; productafbeeldingen (externe URL's)
 
-const CACHE = 'vysion-kassa-v14'
-const STATIC_CACHE = 'vysion-static-v14'
+const CACHE = 'vysion-kassa-v16'
+const STATIC_CACHE = 'vysion-static-v16'
 const IMAGE_CACHE = 'vysion-images-v3'
 
 /** Eerste install: marketing-sectoren + start zodat PWA na één online bezoek ook zonder net start. */
@@ -170,9 +170,11 @@ self.addEventListener('fetch', event => {
     return
   }
 
-  /** Alle zaak-admin HTML (categorieën, producten, …): nooit uit Cache Storage — anders blijft oude JS draaien
-   *  die bij “Opslaan” per ongeluk INSERT uitvoerde. Kassa zat hier al onder via /admin/kassa. */
-  if (url.pathname.includes('/admin/')) {
+  /** Zaak-admin HTML: niet uit Cache Storage — oude bundles → fout gedrag bij Opslaan (INSERT-loop).
+   *  `/shop/:tenant/admin` heeft géén `/admin/` substring (geen slash ná admin); wel expliciet matchen. */
+  const p = url.pathname
+  const isTenantShopAdmin = /\/shop\/[^/]+\/admin(?:\/|$)/.test(p)
+  if (isTenantShopAdmin || p.includes('/admin/')) {
     event.respondWith(fetch(request, { cache: 'no-store' }))
     return
   }

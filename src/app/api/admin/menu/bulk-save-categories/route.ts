@@ -60,35 +60,42 @@ export async function POST(req: NextRequest) {
     const actorId = req.headers.get('x-business-id') || req.headers.get('x-superadmin-id')
     const meta = auditRequestMeta(req)
 
-    for (const cat of categories) {
-      const patch = {
-        name: cat.name,
-        description: cat.description ?? '',
-        sort_order: cat.sort_order,
-        is_active: cat.is_active,
-      }
-
-      const { data: updated, error } = await supabase
-        .from('menu_categories')
-        .update(patch)
-        .eq('id', cat.id)
-        .eq('tenant_slug', tenantSlug)
-        .select('id')
-        .maybeSingle()
-
-      if (error) {
-        logger.warn('[bulk-save-categories] update failed', {
-          requestId,
-          id: cat.id,
-          err: error.message,
-        })
-        return NextResponse.json({ error: error.message }, { status: 400 })
-      }
-      if (!updated) {
-        return NextResponse.json(
-          { error: `Categorie niet gevonden voor deze zaak (id: ${cat.id.slice(0, 8)}…)` },
-          { status: 404 },
-        )
+    const BATCH = 32
+    for (let i = 0; i < categories.length; i += BATCH) {
+      const slice = categories.slice(i, i + BATCH)
+      const outcomes = await Promise.all(
+        slice.map(async (cat) => {
+          const patch = {
+            name: cat.name,
+            description: cat.description ?? '',
+            sort_order: cat.sort_order,
+            is_active: cat.is_active,
+          }
+          const { data: updated, error } = await supabase
+            .from('menu_categories')
+            .update(patch)
+            .eq('id', cat.id)
+            .eq('tenant_slug', tenantSlug)
+            .select('id')
+            .maybeSingle()
+          return { updated, error, id: cat.id }
+        }),
+      )
+      for (const o of outcomes) {
+        if (o.error) {
+          logger.warn('[bulk-save-categories] update failed', {
+            requestId,
+            id: o.id,
+            err: o.error.message,
+          })
+          return NextResponse.json({ error: o.error.message }, { status: 400 })
+        }
+        if (!o.updated) {
+          return NextResponse.json(
+            { error: `Categorie niet gevonden voor deze zaak (id: ${o.id.slice(0, 8)}…)` },
+            { status: 404 },
+          )
+        }
       }
     }
 

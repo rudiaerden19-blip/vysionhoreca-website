@@ -124,6 +124,14 @@ const nextConfig = {
         headers: [...securityHeaders, ...noStoreSuperadmin],
       },
       {
+        source: '/shop/:tenant/admin',
+        headers: [...securityHeaders, ...noStoreSuperadmin],
+      },
+      {
+        source: '/shop/:tenant/admin/:path*',
+        headers: [...securityHeaders, ...noStoreSuperadmin],
+      },
+      {
         // Apply to all routes
         source: '/:path*',
         headers: securityHeaders,

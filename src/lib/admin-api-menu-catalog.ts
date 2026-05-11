@@ -123,7 +123,8 @@ export async function bulkSaveMenuCategories(
   const slug = (tenantSlug || getCurrentTenantSlug() || '').trim()
   if (!slug) return { ok: false, error: 'Niet ingelogd' }
 
-  const categories = categoriesInOrder.map((c, index) => ({
+  const deduped = dedupeCatalogById(categoriesInOrder.filter((c) => c.id != null && String(c.id).trim() !== ''))
+  const categories = deduped.map((c, index) => ({
     id: String(c.id),
     name: c.name,
     description: c.description ?? '',
