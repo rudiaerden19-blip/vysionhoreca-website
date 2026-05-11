@@ -2459,6 +2459,7 @@
       "confirmDelete": "Eliminare questo prodotto?",
       "deleteFailed": "Eliminazione non riuscita",
       "saveFailed": "Salvataggio non riuscito. Riprova.",
+      "invalidPrice": "Inserisci un prezzo valido con virgola o punto, es. 0,90 o 0.90.",
       "namePlaceholder": "Es. Patatine grandi",
       "descriptionPlaceholder": "Descrivi il prodotto...",
       "selectCategory": "Seleziona...",

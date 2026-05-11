@@ -2459,6 +2459,7 @@
       "confirmDelete": "¿Seguro que quieres eliminar este producto?",
       "deleteFailed": "Error al eliminar",
       "saveFailed": "Error al guardar. Inténtelo de nuevo.",
+      "invalidPrice": "Introduce un precio válido con coma o punto (p. ej. 0,90 o 0.90).",
       "namePlaceholder": "Ej. Patatas grandes",
       "descriptionPlaceholder": "Describe el producto...",
       "selectCategory": "Seleccionar...",

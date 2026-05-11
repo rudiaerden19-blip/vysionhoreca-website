@@ -2758,6 +2758,7 @@
       "confirmDelete": "Are you sure you want to delete this product?",
       "deleteFailed": "Delete failed",
       "saveFailed": "Save failed. Please try again.",
+      "invalidPrice": "Enter a valid price using a comma or dot, e.g. 0.90 or 0,90.",
       "namePlaceholder": "E.g. Large Fries",
       "descriptionPlaceholder": "Describe the product...",
       "selectCategory": "Select...",

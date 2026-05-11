@@ -58,6 +58,31 @@ const ALLERGEN_IDS = [
   { id: 'weekdieren', icon: '🐚' },
 ]
 
+/** Tekst prijs zoals gebruiker tikt — komma of punt als decimaal (BE/NL). */
+function parseLocalizedMoneyInput(raw: string): number {
+  const n = raw.trim().replace(/\s/g, '').replace(',', '.')
+  if (n === '' || n === '.') return NaN
+  const v = parseFloat(n)
+  return Number.isFinite(v) ? v : NaN
+}
+
+function isPartialMoneyInput(raw: string): boolean {
+  const t = raw.trim().replace(/\s/g, '')
+  if (t === '') return true
+  if (t.includes(',') && t.includes('.')) return false
+  const normalized = t.includes(',') ? t.replace(',', '.') : t
+  return /^\d*\.?\d*$/.test(normalized)
+}
+
+/** Bestaande prijs naar invoerveld (komma waar nodig). */
+function loadedPriceToInputStr(v: number | undefined): string {
+  if (v == null || Number.isNaN(Number(v))) return ''
+  const num = Number(v)
+  if (num === 0) return ''
+  if (Math.abs(num % 1) < 1e-9) return String(num)
+  return num.toFixed(2).replace('.', ',')
+}
+
 // Sortable Product Card Component
 function SortableProductCard({ 
   product, 
@@ -244,6 +269,10 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     print_label: false,
   })
 
+  /** Invoeveld tekst voor prijs (komma ok); numerieke payload zit pas in save. */
+  const [priceInputStr, setPriceInputStr] = useState('')
+  const [promoPriceInputStr, setPromoPriceInputStr] = useState('')
+
   // Load data on mount
   useEffect(() => {
     async function loadData() {
@@ -275,6 +304,16 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     })
     return [...filt].sort(compareMenuProductsBySortOrder)
   }, [products, categories, selectedCategory, searchQuery])
+
+  const modalParsedPricePreview = useMemo(() => {
+    const p = parseLocalizedMoneyInput(priceInputStr)
+    return Number.isFinite(p) ? p : (formData.price ?? 0)
+  }, [priceInputStr, formData.price])
+
+  const modalParsedPromoPreview = useMemo(() => {
+    const p = parseLocalizedMoneyInput(promoPriceInputStr)
+    return Number.isFinite(p) ? p : (formData.promo_price ?? 0)
+  }, [promoPriceInputStr, formData.promo_price])
 
   const toggleAvailable = async (id: string) => {
     const product = products.find(p => p.id === id)
@@ -371,6 +410,9 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     setFormData({
       ...product,
     })
+    setPriceInputStr(loadedPriceToInputStr(Number(product.price)))
+    const promo = product.promo_price != null ? Number(product.promo_price) : NaN
+    setPromoPriceInputStr(Number.isFinite(promo) && promo > 0 ? loadedPriceToInputStr(promo) : '')
     setEditingProduct(product)
     // Load linked options
     if (product.id) {
@@ -401,6 +443,8 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
       print_label: false,
     })
     setSelectedOptionIds([])
+    setPriceInputStr('')
+    setPromoPriceInputStr('')
     setShowAddModal(true)
   }
 
@@ -410,6 +454,8 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     setFormData({})
     setSelectedOptionIds([])
     setError('')
+    setPriceInputStr('')
+    setPromoPriceInputStr('')
   }
 
   const toggleOptionSelection = (optionId: string) => {
@@ -438,18 +484,38 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     setError('')
 
     try {
+      const priceNum = parseLocalizedMoneyInput(priceInputStr)
+      if (!Number.isFinite(priceNum) || priceNum < 0) {
+        setError(t('adminPages.producten.invalidPrice'))
+        setSaving(false)
+        return
+      }
+
+      let promoNum: number | undefined
+      if (formData.is_promo) {
+        const pr = parseLocalizedMoneyInput(promoPriceInputStr)
+        if (!Number.isFinite(pr) || pr < 0) {
+          setError(t('adminPages.producten.invalidPrice'))
+          setSaving(false)
+          return
+        }
+        promoNum = pr
+      } else {
+        promoNum = undefined
+      }
+
       const productData: MenuProduct = {
         id: editingProduct?.id,
         tenant_slug: params.tenant,
         category_id: formData.category_id || null,
         name: formData.name || '',
         description: formData.description || '',
-        price: formData.price || 0,
+        price: priceNum,
         image_url: formData.image_url || '',
         is_active: formData.is_active ?? true,
         is_popular: formData.is_popular ?? false,
         is_promo: formData.is_promo ?? false,
-        promo_price: formData.is_promo ? (formData.promo_price || 0) : undefined,
+        promo_price: promoNum,
         sort_order: editingProduct?.sort_order || products.length,
         allergens: formData.allergens || [],
         image_display_mode: formData.image_display_mode || null,
@@ -705,12 +771,15 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                       <div className="relative">
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold">€</span>
                         <input
-                          type="number"
-                          step="0.01"
-                          value={formData.price || ''}
-                          onChange={(e) => setFormData(prev => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
+                          type="text"
+                          inputMode="decimal"
+                          value={priceInputStr}
+                          onChange={(e) => {
+                            const raw = e.target.value
+                            if (isPartialMoneyInput(raw)) setPriceInputStr(raw)
+                          }}
                           className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base font-semibold"
-                          placeholder="0.00"
+                          placeholder="0,00"
                         />
                       </div>
                     </div>
@@ -820,18 +889,21 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                       <div className="relative">
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-600 font-bold">€</span>
                         <input
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          value={formData.promo_price || ''}
-                          onChange={(e) => setFormData(prev => ({ ...prev, promo_price: parseFloat(e.target.value) || 0 }))}
+                          type="text"
+                          inputMode="decimal"
+                          value={promoPriceInputStr}
+                          onChange={(e) => {
+                            const raw = e.target.value
+                            if (isPartialMoneyInput(raw)) setPromoPriceInputStr(raw)
+                          }}
                           className="w-full pl-10 pr-4 py-3 border-2 border-orange-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-lg font-bold"
-                          placeholder="0.00"
+                          placeholder="0,00"
                         />
                       </div>
-                      {(formData.promo_price || 0) > 0 && (
+                      {(modalParsedPromoPreview || 0) > 0 && (
                         <p className="text-sm text-orange-600 mt-2">
-                          €{(formData.price || 0).toFixed(2)} → <strong>€{(formData.promo_price || 0).toFixed(2)}</strong>
+                          €{modalParsedPricePreview.toFixed(2)} →{' '}
+                          <strong>€{(modalParsedPromoPreview || 0).toFixed(2)}</strong>
                         </p>
                       )}
                     </div>

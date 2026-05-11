@@ -2459,6 +2459,7 @@
       "confirmDelete": "この商品を削除しますか？",
       "deleteFailed": "削除に失敗しました",
       "saveFailed": "保存に失敗しました。もう一度お試しください。",
+      "invalidPrice": "有効な金額を入力してください（カンマまたはピリオド）。例：0,90 / 0.90。",
       "namePlaceholder": "例：大盛りポテト",
       "descriptionPlaceholder": "商品の説明を入力...",
       "selectCategory": "選択...",

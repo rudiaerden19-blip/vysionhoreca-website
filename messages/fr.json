@@ -1959,6 +1959,7 @@
       "confirmDelete": "Supprimer ce produit ?",
       "deleteFailed": "Échec de la suppression",
       "saveFailed": "Échec de l'enregistrement. Réessayez.",
+      "invalidPrice": "Entrez un prix valide avec une virgule ou un point, ex. 0,90 ou 1.50.",
       "namePlaceholder": "ex. Grande frite",
       "descriptionPlaceholder": "Décrivez le produit...",
       "selectCategory": "Sélectionner...",

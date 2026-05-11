@@ -2459,6 +2459,7 @@
       "confirmDelete": "حذف هذا المنتج؟",
       "deleteFailed": "فشل الحذف",
       "saveFailed": "فشل الحفظ. حاول مرة أخرى.",
+      "invalidPrice": "أدخل سعراً صالحاً باستخدام الفاصلة أو النقطة (مثلاً 0،90 أو 0.90).",
       "namePlaceholder": "مثال: بطاطس كبيرة",
       "descriptionPlaceholder": "صف المنتج...",
       "selectCategory": "اختر...",

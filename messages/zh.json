@@ -2459,6 +2459,7 @@
       "confirmDelete": "确定删除此产品？",
       "deleteFailed": "删除失败",
       "saveFailed": "保存失败，请重试。",
+      "invalidPrice": "请输入有效价格，可使用小数点或逗号，例如 0.90 或 0,90。",
       "namePlaceholder": "例：大份薯条",
       "descriptionPlaceholder": "描述产品...",
       "selectCategory": "选择...",

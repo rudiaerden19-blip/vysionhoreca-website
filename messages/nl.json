@@ -2758,6 +2758,7 @@
       "confirmDelete": "Weet je zeker dat je dit product wilt verwijderen?",
       "deleteFailed": "Verwijderen mislukt",
       "saveFailed": "Opslaan mislukt. Probeer opnieuw.",
+      "invalidPrice": "Vul een geldige prijs in (komma of punt), bijv. 0,90 of 1.50.",
       "namePlaceholder": "Bijv. Grote Friet",
       "descriptionPlaceholder": "Beschrijf het product...",
       "selectCategory": "Selecteer...",

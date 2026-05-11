@@ -1959,6 +1959,7 @@
       "confirmDelete": "Dieses Produkt wirklich löschen?",
       "deleteFailed": "Löschen fehlgeschlagen",
       "saveFailed": "Speichern fehlgeschlagen. Bitte erneut versuchen.",
+      "invalidPrice": "Geben Sie einen gültigen Preis ein (Komma oder Punkt), z. B. 0,90 oder 1.50.",
       "namePlaceholder": "z. B. große Pommes",
       "descriptionPlaceholder": "Produkt beschreiben...",
       "selectCategory": "Auswählen...",
