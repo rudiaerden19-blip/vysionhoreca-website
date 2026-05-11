@@ -711,6 +711,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const tableOrdersKey = `vysion_table_orders_${tenant}`
   const persistTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
+  /** Één persist tegelijk per tafel-slot: voorkomt dat DELETE/INSERT door elkaar lopen (keuken ziet dan niets). */
+  const openOrderPersistChainRef = useRef<Record<string, Promise<void>>>({})
 
   const applyOpenOrdersFromServerRows = useCallback((rows: OpenTableOrderRow[] | null) => {
     if (rows === null) return
@@ -1069,62 +1071,105 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
   }
 
-  const persistOpenOrderRowToSupabase = async (
+  const persistOpenOrderRowToSupabaseImpl = async (
     zone: FloorPlanZone,
     tblNr: string,
     items: CartItem[],
   ) => {
-    const run = async (attempt: number): Promise<void> => {
-      const delOpen = await adminDb.delete(
+    const openWhere = {
+      tenant_slug: tenant,
+      table_number: tblNr,
+      status: 'open' as const,
+      floor_plan_zone: zone,
+    }
+    const prepWhere = {
+      tenant_slug: tenant,
+      table_number: tblNr,
+      status: 'preparing' as const,
+      floor_plan_zone: zone,
+    }
+
+    const deleteOpenAndPreparing = async () => {
+      const delOpen = await adminDb.delete('orders', openWhere, { tenantSlug: tenant })
+      if (!delOpen.ok) console.warn('[kassa] open order delete failed:', delOpen.error)
+      const delPrep = await adminDb.delete('orders', prepWhere, { tenantSlug: tenant })
+      if (!delPrep.ok) console.warn('[kassa] preparing draft delete failed:', delPrep.error)
+    }
+
+    if (items.length === 0) {
+      await deleteOpenAndPreparing()
+      return
+    }
+
+    let customerTableLabel = t('kassaReceipt.tableLabel').replace(/\{number\}/g, String(tblNr))
+    if (zone === FLOOR_PLAN_ZONE_TERRACE) {
+      customerTableLabel = `${customerTableLabel} (${t('kassaApp.floorZoneTerrace')})`
+    }
+
+    const rowPayload: Record<string, unknown> = {
+      order_number: 0,
+      status: 'open',
+      payment_status: 'pending',
+      order_type: 'DINE_IN',
+      customer_name: customerTableLabel,
+      customer_notes: customerTableLabel,
+      table_number: tblNr,
+      floor_plan_zone: zone,
+      subtotal: 0,
+      tax: 0,
+      total: 0,
+      items: items as unknown as Record<string, unknown>[],
+    }
+
+    const sel = await adminDb.select<{ id: string }[]>('orders', {
+      tenantSlug: tenant,
+      select: 'id',
+      match: { tenant_slug: tenant, table_number: tblNr, floor_plan_zone: zone },
+      in: { status: ['open', 'preparing'] },
+      limit: 20,
+      timeoutMs: 12_000,
+    })
+    const ids =
+      sel.ok && Array.isArray(sel.data) ? sel.data.map((r) => r.id).filter(Boolean) : []
+
+    if (ids.length === 1) {
+      const up = await adminDb.update(
         'orders',
-        { tenant_slug: tenant, table_number: tblNr, status: 'open', floor_plan_zone: zone },
-        { tenantSlug: tenant },
+        rowPayload,
+        { id: ids[0], tenant_slug: tenant },
+        { tenantSlug: tenant, timeoutMs: 12_000 },
       )
-      if (!delOpen.ok) {
-        console.warn('[kassa] open order delete failed:', delOpen.error)
-      }
-      const delPrep = await adminDb.delete(
-        'orders',
-        { tenant_slug: tenant, table_number: tblNr, status: 'preparing', floor_plan_zone: zone },
-        { tenantSlug: tenant },
-      )
-      if (!delPrep.ok) {
-        console.warn('[kassa] preparing draft delete failed:', delPrep.error)
-      }
-      if (items.length === 0) return
-      let customerTableLabel = t('kassaReceipt.tableLabel').replace(/\{number\}/g, String(tblNr))
-      if (zone === FLOOR_PLAN_ZONE_TERRACE) {
-        customerTableLabel = `${customerTableLabel} (${t('kassaApp.floorZoneTerrace')})`
-      }
-      const insRes = await adminDb.insert(
-        'orders',
-        {
-          order_number: 0,
-          status: 'open',
-          payment_status: 'pending',
-          order_type: 'DINE_IN',
-          customer_name: customerTableLabel,
-          customer_notes: customerTableLabel,
-          table_number: tblNr,
-          floor_plan_zone: zone,
-          subtotal: 0,
-          tax: 0,
-          total: 0,
-          items: items as unknown as Record<string, unknown>[],
-          created_at: new Date().toISOString(),
-        },
-        { tenantSlug: tenant },
-      )
+      if (up.ok) return
+      console.warn('[kassa] open order update failed, replace:', up.error)
+    }
+
+    await deleteOpenAndPreparing()
+
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const insRes = await adminDb.insert('orders', rowPayload, {
+        tenantSlug: tenant,
+        timeoutMs: 12_000,
+      })
       if (insRes.ok) return
       console.warn('[kassa] open order insert failed:', insRes.error)
       const errMsg = insRes.error || ''
       const uniqueOrConflict =
         insRes.status === 409 || /duplicate|unique|23505/i.test(errMsg)
-      if (attempt < 2 && (insRes.status === 0 || insRes.status >= 500 || uniqueOrConflict)) {
-        window.setTimeout(() => void run(attempt + 1), 650 * (attempt + 1))
-      }
+      const retryable =
+        attempt < 2 && (insRes.status === 0 || insRes.status >= 500 || uniqueOrConflict)
+      if (!retryable) break
+      await new Promise((r) => setTimeout(r, 650 * (attempt + 1)))
     }
-    await run(0)
+  }
+
+  const persistOpenOrderRowToSupabase = (zone: FloorPlanZone, tblNr: string, items: CartItem[]) => {
+    const slotKey = tableOrderMapKey(zone, tblNr)
+    const prev = openOrderPersistChainRef.current[slotKey] ?? Promise.resolve()
+    openOrderPersistChainRef.current[slotKey] = prev
+      .then(() => persistOpenOrderRowToSupabaseImpl(zone, tblNr, items))
+      .catch((err) => {
+        console.warn('[kassa] open order persist:', err)
+      })
   }
 
   const schedulePersistOpenOrder = (zone: FloorPlanZone, tblNr: string, items: CartItem[]) => {
@@ -1902,7 +1947,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         sort_order: 0,
         allergens: [],
       }
-      setCart(prev => [...prev, { product: custom, quantity: 1, cartKey: custom.id! }])
+      setCart((prev) => {
+        const updated = [...prev, { product: custom, quantity: 1, cartKey: custom.id! }]
+        if (tableNumber) {
+          updateTableStatus(tableNumber, true, dineInFloorZone)
+          syncTableOrder(tableNumber, updated)
+        }
+        return updated
+      })
       setNumpadValue('')
     }
   }
