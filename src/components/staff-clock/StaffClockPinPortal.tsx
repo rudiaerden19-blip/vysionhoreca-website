@@ -8,7 +8,7 @@
  * - Form + submit → Enter bevestigt; inputMode numeric hint voor mobiele toetsenborden.
  */
 
-import { useLayoutEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 
 export const STAFF_CLOCK_PIN_Z_INDEX = 230
@@ -44,6 +44,27 @@ export function StaffClockPinPortal({
   onConfirm,
 }: StaffClockPinPortalProps) {
   const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = prevOverflow
+    }
+  }, [open])
+
+  useEffect(() => {
+    if (!open) return
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      if (busy) return
+      e.preventDefault()
+      onCancel()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [open, busy, onCancel])
 
   useLayoutEffect(() => {
     if (!open) return

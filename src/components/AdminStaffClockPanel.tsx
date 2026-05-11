@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLanguage } from '@/i18n'
 import { authFetch } from '@/lib/auth-headers'
 import { StaffClockPinPortal } from '@/components/staff-clock/StaffClockPinPortal'
@@ -47,6 +47,8 @@ export function AdminStaffClockPanel({
   const [pinInput, setPinInput] = useState('')
   const [pinError, setPinError] = useState<string | null>(null)
   const [summary, setSummary] = useState<SummaryState | null>(null)
+  /** Laat late fetch-antwoorden state overslaan na annuleren (voorkomt vastlopende busy). */
+  const pinReqGen = useRef(0)
 
   const staffClockErrorText = useCallback(
     (code: string) => {
@@ -82,6 +84,7 @@ export function AdminStaffClockPanel({
       setPinError(t('staffClock.pinRequired'))
       return
     }
+    const reqGen = ++pinReqGen.current
     setBusy(true)
     setPinError(null)
     try {
@@ -94,12 +97,20 @@ export function AdminStaffClockPanel({
           action: modal.action,
         }),
       })
-      const data = (await res.json()) as {
+      let data: {
         ok?: boolean
         error?: string
         staffName?: string
         summary?: { total: number; order_count: number; orders: { order_number: number; total: number }[] }
       }
+      try {
+        data = (await res.json()) as typeof data
+      } catch {
+        if (pinReqGen.current !== reqGen) return
+        setPinError(t('staffClock.errors.server'))
+        return
+      }
+      if (pinReqGen.current !== reqGen) return
       if (data.ok) {
         setPinModal(null)
         setPinInput('')
@@ -116,9 +127,13 @@ export function AdminStaffClockPanel({
         setPinError(staffClockErrorText(data.error || 'unknown'))
       }
     } catch {
+      if (pinReqGen.current !== reqGen) return
       setPinError(t('staffClock.errors.server'))
+    } finally {
+      if (pinReqGen.current === reqGen) {
+        setBusy(false)
+      }
     }
-    setBusy(false)
   }
 
   const kassaLink = useMemo(() => kassaHref || `/shop/${tenantSlug}/admin/kassa`, [kassaHref, tenantSlug])
@@ -254,7 +269,11 @@ export function AdminStaffClockPanel({
           busy={busy}
           cancelLabel={t('staffClock.cancel')}
           confirmLabel={t('staffClock.confirmPin')}
-          onCancel={() => setPinModal(null)}
+          onCancel={() => {
+            pinReqGen.current += 1
+            setBusy(false)
+            setPinModal(null)
+          }}
           onConfirm={() => void submitPin()}
         />
       )}

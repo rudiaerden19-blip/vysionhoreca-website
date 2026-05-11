@@ -1307,6 +1307,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     orderCount: number
     orders: { order_number: number; total: number }[]
   } | null>(null)
+  /** Verhoog bij annuleren/sluiten zodat late API-antwoorden geen state meer zetten (busy blijft niet hangen). */
+  const staffClockPinReqGen = useRef(0)
   const [activeKassaStaff, setActiveKassaStaff] = useState<{ id: string; name: string } | null>(null)
 
   // Opties modal (editingCartKey = bestaande winkelmandregel aanpassen)
@@ -2508,6 +2510,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const openStaffClockModal = () => {
     playClick()
+    staffClockPinReqGen.current += 1
+    setStaffClockBusy(false)
     setStaffClockOpen(true)
     setStaffClockPinModal(null)
     setStaffClockPinInput('')
@@ -2524,6 +2528,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       setStaffClockPinError(t('staffClock.pinRequired'))
       return
     }
+    const reqGen = ++staffClockPinReqGen.current
     setStaffClockBusy(true)
     setStaffClockPinError(null)
     try {
@@ -2536,12 +2541,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           action: modal.action,
         }),
       })
-      const data = (await res.json()) as {
+      let data: {
         ok?: boolean
         error?: string
         staffName?: string
         summary?: { total: number; order_count: number; orders: { order_number: number; total: number }[] }
       }
+      try {
+        data = (await res.json()) as typeof data
+      } catch {
+        if (staffClockPinReqGen.current !== reqGen) return
+        setStaffClockPinError(t('staffClock.errors.server'))
+        return
+      }
+      if (staffClockPinReqGen.current !== reqGen) return
       if (data.ok) {
         playSuccess()
         setStaffClockPinModal(null)
@@ -2563,13 +2576,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         setStaffClockPinError(staffClockErrorText(data.error || 'unknown'))
       }
     } catch {
+      if (staffClockPinReqGen.current !== reqGen) return
       setStaffClockPinError(t('staffClock.errors.server'))
+    } finally {
+      if (staffClockPinReqGen.current === reqGen) {
+        setStaffClockBusy(false)
+      }
     }
-    setStaffClockBusy(false)
   }
 
   const startStaffSales = (s: { id: string; name: string }) => {
     flushSync(() => {
+      staffClockPinReqGen.current += 1
+      setStaffClockBusy(false)
       setActiveKassaStaff({ id: s.id, name: s.name })
       setStaffClockOpen(false)
       setStaffClockPinModal(null)
@@ -3586,8 +3605,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         pinError={staffClockPinError}
         onClose={() => {
           playClick()
+          staffClockPinReqGen.current += 1
+          setStaffClockBusy(false)
           setStaffClockOpen(false)
           setStaffClockPinModal(null)
+          setStaffClockPinInput('')
+          setStaffClockPinError(null)
         }}
         onPinInputChange={setStaffClockPinInput}
         onStartClockIn={(s) => {
@@ -3605,7 +3628,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         onSales={(s) => startStaffSales(s)}
         onPinCancel={() => {
           playClick()
+          staffClockPinReqGen.current += 1
+          setStaffClockBusy(false)
           setStaffClockPinModal(null)
+          setStaffClockPinInput('')
+          setStaffClockPinError(null)
         }}
         onPinConfirm={() => void submitStaffClockPin()}
       />
