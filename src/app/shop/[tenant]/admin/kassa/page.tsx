@@ -2379,7 +2379,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const agentOk = await sendToVysionPrintAgent({
       winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
       bonInhoud: bonLines.join('\n'),
-      copies: isDraft ? 1 : 2,
+      copies: 2,
       openDrawer: isCash,
       receiptMode: 'kassa',
       orderData: {
