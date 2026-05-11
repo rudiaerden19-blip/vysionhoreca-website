@@ -1141,8 +1141,8 @@ export default function KassaFloorPlan({
             {selectedDecor.type === 'bar_segment' && (() => {
               const s1 = selectedDecor.stool1 || 'K?'
               const s2 = selectedDecor.stool2 || 'K?'
-              const items1 = tableOrders[s1] || []
-              const items2 = tableOrders[s2] || []
+              const items1 = tableOrders[tableOrderMapKey(planZone, s1)] || []
+              const items2 = tableOrders[tableOrderMapKey(planZone, s2)] || []
               const total1 = items1.reduce((sum, item) => sum + (item.product.price + (item.choices||[]).reduce((s,c)=>s+c.price,0)) * item.quantity, 0)
               const total2 = items2.reduce((sum, item) => sum + (item.product.price + (item.choices||[]).reduce((s,c)=>s+c.price,0)) * item.quantity, 0)
 
@@ -1291,7 +1291,7 @@ export default function KassaFloorPlan({
 
         {/* Tafel Sidebar */}
         {selected && (() => {
-          const items = tableOrders[selected.number] || []
+          const items = tableOrders[tableOrderMapKey(planZone, selected.number)] || []
           const hasItems = items.length > 0
           const effectiveStatus = getTableEffectiveStatus(selected.number, selected.status)
           const totalPrice = items.reduce((sum, item) => {
