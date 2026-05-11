@@ -162,7 +162,8 @@ export async function updateOrderStatus(
   id: string,
   status: Order['status'],
   rejectionReason?: string,
-  rejectionNotes?: string
+  rejectionNotes?: string,
+  opts?: { skipZReportSync?: boolean },
 ): Promise<boolean> {
   if (!supabase) {
     console.error('Supabase not configured')
@@ -203,8 +204,9 @@ export async function updateOrderStatus(
 
   const s = String(status).toLowerCase()
   if (
+    !opts?.skipZReportSync &&
     ['completed', 'confirmed', 'preparing', 'ready', 'delivered', 'rejected', 'cancelled'].includes(
-      s
+      s,
     )
   ) {
     await syncZReportAfterOrder(tenantSlug, updated[0].created_at as string)
@@ -499,7 +501,11 @@ export async function approveWebshopOrder(tenantSlug: string, id: string): Promi
  * `paid` voor online betaalmethode alleen als webhook dat al zette; nooit pending→paid voor online.
  * Cash bij afhaal: bij afronden nog pending → markeer paid (ontvangen bij afhalen).
  */
-export async function completeWebshopOrder(tenantSlug: string, id: string): Promise<boolean> {
+export async function completeWebshopOrder(
+  tenantSlug: string,
+  id: string,
+  opts?: { skipZReportSync?: boolean },
+): Promise<boolean> {
   if (!supabase) return false
 
   const { data: order, error: fetchError } = await supabase
@@ -551,7 +557,9 @@ export async function completeWebshopOrder(tenantSlug: string, id: string): Prom
     return false
   }
 
-  await syncZReportAfterOrder(tenantSlug, order.created_at as string)
+  if (!opts?.skipZReportSync) {
+    await syncZReportAfterOrder(tenantSlug, order.created_at as string)
+  }
   return true
 }
 

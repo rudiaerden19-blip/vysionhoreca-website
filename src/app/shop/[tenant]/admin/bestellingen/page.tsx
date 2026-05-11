@@ -3,7 +3,20 @@
 import { useLanguage } from '@/i18n'
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { getOrders, updateOrderStatus, confirmOrder, approveWebshopOrder, completeWebshopOrder, Order, getTenantSettings, TenantSettings, addLoyaltyPoints, isWebshopOrder } from '@/lib/admin-api'
+import {
+  getOrders,
+  updateOrderStatus,
+  confirmOrder,
+  approveWebshopOrder,
+  completeWebshopOrder,
+  Order,
+  getTenantSettings,
+  TenantSettings,
+  addLoyaltyPoints,
+  isWebshopOrder,
+  regenerateZReportForDate,
+  getBelgiumDateString,
+} from '@/lib/admin-api'
 import { formatOrderScheduleDetail } from '@/lib/format-order-schedule'
 import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
@@ -347,13 +360,93 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     if (completableOrders.length === 0 || completingAll) return
     const msg = t('ordersPage.actions.completeAllConfirm').replace('{count}', String(completableOrders.length))
     if (typeof window !== 'undefined' && !window.confirm(msg)) return
+
+    const list = [...completableOrders]
+    /** Voorkom N× volledige Z-rapport-herberekening per dag — dat blokkeerde de UI bij veel orders. */
+    const affectedBelgiumDays = new Set<string>()
+    const succeededWebshopIds = new Set<string>()
+    const succeededPosIds = new Set<string>()
+
+    const yieldToMain = () =>
+      new Promise<void>((resolve) => {
+        if (typeof requestAnimationFrame !== 'undefined') {
+          requestAnimationFrame(() => resolve())
+        } else {
+          setTimeout(resolve, 0)
+        }
+      })
+
     setCompletingAll(true)
+    setUpdatingId(null)
+
     try {
-      for (const order of completableOrders) {
-        await handleMarkOrderComplete(order)
+      let done = 0
+      for (const order of list) {
+        if (!order.id) continue
+        try {
+          if (isWebshopOrder(order)) {
+            const ok = await completeWebshopOrder(params.tenant, order.id, { skipZReportSync: true })
+            if (ok) {
+              succeededWebshopIds.add(order.id)
+              if (order.created_at) {
+                affectedBelgiumDays.add(getBelgiumDateString(new Date(order.created_at)))
+              }
+            }
+          } else {
+            const ok = await updateOrderStatus(params.tenant, order.id, 'completed', undefined, undefined, {
+              skipZReportSync: true,
+            })
+            if (ok) {
+              succeededPosIds.add(order.id)
+              if (order.created_at) {
+                affectedBelgiumDays.add(getBelgiumDateString(new Date(order.created_at)))
+              }
+            }
+          }
+        } catch (err) {
+          console.error('[completeAll] order failed:', order.id, err)
+        }
+        done += 1
+        if (done % 8 === 0) await yieldToMain()
+      }
+
+      const now = new Date().toISOString()
+      setOrders((prev) =>
+        prev.map((o) => {
+          if (!o.id) return o
+          if (succeededWebshopIds.has(o.id)) {
+            return {
+              ...o,
+              status: 'completed',
+              completed_at: now,
+              payment_status:
+                (o.payment_method || '').toLowerCase() === 'cash' &&
+                (o.payment_status || '').toLowerCase() === 'pending'
+                  ? 'paid'
+                  : o.payment_status,
+            }
+          }
+          if (succeededPosIds.has(o.id)) {
+            return { ...o, status: 'completed', completed_at: now }
+          }
+          return o
+        }),
+      )
+
+      await yieldToMain()
+
+      if (supabase && affectedBelgiumDays.size > 0) {
+        for (const day of affectedBelgiumDays) {
+          try {
+            await regenerateZReportForDate(supabase, params.tenant, day)
+          } catch (err) {
+            console.error('[completeAll] Z-rapport herberekenen mislukt:', day, err)
+          }
+        }
       }
     } finally {
       setCompletingAll(false)
+      setUpdatingId(null)
     }
   }
 
