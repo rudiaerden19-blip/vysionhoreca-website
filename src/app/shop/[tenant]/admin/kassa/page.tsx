@@ -3518,7 +3518,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <span className="font-bold text-gray-700 text-lg">{t('kassaApp.cartTotal')}</span>
             <span className="font-bold text-[#3C4D6B] text-2xl">€{total.toFixed(2)}</span>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <button
               type="button"
               onClick={() => { void openCashDrawer() }}
@@ -3527,6 +3527,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             >
               <span className="text-3xl leading-none">💰</span>
               <span className="text-sm font-bold">{t('kassaApp.drawerOpen')}</span>
+            </button>
+            <button
+              type="button"
+              onClick={printDraftBonFromCart}
+              disabled={cart.length === 0}
+              className="flex flex-col items-center justify-center gap-2 rounded-xl bg-amber-400 py-5 text-amber-950 transition-colors hover:bg-amber-300 active:scale-[0.99] disabled:opacity-40 disabled:pointer-events-none"
+              title={t('kassaApp.cartBonTitle')}
+              aria-label={t('kassaApp.cartBonTitle')}
+            >
+              <span className="text-3xl leading-none">🧾</span>
+              <span className="text-sm font-bold">{t('kassaApp.cartBon')}</span>
             </button>
             <button
               type="button"
