@@ -1783,6 +1783,12 @@
       "inactive": "Inactif",
       "note": "Remarque"
     },
+    "errorFallback": {
+      "title": "Une erreur s'est produite dans l'administration",
+      "description": "Réessayez ou revenez au tableau de bord. Si cela se reproduit, notez l'heure et la page pour le support.",
+      "retry": "Réessayer",
+      "backToOverview": "Tableau de bord"
+    },
     "profiel": {
       "title": "Profil de l'entreprise",
       "subtitle": "Gérez les informations de votre entreprise",

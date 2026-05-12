@@ -2283,6 +2283,12 @@
       "inactive": "非アクティブ",
       "note": "注意"
     },
+    "errorFallback": {
+      "title": "管理画面で問題が発生しました",
+      "description": "再度試すか、一覧に戻ってください。繰り返す場合は、日時とページを控えサポートにお知らせください。",
+      "retry": "再試行",
+      "backToOverview": "管理トップへ"
+    },
     "profiel": {
       "title": "ビジネスプロフィール",
       "subtitle": "ビジネス情報を管理",

@@ -2582,6 +2582,12 @@
       "active": "Actief",
       "inactive": "Inactief"
     },
+    "errorFallback": {
+      "title": "Er ging iets mis in het zaakpaneel",
+      "description": "Probeer opnieuw of ga terug naar het overzicht. Blijft dit optreden — noteer tijd en pagina voor support.",
+      "retry": "Probeer opnieuw",
+      "backToOverview": "Naar zaakpaneel"
+    },
     "profiel": {
       "title": "Zaakprofiel",
       "subtitle": "Beheer de basisinformatie van je zaak",

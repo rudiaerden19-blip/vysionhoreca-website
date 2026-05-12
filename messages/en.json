@@ -2582,6 +2582,12 @@
       "active": "Active",
       "inactive": "Inactive"
     },
+    "errorFallback": {
+      "title": "Something went wrong in your admin",
+      "description": "Try again or go back to your dashboard. If this keeps happening, note the time and page for support.",
+      "retry": "Try again",
+      "backToOverview": "Back to dashboard"
+    },
     "profiel": {
       "title": "Business Profile",
       "subtitle": "Manage your business information",

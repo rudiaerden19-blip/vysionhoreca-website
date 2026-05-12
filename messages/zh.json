@@ -2283,6 +2283,12 @@
       "inactive": "非活跃",
       "note": "注意"
     },
+    "errorFallback": {
+      "title": "管理后台出现问题",
+      "description": "请重试或返回概览。如持续发生，请记录时间和页面并联系客服。",
+      "retry": "重试",
+      "backToOverview": "返回控制台"
+    },
     "profiel": {
       "title": "企业资料",
       "subtitle": "管理您的企业信息",

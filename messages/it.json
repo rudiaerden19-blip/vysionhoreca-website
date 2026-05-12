@@ -2283,6 +2283,12 @@
       "inactive": "Inattivo",
       "note": "Nota"
     },
+    "errorFallback": {
+      "title": "Qualcosa è andato storto nell'area di amministrazione",
+      "description": "Riprova o torna alla panoramica. Se succede ancora, annota ora e pagina per l'assistenza.",
+      "retry": "Riprova",
+      "backToOverview": "Vai al pannello"
+    },
     "profiel": {
       "title": "Profilo attività",
       "subtitle": "Gestisci le informazioni della tua attività",

@@ -1783,6 +1783,12 @@
       "inactive": "Inaktiv",
       "note": "Hinweis"
     },
+    "errorFallback": {
+      "title": "Im Verwaltungsbereich ist ein Fehler aufgetreten",
+      "description": "Versuchen Sie es erneut oder kehren Sie zur Übersicht zurück. Wenn es weiterhin auftritt, notieren Sie Zeit und Seite für den Support.",
+      "retry": "Erneut versuchen",
+      "backToOverview": "Zur Übersicht"
+    },
     "profiel": {
       "title": "Geschäftsprofil",
       "subtitle": "Verwalten Sie Ihre Geschäftsinformationen",

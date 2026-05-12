@@ -2283,6 +2283,12 @@
       "inactive": "Inactivo",
       "note": "Nota"
     },
+    "errorFallback": {
+      "title": "Algo salió mal en el panel de administración",
+      "description": "Inténtalo de nuevo o vuelve al resumen. Si se repite, anota la hora y la página para soporte.",
+      "retry": "Reintentar",
+      "backToOverview": "Ir al panel"
+    },
     "profiel": {
       "title": "Perfil del negocio",
       "subtitle": "Gestiona la información de tu negocio",
