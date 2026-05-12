@@ -69,6 +69,8 @@
   <select id="pr"></select>
   <div class="hint">
     USB of netwerk maakt niet uit — kies de printer zoals Windows hem ziet.
+    <strong>Niet</strong> “Microsoft Print to PDF”: dat is geen echte bonprinter.
+    Bij “Opslaan” wordt je printer<strong>direct</strong> bewaard, ook als de tenant hieronder nog niet ingevuld is.
   </div>
 
   <h2>3 · Test</h2>
@@ -78,7 +80,7 @@
   </div>
 
   <h2 style="margin-top: 22px;">&nbsp;</h2>
-  <button type="button" id="save">Opslaan &amp; kassa openen</button>
+  <button type="button" id="save">Printer opslaan &amp; kassa openen</button>
   <button type="button" class="secondary" id="diag" style="margin-top: 8px;">Diagnose kopiëren (voor support)</button>
 
   <div class="ok-msg"  id="ok">Opgeslagen! Kassa wordt geopend…</div>
@@ -149,17 +151,38 @@
       const printerName = sel.value
       const slug = tenantInput.value.trim()
       if (!printerName) return showErr('Selecteer een printer.')
-      if (!slug)        return showErr('Vul de tenant code in.')
-      const kassaUrl = buildKassaUrl(slug)
-      if (!kassaUrl)    return showErr('Tenant code ongeldig.')
+      if (/microsoft\s+print\s+to\s+pdf/i.test(printerName) || /\bone\s*note\b/i.test(printerName)) {
+        showErr('Kies je echte Epson-bonprinter, niet een PDF/virtual printer.')
+        return
+      }
+
+      let kassaUrl = ''
+      if (slug) {
+        kassaUrl = buildKassaUrl(slug)
+        if (!kassaUrl) return showErr('Tenant code ongeldig.')
+      }
+
       try {
-        await window.vysionAgent.saveConfig({ printerName, kassaUrl })
-        showOk('Opgeslagen — kassa wordt geopend…')
-        setStatus('ok', `Klaar — print naar "${printerName}".`)
-        setTimeout(() => window.vysionAgent.openKassa(), 700)
+        await window.vysionAgent.saveConfig({
+          printerName,
+          ...(kassaUrl ? { kassaUrl } : {}),
+        })
       } catch (e) {
         showErr('Opslaan mislukt: ' + (e.message || e))
+        return
       }
+
+      if (!slug) {
+        showErr(
+          'Printer staat nu goed opgeslagen. Vul hierboven nog de tenant code in en tik opnieuw op de knop om de kassa-URL te bewaren én te openen.',
+        )
+        setStatus('ok', `Printer opgeslagen: "${printerName}".`)
+        return
+      }
+
+      showOk('Opgeslagen — kassa wordt geopend…')
+      setStatus('ok', `Klaar — print naar "${printerName}".`)
+      setTimeout(() => window.vysionAgent.openKassa(), 700)
     }
 
     $('testPrint').onclick = async () => {
