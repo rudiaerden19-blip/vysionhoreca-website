@@ -1,4 +1,4 @@
-/** Lokale Vysion Print Agent (Windows): http://127.0.0.1:9742 */
+/** Lokale Vysion Print Agent: http://127.0.0.1:9742 (Windows) of Android kiosk-app (NanoHTTP). */
 
 const DEFAULT_AGENT_ORIGIN = 'http://127.0.0.1:9742'
 
@@ -49,9 +49,91 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
+function isAndroidUa(): boolean {
+  if (typeof navigator === 'undefined') return false
+  return /\bAndroid\b/i.test(navigator.userAgent ?? '')
+}
+
+/** Gelijk aan POST /print body (JSON object). */
+function buildPrintWireObject(body: VysionPrintAgentBody): Record<string, unknown> {
+  return {
+    winkelnaam: body.winkelnaam ?? body.storeName,
+    storeName: body.storeName ?? body.winkelnaam,
+    bonInhoud: body.bonInhoud ?? body.receiptText ?? '',
+    receiptText: body.receiptText ?? body.bonInhoud ?? '',
+    orderData: body.orderData,
+    businessInfo: body.businessInfo,
+    copies: body.copies,
+    openDrawer: body.openDrawer === true,
+    receiptMode: body.receiptMode || 'kassa',
+  }
+}
+
+/** Base64 van UTF‑8‑JSON voor query `d` (Android kiosk `PrintBridgeActivity`). */
+function utf8StringToUrlBase64(s: string): string {
+  const bytes = new TextEncoder().encode(s)
+  let bin = ''
+  for (let i = 0; i < bytes.length; i++) {
+    bin += String.fromCharCode(bytes[i])
+  }
+  return encodeURIComponent(btoa(bin))
+}
+
+/**
+ * HTTPS-pagina in Chrome‑Android blokkeert vaak fetch naar localhost.
+ * Fallback: kiosk-app via `vysionkiosk://` (intent); geen retourstatus mogelijk → optimistisch `true`.
+ */
+function invokeAndroidKioskPrintBridge(body: VysionPrintAgentBody): boolean {
+  if (!isAndroidUa()) return false
+  if (typeof window === 'undefined' || typeof document === 'undefined') return false
+  try {
+    const json = JSON.stringify(buildPrintWireObject(body))
+    const url = `vysionkiosk://print?d=${utf8StringToUrlBase64(json)}`
+    const f = document.createElement('iframe')
+    f.style.cssText =
+      'position:fixed;top:-120px;width:2px;height:2px;border:0;opacity:0;pointer-events:none'
+    f.setAttribute('aria-hidden', 'true')
+    f.src = url
+    document.body.appendChild(f)
+    window.setTimeout(() => {
+      try {
+        f.remove()
+      } catch {
+        /* ignore */
+      }
+    }, 2500)
+    return true
+  } catch {
+    return false
+  }
+}
+
+function invokeAndroidKioskDrawerBridge(): boolean {
+  if (!isAndroidUa()) return false
+  if (typeof window === 'undefined' || typeof document === 'undefined') return false
+  try {
+    const f = document.createElement('iframe')
+    f.style.cssText =
+      'position:fixed;top:-120px;width:2px;height:2px;border:0;opacity:0;pointer-events:none'
+    f.setAttribute('aria-hidden', 'true')
+    f.src = 'vysionkiosk://drawer'
+    document.body.appendChild(f)
+    window.setTimeout(() => {
+      try {
+        f.remove()
+      } catch {
+        /* ignore */
+      }
+    }, 2500)
+    return true
+  } catch {
+    return false
+  }
+}
+
 async function postPrintOnce(
   body: VysionPrintAgentBody,
-  origin: string
+  origin: string,
 ): Promise<boolean> {
   /** Hard timeout zodat een hangende agent de UI niet 30s vastzet. */
   const controller = new AbortController()
@@ -60,17 +142,7 @@ async function postPrintOnce(
     const init: RequestInit = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        winkelnaam: body.winkelnaam ?? body.storeName,
-        storeName: body.storeName ?? body.winkelnaam,
-        bonInhoud: body.bonInhoud ?? body.receiptText ?? '',
-        receiptText: body.receiptText ?? body.bonInhoud ?? '',
-        orderData: body.orderData,
-        businessInfo: body.businessInfo,
-        copies: body.copies,
-        openDrawer: body.openDrawer === true,
-        receiptMode: body.receiptMode || 'kassa',
-      }),
+      body: JSON.stringify(buildPrintWireObject(body)),
       mode: 'cors',
       credentials: 'omit',
       signal: controller.signal,
@@ -89,7 +161,7 @@ async function postPrintOnce(
 
 export async function sendToVysionPrintAgent(
   body: VysionPrintAgentBody,
-  origin = DEFAULT_AGENT_ORIGIN
+  origin = DEFAULT_AGENT_ORIGIN,
 ): Promise<boolean> {
   const base = origin.replace(/\/$/, '')
   /** Agent kan net opstarten na login; korte retries voorkomen onnodige HTML-bon. */
@@ -99,6 +171,7 @@ export async function sendToVysionPrintAgent(
     if (await postPrintOnce(body, base)) return true
     if (i < attempts - 1) await sleep(gapMs)
   }
+  if (invokeAndroidKioskPrintBridge(body)) return true
   return false
 }
 
@@ -122,10 +195,12 @@ export async function openCashDrawer(origin = DEFAULT_AGENT_ORIGIN): Promise<boo
     ;(init as RequestInit & { targetAddressSpace?: string }).targetAddressSpace = 'local'
     const r = await fetch(`${base}/drawer`, init)
     const data = (await r.json().catch(() => null)) as { success?: boolean } | null
-    return r.ok && data?.success === true
+    if (r.ok && data?.success === true) return true
   } catch {
-    return false
+    /* kiosk bridge mogelijk nodig op Android‑Chrome */
   } finally {
     clearTimeout(timer)
   }
+  if (invokeAndroidKioskDrawerBridge()) return true
+  return false
 }
