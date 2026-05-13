@@ -1,6 +1,12 @@
-/** Lokale Vysion Print Agent: http://127.0.0.1:9742 (Windows) of Android kiosk-app (NanoHTTP). */
+/** Lokale Vysion Print Agent: http://127.0.0.1:9742 (Windows) of Android kiosk-app (NanoHTTP / intent). */
 
 const DEFAULT_AGENT_ORIGIN = 'http://127.0.0.1:9742'
+
+/** APK package voor `intent:#Intent…` (manifest `applicationId`). */
+const ANDROID_KIOSK_PACKAGE = 'com.vysion.kiosk'
+
+/** Geen intents > ~60kB — Chrome/OS kan lange URIs kapotknippen. */
+const MAX_INTENT_URI_LENGTH = 60_000
 
 export type VysionPrintAgentItem = {
   quantity: number
@@ -69,62 +75,79 @@ function buildPrintWireObject(body: VysionPrintAgentBody): Record<string, unknow
   }
 }
 
-/** Base64 van UTF‑8‑JSON voor query `d` (Android kiosk `PrintBridgeActivity`). */
-function utf8StringToUrlBase64(s: string): string {
-  const bytes = new TextEncoder().encode(s)
+/** Kassa-bon voor deep link inkorten: ESC/POS op Android heeft `bonInhoud`; `orderData` maakt URLs enorm én redundant. Keuken: `orderData` behouden. */
+function slimBodyForAndroidIntent(body: VysionPrintAgentBody): VysionPrintAgentBody {
+  if (body.receiptMode === 'keuken') {
+    return body
+  }
+  return {
+    winkelnaam: body.winkelnaam ?? body.storeName,
+    storeName: body.storeName ?? body.winkelnaam,
+    bonInhoud: body.bonInhoud ?? body.receiptText ?? '',
+    receiptText: body.receiptText ?? body.bonInhoud ?? '',
+    copies: body.copies,
+    openDrawer: body.openDrawer,
+    receiptMode: body.receiptMode || 'kassa',
+  }
+}
+
+function rawBase64Utf8(json: string): string {
+  const bytes = new TextEncoder().encode(json)
   let bin = ''
   for (let i = 0; i < bytes.length; i++) {
     bin += String.fromCharCode(bytes[i])
   }
-  return encodeURIComponent(btoa(bin))
+  return btoa(bin)
 }
 
 /**
- * HTTPS-pagina in Chrome‑Android blokkeert vaak fetch naar localhost.
- * Fallback: kiosk-app via `vysionkiosk://` (intent); geen retourstatus mogelijk → optimistisch `true`.
+ * Chrome-Android blokkeert custom schemes in iframe; naasync fetch is ook geen gesture meer.
+ * `intent:` + navigatie wordt wél veel vaker gerouteerd naar de kiosk-app.
  */
-function invokeAndroidKioskPrintBridge(body: VysionPrintAgentBody): boolean {
-  if (!isAndroidUa()) return false
-  if (typeof window === 'undefined' || typeof document === 'undefined') return false
+function buildAndroidPrintIntentHref(body: VysionPrintAgentBody): string | null {
   try {
-    const json = JSON.stringify(buildPrintWireObject(body))
-    const url = `vysionkiosk://print?d=${utf8StringToUrlBase64(json)}`
-    const f = document.createElement('iframe')
-    f.style.cssText =
-      'position:fixed;top:-120px;width:2px;height:2px;border:0;opacity:0;pointer-events:none'
-    f.setAttribute('aria-hidden', 'true')
-    f.src = url
-    document.body.appendChild(f)
-    window.setTimeout(() => {
-      try {
-        f.remove()
-      } catch {
-        /* ignore */
-      }
-    }, 2500)
+    if (typeof window === 'undefined') return null
+    const slim = slimBodyForAndroidIntent(body)
+    const json = JSON.stringify(buildPrintWireObject(slim))
+    const b64 = rawBase64Utf8(json)
+    const dEnc = encodeURIComponent(b64)
+
+    let href =
+      `intent://print?d=${dEnc}` +
+      `#Intent;scheme=vysionkiosk;package=${ANDROID_KIOSK_PACKAGE}`
+
+    const back = `${window.location.origin}${window.location.pathname}${window.location.search}`
+    href += ';S.browser_fallback_url=' + encodeURIComponent(back || window.location.href)
+    href += ';end'
+
+    return href.length > MAX_INTENT_URI_LENGTH ? null : href
+  } catch {
+    return null
+  }
+}
+
+function invokeAndroidPrintIntentNavigate(body: VysionPrintAgentBody): boolean {
+  if (!isAndroidUa() || typeof window === 'undefined') return false
+  const href = buildAndroidPrintIntentHref(body)
+  if (!href) return false
+  try {
+    window.location.href = href
     return true
   } catch {
     return false
   }
 }
 
-function invokeAndroidKioskDrawerBridge(): boolean {
-  if (!isAndroidUa()) return false
-  if (typeof window === 'undefined' || typeof document === 'undefined') return false
+function invokeAndroidDrawerIntentNavigate(): boolean {
+  if (!isAndroidUa() || typeof window === 'undefined') return false
   try {
-    const f = document.createElement('iframe')
-    f.style.cssText =
-      'position:fixed;top:-120px;width:2px;height:2px;border:0;opacity:0;pointer-events:none'
-    f.setAttribute('aria-hidden', 'true')
-    f.src = 'vysionkiosk://drawer'
-    document.body.appendChild(f)
-    window.setTimeout(() => {
-      try {
-        f.remove()
-      } catch {
-        /* ignore */
-      }
-    }, 2500)
+    let href = `intent://drawer/#Intent;scheme=vysionkiosk;package=${ANDROID_KIOSK_PACKAGE}`
+    const back = `${window.location.origin}${window.location.pathname}${window.location.search}`
+    href += ';S.browser_fallback_url=' + encodeURIComponent(back || window.location.href)
+    href += ';end'
+
+    if (href.length > MAX_INTENT_URI_LENGTH) return false
+    window.location.href = href
     return true
   } catch {
     return false
@@ -164,6 +187,9 @@ export async function sendToVysionPrintAgent(
   origin = DEFAULT_AGENT_ORIGIN,
 ): Promise<boolean> {
   const base = origin.replace(/\/$/, '')
+  /** Android‑Chrome: eerst kiosk‑intent — HTTPS→localhost faalt vrijwel altijd zonder foutmodal. */
+  if (isAndroidUa() && invokeAndroidPrintIntentNavigate(body)) return true
+
   /** Agent kan net opstarten na login; korte retries voorkomen onnodige HTML-bon. */
   const attempts = 5
   const gapMs = 400
@@ -171,7 +197,7 @@ export async function sendToVysionPrintAgent(
     if (await postPrintOnce(body, base)) return true
     if (i < attempts - 1) await sleep(gapMs)
   }
-  if (invokeAndroidKioskPrintBridge(body)) return true
+  if (invokeAndroidPrintIntentNavigate(body)) return true
   return false
 }
 
@@ -181,6 +207,9 @@ export async function sendToVysionPrintAgent(
  */
 export async function openCashDrawer(origin = DEFAULT_AGENT_ORIGIN): Promise<boolean> {
   const base = origin.replace(/\/$/, '')
+  /** Zelfde patroon als print: eerst kiosk‑intent op Android (Chrome blokkeert vaak localhost). */
+  if (isAndroidUa() && invokeAndroidDrawerIntentNavigate()) return true
+
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), 4000)
   try {
@@ -197,10 +226,10 @@ export async function openCashDrawer(origin = DEFAULT_AGENT_ORIGIN): Promise<boo
     const data = (await r.json().catch(() => null)) as { success?: boolean } | null
     if (r.ok && data?.success === true) return true
   } catch {
-    /* kiosk bridge mogelijk nodig op Android‑Chrome */
+    /* kiosk intent mogelijk nodig op Android‑Chrome */
   } finally {
     clearTimeout(timer)
   }
-  if (invokeAndroidKioskDrawerBridge()) return true
+  if (invokeAndroidDrawerIntentNavigate()) return true
   return false
 }
