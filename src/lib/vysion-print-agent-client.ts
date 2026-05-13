@@ -49,6 +49,74 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
+/** UTF-8 → base64 (browser-safe). */
+function utf8ToBase64(s: string): string {
+  return btoa(unescape(encodeURIComponent(s)))
+}
+
+function isAndroidUserAgent(): boolean {
+  return typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent || '')
+}
+
+/**
+ * Fallback wanneer fetch naar 127.0.0.1 faalt (typisch Android Chrome vanaf HTTPS):
+ * kort `vysionkiosk://`-intent naar de Vysion Kiosk-app.
+ */
+function tryDispatchVysionKioskPrint(body: VysionPrintAgentBody): boolean {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return false
+  if (!isAndroidUserAgent()) return false
+  try {
+    const payload = JSON.stringify({
+      winkelnaam: body.winkelnaam ?? body.storeName,
+      storeName: body.storeName ?? body.winkelnaam,
+      bonInhoud: body.bonInhoud ?? body.receiptText ?? '',
+      receiptText: body.receiptText ?? body.bonInhoud ?? '',
+      orderData: body.orderData,
+      businessInfo: body.businessInfo,
+      copies: body.copies,
+      openDrawer: body.openDrawer === true,
+      receiptMode: body.receiptMode || 'kassa',
+    })
+    const d = utf8ToBase64(payload)
+    const url = `vysionkiosk://print?d=${encodeURIComponent(d)}`
+    const iframe = document.createElement('iframe')
+    iframe.setAttribute('style', 'display:none;width:0;height:0;border:0')
+    iframe.src = url
+    document.body.appendChild(iframe)
+    window.setTimeout(() => {
+      try {
+        iframe.remove()
+      } catch {
+        /* ignore */
+      }
+    }, 1500)
+    return true
+  } catch {
+    return false
+  }
+}
+
+function tryDispatchVysionKioskDrawer(): boolean {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return false
+  if (!isAndroidUserAgent()) return false
+  try {
+    const iframe = document.createElement('iframe')
+    iframe.setAttribute('style', 'display:none;width:0;height:0;border:0')
+    iframe.src = 'vysionkiosk://drawer'
+    document.body.appendChild(iframe)
+    window.setTimeout(() => {
+      try {
+        iframe.remove()
+      } catch {
+        /* ignore */
+      }
+    }, 1500)
+    return true
+  } catch {
+    return false
+  }
+}
+
 async function postPrintOnce(
   body: VysionPrintAgentBody,
   origin: string
@@ -99,6 +167,7 @@ export async function sendToVysionPrintAgent(
     if (await postPrintOnce(body, base)) return true
     if (i < attempts - 1) await sleep(gapMs)
   }
+  if (tryDispatchVysionKioskPrint(body)) return true
   return false
 }
 
@@ -122,10 +191,12 @@ export async function openCashDrawer(origin = DEFAULT_AGENT_ORIGIN): Promise<boo
     ;(init as RequestInit & { targetAddressSpace?: string }).targetAddressSpace = 'local'
     const r = await fetch(`${base}/drawer`, init)
     const data = (await r.json().catch(() => null)) as { success?: boolean } | null
-    return r.ok && data?.success === true
+    if (r.ok && data?.success === true) return true
   } catch {
-    return false
+    /* mislukt → Android Kiosk fallback hieronder */
   } finally {
     clearTimeout(timer)
   }
+  if (tryDispatchVysionKioskDrawer()) return true
+  return false
 }
