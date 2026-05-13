@@ -45,6 +45,92 @@ export type VysionPrintAgentBody = {
   receiptMode?: 'kassa' | 'keuken'
 }
 
+/** Zelfde JSON als POST /print — Android-app (PrintBridgeActivity) verwacht identieke structuur. */
+function buildAgentRequestPayload(body: VysionPrintAgentBody) {
+  return {
+    winkelnaam: body.winkelnaam ?? body.storeName,
+    storeName: body.storeName ?? body.winkelnaam,
+    bonInhoud: body.bonInhoud ?? body.receiptText ?? '',
+    receiptText: body.receiptText ?? body.bonInhoud ?? '',
+    orderData: body.orderData,
+    businessInfo: body.businessInfo,
+    copies: body.copies,
+    openDrawer: body.openDrawer === true,
+    receiptMode: body.receiptMode || 'kassa',
+  }
+}
+
+function isAndroidUserAgent(): boolean {
+  if (typeof navigator === 'undefined') return false
+  return /Android/i.test(navigator.userAgent)
+}
+
+/** UTF-8 → Base64 zoals Android Base64.DEFAULT (standaard alphabet, geen regelbreuken). */
+function utf8ToBase64Json(utf8Json: string): string {
+  if (typeof btoa === 'undefined') return ''
+  try {
+    return btoa(unescape(encodeURIComponent(utf8Json)))
+  } catch {
+    return ''
+  }
+}
+
+/**
+ * Chrome op Android blokkeert vaak fetch naar http://127.0.0.1. De Vysion Kiosk-app registreert
+ * vysionkiosk:// — zelfde payload als de Windows-agent, geen wijziging aan apps/vysion-print-agent.
+ */
+function tryVysionKioskPrintBridge(body: VysionPrintAgentBody): boolean {
+  if (typeof document === 'undefined' || !isAndroidUserAgent()) return false
+  const payload = buildAgentRequestPayload(body)
+  let json: string
+  try {
+    json = JSON.stringify(payload)
+  } catch {
+    return false
+  }
+  const d = utf8ToBase64Json(json)
+  if (!d) return false
+  const url = `vysionkiosk://print?d=${encodeURIComponent(d)}`
+  try {
+    const iframe = document.createElement('iframe')
+    iframe.style.display = 'none'
+    iframe.style.width = '0'
+    iframe.style.height = '0'
+    iframe.src = url
+    document.body.appendChild(iframe)
+    window.setTimeout(() => {
+      try {
+        document.body.removeChild(iframe)
+      } catch {
+        /* ignore */
+      }
+    }, 2500)
+  } catch {
+    return false
+  }
+  return true
+}
+
+function tryVysionKioskDrawerBridge(): boolean {
+  if (typeof document === 'undefined' || !isAndroidUserAgent()) return false
+  try {
+    const iframe = document.createElement('iframe')
+    iframe.style.display = 'none'
+    iframe.src = 'vysionkiosk://drawer'
+    document.body.appendChild(iframe)
+    window.setTimeout(() => {
+      try {
+        document.body.removeChild(iframe)
+      } catch {
+        /* ignore */
+      }
+    }, 2500)
+  } catch {
+    return false
+  }
+  return true
+}
+
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
@@ -60,17 +146,7 @@ async function postPrintOnce(
     const init: RequestInit = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        winkelnaam: body.winkelnaam ?? body.storeName,
-        storeName: body.storeName ?? body.winkelnaam,
-        bonInhoud: body.bonInhoud ?? body.receiptText ?? '',
-        receiptText: body.receiptText ?? body.bonInhoud ?? '',
-        orderData: body.orderData,
-        businessInfo: body.businessInfo,
-        copies: body.copies,
-        openDrawer: body.openDrawer === true,
-        receiptMode: body.receiptMode || 'kassa',
-      }),
+      body: JSON.stringify(buildAgentRequestPayload(body)),
       mode: 'cors',
       credentials: 'omit',
       signal: controller.signal,
@@ -99,6 +175,8 @@ export async function sendToVysionPrintAgent(
     if (await postPrintOnce(body, base)) return true
     if (i < attempts - 1) await sleep(gapMs)
   }
+  /** Windows-agent ongewijzigd: fetch blijft het primaire pad. Alleen als dat na retries faalt: Android Kiosk-bridge. */
+  if (tryVysionKioskPrintBridge(body)) return true
   return false
 }
 
@@ -122,8 +200,11 @@ export async function openCashDrawer(origin = DEFAULT_AGENT_ORIGIN): Promise<boo
     ;(init as RequestInit & { targetAddressSpace?: string }).targetAddressSpace = 'local'
     const r = await fetch(`${base}/drawer`, init)
     const data = (await r.json().catch(() => null)) as { success?: boolean } | null
-    return r.ok && data?.success === true
+    if (r.ok && data?.success === true) return true
+    if (tryVysionKioskDrawerBridge()) return true
+    return false
   } catch {
+    if (tryVysionKioskDrawerBridge()) return true
     return false
   } finally {
     clearTimeout(timer)
