@@ -281,7 +281,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     const requestedDateTime = order.scheduled_date
       ? `${new Date(order.scheduled_date).toLocaleDateString('nl-BE')}${order.scheduled_time ? ' ' + order.scheduled_time : ''}`
       : ''
-    const ok = await sendToVysionPrintAgent({
+    const printResult = await sendToVysionPrintAgent({
       winkelnaam: business?.business_name || '',
       bonInhoud: '',
       copies: 1,
@@ -312,7 +312,12 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
         vatNumber: (business as any)?.btw_number ?? undefined,
       },
     })
-    if (!ok) browserPrintOrder(order)
+    if (printResult.ok) return
+
+    window.alert(
+      `${t('kassaApp.printAgentFailedDebugTitle')}\n\n${printResult.error}\n\n${t('kassaApp.printAgentFailedDebugFooter')}`,
+    )
+    browserPrintOrder(order)
   }
 
   function browserPrintOrder(order: Order) {

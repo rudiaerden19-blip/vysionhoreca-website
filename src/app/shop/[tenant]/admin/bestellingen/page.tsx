@@ -656,7 +656,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         ? it.options.map((o: any) => ({ name: String(o.name || ''), price: Number(o.price || 0) }))
         : [],
     }))
-    const agentOk = await sendToVysionPrintAgent({
+    const printResult = await sendToVysionPrintAgent({
       winkelnaam: tenantSettings?.business_name || 'Horecazaak',
       bonInhoud: '',
       copies: 1,
@@ -690,7 +690,11 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         vatRate: btwPercentage,
       },
     })
-    if (agentOk) return
+    if (printResult.ok) return
+
+    alert(
+      `${t('kassaApp.printAgentFailedDebugTitle')}\n\n${printResult.error}\n\n${t('kassaApp.printAgentFailedDebugFooter')}`,
+    )
 
     // 2) Fallback: HTML browser-print
     const printWindow = window.open('', '_blank', 'width=400,height=800')

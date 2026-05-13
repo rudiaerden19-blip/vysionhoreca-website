@@ -3726,6 +3726,8 @@
     "printAgentFallbackModalBody": "The register did not get a successful response from the Print Agent on this PC (127.0.0.1:9742). A fallback opens next: Windows’ standard Print dialog. That route is NOT a proper ESC/POS receipt like the agent sends — on an Epson thermal printer the result can look tiny or garbled. Fix the agent first (tray → Settings → correct Epson printer → Save → “Test receipt”). Only use Continue as an emergency workaround.",
     "printAgentFallbackModalDownloadLink": "Print Agent download page (Windows)",
     "printAgentFallbackModalContinue": "Open receipt anyway (Windows print fallback)",
+    "printAgentFailedDebugTitle": "Local printer print failed",
+    "printAgentFailedDebugFooter": "Tip: on the tablet — open Vysion Kiosk, grant USB, run test receipt. On PC — Print Agent in the system tray. Make sure this site loads the latest version (clear cache if needed).",
     "remove": "Remove",
     "parkToTable": "Send to table {number} · {zone}",
     "checkout": "Pay",

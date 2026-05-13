@@ -93,19 +93,26 @@ function openAndroidKioskUrl(url: string): boolean {
  * Chrome op Android blokkeert vaak fetch naar http://127.0.0.1. De Vysion Kiosk-app registreert
  * vysionkiosk:// — zelfde payload als de Windows Print Agent (geen wijziging in apps/vysion-print-agent).
  */
-function tryVysionKioskPrintBridge(body: VysionPrintAgentBody): boolean {
-  if (typeof document === 'undefined' || !isAndroidUserAgent()) return false
+function tryVysionKioskPrintBridge(body: VysionPrintAgentBody): { ok: boolean; reason?: string } {
+  if (typeof document === 'undefined') return { ok: false, reason: 'Geen document (SSR).' }
+  if (!isAndroidUserAgent()) return { ok: false, reason: 'Geen Android — overslaan van vysionkiosk://.' }
   const payload = buildAgentRequestPayload(body)
   let json: string
   try {
     json = JSON.stringify(payload)
-  } catch {
-    return false
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e)
+    return { ok: false, reason: `JSON.stringify mislukt: ${msg}` }
   }
   const d = utf8ToBase64Json(json)
-  if (!d) return false
-  const url = `vysionkiosk://print?d=${encodeURIComponent(d)}`
-  return openAndroidKioskUrl(url)
+  if (!d) return { ok: false, reason: 'Base64 mislukt (boninhoud te groot of speciale tekens).' }
+  const enc = encodeURIComponent(d)
+  if (enc.length > 750_000) {
+    return { ok: false, reason: `URL te lang (${enc.length} tekens); bon moet korter of agent via USB PC.` }
+  }
+  const url = `vysionkiosk://print?d=${enc}`
+  if (!openAndroidKioskUrl(url)) return { ok: false, reason: 'location.assign geweigerd of gefaald.' }
+  return { ok: true }
 }
 
 function tryVysionKioskDrawerBridge(): boolean {
@@ -120,10 +127,11 @@ function sleep(ms: number): Promise<void> {
 async function postPrintOnce(
   body: VysionPrintAgentBody,
   origin: string
-): Promise<boolean> {
+): Promise<{ ok: boolean; detail: string }> {
   /** Hard timeout zodat een hangende agent de UI niet 30s vastzet. */
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), 6000)
+  const url = `${origin.replace(/\/$/, '')}/print`
   try {
     const init: RequestInit = {
       method: 'POST',
@@ -135,20 +143,46 @@ async function postPrintOnce(
     }
     ;(init as RequestInit & { targetAddressSpace?: string }).targetAddressSpace = 'local'
 
-    const r = await fetch(`${origin.replace(/\/$/, '')}/print`, init)
-    const data = (await r.json().catch(() => null)) as { success?: boolean } | null
-    return r.ok && data?.success === true
-  } catch {
-    return false
+    const r = await fetch(url, init)
+    const text = await r.text()
+    let data: { success?: boolean; error?: string } | null = null
+    try {
+      data = text ? (JSON.parse(text) as { success?: boolean; error?: string }) : null
+    } catch {
+      data = null
+    }
+    if (r.ok && data?.success === true) return { ok: true, detail: '' }
+    const agentErr = data?.error != null ? String(data.error) : ''
+    const snippet = (text || '').slice(0, 280).trim() || '(lege response)'
+    return {
+      ok: false,
+      detail: `POST ${url} → HTTP ${r.status} ${r.statusText}${agentErr ? `. Agent: ${agentErr}` : ''}. Body: ${snippet}`,
+    }
+  } catch (e) {
+    const name = e instanceof Error ? e.name : 'Error'
+    const msg = e instanceof Error ? e.message : String(e)
+    if (name === 'AbortError') {
+      return {
+        ok: false,
+        detail: `Timeout 6s naar ${url}. Start de Print Agent (Windows) of Vysion printdienst (tablet), of controleer firewall.`,
+      }
+    }
+    return {
+      ok: false,
+      detail: `${name}: ${msg} (geen verbinding met 127.0.0.1:9742 — typisch op Android/Chrome of agent uit).`,
+    }
   } finally {
     clearTimeout(timer)
   }
 }
 
+/** Resultaat voor UI (alert) bij mislukte bon. */
+export type VysionPrintAgentResult = { ok: true } | { ok: false; error: string }
+
 export async function sendToVysionPrintAgent(
   body: VysionPrintAgentBody,
   origin = DEFAULT_AGENT_ORIGIN
-): Promise<boolean> {
+): Promise<VysionPrintAgentResult> {
   const base = origin.replace(/\/$/, '')
   /**
    * Android: localhost faalt snel; weinig retries zodat de vysionkiosk-bridge niet pas na tientallen
@@ -157,13 +191,37 @@ export async function sendToVysionPrintAgent(
   const android = isAndroidUserAgent()
   const attempts = android ? 1 : 5
   const gapMs = android ? 0 : 400
+  let lastDetail = 'Geen poging uitgevoerd.'
   for (let i = 0; i < attempts; i++) {
-    if (await postPrintOnce(body, base)) return true
+    const r = await postPrintOnce(body, base)
+    if (r.ok) return { ok: true }
+    lastDetail = r.detail
     if (i < attempts - 1) await sleep(gapMs)
   }
-  /** Fetch gefaald: op Android direct app-bridge (zelfde JSON als Windows POST). */
-  if (tryVysionKioskPrintBridge(body)) return true
-  return false
+
+  /** Fetch gefaald: op Android app-bridge (zelfde JSON als Windows POST). */
+  const bridge = tryVysionKioskPrintBridge(body)
+  if (bridge.ok) return { ok: true }
+
+  const parts = [
+    `Lokaal printen naar 127.0.0.1:9742 is mislukt.`,
+    ``,
+    `Laatste fout:`,
+    lastDetail,
+  ]
+  if (android) {
+    parts.push(
+      ``,
+      `Android-bridge (vysionkiosk://): ${bridge.reason ?? 'niet geprobeerd of geweigerd door browser.'}`,
+      `Installeer/start Vysion Kiosk en probeer opnieuw.`,
+    )
+  } else {
+    parts.push(
+      ``,
+      `Op deze PC: controleer Print Agent bij de klok (groene status) en testprint.`,
+    )
+  }
+  return { ok: false, error: parts.join('\n') }
 }
 
 /**

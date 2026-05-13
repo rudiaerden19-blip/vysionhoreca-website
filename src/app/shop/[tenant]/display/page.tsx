@@ -712,7 +712,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     const vatRate = (business as any)?.btw_percentage ?? 6
     const tax = total > 0 ? total - total / (1 + vatRate / 100) : 0
 
-    const ok = await sendToVysionPrintAgent({
+    const printResult = await sendToVysionPrintAgent({
       winkelnaam: business?.business_name || '',
       bonInhoud: '',
       copies: 1,
@@ -746,7 +746,12 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
         vatRate,
       },
     })
-    if (!ok) browserPrint(order, type)
+    if (printResult.ok) return
+
+    window.alert(
+      `${t('kassaApp.printAgentFailedDebugTitle')}\n\n${printResult.error}\n\n${t('kassaApp.printAgentFailedDebugFooter')}`,
+    )
+    browserPrint(order, type)
   }
 
   /** Kaartkop + modal header: donkerblauw, witte tekst (zelfde op alle tenants) */

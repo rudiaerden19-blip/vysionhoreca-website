@@ -2376,7 +2376,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const isCash =
       !isDraft && ['CASH', 'cash', 'CONTANT', 'contant'].includes(String(order.paymentMethod || ''))
 
-    const agentOk = await sendToVysionPrintAgent({
+    const printResult = await sendToVysionPrintAgent({
       winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
       bonInhoud: bonLines.join('\n'),
       copies: 2,
@@ -2408,8 +2408,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         vatRate: tenantInfo?.btw_percentage ?? 6,
       },
     })
-    if (agentOk) return
+    if (printResult.ok) return
 
+    window.alert(
+      `${t('kassaApp.printAgentFailedDebugTitle')}\n\n${printResult.error}\n\n${t('kassaApp.printAgentFailedDebugFooter')}`,
+    )
     setPrintAgentFallbackHtml(html)
   }
 
