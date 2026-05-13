@@ -76,8 +76,22 @@ function utf8ToBase64Json(utf8Json: string): string {
 }
 
 /**
+ * Chrome Android opent custom schemes betrouwbaarder via top-level navigatie dan via verborgen iframe.
+ * De pagina verlaat even de kassa — met Terug in Chrome kom je terug (eventueel opnieuw inloggen).
+ */
+function openAndroidKioskUrl(url: string): boolean {
+  if (typeof window === 'undefined') return false
+  try {
+    window.location.assign(url)
+    return true
+  } catch {
+    return false
+  }
+}
+
+/**
  * Chrome op Android blokkeert vaak fetch naar http://127.0.0.1. De Vysion Kiosk-app registreert
- * vysionkiosk:// — zelfde payload als de Windows-agent, geen wijziging aan apps/vysion-print-agent.
+ * vysionkiosk:// — zelfde payload als de Windows Print Agent (geen wijziging in apps/vysion-print-agent).
  */
 function tryVysionKioskPrintBridge(body: VysionPrintAgentBody): boolean {
   if (typeof document === 'undefined' || !isAndroidUserAgent()) return false
@@ -91,44 +105,12 @@ function tryVysionKioskPrintBridge(body: VysionPrintAgentBody): boolean {
   const d = utf8ToBase64Json(json)
   if (!d) return false
   const url = `vysionkiosk://print?d=${encodeURIComponent(d)}`
-  try {
-    const iframe = document.createElement('iframe')
-    iframe.style.display = 'none'
-    iframe.style.width = '0'
-    iframe.style.height = '0'
-    iframe.src = url
-    document.body.appendChild(iframe)
-    window.setTimeout(() => {
-      try {
-        document.body.removeChild(iframe)
-      } catch {
-        /* ignore */
-      }
-    }, 2500)
-  } catch {
-    return false
-  }
-  return true
+  return openAndroidKioskUrl(url)
 }
 
 function tryVysionKioskDrawerBridge(): boolean {
   if (typeof document === 'undefined' || !isAndroidUserAgent()) return false
-  try {
-    const iframe = document.createElement('iframe')
-    iframe.style.display = 'none'
-    iframe.src = 'vysionkiosk://drawer'
-    document.body.appendChild(iframe)
-    window.setTimeout(() => {
-      try {
-        document.body.removeChild(iframe)
-      } catch {
-        /* ignore */
-      }
-    }, 2500)
-  } catch {
-    return false
-  }
-  return true
+  return openAndroidKioskUrl('vysionkiosk://drawer')
 }
 
 function sleep(ms: number): Promise<void> {
@@ -168,14 +150,18 @@ export async function sendToVysionPrintAgent(
   origin = DEFAULT_AGENT_ORIGIN
 ): Promise<boolean> {
   const base = origin.replace(/\/$/, '')
-  /** Agent kan net opstarten na login; korte retries voorkomen onnodige HTML-bon. */
-  const attempts = 5
-  const gapMs = 400
+  /**
+   * Android: localhost faalt snel; weinig retries zodat de vysionkiosk-bridge niet pas na tientallen
+   * seconden komt (user denkt dan dat print “dood” is). Windows: meer retries tegen trage agent-start.
+   */
+  const android = isAndroidUserAgent()
+  const attempts = android ? 1 : 5
+  const gapMs = android ? 0 : 400
   for (let i = 0; i < attempts; i++) {
     if (await postPrintOnce(body, base)) return true
     if (i < attempts - 1) await sleep(gapMs)
   }
-  /** Windows-agent ongewijzigd: fetch blijft het primaire pad. Alleen als dat na retries faalt: Android Kiosk-bridge. */
+  /** Fetch gefaald: op Android direct app-bridge (zelfde JSON als Windows POST). */
   if (tryVysionKioskPrintBridge(body)) return true
   return false
 }
