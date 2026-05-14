@@ -5380,8 +5380,6 @@
     "kassaAppearanceLight": "Light",
     "kassaAppearanceDarkAria": "Use professional dark mode for the register on this device (this business)",
     "kassaAppearanceLightAria": "Use light mode for the register on this device (this business)",
-    "kassaHardwareLite": "No photos",
-    "kassaHardwareLiteAria": "Lightweight register for slower devices: no photo tiles, less CPU/GPU work (this device only). Tip: bookmark with ?kassa_lite=1",
     "back": "Back",
     "menu": "Menu",
     "overview": "Overview",

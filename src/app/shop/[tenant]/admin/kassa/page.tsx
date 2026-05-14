@@ -157,9 +157,6 @@ const KASSA_PRODUCT_GRID_EAGER_TILE_COUNT = 16
 /** Scroll vs tik op embedded touch/WebView (o.a. Elo): kleine beweging telt nog als tik */
 const KASSA_TILE_TAP_SLOP_PX = 18
 
-/** localStorage: tragere terminals — fototegels uit, eenvoudige DOM */
-const KASSA_HARDWARE_LITE_LS = 'vysion_kassa_hardware_lite'
-
 function stoolsFromFloorDecorPayload(data: unknown): { stoolNumber: string; segmentId: string }[] {
   const rawItems = Array.isArray(data)
     ? data
@@ -313,8 +310,6 @@ type KassaCategoryTileButtonProps = {
   imageUrl?: string
   appearanceDark: boolean
   ui: Pick<KassaRegisterUiTheme, 'productTileSolidBg' | 'productTileFooterBar' | 'productFooterTextDark'>
-  /** Geen foto’s/shaduwen — voor tragere embedded browsers (o.a. Elo) */
-  hardwareLite: boolean
 }
 
 const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
@@ -322,33 +317,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
   imageUrl,
   appearanceDark,
   ui,
-  hardwareLite,
 }: KassaCategoryTileButtonProps) {
-  if (hardwareLite) {
-    return (
-      <button
-        type="button"
-        data-kassa-category-id={category.id != null ? String(category.id) : undefined}
-        className={`touch-manipulation select-none flex h-full min-h-0 w-full min-w-0 flex-col items-center justify-center gap-1 overflow-hidden rounded-lg border px-2 py-2 text-center active:brightness-95 ${
-          appearanceDark ? 'border-zinc-600 bg-[#151c28]' : 'border-neutral-300 bg-neutral-50'
-        }`}
-      >
-        {category.icon ? (
-          <span className="text-3xl leading-none sm:text-4xl" aria-hidden>
-            {category.icon}
-          </span>
-        ) : null}
-        <span
-          className={`line-clamp-4 text-sm font-black leading-tight sm:text-base ${
-            appearanceDark ? 'text-zinc-100' : 'text-neutral-900'
-          }`}
-        >
-          {category.name}
-        </span>
-      </button>
-    )
-  }
-
   return (
     <button
       type="button"
@@ -410,7 +379,6 @@ type KassaProductTileButtonProps = {
   ui: KassaRegisterUiTheme
   /** Eerste viewport-tegels eager zodat zwakke terminals niet op lazy-decode wachten */
   imageLoading: 'eager' | 'lazy'
-  hardwareLite: boolean
 }
 
 const KassaProductTileButton = memo(function KassaProductTileButton({
@@ -421,37 +389,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
   appearanceDark,
   ui,
   imageLoading,
-  hardwareLite,
 }: KassaProductTileButtonProps) {
-  if (hardwareLite) {
-    return (
-      <button
-        type="button"
-        data-kassa-product-id={product.id != null ? String(product.id) : undefined}
-        className={`touch-manipulation select-none relative flex h-full min-h-0 w-full min-w-0 flex-col justify-between overflow-hidden rounded-lg border p-2 text-left active:brightness-95 ${
-          appearanceDark ? 'border-zinc-600 bg-[#151c28]' : 'border-neutral-300 bg-neutral-50'
-        }`}
-      >
-        <p className={`line-clamp-4 text-sm font-black leading-snug sm:text-base ${ui.productFooterTextDark}`}>
-          {product.name}
-        </p>
-        <p className={`mt-1 text-lg font-black tabular-nums sm:text-xl ${ui.priceAccentClass}`}>
-          €{product.price.toFixed(2)}
-        </p>
-        {inCart > 0 && (
-          <div className="absolute top-1 right-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-emerald-500 px-1 text-[10px] font-bold text-white">
-            {inCart}
-          </div>
-        )}
-        {hasOpts && (
-          <div className="absolute top-1 left-1 rounded bg-amber-400 px-1 py-0.5 text-[10px] font-bold text-white">
-            ⚙️
-          </div>
-        )}
-      </button>
-    )
-  }
-
   return (
     <button
       type="button"
@@ -525,48 +463,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const offlineQueueKey = offlineOrdersQueueStorageKey(tenant)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [kassaHardwareLite, setKassaHardwareLite] = useState(false)
-
-  useLayoutEffect(() => {
-    const v = searchParams.get('kassa_lite')
-    if (v === '1' || v === 'true') {
-      setKassaHardwareLite(true)
-      try {
-        localStorage.setItem(KASSA_HARDWARE_LITE_LS, '1')
-      } catch {
-        /* ignore */
-      }
-      return
-    }
-    if (v === '0' || v === 'false') {
-      setKassaHardwareLite(false)
-      try {
-        localStorage.removeItem(KASSA_HARDWARE_LITE_LS)
-      } catch {
-        /* ignore */
-      }
-      return
-    }
-    try {
-      setKassaHardwareLite(localStorage.getItem(KASSA_HARDWARE_LITE_LS) === '1')
-    } catch {
-      setKassaHardwareLite(false)
-    }
-  }, [searchParams])
-
-  const toggleKassaHardwareLite = useCallback(() => {
-    setKassaHardwareLite((prev) => {
-      const next = !prev
-      try {
-        if (next) localStorage.setItem(KASSA_HARDWARE_LITE_LS, '1')
-        else localStorage.removeItem(KASSA_HARDWARE_LITE_LS)
-      } catch {
-        /* ignore */
-      }
-      return next
-    })
-  }, [])
-
   const demoFromUrl =
     searchParams.get('demo') === 'bekijk' || searchParams.get('alleen_lezen') === '1'
   const [demoFromMarketingSession, setDemoFromMarketingSession] = useState(false)
@@ -584,13 +480,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     else html.classList.remove('kassa-dark-appearance')
     return () => html.classList.remove('kassa-dark-appearance')
   }, [kassaAppearanceDark])
-
-  useEffect(() => {
-    const html = document.documentElement
-    if (kassaHardwareLite) html.classList.add('vysion-kassa-lite')
-    else html.classList.remove('vysion-kassa-lite')
-    return () => html.classList.remove('vysion-kassa-lite')
-  }, [kassaHardwareLite])
 
   const baseUrl = `/shop/${tenant}/admin`
   const { t, locale, setLocale, locales, localeNames } = useLanguage()
@@ -1848,7 +1737,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   // Zorg dat product- en logo-afbeeldingen in de SW image-cache zitten (offline zichtbaar)
   useEffect(() => {
-    if (kassaHardwareLite) return
     if (products.length === 0) return
     if (typeof navigator !== 'undefined' && !navigator.onLine) return
     const urls: string[] = []
@@ -1857,7 +1745,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     if (tenantInfo?.logo_url) urls.push(tenantInfo.logo_url)
     prefetchProductImageUrls(urls).catch(() => {})
-  }, [products, tenantInfo?.logo_url, kassaHardwareLite])
+  }, [products, tenantInfo?.logo_url])
 
   // Tab terug naar voorgrond (Edge/Windows): menu verversen zonder heel het rooster te verbergen —
   // forceren van menuLoading gaf ±1s "Laden…" bij elke tab-switch.
@@ -3430,24 +3318,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
           <button
             type="button"
-            onClick={toggleKassaHardwareLite}
-            className={`relative z-[40] inline-flex touch-manipulation shrink-0 items-center gap-1 whitespace-nowrap rounded-lg px-1.5 py-1 font-bold text-white transition-colors sm:px-2 sm:py-1.5 ${
-              kassaHardwareLite
-                ? 'bg-emerald-600 hover:bg-emerald-500'
-                : 'bg-white/10 hover:bg-white/20'
-            }`}
-            title={t('adminLayout.kassaHardwareLiteAria')}
-            aria-pressed={kassaHardwareLite}
-            aria-label={t('adminLayout.kassaHardwareLiteAria')}
-          >
-            <span className="text-sm leading-none sm:text-base" aria-hidden>
-              {kassaHardwareLite ? '⚡' : '🪶'}
-            </span>
-            <span className="text-[11px] leading-snug sm:text-xs">{t('adminLayout.kassaHardwareLite')}</span>
-          </button>
-
-          <button
-            type="button"
             onClick={() => toggleKassaAppearance()}
             className="relative z-[40] inline-flex touch-manipulation shrink-0 items-center gap-1 whitespace-nowrap rounded-lg bg-white/10 px-1.5 py-1 font-bold text-white transition-colors hover:bg-white/20 sm:px-2 sm:py-1.5"
             title={
@@ -3577,7 +3447,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                         imageUrl={catImage}
                         appearanceDark={kassaAppearanceDark}
                         ui={ui}
-                        hardwareLite={kassaHardwareLite}
                       />
                     )
                   })}
@@ -3618,7 +3487,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           imageLoading={
                             index < KASSA_PRODUCT_GRID_EAGER_TILE_COUNT ? 'eager' : 'lazy'
                           }
-                          hardwareLite={kassaHardwareLite}
                         />
                       )
                     })}
@@ -3960,7 +3828,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 return (
                   <div key={item.cartKey} className={ui.cartRowBg}>
                     {/* Productfoto */}
-                    {item.product.image_url && !kassaHardwareLite ? (
+                    {item.product.image_url ? (
                       <img src={item.product.image_url} alt={item.product.name}
                         decoding="async"
                         loading="lazy"
