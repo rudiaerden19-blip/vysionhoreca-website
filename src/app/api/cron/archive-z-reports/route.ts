@@ -3,7 +3,6 @@ import { requireCronSecret } from '@/lib/cron-auth'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
 import {
-  aggregateOrderTotalsKassaVsOnline,
   distributeOrderPaymentForZRaport,
   getDateBoundsForBelgium,
   getBelgiumDateString,
@@ -48,7 +47,7 @@ export async function GET(request: NextRequest) {
 
     const { data: allOrders, error: ordersError } = await supabase
       .from('orders')
-      .select('id, tenant_slug, total, payment_method, payment_split_cash, payment_split_card, order_type')
+      .select('id, tenant_slug, total, payment_method, payment_split_cash, payment_split_card')
       .gte('created_at', startUTC)
       .lte('created_at', endUTC)
       .eq('status', 'completed')
@@ -135,13 +134,6 @@ export async function GET(request: NextRequest) {
           onlinePayments += d.online
         })
 
-        const channel = aggregateOrderTotalsKassaVsOnline(
-          orders.map((o) => ({
-            order_type: String(o.order_type ?? ''),
-            total: Number(o.total) || 0,
-          })),
-        )
-
         const taxRate = btwPercentage / 100
         const subtotal = total / (1 + taxRate)
         const tax = total - subtotal
@@ -173,10 +165,6 @@ export async function GET(request: NextRequest) {
           cash_payments: cashPayments,
           card_payments: cardPayments,
           online_payments: onlinePayments,
-          kassa_sales_total: channel.kassaSalesTotal,
-          online_sales_total: channel.onlineSalesTotal,
-          kassa_order_count: channel.kassaOrderCount,
-          online_order_count: channel.onlineOrderCount,
           btw_percentage: btwPercentage,
           business_name: settings?.business_name,
           business_address: settings?.address,

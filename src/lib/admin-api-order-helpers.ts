@@ -75,47 +75,6 @@ export function isWebshopOrder(order: Pick<Order, 'order_type'>): boolean {
 }
 
 /**
- * Omzet splitsen POS-kassa vs webshop — Z-rapport, rapporten-tab, exports.
- * Zelfde bron als dashboard (`isKassaPosOrder`).
- */
-export function aggregateOrderTotalsKassaVsOnline<T extends Pick<Order, 'order_type' | 'total'>>(
-  orders: T[],
-): {
-  kassaSalesTotal: number
-  onlineSalesTotal: number
-  kassaOrderCount: number
-  onlineOrderCount: number
-} {
-  let kassaSum = 0
-  let onlineSum = 0
-  let kassaOrderCount = 0
-  let onlineOrderCount = 0
-  for (const o of orders) {
-    const tot = Number(o.total) || 0
-    if (isKassaPosOrder(o)) {
-      kassaSum += tot
-      kassaOrderCount++
-    } else {
-      onlineSum += tot
-      onlineOrderCount++
-    }
-  }
-  const grand = Math.round((kassaSum + onlineSum) * 100) / 100
-  let kassaSalesTotal = Math.round(kassaSum * 100) / 100
-  let onlineSalesTotal = Math.round(onlineSum * 100) / 100
-  const splitSum = Math.round((kassaSalesTotal + onlineSalesTotal) * 100) / 100
-  const drift = Math.round((grand - splitSum) * 100) / 100
-  if (drift !== 0) {
-    if (kassaSalesTotal >= onlineSalesTotal) {
-      kassaSalesTotal = Math.round((kassaSalesTotal + drift) * 100) / 100
-    } else {
-      onlineSalesTotal = Math.round((onlineSalesTotal + drift) * 100) / 100
-    }
-  }
-  return { kassaSalesTotal, onlineSalesTotal, kassaOrderCount, onlineOrderCount }
-}
-
-/**
  * Orders met status `new` die van het publieke web / groepsmodule komen.
  * Kassa-POS schrijft bij verkoop direct `confirmed` — die horen dit alarm niet te triggeren.
  * Let op: `.toLowerCase()` alleen is onvoldoende (`DELIVERY` zou `delivery` worden); daarom eerst POS uitsluiten.

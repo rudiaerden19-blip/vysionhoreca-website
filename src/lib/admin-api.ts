@@ -23,7 +23,6 @@ export {
 }
 
 import {
-  aggregateOrderTotalsKassaVsOnline,
   distributeOrderPaymentForZRaport,
   isKassaPosOrder,
   isWebshopOrder,
@@ -36,7 +35,6 @@ import {
 
 export type { Order, OrderItem, OrderPaymentBucket }
 export {
-  aggregateOrderTotalsKassaVsOnline,
   distributeOrderPaymentForZRaport,
   isKassaPosOrder,
   isWebshopOrder,

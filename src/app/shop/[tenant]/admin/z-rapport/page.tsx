@@ -6,7 +6,6 @@ import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
 import { authFetch } from '@/lib/auth-headers'
 import {
-  aggregateOrderTotalsKassaVsOnline,
   distributeOrderPaymentForZRaport,
   fetchAllTenantOrdersInCreatedAtRange,
   getTenantSettings,
@@ -52,12 +51,6 @@ interface DailyStats {
   cashPayments: number
   onlinePayments: number
   cardPayments: number
-  /** Omzet fysieke kassa-POS (DINE_IN / TAKEAWAY / DELIVERY); met onlineSalesTotal samen = total. */
-  kassaSalesTotal: number
-  /** Omzet webshop / andere kanalen */
-  onlineSalesTotal: number
-  kassaOrderCount: number
-  onlineOrderCount: number
   orderIds: string[]
 }
 
@@ -76,10 +69,6 @@ interface SavedReport {
   manual_online?: number | null
   manual_total?: number | null
   kassa_saved_at?: string | null
-  kassa_sales_total?: number | null
-  online_sales_total?: number | null
-  kassa_order_count?: number | null
-  online_order_count?: number | null
 }
 
 export default function ZRapportPage({ params }: { params: { tenant: string } }) {
@@ -165,8 +154,6 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         onlinePayments += d.online
       })
 
-      const channel = aggregateOrderTotalsKassaVsOnline(orders)
-
       const taxRate = btwPercentage / 100
       const subtotal = total / (1 + taxRate)
       const tax = total - subtotal
@@ -182,10 +169,6 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         cashPayments,
         onlinePayments,
         cardPayments,
-        kassaSalesTotal: channel.kassaSalesTotal,
-        onlineSalesTotal: channel.onlineSalesTotal,
-        kassaOrderCount: channel.kassaOrderCount,
-        onlineOrderCount: channel.onlineOrderCount,
         orderIds,
       })
     } else {
@@ -200,10 +183,6 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         cashPayments: 0,
         onlinePayments: 0,
         cardPayments: 0,
-        kassaSalesTotal: 0,
-        onlineSalesTotal: 0,
-        kassaOrderCount: 0,
-        onlineOrderCount: 0,
         orderIds: [],
       })
     }
@@ -217,7 +196,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     const result = await adminDb.select<SavedReport[]>('z_reports', {
       tenantSlug: params.tenant,
       select:
-        'id, report_date, order_count, total, generated_at, order_ids, report_hash, is_closed, closed_at, manual_cash, manual_card, manual_online, manual_total, kassa_saved_at, kassa_sales_total, online_sales_total, kassa_order_count, online_order_count',
+        'id, report_date, order_count, total, generated_at, order_ids, report_hash, is_closed, closed_at, manual_cash, manual_card, manual_online, manual_total, kassa_saved_at',
       order: { column: 'report_date', ascending: false },
       limit: 400,
     })
@@ -258,10 +237,6 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         cash_payments: stats.cashPayments,
         card_payments: stats.cardPayments,
         online_payments: stats.onlinePayments,
-        kassa_sales_total: stats.kassaSalesTotal,
-        online_sales_total: stats.onlineSalesTotal,
-        kassa_order_count: stats.kassaOrderCount,
-        online_order_count: stats.onlineOrderCount,
         btw_percentage: btwPercentage,
         business_name: businessInfo?.business_name,
         business_address: businessInfo?.address,
@@ -312,10 +287,6 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         cash_payments: stats.cashPayments,
         card_payments: stats.cardPayments,
         online_payments: stats.onlinePayments,
-        kassa_sales_total: stats.kassaSalesTotal,
-        online_sales_total: stats.onlineSalesTotal,
-        kassa_order_count: stats.kassaOrderCount,
-        online_order_count: stats.onlineOrderCount,
         btw_percentage: btwPercentage,
         business_name: businessInfo?.business_name,
         business_address: businessInfo?.address,
@@ -362,10 +333,6 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         cash_payments: stats?.cashPayments || 0,
         card_payments: stats?.cardPayments || 0,
         online_payments: stats?.onlinePayments || 0,
-        kassa_sales_total: stats?.kassaSalesTotal ?? 0,
-        online_sales_total: stats?.onlineSalesTotal ?? 0,
-        kassa_order_count: stats?.kassaOrderCount ?? 0,
-        online_order_count: stats?.onlineOrderCount ?? 0,
         btw_percentage: btwPercentage,
         business_name: businessInfo?.business_name,
         business_address: businessInfo?.address,
@@ -420,16 +387,10 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       ${report.manual_online != null ? `<div class="row"><span>Online:</span><span>€${(report.manual_online || 0).toFixed(2)}</span></div>` : ''}
       <div class="row total-row"><span>TOTAAL KASSA:</span><span>€${(report.manual_total || 0).toFixed(2)}</span></div>
       ` : ''}
-      ${report.kassa_sales_total != null && report.online_sales_total != null ? `
-      <div class="section-title">OMZET SYSTEEM (PER KANAAL)</div>
-      <div class="row"><span>Kassa (POS):</span><span>€${(report.kassa_sales_total || 0).toFixed(2)} (${report.kassa_order_count ?? 0} bon)</span></div>
-      <div class="row"><span>Online / webshop:</span><span>€${(report.online_sales_total || 0).toFixed(2)} (${report.online_order_count ?? 0} bon)</span></div>
-      <div class="row total-row"><span>TOTAAL SYSTEEM:</span><span>€${(report.total || 0).toFixed(2)}</span></div>
-      ` : report.order_count > 0 ? `
-      <div class="section-title">OMZET SYSTEEM</div>
-      <div class="row"><span>Bonnen:</span><span>${report.order_count}</span></div>
-      <div class="row total-row"><span>TOTAAL SYSTEEM:</span><span>€${(report.total || 0).toFixed(2)}</span></div>
-      <div class="row" style="font-size:11px;opacity:0.8;text-align:center;"><p>(Splitsing kassa/webshop niet beschikbaar — rapport opnieuw opslaan)</p></div>
+      ${report.order_count > 0 ? `
+      <div class="section-title">ONLINE BESTELLINGEN</div>
+      <div class="row"><span>Aantal:</span><span>${report.order_count}</span></div>
+      <div class="row total-row"><span>TOTAAL ONLINE:</span><span>€${(report.total || 0).toFixed(2)}</span></div>
       ` : ''}
       <div class="row total-row" style="font-size:18px;margin-top:16px;"><span>GRAND TOTAL:</span><span>€${((report.manual_total || 0) + (report.total || 0)).toFixed(2)}</span></div>
       <div class="footer">
@@ -440,38 +401,22 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     if (w) { w.document.write(html); w.document.close(); setTimeout(() => w.print(), 250) }
   }
 
-  // Archief aggregatie per periode — kassa vs online = zelfde definities als rapporten (`isKassaPosOrder`).
+  // Archief aggregatie per periode
   const getAggregatedReports = () => {
-    if (archivePeriod === 'dag')
-      return savedReports.map((r) => ({
-        label: formatShortDate(r.report_date),
-        total: (r.total || 0) + (r.manual_total || 0),
-        channelOnline: r.online_sales_total ?? null,
-        channelKassa: r.kassa_sales_total ?? null,
-        channelOnlineCount: r.online_order_count ?? null,
-        channelKassaCount: r.kassa_order_count ?? null,
-        manualTotal: r.manual_total ?? null,
-        count: r.order_count || 0,
-        isClosed: r.is_closed,
-        reportDate: r.report_date,
-        report: r,
-      }))
+    if (archivePeriod === 'dag') return savedReports.map(r => ({
+      label: formatShortDate(r.report_date),
+      total: (r.total || 0) + (r.manual_total || 0),
+      onlineTotal: r.total || 0,
+      kassaTotal: r.manual_total || 0,
+      count: r.order_count || 0,
+      isClosed: r.is_closed,
+      reportDate: r.report_date,
+      report: r,
+    }))
 
-    const groups: Record<
-      string,
-      {
-        label: string
-        total: number
-        channelOnline: number
-        channelKassa: number
-        channelDaysKnown: number
-        channelDaysTotal: number
-        count: number
-        reports: SavedReport[]
-      }
-    > = {}
+    const groups: Record<string, { label: string; total: number; onlineTotal: number; kassaTotal: number; count: number; reports: SavedReport[] }> = {}
 
-    savedReports.forEach((r) => {
+    savedReports.forEach(r => {
       const d = new Date(r.report_date)
       let key = ''
       let label = ''
@@ -487,39 +432,19 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         key = `${d.getFullYear()}`
         label = `${d.getFullYear()}`
       }
-      if (!groups[key])
-        groups[key] = {
-          label,
-          total: 0,
-          channelOnline: 0,
-          channelKassa: 0,
-          channelDaysKnown: 0,
-          channelDaysTotal: 0,
-          count: 0,
-          reports: [],
-        }
-      const g = groups[key]
-      g.total += (r.total || 0) + (r.manual_total || 0)
-      g.channelDaysTotal++
-      const oc = r.online_sales_total
-      const kc = r.kassa_sales_total
-      if (oc != null && kc != null) {
-        g.channelOnline += oc
-        g.channelKassa += kc
-        g.channelDaysKnown++
-      }
-      g.count += r.order_count || 0
-      g.reports.push(r)
+      if (!groups[key]) groups[key] = { label, total: 0, onlineTotal: 0, kassaTotal: 0, count: 0, reports: [] }
+      groups[key].total += (r.total || 0) + (r.manual_total || 0)
+      groups[key].onlineTotal += r.total || 0
+      groups[key].kassaTotal += r.manual_total || 0
+      groups[key].count += r.order_count || 0
+      groups[key].reports.push(r)
     })
 
     return Object.entries(groups).map(([key, g]) => ({
       label: g.label,
       total: g.total,
-      channelOnline: g.channelDaysKnown === g.channelDaysTotal ? g.channelOnline : null,
-      channelKassa: g.channelDaysKnown === g.channelDaysTotal ? g.channelKassa : null,
-      channelOnlineCount: null as number | null,
-      channelKassaCount: null as number | null,
-      manualTotal: null as number | null,
+      onlineTotal: g.onlineTotal,
+      kassaTotal: g.kassaTotal,
       count: g.count,
       isClosed: undefined as boolean | undefined,
       reportDate: key,
@@ -576,7 +501,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           <h1>${businessInfo?.business_name || 'Z-Rapport'}</h1>
           <p>${businessInfo?.address || ''}</p>
           ${businessInfo?.btw_number ? `<p>BTW: ${businessInfo.btw_number}</p>` : ''}
-          <p style="margin-top: 10px; font-weight: bold;">Z-RAPPORT — OMZET</p>
+          <p style="margin-top: 10px; font-weight: bold;">Z-RAPPORT ONLINE VERKOPEN</p>
           <p>${formatDate(selectedDate)}</p>
           ${currentSavedReport?.is_closed ? `<p><span class="closed-badge">✓ AFGESLOTEN</span></p>` : ''}
         </div>
@@ -586,11 +511,6 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           <div class="row"><span>Subtotaal (excl. BTW):</span><span>${formatCurrency(stats.subtotal)}</span></div>
           <div class="row"><span>BTW ${btwPercentage}%:</span><span>${formatCurrency(stats.total - stats.subtotal)}</span></div>
           <div class="row total-row"><span>TOTAAL:</span><span>${formatCurrency(stats.total)}</span></div>
-        </div>
-        <div class="section">
-          <div class="section-title">VERKOOP PER KANAAL</div>
-          <div class="row"><span>Kassa (POS):</span><span>${formatCurrency(stats.kassaSalesTotal)} (${stats.kassaOrderCount} bon)</span></div>
-          <div class="row"><span>Online / webshop:</span><span>${formatCurrency(stats.onlineSalesTotal)} (${stats.onlineOrderCount} bon)</span></div>
         </div>
         <div class="section">
           <div class="section-title">BETALINGEN</div>
@@ -644,10 +564,6 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           cashPayments: stats.cashPayments,
           cardPayments: stats.cardPayments,
           onlinePayments: stats.onlinePayments,
-          kassaSalesTotal: stats.kassaSalesTotal,
-          onlineSalesTotal: stats.onlineSalesTotal,
-          kassaOrderCount: stats.kassaOrderCount,
-          onlineOrderCount: stats.onlineOrderCount,
         })
       })
       if (response.ok) {
@@ -821,7 +737,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
 
             <div className="border-b-2 border-dashed border-gray-300 p-6 text-center">
               <h3 className="text-2xl font-bold text-gray-900">{t('zReport.reportTitle')}</h3>
-              <p className="text-lg text-gray-600">{t('zReport.channelSubtitle')}</p>
+              <p className="text-lg text-gray-600">{t('zReport.onlineSales')}</p>
               <p className="text-gray-500 mt-2">{formatDate(selectedDate)}</p>
               <p className="text-xs text-gray-400 mt-1">Fiscale periode: 00:00u — +1dag 12:00u</p>
               <div className="flex items-center justify-center gap-2 mt-2 flex-wrap">
@@ -874,26 +790,6 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                 <div className="flex justify-between items-center py-4 bg-gray-100 -mx-6 px-6">
                   <span className="text-xl font-bold text-gray-900">{t('zReport.total')}</span>
                   <span className="text-2xl font-bold text-green-600">{formatCurrency(stats.total)}</span>
-                </div>
-
-                <div className="border-t-2 border-dashed border-gray-300 my-4"></div>
-
-                <div className="space-y-2">
-                  <h4 className="font-semibold text-gray-900">{t('zReport.channelSectionTitle')}</h4>
-                  <div className="flex justify-between items-center py-2">
-                    <span className="text-gray-600">{t('zReport.posOmzet')}</span>
-                    <span className="font-medium">
-                      {formatCurrency(stats.kassaSalesTotal)}{' '}
-                      <span className="text-gray-400 text-sm font-normal">({stats.kassaOrderCount} bon)</span>
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center py-2">
-                    <span className="text-gray-600">{t('zReport.onlineOmzet')}</span>
-                    <span className="font-medium">
-                      {formatCurrency(stats.onlineSalesTotal)}{' '}
-                      <span className="text-gray-400 text-sm font-normal">({stats.onlineOrderCount} bon)</span>
-                    </span>
-                  </div>
                 </div>
 
                 <div className="border-t-2 border-dashed border-gray-300 my-4"></div>
@@ -1001,26 +897,8 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                         <span className="text-green-600 font-bold text-sm">{formatCurrency(item.total)}</span>
                       </div>
                       <div className="text-xs text-gray-400 mt-1 space-y-0.5">
-                        {item.channelKassa != null && item.channelOnline != null && (
-                          <>
-                            <div>Kassa (POS): {formatCurrency(item.channelKassa)}{item.channelKassaCount != null ? ` · ${item.channelKassaCount} bon` : ''}</div>
-                            <div>Online: {formatCurrency(item.channelOnline)}{item.channelOnlineCount != null ? ` · ${item.channelOnlineCount} bon` : ''}</div>
-                          </>
-                        )}
-                        {item.channelKassa == null &&
-                          item.channelOnline == null &&
-                          archivePeriod === 'dag' &&
-                          (item.report?.order_count ?? 0) > 0 && (
-                          <div className="text-amber-700 text-xs">Splitsing kassa/online onbekend — rapport opnieuw opslaan.</div>
-                        )}
-                        {item.channelKassa == null &&
-                          item.channelOnline == null &&
-                          archivePeriod !== 'dag' && (
-                          <div className="text-gray-400">Per kanaal: niet alle dagen gesplitst — bekijk per dag</div>
-                        )}
-                        {item.manualTotal != null && item.manualTotal > 0 && (
-                          <div>Handmatig geteld (kas): {formatCurrency(item.manualTotal)}</div>
-                        )}
+                        {item.onlineTotal > 0 && <div>Online: {formatCurrency(item.onlineTotal)}</div>}
+                        {item.kassaTotal > 0 && <div>Kassa: {formatCurrency(item.kassaTotal)}</div>}
                         <div>{item.count} bestellingen</div>
                       </div>
                     </div>
