@@ -1,6 +1,16 @@
 'use client'
 
-import { Suspense, memo, useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } from 'react'
+import {
+  Suspense,
+  memo,
+  useState,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useMemo,
+  useCallback,
+  startTransition,
+} from 'react'
 import dynamic from 'next/dynamic'
 import { flushSync } from 'react-dom'
 import Link from 'next/link'
@@ -287,6 +297,73 @@ const KassaReservationsView = dynamic(() => import('@/components/KassaReservatio
   ),
 })
 
+type KassaCategoryTileButtonProps = {
+  category: MenuCategory
+  imageUrl?: string
+  appearanceDark: boolean
+  ui: Pick<KassaRegisterUiTheme, 'productTileSolidBg' | 'productTileFooterBar' | 'productFooterTextDark'>
+  onPress: (category: MenuCategory) => void
+}
+
+const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
+  category,
+  imageUrl,
+  appearanceDark,
+  ui,
+  onPress,
+}: KassaCategoryTileButtonProps) {
+  return (
+    <button
+      type="button"
+      onClick={() => onPress(category)}
+      className={`touch-manipulation select-none group relative h-full min-h-0 w-full min-w-0 overflow-hidden rounded-xl border shadow-[0_8px_30px_rgba(0,0,0,0.35)] active:brightness-95 ${
+        appearanceDark ? 'border-zinc-600 bg-[#1a2230]' : 'border border-neutral-200/90 bg-neutral-100'
+      }`}
+    >
+      {imageUrl ? (
+        <>
+          <img
+            src={imageUrl}
+            alt={category.name}
+            decoding="async"
+            loading="lazy"
+            className="pointer-events-none absolute inset-0 block h-full min-h-0 w-full select-none object-cover object-center !h-full !w-full !max-w-none"
+          />
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-32 bg-gradient-to-t from-neutral-950/[0.94] via-neutral-950/55 to-transparent sm:h-36"
+            aria-hidden
+          />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2.5 pt-12 sm:px-3 sm:pb-3 sm:pt-14">
+            <div className="flex flex-col items-center gap-1.5 text-center">
+              {category.icon ? (
+                <span className="text-2xl text-amber-200 drop-shadow-[0_2px_4px_rgba(0,0,0,.95)] sm:text-3xl md:text-4xl">
+                  {category.icon}
+                </span>
+              ) : null}
+              <span className="line-clamp-2 text-xl font-black leading-tight tracking-tight text-amber-50 [text-shadow:0_0_1px_rgba(0,0,0,1),0_2px_4px_rgba(0,0,0,.98),0_4px_18px_rgba(0,0,0,.85)] sm:text-2xl md:text-3xl lg:text-4xl">
+                {category.name}
+              </span>
+            </div>
+          </div>
+        </>
+      ) : (
+        <>
+          <div className={`pointer-events-none flex h-full w-full flex-col items-center justify-center gap-3 pt-10 pb-20 ${ui.productTileSolidBg}`}>
+            {category.icon ? (
+              <span className={`text-5xl ${appearanceDark ? 'text-zinc-400' : 'text-neutral-700'}`}>{category.icon}</span>
+            ) : null}
+          </div>
+          <div className={`pointer-events-none absolute inset-x-0 bottom-0 z-10 border-t px-2 pb-2.5 pt-2 sm:px-3 sm:pb-3 sm:pt-2.5 ${ui.productTileFooterBar}`}>
+            <span className={`block text-center text-xl font-black leading-snug sm:text-2xl md:text-3xl ${ui.productFooterTextDark}`}>
+              {category.name}
+            </span>
+          </div>
+        </>
+      )}
+    </button>
+  )
+})
+
 type KassaProductTileButtonProps = {
   product: MenuProduct
   inCart: number
@@ -310,7 +387,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
     <button
       type="button"
       onClick={() => onPress(product)}
-      className={`group relative h-full min-h-0 w-full min-w-0 overflow-hidden rounded-xl text-left active:scale-95 transition-transform ${ui.productTileSolidBg}`}
+      className={`touch-manipulation select-none group relative h-full min-h-0 w-full min-w-0 overflow-hidden rounded-xl text-left active:brightness-95 ${ui.productTileSolidBg}`}
       style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.35)' }}
     >
       {product.image_url ? (
@@ -1758,6 +1835,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     void handleProductClickRef.current(product)
   }, [])
 
+  const handleCategorySelect = useCallback((cat: MenuCategory) => {
+    startTransition(() => setSelectedCategory(cat))
+  }, [])
+
+  const handleCategoryClear = useCallback(() => {
+    startTransition(() => setSelectedCategory(null))
+  }, [])
+
   /** Open opties-modal om toppings/sauzen van een mandregel te wijzigen (alle tenants). */
   const openEditCartItem = async (item: CartItem) => {
     if (demoViewOnly) return
@@ -3172,8 +3257,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           {selectedCategory && (
             <button
               type="button"
-              onClick={() => setSelectedCategory(null)}
-            className={`flex-shrink-0 flex w-full items-center gap-2 px-4 py-2.5 text-left transition-colors ${ui.categoryStripBg} border-b ${ui.categoryStripBorder} ${ui.categoryStripHover}`}
+              onClick={handleCategoryClear}
+              className={`touch-manipulation select-none flex-shrink-0 flex w-full items-center gap-2 px-4 py-2.5 text-left transition-colors active:brightness-95 ${ui.categoryStripBg} border-b ${ui.categoryStripBorder} ${ui.categoryStripHover}`}
             >
               <svg className={`h-5 w-5 shrink-0 ${ui.categoryStripIcon}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -3204,58 +3289,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               ) : (
                 <div
                   data-testid="kassa-category-grid"
-                  className="grid w-full grid-cols-4 gap-4 pb-8"
+                  className="grid w-full grid-cols-4 gap-4 pb-8 touch-manipulation select-none"
                   style={{ gridAutoRows: `${kassaMenuRowPx}px` }}
                 >
-                  {categories.map(cat => {
+                  {categories.map((cat) => {
                     const catImage = cat.id ? categoryTileImageUrlByCategoryId.get(cat.id) : undefined
                     return (
-                      <button
+                      <KassaCategoryTileButton
                         key={cat.id}
-                        onClick={() => setSelectedCategory(cat)}
-                        className={`group relative h-full min-h-0 w-full min-w-0 overflow-hidden rounded-xl border shadow-[0_8px_30px_rgba(0,0,0,0.35)] active:scale-95 transition-transform ${kassaAppearanceDark ? 'border-zinc-600 bg-[#1a2230]' : 'border border-neutral-200/90 bg-neutral-100'}`}
-                      >
-                        {catImage ? (
-                          <>
-                            <img
-                              src={catImage}
-                              alt={cat.name}
-                              decoding="async"
-                              loading="lazy"
-                              className="pointer-events-none absolute inset-0 block h-full min-h-0 w-full select-none object-cover object-center !h-full !w-full !max-w-none"
-                            />
-                            <div
-                              className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-32 bg-gradient-to-t from-neutral-950/[0.94] via-neutral-950/55 to-transparent sm:h-36"
-                              aria-hidden
-                            />
-                            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2.5 pt-12 sm:px-3 sm:pb-3 sm:pt-14">
-                              <div className="flex flex-col items-center gap-1.5 text-center">
-                                {cat.icon ? (
-                                  <span className="text-2xl text-amber-200 drop-shadow-[0_2px_4px_rgba(0,0,0,.95)] sm:text-3xl md:text-4xl">
-                                    {cat.icon}
-                                  </span>
-                                ) : null}
-                                <span className="line-clamp-2 text-xl font-black leading-tight tracking-tight text-amber-50 [text-shadow:0_0_1px_rgba(0,0,0,1),0_2px_4px_rgba(0,0,0,.98),0_4px_18px_rgba(0,0,0,.85)] sm:text-2xl md:text-3xl lg:text-4xl">
-                                  {cat.name}
-                                </span>
-                              </div>
-                            </div>
-                          </>
-                        ) : (
-                          <>
-                            <div className={`pointer-events-none flex h-full w-full flex-col items-center justify-center gap-3 pt-10 pb-20 ${ui.productTileSolidBg}`}>
-                              {cat.icon ? (
-                                <span className={`text-5xl ${kassaAppearanceDark ? 'text-zinc-400' : 'text-neutral-700'}`}>{cat.icon}</span>
-                              ) : null}
-                            </div>
-                            <div className={`pointer-events-none absolute inset-x-0 bottom-0 z-10 border-t px-2 pb-2.5 pt-2 sm:px-3 sm:pb-3 sm:pt-2.5 ${ui.productTileFooterBar}`}>
-                              <span className={`block text-center text-xl font-black leading-snug sm:text-2xl md:text-3xl ${ui.productFooterTextDark}`}>
-                                {cat.name}
-                              </span>
-                            </div>
-                          </>
-                        )}
-                      </button>
+                        category={cat}
+                        imageUrl={catImage}
+                        appearanceDark={kassaAppearanceDark}
+                        ui={ui}
+                        onPress={handleCategorySelect}
+                      />
                     )
                   })}
                 </div>
