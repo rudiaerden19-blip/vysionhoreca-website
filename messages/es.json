@@ -5421,6 +5421,8 @@
     "kassaAppearanceLight": "Claro",
     "kassaAppearanceDarkAria": "Mostrar el TPV en modo oscuro profesional en este dispositivo (este negocio)",
     "kassaAppearanceLightAria": "Mostrar el TPV en modo claro en este dispositivo (este negocio)",
+    "kassaHardwareLite": "Sin fotos",
+    "kassaHardwareLiteAria": "TPV ligero para equipos lentos: sin mosaicos de fotos, menos CPU/GPU (solo este dispositivo). Consejo: marcador con ?kassa_lite=1",
     "back": "Volver",
     "menu": "Menú",
     "overview": "Vista general",

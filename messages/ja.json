@@ -5421,6 +5421,8 @@
     "kassaAppearanceLight": "ライト",
     "kassaAppearanceDarkAria": "この端末・この店舗でレジをプロフェッショナルなダーク表示にします",
     "kassaAppearanceLightAria": "この端末・この店舗でレジをライト表示にします",
+    "kassaHardwareLite": "写真なし",
+    "kassaHardwareLiteAria": "処理が重い端末向けの軽量レジ：写真タイルなしでCPU/GPU負荷を削減（この端末のみ）。ヒント: ?kassa_lite=1 を付けてブックマーク",
     "back": "戻る",
     "menu": "メニュー",
     "overview": "概要",
