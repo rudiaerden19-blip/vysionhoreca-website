@@ -6,6 +6,22 @@ import { trackError } from '@/lib/monitoring'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 import { apiRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
 
+function sanitizeArticleLinesForEmail(raw: unknown): Array<{ label: string; qty: number; total: number }> {
+  if (!Array.isArray(raw)) return []
+  const out: Array<{ label: string; qty: number; total: number }> = []
+  for (const item of raw) {
+    if (!item || typeof item !== 'object') continue
+    const o = item as Record<string, unknown>
+    const label = typeof o.label === 'string' ? o.label.trim().slice(0, 400) : ''
+    if (!label) continue
+    const qty = typeof o.qty === 'number' && Number.isFinite(o.qty) ? Math.max(0, o.qty) : 0
+    const total = typeof o.total === 'number' && Number.isFinite(o.total) ? o.total : 0
+    out.push({ label, qty, total })
+    if (out.length >= 500) break
+  }
+  return out
+}
+
 export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID()
   try {
@@ -26,6 +42,9 @@ export async function POST(request: NextRequest) {
       cashPayments,
       cardPayments,
       onlinePayments,
+      articleLines: rawArticleLines,
+      soldArticlesSectionTitle,
+      soldArticlesPiecesShort,
     } = body
 
     if (!to) {
@@ -65,6 +84,35 @@ export async function POST(request: NextRequest) {
     })
 
     const formatCurrency = (amount: number) => `€${amount.toFixed(2)}`
+
+    const escHtml = (s: string) =>
+      s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+
+    const articlesRows = sanitizeArticleLinesForEmail(rawArticleLines)
+    const articlesSectionTitle =
+      typeof soldArticlesSectionTitle === 'string'
+        ? escHtml(soldArticlesSectionTitle.trim().slice(0, 120))
+        : 'Verkochte artikelen'
+    const piecesShort =
+      typeof soldArticlesPiecesShort === 'string'
+        ? escHtml(soldArticlesPiecesShort.trim().slice(0, 16))
+        : 'st.'
+    const articlesHtml =
+      articlesRows.length === 0
+        ? ''
+        : `
+            <div class="section">
+              <div class="section-title">📦 ${articlesSectionTitle}</div>
+              ${articlesRows
+                .map(
+                  (r) => `
+              <div class="row">
+                <span>${escHtml(r.label)}</span>
+                <span>${r.qty} ${piecesShort} · ${formatCurrency(r.total)}</span>
+              </div>`
+                )
+                .join('')}
+            </div>`
 
     const htmlContent = `
       <!DOCTYPE html>
@@ -134,7 +182,7 @@ export async function POST(request: NextRequest) {
                 <span>🌐 Online:</span>
                 <span>${formatCurrency(onlinePayments)}</span>
               </div>
-            </div>
+            </div>${articlesHtml}
           </div>
           
           <div class="footer">

@@ -14,6 +14,10 @@ import {
   orderCountsTowardRevenueAndZReport,
   type Order,
 } from '@/lib/admin-api'
+import {
+  aggregateZReportArticleLines,
+  type ZReportArticleLine,
+} from '@/lib/z-report-aggregate-articles'
 import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
 
@@ -99,6 +103,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const [emailAddress, setEmailAddress] = useState('')
   const [sendingEmail, setSendingEmail] = useState(false)
   const [currentSavedReport, setCurrentSavedReport] = useState<SavedReport | null>(null)
+  const [articleLines, setArticleLines] = useState<ZReportArticleLine[]>([])
 
   useEffect(() => {
     loadData()
@@ -136,6 +141,8 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         o as Pick<Order, 'order_type' | 'status' | 'payment_status'>
       )
     ) as unknown as Order[]
+
+    setArticleLines(aggregateZReportArticleLines(orders))
 
     if (orders.length) {
       let total = 0
@@ -477,6 +484,21 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
 
   const generateReportHTML = () => {
     if (!stats) return ''
+    const esc = (s: string) =>
+      s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+    const articlesBlock =
+      articleLines.length === 0
+        ? ''
+        : `
+        <div class="section">
+          <div class="section-title">${esc(t('zReport.soldArticlesTitle'))}</div>
+          ${articleLines
+            .map(
+              (l) => `
+          <div class="row"><span>${esc(l.label)}</span><span>${l.qty} ${esc(t('zReport.soldArticlesPiecesShort'))} · ${formatCurrency(l.total)}</span></div>`
+            )
+            .join('')}
+        </div>`
     return `
       <!DOCTYPE html>
       <html>
@@ -517,7 +539,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           <div class="row"><span>Contant:</span><span>${formatCurrency(stats.cashPayments)}</span></div>
           <div class="row"><span>PIN/Kaart:</span><span>${formatCurrency(stats.cardPayments)}</span></div>
           <div class="row"><span>Online:</span><span>${formatCurrency(stats.onlinePayments)}</span></div>
-        </div>
+        </div>${articlesBlock}
         <div class="footer">
           <p>Dagperiode: ${formatShortDate(selectedDate)} 00:00 t/m ${formatShortDate(selectedDate)} +1dag 12:00</p>
           <p>Gegenereerd: ${new Date().toLocaleString('nl-BE')}</p>
@@ -564,6 +586,9 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           cashPayments: stats.cashPayments,
           cardPayments: stats.cardPayments,
           onlinePayments: stats.onlinePayments,
+          articleLines,
+          soldArticlesSectionTitle: t('zReport.soldArticlesTitle'),
+          soldArticlesPiecesShort: t('zReport.soldArticlesPiecesShort'),
         })
       })
       if (response.ok) {
@@ -812,6 +837,30 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                     <div className="flex justify-between items-center py-2">
                       <span className="text-gray-600">💵 {t('zReport.cashPaid')}</span>
                       <span className="font-medium">{formatCurrency(stats.cashPayments)}</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2 pt-2">
+                  <h4 className="font-semibold text-gray-900">{t('zReport.soldArticlesTitle')}</h4>
+                  {articleLines.length === 0 ? (
+                    <p className="text-sm text-gray-500">{t('zReport.soldArticlesEmpty')}</p>
+                  ) : (
+                    <div className="space-y-1 max-h-72 overflow-y-auto pr-1">
+                      {articleLines.map((line, idx) => (
+                        <div
+                          key={`${line.label}-${idx}`}
+                          className="flex justify-between gap-3 text-sm py-1.5 border-b border-gray-100 last:border-0"
+                        >
+                          <span className="text-gray-700 min-w-0 flex-1 break-words">{line.label}</span>
+                          <span className="flex items-center gap-4 shrink-0 tabular-nums">
+                            <span className="text-gray-600">
+                              {line.qty} {t('zReport.soldArticlesPiecesShort')}
+                            </span>
+                            <span className="font-medium w-[5.5rem] text-right">{formatCurrency(line.total)}</span>
+                          </span>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
