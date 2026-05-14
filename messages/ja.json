@@ -4685,6 +4685,7 @@
     "videoCountOne": "動画 1 本",
     "videoCountMany": "動画 {{count}} 本",
     "comingSoon": " — 近日公開",
+    "openVideoInNewTab": "新しいタブで動画を開く",
     "cats": {
       "registreren": {
         "title": "登録",

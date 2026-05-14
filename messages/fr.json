@@ -4708,6 +4708,7 @@
     "videoCountOne": "1 vidéo",
     "videoCountMany": "{{count}} vidéos",
     "comingSoon": " — bientôt disponible",
+    "openVideoInNewTab": "Ouvrir la vidéo dans un nouvel onglet",
     "cats": {
       "registreren": {
         "title": "Inscription",

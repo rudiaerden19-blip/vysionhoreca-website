@@ -4708,6 +4708,7 @@
     "videoCountOne": "1 Video",
     "videoCountMany": "{{count}} Videos",
     "comingSoon": " — demnaechst",
+    "openVideoInNewTab": "Video in neuem Tab öffnen",
     "cats": {
       "registreren": {
         "title": "Registrieren",

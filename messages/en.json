@@ -4947,6 +4947,7 @@
     "videoCountOne": "1 video",
     "videoCountMany": "{{count}} videos",
     "comingSoon": " — coming soon",
+    "openVideoInNewTab": "Open video in new tab",
     "cats": {
       "registreren": {
         "title": "Sign up",

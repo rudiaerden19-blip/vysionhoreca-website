@@ -4685,6 +4685,7 @@
     "videoCountOne": "فيديو واحد",
     "videoCountMany": "{{count}} فيديوهات",
     "comingSoon": " — قريباً",
+    "openVideoInNewTab": "فتح الفيديو في تبويب جديد",
     "cats": {
       "registreren": {
         "title": "التسجيل",

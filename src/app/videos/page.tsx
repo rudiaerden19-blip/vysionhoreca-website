@@ -191,16 +191,26 @@ export default function VideosPage() {
                 </svg>
               </button>
             </div>
+            {/* Geen programmatic play(): kiosk/WebView (o.a. Elo) blokkeert vaak playback zonder directe tik op <video controls>. */}
             <video
               key={actieveVideo.src}
               controls
+              playsInline
+              preload="metadata"
               className="w-full aspect-video"
-              onLoadedMetadata={(e) => {
-                void (e.target as HTMLVideoElement).play().catch(() => {})
-              }}
             >
               <source src={actieveVideo.src} type="video/mp4" />
             </video>
+            <p className="px-6 pb-4 text-center text-sm text-gray-400">
+              <a
+                href={actieveVideo.src}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-accent underline hover:no-underline"
+              >
+                {t('videosPage.openVideoInNewTab')}
+              </a>
+            </p>
           </div>
         </div>
       )}
