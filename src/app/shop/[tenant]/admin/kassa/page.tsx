@@ -729,6 +729,40 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     inside: [],
     terrace: [],
   })
+
+  const [tenantInfo, setTenantInfo] = useState<TenantSettings | null>(null)
+
+  useEffect(() => {
+    const cacheKeySettings = `vysion_settings_${tenant}`
+    const cachedSettings = localStorage.getItem(cacheKeySettings)
+    if (cachedSettings) {
+      try {
+        setTenantInfo(JSON.parse(cachedSettings))
+      } catch {
+        /* ignore */
+      }
+    }
+    getTenantSettings(tenant)
+      .then((s) => {
+        setTenantInfo(s)
+        try {
+          localStorage.setItem(cacheKeySettings, JSON.stringify(s))
+        } catch {
+          /* ignore */
+        }
+      })
+      .catch(() => {
+        /* offline: cache suffices */
+      })
+  }, [tenant])
+
+  /** Zie Admin › Kassa-terminal (`kassa_floor_plan_enabled`). `undefined` = aan (backward compatible). */
+  const kassaFloorPlanEnabled = tenantInfo?.kassa_floor_plan_enabled ?? true
+
+  useEffect(() => {
+    if (!kassaFloorPlanEnabled && showFloorPlan) setShowFloorPlan(false)
+  }, [kassaFloorPlanEnabled, showFloorPlan])
+
   // Openstaande bestellingen per tafel: { "1": CartItem[], "2": CartItem[], ... }
   const [tableOrders, setTableOrders] = useState<Record<string, CartItem[]>>({})
 
@@ -779,65 +813,67 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   // Laad tafels + barkrukken + openstaande bestellingen (localStorage + Supabase sync)
 
   useEffect(() => {
-    for (const zone of KASSA_FLOOR_ZONES) {
-      const lsRaw = localStorage.getItem(floorPlanTablesLocalStorageKey(tenant, zone))
-      if (lsRaw) {
-        try {
-          const parsed = JSON.parse(lsRaw)
-          if (Array.isArray(parsed)) setKassaTablesByZone((p) => ({ ...p, [zone]: parsed }))
-        } catch {
-          /* empty */
+    if (kassaFloorPlanEnabled) {
+      for (const zone of KASSA_FLOOR_ZONES) {
+        const lsRaw = localStorage.getItem(floorPlanTablesLocalStorageKey(tenant, zone))
+        if (lsRaw) {
+          try {
+            const parsed = JSON.parse(lsRaw)
+            if (Array.isArray(parsed)) setKassaTablesByZone((p) => ({ ...p, [zone]: parsed }))
+          } catch {
+            /* empty */
+          }
         }
       }
-    }
 
-    void (async () => {
-      for (const zone of KASSA_FLOOR_ZONES) {
-        const adminRes = await adminDb.select<{ data?: unknown } | null>('floor_plan_tables', {
-          tenantSlug: tenant,
-          select: 'data',
-          match: { plan_zone: zone },
-          single: 'maybe',
-        })
-        let merged = false
-        if (adminRes.ok) {
-          const row = adminRes.data as { data?: unknown } | null | undefined
-          if (row == null) merged = applyKassaFloorPlanTablesPayload(zone, [])
-          else merged = applyKassaFloorPlanTablesPayload(zone, row.data)
+      void (async () => {
+        for (const zone of KASSA_FLOOR_ZONES) {
+          const adminRes = await adminDb.select<{ data?: unknown } | null>('floor_plan_tables', {
+            tenantSlug: tenant,
+            select: 'data',
+            match: { plan_zone: zone },
+            single: 'maybe',
+          })
+          let merged = false
+          if (adminRes.ok) {
+            const row = adminRes.data as { data?: unknown } | null | undefined
+            if (row == null) merged = applyKassaFloorPlanTablesPayload(zone, [])
+            else merged = applyKassaFloorPlanTablesPayload(zone, row.data)
+          }
+          if (!merged) {
+            const { data, error } = await supabase
+              .from('floor_plan_tables')
+              .select('data')
+              .eq('tenant_slug', tenant)
+              .eq('plan_zone', zone)
+              .maybeSingle()
+            if (!error) {
+              if (data == null) applyKassaFloorPlanTablesPayload(zone, [])
+              else applyKassaFloorPlanTablesPayload(zone, data.data)
+            }
+          }
         }
-        if (!merged) {
-          const { data, error } = await supabase
-            .from('floor_plan_tables')
+      })()
+
+      void (async () => {
+        for (const zone of KASSA_FLOOR_ZONES) {
+          const { data } = await supabase
+            .from('floor_plan_decor')
             .select('data')
             .eq('tenant_slug', tenant)
             .eq('plan_zone', zone)
             .maybeSingle()
-          if (!error) {
-            if (data == null) applyKassaFloorPlanTablesPayload(zone, [])
-            else applyKassaFloorPlanTablesPayload(zone, data.data)
+          if (data?.data == null) {
+            setKassaStoolsByZone((p) => ({ ...p, [zone]: [] }))
+          } else {
+            setKassaStoolsByZone((p) => ({
+              ...p,
+              [zone]: stoolsFromFloorDecorPayload(data.data),
+            }))
           }
         }
-      }
-    })()
-
-    void (async () => {
-      for (const zone of KASSA_FLOOR_ZONES) {
-        const { data } = await supabase
-          .from('floor_plan_decor')
-          .select('data')
-          .eq('tenant_slug', tenant)
-          .eq('plan_zone', zone)
-          .maybeSingle()
-        if (data?.data == null) {
-          setKassaStoolsByZone((p) => ({ ...p, [zone]: [] }))
-        } else {
-          setKassaStoolsByZone((p) => ({
-            ...p,
-            [zone]: stoolsFromFloorDecorPayload(data.data),
-          }))
-        }
-      }
-    })()
+      })()
+    }
 
     const ordersRaw = localStorage.getItem(tableOrdersKey)
     if (ordersRaw) {
@@ -851,10 +887,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     void fetchOpenTableOrdersForTenant(tenant).then(applyOpenOrdersFromServerRows)
     // Geen showTablePicker hier: die toggle triggert bij openen plattegrond en overschreef
     // tableOrders met een lege DB-snapshot vóór persist klaar was.
-  }, [tenant, tableOrdersKey, applyOpenOrdersFromServerRows, applyKassaFloorPlanTablesPayload])
+  }, [
+    tenant,
+    tableOrdersKey,
+    kassaFloorPlanEnabled,
+    applyOpenOrdersFromServerRows,
+    applyKassaFloorPlanTablesPayload,
+  ])
 
   // ── Realtime sync: tafelstatus tussen apparaten ───────────────────────────
   useEffect(() => {
+    if (!kassaFloorPlanEnabled) return
+
     const refetchAllFloorPlanTables = () => {
       void (async () => {
         for (const zone of KASSA_FLOOR_ZONES) {
@@ -917,10 +961,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return () => {
       void supabase.removeChannel(tableChannel).catch(() => {})
     }
-  }, [tenant, applyKassaFloorPlanTablesPayload])
+  }, [tenant, kassaFloorPlanEnabled, applyKassaFloorPlanTablesPayload])
 
   // ── Realtime sync: plattegrond-decor / barkrukken ─────────────────────────
   useEffect(() => {
+    if (!kassaFloorPlanEnabled) return
+
     const refetchAllFloorDecor = () => {
       void (async () => {
         for (const zone of KASSA_FLOOR_ZONES) {
@@ -983,7 +1029,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return () => {
       void supabase.removeChannel(decorChannel).catch(() => {})
     }
-  }, [tenant])
+  }, [tenant, kassaFloorPlanEnabled])
 
   // ── Realtime sync: open bestellingen per tafel tussen apparaten ───────────
   useEffect(() => {
@@ -1059,7 +1105,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
 
     const pullAll = () => {
-      pullFloorAndDecor()
+      if (kassaFloorPlanEnabled) pullFloorAndDecor()
       pullOpenOrders()
     }
 
@@ -1070,9 +1116,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     document.addEventListener('visibilitychange', onActive)
     window.addEventListener('focus', onActive)
-    const timerFloor = window.setInterval(() => {
-      if (document.visibilityState === 'visible') pullFloorAndDecor()
-    }, 45_000)
+    let timerFloor: number | null = null
+    if (kassaFloorPlanEnabled) {
+      timerFloor = window.setInterval(() => {
+        if (document.visibilityState === 'visible') pullFloorAndDecor()
+      }, 45_000)
+    }
     const timerOrders = window.setInterval(() => {
       if (document.visibilityState === 'visible') pullOpenOrders()
     }, 12_000)
@@ -1080,10 +1129,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return () => {
       document.removeEventListener('visibilitychange', onActive)
       window.removeEventListener('focus', onActive)
-      window.clearInterval(timerFloor)
+      if (timerFloor !== null) window.clearInterval(timerFloor)
       window.clearInterval(timerOrders)
     }
-  }, [tenant, applyOpenOrdersFromServerRows, applyKassaFloorPlanTablesPayload])
+  }, [tenant, kassaFloorPlanEnabled, applyOpenOrdersFromServerRows, applyKassaFloorPlanTablesPayload])
 
   const cancelPersistTimer = (slotKey: string) => {
     const timers = persistTimersRef.current
@@ -1303,7 +1352,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [splitCash, setSplitCash] = useState(0)
   const [splitCard, setSplitCard] = useState(0)
   const [lastOrder, setLastOrder] = useState<KassaLastOrderReceipt | null>(null)
-  const [tenantInfo, setTenantInfo] = useState<TenantSettings | null>(null)
 
   const [staffClockOpen, setStaffClockOpen] = useState(false)
   const [staffClockList, setStaffClockList] = useState<
@@ -1372,7 +1420,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const CACHE_CATS = `vysion_menu_cats_${tenant}`
   const CACHE_PRODS = `vysion_menu_prods_${tenant}`
   const CACHE_OPTS = `vysion_menu_opts_${tenant}`
-  const CACHE_SETTINGS = `vysion_settings_${tenant}`
 
   // Laad categorieën, producten en welke producten opties hebben
   // Offline: laad uit localStorage-cache; online: laad van Supabase en update cache
@@ -1439,14 +1486,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   useEffect(() => {
     loadMenu()
-    // TenantSettings: ook met cache
-    const cachedSettings = localStorage.getItem(CACHE_SETTINGS)
-    if (cachedSettings) { try { setTenantInfo(JSON.parse(cachedSettings)) } catch { /* ignore */ } }
-    getTenantSettings(tenant).then(s => {
-      setTenantInfo(s)
-      try { localStorage.setItem(CACHE_SETTINGS, JSON.stringify(s)) } catch { /* ignore */ }
-    }).catch(() => { /* offline: al geladen uit cache */ })
-  }, [tenant, loadMenu, CACHE_SETTINGS])
+  }, [tenant, loadMenu])
 
   useEffect(() => {
     try {
@@ -3360,12 +3400,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                         ✕ {t('kassaApp.clearTable')}
                       </button>
                     )}
-                    <button
-                      onClick={() => { setShowTablePicker(false); setShowFloorPlan(true) }}
-                      className="flex-1 py-2 rounded-xl bg-[#3C4D6B] text-white font-semibold text-sm hover:bg-[#2D3A52] transition-colors"
-                    >
-                      🗺️ {t('kassaApp.floorPlan')}
-                    </button>
+                    {kassaFloorPlanEnabled && (
+                      <button
+                        onClick={() => {
+                          setShowTablePicker(false)
+                          setShowFloorPlan(true)
+                        }}
+                        className={`py-2 rounded-xl bg-[#3C4D6B] text-white font-semibold text-sm hover:bg-[#2D3A52] transition-colors ${tableNumber ? 'flex-1' : 'w-full'}`}
+                      >
+                        🗺️ {t('kassaApp.floorPlan')}
+                      </button>
+                    )}
                   </div>
                 </div>
               </>
@@ -3860,7 +3905,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       ) : null}
 
       {/* ── Plattegrond / Tafelkeuze ── */}
-      {showFloorPlan && (
+      {showFloorPlan && kassaFloorPlanEnabled && (
         <KassaFloorPlan
           tenant={tenant}
           planZone={pickerBrowseZone}

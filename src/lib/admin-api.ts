@@ -187,6 +187,8 @@ export interface TenantSettings {
   allergens_config?: string[] | null
   /** Medewerkers mogen op de kassa met PIN in-/uitklokken (instelling: Personeel) */
   kassa_staff_clock_enabled?: boolean
+  /** Plattegrond op het verkoopscherm — realtime/polls naar floor_plan_* (aanbevolen aan; uit voor zwakkere terminals) */
+  kassa_floor_plan_enabled?: boolean
   /** Beginsaldo handmatig kasboek (optioneel) */
   kasboek_opening_balance?: number
   kasboek_opening_balance_date?: string | null
@@ -277,6 +279,32 @@ export async function saveTenantKassaStaffClockEnabled(
       ok: false,
       error:
         'Geen tenant_settings bijgewerkt. Voer supabase/tenant_settings_kassa_staff_clock.sql uit en controleer of deze tenant een instellingenrij heeft.',
+    }
+  }
+  cache.invalidate(cacheKey('tenant_settings', tenantSlug))
+  return { ok: true }
+}
+
+/** Plattegrond op kassa aan/uit — minder sync als uit (tenant_settings.kassa_floor_plan_enabled). */
+export async function saveTenantKassaFloorPlanEnabled(
+  tenantSlug: string,
+  enabled: boolean
+): Promise<{ ok: boolean; error?: string }> {
+  const { data, error } = await supabase
+    .from('tenant_settings')
+    .update({ kassa_floor_plan_enabled: enabled })
+    .eq('tenant_slug', tenantSlug)
+    .select('tenant_slug')
+
+  if (error) {
+    console.error('saveTenantKassaFloorPlanEnabled:', error.message)
+    return { ok: false, error: error.message }
+  }
+  if (!data || data.length === 0) {
+    return {
+      ok: false,
+      error:
+        'Geen tenant_settings bijgewerkt. Voer supabase/tenant_settings_kassa_floor_plan_enabled.sql uit.',
     }
   }
   cache.invalidate(cacheKey('tenant_settings', tenantSlug))

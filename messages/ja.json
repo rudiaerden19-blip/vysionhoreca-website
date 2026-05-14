@@ -2553,6 +2553,16 @@
         "lupine": "ルピン"
       }
     },
+    "kassaTerminal": {
+      "title": "レジ端末",
+      "subtitle": "レジ画面のオプション。フロアプランをオフにするとバックグラウンド同期が減ります。",
+      "floorPlanLabel": "レジでフロアプランを使う",
+      "floorPlanHint": "オフ＝この画面では平面図と平面図データの同期なし（通信とタイマー負荷が軽くなります）。店内テーブルはテーブル選択から利用できます。",
+      "statusOn": "フロアプランはオンです。",
+      "statusOff": "フロアプランはオフです。",
+      "savedFlash": "保存しました — レジ画面を更新すると反映されます。",
+      "dbHint": "Supabase で tenant_settings_kassa_floor_plan_enabled.sql を実行してください（supabase フォルダ）。"
+    },
     "bestellingen": {
       "title": "注文",
       "subtitle": "注文を表示・管理",
@@ -5474,6 +5484,7 @@
       "sm_kassa_allergenen": "Allergens",
       "sm_kassa_bonnenprinter": "Receipt printer",
       "sm_kassa_labels": "Labels",
+      "sm_kassa_terminal": "レジ端末",
       "sm_online_status": "Online on/off",
       "sm_online_klanten": "Customers",
       "sm_online_beloningen": "Rewards",

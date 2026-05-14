@@ -2553,6 +2553,16 @@
         "lupine": "羽扇豆"
       }
     },
+    "kassaTerminal": {
+      "title": "收银终端",
+      "subtitle": "收银屏选项。关闭平面图可减少后台同步负载。",
+      "floorPlanLabel": "收银机显示平面图",
+      "floorPlanHint": "关闭 = 此屏幕不显示平面图、也不同步平面图数据（网络与定时请求更少）。堂食仍可手动选择桌台。",
+      "statusOn": "平面图已开启。",
+      "statusOff": "平面图已关闭。",
+      "savedFlash": "已保存 — 请刷新收银界面以生效。",
+      "dbHint": "请在 Supabase 中执行 SQL 脚本 tenant_settings_kassa_floor_plan_enabled.sql（supabase 目录）。"
+    },
     "bestellingen": {
       "title": "订单",
       "subtitle": "查看和管理订单",
@@ -5474,6 +5484,7 @@
       "sm_kassa_allergenen": "Allergens",
       "sm_kassa_bonnenprinter": "Receipt printer",
       "sm_kassa_labels": "Labels",
+      "sm_kassa_terminal": "收银终端",
       "sm_online_status": "Online on/off",
       "sm_online_klanten": "Customers",
       "sm_online_beloningen": "Rewards",

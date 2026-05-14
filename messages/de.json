@@ -2053,6 +2053,16 @@
         "lupine": "Lupine"
       }
     },
+    "kassaTerminal": {
+      "title": "Kassen-Terminal",
+      "subtitle": "Einstellungen für das Verkaufsdisplay. Grundriss aus schaltet weniger Hintergrund-Synchronisation auf Kassengeräten.",
+      "floorPlanLabel": "Raumplan auf der Kasse",
+      "floorPlanHint": "Aus = keine Grundrisskarte und keine Synchronisation der Grundrissdaten auf diesem Bildschirm (weniger Netzwerk und Timer). Vor Ort essen mit Tischen bleibt über die Tischauswahl möglich.",
+      "statusOn": "Raumplan ist aktiv.",
+      "statusOff": "Raumplan ist aus.",
+      "savedFlash": "Gespeichert — Verkaufsdisplay aktualisieren, um es zu übernehmen.",
+      "dbHint": "SQL-Skript tenant_settings_kassa_floor_plan_enabled.sql in Supabase ausführen (Ordner supabase)."
+    },
     "bestellingen": {
       "title": "Bestellungen",
       "subtitle": "Bestellungen anzeigen und verwalten",
@@ -5497,6 +5507,7 @@
       "sm_kassa_allergenen": "Allergene",
       "sm_kassa_bonnenprinter": "Belegdrucker",
       "sm_kassa_labels": "Etiketten",
+      "sm_kassa_terminal": "Kassen-Terminal",
       "sm_online_status": "Online ein/aus",
       "sm_online_klanten": "Kunden",
       "sm_online_beloningen": "Prämien",

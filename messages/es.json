@@ -2553,6 +2553,16 @@
         "lupine": "Altramuz"
       }
     },
+    "kassaTerminal": {
+      "title": "Terminal TPV",
+      "subtitle": "Opciones para la pantalla de ventas. Desactivar el plano reduce la sincronización en segundo plano.",
+      "floorPlanLabel": "Plano en la caja",
+      "floorPlanHint": "Desactivado = sin mapa ni sincronización de datos del plano en esta pantalla (menos red y temporizadores). El consumo en mesa sigue disponible mediante la selección de mesa.",
+      "statusOn": "Plano activado.",
+      "statusOff": "Plano desactivado.",
+      "savedFlash": "Guardado — actualice la pantalla de ventas para aplicar.",
+      "dbHint": "Ejecute el script SQL tenant_settings_kassa_floor_plan_enabled.sql en Supabase (carpeta supabase)."
+    },
     "bestellingen": {
       "title": "Pedidos",
       "subtitle": "Ver y gestionar pedidos",
@@ -5474,6 +5484,7 @@
       "sm_kassa_allergenen": "Alérgenos",
       "sm_kassa_bonnenprinter": "Impresora de tickets",
       "sm_kassa_labels": "Etiquetas",
+      "sm_kassa_terminal": "Terminal TPV",
       "sm_online_status": "Online on/off",
       "sm_online_klanten": "Clientes",
       "sm_online_beloningen": "Recompensas",

@@ -2852,6 +2852,16 @@
         "lupine": "Lupin"
       }
     },
+    "kassaTerminal": {
+      "title": "POS terminal",
+      "subtitle": "Register screen options. Turning off the floor plan reduces background sync on till devices.",
+      "floorPlanLabel": "Floor plan on register",
+      "floorPlanHint": "Off = no floor-plan map and no floor-plan data sync on this screen (fewer network requests and timers). Dine-in with tables remains available via table selection.",
+      "statusOn": "Floor plan is on.",
+      "statusOff": "Floor plan is off.",
+      "savedFlash": "Saved — refresh the register screen to apply.",
+      "dbHint": "Run the SQL script tenant_settings_kassa_floor_plan_enabled.sql in Supabase (supabase folder)."
+    },
     "bestellingen": {
       "title": "Orders",
       "subtitle": "View and manage orders",
@@ -5433,6 +5443,7 @@
       "sm_kassa_allergenen": "Allergens",
       "sm_kassa_bonnenprinter": "Receipt printer",
       "sm_kassa_labels": "Labels",
+      "sm_kassa_terminal": "POS terminal",
       "sm_online_status": "Online on/off",
       "sm_online_klanten": "Customers",
       "sm_online_beloningen": "Rewards",

@@ -2553,6 +2553,16 @@
         "lupine": "Lupini"
       }
     },
+    "kassaTerminal": {
+      "title": "Terminale cassa",
+      "subtitle": "Impostazioni per la schermata di vendita. Disattivare la pianta riduce la sincronizzazione in background.",
+      "floorPlanLabel": "Pianta sala sulla cassa",
+      "floorPlanHint": "Spento = nessuna mappa né sincronizzazione dei dati del piano su questo schermo (meno rete e timer). Il consumo al tavolo resta disponibile tramite la scelta del tavolo.",
+      "statusOn": "Pianta attiva.",
+      "statusOff": "Pianta disattivata.",
+      "savedFlash": "Salvato — aggiorna la schermata di vendita per applicare.",
+      "dbHint": "Esegui lo script SQL tenant_settings_kassa_floor_plan_enabled.sql in Supabase (cartella supabase)."
+    },
     "bestellingen": {
       "title": "Ordini",
       "subtitle": "Visualizza e gestisci gli ordini",
@@ -5474,6 +5484,7 @@
       "sm_kassa_allergenen": "Allergeni",
       "sm_kassa_bonnenprinter": "Stampante scontrini",
       "sm_kassa_labels": "Etichette",
+      "sm_kassa_terminal": "Terminale cassa",
       "sm_online_status": "Online on/off",
       "sm_online_klanten": "Clienti",
       "sm_online_beloningen": "Premi",

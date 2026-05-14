@@ -2852,6 +2852,16 @@
         "lupine": "Lupine"
       }
     },
+    "kassaTerminal": {
+      "title": "Kassa-terminal",
+      "subtitle": "Opties voor het verkoopscherm. Plattegrond uit zet minder achtergrondsync op kassa-apparaten.",
+      "floorPlanLabel": "Plattegrond op kassa",
+      "floorPlanHint": "Uit = geen plattegrondkaart en geen synchronisatie van plattegrond-data op dit scherm (minder netwerk en timers). Ter plaatse eten met tafels blijft mogelijk via de tafelkeuze.",
+      "statusOn": "Plattegrond staat aan.",
+      "statusOff": "Plattegrond staat uit.",
+      "savedFlash": "Opgeslagen — vernieuw het verkoopscherm om dit direct toe te passen.",
+      "dbHint": "Voer het script tenant_settings_kassa_floor_plan_enabled.sql uit in Supabase (map supabase)."
+    },
     "bestellingen": {
       "title": "Bestellingen",
       "subtitle": "Bekijk en beheer bestellingen",
@@ -5433,6 +5443,7 @@
       "sm_kassa_allergenen": "Allergenen",
       "sm_kassa_bonnenprinter": "Bonnenprinter",
       "sm_kassa_labels": "Labels",
+      "sm_kassa_terminal": "Kassa-terminal",
       "sm_online_status": "Online Aan/Uitzetten",
       "sm_online_klanten": "Klanten",
       "sm_online_beloningen": "Beloningen",

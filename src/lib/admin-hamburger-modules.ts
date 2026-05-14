@@ -132,6 +132,13 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
           labelKey: itemLabelKey('sm_kassa_labels'),
           href: `${baseUrl}/labels`,
         },
+        {
+          id: 'sm_kassa_terminal',
+          icon: '🖥️',
+          label: 'Kassa-terminal',
+          labelKey: itemLabelKey('sm_kassa_terminal'),
+          href: `${baseUrl}/kassa-terminal`,
+        },
       ],
     },
     {

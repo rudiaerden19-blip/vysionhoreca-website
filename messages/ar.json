@@ -2553,6 +2553,16 @@
         "lupine": "الترمس"
       }
     },
+    "kassaTerminal": {
+      "title": "طرفية نقطة البيع",
+      "subtitle": "إعدادات شاشة البيع. تعطيل مخطط القاعة يقلّل المزامنة في الخلفية.",
+      "floorPlanLabel": "مخطط القاعة على جهاز الكاشير",
+      "floorPlanHint": "معطّل = لا خريطة ولا مزامنة لمخطط القاعة على هذه الشاشة (أقل شبكة ومؤقتات). تناول الطعام على الطاولة يبقى متاحًا عبر اختيار الطاولة.",
+      "statusOn": "مخطط القاعة مفعّل.",
+      "statusOff": "مخطط القاعة معطّل.",
+      "savedFlash": "تم الحفظ — حدّث شاشة البيع لتطبيق التغيير.",
+      "dbHint": "نفّذ سكربت SQL tenant_settings_kassa_floor_plan_enabled.sql في Supabase (مجلد supabase)."
+    },
     "bestellingen": {
       "title": "الطلبات",
       "subtitle": "عرض وإدارة الطلبات",
@@ -5474,6 +5484,7 @@
       "sm_kassa_allergenen": "Allergens",
       "sm_kassa_bonnenprinter": "Receipt printer",
       "sm_kassa_labels": "Labels",
+      "sm_kassa_terminal": "طرفية نقطة البيع",
       "sm_online_status": "Online on/off",
       "sm_online_klanten": "Customers",
       "sm_online_beloningen": "Rewards",
