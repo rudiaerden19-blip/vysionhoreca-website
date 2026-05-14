@@ -289,6 +289,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const demoViewOnly = demoFromUrl || demoFromMarketingSession
   const { dark: kassaAppearanceDark, toggle: toggleKassaAppearance } = useKassaUiDarkSync(tenant)
   const ui = useMemo(() => createKassaRegisterUiTheme(kassaAppearanceDark), [kassaAppearanceDark])
+
+  useEffect(() => {
+    const html = document.documentElement
+    if (kassaAppearanceDark) html.classList.add('kassa-dark-appearance')
+    else html.classList.remove('kassa-dark-appearance')
+    return () => html.classList.remove('kassa-dark-appearance')
+  }, [kassaAppearanceDark])
+
   const baseUrl = `/shop/${tenant}/admin`
   const { t, locale, setLocale, locales, localeNames } = useLanguage()
 

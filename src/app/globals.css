@@ -46,6 +46,13 @@ html.vysion-kassa-root body {
   text-rendering: geometricPrecision;
 }
 
+/* Donkere kassa: voorkom wit “rubber band” / lege rand (Safari iOS) — alleen met .kassa-dark-appearance (pagina zet class). */
+html.vysion-kassa-root.kassa-dark-appearance,
+html.vysion-kassa-root.kassa-dark-appearance body {
+  background-color: #0b0f14 !important;
+  color-scheme: dark;
+}
+
 /* Foto-tegels en thumbnails: scherpere herberekening bij opschalen in Chromium/Edge op klassieke lcd */
 html.vysion-klantscherm-root img,
 html.vysion-klantscherm-root picture img,
