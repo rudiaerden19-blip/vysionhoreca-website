@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } from 'react'
+import { Suspense, memo, useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { flushSync } from 'react-dom'
 import Link from 'next/link'
@@ -51,7 +51,7 @@ import {
   publicDemoSessionMatchesTenant,
 } from '@/lib/demo-links'
 import { useKassaUiDarkSync } from '@/lib/kassa-register-ui-dark-preference'
-import { createKassaRegisterUiTheme } from '@/lib/kassa-register-ui-theme'
+import { createKassaRegisterUiTheme, type KassaRegisterUiTheme } from '@/lib/kassa-register-ui-theme'
 import { authFetch, buildShopInternalReturnPath } from '@/lib/auth-headers'
 import {
   attemptCloseThenOrNavigate,
@@ -125,6 +125,13 @@ import {
   writeCachedSecondaryBounds,
   applyCustomerDisplayWindowBounds,
 } from '@/lib/kassa-customer-display-window'
+
+/** Geluid ná eerste paint — zwakkere terminals (o.a. Elo PayPoint) volgen snelle tikken beter */
+function scheduleAddToCartSound() {
+  queueMicrotask(() => {
+    requestAnimationFrame(() => void playAddToCart())
+  })
+}
 
 function stoolsFromFloorDecorPayload(data: unknown): { stoolNumber: string; segmentId: string }[] {
   const rawItems = Array.isArray(data)
@@ -274,6 +281,93 @@ const KassaReservationsView = dynamic(() => import('@/components/KassaReservatio
   ),
 })
 
+type KassaProductTileButtonProps = {
+  product: MenuProduct
+  inCart: number
+  hasOpts: boolean
+  kioskZoom: number
+  appearanceDark: boolean
+  ui: KassaRegisterUiTheme
+  onPress: (product: MenuProduct) => void
+}
+
+const KassaProductTileButton = memo(function KassaProductTileButton({
+  product,
+  inCart,
+  hasOpts,
+  kioskZoom,
+  appearanceDark,
+  ui,
+  onPress,
+}: KassaProductTileButtonProps) {
+  return (
+    <button
+      type="button"
+      onClick={() => onPress(product)}
+      className={`group relative h-full min-h-0 w-full min-w-0 overflow-hidden rounded-xl text-left active:scale-95 transition-transform ${ui.productTileSolidBg}`}
+      style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.35)' }}
+    >
+      {product.image_url ? (
+        <>
+          <div className="pointer-events-none absolute inset-0 overflow-hidden">
+            <img
+              src={product.image_url}
+              alt={product.name}
+              decoding="async"
+              loading="lazy"
+              style={{
+                transform: `scale(${kioskZoom})`,
+                transformOrigin: 'center 78%',
+              }}
+              className="pointer-events-none block h-full min-h-0 w-full select-none object-cover object-center !h-full !w-full !max-w-none"
+            />
+          </div>
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-36 bg-gradient-to-t from-neutral-950/[0.94] via-neutral-950/55 to-transparent sm:h-[8.75rem]"
+            aria-hidden
+          />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2.5 pt-12 sm:px-3 sm:pb-3 sm:pt-14">
+            <p className="line-clamp-2 text-lg font-black leading-snug tracking-tight text-amber-50 [text-shadow:0_0_1px_rgba(0,0,0,1),0_2px_4px_rgba(0,0,0,.98),0_4px_18px_rgba(0,0,0,.85)] sm:text-xl md:text-2xl">
+              {product.name}
+            </p>
+            <p
+              className={`mt-1 text-xl font-black tabular-nums ${ui.priceAccentClass} [text-shadow:0_0_1px_rgba(0,0,0,1),0_2px_6px_rgba(0,0,0,.95)] sm:text-2xl md:text-3xl`}
+            >
+              €{product.price.toFixed(2)}
+            </p>
+          </div>
+        </>
+      ) : (
+        <>
+          <div className={`pointer-events-none flex h-full w-full items-center justify-center pb-28 pt-10 ${ui.productTileSolidBg}`}>
+            <span className={`text-5xl ${appearanceDark ? 'text-zinc-600' : 'text-neutral-300'}`}>
+              🍽️
+            </span>
+          </div>
+          <div className={`pointer-events-none absolute inset-x-0 bottom-0 z-10 border-t px-2 pb-2.5 pt-2 sm:px-3 sm:pb-3 sm:pt-2.5 ${ui.productTileFooterBar}`}>
+            <p className={`line-clamp-2 text-lg font-black leading-snug sm:text-xl md:text-2xl ${ui.productFooterTextDark}`}>
+              {product.name}
+            </p>
+            <p className={`mt-1 text-xl font-black tabular-nums ${ui.priceAccentClass} sm:text-2xl md:text-3xl`}>
+              €{product.price.toFixed(2)}
+            </p>
+          </div>
+        </>
+      )}
+      {inCart > 0 && (
+        <div className="absolute top-1.5 right-1.5 z-20 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-xs font-bold text-white shadow-md">
+          {inCart}
+        </div>
+      )}
+      {hasOpts && (
+        <div className="absolute top-1.5 left-1.5 z-20 rounded-md bg-amber-400 px-1.5 py-0.5 text-xs font-bold text-white shadow">
+          ⚙️
+        </div>
+      )}
+    </button>
+  )
+})
+
 function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const tenant = params.tenant
   const offlineQueueKey = offlineOrdersQueueStorageKey(tenant)
@@ -405,6 +499,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const langRef = useRef<HTMLDivElement>(null)
   /** Alleen bij product/opties: toon korte popup als verkoopmedewerker verplicht is. */
   const blockSaleWithoutStaffIfNeededRef = useRef<() => boolean>(() => false)
+  const handleProductClickRef = useRef<(product: MenuProduct) => Promise<void>>(async () => {})
 
   // ── Nieuwe bestelling alarm (exact donor) ────────────────────────────────
   const [newOrderAlert, setNewOrderAlert] = useState<{id: string; orderNumber: number; total: number} | null>(null)
@@ -1627,7 +1722,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }
 
   const addToCart = (product: MenuProduct, choices: SelectedChoice[] = []) => {
-    playAddToCart()
+    scheduleAddToCartSound()
     const cartKey = choices.length > 0
       ? `${product.id}-${choices.map(c => c.choiceId).sort().join('-')}`
       : product.id!
@@ -1643,7 +1738,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     })
   }
 
-  const handleProductClick = async (product: MenuProduct) => {
+  handleProductClickRef.current = async (product: MenuProduct) => {
     if (blockSaleWithoutStaffIfNeededRef.current()) return
     if (product.id && productIdsWithOptionsSet.has(product.id)) {
       const opts = await getOptionsForProduct(product.id!)
@@ -1652,6 +1747,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       addToCart(product)
     }
   }
+
+  const handleProductClick = useCallback((product: MenuProduct) => {
+    void handleProductClickRef.current(product)
+  }, [])
 
   /** Open opties-modal om toppings/sauzen van een mandregel te wijzigen (alle tenants). */
   const openEditCartItem = async (item: CartItem) => {
@@ -1705,7 +1804,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     if (!editingCartKey && blockSaleWithoutStaffIfNeededRef.current()) return
 
     if (editingCartKey) {
-      playAddToCart()
+      scheduleAddToCartSound()
       const oldQty = cart.find(i => i.cartKey === editingCartKey)?.quantity ?? 1
       const cartKey =
         selected.length > 0
@@ -3172,66 +3271,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       const hasOpts = product.id ? productIdsWithOptionsSet.has(product.id) : false
                       const kioskZoom = clampKassaProductImageZoom(product.kassa_image_zoom)
                       return (
-                        <button
+                        <KassaProductTileButton
                           key={product.id}
-                          onClick={() => handleProductClick(product)}
-                          className={`group relative h-full min-h-0 w-full min-w-0 overflow-hidden rounded-xl text-left active:scale-95 transition-transform ${ui.productTileSolidBg}`}
-                          style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.35)' }}
-                        >
-                          {product.image_url ? (
-                            <>
-                              <div className="pointer-events-none absolute inset-0 overflow-hidden">
-                                <img
-                                  src={product.image_url}
-                                  alt={product.name}
-                                  decoding="async"
-                                  loading="lazy"
-                                  style={{
-                                    transform: `scale(${kioskZoom})`,
-                                    transformOrigin: 'center 78%',
-                                  }}
-                                  className="pointer-events-none block h-full min-h-0 w-full select-none object-cover object-center !h-full !w-full !max-w-none"
-                                />
-                              </div>
-                              <div
-                                className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-36 bg-gradient-to-t from-neutral-950/[0.94] via-neutral-950/55 to-transparent sm:h-[8.75rem]"
-                                aria-hidden
-                              />
-                              <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2.5 pt-12 sm:px-3 sm:pb-3 sm:pt-14">
-                                <p className="line-clamp-2 text-lg font-black leading-snug tracking-tight text-amber-50 [text-shadow:0_0_1px_rgba(0,0,0,1),0_2px_4px_rgba(0,0,0,.98),0_4px_18px_rgba(0,0,0,.85)] sm:text-xl md:text-2xl">
-                                  {product.name}
-                                </p>
-                                <p className={`mt-1 text-xl font-black tabular-nums ${ui.priceAccentClass} [text-shadow:0_0_1px_rgba(0,0,0,1),0_2px_6px_rgba(0,0,0,.95)] sm:text-2xl md:text-3xl`}>
-                                  €{product.price.toFixed(2)}
-                                </p>
-                              </div>
-                            </>
-                          ) : (
-                            <>
-                              <div className={`pointer-events-none flex h-full w-full items-center justify-center pb-28 pt-10 ${ui.productTileSolidBg}`}>
-                                <span className={`text-5xl ${kassaAppearanceDark ? 'text-zinc-600' : 'text-neutral-300'}`}>🍽️</span>
-                              </div>
-                              <div className={`pointer-events-none absolute inset-x-0 bottom-0 z-10 border-t px-2 pb-2.5 pt-2 sm:px-3 sm:pb-3 sm:pt-2.5 ${ui.productTileFooterBar}`}>
-                                <p className={`line-clamp-2 text-lg font-black leading-snug sm:text-xl md:text-2xl ${ui.productFooterTextDark}`}>
-                                  {product.name}
-                                </p>
-                                <p className={`mt-1 text-xl font-black tabular-nums ${ui.priceAccentClass} sm:text-2xl md:text-3xl`}>
-                                  €{product.price.toFixed(2)}
-                                </p>
-                              </div>
-                            </>
-                          )}
-                          {inCart > 0 && (
-                            <div className="absolute top-1.5 right-1.5 z-20 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-xs font-bold text-white shadow-md">
-                              {inCart}
-                            </div>
-                          )}
-                          {hasOpts && (
-                            <div className="absolute top-1.5 left-1.5 z-20 rounded-md bg-amber-400 px-1.5 py-0.5 text-xs font-bold text-white shadow">
-                              ⚙️
-                            </div>
-                          )}
-                        </button>
+                          product={product}
+                          inCart={inCart}
+                          hasOpts={hasOpts}
+                          kioskZoom={kioskZoom}
+                          appearanceDark={kassaAppearanceDark}
+                          ui={ui}
+                          onPress={handleProductClick}
+                        />
                       )
                     })}
                   </div>
