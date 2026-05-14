@@ -5445,7 +5445,7 @@
     "kassaAppearanceDarkAria": "Professioneller Dunkelmodus für die Kasse auf diesem Gerät (dieser Betrieb)",
     "kassaAppearanceLightAria": "Heller Modus für die Kasse auf diesem Gerät (dieser Betrieb)",
     "kassaHardwareLite": "Ohne Fotos",
-    "kassaHardwareLiteAria": "Leichte Kasse für langsamere Geräte: keine Fotokacheln, weniger CPU/GPU (nur dieses Gerät und dieser Betrieb). Tipp: Lesezeichen mit ?kassa_lite=1",
+    "kassaHardwareLiteAria": "Leichte Kasse für langsamere Geräte: keine Fotokacheln, weniger CPU/GPU (nur dieses Gerät). Tipp: Lesezeichen mit ?kassa_lite=1",
     "back": "Zurück",
     "menu": "Menü",
     "overview": "Übersicht",

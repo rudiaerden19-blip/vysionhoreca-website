@@ -5422,7 +5422,7 @@
     "kassaAppearanceDarkAria": "在本设备上以专业深色界面显示收银台（本商户）",
     "kassaAppearanceLightAria": "在本设备上以浅色界面显示收银台（本商户）",
     "kassaHardwareLite": "无照片",
-    "kassaHardwareLiteAria": "为较慢设备准备的轻量收银：无照片磁贴，降低 CPU/GPU 占用（仅限本设备及本商户）。提示：可将 ?kassa_lite=1 加入书签",
+    "kassaHardwareLiteAria": "为较慢设备准备的轻量收银：无照片磁贴，降低 CPU/GPU 占用（仅限本设备）。提示：可将 ?kassa_lite=1 加入书签",
     "back": "返回",
     "menu": "菜单",
     "overview": "概览",

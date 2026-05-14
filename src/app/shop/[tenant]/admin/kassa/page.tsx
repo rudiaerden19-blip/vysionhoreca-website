@@ -157,8 +157,8 @@ const KASSA_PRODUCT_GRID_EAGER_TILE_COUNT = 16
 /** Scroll vs tik op embedded touch/WebView (o.a. Elo): kleine beweging telt nog als tik */
 const KASSA_TILE_TAP_SLOP_PX = 18
 
-/** Legacy globale sleutel (bug): beïnvloedde alle tenants op hetzelfde domein — wordt bij load naar per-tenant sleutel gemigreerd */
-const LEGACY_KASSA_HARDWARE_LITE_LS = 'vysion_kassa_hardware_lite'
+/** localStorage: tragere terminals — fototegels uit, eenvoudige DOM */
+const KASSA_HARDWARE_LITE_LS = 'vysion_kassa_hardware_lite'
 
 function stoolsFromFloorDecorPayload(data: unknown): { stoolNumber: string; segmentId: string }[] {
   const rawItems = Array.isArray(data)
@@ -522,7 +522,6 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
 
 function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const tenant = params.tenant
-  const hardwareLiteStorageKey = `vysion_kassa_hardware_lite_${tenant}`
   const offlineQueueKey = offlineOrdersQueueStorageKey(tenant)
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -533,7 +532,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     if (v === '1' || v === 'true') {
       setKassaHardwareLite(true)
       try {
-        localStorage.setItem(hardwareLiteStorageKey, '1')
+        localStorage.setItem(KASSA_HARDWARE_LITE_LS, '1')
       } catch {
         /* ignore */
       }
@@ -542,40 +541,31 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     if (v === '0' || v === 'false') {
       setKassaHardwareLite(false)
       try {
-        localStorage.removeItem(hardwareLiteStorageKey)
+        localStorage.removeItem(KASSA_HARDWARE_LITE_LS)
       } catch {
         /* ignore */
       }
       return
     }
     try {
-      let stored = localStorage.getItem(hardwareLiteStorageKey)
-      if (stored === null) {
-        const legacy = localStorage.getItem(LEGACY_KASSA_HARDWARE_LITE_LS)
-        if (legacy === '1') {
-          stored = '1'
-          localStorage.setItem(hardwareLiteStorageKey, '1')
-          localStorage.removeItem(LEGACY_KASSA_HARDWARE_LITE_LS)
-        }
-      }
-      setKassaHardwareLite(stored === '1')
+      setKassaHardwareLite(localStorage.getItem(KASSA_HARDWARE_LITE_LS) === '1')
     } catch {
       setKassaHardwareLite(false)
     }
-  }, [searchParams, hardwareLiteStorageKey])
+  }, [searchParams])
 
   const toggleKassaHardwareLite = useCallback(() => {
     setKassaHardwareLite((prev) => {
       const next = !prev
       try {
-        if (next) localStorage.setItem(hardwareLiteStorageKey, '1')
-        else localStorage.removeItem(hardwareLiteStorageKey)
+        if (next) localStorage.setItem(KASSA_HARDWARE_LITE_LS, '1')
+        else localStorage.removeItem(KASSA_HARDWARE_LITE_LS)
       } catch {
         /* ignore */
       }
       return next
     })
-  }, [hardwareLiteStorageKey])
+  }, [])
 
   const demoFromUrl =
     searchParams.get('demo') === 'bekijk' || searchParams.get('alleen_lezen') === '1'
