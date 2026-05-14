@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useMemo, useCallback, type PointerEvent as ReactPointerEvent } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
 import {
@@ -23,14 +23,6 @@ export type TableShape = FloorPlanTable['shape']
 export type TableStatus = FloorPlanTable['status']
 
 export type KassaTable = FloorPlanTable
-
-const FLOOR_MODAL_TOUCH =
-  'min-h-[44px] touch-manipulation [-webkit-tap-highlight-color:transparent]'
-
-function focusFloorModalInput(e: ReactPointerEvent<HTMLInputElement>) {
-  if (e.pointerType !== 'touch' && e.pointerType !== 'pen') return
-  e.currentTarget.focus({ preventScroll: true })
-}
 
 const STATUS_COLORS: Record<TableStatus, string> = {
   FREE: '#22c55e',
@@ -1672,8 +1664,7 @@ export default function KassaFloorPlan({
                     value={addStool1}
                     onChange={e => setAddStool1(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && confirmAddBar()}
-                    onPointerDown={focusFloorModalInput}
-                    className={`w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-amber-500 outline-none text-xl font-bold text-center ${FLOOR_MODAL_TOUCH}`}
+                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-amber-500 outline-none text-xl font-bold text-center"
                     placeholder={t('kassaApp.floorPlanPlaceholderStoolExample')}
                   />
                 </div>
@@ -1689,8 +1680,7 @@ export default function KassaFloorPlan({
                     value={addStool2}
                     onChange={e => setAddStool2(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && confirmAddBar()}
-                    onPointerDown={focusFloorModalInput}
-                    className={`w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-amber-500 outline-none text-xl font-bold text-center ${FLOOR_MODAL_TOUCH}`}
+                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-amber-500 outline-none text-xl font-bold text-center"
                     placeholder={t('kassaApp.floorPlanPlaceholderStoolExample')}
                   />
                 </div>
@@ -1718,7 +1708,7 @@ export default function KassaFloorPlan({
                 <input
                   ref={addTableNumberInputRef}
                   type="text"
-                  inputMode="numeric"
+                  inputMode="text"
                   autoComplete="off"
                   autoCorrect="off"
                   autoCapitalize="off"
@@ -1728,8 +1718,7 @@ export default function KassaFloorPlan({
                   value={addNumber}
                   onChange={e => setAddNumber(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && addTable()}
-                  onPointerDown={focusFloorModalInput}
-                  className={`w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#075985] outline-none text-xl font-bold text-center ${FLOOR_MODAL_TOUCH}`}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#075985] outline-none text-xl font-bold text-center"
                   placeholder={t('kassaApp.floorPlanModalTableNumberPlaceholder')}
                 />
               </div>

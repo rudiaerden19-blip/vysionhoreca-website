@@ -30,17 +30,8 @@ import {
   FixedCostCategory,
   VariableCostCategory,
 } from '@/lib/admin-api'
-import type { PointerEvent as ReactPointerEvent } from 'react'
 
 type TabType = 'overview' | 'kassa' | 'fixed' | 'variable' | 'year' | 'settings'
-
-const ANALYSE_TOUCH_INPUT =
-  'min-h-[44px] touch-manipulation [-webkit-tap-highlight-color:transparent]'
-
-function focusNumberFieldOnTouch(e: ReactPointerEvent<HTMLInputElement>) {
-  if (e.pointerType !== 'touch' && e.pointerType !== 'pen') return
-  e.currentTarget.focus({ preventScroll: true })
-}
 
 // Month names are now loaded from translations
 
@@ -1251,8 +1242,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                 value={targetsForm.target_profit_margin || ''}
                 onChange={e => setTargetsForm(f => ({ ...f, target_profit_margin: Number(e.target.value) }))}
                 placeholder="25"
-                className={`w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 ${ANALYSE_TOUCH_INPUT}`}
-                onPointerDown={focusNumberFieldOnTouch}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
               />
               <p className="text-sm text-gray-500 mt-1">{t('analysePage.settings.targetMarginHelp')}</p>
             </div>
@@ -1264,8 +1254,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                 value={targetsForm.minimum_profit_margin || ''}
                 onChange={e => setTargetsForm(f => ({ ...f, minimum_profit_margin: Number(e.target.value) }))}
                 placeholder="15"
-                className={`w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 ${ANALYSE_TOUCH_INPUT}`}
-                onPointerDown={focusNumberFieldOnTouch}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
               />
               <p className="text-sm text-gray-500 mt-1">{t('analysePage.settings.minMarginHelp')}</p>
             </div>
@@ -1277,8 +1266,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                 value={targetsForm.max_personnel_percent || ''}
                 onChange={e => setTargetsForm(f => ({ ...f, max_personnel_percent: Number(e.target.value) }))}
                 placeholder="30"
-                className={`w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 ${ANALYSE_TOUCH_INPUT}`}
-                onPointerDown={focusNumberFieldOnTouch}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
               />
               <p className="text-sm text-gray-500 mt-1">{t('analysePage.settings.maxPersonnelHelp')}</p>
             </div>
@@ -1290,8 +1278,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                 value={targetsForm.max_ingredient_percent || ''}
                 onChange={e => setTargetsForm(f => ({ ...f, max_ingredient_percent: Number(e.target.value) }))}
                 placeholder="35"
-                className={`w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 ${ANALYSE_TOUCH_INPUT}`}
-                onPointerDown={focusNumberFieldOnTouch}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
               />
               <p className="text-sm text-gray-500 mt-1">{t('analysePage.settings.maxIngredientsHelp')}</p>
             </div>
@@ -1303,8 +1290,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                 value={targetsForm.target_average_ticket || ''}
                 onChange={e => setTargetsForm(f => ({ ...f, target_average_ticket: Number(e.target.value) }))}
                 placeholder="15"
-                className={`w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 ${ANALYSE_TOUCH_INPUT}`}
-                onPointerDown={focusNumberFieldOnTouch}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
@@ -1382,8 +1368,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                       value={kassaForm.cash_revenue || ''}
                       onChange={e => setKassaForm(f => ({ ...f, cash_revenue: Number(e.target.value) }))}
                       placeholder="0.00"
-                      className={`w-full px-4 py-3 border border-gray-200 rounded-xl ${ANALYSE_TOUCH_INPUT}`}
-                      onPointerDown={focusNumberFieldOnTouch}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl"
                     />
                   </div>
                   <div>
@@ -1394,8 +1379,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                       value={kassaForm.card_revenue || ''}
                       onChange={e => setKassaForm(f => ({ ...f, card_revenue: Number(e.target.value) }))}
                       placeholder="0.00"
-                      className={`w-full px-4 py-3 border border-gray-200 rounded-xl ${ANALYSE_TOUCH_INPUT}`}
-                      onPointerDown={focusNumberFieldOnTouch}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl"
                     />
                   </div>
                 </div>
@@ -1406,8 +1390,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                     value={kassaForm.order_count || ''}
                     onChange={e => setKassaForm(f => ({ ...f, order_count: Number(e.target.value) }))}
                     placeholder="0"
-                    className={`w-full px-4 py-3 border border-gray-200 rounded-xl ${ANALYSE_TOUCH_INPUT}`}
-                    onPointerDown={focusNumberFieldOnTouch}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl"
                   />
                 </div>
                 <div>
@@ -1514,8 +1497,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                     value={fixedForm.amount || ''}
                     onChange={e => setFixedForm(f => ({ ...f, amount: Number(e.target.value) }))}
                     placeholder="0.00"
-                    className={`w-full px-4 py-3 border border-gray-200 rounded-xl ${ANALYSE_TOUCH_INPUT}`}
-                    onPointerDown={focusNumberFieldOnTouch}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl"
                   />
                 </div>
                 <div>
@@ -1647,8 +1629,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                       value={variableForm.amount || ''}
                       onChange={e => setVariableForm(f => ({ ...f, amount: Number(e.target.value) }))}
                       placeholder="0.00"
-                      className={`w-full px-4 py-3 border border-gray-200 rounded-xl ${ANALYSE_TOUCH_INPUT}`}
-                      onPointerDown={focusNumberFieldOnTouch}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl"
                     />
                   </div>
                   <div>

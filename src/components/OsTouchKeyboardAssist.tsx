@@ -74,7 +74,11 @@ export function OsTouchKeyboardAssist() {
       requestAnimationFrame(() => tryShowOsKeyboard(nav))
     }
 
-    const kickEligibleFocus = (el: HTMLInputElement | HTMLTextAreaElement) => {
+    /** Touch → soms géén echte focus; daarna géén keyboard. Focus binnen microtask ná user gesture. */
+    const onTouchEnd = (ev: TouchEvent) => {
+      const t = ev.target
+      if (!isEligible(t)) return
+      const el = t
       queueMicrotask(() => {
         try {
           if (document.activeElement !== el) {
@@ -87,24 +91,6 @@ export function OsTouchKeyboardAssist() {
       })
     }
 
-    /** Touch-eventpad (Legacy). */
-    const onTouchEnd = (ev: TouchEvent) => {
-      const t = ev.target
-      if (!isEligible(t)) return
-      kickEligibleFocus(t)
-    }
-
-    /**
-     * Edge/Windows gebruikt veelal Pointer Events i.p.v. alleen Touch Events;
-     * zonder deze handler komt focust op invoervelden soms niet aan bij touchscreen.
-     */
-    const onPointerUp = (ev: PointerEvent) => {
-      if (ev.pointerType !== 'touch' && ev.pointerType !== 'pen') return
-      const t = ev.target
-      if (!isEligible(t)) return
-      kickEligibleFocus(t)
-    }
-
     const onFocusIn = (ev: FocusEvent) => {
       const t = ev.target
       if (!isEligible(t)) return
@@ -112,13 +98,11 @@ export function OsTouchKeyboardAssist() {
     }
 
     document.addEventListener('focusin', onFocusIn, true)
-    const touchEndOpts = { passive: true, capture: true } satisfies AddEventListenerOptions
+    const touchEndOpts = { passive: true, capture: false } satisfies AddEventListenerOptions
     document.addEventListener('touchend', onTouchEnd, touchEndOpts)
-    document.addEventListener('pointerup', onPointerUp, { capture: true })
     return () => {
       document.removeEventListener('focusin', onFocusIn, true)
       document.removeEventListener('touchend', onTouchEnd, touchEndOpts)
-      document.removeEventListener('pointerup', onPointerUp, { capture: true })
     }
   }, [])
 
