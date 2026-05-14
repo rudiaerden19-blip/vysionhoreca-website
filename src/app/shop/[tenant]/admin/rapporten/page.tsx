@@ -7,6 +7,7 @@ import {
   distributeOrderPaymentForZRaport,
   fetchAllOrdersForRapporten,
   getTenantSettings,
+  getZRapportDateBounds,
   orderCountsTowardRevenueAndZReport,
   saveTenantSettings,
   type TenantSettings,
@@ -96,6 +97,105 @@ function parseOrderItems(raw: unknown): Order['items'] {
     }
   }
   return []
+}
+
+/** Orders die tot omzet/Z tellen en in hetzelfde fiscale Z-dagvenster vallen als `reportDateYmd` (Europe/Brussels). */
+function ordersInZRapportFiscalDay(orders: Order[], reportDateYmd: string): Order[] {
+  const { startUTC, endUTC } = getZRapportDateBounds(reportDateYmd)
+  const start = new Date(startUTC).getTime()
+  const end = new Date(endUTC).getTime()
+  return orders.filter((o) => {
+    if (!orderCountsTowardRevenueAndZReport(o)) return false
+    const t = new Date(o.created_at).getTime()
+    return t >= start && t <= end
+  })
+}
+
+type ParsedOrderLine = {
+  name: string
+  quantity: number
+  price: number
+  options?: Array<{ name?: string; price?: number }>
+}
+
+function parseLinesFromOrderItems(items: Order['items']): ParsedOrderLine[] {
+  if (!Array.isArray(items)) return []
+  const out: ParsedOrderLine[] = []
+  for (const row of items) {
+    const r = row as Record<string, unknown>
+    if (typeof r.product_name === 'string') {
+      out.push({
+        name: r.product_name,
+        quantity: Number(r.quantity) || 0,
+        price: Number(r.unit_price ?? r.price) || 0,
+      })
+      continue
+    }
+    const name = typeof r.name === 'string' ? r.name : ''
+    const opts = Array.isArray(r.options) ? (r.options as ParsedOrderLine['options']) : undefined
+    out.push({
+      name,
+      quantity: Number(r.quantity) || 0,
+      price: Number(r.price) || 0,
+      options: opts,
+    })
+  }
+  return out
+}
+
+function optionSignature(opts?: ParsedOrderLine['options']): string {
+  if (!opts?.length) return ''
+  return opts
+    .map((o) => `${String(o?.name ?? '').trim()}@${Number(o?.price) || 0}`)
+    .sort()
+    .join('|')
+}
+
+/** Regelprijs incl. opties (per stuk × aantal), consistent met opgeslagen bonregels. */
+function orderLineAmount(line: ParsedOrderLine): number {
+  const q = Math.max(0, Number(line.quantity) || 0)
+  const unit = Number(line.price) || 0
+  const optUnit = Array.isArray(line.options)
+    ? line.options.reduce((s, o) => s + (Number(o?.price) || 0), 0)
+    : 0
+  return Math.round((unit + optUnit) * q * 100) / 100
+}
+
+type AggregatedArticleLine = { label: string; qty: number; total: number }
+
+/** Aggregeer verkochte hoeveelheden per artikel (incl. variant door opties) voor een set bonnen. */
+function aggregateArticleSalesForOrders(dayOrders: Order[]): AggregatedArticleLine[] {
+  const map = new Map<string, AggregatedArticleLine>()
+  for (const o of dayOrders) {
+    for (const raw of parseLinesFromOrderItems(o.items)) {
+      const name = String(raw.name || '').trim() || 'Artikel'
+      const sig = optionSignature(raw.options)
+      const key = sig ? `${name}|||${sig}` : name
+      const qty = Math.max(0, Number(raw.quantity) || 0)
+      const amt = orderLineAmount(raw)
+      let label = name
+      if (raw.options?.length) {
+        const bits = raw.options.map((x) => String(x?.name ?? '').trim()).filter(Boolean)
+        if (bits.length) label = `${name} (${bits.join(', ')})`
+      }
+      const prev = map.get(key)
+      if (prev) {
+        prev.qty += qty
+        prev.total = Math.round((prev.total + amt) * 100) / 100
+      } else {
+        map.set(key, { label, qty, total: amt })
+      }
+    }
+  }
+  return [...map.values()].sort((a, b) => a.label.localeCompare(b.label, 'nl'))
+}
+
+function escapeHtmlPdf(s: string) {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
 }
 
 function getPeriodStart(period: ExportPeriod): Date {
@@ -541,7 +641,9 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
 
   // ── Boekhouding export ──
   const exportBoekhoudCSV = () => {
-    const selected = zReports.filter(r => selectedZReports.includes(r.id))
+    const selected = zReports
+      .filter((r) => selectedZReports.includes(r.id))
+      .sort((a, b) => a.report_date.localeCompare(b.report_date))
     const headers = ['Datum','Bestellingen','Contant','PIN/Kaart','Online','BTW Laag','BTW Midden','BTW Hoog','Totaal']
     const rows = selected.map(r => [
       r.report_date, String(r.order_count),
@@ -562,18 +664,77 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     a.download = `z-rapporten-${tenant}.csv`; a.click()
   }
 
+  /** Verkopen per artikel per Z-dag (zelfde fiscale dag als het Z-rapport). */
+  const exportBoekhoudArtikelCSV = () => {
+    const selected = zReports
+      .filter((r) => selectedZReports.includes(r.id))
+      .sort((a, b) => a.report_date.localeCompare(b.report_date))
+    const headers = ['Z-rapport (datum)', 'Artikel', 'Aantal', 'Bedrag incl. BTW']
+    const rows: string[][] = []
+    for (const zr of selected) {
+      const dayOrders = ordersInZRapportFiscalDay(validOrders, zr.report_date)
+      const agg = aggregateArticleSalesForOrders(dayOrders)
+      if (agg.length === 0) {
+        rows.push([zr.report_date, '(Geen artikelregels in geladen bonnen)', '0', '0,00'])
+        continue
+      }
+      for (const line of agg) {
+        rows.push([
+          zr.report_date,
+          line.label,
+          String(line.qty),
+          line.total.toFixed(2).replace('.', ','),
+        ])
+      }
+    }
+    const csv = [
+      `"${tenantInfo?.business_name || tenant}"`,
+      '"Verkopen per artikel (Z-rapportperiode)"',
+      '',
+      headers.map((h) => `"${h}"`).join(';'),
+      ...rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(';')),
+    ].join('\n')
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = `z-rapporten-artikelen-${tenant}.csv`
+    a.click()
+  }
+
   const exportBoekhoudPDF = () => {
-    const selected = zReports.filter(r => selectedZReports.includes(r.id))
-    const totalRev = selected.reduce((s,r)=>s+r.total,0)
+    const selected = zReports
+      .filter((r) => selectedZReports.includes(r.id))
+      .sort((a, b) => a.report_date.localeCompare(b.report_date))
+    const totalRev = selected.reduce((s, r) => s + r.total, 0)
+    const articleBlocks = selected
+      .map((zr) => {
+        const dayOrders = ordersInZRapportFiscalDay(validOrders, zr.report_date)
+        const agg = aggregateArticleSalesForOrders(dayOrders)
+        const body =
+          agg.length === 0
+            ? '<tr><td colspan="3">Geen artikelregels in geladen bonnen voor deze dag.</td></tr>'
+            : agg
+                .map(
+                  (l) =>
+                    `<tr><td>${escapeHtmlPdf(l.label)}</td><td class="amt">${l.qty}</td><td class="amt">€${l.total.toFixed(2)}</td></tr>`,
+                )
+                .join('')
+        return `<h2 style="margin-top:28px;font-size:16px">Verkocht per artikel — ${escapeHtmlPdf(zr.report_date)}</h2>
+<table><tr><th>Artikel</th><th class="amt">Aantal</th><th class="amt">Bedrag incl. BTW</th></tr>${body}</table>`
+      })
+      .join('')
     const html = `<!DOCTYPE html><html><head><title>Z-Rapporten Export</title>
-    <style>body{font-family:Arial,sans-serif;padding:40px}table{width:100%;border-collapse:collapse}
-    th,td{padding:8px;border:1px solid #ddd}th{background:#f5f5f5}.footer{color:#999;font-size:11px;margin-top:20px}
+    <style>body{font-family:Arial,sans-serif;padding:40px}table{width:100%;border-collapse:collapse;margin-bottom:12px}
+    th,td{padding:8px;border:1px solid #ddd}th{background:#f5f5f5}.amt{text-align:right;font-family:monospace}.footer{color:#999;font-size:11px;margin-top:20px}
     @media print{button{display:none}}</style></head><body>
     <h1>📊 Z-Rapporten Export</h1>
     <p><strong>${tenantInfo?.business_name||tenant}</strong> — ${selected.length} rapporten — Totaal: €${totalRev.toFixed(2)}</p>
+    <h2 style="font-size:16px;margin-top:20px">Samenvatting per dag</h2>
     <table><tr><th>Datum</th><th>Bonnen</th><th>Contant</th><th>PIN/Kaart</th><th>Totaal</th></tr>
     ${selected.map(r=>`<tr><td>${r.report_date}</td><td>${r.order_count}</td><td>€${r.cash_payments.toFixed(2)}</td><td>€${r.card_payments.toFixed(2)}</td><td><strong>€${r.total.toFixed(2)}</strong></td></tr>`).join('')}
-    </table><div class="footer">Gegenereerd op ${new Date().toLocaleString('nl-NL')}</div>
+    </table>
+    ${articleBlocks}
+    <div class="footer">Gegenereerd op ${new Date().toLocaleString('nl-NL')}</div>
     <button onclick="window.print()" style="margin-top:20px;padding:10px 20px;background:#10b981;color:white;border:none;border-radius:8px;cursor:pointer">🖨️ Afdrukken</button>
     </body></html>`
     const w = window.open('','_blank','width=900,height=700')
@@ -581,8 +742,27 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
   }
 
   const exportBoekhoudJSON = () => {
-    const selected = zReports.filter(r => selectedZReports.includes(r.id))
-    const data = JSON.stringify({ business: tenantInfo?.business_name||tenant, exported_at: new Date().toISOString(), z_reports: selected }, null, 2)
+    const selected = zReports
+      .filter((r) => selectedZReports.includes(r.id))
+      .sort((a, b) => a.report_date.localeCompare(b.report_date))
+    const article_sales_by_report_date = selected.map((zr) => ({
+      report_date: zr.report_date,
+      lines: aggregateArticleSalesForOrders(ordersInZRapportFiscalDay(validOrders, zr.report_date)).map((l) => ({
+        description: l.label,
+        quantity: l.qty,
+        total_incl_vat: l.total,
+      })),
+    }))
+    const data = JSON.stringify(
+      {
+        business: tenantInfo?.business_name || tenant,
+        exported_at: new Date().toISOString(),
+        z_reports: selected,
+        article_sales_by_report_date,
+      },
+      null,
+      2,
+    )
     const blob = new Blob([data], {type:'application/json'})
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob)
     a.download = `z-rapporten-${tenant}.json`; a.click()
@@ -1212,10 +1392,14 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
             )}
 
             {/* Export knoppen */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <button onClick={()=>selectedZReports.length>0&&exportBoekhoudCSV()} disabled={selectedZReports.length===0}
                 className="flex items-center justify-center gap-2 py-4 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-300 text-white font-bold rounded-2xl transition-colors text-sm">
-                📊 Export CSV
+                📊 Export CSV (totalen)
+              </button>
+              <button onClick={()=>selectedZReports.length>0&&exportBoekhoudArtikelCSV()} disabled={selectedZReports.length===0}
+                className="flex items-center justify-center gap-2 py-4 bg-teal-600 hover:bg-teal-700 disabled:bg-gray-300 text-white font-bold rounded-2xl transition-colors text-sm">
+                📑 CSV artikelen
               </button>
               <button onClick={()=>selectedZReports.length>0&&exportBoekhoudPDF()} disabled={selectedZReports.length===0}
                 className="flex items-center justify-center gap-2 py-4 bg-gray-500 hover:bg-gray-600 disabled:bg-gray-300 text-white font-bold rounded-2xl transition-colors text-sm">
@@ -1231,10 +1415,9 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
             <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5">
               <p className="font-semibold text-blue-700 mb-3">ℹ️ Over SCARDa Export</p>
               <ul className="space-y-1.5 text-sm text-blue-600">
-                <li>• CSV formaat is geschikt voor import in boekhoudpakketten</li>
-                <li>• Kolommen: datum, omzet, cash, kaart, online, BTW per tarief, tickets</li>
-                <li>• Alleen afgesloten Z-rapporten zijn exporteerbaar</li>
-                <li>• Elke export wordt gelogd in de audit trail</li>
+                <li>• CSV/PDF totalen: datum, omzet, cash, kaart, online, BTW per tarief, aantal bonnen</li>
+                <li>• <strong>CSV artikelen</strong>, PDF en JSON bevatten ook <strong>verkocht per artikel</strong> per Z-dag (bv. stuks Cola, Fanta)</li>
+                <li>• Alleen geselecteerde Z-rapporten worden geëxporteerd</li>
               </ul>
             </div>
           </div>
