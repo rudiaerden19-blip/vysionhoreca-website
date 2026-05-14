@@ -42,6 +42,7 @@ import {
   persistPublicDemoSessionIfNeeded,
   publicDemoSessionMatchesTenant,
 } from '@/lib/demo-links'
+import { useKassaUiDarkSync } from '@/lib/kassa-register-ui-dark-preference'
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -68,6 +69,8 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   /** `verifying` = client dacht ingelogd; wacht op `/api/auth/verify-tenant-session` (zelfde regels als schrijf-API’s). */
   const [adminAccess, setAdminAccess] = useState<'pending' | 'verifying' | 'ok' | 'login'>('pending')
   const baseUrl = `/shop/${params.tenant}/admin`
+  const { dark: kassaAppearanceDark, toggle: toggleKassaAppearance } = useKassaUiDarkSync(params.tenant)
+
   const {
     moduleAccess,
     enabledModulesJson,
@@ -404,15 +407,36 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
             loading={modulesLoading}
           />
           {!modulesLoading && (isSuperAdminLoggedIn() || moduleAccess['kassa']) && (
-            <a
-              href={adminPosHref}
-              className="touch-manipulation [-webkit-tap-highlight-color:transparent] flex shrink-0 items-center gap-2 rounded-xl bg-[#58CCFF] px-3 py-2 text-sm font-bold text-[#063042] shadow-md transition-colors hover:bg-[#47c6fe] no-underline"
-            >
-              <span className="text-base leading-none" aria-hidden>
-                🧾
-              </span>
-              <span>{t('adminLayout.pos')}</span>
-            </a>
+            <>
+              <a
+                href={adminPosHref}
+                className="touch-manipulation [-webkit-tap-highlight-color:transparent] flex shrink-0 items-center gap-2 rounded-xl bg-[#58CCFF] px-3 py-2 text-sm font-bold text-[#063042] shadow-md transition-colors hover:bg-[#47c6fe] no-underline"
+              >
+                <span className="text-base leading-none" aria-hidden>
+                  🧾
+                </span>
+                <span>{t('adminLayout.pos')}</span>
+              </a>
+              <button
+                type="button"
+                onClick={() => toggleKassaAppearance()}
+                className="touch-manipulation [-webkit-tap-highlight-color:transparent] flex shrink-0 items-center gap-1.5 rounded-xl bg-white/10 px-3 py-2 text-sm font-bold text-white shadow-sm transition-colors hover:bg-white/20"
+                title={
+                  kassaAppearanceDark ? t('adminLayout.kassaAppearanceLightAria') : t('adminLayout.kassaAppearanceDarkAria')
+                }
+                aria-pressed={kassaAppearanceDark}
+                aria-label={
+                  kassaAppearanceDark ? t('adminLayout.kassaAppearanceLightAria') : t('adminLayout.kassaAppearanceDarkAria')
+                }
+              >
+                <span className="text-base leading-none" aria-hidden>
+                  {kassaAppearanceDark ? '☀️' : '🌙'}
+                </span>
+                <span className="hidden min-[380px]:inline">
+                  {kassaAppearanceDark ? t('adminLayout.kassaAppearanceLight') : t('adminLayout.kassaAppearanceDark')}
+                </span>
+              </button>
+            </>
           )}
         </div>
 

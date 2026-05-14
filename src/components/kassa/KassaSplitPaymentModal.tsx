@@ -11,6 +11,7 @@ export function KassaSplitPaymentModal({
   setSplitCard,
   onCloseBack,
   onConfirm,
+  appearance = 'light',
 }: {
   open: boolean
   total: number
@@ -20,30 +21,46 @@ export function KassaSplitPaymentModal({
   setSplitCard: (n: number) => void
   onCloseBack: () => void
   onConfirm: () => void
+  appearance?: 'light' | 'dark'
 }) {
   const { t } = useLanguage()
+  const dark = appearance === 'dark'
   if (!open) return null
 
   const balanced = Math.abs(total - splitCash - splitCard) < 0.01
+  const card = dark
+    ? 'rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl border border-zinc-600 bg-[#151a21]'
+    : 'bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl'
+  const hdr = dark ? 'p-4 border-b border-zinc-600 flex justify-between items-center' : 'p-4 border-b border-gray-100 flex justify-between items-center'
+  const hdrTitle = dark ? 'text-xl font-semibold flex items-center gap-2 text-zinc-50' : 'text-xl font-semibold flex items-center gap-2'
+  const closeBtn = dark ? 'p-2 rounded-lg hover:bg-zinc-800 text-2xl text-zinc-200' : 'p-2 rounded-lg hover:bg-gray-100 text-2xl'
+  const totalBox = dark ? 'text-center p-4 bg-[#263043] rounded-xl border border-zinc-600' : 'text-center p-4 bg-gray-50 rounded-xl'
+  const labelMuted = dark ? 'text-zinc-400 text-sm' : 'text-gray-500 text-sm'
+  const inputCls = dark
+    ? 'w-full px-4 py-4 text-2xl font-bold rounded-xl bg-[#121821] border-2 text-zinc-50 border-zinc-600 focus:border-[#58CCFF] outline-none'
+    : 'w-full px-4 py-4 text-2xl font-bold rounded-xl bg-white border-2 outline-none'
+  const quickBtn = dark
+    ? 'py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-sm font-semibold text-zinc-100 transition-colors'
+    : 'py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-sm font-semibold transition-colors'
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
-        <div className="p-4 border-b flex justify-between items-center">
-          <h3 className="text-xl font-semibold flex items-center gap-2">
+      <div className={card}>
+        <div className={hdr}>
+          <h3 className={hdrTitle}>
             <span className="text-purple-500">👛</span> {t('kassaApp.splitPayTitle')}
           </h3>
-          <button type="button" onClick={onCloseBack} className="p-2 rounded-lg hover:bg-gray-100 text-2xl">
+          <button type="button" onClick={onCloseBack} className={closeBtn}>
             ✕
           </button>
         </div>
         <div className="p-6 space-y-5">
-          <div className="text-center p-4 bg-gray-50 rounded-xl">
-            <p className="text-gray-500">{t('kassaApp.totalToPay')}</p>
-            <p className="text-4xl font-bold text-[#3C4D6B]">€{total.toFixed(2)}</p>
+          <div className={totalBox}>
+            <p className={dark ? 'text-zinc-400' : 'text-gray-500'}>{t('kassaApp.totalToPay')}</p>
+            <p className={dark ? 'text-4xl font-bold text-[#6dd5ff]' : 'text-4xl font-bold text-[#3C4D6B]'}>€{total.toFixed(2)}</p>
           </div>
           <div className="space-y-1">
-            <label className="flex items-center gap-2 text-gray-500 text-sm">
+            <label className={`flex items-center gap-2 ${labelMuted}`}>
               💵 {t('kassaApp.splitCashLabel')}
             </label>
             <input
@@ -54,14 +71,14 @@ export function KassaSplitPaymentModal({
                 setSplitCash(v)
                 setSplitCard(Math.max(0, total - v))
               }}
-              className="w-full px-4 py-4 text-2xl font-bold rounded-xl bg-white border-2 border-green-400 focus:border-green-500 outline-none"
+              className={dark ? `${inputCls} border-green-500 focus:border-green-400` : `${inputCls} border-green-400 focus:border-green-500`}
               placeholder={t('kassaApp.numpadPlaceholder')}
               step="0.01"
               min="0"
             />
           </div>
           <div className="space-y-1">
-            <label className="flex items-center gap-2 text-gray-500 text-sm">
+            <label className={`flex items-center gap-2 ${labelMuted}`}>
               💳 {t('kassaApp.splitCardLabel')}
             </label>
             <input
@@ -72,7 +89,7 @@ export function KassaSplitPaymentModal({
                 setSplitCard(v)
                 setSplitCash(Math.max(0, total - v))
               }}
-              className="w-full px-4 py-4 text-2xl font-bold rounded-xl bg-white border-2 border-blue-400 focus:border-blue-500 outline-none"
+              className={dark ? `${inputCls} border-blue-500 focus:border-blue-400` : `${inputCls} border-blue-400 focus:border-blue-500`}
               placeholder={t('kassaApp.numpadPlaceholder')}
               step="0.01"
               min="0"
@@ -91,7 +108,7 @@ export function KassaSplitPaymentModal({
                   setSplitCash(opt.cash)
                   setSplitCard(opt.card)
                 }}
-                className="py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-sm font-semibold transition-colors"
+                className={quickBtn}
               >
                 {opt.label}
               </button>
