@@ -1387,6 +1387,50 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
               <p className="text-sm text-emerald-400">Exporteer afgesloten Z-rapporten naar CSV, PDF of JSON formaat. Alleen definitieve dagafsluitingen kunnen geëxporteerd worden.</p>
             </div>
 
+            {/* Export — boven de lijst zodat CSV/PDF altijd zichtbaar blijft (geen scroll verbergen) */}
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 space-y-3">
+              <h3 className="font-semibold text-gray-800 text-sm">Exporteren</h3>
+              {zReports.length > 0 && selectedZReports.length === 0 && (
+                <p className="text-sm text-amber-800 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2">
+                  Tip: vink hieronder minstens één Z-rapport aan om CSV of PDF te downloaden.
+                </p>
+              )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <button
+                  type="button"
+                  onClick={() => selectedZReports.length > 0 && exportBoekhoudCSV()}
+                  disabled={selectedZReports.length === 0}
+                  className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-sm font-bold transition-colors bg-emerald-600 hover:bg-emerald-700 text-white disabled:bg-gray-100 disabled:text-gray-500 disabled:hover:bg-gray-100 border border-emerald-700 disabled:border-gray-300 min-h-[48px]"
+                >
+                  📊 CSV totalen
+                </button>
+                <button
+                  type="button"
+                  onClick={() => selectedZReports.length > 0 && exportBoekhoudArtikelCSV()}
+                  disabled={selectedZReports.length === 0}
+                  className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-sm font-bold transition-colors bg-emerald-800 hover:bg-emerald-900 text-white disabled:bg-gray-100 disabled:text-gray-500 disabled:hover:bg-gray-100 border border-emerald-900 disabled:border-gray-300 min-h-[48px]"
+                >
+                  📑 CSV artikelen
+                </button>
+                <button
+                  type="button"
+                  onClick={() => selectedZReports.length > 0 && exportBoekhoudPDF()}
+                  disabled={selectedZReports.length === 0}
+                  className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-sm font-bold transition-colors bg-slate-600 hover:bg-slate-700 text-white disabled:bg-gray-100 disabled:text-gray-500 disabled:hover:bg-gray-100 border border-slate-700 disabled:border-gray-300 min-h-[48px]"
+                >
+                  📄 PDF
+                </button>
+                <button
+                  type="button"
+                  onClick={() => selectedZReports.length > 0 && exportBoekhoudJSON()}
+                  disabled={selectedZReports.length === 0}
+                  className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-sm font-bold transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-100 disabled:text-gray-500 disabled:hover:bg-gray-100 border border-blue-700 disabled:border-gray-300 min-h-[48px]"
+                >
+                  ⬇️ JSON
+                </button>
+              </div>
+            </div>
+
             {/* Z-rapporten selecteren */}
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
               <div className="p-5 border-b border-gray-100 flex items-center justify-between">
@@ -1439,26 +1483,6 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
                 </div>
               </div>
             )}
-
-            {/* Export knoppen */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <button onClick={()=>selectedZReports.length>0&&exportBoekhoudCSV()} disabled={selectedZReports.length===0}
-                className="flex items-center justify-center gap-2 py-4 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-300 text-white font-bold rounded-2xl transition-colors text-sm">
-                📊 Export CSV (totalen)
-              </button>
-              <button onClick={()=>selectedZReports.length>0&&exportBoekhoudArtikelCSV()} disabled={selectedZReports.length===0}
-                className="flex items-center justify-center gap-2 py-4 bg-teal-600 hover:bg-teal-700 disabled:bg-gray-300 text-white font-bold rounded-2xl transition-colors text-sm">
-                📑 CSV artikelen
-              </button>
-              <button onClick={()=>selectedZReports.length>0&&exportBoekhoudPDF()} disabled={selectedZReports.length===0}
-                className="flex items-center justify-center gap-2 py-4 bg-gray-500 hover:bg-gray-600 disabled:bg-gray-300 text-white font-bold rounded-2xl transition-colors text-sm">
-                📄 Export PDF
-              </button>
-              <button onClick={()=>selectedZReports.length>0&&exportBoekhoudJSON()} disabled={selectedZReports.length===0}
-                className="flex items-center justify-center gap-2 py-4 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white font-bold rounded-2xl transition-colors text-sm">
-                ⬇️ Export JSON
-              </button>
-            </div>
 
             {/* Info */}
             <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5">
