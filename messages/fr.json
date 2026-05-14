@@ -5445,7 +5445,7 @@
     "kassaAppearanceDarkAria": "Afficher la caisse en mode sombre professionnel sur cet appareil (cet établissement)",
     "kassaAppearanceLightAria": "Afficher la caisse en mode clair sur cet appareil (cet établissement)",
     "kassaHardwareLite": "Sans photos",
-    "kassaHardwareLiteAria": "Caisse allégée pour matériel plus lent : pas de vignettes photo, moins de charge CPU/GPU (cet appareil uniquement). Astuce : favori avec ?kassa_lite=1",
+    "kassaHardwareLiteAria": "Caisse allégée pour matériel plus lent : pas de vignettes photo, moins de charge CPU/GPU (cet appareil et cet établissement uniquement). Astuce : favori avec ?kassa_lite=1",
     "back": "Retour",
     "menu": "Menu",
     "overview": "Aperçu",

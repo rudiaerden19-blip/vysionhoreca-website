@@ -5422,7 +5422,7 @@
     "kassaAppearanceDarkAria": "Cassa in modalità scura professionale su questo dispositivo (questa attività)",
     "kassaAppearanceLightAria": "Cassa in modalità chiara su questo dispositivo (questa attività)",
     "kassaHardwareLite": "Senza foto",
-    "kassaHardwareLiteAria": "Cassa leggera per dispositivi lenti: niente piastrelle foto, meno CPU/GPU (solo questo dispositivo). Suggerimento: segnalibro con ?kassa_lite=1",
+    "kassaHardwareLiteAria": "Cassa leggera per dispositivi lenti: niente piastrelle foto, meno CPU/GPU (solo questo dispositivo e questa attività). Suggerimento: segnalibro con ?kassa_lite=1",
     "back": "Indietro",
     "menu": "Menu",
     "overview": "Panoramica",

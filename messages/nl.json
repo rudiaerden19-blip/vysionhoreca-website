@@ -5381,7 +5381,7 @@
     "kassaAppearanceDarkAria": "Kassa in professionele donkere modus (op dit apparaat, voor deze zaak)",
     "kassaAppearanceLightAria": "Kassa in lichte modus (op dit apparaat, voor deze zaak)",
     "kassaHardwareLite": "Zonder foto's",
-    "kassaHardwareLiteAria": "Lichte kassa voor tragere schermen: geen fototegels, minder werk voor de processor (per dit apparaat). Tip: bookmark met ?kassa_lite=1",
+    "kassaHardwareLiteAria": "Lichte kassa voor tragere schermen: geen fototegels, minder werk voor de processor (per dit apparaat en deze zaak). Tip: bookmark met ?kassa_lite=1",
     "back": "Terug",
     "menu": "Menu",
     "overview": "Overzicht",
