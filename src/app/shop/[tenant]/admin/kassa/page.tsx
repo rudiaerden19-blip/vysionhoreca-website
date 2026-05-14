@@ -126,12 +126,18 @@ import {
   applyCustomerDisplayWindowBounds,
 } from '@/lib/kassa-customer-display-window'
 
-/** Geluid ná eerste paint — zwakkere terminals (o.a. Elo PayPoint) volgen snelle tikken beter */
-function scheduleAddToCartSound() {
+/** Tik-feedback ná paint — zwakkere touch-terminals blijven UI-updates beter bijbenen */
+function scheduleKassaTapSound(play: () => void) {
   queueMicrotask(() => {
-    requestAnimationFrame(() => void playAddToCart())
+    requestAnimationFrame(() => void play())
   })
 }
+
+function scheduleAddToCartSound() {
+  scheduleKassaTapSound(playAddToCart)
+}
+
+const KASSA_NUMPAD_KEYS = ['7', '8', '9', '+', '4', '5', '6', '-', '1', '2', '3', '×', 'C', '0', '.', '='] as const
 
 function stoolsFromFloorDecorPayload(data: unknown): { stoolNumber: string; segmentId: string }[] {
   const rawItems = Array.isArray(data)
@@ -1835,7 +1841,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }
 
   const updateQty = (cartKey: string, qty: number) => {
-    if (qty <= 0) playRemove(); else playClick()
+    if (qty <= 0) scheduleKassaTapSound(playRemove)
+    else scheduleKassaTapSound(playClick)
     setCart(prev => {
       const updated = qty <= 0
         ? prev.filter(i => i.cartKey !== cartKey)
@@ -1849,7 +1856,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }
 
   const clearCart = () => {
-    playRemove()
+    scheduleKassaTapSound(playRemove)
     setCart([])
     if (tableNumber) {
       syncTableOrder(tableNumber, [])
@@ -2105,29 +2112,31 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [products, selectedCategory])
 
   // ── Numpad ────────────────────────────────────────────────────────────────
-  const handleNumpad = (key: string) => {
-    if (key === 'C') { setNumpadValue(''); return }
-    if (key === '=') {
-      try {
-        const expr = numpadValue.replace(/×/g, '*')
-        // eslint-disable-next-line no-new-func
-        const result = Function('"use strict"; return (' + expr + ')')()
-        setNumpadValue(String(result))
-      } catch { /* ongeldige expressie */ }
-      return
-    }
-    if (['+', '-', '×'].includes(key)) {
-      if (numpadValue && !['+', '-', '×'].some(op => numpadValue.endsWith(op)))
-        setNumpadValue(numpadValue + key)
-      return
-    }
-    if (key === '.') {
-      const parts = numpadValue.split(/[+\-×]/)
-      if (!parts[parts.length - 1].includes('.')) setNumpadValue(numpadValue + '.')
-      return
-    }
-    setNumpadValue(numpadValue + key)
-  }
+  const handleNumpad = useCallback((key: string) => {
+    setNumpadValue((prev) => {
+      if (key === 'C') return ''
+      if (key === '=') {
+        try {
+          const expr = prev.replace(/×/g, '*')
+          // eslint-disable-next-line no-new-func
+          const result = Function('"use strict"; return (' + expr + ')')()
+          return String(result)
+        } catch {
+          return prev
+        }
+      }
+      if (['+', '-', '×'].includes(key)) {
+        if (prev && !['+', '-', '×'].some((op) => prev.endsWith(op))) return prev + key
+        return prev
+      }
+      if (key === '.') {
+        const parts = prev.split(/[+\-×]/)
+        if (!parts[parts.length - 1]?.includes('.')) return prev + '.'
+        return prev
+      }
+      return prev + key
+    })
+  }, [])
 
   const addCustomAmount = () => {
     const amount = parseFloat(numpadValue)
@@ -3551,15 +3560,26 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-4 grid-rows-4 gap-2 flex-1 min-h-0">
-                {['7','8','9','+','4','5','6','-','1','2','3','×','C','0','.','='].map(key => (
+              <div
+                className="grid grid-cols-4 grid-rows-4 gap-2 flex-1 min-h-0 touch-manipulation select-none"
+                onClick={(e) => {
+                  const el = (e.target as HTMLElement).closest('[data-kassa-numpad-key]')
+                  if (!el || !(el instanceof HTMLElement)) return
+                  const k = el.dataset.kassaNumpadKey
+                  if (k) handleNumpad(k)
+                }}
+              >
+                {KASSA_NUMPAD_KEYS.map((key) => (
                   <button
                     key={key}
-                    onClick={() => handleNumpad(key)}
-                    className={`rounded-xl font-bold text-2xl transition-colors active:scale-95 shadow-sm ${
-                      key === 'C' ? 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
-                      : ['+','-','×','='].includes(key) ? 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
-                      : ui.numpadKeyNum
+                    type="button"
+                    data-kassa-numpad-key={key}
+                    className={`rounded-xl font-bold text-2xl shadow-sm touch-manipulation active:brightness-95 ${
+                      key === 'C'
+                        ? 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
+                        : ['+', '-', '×', '='].includes(key)
+                          ? 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
+                          : ui.numpadKeyNum
                     }`}
                   >
                     {key}
@@ -3571,7 +3591,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   type="button"
                   data-testid="kassa-add-custom-amount"
                   onClick={addCustomAmount}
-                  className="mt-3 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-lg transition-colors"
+                  className="mt-3 touch-manipulation py-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-lg active:brightness-95"
                 >
                   {t('kassaApp.addAmount').replace(
                     '{amount}',
@@ -3629,7 +3649,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       <button
                         type="button"
                         onClick={() => updateQty(item.cartKey, item.quantity - 1)}
-                        className="w-8 h-8 rounded-lg bg-red-500 text-white font-bold text-base flex items-center justify-center hover:bg-red-600 transition-colors active:scale-95"
+                        className="touch-manipulation w-8 h-8 rounded-lg bg-red-500 text-white font-bold text-base flex items-center justify-center hover:bg-red-600 active:brightness-95"
                         aria-label={
                           item.quantity === 1 ? t('kassaApp.ariaRemoveLine') : t('kassaApp.ariaDecreaseQty')
                         }
@@ -3643,7 +3663,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           <button
                             type="button"
                             onClick={() => void openEditCartItem(item)}
-                            className="w-8 h-8 rounded-lg bg-amber-500 text-white text-sm flex items-center justify-center hover:bg-amber-600 transition-colors active:scale-95"
+                            className="touch-manipulation w-8 h-8 rounded-lg bg-amber-500 text-white text-sm flex items-center justify-center hover:bg-amber-600 active:brightness-95"
                             title={t('kassaApp.ariaEditOptions')}
                             aria-label={t('kassaApp.ariaEditOptions')}
                           >
@@ -3654,7 +3674,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       <button
                         type="button"
                         onClick={() => updateQty(item.cartKey, item.quantity + 1)}
-                        className="w-8 h-8 rounded-lg bg-[#3C4D6B] text-white font-bold text-base flex items-center justify-center hover:bg-[#2D3A52] transition-colors active:scale-95"
+                        className="touch-manipulation w-8 h-8 rounded-lg bg-[#3C4D6B] text-white font-bold text-base flex items-center justify-center hover:bg-[#2D3A52] active:brightness-95"
                         aria-label={t('kassaApp.ariaIncreaseQty')}
                       >
                         +
@@ -3699,14 +3719,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </span>
           </div>
           <div
-            className={`grid grid-cols-3 ${
+            className={`grid grid-cols-3 touch-manipulation select-none ${
               kassaSidebarFooterTier === 'comfort' ? 'gap-3' : kassaSidebarFooterTier === 'compact' ? 'gap-2' : 'gap-1.5'
             }`}
           >
             <button
               type="button"
               onClick={() => { void openCashDrawer() }}
-              className={`flex flex-col items-center justify-center rounded-xl bg-[#58CCFF] text-[#063042] transition-colors hover:bg-[#47c6fe] active:scale-[0.99] ${
+              className={`flex flex-col items-center justify-center rounded-xl bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe] active:brightness-95 ${
                 kassaSidebarFooterTier === 'comfort'
                   ? 'gap-2 py-5'
                   : kassaSidebarFooterTier === 'compact'
@@ -3739,7 +3759,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               type="button"
               onClick={printDraftBonFromCart}
               disabled={draftBonLineItems.length === 0}
-              className={`flex flex-col items-center justify-center rounded-xl bg-yellow-400 text-yellow-950 transition-colors hover:bg-yellow-300 active:scale-[0.99] disabled:opacity-40 disabled:pointer-events-none ${
+              className={`flex flex-col items-center justify-center rounded-xl bg-yellow-400 text-yellow-950 hover:bg-yellow-300 active:brightness-95 disabled:opacity-40 disabled:pointer-events-none ${
                 kassaSidebarFooterTier === 'comfort'
                   ? 'gap-2 py-5'
                   : kassaSidebarFooterTier === 'compact'
@@ -3773,7 +3793,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               type="button"
               onClick={clearCart}
               disabled={cart.length === 0}
-              className={`flex flex-col items-center justify-center rounded-xl bg-rose-500 text-white transition-colors hover:bg-rose-600 active:scale-[0.99] disabled:opacity-40 disabled:pointer-events-none ${
+              className={`flex flex-col items-center justify-center rounded-xl bg-rose-500 text-white hover:bg-rose-600 active:brightness-95 disabled:opacity-40 disabled:pointer-events-none ${
                 kassaSidebarFooterTier === 'comfort'
                   ? 'gap-2 py-5'
                   : kassaSidebarFooterTier === 'compact'
@@ -3804,8 +3824,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           </div>
           {orderType === 'DINE_IN' && tableNumber && cart.length > 0 && (
             <button
+              type="button"
               onClick={parkOrder}
-              className={`w-full rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold transition-colors flex items-center justify-center ${
+              className={`touch-manipulation w-full rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold active:brightness-95 flex items-center justify-center ${
                 kassaSidebarFooterTier === 'comfort'
                   ? 'py-3 text-base gap-2'
                   : kassaSidebarFooterTier === 'compact'
@@ -3825,13 +3846,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </button>
           )}
           <button
+            type="button"
             onClick={() => {
               if (cart.length === 0) return
-              playCheckout()
+              scheduleKassaTapSound(playCheckout)
               setShowPaymentModal(true)
             }}
             disabled={cart.length === 0}
-            className={`w-full rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition-colors disabled:opacity-40 flex items-center justify-center ${
+            className={`touch-manipulation w-full rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold active:brightness-95 disabled:opacity-40 flex items-center justify-center ${
               kassaSidebarFooterTier === 'comfort'
                 ? 'py-5 text-xl gap-2'
                 : kassaSidebarFooterTier === 'compact'
