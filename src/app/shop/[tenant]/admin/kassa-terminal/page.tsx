@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
 import { getTenantSettings, saveTenantKassaFloorPlanEnabled } from '@/lib/admin-api'
@@ -59,6 +60,17 @@ export default function KassaTerminalSettingsPage({ params }: { params: { tenant
   return (
     <PinGate tenant={tenant}>
       <div className="max-w-2xl mx-auto px-4 pb-10">
+        <div className="mb-6">
+          <Link
+            href={`/shop/${tenant}/admin/kassa`}
+            className="inline-flex items-center gap-2 rounded-xl bg-[#1e293b] px-4 py-2.5 text-sm font-bold text-white shadow-md transition-colors hover:bg-[#334155] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#58CCFF] focus-visible:ring-offset-2"
+          >
+            <span aria-hidden className="text-base leading-none">
+              🧾
+            </span>
+            {t('adminPages.kassaTerminal.backToPos')}
+          </Link>
+        </div>
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-900">{t('adminPages.kassaTerminal.title')}</h1>
           <p className="text-gray-500 mt-1">{t('adminPages.kassaTerminal.subtitle')}</p>

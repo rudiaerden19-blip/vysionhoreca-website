@@ -2855,6 +2855,7 @@
     "kassaTerminal": {
       "title": "Kassa-terminal",
       "subtitle": "Opties voor het verkoopscherm. Plattegrond uit zet minder achtergrondsync op kassa-apparaten.",
+      "backToPos": "Terug naar kassa",
       "floorPlanLabel": "Plattegrond op kassa",
       "floorPlanHint": "Uit = geen plattegrondkaart en geen synchronisatie van plattegrond-data op dit scherm (minder netwerk en timers). Ter plaatse eten met tafels blijft mogelijk via de tafelkeuze.",
       "statusOn": "Plattegrond staat aan.",

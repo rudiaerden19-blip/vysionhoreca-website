@@ -2056,6 +2056,7 @@
     "kassaTerminal": {
       "title": "Terminal caisse",
       "subtitle": "Options pour l'écran de vente. Désactiver le plan réduit la synchronisation en arrière-plan sur les terminaux.",
+      "backToPos": "Retour à la caisse",
       "floorPlanLabel": "Plan de salle sur la caisse",
       "floorPlanHint": "Désactivé = pas de carte ni synchronisation des données du plan sur cet écran (moins de réseau et de minuteurs). La consommation sur place avec tables reste possible via le choix de table.",
       "statusOn": "Plan de salle activé.",

@@ -2556,6 +2556,7 @@
     "kassaTerminal": {
       "title": "Terminale cassa",
       "subtitle": "Impostazioni per la schermata di vendita. Disattivare la pianta riduce la sincronizzazione in background.",
+      "backToPos": "Torna alla cassa",
       "floorPlanLabel": "Pianta sala sulla cassa",
       "floorPlanHint": "Spento = nessuna mappa né sincronizzazione dei dati del piano su questo schermo (meno rete e timer). Il consumo al tavolo resta disponibile tramite la scelta del tavolo.",
       "statusOn": "Pianta attiva.",

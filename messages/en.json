@@ -2855,6 +2855,7 @@
     "kassaTerminal": {
       "title": "POS terminal",
       "subtitle": "Register screen options. Turning off the floor plan reduces background sync on till devices.",
+      "backToPos": "Back to register",
       "floorPlanLabel": "Floor plan on register",
       "floorPlanHint": "Off = no floor-plan map and no floor-plan data sync on this screen (fewer network requests and timers). Dine-in with tables remains available via table selection.",
       "statusOn": "Floor plan is on.",

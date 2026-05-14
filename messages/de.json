@@ -2056,6 +2056,7 @@
     "kassaTerminal": {
       "title": "Kassen-Terminal",
       "subtitle": "Einstellungen für das Verkaufsdisplay. Grundriss aus schaltet weniger Hintergrund-Synchronisation auf Kassengeräten.",
+      "backToPos": "Zurück zur Kasse",
       "floorPlanLabel": "Raumplan auf der Kasse",
       "floorPlanHint": "Aus = keine Grundrisskarte und keine Synchronisation der Grundrissdaten auf diesem Bildschirm (weniger Netzwerk und Timer). Vor Ort essen mit Tischen bleibt über die Tischauswahl möglich.",
       "statusOn": "Raumplan ist aktiv.",

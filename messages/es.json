@@ -2556,6 +2556,7 @@
     "kassaTerminal": {
       "title": "Terminal TPV",
       "subtitle": "Opciones para la pantalla de ventas. Desactivar el plano reduce la sincronización en segundo plano.",
+      "backToPos": "Volver al TPV",
       "floorPlanLabel": "Plano en la caja",
       "floorPlanHint": "Desactivado = sin mapa ni sincronización de datos del plano en esta pantalla (menos red y temporizadores). El consumo en mesa sigue disponible mediante la selección de mesa.",
       "statusOn": "Plano activado.",

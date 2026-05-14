@@ -2556,6 +2556,7 @@
     "kassaTerminal": {
       "title": "收银终端",
       "subtitle": "收银屏选项。关闭平面图可减少后台同步负载。",
+      "backToPos": "返回收银界面",
       "floorPlanLabel": "收银机显示平面图",
       "floorPlanHint": "关闭 = 此屏幕不显示平面图、也不同步平面图数据（网络与定时请求更少）。堂食仍可手动选择桌台。",
       "statusOn": "平面图已开启。",
