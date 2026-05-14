@@ -46,6 +46,14 @@ html.vysion-kassa-root body {
   text-rendering: geometricPrecision;
 }
 
+/*
+ * Embedded touch / kiosk-WebView (o.a. Elo): hint naar manipulation om dubbeltik-zoom-vertraging te beperken.
+ * Scrollports met eigen touch-action (bv. menu-scroll met touch-manipulation) blijven werken voor verticaal slepen.
+ */
+html.vysion-kassa-root {
+  touch-action: manipulation;
+}
+
 /* Donkere kassa: voorkom wit “rubber band” / lege rand (Safari iOS) — alleen met .kassa-dark-appearance (pagina zet class). */
 html.vysion-kassa-root.kassa-dark-appearance,
 html.vysion-kassa-root.kassa-dark-appearance body {

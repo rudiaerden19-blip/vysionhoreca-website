@@ -11,6 +11,7 @@ import {
   useCallback,
   startTransition,
   type MouseEvent,
+  type PointerEvent as ReactPointerEvent,
 } from 'react'
 import dynamic from 'next/dynamic'
 import { flushSync } from 'react-dom'
@@ -152,6 +153,9 @@ const KASSA_NUMPAD_KEYS = ['7', '8', '9', '+', '4', '5', '6', '-', '1', '2', '3'
 
 /** ~4×4 viewport: eager decode voorkomt vertraging bij eerste taps na openen categorie */
 const KASSA_PRODUCT_GRID_EAGER_TILE_COUNT = 16
+
+/** Scroll vs tik op embedded touch/WebView (o.a. Elo): kleine beweging telt nog als tik */
+const KASSA_TILE_TAP_SLOP_PX = 18
 
 function stoolsFromFloorDecorPayload(data: unknown): { stoolNumber: string; segmentId: string }[] {
   const rawItems = Array.isArray(data)
@@ -306,7 +310,6 @@ type KassaCategoryTileButtonProps = {
   imageUrl?: string
   appearanceDark: boolean
   ui: Pick<KassaRegisterUiTheme, 'productTileSolidBg' | 'productTileFooterBar' | 'productFooterTextDark'>
-  onPress: (category: MenuCategory) => void
 }
 
 const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
@@ -314,12 +317,11 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
   imageUrl,
   appearanceDark,
   ui,
-  onPress,
 }: KassaCategoryTileButtonProps) {
   return (
     <button
       type="button"
-      onClick={() => onPress(category)}
+      data-kassa-category-id={category.id != null ? String(category.id) : undefined}
       className={`touch-manipulation select-none group relative h-full min-h-0 w-full min-w-0 overflow-hidden rounded-xl border shadow-[0_8px_30px_rgba(0,0,0,0.35)] active:brightness-95 ${
         appearanceDark ? 'border-zinc-600 bg-[#1a2230]' : 'border border-neutral-200/90 bg-neutral-100'
       }`}
@@ -588,6 +590,21 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   /** Alleen bij product/opties: toon korte popup als verkoopmedewerker verplicht is. */
   const blockSaleWithoutStaffIfNeededRef = useRef<() => boolean>(() => false)
   const handleProductClickRef = useRef<(product: MenuProduct) => Promise<void>>(async () => {})
+  /** Touch/WebView: voorkom dubbele afhandeling (pointerup + synthetische click). */
+  const suppressProductGridClickRef = useRef(false)
+  const productTilePointerRef = useRef<{
+    pointerId: number
+    x: number
+    y: number
+    chip: HTMLElement | null
+  } | null>(null)
+  const suppressCategoryGridClickRef = useRef(false)
+  const categoryTilePointerRef = useRef<{
+    pointerId: number
+    x: number
+    y: number
+    chip: HTMLElement | null
+  } | null>(null)
 
   // ── Nieuwe bestelling alarm (exact donor) ────────────────────────────────
   const [newOrderAlert, setNewOrderAlert] = useState<{id: string; orderNumber: number; total: number} | null>(null)
@@ -2217,8 +2234,52 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return m
   }, [productsInSelectedCategory])
 
+  const categoryGridById = useMemo(() => {
+    const m = new Map<string, MenuCategory>()
+    for (const c of categories) {
+      if (c.id != null) m.set(String(c.id), c)
+    }
+    return m
+  }, [categories])
+
+  const handleProductGridPointerDown = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return
+    const chip = (e.target as HTMLElement).closest('[data-kassa-product-id]')
+    productTilePointerRef.current =
+      chip instanceof HTMLElement ? { pointerId: e.pointerId, x: e.clientX, y: e.clientY, chip } : null
+  }, [])
+
+  const handleProductGridPointerCancel = useCallback(() => {
+    productTilePointerRef.current = null
+  }, [])
+
+  const handleProductGridPointerUp = useCallback(
+    (e: ReactPointerEvent<HTMLDivElement>) => {
+      const start = productTilePointerRef.current
+      productTilePointerRef.current = null
+      if (!start || start.pointerId !== e.pointerId) return
+      if (e.pointerType === 'mouse' && e.button !== 0) return
+      const dx = Math.abs(e.clientX - start.x)
+      const dy = Math.abs(e.clientY - start.y)
+      if (dx > KASSA_TILE_TAP_SLOP_PX || dy > KASSA_TILE_TAP_SLOP_PX) return
+      const endChip = (e.target as HTMLElement).closest('[data-kassa-product-id]')
+      if (!(endChip instanceof HTMLElement) || endChip !== start.chip) return
+      const id = endChip.dataset.kassaProductId
+      if (!id) return
+      const picked = productGridById.get(id)
+      if (!picked) return
+      suppressProductGridClickRef.current = true
+      void handleProductClick(picked)
+    },
+    [productGridById, handleProductClick],
+  )
+
   const handleProductGridClick = useCallback(
     (e: MouseEvent<HTMLDivElement>) => {
+      if (suppressProductGridClickRef.current) {
+        suppressProductGridClickRef.current = false
+        return
+      }
       const el = (e.target as HTMLElement).closest('[data-kassa-product-id]')
       if (!el || !(el instanceof HTMLElement)) return
       const id = el.dataset.kassaProductId
@@ -2227,6 +2288,54 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       if (picked) void handleProductClick(picked)
     },
     [productGridById, handleProductClick],
+  )
+
+  const handleCategoryGridPointerDown = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return
+    const chip = (e.target as HTMLElement).closest('[data-kassa-category-id]')
+    categoryTilePointerRef.current =
+      chip instanceof HTMLElement ? { pointerId: e.pointerId, x: e.clientX, y: e.clientY, chip } : null
+  }, [])
+
+  const handleCategoryGridPointerCancel = useCallback(() => {
+    categoryTilePointerRef.current = null
+  }, [])
+
+  const handleCategoryGridPointerUp = useCallback(
+    (e: ReactPointerEvent<HTMLDivElement>) => {
+      const start = categoryTilePointerRef.current
+      categoryTilePointerRef.current = null
+      if (!start || start.pointerId !== e.pointerId) return
+      if (e.pointerType === 'mouse' && e.button !== 0) return
+      const dx = Math.abs(e.clientX - start.x)
+      const dy = Math.abs(e.clientY - start.y)
+      if (dx > KASSA_TILE_TAP_SLOP_PX || dy > KASSA_TILE_TAP_SLOP_PX) return
+      const endChip = (e.target as HTMLElement).closest('[data-kassa-category-id]')
+      if (!(endChip instanceof HTMLElement) || endChip !== start.chip) return
+      const id = endChip.dataset.kassaCategoryId
+      if (!id) return
+      const picked = categoryGridById.get(id)
+      if (!picked) return
+      suppressCategoryGridClickRef.current = true
+      handleCategorySelect(picked)
+    },
+    [categoryGridById, handleCategorySelect],
+  )
+
+  const handleCategoryGridClick = useCallback(
+    (e: MouseEvent<HTMLDivElement>) => {
+      if (suppressCategoryGridClickRef.current) {
+        suppressCategoryGridClickRef.current = false
+        return
+      }
+      const el = (e.target as HTMLElement).closest('[data-kassa-category-id]')
+      if (!el || !(el instanceof HTMLElement)) return
+      const id = el.dataset.kassaCategoryId
+      if (!id) return
+      const picked = categoryGridById.get(id)
+      if (picked) handleCategorySelect(picked)
+    },
+    [categoryGridById, handleCategorySelect],
   )
 
   // ── Numpad ────────────────────────────────────────────────────────────────
@@ -3307,7 +3416,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <div
             ref={kassaMenuScrollRef}
             data-testid="kassa-menu-scroll"
-            className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4 touch-pan-y [overflow-anchor:none]"
+            className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4 touch-manipulation [overflow-anchor:none]"
           >
             {menuLoading ? (
               <div data-testid="kassa-menu-loading" className={`flex items-center justify-center h-full text-lg ${ui.menuEmptyMuted}`}>{t('kassaApp.loading')}</div>
@@ -3322,6 +3431,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               ) : (
                 <div
                   data-testid="kassa-category-grid"
+                  onPointerDown={handleCategoryGridPointerDown}
+                  onPointerUp={handleCategoryGridPointerUp}
+                  onPointerCancel={handleCategoryGridPointerCancel}
+                  onClick={handleCategoryGridClick}
                   className="grid w-full grid-cols-4 gap-4 pb-8 touch-manipulation select-none"
                   style={{ gridAutoRows: `${kassaMenuRowPx}px` }}
                 >
@@ -3334,7 +3447,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                         imageUrl={catImage}
                         appearanceDark={kassaAppearanceDark}
                         ui={ui}
-                        onPress={handleCategorySelect}
                       />
                     )
                   })}
@@ -3350,6 +3462,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 ) : (
                   <div
                     data-testid="kassa-product-grid"
+                    onPointerDown={handleProductGridPointerDown}
+                    onPointerUp={handleProductGridPointerUp}
+                    onPointerCancel={handleProductGridPointerCancel}
                     onClick={handleProductGridClick}
                     className="grid w-full grid-cols-4 gap-4 pb-8 touch-manipulation select-none"
                     style={{ gridAutoRows: `${kassaMenuRowPx}px` }}
