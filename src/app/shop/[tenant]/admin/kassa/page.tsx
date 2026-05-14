@@ -1741,6 +1741,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     [draftBonLineItems],
   )
 
+  /** Langere kar → compactere onderste snelknoppen zodat meer regels zichtbaar zijn */
+  const kassaSidebarFooterTier = useMemo<'comfort' | 'compact' | 'dense'>(() => {
+    const n = cart.length
+    if (n <= 3) return 'comfort'
+    if (n <= 6) return 'compact'
+    return 'dense'
+  }, [cart.length])
+
   const pickerTables = kassaTablesByZone[pickerBrowseZone]
   const pickerStools = kassaStoolsByZone[pickerBrowseZone]
 
@@ -3479,7 +3487,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               )}
             </div>
           ) : (
-              <div className="space-y-2">
+              <div className={kassaSidebarFooterTier === 'comfort' ? 'space-y-2' : kassaSidebarFooterTier === 'compact' ? 'space-y-1.5' : 'space-y-1'}>
               <div
                 className={`flex items-center gap-2.5 rounded-xl px-2.5 py-2 ${ui.numpadBarBg} ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? '' : 'justify-end'}`}
               >
@@ -3566,51 +3574,150 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           )}
         </div>
 
-        {/* Totaal + knoppen */}
+        {/* Totaal + knoppen — bij langere kar compacter voor meer scrollruimte */}
         <div
-          className={`flex-shrink-0 border-t p-3 space-y-2 ${kassaAppearanceDark ? 'border-zinc-700' : 'border-gray-200'}`}
+          className={`flex-shrink-0 border-t ${kassaAppearanceDark ? 'border-zinc-700' : 'border-gray-200'} ${
+            kassaSidebarFooterTier === 'comfort'
+              ? 'p-3 space-y-2'
+              : kassaSidebarFooterTier === 'compact'
+                ? 'p-2 space-y-1.5'
+                : 'p-1.5 space-y-1'
+          }`}
         >
           <div
-            className={`flex justify-between items-center py-2 border-b ${kassaAppearanceDark ? 'border-zinc-700' : 'border-gray-100'}`}
+            className={`flex justify-between items-center border-b ${kassaAppearanceDark ? 'border-zinc-700' : 'border-gray-100'} ${
+              kassaSidebarFooterTier === 'comfort' ? 'py-2' : kassaSidebarFooterTier === 'compact' ? 'py-1.5' : 'py-1'
+            }`}
           >
-            <span className={`font-bold text-lg ${ui.numpadMeta}`}>{t('kassaApp.cartTotal')}</span>
-            <span className={`font-bold text-2xl ${ui.priceAccentClass}`}>€{total.toFixed(2)}</span>
+            <span
+              className={`font-bold ${ui.numpadMeta} ${
+                kassaSidebarFooterTier === 'comfort' ? 'text-lg' : kassaSidebarFooterTier === 'compact' ? 'text-base' : 'text-sm'
+              }`}
+            >
+              {t('kassaApp.cartTotal')}
+            </span>
+            <span
+              className={`font-bold ${ui.priceAccentClass} ${
+                kassaSidebarFooterTier === 'comfort' ? 'text-2xl' : kassaSidebarFooterTier === 'compact' ? 'text-xl' : 'text-lg'
+              }`}
+            >
+              €{total.toFixed(2)}
+            </span>
           </div>
-          <div className="grid grid-cols-3 gap-3">
+          <div
+            className={`grid grid-cols-3 ${
+              kassaSidebarFooterTier === 'comfort' ? 'gap-3' : kassaSidebarFooterTier === 'compact' ? 'gap-2' : 'gap-1.5'
+            }`}
+          >
             <button
               type="button"
               onClick={() => { void openCashDrawer() }}
-              className="flex flex-col items-center justify-center gap-2 rounded-xl bg-[#58CCFF] py-5 text-[#063042] transition-colors hover:bg-[#47c6fe] active:scale-[0.99]"
+              className={`flex flex-col items-center justify-center rounded-xl bg-[#58CCFF] text-[#063042] transition-colors hover:bg-[#47c6fe] active:scale-[0.99] ${
+                kassaSidebarFooterTier === 'comfort'
+                  ? 'gap-2 py-5'
+                  : kassaSidebarFooterTier === 'compact'
+                    ? 'gap-1 py-3'
+                    : 'gap-0.5 py-2'
+              }`}
               title={t('kassaApp.drawerOpen')}
             >
-              <span className="text-3xl leading-none">💰</span>
-              <span className="text-sm font-bold">{t('kassaApp.drawerOpen')}</span>
+              <span
+                className={`leading-none ${
+                  kassaSidebarFooterTier === 'comfort' ? 'text-3xl' : kassaSidebarFooterTier === 'compact' ? 'text-2xl' : 'text-xl'
+                }`}
+                aria-hidden
+              >
+                💰
+              </span>
+              <span
+                className={`font-bold ${
+                  kassaSidebarFooterTier === 'comfort'
+                    ? 'text-sm'
+                    : kassaSidebarFooterTier === 'compact'
+                      ? 'text-xs'
+                      : 'text-[10px] leading-tight text-center px-0.5'
+                }`}
+              >
+                {t('kassaApp.drawerOpen')}
+              </span>
             </button>
             <button
               type="button"
               onClick={printDraftBonFromCart}
               disabled={draftBonLineItems.length === 0}
-              className="flex flex-col items-center justify-center gap-2 rounded-xl bg-yellow-400 py-5 text-yellow-950 transition-colors hover:bg-yellow-300 active:scale-[0.99] disabled:opacity-40 disabled:pointer-events-none"
+              className={`flex flex-col items-center justify-center rounded-xl bg-yellow-400 text-yellow-950 transition-colors hover:bg-yellow-300 active:scale-[0.99] disabled:opacity-40 disabled:pointer-events-none ${
+                kassaSidebarFooterTier === 'comfort'
+                  ? 'gap-2 py-5'
+                  : kassaSidebarFooterTier === 'compact'
+                    ? 'gap-1 py-3'
+                    : 'gap-0.5 py-2'
+              }`}
               title={t('kassaApp.cartBonTitle')}
               aria-label={t('kassaApp.cartBonTitle')}
             >
-              <span className="text-3xl leading-none">🧾</span>
-              <span className="text-sm font-bold">{t('kassaApp.cartBon')}</span>
+              <span
+                className={`leading-none ${
+                  kassaSidebarFooterTier === 'comfort' ? 'text-3xl' : kassaSidebarFooterTier === 'compact' ? 'text-2xl' : 'text-xl'
+                }`}
+                aria-hidden
+              >
+                🧾
+              </span>
+              <span
+                className={`font-bold ${
+                  kassaSidebarFooterTier === 'comfort'
+                    ? 'text-sm'
+                    : kassaSidebarFooterTier === 'compact'
+                      ? 'text-xs'
+                      : 'text-[10px] leading-tight text-center px-0.5'
+                }`}
+              >
+                {t('kassaApp.cartBon')}
+              </span>
             </button>
             <button
               type="button"
               onClick={clearCart}
               disabled={cart.length === 0}
-              className="flex flex-col items-center justify-center gap-2 rounded-xl bg-rose-500 py-5 text-white transition-colors hover:bg-rose-600 active:scale-[0.99] disabled:opacity-40 disabled:pointer-events-none"
+              className={`flex flex-col items-center justify-center rounded-xl bg-rose-500 text-white transition-colors hover:bg-rose-600 active:scale-[0.99] disabled:opacity-40 disabled:pointer-events-none ${
+                kassaSidebarFooterTier === 'comfort'
+                  ? 'gap-2 py-5'
+                  : kassaSidebarFooterTier === 'compact'
+                    ? 'gap-1 py-3'
+                    : 'gap-0.5 py-2'
+              }`}
             >
-              <span className="text-3xl leading-none">🗑️</span>
-              <span className="text-sm font-bold">{t('kassaApp.remove')}</span>
+              <span
+                className={`leading-none ${
+                  kassaSidebarFooterTier === 'comfort' ? 'text-3xl' : kassaSidebarFooterTier === 'compact' ? 'text-2xl' : 'text-xl'
+                }`}
+                aria-hidden
+              >
+                🗑️
+              </span>
+              <span
+                className={`font-bold ${
+                  kassaSidebarFooterTier === 'comfort'
+                    ? 'text-sm'
+                    : kassaSidebarFooterTier === 'compact'
+                      ? 'text-xs'
+                      : 'text-[10px] leading-tight text-center px-0.5'
+                }`}
+              >
+                {t('kassaApp.remove')}
+              </span>
             </button>
           </div>
           {orderType === 'DINE_IN' && tableNumber && cart.length > 0 && (
             <button
               onClick={parkOrder}
-              className="w-full py-3 rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold text-base transition-colors flex items-center justify-center gap-2"
+              className={`w-full rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold transition-colors flex items-center justify-center ${
+                kassaSidebarFooterTier === 'comfort'
+                  ? 'py-3 text-base gap-2'
+                  : kassaSidebarFooterTier === 'compact'
+                    ? 'py-2 text-sm gap-1.5'
+                    : 'py-1.5 text-xs gap-1'
+              }`}
             >
               🪑{' '}
               {t('kassaApp.parkToTable')
@@ -3630,7 +3737,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               setShowPaymentModal(true)
             }}
             disabled={cart.length === 0}
-            className="w-full py-5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xl transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
+            className={`w-full rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition-colors disabled:opacity-40 flex items-center justify-center ${
+              kassaSidebarFooterTier === 'comfort'
+                ? 'py-5 text-xl gap-2'
+                : kassaSidebarFooterTier === 'compact'
+                  ? 'py-3 text-lg gap-2'
+                  : 'py-2.5 text-base gap-1.5'
+            }`}
           >
             💳 {t('kassaApp.checkout')}
           </button>
