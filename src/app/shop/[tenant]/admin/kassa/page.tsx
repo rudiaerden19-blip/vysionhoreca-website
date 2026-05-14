@@ -10,6 +10,7 @@ import {
   useMemo,
   useCallback,
   startTransition,
+  type MouseEvent,
 } from 'react'
 import dynamic from 'next/dynamic'
 import { flushSync } from 'react-dom'
@@ -148,6 +149,9 @@ function scheduleAddToCartSound() {
 }
 
 const KASSA_NUMPAD_KEYS = ['7', '8', '9', '+', '4', '5', '6', '-', '1', '2', '3', '×', 'C', '0', '.', '='] as const
+
+/** ~4×4 viewport: eager decode voorkomt vertraging bij eerste taps na openen categorie */
+const KASSA_PRODUCT_GRID_EAGER_TILE_COUNT = 16
 
 function stoolsFromFloorDecorPayload(data: unknown): { stoolNumber: string; segmentId: string }[] {
   const rawItems = Array.isArray(data)
@@ -371,7 +375,8 @@ type KassaProductTileButtonProps = {
   kioskZoom: number
   appearanceDark: boolean
   ui: KassaRegisterUiTheme
-  onPress: (product: MenuProduct) => void
+  /** Eerste viewport-tegels eager zodat zwakke terminals niet op lazy-decode wachten */
+  imageLoading: 'eager' | 'lazy'
 }
 
 const KassaProductTileButton = memo(function KassaProductTileButton({
@@ -381,13 +386,13 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
   kioskZoom,
   appearanceDark,
   ui,
-  onPress,
+  imageLoading,
 }: KassaProductTileButtonProps) {
   return (
     <button
       type="button"
-      onClick={() => onPress(product)}
-      className={`touch-manipulation select-none group relative h-full min-h-0 w-full min-w-0 overflow-hidden rounded-xl text-left active:brightness-95 ${ui.productTileSolidBg}`}
+      data-kassa-product-id={product.id != null ? String(product.id) : undefined}
+      className={`touch-manipulation select-none [contain:layout_paint] group relative h-full min-h-0 w-full min-w-0 overflow-hidden rounded-xl text-left active:brightness-95 ${ui.productTileSolidBg}`}
       style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.35)' }}
     >
       {product.image_url ? (
@@ -397,7 +402,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
               src={product.image_url}
               alt={product.name}
               decoding="async"
-              loading="lazy"
+              loading={imageLoading}
               style={{
                 transform: `scale(${kioskZoom})`,
                 transformOrigin: 'center 78%',
@@ -972,20 +977,28 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   useLayoutEffect(() => {
     const el = kassaMenuScrollRef.current
     if (!el || typeof ResizeObserver === 'undefined') return
+    let rafId = 0
     const measure = () => {
-      const st = getComputedStyle(el)
-      const pt = parseFloat(st.paddingTop) || 0
-      const pb = parseFloat(st.paddingBottom) || 0
-      const innerH = el.clientHeight - pt - pb
-      if (innerH <= 0) return
-      const rowH =
-        (innerH - (KASSA_MENU_VISIBLE_ROWS - 1) * KASSA_MENU_GRID_GAP_PX) / KASSA_MENU_VISIBLE_ROWS
-      setKassaMenuRowPx(Math.max(80, Math.floor(rowH)))
+      cancelAnimationFrame(rafId)
+      rafId = requestAnimationFrame(() => {
+        const st = getComputedStyle(el)
+        const pt = parseFloat(st.paddingTop) || 0
+        const pb = parseFloat(st.paddingBottom) || 0
+        const innerH = el.clientHeight - pt - pb
+        if (innerH <= 0) return
+        const rowH =
+          (innerH - (KASSA_MENU_VISIBLE_ROWS - 1) * KASSA_MENU_GRID_GAP_PX) / KASSA_MENU_VISIBLE_ROWS
+        const next = Math.max(80, Math.floor(rowH))
+        setKassaMenuRowPx((prev) => (prev === next ? prev : next))
+      })
     }
     measure()
     const ro = new ResizeObserver(measure)
     ro.observe(el)
-    return () => ro.disconnect()
+    return () => {
+      cancelAnimationFrame(rafId)
+      ro.disconnect()
+    }
   }, [selectedCategory, menuLoading])
 
   // Laad tafels + barkrukken + openstaande bestellingen (localStorage + Supabase sync)
@@ -2196,6 +2209,26 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       .sort(compareMenuProductsBySortOrder)
   }, [products, selectedCategory])
 
+  const productGridById = useMemo(() => {
+    const m = new Map<string, MenuProduct>()
+    for (const p of productsInSelectedCategory) {
+      if (p.id != null) m.set(String(p.id), p)
+    }
+    return m
+  }, [productsInSelectedCategory])
+
+  const handleProductGridClick = useCallback(
+    (e: MouseEvent<HTMLDivElement>) => {
+      const el = (e.target as HTMLElement).closest('[data-kassa-product-id]')
+      if (!el || !(el instanceof HTMLElement)) return
+      const id = el.dataset.kassaProductId
+      if (!id) return
+      const picked = productGridById.get(id)
+      if (picked) void handleProductClick(picked)
+    },
+    [productGridById, handleProductClick],
+  )
+
   // ── Numpad ────────────────────────────────────────────────────────────────
   const handleNumpad = useCallback((key: string) => {
     setNumpadValue((prev) => {
@@ -3317,10 +3350,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 ) : (
                   <div
                     data-testid="kassa-product-grid"
-                    className="grid w-full grid-cols-4 gap-4 pb-8"
+                    onClick={handleProductGridClick}
+                    className="grid w-full grid-cols-4 gap-4 pb-8 touch-manipulation select-none"
                     style={{ gridAutoRows: `${kassaMenuRowPx}px` }}
                   >
-                    {productsInSelectedCategory.map(product => {
+                    {productsInSelectedCategory.map((product, index) => {
                       const inCart = product.id
                         ? (cartQtyByProductId.get(String(product.id)) ?? 0)
                         : 0
@@ -3335,7 +3369,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           kioskZoom={kioskZoom}
                           appearanceDark={kassaAppearanceDark}
                           ui={ui}
-                          onPress={handleProductClick}
+                          imageLoading={
+                            index < KASSA_PRODUCT_GRID_EAGER_TILE_COUNT ? 'eager' : 'lazy'
+                          }
                         />
                       )
                     })}
