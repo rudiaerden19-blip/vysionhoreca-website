@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
 import {
+  aggregateOrderTotalsKassaVsOnline,
   distributeOrderPaymentForZRaport,
   fetchAllOrdersForRapporten,
   getTenantSettings,
@@ -48,6 +49,10 @@ interface ZReport {
   generated_at: string
   business_name?: string
   is_closed?: boolean
+  kassa_sales_total?: number | null
+  online_sales_total?: number | null
+  kassa_order_count?: number | null
+  online_order_count?: number | null
 }
 
 interface TenantInfo {
@@ -79,6 +84,11 @@ function subMonths(d: Date, n: number) { return new Date(d.getFullYear(), d.getM
 function addMonths(d: Date, n: number) { return new Date(d.getFullYear(), d.getMonth()+n, 1) }
 function daysInMonth(y: number, m: number) { return new Date(y, m+1, 0).getDate() }
 function fmt(n: number) { return `€${n.toFixed(2)}` }
+/** CSV-decimaal (comma); leeg als kolom nog niet gevuld (oud rapport). */
+function csvEuroCell(v: number | null | undefined): string {
+  if (v == null || Number.isNaN(Number(v))) return ''
+  return Number(v).toFixed(2).replace('.', ',')
+}
 function fmtDate(s: string) { const d = new Date(s); return `${d.getDate()} ${NL_MONTHS[d.getMonth()]}` }
 /** Korte datum voor periode-onderregels (nl-BE → “2 apr.”) */
 function fmtDayShort(d: Date) {
@@ -508,6 +518,8 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     return validOrders.filter(o => new Date(o.created_at) >= from)
   }, [validOrders, lastZGeneratedAt])
 
+  const xChannelSplit = useMemo(() => aggregateOrderTotalsKassaVsOnline(xOrders), [xOrders])
+
   const xData = useMemo(() => {
     const total = xOrders.reduce((s,o)=>s+o.total,0)
     let cash = 0
@@ -532,6 +544,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     const now = new Date()
     const dateStr = now.toISOString().split('T')[0]
     const vatRate = tenantInfo?.btw_percentage ?? 6
+    const ch = xChannelSplit
 
     const zRes = await adminDb.upsert('z_reports', {
       tenant_slug: tenant,
@@ -545,6 +558,10 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
       cash_payments: xData.cash,
       card_payments: xData.card,
       online_payments: 0,
+      kassa_sales_total: ch.kassaSalesTotal,
+      online_sales_total: ch.onlineSalesTotal,
+      kassa_order_count: ch.kassaOrderCount,
+      online_order_count: ch.onlineOrderCount,
       btw_percentage: vatRate,
       generated_at: now.toISOString(),
       business_name: tenantInfo?.business_name || tenant,
@@ -644,16 +661,35 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     const selected = zReports
       .filter((r) => selectedZReports.includes(r.id))
       .sort((a, b) => a.report_date.localeCompare(b.report_date))
-    const headers = ['Datum','Bestellingen','Contant','PIN/Kaart','Online','BTW Laag','BTW Midden','BTW Hoog','Totaal']
-    const rows = selected.map(r => [
-      r.report_date, String(r.order_count),
-      r.cash_payments.toFixed(2).replace('.',','),
-      r.card_payments.toFixed(2).replace('.',','),
-      r.online_payments.toFixed(2).replace('.',','),
-      r.tax_low.toFixed(2).replace('.',','),
-      r.tax_mid.toFixed(2).replace('.',','),
-      r.tax_high.toFixed(2).replace('.',','),
-      r.total.toFixed(2).replace('.',','),
+    const headers = [
+      'Datum',
+      'Bestellingen',
+      'Kassa omzet',
+      'Online omzet',
+      'Kassa bonnen',
+      'Online bonnen',
+      'Contant',
+      'PIN/Kaart',
+      'Online betaalstromen',
+      'BTW Laag',
+      'BTW Midden',
+      'BTW Hoog',
+      'Totaal',
+    ]
+    const rows = selected.map((r) => [
+      r.report_date,
+      String(r.order_count),
+      csvEuroCell(r.kassa_sales_total ?? null),
+      csvEuroCell(r.online_sales_total ?? null),
+      r.kassa_order_count != null ? String(r.kassa_order_count) : '',
+      r.online_order_count != null ? String(r.online_order_count) : '',
+      r.cash_payments.toFixed(2).replace('.', ','),
+      r.card_payments.toFixed(2).replace('.', ','),
+      r.online_payments.toFixed(2).replace('.', ','),
+      r.tax_low.toFixed(2).replace('.', ','),
+      r.tax_mid.toFixed(2).replace('.', ','),
+      r.tax_high.toFixed(2).replace('.', ','),
+      r.total.toFixed(2).replace('.', ','),
     ])
     const csv = [`"${tenantInfo?.business_name||tenant}"`, '"SCARDa-compatibele Z-Rapport Export"', '',
       headers.map(h=>`"${h}"`).join(';'),
@@ -730,8 +766,12 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     <h1>📊 Z-Rapporten Export</h1>
     <p><strong>${tenantInfo?.business_name||tenant}</strong> — ${selected.length} rapporten — Totaal: €${totalRev.toFixed(2)}</p>
     <h2 style="font-size:16px;margin-top:20px">Samenvatting per dag</h2>
-    <table><tr><th>Datum</th><th>Bonnen</th><th>Contant</th><th>PIN/Kaart</th><th>Totaal</th></tr>
-    ${selected.map(r=>`<tr><td>${r.report_date}</td><td>${r.order_count}</td><td>€${r.cash_payments.toFixed(2)}</td><td>€${r.card_payments.toFixed(2)}</td><td><strong>€${r.total.toFixed(2)}</strong></td></tr>`).join('')}
+    <table><tr><th>Datum</th><th>Bonnen</th><th>Kassa €</th><th>Online €</th><th>Contant</th><th>PIN</th><th>Totaal</th></tr>
+    ${selected.map((r) => {
+      const ke = r.kassa_sales_total != null ? `€${Number(r.kassa_sales_total).toFixed(2)}` : '—'
+      const oe = r.online_sales_total != null ? `€${Number(r.online_sales_total).toFixed(2)}` : '—'
+      return `<tr><td>${r.report_date}</td><td>${r.order_count}</td><td>${ke}</td><td>${oe}</td><td>€${r.cash_payments.toFixed(2)}</td><td>€${r.card_payments.toFixed(2)}</td><td><strong>€${r.total.toFixed(2)}</strong></td></tr>`
+    }).join('')}
     </table>
     ${articleBlocks}
     <div class="footer">Gegenereerd op ${new Date().toLocaleString('nl-NL')}</div>
@@ -1179,11 +1219,13 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
               </div>
             </div>
 
-            {/* 4 stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {/* Omzet + kanalen */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {[
                 { label:'Transacties',   value:String(xData.count),    color:'text-gray-900' },
                 { label:'Totaal Omzet',  value:fmt(xData.total),       color:'text-emerald-500' },
+                { label:'Kassa (POS)',   value:fmt(xChannelSplit.kassaSalesTotal), color:'text-gray-900' },
+                { label:'Online',        value:fmt(xChannelSplit.onlineSalesTotal), color:'text-gray-900' },
                 { label:'Contant',       value:fmt(xData.cash),        color:'text-gray-900' },
                 { label:'PIN/Kaart',     value:fmt(xData.card),        color:'text-gray-900' },
               ].map(s => (
@@ -1246,6 +1288,8 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
                 {[
                   { label:'Transacties:', value:String(xData.count), color:'text-gray-900' },
                   { label:'Totaal Omzet:', value:fmt(xData.total), color:'text-emerald-500' },
+                  { label:'Kassa (POS) omzet:', value:fmt(xChannelSplit.kassaSalesTotal), color:'text-gray-900' },
+                  { label:'Online omzet:', value:fmt(xChannelSplit.onlineSalesTotal), color:'text-gray-900' },
                   { label:'Contant:', value:fmt(xData.cash), color:'text-gray-900' },
                   { label:'PIN/Kaart:', value:fmt(xData.card), color:'text-gray-900' },
                   { label:'Begin Kas:', value:fmt(openingCash), color:'text-gray-900' },
@@ -1308,6 +1352,11 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
                       <div>
                         <p className="font-bold text-sm text-gray-800">{new Date(r.generated_at).toLocaleString('nl-NL')}</p>
                         <p className="text-xs text-gray-400">{r.order_count} transacties</p>
+                        {r.kassa_sales_total != null && r.online_sales_total != null ? (
+                          <p className="text-xs text-gray-500 mt-1">
+                            POS {fmt(r.kassa_sales_total)} · Online {fmt(r.online_sales_total)}
+                          </p>
+                        ) : null}
                       </div>
                       <div className="text-right">
                         <p className="font-bold text-emerald-500">{fmt(r.total)}</p>
@@ -1415,7 +1464,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
             <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5">
               <p className="font-semibold text-blue-700 mb-3">ℹ️ Over SCARDa Export</p>
               <ul className="space-y-1.5 text-sm text-blue-600">
-                <li>• CSV/PDF totalen: datum, omzet, cash, kaart, online, BTW per tarief, aantal bonnen</li>
+                <li>• CSV/PDF totalen: o.a. datum, omzet kassa (POS) vs online, bonnen per kanaal, cash/kaart/online-betaalstromen, BTW, totaal</li>
                 <li>• <strong>CSV artikelen</strong>, PDF en JSON bevatten ook <strong>verkocht per artikel</strong> per Z-dag (bv. stuks Cola, Fanta)</li>
                 <li>• Alleen geselecteerde Z-rapporten worden geëxporteerd</li>
               </ul>

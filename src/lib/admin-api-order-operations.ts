@@ -2,6 +2,7 @@ import { supabase } from './supabase'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { getBelgiumDateString, getZRapportDateBounds } from './belgium-date-bounds'
 import {
+  aggregateOrderTotalsKassaVsOnline,
   distributeOrderPaymentForZRaport,
   isWebshopOrder,
   orderCountsTowardRevenueAndZReport,
@@ -313,6 +314,8 @@ export async function regenerateZReportForDate(
       onlinePayments += d.online
     })
 
+    const channel = aggregateOrderTotalsKassaVsOnline(orders)
+
     const taxRate = btwPercentage / 100
     const subtotal = total / (1 + taxRate)
     const tax = total - subtotal
@@ -344,6 +347,10 @@ export async function regenerateZReportForDate(
           cash_payments: cashPayments,
           card_payments: cardPayments,
           online_payments: onlinePayments,
+          kassa_sales_total: channel.kassaSalesTotal,
+          online_sales_total: channel.onlineSalesTotal,
+          kassa_order_count: channel.kassaOrderCount,
+          online_order_count: channel.onlineOrderCount,
           btw_percentage: btwPercentage,
           business_name: settings?.business_name,
           business_address: settings?.address,
@@ -375,6 +382,10 @@ export async function regenerateZReportForDate(
         cash_payments: cashPayments,
         card_payments: cardPayments,
         online_payments: onlinePayments,
+        kassa_sales_total: channel.kassaSalesTotal,
+        online_sales_total: channel.onlineSalesTotal,
+        kassa_order_count: channel.kassaOrderCount,
+        online_order_count: channel.onlineOrderCount,
         btw_percentage: btwPercentage,
         business_name: settings?.business_name,
         business_address: settings?.address,

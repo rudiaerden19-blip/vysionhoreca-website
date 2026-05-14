@@ -26,6 +26,10 @@ export async function POST(request: NextRequest) {
       cashPayments,
       cardPayments,
       onlinePayments,
+      kassaSalesTotal,
+      onlineSalesTotal,
+      kassaOrderCount,
+      onlineOrderCount,
     } = body
 
     if (!to) {
@@ -119,6 +123,26 @@ export async function POST(request: NextRequest) {
                 <span class="amount">${formatCurrency(total)}</span>
               </div>
             </div>
+
+            ${
+              typeof kassaSalesTotal === 'number' &&
+              typeof onlineSalesTotal === 'number' &&
+              !Number.isNaN(kassaSalesTotal) &&
+              !Number.isNaN(onlineSalesTotal)
+                ? `
+            <div class="section">
+              <div class="section-title">🏪 VERKOOP PER KANAAL</div>
+              <div class="row">
+                <span>Kassa (POS):</span>
+                <span>${formatCurrency(Number(kassaSalesTotal))}${typeof kassaOrderCount === 'number' ? ` <span style="opacity:0.75;font-size:13px">(${kassaOrderCount} bonnen)</span>` : ''}</span>
+              </div>
+              <div class="row">
+                <span>Online / webshop:</span>
+                <span>${formatCurrency(Number(onlineSalesTotal))}${typeof onlineOrderCount === 'number' ? ` <span style="opacity:0.75;font-size:13px">(${onlineOrderCount} bonnen)</span>` : ''}</span>
+              </div>
+            </div>`
+                : ''
+            }
             
             <div class="section">
               <div class="section-title">💳 BETALINGEN</div>

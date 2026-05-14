@@ -1,4 +1,5 @@
 import {
+  aggregateOrderTotalsKassaVsOnline,
   distributeOrderPaymentForZRaport,
   orderCountsTowardRevenueAndZReport,
   isWebshopChannelNewOrder,
@@ -69,6 +70,17 @@ describe('admin-api-order-helpers (Z-rapport / revenue gate)', () => {
         payment_split_card: 60,
       })
     ).toEqual({ cash: 40, card: 60, online: 0 })
+  })
+
+  it('aggregateOrderTotalsKassaVsOnline splits POS vs webshop like rapporten', () => {
+    const r = aggregateOrderTotalsKassaVsOnline([
+      { order_type: 'DINE_IN', total: 10 },
+      { order_type: 'pickup', total: 25 },
+    ])
+    expect(r.kassaSalesTotal).toBe(10)
+    expect(r.onlineSalesTotal).toBe(25)
+    expect(r.kassaOrderCount).toBe(1)
+    expect(r.onlineOrderCount).toBe(1)
   })
 })
 
