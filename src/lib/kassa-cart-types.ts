@@ -20,11 +20,22 @@ export type KassaRegisterOrderType = 'DINE_IN' | 'TAKEAWAY' | 'DELIVERY'
 
 export type KassaPaymentMethod = 'CASH' | 'CARD' | 'IDEAL' | 'BANCONTACT' | 'SPLIT'
 
+/** Afgeleid uit categorie-BTW; ontbreekt bij oude bonnen → UI valt terug op één zaak-tarief. */
+export interface KassaReceiptVatLine {
+  rate: number
+  baseExcl: number
+  tax: number
+}
+
 export interface KassaLastOrderReceipt {
   orderNumber: number
   checkoutReference?: string
   items: KassaCartItem[]
   total: number
+  /** Meerdere tarieven (o.a. categorie-BTW); leeg/ontbreekt = legacy enkelvoudig tarief. */
+  vatSplit?: KassaReceiptVatLine[]
+  subtotalExclVat?: number
+  totalTax?: number
   paymentMethod: KassaPaymentMethod
   splitCash?: number
   splitCard?: number

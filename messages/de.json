@@ -1935,7 +1935,10 @@
       "dragHintShort": "Ziehen für Reihenfolge · auf den Namen tippen zum Bearbeiten",
       "productCount": "{count} Produkte",
       "productCountZero": "Keine Produkte",
-      "productCountTitle": "Anzahl Produkte in dieser Kategorie"
+      "productCountTitle": "Anzahl Produkte in dieser Kategorie",
+      "categoryVatHint": "Legen Sie pro Kategorie einen festen MwSt.-Satz (6 %, 9 %, 12 % oder 21 %) für alle darin gehörigen Artikel fest. „Betriebsstandard“ verwendet den Satz aus den Betriebseinstellungen — wie bisher, wenn Sie nichts ändern.",
+      "categoryVatShort": "MwSt.",
+      "categoryVatUseTenant": "Betriebsstandard"
     },
     "producten": {
       "title": "Produkte",

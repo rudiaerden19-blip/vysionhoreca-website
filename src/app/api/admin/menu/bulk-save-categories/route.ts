@@ -11,12 +11,16 @@ import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 import { recordAudit, auditRequestMeta, type AuditActorType } from '@/lib/audit-log'
 import { logger } from '@/lib/logger'
 
+const CategoryVatSchema = z.union([z.literal(6), z.literal(9), z.literal(12), z.literal(21)])
+
 const CategoryRowSchema = z.object({
   id: z.string().uuid(),
   name: z.string().min(1).max(255),
   description: z.string().optional().nullable(),
   sort_order: z.number().int().min(0).max(999999),
   is_active: z.boolean(),
+  /** null = gebruik tenant standaard-BTW */
+  default_btw_percentage: CategoryVatSchema.nullable(),
 })
 
 const BodySchema = z.object({
@@ -70,6 +74,7 @@ export async function POST(req: NextRequest) {
             description: cat.description ?? '',
             sort_order: cat.sort_order,
             is_active: cat.is_active,
+            default_btw_percentage: cat.default_btw_percentage,
           }
           const { data: updated, error } = await supabase
             .from('menu_categories')

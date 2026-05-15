@@ -23,9 +23,17 @@ export function KassaSuccessReceiptModal({
   const { t } = useLanguage()
   if (!open) return null
 
-  const vatRate = tenantInfo?.btw_percentage ?? 6
-  const subtotal = order.total / (1 + vatRate / 100)
-  const tax = order.total - subtotal
+  const legacyVatRate =
+    typeof tenantInfo?.btw_percentage === 'number' ? tenantInfo.btw_percentage : 6
+  const useVatSplit =
+    Array.isArray(order.vatSplit) &&
+    order.vatSplit.length > 0 &&
+    typeof order.subtotalExclVat === 'number' &&
+    typeof order.totalTax === 'number'
+  const subtotalExcl = useVatSplit
+    ? order.subtotalExclVat!
+    : order.total / (1 + legacyVatRate / 100)
+  const tax = useVatSplit ? order.totalTax! : order.total - subtotalExcl
   const orderTypeLabel =
     order.orderType === 'DINE_IN'
       ? `🍽️ ${t('kassaReceipt.orderTypeDineIn')}`
@@ -55,7 +63,7 @@ export function KassaSuccessReceiptModal({
     hour: '2-digit',
     minute: '2-digit',
   })
-  const successVatLabel = t('kassaReceipt.vat').replace('{rate}', String(vatRate))
+  const successVatLabelLegacy = t('kassaReceipt.vat').replace('{rate}', String(legacyVatRate))
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 overflow-y-auto">
@@ -133,12 +141,21 @@ export function KassaSuccessReceiptModal({
             <div className="space-y-1 text-sm">
               <div className="flex justify-between">
                 <span>{t('kassaReceipt.subtotal')}</span>
-                <span>€{subtotal.toFixed(2)}</span>
+                <span>€{subtotalExcl.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between">
-                <span>{successVatLabel}</span>
-                <span>€{tax.toFixed(2)}</span>
-              </div>
+              {useVatSplit && order.vatSplit
+                ? order.vatSplit.map((row, ri) => (
+                    <div key={`${row.rate}-${ri}`} className="flex justify-between">
+                      <span>{t('kassaReceipt.vat').replace('{rate}', String(row.rate))}</span>
+                      <span>€{row.tax.toFixed(2)}</span>
+                    </div>
+                  ))
+                : (
+                    <div className="flex justify-between">
+                      <span>{successVatLabelLegacy}</span>
+                      <span>€{tax.toFixed(2)}</span>
+                    </div>
+                  )}
               <div className="flex justify-between font-bold text-lg border-t border-gray-400 pt-2 mt-2">
                 <span>{t('kassaReceipt.total')}</span>
                 <span>€{order.total.toFixed(2)}</span>

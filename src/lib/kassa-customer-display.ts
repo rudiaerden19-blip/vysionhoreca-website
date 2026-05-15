@@ -44,6 +44,8 @@ export type KassaCustomerDisplayMessage =
       subtotalExVat: number
       vatRate: number
       vatAmount: number
+      /** Meerdere btw-tarieven (categorie); dan per regel tonen i.p.v. alleen vatRate. */
+      vatLines?: { rate: number; amount: number }[]
       totalInclVat: number
       dineInSubtitle?: string
     }

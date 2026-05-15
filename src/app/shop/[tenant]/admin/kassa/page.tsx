@@ -137,6 +137,12 @@ import {
   writeCachedSecondaryBounds,
   applyCustomerDisplayWindowBounds,
 } from '@/lib/kassa-customer-display-window'
+import {
+  buildCategoryVatLookup,
+  computeInclusiveVatSplitFromCart,
+  resolveVatPercentForProduct,
+  normalizeCategoryVatPercent,
+} from '@/lib/order-vat'
 
 /** Tik-feedback ná paint — zwakkere touch-terminals blijven UI-updates beter bijbenen */
 function scheduleKassaTapSound(play: () => void) {
@@ -958,6 +964,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   /** Zie Admin › Kassa-terminal (`kassa_floor_plan_enabled`). `undefined` = aan (backward compatible). */
   const kassaFloorPlanEnabled = tenantInfo?.kassa_floor_plan_enabled ?? true
+
+  const categoryVatLookup = useMemo(() => buildCategoryVatLookup(categories), [categories])
+  const tenantDefaultBtw = useMemo(
+    () => normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 6, 21),
+    [tenantInfo?.btw_percentage],
+  )
+  const resolveCartLineVat = useCallback(
+    (line: CartItem) =>
+      resolveVatPercentForProduct(line.product, categoryVatLookup, tenantDefaultBtw),
+    [categoryVatLookup, tenantDefaultBtw],
+  )
 
   useEffect(() => {
     if (!kassaFloorPlanEnabled && showFloorPlan) setShowFloorPlan(false)
@@ -2134,7 +2151,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         .split('-')
         .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
         .join(' ')
-    const vatRate = tenantInfo?.btw_percentage ?? 6
+    const fallbackVatRate = normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 6, 21)
     const totalInclVat = Math.round(total * 100) / 100
 
     let msg: KassaCustomerDisplayMessage
@@ -2153,9 +2170,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     } else if (cart.length === 0 && !showPaymentModal && !showSplitModal) {
       msg = { v: 1, phase: 'idle', tenantSlug: tenant, businessName }
     } else if ((showPaymentModal || showSplitModal) && cart.length > 0) {
-      const subtotalExVatRaw = totalInclVat / (1 + vatRate / 100)
-      const subtotalExVat = Math.round(subtotalExVatRaw * 100) / 100
-      const vatAmount = Math.round((totalInclVat - subtotalExVat) * 100) / 100
+      const splitCd = computeInclusiveVatSplitFromCart(cart, resolveCartLineVat)
+      const subtotalExVat = splitCd.subtotalExcl
+      const vatAmount = splitCd.totalTax
+      const vatLines =
+        splitCd.byRate.length > 1
+          ? splitCd.byRate.map((l) => ({ rate: l.rate, amount: l.tax }))
+          : undefined
+      const vatRate = splitCd.byRate.length === 1 ? splitCd.byRate[0].rate : fallbackVatRate
       msg = {
         v: 1,
         phase: 'checkout',
@@ -2165,6 +2187,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         subtotalExVat,
         vatRate,
         vatAmount,
+        ...(vatLines ? { vatLines } : {}),
         totalInclVat,
         dineInSubtitle: customerDisplayDineInSubtitle,
       }
@@ -2201,6 +2224,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     tenantInfo?.btw_percentage,
     customerDisplayThankYou,
     customerDisplayDineInSubtitle,
+    resolveCartLineVat,
   ])
 
   /** Totaal per product-id voor tegel-badge; vermijdt O(producten × mandregels) bij elke qty-wijziging. */
@@ -2455,9 +2479,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       if (Math.abs(total - sc - sd) > 0.02) return
     }
 
-    const vatRate = tenantInfo?.btw_percentage ?? 6
-    const subtotal = total / (1 + vatRate / 100)
-    const tax = total - subtotal
+    const vatSplit = computeInclusiveVatSplitFromCart(cart, resolveCartLineVat)
+    if (Math.abs(vatSplit.grossTotal - total) > 0.03) {
+      console.warn('[kassa] btw-split vs mandtotaal mismatched', { split: vatSplit.grossTotal, total })
+    }
+    const subtotal = vatSplit.subtotalExcl
+    const tax = vatSplit.totalTax
     const createdAt = new Date()
     const kassa_client_uuid =
       typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
@@ -2490,11 +2517,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       tax: Math.round(tax * 100) / 100,
       total: total,
       kassa_staff_id: activeKassaStaff?.id ?? null,
-      items: cart.map(i => ({
+      items: cart.map((i) => ({
         product_id: i.product.id,
         name: i.product.name,
         price: i.product.price,
         quantity: i.quantity,
+        btw_percentage: resolveCartLineVat(i),
         options: (i.choices || []).map((c: any) => ({ name: c.choiceName || c.name || '', price: c.price || 0 })),
       })),
       created_at: createdAt.toISOString(),
@@ -2620,6 +2648,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       checkoutReference: queuedOffline ? shortRef : undefined,
       items: [...cart],
       total,
+      vatSplit: vatSplit.byRate.map((l) => ({
+        rate: l.rate,
+        baseExcl: l.baseExcl,
+        tax: l.tax,
+      })),
+      subtotalExclVat: Math.round(subtotal * 100) / 100,
+      totalTax: Math.round(tax * 100) / 100,
       paymentMethod: method,
       splitCash: method === 'SPLIT' ? splitAmounts?.cash : undefined,
       splitCard: method === 'SPLIT' ? splitAmounts?.card : undefined,
@@ -2657,9 +2692,21 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     })
     const isDraft = !!opts?.draft
     try {
-    const vatRate = tenantInfo?.btw_percentage ?? 6
-    const subtotal = order.total / (1 + vatRate / 100)
-    const tax = order.total - subtotal
+    const fbVatRate = normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 6, 21)
+    const splitOk =
+      Array.isArray(order.vatSplit) &&
+      order.vatSplit.length > 0 &&
+      typeof order.subtotalExclVat === 'number' &&
+      typeof order.totalTax === 'number'
+    let subtotal: number
+    let tax: number
+    if (splitOk) {
+      subtotal = Math.round((order.subtotalExclVat as number) * 100) / 100
+      tax = Math.round((order.totalTax as number) * 100) / 100
+    } else {
+      subtotal = Math.round((order.total / (1 + fbVatRate / 100)) * 100) / 100
+      tax = Math.round((order.total - subtotal) * 100) / 100
+    }
     const orderTypeLabel =
       order.orderType === 'DINE_IN'
         ? `🍽️ ${t('kassaReceipt.orderTypeDineIn')}`
@@ -2694,7 +2741,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       hour: '2-digit',
       minute: '2-digit',
     })
-    const vatRowLabel = escapeReceiptHtml(t('kassaReceipt.vat').replace('{rate}', String(vatRate)))
 
     const orderTypePlain =
       order.orderType === 'DINE_IN'
@@ -2737,7 +2783,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     bonLines.push('--------------------------------')
     bonLines.push(`${t('kassaReceipt.subtotal')}  EUR ${subtotal.toFixed(2)}`)
-    bonLines.push(`${t('kassaReceipt.vat').replace('{rate}', String(vatRate))}  EUR ${tax.toFixed(2)}`)
+    if (splitOk && order.vatSplit!.length >= 1) {
+      for (const row of order.vatSplit!) {
+        bonLines.push(
+          `${t('kassaReceipt.vat').replace('{rate}', String(row.rate))}  EUR ${row.tax.toFixed(2)}`,
+        )
+      }
+    } else {
+      bonLines.push(`${t('kassaReceipt.vat').replace('{rate}', String(fbVatRate))}  EUR ${tax.toFixed(2)}`)
+    }
     bonLines.push(`${t('kassaReceipt.total')}  EUR ${order.total.toFixed(2)}`)
     bonLines.push(`${t('kassaReceipt.paidWith')} ${payLabel}`)
     if (order.helpedByStaffName) {
@@ -2783,7 +2837,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         phone: tenantInfo?.phone ?? undefined,
         vatNumber: tenantInfo?.btw_number ?? undefined,
         website: tenantInfo?.website ?? undefined,
-        vatRate: tenantInfo?.btw_percentage ?? 6,
+        vatRate: splitOk ? order.vatSplit![0].rate : fbVatRate,
       },
     })
 
@@ -2812,7 +2866,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       }).join('')}
       <div class="divider-solid"></div>
       <div class="row"><span>${escapeReceiptHtml(t('kassaReceipt.subtotal'))}</span><span>€${subtotal.toFixed(2)}</span></div>
-      <div class="row"><span>${vatRowLabel}</span><span>€${tax.toFixed(2)}</span></div>
+      ${
+        splitOk && order.vatSplit!.length >= 1
+          ? order
+              .vatSplit!.map(
+                (l) =>
+                  `<div class="row"><span>${escapeReceiptHtml(t('kassaReceipt.vat').replace('{rate}', String(l.rate)))}</span><span>€${l.tax.toFixed(2)}</span></div>`,
+              )
+              .join('')
+          : `<div class="row"><span>${escapeReceiptHtml(t('kassaReceipt.vat').replace('{rate}', String(fbVatRate)))}</span><span>€${tax.toFixed(2)}</span></div>`
+      }
       <div class="row total"><span>${escapeReceiptHtml(t('kassaReceipt.total'))}</span><span>€${order.total.toFixed(2)}</span></div>
       <div class="divider"></div>
       <div class="center small">${escapeReceiptHtml(t('kassaReceipt.paidWith'))} ${escapeReceiptHtml(payLabel)}</div>
@@ -2859,10 +2922,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const printDraftBonFromCart = () => {
     if (draftBonLineItems.length === 0) return
     playClick()
+    const draftSplit = computeInclusiveVatSplitFromCart(draftBonLineItems, resolveCartLineVat)
     const draftOrder: KassaLastOrderReceipt = {
       orderNumber: 0,
       items: draftBonLineItems,
       total: draftBonTotal,
+      vatSplit: draftSplit.byRate.map((l) => ({
+        rate: l.rate,
+        baseExcl: l.baseExcl,
+        tax: l.tax,
+      })),
+      subtotalExclVat: draftSplit.subtotalExcl,
+      totalTax: draftSplit.totalTax,
       paymentMethod: 'CARD',
       orderType,
       tableNumber: tableNumber || '',

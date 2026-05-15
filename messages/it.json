@@ -2435,7 +2435,10 @@
       "dragHintShort": "Trascina per ordinare · tocca il nome per modificare",
       "productCount": "{count} prodotti",
       "productCountZero": "Nessun prodotto",
-      "productCountTitle": "Prodotti in questa categoria"
+      "productCountTitle": "Prodotti in questa categoria",
+      "categoryVatHint": "Imposta un'aliquota IVA fissa per categoria (6%, 9%, 12% o 21%) per i prodotti di quella categoria. «Predefinito attività» usa l'impostazione generale: stesso comportamento di prima se non modifichi nulla.",
+      "categoryVatShort": "IVA",
+      "categoryVatUseTenant": "Predefinito attività"
     },
     "producten": {
       "title": "Prodotti",

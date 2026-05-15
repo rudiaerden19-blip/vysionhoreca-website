@@ -2435,7 +2435,10 @@
       "dragHintShort": "Arrastra para ordenar · toca el nombre para editar",
       "productCount": "{count} productos",
       "productCountZero": "Sin productos",
-      "productCountTitle": "Productos en esta categoría"
+      "productCountTitle": "Productos en esta categoría",
+      "categoryVatHint": "Elige un tipo de IVA fijo por categoría (6 %, 9 %, 12 % o 21 %) para los artículos de esa categoría. « Estándar del local » usa el tipo de los ajustes del negocio: mismo comportamiento que antes si no cambias nada.",
+      "categoryVatShort": "IVA",
+      "categoryVatUseTenant": "Estándar del local"
     },
     "producten": {
       "title": "Productos",

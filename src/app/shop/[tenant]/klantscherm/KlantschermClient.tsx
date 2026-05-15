@@ -341,10 +341,19 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
               <span>{t('kassaCustomerDisplay.subtotalExVat')}</span>
               <span className="tabular-nums font-semibold">{formatMoney(msg.subtotalExVat)}</span>
             </div>
-            <div className="flex justify-between text-white/90">
-              <span>{t('kassaCustomerDisplay.vatLine').replace('{rate}', String(msg.vatRate))}</span>
-              <span className="tabular-nums font-semibold">{formatMoney(msg.vatAmount)}</span>
-            </div>
+            {msg.vatLines && msg.vatLines.length > 0 ? (
+              msg.vatLines.map((row, vi) => (
+                <div key={`${row.rate}-${vi}`} className="flex justify-between text-white/90">
+                  <span>{t('kassaCustomerDisplay.vatLine').replace('{rate}', String(row.rate))}</span>
+                  <span className="tabular-nums font-semibold">{formatMoney(row.amount)}</span>
+                </div>
+              ))
+            ) : (
+              <div className="flex justify-between text-white/90">
+                <span>{t('kassaCustomerDisplay.vatLine').replace('{rate}', String(msg.vatRate))}</span>
+                <span className="tabular-nums font-semibold">{formatMoney(msg.vatAmount)}</span>
+              </div>
+            )}
             <div className={d.checkoutGrand}>
               <span>{t('kassaCustomerDisplay.totalInclVat')}</span>
               <span className="tabular-nums">{formatMoney(msg.totalInclVat)}</span>

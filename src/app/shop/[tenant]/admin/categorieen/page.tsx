@@ -11,6 +11,7 @@ import {
   dedupeCatalogById,
   MenuCategory,
 } from '@/lib/admin-api'
+import { CATEGORY_VAT_PERCENT_OPTIONS } from '@/lib/order-vat'
 import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
@@ -108,6 +109,23 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
     setSaved(false)
   }
 
+  const updateCategoryDefaultBtw = (id: string, value: string) => {
+    const next: number | null =
+      value === '' || value === 'tenant' ? null : parseInt(value, 10)
+    setCategories((prev) =>
+      prev.map((c) =>
+        c.id === id
+          ? {
+              ...c,
+              default_btw_percentage:
+                next === 6 || next === 9 || next === 12 || next === 21 ? next : null,
+            }
+          : c,
+      ),
+    )
+    setSaved(false)
+  }
+
   const handleSave = async () => {
     if (saveInFlightRef.current) return
     saveInFlightRef.current = true
@@ -164,6 +182,9 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t('adminPages.categorieen.title')}</h1>
           <p className="text-gray-500">{t('adminPages.categorieen.subtitle')}</p>
+          <p className="text-gray-500 text-sm mt-2 max-w-xl">
+            {t('adminPages.categorieen.categoryVatHint')}
+          </p>
         </div>
         <motion.button
           whileHover={{ scale: 1.02 }}
@@ -228,11 +249,14 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
 
       {/* Categories List */}
       <motion.div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-        <div className="px-4 py-3 border-b bg-gray-50 flex items-center gap-2">
+        <div className="px-4 py-3 border-b bg-gray-50 flex flex-col sm:flex-row sm:items-center gap-2">
           <span className="text-gray-400 text-sm">☰</span>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 flex-1">
             {t('adminPages.categorieen.dragHintShort')}
           </p>
+          <span className="hidden sm:inline text-xs text-gray-400 font-medium whitespace-nowrap">
+            {t('adminPages.categorieen.categoryVatShort')}
+          </span>
         </div>
         {categories.length === 0 ? (
           <div className="p-12 text-center">
@@ -251,8 +275,8 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
                   : t('adminPages.categorieen.productCount').replace('{count}', String(cnt))
               return (
               <Reorder.Item key={category.id} value={category} className="bg-white hover:bg-gray-50 cursor-grab active:cursor-grabbing transition-colors">
-                <div className="flex items-center gap-3 px-4 py-3.5">
-                  <span className="text-gray-300 text-lg select-none">⠿</span>
+                <div className="flex items-center gap-2 sm:gap-3 px-4 py-3.5 flex-wrap">
+                  <span className="text-gray-300 text-lg select-none shrink-0">⠿</span>
 
                   {editingId === category.id ? (
                     <input
@@ -262,17 +286,43 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
                       onBlur={() => setEditingId(null)}
                       onKeyDown={(e) => e.key === 'Enter' && setEditingId(null)}
                       autoFocus
-                      className="flex-1 px-3 py-1.5 border-2 border-blue-500 rounded-lg focus:outline-none text-base font-medium"
+                      className="flex-1 min-w-[140px] px-3 py-1.5 border-2 border-blue-500 rounded-lg focus:outline-none text-base font-medium"
                     />
                   ) : (
                     <span
-                      className="flex-1 font-medium text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
+                      className="flex-1 min-w-[120px] font-medium text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
                       onClick={() => setEditingId(category.id!)}
                       title="Klik om naam te bewerken"
                     >
                       {category.name}
                     </span>
                   )}
+
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <label className="sr-only" htmlFor={`cat-btw-${category.id}`}>
+                      {t('adminPages.categorieen.categoryVatShort')}
+                    </label>
+                    <select
+                      id={`cat-btw-${category.id}`}
+                      value={
+                        category.default_btw_percentage === 6 ||
+                        category.default_btw_percentage === 9 ||
+                        category.default_btw_percentage === 12 ||
+                        category.default_btw_percentage === 21
+                          ? String(category.default_btw_percentage)
+                          : 'tenant'
+                      }
+                      onChange={(e) => updateCategoryDefaultBtw(category.id!, e.target.value)}
+                      className="text-sm border border-gray-200 rounded-lg px-2 py-1.5 bg-white text-gray-800 max-w-[9.5rem]"
+                    >
+                      <option value="tenant">{t('adminPages.categorieen.categoryVatUseTenant')}</option>
+                      {CATEGORY_VAT_PERCENT_OPTIONS.map((p) => (
+                        <option key={p} value={String(p)}>
+                          {p}%
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
                   <span
                     className="shrink-0 text-xs font-medium text-gray-500 tabular-nums sm:w-36 sm:text-right"

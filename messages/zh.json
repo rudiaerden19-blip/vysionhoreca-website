@@ -2435,7 +2435,10 @@
       "dragHintShort": "拖动排序 · 点击名称编辑",
       "productCount": "{count} 个商品",
       "productCountZero": "无商品",
-      "productCountTitle": "此分类下的商品数量"
+      "productCountTitle": "此分类下的商品数量",
+      "categoryVatHint": "可为每个分类设置固定增值税税率（6%、9%、12% 或 21%），适用于该分类内商品。“店铺默认”沿用店铺设置中的税率；不修改则与以前行为一致。",
+      "categoryVatShort": "增值税",
+      "categoryVatUseTenant": "店铺默认"
     },
     "producten": {
       "title": "产品",

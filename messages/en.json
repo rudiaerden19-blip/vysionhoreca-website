@@ -2734,7 +2734,10 @@
       "dragHintShort": "Drag to reorder · tap the name to edit",
       "productCount": "{count} products",
       "productCountZero": "No products",
-      "productCountTitle": "Number of products in this category"
+      "productCountTitle": "Number of products in this category",
+      "categoryVatHint": "Set a fixed VAT rate per category (6%, 9%, 12% or 21%) for products in that category. “Use business default” follows your shop settings — unchanged behaviour until you pick a rate here.",
+      "categoryVatShort": "VAT",
+      "categoryVatUseTenant": "Business default"
     },
     "producten": {
       "title": "Products",

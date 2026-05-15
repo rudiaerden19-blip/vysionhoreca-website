@@ -47,6 +47,8 @@ export interface MenuCategory {
   icon?: string
   sort_order: number
   is_active: boolean
+  /** 6/9/12/21 of null = gebruik tenant_settings.btw_percentage */
+  default_btw_percentage?: number | null
 }
 
 export async function getMenuCategories(tenantSlug: string): Promise<MenuCategory[]> {
@@ -88,6 +90,9 @@ export async function saveMenuCategory(
     ...(category.icon !== undefined && { icon: category.icon }),
     sort_order: category.sort_order,
     is_active: category.is_active,
+    ...(category.default_btw_percentage !== undefined && {
+      default_btw_percentage: category.default_btw_percentage,
+    }),
   } satisfies Record<string, unknown>
 
   const r = category.id
@@ -102,6 +107,39 @@ export async function saveMenuCategory(
         { ...row, tenant_slug: tenantSlug },
         { tenantSlug, select: '*' },
       )
+
+  if (
+    !r.ok &&
+    /default_btw_percentage|column .* does not exist|schema cache/i.test(r.error || '')
+  ) {
+    const rowLegacy = {
+      name: category.name,
+      description: category.description ?? '',
+      ...(category.icon !== undefined && { icon: category.icon }),
+      sort_order: category.sort_order,
+      is_active: category.is_active,
+    } satisfies Record<string, unknown>
+    const r2 = category.id
+      ? await adminDb.update<MenuCategory[]>(
+          'menu_categories',
+          rowLegacy,
+          { id: category.id, tenant_slug: tenantSlug },
+          { tenantSlug, select: '*' },
+        )
+      : await adminDb.insert<MenuCategory[]>(
+          'menu_categories',
+          { ...rowLegacy, tenant_slug: tenantSlug },
+          { tenantSlug, select: '*' },
+        )
+    if (!r2.ok) {
+      console.error('Error saving menu category:', r2.error)
+      return null
+    }
+    if (!opts?.skipInvalidate) {
+      invalidateMenuCategoriesCache(tenantSlug)
+    }
+    return normalizeDbSingleRow<MenuCategory>(r2.data)
+  }
 
   if (!r.ok) {
     console.error('Error saving menu category:', r.error)
@@ -130,6 +168,7 @@ export async function bulkSaveMenuCategories(
     description: c.description ?? '',
     sort_order: index,
     is_active: c.is_active,
+    default_btw_percentage: c.default_btw_percentage ?? null,
   }))
 
   for (const row of categories) {

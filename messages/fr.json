@@ -1935,7 +1935,10 @@
       "dragHintShort": "Glisser pour l'ordre · appuyez sur le nom pour modifier",
       "productCount": "{count} produits",
       "productCountZero": "Aucun produit",
-      "productCountTitle": "Nombre de produits dans cette catégorie"
+      "productCountTitle": "Nombre de produits dans cette catégorie",
+      "categoryVatHint": "Choisissez un taux de TVA fixe par catégorie (6 %, 9 %, 12 % ou 21 %) pour les articles de cette catégorie. « Standard de l'établissement » reprend le réglage général — comportement inchangé tant que vous ne choisissez pas un taux ici.",
+      "categoryVatShort": "TVA",
+      "categoryVatUseTenant": "Standard établissement"
     },
     "producten": {
       "title": "Produits",
