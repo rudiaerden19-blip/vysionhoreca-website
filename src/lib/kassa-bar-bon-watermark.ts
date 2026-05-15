@@ -1,10 +1,19 @@
 import type { KassaCartItem } from '@/lib/kassa-cart-types'
 
-/** Per tafelsleutel (zone|tafel): laatst naar de toog afgedrukte hoeveelheden per mandregel (cartKey). */
+/** Zelfde logica als mandregel-id in de kassa (zonder fragiele cartKey uit JSON/sync). */
+export function kassaCartLineStableKey(line: KassaCartItem): string {
+  const pid = String(line.product.id ?? '')
+  const ch = line.choices ?? []
+  if (ch.length === 0) return pid
+  return `${pid}-${ch.map((c) => c.choiceId).sort().join('-')}`
+}
+
+/** Per tafelsleutel (zone|tafel): laatst naar de toog gestuurde hoeveelheden per stabiele regel. */
 export type BarBonWatermarkStore = Record<string, Record<string, number>>
 
+/** v2: sleutels op product+keuzes — v1 gebruikte cartKey die na server-sync kon afwijken. */
 export function barBonWatermarkStorageKey(tenantSlug: string): string {
-  return `vysion_kassa_bar_bon_watermark_${tenantSlug}`
+  return `vysion_kassa_bar_bon_watermark_v2_${tenantSlug}`
 }
 
 export function loadBarBonWatermarks(tenantSlug: string): BarBonWatermarkStore {
@@ -35,37 +44,55 @@ export function removeBarBonWatermarkSlot(tenantSlug: string, slotKey: string): 
   saveBarBonWatermarks(tenantSlug, store)
 }
 
-/** Als de mand krimpt: cap last-sent zodat we geen negatieve „delta” voorstellen (MVP). */
-export function reconcileBarBonWatermarkForCart(
+function quantitiesByStableKey(items: KassaCartItem[]): Record<string, number> {
+  const m: Record<string, number> = {}
+  for (const i of items) {
+    const k = kassaCartLineStableKey(i)
+    m[k] = (m[k] ?? 0) + i.quantity
+  }
+  return m
+}
+
+/** Eerste mandregel per stabiele sleutel (voor productnaam/opies op de bon). */
+function firstLineByStableKey(items: KassaCartItem[]): Map<string, KassaCartItem> {
+  const map = new Map<string, KassaCartItem>()
+  for (const i of items) {
+    const k = kassaCartLineStableKey(i)
+    if (!map.has(k)) map.set(k, i)
+  }
+  return map
+}
+
+function reconcileBarBonWatermark(
   lastSent: Record<string, number>,
-  currentCart: KassaCartItem[],
+  currentQty: Record<string, number>,
 ): Record<string, number> {
   const out = { ...lastSent }
-  const byKey = Object.fromEntries(currentCart.map((i) => [i.cartKey, i.quantity]))
   for (const k of Object.keys(out)) {
-    if (byKey[k] == null) delete out[k]
-    else out[k] = Math.min(out[k]!, byKey[k]!)
+    if (currentQty[k] == null) delete out[k]
+    else out[k] = Math.min(out[k]!, currentQty[k]!)
   }
   return out
 }
 
-/** Alleen extra stuks t.o.v. laatste toogbon; `nextWatermark` bij te werken ná geslaagde print. */
+/** Alleen extra stuks t.o.v. laatste toogbon; `nextWatermark` = volledige stand na deze bon. */
 export function computeBarBonDelta(
   currentCart: KassaCartItem[],
   lastSent: Record<string, number>,
 ): { deltaLines: KassaCartItem[]; nextWatermark: Record<string, number> } {
-  const reconciled = reconcileBarBonWatermarkForCart(lastSent, currentCart)
+  const currentQty = quantitiesByStableKey(currentCart)
+  const reps = firstLineByStableKey(currentCart)
+  const reconciled = reconcileBarBonWatermark(lastSent, currentQty)
   const deltaLines: KassaCartItem[] = []
-  const nextWatermark: Record<string, number> = {}
 
-  for (const line of currentCart) {
-    const prev = reconciled[line.cartKey] ?? 0
-    const dq = line.quantity - prev
+  for (const [k, qty] of Object.entries(currentQty)) {
+    const prev = reconciled[k] ?? 0
+    const dq = qty - prev
     if (dq > 0) {
-      deltaLines.push({ ...line, quantity: dq })
+      const base = reps.get(k)!
+      deltaLines.push({ ...base, quantity: dq })
     }
-    nextWatermark[line.cartKey] = line.quantity
   }
 
-  return { deltaLines, nextWatermark }
+  return { deltaLines, nextWatermark: { ...currentQty } }
 }

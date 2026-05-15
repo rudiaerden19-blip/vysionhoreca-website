@@ -494,8 +494,6 @@ function kassaDraftCartGuardSig(items: CartItem[], total: number): string {
 /** Blokkeert dubbeltik op gele bon kort na succes; daarna opnieuw printen mogelijk (geen permanente lock). */
 const KASSA_DRAFT_RECEIPT_COOLDOWN_MS = 3500
 
-const KASSA_BAR_DELTA_AUTOPRINT_DEBOUNCE_MS = 650
-
 function snapshotCartItemsForAsyncPrint(items: CartItem[]): CartItem[] {
   return items.map((i) => ({
     ...i,
@@ -1597,8 +1595,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [switchConfirm, setSwitchConfirm] = useState<string | null>(null)
   /** Na plattegrond «Afrekenen»: open betaalmodal zodra doSwitchToTable klaar is (ook ná switch-bevestiging). */
   const openPaymentAfterFloorPlanSwitchRef = useRef(false)
-  /** Delta-toogbon: debounce + stub tot printReceipt de echte impl zet. */
-  const barDeltaAutoPrintLastAtRef = useRef<Record<string, number>>({})
+  /** Delta-toogbon: voorkom overlappende jobs per tafelsleutel (geen gedeelde guard met gele bon). */
+  const barDeltaSlotInflightRef = useRef<Record<string, boolean>>({})
   const flushBarDeltaSlipRef = useRef<(zone: FloorPlanZone, tblNr: string, snap: CartItem[]) => void>(
     () => {},
   )
@@ -2827,12 +2825,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       if (g.printedOkOnce || g.inFlight) return
       g.inFlight = true
     } else {
-      const g = draftReceiptPrintGuardRef.current
-      if (barTableDelta) {
-        if (g.inFlight) return
-        g.inFlight = true
-      } else {
+      if (!barTableDelta) {
         const sig = kassaDraftCartGuardSig(order.items, order.total)
+        const g = draftReceiptPrintGuardRef.current
         const now = Date.now()
         if (g.cartSig !== sig) {
           g.cartSig = sig
@@ -3110,7 +3105,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       })
     } finally {
       if (!isDraft) paidReceiptPrintGuardRef.current.inFlight = false
-      else draftReceiptPrintGuardRef.current.inFlight = false
+      else if (!barTableDelta) draftReceiptPrintGuardRef.current.inFlight = false
     }
   }
 
@@ -3118,48 +3113,44 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     void (async () => {
       if (demoViewOnly || snap.length === 0) return
       const slotKey = tableOrderMapKey(zone, tblNr)
-      const now = Date.now()
-      if (
-        now - (barDeltaAutoPrintLastAtRef.current[slotKey] ?? 0) <
-        KASSA_BAR_DELTA_AUTOPRINT_DEBOUNCE_MS
-      ) {
-        return
+      if (barDeltaSlotInflightRef.current[slotKey]) return
+      barDeltaSlotInflightRef.current[slotKey] = true
+      try {
+        const store = loadBarBonWatermarks(tenant)
+        const prev = store[slotKey] ?? {}
+        const { deltaLines, nextWatermark } = computeBarBonDelta(snap, prev)
+        if (deltaLines.length === 0) return
+
+        const draftSplit = computeInclusiveVatSplitFromCart(deltaLines, resolveCartLineVat)
+        const deltaTotal = draftSplit.grossTotal
+        const draftOrder: KassaLastOrderReceipt = {
+          orderNumber: 0,
+          items: deltaLines,
+          total: deltaTotal,
+          vatSplit: draftSplit.byRate.map((l) => ({
+            rate: l.rate,
+            baseExcl: l.baseExcl,
+            tax: l.tax,
+          })),
+          subtotalExclVat: draftSplit.subtotalExcl,
+          totalTax: draftSplit.totalTax,
+          paymentMethod: 'CARD',
+          orderType: 'DINE_IN',
+          tableNumber: tblNr,
+          floorPlanZone:
+            zone === FLOOR_PLAN_ZONE_TERRACE ? FLOOR_PLAN_ZONE_TERRACE : FLOOR_PLAN_ZONE_INSIDE,
+          createdAt: new Date(),
+          helpedByStaffName: activeKassaStaff?.name ?? null,
+        }
+
+        await printReceipt(draftOrder, {
+          draft: true,
+          barTableDelta: true,
+          barWatermarkCommit: { slotKey, row: nextWatermark },
+        })
+      } finally {
+        delete barDeltaSlotInflightRef.current[slotKey]
       }
-
-      const store = loadBarBonWatermarks(tenant)
-      const prev = store[slotKey] ?? {}
-      const { deltaLines, nextWatermark } = computeBarBonDelta(snap, prev)
-      if (deltaLines.length === 0) return
-
-      barDeltaAutoPrintLastAtRef.current[slotKey] = now
-
-      const draftSplit = computeInclusiveVatSplitFromCart(deltaLines, resolveCartLineVat)
-      const deltaTotal = draftSplit.grossTotal
-      const draftOrder: KassaLastOrderReceipt = {
-        orderNumber: 0,
-        items: deltaLines,
-        total: deltaTotal,
-        vatSplit: draftSplit.byRate.map((l) => ({
-          rate: l.rate,
-          baseExcl: l.baseExcl,
-          tax: l.tax,
-        })),
-        subtotalExclVat: draftSplit.subtotalExcl,
-        totalTax: draftSplit.totalTax,
-        paymentMethod: 'CARD',
-        orderType: 'DINE_IN',
-        tableNumber: tblNr,
-        floorPlanZone:
-          zone === FLOOR_PLAN_ZONE_TERRACE ? FLOOR_PLAN_ZONE_TERRACE : FLOOR_PLAN_ZONE_INSIDE,
-        createdAt: new Date(),
-        helpedByStaffName: activeKassaStaff?.name ?? null,
-      }
-
-      await printReceipt(draftOrder, {
-        draft: true,
-        barTableDelta: true,
-        barWatermarkCommit: { slotKey, row: nextWatermark },
-      })
     })()
   }
 
