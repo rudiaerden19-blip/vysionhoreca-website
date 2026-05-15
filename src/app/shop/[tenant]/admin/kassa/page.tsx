@@ -880,23 +880,64 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     [productsWithOptions],
   )
 
-  /** gap-4 = 16px; 3 rijen categorieën in view. */
-  const KASSA_MENU_VISIBLE_ROWS = 3
-  const KASSA_MENU_GRID_GAP_PX = 16
+  /** gap-6 = 24px; moet gelijk lopen met Tailwind `gap-6` op de grids + ResizeObserver-formule. */
+  const KASSA_MENU_VISIBLE_ROWS = 4
+  const KASSA_MENU_GRID_GAP_PX = 24
 
   function computeInitialKassaMenuRowPx(): number {
-    if (typeof window === 'undefined') return 220
+    if (typeof window === 'undefined') return 180
     const vh = window.visualViewport?.height ?? window.innerHeight
     const overhead = 68 + 56
     const innerApprox = Math.max(0, vh - overhead - 48)
     const row =
       (innerApprox - (KASSA_MENU_VISIBLE_ROWS - 1) * KASSA_MENU_GRID_GAP_PX) / KASSA_MENU_VISIBLE_ROWS
-    return Math.max(140, Math.floor(row))
+    return Math.max(100, Math.floor(row))
   }
 
-  /** Menu-paneel: 4×3 volle tegels in het zicht; rijhoogte = f(scrollport). gap-4 = 16px. */
+  /** Menu-paneel: 4 kol × N rijen in zicht; rijhoogte = f(scrollport). */
   const kassaMenuScrollRef = useRef<HTMLDivElement>(null)
+  /** Ghost-tap naar nieuwe DOM onder vinger blokkeren (geen tijdvenster: ~2 frames pointer-events uit). */
+  const kassaProductGridRef = useRef<HTMLDivElement>(null)
+  const kassaCategoryGridRef = useRef<HTMLDivElement>(null)
+  /** Vorige gekozen categorie-id; null = nog nooit naar producten geweest. */
+  const kassaPrevSelectedCategoryIdRef = useRef<string | null>(null)
+
   const [kassaMenuRowPx, setKassaMenuRowPx] = useState(computeInitialKassaMenuRowPx)
+
+  /** Na swap categorie⇄product: kort géén pointers op de verse grid (zelfde coörd = ghost tik). */
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') return undefined
+
+    const currentId =
+      selectedCategory?.id !== undefined && selectedCategory?.id !== null
+        ? String(selectedCategory.id)
+        : null
+    const prevId = kassaPrevSelectedCategoryIdRef.current
+
+    let peelEl: HTMLElement | null = null
+    if (currentId !== null) {
+      peelEl = kassaProductGridRef.current
+    } else if (prevId !== null) {
+      peelEl = kassaCategoryGridRef.current
+    }
+    kassaPrevSelectedCategoryIdRef.current = currentId
+
+    if (!peelEl) return undefined
+
+    peelEl.style.pointerEvents = 'none'
+    let rafInner = 0
+    const rafOuter = window.requestAnimationFrame(() => {
+      rafInner = window.requestAnimationFrame(() => {
+        peelEl!.style.pointerEvents = ''
+      })
+    })
+
+    return () => {
+      window.cancelAnimationFrame(rafOuter)
+      window.cancelAnimationFrame(rafInner)
+      peelEl.style.pointerEvents = ''
+    }
+  }, [selectedCategory])
 
   const [showReservations, setShowReservations] = useState(false)
   const [pendingReservCount, setPendingReservCount] = useState(0)
@@ -3536,7 +3577,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             {menuLoading ? (
               <div data-testid="kassa-menu-loading" className={`flex items-center justify-center h-full text-lg ${ui.menuEmptyMuted}`}>{t('kassaApp.loading')}</div>
             ) : !selectedCategory ? (
-              /* Categorieën: vaste 4 kolommen; rijhoogte = (scrollport − gaps) / 3 → altijd 12 volle tegels zichtbaar, rest scrollen */
+              /* Categorieën: vaste 4 kolommen; rijhoogte = (scrollport − gaps) / N → compactere tegels + ruimere gap */
               categories.length === 0 ? (
                 <div className={`flex flex-col items-center justify-center h-full ${ui.menuEmptyMuted}`}>
                   <span className="text-5xl mb-3">📂</span>
@@ -3545,12 +3586,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 </div>
               ) : (
                 <div
+                  ref={kassaCategoryGridRef}
                   data-testid="kassa-category-grid"
                   onPointerDown={handleCategoryGridPointerDown}
                   onPointerUp={handleCategoryGridPointerUp}
                   onPointerCancel={handleCategoryGridPointerCancel}
                   onClick={handleCategoryGridClick}
-                  className="grid w-full grid-cols-4 gap-4 pb-8 touch-manipulation select-none"
+                  className="grid w-full grid-cols-4 gap-6 pb-8 touch-manipulation select-none"
                   style={{ gridAutoRows: `${kassaMenuRowPx}px` }}
                 >
                   {categories.map((cat) => {
@@ -3568,7 +3610,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 </div>
               )
             ) : (
-              /* Producten: zelfde 4×3 viewport-grid als categorieën */
+              /* Producten: zelfde raster als categorieën */
               productsInSelectedCategory.length === 0 ? (
                   <div className={`flex flex-col items-center justify-center h-full ${ui.menuEmptyMuted}`}>
                     <span className="text-5xl mb-3">🍽️</span>
@@ -3576,12 +3618,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   </div>
                 ) : (
                   <div
+                    ref={kassaProductGridRef}
                     data-testid="kassa-product-grid"
                     onPointerDown={handleProductGridPointerDown}
                     onPointerUp={handleProductGridPointerUp}
                     onPointerCancel={handleProductGridPointerCancel}
                     onClick={handleProductGridClick}
-                    className="grid w-full grid-cols-4 gap-4 pb-8 touch-manipulation select-none"
+                    className="grid w-full grid-cols-4 gap-6 pb-8 touch-manipulation select-none"
                     style={{ gridAutoRows: `${kassaMenuRowPx}px` }}
                   >
                     {productsInSelectedCategory.map((product, index) => {
