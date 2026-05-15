@@ -65,11 +65,22 @@ function isAndroidUserAgent(): boolean {
   return /Android/i.test(navigator.userAgent)
 }
 
+const ANDROID_KIOSK_SESSION_STORAGE_KEY = 'vysion_android_kiosk_session'
+
 /** Zelfde query als Vysion Kiosk „Open kassa in Chrome” (`MainActivity.ANDROID_KIOSK_Q`). */
 function hasAndroidKioskSessionHint(): boolean {
   if (typeof window === 'undefined') return false
   try {
-    return new URLSearchParams(window.location.search).get('vysion_android_kiosk') === '1'
+    const q = new URLSearchParams(window.location.search).get('vysion_android_kiosk')
+    if (q === '1') {
+      try {
+        sessionStorage.setItem(ANDROID_KIOSK_SESSION_STORAGE_KEY, '1')
+      } catch {
+        /* private mode / quota */
+      }
+      return true
+    }
+    return sessionStorage.getItem(ANDROID_KIOSK_SESSION_STORAGE_KEY) === '1'
   } catch {
     return false
   }
