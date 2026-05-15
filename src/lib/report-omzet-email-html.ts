@@ -62,6 +62,19 @@ export function buildOmzetReportEmailHtml(p: OmzetReportEmailBodyInput): string 
     .map((line) => `<p style="margin:0 0 4px 0;color:#4b5563;font-size:14px;">${esc(line)}</p>`)
     .join('')
 
+  const titleBand = `
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="border-collapse:collapse;border-bottom:2px solid #1e293b;margin-bottom:12px;">
+      <tr>
+        <td valign="bottom" style="padding:0 12px 12px 0;">
+          <h1 style="margin:0;font-size:22px;color:#1e293b;font-weight:bold;line-height:1.2;">📊 Omzet Rapport</h1>
+        </td>
+        <td valign="bottom" align="right" style="padding:0 0 12px 0;font-size:14px;color:#374151;line-height:1.45;max-width:280px;">
+          <span style="font-weight:bold;color:#111827;font-size:15px;display:block;margin-bottom:4px;">${esc(p.businessName)}</span>
+          Gegenereerd op <strong>${esc(p.generatedAtNl)}</strong>
+        </td>
+      </tr>
+    </table>`
+
   const summaryCell = (label: string, value: string) => `
     <td width="50%" valign="top" style="padding:8px;">
       <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:#334155;border-radius:8px;">
@@ -88,8 +101,7 @@ export function buildOmzetReportEmailHtml(p: OmzetReportEmailBodyInput): string 
         <table role="presentation" width="560" cellspacing="0" cellpadding="0" border="0" style="max-width:560px;width:100%;background-color:#ffffff;border-radius:12px;overflow:hidden;">
           <tr>
             <td style="padding:32px 28px 24px 28px;">
-              <h1 style="margin:0 0 12px 0;font-size:22px;color:#1e293b;font-weight:bold;border-bottom:2px solid #1e293b;padding-bottom:10px;">📊 Omzet Rapport</h1>
-              <p style="margin:0 0 2px 0;font-size:15px;color:#111827;"><strong>${esc(p.businessName)}</strong></p>
+              ${titleBand}
               ${addrHtml}
               ${p.btwNumber ? `<p style="margin:8px 0 0 0;font-size:14px;color:#4b5563;">BTW: ${esc(p.btwNumber)}</p>` : ''}
               <p style="margin:12px 0 0 0;font-size:14px;color:#4b5563;">Periode: <strong>${esc(p.periodLabel)}</strong></p>

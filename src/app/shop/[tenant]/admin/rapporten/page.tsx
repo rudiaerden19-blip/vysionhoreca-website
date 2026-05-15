@@ -12,6 +12,7 @@ import {
   type TenantSettings,
 } from '@/lib/admin-api'
 import { aggregateZReportVatFromOrderRows } from '@/lib/order-vat'
+import { escapeHtml } from '@/lib/report-omzet-email-html'
 import { authFetch } from '@/lib/auth-headers'
 import PinGate from '@/components/PinGate'
 
@@ -605,7 +606,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
       exp.reduce((s,o)=>s+o.tax,0).toFixed(2).replace('.',','),
       exp.reduce((s,o)=>s+o.total,0).toFixed(2).replace('.',','),
     ]
-    const csv = [`"${tenantInfo?.business_name||tenant}"`,`"Periode: ${exportPeriod}"`, '',
+    const csv = [`"${tenantInfo?.business_name||tenant}"`,`"Periode: ${EXPORT_PERIOD_LABEL_NL[exportPeriod]}"`, '',
       headers.map(h=>`"${h}"`).join(';'),
       ...rows.map(r=>r.map(c=>`"${c}"`).join(';')),
       '', totalRow.map(c=>`"${c}"`).join(';'),
@@ -635,9 +636,15 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     if (vatDetailRows.length === 0 && vatAggPdf.totalTax > 0) {
       vatDetailRows.push(`<tr><td>BTW</td><td class="amt">€${vatAggPdf.totalTax.toFixed(2)}</td></tr>`)
     }
+    const postalCity = [tenantInfo?.postal_code, tenantInfo?.city].filter(Boolean).join(' ').trim()
+    const genNl = new Date().toLocaleString('nl-NL')
+    const bizName = escapeHtml(String(tenantInfo?.business_name || tenant))
     const html = `<!DOCTYPE html><html><head><title>Rapport</title>
     <style>body{font-family:Arial,sans-serif;padding:40px;max-width:800px;margin:0 auto}
-    h1{color:#1e293b;border-bottom:2px solid #1e293b;padding-bottom:10px}
+    .report-head{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;padding-bottom:12px;margin-bottom:8px;border-bottom:2px solid #1e293b}
+    .report-head h1{margin:0;font-size:26px;color:#1e293b;line-height:1.2;border:none;padding:0}
+    .report-head-meta{text-align:right;font-size:14px;color:#374151;line-height:1.45;max-width:min(100%,360px)}
+    .report-head-meta .biz{font-weight:700;color:#111827;font-size:15px;display:block;margin-bottom:4px}
     h2{color:#374151;margin-top:30px}.info{color:#6b7280;margin-bottom:20px}
     table{width:100%;border-collapse:collapse;margin:20px 0}
     th,td{padding:10px;text-align:left;border-bottom:1px solid #e5e7eb}
@@ -647,10 +654,16 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     .slabel{font-size:11px;opacity:0.7}.sval{font-size:22px;font-weight:bold}
     .footer{color:#9ca3af;font-size:11px;margin-top:40px}
     @media print{.noprint{display:none}}</style></head><body>
-    <h1>📊 Omzet Rapport</h1>
-    <div class="info"><strong>${tenantInfo?.business_name||tenant}</strong><br>
-    ${tenantInfo?.address?tenantInfo.address+'<br>':''}${tenantInfo?.postal_code||''} ${tenantInfo?.city||''}<br>
-    ${tenantInfo?.btw_number?'BTW: '+tenantInfo.btw_number+'<br>':''}Periode: <strong>${exportPeriod}</strong></div>
+    <div class="report-head">
+      <h1>📊 Omzet Rapport</h1>
+      <div class="report-head-meta">
+        <span class="biz">${bizName}</span>
+        Gegenereerd op <strong>${escapeHtml(genNl)}</strong>
+      </div>
+    </div>
+    <div class="info">
+    ${tenantInfo?.address ? `${escapeHtml(tenantInfo.address)}<br>` : ''}${postalCity ? `${escapeHtml(postalCity)}<br>` : ''}
+    ${tenantInfo?.btw_number ? `BTW: ${escapeHtml(tenantInfo.btw_number)}<br>` : ''}Periode: <strong>${escapeHtml(EXPORT_PERIOD_LABEL_NL[exportPeriod])}</strong></div>
     <div class="summary">
     <div class="sitem"><div class="slabel">Totale Omzet</div><div class="sval">€${totalRev.toFixed(2)}</div></div>
     <div class="sitem"><div class="slabel">Bestellingen</div><div class="sval">${exp.length}</div></div>
