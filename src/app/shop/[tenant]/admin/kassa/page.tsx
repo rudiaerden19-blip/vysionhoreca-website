@@ -89,12 +89,7 @@ import type {
   KassaPaymentMethod as PaymentMethodType,
   KassaLastOrderReceipt,
 } from '@/lib/kassa-cart-types'
-import {
-  computeBarBonDelta,
-  loadBarBonWatermarks,
-  removeBarBonWatermarkSlot,
-  saveBarBonWatermarks,
-} from '@/lib/kassa-bar-bon-watermark'
+import { loadBarBonWatermarks, removeBarBonWatermarkSlot, saveBarBonWatermarks } from '@/lib/kassa-bar-bon-watermark'
 import {
   flushOfflineOrdersToSupabase,
   mergeOfflineOrderQueues,
@@ -479,14 +474,6 @@ function kassaPaidReceiptGuardKey(order: KassaLastOrderReceipt): string {
 
 function kassaPaidReceiptDedupeStorageKey(tenantSlug: string, order: KassaLastOrderReceipt): string {
   return `vysion_kassa_paid_print_ok:${tenantSlug}:${kassaPaidReceiptGuardKey(order)}`
-}
-
-function snapshotCartItemsForAsyncPrint(items: CartItem[]): CartItem[] {
-  return items.map((i) => ({
-    ...i,
-    product: { ...i.product },
-    choices: i.choices?.map((c) => ({ ...c })),
-  }))
 }
 
 /** Gele bon: alleen tegen dubbeltik binnen deze tijd; daarna altijd opnieuw afdrukken mogelijk. */
@@ -1585,11 +1572,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [switchConfirm, setSwitchConfirm] = useState<string | null>(null)
   /** Na plattegrond «Afrekenen»: open betaalmodal zodra doSwitchToTable klaar is (ook ná switch-bevestiging). */
   const openPaymentAfterFloorPlanSwitchRef = useRef(false)
-  /** Delta-toogbon: voorkom overlappende jobs per tafelsleutel (geen gedeelde guard met gele bon). */
-  const barDeltaSlotInflightRef = useRef<Record<string, boolean>>({})
-  const flushBarDeltaSlipRef = useRef<(zone: FloorPlanZone, tblNr: string, snap: CartItem[]) => void>(
-    () => {},
-  )
 
   const switchToTable = (newTableNr: string) => {
     const zone = pickerBrowseZone
@@ -1606,9 +1588,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const doSwitchToTable = (newTableNr: string, zone: FloorPlanZone) => {
     if (tableNumber && cart.length > 0) {
-      const snap = snapshotCartItemsForAsyncPrint(cart)
       saveCartToTable(dineInFloorZone, tableNumber, cart)
-      void flushBarDeltaSlipRef.current(dineInFloorZone, tableNumber, snap)
     }
     const slotKey = tableOrderMapKey(zone, newTableNr)
     const existingOrder = tableOrders[slotKey] || []
@@ -1628,9 +1608,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   // "Naar tafel" knop: sla bestelling op en leeg de kassa voor volgende tafel
   const parkOrder = () => {
     if (!tableNumber || cart.length === 0) return
-    const snap = snapshotCartItemsForAsyncPrint(cart)
     saveCartToTable(dineInFloorZone, tableNumber, cart)
-    void flushBarDeltaSlipRef.current(dineInFloorZone, tableNumber, snap)
     setCart([])
     setTableNumber('')
     setDineInFloorZone(FLOOR_PLAN_ZONE_INSIDE)
@@ -3088,51 +3066,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       if (!isDraft) paidReceiptPrintGuardRef.current.inFlight = false
       else if (!barKitchenDelta) draftReceiptPrintGuardRef.current.inFlight = false
     }
-  }
-
-  flushBarDeltaSlipRef.current = (zone, tblNr, snap) => {
-    void (async () => {
-      if (demoViewOnly || snap.length === 0) return
-      const slotKey = tableOrderMapKey(zone, tblNr)
-      if (barDeltaSlotInflightRef.current[slotKey]) return
-      barDeltaSlotInflightRef.current[slotKey] = true
-      try {
-        const store = loadBarBonWatermarks(tenant)
-        const prev = store[slotKey] ?? {}
-        const { deltaLines, nextWatermark } = computeBarBonDelta(snap, prev)
-        if (deltaLines.length === 0) return
-
-        const draftSplit = computeInclusiveVatSplitFromCart(deltaLines, resolveCartLineVat)
-        const deltaTotal = draftSplit.grossTotal
-        const draftOrder: KassaLastOrderReceipt = {
-          orderNumber: 0,
-          items: deltaLines,
-          total: deltaTotal,
-          vatSplit: draftSplit.byRate.map((l) => ({
-            rate: l.rate,
-            baseExcl: l.baseExcl,
-            tax: l.tax,
-          })),
-          subtotalExclVat: draftSplit.subtotalExcl,
-          totalTax: draftSplit.totalTax,
-          paymentMethod: 'CARD',
-          orderType: 'DINE_IN',
-          tableNumber: tblNr,
-          floorPlanZone:
-            zone === FLOOR_PLAN_ZONE_TERRACE ? FLOOR_PLAN_ZONE_TERRACE : FLOOR_PLAN_ZONE_INSIDE,
-          createdAt: new Date(),
-          helpedByStaffName: activeKassaStaff?.name ?? null,
-        }
-
-        await printReceipt(draftOrder, {
-          draft: true,
-          barTableDelta: true,
-          barWatermarkCommit: { slotKey, row: nextWatermark },
-        })
-      } finally {
-        delete barDeltaSlotInflightRef.current[slotKey]
-      }
-    })()
   }
 
   /** Voorlopige bon zonder afrekenen — volledige mand/kar zoals op het scherm (incl. open tafelmand). */
