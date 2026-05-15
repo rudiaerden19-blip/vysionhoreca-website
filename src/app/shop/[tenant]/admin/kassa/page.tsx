@@ -1619,7 +1619,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
    * Thermische print-status op het scherm — géén window.alert ná async (Chrome Android blokkeert dat).
    */
   const [thermalPrintBanner, setThermalPrintBanner] = useState<{
-    variant: 'info' | 'success' | 'error'
+    variant: 'success' | 'error'
     message: string
   } | null>(null)
   const [splitCash, setSplitCash] = useState(0)
@@ -2727,10 +2727,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       })
       return
     }
-    setThermalPrintBanner({
-      variant: 'info',
-      message: 'Bonafdruk: printer op deze tablet/PC wordt aangesproken…',
-    })
     const isDraft = !!opts?.draft
     try {
     const fbVatRate = normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 6, 21)
@@ -4470,11 +4466,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <p
               className={`whitespace-pre-wrap text-sm leading-relaxed ${
-                thermalPrintBanner.variant === 'error'
-                  ? 'text-red-200'
-                  : thermalPrintBanner.variant === 'success'
-                    ? 'text-emerald-200'
-                    : 'text-slate-100'
+                thermalPrintBanner.variant === 'error' ? 'text-red-200' : 'text-emerald-200'
               }`}
             >
               {thermalPrintBanner.message}
