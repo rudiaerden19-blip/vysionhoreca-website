@@ -3229,7 +3229,11 @@
     "draftReceiptRef": "مسودة",
     "draftNotPaid": "لم يُحسم البيع (لا تسجيل)",
     "draftBanner": "*** مسودة — لم يُحسم البيع ***",
-    "draftFooter": "للمعلومات فقط — لم يُدفع بعد."
+    "draftFooter": "للمعلومات فقط — لم يُدفع بعد.",
+    "barToogBanner": "*** البار — جديد فقط ***",
+    "barToogHint": "الأسطر الجديدة فقط منذ آخر إيصال بار.",
+    "barToogReceiptRef": "بار",
+    "barToogFooter": "لم يُسدَّد بعد — للتحضير في البار فقط."
   },
   "kassaApp": {
     "soundTitle": "تفعيل الصوت",

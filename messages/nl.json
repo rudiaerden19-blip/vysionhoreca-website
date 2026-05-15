@@ -3687,7 +3687,11 @@
     "draftReceiptRef": "VOORLOPIG",
     "draftNotPaid": "Niet afgerekend (geen registratie)",
     "draftBanner": "*** VOORLOPIG — NIET AFGEREKEND ***",
-    "draftFooter": "Enkel ter info — nog niet betaald."
+    "draftFooter": "Enkel ter info — nog niet betaald.",
+    "barToogBanner": "*** TOOG — ALLEEN NIEUW ***",
+    "barToogHint": "Alleen nieuwe regels sinds de vorige toogbon.",
+    "barToogReceiptRef": "TOOG",
+    "barToogFooter": "Nog niet afgerekend — enkel voor bereiding door de toog."
   },
   "kassaApp": {
     "soundTitle": "Activeer geluid",

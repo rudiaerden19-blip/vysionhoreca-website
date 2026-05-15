@@ -3229,7 +3229,11 @@
     "draftReceiptRef": "PROVVISORIO",
     "draftNotPaid": "Non saldato (nessuna registrazione)",
     "draftBanner": "*** PROVVISORIO — NON SALDATO ***",
-    "draftFooter": "Solo informativo — non ancora pagato."
+    "draftFooter": "Solo informativo — non ancora pagato.",
+    "barToogBanner": "*** BAR — SOLO NUOVE ***",
+    "barToogHint": "Solo righe nuove dall’ultimo scontrino bar.",
+    "barToogReceiptRef": "BAR",
+    "barToogFooter": "Non ancora saldato — solo per preparazione al bar."
   },
   "kassaApp": {
     "soundTitle": "Attiva audio",

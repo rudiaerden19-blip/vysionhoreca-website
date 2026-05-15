@@ -3229,7 +3229,11 @@
     "draftReceiptRef": "案内",
     "draftNotPaid": "未決済（売上計上なし）",
     "draftBanner": "*** 案内用 — 未決済 ***",
-    "draftFooter": "ご確認用です — まだお支払いはありません。"
+    "draftFooter": "ご確認用です — まだお支払いはありません。",
+    "barToogBanner": "*** バー — 新規のみ ***",
+    "barToogHint": "前回のバー伝票以降に追加された行のみです。",
+    "barToogReceiptRef": "バー",
+    "barToogFooter": "未精算 — バーでの提供準備用です。"
   },
   "kassaApp": {
     "soundTitle": "音を有効にする",

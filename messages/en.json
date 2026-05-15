@@ -3687,7 +3687,11 @@
     "draftReceiptRef": "DRAFT",
     "draftNotPaid": "Not settled (no sale recorded)",
     "draftBanner": "*** DRAFT — NOT SETTLED ***",
-    "draftFooter": "For information only — not paid yet."
+    "draftFooter": "For information only — not paid yet.",
+    "barToogBanner": "*** BAR — NEW ITEMS ONLY ***",
+    "barToogHint": "Only new lines since the last bar slip.",
+    "barToogReceiptRef": "BAR",
+    "barToogFooter": "Not settled yet — for bar preparation only."
   },
   "kassaApp": {
     "soundTitle": "Enable sound",

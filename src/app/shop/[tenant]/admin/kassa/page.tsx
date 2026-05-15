@@ -90,6 +90,12 @@ import type {
   KassaLastOrderReceipt,
 } from '@/lib/kassa-cart-types'
 import {
+  computeBarBonDelta,
+  loadBarBonWatermarks,
+  removeBarBonWatermarkSlot,
+  saveBarBonWatermarks,
+} from '@/lib/kassa-bar-bon-watermark'
+import {
   flushOfflineOrdersToSupabase,
   mergeOfflineOrderQueues,
   offlineOrdersQueueStorageKey,
@@ -483,6 +489,19 @@ function kassaDraftCartGuardSig(items: CartItem[], total: number): string {
       .sort()
       .join('|') + `@${total.toFixed(4)}`
   )
+}
+
+/** Blokkeert dubbeltik op gele bon kort na succes; daarna opnieuw printen mogelijk (geen permanente lock). */
+const KASSA_DRAFT_RECEIPT_COOLDOWN_MS = 3500
+
+const KASSA_BAR_DELTA_AUTOPRINT_DEBOUNCE_MS = 650
+
+function snapshotCartItemsForAsyncPrint(items: CartItem[]): CartItem[] {
+  return items.map((i) => ({
+    ...i,
+    product: { ...i.product },
+    choices: i.choices?.map((c) => ({ ...c })),
+  }))
 }
 
 function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
@@ -1578,6 +1597,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [switchConfirm, setSwitchConfirm] = useState<string | null>(null)
   /** Na plattegrond «Afrekenen»: open betaalmodal zodra doSwitchToTable klaar is (ook ná switch-bevestiging). */
   const openPaymentAfterFloorPlanSwitchRef = useRef(false)
+  /** Delta-toogbon: debounce + stub tot printReceipt de echte impl zet. */
+  const barDeltaAutoPrintLastAtRef = useRef<Record<string, number>>({})
+  const flushBarDeltaSlipRef = useRef<(zone: FloorPlanZone, tblNr: string, snap: CartItem[]) => void>(
+    () => {},
+  )
 
   const switchToTable = (newTableNr: string) => {
     const zone = pickerBrowseZone
@@ -1594,7 +1618,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const doSwitchToTable = (newTableNr: string, zone: FloorPlanZone) => {
     if (tableNumber && cart.length > 0) {
+      const snap = snapshotCartItemsForAsyncPrint(cart)
       saveCartToTable(dineInFloorZone, tableNumber, cart)
+      void flushBarDeltaSlipRef.current(dineInFloorZone, tableNumber, snap)
     }
     const slotKey = tableOrderMapKey(zone, newTableNr)
     const existingOrder = tableOrders[slotKey] || []
@@ -1614,7 +1640,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   // "Naar tafel" knop: sla bestelling op en leeg de kassa voor volgende tafel
   const parkOrder = () => {
     if (!tableNumber || cart.length === 0) return
+    const snap = snapshotCartItemsForAsyncPrint(cart)
     saveCartToTable(dineInFloorZone, tableNumber, cart)
+    void flushBarDeltaSlipRef.current(dineInFloorZone, tableNumber, snap)
     setCart([])
     setTableNumber('')
     setDineInFloorZone(FLOOR_PLAN_ZONE_INSIDE)
@@ -1657,8 +1685,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const draftReceiptPrintGuardRef = useRef<{
     cartSig: string | null
     inFlight: boolean
-    printedOkOnce: boolean
-  }>({ cartSig: null, inFlight: false, printedOkOnce: false })
+    /** Laatste succesvolle voorlopige print (ms) — cooldown tegen dubbeltik, niet permanent blokkeren. */
+    lastOkAt: number
+  }>({ cartSig: null, inFlight: false, lastOkAt: 0 })
 
   const [splitCash, setSplitCash] = useState(0)
   const [splitCard, setSplitCard] = useState(0)
@@ -2513,6 +2542,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const clearTableAfterPayment = (zone: FloorPlanZone, tblNr: string) => {
     const slotKey = tableOrderMapKey(zone, tblNr)
     cancelPersistTimer(slotKey)
+    removeBarBonWatermarkSlot(tenant, slotKey)
     const updated = { ...tableOrders }
     delete updated[slotKey]
     setTableOrders(updated)
@@ -2757,7 +2787,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setShowSuccessModal(true)
   }
 
-  const printReceipt = async (order: typeof lastOrder, opts?: { draft?: boolean }) => {
+  const printReceipt = async (
+    order: typeof lastOrder,
+    opts?: {
+      draft?: boolean
+      /** Alleen nieuwe regels t.o.v. vorige toogbon (tafelmand). */
+      barTableDelta?: boolean
+      /** Na geslaagde print: watermerk bijwerken (localStorage per tenant). */
+      barWatermarkCommit?: { slotKey: string; row: Record<string, number> }
+    },
+  ) => {
     if (!order) {
       setThermalPrintBanner({
         variant: 'error',
@@ -2766,6 +2805,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       return
     }
     const isDraft = !!opts?.draft
+    const barTableDelta = !!opts?.barTableDelta
 
     if (!isDraft) {
       try {
@@ -2787,15 +2827,22 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       if (g.printedOkOnce || g.inFlight) return
       g.inFlight = true
     } else {
-      const sig = kassaDraftCartGuardSig(order.items, order.total)
       const g = draftReceiptPrintGuardRef.current
-      if (g.cartSig !== sig) {
-        g.cartSig = sig
-        g.printedOkOnce = false
-        g.inFlight = false
+      if (barTableDelta) {
+        if (g.inFlight) return
+        g.inFlight = true
+      } else {
+        const sig = kassaDraftCartGuardSig(order.items, order.total)
+        const now = Date.now()
+        if (g.cartSig !== sig) {
+          g.cartSig = sig
+          g.lastOkAt = 0
+          g.inFlight = false
+        }
+        if (g.inFlight) return
+        if (now - g.lastOkAt < KASSA_DRAFT_RECEIPT_COOLDOWN_MS) return
+        g.inFlight = true
       }
-      if (g.printedOkOnce || g.inFlight) return
-      g.inFlight = true
     }
 
     try {
@@ -2821,7 +2868,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           ? `📦 ${t('kassaReceipt.orderTypeTakeaway')}`
           : `🚗 ${t('kassaReceipt.orderTypeDelivery')}`
     const receiptRefDisplay = isDraft
-      ? t('kassaReceipt.draftReceiptRef')
+      ? barTableDelta
+        ? t('kassaReceipt.barToogReceiptRef')
+        : t('kassaReceipt.draftReceiptRef')
       : order.checkoutReference ??
         (order.orderNumber > 0 ? String(order.orderNumber) : '—')
 
@@ -2870,7 +2919,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     if (tenantInfo?.phone) bonLines.push(`${t('kassaReceipt.telPrefix')} ${tenantInfo.phone}`)
     bonLines.push('--------------------------------')
     if (isDraft) {
-      bonLines.push(t('kassaReceipt.draftBanner'))
+      if (barTableDelta) {
+        bonLines.push(t('kassaReceipt.barToogBanner'))
+        bonLines.push(t('kassaReceipt.barToogHint'))
+      } else {
+        bonLines.push(t('kassaReceipt.draftBanner'))
+      }
       bonLines.push('--------------------------------')
     }
     bonLines.push(
@@ -2907,7 +2961,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     if (tenantInfo?.btw_number) {
       bonLines.push(t('kassaReceipt.businessVatLabel').replace('{vatNumber}', tenantInfo.btw_number))
     }
-    bonLines.push(isDraft ? t('kassaReceipt.draftFooter') : t('kassaReceipt.thanks'))
+    bonLines.push(
+      isDraft
+        ? barTableDelta
+          ? t('kassaReceipt.barToogFooter')
+          : t('kassaReceipt.draftFooter')
+        : t('kassaReceipt.thanks'),
+    )
     if (tenantInfo?.website) bonLines.push(tenantInfo.website)
 
     /** Kassa-lade alleen openen bij contante betaling — PIN/online hebben dat niet nodig. Voorlopige bon: nooit. */
@@ -2958,7 +3018,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         ${tenantInfo?.phone ? `<div class="small">${escapeReceiptHtml(t('kassaReceipt.telPrefix'))} ${escapeReceiptHtml(tenantInfo.phone)}</div>` : ''}
       </div>
       <div class="divider"></div>
-      ${isDraft ? `<div class="center bold">${escapeReceiptHtml(t('kassaReceipt.draftBanner'))}</div><div class="divider-solid"></div>` : ''}
+      ${isDraft ? `<div class="center bold">${escapeReceiptHtml(barTableDelta ? t('kassaReceipt.barToogBanner') : t('kassaReceipt.draftBanner'))}</div>${barTableDelta ? `<div class="center small">${escapeReceiptHtml(t('kassaReceipt.barToogHint'))}</div>` : ''}<div class="divider-solid"></div>` : ''}
       <div class="center order-type">${escapeReceiptHtml(orderTypeLabel)}${order.tableNumber ? `<br/>${escapeReceiptHtml(t('kassaReceipt.tablePrefix'))} ${escapeReceiptHtml(String(order.tableNumber))}${escapeReceiptHtml(terraceSuffix)}` : ''}</div>
       <div class="row small">
         <span>${escapeReceiptHtml(t('kassaReceipt.receiptNo'))}${escapeReceiptHtml(receiptRefDisplay)}</span>
@@ -2990,7 +3050,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       <div class="divider"></div>
       <div class="center small">
         ${tenantInfo?.btw_number ? `${escapeReceiptHtml(t('kassaReceipt.businessVatLabel').replace('{vatNumber}', tenantInfo.btw_number))}<br/>` : ''}
-        ${escapeReceiptHtml(isDraft ? t('kassaReceipt.draftFooter') : t('kassaReceipt.thanks'))}
+        ${escapeReceiptHtml(isDraft ? (barTableDelta ? t('kassaReceipt.barToogFooter') : t('kassaReceipt.draftFooter')) : t('kassaReceipt.thanks'))}
         ${tenantInfo?.website ? `<br/>${escapeReceiptHtml(tenantInfo.website)}` : ''}
       </div>
     </body></html>`
@@ -3025,7 +3085,21 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         } catch {
           /* quota / private mode */
         }
-      } else draftReceiptPrintGuardRef.current.printedOkOnce = true
+      } else {
+        if (!barTableDelta) {
+          draftReceiptPrintGuardRef.current.lastOkAt = Date.now()
+        }
+        const commit = opts?.barWatermarkCommit
+        if (commit?.slotKey) {
+          try {
+            const st = loadBarBonWatermarks(tenant)
+            st[commit.slotKey] = commit.row
+            saveBarBonWatermarks(tenant, st)
+          } catch {
+            /* ignore */
+          }
+        }
+      }
       return
     }
     } catch (printErr: unknown) {
@@ -3038,6 +3112,55 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       if (!isDraft) paidReceiptPrintGuardRef.current.inFlight = false
       else draftReceiptPrintGuardRef.current.inFlight = false
     }
+  }
+
+  flushBarDeltaSlipRef.current = (zone, tblNr, snap) => {
+    void (async () => {
+      if (demoViewOnly || snap.length === 0) return
+      const slotKey = tableOrderMapKey(zone, tblNr)
+      const now = Date.now()
+      if (
+        now - (barDeltaAutoPrintLastAtRef.current[slotKey] ?? 0) <
+        KASSA_BAR_DELTA_AUTOPRINT_DEBOUNCE_MS
+      ) {
+        return
+      }
+
+      const store = loadBarBonWatermarks(tenant)
+      const prev = store[slotKey] ?? {}
+      const { deltaLines, nextWatermark } = computeBarBonDelta(snap, prev)
+      if (deltaLines.length === 0) return
+
+      barDeltaAutoPrintLastAtRef.current[slotKey] = now
+
+      const draftSplit = computeInclusiveVatSplitFromCart(deltaLines, resolveCartLineVat)
+      const deltaTotal = draftSplit.grossTotal
+      const draftOrder: KassaLastOrderReceipt = {
+        orderNumber: 0,
+        items: deltaLines,
+        total: deltaTotal,
+        vatSplit: draftSplit.byRate.map((l) => ({
+          rate: l.rate,
+          baseExcl: l.baseExcl,
+          tax: l.tax,
+        })),
+        subtotalExclVat: draftSplit.subtotalExcl,
+        totalTax: draftSplit.totalTax,
+        paymentMethod: 'CARD',
+        orderType: 'DINE_IN',
+        tableNumber: tblNr,
+        floorPlanZone:
+          zone === FLOOR_PLAN_ZONE_TERRACE ? FLOOR_PLAN_ZONE_TERRACE : FLOOR_PLAN_ZONE_INSIDE,
+        createdAt: new Date(),
+        helpedByStaffName: activeKassaStaff?.name ?? null,
+      }
+
+      await printReceipt(draftOrder, {
+        draft: true,
+        barTableDelta: true,
+        barWatermarkCommit: { slotKey, row: nextWatermark },
+      })
+    })()
   }
 
   /** Voorlopige bon zonder afrekenen — lijnen uit kar en/of openstaande tafelmand. */

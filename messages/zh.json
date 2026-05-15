@@ -3229,7 +3229,11 @@
     "draftReceiptRef": "预览",
     "draftNotPaid": "未结账（未记账）",
     "draftBanner": "*** 预览 — 未结账 ***",
-    "draftFooter": "仅供参考 — 尚未付款。"
+    "draftFooter": "仅供参考 — 尚未付款。",
+    "barToogBanner": "*** 吧台 — 仅新增 ***",
+    "barToogHint": "仅含上次吧台小票之后新增的行。",
+    "barToogReceiptRef": "吧台",
+    "barToogFooter": "尚未结账 — 仅供吧台备餐。"
   },
   "kassaApp": {
     "soundTitle": "启用声音",

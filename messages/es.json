@@ -3229,7 +3229,11 @@
     "draftReceiptRef": "BORRADOR",
     "draftNotPaid": "Sin cobrar (sin registro)",
     "draftBanner": "*** BORRADOR — SIN COBRAR ***",
-    "draftFooter": "Solo informativo — aún no pagado."
+    "draftFooter": "Solo informativo — aún no pagado.",
+    "barToogBanner": "*** BAR — SOLO NOVEDADES ***",
+    "barToogHint": "Solo líneas nuevas desde el último ticket de barra.",
+    "barToogReceiptRef": "BAR",
+    "barToogFooter": "Aún no liquidado — solo para preparación en barra."
   },
   "kassaApp": {
     "soundTitle": "Activar sonido",

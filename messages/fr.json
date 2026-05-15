@@ -2729,7 +2729,11 @@
     "draftReceiptRef": "PROVISOIRE",
     "draftNotPaid": "Non réglé (pas d'enregistrement)",
     "draftBanner": "*** PROVISOIRE — NON RÉGLÉ ***",
-    "draftFooter": "À titre informatif — pas encore payé."
+    "draftFooter": "À titre informatif — pas encore payé.",
+    "barToogBanner": "*** BAR — NOUVEAUTÉS SEULEMENT ***",
+    "barToogHint": "Uniquement les lignes nouvelles depuis le dernier ticket bar.",
+    "barToogReceiptRef": "BAR",
+    "barToogFooter": "Pas encore réglé — uniquement pour préparation au bar."
   },
   "kassaApp": {
     "soundTitle": "Activer le son",

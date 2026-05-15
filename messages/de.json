@@ -2729,7 +2729,11 @@
     "draftReceiptRef": "VORLÄUFIG",
     "draftNotPaid": "Nicht abgerechnet (keine Buchung)",
     "draftBanner": "*** VORLÄUFIG — NICHT ABGERECHNET ***",
-    "draftFooter": "Nur zur Information — noch nicht bezahlt."
+    "draftFooter": "Nur zur Information — noch nicht bezahlt.",
+    "barToogBanner": "*** BAR — NUR NEU ***",
+    "barToogHint": "Nur neue Positionen seit dem letzten Barbon.",
+    "barToogReceiptRef": "BAR",
+    "barToogFooter": "Noch nicht abgerechnet — nur zur Zubereitung an der Bar."
   },
   "kassaApp": {
     "soundTitle": "Ton aktivieren",
