@@ -91,7 +91,6 @@ import type {
 } from '@/lib/kassa-cart-types'
 import {
   computeBarBonDelta,
-  kassaDraftBonGuardSig,
   loadBarBonWatermarks,
   removeBarBonWatermarkSlot,
   saveBarBonWatermarks,
@@ -489,6 +488,9 @@ function snapshotCartItemsForAsyncPrint(items: CartItem[]): CartItem[] {
     choices: i.choices?.map((c) => ({ ...c })),
   }))
 }
+
+/** Gele bon: alleen tegen dubbeltik binnen deze tijd; daarna altijd opnieuw afdrukken mogelijk. */
+const KASSA_DRAFT_RECEIPT_COOLDOWN_MS = 450
 
 function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const tenant = params.tenant
@@ -1669,11 +1671,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }>({ key: null, inFlight: false, printedOkOnce: false })
 
   const draftReceiptPrintGuardRef = useRef<{
-    cartSig: string | null
     inFlight: boolean
-    /** Gele bon: max. één geslaagde print per mand-handtekening (dubbeltik → geen 2e job). */
-    printedOkOnce: boolean
-  }>({ cartSig: null, inFlight: false, printedOkOnce: false })
+    /** Laatste geslaagde voorlopige print — alleen cooldown tegen dubbeltik, geen permanent blok. */
+    lastOkAt: number
+  }>({ inFlight: false, lastOkAt: 0 })
 
   const [splitCash, setSplitCash] = useState(0)
   const [splitCard, setSplitCard] = useState(0)
@@ -2779,10 +2780,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       draft?: boolean
       /** Alleen nieuwe regels t.o.v. vorige toogbon (tafelmand). */
       barTableDelta?: boolean
-      /** Gele voorlopige bon (tafel): alleen delta t.o.v. watermerk — aparte teksten dan toogbon. */
-      draftDeltaOnly?: boolean
-      /** Dubbeltik-guard op volledige mand t.o.v. order.items (bij delta-bon). */
-      draftYellowBonGuardSig?: string
       /** Na geslaagde print: watermerk bijwerken (localStorage per tenant). */
       barWatermarkCommit?: { slotKey: string; row: Record<string, number> }
     },
@@ -2796,7 +2793,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     const isDraft = !!opts?.draft
     const barKitchenDelta = !!opts?.barTableDelta
-    const interimDraftDeltaOnly = !!opts?.draftDeltaOnly
 
     if (!isDraft) {
       try {
@@ -2819,15 +2815,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       g.inFlight = true
     } else {
       if (!barKitchenDelta) {
-        const sig =
-          opts?.draftYellowBonGuardSig ?? kassaDraftBonGuardSig(order.items, order.total)
         const g = draftReceiptPrintGuardRef.current
-        if (g.cartSig !== sig) {
-          g.cartSig = sig
-          g.printedOkOnce = false
-          g.inFlight = false
-        }
-        if (g.printedOkOnce || g.inFlight) return
+        const now = Date.now()
+        if (g.inFlight) return
+        if (now - g.lastOkAt < KASSA_DRAFT_RECEIPT_COOLDOWN_MS) return
         g.inFlight = true
       }
     }
@@ -2909,9 +2900,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       if (barKitchenDelta) {
         bonLines.push(t('kassaReceipt.barToogBanner'))
         bonLines.push(t('kassaReceipt.barToogHint'))
-      } else if (interimDraftDeltaOnly) {
-        bonLines.push(t('kassaReceipt.interimDeltaBanner'))
-        bonLines.push(t('kassaReceipt.interimDeltaHint'))
       } else {
         bonLines.push(t('kassaReceipt.draftBanner'))
       }
@@ -2953,11 +2941,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     bonLines.push(
       isDraft
-        ? barKitchenDelta
-          ? t('kassaReceipt.barToogFooter')
-          : interimDraftDeltaOnly
-            ? t('kassaReceipt.interimDeltaFooter')
-            : t('kassaReceipt.draftFooter')
+        ? barKitchenDelta ? t('kassaReceipt.barToogFooter') : t('kassaReceipt.draftFooter')
         : t('kassaReceipt.thanks'),
     )
     if (tenantInfo?.website) bonLines.push(tenantInfo.website)
@@ -3010,7 +2994,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         ${tenantInfo?.phone ? `<div class="small">${escapeReceiptHtml(t('kassaReceipt.telPrefix'))} ${escapeReceiptHtml(tenantInfo.phone)}</div>` : ''}
       </div>
       <div class="divider"></div>
-      ${isDraft ? `<div class="center bold">${escapeReceiptHtml(barKitchenDelta ? t('kassaReceipt.barToogBanner') : interimDraftDeltaOnly ? t('kassaReceipt.interimDeltaBanner') : t('kassaReceipt.draftBanner'))}</div>${barKitchenDelta || interimDraftDeltaOnly ? `<div class="center small">${escapeReceiptHtml(barKitchenDelta ? t('kassaReceipt.barToogHint') : t('kassaReceipt.interimDeltaHint'))}</div>` : ''}<div class="divider-solid"></div>` : ''}
+      ${isDraft ? `<div class="center bold">${escapeReceiptHtml(barKitchenDelta ? t('kassaReceipt.barToogBanner') : t('kassaReceipt.draftBanner'))}</div>${barKitchenDelta ? `<div class="center small">${escapeReceiptHtml(t('kassaReceipt.barToogHint'))}</div>` : ''}<div class="divider-solid"></div>` : ''}
       <div class="center order-type">${escapeReceiptHtml(orderTypeLabel)}${order.tableNumber ? `<br/>${escapeReceiptHtml(t('kassaReceipt.tablePrefix'))} ${escapeReceiptHtml(String(order.tableNumber))}${escapeReceiptHtml(terraceSuffix)}` : ''}</div>
       <div class="row small">
         <span>${escapeReceiptHtml(t('kassaReceipt.receiptNo'))}${escapeReceiptHtml(receiptRefDisplay)}</span>
@@ -3042,7 +3026,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       <div class="divider"></div>
       <div class="center small">
         ${tenantInfo?.btw_number ? `${escapeReceiptHtml(t('kassaReceipt.businessVatLabel').replace('{vatNumber}', tenantInfo.btw_number))}<br/>` : ''}
-        ${escapeReceiptHtml(isDraft ? (barKitchenDelta ? t('kassaReceipt.barToogFooter') : interimDraftDeltaOnly ? t('kassaReceipt.interimDeltaFooter') : t('kassaReceipt.draftFooter')) : t('kassaReceipt.thanks'))}
+        ${escapeReceiptHtml(isDraft ? (barKitchenDelta ? t('kassaReceipt.barToogFooter') : t('kassaReceipt.draftFooter')) : t('kassaReceipt.thanks'))}
         ${tenantInfo?.website ? `<br/>${escapeReceiptHtml(tenantInfo.website)}` : ''}
       </div>
     </body></html>`
@@ -3079,7 +3063,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         }
       } else {
         if (!barKitchenDelta) {
-          draftReceiptPrintGuardRef.current.printedOkOnce = true
+          draftReceiptPrintGuardRef.current.lastOkAt = Date.now()
         }
         const commit = opts?.barWatermarkCommit
         if (commit?.slotKey) {
@@ -3151,48 +3135,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     })()
   }
 
-  /** Voorlopige bon zonder afrekenen — lijnen uit kar en/of openstaande tafelmand. Bij dine-in+tafel: alleen nieuw sinds vorige bon/toog (zelfde watermerk als automatische toogbon). */
+  /** Voorlopige bon zonder afrekenen — volledige mand/kar zoals op het scherm (incl. open tafelmand). */
   const printDraftBonFromCart = async () => {
     if (draftBonLineItems.length === 0) return
     try {
       setDraftBonPrinting(true)
       playClick()
-
-      const guardSigFull = kassaDraftBonGuardSig(draftBonLineItems, draftBonTotal)
-
-      const useTableInterimDelta =
-        orderType === 'DINE_IN' && !!String(tableNumber ?? '').trim()
-
-      let linesForBon = draftBonLineItems
-      let totalForBon = draftBonTotal
-      let draftSplit = computeInclusiveVatSplitFromCart(draftBonLineItems, resolveCartLineVat)
-      let watermarkCommit: { slotKey: string; row: Record<string, number> } | undefined
-      let interimDeltaOnly = false
-
-      if (useTableInterimDelta) {
-        const tblNr = String(tableNumber ?? '').trim()
-        const slotKey = tableOrderMapKey(dineInFloorZone, tblNr)
-        const store = loadBarBonWatermarks(tenant)
-        const prev = store[slotKey] ?? {}
-        const { deltaLines, nextWatermark } = computeBarBonDelta(draftBonLineItems, prev)
-        if (deltaLines.length === 0) {
-          setThermalPrintBanner({
-            variant: 'error',
-            message: t('kassaReceipt.interimBonNothingNew'),
-          })
-          return
-        }
-        linesForBon = deltaLines
-        draftSplit = computeInclusiveVatSplitFromCart(deltaLines, resolveCartLineVat)
-        totalForBon = draftSplit.grossTotal
-        watermarkCommit = { slotKey, row: nextWatermark }
-        interimDeltaOnly = true
-      }
-
+      const draftSplit = computeInclusiveVatSplitFromCart(draftBonLineItems, resolveCartLineVat)
       const draftOrder: KassaLastOrderReceipt = {
         orderNumber: 0,
-        items: linesForBon,
-        total: totalForBon,
+        items: draftBonLineItems,
+        total: draftBonTotal,
         vatSplit: draftSplit.byRate.map((l) => ({
           rate: l.rate,
           baseExcl: l.baseExcl,
@@ -3207,17 +3160,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         createdAt: new Date(),
         helpedByStaffName: activeKassaStaff?.name ?? null,
       }
-
-      await printReceipt(draftOrder, {
-        draft: true,
-        ...(interimDeltaOnly
-          ? {
-              draftDeltaOnly: true,
-              draftYellowBonGuardSig: guardSigFull,
-              barWatermarkCommit: watermarkCommit,
-            }
-          : {}),
-      })
+      await printReceipt(draftOrder, { draft: true })
     } finally {
       setDraftBonPrinting(false)
     }
