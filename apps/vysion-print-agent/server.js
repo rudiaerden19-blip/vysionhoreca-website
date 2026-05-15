@@ -555,6 +555,12 @@ function buildEscPosPayload(body) {
  * vóór een geldbedrag (E12.34 / E 12.34) worden omgezet naar het echte
  * euro-byte (0xD5 in PC858). Hierdoor toont de printer het €-teken,
  * ook als de website in z'n platte tekst nog "EUR" of "E" gebruikt.
+ *
+ * Regels mét Han-tekens (Chinees o.a.): een losse "E" vóór een cijfer zónder
+ * decimalen (bv. "E250" in een productnaam) werd ten onrechte als € geprint.
+ * Daar geldt een strengere E→€ regel (alleen bedragen met .xx of ,xx).
+ * Regels zónder Han: exact dezelfde heuristiek als voorheen — bestaande
+ * EPSON + PC858-bonnen ongewijzigd.
  */
 function encWithEuro(line) {
   const s = (line ?? '').toString()
@@ -567,15 +573,59 @@ function encWithEuro(line) {
   let replaced = s
     .replace(/€\s*/g, MARKER + ' ')
     .replace(/\bEUR\s*/gi, MARKER + ' ')
-    .replace(/(^|[\s(])E(?=\s?-?\d)/g, '$1' + MARKER + ' ')
-    // Verwijder dubbele spaties die door de replace kunnen ontstaan
-    .replace(/  +/g, ' ')
+  if (/\p{Script=Han}/u.test(s)) {
+    replaced = replaced.replace(
+      /(^|[\s(])E(?=\s*-?\d+[.,]\d{2})/g,
+      '$1' + MARKER + ' ',
+    )
+  } else {
+    replaced = replaced.replace(/(^|[\s(])E(?=\s?-?\d)/g, '$1' + MARKER + ' ')
+  }
+  replaced = replaced.replace(/  +/g, ' ')
   const buf = encInline(replaced)
   for (let i = 0; i < buf.length; i++) {
     if (buf[i] === 0xfe) buf[i] = EURO_BYTE
   }
   return Buffer.concat([buf, Buffer.from([0x0a])])
 }
+
+/**
+ * Smoke/regressie voor Epson PC858 (0xD5 euro) + platte bon — geen printer nodig.
+ * CI of release: `VYSION_PRINT_AGENT_ENC_TEST=1 node -e "require('./server.js')"` vanuit deze map.
+ */
+;(function encWithEuroRegressionSmoke() {
+  if (process.env.VYSION_PRINT_AGENT_ENC_TEST !== '1') return
+  const assert = require('assert')
+  const euro = EURO_BYTE
+  const lineHasEuroByte = (buf) => buf.includes(euro)
+  /** Zonder Han: zelfde gedrag als vroeger (losse E vóór cijfer → €-byte). */
+  assert(lineHasEuroByte(encWithEuro('Totaal E12,50')), 'Latijn: E12,50→€')
+  assert(lineHasEuroByte(encWithEuro('Code E250')), 'Latijn: E250 blijft E→€ (compat)')
+  assert(lineHasEuroByte(encWithEuro('1x Friet  EUR 2.50')), 'EUR→€')
+  assert(!lineHasEuroByte(encWithEuro('Alleen tekst zonder geld')), 'Geen valse €')
+  /** Met Han: geen E+digit zonder decimalen als € (productcodes). */
+  assert(!lineHasEuroByte(encWithEuro('红牛饮料 E250')), 'Han: E250 geen €')
+  assert(lineHasEuroByte(encWithEuro('红牛 EUR 3,50')), 'Han: EUR→€')
+  assert(lineHasEuroByte(encWithEuro('套餐 E 9,99')), 'Han: E met decimalen→€')
+  /** Rijke bon (orderData): EPSON PC858 + padPrice — ongewijzigd pad voor de meeste kassa's. */
+  const rich = buildEscPosPayload({
+    receiptMode: 'kassa',
+    winkelnaam: 'Testzaak',
+    orderData: {
+      orderNumber: 99,
+      orderType: 'TAKEAWAY',
+      items: [{ quantity: 2, name: 'Friet', price: 6.0 }],
+      subtotal: 4.96,
+      tax: 1.04,
+      total: 6,
+      paymentMethod: 'CARD',
+    },
+    businessInfo: { name: 'Testzaak', vatRate: 21 },
+  })
+  assert(Buffer.isBuffer(rich) && rich.includes(euro), 'Rich receipt: €-bytes aanwezig')
+  // eslint-disable-next-line no-console -- bewust bij selftest
+  console.log('[print-agent] encWithEuro regression smoke: OK')
+})()
 
 function getScriptPath(scriptName) {
   try {
