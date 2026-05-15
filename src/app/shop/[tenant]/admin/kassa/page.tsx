@@ -1565,7 +1565,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const slotKey = tableOrderMapKey(zone, tblNr)
     cancelPersistTimer(slotKey)
     if (items.length === 0) {
-      removeBarBonWatermarkSlot(tenant, slotKey)
+      try {
+        removeBarBonWatermarkSlot(tenant, slotKey)
+      } catch {
+        /* storage mag tafel-sync niet breken */
+      }
     }
     setTableOrders((prev) => {
       const updated = { ...prev, [slotKey]: items }
@@ -1934,7 +1938,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const zone = dineInFloorZone
     const slotKey = tableOrderMapKey(zone, tblNr)
     if (updatedCart.length === 0) {
-      removeBarBonWatermarkSlot(tenant, slotKey)
+      try {
+        removeBarBonWatermarkSlot(tenant, slotKey)
+      } catch {
+        /* idem */
+      }
     }
     setTableOrders((prev) => {
       const next = { ...prev, [slotKey]: updatedCart }
@@ -3100,43 +3108,73 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       playClick()
 
       if (useToogDelta) {
-        const store = loadBarBonWatermarks(tenant)
-        const prev = store[slotKey] ?? {}
-        const { deltaLines, nextWatermark } = computeBarBonDelta(draftBonLineItems, prev)
-        if (deltaLines.length === 0) {
-          setThermalPrintBanner({
-            variant: 'error',
-            message: t('kassaReceipt.interimBonNothingNew'),
+        try {
+          const store = loadBarBonWatermarks(tenant)
+          const rawPrev = store[slotKey]
+          const prev =
+            rawPrev != null && typeof rawPrev === 'object' && !Array.isArray(rawPrev)
+              ? (rawPrev as Record<string, number>)
+              : {}
+
+          const { deltaLines, nextWatermark } = computeBarBonDelta(draftBonLineItems, prev)
+          if (deltaLines.length === 0) {
+            setThermalPrintBanner({
+              variant: 'error',
+              message: t('kassaReceipt.interimBonNothingNew'),
+            })
+            return
+          }
+
+          const draftSplit = computeInclusiveVatSplitFromCart(deltaLines, resolveCartLineVat)
+          const draftOrder: KassaLastOrderReceipt = {
+            orderNumber: 0,
+            items: deltaLines,
+            total: draftSplit.grossTotal,
+            vatSplit: draftSplit.byRate.map((l) => ({
+              rate: l.rate,
+              baseExcl: l.baseExcl,
+              tax: l.tax,
+            })),
+            subtotalExclVat: draftSplit.subtotalExcl,
+            totalTax: draftSplit.totalTax,
+            paymentMethod: 'CARD',
+            orderType: 'DINE_IN',
+            tableNumber: tblNr,
+            floorPlanZone:
+              dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE ? FLOOR_PLAN_ZONE_TERRACE : FLOOR_PLAN_ZONE_INSIDE,
+            createdAt: new Date(),
+            helpedByStaffName: activeKassaStaff?.name ?? null,
+          }
+
+          await printReceipt(draftOrder, {
+            draft: true,
+            barTableDelta: true,
+            barWatermarkCommit: { slotKey, row: nextWatermark },
           })
-          return
+        } catch {
+          /** Agent/netwerk/randcase: volledige voorlopige bon — kassa blijft bruikbaar (watermerk ongewijzigd). */
+          const draftSplit = computeInclusiveVatSplitFromCart(draftBonLineItems, resolveCartLineVat)
+          const draftOrder: KassaLastOrderReceipt = {
+            orderNumber: 0,
+            items: draftBonLineItems,
+            total: draftBonTotal,
+            vatSplit: draftSplit.byRate.map((l) => ({
+              rate: l.rate,
+              baseExcl: l.baseExcl,
+              tax: l.tax,
+            })),
+            subtotalExclVat: draftSplit.subtotalExcl,
+            totalTax: draftSplit.totalTax,
+            paymentMethod: 'CARD',
+            orderType: 'DINE_IN',
+            tableNumber: tblNr,
+            floorPlanZone:
+              dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE ? FLOOR_PLAN_ZONE_TERRACE : FLOOR_PLAN_ZONE_INSIDE,
+            createdAt: new Date(),
+            helpedByStaffName: activeKassaStaff?.name ?? null,
+          }
+          await printReceipt(draftOrder, { draft: true })
         }
-
-        const draftSplit = computeInclusiveVatSplitFromCart(deltaLines, resolveCartLineVat)
-        const draftOrder: KassaLastOrderReceipt = {
-          orderNumber: 0,
-          items: deltaLines,
-          total: draftSplit.grossTotal,
-          vatSplit: draftSplit.byRate.map((l) => ({
-            rate: l.rate,
-            baseExcl: l.baseExcl,
-            tax: l.tax,
-          })),
-          subtotalExclVat: draftSplit.subtotalExcl,
-          totalTax: draftSplit.totalTax,
-          paymentMethod: 'CARD',
-          orderType: 'DINE_IN',
-          tableNumber: tblNr,
-          floorPlanZone:
-            dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE ? FLOOR_PLAN_ZONE_TERRACE : FLOOR_PLAN_ZONE_INSIDE,
-          createdAt: new Date(),
-          helpedByStaffName: activeKassaStaff?.name ?? null,
-        }
-
-        await printReceipt(draftOrder, {
-          draft: true,
-          barTableDelta: true,
-          barWatermarkCommit: { slotKey, row: nextWatermark },
-        })
         return
       }
 
