@@ -12,6 +12,7 @@ export function KassaSuccessReceiptModal({
   locale,
   onClose,
   onPrint,
+  printDisabled = false,
 }: {
   open: boolean
   order: KassaLastOrderReceipt
@@ -19,6 +20,8 @@ export function KassaSuccessReceiptModal({
   locale: string
   onClose: () => void
   onPrint: () => Promise<void>
+  /** Voorkom dubbeltik tijdens print / guard-ref sync. */
+  printDisabled?: boolean
 }) {
   const { t } = useLanguage()
   if (!open) return null
@@ -185,8 +188,9 @@ export function KassaSuccessReceiptModal({
         <div className="p-4 border-t flex gap-3">
           <button
             type="button"
+            disabled={printDisabled}
             onClick={() => void onPrint()}
-            className="flex-1 py-3 rounded-xl bg-gray-100 font-semibold text-gray-700 flex items-center justify-center gap-2 touch-manipulation min-h-[44px]"
+            className="flex-1 py-3 rounded-xl bg-gray-100 font-semibold text-gray-700 flex items-center justify-center gap-2 touch-manipulation min-h-[44px] disabled:opacity-50 disabled:pointer-events-none"
           >
             🖨️ {t('kassaReceipt.print')}
           </button>

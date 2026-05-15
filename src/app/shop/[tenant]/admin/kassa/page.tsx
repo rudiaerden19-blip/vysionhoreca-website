@@ -464,6 +464,24 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
   )
 })
 
+/** Unieke sleutel per afgeronde verkoop — voorkomt meerdere Print-Agent-jobs bij dubbeltik op „Bon afdrukken”. */
+function kassaPaidReceiptGuardKey(order: KassaLastOrderReceipt): string {
+  const ca = order.createdAt
+  const t =
+    ca instanceof Date ? ca.getTime() : typeof ca === 'string' ? Date.parse(ca) : 0
+  return `${order.orderNumber}:${order.checkoutReference ?? ''}:${t}:${order.total}`
+}
+
+/** Handtekening van de huidige kar/mand voor voorlopige bon — reset bij gewijzigde inhoud. */
+function kassaDraftCartGuardSig(items: CartItem[], total: number): string {
+  return (
+    items
+      .map((i) => `${i.cartKey}:${i.quantity}:${String(i.product.id ?? '')}:${i.product.price}`)
+      .sort()
+      .join('|') + `@${total.toFixed(4)}`
+  )
+}
+
 function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const tenant = params.tenant
   const offlineQueueKey = offlineOrdersQueueStorageKey(tenant)
@@ -1622,6 +1640,23 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     variant: 'success' | 'error'
     message: string
   } | null>(null)
+  /** Bon afdrukken in succesmodal: UI-lock tijdens await. */
+  const [successReceiptPrintBusy, setSuccessReceiptPrintBusy] = useState(false)
+  /** Gele kop / sidebar: voorlopige bon wordt afgedrukt. */
+  const [draftBonPrinting, setDraftBonPrinting] = useState(false)
+
+  const paidReceiptPrintGuardRef = useRef<{
+    key: string | null
+    inFlight: boolean
+    printedOkOnce: boolean
+  }>({ key: null, inFlight: false, printedOkOnce: false })
+
+  const draftReceiptPrintGuardRef = useRef<{
+    cartSig: string | null
+    inFlight: boolean
+    printedOkOnce: boolean
+  }>({ cartSig: null, inFlight: false, printedOkOnce: false })
+
   const [splitCash, setSplitCash] = useState(0)
   const [splitCard, setSplitCard] = useState(0)
   const [lastOrder, setLastOrder] = useState<KassaLastOrderReceipt | null>(null)
@@ -2728,6 +2763,29 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       return
     }
     const isDraft = !!opts?.draft
+
+    if (!isDraft) {
+      const key = kassaPaidReceiptGuardKey(order)
+      const g = paidReceiptPrintGuardRef.current
+      if (g.key !== key) {
+        g.key = key
+        g.printedOkOnce = false
+        g.inFlight = false
+      }
+      if (g.printedOkOnce || g.inFlight) return
+      g.inFlight = true
+    } else {
+      const sig = kassaDraftCartGuardSig(order.items, order.total)
+      const g = draftReceiptPrintGuardRef.current
+      if (g.cartSig !== sig) {
+        g.cartSig = sig
+        g.printedOkOnce = false
+        g.inFlight = false
+      }
+      if (g.printedOkOnce || g.inFlight) return
+      g.inFlight = true
+    }
+
     try {
     const fbVatRate = normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 6, 21)
     const splitOk =
@@ -2945,40 +3003,52 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         setPrintAgentFallbackHtml(isAndroidTabletPrintClient() ? '' : receiptHtml)
       }
     })
-    if (printResult.ok) return
+    if (printResult.ok) {
+      if (!isDraft) paidReceiptPrintGuardRef.current.printedOkOnce = true
+      else draftReceiptPrintGuardRef.current.printedOkOnce = true
+      return
+    }
     } catch (printErr: unknown) {
       const msg = printErr instanceof Error ? printErr.message : String(printErr)
       setThermalPrintBanner({
         variant: 'error',
         message: `Bonafdruk fout:\n\n${msg}`,
       })
+    } finally {
+      if (!isDraft) paidReceiptPrintGuardRef.current.inFlight = false
+      else draftReceiptPrintGuardRef.current.inFlight = false
     }
   }
 
   /** Voorlopige bon zonder afrekenen — lijnen uit kar en/of openstaande tafelmand. */
-  const printDraftBonFromCart = () => {
+  const printDraftBonFromCart = async () => {
     if (draftBonLineItems.length === 0) return
-    playClick()
-    const draftSplit = computeInclusiveVatSplitFromCart(draftBonLineItems, resolveCartLineVat)
-    const draftOrder: KassaLastOrderReceipt = {
-      orderNumber: 0,
-      items: draftBonLineItems,
-      total: draftBonTotal,
-      vatSplit: draftSplit.byRate.map((l) => ({
-        rate: l.rate,
-        baseExcl: l.baseExcl,
-        tax: l.tax,
-      })),
-      subtotalExclVat: draftSplit.subtotalExcl,
-      totalTax: draftSplit.totalTax,
-      paymentMethod: 'CARD',
-      orderType,
-      tableNumber: tableNumber || '',
-      floorPlanZone: orderType === 'DINE_IN' ? dineInFloorZone : undefined,
-      createdAt: new Date(),
-      helpedByStaffName: activeKassaStaff?.name ?? null,
+    try {
+      setDraftBonPrinting(true)
+      playClick()
+      const draftSplit = computeInclusiveVatSplitFromCart(draftBonLineItems, resolveCartLineVat)
+      const draftOrder: KassaLastOrderReceipt = {
+        orderNumber: 0,
+        items: draftBonLineItems,
+        total: draftBonTotal,
+        vatSplit: draftSplit.byRate.map((l) => ({
+          rate: l.rate,
+          baseExcl: l.baseExcl,
+          tax: l.tax,
+        })),
+        subtotalExclVat: draftSplit.subtotalExcl,
+        totalTax: draftSplit.totalTax,
+        paymentMethod: 'CARD',
+        orderType,
+        tableNumber: tableNumber || '',
+        floorPlanZone: orderType === 'DINE_IN' ? dineInFloorZone : undefined,
+        createdAt: new Date(),
+        helpedByStaffName: activeKassaStaff?.name ?? null,
+      }
+      await printReceipt(draftOrder, { draft: true })
+    } finally {
+      setDraftBonPrinting(false)
     }
-    void printReceipt(draftOrder, { draft: true })
   }
 
   const printStaffClockSalesSummary = async () => {
@@ -3361,7 +3431,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <button
             type="button"
             onClick={printDraftBonFromCart}
-            disabled={draftBonLineItems.length === 0}
+            disabled={draftBonLineItems.length === 0 || draftBonPrinting}
             className="max-w-full truncate rounded-md px-1 py-0.5 text-center text-[10px] font-semibold leading-tight tracking-tight text-white/95 transition-colors hover:bg-white/15 active:bg-white/25 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-transparent sm:text-[11px] md:text-xs"
             title={t('kassaApp.cartBonTitle')}
             aria-label={t('kassaApp.cartBonTitle')}
@@ -4110,7 +4180,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <button
               type="button"
               onClick={printDraftBonFromCart}
-              disabled={draftBonLineItems.length === 0}
+              disabled={draftBonLineItems.length === 0 || draftBonPrinting}
               className={`flex flex-col items-center justify-center rounded-xl bg-yellow-400 text-yellow-950 hover:bg-yellow-300 active:brightness-95 disabled:opacity-40 disabled:pointer-events-none ${
                 kassaSidebarFooterTier === 'comfort'
                   ? 'gap-2 py-5'
@@ -4491,10 +4561,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           tenantInfo={tenantInfo}
           locale={locale}
           onClose={() => setShowSuccessModal(false)}
+          printDisabled={successReceiptPrintBusy}
           onPrint={async () => {
             try {
+              setSuccessReceiptPrintBusy(true)
               await printReceipt(lastOrder)
             } finally {
+              setSuccessReceiptPrintBusy(false)
               setShowSuccessModal(false)
             }
           }}
