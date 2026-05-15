@@ -2437,6 +2437,7 @@
       "productCountZero": "无商品",
       "productCountTitle": "此分类下的商品数量",
       "categoryVatHint": "可为每个分类设置固定增值税税率（6%、9%、12% 或 21%），适用于该分类内商品。“店铺默认”沿用店铺设置中的税率；不修改则与以前行为一致。",
+      "categoryVatTypicalRatesHint": "提示 — 餐饮行业常见做法：餐食与软饮料选 9%；酒精饮料选 21%。如有疑问请咨询会计师或税务部门。",
       "categoryVatShort": "增值税",
       "categoryVatUseTenant": "店铺默认"
     },

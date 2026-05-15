@@ -2437,6 +2437,7 @@
       "productCountZero": "商品なし",
       "productCountTitle": "このカテゴリの商品数",
       "categoryVatHint": "カテゴリごとに消費税率（6%、9%、12%、21%）を固定できます。「店舗のデフォルト」は店舗設定の税率を使います（変更不要なら今まで通り）。",
+      "categoryVatTypicalRatesHint": "ヒント — 飲食店では例として、飲食・清涼飲料は9%、アルコール飲料は21%と設定することが多いです。不明な場合は税理士または税務署にご確認ください。",
       "categoryVatShort": "消費税",
       "categoryVatUseTenant": "店舗デフォルト"
     },

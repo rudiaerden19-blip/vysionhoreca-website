@@ -1937,6 +1937,7 @@
       "productCountZero": "Keine Produkte",
       "productCountTitle": "Anzahl Produkte in dieser Kategorie",
       "categoryVatHint": "Legen Sie pro Kategorie einen festen MwSt.-Satz (6 %, 9 %, 12 % oder 21 %) für alle darin gehörigen Artikel fest. „Betriebsstandard“ verwendet den Satz aus den Betriebseinstellungen — wie bisher, wenn Sie nichts ändern.",
+      "categoryVatTypicalRatesHint": "Hinweis — in der Gastronomie oft üblich: Speisen und Erfrischungsgetränke 9 %; alkoholische Getränke 21 %. Bei Unsicherheit Steuerberater oder Finanzamt konsultieren.",
       "categoryVatShort": "MwSt.",
       "categoryVatUseTenant": "Betriebsstandard"
     },

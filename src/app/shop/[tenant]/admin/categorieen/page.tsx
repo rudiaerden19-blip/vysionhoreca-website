@@ -185,6 +185,9 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
           <p className="text-gray-500 text-sm mt-2 max-w-xl">
             {t('adminPages.categorieen.categoryVatHint')}
           </p>
+          <p className="text-sm text-amber-900 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 mt-2 max-w-xl">
+            {t('adminPages.categorieen.categoryVatTypicalRatesHint')}
+          </p>
         </div>
         <motion.button
           whileHover={{ scale: 1.02 }}
