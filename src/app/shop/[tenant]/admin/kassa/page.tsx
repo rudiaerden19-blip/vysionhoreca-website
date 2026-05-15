@@ -1592,8 +1592,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [switchConfirm, setSwitchConfirm] = useState<string | null>(null)
   /** Na plattegrond «Afrekenen»: open betaalmodal zodra doSwitchToTable klaar is (ook ná switch-bevestiging). */
   const openPaymentAfterFloorPlanSwitchRef = useRef(false)
-  /** Gele bon → toog (delta): geen overlappende print-job per tafelsleutel. */
-  const toogBonSlotInflightRef = useRef<Record<string, boolean>>({})
   /** Automatische toog-delta bij «Naar tafel» / tafel wisselen: aparte inflight per slot. */
   const barDeltaSlotInflightRef = useRef<Record<string, boolean>>({})
   const flushBarDeltaSlipRef = useRef<(zone: FloorPlanZone, tblNr: string, snap: CartItem[]) => void>(() => {})
@@ -3180,92 +3178,27 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }
 
   /**
-   * Gele bon: afhalen/bezorgen of dine-in zonder tafel = volledige voorlopige mand (zoals voorheen).
-   * Ter plaatse mét tafel = alleen delta naar de toog; watermerk reset bij lege mand (verwijder) of afrekenen.
+   * Gele bon: altijd volledige mand/kar op de bon (incl. hele tafel).
+   * Bij dine-in+tafel: na geslaagde print watermerk = volledige stand, zodat «Naar tafel» alleen nog delta print.
    */
   const printDraftBonFromCart = async () => {
     if (draftBonLineItems.length === 0) return
-
-    const tblNr = orderType === 'DINE_IN' ? String(tableNumber ?? '').trim() : ''
-    const useToogDelta = orderType === 'DINE_IN' && tblNr !== ''
-    const slotKey = useToogDelta ? tableOrderMapKey(dineInFloorZone, tblNr) : ''
-
-    if (useToogDelta && toogBonSlotInflightRef.current[slotKey]) return
-    if (useToogDelta) toogBonSlotInflightRef.current[slotKey] = true
-
     try {
       setDraftBonPrinting(true)
       playClick()
 
-      if (useToogDelta) {
-        try {
-          const store = loadBarBonWatermarks(tenant)
-          const rawPrev = store[slotKey]
-          const prev =
-            rawPrev != null && typeof rawPrev === 'object' && !Array.isArray(rawPrev)
-              ? (rawPrev as Record<string, number>)
-              : {}
-
-          const { deltaLines, nextWatermark } = computeBarBonDelta(draftBonLineItems, prev)
-          if (deltaLines.length === 0) {
-            setThermalPrintBanner({
-              variant: 'error',
-              message: t('kassaReceipt.interimBonNothingNew'),
-            })
-            return
+      let watermarkCommit: { slotKey: string; row: Record<string, number> } | undefined
+      if (orderType === 'DINE_IN') {
+        const tblNr = String(tableNumber ?? '').trim()
+        if (tblNr !== '') {
+          try {
+            const slotKey = tableOrderMapKey(dineInFloorZone, tblNr)
+            const { nextWatermark } = computeBarBonDelta(draftBonLineItems, {})
+            watermarkCommit = { slotKey, row: nextWatermark }
+          } catch {
+            /* geen watermark-bijwerk bij bereken-fout — bon mag wél printen */
           }
-
-          const draftSplit = computeInclusiveVatSplitFromCart(deltaLines, resolveCartLineVat)
-          const draftOrder: KassaLastOrderReceipt = {
-            orderNumber: 0,
-            items: deltaLines,
-            total: draftSplit.grossTotal,
-            vatSplit: draftSplit.byRate.map((l) => ({
-              rate: l.rate,
-              baseExcl: l.baseExcl,
-              tax: l.tax,
-            })),
-            subtotalExclVat: draftSplit.subtotalExcl,
-            totalTax: draftSplit.totalTax,
-            paymentMethod: 'CARD',
-            orderType: 'DINE_IN',
-            tableNumber: tblNr,
-            floorPlanZone:
-              dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE ? FLOOR_PLAN_ZONE_TERRACE : FLOOR_PLAN_ZONE_INSIDE,
-            createdAt: new Date(),
-            helpedByStaffName: activeKassaStaff?.name ?? null,
-          }
-
-          await printReceipt(draftOrder, {
-            draft: true,
-            barTableDelta: true,
-            barWatermarkCommit: { slotKey, row: nextWatermark },
-          })
-        } catch {
-          /** Agent/netwerk/randcase: volledige voorlopige bon — kassa blijft bruikbaar (watermerk ongewijzigd). */
-          const draftSplit = computeInclusiveVatSplitFromCart(draftBonLineItems, resolveCartLineVat)
-          const draftOrder: KassaLastOrderReceipt = {
-            orderNumber: 0,
-            items: draftBonLineItems,
-            total: draftBonTotal,
-            vatSplit: draftSplit.byRate.map((l) => ({
-              rate: l.rate,
-              baseExcl: l.baseExcl,
-              tax: l.tax,
-            })),
-            subtotalExclVat: draftSplit.subtotalExcl,
-            totalTax: draftSplit.totalTax,
-            paymentMethod: 'CARD',
-            orderType: 'DINE_IN',
-            tableNumber: tblNr,
-            floorPlanZone:
-              dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE ? FLOOR_PLAN_ZONE_TERRACE : FLOOR_PLAN_ZONE_INSIDE,
-            createdAt: new Date(),
-            helpedByStaffName: activeKassaStaff?.name ?? null,
-          }
-          await printReceipt(draftOrder, { draft: true })
         }
-        return
       }
 
       const draftSplit = computeInclusiveVatSplitFromCart(draftBonLineItems, resolveCartLineVat)
@@ -3287,9 +3220,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         createdAt: new Date(),
         helpedByStaffName: activeKassaStaff?.name ?? null,
       }
-      await printReceipt(draftOrder, { draft: true })
+
+      await printReceipt(draftOrder, {
+        draft: true,
+        ...(watermarkCommit ? { barWatermarkCommit: watermarkCommit } : {}),
+      })
     } finally {
-      if (useToogDelta) delete toogBonSlotInflightRef.current[slotKey]
       setDraftBonPrinting(false)
     }
   }
