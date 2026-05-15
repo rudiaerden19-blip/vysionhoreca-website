@@ -12,6 +12,7 @@ import {
   type TenantSettings,
 } from '@/lib/admin-api'
 import { aggregateZReportVatFromOrderRows } from '@/lib/order-vat'
+import { authFetch } from '@/lib/auth-headers'
 import PinGate from '@/components/PinGate'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -107,6 +108,46 @@ function getPeriodStart(period: ExportPeriod): Date {
   return startOfYear(now)
 }
 
+const EXPORT_PERIOD_LABEL_NL: Record<ExportPeriod, string> = {
+  day: 'Vandaag',
+  week: 'Deze week',
+  month: 'Deze maand',
+  year: 'Dit jaar',
+}
+
+function computeOmzetOverviewSnapshot(
+  exportPeriod: ExportPeriod,
+  validOrders: Order[],
+  tenantInfo: TenantInfo | null,
+) {
+  const from = getPeriodStart(exportPeriod)
+  const exp = validOrders.filter((o) => new Date(o.created_at) >= from)
+  const totalRev = exp.reduce((s, o) => s + o.total, 0)
+  let cash = 0
+  let card = 0
+  for (const o of exp) {
+    const d = distributeOrderPaymentForZRaport(o)
+    cash += d.cash
+    card += d.card + d.online
+  }
+  const defaultBtwPdf = tenantInfo?.btw_percentage ?? 6
+  const vatAggPdf = aggregateZReportVatFromOrderRows(
+    exp.map((o) => ({ total: o.total, items: (o as { items?: unknown }).items })),
+    defaultBtwPdf,
+  )
+  return { exp, totalRev, cash, card, vatAggPdf }
+}
+
+function addressLinesForOverviewEmail(info: TenantInfo | null): string[] {
+  if (!info) return []
+  const lines: string[] = []
+  if (info.address?.trim()) lines.push(info.address.trim())
+  const pc = (info.postal_code || '').trim()
+  const city = (info.city || '').trim()
+  if (pc || city) lines.push([pc, city].filter(Boolean).join(' '))
+  return lines
+}
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function RapportenPage({ params }: { params: { tenant: string } }) {
   const tenant = params.tenant
@@ -131,6 +172,24 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
 
   // Boekhouding state
   const [selectedZReports, setSelectedZReports] = useState<string[]>([])
+
+  const [showOverviewEmailModal, setShowOverviewEmailModal] = useState(false)
+  const [overviewEmailTo, setOverviewEmailTo] = useState('')
+  const [overviewEmailSending, setOverviewEmailSending] = useState(false)
+  const [overviewEmailError, setOverviewEmailError] = useState('')
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      const raw = localStorage.getItem('vysion_tenant')
+      if (!raw) return
+      const parsed = JSON.parse(raw) as { email?: string }
+      if (typeof parsed.email === 'string' && parsed.email.trim())
+        setOverviewEmailTo(parsed.email.trim())
+    } catch {
+      /* ignore */
+    }
+  }, [])
 
   const schedulePersistOpeningCash = useCallback(
     (value: number) => {
@@ -472,10 +531,66 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     await loadData()
   }
 
+  const openOverviewEmailModal = () => {
+    try {
+      const raw = typeof window !== 'undefined' ? localStorage.getItem('vysion_tenant') : null
+      if (raw) {
+        const parsed = JSON.parse(raw) as { email?: string }
+        if (typeof parsed.email === 'string' && parsed.email.trim())
+          setOverviewEmailTo(parsed.email.trim())
+      }
+    } catch {
+      /* ignore */
+    }
+    setOverviewEmailError('')
+    setShowOverviewEmailModal(true)
+  }
+
+  const sendOverviewEmailReport = async () => {
+    const snapshot = computeOmzetOverviewSnapshot(exportPeriod, validOrders, tenantInfo)
+    const { exp, totalRev, cash, card, vatAggPdf } = snapshot
+    setOverviewEmailSending(true)
+    setOverviewEmailError('')
+    try {
+      const res = await authFetch('/api/send-omzet-report-email', {
+        method: 'POST',
+        body: JSON.stringify({
+          tenantSlug: tenant,
+          to: overviewEmailTo.trim(),
+          exportPeriod,
+          periodLabel: EXPORT_PERIOD_LABEL_NL[exportPeriod],
+          businessName: tenantInfo?.business_name || tenant,
+          addressBlockLines: addressLinesForOverviewEmail(tenantInfo),
+          btwNumber: tenantInfo?.btw_number || '',
+          totalRev,
+          orderCount: exp.length,
+          cash,
+          card,
+          subtotalExcl: vatAggPdf.subtotalExcl,
+          taxLow: vatAggPdf.tax_low,
+          taxMid: vatAggPdf.tax_mid,
+          taxHigh: vatAggPdf.tax_high,
+          totalTax: vatAggPdf.totalTax,
+        }),
+      })
+      const data = (await res.json().catch(() => ({}))) as { error?: string }
+      if (!res.ok) {
+        setOverviewEmailError(data.error || 'Versturen mislukt')
+        return
+      }
+      setShowOverviewEmailModal(false)
+      alert('Het omzetrapport is naar je e-mail gestuurd.')
+    } catch {
+      setOverviewEmailError('Netwerk- of serverfout. Probeer opnieuw.')
+    } finally {
+      setOverviewEmailSending(false)
+    }
+  }
+
   // ── CSV Export ──
   const exportCSV = () => {
     const from = getPeriodStart(exportPeriod)
-    const exp = validOrders.filter(o => new Date(o.created_at) >= from)
+    const exp = validOrders.filter((o) => new Date(o.created_at) >= from)
     const headers = ['Datum','Tijd','Bon#','Type','Betaling','Subtotaal','BTW','Totaal']
     const rows = exp.map(o => [
       new Date(o.created_at).toLocaleDateString('nl-NL'),
@@ -502,20 +617,10 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
 
   // ── PDF Export ──
   const exportPDF = () => {
-    const from = getPeriodStart(exportPeriod)
-    const exp = validOrders.filter(o => new Date(o.created_at) >= from)
-    const totalRev = exp.reduce((s,o)=>s+o.total,0)
-    let cash = 0
-    let card = 0
-    for (const o of exp) {
-      const d = distributeOrderPaymentForZRaport(o)
-      cash += d.cash
-      card += d.card + d.online
-    }
-    const defaultBtwPdf = tenantInfo?.btw_percentage ?? 6
-    const vatAggPdf = aggregateZReportVatFromOrderRows(
-      exp.map((o) => ({ total: o.total, items: (o as { items?: unknown }).items })),
-      defaultBtwPdf,
+    const { exp, totalRev, cash, card, vatAggPdf } = computeOmzetOverviewSnapshot(
+      exportPeriod,
+      validOrders,
+      tenantInfo,
     )
     const vatDetailRows: string[] = []
     if (vatAggPdf.tax_low > 0) {
@@ -700,6 +805,13 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
               </button>
               <button onClick={exportPDF} className="flex items-center gap-2 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-xl text-sm font-medium transition-colors">
                 📄 PDF
+              </button>
+              <button
+                type="button"
+                onClick={openOverviewEmailModal}
+                className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-sm font-medium transition-colors"
+              >
+                📧 E-mail
               </button>
             </div>
 
@@ -1287,6 +1399,69 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
           </div>
         )}
         </>
+      )}
+
+      {showOverviewEmailModal && (
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 p-4"
+          role="presentation"
+          onClick={() => {
+            if (!overviewEmailSending) setShowOverviewEmailModal(false)
+          }}
+        >
+          <div
+            className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-gray-100"
+            role="dialog"
+            aria-labelledby="overview-email-dialog-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 id="overview-email-dialog-title" className="text-lg font-bold text-gray-900 mb-1">
+              Omzetrapport mailen
+            </h3>
+            <p className="text-sm text-gray-500 mb-1">
+              Zelfde overzicht als bij PDF voor <strong>{EXPORT_PERIOD_LABEL_NL[exportPeriod]}</strong>.
+            </p>
+            <p className="text-xs text-gray-400 mb-4">
+              Alleen naar het e-mailadres van je zaak-login (prefilled hieronder).
+            </p>
+            <label htmlFor="overview-email-input" className="block text-sm font-medium text-gray-700 mb-1">
+              E-mail
+            </label>
+            <input
+              id="overview-email-input"
+              type="email"
+              autoComplete="email"
+              value={overviewEmailTo}
+              onChange={(e) => setOverviewEmailTo(e.target.value)}
+              className="w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-slate-500 text-gray-900"
+            />
+            {overviewEmailError && (
+              <p className="text-sm text-red-600 mt-2">{overviewEmailError}</p>
+            )}
+            <div className="flex gap-3 justify-end mt-5 flex-wrap">
+              <button
+                type="button"
+                disabled={overviewEmailSending}
+                onClick={() => setShowOverviewEmailModal(false)}
+                className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium text-sm disabled:opacity-50"
+              >
+                Annuleer
+              </button>
+              <button
+                type="button"
+                disabled={
+                  overviewEmailSending ||
+                  !overviewEmailTo.trim() ||
+                  !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(overviewEmailTo.trim())
+                }
+                onClick={() => void sendOverviewEmailReport()}
+                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-medium text-sm disabled:opacity-50"
+              >
+                {overviewEmailSending ? 'Versturen…' : 'Versturen'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       <div className="mt-12 pb-8 text-center">
