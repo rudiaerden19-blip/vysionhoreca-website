@@ -3233,7 +3233,11 @@
     "barToogBanner": "*** バー — 新規のみ ***",
     "barToogHint": "前回のバー伝票以降に追加された行のみです。",
     "barToogReceiptRef": "バー",
-    "barToogFooter": "未精算 — バーでの提供準備用です。"
+    "barToogFooter": "未精算 — バーでの提供準備用です。",
+    "interimDeltaBanner": "*** 仮伝票 — 新規のみ ***",
+    "interimDeltaHint": "このテーブルの前回の伝票またはバー印字以降の商品のみ。",
+    "interimDeltaFooter": "参考用 — 未会計。新規行のみ。",
+    "interimBonNothingNew": "このテーブルに印刷する新規はありません — すでに前の伝票に含まれています。"
   },
   "kassaApp": {
     "soundTitle": "音を有効にする",

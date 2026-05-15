@@ -3233,7 +3233,11 @@
     "barToogBanner": "*** 吧台 — 仅新增 ***",
     "barToogHint": "仅含上次吧台小票之后新增的行。",
     "barToogReceiptRef": "吧台",
-    "barToogFooter": "尚未结账 — 仅供吧台备餐。"
+    "barToogFooter": "尚未结账 — 仅供吧台备餐。",
+    "interimDeltaBanner": "*** 临时小票 — 仅新增 ***",
+    "interimDeltaHint": "仅包含本桌自上一张收据或吧台打印后的品项。",
+    "interimDeltaFooter": "仅供参考 — 尚未结账。仅新行。",
+    "interimBonNothingNew": "本桌没有可打印的新增品项 — 已出现在之前的收据上。"
   },
   "kassaApp": {
     "soundTitle": "启用声音",

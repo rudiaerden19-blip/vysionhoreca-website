@@ -3691,7 +3691,11 @@
     "barToogBanner": "*** TOOG — ALLEEN NIEUW ***",
     "barToogHint": "Alleen nieuwe regels sinds de vorige toogbon.",
     "barToogReceiptRef": "TOOG",
-    "barToogFooter": "Nog niet afgerekend — enkel voor bereiding door de toog."
+    "barToogFooter": "Nog niet afgerekend — enkel voor bereiding door de toog.",
+    "interimDeltaBanner": "*** VOORLOPIG — ALLEEN NIEUW ***",
+    "interimDeltaHint": "Alleen items sinds de vorige bon of toogafdruk voor deze tafel.",
+    "interimDeltaFooter": "Enkel ter info — nog niet betaald. Alleen nieuwe regels.",
+    "interimBonNothingNew": "Niets nieuws om af te drukken voor deze tafel — dat staat al op een eerdere bon."
   },
   "kassaApp": {
     "soundTitle": "Activeer geluid",

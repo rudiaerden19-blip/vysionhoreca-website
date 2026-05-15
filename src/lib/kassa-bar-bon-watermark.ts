@@ -53,6 +53,13 @@ function quantitiesByStableKey(items: KassaCartItem[]): Record<string, number> {
   return m
 }
 
+/** Handtekening van de volledige voorlopige mand (gele bon) — zelfde stabiele regels als toog-watermerk. */
+export function kassaDraftBonGuardSig(items: KassaCartItem[], total: number): string {
+  const qty = quantitiesByStableKey(items)
+  const keys = Object.keys(qty).sort()
+  return keys.map((k) => `${k}:${qty[k]}`).join('|') + `@${total.toFixed(4)}`
+}
+
 /** Eerste mandregel per stabiele sleutel (voor productnaam/opies op de bon). */
 function firstLineByStableKey(items: KassaCartItem[]): Map<string, KassaCartItem> {
   const map = new Map<string, KassaCartItem>()

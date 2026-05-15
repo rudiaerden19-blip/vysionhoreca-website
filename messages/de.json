@@ -2733,7 +2733,11 @@
     "barToogBanner": "*** BAR — NUR NEU ***",
     "barToogHint": "Nur neue Positionen seit dem letzten Barbon.",
     "barToogReceiptRef": "BAR",
-    "barToogFooter": "Noch nicht abgerechnet — nur zur Zubereitung an der Bar."
+    "barToogFooter": "Noch nicht abgerechnet — nur zur Zubereitung an der Bar.",
+    "interimDeltaBanner": "*** VORLÄUFIG — NUR NEU ***",
+    "interimDeltaHint": "Nur Positionen seit dem letzten Bon oder Barbondruck für diesen Tisch.",
+    "interimDeltaFooter": "Nur zur Info — noch nicht bezahlt. Nur neue Zeilen.",
+    "interimBonNothingNew": "Nichts Neues zum Drucken für diesen Tisch — steht bereits auf einem früheren Bon."
   },
   "kassaApp": {
     "soundTitle": "Ton aktivieren",

@@ -3691,7 +3691,11 @@
     "barToogBanner": "*** BAR — NEW ITEMS ONLY ***",
     "barToogHint": "Only new lines since the last bar slip.",
     "barToogReceiptRef": "BAR",
-    "barToogFooter": "Not settled yet — for bar preparation only."
+    "barToogFooter": "Not settled yet — for bar preparation only.",
+    "interimDeltaBanner": "*** INTERIM — NEW ITEMS ONLY ***",
+    "interimDeltaHint": "Only items since the last slip or bar print for this table.",
+    "interimDeltaFooter": "For information only — not paid yet. New lines only.",
+    "interimBonNothingNew": "Nothing new to print for this table — it's already on an earlier slip."
   },
   "kassaApp": {
     "soundTitle": "Enable sound",

@@ -2733,7 +2733,11 @@
     "barToogBanner": "*** BAR — NOUVEAUTÉS SEULEMENT ***",
     "barToogHint": "Uniquement les lignes nouvelles depuis le dernier ticket bar.",
     "barToogReceiptRef": "BAR",
-    "barToogFooter": "Pas encore réglé — uniquement pour préparation au bar."
+    "barToogFooter": "Pas encore réglé — uniquement pour préparation au bar.",
+    "interimDeltaBanner": "*** PROVISOIRE — NOUVEAUTÉS UNIQUEMENT ***",
+    "interimDeltaHint": "Uniquement les articles depuis le dernier ticket ou tirage bar pour cette table.",
+    "interimDeltaFooter": "À titre indicatif — pas encore payé. Nouvelles lignes seulement.",
+    "interimBonNothingNew": "Rien de nouveau à imprimer pour cette table — c’est déjà sur un ticket précédent."
   },
   "kassaApp": {
     "soundTitle": "Activer le son",

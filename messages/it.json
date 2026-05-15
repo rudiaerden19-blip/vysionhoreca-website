@@ -3233,7 +3233,11 @@
     "barToogBanner": "*** BAR — SOLO NUOVE ***",
     "barToogHint": "Solo righe nuove dall’ultimo scontrino bar.",
     "barToogReceiptRef": "BAR",
-    "barToogFooter": "Non ancora saldato — solo per preparazione al bar."
+    "barToogFooter": "Non ancora saldato — solo per preparazione al bar.",
+    "interimDeltaBanner": "*** PROVVISORIO — SOLO NUOVE ***",
+    "interimDeltaHint": "Solo articoli dall’ultimo scontrino o stampa bar per questo tavolo.",
+    "interimDeltaFooter": "Solo a titolo informativo — non ancora pagato. Solo righe nuove.",
+    "interimBonNothingNew": "Niente di nuovo da stampare per questo tavolo — è già su uno scontrino precedente."
   },
   "kassaApp": {
     "soundTitle": "Attiva audio",
