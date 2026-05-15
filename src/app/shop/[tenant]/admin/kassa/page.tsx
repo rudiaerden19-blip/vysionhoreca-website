@@ -1557,6 +1557,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const customerDisplayBcRef = useRef<BroadcastChannel | null>(null)
   /** HTML bon wacht op modal als lokale Print Agent faalt; daarna printReceiptHtmlDocument */
   const [printAgentFallbackHtml, setPrintAgentFallbackHtml] = useState<string | null>(null)
+  /**
+   * Thermische print-status op het scherm — géén window.alert ná async (Chrome Android blokkeert dat).
+   */
+  const [thermalPrintBanner, setThermalPrintBanner] = useState<{
+    variant: 'info' | 'success' | 'error'
+    message: string
+  } | null>(null)
   const [splitCash, setSplitCash] = useState(0)
   const [splitCard, setSplitCard] = useState(0)
   const [lastOrder, setLastOrder] = useState<KassaLastOrderReceipt | null>(null)
@@ -2637,8 +2644,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }
 
   const printReceipt = async (order: typeof lastOrder, opts?: { draft?: boolean }) => {
-    if (!order) return
+    if (!order) {
+      setThermalPrintBanner({
+        variant: 'error',
+        message: 'Geen bon om te printen. Sluit dit bericht en probeer opnieuw.',
+      })
+      return
+    }
+    setThermalPrintBanner({
+      variant: 'info',
+      message: 'Bonafdruk: printer op deze tablet/PC wordt aangesproken…',
+    })
     const isDraft = !!opts?.draft
+    try {
     const vatRate = tenantInfo?.btw_percentage ?? 6
     const subtotal = order.total / (1 + vatRate / 100)
     const tax = order.total - subtotal
@@ -2803,12 +2821,31 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         vatRate: tenantInfo?.btw_percentage ?? 6,
       },
     })
-    if (printResult.ok) return
+    if (printResult.ok) {
+      if (typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent)) {
+        setThermalPrintBanner({
+          variant: 'success',
+          message:
+            'Print-opdracht verstuurd. Geen papier? Controleer USB-printer en Vysion Kiosk-app. Verschijnt een tweede venster? Gebruik „Doorgaan” voor bon in de browser.',
+        })
+      } else {
+        setThermalPrintBanner(null)
+      }
+      return
+    }
 
-    window.alert(
-      `${t('kassaApp.printAgentFailedDebugTitle')}\n\n${printResult.error}\n\n${t('kassaApp.printAgentFailedDebugFooter')}`,
-    )
+    setThermalPrintBanner({
+      variant: 'error',
+      message: `${t('kassaApp.printAgentFailedDebugTitle')}\n\n${printResult.error}\n\n${t('kassaApp.printAgentFailedDebugFooter')}`,
+    })
     setPrintAgentFallbackHtml(html)
+    } catch (printErr: unknown) {
+      const msg = printErr instanceof Error ? printErr.message : String(printErr)
+      setThermalPrintBanner({
+        variant: 'error',
+        message: `Bonafdruk fout:\n\n${msg}`,
+      })
+    }
   }
 
   /** Voorlopige bon zonder afrekenen — lijnen uit kar en/of openstaande tafelmand. */
@@ -4293,6 +4330,34 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               }}
             >
               {t('kassaApp.printAgentFallbackModalContinue')}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {thermalPrintBanner && (
+        <div
+          className="fixed inset-x-2 bottom-2 z-[400] max-h-[45vh] overflow-y-auto rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-left text-white shadow-xl sm:inset-x-6"
+          role="alert"
+        >
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <p
+              className={`whitespace-pre-wrap text-sm leading-relaxed ${
+                thermalPrintBanner.variant === 'error'
+                  ? 'text-red-200'
+                  : thermalPrintBanner.variant === 'success'
+                    ? 'text-emerald-200'
+                    : 'text-slate-100'
+              }`}
+            >
+              {thermalPrintBanner.message}
+            </p>
+            <button
+              type="button"
+              onClick={() => setThermalPrintBanner(null)}
+              className="shrink-0 touch-manipulation rounded-lg bg-white/10 px-3 py-2 text-xs font-semibold text-white hover:bg-white/20"
+            >
+              Sluiten
             </button>
           </div>
         </div>
