@@ -345,9 +345,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
             alt={category.name}
             decoding="async"
             loading="lazy"
-            className={`pointer-events-none absolute inset-0 block h-full min-h-0 w-full select-none object-contain object-center !h-full !w-full !max-w-none ${
-              appearanceDark ? 'bg-[#1a2230]' : 'bg-neutral-100'
-            }`}
+            className="pointer-events-none absolute inset-0 block h-full min-h-0 w-full select-none object-cover object-center !h-full !w-full !max-w-none"
           />
           <div
             className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-32 bg-gradient-to-t from-neutral-950/[0.94] via-neutral-950/55 to-transparent sm:h-36"
@@ -425,7 +423,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
                 transform: `scale(${kioskZoom})`,
                 transformOrigin: 'center 78%',
               }}
-              className="pointer-events-none block h-full min-h-0 w-full select-none object-contain object-center !h-full !w-full !max-w-none"
+              className="pointer-events-none block h-full min-h-0 w-full select-none object-cover object-center !h-full !w-full !max-w-none"
             />
           </div>
           <div
