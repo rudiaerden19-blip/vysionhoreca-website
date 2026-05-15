@@ -1563,6 +1563,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [thermalPrintBanner, setThermalPrintBanner] = useState<{
     variant: 'info' | 'success' | 'error'
     message: string
+    /** Alleen bij succes op tablet: HTML voor optionele browser-print. */
+    browserReceiptHtml?: string
   } | null>(null)
   const [splitCash, setSplitCash] = useState(0)
   const [splitCard, setSplitCard] = useState(0)
@@ -2786,9 +2788,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       },
     })
 
-    let fallbackHtml = ''
-    if (!printResult.ok) {
-      fallbackHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${escapeReceiptHtml(docTitle)}</title><style>${KASSA_PRINT_RECEIPT_STYLES}</style></head><body>
+    const receiptHtml =
+      !printResult.ok || (printResult.ok && isAndroidTabletPrintClient())
+        ? `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${escapeReceiptHtml(docTitle)}</title><style>${KASSA_PRINT_RECEIPT_STYLES}</style></head><body>
       <div class="center">
         <div class="bold big">${bizName}</div>
         ${tenantInfo?.address ? `<div class="small">${escapeReceiptHtml(tenantInfo.address)}</div>` : ''}
@@ -2823,7 +2825,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         ${tenantInfo?.website ? `<br/>${escapeReceiptHtml(tenantInfo.website)}` : ''}
       </div>
     </body></html>`
-    }
+        : ''
 
     flushSync(() => {
       if (printResult.ok) {
@@ -2831,7 +2833,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           setThermalPrintBanner({
             variant: 'success',
             message:
-              'Print-opdracht verstuurd naar de Vysion-app (zie/toast op tablet). Geen papier? USB-printer. Anders „Doorgaan” hieronder voor bon in browser.',
+              'Bon is naar de Vysion Kiosk-app gestuurd (USB-printer).\n\nNormaal komt er nu papier uit de bonprinter. Zo niet: USB-kabel, stroom op de printer, en testprint vanuit de app.\n\nAlleen een bon op dit scherm? Tik op „Bon in browser openen”.',
+            browserReceiptHtml: receiptHtml,
           })
         } else {
           setThermalPrintBanner(null)
@@ -2841,7 +2844,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           variant: 'error',
           message: `${t('kassaApp.printAgentFailedDebugTitle')}\n\n${printResult.error}\n\n${t('kassaApp.printAgentFailedDebugFooter')}`,
         })
-        setPrintAgentFallbackHtml(fallbackHtml)
+        setPrintAgentFallbackHtml(receiptHtml)
       }
     })
     if (printResult.ok) return
@@ -4358,13 +4361,28 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             >
               {thermalPrintBanner.message}
             </p>
-            <button
-              type="button"
-              onClick={() => setThermalPrintBanner(null)}
-              className="shrink-0 touch-manipulation rounded-lg bg-white/10 px-3 py-2 text-xs font-semibold text-white hover:bg-white/20"
-            >
-              Sluiten
-            </button>
+            <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:items-start">
+              {thermalPrintBanner.variant === 'success' && thermalPrintBanner.browserReceiptHtml ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const h = thermalPrintBanner.browserReceiptHtml
+                    setThermalPrintBanner(null)
+                    if (h) printReceiptHtmlDocument(h)
+                  }}
+                  className="touch-manipulation rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-500"
+                >
+                  Bon in browser openen
+                </button>
+              ) : null}
+              <button
+                type="button"
+                onClick={() => setThermalPrintBanner(null)}
+                className="touch-manipulation rounded-lg bg-white/10 px-3 py-2 text-xs font-semibold text-white hover:bg-white/20"
+              >
+                Sluiten
+              </button>
+            </div>
           </div>
         </div>
       )}
