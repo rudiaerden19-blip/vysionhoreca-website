@@ -92,6 +92,11 @@ function openAndroidKioskUrl(url: string): boolean {
 /**
  * Chrome op Android blokkeert vaak fetch naar http://127.0.0.1. De Vysion Kiosk-app registreert
  * vysionkiosk:// — zelfde payload als de Windows Print Agent (geen wijziging in apps/vysion-print-agent).
+ *
+ * Belangrijk: bij succes retourneren we { ok: true } ná navigatie — de kassa toont dan géén
+ * fout-popup. Zonder voorafgaande feedback lijkt „afdrukken“ daarom dood.
+ * Dit blokkerende venster geeft óók een verse gebruikersactie (OK) vóór location.assign,
+ * wat soms helpt als Chrome custom schemes anders stilletjes negeert.
  */
 function tryVysionKioskPrintBridge(body: VysionPrintAgentBody): { ok: boolean; reason?: string } {
   if (typeof document === 'undefined') return { ok: false, reason: 'Geen document (SSR).' }
@@ -111,6 +116,12 @@ function tryVysionKioskPrintBridge(body: VysionPrintAgentBody): { ok: boolean; r
     return { ok: false, reason: `URL te lang (${enc.length} tekens); bon moet korter of agent via USB PC.` }
   }
   const url = `vysionkiosk://print?d=${enc}`
+  if (typeof window !== 'undefined' && typeof window.alert === 'function') {
+    window.alert(
+      'Bon wordt naar de Vysion Kiosk-app gestuurd.\n\n' +
+        'Tik op OK. Gebeurt er daarna niets: open Vysion Kiosk en gebruik daar „Open kassa in Chrome”; controleer USB-printer.',
+    )
+  }
   if (!openAndroidKioskUrl(url)) return { ok: false, reason: 'location.assign geweigerd of gefaald.' }
   return { ok: true }
 }
