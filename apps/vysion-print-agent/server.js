@@ -32,8 +32,10 @@ const EMPHASIZE_OFF   = Buffer.from([ESC, 0x47, 0x00])
 /** Meer ruimte tussen regels zodat tekst niet plakt. */
 const LINE_SPACING_W  = Buffer.from([ESC, 0x33, 0x3C])
 const LINE_SPACING_N  = Buffer.from([ESC, 0x33, 0x1E])
-/** Code page PC858 (West-Europees) — gebruikt voor hoofdletters/cijfers na NFD-strip. */
-const CODEPAGE_PC858  = Buffer.from([ESC, 0x74, 0x13])
+/** PC437 (USA, ESC t 0) — pure ASCII-compatibele glyph-tabel op vrijwel alle ESC/POS‑printers.
+ *  PC858 (ESC t 19) gaf op Chinese/Xprinter‑firmware nog verkeerde Han‑tekens naast bedragen,
+ *  ook nadat we € door ASCII „EUR“ vervingen. We gebruiken geen hoge PC858‑tekens meer. */
+const CODEPAGE_PC437 = Buffer.from([ESC, 0x74, 0x00])
 /** Valuta op de bon als ASCII "EUR " i.p.v. byte 0xD5: op GBK/Chinees‑firmware werd 0xD5
  *  met het volgende byte als Han‑teken gelezen (bv. 詠 i.p.v. €). */
 const PREFIX_EUR_ASCII = Buffer.from('EUR ', 'latin1')
@@ -47,7 +49,7 @@ const DRAWER_KICK     = Buffer.from([ESC, 0x70, 0x00, 0x32, 0x32])
  * Encodeer tekst naar bytes voor de printer:
  * - Strip diakritische tekens (é → e, à → a) zodat we binnen latin1 blijven
  * - Vervang € door ASCII "EUR " (geen 0xD5: Chinese printers lezen dat als GBK/Han).
- * - Printer is gezet op CODEPAGE_PC858 voor overige Latin1 tekens na NFD-strip.
+ * - Printercodepage PC437 ESC t 0 (geen PC858 — veel Chinese firmware hoort dat verkeerd).
  * - Andere niet-latin1 chars worden ?
  * - Voeg \n toe (newline)
  */
@@ -124,7 +126,7 @@ function buildRichReceipt(body) {
 
   // Init
   c.push(ESC_INIT)
-  c.push(CODEPAGE_PC858)
+  c.push(CODEPAGE_PC437)
   c.push(EMPHASIZE_ON)
   c.push(BOLD_ON)
   c.push(LINE_SPACING_W)
@@ -319,7 +321,7 @@ function buildKitchenReceipt(body) {
   const c = []
 
   c.push(ESC_INIT)
-  c.push(CODEPAGE_PC858)
+  c.push(CODEPAGE_PC437)
   c.push(EMPHASIZE_ON)
   c.push(BOLD_ON)
   c.push(LINE_SPACING_W)
@@ -460,7 +462,7 @@ function buildEscPosPayload(body) {
   const c = []
 
   c.push(ESC_INIT)
-  c.push(CODEPAGE_PC858)
+  c.push(CODEPAGE_PC437)
   c.push(EMPHASIZE_ON)
   c.push(BOLD_ON)
   c.push(LINE_SPACING_W)
