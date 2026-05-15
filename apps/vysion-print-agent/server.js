@@ -39,6 +39,28 @@ const CODEPAGE_PC437 = Buffer.from([ESC, 0x74, 0x00])
 /** Valuta op de bon als ASCII "EUR " i.p.v. byte 0xD5: op GBK/Chinees‑firmware werd 0xD5
  *  met het volgende byte als Han‑teken gelezen (bv. 詠 i.p.v. €). */
 const PREFIX_EUR_ASCII = Buffer.from('EUR ', 'latin1')
+
+/** Strip/printer‑veilig: GEEN bytes ≥128 in door klant geleverde tekst.
+ *  Veel Chinese thermische printers parsen uitvoer GBK‑achtig: één byte 0xA0‑0xFF
+ *  kan de rest van de regel (incl. "EUR ") als Han laten verschuiven → verkeerde glyphe. */
+function isSafeEscPosAsciiCode(code) {
+  return (
+    code === 0x09 || // tab
+    code === 0x0a ||
+    code === 0x0d ||
+    (code >= 0x20 && code <= 0x7e)
+  )
+}
+
+/** Voor regels die NIET via encInline gaan (bv. padRow + raw datum). */
+function to7bitAsciiLine(s) {
+  let out = ''
+  for (const ch of String(s ?? '')) {
+    const code = ch.charCodeAt(0)
+    out += isSafeEscPosAsciiCode(code) ? ch : '?'
+  }
+  return out
+}
 /** Cash-drawer kick: ESC p 0 50 50 — pulse op pin 2 (~100ms).
  *  Dit is exact het commando dat de Epson APD driver-test gebruikt.
  *  Voor TM-T88V: als RAW write deze bytes filtert door APD, gebruiken we
@@ -47,10 +69,10 @@ const DRAWER_KICK     = Buffer.from([ESC, 0x70, 0x00, 0x32, 0x32])
 
 /**
  * Encodeer tekst naar bytes voor de printer:
- * - Strip diakritische tekens (é → e, à → a) zodat we binnen latin1 blijven
+ * - Strip diakritische tekens (é → e); daarna alleen 7-bits ASCII naar de printer
  * - Vervang € door ASCII "EUR " (geen 0xD5: Chinese printers lezen dat als GBK/Han).
- * - Printercodepage PC437 ESC t 0 (geen PC858 — veel Chinese firmware hoort dat verkeerd).
- * - Andere niet-latin1 chars worden ?
+ * - Alleen ASCII 32–126 (plus tab/newline/carriage return); geen bytes ≥128
+ *   (Chinese/GBK‑firmware anders fout‑gesynchroniseerd rond EUR/prijzen).
  * - Voeg \n toe (newline)
  */
 function enc(text) {
@@ -66,12 +88,12 @@ function encInline(text) {
   // Build byte-by-byte; € → ASCII "EUR "
   const out = []
   for (const ch of s) {
-    if (ch === '€') {
-      out.push(0x45, 0x55, 0x52, 0x20) // EUR + spatie
+    const code = ch.charCodeAt(0)
+    if (ch === '€' || code === 8364) {
+      out.push(0x45, 0x55, 0x52, 0x20)
       continue
     }
-    const code = ch.charCodeAt(0)
-    if (code <= 0xff) {
+    if (isSafeEscPosAsciiCode(code)) {
       out.push(code)
     } else {
       out.push(0x3f) // '?'
@@ -81,8 +103,10 @@ function encInline(text) {
 }
 
 function padRow(left, right, width) {
-  const pad = Math.max(1, width - left.length - right.length)
-  return Buffer.from(`${left}${' '.repeat(pad)}${right}\n`, 'latin1')
+  const l = to7bitAsciiLine(left)
+  const r = to7bitAsciiLine(right)
+  const pad = Math.max(1, width - l.length - r.length)
+  return Buffer.from(`${l}${' '.repeat(pad)}${r}\n`, 'latin1')
 }
 
 /**
