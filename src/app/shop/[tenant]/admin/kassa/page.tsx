@@ -464,12 +464,15 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
   )
 })
 
-/** Unieke sleutel per afgeronde verkoop — voorkomt meerdere Print-Agent-jobs bij dubbeltik op „Bon afdrukken”. */
+/** Unieke sleutel per afgeronde verkoop — zonder tijdstip (dat kan per render/build verschillen). */
 function kassaPaidReceiptGuardKey(order: KassaLastOrderReceipt): string {
-  const ca = order.createdAt
-  const t =
-    ca instanceof Date ? ca.getTime() : typeof ca === 'string' ? Date.parse(ca) : 0
-  return `${order.orderNumber}:${order.checkoutReference ?? ''}:${t}:${order.total}`
+  const ref = String(order.checkoutReference ?? '').trim()
+  const cents = Math.round(order.total * 100)
+  return `${order.orderNumber}|${ref}|${cents}`
+}
+
+function kassaPaidReceiptDedupeStorageKey(tenantSlug: string, order: KassaLastOrderReceipt): string {
+  return `vysion_kassa_paid_print_ok:${tenantSlug}:${kassaPaidReceiptGuardKey(order)}`
 }
 
 /** Handtekening van de huidige kar/mand voor voorlopige bon — reset bij gewijzigde inhoud. */
@@ -2765,6 +2768,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const isDraft = !!opts?.draft
 
     if (!isDraft) {
+      try {
+        if (typeof window !== 'undefined') {
+          const sk = kassaPaidReceiptDedupeStorageKey(tenant, order)
+          if (window.sessionStorage.getItem(sk) === '1') return
+        }
+      } catch {
+        /* sessionStorage onbereikbaar */
+      }
+
       const key = kassaPaidReceiptGuardKey(order)
       const g = paidReceiptPrintGuardRef.current
       if (g.key !== key) {
@@ -3004,8 +3016,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       }
     })
     if (printResult.ok) {
-      if (!isDraft) paidReceiptPrintGuardRef.current.printedOkOnce = true
-      else draftReceiptPrintGuardRef.current.printedOkOnce = true
+      if (!isDraft) {
+        paidReceiptPrintGuardRef.current.printedOkOnce = true
+        try {
+          if (typeof window !== 'undefined') {
+            window.sessionStorage.setItem(kassaPaidReceiptDedupeStorageKey(tenant, order), '1')
+          }
+        } catch {
+          /* quota / private mode */
+        }
+      } else draftReceiptPrintGuardRef.current.printedOkOnce = true
       return
     }
     } catch (printErr: unknown) {

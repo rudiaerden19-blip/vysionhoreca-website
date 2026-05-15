@@ -3669,6 +3669,7 @@
   "kassaReceipt": {
     "helpedBy": "U bent geholpen door medewerker {name}",
     "print": "Bon afdrukken",
+    "printSending": "Bon wordt afgedrukt…",
     "telPrefix": "Tel:",
     "tablePrefix": "TAFEL",
     "tableLabel": "Tafel {number}",

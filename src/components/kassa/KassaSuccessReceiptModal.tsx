@@ -4,6 +4,7 @@ import type { TenantSettings } from '@/lib/admin-api'
 import type { KassaLastOrderReceipt } from '@/lib/kassa-cart-types'
 import { useLanguage } from '@/i18n'
 import { appLocaleToBcp47 } from '@/lib/print-receipt-html'
+import { useEffect, useState } from 'react'
 
 export function KassaSuccessReceiptModal({
   open,
@@ -24,6 +25,14 @@ export function KassaSuccessReceiptModal({
   printDisabled?: boolean
 }) {
   const { t } = useLanguage()
+  /** Meteen spinner na tik (parent `printDisabled` komt pas na re-render). */
+  const [optimisticPrintBusy, setOptimisticPrintBusy] = useState(false)
+  const printBusy = printDisabled || optimisticPrintBusy
+
+  useEffect(() => {
+    if (!open) setOptimisticPrintBusy(false)
+  }, [open])
+
   if (!open) return null
 
   const legacyVatRate =
@@ -188,13 +197,52 @@ export function KassaSuccessReceiptModal({
         <div className="p-4 border-t flex gap-3">
           <button
             type="button"
-            disabled={printDisabled}
-            onClick={() => void onPrint()}
-            className="flex-1 py-3 rounded-xl bg-gray-100 font-semibold text-gray-700 flex items-center justify-center gap-2 touch-manipulation min-h-[44px] disabled:opacity-50 disabled:pointer-events-none"
+            disabled={printBusy}
+            aria-busy={printBusy}
+            onClick={() => {
+              if (printBusy) return
+              setOptimisticPrintBusy(true)
+              void onPrint().finally(() => setOptimisticPrintBusy(false))
+            }}
+            className={`flex-1 py-3 rounded-xl font-semibold flex items-center justify-center gap-2.5 touch-manipulation min-h-[44px] transition-[background-color,box-shadow,color] duration-200 disabled:pointer-events-none ${
+              printBusy
+                ? 'cursor-wait bg-emerald-50 text-emerald-900 shadow-[inset_0_0_0_2px_rgba(16,185,129,0.35)]'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300'
+            }`}
           >
-            🖨️ {t('kassaReceipt.print')}
+            {printBusy ? (
+              <>
+                <svg
+                  className="h-5 w-5 shrink-0 animate-spin text-emerald-700"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  aria-hidden
+                >
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path
+                    className="opacity-90"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
+                </svg>
+                <span className="tabular-nums">{t('kassaReceipt.printSending')}</span>
+              </>
+            ) : (
+              <>
+                <span aria-hidden className="select-none">
+                  🖨️
+                </span>
+                <span>{t('kassaReceipt.print')}</span>
+              </>
+            )}
           </button>
-          <button type="button" onClick={onClose} className="flex-1 py-3 rounded-xl bg-[#3C4D6B] text-white font-bold">
+          <button
+            type="button"
+            disabled={printBusy}
+            onClick={onClose}
+            className="flex-1 py-3 rounded-xl bg-[#3C4D6B] text-white font-bold disabled:opacity-45 disabled:pointer-events-none"
+          >
             {t('kassaApp.successClose')}
           </button>
         </div>

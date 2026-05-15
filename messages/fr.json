@@ -2711,6 +2711,7 @@
   "kassaReceipt": {
     "helpedBy": "Vous avez été servi par {name}",
     "print": "Imprimer le ticket",
+    "printSending": "Impression du ticket…",
     "telPrefix": "Tél :",
     "tablePrefix": "TABLE",
     "tableLabel": "Table {number}",

@@ -3211,6 +3211,7 @@
   "kassaReceipt": {
     "helpedBy": "Sei stato servito da {name}",
     "print": "Stampa scontrino",
+    "printSending": "Stampa in corso…",
     "telPrefix": "Tel:",
     "tablePrefix": "TAVOLO",
     "tableLabel": "Tavolo {number}",

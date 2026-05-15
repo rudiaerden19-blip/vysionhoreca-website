@@ -2711,6 +2711,7 @@
   "kassaReceipt": {
     "helpedBy": "Sie wurden von {name} bedient",
     "print": "Beleg drucken",
+    "printSending": "Beleg wird gedruckt…",
     "telPrefix": "Tel:",
     "tablePrefix": "TISCH",
     "tableLabel": "Tisch {number}",

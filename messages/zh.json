@@ -3211,6 +3211,7 @@
   "kassaReceipt": {
     "helpedBy": "为您服务：{name}",
     "print": "打印小票",
+    "printSending": "正在打印…",
     "telPrefix": "电话:",
     "tablePrefix": "桌",
     "tableLabel": "桌号 {number}",

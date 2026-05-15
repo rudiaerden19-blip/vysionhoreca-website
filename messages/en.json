@@ -3669,6 +3669,7 @@
   "kassaReceipt": {
     "helpedBy": "You were helped by {name}",
     "print": "Print receipt",
+    "printSending": "Printing receipt…",
     "telPrefix": "Tel:",
     "tablePrefix": "TABLE",
     "tableLabel": "Table {number}",
