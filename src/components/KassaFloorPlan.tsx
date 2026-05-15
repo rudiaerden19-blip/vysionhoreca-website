@@ -27,6 +27,10 @@ export type KassaTable = FloorPlanTable
 const FLOOR_MODAL_TOUCH =
   'min-h-[44px] touch-manipulation [-webkit-tap-highlight-color:transparent]'
 
+/** Witte invoer op plattegrond-modals — voorkomt kassa-dark input-styling op het hele veld. */
+const FLOOR_MODAL_INPUT_LIGHT =
+  'bg-white text-black placeholder:text-neutral-500 caret-gray-900 [color-scheme:light]'
+
 function focusFloorModalInput(e: ReactPointerEvent<HTMLInputElement>) {
   if (e.pointerType !== 'touch' && e.pointerType !== 'pen') return
   e.currentTarget.focus({ preventScroll: true })
@@ -1673,7 +1677,7 @@ export default function KassaFloorPlan({
                     onChange={e => setAddStool1(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && confirmAddBar()}
                     onPointerDown={focusFloorModalInput}
-                    className={`w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-amber-500 outline-none text-xl font-bold text-center ${FLOOR_MODAL_TOUCH}`}
+                    className={`w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-amber-500 outline-none text-xl font-bold text-center ${FLOOR_MODAL_INPUT_LIGHT} ${FLOOR_MODAL_TOUCH}`}
                     placeholder={t('kassaApp.floorPlanPlaceholderStoolExample')}
                   />
                 </div>
@@ -1690,7 +1694,7 @@ export default function KassaFloorPlan({
                     onChange={e => setAddStool2(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && confirmAddBar()}
                     onPointerDown={focusFloorModalInput}
-                    className={`w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-amber-500 outline-none text-xl font-bold text-center ${FLOOR_MODAL_TOUCH}`}
+                    className={`w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-amber-500 outline-none text-xl font-bold text-center ${FLOOR_MODAL_INPUT_LIGHT} ${FLOOR_MODAL_TOUCH}`}
                     placeholder={t('kassaApp.floorPlanPlaceholderStoolExample')}
                   />
                 </div>
@@ -1729,7 +1733,7 @@ export default function KassaFloorPlan({
                   onChange={e => setAddNumber(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && addTable()}
                   onPointerDown={focusFloorModalInput}
-                  className={`w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#075985] outline-none text-xl font-bold text-center ${FLOOR_MODAL_TOUCH}`}
+                  className={`w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#075985] outline-none text-xl font-bold text-center ${FLOOR_MODAL_INPUT_LIGHT} ${FLOOR_MODAL_TOUCH}`}
                   placeholder={t('kassaApp.floorPlanModalTableNumberPlaceholder')}
                 />
               </div>
