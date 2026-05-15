@@ -32,10 +32,11 @@ const EMPHASIZE_OFF   = Buffer.from([ESC, 0x47, 0x00])
 /** Meer ruimte tussen regels zodat tekst niet plakt. */
 const LINE_SPACING_W  = Buffer.from([ESC, 0x33, 0x3C])
 const LINE_SPACING_N  = Buffer.from([ESC, 0x33, 0x1E])
-/** Code page PC858 = Western European met €-teken op 0xD5. */
+/** Code page PC858 (West-Europees) — gebruikt voor hoofdletters/cijfers na NFD-strip. */
 const CODEPAGE_PC858  = Buffer.from([ESC, 0x74, 0x13])
-/** Euro-byte in PC858. */
-const EURO_BYTE       = 0xd5
+/** Valuta op de bon als ASCII "EUR " i.p.v. byte 0xD5: op GBK/Chinees‑firmware werd 0xD5
+ *  met het volgende byte als Han‑teken gelezen (bv. 詠 i.p.v. €). */
+const PREFIX_EUR_ASCII = Buffer.from('EUR ', 'latin1')
 /** Cash-drawer kick: ESC p 0 50 50 — pulse op pin 2 (~100ms).
  *  Dit is exact het commando dat de Epson APD driver-test gebruikt.
  *  Voor TM-T88V: als RAW write deze bytes filtert door APD, gebruiken we
@@ -45,8 +46,8 @@ const DRAWER_KICK     = Buffer.from([ESC, 0x70, 0x00, 0x32, 0x32])
 /**
  * Encodeer tekst naar bytes voor de printer:
  * - Strip diakritische tekens (é → e, à → a) zodat we binnen latin1 blijven
- * - Vervang € door byte 0xD5 (euro in PC858 codepage). De printer is geinit
- *   met CODEPAGE_PC858 dus deze byte rendert als echt €-teken.
+ * - Vervang € door ASCII "EUR " (geen 0xD5: Chinese printers lezen dat als GBK/Han).
+ * - Printer is gezet op CODEPAGE_PC858 voor overige Latin1 tekens na NFD-strip.
  * - Andere niet-latin1 chars worden ?
  * - Voeg \n toe (newline)
  */
@@ -60,11 +61,11 @@ function encInline(text) {
     .normalize('NFD')
     .replace(/\p{M}/gu, '')
 
-  // Build byte-by-byte, replace € with EURO_BYTE
+  // Build byte-by-byte; € → ASCII "EUR "
   const out = []
   for (const ch of s) {
     if (ch === '€') {
-      out.push(EURO_BYTE)
+      out.push(0x45, 0x55, 0x52, 0x20) // EUR + spatie
       continue
     }
     const code = ch.charCodeAt(0)
@@ -83,18 +84,16 @@ function padRow(left, right, width) {
 }
 
 /**
- * Print "label                      € 12.34" — echt euro-teken + spatie + bedrag.
- * Spatie tussen € en bedrag voor leesbaarheid.
+ * Print "label                    EUR 12.34" — ASCII valuta (ook op Chinese/GBK‑firmware).
  */
 function padPrice(label, amount, width) {
   const num = Number(amount).toFixed(2)
-  // "€ " (2 chars) + bedrag
-  const rightLen = 2 + num.length
+  const rightLen = PREFIX_EUR_ASCII.length + num.length
   const pad = Math.max(1, width - label.length - rightLen)
   return Buffer.concat([
     encInline(label),
     Buffer.from(' '.repeat(pad), 'latin1'),
-    Buffer.from([EURO_BYTE, 0x20]), // € + spatie
+    PREFIX_EUR_ASCII,
     encInline(num),
     Buffer.from([0x0a]),
   ])
@@ -229,7 +228,7 @@ function buildRichReceipt(body) {
       if (cp > 0) {
         c.push(Buffer.concat([
           encInline(`   + ${cn}  `),
-          Buffer.from([EURO_BYTE, 0x20]), // € + spatie
+          PREFIX_EUR_ASCII,
           enc(cp.toFixed(2)),
         ]))
       } else {
@@ -525,7 +524,7 @@ function buildEscPosPayload(body) {
       c.push(Buffer.from('\n', 'latin1'))
     }
 
-    // De regel zelf — zet "EUR 2.50" en "E2.50" / "E 2.50" om naar echte €
+    // De regel zelf — € / EUR / korte E worden ASCII "EUR " (Chinese printers veilig)
     c.push(encWithEuro(line))
 
     // Na ITEM-lijn (1x ..., 2x ...): lege regel zodat items niet plakken
@@ -551,63 +550,44 @@ function buildEscPosPayload(body) {
 }
 
 /**
- * Encode een tekstregel waarbij voorvallen van "EUR ", "EUR" of een losse "E"
- * vóór een geldbedrag (E12.34 / E 12.34) worden omgezet naar het echte
- * euro-byte (0xD5 in PC858). Hierdoor toont de printer het €-teken,
- * ook als de website in z'n platte tekst nog "EUR" of "E" gebruikt.
- *
- * Regels mét Han-tekens (Chinees o.a.): een losse "E" vóór een cijfer zónder
- * decimalen (bv. "E250" in een productnaam) werd ten onrechte als € geprint.
- * Daar geldt een strengere E→€ regel (alleen bedragen met .xx of ,xx).
- * Regels zónder Han: exact dezelfde heuristiek als voorheen — bestaande
- * EPSON + PC858-bonnen ongewijzigd.
+ * Encode plaatetekst‑regels: €, EUR en korte **E** vóór bedrag → ASCII **"EUR "**
+ * zodat Chinees/GBK‑firmware geen Han‑glyphe toont waar PC858 byte 0xD5 (=€) fout zou interpreteren.
+ * Han‑regels: strengere **E**→EUR (alleen met ,xx/.xx).
  */
 function encWithEuro(line) {
   const s = (line ?? '').toString()
-  /**
-   * Strategie: vervang elke euro-aanduiding (€, EUR, los E voor cijfer) door
-   * een tijdelijk markeerteken (0xFE) + spatie. Daarna byte-encode, en swap
-   * 0xFE → EURO_BYTE (0xD5). Zo komt er ALTIJD spatie tussen € en bedrag.
-   */
-  const MARKER = '\u00FE'
-  let replaced = s
-    .replace(/€\s*/g, MARKER + ' ')
-    .replace(/\bEUR\s*/gi, MARKER + ' ')
+  let replaced = s.replace(/€\s*/g, 'EUR ')
   if (/\p{Script=Han}/u.test(s)) {
-    replaced = replaced.replace(
-      /(^|[\s(])E(?=\s*-?\d+[.,]\d{2})/g,
-      '$1' + MARKER + ' ',
-    )
+    replaced = replaced.replace(/(^|[\s(])E(?=\s*-?\d+[.,]\d{2})/g, '$1EUR ')
   } else {
-    replaced = replaced.replace(/(^|[\s(])E(?=\s?-?\d)/g, '$1' + MARKER + ' ')
+    replaced = replaced.replace(/(^|[\s(])E(?=\s?-?\d)/g, '$1EUR ')
   }
+  replaced = replaced.replace(/(EUR\s*){2,}/gi, 'EUR ')
   replaced = replaced.replace(/  +/g, ' ')
-  const buf = encInline(replaced)
-  for (let i = 0; i < buf.length; i++) {
-    if (buf[i] === 0xfe) buf[i] = EURO_BYTE
-  }
-  return Buffer.concat([buf, Buffer.from([0x0a])])
+  return Buffer.concat([encInline(replaced), Buffer.from([0x0a])])
 }
 
 /**
- * Smoke/regressie voor Epson PC858 (0xD5 euro) + platte bon — geen printer nodig.
+ * Smoke/regressie: ASCII "EUR" op bon, géén PC858‑eurobyte 0xD5 in tekst‑payload (GBK/Chinees).
  * CI of release: `VYSION_PRINT_AGENT_ENC_TEST=1 node -e "require('./server.js')"` vanuit deze map.
  */
 ;(function encWithEuroRegressionSmoke() {
   if (process.env.VYSION_PRINT_AGENT_ENC_TEST !== '1') return
   const assert = require('assert')
-  const euro = EURO_BYTE
-  const lineHasEuroByte = (buf) => buf.includes(euro)
-  /** Zonder Han: zelfde gedrag als vroeger (losse E vóór cijfer → €-byte). */
-  assert(lineHasEuroByte(encWithEuro('Totaal E12,50')), 'Latijn: E12,50→€')
-  assert(lineHasEuroByte(encWithEuro('Code E250')), 'Latijn: E250 blijft E→€ (compat)')
-  assert(lineHasEuroByte(encWithEuro('1x Friet  EUR 2.50')), 'EUR→€')
-  assert(!lineHasEuroByte(encWithEuro('Alleen tekst zonder geld')), 'Geen valse €')
-  /** Met Han: geen E+digit zonder decimalen als € (productcodes). */
-  assert(!lineHasEuroByte(encWithEuro('红牛饮料 E250')), 'Han: E250 geen €')
-  assert(lineHasEuroByte(encWithEuro('红牛 EUR 3,50')), 'Han: EUR→€')
-  assert(lineHasEuroByte(encWithEuro('套餐 E 9,99')), 'Han: E met decimalen→€')
-  /** Rijke bon (orderData): EPSON PC858 + padPrice — ongewijzigd pad voor de meeste kassa's. */
+  const needle = Buffer.from('EUR', 'latin1')
+  const hasEurAscii = (buf) => Buffer.isBuffer(buf) && buf.includes(needle)
+  const noD5InUserText = (buf) => {
+    const i = Buffer.from(buf).indexOf(0xd5)
+    return i < 0
+  }
+  assert(hasEurAscii(encWithEuro('Totaal E12,50')), 'Latijn: E12,50→EUR')
+  assert(hasEurAscii(encWithEuro('Code E250')), 'Latijn: E250→EUR')
+  assert(hasEurAscii(encWithEuro('1x Friet  EUR 2.50')), 'EUR in regel')
+  assert(!hasEurAscii(encWithEuro('Alleen tekst zonder geld')), 'Geen valse EUR')
+  assert(!hasEurAscii(encWithEuro('红牛饮料 E250')), 'Han: E250 geen valuta')
+  assert(hasEurAscii(encWithEuro('红牛 EUR 3,50')), 'Han: EUR')
+  assert(hasEurAscii(encWithEuro('套餐 E 9,99')), 'Han: E met decimalen→EUR')
+  /** Rijke bon: prijsregels bevatten ASCII EUR */
   const rich = buildEscPosPayload({
     receiptMode: 'kassa',
     winkelnaam: 'Testzaak',
@@ -622,7 +602,8 @@ function encWithEuro(line) {
     },
     businessInfo: { name: 'Testzaak', vatRate: 21 },
   })
-  assert(Buffer.isBuffer(rich) && rich.includes(euro), 'Rich receipt: €-bytes aanwezig')
+  assert(hasEurAscii(rich), 'Rich receipt: EUR‑ASCII')
+  assert(noD5InUserText(rich), 'Rich receipt: géén 0xD5‑euroglyphe (Chinese firmware)')
   // eslint-disable-next-line no-console -- bewust bij selftest
   console.log('[print-agent] encWithEuro regression smoke: OK')
 })()
