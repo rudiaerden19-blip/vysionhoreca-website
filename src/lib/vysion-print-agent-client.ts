@@ -65,6 +65,24 @@ function isAndroidUserAgent(): boolean {
   return /Android/i.test(navigator.userAgent)
 }
 
+/** Zelfde query als Vysion Kiosk „Open kassa in Chrome” (`MainActivity.ANDROID_KIOSK_Q`). */
+function hasAndroidKioskSessionHint(): boolean {
+  if (typeof window === 'undefined') return false
+  try {
+    return new URLSearchParams(window.location.search).get('vysion_android_kiosk') === '1'
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Tablet-printstrategie (brug eerst, fetch-timeout race): echte Android UA óf kiosk-sessie.
+ * Bij „Desktop-site aan” vermeldt Chrome vaak géén Android meer → dan faalde de oude Windows-loop op localhost.
+ */
+export function isAndroidTabletPrintClient(): boolean {
+  return isAndroidUserAgent() || hasAndroidKioskSessionHint()
+}
+
 /** UTF-8 → Base64 zoals Android Base64.DEFAULT (standaard alphabet, geen regelbreuken). */
 function utf8ToBase64Json(utf8Json: string): string {
   if (typeof btoa === 'undefined') return ''
@@ -97,7 +115,9 @@ function openAndroidKioskUrl(url: string): boolean {
  */
 function tryVysionKioskPrintBridge(body: VysionPrintAgentBody): { ok: boolean; reason?: string } {
   if (typeof document === 'undefined') return { ok: false, reason: 'Geen document (SSR).' }
-  if (!isAndroidUserAgent()) return { ok: false, reason: 'Geen Android — overslaan van vysionkiosk://.' }
+  if (!isAndroidTabletPrintClient()) {
+    return { ok: false, reason: 'Geen tablet/kiosk-sessie — overslaan van vysionkiosk://.' }
+  }
   const payload = buildAgentRequestPayload(body)
   let json: string
   try {
@@ -124,7 +144,7 @@ function tryVysionKioskPrintBridge(body: VysionPrintAgentBody): { ok: boolean; r
 }
 
 function tryVysionKioskDrawerBridge(): boolean {
-  if (typeof document === 'undefined' || !isAndroidUserAgent()) return false
+  if (typeof document === 'undefined' || !isAndroidTabletPrintClient()) return false
   return openAndroidKioskUrl('vysionkiosk://drawer')
 }
 
@@ -192,14 +212,14 @@ async function sendToVysionPrintAgentCore(
   origin: string,
 ): Promise<VysionPrintAgentResult> {
   const base = origin.replace(/\/$/, '')
-  const android = isAndroidUserAgent()
+  const tablet = isAndroidTabletPrintClient()
 
   /**
    * Android / Chrome: fetch naar 127.0.0.1 kan lang vasthangen → gebruikers zien alleen de grijs/blauwe balk.
    * Tablet-route eerst: dezelfde JSON als POST /print via vysionkiosk:// (Vysion Kiosk-app).
    * Windows blijft uitsluitend localhost naar de Print Agent — géén brug eerst.
    */
-  if (android) {
+  if (tablet) {
     const bridge = tryVysionKioskPrintBridge(body)
     if (bridge.ok) return { ok: true }
     const r = await postPrintOnce(body, base)
@@ -242,8 +262,8 @@ export async function sendToVysionPrintAgent(
   origin = DEFAULT_AGENT_ORIGIN,
 ): Promise<VysionPrintAgentResult> {
   const core = sendToVysionPrintAgentCore(body, origin)
-  /** Alleen tablet: fetch naar localhost kan vastzitten zonder nette Abort — PC mag lang retry'en (Windows-agent). */
-  if (!isAndroidUserAgent()) return core
+  /** Alleen tablet/kiosk-sessie: fetch naar localhost kan vastzitten zonder nette Abort — PC mag lang retry'en (Windows-agent). */
+  if (!isAndroidTabletPrintClient()) return core
   const wallClock = sleep(12_000).then(
     (): VysionPrintAgentResult => ({
       ok: false,

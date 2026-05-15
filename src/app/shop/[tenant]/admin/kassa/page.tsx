@@ -50,7 +50,7 @@ import {
   printReceiptHtmlDocument,
   printStaffSalesSummaryReceipt,
 } from '@/lib/print-receipt-html'
-import { sendToVysionPrintAgent, openCashDrawer } from '@/lib/vysion-print-agent-client'
+import { sendToVysionPrintAgent, openCashDrawer, isAndroidTabletPrintClient } from '@/lib/vysion-print-agent-client'
 import {
   offlineDbLoadMenuSnapshot,
   offlineDbSaveMenuSnapshot,
@@ -2749,42 +2749,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     bonLines.push(isDraft ? t('kassaReceipt.draftFooter') : t('kassaReceipt.thanks'))
     if (tenantInfo?.website) bonLines.push(tenantInfo.website)
 
-    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${escapeReceiptHtml(docTitle)}</title><style>${KASSA_PRINT_RECEIPT_STYLES}</style></head><body>
-      <div class="center">
-        <div class="bold big">${bizName}</div>
-        ${tenantInfo?.address ? `<div class="small">${escapeReceiptHtml(tenantInfo.address)}</div>` : ''}
-        ${tenantInfo?.postal_code || tenantInfo?.city ? `<div class="small">${escapeReceiptHtml(tenantInfo.postal_code ?? '')} ${escapeReceiptHtml(tenantInfo.city ?? '')}</div>` : ''}
-        ${tenantInfo?.phone ? `<div class="small">${escapeReceiptHtml(t('kassaReceipt.telPrefix'))} ${escapeReceiptHtml(tenantInfo.phone)}</div>` : ''}
-      </div>
-      <div class="divider"></div>
-      ${isDraft ? `<div class="center bold">${escapeReceiptHtml(t('kassaReceipt.draftBanner'))}</div><div class="divider-solid"></div>` : ''}
-      <div class="center order-type">${escapeReceiptHtml(orderTypeLabel)}${order.tableNumber ? `<br/>${escapeReceiptHtml(t('kassaReceipt.tablePrefix'))} ${escapeReceiptHtml(String(order.tableNumber))}${escapeReceiptHtml(terraceSuffix)}` : ''}</div>
-      <div class="row small">
-        <span>${escapeReceiptHtml(t('kassaReceipt.receiptNo'))}${escapeReceiptHtml(receiptRefDisplay)}</span>
-        <span>${escapeReceiptHtml(dateStr)}</span>
-      </div>
-      <div class="divider-solid"></div>
-      ${order.items.map(i => {
-        const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
-        const lineTotal = (i.product.price + choicesTotal) * i.quantity
-        return `<div class="row"><span>${i.quantity}x ${escapeReceiptHtml(i.product.name)}</span><span>€${lineTotal.toFixed(2)}</span></div>
-        ${(i.choices || []).map(c => `<div class="row small" style="margin-left:15px;color:#666;"><span>+ ${escapeReceiptHtml(c.choiceName)}</span><span>${c.price > 0 ? '€' + c.price.toFixed(2) : ''}</span></div>`).join('')}`
-      }).join('')}
-      <div class="divider-solid"></div>
-      <div class="row"><span>${escapeReceiptHtml(t('kassaReceipt.subtotal'))}</span><span>€${subtotal.toFixed(2)}</span></div>
-      <div class="row"><span>${vatRowLabel}</span><span>€${tax.toFixed(2)}</span></div>
-      <div class="row total"><span>${escapeReceiptHtml(t('kassaReceipt.total'))}</span><span>€${order.total.toFixed(2)}</span></div>
-      <div class="divider"></div>
-      <div class="center small">${escapeReceiptHtml(t('kassaReceipt.paidWith'))} ${escapeReceiptHtml(payLabel)}</div>
-      ${order.helpedByStaffName ? `<div class="divider"></div><div class="center bold">${t('kassaReceipt.helpedBy').replace('{name}', escapeReceiptHtml(order.helpedByStaffName))}</div>` : ''}
-      <div class="divider"></div>
-      <div class="center small">
-        ${tenantInfo?.btw_number ? `${escapeReceiptHtml(t('kassaReceipt.businessVatLabel').replace('{vatNumber}', tenantInfo.btw_number))}<br/>` : ''}
-        ${escapeReceiptHtml(isDraft ? t('kassaReceipt.draftFooter') : t('kassaReceipt.thanks'))}
-        ${tenantInfo?.website ? `<br/>${escapeReceiptHtml(tenantInfo.website)}` : ''}
-      </div>
-    </body></html>`
-
     /** Kassa-lade alleen openen bij contante betaling — PIN/online hebben dat niet nodig. Voorlopige bon: nooit. */
     const isCash =
       !isDraft && ['CASH', 'cash', 'CONTANT', 'contant'].includes(String(order.paymentMethod || ''))
@@ -2821,9 +2785,49 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         vatRate: tenantInfo?.btw_percentage ?? 6,
       },
     })
+
+    let fallbackHtml = ''
+    if (!printResult.ok) {
+      fallbackHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${escapeReceiptHtml(docTitle)}</title><style>${KASSA_PRINT_RECEIPT_STYLES}</style></head><body>
+      <div class="center">
+        <div class="bold big">${bizName}</div>
+        ${tenantInfo?.address ? `<div class="small">${escapeReceiptHtml(tenantInfo.address)}</div>` : ''}
+        ${tenantInfo?.postal_code || tenantInfo?.city ? `<div class="small">${escapeReceiptHtml(tenantInfo.postal_code ?? '')} ${escapeReceiptHtml(tenantInfo.city ?? '')}</div>` : ''}
+        ${tenantInfo?.phone ? `<div class="small">${escapeReceiptHtml(t('kassaReceipt.telPrefix'))} ${escapeReceiptHtml(tenantInfo.phone)}</div>` : ''}
+      </div>
+      <div class="divider"></div>
+      ${isDraft ? `<div class="center bold">${escapeReceiptHtml(t('kassaReceipt.draftBanner'))}</div><div class="divider-solid"></div>` : ''}
+      <div class="center order-type">${escapeReceiptHtml(orderTypeLabel)}${order.tableNumber ? `<br/>${escapeReceiptHtml(t('kassaReceipt.tablePrefix'))} ${escapeReceiptHtml(String(order.tableNumber))}${escapeReceiptHtml(terraceSuffix)}` : ''}</div>
+      <div class="row small">
+        <span>${escapeReceiptHtml(t('kassaReceipt.receiptNo'))}${escapeReceiptHtml(receiptRefDisplay)}</span>
+        <span>${escapeReceiptHtml(dateStr)}</span>
+      </div>
+      <div class="divider-solid"></div>
+      ${order.items.map(i => {
+        const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
+        const lineTotal = (i.product.price + choicesTotal) * i.quantity
+        return `<div class="row"><span>${i.quantity}x ${escapeReceiptHtml(i.product.name)}</span><span>€${lineTotal.toFixed(2)}</span></div>
+        ${(i.choices || []).map(c => `<div class="row small" style="margin-left:15px;color:#666;"><span>+ ${escapeReceiptHtml(c.choiceName)}</span><span>${c.price > 0 ? '€' + c.price.toFixed(2) : ''}</span></div>`).join('')}`
+      }).join('')}
+      <div class="divider-solid"></div>
+      <div class="row"><span>${escapeReceiptHtml(t('kassaReceipt.subtotal'))}</span><span>€${subtotal.toFixed(2)}</span></div>
+      <div class="row"><span>${vatRowLabel}</span><span>€${tax.toFixed(2)}</span></div>
+      <div class="row total"><span>${escapeReceiptHtml(t('kassaReceipt.total'))}</span><span>€${order.total.toFixed(2)}</span></div>
+      <div class="divider"></div>
+      <div class="center small">${escapeReceiptHtml(t('kassaReceipt.paidWith'))} ${escapeReceiptHtml(payLabel)}</div>
+      ${order.helpedByStaffName ? `<div class="divider"></div><div class="center bold">${t('kassaReceipt.helpedBy').replace('{name}', escapeReceiptHtml(order.helpedByStaffName))}</div>` : ''}
+      <div class="divider"></div>
+      <div class="center small">
+        ${tenantInfo?.btw_number ? `${escapeReceiptHtml(t('kassaReceipt.businessVatLabel').replace('{vatNumber}', tenantInfo.btw_number))}<br/>` : ''}
+        ${escapeReceiptHtml(isDraft ? t('kassaReceipt.draftFooter') : t('kassaReceipt.thanks'))}
+        ${tenantInfo?.website ? `<br/>${escapeReceiptHtml(tenantInfo.website)}` : ''}
+      </div>
+    </body></html>`
+    }
+
     flushSync(() => {
       if (printResult.ok) {
-        if (typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent)) {
+        if (isAndroidTabletPrintClient()) {
           setThermalPrintBanner({
             variant: 'success',
             message:
@@ -2837,7 +2841,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           variant: 'error',
           message: `${t('kassaApp.printAgentFailedDebugTitle')}\n\n${printResult.error}\n\n${t('kassaApp.printAgentFailedDebugFooter')}`,
         })
-        setPrintAgentFallbackHtml(html)
+        setPrintAgentFallbackHtml(fallbackHtml)
       }
     })
     if (printResult.ok) return
