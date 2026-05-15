@@ -2821,24 +2821,26 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         vatRate: tenantInfo?.btw_percentage ?? 6,
       },
     })
-    if (printResult.ok) {
-      if (typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent)) {
-        setThermalPrintBanner({
-          variant: 'success',
-          message:
-            'Print-opdracht verstuurd. Geen papier? Controleer USB-printer en Vysion Kiosk-app. Verschijnt een tweede venster? Gebruik „Doorgaan” voor bon in de browser.',
-        })
+    flushSync(() => {
+      if (printResult.ok) {
+        if (typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent)) {
+          setThermalPrintBanner({
+            variant: 'success',
+            message:
+              'Print-opdracht verstuurd naar de Vysion-app (zie/toast op tablet). Geen papier? USB-printer. Anders „Doorgaan” hieronder voor bon in browser.',
+          })
+        } else {
+          setThermalPrintBanner(null)
+        }
       } else {
-        setThermalPrintBanner(null)
+        setThermalPrintBanner({
+          variant: 'error',
+          message: `${t('kassaApp.printAgentFailedDebugTitle')}\n\n${printResult.error}\n\n${t('kassaApp.printAgentFailedDebugFooter')}`,
+        })
+        setPrintAgentFallbackHtml(html)
       }
-      return
-    }
-
-    setThermalPrintBanner({
-      variant: 'error',
-      message: `${t('kassaApp.printAgentFailedDebugTitle')}\n\n${printResult.error}\n\n${t('kassaApp.printAgentFailedDebugFooter')}`,
     })
-    setPrintAgentFallbackHtml(html)
+    if (printResult.ok) return
     } catch (printErr: unknown) {
       const msg = printErr instanceof Error ? printErr.message : String(printErr)
       setThermalPrintBanner({

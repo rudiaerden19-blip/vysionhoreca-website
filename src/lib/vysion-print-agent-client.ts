@@ -192,43 +192,48 @@ async function sendToVysionPrintAgentCore(
   origin: string,
 ): Promise<VysionPrintAgentResult> {
   const base = origin.replace(/\/$/, '')
-  /**
-   * Android: localhost faalt snel; weinig retries zodat de vysionkiosk-bridge niet pas na tientallen
-   * seconden komt (user denkt dan dat print “dood” is). Windows: meer retries tegen trage agent-start.
-   */
   const android = isAndroidUserAgent()
-  const attempts = android ? 1 : 5
-  const gapMs = android ? 0 : 400
+
+  /**
+   * Android / Chrome: fetch naar 127.0.0.1 kan lang vasthangen → gebruikers zien alleen de grijs/blauwe balk.
+   * Tablet-route eerst: dezelfde JSON als POST /print via vysionkiosk:// (Vysion Kiosk-app).
+   * Windows blijft uitsluitend localhost naar de Print Agent — géén brug eerst.
+   */
+  if (android) {
+    const bridge = tryVysionKioskPrintBridge(body)
+    if (bridge.ok) return { ok: true }
+    const r = await postPrintOnce(body, base)
+    if (r.ok) return { ok: true }
+    return {
+      ok: false,
+      error: [
+        `Bonafdruk op deze tablet mislukt.`,
+        ``,
+        `App-brug vysionkiosk://: ${bridge.reason ?? '—'}`,
+        ``,
+        `Print-service op dit apparaat (127.0.0.1): ${r.detail}`,
+        ``,
+        `Tip: open de kassa via „Open kassa in Chrome” in de Vysion Kiosk-app en controleer de USB-printer.`,
+      ].join('\n'),
+    }
+  }
+
   let lastDetail = 'Geen poging uitgevoerd.'
-  for (let i = 0; i < attempts; i++) {
+  for (let i = 0; i < 5; i++) {
     const r = await postPrintOnce(body, base)
     if (r.ok) return { ok: true }
     lastDetail = r.detail
-    if (i < attempts - 1) await sleep(gapMs)
+    if (i < 4) await sleep(400)
   }
-
-  /** Fetch gefaald: op Android app-bridge (zelfde JSON als Windows POST). */
-  const bridge = tryVysionKioskPrintBridge(body)
-  if (bridge.ok) return { ok: true }
 
   const parts = [
     `Lokaal printen naar 127.0.0.1:9742 is mislukt.`,
     ``,
     `Laatste fout:`,
     lastDetail,
+    ``,
+    `Op deze PC: controleer Print Agent bij de klok (groene status) en testprint.`,
   ]
-  if (android) {
-    parts.push(
-      ``,
-      `Android-bridge (vysionkiosk://): ${bridge.reason ?? 'niet geprobeerd of geweigerd door browser.'}`,
-      `Installeer/start Vysion Kiosk en probeer opnieuw.`,
-    )
-  } else {
-    parts.push(
-      ``,
-      `Op deze PC: controleer Print Agent bij de klok (groene status) en testprint.`,
-    )
-  }
   return { ok: false, error: parts.join('\n') }
 }
 
