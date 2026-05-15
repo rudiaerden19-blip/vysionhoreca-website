@@ -113,8 +113,14 @@ function tryVysionKioskPrintBridge(body: VysionPrintAgentBody): { ok: boolean; r
     return { ok: false, reason: `URL te lang (${enc.length} tekens); bon moet korter of agent via USB PC.` }
   }
   const url = `vysionkiosk://print?d=${enc}`
-  if (!openAndroidKioskUrl(url)) return { ok: false, reason: 'location.assign geweigerd of gefaald.' }
-  return { ok: true }
+  /** Meteen assign kan de pagina losscheuren vóór React de succes-banner pint — korte defer helpt. */
+  if (typeof window !== 'undefined') {
+    window.setTimeout(() => {
+      openAndroidKioskUrl(url)
+    }, 450)
+    return { ok: true }
+  }
+  return { ok: false, reason: 'Geen window.' }
 }
 
 function tryVysionKioskDrawerBridge(): boolean {
@@ -181,9 +187,9 @@ async function postPrintOnce(
 /** Resultaat voor UI (alert) bij mislukte bon. */
 export type VysionPrintAgentResult = { ok: true } | { ok: false; error: string }
 
-export async function sendToVysionPrintAgent(
+async function sendToVysionPrintAgentCore(
   body: VysionPrintAgentBody,
-  origin = DEFAULT_AGENT_ORIGIN
+  origin: string,
 ): Promise<VysionPrintAgentResult> {
   const base = origin.replace(/\/$/, '')
   /**
@@ -224,6 +230,25 @@ export async function sendToVysionPrintAgent(
     )
   }
   return { ok: false, error: parts.join('\n') }
+}
+
+export async function sendToVysionPrintAgent(
+  body: VysionPrintAgentBody,
+  origin = DEFAULT_AGENT_ORIGIN,
+): Promise<VysionPrintAgentResult> {
+  const core = sendToVysionPrintAgentCore(body, origin)
+  /** Alleen tablet: fetch naar localhost kan vastzitten zonder nette Abort — PC mag lang retry'en (Windows-agent). */
+  if (!isAndroidUserAgent()) return core
+  const wallClock = sleep(12_000).then(
+    (): VysionPrintAgentResult => ({
+      ok: false,
+      error:
+        'Print reageerde niet binnen 12 seconden op dit tablet.\n\n' +
+        'Controleer of „Vysion printdienst“ draait (notificatie), USB-printer, en probeer opnieuw. ' +
+        'Blijft dit zo: herstart de Vysion Kiosk-app.',
+    }),
+  )
+  return await Promise.race([core, wallClock])
 }
 
 /**
