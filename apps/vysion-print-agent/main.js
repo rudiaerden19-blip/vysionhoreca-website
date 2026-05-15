@@ -24,6 +24,7 @@ const {
   startServer,
   listWindowsPrintersSync,
   buildEscPosPayload,
+  encInline,
   printRawWindows,
   openCashDrawerWindows,
   sleepSyncMs,
@@ -355,8 +356,9 @@ function buildTestReceiptPayload() {
   c.push(Buffer.from('VYSION TEST\n', 'latin1'))
   c.push(Buffer.from([GS, 0x21, 0x00]))
   c.push(Buffer.from('\n', 'latin1'))
-  c.push(Buffer.from(`v${app.getVersion()}\n`, 'latin1'))
-  c.push(Buffer.from(`${new Date().toLocaleString('nl-BE')}\n`, 'latin1'))
+  // Geen raw toLocaleString → latin1: NBSP/thin-space (≥128) desynchroniseert Chinese/GBK-firmware.
+  c.push(Buffer.concat([encInline(`v${app.getVersion()}`), Buffer.from([0x0a])]))
+  c.push(Buffer.concat([encInline(new Date().toLocaleString('nl-BE')), Buffer.from([0x0a])]))
   c.push(Buffer.from('\n----------------------------------------\n', 'latin1'))
   c.push(Buffer.from('Bonprinter werkt!\n', 'latin1'))
   c.push(Buffer.from('\n\n\n\n', 'latin1'))

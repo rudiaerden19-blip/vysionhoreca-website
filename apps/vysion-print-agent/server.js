@@ -24,8 +24,23 @@ const DOUBLE_SIZE     = Buffer.from([GS,  0x21, 0x11])
 const NORMAL_SIZE     = Buffer.from([GS,  0x21, 0x00])
 const CUT_PARTIAL     = Buffer.from([GS,  0x56, 0x01])
 const FEED_LINES      = (n) => Buffer.from([ESC, 0x64, Math.min(n, 255)])
-/** ESC J n: feed n * 0.125mm — exact controle over witruimte. n = 80 → 10mm = 1cm. */
-const FEED_DOTS       = (n) => Buffer.from([ESC, 0x4a, Math.min(Math.max(n, 0), 255)])
+
+/**
+ * ESC J n — feed n dots (0.125 mm per dot op typische 203 dpi).
+ * Op sommige Chinese clone-firmware wordt **n ≥ 0x80** soms als eerste byte van
+ * DBCS/Han geïnterpreteerd als het commando wordt gemist → rest van de bon
+ * verschuift verkeerd naast bedragen. Daarom altijd opsplitsen tot n ≤ 127.
+ */
+function feedDots(n) {
+  let left = Math.min(Math.max(Math.floor(Number(n) || 0), 0), 255 * 64)
+  const parts = []
+  while (left > 0) {
+    const step = Math.min(left, 127)
+    parts.push(Buffer.from([ESC, 0x4a, step]))
+    left -= step
+  }
+  return Buffer.concat(parts)
+}
 /** Donkerder printen (double-strike) — bon is dan goed leesbaar. */
 const EMPHASIZE_ON    = Buffer.from([ESC, 0x47, 0x01])
 const EMPHASIZE_OFF   = Buffer.from([ESC, 0x47, 0x00])
@@ -323,8 +338,8 @@ function buildRichReceipt(body) {
    * Om écht 1 cm zichtbare witruimte ONDER 'Bedankt' te krijgen, moeten we
    * minimaal ~25 mm extra feeden (= 200 dots @ 8 dots/mm).
    */
-  c.push(FEED_DOTS(160)) // 20 mm
-  c.push(FEED_DOTS(80))  // + 10 mm = 30 mm totaal
+  c.push(feedDots(160)) // 20 mm
+  c.push(feedDots(80))  // + 10 mm = 30 mm totaal
   c.push(CUT_PARTIAL)
 
   return Buffer.concat(c)
@@ -463,8 +478,8 @@ function buildKitchenReceipt(body) {
   c.push(BOLD_OFF)
   c.push(EMPHASIZE_OFF)
   c.push(LINE_SPACING_N)
-  c.push(FEED_DOTS(160))
-  c.push(FEED_DOTS(80))
+  c.push(feedDots(160))
+  c.push(feedDots(80))
   c.push(CUT_PARTIAL)
 
   return Buffer.concat(c)
@@ -569,8 +584,8 @@ function buildEscPosPayload(body) {
    * Cutter-offset compensatie: 30 mm totaal feed → ~15 mm zichtbare ruimte
    * ONDER 'Bedankt' op een typische Epson TM.
    */
-  c.push(FEED_DOTS(160)) // 20 mm
-  c.push(FEED_DOTS(80))  // + 10 mm
+  c.push(feedDots(160)) // 20 mm
+  c.push(feedDots(80))  // + 10 mm
   c.push(CUT_PARTIAL)
   return Buffer.concat(c)
 }
@@ -630,6 +645,13 @@ function encWithEuro(line) {
   })
   assert(hasEurAscii(rich), 'Rich receipt: EUR‑ASCII')
   assert(noD5InUserText(rich), 'Rich receipt: géén 0xD5‑euroglyphe (Chinese firmware)')
+  const noEscJHighN = (buf) => {
+    for (let i = 0; i + 2 < buf.length; i++) {
+      if (buf[i] === 0x1b && buf[i + 1] === 0x4a && buf[i + 2] >= 0x80) return false
+    }
+    return true
+  }
+  assert(noEscJHighN(rich), 'Rich receipt: ESC J n altijd < 128 (GBK‑sync)')
   // eslint-disable-next-line no-console -- bewust bij selftest
   console.log('[print-agent] encWithEuro regression smoke: OK')
 })()
@@ -902,6 +924,7 @@ module.exports = {
   createApp,
   startServer,
   buildEscPosPayload,
+  encInline,
   printRawWindows,
   openCashDrawerWindows,
   listWindowsPrintersSync,
