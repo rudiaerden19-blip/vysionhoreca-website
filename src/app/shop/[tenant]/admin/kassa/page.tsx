@@ -1563,8 +1563,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [thermalPrintBanner, setThermalPrintBanner] = useState<{
     variant: 'info' | 'success' | 'error'
     message: string
-    /** Alleen bij succes op tablet: HTML voor optionele browser-print. */
-    browserReceiptHtml?: string
   } | null>(null)
   const [splitCash, setSplitCash] = useState(0)
   const [splitCard, setSplitCard] = useState(0)
@@ -2789,9 +2787,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       },
     })
 
-    const receiptHtml =
-      !printResult.ok || (printResult.ok && isAndroidTabletPrintClient())
-        ? `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${escapeReceiptHtml(docTitle)}</title><style>${KASSA_PRINT_RECEIPT_STYLES}</style></head><body>
+    /** Alleen bij Print-Agent-fout op PC: HTML voor noodafdruk. Tablet/kiosk: géén browser-print (Chrome → alleen PDF, kiosk valt om). */
+    const receiptHtml = !printResult.ok
+      ? `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${escapeReceiptHtml(docTitle)}</title><style>${KASSA_PRINT_RECEIPT_STYLES}</style></head><body>
       <div class="center">
         <div class="bold big">${bizName}</div>
         ${tenantInfo?.address ? `<div class="small">${escapeReceiptHtml(tenantInfo.address)}</div>` : ''}
@@ -2834,8 +2832,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           setThermalPrintBanner({
             variant: 'success',
             message:
-              'Bon is naar de Vysion Kiosk-app gestuurd (USB-printer).\n\nNormaal komt er nu papier uit de bonprinter. Zo niet: USB-kabel, stroom op de printer, en testprint vanuit de app.\n\nAlleen een bon op dit scherm? Tik op „Bon in browser openen”.',
-            browserReceiptHtml: receiptHtml,
+              'Print-opdracht naar de Vysion-app (USB-bonprinter).\n\nGeen papier? Los dat op in de app (testprint, USB, papierrol) — niet via browser/PDF; dat werkt hier niet voor de bonprinter.',
           })
         } else {
           setThermalPrintBanner(null)
@@ -2845,7 +2842,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           variant: 'error',
           message: `${t('kassaApp.printAgentFailedDebugTitle')}\n\n${printResult.error}\n\n${t('kassaApp.printAgentFailedDebugFooter')}`,
         })
-        setPrintAgentFallbackHtml(receiptHtml)
+        setPrintAgentFallbackHtml(isAndroidTabletPrintClient() ? '' : receiptHtml)
       }
     })
     if (printResult.ok) return
@@ -4317,29 +4314,35 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         >
           <div className={ui.printFallbackPanel}>
             <h2 id="print-agent-fallback-title" className={ui.printFallbackTitle}>
-              {t('kassaApp.printAgentFallbackModalTitle')}
+              {isAndroidTabletPrintClient()
+                ? 'Bonprinter (tablet)'
+                : t('kassaApp.printAgentFallbackModalTitle')}
             </h2>
             <p className={ui.printFallbackBody}>
-              {t('kassaApp.printAgentFallbackModalBody')}
+              {isAndroidTabletPrintClient()
+                ? 'Print naar de USB-bonprinter is mislukt. Browser-print op Android opent alleen PDF en sluit de kiosk-flow af — gebruik daarom de Vysion Kiosk-app (testprint, USB-rechten, papier).'
+                : t('kassaApp.printAgentFallbackModalBody')}
             </p>
-            <a
-              href="https://www.vysionhoreca.com/download/print-agent-windows"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-4 flex w-full items-center justify-center rounded-xl bg-[#3C4D6B] px-4 py-3 text-center text-sm font-bold text-white hover:bg-[#2D3A52]"
-            >
-              {t('kassaApp.printAgentFallbackModalDownloadLink')}
-            </a>
+            {!isAndroidTabletPrintClient() ? (
+              <a
+                href="https://www.vysionhoreca.com/download/print-agent-windows"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 flex w-full items-center justify-center rounded-xl bg-[#3C4D6B] px-4 py-3 text-center text-sm font-bold text-white hover:bg-[#2D3A52]"
+              >
+                {t('kassaApp.printAgentFallbackModalDownloadLink')}
+              </a>
+            ) : null}
             <button
               type="button"
               className={ui.printFallbackGhost}
               onClick={() => {
                 const h = printAgentFallbackHtml
                 setPrintAgentFallbackHtml(null)
-                if (h) printReceiptHtmlDocument(h)
+                if (h && h.length > 0 && !isAndroidTabletPrintClient()) printReceiptHtmlDocument(h)
               }}
             >
-              {t('kassaApp.printAgentFallbackModalContinue')}
+              {isAndroidTabletPrintClient() ? 'Sluiten' : t('kassaApp.printAgentFallbackModalContinue')}
             </button>
           </div>
         </div>
@@ -4363,19 +4366,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               {thermalPrintBanner.message}
             </p>
             <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:items-start">
-              {thermalPrintBanner.variant === 'success' && thermalPrintBanner.browserReceiptHtml ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    const h = thermalPrintBanner.browserReceiptHtml
-                    setThermalPrintBanner(null)
-                    if (h) printReceiptHtmlDocument(h)
-                  }}
-                  className="touch-manipulation rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-500"
-                >
-                  Bon in browser openen
-                </button>
-              ) : null}
               <button
                 type="button"
                 onClick={() => setThermalPrintBanner(null)}

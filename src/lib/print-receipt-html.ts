@@ -1,3 +1,5 @@
+import { isAndroidTabletPrintClient } from '@/lib/vysion-print-agent-client'
+
 /** Escape text for HTML receipts (names, addresses, notes). */
 export function escapeReceiptHtml(s: string): string {
   return s
@@ -130,6 +132,9 @@ export function buildStaffSalesSummaryReceiptHtml(opts: {
 
 /** Print HTML via hidden iframe (same-origin); falls back to blob/blank window. */
 export function printReceiptHtmlDocument(html: string): void {
+  /** Chrome Android: systeemdialoog wordt vrijwel altijd PDF — kiosk valt om; tablet gebruikt USB-brug. */
+  if (typeof window !== 'undefined' && isAndroidTabletPrintClient()) return
+
   let printStarted = false
   const cleanupIframe = (el: HTMLIFrameElement) => {
     try {
