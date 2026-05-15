@@ -463,11 +463,14 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 }}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               >
-                <option value={6}>6% - Voeding (horeca, afhaal)</option>
-                <option value={12}>12% - Restaurant (ter plaatse)</option>
-                <option value={21}>21% - Standaard tarief</option>
+                <option value={6}>6% — België: laag tarief (o.a. voeding, afhaal)</option>
+                <option value={9}>9% — Nederland: laag tarief</option>
+                <option value={12}>12% — België: restaurant (ter plaatse)</option>
+                <option value={21}>21% — Hoog tarief</option>
               </select>
-              <p className="text-xs text-gray-400 mt-1">6% voor afhaalmaaltijden, 12% voor ter plaatse consumptie</p>
+              <p className="text-xs text-gray-400 mt-1">
+                België: o.a. 6% / 12% / 21%. Nederland: o.a. 9% (laag) en 21% (hoog). Kies het tarief van jouw zaak.
+              </p>
             </div>
 
           </div>

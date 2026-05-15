@@ -159,7 +159,7 @@ export async function GET(request: NextRequest) {
           order_count: orders.length,
           subtotal,
           tax_low: btwPercentage === 6 ? tax : 0,
-          tax_mid: btwPercentage === 12 ? tax : 0,
+          tax_mid: btwPercentage === 9 || btwPercentage === 12 ? tax : 0,
           tax_high: btwPercentage === 21 ? tax : 0,
           total,
           cash_payments: cashPayments,

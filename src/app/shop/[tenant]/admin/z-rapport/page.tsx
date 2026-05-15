@@ -170,7 +170,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         orderCount: orders.length,
         subtotal,
         taxLow: btwPercentage === 6 ? tax : 0,
-        taxMid: btwPercentage === 12 ? tax : 0,
+        taxMid: btwPercentage === 9 || btwPercentage === 12 ? tax : 0,
         taxHigh: btwPercentage === 21 ? tax : 0,
         total,
         cashPayments,
@@ -799,7 +799,9 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                 )}
                 {stats.taxMid > 0 && (
                   <div className="flex justify-between items-center py-2">
-                    <span className="text-gray-600">{t('zReport.vat')} 12%</span>
+                    <span className="text-gray-600">
+                      {t('zReport.vat')} {btwPercentage}%
+                    </span>
                     <span className="font-medium">{formatCurrency(stats.taxMid)}</span>
                   </div>
                 )}

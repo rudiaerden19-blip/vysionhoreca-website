@@ -203,8 +203,8 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
         <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
           <span>📊</span> {t('adminPages.betaling.vat')}
         </h2>
-        <div className="grid grid-cols-3 gap-4">
-          {[6, 12, 21].map((rate) => (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {[6, 9, 12, 21].map((rate) => (
             <button
               key={rate}
               onClick={() => setVatRate(rate)}

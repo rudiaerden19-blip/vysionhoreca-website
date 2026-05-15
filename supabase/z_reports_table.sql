@@ -9,8 +9,8 @@ CREATE TABLE IF NOT EXISTS z_reports (
   -- Totalen
   order_count INTEGER NOT NULL DEFAULT 0,
   subtotal DECIMAL(10,2) NOT NULL DEFAULT 0,
-  tax_low DECIMAL(10,2) NOT NULL DEFAULT 0,      -- BTW 6%
-  tax_mid DECIMAL(10,2) NOT NULL DEFAULT 0,      -- BTW 12%
+  tax_low DECIMAL(10,2) NOT NULL DEFAULT 0,      -- BTW 6% (BE)
+  tax_mid DECIMAL(10,2) NOT NULL DEFAULT 0,      -- BTW 9% (NL laag) of 12% (BE midden)
   tax_high DECIMAL(10,2) NOT NULL DEFAULT 0,     -- BTW 21%
   total DECIMAL(10,2) NOT NULL DEFAULT 0,
   
