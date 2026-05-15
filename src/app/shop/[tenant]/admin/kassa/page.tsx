@@ -345,7 +345,9 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
             alt={category.name}
             decoding="async"
             loading="lazy"
-            className="pointer-events-none absolute inset-0 block h-full min-h-0 w-full select-none object-cover object-center !h-full !w-full !max-w-none"
+            className={`pointer-events-none absolute inset-0 block h-full min-h-0 w-full select-none object-contain object-center !h-full !w-full !max-w-none ${
+              appearanceDark ? 'bg-[#1a2230]' : 'bg-neutral-100'
+            }`}
           />
           <div
             className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-32 bg-gradient-to-t from-neutral-950/[0.94] via-neutral-950/55 to-transparent sm:h-36"
@@ -411,7 +413,9 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
     >
       {product.image_url ? (
         <>
-          <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div
+            className={`pointer-events-none absolute inset-0 overflow-hidden ${ui.productTileSolidBg}`}
+          >
             <img
               src={product.image_url}
               alt={product.name}
@@ -421,7 +425,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
                 transform: `scale(${kioskZoom})`,
                 transformOrigin: 'center 78%',
               }}
-              className="pointer-events-none block h-full min-h-0 w-full select-none object-cover object-center !h-full !w-full !max-w-none"
+              className="pointer-events-none block h-full min-h-0 w-full select-none object-contain object-center !h-full !w-full !max-w-none"
             />
           </div>
           <div
@@ -911,15 +915,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   /** gap-6 = 24px; moet gelijk lopen met Tailwind `gap-6` op de grids + ResizeObserver-formule. */
   const KASSA_MENU_VISIBLE_ROWS = 4
   const KASSA_MENU_GRID_GAP_PX = 24
+  /** Tegels hoger (zelfde breedte/spacing): minder uitsneden foto; gebruiker scrollt iets meer. */
+  const KASSA_MENU_TILE_HEIGHT_BOOST = 1.13
 
   function computeInitialKassaMenuRowPx(): number {
-    if (typeof window === 'undefined') return 180
+    if (typeof window === 'undefined') return Math.floor(180 * KASSA_MENU_TILE_HEIGHT_BOOST)
     const vh = window.visualViewport?.height ?? window.innerHeight
     const overhead = 68 + 56
     const innerApprox = Math.max(0, vh - overhead - 48)
     const row =
-      (innerApprox - (KASSA_MENU_VISIBLE_ROWS - 1) * KASSA_MENU_GRID_GAP_PX) / KASSA_MENU_VISIBLE_ROWS
-    return Math.max(100, Math.floor(row))
+      ((innerApprox - (KASSA_MENU_VISIBLE_ROWS - 1) * KASSA_MENU_GRID_GAP_PX) / KASSA_MENU_VISIBLE_ROWS) *
+      KASSA_MENU_TILE_HEIGHT_BOOST
+    return Math.max(108, Math.floor(row))
   }
 
   /** Menu-paneel: 4 kol × N rijen in zicht; rijhoogte = f(scrollport). */
@@ -1090,8 +1097,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         const innerH = el.clientHeight - pt - pb
         if (innerH <= 0) return
         const rowH =
-          (innerH - (KASSA_MENU_VISIBLE_ROWS - 1) * KASSA_MENU_GRID_GAP_PX) / KASSA_MENU_VISIBLE_ROWS
-        const next = Math.max(80, Math.floor(rowH))
+          ((innerH - (KASSA_MENU_VISIBLE_ROWS - 1) * KASSA_MENU_GRID_GAP_PX) / KASSA_MENU_VISIBLE_ROWS) *
+          KASSA_MENU_TILE_HEIGHT_BOOST
+        const next = Math.max(96, Math.floor(rowH))
         setKassaMenuRowPx((prev) => (prev === next ? prev : next))
       })
     }
