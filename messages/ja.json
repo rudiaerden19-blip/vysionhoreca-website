@@ -4282,6 +4282,7 @@
     "orderCount": "注文件数",
     "subtotal": "小計（税抜）",
     "vat": "消費税",
+    "vatMidRates": "9% / 12%",
     "total": "合計",
     "paymentMethods": "支払い方法",
     "soldArticlesTitle": "販売商品",

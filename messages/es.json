@@ -4282,6 +4282,7 @@
     "orderCount": "Número de pedidos",
     "subtotal": "Subtotal (sin IVA)",
     "vat": "IVA",
+    "vatMidRates": "9 % / 12 %",
     "total": "TOTAL",
     "paymentMethods": "Métodos de pago",
     "soldArticlesTitle": "Artículos vendidos",

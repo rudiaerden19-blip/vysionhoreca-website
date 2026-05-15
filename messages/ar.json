@@ -4282,6 +4282,7 @@
     "orderCount": "عدد الطلبات",
     "subtotal": "المجموع الفرعي (بدون ضريبة)",
     "vat": "ضريبة القيمة المضافة",
+    "vatMidRates": "9% / 12%",
     "total": "الإجمالي",
     "paymentMethods": "طرق الدفع",
     "soldArticlesTitle": "الأصناف المباعة",

@@ -7,6 +7,7 @@ import {
   orderCountsTowardRevenueAndZReport,
   type Order,
 } from './admin-api-order-helpers'
+import { aggregateZReportVatFromOrderRows } from './order-vat'
 
 // =====================================================
 // ORDERS / BESTELLINGEN — types & pure helpers: `./admin-api-order-helpers`
@@ -260,7 +261,7 @@ export async function regenerateZReportForDate(
       tenantSlug,
       startUTC,
       endUTC,
-      'id, total, payment_method, payment_split_cash, payment_split_card, order_type, status, payment_status'
+      'id, total, payment_method, payment_split_cash, payment_split_card, order_type, status, payment_status, items'
     )
 
     const orders = ordersRaw.filter((o) =>
@@ -272,6 +273,7 @@ export async function regenerateZReportForDate(
         Order,
         | 'id'
         | 'total'
+        | 'items'
         | 'payment_method'
         | 'payment_split_cash'
         | 'payment_split_card'
@@ -304,7 +306,7 @@ export async function regenerateZReportForDate(
 
     orders.forEach((order) => {
       orderIds.push(order.id)
-      const orderTotal = order.total || 0
+      const orderTotal = Number(order.total) || 0
       total += orderTotal
 
       const d = distributeOrderPaymentForZRaport(order)
@@ -313,9 +315,13 @@ export async function regenerateZReportForDate(
       onlinePayments += d.online
     })
 
-    const taxRate = btwPercentage / 100
-    const subtotal = total / (1 + taxRate)
-    const tax = total - subtotal
+    total = Math.round(total * 100) / 100
+
+    const vatAgg = aggregateZReportVatFromOrderRows(
+      orders.map((o) => ({ total: o.total, items: o.items })),
+      btwPercentage,
+    )
+    const subtotal = vatAgg.subtotalExcl
 
     const hashInput = JSON.stringify({
       tenant: tenantSlug,
@@ -337,9 +343,9 @@ export async function regenerateZReportForDate(
           report_date: date,
           order_count: orders.length,
           subtotal: subtotal,
-          tax_low: btwPercentage === 6 ? tax : 0,
-          tax_mid: btwPercentage === 9 || btwPercentage === 12 ? tax : 0,
-          tax_high: btwPercentage === 21 ? tax : 0,
+          tax_low: vatAgg.tax_low,
+          tax_mid: vatAgg.tax_mid,
+          tax_high: vatAgg.tax_high,
           total: total,
           cash_payments: cashPayments,
           card_payments: cardPayments,
@@ -368,9 +374,9 @@ export async function regenerateZReportForDate(
         report_date: date,
         order_count: orders.length,
         subtotal: subtotal,
-        tax_low: btwPercentage === 6 ? tax : 0,
-        tax_mid: btwPercentage === 9 || btwPercentage === 12 ? tax : 0,
-        tax_high: btwPercentage === 21 ? tax : 0,
+        tax_low: vatAgg.tax_low,
+        tax_mid: vatAgg.tax_mid,
+        tax_high: vatAgg.tax_high,
         total: total,
         cash_payments: cashPayments,
         card_payments: cardPayments,

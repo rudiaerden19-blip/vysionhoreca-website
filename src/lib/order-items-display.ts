@@ -70,6 +70,17 @@ export function orderItemLineTotalEur(item: unknown): number {
     return (base + extras) * q
   }
 
+  /** Platte items (o.a. kassa + webshop): basisprijs + option-prijzen × aantal */
+  let optFlat = 0
+  const opts = o.options
+  if (Array.isArray(opts)) {
+    for (const x of opts) {
+      if (x && typeof x === 'object') {
+        optFlat += Number((x as Record<string, unknown>).price) || 0
+      }
+    }
+  }
+
   const unit = Number(o.unit_price ?? o.price ?? 0)
-  return unit * q
+  return (unit + optFlat) * q
 }

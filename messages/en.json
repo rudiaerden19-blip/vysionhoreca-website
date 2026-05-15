@@ -3211,6 +3211,7 @@
     "orderCount": "Number of orders",
     "subtotal": "Subtotal (excl. VAT)",
     "vat": "VAT",
+    "vatMidRates": "9% / 12%",
     "total": "TOTAL",
     "paymentMethods": "Payment methods",
     "soldArticlesTitle": "Sold articles",

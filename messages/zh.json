@@ -4282,6 +4282,7 @@
     "orderCount": "订单数量",
     "subtotal": "小计（不含增值税）",
     "vat": "增值税",
+    "vatMidRates": "9% / 12%",
     "total": "合计",
     "paymentMethods": "支付方式",
     "soldArticlesTitle": "售出商品",

@@ -6,7 +6,10 @@ import {
   distributeOrderPaymentForZRaport,
   getDateBoundsForBelgium,
   getBelgiumDateString,
+  orderCountsTowardRevenueAndZReport,
+  type Order,
 } from '@/lib/admin-api'
+import { aggregateZReportVatFromOrderRows } from '@/lib/order-vat'
 
 // Vercel Cron Job - runs daily at midnight
 // Configure in vercel.json: { "crons": [{ "path": "/api/cron/archive-z-reports", "schedule": "0 0 * * *" }] }
@@ -45,17 +48,28 @@ export async function GET(request: NextRequest) {
     const { startUTC, endUTC } = getDateBoundsForBelgium(yesterdayStr)
     logger.info('Query bounds', { requestId, startUTC, endUTC })
 
-    const { data: allOrders, error: ordersError } = await supabase
+    const ANALYTICS_ORDER_STATUS_EXCLUDE =
+      '("cancelled","rejected","CANCELLED","REJECTED")' as const
+
+    const { data: allOrdersRaw, error: ordersError } = await supabase
       .from('orders')
-      .select('id, tenant_slug, total, payment_method, payment_split_cash, payment_split_card')
+      .select(
+        'id, tenant_slug, total, items, payment_method, payment_split_cash, payment_split_card, order_type, status, payment_status, created_at',
+      )
       .gte('created_at', startUTC)
       .lte('created_at', endUTC)
-      .eq('status', 'completed')
+      .not('status', 'in', ANALYTICS_ORDER_STATUS_EXCLUDE)
 
     if (ordersError) {
       logger.error('Failed to fetch orders', { requestId, error: ordersError.message })
       return NextResponse.json({ error: 'Failed to fetch orders' }, { status: 500 })
     }
+
+    const allOrders = (allOrdersRaw || []).filter((row) =>
+      orderCountsTowardRevenueAndZReport(
+        row as Pick<Order, 'order_type' | 'status' | 'payment_status'>,
+      ),
+    )
 
     if (!allOrders || allOrders.length === 0) {
       logger.info('No completed orders found for yesterday', { requestId, date: yesterdayStr })
@@ -123,9 +137,9 @@ export async function GET(request: NextRequest) {
         let cardPayments = 0
         const orderIds: string[] = []
 
-        orders.forEach(order => {
-          orderIds.push(order.id)
-          const orderTotal = order.total || 0
+        orders.forEach((order) => {
+          orderIds.push(order.id as string)
+          const orderTotal = Number(order.total) || 0
           total += orderTotal
 
           const d = distributeOrderPaymentForZRaport(order)
@@ -134,9 +148,14 @@ export async function GET(request: NextRequest) {
           onlinePayments += d.online
         })
 
-        const taxRate = btwPercentage / 100
-        const subtotal = total / (1 + taxRate)
-        const tax = total - subtotal
+        total = Math.round(total * 100) / 100
+
+        const vatAgg = aggregateZReportVatFromOrderRows(
+          orders.map((o) => ({ total: o.total, items: o.items })),
+          btwPercentage,
+        )
+
+        const subtotal = vatAgg.subtotalExcl
 
         // Generate simple hash
         const hashInput = JSON.stringify({
@@ -158,9 +177,9 @@ export async function GET(request: NextRequest) {
         const reportData = {
           order_count: orders.length,
           subtotal,
-          tax_low: btwPercentage === 6 ? tax : 0,
-          tax_mid: btwPercentage === 9 || btwPercentage === 12 ? tax : 0,
-          tax_high: btwPercentage === 21 ? tax : 0,
+          tax_low: vatAgg.tax_low,
+          tax_mid: vatAgg.tax_mid,
+          tax_high: vatAgg.tax_high,
           total,
           cash_payments: cashPayments,
           card_payments: cardPayments,

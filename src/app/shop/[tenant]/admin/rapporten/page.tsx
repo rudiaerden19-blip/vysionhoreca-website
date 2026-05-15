@@ -11,6 +11,7 @@ import {
   saveTenantSettings,
   type TenantSettings,
 } from '@/lib/admin-api'
+import { aggregateZReportVatFromOrderRows } from '@/lib/order-vat'
 import PinGate from '@/components/PinGate'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -431,21 +432,28 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     }
     const now = new Date()
     const dateStr = now.toISOString().split('T')[0]
-    const vatRate = tenantInfo?.btw_percentage ?? 6
+    const defaultBtw = tenantInfo?.btw_percentage ?? 6
+    const vatAgg = aggregateZReportVatFromOrderRows(
+      xOrders.map((o) => ({
+        total: o.total,
+        items: (o as { items?: unknown }).items,
+      })),
+      defaultBtw,
+    )
 
     const zRes = await adminDb.upsert('z_reports', {
       tenant_slug: tenant,
       report_date: dateStr,
       order_count: xData.count,
-      subtotal: xData.total - xData.tax,
-      tax_low: vatRate <= 6 ? xData.tax : 0,
-      tax_mid: vatRate > 6 && vatRate <= 12 ? xData.tax : 0,
-      tax_high: vatRate > 12 ? xData.tax : 0,
+      subtotal: vatAgg.subtotalExcl,
+      tax_low: vatAgg.tax_low,
+      tax_mid: vatAgg.tax_mid,
+      tax_high: vatAgg.tax_high,
       total: xData.total,
       cash_payments: xData.cash,
       card_payments: xData.card,
       online_payments: 0,
-      btw_percentage: vatRate,
+      btw_percentage: defaultBtw,
       generated_at: now.toISOString(),
       business_name: tenantInfo?.business_name || tenant,
     }, { tenantSlug: tenant, onConflict: 'tenant_slug,report_date' })
@@ -497,7 +505,6 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     const from = getPeriodStart(exportPeriod)
     const exp = validOrders.filter(o => new Date(o.created_at) >= from)
     const totalRev = exp.reduce((s,o)=>s+o.total,0)
-    const totalTax = exp.reduce((s,o)=>s+o.tax,0)
     let cash = 0
     let card = 0
     for (const o of exp) {
@@ -505,7 +512,24 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
       cash += d.cash
       card += d.card + d.online
     }
-    const vatRate = tenantInfo?.btw_percentage ?? 6
+    const defaultBtwPdf = tenantInfo?.btw_percentage ?? 6
+    const vatAggPdf = aggregateZReportVatFromOrderRows(
+      exp.map((o) => ({ total: o.total, items: (o as { items?: unknown }).items })),
+      defaultBtwPdf,
+    )
+    const vatDetailRows: string[] = []
+    if (vatAggPdf.tax_low > 0) {
+      vatDetailRows.push(`<tr><td>BTW 6%</td><td class="amt">€${vatAggPdf.tax_low.toFixed(2)}</td></tr>`)
+    }
+    if (vatAggPdf.tax_mid > 0) {
+      vatDetailRows.push(`<tr><td>BTW 9% / 12%</td><td class="amt">€${vatAggPdf.tax_mid.toFixed(2)}</td></tr>`)
+    }
+    if (vatAggPdf.tax_high > 0) {
+      vatDetailRows.push(`<tr><td>BTW 21%</td><td class="amt">€${vatAggPdf.tax_high.toFixed(2)}</td></tr>`)
+    }
+    if (vatDetailRows.length === 0 && vatAggPdf.totalTax > 0) {
+      vatDetailRows.push(`<tr><td>BTW</td><td class="amt">€${vatAggPdf.totalTax.toFixed(2)}</td></tr>`)
+    }
     const html = `<!DOCTYPE html><html><head><title>Rapport</title>
     <style>body{font-family:Arial,sans-serif;padding:40px;max-width:800px;margin:0 auto}
     h1{color:#1e293b;border-bottom:2px solid #1e293b;padding-bottom:10px}
@@ -529,8 +553,9 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     <div class="sitem"><div class="slabel">💳 PIN/Kaart</div><div class="sval">€${card.toFixed(2)}</div></div></div>
     <h2>BTW Overzicht</h2><table>
     <tr><th>Omschrijving</th><th class="amt">Bedrag</th></tr>
-    <tr><td>Omzet excl. BTW</td><td class="amt">€${(totalRev-totalTax).toFixed(2)}</td></tr>
-    <tr><td>BTW ${vatRate}%</td><td class="amt">€${totalTax.toFixed(2)}</td></tr>
+    <tr><td>Omzet excl. BTW</td><td class="amt">€${vatAggPdf.subtotalExcl.toFixed(2)}</td></tr>
+    ${vatDetailRows.join('\n')}
+    <tr><td><strong>Totaal BTW</strong></td><td class="amt"><strong>€${vatAggPdf.totalTax.toFixed(2)}</strong></td></tr>
     <tr><td><strong>Totaal incl. BTW</strong></td><td class="amt"><strong>€${totalRev.toFixed(2)}</strong></td></tr></table>
     <div class="footer">Gegenereerd op ${new Date().toLocaleString('nl-NL')} — Vysion Horeca POS</div>
     <button class="noprint" onclick="window.print()" style="margin-top:20px;padding:10px 20px;background:#1e293b;color:white;border:none;border-radius:8px;cursor:pointer">🖨️ Afdrukken / PDF opslaan</button>

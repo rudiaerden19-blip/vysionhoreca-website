@@ -4305,6 +4305,7 @@
     "orderCount": "Nombre de commandes",
     "subtotal": "Sous-total (HT)",
     "vat": "TVA",
+    "vatMidRates": "9 % / 12 %",
     "total": "TOTAL",
     "paymentMethods": "Modes de paiement",
     "soldArticlesTitle": "Articles vendus",

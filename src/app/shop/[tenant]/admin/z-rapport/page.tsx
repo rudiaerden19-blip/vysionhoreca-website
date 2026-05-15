@@ -18,6 +18,10 @@ import {
   aggregateZReportArticleLines,
   type ZReportArticleLine,
 } from '@/lib/z-report-aggregate-articles'
+import {
+  aggregateZReportVatFromOrderRows,
+  type ZReportVatOrderSlice,
+} from '@/lib/order-vat'
 import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
 
@@ -121,9 +125,10 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     setLoading(true)
 
     const settings = await getTenantSettings(params.tenant)
+    const settingsBtw = Number(settings?.btw_percentage) || 6
     if (settings) {
       setBusinessInfo(settings)
-      setBtwPercentage(settings.btw_percentage || 6)
+      setBtwPercentage(settingsBtw)
     }
 
     // KRITIEK: Fiscale daggrens = 00:00 tot 12:00 de VOLGENDE dag (GKS compliant)
@@ -153,7 +158,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
 
       orders.forEach((order) => {
         if (order.id) orderIds.push(order.id)
-        const orderTotal = order.total || 0
+        const orderTotal = Number(order.total) || 0
         total += orderTotal
         const d = distributeOrderPaymentForZRaport(order)
         cashPayments += d.cash
@@ -161,17 +166,21 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         onlinePayments += d.online
       })
 
-      const taxRate = btwPercentage / 100
-      const subtotal = total / (1 + taxRate)
-      const tax = total - subtotal
+      total = Math.round(total * 100) / 100
+
+      const vatSlice: ZReportVatOrderSlice[] = orders.map((o) => ({
+        total: o.total,
+        items: (o as { items?: unknown }).items,
+      }))
+      const vatAgg = aggregateZReportVatFromOrderRows(vatSlice, settingsBtw)
 
       setStats({
         date: selectedDate,
         orderCount: orders.length,
-        subtotal,
-        taxLow: btwPercentage === 6 ? tax : 0,
-        taxMid: btwPercentage === 9 || btwPercentage === 12 ? tax : 0,
-        taxHigh: btwPercentage === 21 ? tax : 0,
+        subtotal: vatAgg.subtotalExcl,
+        taxLow: vatAgg.tax_low,
+        taxMid: vatAgg.tax_mid,
+        taxHigh: vatAgg.tax_high,
         total,
         cashPayments,
         onlinePayments,
@@ -800,7 +809,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                 {stats.taxMid > 0 && (
                   <div className="flex justify-between items-center py-2">
                     <span className="text-gray-600">
-                      {t('zReport.vat')} {btwPercentage}%
+                      {t('zReport.vat')} {t('zReport.vatMidRates')}
                     </span>
                     <span className="font-medium">{formatCurrency(stats.taxMid)}</span>
                   </div>

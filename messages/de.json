@@ -4305,6 +4305,7 @@
     "orderCount": "Anzahl Bestellungen",
     "subtotal": "Zwischensumme (ohne MwSt.)",
     "vat": "MwSt.",
+    "vatMidRates": "9 % / 12 %",
     "total": "GESAMT",
     "paymentMethods": "Zahlungsarten",
     "soldArticlesTitle": "Verkaufte Artikel",
