@@ -67,31 +67,63 @@ function isAndroidUserAgent(): boolean {
 
 const ANDROID_KIOSK_SESSION_STORAGE_KEY = 'vysion_android_kiosk_session'
 
+function persistAndroidKioskHint(): void {
+  try {
+    sessionStorage.setItem(ANDROID_KIOSK_SESSION_STORAGE_KEY, '1')
+  } catch {
+    /* private mode */
+  }
+  try {
+    localStorage.setItem(ANDROID_KIOSK_SESSION_STORAGE_KEY, '1')
+  } catch {
+    /* private mode / quota */
+  }
+}
+
+function readStoredAndroidKioskHint(): boolean {
+  try {
+    return (
+      sessionStorage.getItem(ANDROID_KIOSK_SESSION_STORAGE_KEY) === '1' ||
+      localStorage.getItem(ANDROID_KIOSK_SESSION_STORAGE_KEY) === '1'
+    )
+  } catch {
+    return false
+  }
+}
+
 /** Zelfde query als Vysion Kiosk „Open kassa in Chrome” (`MainActivity.ANDROID_KIOSK_Q`). */
 function hasAndroidKioskSessionHint(): boolean {
   if (typeof window === 'undefined') return false
   try {
     const q = new URLSearchParams(window.location.search).get('vysion_android_kiosk')
     if (q === '1') {
-      try {
-        sessionStorage.setItem(ANDROID_KIOSK_SESSION_STORAGE_KEY, '1')
-      } catch {
-        /* private mode / quota */
-      }
+      persistAndroidKioskHint()
       return true
     }
-    return sessionStorage.getItem(ANDROID_KIOSK_SESSION_STORAGE_KEY) === '1'
+    return readStoredAndroidKioskHint()
   } catch {
     return false
   }
 }
 
 /**
- * Tablet-printstrategie (brug eerst, fetch-timeout race): echte Android UA óf kiosk-sessie.
- * Bij „Desktop-site aan” vermeldt Chrome vaak géén Android meer → dan faalde de oude Windows-loop op localhost.
+ * Chrome Android „Desktopweergave”: UA kan op Linux-desktop lijken zonder „Android”-token.
+ * Touchscreen + Chrome + geen Windows/Mac wijst nog vaak op tablet/kiosk met misleidende UA.
+ */
+function looksLikeAndroidChromeDesktopUa(): boolean {
+  if (typeof navigator === 'undefined') return false
+  if (navigator.maxTouchPoints <= 0) return false
+  const ua = navigator.userAgent
+  if (!/\bChrome\/\d/.test(ua) || /\bEdg\//.test(ua)) return false
+  if (/\bWindows NT\b/.test(ua) || /\bMac OS X\b/.test(ua)) return false
+  return /\bLinux\b/.test(ua) || /\bAndroid\b/.test(ua)
+}
+
+/**
+ * Tablet-printstrategie (brug eerst, fetch-timeout race): Android UA, kiosk-flag, of verdachte desktop-UA op touch-Chrome.
  */
 export function isAndroidTabletPrintClient(): boolean {
-  return isAndroidUserAgent() || hasAndroidKioskSessionHint()
+  return isAndroidUserAgent() || hasAndroidKioskSessionHint() || looksLikeAndroidChromeDesktopUa()
 }
 
 /** UTF-8 → Base64 zoals Android Base64.DEFAULT (standaard alphabet, geen regelbreuken). */
@@ -105,11 +137,48 @@ function utf8ToBase64Json(utf8Json: string): string {
 }
 
 /**
- * Chrome Android opent custom schemes betrouwbaarder via top-level navigatie dan via verborgen iframe.
- * De pagina verlaat even de kassa — met Terug in Chrome kom je terug (eventueel opnieuw inloggen).
+ * Custom scheme naar Vysion Kiosk-app.
+ *
+ * **Niet** `location.assign` als eerste keus: dan navigeert het **huidige** tabblad weg van HTTPS-kassa → SPA breekt,
+ * gebruiker valt vaak terug op Chrome-start of moet opnieuw inloggen.
+ *
+ * Eerst `_blank` (popup of `<a target="_blank">`): hoofdtab blijft op de webkassa; het systeem stuurt de intent nog steeds naar de app.
  */
-function openAndroidKioskUrl(url: string): boolean {
+function openKioskDeepLink(url: string): boolean {
   if (typeof window === 'undefined') return false
+
+  try {
+    const secondary = window.open(url, '_blank')
+    if (secondary != null) {
+      window.setTimeout(() => {
+        try {
+          secondary.close()
+        } catch {
+          /* blanco tab na externe scheme — niet kritisch */
+        }
+      }, 500)
+      return true
+    }
+  } catch {
+    /* popup geblokkeerd */
+  }
+
+  if (typeof document !== 'undefined') {
+    try {
+      const a = document.createElement('a')
+      a.href = url
+      a.target = '_blank'
+      a.rel = 'noopener noreferrer'
+      a.style.display = 'none'
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      return true
+    } catch {
+      /* fallback hieronder */
+    }
+  }
+
   try {
     window.location.assign(url)
     return true
@@ -144,11 +213,11 @@ function tryVysionKioskPrintBridge(body: VysionPrintAgentBody): { ok: boolean; r
     return { ok: false, reason: `URL te lang (${enc.length} tekens); bon moet korter of agent via USB PC.` }
   }
   const url = `vysionkiosk://print?d=${enc}`
-  /** Meteen assign kan de pagina losscheuren vóór React de succes-banner pint — korte defer helpt. */
+  /** Korte defer: React kan succes-banner nog pinten voordat secundair tabblad/scheme wordt geopend. */
   if (typeof window !== 'undefined') {
     window.setTimeout(() => {
-      openAndroidKioskUrl(url)
-    }, 450)
+      openKioskDeepLink(url)
+    }, 120)
     return { ok: true }
   }
   return { ok: false, reason: 'Geen window.' }
@@ -156,7 +225,7 @@ function tryVysionKioskPrintBridge(body: VysionPrintAgentBody): { ok: boolean; r
 
 function tryVysionKioskDrawerBridge(): boolean {
   if (typeof document === 'undefined' || !isAndroidTabletPrintClient()) return false
-  return openAndroidKioskUrl('vysionkiosk://drawer')
+  return openKioskDeepLink('vysionkiosk://drawer')
 }
 
 function sleep(ms: number): Promise<void> {
@@ -182,8 +251,19 @@ async function postPrintOnce(
     }
     ;(init as RequestInit & { targetAddressSpace?: string }).targetAddressSpace = 'local'
 
-    const r = await fetch(url, init)
-    const text = await r.text()
+    const r = await Promise.race([
+      fetch(url, init),
+      sleep(7000).then(() => {
+        controller.abort()
+        throw new DOMException('Hard deadline bij POST /print', 'AbortError')
+      }),
+    ])
+    const text = await Promise.race([
+      r.text(),
+      sleep(3000).then(() => {
+        throw new DOMException('Hard deadline bij lezen antwoord print-service', 'AbortError')
+      }),
+    ])
     let data: { success?: boolean; error?: string } | null = null
     try {
       data = text ? (JSON.parse(text) as { success?: boolean; error?: string }) : null
@@ -273,15 +353,20 @@ export async function sendToVysionPrintAgent(
   origin = DEFAULT_AGENT_ORIGIN,
 ): Promise<VysionPrintAgentResult> {
   const core = sendToVysionPrintAgentCore(body, origin)
-  /** Alleen tablet/kiosk-sessie: fetch naar localhost kan vastzitten zonder nette Abort — PC mag lang retry'en (Windows-agent). */
-  if (!isAndroidTabletPrintClient()) return core
-  const wallClock = sleep(12_000).then(
+  /**
+   * Altijd een muurklok: sommige Chrome/Android-combinaties laten fetch naar 127.0.0.1 of body.text()
+   * vastlopen zonder nette Abort → blauwe „printer wordt aangesproken” voor altijd.
+   * Tablet korter (brug hoort direct OK); Windows mag iets langer (meerdere retries).
+   */
+  const ms = isAndroidTabletPrintClient() ? 18_000 : 55_000
+  const wallClock = sleep(ms).then(
     (): VysionPrintAgentResult => ({
       ok: false,
       error:
-        'Print reageerde niet binnen 12 seconden op dit tablet.\n\n' +
-        'Controleer of „Vysion printdienst“ draait (notificatie), USB-printer, en probeer opnieuw. ' +
-        'Blijft dit zo: herstart de Vysion Kiosk-app.',
+        `Print-service reageerde niet binnen ${Math.round(ms / 1000)} seconden.\n\n` +
+        (isAndroidTabletPrintClient()
+          ? 'Tablet: controleer „Vysion printdienst“, USB-printer, open de kassa via „Open kassa in Chrome” in de app, en zet Chrome Desktopweergave UIT. Herstart de Kiosk-app bij twijfel.'
+          : 'PC: start de Print Agent (icoon bij de klok), testprint vanuit de agent. Controleer firewall en dat poort 9742 lokaal bereikbaar is.'),
     }),
   )
   return await Promise.race([core, wallClock])
