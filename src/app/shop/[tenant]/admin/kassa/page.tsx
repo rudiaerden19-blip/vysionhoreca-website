@@ -2943,8 +2943,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const printResult = await sendToVysionPrintAgent({
       winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
       bonInhoud: bonLines.join('\n'),
-      /** Tablet/USB: 1 bon — „bon OK (2x)” in app-toast was verwarrend; Windows-agent blijft 2 kopieën. */
-      copies: isAndroidTabletPrintClient() ? 1 : 2,
+      /** Voorlopige bon (gele knop): altijd 1; afrekend bon tablet 1, desktop 2 (archief/klant). */
+      copies: isDraft ? 1 : isAndroidTabletPrintClient() ? 1 : 2,
       openDrawer: isCash,
       receiptMode: 'kassa',
       orderData: {
