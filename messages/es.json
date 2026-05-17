@@ -3478,7 +3478,7 @@
   },
   "analysePage": {
     "title": "Análisis empresarial",
-    "subtitle": "Analiza tus ingresos, costos y beneficios",
+    "subtitle": "Analiza tus ingresos, costos y beneficios. Los ingresos de TPV y tienda online se calculan automáticamente desde tus pedidos.",
     "tabs": {
       "overview": "Resumen",
       "kassa": "Ventas TPV",
@@ -3591,7 +3591,7 @@
       "yearCosts": "Costos anuales",
       "yearProfit": "Beneficio anual",
       "averageMargin": "Margen promedio",
-      "tip": "Ingresa cada mes tus ventas y compras para un resumen anual preciso."
+      "tip": "Introduce costes fijos y compras cuando haga falta; los ingresos se calculan automáticamente desde los pedidos."
     },
     "settings": {
       "title": "Establecer objetivos",

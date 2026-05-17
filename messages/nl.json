@@ -3938,7 +3938,7 @@
   },
   "analysePage": {
     "title": "Bedrijfsanalyse",
-    "subtitle": "Analyseer je omzet, kosten en winst",
+    "subtitle": "Analyseer je omzet, kosten en winst. Omzet uit kassa en webshop komt automatisch uit je bestellingen.",
     "tabs": {
       "overview": "Overzicht",
       "kassa": "Kassa Omzet",
@@ -4051,7 +4051,7 @@
       "yearCosts": "Jaar Kosten",
       "yearProfit": "Jaar Winst",
       "averageMargin": "Gemiddelde Marge",
-      "tip": "Vul elke maand je kassa omzet en aankopen in voor een nauwkeurig jaaroverzicht."
+      "tip": "Vul waar nodig vaste kosten en aankopen in; omzet wordt automatisch uit je bestellingen berekend."
     },
     "settings": {
       "title": "Bedrijfsdoelen Instellen",

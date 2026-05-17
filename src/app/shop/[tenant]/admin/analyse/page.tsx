@@ -8,9 +8,6 @@ import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
 import { getAuthHeaders } from '@/lib/auth-headers'
 import {
-  getDailySales,
-  saveDailySales,
-  deleteDailySales,
   getFixedCosts,
   saveFixedCost,
   deleteFixedCost,
@@ -22,7 +19,6 @@ import {
   calculateMonthlyReport,
   FIXED_COST_CATEGORIES,
   VARIABLE_COST_CATEGORIES,
-  DailySales,
   FixedCost,
   VariableCost,
   BusinessTargets,
@@ -32,7 +28,7 @@ import {
 } from '@/lib/admin-api'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 
-type TabType = 'overview' | 'kassa' | 'fixed' | 'variable' | 'year' | 'settings'
+type TabType = 'overview' | 'fixed' | 'variable' | 'year' | 'settings'
 
 const ANALYSE_TOUCH_INPUT =
   'min-h-[44px] touch-manipulation [-webkit-tap-highlight-color:transparent]'
@@ -170,29 +166,18 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
   const [saving, setSaving] = useState(false)
 
   // Data state
-  const [dailySales, setDailySales] = useState<DailySales[]>([])
   const [fixedCosts, setFixedCosts] = useState<FixedCost[]>([])
   const [variableCosts, setVariableCosts] = useState<VariableCost[]>([])
   const [businessTargets, setBusinessTargets] = useState<BusinessTargets | null>(null)
   const [monthlyReport, setMonthlyReport] = useState<MonthlyReport | null>(null)
 
   // Modals
-  const [showKassaModal, setShowKassaModal] = useState(false)
   const [showFixedModal, setShowFixedModal] = useState(false)
   const [showVariableModal, setShowVariableModal] = useState(false)
-  const [editingKassa, setEditingKassa] = useState<DailySales | null>(null)
   const [editingFixed, setEditingFixed] = useState<FixedCost | null>(null)
   const [editingVariable, setEditingVariable] = useState<VariableCost | null>(null)
 
   // Form states
-  const [kassaForm, setKassaForm] = useState({
-    date: new Date().toISOString().split('T')[0],
-    cash_revenue: 0,
-    card_revenue: 0,
-    order_count: 0,
-    notes: '',
-  })
-
   const [fixedForm, setFixedForm] = useState({
     category: 'OTHER' as FixedCostCategory,
     name: '',
@@ -223,7 +208,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
 
   /** iPad/Safari: native confirm() werkt hier vaak niet; eigen modal. */
   const [deleteConfirm, setDeleteConfirm] = useState<
-    { type: 'kassa' | 'fixed' | 'variable'; id: string } | null
+    { type: 'fixed' | 'variable'; id: string } | null
   >(null)
   const [deleteWorking, setDeleteWorking] = useState(false)
 
@@ -236,15 +221,13 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
   async function loadData() {
     setLoading(true)
     try {
-      const [sales, fixed, variable, targets, report] = await Promise.all([
-        getDailySales(params.tenant, selectedYear, selectedMonth),
+      const [fixed, variable, targets, report] = await Promise.all([
         getFixedCosts(params.tenant),
         getVariableCosts(params.tenant, selectedYear, selectedMonth),
         getBusinessTargets(params.tenant),
         calculateMonthlyReport(params.tenant, selectedYear, selectedMonth),
       ])
 
-      setDailySales(sales)
       setFixedCosts(fixed)
       setVariableCosts(variable)
       setBusinessTargets(targets)
@@ -300,49 +283,6 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
       profitMargin: monthlyReport.profitMargin,
     }
   }, [monthlyReport])
-
-  // Kassa handlers
-  const openKassaModal = (sale?: DailySales) => {
-    if (sale) {
-      setEditingKassa(sale)
-      setKassaForm({
-        date: sale.date,
-        cash_revenue: sale.cash_revenue,
-        card_revenue: sale.card_revenue,
-        order_count: sale.order_count,
-        notes: sale.notes || '',
-      })
-    } else {
-      setEditingKassa(null)
-      setKassaForm({
-        date: new Date().toISOString().split('T')[0],
-        cash_revenue: 0,
-        card_revenue: 0,
-        order_count: 0,
-        notes: '',
-      })
-    }
-    setShowKassaModal(true)
-  }
-
-  const saveKassa = async () => {
-    setSaving(true)
-    const success = await saveDailySales({
-      id: editingKassa?.id,
-      tenant_slug: params.tenant,
-      ...kassaForm,
-      total_revenue: kassaForm.cash_revenue + kassaForm.card_revenue,
-    })
-    if (success) {
-      setShowKassaModal(false)
-      loadData()
-    }
-    setSaving(false)
-  }
-
-  const handleDeleteKassa = (id: string) => {
-    setDeleteConfirm({ type: 'kassa', id })
-  }
 
   // Fixed cost handlers
   const openFixedModal = (cost?: FixedCost) => {
@@ -448,8 +388,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
     if (!deleteConfirm) return
     setDeleteWorking(true)
     try {
-      if (deleteConfirm.type === 'kassa') await deleteDailySales(deleteConfirm.id, params.tenant)
-      else if (deleteConfirm.type === 'fixed') await deleteFixedCost(deleteConfirm.id, params.tenant)
+      if (deleteConfirm.type === 'fixed') await deleteFixedCost(deleteConfirm.id, params.tenant)
       else await deleteVariableCost(deleteConfirm.id, params.tenant)
       setDeleteConfirm(null)
       await loadData()
@@ -643,7 +582,6 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
       <div className="flex flex-wrap gap-2 mb-6 bg-white rounded-xl p-2 shadow-sm">
         {[
           { id: 'overview', label: `📊 ${t('analysePage.tabs.overview')}` },
-          { id: 'kassa', label: `💵 ${t('analysePage.tabs.kassa')}` },
           { id: 'fixed', label: `🏠 ${t('analysePage.tabs.fixed')}` },
           { id: 'variable', label: `🛒 ${t('analysePage.tabs.variable')}` },
           { id: 'year', label: `📅 ${t('analysePage.tabs.year')}` },
@@ -875,89 +813,6 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               })}
             </div>
           </motion.div>
-        </div>
-      )}
-
-      {/* Kassa Tab */}
-      {activeTab === 'kassa' && (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">💵 {t('analysePage.kassa.title')}</h2>
-              <p className="text-gray-500">{t('analysePage.kassa.subtitle')}</p>
-            </div>
-            <button
-              onClick={() => openKassaModal()}
-              className="px-4 py-2 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
-            >
-              ➕ {t('analysePage.kassa.newDay')}
-            </button>
-          </div>
-
-          {/* Calendar-like view */}
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-3 text-left text-gray-600 font-medium">{t('analysePage.kassa.date')}</th>
-                  <th className="px-4 py-3 text-right text-gray-600 font-medium">{t('analysePage.kassa.cash')}</th>
-                  <th className="px-4 py-3 text-right text-gray-600 font-medium">{t('analysePage.kassa.card')}</th>
-                  <th className="px-4 py-3 text-right text-gray-600 font-medium">{t('analysePage.overview.total')}</th>
-                  <th className="px-4 py-3 text-right text-gray-600 font-medium">{t('analysePage.kassa.orders')}</th>
-                  <th className="px-4 py-3 text-center text-gray-600 font-medium">{t('analysePage.common.actions')}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {dailySales.length > 0 ? (
-                  dailySales.map(sale => (
-                    <tr key={sale.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 font-medium text-gray-900">
-                        {new Date(sale.date).toLocaleDateString('nl-BE', { weekday: 'short', day: 'numeric', month: 'short' })}
-                      </td>
-                      <td className="px-4 py-3 text-right text-gray-600">{formatCurrency(sale.cash_revenue)}</td>
-                      <td className="px-4 py-3 text-right text-gray-600">{formatCurrency(sale.card_revenue)}</td>
-                      <td className="px-4 py-3 text-right font-bold text-green-600">{formatCurrency(sale.total_revenue)}</td>
-                      <td className="px-4 py-3 text-right text-gray-600">{sale.order_count}</td>
-                      <td className="px-4 py-3 text-center">
-                        <button
-                          type="button"
-                          onClick={() => openKassaModal(sale)}
-                          className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center touch-manipulation text-blue-500 hover:text-blue-700 mr-2"
-                        >
-                          ✏️
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteKassa(sale.id!)}
-                          className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center touch-manipulation text-red-500 hover:text-red-700"
-                        >
-                          🗑️
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={6} className="px-4 py-12 text-center text-gray-400">
-                      <div className="text-4xl mb-2">💵</div>
-                      <p>{t('analysePage.kassa.noData')}</p>
-                      <p className="text-sm">{t('analysePage.kassa.clickNew')}</p>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Monthly Total */}
-          {dailySales.length > 0 && (
-            <div className="bg-green-50 border border-green-200 rounded-2xl p-4 flex items-center justify-between">
-              <span className="font-bold text-green-800">{t('analysePage.kassa.monthTotal')} {MONTH_NAMES[selectedMonth - 1]}</span>
-              <span className="text-2xl font-bold text-green-600">
-                {formatCurrency(dailySales.reduce((sum, s) => sum + s.total_revenue, 0))}
-              </span>
-            </div>
-          )}
         </div>
       )}
 
@@ -1342,112 +1197,6 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
         </div>
       )}
 
-      {/* Kassa Modal */}
-      <AnimatePresence>
-        {showKassaModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[130] flex items-center justify-center bg-black/50 p-4"
-            onClick={() => setShowKassaModal(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              onClick={e => e.stopPropagation()}
-              className="bg-white rounded-2xl w-full max-w-md shadow-xl"
-            >
-              <div className="p-4 border-b flex items-center justify-between">
-                <h2 className="text-xl font-bold">{editingKassa ? `✏️ ${t('analysePage.kassa.editDay')}` : `➕ ${t('analysePage.kassa.newDay')}`}</h2>
-                <button onClick={() => setShowKassaModal(false)} className="text-gray-400 hover:text-gray-600">✕</button>
-              </div>
-              <div className="p-6 space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('analysePage.kassa.date')}</label>
-                  <input
-                    type="date"
-                    value={kassaForm.date}
-                    onChange={e => setKassaForm(f => ({ ...f, date: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">💵 {t('analysePage.kassa.cashRevenue')}</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={kassaForm.cash_revenue || ''}
-                      onChange={e => setKassaForm(f => ({ ...f, cash_revenue: Number(e.target.value) }))}
-                      placeholder="0.00"
-                      className={`w-full px-4 py-3 border border-gray-200 rounded-xl ${ANALYSE_TOUCH_INPUT}`}
-                      onPointerDown={focusNumberFieldOnTouch}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">💳 {t('analysePage.kassa.cardRevenue')}</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={kassaForm.card_revenue || ''}
-                      onChange={e => setKassaForm(f => ({ ...f, card_revenue: Number(e.target.value) }))}
-                      placeholder="0.00"
-                      className={`w-full px-4 py-3 border border-gray-200 rounded-xl ${ANALYSE_TOUCH_INPUT}`}
-                      onPointerDown={focusNumberFieldOnTouch}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">📦 {t('analysePage.kassa.orderCount')}</label>
-                  <input
-                    type="number"
-                    value={kassaForm.order_count || ''}
-                    onChange={e => setKassaForm(f => ({ ...f, order_count: Number(e.target.value) }))}
-                    placeholder="0"
-                    className={`w-full px-4 py-3 border border-gray-200 rounded-xl ${ANALYSE_TOUCH_INPUT}`}
-                    onPointerDown={focusNumberFieldOnTouch}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">📝 {t('analysePage.kassa.notes')}</label>
-                  <textarea
-                    value={kassaForm.notes}
-                    onChange={e => setKassaForm(f => ({ ...f, notes: e.target.value }))}
-                    rows={2}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl"
-                  />
-                </div>
-                <div className="bg-gray-50 p-4 rounded-xl">
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium text-gray-700">{t('analysePage.overview.total')}:</span>
-                    <span className="text-2xl font-bold text-green-600">
-                      {formatCurrency(kassaForm.cash_revenue + kassaForm.card_revenue)}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setShowKassaModal(false)}
-                    className="flex-1 px-4 py-3 border border-gray-200 rounded-xl font-medium hover:bg-gray-50"
-                  >
-                    {t('analysePage.common.cancel')}
-                  </button>
-                  <button
-                    onClick={saveKassa}
-                    disabled={saving}
-                    className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 disabled:opacity-50"
-                  >
-                    {saving ? t('analysePage.common.saving') : `💾 ${t('analysePage.common.save')}`}
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Fixed Cost Modal */}
       <AnimatePresence>
         {showFixedModal && (
@@ -1720,7 +1469,6 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                 id="analyse-delete-confirm-title"
                 className="text-center text-base font-medium leading-snug text-gray-800"
               >
-                {deleteConfirm.type === 'kassa' && t('analysePage.kassa.confirmDelete')}
                 {deleteConfirm.type === 'fixed' && t('analysePage.fixed.confirmDelete')}
                 {deleteConfirm.type === 'variable' && t('analysePage.variable.confirmDelete')}
               </p>

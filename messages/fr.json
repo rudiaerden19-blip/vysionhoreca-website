@@ -2978,7 +2978,7 @@
   },
   "analysePage": {
     "title": "Analyse commerciale",
-    "subtitle": "Analysez votre chiffre d'affaires, coûts et bénéfices",
+    "subtitle": "Analysez votre chiffre d'affaires, vos coûts et vos bénéfices. Le CA caisse et en ligne est calculé automatiquement à partir de vos commandes.",
     "tabs": {
       "overview": "Aperçu",
       "kassa": "CA Caisse",
@@ -3091,7 +3091,7 @@
       "yearCosts": "Coûts annuels",
       "yearProfit": "Bénéfice annuel",
       "averageMargin": "Marge moyenne",
-      "tip": "Saisissez chaque mois votre CA et achats pour un aperçu annuel précis."
+      "tip": "Saisissez si besoin les charges fixes et les achats ; le CA est calculé automatiquement à partir des commandes."
     },
     "settings": {
       "title": "Définir les objectifs",

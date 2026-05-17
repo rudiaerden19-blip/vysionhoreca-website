@@ -3938,7 +3938,7 @@
   },
   "analysePage": {
     "title": "Business Analysis",
-    "subtitle": "Analyze your revenue, costs and profit",
+    "subtitle": "Analyze your revenue, costs and profit. POS and webshop revenue comes automatically from your orders.",
     "tabs": {
       "overview": "Overview",
       "kassa": "POS Revenue",
@@ -4051,7 +4051,7 @@
       "yearCosts": "Year Costs",
       "yearProfit": "Year Profit",
       "averageMargin": "Average Margin",
-      "tip": "Enter your POS revenue and purchases each month for an accurate year overview."
+      "tip": "Enter fixed costs and purchases where needed; revenue is calculated automatically from orders."
     },
     "settings": {
       "title": "Set Business Goals",

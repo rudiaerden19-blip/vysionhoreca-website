@@ -3478,7 +3478,7 @@
   },
   "analysePage": {
     "title": "Analisi aziendale",
-    "subtitle": "Analizza ricavi, costi e profitti",
+    "subtitle": "Analizza ricavi, costi e profitti. I ricavi da cassa e webshop sono calcolati automaticamente dai tuoi ordini.",
     "tabs": {
       "overview": "Panoramica",
       "kassa": "Incassi POS",
@@ -3591,7 +3591,7 @@
       "yearCosts": "Costi annuali",
       "yearProfit": "Profitto annuale",
       "averageMargin": "Margine medio",
-      "tip": "Inserisci ogni mese incassi e acquisti per una panoramica annuale precisa."
+      "tip": "Inserisci costi fissi e acquisti dove serve; il ricavo viene calcolato automaticamente dagli ordini."
     },
     "settings": {
       "title": "Imposta obiettivi aziendali",

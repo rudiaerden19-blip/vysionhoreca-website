@@ -2978,7 +2978,7 @@
   },
   "analysePage": {
     "title": "Betriebsanalyse",
-    "subtitle": "Analysieren Sie Umsatz, Kosten und Gewinn",
+    "subtitle": "Analysieren Sie Umsatz, Kosten und Gewinn. Kassen- und Online-Umsatz werden automatisch aus Ihren Bestellungen berechnet.",
     "tabs": {
       "overview": "Übersicht",
       "kassa": "Kassenumsatz",
@@ -3091,7 +3091,7 @@
       "yearCosts": "Jahreskosten",
       "yearProfit": "Jahresgewinn",
       "averageMargin": "Durchschnittliche Marge",
-      "tip": "Tragen Sie jeden Monat Kassenumsatz und Einkäufe ein für eine genaue Jahresübersicht."
+      "tip": "Geben Sie bei Bedarf Fixkosten und Einkäufe ein; der Umsatz wird automatisch aus Bestellungen berechnet."
     },
     "settings": {
       "title": "Geschäftsziele festlegen",
