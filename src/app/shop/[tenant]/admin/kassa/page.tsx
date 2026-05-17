@@ -402,48 +402,48 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
     <button
       type="button"
       data-kassa-product-id={product.id != null ? String(product.id) : undefined}
-      className={`touch-manipulation select-none [contain:layout_paint] group relative h-full min-h-0 w-full min-w-0 overflow-hidden rounded-xl text-left active:brightness-95 ${ui.productTileSolidBg}`}
+      className={`touch-manipulation select-none [contain:layout_paint] group relative flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden rounded-xl text-left active:brightness-95 ${ui.productTileSolidBg}`}
       style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.35)' }}
     >
       {product.image_url ? (
         <>
-          <div
-            className={`pointer-events-none absolute inset-0 overflow-hidden ${ui.productTileSolidBg}`}
-          >
-            <img
-              src={product.image_url}
-              alt={product.name}
-              decoding="async"
-              loading={imageLoading}
-              style={{
-                transform: `scale(${kioskZoom})`,
-                transformOrigin: 'center 78%',
-              }}
-              className="pointer-events-none block h-full min-h-0 w-full select-none object-cover object-top !h-full !w-full !max-w-none"
-            />
+          <div className="pointer-events-none relative min-h-0 flex-1 overflow-hidden">
+            <div className={`pointer-events-none absolute inset-0 overflow-hidden ${ui.productTileSolidBg}`}>
+              <img
+                src={product.image_url}
+                alt={product.name}
+                decoding="async"
+                loading={imageLoading}
+                style={{
+                  transform: `scale(${kioskZoom})`,
+                  transformOrigin: 'center 78%',
+                }}
+                className="pointer-events-none absolute inset-0 block h-full min-h-0 w-full select-none object-cover object-top !h-full !w-full !max-w-none"
+              />
+            </div>
           </div>
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2.5 pt-2 sm:px-3 sm:pb-3 sm:pt-2">
-            <p className="line-clamp-2 text-lg font-black leading-snug tracking-tight text-black sm:text-xl md:text-2xl">
+          <div
+            className={`pointer-events-none shrink-0 border-t px-2 pb-2.5 pt-2 text-center sm:px-3 sm:pb-3 sm:pt-2.5 ${ui.productTileFooterBar}`}
+          >
+            <p
+              className={`line-clamp-2 text-lg font-black leading-snug tracking-tight sm:text-xl md:text-2xl ${ui.productFooterTextDark}`}
+            >
               {product.name}
-            </p>
-            <p className={`mt-1 text-xl font-black tabular-nums ${ui.priceAccentClass} sm:text-2xl md:text-3xl`}>
-              €{product.price.toFixed(2)}
             </p>
           </div>
         </>
       ) : (
         <>
-          <div className={`pointer-events-none flex h-full w-full items-center justify-center pb-28 pt-10 ${ui.productTileSolidBg}`}>
-            <span className={`text-5xl ${appearanceDark ? 'text-zinc-600' : 'text-neutral-300'}`}>
-              🍽️
-            </span>
+          <div
+            className={`pointer-events-none flex min-h-0 flex-1 flex-col items-center justify-center px-2 pt-6 ${ui.productTileSolidBg}`}
+          >
+            <span className={`text-5xl ${appearanceDark ? 'text-zinc-600' : 'text-neutral-300'}`}>🍽️</span>
           </div>
-          <div className={`pointer-events-none absolute inset-x-0 bottom-0 z-10 border-t px-2 pb-2.5 pt-2 sm:px-3 sm:pb-3 sm:pt-2.5 ${ui.productTileFooterBar}`}>
+          <div
+            className={`pointer-events-none shrink-0 border-t px-2 pb-2.5 pt-2 sm:px-3 sm:pb-3 sm:pt-2.5 ${ui.productTileFooterBar}`}
+          >
             <p className={`line-clamp-2 text-lg font-black leading-snug sm:text-xl md:text-2xl ${ui.productFooterTextDark}`}>
               {product.name}
-            </p>
-            <p className={`mt-1 text-xl font-black tabular-nums ${ui.priceAccentClass} sm:text-2xl md:text-3xl`}>
-              €{product.price.toFixed(2)}
             </p>
           </div>
         </>
