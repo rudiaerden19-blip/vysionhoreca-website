@@ -324,8 +324,11 @@ const KASSA_MENU_TILE_IMAGE_WELL =
 const KASSA_MENU_TILE_IMG_CLASS =
   'pointer-events-none absolute inset-0 box-border h-full w-full select-none object-contain object-center'
 
+const KASSA_MENU_TILE_LABEL_WRAP =
+  'pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-0 sm:px-3'
+
 const KASSA_MENU_TILE_LABEL_CLASS =
-  'line-clamp-2 text-center text-base font-black leading-snug tracking-tight text-black sm:text-lg md:text-xl'
+  'm-0 line-clamp-2 text-center text-base font-black leading-snug tracking-tight text-black sm:text-lg md:text-xl'
 
 type KassaCategoryTileButtonProps = {
   category: MenuCategory
@@ -354,7 +357,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
               className={KASSA_MENU_TILE_IMG_CLASS}
             />
           </div>
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2 sm:px-3">
+          <div className={KASSA_MENU_TILE_LABEL_WRAP}>
             <p className={KASSA_MENU_TILE_LABEL_CLASS}>{category.name}</p>
           </div>
         </>
@@ -363,7 +366,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center overflow-hidden rounded-xl bg-white">
             {category.icon ? <span className="text-5xl text-neutral-400">{category.icon}</span> : null}
           </div>
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2 sm:px-3">
+          <div className={KASSA_MENU_TILE_LABEL_WRAP}>
             <p className={KASSA_MENU_TILE_LABEL_CLASS}>{category.name}</p>
           </div>
         </>
@@ -401,7 +404,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
               className={KASSA_MENU_TILE_IMG_CLASS}
             />
           </div>
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2 sm:px-3">
+          <div className={KASSA_MENU_TILE_LABEL_WRAP}>
             <p className={KASSA_MENU_TILE_LABEL_CLASS}>{product.name}</p>
           </div>
         </>
@@ -410,7 +413,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center overflow-hidden rounded-xl bg-white px-2 pt-4">
             <span className="text-5xl text-neutral-300">🍽️</span>
           </div>
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2 sm:px-3">
+          <div className={KASSA_MENU_TILE_LABEL_WRAP}>
             <p className={KASSA_MENU_TILE_LABEL_CLASS}>{product.name}</p>
           </div>
         </>
