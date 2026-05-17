@@ -3,6 +3,7 @@
 import type { MenuProduct, ProductOption, ProductOptionChoice } from '@/lib/admin-api'
 import type { KassaSelectedChoice } from '@/lib/kassa-cart-types'
 import { useLanguage } from '@/i18n'
+import { kassaProductImageRetryOnError } from '@/lib/kassa-img-retry'
 
 export interface KassaProductOptionsModalModel {
   product: MenuProduct
@@ -44,6 +45,7 @@ export function KassaProductOptionsModal({
             <img
               src={model.product.image_url}
               alt={model.product.name}
+              onError={kassaProductImageRetryOnError}
               className="w-14 h-14 rounded-xl object-cover flex-shrink-0"
             />
           )}

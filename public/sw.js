@@ -3,7 +3,7 @@
 
 const CACHE = 'vysion-kassa-v16'
 const STATIC_CACHE = 'vysion-static-v16'
-const IMAGE_CACHE = 'vysion-images-v3'
+const IMAGE_CACHE = 'vysion-images-v4'
 
 /** Eerste install: marketing-sectoren + start zodat PWA na één online bezoek ook zonder net start. */
 const PRECACHE_SAME_ORIGIN = [
@@ -75,19 +75,22 @@ function shouldStoreImageResponse(url, request, response) {
   return false
 }
 
-function cacheFirstExternalImage(request, url) {
+/** Online: altijd netwerk eerst (voorkomt “lege” tegels door corrupte cache-first hits). Offline: cache fallback. */
+function networkFirstExternalImage(request, url) {
   return caches.open(IMAGE_CACHE).then(cache =>
-    cache.match(request).then(cached => {
-      if (cached) return cached
-      return fetch(request)
-        .then(response => {
-          if (shouldStoreImageResponse(url, request, response)) {
-            cache.put(request, response.clone())
-          }
-          return response
+    fetch(request)
+      .then(response => {
+        if (response.ok && shouldStoreImageResponse(url, request, response)) {
+          void cache.put(request, response.clone()).catch(() => {})
+        }
+        return response
+      })
+      .catch(() =>
+        cache.match(request).then(hit => {
+          if (hit) return hit
+          return new Response('', { status: 503, statusText: 'No cached image' })
         })
-        .catch(() => cache.match(request))
-    })
+      )
   )
 }
 
@@ -119,7 +122,7 @@ self.addEventListener('fetch', event => {
   if (url.hostname === 'api.qrserver.com' || url.hostname.endsWith('.qrserver.com')) return
 
   if (url.hostname !== self.location.hostname) {
-    event.respondWith(cacheFirstExternalImage(request, url))
+    event.respondWith(networkFirstExternalImage(request, url))
     return
   }
 

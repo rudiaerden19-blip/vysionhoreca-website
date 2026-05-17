@@ -37,6 +37,7 @@ import { adminDb } from '@/lib/admin-db-client'
 import { useLanguage } from '@/i18n'
 import { getSoundsEnabled, setSoundsEnabled, playClick, playAddToCart, playRemove, playSuccess, playCashRegister, playCheckout, initAudio, prewarmAudio, playOrderNotification, activateAudioForIOS } from '@/lib/sounds'
 import { prefetchProductImageUrls } from '@/lib/offline-product-images'
+import { kassaProductImageRetryOnError } from '@/lib/kassa-img-retry'
 import { allTenantModulesTrue, type TenantModuleId } from '@/lib/tenant-modules'
 import {
   buildHamburgerModules,
@@ -342,6 +343,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
             alt={category.name}
             decoding="async"
             loading="eager"
+            onError={kassaProductImageRetryOnError}
             className="pointer-events-none absolute inset-0 block h-full min-h-0 w-full select-none object-cover object-top !h-full !w-full !max-w-none"
           />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2.5 pt-2 sm:px-3 sm:pb-3 sm:pt-2">
@@ -408,6 +410,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
                 alt={product.name}
                 decoding="async"
                 loading="eager"
+                onError={kassaProductImageRetryOnError}
                 style={{
                   transform: `scale(${kioskZoom})`,
                   transformOrigin: 'center 78%',
@@ -4226,6 +4229,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       <img src={item.product.image_url} alt={item.product.name}
                         decoding="async"
                         loading="eager"
+                        onError={kassaProductImageRetryOnError}
                         className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
                     ) : (
                       <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 text-xl ${ui.cartThumbPlaceholder}`}>🍽️</div>
