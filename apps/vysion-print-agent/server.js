@@ -6,7 +6,7 @@
 const express = require('express')
 const cors = require('cors')
 const path = require('path')
-const { spawnSync } = require('child_process')
+const { spawnSync, spawn } = require('child_process')
 const fs = require('fs')
 const os = require('os')
 const crypto = require('crypto')
@@ -693,6 +693,34 @@ function openCashDrawerWindows(printerName) {
 }
 
 /**
+ * Start ladekick **parallel** aan de eerste bon — geen `spawnSync` (dat blokkeerde seconden tot de printer ook begon).
+ * Fouten alleen naar console; synchrone `/drawer`-route gebruikt nog `openCashDrawerWindows`.
+ */
+function kickCashDrawerWindowsParallel(printerName) {
+  const ps1 = getDrawerScriptPath()
+  if (!fs.existsSync(ps1)) {
+    console.error('[drawer] parallel kick: open-drawer.ps1 niet gevonden')
+    return
+  }
+  const child = spawn(
+    'powershell.exe',
+    ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', ps1, '-PrinterName', printerName],
+    { windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] },
+  )
+  let errBuf = ''
+  child.stderr?.on('data', (d) => {
+    errBuf += String(d)
+    if (errBuf.length > 2000) errBuf = errBuf.slice(-2000)
+  })
+  child.on('error', (e) => console.error('[drawer] parallel kick spawn →', e))
+  child.on('close', (code) => {
+    if (code !== 0) {
+      console.error('[drawer] parallel kick niet OK (exit', `${code})`, errBuf.trim() || '(geen stderr)')
+    }
+  })
+}
+
+/**
  * Stuurt RAW ESC/POS bytes naar een Windows-printer met automatische retry.
  *
  *   1) Als attempt 1 faalt en de fout lijkt op "printer offline" of timeout
@@ -866,15 +894,17 @@ function createApp(getPrinterName /* () => string | null */) {
         : 2
 
       /**
-       * Lade-kick ná de eerste succesvolle bon i.p.v. ervoor: `openCashDrawerWindows` blokkeert
-       * synchroon (PowerShell spawnSync tot 8s) en gaf veel locaties „printer doet eerst heel lang niets”.
-       * Eerste afdruk begint nu meteen; lade nog vóór de tweede kopie (≥1 kopie) of direct na kopie bij 1 exemplaar.
+       * Bij contante betaling: lade **parallel** met eerste bon-print (`spawn`), geen wacht tot PowerShell terugkomt —
+       * gebruiker hoort/sees print + lade ongeveer tegelijk. `/drawer` API blijft synchroon voor expliciete test.
        */
       const wantDrawer = body.openDrawer === true
 
       let lastError = null
       let printedCount = 0
       for (let i = 0; i < copies; i++) {
+        if (wantDrawer && i === 0) {
+          kickCashDrawerWindowsParallel(printerName)
+        }
         const result = printRawWindows(printerName, payload)
         if (!result.ok) {
           lastError = result.error
@@ -882,12 +912,6 @@ function createApp(getPrinterName /* () => string | null */) {
           break
         }
         printedCount++
-
-        if (wantDrawer && i === 0) {
-          const dr = openCashDrawerWindows(printerName)
-          if (!dr.ok) console.error('[print] drawer-kick →', dr.error)
-          sleepSyncMs(200)
-        }
 
         if (i < copies - 1) sleepSyncMs(INTER_RECEIPT_COPY_PAUSE_MS)
       }
@@ -934,6 +958,7 @@ module.exports = {
   encInline,
   printRawWindows,
   openCashDrawerWindows,
+  kickCashDrawerWindowsParallel,
   listWindowsPrintersSync,
   sleepSyncMs,
   DRAWER_KICK,

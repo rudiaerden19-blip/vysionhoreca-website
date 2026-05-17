@@ -27,6 +27,7 @@ const {
   encInline,
   printRawWindows,
   openCashDrawerWindows,
+  kickCashDrawerWindowsParallel,
   sleepSyncMs,
   DRAWER_KICK,
 } = require('./server')
@@ -604,6 +605,9 @@ ipcMain.handle('agent:request', async (_evt, { path: reqPath, method, body }) =>
       const INTER_RECEIPT_COPY_PAUSE_MS = 560
       let result = { ok: false, error: 'no copies' }
       for (let i = 0; i < copies; i++) {
+        if (wantDrawer && i === 0) {
+          kickCashDrawerWindowsParallel(printerName)
+        }
         result = printRawWindows(printerName, payload)
         if (!result.ok) {
           console.error('[agent:print]', i + 1, '/', copies, '→', result.error)
@@ -613,12 +617,6 @@ ipcMain.handle('agent:request', async (_evt, { path: reqPath, method, body }) =>
             for (let q = 0; q < remaining; q++) printQueue.enqueue(payload, `${orderLabel} (${q+1}/${remaining})`)
           }
           break
-        }
-        // Lade ná eerste print — niet ervoor; zie server.js (/print handler).
-        if (wantDrawer && i === 0) {
-          const dr = openCashDrawerWindows(printerName)
-          if (!dr.ok) console.error('[print] drawer-kick →', dr.error)
-          sleepSyncMs(200)
         }
         if (i < copies - 1) sleepSyncMs(INTER_RECEIPT_COPY_PAUSE_MS)
       }
