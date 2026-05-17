@@ -3299,6 +3299,8 @@
     "printAgentFallbackModalBody": "لم تصل الكاشيرة إلى استجابة صحيحة من Print Agent على هذا الجهاز (127.0.0.1:9742). يُفعّل مسار الطوارئ: نافذة الطباعة العادية في Windows. هذا ليس إيصال ESC/POS كما مع الوكيل — على Epson حرارية قد يصغر النص أو يصبح غير مقروء. أصلِح الوكيل أولاً (الصينية → الإعدادات → اختر Epson الصحيح → احفظ → اختبار). استخدم متابعة فقط كحل مؤقت.",
     "printAgentFallbackModalDownloadLink": "صفحة تنزيل Print Agent (Windows)",
     "printAgentFallbackModalContinue": "المتابعة رغم ذلك (طباعة Windows)",
+    "printAgentFallbackModalClose": "إغلاق",
+    "printAgentFallbackEmergencyPrintDisabledHint": "طباعة الطوارئ عبر Windows غير متوفرة على هذا الجهاز اللوحي. استخدم Vysion Kiosk أو أصلح Print Agent على جهاز كمبيوتر.",
     "remove": "Eliminar",
     "parkToTable": "إلى الطاولة {number} · {zone}",
     "checkout": "الدفع",

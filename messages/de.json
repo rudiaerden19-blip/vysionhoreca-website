@@ -2799,6 +2799,8 @@
     "printAgentFallbackModalBody": "Die Kassa erhielt keine erfolgreiche Antwort vom Print Agent auf diesem PC (127.0.0.1:9742). Es folgt der Notfallweg: der normale Windows-Druckdialog. Das ist kein richtiger ESC/POS-Beleg wie über den Agent — auf einem Epson-Thermodrucker kann die Ausgabe winzig oder unleserlich sein. Zuerst den Agent reparieren (Tray → Einstellungen → richtigen Epson wählen → Speichern → Testbeleg). „Weiter“ nur als Notlösung.",
     "printAgentFallbackModalDownloadLink": "Downloadseite Print Agent (Windows)",
     "printAgentFallbackModalContinue": "Trotzdem öffnen (Windows-Notdruck)",
+    "printAgentFallbackModalClose": "Schließen",
+    "printAgentFallbackEmergencyPrintDisabledHint": "Notfall-Windows-Druck ist auf diesem Android-Tablet nicht verfügbar. Nutzen Sie Vysion Kiosk oder reparieren Sie den Print Agent am PC.",
     "remove": "Entfernen",
     "parkToTable": "Zu Tisch {number} · {zone}",
     "checkout": "Bezahlen",

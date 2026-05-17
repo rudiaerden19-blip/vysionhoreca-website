@@ -3299,6 +3299,8 @@
     "printAgentFallbackModalBody": "此电脑上的 Print Agent（127.0.0.1:9742）未返回成功。将走应急流程：打开 Windows 标准“打印”对话框。这不是通过代理发送的 ESC/POS 小票；在爱普生热敏机上可能又小又乱。请先修复代理（托盘 → 设置 → 选择正确的爱普生 → 保存 → 测试打印）。仅在紧急时使用“继续”。",
     "printAgentFallbackModalDownloadLink": "Print Agent 下载页面（Windows）",
     "printAgentFallbackModalContinue": "仍要打开（Windows 应急打印）",
+    "printAgentFallbackModalClose": "关闭",
+    "printAgentFallbackEmergencyPrintDisabledHint": "Android 平板上无法使用 Windows 应急打印。请使用 Vysion Kiosk，或在 PC 上修复 Print Agent。",
     "remove": "Eliminar",
     "parkToTable": "送回桌位 {number} · {zone}",
     "checkout": "结账",

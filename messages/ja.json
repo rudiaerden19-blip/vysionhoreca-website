@@ -3299,6 +3299,8 @@
     "printAgentFallbackModalBody": "この PC の Print Agent（127.0.0.1:9742）から正しい応答がありません。Windows の画面「印刷」が開きます。これはエージェント経由の ESC/POS レシートではありません。Epson サーマルでは文字が小さく乱れることがあります。まずトレイからエージェントを修復（設定で正しい Epson を保存 → テスト印刷）。「続行」は緊急時のみ。",
     "printAgentFallbackModalDownloadLink": "Print Agent ダウンロードページ（Windows）",
     "printAgentFallbackModalContinue": "とにかく開く（Windows 印刷・緊急）",
+    "printAgentFallbackModalClose": "閉じる",
+    "printAgentFallbackEmergencyPrintDisabledHint": "AndroidタブレットではWindowsの緊急印刷は使えません。Vysionキオスクを使うか、PCでPrint Agentを直してください。",
     "remove": "Eliminar",
     "parkToTable": "テーブルへ {number} · {zone}",
     "checkout": "会計",

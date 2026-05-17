@@ -2047,7 +2047,7 @@ export async function calculateMonthlyReport(
     tenantSlug,
     startUTC,
     endUTC,
-    'total, status, payment_method, payment_split_cash, payment_split_card, order_type, payment_status'
+    'total, status, payment_method, payment_split_cash, payment_split_card, order_type, payment_status, created_at'
   )
 
   const ordersData = ordersDataRaw.filter((o) =>
@@ -2065,10 +2065,34 @@ export async function calculateMonthlyReport(
   const kassaRevenueFromOrders = kassaOrderRows.reduce((sum, o) => sum + (Number(o.total) || 0), 0)
   const kassaOrdersFromOrders = kassaOrderRows.length
 
-  // 2. Handmatige kassa-dagtotalen (daily_sales) — bovenop echte POS-orders uit orders-tabel
+  /** Brussels kalenderdag → POS die meetelt voor analyse (geen dubbeltelling met daily_sales). */
+  const kassaOrderRevenueByBelgiumDay = new Map<string, number>()
+  const kassaOrderCountByBelgiumDay = new Map<string, number>()
+  for (const o of kassaOrderRows) {
+    const raw = o as Record<string, unknown>
+    const created = raw.created_at
+    const ts =
+      typeof created === 'string' && created.length > 0 ? Date.parse(created) : Number.NaN
+    if (!Number.isFinite(ts)) continue
+    const day = getBelgiumDateString(new Date(ts))
+    const total = Number(raw.total) || 0
+    kassaOrderRevenueByBelgiumDay.set(day, (kassaOrderRevenueByBelgiumDay.get(day) ?? 0) + total)
+    kassaOrderCountByBelgiumDay.set(day, (kassaOrderCountByBelgiumDay.get(day) ?? 0) + 1)
+  }
+
+  // 2. Handmatige kassa-dagtotalen (daily_sales): alleen voor dagen zonder meetellende POS-order(s).
+  //    Anders dubbelt het met stap 1 — typisch zelfde omzet uit kassa én uit «Kassa omzet invoeren».
   const dailySales = await getDailySales(tenantSlug, year, month)
-  const kassaRevenueFromManual = dailySales.reduce((sum, d) => sum + (Number(d.total_revenue) || 0), 0)
-  const kassaOrdersFromManual = dailySales.reduce((sum, d) => sum + (Number(d.order_count) || 0), 0)
+  let kassaRevenueFromManual = 0
+  let kassaOrdersFromManual = 0
+  for (const d of dailySales) {
+    const day = d.date
+    const revDay = kassaOrderRevenueByBelgiumDay.get(day) ?? 0
+    const cntDay = kassaOrderCountByBelgiumDay.get(day) ?? 0
+    if (revDay > 0 || cntDay > 0) continue
+    kassaRevenueFromManual += Number(d.total_revenue) || 0
+    kassaOrdersFromManual += Number(d.order_count) || 0
+  }
 
   const kassaRevenue = kassaRevenueFromOrders + kassaRevenueFromManual
   const kassaOrders = kassaOrdersFromOrders + kassaOrdersFromManual

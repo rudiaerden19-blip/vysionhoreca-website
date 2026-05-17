@@ -3024,21 +3024,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     flushSync(() => {
       if (printResult.ok) {
-        if (isAndroidTabletPrintClient()) {
-          setThermalPrintBanner({
-            variant: 'success',
-            message:
-              'Print-opdracht naar de Vysion-app (USB-bonprinter).\n\nGeen papier? Los dat op in de app (testprint, USB, papierrol) — niet via browser/PDF; dat werkt hier niet voor de bonprinter.',
-          })
-        } else {
-          setThermalPrintBanner(null)
-        }
+        /** Zelfde op tablet/desktop: geen losse succes-toast — voorkomt verschillende UX per apparaat. */
+        setThermalPrintBanner(null)
       } else {
         setThermalPrintBanner({
           variant: 'error',
           message: `${t('kassaApp.printAgentFailedDebugTitle')}\n\n${printResult.error}\n\n${t('kassaApp.printAgentFailedDebugFooter')}`,
         })
-        setPrintAgentFallbackHtml(isAndroidTabletPrintClient() ? '' : receiptHtml)
+        /** Zelfde nood-HTML overal; alleen bij Android geen browser-print bij „Doorgaan”. */
+        setPrintAgentFallbackHtml(receiptHtml)
       }
     })
     if (printResult.ok) {
@@ -4639,36 +4633,47 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         >
           <div className={ui.printFallbackPanel}>
             <h2 id="print-agent-fallback-title" className={ui.printFallbackTitle}>
-              {isAndroidTabletPrintClient()
-                ? 'Bonprinter (tablet)'
-                : t('kassaApp.printAgentFallbackModalTitle')}
+              {t('kassaApp.printAgentFallbackModalTitle')}
             </h2>
-            <p className={ui.printFallbackBody}>
-              {isAndroidTabletPrintClient()
-                ? 'Print naar de USB-bonprinter is mislukt. Browser-print op Android opent alleen PDF en sluit de kiosk-flow af — gebruik daarom de Vysion Kiosk-app (testprint, USB-rechten, papier).'
-                : t('kassaApp.printAgentFallbackModalBody')}
-            </p>
-            {!isAndroidTabletPrintClient() ? (
-              <a
-                href="https://www.vysionhoreca.com/download/print-agent-windows"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-4 flex w-full items-center justify-center rounded-xl bg-[#3C4D6B] px-4 py-3 text-center text-sm font-bold text-white hover:bg-[#2D3A52]"
-              >
-                {t('kassaApp.printAgentFallbackModalDownloadLink')}
-              </a>
-            ) : null}
-            <button
-              type="button"
-              className={ui.printFallbackGhost}
-              onClick={() => {
-                const h = printAgentFallbackHtml
-                setPrintAgentFallbackHtml(null)
-                if (h && h.length > 0 && !isAndroidTabletPrintClient()) printReceiptHtmlDocument(h)
-              }}
+            <p className={ui.printFallbackBody}>{t('kassaApp.printAgentFallbackModalBody')}</p>
+            <a
+              href="https://www.vysionhoreca.com/download/print-agent-windows"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 flex w-full items-center justify-center rounded-xl bg-[#3C4D6B] px-4 py-3 text-center text-sm font-bold text-white hover:bg-[#2D3A52]"
             >
-              {isAndroidTabletPrintClient() ? 'Sluiten' : t('kassaApp.printAgentFallbackModalContinue')}
-            </button>
+              {t('kassaApp.printAgentFallbackModalDownloadLink')}
+            </a>
+            <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                className={`w-full sm:w-auto ${ui.modalGhostBtn}`}
+                onClick={() => setPrintAgentFallbackHtml(null)}
+              >
+                {t('kassaApp.printAgentFallbackModalClose')}
+              </button>
+              <button
+                type="button"
+                title={
+                  isAndroidTabletPrintClient()
+                    ? t('kassaApp.printAgentFallbackEmergencyPrintDisabledHint')
+                    : undefined
+                }
+                disabled={
+                  !printAgentFallbackHtml ||
+                  printAgentFallbackHtml.length === 0 ||
+                  isAndroidTabletPrintClient()
+                }
+                className={`w-full sm:w-auto ${ui.printFallbackGhost.replace(/^mt-3\s+/, '')} disabled:cursor-not-allowed disabled:opacity-50`}
+                onClick={() => {
+                  const h = printAgentFallbackHtml
+                  setPrintAgentFallbackHtml(null)
+                  if (h && h.length > 0 && !isAndroidTabletPrintClient()) printReceiptHtmlDocument(h)
+                }}
+              >
+                {t('kassaApp.printAgentFallbackModalContinue')}
+              </button>
+            </div>
           </div>
         </div>
       )}

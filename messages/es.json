@@ -3299,6 +3299,8 @@
     "printAgentFallbackModalBody": "La caja no obtuvo respuesta correcta del Print Agent en este PC (127.0.0.1:9742). Se usará la vía de emergencia: el cuadro de impresión de Windows. No es un ticket ESC/POS real como con el agente — en una Epson térmica puede salir muy pequeño o ilegible. Primero restaure el agente (bandeja → Ajustes → Epson correcto → Guardar → prueba). Use Continuar solo como medida provisional.",
     "printAgentFallbackModalDownloadLink": "Página de descarga Print Agent (Windows)",
     "printAgentFallbackModalContinue": "Abrir ticket igualmente (fallback Windows)",
+    "printAgentFallbackModalClose": "Cerrar",
+    "printAgentFallbackEmergencyPrintDisabledHint": "La impresión de emergencia de Windows no está disponible en esta tableta Android. Use Vysion Kiosk o repare Print Agent en un PC.",
     "remove": "Eliminar",
     "parkToTable": "A mesa {number} · {zone}",
     "checkout": "Cobrar",
