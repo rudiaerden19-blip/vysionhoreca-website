@@ -314,18 +314,19 @@ const KassaReservationsView = dynamic(() => import('@/components/KassaReservatio
   ),
 })
 
-/** Categorie- en producttegel: dezelfde witte kaart; foto volledig zichtbaar (contain) op wit, geen donkere randen. */
+/** Categorie- en producttegel: witte kaart; foto alleen bovenin, titel in vaste strook eronder (niet over de foto). */
 const KASSA_MENU_TILE_BUTTON_CLASS =
-  'touch-manipulation select-none group relative h-full min-h-0 w-full min-w-0 overflow-hidden rounded-xl border border-neutral-200/90 bg-white text-left shadow-[0_8px_30px_rgba(0,0,0,0.35)] active:brightness-95'
+  'touch-manipulation select-none group relative flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden rounded-xl border border-neutral-200/90 bg-white text-left shadow-[0_8px_30px_rgba(0,0,0,0.35)] active:brightness-95'
 
 const KASSA_MENU_TILE_IMAGE_WELL =
-  'pointer-events-none absolute inset-0 overflow-hidden rounded-xl bg-white'
+  'pointer-events-none relative min-h-0 w-full min-w-0 flex-1 overflow-hidden bg-white'
 
 const KASSA_MENU_TILE_IMG_CLASS =
   'pointer-events-none absolute inset-0 box-border h-full w-full select-none object-contain object-center'
 
+/** Vaste onderstrook: titel staat onder de afbeelding, niet in de foto. */
 const KASSA_MENU_TILE_LABEL_WRAP =
-  'pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-0 sm:px-3'
+  'pointer-events-none shrink-0 w-full bg-white px-2 pb-2 pt-1.5 sm:px-3'
 
 const KASSA_MENU_TILE_LABEL_CLASS =
   'm-0 line-clamp-2 text-center text-base font-black leading-snug tracking-tight text-black sm:text-lg md:text-xl'
@@ -363,7 +364,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
         </>
       ) : (
         <>
-          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center overflow-hidden rounded-xl bg-white">
+          <div className="pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-white px-2">
             {category.icon ? <span className="text-5xl text-neutral-400">{category.icon}</span> : null}
           </div>
           <div className={KASSA_MENU_TILE_LABEL_WRAP}>
@@ -410,7 +411,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
         </>
       ) : (
         <>
-          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center overflow-hidden rounded-xl bg-white px-2 pt-4">
+          <div className="pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-white px-2 pt-4">
             <span className="text-5xl text-neutral-300">🍽️</span>
           </div>
           <div className={KASSA_MENU_TILE_LABEL_WRAP}>
