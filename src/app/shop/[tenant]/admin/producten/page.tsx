@@ -20,6 +20,7 @@ import {
   rectSortingStrategy 
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import Image from 'next/image'
 import { 
   getMenuProducts, 
   getMenuCategories, 
@@ -36,6 +37,7 @@ import {
   KASSA_PRODUCT_IMAGE_ZOOM_MAX,
   compareMenuProductsBySortOrder,
 } from '@/lib/admin-api'
+import { canUseNextImageOptimizer } from '@/lib/next-image-optimizer-allowed'
 import MediaPicker from '@/components/MediaPicker'
 import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
@@ -138,12 +140,29 @@ function SortableProductCard({
         className={`relative h-40 overflow-hidden ${product.image_display_mode === 'contain' ? 'bg-gray-50' : 'bg-white'}`}
       >
         {product.image_url ? (
-          <img
-            src={product.image_url}
-            alt={product.name}
-            draggable={false}
-            className={`w-full h-full pointer-events-none ${product.image_display_mode === 'contain' ? 'object-contain object-center' : 'object-cover object-center'}`}
-          />
+          canUseNextImageOptimizer(product.image_url) ? (
+            <Image
+              src={product.image_url}
+              alt={product.name}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
+              quality={48}
+              loading="lazy"
+              draggable={false}
+              className={`pointer-events-none ${
+                product.image_display_mode === 'contain' ? 'object-contain object-center' : 'object-cover object-center'
+              }`}
+            />
+          ) : (
+            <img
+              src={product.image_url}
+              alt={product.name}
+              draggable={false}
+              loading="lazy"
+              decoding="async"
+              className={`w-full h-full pointer-events-none ${product.image_display_mode === 'contain' ? 'object-contain object-center' : 'object-cover object-center'}`}
+            />
+          )
         ) : (
           <div className="w-full h-full flex items-center justify-center text-5xl bg-gray-50">
             🍟

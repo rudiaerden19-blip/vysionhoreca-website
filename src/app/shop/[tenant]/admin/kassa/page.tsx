@@ -16,6 +16,7 @@ import {
 import dynamic from 'next/dynamic'
 import { flushSync } from 'react-dom'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
   MenuProduct,
@@ -37,6 +38,7 @@ import { useLanguage } from '@/i18n'
 import { getSoundsEnabled, setSoundsEnabled, playClick, playAddToCart, playRemove, playSuccess, playCashRegister, playCheckout, initAudio, prewarmAudio, playOrderNotification, activateAudioForIOS } from '@/lib/sounds'
 import { prefetchProductImageUrls } from '@/lib/offline-product-images'
 import { kassaProductImageRetryOnError } from '@/lib/kassa-img-retry'
+import { canUseNextImageOptimizer } from '@/lib/next-image-optimizer-allowed'
 import { allTenantModulesTrue, type TenantModuleId } from '@/lib/tenant-modules'
 import {
   buildHamburgerModules,
@@ -324,6 +326,86 @@ const KASSA_MENU_TILE_IMAGE_WELL =
 const KASSA_MENU_TILE_IMG_CLASS =
   'pointer-events-none absolute inset-0 box-border h-full w-full select-none object-contain object-center'
 
+const KASSA_MENU_TILE_IMAGE_SIZES =
+  '(max-width: 640px) 48vw, (max-width: 1024px) 33vw, (max-width: 1536px) 20vw, 220px'
+
+/**
+ * Tegels: WebP/kleiner via next/image als de host is toegestaan; anders gewone img met lazy.
+ * Geen `loading=eager` meer — tegelraster laadde honderden KB per tegel tegelijk.
+ */
+const KassaMenuTileImage = memo(function KassaMenuTileImage({
+  src,
+  alt,
+  className,
+}: {
+  src: string
+  alt: string
+  className: string
+}) {
+  if (canUseNextImageOptimizer(src)) {
+    return (
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        sizes={KASSA_MENU_TILE_IMAGE_SIZES}
+        quality={44}
+        loading="lazy"
+        onError={kassaProductImageRetryOnError}
+        className={className}
+      />
+    )
+  }
+  return (
+    <img
+      src={src}
+      alt={alt}
+      decoding="async"
+      loading="lazy"
+      onError={kassaProductImageRetryOnError}
+      className={className}
+    />
+  )
+})
+
+type KassaCartLineThumbProps = {
+  imageUrl: string
+  alt: string
+  className: string
+}
+
+const KassaCartLineThumb = memo(function KassaCartLineThumb({
+  imageUrl,
+  alt,
+  className,
+}: KassaCartLineThumbProps) {
+  if (canUseNextImageOptimizer(imageUrl)) {
+    return (
+      <Image
+        src={imageUrl}
+        alt={alt}
+        width={48}
+        height={48}
+        sizes="48px"
+        quality={40}
+        loading="lazy"
+        onError={kassaProductImageRetryOnError}
+        className={className}
+      />
+    )
+  }
+  return (
+    <img
+      src={imageUrl}
+      alt={alt}
+      decoding="async"
+      loading="lazy"
+      onError={kassaProductImageRetryOnError}
+      className={className}
+    />
+  )
+})
+
 /** Vaste onderstrook: titel staat onder de afbeelding, niet in de foto. */
 const KASSA_MENU_TILE_LABEL_WRAP =
   'pointer-events-none shrink-0 w-full bg-white px-2 pb-2 pt-1.5 sm:px-3'
@@ -349,12 +431,9 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
       {imageUrl ? (
         <>
           <div className={KASSA_MENU_TILE_IMAGE_WELL}>
-            <img
+            <KassaMenuTileImage
               src={imageUrl}
               alt={category.name}
-              decoding="async"
-              loading="eager"
-              onError={kassaProductImageRetryOnError}
               className={KASSA_MENU_TILE_IMG_CLASS}
             />
           </div>
@@ -396,12 +475,9 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
       {product.image_url ? (
         <>
           <div className={KASSA_MENU_TILE_IMAGE_WELL}>
-            <img
+            <KassaMenuTileImage
               src={product.image_url}
               alt={product.name}
-              decoding="async"
-              loading="eager"
-              onError={kassaProductImageRetryOnError}
               className={KASSA_MENU_TILE_IMG_CLASS}
             />
           </div>
@@ -4201,11 +4277,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   <div key={item.cartKey} className={ui.cartRowBg}>
                     {/* Productfoto */}
                     {item.product.image_url ? (
-                      <img src={item.product.image_url} alt={item.product.name}
-                        decoding="async"
-                        loading="eager"
-                        onError={kassaProductImageRetryOnError}
-                        className={`w-12 h-12 rounded-lg flex-shrink-0 ${item.product.image_display_mode === 'contain' ? `object-contain ${ui.cartThumbPlaceholder}` : 'object-cover'}`} />
+                      <KassaCartLineThumb
+                        imageUrl={item.product.image_url}
+                        alt={item.product.name}
+                        className={`w-12 h-12 rounded-lg flex-shrink-0 ${
+                          item.product.image_display_mode === 'contain'
+                            ? `object-contain ${ui.cartThumbPlaceholder}`
+                            : 'object-cover'
+                        }`}
+                      />
                     ) : (
                       <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 text-xl ${ui.cartThumbPlaceholder}`}>🍽️</div>
                     )}
