@@ -163,31 +163,23 @@ function SortableProductCard({
           )}
         </div>
         {!product.is_active && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-[5]">
             <span className="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full">
               Niet beschikbaar
             </span>
           </div>
         )}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] px-2 pb-2 pt-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+          <h3 className="font-bold text-white text-sm line-clamp-2 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
+            {product.name}
+          </h3>
+        </div>
       </div>
 
       {/* Content */}
       <div className="p-4">
-        <div className="flex justify-between items-start mb-2">
-          <div>
-            <h3 className="font-bold text-gray-900">{product.name}</h3>
-            <span className="text-sm text-gray-500">{category?.name || 'Geen categorie'}</span>
-          </div>
-          <div className="text-right">
-            {product.is_promo && product.promo_price ? (
-              <>
-                <span className="text-gray-400 line-through text-sm">€{product.price.toFixed(2)}</span>
-                <span className="text-green-500 font-bold text-lg block">€{product.promo_price.toFixed(2)}</span>
-              </>
-            ) : (
-              <span className="text-blue-600 font-bold text-lg">€{product.price.toFixed(2)}</span>
-            )}
-          </div>
+        <div className="mb-2">
+          <span className="text-sm text-gray-500">{category?.name || 'Geen categorie'}</span>
         </div>
         <p className="text-sm text-gray-500 line-clamp-2 mb-4">{product.description}</p>
 

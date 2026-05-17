@@ -141,11 +141,7 @@ const MenuProductCard = memo(function MenuProductCard({
           <div className="w-full h-full flex items-center justify-center text-6xl">🍟</div>
         )}
 
-        {!useContain && !lite && (
-          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/40 to-transparent" />
-        )}
-
-        <div className="absolute top-3 left-3 flex gap-2">
+        <div className="absolute top-3 left-3 z-[6] flex gap-2">
           {item.is_popular && (
             <span style={{ backgroundColor: primaryColor }} className="text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md">
               🔥 POPULAIR
@@ -156,24 +152,18 @@ const MenuProductCard = memo(function MenuProductCard({
           )}
         </div>
 
-        <div className="absolute top-3 right-3">
-          {item.is_promo && item.promo_price != null ? (
-            <div className="flex flex-col items-end gap-1">
-              <span className="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow-md">
-                €{item.promo_price.toFixed(2)}
-              </span>
-              <span className="bg-black/50 text-white/70 text-xs font-medium px-2 py-0.5 rounded-full line-through">
-                €{item.price.toFixed(2)}
-              </span>
-            </div>
-          ) : (
-            <span
-              className="text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-md"
-              style={{ backgroundColor: primaryColor }}
-            >
-              €{item.price.toFixed(2)}
-            </span>
-          )}
+        <div
+          className={`absolute inset-x-0 bottom-0 z-[5] bg-gradient-to-t from-black/80 via-black/45 to-transparent px-3 ${
+            lite ? 'pb-2.5 pt-12' : 'pb-3 pt-14'
+          }`}
+        >
+          <h3
+            className={`font-bold text-white leading-snug line-clamp-2 drop-shadow-sm ${
+              lite ? 'text-lg' : 'text-base sm:text-lg'
+            }`}
+          >
+            {item.name}
+          </h3>
         </div>
 
         {!item.is_available && (
@@ -184,7 +174,6 @@ const MenuProductCard = memo(function MenuProductCard({
       </div>
 
       <div className={lite ? 'p-4 pb-3' : 'p-3 sm:p-4'}>
-        <h3 className={`font-bold ${lite ? 'text-lg' : 'text-base sm:text-lg'} ${theme.text} mb-1 leading-snug`}>{item.name}</h3>
         {item.description && (
           <p className={`${theme.textLight} text-xs sm:text-sm mb-3 line-clamp-2 leading-relaxed`}>{item.description}</p>
         )}

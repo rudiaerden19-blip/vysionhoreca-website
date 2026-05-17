@@ -243,16 +243,6 @@ function MenuItemCard({ product, primaryColor, t }: { product: MenuProduct; prim
                 <p className="text-white/50 text-xs mt-0.5 line-clamp-1">{product.description}</p>
               )}
             </div>
-            <div className="text-right flex-shrink-0">
-              {hasPromo ? (
-                <>
-                  <p className="text-white/40 text-xs line-through">€{product.price.toFixed(2)}</p>
-                  <p className="font-bold text-sm text-white">€{product.promo_price!.toFixed(2)}</p>
-                </>
-              ) : (
-                <p className="font-bold text-sm text-white">€{product.price.toFixed(2)}</p>
-              )}
-            </div>
           </div>
         </div>
       </div>

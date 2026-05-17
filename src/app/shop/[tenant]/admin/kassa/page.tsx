@@ -404,39 +404,33 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
     <button
       type="button"
       data-kassa-product-id={product.id != null ? String(product.id) : undefined}
-      className={`touch-manipulation select-none group relative flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden rounded-xl text-left active:brightness-95 ${ui.productTileSolidBg}`}
+      className={`touch-manipulation select-none group relative h-full min-h-0 w-full min-w-0 overflow-hidden rounded-xl text-left active:brightness-95 ${ui.productTileSolidBg}`}
       style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.35)' }}
     >
       {product.image_url ? (
         <>
-          <div className="pointer-events-none relative min-h-0 flex-1 basis-0 overflow-hidden rounded-t-xl">
-            <div className={`pointer-events-none absolute inset-0 overflow-hidden ${ui.productTileSolidBg}`}>
-              <img
-                src={product.image_url}
-                alt={product.name}
-                decoding="async"
-                loading="eager"
-                onError={kassaProductImageRetryOnError}
-                style={
-                  fitContain
-                    ? undefined
-                    : {
-                        transform: `scale(${kioskZoom})`,
-                        transformOrigin: 'center 78%',
-                      }
-                }
-                className={`pointer-events-none absolute inset-0 block h-full min-h-0 w-full select-none !h-full !w-full !max-w-none ${
-                  fitContain ? 'object-contain object-center' : 'object-cover object-top'
-                }`}
-              />
-            </div>
+          <div className={`pointer-events-none absolute inset-0 overflow-hidden rounded-xl ${ui.productTileSolidBg}`}>
+            <img
+              src={product.image_url}
+              alt={product.name}
+              decoding="async"
+              loading="eager"
+              onError={kassaProductImageRetryOnError}
+              style={
+                fitContain
+                  ? undefined
+                  : {
+                      transform: `scale(${kioskZoom})`,
+                      transformOrigin: 'center 78%',
+                    }
+              }
+              className={`pointer-events-none absolute inset-0 block h-full min-h-0 w-full select-none !h-full !w-full !max-w-none ${
+                fitContain ? 'object-contain object-center' : 'object-cover object-top'
+              }`}
+            />
           </div>
-          <div
-            className={`pointer-events-none shrink-0 rounded-b-xl border-t px-2 py-2.5 text-center sm:px-3 sm:py-3 ${ui.productTileFooterBar}`}
-          >
-            <p
-              className={`line-clamp-2 text-lg font-black leading-snug tracking-tight sm:text-xl md:text-2xl ${ui.productFooterTextDark}`}
-            >
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2.5 pt-10 sm:px-3 sm:pb-3 sm:pt-12 bg-gradient-to-t from-black/80 via-black/45 to-transparent">
+            <p className="line-clamp-2 text-center text-lg font-black leading-snug tracking-tight text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] sm:text-xl md:text-2xl">
               {product.name}
             </p>
           </div>
@@ -444,14 +438,12 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
       ) : (
         <>
           <div
-            className={`pointer-events-none relative flex min-h-0 flex-1 basis-0 flex-col items-center justify-center overflow-hidden rounded-t-xl px-2 pt-4 ${ui.productTileSolidBg}`}
+            className={`pointer-events-none absolute inset-0 flex flex-col items-center justify-center overflow-hidden rounded-xl px-2 pt-4 ${ui.productTileSolidBg}`}
           >
             <span className={`text-5xl ${appearanceDark ? 'text-zinc-600' : 'text-neutral-300'}`}>🍽️</span>
           </div>
-          <div
-            className={`pointer-events-none shrink-0 rounded-b-xl border-t px-2 py-2.5 text-center sm:px-3 sm:py-3 ${ui.productTileFooterBar}`}
-          >
-            <p className={`line-clamp-2 text-lg font-black leading-snug sm:text-xl md:text-2xl ${ui.productFooterTextDark}`}>
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2.5 pt-10 sm:px-3 sm:pb-3 sm:pt-12 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+            <p className="line-clamp-2 text-center text-lg font-black leading-snug text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] sm:text-xl md:text-2xl">
               {product.name}
             </p>
           </div>
