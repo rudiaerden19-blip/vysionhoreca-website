@@ -13,7 +13,7 @@
  * ------------------------------------------------------------------------- */
 
 const electron = require('electron')
-const { app, BrowserWindow, Tray, Menu, ipcMain, nativeImage, safeStorage, shell, dialog } = electron
+const { app, BrowserWindow, Tray, Menu, ipcMain, nativeImage, safeStorage, shell, dialog, session } = electron
 const path = require('path')
 const fs = require('fs')
 const os = require('os')
@@ -33,6 +33,8 @@ const {
 
 // ---- Constants -----------------------------------------------------------
 const PORT = 9742
+/** Zelfde waarde als `webPreferences.partition` van het kassa-venster — hier wissen we SW + caches. */
+const KASSA_SESSION_PARTITION = 'persist:vysion-kassa'
 const HEALTH_INTERVAL_MS = 30_000
 const UPDATE_CHECK_INTERVAL_MS = 4 * 60 * 60 * 1000  // elke 4 uur
 const GH_OWNER = 'rudiaerden19-blip'
@@ -116,6 +118,34 @@ function pickIcon() {
   return makeColorIcon('green')
 }
 
+/**
+ * Leegt HTTP-cache, Service Workers en Cache Storage voor het kassa-browserprofiel.
+ * Lost o.a. ontbrekende productfoto's op (corrupte SW-image-cache) zonder login/cookies te wissen.
+ */
+async function clearKassaPartitionCache() {
+  const ses = session.fromPartition(KASSA_SESSION_PARTITION)
+  try {
+    await ses.clearCache()
+  } catch (e) {
+    console.error('[kassa-cache] clearCache', e)
+  }
+  try {
+    await ses.clearStorageData({
+      storages: ['serviceworkers', 'cachestorage', 'shadercache'],
+    })
+  } catch (e) {
+    console.error('[kassa-cache] clearStorageData', e)
+  }
+  console.info('[kassa-cache] partition geleegd:', KASSA_SESSION_PARTITION)
+  if (kassaWindow && !kassaWindow.isDestroyed()) {
+    try {
+      kassaWindow.webContents.reloadIgnoringCache()
+    } catch (e) {
+      console.error('[kassa-cache] reload', e)
+    }
+  }
+}
+
 // ---- Kassa-window --------------------------------------------------------
 function openKassa() {
   if (!config.kassaUrl || !getPrinterName()) {
@@ -136,7 +166,7 @@ function openKassa() {
       nodeIntegration: false,
       contextIsolation: false,
       preload: path.join(__dirname, 'kassa-preload.js'),
-      partition: 'persist:vysion-kassa',
+      partition: KASSA_SESSION_PARTITION,
       backgroundThrottling: false, // achtergrond-tab niet vertragen → polls werken
     },
     title: 'Vysion Kassa',
@@ -329,6 +359,20 @@ function buildTray() {
         },
       },
       { type: 'separator' },
+      {
+        label: 'Kassa-cache legen (foto\'s / service worker)',
+        click: async () => {
+          await clearKassaPartitionCache()
+          dialog.showMessageBox({
+            type: 'info',
+            title: 'Vysion Print Agent',
+            message:
+              'De cache van het kassa-venster is geleegd (HTTP-cache, service worker, afbeeldings-cache).\n\n' +
+              'Ingelogd blijven: cookies en lokale opslag zijn niet gewist.\n\n' +
+              'Het kassa-venster is vernieuwd als het open stond.',
+          })
+        },
+      },
       {
         label: 'Opgeslagen wachtwoord wissen',
         click: () => {
