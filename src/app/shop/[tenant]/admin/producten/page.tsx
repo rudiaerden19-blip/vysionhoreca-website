@@ -169,10 +169,8 @@ function SortableProductCard({
             </span>
           </div>
         )}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] px-2 pb-2 pt-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
-          <h3 className="font-bold text-white text-sm line-clamp-2 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
-            {product.name}
-          </h3>
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] px-2 pb-2">
+          <h3 className="font-bold text-black text-sm line-clamp-2">{product.name}</h3>
         </div>
       </div>
 

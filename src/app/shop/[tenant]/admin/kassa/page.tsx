@@ -429,8 +429,8 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
               }`}
             />
           </div>
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2.5 pt-10 sm:px-3 sm:pb-3 sm:pt-12 bg-gradient-to-t from-black/80 via-black/45 to-transparent">
-            <p className="line-clamp-2 text-center text-lg font-black leading-snug tracking-tight text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] sm:text-xl md:text-2xl">
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2 sm:px-3">
+            <p className="line-clamp-2 text-center text-lg font-black leading-snug tracking-tight text-black sm:text-xl md:text-2xl">
               {product.name}
             </p>
           </div>
@@ -442,8 +442,8 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
           >
             <span className={`text-5xl ${appearanceDark ? 'text-zinc-600' : 'text-neutral-300'}`}>🍽️</span>
           </div>
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2.5 pt-10 sm:px-3 sm:pb-3 sm:pt-12 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
-            <p className="line-clamp-2 text-center text-lg font-black leading-snug text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] sm:text-xl md:text-2xl">
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2 sm:px-3">
+            <p className="line-clamp-2 text-center text-lg font-black leading-snug text-black sm:text-xl md:text-2xl">
               {product.name}
             </p>
           </div>

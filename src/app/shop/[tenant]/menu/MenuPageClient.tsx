@@ -152,15 +152,9 @@ const MenuProductCard = memo(function MenuProductCard({
           )}
         </div>
 
-        <div
-          className={`absolute inset-x-0 bottom-0 z-[5] bg-gradient-to-t from-black/80 via-black/45 to-transparent px-3 ${
-            lite ? 'pb-2.5 pt-12' : 'pb-3 pt-14'
-          }`}
-        >
+        <div className={`absolute inset-x-0 bottom-0 z-[5] px-3 ${lite ? 'pb-2' : 'pb-2.5'}`}>
           <h3
-            className={`font-bold text-white leading-snug line-clamp-2 drop-shadow-sm ${
-              lite ? 'text-lg' : 'text-base sm:text-lg'
-            }`}
+            className={`font-bold text-black leading-snug line-clamp-2 ${lite ? 'text-lg' : 'text-base sm:text-lg'}`}
           >
             {item.name}
           </h3>
