@@ -377,6 +377,10 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
   )
 })
 
+/** Witte omtrek om zwarte titel/prijs — geen vlak, werkt op oudere kiosk-browsers (geen paint-order nodig). */
+const KASSA_PRODUCT_TILE_LABEL_OUTLINE =
+  '[text-shadow:1px_0_0_#fff,-1px_0_0_#fff,0_1px_0_#fff,0_-1px_0_#fff,1px_1px_0_#fff,-1px_-1px_0_#fff,1px_-1px_0_#fff,-1px_1px_0_#fff]'
+
 type KassaProductTileButtonProps = {
   product: MenuProduct
   inCart: number
@@ -403,27 +407,30 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
     >
       {product.image_url ? (
         <>
-          <div className="pointer-events-none relative min-h-0 flex-1 basis-0 overflow-hidden">
-            <div className={`pointer-events-none absolute inset-0 overflow-hidden ${ui.productTileSolidBg}`}>
-              <img
-                src={product.image_url}
-                alt={product.name}
-                decoding="async"
-                loading="eager"
-                onError={kassaProductImageRetryOnError}
-                style={{
-                  transform: `scale(${kioskZoom})`,
-                  transformOrigin: 'center 78%',
-                }}
-                className="pointer-events-none absolute inset-0 block h-full min-h-0 w-full select-none object-cover object-top !h-full !w-full !max-w-none"
-              />
-            </div>
+          <div className={`pointer-events-none absolute inset-0 overflow-hidden ${ui.productTileSolidBg}`}>
+            <img
+              src={product.image_url}
+              alt={product.name}
+              decoding="async"
+              loading="eager"
+              onError={kassaProductImageRetryOnError}
+              style={{
+                transform: `scale(${kioskZoom})`,
+                transformOrigin: 'center 78%',
+              }}
+              className="pointer-events-none absolute inset-0 block h-full min-h-0 w-full select-none object-cover object-top !h-full !w-full !max-w-none"
+            />
           </div>
-          <div className="pointer-events-none shrink-0 bg-white px-2 pb-2.5 pt-2 text-center sm:px-3 sm:pb-3 sm:pt-2.5">
-            <p className="line-clamp-2 text-lg font-black leading-snug tracking-tight text-black sm:text-xl md:text-2xl">
+          {/* Geen achtergrondvlak: alleen tekst + prijs op de foto */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-transparent px-2 pb-2.5 pt-8 text-center sm:px-3 sm:pb-3 sm:pt-10">
+            <p
+              className={`line-clamp-2 text-lg font-black leading-snug tracking-tight text-black sm:text-xl md:text-2xl ${KASSA_PRODUCT_TILE_LABEL_OUTLINE}`}
+            >
               {product.name}
             </p>
-            <p className="mt-1 text-xl font-black tabular-nums text-black sm:text-2xl md:text-3xl">
+            <p
+              className={`mt-1 text-xl font-black tabular-nums text-black sm:text-2xl md:text-3xl ${KASSA_PRODUCT_TILE_LABEL_OUTLINE}`}
+            >
               €{product.price.toFixed(2)}
             </p>
           </div>
@@ -431,15 +438,15 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
       ) : (
         <>
           <div
-            className={`pointer-events-none flex min-h-0 flex-1 flex-col items-center justify-center px-2 pt-6 ${ui.productTileSolidBg}`}
+            className={`pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-2 pt-2 ${ui.productTileSolidBg}`}
           >
             <span className={`text-5xl ${appearanceDark ? 'text-zinc-600' : 'text-neutral-300'}`}>🍽️</span>
           </div>
-          <div className="pointer-events-none shrink-0 bg-white px-2 pb-2.5 pt-2 sm:px-3 sm:pb-3 sm:pt-2.5">
-            <p className="line-clamp-2 text-center text-lg font-black leading-snug text-black sm:text-xl md:text-2xl">
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-transparent px-2 pb-2.5 pt-6 text-center sm:px-3 sm:pb-3 sm:pt-8">
+            <p className={`line-clamp-2 text-lg font-black leading-snug text-black sm:text-xl md:text-2xl ${KASSA_PRODUCT_TILE_LABEL_OUTLINE}`}>
               {product.name}
             </p>
-            <p className="mt-1 text-center text-xl font-black tabular-nums text-black sm:text-2xl md:text-3xl">
+            <p className={`mt-1 text-xl font-black tabular-nums text-black sm:text-2xl md:text-3xl ${KASSA_PRODUCT_TILE_LABEL_OUTLINE}`}>
               €{product.price.toFixed(2)}
             </p>
           </div>
