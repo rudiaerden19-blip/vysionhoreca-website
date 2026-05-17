@@ -140,6 +140,7 @@ import {
   pulseApplyCustomerDisplayBounds,
   readCachedSecondaryBounds,
   resolveSecondaryBoundsViaApi,
+  shouldAutoOpenKlantschermForHardware,
   writeCachedSecondaryBounds,
   applyCustomerDisplayWindowBounds,
 } from '@/lib/kassa-customer-display-window'
@@ -1627,7 +1628,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     dineInSubtitle?: string
   } | null>(null)
   const customerDisplayBcRef = useRef<BroadcastChannel | null>(null)
-  /** Eén automatische klantscherm-popup per tenant-lading (herstel/refocus via vaste window.open naam). */
+  /** Bij ≥2 werkgebieden: klantscherm automatisch; single-monitor géén popup (handmatige knop blijft). */
   const customerDisplayAutoOpenedForTenantRef = useRef<string | null>(null)
   /** HTML bon wacht op modal als lokale Print Agent faalt; daarna printReceiptHtmlDocument */
   const [printAgentFallbackHtml, setPrintAgentFallbackHtml] = useState<string | null>(null)
@@ -2233,15 +2234,29 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     void reposition()
   }, [tenant, customerDisplayToken, t])
 
-  /** Bij laden kassa direct klantscherm openen — zelfde vensternaam hervat bestaande popup zonder nieuwe taps. Popup-blocker kan blokkeren; knop blijft fallback. */
+  /** Bij laden kassa: automatisch klantscherm alleen op multi-monitor werkplekken. Popup-blocker kan blokkeren; knop blijft fallback. */
   useEffect(() => {
     if (typeof window === 'undefined') return
     if (demoViewOnly) return
-    if (customerDisplayAutoOpenedForTenantRef.current === tenant) return
-    customerDisplayAutoOpenedForTenantRef.current = tenant
-    queueMicrotask(() => {
-      openKlantschermWindow()
-    })
+    let alive = true
+    void (async () => {
+      let multi = false
+      try {
+        multi = await shouldAutoOpenKlantschermForHardware(window)
+      } catch {
+        multi = false
+      }
+      if (!alive || !multi) return
+      if (customerDisplayAutoOpenedForTenantRef.current === tenant) return
+      customerDisplayAutoOpenedForTenantRef.current = tenant
+      queueMicrotask(() => {
+        if (!alive) return
+        openKlantschermWindow()
+      })
+    })()
+    return () => {
+      alive = false
+    }
   }, [tenant, demoViewOnly, openKlantschermWindow])
 
   useEffect(() => {
