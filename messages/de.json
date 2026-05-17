@@ -1990,6 +1990,8 @@
       "imageDefault": "Standard",
       "imageCover": "Groß",
       "imageContain": "Vollständig",
+      "productImageFitHint": "Mit Vollständig bleibt das ganze Produkt in der Produktliste, Kasse und im Shop sichtbar (empfohlen für hohe Flaschen und Hochformat). Groß füllt die Kachel und kann oben/unten beschneiden.",
+      "productImageContainNoZoomNote": "Bei Vollständig wird das ganze Foto gezeigt; der Kassen-Zoom wird dann nicht verwendet.",
       "noProductsFound": "Keine Produkte gefunden",
       "adjustFilters": "Filter anpassen oder neues Produkt hinzufügen",
       "kassaImageZoom": "Kachel-Zoom Kasse",

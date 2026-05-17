@@ -1990,6 +1990,8 @@
       "imageDefault": "Par défaut",
       "imageCover": "Grand",
       "imageContain": "Complet",
+      "productImageFitHint": "Complet garde tout le produit visible dans la liste, la caisse et la boutique (idéal pour les bouteilles hautes et les photos verticales). Grand remplit la tuile et peut rogner le haut/bas.",
+      "productImageContainNoZoomNote": "Avec Complet, la photo entière est affichée ; le zoom tuile caisse ne s’applique pas.",
       "noProductsFound": "Aucun produit trouvé",
       "adjustFilters": "Modifiez les filtres ou ajoutez un produit",
       "kassaImageZoom": "Zoom tuile caisse",

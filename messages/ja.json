@@ -2490,6 +2490,8 @@
       "imageDefault": "デフォルト",
       "imageCover": "大",
       "imageContain": "全体表示",
+      "productImageFitHint": "全体表示では商品一覧・レジ・ショップで商品全体が見えるようにします（背の高いボトルや縦長写真向け）。拡大表示はタイルを埋めますが上下が切れることがあります。",
+      "productImageContainNoZoomNote": "全体表示では写真全体を表示します。レジのタイルズームは使いません。",
       "noProductsFound": "商品が見つかりません",
       "adjustFilters": "フィルターを変更するか新しい商品を追加してください",
       "kassaImageZoom": "POSタイルの拡大",

@@ -2789,6 +2789,8 @@
       "imageDefault": "Default",
       "imageCover": "Large",
       "imageContain": "Full",
+      "productImageFitHint": "Full keeps the entire product visible in the admin grid, POS and shop (ideal for tall bottles and upright photos). Large fills the tile and may crop the top and bottom.",
+      "productImageContainNoZoomNote": "With Full the entire photo is shown; POS tile zoom is not used.",
       "noProductsFound": "No products found",
       "adjustFilters": "Adjust your filters or add a new product",
       "kassaImageZoom": "POS tile zoom",

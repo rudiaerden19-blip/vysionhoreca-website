@@ -133,14 +133,16 @@ function SortableProductCard({
         <span className="text-xs font-medium">Sleep om te verplaatsen</span>
       </div>
 
-      {/* Image - vaste grootte voor uniformiteit */}
-      <div className="relative h-40 bg-white overflow-hidden">
+      {/* Image — object-fit volgt image_display_mode (zelfde als webshop/kassa) */}
+      <div
+        className={`relative h-40 overflow-hidden ${product.image_display_mode === 'contain' ? 'bg-gray-50' : 'bg-white'}`}
+      >
         {product.image_url ? (
           <img
             src={product.image_url}
             alt={product.name}
             draggable={false}
-            className="w-full h-full object-cover pointer-events-none"
+            className={`w-full h-full pointer-events-none ${product.image_display_mode === 'contain' ? 'object-contain object-center' : 'object-cover object-center'}`}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-5xl bg-gray-50">
@@ -438,7 +440,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
       is_promo: false,
       promo_price: undefined,
       allergens: [],
-      image_display_mode: null,
+      image_display_mode: 'contain',
       kassa_image_zoom: 1,
       print_label: false,
     })
@@ -809,47 +811,96 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                     value={formData.image_url || ''}
                     onChange={(url) => setFormData(prev => ({ ...prev, image_url: url }))}
                   />
+                  <div className="space-y-2 rounded-xl border border-gray-100 bg-gray-50/80 p-4">
+                    <label className="block text-sm font-medium text-gray-800">
+                      {t('adminPages.producten.imageDisplayMode')}
+                    </label>
+                    <p className="text-xs text-gray-600">{t('adminPages.producten.productImageFitHint')}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {(['contain', 'cover'] as const).map((mode) => {
+                        const selected =
+                          (formData.image_display_mode === 'contain') === (mode === 'contain')
+                        return (
+                          <button
+                            key={mode}
+                            type="button"
+                            onClick={() =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                image_display_mode: mode,
+                              }))
+                            }
+                            className={`rounded-xl border-2 px-4 py-2 text-sm font-semibold transition-colors ${
+                              selected
+                                ? 'border-orange-500 bg-orange-50 text-orange-900'
+                                : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                            }`}
+                          >
+                            {mode === 'contain'
+                              ? t('adminPages.producten.imageContain')
+                              : t('adminPages.producten.imageCover')}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
                   {!!formData.image_url?.trim() && (
                     <div className="space-y-3 rounded-xl border border-gray-100 bg-gray-50/80 p-4">
-                      <div>
-                        <label className="mb-1 block text-sm font-medium text-gray-800">
-                          {t('adminPages.producten.kassaImageZoom')}
-                        </label>
-                        <p className="text-xs text-gray-600">{t('adminPages.producten.kassaImageZoomHint')}</p>
-                      </div>
-                      <p className="text-xs font-medium text-gray-500">
-                        {t('adminPages.producten.kassaImageZoomPreview')}
-                      </p>
-                      <div className="relative mx-auto aspect-[4/5] w-full max-w-[200px] overflow-hidden rounded-xl bg-neutral-300 ring-2 ring-neutral-400/30">
-                        <img
-                          src={formData.image_url}
-                          alt=""
-                          className="h-full w-full object-cover object-center"
-                          style={{
-                            transform: `scale(${clampKassaProductImageZoom(formData.kassa_image_zoom as number)})`,
-                            transformOrigin: 'center 78%',
-                          }}
-                        />
-                      </div>
-                      <input
-                        type="range"
-                        min={KASSA_PRODUCT_IMAGE_ZOOM_MIN}
-                        max={KASSA_PRODUCT_IMAGE_ZOOM_MAX}
-                        step={0.05}
-                        value={clampKassaProductImageZoom(formData.kassa_image_zoom as number)}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            kassa_image_zoom: parseFloat(e.target.value),
-                          }))
-                        }
-                        className="w-full accent-orange-500"
-                      />
-                      <div className="flex justify-between text-xs text-gray-500">
-                        <span>{Math.round(KASSA_PRODUCT_IMAGE_ZOOM_MIN * 100)}%</span>
-                        <span>{Math.round(clampKassaProductImageZoom(formData.kassa_image_zoom as number) * 100)}%</span>
-                        <span>{Math.round(KASSA_PRODUCT_IMAGE_ZOOM_MAX * 100)}%</span>
-                      </div>
+                      {formData.image_display_mode === 'contain' ? (
+                        <>
+                          <p className="text-sm font-medium text-gray-800">{t('adminPages.producten.kassaImageZoomPreview')}</p>
+                          <p className="text-xs text-gray-600">{t('adminPages.producten.productImageContainNoZoomNote')}</p>
+                          <div className="relative mx-auto aspect-[4/5] w-full max-w-[200px] overflow-hidden rounded-xl bg-neutral-300 ring-2 ring-neutral-400/30">
+                            <img
+                              src={formData.image_url}
+                              alt=""
+                              className="h-full w-full object-contain object-center"
+                            />
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div>
+                            <label className="mb-1 block text-sm font-medium text-gray-800">
+                              {t('adminPages.producten.kassaImageZoom')}
+                            </label>
+                            <p className="text-xs text-gray-600">{t('adminPages.producten.kassaImageZoomHint')}</p>
+                          </div>
+                          <p className="text-xs font-medium text-gray-500">
+                            {t('adminPages.producten.kassaImageZoomPreview')}
+                          </p>
+                          <div className="relative mx-auto aspect-[4/5] w-full max-w-[200px] overflow-hidden rounded-xl bg-neutral-300 ring-2 ring-neutral-400/30">
+                            <img
+                              src={formData.image_url}
+                              alt=""
+                              className="h-full w-full object-cover object-center"
+                              style={{
+                                transform: `scale(${clampKassaProductImageZoom(formData.kassa_image_zoom as number)})`,
+                                transformOrigin: 'center 78%',
+                              }}
+                            />
+                          </div>
+                          <input
+                            type="range"
+                            min={KASSA_PRODUCT_IMAGE_ZOOM_MIN}
+                            max={KASSA_PRODUCT_IMAGE_ZOOM_MAX}
+                            step={0.05}
+                            value={clampKassaProductImageZoom(formData.kassa_image_zoom as number)}
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                kassa_image_zoom: parseFloat(e.target.value),
+                              }))
+                            }
+                            className="w-full accent-orange-500"
+                          />
+                          <div className="flex justify-between text-xs text-gray-500">
+                            <span>{Math.round(KASSA_PRODUCT_IMAGE_ZOOM_MIN * 100)}%</span>
+                            <span>{Math.round(clampKassaProductImageZoom(formData.kassa_image_zoom as number) * 100)}%</span>
+                            <span>{Math.round(KASSA_PRODUCT_IMAGE_ZOOM_MAX * 100)}%</span>
+                          </div>
+                        </>
+                      )}
                     </div>
                   )}
                 </div>

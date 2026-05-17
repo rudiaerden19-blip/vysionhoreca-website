@@ -318,6 +318,8 @@ const KassaReservationsView = dynamic(() => import('@/components/KassaReservatio
 type KassaCategoryTileButtonProps = {
   category: MenuCategory
   imageUrl?: string
+  /** Eerste product in categorie gebruikt soms contain — zelfde als producttegel */
+  imageFitContain?: boolean
   appearanceDark: boolean
   ui: Pick<KassaRegisterUiTheme, 'productTileSolidBg' | 'productTileFooterBar' | 'productFooterTextDark'>
 }
@@ -325,6 +327,7 @@ type KassaCategoryTileButtonProps = {
 const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
   category,
   imageUrl,
+  imageFitContain,
   appearanceDark,
   ui,
 }: KassaCategoryTileButtonProps) {
@@ -344,7 +347,9 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
             decoding="async"
             loading="eager"
             onError={kassaProductImageRetryOnError}
-            className="pointer-events-none absolute inset-0 block h-full min-h-0 w-full select-none object-cover object-top !h-full !w-full !max-w-none"
+            className={`pointer-events-none absolute inset-0 block h-full min-h-0 w-full select-none !h-full !w-full !max-w-none ${
+              imageFitContain ? 'object-contain object-center' : 'object-cover object-top'
+            }`}
           />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2.5 pt-2 sm:px-3 sm:pb-3 sm:pt-2">
             <div className="flex flex-col items-center gap-1.5 text-center">
@@ -394,6 +399,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
   appearanceDark,
   ui,
 }: KassaProductTileButtonProps) {
+  const fitContain = product.image_display_mode === 'contain'
   return (
     <button
       type="button"
@@ -411,11 +417,17 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
                 decoding="async"
                 loading="eager"
                 onError={kassaProductImageRetryOnError}
-                style={{
-                  transform: `scale(${kioskZoom})`,
-                  transformOrigin: 'center 78%',
-                }}
-                className="pointer-events-none absolute inset-0 block h-full min-h-0 w-full select-none object-cover object-top !h-full !w-full !max-w-none"
+                style={
+                  fitContain
+                    ? undefined
+                    : {
+                        transform: `scale(${kioskZoom})`,
+                        transformOrigin: 'center 78%',
+                      }
+                }
+                className={`pointer-events-none absolute inset-0 block h-full min-h-0 w-full select-none !h-full !w-full !max-w-none ${
+                  fitContain ? 'object-contain object-center' : 'object-cover object-top'
+                }`}
               />
             </div>
           </div>
@@ -2343,13 +2355,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return m
   }, [cart])
 
-  /** Eerste productafbeelding per categorie (zelfde volgorde als vroeger: door products-array). */
-  const categoryTileImageUrlByCategoryId = useMemo(() => {
-    const m = new Map<string, string>()
+  /** Eerste product met foto per categorie + contain-modus (zelfde uitsnede als producttegel). */
+  const categoryTileImageByCategoryId = useMemo(() => {
+    const m = new Map<string, { url: string; fitContain: boolean }>()
     for (const p of products) {
       const cid = p.category_id
       if (!cid || !p.image_url) continue
-      if (!m.has(cid)) m.set(cid, p.image_url)
+      if (!m.has(cid)) {
+        m.set(cid, {
+          url: p.image_url,
+          fitContain: p.image_display_mode === 'contain',
+        })
+      }
     }
     return m
   }, [products])
@@ -3838,12 +3855,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   style={{ gridAutoRows: `${kassaMenuRowPx}px` }}
                 >
                   {categories.map((cat) => {
-                    const catImage = cat.id ? categoryTileImageUrlByCategoryId.get(cat.id) : undefined
+                    const tile = cat.id ? categoryTileImageByCategoryId.get(cat.id) : undefined
                     return (
                       <KassaCategoryTileButton
                         key={cat.id}
                         category={cat}
-                        imageUrl={catImage}
+                        imageUrl={tile?.url}
+                        imageFitContain={tile?.fitContain}
                         appearanceDark={kassaAppearanceDark}
                         ui={ui}
                       />
@@ -4230,7 +4248,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                         decoding="async"
                         loading="eager"
                         onError={kassaProductImageRetryOnError}
-                        className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
+                        className={`w-12 h-12 rounded-lg flex-shrink-0 ${item.product.image_display_mode === 'contain' ? `object-contain ${ui.cartThumbPlaceholder}` : 'object-cover'}`} />
                     ) : (
                       <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 text-xl ${ui.cartThumbPlaceholder}`}>🍽️</div>
                     )}

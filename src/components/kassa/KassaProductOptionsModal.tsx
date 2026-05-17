@@ -46,7 +46,7 @@ export function KassaProductOptionsModal({
               src={model.product.image_url}
               alt={model.product.name}
               onError={kassaProductImageRetryOnError}
-              className="w-14 h-14 rounded-xl object-cover flex-shrink-0"
+              className={`w-14 h-14 rounded-xl flex-shrink-0 ${model.product.image_display_mode === 'contain' ? (dark ? 'object-contain bg-zinc-800' : 'object-contain bg-gray-100') : 'object-cover'}`}
             />
           )}
           <div className="flex-1 min-w-0">

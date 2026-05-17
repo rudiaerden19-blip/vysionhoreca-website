@@ -2490,6 +2490,8 @@
       "imageDefault": "Predeterminado",
       "imageCover": "Grande",
       "imageContain": "Completo",
+      "productImageFitHint": "Completo mantiene visible todo el producto en la lista, la caja y la tienda (recomendado para botellas altas y fotos verticales). Grande llena la tarjeta y puede recortar arriba/abajo.",
+      "productImageContainNoZoomNote": "Con Completo se muestra toda la foto; no se usa el zoom en la tarjeta del TPV.",
       "noProductsFound": "No se encontraron productos",
       "adjustFilters": "Ajusta los filtros o añade un producto nuevo",
       "kassaImageZoom": "Zoom azulejo TP",

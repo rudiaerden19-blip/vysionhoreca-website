@@ -242,11 +242,23 @@ export async function getMenuProducts(tenantSlug: string, signal?: AbortSignal):
   )
 }
 
+/** Voorkomt rare DB/waarden die UI (`fitContain`) onvoorspelbaar maken. */
+function normalizeProductImageDisplayMode(raw: unknown): MenuProduct['image_display_mode'] {
+  if (raw === undefined || raw === null || raw === '') return null
+  const s = String(raw).trim().toLowerCase()
+  if (s === 'contain') return 'contain'
+  if (s === 'cover') return 'cover'
+  return null
+}
+
 function normalizeMenuProductsFromDb(rows: MenuProduct[] | null): MenuProduct[] {
   const list = dedupeCatalogById(rows || [])
   return list.map((row) => ({
     ...row,
     kassa_image_zoom: clampKassaProductImageZoom((row as { kassa_image_zoom?: unknown }).kassa_image_zoom),
+    image_display_mode: normalizeProductImageDisplayMode(
+      (row as { image_display_mode?: unknown }).image_display_mode,
+    ),
   }))
 }
 
@@ -263,6 +275,9 @@ export async function saveMenuProduct(product: MenuProduct): Promise<{ data: Men
       data: {
         ...d,
         kassa_image_zoom: clampKassaProductImageZoom((d as { kassa_image_zoom?: unknown }).kassa_image_zoom),
+        image_display_mode: normalizeProductImageDisplayMode(
+          (d as { image_display_mode?: unknown }).image_display_mode,
+        ),
       },
     }
   }

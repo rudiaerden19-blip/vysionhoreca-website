@@ -2490,6 +2490,8 @@
       "imageDefault": "默认",
       "imageCover": "大图",
       "imageContain": "完整显示",
+      "productImageFitHint": "完整显示可在商品列表、收银与网店中保留整个商品可见（适合高瓶与竖图）。大图铺满卡片，可能会裁剪上下边缘。",
+      "productImageContainNoZoomNote": "选择完整显示时将展示整张照片；不使用收银磁贴缩放。",
       "noProductsFound": "未找到产品",
       "adjustFilters": "调整筛选或添加新产品",
       "kassaImageZoom": "收银图块缩放",

@@ -2490,6 +2490,8 @@
       "imageDefault": "Predefinito",
       "imageCover": "Grande",
       "imageContain": "Completo",
+      "productImageFitHint": "Completo mantiene visibile l’intero prodotto nell’elenco, in cassa e nello shop (consigliato per bottiglie alte e foto verticali). Grande riempie la tessera e può ritagliare sopra/sotto.",
+      "productImageContainNoZoomNote": "Con Completo viene mostrata l’intera foto; lo zoom cassa non si applica.",
       "noProductsFound": "Nessun prodotto trovato",
       "adjustFilters": "Modifica i filtri o aggiungi un nuovo prodotto",
       "kassaImageZoom": "Zoom riquadro cassa",

@@ -2789,6 +2789,8 @@
       "imageDefault": "Standaard",
       "imageCover": "Groot",
       "imageContain": "Volledig",
+      "productImageFitHint": "Met Volledig blijft het hele product zichtbaar op de productlijst, kassa en webshop (aanbevolen voor hoge flessen en staande foto's). Groot vult de tegel en kan boven/beneden bijsnijden.",
+      "productImageContainNoZoomNote": "Bij Volledig wordt de hele foto getoond; zoom op de kassa is dan niet nodig.",
       "noProductsFound": "Geen producten gevonden",
       "adjustFilters": "Pas je filters aan of voeg een nieuw product toe",
       "kassaImageZoom": "Zoom kassa-tegel",
