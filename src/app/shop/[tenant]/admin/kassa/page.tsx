@@ -422,17 +422,11 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
               className="pointer-events-none block h-full min-h-0 w-full select-none object-cover object-top !h-full !w-full !max-w-none"
             />
           </div>
-          <div
-            className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-36 bg-gradient-to-t from-neutral-950/[0.94] via-neutral-950/55 to-transparent sm:h-[8.75rem]"
-            aria-hidden
-          />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2.5 pt-12 sm:px-3 sm:pb-3 sm:pt-14">
-            <p className="line-clamp-2 text-lg font-black leading-snug tracking-tight text-amber-50 [text-shadow:0_0_1px_rgba(0,0,0,1),0_2px_4px_rgba(0,0,0,.98),0_4px_18px_rgba(0,0,0,.85)] sm:text-xl md:text-2xl">
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2.5 pt-2 sm:px-3 sm:pb-3 sm:pt-2">
+            <p className="line-clamp-2 text-lg font-black leading-snug tracking-tight text-black sm:text-xl md:text-2xl">
               {product.name}
             </p>
-            <p
-              className={`mt-1 text-xl font-black tabular-nums ${ui.priceAccentClass} [text-shadow:0_0_1px_rgba(0,0,0,1),0_2px_6px_rgba(0,0,0,.95)] sm:text-2xl md:text-3xl`}
-            >
+            <p className={`mt-1 text-xl font-black tabular-nums ${ui.priceAccentClass} sm:text-2xl md:text-3xl`}>
               €{product.price.toFixed(2)}
             </p>
           </div>
