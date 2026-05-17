@@ -318,8 +318,6 @@ const KassaReservationsView = dynamic(() => import('@/components/KassaReservatio
 type KassaCategoryTileButtonProps = {
   category: MenuCategory
   imageUrl?: string
-  /** Eerste product in categorie gebruikt soms contain — zelfde als producttegel */
-  imageFitContain?: boolean
   appearanceDark: boolean
   ui: Pick<KassaRegisterUiTheme, 'productTileSolidBg' | 'productTileFooterBar' | 'productFooterTextDark'>
 }
@@ -327,7 +325,6 @@ type KassaCategoryTileButtonProps = {
 const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
   category,
   imageUrl,
-  imageFitContain,
   appearanceDark,
   ui,
 }: KassaCategoryTileButtonProps) {
@@ -347,9 +344,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
             decoding="async"
             loading="eager"
             onError={kassaProductImageRetryOnError}
-            className={`pointer-events-none absolute inset-0 block h-full min-h-0 w-full select-none !h-full !w-full !max-w-none ${
-              imageFitContain ? 'object-contain object-center' : 'object-cover object-top'
-            }`}
+            className="pointer-events-none absolute inset-0 block h-full min-h-0 w-full select-none !h-full !w-full !max-w-none object-cover object-center"
           />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2.5 pt-2 sm:px-3 sm:pb-3 sm:pt-2">
             <div className="flex flex-col items-center gap-1.5 text-center">
@@ -904,8 +899,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   /** gap-6 = 24px; moet gelijk lopen met Tailwind `gap-6` op de grids + ResizeObserver-formule. */
   const KASSA_MENU_VISIBLE_ROWS = 4
   const KASSA_MENU_GRID_GAP_PX = 24
-  /** Hogere tegels (zelfde breedte & gap als grid): meer zichtbare foto onder object-cover i.p.v. veel top/bottom wegknippen. */
-  const KASSA_MENU_TILE_HEIGHT_BOOST = 1.34
+  /** 1 = rijhoogte past bij 4 zichtbare rijen in scrollport (min gap); >1 maakt tegels hoger dan die ruimte → extra scroll/lijntjes. */
+  const KASSA_MENU_TILE_HEIGHT_BOOST = 1
 
   function computeInitialKassaMenuRowPx(): number {
     if (typeof window === 'undefined') return Math.floor(180 * KASSA_MENU_TILE_HEIGHT_BOOST)
@@ -2347,16 +2342,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return m
   }, [cart])
 
-  /** Eerste product met foto per categorie + contain-modus (zelfde uitsnede als producttegel). */
+  /** Eerste product met foto per categorie — op categorietegels altijd cover zodat de foto de tegel vult. */
   const categoryTileImageByCategoryId = useMemo(() => {
-    const m = new Map<string, { url: string; fitContain: boolean }>()
+    const m = new Map<string, { url: string }>()
     for (const p of products) {
       const cid = p.category_id
       if (!cid || !p.image_url) continue
       if (!m.has(cid)) {
         m.set(cid, {
           url: p.image_url,
-          fitContain: p.image_display_mode === 'contain',
         })
       }
     }
@@ -3853,7 +3847,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                         key={cat.id}
                         category={cat}
                         imageUrl={tile?.url}
-                        imageFitContain={tile?.fitContain}
                         appearanceDark={kassaAppearanceDark}
                         ui={ui}
                       />
