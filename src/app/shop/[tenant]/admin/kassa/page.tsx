@@ -419,13 +419,12 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
               />
             </div>
           </div>
-          <div
-            className={`pointer-events-none shrink-0 border-t px-2 pb-2.5 pt-2 text-center sm:px-3 sm:pb-3 sm:pt-2.5 ${ui.productTileFooterBar}`}
-          >
-            <p
-              className={`line-clamp-2 text-lg font-black leading-snug tracking-tight sm:text-xl md:text-2xl ${ui.productFooterTextDark}`}
-            >
+          <div className="pointer-events-none shrink-0 bg-white px-2 pb-2.5 pt-2 text-center sm:px-3 sm:pb-3 sm:pt-2.5">
+            <p className="line-clamp-2 text-lg font-black leading-snug tracking-tight text-black sm:text-xl md:text-2xl">
               {product.name}
+            </p>
+            <p className="mt-1 text-xl font-black tabular-nums text-black sm:text-2xl md:text-3xl">
+              €{product.price.toFixed(2)}
             </p>
           </div>
         </>
@@ -436,11 +435,12 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
           >
             <span className={`text-5xl ${appearanceDark ? 'text-zinc-600' : 'text-neutral-300'}`}>🍽️</span>
           </div>
-          <div
-            className={`pointer-events-none shrink-0 border-t px-2 pb-2.5 pt-2 sm:px-3 sm:pb-3 sm:pt-2.5 ${ui.productTileFooterBar}`}
-          >
-            <p className={`line-clamp-2 text-lg font-black leading-snug sm:text-xl md:text-2xl ${ui.productFooterTextDark}`}>
+          <div className="pointer-events-none shrink-0 bg-white px-2 pb-2.5 pt-2 sm:px-3 sm:pb-3 sm:pt-2.5">
+            <p className="line-clamp-2 text-center text-lg font-black leading-snug text-black sm:text-xl md:text-2xl">
               {product.name}
+            </p>
+            <p className="mt-1 text-center text-xl font-black tabular-nums text-black sm:text-2xl md:text-3xl">
+              €{product.price.toFixed(2)}
             </p>
           </div>
         </>
