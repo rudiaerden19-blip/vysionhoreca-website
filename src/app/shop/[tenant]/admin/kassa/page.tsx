@@ -163,9 +163,6 @@ function scheduleAddToCartSound() {
 
 const KASSA_NUMPAD_KEYS = ['7', '8', '9', '+', '4', '5', '6', '-', '1', '2', '3', '×', 'C', '0', '.', '='] as const
 
-/** ~4×4 viewport: eager decode voorkomt vertraging bij eerste taps na openen categorie */
-const KASSA_PRODUCT_GRID_EAGER_TILE_COUNT = 16
-
 /** Scroll vs tik op embedded touch/WebView (o.a. Elo): kleine beweging telt nog als tik */
 const KASSA_TILE_TAP_SLOP_PX = 18
 
@@ -344,7 +341,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
             src={imageUrl}
             alt={category.name}
             decoding="async"
-            loading="lazy"
+            loading="eager"
             className="pointer-events-none absolute inset-0 block h-full min-h-0 w-full select-none object-cover object-top !h-full !w-full !max-w-none"
           />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2.5 pt-2 sm:px-3 sm:pb-3 sm:pt-2">
@@ -385,8 +382,6 @@ type KassaProductTileButtonProps = {
   kioskZoom: number
   appearanceDark: boolean
   ui: KassaRegisterUiTheme
-  /** Eerste viewport-tegels eager zodat zwakke terminals niet op lazy-decode wachten */
-  imageLoading: 'eager' | 'lazy'
 }
 
 const KassaProductTileButton = memo(function KassaProductTileButton({
@@ -396,24 +391,23 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
   kioskZoom,
   appearanceDark,
   ui,
-  imageLoading,
 }: KassaProductTileButtonProps) {
   return (
     <button
       type="button"
       data-kassa-product-id={product.id != null ? String(product.id) : undefined}
-      className={`touch-manipulation select-none [contain:layout_paint] group relative flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden rounded-xl text-left active:brightness-95 ${ui.productTileSolidBg}`}
+      className={`touch-manipulation select-none group relative flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden rounded-xl text-left active:brightness-95 ${ui.productTileSolidBg}`}
       style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.35)' }}
     >
       {product.image_url ? (
         <>
-          <div className="pointer-events-none relative min-h-0 flex-1 overflow-hidden">
+          <div className="pointer-events-none relative min-h-0 flex-1 basis-0 overflow-hidden">
             <div className={`pointer-events-none absolute inset-0 overflow-hidden ${ui.productTileSolidBg}`}>
               <img
                 src={product.image_url}
                 alt={product.name}
                 decoding="async"
-                loading={imageLoading}
+                loading="eager"
                 style={{
                   transform: `scale(${kioskZoom})`,
                   transformOrigin: 'center 78%',
@@ -1083,7 +1077,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         const pt = parseFloat(st.paddingTop) || 0
         const pb = parseFloat(st.paddingBottom) || 0
         const innerH = el.clientHeight - pt - pb
-        if (innerH <= 0) return
+        const fallback = computeInitialKassaMenuRowPx()
+        if (innerH <= 0) {
+          setKassaMenuRowPx((prev) => (prev === fallback ? prev : fallback))
+          return
+        }
         const rowH =
           ((innerH - (KASSA_MENU_VISIBLE_ROWS - 1) * KASSA_MENU_GRID_GAP_PX) / KASSA_MENU_VISIBLE_ROWS) *
           KASSA_MENU_TILE_HEIGHT_BOOST
@@ -3833,7 +3831,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   onPointerUp={handleCategoryGridPointerUp}
                   onPointerCancel={handleCategoryGridPointerCancel}
                   onClick={handleCategoryGridClick}
-                  className="grid w-full grid-cols-4 gap-6 pb-8 touch-manipulation select-none"
+                  className="grid min-h-0 w-full grid-cols-2 items-stretch md:grid-cols-3 lg:grid-cols-4 gap-6 pb-8 touch-manipulation select-none [&>*]:min-h-0"
                   style={{ gridAutoRows: `${kassaMenuRowPx}px` }}
                 >
                   {categories.map((cat) => {
@@ -3865,10 +3863,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     onPointerUp={handleProductGridPointerUp}
                     onPointerCancel={handleProductGridPointerCancel}
                     onClick={handleProductGridClick}
-                    className="grid w-full grid-cols-4 gap-6 pb-8 touch-manipulation select-none"
+                    className="grid min-h-0 w-full grid-cols-2 items-stretch md:grid-cols-3 lg:grid-cols-4 gap-6 pb-8 touch-manipulation select-none [&>*]:min-h-0"
                     style={{ gridAutoRows: `${kassaMenuRowPx}px` }}
                   >
-                    {productsInSelectedCategory.map((product, index) => {
+                    {productsInSelectedCategory.map((product) => {
                       const inCart = product.id
                         ? (cartQtyByProductId.get(String(product.id)) ?? 0)
                         : 0
@@ -3883,9 +3881,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           kioskZoom={kioskZoom}
                           appearanceDark={kassaAppearanceDark}
                           ui={ui}
-                          imageLoading={
-                            index < KASSA_PRODUCT_GRID_EAGER_TILE_COUNT ? 'eager' : 'lazy'
-                          }
                         />
                       )
                     })}
@@ -4230,7 +4225,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     {item.product.image_url ? (
                       <img src={item.product.image_url} alt={item.product.name}
                         decoding="async"
-                        loading="lazy"
+                        loading="eager"
                         className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
                     ) : (
                       <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 text-xl ${ui.cartThumbPlaceholder}`}>🍽️</div>
