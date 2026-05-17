@@ -217,7 +217,7 @@ function tryVysionKioskPrintBridge(body: VysionPrintAgentBody): { ok: boolean; r
   if (typeof window !== 'undefined') {
     window.setTimeout(() => {
       openKioskDeepLink(url)
-    }, 120)
+    }, 48)
     return { ok: true }
   }
   return { ok: false, reason: 'Geen window.' }
@@ -330,11 +330,12 @@ async function sendToVysionPrintAgentCore(
   }
 
   let lastDetail = 'Geen poging uitgevoerd.'
-  for (let i = 0; i < 5; i++) {
+  /** Minder pogingen maar korter tussen herkoppeling — agent meestal wél bereikbaar; 5× lange backoff voelde als „traag“. */
+  for (let i = 0; i < 3; i++) {
     const r = await postPrintOnce(body, base)
     if (r.ok) return { ok: true }
     lastDetail = r.detail
-    if (i < 4) await sleep(400)
+    if (i < 2) await sleep(200)
   }
 
   const parts = [

@@ -751,6 +751,9 @@ function printRawWindows(printerName, payloadBuffer, attempt = 1) {
   }
 }
 
+/** Pauze tussen twee bonkopieën USB/RAW — te kort geeft spool-fouten; te lang voelt als traag gedrag aan de kassa. */
+const INTER_RECEIPT_COPY_PAUSE_MS = 560
+
 /** Korte synchrone pauze (zonder CPU te verbranden) tussen kopieën zodat de printer-spool kan resetten. */
 function sleepSyncMs(ms) {
   try {
@@ -862,15 +865,12 @@ function createApp(getPrinterName /* () => string | null */) {
         ? Math.min(Math.max(body.copies, 1), 5)
         : 2
 
-      // Kassa-lade via PASSTHROUGH-escape (driver pad dat APD niet filtert).
-      // Wordt vóór de bon-print verstuurd zodat de lade meteen opengaat
-      // wanneer de klant betaalt.
+      /**
+       * Lade-kick ná de eerste succesvolle bon i.p.v. ervoor: `openCashDrawerWindows` blokkeert
+       * synchroon (PowerShell spawnSync tot 8s) en gaf veel locaties „printer doet eerst heel lang niets”.
+       * Eerste afdruk begint nu meteen; lade nog vóór de tweede kopie (≥1 kopie) of direct na kopie bij 1 exemplaar.
+       */
       const wantDrawer = body.openDrawer === true
-      if (wantDrawer) {
-        const dr = openCashDrawerWindows(printerName)
-        if (!dr.ok) console.error('[print] drawer-kick →', dr.error)
-        sleepSyncMs(200)
-      }
 
       let lastError = null
       let printedCount = 0
@@ -882,7 +882,14 @@ function createApp(getPrinterName /* () => string | null */) {
           break
         }
         printedCount++
-        if (i < copies - 1) sleepSyncMs(700)
+
+        if (wantDrawer && i === 0) {
+          const dr = openCashDrawerWindows(printerName)
+          if (!dr.ok) console.error('[print] drawer-kick →', dr.error)
+          sleepSyncMs(200)
+        }
+
+        if (i < copies - 1) sleepSyncMs(INTER_RECEIPT_COPY_PAUSE_MS)
       }
 
       if (printedCount === copies) {

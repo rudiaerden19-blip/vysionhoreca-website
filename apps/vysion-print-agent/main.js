@@ -600,11 +600,8 @@ ipcMain.handle('agent:request', async (_evt, { path: reqPath, method, body }) =>
       const orderLabel = body?.orderData?.orderNumber
         ? `bon #${body.orderData.orderNumber}`
         : (body?.receiptMode === 'keuken' ? 'keukenbon' : 'kassabon')
-      if (wantDrawer) {
-        const dr = openCashDrawerWindows(printerName)
-        if (!dr.ok) console.error('[print] drawer-kick →', dr.error)
-        sleepSyncMs(150)
-      }
+      /** Gelijk aan server.js INTER_RECEIPT_COPY_PAUSE_MS — kortere maar veilige tussenpauze voor tweede kopie. */
+      const INTER_RECEIPT_COPY_PAUSE_MS = 560
       let result = { ok: false, error: 'no copies' }
       for (let i = 0; i < copies; i++) {
         result = printRawWindows(printerName, payload)
@@ -617,7 +614,13 @@ ipcMain.handle('agent:request', async (_evt, { path: reqPath, method, body }) =>
           }
           break
         }
-        if (i < copies - 1) sleepSyncMs(700)
+        // Lade ná eerste print — niet ervoor; zie server.js (/print handler).
+        if (wantDrawer && i === 0) {
+          const dr = openCashDrawerWindows(printerName)
+          if (!dr.ok) console.error('[print] drawer-kick →', dr.error)
+          sleepSyncMs(200)
+        }
+        if (i < copies - 1) sleepSyncMs(INTER_RECEIPT_COPY_PAUSE_MS)
       }
       if (result.ok) return { status: 200, body: { success: true, drawer: wantDrawer, queued: 0 } }
       return {
