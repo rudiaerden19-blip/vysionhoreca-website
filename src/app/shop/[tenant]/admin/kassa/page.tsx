@@ -325,7 +325,7 @@ const KASSA_MENU_TILE_IMG_CLASS =
   'pointer-events-none absolute inset-0 box-border h-full w-full select-none object-contain object-center'
 
 const KASSA_MENU_TILE_LABEL_CLASS =
-  'line-clamp-2 text-center text-lg font-black leading-snug tracking-tight text-black sm:text-xl md:text-2xl'
+  'line-clamp-2 text-center text-base font-black leading-snug tracking-tight text-black sm:text-lg md:text-xl'
 
 type KassaCategoryTileButtonProps = {
   category: MenuCategory
