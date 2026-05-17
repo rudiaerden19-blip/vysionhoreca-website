@@ -29,7 +29,6 @@ import {
   getOptionsForProduct,
   getTenantSettings,
   TenantSettings,
-  clampKassaProductImageZoom,
   compareMenuProductsBySortOrder,
 } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
@@ -315,61 +314,57 @@ const KassaReservationsView = dynamic(() => import('@/components/KassaReservatio
   ),
 })
 
+/** Categorie- en producttegel: dezelfde witte kaart; foto volledig zichtbaar (contain) op wit, geen donkere randen. */
+const KASSA_MENU_TILE_BUTTON_CLASS =
+  'touch-manipulation select-none group relative h-full min-h-0 w-full min-w-0 overflow-hidden rounded-xl border border-neutral-200/90 bg-white text-left shadow-[0_8px_30px_rgba(0,0,0,0.35)] active:brightness-95'
+
+const KASSA_MENU_TILE_IMAGE_WELL =
+  'pointer-events-none absolute inset-0 overflow-hidden rounded-xl bg-white'
+
+const KASSA_MENU_TILE_IMG_CLASS =
+  'pointer-events-none absolute inset-0 box-border h-full w-full select-none object-contain object-center'
+
+const KASSA_MENU_TILE_LABEL_CLASS =
+  'line-clamp-2 text-center text-lg font-black leading-snug tracking-tight text-black sm:text-xl md:text-2xl'
+
 type KassaCategoryTileButtonProps = {
   category: MenuCategory
   imageUrl?: string
-  appearanceDark: boolean
-  ui: Pick<KassaRegisterUiTheme, 'productTileSolidBg' | 'productTileFooterBar' | 'productFooterTextDark'>
 }
 
 const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
   category,
   imageUrl,
-  appearanceDark,
-  ui,
 }: KassaCategoryTileButtonProps) {
   return (
     <button
       type="button"
       data-kassa-category-id={category.id != null ? String(category.id) : undefined}
-      className={`touch-manipulation select-none group relative h-full min-h-0 w-full min-w-0 overflow-hidden rounded-xl border shadow-[0_8px_30px_rgba(0,0,0,0.35)] active:brightness-95 ${
-        appearanceDark ? 'border-zinc-600 bg-[#1a2230]' : 'border border-neutral-200/90 bg-neutral-100'
-      }`}
+      className={KASSA_MENU_TILE_BUTTON_CLASS}
     >
       {imageUrl ? (
         <>
-          <img
-            src={imageUrl}
-            alt={category.name}
-            decoding="async"
-            loading="eager"
-            onError={kassaProductImageRetryOnError}
-            className="pointer-events-none absolute inset-0 block h-full min-h-0 w-full select-none !h-full !w-full !max-w-none object-cover object-center"
-          />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2.5 pt-2 sm:px-3 sm:pb-3 sm:pt-2">
-            <div className="flex flex-col items-center gap-1.5 text-center">
-              {category.icon ? (
-                <span className="text-2xl text-[#1e2431] sm:text-3xl md:text-4xl">
-                  {category.icon}
-                </span>
-              ) : null}
-              <span className="line-clamp-2 text-xl font-black leading-tight tracking-tight text-[#1e2431] sm:text-2xl md:text-3xl lg:text-4xl">
-                {category.name}
-              </span>
-            </div>
+          <div className={KASSA_MENU_TILE_IMAGE_WELL}>
+            <img
+              src={imageUrl}
+              alt={category.name}
+              decoding="async"
+              loading="eager"
+              onError={kassaProductImageRetryOnError}
+              className={KASSA_MENU_TILE_IMG_CLASS}
+            />
+          </div>
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2 sm:px-3">
+            <p className={KASSA_MENU_TILE_LABEL_CLASS}>{category.name}</p>
           </div>
         </>
       ) : (
         <>
-          <div className={`pointer-events-none flex h-full w-full flex-col items-center justify-center gap-3 pt-10 pb-20 ${ui.productTileSolidBg}`}>
-            {category.icon ? (
-              <span className={`text-5xl ${appearanceDark ? 'text-zinc-400' : 'text-neutral-700'}`}>{category.icon}</span>
-            ) : null}
+          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center overflow-hidden rounded-xl bg-white">
+            {category.icon ? <span className="text-5xl text-neutral-400">{category.icon}</span> : null}
           </div>
-          <div className={`pointer-events-none absolute inset-x-0 bottom-0 z-10 border-t px-2 pb-2.5 pt-2 sm:px-3 sm:pb-3 sm:pt-2.5 ${ui.productTileFooterBar}`}>
-            <span className={`block text-center text-xl font-black leading-snug sm:text-2xl md:text-3xl ${ui.productFooterTextDark}`}>
-              {category.name}
-            </span>
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2 sm:px-3">
+            <p className={KASSA_MENU_TILE_LABEL_CLASS}>{category.name}</p>
           </div>
         </>
       )}
@@ -381,66 +376,42 @@ type KassaProductTileButtonProps = {
   product: MenuProduct
   inCart: number
   hasOpts: boolean
-  kioskZoom: number
-  appearanceDark: boolean
-  ui: KassaRegisterUiTheme
 }
 
 const KassaProductTileButton = memo(function KassaProductTileButton({
   product,
   inCart,
   hasOpts,
-  kioskZoom,
-  appearanceDark,
-  ui,
 }: KassaProductTileButtonProps) {
-  const fitContain = product.image_display_mode === 'contain'
   return (
     <button
       type="button"
       data-kassa-product-id={product.id != null ? String(product.id) : undefined}
-      className={`touch-manipulation select-none group relative h-full min-h-0 w-full min-w-0 overflow-hidden rounded-xl text-left active:brightness-95 ${ui.productTileSolidBg}`}
-      style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.35)' }}
+      className={KASSA_MENU_TILE_BUTTON_CLASS}
     >
       {product.image_url ? (
         <>
-          <div className={`pointer-events-none absolute inset-0 overflow-hidden rounded-xl ${ui.productTileSolidBg}`}>
+          <div className={KASSA_MENU_TILE_IMAGE_WELL}>
             <img
               src={product.image_url}
               alt={product.name}
               decoding="async"
               loading="eager"
               onError={kassaProductImageRetryOnError}
-              style={
-                fitContain
-                  ? undefined
-                  : {
-                      transform: `scale(${kioskZoom})`,
-                      transformOrigin: 'center 78%',
-                    }
-              }
-              className={`pointer-events-none absolute inset-0 block h-full min-h-0 w-full select-none !h-full !w-full !max-w-none ${
-                fitContain ? 'object-contain object-center' : 'object-cover object-top'
-              }`}
+              className={KASSA_MENU_TILE_IMG_CLASS}
             />
           </div>
           <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2 sm:px-3">
-            <p className="line-clamp-2 text-center text-lg font-black leading-snug tracking-tight text-black sm:text-xl md:text-2xl">
-              {product.name}
-            </p>
+            <p className={KASSA_MENU_TILE_LABEL_CLASS}>{product.name}</p>
           </div>
         </>
       ) : (
         <>
-          <div
-            className={`pointer-events-none absolute inset-0 flex flex-col items-center justify-center overflow-hidden rounded-xl px-2 pt-4 ${ui.productTileSolidBg}`}
-          >
-            <span className={`text-5xl ${appearanceDark ? 'text-zinc-600' : 'text-neutral-300'}`}>🍽️</span>
+          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center overflow-hidden rounded-xl bg-white px-2 pt-4">
+            <span className="text-5xl text-neutral-300">🍽️</span>
           </div>
           <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2 sm:px-3">
-            <p className="line-clamp-2 text-center text-lg font-black leading-snug text-black sm:text-xl md:text-2xl">
-              {product.name}
-            </p>
+            <p className={KASSA_MENU_TILE_LABEL_CLASS}>{product.name}</p>
           </div>
         </>
       )}
@@ -896,9 +867,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     [productsWithOptions],
   )
 
-  /** gap-6 = 24px; moet gelijk lopen met Tailwind `gap-6` op de grids + ResizeObserver-formule. */
+  /** gap-4 (16px) op categorie-/productgrid; zelfde waarde in ResizeObserver-formule. */
+  const KASSA_MENU_GRID_GAP_PX = 16
+
   const KASSA_MENU_VISIBLE_ROWS = 4
-  const KASSA_MENU_GRID_GAP_PX = 24
   /** 1 = rijhoogte past bij 4 zichtbare rijen in scrollport (min gap); >1 maakt tegels hoger dan die ruimte → extra scroll/lijntjes. */
   const KASSA_MENU_TILE_HEIGHT_BOOST = 1
 
@@ -3822,7 +3794,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             {menuLoading ? (
               <div data-testid="kassa-menu-loading" className={`flex items-center justify-center h-full text-lg ${ui.menuEmptyMuted}`}>{t('kassaApp.loading')}</div>
             ) : !selectedCategory ? (
-              /* Categorieën: vaste 4 kolommen; rijhoogte = (scrollport − gaps) / N → compactere tegels + ruimere gap */
+              /* Categorieën: responsief raster; rijhoogte vult viewport; gap-4 = KASSA_MENU_GRID_GAP_PX */
               categories.length === 0 ? (
                 <div className={`flex flex-col items-center justify-center h-full ${ui.menuEmptyMuted}`}>
                   <span className="text-5xl mb-3">📂</span>
@@ -3837,19 +3809,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   onPointerUp={handleCategoryGridPointerUp}
                   onPointerCancel={handleCategoryGridPointerCancel}
                   onClick={handleCategoryGridClick}
-                  className="grid min-h-0 w-full grid-cols-2 items-stretch md:grid-cols-3 lg:grid-cols-4 gap-6 pb-8 touch-manipulation select-none [&>*]:min-h-0"
+                  className="grid min-h-0 w-full grid-cols-2 items-stretch gap-4 pb-8 touch-manipulation select-none sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 [&>*]:min-h-0"
                   style={{ gridAutoRows: `${kassaMenuRowPx}px` }}
                 >
                   {categories.map((cat) => {
                     const tile = cat.id ? categoryTileImageByCategoryId.get(cat.id) : undefined
                     return (
-                      <KassaCategoryTileButton
-                        key={cat.id}
-                        category={cat}
-                        imageUrl={tile?.url}
-                        appearanceDark={kassaAppearanceDark}
-                        ui={ui}
-                      />
+                      <KassaCategoryTileButton key={cat.id} category={cat} imageUrl={tile?.url} />
                     )
                   })}
                 </div>
@@ -3869,7 +3835,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     onPointerUp={handleProductGridPointerUp}
                     onPointerCancel={handleProductGridPointerCancel}
                     onClick={handleProductGridClick}
-                    className="grid min-h-0 w-full grid-cols-2 items-stretch md:grid-cols-3 lg:grid-cols-4 gap-6 pb-8 touch-manipulation select-none [&>*]:min-h-0"
+                    className="grid min-h-0 w-full grid-cols-2 items-stretch gap-4 pb-8 touch-manipulation select-none sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 [&>*]:min-h-0"
                     style={{ gridAutoRows: `${kassaMenuRowPx}px` }}
                   >
                     {productsInSelectedCategory.map((product) => {
@@ -3877,16 +3843,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                         ? (cartQtyByProductId.get(String(product.id)) ?? 0)
                         : 0
                       const hasOpts = product.id ? productIdsWithOptionsSet.has(product.id) : false
-                      const kioskZoom = clampKassaProductImageZoom(product.kassa_image_zoom)
                       return (
                         <KassaProductTileButton
                           key={product.id}
                           product={product}
                           inCart={inCart}
                           hasOpts={hasOpts}
-                          kioskZoom={kioskZoom}
-                          appearanceDark={kassaAppearanceDark}
-                          ui={ui}
                         />
                       )
                     })}
