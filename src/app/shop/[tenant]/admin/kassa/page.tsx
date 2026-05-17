@@ -870,8 +870,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   /** gap-4 (16px) op categorie-/productgrid; zelfde waarde in ResizeObserver-formule. */
   const KASSA_MENU_GRID_GAP_PX = 16
 
-  const KASSA_MENU_VISIBLE_ROWS = 4
-  /** 1 = rijhoogte past bij 4 zichtbare rijen in scrollport (min gap); >1 maakt tegels hoger dan die ruimte → extra scroll/lijntjes. */
+  const KASSA_MENU_VISIBLE_ROWS = 3
+  /** 1 = rijhoogte past bij KASSA_MENU_VISIBLE_ROWS in scrollport (min gap); hogere rijen = grotere tegels / meer tekstruimte (o.a. 15"). */
   const KASSA_MENU_TILE_HEIGHT_BOOST = 1
 
   function computeInitialKassaMenuRowPx(): number {
@@ -885,7 +885,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return Math.max(120, Math.floor(row))
   }
 
-  /** Menu-paneel: 4 kol × N rijen in zicht; rijhoogte = f(scrollport). */
+  /** Menu-paneel: responsieve kolommen × N rijen; rijhoogte = f(scrollport), ~3 rijen “doel” = hogere tegels. */
   const kassaMenuScrollRef = useRef<HTMLDivElement>(null)
   /** Ghost-tap naar nieuwe DOM onder vinger blokkeren (geen tijdvenster: ~2 frames pointer-events uit). */
   const kassaProductGridRef = useRef<HTMLDivElement>(null)
