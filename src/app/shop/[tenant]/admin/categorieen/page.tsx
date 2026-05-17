@@ -15,6 +15,7 @@ import { CATEGORY_VAT_PERCENT_OPTIONS } from '@/lib/order-vat'
 import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
+import MediaPicker from '@/components/MediaPicker'
 
 export default function CategorieenPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
@@ -22,6 +23,7 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
   const [categories, setCategories] = useState<MenuCategory[]>([])
   const [editingId, setEditingId] = useState<string | null>(null)
   const [newCategory, setNewCategory] = useState('')
+  const [newCategoryImageUrl, setNewCategoryImageUrl] = useState('')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -84,18 +86,21 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
 
   const addCategory = async () => {
     if (newCategory.trim()) {
+      const img = newCategoryImageUrl.trim()
       const newCat: MenuCategory = {
         tenant_slug: params.tenant,
         name: newCategory.trim(),
         description: '',
         sort_order: categories.length,
         is_active: true,
+        ...(img ? { image_url: img } : {}),
       }
       
       const saved = await saveMenuCategory(newCat)
       if (saved) {
         await refreshCategoriesAndProductCounts()
         setNewCategory('')
+        setNewCategoryImageUrl('')
       } else {
         setError(t('adminPages.categorieen.addFailed'))
       }
@@ -106,6 +111,11 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
     setCategories(prev => prev.map(c => 
       c.id === id ? { ...c, name } : c
     ))
+    setSaved(false)
+  }
+
+  const updateCategoryImage = (id: string, image_url: string) => {
+    setCategories((prev) => prev.map((c) => (c.id === id ? { ...c, image_url } : c)))
     setSaved(false)
   }
 
@@ -231,23 +241,37 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
       )}
 
       {/* Add New */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm mb-4 flex gap-3 items-center border border-dashed border-blue-200">
-        <span className="text-2xl">📂</span>
-        <input
-          type="text"
-          value={newCategory}
-          onChange={(e) => setNewCategory(e.target.value)}
-          placeholder="Naam nieuwe categorie..."
-          className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
-          onKeyDown={(e) => e.key === 'Enter' && addCategory()}
-        />
-        <button
-          onClick={addCategory}
-          disabled={!newCategory.trim()}
-          className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 text-white rounded-xl font-medium transition-colors whitespace-nowrap"
-        >
-          + Toevoegen
-        </button>
+      <div className="bg-white rounded-2xl p-4 shadow-sm mb-4 border border-dashed border-blue-200 flex flex-col gap-3">
+        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+          <span className="text-2xl shrink-0 hidden sm:block">📂</span>
+          <input
+            type="text"
+            value={newCategory}
+            onChange={(e) => setNewCategory(e.target.value)}
+            placeholder={t('adminPages.categorieen.newCategoryPlaceholder')}
+            className="flex-1 min-w-0 px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
+            onKeyDown={(e) => e.key === 'Enter' && addCategory()}
+          />
+          <button
+            type="button"
+            onClick={addCategory}
+            disabled={!newCategory.trim()}
+            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 text-white rounded-xl font-medium transition-colors whitespace-nowrap shrink-0"
+          >
+            {t('adminPages.categorieen.add')}
+          </button>
+        </div>
+        <div className="sm:pl-10">
+          <p className="text-xs text-gray-500 mb-2">{t('adminPages.categorieen.categoryImageHelp')}</p>
+          <div className="max-w-xl">
+            <MediaPicker
+              tenantSlug={params.tenant}
+              value={newCategoryImageUrl}
+              onChange={setNewCategoryImageUrl}
+              label={t('adminPages.categorieen.image')}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Categories List */}
@@ -280,6 +304,15 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
               <Reorder.Item key={category.id} value={category} className="bg-white hover:bg-gray-50 cursor-grab active:cursor-grabbing transition-colors">
                 <div className="flex items-center gap-2 sm:gap-3 px-4 py-3.5 flex-wrap">
                   <span className="text-gray-300 text-lg select-none shrink-0">⠿</span>
+
+                  <div className="shrink-0 w-full min-[480px]:w-[200px] sm:max-w-[220px]">
+                    <MediaPicker
+                      tenantSlug={params.tenant}
+                      value={(category.image_url || '').trim()}
+                      onChange={(url) => updateCategoryImage(category.id!, url)}
+                      label={t('adminPages.categorieen.image')}
+                    />
+                  </div>
 
                   {editingId === category.id ? (
                     <input

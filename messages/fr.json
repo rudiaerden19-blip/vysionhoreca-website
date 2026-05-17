@@ -1939,7 +1939,8 @@
       "categoryVatHint": "Choisissez un taux de TVA fixe par catégorie (6 %, 9 %, 12 % ou 21 %) pour les articles de cette catégorie. « Standard de l'établissement » reprend le réglage général — comportement inchangé tant que vous ne choisissez pas un taux ici.",
       "categoryVatTypicalRatesHint": "Conseil — courant en restauration : aliments et boissons non alcoolisées 9 % ; boissons alcoolisées 21 %. En cas de doute, vérifiez avec votre comptable ou l’administration fiscale.",
       "categoryVatShort": "TVA",
-      "categoryVatUseTenant": "Standard établissement"
+      "categoryVatUseTenant": "Standard établissement",
+      "categoryImageHelp": "Facultatif — même médiathèque et envoi que pour les produits."
     },
     "producten": {
       "title": "Produits",

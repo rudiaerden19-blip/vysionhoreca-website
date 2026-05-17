@@ -2439,7 +2439,8 @@
       "categoryVatHint": "Imposta un'aliquota IVA fissa per categoria (6%, 9%, 12% o 21%) per i prodotti di quella categoria. «Predefinito attività» usa l'impostazione generale: stesso comportamento di prima se non modifichi nulla.",
       "categoryVatTypicalRatesHint": "Suggerimento — spesso nell’horeca: cibo e bibite analcoliche 9%; bevande alcoliche 21%. In caso di dubbio, rivolgersi al commercialista o all’agenzia delle entrate.",
       "categoryVatShort": "IVA",
-      "categoryVatUseTenant": "Predefinito attività"
+      "categoryVatUseTenant": "Predefinito attività",
+      "categoryImageHelp": "Facoltativa — stessa libreria media e caricamento dei prodotti."
     },
     "producten": {
       "title": "Prodotti",

@@ -2738,7 +2738,8 @@
       "categoryVatHint": "Kies per categorie een vast BTW-tarief (6%, 9%, 12% of 21%) voor producten in die categorie. „Zaak standaard\" gebruikt het tarief uit je zaak-instellingen — hetzelfde gedrag als voorheen als je niets wijzigt.",
       "categoryVatTypicalRatesHint": "Tip — veelgebruikt in de horeca: eten en frisdranken 9%; alcoholische dranken 21%. Controleer bij twijfel bij je boekhouder of het fiscaal centrum.",
       "categoryVatShort": "BTW",
-      "categoryVatUseTenant": "Zaak standaard"
+      "categoryVatUseTenant": "Zaak standaard",
+      "categoryImageHelp": "Optioneel — zelfde mediabibliotheek en upload als bij Producten."
     },
     "producten": {
       "title": "Producten",

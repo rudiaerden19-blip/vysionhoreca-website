@@ -2318,20 +2318,22 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return m
   }, [cart])
 
-  /** Eerste product met foto per categorie — op categorietegels altijd cover zodat de foto de tegel vult. */
+  /** Categorietegel-foto: eigen `image_url` als gezet, anders eerste productfoto in categorie. */
   const categoryTileImageByCategoryId = useMemo(() => {
     const m = new Map<string, { url: string }>()
+    for (const c of categories) {
+      const id = c.id != null ? String(c.id) : ''
+      const u = (c.image_url || '').trim()
+      if (id && u) m.set(id, { url: u })
+    }
     for (const p of products) {
       const cid = p.category_id
       if (!cid || !p.image_url) continue
-      if (!m.has(cid)) {
-        m.set(cid, {
-          url: p.image_url,
-        })
-      }
+      const key = String(cid)
+      if (!m.has(key)) m.set(key, { url: p.image_url })
     }
     return m
-  }, [products])
+  }, [categories, products])
 
   const productsInSelectedCategory = useMemo(() => {
     if (!selectedCategory) return []

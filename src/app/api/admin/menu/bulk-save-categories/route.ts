@@ -21,6 +21,7 @@ const CategoryRowSchema = z.object({
   is_active: z.boolean(),
   /** null = gebruik tenant standaard-BTW */
   default_btw_percentage: CategoryVatSchema.nullable(),
+  image_url: z.string().max(8000).optional().nullable(),
 })
 
 const BodySchema = z.object({
@@ -75,6 +76,7 @@ export async function POST(req: NextRequest) {
             sort_order: cat.sort_order,
             is_active: cat.is_active,
             default_btw_percentage: cat.default_btw_percentage,
+            image_url: cat.image_url ?? '',
           }
           const { data: updated, error } = await supabase
             .from('menu_categories')

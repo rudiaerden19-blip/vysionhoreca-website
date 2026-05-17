@@ -2738,7 +2738,8 @@
       "categoryVatHint": "Set a fixed VAT rate per category (6%, 9%, 12% or 21%) for products in that category. “Use business default” follows your shop settings — unchanged behaviour until you pick a rate here.",
       "categoryVatTypicalRatesHint": "Tip — common in hospitality: food and soft drinks 9%; alcoholic beverages 21%. If unsure, check with your accountant or tax office.",
       "categoryVatShort": "VAT",
-      "categoryVatUseTenant": "Business default"
+      "categoryVatUseTenant": "Business default",
+      "categoryImageHelp": "Optional — same media library and upload as for products."
     },
     "producten": {
       "title": "Products",

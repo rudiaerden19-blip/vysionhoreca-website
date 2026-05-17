@@ -2439,7 +2439,8 @@
       "categoryVatHint": "Elige un tipo de IVA fijo por categoría (6 %, 9 %, 12 % o 21 %) para los artículos de esa categoría. « Estándar del local » usa el tipo de los ajustes del negocio: mismo comportamiento que antes si no cambias nada.",
       "categoryVatTypicalRatesHint": "Consejo — habitual en hostelería: comida y refrescos 9 %; bebidas alcohólicas 21 %. Si tienes dudas, consulta a tu asesor o a la administración tributaria.",
       "categoryVatShort": "IVA",
-      "categoryVatUseTenant": "Estándar del local"
+      "categoryVatUseTenant": "Estándar del local",
+      "categoryImageHelp": "Opcional — misma biblioteca de medios y subida que en Productos."
     },
     "producten": {
       "title": "Productos",

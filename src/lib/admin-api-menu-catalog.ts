@@ -45,6 +45,8 @@ export interface MenuCategory {
   name: string
   description: string
   icon?: string
+  /** Optioneel; kassa/webshop categorietegel — leeg = fallback op eerste productfoto */
+  image_url?: string
   sort_order: number
   is_active: boolean
   /** 6/9/12/21 of null = gebruik tenant_settings.btw_percentage */
@@ -88,6 +90,7 @@ export async function saveMenuCategory(
     name: category.name,
     description: category.description ?? '',
     ...(category.icon !== undefined && { icon: category.icon }),
+    image_url: category.image_url ?? '',
     sort_order: category.sort_order,
     is_active: category.is_active,
     ...(category.default_btw_percentage !== undefined && {
@@ -110,7 +113,7 @@ export async function saveMenuCategory(
 
   if (
     !r.ok &&
-    /default_btw_percentage|column .* does not exist|schema cache/i.test(r.error || '')
+    /default_btw_percentage|image_url|column .* does not exist|schema cache/i.test(r.error || '')
   ) {
     const rowLegacy = {
       name: category.name,
@@ -169,6 +172,7 @@ export async function bulkSaveMenuCategories(
     sort_order: index,
     is_active: c.is_active,
     default_btw_percentage: c.default_btw_percentage ?? null,
+    image_url: c.image_url ?? '',
   }))
 
   for (const row of categories) {
