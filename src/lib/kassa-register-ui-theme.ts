@@ -169,7 +169,7 @@ export function createKassaRegisterUiTheme(dark: boolean): KassaRegisterUiTheme 
     menuEmptyMuted: 'text-zinc-500',
     productTileSolidBg: 'bg-[#1a2230]',
     productTileSolidBorder: 'border-zinc-600',
-    productTileFooterBar: 'border-zinc-600 bg-[#151a21]/98',
+    productTileFooterBar: 'border-zinc-600/70 bg-[#151a21]/55 backdrop-blur-md',
     productFooterTextDark: 'text-zinc-50',
     priceAccentClass: 'text-[#6dd5ff]',
     sidebarBg: 'bg-[#0f1319] border-l border-zinc-700',
