@@ -2772,6 +2772,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       barTableDelta?: boolean
       /** Na geslaagde print: watermerk bijwerken (localStorage per tenant). */
       barWatermarkCommit?: { slotKey: string; row: Record<string, number> }
+      /**
+       * Alleen bij draft: 1 = gele Bon-knop / toog-delta; 2 = tap op zaaknaam in header (zelfde volume als betaalde bon).
+       * Betaalde bon: altijd 2 — dit veld wordt genegeerd.
+       */
+      draftCopies?: 1 | 2
     },
   ) => {
     if (!order) {
@@ -2940,11 +2945,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const isCash =
       !isDraft && ['CASH', 'cash', 'CONTANT', 'contant'].includes(String(order.paymentMethod || ''))
 
+    const paidCopies = 2
+    const draftCopies = opts?.draftCopies === 2 ? 2 : 1
     const printResult = await sendToVysionPrintAgent({
       winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
       bonInhoud: bonLines.join('\n'),
-      /** Voorlopige bon (gele knop, toog-delta «Naar tafel»): 1. Afrekenen (betaald): overal 2. */
-      copies: isDraft ? 1 : 2,
+      /** Draft: 1 = gele Bon / toog-delta; 2 = zaaknaam in header. Betaald (afrekenen): altijd 2. */
+      copies: isDraft ? draftCopies : paidCopies,
       openDrawer: isCash,
       receiptMode: 'kassa',
       orderData: {
@@ -3153,7 +3160,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
    * Gele bon: altijd volledige mand/kar op de bon (incl. hele tafel).
    * Bij dine-in+tafel: na geslaagde print watermerk = volledige stand, zodat «Naar tafel» alleen nog delta print.
    */
-  const printDraftBonFromCart = async () => {
+  const printDraftBonFromCart = async (opts?: { draftCopies?: 1 | 2 }) => {
     if (draftBonLineItems.length === 0) return
     try {
       setDraftBonPrinting(true)
@@ -3195,6 +3202,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
       await printReceipt(draftOrder, {
         draft: true,
+        draftCopies: opts?.draftCopies ?? 1,
         ...(watermarkCommit ? { barWatermarkCommit: watermarkCommit } : {}),
       })
     } finally {
@@ -3581,7 +3589,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         <div className="relative z-20 flex min-w-0 max-w-[6.5rem] shrink-0 flex-col justify-center px-0.5 sm:max-w-[8.5rem] md:max-w-[11rem] lg:max-w-[13rem] ml-[1cm]">
           <button
             type="button"
-            onClick={printDraftBonFromCart}
+            onClick={() => {
+              void printDraftBonFromCart({ draftCopies: 2 })
+            }}
             disabled={draftBonLineItems.length === 0 || draftBonPrinting}
             className="max-w-full truncate rounded-md px-1 py-0.5 text-center text-[10px] font-semibold leading-tight tracking-tight text-white/95 transition-colors hover:bg-white/15 active:bg-white/25 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-transparent sm:text-[11px] md:text-xs"
             title={t('kassaApp.cartBonTitle')}
@@ -4318,7 +4328,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </button>
             <button
               type="button"
-              onClick={printDraftBonFromCart}
+              onClick={() => {
+                void printDraftBonFromCart({ draftCopies: 1 })
+              }}
               disabled={draftBonLineItems.length === 0 || draftBonPrinting}
               className={`flex flex-col items-center justify-center rounded-xl bg-yellow-400 text-yellow-950 hover:bg-yellow-300 active:brightness-95 disabled:opacity-40 disabled:pointer-events-none ${
                 kassaSidebarFooterTier === 'comfort'

@@ -328,11 +328,27 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
 
   // Sla handmatige kassa invoer op
   const saveKassaEntry = async () => {
+    if (currentSavedReport?.is_closed) {
+      alert(t('zReport.kassaEntryClosedBlocked'))
+      return
+    }
+
     setSavingKassa(true)
     const cash = parseFloat(kassaForm.cash) || 0
     const card = parseFloat(kassaForm.card) || 0
     const online = parseFloat(kassaForm.online) || 0
     const total = cash + card + online
+
+    const ordersTotal = stats?.total ?? 0
+    if (ordersTotal > 0 && total > 0) {
+      const tolerance = Math.max(0.05, ordersTotal * 0.02)
+      if (Math.abs(total - ordersTotal) <= tolerance) {
+        if (!window.confirm(t('zReport.kassaDuplicateConfirm'))) {
+          setSavingKassa(false)
+          return
+        }
+      }
+    }
 
     const r = await adminDb.upsert(
       'z_reports',
@@ -629,6 +645,14 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   }
 
   const isDayClosed = currentSavedReport?.is_closed === true
+  const hasExistingManualEntry =
+    !!currentSavedReport &&
+    (currentSavedReport.manual_total != null ||
+      currentSavedReport.manual_cash != null ||
+      currentSavedReport.manual_card != null ||
+      currentSavedReport.manual_online != null)
+  const kassaFormHasValues =
+    !!kassaForm.cash.trim() || !!kassaForm.card.trim() || !!kassaForm.online.trim()
 
   if (loading) {
     return (
@@ -690,9 +714,15 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           {/* KASSA INVOER */}
           <button
             onClick={() => { setKassaForm({ cash: '', card: '', online: '' }); setShowKassaModal(true) }}
-            className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium flex items-center gap-2"
+            disabled={isDayClosed}
+            title={isDayClosed ? t('zReport.kassaButtonTitleClosed') : undefined}
+            className={`px-4 py-2 rounded-xl font-medium flex items-center gap-2 ${
+              isDayClosed
+                ? 'bg-orange-300 text-white cursor-not-allowed opacity-60'
+                : 'bg-orange-500 hover:bg-orange-600 text-white'
+            }`}
           >
-            🏧 Kassa invoer
+            🏧 {t('zReport.kassaEntryButton')}
           </button>
           {/* OPSLAAN — geblokkeerd als dag afgesloten */}
           <button
@@ -957,8 +987,16 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                         <span className="text-green-600 font-bold text-sm">{formatCurrency(item.total)}</span>
                       </div>
                       <div className="text-xs text-gray-400 mt-1 space-y-0.5">
-                        {item.onlineTotal > 0 && <div>Online: {formatCurrency(item.onlineTotal)}</div>}
-                        {item.kassaTotal > 0 && <div>Kassa: {formatCurrency(item.kassaTotal)}</div>}
+                        {item.onlineTotal > 0 && (
+                          <div>
+                            {t('zReport.archiveBreakdownOrders')}: {formatCurrency(item.onlineTotal)}
+                          </div>
+                        )}
+                        {item.kassaTotal > 0 && (
+                          <div>
+                            {t('zReport.archiveBreakdownManual')}: {formatCurrency(item.kassaTotal)}
+                          </div>
+                        )}
                         <div>{item.count} bestellingen</div>
                       </div>
                     </div>
@@ -1079,18 +1117,18 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
               <div className="flex items-center gap-3 mb-2">
                 <span className="text-3xl">🏧</span>
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900">Kassa invoer</h2>
+                  <h2 className="text-xl font-bold text-gray-900">{t('zReport.kassaModalTitle')}</h2>
                   <p className="text-gray-500 text-sm">{formatDate(selectedDate)}</p>
                 </div>
               </div>
 
-              <p className="text-gray-500 text-sm mb-6">
-                Vul het kassabedrag in per betaalmethode na je shift.
-              </p>
+              <p className="text-gray-600 text-sm mb-4 leading-relaxed">{t('zReport.kassaModalIntro')}</p>
 
               <div className="space-y-4 mb-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">💵 Contant</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    💵 {t('zReport.kassaModalCash')}
+                  </label>
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium">€</span>
                     <input
@@ -1105,7 +1143,9 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">💳 Kaart</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    💳 {t('zReport.kassaModalCard')}
+                  </label>
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium">€</span>
                     <input
@@ -1120,7 +1160,9 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">🌐 Online</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    🌐 {t('zReport.kassaModalOnlineExtra')}
+                  </label>
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium">€</span>
                     <input
@@ -1138,7 +1180,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                 {/* Totaal preview */}
                 {(kassaForm.cash || kassaForm.card || kassaForm.online) && (
                   <div className="bg-orange-50 rounded-xl p-4 flex justify-between items-center">
-                    <span className="font-medium text-gray-700">Totaal kassa:</span>
+                    <span className="font-medium text-gray-700">{t('zReport.kassaModalTotalPreview')}:</span>
                     <span className="text-xl font-bold text-orange-600">
                       {formatCurrency((parseFloat(kassaForm.cash) || 0) + (parseFloat(kassaForm.card) || 0) + (parseFloat(kassaForm.online) || 0))}
                     </span>
@@ -1146,19 +1188,32 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                 )}
               </div>
 
+              {hasExistingManualEntry && (
+                <p className="text-xs text-gray-500 mb-4">{t('zReport.kassaModalClearHint')}</p>
+              )}
+
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowKassaModal(false)}
                   className="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium"
                 >
-                  Annuleren
+                  {t('zReport.kassaModalCancel')}
                 </button>
                 <button
                   onClick={saveKassaEntry}
-                  disabled={savingKassa || (!kassaForm.cash && !kassaForm.card && !kassaForm.online)}
+                  disabled={
+                    savingKassa ||
+                    (!kassaFormHasValues && !hasExistingManualEntry)
+                  }
                   className="flex-1 px-4 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold disabled:bg-gray-300 flex items-center justify-center gap-2"
                 >
-                  {savingKassa ? <><span className="animate-spin">⏳</span> Opslaan...</> : <>📊 Rapport opslaan</>}
+                  {savingKassa ? (
+                    <>
+                      <span className="animate-spin">⏳</span> {t('zReport.kassaModalSaving')}
+                    </>
+                  ) : (
+                    <>📊 {t('zReport.kassaModalSave')}</>
+                  )}
                 </button>
               </div>
             </motion.div>
