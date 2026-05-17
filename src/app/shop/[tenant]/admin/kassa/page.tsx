@@ -1627,6 +1627,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     dineInSubtitle?: string
   } | null>(null)
   const customerDisplayBcRef = useRef<BroadcastChannel | null>(null)
+  /** Eén automatische klantscherm-popup per tenant-lading (herstel/refocus via vaste window.open naam). */
+  const customerDisplayAutoOpenedForTenantRef = useRef<string | null>(null)
   /** HTML bon wacht op modal als lokale Print Agent faalt; daarna printReceiptHtmlDocument */
   const [printAgentFallbackHtml, setPrintAgentFallbackHtml] = useState<string | null>(null)
   /**
@@ -2171,6 +2173,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     if (typeof window === 'undefined') return
     let tok = customerDisplayToken
     if (!tok) {
+      try {
+        const saved = sessionStorage.getItem(`vysion_klantscherm_${tenant}`)?.trim()
+        if (saved) {
+          tok = saved
+          setCustomerDisplayToken(saved)
+        }
+      } catch {
+        /* ignore */
+      }
+    }
+    if (!tok) {
       tok =
         typeof crypto !== 'undefined' && 'randomUUID' in crypto
           ? crypto.randomUUID()
@@ -2219,6 +2232,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     void reposition()
   }, [tenant, customerDisplayToken, t])
+
+  /** Bij laden kassa direct klantscherm openen — zelfde vensternaam hervat bestaande popup zonder nieuwe taps. Popup-blocker kan blokkeren; knop blijft fallback. */
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (demoViewOnly) return
+    if (customerDisplayAutoOpenedForTenantRef.current === tenant) return
+    customerDisplayAutoOpenedForTenantRef.current = tenant
+    queueMicrotask(() => {
+      openKlantschermWindow()
+    })
+  }, [tenant, demoViewOnly, openKlantschermWindow])
 
   useEffect(() => {
     const bc = customerDisplayBcRef.current
