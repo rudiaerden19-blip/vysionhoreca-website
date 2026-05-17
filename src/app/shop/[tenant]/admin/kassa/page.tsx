@@ -347,18 +347,14 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
             loading="lazy"
             className="pointer-events-none absolute inset-0 block h-full min-h-0 w-full select-none object-cover object-top !h-full !w-full !max-w-none"
           />
-          <div
-            className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-32 bg-gradient-to-t from-neutral-950/[0.94] via-neutral-950/55 to-transparent sm:h-36"
-            aria-hidden
-          />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2.5 pt-12 sm:px-3 sm:pb-3 sm:pt-14">
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2 pb-2.5 pt-2 sm:px-3 sm:pb-3 sm:pt-2">
             <div className="flex flex-col items-center gap-1.5 text-center">
               {category.icon ? (
-                <span className="text-2xl text-amber-200 drop-shadow-[0_2px_4px_rgba(0,0,0,.95)] sm:text-3xl md:text-4xl">
+                <span className="text-2xl text-[#1e2431] sm:text-3xl md:text-4xl">
                   {category.icon}
                 </span>
               ) : null}
-              <span className="line-clamp-2 text-xl font-black leading-tight tracking-tight text-amber-50 [text-shadow:0_0_1px_rgba(0,0,0,1),0_2px_4px_rgba(0,0,0,.98),0_4px_18px_rgba(0,0,0,.85)] sm:text-2xl md:text-3xl lg:text-4xl">
+              <span className="line-clamp-2 text-xl font-black leading-tight tracking-tight text-[#1e2431] sm:text-2xl md:text-3xl lg:text-4xl">
                 {category.name}
               </span>
             </div>
