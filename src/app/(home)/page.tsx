@@ -1420,12 +1420,10 @@ function TestimonialSection() {
 
 // Main Page Component
 export default function HomePage() {
-  const [stickyNav, setStickyNav] = useState(false)
-
   return (
     <main>
-      {stickyNav && <Navigation />}
-      <HomeLandingHero onStickyNavChange={setStickyNav} />
+      <Navigation />
+      <HomeLandingHero />
       <WhyVysionSection />
       <GratisWebsiteBannerSection />
       <VysionBeestSection />

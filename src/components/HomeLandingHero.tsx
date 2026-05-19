@@ -6,14 +6,12 @@ import { useLanguage, Locale } from '@/i18n'
 import { LocaleFlagEmoji, LocaleFlagWithCode } from '@/components/LocaleFlagEmoji'
 import SubscriptionsTermsPopup from './SubscriptionsTermsPopup'
 
-type Props = {
-  onStickyNavChange?: (show: boolean) => void
-}
-
 const HERO_BG = '/images/hero-header.png'
 
-export default function HomeLandingHero({ onStickyNavChange }: Props) {
-  const sectionRef = useRef<HTMLElement>(null)
+/** Hoogte vaste marketing-nav (~ `Navigation` h-20); inhoud niet onder de balk laten verdwijnen. */
+const NAV_TOP_OFFSET_CLASS = 'pt-20'
+
+export default function HomeLandingHero() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isLangOpen, setIsLangOpen] = useState(false)
   const langRef = useRef<HTMLDivElement>(null)
@@ -28,20 +26,6 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
     document.addEventListener('pointerdown', handlePointerOutside, true)
     return () => document.removeEventListener('pointerdown', handlePointerOutside, true)
   }, [])
-
-  useEffect(() => {
-    const hero = sectionRef.current
-    if (!hero || !onStickyNavChange) return
-
-    const onScroll = () => {
-      const rect = hero.getBoundingClientRect()
-      onStickyNavChange(rect.bottom < 72)
-    }
-
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [onStickyNavChange])
 
   const handleLanguageSelect = (langCode: Locale) => {
     setLocale(langCode)
@@ -58,10 +42,9 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
 
   return (
     <section
-      ref={sectionRef}
-      className="relative min-h-[72svh] sm:min-h-[76svh] flex flex-col text-white overflow-hidden pb-6 sm:pb-8"
+      className={`relative ${NAV_TOP_OFFSET_CLASS} min-h-[72svh] sm:min-h-[76svh] flex flex-col text-white overflow-hidden pb-6 sm:pb-8`}
     >
-      <div className="absolute inset-0">
+      <div className="absolute inset-x-0 top-[-5rem] bottom-0">
         <Image
           src={HERO_BG}
           alt=""
