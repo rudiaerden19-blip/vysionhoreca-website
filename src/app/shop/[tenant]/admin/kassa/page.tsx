@@ -172,8 +172,12 @@ function kassaMenuGridColumnCountForInnerWidth(innerGridWidthPx: number): number
   return 2
 }
 
-/** Ruimte voor titel + onderrand binnen SXGA-tegel (≈ 2 regels sm/lg). */
-const KASSA_SXGA_LABEL_STRIP_RESERVED_PX = 108
+/** Ruimte titel onder 5∶4‑fotobak (SXGA). */
+const KASSA_SXGA_LABEL_STRIP_RESERVED_PX = 92
+/** `aspect-[5/4]` ⇒ hoogte beeldhok = deze fractie × celbreedte */
+const KASSA_SXGA_TILE_IMAGE_HEIGHT_FRAC = 0.8
+/** Zelfde als `mt-2` tussen foto-strook en naam */
+const KASSA_SXGA_IMAGE_TO_TITLE_GAP_PX = 8
 
 /**
  * Fysisch paneel klassiek **1280×1024** óf daar dicht tegenaan (sommige Elo/OS rapporteren ±2px).
@@ -182,12 +186,30 @@ const KASSA_SXGA_LABEL_STRIP_RESERVED_PX = 108
  */
 function isLikelySxga1280by1024PhysicalPanel(): boolean {
   if (typeof window === 'undefined') return false
-  const sw = window.screen?.width ?? 0
-  const sh = window.screen?.height ?? 0
-  if (sw <= 0 || sh <= 0) return false
-  const lw = Math.max(sw, sh)
-  const shrt = Math.min(sw, sh)
-  return lw >= 1268 && lw <= 1298 && shrt >= 1008 && shrt <= 1040 && lw / shrt >= 1.2 && lw / shrt <= 1.302
+  const scr = window.screen
+  if (!scr || scr.width <= 0 || scr.height <= 0) return false
+
+  const tryPair = (a: number, b: number): boolean => {
+    if (!(a > 0 && b > 0)) return false
+    const lw = Math.max(a, b)
+    const sh = Math.min(a, b)
+    return lw >= 1248 && lw <= 1312 && sh >= 1000 && sh <= 1060 && lw / sh >= 1.18 && lw / sh <= 1.32
+  }
+
+  if (tryPair(scr.width, scr.height)) return true
+  if (tryPair(scr.availWidth, scr.availHeight)) return true
+  return false
+}
+
+/**
+ * `visualViewport`/inner nabij **1280×1024‑klasse** (inclusief Windows‑schaal **~1024×819**) — géén XGA 1024×768.
+ */
+function innerViewportRoughlySxga17(wCss: number, hCss: number): boolean {
+  const lw = Math.max(wCss, hCss)
+  const sh = Math.min(wCss, hCss)
+  if (lw < 990 || lw > 1380 || sh < 796 || sh > 1108) return false
+  const r = lw / sh
+  return r >= 1.158 && r <= 1.36
 }
 
 /**
@@ -201,8 +223,7 @@ function sxgaLayoutMatchMediaHint(): boolean {
 }
 
 /**
- * Alleen **17″ vierkante 1280×1024‑klasse**: inner‑logica **`matchMedia`**, **`screen`‑paneel‑hint**.
- * Geen **iPad**.
+ * Alleen automatisch voor **≈1280×1024 / vierkante 17″‑kassa**. Geen invoer/schakelaars.
  */
 function shouldApplyKassaCompactSquareMonitorTileCap(): boolean {
   if (typeof window === 'undefined' || typeof navigator === 'undefined') return false
@@ -211,42 +232,36 @@ function shouldApplyKassaCompactSquareMonitorTileCap(): boolean {
   if (/\biPhone\b|\biPad\b|\biPod\b/.test(ua)) return false
   if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) return false
 
-  const mediaHit = sxgaLayoutMatchMediaHint()
-
   const vv = window.visualViewport
   const wSrc = vv?.width != null && vv.width > 0 ? vv.width : window.innerWidth
   const hSrc = vv?.height != null && vv.height > 0 ? vv.height : window.innerHeight
   const w = Math.max(1, Math.floor(wSrc))
   const h = Math.max(1, Math.floor(hSrc))
-  /** Kiosk met echt **1280×1024‑paneel** maar inner soms gek (zoom, kiosk‑shell): toch SXGA‑tegels. */
-  const panelHit =
-    isLikelySxga1280by1024PhysicalPanel() &&
-    Math.max(w, h) <= 1540 &&
-    Math.min(w, h) >= 640 &&
-    !(w <= 720 && h <= 840)
 
-  if (panelHit) return true
+  if (innerViewportRoughlySxga17(w, h)) return true
 
-  if (mediaHit) return true
+  if (isLikelySxga1280by1024PhysicalPanel()) return true
+
+  if (sxgaLayoutMatchMediaHint()) return true
 
   if (w <= h || w < 860 || h < 620) return false
 
   const shortSide = h
   const longSide = w
   const inSizeBand =
-    longSide >= 980 && longSide <= 1400 && shortSide >= 785 && shortSide <= 1090
+    longSide >= 980 && longSide <= 1400 && shortSide >= 796 && shortSide <= 1090
 
   let ratioHit = false
   if (inSizeBand) {
     const r = longSide / shortSide
-    ratioHit = r >= 1.215 && r <= 1.39
+    ratioHit = r >= 1.2 && r <= 1.36
   }
 
   return ratioHit
 }
 
 /**
- * SXGA (~17″): rij ≈ vierkante foto (celbreedte) + `mt-3.5` + titelstrook — geen leeg blok onder naam.
+ * SXGA (~17″): rij gelijk aan **5∶4‑foto** (`0.8×` celbreedte) + lichte gap + titel — overige schermen ongemoeid.
  */
 function applyKassaMenuSquareMonitorTileRowCap(
   rowH: number,
@@ -261,10 +276,10 @@ function applyKassaMenuSquareMonitorTileRowCap(
       ? (gridInnerWidthPx - (cols - 1) * menuGridGapPx) / cols
       : gridInnerWidthPx
 
-  /** `aspect-square` gebruikt fractie van rastercel — rij niet te kort rekken (`floor`). */
-  const KASSA_SXGA_MT_BELOW_IMG_PX = 14
+  const cw = Math.max(1, cellW)
+  const imgBandPx = cw * KASSA_SXGA_TILE_IMAGE_HEIGHT_FRAC
   const idealSxgaRowPx = Math.ceil(
-    Math.max(1, cellW) + KASSA_SXGA_MT_BELOW_IMG_PX + KASSA_SXGA_LABEL_STRIP_RESERVED_PX,
+    imgBandPx + KASSA_SXGA_IMAGE_TO_TITLE_GAP_PX + KASSA_SXGA_LABEL_STRIP_RESERVED_PX,
   )
   void _unusedMaxTileHToCellWLegacy
 
@@ -432,11 +447,10 @@ const KASSA_MENU_TILE_IMAGE_WELL =
   'pointer-events-none relative min-h-0 w-full min-w-0 flex-1 overflow-hidden bg-white'
 
 /**
- * SXGA ~17″: geen flex-1 (duwt tekst naar beneden). `aspect-square` met abs. foto geeft wél echte hoogte
- * (anders collapse als bij max-h-percent-only).
+ * SXGA ~17″: **5∶4‑foto** (lager dan vierkant) ⇒ titel dichter tegen de plaatje; abs.‑img heeft wél echte hoogte.
  */
 const KASSA_MENU_TILE_IMAGE_WELL_SXGA =
-  'pointer-events-none relative w-full shrink-0 flex-none aspect-square overflow-hidden bg-white'
+  'pointer-events-none relative w-full shrink-0 flex-none aspect-[5/4] overflow-hidden bg-white'
 
 const KASSA_MENU_TILE_IMG_CLASS =
   'pointer-events-none absolute inset-0 box-border h-full w-full select-none object-contain object-center'
@@ -447,7 +461,7 @@ const KASSA_MENU_TILE_LABEL_WRAP =
 
 /** SXGA ~17″: dichter tegen de foto, zelfde horizontale marge als standaard. */
 const KASSA_MENU_TILE_LABEL_WRAP_SXGA =
-  'pointer-events-none shrink-0 w-full bg-white px-2 pb-1.5 pt-0 mt-3.5 sm:px-3 sm:pb-2 sm:mt-3.5 sm:pt-0'
+  'pointer-events-none shrink-0 w-full bg-white px-2 pb-1.5 pt-0 mt-2 sm:px-3 sm:pb-2 sm:mt-2 sm:pt-0'
 
 const KASSA_MENU_TILE_LABEL_CLASS =
   'm-0 line-clamp-2 text-center text-base font-black leading-snug tracking-tight text-black sm:text-lg md:text-xl'
@@ -475,7 +489,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
 
   const noImgTop =
     sxgaDenseTileLayout ?
-      'pointer-events-none flex w-full shrink-0 flex-none flex-col items-center justify-center overflow-hidden bg-white px-2 aspect-square'
+      'pointer-events-none flex w-full shrink-0 flex-none flex-col items-center justify-center overflow-hidden bg-white px-2 aspect-[5/4]'
     : 'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-white px-2'
 
   return (
@@ -535,7 +549,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
 
   const noImgTop =
     sxgaDenseTileLayout ?
-      'pointer-events-none flex w-full shrink-0 flex-none flex-col items-center justify-center overflow-hidden bg-white px-2 aspect-square'
+      'pointer-events-none flex w-full shrink-0 flex-none flex-col items-center justify-center overflow-hidden bg-white px-2 aspect-[5/4]'
     : 'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-white px-2 pt-4'
 
   return (
