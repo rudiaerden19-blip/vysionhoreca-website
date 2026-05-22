@@ -1267,11 +1267,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [])
 
   useLayoutEffect(() => {
-    const el = kassaMenuScrollRef.current
-    if (!el || typeof ResizeObserver === 'undefined') return
     let rafId = 0
+
+    /** Moet synchroon: geen `rAF` — anders eerste categorie-frame nog “niet‑SXGA” (te groot). */
+    function syncSxgaDenseFromViewport() {
+      const sxgaDense = shouldApplyKassaCompactSquareMonitorTileCap()
+      setKassaSxgaDenseTiles((prev) => (prev === sxgaDense ? prev : sxgaDense))
+    }
+
     const measure = () => {
+      syncSxgaDenseFromViewport()
       cancelAnimationFrame(rafId)
+      const el = kassaMenuScrollRef.current
+      if (!el || typeof ResizeObserver === 'undefined') return
+
       rafId = requestAnimationFrame(() => {
         const st = getComputedStyle(el)
         const pt = parseFloat(st.paddingTop) || 0
@@ -1286,8 +1295,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             : window.innerWidth
         const viewportW = Math.max(1, Math.floor(vpWsrc))
         const fallback = computeInitialKassaMenuRowPx()
-        const sxgaDense = shouldApplyKassaCompactSquareMonitorTileCap()
-        setKassaSxgaDenseTiles((prev) => (prev === sxgaDense ? prev : sxgaDense))
         if (innerH <= 0) {
           setKassaMenuRowPx((prev) => (prev === fallback ? prev : fallback))
           return
@@ -1306,9 +1313,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         setKassaMenuRowPx((prev) => (prev === next ? prev : next))
       })
     }
+
     measure()
-    const ro = new ResizeObserver(measure)
-    ro.observe(el)
+    let ro: ResizeObserver | undefined
+    if (typeof ResizeObserver !== 'undefined' && kassaMenuScrollRef.current) {
+      ro = new ResizeObserver(measure)
+      ro.observe(kassaMenuScrollRef.current)
+    }
     const onLayoutSignal = () => measure()
     window.addEventListener('resize', onLayoutSignal)
     window.visualViewport?.addEventListener?.('resize', onLayoutSignal)
@@ -1316,7 +1327,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       cancelAnimationFrame(rafId)
       window.removeEventListener('resize', onLayoutSignal)
       window.visualViewport?.removeEventListener?.('resize', onLayoutSignal)
-      ro.disconnect()
+      ro?.disconnect()
     }
   }, [selectedCategory, menuLoading])
 

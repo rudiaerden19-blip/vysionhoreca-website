@@ -1,0 +1,14 @@
+---
+description: Altijd commit + push na code-wijzigingen (tenzij expliciet verboden)
+alwaysApply: true
+---
+
+# Git: automatisch committen
+
+**Voorkeur projecteigenaar:** na elke bouwtaak met **bestandswijzigingen** automatisch **`git commit`** en **`git push`** naar de actuele branch (doorgaans `main`), zodat Vercel kan deployen voor alle tenants.
+
+- **Uitzonderingen:** geen commit bij alleen uitleg/lezen; geen lege commits; geen force-push of destructieve git-acties tenzij expliciet gevraagd.
+- **TypeScript:** bij `.ts`/`.tsx`-wijzigingen eerst **`npx tsc --noEmit`** waar passend.
+- **Hooks:** nooit `--no-verify` tenzij expliciet gevraagd.
+
+Dit **overrulet** een algemene voorkeur om pas te committen na expliciet verzoek — **hier geldt: standaard wel committen**.
