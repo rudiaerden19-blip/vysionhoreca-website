@@ -387,6 +387,13 @@ const KASSA_MENU_TILE_BUTTON_CLASS =
 const KASSA_MENU_TILE_IMAGE_WELL =
   'pointer-events-none relative min-h-0 w-full min-w-0 flex-1 overflow-hidden bg-white'
 
+/**
+ * SXGA ~17″: geen flex-1 (duwt tekst naar beneden). `aspect-square` met abs. foto geeft wél echte hoogte
+ * (anders collapse als bij max-h-percent-only).
+ */
+const KASSA_MENU_TILE_IMAGE_WELL_SXGA =
+  'pointer-events-none relative w-full shrink-0 flex-none aspect-square overflow-hidden bg-white'
+
 const KASSA_MENU_TILE_IMG_CLASS =
   'pointer-events-none absolute inset-0 box-border h-full w-full select-none object-contain object-center'
 
@@ -394,27 +401,43 @@ const KASSA_MENU_TILE_IMG_CLASS =
 const KASSA_MENU_TILE_LABEL_WRAP =
   'pointer-events-none shrink-0 w-full bg-white px-2 pb-2 pt-1.5 sm:px-3'
 
+/** SXGA ~17″: dichter tegen de foto, zelfde horizontale marge als standaard. */
+const KASSA_MENU_TILE_LABEL_WRAP_SXGA =
+  'pointer-events-none shrink-0 w-full bg-white px-2 pb-1.5 pt-1 sm:px-3 sm:pb-2 sm:pt-1'
+
 const KASSA_MENU_TILE_LABEL_CLASS =
   'm-0 line-clamp-2 text-center text-base font-black leading-snug tracking-tight text-black sm:text-lg md:text-xl'
 
 type KassaCategoryTileButtonProps = {
   category: MenuCategory
   imageUrl?: string
+  sxgaDenseTileLayout?: boolean
 }
 
 const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
   category,
   imageUrl,
+  sxgaDenseTileLayout,
 }: KassaCategoryTileButtonProps) {
+  const btnClass =
+    sxgaDenseTileLayout ? `${KASSA_MENU_TILE_BUTTON_CLASS} justify-start` : KASSA_MENU_TILE_BUTTON_CLASS
+  const imgWell = sxgaDenseTileLayout ? KASSA_MENU_TILE_IMAGE_WELL_SXGA : KASSA_MENU_TILE_IMAGE_WELL
+  const labelWrap = sxgaDenseTileLayout ? KASSA_MENU_TILE_LABEL_WRAP_SXGA : KASSA_MENU_TILE_LABEL_WRAP
+
+  const noImgTop =
+    sxgaDenseTileLayout ?
+      'pointer-events-none flex w-full shrink-0 flex-none flex-col items-center justify-center overflow-hidden bg-white px-2 aspect-square'
+    : 'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-white px-2'
+
   return (
     <button
       type="button"
       data-kassa-category-id={category.id != null ? String(category.id) : undefined}
-      className={KASSA_MENU_TILE_BUTTON_CLASS}
+      className={btnClass}
     >
       {imageUrl ? (
         <>
-          <div className={KASSA_MENU_TILE_IMAGE_WELL}>
+          <div className={imgWell}>
             <img
               src={imageUrl}
               alt={category.name}
@@ -424,16 +447,16 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
               className={KASSA_MENU_TILE_IMG_CLASS}
             />
           </div>
-          <div className={KASSA_MENU_TILE_LABEL_WRAP}>
+          <div className={labelWrap}>
             <p className={KASSA_MENU_TILE_LABEL_CLASS}>{category.name}</p>
           </div>
         </>
       ) : (
         <>
-          <div className="pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-white px-2">
+          <div className={noImgTop}>
             {category.icon ? <span className="text-5xl text-neutral-400">{category.icon}</span> : null}
           </div>
-          <div className={KASSA_MENU_TILE_LABEL_WRAP}>
+          <div className={labelWrap}>
             <p className={KASSA_MENU_TILE_LABEL_CLASS}>{category.name}</p>
           </div>
         </>
@@ -446,22 +469,34 @@ type KassaProductTileButtonProps = {
   product: MenuProduct
   inCart: number
   hasOpts: boolean
+  sxgaDenseTileLayout?: boolean
 }
 
 const KassaProductTileButton = memo(function KassaProductTileButton({
   product,
   inCart,
   hasOpts,
+  sxgaDenseTileLayout,
 }: KassaProductTileButtonProps) {
+  const btnClass =
+    sxgaDenseTileLayout ? `${KASSA_MENU_TILE_BUTTON_CLASS} justify-start` : KASSA_MENU_TILE_BUTTON_CLASS
+  const imgWell = sxgaDenseTileLayout ? KASSA_MENU_TILE_IMAGE_WELL_SXGA : KASSA_MENU_TILE_IMAGE_WELL
+  const labelWrap = sxgaDenseTileLayout ? KASSA_MENU_TILE_LABEL_WRAP_SXGA : KASSA_MENU_TILE_LABEL_WRAP
+
+  const noImgTop =
+    sxgaDenseTileLayout ?
+      'pointer-events-none flex w-full shrink-0 flex-none flex-col items-center justify-center overflow-hidden bg-white px-2 pt-3 aspect-square'
+    : 'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-white px-2 pt-4'
+
   return (
     <button
       type="button"
       data-kassa-product-id={product.id != null ? String(product.id) : undefined}
-      className={KASSA_MENU_TILE_BUTTON_CLASS}
+      className={btnClass}
     >
       {product.image_url ? (
         <>
-          <div className={KASSA_MENU_TILE_IMAGE_WELL}>
+          <div className={imgWell}>
             <img
               src={product.image_url}
               alt={product.name}
@@ -471,16 +506,16 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
               className={KASSA_MENU_TILE_IMG_CLASS}
             />
           </div>
-          <div className={KASSA_MENU_TILE_LABEL_WRAP}>
+          <div className={labelWrap}>
             <p className={KASSA_MENU_TILE_LABEL_CLASS}>{product.name}</p>
           </div>
         </>
       ) : (
         <>
-          <div className="pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-white px-2 pt-4">
+          <div className={noImgTop}>
             <span className="text-5xl text-neutral-300">🍽️</span>
           </div>
-          <div className={KASSA_MENU_TILE_LABEL_WRAP}>
+          <div className={labelWrap}>
             <p className={KASSA_MENU_TILE_LABEL_CLASS}>{product.name}</p>
           </div>
         </>
@@ -944,11 +979,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   /** 1 = rijhoogte past bij KASSA_MENU_VISIBLE_ROWS in scrollport (min gap); hogere rijen = grotere tegels / meer tekstruimte (o.a. 15"). */
   const KASSA_MENU_TILE_HEIGHT_BOOST = 1
   /**
-   * Bij 4:3 / bijna vierkante kassa-monitor: begrens tegelrijhoogte i.f.v. kolombreedte.
-   * Alleen typische SXGA **17″ (~1280×1024 / 1280×960)** (`shouldApplyKassaCompactSquareMonitorTileCap`): geen 15″ XGA,
-   * grotere desktops of iPads.
+   * Alleen SXGA **17″** (`shouldApplyKassaCompactSquareMonitorTileCap`): iets hogere rij versus celbreedte
+   * = grotere tegels — andere schermen blijven ongewijzigd (functie returnt dan `rowH` ongewijzigd).
    */
-  const KASSA_MENU_SQUARE_MONITOR_MAX_TILE_H_TO_CELL_W = 1.24
+  const KASSA_MENU_SQUARE_MONITOR_MAX_TILE_H_TO_CELL_W = 1.42
 
   function estimateKassaMenuGridInnerWidthPx(): number {
     if (typeof window === 'undefined') return 560
@@ -984,6 +1018,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const kassaPrevSelectedCategoryIdRef = useRef<string | null>(null)
 
   const [kassaMenuRowPx, setKassaMenuRowPx] = useState(computeInitialKassaMenuRowPx)
+  /** SXGA ~17″: dichtere titel+vierkante fotobak — alleen daar `sxgaDenseTileLayout` naar tegels */
+  const [kassaSxgaDenseTiles, setKassaSxgaDenseTiles] = useState(false)
 
   /** Na swap categorie⇄product: kort géén pointers op de verse grid (zelfde coörd = ghost tik). */
   useLayoutEffect(() => {
@@ -1145,6 +1181,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         const innerH = el.clientHeight - pt - pb
         const gridInnerW = Math.max(0, el.clientWidth - pl - pr)
         const fallback = computeInitialKassaMenuRowPx()
+        const sxgaDense = shouldApplyKassaCompactSquareMonitorTileCap()
+        setKassaSxgaDenseTiles((prev) => (prev === sxgaDense ? prev : sxgaDense))
         if (innerH <= 0) {
           setKassaMenuRowPx((prev) => (prev === fallback ? prev : fallback))
           return
@@ -3958,7 +3996,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   {categories.map((cat) => {
                     const tile = cat.id ? categoryTileImageByCategoryId.get(cat.id) : undefined
                     return (
-                      <KassaCategoryTileButton key={cat.id} category={cat} imageUrl={tile?.url} />
+                      <KassaCategoryTileButton
+                        key={cat.id}
+                        category={cat}
+                        imageUrl={tile?.url}
+                        sxgaDenseTileLayout={kassaSxgaDenseTiles}
+                      />
                     )
                   })}
                 </div>
@@ -3992,6 +4035,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           product={product}
                           inCart={inCart}
                           hasOpts={hasOpts}
+                          sxgaDenseTileLayout={kassaSxgaDenseTiles}
                         />
                       )
                     })}
