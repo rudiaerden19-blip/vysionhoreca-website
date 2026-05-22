@@ -173,33 +173,38 @@ function kassaMenuGridColumnCountForInnerWidth(innerGridWidthPx: number): number
 }
 
 /**
- * Compacte (~17″) 4:3-kassa-monitor: veel bruikbare hoogte + smalle rasterkolommen ⇒ tegelrij te hoog.
- * We kunnen fysieke inch niet meten — alleen gebruikelijke logische viewport-breedtes/hoogtes (geen grotere 1600×1200 / veel 21″).
- * Geen aanpassing op iPad/iPhone (UA + iPadOS “desktop” UA), zodat 1024×768-achtige iPad-weergaven niet verschillen van voorheen.
+ * Alleen klassieke **17″ 4:3** in de praktijk: logische **`~1280×1024`** of **`~1280×960`** (SXGA).
+ * Inch meten kan de browser niet; we sluiten bewust **XGA `1024×768`** uit (komt veel op 14–15″).
+ * **`longSide`/hoog DPI** van grote desktops (≥21″) valt ook buiten de band. **Geen aanpassing op iPads** (zie UA-check).
  */
 function shouldApplyKassaCompactSquareMonitorTileCap(): boolean {
   if (typeof window === 'undefined' || typeof navigator === 'undefined') return false
 
   const ua = navigator.userAgent
-  /** iPad / iPhone Safari / WebView — zelfde logische px als oude desktops komt veel voor */
+  /** iPad / iPhone — afblijven */
   if (/\biPhone\b|\biPad\b|\biPod\b/.test(ua)) return false
-  /** iPadOS 13+ met “Safari-desktop” UA: vaak Macintosh + touchscreen */
+  /** iPadOS “Safari-desktop” UA */
   if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) return false
 
   const w = window.innerWidth
   const h = window.innerHeight
 
-  /** Alleen “breed panorama” kiosk; portrait/tablet‑portret laten we ongemoeid */
+  /** Landscape kiosk; portrait / tablet‑portret: niet aanpassen */
   if (w <= h || w < 960 || h < 640) return false
 
   const shortSide = h
   const longSide = w
-  /** Typisch logische grootte SXGA-/XGA op ~17″; sluit veel grotere desktops (bv. 1600×1200 / 21″) uit */
-  if (longSide < 980 || longSide > 1360 || shortSide < 680 || shortSide > 1050) return false
 
-  /* 1024×768 en 1280×1024 vallen zo rond 4:3; langere schermrand valt uit via longSide-shortSide band */
+  /*
+   * Smalle band + strakker aspect (~4:3). Sluit o.a. uit:
+   * - 1024×768 ("voor 15inch/oud") — short te laag;
+   * - 1366×768, 1440×900, breedbeeld — buiten ratio of long/te hoog/te laag voor SXGA-band;
+   * - 1400×1050 / 1600×1200 (veel grotere 4:3) — long te groot.
+   */
+  if (longSide < 1220 || longSide > 1340 || shortSide < 900 || shortSide > 1080) return false
+
   const r = longSide / shortSide
-  return r >= 1.22 && r <= 1.38
+  return r >= 1.24 && r <= 1.36
 }
 
 /**
@@ -940,7 +945,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const KASSA_MENU_TILE_HEIGHT_BOOST = 1
   /**
    * Bij 4:3 / bijna vierkante kassa-monitor: begrens tegelrijhoogte i.f.v. kolombreedte.
-   * Alleen bij compacte ~17″ 4:3-kiosk (`shouldApplyKassaCompactSquareMonitorTileCap`).
+   * Alleen typische SXGA **17″ (~1280×1024 / 1280×960)** (`shouldApplyKassaCompactSquareMonitorTileCap`): geen 15″ XGA,
+   * grotere desktops of iPads.
    */
   const KASSA_MENU_SQUARE_MONITOR_MAX_TILE_H_TO_CELL_W = 1.24
 
