@@ -172,12 +172,12 @@ function kassaMenuGridColumnCountForInnerWidth(innerGridWidthPx: number): number
   return 2
 }
 
-/** Ruimte titel onder 5∶4‑fotobak (SXGA). */
-const KASSA_SXGA_LABEL_STRIP_RESERVED_PX = 92
+/** Ruimte titel onder 5∶4‑fotobak (SXGA); strak zodat `gridAutoRows` niet boven inhoud blijft hangen. */
+const KASSA_SXGA_LABEL_STRIP_RESERVED_PX = 66
 /** `aspect-[5/4]` ⇒ hoogte beeldhok = deze fractie × celbreedte */
 const KASSA_SXGA_TILE_IMAGE_HEIGHT_FRAC = 0.8
-/** Zelfde als `mt-2` tussen foto-strook en naam */
-const KASSA_SXGA_IMAGE_TO_TITLE_GAP_PX = 8
+/** Zelfde als `mt-1.5` tussen foto-strook en naam */
+const KASSA_SXGA_IMAGE_TO_TITLE_GAP_PX = 6
 
 /**
  * Fysisch paneel klassiek **1280×1024** óf daar dicht tegenaan (sommige Elo/OS rapporteren ±2px).
@@ -283,7 +283,7 @@ function applyKassaMenuSquareMonitorTileRowCap(
   )
   void _unusedMaxTileHToCellWLegacy
 
-  return Math.max(142, Math.min(rowH, idealSxgaRowPx))
+  return Math.max(118, Math.min(rowH, idealSxgaRowPx))
 }
 
 const KASSA_NUMPAD_KEYS = ['7', '8', '9', '+', '4', '5', '6', '-', '1', '2', '3', '×', 'C', '0', '.', '='] as const
@@ -440,8 +440,17 @@ const KassaReservationsView = dynamic(() => import('@/components/KassaReservatio
 })
 
 /** Categorie- en producttegel: witte kaart; foto alleen bovenin, titel in vaste strook eronder (niet over de foto). */
-const KASSA_MENU_TILE_BUTTON_CLASS =
-  'touch-manipulation select-none group relative flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden rounded-xl border border-neutral-200/90 bg-white text-left shadow-[0_8px_30px_rgba(0,0,0,0.35)] active:brightness-95'
+const KASSA_MENU_TILE_BUTTON_CLASS_BASE =
+  'touch-manipulation select-none group relative flex min-h-0 w-full min-w-0 flex-col overflow-hidden rounded-xl border border-neutral-200/90 bg-white text-left shadow-[0_8px_30px_rgba(0,0,0,0.35)] active:brightness-95'
+
+/** Standaard: rastercel wordt **items-stretch** ⇒ knop moet **`h-full`**. */
+const KASSA_MENU_TILE_BUTTON_CLASS = `${KASSA_MENU_TILE_BUTTON_CLASS_BASE} h-full`
+
+/**
+ * SXGA: **`h-auto`** — geen groot wit blok onder titel als `gridAutoRows` te ruim rekende;
+ * combinatie met **`items-start`** op het grid voor beide grids (cat + product).
+ */
+const KASSA_MENU_TILE_BUTTON_CLASS_SXGA = `${KASSA_MENU_TILE_BUTTON_CLASS_BASE} h-auto justify-start`
 
 const KASSA_MENU_TILE_IMAGE_WELL =
   'pointer-events-none relative min-h-0 w-full min-w-0 flex-1 overflow-hidden bg-white'
@@ -461,7 +470,7 @@ const KASSA_MENU_TILE_LABEL_WRAP =
 
 /** SXGA ~17″: dichter tegen de foto, zelfde horizontale marge als standaard. */
 const KASSA_MENU_TILE_LABEL_WRAP_SXGA =
-  'pointer-events-none shrink-0 w-full bg-white px-2 pb-1.5 pt-0 mt-2 sm:px-3 sm:pb-2 sm:mt-2 sm:pt-0'
+  'pointer-events-none shrink-0 w-full bg-white px-2 pb-1.5 pt-0 mt-1.5 sm:px-3 sm:pb-2 sm:mt-1.5 sm:pt-0'
 
 const KASSA_MENU_TILE_LABEL_CLASS =
   'm-0 line-clamp-2 text-center text-base font-black leading-snug tracking-tight text-black sm:text-lg md:text-xl'
@@ -481,8 +490,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
   imageUrl,
   sxgaDenseTileLayout,
 }: KassaCategoryTileButtonProps) {
-  const btnClass =
-    sxgaDenseTileLayout ? `${KASSA_MENU_TILE_BUTTON_CLASS} justify-start` : KASSA_MENU_TILE_BUTTON_CLASS
+  const btnClass = sxgaDenseTileLayout ? KASSA_MENU_TILE_BUTTON_CLASS_SXGA : KASSA_MENU_TILE_BUTTON_CLASS
   const imgWell = sxgaDenseTileLayout ? KASSA_MENU_TILE_IMAGE_WELL_SXGA : KASSA_MENU_TILE_IMAGE_WELL
   const labelWrap = sxgaDenseTileLayout ? KASSA_MENU_TILE_LABEL_WRAP_SXGA : KASSA_MENU_TILE_LABEL_WRAP
   const labelClass = sxgaDenseTileLayout ? KASSA_MENU_TILE_LABEL_CLASS_SXGA : KASSA_MENU_TILE_LABEL_CLASS
@@ -541,8 +549,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
   hasOpts,
   sxgaDenseTileLayout,
 }: KassaProductTileButtonProps) {
-  const btnClass =
-    sxgaDenseTileLayout ? `${KASSA_MENU_TILE_BUTTON_CLASS} justify-start` : KASSA_MENU_TILE_BUTTON_CLASS
+  const btnClass = sxgaDenseTileLayout ? KASSA_MENU_TILE_BUTTON_CLASS_SXGA : KASSA_MENU_TILE_BUTTON_CLASS
   const imgWell = sxgaDenseTileLayout ? KASSA_MENU_TILE_IMAGE_WELL_SXGA : KASSA_MENU_TILE_IMAGE_WELL
   const labelWrap = sxgaDenseTileLayout ? KASSA_MENU_TILE_LABEL_WRAP_SXGA : KASSA_MENU_TILE_LABEL_WRAP
   const labelClass = sxgaDenseTileLayout ? KASSA_MENU_TILE_LABEL_CLASS_SXGA : KASSA_MENU_TILE_LABEL_CLASS
@@ -4062,8 +4069,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   onPointerUp={handleCategoryGridPointerUp}
                   onPointerCancel={handleCategoryGridPointerCancel}
                   onClick={handleCategoryGridClick}
-                  className="grid min-h-0 w-full grid-cols-2 items-stretch gap-4 pb-8 touch-manipulation select-none sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 [&>*]:min-h-0"
-                  style={{ gridAutoRows: `${kassaMenuRowPx}px` }}
+                  className={`grid min-h-0 w-full grid-cols-2 gap-4 pb-8 touch-manipulation select-none sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start' : 'items-stretch'}`}
+                  style={
+                    kassaSxgaDenseTiles ?
+                      { gridAutoRows: 'max-content' }
+                    : { gridAutoRows: `${kassaMenuRowPx}px` }
+                  }
                 >
                   {categories.map((cat) => {
                     const tile = cat.id ? categoryTileImageByCategoryId.get(cat.id) : undefined
@@ -4094,8 +4105,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     onPointerUp={handleProductGridPointerUp}
                     onPointerCancel={handleProductGridPointerCancel}
                     onClick={handleProductGridClick}
-                    className="grid min-h-0 w-full grid-cols-2 items-stretch gap-4 pb-8 touch-manipulation select-none sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 [&>*]:min-h-0"
-                    style={{ gridAutoRows: `${kassaMenuRowPx}px` }}
+                    className={`grid min-h-0 w-full grid-cols-2 gap-4 pb-8 touch-manipulation select-none sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start' : 'items-stretch'}`}
+                    style={
+                      kassaSxgaDenseTiles ?
+                        { gridAutoRows: 'max-content' }
+                      : { gridAutoRows: `${kassaMenuRowPx}px` }
+                    }
                   >
                     {productsInSelectedCategory.map((product) => {
                       const inCart = product.id
