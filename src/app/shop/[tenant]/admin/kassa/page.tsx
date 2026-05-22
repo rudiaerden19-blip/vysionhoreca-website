@@ -172,8 +172,23 @@ function kassaMenuGridColumnCountForInnerWidth(innerGridWidthPx: number): number
   return 2
 }
 
-/** Ruimte voor titel + onderrand binnen SXGA-tegel (±2 regels). */
-const KASSA_SXGA_LABEL_STRIP_RESERVED_PX = 96
+/** Ruimte voor titel + onderrand binnen SXGA-tegel (≈ 2 regels sm/lg). */
+const KASSA_SXGA_LABEL_STRIP_RESERVED_PX = 108
+
+/**
+ * Fysisch paneel klassiek **1280×1024** óf daar dicht tegenaan (sommige Elo/OS rapporteren ±2px).
+ * Vangt kassa’s waar `inner*` door zoom/oriëntatie **niet altijd landschaps-w>h** heeft zoals verwacht,
+ * maar het scherm wel echt deze 17″ 4∶3 klasse is.
+ */
+function isLikelySxga1280by1024PhysicalPanel(): boolean {
+  if (typeof window === 'undefined') return false
+  const sw = window.screen?.width ?? 0
+  const sh = window.screen?.height ?? 0
+  if (sw <= 0 || sh <= 0) return false
+  const lw = Math.max(sw, sh)
+  const shrt = Math.min(sw, sh)
+  return lw >= 1268 && lw <= 1298 && shrt >= 1008 && shrt <= 1040 && lw / shrt >= 1.2 && lw / shrt <= 1.302
+}
 
 /**
  * Fallback: viewport matchMedia klassiek SXGA‑kiosk; sluit breedbeeld uit.
@@ -186,7 +201,8 @@ function sxgaLayoutMatchMediaHint(): boolean {
 }
 
 /**
- * Alleen **~17″ 4:3 (SXGA-klasse)**: pixelband óf **`matchMedia`**. **Geen iPad**.
+ * Alleen **17″ vierkante 1280×1024‑klasse**: inner‑logica **`matchMedia`**, **`screen`‑paneel‑hint**.
+ * Geen **iPad**.
  */
 function shouldApplyKassaCompactSquareMonitorTileCap(): boolean {
   if (typeof window === 'undefined' || typeof navigator === 'undefined') return false
@@ -202,13 +218,23 @@ function shouldApplyKassaCompactSquareMonitorTileCap(): boolean {
   const hSrc = vv?.height != null && vv.height > 0 ? vv.height : window.innerHeight
   const w = Math.max(1, Math.floor(wSrc))
   const h = Math.max(1, Math.floor(hSrc))
+  /** Kiosk met echt **1280×1024‑paneel** maar inner soms gek (zoom, kiosk‑shell): toch SXGA‑tegels. */
+  const panelHit =
+    isLikelySxga1280by1024PhysicalPanel() &&
+    Math.max(w, h) <= 1540 &&
+    Math.min(w, h) >= 640 &&
+    !(w <= 720 && h <= 840)
 
-  if (w <= h || w < 960 || h < 628) return false
+  if (panelHit) return true
+
+  if (mediaHit) return true
+
+  if (w <= h || w < 860 || h < 620) return false
 
   const shortSide = h
   const longSide = w
   const inSizeBand =
-    longSide >= 1000 && longSide <= 1400 && shortSide >= 785 && shortSide <= 1090
+    longSide >= 980 && longSide <= 1400 && shortSide >= 785 && shortSide <= 1090
 
   let ratioHit = false
   if (inSizeBand) {
@@ -216,7 +242,7 @@ function shouldApplyKassaCompactSquareMonitorTileCap(): boolean {
     ratioHit = r >= 1.215 && r <= 1.39
   }
 
-  return ratioHit || mediaHit
+  return ratioHit
 }
 
 /**
@@ -235,11 +261,11 @@ function applyKassaMenuSquareMonitorTileRowCap(
       ? (gridInnerWidthPx - (cols - 1) * menuGridGapPx) / cols
       : gridInnerWidthPx
 
-  const cw = Math.max(1, Math.floor(cellW))
-  /** Zelfde offset als SXGA‑labelstrip `mt-3.5` (14px) */
+  /** `aspect-square` gebruikt fractie van rastercel — rij niet te kort rekken (`floor`). */
   const KASSA_SXGA_MT_BELOW_IMG_PX = 14
-
-  const idealSxgaRowPx = Math.ceil(cw + KASSA_SXGA_MT_BELOW_IMG_PX + KASSA_SXGA_LABEL_STRIP_RESERVED_PX)
+  const idealSxgaRowPx = Math.ceil(
+    Math.max(1, cellW) + KASSA_SXGA_MT_BELOW_IMG_PX + KASSA_SXGA_LABEL_STRIP_RESERVED_PX,
+  )
   void _unusedMaxTileHToCellWLegacy
 
   return Math.max(142, Math.min(rowH, idealSxgaRowPx))
@@ -426,6 +452,10 @@ const KASSA_MENU_TILE_LABEL_WRAP_SXGA =
 const KASSA_MENU_TILE_LABEL_CLASS =
   'm-0 line-clamp-2 text-center text-base font-black leading-snug tracking-tight text-black sm:text-lg md:text-xl'
 
+/** SXGA 17″: categorie + product gelijk (`md:text-xl` wordt te groot in smalle rastercel). */
+const KASSA_MENU_TILE_LABEL_CLASS_SXGA =
+  'm-0 line-clamp-2 text-center text-base font-black leading-snug tracking-tight text-black'
+
 type KassaCategoryTileButtonProps = {
   category: MenuCategory
   imageUrl?: string
@@ -441,6 +471,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
     sxgaDenseTileLayout ? `${KASSA_MENU_TILE_BUTTON_CLASS} justify-start` : KASSA_MENU_TILE_BUTTON_CLASS
   const imgWell = sxgaDenseTileLayout ? KASSA_MENU_TILE_IMAGE_WELL_SXGA : KASSA_MENU_TILE_IMAGE_WELL
   const labelWrap = sxgaDenseTileLayout ? KASSA_MENU_TILE_LABEL_WRAP_SXGA : KASSA_MENU_TILE_LABEL_WRAP
+  const labelClass = sxgaDenseTileLayout ? KASSA_MENU_TILE_LABEL_CLASS_SXGA : KASSA_MENU_TILE_LABEL_CLASS
 
   const noImgTop =
     sxgaDenseTileLayout ?
@@ -466,7 +497,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
             />
           </div>
           <div className={labelWrap}>
-            <p className={KASSA_MENU_TILE_LABEL_CLASS}>{category.name}</p>
+            <p className={labelClass}>{category.name}</p>
           </div>
         </>
       ) : (
@@ -475,7 +506,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
             {category.icon ? <span className="text-5xl text-neutral-400">{category.icon}</span> : null}
           </div>
           <div className={labelWrap}>
-            <p className={KASSA_MENU_TILE_LABEL_CLASS}>{category.name}</p>
+            <p className={labelClass}>{category.name}</p>
           </div>
         </>
       )}
@@ -500,10 +531,11 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
     sxgaDenseTileLayout ? `${KASSA_MENU_TILE_BUTTON_CLASS} justify-start` : KASSA_MENU_TILE_BUTTON_CLASS
   const imgWell = sxgaDenseTileLayout ? KASSA_MENU_TILE_IMAGE_WELL_SXGA : KASSA_MENU_TILE_IMAGE_WELL
   const labelWrap = sxgaDenseTileLayout ? KASSA_MENU_TILE_LABEL_WRAP_SXGA : KASSA_MENU_TILE_LABEL_WRAP
+  const labelClass = sxgaDenseTileLayout ? KASSA_MENU_TILE_LABEL_CLASS_SXGA : KASSA_MENU_TILE_LABEL_CLASS
 
   const noImgTop =
     sxgaDenseTileLayout ?
-      'pointer-events-none flex w-full shrink-0 flex-none flex-col items-center justify-center overflow-hidden bg-white px-2 pt-3 aspect-square'
+      'pointer-events-none flex w-full shrink-0 flex-none flex-col items-center justify-center overflow-hidden bg-white px-2 aspect-square'
     : 'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-white px-2 pt-4'
 
   return (
@@ -525,7 +557,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
             />
           </div>
           <div className={labelWrap}>
-            <p className={KASSA_MENU_TILE_LABEL_CLASS}>{product.name}</p>
+            <p className={labelClass}>{product.name}</p>
           </div>
         </>
       ) : (
@@ -534,7 +566,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
             <span className="text-5xl text-neutral-300">🍽️</span>
           </div>
           <div className={labelWrap}>
-            <p className={KASSA_MENU_TILE_LABEL_CLASS}>{product.name}</p>
+            <p className={labelClass}>{product.name}</p>
           </div>
         </>
       )}
@@ -4011,6 +4043,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 <div
                   ref={kassaCategoryGridRef}
                   data-testid="kassa-category-grid"
+                  data-kassa-sxga-tiles={kassaSxgaDenseTiles ? '1' : '0'}
                   onPointerDown={handleCategoryGridPointerDown}
                   onPointerUp={handleCategoryGridPointerUp}
                   onPointerCancel={handleCategoryGridPointerCancel}
@@ -4042,6 +4075,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   <div
                     ref={kassaProductGridRef}
                     data-testid="kassa-product-grid"
+                    data-kassa-sxga-tiles={kassaSxgaDenseTiles ? '1' : '0'}
                     onPointerDown={handleProductGridPointerDown}
                     onPointerUp={handleProductGridPointerUp}
                     onPointerCancel={handleProductGridPointerCancel}
