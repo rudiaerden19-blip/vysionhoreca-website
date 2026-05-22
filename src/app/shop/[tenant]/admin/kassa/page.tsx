@@ -172,52 +172,61 @@ function kassaMenuGridColumnCountForInnerWidth(innerGridWidthPx: number): number
   return 2
 }
 
+/** Ruimte voor titel + onderrand binnen SXGA-tegel (±2 regels). */
+const KASSA_SXGA_LABEL_STRIP_RESERVED_PX = 96
+
 /**
- * Alleen **~17″ 4:3 (SXGA-klasse)**: combinatie aspect + logische afmetingen.
- * Rekening gehouden met **Windows-schaal**: `visualViewport`/inner zijn vaak **kleiner** dan 1280×1024 —
- * daarom géén drempel meer op `≥1220 / ≥900` (dat schoot veel echte setups mis).
- * XGA **`1024×768`** uit via `short < 785`. **Geen iPad**. Grote desktops via `long > 1400`.
+ * Fallback: viewport matchMedia klassiek SXGA‑kiosk; sluit breedbeeld uit.
+ */
+function sxgaLayoutMatchMediaHint(): boolean {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false
+  return window.matchMedia(
+    '(min-width: 1000px) and (max-width: 1420px) and (min-height: 785px) and (max-height: 1100px) and (min-aspect-ratio: 1215/1000) and (max-aspect-ratio: 1395/1000)',
+  ).matches
+}
+
+/**
+ * Alleen **~17″ 4:3 (SXGA-klasse)**: pixelband óf **`matchMedia`**. **Geen iPad**.
  */
 function shouldApplyKassaCompactSquareMonitorTileCap(): boolean {
   if (typeof window === 'undefined' || typeof navigator === 'undefined') return false
 
   const ua = navigator.userAgent
-  /** iPad / iPhone — afblijven */
   if (/\biPhone\b|\biPad\b|\biPod\b/.test(ua)) return false
-  /** iPadOS “Safari-desktop” UA */
   if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) return false
 
-  /** prefer visualViewport voor kiosk/PWA waar inner* door UI kan afwijken */
+  const mediaHit = sxgaLayoutMatchMediaHint()
+
   const vv = window.visualViewport
   const wSrc = vv?.width != null && vv.width > 0 ? vv.width : window.innerWidth
   const hSrc = vv?.height != null && vv.height > 0 ? vv.height : window.innerHeight
   const w = Math.max(1, Math.floor(wSrc))
   const h = Math.max(1, Math.floor(hSrc))
 
-  /** Landscape kiosk; portrait — niet aanpassen */
   if (w <= h || w < 960 || h < 628) return false
 
   const shortSide = h
   const longSide = w
+  const inSizeBand =
+    longSide >= 1000 && longSide <= 1400 && shortSide >= 785 && shortSide <= 1090
 
-  /*
-   * ~17″ 4:3 (SXGA) óf ná Windows-schaal kleinere logische viewport (bv. ~1024×819).
-   * Sluit nog steeds klassieke XGA `1024×768` (short ≤ ~780) én bakken 1600+/21″ uit.
-   */
-  if (longSide < 1000 || longSide > 1400 || shortSide < 785 || shortSide > 1090) return false
+  let ratioHit = false
+  if (inSizeBand) {
+    const r = longSide / shortSide
+    ratioHit = r >= 1.215 && r <= 1.39
+  }
 
-  const r = longSide / shortSide
-  return r >= 1.215 && r <= 1.39
+  return ratioHit || mediaHit
 }
 
 /**
- * Cap rijhoogte op kolombreedte (`shouldApplyKassaCompactSquareMonitorTileCap`).
+ * SXGA (~17″): rij ≈ vierkante foto (celbreedte) + `mt-3.5` + titelstrook — geen leeg blok onder naam.
  */
 function applyKassaMenuSquareMonitorTileRowCap(
   rowH: number,
   gridInnerWidthPx: number,
   menuGridGapPx: number,
-  maxTileHToCellW: number,
+  _unusedMaxTileHToCellWLegacy: number,
 ): number {
   if (!shouldApplyKassaCompactSquareMonitorTileCap()) return rowH
   const cols = kassaMenuGridColumnCountForInnerWidth(gridInnerWidthPx)
@@ -225,9 +234,15 @@ function applyKassaMenuSquareMonitorTileRowCap(
     cols > 0
       ? (gridInnerWidthPx - (cols - 1) * menuGridGapPx) / cols
       : gridInnerWidthPx
-  const capPx = Math.floor(Math.max(0, cellW) * maxTileHToCellW)
-  const safeCap = Math.max(108, capPx)
-  return Math.min(rowH, safeCap)
+
+  const cw = Math.max(1, Math.floor(cellW))
+  /** Zelfde offset als SXGA‑labelstrip `mt-3.5` (14px) */
+  const KASSA_SXGA_MT_BELOW_IMG_PX = 14
+
+  const idealSxgaRowPx = Math.ceil(cw + KASSA_SXGA_MT_BELOW_IMG_PX + KASSA_SXGA_LABEL_STRIP_RESERVED_PX)
+  void _unusedMaxTileHToCellWLegacy
+
+  return Math.max(142, Math.min(rowH, idealSxgaRowPx))
 }
 
 const KASSA_NUMPAD_KEYS = ['7', '8', '9', '+', '4', '5', '6', '-', '1', '2', '3', '×', 'C', '0', '.', '='] as const
@@ -406,7 +421,7 @@ const KASSA_MENU_TILE_LABEL_WRAP =
 
 /** SXGA ~17″: dichter tegen de foto, zelfde horizontale marge als standaard. */
 const KASSA_MENU_TILE_LABEL_WRAP_SXGA =
-  'pointer-events-none shrink-0 w-full bg-white px-2 pb-1.5 pt-1 sm:px-3 sm:pb-2 sm:pt-1'
+  'pointer-events-none shrink-0 w-full bg-white px-2 pb-1.5 pt-0 mt-3.5 sm:px-3 sm:pb-2 sm:mt-3.5 sm:pt-0'
 
 const KASSA_MENU_TILE_LABEL_CLASS =
   'm-0 line-clamp-2 text-center text-base font-black leading-snug tracking-tight text-black sm:text-lg md:text-xl'
@@ -982,8 +997,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   /** 1 = rijhoogte past bij KASSA_MENU_VISIBLE_ROWS in scrollport (min gap); hogere rijen = grotere tegels / meer tekstruimte (o.a. 15"). */
   const KASSA_MENU_TILE_HEIGHT_BOOST = 1
   /**
-   * Alleen SXGA **17″** (`shouldApplyKassaCompactSquareMonitorTileCap`): iets hogere rij versus celbreedte
-   * = grotere tegels — andere schermen blijven ongewijzigd (functie returnt dan `rowH` ongewijzigd).
+   * SXGA gebruikt deze waarde niet meer (inhoud‑rij); argument blijft voor API-compat.
    */
   const KASSA_MENU_SQUARE_MONITOR_MAX_TILE_H_TO_CELL_W = 1.42
 
