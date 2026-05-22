@@ -2571,6 +2571,27 @@
       "savedFlash": "保存しました — レジ画面を更新すると反映されます。",
       "dbHint": "Supabase で tenant_settings_kassa_floor_plan_enabled.sql を実行してください（supabase フォルダ）。"
     },
+    "printerInstall": {
+      "title": "レシートプリンター（Windows）",
+      "subtitle": "このPCのPrint Agent：Windowsに表示されるプリンターを選び、レジURLを確認します。レジからの既存の印刷は変わりません。",
+      "backToOverview": "管理画面に戻る",
+      "intro": "Vysion Print Agentが動いているWindows PC（トレイアイコン）でのみ有効。レシートは同じローカル（127.0.0.1:9742）経由です。",
+      "agentOffline": "Print Agentに接続できません（127.0.0.1:9742）。起動するか下のリンクからインストールしてください。",
+      "agentOld": "このPrint Agentは古く、Webからの保存に対応していません。最新版を入れるか、トレイ→設定を使ってください。",
+      "printerLabel": "Windowsのレシートプリンター",
+      "printerPlaceholder": "— プリンターを選択 —",
+      "kassaUrlLabel": "レジURL",
+      "kassaUrlHint": "このテナントの既定値。プレビューや別ドメインのときだけ変更。",
+      "refresh": "再読み込み",
+      "save": "Print Agentに保存",
+      "saving": "保存中…",
+      "saved": "Print Agentに保存しました。",
+      "validationPrinter": "プリンターを選択してください。",
+      "validationUrl": "有効なレジURLを入力（https…で /admin/kassa で終わる）。",
+      "downloadIntro": "Print Agentがまだ？",
+      "downloadCta": "Windows版をダウンロード",
+      "systrayTip": "同じ設定：トレイアイコン→設定（Vysion Print Agent）。"
+    },
     "bestellingen": {
       "title": "注文",
       "subtitle": "注文を表示・管理",

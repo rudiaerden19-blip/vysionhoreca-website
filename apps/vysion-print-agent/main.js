@@ -549,6 +549,22 @@ async function downloadAndInstallUpdate(downloadUrl, isSetupExe) {
   setTimeout(() => app.quit(), 1500)
 }
 
+/** Deelt logica tussen Electron Instellingen-window en HTTP POST /config. */
+function applyConfigPartial(partial) {
+  config = {
+    printerName: typeof partial.printerName === 'string' ? partial.printerName : config.printerName,
+    kassaUrl:
+      typeof partial.kassaUrl === 'string' ? partial.kassaUrl.trim() : config.kassaUrl,
+    port: typeof partial.port === 'number' ? partial.port : config.port,
+    autoStart: typeof partial.autoStart === 'boolean' ? partial.autoStart : config.autoStart,
+    autoUpdate: typeof partial.autoUpdate === 'boolean' ? partial.autoUpdate : config.autoUpdate,
+  }
+  saveConfig(config)
+  syncWindowsStartup()
+  checkHealth()
+  buildTray()
+}
+
 // ---- IPC voor settings-window --------------------------------------------
 ipcMain.handle('kassa:open',     () => { openKassa() })
 ipcMain.handle('printers:list',  () => {
@@ -560,17 +576,7 @@ ipcMain.handle('config:get', () => ({
   agentVersion: app.getVersion(),
 }))
 ipcMain.handle('config:save', (_evt, partial) => {
-  config = {
-    printerName: typeof partial.printerName === 'string' ? partial.printerName : config.printerName,
-    kassaUrl:    typeof partial.kassaUrl === 'string'    ? partial.kassaUrl    : config.kassaUrl,
-    port:        typeof partial.port === 'number'        ? partial.port        : config.port,
-    autoStart:   typeof partial.autoStart === 'boolean'  ? partial.autoStart   : config.autoStart,
-    autoUpdate:  typeof partial.autoUpdate === 'boolean' ? partial.autoUpdate  : config.autoUpdate,
-  }
-  saveConfig(config)
-  syncWindowsStartup()
-  checkHealth()
-  buildTray()
+  applyConfigPartial(partial || {})
   return { ok: true }
 })
 
@@ -680,7 +686,20 @@ if (!gotLock) {
     runIntegrityCheck()
     try {
       const port = config.port || PORT
-      serverHandle = startServer(getPrinterName, port)
+      serverHandle = startServer(
+        {
+          getPrinterName,
+          getConfigSnapshot: () => ({
+            printerName: config.printerName || '',
+            kassaUrl: config.kassaUrl || '',
+          }),
+          patchConfig: (patch) => {
+            applyConfigPartial(patch || {})
+            return { ok: true }
+          },
+        },
+        port,
+      )
     } catch (e) {
       console.error('[server] start mislukt', e)
     }

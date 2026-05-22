@@ -1,6 +1,7 @@
-/** Lokale Vysion Print Agent (Windows): http://127.0.0.1:9742 */
+/** Lokale Vysion Print Agent (Windows): poort standaard 9742 — zie `sendToVysionPrintAgent`. */
+export const VYSION_PRINT_AGENT_LOCAL_ORIGIN = 'http://127.0.0.1:9742'
 
-const DEFAULT_AGENT_ORIGIN = 'http://127.0.0.1:9742'
+const DEFAULT_AGENT_ORIGIN = VYSION_PRINT_AGENT_LOCAL_ORIGIN
 
 export type VysionPrintAgentItem = {
   quantity: number
@@ -399,6 +400,121 @@ export async function openCashDrawer(origin = DEFAULT_AGENT_ORIGIN): Promise<boo
   } catch {
     if (tryVysionKioskDrawerBridge()) return true
     return false
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
+/** Admin-pagina „Printer installatie”: lijst Windows-printers via Print Agent. */
+export async function fetchVysionPrintAgentPrinterList(
+  origin: string = VYSION_PRINT_AGENT_LOCAL_ORIGIN,
+): Promise<{ ok: true; printers: string[] } | { ok: false; error: string; status?: number }> {
+  if (typeof window === 'undefined') {
+    return { ok: false, error: 'SSR' }
+  }
+  const controller = new AbortController()
+  const timer = window.setTimeout(() => controller.abort(), 10_000)
+  try {
+    const base = origin.replace(/\/$/, '')
+    const init: RequestInit = {
+      method: 'GET',
+      mode: 'cors',
+      credentials: 'omit',
+      signal: controller.signal,
+    }
+    ;(init as RequestInit & { targetAddressSpace?: string }).targetAddressSpace = 'local'
+    const r = await fetch(`${base}/printers`, init)
+    const data = (await r.json().catch(() => null)) as { ok?: boolean; printers?: unknown } | null
+    if (r.ok && data && data.ok === true && Array.isArray(data.printers)) {
+      return { ok: true, printers: data.printers.filter((p) => typeof p === 'string') as string[] }
+    }
+    return { ok: false, error: `HTTP ${r.status}`, status: r.status }
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e)
+    return { ok: false, error: msg }
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
+/** Huidige printer + kassa-URL uit agent (zelfde als Electron Instellingen). */
+export async function fetchVysionPrintAgentConfigSnapshot(
+  origin: string = VYSION_PRINT_AGENT_LOCAL_ORIGIN,
+): Promise<
+  { ok: true; printerName: string; kassaUrl: string } | { ok: false; error: string; status?: number }
+> {
+  if (typeof window === 'undefined') {
+    return { ok: false, error: 'SSR' }
+  }
+  const controller = new AbortController()
+  const timer = window.setTimeout(() => controller.abort(), 10_000)
+  try {
+    const base = origin.replace(/\/$/, '')
+    const init: RequestInit = {
+      method: 'GET',
+      mode: 'cors',
+      credentials: 'omit',
+      signal: controller.signal,
+    }
+    ;(init as RequestInit & { targetAddressSpace?: string }).targetAddressSpace = 'local'
+    const r = await fetch(`${base}/config`, init)
+    const data = (await r.json().catch(() => null)) as {
+      ok?: boolean
+      printerName?: string
+      kassaUrl?: string
+      error?: string
+    } | null
+    if (r.ok && data?.ok === true) {
+      return {
+        ok: true,
+        printerName: typeof data.printerName === 'string' ? data.printerName : '',
+        kassaUrl: typeof data.kassaUrl === 'string' ? data.kassaUrl : '',
+      }
+    }
+    const err = data?.error != null ? String(data.error) : `HTTP ${r.status}`
+    return { ok: false, error: err, status: r.status }
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e)
+    return { ok: false, error: msg }
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
+/** Persisteer printer/kassa-url in Print Agent-config (browser → 127.0.0.1). */
+export async function saveVysionPrintAgentConfigPatch(
+  patch: { printerName?: string; kassaUrl?: string },
+  origin: string = VYSION_PRINT_AGENT_LOCAL_ORIGIN,
+): Promise<{ ok: true } | { ok: false; error: string; status?: number }> {
+  if (typeof window === 'undefined') {
+    return { ok: false, error: 'SSR' }
+  }
+  const controller = new AbortController()
+  const timer = window.setTimeout(() => controller.abort(), 15_000)
+  try {
+    const base = origin.replace(/\/$/, '')
+    const init: RequestInit = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      mode: 'cors',
+      credentials: 'omit',
+      body: JSON.stringify(patch || {}),
+      signal: controller.signal,
+    }
+    ;(init as RequestInit & { targetAddressSpace?: string }).targetAddressSpace = 'local'
+    const r = await fetch(`${base}/config`, init)
+    const data = (await r.json().catch(() => null)) as { ok?: boolean; error?: string } | null
+    if (r.ok && data?.ok === true) return { ok: true }
+    const err =
+      data?.error != null
+        ? String(data.error)
+        : r.status === 503
+          ? 'config-endpoint-not-available'
+          : `HTTP ${r.status}`
+    return { ok: false, error: err, status: r.status }
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e)
+    return { ok: false, error: msg }
   } finally {
     clearTimeout(timer)
   }

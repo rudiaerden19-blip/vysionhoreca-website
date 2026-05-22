@@ -2571,6 +2571,27 @@
       "savedFlash": "تم الحفظ — حدّث شاشة البيع لتطبيق التغيير.",
       "dbHint": "نفّذ سكربت SQL tenant_settings_kassa_floor_plan_enabled.sql في Supabase (مجلد supabase)."
     },
+    "printerInstall": {
+      "title": "طابعة الإيصالات (Windows)",
+      "subtitle": "Print Agent على هذا الجهاز: اختر الطابعة كما تظهر في Windows وراجع عنوان URL للكاشير. لا يتغير الطباعة الحالية من الكاشير.",
+      "backToOverview": "العودة إلى لوحة الإدارة",
+      "intro": "فقط على حاسوب Windows حيث تعمل Vysion Print Agent (أيقونة شريط المهام). الإيصالات ما زالت عبر نفس الخدمة المحلية (127.0.0.1:9742).",
+      "agentOffline": "لا يمكن الاتصال بـ Print Agent على هذا الجهاز (127.0.0.1:9742). شغّل التطبيق أو ثبّته من الرابط بالأسفل.",
+      "agentOld": "هذه النسخة قديمة ولا يدعم الحفظ من الموقع. نزّل أحد إصدار أو استخدم أيقونة الشريط → الإعدادات.",
+      "printerLabel": "طابعة الإيصالات في Windows",
+      "printerPlaceholder": "— اختر طابعة —",
+      "kassaUrlLabel": "رابط الكاشير",
+      "kassaUrlHint": "القيمة الافتراضية لهذا العميل؛ غيّره فقط لمعاينة أو نطاق آخر.",
+      "refresh": "إعادة التحميل",
+      "save": "حفظ في Print Agent",
+      "saving": "جارٍ الحفظ…",
+      "saved": "تم الحفظ في Print Agent.",
+      "validationPrinter": "اختر طابعةً.",
+      "validationUrl": "رابط الكاشير غير صالح (https… وينتهي بـ /admin/kassa).",
+      "downloadIntro": "لا تملك Print Agent بعد؟",
+      "downloadCta": "تنزيل لنظام Windows",
+      "systrayTip": "نفس الإعداد من: أيقونة الشريط → الإعدادات (Vysion Print Agent)."
+    },
     "bestellingen": {
       "title": "الطلبات",
       "subtitle": "عرض وإدارة الطلبات",

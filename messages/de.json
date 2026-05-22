@@ -2071,6 +2071,27 @@
       "savedFlash": "Gespeichert — Verkaufsdisplay aktualisieren, um es zu übernehmen.",
       "dbHint": "SQL-Skript tenant_settings_kassa_floor_plan_enabled.sql in Supabase ausführen (Ordner supabase)."
     },
+    "printerInstall": {
+      "title": "Bondrucker (Windows)",
+      "subtitle": "Print Agent auf diesem PC: Wählen Sie den Bondrucker wie in Windows angezeigt und prüfen Sie die Kassen-URL. Bestehendes Drucken aus der Kasse ändert sich nicht.",
+      "backToOverview": "Zurück zum Adminbereich",
+      "intro": "Nur auf dem Windows-PC, auf dem die Vysion Print Agent läuft (Tray-Symbol). Belege weiterhin über denselben lokalen Dienst (127.0.0.1:9742).",
+      "agentOffline": "Keine Verbindung zur Print Agent auf diesem Computer (127.0.0.1:9742). Starten Sie den Agent oder installieren Sie ihn über den Download.",
+      "agentOld": "Diese Print Agent ist zu alt für das Speichern über die Website. Installieren Sie die neueste Version oder nutzen Sie Tray → Einstellungen.",
+      "printerLabel": "Bondrucker unter Windows",
+      "printerPlaceholder": "— Drucker wählen —",
+      "kassaUrlLabel": "Kassen-URL",
+      "kassaUrlHint": "Standard für diesen Tenant; bei Preview anderer Domain ändern.",
+      "refresh": "Neu laden",
+      "save": "In Print Agent speichern",
+      "saving": "Speichern…",
+      "saved": "In der Print Agent gespeichert.",
+      "validationPrinter": "Bitte einen Bondrucker wählen.",
+      "validationUrl": "Geben Sie eine gültige Kassen-URL ein (https… und Ende /admin/kassa).",
+      "downloadIntro": "Noch keine Print Agent?",
+      "downloadCta": "Download für Windows",
+      "systrayTip": "Gleiches Menü über: Tray-Symbol → Einstellungen (Vysion Print Agent)."
+    },
     "bestellingen": {
       "title": "Bestellungen",
       "subtitle": "Bestellungen anzeigen und verwalten",
