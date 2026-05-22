@@ -162,6 +162,66 @@ function scheduleAddToCartSound() {
   scheduleKassaTapSound(playAddToCart)
 }
 
+/** `grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6` — inner breedte ná padding. */
+function kassaMenuGridColumnCountForInnerWidth(innerGridWidthPx: number): number {
+  if (!Number.isFinite(innerGridWidthPx) || innerGridWidthPx <= 0) return 2
+  if (innerGridWidthPx >= 1280) return 6
+  if (innerGridWidthPx >= 1024) return 5
+  if (innerGridWidthPx >= 768) return 4
+  if (innerGridWidthPx >= 640) return 3
+  return 2
+}
+
+/**
+ * Compacte (~17″) 4:3-kassa-monitor: veel bruikbare hoogte + smalle rasterkolommen ⇒ tegelrij te hoog.
+ * We kunnen fysieke inch niet meten — alleen gebruikelijke logische viewport-breedtes/hoogtes (geen grotere 1600×1200 / veel 21″).
+ * Geen aanpassing op iPad/iPhone (UA + iPadOS “desktop” UA), zodat 1024×768-achtige iPad-weergaven niet verschillen van voorheen.
+ */
+function shouldApplyKassaCompactSquareMonitorTileCap(): boolean {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') return false
+
+  const ua = navigator.userAgent
+  /** iPad / iPhone Safari / WebView — zelfde logische px als oude desktops komt veel voor */
+  if (/\biPhone\b|\biPad\b|\biPod\b/.test(ua)) return false
+  /** iPadOS 13+ met “Safari-desktop” UA: vaak Macintosh + touchscreen */
+  if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) return false
+
+  const w = window.innerWidth
+  const h = window.innerHeight
+
+  /** Alleen “breed panorama” kiosk; portrait/tablet‑portret laten we ongemoeid */
+  if (w <= h || w < 960 || h < 640) return false
+
+  const shortSide = h
+  const longSide = w
+  /** Typisch logische grootte SXGA-/XGA op ~17″; sluit veel grotere desktops (bv. 1600×1200 / 21″) uit */
+  if (longSide < 980 || longSide > 1360 || shortSide < 680 || shortSide > 1050) return false
+
+  /* 1024×768 en 1280×1024 vallen zo rond 4:3; langere schermrand valt uit via longSide-shortSide band */
+  const r = longSide / shortSide
+  return r >= 1.22 && r <= 1.38
+}
+
+/**
+ * Cap rijhoogte op kolombreedte (`shouldApplyKassaCompactSquareMonitorTileCap`).
+ */
+function applyKassaMenuSquareMonitorTileRowCap(
+  rowH: number,
+  gridInnerWidthPx: number,
+  menuGridGapPx: number,
+  maxTileHToCellW: number,
+): number {
+  if (!shouldApplyKassaCompactSquareMonitorTileCap()) return rowH
+  const cols = kassaMenuGridColumnCountForInnerWidth(gridInnerWidthPx)
+  const cellW =
+    cols > 0
+      ? (gridInnerWidthPx - (cols - 1) * menuGridGapPx) / cols
+      : gridInnerWidthPx
+  const capPx = Math.floor(Math.max(0, cellW) * maxTileHToCellW)
+  const safeCap = Math.max(108, capPx)
+  return Math.min(rowH, safeCap)
+}
+
 const KASSA_NUMPAD_KEYS = ['7', '8', '9', '+', '4', '5', '6', '-', '1', '2', '3', '×', 'C', '0', '.', '='] as const
 
 /** Scroll vs tik op embedded touch/WebView (o.a. Elo): kleine beweging telt nog als tik */
@@ -878,16 +938,35 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const KASSA_MENU_VISIBLE_ROWS = 3
   /** 1 = rijhoogte past bij KASSA_MENU_VISIBLE_ROWS in scrollport (min gap); hogere rijen = grotere tegels / meer tekstruimte (o.a. 15"). */
   const KASSA_MENU_TILE_HEIGHT_BOOST = 1
+  /**
+   * Bij 4:3 / bijna vierkante kassa-monitor: begrens tegelrijhoogte i.f.v. kolombreedte.
+   * Alleen bij compacte ~17″ 4:3-kiosk (`shouldApplyKassaCompactSquareMonitorTileCap`).
+   */
+  const KASSA_MENU_SQUARE_MONITOR_MAX_TILE_H_TO_CELL_W = 1.24
+
+  function estimateKassaMenuGridInnerWidthPx(): number {
+    if (typeof window === 'undefined') return 560
+    const iw = window.innerWidth
+    const sidebarPx = iw >= 1024 ? 380 : iw >= 640 ? 384 : 320
+    const horizontalPadGuess = 32
+    return Math.max(200, iw - sidebarPx - horizontalPadGuess)
+  }
 
   function computeInitialKassaMenuRowPx(): number {
     if (typeof window === 'undefined') return Math.floor(180 * KASSA_MENU_TILE_HEIGHT_BOOST)
     const vh = window.visualViewport?.height ?? window.innerHeight
     const overhead = 68 + 56
     const innerApprox = Math.max(0, vh - overhead - 48)
-    const row =
+    let row =
       ((innerApprox - (KASSA_MENU_VISIBLE_ROWS - 1) * KASSA_MENU_GRID_GAP_PX) / KASSA_MENU_VISIBLE_ROWS) *
       KASSA_MENU_TILE_HEIGHT_BOOST
-    return Math.max(120, Math.floor(row))
+    row = Math.max(120, Math.floor(row))
+    return applyKassaMenuSquareMonitorTileRowCap(
+      row,
+      estimateKassaMenuGridInnerWidthPx(),
+      KASSA_MENU_GRID_GAP_PX,
+      KASSA_MENU_SQUARE_MONITOR_MAX_TILE_H_TO_CELL_W,
+    )
   }
 
   /** Menu-paneel: responsieve kolommen × N rijen; rijhoogte = f(scrollport), ~3 rijen “doel” = hogere tegels. */
@@ -1055,16 +1134,25 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         const st = getComputedStyle(el)
         const pt = parseFloat(st.paddingTop) || 0
         const pb = parseFloat(st.paddingBottom) || 0
+        const pl = parseFloat(st.paddingLeft) || 0
+        const pr = parseFloat(st.paddingRight) || 0
         const innerH = el.clientHeight - pt - pb
+        const gridInnerW = Math.max(0, el.clientWidth - pl - pr)
         const fallback = computeInitialKassaMenuRowPx()
         if (innerH <= 0) {
           setKassaMenuRowPx((prev) => (prev === fallback ? prev : fallback))
           return
         }
-        const rowH =
+        let rowH =
           ((innerH - (KASSA_MENU_VISIBLE_ROWS - 1) * KASSA_MENU_GRID_GAP_PX) / KASSA_MENU_VISIBLE_ROWS) *
           KASSA_MENU_TILE_HEIGHT_BOOST
-        const next = Math.max(108, Math.floor(rowH))
+        rowH = Math.max(108, Math.floor(rowH))
+        const next = applyKassaMenuSquareMonitorTileRowCap(
+          rowH,
+          gridInnerW,
+          KASSA_MENU_GRID_GAP_PX,
+          KASSA_MENU_SQUARE_MONITOR_MAX_TILE_H_TO_CELL_W,
+        )
         setKassaMenuRowPx((prev) => (prev === next ? prev : next))
       })
     }
