@@ -173,9 +173,10 @@ function kassaMenuGridColumnCountForInnerWidth(innerGridWidthPx: number): number
 }
 
 /**
- * Alleen klassieke **17″ 4:3** in de praktijk: logische **`~1280×1024`** of **`~1280×960`** (SXGA).
- * Inch meten kan de browser niet; we sluiten bewust **XGA `1024×768`** uit (komt veel op 14–15″).
- * **`longSide`/hoog DPI** van grote desktops (≥21″) valt ook buiten de band. **Geen aanpassing op iPads** (zie UA-check).
+ * Alleen **~17″ 4:3 (SXGA-klasse)**: combinatie aspect + logische afmetingen.
+ * Rekening gehouden met **Windows-schaal**: `visualViewport`/inner zijn vaak **kleiner** dan 1280×1024 —
+ * daarom géén drempel meer op `≥1220 / ≥900` (dat schoot veel echte setups mis).
+ * XGA **`1024×768`** uit via `short < 785`. **Geen iPad**. Grote desktops via `long > 1400`.
  */
 function shouldApplyKassaCompactSquareMonitorTileCap(): boolean {
   if (typeof window === 'undefined' || typeof navigator === 'undefined') return false
@@ -186,25 +187,27 @@ function shouldApplyKassaCompactSquareMonitorTileCap(): boolean {
   /** iPadOS “Safari-desktop” UA */
   if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) return false
 
-  const w = window.innerWidth
-  const h = window.innerHeight
+  /** prefer visualViewport voor kiosk/PWA waar inner* door UI kan afwijken */
+  const vv = window.visualViewport
+  const wSrc = vv?.width != null && vv.width > 0 ? vv.width : window.innerWidth
+  const hSrc = vv?.height != null && vv.height > 0 ? vv.height : window.innerHeight
+  const w = Math.max(1, Math.floor(wSrc))
+  const h = Math.max(1, Math.floor(hSrc))
 
-  /** Landscape kiosk; portrait / tablet‑portret: niet aanpassen */
-  if (w <= h || w < 960 || h < 640) return false
+  /** Landscape kiosk; portrait — niet aanpassen */
+  if (w <= h || w < 960 || h < 628) return false
 
   const shortSide = h
   const longSide = w
 
   /*
-   * Smalle band + strakker aspect (~4:3). Sluit o.a. uit:
-   * - 1024×768 ("voor 15inch/oud") — short te laag;
-   * - 1366×768, 1440×900, breedbeeld — buiten ratio of long/te hoog/te laag voor SXGA-band;
-   * - 1400×1050 / 1600×1200 (veel grotere 4:3) — long te groot.
+   * ~17″ 4:3 (SXGA) óf ná Windows-schaal kleinere logische viewport (bv. ~1024×819).
+   * Sluit nog steeds klassieke XGA `1024×768` (short ≤ ~780) én bakken 1600+/21″ uit.
    */
-  if (longSide < 1220 || longSide > 1340 || shortSide < 900 || shortSide > 1080) return false
+  if (longSide < 1000 || longSide > 1400 || shortSide < 785 || shortSide > 1090) return false
 
   const r = longSide / shortSide
-  return r >= 1.24 && r <= 1.36
+  return r >= 1.215 && r <= 1.39
 }
 
 /**
@@ -986,7 +989,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   function estimateKassaMenuGridInnerWidthPx(): number {
     if (typeof window === 'undefined') return 560
-    const iw = window.innerWidth
+    const vv = window.visualViewport
+    const iw = Math.floor(
+      vv?.width != null && vv.width > 0 ? vv.width : window.innerWidth,
+    )
     const sidebarPx = iw >= 1024 ? 380 : iw >= 640 ? 384 : 320
     const horizontalPadGuess = 32
     return Math.max(200, iw - sidebarPx - horizontalPadGuess)
@@ -1203,8 +1209,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     measure()
     const ro = new ResizeObserver(measure)
     ro.observe(el)
+    const onLayoutSignal = () => measure()
+    window.addEventListener('resize', onLayoutSignal)
+    window.visualViewport?.addEventListener?.('resize', onLayoutSignal)
     return () => {
       cancelAnimationFrame(rafId)
+      window.removeEventListener('resize', onLayoutSignal)
+      window.visualViewport?.removeEventListener?.('resize', onLayoutSignal)
       ro.disconnect()
     }
   }, [selectedCategory, menuLoading])
