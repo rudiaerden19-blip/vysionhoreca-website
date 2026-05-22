@@ -394,9 +394,6 @@ export function adminPathToModule(pathname: string, tenantSlug: string): AdminMo
   if (rest.startsWith('/betaling')) {
     return { kind: 'module', module: 'instellingen' }
   }
-  if (rest.startsWith('/printer-installatie')) {
-    return { kind: 'module', module: 'instellingen' }
-  }
   if (
     rest.startsWith('/online-status') ||
     rest.startsWith('/klanten') ||

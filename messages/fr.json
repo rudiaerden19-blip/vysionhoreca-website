@@ -2071,27 +2071,6 @@
       "savedFlash": "Enregistré — actualisez l'écran de vente pour appliquer.",
       "dbHint": "Exécutez le script SQL tenant_settings_kassa_floor_plan_enabled.sql dans Supabase (dossier supabase)."
     },
-    "printerInstall": {
-      "title": "Imprimante tickets (Windows)",
-      "subtitle": "Print Agent sur ce PC : choisissez l’imprimante telle que Windows l’affiche et vérifiez l’URL de la caisse. L’impression existante depuis la caisse ne change pas.",
-      "backToOverview": "Retour au tableau de bord",
-      "intro": "Uniquement sur le PC Windows où la Vysion Print Agent tourne (icône près de l’horloge). Les tickets passent toujours par la même passerelle locale (127.0.0.1:9742).",
-      "agentOffline": "Impossible de joindre la Print Agent sur cet ordinateur (127.0.0.1:9742). Démarrez l’agent ou installez-la via le lien ci-dessous.",
-      "agentOld": "Cette Print Agent est trop ancienne pour enregistrer depuis le site. Téléchargez la dernière version ou utilisez l’icône → Réglages.",
-      "printerLabel": "Imprimante tickets sous Windows",
-      "printerPlaceholder": "— Choisir une imprimante —",
-      "kassaUrlLabel": "URL caisse",
-      "kassaUrlHint": "Valeur par défaut pour cet établissement ; modifier seulement en préproduction/autre domaine.",
-      "refresh": "Actualiser",
-      "save": "Enregistrer dans la Print Agent",
-      "saving": "Enregistrement…",
-      "saved": "Enregistré dans la Print Agent.",
-      "validationPrinter": "Choisissez une imprimante.",
-      "validationUrl": "URL caisse invalide (https… et terminaison /admin/kassa).",
-      "downloadIntro": "Pas encore de Print Agent ?",
-      "downloadCta": "Télécharger pour Windows",
-      "systrayTip": "Même réglage via : icône près de l’horloge → Réglages (Vysion Print Agent)."
-    },
     "bestellingen": {
       "title": "Commandes",
       "subtitle": "Voir et gérer les commandes",

@@ -2870,27 +2870,6 @@
       "savedFlash": "Saved — refresh the register screen to apply.",
       "dbHint": "Run the SQL script tenant_settings_kassa_floor_plan_enabled.sql in Supabase (supabase folder)."
     },
-    "printerInstall": {
-      "title": "Receipt printer (Windows)",
-      "subtitle": "Print Agent on this PC: pick the receipt printer as shown in Windows and check the register URL. Existing printing from the register does not change — this page is configuration only.",
-      "backToOverview": "Back to admin overview",
-      "intro": "Only on the Windows PC where the Vysion Print Agent runs (tray icon). Receipts still use the same local agent (127.0.0.1:9742).",
-      "agentOffline": "Cannot reach the Print Agent on this computer (127.0.0.1:9742). Start the agent or install it using the download below.",
-      "agentOld": "This Print Agent is too old to save settings from the website. Download the latest version, or open the tray icon → Settings.",
-      "printerLabel": "Receipt printer in Windows",
-      "printerPlaceholder": "— Select a printer —",
-      "kassaUrlLabel": "Register URL",
-      "kassaUrlHint": "Default for this tenant; change only if you use preview or another domain.",
-      "refresh": "Reload",
-      "save": "Save to Print Agent",
-      "saving": "Saving…",
-      "saved": "Saved in the Print Agent.",
-      "validationPrinter": "Select a receipt printer.",
-      "validationUrl": "Enter a valid register URL (starts with http(s) and ends with /admin/kassa).",
-      "downloadIntro": "No Print Agent yet?",
-      "downloadCta": "Download for Windows",
-      "systrayTip": "You can configure the same in: tray icon → Settings (Vysion Print Agent)."
-    },
     "bestellingen": {
       "title": "Orders",
       "subtitle": "View and manage orders",

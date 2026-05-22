@@ -2870,27 +2870,6 @@
       "savedFlash": "Opgeslagen — vernieuw het verkoopscherm om dit direct toe te passen.",
       "dbHint": "Voer het script tenant_settings_kassa_floor_plan_enabled.sql uit in Supabase (map supabase)."
     },
-    "printerInstall": {
-      "title": "Bonprinter (Windows)",
-      "subtitle": "Print Agent op deze pc: kies de bonprinter zoals Windows hem toont en controleer de kassa-URL. Bestaand afdrukken in de kassa verandert niet — dit scherm is alleen configuratie.",
-      "backToOverview": "Terug naar zaakpaneel",
-      "intro": "Alleen op de Windows-pc waar de Vysion Print Agent draait (icoon bij de klok). Bonnen blijven naar dezelfde lokale agent (127.0.0.1:9742).",
-      "agentOffline": "Geen verbinding met de Print Agent op deze computer (127.0.0.1:9742). Start de agent of gebruik de download hieronder.",
-      "agentOld": "Deze Print Agent is te oud voor opslaan via de website. Download de nieuwste versie, of stel in via het icoon bij de klok → Instellingen.",
-      "printerLabel": "Bonprinter in Windows",
-      "printerPlaceholder": "— Kies een printer —",
-      "kassaUrlLabel": "Kassa-URL",
-      "kassaUrlHint": "Standaard voor deze zaak; wijzig alleen bij preview of een andere domein-link.",
-      "refresh": "Opnieuw laden",
-      "save": "Opslaan in Print Agent",
-      "saving": "Bezig met opslaan…",
-      "saved": "Opgeslagen in de Print Agent.",
-      "validationPrinter": "Kies een bonprinter.",
-      "validationUrl": "Vul een geldige kassa-URL in (begint met http(s) en eindigt op /admin/kassa).",
-      "downloadIntro": "Nog geen Print Agent?",
-      "downloadCta": "Download voor Windows",
-      "systrayTip": "Zelfde instelling bereik je via: icoon bij de klok → Instellingen (Vysion Print Agent)."
-    },
     "bestellingen": {
       "title": "Bestellingen",
       "subtitle": "Bekijk en beheer bestellingen",

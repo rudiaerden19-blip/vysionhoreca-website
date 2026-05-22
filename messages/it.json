@@ -2571,27 +2571,6 @@
       "savedFlash": "Salvato — aggiorna la schermata di vendita per applicare.",
       "dbHint": "Esegui lo script SQL tenant_settings_kassa_floor_plan_enabled.sql in Supabase (cartella supabase)."
     },
-    "printerInstall": {
-      "title": "Stampante scontrini (Windows)",
-      "subtitle": "Print Agent su questo PC: scegli la stampante come in Windows e controlla l’URL della cassa. La stampa esistente dalla cassa non cambia.",
-      "backToOverview": "Torna al pannello",
-      "intro": "Solo sul PC Windows dove gira Vysion Print Agent (icona nel vassoio). Gli scontrini usano ancora lo stesso servizio locale (127.0.0.1:9742).",
-      "agentOffline": "Connessione a Print Agent assente (127.0.0.1:9742). Avvia l’agente o installalo con il download.",
-      "agentOld": "Print Agent troppo vecchia per salvare dal sito. Scarica l’ultima versione o usa icona → Impostazioni.",
-      "printerLabel": "Stampante scontrini in Windows",
-      "printerPlaceholder": "— Scegli stampante —",
-      "kassaUrlLabel": "URL cassa",
-      "kassaUrlHint": "Predefinito per questo locale; modifica solo in preview o altro dominio.",
-      "refresh": "Ricarica",
-      "save": "Salva in Print Agent",
-      "saving": "Salvataggio…",
-      "saved": "Salvato in Print Agent.",
-      "validationPrinter": "Scegli una stampante.",
-      "validationUrl": "URL cassa non valido (https… e termina con /admin/kassa).",
-      "downloadIntro": "Non hai ancora Print Agent?",
-      "downloadCta": "Scarica per Windows",
-      "systrayTip": "Stesso menu: icona vassoio → Impostazioni (Vysion Print Agent)."
-    },
     "bestellingen": {
       "title": "Ordini",
       "subtitle": "Visualizza e gestisci gli ordini",

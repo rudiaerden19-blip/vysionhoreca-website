@@ -2571,27 +2571,6 @@
       "savedFlash": "已保存 — 请刷新收银界面以生效。",
       "dbHint": "请在 Supabase 中执行 SQL 脚本 tenant_settings_kassa_floor_plan_enabled.sql（supabase 目录）。"
     },
-    "printerInstall": {
-      "title": "小票打印机（Windows）",
-      "subtitle": "本机的 Print Agent：选择 Windows 中显示的打印机并核对收银台 URL。现有从收银台打印不受影响。",
-      "backToOverview": "返回管理首页",
-      "intro": "仅在运行 Vysion Print Agent 的 Windows 电脑（托盘图标）有效。小票仍走同一本地服务（127.0.0.1:9742）。",
-      "agentOffline": "无法连接本机 Print Agent（127.0.0.1:9742）。请启动应用或通过下方链接安装。",
-      "agentOld": "Print Agent 版本过旧，无法从网站保存。请下载最新版或使用托盘→设置。",
-      "printerLabel": "Windows 中的小票打印机",
-      "printerPlaceholder": "— 选择打印机 —",
-      "kassaUrlLabel": "收银台 URL",
-      "kassaUrlHint": "默认已填本店；仅在预览或其他域名时修改。",
-      "refresh": "重新加载",
-      "save": "保存到 Print Agent",
-      "saving": "正在保存…",
-      "saved": "已保存到 Print Agent。",
-      "validationPrinter": "请选择打印机。",
-      "validationUrl": "收银台 URL 无效（需 https 并以 /admin/kassa 结尾）。",
-      "downloadIntro": "还没有 Print Agent？",
-      "downloadCta": "下载 Windows 版",
-      "systrayTip": "同样可在：托盘图标→设置（Vysion Print Agent）。"
-    },
     "bestellingen": {
       "title": "订单",
       "subtitle": "查看和管理订单",
