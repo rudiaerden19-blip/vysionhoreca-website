@@ -162,7 +162,7 @@ function scheduleAddToCartSound() {
   scheduleKassaTapSound(playAddToCart)
 }
 
-/** `grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6` — inner breedte ná padding. */
+/** `grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5` plus op **`xl`**: 6 óf SXGA‑17″→5 kolommen (`kassaSxgaDenseTiles`). */
 function kassaMenuGridColumnCountForInnerWidth(innerGridWidthPx: number): number {
   if (!Number.isFinite(innerGridWidthPx) || innerGridWidthPx <= 0) return 2
   if (innerGridWidthPx >= 1280) return 6
@@ -172,10 +172,30 @@ function kassaMenuGridColumnCountForInnerWidth(innerGridWidthPx: number): number
   return 2
 }
 
-/** Ruimte titel onder 5∶4‑fotobak (SXGA); strak zodat `gridAutoRows` niet boven inhoud blijft hangen. */
-const KASSA_SXGA_LABEL_STRIP_RESERVED_PX = 66
-/** `aspect-[5/4]` ⇒ hoogte beeldhok = deze fractie × celbreedte */
-const KASSA_SXGA_TILE_IMAGE_HEIGHT_FRAC = 0.8
+/**
+ * Tailwind breakpoints voor menu‑grid gebruiken **`min-width` op viewport** (`sm`…`xl`).
+ * `gridInnerWidthPx` daarvan afleiden (= scrollbar + zijbalk) gaf fout kolom‑aantal in caps en “andere” tegels.
+ */
+function kassaMenuGridColumnCountForViewportCss(vpWcss: number): number {
+  if (!Number.isFinite(vpWcss) || vpWcss <= 0) return 2
+  if (vpWcss >= 1280) return 6
+  if (vpWcss >= 1024) return 5
+  if (vpWcss >= 768) return 4
+  if (vpWcss >= 640) return 3
+  return 2
+}
+
+/** SXGA ~17″: op **`xl`** iets bredere cel — **5** kolommen ipv 6 voor grotere tikvlakken. */
+function kassaMenuGridColumnCountSxgaViewport(vpWcss: number): number {
+  const base = kassaMenuGridColumnCountForViewportCss(vpWcss)
+  if (vpWcss >= 1280 && base === 6) return 5
+  return base
+}
+
+/** Ruimte titel onder fotobak (SXGA); strak maar leesbare 2‑regellijn. */
+const KASSA_SXGA_LABEL_STRIP_RESERVED_PX = 74
+/** Vierkante fotobak ⇒ hoogte = celbreedte */
+const KASSA_SXGA_TILE_IMAGE_HEIGHT_FRAC = 1
 /** Zelfde als `mt-1.5` tussen foto-strook en naam */
 const KASSA_SXGA_IMAGE_TO_TITLE_GAP_PX = 6
 
@@ -261,16 +281,17 @@ function shouldApplyKassaCompactSquareMonitorTileCap(): boolean {
 }
 
 /**
- * SXGA (~17″): rij gelijk aan **5∶4‑foto** (`0.8×` celbreedte) + lichte gap + titel — overige schermen ongemoeid.
+ * SXGA (~17″): rij gelijk aan **vierkante foto** (celbreedte) + lichte gap + titel — overige schermen ongemoeid.
  */
 function applyKassaMenuSquareMonitorTileRowCap(
   rowH: number,
   gridInnerWidthPx: number,
   menuGridGapPx: number,
   _unusedMaxTileHToCellWLegacy: number,
+  viewportCssWidth: number,
 ): number {
   if (!shouldApplyKassaCompactSquareMonitorTileCap()) return rowH
-  const cols = kassaMenuGridColumnCountForInnerWidth(gridInnerWidthPx)
+  const cols = kassaMenuGridColumnCountSxgaViewport(viewportCssWidth)
   const cellW =
     cols > 0
       ? (gridInnerWidthPx - (cols - 1) * menuGridGapPx) / cols
@@ -456,10 +477,14 @@ const KASSA_MENU_TILE_IMAGE_WELL =
   'pointer-events-none relative min-h-0 w-full min-w-0 flex-1 overflow-hidden bg-white'
 
 /**
- * SXGA ~17″: **5∶4‑foto** (lager dan vierkant) ⇒ titel dichter tegen de plaatje; abs.‑img heeft wél echte hoogte.
+ * SXGA ~17″: **vierkante** fotobak iets grotere tik‑/kijkvlak bij zelfde celbreedte; abs.‑img heeft wél echte hoogte.
  */
 const KASSA_MENU_TILE_IMAGE_WELL_SXGA =
-  'pointer-events-none relative w-full shrink-0 flex-none aspect-[5/4] overflow-hidden bg-white'
+  'pointer-events-none relative w-full shrink-0 flex-none aspect-square overflow-hidden bg-white'
+
+/** SXGA placeholder (geen afbeeldings‑URL):zelfde vorm als fotobak. */
+const KASSA_MENU_TILE_PLACEHOLDER_WELL_SXGA =
+  'pointer-events-none flex w-full shrink-0 flex-none flex-col items-center justify-center overflow-hidden bg-white px-2 aspect-square'
 
 const KASSA_MENU_TILE_IMG_CLASS =
   'pointer-events-none absolute inset-0 box-border h-full w-full select-none object-contain object-center'
@@ -495,10 +520,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
   const labelWrap = sxgaDenseTileLayout ? KASSA_MENU_TILE_LABEL_WRAP_SXGA : KASSA_MENU_TILE_LABEL_WRAP
   const labelClass = sxgaDenseTileLayout ? KASSA_MENU_TILE_LABEL_CLASS_SXGA : KASSA_MENU_TILE_LABEL_CLASS
 
-  const noImgTop =
-    sxgaDenseTileLayout ?
-      'pointer-events-none flex w-full shrink-0 flex-none flex-col items-center justify-center overflow-hidden bg-white px-2 aspect-[5/4]'
-    : 'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-white px-2'
+  const noImgTop = sxgaDenseTileLayout ? KASSA_MENU_TILE_PLACEHOLDER_WELL_SXGA : 'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-white px-2'
 
   return (
     <button
@@ -554,10 +576,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
   const labelWrap = sxgaDenseTileLayout ? KASSA_MENU_TILE_LABEL_WRAP_SXGA : KASSA_MENU_TILE_LABEL_WRAP
   const labelClass = sxgaDenseTileLayout ? KASSA_MENU_TILE_LABEL_CLASS_SXGA : KASSA_MENU_TILE_LABEL_CLASS
 
-  const noImgTop =
-    sxgaDenseTileLayout ?
-      'pointer-events-none flex w-full shrink-0 flex-none flex-col items-center justify-center overflow-hidden bg-white px-2 aspect-[5/4]'
-    : 'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-white px-2 pt-4'
+  const noImgTop = sxgaDenseTileLayout ? KASSA_MENU_TILE_PLACEHOLDER_WELL_SXGA : 'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-white px-2 pt-4'
 
   return (
     <button
@@ -1079,6 +1098,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       estimateKassaMenuGridInnerWidthPx(),
       KASSA_MENU_GRID_GAP_PX,
       KASSA_MENU_SQUARE_MONITOR_MAX_TILE_H_TO_CELL_W,
+      Math.max(
+        1,
+        Math.floor(
+          window.visualViewport?.width != null && window.visualViewport.width > 0
+            ? window.visualViewport.width
+            : window.innerWidth,
+        ),
+      ),
     )
   }
 
@@ -1253,6 +1280,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         const pr = parseFloat(st.paddingRight) || 0
         const innerH = el.clientHeight - pt - pb
         const gridInnerW = Math.max(0, el.clientWidth - pl - pr)
+        const vpWsrc =
+          window.visualViewport?.width != null && window.visualViewport.width > 0
+            ? window.visualViewport.width
+            : window.innerWidth
+        const viewportW = Math.max(1, Math.floor(vpWsrc))
         const fallback = computeInitialKassaMenuRowPx()
         const sxgaDense = shouldApplyKassaCompactSquareMonitorTileCap()
         setKassaSxgaDenseTiles((prev) => (prev === sxgaDense ? prev : sxgaDense))
@@ -1269,6 +1301,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           gridInnerW,
           KASSA_MENU_GRID_GAP_PX,
           KASSA_MENU_SQUARE_MONITOR_MAX_TILE_H_TO_CELL_W,
+          viewportW,
         )
         setKassaMenuRowPx((prev) => (prev === next ? prev : next))
       })
@@ -4048,7 +4081,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <div
             ref={kassaMenuScrollRef}
             data-testid="kassa-menu-scroll"
-            className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4 touch-manipulation [overflow-anchor:none]"
+            className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4 touch-manipulation [overflow-anchor:none] [scrollbar-gutter:stable]"
           >
             {menuLoading ? (
               <div data-testid="kassa-menu-loading" className={`flex items-center justify-center h-full text-lg ${ui.menuEmptyMuted}`}>{t('kassaApp.loading')}</div>
@@ -4069,7 +4102,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   onPointerUp={handleCategoryGridPointerUp}
                   onPointerCancel={handleCategoryGridPointerCancel}
                   onClick={handleCategoryGridClick}
-                  className={`grid min-h-0 w-full grid-cols-2 gap-4 pb-8 touch-manipulation select-none sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start' : 'items-stretch'}`}
+                  className={`grid min-h-0 w-full grid-cols-2 gap-4 pb-8 touch-manipulation select-none sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 ${kassaSxgaDenseTiles ? 'xl:grid-cols-5' : 'xl:grid-cols-6'} [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start' : 'items-stretch'}`}
                   style={
                     kassaSxgaDenseTiles ?
                       { gridAutoRows: 'max-content' }
@@ -4105,7 +4138,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     onPointerUp={handleProductGridPointerUp}
                     onPointerCancel={handleProductGridPointerCancel}
                     onClick={handleProductGridClick}
-                    className={`grid min-h-0 w-full grid-cols-2 gap-4 pb-8 touch-manipulation select-none sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start' : 'items-stretch'}`}
+                    className={`grid min-h-0 w-full grid-cols-2 gap-4 pb-8 touch-manipulation select-none sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 ${kassaSxgaDenseTiles ? 'xl:grid-cols-5' : 'xl:grid-cols-6'} [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start' : 'items-stretch'}`}
                     style={
                       kassaSxgaDenseTiles ?
                         { gridAutoRows: 'max-content' }
