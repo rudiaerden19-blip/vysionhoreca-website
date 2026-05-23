@@ -186,13 +186,16 @@ export default function HomeLandingHero() {
         <div
           className="mt-8 sm:mt-10 md:mt-12 w-full max-w-lg sm:max-w-xl mx-auto rounded-2xl border border-white/25 bg-white/[0.07] backdrop-blur-md px-5 py-6 sm:px-8 sm:py-7 shadow-[0_12px_40px_rgba(0,0,0,0.4)] ring-1 ring-white/10"
           role="region"
-          aria-label={`${t('heroLanding.ctaModulesHeadline')} ${t('heroLanding.ctaModulesSubline')} ${t('heroLanding.ctaModulesPricePrefix')} €${t('heroLanding.ctaModulesPriceAmount')} ${t('heroLanding.ctaModulesPricePeriod')}. ${t('heroLanding.ctaModulesPriceNote')} ${t('heroLanding.ctaModulesPriceExtra')}. ${t('heroLanding.readTermsLink')}`}
+          aria-label={`${t('heroLanding.ctaModulesHeadline')} ${t('heroLanding.ctaModulesSubline')} ${t('heroLanding.ctaModulesKassaFootnote')} ${t('heroLanding.ctaModulesPricePrefix')} €${t('heroLanding.ctaModulesPriceAmount')} ${t('heroLanding.ctaModulesPricePeriod')}. ${t('heroLanding.ctaModulesPriceNote')} ${t('heroLanding.ctaModulesPriceExtra')}. ${t('heroLanding.readTermsLink')}`}
         >
           <p className="text-xl sm:text-2xl md:text-[1.65rem] font-bold text-white tracking-tight text-balance leading-snug">
             {t('heroLanding.ctaModulesHeadline')}
           </p>
           <p className="mt-2 text-base sm:text-lg font-semibold text-accent text-balance leading-snug">
             {t('heroLanding.ctaModulesSubline')}
+          </p>
+          <p className="mt-1.5 text-[0.65rem] sm:text-[0.7rem] text-white/65 font-normal leading-snug max-w-md mx-auto">
+            {t('heroLanding.ctaModulesKassaFootnote')}
           </p>
           <div className="mt-4 sm:mt-5 pt-4 sm:pt-5 border-t border-white/20">
             <div className="flex flex-wrap items-baseline justify-center gap-x-2 gap-y-1 text-white">
