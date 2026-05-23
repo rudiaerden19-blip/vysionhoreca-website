@@ -17,7 +17,7 @@ const planPricesYearly: Record<string, number> = {
 }
 
 const planNames: Record<string, string> = {
-  starter: 'Vysion Pro',
+  starter: 'Online ordering platform',
   pro: 'Vysion Premium',
 }
 

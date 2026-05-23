@@ -31,11 +31,11 @@
     "ctaPricing": "Voir les tarifs",
     "ctaTrial": "Commencer gratuitement",
     "contactLine": "Des questions ? Utilisez le bloc contact en page d’accueil.",
-    "vysionProHeading": "Vysion Pro",
-    "vysionProLargeTitle": "Vysion Pro",
+    "vysionProHeading": "Plateforme de commande en ligne",
+    "vysionProLargeTitle": "Plateforme de commande en ligne",
     "vysionPremiumLargeTitle": "Vysion Premium",
-    "vysionProImageAlt": "Aperçu du forfait Vysion Pro",
-    "vysionProRightP1": "Avec Vysion Pro, vous regroupez commandes en ligne, site web, stocks, écran cuisine, réservations de tables et bien plus dans un seul abonnement.",
+    "vysionProImageAlt": "Aperçu du forfait plateforme de commande en ligne",
+    "vysionProRightP1": "Commandes en ligne, votre propre site, stocks, écran cuisine, réservations de tables et bien plus sont inclus dans cet abonnement.",
     "vysionProRightP2": "Choisissez la facturation mensuelle ou annuelle ; l’offre annuelle inclut 10 % de réduction. Tous les avantages listés sont inclus, avec formation et support.",
     "vysionProModulesP1": "Vous choisissez les modules dans votre matériel ; ce dont vous n’avez pas besoin, vous ne payez pas non plus.",
     "vysionProModulesP2": "Vous voulez votre propre module, comme avec votre ancienne caisse ? Pas de problème : nos développeurs le réalisent pour vous en interne.",
@@ -355,7 +355,7 @@
     "compareDiscountStarter": "-40 %",
     "compareDiscountPro": "-23 %",
     "starter": {
-      "name": "Vysion Pro",
+      "name": "Plateforme de commande en ligne",
       "features": {
         "1": "Plateforme de commande en ligne",
         "2": "Site web propre entièrement personnalisable",
@@ -374,7 +374,7 @@
     },
     "pro": {
       "name": "Vysion Premium",
-      "allOfStarter": "Tout de Starter, plus:",
+      "allOfStarter": "Tout de la plateforme de commande en ligne, plus :",
       "hardwareIncluded": "Matériel inclus",
       "features": {
         "1": "Licence caisse incluse",

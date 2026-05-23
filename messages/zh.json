@@ -31,11 +31,11 @@
     "ctaPricing": "查看价格",
     "ctaTrial": "免费试用",
     "contactLine": "有疑问？请使用首页的联系区块。",
-    "vysionProHeading": "Vysion Pro",
-    "vysionProLargeTitle": "Vysion Pro",
+    "vysionProHeading": "在线订餐平台",
+    "vysionProLargeTitle": "在线订餐平台",
     "vysionPremiumLargeTitle": "Vysion Premium",
-    "vysionProImageAlt": "Vysion Pro 套餐概览",
-    "vysionProRightP1": "Vysion Pro 将在线订餐、自有网站、库存、厨房屏、桌位预订等整合在同一订阅中。",
+    "vysionProImageAlt": "在线订餐平台套餐概览",
+    "vysionProRightP1": "在线订餐、自有网站、库存、厨房屏、桌位预订等均包含在此订阅中。",
     "vysionProRightP2": "支持按月或按年付费；年付可省 10%。卡片上所列功能均已包含，并提供免费入门培训与支持。",
     "vysionProModulesP1": "硬件里用哪些模块由您决定；不需要的模块，也不必付费。",
     "vysionProModulesP2": "想保留以前收银机上那样的自定义模块？没问题：我们的程序员可在公司内部为您定制开发。",
@@ -355,7 +355,7 @@
     "compareDiscountStarter": "-40%",
     "compareDiscountPro": "-23%",
     "starter": {
-      "name": "Vysion Pro",
+      "name": "在线订餐平台",
       "features": {
         "1": "在线订单平台",
         "2": "完全可定制的独立网站",
@@ -374,7 +374,7 @@
     },
     "pro": {
       "name": "Vysion Premium",
-      "allOfStarter": "Starter的所有功能，加上：",
+      "allOfStarter": "在线订餐平台的所有功能，外加：",
       "hardwareIncluded": "含硬件",
       "features": {
         "1": "包含POS授权",

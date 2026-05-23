@@ -31,11 +31,11 @@
     "ctaPricing": "عرض الأسعار",
     "ctaTrial": "ابدأ مجانًا",
     "contactLine": "أسئلة؟ استخدم قسم الاتصال في الصفحة الرئيسية.",
-    "vysionProHeading": "Vysion Pro",
-    "vysionProLargeTitle": "Vysion Pro",
+    "vysionProHeading": "منصة الطلب عبر الإنترنت",
+    "vysionProLargeTitle": "منصة الطلب عبر الإنترنت",
     "vysionPremiumLargeTitle": "Vysion Premium",
-    "vysionProImageAlt": "نظرة عامة على باقة Vysion Pro",
-    "vysionProRightP1": "يجمع Vysion Pro الطلب عبر الإنترنت وموقعك والمخزون وشاشة المطبخ وحجوزات الطاولات والمزيد في اشتراك واحد.",
+    "vysionProImageAlt": "نظرة عامة على باقة منصة الطلب عبر الإنترنت",
+    "vysionProRightP1": "الطلب عبر الإنترنت وموقعك والمخزون وشاشة المطبخ وحجوزات الطاولات والمزيد ضمن هذا الاشتراك.",
     "vysionProRightP2": "ادفع شهريًا أو سنويًا؛ الخطة السنوية توفّر 10٪. كل المزايا المذكورة مشمولة، مع تدريب مجاني ودعم.",
     "vysionProModulesP1": "أنت تختار الوحدات التي تريدها في أجهزتك؛ ولا تدفع مقابل ما لا تحتاجه.",
     "vysionProModulesP2": "تريد وحدة كما اعتدت مع كاشيرك السابق؟ لا مشكلة: مطورونا يبنونها لك داخل الشركة.",
@@ -355,7 +355,7 @@
     "compareDiscountStarter": "-40٪",
     "compareDiscountPro": "-23٪",
     "starter": {
-      "name": "Vysion Pro",
+      "name": "منصة الطلب عبر الإنترنت",
       "features": {
         "1": "منصة طلبات أونلاين",
         "2": "موقع خاص قابل للتخصيص بالكامل",
@@ -374,7 +374,7 @@
     },
     "pro": {
       "name": "Vysion Premium",
-      "allOfStarter": "كل مميزات Starter، بالإضافة إلى:",
+      "allOfStarter": "كل ميزات منصة الطلب عبر الإنترنت، بالإضافة إلى:",
       "hardwareIncluded": "يتضمن العتاد (الأجهزة)",
       "features": {
         "1": "ترخيص نقاط البيع مشمول",

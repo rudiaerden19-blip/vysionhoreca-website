@@ -81,7 +81,7 @@ export default function AbonnementenPage() {
         </div>
       </section>
 
-      {/* Sectie 2 — Vysion Pro: toggle, prijs links, tekst rechts */}
+      {/* Sectie 2 — Online bestelplatform: toggle, prijs links, tekst rechts */}
       <section className="pb-24 sm:pb-32 bg-[#e3e3e3] border-t border-gray-300/60">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-24">
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-10 sm:mb-14 text-balance break-words px-1">

@@ -31,11 +31,11 @@
     "ctaPricing": "Ver precios",
     "ctaTrial": "Empezar gratis",
     "contactLine": "¿Dudas? Usa el bloque de contacto en la página de inicio.",
-    "vysionProHeading": "Vysion Pro",
-    "vysionProLargeTitle": "Vysion Pro",
+    "vysionProHeading": "Plataforma de pedidos online",
+    "vysionProLargeTitle": "Plataforma de pedidos online",
     "vysionPremiumLargeTitle": "Vysion Premium",
-    "vysionProImageAlt": "Vista del paquete Vysion Pro",
-    "vysionProRightP1": "Con Vysion Pro tienes pedidos online, tu propia web, stock, pantalla de cocina, reservas de mesa y mucho más en una sola suscripción.",
+    "vysionProImageAlt": "Vista del paquete plataforma de pedidos online",
+    "vysionProRightP1": "Pedidos online, tu propia web, stock, pantalla de cocina, reservas de mesa y mucho más están incluidos en esta suscripción.",
     "vysionProRightP2": "Paga al mes o al año; con el plan anual ahorras un 10%. Todas las ventajas de la tarjeta están incluidas, con formación inicial gratuita y soporte.",
     "vysionProModulesP1": "Tú eliges qué módulos quieres en tu hardware; por lo que no quieres, tampoco pagas.",
     "vysionProModulesP2": "¿Quieres tu propio módulo como con la caja anterior? No hay problema: nuestros programadores lo desarrollan para ti de forma interna.",
@@ -355,7 +355,7 @@
     "compareDiscountStarter": "-40%",
     "compareDiscountPro": "-23%",
     "starter": {
-      "name": "Vysion Pro",
+      "name": "Plataforma de pedidos online",
       "features": {
         "1": "Plataforma de pedidos online",
         "2": "Sitio web propio totalmente personalizable",
@@ -374,7 +374,7 @@
     },
     "pro": {
       "name": "Vysion Premium",
-      "allOfStarter": "Todo de Starter, más:",
+      "allOfStarter": "Todo de la plataforma de pedidos online, más:",
       "hardwareIncluded": "Hardware incluido",
       "features": {
         "1": "Licencia de TPV incluida",

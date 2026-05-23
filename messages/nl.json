@@ -31,11 +31,11 @@
     "ctaPricing": "Bekijk prijzen",
     "ctaTrial": "Gratis starten",
     "contactLine": "Vragen? Ga naar het contactblok op de homepage.",
-    "vysionProHeading": "Vysion Pro",
-    "vysionProLargeTitle": "Vysion Pro",
+    "vysionProHeading": "Online bestelplatform",
+    "vysionProLargeTitle": "Online bestelplatform",
     "vysionPremiumLargeTitle": "Vysion Premium",
-    "vysionProImageAlt": "Overzicht van het Vysion Pro pakket",
-    "vysionProRightP1": "Met Vysion Pro krijgt u online bestellen, uw eigen website, voorraad, keukenscherm, tafelreservatie en nog veel meer in één abonnement.",
+    "vysionProImageAlt": "Overzicht van het Online bestelplatform-pakket",
+    "vysionProRightP1": "Online bestellen, uw eigen website, voorraad, keukenscherm, tafelreservatie en nog veel meer zit in dit abonnement.",
     "vysionProRightP2": "Kies maandelijks of jaarlijks betalen; met jaarbetaling profiteert u van 10% korting. Alle vermelde voordelen zitten inbegrepen, inclusief gratis opleiding en support.",
     "vysionProModulesP1": "Jij kiest welke modules je in je hardware wilt; wat je niet wilt, betaal je ook niet voor.",
     "vysionProModulesP2": "Wil je je eigen module, zoals je die met een andere kassa gebruikte? Geen probleem: onze programmeurs bouwen dat voor jou in eigen huis.",
@@ -636,7 +636,7 @@
     "compareDiscountStarter": "-40%",
     "compareDiscountPro": "-23%",
     "starter": {
-      "name": "Vysion Pro",
+      "name": "Online bestelplatform",
       "features": {
         "1": "Online bestelplatform",
         "2": "Eigen website volledig aanpasbaar",
@@ -655,7 +655,7 @@
     },
     "pro": {
       "name": "Vysion Premium",
-      "allOfStarter": "Alles van Pro, plus:",
+      "allOfStarter": "Alles van Online bestelplatform, plus:",
       "hardwareIncluded": "Hardware inbegrepen",
       "features": {
         "1": "Kassa licentie inbegrepen",
@@ -2954,7 +2954,7 @@
       "daysLeft": "dagen over",
       "nextPayment": "Volgende betaling",
       "perMonth": "/maand",
-      "starter": "Vysion Pro",
+      "starter": "Online bestelplatform",
       "starterDesc": "Alles wat je nodig hebt",
       "pro": "Vysion Premium",
       "proDesc": "Alles + extra features",

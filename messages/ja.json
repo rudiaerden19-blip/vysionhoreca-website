@@ -31,11 +31,11 @@
     "ctaPricing": "料金を見る",
     "ctaTrial": "無料で始める",
     "contactLine": "ご質問はホームページのお問い合わせへ。",
-    "vysionProHeading": "Vysion Pro",
-    "vysionProLargeTitle": "Vysion Pro",
+    "vysionProHeading": "オンライン注文プラットフォーム",
+    "vysionProLargeTitle": "オンライン注文プラットフォーム",
     "vysionPremiumLargeTitle": "Vysion Premium",
-    "vysionProImageAlt": "Vysion Pro パッケージの概要",
-    "vysionProRightP1": "Vysion Pro なら、オンライン注文、独自サイト、在庫、キッチンディスプレイ、テーブル予約などをひとつのサブスクにまとめられます。",
+    "vysionProImageAlt": "オンライン注文プラットフォームパッケージの概要",
+    "vysionProRightP1": "オンライン注文、独自サイト、在庫、キッチンディスプレイ、テーブル予約などがこのサブスクリプションに含まれます。",
     "vysionProRightP2": "月額・年額から選択可能。年払いは 10% お得です。カード記載の機能はすべて含まれ、無料のオンボーディング研修とサポート付きです。",
     "vysionProModulesP1": "ハードウェアに入れるモジュールはお選びいただけます。不要なものにはお支払いも不要です。",
     "vysionProModulesP2": "以前のレジと同じような独自モジュールが欲しい？問題ありません。エンジニアが社内で構築します。",
@@ -355,7 +355,7 @@
     "compareDiscountStarter": "-40%",
     "compareDiscountPro": "-23%",
     "starter": {
-      "name": "Vysion Pro",
+      "name": "オンライン注文プラットフォーム",
       "features": {
         "1": "オンライン注文プラットフォーム",
         "2": "完全カスタマイズ可能な独自ウェブサイト",
@@ -374,7 +374,7 @@
     },
     "pro": {
       "name": "Vysion Premium",
-      "allOfStarter": "Starterのすべて、さらに:",
+      "allOfStarter": "オンライン注文プラットフォームのすべてに加えて：",
       "hardwareIncluded": "ハードウェア込み",
       "features": {
         "1": "POSライセンス込み",

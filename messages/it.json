@@ -31,11 +31,11 @@
     "ctaPricing": "Vedi prezzi",
     "ctaTrial": "Inizia gratis",
     "contactLine": "Domande? Usa il blocco contatti in homepage.",
-    "vysionProHeading": "Vysion Pro",
-    "vysionProLargeTitle": "Vysion Pro",
+    "vysionProHeading": "Piattaforma ordini online",
+    "vysionProLargeTitle": "Piattaforma ordini online",
     "vysionPremiumLargeTitle": "Vysion Premium",
-    "vysionProImageAlt": "Panoramica del pacchetto Vysion Pro",
-    "vysionProRightP1": "Con Vysion Pro ottieni ordinazioni online, il tuo sito, magazzino, display cucina, prenotazioni tavoli e altro in un unico abbonamento.",
+    "vysionProImageAlt": "Panoramica del pacchetto piattaforma ordini online",
+    "vysionProRightP1": "Ordini online, il tuo sito, magazzino, display cucina, prenotazioni tavoli e altro sono inclusi in questo abbonamento.",
     "vysionProRightP2": "Scegli pagamento mensile o annuale; con l’annuale risparmi il 10%. Tutte le funzioni indicate sono incluse, con formazione iniziale gratuita e assistenza.",
     "vysionProModulesP1": "Scegli tu quali moduli avere nell’hardware; per ciò che non vuoi, non paghi neanche.",
     "vysionProModulesP2": "Vuoi il tuo modulo come con la cassa precedente? Nessun problema: i nostri programmatori lo realizzano per te internamente.",
@@ -355,7 +355,7 @@
     "compareDiscountStarter": "-40%",
     "compareDiscountPro": "-23%",
     "starter": {
-      "name": "Vysion Pro",
+      "name": "Piattaforma ordini online",
       "features": {
         "1": "Piattaforma ordini online",
         "2": "Sito web proprio completamente personalizzabile",
@@ -374,7 +374,7 @@
     },
     "pro": {
       "name": "Vysion Premium",
-      "allOfStarter": "Tutto di Starter, più:",
+      "allOfStarter": "Tutto della piattaforma ordini online, più:",
       "hardwareIncluded": "Hardware incluso",
       "features": {
         "1": "Licenza POS inclusa",
