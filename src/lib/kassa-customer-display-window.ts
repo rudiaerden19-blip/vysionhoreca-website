@@ -126,26 +126,6 @@ export async function resolveSecondaryBoundsViaApi(openerOrPopup: Window): Promi
   }
 }
 
-/** True wanneer de browser/OS expliciet meerdere schermen meldt (Chromium o.a.). */
-export function screenReportsMultiMonitorSync(screen: Screen): boolean {
-  const s = screen as Screen & { isExtended?: boolean }
-  return s.isExtended === true
-}
-
-/**
- * Alleen automatisch klantscherm openen bij ≥2 werkgebieden.
- *
- * Single-monitor PCs: bij `isExtended === false` of ontbrekende API → géén popup.
- * (`heuristicSecondaryBoundsSync` gébruiken we níet als signaal — daar krijg je ook op 1 scherm een schijn-tweede-monitor.)
- */
-export async function shouldAutoOpenKlantschermForHardware(openerWindow: Window): Promise<boolean> {
-  if (screenReportsMultiMonitorSync(openerWindow.screen)) return true
-  const s = openerWindow.screen as Screen & { isExtended?: boolean }
-  if (s.isExtended === false) return false
-  const secondary = await resolveSecondaryBoundsViaApi(openerWindow)
-  return secondary != null
-}
-
 /** Cache bijgewerkt na permissie — graag vanuit kassa bij mount aanroepen. */
 export async function prefetchCustomerDisplayBounds(openerWindow: Window): Promise<void> {
   const b = await resolveSecondaryBoundsViaApi(openerWindow)
