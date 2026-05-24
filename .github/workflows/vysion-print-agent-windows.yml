@@ -5,9 +5,20 @@ name: Vysion Print Agent — Windows Setup
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/vysion-print-agent/**'
+      - '.github/workflows/vysion-print-agent-windows.yml'
 
 permissions:
   contents: write
+
+# Eén taak tegelijk: voorkomt dubbele release-upload als er snel opeenvolgende pushes zijn.
+concurrency:
+  group: print-agent-windows-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
