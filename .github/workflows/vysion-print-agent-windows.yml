@@ -56,7 +56,7 @@ jobs:
           $startBat = "@echo off`r`nchcp 65001 >nul`r`necho.`r`necho  Vysion Print Agent wordt gestart...`r`necho  Het icoon verschijnt rechtsonder in de taakbalk.`r`necho.`r`nstart `"`" `"%~dp0Vysion Print Agent.exe`"`r`n"
           Set-Content -LiteralPath "$targetDir\START.bat" -Value $startBat -Encoding OEM
 
-          $readme = "Vysion Print Agent - USB versie`r`n================================`r`n`r`n1. Kopieer deze map naar de kassa-pc (bv. C:\VysionPrint)`r`n2. Dubbelklik START.bat`r`n3. Vysion icoon rechtsonder -> kies Epson printer -> Opslaan`r`n4. Klaar! Geen installatie nodig.`r`n`r`nAutostart: snelkoppeling van START.bat in shell:startup plaatsen.`r`n"
+          $readme = "Vysion Print Agent - USB versie`r`n================================`r`n`r`n1. Kopieer deze map naar de kassa-pc (bv. C:\VysionPrint)`r`n2. Dubbelklik START.bat`r`n3. Vysion icoon rechtsonder -> Instellingen: kies Printer + vul Kassa-URL -> Opslaan & Open Kassa`r`n4. Klaar! Geen installatie nodig.`r`n`r`nAutostart: snelkoppeling van START.bat in shell:startup plaatsen.`r`n"
           Set-Content -LiteralPath "$targetDir\LEES-MIJ.txt" -Value $readme -Encoding UTF8
 
           $zipPath = Join-Path $dist "Vysion-Print-Agent-USB.zip"
@@ -93,7 +93,7 @@ jobs:
             **→ Download `Vysion-Print-Agent-USB.zip`**
             1. ZIP uitpakken op USB stick "usb disk" of rechtstreeks op de pc
             2. Dubbelklik `START.bat`
-            3. Vysion icoon rechtsonder → kies Epson printer → Opslaan
+            3. Vysion icoon rechtsonder → Instellingen: Printer + Kassa-URL → Opslaan & Open Kassa
             4. Klaar — geen installatie nodig!
 
             ### Klassieke installer (als SmartScreen toelaat)
