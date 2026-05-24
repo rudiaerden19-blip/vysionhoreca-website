@@ -1,6 +1,6 @@
 {
   "name": "vysion-print-agent",
-  "version": "2.0.8",
+  "version": "2.0.9",
   "private": true,
   "author": "Vysion Horeca",
   "description": "Lokale USB/Windows bonprinter voor Ordervysion — dubbelklik installer, geen npm op de kassa.",
@@ -14,7 +14,7 @@
     "appId": "com.vysionhoreca.printagent",
     "productName": "Vysion Print Agent",
     "executableName": "Vysion Print Agent",
-    "directories": { "output": "dist" },
+    "directories": { "output": "dist", "buildResources": "nsis-include" },
     "files": [
       "main.js",
       "server.js",
@@ -35,7 +35,8 @@
     ],
     "nsis": {
       "oneClick": true,
-      "perMachine": false
+      "perMachine": false,
+      "include": "installer.nsh"
     },
     "win": {
       "target": ["nsis"],
