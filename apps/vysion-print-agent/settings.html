@@ -5,214 +5,86 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Vysion Print Agent</title>
   <style>
-    :root {
-      --bg: #f4f4f5;
-      --card: #ffffff;
-      --primary: #3c4d6b;
-      --primary-dark: #2d3a52;
-      --ok: #15803d;
-      --err: #b91c1c;
-      --muted: #71717a;
-      --border: #d4d4d8;
-    }
-    * { box-sizing: border-box; }
-    body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 18px; color: #18181b; }
-    h1 { font-size: 1.05rem; margin: 0 0 4px; display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
-    h1 .v { font-weight: 400; color: var(--muted); font-size: 0.8rem; }
-    h2 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin: 18px 0 8px; }
-    p.lead { color: var(--muted); font-size: 0.85rem; line-height: 1.45; margin: 0 0 16px; }
-    label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.82rem; }
-    input, select { width: 100%; padding: 10px 12px; border-radius: 9px; border: 1px solid var(--border); font-size: 0.92rem; margin-bottom: 12px; background: var(--card); }
-    input:focus, select:focus { outline: 2px solid #818cf8; outline-offset: -1px; border-color: transparent; }
-    .hint { font-size: 0.75rem; color: var(--muted); margin: -8px 0 14px; line-height: 1.4; }
-    button { background: var(--primary); color: #fff; border: none; padding: 12px 18px; border-radius: 10px; font-weight: 700; cursor: pointer; width: 100%; font-size: 0.95rem; transition: background 0.12s; }
-    button:hover:not(:disabled) { background: var(--primary-dark); }
-    button:disabled { opacity: 0.55; cursor: default; }
-    button.secondary { background: var(--card); color: #27272a; border: 1px solid var(--border); }
-    button.secondary:hover:not(:disabled) { background: #f4f4f5; }
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .ok-msg, .err-msg { font-size: 0.82rem; margin-top: 12px; padding: 10px 12px; border-radius: 8px; display: none; line-height: 1.4; }
-    .ok-msg { background: #dcfce7; color: var(--ok); }
-    .err-msg { background: #fee2e2; color: var(--err); }
-    .status-card { background: var(--card); border-radius: 10px; padding: 12px; margin-bottom: 14px; border: 1px solid var(--border); display: flex; align-items: center; gap: 10px; font-size: 0.85rem; }
-    .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-    .dot.ok { background: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,0.18); }
-    .dot.warn { background: #eab308; box-shadow: 0 0 0 3px rgba(234,179,8,0.18); }
-    .dot.err { background: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.18); }
-    code { background: #e4e4e7; padding: 2px 6px; border-radius: 4px; font-size: 0.78rem; }
+    body { font-family: Segoe UI, system-ui, sans-serif; padding: 20px; background: #f4f4f5; margin: 0; }
+    h1 { font-size: 1.1rem; margin: 0 0 8px; }
+    p { color: #444; font-size: 0.9rem; line-height: 1.45; margin: 0 0 16px; }
+    label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.85rem; }
+    select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 0.95rem; margin-bottom: 16px; }
+    button { background: #3c4d6b; color: #fff; border: none; padding: 12px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; width: 100%; font-size: 1rem; }
+    button:hover { background: #2d3a52; }
+    code { background: #e4e4e7; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; }
+    .ok { color: #15803d; font-size: 0.85rem; margin-top: 12px; display: none; }
+    .err { color: #b91c1c; font-size: 0.85rem; margin-top: 12px; display: none; }
   </style>
 </head>
 <body>
-  <h1>
-    <span>Vysion Print Agent</span>
-    <span class="v" id="version"></span>
-  </h1>
-  <p class="lead">
-    Eenmalig instellen — daarna start de kassa automatisch met de juiste printer.
+  <h1>Vysion Print Agent <span id="version" style="font-weight:400;color:#666;font-size:0.85rem;"></span></h1>
+  <p>
+    <strong>Geen installer?</strong> Open op deze pc (geen Google nodig): <br />
+    <a href="https://www.vysionhoreca.com/download/print-agent-windows" target="_blank" rel="noopener noreferrer">vysionhoreca.com/download/print-agent-windows</a><br />
+    Of technische release:
+    <a href="https://github.com/rudiaerden19-blip/vysionhoreca-website/releases/tag/vysion-print-agent-windows" target="_blank" rel="noopener noreferrer">GitHub — Vysion Print Agent (Windows)</a>
   </p>
-
-  <div class="status-card" id="status">
-    <span class="dot warn" id="statusDot"></span>
-    <span id="statusText">Status controleren…</span>
-  </div>
-
-  <h2>1 · Jouw zaak</h2>
-  <label for="tenantSlug">Tenant code</label>
-  <input type="text" id="tenantSlug" placeholder="bv. geerkensdrankenhandel" autocomplete="off" />
-  <div class="hint">
-    De code van jouw zaak op Vysion (deel achter <code>/shop/</code> in de URL).
-    De volledige kassa-URL wordt automatisch opgebouwd.
-  </div>
-
-  <h2>2 · Bonprinter</h2>
-  <label for="pr">Welke printer in Windows?</label>
+  <p>
+    Kies de bonprinter die Windows al ziet (USB/Ethernet maakt niet uit). De kassa stuurt bonnen naar
+    <code>http://127.0.0.1:9742/print</code> op <strong>deze pc</strong>.
+  </p>
+  <label for="pr">Printer</label>
   <select id="pr"></select>
-  <div class="hint">
-    USB of netwerk maakt niet uit — kies de printer zoals Windows hem ziet.
-    <strong>Niet</strong> “Microsoft Print to PDF”: dat is geen echte bonprinter.
-    Bij “Opslaan” wordt je printer<strong>direct</strong> bewaard, ook als de tenant hieronder nog niet ingevuld is.
-  </div>
-
-  <h2>3 · Test</h2>
-  <div class="row">
-    <button type="button" class="secondary" id="testPrint">Test bonnetje</button>
-    <button type="button" class="secondary" id="testDrawer">Lade testen</button>
-  </div>
-
-  <h2 style="margin-top: 22px;">&nbsp;</h2>
-  <button type="button" id="save">Printer opslaan &amp; kassa openen</button>
-  <button type="button" class="secondary" id="diag" style="margin-top: 8px;">Diagnose kopiëren (voor support)</button>
-
-  <div class="ok-msg"  id="ok">Opgeslagen! Kassa wordt geopend…</div>
-  <div class="err-msg" id="err"></div>
-
+  <label for="kassaUrl" style="margin-top:8px;">Kassa URL</label>
+  <input type="url" id="kassaUrl" placeholder="https://www.vysionhoreca.com/shop/jouwtenant/admin/kassa"
+    style="width:100%;padding:10px;border-radius:8px;border:1px solid #ccc;font-size:0.9rem;margin-bottom:16px;box-sizing:border-box;" />
+  <button type="button" id="save">Opslaan &amp; Open Kassa</button>
+  <div class="ok" id="ok">Opgeslagen! Kassa opent automatisch.</div>
+  <div class="err" id="err"></div>
   <script>
-    const $ = (id) => document.getElementById(id)
-    const sel = $('pr')
-    const okEl = $('ok')
-    const errEl = $('err')
-    const tenantInput = $('tenantSlug')
-    const statusDot = $('statusDot')
-    const statusText = $('statusText')
-
-    function showOk(msg) { okEl.textContent = msg; okEl.style.display = 'block'; errEl.style.display = 'none'; setTimeout(() => okEl.style.display = 'none', 4000) }
-    function showErr(msg) { errEl.textContent = msg; errEl.style.display = 'block'; okEl.style.display = 'none' }
-    function setStatus(level, text) { statusDot.className = 'dot ' + level; statusText.textContent = text }
-
-    function buildKassaUrl(slug) {
-      const s = (slug || '').trim().toLowerCase().replace(/[^a-z0-9-]/g, '')
-      if (!s) return ''
-      return `https://www.vysionhoreca.com/shop/${s}/admin/kassa`
-    }
-
-    function parseTenantFromUrl(url) {
-      try {
-        const m = String(url || '').match(/\/shop\/([^/]+)/i)
-        return m ? m[1] : ''
-      } catch { return '' }
-    }
+    const sel = document.getElementById('pr')
+    const ok = document.getElementById('ok')
+    const err = document.getElementById('err')
+    const urlInput = document.getElementById('kassaUrl')
 
     async function load() {
-      try {
-        const [cfg, plist] = await Promise.all([
-          window.vysionAgent.getConfig(),
-          window.vysionAgent.listPrinters(),
-        ])
-
-        if (cfg.agentVersion) $('version').textContent = `v${cfg.agentVersion}`
-
-        const slug = parseTenantFromUrl(cfg.kassaUrl)
-        if (slug) tenantInput.value = slug
-
-        sel.innerHTML = ''
-        if (!plist.ok || !plist.printers?.length) {
-          const opt = document.createElement('option')
-          opt.value = ''; opt.textContent = '— geen printer gevonden —'
-          sel.appendChild(opt)
-          setStatus('err', 'Geen printer gevonden in Windows. Sluit de printer aan en herstart deze app.')
-          return
-        }
-        for (const name of plist.printers.sort((a, b) => a.localeCompare(b))) {
-          const o = document.createElement('option')
-          o.value = name; o.textContent = name
-          if (cfg.printerName === name) o.selected = true
-          sel.appendChild(o)
-        }
-
-        if (!cfg.printerName)      setStatus('warn', 'Klaar voor instelling — kies printer + tenant.')
-        else if (!slug)            setStatus('warn', 'Tenant code ontbreekt nog.')
-        else                       setStatus('ok',   `Klaar — print naar "${cfg.printerName}".`)
-      } catch (e) {
-        setStatus('err', 'Kon agent niet bereiken — herstart de app.')
-      }
-    }
-
-    $('save').onclick = async () => {
-      const printerName = sel.value
-      const slug = tenantInput.value.trim()
-      if (!printerName) return showErr('Selecteer een printer.')
-      if (/microsoft\s+print\s+to\s+pdf/i.test(printerName) || /\bone\s*note\b/i.test(printerName)) {
-        showErr('Kies je echte Epson-bonprinter, niet een PDF/virtual printer.')
+      err.style.display = 'none'
+      const [cfg, plist] = await Promise.all([
+        window.vysionAgent.getConfig(),
+        window.vysionAgent.listPrinters(),
+      ])
+      if (cfg.kassaUrl) urlInput.value = cfg.kassaUrl
+      const ver = document.getElementById('version')
+      if (ver && cfg.agentVersion) ver.textContent = `v${cfg.agentVersion}`
+      sel.innerHTML = ''
+      if (!plist.ok || !plist.printers?.length) {
+        err.textContent = plist.error || 'Geen printers gevonden in Windows.'
+        err.style.display = 'block'
         return
       }
-
-      let kassaUrl = ''
-      if (slug) {
-        kassaUrl = buildKassaUrl(slug)
-        if (!kassaUrl) return showErr('Tenant code ongeldig.')
+      for (const name of plist.printers.sort((a, b) => a.localeCompare(b))) {
+        const o = document.createElement('option')
+        o.value = name
+        o.textContent = name
+        if (cfg.printerName === name) o.selected = true
+        sel.appendChild(o)
       }
+    }
 
-      try {
-        await window.vysionAgent.saveConfig({
-          printerName,
-          ...(kassaUrl ? { kassaUrl } : {}),
-        })
-      } catch (e) {
-        showErr('Opslaan mislukt: ' + (e.message || e))
+    document.getElementById('save').onclick = async () => {
+      ok.style.display = 'none'
+      err.style.display = 'none'
+      const printerName = sel.value
+      if (!printerName) {
+        err.textContent = 'Selecteer een printer.'
+        err.style.display = 'block'
         return
       }
-
-      if (!slug) {
-        showErr(
-          'Printer staat nu goed opgeslagen. Vul hierboven nog de tenant code in en tik opnieuw op de knop om de kassa-URL te bewaren én te openen.',
-        )
-        setStatus('ok', `Printer opgeslagen: "${printerName}".`)
+      const kassaUrl = urlInput.value.trim()
+      if (!kassaUrl) {
+        err.textContent = 'Vul de kassa URL in.'
+        err.style.display = 'block'
         return
       }
-
-      showOk('Opgeslagen — kassa wordt geopend…')
-      setStatus('ok', `Klaar — print naar "${printerName}".`)
-      setTimeout(() => window.vysionAgent.openKassa(), 700)
-    }
-
-    $('testPrint').onclick = async () => {
-      const printerName = sel.value
-      if (!printerName) return showErr('Selecteer eerst een printer.')
-      try {
-        await window.vysionAgent.saveConfig({ printerName })
-        const r = await window.vysionAgent.testPrint()
-        if (r?.success) showOk('Testbon verstuurd — controleer de printer.')
-        else showErr('Testen mislukt: ' + (r?.error || 'onbekende fout'))
-      } catch (e) { showErr('Test mislukt: ' + (e.message || e)) }
-    }
-
-    $('testDrawer').onclick = async () => {
-      const printerName = sel.value
-      if (!printerName) return showErr('Selecteer eerst een printer.')
-      try {
-        await window.vysionAgent.saveConfig({ printerName })
-        const r = await window.vysionAgent.testDrawer()
-        if (r?.success) showOk('Lade-puls verzonden — lade zou moeten openen.')
-        else showErr('Lade-test mislukt: ' + (r?.error || 'onbekend'))
-      } catch (e) { showErr('Lade-test mislukt: ' + (e.message || e)) }
-    }
-
-    $('diag').onclick = async () => {
-      try {
-        const r = await window.vysionAgent.diagnose()
-        await navigator.clipboard.writeText(r?.text || '')
-        showOk('Diagnose-info gekopieerd. Plak in WhatsApp/email naar Vysion.')
-      } catch (e) { showErr('Kopieren mislukt: ' + (e.message || e)) }
+      await window.vysionAgent.saveConfig({ printerName, kassaUrl })
+      ok.style.display = 'block'
+      setTimeout(() => window.vysionAgent.openKassa(), 800)
     }
 
     load()
