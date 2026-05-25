@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 
-/** Velden waar we géén OS-/virtueel toetsenbord forceren. */
+/** Velden waar we géén focus-/touch-fix toepassen. */
 const DATA_OPT_OUT = 'data-no-os-touch-keyboard'
 
 const IGNORE_INPUT_TYPES = new Set([
@@ -23,13 +23,6 @@ const IGNORE_INPUT_TYPES = new Set([
   'week',
 ])
 
-type NavVk = Navigator & {
-  virtualKeyboard?: {
-    overlaysContent?: boolean
-    show?: () => void
-  }
-}
-
 function isEligible(el: EventTarget | null): el is HTMLInputElement | HTMLTextAreaElement {
   if (!el || !(el instanceof HTMLElement)) return false
   if (el.closest(`[${DATA_OPT_OUT}]`)) return false
@@ -44,36 +37,15 @@ function isEligible(el: EventTarget | null): el is HTMLInputElement | HTMLTextAr
   return false
 }
 
-function tryShowOsKeyboard(nav: NavVk): void {
-  try {
-    nav.virtualKeyboard?.show?.()
-  } catch {
-    /* policy / browser-weigering — stil falen */
-  }
-}
-
 /**
- * Windows-touch / kiosk (Edge Chromium): systeem-toetsenbord komt niet altijd automatisch naar boven na
- * onze verwijdering van het custom keyboard. Dit triggert de VirtualKeyboard API na focus waar ondersteund.
- * Geen deps; mag op elke tenant-pagina draaien.
+ * Edge/Chromium **VirtualKeyboard.show()** laat op sommige Windows-touch/Elo setups het **kleine
+ * zwevende** systeemtoetsenbord verschijnen. We roepen die API daarom niet meer aan.
+ *
+ * Dit onderdeel zorgt er alleen nog voor dat touch/pen-tikken betrouwbaar **`focus`** op het
+ * invoerveld krijgt — het OS mag daarna zijn normale (grotere/docke) keyboard kiezen.
  */
 export function OsTouchKeyboardAssist() {
   useEffect(() => {
-    const nav = navigator as NavVk
-    const hasVk = typeof nav.virtualKeyboard?.show === 'function'
-
-    if (hasVk) {
-      try {
-        nav.virtualKeyboard!.overlaysContent = true
-      } catch {
-        /* oudere builds */
-      }
-    }
-
-    const afterFocusKick = () => {
-      requestAnimationFrame(() => tryShowOsKeyboard(nav))
-    }
-
     const kickEligibleFocus = (el: HTMLInputElement | HTMLTextAreaElement) => {
       queueMicrotask(() => {
         try {
@@ -83,11 +55,10 @@ export function OsTouchKeyboardAssist() {
         } catch {
           /* noop */
         }
-        if (hasVk) tryShowOsKeyboard(nav)
       })
     }
 
-    /** Touch-eventpad (Legacy). */
+    /** Touch-eventpad (legacy). */
     const onTouchEnd = (ev: TouchEvent) => {
       const t = ev.target
       if (!isEligible(t)) return
@@ -95,8 +66,7 @@ export function OsTouchKeyboardAssist() {
     }
 
     /**
-     * Edge/Windows gebruikt veelal Pointer Events i.p.v. alleen Touch Events;
-     * zonder deze handler komt focust op invoervelden soms niet aan bij touchscreen.
+     * Edge/Windows gebruikt vaak Pointer Events; zonder focus-kick bereikt invoer soms geen caret.
      */
     const onPointerUp = (ev: PointerEvent) => {
       if (ev.pointerType !== 'touch' && ev.pointerType !== 'pen') return
@@ -105,18 +75,10 @@ export function OsTouchKeyboardAssist() {
       kickEligibleFocus(t)
     }
 
-    const onFocusIn = (ev: FocusEvent) => {
-      const t = ev.target
-      if (!isEligible(t)) return
-      afterFocusKick()
-    }
-
-    document.addEventListener('focusin', onFocusIn, true)
     const touchEndOpts = { passive: true, capture: true } satisfies AddEventListenerOptions
     document.addEventListener('touchend', onTouchEnd, touchEndOpts)
     document.addEventListener('pointerup', onPointerUp, { capture: true })
     return () => {
-      document.removeEventListener('focusin', onFocusIn, true)
       document.removeEventListener('touchend', onTouchEnd, touchEndOpts)
       document.removeEventListener('pointerup', onPointerUp, { capture: true })
     }
