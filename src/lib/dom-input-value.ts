@@ -9,6 +9,21 @@
 /** Optioneel: zet op het element om GlobalAutoCapitalize over te slaan (legacy / scripts). */
 export const ATTR_VYSION_KB_MANAGED = 'data-vysion-kb-managed'
 
+/** Zet focus terug op het veld vóór caret-berekening (touchtoetsenbord mag geen focus stelen). */
+export function focusInputForProgrammaticEdit(
+  el: HTMLInputElement | HTMLTextAreaElement,
+): void {
+  try {
+    el.focus({ preventScroll: true })
+  } catch {
+    try {
+      el.focus()
+    } catch {
+      /* noop */
+    }
+  }
+}
+
 type ValueTracking = { setValue: (v: string) => void }
 
 function getValueTracker(el: HTMLInputElement | HTMLTextAreaElement): ValueTracking | null {

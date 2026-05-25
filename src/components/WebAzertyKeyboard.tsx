@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 
 import { STAFF_PIN_MAX_LEN } from '@/components/staff-clock/StaffClockPinPortal'
 import { useLanguage } from '@/i18n'
-import { setNativeInputValue } from '@/lib/dom-input-value'
+import { ATTR_VYSION_KB_MANAGED, focusInputForProgrammaticEdit, setNativeInputValue } from '@/lib/dom-input-value'
 import { usePathname } from 'next/navigation'
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
@@ -94,6 +94,7 @@ function numericAllowDecimal(el: HTMLInputElement | HTMLTextAreaElement): boolea
 }
 
 function insertSnippet(el: HTMLInputElement | HTMLTextAreaElement, snippet: string): void {
+  focusInputForProgrammaticEdit(el)
   const start = el.selectionStart ?? el.value.length
   const end = el.selectionEnd ?? start
   const val = el.value
@@ -121,6 +122,7 @@ function insertSnippet(el: HTMLInputElement | HTMLTextAreaElement, snippet: stri
 }
 
 function backspace(el: HTMLInputElement | HTMLTextAreaElement): void {
+  focusInputForProgrammaticEdit(el)
   const start = el.selectionStart ?? 0
   const end = el.selectionEnd ?? start
   const val = el.value
@@ -180,16 +182,34 @@ type KeyBtnProps = {
 }
 
 function KeyBtn({ label, onClick, className = '', 'aria-label': ariaLabel, title }: KeyBtnProps) {
+  /** Touch: sommige kiosks geven géén betrouwbare click na touchend; desktop: voorkom dubbele fire. */
+  const touchConsumedRef = useRef(false)
+
   return (
     <button
       type="button"
       tabIndex={-1}
       title={title}
       aria-label={ariaLabel}
+      onPointerDown={(e) => {
+        e.preventDefault()
+      }}
       onMouseDown={(e) => {
         e.preventDefault()
       }}
-      onClick={onClick}
+      onTouchEnd={(e) => {
+        e.preventDefault()
+        touchConsumedRef.current = true
+        onClick()
+        window.setTimeout(() => {
+          touchConsumedRef.current = false
+        }, 500)
+      }}
+      onClick={(e) => {
+        e.preventDefault()
+        if (touchConsumedRef.current) return
+        onClick()
+      }}
       className={`min-h-[44px] shrink-0 select-none rounded-[5px] border border-black/35 bg-[#474a54] px-1 text-base font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] touch-manipulation active:bg-[#2f323b] active:brightness-105 ${className}`.trim()}
     >
       {label}
@@ -248,20 +268,28 @@ export function WebAzertyKeyboard() {
   useLayoutEffect(() => {
     if (!target || !target.isConnected) return
 
-    let prev: string | null = null
+    let prevInputmode: string | null = null
+    let prevKbManaged: string | null = null
     try {
-      if (target.hasAttribute('inputmode')) prev = target.getAttribute('inputmode')
+      if (target.hasAttribute('inputmode')) prevInputmode = target.getAttribute('inputmode')
       target.setAttribute('inputmode', 'none')
+
+      prevKbManaged = target.getAttribute(ATTR_VYSION_KB_MANAGED)
+      target.setAttribute(ATTR_VYSION_KB_MANAGED, '1')
     } catch {
-      prev = null
+      prevInputmode = null
+      prevKbManaged = null
     }
 
     const elCleanup = target
     return () => {
       if (!elCleanup.isConnected) return
       try {
-        if (prev === null) elCleanup.removeAttribute('inputmode')
-        else elCleanup.setAttribute('inputmode', prev)
+        if (prevInputmode === null) elCleanup.removeAttribute('inputmode')
+        else elCleanup.setAttribute('inputmode', prevInputmode)
+
+        if (prevKbManaged === null) elCleanup.removeAttribute(ATTR_VYSION_KB_MANAGED)
+        else elCleanup.setAttribute(ATTR_VYSION_KB_MANAGED, prevKbManaged)
       } catch {
         /* noop */
       }
@@ -347,6 +375,7 @@ export function WebAzertyKeyboard() {
         className="col-span-3 bg-red-900/85 text-white"
         onClick={() => {
           if (!target?.isConnected) return
+          focusInputForProgrammaticEdit(target)
           try {
             setNativeInputValue(target, '')
           } catch {
@@ -363,6 +392,7 @@ export function WebAzertyKeyboard() {
         className="col-span-3 bg-[#3C4D6B]"
         onClick={() => {
           if (!target?.isConnected) return
+          focusInputForProgrammaticEdit(target)
           submitClosestForm(target)
         }}
       />
@@ -442,7 +472,10 @@ export function WebAzertyKeyboard() {
             className={`h-11 min-h-[44px] w-[4.0625rem] shrink-0 border-zinc-900 bg-[#585c66] text-lg font-bold leading-none max-[380px]:h-10 max-[380px]:min-h-[40px] max-[380px]:w-[3.5rem] ${
               caps ? 'ring-2 ring-amber-400 ring-offset-2 ring-offset-[#151a21]' : ''
             }`}
-            onClick={() => setCaps((c) => !c)}
+            onClick={() => {
+              if (target?.isConnected) focusInputForProgrammaticEdit(target)
+              setCaps((c) => !c)
+            }}
           />
           {(['@', '-', '/', '€'] as const).map((s) => (
             <KeyBtn key={s} label={s} className={SYMBOL_KEY} onClick={() => onChar(s)} />
@@ -462,6 +495,7 @@ export function WebAzertyKeyboard() {
             className="h-11 min-h-[44px] w-[min(6.75rem,calc((100vw-52px)*0.34))] shrink-0 border-[#324160] bg-[#3f5380] px-3 text-[15px] font-semibold max-[380px]:h-10 max-[380px]:min-h-[40px]"
             onClick={() => {
               if (!target?.isConnected) return
+              focusInputForProgrammaticEdit(target)
               if (target instanceof HTMLTextAreaElement) insertSnippet(target, '\n')
               else submitClosestForm(target)
             }}
@@ -484,6 +518,7 @@ export function WebAzertyKeyboard() {
         <button
           type="button"
           tabIndex={-1}
+          onPointerDown={(e) => e.preventDefault()}
           onMouseDown={(e) => e.preventDefault()}
           onClick={closePanel}
           className="min-h-[40px] rounded-lg bg-zinc-800 px-3 text-sm font-bold text-white active:bg-zinc-950 touch-manipulation"
