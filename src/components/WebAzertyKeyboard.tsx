@@ -123,7 +123,8 @@ function insertSnippet(el: HTMLInputElement | HTMLTextAreaElement, snippet: stri
 
 function backspace(el: HTMLInputElement | HTMLTextAreaElement): void {
   focusInputForProgrammaticEdit(el)
-  const start = el.selectionStart ?? 0
+  /** Bij null (sommige kiosk-browsers ná touch) invoegen net als insertSnippet: caret op einde tekst */
+  const start = el.selectionStart ?? el.value.length
   const end = el.selectionEnd ?? start
   const val = el.value
 
@@ -182,8 +183,12 @@ type KeyBtnProps = {
 }
 
 function KeyBtn({ label, onClick, className = '', 'aria-label': ariaLabel, title }: KeyBtnProps) {
-  /** Touch: sommige kiosks geven géén betrouwbare click na touchend; desktop: voorkom dubbele fire. */
+  /** Touch via pointerevents; muisklik apart — géén dubbele touchEnd+pointerUp vuur */
   const touchConsumedRef = useRef(false)
+
+  const run = () => {
+    onClick()
+  }
 
   return (
     <button
@@ -192,25 +197,27 @@ function KeyBtn({ label, onClick, className = '', 'aria-label': ariaLabel, title
       title={title}
       aria-label={ariaLabel}
       onPointerDown={(e) => {
+        if (e.pointerType !== 'touch' && e.pointerType !== 'pen') return
         e.preventDefault()
       }}
-      onMouseDown={(e) => {
-        e.preventDefault()
-      }}
-      onTouchEnd={(e) => {
+      onPointerUp={(e) => {
+        if (e.pointerType !== 'touch' && e.pointerType !== 'pen') return
         e.preventDefault()
         touchConsumedRef.current = true
-        onClick()
+        run()
         window.setTimeout(() => {
           touchConsumedRef.current = false
         }, 500)
       }}
+      onMouseDown={(e) => {
+        e.preventDefault()
+      }}
       onClick={(e) => {
         e.preventDefault()
         if (touchConsumedRef.current) return
-        onClick()
+        run()
       }}
-      className={`min-h-[44px] shrink-0 select-none rounded-[5px] border border-black/35 bg-[#474a54] px-1 text-base font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] touch-manipulation active:bg-[#2f323b] active:brightness-105 ${className}`.trim()}
+      className={`min-h-[40px] min-w-[44px] shrink-0 select-none rounded-[5px] border border-black/35 bg-[#474a54] px-1 text-base font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] touch-manipulation active:bg-[#2f323b] active:brightness-105 ${className}`.trim()}
     >
       {label}
     </button>
@@ -300,7 +307,8 @@ export function WebAzertyKeyboard() {
     if (!target) return
     requestAnimationFrame(() => {
       try {
-        target.scrollIntoView({ block: 'center', behavior: 'smooth' })
+        /** nearest + auto = minder “springen” waardoor het veld niet eindeloos tegen het blok duwt */
+        target.scrollIntoView({ block: 'nearest', behavior: 'auto' })
       } catch {
         /* noop */
       }
@@ -356,7 +364,7 @@ export function WebAzertyKeyboard() {
   const DIGITS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
 
   const numericGrid = (
-    <div className="mx-auto grid max-w-xl grid-cols-12 gap-1.5 px-2 pb-3">
+    <div className="mx-auto grid max-w-[min(52rem,calc(100vw-24px))] grid-cols-12 gap-x-2 gap-y-2 px-3 pb-2 pt-1">
       {(['7', '8', '9'] as const).map((d) => (
         <KeyBtn key={d} label={d} className="col-span-3" onClick={() => onChar(d)} />
       ))}
@@ -407,25 +415,31 @@ export function WebAzertyKeyboard() {
       )}
     </div>
   )
+  /** Bredere rijen die meeschalen met schermbreedte; vaste maar niet te hoge tikhoogte. */
+  const rowWrap = 'mx-auto flex w-full max-w-[min(92rem,calc(100vw-16px))] justify-center gap-1.5 px-2'
 
-  /** Vaste kerneenheid zodat ingesprongen rijen lijken op een fysiek AZERTY-toetsenbord. */
   const letterKeyCls =
-    'h-11 min-h-[44px] w-[2.4375rem] min-w-[2.4375rem] px-0 text-[17px] font-normal tracking-tight max-[380px]:h-10 max-[380px]:min-h-[40px] max-[380px]:w-[2rem] max-[380px]:min-w-[2rem] max-[380px]:text-[16px]'
+    'h-10 min-h-[40px] flex-[1_1_0] min-w-[2.75rem] max-sm:min-w-[2.5rem] px-0 py-0 text-[17px] font-normal tracking-tight sm:text-[18px]'
 
-  const SYMBOL_KEY =
-    'h-11 min-h-[44px] w-[2rem] min-w-[2rem] px-0 text-[16px] max-[380px]:h-10 max-[380px]:min-h-[40px] max-[380px]:w-[1.75rem] max-[380px]:min-w-[1.75rem]'
+  const SYMBOL_KEY_COMPACT =
+    'h-10 min-h-[40px] w-10 shrink-0 px-0 text-[17px] sm:w-11 sm:text-[18px]'
 
   const letterBlock = (
-    <div className="mx-auto w-full max-w-lg select-none pb-2 sm:max-w-[min(100%,36rem)]">
-      <div className="flex justify-center gap-[5px] px-2 pt-1">
+    <div className="mx-auto w-full select-none pb-1.5">
+      <div className={`${rowWrap} pt-0.5`}>
         {DIGITS.map((d) => (
-          <KeyBtn key={d} label={d} className="h-10 min-h-10 w-9 px-0 text-[15px]" onClick={() => onChar(d)} />
+          <KeyBtn
+            key={d}
+            label={d}
+            className="h-10 min-h-[40px] flex-[1_1_0] min-w-10 max-sm:min-w-9 px-0 text-[16px] sm:text-[17px]"
+            onClick={() => onChar(d)}
+          />
         ))}
       </div>
 
-      {/* AZERTY-letters in trapsgewijze rijen (zoals gebruikelijk op touchscreen-keyboards). */}
-      <div className="mt-2 space-y-1.5 px-2">
-        <div className="flex justify-center gap-[5px]">
+      {/* AZERTY met trapjes; elk teken wordt breder op brede schermen */}
+      <div className="mt-1 space-y-1">
+        <div className={`${rowWrap}`}>
           {ROW1.map((chr) => (
             <KeyBtn
               key={chr}
@@ -435,7 +449,7 @@ export function WebAzertyKeyboard() {
             />
           ))}
         </div>
-        <div className="flex justify-center gap-[5px] pl-7 sm:pl-9 md:pl-10">
+        <div className={`${rowWrap} pl-8 sm:pl-10 md:pl-12`}>
           {ROW2.map((chr) => (
             <KeyBtn
               key={chr}
@@ -445,7 +459,7 @@ export function WebAzertyKeyboard() {
             />
           ))}
         </div>
-        <div className="flex items-center justify-center gap-[5px] pl-[1.6875rem] sm:pl-10 md:pl-[3.125rem]">
+        <div className={`${rowWrap} pl-6 sm:pl-10 md:pl-[3.25rem]`}>
           {ROW3.map((chr) => (
             <KeyBtn
               key={chr}
@@ -456,21 +470,21 @@ export function WebAzertyKeyboard() {
           ))}
           <KeyBtn
             label="⌫"
-            className="h-11 min-h-[44px] w-[5rem] shrink-0 border-amber-950/70 bg-[#5f3b28] text-lg"
+            className="h-10 min-h-[40px] shrink-0 border-amber-950/70 bg-[#5f3b28] px-3 text-lg sm:min-w-[4.75rem]"
             onClick={() => {
               if (target?.isConnected) backspace(target)
             }}
           />
         </div>
 
-        {/* Onder twee rijen zoals veel OS-touchkeyboards: interpunctie; daarna spatiel + enter. */}
-        <div className="flex flex-wrap items-center justify-center gap-[5px] px-1">
+        {/* Eén onderrij: shift, tekens, spatiel met harde breedte-floor, enter — spaart hoogte t.o.v. twee rijen */}
+        <div className="mx-auto flex max-w-none min-w-full flex-nowrap justify-start gap-1.5 overflow-x-auto pb-1 px-2 sm:justify-center sm:overflow-x-visible [scrollbar-width:thin]">
           <KeyBtn
             label="⇧"
             aria-label={t('kassaApp.webKbCaps')}
             title={t('kassaApp.webKbCaps')}
-            className={`h-11 min-h-[44px] w-[4.0625rem] shrink-0 border-zinc-900 bg-[#585c66] text-lg font-bold leading-none max-[380px]:h-10 max-[380px]:min-h-[40px] max-[380px]:w-[3.5rem] ${
-              caps ? 'ring-2 ring-amber-400 ring-offset-2 ring-offset-[#151a21]' : ''
+            className={`h-10 min-h-[40px] shrink-0 border-zinc-900 bg-[#585c66] px-2 text-xl font-bold leading-none sm:min-w-[3.375rem] ${
+              caps ? 'ring-[3px] ring-amber-400 ring-offset-0 ring-offset-transparent' : ''
             }`}
             onClick={() => {
               if (target?.isConnected) focusInputForProgrammaticEdit(target)
@@ -478,21 +492,20 @@ export function WebAzertyKeyboard() {
             }}
           />
           {(['@', '-', '/', '€'] as const).map((s) => (
-            <KeyBtn key={s} label={s} className={SYMBOL_KEY} onClick={() => onChar(s)} />
+            <KeyBtn key={s} label={s} className={SYMBOL_KEY_COMPACT} onClick={() => onChar(s)} />
           ))}
-          <KeyBtn label="_" className={SYMBOL_KEY} onClick={() => onChar('_')} />
-          <KeyBtn label="." className={SYMBOL_KEY} onClick={() => onChar('.')} />
-          <KeyBtn label="," className={SYMBOL_KEY} onClick={() => onChar(',')} />
-        </div>
-        <div className="flex items-center gap-[5px] px-2 pt-1.5 pb-0.5 sm:mx-auto sm:max-w-[min(100%,28rem)]">
+          <KeyBtn label="_" className={SYMBOL_KEY_COMPACT} onClick={() => onChar('_')} />
+          <KeyBtn label="." className={SYMBOL_KEY_COMPACT} onClick={() => onChar('.')} />
+          <KeyBtn label="," className={SYMBOL_KEY_COMPACT} onClick={() => onChar(',')} />
+          {/* Geen flex-1 + min-w-0: daar klapte dit op 0 bij smalle wrappers — blokkeerde tikken */}
           <KeyBtn
             label={t('kassaApp.webKbSpace')}
-            className="h-11 min-h-[44px] min-w-0 flex-1 text-[15px] font-semibold tracking-wide sm:text-base"
+            className="h-10 min-h-[40px] max-sm:min-w-[7rem] min-w-[8.5rem] flex-1 basis-[clamp(10rem,36vw,24rem)] px-3 text-[15px] font-semibold tracking-wide sm:min-w-[9rem] sm:text-base"
             onClick={() => onChar(' ')}
           />
           <KeyBtn
             label={t('kassaApp.webKbEnter')}
-            className="h-11 min-h-[44px] w-[min(6.75rem,calc((100vw-52px)*0.34))] shrink-0 border-[#324160] bg-[#3f5380] px-3 text-[15px] font-semibold max-[380px]:h-10 max-[380px]:min-h-[40px]"
+            className="h-10 min-h-[40px] w-[min(6.5rem,calc((100vw-48px)*0.26))] shrink-0 border-[#324160] bg-[#3f5380] px-3 text-[15px] font-semibold"
             onClick={() => {
               if (!target?.isConnected) return
               focusInputForProgrammaticEdit(target)
@@ -509,25 +522,39 @@ export function WebAzertyKeyboard() {
     <div
       ref={panelRef}
       data-web-azerty-keyboard-panel
-      className="fixed inset-x-0 bottom-0 z-[600] border-t border-zinc-700 bg-[#151a21]/98 px-1 pb-[max(env(safe-area-inset-bottom),8px)] pt-2 shadow-[0_-8px_28px_rgba(0,0,0,.45)] backdrop-blur-sm"
+      className="fixed inset-x-0 bottom-0 z-[600] overflow-hidden border-t border-zinc-700 bg-[#151a21]/98 px-1 pb-[max(env(safe-area-inset-bottom),6px)] pt-1.5 shadow-[0_-8px_28px_rgba(0,0,0,.45)] backdrop-blur-sm"
       role="region"
       aria-label={t('kassaApp.webKbTitle')}
     >
-      <div className="mb-1 flex items-center justify-between gap-2 px-2">
-        <p className="truncate text-xs font-semibold text-zinc-300">{t('kassaApp.webKbTitle')}</p>
-        <button
-          type="button"
-          tabIndex={-1}
-          onPointerDown={(e) => e.preventDefault()}
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={closePanel}
-          className="min-h-[40px] rounded-lg bg-zinc-800 px-3 text-sm font-bold text-white active:bg-zinc-950 touch-manipulation"
-        >
-          {t('kassaApp.webKbClose')}
-        </button>
+      {/* Groot watermerk achter de toetsen — geen pointer-events */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center overflow-hidden"
+      >
+        <span className="-rotate-[8deg] select-none whitespace-nowrap py-2 text-[clamp(4rem,36vw,15rem)] font-black uppercase leading-none tracking-[0.42em] text-[#3C4D6B]/20 sm:text-[clamp(5.25rem,32vw,17.5rem)] md:text-[clamp(6rem,28vw,20rem)]">
+          VYSION
+        </span>
       </div>
 
-      {numericMode ? numericGrid : letterBlock}
+      <div className="relative z-[1]">
+        <div className="flex items-center justify-between gap-2 border-b border-zinc-800/80 px-2 py-1">
+          <p className="truncate text-[11px] font-semibold leading-tight text-zinc-400 sm:text-xs">
+            {t('kassaApp.webKbTitle')}
+          </p>
+          <button
+            type="button"
+            tabIndex={-1}
+            onPointerDown={(e) => e.preventDefault()}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={closePanel}
+            className="h-9 shrink-0 rounded-md bg-zinc-800 px-3 text-xs font-bold text-white touch-manipulation active:bg-zinc-950 sm:h-10 sm:text-sm"
+          >
+            {t('kassaApp.webKbClose')}
+          </button>
+        </div>
+
+        {numericMode ? numericGrid : letterBlock}
+      </div>
     </div>
   )
 }
