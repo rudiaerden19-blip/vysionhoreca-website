@@ -17,6 +17,7 @@ import {
   regenerateZReportForDate,
   getBelgiumDateString,
 } from '@/lib/admin-api'
+import { appIntlLocaleTag, formatKlantschermWaitingClock } from '@/lib/format-kassa-header-date'
 import { formatOrderScheduleDetail } from '@/lib/format-order-schedule'
 import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
@@ -840,15 +841,35 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   const formatTime = (dateString?: string) => {
     if (!dateString) return ''
     const date = new Date(dateString)
+    if (Number.isNaN(date.getTime())) return ''
     const now = new Date()
-    const diff = now.getTime() - date.getTime()
-    const minutes = Math.floor(diff / (1000 * 60))
-    
+    const diffMs = now.getTime() - date.getTime()
+
+    /** Zelfde pad als klantscherm: lokale systeem‑TZ via getHours/getMinutes (Intl‑uur edge cases mijden). */
+    const clockHm = (): string => formatKlantschermWaitingClock(date, locale)
+
+    const fullCalendarDateClock = (): string => {
+      const tag = appIntlLocaleTag(locale)
+      const datePart = new Intl.DateTimeFormat(tag, {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      }).format(date)
+      return `${datePart} ${clockHm()}`
+    }
+
+    if (diffMs < 0) return fullCalendarDateClock()
+
+    const minutes = Math.floor(diffMs / (1000 * 60))
+
     if (minutes < 1) return t('ordersPage.justNow')
     if (minutes < 60) return `${minutes} ${t('ordersPage.minutesAgo')}`
-    const hours = Math.floor(minutes / 60)
-    if (hours < 24) return `${hours}${t('ordersPage.hoursAgo')}`
-    return date.toLocaleDateString('nl-BE')
+
+    /** ≥60 min maar <24 uur: exacte plaatsingstijd (uu:mm), geen ruwe «5u». */
+    if (minutes < 24 * 60) return clockHm()
+
+    /** Lang geleden: datum + tijd */
+    return fullCalendarDateClock()
   }
 
   const filteredOrders = orders.filter(o => {
