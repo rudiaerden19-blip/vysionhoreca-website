@@ -171,18 +171,26 @@ function submitClosestForm(el: HTMLInputElement | HTMLTextAreaElement): void {
   }
 }
 
-type KeyBtnProps = { label: ReactNode; onClick: () => void; className?: string }
+type KeyBtnProps = {
+  label: ReactNode
+  onClick: () => void
+  className?: string
+  'aria-label'?: string
+  title?: string
+}
 
-function KeyBtn({ label, onClick, className = '' }: KeyBtnProps) {
+function KeyBtn({ label, onClick, className = '', 'aria-label': ariaLabel, title }: KeyBtnProps) {
   return (
     <button
       type="button"
       tabIndex={-1}
+      title={title}
+      aria-label={ariaLabel}
       onMouseDown={(e) => {
         e.preventDefault()
       }}
       onClick={onClick}
-      className={`min-h-[48px] select-none rounded-lg bg-zinc-800 px-1 text-lg font-bold text-white shadow-sm active:bg-zinc-950 active:brightness-110 touch-manipulation ${className}`.trim()}
+      className={`min-h-[44px] shrink-0 select-none rounded-[5px] border border-black/35 bg-[#474a54] px-1 text-base font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] touch-manipulation active:bg-[#2f323b] active:brightness-105 ${className}`.trim()}
     >
       {label}
     </button>
@@ -370,98 +378,97 @@ export function WebAzertyKeyboard() {
     </div>
   )
 
+  /** Vaste kerneenheid zodat ingesprongen rijen lijken op een fysiek AZERTY-toetsenbord. */
+  const letterKeyCls =
+    'h-11 min-h-[44px] w-[2.4375rem] min-w-[2.4375rem] px-0 text-[17px] font-normal tracking-tight max-[380px]:h-10 max-[380px]:min-h-[40px] max-[380px]:w-[2rem] max-[380px]:min-w-[2rem] max-[380px]:text-[16px]'
+
+  const SYMBOL_KEY =
+    'h-11 min-h-[44px] w-[2rem] min-w-[2rem] px-0 text-[16px] max-[380px]:h-10 max-[380px]:min-h-[40px] max-[380px]:w-[1.75rem] max-[380px]:min-w-[1.75rem]'
+
   const letterBlock = (
-    <>
-      <div className="mx-auto flex max-w-5xl gap-1 px-2 pb-1">
+    <div className="mx-auto w-full max-w-lg select-none pb-2 sm:max-w-[min(100%,36rem)]">
+      <div className="flex justify-center gap-[5px] px-2 pt-1">
         {DIGITS.map((d) => (
-          <KeyBtn key={d} label={d} className="min-w-0 flex-1 min-h-[44px] text-base" onClick={() => onChar(d)} />
+          <KeyBtn key={d} label={d} className="h-10 min-h-10 w-9 px-0 text-[15px]" onClick={() => onChar(d)} />
         ))}
       </div>
 
-      <div className="mx-auto max-w-5xl space-y-1 px-2">
-        <div className="grid grid-cols-10 gap-1">
+      {/* AZERTY-letters in trapsgewijze rijen (zoals gebruikelijk op touchscreen-keyboards). */}
+      <div className="mt-2 space-y-1.5 px-2">
+        <div className="flex justify-center gap-[5px]">
           {ROW1.map((chr) => (
             <KeyBtn
               key={chr}
               label={caps ? chr.toUpperCase() : chr}
-              className="min-h-[48px]"
+              className={letterKeyCls}
               onClick={() => onChar(chr)}
             />
           ))}
         </div>
-
-        <div className="grid grid-cols-10 gap-1">
+        <div className="flex justify-center gap-[5px] pl-7 sm:pl-9 md:pl-10">
           {ROW2.map((chr) => (
             <KeyBtn
               key={chr}
               label={caps ? chr.toUpperCase() : chr}
-              className="min-h-[48px]"
+              className={letterKeyCls}
               onClick={() => onChar(chr)}
             />
           ))}
         </div>
-
-        <div className="flex gap-1">
+        <div className="flex items-center justify-center gap-[5px] pl-[1.6875rem] sm:pl-10 md:pl-[3.125rem]">
           {ROW3.map((chr) => (
             <KeyBtn
               key={chr}
               label={caps ? chr.toUpperCase() : chr}
-              className="min-h-[48px] flex-1"
+              className={letterKeyCls}
               onClick={() => onChar(chr)}
             />
           ))}
           <KeyBtn
             label="⌫"
-            className="h-[48px] min-h-[48px] w-[112px] flex-none shrink-0 bg-amber-900/95"
+            className="h-11 min-h-[44px] w-[5rem] shrink-0 border-amber-950/70 bg-[#5f3b28] text-lg"
             onClick={() => {
               if (target?.isConnected) backspace(target)
             }}
           />
         </div>
 
-        <div className="grid grid-cols-12 gap-1">
+        {/* Onder twee rijen zoals veel OS-touchkeyboards: interpunctie; daarna spatiel + enter. */}
+        <div className="flex flex-wrap items-center justify-center gap-[5px] px-1">
           <KeyBtn
-            label={t('kassaApp.webKbCaps')}
-            className={`col-span-12 min-h-[48px] bg-zinc-700 ${caps ? 'ring-2 ring-amber-400' : ''}`}
+            label="⇧"
+            aria-label={t('kassaApp.webKbCaps')}
+            title={t('kassaApp.webKbCaps')}
+            className={`h-11 min-h-[44px] w-[4.0625rem] shrink-0 border-zinc-900 bg-[#585c66] text-lg font-bold leading-none max-[380px]:h-10 max-[380px]:min-h-[40px] max-[380px]:w-[3.5rem] ${
+              caps ? 'ring-2 ring-amber-400 ring-offset-2 ring-offset-[#151a21]' : ''
+            }`}
             onClick={() => setCaps((c) => !c)}
           />
+          {(['@', '-', '/', '€'] as const).map((s) => (
+            <KeyBtn key={s} label={s} className={SYMBOL_KEY} onClick={() => onChar(s)} />
+          ))}
+          <KeyBtn label="_" className={SYMBOL_KEY} onClick={() => onChar('_')} />
+          <KeyBtn label="." className={SYMBOL_KEY} onClick={() => onChar('.')} />
+          <KeyBtn label="," className={SYMBOL_KEY} onClick={() => onChar(',')} />
         </div>
-
-        <div className="grid grid-cols-12 gap-1 pb-2">
-          <div className="col-span-12 flex gap-1 sm:col-span-6">
-            {['@', '-', '_'].map((s) => (
-              <KeyBtn key={s} label={s} className="min-h-[48px] flex-1" onClick={() => onChar(s)} />
-            ))}
-          </div>
-          <div className="col-span-12 flex gap-1 sm:col-span-6">
-            {['/', '€'].map((s) => (
-              <KeyBtn key={s} label={s} className="min-h-[48px] flex-1" onClick={() => onChar(s)} />
-            ))}
-          </div>
-
+        <div className="flex items-center gap-[5px] px-2 pt-1.5 pb-0.5 sm:mx-auto sm:max-w-[min(100%,28rem)]">
           <KeyBtn
             label={t('kassaApp.webKbSpace')}
-            className="col-span-12 min-h-[52px] text-base md:col-span-7"
+            className="h-11 min-h-[44px] min-w-0 flex-1 text-[15px] font-semibold tracking-wide sm:text-base"
             onClick={() => onChar(' ')}
           />
-          <KeyBtn label="." className="col-span-6 min-h-[48px] md:col-span-2" onClick={() => onChar('.')} />
-          <KeyBtn label="," className="col-span-6 min-h-[48px] md:col-span-3" onClick={() => onChar(',')} />
-        </div>
-
-        <div className="grid grid-cols-2 gap-1 pb-2">
           <KeyBtn
             label={t('kassaApp.webKbEnter')}
-            className="min-h-[52px] bg-[#3C4D6B]"
+            className="h-11 min-h-[44px] w-[min(6.75rem,calc((100vw-52px)*0.34))] shrink-0 border-[#324160] bg-[#3f5380] px-3 text-[15px] font-semibold max-[380px]:h-10 max-[380px]:min-h-[40px]"
             onClick={() => {
               if (!target?.isConnected) return
               if (target instanceof HTMLTextAreaElement) insertSnippet(target, '\n')
               else submitClosestForm(target)
             }}
           />
-          <KeyBtn label={t('kassaApp.webKbClose')} className="min-h-[52px] bg-zinc-700" onClick={closePanel} />
         </div>
       </div>
-    </>
+    </div>
   )
 
   return (
