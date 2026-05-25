@@ -161,11 +161,11 @@ function scheduleAddToCartSound() {
   scheduleKassaTapSound(playAddToCart)
 }
 
-/** Kiosk/SXGA‑raster kolomtelling — matcht `kassaSxgaDenseTiles` Tailwind‑kolommen (row‑cap op tegelhoogte). */
+/** Kiosk/SXGA‑raster: smalle sidebar + vijf kolommen op `lg` — matcht Tailwind‑raster voor row‑cap. */
 function kassaMenuGridColumnCountSxgaViewport(vpWcss: number): number {
   if (!Number.isFinite(vpWcss) || vpWcss <= 0) return 2
-  if (vpWcss >= 1024) return 4
-  if (vpWcss >= 768) return 3
+  if (vpWcss >= 1024) return 5
+  if (vpWcss >= 768) return 4
   if (vpWcss >= 640) return 3
   return 2
 }
@@ -258,6 +258,13 @@ function shouldApplyKassaCompactSquareMonitorTileCap(): boolean {
 
   return ratioHit
 }
+
+/** Standaard numpadbalk (`w-80` / `sm:w-96` / `lg:w-[380px]`). */
+const KASSA_SIDEBAR_WIDTH_BASE_PX = 320
+const KASSA_SIDEBAR_WIDTH_SM_PX = 384
+const KASSA_SIDEBAR_WIDTH_LG_PX = 380
+/** Smaller alleen bij `shouldApplyKassaCompactSquareMonitorTileCap()` — meer ruimte voor 5 tegels breed. */
+const KASSA_SIDEBAR_WIDTH_SXGA_COMPACT_PX = 300
 
 /**
  * SXGA (~17″): rij gelijk aan **vierkante foto** (celbreedte) + lichte gap + titel — overige schermen ongemoeid.
@@ -1062,7 +1069,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const iw = Math.floor(
       vv?.width != null && vv.width > 0 ? vv.width : window.innerWidth,
     )
-    const sidebarPx = iw >= 1024 ? 380 : iw >= 640 ? 384 : 320
+    const kioskSxga = shouldApplyKassaCompactSquareMonitorTileCap()
+    const sidebarPx = kioskSxga
+      ? KASSA_SIDEBAR_WIDTH_SXGA_COMPACT_PX
+      : iw >= 1024
+        ? KASSA_SIDEBAR_WIDTH_LG_PX
+        : iw >= 640
+          ? KASSA_SIDEBAR_WIDTH_SM_PX
+          : KASSA_SIDEBAR_WIDTH_BASE_PX
     const horizontalPadGuess = 32
     return Math.max(200, iw - sidebarPx - horizontalPadGuess)
   }
@@ -1312,7 +1326,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       window.visualViewport?.removeEventListener?.('resize', onLayoutSignal)
       ro?.disconnect()
     }
-  }, [selectedCategory, menuLoading])
+  }, [selectedCategory, menuLoading, kassaSxgaDenseTiles])
 
   // Laad tafels + barkrukken + openstaande bestellingen (localStorage + Supabase sync)
 
@@ -4064,7 +4078,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   onPointerUp={handleCategoryGridPointerUp}
                   onPointerCancel={handleCategoryGridPointerCancel}
                   onClick={handleCategoryGridClick}
-                  className={`grid min-h-0 w-full grid-cols-2 gap-4 pb-8 touch-manipulation select-none ${kassaSxgaDenseTiles ? 'sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4' : 'sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'} [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start' : 'items-stretch'}`}
+                  className={`grid min-h-0 w-full grid-cols-2 gap-4 pb-8 touch-manipulation select-none ${kassaSxgaDenseTiles ? 'sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5' : 'sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'} [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start' : 'items-stretch'}`}
                   style={
                     kassaSxgaDenseTiles ?
                       { gridAutoRows: 'max-content' }
@@ -4100,7 +4114,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     onPointerUp={handleProductGridPointerUp}
                     onPointerCancel={handleProductGridPointerCancel}
                     onClick={handleProductGridClick}
-                    className={`grid min-h-0 w-full grid-cols-2 gap-4 pb-8 touch-manipulation select-none ${kassaSxgaDenseTiles ? 'sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4' : 'sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'} [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start' : 'items-stretch'}`}
+                    className={`grid min-h-0 w-full grid-cols-2 gap-4 pb-8 touch-manipulation select-none ${kassaSxgaDenseTiles ? 'sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5' : 'sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'} [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start' : 'items-stretch'}`}
                     style={
                       kassaSxgaDenseTiles ?
                         { gridAutoRows: 'max-content' }
@@ -4129,7 +4143,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
 
         {/* ── Rechts: numpad / cart ── */}
-        <div className={`w-80 sm:w-96 lg:w-[380px] flex flex-col flex-shrink-0 min-h-0 min-w-0 overflow-hidden ${ui.sidebarBg}`}>
+        <div className={`${kassaSxgaDenseTiles ? 'w-[300px]' : 'w-80 sm:w-96 lg:w-[380px]'} flex flex-col flex-shrink-0 min-h-0 min-w-0 overflow-hidden ${ui.sidebarBg}`}>
 
         {/* Dine-in: één rij — twee halve knoppen (Binnen / Terras). Geen aparte “Kies tafel…”. */}
         {orderType === 'DINE_IN' && (
