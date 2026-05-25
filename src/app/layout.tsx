@@ -8,6 +8,7 @@ import { PageViewTracker } from '@/components/PageViewTracker'
 import { PWARegister } from '@/components/PWARegister'
 import SectorChoiceGate from '@/components/SectorChoiceGate'
 import { OsTouchKeyboardAssist } from '@/components/OsTouchKeyboardAssist'
+import { WebAzertyKeyboard } from '@/components/WebAzertyKeyboard'
 import { TENANT_APP_SHELL_THEME_COLOR } from '@/lib/theme-color'
 const inter = Inter({ 
   subsets: ['latin'],
@@ -177,6 +178,7 @@ export default function RootLayout({
           <PWARegister />
           <GlobalAutoCapitalize />
           <OsTouchKeyboardAssist />
+          <WebAzertyKeyboard />
           <PageViewTracker />
           <SectorChoiceGate />
           {children}

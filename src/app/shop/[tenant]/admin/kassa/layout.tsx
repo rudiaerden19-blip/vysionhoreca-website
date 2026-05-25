@@ -2,7 +2,6 @@
  * Kassa moet altijd verse shell/fetch krijgen — voorkomt dat CDN/browser + SW
  * oude HTML tonen terwijl andere werkstations al de nieuwe bundle hebben.
  */
-import { KassaKeyboardShell } from '@/components/kassa/KassaKeyboardShell'
 import type { Viewport } from 'next'
 
 export const dynamic = 'force-dynamic'
@@ -17,5 +16,5 @@ export const viewport: Viewport = {
 }
 
 export default function AdminKassaLayout({ children }: { children: React.ReactNode }) {
-  return <KassaKeyboardShell>{children}</KassaKeyboardShell>
+  return children
 }

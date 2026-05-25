@@ -5,6 +5,7 @@ import type { ReactNode } from 'react'
 import { STAFF_PIN_MAX_LEN } from '@/components/staff-clock/StaffClockPinPortal'
 import { useLanguage } from '@/i18n'
 import { setNativeInputValue } from '@/lib/dom-input-value'
+import { usePathname } from 'next/navigation'
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 const IGNORE_TYPES = new Set([
@@ -25,28 +26,56 @@ const IGNORE_TYPES = new Set([
   'week',
 ])
 
-function isAdminKassaPath(): boolean {
+/**
+ * Zaak-shell + keuken + interne dashboards: altijd groot webtoetsenbord (kassa-/touch-pc stack).
+ * Publieke landingspagina’s: vooral bij touch-/tablet-pointer.
+ * Opslag: localStorage `vysion_web_kb_force` = 1 aan, `vysion_web_kb_off` = 1 uit.
+ */
+function shouldActivateWebKeyboard(pathname: string): boolean {
   if (typeof window === 'undefined') return false
-  const p = window.location.pathname.replace(/\/+$/, '')
-  return /^\/shop\/[^/]+\/admin\/kassa$/i.test(p)
+
+  try {
+    if (localStorage.getItem('vysion_web_kb_off') === '1') return false
+    if (localStorage.getItem('vysion_web_kb_force') === '1') return true
+  } catch {
+    /* noop */
+  }
+
+  const p = pathname || window.location.pathname
+
+  if (/^\/shop\/[^/]+\//i.test(p)) return true
+  if (/^\/keuken\//i.test(p)) return true
+  if (/^\/(?:superadmin|dashboard|registreer)\b/i.test(p)) return true
+
+  try {
+    if (window.matchMedia?.('(pointer: coarse)')?.matches) return true
+    if ('maxTouchPoints' in navigator && navigator.maxTouchPoints > 0) return true
+  } catch {
+    /* noop */
+  }
+
+  return false
 }
 
-function isEligibleField(el: EventTarget | null): el is HTMLInputElement | HTMLTextAreaElement {
+function isEligibleField(
+  el: EventTarget | null,
+  pathname: string,
+): el is HTMLInputElement | HTMLTextAreaElement {
   if (!el || !(el instanceof HTMLElement)) return false
   if (!(el instanceof HTMLInputElement) && !(el instanceof HTMLTextAreaElement)) return false
-  if (!isAdminKassaPath()) return false
+  if (!shouldActivateWebKeyboard(pathname)) return false
+
   if (el.readOnly || el.disabled) return false
-  if (el.closest('[data-kassa-no-web-keyboard]')) return false
+  if (el.closest('[data-no-web-touch-keyboard],[data-kassa-no-web-keyboard]'))
+    return false
 
   if (el instanceof HTMLTextAreaElement) return true
-
   if (IGNORE_TYPES.has(el.type)) return false
   return true
 }
 
 function isNumericMode(el: HTMLInputElement | HTMLTextAreaElement): boolean {
   if (el instanceof HTMLTextAreaElement) return false
-
   if (el.type === 'number') return true
 
   const im = (el.getAttribute('inputmode') || '').toLowerCase()
@@ -60,7 +89,6 @@ function isNumericMode(el: HTMLInputElement | HTMLTextAreaElement): boolean {
   return false
 }
 
-/** PIN: geen punt/komma; splits-betaling: wél decimals. */
 function numericAllowDecimal(el: HTMLInputElement | HTMLTextAreaElement): boolean {
   return el instanceof HTMLInputElement && el.type === 'number'
 }
@@ -87,7 +115,7 @@ function insertSnippet(el: HTMLInputElement | HTMLTextAreaElement, snippet: stri
     try {
       el.setSelectionRange(pos, pos)
     } catch {
-      /* number inputs / kiosk quirks */
+      /* noop */
     }
   })
 }
@@ -134,9 +162,7 @@ function submitClosestForm(el: HTMLInputElement | HTMLTextAreaElement): void {
   const form = el.closest('form')
   if (!(form instanceof HTMLFormElement)) return
   try {
-    if (typeof form.requestSubmit === 'function') {
-      form.requestSubmit()
-    }
+    if (typeof form.requestSubmit === 'function') form.requestSubmit()
   } catch {
     const btn = form.querySelector(
       'button[type="submit"]:not(:disabled)',
@@ -153,7 +179,6 @@ function KeyBtn({ label, onClick, className = '' }: KeyBtnProps) {
       type="button"
       tabIndex={-1}
       onMouseDown={(e) => {
-        /* voorkom blur op het invoerveld vóór onClick (Windows-touch / Edge kiosk) */
         e.preventDefault()
       }}
       onClick={onClick}
@@ -164,44 +189,45 @@ function KeyBtn({ label, onClick, className = '' }: KeyBtnProps) {
   )
 }
 
-/**
- * Groot vast web‑toetsenbord voor touchscreen‑kassa’s (Edge/Windows-bug klein OS‑keyboard omzeilen).
- * Alleen actief op `/shop/{tenant}/admin/kassa`.
- */
-export function KassaWebKeyboard() {
+export function WebAzertyKeyboard() {
+  const pathname = usePathname() || ''
   const { t } = useLanguage()
   const [target, setTarget] = useState<HTMLInputElement | HTMLTextAreaElement | null>(null)
   const [caps, setCaps] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
 
+  const kbOn = shouldActivateWebKeyboard(pathname)
+
+  useEffect(() => {
+    if (!kbOn) setTarget(null)
+  }, [kbOn])
+
   const numericMode = !!(target && isNumericMode(target))
   const decimalsOk = !!(target && numericAllowDecimal(target))
   const pinOnly = !!(target && target instanceof HTMLInputElement && target.type === 'password')
 
-  const handleFocusCapture = useCallback((ev: FocusEvent) => {
-    const tEl = ev.target
-    if (!isEligibleField(tEl)) return
-    setTarget(tEl)
-
-    setCaps(false)
-  }, [])
+  const handleFocusCapture = useCallback(
+    (ev: FocusEvent) => {
+      const tEl = ev.target
+      if (!isEligibleField(tEl, pathname)) return
+      setTarget(tEl)
+      setCaps(false)
+    },
+    [pathname],
+  )
 
   useEffect(() => {
     document.addEventListener('focusin', handleFocusCapture, true)
     return () => document.removeEventListener('focusin', handleFocusCapture, true)
   }, [handleFocusCapture])
 
-  /** Sluit als focus het invoerveld verlaat (geen ander kassa‑veld). */
   useEffect(() => {
     const onBlur = () => {
       queueMicrotask(() => {
         const active = document.activeElement
         if (active instanceof HTMLElement && panelRef.current?.contains(active)) return
         if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) {
-          if (isEligibleField(active)) {
-            /* ander tekst-/nummerveld: focus‑in zette al target bij */
-            return
-          }
+          if (isEligibleField(active, pathname)) return
         }
         setTarget(null)
       })
@@ -209,9 +235,8 @@ export function KassaWebKeyboard() {
 
     document.addEventListener('focusout', onBlur, true)
     return () => document.removeEventListener('focusout', onBlur, true)
-  }, [])
+  }, [pathname])
 
-  /** Hint `inputmode=none`: minder gedoe met het zwevende systeem‑keyboard waar browsers dat respecteren. */
   useLayoutEffect(() => {
     if (!target || !target.isConnected) return
 
@@ -235,7 +260,6 @@ export function KassaWebKeyboard() {
     }
   }, [target])
 
-  /** Houd invoer zichtbaar boven vast toetsenbord */
   useLayoutEffect(() => {
     if (!target) return
     requestAnimationFrame(() => {
@@ -261,7 +285,6 @@ export function KassaWebKeyboard() {
     (chRaw: string) => {
       if (!target || !target.isConnected) return
 
-      /** Één-letter caps-gedrag zoals klassieke shift */
       const applyCase = (c: string) => {
         if (numericMode || !caps) return c
         if (/[a-z]/.test(c)) return c.toUpperCase()
@@ -288,14 +311,14 @@ export function KassaWebKeyboard() {
     [target, numericMode, caps, decimalsOk],
   )
 
-  if (!target) return null
+  if (!kbOn || !target) return null
 
-  const ROW_Q = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p']
-  const ROW_A = ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l']
-  const ROW_Z = ['z', 'x', 'c', 'v', 'b', 'n', 'm']
+  /** Belgian AZERTY (PC-indeling voor BE). */
+  const ROW1 = ['a', 'z', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p']
+  const ROW2 = ['q', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm']
+  const ROW3 = ['w', 'x', 'c', 'v', 'b', 'n']
   const DIGITS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
 
-  /** Numeriek blok: 12-kolommen rooster */
   const numericGrid = (
     <div className="mx-auto grid max-w-xl grid-cols-12 gap-1.5 px-2 pb-3">
       {(['7', '8', '9'] as const).map((d) => (
@@ -357,7 +380,7 @@ export function KassaWebKeyboard() {
 
       <div className="mx-auto max-w-5xl space-y-1 px-2">
         <div className="grid grid-cols-10 gap-1">
-          {ROW_Q.map((chr) => (
+          {ROW1.map((chr) => (
             <KeyBtn
               key={chr}
               label={caps ? chr.toUpperCase() : chr}
@@ -367,18 +390,29 @@ export function KassaWebKeyboard() {
           ))}
         </div>
 
-        <div className="grid grid-cols-12 gap-1">
-          {ROW_A.map((chr) => (
+        <div className="grid grid-cols-10 gap-1">
+          {ROW2.map((chr) => (
             <KeyBtn
               key={chr}
               label={caps ? chr.toUpperCase() : chr}
-              className="col-span-1 min-h-[48px]"
+              className="min-h-[48px]"
+              onClick={() => onChar(chr)}
+            />
+          ))}
+        </div>
+
+        <div className="flex gap-1">
+          {ROW3.map((chr) => (
+            <KeyBtn
+              key={chr}
+              label={caps ? chr.toUpperCase() : chr}
+              className="min-h-[48px] flex-1"
               onClick={() => onChar(chr)}
             />
           ))}
           <KeyBtn
             label="⌫"
-            className="col-span-3 min-h-[48px] bg-amber-900/95"
+            className="h-[48px] min-h-[48px] w-[112px] flex-none shrink-0 bg-amber-900/95"
             onClick={() => {
               if (target?.isConnected) backspace(target)
             }}
@@ -386,32 +420,32 @@ export function KassaWebKeyboard() {
         </div>
 
         <div className="grid grid-cols-12 gap-1">
-          {ROW_Z.map((chr) => (
-            <KeyBtn
-              key={chr}
-              label={caps ? chr.toUpperCase() : chr}
-              className="col-span-1 min-h-[48px]"
-              onClick={() => onChar(chr)}
-            />
-          ))}
           <KeyBtn
             label={t('kassaApp.webKbCaps')}
-            className={`col-span-5 min-h-[48px] bg-zinc-700 ${caps ? 'ring-2 ring-amber-400' : ''}`}
+            className={`col-span-12 min-h-[48px] bg-zinc-700 ${caps ? 'ring-2 ring-amber-400' : ''}`}
             onClick={() => setCaps((c) => !c)}
           />
         </div>
 
-        <div className="grid grid-cols-12 gap-1 pt-0.5 pb-2">
-          {['-', '_', '@', '€'].map((s) => (
-            <KeyBtn key={s} label={s} className="col-span-3 min-h-[48px]" onClick={() => onChar(s)} />
-          ))}
+        <div className="grid grid-cols-12 gap-1 pb-2">
+          <div className="col-span-12 flex gap-1 sm:col-span-6">
+            {['@', '-', '_'].map((s) => (
+              <KeyBtn key={s} label={s} className="min-h-[48px] flex-1" onClick={() => onChar(s)} />
+            ))}
+          </div>
+          <div className="col-span-12 flex gap-1 sm:col-span-6">
+            {['/', '€'].map((s) => (
+              <KeyBtn key={s} label={s} className="min-h-[48px] flex-1" onClick={() => onChar(s)} />
+            ))}
+          </div>
+
           <KeyBtn
             label={t('kassaApp.webKbSpace')}
-            className="col-span-6 min-h-[52px] text-base"
+            className="col-span-12 min-h-[52px] text-base md:col-span-7"
             onClick={() => onChar(' ')}
           />
-          <KeyBtn label="." className="col-span-3 min-h-[48px]" onClick={() => onChar('.')} />
-          <KeyBtn label="," className="col-span-3 min-h-[48px]" onClick={() => onChar(',')} />
+          <KeyBtn label="." className="col-span-6 min-h-[48px] md:col-span-2" onClick={() => onChar('.')} />
+          <KeyBtn label="," className="col-span-6 min-h-[48px] md:col-span-3" onClick={() => onChar(',')} />
         </div>
 
         <div className="grid grid-cols-2 gap-1 pb-2">
@@ -424,11 +458,7 @@ export function KassaWebKeyboard() {
               else submitClosestForm(target)
             }}
           />
-          <KeyBtn
-            label={t('kassaApp.webKbClose')}
-            className="min-h-[52px] bg-zinc-700"
-            onClick={closePanel}
-          />
+          <KeyBtn label={t('kassaApp.webKbClose')} className="min-h-[52px] bg-zinc-700" onClick={closePanel} />
         </div>
       </div>
     </>
@@ -437,7 +467,7 @@ export function KassaWebKeyboard() {
   return (
     <div
       ref={panelRef}
-      data-kassa-web-keyboard-panel
+      data-web-azerty-keyboard-panel
       className="fixed inset-x-0 bottom-0 z-[600] border-t border-zinc-700 bg-[#151a21]/98 px-1 pb-[max(env(safe-area-inset-bottom),8px)] pt-2 shadow-[0_-8px_28px_rgba(0,0,0,.45)] backdrop-blur-sm"
       role="region"
       aria-label={t('kassaApp.webKbTitle')}
