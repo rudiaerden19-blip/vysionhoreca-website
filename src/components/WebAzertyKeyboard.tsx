@@ -217,7 +217,7 @@ function KeyBtn({ label, onClick, className = '', 'aria-label': ariaLabel, title
         if (touchConsumedRef.current) return
         run()
       }}
-      className={`min-h-[40px] min-w-[44px] shrink-0 select-none rounded-[5px] border border-black/35 bg-[#474a54] px-1 text-base font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] touch-manipulation active:bg-[#2f323b] active:brightness-105 ${className}`.trim()}
+      className={`min-h-[48px] min-w-[52px] shrink-0 select-none rounded-[6px] border border-black/35 bg-[#474a54] px-1.5 text-lg font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] touch-manipulation active:bg-[#2f323b] active:brightness-105 ${className}`.trim()}
     >
       {label}
     </button>
@@ -364,7 +364,7 @@ export function WebAzertyKeyboard() {
   const DIGITS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
 
   const numericGrid = (
-    <div className="mx-auto grid max-w-[min(52rem,calc(100vw-24px))] grid-cols-12 gap-x-2 gap-y-2 px-3 pb-2 pt-1">
+    <div className="mx-auto grid max-w-[min(52rem,calc(100vw-24px))] grid-cols-12 gap-x-2.5 gap-y-2.5 px-3 pb-2.5 pt-1.5">
       {(['7', '8', '9'] as const).map((d) => (
         <KeyBtn key={d} label={d} className="col-span-3" onClick={() => onChar(d)} />
       ))}
@@ -416,13 +416,13 @@ export function WebAzertyKeyboard() {
     </div>
   )
   /** Bredere rijen die meeschalen met schermbreedte; vaste maar niet te hoge tikhoogte. */
-  const rowWrap = 'mx-auto flex w-full max-w-[min(92rem,calc(100vw-16px))] justify-center gap-1.5 px-2'
+  const rowWrap = 'mx-auto flex w-full max-w-[min(92rem,calc(100vw-16px))] justify-center gap-2 px-2'
 
   const letterKeyCls =
-    'h-10 min-h-[40px] flex-[1_1_0] min-w-[2.75rem] max-sm:min-w-[2.5rem] px-0 py-0 text-[17px] font-normal tracking-tight sm:text-[18px]'
+    'h-12 min-h-[48px] flex-[1_1_0] min-w-[3.125rem] max-sm:min-w-[2.875rem] px-0 py-0 text-[18px] font-normal tracking-tight sm:text-[19px]'
 
   const SYMBOL_KEY_COMPACT =
-    'h-10 min-h-[40px] w-10 shrink-0 px-0 text-[17px] sm:w-11 sm:text-[18px]'
+    'h-12 min-h-[48px] w-[2.875rem] shrink-0 px-0 text-[18px] sm:w-12 sm:text-[19px]'
 
   const letterBlock = (
     <div className="mx-auto w-full select-none pb-1.5">
@@ -431,7 +431,7 @@ export function WebAzertyKeyboard() {
           <KeyBtn
             key={d}
             label={d}
-            className="h-10 min-h-[40px] flex-[1_1_0] min-w-10 max-sm:min-w-9 px-0 text-[16px] sm:text-[17px]"
+            className="h-12 min-h-[48px] flex-[1_1_0] min-w-[2.625rem] max-sm:min-w-10 px-0 text-[17px] sm:text-[18px]"
             onClick={() => onChar(d)}
           />
         ))}
@@ -470,7 +470,7 @@ export function WebAzertyKeyboard() {
           ))}
           <KeyBtn
             label="⌫"
-            className="h-10 min-h-[40px] shrink-0 border-amber-950/70 bg-[#5f3b28] px-3 text-lg sm:min-w-[4.75rem]"
+            className="h-12 min-h-[48px] shrink-0 border-amber-950/70 bg-[#5f3b28] px-4 text-xl sm:min-w-[5.25rem]"
             onClick={() => {
               if (target?.isConnected) backspace(target)
             }}
@@ -478,12 +478,12 @@ export function WebAzertyKeyboard() {
         </div>
 
         {/* Eén onderrij: shift, tekens, spatiel met harde breedte-floor, enter — spaart hoogte t.o.v. twee rijen */}
-        <div className="mx-auto flex max-w-none min-w-full flex-nowrap justify-start gap-1.5 overflow-x-auto pb-1 px-2 sm:justify-center sm:overflow-x-visible [scrollbar-width:thin]">
+        <div className="mx-auto flex w-full max-w-[min(92rem,calc(100vw-16px))] flex-nowrap justify-start gap-2 overflow-x-auto px-2 pb-1 sm:justify-center sm:overflow-x-visible [scrollbar-width:thin]">
           <KeyBtn
             label="⇧"
             aria-label={t('kassaApp.webKbCaps')}
             title={t('kassaApp.webKbCaps')}
-            className={`h-10 min-h-[40px] shrink-0 border-zinc-900 bg-[#585c66] px-2 text-xl font-bold leading-none sm:min-w-[3.375rem] ${
+            className={`h-12 min-h-[48px] shrink-0 border-zinc-900 bg-[#585c66] px-3 text-2xl font-bold leading-none sm:min-w-[3.75rem] ${
               caps ? 'ring-[3px] ring-amber-400 ring-offset-0 ring-offset-transparent' : ''
             }`}
             onClick={() => {
@@ -500,12 +500,12 @@ export function WebAzertyKeyboard() {
           {/* Geen flex-1 + min-w-0: daar klapte dit op 0 bij smalle wrappers — blokkeerde tikken */}
           <KeyBtn
             label={t('kassaApp.webKbSpace')}
-            className="h-10 min-h-[40px] max-sm:min-w-[7rem] min-w-[8.5rem] flex-1 basis-[clamp(10rem,36vw,24rem)] px-3 text-[15px] font-semibold tracking-wide sm:min-w-[9rem] sm:text-base"
+            className="h-12 min-h-[48px] max-sm:min-w-[8rem] min-w-[9.5rem] flex-1 basis-[clamp(11rem,38vw,26rem)] px-4 text-base font-semibold tracking-wide sm:min-w-[10.5rem] sm:text-lg"
             onClick={() => onChar(' ')}
           />
           <KeyBtn
             label={t('kassaApp.webKbEnter')}
-            className="h-10 min-h-[40px] w-[min(6.5rem,calc((100vw-48px)*0.26))] shrink-0 border-[#324160] bg-[#3f5380] px-3 text-[15px] font-semibold"
+            className="h-12 min-h-[48px] w-[min(7.25rem,calc((100vw-48px)*0.28))] shrink-0 border-[#324160] bg-[#3f5380] px-4 text-base font-semibold sm:text-[17px]"
             onClick={() => {
               if (!target?.isConnected) return
               focusInputForProgrammaticEdit(target)
@@ -522,39 +522,27 @@ export function WebAzertyKeyboard() {
     <div
       ref={panelRef}
       data-web-azerty-keyboard-panel
-      className="fixed inset-x-0 bottom-0 z-[600] overflow-hidden border-t border-zinc-700 bg-[#151a21]/98 px-1 pb-[max(env(safe-area-inset-bottom),6px)] pt-1.5 shadow-[0_-8px_28px_rgba(0,0,0,.45)] backdrop-blur-sm"
+      className="fixed inset-x-0 bottom-0 z-[600] border-t border-zinc-700 bg-[#151a21]/98 px-1 pb-[max(env(safe-area-inset-bottom),6px)] pt-1.5 shadow-[0_-8px_28px_rgba(0,0,0,.45)] backdrop-blur-sm"
       role="region"
       aria-label={t('kassaApp.webKbTitle')}
     >
-      {/* Groot watermerk achter de toetsen — geen pointer-events */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center overflow-hidden"
-      >
-        <span className="-rotate-[8deg] select-none whitespace-nowrap py-2 text-[clamp(4rem,36vw,15rem)] font-black uppercase leading-none tracking-[0.42em] text-[#3C4D6B]/20 sm:text-[clamp(5.25rem,32vw,17.5rem)] md:text-[clamp(6rem,28vw,20rem)]">
-          VYSION
-        </span>
+      <div className="flex items-center justify-between gap-2 border-b border-zinc-800/80 px-2 py-1">
+        <p className="truncate text-[11px] font-semibold leading-tight text-zinc-400 sm:text-xs">
+          {t('kassaApp.webKbTitle')}
+        </p>
+        <button
+          type="button"
+          tabIndex={-1}
+          onPointerDown={(e) => e.preventDefault()}
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={closePanel}
+          className="h-9 shrink-0 rounded-md bg-zinc-800 px-3 text-xs font-bold text-white touch-manipulation active:bg-zinc-950 sm:h-10 sm:text-sm"
+        >
+          {t('kassaApp.webKbClose')}
+        </button>
       </div>
 
-      <div className="relative z-[1]">
-        <div className="flex items-center justify-between gap-2 border-b border-zinc-800/80 px-2 py-1">
-          <p className="truncate text-[11px] font-semibold leading-tight text-zinc-400 sm:text-xs">
-            {t('kassaApp.webKbTitle')}
-          </p>
-          <button
-            type="button"
-            tabIndex={-1}
-            onPointerDown={(e) => e.preventDefault()}
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={closePanel}
-            className="h-9 shrink-0 rounded-md bg-zinc-800 px-3 text-xs font-bold text-white touch-manipulation active:bg-zinc-950 sm:h-10 sm:text-sm"
-          >
-            {t('kassaApp.webKbClose')}
-          </button>
-        </div>
-
-        {numericMode ? numericGrid : letterBlock}
-      </div>
+      {numericMode ? numericGrid : letterBlock}
     </div>
   )
 }
