@@ -3356,6 +3356,7 @@
     "webKbClear": "Borrar",
     "webKbDotComHint": "Insertar .com",
     "webKbLayoutGroupAria": "Distribución del teclado",
+    "webKbPinTitle": "PIN / números",
     "pushNewOrderBody": "¡Pedido n.º{orderNumber} recibido!",
     "pushNewReservationBody": "Ha llegado una nueva reserva.",
     "pushNewOrderTitle": "🔔 ¡NUEVO PEDIDO!",

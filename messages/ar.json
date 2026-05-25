@@ -3356,6 +3356,7 @@
     "webKbClear": "مسح",
     "webKbDotComHint": "إدراج .com",
     "webKbLayoutGroupAria": "تخطيط لوحة المفاتيح",
+    "webKbPinTitle": "رمز PIN",
     "pushNewOrderBody": "وصل الطلب رقم {orderNumber}!",
     "pushNewReservationBody": "وصل حجز جديد.",
     "pushNewOrderTitle": "🔔 طلب جديد!",

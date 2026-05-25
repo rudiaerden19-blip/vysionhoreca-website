@@ -2856,6 +2856,7 @@
     "webKbClear": "Effacer",
     "webKbDotComHint": "Insérer .com",
     "webKbLayoutGroupAria": "Disposition du clavier",
+    "webKbPinTitle": "PIN / chiffres",
     "pushNewOrderBody": "Commande n°{orderNumber} reçue !",
     "pushNewReservationBody": "Une nouvelle réservation est arrivée.",
     "pushNewOrderTitle": "🔔 NOUVELLE COMMANDE !",

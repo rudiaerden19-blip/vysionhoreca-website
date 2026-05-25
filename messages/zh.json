@@ -3356,6 +3356,7 @@
     "webKbClear": "清除",
     "webKbDotComHint": "插入 .com",
     "webKbLayoutGroupAria": "键盘布局",
+    "webKbPinTitle": "PIN（数字）",
     "pushNewOrderBody": "订单 #{orderNumber} 已到达！",
     "pushNewReservationBody": "有新的预订。",
     "pushNewOrderTitle": "🔔 新订单！",

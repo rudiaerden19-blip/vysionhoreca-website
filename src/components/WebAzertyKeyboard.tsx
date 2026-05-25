@@ -111,6 +111,56 @@ function isNumericMode(el: HTMLInputElement | HTMLTextAreaElement): boolean {
   return false
 }
 
+/** id/name/autocomplete → losse tokens (camelCase, streepjes) voor “pin”-detectie zonder “pricing”-false positives. */
+function normalizeFieldTokens(s: string): string {
+  return s
+    .replace(/[_-]+/g, ' ')
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+}
+
+function hintsPinNaming(el: HTMLInputElement): boolean {
+  const id = normalizeFieldTokens(el.id || '')
+  const name = normalizeFieldTokens(el.name || '')
+  const ac = `${el.autocomplete ?? ''} ${el.getAttribute('autocomplete') ?? ''}`
+  const blob = `${id} ${name} ${ac}`.toLowerCase()
+  return /\b(pin|pincode|passcode|otp)\b/.test(blob) || /\bone-time-code\b/i.test(ac)
+}
+
+function isDigitOriented(el: HTMLInputElement): boolean {
+  if (el.type === 'number' || el.type === 'tel') return true
+  const im = (el.getAttribute('inputmode') || '').toLowerCase()
+  if (im === 'numeric' || im === 'decimal') return true
+  return false
+}
+
+/**
+ * Compact PINATM-numpad: korte wachtwoordvelden, expliciete data-attribuut,
+ * OTP, of velden met pin/pincode in id|name + cijferachtig type/modus.
+ * `data-web-kb-pin="1"` op <input> of ancestor forceert compact numpad.
+ */
+function isCompactPinField(el: HTMLInputElement | HTMLTextAreaElement): boolean {
+  if (!(el instanceof HTMLInputElement)) return false
+
+  try {
+    if (el.closest('[data-web-kb-pin="1"]')) return true
+  } catch {
+    /* noop */
+  }
+
+  const ac = el.autocomplete ?? el.getAttribute('autocomplete') ?? ''
+  if (/\bone-time-code\b/i.test(ac)) return true
+
+  const ml = typeof el.maxLength === 'number' ? el.maxLength : 0
+
+  if (el.type === 'password') {
+    if (ml > 0 && ml <= STAFF_PIN_MAX_LEN) return true
+    return hintsPinNaming(el)
+  }
+
+  if (!hintsPinNaming(el)) return false
+  return isDigitOriented(el)
+}
+
 function numericAllowDecimal(el: HTMLInputElement | HTMLTextAreaElement): boolean {
   return el instanceof HTMLInputElement && el.type === 'number'
 }
@@ -264,8 +314,10 @@ export function WebAzertyKeyboard() {
     if (!kbOn) setTarget(null)
   }, [kbOn])
 
-  const numericMode = !!(target && isNumericMode(target))
-  const decimalsOk = !!(target && numericAllowDecimal(target))
+  const legacyNumericMode = !!(target && isNumericMode(target))
+  const pinCompactMode = !!(target && isCompactPinField(target))
+  const effectiveNumericKeyboard = legacyNumericMode || pinCompactMode
+  const decimalsOk = !!(target && numericAllowDecimal(target) && !pinCompactMode)
   const pinOnly = !!(target && target instanceof HTMLInputElement && target.type === 'password')
 
   const handleFocusCapture = useCallback(
@@ -340,7 +392,7 @@ export function WebAzertyKeyboard() {
         /* noop */
       }
     })
-  }, [target, numericMode])
+  }, [target, legacyNumericMode, pinCompactMode])
 
   const closePanel = () => {
     try {
@@ -356,23 +408,23 @@ export function WebAzertyKeyboard() {
     (chRaw: string) => {
       if (!target || !target.isConnected) return
 
-      /** Snelle invoer (.com, …) buiten caps/numeriek */
-      if (!numericMode && chRaw.length > 1) {
+      /** Snelle invoer (.com, …) buiten numeriek-/PIN-blok */
+      if (!effectiveNumericKeyboard && chRaw.length > 1) {
         insertSnippet(target, chRaw)
         return
       }
 
       const applyCase = (c: string) => {
-        if (numericMode || !caps) return c
+        if (effectiveNumericKeyboard || !caps) return c
         if (/[a-z]/.test(c)) return c.toUpperCase()
         return c
       }
 
-      if (!numericMode && caps && /[a-zA-Za-ž¿-ÿ]/.test(chRaw)) {
+      if (!effectiveNumericKeyboard && caps && /[a-zA-Za-ž¿-ÿ]/.test(chRaw)) {
         queueMicrotask(() => setCaps(false))
       }
 
-      if (numericMode) {
+      if (effectiveNumericKeyboard) {
         if (chRaw === '.' || chRaw === ',') {
           if (!decimalsOk) return
           insertSnippet(target, '.')
@@ -385,7 +437,7 @@ export function WebAzertyKeyboard() {
 
       insertSnippet(target, applyCase(chRaw))
     },
-    [target, numericMode, caps, decimalsOk],
+    [target, effectiveNumericKeyboard, caps, decimalsOk],
   )
 
   if (!kbOn || !target) return null
@@ -467,6 +519,62 @@ export function WebAzertyKeyboard() {
       )}
     </div>
   )
+
+  /** Compact ATM-stijl (PIN / OTP): minder breed en lager dan het grote numeriek rooster */
+  const pinKeyCls =
+    '!min-h-0 min-h-[44px] h-11 shrink-0 rounded-xl border border-black/35 bg-[#474a54] px-0 text-[22px] font-bold leading-none text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] touch-manipulation active:bg-[#2f323b]'
+
+  const pinCompactGrid = (
+    <div className="mx-auto w-full max-w-[300px] px-4 pb-3 pt-1 sm:max-w-[320px]">
+      {(
+        [
+          ['1', '2', '3'],
+          ['4', '5', '6'],
+          ['7', '8', '9'],
+        ] as const
+      ).map((row) => (
+        <div key={row.join('')} className="mb-2 grid grid-cols-3 gap-2">
+          {row.map((d) => (
+            <KeyBtn key={d} label={d} className={pinKeyCls} onClick={() => onChar(d)} />
+          ))}
+        </div>
+      ))}
+      <div className="grid grid-cols-3 gap-2">
+        <KeyBtn
+          label={t('kassaApp.webKbClear')}
+          className={`${pinKeyCls} border-red-950/55 bg-[#682828] text-sm font-semibold leading-tight sm:text-[15px]`}
+          onClick={() => {
+            if (!target?.isConnected) return
+            focusInputForProgrammaticEdit(target)
+            try {
+              setNativeInputValue(target, '')
+            } catch {
+              target.value = ''
+              target.dispatchEvent(new Event('input', { bubbles: true }))
+            }
+          }}
+        />
+        <KeyBtn label="0" className={pinKeyCls} onClick={() => onChar('0')} />
+        <KeyBtn
+          label="⌫"
+          className={`${pinKeyCls} border-amber-950/65 bg-[#5f3b28] text-xl`}
+          onClick={() => {
+            if (target?.isConnected) backspace(target)
+          }}
+        />
+      </div>
+      <KeyBtn
+        label={t('kassaApp.webKbEnter')}
+        className="mt-2 !min-h-0 min-h-[46px] w-full shrink-0 rounded-xl border-[#324160] bg-[#3f5380] py-3 text-[15px] font-bold sm:text-[16px]"
+        onClick={() => {
+          if (!target?.isConnected) return
+          focusInputForProgrammaticEdit(target)
+          submitClosestForm(target)
+        }}
+      />
+    </div>
+  )
+
   /** Bredere rijen die meeschalen met schermbreedte; vaste maar niet te hoge tikhoogte. */
   const rowWrap = 'mx-auto flex w-full max-w-[min(92rem,calc(100vw-16px))] justify-center gap-2 px-2'
 
@@ -584,50 +692,62 @@ export function WebAzertyKeyboard() {
     <div
       ref={panelRef}
       data-web-touch-keyboard-panel
-      className="fixed inset-x-0 bottom-0 z-[600] border-t border-zinc-700 bg-[#151a21] px-1 pb-[max(env(safe-area-inset-bottom),6px)] pt-1.5 shadow-[0_-8px_28px_rgba(0,0,0,.45)]"
+      className={`fixed inset-x-0 bottom-0 z-[600] border-t border-zinc-700 bg-[#151a21] px-1 pb-[max(env(safe-area-inset-bottom),6px)] pt-1.5 shadow-[0_-8px_28px_rgba(0,0,0,.45)] ${
+        pinCompactMode ? 'rounded-t-2xl' : ''
+      }`}
       role="region"
-      aria-label={`${t('kassaApp.webKbTitle')} (${letterLayout.toUpperCase()})`}
+      aria-label={
+        pinCompactMode ? t('kassaApp.webKbPinTitle') : `${t('kassaApp.webKbTitle')} (${letterLayout.toUpperCase()})`
+      }
     >
-      <div className="flex items-center gap-2 border-b border-zinc-800/80 px-2 py-1">
-        <div
-          role="group"
-          aria-label={t('kassaApp.webKbLayoutGroupAria')}
-          className="flex shrink-0 divide-x divide-zinc-600 overflow-hidden rounded-md border border-zinc-600"
-        >
-          <button
-            type="button"
-            tabIndex={-1}
-            aria-pressed={letterLayout === 'azerty'}
-            onPointerDown={(e) => {
-              if (e.pointerType === 'touch' || e.pointerType === 'pen') e.preventDefault()
-            }}
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => chooseLayout('azerty')}
-            className={`h-9 min-w-[4.25rem] shrink-0 px-2 text-[11px] font-extrabold uppercase tracking-wide touch-manipulation active:brightness-110 sm:h-10 sm:min-w-[4.85rem] sm:text-xs ${
-              letterLayout === 'azerty' ? 'bg-[#3C4D6B] text-white' : 'bg-zinc-800 text-zinc-400'
-            }`}
-          >
-            AZERTY
-          </button>
-          <button
-            type="button"
-            tabIndex={-1}
-            aria-pressed={letterLayout === 'qwerty'}
-            onPointerDown={(e) => {
-              if (e.pointerType === 'touch' || e.pointerType === 'pen') e.preventDefault()
-            }}
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => chooseLayout('qwerty')}
-            className={`h-9 min-w-[4.25rem] shrink-0 px-2 text-[11px] font-extrabold uppercase tracking-wide touch-manipulation active:brightness-110 sm:h-10 sm:min-w-[4.85rem] sm:text-xs ${
-              letterLayout === 'qwerty' ? 'bg-[#3C4D6B] text-white' : 'bg-zinc-800 text-zinc-400'
-            }`}
-          >
-            QWERTY
-          </button>
-        </div>
-        <p className="min-w-0 flex-1 truncate text-center text-[11px] font-semibold leading-tight text-zinc-400 sm:text-xs">
-          {t('kassaApp.webKbTitle')}
-        </p>
+      <div className="flex w-full items-center gap-2 border-b border-zinc-800/80 px-2 py-1">
+        {pinCompactMode ? (
+          <p className="min-w-0 flex-1 truncate text-left text-[12px] font-semibold leading-tight text-zinc-200 sm:text-sm">
+            {t('kassaApp.webKbPinTitle')}
+          </p>
+        ) : (
+          <>
+            <div
+              role="group"
+              aria-label={t('kassaApp.webKbLayoutGroupAria')}
+              className="flex shrink-0 divide-x divide-zinc-600 overflow-hidden rounded-md border border-zinc-600"
+            >
+              <button
+                type="button"
+                tabIndex={-1}
+                aria-pressed={letterLayout === 'azerty'}
+                onPointerDown={(e) => {
+                  if (e.pointerType === 'touch' || e.pointerType === 'pen') e.preventDefault()
+                }}
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => chooseLayout('azerty')}
+                className={`h-9 min-w-[4.25rem] shrink-0 px-2 text-[11px] font-extrabold uppercase tracking-wide touch-manipulation active:brightness-110 sm:h-10 sm:min-w-[4.85rem] sm:text-xs ${
+                  letterLayout === 'azerty' ? 'bg-[#3C4D6B] text-white' : 'bg-zinc-800 text-zinc-400'
+                }`}
+              >
+                AZERTY
+              </button>
+              <button
+                type="button"
+                tabIndex={-1}
+                aria-pressed={letterLayout === 'qwerty'}
+                onPointerDown={(e) => {
+                  if (e.pointerType === 'touch' || e.pointerType === 'pen') e.preventDefault()
+                }}
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => chooseLayout('qwerty')}
+                className={`h-9 min-w-[4.25rem] shrink-0 px-2 text-[11px] font-extrabold uppercase tracking-wide touch-manipulation active:brightness-110 sm:h-10 sm:min-w-[4.85rem] sm:text-xs ${
+                  letterLayout === 'qwerty' ? 'bg-[#3C4D6B] text-white' : 'bg-zinc-800 text-zinc-400'
+                }`}
+              >
+                QWERTY
+              </button>
+            </div>
+            <p className="min-w-0 flex-1 truncate text-center text-[11px] font-semibold leading-tight text-zinc-400 sm:text-xs">
+              {t('kassaApp.webKbTitle')}
+            </p>
+          </>
+        )}
         <button
           type="button"
           tabIndex={-1}
@@ -640,7 +760,7 @@ export function WebAzertyKeyboard() {
         </button>
       </div>
 
-      {numericMode ? numericGrid : letterBlock}
+      {pinCompactMode ? pinCompactGrid : legacyNumericMode ? numericGrid : letterBlock}
     </div>
   )
 }

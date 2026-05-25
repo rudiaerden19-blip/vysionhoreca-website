@@ -108,6 +108,7 @@ export function StaffClockPinPortal({
             pattern="[0-9]*"
             enterKeyHint="done"
             name="staff-pin"
+            data-web-kb-pin="1"
             autoComplete="new-password"
             autoCapitalize="off"
             autoCorrect="off"

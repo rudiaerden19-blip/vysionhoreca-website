@@ -3356,6 +3356,7 @@
     "webKbClear": "クリア",
     "webKbDotComHint": ".comを入力",
     "webKbLayoutGroupAria": "キーボード配列",
+    "webKbPinTitle": "PIN（数字）",
     "pushNewOrderBody": "注文 #{orderNumber} が届きました！",
     "pushNewReservationBody": "新しい予約が届きました。",
     "pushNewOrderTitle": "🔔 新しい注文！",

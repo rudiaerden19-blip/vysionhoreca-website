@@ -2856,6 +2856,7 @@
     "webKbClear": "Löschen",
     "webKbDotComHint": ".com einfügen",
     "webKbLayoutGroupAria": "Tastaturbelegung",
+    "webKbPinTitle": "PIN / Ziffern",
     "pushNewOrderBody": "Bestellung #{orderNumber} ist eingegangen!",
     "pushNewReservationBody": "Eine neue Reservierung ist eingegangen.",
     "pushNewOrderTitle": "🔔 NEUE BESTELLUNG!",

@@ -3832,6 +3832,7 @@
     "webKbClear": "Clear",
     "webKbDotComHint": "Insert .com",
     "webKbLayoutGroupAria": "Keyboard layout",
+    "webKbPinTitle": "PIN / numbers",
     "pushNewOrderBody": "Order #{orderNumber} has arrived!",
     "pushNewReservationBody": "A new reservation has arrived.",
     "pushNewOrderTitle": "🔔 NEW ORDER!",
