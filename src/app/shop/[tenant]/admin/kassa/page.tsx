@@ -161,34 +161,13 @@ function scheduleAddToCartSound() {
   scheduleKassaTapSound(playAddToCart)
 }
 
-/** `grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5` plus op **`xl`**: 6 óf SXGA‑17″→5 kolommen (`kassaSxgaDenseTiles`). */
-function kassaMenuGridColumnCountForInnerWidth(innerGridWidthPx: number): number {
-  if (!Number.isFinite(innerGridWidthPx) || innerGridWidthPx <= 0) return 2
-  if (innerGridWidthPx >= 1280) return 6
-  if (innerGridWidthPx >= 1024) return 5
-  if (innerGridWidthPx >= 768) return 4
-  if (innerGridWidthPx >= 640) return 3
-  return 2
-}
-
-/**
- * Tailwind breakpoints voor menu‑grid gebruiken **`min-width` op viewport** (`sm`…`xl`).
- * `gridInnerWidthPx` daarvan afleiden (= scrollbar + zijbalk) gaf fout kolom‑aantal in caps en “andere” tegels.
- */
-function kassaMenuGridColumnCountForViewportCss(vpWcss: number): number {
+/** Kiosk/SXGA‑raster kolomtelling — matcht `kassaSxgaDenseTiles` Tailwind‑kolommen (row‑cap op tegelhoogte). */
+function kassaMenuGridColumnCountSxgaViewport(vpWcss: number): number {
   if (!Number.isFinite(vpWcss) || vpWcss <= 0) return 2
-  if (vpWcss >= 1280) return 6
-  if (vpWcss >= 1024) return 5
-  if (vpWcss >= 768) return 4
+  if (vpWcss >= 1024) return 4
+  if (vpWcss >= 768) return 3
   if (vpWcss >= 640) return 3
   return 2
-}
-
-/** SXGA ~17″: op **`xl`** iets bredere cel — **5** kolommen ipv 6 voor grotere tikvlakken. */
-function kassaMenuGridColumnCountSxgaViewport(vpWcss: number): number {
-  const base = kassaMenuGridColumnCountForViewportCss(vpWcss)
-  if (vpWcss >= 1280 && base === 6) return 5
-  return base
 }
 
 /** Ruimte titel onder fotobak (SXGA); strak maar leesbare 2‑regellijn. */
@@ -248,7 +227,8 @@ function shouldApplyKassaCompactSquareMonitorTileCap(): boolean {
   if (typeof window === 'undefined' || typeof navigator === 'undefined') return false
 
   const ua = navigator.userAgent
-  if (/\biPhone\b|\biPad\b|\biPod\b/.test(ua)) return false
+  // Alleen kleine phones uitsluiten; iPad-landscape kiosk mag dezelfde compacte tegels als Elo gebruiken.
+  if (/\biPhone\b|\biPod\b/.test(ua)) return false
   if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) return false
 
   const vv = window.visualViewport
@@ -488,6 +468,10 @@ const KASSA_MENU_TILE_PLACEHOLDER_WELL_SXGA =
 const KASSA_MENU_TILE_IMG_CLASS =
   'pointer-events-none absolute inset-0 box-border h-full w-full select-none object-contain object-center'
 
+/** Kiosk/SXGA: vult het vierkant gelijkmatig op (licht bijsnijden); minder verschil tussen bron‑aspect‑ratio’s. */
+const KASSA_MENU_TILE_IMG_CLASS_SXGA_COVER =
+  'pointer-events-none absolute inset-0 box-border h-full w-full select-none object-cover object-center'
+
 /** Vaste onderstrook: titel staat onder de afbeelding, niet in de foto. */
 const KASSA_MENU_TILE_LABEL_WRAP =
   'pointer-events-none shrink-0 w-full bg-white px-2 pb-2 pt-1.5 sm:px-3'
@@ -536,7 +520,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
               decoding="async"
               loading="eager"
               onError={kassaProductImageRetryOnError}
-              className={KASSA_MENU_TILE_IMG_CLASS}
+              className={sxgaDenseTileLayout ? KASSA_MENU_TILE_IMG_CLASS_SXGA_COVER : KASSA_MENU_TILE_IMG_CLASS}
             />
           </div>
           <div className={labelWrap}>
@@ -592,7 +576,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
               decoding="async"
               loading="eager"
               onError={kassaProductImageRetryOnError}
-              className={KASSA_MENU_TILE_IMG_CLASS}
+              className={sxgaDenseTileLayout ? KASSA_MENU_TILE_IMG_CLASS_SXGA_COVER : KASSA_MENU_TILE_IMG_CLASS}
             />
           </div>
           <div className={labelWrap}>
@@ -3851,7 +3835,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
 
         <div className="flex min-w-0 flex-1 items-center gap-1 sm:gap-1.5">
-        <div className="relative z-20 flex min-w-0 max-w-[6.5rem] shrink-0 flex-col justify-center px-0.5 sm:max-w-[8.5rem] md:max-w-[11rem] lg:max-w-[13rem] ml-[1cm]">
+        <div className="relative z-20 flex min-w-0 max-w-[6.5rem] shrink-0 flex-col justify-center px-0.5 sm:max-w-[8.5rem] md:max-w-[11rem] lg:max-w-[13rem] ml-2 2xl:ml-[1cm]">
           <button
             type="button"
             onClick={() => {
@@ -3867,7 +3851,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           </button>
         </div>
 
-        {/* Snelkoppelingen: geen extra ml hier — tenant heeft ml-[1cm], zo blijven deze knoppen op dezelfde horizontale positie */}
+        {/* Snelkoppelingen: geen extra ml — onder 2xl kortere tekstlabels (alleen icons) zodat 17″/iPad‑breedtes niet botsen */}
         <div className="relative z-20 flex min-h-0 min-w-0 flex-1 items-center">
           <nav
             aria-label={t('kassaApp.quickLinksAria')}
@@ -3883,10 +3867,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 setShowReservations(true)
               }}
               title={t('kassaApp.navReservations')}
+              aria-label={t('kassaApp.navReservations')}
               className="relative inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-lg bg-[#3C4D6B] px-1.5 py-1 font-bold text-white transition-colors hover:bg-[#2D3A52] sm:gap-1 sm:px-2 sm:py-1.5"
             >
               <span className="text-sm leading-none sm:text-base" aria-hidden>📅</span>
-              <span className="text-[11px] leading-snug sm:text-xs">{t('kassaApp.navReservations')}</span>
+              <span className="hidden text-[11px] leading-snug sm:text-xs 2xl:inline">{t('kassaApp.navReservations')}</span>
               {pendingReservCount > 0 && (
                 <span className="absolute -right-1 -top-1.5 flex h-7 min-w-[26px] items-center justify-center rounded-full border-2 border-white bg-red-600 px-1.5 text-sm font-black text-white shadow-lg sm:-right-2 sm:-top-2">
                   {pendingReservCount}
@@ -3900,12 +3885,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               type="button"
               onClick={openKlantschermWindow}
               title={t('kassaApp.customerDisplayHint')}
+              aria-label={t('kassaApp.openCustomerDisplay')}
               className="relative inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-lg bg-[#3C4D6B] px-1.5 py-1 font-bold text-white transition-colors hover:bg-[#2D3A52] sm:gap-1 sm:px-2 sm:py-1.5"
             >
               <span className="text-sm leading-none sm:text-base" aria-hidden>
                 👤
               </span>
-              <span className="text-[11px] leading-snug sm:text-xs">{t('kassaApp.openCustomerDisplay')}</span>
+              <span className="hidden text-[11px] leading-snug sm:text-xs 2xl:inline">{t('kassaApp.openCustomerDisplay')}</span>
             </button>
           )}
 
@@ -3913,10 +3899,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <Link
               href={`/shop/${tenant}/display`}
               title={t('kassaApp.navShopDisplay')}
+              aria-label={t('kassaApp.navShopDisplay')}
               className="inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-lg bg-[#3C4D6B] px-1.5 py-1 font-bold text-white transition-colors hover:bg-[#2D3A52] sm:gap-1 sm:px-2 sm:py-1.5"
             >
               <span className="text-sm leading-none sm:text-base" aria-hidden>🖥️</span>
-              <span className="text-[11px] leading-snug sm:text-xs">{t('kassaApp.navShopDisplay')}</span>
+              <span className="hidden text-[11px] leading-snug sm:text-xs 2xl:inline">{t('kassaApp.navShopDisplay')}</span>
             </Link>
           )}
 
@@ -3924,10 +3911,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <Link
               href={`/keuken/${tenant}`}
               title={t('kassaApp.navKitchenDisplay')}
+              aria-label={t('kassaApp.navKitchenDisplay')}
               className="inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-lg bg-[#3C4D6B] px-1.5 py-1 font-bold text-white transition-colors hover:bg-[#2D3A52] sm:gap-1 sm:px-2 sm:py-1.5"
             >
               <span className="text-sm leading-none sm:text-base" aria-hidden>👨‍🍳</span>
-              <span className="text-[11px] leading-snug sm:text-xs">{t('kassaApp.navKitchenDisplay')}</span>
+              <span className="hidden text-[11px] leading-snug sm:text-xs 2xl:inline">{t('kassaApp.navKitchenDisplay')}</span>
             </Link>
           )}
 
@@ -3942,15 +3930,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
           {isOnline !== null && (
             <div
-              className={`inline-flex max-w-[5.5rem] shrink-0 items-center gap-0.5 rounded-md px-1.5 py-1 text-[10px] font-bold leading-tight sm:max-w-[7rem] sm:text-[11px] md:max-w-none md:text-xs ${
+              className={`inline-flex shrink-0 items-center gap-0.5 rounded-md px-1.5 py-1 text-[10px] font-bold leading-tight sm:text-[11px] md:text-xs ${
                 isOnline ? 'bg-[#3C4D6B] text-white' : 'bg-red-600/95 text-white'
               }`}
               title={isOnline ? t('kassaApp.onlineModeLiveTitle') : t('kassaApp.offlineModeActive')}
               role="status"
               aria-live="polite"
+              aria-label={isOnline ? t('kassaApp.onlineModeLive') : t('kassaApp.offlineModeActive')}
             >
               <span className="text-sm leading-none sm:text-base" aria-hidden>☁️</span>
-              <span className="truncate">{isOnline ? t('kassaApp.onlineModeLive') : t('kassaApp.offlineModeActive')}</span>
+              <span className="hidden max-w-[9rem] truncate 2xl:inline">
+                {isOnline ? t('kassaApp.onlineModeLive') : t('kassaApp.offlineModeActive')}
+              </span>
             </div>
           )}
 
@@ -3977,7 +3968,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             }
           >
             <span className="text-sm leading-none sm:text-base" aria-hidden>{kassaAppearanceDark ? '☀️' : '🌙'}</span>
-            <span className="text-[11px] leading-snug sm:text-xs">
+            <span className="hidden text-[11px] leading-snug sm:text-xs 2xl:inline">
               {kassaAppearanceDark ? t('adminLayout.kassaAppearanceLight') : t('adminLayout.kassaAppearanceDark')}
             </span>
           </button>
@@ -4011,10 +4002,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           type="button"
           onClick={() => setLogoutSoftwareConfirmOpen(true)}
           title={t('kassaApp.logout')}
+          aria-label={t('kassaApp.logout')}
           className="relative z-20 inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-lg bg-[#58CCFF] px-1.5 py-1 text-[11px] font-bold text-black transition-colors hover:bg-[#47c6fe] sm:gap-1 sm:px-2.5 sm:py-1.5 sm:text-sm"
         >
           <span className="text-sm sm:text-base" aria-hidden>🚪</span>
-          <span className="leading-snug">{t('kassaApp.logout')}</span>
+          <span className="hidden leading-snug 2xl:inline">{t('kassaApp.logout')}</span>
         </button>
         </div>
 
@@ -4085,7 +4077,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   onPointerUp={handleCategoryGridPointerUp}
                   onPointerCancel={handleCategoryGridPointerCancel}
                   onClick={handleCategoryGridClick}
-                  className={`grid min-h-0 w-full grid-cols-2 gap-4 pb-8 touch-manipulation select-none sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 ${kassaSxgaDenseTiles ? 'xl:grid-cols-5' : 'xl:grid-cols-6'} [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start' : 'items-stretch'}`}
+                  className={`grid min-h-0 w-full grid-cols-2 gap-4 pb-8 touch-manipulation select-none ${kassaSxgaDenseTiles ? 'sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4' : 'sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'} [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start' : 'items-stretch'}`}
                   style={
                     kassaSxgaDenseTiles ?
                       { gridAutoRows: 'max-content' }
@@ -4121,7 +4113,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     onPointerUp={handleProductGridPointerUp}
                     onPointerCancel={handleProductGridPointerCancel}
                     onClick={handleProductGridClick}
-                    className={`grid min-h-0 w-full grid-cols-2 gap-4 pb-8 touch-manipulation select-none sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 ${kassaSxgaDenseTiles ? 'xl:grid-cols-5' : 'xl:grid-cols-6'} [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start' : 'items-stretch'}`}
+                    className={`grid min-h-0 w-full grid-cols-2 gap-4 pb-8 touch-manipulation select-none ${kassaSxgaDenseTiles ? 'sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4' : 'sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'} [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start' : 'items-stretch'}`}
                     style={
                       kassaSxgaDenseTiles ?
                         { gridAutoRows: 'max-content' }
