@@ -26,6 +26,28 @@ const IGNORE_TYPES = new Set([
   'week',
 ])
 
+const STORAGE_KEYBOARD_LAYOUT = 'vysion_web_kb_layout'
+
+type KeyboardLetterLayout = 'azerty' | 'qwerty'
+
+function readStoredLetterLayout(): KeyboardLetterLayout {
+  if (typeof window === 'undefined') return 'azerty'
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEYBOARD_LAYOUT)
+    return raw === 'qwerty' ? 'qwerty' : 'azerty'
+  } catch {
+    return 'azerty'
+  }
+}
+
+function persistLetterLayout(layout: KeyboardLetterLayout) {
+  try {
+    window.localStorage.setItem(STORAGE_KEYBOARD_LAYOUT, layout)
+  } catch {
+    /* noop */
+  }
+}
+
 /**
  * Zaak-shell + keuken + interne dashboards: altijd groot webtoetsenbord (kassa-/touch-pc stack).
  * Publieke landingspagina’s: vooral bij touch-/tablet-pointer.
@@ -229,9 +251,14 @@ export function WebAzertyKeyboard() {
   const { t } = useLanguage()
   const [target, setTarget] = useState<HTMLInputElement | HTMLTextAreaElement | null>(null)
   const [caps, setCaps] = useState(false)
+  const [letterLayout, setLetterLayout] = useState<KeyboardLetterLayout>('azerty')
   const panelRef = useRef<HTMLDivElement>(null)
 
   const kbOn = shouldActivateWebKeyboard(pathname)
+
+  useEffect(() => {
+    setLetterLayout(readStoredLetterLayout())
+  }, [])
 
   useEffect(() => {
     if (!kbOn) setTarget(null)
@@ -363,10 +390,29 @@ export function WebAzertyKeyboard() {
 
   if (!kbOn || !target) return null
 
-  /** Belgian AZERTY (PC-indeling voor BE). */
-  const ROW1 = ['a', 'z', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p']
-  const ROW2 = ['q', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm']
-  const ROW3 = ['w', 'x', 'c', 'v', 'b', 'n']
+  /** AZERTY (BE PC) versus standaard QWERTY. */
+  const AZERTY_ROW1 = ['a', 'z', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p']
+  const AZERTY_ROW2 = ['q', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm']
+  const AZERTY_ROW3 = ['w', 'x', 'c', 'v', 'b', 'n']
+
+  const QWERTY_ROW1 = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p']
+  const QWERTY_ROW2 = ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l']
+  const QWERTY_ROW3 = ['z', 'x', 'c', 'v', 'b', 'n', 'm']
+
+  const ROW1 = letterLayout === 'azerty' ? AZERTY_ROW1 : QWERTY_ROW1
+  const ROW2 = letterLayout === 'azerty' ? AZERTY_ROW2 : QWERTY_ROW2
+  const ROW3 = letterLayout === 'azerty' ? AZERTY_ROW3 : QWERTY_ROW3
+
+  const rowPad2 =
+    letterLayout === 'azerty' ? 'pl-8 sm:pl-10 md:pl-12' : 'pl-10 sm:pl-14 md:pl-[3.75rem]'
+  const rowPad3 =
+    letterLayout === 'azerty' ? 'pl-6 sm:pl-10 md:pl-[3.25rem]' : 'pl-8 sm:pl-14 md:pl-[4.25rem]'
+
+  const chooseLayout = (L: KeyboardLetterLayout) => {
+    setLetterLayout(L)
+    persistLetterLayout(L)
+  }
+
   const DIGITS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
 
   const numericGrid = (
@@ -443,7 +489,7 @@ export function WebAzertyKeyboard() {
         ))}
       </div>
 
-      {/* AZERTY met trapjes; elk teken wordt breder op brede schermen */}
+      {/* Letterrijen (AZERTY of QWERTY) met trapjes */}
       <div className="mt-1 space-y-1">
         <div className={`${rowWrap}`}>
           {ROW1.map((chr) => (
@@ -455,7 +501,7 @@ export function WebAzertyKeyboard() {
             />
           ))}
         </div>
-        <div className={`${rowWrap} pl-8 sm:pl-10 md:pl-12`}>
+        <div className={`${rowWrap} ${rowPad2}`}>
           {ROW2.map((chr) => (
             <KeyBtn
               key={chr}
@@ -465,7 +511,7 @@ export function WebAzertyKeyboard() {
             />
           ))}
         </div>
-        <div className={`${rowWrap} pl-6 sm:pl-10 md:pl-[3.25rem]`}>
+        <div className={`${rowWrap} ${rowPad3}`}>
           {ROW3.map((chr) => (
             <KeyBtn
               key={chr}
@@ -537,13 +583,49 @@ export function WebAzertyKeyboard() {
   return (
     <div
       ref={panelRef}
-      data-web-azerty-keyboard-panel
+      data-web-touch-keyboard-panel
       className="fixed inset-x-0 bottom-0 z-[600] border-t border-zinc-700 bg-[#151a21] px-1 pb-[max(env(safe-area-inset-bottom),6px)] pt-1.5 shadow-[0_-8px_28px_rgba(0,0,0,.45)]"
       role="region"
-      aria-label={t('kassaApp.webKbTitle')}
+      aria-label={`${t('kassaApp.webKbTitle')} (${letterLayout.toUpperCase()})`}
     >
-      <div className="flex items-center justify-between gap-2 border-b border-zinc-800/80 px-2 py-1">
-        <p className="truncate text-[11px] font-semibold leading-tight text-zinc-400 sm:text-xs">
+      <div className="flex items-center gap-2 border-b border-zinc-800/80 px-2 py-1">
+        <div
+          role="group"
+          aria-label={t('kassaApp.webKbLayoutGroupAria')}
+          className="flex shrink-0 divide-x divide-zinc-600 overflow-hidden rounded-md border border-zinc-600"
+        >
+          <button
+            type="button"
+            tabIndex={-1}
+            aria-pressed={letterLayout === 'azerty'}
+            onPointerDown={(e) => {
+              if (e.pointerType === 'touch' || e.pointerType === 'pen') e.preventDefault()
+            }}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => chooseLayout('azerty')}
+            className={`h-9 min-w-[4.25rem] shrink-0 px-2 text-[11px] font-extrabold uppercase tracking-wide touch-manipulation active:brightness-110 sm:h-10 sm:min-w-[4.85rem] sm:text-xs ${
+              letterLayout === 'azerty' ? 'bg-[#3C4D6B] text-white' : 'bg-zinc-800 text-zinc-400'
+            }`}
+          >
+            AZERTY
+          </button>
+          <button
+            type="button"
+            tabIndex={-1}
+            aria-pressed={letterLayout === 'qwerty'}
+            onPointerDown={(e) => {
+              if (e.pointerType === 'touch' || e.pointerType === 'pen') e.preventDefault()
+            }}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => chooseLayout('qwerty')}
+            className={`h-9 min-w-[4.25rem] shrink-0 px-2 text-[11px] font-extrabold uppercase tracking-wide touch-manipulation active:brightness-110 sm:h-10 sm:min-w-[4.85rem] sm:text-xs ${
+              letterLayout === 'qwerty' ? 'bg-[#3C4D6B] text-white' : 'bg-zinc-800 text-zinc-400'
+            }`}
+          >
+            QWERTY
+          </button>
+        </div>
+        <p className="min-w-0 flex-1 truncate text-center text-[11px] font-semibold leading-tight text-zinc-400 sm:text-xs">
           {t('kassaApp.webKbTitle')}
         </p>
         <button
