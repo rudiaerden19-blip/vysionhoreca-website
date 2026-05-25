@@ -118,7 +118,8 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
     if (!token || typeof document === 'undefined') return
     let cleared = false
     let attempts = 0
-    const maxAttempts = 48
+    /** Ruimer interval: herhaalde requestFullscreen-elke-<200ms gaf bij sommige kiosk‑schermen korte zwarte flashes. */
+    const maxAttempts = 38
     const id = window.setInterval(() => {
       if (cleared) return
       if (document.fullscreenElement) {
@@ -134,7 +135,7 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
       const req = el.requestFullscreen as ((options?: FullscreenOptions) => Promise<void>) | undefined
       if (!req) return
       void req.call(el, { navigationUI: 'hide' }).catch(() => {})
-    }, 220)
+    }, 520)
     return () => {
       cleared = true
       window.clearInterval(id)

@@ -132,38 +132,78 @@ export async function prefetchCustomerDisplayBounds(openerWindow: Window): Promi
   if (b) writeCachedSecondaryBounds(b)
 }
 
-function applyBounds(target: Window, s: ScreenLike): boolean {
+/** Elke puls start een nieuwe interval; opruimen voorkomt dubbel move/resize/focus tegen hetzelfde popup. */
+const activePulseIntervals = new Map<Window, number>()
+const activePulseClears = new Map<Window, number>()
+
+function applyBounds(target: Window, s: ScreenLike, withFocus = true): boolean {
   try {
     target.moveTo(Math.round(s.availLeft), Math.round(s.availTop))
     target.resizeTo(Math.max(320, Math.round(s.availWidth)), Math.max(240, Math.round(s.availHeight)))
-    target.focus()
+    if (withFocus) target.focus()
     return true
   } catch {
     return false
   }
 }
 
+function cancelCustomerDisplayPulse(target: Window): void {
+  const id = activePulseIntervals.get(target)
+  if (id !== undefined) {
+    window.clearInterval(id)
+    activePulseIntervals.delete(target)
+  }
+  const t = activePulseClears.get(target)
+  if (t !== undefined) {
+    window.clearTimeout(t)
+    activePulseClears.delete(target)
+  }
+}
+
 /** Direct na window.open aanroepen (zelfde tick); backup voor browsers die features negeren. */
 export function applyCustomerDisplayWindowBounds(target: Window, bounds: ScreenLike): boolean {
-  return applyBounds(target, bounds)
+  return applyBounds(target, bounds, true)
 }
 
 /**
  * Houdt het klantscherm venster op werkgebied-breedte (geen muis op klantscherm).
  * Herhaalt move/resize enkele seconden tegen browser-chrome die eerst kleiner opent.
+ *
+ * Interval bewust ~0,5–1s i.p.v. sub-200ms: te frequente focus()/move op Windows‑multi‑monitor
+ * kan HDMI/compositor-flitsen geven (“scherm uit/terug”).
  */
 export function pulseApplyCustomerDisplayBounds(
   target: Window,
   bounds: ScreenLike,
   durationMs = 8000,
+  opts?: { intervalMs?: number; focusOnlyFirst?: boolean },
 ): void {
+  const intervalMs =
+    opts?.intervalMs ??
+    /** langzamer voor minder interferentie met kassa-/OS-focus en display-handshake */
+    550
+  const focusOnlyFirst = opts?.focusOnlyFirst ?? true
+
+  cancelCustomerDisplayPulse(target)
+
+  let firstTick = true
   const tick = () => {
-    if (target.closed) return
-    applyCustomerDisplayWindowBounds(target, bounds)
+    if (target.closed) {
+      cancelCustomerDisplayPulse(target)
+      return
+    }
+    applyBounds(target, bounds, focusOnlyFirst ? firstTick : true)
+    firstTick = false
   }
   tick()
-  const id = window.setInterval(tick, 180)
-  window.setTimeout(() => clearInterval(id), durationMs)
+  const id = window.setInterval(tick, intervalMs)
+  activePulseIntervals.set(target, id)
+  const clearTid = window.setTimeout(() => {
+    window.clearInterval(id)
+    activePulseIntervals.delete(target)
+    activePulseClears.delete(target)
+  }, durationMs)
+  activePulseClears.set(target, clearTid)
 }
 
 /** Popup naar gekozen tweede scherm brengen (ná open). */
