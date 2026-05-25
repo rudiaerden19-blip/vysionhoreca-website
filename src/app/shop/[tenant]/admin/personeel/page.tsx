@@ -438,6 +438,11 @@ export default function PersoneelPage() {
                 <div className="flex gap-2">
                   <input
                     type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    autoComplete="off"
+                    name="staff-pin-code"
+                    data-web-kb-pin="1"
                     value={formData.pin || ''}
                     onChange={(e) => setFormData({ ...formData, pin: e.target.value.replace(/\D/g, '').slice(0, 4) })}
                     className="flex-1 px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-xl tracking-widest"
