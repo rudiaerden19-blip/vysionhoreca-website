@@ -2854,6 +2854,7 @@
     "webKbSpace": "Espace",
     "webKbEnter": "Entrée",
     "webKbClear": "Effacer",
+    "webKbDotComHint": "Insérer .com",
     "pushNewOrderBody": "Commande n°{orderNumber} reçue !",
     "pushNewReservationBody": "Une nouvelle réservation est arrivée.",
     "pushNewOrderTitle": "🔔 NOUVELLE COMMANDE !",

@@ -329,6 +329,12 @@ export function WebAzertyKeyboard() {
     (chRaw: string) => {
       if (!target || !target.isConnected) return
 
+      /** Snelle invoer (.com, …) buiten caps/numeriek */
+      if (!numericMode && chRaw.length > 1) {
+        insertSnippet(target, chRaw)
+        return
+      }
+
       const applyCase = (c: string) => {
         if (numericMode || !caps) return c
         if (/[a-z]/.test(c)) return c.toUpperCase()
@@ -497,6 +503,16 @@ export function WebAzertyKeyboard() {
           <KeyBtn label="_" className={SYMBOL_KEY_COMPACT} onClick={() => onChar('_')} />
           <KeyBtn label="." className={SYMBOL_KEY_COMPACT} onClick={() => onChar('.')} />
           <KeyBtn label="," className={SYMBOL_KEY_COMPACT} onClick={() => onChar(',')} />
+          <KeyBtn label=":" className={SYMBOL_KEY_COMPACT} onClick={() => onChar(':')} />
+          <KeyBtn label="&" className={SYMBOL_KEY_COMPACT} onClick={() => onChar('&')} />
+          <KeyBtn label="'" className={SYMBOL_KEY_COMPACT} onClick={() => onChar("'")} />
+          <KeyBtn
+            label=".com"
+            title={t('kassaApp.webKbDotComHint')}
+            aria-label={t('kassaApp.webKbDotComHint')}
+            className="h-12 min-h-[48px] w-auto min-w-[3.25rem] shrink-0 px-2 text-sm font-bold tracking-tight sm:min-w-[3.75rem] sm:text-base"
+            onClick={() => onChar('.com')}
+          />
           {/* Geen flex-1 + min-w-0: daar klapte dit op 0 bij smalle wrappers — blokkeerde tikken */}
           <KeyBtn
             label={t('kassaApp.webKbSpace')}
@@ -522,7 +538,7 @@ export function WebAzertyKeyboard() {
     <div
       ref={panelRef}
       data-web-azerty-keyboard-panel
-      className="fixed inset-x-0 bottom-0 z-[600] border-t border-zinc-700 bg-[#151a21]/98 px-1 pb-[max(env(safe-area-inset-bottom),6px)] pt-1.5 shadow-[0_-8px_28px_rgba(0,0,0,.45)] backdrop-blur-sm"
+      className="fixed inset-x-0 bottom-0 z-[600] border-t border-zinc-700 bg-[#151a21] px-1 pb-[max(env(safe-area-inset-bottom),6px)] pt-1.5 shadow-[0_-8px_28px_rgba(0,0,0,.45)]"
       role="region"
       aria-label={t('kassaApp.webKbTitle')}
     >

@@ -3354,6 +3354,7 @@
     "webKbSpace": "スペース",
     "webKbEnter": "Enter",
     "webKbClear": "クリア",
+    "webKbDotComHint": ".comを入力",
     "pushNewOrderBody": "注文 #{orderNumber} が届きました！",
     "pushNewReservationBody": "新しい予約が届きました。",
     "pushNewOrderTitle": "🔔 新しい注文！",

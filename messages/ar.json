@@ -3354,6 +3354,7 @@
     "webKbSpace": "مسافة",
     "webKbEnter": "إدخال",
     "webKbClear": "مسح",
+    "webKbDotComHint": "إدراج .com",
     "pushNewOrderBody": "وصل الطلب رقم {orderNumber}!",
     "pushNewReservationBody": "وصل حجز جديد.",
     "pushNewOrderTitle": "🔔 طلب جديد!",

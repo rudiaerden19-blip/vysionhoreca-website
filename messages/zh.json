@@ -3354,6 +3354,7 @@
     "webKbSpace": "空格",
     "webKbEnter": "回车",
     "webKbClear": "清除",
+    "webKbDotComHint": "插入 .com",
     "pushNewOrderBody": "订单 #{orderNumber} 已到达！",
     "pushNewReservationBody": "有新的预订。",
     "pushNewOrderTitle": "🔔 新订单！",

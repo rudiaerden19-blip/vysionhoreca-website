@@ -2854,6 +2854,7 @@
     "webKbSpace": "Leertaste",
     "webKbEnter": "Enter",
     "webKbClear": "Löschen",
+    "webKbDotComHint": ".com einfügen",
     "pushNewOrderBody": "Bestellung #{orderNumber} ist eingegangen!",
     "pushNewReservationBody": "Eine neue Reservierung ist eingegangen.",
     "pushNewOrderTitle": "🔔 NEUE BESTELLUNG!",

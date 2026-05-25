@@ -3830,6 +3830,7 @@
     "webKbSpace": "Space",
     "webKbEnter": "Enter",
     "webKbClear": "Clear",
+    "webKbDotComHint": "Insert .com",
     "pushNewOrderBody": "Order #{orderNumber} has arrived!",
     "pushNewReservationBody": "A new reservation has arrived.",
     "pushNewOrderTitle": "🔔 NEW ORDER!",

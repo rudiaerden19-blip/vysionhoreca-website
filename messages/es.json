@@ -3354,6 +3354,7 @@
     "webKbSpace": "Espacio",
     "webKbEnter": "Intro",
     "webKbClear": "Borrar",
+    "webKbDotComHint": "Insertar .com",
     "pushNewOrderBody": "¡Pedido n.º{orderNumber} recibido!",
     "pushNewReservationBody": "Ha llegado una nueva reserva.",
     "pushNewOrderTitle": "🔔 ¡NUEVO PEDIDO!",
