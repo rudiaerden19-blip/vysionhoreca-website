@@ -763,8 +763,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [orderType, setOrderType] = useState<OrderType>('DINE_IN')
   const [tableNumber, setTableNumber] = useState('')
   const [numpadValue, setNumpadValue] = useState('')
-  /** Toggle via footer-knop; bij nieuwe karregels standaard kar tonen. */
-  const [numpadPanelVisible, setNumpadPanelVisible] = useState(true)
+  /** Alleen zichtbaar na druk op Num pad; bij opstart/login uit. */
+  const [numpadPanelVisible, setNumpadPanelVisible] = useState(false)
   useEffect(() => {
     if (cart.length > 0) setNumpadPanelVisible(false)
   }, [cart.length])
