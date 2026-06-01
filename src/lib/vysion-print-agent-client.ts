@@ -297,9 +297,11 @@ export async function fetchPrintAgentHealth(
   }
 }
 
-/** Aparte keukenprinter in agent (niet dezelfde als zaak/kassa-printer). */
+/**
+ * Aparte keukenprinter in agent (veld ingevuld én niet dezelfde als zaak/kassa).
+ * Bij true stuurt de kassa receiptMode `keuken` → agent print op die printer.
+ */
 export function printAgentHasDedicatedKitchenPrinter(health: PrintAgentHealth): boolean {
-  if (!health.ok || !health.printerConfigured) return false
   const kitchen = health.kitchenPrinterName?.trim()
   if (!kitchen) return false
   const primary = health.printerName?.trim()

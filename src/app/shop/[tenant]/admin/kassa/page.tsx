@@ -3174,23 +3174,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const receiptMode = opts?.receiptMode ?? 'kassa'
     const receiptTableNr = kassaReceiptTableNumber(order.orderType, order.tableNumber)
 
-    if (isDraft && barKitchenDelta && receiptMode === 'keuken') {
-      const health = await fetchPrintAgentHealth()
-      if (!printAgentHasDedicatedKitchenPrinter(health)) {
-        const commit = opts?.barWatermarkCommit
-        if (commit?.slotKey) {
-          try {
-            const st = loadBarBonWatermarks(tenant)
-            st[commit.slotKey] = commit.row
-            saveBarBonWatermarks(tenant, st)
-          } catch {
-            /* ignore */
-          }
-        }
-        return
-      }
-    }
-
     if (!isDraft) {
       try {
         if (typeof window !== 'undefined') {
