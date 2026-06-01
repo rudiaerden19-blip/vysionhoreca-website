@@ -312,7 +312,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
   return (
     <PinGate tenant={params.tenant}>
     <div
-      className="relative -mx-4 -mt-4 min-h-[calc(100svh-3.5rem)] supports-[height:100dvh]:min-h-[calc(100dvh-3.5rem)] md:-mx-6 md:-mt-6"
+      className="relative -mx-4 -mt-4 min-h-[calc(100dvh-3.5rem)] overflow-hidden pb-4 md:-mx-6 md:-mt-6 md:pb-6"
       data-testid="admin-dashboard-shell"
     >
       {dashboardBackground ? (

@@ -87,6 +87,9 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
 
   const showLockButton = LOCK_PAGES.some(p => adminPath.includes(`/admin/${p}`))
 
+  const isAdminDashboardRoot =
+    adminPath === baseUrl || adminPath === `${baseUrl}/`
+
   useEffect(() => {
     async function checkTenant() {
       setLoading(true)
@@ -487,7 +490,9 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
 
       {/* Hoofdinhoud — geen sidebar, volle breedte */}
       <main className="overflow-x-hidden min-h-screen pt-14">
-        <div className="max-w-full p-4 pb-24 md:p-6">
+        <div
+          className={`max-w-full p-4 md:p-6 ${isAdminDashboardRoot ? 'pb-0' : 'pb-24'}`}
+        >
           {children}
         </div>
       </main>
