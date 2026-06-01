@@ -271,17 +271,20 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
 
   const hasDashboardBg = Boolean(dashboardBackground?.url)
   const cardSurface = hasDashboardBg
-    ? 'rounded-2xl bg-white/70 p-6 shadow-md ring-1 ring-white/50 backdrop-blur-md'
+    ? 'rounded-2xl bg-white/45 p-6 shadow-sm ring-1 ring-white/40 backdrop-blur-lg'
     : 'bg-white rounded-2xl p-6 shadow-sm'
   const panelSurface = hasDashboardBg
-    ? 'rounded-2xl bg-white/70 px-5 py-4 shadow-md ring-1 ring-white/50 backdrop-blur-md'
+    ? 'rounded-2xl bg-white/45 px-5 py-4 shadow-sm ring-1 ring-white/40 backdrop-blur-lg'
     : ''
   const orderRowSurface = hasDashboardBg
-    ? 'rounded-xl bg-white/55 p-4 backdrop-blur-sm'
+    ? 'rounded-xl bg-white/35 p-4 backdrop-blur-md ring-1 ring-white/30'
     : 'rounded-xl bg-gray-50 p-4'
   const statLabelClass = hasDashboardBg
-    ? 'text-sm font-semibold text-gray-900'
+    ? 'text-sm font-semibold text-gray-900 [text-shadow:0_0_10px_rgba(255,255,255,0.9),0_1px_1px_rgba(255,255,255,0.85)]'
     : 'text-gray-500 text-sm'
+  const onPhotoTextShadow = hasDashboardBg
+    ? '[text-shadow:0_0_12px_rgba(255,255,255,0.92),0_1px_2px_rgba(255,255,255,0.88)]'
+    : ''
 
   return (
     <PinGate tenant={params.tenant}>
@@ -303,7 +306,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
               style={adminDashboardBackgroundImageStyle(dashboardBackground)}
             />
           </div>
-          <div className="pointer-events-none absolute inset-0 bg-white/35" aria-hidden />
+          <div className="pointer-events-none absolute inset-0 bg-white/20" aria-hidden />
         </>
       ) : null}
       <div className="relative z-10 mx-auto max-w-7xl px-4 pb-8 md:px-6">
@@ -316,11 +319,13 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-3xl font-bold text-gray-900"
+          className={`text-3xl font-bold text-gray-900 ${onPhotoTextShadow}`}
         >
           {t('adminDashboard.welcome')} {businessName}
         </motion.h1>
-        <p className="mt-1 text-gray-600">{t('adminDashboard.subtitle')}</p>
+        <p className={`mt-1 font-medium text-gray-900 ${onPhotoTextShadow}`}>
+          {t('adminDashboard.subtitle')}
+        </p>
       </div>
 
       {/* Stats Grid */}
@@ -335,7 +340,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
             <span className={statLabelClass}>{t('adminDashboard.stats.ordersToday')}</span>
             <span className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">📦</span>
           </div>
-          <p className="text-3xl font-bold text-gray-900">{stats.todayOrders}</p>
+          <p className={`text-3xl font-bold text-gray-900 ${onPhotoTextShadow}`}>{stats.todayOrders}</p>
           <p className={`text-sm mt-1 ${ordersChange.positive ? 'text-green-500' : 'text-red-500'}`}>
             {ordersChange.value} {t('adminDashboard.stats.vsYesterday')}
           </p>
@@ -351,7 +356,9 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
             <span className={statLabelClass}>{t('adminDashboard.stats.revenueToday')}</span>
             <span className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">💰</span>
           </div>
-          <p className="text-3xl font-bold text-gray-900">€{stats.todayRevenue.toFixed(2)}</p>
+          <p className={`text-3xl font-bold text-gray-900 ${onPhotoTextShadow}`}>
+            €{stats.todayRevenue.toFixed(2)}
+          </p>
           <p className={`text-sm mt-1 ${revenueChange.positive ? 'text-green-500' : 'text-red-500'}`}>
             {revenueChange.value} {t('adminDashboard.stats.vsYesterday')}
           </p>
@@ -367,7 +374,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
             <span className={statLabelClass}>{t('adminDashboard.stats.pendingOrders')}</span>
             <span className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">⏳</span>
           </div>
-          <p className="text-3xl font-bold text-gray-900">{stats.pendingOrders}</p>
+          <p className={`text-3xl font-bold text-gray-900 ${onPhotoTextShadow}`}>{stats.pendingOrders}</p>
           <p className={`text-sm mt-1 ${stats.pendingOrders > 0 ? 'text-blue-600' : 'text-green-500'}`}>
             {stats.pendingOrders > 0 ? t('adminDashboard.stats.actionRequired') : t('adminDashboard.stats.allProcessed')}
           </p>
@@ -383,7 +390,9 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
             <span className={statLabelClass}>{t('adminDashboard.stats.rating')}</span>
             <span className="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center">⭐</span>
           </div>
-          <p className="text-3xl font-bold text-gray-900">{stats.averageRating || '-'}</p>
+          <p className={`text-3xl font-bold text-gray-900 ${onPhotoTextShadow}`}>
+            {stats.averageRating || '-'}
+          </p>
           <p className={`${statLabelClass} mt-1`}>{stats.totalReviews} {t('adminDashboard.stats.reviews')}</p>
         </motion.div>
       </div>
@@ -398,7 +407,9 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           className={cardSurface}
         >
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-gray-900">{t('adminDashboard.recentOrders.title')}</h2>
+            <h2 className={`text-lg font-semibold text-gray-900 ${onPhotoTextShadow}`}>
+              {t('adminDashboard.recentOrders.title')}
+            </h2>
             {moduleAccess['online-bestellingen'] && (
               <Link href={`/shop/${params.tenant}/admin/bestellingen`} className="text-blue-600 hover:text-blue-600 text-sm font-medium">
                 {t('adminDashboard.viewAll')} →
@@ -446,7 +457,9 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           className={cardSurface}
         >
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-gray-900">{t('adminDashboard.popularItems.title')}</h2>
+            <h2 className={`text-lg font-semibold text-gray-900 ${onPhotoTextShadow}`}>
+              {t('adminDashboard.popularItems.title')}
+            </h2>
             {moduleAccess.rapporten && (
               <Link href={`/shop/${params.tenant}/admin/verkoop`} className="text-blue-600 hover:text-blue-600 text-sm font-medium">
                 {t('adminDashboard.viewAll')} →
@@ -466,7 +479,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
                     {index + 1}
                   </span>
                   <div className="flex-1">
-                    <p className="font-medium text-gray-900">{item.name}</p>
+                    <p className={`font-medium text-gray-900 ${onPhotoTextShadow}`}>{item.name}</p>
                     <div className="mt-1 h-2 w-full rounded-full bg-gray-100">
                       <div 
                         className="bg-blue-600 h-2 rounded-full" 
@@ -474,7 +487,9 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
                       />
                     </div>
                   </div>
-                  <span className="text-sm font-semibold text-gray-900">{item.count}x</span>
+                  <span className={`text-sm font-semibold text-gray-900 ${onPhotoTextShadow}`}>
+                    {item.count}x
+                  </span>
                 </div>
               ))}
             </div>
