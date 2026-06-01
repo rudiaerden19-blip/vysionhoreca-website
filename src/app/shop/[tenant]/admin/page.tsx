@@ -271,8 +271,14 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
 
   const hasDashboardBg = Boolean(dashboardBackground?.url)
   const cardSurface = hasDashboardBg
-    ? 'rounded-2xl bg-white p-6 shadow-lg ring-1 ring-slate-200/90'
+    ? 'rounded-2xl bg-white/70 p-6 shadow-md ring-1 ring-white/50 backdrop-blur-md'
     : 'bg-white rounded-2xl p-6 shadow-sm'
+  const panelSurface = hasDashboardBg
+    ? 'rounded-2xl bg-white/70 px-5 py-4 shadow-md ring-1 ring-white/50 backdrop-blur-md'
+    : ''
+  const orderRowSurface = hasDashboardBg
+    ? 'rounded-xl bg-white/55 p-4 backdrop-blur-sm'
+    : 'rounded-xl bg-gray-50 p-4'
   const statLabelClass = hasDashboardBg
     ? 'text-sm font-semibold text-gray-900'
     : 'text-gray-500 text-sm'
@@ -297,16 +303,14 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
               style={adminDashboardBackgroundImageStyle(dashboardBackground)}
             />
           </div>
-          <div className="pointer-events-none absolute inset-0 bg-white/55" aria-hidden />
+          <div className="pointer-events-none absolute inset-0 bg-white/35" aria-hidden />
         </>
       ) : null}
       <div className="relative z-10 mx-auto max-w-7xl px-4 pb-8 md:px-6">
       {/* Header */}
       <div
         className={
-          hasDashboardBg
-            ? 'mb-8 rounded-2xl bg-white px-5 py-4 shadow-lg ring-1 ring-slate-200/90'
-            : 'mb-8 pt-1'
+          hasDashboardBg ? `mb-8 ${panelSurface}` : 'mb-8 pt-1'
         }
       >
         <motion.h1
@@ -411,7 +415,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
               {recentOrders.map((order) => (
                 <div
                   key={order.id}
-                  className="flex items-center justify-between rounded-xl bg-gray-50 p-4"
+                  className={`flex items-center justify-between ${orderRowSurface}`}
                 >
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
