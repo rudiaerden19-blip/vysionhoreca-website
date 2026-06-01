@@ -4075,12 +4075,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <button
             type="button"
             onClick={() => {
+              if (draftBonLineItems.length === 0 || draftBonPrinting) return
               void printDraftBonFromCart({ draftCopies: 2 })
             }}
-            disabled={draftBonLineItems.length === 0 || draftBonPrinting}
-            className="max-w-full truncate rounded-md px-1 py-0.5 text-center text-sm font-bold leading-tight tracking-tight text-white transition-colors hover:bg-white/15 active:bg-white/25 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-transparent sm:text-base md:text-lg"
+            className="max-w-full truncate rounded-md px-1 py-0.5 text-center text-sm font-bold leading-tight tracking-tight text-white transition-colors hover:bg-white/15 active:bg-white/25 sm:text-base md:text-lg"
             title={t('kassaApp.cartBonTitle')}
-            aria-label={t('kassaApp.cartBonTitle')}
+            aria-label={`${tenantInfo?.business_name || tenant} — ${t('kassaApp.cartBonTitle')}`}
           >
             {tenantInfo?.business_name ||
               tenant.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
@@ -4939,10 +4939,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 playClick()
                 setNumpadPanelVisible((v) => !v)
               }}
-              className={`flex shrink-0 items-center justify-center rounded-xl shadow-sm ring-1 ring-black/10 active:brightness-95 ${
+              className={`flex shrink-0 items-center justify-center rounded-xl shadow-sm ring-1 active:brightness-95 ${
                 numpadPanelVisible
-                  ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
-                  : 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
+                  ? 'bg-[#58CCFF] text-[#063042] ring-black/10 hover:bg-[#47c6fe]'
+                  : 'bg-black text-white ring-white/25 hover:bg-zinc-900'
               } ${
                 kassaSxgaDenseTiles
                   ? 'h-[3.25rem] w-[3.25rem] p-2'
