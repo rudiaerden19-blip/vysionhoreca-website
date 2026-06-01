@@ -4420,8 +4420,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
               }`}
             >
-              <span className="text-[11px] font-bold uppercase leading-tight tracking-wide sm:text-xs">
-                🍽️ {t('kassaApp.orderTypeDineIn')}
+              <span className="text-center text-xs font-bold leading-tight sm:text-sm">
+                {t('kassaApp.orderTypeDineIn')}
               </span>
               {orderType === 'DINE_IN' && tableNumber ? (
                 <span className="mt-0.5 max-w-full truncate text-[10px] font-semibold normal-case opacity-95 sm:text-xs">
@@ -4442,8 +4442,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
               }`}
             >
-              <span className="text-[11px] font-bold uppercase leading-tight tracking-wide sm:text-xs">
-                📦 {t('kassaApp.orderTypeTakeaway')}
+              <span className="text-center text-xs font-bold leading-tight sm:text-sm">
+                {t('kassaApp.orderTypeTakeaway')}
               </span>
             </button>
             <button
@@ -4456,8 +4456,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
               }`}
             >
-              <span className="text-[11px] font-bold uppercase leading-tight tracking-wide sm:text-xs">
-                🚗 {t('kassaApp.orderTypeDelivery')}
+              <span className="text-center text-xs font-bold leading-tight sm:text-sm">
+                {t('kassaApp.orderTypeDelivery')}
               </span>
             </button>
           </div>

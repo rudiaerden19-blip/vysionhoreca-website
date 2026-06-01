@@ -35,15 +35,20 @@ export function formatKassaNumpadHeaderDate(date: Date, locale: Locale): string 
   const pick = (type: Intl.DateTimeFormatPartTypes) =>
     parts.find((p) => p.type === type)?.value ?? ''
 
-  let weekday = pick('weekday').replace(/\.$/, '').trim()
+  const capToken = (s: string) => {
+    const t = s.replace(/\.$/, '').trim()
+    if (!t) return t
+    return t.charAt(0).toLocaleUpperCase(tag) + t.slice(1)
+  }
+
+  const weekday = capToken(pick('weekday'))
   const day = pick('day').trim()
-  let month = pick('month').replace(/\.$/, '').trim().toLowerCase()
+  let month = capToken(pick('month'))
   const year = pick('year').trim()
 
   // In het Nederlands spreken we vaak „sept”; Intl geeft meestal „sep”.
-  if (locale === 'nl' && month === 'sep') month = 'sept'
+  if (locale === 'nl' && month.toLowerCase() === 'sep') month = 'Sept'
 
-  // Arabisch (Latin digits): verbind met spaties; RTL laat de browser aan.
   return `${weekday} ${day} ${month} ${year}`.replace(/\s+/g, ' ').trim()
 }
 
