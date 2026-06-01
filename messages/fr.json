@@ -2797,6 +2797,7 @@
     "orderTypeWithTable": " • Table {number}",
     "addAmount": "+ Ajouter €{amount}",
     "cartTotal": "Total",
+    "parkedOnTableSection": "Déjà à la table",
     "drawerOpen": "Ouvrir le tiroir",
     "cartBon": "Ticket",
     "cartBonTitle": "Imprimer un ticket provisoire du panier (sans encaissement)",

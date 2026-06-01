@@ -2797,6 +2797,7 @@
     "orderTypeWithTable": " • Tisch {number}",
     "addAmount": "+ €{amount} hinzufügen",
     "cartTotal": "Summe",
+    "parkedOnTableSection": "Bereits am Tisch",
     "drawerOpen": "Schublade öffnen",
     "cartBon": "Bon",
     "cartBonTitle": "Vorläufigen Bon aus aktuellem Warenkorb drucken (ohne Bezahlung)",

@@ -97,6 +97,7 @@ import type {
   KassaLastOrderReceipt,
 } from '@/lib/kassa-cart-types'
 import { kassaReceiptTableNumber } from '@/lib/kassa-cart-types'
+import { mergeCartLinesForTable } from '@/lib/kassa-table-cart-merge'
 import {
   computeBarBonDelta,
   loadBarBonWatermarks,
@@ -1875,15 +1876,23 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const doSwitchToTable = (newTableNr: string, zone: FloorPlanZone) => {
     if (tableNumber && cart.length > 0) {
       const snap = snapshotCartItemsForAsyncPrint(cart)
-      saveCartToTable(dineInFloorZone, tableNumber, cart)
-      void flushBarDeltaSlipRef.current(dineInFloorZone, tableNumber, snap, {
+      const oldZone = dineInFloorZone
+      const oldTbl = tableNumber
+      const oldSlot = tableOrderMapKey(oldZone, oldTbl)
+      setTableOrders((prev) => {
+        const merged = mergeCartLinesForTable(prev[oldSlot] || [], cart)
+        const next = { ...prev, [oldSlot]: merged }
+        localStorage.setItem(tableOrdersKey, JSON.stringify(next))
+        updateTableStatus(oldTbl, merged.length > 0, oldZone)
+        schedulePersistOpenOrder(oldZone, oldTbl, merged)
+        return next
+      })
+      void flushBarDeltaSlipRef.current(oldZone, oldTbl, snap, {
         printKitchen: true,
         printKassaSlip: false,
       })
     }
-    const slotKey = tableOrderMapKey(zone, newTableNr)
-    const existingOrder = tableOrders[slotKey] || []
-    setCart(existingOrder)
+    setCart([])
     setTableNumber(newTableNr)
     setDineInFloorZone(zone)
     setOrderType('DINE_IN')
@@ -1896,12 +1905,22 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
   }
 
-  /** Voeg toe aan tafel: mand opslaan + keuken-delta (alleen bij keukenprinter in agent). Tussentijdse bon: alleen kassa-delta. */
+  /** Voeg toe aan tafel: nieuwe karronde naar tafelmand; keuken/kassa-delta alleen over die ronde. */
   const parkOrder = (opts: { printKitchen: boolean; printKassaSlip: boolean }) => {
     if (!tableNumber || cart.length === 0) return
     const snap = snapshotCartItemsForAsyncPrint(cart)
-    saveCartToTable(dineInFloorZone, tableNumber, cart)
-    void flushBarDeltaSlipRef.current(dineInFloorZone, tableNumber, snap, opts)
+    const zone = dineInFloorZone
+    const tbl = tableNumber
+    const slotKey = tableOrderMapKey(zone, tbl)
+    setTableOrders((prev) => {
+      const merged = mergeCartLinesForTable(prev[slotKey] || [], cart)
+      const next = { ...prev, [slotKey]: merged }
+      localStorage.setItem(tableOrdersKey, JSON.stringify(next))
+      updateTableStatus(tbl, merged.length > 0, zone)
+      schedulePersistOpenOrder(zone, tbl, merged)
+      return next
+    })
+    void flushBarDeltaSlipRef.current(zone, tbl, snap, opts)
     setCart([])
     setTableNumber('')
     setDineInFloorZone(FLOOR_PLAN_ZONE_INSIDE)
@@ -2212,23 +2231,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }
 
   // ── Cart ─────────────────────────────────────────────────────────────────
-  const syncTableOrder = (tblNr: string | '', updatedCart: CartItem[]) => {
-    if (!tblNr) return
-    const zone = dineInFloorZone
+  const tableHasOpenOrder = (zone: FloorPlanZone, tblNr: string, cartRound: CartItem[]) => {
     const slotKey = tableOrderMapKey(zone, tblNr)
-    if (updatedCart.length === 0) {
-      try {
-        removeBarBonWatermarkSlot(tenant, slotKey)
-      } catch {
-        /* idem */
-      }
-    }
-    setTableOrders((prev) => {
-      const next = { ...prev, [slotKey]: updatedCart }
-      localStorage.setItem(tableOrdersKey, JSON.stringify(next))
-      return next
-    })
-    schedulePersistOpenOrder(zone, tblNr, updatedCart)
+    const parked = tableOrders[slotKey]?.length ?? 0
+    return parked > 0 || cartRound.length > 0
   }
 
   const addToCart = (product: MenuProduct, choices: SelectedChoice[] = []) => {
@@ -2242,7 +2248,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         ? prev.map(i => i.cartKey === cartKey ? { ...i, quantity: i.quantity + 1 } : i)
         : [...prev, { product, quantity: 1, choices, cartKey }]
       if (tableNumber) {
-        syncTableOrder(tableNumber, updated)
+        updateTableStatus(tableNumber, tableHasOpenOrder(dineInFloorZone, tableNumber, updated), dineInFloorZone)
       }
       return updated
     })
@@ -2341,8 +2347,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           updated = [...without, { product, quantity: oldQty, choices: selected, cartKey }]
         }
         if (tableNumber) {
-          updateTableStatus(tableNumber, updated.length > 0, dineInFloorZone)
-          syncTableOrder(tableNumber, updated)
+          updateTableStatus(tableNumber, tableHasOpenOrder(dineInFloorZone, tableNumber, updated), dineInFloorZone)
         }
         return updated
       })
@@ -2360,8 +2365,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         ? prev.filter(i => i.cartKey !== cartKey)
         : prev.map(i => i.cartKey === cartKey ? { ...i, quantity: qty } : i)
       if (tableNumber) {
-        updateTableStatus(tableNumber, updated.length > 0, dineInFloorZone)
-        syncTableOrder(tableNumber, updated)
+        updateTableStatus(tableNumber, tableHasOpenOrder(dineInFloorZone, tableNumber, updated), dineInFloorZone)
       }
       return updated
     })
@@ -2371,24 +2375,40 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     scheduleKassaTapSound(playRemove)
     setCart([])
     if (tableNumber) {
-      syncTableOrder(tableNumber, [])
-      updateTableStatus(tableNumber, false, dineInFloorZone)
+      updateTableStatus(
+        tableNumber,
+        tableHasOpenOrder(dineInFloorZone, tableNumber, []),
+        dineInFloorZone,
+      )
     }
   }
-  const total = cart.reduce((sum, i) => {
-    const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
-    return sum + (i.product.price + choicesTotal) * i.quantity
-  }, 0)
 
-  /** Voorlopige bon: bij dine-in + tafel eerst openstaande mand (`tableOrders` / server), anders kar. */
-  const draftBonLineItems = useMemo((): CartItem[] => {
-    if (orderType === 'DINE_IN' && tableNumber) {
-      const k = tableOrderMapKey(dineInFloorZone, tableNumber)
-      const fromTable = tableOrders[k]
-      if (fromTable && fromTable.length > 0) return fromTable
-    }
+  const activeTableSlotKey = useMemo(() => {
+    if (orderType !== 'DINE_IN' || !tableNumber) return null
+    return tableOrderMapKey(dineInFloorZone, tableNumber)
+  }, [orderType, tableNumber, dineInFloorZone])
+
+  const parkedOnTableLines = useMemo((): CartItem[] => {
+    if (!activeTableSlotKey) return []
+    return tableOrders[activeTableSlotKey] ?? []
+  }, [activeTableSlotKey, tableOrders])
+
+  /** Volledige rekening (op tafel + deze ronde) voor totaal, betalen en voorlopige bon. */
+  const billLines = useMemo((): CartItem[] => {
+    if (activeTableSlotKey) return mergeCartLinesForTable(parkedOnTableLines, cart)
     return cart
-  }, [orderType, tableNumber, dineInFloorZone, tableOrders, cart])
+  }, [activeTableSlotKey, parkedOnTableLines, cart])
+
+  const total = useMemo(
+    () =>
+      billLines.reduce((sum, i) => {
+        const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
+        return sum + (i.product.price + choicesTotal) * i.quantity
+      }, 0),
+    [billLines],
+  )
+
+  const draftBonLineItems = billLines
 
   const draftBonTotal = useMemo(
     () =>
@@ -2522,6 +2542,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     [cart, categories],
   )
 
+  const parkedLinesByCategory = useMemo(
+    () => sortKassaCartLinesByMenuCategory(parkedOnTableLines, categories),
+    [parkedOnTableLines, categories],
+  )
+
+  const billLinesByCategory = useMemo(
+    () => sortKassaCartLinesByMenuCategory(billLines, categories),
+    [billLines, categories],
+  )
+
   useEffect(() => {
     const bc = customerDisplayBcRef.current
     if (!bc || !customerDisplayToken) return
@@ -2548,10 +2578,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         totalInclVat: customerDisplayThankYou.total,
         dineInSubtitle: customerDisplayThankYou.dineInSubtitle,
       }
-    } else if (cart.length === 0 && !showPaymentModal && !showSplitModal) {
+    } else if (billLines.length === 0 && !showPaymentModal && !showSplitModal) {
       msg = { v: 1, phase: 'idle', tenantSlug: tenant, businessName }
-    } else if ((showPaymentModal || showSplitModal) && cart.length > 0) {
-      const splitCd = computeInclusiveVatSplitFromCart(cart, resolveCartLineVat)
+    } else if ((showPaymentModal || showSplitModal) && billLines.length > 0) {
+      const splitCd = computeInclusiveVatSplitFromCart(billLines, resolveCartLineVat)
       const subtotalExVat = splitCd.subtotalExcl
       const vatAmount = splitCd.totalTax
       const vatLines =
@@ -2564,7 +2594,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         phase: 'checkout',
         tenantSlug: tenant,
         businessName,
-        lines: buildKassaCustomerDisplayLines(cartLinesByCategory),
+        lines: buildKassaCustomerDisplayLines(billLinesByCategory),
         subtotalExVat,
         vatRate,
         vatAmount,
@@ -2572,13 +2602,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         totalInclVat,
         dineInSubtitle: customerDisplayDineInSubtitle,
       }
-    } else if (cart.length > 0) {
+    } else if (billLines.length > 0) {
       msg = {
         v: 1,
         phase: 'cart',
         tenantSlug: tenant,
         businessName,
-        lines: buildKassaCustomerDisplayLines(cartLinesByCategory),
+        lines: buildKassaCustomerDisplayLines(billLinesByCategory),
         totalInclVat,
         dineInSubtitle: customerDisplayDineInSubtitle,
       }
@@ -2597,8 +2627,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [
     tenant,
     customerDisplayToken,
-    cart,
-    cartLinesByCategory,
+    billLines,
+    billLinesByCategory,
     total,
     showPaymentModal,
     showSplitModal,
@@ -2870,8 +2900,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       setCart((prev) => {
         const updated = [...prev, { product: custom, quantity: 1, cartKey: custom.id! }]
         if (tableNumber) {
-          updateTableStatus(tableNumber, true, dineInFloorZone)
-          syncTableOrder(tableNumber, updated)
+          updateTableStatus(tableNumber, tableHasOpenOrder(dineInFloorZone, tableNumber, updated), dineInFloorZone)
         }
         return updated
       })
@@ -2927,7 +2956,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     method: PaymentMethodType,
     splitAmounts?: { cash: number; card: number },
   ) => {
-    if (cart.length === 0) return
+    if (billLines.length === 0) return
 
     if (method === 'SPLIT') {
       const sc = splitAmounts?.cash ?? 0
@@ -2944,9 +2973,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     } catch {
       /* offline: bestaande lookup */
     }
-    const resolveLineVatAtCheckout = (line: (typeof cart)[number]) =>
+    const resolveLineVatAtCheckout = (line: (typeof billLines)[number]) =>
       resolveVatPercentForProduct(line.product, freshVatLookup, tenantDefaultBtw)
-    const vatSplit = computeInclusiveVatSplitFromCart(cart, resolveLineVatAtCheckout)
+    const vatSplit = computeInclusiveVatSplitFromCart(billLines, resolveLineVatAtCheckout)
     if (Math.abs(vatSplit.grossTotal - total) > 0.03) {
       console.warn('[kassa] btw-split vs mandtotaal mismatched', { split: vatSplit.grossTotal, total })
     }
@@ -2984,7 +3013,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       tax: Math.round(tax * 100) / 100,
       total: total,
       kassa_staff_id: activeKassaStaff?.id ?? null,
-      items: cart.map((i) => ({
+      items: billLines.map((i) => ({
         product_id: i.product.id,
         name: i.product.name,
         price: i.product.price,
@@ -3113,7 +3142,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setLastOrder({
       orderNumber: allocatedOrderNumber,
       checkoutReference: queuedOffline ? shortRef : undefined,
-      items: sortKassaCartLinesByMenuCategory([...cart], categories),
+      items: sortKassaCartLinesByMenuCategory([...billLines], categories),
       total,
       vatSplit: vatSplit.byRate.map((l) => ({
         rate: l.rate,
@@ -4453,6 +4482,31 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         <div className="flex-1 min-h-0 overflow-y-auto px-3 pt-2 flex flex-col touch-pan-y">
           {cart.length === 0 ? (
             <div className="flex flex-col flex-1 min-h-0">
+              {parkedLinesByCategory.length > 0 ? (
+                <div className="mb-2 shrink-0" data-testid="kassa-parked-on-table">
+                  <p className={`mb-1 text-xs font-bold uppercase tracking-wide ${ui.numpadMeta}`}>
+                    {t('kassaApp.parkedOnTableSection')}
+                  </p>
+                  <div className="space-y-1">
+                    {parkedLinesByCategory.map((item) => {
+                      const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
+                      return (
+                        <div
+                          key={`parked-${item.cartKey}`}
+                          className={`flex items-center gap-2 rounded-lg px-2 py-1.5 opacity-80 ${ui.cartRowBg}`}
+                        >
+                          <div className="flex-1 min-w-0">
+                            <p className={`truncate text-sm font-semibold ${ui.cartTitle}`}>{item.product.name}</p>
+                            <p className={`text-xs ${ui.cartChoices}`}>
+                              {item.quantity}× · €{((item.product.price + choicesTotal) * item.quantity).toFixed(2)}
+                            </p>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              ) : null}
               <div className={`mb-3 flex items-center gap-2.5 rounded-xl px-2.5 py-2 ${ui.numpadBarBg}`}>
                 {tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? (
                   <button
@@ -4548,6 +4602,31 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   {numpadHeaderDateLabel}
                 </p>
               </div>
+              {parkedLinesByCategory.length > 0 ? (
+                <div className="mb-2 shrink-0" data-testid="kassa-parked-on-table">
+                  <p className={`mb-1 text-xs font-bold uppercase tracking-wide ${ui.numpadMeta}`}>
+                    {t('kassaApp.parkedOnTableSection')}
+                  </p>
+                  <div className="space-y-1">
+                    {parkedLinesByCategory.map((item) => {
+                      const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
+                      return (
+                        <div
+                          key={`parked-${item.cartKey}`}
+                          className={`flex items-center gap-2 rounded-lg px-2 py-1.5 opacity-80 ${ui.cartRowBg}`}
+                        >
+                          <div className="flex-1 min-w-0">
+                            <p className={`truncate text-sm font-semibold ${ui.cartTitle}`}>{item.product.name}</p>
+                            <p className={`text-xs ${ui.cartChoices}`}>
+                              {item.quantity}× · €{((item.product.price + choicesTotal) * item.quantity).toFixed(2)}
+                            </p>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              ) : null}
               <div data-testid="kassa-cart-lines">
               {cartLinesByCategory.map(item => {
                 const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
@@ -4793,11 +4872,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <button
             type="button"
             onClick={() => {
-              if (cart.length === 0) return
+              if (billLines.length === 0) return
               scheduleKassaTapSound(playCheckout)
               setShowPaymentModal(true)
             }}
-            disabled={cart.length === 0}
+            disabled={billLines.length === 0}
             className={`touch-manipulation w-full rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold active:brightness-95 disabled:opacity-40 flex items-center justify-center ${
               kassaSidebarFooterTier === 'comfort'
                 ? 'py-5 text-xl gap-2'

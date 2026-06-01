@@ -3771,6 +3771,7 @@
     "orderTypeWithTable": " • Table {number}",
     "addAmount": "+ Add €{amount}",
     "cartTotal": "Total",
+    "parkedOnTableSection": "Already on table",
     "drawerOpen": "Open drawer",
     "cartBon": "Receipt",
     "cartBonTitle": "Print a draft receipt from the current cart (without checkout)",

@@ -3297,6 +3297,7 @@
     "orderTypeWithTable": " • Mesa {number}",
     "addAmount": "+ Añadir €{amount}",
     "cartTotal": "Total",
+    "parkedOnTableSection": "Ya en la mesa",
     "drawerOpen": "Abrir cajón",
     "cartBon": "Ticket",
     "cartBonTitle": "Imprimir ticket provisional del carrito (sin cobrar)",
