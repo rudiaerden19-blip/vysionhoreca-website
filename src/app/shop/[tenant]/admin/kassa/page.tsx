@@ -2033,6 +2033,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return () => {
       document.body.style.overflow = prev
       document.documentElement.style.overflow = ''
+      window.scrollTo(0, 0)
+      document.documentElement.scrollTop = 0
+      document.body.scrollTop = 0
     }
   }, [])
 

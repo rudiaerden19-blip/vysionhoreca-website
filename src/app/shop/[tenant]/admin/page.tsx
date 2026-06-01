@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useLayoutEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -261,6 +261,12 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
   const ordersChange = getPercentageChange(stats.todayOrders, stats.yesterdayOrders)
   const revenueChange = getPercentageChange(stats.todayRevenue, stats.yesterdayRevenue)
 
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0)
+    document.documentElement.scrollTop = 0
+    document.body.scrollTop = 0
+  }, [])
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -306,7 +312,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
   return (
     <PinGate tenant={params.tenant}>
     <div
-      className="relative -mx-4 min-h-[calc(100svh-5.5rem)] md:-mx-6"
+      className="relative -mx-4 -mt-4 min-h-[calc(100svh-3.5rem)] supports-[height:100dvh]:min-h-[calc(100dvh-3.5rem)] md:-mx-6 md:-mt-6"
       data-testid="admin-dashboard-shell"
     >
       {dashboardBackground ? (

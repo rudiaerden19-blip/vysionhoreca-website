@@ -293,6 +293,15 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     } catch { /* ignore */ }
   }, [params.tenant, adminPath])
 
+  /** Overzicht en andere admin-pagina’s: altijd bovenaan (geen witte band na kassa / browser scroll-restore). */
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') return
+    if (adminPath.includes('/kassa')) return
+    window.scrollTo(0, 0)
+    document.documentElement.scrollTop = 0
+    document.body.scrollTop = 0
+  }, [adminPath])
+
   useEffect(() => {
     if (loading || modulesLoading || tenantExists === false) return
     if (demoPublicUnauthenticated) return
@@ -477,8 +486,8 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
       </div>
 
       {/* Hoofdinhoud — geen sidebar, volle breedte */}
-      <main className="pt-14 overflow-x-hidden min-h-screen">
-        <div className="p-4 md:p-6 max-w-full pb-24">
+      <main className="overflow-x-hidden min-h-screen pt-14">
+        <div className="max-w-full p-4 pb-24 md:p-6">
           {children}
         </div>
       </main>
