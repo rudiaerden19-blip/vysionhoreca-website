@@ -239,6 +239,56 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
+export type PrintAgentHealth = {
+  ok: boolean
+  printerConfigured: boolean
+  kitchenPrinterName: string | null
+}
+
+/** GET /health — o.a. of keukenprinter in de agent is ingesteld. */
+export async function fetchPrintAgentHealth(
+  origin = DEFAULT_AGENT_ORIGIN,
+): Promise<PrintAgentHealth> {
+  const base = origin.replace(/\/$/, '')
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), 3000)
+  try {
+    const init: RequestInit = {
+      method: 'GET',
+      mode: 'cors',
+      credentials: 'omit',
+      signal: controller.signal,
+    }
+    ;(init as RequestInit & { targetAddressSpace?: string }).targetAddressSpace = 'local'
+    const r = await fetch(`${base}/health`, init)
+    if (!r.ok) {
+      return { ok: false, printerConfigured: false, kitchenPrinterName: null }
+    }
+    const j = (await r.json()) as {
+      ok?: boolean
+      printerConfigured?: boolean
+      kitchenPrinterName?: string | null
+    }
+    const k =
+      j.kitchenPrinterName != null && String(j.kitchenPrinterName).trim() !== ''
+        ? String(j.kitchenPrinterName).trim()
+        : null
+    return {
+      ok: j.ok === true,
+      printerConfigured: j.printerConfigured === true,
+      kitchenPrinterName: k,
+    }
+  } catch {
+    return { ok: false, printerConfigured: false, kitchenPrinterName: null }
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
+export function printAgentHasKitchenPrinter(health: PrintAgentHealth): boolean {
+  return health.kitchenPrinterName != null && health.kitchenPrinterName.length > 0
+}
+
 async function postPrintOnce(
   body: VysionPrintAgentBody,
   origin: string

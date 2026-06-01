@@ -51,7 +51,13 @@ import {
   printReceiptHtmlDocument,
   printStaffSalesSummaryReceipt,
 } from '@/lib/print-receipt-html'
-import { sendToVysionPrintAgent, openCashDrawer, isAndroidTabletPrintClient } from '@/lib/vysion-print-agent-client'
+import {
+  sendToVysionPrintAgent,
+  openCashDrawer,
+  isAndroidTabletPrintClient,
+  fetchPrintAgentHealth,
+  printAgentHasKitchenPrinter,
+} from '@/lib/vysion-print-agent-client'
 import {
   offlineDbLoadMenuSnapshot,
   offlineDbSaveMenuSnapshot,
@@ -1845,7 +1851,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   /** Automatische toog-delta bij «Naar tafel» / tafel wisselen: aparte inflight per slot. */
   const barDeltaSlotInflightRef = useRef<Record<string, boolean>>({})
   const flushBarDeltaSlipRef = useRef<
-    (zone: FloorPlanZone, tblNr: string, snap: CartItem[], opts?: { printKassaSlip?: boolean }) => void
+    (
+      zone: FloorPlanZone,
+      tblNr: string,
+      snap: CartItem[],
+      opts?: { printKitchen?: boolean; printKassaSlip?: boolean },
+    ) => void
   >(() => {})
 
   const switchToTable = (newTableNr: string) => {
@@ -1865,7 +1876,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     if (tableNumber && cart.length > 0) {
       const snap = snapshotCartItemsForAsyncPrint(cart)
       saveCartToTable(dineInFloorZone, tableNumber, cart)
-      void flushBarDeltaSlipRef.current(dineInFloorZone, tableNumber, snap, { printKassaSlip: false })
+      void flushBarDeltaSlipRef.current(dineInFloorZone, tableNumber, snap, {
+        printKitchen: true,
+        printKassaSlip: false,
+      })
     }
     const slotKey = tableOrderMapKey(zone, newTableNr)
     const existingOrder = tableOrders[slotKey] || []
@@ -1882,12 +1896,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
   }
 
-  /** Naar tafel: mand opslaan; keuken-delta altijd; kassabon alleen als printKassaSlip. */
-  const parkOrder = (printKassaSlip: boolean) => {
+  /** Voeg toe aan tafel: mand opslaan + keuken-delta (alleen bij keukenprinter in agent). Tussentijdse bon: alleen kassa-delta. */
+  const parkOrder = (opts: { printKitchen: boolean; printKassaSlip: boolean }) => {
     if (!tableNumber || cart.length === 0) return
     const snap = snapshotCartItemsForAsyncPrint(cart)
     saveCartToTable(dineInFloorZone, tableNumber, cart)
-    void flushBarDeltaSlipRef.current(dineInFloorZone, tableNumber, snap, { printKassaSlip })
+    void flushBarDeltaSlipRef.current(dineInFloorZone, tableNumber, snap, opts)
     setCart([])
     setTableNumber('')
     setDineInFloorZone(FLOOR_PLAN_ZONE_INSIDE)
@@ -3455,7 +3469,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   flushBarDeltaSlipRef.current = (zone, tblNr, snap, slipOpts) => {
     void (async () => {
       if (demoViewOnly || snap.length === 0) return
+      const wantKitchen = slipOpts?.printKitchen === true
       const printKassaSlip = slipOpts?.printKassaSlip === true
+      if (!wantKitchen && !printKassaSlip) return
       const slotKey = tableOrderMapKey(zone, tblNr)
       if (barDeltaSlotInflightRef.current[slotKey]) return
       barDeltaSlotInflightRef.current[slotKey] = true
@@ -3493,12 +3509,32 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         const watermarkCommit = { slotKey, row: nextWatermark }
 
-        await printReceipt(draftOrder, {
-          draft: true,
-          barTableDelta: true,
-          receiptMode: 'keuken',
-          barWatermarkCommit: printKassaSlip ? undefined : watermarkCommit,
-        })
+        const commitWatermarkOnly = () => {
+          try {
+            const st = loadBarBonWatermarks(tenant)
+            st[watermarkCommit.slotKey] = watermarkCommit.row
+            saveBarBonWatermarks(tenant, st)
+          } catch {
+            /* ignore */
+          }
+        }
+
+        let kitchenAvailable = false
+        if (wantKitchen) {
+          const health = await fetchPrintAgentHealth()
+          kitchenAvailable = printAgentHasKitchenPrinter(health)
+        }
+
+        if (wantKitchen && kitchenAvailable) {
+          await printReceipt(draftOrder, {
+            draft: true,
+            barTableDelta: true,
+            receiptMode: 'keuken',
+            barWatermarkCommit: printKassaSlip ? undefined : watermarkCommit,
+          })
+        } else if (wantKitchen && !kitchenAvailable) {
+          commitWatermarkOnly()
+        }
 
         if (printKassaSlip) {
           await printReceipt(draftOrder, {
@@ -4721,7 +4757,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             >
               <button
                 type="button"
-                onClick={() => parkOrder(false)}
+                onClick={() => parkOrder({ printKitchen: true, printKassaSlip: false })}
                 className={`min-w-0 flex-1 border-r border-black/15 font-bold active:brightness-95 flex items-center justify-center text-center ${
                   dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE
                     ? 'bg-emerald-700 text-white hover:bg-emerald-800'
@@ -4738,7 +4774,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               </button>
               <button
                 type="button"
-                onClick={() => parkOrder(true)}
+                onClick={() => parkOrder({ printKitchen: false, printKassaSlip: true })}
                 className={`min-w-0 flex-1 font-bold active:brightness-95 flex items-center justify-center text-center ${
                   dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE
                     ? 'bg-emerald-400 text-emerald-950 hover:bg-emerald-300'
