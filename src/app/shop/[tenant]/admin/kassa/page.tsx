@@ -315,6 +315,11 @@ const KASSA_STRIP_SCROLL_DELTA_PX = 4
 /** Titelbalk: klantscherm + geluid tijdelijk verborgen (code blijft voor later). */
 const KASSA_HEADER_HIDE_CUSTOMER_DISPLAY_AND_SOUND = true
 
+/** Alleen Binnen/Terras — groter dan besteltype-knoppen eronder. */
+function kassaFloorZoneButtonTouchClass(sxga: boolean): string {
+  return sxga ? 'min-h-[3.25rem] py-2.5 text-base' : 'min-h-[2.75rem] py-2 text-sm'
+}
+
 /** Sidebar-footer: touch-vriendelijke hoogte (Lade / Bon / Verwijder). */
 function kassaFooterActionTouchMinHClass(sxga: boolean, denseBill: boolean): string {
   if (sxga) return 'min-h-[4.75rem] py-2.5'
@@ -4410,15 +4415,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   setPickerBrowseZone(FLOOR_PLAN_ZONE_INSIDE)
                   setShowTablePicker(true)
                 }}
-                className={`flex flex-1 flex-col items-center justify-center rounded-lg px-2 font-bold transition-colors ${
-                  kassaSxgaDenseTiles ? 'min-h-[34px] py-1.5 text-sm' : 'min-h-[30px] py-1 text-xs'
-                } ${
+                className={`flex flex-1 flex-col items-center justify-center rounded-xl px-3 font-bold transition-colors ${kassaFloorZoneButtonTouchClass(
+                  kassaSxgaDenseTiles,
+                )} ${
                   pickerBrowseZone === FLOOR_PLAN_ZONE_INSIDE && showTablePicker
                     ? `bg-[#3C4D6B] text-white ring-2 ring-[#58CCFF]/55 ring-offset-2 ${ui.ringOffset}`
                     : 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
                 }`}
               >
-                <span className="text-xs font-bold">{t('kassaApp.floorZoneInside')}</span>
+                <span className="font-bold">{t('kassaApp.floorZoneInside')}</span>
                 {orderType === 'DINE_IN' && tableNumber && dineInFloorZone === FLOOR_PLAN_ZONE_INSIDE ? (
                   <span className="mt-0.5 text-xs font-semibold opacity-95">
                     {kassaStoolsByZone[FLOOR_PLAN_ZONE_INSIDE].some((s) => s.stoolNumber === tableNumber)
@@ -4438,15 +4443,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   setPickerBrowseZone(FLOOR_PLAN_ZONE_TERRACE)
                   setShowTablePicker(true)
                 }}
-                className={`flex flex-1 flex-col items-center justify-center rounded-lg px-2 font-bold transition-colors ${
-                  kassaSxgaDenseTiles ? 'min-h-[34px] py-1.5 text-sm' : 'min-h-[30px] py-1 text-xs'
-                } ${
+                className={`flex flex-1 flex-col items-center justify-center rounded-xl px-3 font-bold transition-colors ${kassaFloorZoneButtonTouchClass(
+                  kassaSxgaDenseTiles,
+                )} ${
                   pickerBrowseZone === FLOOR_PLAN_ZONE_TERRACE && showTablePicker
                     ? `bg-emerald-600 text-white ring-2 ring-emerald-300/80 ring-offset-2 ${ui.ringOffset}`
                     : 'bg-emerald-600 text-white hover:bg-emerald-700'
                 }`}
               >
-                <span className="text-xs font-bold">{t('kassaApp.floorZoneTerrace')}</span>
+                <span className="font-bold">{t('kassaApp.floorZoneTerrace')}</span>
                 {orderType === 'DINE_IN' && tableNumber && dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE ? (
                   <span className="mt-0.5 text-xs font-semibold opacity-95">
                     {kassaStoolsByZone[FLOOR_PLAN_ZONE_TERRACE].some((s) => s.stoolNumber === tableNumber)
