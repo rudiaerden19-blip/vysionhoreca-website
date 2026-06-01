@@ -3745,6 +3745,8 @@
     "noCategoriesTitle": "Nog geen categorieën",
     "noCategoriesHint": "Voeg categorieën toe via het online platform",
     "noProductsInCategory": "Geen producten in deze categorie",
+    "categories": "Categorieën",
+    "backToCategories": "Terug naar categorieën",
     "pickTablePlaceholder": "Kies tafel…",
     "pickTableTitle": "Kies tafel",
     "noTablesYet": "Nog geen tafels aangemaakt",

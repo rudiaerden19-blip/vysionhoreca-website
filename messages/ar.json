@@ -3271,6 +3271,8 @@
     "noCategoriesTitle": "لا توجد فئات بعد",
     "noCategoriesHint": "أضف الفئات من لوحة الإدارة",
     "noProductsInCategory": "لا توجد منتجات في هذه الفئة",
+    "categories": "الفئات",
+    "backToCategories": "العودة إلى الفئات",
     "pickTablePlaceholder": "اختر طاولة…",
     "pickTableTitle": "اختر طاولة",
     "noTablesYet": "لم تُنشأ طاولات بعد",

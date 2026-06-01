@@ -3271,6 +3271,8 @@
     "noCategoriesTitle": "Aún no hay categorías",
     "noCategoriesHint": "Añade categorías en el admin online",
     "noProductsInCategory": "No hay productos en esta categoría",
+    "categories": "Categorías",
+    "backToCategories": "Volver a categorías",
     "pickTablePlaceholder": "Elige mesa…",
     "pickTableTitle": "Elige mesa",
     "noTablesYet": "Aún no hay mesas",

@@ -1111,6 +1111,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   /** Ghost-tap naar nieuwe DOM onder vinger blokkeren (geen tijdvenster: ~2 frames pointer-events uit). */
   const kassaProductGridRef = useRef<HTMLDivElement>(null)
   const kassaCategoryGridRef = useRef<HTMLDivElement>(null)
+  const kassaCategoryStripRef = useRef<HTMLDivElement>(null)
   /** Vorige gekozen categorie-id; null = nog nooit naar producten geweest. */
   const kassaPrevSelectedCategoryIdRef = useRef<string | null>(null)
 
@@ -1152,6 +1153,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       peelEl.style.pointerEvents = ''
     }
   }, [selectedCategory])
+
+  useLayoutEffect(() => {
+    if (!selectedCategory?.id || !kassaCategoryStripRef.current) return
+    const chip = kassaCategoryStripRef.current.querySelector(
+      `[data-kassa-strip-category-id="${String(selectedCategory.id)}"]`,
+    )
+    if (chip && 'scrollIntoView' in chip) {
+      chip.scrollIntoView({ inline: 'nearest', block: 'nearest', behavior: 'smooth' })
+    }
+  }, [selectedCategory?.id])
 
   const [showReservations, setShowReservations] = useState(false)
   const [pendingReservCount, setPendingReservCount] = useState(0)
@@ -4036,21 +4047,59 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* ── Midden: categorieën / producten ── */}
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
 
-          {/* Sub-header: tik op balk om naar categorieën te gaan (geen aparte Terug-knop) */}
-          {selectedCategory && (
-            <button
-              type="button"
-              onClick={handleCategoryClear}
-              className={`touch-manipulation select-none flex-shrink-0 flex w-full items-center gap-2 px-4 py-2.5 text-left transition-colors active:brightness-95 ${ui.categoryStripBg} border-b ${ui.categoryStripBorder} ${ui.categoryStripHover}`}
+          {/* Categoriebalk boven producten: alle tenant-categorieën, horizontaal scrollbaar */}
+          {selectedCategory && categories.length > 0 && (
+            <div
+              className={`flex shrink-0 items-stretch border-b ${ui.categoryStripBorder} ${ui.categoryStripBg}`}
             >
-              <svg className={`h-5 w-5 shrink-0 ${ui.categoryStripIcon}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              <span className={`text-lg font-bold ${ui.categoryStripText}`}>
-                {selectedCategory.icon && <span className="mr-1">{selectedCategory.icon}</span>}
-                {selectedCategory.name}
-              </span>
-            </button>
+              <button
+                type="button"
+                onClick={handleCategoryClear}
+                title={t('kassaApp.backToCategories')}
+                aria-label={t('kassaApp.backToCategories')}
+                className={`touch-manipulation select-none flex shrink-0 items-center justify-center px-3 transition-colors active:brightness-95 ${ui.categoryStripHover} border-r ${ui.categoryStripBorder}`}
+              >
+                <svg className={`h-5 w-5 shrink-0 ${ui.categoryStripIcon}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <div
+                ref={kassaCategoryStripRef}
+                data-testid="kassa-category-strip"
+                role="tablist"
+                aria-label={t('kassaApp.categories')}
+                className="flex min-w-0 flex-1 gap-2 overflow-x-auto overflow-y-hidden overscroll-x-contain px-2 py-2 touch-manipulation [scrollbar-gutter:stable] [-webkit-overflow-scrolling:touch]"
+              >
+                {categories.map((cat) => {
+                  const active =
+                    cat.id !== undefined &&
+                    cat.id !== null &&
+                    selectedCategory.id !== undefined &&
+                    selectedCategory.id !== null &&
+                    String(cat.id) === String(selectedCategory.id)
+                  return (
+                    <button
+                      key={cat.id ?? cat.name}
+                      type="button"
+                      role="tab"
+                      aria-selected={active}
+                      data-kassa-strip-category-id={cat.id != null ? String(cat.id) : undefined}
+                      onClick={() => handleCategorySelect(cat)}
+                      className={`shrink-0 whitespace-nowrap rounded-xl border px-4 py-2 text-base font-bold transition-colors active:brightness-95 ${
+                        active
+                          ? 'border-[#58CCFF] bg-[#58CCFF] text-black shadow-sm'
+                          : kassaAppearanceDark
+                            ? `border-zinc-500 bg-[#1a2230] ${ui.categoryStripText} ${ui.categoryStripHover}`
+                            : `border-gray-300 bg-white ${ui.categoryStripText} ${ui.categoryStripHover}`
+                      }`}
+                    >
+                      {cat.icon ? <span className="mr-1">{cat.icon}</span> : null}
+                      {cat.name}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
           )}
 
           {/* Grid — min-h-0 nodig: anders groeit de flex-child mee met alle tegels en wordt onderaan afgekapt zonder scroll */}

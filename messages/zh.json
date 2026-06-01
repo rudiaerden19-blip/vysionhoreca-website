@@ -3271,6 +3271,8 @@
     "noCategoriesTitle": "暂无分类",
     "noCategoriesHint": "在在线后台添加分类",
     "noProductsInCategory": "该分类下没有商品",
+    "categories": "分类",
+    "backToCategories": "返回分类",
     "pickTablePlaceholder": "选择桌号…",
     "pickTableTitle": "选择桌号",
     "noTablesYet": "尚未创建桌台",

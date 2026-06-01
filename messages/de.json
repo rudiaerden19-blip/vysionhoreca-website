@@ -2771,6 +2771,8 @@
     "noCategoriesTitle": "Noch keine Kategorien",
     "noCategoriesHint": "Kategorien im Online-Admin hinzufügen",
     "noProductsInCategory": "Keine Produkte in dieser Kategorie",
+    "categories": "Kategorien",
+    "backToCategories": "Zurück zu Kategorien",
     "pickTablePlaceholder": "Tisch wählen…",
     "pickTableTitle": "Tisch wählen",
     "noTablesYet": "Noch keine Tische angelegt",

@@ -3745,6 +3745,8 @@
     "noCategoriesTitle": "No categories yet",
     "noCategoriesHint": "Add categories in the online admin",
     "noProductsInCategory": "No products in this category",
+    "categories": "Categories",
+    "backToCategories": "Back to categories",
     "pickTablePlaceholder": "Choose table…",
     "pickTableTitle": "Choose table",
     "noTablesYet": "No tables created yet",

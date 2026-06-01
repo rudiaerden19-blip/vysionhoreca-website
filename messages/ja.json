@@ -3271,6 +3271,8 @@
     "noCategoriesTitle": "カテゴリがありません",
     "noCategoriesHint": "管理画面でカテゴリを追加",
     "noProductsInCategory": "このカテゴリに商品がありません",
+    "categories": "カテゴリ",
+    "backToCategories": "カテゴリに戻る",
     "pickTablePlaceholder": "テーブルを選択…",
     "pickTableTitle": "テーブルを選択",
     "noTablesYet": "テーブルが未作成です",

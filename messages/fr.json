@@ -2771,6 +2771,8 @@
     "noCategoriesTitle": "Pas encore de catégories",
     "noCategoriesHint": "Ajoutez des catégories dans l’admin en ligne",
     "noProductsInCategory": "Aucun produit dans cette catégorie",
+    "categories": "Catégories",
+    "backToCategories": "Retour aux catégories",
     "pickTablePlaceholder": "Choisir une table…",
     "pickTableTitle": "Choisir une table",
     "noTablesYet": "Aucune table créée",

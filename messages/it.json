@@ -3271,6 +3271,8 @@
     "noCategoriesTitle": "Nessuna categoria",
     "noCategoriesHint": "Aggiungi categorie dall’admin online",
     "noProductsInCategory": "Nessun prodotto in questa categoria",
+    "categories": "Categorie",
+    "backToCategories": "Torna alle categorie",
     "pickTablePlaceholder": "Scegli tavolo…",
     "pickTableTitle": "Scegli tavolo",
     "noTablesYet": "Nessun tavolo creato",
