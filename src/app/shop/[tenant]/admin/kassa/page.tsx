@@ -4071,14 +4071,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
 
         <div className="flex min-w-0 flex-1 items-center gap-1 sm:gap-1.5">
-        <div className="relative z-20 flex min-w-0 max-w-[6.5rem] shrink-0 flex-col justify-center px-0.5 sm:max-w-[8.5rem] md:max-w-[11rem] lg:max-w-[13rem] ml-[1cm]">
+        <div className="relative z-20 ml-[1cm] flex min-w-0 max-w-[9rem] shrink-0 flex-col justify-center px-0.5 sm:max-w-[11rem] md:max-w-[14rem] lg:max-w-[16rem]">
           <button
             type="button"
             onClick={() => {
               void printDraftBonFromCart({ draftCopies: 2 })
             }}
             disabled={draftBonLineItems.length === 0 || draftBonPrinting}
-            className="max-w-full truncate rounded-md px-1 py-0.5 text-center text-[10px] font-semibold leading-tight tracking-tight text-white/95 transition-colors hover:bg-white/15 active:bg-white/25 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-transparent sm:text-[11px] md:text-xs"
+            className="max-w-full truncate rounded-md px-1 py-0.5 text-center text-sm font-bold leading-tight tracking-tight text-white transition-colors hover:bg-white/15 active:bg-white/25 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-transparent sm:text-base md:text-lg"
             title={t('kassaApp.cartBonTitle')}
             aria-label={t('kassaApp.cartBonTitle')}
           >

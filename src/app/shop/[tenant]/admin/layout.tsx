@@ -454,7 +454,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
 
         {/* Tenant naam midden */}
         <div className="flex min-w-0 flex-1 items-center justify-center px-1">
-          <span className="truncate text-center text-sm font-medium tracking-normal text-white sm:text-base">
+          <span className="truncate text-center text-base font-semibold tracking-normal text-white sm:text-lg">
             {adminHeaderTitle}
           </span>
         </div>
