@@ -4481,9 +4481,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* Cart of Numpad */}
         <div className="flex-1 min-h-0 overflow-y-auto px-3 pt-2 flex flex-col touch-pan-y">
           {cart.length === 0 ? (
-            <div className="flex flex-col flex-1 min-h-0">
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
               {parkedLinesByCategory.length > 0 ? (
-                <div className="mb-2 shrink-0" data-testid="kassa-parked-on-table">
+                <div
+                  className="mb-2 max-h-[min(38vh,11rem)] shrink-0 overflow-y-auto overscroll-y-contain"
+                  data-testid="kassa-parked-on-table"
+                >
                   <p className={`mb-1 text-xs font-bold uppercase tracking-wide ${ui.numpadMeta}`}>
                     {t('kassaApp.parkedOnTableSection')}
                   </p>
@@ -4507,7 +4510,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   </div>
                 </div>
               ) : null}
-              <div className={`mb-3 flex items-center gap-2.5 rounded-xl px-2.5 py-2 ${ui.numpadBarBg}`}>
+              <div className="flex min-h-[15rem] flex-1 flex-col justify-end">
+              <div className={`mb-3 flex shrink-0 items-center gap-2.5 rounded-xl px-2.5 py-2 ${ui.numpadBarBg}`}>
                 {tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? (
                   <button
                     type="button"
@@ -4539,7 +4543,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 </div>
               </div>
               <div
-                className="grid grid-cols-4 grid-rows-4 gap-2 flex-1 min-h-0 touch-manipulation select-none"
+                className="grid shrink-0 grid-cols-4 gap-2 touch-manipulation select-none [grid-template-rows:repeat(4,minmax(2.75rem,1fr))]"
                 onClick={(e) => {
                   const el = (e.target as HTMLElement).closest('[data-kassa-numpad-key]')
                   if (!el || !(el instanceof HTMLElement)) return
@@ -4552,7 +4556,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     key={key}
                     type="button"
                     data-kassa-numpad-key={key}
-                    className={`rounded-xl font-bold text-2xl shadow-sm touch-manipulation active:brightness-95 ${
+                    className={`min-h-[2.75rem] rounded-xl font-bold text-2xl shadow-sm touch-manipulation active:brightness-95 ${
                       key === 'C'
                         ? 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
                         : ['+', '-', '×', '='].includes(key)
@@ -4569,7 +4573,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   type="button"
                   data-testid="kassa-add-custom-amount"
                   onClick={addCustomAmount}
-                  className="mt-3 touch-manipulation py-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-lg active:brightness-95"
+                  className="mt-3 shrink-0 touch-manipulation py-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-lg active:brightness-95"
                 >
                   {t('kassaApp.addAmount').replace(
                     '{amount}',
@@ -4577,6 +4581,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   )}
                 </button>
               )}
+              </div>
             </div>
           ) : (
               <div className={kassaSidebarFooterTier === 'comfort' ? 'space-y-2' : kassaSidebarFooterTier === 'compact' ? 'space-y-1.5' : 'space-y-1'}>
