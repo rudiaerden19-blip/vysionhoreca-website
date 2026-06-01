@@ -2386,6 +2386,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return tableOrders[activeTableSlotKey] ?? []
   }, [activeTableSlotKey, tableOrders])
 
+  /** Alleen «Al op tafel», geen kar/numpad: lijst vult het zwarte vlak. */
+  const parkedOnlySidebarView = useMemo(
+    () => !numpadPanelVisible && cart.length === 0 && parkedOnTableLines.length > 0,
+    [numpadPanelVisible, cart.length, parkedOnTableLines.length],
+  )
+
   /** Volledige rekening (op tafel + deze ronde) voor totaal, betalen en voorlopige bon. */
   const billLines = useMemo((): CartItem[] => {
     if (activeTableSlotKey) return mergeCartLinesForTable(parkedOnTableLines, cart)
@@ -4489,17 +4495,28 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
 
         {/* Cart / numpad (toggle via footer) */}
-        <div className="flex-1 min-h-0 overflow-y-auto px-3 pt-2 flex flex-col touch-pan-y">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-3 pt-2 touch-pan-y">
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-              {parkedLinesByCategory.length > 0 ? (
+              {parkedLinesByCategory.length > 0 &&
+              (parkedOnlySidebarView || numpadPanelVisible) ? (
                 <div
-                  className="mb-2 max-h-[min(38vh,11rem)] shrink-0 overflow-y-auto overscroll-y-contain"
+                  className={
+                    parkedOnlySidebarView
+                      ? 'mb-2 flex min-h-0 flex-1 flex-col overflow-hidden'
+                      : 'mb-2 max-h-[min(38vh,11rem)] shrink-0 overflow-y-auto overscroll-y-contain'
+                  }
                   data-testid="kassa-parked-on-table"
                 >
-                  <p className={`mb-1 text-xs font-bold uppercase tracking-wide ${ui.numpadMeta}`}>
+                  <p className={`mb-1 shrink-0 text-xs font-bold uppercase tracking-wide ${ui.numpadMeta}`}>
                     {t('kassaApp.parkedOnTableSection')}
                   </p>
-                  <div className="space-y-1">
+                  <div
+                    className={
+                      parkedOnlySidebarView
+                        ? 'min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-y-contain'
+                        : 'space-y-1'
+                    }
+                  >
                     {parkedLinesByCategory.map((item) => {
                       const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
                       return (
@@ -4593,9 +4610,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               )}
               </div>
               ) : cart.length > 0 ? (
-              <div className={kassaSidebarFooterTier === 'comfort' ? 'space-y-2' : kassaSidebarFooterTier === 'compact' ? 'space-y-1.5' : 'space-y-1'}>
               <div
-                className={`flex items-center gap-2.5 rounded-xl px-2.5 py-2 ${ui.numpadBarBg} ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? '' : 'justify-end'}`}
+                className={`flex min-h-0 flex-1 flex-col overflow-hidden ${
+                  kassaSidebarFooterTier === 'comfort' ? 'gap-2' : kassaSidebarFooterTier === 'compact' ? 'gap-1.5' : 'gap-1'
+                }`}
+              >
+              <div
+                className={`flex shrink-0 items-center gap-2.5 rounded-xl px-2.5 py-2 ${ui.numpadBarBg} ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? '' : 'justify-end'}`}
               >
                 {tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? (
                   <button
@@ -4616,7 +4637,38 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   {numpadHeaderDateLabel}
                 </p>
               </div>
-              <div data-testid="kassa-cart-lines">
+              {parkedLinesByCategory.length > 0 ? (
+                <div
+                  className="max-h-[min(38vh,11rem)] shrink-0 overflow-y-auto overscroll-y-contain"
+                  data-testid="kassa-parked-on-table"
+                >
+                  <p className={`mb-1 text-xs font-bold uppercase tracking-wide ${ui.numpadMeta}`}>
+                    {t('kassaApp.parkedOnTableSection')}
+                  </p>
+                  <div className="space-y-1">
+                    {parkedLinesByCategory.map((item) => {
+                      const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
+                      return (
+                        <div
+                          key={`parked-${item.cartKey}`}
+                          className={`flex items-center gap-2 rounded-lg px-2 py-1.5 opacity-80 ${ui.cartRowBg}`}
+                        >
+                          <div className="flex-1 min-w-0">
+                            <p className={`truncate text-sm font-semibold ${ui.cartTitle}`}>{item.product.name}</p>
+                            <p className={`text-xs ${ui.cartChoices}`}>
+                              {item.quantity}× · €{((item.product.price + choicesTotal) * item.quantity).toFixed(2)}
+                            </p>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              ) : null}
+              <div
+                className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain"
+                data-testid="kassa-cart-lines"
+              >
               {cartLinesByCategory.map(item => {
                 const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
                 return (
