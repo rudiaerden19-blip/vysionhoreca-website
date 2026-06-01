@@ -24,6 +24,7 @@ import {
   ProductOptionChoice,
   dedupeCatalogById,
   getMenuCategories,
+  invalidateMenuCategoriesCache,
   getMenuProducts,
   getProductsWithOptions,
   getOptionsForProduct,
@@ -2910,7 +2911,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       if (Math.abs(total - sc - sd) > 0.02) return
     }
 
-    const vatSplit = computeInclusiveVatSplitFromCart(cart, resolveCartLineVat)
+    invalidateMenuCategoriesCache(tenant)
+    let freshVatLookup = categoryVatLookup
+    try {
+      const freshCats = dedupeCatalogById((await getMenuCategories(tenant)).filter((c) => c.is_active))
+      freshVatLookup = buildCategoryVatLookup(freshCats)
+      setCategories(freshCats)
+    } catch {
+      /* offline: bestaande lookup */
+    }
+    const resolveLineVatAtCheckout = (line: (typeof cart)[number]) =>
+      resolveVatPercentForProduct(line.product, freshVatLookup, tenantDefaultBtw)
+    const vatSplit = computeInclusiveVatSplitFromCart(cart, resolveLineVatAtCheckout)
     if (Math.abs(vatSplit.grossTotal - total) > 0.03) {
       console.warn('[kassa] btw-split vs mandtotaal mismatched', { split: vatSplit.grossTotal, total })
     }
@@ -2953,7 +2965,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         name: i.product.name,
         price: i.product.price,
         quantity: i.quantity,
-        btw_percentage: resolveCartLineVat(i),
+        btw_percentage: resolveLineVatAtCheckout(i),
         options: (i.choices || []).map((c: any) => ({ name: c.choiceName || c.name || '', price: c.price || 0 })),
       })),
       created_at: createdAt.toISOString(),
@@ -3293,6 +3305,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     const paidCopies = 2
     const draftCopies = opts?.draftCopies === 2 ? 2 : 1
+    const agentVatLines =
+      splitOk && order.vatSplit!.length > 0
+        ? order.vatSplit!.map((row) => ({ rate: row.rate, tax: row.tax }))
+        : [{ rate: fbVatRate, tax }]
+
     const printResult = await sendToVysionPrintAgent({
       winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
       bonInhoud: bonLines.join('\n'),
@@ -3314,6 +3331,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         tax,
         total: order.total,
         paymentMethod: order.paymentMethod,
+        vatLines: agentVatLines,
       },
       businessInfo: {
         name: tenantInfo?.business_name,
@@ -3323,7 +3341,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         phone: tenantInfo?.phone ?? undefined,
         vatNumber: tenantInfo?.btw_number ?? undefined,
         website: tenantInfo?.website ?? undefined,
-        vatRate: splitOk ? order.vatSplit![0].rate : fbVatRate,
+        vatRate: agentVatLines.length === 1 ? agentVatLines[0].rate : fbVatRate,
       },
     })
 

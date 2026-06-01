@@ -9,6 +9,11 @@ export type VysionPrintAgentItem = {
   choices?: { name: string; price: number }[]
 }
 
+export type VysionPrintAgentVatLine = {
+  rate: number
+  tax: number
+}
+
 export type VysionPrintAgentOrderData = {
   orderNumber: number | string
   orderType?: string
@@ -18,6 +23,8 @@ export type VysionPrintAgentOrderData = {
   tax: number
   total: number
   paymentMethod?: string
+  /** Meerdere BTW-tarieven (categorie-BTW); anders valt agent terug op businessInfo.vatRate. */
+  vatLines?: VysionPrintAgentVatLine[]
 }
 
 export type VysionPrintAgentBusinessInfo = {
