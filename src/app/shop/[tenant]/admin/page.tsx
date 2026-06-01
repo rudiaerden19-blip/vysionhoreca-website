@@ -9,6 +9,7 @@ import { useLanguage } from '@/i18n'
 import {
   fetchAllTenantOrdersForDashboard,
   getTenantSettings,
+  isActiveTenantOrderStatus,
   orderCountsTowardRevenueAndZReport,
   type Order,
 } from '@/lib/admin-api'
@@ -158,10 +159,12 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
     const weekOrdersCount = weekOrders.length
     const weekRevenue = weekOrders.reduce((sum, o) => sum + (o.total || 0), 0)
 
-    // Wachtende orders: nieuwe + in behandeling (niet betaald, niet geweigerd)
-    const pendingOrders = allOrdersList.filter(o =>
-      ['new', 'NEW', 'pending', 'confirmed', 'preparing'].includes(o.status || '')
-    ).length
+    // Wachtende = actief vandaag (zelfde statuslogica als Bestellingen › Actief, niet oude confirmed in archief)
+    const pendingOrders = allOrdersList.filter((o) => {
+      if (!isActiveTenantOrderStatus(o.status)) return false
+      if (!o.created_at) return false
+      return new Date(o.created_at) >= today
+    }).length
 
     // Recent orders (last 5, alle statussen voor weergave)
     const recentOrdersData = allOrdersList.slice(0, 5).map((o) => ({
@@ -268,8 +271,11 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
 
   const hasDashboardBg = Boolean(dashboardBackground?.url)
   const cardSurface = hasDashboardBg
-    ? 'rounded-2xl bg-white/96 p-6 shadow-md ring-1 ring-black/5'
+    ? 'rounded-2xl bg-white p-6 shadow-lg ring-1 ring-slate-200/90'
     : 'bg-white rounded-2xl p-6 shadow-sm'
+  const statLabelClass = hasDashboardBg
+    ? 'text-sm font-semibold text-gray-900'
+    : 'text-gray-500 text-sm'
 
   return (
     <PinGate tenant={params.tenant}>
@@ -296,17 +302,21 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
       ) : null}
       <div className="relative z-10 mx-auto max-w-7xl px-4 pb-8 md:px-6">
       {/* Header */}
-      <div className="mb-8 pt-1">
-        <motion.h1 
+      <div
+        className={
+          hasDashboardBg
+            ? 'mb-8 rounded-2xl bg-white px-5 py-4 shadow-lg ring-1 ring-slate-200/90'
+            : 'mb-8 pt-1'
+        }
+      >
+        <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`text-3xl font-bold text-gray-900 ${hasDashboardBg ? '[text-shadow:0_1px_2px_rgba(255,255,255,0.9)]' : ''}`}
+          className="text-3xl font-bold text-gray-900"
         >
           {t('adminDashboard.welcome')} {businessName}
         </motion.h1>
-        <p className={`mt-1 ${hasDashboardBg ? 'text-gray-800' : 'text-gray-500'}`}>
-          {t('adminDashboard.subtitle')}
-        </p>
+        <p className="mt-1 text-gray-600">{t('adminDashboard.subtitle')}</p>
       </div>
 
       {/* Stats Grid */}
@@ -318,7 +328,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           className={cardSurface}
         >
           <div className="flex items-center justify-between mb-4">
-            <span className="text-gray-500 text-sm">{t('adminDashboard.stats.ordersToday')}</span>
+            <span className={statLabelClass}>{t('adminDashboard.stats.ordersToday')}</span>
             <span className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">📦</span>
           </div>
           <p className="text-3xl font-bold text-gray-900">{stats.todayOrders}</p>
@@ -334,7 +344,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           className={cardSurface}
         >
           <div className="flex items-center justify-between mb-4">
-            <span className="text-gray-500 text-sm">{t('adminDashboard.stats.revenueToday')}</span>
+            <span className={statLabelClass}>{t('adminDashboard.stats.revenueToday')}</span>
             <span className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">💰</span>
           </div>
           <p className="text-3xl font-bold text-gray-900">€{stats.todayRevenue.toFixed(2)}</p>
@@ -350,7 +360,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           className={cardSurface}
         >
           <div className="flex items-center justify-between mb-4">
-            <span className="text-gray-500 text-sm">{t('adminDashboard.stats.pendingOrders')}</span>
+            <span className={statLabelClass}>{t('adminDashboard.stats.pendingOrders')}</span>
             <span className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">⏳</span>
           </div>
           <p className="text-3xl font-bold text-gray-900">{stats.pendingOrders}</p>
@@ -366,11 +376,11 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           className={cardSurface}
         >
           <div className="flex items-center justify-between mb-4">
-            <span className="text-gray-500 text-sm">{t('adminDashboard.stats.rating')}</span>
+            <span className={statLabelClass}>{t('adminDashboard.stats.rating')}</span>
             <span className="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center">⭐</span>
           </div>
           <p className="text-3xl font-bold text-gray-900">{stats.averageRating || '-'}</p>
-          <p className="text-gray-500 text-sm mt-1">{stats.totalReviews} {t('adminDashboard.stats.reviews')}</p>
+          <p className={`${statLabelClass} mt-1`}>{stats.totalReviews} {t('adminDashboard.stats.reviews')}</p>
         </motion.div>
       </div>
 
@@ -460,7 +470,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
                       />
                     </div>
                   </div>
-                  <span className="text-sm font-medium text-gray-500">{item.count}x</span>
+                  <span className="text-sm font-semibold text-gray-900">{item.count}x</span>
                 </div>
               ))}
             </div>

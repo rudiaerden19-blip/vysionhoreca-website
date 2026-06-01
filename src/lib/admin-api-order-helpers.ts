@@ -74,6 +74,12 @@ export function isWebshopOrder(order: Pick<Order, 'order_type'>): boolean {
   return !isKassaPosOrder(order)
 }
 
+/** Zelfde als tab «Actief» op admin/bestellingen (niet afgerond, geannuleerd of geweigerd). */
+export function isActiveTenantOrderStatus(status: string | null | undefined): boolean {
+  const s = (status || '').toString().toLowerCase()
+  return !!s && !['completed', 'cancelled', 'rejected'].includes(s)
+}
+
 /**
  * Orders met status `new` die van het publieke web / groepsmodule komen.
  * Kassa-POS schrijft bij verkoop direct `confirmed` — die horen dit alarm niet te triggeren.

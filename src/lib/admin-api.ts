@@ -24,6 +24,7 @@ export {
 
 import {
   distributeOrderPaymentForZRaport,
+  isActiveTenantOrderStatus,
   isKassaPosOrder,
   isWebshopOrder,
   orderCountsTowardRevenueAndZReport,
@@ -36,6 +37,7 @@ import {
 export type { Order, OrderItem, OrderPaymentBucket }
 export {
   distributeOrderPaymentForZRaport,
+  isActiveTenantOrderStatus,
   isKassaPosOrder,
   isWebshopOrder,
   orderCountsTowardRevenueAndZReport,

@@ -14,6 +14,7 @@ import {
   TenantSettings,
   addLoyaltyPoints,
   isWebshopOrder,
+  isActiveTenantOrderStatus,
   regenerateZReportForDate,
   getBelgiumDateString,
 } from '@/lib/admin-api'
@@ -874,12 +875,12 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
 
   const filteredOrders = orders.filter(o => {
     const status = o.status?.toLowerCase()
-    if (filter === 'active') return !['completed', 'cancelled', 'rejected'].includes(status)
+    if (filter === 'active') return isActiveTenantOrderStatus(o.status)
     if (filter === 'completed') return status === 'completed'
     return true
   })
 
-  const activeCount = orders.filter(o => !['completed', 'cancelled', 'rejected'].includes(o.status?.toLowerCase())).length
+  const activeCount = orders.filter((o) => isActiveTenantOrderStatus(o.status)).length
   const newCount = orders.filter(o => o.status === 'new' || o.status === 'NEW').length
 
   if (loading) {
