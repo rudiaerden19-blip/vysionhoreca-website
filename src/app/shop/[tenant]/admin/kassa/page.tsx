@@ -298,6 +298,10 @@ const KASSA_NUMPAD_KEYS = ['7', '8', '9', '+', '4', '5', '6', '-', '1', '2', '3'
 
 /** Scroll vs tik op embedded touch/WebView (o.a. Elo): kleine beweging telt nog als tik */
 const KASSA_TILE_TAP_SLOP_PX = 18
+/** Horizontale categoriebalk: ruimere slop + scroll-as detectie (17″/21″/iPad). */
+const KASSA_STRIP_TAP_SLOP_PX = 24
+const KASSA_STRIP_SCROLL_AXIS_MIN_PX = 8
+const KASSA_STRIP_SCROLL_DELTA_PX = 4
 
 function stoolsFromFloorDecorPayload(data: unknown): { stoolNumber: string; segmentId: string }[] {
   const rawItems = Array.isArray(data)
@@ -783,6 +787,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     x: number
     y: number
     chip: HTMLElement | null
+  } | null>(null)
+  const suppressCategoryStripClickRef = useRef(false)
+  const categoryStripPointerRef = useRef<{
+    pointerId: number
+    x: number
+    y: number
+    chip: HTMLElement | null
+    scrollLeft: number
   } | null>(null)
 
   // ── Nieuwe bestelling alarm (exact donor) ────────────────────────────────
@@ -2720,6 +2732,73 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     [categoryGridById, handleCategorySelect],
   )
 
+  const handleCategoryStripPointerDown = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return
+    const chip = (e.target as HTMLElement).closest('[data-kassa-strip-category-id]')
+    categoryStripPointerRef.current = {
+      pointerId: e.pointerId,
+      x: e.clientX,
+      y: e.clientY,
+      chip: chip instanceof HTMLElement ? chip : null,
+      scrollLeft: kassaCategoryStripRef.current?.scrollLeft ?? 0,
+    }
+  }, [])
+
+  const handleCategoryStripPointerCancel = useCallback(() => {
+    categoryStripPointerRef.current = null
+  }, [])
+
+  const handleCategoryStripPointerUp = useCallback(
+    (e: ReactPointerEvent<HTMLDivElement>) => {
+      const start = categoryStripPointerRef.current
+      categoryStripPointerRef.current = null
+      if (!start || start.pointerId !== e.pointerId) return
+      if (e.pointerType === 'mouse' && e.button !== 0) return
+      if (!start.chip) return
+
+      const scrollEl = kassaCategoryStripRef.current
+      if (
+        scrollEl &&
+        Math.abs(scrollEl.scrollLeft - start.scrollLeft) > KASSA_STRIP_SCROLL_DELTA_PX
+      ) {
+        return
+      }
+
+      const dx = e.clientX - start.x
+      const dy = e.clientY - start.y
+      const adx = Math.abs(dx)
+      const ady = Math.abs(dy)
+      if (adx > KASSA_STRIP_SCROLL_AXIS_MIN_PX && adx >= ady) return
+      if (adx > KASSA_STRIP_TAP_SLOP_PX || ady > KASSA_STRIP_TAP_SLOP_PX) return
+
+      const endChip = (e.target as HTMLElement).closest('[data-kassa-strip-category-id]')
+      if (!(endChip instanceof HTMLElement) || endChip !== start.chip) return
+      const id = endChip.dataset.kassaStripCategoryId
+      if (!id) return
+      const picked = categoryGridById.get(id)
+      if (!picked) return
+      suppressCategoryStripClickRef.current = true
+      handleCategorySelect(picked)
+    },
+    [categoryGridById, handleCategorySelect],
+  )
+
+  const handleCategoryStripClick = useCallback(
+    (e: MouseEvent<HTMLDivElement>) => {
+      if (suppressCategoryStripClickRef.current) {
+        suppressCategoryStripClickRef.current = false
+        return
+      }
+      const el = (e.target as HTMLElement).closest('[data-kassa-strip-category-id]')
+      if (!el || !(el instanceof HTMLElement)) return
+      const id = el.dataset.kassaStripCategoryId
+      if (!id) return
+      const picked = categoryGridById.get(id)
+      if (picked) handleCategorySelect(picked)
+    },
+    [categoryGridById, handleCategorySelect],
+  )
+
   // ── Numpad ────────────────────────────────────────────────────────────────
   const handleNumpad = useCallback((key: string) => {
     setNumpadValue((prev) => {
@@ -4061,7 +4140,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 data-testid="kassa-category-strip"
                 role="tablist"
                 aria-label={t('kassaApp.categories')}
-                className="flex min-w-0 flex-1 gap-2 overflow-x-auto overflow-y-hidden overscroll-x-contain px-2 py-2 touch-manipulation [scrollbar-gutter:stable] [-webkit-overflow-scrolling:touch]"
+                onPointerDown={handleCategoryStripPointerDown}
+                onPointerUp={handleCategoryStripPointerUp}
+                onPointerCancel={handleCategoryStripPointerCancel}
+                onClick={handleCategoryStripClick}
+                className="flex min-w-0 flex-1 touch-pan-x gap-2 overflow-x-auto overflow-y-hidden overscroll-x-contain px-2 py-2 select-none [scrollbar-gutter:stable] [-webkit-overflow-scrolling:touch]"
               >
                 {categories.map((cat) => {
                   const active =
@@ -4077,8 +4160,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       role="tab"
                       aria-selected={active}
                       data-kassa-strip-category-id={cat.id != null ? String(cat.id) : undefined}
-                      onClick={() => handleCategorySelect(cat)}
-                      className={`shrink-0 whitespace-nowrap rounded-xl border px-4 py-2 text-base font-bold transition-colors active:brightness-95 ${
+                      className={`shrink-0 touch-pan-x whitespace-nowrap rounded-xl border px-4 py-2 text-base font-bold transition-colors active:brightness-95 ${
                         active
                           ? 'border-[#58CCFF] bg-[#58CCFF] text-black shadow-sm'
                           : kassaAppearanceDark
