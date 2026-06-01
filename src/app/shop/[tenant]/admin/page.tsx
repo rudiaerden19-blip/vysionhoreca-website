@@ -279,20 +279,28 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
   const orderRowSurface = hasDashboardBg
     ? 'rounded-xl p-4 ring-1 ring-white/35 bg-white/10 backdrop-blur-[4px]'
     : 'rounded-xl bg-gray-50 p-4'
-  const mutedOnPhoto = hasDashboardBg
-    ? 'text-sm font-medium text-gray-900 [text-shadow:0_0_10px_#fff,0_0_4px_#fff]'
-    : 'text-sm text-gray-500'
+  const photoTextShadow = hasDashboardBg
+    ? '[text-shadow:0_1px_3px_rgba(0,0,0,0.9),0_0_12px_rgba(0,0,0,0.55)]'
+    : ''
+  const photoFg = hasDashboardBg ? `text-white ${photoTextShadow}` : 'text-gray-900'
+  const photoFgMuted = hasDashboardBg
+    ? `text-white/90 ${photoTextShadow}`
+    : 'text-gray-500'
+  const photoLinkClass = hasDashboardBg
+    ? 'text-white/95 hover:text-white text-sm font-medium underline-offset-2 hover:underline'
+    : 'text-blue-600 hover:text-blue-600 text-sm font-medium'
+  const mutedOnPhoto = hasDashboardBg ? `text-sm font-medium ${photoFgMuted}` : 'text-sm text-gray-500'
   const popularRankClass = hasDashboardBg
-    ? 'flex h-8 w-8 items-center justify-center rounded-lg bg-white/25 text-sm font-bold text-gray-900 ring-1 ring-white/40'
+    ? `flex h-8 w-8 items-center justify-center rounded-lg bg-black/30 text-sm font-bold text-white ring-1 ring-white/35 ${photoTextShadow}`
     : 'flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 text-sm font-bold text-gray-500'
   const popularBarTrackClass = hasDashboardBg
-    ? 'mt-1 h-2 w-full rounded-full bg-white/25 ring-1 ring-white/20'
+    ? 'mt-1 h-2 w-full rounded-full bg-black/25 ring-1 ring-white/25'
     : 'mt-1 h-2 w-full rounded-full bg-gray-100'
   const statLabelClass = hasDashboardBg
-    ? 'text-sm font-semibold text-gray-900 [text-shadow:0_0_12px_#fff,0_0_6px_#fff,0_1px_1px_#fff]'
+    ? `text-sm font-semibold ${photoFg}`
     : 'text-gray-500 text-sm'
-  const onPhotoTextShadow = hasDashboardBg
-    ? '[text-shadow:0_0_14px_#fff,0_0_8px_#fff,0_1px_2px_#fff]'
+  const statusBadgeOnPhoto = hasDashboardBg
+    ? 'text-xs px-2 py-1 rounded-full bg-black/35 text-white ring-1 ring-white/30'
     : ''
 
   return (
@@ -327,13 +335,11 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`text-3xl font-bold text-gray-900 ${onPhotoTextShadow}`}
+          className={`text-3xl font-bold ${photoFg}`}
         >
           {t('adminDashboard.welcome')} {businessName}
         </motion.h1>
-        <p className={`mt-1 font-medium text-gray-900 ${onPhotoTextShadow}`}>
-          {t('adminDashboard.subtitle')}
-        </p>
+        <p className={`mt-1 font-medium ${photoFgMuted}`}>{t('adminDashboard.subtitle')}</p>
       </div>
 
       {/* Stats Grid */}
@@ -348,8 +354,18 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
             <span className={statLabelClass}>{t('adminDashboard.stats.ordersToday')}</span>
             <span className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">📦</span>
           </div>
-          <p className={`text-3xl font-bold text-gray-900 ${onPhotoTextShadow}`}>{stats.todayOrders}</p>
-          <p className={`text-sm mt-1 ${ordersChange.positive ? 'text-green-500' : 'text-red-500'}`}>
+          <p className={`text-3xl font-bold ${photoFg}`}>{stats.todayOrders}</p>
+          <p
+            className={`text-sm mt-1 ${
+              hasDashboardBg
+                ? ordersChange.positive
+                  ? 'text-emerald-200'
+                  : 'text-red-200'
+                : ordersChange.positive
+                  ? 'text-green-500'
+                  : 'text-red-500'
+            }`}
+          >
             {ordersChange.value} {t('adminDashboard.stats.vsYesterday')}
           </p>
         </motion.div>
@@ -364,10 +380,18 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
             <span className={statLabelClass}>{t('adminDashboard.stats.revenueToday')}</span>
             <span className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">💰</span>
           </div>
-          <p className={`text-3xl font-bold text-gray-900 ${onPhotoTextShadow}`}>
-            €{stats.todayRevenue.toFixed(2)}
-          </p>
-          <p className={`text-sm mt-1 ${revenueChange.positive ? 'text-green-500' : 'text-red-500'}`}>
+          <p className={`text-3xl font-bold ${photoFg}`}>€{stats.todayRevenue.toFixed(2)}</p>
+          <p
+            className={`text-sm mt-1 ${
+              hasDashboardBg
+                ? revenueChange.positive
+                  ? 'text-emerald-200'
+                  : 'text-red-200'
+                : revenueChange.positive
+                  ? 'text-green-500'
+                  : 'text-red-500'
+            }`}
+          >
             {revenueChange.value} {t('adminDashboard.stats.vsYesterday')}
           </p>
         </motion.div>
@@ -382,8 +406,18 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
             <span className={statLabelClass}>{t('adminDashboard.stats.pendingOrders')}</span>
             <span className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">⏳</span>
           </div>
-          <p className={`text-3xl font-bold text-gray-900 ${onPhotoTextShadow}`}>{stats.pendingOrders}</p>
-          <p className={`text-sm mt-1 ${stats.pendingOrders > 0 ? 'text-blue-600' : 'text-green-500'}`}>
+          <p className={`text-3xl font-bold ${photoFg}`}>{stats.pendingOrders}</p>
+          <p
+            className={`text-sm mt-1 ${
+              hasDashboardBg
+                ? stats.pendingOrders > 0
+                  ? 'text-sky-200'
+                  : 'text-emerald-200'
+                : stats.pendingOrders > 0
+                  ? 'text-blue-600'
+                  : 'text-green-500'
+            }`}
+          >
             {stats.pendingOrders > 0 ? t('adminDashboard.stats.actionRequired') : t('adminDashboard.stats.allProcessed')}
           </p>
         </motion.div>
@@ -398,9 +432,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
             <span className={statLabelClass}>{t('adminDashboard.stats.rating')}</span>
             <span className="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center">⭐</span>
           </div>
-          <p className={`text-3xl font-bold text-gray-900 ${onPhotoTextShadow}`}>
-            {stats.averageRating || '-'}
-          </p>
+          <p className={`text-3xl font-bold ${photoFg}`}>{stats.averageRating || '-'}</p>
           <p className={`${statLabelClass} mt-1`}>{stats.totalReviews} {t('adminDashboard.stats.reviews')}</p>
         </motion.div>
       </div>
@@ -415,17 +447,17 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           className={cardSurface}
         >
           <div className="flex items-center justify-between mb-6">
-            <h2 className={`text-lg font-semibold text-gray-900 ${onPhotoTextShadow}`}>
+            <h2 className={`text-lg font-semibold ${photoFg}`}>
               {t('adminDashboard.recentOrders.title')}
             </h2>
             {moduleAccess['online-bestellingen'] && (
-              <Link href={`/shop/${params.tenant}/admin/bestellingen`} className="text-blue-600 hover:text-blue-600 text-sm font-medium">
+              <Link href={`/shop/${params.tenant}/admin/bestellingen`} className={photoLinkClass}>
                 {t('adminDashboard.viewAll')} →
               </Link>
             )}
           </div>
           {recentOrders.length === 0 ? (
-            <div className="text-center py-8 text-gray-400">
+            <div className={`text-center py-8 ${hasDashboardBg ? 'text-white/80' : 'text-gray-400'}`}>
               <p className="text-4xl mb-2">📦</p>
               <p>{t('adminDashboard.recentOrders.noOrders')}</p>
             </div>
@@ -437,11 +469,21 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
                   className={`flex items-center justify-between ${orderRowSurface}`}
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                      <span className="text-blue-600 font-bold text-sm">{order.customer_name[0]?.toUpperCase()}</span>
+                    <div
+                      className={
+                        hasDashboardBg
+                          ? 'flex h-10 w-10 items-center justify-center rounded-full bg-black/35 ring-1 ring-white/35'
+                          : 'flex h-10 w-10 items-center justify-center rounded-full bg-blue-100'
+                      }
+                    >
+                      <span
+                        className={`text-sm font-bold ${hasDashboardBg ? 'text-white' : 'text-blue-600'}`}
+                      >
+                        {order.customer_name[0]?.toUpperCase()}
+                      </span>
                     </div>
                     <div>
-                      <p className={`font-medium text-gray-900 ${onPhotoTextShadow}`}>
+                      <p className={`font-medium ${photoFg}`}>
                         {order.order_number} · {order.customer_name}
                       </p>
                       <p className={mutedOnPhoto}>
@@ -450,10 +492,13 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className={`font-bold text-gray-900 ${onPhotoTextShadow}`}>
-                      €{order.total.toFixed(2)}
-                    </p>
-                    <span className={`text-xs px-2 py-1 rounded-full ${statusColors[order.status]?.bg || 'bg-gray-100'} ${statusColors[order.status]?.text || 'text-gray-700'}`}>
+                    <p className={`font-bold ${photoFg}`}>€{order.total.toFixed(2)}</p>
+                    <span
+                      className={
+                        statusBadgeOnPhoto ||
+                        `text-xs px-2 py-1 rounded-full ${statusColors[order.status]?.bg || 'bg-gray-100'} ${statusColors[order.status]?.text || 'text-gray-700'}`
+                      }
+                    >
                       {t(`adminDashboard.status.${statusColors[order.status]?.labelKey || 'pending'}`)}
                     </span>
                   </div>
@@ -471,17 +516,17 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           className={cardSurface}
         >
           <div className="flex items-center justify-between mb-6">
-            <h2 className={`text-lg font-semibold text-gray-900 ${onPhotoTextShadow}`}>
+            <h2 className={`text-lg font-semibold ${photoFg}`}>
               {t('adminDashboard.popularItems.title')}
             </h2>
             {moduleAccess.rapporten && (
-              <Link href={`/shop/${params.tenant}/admin/verkoop`} className="text-blue-600 hover:text-blue-600 text-sm font-medium">
+              <Link href={`/shop/${params.tenant}/admin/verkoop`} className={photoLinkClass}>
                 {t('adminDashboard.viewAll')} →
               </Link>
             )}
           </div>
           {stats.popularItems.length === 0 ? (
-            <div className="text-center py-8 text-gray-400">
+            <div className={`text-center py-8 ${hasDashboardBg ? 'text-white/80' : 'text-gray-400'}`}>
               <p className="text-4xl mb-2">🍟</p>
               <p>{t('adminDashboard.popularItems.noSales')}</p>
             </div>
@@ -491,7 +536,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
                 <div key={item.name} className="flex items-center gap-4">
                   <span className={popularRankClass}>{index + 1}</span>
                   <div className="flex-1">
-                    <p className={`font-medium text-gray-900 ${onPhotoTextShadow}`}>{item.name}</p>
+                    <p className={`font-medium ${photoFg}`}>{item.name}</p>
                     <div className={popularBarTrackClass}>
                       <div 
                         className="bg-blue-600 h-2 rounded-full" 
@@ -499,9 +544,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
                       />
                     </div>
                   </div>
-                  <span className={`text-sm font-semibold text-gray-900 ${onPhotoTextShadow}`}>
-                    {item.count}x
-                  </span>
+                  <span className={`text-sm font-semibold ${photoFg}`}>{item.count}x</span>
                 </div>
               ))}
             </div>
