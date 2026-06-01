@@ -89,6 +89,7 @@ import type {
   KassaPaymentMethod as PaymentMethodType,
   KassaLastOrderReceipt,
 } from '@/lib/kassa-cart-types'
+import { kassaReceiptTableNumber } from '@/lib/kassa-cart-types'
 import {
   computeBarBonDelta,
   loadBarBonWatermarks,
@@ -2844,16 +2845,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     const shortRef = kassa_client_uuid.replace(/-/g, '').slice(-10).toUpperCase()
 
-    const customerTableLabel =
-      tableNumber
-        ? (() => {
-            let lbl = t('kassaReceipt.tableLabel').replace(/\{number\}/g, String(tableNumber))
-            if (orderType === 'DINE_IN' && dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE) {
-              lbl = `${lbl} (${t('kassaApp.floorZoneTerrace')})`
-            }
-            return lbl
-          })()
-        : null
+    const receiptTable = kassaReceiptTableNumber(orderType, tableNumber)
+    const customerTableLabel = receiptTable
+      ? (() => {
+          let lbl = t('kassaReceipt.tableLabel').replace(/\{number\}/g, receiptTable)
+          if (dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE) {
+            lbl = `${lbl} (${t('kassaApp.floorZoneTerrace')})`
+          }
+          return lbl
+        })()
+      : null
 
     const orderPayload: Record<string, unknown> = {
       tenant_slug: tenant,
@@ -3010,8 +3011,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       splitCash: method === 'SPLIT' ? splitAmounts?.cash : undefined,
       splitCard: method === 'SPLIT' ? splitAmounts?.card : undefined,
       orderType,
-      tableNumber,
-      floorPlanZone: orderType === 'DINE_IN' && tableNumber ? dineInFloorZone : undefined,
+      tableNumber: receiptTable,
+      floorPlanZone: receiptTable ? dineInFloorZone : undefined,
       createdAt,
       helpedByStaffName: activeKassaStaff?.name?.trim() || null,
     })
@@ -3053,6 +3054,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     const isDraft = !!opts?.draft
     const barKitchenDelta = !!opts?.barTableDelta
+    const receiptTableNr = kassaReceiptTableNumber(order.orderType, order.tableNumber)
 
     if (!isDraft) {
       try {
@@ -3166,8 +3168,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       bonLines.push('--------------------------------')
     }
     bonLines.push(
-      order.tableNumber
-        ? `${orderTypePlain} | ${t('kassaReceipt.tablePrefix')} ${order.tableNumber}${terraceSuffix}`
+      receiptTableNr
+        ? `${orderTypePlain} | ${t('kassaReceipt.tablePrefix')} ${receiptTableNr}${terraceSuffix}`
         : orderTypePlain,
     )
     bonLines.push(`${t('kassaReceipt.receiptNo')}${receiptRefDisplay}  ${dateStr}`)
@@ -3222,7 +3224,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       orderData: {
         orderNumber: order.orderNumber,
         orderType: order.orderType,
-        tableNumber: order.tableNumber || null,
+        tableNumber: receiptTableNr || null,
         items: order.items.map(i => ({
           quantity: i.quantity,
           name: i.product.name,
@@ -3257,7 +3259,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       </div>
       <div class="divider"></div>
       ${isDraft ? `<div class="center bold">${escapeReceiptHtml(barKitchenDelta ? t('kassaReceipt.barToogBanner') : t('kassaReceipt.draftBanner'))}</div>${barKitchenDelta ? `<div class="center small">${escapeReceiptHtml(t('kassaReceipt.barToogHint'))}</div>` : ''}<div class="divider-solid"></div>` : ''}
-      <div class="center order-type">${escapeReceiptHtml(orderTypeLabel)}${order.tableNumber ? `<br/>${escapeReceiptHtml(t('kassaReceipt.tablePrefix'))} ${escapeReceiptHtml(String(order.tableNumber))}${escapeReceiptHtml(terraceSuffix)}` : ''}</div>
+      <div class="center order-type">${escapeReceiptHtml(orderTypeLabel)}${receiptTableNr ? `<br/>${escapeReceiptHtml(t('kassaReceipt.tablePrefix'))} ${escapeReceiptHtml(receiptTableNr)}${escapeReceiptHtml(terraceSuffix)}` : ''}</div>
       <div class="row small">
         <span>${escapeReceiptHtml(t('kassaReceipt.receiptNo'))}${escapeReceiptHtml(receiptRefDisplay)}</span>
         <span>${escapeReceiptHtml(dateStr)}</span>
@@ -3459,8 +3461,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         totalTax: draftSplit.totalTax,
         paymentMethod: 'CARD',
         orderType,
-        tableNumber: tableNumber || '',
-        floorPlanZone: orderType === 'DINE_IN' ? dineInFloorZone : undefined,
+        tableNumber: kassaReceiptTableNumber(orderType, tableNumber),
+        floorPlanZone: orderType === 'DINE_IN' && tableNumber ? dineInFloorZone : undefined,
         createdAt: new Date(),
         helpedByStaffName: activeKassaStaff?.name ?? null,
       }

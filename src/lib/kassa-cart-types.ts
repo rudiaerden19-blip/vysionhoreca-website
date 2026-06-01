@@ -18,6 +18,15 @@ export interface KassaCartItem {
 
 export type KassaRegisterOrderType = 'DINE_IN' | 'TAKEAWAY' | 'DELIVERY'
 
+/** Tafel op bon/DB alleen bij dine-in (bij afhalen/leveren geen tafelregel). */
+export function kassaReceiptTableNumber(
+  orderType: KassaRegisterOrderType,
+  tableNumber: string | undefined | null,
+): string {
+  if (orderType !== 'DINE_IN') return ''
+  return String(tableNumber ?? '').trim()
+}
+
 export type KassaPaymentMethod = 'CASH' | 'CARD' | 'IDEAL' | 'BANCONTACT' | 'SPLIT'
 
 /** Afgeleid uit categorie-BTW; ontbreekt bij oude bonnen → UI valt terug op één zaak-tarief. */

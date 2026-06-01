@@ -2,6 +2,7 @@
 
 import type { TenantSettings } from '@/lib/admin-api'
 import type { KassaLastOrderReceipt } from '@/lib/kassa-cart-types'
+import { kassaReceiptTableNumber } from '@/lib/kassa-cart-types'
 import { useLanguage } from '@/i18n'
 import { appLocaleToBcp47 } from '@/lib/print-receipt-html'
 import { useEffect, useState } from 'react'
@@ -52,6 +53,7 @@ export function KassaSuccessReceiptModal({
       : order.orderType === 'TAKEAWAY'
         ? `📦 ${t('kassaReceipt.orderTypeTakeaway')}`
         : `🚗 ${t('kassaReceipt.orderTypeDelivery')}`
+  const receiptTableNr = kassaReceiptTableNumber(order.orderType, order.tableNumber)
   const receiptRefSuccess =
     order.checkoutReference ?? (order.orderNumber > 0 ? String(order.orderNumber) : '—')
 
@@ -109,9 +111,9 @@ export function KassaSuccessReceiptModal({
             <div className="border-t-2 border-dashed border-gray-400 my-3" />
             <div className="text-center mb-3">
               <p className="font-bold text-lg">{orderTypeLabel}</p>
-              {order.tableNumber && (
-                <p className="font-bold">{t('kassaReceipt.tableLabel').replace(/\{number\}/g, String(order.tableNumber))}</p>
-              )}
+              {receiptTableNr ? (
+                <p className="font-bold">{t('kassaReceipt.tableLabel').replace(/\{number\}/g, receiptTableNr)}</p>
+              ) : null}
             </div>
             <div className="text-xs mb-3">
               <div className="flex justify-between">
