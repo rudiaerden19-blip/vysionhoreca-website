@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 
+/** Query-params per request — niet statisch prerenderen. */
+export const dynamic = 'force-dynamic'
+
 /**
  * Secure endpoint to fetch gift card code ONLY after payment is confirmed
  * This prevents exposing the code before payment completes
  */
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url)
-    const giftCardId = searchParams.get('id')
-    const tenantSlug = searchParams.get('tenant')
+    const giftCardId = request.nextUrl.searchParams.get('id')
+    const tenantSlug = request.nextUrl.searchParams.get('tenant')
 
     if (!giftCardId || !tenantSlug) {
       return NextResponse.json(
