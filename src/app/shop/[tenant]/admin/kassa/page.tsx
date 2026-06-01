@@ -4185,9 +4185,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* ── Rechts: numpad / cart ── */}
         <div className={`${kassaSxgaDenseTiles ? 'w-[300px]' : 'w-80 sm:w-96 lg:w-[380px]'} flex flex-col flex-shrink-0 min-h-0 min-w-0 overflow-hidden ${ui.sidebarBg}`}>
 
-        {/* Dine-in: één rij — twee halve knoppen (Binnen / Terras). Geen aparte “Kies tafel…”. */}
-        {orderType === 'DINE_IN' && (
-          <div className="px-3 pt-3 relative shrink-0">
+        {/* Zone: Binnen / Terras — altijd zichtbaar (ook bij afhalen/leveren). */}
+        <div className="px-3 pt-3 relative shrink-0">
             <div className="flex gap-2">
               <button
                 type="button"
@@ -4207,7 +4206,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 }`}
               >
                 <span className="text-sm sm:text-base">{t('kassaApp.floorZoneInside')}</span>
-                {tableNumber && dineInFloorZone === FLOOR_PLAN_ZONE_INSIDE ? (
+                {orderType === 'DINE_IN' && tableNumber && dineInFloorZone === FLOOR_PLAN_ZONE_INSIDE ? (
                   <span className="mt-0.5 text-xs font-semibold opacity-95">
                     {kassaStoolsByZone[FLOOR_PLAN_ZONE_INSIDE].some((s) => s.stoolNumber === tableNumber)
                       ? `🍺 ${tableNumber}`
@@ -4233,7 +4232,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 }`}
               >
                 <span className="text-sm sm:text-base">{t('kassaApp.floorZoneTerrace')}</span>
-                {tableNumber && dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE ? (
+                {orderType === 'DINE_IN' && tableNumber && dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE ? (
                   <span className="mt-0.5 text-xs font-semibold opacity-95">
                     {kassaStoolsByZone[FLOOR_PLAN_ZONE_TERRACE].some((s) => s.stoolNumber === tableNumber)
                       ? `🍺 ${tableNumber}`
@@ -4357,8 +4356,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 </div>
               </>
             )}
-          </div>
-        )}
+        </div>
 
         {/* Besteltype: drie segmenten in één balk (ter plaatse / afhalen / leveren) */}
         <div className="mx-3 mt-2 shrink-0" data-testid="kassa-order-type-bar">
