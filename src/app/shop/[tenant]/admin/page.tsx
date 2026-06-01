@@ -260,9 +260,13 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
     )
   }
 
-  const cardSurface = dashboardBackgroundUrl
-    ? 'rounded-2xl bg-white/94 p-6 shadow-sm ring-1 ring-black/5'
+  const hasDashboardBg = Boolean(dashboardBackgroundUrl)
+  const cardSurface = hasDashboardBg
+    ? 'rounded-2xl bg-gradient-to-br from-white via-white to-slate-50 p-6 shadow-lg ring-1 ring-slate-200/90'
     : 'bg-white rounded-2xl p-6 shadow-sm'
+  const headerSurface = hasDashboardBg
+    ? 'mb-8 rounded-2xl bg-gradient-to-r from-white via-white to-slate-100/95 px-5 py-4 shadow-md ring-1 ring-slate-200/90'
+    : 'mb-8 pt-1'
 
   return (
     <PinGate tenant={params.tenant}>
@@ -277,20 +281,31 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
             style={{ backgroundImage: `url(${JSON.stringify(dashboardBackgroundUrl)})` }}
             aria-hidden
           />
-          <div className="pointer-events-none absolute inset-0 bg-gray-100/82" aria-hidden />
+          <div
+            className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/95 via-slate-50/90 to-slate-100/96"
+            aria-hidden
+          />
+          <div
+            className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-slate-900/25 via-transparent to-white/50"
+            aria-hidden
+          />
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-slate-800/35 to-transparent"
+            aria-hidden
+          />
         </>
       ) : null}
       <div className="relative z-10 mx-auto max-w-7xl px-4 pb-8 md:px-6">
       {/* Header */}
-      <div className="mb-8 pt-1">
+      <div className={headerSurface}>
         <motion.h1 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-3xl font-bold text-gray-900"
+          className="text-3xl font-bold text-gray-900 drop-shadow-sm"
         >
           {t('adminDashboard.welcome')} {businessName}
         </motion.h1>
-        <p className="text-gray-500 mt-1">{t('adminDashboard.subtitle')}</p>
+        <p className="mt-1 text-gray-600">{t('adminDashboard.subtitle')}</p>
       </div>
 
       {/* Stats Grid */}
@@ -383,7 +398,12 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           ) : (
             <div className="space-y-4">
               {recentOrders.map((order) => (
-                <div key={order.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                <div
+                  key={order.id}
+                  className={`flex items-center justify-between rounded-xl p-4 ${
+                    hasDashboardBg ? 'bg-slate-50 ring-1 ring-slate-100' : 'bg-gray-50'
+                  }`}
+                >
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
                       <span className="text-blue-600 font-bold text-sm">{order.customer_name[0]?.toUpperCase()}</span>
@@ -429,12 +449,20 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
             <div className="space-y-4">
               {stats.popularItems.map((item, index) => (
                 <div key={item.name} className="flex items-center gap-4">
-                  <span className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-sm font-bold text-gray-500">
+                  <span
+                    className={`flex h-8 w-8 items-center justify-center rounded-lg text-sm font-bold text-gray-600 ${
+                      hasDashboardBg ? 'bg-white ring-1 ring-slate-200' : 'bg-gray-100'
+                    }`}
+                  >
                     {index + 1}
                   </span>
                   <div className="flex-1">
                     <p className="font-medium text-gray-900">{item.name}</p>
-                    <div className="w-full bg-gray-100 rounded-full h-2 mt-1">
+                    <div
+                      className={`mt-1 h-2 w-full rounded-full ${
+                        hasDashboardBg ? 'bg-slate-200' : 'bg-gray-100'
+                      }`}
+                    >
                       <div 
                         className="bg-blue-600 h-2 rounded-full" 
                         style={{ width: `${(item.count / stats.popularItems[0].count) * 100}%` }}
