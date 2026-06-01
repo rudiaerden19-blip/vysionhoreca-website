@@ -3785,6 +3785,7 @@
     "printAgentFailedDebugFooter": "Tip: on the tablet — open Vysion Kiosk, grant USB, run test receipt. On PC — Print Agent in the system tray. Make sure this site loads the latest version (clear cache if needed).",
     "remove": "Remove",
     "parkToTable": "Send to table {number} · {zone}",
+    "parkToTableWithReceipt": "Send to table {number} · {zone} + receipt",
     "checkout": "Pay",
     "switchTableTitle": "Switch table?",
     "switchTableBody": "You still have items on table {current}. That order will be saved. Continue to table {next}?",

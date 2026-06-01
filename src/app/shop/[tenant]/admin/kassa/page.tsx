@@ -1844,7 +1844,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const openPaymentAfterFloorPlanSwitchRef = useRef(false)
   /** Automatische toog-delta bij «Naar tafel» / tafel wisselen: aparte inflight per slot. */
   const barDeltaSlotInflightRef = useRef<Record<string, boolean>>({})
-  const flushBarDeltaSlipRef = useRef<(zone: FloorPlanZone, tblNr: string, snap: CartItem[]) => void>(() => {})
+  const flushBarDeltaSlipRef = useRef<
+    (zone: FloorPlanZone, tblNr: string, snap: CartItem[], opts?: { printKassaSlip?: boolean }) => void
+  >(() => {})
 
   const switchToTable = (newTableNr: string) => {
     const zone = pickerBrowseZone
@@ -1863,7 +1865,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     if (tableNumber && cart.length > 0) {
       const snap = snapshotCartItemsForAsyncPrint(cart)
       saveCartToTable(dineInFloorZone, tableNumber, cart)
-      void flushBarDeltaSlipRef.current(dineInFloorZone, tableNumber, snap)
+      void flushBarDeltaSlipRef.current(dineInFloorZone, tableNumber, snap, { printKassaSlip: false })
     }
     const slotKey = tableOrderMapKey(zone, newTableNr)
     const existingOrder = tableOrders[slotKey] || []
@@ -1880,12 +1882,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
   }
 
-  // "Naar tafel" knop: sla bestelling op en leeg de kassa voor volgende tafel
-  const parkOrder = () => {
+  /** Naar tafel: mand opslaan; keuken-delta altijd; kassabon alleen als printKassaSlip. */
+  const parkOrder = (printKassaSlip: boolean) => {
     if (!tableNumber || cart.length === 0) return
     const snap = snapshotCartItemsForAsyncPrint(cart)
     saveCartToTable(dineInFloorZone, tableNumber, cart)
-    void flushBarDeltaSlipRef.current(dineInFloorZone, tableNumber, snap)
+    void flushBarDeltaSlipRef.current(dineInFloorZone, tableNumber, snap, { printKassaSlip })
     setCart([])
     setTableNumber('')
     setDineInFloorZone(FLOOR_PLAN_ZONE_INSIDE)
@@ -3142,6 +3144,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
        * Betaalde bon: altijd 2 — dit veld wordt genegeerd.
        */
       draftCopies?: 1 | 2
+      /** Standaard kassa; keuken bij «naar tafel»-delta. */
+      receiptMode?: 'kassa' | 'keuken'
     },
   ) => {
     if (!order) {
@@ -3320,7 +3324,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       /** Draft: 1 = gele Bon / toog-delta; 2 = zaaknaam in header. Betaald (afrekenen): altijd 2. */
       copies: isDraft ? draftCopies : paidCopies,
       openDrawer: isCash,
-      receiptMode: 'kassa',
+      receiptMode: opts?.receiptMode ?? 'kassa',
       orderData: {
         orderNumber: order.orderNumber,
         orderType: order.orderType,
@@ -3448,9 +3452,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
   }
 
-  flushBarDeltaSlipRef.current = (zone, tblNr, snap) => {
+  flushBarDeltaSlipRef.current = (zone, tblNr, snap, slipOpts) => {
     void (async () => {
       if (demoViewOnly || snap.length === 0) return
+      const printKassaSlip = slipOpts?.printKassaSlip === true
       const slotKey = tableOrderMapKey(zone, tblNr)
       if (barDeltaSlotInflightRef.current[slotKey]) return
       barDeltaSlotInflightRef.current[slotKey] = true
@@ -3486,37 +3491,25 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           helpedByStaffName: activeKassaStaff?.name ?? null,
         }
 
+        const watermarkCommit = { slotKey, row: nextWatermark }
+
         await printReceipt(draftOrder, {
           draft: true,
           barTableDelta: true,
-          barWatermarkCommit: { slotKey, row: nextWatermark },
+          receiptMode: 'keuken',
+          barWatermarkCommit: printKassaSlip ? undefined : watermarkCommit,
         })
-      } catch {
-        try {
-          const draftSplit = computeInclusiveVatSplitFromCart(snap, resolveCartLineVat)
-          const draftOrder: KassaLastOrderReceipt = {
-            orderNumber: 0,
-            items: sortKassaCartLinesByMenuCategory(snap, categories),
-            total: draftSplit.grossTotal,
-            vatSplit: draftSplit.byRate.map((l) => ({
-              rate: l.rate,
-              baseExcl: l.baseExcl,
-              tax: l.tax,
-            })),
-            subtotalExclVat: draftSplit.subtotalExcl,
-            totalTax: draftSplit.totalTax,
-            paymentMethod: 'CARD',
-            orderType: 'DINE_IN',
-            tableNumber: tblNr,
-            floorPlanZone:
-              zone === FLOOR_PLAN_ZONE_TERRACE ? FLOOR_PLAN_ZONE_TERRACE : FLOOR_PLAN_ZONE_INSIDE,
-            createdAt: new Date(),
-            helpedByStaffName: activeKassaStaff?.name ?? null,
-          }
-          await printReceipt(draftOrder, { draft: true })
-        } catch {
-          /* print faalde — mand staat wel opgeslagen */
+
+        if (printKassaSlip) {
+          await printReceipt(draftOrder, {
+            draft: true,
+            barTableDelta: true,
+            receiptMode: 'kassa',
+            barWatermarkCommit: watermarkCommit,
+          })
         }
+      } catch {
+        /* mand staat opgeslagen; print optioneel */
       } finally {
         delete barDeltaSlotInflightRef.current[slotKey]
       }
@@ -4720,27 +4713,54 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </button>
           </div>
           {orderType === 'DINE_IN' && tableNumber && cart.length > 0 && (
-            <button
-              type="button"
-              onClick={parkOrder}
-              className={`touch-manipulation w-full rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold active:brightness-95 flex items-center justify-center ${
-                kassaSidebarFooterTier === 'comfort'
-                  ? 'py-3 text-base gap-2'
-                  : kassaSidebarFooterTier === 'compact'
-                    ? 'py-2 text-sm gap-1.5'
-                    : 'py-1.5 text-xs gap-1'
+            <div
+              className={`grid w-full touch-manipulation select-none ${
+                kassaSidebarFooterTier === 'comfort' ? 'gap-2' : 'gap-1.5'
               }`}
             >
-              🪑{' '}
-              {t('kassaApp.parkToTable')
-                .replace(/\{number\}/g, String(tableNumber))
-                .replace(
-                  /\{zone\}/g,
-                  dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE
-                    ? t('kassaApp.floorZoneTerrace')
-                    : t('kassaApp.floorZoneInside'),
-                )}
-            </button>
+              <button
+                type="button"
+                onClick={() => parkOrder(false)}
+                className={`w-full rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold active:brightness-95 flex items-center justify-center ${
+                  kassaSidebarFooterTier === 'comfort'
+                    ? 'py-3 text-base gap-2'
+                    : kassaSidebarFooterTier === 'compact'
+                      ? 'py-2 text-sm gap-1.5'
+                      : 'py-1.5 text-xs gap-1'
+                }`}
+              >
+                🪑{' '}
+                {t('kassaApp.parkToTable')
+                  .replace(/\{number\}/g, String(tableNumber))
+                  .replace(
+                    /\{zone\}/g,
+                    dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE
+                      ? t('kassaApp.floorZoneTerrace')
+                      : t('kassaApp.floorZoneInside'),
+                  )}
+              </button>
+              <button
+                type="button"
+                onClick={() => parkOrder(true)}
+                className={`w-full rounded-xl bg-[#58CCFF] hover:bg-[#47c6fe] text-[#063042] font-bold active:brightness-95 flex items-center justify-center ${
+                  kassaSidebarFooterTier === 'comfort'
+                    ? 'py-2.5 text-sm gap-2'
+                    : kassaSidebarFooterTier === 'compact'
+                      ? 'py-2 text-xs gap-1.5'
+                      : 'py-1.5 text-[10px] gap-1 leading-tight px-1'
+                }`}
+              >
+                🪑🧾{' '}
+                {t('kassaApp.parkToTableWithReceipt')
+                  .replace(/\{number\}/g, String(tableNumber))
+                  .replace(
+                    /\{zone\}/g,
+                    dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE
+                      ? t('kassaApp.floorZoneTerrace')
+                      : t('kassaApp.floorZoneInside'),
+                  )}
+              </button>
+            </div>
           )}
           <button
             type="button"

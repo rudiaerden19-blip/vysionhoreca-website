@@ -3309,6 +3309,7 @@
     "printAgentFallbackEmergencyPrintDisabledHint": "La impresión de emergencia de Windows no está disponible en esta tableta Android. Use Vysion Kiosk o repare Print Agent en un PC.",
     "remove": "Eliminar",
     "parkToTable": "A mesa {number} · {zone}",
+    "parkToTableWithReceipt": "A mesa {number} · {zone} + ticket caja",
     "checkout": "Cobrar",
     "switchTableTitle": "¿Cambiar de mesa?",
     "switchTableBody": "Aún tienes artículos en la mesa {current}. Ese pedido se guardará. ¿Continuar a la mesa {next}?",

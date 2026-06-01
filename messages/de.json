@@ -2809,6 +2809,7 @@
     "printAgentFallbackEmergencyPrintDisabledHint": "Notfall-Windows-Druck ist auf diesem Android-Tablet nicht verfügbar. Nutzen Sie Vysion Kiosk oder reparieren Sie den Print Agent am PC.",
     "remove": "Entfernen",
     "parkToTable": "Zu Tisch {number} · {zone}",
+    "parkToTableWithReceipt": "Zu Tisch {number} · {zone} + Kassenbon",
     "checkout": "Bezahlen",
     "switchTableTitle": "Tisch wechseln?",
     "switchTableBody": "Sie haben noch Artikel auf Tisch {current}. Diese Bestellung wird gespeichert. Weiter zu Tisch {next}?",
