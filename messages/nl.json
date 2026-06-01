@@ -2622,7 +2622,7 @@
       "aboutPhotoTitle": "Over Ons Foto",
       "aboutPhotoDesc": "Deze foto wordt getoond naast de \"Over Ons\" sectie",
       "dashboardBackgroundTitle": "Achtergrond admin-overzicht",
-      "dashboardBackgroundDesc": "Foto van je zaak op het Welkom-scherm (Overzicht). Schaalt mee op elk scherm; kies een breed beeld met het belangrijkste in het midden.",
+      "dashboardBackgroundDesc": "Foto van je zaak op het Welkom-scherm (Overzicht). Sleep en zoom hieronder om het midden van de foto goed te zetten — die positie wordt op elk scherm gebruikt.",
       "dashboardBackgroundLabel": "Zaakfoto achtergrond",
       "topSellersTitle": "Best Verkochte Producten",
       "topSellersDesc": "Toon je 3 populairste producten op de homepage",

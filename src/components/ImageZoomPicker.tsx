@@ -6,7 +6,7 @@ import Image from 'next/image'
 import MediaPicker from './MediaPicker'
 import { useLanguage } from '@/i18n'
 
-interface ImageZoomSettings {
+export interface ImageZoomSettings {
   url: string
   zoom: number      // 1 = 100%, 1.5 = 150%, etc.
   positionX: number // 0-100 (percentage)

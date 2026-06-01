@@ -1823,7 +1823,7 @@
       "aboutPhotoTitle": "Photo « À propos »",
       "aboutPhotoDesc": "Cette photo s’affiche à côté de la section « À propos »",
       "dashboardBackgroundTitle": "Arrière-plan vue d’ensemble admin",
-      "dashboardBackgroundDesc": "Photo de votre établissement sur l’écran Bienvenue (Aperçu). S’adapte à tous les écrans ; image large avec le sujet au centre.",
+      "dashboardBackgroundDesc": "Photo sur l’écran Bienvenue (Aperçu). Zoomez et déplacez ici — cette position est utilisée sur tous les écrans.",
       "dashboardBackgroundLabel": "Photo de fond établissement",
       "topSellersTitle": "Produits les plus vendus",
       "topSellersDesc": "Affichez vos trois produits les plus populaires sur l’accueil",

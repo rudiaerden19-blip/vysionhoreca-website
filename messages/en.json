@@ -2622,7 +2622,7 @@
       "aboutPhotoTitle": "About us photo",
       "aboutPhotoDesc": "This photo is shown next to the “About us” section",
       "dashboardBackgroundTitle": "Admin overview background",
-      "dashboardBackgroundDesc": "Photo of your venue on the Welcome (Overview) screen. Scales on any display; use a wide image with the subject centered.",
+      "dashboardBackgroundDesc": "Photo of your venue on the Welcome (Overview) screen. Drag and zoom below to set the focal point — that position is used on every screen size.",
       "dashboardBackgroundLabel": "Venue background photo",
       "topSellersTitle": "Best-selling products",
       "topSellersDesc": "Show your three most popular products on the homepage",

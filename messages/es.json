@@ -2323,7 +2323,7 @@
       "aboutPhotoTitle": "Foto de «Sobre nosotros»",
       "aboutPhotoDesc": "Esta foto se muestra junto a la sección «Sobre nosotros»",
       "dashboardBackgroundTitle": "Fondo del resumen admin",
-      "dashboardBackgroundDesc": "Foto de tu local en la pantalla de bienvenida (Resumen). Se adapta a cualquier pantalla; imagen ancha con el motivo centrado.",
+      "dashboardBackgroundDesc": "Foto en la pantalla de bienvenida (Resumen). Arrastra y haz zoom aquí — esa posición se usa en todos los tamaños de pantalla.",
       "dashboardBackgroundLabel": "Foto de fondo del local",
       "topSellersTitle": "Productos más vendidos",
       "topSellersDesc": "Muestra tus tres productos más populares en la página de inicio",

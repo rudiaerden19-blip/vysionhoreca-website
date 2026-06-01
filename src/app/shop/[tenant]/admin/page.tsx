@@ -15,7 +15,11 @@ import {
 import PinGate from '@/components/PinGate'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
 import { isOwnerSessionFreshForTenant, isSuperAdminLoggedIn } from '@/lib/auth-headers'
-import { resolveAdminDashboardBackgroundUrl } from '@/lib/tenant-dashboard-background'
+import {
+  adminDashboardBackgroundImageStyle,
+  resolveAdminDashboardBackground,
+} from '@/lib/tenant-dashboard-background'
+import Image from 'next/image'
 
 interface DashboardStats {
   todayOrders: number
@@ -45,7 +49,9 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
   const router = useRouter()
   const { moduleAccess } = useTenantModuleFlags(params.tenant)
   const [businessName, setBusinessName] = useState<string>('')
-  const [dashboardBackgroundUrl, setDashboardBackgroundUrl] = useState<string | null>(null)
+  const [dashboardBackground, setDashboardBackground] = useState<
+    ReturnType<typeof resolveAdminDashboardBackground>
+  >(null)
 
   // Welkomstpagina: eerste sessiebezoek zonder ENTER op /welkom. Na wachtwoord-login is de eigenaar
   // al geïdentificeerd — niet opnieuw forceren (anders: login wiste vlag + kassa zet ze niet → Overzicht → splash).
@@ -88,8 +94,8 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
         ).join(' ')
         setBusinessName(capitalizedName)
       }
-      setDashboardBackgroundUrl(
-        resolveAdminDashboardBackgroundUrl(settings?.admin_dashboard_background_image),
+      setDashboardBackground(
+        resolveAdminDashboardBackground(settings?.admin_dashboard_background_image),
       )
     }
     loadBusinessName()
@@ -260,7 +266,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
     )
   }
 
-  const hasDashboardBg = Boolean(dashboardBackgroundUrl)
+  const hasDashboardBg = Boolean(dashboardBackground?.url)
   const cardSurface = hasDashboardBg
     ? 'rounded-2xl bg-gradient-to-br from-white via-white to-slate-50 p-6 shadow-lg ring-1 ring-slate-200/90'
     : 'bg-white rounded-2xl p-6 shadow-sm'
@@ -274,13 +280,20 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
       className="relative -mx-4 min-h-[calc(100svh-5.5rem)] md:-mx-6"
       data-testid="admin-dashboard-shell"
     >
-      {dashboardBackgroundUrl ? (
+      {dashboardBackground ? (
         <>
-          <div
-            className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url(${JSON.stringify(dashboardBackgroundUrl)})` }}
-            aria-hidden
-          />
+          <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+            <Image
+              src={dashboardBackground.url}
+              alt=""
+              fill
+              priority
+              sizes="100vw"
+              quality={60}
+              className="object-cover"
+              style={adminDashboardBackgroundImageStyle(dashboardBackground)}
+            />
+          </div>
           <div
             className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/95 via-slate-50/90 to-slate-100/96"
             aria-hidden

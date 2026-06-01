@@ -2323,7 +2323,7 @@
       "aboutPhotoTitle": "Foto «Chi siamo»",
       "aboutPhotoDesc": "Questa foto è mostrata accanto alla sezione «Chi siamo»",
       "dashboardBackgroundTitle": "Sfondo panoramica admin",
-      "dashboardBackgroundDesc": "Foto del locale nella schermata Benvenuto (Panoramica). Si adatta a ogni schermo; immagine larga con soggetto al centro.",
+      "dashboardBackgroundDesc": "Foto nella schermata Benvenuto (Panoramica). Trascina e zooma qui — la posizione vale su ogni schermo.",
       "dashboardBackgroundLabel": "Foto sfondo locale",
       "topSellersTitle": "Prodotti più venduti",
       "topSellersDesc": "Mostra i tre prodotti più popolari in homepage",

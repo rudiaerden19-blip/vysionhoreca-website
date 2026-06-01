@@ -2323,7 +2323,7 @@
       "aboutPhotoTitle": "「关于我们」配图",
       "aboutPhotoDesc": "该图片显示在「关于我们」版块旁边",
       "dashboardBackgroundTitle": "管理概览背景",
-      "dashboardBackgroundDesc": "欢迎（概览）页面上的店铺照片，随屏幕自适应；请使用主体居中的宽幅图片。",
+      "dashboardBackgroundDesc": "欢迎（概览）页面的照片。在下方拖动并缩放以设置焦点，所有屏幕尺寸均使用该位置。",
       "dashboardBackgroundLabel": "店铺背景图",
       "topSellersTitle": "热销产品",
       "topSellersDesc": "在首页展示三个最受欢迎的产品",

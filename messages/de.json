@@ -1823,7 +1823,7 @@
       "aboutPhotoTitle": "Über-uns-Foto",
       "aboutPhotoDesc": "Dieses Foto wird neben dem Abschnitt „Über uns“ angezeigt",
       "dashboardBackgroundTitle": "Hintergrund Admin-Übersicht",
-      "dashboardBackgroundDesc": "Foto Ihres Lokals auf dem Willkommensbildschirm (Übersicht). Passt sich jedem Bildschirm an; breites Motiv in der Mitte wählen.",
+      "dashboardBackgroundDesc": "Foto auf dem Willkommensbildschirm (Übersicht). Hier zoomen und verschieben — diese Position gilt auf allen Bildschirmgrößen.",
       "dashboardBackgroundLabel": "Hintergrundfoto Lokal",
       "topSellersTitle": "Meistverkaufte Produkte",
       "topSellersDesc": "Zeigen Sie Ihre drei beliebtesten Produkte auf der Startseite",
