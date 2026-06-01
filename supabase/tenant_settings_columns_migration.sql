@@ -35,6 +35,7 @@ ALTER TABLE tenant_settings ADD COLUMN IF NOT EXISTS top_seller_3 TEXT;
 ALTER TABLE tenant_settings ADD COLUMN IF NOT EXISTS cover_image_1 TEXT;
 ALTER TABLE tenant_settings ADD COLUMN IF NOT EXISTS cover_image_2 TEXT;
 ALTER TABLE tenant_settings ADD COLUMN IF NOT EXISTS cover_image_3 TEXT;
+ALTER TABLE tenant_settings ADD COLUMN IF NOT EXISTS admin_dashboard_background_image TEXT;
 
 -- SEO
 ALTER TABLE tenant_settings ADD COLUMN IF NOT EXISTS seo_title TEXT;

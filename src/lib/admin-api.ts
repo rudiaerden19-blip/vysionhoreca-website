@@ -149,6 +149,8 @@ export interface TenantSettings {
   cover_image_1?: string
   cover_image_2?: string
   cover_image_3?: string
+  /** Foto achtergrond admin-overzicht (Welkom); ImageZoom JSON of URL */
+  admin_dashboard_background_image?: string
   // SEO fields
   seo_title?: string
   seo_description?: string

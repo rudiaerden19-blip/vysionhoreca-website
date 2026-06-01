@@ -15,6 +15,7 @@ import {
 import PinGate from '@/components/PinGate'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
 import { isOwnerSessionFreshForTenant, isSuperAdminLoggedIn } from '@/lib/auth-headers'
+import { resolveAdminDashboardBackgroundUrl } from '@/lib/tenant-dashboard-background'
 
 interface DashboardStats {
   todayOrders: number
@@ -44,6 +45,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
   const router = useRouter()
   const { moduleAccess } = useTenantModuleFlags(params.tenant)
   const [businessName, setBusinessName] = useState<string>('')
+  const [dashboardBackgroundUrl, setDashboardBackgroundUrl] = useState<string | null>(null)
 
   // Welkomstpagina: eerste sessiebezoek zonder ENTER op /welkom. Na wachtwoord-login is de eigenaar
   // al geïdentificeerd — niet opnieuw forceren (anders: login wiste vlag + kassa zet ze niet → Overzicht → splash).
@@ -86,6 +88,9 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
         ).join(' ')
         setBusinessName(capitalizedName)
       }
+      setDashboardBackgroundUrl(
+        resolveAdminDashboardBackgroundUrl(settings?.admin_dashboard_background_image),
+      )
     }
     loadBusinessName()
   }, [params.tenant])
@@ -255,11 +260,29 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
     )
   }
 
+  const cardSurface = dashboardBackgroundUrl
+    ? 'rounded-2xl bg-white/94 p-6 shadow-sm ring-1 ring-black/5'
+    : 'bg-white rounded-2xl p-6 shadow-sm'
+
   return (
     <PinGate tenant={params.tenant}>
-    <div className="max-w-7xl mx-auto">
+    <div
+      className="relative -mx-4 min-h-[calc(100svh-5.5rem)] md:-mx-6"
+      data-testid="admin-dashboard-shell"
+    >
+      {dashboardBackgroundUrl ? (
+        <>
+          <div
+            className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: `url(${JSON.stringify(dashboardBackgroundUrl)})` }}
+            aria-hidden
+          />
+          <div className="pointer-events-none absolute inset-0 bg-gray-100/82" aria-hidden />
+        </>
+      ) : null}
+      <div className="relative z-10 mx-auto max-w-7xl px-4 pb-8 md:px-6">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-8 pt-1">
         <motion.h1 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -276,7 +299,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl p-6 shadow-sm"
+          className={cardSurface}
         >
           <div className="flex items-center justify-between mb-4">
             <span className="text-gray-500 text-sm">{t('adminDashboard.stats.ordersToday')}</span>
@@ -292,7 +315,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl p-6 shadow-sm"
+          className={cardSurface}
         >
           <div className="flex items-center justify-between mb-4">
             <span className="text-gray-500 text-sm">{t('adminDashboard.stats.revenueToday')}</span>
@@ -308,7 +331,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-white rounded-2xl p-6 shadow-sm"
+          className={cardSurface}
         >
           <div className="flex items-center justify-between mb-4">
             <span className="text-gray-500 text-sm">{t('adminDashboard.stats.pendingOrders')}</span>
@@ -324,7 +347,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-white rounded-2xl p-6 shadow-sm"
+          className={cardSurface}
         >
           <div className="flex items-center justify-between mb-4">
             <span className="text-gray-500 text-sm">{t('adminDashboard.stats.rating')}</span>
@@ -342,7 +365,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="bg-white rounded-2xl p-6 shadow-sm"
+          className={cardSurface}
         >
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-gray-900">{t('adminDashboard.recentOrders.title')}</h2>
@@ -387,7 +410,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7 }}
-          className="bg-white rounded-2xl p-6 shadow-sm"
+          className={cardSurface}
         >
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-gray-900">{t('adminDashboard.popularItems.title')}</h2>
@@ -449,6 +472,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           </div>
         </div>
       </motion.div>
+      </div>
     </div>
     </PinGate>
   )

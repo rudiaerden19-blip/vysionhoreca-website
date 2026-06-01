@@ -72,6 +72,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
     cover_image_1: '',
     cover_image_2: '',
     cover_image_3: '',
+    admin_dashboard_background_image: '',
     specialty_1_image: '',
     specialty_1_title: '',
     specialty_2_image: '',
@@ -636,6 +637,31 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
             value={formData.about_image || ''}
             onChange={(url) => {
               setFormData(prev => ({ ...prev, about_image: url }))
+              setSaved(false)
+            }}
+          />
+        </motion.div>
+
+        {/* Admin dashboard achtergrond */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.36 }}
+          className="bg-white rounded-2xl p-6 shadow-sm"
+        >
+          <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
+            <span>🏠</span> {t('adminPages.profiel.dashboardBackgroundTitle')}
+          </h2>
+          <p className="text-gray-500 text-sm mb-6">{t('adminPages.profiel.dashboardBackgroundDesc')}</p>
+          <ImageZoomPicker
+            tenantSlug={params.tenant}
+            label={t('adminPages.profiel.dashboardBackgroundLabel')}
+            value={parseImageZoomSettings(formData.admin_dashboard_background_image)}
+            onChange={(settings) => {
+              setFormData(prev => ({
+                ...prev,
+                admin_dashboard_background_image: stringifyImageZoomSettings(settings),
+              }))
               setSaved(false)
             }}
           />
