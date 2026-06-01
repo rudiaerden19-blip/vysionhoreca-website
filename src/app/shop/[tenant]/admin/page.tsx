@@ -271,19 +271,28 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
 
   const hasDashboardBg = Boolean(dashboardBackground?.url)
   const cardSurface = hasDashboardBg
-    ? 'rounded-2xl bg-white/45 p-6 shadow-sm ring-1 ring-white/40 backdrop-blur-lg'
+    ? 'rounded-2xl bg-white/18 p-6 ring-1 ring-white/30 backdrop-blur-[6px]'
     : 'bg-white rounded-2xl p-6 shadow-sm'
   const panelSurface = hasDashboardBg
-    ? 'rounded-2xl bg-white/45 px-5 py-4 shadow-sm ring-1 ring-white/40 backdrop-blur-lg'
+    ? 'rounded-2xl bg-white/18 px-5 py-4 ring-1 ring-white/30 backdrop-blur-[6px]'
     : ''
   const orderRowSurface = hasDashboardBg
-    ? 'rounded-xl bg-white/35 p-4 backdrop-blur-md ring-1 ring-white/30'
+    ? 'rounded-xl p-4 ring-1 ring-white/35 bg-white/10 backdrop-blur-[4px]'
     : 'rounded-xl bg-gray-50 p-4'
+  const mutedOnPhoto = hasDashboardBg
+    ? 'text-sm font-medium text-gray-900 [text-shadow:0_0_10px_#fff,0_0_4px_#fff]'
+    : 'text-sm text-gray-500'
+  const popularRankClass = hasDashboardBg
+    ? 'flex h-8 w-8 items-center justify-center rounded-lg bg-white/25 text-sm font-bold text-gray-900 ring-1 ring-white/40'
+    : 'flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 text-sm font-bold text-gray-500'
+  const popularBarTrackClass = hasDashboardBg
+    ? 'mt-1 h-2 w-full rounded-full bg-white/25 ring-1 ring-white/20'
+    : 'mt-1 h-2 w-full rounded-full bg-gray-100'
   const statLabelClass = hasDashboardBg
-    ? 'text-sm font-semibold text-gray-900 [text-shadow:0_0_10px_rgba(255,255,255,0.9),0_1px_1px_rgba(255,255,255,0.85)]'
+    ? 'text-sm font-semibold text-gray-900 [text-shadow:0_0_12px_#fff,0_0_6px_#fff,0_1px_1px_#fff]'
     : 'text-gray-500 text-sm'
   const onPhotoTextShadow = hasDashboardBg
-    ? '[text-shadow:0_0_12px_rgba(255,255,255,0.92),0_1px_2px_rgba(255,255,255,0.88)]'
+    ? '[text-shadow:0_0_14px_#fff,0_0_8px_#fff,0_1px_2px_#fff]'
     : ''
 
   return (
@@ -306,7 +315,6 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
               style={adminDashboardBackgroundImageStyle(dashboardBackground)}
             />
           </div>
-          <div className="pointer-events-none absolute inset-0 bg-white/20" aria-hidden />
         </>
       ) : null}
       <div className="relative z-10 mx-auto max-w-7xl px-4 pb-8 md:px-6">
@@ -433,12 +441,18 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
                       <span className="text-blue-600 font-bold text-sm">{order.customer_name[0]?.toUpperCase()}</span>
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900">{order.order_number} · {order.customer_name}</p>
-                      <p className="text-sm text-gray-500">{order.items?.length || 0} items · {getTimeAgo(order.created_at)}</p>
+                      <p className={`font-medium text-gray-900 ${onPhotoTextShadow}`}>
+                        {order.order_number} · {order.customer_name}
+                      </p>
+                      <p className={mutedOnPhoto}>
+                        {order.items?.length || 0} items · {getTimeAgo(order.created_at)}
+                      </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-gray-900">€{order.total.toFixed(2)}</p>
+                    <p className={`font-bold text-gray-900 ${onPhotoTextShadow}`}>
+                      €{order.total.toFixed(2)}
+                    </p>
                     <span className={`text-xs px-2 py-1 rounded-full ${statusColors[order.status]?.bg || 'bg-gray-100'} ${statusColors[order.status]?.text || 'text-gray-700'}`}>
                       {t(`adminDashboard.status.${statusColors[order.status]?.labelKey || 'pending'}`)}
                     </span>
@@ -475,12 +489,10 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
             <div className="space-y-4">
               {stats.popularItems.map((item, index) => (
                 <div key={item.name} className="flex items-center gap-4">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 text-sm font-bold text-gray-500">
-                    {index + 1}
-                  </span>
+                  <span className={popularRankClass}>{index + 1}</span>
                   <div className="flex-1">
                     <p className={`font-medium text-gray-900 ${onPhotoTextShadow}`}>{item.name}</p>
-                    <div className="mt-1 h-2 w-full rounded-full bg-gray-100">
+                    <div className={popularBarTrackClass}>
                       <div 
                         className="bg-blue-600 h-2 rounded-full" 
                         style={{ width: `${(item.count / stats.popularItems[0].count) * 100}%` }}
