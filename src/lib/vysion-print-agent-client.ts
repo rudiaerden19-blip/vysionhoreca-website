@@ -242,6 +242,7 @@ function sleep(ms: number): Promise<void> {
 export type PrintAgentHealth = {
   ok: boolean
   printerConfigured: boolean
+  printerName: string | null
   kitchenPrinterName: string | null
 }
 
@@ -262,13 +263,23 @@ export async function fetchPrintAgentHealth(
     ;(init as RequestInit & { targetAddressSpace?: string }).targetAddressSpace = 'local'
     const r = await fetch(`${base}/health`, init)
     if (!r.ok) {
-      return { ok: false, printerConfigured: false, kitchenPrinterName: null }
+      return {
+        ok: false,
+        printerConfigured: false,
+        printerName: null,
+        kitchenPrinterName: null,
+      }
     }
     const j = (await r.json()) as {
       ok?: boolean
       printerConfigured?: boolean
+      printerName?: string | null
       kitchenPrinterName?: string | null
     }
+    const p =
+      j.printerName != null && String(j.printerName).trim() !== ''
+        ? String(j.printerName).trim()
+        : null
     const k =
       j.kitchenPrinterName != null && String(j.kitchenPrinterName).trim() !== ''
         ? String(j.kitchenPrinterName).trim()
@@ -276,17 +287,24 @@ export async function fetchPrintAgentHealth(
     return {
       ok: j.ok === true,
       printerConfigured: j.printerConfigured === true,
+      printerName: p,
       kitchenPrinterName: k,
     }
   } catch {
-    return { ok: false, printerConfigured: false, kitchenPrinterName: null }
+    return { ok: false, printerConfigured: false, printerName: null, kitchenPrinterName: null }
   } finally {
     clearTimeout(timer)
   }
 }
 
-export function printAgentHasKitchenPrinter(health: PrintAgentHealth): boolean {
-  return health.kitchenPrinterName != null && health.kitchenPrinterName.length > 0
+/** Aparte keukenprinter in agent (niet dezelfde als zaak/kassa-printer). */
+export function printAgentHasDedicatedKitchenPrinter(health: PrintAgentHealth): boolean {
+  if (!health.ok || !health.printerConfigured) return false
+  const kitchen = health.kitchenPrinterName?.trim()
+  if (!kitchen) return false
+  const primary = health.printerName?.trim()
+  if (!primary) return false
+  return kitchen.localeCompare(primary, undefined, { sensitivity: 'accent' }) !== 0
 }
 
 async function postPrintOnce(

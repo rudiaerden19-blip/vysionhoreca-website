@@ -56,7 +56,7 @@ import {
   openCashDrawer,
   isAndroidTabletPrintClient,
   fetchPrintAgentHealth,
-  printAgentHasKitchenPrinter,
+  printAgentHasDedicatedKitchenPrinter,
 } from '@/lib/vysion-print-agent-client'
 import {
   offlineDbLoadMenuSnapshot,
@@ -3171,7 +3171,25 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     const isDraft = !!opts?.draft
     const barKitchenDelta = !!opts?.barTableDelta
+    const receiptMode = opts?.receiptMode ?? 'kassa'
     const receiptTableNr = kassaReceiptTableNumber(order.orderType, order.tableNumber)
+
+    if (isDraft && barKitchenDelta && receiptMode === 'keuken') {
+      const health = await fetchPrintAgentHealth()
+      if (!printAgentHasDedicatedKitchenPrinter(health)) {
+        const commit = opts?.barWatermarkCommit
+        if (commit?.slotKey) {
+          try {
+            const st = loadBarBonWatermarks(tenant)
+            st[commit.slotKey] = commit.row
+            saveBarBonWatermarks(tenant, st)
+          } catch {
+            /* ignore */
+          }
+        }
+        return
+      }
+    }
 
     if (!isDraft) {
       try {
@@ -3338,7 +3356,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       /** Draft: 1 = gele Bon / toog-delta; 2 = zaaknaam in header. Betaald (afrekenen): altijd 2. */
       copies: isDraft ? draftCopies : paidCopies,
       openDrawer: isCash,
-      receiptMode: opts?.receiptMode ?? 'kassa',
+      receiptMode,
       orderData: {
         orderNumber: order.orderNumber,
         orderType: order.orderType,
@@ -3522,7 +3540,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         let kitchenAvailable = false
         if (wantKitchen) {
           const health = await fetchPrintAgentHealth()
-          kitchenAvailable = printAgentHasKitchenPrinter(health)
+          kitchenAvailable = printAgentHasDedicatedKitchenPrinter(health)
         }
 
         if (wantKitchen && kitchenAvailable) {
