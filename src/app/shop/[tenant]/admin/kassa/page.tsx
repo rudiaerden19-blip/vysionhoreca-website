@@ -4378,14 +4378,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </div>
         </div>
 
-        {/* Besteltype: drie segmenten in één balk (ter plaatse / afhalen / leveren) */}
+        {/* Besteltype: drie losse knoppen (ter plaatse / afhalen / leveren) */}
         <div className="mx-3 mt-2 shrink-0" data-testid="kassa-order-type-bar">
-          <div className="flex overflow-hidden rounded-xl shadow-sm ring-1 ring-black/10">
+          <div className="flex gap-2">
             <button
               type="button"
               aria-pressed={orderType === 'DINE_IN'}
               onClick={() => selectOrderType('DINE_IN')}
-              className={`flex min-w-0 flex-1 flex-col items-center justify-center border-r border-black/15 px-1 py-2.5 text-center transition-colors active:brightness-95 sm:py-3 ${
+              className={`flex min-w-0 flex-1 flex-col items-center justify-center rounded-xl px-1 py-2.5 text-center shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 sm:py-3 ${
                 orderType === 'DINE_IN'
                   ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
                   : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
@@ -4407,7 +4407,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               type="button"
               aria-pressed={orderType === 'TAKEAWAY'}
               onClick={() => selectOrderType('TAKEAWAY')}
-              className={`flex min-w-0 flex-1 flex-col items-center justify-center border-r border-black/15 px-1 py-2.5 text-center transition-colors active:brightness-95 sm:py-3 ${
+              className={`flex min-w-0 flex-1 flex-col items-center justify-center rounded-xl px-1 py-2.5 text-center shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 sm:py-3 ${
                 orderType === 'TAKEAWAY'
                   ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
                   : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
@@ -4421,7 +4421,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               type="button"
               aria-pressed={orderType === 'DELIVERY'}
               onClick={() => selectOrderType('DELIVERY')}
-              className={`flex min-w-0 flex-1 flex-col items-center justify-center px-1 py-2.5 text-center transition-colors active:brightness-95 sm:py-3 ${
+              className={`flex min-w-0 flex-1 flex-col items-center justify-center rounded-xl px-1 py-2.5 text-center shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 sm:py-3 ${
                 orderType === 'DELIVERY'
                   ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
                   : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
@@ -4751,15 +4751,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           </div>
           {orderType === 'DINE_IN' && tableNumber && cart.length > 0 && (
             <div
-              className={`flex w-full overflow-hidden rounded-xl shadow-sm ring-1 ring-black/10 touch-manipulation select-none ${
-                dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE ? 'bg-emerald-700' : 'bg-[#3C4D6B]'
-              }`}
+              className="flex w-full gap-2 touch-manipulation select-none"
               data-testid="kassa-park-table-split"
             >
               <button
                 type="button"
                 onClick={() => parkOrder({ printKitchen: true, printKassaSlip: false })}
-                className={`min-w-0 flex-1 border-r border-black/15 font-bold active:brightness-95 flex items-center justify-center text-center ${
+                className={`min-w-0 flex-1 rounded-xl font-bold shadow-sm ring-1 ring-black/10 active:brightness-95 flex items-center justify-center text-center ${
                   dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE
                     ? 'bg-emerald-700 text-white hover:bg-emerald-800'
                     : 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
@@ -4776,7 +4774,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <button
                 type="button"
                 onClick={() => parkOrder({ printKitchen: false, printKassaSlip: true })}
-                className={`min-w-0 flex-1 font-bold active:brightness-95 flex items-center justify-center text-center ${
+                className={`min-w-0 flex-1 rounded-xl font-bold shadow-sm ring-1 ring-black/10 active:brightness-95 flex items-center justify-center text-center ${
                   dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE
                     ? 'bg-emerald-400 text-emerald-950 hover:bg-emerald-300'
                     : 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
