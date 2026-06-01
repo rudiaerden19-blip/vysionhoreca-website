@@ -3305,11 +3305,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     const paidCopies = 2
     const draftCopies = opts?.draftCopies === 2 ? 2 : 1
-    const agentVatLines =
-      splitOk && order.vatSplit!.length > 0
-        ? order.vatSplit!.map((row) => ({ rate: row.rate, tax: row.tax }))
-        : [{ rate: fbVatRate, tax }]
-
     const printResult = await sendToVysionPrintAgent({
       winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
       bonInhoud: bonLines.join('\n'),
@@ -3331,7 +3326,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         tax,
         total: order.total,
         paymentMethod: order.paymentMethod,
-        vatLines: agentVatLines,
       },
       businessInfo: {
         name: tenantInfo?.business_name,
@@ -3341,7 +3335,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         phone: tenantInfo?.phone ?? undefined,
         vatNumber: tenantInfo?.btw_number ?? undefined,
         website: tenantInfo?.website ?? undefined,
-        vatRate: agentVatLines.length === 1 ? agentVatLines[0].rate : fbVatRate,
+        vatRate: splitOk ? order.vatSplit![0].rate : fbVatRate,
       },
     })
 
