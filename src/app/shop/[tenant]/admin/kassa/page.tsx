@@ -2371,18 +2371,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     })
   }
 
-  const clearCart = () => {
-    scheduleKassaTapSound(playRemove)
-    setCart([])
-    if (tableNumber) {
-      updateTableStatus(
-        tableNumber,
-        tableHasOpenOrder(dineInFloorZone, tableNumber, []),
-        dineInFloorZone,
-      )
-    }
-  }
-
   const activeTableSlotKey = useMemo(() => {
     if (orderType !== 'DINE_IN' || !tableNumber) return null
     return tableOrderMapKey(dineInFloorZone, tableNumber)
@@ -2950,6 +2938,23 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       { tenant_slug: tenant, table_number: tblNr, status: 'preparing', floor_plan_zone: zone },
       { tenantSlug: tenant },
     )
+  }
+
+  /** Kar leegmaken; bij tafel ook open mand + DB-order (na gele bon of bij fout). */
+  const clearCart = () => {
+    scheduleKassaTapSound(playRemove)
+    setCart([])
+    if (orderType === 'DINE_IN' && tableNumber) {
+      clearTableAfterPayment(dineInFloorZone, tableNumber)
+      return
+    }
+    if (tableNumber) {
+      updateTableStatus(
+        tableNumber,
+        tableHasOpenOrder(dineInFloorZone, tableNumber, []),
+        dineInFloorZone,
+      )
+    }
   }
 
   const completePayment = async (
@@ -4803,7 +4808,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <button
               type="button"
               onClick={clearCart}
-              disabled={cart.length === 0}
+              disabled={billLines.length === 0}
               className={`flex flex-col items-center justify-center rounded-xl bg-rose-500 text-white hover:bg-rose-600 active:brightness-95 disabled:opacity-40 disabled:pointer-events-none ${
                 kassaSidebarFooterTier === 'comfort'
                   ? 'gap-2 py-5'
