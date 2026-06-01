@@ -2810,6 +2810,8 @@
     "remove": "Entfernen",
     "parkToTable": "Zu Tisch {number} · {zone}",
     "parkToTableWithReceipt": "Zu Tisch {number} · {zone} + Kassenbon",
+    "parkTableKitchenBon": "Tisch {number} Küche",
+    "parkTableKassaBon": "Tisch {number} Kasse",
     "checkout": "Bezahlen",
     "switchTableTitle": "Tisch wechseln?",
     "switchTableBody": "Sie haben noch Artikel auf Tisch {current}. Diese Bestellung wird gespeichert. Weiter zu Tisch {next}?",

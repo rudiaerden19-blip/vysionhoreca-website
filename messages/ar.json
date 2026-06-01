@@ -3310,6 +3310,8 @@
     "remove": "Eliminar",
     "parkToTable": "إلى الطاولة {number} · {zone}",
     "parkToTableWithReceipt": "إلى الطاولة {number} · {zone} + إيصال الكاشير",
+    "parkTableKitchenBon": "طاولة {number} مطبخ",
+    "parkTableKassaBon": "طاولة {number} كاشير",
     "checkout": "الدفع",
     "switchTableTitle": "تبديل الطاولة؟",
     "switchTableBody": "لا تزال هناك أصناف على الطاولة {current}. سيتم حفظ الطلب. المتابعة إلى الطاولة {next}؟",

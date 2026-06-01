@@ -4714,51 +4714,44 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           </div>
           {orderType === 'DINE_IN' && tableNumber && cart.length > 0 && (
             <div
-              className={`grid w-full touch-manipulation select-none ${
-                kassaSidebarFooterTier === 'comfort' ? 'gap-2' : 'gap-1.5'
+              className={`flex w-full overflow-hidden rounded-xl shadow-sm ring-1 ring-black/10 touch-manipulation select-none ${
+                dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE ? 'bg-emerald-700' : 'bg-[#3C4D6B]'
               }`}
+              data-testid="kassa-park-table-split"
             >
               <button
                 type="button"
                 onClick={() => parkOrder(false)}
-                className={`w-full rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold active:brightness-95 flex items-center justify-center ${
+                className={`min-w-0 flex-1 border-r border-black/15 font-bold active:brightness-95 flex items-center justify-center text-center ${
+                  dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE
+                    ? 'bg-emerald-700 text-white hover:bg-emerald-800'
+                    : 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
+                } ${
                   kassaSidebarFooterTier === 'comfort'
-                    ? 'py-3 text-base gap-2'
+                    ? 'px-2 py-3 text-sm leading-tight'
                     : kassaSidebarFooterTier === 'compact'
-                      ? 'py-2 text-sm gap-1.5'
-                      : 'py-1.5 text-xs gap-1'
+                      ? 'px-1.5 py-2 text-xs leading-tight'
+                      : 'px-1 py-1.5 text-[10px] leading-tight'
                 }`}
               >
-                🪑{' '}
-                {t('kassaApp.parkToTable')
-                  .replace(/\{number\}/g, String(tableNumber))
-                  .replace(
-                    /\{zone\}/g,
-                    dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE
-                      ? t('kassaApp.floorZoneTerrace')
-                      : t('kassaApp.floorZoneInside'),
-                  )}
+                {t('kassaApp.parkTableKitchenBon').replace(/\{number\}/g, String(tableNumber))}
               </button>
               <button
                 type="button"
                 onClick={() => parkOrder(true)}
-                className={`w-full rounded-xl bg-[#58CCFF] hover:bg-[#47c6fe] text-[#063042] font-bold active:brightness-95 flex items-center justify-center ${
+                className={`min-w-0 flex-1 font-bold active:brightness-95 flex items-center justify-center text-center ${
+                  dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE
+                    ? 'bg-emerald-400 text-emerald-950 hover:bg-emerald-300'
+                    : 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
+                } ${
                   kassaSidebarFooterTier === 'comfort'
-                    ? 'py-2.5 text-sm gap-2'
+                    ? 'px-2 py-3 text-sm leading-tight'
                     : kassaSidebarFooterTier === 'compact'
-                      ? 'py-2 text-xs gap-1.5'
-                      : 'py-1.5 text-[10px] gap-1 leading-tight px-1'
+                      ? 'px-1.5 py-2 text-xs leading-tight'
+                      : 'px-1 py-1.5 text-[10px] leading-tight'
                 }`}
               >
-                🪑🧾{' '}
-                {t('kassaApp.parkToTableWithReceipt')
-                  .replace(/\{number\}/g, String(tableNumber))
-                  .replace(
-                    /\{zone\}/g,
-                    dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE
-                      ? t('kassaApp.floorZoneTerrace')
-                      : t('kassaApp.floorZoneInside'),
-                  )}
+                {t('kassaApp.parkTableKassaBon').replace(/\{number\}/g, String(tableNumber))}
               </button>
             </div>
           )}

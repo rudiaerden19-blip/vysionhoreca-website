@@ -3310,6 +3310,8 @@
     "remove": "Eliminar",
     "parkToTable": "送回桌位 {number} · {zone}",
     "parkToTableWithReceipt": "送回桌位 {number} · {zone} + 收银小票",
+    "parkTableKitchenBon": "桌位{number} 厨房单",
+    "parkTableKassaBon": "桌位{number} 收银单",
     "checkout": "结账",
     "switchTableTitle": "切换桌台？",
     "switchTableBody": "桌 {current} 上仍有商品。该订单将保存。是否继续到桌 {next}？",

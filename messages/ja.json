@@ -3310,6 +3310,8 @@
     "remove": "Eliminar",
     "parkToTable": "テーブルへ {number} · {zone}",
     "parkToTableWithReceipt": "テーブルへ {number} · {zone} + レシート",
+    "parkTableKitchenBon": "テーブル{number} キッチン",
+    "parkTableKassaBon": "テーブル{number} レシート",
     "checkout": "会計",
     "switchTableTitle": "テーブルを変更？",
     "switchTableBody": "テーブル {current} に商品が残っています。注文は保存されます。テーブル {next} に移りますか？",

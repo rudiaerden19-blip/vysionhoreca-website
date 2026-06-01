@@ -3310,6 +3310,8 @@
     "remove": "Eliminar",
     "parkToTable": "Al tavolo {number} · {zone}",
     "parkToTableWithReceipt": "Al tavolo {number} · {zone} + scontrino cassa",
+    "parkTableKitchenBon": "tavolo {number} cucina",
+    "parkTableKassaBon": "tavolo {number} cassa",
     "checkout": "Paga",
     "switchTableTitle": "Cambiare tavolo?",
     "switchTableBody": "Hai ancora articoli al tavolo {current}. L’ordine verrà salvato. Continuare al tavolo {next}?",

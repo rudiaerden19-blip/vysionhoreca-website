@@ -2810,6 +2810,8 @@
     "remove": "Supprimer",
     "parkToTable": "Vers table {number} · {zone}",
     "parkToTableWithReceipt": "Vers table {number} · {zone} + ticket caisse",
+    "parkTableKitchenBon": "table {number} cuisine",
+    "parkTableKassaBon": "table {number} caisse",
     "checkout": "Payer",
     "switchTableTitle": "Changer de table ?",
     "switchTableBody": "Il reste des articles sur la table {current}. La commande sera enregistrée. Continuer vers la table {next} ?",
