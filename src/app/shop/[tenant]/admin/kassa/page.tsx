@@ -4749,9 +4749,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </div>
         </div>
 
-        {/* Totaal + knoppen — compacter zodat karregels zichtbaar blijven */}
+        {/* Totaal + knoppen — leesbaar formaat, karveld blijft prioriteit */}
         <div
-          className={`shrink-0 border-t ${kassaAppearanceDark ? 'border-zinc-700' : 'border-gray-200'} p-1 space-y-0.5`}
+          className={`shrink-0 border-t ${kassaAppearanceDark ? 'border-zinc-700' : 'border-gray-200'} p-1.5 space-y-1`}
         >
           <div
             className={`flex items-center justify-between border-b ${kassaAppearanceDark ? 'border-zinc-700' : 'border-gray-100'} py-0.5`}
@@ -4767,19 +4767,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               €{total.toFixed(2)}
             </span>
           </div>
-          <div className="grid grid-cols-3 gap-1 touch-manipulation select-none">
+          <div className="grid grid-cols-3 gap-1.5 touch-manipulation select-none">
             <button
               type="button"
               onClick={() => { void openCashDrawer() }}
-              className={`flex flex-col items-center justify-center gap-0 rounded-lg bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe] active:brightness-95 ${
-                kassaSidebarFooterTier === 'dense' ? 'py-1' : 'py-1.5'
+              className={`flex flex-col items-center justify-center gap-0.5 rounded-lg bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe] active:brightness-95 ${
+                kassaSidebarFooterTier === 'dense' ? 'min-h-[3.25rem] py-1.5' : 'min-h-[3.5rem] py-2'
               }`}
               title={t('kassaApp.drawerOpen')}
             >
-              <span className="text-base leading-none" aria-hidden>
+              <span className="text-lg leading-none" aria-hidden>
                 💰
               </span>
-              <span className="px-0.5 text-center text-[9px] font-bold leading-tight">
+              <span className="px-0.5 text-center text-[10px] font-bold leading-tight sm:text-[11px]">
                 {t('kassaApp.drawerOpen')}
               </span>
             </button>
@@ -4789,16 +4789,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 void printDraftBonFromCart({ draftCopies: 1 })
               }}
               disabled={draftBonLineItems.length === 0 || draftBonPrinting}
-              className={`flex flex-col items-center justify-center gap-0 rounded-lg bg-yellow-400 text-yellow-950 hover:bg-yellow-300 active:brightness-95 disabled:pointer-events-none disabled:opacity-40 ${
-                kassaSidebarFooterTier === 'dense' ? 'py-1' : 'py-1.5'
+              className={`flex flex-col items-center justify-center gap-0.5 rounded-lg bg-yellow-400 text-yellow-950 hover:bg-yellow-300 active:brightness-95 disabled:pointer-events-none disabled:opacity-45 ${
+                kassaSidebarFooterTier === 'dense' ? 'min-h-[3.25rem] py-1.5' : 'min-h-[3.5rem] py-2'
               }`}
               title={t('kassaApp.cartBonTitle')}
               aria-label={t('kassaApp.cartBonTitle')}
             >
-              <span className="text-base leading-none" aria-hidden>
+              <span className="text-lg leading-none" aria-hidden>
                 🧾
               </span>
-              <span className="px-0.5 text-center text-[9px] font-bold leading-tight">
+              <span className="px-0.5 text-center text-[10px] font-bold leading-tight sm:text-[11px]">
                 {t('kassaApp.cartBon')}
               </span>
             </button>
@@ -4806,14 +4806,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               type="button"
               onClick={clearCart}
               disabled={billLines.length === 0}
-              className={`flex flex-col items-center justify-center gap-0 rounded-lg bg-rose-500 text-white hover:bg-rose-600 active:brightness-95 disabled:pointer-events-none disabled:opacity-40 ${
-                kassaSidebarFooterTier === 'dense' ? 'py-1' : 'py-1.5'
+              className={`flex flex-col items-center justify-center gap-0.5 rounded-lg bg-rose-500 text-white hover:bg-rose-600 active:brightness-95 disabled:bg-rose-900/50 disabled:text-white/70 disabled:opacity-100 ${
+                kassaSidebarFooterTier === 'dense' ? 'min-h-[3.25rem] py-1.5' : 'min-h-[3.5rem] py-2'
               }`}
             >
-              <span className="text-base leading-none" aria-hidden>
+              <span className="text-lg leading-none" aria-hidden>
                 🗑️
               </span>
-              <span className="px-0.5 text-center text-[9px] font-bold leading-tight">
+              <span className="px-0.5 text-center text-[10px] font-bold leading-tight sm:text-[11px]">
                 {t('kassaApp.remove')}
               </span>
             </button>
@@ -4830,7 +4830,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE
                     ? 'bg-emerald-700 text-white hover:bg-emerald-800'
                     : 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
-                } px-1 py-1.5 text-[10px] leading-tight`}
+                } px-1.5 py-2 text-[11px] leading-tight`}
               >
                 {t('kassaApp.parkTableKitchenBon')}
               </button>
@@ -4841,13 +4841,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE
                     ? 'bg-emerald-400 text-emerald-950 hover:bg-emerald-300'
                     : 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
-                } px-1 py-1.5 text-[10px] leading-tight`}
+                } px-1.5 py-2 text-[11px] leading-tight`}
               >
                 {t('kassaApp.parkTableKassaBon')}
               </button>
             </div>
           )}
-          <div className="flex gap-1 touch-manipulation select-none">
+          <div className="flex gap-1.5 touch-manipulation select-none">
             <button
               type="button"
               aria-pressed={numpadPanelVisible}
@@ -4856,11 +4856,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 playClick()
                 setNumpadPanelVisible((v) => !v)
               }}
-              className={`flex shrink-0 flex-col items-center justify-center rounded-lg px-1.5 font-bold shadow-sm ring-1 ring-black/10 active:brightness-95 ${
+              className={`flex shrink-0 flex-col items-center justify-center rounded-lg px-2 font-bold shadow-sm ring-1 ring-black/10 active:brightness-95 ${
                 numpadPanelVisible
                   ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
                   : 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
-              } min-w-[3.5rem] py-1.5 text-[9px] leading-tight`}
+              } min-w-[4.25rem] min-h-[2.75rem] py-2 text-[10px] leading-tight sm:text-[11px]`}
             >
               {t('kassaApp.numpadToggle')}
             </button>
@@ -4872,9 +4872,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 setShowPaymentModal(true)
               }}
               disabled={billLines.length === 0}
-              className={`flex min-w-0 flex-1 items-center justify-center gap-1 rounded-lg bg-emerald-500 font-bold text-white hover:bg-emerald-600 active:brightness-95 disabled:opacity-40 ${
-                kassaSidebarFooterTier === 'dense' ? 'py-2 text-xs' : 'py-2 text-sm'
-              }`}
+              className={`flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-lg bg-emerald-500 font-bold text-white hover:bg-emerald-600 active:brightness-95 disabled:bg-emerald-900/45 disabled:text-white/75 disabled:opacity-100 min-h-[2.75rem] py-2.5 text-sm`}
             >
               💳 {t('kassaApp.checkout')}
             </button>
