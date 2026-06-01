@@ -312,6 +312,9 @@ const KASSA_STRIP_TAP_SLOP_PX = 24
 const KASSA_STRIP_SCROLL_AXIS_MIN_PX = 8
 const KASSA_STRIP_SCROLL_DELTA_PX = 4
 
+/** Titelbalk: klantscherm + geluid tijdelijk verborgen (code blijft voor later). */
+const KASSA_HEADER_HIDE_CUSTOMER_DISPLAY_AND_SOUND = true
+
 /** Sidebar-footer: touch-vriendelijke hoogte (Lade / Bon / Verwijder). */
 function kassaFooterActionTouchMinHClass(sxga: boolean, denseBill: boolean): string {
   if (sxga) return 'min-h-[4.75rem] py-2.5'
@@ -4060,8 +4063,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           </button>
         </div>
 
-        {/* Snelkoppelingen: tekstknoppen (geen decoratieve emoji’s in de titelbalk — leesbare labels op alle breedtes). */}
-        <div className="relative z-20 flex min-h-0 min-w-0 flex-1 items-center">
+        {/* Snelkoppelingen: 4cm naar rechts; tenantnaam links ongewijzigd */}
+        <div className="relative z-20 ml-[4cm] flex min-h-0 min-w-0 flex-1 items-center">
           <nav
             aria-label={t('kassaApp.quickLinksAria')}
             className="flex min-h-0 min-w-0 flex-1 flex-nowrap items-center justify-start gap-0.5 sm:gap-1"
@@ -4092,7 +4095,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               type="button"
               onClick={openKlantschermWindow}
               title={t('kassaApp.customerDisplayHint')}
-              className="relative inline-flex shrink-0 items-center whitespace-nowrap rounded-lg bg-[#3C4D6B] px-1.5 py-1 font-bold text-white transition-colors hover:bg-[#2D3A52] sm:gap-1 sm:px-2 sm:py-1.5"
+              aria-hidden={KASSA_HEADER_HIDE_CUSTOMER_DISPLAY_AND_SOUND}
+              tabIndex={KASSA_HEADER_HIDE_CUSTOMER_DISPLAY_AND_SOUND ? -1 : 0}
+              className={`relative inline-flex shrink-0 items-center whitespace-nowrap rounded-lg bg-[#3C4D6B] px-1.5 py-1 font-bold text-white transition-colors hover:bg-[#2D3A52] sm:gap-1 sm:px-2 sm:py-1.5 ${
+                KASSA_HEADER_HIDE_CUSTOMER_DISPLAY_AND_SOUND ? 'hidden' : ''
+              }`}
             >
               <span className="text-[11px] leading-snug sm:text-xs">{t('kassaApp.openCustomerDisplay')}</span>
             </button>
@@ -4121,9 +4128,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <button
             type="button"
             onClick={toggleSound}
+            aria-hidden={KASSA_HEADER_HIDE_CUSTOMER_DISPLAY_AND_SOUND}
+            tabIndex={KASSA_HEADER_HIDE_CUSTOMER_DISPLAY_AND_SOUND ? -1 : 0}
             className={`inline-flex shrink-0 items-center whitespace-nowrap rounded-lg px-1.5 py-1 font-bold transition-colors sm:gap-1 sm:px-2 sm:py-1.5 ${
               soundsOn ? 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]' : 'bg-white/10 text-white/90 hover:bg-white/20'
-            }`}
+            } ${KASSA_HEADER_HIDE_CUSTOMER_DISPLAY_AND_SOUND ? 'hidden' : ''}`}
             title={soundsOn ? t('kassaApp.soundOnTitle') : t('kassaApp.soundOffTitle')}
           >
             <span className="text-[11px] leading-snug sm:text-xs">
