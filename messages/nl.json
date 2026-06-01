@@ -3772,6 +3772,7 @@
     "addAmount": "+ €{amount} toevoegen",
     "cartTotal": "Totaal",
     "parkedOnTableSection": "Al op tafel",
+    "cartNewLinesSection": "Nieuwe bestelling",
     "drawerOpen": "Lade open",
     "cartBon": "Bon",
     "cartBonTitle": "Voorlopige bon van de huidige kar printen (zonder afrekenen)",

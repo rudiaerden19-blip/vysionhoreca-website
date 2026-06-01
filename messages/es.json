@@ -3298,6 +3298,7 @@
     "addAmount": "+ Añadir €{amount}",
     "cartTotal": "Total",
     "parkedOnTableSection": "Ya en la mesa",
+    "cartNewLinesSection": "Nuevo pedido",
     "drawerOpen": "Abrir cajón",
     "cartBon": "Ticket",
     "cartBonTitle": "Imprimir ticket provisional del carrito (sin cobrar)",

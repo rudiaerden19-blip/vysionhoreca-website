@@ -2798,6 +2798,7 @@
     "addAmount": "+ €{amount} hinzufügen",
     "cartTotal": "Summe",
     "parkedOnTableSection": "Bereits am Tisch",
+    "cartNewLinesSection": "Neue Bestellung",
     "drawerOpen": "Schublade öffnen",
     "cartBon": "Bon",
     "cartBonTitle": "Vorläufigen Bon aus aktuellem Warenkorb drucken (ohne Bezahlung)",

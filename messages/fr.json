@@ -2798,6 +2798,7 @@
     "addAmount": "+ Ajouter €{amount}",
     "cartTotal": "Total",
     "parkedOnTableSection": "Déjà à la table",
+    "cartNewLinesSection": "Nouvelle commande",
     "drawerOpen": "Ouvrir le tiroir",
     "cartBon": "Ticket",
     "cartBonTitle": "Imprimer un ticket provisoire du panier (sans encaissement)",

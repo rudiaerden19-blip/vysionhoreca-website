@@ -3298,6 +3298,7 @@
     "addAmount": "+ Aggiungi €{amount}",
     "cartTotal": "Total",
     "parkedOnTableSection": "Già al tavolo",
+    "cartNewLinesSection": "Nuovo ordine",
     "drawerOpen": "Apri cassetto",
     "cartBon": "Scontrino",
     "cartBonTitle": "Stampa scontrino provvisorio dal carrello (senza incasso)",

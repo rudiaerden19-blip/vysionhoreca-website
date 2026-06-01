@@ -3298,6 +3298,7 @@
     "addAmount": "+ إضافة €{amount}",
     "cartTotal": "Total",
     "parkedOnTableSection": "على الطاولة مسبقاً",
+    "cartNewLinesSection": "طلب جديد",
     "drawerOpen": "فتح الدرج",
     "cartBon": "إيصال",
     "cartBonTitle": "طباعة إيصال مبدئي من السلة الحالية (بدون إتمام الدفع)",

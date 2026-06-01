@@ -3772,6 +3772,7 @@
     "addAmount": "+ Add €{amount}",
     "cartTotal": "Total",
     "parkedOnTableSection": "Already on table",
+    "cartNewLinesSection": "New order",
     "drawerOpen": "Open drawer",
     "cartBon": "Receipt",
     "cartBonTitle": "Print a draft receipt from the current cart (without checkout)",

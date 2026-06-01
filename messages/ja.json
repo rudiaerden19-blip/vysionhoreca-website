@@ -3298,6 +3298,7 @@
     "addAmount": "+ €{amount} を追加",
     "cartTotal": "Total",
     "parkedOnTableSection": "テーブル済み",
+    "cartNewLinesSection": "新規注文",
     "drawerOpen": "ドロワーを開く",
     "cartBon": "伝票",
     "cartBonTitle": "現在のカートから案内伝票を印刷（会計しない）",
