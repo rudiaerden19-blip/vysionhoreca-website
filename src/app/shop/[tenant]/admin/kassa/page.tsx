@@ -151,6 +151,7 @@ import {
   resolveVatPercentForProduct,
   normalizeCategoryVatPercent,
 } from '@/lib/order-vat'
+import { sortKassaCartLinesByMenuCategory } from '@/lib/kassa-cart-grouping'
 
 /** Tik-feedback ná paint — zwakkere touch-terminals blijven UI-updates beter bijbenen */
 function scheduleKassaTapSound(play: () => void) {
@@ -2499,6 +2500,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     void reposition()
   }, [tenant, customerDisplayToken, t])
 
+  /** Mand + bon: categorievolgorde uit menu (niet tikvolgorde). */
+  const cartLinesByCategory = useMemo(
+    () => sortKassaCartLinesByMenuCategory(cart, categories),
+    [cart, categories],
+  )
+
   useEffect(() => {
     const bc = customerDisplayBcRef.current
     if (!bc || !customerDisplayToken) return
@@ -2541,7 +2548,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         phase: 'checkout',
         tenantSlug: tenant,
         businessName,
-        lines: buildKassaCustomerDisplayLines(cart),
+        lines: buildKassaCustomerDisplayLines(cartLinesByCategory),
         subtotalExVat,
         vatRate,
         vatAmount,
@@ -2555,7 +2562,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         phase: 'cart',
         tenantSlug: tenant,
         businessName,
-        lines: buildKassaCustomerDisplayLines(cart),
+        lines: buildKassaCustomerDisplayLines(cartLinesByCategory),
         totalInclVat,
         dineInSubtitle: customerDisplayDineInSubtitle,
       }
@@ -2575,6 +2582,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     tenant,
     customerDisplayToken,
     cart,
+    cartLinesByCategory,
     total,
     showPaymentModal,
     showSplitModal,
@@ -2637,7 +2645,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return m
   }, [categories])
 
-  const handleProductGridPointerDown = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
+  const handleProductGridPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     if (e.pointerType === 'mouse' && e.button !== 0) return
     const chip = (e.target as HTMLElement).closest('[data-kassa-product-id]')
     productTilePointerRef.current =
@@ -3089,7 +3097,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setLastOrder({
       orderNumber: allocatedOrderNumber,
       checkoutReference: queuedOffline ? shortRef : undefined,
-      items: [...cart],
+      items: sortKassaCartLinesByMenuCategory([...cart], categories),
       total,
       vatSplit: vatSplit.byRate.map((l) => ({
         rate: l.rate,
@@ -3265,7 +3273,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     )
     bonLines.push(`${t('kassaReceipt.receiptNo')}${receiptRefDisplay}  ${dateStr}`)
     bonLines.push('--------------------------------')
-    for (const i of order.items) {
+    const receiptLines = sortKassaCartLinesByMenuCategory(order.items, categories)
+    for (const i of receiptLines) {
       const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
       const lineTotal = (i.product.price + choicesTotal) * i.quantity
       bonLines.push(`${i.quantity}x ${i.product.name}  EUR ${lineTotal.toFixed(2)}`)
@@ -3356,7 +3365,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         <span>${escapeReceiptHtml(dateStr)}</span>
       </div>
       <div class="divider-solid"></div>
-      ${order.items.map(i => {
+      ${sortKassaCartLinesByMenuCategory(order.items, categories).map(i => {
         const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
         const lineTotal = (i.product.price + choicesTotal) * i.quantity
         return `<div class="row"><span>${i.quantity}x ${escapeReceiptHtml(i.product.name)}</span><span>€${lineTotal.toFixed(2)}</span></div>
@@ -3459,7 +3468,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         const deltaTotal = draftSplit.grossTotal
         const draftOrder: KassaLastOrderReceipt = {
           orderNumber: 0,
-          items: deltaLines,
+          items: sortKassaCartLinesByMenuCategory(deltaLines, categories),
           total: deltaTotal,
           vatSplit: draftSplit.byRate.map((l) => ({
             rate: l.rate,
@@ -3487,7 +3496,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           const draftSplit = computeInclusiveVatSplitFromCart(snap, resolveCartLineVat)
           const draftOrder: KassaLastOrderReceipt = {
             orderNumber: 0,
-            items: snap,
+            items: sortKassaCartLinesByMenuCategory(snap, categories),
             total: draftSplit.grossTotal,
             vatSplit: draftSplit.byRate.map((l) => ({
               rate: l.rate,
@@ -3541,7 +3550,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       const draftSplit = computeInclusiveVatSplitFromCart(draftBonLineItems, resolveCartLineVat)
       const draftOrder: KassaLastOrderReceipt = {
         orderNumber: 0,
-        items: draftBonLineItems,
+        items: sortKassaCartLinesByMenuCategory(draftBonLineItems, categories),
         total: draftBonTotal,
         vatSplit: draftSplit.byRate.map((l) => ({
           rate: l.rate,
@@ -4510,7 +4519,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 </p>
               </div>
               <div data-testid="kassa-cart-lines">
-              {cart.map(item => {
+              {cartLinesByCategory.map(item => {
                 const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
                 return (
                   <div key={item.cartKey} className={ui.cartRowBg}>
