@@ -4234,9 +4234,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 onClick={handleCategoryClear}
                 title={t('kassaApp.backToCategories')}
                 aria-label={t('kassaApp.backToCategories')}
-                className={`touch-manipulation select-none flex shrink-0 items-center justify-center px-3 transition-colors active:brightness-95 ${ui.categoryStripHover} border-r ${ui.categoryStripBorder}`}
+                className={`touch-manipulation select-none flex shrink-0 items-center justify-center px-2 transition-colors active:brightness-95 ${ui.categoryStripHover} border-r ${ui.categoryStripBorder}`}
               >
-                <svg className={`h-5 w-5 shrink-0 ${ui.categoryStripIcon}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                <svg className={`h-4 w-4 shrink-0 ${ui.categoryStripIcon}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
@@ -4249,7 +4249,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 onPointerUp={handleCategoryStripPointerUp}
                 onPointerCancel={handleCategoryStripPointerCancel}
                 onClick={handleCategoryStripClick}
-                className="flex min-w-0 flex-1 touch-pan-x gap-2 overflow-x-auto overflow-y-hidden overscroll-x-contain px-2 py-2 select-none [scrollbar-gutter:stable] [-webkit-overflow-scrolling:touch]"
+                className="flex min-w-0 flex-1 touch-pan-x gap-1.5 overflow-x-auto overflow-y-hidden overscroll-x-contain px-1.5 py-1.5 select-none [scrollbar-gutter:stable] [-webkit-overflow-scrolling:touch]"
               >
                 {categories.map((cat) => {
                   const active =
@@ -4265,7 +4265,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       role="tab"
                       aria-selected={active}
                       data-kassa-strip-category-id={cat.id != null ? String(cat.id) : undefined}
-                      className={`shrink-0 touch-pan-x whitespace-nowrap rounded-xl border px-4 py-2 text-base font-bold transition-colors active:brightness-95 ${
+                      className={`shrink-0 touch-pan-x whitespace-nowrap rounded-lg border px-2.5 py-1 text-xs font-bold leading-tight transition-colors active:brightness-95 sm:px-3 sm:py-1.5 sm:text-sm ${
                         active
                           ? 'border-[#58CCFF] bg-[#58CCFF] text-black shadow-sm'
                           : kassaAppearanceDark
@@ -4273,7 +4273,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                             : `border-gray-300 bg-white ${ui.categoryStripText} ${ui.categoryStripHover}`
                       }`}
                     >
-                      {cat.icon ? <span className="mr-1">{cat.icon}</span> : null}
+                      {cat.icon ? <span className="mr-0.5 text-sm sm:text-base">{cat.icon}</span> : null}
                       {cat.name}
                     </button>
                   )
