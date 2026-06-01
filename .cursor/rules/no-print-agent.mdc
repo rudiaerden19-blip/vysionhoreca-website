@@ -1,0 +1,22 @@
+---
+description: Print Agent niet aanraken tenzij expliciet gevraagd
+alwaysApply: true
+---
+
+# Vysion Print Agent — niet aanraken
+
+**Standaard:** werk **niet** in `apps/vysion-print-agent/` en commit/push **geen** wijzigingen daar — **ook niet** voor BTW/bonnen/kassa-fixes die “even” in de agent horen.
+
+## Verboden (ook niet bij impliciete fix-behoefte)
+
+- Bestanden onder `apps/vysion-print-agent/**` bewerken, refactoren of “mee committen” bij andere taken
+- Print-agent scripts, `main.js` in die app, `server.js`, installers (`.bat`), USB-sync, enz. “even fixen” of opruimen
+- Root-level `main.js` als die bij print-agent hoort, tenzij de gebruiker dat pad noemt
+
+## Wel toegestaan
+
+- Alleen als de gebruiker **expliciet** om Print Agent, bonprinter, Electron-agent of `apps/vysion-print-agent` vraagt
+
+## Git
+
+- Bij commit/push voor kassa, webshop, admin, enz.: **alleen** relevante paden stagen — nooit `apps/vysion-print-agent/` “erbij” omdat het lokaal gewijzigd staat.

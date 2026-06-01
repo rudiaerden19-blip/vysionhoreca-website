@@ -286,20 +286,11 @@ function buildRichReceipt(body) {
   const subtotal = parseNumber(orderData?.subtotal)
   const tax = parseNumber(orderData?.tax)
   const total = parseNumber(orderData?.total)
-  const vatLines = Array.isArray(orderData?.vatLines) ? orderData.vatLines : []
-  const fallbackVatRate = parseNumber(businessInfo?.vatRate) || 21
+  const vatRate = parseNumber(businessInfo?.vatRate) || 21
 
   c.push(DOUBLE_HEIGHT)
   c.push(padPrice('Subtotaal', subtotal, W))
-  if (vatLines.length > 0) {
-    for (const row of vatLines) {
-      const rate = parseNumber(row.rate) || fallbackVatRate
-      const lineTax = parseNumber(row.tax)
-      c.push(padPrice(`BTW (${rate}%)`, lineTax, W))
-    }
-  } else {
-    c.push(padPrice(`BTW (${fallbackVatRate}%)`, tax, W))
-  }
+  c.push(padPrice(`BTW (${vatRate}%)`, tax, W))
   c.push(NORMAL_SIZE)
 
   c.push(Buffer.from('\n', 'latin1'))
@@ -791,99 +782,6 @@ function printRawWindows(printerName, payloadBuffer, attempt = 1) {
 /** Pauze tussen twee bonkopieën USB/RAW — te kort geeft spool-fouten; te lang voelt als traag gedrag aan de kassa. */
 const INTER_RECEIPT_COPY_PAUSE_MS = 560
 
-/**
- * Eén ESC/POS-aanvraag: hoofdprinter (zaak/bar) + optioneel tweede keukenprinter.
- * @param {Record<string, unknown>} body - JSON zoals POST /print
- * @param {{ printerName?: string|null, kitchenPrinterName?: string|null }} cfg
- * @returns {{ ok: boolean, error?: string, printedCopies: number, buddyPrinted: boolean, kitchenFailOnly?: boolean, payload?: Buffer, copies?: number, orderLabel?: string }}
- */
-function executePrintRequest(body, cfg) {
-  const primary = cfg.printerName && String(cfg.printerName).trim() ? String(cfg.printerName).trim() : null
-  const kitchenPnRaw = cfg.kitchenPrinterName ? String(cfg.kitchenPrinterName).trim() : ''
-  const kitchenPn = kitchenPnRaw || ''
-
-  const b = body && typeof body === 'object' ? body : {}
-
-  const receiptMode = b.receiptMode === 'keuken' ? 'keuken' : 'kassa'
-
-  if (!primary) {
-    return { ok: false, error: 'Geen hoofdprinter (zaak/bar) gekozen.', printedCopies: 0, buddyPrinted: false }
-  }
-
-  /** Keukenb-only op tweede apparaten; zoniet op hoofdprinter. */
-  const targetPrinter =
-    receiptMode === 'keuken' && kitchenPn && kitchenPn !== primary ? kitchenPn : primary
-
-  const companionKitchen = b.companionKitchen !== false
-  /** Na volledige kassabon: automatisch ook keukenbon op keukenprinter (indien ingesteld). */
-  const wantBuddyKitchen =
-    receiptMode === 'kassa' &&
-    companionKitchen &&
-    kitchenPn !== '' &&
-    kitchenPn !== primary
-
-  const payloadMain = buildEscPosPayload({ ...b, receiptMode })
-
-  const copies =
-    typeof b.copies === 'number' && b.copies >= 1 ? Math.min(Math.max(Math.floor(b.copies), 1), 5) : 2
-  const wantDrawer = b.openDrawer === true
-
-  const orderLabel = b.orderData?.orderNumber
-    ? `bon #${b.orderData.orderNumber}`
-    : receiptMode === 'keuken'
-      ? 'keukenbon'
-      : 'kassabon'
-
-  let printedCount = 0
-  let lastError = null
-
-  for (let i = 0; i < copies; i++) {
-    if (wantDrawer && i === 0 && receiptMode === 'kassa') {
-      kickCashDrawerWindowsParallel(primary)
-    }
-    const result = printRawWindows(targetPrinter, payloadMain)
-    if (!result.ok) {
-      lastError = result.error || 'Print mislukt'
-      console.error(`[print] copy ${i + 1}/${copies} (${targetPrinter}) →`, lastError)
-
-      /** Totale kopieën die nog gedrukt moeten worden; alleen naar wachtrij als er nog géén kopie lukte. */
-      const remaining = copies - i
-      return {
-        ok: false,
-        error: lastError,
-        printedCopies: printedCount,
-        buddyPrinted: false,
-        ...(printedCount === 0
-          ? { payload: payloadMain, copies: remaining, orderLabel: `${orderLabel} (kopieën)` }
-          : {}),
-      }
-    }
-    printedCount++
-    if (i < copies - 1) sleepSyncMs(INTER_RECEIPT_COPY_PAUSE_MS)
-  }
-
-  let buddyPrinted = false
-  if (wantBuddyKitchen && printedCount === copies) {
-    sleepSyncMs(INTER_RECEIPT_COPY_PAUSE_MS)
-    const kitchenPayload = buildEscPosPayload({ ...b, receiptMode: 'keuken' })
-    const kr = printRawWindows(kitchenPn, kitchenPayload)
-    if (!kr.ok) {
-      console.error('[print] companion keuken →', kr.error)
-      return {
-        ok: false,
-        error:
-          typeof kr.error === 'string' ? `Kassa ok, keuken: ${kr.error}` : `Kassa ok, keukenprint mislukt.`,
-        printedCopies: printedCount,
-        buddyPrinted: false,
-        kitchenFailOnly: true,
-      }
-    }
-    buddyPrinted = true
-  }
-
-  return { ok: true, printedCopies: printedCount, buddyPrinted }
-}
-
 /** Korte synchrone pauze (zonder CPU te verbranden) tussen kopieën zodat de printer-spool kan resetten. */
 function sleepSyncMs(ms) {
   try {
@@ -910,11 +808,7 @@ function listWindowsPrintersSync() {
   }
 }
 
-function createApp(
-  getPrintConfig /* () => { printerName: string|null, kitchenPrinterName?: string|null } */,
-  hooks = {},
-) {
-  const onOpenSettings = typeof hooks.onOpenSettings === 'function' ? hooks.onOpenSettings : null
+function createApp(getPrinterName /* () => string | null */) {
   const app = express()
 
   /** Expliciete OPTIONS preflight handler voor Chrome/Edge Private Network Access.
@@ -944,28 +838,13 @@ function createApp(
   app.use(express.json({ limit: '512kb' }))
 
   app.get('/health', (_req, res) => {
-    const c = getPrintConfig() || {}
-    const name = c.printerName && String(c.printerName).trim() ? String(c.printerName).trim() : null
-    const k = c.kitchenPrinterName && String(c.kitchenPrinterName).trim() ? String(c.kitchenPrinterName).trim() : null
+    const name = getPrinterName()
     res.json({
       ok: true,
       service: 'vysion-print-agent',
       printerConfigured: !!name,
       printerName: name || null,
-      kitchenPrinterName: k || null,
     })
-  })
-
-  app.post('/open-settings', (_req, res) => {
-    if (!onOpenSettings) {
-      return res.status(501).json({ ok: false, error: 'Instellingen alleen via Vysion Kassa-app.' })
-    }
-    try {
-      onOpenSettings()
-      return res.json({ ok: true })
-    } catch (e) {
-      return res.status(500).json({ ok: false, error: String(e?.message || e) })
-    }
   })
 
   app.get('/printers', (_req, res) => {
@@ -978,9 +857,7 @@ function createApp(
   })
 
   app.post('/drawer', (_req, res) => {
-    const cfg = getPrintConfig() || {}
-    const printerName =
-      cfg.printerName && String(cfg.printerName).trim() ? String(cfg.printerName).trim() : null
+    const printerName = getPrinterName()
     if (!printerName) {
       return res.status(400).json({ success: false, error: 'Geen printer geconfigureerd.' })
     }
@@ -998,12 +875,7 @@ function createApp(
   })
 
   app.post('/print', (req, res) => {
-    const cfg =
-      typeof getPrintConfig === 'function'
-        ? getPrintConfig()
-        : { printerName: null, kitchenPrinterName: null }
-    const printerName =
-      cfg && cfg.printerName && String(cfg.printerName).trim() ? String(cfg.printerName).trim() : null
+    const printerName = getPrinterName()
     if (!printerName) {
       return res.status(400).json({
         success: false,
@@ -1012,42 +884,46 @@ function createApp(
     }
     try {
       const body = req.body || {}
+      const payload = buildEscPosPayload(body)
+      /**
+       * Default 2 exemplaren (klant + keuken). Website kan dit overschrijven
+       * met een expliciete `copies` waarde.
+       */
+      const copies = (typeof body.copies === 'number' && body.copies >= 1)
+        ? Math.min(Math.max(body.copies, 1), 5)
+        : 2
+
+      /**
+       * Bij contante betaling: lade **parallel** met eerste bon-print (`spawn`), geen wacht tot PowerShell terugkomt —
+       * gebruiker hoort/sees print + lade ongeveer tegelijk. `/drawer` API blijft synchroon voor expliciete test.
+       */
       const wantDrawer = body.openDrawer === true
-      const r = executePrintRequest(body, {
-        printerName: cfg.printerName,
-        kitchenPrinterName: cfg.kitchenPrinterName,
-      })
-      const copiesAsked =
-        typeof body.copies === 'number' && body.copies >= 1
-          ? Math.min(Math.max(Math.floor(body.copies), 1), 5)
-          : 2
 
-      if (r.ok) {
-        return res.json({
-          success: true,
-          message: 'OK',
-          copies: r.printedCopies,
-          drawer: wantDrawer,
-          buddyPrinted: r.buddyPrinted || false,
-        })
+      let lastError = null
+      let printedCount = 0
+      for (let i = 0; i < copies; i++) {
+        if (wantDrawer && i === 0) {
+          kickCashDrawerWindowsParallel(printerName)
+        }
+        const result = printRawWindows(printerName, payload)
+        if (!result.ok) {
+          lastError = result.error
+          console.error(`[print] copy ${i + 1}/${copies} → ${result.error}`)
+          break
+        }
+        printedCount++
+
+        if (i < copies - 1) sleepSyncMs(INTER_RECEIPT_COPY_PAUSE_MS)
       }
 
-      if (r.kitchenFailOnly) {
-        return res.status(207).json({
-          success: false,
-          kitchenFailOnly: true,
-          buddyPrinted: false,
-          error: r.error || 'Keukenprint mislukt',
-          printed: r.printedCopies,
-          requestedCopies: copiesAsked,
-        })
+      if (printedCount === copies) {
+        return res.json({ success: true, message: 'OK', copies: printedCount, drawer: wantDrawer })
       }
-
       return res.status(500).json({
         success: false,
-        error: r.error || 'Print mislukt',
-        printed: r.printedCopies,
-        requested: copiesAsked,
+        error: lastError || 'Print mislukt',
+        printed: printedCount,
+        requested: copies,
       })
     } catch (e) {
       console.error('[print] exception', e)
@@ -1058,8 +934,8 @@ function createApp(
   return app
 }
 
-function startServer(getPrintConfig, port = 9742, hooks = {}) {
-  const app = createApp(getPrintConfig, hooks)
+function startServer(getPrinterName, port = 9742) {
+  const app = createApp(getPrinterName)
   const srv = app.listen(port, '127.0.0.1', () => {
     console.log(`Vysion Print Agent luistert op http://127.0.0.1:${port}`)
   })
@@ -1078,7 +954,6 @@ function startServer(getPrintConfig, port = 9742, hooks = {}) {
 module.exports = {
   createApp,
   startServer,
-  executePrintRequest,
   buildEscPosPayload,
   encInline,
   printRawWindows,
