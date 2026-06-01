@@ -4270,7 +4270,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         <div className={`${kassaSxgaDenseTiles ? 'w-[300px]' : 'w-80 sm:w-96 lg:w-[380px]'} flex flex-col flex-shrink-0 min-h-0 min-w-0 overflow-hidden ${ui.sidebarBg}`}>
 
         {/* Zone: Binnen / Terras — altijd zichtbaar (ook bij afhalen/leveren). */}
-        <div className="px-3 pt-3 relative shrink-0">
+        <div className="shrink-0 px-3 pt-3">
             <div className="flex gap-2">
               <button
                 type="button"
@@ -4325,121 +4325,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 ) : null}
               </button>
             </div>
-
-            {/* Tafel picker popup */}
-            {showTablePicker && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setShowTablePicker(false)} />
-                <div className={ui.tablePickerPanel}>
-                  <div className={`p-3 border-b ${ui.tablePickerHeader}`}>
-                    <p className={`text-xs font-bold uppercase tracking-wider text-center ${ui.tablePickerEmpty}`}>{t('kassaApp.pickTableTitle')}</p>
-                  </div>
-                  {pickerTables.length === 0 && pickerStools.length === 0 ? (
-                    <div className={`p-4 text-center text-sm ${ui.tablePickerEmpty}`}>
-                      {t('kassaApp.noTablesYet')}
-                    </div>
-                  ) : (
-                    <>
-                      {pickerTables.length > 0 && (
-                        <div className="p-2 grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
-                          {pickerTables.map((tbl) => (
-                            <button
-                              key={tbl.id}
-                              onClick={() => switchToTable(tbl.number)}
-                              className={`py-3 rounded-xl font-bold text-sm transition-colors border-2 relative ${
-                                tableNumber === tbl.number && dineInFloorZone === pickerBrowseZone
-                                  ? 'bg-[#3C4D6B] text-white border-[#3C4D6B]'
-                                  : tbl.status === 'FREE'
-                                  ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'
-                                  : tbl.status === 'UNPAID'
-                                  ? 'bg-amber-50 text-amber-700 border-amber-300 hover:bg-amber-100'
-                                  : 'bg-blue-50 text-blue-700 border-blue-300 hover:bg-blue-100'
-                              }`}
-                            >
-                              <div className="text-lg">🪑</div>
-                              <div>{tbl.number}</div>
-                              <div className="text-[10px] opacity-70">
-                                {tbl.status === 'FREE'
-                                  ? t('kassaApp.tableStatusFree')
-                                  : tbl.status === 'OCCUPIED'
-                                    ? t('kassaApp.tableStatusOccupied')
-                                    : t('kassaApp.tableStatusUnpaid')}
-                              </div>
-                              {(tableOrders[tableOrderMapKey(pickerBrowseZone, tbl.number)]?.length ?? 0) > 0 && (
-                                <span className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
-                                  {tableOrders[tableOrderMapKey(pickerBrowseZone, tbl.number)]!.length}
-                                </span>
-                              )}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                      {pickerStools.length > 0 && (
-                        <>
-                          <div className="px-3 py-1.5 bg-amber-50 border-t border-amber-100 flex items-center gap-2">
-                            <span className="text-xs font-bold text-amber-700 uppercase tracking-wider">🍺 {t('kassaApp.stoolsSection')}</span>
-                          </div>
-                          <div className="p-2 grid grid-cols-3 gap-2 max-h-36 overflow-y-auto">
-                            {pickerStools.map((s) => (
-                              <button
-                                key={s.segmentId + s.stoolNumber}
-                                onClick={() => switchToTable(s.stoolNumber)}
-                                className={`py-3 rounded-xl font-bold text-sm transition-colors border-2 relative ${
-                                  tableNumber === s.stoolNumber && dineInFloorZone === pickerBrowseZone
-                                    ? 'bg-[#3C4D6B] text-white border-[#3C4D6B]'
-                                    : (tableOrders[tableOrderMapKey(pickerBrowseZone, s.stoolNumber)]?.length ?? 0) >
-                                      0
-                                    ? 'bg-blue-50 text-blue-700 border-blue-300 hover:bg-blue-100'
-                                    : 'bg-amber-50 text-amber-700 border-amber-300 hover:bg-amber-100'
-                                }`}
-                              >
-                                <div className="text-lg">🍺</div>
-                                <div>{s.stoolNumber}</div>
-                                <div className="text-[10px] opacity-70">
-                                  {(tableOrders[tableOrderMapKey(pickerBrowseZone, s.stoolNumber)]?.length ?? 0) > 0
-                                    ? t('kassaApp.tableStatusOccupied')
-                                    : t('kassaApp.tableStatusFree')}
-                                </div>
-                                {(tableOrders[tableOrderMapKey(pickerBrowseZone, s.stoolNumber)]?.length ?? 0) > 0 && (
-                                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
-                                    {tableOrders[tableOrderMapKey(pickerBrowseZone, s.stoolNumber)]!.length}
-                                  </span>
-                                )}
-                              </button>
-                            ))}
-                          </div>
-                        </>
-                      )}
-                    </>
-                  )}
-                  <div className={ui.tablePickerFooterBar}>
-                    {tableNumber && (
-                      <button
-                        onClick={() => {
-                          setTableNumber('')
-                          setDineInFloorZone(pickerBrowseZone)
-                          setShowTablePicker(false)
-                        }}
-                        className="flex-1 py-2 rounded-xl bg-red-50 text-red-600 font-semibold text-sm hover:bg-red-100 transition-colors"
-                      >
-                        ✕ {t('kassaApp.clearTable')}
-                      </button>
-                    )}
-                    {kassaFloorPlanEnabled && (
-                      <button
-                        onClick={() => {
-                          setShowTablePicker(false)
-                          setShowFloorPlan(true)
-                        }}
-                        className={`py-2 rounded-xl bg-[#3C4D6B] text-white font-semibold text-sm hover:bg-[#2D3A52] transition-colors ${tableNumber ? 'flex-1' : 'w-full'}`}
-                      >
-                        🗺️ {t('kassaApp.floorPlan')}
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </>
-            )}
         </div>
 
         {/* Besteltype: drie segmenten in één balk (ter plaatse / afhalen / leveren) */}
@@ -5021,6 +4906,168 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             setShowReservations(false)
           }}
         />
+      )}
+
+      {/* Tafelkiezer: gecentreerd over de kassa (niet in de rechterkolom) */}
+      {showTablePicker && (
+        <div
+          className="fixed inset-0 z-[210] flex items-center justify-center p-4 sm:p-6"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="kassa-table-picker-title"
+          data-testid="kassa-table-picker-modal"
+        >
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/60 touch-manipulation"
+            aria-label={t('kassaApp.closeAria')}
+            onClick={() => setShowTablePicker(false)}
+          />
+          <div
+            className={`relative z-10 flex w-full max-w-3xl max-h-[min(88vh,780px)] min-h-0 flex-col overflow-hidden rounded-2xl border shadow-2xl ${ui.tablePickerBorder} ${
+              kassaAppearanceDark ? 'bg-[#151a21]' : 'bg-white'
+            }`}
+          >
+            <div className={`flex shrink-0 items-center gap-3 border-b px-4 py-3 ${ui.tablePickerHeader}`}>
+              <div className="min-w-0 flex-1 text-center">
+                <p
+                  id="kassa-table-picker-title"
+                  className={`text-xs font-bold uppercase tracking-wider ${ui.tablePickerEmpty}`}
+                >
+                  {t('kassaApp.pickTableTitle')}
+                </p>
+                <p className={`mt-0.5 text-base font-bold ${ui.flyMenuText}`}>
+                  {pickerBrowseZone === FLOOR_PLAN_ZONE_TERRACE
+                    ? t('kassaApp.floorZoneTerrace')
+                    : t('kassaApp.floorZoneInside')}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  playClick()
+                  setShowTablePicker(false)
+                }}
+                className={`shrink-0 rounded-xl px-3 py-2 text-lg font-bold leading-none transition-colors ${ui.categoryStripHover} ${ui.flyMenuText}`}
+                aria-label={t('kassaApp.closeAria')}
+              >
+                ×
+              </button>
+            </div>
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain touch-pan-y">
+              {pickerTables.length === 0 && pickerStools.length === 0 ? (
+                <div className={`p-8 text-center text-base ${ui.tablePickerEmpty}`}>
+                  {t('kassaApp.noTablesYet')}
+                </div>
+              ) : (
+                <>
+                  {pickerTables.length > 0 && (
+                    <div className="grid grid-cols-3 gap-3 p-4 sm:grid-cols-4 md:grid-cols-5">
+                      {pickerTables.map((tbl) => (
+                        <button
+                          key={tbl.id}
+                          type="button"
+                          onClick={() => switchToTable(tbl.number)}
+                          className={`relative touch-manipulation rounded-xl border-2 py-4 font-bold transition-colors active:brightness-95 ${
+                            tableNumber === tbl.number && dineInFloorZone === pickerBrowseZone
+                              ? 'border-[#3C4D6B] bg-[#3C4D6B] text-white'
+                              : tbl.status === 'FREE'
+                                ? 'border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                                : tbl.status === 'UNPAID'
+                                  ? 'border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100'
+                                  : 'border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100'
+                          }`}
+                        >
+                          <div className="text-2xl">🪑</div>
+                          <div className="text-lg">{tbl.number}</div>
+                          <div className="text-[11px] opacity-70">
+                            {tbl.status === 'FREE'
+                              ? t('kassaApp.tableStatusFree')
+                              : tbl.status === 'OCCUPIED'
+                                ? t('kassaApp.tableStatusOccupied')
+                                : t('kassaApp.tableStatusUnpaid')}
+                          </div>
+                          {(tableOrders[tableOrderMapKey(pickerBrowseZone, tbl.number)]?.length ?? 0) > 0 && (
+                            <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-[10px] font-bold text-white">
+                              {tableOrders[tableOrderMapKey(pickerBrowseZone, tbl.number)]!.length}
+                            </span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {pickerStools.length > 0 && (
+                    <>
+                      <div className="flex items-center gap-2 border-t border-amber-100 bg-amber-50 px-4 py-2">
+                        <span className="text-xs font-bold uppercase tracking-wider text-amber-700">
+                          🍺 {t('kassaApp.stoolsSection')}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-3 p-4 sm:grid-cols-4 md:grid-cols-5">
+                        {pickerStools.map((s) => (
+                          <button
+                            key={s.segmentId + s.stoolNumber}
+                            type="button"
+                            onClick={() => switchToTable(s.stoolNumber)}
+                            className={`relative touch-manipulation rounded-xl border-2 py-4 font-bold transition-colors active:brightness-95 ${
+                              tableNumber === s.stoolNumber && dineInFloorZone === pickerBrowseZone
+                                ? 'border-[#3C4D6B] bg-[#3C4D6B] text-white'
+                                : (tableOrders[tableOrderMapKey(pickerBrowseZone, s.stoolNumber)]?.length ?? 0) > 0
+                                  ? 'border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100'
+                                  : 'border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100'
+                            }`}
+                          >
+                            <div className="text-2xl">🍺</div>
+                            <div className="text-lg">{s.stoolNumber}</div>
+                            <div className="text-[11px] opacity-70">
+                              {(tableOrders[tableOrderMapKey(pickerBrowseZone, s.stoolNumber)]?.length ?? 0) > 0
+                                ? t('kassaApp.tableStatusOccupied')
+                                : t('kassaApp.tableStatusFree')}
+                            </div>
+                            {(tableOrders[tableOrderMapKey(pickerBrowseZone, s.stoolNumber)]?.length ?? 0) > 0 && (
+                              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-[10px] font-bold text-white">
+                                {tableOrders[tableOrderMapKey(pickerBrowseZone, s.stoolNumber)]!.length}
+                              </span>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </>
+              )}
+            </div>
+            <div className={`flex shrink-0 gap-2 border-t p-3 ${ui.tablePickerFooterBar}`}>
+              {tableNumber && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    playClick()
+                    setTableNumber('')
+                    setDineInFloorZone(pickerBrowseZone)
+                    setShowTablePicker(false)
+                  }}
+                  className="flex-1 rounded-xl bg-red-50 py-3 text-sm font-semibold text-red-600 transition-colors hover:bg-red-100"
+                >
+                  ✕ {t('kassaApp.clearTable')}
+                </button>
+              )}
+              {kassaFloorPlanEnabled && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    playClick()
+                    setShowTablePicker(false)
+                    setShowFloorPlan(true)
+                  }}
+                  className={`rounded-xl bg-[#3C4D6B] py-3 text-sm font-semibold text-white transition-colors hover:bg-[#2D3A52] ${tableNumber ? 'flex-1' : 'w-full'}`}
+                >
+                  🗺️ {t('kassaApp.floorPlan')}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
       )}
 
       {/* ── Betaalmodal / split / succes ── */}
