@@ -1,22 +1,26 @@
 ---
-description: Print Agent niet aanraken tenzij expliciet gevraagd
+description: ABSOLUUT — Print Agent nooit aanraken
 alwaysApply: true
 ---
 
-# Vysion Print Agent — niet aanraken
+# 🚫 Vysion Print Agent — NOOIT AANRAKEN
 
-**Standaard:** werk **niet** in `apps/vysion-print-agent/` en commit/push **geen** wijzigingen daar — **ook niet** voor BTW/bonnen/kassa-fixes die “even” in de agent horen.
+**Vaste projectregel (eigenaar):** kom **nooit meer** aan de Print Agent. Geen uitzonderingen tenzij de gebruiker in **dezelfde opdracht** letterlijk schrijft dat je **`apps/vysion-print-agent/`** (of een concreet bestand daarin) **mag wijzigen**.
 
-## Verboden (ook niet bij impliciete fix-behoefte)
+## Verboden — altijd
 
-- Bestanden onder `apps/vysion-print-agent/**` bewerken, refactoren of “mee committen” bij andere taken
-- Print-agent scripts, `main.js` in die app, `server.js`, installers (`.bat`), USB-sync, enz. “even fixen” of opruimen
-- Root-level `main.js` als die bij print-agent hoort, tenzij de gebruiker dat pad noemt
+- **Lezen voor “even snel fixen” mag**, maar **geen enkele wijziging** onder `apps/vysion-print-agent/**`
+- Geen refactors, geen BTW/bon-fixes, geen “sync met website”, geen installers (`.bat`), USB-scripts, `server.js`, `main.js`, `package.json`, enz. in die map
+- **Geen commit/push** van iets onder `apps/vysion-print-agent/` — ook niet “per ongeluk” bij andere taken
+- Root-`main.js` die bij de agent hoort: **niet** meenemen in commits
+- Bij bon-/print-problemen: alleen **`src/`** (kassa, `vysion-print-agent-client.ts`, keuken, bestellingen, …) — **niet** de agent-app
 
-## Wel toegestaan
+## Wel toegestaan (print voor tenants)
 
-- Alleen als de gebruiker **expliciet** om Print Agent, bonprinter, Electron-agent of `apps/vysion-print-agent` vraagt
+- Website blijft naar de **lokale** agent praten (`sendToVysionPrintAgent`, `bonInhoud`, `orderData`) — dat is **geen** wijziging aan `apps/vysion-print-agent/`
+- Uitleg aan gebruiker: agent draait **lokaal per zaak**, wordt **niet** via Vercel gedeployed
 
-## Git
+## Git staging
 
-- Bij commit/push voor kassa, webshop, admin, enz.: **alleen** relevante paden stagen — nooit `apps/vysion-print-agent/` “erbij” omdat het lokaal gewijzigd staat.
+- `git add` alleen paden die **niet** onder `apps/vysion-print-agent/` vallen
+- Staat print-agent lokaal gewijzigd: **negeren** bij commit — niet committen, niet “meenemen om op te ruimen”
