@@ -763,6 +763,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [orderType, setOrderType] = useState<OrderType>('DINE_IN')
   const [tableNumber, setTableNumber] = useState('')
   const [numpadValue, setNumpadValue] = useState('')
+  /** Toggle via footer-knop; bij nieuwe karregels standaard kar tonen. */
+  const [numpadPanelVisible, setNumpadPanelVisible] = useState(true)
+  useEffect(() => {
+    if (cart.length > 0) setNumpadPanelVisible(false)
+  }, [cart.length])
   /** Minuut-update zodat de datum in de lege numpad-balk rond middernacht klopt. */
   const [numpadBarDate, setNumpadBarDate] = useState(() => new Date())
   useEffect(() => {
@@ -4483,9 +4488,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           ) : null}
         </div>
 
-        {/* Cart of Numpad */}
+        {/* Cart / numpad (toggle via footer) */}
         <div className="flex-1 min-h-0 overflow-y-auto px-3 pt-2 flex flex-col touch-pan-y">
-          {cart.length === 0 ? (
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
               {parkedLinesByCategory.length > 0 ? (
                 <div
@@ -4515,7 +4519,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   </div>
                 </div>
               ) : null}
-              <div className="flex min-h-[15rem] flex-1 flex-col justify-end">
+              {numpadPanelVisible ? (
+              <div className="flex min-h-[15rem] flex-1 flex-col justify-end" data-testid="kassa-numpad-panel">
               <div className={`mb-3 flex shrink-0 items-center gap-2.5 rounded-xl px-2.5 py-2 ${ui.numpadBarBg}`}>
                 {tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? (
                   <button
@@ -4587,8 +4592,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 </button>
               )}
               </div>
-            </div>
-          ) : (
+              ) : cart.length > 0 ? (
               <div className={kassaSidebarFooterTier === 'comfort' ? 'space-y-2' : kassaSidebarFooterTier === 'compact' ? 'space-y-1.5' : 'space-y-1'}>
               <div
                 className={`flex items-center gap-2.5 rounded-xl px-2.5 py-2 ${ui.numpadBarBg} ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? '' : 'justify-end'}`}
@@ -4612,31 +4616,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   {numpadHeaderDateLabel}
                 </p>
               </div>
-              {parkedLinesByCategory.length > 0 ? (
-                <div className="mb-2 shrink-0" data-testid="kassa-parked-on-table">
-                  <p className={`mb-1 text-xs font-bold uppercase tracking-wide ${ui.numpadMeta}`}>
-                    {t('kassaApp.parkedOnTableSection')}
-                  </p>
-                  <div className="space-y-1">
-                    {parkedLinesByCategory.map((item) => {
-                      const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
-                      return (
-                        <div
-                          key={`parked-${item.cartKey}`}
-                          className={`flex items-center gap-2 rounded-lg px-2 py-1.5 opacity-80 ${ui.cartRowBg}`}
-                        >
-                          <div className="flex-1 min-w-0">
-                            <p className={`truncate text-sm font-semibold ${ui.cartTitle}`}>{item.product.name}</p>
-                            <p className={`text-xs ${ui.cartChoices}`}>
-                              {item.quantity}× · €{((item.product.price + choicesTotal) * item.quantity).toFixed(2)}
-                            </p>
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              ) : null}
               <div data-testid="kassa-cart-lines">
               {cartLinesByCategory.map(item => {
                 const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
@@ -4699,7 +4678,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               })}
               </div>
             </div>
-          )}
+              ) : null}
+            </div>
         </div>
 
         {/* Totaal + knoppen — bij langere kar compacter voor meer scrollruimte */}
@@ -4879,24 +4859,48 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               </button>
             </div>
           )}
-          <button
-            type="button"
-            onClick={() => {
-              if (billLines.length === 0) return
-              scheduleKassaTapSound(playCheckout)
-              setShowPaymentModal(true)
-            }}
-            disabled={billLines.length === 0}
-            className={`touch-manipulation w-full rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold active:brightness-95 disabled:opacity-40 flex items-center justify-center ${
-              kassaSidebarFooterTier === 'comfort'
-                ? 'py-5 text-xl gap-2'
-                : kassaSidebarFooterTier === 'compact'
-                  ? 'py-3 text-lg gap-2'
-                  : 'py-2.5 text-base gap-1.5'
-            }`}
-          >
-            💳 {t('kassaApp.checkout')}
-          </button>
+          <div className="flex gap-2 touch-manipulation select-none">
+            <button
+              type="button"
+              aria-pressed={numpadPanelVisible}
+              data-testid="kassa-numpad-toggle"
+              onClick={() => {
+                playClick()
+                setNumpadPanelVisible((v) => !v)
+              }}
+              className={`flex shrink-0 flex-col items-center justify-center rounded-xl px-2 font-bold shadow-sm ring-1 ring-black/10 active:brightness-95 ${
+                numpadPanelVisible
+                  ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
+                  : 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
+              } ${
+                kassaSidebarFooterTier === 'comfort'
+                  ? 'min-w-[5.5rem] py-5 text-xs leading-tight'
+                  : kassaSidebarFooterTier === 'compact'
+                    ? 'min-w-[5rem] py-3 text-[11px] leading-tight'
+                    : 'min-w-[4.5rem] py-2.5 text-[10px] leading-tight'
+              }`}
+            >
+              {t('kassaApp.numpadToggle')}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (billLines.length === 0) return
+                scheduleKassaTapSound(playCheckout)
+                setShowPaymentModal(true)
+              }}
+              disabled={billLines.length === 0}
+              className={`min-w-0 flex-1 rounded-xl bg-emerald-500 font-bold text-white hover:bg-emerald-600 active:brightness-95 disabled:opacity-40 flex items-center justify-center ${
+                kassaSidebarFooterTier === 'comfort'
+                  ? 'py-5 text-xl gap-2'
+                  : kassaSidebarFooterTier === 'compact'
+                    ? 'py-3 text-lg gap-2'
+                    : 'py-2.5 text-base gap-1.5'
+              }`}
+            >
+              💳 {t('kassaApp.checkout')}
+            </button>
+          </div>
         </div>
         </div>
       </div>
