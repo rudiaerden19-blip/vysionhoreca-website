@@ -4348,7 +4348,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               onClick={() => selectOrderType('DINE_IN')}
               className={`flex min-w-0 flex-1 flex-col items-center justify-center border-r border-black/15 px-1 py-2.5 text-center transition-colors active:brightness-95 sm:py-3 ${
                 orderType === 'DINE_IN'
-                  ? 'bg-[#3C4D6B] text-white'
+                  ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
                   : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
               }`}
             >
