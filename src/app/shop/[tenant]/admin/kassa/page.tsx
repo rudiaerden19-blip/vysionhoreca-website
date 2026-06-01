@@ -180,8 +180,8 @@ function kassaMenuGridColumnCountSxgaViewport(vpWcss: number): number {
   return 2
 }
 
-/** Ruimte titel onder fotobak (SXGA); strak maar leesbare 2‑regellijn. */
-const KASSA_SXGA_LABEL_STRIP_RESERVED_PX = 74
+/** Ruimte titel onder fotobak (SXGA); strak maar leesbare 2‑regellijn op 17″. */
+const KASSA_SXGA_LABEL_STRIP_RESERVED_PX = 80
 /** Vierkante fotobak ⇒ hoogte = celbreedte */
 const KASSA_SXGA_TILE_IMAGE_HEIGHT_FRAC = 1
 /** Zelfde als `mt-1.5` tussen foto-strook en naam */
@@ -506,7 +506,7 @@ const KASSA_MENU_TILE_LABEL_CLASS =
 
 /** SXGA 17″: categorie + product gelijk (`md:text-xl` wordt te groot in smalle rastercel). */
 const KASSA_MENU_TILE_LABEL_CLASS_SXGA =
-  'm-0 line-clamp-2 text-center text-base font-black leading-snug tracking-tight text-black'
+  'm-0 line-clamp-2 text-center text-[15px] font-black leading-snug tracking-tight text-black sm:text-base'
 
 type KassaCategoryTileButtonProps = {
   category: MenuCategory
@@ -4249,7 +4249,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 onPointerUp={handleCategoryStripPointerUp}
                 onPointerCancel={handleCategoryStripPointerCancel}
                 onClick={handleCategoryStripClick}
-                className="flex min-w-0 flex-1 touch-pan-x gap-1.5 overflow-x-auto overflow-y-hidden overscroll-x-contain px-1.5 py-1.5 select-none [scrollbar-gutter:stable] [-webkit-overflow-scrolling:touch]"
+                className={`flex min-w-0 flex-1 touch-pan-x overflow-x-auto overflow-y-hidden overscroll-x-contain select-none [scrollbar-gutter:stable] [-webkit-overflow-scrolling:touch] ${
+                  kassaSxgaDenseTiles ? 'gap-2 px-2 py-2' : 'gap-1.5 px-1.5 py-1.5'
+                }`}
               >
                 {categories.map((cat) => {
                   const active =
@@ -4265,7 +4267,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       role="tab"
                       aria-selected={active}
                       data-kassa-strip-category-id={cat.id != null ? String(cat.id) : undefined}
-                      className={`shrink-0 touch-pan-x whitespace-nowrap rounded-lg border px-2.5 py-1 text-xs font-bold leading-tight transition-colors active:brightness-95 sm:px-3 sm:py-1.5 sm:text-sm ${
+                      className={`shrink-0 touch-pan-x whitespace-nowrap rounded-lg border font-bold leading-tight transition-colors active:brightness-95 ${
+                        kassaSxgaDenseTiles
+                          ? 'px-3 py-1.5 text-sm'
+                          : 'px-2.5 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm'
+                      } ${
                         active
                           ? 'border-[#58CCFF] bg-[#58CCFF] text-black shadow-sm'
                           : kassaAppearanceDark
@@ -4307,7 +4313,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   onPointerUp={handleCategoryGridPointerUp}
                   onPointerCancel={handleCategoryGridPointerCancel}
                   onClick={handleCategoryGridClick}
-                  className={`grid min-h-0 w-full grid-cols-2 gap-4 pb-8 touch-manipulation select-none ${kassaSxgaDenseTiles ? 'sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5' : 'sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'} [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start' : 'items-stretch'}`}
+                  className={`grid min-h-0 w-full grid-cols-2 pb-8 touch-manipulation select-none ${kassaSxgaDenseTiles ? 'gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5' : 'gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'} [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start' : 'items-stretch'}`}
                   style={
                     kassaSxgaDenseTiles ?
                       { gridAutoRows: 'max-content' }
@@ -4343,7 +4349,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     onPointerUp={handleProductGridPointerUp}
                     onPointerCancel={handleProductGridPointerCancel}
                     onClick={handleProductGridClick}
-                    className={`grid min-h-0 w-full grid-cols-2 gap-4 pb-8 touch-manipulation select-none ${kassaSxgaDenseTiles ? 'sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5' : 'sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'} [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start' : 'items-stretch'}`}
+                    className={`grid min-h-0 w-full grid-cols-2 pb-8 touch-manipulation select-none ${kassaSxgaDenseTiles ? 'gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5' : 'gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'} [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start' : 'items-stretch'}`}
                     style={
                       kassaSxgaDenseTiles ?
                         { gridAutoRows: 'max-content' }
@@ -4388,7 +4394,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   setPickerBrowseZone(FLOOR_PLAN_ZONE_INSIDE)
                   setShowTablePicker(true)
                 }}
-                className={`flex min-h-[30px] flex-1 flex-col items-center justify-center rounded-lg px-2 py-1 text-xs font-bold transition-colors ${
+                className={`flex flex-1 flex-col items-center justify-center rounded-lg px-2 font-bold transition-colors ${
+                  kassaSxgaDenseTiles ? 'min-h-[34px] py-1.5 text-sm' : 'min-h-[30px] py-1 text-xs'
+                } ${
                   pickerBrowseZone === FLOOR_PLAN_ZONE_INSIDE && showTablePicker
                     ? `bg-[#3C4D6B] text-white ring-2 ring-[#58CCFF]/55 ring-offset-2 ${ui.ringOffset}`
                     : 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
@@ -4414,7 +4422,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   setPickerBrowseZone(FLOOR_PLAN_ZONE_TERRACE)
                   setShowTablePicker(true)
                 }}
-                className={`flex min-h-[30px] flex-1 flex-col items-center justify-center rounded-lg px-2 py-1 text-xs font-bold transition-colors ${
+                className={`flex flex-1 flex-col items-center justify-center rounded-lg px-2 font-bold transition-colors ${
+                  kassaSxgaDenseTiles ? 'min-h-[34px] py-1.5 text-sm' : 'min-h-[30px] py-1 text-xs'
+                } ${
                   pickerBrowseZone === FLOOR_PLAN_ZONE_TERRACE && showTablePicker
                     ? `bg-emerald-600 text-white ring-2 ring-emerald-300/80 ring-offset-2 ${ui.ringOffset}`
                     : 'bg-emerald-600 text-white hover:bg-emerald-700'
@@ -4439,7 +4449,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               type="button"
               aria-pressed={orderType === 'DINE_IN'}
               onClick={() => selectOrderType('DINE_IN')}
-              className={`flex min-h-[28px] min-w-0 flex-1 flex-col items-center justify-center rounded-lg px-1 py-1 text-center text-xs shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 ${
+              className={`flex min-w-0 flex-1 flex-col items-center justify-center rounded-lg px-1 text-center text-xs shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 ${
+                kassaSxgaDenseTiles ? 'min-h-[32px] py-1.5' : 'min-h-[28px] py-1'
+              } ${
                 orderType === 'DINE_IN'
                   ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
                   : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
@@ -4461,7 +4473,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               type="button"
               aria-pressed={orderType === 'TAKEAWAY'}
               onClick={() => selectOrderType('TAKEAWAY')}
-              className={`flex min-h-[28px] min-w-0 flex-1 flex-col items-center justify-center rounded-lg px-1 py-1 text-center text-xs shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 ${
+              className={`flex min-w-0 flex-1 flex-col items-center justify-center rounded-lg px-1 text-center text-xs shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 ${
+                kassaSxgaDenseTiles ? 'min-h-[32px] py-1.5' : 'min-h-[28px] py-1'
+              } ${
                 orderType === 'TAKEAWAY'
                   ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
                   : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
@@ -4475,7 +4489,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               type="button"
               aria-pressed={orderType === 'DELIVERY'}
               onClick={() => selectOrderType('DELIVERY')}
-              className={`flex min-h-[28px] min-w-0 flex-1 flex-col items-center justify-center rounded-lg px-1 py-1 text-center text-xs shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 ${
+              className={`flex min-w-0 flex-1 flex-col items-center justify-center rounded-lg px-1 text-center text-xs shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 ${
+                kassaSxgaDenseTiles ? 'min-h-[32px] py-1.5' : 'min-h-[28px] py-1'
+              } ${
                 orderType === 'DELIVERY'
                   ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
                   : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
@@ -4709,7 +4725,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       <button
                         type="button"
                         onClick={() => updateQty(item.cartKey, item.quantity - 1)}
-                        className="touch-manipulation w-8 h-8 rounded-lg bg-red-500 text-white font-bold text-base flex items-center justify-center hover:bg-red-600 active:brightness-95"
+                        className={`touch-manipulation rounded-lg bg-red-500 text-white font-bold flex items-center justify-center hover:bg-red-600 active:brightness-95 ${
+                          kassaSxgaDenseTiles ? 'h-9 w-9 text-lg' : 'h-8 w-8 text-base'
+                        }`}
                         aria-label={
                           item.quantity === 1 ? t('kassaApp.ariaRemoveLine') : t('kassaApp.ariaDecreaseQty')
                         }
@@ -4723,7 +4741,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           <button
                             type="button"
                             onClick={() => void openEditCartItem(item)}
-                            className="touch-manipulation w-8 h-8 rounded-lg bg-amber-500 text-white text-sm flex items-center justify-center hover:bg-amber-600 active:brightness-95"
+                            className={`touch-manipulation rounded-lg bg-amber-500 text-white flex items-center justify-center hover:bg-amber-600 active:brightness-95 ${
+                              kassaSxgaDenseTiles ? 'h-9 w-9 text-sm' : 'h-8 w-8 text-sm'
+                            }`}
                             title={t('kassaApp.ariaEditOptions')}
                             aria-label={t('kassaApp.ariaEditOptions')}
                           >
@@ -4734,7 +4754,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       <button
                         type="button"
                         onClick={() => updateQty(item.cartKey, item.quantity + 1)}
-                        className="touch-manipulation w-8 h-8 rounded-lg bg-[#3C4D6B] text-white font-bold text-base flex items-center justify-center hover:bg-[#2D3A52] active:brightness-95"
+                        className={`touch-manipulation rounded-lg bg-[#3C4D6B] text-white font-bold flex items-center justify-center hover:bg-[#2D3A52] active:brightness-95 ${
+                          kassaSxgaDenseTiles ? 'h-9 w-9 text-lg' : 'h-8 w-8 text-base'
+                        }`}
                         aria-label={t('kassaApp.ariaIncreaseQty')}
                       >
                         +
@@ -4772,14 +4794,22 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               type="button"
               onClick={() => { void openCashDrawer() }}
               className={`flex flex-col items-center justify-center gap-0.5 rounded-lg bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe] active:brightness-95 ${
-                kassaSidebarFooterTier === 'dense' ? 'min-h-[3.25rem] py-1.5' : 'min-h-[3.5rem] py-2'
+                kassaSxgaDenseTiles
+                  ? 'min-h-[3.75rem] py-2'
+                  : kassaSidebarFooterTier === 'dense'
+                    ? 'min-h-[3.25rem] py-1.5'
+                    : 'min-h-[3.5rem] py-2'
               }`}
               title={t('kassaApp.drawerOpen')}
             >
-              <span className="text-lg leading-none" aria-hidden>
+              <span className={`leading-none ${kassaSxgaDenseTiles ? 'text-xl' : 'text-lg'}`} aria-hidden>
                 💰
               </span>
-              <span className="px-0.5 text-center text-[10px] font-bold leading-tight sm:text-[11px]">
+              <span
+                className={`px-0.5 text-center font-bold leading-tight ${
+                  kassaSxgaDenseTiles ? 'text-[11px]' : 'text-[10px] sm:text-[11px]'
+                }`}
+              >
                 {t('kassaApp.drawerOpen')}
               </span>
             </button>
@@ -4790,15 +4820,23 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               }}
               disabled={draftBonLineItems.length === 0 || draftBonPrinting}
               className={`flex flex-col items-center justify-center gap-0.5 rounded-lg bg-yellow-400 text-yellow-950 hover:bg-yellow-300 active:brightness-95 disabled:pointer-events-none disabled:opacity-45 ${
-                kassaSidebarFooterTier === 'dense' ? 'min-h-[3.25rem] py-1.5' : 'min-h-[3.5rem] py-2'
+                kassaSxgaDenseTiles
+                  ? 'min-h-[3.75rem] py-2'
+                  : kassaSidebarFooterTier === 'dense'
+                    ? 'min-h-[3.25rem] py-1.5'
+                    : 'min-h-[3.5rem] py-2'
               }`}
               title={t('kassaApp.cartBonTitle')}
               aria-label={t('kassaApp.cartBonTitle')}
             >
-              <span className="text-lg leading-none" aria-hidden>
+              <span className={`leading-none ${kassaSxgaDenseTiles ? 'text-xl' : 'text-lg'}`} aria-hidden>
                 🧾
               </span>
-              <span className="px-0.5 text-center text-[10px] font-bold leading-tight sm:text-[11px]">
+              <span
+                className={`px-0.5 text-center font-bold leading-tight ${
+                  kassaSxgaDenseTiles ? 'text-[11px]' : 'text-[10px] sm:text-[11px]'
+                }`}
+              >
                 {t('kassaApp.cartBon')}
               </span>
             </button>
@@ -4807,13 +4845,21 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               onClick={clearCart}
               disabled={billLines.length === 0}
               className={`flex flex-col items-center justify-center gap-0.5 rounded-lg bg-rose-500 text-white hover:bg-rose-600 active:brightness-95 disabled:bg-rose-900/50 disabled:text-white/70 disabled:opacity-100 ${
-                kassaSidebarFooterTier === 'dense' ? 'min-h-[3.25rem] py-1.5' : 'min-h-[3.5rem] py-2'
+                kassaSxgaDenseTiles
+                  ? 'min-h-[3.75rem] py-2'
+                  : kassaSidebarFooterTier === 'dense'
+                    ? 'min-h-[3.25rem] py-1.5'
+                    : 'min-h-[3.5rem] py-2'
               }`}
             >
-              <span className="text-lg leading-none" aria-hidden>
+              <span className={`leading-none ${kassaSxgaDenseTiles ? 'text-xl' : 'text-lg'}`} aria-hidden>
                 🗑️
               </span>
-              <span className="px-0.5 text-center text-[10px] font-bold leading-tight sm:text-[11px]">
+              <span
+                className={`px-0.5 text-center font-bold leading-tight ${
+                  kassaSxgaDenseTiles ? 'text-[11px]' : 'text-[10px] sm:text-[11px]'
+                }`}
+              >
                 {t('kassaApp.remove')}
               </span>
             </button>
@@ -4860,7 +4906,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 numpadPanelVisible
                   ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
                   : 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
-              } min-w-[4.25rem] min-h-[2.75rem] py-2 text-[10px] leading-tight sm:text-[11px]`}
+              } ${
+                kassaSxgaDenseTiles
+                  ? 'min-w-[4.5rem] min-h-[3rem] py-2.5 text-[11px]'
+                  : 'min-w-[4.25rem] min-h-[2.75rem] py-2 text-[10px] sm:text-[11px]'
+              } leading-tight`}
             >
               {t('kassaApp.numpadToggle')}
             </button>
@@ -4872,7 +4922,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 setShowPaymentModal(true)
               }}
               disabled={billLines.length === 0}
-              className={`flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-lg bg-emerald-500 font-bold text-white hover:bg-emerald-600 active:brightness-95 disabled:bg-emerald-900/45 disabled:text-white/75 disabled:opacity-100 min-h-[2.75rem] py-2.5 text-sm`}
+              className={`flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-lg bg-emerald-500 font-bold text-white hover:bg-emerald-600 active:brightness-95 disabled:bg-emerald-900/45 disabled:text-white/75 disabled:opacity-100 ${
+                kassaSxgaDenseTiles ? 'min-h-[3rem] py-3 text-base' : 'min-h-[2.75rem] py-2.5 text-sm'
+              }`}
             >
               💳 {t('kassaApp.checkout')}
             </button>
