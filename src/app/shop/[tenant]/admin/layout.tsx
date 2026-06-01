@@ -405,9 +405,9 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
 
   return (
     <div style={{ maxWidth: '100%', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-100">
-      {/* ── Slanke blauwe topbalk (zelfde stijl als kassa). Z-index 100 — modals/dialoog: min. z-[130] zodat ze boven deze balk blijven (iPad). ── */}
+      {/* ── Zwarte topbalk (zelfde stijl als kassa). Z-index 100 — modals/dialoog: min. z-[130] zodat ze boven deze balk blijven (iPad). ── */}
       <div
-        className="fixed top-0 left-0 right-0 z-[100] flex items-center gap-2 bg-[#1e293b] px-2 sm:px-3"
+        className="fixed top-0 left-0 right-0 z-[100] flex items-center gap-2 bg-black px-2 sm:px-3"
         style={{ height: 56 }}
       >
         <div className="flex min-w-0 shrink-0 items-center gap-2">

@@ -3974,7 +3974,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       <div className={`flex min-h-0 flex-1 flex-col overflow-hidden ${ui.shellBg}`}>
 
       {/* ── Blauwe balk: één rij — kleine tenantnaam zodat snelkoppelingen naast elkaar passen zonder horizontale scrollbar ── */}
-      <div className="relative z-30 flex min-h-[52px] w-full min-w-0 shrink-0 items-center gap-1 bg-[#1e293b] px-2 py-1.5 sm:gap-1.5 sm:px-3">
+      <div className="relative z-30 flex min-h-[52px] w-full min-w-0 shrink-0 items-center gap-1 bg-black px-2 py-1.5 sm:gap-1.5 sm:px-3">
 
         {/* Backdrop sluit menu/flyout (printer-bridge-modal heeft eigen overlay) */}
         {(hamburgerOpen || flyoutOpen) && (
