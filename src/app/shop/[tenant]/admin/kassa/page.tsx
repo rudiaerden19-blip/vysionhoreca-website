@@ -4734,7 +4734,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       : 'px-1 py-1.5 text-[10px] leading-tight'
                 }`}
               >
-                {t('kassaApp.parkTableKitchenBon').replace(/\{number\}/g, String(tableNumber))}
+                {t('kassaApp.parkTableKitchenBon')}
               </button>
               <button
                 type="button"
@@ -4751,7 +4751,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       : 'px-1 py-1.5 text-[10px] leading-tight'
                 }`}
               >
-                {t('kassaApp.parkTableKassaBon').replace(/\{number\}/g, String(tableNumber))}
+                {t('kassaApp.parkTableKassaBon')}
               </button>
             </div>
           )}
