@@ -1,0 +1,40 @@
+---
+description: GKS-pilot vs productie-kassa — deploy, tenant-URL, isolatie (alle agents)
+alwaysApply: true
+---
+
+# GKS vs productie-kassa (500+ tenants)
+
+## Klant-URL — vast, niet GKS
+
+- Elke tenant gebruikt **altijd** het verkoopscherm **`/shop/{tenant}/admin/kassa`** (subdomein of pad — zie `getAdminKassaEntryHref` in `tenant-modules.ts`).
+- **Geen** tenant-flow, menu, welkom of demo-link naar **`/admin/gks-kassa`**. Klanten kunnen daar niet “per ongeluk” terecht via de normale ingang.
+- **Nooit** `/admin/kassa` redirecten of vervangen door `gks-kassa` zonder **expliciete** productiebeslissing van de eigenaar in die opdracht.
+
+## Zelfde Vercel-project ≠ andere kassa voor klanten
+
+- Deploy naar **`vysionhoreca-website`** (GitHub → Vercel) ship **één** build met **meerdere routes**.
+- **`/admin/kassa`** = productie-POS (ongewijzigd gedrag voor bestaande zaken).
+- **`/admin/gks-kassa`** = **intern/cert-pilot**; extra route op de server, geen vervanging van de klant-URL.
+- Deploy betekent **niet**: “alle tenants zitten in GKS”. Alleen wie **bewust** de GKS-URL opent (jullie pilot), gebruikt GKS.
+
+## Code — waar bouwen / waar niet
+
+| Verboden zonder expliciet verzoek | Verplicht voor GKS-werk |
+|-----------------------------------|-------------------------|
+| `src/app/shop/[tenant]/admin/kassa/**` | `src/app/shop/[tenant]/admin/gks-kassa/**` |
+| Writes naar `orders`, `z_reports` vanuit GKS-pad | `gks_commercial_orders` via `/api/gks-kassa/commercial-orders` |
+| Gedeelde kassa-libs breken voor “even snel” | `src/lib/gks-kassa/**` (eigen offline, Z-sync no-op, storage `gks_*`) |
+
+- **`apps/vysion-print-agent/**`**: zie regel `no-print-agent.mdc` — nooit aanraken.
+
+## Supabase & Git
+
+- GKS-schema: `supabase/migrations/*gks*` (o.a. `gks_commercial_orders`). Migratie op Supabase is **additief**; productie-`orders` blijft de bron voor **`/admin/kassa`**.
+- Bij commit: **niet** `apps/vysion-print-agent/` meenemen.
+- Vóór afronden GKS-taken: `git diff -- 'src/app/shop/[tenant]/admin/kassa/'` moet **leeg** zijn.
+
+## Documentatie
+
+- Deploy-map: `docs/gks/DEPLOYMENT-MAP.md`
+- Runtime-isolatie: `src/lib/gks-kassa/ISOLATION.md`

@@ -1,0 +1,32 @@
+# GKS-kassa isolatie vs productie `/admin/kassa`
+
+Deploy naar GitHub / Vercel / Supabase: zie [`docs/gks/DEPLOYMENT-MAP.md`](../../../docs/gks/DEPLOYMENT-MAP.md).
+
+## Doel
+
+Pilot/certificatie onder `/shop/[tenant]/admin/gks-kassa` mag **geen** productie-POS-data wijzigen.
+
+## Code
+
+| Productie | GKS |
+|-----------|-----|
+| `admin/kassa/page.tsx` | `admin/gks-kassa/page.tsx` (fork) |
+| `orders` | `gks_commercial_orders` via `/api/gks-kassa/commercial-orders` |
+| `kassa-z-sync-safe` → `z_reports` | `gks-kassa/z-sync-safe` (no-op) |
+| `vysion-kassa-offline` IDB | `vysion-gks-kassa-offline` |
+| `vysion_*` localStorage | `gks_*` (`storage-keys.ts`) |
+
+## Nog gedeeld (read-only of bewust)
+
+- Menu/catalogus via `admin-api` (lezen).
+- Plattegrond **server** (`floor_plan_tables` realtime) — alleen lezen/sync; **geen** `upsert` vanuit GKS.
+- `/api/kassa/staff-clock` — staff-sessies (TODO: aparte GKS-route indien nodig).
+- Print agent (`sendToVysionPrintAgent`) — lokaal per zaak.
+- Webshop-order **alarm** uitgeschakeld (geen poll op productie `orders.status=new`).
+
+## Check vóór deploy
+
+```bash
+git diff -- 'src/app/shop/[tenant]/admin/kassa/'
+# moet leeg zijn
+```

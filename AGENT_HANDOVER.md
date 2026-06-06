@@ -4,6 +4,8 @@
 > **⚠️ KRITIEKE REGEL VOOR ELKE AGENT:**
 > Bouw NOOIT iets zonder eerst te overleggen met de gebruiker. Lees dit document volledig vóór je één regel code aanraakt. Eerdere agents hebben fouten gemaakt door te snel te handelen. Deze codebase heeft 500+ actieve tenants — een fout treft iedereen.
 
+> **GKS vs productie-kassa (Cursor, altijd actief):** Klanten blijven op **`/shop/{tenant}/admin/kassa`** — die URL wijzigt niet door deploy. GKS-pilot alleen onder **`/admin/gks-kassa`**; niet redirecten, niet `admin/kassa/` wijzigen. Zie `.cursor/rules/gks-vs-production-kassa.mdc` en `docs/gks/DEPLOYMENT-MAP.md`.
+
 ---
 
 ## 1. PROJECT IDENTITEIT
