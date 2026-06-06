@@ -1,15 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
+import { getApiRouteSupabase } from '@/lib/api-route-supabase'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
 
 // GET — volledige credentials alleen voor zaak-eigenaar/superadmin; publiek: alleen nummer + actief
 export async function GET(request: NextRequest) {
+  const db = getApiRouteSupabase()
+  if (!db.ok) return db.response
+  const supabaseAdmin = db.supabase
   const tenantSlug = request.nextUrl.searchParams.get('tenant')
 
   if (!tenantSlug) {
@@ -37,6 +34,9 @@ export async function GET(request: NextRequest) {
 // POST — alleen eigenaar of superadmin
 export async function POST(request: NextRequest) {
   try {
+    const db = getApiRouteSupabase()
+    if (!db.ok) return db.response
+    const supabaseAdmin = db.supabase
     const body = await request.json()
     const { tenant_slug, ...settings } = body
 

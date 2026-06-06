@@ -1,15 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { createHmac, timingSafeEqual } from 'node:crypto'
 
+import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
 import { trackError } from '@/lib/monitoring'
-
-// Supabase client with service role for server operations
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
 
 // WhatsApp Cloud API configuration
 const WHATSAPP_API_VERSION = 'v24.0'
@@ -210,6 +204,8 @@ export async function POST(request: NextRequest) {
 
 // Get customer's saved language preference
 async function getCustomerLanguage(tenantSlug: string, customerPhone: string): Promise<string | null> {
+  const supabaseAdmin = getServerSupabaseClient()
+  if (!supabaseAdmin) return null
   const { data } = await supabaseAdmin
     .from('whatsapp_sessions')
     .select('data')
@@ -223,6 +219,8 @@ async function getCustomerLanguage(tenantSlug: string, customerPhone: string): P
 
 // Clear customer's language preference
 async function clearCustomerLanguage(tenantSlug: string, customerPhone: string) {
+  const supabaseAdmin = getServerSupabaseClient()
+  if (!supabaseAdmin) return
   await supabaseAdmin
     .from('whatsapp_sessions')
     .delete()
@@ -233,6 +231,8 @@ async function clearCustomerLanguage(tenantSlug: string, customerPhone: string) 
 
 // Save customer's language preference
 async function saveCustomerLanguage(tenantSlug: string, customerPhone: string, language: string) {
+  const supabaseAdmin = getServerSupabaseClient()
+  if (!supabaseAdmin) return
   // First check if session exists
   const { data: existing } = await supabaseAdmin
     .from('whatsapp_sessions')
@@ -318,6 +318,8 @@ async function sendLanguageMenu(
 }
 
 async function findTenantByWhatsAppPhone(phoneNumberId: string) {
+  const supabaseAdmin = getServerSupabaseClient()
+  if (!supabaseAdmin) return null
   const { data, error } = await supabaseAdmin
     .from('whatsapp_settings')
     .select('*')

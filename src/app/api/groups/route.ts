@@ -1,15 +1,13 @@
-import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { getGroupsApiSupabase } from '@/lib/groups-api-supabase'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
 
 // GET - List groups for a tenant
 export async function GET(request: NextRequest) {
   try {
+    const db = getGroupsApiSupabase()
+    if (!db.ok) return db.response
+    const { supabase } = db
     const { searchParams } = new URL(request.url)
     const tenant_slug = searchParams.get('tenant_slug')
 
@@ -51,6 +49,9 @@ export async function GET(request: NextRequest) {
 // POST - Create a new group
 export async function POST(request: NextRequest) {
   try {
+    const db = getGroupsApiSupabase()
+    if (!db.ok) return db.response
+    const { supabase } = db
     const body = await request.json()
     const {
       tenant_slug,
@@ -116,6 +117,9 @@ export async function POST(request: NextRequest) {
 // PUT - Update a group
 export async function PUT(request: NextRequest) {
   try {
+    const db = getGroupsApiSupabase()
+    if (!db.ok) return db.response
+    const { supabase } = db
     const body = await request.json()
     const { id, ...updates } = body
 
@@ -159,6 +163,9 @@ export async function PUT(request: NextRequest) {
 // DELETE - Archive a group
 export async function DELETE(request: NextRequest) {
   try {
+    const db = getGroupsApiSupabase()
+    if (!db.ok) return db.response
+    const { supabase } = db
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
 

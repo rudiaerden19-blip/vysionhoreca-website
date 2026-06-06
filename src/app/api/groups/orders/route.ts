@@ -1,11 +1,6 @@
-import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { getGroupsApiSupabase } from '@/lib/groups-api-supabase'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
 
 function normalizeTenantSlug(s: string) {
   return (s || '').replace(/-/g, '').toLowerCase()
@@ -14,6 +9,9 @@ function normalizeTenantSlug(s: string) {
 // GET - Get orders for a group session
 export async function GET(request: NextRequest) {
   try {
+    const db = getGroupsApiSupabase()
+    if (!db.ok) return db.response
+    const { supabase } = db
     const { searchParams } = new URL(request.url)
     const session_id = searchParams.get('session_id')
     const group_id = searchParams.get('group_id')
@@ -109,6 +107,9 @@ export async function GET(request: NextRequest) {
 // POST - Create a group order (from member)
 export async function POST(request: Request) {
   try {
+    const db = getGroupsApiSupabase()
+    if (!db.ok) return db.response
+    const { supabase } = db
     const body = await request.json()
     const {
       tenant_slug,

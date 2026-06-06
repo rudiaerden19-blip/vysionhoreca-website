@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getApiRouteSupabase } from '@/lib/api-route-supabase'
 import { apiRateLimiter, checkRateLimit } from '@/lib/rate-limit'
 import { logger } from '@/lib/logger'
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
 
 const WHATSAPP_API_VERSION = 'v24.0'
 const WHATSAPP_API_URL = `https://graph.facebook.com/${WHATSAPP_API_VERSION}`
@@ -41,6 +36,9 @@ function getClientIp(req: NextRequest): string {
 export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID()
   try {
+    const db = getApiRouteSupabase()
+    if (!db.ok) return db.response
+    const supabaseAdmin = db.supabase
     const body = await request.json()
     const {
       orderId,

@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getApiRouteSupabase } from '@/lib/api-route-supabase'
 import { assertInternalToolAccess } from '@/lib/api-internal-tool-gate'
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
 
 const WHATSAPP_API_VERSION = 'v24.0'
 const WHATSAPP_API_URL = `https://graph.facebook.com/${WHATSAPP_API_VERSION}`
@@ -38,6 +33,10 @@ export async function GET(request: NextRequest) {
   if (!gate.ok) {
     return NextResponse.json(gate.json, { status: gate.status })
   }
+
+  const db = getApiRouteSupabase()
+  if (!db.ok) return db.response
+  const supabaseAdmin = db.supabase
 
   try {
     // Get all whatsapp_settings

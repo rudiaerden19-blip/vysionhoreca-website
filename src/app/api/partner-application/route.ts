@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getApiRouteSupabase } from '@/lib/api-route-supabase'
 import {
   checkRateLimit,
   getClientIP,
@@ -8,13 +8,11 @@ import {
 import { parseJsonBody, jsonServerError } from '@/lib/api-request'
 import { partnerApplicationSchema } from '@/lib/api-schemas'
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
 export async function POST(request: NextRequest) {
   try {
+    const db = getApiRouteSupabase()
+    if (!db.ok) return db.response
+    const supabaseAdmin = db.supabase
     const clientIP = getClientIP(request)
     const rateLimitResult = await checkRateLimit(partnerApplicationRateLimiter, clientIP)
     if (!rateLimitResult.success) {
