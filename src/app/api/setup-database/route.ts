@@ -1,18 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getApiRouteSupabase } from '@/lib/api-route-supabase'
 import { assertInternalToolAccess } from '@/lib/api-internal-tool-gate'
-
-// Admin client with service role for DDL operations
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
 
 export async function POST(request: NextRequest) {
   const gate = await assertInternalToolAccess(request)
   if (!gate.ok) {
     return NextResponse.json(gate.json, { status: gate.status })
   }
+
+  const db = getApiRouteSupabase()
+  if (!db.ok) return db.response
+  const supabaseAdmin = db.supabase
 
   try {
     // Create daily_sales table if it doesn't exist
@@ -78,6 +76,10 @@ export async function GET(request: NextRequest) {
   if (!gate.ok) {
     return NextResponse.json(gate.json, { status: gate.status })
   }
+
+  const db = getApiRouteSupabase()
+  if (!db.ok) return db.response
+  const supabaseAdmin = db.supabase
 
   // Check which tables exist
   try {

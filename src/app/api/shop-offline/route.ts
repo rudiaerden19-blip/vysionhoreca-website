@@ -1,14 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
+import { getApiRouteSupabase } from '@/lib/api-route-supabase'
 import { logger } from '@/lib/logger'
 import { trackError } from '@/lib/monitoring'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
 
 const SETUP_SQL = `
   CREATE TABLE IF NOT EXISTS shop_offline_status (
@@ -23,7 +19,7 @@ const SETUP_SQL = `
 
 let tableReady = false
 
-async function ensureTable() {
+async function ensureTable(supabaseAdmin: SupabaseClient) {
   if (tableReady) return true
 
   // First check if table exists
@@ -55,6 +51,9 @@ async function ensureTable() {
 }
 
 export async function GET(request: NextRequest) {
+  const db = getApiRouteSupabase()
+  if (!db.ok) return db.response
+  const supabaseAdmin = db.supabase
   const { searchParams } = new URL(request.url)
   const tenant = searchParams.get('tenant')
 
@@ -62,7 +61,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Missing tenant' }, { status: 400 })
   }
 
-  await ensureTable()
+  await ensureTable(supabaseAdmin)
 
   const { data, error } = await supabaseAdmin
     .from('shop_offline_status')
@@ -82,6 +81,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const db = getApiRouteSupabase()
+  if (!db.ok) return db.response
+  const supabaseAdmin = db.supabase
   const body = await request.json()
   const { tenant, is_offline, offline_reason, offline_message } = body
 
@@ -94,7 +96,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
   }
 
-  const ready = await ensureTable()
+  const ready = await ensureTable(supabaseAdmin)
   if (!ready) {
     return NextResponse.json(
       { error: 'shop_offline_status table does not exist. Run supabase/shop_offline_status_migration.sql in the Supabase SQL editor.' },
