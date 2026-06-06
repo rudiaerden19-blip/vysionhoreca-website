@@ -15,8 +15,129 @@ import {
 } from '@/services/gksPartnerService'
 import type { FloorPlanZone } from '@/lib/kassa-floor-plan-zone'
 import { tableOrderMapKey } from '@/lib/kassa-floor-plan-zone'
+import {
+  GKS_PILOT_DEVICE_ID,
+  GKS_PILOT_EST_NO,
+  GKS_PILOT_POS_ID,
+  GKS_PILOT_POS_SW_VERSION,
+  GKS_PILOT_TERMINAL_ID,
+} from '@/lib/gks-kassa/pilot-config'
+import { getBookingDateBrussels, getOrCreateBookingPeriodId } from '@/lib/gks-kassa/booking-period'
+import type { GksPosEnvelope, GksSignResult } from '@/lib/gks-kassa/fdm-types'
+import {
+  gksFiscalJournalCreatePending,
+  gksFiscalJournalMarkFailed,
+  gksFiscalJournalMarkSuccess,
+} from '@/lib/gks-kassa/fiscal-journal-api'
 
 export type GksFiscalFlowError = { code: string; message: string }
+
+/** Altijd RFC-4122 UUID (API fiscal_journal vereist .uuid()). */
+function newIdempotencyKey(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID()
+  }
+  const bytes = new Uint8Array(16)
+  if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+    crypto.getRandomValues(bytes)
+  } else {
+    for (let i = 0; i < 16; i++) bytes[i] = Math.floor(Math.random() * 256)
+  }
+  bytes[6] = (bytes[6]! & 0x0f) | 0x40
+  bytes[8] = (bytes[8]! & 0x3f) | 0x80
+  const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`
+}
+
+const POS_TICKET_LS_KEY = (tenant: string) =>
+  `gks_pos_fiscal_ticket_no_${tenant}_${GKS_PILOT_TERMINAL_ID}`
+
+/** Volgende ticketnr zoals signSale/buildEnvelope (zonder localStorage te verhogen). */
+function peekNextPosFiscalTicketNo(tenantSlug: string): number {
+  if (typeof window === 'undefined') return 1
+  try {
+    const raw = localStorage.getItem(POS_TICKET_LS_KEY(tenantSlug))
+    const prev = raw ? parseInt(raw, 10) : 0
+    return prev >= 999999999 ? 1 : prev + 1
+  } catch {
+    return 1
+  }
+}
+
+function brusselsPosDateTime(): string {
+  const d = new Date()
+  const parts = new Intl.DateTimeFormat('sv-SE', {
+    timeZone: 'Europe/Brussels',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }).formatToParts(d)
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? '00'
+  const offset =
+    new Date(d.toLocaleString('en-US', { timeZone: 'Europe/Brussels' })).getTime() -
+      new Date(d.toLocaleString('en-US', { timeZone: 'UTC' })).getTime() >=
+    3600000
+      ? '+02:00'
+      : '+01:00'
+  return `${get('year')}-${get('month')}-${get('day')}T${get('hour')}:${get('minute')}:${get('second')}${offset}`
+}
+
+function buildPendingEnvelope(ctx: GksPartnerContext): GksPosEnvelope {
+  return {
+    language: ctx.language ?? 'NL',
+    ticketMedium: ctx.ticketMedium ?? 'PAPER',
+    posId: GKS_PILOT_POS_ID,
+    posFiscalTicketNo: peekNextPosFiscalTicketNo(ctx.tenantSlug),
+    posSwVersion: GKS_PILOT_POS_SW_VERSION,
+    terminalId: GKS_PILOT_TERMINAL_ID,
+    deviceId: GKS_PILOT_DEVICE_ID,
+    posDateTime: brusselsPosDateTime(),
+    bookingPeriodId: getOrCreateBookingPeriodId(ctx.tenantSlug),
+    bookingDate: getBookingDateBrussels(),
+    vatNo: ctx.vatNo,
+    estNo: GKS_PILOT_EST_NO,
+    employeeId: ctx.employeeId,
+  }
+}
+
+function signResultToResponsePayload(result: GksSignResult): Record<string, unknown> {
+  return {
+    posId: result.posId,
+    posFiscalTicketNo: result.posFiscalTicketNo,
+    posDateTime: result.posDateTime,
+    terminalId: result.terminalId,
+    deviceId: result.deviceId,
+    eventOperation: result.eventOperation,
+    fdmRef: result.fdmRef,
+    fdmSwVersion: result.fdmSwVersion,
+    shortSignature: result.shortSignature,
+    verificationUrl: result.verificationUrl,
+    vatCalc: result.vatCalc,
+    digitalSignature: result.digitalSignature,
+  }
+}
+
+async function markJournalFailedSafe(
+  tenantSlug: string,
+  journalId: string,
+  code: string,
+  message: string,
+  detail?: unknown,
+): Promise<void> {
+  try {
+    await gksFiscalJournalMarkFailed(tenantSlug, journalId, {
+      error: code,
+      message,
+      detail: detail != null ? String(detail) : undefined,
+    })
+  } catch {
+    /* best-effort */
+  }
+}
 
 function partnerCtx(
   tenantSlug: string,
@@ -163,6 +284,7 @@ export async function gksCompleteSaleN(
 ): Promise<{ ok: true; posFiscalTicketNo: number; shortSignature?: string } | { ok: false; error: GksFiscalFlowError }> {
   const gate = await gksEnsureFdmReady(tenantSlug, staff, vatNo)
   if (gate) return { ok: false, error: gate }
+  const ctx = partnerCtx(tenantSlug, staff!, vatNo)
   const transaction = cartLinesToTransaction(billLines, resolveVatPercent)
   const financials = paymentLinesForSale(method, total, opts?.splitAmounts)
   let costCenter: { id: string; type: 'TABLE'; reference: string } | undefined
@@ -174,12 +296,73 @@ export async function gksCompleteSaleN(
       reference: getOrCreateCostCenterReference(tenantSlug, slotKey),
     }
   }
-  const result = await signSale(
-    partnerCtx(tenantSlug, staff!, vatNo),
-    transaction,
-    financials,
-    costCenter,
+
+  const envelope = buildPendingEnvelope(ctx)
+  const idempotencyKey = newIdempotencyKey()
+
+  const pendingRes = await gksFiscalJournalCreatePending({
+    tenantSlug,
+    eventLabel: 'N',
+    mutation: 'signSale',
+    idempotencyKey,
+    posId: envelope.posId,
+    terminalId: envelope.terminalId,
+    deviceId: envelope.deviceId,
+    posFiscalTicketNo: envelope.posFiscalTicketNo,
+    posDateTime: envelope.posDateTime,
+    bookingPeriodId: envelope.bookingPeriodId,
+    bookingDate: envelope.bookingDate,
+    employeeId: envelope.employeeId,
+    requestPayload: {
+      costCenter,
+      transaction,
+      financials,
+      envelope,
+    },
+  })
+  if (!pendingRes.ok) {
+    return {
+      ok: false,
+      error: {
+        code: 'FISCAL_JOURNAL_PENDING',
+        message: pendingRes.error || 'Kon fiscaal journal niet starten.',
+      },
+    }
+  }
+  const journalId = pendingRes.data.id
+
+  let result: GksSignResult
+  try {
+    result = await signSale(ctx, transaction, financials, costCenter)
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'signSale mislukt'
+    await markJournalFailedSafe(tenantSlug, journalId, 'SIGN_SALE_FAILED', message)
+    return { ok: false, error: { code: 'SIGN_SALE_FAILED', message } }
+  }
+
+  const successRes = await gksFiscalJournalMarkSuccess(
+    tenantSlug,
+    journalId,
+    signResultToResponsePayload(result),
   )
+  if (!successRes.ok || successRes.data.status !== 'SUCCESS') {
+    await markJournalFailedSafe(
+      tenantSlug,
+      journalId,
+      'MARK_SUCCESS_FAILED',
+      successRes.ok ? `status=${successRes.data.status}` : successRes.error,
+    )
+    return {
+      ok: false,
+      error: {
+        code: 'MARK_SUCCESS_FAILED',
+        message: successRes.ok
+          ? 'Fiscaal journal kon niet op SUCCESS gezet worden.'
+          : successRes.error || 'mark_success mislukt',
+      },
+    }
+  }
+
   if (opts?.zone && opts?.tableNumber) {
     clearCostCenterReference(tenantSlug, tableOrderMapKey(opts.zone, opts.tableNumber))
   }
