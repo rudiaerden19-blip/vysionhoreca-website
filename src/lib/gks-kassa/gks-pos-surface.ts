@@ -6,8 +6,8 @@
 export const GKS_MENU_PLATE_BG = '#333336'
 export const GKS_MENU_PLATE_BG_CLASS = 'bg-[#333336]'
 
-/** Bijna recht, heel licht afgerond. */
-export const GKS_BTN_SHAPE = 'rounded-[3px]'
+/** Subtiel afgerond — luxe POS, geen pill. */
+export const GKS_BTN_SHAPE = 'rounded-[6px]'
 
 /** Zachte “bollig”: donker boven/onder, iets lichter midden — geen harde radiale flare. */
 const GKS_BTN_FACE =

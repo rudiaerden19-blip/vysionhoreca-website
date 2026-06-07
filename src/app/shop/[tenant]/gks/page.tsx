@@ -4157,7 +4157,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250607-btn-darker-grey"
+      data-gks-ui="20250607-btn-radius-6"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4370,7 +4370,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           {isOnline !== null && (
             <div
               className={`inline-flex max-w-[6.5rem] shrink-0 items-center justify-center gap-0.5 px-3 py-2 font-bold leading-tight min-h-[2.35rem] sm:min-h-[2.6rem] sm:max-w-[8rem] md:max-w-none ${KASSA_HEADER_QUICK_LINK_LABEL} ${
-                isOnline ? `${GKS_BTN_SHAPE} ${GKS_POS_BTN}` : 'rounded-none bg-red-600/95 text-white'
+                isOnline ? `${GKS_BTN_SHAPE} ${GKS_POS_BTN}` : `${GKS_BTN_SHAPE} bg-red-600/95 text-white`
               }`}
               title={isOnline ? t('kassaApp.onlineModeLiveTitle') : t('kassaApp.offlineModeActive')}
               role="status"
@@ -4523,7 +4523,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           ? GKS_ACCENT_BTN
                           : kassaAppearanceDark
                             ? `${GKS_BTN_SHAPE} ${GKS_POS_BTN}`
-                            : `rounded-none border-gray-300 bg-white ${ui.categoryStripText} ${ui.categoryStripHover}`
+                            : `${GKS_BTN_SHAPE} border-gray-300 bg-white ${ui.categoryStripText} ${ui.categoryStripHover}`
                       }`}
                     >
                       {cat.icon ? <span className="mr-0.5 text-sm sm:text-base">{cat.icon}</span> : null}
@@ -5347,7 +5347,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           key={tbl.id}
                           type="button"
                           onClick={() => switchToTable(tbl.number)}
-                          className={`relative touch-manipulation rounded-xl border-2 py-4 font-bold transition-colors active:brightness-95 ${
+                          className={`relative touch-manipulation border-2 py-4 font-bold transition-colors active:brightness-95 ${GKS_BTN_SHAPE} ${
                             tableNumber === tbl.number && dineInFloorZone === pickerBrowseZone
                               ? GKS_ACCENT_BTN
                               : tbl.status === 'FREE'
@@ -5388,7 +5388,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                             key={s.segmentId + s.stoolNumber}
                             type="button"
                             onClick={() => switchToTable(s.stoolNumber)}
-                            className={`relative touch-manipulation rounded-xl border-2 py-4 font-bold transition-colors active:brightness-95 ${
+                            className={`relative touch-manipulation border-2 py-4 font-bold transition-colors active:brightness-95 ${GKS_BTN_SHAPE} ${
                               tableNumber === s.stoolNumber && dineInFloorZone === pickerBrowseZone
                                 ? GKS_ACCENT_BTN
                                 : (tableOrders[tableOrderMapKey(pickerBrowseZone, s.stoolNumber)]?.length ?? 0) > 0
