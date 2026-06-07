@@ -5033,10 +5033,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 playClick()
                 setNumpadPanelVisible((v) => !v)
               }}
-              className={`flex flex-col items-center justify-center gap-1 rounded-xl active:brightness-95 ${
-                numpadPanelVisible
-                  ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
-                  : 'bg-black text-white hover:bg-zinc-900'
+              className={`flex flex-col items-center justify-center gap-1 rounded-xl bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe] active:brightness-95 ${
+                numpadPanelVisible ? 'ring-2 ring-[#063042]/35' : ''
               } ${kassaFooterActionTouchMinHClass(
                 kassaSxgaDenseTiles,
                 kassaSidebarFooterTier === 'dense',
