@@ -4127,7 +4127,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   )
 
   const gksVatNo = tenantInfo?.btw_number?.trim() || 'BE0000000000'
-  const { internetLocked: gksInternetLocked } = useGksInternetLock()
+  const { internetLocked: gksInternetLocked, gksOnline: gksInternetOnline } = useGksInternetLock()
   const gksAvailability = useGksAvailability(tenant, activeKassaStaff, gksVatNo)
   const { blocked: gksFdmFiscalBlocked } = useGksFiscalBlocked(gksAvailability)
   const gksFdmOverlay =
@@ -4136,7 +4136,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     gksAvailabilityShowsOverlay(gksAvailability.status) &&
     gksAvailability.status !== 'INTERNET_OFFLINE'
   const gksShowLockOverlay = gksInternetLocked || gksFdmOverlay
-  const gksFiscalBlocked = gksInternetLocked || gksFdmFiscalBlocked
+  const gksFiscalBlocked = !gksInternetOnline || gksFdmFiscalBlocked
   const gksFiscalBlockedTitle = t('gksAvailability.tooltipBlocked')
   const gksLockOverlayMessage = gksInternetLocked
     ? t('gksAvailability.overlay.internet')

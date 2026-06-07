@@ -10,19 +10,28 @@ import {
 
 export function useGksInternetLock(): {
   gksOnline: boolean
+  /** Alleen true bij bevestigde offline — voor volscherm overlay. */
   internetLocked: boolean
 } {
-  const [locked, setLocked] = useState(() => getGksInternetLocked())
+  const [snap, setSnap] = useState(() => ({
+    locked: getGksInternetLocked(),
+    online: getGksInternetOnline(),
+  }))
 
   useEffect(() => {
     ensureGksInternetLockPolling()
-    return subscribeGksInternetLock(() => {
-      setLocked(getGksInternetLocked())
-    })
+    const sync = () => {
+      setSnap({
+        locked: getGksInternetLocked(),
+        online: getGksInternetOnline(),
+      })
+    }
+    sync()
+    return subscribeGksInternetLock(sync)
   }, [])
 
   return {
-    gksOnline: !locked,
-    internetLocked: locked,
+    gksOnline: snap.online,
+    internetLocked: snap.locked,
   }
 }

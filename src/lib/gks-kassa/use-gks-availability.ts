@@ -23,6 +23,7 @@ export function useGksAvailability(
 
   useEffect(() => {
     let cancelled = false
+    setAvailability(null)
 
     const run = async () => {
       if (busyRef.current) return

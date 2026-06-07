@@ -1,5 +1,6 @@
 import {
   applyGksPingResult,
+  getGksInternetLocked,
   getGksInternetOnline,
   pingGksServerOnce,
   resetGksInternetLockForTest,
@@ -12,18 +13,19 @@ describe('gks-internet-lock', () => {
     global.fetch = jest.fn()
   })
 
-  it('starts locked until two consecutive successful pings', () => {
+  it('starts without overlay; fiscal offline until first successful ping', () => {
+    expect(getGksInternetLocked()).toBe(false)
     expect(getGksInternetOnline()).toBe(false)
     applyGksPingResult(true)
-    expect(getGksInternetOnline()).toBe(false)
-    applyGksPingResult(true)
+    expect(getGksInternetLocked()).toBe(false)
     expect(getGksInternetOnline()).toBe(true)
   })
 
-  it('one failed ping locks immediately', () => {
+  it('one failed ping locks overlay immediately', () => {
     resetGksInternetLockForTest({ online: true })
     expect(getGksInternetOnline()).toBe(true)
     applyGksPingResult(false)
+    expect(getGksInternetLocked()).toBe(true)
     expect(getGksInternetOnline()).toBe(false)
   })
 
