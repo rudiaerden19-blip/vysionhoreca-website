@@ -280,8 +280,15 @@ export async function gksCompleteSaleN(
     zone?: FloorPlanZone
     tableNumber?: string
     splitAmounts?: { cash: number; card: number }
+    /** Na signSale, vóór mark_success — koppel gks_commercial_orders.id aan journal. */
+    resolveCommercialOrderId?: (ctx: {
+      posFiscalTicketNo: number
+    }) => Promise<string | null | undefined>
   },
-): Promise<{ ok: true; posFiscalTicketNo: number; shortSignature?: string } | { ok: false; error: GksFiscalFlowError }> {
+): Promise<
+  | { ok: true; posFiscalTicketNo: number; shortSignature?: string; journalId: string }
+  | { ok: false; error: GksFiscalFlowError }
+> {
   const gate = await gksEnsureFdmReady(tenantSlug, staff, vatNo)
   if (gate) return { ok: false, error: gate }
   const ctx = partnerCtx(tenantSlug, staff!, vatNo)
@@ -340,10 +347,23 @@ export async function gksCompleteSaleN(
     return { ok: false, error: { code: 'SIGN_SALE_FAILED', message } }
   }
 
+  let commercialOrderId: string | undefined
+  if (opts?.resolveCommercialOrderId) {
+    try {
+      const linked = await opts.resolveCommercialOrderId({
+        posFiscalTicketNo: result.posFiscalTicketNo,
+      })
+      if (linked) commercialOrderId = linked
+    } catch (err: unknown) {
+      console.warn('[gks-kassa] resolveCommercialOrderId failed', err)
+    }
+  }
+
   const successRes = await gksFiscalJournalMarkSuccess(
     tenantSlug,
     journalId,
     signResultToResponsePayload(result),
+    commercialOrderId,
   )
   if (!successRes.ok || successRes.data.status !== 'SUCCESS') {
     await markJournalFailedSafe(
@@ -370,5 +390,6 @@ export async function gksCompleteSaleN(
     ok: true,
     posFiscalTicketNo: result.posFiscalTicketNo,
     shortSignature: result.shortSignature,
+    journalId,
   }
 }

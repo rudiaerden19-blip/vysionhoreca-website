@@ -84,6 +84,12 @@ import {
 } from '@/lib/session-broadcast'
 import { gksCompleteSaleN, gksPersistTableOrderP } from '@/lib/gks-kassa/gks-fiscal-flows'
 import { gksPersistPaidCommercialOrder } from '@/lib/gks-kassa/gks-persist-paid-commercial-order'
+import type { GksPersistPaidCommercialResult } from '@/lib/gks-kassa/gks-persist-paid-commercial-order'
+import {
+  fetchGksOpenTableOrdersForTenant,
+  gksDeleteOpenTableCommercialOrders,
+  gksPersistOpenTableCommercialOrder,
+} from '@/lib/gks-kassa/gks-open-table-commercial'
 import type { GksActiveStaff } from '@/lib/gks-kassa/gks-staff'
 import { GKS_MANDATORY_STAFF_SESSION } from '@/lib/gks-kassa/pilot-config'
 import { formatKassaNumpadHeaderDate } from '@/lib/format-kassa-header-date'
@@ -448,9 +454,8 @@ function isDineInOpenTableDraftRow(row: OpenTableOrderRow): boolean {
  * Anon-Supabase alleen als fallback (bv. demo zonder sessie).
  * `preparing` = keuken heeft "klaar" gezet op open mand; mand blijft zichtbaar tot afrekenen.
  */
-async function fetchOpenTableOrdersForTenant(_tenantSlug: string): Promise<OpenTableOrderRow[] | null> {
-  /** Stap 1: geen commerciële mirror — alleen localStorage + fiscaal journal (event P). */
-  return null
+async function fetchOpenTableOrdersForTenant(tenantSlug: string): Promise<OpenTableOrderRow[] | null> {
+  return fetchGksOpenTableOrdersForTenant(tenantSlug)
 }
 
 function buildKassaCustomerDisplayLines(cart: CartItem[]): KassaCustomerDisplayLine[] {
@@ -1726,7 +1731,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     if (err) {
       console.warn('[gks-kassa] signOrder P:', err)
       alert(err.message)
+      return
     }
+
+    let customerTableLabel = t('kassaReceipt.tableLabel').replace(/\{number\}/g, String(tblNr))
+    if (zone === FLOOR_PLAN_ZONE_TERRACE) {
+      customerTableLabel = `${customerTableLabel} (${t('kassaApp.floorZoneTerrace')})`
+    }
+    await gksPersistOpenTableCommercialOrder(tenant, zone, tblNr, items, customerTableLabel)
   }
 
   const persistOpenOrderRowToSupabase = (zone: FloorPlanZone, tblNr: string, items: CartItem[]) => {
@@ -2870,6 +2882,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     } catch {
       /* empty */
     }
+    void gksDeleteOpenTableCommercialOrders(tenant, zone, tblNr)
   }
 
   /** Kar leegmaken; bij tafel ook open mand + DB-order (na gele bon of bij fout). */
@@ -2946,29 +2959,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       : null
 
     const vatNo = tenantInfo?.btw_number?.trim() || 'BE0000000000'
-    const saleRes = await gksCompleteSaleN(
-      tenant,
-      activeKassaStaff,
-      vatNo,
-      billLines,
-      total,
-      method,
-      resolveLineVatAtCheckout,
-      {
-        zone: orderType === 'DINE_IN' && tableNumber ? dineInFloorZone : undefined,
-        tableNumber: orderType === 'DINE_IN' ? tableNumber || undefined : undefined,
-        splitAmounts: method === 'SPLIT' ? splitAmounts : undefined,
-      },
-    )
-    if (!saleRes.ok) {
-      alert(saleRes.error.message)
-      return
-    }
-    const allocatedOrderNumber = saleRes.posFiscalTicketNo
 
     const orderPayload: Record<string, unknown> = {
       kassa_client_uuid,
-      order_number: allocatedOrderNumber,
       customer_name: customerTableLabel ?? t('kassaApp.walkInCustomerName'),
       status: 'confirmed',
       payment_status: 'paid',
@@ -3003,14 +2996,43 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       orderPayload.payment_split_card = Math.round(splitAmounts.card * 100) / 100
     }
 
-    const persistRes = await gksPersistPaidCommercialOrder(tenant, orderPayload, kassa_client_uuid)
+    const persistRef: { current: GksPersistPaidCommercialResult | null } = { current: null }
+    const saleRes = await gksCompleteSaleN(
+      tenant,
+      activeKassaStaff,
+      vatNo,
+      billLines,
+      total,
+      method,
+      resolveLineVatAtCheckout,
+      {
+        zone: orderType === 'DINE_IN' && tableNumber ? dineInFloorZone : undefined,
+        tableNumber: orderType === 'DINE_IN' ? tableNumber || undefined : undefined,
+        splitAmounts: method === 'SPLIT' ? splitAmounts : undefined,
+        resolveCommercialOrderId: async ({ posFiscalTicketNo }) => {
+          persistRef.current = await gksPersistPaidCommercialOrder(
+            tenant,
+            { ...orderPayload, order_number: posFiscalTicketNo },
+            kassa_client_uuid,
+          )
+          return persistRef.current.commercialOrderId ?? null
+        },
+      },
+    )
+    if (!saleRes.ok) {
+      alert(saleRes.error.message)
+      return
+    }
+    const allocatedOrderNumber = saleRes.posFiscalTicketNo
+
     let queuedOffline = false
-    if (persistRes.queuedOffline) {
+    const persistRes = persistRef.current
+    if (persistRes?.queuedOffline) {
       queuedOffline = true
       alert(
         `${t('kassaApp.offlineModeActive')}\n\n${t('kassaApp.offlineOrderQueuedAlert').replace('{ref}', shortRef)}`,
       )
-    } else if (persistRes.hardError) {
+    } else if (persistRes?.hardError) {
       console.error('[gks-kassa] commercial order insert:', persistRes.hardError)
       alert(
         `${t('kassaApp.orderPersistFailedTitle')}\n\n${t('kassaApp.orderPersistFailedBody')}\n\n(Fiscale verkoop staat wel in het journal.)${persistRes.hardError ? `\n\n(${persistRes.hardError})` : ''}`,

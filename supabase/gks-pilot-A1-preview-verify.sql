@@ -23,16 +23,20 @@ SELECT id, name, insz, is_active
 FROM staff
 WHERE tenant_slug = 'gkstest' AND is_active = true;
 
--- 4) Laatste fiscale verkopen (N) — tijd in België
+-- 4) Laatste fiscale verkopen (N) — tijd in België + koppeling commercial
 SELECT
-  pos_fiscal_ticket_no,
-  status,
-  employee_id,
-  created_at AT TIME ZONE 'Europe/Brussels' AS tijd_belgie
-FROM fiscal_journal
-WHERE tenant_slug = 'gkstest'
-  AND event_label = 'N'
-ORDER BY created_at DESC
+  fj.pos_fiscal_ticket_no,
+  fj.status,
+  fj.commercial_order_id,
+  g.order_number,
+  g.total,
+  fj.created_at AT TIME ZONE 'Europe/Brussels' AS tijd_belgie
+FROM fiscal_journal fj
+LEFT JOIN gks_commercial_orders g
+  ON g.tenant_slug = fj.tenant_slug AND g.id = fj.commercial_order_id
+WHERE fj.tenant_slug = 'gkstest'
+  AND fj.event_label = 'N'
+ORDER BY fj.created_at DESC
 LIMIT 5;
 
 -- 5) Migraties in repo (handmatig vergelijken met Supabase migration history):

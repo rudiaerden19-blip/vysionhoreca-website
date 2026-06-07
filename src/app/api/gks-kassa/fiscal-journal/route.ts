@@ -73,6 +73,7 @@ const OpSchema = z.discriminatedUnion('op', [
     tenantSlug: z.string().min(1),
     journalId: z.string().uuid(),
     responsePayload: z.record(z.unknown()),
+    commercialOrderId: z.string().uuid().optional(),
   }),
   z.object({
     op: z.literal('mark_failed'),
@@ -152,13 +153,17 @@ export async function POST(req: NextRequest) {
     }
 
     if (body.op === 'mark_success') {
+      const patch: Record<string, unknown> = {
+        status: 'SUCCESS',
+        response_payload: body.responsePayload,
+        error_payload: null,
+      }
+      if (body.commercialOrderId) {
+        patch.commercial_order_id = body.commercialOrderId
+      }
       const { data, error } = await supabase
         .from('fiscal_journal')
-        .update({
-          status: 'SUCCESS',
-          response_payload: body.responsePayload,
-          error_payload: null,
-        })
+        .update(patch)
         .eq('tenant_slug', tenantSlug)
         .eq('id', body.journalId)
         .neq('status', 'SUCCESS')

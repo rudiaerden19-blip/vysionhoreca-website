@@ -72,12 +72,14 @@ export async function gksFiscalJournalMarkSuccess(
   tenantSlug: string,
   journalId: string,
   responsePayload: Record<string, unknown>,
+  commercialOrderId?: string | null,
 ): Promise<ApiResult<GksFiscalJournalStatusRow>> {
   return postFiscalJournal<GksFiscalJournalStatusRow>({
     op: 'mark_success',
     tenantSlug,
     journalId,
     responsePayload,
+    ...(commercialOrderId ? { commercialOrderId } : {}),
   })
 }
 
