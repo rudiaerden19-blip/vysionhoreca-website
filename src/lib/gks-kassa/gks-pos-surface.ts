@@ -2,15 +2,24 @@
  * GKS-pilot: POS-ref — zwart-grijs, lichte verticale overgang, subtiele schaduw (niet overdreven).
  */
 
-/** Eén vlak: tegels + sidebar + header (zelfde textuur, geen kleurverschil tussen kolommen). */
-export const GKS_MENU_PLATE_BG = '#2c2c2e'
+/** Fallback onder textuur — iets donkerder dan #2c2c2e, geen harde zwart. */
+export const GKS_MENU_PLATE_BG = '#262628'
 export const GKS_MENU_PLATE_TEXTURE_PATH = '/gks/menu-plate-texture.png'
-export const GKS_MENU_PLATE_BG_CLASS = [
-  'bg-[#2c2c2e]',
-  "bg-[url('/gks/menu-plate-texture.png')]",
-  'bg-repeat',
-  'bg-[length:190px_248px]',
+
+/** Eén doorlopend vlak (alleen shell); kinderen transparant. */
+export const GKS_MENU_PLATE_SHELL_BG_CLASS = [
+  'bg-[#262628]',
+  "bg-[linear-gradient(rgba(0,0,0,0.14),rgba(0,0,0,0.14)),url('/gks/menu-plate-texture.png')]",
+  'bg-cover',
+  'bg-center',
+  'bg-no-repeat',
 ].join(' ')
+
+/** Donkere zones zonder eigen herhaling — shell-textuur schijnt door. */
+export const GKS_MENU_PLATE_TRANSPARENT_CLASS = 'bg-transparent'
+
+/** @deprecated Gebruik SHELL op wrapper + TRANSPARENT op secties. */
+export const GKS_MENU_PLATE_BG_CLASS = GKS_MENU_PLATE_SHELL_BG_CLASS
 
 /** Subtiel afgerond — luxe POS, geen pill. */
 export const GKS_BTN_SHAPE = 'rounded-[6px]'
