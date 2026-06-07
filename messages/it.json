@@ -3221,6 +3221,12 @@
   },
   "gksAvailability": {
     "tooltipBlocked": "GKS richiede connessione Internet e FDM attiva.",
+    "overlay": {
+      "internet": "GKS non disponibile. Le azioni fiscali sono bloccate fino al ripristino della connessione Internet.",
+      "fdmUnreachable": "GKS non disponibile. Le azioni fiscali sono bloccate finché FDM/Checkbox non è di nuovo raggiungibile.",
+      "fdmError": "GKS non disponibile. Le azioni fiscali sono bloccate. Controllare lo stato FDM.",
+      "hint": "La cassa resta visibile; pagamento e scontrini fiscali sono temporaneamente disattivati."
+    },
     "banner": {
       "ONLINE_OK": "",
       "INTERNET_OFFLINE": "Connessione Internet assente. Le vendite GKS non possono essere completate.",

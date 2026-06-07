@@ -106,6 +106,55 @@ export function gksAvailabilityBlocksFiscal(status: GksAvailabilityStatus): bool
   return status !== 'ONLINE_OK'
 }
 
+/** Volscherm-popup alleen bij echte connectiviteit/FDM — niet bij ontbrekende medewerker. */
+export function gksAvailabilityShowsOverlay(status: GksAvailabilityStatus | null): boolean {
+  if (!status) return false
+  return status === 'INTERNET_OFFLINE' || status === 'FDM_UNREACHABLE' || status === 'FDM_ERROR'
+}
+
+/** Disable afrekenen/bon zonder medewerker te maskeren als «offline». */
+export function gksAvailabilityDisablesFiscalUi(availability: GksAvailability | null): boolean {
+  if (!availability) return false
+  if (availability.status === 'UNKNOWN' && availability.message === 'STAFF_REQUIRED') {
+    return false
+  }
+  return (
+    availability.status === 'INTERNET_OFFLINE' ||
+    availability.status === 'FDM_UNREACHABLE' ||
+    availability.status === 'FDM_ERROR'
+  )
+}
+
+export function gksAvailabilityOverlayMessage(
+  availability: GksAvailability,
+  t?: (key: string) => string,
+): string {
+  if (t) {
+    if (availability.status === 'INTERNET_OFFLINE') {
+      const msg = t('gksAvailability.overlay.internet')
+      if (msg !== 'gksAvailability.overlay.internet') return msg
+    }
+    if (availability.status === 'FDM_UNREACHABLE') {
+      const msg = t('gksAvailability.overlay.fdmUnreachable')
+      if (msg !== 'gksAvailability.overlay.fdmUnreachable') return msg
+    }
+    if (availability.status === 'FDM_ERROR') {
+      const msg = t('gksAvailability.overlay.fdmError')
+      if (msg !== 'gksAvailability.overlay.fdmError') return msg
+    }
+  }
+  if (availability.status === 'INTERNET_OFFLINE') {
+    return 'GKS niet beschikbaar. Fiscale acties zijn geblokkeerd totdat uw internet hersteld is.'
+  }
+  if (availability.status === 'FDM_UNREACHABLE') {
+    return 'GKS niet beschikbaar. Fiscale acties zijn geblokkeerd totdat FDM/Checkbox weer bereikbaar is.'
+  }
+  if (availability.status === 'FDM_ERROR') {
+    return 'GKS niet beschikbaar. Fiscale acties zijn geblokkeerd. Controleer de FDM-status.'
+  }
+  return gksAvailabilityBannerMessage(availability, t)
+}
+
 const STATUS_MESSAGES_NL: Record<GksAvailabilityStatus, string> = {
   ONLINE_OK: '',
   INTERNET_OFFLINE: 'Internetverbinding offline. GKS-verkoop kan niet afgerond worden.',

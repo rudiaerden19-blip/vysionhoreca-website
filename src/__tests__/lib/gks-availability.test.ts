@@ -8,6 +8,8 @@ import {
   checkFdmStatus,
   getGksAvailability,
   gksAvailabilityBlocksFiscal,
+  gksAvailabilityDisablesFiscalUi,
+  gksAvailabilityShowsOverlay,
 } from '@/lib/gks-kassa/gks-availability'
 
 const staff = { id: 's1', name: 'Test', insz: '00000000097' }
@@ -71,6 +73,26 @@ describe('gks-availability', () => {
     })
     const err = await assertGksCanFiscalize(ctx)
     expect(err).toBeNull()
+  })
+
+  it('does not show overlay for staff-required UNKNOWN', () => {
+    const availability = {
+      status: 'UNKNOWN' as const,
+      message: 'STAFF_REQUIRED',
+      checkedAt: Date.now(),
+    }
+    expect(gksAvailabilityShowsOverlay(availability.status)).toBe(false)
+    expect(gksAvailabilityDisablesFiscalUi(availability)).toBe(false)
+  })
+
+  it('shows overlay when internet offline', () => {
+    expect(gksAvailabilityShowsOverlay('INTERNET_OFFLINE')).toBe(true)
+    expect(
+      gksAvailabilityDisablesFiscalUi({
+        status: 'INTERNET_OFFLINE',
+        checkedAt: Date.now(),
+      }),
+    ).toBe(true)
   })
 
   it('production kassa route does not import gks-availability guard', () => {

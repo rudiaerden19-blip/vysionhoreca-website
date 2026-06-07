@@ -3695,6 +3695,12 @@
   },
   "gksAvailability": {
     "tooltipBlocked": "GKS vereist actieve internet- en FDM-verbinding.",
+    "overlay": {
+      "internet": "GKS niet beschikbaar. Fiscale acties zijn geblokkeerd totdat uw internet hersteld is.",
+      "fdmUnreachable": "GKS niet beschikbaar. Fiscale acties zijn geblokkeerd totdat FDM/Checkbox weer bereikbaar is.",
+      "fdmError": "GKS niet beschikbaar. Fiscale acties zijn geblokkeerd. Controleer de FDM-status.",
+      "hint": "De kassa blijft zichtbaar; afrekenen en fiscale bonnen zijn tijdelijk uitgeschakeld."
+    },
     "banner": {
       "ONLINE_OK": "",
       "INTERNET_OFFLINE": "Internetverbinding offline. GKS-verkoop kan niet afgerond worden.",

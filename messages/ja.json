@@ -3221,6 +3221,12 @@
   },
   "gksAvailability": {
     "tooltipBlocked": "GKSにはインターネットとFDMの接続が必要です。",
+    "overlay": {
+      "internet": "GKSは利用できません。インターネット接続が復旧するまで税務操作はブロックされます。",
+      "fdmUnreachable": "GKSは利用できません。FDM/Checkboxに再度接続できるまで税務操作はブロックされます。",
+      "fdmError": "GKSは利用できません。税務操作はブロックされています。FDMの状態を確認してください。",
+      "hint": "レジは表示されたままです。会計と税務レシートは一時的に無効です。"
+    },
     "banner": {
       "ONLINE_OK": "",
       "INTERNET_OFFLINE": "インターネット接続がオフラインです。GKS販売を完了できません。",

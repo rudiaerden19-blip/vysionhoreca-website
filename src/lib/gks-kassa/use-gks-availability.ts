@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react'
 import type { GksActiveStaff } from '@/lib/gks-kassa/gks-staff'
 import {
   getGksAvailability,
+  gksAvailabilityDisablesFiscalUi,
+  gksAvailabilityShowsOverlay,
   type GksAvailability,
   type GksAvailabilityStatus,
 } from '@/lib/gks-kassa/gks-availability'
@@ -52,9 +54,18 @@ export function useGksAvailability(
 export function useGksFiscalBlocked(
   availability: GksAvailability | null,
 ): { blocked: boolean; status: GksAvailabilityStatus | null } {
-  if (!availability) return { blocked: true, status: null }
   return {
-    blocked: availability.status !== 'ONLINE_OK',
-    status: availability.status,
+    blocked: gksAvailabilityDisablesFiscalUi(availability),
+    status: availability?.status ?? null,
+  }
+}
+
+export function useGksAvailabilityOverlay(
+  availability: GksAvailability | null,
+): { showOverlay: boolean; status: GksAvailabilityStatus | null } {
+  const status = availability?.status ?? null
+  return {
+    showOverlay: gksAvailabilityShowsOverlay(status),
+    status,
   }
 }

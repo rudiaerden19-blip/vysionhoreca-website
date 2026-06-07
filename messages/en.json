@@ -3695,6 +3695,12 @@
   },
   "gksAvailability": {
     "tooltipBlocked": "GKS requires an active internet and FDM connection.",
+    "overlay": {
+      "internet": "GKS unavailable. Fiscal actions are blocked until your internet connection is restored.",
+      "fdmUnreachable": "GKS unavailable. Fiscal actions are blocked until FDM/Checkbox is reachable again.",
+      "fdmError": "GKS unavailable. Fiscal actions are blocked. Check the FDM status.",
+      "hint": "The register stays visible; checkout and fiscal receipts are temporarily disabled."
+    },
     "banner": {
       "ONLINE_OK": "",
       "INTERNET_OFFLINE": "Internet connection offline. GKS sales cannot be completed.",

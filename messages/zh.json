@@ -3221,6 +3221,12 @@
   },
   "gksAvailability": {
     "tooltipBlocked": "GKS 需要有效的互联网和 FDM 连接。",
+    "overlay": {
+      "internet": "GKS 不可用。互联网恢复前税务操作已阻止。",
+      "fdmUnreachable": "GKS 不可用。FDM/Checkbox 恢复可达前税务操作已阻止。",
+      "fdmError": "GKS 不可用。税务操作已阻止。请检查 FDM 状态。",
+      "hint": "收银界面仍可见；结账和税务小票暂时禁用。"
+    },
     "banner": {
       "ONLINE_OK": "",
       "INTERNET_OFFLINE": "互联网连接离线。无法完成 GKS 销售。",

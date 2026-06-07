@@ -103,11 +103,12 @@ import { GKS_MANDATORY_STAFF_SESSION } from '@/lib/gks-kassa/pilot-config'
 import { formatKassaNumpadHeaderDate } from '@/lib/format-kassa-header-date'
 import { appendKassaCloseTipToAbsoluteLoginUrl } from '@/lib/shop-login-kassa-tip'
 import { syncZReportAfterOrderSafe } from '@/lib/gks-kassa/z-sync-safe'
+import { assertGksCanFiscalize, gksAvailabilityOverlayMessage } from '@/lib/gks-kassa/gks-availability'
 import {
-  assertGksCanFiscalize,
-  gksAvailabilityBannerMessage,
-} from '@/lib/gks-kassa/gks-availability'
-import { useGksAvailability, useGksFiscalBlocked } from '@/lib/gks-kassa/use-gks-availability'
+  useGksAvailability,
+  useGksAvailabilityOverlay,
+  useGksFiscalBlocked,
+} from '@/lib/gks-kassa/use-gks-availability'
 import { KassaAnalogClock } from '@/components/kassa/KassaAnalogClock'
 import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
 import type {
@@ -4032,6 +4033,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const gksVatNo = tenantInfo?.btw_number?.trim() || 'BE0000000000'
   const gksAvailability = useGksAvailability(tenant, activeKassaStaff, gksVatNo)
   const { blocked: gksFiscalBlocked } = useGksFiscalBlocked(gksAvailability)
+  const { showOverlay: gksShowAvailabilityOverlay } = useGksAvailabilityOverlay(gksAvailability)
   const gksFiscalBlockedTitle = t('gksAvailability.tooltipBlocked')
 
   return (
@@ -4048,16 +4050,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         }}
       />
       <div className={`flex min-h-0 flex-1 flex-col overflow-hidden ${ui.shellBg}`}>
-
-      {gksAvailability && gksFiscalBlocked ? (
-        <div
-          role="alert"
-          data-testid="gks-availability-banner"
-          className="shrink-0 border-b border-red-900/40 bg-red-600 px-3 py-2 text-center text-sm font-semibold text-white"
-        >
-          {gksAvailabilityBannerMessage(gksAvailability, t)}
-        </div>
-      ) : null}
 
       {/* ── Blauwe balk: één rij — kleine tenantnaam zodat snelkoppelingen naast elkaar passen zonder horizontale scrollbar ── */}
       <div className="relative z-30 flex min-h-[56px] w-full min-w-0 shrink-0 items-center gap-1.5 bg-black px-2 py-2 sm:gap-2 sm:px-3">
@@ -5511,6 +5503,31 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       ) : null}
 
       {/* ── ORANJE SCHERM: Nieuwe online bestelling (exact donor) ── */}
+      {gksShowAvailabilityOverlay && gksAvailability ? (
+        <div
+          className="fixed inset-0 z-[240] flex items-center justify-center bg-black/45 p-6 backdrop-blur-md"
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="gks-availability-overlay-title"
+          data-testid="gks-availability-overlay"
+        >
+          <div className="max-w-lg rounded-2xl border border-red-200/80 bg-white px-8 py-10 text-center shadow-2xl">
+            <div className="mb-4 text-5xl" aria-hidden>
+              📡
+            </div>
+            <h2
+              id="gks-availability-overlay-title"
+              className="text-xl font-bold leading-snug text-red-700 sm:text-2xl"
+            >
+              {gksAvailabilityOverlayMessage(gksAvailability, t)}
+            </h2>
+            <p className="mt-4 text-sm text-gray-600">
+              {t('gksAvailability.overlay.hint')}
+            </p>
+          </div>
+        </div>
+      ) : null}
+
       {newOrderAlert && !demoViewOnly && (
         <div
           className="fixed inset-0 z-[200] bg-orange-500 flex flex-col items-center justify-center animate-pulse cursor-pointer"
