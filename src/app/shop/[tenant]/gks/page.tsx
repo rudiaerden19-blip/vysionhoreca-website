@@ -561,7 +561,7 @@ const KassaReservationsView = dynamic(() => import('@/components/KassaReservatio
 
 /** Categorie- en producttegel: witte kaart; foto alleen bovenin, titel in vaste strook eronder (niet over de foto). */
 const KASSA_MENU_TILE_BUTTON_CLASS_BASE =
-  `touch-manipulation select-none group relative flex min-h-0 w-full min-w-0 flex-col overflow-hidden ${GKS_BTN_SHAPE} border border-[#1a1a1a] bg-[#2a2a2a] text-left !font-medium ${GKS_BTN_PRESS} ${GKS_TILE_LIFT_SHADOW}`
+  `touch-manipulation select-none group relative flex min-h-0 w-full min-w-0 flex-col overflow-hidden ${GKS_BTN_SHAPE} border border-[#1a1a1a] bg-transparent text-left !font-medium ${GKS_BTN_PRESS} ${GKS_TILE_LIFT_SHADOW}`
 
 /** Standaard: rastercel wordt **items-stretch** ⇒ knop moet **`h-full`**. */
 const KASSA_MENU_TILE_BUTTON_CLASS = `${KASSA_MENU_TILE_BUTTON_CLASS_BASE} h-full`
@@ -4153,7 +4153,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250608-btn-shadow-black-only"
+      data-gks-ui="20250608-tile-label-same-plate-grain"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >

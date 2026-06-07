@@ -448,20 +448,13 @@ html[data-vysion-web-kb-open] {
 }
 
 /* GKS-pilot: subtiele filmkorrel op effen menu-plate (#333336), geen tegel-foto */
+/* Shell + tegel-titelstrook: één korrel (fixed = zelfde fase als achtergrond). */
 .gks-menu-plate-grain {
   background-color: #333336;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.15' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.85'/%3E%3C/svg%3E");
   background-size: 120px 120px;
   background-repeat: repeat;
-  background-blend-mode: overlay;
-}
-
-/* Categorie-/producttegel: titelstrook — zelfde grijs + korrel (opacity 0.82) */
-.gks-menu-tile-label-grain {
-  background-color: #333336;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.15' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.82'/%3E%3C/svg%3E");
-  background-size: 120px 120px;
-  background-repeat: repeat;
+  background-attachment: fixed;
   background-blend-mode: overlay;
 }
 
