@@ -3215,6 +3215,14 @@
     "goToKassaSales": "Abrir TPV para ventas",
     "refreshList": "Actualizar lista"
   },
+  "gksReceipt": {
+    "fiscalTicketHeader": "TICKET FISCAL IVA",
+    "proFormaBanner": "PRO FORMA — CUENTA PROVISIONAL",
+    "notValidFiscalTicket": "ESTO NO ES UN TICKET FISCAL IVA VÁLIDO",
+    "shortSignature": "Firma:",
+    "eventCounter": "Contador:",
+    "verifyAt": "Verificar en:"
+  },
   "kassaReceipt": {
     "helpedBy": "Le ha atendido {name}",
     "print": "Imprimir ticket",

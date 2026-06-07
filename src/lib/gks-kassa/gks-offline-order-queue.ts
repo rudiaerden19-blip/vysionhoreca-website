@@ -50,10 +50,24 @@ export async function flushOfflineOrdersToSupabase(tenantSlug: string): Promise<
     const remaining: object[] = []
     for (const order of freshQueue) {
       const row = order as Record<string, unknown>
-      const insRes = await gksCommercialOrders.insert<{ id?: string }>(tenantSlug, row, 'id')
-      if (insRes.ok) continue
-      if (isDuplicateGksKassaClientViolation(insRes.error)) continue
-      remaining.push(order)
+      let ok = false
+      for (let attempt = 0; attempt < 3; attempt++) {
+        const insRes = await gksCommercialOrders.insert<{ id?: string }>(tenantSlug, row, 'id')
+        if (insRes.ok) {
+          ok = true
+          break
+        }
+        if (isDuplicateGksKassaClientViolation(insRes.error)) {
+          ok = true
+          break
+        }
+        const retryable =
+          attempt < 2 &&
+          (insRes.status === 0 || insRes.status >= 500 || /network|fetch|timeout/i.test(insRes.error || ''))
+        if (!retryable) break
+        await new Promise((r) => setTimeout(r, 400 * (attempt + 1)))
+      }
+      if (!ok) remaining.push(order)
     }
     try {
       await offlineDbSetOrderQueue(tenantSlug, remaining)

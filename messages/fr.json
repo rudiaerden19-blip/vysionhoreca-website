@@ -2715,6 +2715,14 @@
     "goToKassaSales": "Ouvrir la caisse pour la vente",
     "refreshList": "Actualiser la liste"
   },
+  "gksReceipt": {
+    "fiscalTicketHeader": "TICKET TVA",
+    "proFormaBanner": "PRO FORMA — NOTE PROVISOIRE",
+    "notValidFiscalTicket": "CECI N'EST PAS UN TICKET TVA VALIDE",
+    "shortSignature": "Signature :",
+    "eventCounter": "Compteur :",
+    "verifyAt": "Vérifier sur :"
+  },
   "kassaReceipt": {
     "helpedBy": "Vous avez été servi par {name}",
     "print": "Imprimer le ticket",

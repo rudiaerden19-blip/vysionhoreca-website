@@ -3215,6 +3215,14 @@
     "goToKassaSales": "売上のためレジを開く",
     "refreshList": "一覧を更新"
   },
+  "gksReceipt": {
+    "fiscalTicketHeader": "消費税レシート",
+    "proFormaBanner": "PRO FORMA — 仮請求",
+    "notValidFiscalTicket": "これは有効な消費税レシートではありません",
+    "shortSignature": "署名:",
+    "eventCounter": "カウンター:",
+    "verifyAt": "確認:"
+  },
   "kassaReceipt": {
     "helpedBy": "担当：{name}",
     "print": "レシートを印刷",

@@ -3215,6 +3215,14 @@
     "goToKassaSales": "Apri cassa per le vendite",
     "refreshList": "Aggiorna elenco"
   },
+  "gksReceipt": {
+    "fiscalTicketHeader": "SCONTRINO FISCALE IVA",
+    "proFormaBanner": "PRO FORMA — CONTO PROVVISORIO",
+    "notValidFiscalTicket": "QUESTO NON È UNO SCONTRINO FISCALE IVA VALIDO",
+    "shortSignature": "Firma:",
+    "eventCounter": "Contatore:",
+    "verifyAt": "Verifica su:"
+  },
   "kassaReceipt": {
     "helpedBy": "Sei stato servito da {name}",
     "print": "Stampa scontrino",

@@ -3215,6 +3215,14 @@
     "goToKassaSales": "فتح الصندوق للبيع",
     "refreshList": "تحديث القائمة"
   },
+  "gksReceipt": {
+    "fiscalTicketHeader": "تذكرة ضريبة القيمة المضافة",
+    "proFormaBanner": "مبدئي — فاتورة مؤقتة",
+    "notValidFiscalTicket": "هذه ليست تذكرة ضريبة قيمة مضافة صالحة",
+    "shortSignature": "التوقيع:",
+    "eventCounter": "العداد:",
+    "verifyAt": "تحقق على:"
+  },
   "kassaReceipt": {
     "helpedBy": "خدمك {name}",
     "print": "طباعة الإيصال",

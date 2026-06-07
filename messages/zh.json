@@ -3215,6 +3215,14 @@
     "goToKassaSales": "打开收银端进行销售",
     "refreshList": "刷新列表"
   },
+  "gksReceipt": {
+    "fiscalTicketHeader": "增值税 fiscal 票据",
+    "proFormaBanner": "形式发票 — 暂计账单",
+    "notValidFiscalTicket": "这不是有效的增值税 fiscal 票据",
+    "shortSignature": "签名：",
+    "eventCounter": "计数：",
+    "verifyAt": "验证："
+  },
   "kassaReceipt": {
     "helpedBy": "为您服务：{name}",
     "print": "打印小票",

@@ -54,4 +54,6 @@ export interface KassaLastOrderReceipt {
   floorPlanZone?: FloorPlanZone
   createdAt: Date
   helpedByStaffName?: string | null
+  /** GKS-pilot: bon-BTW en QR na signSale (N); niet op productie-kassa. */
+  gksFiscal?: import('@/lib/gks-kassa/gks-fiscal-receipt').GksFiscalReceiptSnapshot
 }

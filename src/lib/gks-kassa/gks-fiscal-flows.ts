@@ -25,6 +25,10 @@ import {
 import { getBookingDateBrussels, getOrCreateBookingPeriodId } from '@/lib/gks-kassa/booking-period'
 import type { GksPosEnvelope, GksSignResult } from '@/lib/gks-kassa/fdm-types'
 import {
+  gksFiscalSnapshotFromSignResult,
+  type GksFiscalReceiptSnapshot,
+} from '@/lib/gks-kassa/gks-fiscal-receipt'
+import {
   gksFiscalJournalCreatePending,
   gksFiscalJournalMarkFailed,
   gksFiscalJournalMarkSuccess,
@@ -342,7 +346,13 @@ export async function gksCompleteSaleN(
     }) => Promise<string | null | undefined>
   },
 ): Promise<
-  | { ok: true; posFiscalTicketNo: number; shortSignature?: string; journalId: string }
+  | {
+      ok: true
+      posFiscalTicketNo: number
+      shortSignature?: string
+      journalId: string
+      fiscalSnapshot: GksFiscalReceiptSnapshot
+    }
   | { ok: false; error: GksFiscalFlowError }
 > {
   const gate = await gksEnsureFdmReady(tenantSlug, staff, vatNo)
@@ -447,5 +457,6 @@ export async function gksCompleteSaleN(
     posFiscalTicketNo: result.posFiscalTicketNo,
     shortSignature: result.shortSignature,
     journalId,
+    fiscalSnapshot: gksFiscalSnapshotFromSignResult(result),
   }
 }

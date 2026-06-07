@@ -83,6 +83,12 @@ import {
   setTerminalLogout,
 } from '@/lib/session-broadcast'
 import { gksCompleteSaleN, gksPersistTableOrderP } from '@/lib/gks-kassa/gks-fiscal-flows'
+import {
+  appendGksFiscalPaidReceiptLines,
+  appendGksProFormaDraftLines,
+  gksVatSplitFromFdmVatCalc,
+  prependGksFiscalTicketHeader,
+} from '@/lib/gks-kassa/gks-fiscal-receipt'
 import { gksPersistPaidCommercialOrder } from '@/lib/gks-kassa/gks-persist-paid-commercial-order'
 import type { GksPersistPaidCommercialResult } from '@/lib/gks-kassa/gks-persist-paid-commercial-order'
 import {
@@ -3129,18 +3135,24 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           : undefined,
     })
 
+    const fdmVat = gksVatSplitFromFdmVatCalc(saleRes.fiscalSnapshot.vatCalc, total)
+    const receiptVatSplit = fdmVat?.byRate ?? vatSplit.byRate.map((l) => ({
+      rate: l.rate,
+      baseExcl: l.baseExcl,
+      tax: l.tax,
+    }))
+    const receiptSubtotalExcl =
+      fdmVat?.subtotalExcl ?? Math.round(subtotal * 100) / 100
+    const receiptTotalTax = fdmVat?.totalTax ?? Math.round(tax * 100) / 100
+
     setLastOrder({
       orderNumber: allocatedOrderNumber,
       checkoutReference: queuedOffline ? shortRef : undefined,
       items: sortKassaCartLinesByMenuCategory([...billLines], categories),
       total,
-      vatSplit: vatSplit.byRate.map((l) => ({
-        rate: l.rate,
-        baseExcl: l.baseExcl,
-        tax: l.tax,
-      })),
-      subtotalExclVat: Math.round(subtotal * 100) / 100,
-      totalTax: Math.round(tax * 100) / 100,
+      vatSplit: receiptVatSplit,
+      subtotalExclVat: receiptSubtotalExcl,
+      totalTax: receiptTotalTax,
       paymentMethod: method,
       splitCash: method === 'SPLIT' ? splitAmounts?.cash : undefined,
       splitCard: method === 'SPLIT' ? splitAmounts?.card : undefined,
@@ -3149,6 +3161,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       floorPlanZone: receiptTable ? dineInFloorZone : undefined,
       createdAt,
       helpedByStaffName: activeKassaStaff?.name?.trim() || null,
+      gksFiscal: saleRes.fiscalSnapshot,
     })
 
     if (tableNumber && orderType === 'DINE_IN') clearTableAfterPayment(dineInFloorZone, tableNumber)
@@ -3230,6 +3243,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
 
     try {
+    const gksFiscalLabels = {
+      fiscalTicketHeader: t('gksReceipt.fiscalTicketHeader'),
+      proFormaBanner: t('gksReceipt.proFormaBanner'),
+      notValidFiscalTicket: t('gksReceipt.notValidFiscalTicket'),
+      shortSignature: t('gksReceipt.shortSignature'),
+      eventCounter: t('gksReceipt.eventCounter'),
+      verifyAt: t('gksReceipt.verifyAt'),
+    }
     const fbVatRate = normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 6, 21)
     const splitOk =
       Array.isArray(order.vatSplit) &&
@@ -3302,6 +3323,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     if (tenantInfo?.phone) bonLines.push(`${t('kassaReceipt.telPrefix')} ${tenantInfo.phone}`)
     bonLines.push('--------------------------------')
+    if (!isDraft && order.gksFiscal) {
+      prependGksFiscalTicketHeader(bonLines, gksFiscalLabels.fiscalTicketHeader)
+    }
     if (isDraft) {
       if (barKitchenDelta) {
         bonLines.push(t('kassaReceipt.barToogBanner'))
@@ -3309,6 +3333,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       } else {
         bonLines.push(t('kassaReceipt.draftBanner'))
       }
+      appendGksProFormaDraftLines(bonLines, gksFiscalLabels)
       bonLines.push('--------------------------------')
     }
     bonLines.push(
@@ -3319,32 +3344,46 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     bonLines.push(`${t('kassaReceipt.receiptNo')}${receiptRefDisplay}  ${dateStr}`)
     bonLines.push('--------------------------------')
     const receiptLines = sortKassaCartLinesByMenuCategory(order.items, categories)
+    const hideMoneyOnBon = isDraft && receiptMode === 'keuken'
     for (const i of receiptLines) {
       const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
       const lineTotal = (i.product.price + choicesTotal) * i.quantity
-      bonLines.push(`${i.quantity}x ${i.product.name}  EUR ${lineTotal.toFixed(2)}`)
+      bonLines.push(
+        hideMoneyOnBon
+          ? `${i.quantity}x ${i.product.name}`
+          : `${i.quantity}x ${i.product.name}  EUR ${lineTotal.toFixed(2)}`,
+      )
       for (const c of i.choices || []) {
-        bonLines.push(`  + ${c.choiceName}${c.price > 0 ? `  EUR ${c.price.toFixed(2)}` : ''}`)
+        bonLines.push(
+          hideMoneyOnBon
+            ? `  + ${c.choiceName}`
+            : `  + ${c.choiceName}${c.price > 0 ? `  EUR ${c.price.toFixed(2)}` : ''}`,
+        )
       }
     }
     bonLines.push('--------------------------------')
-    bonLines.push(`${t('kassaReceipt.subtotal')}  EUR ${subtotal.toFixed(2)}`)
-    if (splitOk && order.vatSplit!.length >= 1) {
-      for (const row of order.vatSplit!) {
-        bonLines.push(
-          `${t('kassaReceipt.vat').replace('{rate}', String(row.rate))}  EUR ${row.tax.toFixed(2)}`,
-        )
+    if (!hideMoneyOnBon) {
+      bonLines.push(`${t('kassaReceipt.subtotal')}  EUR ${subtotal.toFixed(2)}`)
+      if (splitOk && order.vatSplit!.length >= 1) {
+        for (const row of order.vatSplit!) {
+          bonLines.push(
+            `${t('kassaReceipt.vat').replace('{rate}', String(row.rate))}  EUR ${row.tax.toFixed(2)}`,
+          )
+        }
+      } else {
+        bonLines.push(`${t('kassaReceipt.vat').replace('{rate}', String(fbVatRate))}  EUR ${tax.toFixed(2)}`)
       }
-    } else {
-      bonLines.push(`${t('kassaReceipt.vat').replace('{rate}', String(fbVatRate))}  EUR ${tax.toFixed(2)}`)
+      bonLines.push(`${t('kassaReceipt.total')}  EUR ${order.total.toFixed(2)}`)
+      bonLines.push(`${t('kassaReceipt.paidWith')} ${payLabel}`)
     }
-    bonLines.push(`${t('kassaReceipt.total')}  EUR ${order.total.toFixed(2)}`)
-    bonLines.push(`${t('kassaReceipt.paidWith')} ${payLabel}`)
     if (order.helpedByStaffName) {
       bonLines.push(t('kassaReceipt.helpedBy').replace('{name}', order.helpedByStaffName))
     }
     if (tenantInfo?.btw_number) {
       bonLines.push(t('kassaReceipt.businessVatLabel').replace('{vatNumber}', tenantInfo.btw_number))
+    }
+    if (!isDraft && order.gksFiscal) {
+      appendGksFiscalPaidReceiptLines(bonLines, order.gksFiscal, gksFiscalLabels)
     }
     bonLines.push(
       isDraft

@@ -2715,6 +2715,14 @@
     "goToKassaSales": "Zur Kasse für Verkauf",
     "refreshList": "Liste aktualisieren"
   },
+  "gksReceipt": {
+    "fiscalTicketHeader": "MWST-KASSENBON",
+    "proFormaBanner": "PRO FORMA — VORLÄUFIGE RECHNUNG",
+    "notValidFiscalTicket": "DIES IST KEIN GÜLTIGER MWST-KASSENBON",
+    "shortSignature": "Signatur:",
+    "eventCounter": "Zähler:",
+    "verifyAt": "Prüfen unter:"
+  },
   "kassaReceipt": {
     "helpedBy": "Sie wurden von {name} bedient",
     "print": "Beleg drucken",

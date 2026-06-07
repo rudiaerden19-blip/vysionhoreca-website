@@ -22,6 +22,10 @@ import {
 import { sendToVysionPrintAgent } from '@/lib/vysion-print-agent-client'
 import { fetchKitchenQueueOrders } from '@/lib/kitchen-queue-orders'
 import {
+  isGksCommercialKitchenOrder,
+  updateGksCommercialKitchenStatus,
+} from '@/lib/gks-kassa/gks-kitchen-queue'
+import {
   orderItemDisplayName,
   orderItemDisplayOptionLines,
   orderItemLineTotalEur,
@@ -211,10 +215,20 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
 
   async function handleAllReady() {
     await Promise.all(
-      orders.map((o) => {
+      orders.map(async (o) => {
         const st = (o.status || '').toLowerCase()
         const isOpenTab = st === 'open' && (o.order_type || '').toString().toUpperCase() === 'DINE_IN'
-        return updateOrderStatus(params.tenant, o.id, isOpenTab ? 'preparing' : 'ready')
+        const next = isOpenTab ? 'preparing' : 'ready'
+        if (isGksCommercialKitchenOrder(o as Order & { _gks_commercial?: boolean }) && supabase) {
+          await updateGksCommercialKitchenStatus(
+            supabase,
+            params.tenant,
+            o.id,
+            next as 'preparing' | 'ready',
+          )
+          return
+        }
+        await updateOrderStatus(params.tenant, o.id, next)
       }),
     )
     setOrders([])
@@ -224,7 +238,13 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     const st = (order.status || '').toLowerCase()
     const isOpenTab = st === 'open' && (order.order_type || '').toString().toUpperCase() === 'DINE_IN'
 
-    if (isOpenTab) {
+    if (isGksCommercialKitchenOrder(order as Order & { _gks_commercial?: boolean }) && supabase) {
+      if (isOpenTab) {
+        await updateGksCommercialKitchenStatus(supabase, params.tenant, order.id, 'preparing')
+      } else {
+        await updateGksCommercialKitchenStatus(supabase, params.tenant, order.id, 'ready')
+      }
+    } else if (isOpenTab) {
       await updateOrderStatus(params.tenant, order.id, 'preparing')
     } else {
       await updateOrderStatus(params.tenant, order.id, 'ready')

@@ -3689,6 +3689,14 @@
     "goToKassaSales": "Naar kassa voor verkoop",
     "refreshList": "Lijst vernieuwen"
   },
+  "gksReceipt": {
+    "fiscalTicketHeader": "BTW-KASTICKET",
+    "proFormaBanner": "PRO FORMA — VOORLOPIGE REKENING",
+    "notValidFiscalTicket": "DIT IS GEEN GELDIG BTW-KASTICKET",
+    "shortSignature": "Handtekening:",
+    "eventCounter": "Teller:",
+    "verifyAt": "Verifieer op:"
+  },
   "kassaReceipt": {
     "helpedBy": "U bent geholpen door medewerker {name}",
     "print": "Bon afdrukken",

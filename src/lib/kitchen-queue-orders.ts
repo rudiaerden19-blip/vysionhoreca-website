@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { isKassaPosOrder } from '@/lib/admin-api-order-helpers'
+import { fetchGksKitchenQueueRows } from '@/lib/gks-kassa/gks-kitchen-queue'
 
 export function parseOrdersItemsJson<T extends Record<string, unknown>>(rows: T[]): T[] {
   return rows.map((order) => ({
@@ -76,11 +77,18 @@ export async function fetchKitchenQueueOrders(
     const id = row.id as string
     if (id && !byId.has(id)) byId.set(id, row as Record<string, unknown>)
   }
-  const parsed = parseOrdersItemsJson([...byId.values()])
-  return parsed
+  const gksRows = await fetchGksKitchenQueueRows(client, tenantSlug)
+  const parsed = parseOrdersItemsJson([...byId.values(), ...gksRows])
+  const byIdMerged = new Map<string, Record<string, unknown>>()
+  for (const row of parsed) {
+    const id = row.id as string
+    if (id && !byIdMerged.has(id)) byIdMerged.set(id, row)
+  }
+  return [...byIdMerged.values()]
     .filter(isKitchenQueueOrder)
     .sort(
       (a, b) =>
-        new Date(String(a.created_at ?? 0)).getTime() - new Date(String(b.created_at ?? 0)).getTime(),
+        new Date(String(a.updated_at ?? a.created_at ?? 0)).getTime() -
+        new Date(String(b.updated_at ?? b.created_at ?? 0)).getTime(),
     )
 }

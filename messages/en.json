@@ -3689,6 +3689,14 @@
     "goToKassaSales": "Open POS for sales",
     "refreshList": "Refresh list"
   },
+  "gksReceipt": {
+    "fiscalTicketHeader": "VAT FISCAL TICKET",
+    "proFormaBanner": "PRO FORMA — PROVISIONAL BILL",
+    "notValidFiscalTicket": "THIS IS NOT A VALID VAT FISCAL TICKET",
+    "shortSignature": "Signature:",
+    "eventCounter": "Counter:",
+    "verifyAt": "Verify at:"
+  },
   "kassaReceipt": {
     "helpedBy": "You were helped by {name}",
     "print": "Print receipt",
