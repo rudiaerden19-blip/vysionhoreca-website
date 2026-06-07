@@ -23,6 +23,7 @@ import { LocaleFlagEmoji, LocaleFlagWithCode } from '@/components/LocaleFlagEmoj
 import { LoginKassaCloseHintModal } from '@/components/LoginKassaCloseHintModal'
 import { LOGIN_QUERY_KASSA_CLOSE_TIP } from '@/lib/shop-login-kassa-tip'
 import { gksPilotTenantSlugs } from '@/lib/gks-kassa/pilot-config'
+import { pathnameLooksLikeGksKassaPos } from '@/lib/tenant-modules'
 
 /** Zelfde hosts als middleware `exactMainDomains` (+ dev): sessie blijft in localStorage van dit domein. */
 function stayOnMainDomainForShopSession(hostname: string): boolean {
@@ -56,14 +57,23 @@ export default function LoginPage() {
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return
     const origin = window.location.origin
+    const params = new URLSearchParams(window.location.search)
+    const nextRaw = params.get('next')
+    let nextForGksCheck = (nextRaw || '').trim()
+    try {
+      if (nextRaw) nextForGksCheck = decodeURIComponent(nextRaw.trim())
+    } catch {
+      nextForGksCheck = nextRaw || ''
+    }
+    const loginForGksKassa =
+      nextForGksCheck.startsWith('/') &&
+      pathnameLooksLikeGksKassaPos(nextForGksCheck.split('?')[0])
+
     const term = readTerminalLogout()
-    if (term?.kind === 'superadmin') {
+    if (term?.kind === 'superadmin' && !loginForGksKassa) {
       window.location.replace(`${origin}/superadmin/login`)
       return
     }
-
-    const params = new URLSearchParams(window.location.search)
-    const nextRaw = params.get('next')
 
     mirrorSuperadminSessionFromCookieToLocalStorage()
     if (isSuperAdminLoggedIn()) {

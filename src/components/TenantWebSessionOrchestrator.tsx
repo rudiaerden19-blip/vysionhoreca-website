@@ -21,6 +21,10 @@ import {
   type OwnerLogoutMessage,
 } from '@/lib/session-broadcast'
 import { appendKassaCloseTipToAbsoluteLoginUrl } from '@/lib/shop-login-kassa-tip'
+import {
+  pathnameLooksLikeGksKassaPos,
+  tenantSlugFromGksKassaPathname,
+} from '@/lib/tenant-modules'
 
 /**
  * Uitloggen op één plaats: andere tabbladen mee opruimen (BroadcastChannel) + lokale „terminal logout”-
@@ -35,42 +39,45 @@ export function TenantWebSessionOrchestrator({ tenantSlug }: { tenantSlug: strin
     if (!stamp) return
 
     if (stamp.kind === 'superadmin') {
+      const p = pathname || ''
+      if (pathnameLooksLikeGksKassaPos(p)) {
+        if (p === '/login' || p.endsWith('/login')) return
+        const origin = window.location.origin
+        const q = window.location.search || ''
+        const slug = tenantSlugFromGksKassaPathname(p) || tenantSlug
+        if (slug) {
+          setTerminalLogout({ kind: 'staff', tenantSlug: slug })
+        }
+        window.location.replace(
+          `${origin}/login?next=${encodeURIComponent(`${p}${q}`)}`,
+        )
+        return
+      }
       if (isSuperAdminLoggedIn()) {
         clearTerminalLogout()
         return
       }
-      const p = pathname || ''
       if (p.startsWith('/superadmin/login')) return
       window.location.replace(`${window.location.origin}/superadmin/login`)
       return
     }
 
-    if (stamp.tenantSlug !== tenantSlug) return
+    if (stamp.kind === 'staff' && stamp.tenantSlug !== tenantSlug) return
 
     const p = pathname || ''
-    const onGksPos =
-      p.includes('/gks') || p.endsWith('/gks') || p.includes('/admin/gks-kassa')
+    const onKassaSurface =
+      pathnameLooksLikeGksKassaPos(p) || /\/admin\/kassa(\/|$)/.test(p)
 
-    if (onGksPos) {
+    if (stamp.kind === 'staff' && stamp.tenantSlug === tenantSlug) {
+      if (!onKassaSurface) return
       if (p === '/login' || p.endsWith('/login')) return
       const origin = window.location.origin
       const q = window.location.search || ''
-      const rawNext = `${p}${q}`
-      window.location.replace(`${origin}/login?next=${encodeURIComponent(rawNext)}`)
+      window.location.replace(
+        `${origin}/login?next=${encodeURIComponent(`${p}${q}`)}`,
+      )
       return
     }
-
-    if (isSuperAdminLoggedIn() || isOwnerSessionFreshForTenant(tenantSlug)) {
-      clearTerminalLogout()
-      return
-    }
-
-    /* staff zaak-session */
-    if (p === '/login') return
-    const origin = window.location.origin
-    const q = window.location.search || ''
-    const rawNext = `${p}${q}`
-    window.location.replace(`${origin}/login?next=${encodeURIComponent(rawNext)}`)
   }, [pathname, tenantSlug])
 
   useEffect(() => {

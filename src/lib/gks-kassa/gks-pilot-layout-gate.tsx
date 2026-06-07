@@ -27,7 +27,6 @@ export function clearGksPilotAuthSession(tenantSlug: string): void {
 function terminalLogoutBlocksPilotCache(tenantSlug: string): boolean {
   const term = readTerminalLogout()
   if (!term) return false
-  if (term.kind === 'superadmin') return true
   if (term.kind === 'staff' && term.tenantSlug === tenantSlug) return true
   return false
 }

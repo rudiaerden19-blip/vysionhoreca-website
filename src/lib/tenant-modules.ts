@@ -286,6 +286,20 @@ export function isShopAdminKassaPosPath(pathnameNormalized: string, tenantSlug: 
   return p === base
 }
 
+/** GKS-kassa-URL (tenant-host `/gks` of pad `/shop/…/gks`) — geen platform-/superadmin-login. */
+export function pathnameLooksLikeGksKassaPos(pathname: string): boolean {
+  const p = (pathname || '').split('?')[0].replace(/\/+$/, '') || '/'
+  if (p === '/gks' || p.endsWith('/gks')) return true
+  if (p.includes('/admin/gks-kassa')) return true
+  return false
+}
+
+export function tenantSlugFromGksKassaPathname(pathname: string): string | null {
+  const p = (pathname || '').split('?')[0]
+  const m = p.match(/^\/shop\/([^/]+)\/gks/)
+  return m?.[1] ?? null
+}
+
 /** GKS-pilot POS `/shop/:slug/gks` (legacy `/admin/gks-kassa` redirect in middleware). */
 export function isShopGksPilotPosPath(pathnameNormalized: string, tenantSlug: string): boolean {
   const p = pathnameNormalized.split('?')[0].replace(/\/+$/, '')
