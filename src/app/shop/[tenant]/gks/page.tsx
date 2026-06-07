@@ -83,6 +83,7 @@ import {
   setTerminalLogout,
 } from '@/lib/session-broadcast'
 import { gksCompleteSaleN, gksPersistTableOrderP } from '@/lib/gks-kassa/gks-fiscal-flows'
+import { gksPersistPaidCommercialOrder } from '@/lib/gks-kassa/gks-persist-paid-commercial-order'
 import type { GksActiveStaff } from '@/lib/gks-kassa/gks-staff'
 import { GKS_MANDATORY_STAFF_SESSION } from '@/lib/gks-kassa/pilot-config'
 import { formatKassaNumpadHeaderDate } from '@/lib/format-kassa-header-date'
@@ -2964,7 +2965,58 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       return
     }
     const allocatedOrderNumber = saleRes.posFiscalTicketNo
-    const queuedOffline = false
+
+    const orderPayload: Record<string, unknown> = {
+      kassa_client_uuid,
+      order_number: allocatedOrderNumber,
+      customer_name: customerTableLabel ?? t('kassaApp.walkInCustomerName'),
+      status: 'confirmed',
+      payment_status: 'paid',
+      payment_method: method === 'SPLIT' ? 'SPLIT' : method,
+      order_type: orderType,
+      customer_notes: customerTableLabel,
+      subtotal: Math.round(subtotal * 100) / 100,
+      tax: Math.round(tax * 100) / 100,
+      total,
+      kassa_staff_id: activeKassaStaff?.id ?? null,
+      items: billLines.map((i) => ({
+        product_id: i.product.id,
+        name: i.product.name,
+        price: i.product.price,
+        quantity: i.quantity,
+        btw_percentage: resolveLineVatAtCheckout(i),
+        options: (i.choices || []).map((c: SelectedChoice) => ({
+          name: c.choiceName || '',
+          price: c.price || 0,
+        })),
+      })),
+      created_at: createdAt.toISOString(),
+    }
+    if (orderType === 'DINE_IN') {
+      orderPayload.floor_plan_zone = tableNumber ? dineInFloorZone : FLOOR_PLAN_ZONE_INSIDE
+    }
+    if (orderType === 'DINE_IN' && tableNumber) {
+      orderPayload.table_number = tableNumber
+    }
+    if (method === 'SPLIT' && splitAmounts) {
+      orderPayload.payment_split_cash = Math.round(splitAmounts.cash * 100) / 100
+      orderPayload.payment_split_card = Math.round(splitAmounts.card * 100) / 100
+    }
+
+    const persistRes = await gksPersistPaidCommercialOrder(tenant, orderPayload, kassa_client_uuid)
+    let queuedOffline = false
+    if (persistRes.queuedOffline) {
+      queuedOffline = true
+      alert(
+        `${t('kassaApp.offlineModeActive')}\n\n${t('kassaApp.offlineOrderQueuedAlert').replace('{ref}', shortRef)}`,
+      )
+    } else if (persistRes.hardError) {
+      console.error('[gks-kassa] commercial order insert:', persistRes.hardError)
+      alert(
+        `${t('kassaApp.orderPersistFailedTitle')}\n\n${t('kassaApp.orderPersistFailedBody')}\n\n(Fiscale verkoop staat wel in het journal.)${persistRes.hardError ? `\n\n(${persistRes.hardError})` : ''}`,
+      )
+    }
+
     syncZReportAfterOrderSafe(tenant, createdAt.toISOString())
     playCashRegister()
     setTimeout(() => playSuccess(), 400)
