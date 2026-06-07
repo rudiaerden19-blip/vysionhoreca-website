@@ -420,14 +420,29 @@ function buildOpenTableOrdersMapFromRows(
  * nog niet in die snapshot zitten (persist debounce / net gesleept) blijven zichtbaar
  * tot de server ze teruggeeft.
  */
+function cartLinesTotalUnits(lines: CartItem[]): number {
+  return lines.reduce((sum, line) => sum + (line.quantity || 0), 0)
+}
+
 function mergeOpenTableOrdersServerWithPendingLocal(
   prev: Record<string, CartItem[]>,
-  fromServer: Record<string, CartItem[]>
+  fromServer: Record<string, CartItem[]>,
+  persistInflightBySlot: Record<string, number>,
 ): Record<string, CartItem[]> {
-  const merged: Record<string, CartItem[]> = { ...fromServer }
+  const merged: Record<string, CartItem[]> = {}
+  for (const [k, raw] of Object.entries(fromServer)) {
+    merged[k] = normalizeGksCommercialItemsToCartLines(raw)
+  }
   for (const [k, v] of Object.entries(prev)) {
-    if (!(k in fromServer) && (v?.length ?? 0) > 0) {
-      merged[k] = normalizeGksCommercialItemsToCartLines(v)
+    if ((v?.length ?? 0) === 0) continue
+    const local = normalizeGksCommercialItemsToCartLines(v)
+    const inflight = (persistInflightBySlot[k] ?? 0) > 0
+    if (!(k in merged)) {
+      merged[k] = local
+      continue
+    }
+    if (inflight || cartLinesTotalUnits(local) > cartLinesTotalUnits(merged[k])) {
+      merged[k] = local
     }
   }
   return merged
@@ -1295,12 +1310,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const persistTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
   /** Één persist tegelijk per tafel-slot: voorkomt dat DELETE/INSERT door elkaar lopen (keuken ziet dan niets). */
   const openOrderPersistChainRef = useRef<Record<string, Promise<void>>>({})
+  const openOrderPersistInflightRef = useRef<Record<string, number>>({})
 
   const applyOpenOrdersFromServerRows = useCallback((rows: OpenTableOrderRow[] | null) => {
     if (rows === null) return
     const fromServer = buildOpenTableOrdersMapFromRows(rows)
     setTableOrders((prev) => {
-      const merged = mergeOpenTableOrdersServerWithPendingLocal(prev, fromServer)
+      const merged = mergeOpenTableOrdersServerWithPendingLocal(
+        prev,
+        fromServer,
+        openOrderPersistInflightRef.current,
+      )
       localStorage.setItem(tableOrdersKey, JSON.stringify(merged))
       return merged
     })
@@ -1723,6 +1743,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     tblNr: string,
     items: CartItem[],
   ) => {
+    const slotKey = tableOrderMapKey(zone, tblNr)
+    openOrderPersistInflightRef.current[slotKey] =
+      (openOrderPersistInflightRef.current[slotKey] ?? 0) + 1
+    try {
     if (items.length === 0) {
       await gksDeleteOpenTableCommercialOrders(tenant, zone, tblNr)
       return
@@ -1757,6 +1781,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     if (err) {
       console.warn('[gks-kassa] signOrder P journal:', err)
       alert(err.message)
+    }
+    } finally {
+      const n = (openOrderPersistInflightRef.current[slotKey] ?? 1) - 1
+      if (n <= 0) delete openOrderPersistInflightRef.current[slotKey]
+      else openOrderPersistInflightRef.current[slotKey] = n
     }
   }
 
@@ -4488,26 +4517,39 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* Cart / numpad (toggle via footer) */}
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-1.5 pt-0.5 touch-pan-y">
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+              <div
+                className={`mb-2 flex shrink-0 items-center gap-2 rounded-lg px-2 py-1 ${ui.numpadBarBg}`}
+                data-testid="kassa-sidebar-clock-bar"
+              >
+                {showKassaStaffClockButton ? (
+                  <button
+                    type="button"
+                    onClick={openStaffClockModal}
+                    className={`shrink-0 active:scale-[0.98] transition-all ${ui.clockTileBg} ${ui.clockTileHover}`}
+                    title={t('staffClock.buttonTitle')}
+                    aria-label={t('staffClock.buttonTitle')}
+                  >
+                    <KassaAnalogClock size={parkedOnlySidebarView ? 72 : 48} />
+                  </button>
+                ) : null}
+                <p
+                  className={`min-w-0 truncate whitespace-nowrap text-right text-xs font-semibold leading-tight tracking-tight sm:text-sm ${ui.numpadMeta} ${showKassaStaffClockButton ? 'flex-1' : 'w-full'}`}
+                  title={numpadHeaderDateLabel}
+                  aria-live="polite"
+                >
+                  {numpadHeaderDateLabel}
+                </p>
+              </div>
               {parkedLinesByCategory.length > 0 &&
               (parkedOnlySidebarView || numpadPanelVisible) ? (
                 <div
-                  className={
-                    parkedOnlySidebarView
-                      ? 'mb-2 flex min-h-0 flex-1 flex-col overflow-hidden'
-                      : 'mb-2 max-h-[min(38vh,11rem)] shrink-0 overflow-y-auto overscroll-y-contain'
-                  }
+                  className="mb-2 max-h-[min(42vh,14rem)] shrink-0 overflow-y-auto overscroll-y-contain flex flex-col"
                   data-testid="kassa-parked-on-table"
                 >
                   <p className={`mb-1 shrink-0 text-xs font-bold uppercase tracking-wide ${ui.numpadMeta}`}>
                     {t('kassaApp.parkedOnTableSection')}
                   </p>
-                  <div
-                    className={
-                      parkedOnlySidebarView
-                        ? 'min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-y-contain'
-                        : 'space-y-1'
-                    }
-                  >
+                  <div className="space-y-1">
                     {parkedLinesByCategory.map((item) => {
                       const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
                       return (
@@ -4529,28 +4571,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               ) : null}
               {numpadPanelVisible ? (
               <div className="flex min-h-[15rem] flex-1 flex-col justify-end" data-testid="kassa-numpad-panel">
-              <div className={`mb-3 flex shrink-0 items-center gap-2.5 rounded-xl px-2.5 py-2 ${ui.numpadBarBg}`}>
-                {showKassaStaffClockButton ? (
-                  <button
-                    type="button"
-                    onClick={openStaffClockModal}
-                    className={`shrink-0 active:scale-[0.98] transition-all ${ui.clockTileBg} ${ui.clockTileHover}`}
-                    title={t('staffClock.buttonTitle')}
-                    aria-label={t('staffClock.buttonTitle')}
-                  >
-                    <KassaAnalogClock size={72} />
-                  </button>
-                ) : null}
-                <div
-                  className={`min-w-0 flex flex-col justify-center gap-0.5 ${showKassaStaffClockButton ? 'flex-1' : 'w-full'}`}
-                >
-                  <p
-                    className={`truncate whitespace-nowrap text-right text-xs font-semibold leading-tight tracking-tight sm:text-sm ${ui.numpadMeta}`}
-                    title={numpadHeaderDateLabel}
-                    aria-live="polite"
-                  >
-                    {numpadHeaderDateLabel}
-                  </p>
+              <div className="mb-3 flex shrink-0 flex-col gap-0.5">
                   <input
                     type="text"
                     value={numpadValue}
@@ -4558,7 +4579,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     aria-label={t('kassaApp.numpadPlaceholder')}
                     className={`w-full min-w-0 border-none bg-transparent text-right text-2xl font-bold outline-none sm:text-3xl ${ui.numpadInput}`}
                   />
-                </div>
               </div>
               <div
                 className="grid shrink-0 grid-cols-4 gap-2 touch-manipulation select-none [grid-template-rows:repeat(4,minmax(2.75rem,1fr))]"
@@ -4606,28 +4626,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   kassaSidebarFooterTier === 'comfort' ? 'gap-2' : kassaSidebarFooterTier === 'compact' ? 'gap-1.5' : 'gap-1'
                 }`}
               >
-              <div
-                className={`flex shrink-0 items-center gap-2 rounded-lg px-2 py-1 ${ui.numpadBarBg} ${showKassaStaffClockButton ? '' : 'justify-end'}`}
-              >
-                {showKassaStaffClockButton ? (
-                  <button
-                    type="button"
-                    onClick={openStaffClockModal}
-                    className={`shrink-0 active:scale-[0.98] transition-all ${ui.clockTileBg} ${ui.clockTileHover}`}
-                    title={t('staffClock.buttonTitle')}
-                    aria-label={t('staffClock.buttonTitle')}
-                  >
-                    <KassaAnalogClock size={48} />
-                  </button>
-                ) : null}
-                <p
-                  className={`min-w-0 truncate whitespace-nowrap text-right text-[11px] font-semibold leading-tight tracking-tight ${ui.numpadMeta} ${showKassaStaffClockButton ? 'flex-1' : 'w-full'}`}
-                  title={numpadHeaderDateLabel}
-                  aria-live="polite"
-                >
-                  {numpadHeaderDateLabel}
-                </p>
-              </div>
               {parkedLinesByCategory.length > 0 ? (
                 <div
                   className="max-h-[min(20vh,6.5rem)] shrink-0 overflow-y-auto overscroll-y-contain"
@@ -4733,30 +4731,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               })}
               </div>
             </div>
-              ) : (
-                <div
-                  className={`flex shrink-0 items-center gap-2 rounded-lg px-1.5 py-0.5 ${ui.numpadBarBg}`}
-                >
-                  {showKassaStaffClockButton ? (
-                    <button
-                      type="button"
-                      onClick={openStaffClockModal}
-                      className={`shrink-0 active:scale-[0.98] transition-all ${ui.clockTileBg} ${ui.clockTileHover}`}
-                      title={t('staffClock.buttonTitle')}
-                      aria-label={t('staffClock.buttonTitle')}
-                    >
-                      <KassaAnalogClock size={48} />
-                    </button>
-                  ) : null}
-                  <p
-                    className={`min-w-0 flex-1 truncate whitespace-nowrap text-right text-[11px] font-semibold leading-tight ${ui.numpadMeta}`}
-                    title={numpadHeaderDateLabel}
-                    aria-live="polite"
-                  >
-                    {numpadHeaderDateLabel}
-                  </p>
-                </div>
-              )}
+              ) : parkedOnlySidebarView ? (
+                <div className="min-h-0 flex-1" aria-hidden />
+              ) : null}
             </div>
         </div>
 
