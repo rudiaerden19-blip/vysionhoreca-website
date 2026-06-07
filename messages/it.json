@@ -3222,7 +3222,8 @@
   "gksAvailability": {
     "tooltipBlocked": "GKS richiede connessione Internet e FDM attiva.",
     "overlay": {
-      "internet": "GKS non disponibile. Le azioni fiscali sono bloccate fino al ripristino della connessione Internet.",
+      "internet": "Nessuna connessione Internet. Le funzioni GKS e finanziarie sono bloccate.",
+      "internetSubtext": "La cassa tornerà operativa non appena la connessione Internet sarà ripristinata.",
       "fdmUnreachable": "GKS non disponibile. Le azioni fiscali sono bloccate finché FDM/Checkbox non è di nuovo raggiungibile.",
       "fdmError": "GKS non disponibile. Le azioni fiscali sono bloccate. Controllare lo stato FDM.",
       "hint": "La cassa resta visibile; pagamento e scontrini fiscali sono temporaneamente disattivati."

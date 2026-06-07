@@ -2722,7 +2722,8 @@
   "gksAvailability": {
     "tooltipBlocked": "GKS nécessite une connexion Internet et FDM active.",
     "overlay": {
-      "internet": "GKS indisponible. Les actions fiscales sont bloquées jusqu’au rétablissement de votre connexion Internet.",
+      "internet": "Pas de connexion Internet. Les fonctions GKS et financières sont bloquées.",
+      "internetSubtext": "Votre caisse refonctionnera dès que la connexion Internet sera rétablie.",
       "fdmUnreachable": "GKS indisponible. Les actions fiscales sont bloquées jusqu’à ce que FDM/Checkbox soit à nouveau accessible.",
       "fdmError": "GKS indisponible. Les actions fiscales sont bloquées. Vérifiez le statut FDM.",
       "hint": "La caisse reste visible ; l’encaissement et les tickets fiscaux sont temporairement désactivés."

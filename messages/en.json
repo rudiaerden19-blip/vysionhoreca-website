@@ -3696,7 +3696,8 @@
   "gksAvailability": {
     "tooltipBlocked": "GKS requires an active internet and FDM connection.",
     "overlay": {
-      "internet": "GKS unavailable. Fiscal actions are blocked until your internet connection is restored.",
+      "internet": "No internet connection. GKS and financial functions are blocked.",
+      "internetSubtext": "Your register will work again once the internet connection is restored.",
       "fdmUnreachable": "GKS unavailable. Fiscal actions are blocked until FDM/Checkbox is reachable again.",
       "fdmError": "GKS unavailable. Fiscal actions are blocked. Check the FDM status.",
       "hint": "The register stays visible; checkout and fiscal receipts are temporarily disabled."

@@ -37,12 +37,34 @@ export const gksCommercialOrders = {
     })
   },
 
-  insert<T>(tenantSlug: string, row: Record<string, unknown>, select?: string) {
-    return post<T>({ op: 'insert', tenantSlug, row, select })
+  insert<T>(
+    tenantSlug: string,
+    row: Record<string, unknown>,
+    select?: string,
+    fiscalJournalId?: string,
+  ) {
+    return post<T>({
+      op: 'insert',
+      tenantSlug,
+      row,
+      select,
+      ...(fiscalJournalId ? { fiscalJournalId } : {}),
+    })
   },
 
-  update<T>(tenantSlug: string, row: Record<string, unknown>, match: Record<string, unknown>) {
-    return post<T>({ op: 'update', tenantSlug, row, match })
+  update<T>(
+    tenantSlug: string,
+    row: Record<string, unknown>,
+    match: Record<string, unknown>,
+    fiscalJournalId?: string,
+  ) {
+    return post<T>({
+      op: 'update',
+      tenantSlug,
+      row,
+      match,
+      ...(fiscalJournalId ? { fiscalJournalId } : {}),
+    })
   },
 
   delete(tenantSlug: string, match: Record<string, unknown>) {

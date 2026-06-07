@@ -3696,7 +3696,8 @@
   "gksAvailability": {
     "tooltipBlocked": "GKS vereist actieve internet- en FDM-verbinding.",
     "overlay": {
-      "internet": "GKS niet beschikbaar. Fiscale acties zijn geblokkeerd totdat uw internet hersteld is.",
+      "internet": "Geen internetverbinding. GKS- en financiële functies zijn geblokkeerd.",
+      "internetSubtext": "Uw kassa werkt weer zodra het internet hersteld is.",
       "fdmUnreachable": "GKS niet beschikbaar. Fiscale acties zijn geblokkeerd totdat FDM/Checkbox weer bereikbaar is.",
       "fdmError": "GKS niet beschikbaar. Fiscale acties zijn geblokkeerd. Controleer de FDM-status.",
       "hint": "De kassa blijft zichtbaar; afrekenen en fiscale bonnen zijn tijdelijk uitgeschakeld."

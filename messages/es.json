@@ -3222,7 +3222,8 @@
   "gksAvailability": {
     "tooltipBlocked": "GKS requiere conexión activa a Internet y FDM.",
     "overlay": {
-      "internet": "GKS no disponible. Las acciones fiscales están bloqueadas hasta que se restaure su conexión a Internet.",
+      "internet": "Sin conexión a Internet. Las funciones GKS y financieras están bloqueadas.",
+      "internetSubtext": "Su caja volverá a funcionar cuando se restaure la conexión a Internet.",
       "fdmUnreachable": "GKS no disponible. Las acciones fiscales están bloqueadas hasta que FDM/Checkbox vuelva a estar accesible.",
       "fdmError": "GKS no disponible. Las acciones fiscales están bloqueadas. Compruebe el estado del FDM.",
       "hint": "La caja sigue visible; el cobro y los tickets fiscales están desactivados temporalmente."

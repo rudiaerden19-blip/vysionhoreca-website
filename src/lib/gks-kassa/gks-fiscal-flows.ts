@@ -343,6 +343,7 @@ export async function gksCompleteSaleN(
     /** Na signSale, vóór mark_success — koppel gks_commercial_orders.id aan journal. */
     resolveCommercialOrderId?: (ctx: {
       posFiscalTicketNo: number
+      journalId: string
     }) => Promise<string | null | undefined>
   },
 ): Promise<
@@ -418,6 +419,7 @@ export async function gksCompleteSaleN(
     try {
       const linked = await opts.resolveCommercialOrderId({
         posFiscalTicketNo: result.posFiscalTicketNo,
+        journalId,
       })
       if (linked) commercialOrderId = linked
     } catch (err: unknown) {

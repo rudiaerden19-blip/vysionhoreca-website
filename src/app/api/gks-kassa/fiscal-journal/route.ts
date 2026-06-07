@@ -8,6 +8,7 @@ import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 import { apiRateLimiter, checkRateLimit } from '@/lib/rate-limit'
 import { logger } from '@/lib/logger'
+import { validateGksFdmMarkSuccessPayload } from '@/lib/gks-kassa/gks-fiscal-server-guards'
 import { isGksZReportPilotTenant } from '@/lib/gks-kassa/pilot-config'
 import { gksApiTimeMeta, withBelgiumTimestampFields } from '@/lib/gks-kassa/belgium-datetime'
 
@@ -153,6 +154,10 @@ export async function POST(req: NextRequest) {
     }
 
     if (body.op === 'mark_success') {
+      const payloadCheck = validateGksFdmMarkSuccessPayload(body.responsePayload)
+      if (!payloadCheck.ok) {
+        return NextResponse.json({ error: payloadCheck.error }, { status: 400 })
+      }
       const patch: Record<string, unknown> = {
         status: 'SUCCESS',
         response_payload: body.responsePayload,

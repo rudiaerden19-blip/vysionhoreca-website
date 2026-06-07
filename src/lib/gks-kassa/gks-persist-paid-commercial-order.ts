@@ -16,6 +16,7 @@ export async function gksPersistPaidCommercialOrder(
   tenantSlug: string,
   orderPayload: Record<string, unknown>,
   kassaClientUuid: string,
+  fiscalJournalId: string,
 ): Promise<GksPersistPaidCommercialResult> {
   const fallbackOrderNo = Number(orderPayload.order_number) || 0
 
@@ -23,6 +24,7 @@ export async function gksPersistPaidCommercialOrder(
     tenantSlug,
     orderPayload,
     'order_number,id',
+    fiscalJournalId,
   )
 
   if (insRes.ok && insRes.data?.order_number != null) {

@@ -10,6 +10,7 @@ import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 import { apiRateLimiter, checkRateLimit } from '@/lib/rate-limit'
 import { logger } from '@/lib/logger'
 import { gksApiTimeMeta, withBelgiumTimestampFields } from '@/lib/gks-kassa/belgium-datetime'
+import { enforcePaidCommercialInsertGuard } from '@/lib/gks-kassa/gks-fiscal-server-guards'
 import { sanitizeGksCommercialOrderRow } from '@/lib/gks-kassa/sanitize-commercial-order-row'
 
 const OpSchema = z.discriminatedUnion('op', [
@@ -25,12 +26,15 @@ const OpSchema = z.discriminatedUnion('op', [
     tenantSlug: z.string().min(1),
     row: z.record(z.unknown()),
     select: z.string().optional(),
+    /** Verplicht bij payment_status=paid — koppeling aan lopend signSale-journal (N). */
+    fiscalJournalId: z.string().uuid().optional(),
   }),
   z.object({
     op: z.literal('update'),
     tenantSlug: z.string().min(1),
     row: z.record(z.unknown()),
     match: z.record(z.unknown()),
+    fiscalJournalId: z.string().uuid().optional(),
   }),
   z.object({
     op: z.literal('delete'),
@@ -134,6 +138,15 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: sanitized.error }, { status: 400 })
       }
       const row = sanitized.row
+      const paidGuard = await enforcePaidCommercialInsertGuard(
+        supabase,
+        tenantSlug,
+        row,
+        body.fiscalJournalId,
+      )
+      if (!paidGuard.ok) {
+        return NextResponse.json({ error: paidGuard.error }, { status: paidGuard.status })
+      }
       const needsNum =
         row.payment_status === 'paid' &&
         ['DINE_IN', 'TAKEAWAY', 'DELIVERY'].includes(String(row.order_type || '')) &&
@@ -163,6 +176,15 @@ export async function POST(req: NextRequest) {
 
     if (body.op === 'update') {
       const row = { ...body.row, updated_at: new Date().toISOString() }
+      const paidGuard = await enforcePaidCommercialInsertGuard(
+        supabase,
+        tenantSlug,
+        row,
+        body.fiscalJournalId,
+      )
+      if (!paidGuard.ok) {
+        return NextResponse.json({ error: paidGuard.error }, { status: paidGuard.status })
+      }
       let q = supabase.from('gks_commercial_orders').update(row).eq('tenant_slug', tenantSlug)
       for (const [k, v] of Object.entries(body.match)) {
         q = q.eq(k, v as string)

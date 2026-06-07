@@ -3113,11 +3113,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         zone: orderType === 'DINE_IN' && tableNumber ? dineInFloorZone : undefined,
         tableNumber: orderType === 'DINE_IN' ? tableNumber || undefined : undefined,
         splitAmounts: method === 'SPLIT' ? splitAmounts : undefined,
-        resolveCommercialOrderId: async ({ posFiscalTicketNo }) => {
+        resolveCommercialOrderId: async ({ posFiscalTicketNo, journalId }) => {
           persistRef.current = await gksPersistPaidCommercialOrder(
             tenant,
             { ...orderPayload, order_number: posFiscalTicketNo },
             kassa_client_uuid,
+            journalId,
           )
           return persistRef.current.commercialOrderId ?? null
         },
@@ -5544,8 +5545,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             >
               {gksLockOverlayMessage}
             </h2>
-            <p className="mt-4 text-sm text-gray-600">
-              {t('gksAvailability.overlay.hint')}
+            <p className="mt-4 text-xs text-gray-600 sm:text-sm">
+              {gksInternetLocked
+                ? t('gksAvailability.overlay.internetSubtext')
+                : t('gksAvailability.overlay.hint')}
             </p>
           </div>
         </div>

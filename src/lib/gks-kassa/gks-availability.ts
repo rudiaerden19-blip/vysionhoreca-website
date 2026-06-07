@@ -129,7 +129,7 @@ export function gksAvailabilityOverlayMessage(
     }
   }
   if (availability.status === 'INTERNET_OFFLINE') {
-    return 'GKS niet beschikbaar. Fiscale acties zijn geblokkeerd totdat uw internet hersteld is.'
+    return 'Geen internetverbinding. GKS- en financiële functies zijn geblokkeerd.'
   }
   if (availability.status === 'FDM_UNREACHABLE') {
     return 'GKS niet beschikbaar. Fiscale acties zijn geblokkeerd totdat FDM/Checkbox weer bereikbaar is.'
