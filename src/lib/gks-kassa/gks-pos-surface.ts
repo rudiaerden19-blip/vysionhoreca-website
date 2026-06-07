@@ -1,54 +1,61 @@
 /**
- * GKS-pilot: referentie-POS — lichtgrijs boven → donker onder, licht afgeronde hoeken.
+ * GKS-pilot: toets-dome (keyboard-ref) — zachte radiale schakering, licht bollig.
  */
 
-/** Rechthoekig, subtiel afgerond (“een beetje bollig”). */
-export const GKS_BTN_SHAPE = 'rounded-[5px]'
+/** Chiclet-toets: nauwelijks afgerond. */
+export const GKS_BTN_SHAPE = 'rounded-[4px]'
 
-const GKS_EDGE =
-  'border border-[#2a2a2a] border-b-[#121212] shadow-[inset_0_1px_0_rgba(255,255,255,0.26)]'
+/** Convex dome: highlight top-midden, donker aan randen (zoals toetsenbord). */
+const GKS_KEY_FACE =
+  'bg-[radial-gradient(ellipse_95%_75%_at_50%_32%,#8f8f8f_0%,#5a5a5a_28%,#2a2a2a_58%,#121212_82%,#060606_100%)]'
+
+const GKS_KEY_FACE_SELECTED =
+  'bg-[radial-gradient(ellipse_95%_75%_at_50%_32%,#a5a5a5_0%,#6d6d6d_28%,#3a3a3a_58%,#1a1a1a_82%,#0a0a0a_100%)]'
+
+const GKS_KEY_DEPTH =
+  'border border-[#050505] shadow-[inset_0_1px_0_rgba(255,255,255,0.22),inset_0_-1px_0_rgba(0,0,0,0.65),0_1px_0_rgba(255,255,255,0.04)]'
 
 /** Standaard toets (numpad, sidebar, header). */
 export const GKS_POS_BTN = [
-  'bg-gradient-to-b from-[#9a9a9a] via-[#5f5f5f] to-[#2a2a2a]',
-  GKS_EDGE,
-  'text-white',
-  'hover:brightness-105',
-  'active:brightness-[0.92]',
+  GKS_KEY_FACE,
+  GKS_KEY_DEPTH,
+  'text-[#e8e8e8]',
+  'hover:brightness-[1.06]',
+  'active:brightness-[0.94]',
 ].join(' ')
 
-/** Geselecteerde toets (bijv. Binnen, Ter plaatse, numpad open). */
+/** Geselecteerde toets. */
 export const GKS_POS_BTN_SELECTED = [
-  'bg-gradient-to-b from-[#b0b0b0] via-[#757575] to-[#3d3d3d]',
-  GKS_EDGE,
+  GKS_KEY_FACE_SELECTED,
+  GKS_KEY_DEPTH,
   'text-white',
-  'ring-1 ring-inset ring-white/12',
-  'hover:brightness-105',
-  'active:brightness-[0.92]',
+  'ring-1 ring-inset ring-white/10',
+  'hover:brightness-[1.06]',
+  'active:brightness-[0.94]',
 ].join(' ')
 
 /** Primaire actie (Afrekenen, actieve categorie). */
 export const GKS_ACCENT_BTN = [
   GKS_BTN_SHAPE,
-  'bg-gradient-to-b from-[#5cadff] via-[#0056d6] to-[#003a8c]',
+  'bg-[radial-gradient(ellipse_95%_75%_at_50%_30%,#6eb8ff_0%,#1a6fe8_35%,#0048b5_68%,#002a6b_100%)]',
   'text-white',
-  'border border-[#003080] border-b-[#001d45]',
-  'shadow-[inset_0_1px_0_rgba(255,255,255,0.32)]',
-  'hover:brightness-105',
-  'active:brightness-[0.92]',
+  'border border-[#001a45]',
+  'shadow-[inset_0_1px_0_rgba(255,255,255,0.35),inset_0_-1px_0_rgba(0,0,0,0.5)]',
+  'hover:brightness-[1.05]',
+  'active:brightness-[0.93]',
 ].join(' ')
 
-/** Displayvelden (totaal, numpad-invoer). */
+/** Ingevallen display (totaal, numpad-invoer). */
 export const GKS_POS_FIELD = [
   GKS_BTN_SHAPE,
-  'bg-gradient-to-b from-[#8a8a8a] via-[#4a4a4a] to-[#1a1a1a]',
-  'border border-[#0f0f0f]',
-  'shadow-[inset_0_2px_8px_rgba(0,0,0,0.5)]',
+  'bg-[radial-gradient(ellipse_110%_90%_at_50%_18%,#4a4a4a_0%,#252525_45%,#0c0c0c_100%)]',
+  'border border-[#030303]',
+  'shadow-[inset_0_3px_10px_rgba(0,0,0,0.75),inset_0_1px_0_rgba(255,255,255,0.06)]',
 ].join(' ')
 
-/** Onderstrook menu-tegel (titel onder foto). */
+/** Onderstrook menu-tegel. */
 export const GKS_MENU_TILE_LABEL_SURFACE =
-  'bg-gradient-to-b from-[#8a8a8a] via-[#5a5a5a] to-[#333333]'
+  'bg-[radial-gradient(ellipse_100%_80%_at_50%_28%,#7a7a7a_0%,#454545_50%,#1e1e1e_100%)]'
 
 export function gksPosButtonClass(selected: boolean): string {
   return `${GKS_BTN_SHAPE} ${selected ? GKS_POS_BTN_SELECTED : GKS_POS_BTN}`
