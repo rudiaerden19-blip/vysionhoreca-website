@@ -45,7 +45,10 @@ export function useKassaUiDarkSync(tenantSlug: string): {
   setDark: (next: boolean) => void
   toggle: () => void
 } {
-  const [dark, setDarkState] = useState(false)
+  const [dark, setDarkState] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return readKassaUiDarkPreference(tenantSlug)
+  })
 
   useEffect(() => {
     setDarkState(readKassaUiDarkPreference(tenantSlug))

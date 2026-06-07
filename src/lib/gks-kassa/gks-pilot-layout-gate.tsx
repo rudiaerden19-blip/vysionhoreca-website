@@ -3,6 +3,7 @@
 import { useEffect, useRef, type ReactNode } from 'react'
 import {
   buildShopInternalReturnPath,
+  clearTenantOwnerSession,
   isOwnerSessionFreshForTenant,
   isSuperAdminLoggedIn,
   verifyShopAdminApiSession,
@@ -23,16 +24,24 @@ export function GksPilotLayoutGate({
   tenantSlug: string
   children: ReactNode
 }) {
-  const ran = useRef(false)
+  const authCheckTenantRef = useRef<string | null>(null)
+  const redirectingRef = useRef(false)
 
   useEffect(() => {
-    if (ran.current) return
-    ran.current = true
+    if (authCheckTenantRef.current === tenantSlug) return
+    authCheckTenantRef.current = tenantSlug
 
     let cancelled = false
 
     const goLogin = () => {
-      if (cancelled) return
+      if (cancelled || redirectingRef.current) return
+      redirectingRef.current = true
+      clearTenantOwnerSession()
+      try {
+        sessionStorage.removeItem(gksPilotAuthSessionKey(tenantSlug))
+      } catch {
+        /* ignore */
+      }
       const next = buildShopInternalReturnPath(
         tenantSlug,
         window.location.pathname,
@@ -72,6 +81,7 @@ export function GksPilotLayoutGate({
           }
           return
         }
+        clearTenantOwnerSession()
       }
 
       goLogin()

@@ -414,7 +414,12 @@ function ShopAdminLayoutInner({
     tenantSlug,
   ])
 
+  const isKassaPosPath = isShopAdminKassaPosPath(adminPath, params.tenant)
+
   if (loading || tenantExists === null) {
+    if (isKassaPosPath) {
+      return <>{children}</>
+    }
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
@@ -441,6 +446,9 @@ function ShopAdminLayoutInner({
   }
 
   if (tenantExists && adminAccess !== 'ok') {
+    if (isKassaPosPath && adminAccess !== 'login') {
+      return <>{children}</>
+    }
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
@@ -454,7 +462,7 @@ function ShopAdminLayoutInner({
   }
 
   // Kassa POS: geen layout-wrapper; submodule-toggles blokkeren /kassa niet meer (verkoopscherm = altijd beschikbaar bij kassa-module).
-  if (adminPath.includes('/kassa')) {
+  if (isKassaPosPath) {
     if (demoPublicUnauthenticated) {
       return <>{children}</>
     }
