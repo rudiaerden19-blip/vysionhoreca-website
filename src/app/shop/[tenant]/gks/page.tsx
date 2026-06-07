@@ -4172,7 +4172,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250608-selected-blue-glow"
+      data-gks-ui="20250608-table-picker-grain"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -5342,7 +5342,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           />
           <div
             className={`relative z-10 flex w-full max-w-3xl max-h-[min(88vh,780px)] min-h-0 flex-col overflow-hidden rounded-2xl border shadow-2xl ${ui.tablePickerBorder} ${
-              kassaAppearanceDark ? 'bg-[#151a21]' : 'bg-white'
+              kassaAppearanceDark ? GKS_MENU_PLATE_SHELL_BG_CLASS : 'bg-white'
             }`}
           >
             <div className={`flex shrink-0 items-center gap-3 border-b px-4 py-3 ${ui.tablePickerHeader}`}>
