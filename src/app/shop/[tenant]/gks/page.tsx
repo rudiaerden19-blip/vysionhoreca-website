@@ -76,6 +76,14 @@ import {
 import { useKassaUiDarkSync } from '@/lib/kassa-register-ui-dark-preference'
 import type { KassaRegisterUiTheme } from '@/lib/kassa-register-ui-theme'
 import { createGksRegisterUiTheme } from '@/lib/gks-kassa/gks-register-ui-theme'
+import {
+  GKS_ACCENT_BTN,
+  GKS_BTN_SHAPE,
+  GKS_MENU_TILE_LABEL_SURFACE,
+  GKS_POS_BTN,
+  GKS_POS_FIELD,
+  gksPosButtonClass,
+} from '@/lib/gks-kassa/gks-pos-surface'
 import { authFetch, buildShopInternalReturnPath } from '@/lib/auth-headers'
 import {
   attemptCloseThenOrNavigate,
@@ -365,16 +373,6 @@ const GKS_ACCENT_ROOT_STYLE = {
   '--gks-accent-hover': '#004bb8',
 } as React.CSSProperties
 
-/** POS-stijl: rechthoekig, grijs; alleen expliciete accent-knoppen blauw. */
-const GKS_BTN_SHAPE = 'rounded-none'
-
-const GKS_POS_BTN =
-  'bg-[#4a4a4a] text-white hover:bg-[#565656] border border-[#5c5c5c]'
-
-const GKS_POS_BTN_SELECTED = 'bg-[#5e5e5e] text-white hover:bg-[#686868] border border-[#787878]'
-
-const GKS_ACCENT_BTN = `${GKS_BTN_SHAPE} bg-[var(--gks-accent)] text-white hover:bg-[var(--gks-accent-hover)] border border-[var(--gks-accent-hover)]`
-
 const KASSA_HEADER_QUICK_LINK_BTN =
   `inline-flex shrink-0 items-center justify-center whitespace-nowrap ${GKS_BTN_SHAPE} ${GKS_POS_BTN} font-bold transition-colors min-h-[2.35rem] px-3 py-2 sm:min-h-[2.6rem] sm:px-3.5 sm:py-2.5`
 const KASSA_HEADER_QUICK_LINK_LABEL = 'text-xs leading-snug sm:text-sm'
@@ -387,10 +385,6 @@ function kassaFloorZoneButtonTouchClass(sxga: boolean): string {
 /** Ter plaatse / Afhalen / Leveren — touch-vriendelijk. */
 function kassaOrderTypeButtonTouchClass(sxga: boolean): string {
   return sxga ? 'min-h-[3.25rem] py-2.5' : 'min-h-[3rem] py-2.5'
-}
-
-function gksPosButtonClass(selected: boolean): string {
-  return `${GKS_BTN_SHAPE} ${selected ? GKS_POS_BTN_SELECTED : GKS_POS_BTN}`
 }
 
 /** Sidebar-footer: touch-vriendelijke hoogte (Lade / Bon / Numpad). */
@@ -574,7 +568,7 @@ const KassaReservationsView = dynamic(() => import('@/components/KassaReservatio
 
 /** Categorie- en producttegel: witte kaart; foto alleen bovenin, titel in vaste strook eronder (niet over de foto). */
 const KASSA_MENU_TILE_BUTTON_CLASS_BASE =
-  'touch-manipulation select-none group relative flex min-h-0 w-full min-w-0 flex-col overflow-hidden rounded-none border border-[#5c5c5c] bg-[#4a4a4a] text-left active:brightness-95'
+  `touch-manipulation select-none group relative flex min-h-0 w-full min-w-0 flex-col overflow-hidden ${GKS_BTN_SHAPE} border border-[#1a1a1a] bg-[#2a2a2a] text-left active:brightness-[0.92]`
 
 /** Standaard: rastercel wordt **items-stretch** ⇒ knop moet **`h-full`**. */
 const KASSA_MENU_TILE_BUTTON_CLASS = `${KASSA_MENU_TILE_BUTTON_CLASS_BASE} h-full`
@@ -607,11 +601,11 @@ const KASSA_MENU_TILE_IMG_CLASS_SXGA_COVER =
 
 /** Vaste onderstrook: titel staat onder de afbeelding, niet in de foto. */
 const KASSA_MENU_TILE_LABEL_WRAP =
-  'pointer-events-none shrink-0 w-full bg-[#4a4a4a] px-2 pb-2 pt-1.5 sm:px-3'
+  `pointer-events-none shrink-0 w-full ${GKS_MENU_TILE_LABEL_SURFACE} px-2 pb-2 pt-1.5 sm:px-3`
 
 /** SXGA ~17″: dichter tegen de foto, zelfde horizontale marge als standaard. */
 const KASSA_MENU_TILE_LABEL_WRAP_SXGA =
-  'pointer-events-none shrink-0 w-full bg-[#4a4a4a] px-2 pb-1.5 pt-0 mt-1.5 sm:px-3 sm:pb-2 sm:mt-1.5 sm:pt-0'
+  `pointer-events-none shrink-0 w-full ${GKS_MENU_TILE_LABEL_SURFACE} px-2 pb-1.5 pt-0 mt-1.5 sm:px-3 sm:pb-2 sm:mt-1.5 sm:pt-0`
 
 const KASSA_MENU_TILE_LABEL_CLASS =
   'm-0 line-clamp-2 text-center text-base font-black leading-snug tracking-tight text-white sm:text-lg md:text-xl'
@@ -4162,7 +4156,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250607-pos-luxury-gunmetal"
+      data-gks-ui="20250607-pos-gradient-keys"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4394,7 +4388,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <button
             type="button"
             onClick={() => toggleKassaAppearance()}
-            className="relative z-[40] inline-flex touch-manipulation shrink-0 items-center gap-1 whitespace-nowrap rounded-lg bg-white/10 px-1.5 py-1 font-bold text-white transition-colors hover:bg-white/20 sm:px-2 sm:py-1.5"
+            className={`relative z-[40] inline-flex touch-manipulation shrink-0 items-center gap-1 whitespace-nowrap px-1.5 py-1 font-bold sm:px-2 sm:py-1.5 ${gksPosButtonClass(kassaAppearanceDark)}`}
             title={
               kassaAppearanceDark ? t('adminLayout.kassaAppearanceLightAria') : t('adminLayout.kassaAppearanceDarkAria')
             }
@@ -4415,7 +4409,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               aria-expanded={langOpen}
               aria-label={`${t('nav.language')}: ${localeNames[locale]}`}
               onClick={() => setLangOpen(o => !o)}
-              className="inline-flex touch-manipulation items-center gap-0.5 whitespace-nowrap rounded-lg bg-white/10 px-1.5 py-1.5 font-medium text-white transition-colors hover:bg-white/20 sm:gap-1 sm:rounded-xl sm:px-2 sm:py-2 md:px-3"
+              className={`inline-flex touch-manipulation items-center gap-0.5 whitespace-nowrap px-1.5 py-1.5 font-medium sm:gap-1 sm:px-2 sm:py-2 md:px-3 ${gksPosButtonClass(langOpen)}`}
             >
               <LocaleFlagEmoji locale={locale} variant="inline" className="text-sm text-white sm:text-[15px]" />
               <svg className={`size-4 shrink-0 transition-transform ${langOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
@@ -4622,7 +4616,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* ── Rechts: numpad / cart ── */}
         <div
           className={`${kassaSxgaDenseTiles ? 'w-[300px]' : 'w-80 sm:w-96 lg:w-[380px]'} flex min-h-0 min-w-0 flex-shrink-0 flex-col overflow-x-hidden overflow-y-auto border-0 ${
-            kassaAppearanceDark ? 'bg-[#333333]' : 'bg-white'
+            kassaAppearanceDark ? 'bg-[#2d2d30]' : 'bg-white'
           }`}
         >
 
@@ -4806,7 +4800,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               ) : null}
               {numpadPanelVisible ? (
               <div className="flex min-h-[15rem] flex-1 flex-col justify-end" data-testid="kassa-numpad-panel">
-              <div className="mb-3 flex shrink-0 flex-col gap-0.5">
+              <div className={`mb-3 flex shrink-0 flex-col gap-0.5 px-3 py-2 ${GKS_POS_FIELD}`}>
                   <input
                     type="text"
                     value={numpadValue}
@@ -4918,7 +4912,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       <button
                         type="button"
                         onClick={() => updateQty(item.cartKey, item.quantity - 1)}
-                        className={`touch-manipulation rounded-lg bg-red-500 text-white font-bold flex items-center justify-center hover:bg-red-600 active:brightness-95 ${
+                        className={`touch-manipulation font-bold flex items-center justify-center ${GKS_BTN_SHAPE} ${GKS_POS_BTN} ${
                           kassaSxgaDenseTiles ? 'h-9 w-9 text-lg' : 'h-8 w-8 text-base'
                         }`}
                         aria-label={
@@ -4934,7 +4928,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           <button
                             type="button"
                             onClick={() => void openEditCartItem(item)}
-                            className={`touch-manipulation rounded-lg bg-amber-500 text-white flex items-center justify-center hover:bg-amber-600 active:brightness-95 ${
+                            className={`touch-manipulation flex items-center justify-center ${GKS_BTN_SHAPE} ${GKS_POS_BTN} ${
                               kassaSxgaDenseTiles ? 'h-9 w-9 text-sm' : 'h-8 w-8 text-sm'
                             }`}
                             title={t('kassaApp.ariaEditOptions')}
@@ -4968,10 +4962,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         {/* Totaal + knoppen — touch-vriendelijk (kiosk) */}
         <div
-          className={`sticky bottom-0 z-10 shrink-0 border-t ${kassaAppearanceDark ? 'border-[#4a4a4a] bg-[#333333]' : 'border-gray-200 bg-white'} p-1.5 space-y-1`}
+          className={`sticky bottom-0 z-10 shrink-0 border-t ${kassaAppearanceDark ? 'border-[#1a1a1a] bg-[#2d2d30]' : 'border-gray-200 bg-white'} p-1.5 space-y-1`}
         >
           <div
-            className={`flex items-center justify-between border-b ${kassaAppearanceDark ? 'border-zinc-700' : 'border-gray-100'} py-1`}
+            className={`flex items-center justify-between gap-2 px-2.5 py-2 ${GKS_POS_FIELD}`}
           >
             <span className={`text-sm font-bold ${ui.numpadMeta}`}>
               {t('kassaApp.cartTotal')}
@@ -5344,7 +5338,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           onClick={() => switchToTable(tbl.number)}
                           className={`relative touch-manipulation rounded-xl border-2 py-4 font-bold transition-colors active:brightness-95 ${
                             tableNumber === tbl.number && dineInFloorZone === pickerBrowseZone
-                              ? `${GKS_BTN_SHAPE} border-[var(--gks-accent)] bg-[var(--gks-accent)] text-white`
+                              ? GKS_ACCENT_BTN
                               : tbl.status === 'FREE'
                                 ? 'border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
                                 : tbl.status === 'UNPAID'
@@ -5385,7 +5379,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                             onClick={() => switchToTable(s.stoolNumber)}
                             className={`relative touch-manipulation rounded-xl border-2 py-4 font-bold transition-colors active:brightness-95 ${
                               tableNumber === s.stoolNumber && dineInFloorZone === pickerBrowseZone
-                                ? `${GKS_BTN_SHAPE} border-[var(--gks-accent)] bg-[var(--gks-accent)] text-white`
+                                ? GKS_ACCENT_BTN
                                 : (tableOrders[tableOrderMapKey(pickerBrowseZone, s.stoolNumber)]?.length ?? 0) > 0
                                   ? 'border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100'
                                   : 'border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100'

@@ -2,9 +2,15 @@ import {
   createKassaRegisterUiTheme,
   type KassaRegisterUiTheme,
 } from '@/lib/kassa-register-ui-theme'
+import {
+  GKS_BTN_SHAPE,
+  GKS_MENU_TILE_LABEL_SURFACE,
+  GKS_POS_BTN,
+  GKS_POS_FIELD,
+} from '@/lib/gks-kassa/gks-pos-surface'
 
 /**
- * GKS-pilot: neutraal gunmetal (POS-referentie), geen blauw-grijze productie-tinten.
+ * GKS-pilot: neutraal gunmetal + gradient-toetsen (POS-referentie).
  * Alleen gebruikt op `/shop/{tenant}/gks`.
  */
 export function createGksRegisterUiTheme(dark: boolean): KassaRegisterUiTheme {
@@ -13,42 +19,35 @@ export function createGksRegisterUiTheme(dark: boolean): KassaRegisterUiTheme {
 
   return {
     ...base,
-    shellBg: 'bg-[#2d2d30]',
-    soundBackdrop: 'bg-[#2d2d30]',
-    flyMenuPanel: 'rounded-none shadow-lg border border-[#4a4a4a] bg-[#333333]',
+    shellBg: 'bg-[#252528]',
+    soundBackdrop: 'bg-[#252528]',
+    flyMenuPanel: `${GKS_BTN_SHAPE} shadow-lg border border-[#1a1a1a] bg-[#333333]`,
     flyMenuBorder: 'border-[#4a4a4a]',
     flyMenuDivider: 'border-[#4a4a4a]',
     flyMenuRowHover: 'hover:bg-[#454545]',
     flyMenuRowActive: 'bg-[#4a4a4a]',
-    langPanel:
-      'absolute right-0 top-full z-[130] mt-1 min-w-[180px] overflow-hidden rounded-none border border-[#4a4a4a] bg-[#333333] shadow-lg',
+    langPanel: `absolute right-0 top-full z-[130] mt-1 min-w-[180px] overflow-hidden ${GKS_BTN_SHAPE} border border-[#1a1a1a] bg-[#333333] shadow-lg`,
     langRowActive: 'bg-[#4a4a4a] font-semibold text-white',
-    categoryStripBg: 'bg-[#383838]',
-    categoryStripBorder: 'border-[#4a4a4a]',
-    categoryStripHover: 'hover:bg-[#454545]',
-    productTileSolidBg: 'bg-[#404040]',
-    productTileSolidBorder: 'border-[#5c5c5c]',
-    productTileFooterBar: 'border-[#5c5c5c] bg-[#4a4a4a]',
-    sidebarBg: 'bg-[#333333] border-l border-[#4a4a4a]',
-    ringOffset: 'ring-offset-[#333333]',
-    tablePickerPanel:
-      'absolute left-0 right-0 top-full mt-1 z-50 rounded-none shadow-lg border border-[#4a4a4a] bg-[#333333] overflow-hidden',
-    tablePickerHeader: 'bg-[#383838] border-b border-[#4a4a4a]',
-    tablePickerFooterBar: 'p-2 border-t border-[#4a4a4a] bg-[#383838] flex gap-2',
-    numpadBarBg: 'bg-[#333333]',
-    clockTileBg: 'rounded-none bg-[#404040] p-1 border border-[#5c5c5c]',
-    clockTileHover: 'hover:border-[#787878] hover:bg-[#4a4a4a]',
-    numpadKeyNum: 'bg-[#4a4a4a] text-white hover:bg-[#565656] border border-[#5c5c5c]',
-    cartRowBg:
-      'bg-[#383838] rounded-none p-2.5 flex items-center gap-2.5 border border-[#4a4a4a]',
-    cartThumbPlaceholder: 'bg-[#4a4a4a]',
-    modalConfirmBg:
-      'rounded-none w-full max-w-sm shadow-lg p-6 flex flex-col gap-4 bg-[#333333] border border-[#4a4a4a]',
-    modalGhostBtn:
-      'flex-1 py-3 rounded-none bg-[#4a4a4a] text-white font-semibold hover:bg-[#565656] transition-colors border border-[#5c5c5c]',
-    printFallbackPanel:
-      'w-full max-w-md rounded-none border border-[#4a4a4a] bg-[#333333] p-5 shadow-lg sm:p-6',
-    printFallbackGhost:
-      'mt-3 w-full rounded-none border border-[#5c5c5c] bg-[#4a4a4a] px-4 py-3 text-sm font-semibold text-white hover:bg-[#565656]',
+    categoryStripBg: 'bg-[#2d2d30]',
+    categoryStripBorder: 'border-[#1a1a1a]',
+    categoryStripHover: 'hover:brightness-105',
+    productTileSolidBg: 'bg-[#2a2a2a]',
+    productTileSolidBorder: 'border-[#1a1a1a]',
+    productTileFooterBar: `border-[#1a1a1a] ${GKS_MENU_TILE_LABEL_SURFACE}`,
+    sidebarBg: 'bg-[#2d2d30] border-l border-[#1a1a1a]',
+    ringOffset: 'ring-offset-[#2d2d30]',
+    tablePickerPanel: `absolute left-0 right-0 top-full mt-1 z-50 ${GKS_BTN_SHAPE} shadow-lg border border-[#1a1a1a] bg-[#333333] overflow-hidden`,
+    tablePickerHeader: 'bg-[#383838] border-b border-[#1a1a1a]',
+    tablePickerFooterBar: 'p-2 border-t border-[#1a1a1a] bg-[#2d2d30] flex gap-2',
+    numpadBarBg: 'bg-[#2d2d30]',
+    clockTileBg: `${GKS_BTN_SHAPE} ${GKS_POS_BTN} p-1`,
+    clockTileHover: 'hover:brightness-105',
+    numpadKeyNum: `${GKS_BTN_SHAPE} ${GKS_POS_BTN}`,
+    cartRowBg: `${GKS_POS_FIELD} p-2.5 flex items-center gap-2.5`,
+    cartThumbPlaceholder: 'bg-[#3a3a3a]',
+    modalConfirmBg: `${GKS_BTN_SHAPE} w-full max-w-sm shadow-lg p-6 flex flex-col gap-4 bg-[#333333] border border-[#1a1a1a]`,
+    modalGhostBtn: `flex-1 py-3 ${GKS_BTN_SHAPE} ${GKS_POS_BTN} font-semibold transition-[filter]`,
+    printFallbackPanel: `w-full max-w-md ${GKS_BTN_SHAPE} border border-[#1a1a1a] bg-[#333333] p-5 shadow-lg sm:p-6`,
+    printFallbackGhost: `mt-3 w-full py-3 px-4 text-sm font-semibold ${GKS_BTN_SHAPE} ${GKS_POS_BTN}`,
   }
 }
