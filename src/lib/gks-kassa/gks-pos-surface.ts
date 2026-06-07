@@ -108,9 +108,9 @@ export const GKS_POS_BTN_SELECTED = [
   GKS_POS_SELECTED_ACCENT_TEXT,
 ].join(' ')
 
-/** Afrekenen — zelfde basis + sterkere blauwe gloed. */
+/** Afrekenen — geselecteerde gloed + lichte extra (iets minder dan vóór). */
 export const GKS_CHECKOUT_LIFT_SHADOW =
-  'shadow-[0_4px_9px_rgba(0,0,0,0.64),0_11px_26px_rgba(0,0,0,0.51),0_15px_37px_rgba(0,0,0,0.40),-7px_0_16px_rgba(0,0,0,0.40),7px_0_16px_rgba(0,0,0,0.40),0_8px_32px_rgba(26,127,216,0.58),0_0_30px_rgba(110,181,255,0.42),0_0_16px_rgba(110,181,255,0.48),0_12px_44px_rgba(26,127,216,0.62),0_0_40px_rgba(110,181,255,0.52),0_0_22px_rgba(110,181,255,0.58)]'
+  'shadow-[0_4px_9px_rgba(0,0,0,0.64),0_11px_26px_rgba(0,0,0,0.51),0_15px_37px_rgba(0,0,0,0.40),-7px_0_16px_rgba(0,0,0,0.40),7px_0_16px_rgba(0,0,0,0.40),0_8px_32px_rgba(26,127,216,0.58),0_0_30px_rgba(110,181,255,0.42),0_0_16px_rgba(110,181,255,0.48),0_10px_36px_rgba(26,127,216,0.46),0_0_28px_rgba(110,181,255,0.34)]'
 
 /** Footer Afrekenen — geselecteerde look + altijd blauwe tekst. */
 export const GKS_CHECKOUT_BTN = [
