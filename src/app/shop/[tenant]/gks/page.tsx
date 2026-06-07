@@ -87,6 +87,7 @@ import { gksPersistPaidCommercialOrder } from '@/lib/gks-kassa/gks-persist-paid-
 import type { GksPersistPaidCommercialResult } from '@/lib/gks-kassa/gks-persist-paid-commercial-order'
 import {
   fetchGksOpenTableOrdersForTenant,
+  normalizeGksCommercialItemsToCartLines,
   gksDeleteOpenTableCommercialOrders,
   gksPersistOpenTableCommercialOrder,
 } from '@/lib/gks-kassa/gks-open-table-commercial'
@@ -407,7 +408,7 @@ function buildOpenTableOrdersMapFromRows(
     if (ps === 'paid') continue
     if (tn != null && String(tn) !== '' && row.items != null) {
       const zone = normalizeFloorPlanZone(row.floor_plan_zone)
-      out[tableOrderMapKey(zone, String(tn))] = row.items as CartItem[]
+      out[tableOrderMapKey(zone, String(tn))] = normalizeGksCommercialItemsToCartLines(row.items)
     }
   }
   return out
@@ -1877,17 +1878,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const zone = dineInFloorZone
     const tbl = tableNumber
     const slotKey = tableOrderMapKey(zone, tbl)
-    let mergedForPersist: CartItem[] = []
     setTableOrders((prev) => {
       const merged = mergeCartLinesForTable(prev[slotKey] || [], cart)
-      mergedForPersist = merged
       const next = { ...prev, [slotKey]: merged }
       localStorage.setItem(tableOrdersKey, JSON.stringify(next))
       updateTableStatus(tbl, merged.length > 0, zone)
+      cancelPersistTimer(slotKey)
+      queueMicrotask(() => void persistOpenOrderRowToSupabase(zone, tbl, merged))
       return next
     })
-    cancelPersistTimer(slotKey)
-    void persistOpenOrderRowToSupabase(zone, tbl, mergedForPersist)
     void flushBarDeltaSlipRef.current(zone, tbl, snap, opts)
     setCart([])
     setTableNumber('')

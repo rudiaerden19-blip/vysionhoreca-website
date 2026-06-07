@@ -1,4 +1,9 @@
-import type { KassaCartItem } from '@/lib/kassa-cart-types'
+import type { MenuProduct } from '@/lib/admin-api'
+import type { KassaCartItem, KassaSelectedChoice } from '@/lib/kassa-cart-types'
+
+function minimalMenuProduct(id: string, name: string, price: number): MenuProduct {
+  return { id, name, price } as MenuProduct
+}
 import type { FloorPlanZone } from '@/lib/kassa-floor-plan-zone'
 import { gksCommercialOrders } from '@/lib/gks-kassa/commercial-orders-client'
 
@@ -29,6 +34,43 @@ export function cartItemsToGksCommercialItems(items: KassaCartItem[]): Record<st
     choices: i.choices,
     cartKey: i.cartKey,
   }))
+}
+
+/** DB-items (plat JSON) → mandregels met `product` voor kassa-UI. */
+export function normalizeGksCommercialItemsToCartLines(items: unknown): KassaCartItem[] {
+  if (!Array.isArray(items)) return []
+  const out: KassaCartItem[] = []
+  for (const raw of items) {
+    if (!raw || typeof raw !== 'object') continue
+    const r = raw as Record<string, unknown>
+    const nested = r.product
+    if (nested && typeof nested === 'object') {
+      const p = nested as { id?: string; name?: string; price?: number }
+      if (p.name != null && typeof p.price === 'number') {
+        out.push({
+          product: minimalMenuProduct(
+            p.id ?? String(r.product_id ?? 'item'),
+            String(p.name),
+            p.price,
+          ),
+          quantity: Number(r.quantity) || 1,
+          choices: Array.isArray(r.choices) ? (r.choices as KassaSelectedChoice[]) : [],
+          cartKey: String(r.cartKey ?? p.id ?? 'line'),
+        })
+        continue
+      }
+    }
+    const name = String(r.name ?? 'Item')
+    const price = Number(r.price) || 0
+    const productId = String(r.product_id ?? `gks-${name}`)
+    out.push({
+      product: minimalMenuProduct(productId, name, price),
+      quantity: Number(r.quantity) || 1,
+      choices: Array.isArray(r.choices) ? (r.choices as KassaSelectedChoice[]) : [],
+      cartKey: String(r.cartKey ?? productId),
+    })
+  }
+  return out
 }
 
 export async function fetchGksOpenTableOrdersForTenant(
