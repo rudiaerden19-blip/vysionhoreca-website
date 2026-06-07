@@ -358,8 +358,16 @@ const KASSA_STRIP_SCROLL_DELTA_PX = 4
 /** Titelbalk: klantscherm + geluid tijdelijk verborgen (code blijft voor later). */
 const KASSA_HEADER_HIDE_CUSTOMER_DISPLAY_AND_SOUND = true
 
+/** GKS accent — exact #0056d6 via CSS-variabele op `kassa-app` root. */
+const GKS_ACCENT_ROOT_STYLE = {
+  '--gks-accent': '#0056d6',
+  '--gks-accent-hover': '#004bb8',
+} as React.CSSProperties
+
+const GKS_ACCENT_BTN = 'bg-[var(--gks-accent)] text-white hover:bg-[var(--gks-accent-hover)]'
+
 const KASSA_HEADER_QUICK_LINK_BTN =
-  'inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-xl bg-[#0056d6] font-bold text-white transition-colors hover:bg-[#004bb8] min-h-[2.35rem] px-3 py-2 sm:min-h-[2.6rem] sm:px-3.5 sm:py-2.5'
+  `inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-xl ${GKS_ACCENT_BTN} font-bold transition-colors min-h-[2.35rem] px-3 py-2 sm:min-h-[2.6rem] sm:px-3.5 sm:py-2.5`
 const KASSA_HEADER_QUICK_LINK_LABEL = 'text-xs leading-snug sm:text-sm'
 
 /** Alleen Binnen/Terras — groter dan besteltype-knoppen eronder. */
@@ -374,9 +382,7 @@ function kassaOrderTypeButtonTouchClass(sxga: boolean): string {
 
 /** GKS sidebar: één blauw (#0056d6) voor zone-, type- en afreken-knoppen. */
 function gksSidebarBlueButtonClass(selected: boolean): string {
-  return `bg-[#0056d6] text-white hover:bg-[#004bb8] ${
-    selected ? 'ring-2 ring-white/45 ring-inset' : 'opacity-95'
-  }`
+  return `${GKS_ACCENT_BTN} ${selected ? 'ring-2 ring-white/45 ring-inset' : 'opacity-95'}`
 }
 
 /** Sidebar-footer: touch-vriendelijke hoogte (Lade / Bon / Numpad). */
@@ -4148,8 +4154,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250607-accent-0056d6"
+      data-gks-ui="20250607-accent-0056d6-vars"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
+      style={GKS_ACCENT_ROOT_STYLE}
     >
       <LogoutSoftwareConfirmModal
         open={logoutSoftwareConfirmOpen}
@@ -4179,7 +4186,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* ── Hamburger ── */}
         <div className="relative z-20 flex shrink-0 items-center gap-2">
           <button onClick={() => { setHamburgerOpen(!hamburgerOpen); setHamburgerSubOpen(null) }}
-            className={`flex items-center gap-1.5 rounded-xl px-2 py-1.5 transition-colors sm:gap-2 sm:px-3 ${hamburgerOpen ? 'bg-[#004bb8] text-white' : 'bg-[#0056d6] text-white hover:bg-[#004bb8]'}`}
+            className={`flex items-center gap-1.5 rounded-xl px-2 py-1.5 transition-colors sm:gap-2 sm:px-3 ${hamburgerOpen ? 'bg-[var(--gks-accent-hover)] text-white' : `${GKS_ACCENT_BTN}`}`}
             type="button"
             title={t('kassaApp.hamburgerMenu')}
             aria-expanded={hamburgerOpen}
@@ -4356,7 +4363,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           {isOnline !== null && (
             <div
               className={`inline-flex max-w-[6.5rem] shrink-0 items-center justify-center gap-0.5 rounded-xl px-3 py-2 font-bold leading-tight min-h-[2.35rem] sm:min-h-[2.6rem] sm:max-w-[8rem] md:max-w-none ${KASSA_HEADER_QUICK_LINK_LABEL} ${
-                isOnline ? 'bg-[#0056d6] text-white' : 'bg-red-600/95 text-white'
+                isOnline ? 'bg-[var(--gks-accent)] text-white' : 'bg-red-600/95 text-white'
               }`}
               title={isOnline ? t('kassaApp.onlineModeLiveTitle') : t('kassaApp.offlineModeActive')}
               role="status"
@@ -4422,7 +4429,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           type="button"
           onClick={() => setLogoutSoftwareConfirmOpen(true)}
           title={t('kassaApp.logout')}
-          className="relative z-20 inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-lg bg-[#0056d6] px-1.5 py-1 text-[11px] font-bold text-white transition-colors hover:bg-[#004bb8] sm:gap-1 sm:px-2.5 sm:py-1.5 sm:text-sm"
+          className={`relative z-20 inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-lg px-1.5 py-1 text-[11px] font-bold transition-colors sm:gap-1 sm:px-2.5 sm:py-1.5 sm:text-sm ${GKS_ACCENT_BTN}`}
         >
           <span className="leading-snug">{t('kassaApp.logout')}</span>
         </button>
@@ -4502,7 +4509,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           : 'px-2.5 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm'
                       } ${
                         active
-                          ? 'border-[#0056d6] bg-[#0056d6] text-white shadow-sm'
+                          ? 'border-[var(--gks-accent)] bg-[var(--gks-accent)] text-white shadow-sm'
                           : kassaAppearanceDark
                             ? `border-zinc-500 bg-[#1a2230] ${ui.categoryStripText} ${ui.categoryStripHover}`
                             : `border-gray-300 bg-white ${ui.categoryStripText} ${ui.categoryStripHover}`
@@ -4738,14 +4745,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-1.5 pt-0.5 touch-pan-y">
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
               <div
-                className="mb-2 flex shrink-0 items-center gap-2 rounded-lg bg-[#0056d6] px-2 py-1"
+                className="mb-2 flex shrink-0 items-center gap-2 rounded-lg bg-[var(--gks-accent)] px-2 py-1"
                 data-testid="kassa-sidebar-clock-bar"
               >
                 {showKassaStaffClockButton ? (
                   <button
                     type="button"
                     onClick={openStaffClockModal}
-                    className={`shrink-0 active:scale-[0.98] transition-all ${ui.clockTileBg} hover:border-[#004bb8] hover:bg-[#263043]`}
+                    className={`shrink-0 active:scale-[0.98] transition-all ${ui.clockTileBg} hover:border-[var(--gks-accent-hover)] hover:bg-[#263043]`}
                     title={t('staffClock.buttonTitle')}
                     aria-label={t('staffClock.buttonTitle')}
                   >
@@ -4979,7 +4986,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <button
               type="button"
               onClick={() => { void openCashDrawer() }}
-              className={`flex flex-col items-center justify-center gap-1 rounded-xl bg-[#0056d6] text-white hover:bg-[#004bb8] active:brightness-95 ${kassaFooterActionTouchMinHClass(
+              className={`flex flex-col items-center justify-center gap-1 rounded-xl bg-[var(--gks-accent)] text-white hover:bg-[var(--gks-accent-hover)] active:brightness-95 ${kassaFooterActionTouchMinHClass(
                 kassaSxgaDenseTiles,
                 kassaSidebarFooterTier === 'dense',
               )}`}
@@ -5030,7 +5037,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 playClick()
                 setNumpadPanelVisible((v) => !v)
               }}
-              className={`flex flex-col items-center justify-center gap-1 rounded-xl bg-[#0056d6] text-white hover:bg-[#004bb8] active:brightness-95 ${
+              className={`flex flex-col items-center justify-center gap-1 rounded-xl bg-[var(--gks-accent)] text-white hover:bg-[var(--gks-accent-hover)] active:brightness-95 ${
                 numpadPanelVisible ? 'ring-2 ring-white/45 ring-inset' : ''
               } ${kassaFooterActionTouchMinHClass(
                 kassaSxgaDenseTiles,
@@ -5073,7 +5080,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 className={`min-w-0 flex-1 rounded-lg font-bold shadow-sm ring-1 ring-black/10 active:brightness-95 flex items-center justify-center text-center disabled:opacity-45 disabled:pointer-events-none ${
                   dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE
                     ? 'bg-emerald-400 text-emerald-950 hover:bg-emerald-300'
-                    : 'bg-[#0056d6] text-white hover:bg-[#004bb8]'
+                    : 'bg-[var(--gks-accent)] text-white hover:bg-[var(--gks-accent-hover)]'
                 } px-2 py-3 text-xs leading-tight sm:text-sm ${
                   kassaSxgaDenseTiles ? 'min-h-[2.875rem]' : 'min-h-[2.5rem]'
                 }`}
@@ -5093,7 +5100,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 setShowPaymentModal(true)
               }}
               disabled={billLines.length === 0 || gksFiscalBlocked}
-              className={`flex w-full items-center justify-center gap-2 rounded-xl bg-[#0056d6] font-bold text-white shadow-sm hover:bg-[#004bb8] active:brightness-95 disabled:cursor-not-allowed disabled:pointer-events-none disabled:hover:bg-[#0056d6] ${
+              className={`flex w-full items-center justify-center gap-2 rounded-xl font-bold text-white shadow-sm active:brightness-95 disabled:cursor-not-allowed disabled:pointer-events-none disabled:hover:bg-[var(--gks-accent)] ${GKS_ACCENT_BTN} ${
                 kassaSxgaDenseTiles
                   ? 'min-h-[4rem] py-3.5 text-xl'
                   : 'min-h-[3.5rem] py-3 text-lg'
