@@ -103,6 +103,11 @@ import { GKS_MANDATORY_STAFF_SESSION } from '@/lib/gks-kassa/pilot-config'
 import { formatKassaNumpadHeaderDate } from '@/lib/format-kassa-header-date'
 import { appendKassaCloseTipToAbsoluteLoginUrl } from '@/lib/shop-login-kassa-tip'
 import { syncZReportAfterOrderSafe } from '@/lib/gks-kassa/z-sync-safe'
+import {
+  assertGksCanFiscalize,
+  gksAvailabilityBannerMessage,
+} from '@/lib/gks-kassa/gks-availability'
+import { useGksAvailability, useGksFiscalBlocked } from '@/lib/gks-kassa/use-gks-availability'
 import { KassaAnalogClock } from '@/components/kassa/KassaAnalogClock'
 import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
 import type {
@@ -3000,6 +3005,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     // FinCloud: geen directe kassa-koppeling — alleen FDM/BII GraphQL.
     if (billLines.length === 0) return
 
+    const fiscalGate = await assertGksCanFiscalize({
+      tenantSlug: tenant,
+      staff: activeKassaStaff,
+      vatNo: tenantInfo?.btw_number?.trim() || 'BE0000000000',
+    })
+    if (fiscalGate) {
+      alert(fiscalGate.message)
+      return
+    }
+
     if (method === 'SPLIT') {
       const sc = splitAmounts?.cash ?? 0
       const sd = splitAmounts?.card ?? 0
@@ -3028,8 +3043,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
         ? crypto.randomUUID()
         : `${tenant}-${createdAt.getTime()}-${Math.random().toString(36).slice(2, 12)}`
-
-    const shortRef = kassa_client_uuid.replace(/-/g, '').slice(-10).toUpperCase()
 
     const receiptTable = kassaReceiptTableNumber(orderType, tableNumber)
     const customerTableLabel = receiptTable
@@ -3109,21 +3122,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     const allocatedOrderNumber = saleRes.posFiscalTicketNo
 
-    let queuedOffline = false
     const persistRes = persistRef.current
-    if (persistRes?.queuedOffline) {
-      queuedOffline = true
-      alert(
-        `${t('kassaApp.offlineModeActive')}\n\n${t('kassaApp.offlineOrderQueuedAlert').replace('{ref}', shortRef)}`,
-      )
-    } else if (persistRes?.hardError) {
+    if (persistRes?.hardError) {
       console.error('[gks-kassa] commercial order insert:', persistRes.hardError)
       alert(
         `${t('kassaApp.orderPersistFailedTitle')}\n\n${t('kassaApp.orderPersistFailedBody')}\n\n(Fiscale verkoop staat wel in het journal.)${persistRes.hardError ? `\n\n(${persistRes.hardError})` : ''}`,
       )
     }
 
-    syncZReportAfterOrderSafe(tenant, createdAt.toISOString())
+    syncZReportAfterOrderSafe(tenant, createdAt.toISOString(), {
+      staffInsz: activeKassaStaff?.insz ?? null,
+      vatNo,
+    })
     playCashRegister()
     setTimeout(() => playSuccess(), 400)
 
@@ -3155,7 +3165,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     setLastOrder({
       orderNumber: allocatedOrderNumber,
-      checkoutReference: queuedOffline ? shortRef : undefined,
+      checkoutReference: undefined,
       items: sortKassaCartLinesByMenuCategory([...billLines], categories),
       total,
       vatSplit: receiptVatSplit,
@@ -3219,6 +3229,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const isDraft = !!opts?.draft
     const barKitchenDelta = !!opts?.barTableDelta
     const receiptMode = opts?.receiptMode ?? 'kassa'
+    const skipFiscalGuard = isDraft && receiptMode === 'keuken'
+    if (!skipFiscalGuard) {
+      const fiscalGate = await assertGksCanFiscalize({
+        tenantSlug: tenant,
+        staff: activeKassaStaff,
+        vatNo: tenantInfo?.btw_number?.trim() || 'BE0000000000',
+      })
+      if (fiscalGate) {
+        setThermalPrintBanner({ variant: 'error', message: fiscalGate.message })
+        return
+      }
+    }
     const receiptTableNr = kassaReceiptTableNumber(order.orderType, order.tableNumber)
 
     if (!isDraft) {
@@ -3632,6 +3654,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
    */
   const printDraftBonFromCart = async (opts?: { draftCopies?: 1 | 2 }) => {
     if (draftBonLineItems.length === 0) return
+    const fiscalGate = await assertGksCanFiscalize({
+      tenantSlug: tenant,
+      staff: activeKassaStaff,
+      vatNo: tenantInfo?.btw_number?.trim() || 'BE0000000000',
+    })
+    if (fiscalGate) {
+      setThermalPrintBanner({ variant: 'error', message: fiscalGate.message })
+      return
+    }
     try {
       setDraftBonPrinting(true)
       playClick()
@@ -3998,6 +4029,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     [t],
   )
 
+  const gksVatNo = tenantInfo?.btw_number?.trim() || 'BE0000000000'
+  const gksAvailability = useGksAvailability(tenant, activeKassaStaff, gksVatNo)
+  const { blocked: gksFiscalBlocked } = useGksFiscalBlocked(gksAvailability)
+  const gksFiscalBlockedTitle = t('gksAvailability.tooltipBlocked')
+
   return (
     <div
       className="flex min-h-0 flex-col overflow-hidden h-[100svh] max-h-[100svh] supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh]"
@@ -4012,6 +4048,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         }}
       />
       <div className={`flex min-h-0 flex-1 flex-col overflow-hidden ${ui.shellBg}`}>
+
+      {gksAvailability && gksFiscalBlocked ? (
+        <div
+          role="alert"
+          data-testid="gks-availability-banner"
+          className="shrink-0 border-b border-red-900/40 bg-red-600 px-3 py-2 text-center text-sm font-semibold text-white"
+        >
+          {gksAvailabilityBannerMessage(gksAvailability, t)}
+        </div>
+      ) : null}
 
       {/* ── Blauwe balk: één rij — kleine tenantnaam zodat snelkoppelingen naast elkaar passen zonder horizontale scrollbar ── */}
       <div className="relative z-30 flex min-h-[56px] w-full min-w-0 shrink-0 items-center gap-1.5 bg-black px-2 py-2 sm:gap-2 sm:px-3">
@@ -4114,12 +4160,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         <div className="relative z-20 ml-[1cm] flex min-w-0 max-w-[9rem] shrink-0 flex-col justify-center px-0.5 sm:max-w-[11rem] md:max-w-[14rem] lg:max-w-[16rem]">
           <button
             type="button"
+            disabled={gksFiscalBlocked || draftBonLineItems.length === 0 || draftBonPrinting}
             onClick={() => {
-              if (draftBonLineItems.length === 0 || draftBonPrinting) return
+              if (draftBonLineItems.length === 0 || draftBonPrinting || gksFiscalBlocked) return
               void printDraftBonFromCart({ draftCopies: 2 })
             }}
-            className="max-w-full truncate rounded-md px-1 py-0.5 text-center text-sm font-bold leading-tight tracking-tight text-white transition-colors hover:bg-white/15 active:bg-white/25 sm:text-base md:text-lg"
-            title={t('kassaApp.cartBonTitle')}
+            className="max-w-full truncate rounded-md px-1 py-0.5 text-center text-sm font-bold leading-tight tracking-tight text-white transition-colors hover:bg-white/15 active:bg-white/25 disabled:opacity-45 disabled:pointer-events-none sm:text-base md:text-lg"
+            title={gksFiscalBlocked ? gksFiscalBlockedTitle : t('kassaApp.cartBonTitle')}
             aria-label={`${tenantInfo?.business_name || tenant} — ${t('kassaApp.cartBonTitle')}`}
           >
             {tenantInfo?.business_name ||
@@ -4868,12 +4915,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               onClick={() => {
                 void printDraftBonFromCart({ draftCopies: 1 })
               }}
-              disabled={draftBonLineItems.length === 0 || draftBonPrinting}
+              disabled={gksFiscalBlocked || draftBonLineItems.length === 0 || draftBonPrinting}
+              title={gksFiscalBlocked ? gksFiscalBlockedTitle : t('kassaApp.cartBonTitle')}
               className={`flex flex-col items-center justify-center gap-1 rounded-xl bg-yellow-400 text-yellow-950 hover:bg-yellow-300 active:brightness-95 disabled:pointer-events-none disabled:opacity-45 ${kassaFooterActionTouchMinHClass(
                 kassaSxgaDenseTiles,
                 kassaSidebarFooterTier === 'dense',
               )}`}
-              title={t('kassaApp.cartBonTitle')}
               aria-label={t('kassaApp.cartBonTitle')}
             >
               <span className={`leading-none ${kassaSxgaDenseTiles ? 'text-2xl' : 'text-xl'}`} aria-hidden>
@@ -4928,8 +4975,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               </button>
               <button
                 type="button"
+                disabled={gksFiscalBlocked}
+                title={gksFiscalBlocked ? gksFiscalBlockedTitle : undefined}
                 onClick={() => parkOrder({ printKitchen: false, printKassaSlip: true })}
-                className={`min-w-0 flex-1 rounded-lg font-bold shadow-sm ring-1 ring-black/10 active:brightness-95 flex items-center justify-center text-center ${
+                className={`min-w-0 flex-1 rounded-lg font-bold shadow-sm ring-1 ring-black/10 active:brightness-95 flex items-center justify-center text-center disabled:opacity-45 disabled:pointer-events-none ${
                   dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE
                     ? 'bg-emerald-400 text-emerald-950 hover:bg-emerald-300'
                     : 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
@@ -4966,12 +5015,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </button>
             <button
               type="button"
+              data-testid="kassa-checkout"
+              title={gksFiscalBlocked ? gksFiscalBlockedTitle : undefined}
               onClick={() => {
-                if (billLines.length === 0) return
+                if (billLines.length === 0 || gksFiscalBlocked) return
                 scheduleKassaTapSound(playCheckout)
                 setShowPaymentModal(true)
               }}
-              disabled={billLines.length === 0}
+              disabled={billLines.length === 0 || gksFiscalBlocked}
               className={`flex min-w-0 flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-500 font-bold text-white hover:bg-emerald-600 active:brightness-95 disabled:bg-emerald-900/45 disabled:text-white/75 disabled:opacity-100 ${
                 kassaSxgaDenseTiles
                   ? 'min-h-[4rem] py-3.5 text-xl'
@@ -5338,6 +5389,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           setShowPaymentModal(false)
         }}
         appearance={kassaAppearanceDark ? 'dark' : 'light'}
+        payDisabled={gksFiscalBlocked}
+        payDisabledTitle={gksFiscalBlockedTitle}
       />
 
       <KassaSplitPaymentModal
@@ -5353,6 +5406,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         }}
         onConfirm={() => void completePayment('SPLIT', { cash: splitCash, card: splitCard })}
         appearance={kassaAppearanceDark ? 'dark' : 'light'}
+        payDisabled={gksFiscalBlocked}
+        payDisabledTitle={gksFiscalBlockedTitle}
       />
 
       {printAgentFallbackHtml !== null && (
@@ -5442,7 +5497,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           tenantInfo={tenantInfo}
           locale={locale}
           onClose={() => setShowSuccessModal(false)}
-          printDisabled={successReceiptPrintBusy}
+          printDisabled={successReceiptPrintBusy || gksFiscalBlocked}
           onPrint={async () => {
             try {
               setSuccessReceiptPrintBusy(true)

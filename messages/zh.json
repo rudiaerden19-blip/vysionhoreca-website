@@ -3219,6 +3219,17 @@
     "goToKassaSales": "打开收银端进行销售",
     "refreshList": "刷新列表"
   },
+  "gksAvailability": {
+    "tooltipBlocked": "GKS 需要有效的互联网和 FDM 连接。",
+    "banner": {
+      "ONLINE_OK": "",
+      "INTERNET_OFFLINE": "互联网连接离线。无法完成 GKS 销售。",
+      "FDM_UNREACHABLE": "无法访问 FDM/Checkbox。税务登记已阻止。",
+      "FDM_ERROR": "FDM 报告错误。请继续前检查 FDM 状态。",
+      "UNKNOWN": "GKS 可用性未知。税务操作已阻止。",
+      "STAFF_REQUIRED": "税务销售需要具有 INSZ 的员工。"
+    }
+  },
   "gksReceipt": {
     "fiscalTicketHeader": "增值税 fiscal 票据",
     "proFormaBanner": "形式发票 — 暂计账单",

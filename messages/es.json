@@ -3219,6 +3219,17 @@
     "goToKassaSales": "Abrir TPV para ventas",
     "refreshList": "Actualizar lista"
   },
+  "gksAvailability": {
+    "tooltipBlocked": "GKS requiere conexión activa a Internet y FDM.",
+    "banner": {
+      "ONLINE_OK": "",
+      "INTERNET_OFFLINE": "Conexión a Internet sin conexión. No se pueden completar ventas GKS.",
+      "FDM_UNREACHABLE": "FDM/Checkbox no accesible. El registro fiscal está bloqueado.",
+      "FDM_ERROR": "El FDM informa un error. Compruebe el estado del FDM antes de continuar.",
+      "UNKNOWN": "Disponibilidad GKS desconocida. Las acciones fiscales están bloqueadas.",
+      "STAFF_REQUIRED": "Se requiere empleado con INSZ para ventas fiscales."
+    }
+  },
   "gksReceipt": {
     "fiscalTicketHeader": "TICKET FISCAL IVA",
     "proFormaBanner": "PRO FORMA — CUENTA PROVISIONAL",

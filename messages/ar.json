@@ -3219,6 +3219,17 @@
     "goToKassaSales": "فتح الصندوق للبيع",
     "refreshList": "تحديث القائمة"
   },
+  "gksAvailability": {
+    "tooltipBlocked": "يتطلب GKS اتصالاً نشطاً بالإنترنت وFDM.",
+    "banner": {
+      "ONLINE_OK": "",
+      "INTERNET_OFFLINE": "اتصال الإنترنت غير متاح. لا يمكن إتمام مبيعات GKS.",
+      "FDM_UNREACHABLE": "FDM/Checkbox غير قابل للوصول. التسجيل الضريبي محظور.",
+      "FDM_ERROR": "أبلغ FDM عن خطأ. تحقق من حالة FDM قبل المتابعة.",
+      "UNKNOWN": "توفر GKS غير معروف. الإجراءات الضريبية محظورة.",
+      "STAFF_REQUIRED": "مطلوب موظف بـ INSZ للمبيعات الضريبية."
+    }
+  },
   "gksReceipt": {
     "fiscalTicketHeader": "تذكرة ضريبة القيمة المضافة",
     "proFormaBanner": "مبدئي — فاتورة مؤقتة",

@@ -7,12 +7,8 @@ import { cashRoundingDelta, roundCashToFiveCents } from '@/lib/gks-kassa/cash-ro
 import { clearCostCenterReference, getOrCreateCostCenterReference } from '@/lib/gks-kassa/cost-center-session'
 import type { GksPaymentLineInput } from '@/lib/gks-kassa/fdm-types'
 import { assertGksStaffForFiscal, type GksActiveStaff } from '@/lib/gks-kassa/gks-staff'
-import {
-  queryFdmStatus,
-  signOrder,
-  signSale,
-  type GksPartnerContext,
-} from '@/services/gksPartnerService'
+import { assertGksCanFiscalize } from '@/lib/gks-kassa/gks-availability'
+import { signOrder, signSale, type GksPartnerContext } from '@/services/gksPartnerService'
 import type { FloorPlanZone } from '@/lib/kassa-floor-plan-zone'
 import { tableOrderMapKey } from '@/lib/kassa-floor-plan-zone'
 import {
@@ -242,11 +238,7 @@ export async function gksEnsureFdmReady(
   if (!assertGksStaffForFiscal(staff)) {
     return { code: 'STAFF_REQUIRED', message: 'Medewerker met geldig INSZ vereist.' }
   }
-  const status = await queryFdmStatus(partnerCtx(tenantSlug, staff, vatNo))
-  if (!status.operational) {
-    return { code: 'FDM_NOT_OPERATIONAL', message: status.messages.join('; ') || 'FDM niet operationeel' }
-  }
-  return null
+  return assertGksCanFiscalize({ tenantSlug, staff, vatNo })
 }
 
 export async function gksPersistTableOrderP(

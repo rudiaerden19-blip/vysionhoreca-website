@@ -3219,6 +3219,17 @@
     "goToKassaSales": "売上のためレジを開く",
     "refreshList": "一覧を更新"
   },
+  "gksAvailability": {
+    "tooltipBlocked": "GKSにはインターネットとFDMの接続が必要です。",
+    "banner": {
+      "ONLINE_OK": "",
+      "INTERNET_OFFLINE": "インターネット接続がオフラインです。GKS販売を完了できません。",
+      "FDM_UNREACHABLE": "FDM/Checkboxに到達できません。税務登録はブロックされています。",
+      "FDM_ERROR": "FDMがエラーを報告しました。続行前にFDMの状態を確認してください。",
+      "UNKNOWN": "GKSの可用性が不明です。税務操作はブロックされています。",
+      "STAFF_REQUIRED": "税務販売にはINSZを持つスタッフが必要です。"
+    }
+  },
   "gksReceipt": {
     "fiscalTicketHeader": "消費税レシート",
     "proFormaBanner": "PRO FORMA — 仮請求",

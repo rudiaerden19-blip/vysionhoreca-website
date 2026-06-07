@@ -3693,6 +3693,17 @@
     "goToKassaSales": "Naar kassa voor verkoop",
     "refreshList": "Lijst vernieuwen"
   },
+  "gksAvailability": {
+    "tooltipBlocked": "GKS vereist actieve internet- en FDM-verbinding.",
+    "banner": {
+      "ONLINE_OK": "",
+      "INTERNET_OFFLINE": "Internetverbinding offline. GKS-verkoop kan niet afgerond worden.",
+      "FDM_UNREACHABLE": "FDM/Checkbox niet bereikbaar. Fiscale registratie is geblokkeerd.",
+      "FDM_ERROR": "FDM meldt een fout. Controleer de FDM-status voor u verder werkt.",
+      "UNKNOWN": "GKS-beschikbaarheid onbekend. Fiscale acties zijn geblokkeerd.",
+      "STAFF_REQUIRED": "Medewerker met INSZ vereist voor fiscale verkoop."
+    }
+  },
   "gksReceipt": {
     "fiscalTicketHeader": "BTW-KASTICKET",
     "proFormaBanner": "PRO FORMA — VOORLOPIGE REKENING",

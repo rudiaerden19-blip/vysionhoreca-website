@@ -2719,6 +2719,17 @@
     "goToKassaSales": "Ouvrir la caisse pour la vente",
     "refreshList": "Actualiser la liste"
   },
+  "gksAvailability": {
+    "tooltipBlocked": "GKS nécessite une connexion Internet et FDM active.",
+    "banner": {
+      "ONLINE_OK": "",
+      "INTERNET_OFFLINE": "Connexion Internet hors ligne. Les ventes GKS ne peuvent pas être finalisées.",
+      "FDM_UNREACHABLE": "FDM/Checkbox inaccessible. L'enregistrement fiscal est bloqué.",
+      "FDM_ERROR": "Le FDM signale une erreur. Vérifiez le statut FDM avant de continuer.",
+      "UNKNOWN": "Disponibilité GKS inconnue. Les actions fiscales sont bloquées.",
+      "STAFF_REQUIRED": "Employé avec INSZ requis pour la vente fiscale."
+    }
+  },
   "gksReceipt": {
     "fiscalTicketHeader": "TICKET TVA",
     "proFormaBanner": "PRO FORMA — NOTE PROVISOIRE",

@@ -2719,6 +2719,17 @@
     "goToKassaSales": "Zur Kasse für Verkauf",
     "refreshList": "Liste aktualisieren"
   },
+  "gksAvailability": {
+    "tooltipBlocked": "GKS erfordert eine aktive Internet- und FDM-Verbindung.",
+    "banner": {
+      "ONLINE_OK": "",
+      "INTERNET_OFFLINE": "Internetverbindung offline. GKS-Verkauf kann nicht abgeschlossen werden.",
+      "FDM_UNREACHABLE": "FDM/Checkbox nicht erreichbar. Fiskalische Registrierung ist blockiert.",
+      "FDM_ERROR": "FDM meldet einen Fehler. Prüfen Sie den FDM-Status, bevor Sie fortfahren.",
+      "UNKNOWN": "GKS-Verfügbarkeit unbekannt. Fiskalische Aktionen sind blockiert.",
+      "STAFF_REQUIRED": "Mitarbeiter mit INSZ erforderlich für fiskalischen Verkauf."
+    }
+  },
   "gksReceipt": {
     "fiscalTicketHeader": "MWST-KASSENBON",
     "proFormaBanner": "PRO FORMA — VORLÄUFIGE RECHNUNG",

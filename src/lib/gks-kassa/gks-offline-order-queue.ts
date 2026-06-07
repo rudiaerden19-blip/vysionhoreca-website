@@ -40,15 +40,30 @@ export async function mergeOfflineOrderQueues(tenantSlug: string): Promise<objec
   return merged
 }
 
+function isPaidFiscalQueueRow(row: Record<string, unknown>): boolean {
+  const ps = String(row.payment_status ?? '').toLowerCase()
+  return ps === 'paid'
+}
+
 export async function flushOfflineOrdersToSupabase(tenantSlug: string): Promise<void> {
   const offlineQueueKey = offlineOrdersQueueStorageKey(tenantSlug)
 
   const processQueue = async () => {
     const freshQueue = await mergeOfflineOrderQueues(tenantSlug)
-    if (freshQueue.length === 0) return
+    const fiscalPaid = freshQueue.filter((o) => isPaidFiscalQueueRow(o as Record<string, unknown>))
+    const workQueue = freshQueue.filter((o) => !isPaidFiscalQueueRow(o as Record<string, unknown>))
+    if (fiscalPaid.length > 0) {
+      try {
+        await offlineDbSetOrderQueue(tenantSlug, workQueue)
+        localStorage.setItem(offlineQueueKey, JSON.stringify(workQueue))
+      } catch {
+        /* ignore */
+      }
+    }
+    if (workQueue.length === 0) return
 
     const remaining: object[] = []
-    for (const order of freshQueue) {
+    for (const order of workQueue) {
       const row = order as Record<string, unknown>
       let ok = false
       for (let attempt = 0; attempt < 3; attempt++) {

@@ -19,6 +19,8 @@ export function KassaPaymentModal({
   onPay,
   onOpenSplit,
   appearance = 'light',
+  payDisabled = false,
+  payDisabledTitle,
 }: {
   open: boolean
   total: number
@@ -27,6 +29,8 @@ export function KassaPaymentModal({
   onPay: (method: KassaQuickPayMethod) => void
   onOpenSplit: () => void
   appearance?: 'light' | 'dark'
+  payDisabled?: boolean
+  payDisabledTitle?: string
 }) {
   const { t } = useLanguage()
   const dark = appearance === 'dark'
@@ -63,8 +67,10 @@ export function KassaPaymentModal({
               <button
                 key={pm.method}
                 type="button"
+                disabled={payDisabled}
+                title={payDisabled ? payDisabledTitle : undefined}
                 onClick={() => onPay(pm.method)}
-                className={btnTile}
+                className={`${btnTile} disabled:opacity-45 disabled:pointer-events-none`}
                 style={{ borderColor: pm.color }}
               >
                 <span className="text-4xl">{pm.icon}</span>
@@ -73,8 +79,10 @@ export function KassaPaymentModal({
             ))}
             <button
               type="button"
+              disabled={payDisabled}
+              title={payDisabled ? payDisabledTitle : undefined}
               onClick={onOpenSplit}
-              className={`col-span-2 ${btnTile}`}
+              className={`col-span-2 ${btnTile} disabled:opacity-45 disabled:pointer-events-none`}
               style={{ borderColor: '#8b5cf6' }}
             >
               <span className="text-4xl">👛</span>

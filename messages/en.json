@@ -3693,6 +3693,17 @@
     "goToKassaSales": "Open POS for sales",
     "refreshList": "Refresh list"
   },
+  "gksAvailability": {
+    "tooltipBlocked": "GKS requires an active internet and FDM connection.",
+    "banner": {
+      "ONLINE_OK": "",
+      "INTERNET_OFFLINE": "Internet connection offline. GKS sales cannot be completed.",
+      "FDM_UNREACHABLE": "FDM/Checkbox unreachable. Fiscal registration is blocked.",
+      "FDM_ERROR": "FDM reported an error. Check FDM status before continuing.",
+      "UNKNOWN": "GKS availability unknown. Fiscal actions are blocked.",
+      "STAFF_REQUIRED": "Staff member with national ID (INSZ) required for fiscal sales."
+    }
+  },
   "gksReceipt": {
     "fiscalTicketHeader": "VAT FISCAL TICKET",
     "proFormaBanner": "PRO FORMA — PROVISIONAL BILL",

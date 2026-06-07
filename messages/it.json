@@ -3219,6 +3219,17 @@
     "goToKassaSales": "Apri cassa per le vendite",
     "refreshList": "Aggiorna elenco"
   },
+  "gksAvailability": {
+    "tooltipBlocked": "GKS richiede connessione Internet e FDM attiva.",
+    "banner": {
+      "ONLINE_OK": "",
+      "INTERNET_OFFLINE": "Connessione Internet assente. Le vendite GKS non possono essere completate.",
+      "FDM_UNREACHABLE": "FDM/Checkbox non raggiungibile. La registrazione fiscale è bloccata.",
+      "FDM_ERROR": "Il FDM segnala un errore. Controllare lo stato FDM prima di continuare.",
+      "UNKNOWN": "Disponibilità GKS sconosciuta. Le azioni fiscali sono bloccate.",
+      "STAFF_REQUIRED": "Dipendente con INSZ richiesto per vendite fiscali."
+    }
+  },
   "gksReceipt": {
     "fiscalTicketHeader": "SCONTRINO FISCALE IVA",
     "proFormaBanner": "PRO FORMA — CONTO PROVVISORIO",

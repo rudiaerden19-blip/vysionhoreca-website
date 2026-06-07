@@ -1,9 +1,6 @@
 import { isLikelyOfflineOrNetworkPersistFailure } from '@/lib/kassa-supabase-guards'
 import { gksCommercialOrders, isDuplicateGksKassaClientViolation } from '@/lib/gks-kassa/commercial-orders-client'
 import { fetchGksOrderNumberByKassaClientUuid } from '@/lib/gks-kassa/gks-fetch-order-number'
-import { mergeOfflineOrderQueues } from '@/lib/gks-kassa/gks-offline-order-queue'
-import { offlineDbSetOrderQueue } from '@/lib/gks-kassa/offline-db'
-import { gksOfflineOrdersQueueStorageKey } from '@/lib/gks-kassa/storage-keys'
 
 export type GksPersistPaidCommercialResult = {
   orderNumber: number
@@ -61,22 +58,11 @@ export async function gksPersistPaidCommercialOrder(
     !insRes.ok &&
     (insRes.status === 0 || insRes.status >= 500 || isLikelyOfflineOrNetworkPersistFailure(insRes.error))
   ) {
-    const queue = await mergeOfflineOrderQueues(tenantSlug)
-    const row = { ...orderPayload, tenant_slug: tenantSlug }
-    if (
-      !queue.some(
-        (o) => (o as { kassa_client_uuid?: string }).kassa_client_uuid === kassaClientUuid,
-      )
-    ) {
-      queue.push(row)
-      try {
-        await offlineDbSetOrderQueue(tenantSlug, queue)
-        localStorage.setItem(gksOfflineOrdersQueueStorageKey(tenantSlug), JSON.stringify(queue))
-      } catch {
-        /* ignore */
-      }
+    return {
+      orderNumber: fallbackOrderNo,
+      queuedOffline: false,
+      hardError: 'gks_no_offline_fiscal_persist',
     }
-    return { orderNumber: fallbackOrderNo, queuedOffline: true }
   }
 
   const errMsg = !insRes.ok ? insRes.error || 'insert_failed' : 'insert_failed'
