@@ -3,6 +3,7 @@ jest.mock('@/services/gksPartnerService', () => ({
 }))
 
 import { queryFdmStatus } from '@/services/gksPartnerService'
+import { resetGksInternetLockForTest } from '@/lib/gks-kassa/gks-internet-lock'
 import {
   assertGksCanFiscalize,
   checkFdmStatus,
@@ -18,12 +19,12 @@ const ctx = { tenantSlug: 'gkstest', staff, vatNo: 'BE0123456789' }
 describe('gks-availability', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    resetGksInternetLockForTest({ online: true })
     global.fetch = jest.fn()
-    Object.defineProperty(global.navigator, 'onLine', { value: true, configurable: true })
   })
 
-  it('returns INTERNET_OFFLINE when ping fails', async () => {
-    ;(global.fetch as jest.Mock).mockResolvedValue({ ok: false })
+  it('returns INTERNET_OFFLINE when internet lock is down', async () => {
+    resetGksInternetLockForTest()
     const availability = await getGksAvailability(ctx)
     expect(availability.status).toBe('INTERNET_OFFLINE')
     expect(gksAvailabilityBlocksFiscal(availability.status)).toBe(true)
@@ -57,8 +58,8 @@ describe('gks-availability', () => {
     expect(availability.status).toBe('FDM_ERROR')
   })
 
-  it('assertGksCanFiscalize blocks when internet offline', async () => {
-    ;(global.fetch as jest.Mock).mockRejectedValue(new Error('network'))
+  it('assertGksCanFiscalize blocks when internet lock is down', async () => {
+    resetGksInternetLockForTest()
     const err = await assertGksCanFiscalize(ctx)
     expect(err).not.toBeNull()
     expect(err?.code).toBe('INTERNET_OFFLINE')

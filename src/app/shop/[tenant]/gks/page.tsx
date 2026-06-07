@@ -103,10 +103,15 @@ import { GKS_MANDATORY_STAFF_SESSION } from '@/lib/gks-kassa/pilot-config'
 import { formatKassaNumpadHeaderDate } from '@/lib/format-kassa-header-date'
 import { appendKassaCloseTipToAbsoluteLoginUrl } from '@/lib/shop-login-kassa-tip'
 import { syncZReportAfterOrderSafe } from '@/lib/gks-kassa/z-sync-safe'
-import { assertGksCanFiscalize, gksAvailabilityOverlayMessage } from '@/lib/gks-kassa/gks-availability'
+import {
+  assertGksCanFiscalize,
+  gksAvailabilityOverlayMessage,
+  gksAvailabilityShowsOverlay,
+} from '@/lib/gks-kassa/gks-availability'
+import { getGksInternetOnline } from '@/lib/gks-kassa/gks-internet-lock'
+import { useGksInternetLock } from '@/lib/gks-kassa/use-gks-internet-lock'
 import {
   useGksAvailability,
-  useGksAvailabilityOverlay,
   useGksFiscalBlocked,
 } from '@/lib/gks-kassa/use-gks-availability'
 import { KassaAnalogClock } from '@/components/kassa/KassaAnalogClock'
@@ -3005,6 +3010,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     // 6) Pas NA SignResult: adminDb.insert orders (commercieel), syncZReport (later signReportTurnoverZ), clearTableAfterPayment.
     // FinCloud: geen directe kassa-koppeling — alleen FDM/BII GraphQL.
     if (billLines.length === 0) return
+    if (!getGksInternetOnline()) return
 
     const fiscalGate = await assertGksCanFiscalize({
       tenantSlug: tenant,
@@ -3232,6 +3238,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const receiptMode = opts?.receiptMode ?? 'kassa'
     const skipFiscalGuard = isDraft && receiptMode === 'keuken'
     if (!skipFiscalGuard) {
+      if (!getGksInternetOnline()) return
       const fiscalGate = await assertGksCanFiscalize({
         tenantSlug: tenant,
         staff: activeKassaStaff,
@@ -3655,6 +3662,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
    */
   const printDraftBonFromCart = async (opts?: { draftCopies?: 1 | 2 }) => {
     if (draftBonLineItems.length === 0) return
+    if (!getGksInternetOnline()) return
     const fiscalGate = await assertGksCanFiscalize({
       tenantSlug: tenant,
       staff: activeKassaStaff,
@@ -4031,15 +4039,30 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   )
 
   const gksVatNo = tenantInfo?.btw_number?.trim() || 'BE0000000000'
+  const { internetLocked: gksInternetLocked } = useGksInternetLock()
   const gksAvailability = useGksAvailability(tenant, activeKassaStaff, gksVatNo)
-  const { blocked: gksFiscalBlocked } = useGksFiscalBlocked(gksAvailability)
-  const { showOverlay: gksShowAvailabilityOverlay } = useGksAvailabilityOverlay(gksAvailability)
+  const { blocked: gksFdmFiscalBlocked } = useGksFiscalBlocked(gksAvailability)
+  const gksFdmOverlay =
+    !gksInternetLocked &&
+    !!gksAvailability &&
+    gksAvailabilityShowsOverlay(gksAvailability.status) &&
+    gksAvailability.status !== 'INTERNET_OFFLINE'
+  const gksShowLockOverlay = gksInternetLocked || gksFdmOverlay
+  const gksFiscalBlocked = gksInternetLocked || gksFdmFiscalBlocked
   const gksFiscalBlockedTitle = t('gksAvailability.tooltipBlocked')
+  const gksLockOverlayMessage = gksInternetLocked
+    ? t('gksAvailability.overlay.internet')
+    : gksAvailability
+      ? gksAvailabilityOverlayMessage(gksAvailability, t)
+      : ''
 
   return (
     <div
-      className="flex min-h-0 flex-col overflow-hidden h-[100svh] max-h-[100svh] supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh]"
+      className={`flex min-h-0 flex-col overflow-hidden h-[100svh] max-h-[100svh] supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh] ${
+        gksShowLockOverlay ? 'pointer-events-none select-none' : ''
+      }`}
       data-testid="kassa-app"
+      data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
     >
       <LogoutSoftwareConfirmModal
         open={logoutSoftwareConfirmOpen}
@@ -5503,9 +5526,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       ) : null}
 
       {/* ── ORANJE SCHERM: Nieuwe online bestelling (exact donor) ── */}
-      {gksShowAvailabilityOverlay && gksAvailability ? (
+      {gksShowLockOverlay ? (
         <div
-          className="fixed inset-0 z-[240] flex items-center justify-center bg-black/45 p-6 backdrop-blur-md"
+          className="pointer-events-auto fixed inset-0 z-[240] flex items-center justify-center bg-black/45 p-6 backdrop-blur-md"
           role="alertdialog"
           aria-modal="true"
           aria-labelledby="gks-availability-overlay-title"
@@ -5519,7 +5542,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               id="gks-availability-overlay-title"
               className="text-xl font-bold leading-snug text-red-700 sm:text-2xl"
             >
-              {gksAvailabilityOverlayMessage(gksAvailability, t)}
+              {gksLockOverlayMessage}
             </h2>
             <p className="mt-4 text-sm text-gray-600">
               {t('gksAvailability.overlay.hint')}

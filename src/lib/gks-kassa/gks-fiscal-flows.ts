@@ -7,7 +7,8 @@ import { cashRoundingDelta, roundCashToFiveCents } from '@/lib/gks-kassa/cash-ro
 import { clearCostCenterReference, getOrCreateCostCenterReference } from '@/lib/gks-kassa/cost-center-session'
 import type { GksPaymentLineInput } from '@/lib/gks-kassa/fdm-types'
 import { assertGksStaffForFiscal, type GksActiveStaff } from '@/lib/gks-kassa/gks-staff'
-import { assertGksCanFiscalize } from '@/lib/gks-kassa/gks-availability'
+import { assertGksCanFiscalize, gksAvailabilityToFlowError } from '@/lib/gks-kassa/gks-availability'
+import { getGksInternetOnline } from '@/lib/gks-kassa/gks-internet-lock'
 import { signOrder, signSale, type GksPartnerContext } from '@/services/gksPartnerService'
 import type { FloorPlanZone } from '@/lib/kassa-floor-plan-zone'
 import { tableOrderMapKey } from '@/lib/kassa-floor-plan-zone'
@@ -235,6 +236,13 @@ export async function gksEnsureFdmReady(
   staff: GksActiveStaff | null,
   vatNo: string,
 ): Promise<GksFiscalFlowError | null> {
+  if (!getGksInternetOnline()) {
+    const err = gksAvailabilityToFlowError({
+      status: 'INTERNET_OFFLINE',
+      checkedAt: Date.now(),
+    })
+    return { code: err.code, message: err.message }
+  }
   if (!assertGksStaffForFiscal(staff)) {
     return { code: 'STAFF_REQUIRED', message: 'Medewerker met geldig INSZ vereist.' }
   }

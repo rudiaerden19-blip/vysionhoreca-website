@@ -3,8 +3,8 @@
 import type { GksActiveStaff } from '@/lib/gks-kassa/gks-staff'
 import { assertGksStaffForFiscal } from '@/lib/gks-kassa/gks-staff'
 export type GksFiscalGuardError = { code: string; message: string }
+import { getGksInternetOnline, pingGksServerOnce } from '@/lib/gks-kassa/gks-internet-lock'
 import { queryFdmStatus, type GksPartnerContext } from '@/services/gksPartnerService'
-const PING_TIMEOUT_MS = 10_000
 
 export type GksAvailabilityStatus =
   | 'ONLINE_OK'
@@ -35,24 +35,10 @@ export function partnerCtxFromAvailability(ctx: GksAvailabilityContext): GksPart
   }
 }
 
-/** Server bereikbaar via /api/ping (zelfde patroon als kassa-server-online). */
+/** Actieve GKS-ping (zelfde als internet-lock). */
 export async function checkInternetOnline(): Promise<boolean> {
-  if (typeof navigator !== 'undefined' && !navigator.onLine) return false
-  const ctrl = new AbortController()
-  const timer = window.setTimeout(() => ctrl.abort(), PING_TIMEOUT_MS)
-  try {
-    const res = await fetch('/api/ping', {
-      method: 'GET',
-      cache: 'no-store',
-      credentials: 'same-origin',
-      signal: ctrl.signal,
-    })
-    return res.ok
-  } catch {
-    return false
-  } finally {
-    window.clearTimeout(timer)
-  }
+  if (!getGksInternetOnline()) return false
+  return pingGksServerOnce()
 }
 
 function isNetworkLikeMessage(msg: string): boolean {
@@ -90,8 +76,7 @@ export async function checkFdmStatus(
 
 export async function getGksAvailability(ctx: GksAvailabilityContext): Promise<GksAvailability> {
   const checkedAt = Date.now()
-  const online = await checkInternetOnline()
-  if (!online) {
+  if (!getGksInternetOnline()) {
     return { status: 'INTERNET_OFFLINE', checkedAt }
   }
   if (!assertGksStaffForFiscal(ctx.staff)) {
@@ -190,6 +175,12 @@ export function gksAvailabilityToFlowError(availability: GksAvailability): GksFi
 export async function assertGksCanFiscalize(
   ctx: GksAvailabilityContext,
 ): Promise<GksFiscalGuardError | null> {
+  if (!getGksInternetOnline()) {
+    return gksAvailabilityToFlowError({
+      status: 'INTERNET_OFFLINE',
+      checkedAt: Date.now(),
+    })
+  }
   const availability = await getGksAvailability(ctx)
   if (!gksAvailabilityBlocksFiscal(availability.status)) return null
   return gksAvailabilityToFlowError(availability)

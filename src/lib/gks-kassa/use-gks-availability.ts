@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import type { GksActiveStaff } from '@/lib/gks-kassa/gks-staff'
+import { getGksInternetOnline, subscribeGksInternetLock } from '@/lib/gks-kassa/gks-internet-lock'
 import {
   getGksAvailability,
   gksAvailabilityDisablesFiscalUi,
@@ -10,7 +11,7 @@ import {
   type GksAvailabilityStatus,
 } from '@/lib/gks-kassa/gks-availability'
 
-const POLL_MS = 30_000
+const FDM_POLL_MS = 30_000
 
 export function useGksAvailability(
   tenantSlug: string,
@@ -25,6 +26,12 @@ export function useGksAvailability(
 
     const run = async () => {
       if (busyRef.current) return
+      if (!getGksInternetOnline()) {
+        if (!cancelled) {
+          setAvailability({ status: 'INTERNET_OFFLINE', checkedAt: Date.now() })
+        }
+        return
+      }
       busyRef.current = true
       try {
         const next = await getGksAvailability({ tenantSlug, staff, vatNo })
@@ -35,16 +42,13 @@ export function useGksAvailability(
     }
 
     void run()
-    const id = window.setInterval(() => void run(), POLL_MS)
-    const onOnline = () => void run()
-    window.addEventListener('online', onOnline)
-    window.addEventListener('offline', onOnline)
+    const id = window.setInterval(() => void run(), FDM_POLL_MS)
+    const unsubLock = subscribeGksInternetLock(() => void run())
 
     return () => {
       cancelled = true
       window.clearInterval(id)
-      window.removeEventListener('online', onOnline)
-      window.removeEventListener('offline', onOnline)
+      unsubLock()
     }
   }, [tenantSlug, staff?.id, staff?.insz, vatNo])
 
