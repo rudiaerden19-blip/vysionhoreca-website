@@ -940,13 +940,6 @@
     "loginFailed": "Login mislukt",
     "tenantNotFound": "Geen zaak gevonden. Neem contact op met support.",
     "somethingWentWrong": "Er is iets misgegaan. Probeer opnieuw.",
-    "firstLoginLink": "Eerste keer? Stel je wachtwoord in",
-    "firstLoginTitle": "Eerste wachtwoord instellen",
-    "confirmPassword": "Bevestig wachtwoord",
-    "setPasswordButton": "Wachtwoord opslaan",
-    "savingPassword": "Opslaan...",
-    "passwordMismatch": "Wachtwoorden komen niet overeen",
-    "passwordMinLength": "Minimaal 8 tekens",
     "fillEmailFirst": "Vul eerst je email adres in",
     "databaseNotAvailable": "Database niet beschikbaar",
     "troubleshooting": {

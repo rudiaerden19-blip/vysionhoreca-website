@@ -659,13 +659,6 @@
     "loginFailed": "Accesso fallito",
     "tenantNotFound": "Nessuna attività trovata. Contatta il supporto.",
     "somethingWentWrong": "Qualcosa è andato storto. Riprova.",
-    "firstLoginLink": "Prima volta? Imposta la password",
-    "firstLoginTitle": "Imposta la prima password",
-    "confirmPassword": "Conferma password",
-    "setPasswordButton": "Salva password",
-    "savingPassword": "Salvataggio...",
-    "passwordMismatch": "Le password non corrispondono",
-    "passwordMinLength": "Almeno 8 caratteri",
     "fillEmailFirst": "Inserisci prima il tuo indirizzo email",
     "databaseNotAvailable": "Database non disponibile",
     "troubleshooting": {

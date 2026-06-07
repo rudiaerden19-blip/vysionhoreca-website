@@ -57,11 +57,6 @@ export const forgotPasswordBodySchema = z.object({
   email: emailField,
 })
 
-export const setInitialOwnerPasswordBodySchema = z.object({
-  email: emailField,
-  password: z.string().min(8).max(128),
-})
-
 export const resetPasswordBodySchema = z.object({
   token: z.string().trim().min(32).max(128),
   password: z.string().min(8).max(128),

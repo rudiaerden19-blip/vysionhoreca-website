@@ -659,13 +659,6 @@
     "loginFailed": "فشل تسجيل الدخول",
     "tenantNotFound": "لم يتم العثور على المتجر. تواصل مع الدعم.",
     "somethingWentWrong": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
-    "firstLoginLink": "أول مرة؟ عيّن كلمة المرور",
-    "firstLoginTitle": "تعيين كلمة المرور لأول مرة",
-    "confirmPassword": "تأكيد كلمة المرور",
-    "setPasswordButton": "حفظ كلمة المرور",
-    "savingPassword": "جاري الحفظ...",
-    "passwordMismatch": "كلمتا المرور غير متطابقتين",
-    "passwordMinLength": "8 أحرف على الأقل",
     "fillEmailFirst": "يرجى إدخال عنوان بريدك الإلكتروني أولاً",
     "databaseNotAvailable": "قاعدة البيانات غير متاحة",
     "troubleshooting": {

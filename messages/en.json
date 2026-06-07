@@ -940,13 +940,6 @@
     "loginFailed": "Login failed",
     "tenantNotFound": "No business found. Please contact support.",
     "somethingWentWrong": "Something went wrong. Please try again.",
-    "firstLoginLink": "First time? Set your password",
-    "firstLoginTitle": "Set your first password",
-    "confirmPassword": "Confirm password",
-    "setPasswordButton": "Save password",
-    "savingPassword": "Saving...",
-    "passwordMismatch": "Passwords do not match",
-    "passwordMinLength": "At least 8 characters",
     "fillEmailFirst": "Please enter your email address first",
     "databaseNotAvailable": "Database not available",
     "troubleshooting": {

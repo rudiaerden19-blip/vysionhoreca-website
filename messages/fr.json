@@ -659,13 +659,6 @@
     "loginFailed": "Échec de la connexion",
     "tenantNotFound": "Aucun établissement trouvé. Contactez le support.",
     "somethingWentWrong": "Une erreur s'est produite. Veuillez réessayer.",
-    "firstLoginLink": "Première fois ? Définissez votre mot de passe",
-    "firstLoginTitle": "Définir votre premier mot de passe",
-    "confirmPassword": "Confirmer le mot de passe",
-    "setPasswordButton": "Enregistrer le mot de passe",
-    "savingPassword": "Enregistrement...",
-    "passwordMismatch": "Les mots de passe ne correspondent pas",
-    "passwordMinLength": "Au moins 8 caractères",
     "fillEmailFirst": "Veuillez d'abord entrer votre adresse e-mail",
     "databaseNotAvailable": "Base de données non disponible",
     "troubleshooting": {

@@ -212,19 +212,6 @@ export async function POST(request: NextRequest) {
     const isValid = await verifyPassword(password, profile.password_hash)
 
     if (!isValid) {
-      const h = (profile.password_hash || '').trim()
-      const needsInitial =
-        !h || h === 'RESET_REQUIRED' || !h.startsWith('$2')
-      if (needsInitial) {
-        return NextResponse.json(
-          {
-            error:
-              'Nog geen wachtwoord ingesteld. Kies onderaan op /login: Eerste wachtwoord instellen.',
-            code: 'INITIAL_PASSWORD_REQUIRED',
-          },
-          { status: 401 },
-        )
-      }
       return NextResponse.json(
         { error: 'Onjuist wachtwoord' },
         { status: 401 }

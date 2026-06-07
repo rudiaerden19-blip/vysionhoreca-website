@@ -659,13 +659,6 @@
     "loginFailed": "登录失败",
     "tenantNotFound": "未找到门店。请联系支持。",
     "somethingWentWrong": "出错了。请重试。",
-    "firstLoginLink": "首次使用？设置密码",
-    "firstLoginTitle": "设置首次密码",
-    "confirmPassword": "确认密码",
-    "setPasswordButton": "保存密码",
-    "savingPassword": "保存中...",
-    "passwordMismatch": "两次密码不一致",
-    "passwordMinLength": "至少 8 个字符",
     "fillEmailFirst": "请先输入您的电子邮件地址",
     "databaseNotAvailable": "数据库不可用",
     "troubleshooting": {
