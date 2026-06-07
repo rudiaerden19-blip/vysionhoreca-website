@@ -6,7 +6,7 @@ import { useEffect } from 'react'
 function bumpServiceWorker() {
   if (!('serviceWorker' in navigator)) return
   void navigator.serviceWorker
-    .register('/sw.js')
+    .register('/sw.js?v=17')
     .then((reg) => reg.update())
     .catch(() => { /* ignore */ })
 }
