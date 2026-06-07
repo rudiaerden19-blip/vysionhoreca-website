@@ -42,7 +42,7 @@ export const GKS_TILE_LIFT_SHADOW =
 
 /** Geselecteerd / Afrekenen — sterkere zwarte lift (tekst blijft blauw waar van toepassing). */
 export const GKS_POS_SELECTED_LIFT_SHADOW =
-  'shadow-[0_4px_9px_rgba(0,0,0,0.64),0_11px_26px_rgba(0,0,0,0.51),0_15px_37px_rgba(0,0,0,0.40)]'
+  'shadow-[0_4px_9px_rgba(0,0,0,0.64),0_11px_26px_rgba(0,0,0,0.51),0_15px_37px_rgba(0,0,0,0.40),-7px_0_16px_rgba(0,0,0,0.40),7px_0_16px_rgba(0,0,0,0.40)]'
 
 /** Geselecteerde POS-knoppen + Afrekenen (constant). */
 export const GKS_POS_SELECTED_ACCENT_TEXT = 'text-[#6eb5ff]'
@@ -108,10 +108,19 @@ export const GKS_POS_BTN_SELECTED = [
   GKS_POS_SELECTED_ACCENT_TEXT,
 ].join(' ')
 
+/** Afrekenen — zwarte lift + blauwe gloed (GKS-accent). */
+export const GKS_CHECKOUT_LIFT_SHADOW =
+  'shadow-[0_4px_9px_rgba(0,0,0,0.64),0_11px_26px_rgba(0,0,0,0.51),0_15px_37px_rgba(0,0,0,0.40),-7px_0_16px_rgba(0,0,0,0.40),7px_0_16px_rgba(0,0,0,0.40),0_6px_24px_rgba(26,127,216,0.48),0_0_22px_rgba(110,181,255,0.32)]'
+
 /** Footer Afrekenen — geselecteerde look + altijd blauwe tekst. */
 export const GKS_CHECKOUT_BTN = [
   GKS_BTN_SHAPE,
-  GKS_POS_BTN_SELECTED,
+  GKS_BTN_FACE,
+  'border border-[#2a2a2a]',
+  GKS_CHECKOUT_LIFT_SHADOW,
+  GKS_BTN_PRESS,
+  GKS_BTN_PRESS_FACE,
+  GKS_POS_SELECTED_ACCENT_TEXT,
   GKS_BTN_ARIA_DISABLED,
   'aria-disabled:text-[#6eb5ff]',
   'touch-manipulation',
