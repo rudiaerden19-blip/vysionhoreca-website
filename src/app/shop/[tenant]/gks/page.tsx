@@ -4599,7 +4599,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* ── Rechts: numpad / cart ── */}
         <div
           className={`${kassaSxgaDenseTiles ? 'w-[300px]' : 'w-80 sm:w-96 lg:w-[380px]'} flex min-h-0 min-w-0 flex-shrink-0 flex-col overflow-x-hidden overflow-y-auto border-0 ${
-            kassaAppearanceDark ? `bg-[${GKS_SIDEBAR_SURFACE_BG}]` : 'bg-white'
+            kassaAppearanceDark ? 'bg-[#161d27]' : 'bg-white'
           }`}
         >
 
@@ -4967,7 +4967,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         {/* Totaal + knoppen — touch-vriendelijk (kiosk) */}
         <div
-          className={`sticky bottom-0 z-10 shrink-0 border-t ${kassaAppearanceDark ? `border-zinc-700 bg-[${GKS_SIDEBAR_SURFACE_BG}]` : 'border-gray-200 bg-white'} p-1.5 space-y-1`}
+          className={`sticky bottom-0 z-10 shrink-0 border-t ${kassaAppearanceDark ? 'border-zinc-700 bg-[#161d27]' : 'border-gray-200 bg-white'} p-1.5 space-y-1`}
         >
           <div
             className={`flex items-center justify-between border-b ${kassaAppearanceDark ? 'border-zinc-700' : 'border-gray-100'} py-1`}
@@ -5101,7 +5101,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 setShowPaymentModal(true)
               }}
               disabled={billLines.length === 0 || gksFiscalBlocked}
-              className={`flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 font-bold text-white hover:bg-emerald-700 active:brightness-95 disabled:bg-emerald-900/45 disabled:text-white/75 disabled:opacity-100 ${
+              className={`flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 font-bold text-white hover:bg-emerald-700 active:brightness-95 disabled:pointer-events-none disabled:opacity-45 disabled:hover:bg-emerald-600 ${
                 kassaSxgaDenseTiles
                   ? 'min-h-[4rem] py-3.5 text-xl'
                   : 'min-h-[3.5rem] py-3 text-lg'
