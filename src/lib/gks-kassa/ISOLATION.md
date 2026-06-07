@@ -22,7 +22,7 @@ Pilot/certificatie onder `/shop/[tenant]/gks` (legacy `/admin/gks-kassa` → red
 - Plattegrond **server** (`floor_plan_tables` realtime) — alleen lezen/sync; **geen** `upsert` vanuit GKS.
 - `/api/kassa/staff-clock` — staff-sessies (TODO: aparte GKS-route indien nodig).
 - Print agent (`sendToVysionPrintAgent`) — lokaal per zaak.
-- Webshop-order **alarm** uitgeschakeld (geen poll op productie `orders.status=new`).
+- Webshop-order **alarm**: alleen **lezen** van `orders.status=new` (webshop-kanaal); geen writes naar `orders`.
 - Geen fullscreen «Activeer geluid»-gate: audio ontgrendelt op eerste tik op de POS (zelfde sessie-key `gks_kassa_audio_ok_*`).
 - **Route:** `/shop/{tenant}/gks` — geen `AdminLayout` (alleen shop-layout + `GksPilotLayoutGate`).
 

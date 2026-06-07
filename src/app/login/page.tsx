@@ -67,6 +67,10 @@ export default function LoginPage() {
 
     mirrorSuperadminSessionFromCookieToLocalStorage()
     if (isSuperAdminLoggedIn()) {
+      /** Na kassa-uitloggen: geen superadmin-skip terug naar POS — anders lijkt uitloggen kapot. */
+      if (term?.kind === 'staff') {
+        return
+      }
       clearTerminalLogout()
       let nextDecoded = (nextRaw || '').trim()
       try {

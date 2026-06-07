@@ -47,5 +47,6 @@ export async function ensureGksPilotFreshServiceWorker(): Promise<'reload' | 'ok
     /* ignore */
   }
 
-  return 'reload'
+  /** Geen geforceerde reload — veroorzaakte „kassa start opnieuw” na uitloggen/deploy. */
+  return 'ok'
 }

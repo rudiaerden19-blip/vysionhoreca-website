@@ -1,5 +1,4 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { isKassaPosOrder } from '@/lib/admin-api-order-helpers'
 import { isGksZReportPilotTenant } from '@/lib/gks-kassa/pilot-config'
 
 const GKS_PAGE_SIZE = 1000
@@ -117,7 +116,10 @@ export async function fetchAllGksCommercialOrdersNewestFirst(
   return all
 }
 
-/** Pilot: POS-omzet uit GKS-tabel; webshop/online blijft uit productie `orders`. */
+/**
+ * Pilot: voeg GKS-commercial rijen toe aan productie `orders` (geen wegfilteren).
+ * Oude kassa-orders in `orders` blijven meetellen; nieuwe GKS-sales staan alleen in GKS-tabel.
+ */
 export function mergePilotReportingOrderRows(
   tenantSlug: string,
   productionRows: Record<string, unknown>[],
@@ -125,10 +127,16 @@ export function mergePilotReportingOrderRows(
   sort: 'asc' | 'desc',
 ): Record<string, unknown>[] {
   if (!isGksZReportPilotTenant(tenantSlug)) return productionRows
-  const nonKassaProduction = productionRows.filter(
-    (o) => !isKassaPosOrder({ order_type: String(o.order_type ?? '') }),
-  )
-  const merged = [...nonKassaProduction, ...gksRows]
+  const byId = new Map<string, Record<string, unknown>>()
+  for (const row of productionRows) {
+    const id = String(row.id ?? '')
+    if (id) byId.set(id, row)
+  }
+  for (const row of gksRows) {
+    const id = String(row.id ?? '')
+    if (id && !byId.has(id)) byId.set(id, row)
+  }
+  const merged = [...byId.values()]
   merged.sort((a, b) => {
     const ta = String(a.created_at ?? '')
     const tb = String(b.created_at ?? '')
@@ -139,4 +147,36 @@ export function mergePilotReportingOrderRows(
     return sort === 'asc' ? ia.localeCompare(ib) : ib.localeCompare(ia)
   })
   return merged
+}
+
+/** Populaire items / verkoop: GKS-bonnen hebben items in JSONB, geen `order_items`-rijen. */
+export function aggregateGksCommercialItemsIntoProductStats(
+  rows: Record<string, unknown>[],
+  productStats: Record<string, { sales: number; revenue: number }>,
+): void {
+  for (const row of rows) {
+    const ps = (row.payment_status || '').toString().toLowerCase()
+    if (ps !== 'paid') continue
+    const st = (row.status || '').toString().toLowerCase()
+    if (st === 'cancelled' || st === 'rejected') continue
+    const items = Array.isArray(row.items) ? row.items : []
+    for (const raw of items) {
+      if (!raw || typeof raw !== 'object') continue
+      const it = raw as Record<string, unknown>
+      const nested = it.product as Record<string, unknown> | undefined
+      const name = String(
+        it.name ?? it.product_name ?? nested?.name ?? 'Onbekend',
+      ).trim()
+      if (!name) continue
+      const qty = Math.max(1, Number(it.quantity) || 1)
+      const lineTotal =
+        Number(it.total_price) ||
+        Number(it.price) * qty ||
+        Number(it.unit_price) * qty ||
+        0
+      if (!productStats[name]) productStats[name] = { sales: 0, revenue: 0 }
+      productStats[name].sales += qty
+      productStats[name].revenue += lineTotal
+    }
+  }
 }

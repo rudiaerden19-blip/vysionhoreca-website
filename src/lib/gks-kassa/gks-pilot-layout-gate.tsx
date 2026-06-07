@@ -9,10 +9,36 @@ import {
   verifyShopAdminApiSession,
 } from '@/lib/auth-headers'
 import { mirrorSuperadminSessionFromCookieToLocalStorage } from '@/lib/superadmin-cookies'
-import { clearTerminalLogout } from '@/lib/session-broadcast'
+import { readTerminalLogout } from '@/lib/session-broadcast'
 
-function gksPilotAuthSessionKey(tenantSlug: string): string {
+export function gksPilotAuthSessionKey(tenantSlug: string): string {
   return `gks_pilot_auth_ok_${tenantSlug}`
+}
+
+export function clearGksPilotAuthSession(tenantSlug: string): void {
+  if (typeof window === 'undefined') return
+  try {
+    sessionStorage.removeItem(gksPilotAuthSessionKey(tenantSlug))
+  } catch {
+    /* ignore */
+  }
+}
+
+function terminalLogoutBlocksPilotCache(tenantSlug: string): boolean {
+  const term = readTerminalLogout()
+  if (!term) return false
+  if (term.kind === 'superadmin') return true
+  if (term.kind === 'staff' && term.tenantSlug === tenantSlug) return true
+  return false
+}
+
+function pilotAuthCacheAllowsSkip(tenantSlug: string): boolean {
+  if (terminalLogoutBlocksPilotCache(tenantSlug)) return false
+  try {
+    return sessionStorage.getItem(gksPilotAuthSessionKey(tenantSlug)) === '1'
+  } catch {
+    return false
+  }
 }
 
 /**
@@ -29,7 +55,6 @@ export function GksPilotLayoutGate({
   const redirectingRef = useRef(false)
 
   const markPilotAuthOk = () => {
-    clearTerminalLogout()
     try {
       sessionStorage.setItem(gksPilotAuthSessionKey(tenantSlug), '1')
     } catch {
@@ -39,14 +64,11 @@ export function GksPilotLayoutGate({
 
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return
-    try {
-      if (sessionStorage.getItem(gksPilotAuthSessionKey(tenantSlug)) === '1') {
-        clearTerminalLogout()
-        return
-      }
-    } catch {
-      /* ignore */
+    if (terminalLogoutBlocksPilotCache(tenantSlug)) {
+      clearGksPilotAuthSession(tenantSlug)
+      return
     }
+    if (pilotAuthCacheAllowsSkip(tenantSlug)) return
     mirrorSuperadminSessionFromCookieToLocalStorage()
     if (isSuperAdminLoggedIn()) {
       markPilotAuthOk()
@@ -62,12 +84,8 @@ export function GksPilotLayoutGate({
     const goLogin = () => {
       if (cancelled || redirectingRef.current) return
       redirectingRef.current = true
+      clearGksPilotAuthSession(tenantSlug)
       clearTenantOwnerSession()
-      try {
-        sessionStorage.removeItem(gksPilotAuthSessionKey(tenantSlug))
-      } catch {
-        /* ignore */
-      }
       const next = buildShopInternalReturnPath(
         tenantSlug,
         window.location.pathname,
@@ -77,13 +95,14 @@ export function GksPilotLayoutGate({
     }
 
     void (async () => {
-      try {
-        if (sessionStorage.getItem(gksPilotAuthSessionKey(tenantSlug)) === '1') {
-          clearTerminalLogout()
-          return
-        }
-      } catch {
-        /* ignore */
+      if (terminalLogoutBlocksPilotCache(tenantSlug)) {
+        clearGksPilotAuthSession(tenantSlug)
+        goLogin()
+        return
+      }
+
+      if (pilotAuthCacheAllowsSkip(tenantSlug)) {
+        return
       }
 
       mirrorSuperadminSessionFromCookieToLocalStorage()

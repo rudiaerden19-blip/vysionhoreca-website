@@ -47,12 +47,23 @@ export function TenantWebSessionOrchestrator({ tenantSlug }: { tenantSlug: strin
 
     if (stamp.tenantSlug !== tenantSlug) return
 
+    const p = pathname || ''
+    const onGksPos =
+      p.includes('/gks') || p.endsWith('/gks') || p.includes('/admin/gks-kassa')
+
+    if (onGksPos) {
+      if (p === '/login' || p.endsWith('/login')) return
+      const origin = window.location.origin
+      const q = window.location.search || ''
+      const rawNext = `${p}${q}`
+      window.location.replace(`${origin}/login?next=${encodeURIComponent(rawNext)}`)
+      return
+    }
+
     if (isSuperAdminLoggedIn() || isOwnerSessionFreshForTenant(tenantSlug)) {
       clearTerminalLogout()
       return
     }
-
-    const p = pathname || ''
 
     /* staff zaak-session */
     if (p === '/login') return

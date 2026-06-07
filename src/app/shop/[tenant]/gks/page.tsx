@@ -114,6 +114,7 @@ import type {
 } from '@/lib/kassa-cart-types'
 import { kassaReceiptTableNumber } from '@/lib/kassa-cart-types'
 import { mergeCartLinesForTable } from '@/lib/kassa-table-cart-merge'
+import { isWebshopChannelNewOrder } from '@/lib/admin-api-order-helpers'
 import {
   computeBarBonDelta,
   loadBarBonWatermarks,
@@ -976,7 +977,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const check = async () => {
       try {
         const [{ data: orders }, { data: idRows }, pendingRes] = await Promise.all([
-          Promise.resolve({ data: [] as { id: string; order_number?: number; total?: number }[] }),
+          supabase
+            .from('orders')
+            .select('id,order_number,total,status,order_type')
+            .eq('tenant_slug', tenant)
+            .eq('status', 'new')
+            .order('created_at', { ascending: false })
+            .limit(50),
           supabase
             .from('reservations')
             .select('id')
@@ -989,9 +996,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             .eq('tenant_slug', tenant)
             .or('status.eq.PENDING,status.eq.pending,status.eq.WAITLIST,status.eq.waitlist'),
         ])
-        /** GKS-kassa: geen poll op productie webshop-orders (`orders`). */
-        const webshopNewList: { id: string; order_number: number; total?: number }[] = []
-        void orders
+        /** Alleen webshop `new` (read-only op `orders` — geen GKS-write). */
+        const webshopNewList = (orders || []).filter((o: { order_type?: string | null }) =>
+          isWebshopChannelNewOrder(o),
+        ) as { id: string; order_number: number; total?: number }[]
         const reservList = idRows || []
         const pendingAndWl = pendingRes.count ?? 0
         setPendingReservCount(pendingAndWl)

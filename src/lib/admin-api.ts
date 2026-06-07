@@ -33,6 +33,11 @@ import {
   type OrderItem,
   type OrderPaymentBucket,
 } from './admin-api-order-helpers'
+import {
+  aggregateGksCommercialItemsIntoProductStats,
+  fetchGksCommercialOrdersInCreatedAtRange,
+} from '@/lib/gks-kassa/gks-commercial-orders-reporting'
+import { isGksZReportPilotTenant } from '@/lib/gks-kassa/pilot-config'
 
 export type { Order, OrderItem, OrderPaymentBucket }
 export {
@@ -1349,6 +1354,17 @@ export async function getTopProducts(tenantSlug: string, period: 'week' | 'month
     productStats[item.product_name].sales += item.quantity
     productStats[item.product_name].revenue += item.total_price
   })
+
+  if (isGksZReportPilotTenant(tenantSlug)) {
+    const gksRows = await fetchGksCommercialOrdersInCreatedAtRange(
+      supabase,
+      tenantSlug,
+      startDate.toISOString(),
+      now.toISOString(),
+      'items,payment_status,status',
+    )
+    aggregateGksCommercialItemsIntoProductStats(gksRows, productStats)
+  }
   
   return Object.entries(productStats)
     .map(([name, stats]) => ({ name, ...stats }))

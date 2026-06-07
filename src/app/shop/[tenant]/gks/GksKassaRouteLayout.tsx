@@ -18,10 +18,7 @@ export function GksKassaRouteLayout({
     void (async () => {
       const outcome = await ensureGksPilotFreshServiceWorker()
       if (cancelled) return
-      if (outcome === 'reload') {
-        window.location.reload()
-        return
-      }
+      void outcome
       setSwReady(true)
     })()
     return () => {

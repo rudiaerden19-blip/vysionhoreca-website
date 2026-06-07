@@ -157,6 +157,7 @@ export function applyOwnerOnlyLogoutCleanup(tenantSlug: string): void {
     sessionStorage.removeItem(`vysion_welcomed_${tenantSlug}`)
     sessionStorage.removeItem(`vysion_kassa_audio_ok_${tenantSlug}`)
     sessionStorage.removeItem(`vysion_audio_activated_${tenantSlug}`)
+    sessionStorage.removeItem(`gks_pilot_auth_ok_${tenantSlug}`)
   } catch {
     /* ignore */
   }

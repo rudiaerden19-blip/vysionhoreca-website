@@ -24,33 +24,39 @@ function mapGksCommercialRowToKitchenOrder(row: Record<string, unknown>): Record
   }
 }
 
+/** Zelfde logica als `fetchKitchenQueueOrders` op `orders`, maar voor GKS-commercial (pilot). */
 export async function fetchGksKitchenQueueRows(
   client: SupabaseClient,
   tenantSlug: string,
 ): Promise<Record<string, unknown>[]> {
   if (!isGksZReportPilotTenant(tenantSlug)) return []
-  const [openRes, prepRes] = await Promise.all([
+  const [r1, r2] = await Promise.all([
+    client
+      .from('gks_commercial_orders')
+      .select('*')
+      .eq('tenant_slug', tenantSlug)
+      .in('status', ['confirmed', 'preparing'])
+      .order('created_at', { ascending: true })
+      .limit(50),
     client
       .from('gks_commercial_orders')
       .select('*')
       .eq('tenant_slug', tenantSlug)
       .eq('status', 'open')
       .eq('order_type', 'DINE_IN')
-      .order('updated_at', { ascending: true })
-      .limit(50),
-    client
-      .from('gks_commercial_orders')
-      .select('*')
-      .eq('tenant_slug', tenantSlug)
-      .eq('status', 'preparing')
-      .eq('order_type', 'DINE_IN')
-      .order('updated_at', { ascending: true })
+      .order('created_at', { ascending: true })
       .limit(50),
   ])
-  if (openRes.error) console.warn('[gks-kitchen] open:', openRes.error.message)
-  if (prepRes.error) console.warn('[gks-kitchen] preparing:', prepRes.error.message)
-  const rows = [...(openRes.data ?? []), ...(prepRes.data ?? [])]
-  const parsed = parseOrdersItemsJson(rows as Record<string, unknown>[])
+  if (r1.error) console.warn('[gks-kitchen] confirmed/preparing:', r1.error.message)
+  if (r2.error) console.warn('[gks-kitchen] open DINE_IN:', r2.error.message)
+
+  const rows = [...(r1.data ?? []), ...(r2.data ?? [])]
+  const byId = new Map<string, Record<string, unknown>>()
+  for (const row of rows) {
+    const id = row.id as string
+    if (id && !byId.has(id)) byId.set(id, row as Record<string, unknown>)
+  }
+  const parsed = parseOrdersItemsJson([...byId.values()])
   return parsed.filter(isKitchenQueueOrder).map(mapGksCommercialRowToKitchenOrder)
 }
 
