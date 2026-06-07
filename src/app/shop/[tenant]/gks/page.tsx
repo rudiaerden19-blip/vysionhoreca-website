@@ -7,7 +7,6 @@
  */
 
 import {
-  Suspense,
   memo,
   useState,
   useEffect,
@@ -22,7 +21,7 @@ import {
 import dynamic from 'next/dynamic'
 import { flushSync } from 'react-dom'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import {
   MenuProduct,
   MenuCategory,
@@ -91,7 +90,6 @@ import { appendKassaCloseTipToAbsoluteLoginUrl } from '@/lib/shop-login-kassa-ti
 import { syncZReportAfterOrderSafe } from '@/lib/gks-kassa/z-sync-safe'
 import { KassaAnalogClock } from '@/components/kassa/KassaAnalogClock'
 import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
-import { KassaRegisterSuspenseFallback } from '@/components/KassaRegisterSuspenseFallback'
 import type {
   KassaCartItem as CartItem,
   KassaSelectedChoice as SelectedChoice,
@@ -678,14 +676,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const tenant = params.tenant
   const offlineQueueKey = offlineOrdersQueueStorageKey(tenant)
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const demoFromUrl =
-    searchParams.get('demo') === 'bekijk' || searchParams.get('alleen_lezen') === '1'
+  const [demoFromUrl, setDemoFromUrl] = useState(false)
   const [demoFromMarketingSession, setDemoFromMarketingSession] = useState(false)
   useLayoutEffect(() => {
+    try {
+      const sp = new URLSearchParams(window.location.search)
+      setDemoFromUrl(
+        sp.get('demo') === 'bekijk' || sp.get('alleen_lezen') === '1',
+      )
+    } catch {
+      setDemoFromUrl(false)
+    }
     if (!isMarketingDemoTenantSlug(tenant)) return
     setDemoFromMarketingSession(publicDemoSessionMatchesTenant(tenant))
-  }, [tenant, searchParams])
+  }, [tenant])
   const demoViewOnly = demoFromUrl || demoFromMarketingSession
   const { dark: kassaAppearanceDark, toggle: toggleKassaAppearance } = useKassaUiDarkSync(tenant)
   const ui = useMemo(() => createKassaRegisterUiTheme(kassaAppearanceDark), [kassaAppearanceDark])
@@ -5306,9 +5310,5 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 }
 
 export default function KassaAdminPage(props: { params: { tenant: string } }) {
-  return (
-    <Suspense fallback={<KassaRegisterSuspenseFallback />}>
-      <KassaAdminPageInner {...props} />
-    </Suspense>
-  )
+  return <KassaAdminPageInner {...props} />
 }
