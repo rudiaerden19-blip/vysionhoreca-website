@@ -9,6 +9,14 @@ export const GKS_MENU_PLATE_BG_CLASS = 'bg-[#333336]'
 /** Subtiel afgerond — luxe POS, geen pill. */
 export const GKS_BTN_SHAPE = 'rounded-[6px]'
 
+/** Minder zwaar dan overal `font-bold`. */
+export const GKS_FONT_UI = 'font-semibold'
+export const GKS_FONT_UI_SOFT = 'font-medium'
+
+/** Klokbalk: zelfde vlak, lichtere schaduw dan knoppen. */
+export const GKS_CLOCK_BAR_SHADOW =
+  'shadow-[0_1px_3px_rgba(0,0,0,0.16),0_3px_8px_rgba(0,0,0,0.1)]'
+
 /** Zachte “bollig”: donker boven/onder, iets lichter midden — geen harde radiale flare. */
 const GKS_BTN_FACE =
   'bg-[linear-gradient(180deg,#161616_0%,#323232_46%,#1c1c1c_100%)]'
@@ -65,6 +73,13 @@ export const GKS_POS_FIELD = [
 /** Onderstrook menu-tegel. */
 export const GKS_MENU_TILE_LABEL_SURFACE =
   'bg-[linear-gradient(180deg,#2e2e2e_0%,#1a1a1a_100%)]'
+
+export const GKS_CLOCK_BAR = [
+  GKS_BTN_SHAPE,
+  GKS_BTN_FACE,
+  'border border-[#2a2a2a]',
+  GKS_CLOCK_BAR_SHADOW,
+].join(' ')
 
 export function gksPosButtonClass(selected: boolean): string {
   return `${GKS_BTN_SHAPE} ${selected ? GKS_POS_BTN_SELECTED : GKS_POS_BTN}`

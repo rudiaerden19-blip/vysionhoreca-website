@@ -1,8 +1,8 @@
 // Vysion Kassa – Service Worker
 // Offline: kassa-app + statische assets + sector-marketingpagina’s; productafbeeldingen (externe URL's)
 
-const CACHE = 'vysion-kassa-v33'
-const STATIC_CACHE = 'vysion-static-v33'
+const CACHE = 'vysion-kassa-v34'
+const STATIC_CACHE = 'vysion-static-v34'
 const IMAGE_CACHE = 'vysion-images-v4'
 
 /** Eerste install: marketing-sectoren + start zodat PWA na één online bezoek ook zonder net start. */
