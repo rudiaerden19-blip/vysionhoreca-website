@@ -4157,7 +4157,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250607-pos-btn-subtle"
+      data-gks-ui="20250607-surface-333336"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4172,7 +4172,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       <div className={`flex min-h-0 flex-1 flex-col overflow-hidden ${ui.shellBg}`}>
 
       {/* ── Blauwe balk: één rij — kleine tenantnaam zodat snelkoppelingen naast elkaar passen zonder horizontale scrollbar ── */}
-      <div className="relative z-30 flex min-h-[56px] w-full min-w-0 shrink-0 items-center gap-1.5 border-b border-[#1f1f1f] bg-[#2d2d30] px-2 py-2 sm:gap-2 sm:px-3">
+      <div
+        className={`relative z-30 flex min-h-[56px] w-full min-w-0 shrink-0 items-center gap-1.5 border-b border-[#333336] px-2 py-2 sm:gap-2 sm:px-3 ${
+          kassaAppearanceDark ? GKS_MENU_PLATE_BG_CLASS : 'bg-[#3C4D6B]'
+        }`}
+      >
 
         {/* Backdrop sluit menu/flyout (printer-bridge-modal heeft eigen overlay) */}
         {(hamburgerOpen || flyoutOpen) && (
@@ -4623,7 +4627,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* ── Rechts: numpad / cart ── */}
         <div
           className={`${kassaSxgaDenseTiles ? 'w-[300px]' : 'w-80 sm:w-96 lg:w-[380px]'} flex min-h-0 min-w-0 flex-shrink-0 flex-col overflow-x-hidden overflow-y-auto border-0 ${
-            kassaAppearanceDark ? 'bg-[#2d2d30]' : 'bg-white'
+            kassaAppearanceDark ? GKS_MENU_PLATE_BG_CLASS : 'bg-white'
           }`}
         >
 
@@ -4969,7 +4973,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         {/* Totaal + knoppen — touch-vriendelijk (kiosk) */}
         <div
-          className={`sticky bottom-0 z-10 shrink-0 border-t ${kassaAppearanceDark ? 'border-[#1a1a1a] bg-[#2d2d30]' : 'border-gray-200 bg-white'} p-1.5 space-y-1`}
+          className={`sticky bottom-0 z-10 shrink-0 border-t ${kassaAppearanceDark ? `border-[#333336] ${GKS_MENU_PLATE_BG_CLASS}` : 'border-gray-200 bg-white'} p-1.5 space-y-1`}
         >
           <div
             className={`flex items-center justify-between gap-2 px-2.5 py-2 ${GKS_POS_FIELD}`}

@@ -2,9 +2,9 @@
  * GKS-pilot: POS-ref — zwart-grijs, lichte verticale overgang, subtiele schaduw (niet overdreven).
  */
 
-/** Groot vlak achter categorie-/producttegels (POS-plate). */
-export const GKS_MENU_PLATE_BG = '#2c2c2e'
-export const GKS_MENU_PLATE_BG_CLASS = 'bg-[#2c2c2e]'
+/** Eén vlak: tegels + sidebar + header (geen kleurverschil tussen kolommen). */
+export const GKS_MENU_PLATE_BG = '#333336'
+export const GKS_MENU_PLATE_BG_CLASS = 'bg-[#333336]'
 
 /** Bijna recht, heel licht afgerond. */
 export const GKS_BTN_SHAPE = 'rounded-[3px]'
