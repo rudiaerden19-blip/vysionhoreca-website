@@ -6,6 +6,7 @@
 |----------|------|
 | [STAP-1-MB-TITEL-II-H1.md](./STAP-1-MB-TITEL-II-H1.md) | **Stap 1 bouwen** — MB events N/P/T/S, FDM-mutaties, tafel, ticket |
 | [DEPLOYMENT-MAP.md](./DEPLOYMENT-MAP.md) | Wat gaat naar **GitHub**, **Vercel** en **Supabase** (en wat niet) |
+| [MERGE-TO-MAIN.md](./MERGE-TO-MAIN.md) | GKS op **main** zonder wijzigingen aan `/admin/kassa` (CI-guard) |
 | [../../src/lib/gks-kassa/ISOLATION.md](../../src/lib/gks-kassa/ISOLATION.md) | Scheiding GKS-kassa vs productie `/admin/kassa` |
 | [../../src/gks/README.md](../../src/gks/README.md) | Toekomstige fiscale module (FDM, journal, audit) |
 

@@ -16,6 +16,7 @@
     "test:e2e:no-server": "PLAYWRIGHT_SKIP_WEBSERVER=1 playwright test",
     "k6:load": "k6 run k6/ordervysion-load.js",
     "check:supabase-advisor": "node -e \"console.log('Open Supabase Dashboard → Database → Advisors/Linter. Zie supabase/README_RLS_AND_SECURITY_ADVISOR.md')\"",
+    "check:production-kassa": "bash scripts/check-production-kassa-untouched.sh origin/main",
     "print-agent:dev": "cd apps/vysion-print-agent && npm start",
     "print-agent:dist": "cd apps/vysion-print-agent && npm run dist"
   },

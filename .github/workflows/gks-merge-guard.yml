@@ -1,0 +1,16 @@
+# Blokkeer merge naar main als productie-POS (/admin/kassa) is gewijzigd.
+name: GKS merge guard
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  production-kassa-untouched:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Productie-kassa diff vs base
+        run: bash scripts/check-production-kassa-untouched.sh "origin/${{ github.base_ref }}"
