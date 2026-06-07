@@ -3717,7 +3717,9 @@
     "notValidFiscalTicket": "THIS IS NOT A VALID VAT FISCAL TICKET",
     "shortSignature": "Signature:",
     "eventCounter": "Counter:",
-    "verifyAt": "Verify at:"
+    "verifyAt": "Verify at:",
+    "copyBanner": "COPY — VAT FISCAL TICKET",
+    "copyPrint": "Copy receipt"
   },
   "kassaReceipt": {
     "helpedBy": "You were helped by {name}",

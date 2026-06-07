@@ -2743,7 +2743,9 @@
     "notValidFiscalTicket": "CECI N'EST PAS UN TICKET TVA VALIDE",
     "shortSignature": "Signature :",
     "eventCounter": "Compteur :",
-    "verifyAt": "Vérifier sur :"
+    "verifyAt": "Vérifier sur :",
+    "copyBanner": "COPIE — TICKET FISCAL TVA",
+    "copyPrint": "Copie du ticket"
   },
   "kassaReceipt": {
     "helpedBy": "Vous avez été servi par {name}",

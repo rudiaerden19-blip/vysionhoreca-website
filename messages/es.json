@@ -3243,7 +3243,9 @@
     "notValidFiscalTicket": "ESTO NO ES UN TICKET FISCAL IVA VÁLIDO",
     "shortSignature": "Firma:",
     "eventCounter": "Contador:",
-    "verifyAt": "Verificar en:"
+    "verifyAt": "Verificar en:",
+    "copyBanner": "COPIA — TICKET FISCAL IVA",
+    "copyPrint": "Copia del ticket"
   },
   "kassaReceipt": {
     "helpedBy": "Le ha atendido {name}",

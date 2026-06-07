@@ -98,6 +98,11 @@ export function appendGksProFormaDraftLines(
 }
 
 /** Na signPreBill (P): teller op pro forma — geen QR / geen BTW-KASTICKET-header. */
+export function appendGksCopyBannerLines(bonLines: string[], copyBanner: string): void {
+  bonLines.push(copyBanner)
+  bonLines.push('--------------------------------')
+}
+
 export function appendGksProFormaFdmRefLines(
   bonLines: string[],
   fiscal: GksFiscalReceiptSnapshot,

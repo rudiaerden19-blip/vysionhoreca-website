@@ -3243,7 +3243,9 @@
     "notValidFiscalTicket": "هذه ليست تذكرة ضريبة قيمة مضافة صالحة",
     "shortSignature": "التوقيع:",
     "eventCounter": "العداد:",
-    "verifyAt": "تحقق على:"
+    "verifyAt": "تحقق على:",
+    "copyBanner": "نسخة — تذكرة ضريبة القيمة المضافة",
+    "copyPrint": "نسخة الإيصال"
   },
   "kassaReceipt": {
     "helpedBy": "خدمك {name}",

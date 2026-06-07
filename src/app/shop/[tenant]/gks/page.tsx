@@ -82,9 +82,15 @@ import {
   broadcastTenantOwnerLogout,
   setTerminalLogout,
 } from '@/lib/session-broadcast'
-import { gksCompleteSaleN, gksPersistTableOrderP, gksSignPreBill } from '@/lib/gks-kassa/gks-fiscal-flows'
+import {
+  gksCompleteSaleN,
+  gksPersistTableOrderP,
+  gksSignCopy,
+  gksSignPreBill,
+} from '@/lib/gks-kassa/gks-fiscal-flows'
 import {
   appendGksFiscalPaidReceiptLines,
+  appendGksCopyBannerLines,
   appendGksProFormaDraftLines,
   appendGksProFormaFdmRefLines,
   gksVatSplitFromFdmVatCalc,
@@ -3219,6 +3225,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       draftCopies?: 1 | 2
       /** Standaard kassa; keuken bij «naar tafel»-delta. */
       receiptMode?: 'kassa' | 'keuken'
+      /** Na signCopy (C): kopiebon met zelfde QR als origineel N. */
+      copyTicket?: boolean
     },
   ) => {
     // TODO(GKS): Afdruk ≠ FDM-bericht — render pas na SignResult.
@@ -3253,14 +3261,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     const receiptTableNr = kassaReceiptTableNumber(order.orderType, order.tableNumber)
 
+    const isCopyTicket = !!opts?.copyTicket
     if (!isDraft) {
-      try {
-        if (typeof window !== 'undefined') {
-          const sk = kassaPaidReceiptDedupeStorageKey(tenant, order)
-          if (window.sessionStorage.getItem(sk) === '1') return
+      if (!isCopyTicket) {
+        try {
+          if (typeof window !== 'undefined') {
+            const sk = kassaPaidReceiptDedupeStorageKey(tenant, order)
+            if (window.sessionStorage.getItem(sk) === '1') return
+          }
+        } catch {
+          /* sessionStorage onbereikbaar */
         }
-      } catch {
-        /* sessionStorage onbereikbaar */
       }
 
       const key = kassaPaidReceiptGuardKey(order)
@@ -3270,7 +3281,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         g.printedOkOnce = false
         g.inFlight = false
       }
-      if (g.printedOkOnce || g.inFlight) return
+      if (!isCopyTicket && (g.printedOkOnce || g.inFlight)) return
+      if (g.inFlight) return
       g.inFlight = true
     } else {
       if (!barKitchenDelta) {
@@ -3290,6 +3302,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       shortSignature: t('gksReceipt.shortSignature'),
       eventCounter: t('gksReceipt.eventCounter'),
       verifyAt: t('gksReceipt.verifyAt'),
+      copyBanner: t('gksReceipt.copyBanner'),
     }
     const fbVatRate = normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 6, 21)
     const splitOk =
@@ -3367,6 +3380,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     if (tenantInfo?.phone) bonLines.push(`${t('kassaReceipt.telPrefix')} ${tenantInfo.phone}`)
     bonLines.push('--------------------------------')
+    if (!isDraft && isCopyTicket) {
+      appendGksCopyBannerLines(bonLines, gksFiscalLabels.copyBanner)
+    }
     if (!isDraft && order.gksFiscal) {
       prependGksFiscalTicketHeader(bonLines, gksFiscalLabels.fiscalTicketHeader)
     }
@@ -3542,13 +3558,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     })
     if (printResult.ok) {
       if (!isDraft) {
-        paidReceiptPrintGuardRef.current.printedOkOnce = true
-        try {
-          if (typeof window !== 'undefined') {
-            window.sessionStorage.setItem(kassaPaidReceiptDedupeStorageKey(tenant, order), '1')
+        if (!isCopyTicket) {
+          paidReceiptPrintGuardRef.current.printedOkOnce = true
+          try {
+            if (typeof window !== 'undefined') {
+              window.sessionStorage.setItem(kassaPaidReceiptDedupeStorageKey(tenant, order), '1')
+            }
+          } catch {
+            /* quota / private mode */
           }
-        } catch {
-          /* quota / private mode */
         }
       } else {
         if (!barKitchenDelta) {
@@ -3687,6 +3705,32 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
    * Gele bon: altijd volledige mand/kar op de bon (incl. hele tafel).
    * Bij dine-in+tafel: na geslaagde print watermerk = volledige stand, zodat «Naar tafel» alleen nog delta print.
    */
+  const printLastOrderCopy = async () => {
+    if (!lastOrder?.gksFiscal) {
+      setThermalPrintBanner({
+        variant: 'error',
+        message: 'Geen fiscaal ticket om te kopiëren.',
+      })
+      return
+    }
+    if (!getGksInternetOnline()) return
+    const copyRes = await gksSignCopy(
+      tenant,
+      activeKassaStaff,
+      tenantInfo?.btw_number?.trim() || 'BE0000000000',
+      lastOrder.gksFiscal,
+    )
+    if (!copyRes.ok) {
+      setThermalPrintBanner({ variant: 'error', message: copyRes.error.message })
+      return
+    }
+    const orderCopy: KassaLastOrderReceipt = {
+      ...lastOrder,
+      gksFiscal: copyRes.fiscalSnapshot,
+    }
+    await printReceipt(orderCopy, { copyTicket: true })
+  }
+
   const printDraftBonFromCart = async (opts?: { draftCopies?: 1 | 2 }) => {
     if (draftBonLineItems.length === 0) return
     if (!getGksInternetOnline()) return
@@ -5566,6 +5610,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               setShowSuccessModal(false)
             }
           }}
+          onCopyPrint={
+            lastOrder.gksFiscal
+              ? async () => {
+                  try {
+                    setSuccessReceiptPrintBusy(true)
+                    await printLastOrderCopy()
+                  } finally {
+                    setSuccessReceiptPrintBusy(false)
+                  }
+                }
+              : undefined
+          }
+          copyPrintLabel={t('gksReceipt.copyPrint')}
+          copyPrintDisabled={successReceiptPrintBusy || gksFiscalBlocked}
         />
       ) : null}
 

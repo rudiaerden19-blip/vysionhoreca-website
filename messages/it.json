@@ -3243,7 +3243,9 @@
     "notValidFiscalTicket": "QUESTO NON È UNO SCONTRINO FISCALE IVA VALIDO",
     "shortSignature": "Firma:",
     "eventCounter": "Contatore:",
-    "verifyAt": "Verifica su:"
+    "verifyAt": "Verifica su:",
+    "copyBanner": "COPIA — SCONTRINO FISCALE IVA",
+    "copyPrint": "Copia scontrino"
   },
   "kassaReceipt": {
     "helpedBy": "Sei stato servito da {name}",

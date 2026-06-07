@@ -9,7 +9,13 @@ import type { GksPaymentLineInput } from '@/lib/gks-kassa/fdm-types'
 import { assertGksStaffForFiscal, type GksActiveStaff } from '@/lib/gks-kassa/gks-staff'
 import { assertGksCanFiscalize, gksAvailabilityToFlowError } from '@/lib/gks-kassa/gks-availability'
 import { getGksInternetOnline } from '@/lib/gks-kassa/gks-internet-lock'
-import { signOrder, signPreBill, signSale, type GksPartnerContext } from '@/services/gksPartnerService'
+import {
+  signCopy,
+  signOrder,
+  signPreBill,
+  signSale,
+  type GksPartnerContext,
+} from '@/services/gksPartnerService'
 import type { FloorPlanZone } from '@/lib/kassa-floor-plan-zone'
 import { tableOrderMapKey } from '@/lib/kassa-floor-plan-zone'
 import {
@@ -427,6 +433,94 @@ export async function gksSignPreBill(
     journalId,
     posFiscalTicketNo: result.posFiscalTicketNo,
   }
+}
+
+/** Kopie (C) van betaald N-ticket — originele QR/handtekening behouden. */
+export async function gksSignCopy(
+  tenantSlug: string,
+  staff: GksActiveStaff | null,
+  vatNo: string,
+  original: GksFiscalReceiptSnapshot,
+): Promise<
+  | { ok: true; fiscalSnapshot: GksFiscalReceiptSnapshot; journalId: string }
+  | { ok: false; error: GksFiscalFlowError }
+> {
+  const gate = await gksEnsureFdmReady(tenantSlug, staff, vatNo)
+  if (gate) return { ok: false, error: gate }
+  const ctx = partnerCtx(tenantSlug, staff!, vatNo)
+  const envelope = buildPendingEnvelope(ctx)
+  const idempotencyKey = newIdempotencyKey()
+
+  const pendingRes = await gksFiscalJournalCreatePending({
+    tenantSlug,
+    eventLabel: 'C',
+    mutation: 'signCopy',
+    idempotencyKey,
+    posId: envelope.posId,
+    terminalId: envelope.terminalId,
+    deviceId: envelope.deviceId,
+    posFiscalTicketNo: original.posFiscalTicketNo,
+    posDateTime: envelope.posDateTime,
+    bookingPeriodId: envelope.bookingPeriodId,
+    bookingDate: envelope.bookingDate,
+    employeeId: envelope.employeeId,
+    requestPayload: {
+      originalFdmRef: original.fdmRef,
+      originalPosFiscalTicketNo: original.posFiscalTicketNo,
+      envelope,
+    },
+  })
+  if (!pendingRes.ok) {
+    return {
+      ok: false,
+      error: {
+        code: 'FISCAL_JOURNAL_PENDING',
+        message: pendingRes.error || 'Kon fiscaal journal (copy) niet starten.',
+      },
+    }
+  }
+  const journalId = pendingRes.data.id
+
+  let result: GksSignResult
+  try {
+    result = await signCopy(ctx, {
+      posFiscalTicketNo: original.posFiscalTicketNo,
+      fdmRef: original.fdmRef,
+      shortSignature: original.shortSignature,
+      verificationUrl: original.verificationUrl,
+      vatCalc: original.vatCalc,
+      digitalSignature: original.digitalSignature,
+    })
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'signCopy mislukt'
+    await markJournalFailedSafe(tenantSlug, journalId, 'SIGN_COPY_FAILED', message)
+    return { ok: false, error: { code: 'SIGN_COPY_FAILED', message } }
+  }
+
+  const successRes = await gksFiscalJournalMarkSuccess(
+    tenantSlug,
+    journalId,
+    signResultToResponsePayload(result),
+  )
+  if (!successRes.ok || successRes.data.status !== 'SUCCESS') {
+    await markJournalFailedSafe(
+      tenantSlug,
+      journalId,
+      'MARK_SUCCESS_FAILED',
+      successRes.ok ? `status=${successRes.data.status}` : successRes.error,
+    )
+    return {
+      ok: false,
+      error: {
+        code: 'MARK_SUCCESS_FAILED',
+        message: successRes.ok
+          ? 'Fiscaal journal (copy) kon niet op SUCCESS gezet worden.'
+          : successRes.error || 'mark_success mislukt',
+      },
+    }
+  }
+
+  return { ok: true, fiscalSnapshot: gksFiscalSnapshotFromSignResult(result), journalId }
 }
 
 export async function gksCompleteSaleN(

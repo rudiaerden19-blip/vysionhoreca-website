@@ -3717,7 +3717,9 @@
     "notValidFiscalTicket": "DIT IS GEEN GELDIG BTW-KASTICKET",
     "shortSignature": "Handtekening:",
     "eventCounter": "Teller:",
-    "verifyAt": "Verifieer op:"
+    "verifyAt": "Verifieer op:",
+    "copyBanner": "KOPIE — BTW-KASTICKET",
+    "copyPrint": "Kopie bon"
   },
   "kassaReceipt": {
     "helpedBy": "U bent geholpen door medewerker {name}",

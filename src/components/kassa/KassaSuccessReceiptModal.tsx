@@ -15,6 +15,9 @@ export function KassaSuccessReceiptModal({
   onClose,
   onPrint,
   printDisabled = false,
+  onCopyPrint,
+  copyPrintLabel,
+  copyPrintDisabled = false,
 }: {
   open: boolean
   order: KassaLastOrderReceipt
@@ -24,11 +27,16 @@ export function KassaSuccessReceiptModal({
   onPrint: () => Promise<void>
   /** Voorkom dubbeltik tijdens print / guard-ref sync. */
   printDisabled?: boolean
+  /** GKS: signCopy + kopie afdrukken (alleen /gks). */
+  onCopyPrint?: () => Promise<void>
+  copyPrintLabel?: string
+  copyPrintDisabled?: boolean
 }) {
   const { t } = useLanguage()
   /** Meteen spinner na tik (parent `printDisabled` komt pas na re-render). */
   const [optimisticPrintBusy, setOptimisticPrintBusy] = useState(false)
   const printBusy = printDisabled || optimisticPrintBusy
+  const copyBusy = copyPrintDisabled || optimisticPrintBusy
 
   useEffect(() => {
     if (!open) setOptimisticPrintBusy(false)
@@ -218,7 +226,22 @@ export function KassaSuccessReceiptModal({
           </div>
         </div>
 
-        <div className="p-4 border-t flex gap-3">
+        <div className="p-4 border-t flex flex-col gap-2">
+          {onCopyPrint && copyPrintLabel ? (
+            <button
+              type="button"
+              disabled={copyBusy}
+              onClick={() => {
+                if (copyBusy) return
+                setOptimisticPrintBusy(true)
+                void onCopyPrint().finally(() => setOptimisticPrintBusy(false))
+              }}
+              className="w-full py-3 rounded-xl font-semibold bg-amber-50 text-amber-950 hover:bg-amber-100 disabled:opacity-45"
+            >
+              {copyPrintLabel}
+            </button>
+          ) : null}
+          <div className="flex gap-3">
           <button
             type="button"
             disabled={printBusy}
@@ -269,6 +292,7 @@ export function KassaSuccessReceiptModal({
           >
             {t('kassaApp.successClose')}
           </button>
+          </div>
         </div>
       </div>
     </div>

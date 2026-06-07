@@ -29,6 +29,7 @@ export function validateGksFdmMarkSuccessPayload(
   const op = String(parsed.data.eventOperation).toUpperCase()
   const allowed =
     op === 'SALE' ||
+    op === 'COPY' ||
     op === 'ORDER' ||
     op === 'PRE_BILL' ||
     op.includes('REPORT') ||
@@ -36,7 +37,7 @@ export function validateGksFdmMarkSuccessPayload(
   if (!allowed) {
     return { ok: false, error: 'response_payload_event_operation_ongeldig' }
   }
-  if (op === 'SALE') {
+  if (op === 'SALE' || op === 'COPY') {
     if (!parsed.data.shortSignature?.trim() || !parsed.data.verificationUrl?.trim()) {
       return { ok: false, error: 'response_payload_sale_vereist_handtekening_en_qr' }
     }

@@ -3,7 +3,7 @@
 | # | Use-case | Gebouwd | Getest |
 |---|----------|---------|--------|
 | 1 | signPreBill — voorlopige rekening + pro forma | **ja** (`gksSignPreBill`, gele bon) | unit + handmatig preview |
-| 2 | signCopy | nee | nee |
+| 2 | signCopy | **ja** (kopie bon na verkoop) | unit + handmatig |
 | 3 | Refunds | nee | nee |
 | 4 | WorkIn / WorkOut | nee | nee |
 | 5 | X/Z rapporten | deels (Z pilot) | deels |

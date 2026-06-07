@@ -3243,7 +3243,9 @@
     "notValidFiscalTicket": "这不是有效的增值税 fiscal 票据",
     "shortSignature": "签名：",
     "eventCounter": "计数：",
-    "verifyAt": "验证："
+    "verifyAt": "验证：",
+    "copyBanner": "副本 — 增值税收银条",
+    "copyPrint": "复印小票"
   },
   "kassaReceipt": {
     "helpedBy": "为您服务：{name}",

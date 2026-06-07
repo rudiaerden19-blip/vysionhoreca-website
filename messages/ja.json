@@ -3243,7 +3243,9 @@
     "notValidFiscalTicket": "これは有効な消費税レシートではありません",
     "shortSignature": "署名:",
     "eventCounter": "カウンター:",
-    "verifyAt": "確認:"
+    "verifyAt": "確認:",
+    "copyBanner": "コピー — 付加価値税レシート",
+    "copyPrint": "レシートのコピー"
   },
   "kassaReceipt": {
     "helpedBy": "担当：{name}",

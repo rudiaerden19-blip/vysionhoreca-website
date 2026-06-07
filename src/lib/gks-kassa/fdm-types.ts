@@ -1,6 +1,6 @@
 export type GksVatLabel = 'A' | 'B' | 'C' | 'D' | 'X'
 
-export type GksEventLabel = 'N' | 'P' | 'R'
+export type GksEventLabel = 'N' | 'P' | 'C' | 'R'
 
 export type GksTicketMedium = 'PAPER' | 'DIGITAL' | 'PAPER_DIGITAL' | 'NONE'
 
@@ -114,7 +114,13 @@ export interface GksFiscalJournalEntry {
   id: string
   tenantSlug: string
   createdAt: string
-  mutation: 'signOrder' | 'signPreBill' | 'signSale' | 'signReportTurnoverZ' | 'status'
+  mutation:
+    | 'signOrder'
+    | 'signPreBill'
+    | 'signSale'
+    | 'signCopy'
+    | 'signReportTurnoverZ'
+    | 'status'
   request: Record<string, unknown>
   response: Record<string, unknown> | GksSignResult | GksFdmStatus
   mock: boolean

@@ -84,7 +84,7 @@ function buildEnvelope(ctx: GksPartnerContext): GksPosEnvelope {
 function mockSignResult(
   envelope: GksPosEnvelope,
   eventOperation: string,
-  eventLabel: 'N' | 'P' | 'R',
+  eventLabel: 'N' | 'P' | 'C' | 'R',
   transaction?: GksTransactionInput,
 ): GksSignResult {
   mockEventCounter += 1
@@ -201,6 +201,60 @@ export async function signPreBill(
   const result = mockSignResult(envelope, 'PRE_BILL', 'P', transaction)
   await appendFiscalJournalEntry(ctx.tenantSlug, {
     mutation: 'signPreBill',
+    request,
+    response: result,
+    mock: partnerMode() === 'mock',
+  })
+  return result
+}
+
+/** Kopie (C) — zelfde QR/handtekening als origineel N-ticket. */
+export async function signCopy(
+  ctx: GksPartnerContext,
+  original: {
+    posFiscalTicketNo: number
+    fdmRef: GksSignResult['fdmRef']
+    shortSignature?: string
+    verificationUrl?: string
+    vatCalc?: GksSignResult['vatCalc']
+    digitalSignature?: string
+  },
+): Promise<GksSignResult> {
+  const envelope = buildEnvelope(ctx)
+  mockEventCounter += 1
+  mockTotalCounter += 1
+  const request = {
+    ...envelope,
+    fdmRefs: [{ fdmRef: original.fdmRef }],
+    posFiscalTicketNo: original.posFiscalTicketNo,
+  }
+  const mutation = `mutation SignCopy($data: CopyInput!) { signCopy(data: $data) { shortSignature verificationUrl } }`
+  const gql = await postGraphQlMock(mutation, { data: request }, ctx)
+  if (gql.errors?.length) throw new Error(gql.errors[0].message)
+  const result: GksSignResult = {
+    posId: envelope.posId,
+    posFiscalTicketNo: original.posFiscalTicketNo,
+    posDateTime: envelope.posDateTime,
+    terminalId: envelope.terminalId,
+    deviceId: envelope.deviceId,
+    eventOperation: 'COPY',
+    fdmRef: {
+      ...original.fdmRef,
+      eventLabel: 'C',
+      eventCounter: mockEventCounter,
+      totalCounter: mockTotalCounter,
+    },
+    fdmSwVersion: '1.0.0-mock',
+    digitalSignature:
+      original.digitalSignature ?? btoa(`mock-copy-sig-${original.posFiscalTicketNo}-${Date.now()}`),
+    shortSignature: original.shortSignature,
+    verificationUrl: original.verificationUrl,
+    vatCalc: original.vatCalc,
+    bufferCapacityUsed: 12.5,
+    footer: [],
+  }
+  await appendFiscalJournalEntry(ctx.tenantSlug, {
+    mutation: 'signCopy',
     request,
     response: result,
     mock: partnerMode() === 'mock',
