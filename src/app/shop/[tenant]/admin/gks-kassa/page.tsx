@@ -4267,7 +4267,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
 
         {/* ── Rechts: numpad / cart ── */}
-        <div className={`${kassaSxgaDenseTiles ? 'w-[300px]' : 'w-80 sm:w-96 lg:w-[380px]'} flex flex-col flex-shrink-0 min-h-0 min-w-0 overflow-hidden ${ui.sidebarBg}`}>
+        <div
+          className={`${kassaSxgaDenseTiles ? 'w-[300px]' : 'w-80 sm:w-96 lg:w-[380px]'} flex min-h-0 min-w-0 flex-shrink-0 flex-col overflow-x-hidden overflow-y-auto border-0 ${
+            kassaAppearanceDark ? 'bg-[#0f1319]' : 'bg-white'
+          }`}
+        >
 
         {/* Zone: Binnen / Terras — altijd zichtbaar (ook bij afhalen/leveren). */}
         <div className="shrink-0 px-2 pt-1.5">
@@ -4287,7 +4291,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   kassaSxgaDenseTiles,
                 )} ${
                   pickerBrowseZone === FLOOR_PLAN_ZONE_INSIDE && showTablePicker
-                    ? `bg-[#3C4D6B] text-white ring-2 ring-[#58CCFF]/55 ring-offset-2 ${ui.ringOffset}`
+                    ? 'bg-[#3C4D6B] text-white ring-2 ring-[#58CCFF]/55 ring-inset'
                     : 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
                 }`}
               >
@@ -4315,7 +4319,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   kassaSxgaDenseTiles,
                 )} ${
                   pickerBrowseZone === FLOOR_PLAN_ZONE_TERRACE && showTablePicker
-                    ? `bg-emerald-600 text-white ring-2 ring-emerald-300/80 ring-offset-2 ${ui.ringOffset}`
+                    ? 'bg-emerald-600 text-white ring-2 ring-emerald-300/80 ring-inset'
                     : 'bg-emerald-600 text-white hover:bg-emerald-700'
                 }`}
               >
@@ -4409,7 +4413,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
 
         {/* Cart / numpad (toggle via footer) */}
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-2.5 pt-1.5 touch-pan-y">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-1.5 pt-0.5 touch-pan-y">
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
               {parkedLinesByCategory.length > 0 &&
               (parkedOnlySidebarView || numpadPanelVisible) ? (
@@ -4656,13 +4660,36 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               })}
               </div>
             </div>
-              ) : null}
+              ) : (
+                <div
+                  className={`flex shrink-0 items-center gap-2 rounded-lg px-1.5 py-0.5 ${ui.numpadBarBg}`}
+                >
+                  {showKassaStaffClockButton ? (
+                    <button
+                      type="button"
+                      onClick={openStaffClockModal}
+                      className={`shrink-0 active:scale-[0.98] transition-all ${ui.clockTileBg} ${ui.clockTileHover}`}
+                      title={t('staffClock.buttonTitle')}
+                      aria-label={t('staffClock.buttonTitle')}
+                    >
+                      <KassaAnalogClock size={48} />
+                    </button>
+                  ) : null}
+                  <p
+                    className={`min-w-0 flex-1 truncate whitespace-nowrap text-right text-[11px] font-semibold leading-tight ${ui.numpadMeta}`}
+                    title={numpadHeaderDateLabel}
+                    aria-live="polite"
+                  >
+                    {numpadHeaderDateLabel}
+                  </p>
+                </div>
+              )}
             </div>
         </div>
 
         {/* Totaal + knoppen — touch-vriendelijk (kiosk) */}
         <div
-          className={`shrink-0 border-t ${kassaAppearanceDark ? 'border-zinc-700' : 'border-gray-200'} p-2 space-y-1.5`}
+          className={`sticky bottom-0 z-10 shrink-0 border-t ${kassaAppearanceDark ? 'border-zinc-700 bg-[#0f1319]' : 'border-gray-200 bg-white'} p-1.5 space-y-1`}
         >
           <div
             className={`flex items-center justify-between border-b ${kassaAppearanceDark ? 'border-zinc-700' : 'border-gray-100'} py-1`}
