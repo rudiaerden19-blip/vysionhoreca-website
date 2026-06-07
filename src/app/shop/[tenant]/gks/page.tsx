@@ -399,22 +399,6 @@ function kassaFooterActionTouchMinHClass(sxga: boolean, denseBill: boolean): str
   return 'min-h-[4.25rem] py-2.5'
 }
 
-/** Icoon voor numpad-toggle (geen tekstlabel op de knop). */
-function KassaNumpadToggleIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <rect x="3" y="3" width="5.5" height="5.5" rx="1.25" />
-      <rect x="10.5" y="3" width="5.5" height="5.5" rx="1.25" />
-      <rect x="18" y="3" width="3" height="5.5" rx="1" />
-      <rect x="3" y="10.5" width="5.5" height="5.5" rx="1.25" />
-      <rect x="10.5" y="10.5" width="5.5" height="5.5" rx="1.25" />
-      <rect x="18" y="10.5" width="3" height="5.5" rx="1" />
-      <rect x="3" y="18" width="12" height="3" rx="1" />
-      <rect x="16.5" y="18" width="4.5" height="3" rx="1" />
-    </svg>
-  )
-}
-
 function stoolsFromFloorDecorPayload(data: unknown): { stoolNumber: string; segmentId: string }[] {
   const rawItems = Array.isArray(data)
     ? data
@@ -4161,7 +4145,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250607-type-soft-no-icons"
+      data-gks-ui="20250607-footer-text-only"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -5018,17 +5002,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               }}
               disabled={gksFiscalBlocked || draftBonLineItems.length === 0 || draftBonPrinting}
               title={gksFiscalBlocked ? gksFiscalBlockedTitle : t('kassaApp.cartBonTitle')}
-              className={`flex flex-col items-center justify-center gap-1 active:brightness-95 disabled:pointer-events-none disabled:opacity-45 ${gksPosButtonClass(false)} ${kassaFooterActionTouchMinHClass(
+              className={`flex items-center justify-center px-1 active:brightness-95 disabled:pointer-events-none disabled:opacity-45 ${gksPosButtonClass(false)} ${kassaFooterActionTouchMinHClass(
                 kassaSxgaDenseTiles,
                 kassaSidebarFooterTier === 'dense',
               )}`}
               aria-label={t('kassaApp.cartBonTitle')}
             >
-              <span className={`leading-none ${kassaSxgaDenseTiles ? 'text-2xl' : 'text-xl'}`} aria-hidden>
-                🧾
-              </span>
               <span
-                className={`px-0.5 text-center font-semibold leading-tight ${
+                className={`text-center leading-tight ${
                   kassaSxgaDenseTiles ? 'text-xs' : 'text-[11px] sm:text-xs'
                 }`}
               >
@@ -5045,14 +5026,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 playClick()
                 setNumpadPanelVisible((v) => !v)
               }}
-              className={`flex flex-col items-center justify-center gap-1 active:brightness-95 ${gksPosButtonClass(numpadPanelVisible)} ${kassaFooterActionTouchMinHClass(
+              className={`flex items-center justify-center px-1 active:brightness-95 ${gksPosButtonClass(numpadPanelVisible)} ${kassaFooterActionTouchMinHClass(
                 kassaSxgaDenseTiles,
                 kassaSidebarFooterTier === 'dense',
               )}`}
             >
-              <KassaNumpadToggleIcon className={kassaSxgaDenseTiles ? 'h-8 w-8' : 'h-7 w-7'} />
               <span
-                className={`px-0.5 text-center font-semibold leading-tight ${
+                className={`text-center leading-tight ${
                   kassaSxgaDenseTiles ? 'text-xs' : 'text-[11px] sm:text-xs'
                 }`}
               >
