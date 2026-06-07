@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useLayoutEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import {
   buildShopInternalReturnPath,
@@ -33,7 +33,7 @@ import {
 export function TenantWebSessionOrchestrator({ tenantSlug }: { tenantSlug: string }) {
   const pathname = usePathname()
 
-  useEffect(() => {
+  const runTerminalLogoutRouting = () => {
     if (typeof window === 'undefined') return
     const stamp = readTerminalLogout()
     if (!stamp) return
@@ -76,8 +76,15 @@ export function TenantWebSessionOrchestrator({ tenantSlug }: { tenantSlug: strin
       window.location.replace(
         `${origin}/login?next=${encodeURIComponent(`${p}${q}`)}`,
       )
-      return
     }
+  }
+
+  useLayoutEffect(() => {
+    runTerminalLogoutRouting()
+  }, [pathname, tenantSlug])
+
+  useEffect(() => {
+    runTerminalLogoutRouting()
   }, [pathname, tenantSlug])
 
   useEffect(() => {
