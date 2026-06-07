@@ -40,7 +40,9 @@ export function sanitizeGksCommercialOrderRow(
     row[key] = value
   }
   const uuid = row.kassa_client_uuid
-  if (!isGksUuid(uuid)) {
+  if (uuid == null || uuid === '') {
+    delete row.kassa_client_uuid
+  } else if (!isGksUuid(uuid)) {
     return { error: 'kassa_client_uuid moet een geldige UUID zijn' }
   }
   if (row.kassa_staff_id != null && row.kassa_staff_id !== '' && !isGksUuid(row.kassa_staff_id)) {
