@@ -4,6 +4,7 @@ import {
 } from '@/lib/kassa-register-ui-theme'
 import {
   GKS_BTN_SHAPE,
+  GKS_MENU_PLATE_BG_CLASS,
   GKS_MENU_TILE_LABEL_SURFACE,
   GKS_POS_BTN,
   GKS_POS_FIELD,
@@ -19,8 +20,8 @@ export function createGksRegisterUiTheme(dark: boolean): KassaRegisterUiTheme {
 
   return {
     ...base,
-    shellBg: 'bg-[#252528]',
-    soundBackdrop: 'bg-[#252528]',
+    shellBg: GKS_MENU_PLATE_BG_CLASS,
+    soundBackdrop: GKS_MENU_PLATE_BG_CLASS,
     flyMenuPanel: `${GKS_BTN_SHAPE} shadow-lg border border-[#1a1a1a] bg-[#333333]`,
     flyMenuBorder: 'border-[#4a4a4a]',
     flyMenuDivider: 'border-[#4a4a4a]',
@@ -28,7 +29,7 @@ export function createGksRegisterUiTheme(dark: boolean): KassaRegisterUiTheme {
     flyMenuRowActive: 'bg-[#4a4a4a]',
     langPanel: `absolute right-0 top-full z-[130] mt-1 min-w-[180px] overflow-hidden ${GKS_BTN_SHAPE} border border-[#1a1a1a] bg-[#333333] shadow-lg`,
     langRowActive: 'bg-[#4a4a4a] font-semibold text-white',
-    categoryStripBg: 'bg-[#2d2d30]',
+    categoryStripBg: GKS_MENU_PLATE_BG_CLASS,
     categoryStripBorder: 'border-[#1a1a1a]',
     categoryStripHover: 'hover:brightness-105',
     productTileSolidBg: 'bg-[#2a2a2a]',

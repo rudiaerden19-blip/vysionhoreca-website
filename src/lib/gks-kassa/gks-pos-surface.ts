@@ -2,6 +2,10 @@
  * GKS-pilot: toets-dome (keyboard-ref) — zachte radiale schakering, licht bollig.
  */
 
+/** Groot vlak achter categorie-/producttegels (POS-plate). */
+export const GKS_MENU_PLATE_BG = '#2c2c2e'
+export const GKS_MENU_PLATE_BG_CLASS = 'bg-[#2c2c2e]'
+
 /** Chiclet-toets: nauwelijks afgerond. */
 export const GKS_BTN_SHAPE = 'rounded-[4px]'
 

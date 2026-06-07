@@ -79,6 +79,7 @@ import { createGksRegisterUiTheme } from '@/lib/gks-kassa/gks-register-ui-theme'
 import {
   GKS_ACCENT_BTN,
   GKS_BTN_SHAPE,
+  GKS_MENU_PLATE_BG_CLASS,
   GKS_MENU_TILE_LABEL_SURFACE,
   GKS_POS_BTN,
   GKS_POS_FIELD,
@@ -4156,7 +4157,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250607-pos-keycap-shade"
+      data-gks-ui="20250607-menu-plate-2c2c2e"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4460,7 +4461,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       <div className="flex min-h-0 flex-1 overflow-hidden w-full">
 
         {/* ── Midden: categorieën / producten ── */}
-        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+        <div
+          className={`flex-1 flex flex-col min-h-0 overflow-hidden ${
+            kassaAppearanceDark ? GKS_MENU_PLATE_BG_CLASS : 'bg-[#e3e3e3]'
+          }`}
+        >
 
           {/* Categoriebalk boven producten: alle tenant-categorieën, horizontaal scrollbaar */}
           {selectedCategory && categories.length > 0 && (
@@ -4530,7 +4535,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <div
             ref={kassaMenuScrollRef}
             data-testid="kassa-menu-scroll"
-            className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4 touch-manipulation [overflow-anchor:none] [scrollbar-gutter:stable]"
+            className={`flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4 touch-manipulation [overflow-anchor:none] [scrollbar-gutter:stable] ${
+              kassaAppearanceDark ? GKS_MENU_PLATE_BG_CLASS : ''
+            }`}
           >
             {!selectedCategory ? (
               /* Categorieën: responsief raster; rijhoogte vult viewport; gap-4 = KASSA_MENU_GRID_GAP_PX */
