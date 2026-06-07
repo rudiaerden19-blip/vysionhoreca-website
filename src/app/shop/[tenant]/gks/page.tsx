@@ -4146,7 +4146,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250607-header-util-gap"
+      data-gks-ui="20250607-header-quicklinks-gap"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4283,7 +4283,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         <div className="relative z-20 ml-[4cm] flex min-h-0 min-w-0 flex-1 items-center">
           <nav
             aria-label={t('kassaApp.quickLinksAria')}
-            className="flex min-h-0 min-w-0 flex-1 flex-nowrap items-center justify-start gap-1.5 sm:gap-2"
+            className="flex min-h-0 min-w-0 flex-1 flex-nowrap items-center justify-start gap-2.5 sm:gap-3"
           >
 
           {effectiveAccess.reservaties && (
