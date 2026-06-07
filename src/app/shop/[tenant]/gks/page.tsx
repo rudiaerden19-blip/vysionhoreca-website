@@ -4152,7 +4152,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250608-menu-plate-solid-grey"
+      data-gks-ui="20250608-header-licht-white-tenant-shift"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4276,12 +4276,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               if (draftBonLineItems.length === 0 || draftBonPrinting || gksFiscalBlocked) return
               void printDraftBonFromCart({ draftCopies: 2 })
             }}
-            className="max-w-full truncate rounded-md px-1 py-0.5 text-center text-sm font-semibold leading-tight tracking-tight text-white transition-colors hover:bg-white/15 active:bg-white/25 disabled:opacity-45 disabled:pointer-events-none sm:text-base md:text-lg"
+            className="max-w-full rounded-md px-1 py-0.5 text-center text-sm font-semibold leading-tight tracking-tight text-white transition-colors hover:bg-white/15 active:bg-white/25 disabled:opacity-45 disabled:pointer-events-none sm:text-base md:text-lg"
             title={gksFiscalBlocked ? gksFiscalBlockedTitle : t('kassaApp.cartBonTitle')}
             aria-label={`${tenantInfo?.business_name || tenant} — ${t('kassaApp.cartBonTitle')}`}
           >
-            {tenantInfo?.business_name ||
-              tenant.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+            <span className="block max-w-full truncate pl-[1cm]">
+              {tenantInfo?.business_name ||
+                tenant.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+            </span>
           </button>
         </div>
 
@@ -4399,7 +4401,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               kassaAppearanceDark ? t('adminLayout.kassaAppearanceLightAria') : t('adminLayout.kassaAppearanceDarkAria')
             }
           >
-            <span className="text-[11px] leading-snug sm:text-xs">
+            <span className="text-[11px] leading-snug !text-[#f0f0f0] sm:text-xs">
               {kassaAppearanceDark ? t('adminLayout.kassaAppearanceLight') : t('adminLayout.kassaAppearanceDark')}
             </span>
           </button>
