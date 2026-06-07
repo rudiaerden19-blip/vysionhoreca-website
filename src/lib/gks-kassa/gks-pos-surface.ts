@@ -121,9 +121,8 @@ export const GKS_POS_FIELD = [
   'shadow-[inset_0_2px_5px_rgba(0,0,0,0.45)]',
 ].join(' ')
 
-/** Onderstrook menu-tegel. */
-export const GKS_MENU_TILE_LABEL_SURFACE =
-  'bg-[linear-gradient(180deg,#2e2e2e_0%,#1a1a1a_100%)]'
+/** Onderstrook categorie-/producttegel — #333336 + korrel 0.82 (`.gks-menu-tile-label-grain`). */
+export const GKS_MENU_TILE_LABEL_SURFACE = 'gks-menu-tile-label-grain'
 
 export const GKS_CLOCK_BAR = [
   GKS_BTN_SHAPE,
