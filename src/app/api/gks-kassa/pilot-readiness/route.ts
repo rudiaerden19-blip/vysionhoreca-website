@@ -3,6 +3,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { gksApiTimeMeta, withBelgiumTimestampFields } from '@/lib/gks-kassa/belgium-datetime'
 import { gksPilotTenantSlugs } from '@/lib/gks-kassa/pilot-config'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
@@ -87,8 +88,22 @@ export async function GET(req: NextRequest) {
     tables.fiscal_journal === 'ok' &&
     (staffInszCount ?? 0) > 0
 
+  const { data: recentJournal } = await supabase
+    .from('fiscal_journal')
+    .select(
+      'id, event_label, status, pos_fiscal_ticket_no, employee_id, created_at, pos_date_time',
+    )
+    .eq('tenant_slug', tenantSlug)
+    .order('created_at', { ascending: false })
+    .limit(5)
+
+  const recentFiscalJournal = (recentJournal ?? []).map((row) =>
+    withBelgiumTimestampFields(row as Record<string, unknown>),
+  )
+
   return NextResponse.json({
     ok: true,
+    ...gksApiTimeMeta(),
     track: 'A-preview',
     tenantSlug,
     pilotActive,
@@ -100,5 +115,6 @@ export async function GET(req: NextRequest) {
     gksUrl: `/shop/${tenantSlug}/gks`,
     ready,
     hints,
+    recentFiscalJournal,
   })
 }

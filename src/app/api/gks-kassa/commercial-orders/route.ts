@@ -9,6 +9,7 @@ import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 import { apiRateLimiter, checkRateLimit } from '@/lib/rate-limit'
 import { logger } from '@/lib/logger'
+import { gksApiTimeMeta, withBelgiumTimestampFields } from '@/lib/gks-kassa/belgium-datetime'
 
 const OpSchema = z.discriminatedUnion('op', [
   z.object({
@@ -107,7 +108,10 @@ export async function POST(req: NextRequest) {
         logger.warn('gks commercial-orders select', { requestId, error: error.message })
         return NextResponse.json({ error: error.message }, { status: 500 })
       }
-      return NextResponse.json({ data })
+      const rows = (data ?? []).map((row) =>
+        withBelgiumTimestampFields(row as Record<string, unknown>),
+      )
+      return NextResponse.json({ ...gksApiTimeMeta(), data: rows })
     }
 
     if (body.op === 'order_number_by_uuid') {

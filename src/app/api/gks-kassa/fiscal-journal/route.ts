@@ -9,8 +9,44 @@ import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 import { apiRateLimiter, checkRateLimit } from '@/lib/rate-limit'
 import { logger } from '@/lib/logger'
 import { isGksZReportPilotTenant } from '@/lib/gks-kassa/pilot-config'
+import { gksApiTimeMeta, withBelgiumTimestampFields } from '@/lib/gks-kassa/belgium-datetime'
 
 export const dynamic = 'force-dynamic'
+
+export async function GET(req: NextRequest) {
+  const tenantSlug = req.nextUrl.searchParams.get('tenant_slug')?.trim()
+  if (!tenantSlug) {
+    return NextResponse.json({ error: 'tenant_slug_required' }, { status: 400 })
+  }
+  if (!isGksZReportPilotTenant(tenantSlug)) {
+    return NextResponse.json({ error: 'GKS pilot niet actief voor deze tenant' }, { status: 403 })
+  }
+  const access = await verifyTenantOrSuperAdmin(req, tenantSlug)
+  if (!access.authorized) {
+    return NextResponse.json({ error: access.error || 'Niet geautoriseerd' }, { status: 403 })
+  }
+  const limitRaw = req.nextUrl.searchParams.get('limit')
+  const limit = Math.min(Math.max(parseInt(limitRaw || '20', 10) || 20, 1), 100)
+  const supabase = getServerSupabaseClient()
+  if (!supabase) {
+    return NextResponse.json({ error: 'server_config' }, { status: 500 })
+  }
+  const { data, error } = await supabase
+    .from('fiscal_journal')
+    .select(
+      'id, event_label, status, pos_fiscal_ticket_no, employee_id, created_at, updated_at, pos_date_time, booking_date',
+    )
+    .eq('tenant_slug', tenantSlug)
+    .order('created_at', { ascending: false })
+    .limit(limit)
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+  const rows = (data ?? []).map((row) =>
+    withBelgiumTimestampFields(row as Record<string, unknown>),
+  )
+  return NextResponse.json({ ...gksApiTimeMeta(), data: rows })
+}
 
 const EventLabelSchema = z.enum(['N', 'P', 'T', 'C', 'F', 'S', 'I', 'R'])
 
@@ -112,7 +148,7 @@ export async function POST(req: NextRequest) {
         logger.warn('gks fiscal-journal create_pending', { requestId, error: error.message })
         return NextResponse.json({ error: error.message }, { status: 409 })
       }
-      return NextResponse.json({ data })
+      return NextResponse.json({ ...gksApiTimeMeta(), data })
     }
 
     if (body.op === 'mark_success') {
@@ -136,7 +172,7 @@ export async function POST(req: NextRequest) {
       if (!data) {
         return NextResponse.json({ error: 'Journal niet gevonden of al SUCCESS' }, { status: 404 })
       }
-      return NextResponse.json({ data })
+      return NextResponse.json({ ...gksApiTimeMeta(), data })
     }
 
     if (body.op === 'mark_failed') {
@@ -159,7 +195,7 @@ export async function POST(req: NextRequest) {
       if (!data) {
         return NextResponse.json({ error: 'Journal niet gevonden of al afgerond' }, { status: 404 })
       }
-      return NextResponse.json({ data })
+      return NextResponse.json({ ...gksApiTimeMeta(), data })
     }
 
     return NextResponse.json({ error: 'onbekende op' }, { status: 400 })
