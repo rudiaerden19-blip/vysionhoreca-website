@@ -4152,7 +4152,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250608-menu-plate-subtle-grain"
+      data-gks-ui="20250608-sidebar-btn-spacing"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4631,8 +4631,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         >
 
         {/* Zone: Binnen / Terras — altijd zichtbaar (ook bij afhalen/leveren). */}
-        <div className="shrink-0 px-3 pt-2.5 pb-1">
-            <div className="flex gap-2.5">
+        <div className="shrink-0 px-3 pt-3 pb-2">
+            <div className="flex gap-3.5">
               <button
                 type="button"
                 onClick={() => {
@@ -4689,8 +4689,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
 
         {/* Besteltype: drie losse knoppen (ter plaatse / afhalen / leveren) */}
-        <div className="mx-3 mt-2 shrink-0 space-y-2" data-testid="kassa-order-type-bar">
-          <div className="flex gap-2.5">
+        <div className="mx-3 mt-3.5 shrink-0 space-y-2.5" data-testid="kassa-order-type-bar">
+          <div className="flex gap-3.5">
             <button
               type="button"
               aria-pressed={orderType === 'DINE_IN'}
@@ -4754,10 +4754,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
 
         {/* Cart / numpad (toggle via footer) */}
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-3 pt-1 touch-pan-y">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-3 pt-2 touch-pan-y">
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
               <div
-                className={`mb-3 mt-1 flex shrink-0 items-center gap-3 px-3 py-2 ${GKS_CLOCK_BAR}`}
+                className={`mb-3 mt-2.5 flex shrink-0 items-center gap-3 px-3 py-2 ${GKS_CLOCK_BAR}`}
                 data-testid="kassa-sidebar-clock-bar"
               >
                 {showKassaStaffClockButton ? (
