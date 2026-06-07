@@ -227,12 +227,15 @@ export function KassaStaffSalesPickModal({
   busy,
   onClose,
   onPick,
+  onOpenClockManage,
 }: {
   open: boolean
   staffList: KassaStaffClockRow[]
   busy: boolean
   onClose: () => void
   onPick: (row: KassaStaffClockRow) => void
+  /** GKS: in-/uitklokken zonder extra «Verkoop»-stap; optioneel onderaan. */
+  onOpenClockManage?: () => void
 }) {
   const { t } = useLanguage()
   const clockedIn = staffList.filter((s) => s.hasOpenSession)
@@ -269,7 +272,17 @@ export function KassaStaffSalesPickModal({
             ))
           )}
         </div>
-        <div className="border-t border-gray-100 p-4">
+        <div className="border-t border-gray-100 p-4 space-y-2">
+          {onOpenClockManage ? (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={onOpenClockManage}
+              className="w-full min-h-[44px] rounded-xl border-2 border-gray-200 bg-white font-semibold text-gray-700 hover:bg-gray-50"
+            >
+              {t('staffClock.salesPickManageClock')}
+            </button>
+          ) : null}
           <button
             type="button"
             disabled={busy}

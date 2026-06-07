@@ -3471,6 +3471,7 @@
     "salesPickTitle": "من يبيع؟",
     "salesPickIntro": "اختر اسمك. أنت مسجّل الدخول — لا حاجة لرمز PIN.",
     "salesPickNone": "لا أحد مسجّل الدخول. سجّل الدخول برمز PIN أولاً.",
+    "salesPickManageClock": "تسجيل دخول / خروج (PIN)",
     "loadingList": "جاري التحميل…",
     "noStaff": "لا يوجد موظفون نشطون. أضفهم في الموظفين.",
     "statusClockedIn": "مسجّل دخول",

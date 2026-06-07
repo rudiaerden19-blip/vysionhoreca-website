@@ -3471,6 +3471,7 @@
     "salesPickTitle": "¿Quién vende?",
     "salesPickIntro": "Elige tu nombre. Ya has fichado la entrada — sin PIN.",
     "salesPickNone": "Nadie ha fichado. Ficha entrada con PIN primero.",
+    "salesPickManageClock": "Fichar entrada / salida (PIN)",
     "loadingList": "Cargando…",
     "noStaff": "No hay empleados activos. Añádelos en Personal.",
     "statusClockedIn": "Fichado",

@@ -3471,6 +3471,7 @@
     "salesPickTitle": "Chi vende?",
     "salesPickIntro": "Scegli il tuo nome. Sei già timbrato — nessun PIN.",
     "salesPickNone": "Nessuno timbrato. Timbra prima con il PIN.",
+    "salesPickManageClock": "Timbratura entrata / uscita (PIN)",
     "loadingList": "Caricamento…",
     "noStaff": "Nessun dipendente attivo. Aggiungili in Personale.",
     "statusClockedIn": "In servizio",

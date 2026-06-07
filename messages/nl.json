@@ -3947,6 +3947,7 @@
     "salesPickTitle": "Wie verkoopt?",
     "salesPickIntro": "Kies je naam. Je bent al ingeklokt — geen PIN nodig.",
     "salesPickNone": "Niemand ingeklokt. Eerst inklokken met PIN.",
+    "salesPickManageClock": "Inklokken / uitklokken (PIN)",
     "loadingList": "Laden…",
     "noStaff": "Geen actieve medewerkers. Voeg ze toe bij Personeel.",
     "statusClockedIn": "Ingeklokt",

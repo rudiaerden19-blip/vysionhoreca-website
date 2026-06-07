@@ -2971,6 +2971,7 @@
     "salesPickTitle": "Qui vend ?",
     "salesPickIntro": "Choisissez votre nom. Vous êtes pointé — pas de PIN.",
     "salesPickNone": "Personne pointé. Pointez d'abord avec votre PIN.",
+    "salesPickManageClock": "Pointer entrée / sortie (PIN)",
     "loadingList": "Chargement…",
     "noStaff": "Aucun employé actif. Ajoutez-les dans Personnel.",
     "statusClockedIn": "En service",

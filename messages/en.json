@@ -3947,6 +3947,7 @@
     "salesPickTitle": "Who is selling?",
     "salesPickIntro": "Tap your name. You are already clocked in — no PIN needed.",
     "salesPickNone": "Nobody clocked in. Clock in with your PIN first.",
+    "salesPickManageClock": "Clock in / out (PIN)",
     "loadingList": "Loading…",
     "noStaff": "No active staff. Add them under Staff.",
     "statusClockedIn": "Clocked in",

@@ -3745,6 +3745,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const loadStaffClockList = useCallback(async (opts?: { background?: boolean }) => {
     const background = opts?.background === true
     if (!background) setStaffClockListLoading(true)
+    let rows: { id: string; name: string; hasOpenSession: boolean }[] = []
     try {
       const url = GKS_MANDATORY_STAFF_SESSION
         ? `/api/gks-kassa/staff?tenant_slug=${encodeURIComponent(tenant)}`
@@ -3755,13 +3756,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         staff?: { id: string; name: string; hasOpenSession?: boolean; hasInsz?: boolean }[]
       }
       if (data.ok && data.staff) {
-        setStaffClockList(
-          data.staff.map((s) => ({
-            id: s.id,
-            name: s.name,
-            hasOpenSession: Boolean(s.hasOpenSession),
-          })),
-        )
+        rows = data.staff.map((s) => ({
+          id: s.id,
+          name: s.name,
+          hasOpenSession: Boolean(s.hasOpenSession),
+        }))
+        setStaffClockList(rows)
       } else if (!background) setStaffClockList([])
     } catch {
       if (!background) setStaffClockList([])
@@ -3769,6 +3769,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       if (!background) setStaffClockListLoading(false)
       setStaffClockListHydrated(true)
     }
+    return rows
   }, [tenant])
 
   useEffect(() => {
@@ -3788,11 +3789,31 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     playClick()
     staffClockPinReqGen.current += 1
     setStaffClockBusy(false)
-    setStaffClockOpen(true)
     setStaffClockPinModal(null)
     setStaffClockPinInput('')
     setStaffClockPinError(null)
-    void loadStaffClockList({ background: staffClockList.length > 0 })
+    void (async () => {
+      let list = staffClockList
+      if (!staffClockListHydrated || list.length === 0) {
+        list = await loadStaffClockList({ background: false })
+      } else {
+        void loadStaffClockList({ background: true })
+      }
+      const anyClockedIn = list.some((s) => s.hasOpenSession)
+      if (anyClockedIn) {
+        setStaffClockOpen(false)
+        setStaffSalesPickOpen(true)
+      } else {
+        setStaffSalesPickOpen(false)
+        setStaffClockOpen(true)
+      }
+    })()
+  }
+
+  const openStaffClockManageFromSalesPick = () => {
+    playClick()
+    setStaffSalesPickOpen(false)
+    setStaffClockOpen(true)
   }
 
   const submitStaffClockPin = async () => {
@@ -5044,6 +5065,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           setStaffSalesPickOpen(false)
         }}
         onPick={(s) => void confirmStaffSalesPick(s)}
+        onOpenClockManage={openStaffClockManageFromSalesPick}
       />
 
       {staffClockSummary ? (

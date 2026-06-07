@@ -2971,6 +2971,7 @@
     "salesPickTitle": "Wer verkauft?",
     "salesPickIntro": "Tippe auf deinen Namen. Du bist eingestempelt — keine PIN nötig.",
     "salesPickNone": "Niemand eingestempelt. Zuerst mit PIN einstempeln.",
+    "salesPickManageClock": "Ein- / Ausstempeln (PIN)",
     "loadingList": "Laden…",
     "noStaff": "Keine aktiven Mitarbeiter. Unter Personal anlegen.",
     "statusClockedIn": "Eingestempelt",

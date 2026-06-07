@@ -3471,6 +3471,7 @@
     "salesPickTitle": "谁在销售？",
     "salesPickIntro": "点选您的姓名。您已打卡上班 — 无需 PIN。",
     "salesPickNone": "无人已打卡。请先用 PIN 上班打卡。",
+    "salesPickManageClock": "上班 / 下班打卡（PIN）",
     "loadingList": "加载中…",
     "noStaff": "没有在职员工。请在人员中添加。",
     "statusClockedIn": "已上班",
