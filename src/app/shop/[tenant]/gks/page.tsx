@@ -74,7 +74,8 @@ import {
   publicDemoSessionMatchesTenant,
 } from '@/lib/demo-links'
 import { useKassaUiDarkSync } from '@/lib/kassa-register-ui-dark-preference'
-import { createKassaRegisterUiTheme, type KassaRegisterUiTheme } from '@/lib/kassa-register-ui-theme'
+import type { KassaRegisterUiTheme } from '@/lib/kassa-register-ui-theme'
+import { createGksRegisterUiTheme } from '@/lib/gks-kassa/gks-register-ui-theme'
 import { authFetch, buildShopInternalReturnPath } from '@/lib/auth-headers'
 import {
   attemptCloseThenOrNavigate,
@@ -781,7 +782,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [tenant])
   const demoViewOnly = demoFromUrl || demoFromMarketingSession
   const { dark: kassaAppearanceDark, toggle: toggleKassaAppearance } = useKassaUiDarkSync(tenant)
-  const ui = useMemo(() => createKassaRegisterUiTheme(kassaAppearanceDark), [kassaAppearanceDark])
+  const ui = useMemo(() => createGksRegisterUiTheme(kassaAppearanceDark), [kassaAppearanceDark])
 
   useEffect(() => {
     const html = document.documentElement
@@ -4161,7 +4162,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250607-pos-flat-grey"
+      data-gks-ui="20250607-pos-luxury-gunmetal"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4176,7 +4177,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       <div className={`flex min-h-0 flex-1 flex-col overflow-hidden ${ui.shellBg}`}>
 
       {/* ── Blauwe balk: één rij — kleine tenantnaam zodat snelkoppelingen naast elkaar passen zonder horizontale scrollbar ── */}
-      <div className="relative z-30 flex min-h-[56px] w-full min-w-0 shrink-0 items-center gap-1.5 bg-black px-2 py-2 sm:gap-2 sm:px-3">
+      <div className="relative z-30 flex min-h-[56px] w-full min-w-0 shrink-0 items-center gap-1.5 border-b border-[#1f1f1f] bg-[#2d2d30] px-2 py-2 sm:gap-2 sm:px-3">
 
         {/* Backdrop sluit menu/flyout (printer-bridge-modal heeft eigen overlay) */}
         {(hamburgerOpen || flyoutOpen) && (
@@ -4452,7 +4453,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
       )}
       {installPrompt && !isInstalled && (
-        <div className="flex-shrink-0 bg-[#3C4D6B] text-white text-xs font-semibold flex items-center justify-between gap-2 py-1.5 px-4">
+        <div className="flex-shrink-0 bg-[#383838] text-white text-xs font-semibold flex items-center justify-between gap-2 py-1.5 px-4 border-b border-[#4a4a4a]">
           <span>📲 {t('kassaApp.pwaInstallBanner')}</span>
           <div className="flex gap-2">
             <button onClick={handleInstallPWA} className={ui.pwaInstallBtn}>{t('kassaApp.install')}</button>
@@ -4621,7 +4622,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* ── Rechts: numpad / cart ── */}
         <div
           className={`${kassaSxgaDenseTiles ? 'w-[300px]' : 'w-80 sm:w-96 lg:w-[380px]'} flex min-h-0 min-w-0 flex-shrink-0 flex-col overflow-x-hidden overflow-y-auto border-0 ${
-            kassaAppearanceDark ? 'bg-[#161d27]' : 'bg-white'
+            kassaAppearanceDark ? 'bg-[#333333]' : 'bg-white'
           }`}
         >
 
@@ -4946,7 +4947,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       <button
                         type="button"
                         onClick={() => updateQty(item.cartKey, item.quantity + 1)}
-                        className={`touch-manipulation rounded-lg bg-[#3C4D6B] text-white font-bold flex items-center justify-center hover:bg-[#2D3A52] active:brightness-95 ${
+                        className={`touch-manipulation font-bold flex items-center justify-center active:brightness-95 ${GKS_BTN_SHAPE} ${GKS_POS_BTN} ${
                           kassaSxgaDenseTiles ? 'h-9 w-9 text-lg' : 'h-8 w-8 text-base'
                         }`}
                         aria-label={t('kassaApp.ariaIncreaseQty')}
@@ -4967,7 +4968,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         {/* Totaal + knoppen — touch-vriendelijk (kiosk) */}
         <div
-          className={`sticky bottom-0 z-10 shrink-0 border-t ${kassaAppearanceDark ? 'border-zinc-700 bg-[#161d27]' : 'border-gray-200 bg-white'} p-1.5 space-y-1`}
+          className={`sticky bottom-0 z-10 shrink-0 border-t ${kassaAppearanceDark ? 'border-[#4a4a4a] bg-[#333333]' : 'border-gray-200 bg-white'} p-1.5 space-y-1`}
         >
           <div
             className={`flex items-center justify-between border-b ${kassaAppearanceDark ? 'border-zinc-700' : 'border-gray-100'} py-1`}
@@ -5132,7 +5133,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   const p = switchConfirm ? parseTableOrderMapKey(switchConfirm) : null
                   if (p) doSwitchToTable(p.tableNumber, p.zone)
                 }}
-                className="flex-1 py-3 rounded-xl bg-[#3C4D6B] text-white font-bold hover:bg-[#2D3A52] transition-colors"
+                className={`flex-1 py-3 font-bold transition-colors ${GKS_ACCENT_BTN}`}
               >
                 {t('kassaApp.switchToTable').replace(/\{number\}/g, switchConfirmDisplay)}
               </button>
@@ -5343,7 +5344,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           onClick={() => switchToTable(tbl.number)}
                           className={`relative touch-manipulation rounded-xl border-2 py-4 font-bold transition-colors active:brightness-95 ${
                             tableNumber === tbl.number && dineInFloorZone === pickerBrowseZone
-                              ? 'border-[#3C4D6B] bg-[#3C4D6B] text-white'
+                              ? `${GKS_BTN_SHAPE} border-[var(--gks-accent)] bg-[var(--gks-accent)] text-white`
                               : tbl.status === 'FREE'
                                 ? 'border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
                                 : tbl.status === 'UNPAID'
@@ -5384,7 +5385,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                             onClick={() => switchToTable(s.stoolNumber)}
                             className={`relative touch-manipulation rounded-xl border-2 py-4 font-bold transition-colors active:brightness-95 ${
                               tableNumber === s.stoolNumber && dineInFloorZone === pickerBrowseZone
-                                ? 'border-[#3C4D6B] bg-[#3C4D6B] text-white'
+                                ? `${GKS_BTN_SHAPE} border-[var(--gks-accent)] bg-[var(--gks-accent)] text-white`
                                 : (tableOrders[tableOrderMapKey(pickerBrowseZone, s.stoolNumber)]?.length ?? 0) > 0
                                   ? 'border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100'
                                   : 'border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100'
@@ -5433,7 +5434,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     setShowTablePicker(false)
                     setShowFloorPlan(true)
                   }}
-                  className={`rounded-xl bg-[#3C4D6B] py-3 text-sm font-semibold text-white transition-colors hover:bg-[#2D3A52] ${tableNumber ? 'flex-1' : 'w-full'}`}
+                  className={`py-3 text-sm font-semibold transition-colors ${GKS_POS_BTN} ${GKS_BTN_SHAPE} ${tableNumber ? 'flex-1' : 'w-full'}`}
                 >
                   🗺️ {t('kassaApp.floorPlan')}
                 </button>
@@ -5494,7 +5495,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               href="https://www.vysionhoreca.com/download/print-agent-windows"
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-4 flex w-full items-center justify-center rounded-xl bg-[#3C4D6B] px-4 py-3 text-center text-sm font-bold text-white hover:bg-[#2D3A52]"
+              className={`mt-4 flex w-full items-center justify-center px-4 py-3 text-center text-sm font-bold ${GKS_ACCENT_BTN}`}
             >
               {t('kassaApp.printAgentFallbackModalDownloadLink')}
             </a>
