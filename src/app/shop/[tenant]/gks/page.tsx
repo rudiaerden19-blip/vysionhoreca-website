@@ -1745,6 +1745,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       resolveCartLineVat,
       { commercialOrderId },
     )
+    if (!commercialOrderId) {
+      console.warn('[gks-kassa] open commercial mirror niet weggeschreven')
+    }
     if (err) {
       console.warn('[gks-kassa] signOrder P journal:', err)
       alert(err.message)
@@ -1869,18 +1872,22 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   /** Voeg toe aan tafel: nieuwe karronde naar tafelmand; keuken/kassa-delta alleen over die ronde. */
   const parkOrder = (opts: { printKitchen: boolean; printKassaSlip: boolean }) => {
     if (!tableNumber || cart.length === 0) return
+    if (blockSaleWithoutStaffIfNeededRef.current()) return
     const snap = snapshotCartItemsForAsyncPrint(cart)
     const zone = dineInFloorZone
     const tbl = tableNumber
     const slotKey = tableOrderMapKey(zone, tbl)
+    let mergedForPersist: CartItem[] = []
     setTableOrders((prev) => {
       const merged = mergeCartLinesForTable(prev[slotKey] || [], cart)
+      mergedForPersist = merged
       const next = { ...prev, [slotKey]: merged }
       localStorage.setItem(tableOrdersKey, JSON.stringify(next))
       updateTableStatus(tbl, merged.length > 0, zone)
-      schedulePersistOpenOrder(zone, tbl, merged)
       return next
     })
+    cancelPersistTimer(slotKey)
+    void persistOpenOrderRowToSupabase(zone, tbl, mergedForPersist)
     void flushBarDeltaSlipRef.current(zone, tbl, snap, opts)
     setCart([])
     setTableNumber('')
