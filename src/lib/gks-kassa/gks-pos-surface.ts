@@ -36,13 +36,15 @@ export const GKS_POS_BTN_SELECTED = [
   'active:brightness-[0.96]',
 ].join(' ')
 
-/** Primaire actie (Afrekenen, actieve categorie). */
+/**
+ * Primaire actie (Afrekenen) — POS-ref “Kassa”: cyan boven → koningsblauw onder.
+ */
 export const GKS_ACCENT_BTN = [
   GKS_BTN_SHAPE,
-  'bg-[linear-gradient(180deg,#1a5fc4_0%,#0056d6_55%,#003d99_100%)]',
+  'bg-[linear-gradient(180deg,#7ad9ff_0%,#4fb8f0_32%,#1a7fd8_62%,#004aad_100%)]',
   'text-white',
-  'border border-[#002d6b]',
-  'shadow-[0_2px_4px_rgba(0,0,0,0.4)]',
+  'border border-[#003878] border-t-[#9ee8ff]/35',
+  'shadow-[0_2px_4px_rgba(0,0,0,0.38)]',
   'active:brightness-[0.96]',
 ].join(' ')
 

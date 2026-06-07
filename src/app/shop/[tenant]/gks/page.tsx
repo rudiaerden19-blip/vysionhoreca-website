@@ -370,8 +370,8 @@ const KASSA_HEADER_HIDE_CUSTOMER_DISPLAY_AND_SOUND = true
 
 /** GKS accent — exact #0056d6 via CSS-variabele op `kassa-app` root. */
 const GKS_ACCENT_ROOT_STYLE = {
-  '--gks-accent': '#0056d6',
-  '--gks-accent-hover': '#004bb8',
+  '--gks-accent': '#1a7fd8',
+  '--gks-accent-hover': '#004aad',
 } as React.CSSProperties
 
 const KASSA_HEADER_QUICK_LINK_BTN =
@@ -4157,7 +4157,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250607-surface-333336"
+      data-gks-ui="20250607-checkout-cyan-blue"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
