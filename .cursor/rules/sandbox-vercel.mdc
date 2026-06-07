@@ -18,9 +18,11 @@ Einde van de taak (tenzij de gebruiker expliciet zegt *niet* te committen/pushen
 1. **`git status`** — alle relevante bestanden meenemen.
 2. **`npx tsc --noEmit`** als er TypeScript-wijzigingen zijn — voorkom kapotte `main`.
 3. **`git commit`** — duidelijke boodschap (wat + waarom).
-4. **`git push origin`** (huidige branch, meestal `main`).
+4. **`git push origin`** (huidige branch).
 
-**Deploy:** push naar GitHub triggert **Vercel** (production en/of preview). **Niet vergeten:** altijd pushen na commit zodat alle tenants dezelfde nieuwe build krijgen.
+**Deploy:** push naar GitHub triggert **Vercel** (production en/of preview). **Niet vergeten:** altijd pushen na commit.
+
+**GKS / fiscale pilot:** standaard **alleen Preview** — werk op branch `gks/fiscal-journal-preview` (of andere preview-branch). **Niet** naar `main` pushen/mergen tenzij de eigenaar dat **expliciet** vraagt. Test op de **Vercel preview-URL** van die branch (niet productie-URL).
 
 **Uitzonderingen:** geen commit bij puur uitleg/lezen zonder bestandswijzigingen; geen lege commits.
 
