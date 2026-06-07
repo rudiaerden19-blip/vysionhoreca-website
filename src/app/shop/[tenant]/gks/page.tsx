@@ -4153,7 +4153,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250608-menu-plate-grain-085"
+      data-gks-ui="20250608-header-rule-fullwidth"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4169,8 +4169,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
       {/* ── Blauwe balk: één rij — kleine tenantnaam zodat snelkoppelingen naast elkaar passen zonder horizontale scrollbar ── */}
       <div
-        className={`relative z-30 flex min-h-[56px] w-full min-w-0 shrink-0 items-center gap-1.5 border-b border-[#333336] px-2 py-2 sm:gap-2 sm:px-3 ${
-          kassaAppearanceDark ? GKS_MENU_PLATE_TRANSPARENT_CLASS : 'bg-[#3C4D6B]'
+        className={`relative z-30 flex min-h-[56px] w-full min-w-0 shrink-0 items-center gap-1.5 px-2 py-2 sm:gap-2 sm:px-3 ${
+          kassaAppearanceDark
+            ? `pb-3 ${GKS_MENU_PLATE_TRANSPARENT_CLASS}`
+            : 'border-b border-[#333336] bg-[#3C4D6B]'
         }`}
       >
 
@@ -4289,9 +4291,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
 
         {/* Snelkoppelingen: 4cm naar rechts; tenantnaam links ongewijzigd */}
-        <div
-          className={`relative z-20 ml-[4cm] flex min-h-0 min-w-0 flex-1 items-center self-stretch border-b ${GKS_RULE_BLACK}`}
-        >
+        <div className="relative z-20 ml-[4cm] flex min-h-0 min-w-0 flex-1 items-center">
           <nav
             aria-label={t('kassaApp.quickLinksAria')}
             className="flex min-h-0 min-w-0 flex-1 flex-nowrap items-center justify-start gap-2.5 sm:gap-3"
@@ -4443,6 +4443,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <span className="leading-snug">{t('kassaApp.logout')}</span>
           </button>
         </div>
+
+        {kassaAppearanceDark ? (
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-px bg-black"
+            aria-hidden
+          />
+        ) : null}
 
       </div>
 
