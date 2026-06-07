@@ -367,7 +367,7 @@ function kassaFloorZoneButtonTouchClass(sxga: boolean): string {
   return sxga ? 'min-h-[3.25rem] py-2.5 text-base' : 'min-h-[2.75rem] py-2 text-sm'
 }
 
-/** Sidebar-footer: touch-vriendelijke hoogte (Lade / Bon / Verwijder). */
+/** Sidebar-footer: touch-vriendelijke hoogte (Lade / Bon / Numpad). */
 function kassaFooterActionTouchMinHClass(sxga: boolean, denseBill: boolean): string {
   if (sxga) return 'min-h-[4.75rem] py-2.5'
   if (denseBill) return 'min-h-[4rem] py-2'
@@ -5025,22 +5025,30 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </button>
             <button
               type="button"
-              onClick={clearCart}
-              disabled={billLines.length === 0}
-              className={`flex flex-col items-center justify-center gap-1 rounded-xl bg-rose-500 text-white hover:bg-rose-600 active:brightness-95 disabled:bg-rose-900/50 disabled:text-white/70 disabled:opacity-100 ${kassaFooterActionTouchMinHClass(
+              aria-pressed={numpadPanelVisible}
+              data-testid="kassa-numpad-toggle"
+              title={t('kassaApp.numpadToggle')}
+              aria-label={t('kassaApp.numpadToggle')}
+              onClick={() => {
+                playClick()
+                setNumpadPanelVisible((v) => !v)
+              }}
+              className={`flex flex-col items-center justify-center gap-1 rounded-xl active:brightness-95 ${
+                numpadPanelVisible
+                  ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
+                  : 'bg-black text-white hover:bg-zinc-900'
+              } ${kassaFooterActionTouchMinHClass(
                 kassaSxgaDenseTiles,
                 kassaSidebarFooterTier === 'dense',
               )}`}
             >
-              <span className={`leading-none ${kassaSxgaDenseTiles ? 'text-2xl' : 'text-xl'}`} aria-hidden>
-                🗑️
-              </span>
+              <KassaNumpadToggleIcon className={kassaSxgaDenseTiles ? 'h-8 w-8' : 'h-7 w-7'} />
               <span
                 className={`px-0.5 text-center font-bold leading-tight ${
                   kassaSxgaDenseTiles ? 'text-xs' : 'text-[11px] sm:text-xs'
                 }`}
               >
-                {t('kassaApp.remove')}
+                {t('kassaApp.numpadToggle')}
               </span>
             </button>
           </div>
@@ -5079,29 +5087,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               </button>
             </div>
           )}
-          <div className="flex gap-2 touch-manipulation select-none">
-            <button
-              type="button"
-              aria-pressed={numpadPanelVisible}
-              data-testid="kassa-numpad-toggle"
-              title={t('kassaApp.numpadToggle')}
-              aria-label={t('kassaApp.numpadToggle')}
-              onClick={() => {
-                playClick()
-                setNumpadPanelVisible((v) => !v)
-              }}
-              className={`flex shrink-0 items-center justify-center rounded-xl shadow-sm ring-1 active:brightness-95 ${
-                numpadPanelVisible
-                  ? 'bg-[#58CCFF] text-[#063042] ring-black/10 hover:bg-[#47c6fe]'
-                  : 'bg-black text-white ring-white/25 hover:bg-zinc-900'
-              } ${
-                kassaSxgaDenseTiles
-                  ? 'h-[3.25rem] w-[3.25rem] p-2'
-                  : 'h-[3rem] w-[3rem] p-1.5'
-              }`}
-            >
-              <KassaNumpadToggleIcon className={kassaSxgaDenseTiles ? 'h-8 w-8' : 'h-7 w-7'} />
-            </button>
+          <div className="w-full touch-manipulation select-none">
             <button
               type="button"
               data-testid="kassa-checkout"
@@ -5112,7 +5098,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 setShowPaymentModal(true)
               }}
               disabled={billLines.length === 0 || gksFiscalBlocked}
-              className={`flex min-w-0 flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-500 font-bold text-white hover:bg-emerald-600 active:brightness-95 disabled:bg-emerald-900/45 disabled:text-white/75 disabled:opacity-100 ${
+              className={`flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 font-bold text-white hover:bg-emerald-600 active:brightness-95 disabled:bg-emerald-900/45 disabled:text-white/75 disabled:opacity-100 ${
                 kassaSxgaDenseTiles
                   ? 'min-h-[4rem] py-3.5 text-xl'
                   : 'min-h-[3.5rem] py-3 text-lg'
