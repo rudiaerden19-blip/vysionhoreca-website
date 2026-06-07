@@ -15,8 +15,8 @@ export const GKS_MENU_PLATE_BG_CLASS = GKS_MENU_PLATE_SHELL_BG_CLASS
 /** Dunne zwarte scheidingslijnen (header-nav, sidebar, footer). */
 export const GKS_RULE_BLACK = 'border-black'
 
-/** Subtiel afgerond — luxe POS, geen pill. */
-export const GKS_BTN_SHAPE = 'rounded-[6px]'
+/** Afgerond — zelfde hoek als Ter plaatse / footer-knoppen (visueel ronder op brede balken). */
+export const GKS_BTN_SHAPE = 'rounded-xl'
 
 /** Minder zwaar dan overal `font-bold`. */
 export const GKS_FONT_UI = 'font-semibold'
@@ -157,15 +157,12 @@ export function gksPosButtonClass(selected: boolean): string {
   return `${GKS_BTN_SHAPE} ${selected ? GKS_POS_BTN_SELECTED : GKS_POS_BTN}`
 }
 
-/** Horizontale strook (klok, totaal): zelfde Tailwind als POS-knop + overflow voor hoeken. */
-export function gksPosRaisedStripClass(deepShadow = false): string {
-  const shadow = deepShadow
-    ? GKS_CLOCK_BAR_LIFT_SHADOW.replace(/^shadow-/, '!shadow-')
-    : ''
-  return `${gksPosButtonClass(false)} overflow-hidden ${shadow}`.trim()
+/** Horizontale strook (totaal): exact dezelfde utility-reeks als een POS-knop. */
+export function gksPosRaisedStripClass(): string {
+  return gksPosButtonClass(false)
 }
 
-/** Klokbalk: zelfde basis als Ter plaatse-knoppen + diepere schaduw. */
+/** Klokbalk: 1:1 met order-type-knoppen (geen overflow-hidden — anders verdwijnt de schaduw). */
 export function gksClockBarClass(): string {
-  return `${gksPosRaisedStripClass(true)} relative z-0`
+  return `${gksPosButtonClass(false)} relative z-0`
 }

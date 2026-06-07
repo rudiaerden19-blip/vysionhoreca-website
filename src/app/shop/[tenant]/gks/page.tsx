@@ -4179,7 +4179,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250608-numpad-slide-fast"
+      data-gks-ui="20250608-clock-bar-match-buttons"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4970,7 +4970,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       {item.choices && item.choices.length > 0 && (
                         <p className={`text-xs truncate ${ui.cartChoices}`}>{item.choices.map(c => c.choiceName).join(', ')}</p>
                       )}
-                      <p className="text-emerald-600 font-semibold text-sm">€{((item.product.price + choicesTotal) * item.quantity).toFixed(2)}</p>
+                      <p className={`font-semibold text-sm ${GKS_POS_SELECTED_ACCENT_TEXT}`}>
+                        €{((item.product.price + choicesTotal) * item.quantity).toFixed(2)}
+                      </p>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <button
