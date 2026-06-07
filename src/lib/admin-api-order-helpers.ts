@@ -93,6 +93,7 @@ export function isWebshopChannelNewOrder(order: { order_type?: string | null | u
 
 /**
  * Dashboard, Z-rapport, rapporten, bedrijfsanalyse, verkoop: zelfde bron van waarheid.
+ * GKS-pilot: kassa-POS uit `gks_commercial_orders` (zie gks-commercial-orders-reporting.ts).
  *
  * - Webshop/online: telt zodra de zaak bevestigt (confirmed+) OF zodra online betaald (paid) — niet pas bij "afronden".
  * - Fysieke kassa (POS): telt zodra op "Betalen" (payment_status paid).

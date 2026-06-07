@@ -8,6 +8,12 @@ import {
   type Order,
 } from './admin-api-order-helpers'
 import { aggregateZReportVatFromOrderRows } from './order-vat'
+import {
+  fetchAllGksCommercialOrdersNewestFirst,
+  fetchGksCommercialOrdersInCreatedAtRange,
+  mergePilotReportingOrderRows,
+} from '@/lib/gks-kassa/gks-commercial-orders-reporting'
+import { isGksZReportPilotTenant } from '@/lib/gks-kassa/pilot-config'
 
 // =====================================================
 // ORDERS / BESTELLINGEN — types & pure helpers: `./admin-api-order-helpers`
@@ -54,6 +60,16 @@ export async function fetchAllOrdersInCreatedAtRange(
     if (chunk.length < ORDERS_ANALYTICS_PAGE_SIZE) break
     from += ORDERS_ANALYTICS_PAGE_SIZE
   }
+  if (isGksZReportPilotTenant(tenantSlug)) {
+    const gks = await fetchGksCommercialOrdersInCreatedAtRange(
+      client,
+      tenantSlug,
+      startUTC,
+      endUTC,
+      selectColumns,
+    )
+    return mergePilotReportingOrderRows(tenantSlug, all, gks, 'asc')
+  }
   return all
 }
 
@@ -81,6 +97,10 @@ async function fetchAllTenantOrdersNewestFirst(
     all.push(...chunk)
     if (chunk.length < ORDERS_ANALYTICS_PAGE_SIZE) break
     from += ORDERS_ANALYTICS_PAGE_SIZE
+  }
+  if (isGksZReportPilotTenant(tenantSlug)) {
+    const gks = await fetchAllGksCommercialOrdersNewestFirst(supabase, tenantSlug, selectColumns)
+    return mergePilotReportingOrderRows(tenantSlug, all, gks, 'desc')
   }
   return all
 }
