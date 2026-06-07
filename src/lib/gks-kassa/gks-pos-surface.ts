@@ -47,6 +47,13 @@ export const GKS_POS_SELECTED_ACCENT_TEXT = 'text-[#6eb5ff]'
 
 const GKS_BTN_EDGE = `border border-[#2a2a2a] ${GKS_SUBTLE_LIFT_SHADOW}`
 
+/** Menu-tegels: zachter ingedrukt (geen harde “plop”). */
+export const GKS_TILE_PRESS = [
+  'transition-[transform,box-shadow,filter] duration-200 ease-out',
+  'active:translate-y-[1px]',
+  'active:brightness-[0.96]',
+].join(' ')
+
 /** Tik/klik: ingedrukt (inset + 2px omlaag), losgelaten = weer raised. */
 export const GKS_BTN_PRESS = [
   'transition-[transform,box-shadow,filter,background] duration-100 ease-out',

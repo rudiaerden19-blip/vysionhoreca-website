@@ -19,6 +19,7 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from 'react'
 import dynamic from 'next/dynamic'
+import { AnimatePresence, motion } from 'framer-motion'
 import { flushSync } from 'react-dom'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -90,6 +91,7 @@ import {
   GKS_FONT_UI,
   GKS_FONT_UI_SOFT,
   GKS_TILE_LIFT_SHADOW,
+  GKS_TILE_PRESS,
   GKS_RULE_BLACK,
   gksPosButtonClass,
 } from '@/lib/gks-kassa/gks-pos-surface'
@@ -561,7 +563,22 @@ const KassaReservationsView = dynamic(() => import('@/components/KassaReservatio
 
 /** Categorie- en producttegel: witte kaart; foto alleen bovenin, titel in vaste strook eronder (niet over de foto). */
 const KASSA_MENU_TILE_BUTTON_CLASS_BASE =
-  `touch-manipulation select-none group relative flex min-h-0 w-full min-w-0 flex-col overflow-hidden ${GKS_BTN_SHAPE} border border-[#1a1a1a] bg-transparent text-left !font-medium ${GKS_BTN_PRESS} ${GKS_TILE_LIFT_SHADOW}`
+  `touch-manipulation select-none group relative flex min-h-0 w-full min-w-0 flex-col overflow-hidden ${GKS_BTN_SHAPE} border border-[#1a1a1a] bg-transparent text-left !font-medium ${GKS_TILE_PRESS} ${GKS_TILE_LIFT_SHADOW}`
+
+/** Categorie ↔ producten: luxe slide i.p.v. harde swap. */
+const GKS_MENU_VIEW_SLIDE = {
+  initial: { opacity: 0, x: 36 },
+  animate: { opacity: 1, x: 0 },
+  exit: { opacity: 0, x: -36 },
+  transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const },
+}
+
+const GKS_CATEGORY_STRIP_REVEAL = {
+  initial: { opacity: 0, y: -10 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -8 },
+  transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] as const },
+}
 
 /** Standaard: rastercel wordt **items-stretch** ⇒ knop moet **`h-full`**. */
 const KASSA_MENU_TILE_BUTTON_CLASS = `${KASSA_MENU_TILE_BUTTON_CLASS_BASE} h-full`
@@ -4153,7 +4170,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250608-clock-total-btn-shadow"
+      data-gks-ui="20250608-menu-tile-slide-transition"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4481,9 +4498,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         >
 
           {/* Categoriebalk boven producten: alle tenant-categorieën, horizontaal scrollbaar */}
+          <AnimatePresence initial={false}>
           {selectedCategory && categories.length > 0 && (
-            <div
+            <motion.div
+              key="kassa-category-strip"
               className={`flex shrink-0 items-stretch border-b ${ui.categoryStripBorder} ${ui.categoryStripBg}`}
+              {...GKS_CATEGORY_STRIP_REVEAL}
             >
               <button
                 type="button"
@@ -4541,18 +4561,25 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   )
                 })}
               </div>
-            </div>
+            </motion.div>
           )}
+          </AnimatePresence>
 
           {/* Grid — min-h-0 nodig: anders groeit de flex-child mee met alle tegels en wordt onderaan afgekapt zonder scroll */}
           <div
             ref={kassaMenuScrollRef}
             data-testid="kassa-menu-scroll"
-            className={`flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4 touch-manipulation [overflow-anchor:none] [scrollbar-gutter:stable] ${
+            className={`relative flex-1 min-h-0 overflow-x-hidden overflow-y-auto overscroll-y-contain p-4 touch-manipulation [overflow-anchor:none] [scrollbar-gutter:stable] ${
               kassaAppearanceDark ? GKS_MENU_PLATE_TRANSPARENT_CLASS : ''
             }`}
           >
+            <AnimatePresence mode="wait" initial={false}>
             {!selectedCategory ? (
+              <motion.div
+                key="kassa-menu-categories"
+                className="min-h-0 w-full"
+                {...GKS_MENU_VIEW_SLIDE}
+              >
               /* Categorieën: responsief raster; rijhoogte vult viewport; gap-4 = KASSA_MENU_GRID_GAP_PX */
               categories.length === 0 ? (
                 <div className={`flex flex-col items-center justify-center h-full ${ui.menuEmptyMuted}`}>
@@ -4589,9 +4616,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   })}
                 </div>
               )
+              </motion.div>
             ) : (
-              /* Producten: zelfde raster als categorieën */
-              productsInSelectedCategory.length === 0 ? (
+              <motion.div
+                key={`kassa-menu-products-${selectedCategory.id ?? selectedCategory.name}`}
+                className="min-h-0 w-full"
+                {...GKS_MENU_VIEW_SLIDE}
+              >
+              {productsInSelectedCategory.length === 0 ? (
                   <div className={`flex flex-col items-center justify-center h-full ${ui.menuEmptyMuted}`}>
                     <span className="text-5xl mb-3">🍽️</span>
                     <p className="font-semibold">{t('kassaApp.noProductsInCategory')}</p>
@@ -4628,8 +4660,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       )
                     })}
                   </div>
-                )
+                )}
+              </motion.div>
             )}
+            </AnimatePresence>
           </div>
         </div>
 
