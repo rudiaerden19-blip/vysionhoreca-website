@@ -1,30 +1,15 @@
-import type { CSSProperties } from 'react'
-
 /**
  * GKS-pilot: POS-ref — zwart-grijs, lichte verticale overgang, subtiele schaduw (niet overdreven).
  */
 
-/** Fallback onder leisteen-textuur (iets lichter dan #262628). */
-export const GKS_MENU_PLATE_BG = '#2e2e32'
-/** Seamless leisteen — één vlak, geen tile-repeat. */
-export const GKS_MENU_PLATE_TEXTURE_PATH = '/gks/menu-plate-leisteen.png'
+/** Eén effen vlak: tegels + sidebar + header (geen textuur). */
+export const GKS_MENU_PLATE_BG = '#333336'
+export const GKS_MENU_PLATE_SHELL_BG_CLASS = 'bg-[#333336]'
 
-/** Inline background: cover + no-repeat (betrouwbaarder dan Tailwind arbitrary bg). */
-export const GKS_MENU_PLATE_SHELL_BG_STYLE: CSSProperties = {
-  backgroundColor: GKS_MENU_PLATE_BG,
-  backgroundImage: `linear-gradient(rgba(255,255,255,0.06), rgba(255,255,255,0.06)), url('${GKS_MENU_PLATE_TEXTURE_PATH}')`,
-  backgroundSize: 'cover',
-  backgroundRepeat: 'no-repeat',
-  backgroundPosition: 'center center',
-}
-
-/** Shell: geen Tailwind-bg; stijl via GKS_MENU_PLATE_SHELL_BG_STYLE op de wrapper. */
-export const GKS_MENU_PLATE_SHELL_BG_CLASS = 'bg-transparent'
-
-/** Donkere zones zonder eigen achtergrond — shell-textuur schijnt door. */
+/** Secties zonder eigen kleur — zelfde effen grijs als shell. */
 export const GKS_MENU_PLATE_TRANSPARENT_CLASS = 'bg-transparent'
 
-/** @deprecated Gebruik SHELL style + TRANSPARENT op secties. */
+/** @deprecated Gebruik SHELL op wrapper; TRANSPARENT alleen waar shell doorloopt. */
 export const GKS_MENU_PLATE_BG_CLASS = GKS_MENU_PLATE_SHELL_BG_CLASS
 
 /** Subtiel afgerond — luxe POS, geen pill. */
