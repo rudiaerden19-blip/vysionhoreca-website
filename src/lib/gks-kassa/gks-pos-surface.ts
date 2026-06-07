@@ -32,9 +32,9 @@ export const GKS_CLOCK_BAR_LIFT_SHADOW = GKS_CLOCK_BAR_SHADOW
 const GKS_BTN_FACE =
   'bg-[linear-gradient(180deg,#161616_0%,#323232_46%,#1c1c1c_100%)]'
 
-/** Diepte achter knoppen — zwart, geen blauwe gloed (+10% t.o.v. vorige waarden). */
+/** Diepte achter knoppen — verticaal ongewijzigd; +20% zij-lift (±x, geen extra y). */
 export const GKS_SUBTLE_LIFT_SHADOW =
-  'shadow-[0_4px_9px_rgba(0,0,0,0.61),0_11px_24px_rgba(0,0,0,0.46)]'
+  'shadow-[0_4px_9px_rgba(0,0,0,0.61),0_11px_24px_rgba(0,0,0,0.46),-6px_0_14px_rgba(0,0,0,0.38),6px_0_14px_rgba(0,0,0,0.38)]'
 
 /** Diepte achter menu-tegels — iets ruimer zwart. */
 export const GKS_TILE_LIFT_SHADOW =
