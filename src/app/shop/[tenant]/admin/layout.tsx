@@ -45,7 +45,6 @@ import {
   publicDemoSessionMatchesTenant,
 } from '@/lib/demo-links'
 import { useKassaUiDarkSync } from '@/lib/kassa-register-ui-dark-preference'
-import { GksPilotLayoutGate } from '@/lib/gks-kassa/gks-pilot-layout-gate'
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -70,9 +69,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     Boolean(tenantSlugEarly) &&
     isShopAdminGksKassaPosPath(adminPathEarly, tenantSlugEarly)
   ) {
-    return (
-      <GksPilotLayoutGate tenantSlug={params.tenant}>{children}</GksPilotLayoutGate>
-    )
+    return <>{children}</>
   }
 
   return <ShopAdminLayoutInner params={params}>{children}</ShopAdminLayoutInner>

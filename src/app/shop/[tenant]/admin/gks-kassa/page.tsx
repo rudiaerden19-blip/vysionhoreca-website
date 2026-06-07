@@ -1074,17 +1074,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [categories, setCategories] = useState<MenuCategory[]>([])
   const [products, setProducts] = useState<MenuProduct[]>([])
   const [selectedCategory, setSelectedCategory] = useState<MenuCategory | null>(null)
-  const [menuLoading, setMenuLoading] = useState(() => {
-    if (typeof window === 'undefined') return true
-    try {
-      const cats = localStorage.getItem(gksMenuCatsCacheKey(tenant))
-      const prods = localStorage.getItem(gksMenuProdsCacheKey(tenant))
-      const opts = localStorage.getItem(gksMenuOptsCacheKey(tenant))
-      return !(cats && prods && opts)
-    } catch {
-      return true
-    }
-  })
   const [productsWithOptions, setProductsWithOptions] = useState<string[]>([])
   const productIdsWithOptionsSet = useMemo(
     () => new Set(productsWithOptions),
@@ -1376,7 +1365,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       window.visualViewport?.removeEventListener?.('resize', onLayoutSignal)
       ro?.disconnect()
     }
-  }, [selectedCategory, menuLoading, kassaSxgaDenseTiles])
+  }, [selectedCategory, categories.length, kassaSxgaDenseTiles])
 
   // Laad tafels + barkrukken + openstaande bestellingen (localStorage + Supabase sync)
 
@@ -1995,7 +1984,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         setCategories(dedupeCatalogById(JSON.parse(cachedCats)))
         setProducts(dedupeCatalogById(JSON.parse(cachedProds)))
         setProductsWithOptions([...new Set(JSON.parse(cachedOpts) as string[])])
-        setMenuLoading(false)
       }
     } catch {
       /* ignore */
@@ -2004,22 +1992,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   // Laad categorieën, producten en welke producten opties hebben
   // Offline: laad uit localStorage-cache; online: laad van Supabase en update cache
-  const loadMenu = useCallback(async (opts?: { silent?: boolean }) => {
-    const silent = !!opts?.silent
-    let hasWarmCache = false
-    if (typeof window !== 'undefined') {
-      try {
-        hasWarmCache = !!(
-          localStorage.getItem(CACHE_CATS) &&
-          localStorage.getItem(CACHE_PRODS) &&
-          localStorage.getItem(CACHE_OPTS)
-        )
-      } catch {
-        hasWarmCache = false
-      }
-    }
-    if (!silent && !hasWarmCache) setMenuLoading(true)
-
+  const loadMenu = useCallback(async (_opts?: { silent?: boolean }) => {
     // 1) IndexedDB (meest recente snapshot na eerdere sessie)
     try {
       const snap = await offlineDbLoadMenuSnapshot(tenant)
@@ -2027,7 +2000,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         setCategories(dedupeCatalogById(JSON.parse(snap.categoriesJson)))
         setProducts(dedupeCatalogById(JSON.parse(snap.productsJson)))
         setProductsWithOptions([...new Set(JSON.parse(snap.productsWithOptionsJson) as string[])])
-        setMenuLoading(false)
       }
     } catch {
       /* ignore */
@@ -2042,7 +2014,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         setCategories(dedupeCatalogById(JSON.parse(cachedCats)))
         setProducts(dedupeCatalogById(JSON.parse(cachedProds)))
         setProductsWithOptions([...new Set(JSON.parse(cachedOpts) as string[])])
-        setMenuLoading(false)
       }
     } catch {
       /* geen geldige cache */
@@ -2074,7 +2045,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     } catch {
       // Netwerkfout – cache hierboven is voldoende
     }
-    setMenuLoading(false)
   }, [tenant, CACHE_CATS, CACHE_PRODS, CACHE_OPTS])
 
   useEffect(() => {
@@ -4185,9 +4155,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             data-testid="kassa-menu-scroll"
             className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4 touch-manipulation [overflow-anchor:none] [scrollbar-gutter:stable]"
           >
-            {menuLoading ? (
-              <div data-testid="kassa-menu-loading" className={`flex items-center justify-center h-full text-lg ${ui.menuEmptyMuted}`}>{t('kassaApp.loading')}</div>
-            ) : !selectedCategory ? (
+            {!selectedCategory ? (
               /* Categorieën: responsief raster; rijhoogte vult viewport; gap-4 = KASSA_MENU_GRID_GAP_PX */
               categories.length === 0 ? (
                 <div className={`flex flex-col items-center justify-center h-full ${ui.menuEmptyMuted}`}>
