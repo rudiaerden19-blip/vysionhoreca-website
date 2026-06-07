@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { getBelgiumDateString, getDateBoundsForBelgium } from '@/lib/belgium-date-bounds'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
+import { isGksZReportPilotTenant } from '@/lib/gks-kassa/pilot-config'
 
 export const dynamic = 'force-dynamic'
 
@@ -248,8 +249,9 @@ export async function POST(request: NextRequest) {
   const dayYmd = getBelgiumDateString()
   const { startUTC, endUTC } = getDateBoundsForBelgium(dayYmd)
 
+  const salesTable = isGksZReportPilotTenant(tenant_slug) ? 'gks_commercial_orders' : 'orders'
   const { data: orderRows, error: ordErr } = await supabase
-    .from('orders')
+    .from(salesTable)
     .select('order_number, total')
     .eq('tenant_slug', tenant_slug)
     .eq('kassa_staff_id', staff_id)
