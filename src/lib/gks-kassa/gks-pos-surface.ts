@@ -157,8 +157,15 @@ export function gksPosButtonClass(selected: boolean): string {
   return `${GKS_BTN_SHAPE} ${selected ? GKS_POS_BTN_SELECTED : GKS_POS_BTN}`
 }
 
-/** Klokbalk: exact dezelfde vorm/afgerondheid als Ter plaatse-knoppen + diepere schaduw. */
+/** Horizontale strook (klok, totaal): zelfde Tailwind als POS-knop + overflow voor hoeken. */
+export function gksPosRaisedStripClass(deepShadow = false): string {
+  const shadow = deepShadow
+    ? GKS_CLOCK_BAR_LIFT_SHADOW.replace(/^shadow-/, '!shadow-')
+    : ''
+  return `${gksPosButtonClass(false)} overflow-hidden ${shadow}`.trim()
+}
+
+/** Klokbalk: zelfde basis als Ter plaatse-knoppen + diepere schaduw. */
 export function gksClockBarClass(): string {
-  const lift = GKS_CLOCK_BAR_LIFT_SHADOW.replace(/^shadow-/, '!shadow-')
-  return `${gksPosButtonClass(false)} relative z-0 ${lift}`
+  return `${gksPosRaisedStripClass(true)} relative z-0`
 }

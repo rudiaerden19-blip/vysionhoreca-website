@@ -85,9 +85,9 @@ import {
   GKS_MENU_PLATE_TRANSPARENT_CLASS,
   GKS_MENU_TILE_LABEL_SURFACE,
   GKS_POS_BTN,
-  GKS_POS_FIELD,
   GKS_BTN_PRESS,
   gksClockBarClass,
+  gksPosRaisedStripClass,
   GKS_FONT_UI,
   GKS_FONT_UI_SOFT,
   GKS_TILE_LIFT_SHADOW,
@@ -578,6 +578,14 @@ const GKS_CATEGORY_STRIP_REVEAL = {
   animate: { opacity: 1, y: 0 },
   exit: { opacity: 0, y: -8 },
   transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] as const },
+}
+
+/** Num pad: omhoog inschuiven, terug omlaag (geen pop). */
+const GKS_NUMPAD_PANEL_SLIDE = {
+  initial: { opacity: 0, y: 52 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: 52 },
+  transition: { duration: 0.38, ease: [0.22, 1, 0.36, 1] as const },
 }
 
 /** Standaard: rastercel wordt **items-stretch** ⇒ knop moet **`h-full`**. */
@@ -4170,7 +4178,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250608-build-jsx-clock-bar-match"
+      data-gks-ui="20250608-numpad-slide-strip-match"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4801,7 +4809,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-3 pt-2 touch-pan-y">
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
               <div
-                className={`mb-3 mt-2.5 flex shrink-0 items-center gap-3 px-3 py-2 ${gksClockBarClass()}`}
+                className={`mb-3 mt-2.5 flex shrink-0 items-center gap-3 px-3 ${gksClockBarClass()} ${kassaOrderTypeButtonTouchClass(
+                  kassaSxgaDenseTiles,
+                )}`}
                 data-testid="kassa-sidebar-clock-bar"
               >
                 {showKassaStaffClockButton ? (
@@ -4852,43 +4862,51 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   </div>
                 </div>
               ) : null}
-              {numpadPanelVisible ? (
-              <div className="flex min-h-[15rem] flex-1 flex-col justify-end" data-testid="kassa-numpad-panel">
-              <div
-                className="grid shrink-0 grid-cols-4 gap-2 touch-manipulation select-none [grid-template-rows:repeat(4,minmax(2.75rem,1fr))]"
-                onClick={(e) => {
-                  const el = (e.target as HTMLElement).closest('[data-kassa-numpad-key]')
-                  if (!el || !(el instanceof HTMLElement)) return
-                  const k = el.dataset.kassaNumpadKey
-                  if (k) handleNumpad(k)
-                }}
-              >
-                {KASSA_NUMPAD_KEYS.map((key) => (
-                  <button
-                    key={key}
-                    type="button"
-                    data-kassa-numpad-key={key}
-                    className={`min-h-[2.75rem] font-semibold text-2xl touch-manipulation ${GKS_BTN_SHAPE} ${GKS_POS_BTN}`}
+              <AnimatePresence initial={false}>
+                {numpadPanelVisible ? (
+                  <motion.div
+                    key="kassa-numpad-panel"
+                    className="flex min-h-[15rem] flex-1 flex-col justify-end"
+                    data-testid="kassa-numpad-panel"
+                    {...GKS_NUMPAD_PANEL_SLIDE}
                   >
-                    {key}
-                  </button>
-                ))}
-              </div>
-              {numpadValue && parseFloat(numpadValue) > 0 && (
-                <button
-                  type="button"
-                  data-testid="kassa-add-custom-amount"
-                  onClick={addCustomAmount}
-                  className={`mt-3 shrink-0 touch-manipulation py-4 font-semibold text-lg ${GKS_ACCENT_BTN}`}
-                >
-                  {t('kassaApp.addAmount').replace(
-                    '{amount}',
-                    parseFloat(numpadValue || '0').toFixed(2),
-                  )}
-                </button>
-              )}
-              </div>
-              ) : cart.length > 0 ? (
+                    <div
+                      className="grid shrink-0 grid-cols-4 gap-2 touch-manipulation select-none [grid-template-rows:repeat(4,minmax(2.75rem,1fr))]"
+                      onClick={(e) => {
+                        const el = (e.target as HTMLElement).closest('[data-kassa-numpad-key]')
+                        if (!el || !(el instanceof HTMLElement)) return
+                        const k = el.dataset.kassaNumpadKey
+                        if (k) handleNumpad(k)
+                      }}
+                    >
+                      {KASSA_NUMPAD_KEYS.map((key) => (
+                        <button
+                          key={key}
+                          type="button"
+                          data-kassa-numpad-key={key}
+                          className={`min-h-[2.75rem] font-semibold text-2xl touch-manipulation ${GKS_BTN_SHAPE} ${GKS_POS_BTN}`}
+                        >
+                          {key}
+                        </button>
+                      ))}
+                    </div>
+                    {numpadValue && parseFloat(numpadValue) > 0 && (
+                      <button
+                        type="button"
+                        data-testid="kassa-add-custom-amount"
+                        onClick={addCustomAmount}
+                        className={`mt-3 shrink-0 touch-manipulation py-4 font-semibold text-lg ${GKS_ACCENT_BTN}`}
+                      >
+                        {t('kassaApp.addAmount').replace(
+                          '{amount}',
+                          parseFloat(numpadValue || '0').toFixed(2),
+                        )}
+                      </button>
+                    )}
+                  </motion.div>
+                ) : null}
+              </AnimatePresence>
+              {!numpadPanelVisible && cart.length > 0 ? (
               <div
                 className={`flex min-h-0 flex-1 flex-col overflow-hidden ${
                   kassaSidebarFooterTier === 'comfort' ? 'gap-2' : kassaSidebarFooterTier === 'compact' ? 'gap-1.5' : 'gap-1'
@@ -5010,7 +5028,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           className={`sticky bottom-0 z-10 shrink-0 border-t ${kassaAppearanceDark ? `${GKS_RULE_BLACK} ${GKS_MENU_PLATE_TRANSPARENT_CLASS}` : 'border-gray-200 bg-white'} px-3 py-2.5 space-y-2.5`}
         >
           <div
-            className={`flex items-center justify-between gap-2 px-2.5 py-2 ${GKS_POS_FIELD}`}
+            className={`flex items-center justify-between gap-2 px-2.5 ${gksPosRaisedStripClass()} ${kassaFooterActionTouchMinHClass(
+              kassaSxgaDenseTiles,
+              kassaSidebarFooterTier === 'dense',
+            )}`}
           >
             <span className={`text-sm font-semibold ${ui.numpadMeta}`}>
               {t('kassaApp.cartTotal')}
