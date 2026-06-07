@@ -4741,7 +4741,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-1.5 pt-0.5 touch-pan-y">
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
               <div
-                className={`mb-2 flex shrink-0 items-center gap-2 rounded-lg px-2 py-1 ${ui.numpadBarBg}`}
+                className="mb-2 flex shrink-0 items-center gap-2 rounded-lg bg-[#58CCFF] px-2 py-1"
                 data-testid="kassa-sidebar-clock-bar"
               >
                 {showKassaStaffClockButton ? (
