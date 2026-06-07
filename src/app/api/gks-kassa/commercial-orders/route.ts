@@ -10,6 +10,7 @@ import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 import { apiRateLimiter, checkRateLimit } from '@/lib/rate-limit'
 import { logger } from '@/lib/logger'
 import { gksApiTimeMeta, withBelgiumTimestampFields } from '@/lib/gks-kassa/belgium-datetime'
+import { sanitizeGksCommercialOrderRow } from '@/lib/gks-kassa/sanitize-commercial-order-row'
 
 const OpSchema = z.discriminatedUnion('op', [
   z.object({
@@ -128,7 +129,11 @@ export async function POST(req: NextRequest) {
     }
 
     if (body.op === 'insert') {
-      const row = { ...body.row, tenant_slug: tenantSlug } as Record<string, unknown>
+      const sanitized = sanitizeGksCommercialOrderRow(body.row, tenantSlug)
+      if ('error' in sanitized) {
+        return NextResponse.json({ error: sanitized.error }, { status: 400 })
+      }
+      const row = sanitized.row
       const needsNum =
         row.payment_status === 'paid' &&
         ['DINE_IN', 'TAKEAWAY', 'DELIVERY'].includes(String(row.order_type || '')) &&
@@ -142,11 +147,18 @@ export async function POST(req: NextRequest) {
         .from('gks_commercial_orders')
         .insert(row)
         .select(sel)
-        .maybeSingle()
       if (error) {
+        logger.warn('gks commercial-orders insert', { requestId, error: error.message })
         return NextResponse.json({ error: error.message }, { status: 409 })
       }
-      return NextResponse.json({ data: data ?? null })
+      const inserted = Array.isArray(data) ? data[0] : data
+      if (!inserted) {
+        return NextResponse.json({ error: 'insert_returned_empty' }, { status: 500 })
+      }
+      return NextResponse.json({
+        ...gksApiTimeMeta(),
+        data: withBelgiumTimestampFields(inserted as unknown as Record<string, unknown>),
+      })
     }
 
     if (body.op === 'update') {

@@ -53,6 +53,12 @@ export async function GET(req: NextRequest) {
     .eq('tenant_slug', tenantSlug)
     .maybeSingle()
 
+  const { count: commercialPaidCount } = await supabase
+    .from('gks_commercial_orders')
+    .select('id', { count: 'exact', head: true })
+    .eq('tenant_slug', tenantSlug)
+    .eq('payment_status', 'paid')
+
   const { count: staffInszCount, error: staffErr } = await supabase
     .from('staff')
     .select('id', { count: 'exact', head: true })
@@ -112,6 +118,7 @@ export async function GET(req: NextRequest) {
     businessName: tenantRow?.business_name ?? null,
     tables,
     staffWithInsz: staffInszCount ?? 0,
+    gksCommercialOrdersPaidCount: commercialPaidCount ?? 0,
     gksUrl: `/shop/${tenantSlug}/gks`,
     ready,
     hints,

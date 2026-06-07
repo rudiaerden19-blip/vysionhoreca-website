@@ -36,17 +36,17 @@ export async function gksPersistPaidCommercialOrder(
     }
   }
 
-  if (insRes.ok && insRes.data?.order_number == null) {
+  if (insRes.ok && (insRes.data == null || insRes.data?.order_number == null)) {
     const n = await fetchGksOrderNumberByKassaClientUuid(tenantSlug, kassaClientUuid)
-    if (n <= 0) {
-      return {
-        orderNumber: fallbackOrderNo,
-        queuedOffline: false,
-        hardError: 'order_number_unresolved',
-        commercialOrderId: insRes.data?.id,
-      }
+    if (n > 0) {
+      return { orderNumber: n, queuedOffline: false, commercialOrderId: insRes.data?.id }
     }
-    return { orderNumber: n, queuedOffline: false, commercialOrderId: insRes.data?.id }
+    return {
+      orderNumber: fallbackOrderNo,
+      queuedOffline: false,
+      hardError: insRes.data == null ? 'insert_empty_response' : 'order_number_unresolved',
+      commercialOrderId: insRes.data?.id,
+    }
   }
 
   if (!insRes.ok && isDuplicateGksKassaClientViolation(insRes.error)) {
