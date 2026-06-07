@@ -11,14 +11,14 @@ export const GKS_BTN_SHAPE = 'rounded-[3px]'
 
 /** Zachte “bollig”: donker boven/onder, iets lichter midden — geen harde radiale flare. */
 const GKS_BTN_FACE =
-  'bg-[linear-gradient(180deg,#2b2b2b_0%,#4a4a4a_46%,#323232_100%)]'
+  'bg-[linear-gradient(180deg,#161616_0%,#323232_46%,#1c1c1c_100%)]'
 
 const GKS_BTN_FACE_SELECTED =
-  'bg-[linear-gradient(180deg,#353535_0%,#585858_46%,#3d3d3d_100%)]'
+  'bg-[linear-gradient(180deg,#1e1e1e_0%,#3a3a3a_46%,#242424_100%)]'
 
 /** Dunne rand + lichte drop shadow (referentie-POS). */
 const GKS_BTN_EDGE =
-  'border border-[#3a3a3a] shadow-[0_2px_3px_rgba(0,0,0,0.35)]'
+  'border border-[#2a2a2a] shadow-[0_2px_3px_rgba(0,0,0,0.42)]'
 
 /** Standaard knop. */
 export const GKS_POS_BTN = [
@@ -58,7 +58,7 @@ export const GKS_POS_FIELD = [
 
 /** Onderstrook menu-tegel. */
 export const GKS_MENU_TILE_LABEL_SURFACE =
-  'bg-[linear-gradient(180deg,#404040_0%,#2a2a2a_100%)]'
+  'bg-[linear-gradient(180deg,#2e2e2e_0%,#1a1a1a_100%)]'
 
 export function gksPosButtonClass(selected: boolean): string {
   return `${GKS_BTN_SHAPE} ${selected ? GKS_POS_BTN_SELECTED : GKS_POS_BTN}`
