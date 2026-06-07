@@ -4172,7 +4172,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250608-grain-stronger-plate"
+      data-gks-ui="20250608-flymenu-no-icons"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4258,8 +4258,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 {/* Tweede popup rechts: sub-items */}
                 {activeMod && (
                   <div className={`ml-2 overflow-y-auto self-start ${ui.flyMenuPanel}`} style={{ width: 220, maxHeight: '85vh' }}>
-                    <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-semibold uppercase tracking-wider sticky top-0 rounded-t-2xl flex items-center gap-2">
-                      <span>{activeMod.icon}</span>{' '}
+                    <div
+                      className={`sticky top-0 border-b px-4 py-2.5 text-xs font-semibold uppercase tracking-wider ${ui.flyMenuDivider} ${ui.flyMenuText}`}
+                    >
                       {activeMod.labelKey ? t(activeMod.labelKey) : activeMod.label}
                     </div>
                     {activeMod.items.map(item => (
@@ -4267,8 +4268,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                         setHamburgerOpen(false)
                         setHamburgerSubOpen(null)
                       }}
-                        className={`flex items-center gap-3 px-4 py-3 ${ui.flyMenuRowHover} border-b ${ui.flyMenuDivider} text-sm ${ui.flyMenuTextMuted} transition-colors`}>
-                        <span>{item.icon}</span>
+                        className={`flex items-center px-4 py-3 ${ui.flyMenuRowHover} border-b ${ui.flyMenuDivider} text-sm ${ui.flyMenuTextMuted} transition-colors`}>
                         <span>{item.labelKey ? t(item.labelKey) : item.label}</span>
                       </Link>
                     ))}
@@ -4396,10 +4396,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           )}
 
           {activeKassaStaff && !demoViewOnly && (
-            <div className="hidden max-w-[7rem] shrink-0 items-center rounded-md bg-emerald-600/90 px-1.5 py-1 text-[10px] font-semibold text-white sm:flex md:max-w-[10rem] md:text-xs">
-              <span className="truncate" title={activeKassaStaff.name}>
-                {activeKassaStaff.name}
-              </span>
+            <div
+              className={`hidden max-w-[7rem] shrink-0 sm:inline-flex md:max-w-[10rem] ${KASSA_HEADER_QUICK_LINK_BTN} ${GKS_POS_SELECTED_ACCENT_TEXT}`}
+              role="status"
+              title={activeKassaStaff.name}
+            >
+              <span className={`truncate ${KASSA_HEADER_QUICK_LINK_LABEL}`}>{activeKassaStaff.name}</span>
             </div>
           )}
           </nav>
