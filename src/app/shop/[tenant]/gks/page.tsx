@@ -4146,7 +4146,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250607-bon-same-grey"
+      data-gks-ui="20250607-numpad-in-total-bar"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4800,15 +4800,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               ) : null}
               {numpadPanelVisible ? (
               <div className="flex min-h-[15rem] flex-1 flex-col justify-end" data-testid="kassa-numpad-panel">
-              <div className={`mb-3 flex shrink-0 flex-col gap-0.5 px-3 py-2 ${GKS_POS_FIELD}`}>
-                  <input
-                    type="text"
-                    value={numpadValue}
-                    readOnly
-                    aria-label={t('kassaApp.numpadPlaceholder')}
-                    className={`w-full min-w-0 border-none bg-transparent text-right text-2xl font-semibold outline-none sm:text-3xl ${ui.numpadInput}`}
-                  />
-              </div>
               <div
                 className="grid shrink-0 grid-cols-4 gap-2 touch-manipulation select-none [grid-template-rows:repeat(4,minmax(2.75rem,1fr))]"
                 onClick={(e) => {
@@ -4970,13 +4961,25 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <span className={`text-sm font-semibold ${ui.numpadMeta}`}>
               {t('kassaApp.cartTotal')}
             </span>
-            <span
-              className={`font-semibold ${ui.priceAccentClass} ${
-                kassaSxgaDenseTiles || kassaSidebarFooterTier !== 'dense' ? 'text-xl' : 'text-lg'
-              }`}
-            >
-              €{total.toFixed(2)}
-            </span>
+            {numpadPanelVisible ? (
+              <span
+                className={`min-w-0 truncate text-right font-semibold tabular-nums ${ui.numpadInput} ${
+                  kassaSxgaDenseTiles ? 'text-2xl' : 'text-xl sm:text-2xl'
+                }`}
+                aria-live="polite"
+                aria-label={t('kassaApp.numpadPlaceholder')}
+              >
+                €{numpadValue || '0'}
+              </span>
+            ) : (
+              <span
+                className={`font-semibold tabular-nums ${ui.priceAccentClass} ${
+                  kassaSxgaDenseTiles || kassaSidebarFooterTier !== 'dense' ? 'text-xl' : 'text-lg'
+                }`}
+              >
+                €{total.toFixed(2)}
+              </span>
+            )}
           </div>
           <div className="grid grid-cols-3 gap-3 touch-manipulation select-none">
             <button
