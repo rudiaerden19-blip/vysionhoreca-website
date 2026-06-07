@@ -82,6 +82,7 @@ import {
   GKS_BTN_ARIA_DISABLED,
   GKS_CHECKOUT_BTN,
   GKS_BTN_SHAPE,
+  GKS_MENU_PLATE_SHELL_BG_CLASS,
   GKS_MENU_PLATE_TRANSPARENT_CLASS,
   GKS_MENU_TILE_LABEL_SURFACE,
   GKS_POS_BTN,
@@ -4171,7 +4172,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250608-grain-gray-fix"
+      data-gks-ui="20250608-grain-stronger-plate"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4189,7 +4190,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       <div
         className={`relative z-30 flex min-h-[56px] w-full min-w-0 shrink-0 items-center gap-1.5 px-2 py-2 sm:gap-2 sm:px-3 ${
           kassaAppearanceDark
-            ? `pb-3 ${GKS_MENU_PLATE_TRANSPARENT_CLASS}`
+            ? `pb-3 ${GKS_MENU_PLATE_SHELL_BG_CLASS}`
             : 'border-b border-[#333336] bg-[#3C4D6B]'
         }`}
       >
@@ -4494,7 +4495,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* ── Midden: categorieën / producten ── */}
         <div
           className={`flex-1 flex flex-col min-h-0 overflow-hidden ${
-            kassaAppearanceDark ? GKS_MENU_PLATE_TRANSPARENT_CLASS : 'bg-[#e3e3e3]'
+            kassaAppearanceDark ? GKS_MENU_PLATE_SHELL_BG_CLASS : 'bg-[#e3e3e3]'
           }`}
         >
 
@@ -4571,7 +4572,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             ref={kassaMenuScrollRef}
             data-testid="kassa-menu-scroll"
             className={`relative flex-1 min-h-0 overflow-x-hidden overflow-y-auto overscroll-y-contain p-4 touch-manipulation [overflow-anchor:none] [scrollbar-gutter:stable] ${
-              kassaAppearanceDark ? GKS_MENU_PLATE_TRANSPARENT_CLASS : ''
+              kassaAppearanceDark ? GKS_MENU_PLATE_SHELL_BG_CLASS : ''
             }`}
           >
             {!selectedCategory ? (
@@ -4664,7 +4665,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* ── Rechts: numpad / cart ── */}
         <div
           className={`${kassaSxgaDenseTiles ? 'w-[300px]' : 'w-80 sm:w-96 lg:w-[380px]'} flex min-h-0 min-w-0 flex-shrink-0 flex-col overflow-x-hidden overflow-y-auto ${
-            kassaAppearanceDark ? `border-l ${GKS_RULE_BLACK} ${GKS_MENU_PLATE_TRANSPARENT_CLASS}` : 'border-0 bg-white'
+            kassaAppearanceDark ? `border-l ${GKS_RULE_BLACK} ${GKS_MENU_PLATE_SHELL_BG_CLASS}` : 'border-0 bg-white'
           }`}
         >
 
@@ -5015,7 +5016,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         {/* Totaal + knoppen — touch-vriendelijk (kiosk) */}
         <div
-          className={`sticky bottom-0 z-10 shrink-0 border-t ${kassaAppearanceDark ? `${GKS_RULE_BLACK} ${GKS_MENU_PLATE_TRANSPARENT_CLASS}` : 'border-gray-200 bg-white'} px-3 py-2.5 space-y-2.5`}
+          className={`sticky bottom-0 z-10 shrink-0 border-t ${kassaAppearanceDark ? `${GKS_RULE_BLACK} ${GKS_MENU_PLATE_SHELL_BG_CLASS}` : 'border-gray-200 bg-white'} px-3 py-2.5 space-y-2.5`}
         >
           <div
             className={`flex items-center justify-between gap-2 px-2.5 ${gksPosRaisedStripClass()} ${kassaFooterActionTouchMinHClass(
