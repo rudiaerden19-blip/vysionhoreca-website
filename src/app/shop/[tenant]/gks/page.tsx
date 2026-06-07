@@ -91,7 +91,6 @@ import {
   GKS_FONT_UI_SOFT,
   GKS_TILE_LIFT_SHADOW,
   gksPosButtonClass,
-  GKS_POS_SELECTED_ACCENT_TEXT,
 } from '@/lib/gks-kassa/gks-pos-surface'
 import { authFetch, buildShopInternalReturnPath } from '@/lib/auth-headers'
 import {
@@ -4153,7 +4152,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250607-menu-plate-texture"
+      data-gks-ui="20250607-selected-btn-blue-text"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4698,17 +4697,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 kassaSxgaDenseTiles,
               )} ${gksPosButtonClass(orderType === 'DINE_IN')}`}
             >
-              <span
-                className={`text-center text-sm font-semibold leading-tight ${
-                  orderType === 'DINE_IN' ? GKS_POS_SELECTED_ACCENT_TEXT : ''
-                }`}
-              >
+              <span className="text-center text-sm font-semibold leading-tight">
                 {t('kassaApp.orderTypeDineIn')}
               </span>
               {orderType === 'DINE_IN' && tableNumber ? (
-                <span
-                  className={`mt-0.5 max-w-full truncate text-[10px] font-semibold normal-case sm:text-xs ${GKS_POS_SELECTED_ACCENT_TEXT}`}
-                >
+                <span className="mt-0.5 max-w-full truncate text-[10px] font-semibold normal-case opacity-95 sm:text-xs">
                   {t('kassaApp.tableWord')} {tableNumber}
                   {dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE
                     ? ` (${t('kassaApp.floorZoneTerraceShort')})`
