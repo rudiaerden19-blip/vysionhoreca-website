@@ -74,7 +74,25 @@ export async function checkFdmStatus(
   }
 }
 
-export async function getGksAvailability(ctx: GksAvailabilityContext): Promise<GksAvailability> {
+const GKS_AVAILABILITY_CACHE_MS = 20_000
+
+let gksAvailabilityCache: {
+  key: string
+  availability: GksAvailability
+} | null = null
+
+function gksAvailabilityCacheKey(ctx: GksAvailabilityContext): string {
+  return `${ctx.tenantSlug}|${ctx.staff?.insz ?? ''}|${ctx.vatNo}`
+}
+
+export function invalidateGksAvailabilityCache(): void {
+  gksAvailabilityCache = null
+}
+
+export async function getGksAvailability(
+  ctx: GksAvailabilityContext,
+  opts?: { bypassCache?: boolean },
+): Promise<GksAvailability> {
   const checkedAt = Date.now()
   if (!getGksInternetOnline()) {
     return { status: 'INTERNET_OFFLINE', checkedAt }
@@ -82,9 +100,25 @@ export async function getGksAvailability(ctx: GksAvailabilityContext): Promise<G
   if (!assertGksStaffForFiscal(ctx.staff)) {
     return { status: 'UNKNOWN', message: 'STAFF_REQUIRED', checkedAt }
   }
+  const cacheKey = gksAvailabilityCacheKey(ctx)
+  if (!opts?.bypassCache && gksAvailabilityCache?.key === cacheKey) {
+    const age = checkedAt - gksAvailabilityCache.availability.checkedAt
+    if (
+      age < GKS_AVAILABILITY_CACHE_MS &&
+      gksAvailabilityCache.availability.status === 'ONLINE_OK'
+    ) {
+      return { ...gksAvailabilityCache.availability, checkedAt }
+    }
+  }
   const partner = partnerCtxFromAvailability(ctx)
   const fdm = await checkFdmStatus(partner)
-  return { status: fdm.status, message: fdm.message, checkedAt }
+  const availability: GksAvailability = { status: fdm.status, message: fdm.message, checkedAt }
+  if (availability.status === 'ONLINE_OK') {
+    gksAvailabilityCache = { key: cacheKey, availability }
+  } else {
+    gksAvailabilityCache = null
+  }
+  return availability
 }
 
 export function gksAvailabilityBlocksFiscal(status: GksAvailabilityStatus): boolean {

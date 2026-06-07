@@ -156,7 +156,7 @@ export async function queryFdmStatus(ctx: GksPartnerContext): Promise<GksFdmStat
     bufferCapacityUsed: 12.5,
     messages: gql.errors?.map((e) => e.message) ?? [],
   }
-  await appendFiscalJournalEntry(ctx.tenantSlug, {
+  void appendFiscalJournalEntry(ctx.tenantSlug, {
     mutation: 'status',
     request: { query: 'status', language: ctx.language ?? 'NL' },
     response: status,
@@ -268,17 +268,14 @@ export async function signSale(
   financials: GksPaymentLineInput[],
   costCenter?: GksCostCenter,
 ): Promise<GksSignResult> {
-  const status = await queryFdmStatus(ctx)
-  if (!status.operational) {
-    throw new Error('FDM_NOT_OPERATIONAL')
-  }
+  /** FDM-gate zit in gksEnsureFdmReady vóór signSale — geen tweede status-roundtrip. */
   const envelope = buildEnvelope(ctx)
   const request = { ...envelope, costCenter, transaction, financials }
   const mutation = `mutation SignSale($data: SaleInput!) { signSale(data: $data) { shortSignature verificationUrl vatCalc { label taxableAmount vatAmount } } }`
   const gql = await postGraphQlMock(mutation, { data: request }, ctx)
   if (gql.errors?.length) throw new Error(gql.errors[0].message)
   const result = mockSignResult(envelope, 'SALE', 'N', transaction)
-  await appendFiscalJournalEntry(ctx.tenantSlug, {
+  void appendFiscalJournalEntry(ctx.tenantSlug, {
     mutation: 'signSale',
     request,
     response: result,

@@ -609,51 +609,50 @@ export async function gksCompleteSaleN(
     return { ok: false, error: { code: 'SIGN_SALE_FAILED', message } }
   }
 
-  let commercialOrderId: string | undefined
-  if (opts?.resolveCommercialOrderId) {
-    try {
-      const linked = await opts.resolveCommercialOrderId({
-        posFiscalTicketNo: result.posFiscalTicketNo,
-        journalId,
-      })
-      if (linked) commercialOrderId = linked
-    } catch (err: unknown) {
-      console.warn('[gks-kassa] resolveCommercialOrderId failed', err)
-    }
-  }
+  const fiscalSnapshot = gksFiscalSnapshotFromSignResult(result)
+  const posFiscalTicketNo = result.posFiscalTicketNo
 
-  const successRes = await gksFiscalJournalMarkSuccess(
-    tenantSlug,
-    journalId,
-    signResultToResponsePayload(result),
-    commercialOrderId,
-  )
-  if (!successRes.ok || successRes.data.status !== 'SUCCESS') {
-    await markJournalFailedSafe(
+  void (async () => {
+    let commercialOrderId: string | undefined
+    if (opts?.resolveCommercialOrderId) {
+      try {
+        const linked = await opts.resolveCommercialOrderId({
+          posFiscalTicketNo,
+          journalId,
+        })
+        if (linked) commercialOrderId = linked
+      } catch (err: unknown) {
+        console.warn('[gks-kassa] resolveCommercialOrderId failed', err)
+      }
+    }
+
+    const successRes = await gksFiscalJournalMarkSuccess(
       tenantSlug,
       journalId,
-      'MARK_SUCCESS_FAILED',
-      successRes.ok ? `status=${successRes.data.status}` : successRes.error,
+      signResultToResponsePayload(result),
+      commercialOrderId,
     )
-    return {
-      ok: false,
-      error: {
-        code: 'MARK_SUCCESS_FAILED',
-        message: successRes.ok
-          ? 'Fiscaal journal kon niet op SUCCESS gezet worden.'
-          : successRes.error || 'mark_success mislukt',
-      },
+    if (!successRes.ok || successRes.data.status !== 'SUCCESS') {
+      await markJournalFailedSafe(
+        tenantSlug,
+        journalId,
+        'MARK_SUCCESS_FAILED',
+        successRes.ok ? `status=${successRes.data.status}` : successRes.error,
+      )
+      console.error('[gks-kassa] mark_success na verkoop mislukt', successRes)
+      return
     }
-  }
 
-  if (opts?.zone && opts?.tableNumber) {
-    clearCostCenterReference(tenantSlug, tableOrderMapKey(opts.zone, opts.tableNumber))
-  }
+    if (opts?.zone && opts?.tableNumber) {
+      clearCostCenterReference(tenantSlug, tableOrderMapKey(opts.zone, opts.tableNumber))
+    }
+  })()
+
   return {
     ok: true,
-    posFiscalTicketNo: result.posFiscalTicketNo,
+    posFiscalTicketNo,
     shortSignature: result.shortSignature,
     journalId,
-    fiscalSnapshot: gksFiscalSnapshotFromSignResult(result),
+    fiscalSnapshot,
   }
 }

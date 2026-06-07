@@ -97,7 +97,6 @@ import {
   prependGksFiscalTicketHeader,
 } from '@/lib/gks-kassa/gks-fiscal-receipt'
 import { gksPersistPaidCommercialOrder } from '@/lib/gks-kassa/gks-persist-paid-commercial-order'
-import type { GksPersistPaidCommercialResult } from '@/lib/gks-kassa/gks-persist-paid-commercial-order'
 import {
   fetchGksOpenTableOrdersForTenant,
   normalizeGksCommercialItemsToCartLines,
@@ -3019,33 +3018,23 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     if (billLines.length === 0) return
     if (!getGksInternetOnline()) return
 
-    const fiscalGate = await assertGksCanFiscalize({
-      tenantSlug: tenant,
-      staff: activeKassaStaff,
-      vatNo: tenantInfo?.btw_number?.trim() || 'BE0000000000',
-    })
-    if (fiscalGate) {
-      alert(fiscalGate.message)
-      return
-    }
-
     if (method === 'SPLIT') {
       const sc = splitAmounts?.cash ?? 0
       const sd = splitAmounts?.card ?? 0
       if (Math.abs(total - sc - sd) > 0.02) return
     }
 
-    invalidateMenuCategoriesCache(tenant)
-    let freshVatLookup = categoryVatLookup
-    try {
-      const freshCats = dedupeCatalogById((await getMenuCategories(tenant)).filter((c) => c.is_active))
-      freshVatLookup = buildCategoryVatLookup(freshCats)
-      setCategories(freshCats)
-    } catch {
-      /* offline: bestaande lookup */
-    }
     const resolveLineVatAtCheckout = (line: (typeof billLines)[number]) =>
-      resolveVatPercentForProduct(line.product, freshVatLookup, tenantDefaultBtw)
+      resolveVatPercentForProduct(line.product, categoryVatLookup, tenantDefaultBtw)
+    void invalidateMenuCategoriesCache(tenant)
+    void getMenuCategories(tenant)
+      .then((freshCats) => {
+        const deduped = dedupeCatalogById(freshCats.filter((c) => c.is_active))
+        setCategories(deduped)
+      })
+      .catch(() => {
+        /* achtergrond */
+      })
     const vatSplit = computeInclusiveVatSplitFromCart(billLines, resolveLineVatAtCheckout)
     if (Math.abs(vatSplit.grossTotal - total) > 0.03) {
       console.warn('[kassa] btw-split vs mandtotaal mismatched', { split: vatSplit.grossTotal, total })
@@ -3107,7 +3096,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       orderPayload.payment_split_card = Math.round(splitAmounts.card * 100) / 100
     }
 
-    const persistRef: { current: GksPersistPaidCommercialResult | null } = { current: null }
     const saleRes = await gksCompleteSaleN(
       tenant,
       activeKassaStaff,
@@ -3121,13 +3109,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         tableNumber: orderType === 'DINE_IN' ? tableNumber || undefined : undefined,
         splitAmounts: method === 'SPLIT' ? splitAmounts : undefined,
         resolveCommercialOrderId: async ({ posFiscalTicketNo, journalId }) => {
-          persistRef.current = await gksPersistPaidCommercialOrder(
+          const persistRes = await gksPersistPaidCommercialOrder(
             tenant,
             { ...orderPayload, order_number: posFiscalTicketNo },
             kassa_client_uuid,
             journalId,
           )
-          return persistRef.current.commercialOrderId ?? null
+          if (persistRes.hardError) {
+            console.error('[gks-kassa] commercial order insert:', persistRes.hardError)
+            alert(
+              `${t('kassaApp.orderPersistFailedTitle')}\n\n${t('kassaApp.orderPersistFailedBody')}\n\n(Fiscale verkoop staat wel in het journal.)${persistRes.hardError ? `\n\n(${persistRes.hardError})` : ''}`,
+            )
+          }
+          return persistRes.commercialOrderId ?? null
         },
       },
     )
@@ -3136,14 +3130,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       return
     }
     const allocatedOrderNumber = saleRes.posFiscalTicketNo
-
-    const persistRes = persistRef.current
-    if (persistRes?.hardError) {
-      console.error('[gks-kassa] commercial order insert:', persistRes.hardError)
-      alert(
-        `${t('kassaApp.orderPersistFailedTitle')}\n\n${t('kassaApp.orderPersistFailedBody')}\n\n(Fiscale verkoop staat wel in het journal.)${persistRes.hardError ? `\n\n(${persistRes.hardError})` : ''}`,
-      )
-    }
 
     syncZReportAfterOrderSafe(tenant, createdAt.toISOString(), {
       staffInsz: activeKassaStaff?.insz ?? null,
