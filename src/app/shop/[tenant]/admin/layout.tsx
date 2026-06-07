@@ -11,6 +11,7 @@ import {
   getAdminKassaEntryHref,
   getFirstAccessibleAdminPath,
   hasModuleAccessForPathname,
+  isShopAdminGksKassaPosPath,
   isShopAdminKassaPosPath,
   normalizeShopAdminPathname,
   resolveShopTenantSlug,
@@ -101,7 +102,14 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   const isAdminDashboardRoot =
     adminPath === baseUrl || adminPath === `${baseUrl}/`
 
+  const onGksKassaPos =
+    Boolean(tenantSlug) && isShopAdminGksKassaPosPath(adminPath, tenantSlug)
+
   useEffect(() => {
+    if (onGksKassaPos) {
+      setLoading(false)
+      return
+    }
     const slug = resolveShopTenantSlug(pathname, routeTenant || params.tenant)
     const seq = ++tenantCheckSeq.current
 
@@ -155,7 +163,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     return () => {
       tenantCheckSeq.current += 1
     }
-  }, [pathname, routeTenant, params.tenant])
+  }, [pathname, routeTenant, params.tenant, onGksKassaPos])
 
   useEffect(() => {
     setAdminAccess('pending')
@@ -191,8 +199,10 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   }, [params.tenant, adminPath, baseUrl])
 
   useLayoutEffect(() => {
-    if (loading || tenantExists === null) return
-    if (tenantExists === false) return
+    if (!onGksKassaPos) {
+      if (loading || tenantExists === null) return
+      if (tenantExists === false) return
+    }
     if (typeof window === 'undefined') return
 
     const stripHandoffParamFromSearch = (search: string) => {
@@ -274,7 +284,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     }
 
     goTenantLogin()
-  }, [loading, tenantExists, params.tenant, demoPublicUnauthenticated])
+  }, [loading, tenantExists, params.tenant, demoPublicUnauthenticated, onGksKassaPos])
 
   /** Server moet dezelfde sessie zien als schrijf-API’s; ruimt verouderde `vysion_tenant` op bij mismatch. */
   useEffect(() => {
@@ -356,6 +366,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   }, [adminPath])
 
   useEffect(() => {
+    if (onGksKassaPos) return
     if (loading || modulesLoading || tenantExists === false) return
     if (demoPublicUnauthenticated) return
     if (typeof window !== 'undefined' && isSuperAdminLoggedIn()) return
@@ -369,6 +380,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     const subId = getSubmenuIdForPathname(adminPath, params.tenant)
     if (
       !isShopAdminKassaPosPath(adminPath, params.tenant) &&
+      !isShopAdminGksKassaPosPath(adminPath, tenantSlug) &&
       subId &&
       !isSubmenuForcedOn(subId) &&
       !isSubmenuEnabledInTenantConfig(
@@ -389,7 +401,32 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     enabledModulesJson,
     router,
     demoPublicUnauthenticated,
+    onGksKassaPos,
+    tenantSlug,
   ])
+
+  /** GKS POS: geen async tenant_settings-gate in AdminLayout (voorkomt valse «Shop niet gevonden»). */
+  if (onGksKassaPos) {
+    if (demoPublicUnauthenticated) {
+      return <>{children}</>
+    }
+    if (typeof window !== 'undefined' && isSuperAdminLoggedIn()) {
+      return <>{children}</>
+    }
+    if (adminAccess !== 'ok') {
+      return (
+        <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-gray-600">
+              {adminAccess === 'login' ? t('adminLayout.redirectLogin') : t('adminLayout.loading')}
+            </p>
+          </div>
+        </div>
+      )
+    }
+    return <>{children}</>
+  }
 
   if (loading || tenantExists === null) {
     return (

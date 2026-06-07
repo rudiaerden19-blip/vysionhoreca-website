@@ -285,6 +285,13 @@ export function isShopAdminKassaPosPath(pathnameNormalized: string, tenantSlug: 
   return p === base
 }
 
+/** GKS-certificatie-POS `/shop/:slug/admin/gks-kassa` — eigen route, geen productie-kassa. */
+export function isShopAdminGksKassaPosPath(pathnameNormalized: string, tenantSlug: string): boolean {
+  const base = `/shop/${tenantSlug}/admin/gks-kassa`
+  const p = pathnameNormalized.split('?')[0].replace(/\/+$/, '')
+  return p === base
+}
+
 /**
  * Bestemming voor de admin-topbalk «terug naar kassa» — het verkoopscherm.
  * Submenu’s (categorieën, producten, …) gelden voor de hamburger-setup, niet voor toegang tot `/kassa`.
