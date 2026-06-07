@@ -23,6 +23,7 @@ Pilot/certificatie onder `/shop/[tenant]/admin/gks-kassa` mag **geen** productie
 - `/api/kassa/staff-clock` — staff-sessies (TODO: aparte GKS-route indien nodig).
 - Print agent (`sendToVysionPrintAgent`) — lokaal per zaak.
 - Webshop-order **alarm** uitgeschakeld (geen poll op productie `orders.status=new`).
+- Geen fullscreen «Activeer geluid»-gate: audio ontgrendelt op eerste tik op de POS (zelfde sessie-key `gks_kassa_audio_ok_*`).
 
 ## Check vóór deploy
 

@@ -730,31 +730,23 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [hamburgerOpen, setHamburgerOpen] = useState(false)
   const [hamburgerSubOpen, setHamburgerSubOpen] = useState<string | null>(null)
   const closeNav = () => { setNavOpen(false); setKassaOpen(false); setFlyoutOpen(null); setOnlineSubOpen(null) }
-  // ── Geluid activatie scherm ──────────────────────────────────────────────
-  // Eén keer per sessie (sessionStorage). Navigeren binnen de kassa toont het NIET opnieuw.
-  // Bij nieuwe browsersessie (volgende ochtend) verschijnt het opnieuw.
+  // ── Audio (GKS): geen fullscreen-gate — eerste tik op POS ontgrendelt (browser gesture).
+  // sessionStorage onthoudt “ok” per tab; webshop-alarm staat uit (ISOLATION.md).
   const SESSION_KEY = gksAudioOkSessionKey(tenant)
-  const [soundActivated, setSoundActivated] = useState(() => {
-    if (demoViewOnly) return true
-    return typeof window !== 'undefined' && sessionStorage.getItem(SESSION_KEY) === 'true'
-  })
-  const [showSoundActivation, setShowSoundActivation] = useState(() => {
-    if (demoViewOnly) return false
-    return typeof window === 'undefined' ? false : sessionStorage.getItem(SESSION_KEY) !== 'true'
-  })
 
-  const activateSound = () => {
-    // Zelfde singleton AudioContext + notification.mp3 als playOrderNotification (niet aparte AudioContext)
+  const persistKassaAudioUnlocked = useCallback(() => {
     activateAudioForIOS()
     initAudio()
     prewarmAudio()
-    if ('Notification' in window && Notification.permission === 'default') {
+    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
       Notification.requestPermission()
     }
-    sessionStorage.setItem(SESSION_KEY, 'true')
-    setSoundActivated(true)
-    setShowSoundActivation(false)
-  }
+    try {
+      sessionStorage.setItem(SESSION_KEY, 'true')
+    } catch {
+      /* ignore */
+    }
+  }, [SESSION_KEY])
 
   /** Css-hooks voor scherpere lcd-weergave (globals.css: tekst + afbeeldingen); opruimen bij verlaten kassa */
   useEffect(() => {
@@ -768,20 +760,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
   }, [])
 
-  /** Eerste tik op kassa ontgrendelt audio (sessie al “ok”) zodat poll achtergrond alarm kan afspelen */
+  /** Eerste tik op kassa ontgrendelt audio (geen blokkerend overlay). */
   const audioUnlockOnceRef = useRef(false)
   useEffect(() => {
-    if (demoViewOnly || !soundActivated || audioUnlockOnceRef.current) return
+    if (demoViewOnly) return
     const onPointer = () => {
       if (audioUnlockOnceRef.current) return
       audioUnlockOnceRef.current = true
-      activateAudioForIOS()
-      initAudio()
+      persistKassaAudioUnlocked()
       window.removeEventListener('pointerdown', onPointer, true)
     }
     window.addEventListener('pointerdown', onPointer, true)
     return () => window.removeEventListener('pointerdown', onPointer, true)
-  }, [soundActivated, demoViewOnly])
+  }, [demoViewOnly, persistKassaAudioUnlocked])
 
   const [cart, setCart] = useState<CartItem[]>([])
   const [orderType, setOrderType] = useState<OrderType>('DINE_IN')
@@ -3779,33 +3770,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     ],
     [t],
   )
-
-  // ── Geluid activatie scherm (exact donor) — toon elke sessie ───────────
-  if (showSoundActivation && !soundActivated && !demoViewOnly) {
-    return (
-      <div className={`fixed inset-0 z-[200] flex flex-col items-center justify-center p-8 ${ui.soundBackdrop}`}>
-        <div className={`max-w-md text-center ${ui.soundHeading}`}>
-          <div className="mb-8 text-8xl">🔔</div>
-          <h1 className={`mb-4 text-4xl font-bold ${ui.soundHeading}`}>{t('kassaApp.soundTitle')}</h1>
-          <p className={`mb-8 text-xl ${ui.soundBody}`}>
-            {t('kassaApp.soundBody')}
-            <br /><br />
-            <strong className={ui.soundStrong}>{t('kassaApp.soundOncePerDay')}</strong>
-          </p>
-          <button
-            onClick={activateSound}
-            className="flex w-full transform items-center justify-center gap-4 rounded-2xl bg-green-500 py-6 text-2xl font-bold text-white shadow-lg transition-all hover:scale-105 hover:bg-green-600"
-          >
-            <span className="text-4xl">🔊</span>
-            {t('kassaApp.soundActivateButton').toUpperCase()}
-          </button>
-          <p className={`mt-6 text-sm ${ui.soundMuted}`}>
-            💡 {t('kassaApp.soundHintFooter')}
-          </p>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div
