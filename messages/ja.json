@@ -659,6 +659,13 @@
     "loginFailed": "ログインに失敗しました",
     "tenantNotFound": "店舗が見つかりません。サポートにお問い合わせください。",
     "somethingWentWrong": "エラーが発生しました。もう一度お試しください。",
+    "firstLoginLink": "初めてですか？パスワードを設定",
+    "firstLoginTitle": "初回パスワードの設定",
+    "confirmPassword": "パスワードの確認",
+    "setPasswordButton": "パスワードを保存",
+    "savingPassword": "保存中...",
+    "passwordMismatch": "パスワードが一致しません",
+    "passwordMinLength": "8文字以上",
     "fillEmailFirst": "まずメールアドレスを入力してください",
     "databaseNotAvailable": "データベースが利用できません",
     "troubleshooting": {

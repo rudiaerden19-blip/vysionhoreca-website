@@ -659,6 +659,13 @@
     "loginFailed": "Error al iniciar sesión",
     "tenantNotFound": "No se encontró el negocio. Contacte con soporte.",
     "somethingWentWrong": "Algo salió mal. Por favor, inténtalo de nuevo.",
+    "firstLoginLink": "¿Primera vez? Establece tu contraseña",
+    "firstLoginTitle": "Establecer tu primera contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "setPasswordButton": "Guardar contraseña",
+    "savingPassword": "Guardando...",
+    "passwordMismatch": "Las contraseñas no coinciden",
+    "passwordMinLength": "Al menos 8 caracteres",
     "fillEmailFirst": "Por favor, introduce tu dirección de correo electrónico primero",
     "databaseNotAvailable": "Base de datos no disponible",
     "troubleshooting": {

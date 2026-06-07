@@ -44,6 +44,8 @@ export default function LoginPage() {
   const { t, locale, setLocale, locales, localeNames } = useLanguage()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [passwordConfirm, setPasswordConfirm] = useState('')
+  const [loginMode, setLoginMode] = useState<'signin' | 'initial'>('signin')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [isLangOpen, setIsLangOpen] = useState(false)
@@ -177,6 +179,98 @@ export default function LoginPage() {
     setIsLangOpen(false)
   }
 
+  const completeLoginAfterPassword = async (loginEmail: string, loginPassword: string) => {
+    const nextParam =
+      typeof window !== 'undefined'
+        ? new URLSearchParams(window.location.search).get('next')
+        : null
+    let targetTenantSlug: string | undefined
+    if (nextParam) {
+      try {
+        const dec = decodeURIComponent(nextParam.trim())
+        const m = dec.match(/^\/shop\/([^/?#]+)/)
+        if (m?.[1]) targetTenantSlug = m[1].toLowerCase()
+      } catch {
+        /* ignore */
+      }
+    }
+
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: loginEmail,
+        password: loginPassword,
+        ...(targetTenantSlug ? { target_tenant_slug: targetTenantSlug } : {}),
+      }),
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      setError(data.error || t('login.loginFailed'))
+      setIsLoading(false)
+      return
+    }
+
+    const tenant = data.tenant
+
+    if (!tenant.tenant_slug) {
+      setError(t('login.tenantNotFound'))
+      setIsLoading(false)
+      return
+    }
+
+    persistTenantSessionWithToday(tenant as Record<string, unknown>)
+    clearTerminalLogout()
+
+    const safeNext = normalizeLoginNextPath(nextParam, tenant.tenant_slug)
+    const fallbackAfterLogin = gksPilotTenantSlugs().includes(tenant.tenant_slug)
+      ? `/shop/${tenant.tenant_slug}/gks`
+      : `/shop/${tenant.tenant_slug}/admin`
+
+    const host = typeof window !== 'undefined' ? window.location.hostname : ''
+    if (stayOnMainDomainForShopSession(host)) {
+      router.push(safeNext || fallbackAfterLogin)
+    } else {
+      const target = safeNext || fallbackAfterLogin
+      const hostPath = internalShopPathToTenantHostPath(target, tenant.tenant_slug)
+      window.location.assign(`${window.location.origin}${hostPath}`)
+    }
+  }
+
+  const handleInitialPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!email || !password || !passwordConfirm) return
+    if (password.length < 8) {
+      setError(t('login.passwordMinLength'))
+      return
+    }
+    if (password !== passwordConfirm) {
+      setError(t('login.passwordMismatch'))
+      return
+    }
+    setIsLoading(true)
+    setError('')
+    try {
+      const res = await fetch('/api/auth/set-initial-owner-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || t('login.somethingWentWrong'))
+        setIsLoading(false)
+        return
+      }
+      await completeLoginAfterPassword(email, password)
+    } catch {
+      setError(t('login.somethingWentWrong'))
+      setIsLoading(false)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email || !password) return
@@ -185,66 +279,7 @@ export default function LoginPage() {
     setError('')
     
     try {
-      const nextParam =
-        typeof window !== 'undefined'
-          ? new URLSearchParams(window.location.search).get('next')
-          : null
-      let targetTenantSlug: string | undefined
-      if (nextParam) {
-        try {
-          const dec = decodeURIComponent(nextParam.trim())
-          const m = dec.match(/^\/shop\/([^/?#]+)/)
-          if (m?.[1]) targetTenantSlug = m[1].toLowerCase()
-        } catch {
-          /* ignore */
-        }
-      }
-
-      // Server-side API call voor robuuste login
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          password,
-          ...(targetTenantSlug ? { target_tenant_slug: targetTenantSlug } : {}),
-        }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        setError(data.error || t('login.loginFailed'))
-        setIsLoading(false)
-        return
-      }
-
-      const tenant = data.tenant
-
-      if (!tenant.tenant_slug) {
-        setError(t('login.tenantNotFound'))
-        setIsLoading(false)
-        return
-      }
-
-      persistTenantSessionWithToday(tenant as Record<string, unknown>)
-      clearTerminalLogout()
-
-      const safeNext = normalizeLoginNextPath(nextParam, tenant.tenant_slug)
-      const fallbackAfterLogin = gksPilotTenantSlugs().includes(tenant.tenant_slug)
-        ? `/shop/${tenant.tenant_slug}/gks`
-        : `/shop/${tenant.tenant_slug}/admin`
-
-      const host =
-        typeof window !== 'undefined' ? window.location.hostname : ''
-      if (stayOnMainDomainForShopSession(host)) {
-        router.push(safeNext || fallbackAfterLogin)
-      } else {
-        const target = safeNext || fallbackAfterLogin
-        const hostPath = internalShopPathToTenantHostPath(target, tenant.tenant_slug)
-        window.location.assign(`${window.location.origin}${hostPath}`)
-      }
-      
+      await completeLoginAfterPassword(email, password)
     } catch (err) {
       setError(t('login.somethingWentWrong'))
     }
@@ -318,11 +353,18 @@ export default function LoginPage() {
               </span>
             </Link>
             <p className="mt-3 text-gray-800">
-              {t('login.logInToAccount')}
+              {loginMode === 'initial'
+                ? t('login.firstLoginTitle')
+                : t('login.logInToAccount')}
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off" method="post">
+          <form
+            onSubmit={loginMode === 'initial' ? handleInitialPasswordSubmit : handleSubmit}
+            className="space-y-6"
+            autoComplete="off"
+            method="post"
+          >
               <div>
                 <label htmlFor="email" className="mb-2 block text-sm font-medium text-gray-800">
                   {t('login.emailAddress')} <span className="text-red-500">*</span>
@@ -359,6 +401,27 @@ export default function LoginPage() {
                 />
               </div>
 
+              {loginMode === 'initial' && (
+                <div>
+                  <label
+                    htmlFor="passwordConfirm"
+                    className="mb-2 block text-sm font-medium text-gray-800"
+                  >
+                    {t('login.confirmPassword')} <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="passwordConfirm"
+                    name="vysion_password_confirm"
+                    type="password"
+                    value={passwordConfirm}
+                    onChange={(e) => setPasswordConfirm(e.target.value)}
+                    required
+                    autoComplete="off"
+                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition-all placeholder:text-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/25"
+                  />
+                </div>
+              )}
+
               {error && (
                 <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
                   {error}
@@ -367,7 +430,12 @@ export default function LoginPage() {
 
               <button
                 type="submit"
-                disabled={isLoading || !email || !password}
+                disabled={
+                  isLoading ||
+                  !email ||
+                  !password ||
+                  (loginMode === 'initial' && !passwordConfirm)
+                }
                 aria-busy={isLoading}
                 className="flex w-full items-center justify-center gap-2 rounded-lg bg-accent py-4 font-semibold text-white transition-colors hover:bg-accent/90 disabled:bg-accent/50"
               >
@@ -379,19 +447,52 @@ export default function LoginPage() {
                       className="inline-block h-5 w-5 shrink-0 rounded-full border-2 border-white border-t-transparent"
                       aria-hidden
                     />
-                    <span>{t('login.loggingIn')}</span>
+                    <span>
+                      {loginMode === 'initial' ? t('login.savingPassword') : t('login.loggingIn')}
+                    </span>
                   </>
                 ) : (
-                  <span>{`${t('login.loginButton')} →`}</span>
+                  <span>
+                    {loginMode === 'initial'
+                      ? `${t('login.setPasswordButton')} →`
+                      : `${t('login.loginButton')} →`}
+                  </span>
                 )}
               </button>
 
-              <Link
-                href="/login/forgot-password"
-                className="block w-full text-center text-sm font-medium text-accent transition-colors hover:text-accent/80"
-              >
-                {t('login.forgotPassword')}
-              </Link>
+              {loginMode === 'signin' ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLoginMode('initial')
+                      setError('')
+                      setPasswordConfirm('')
+                    }}
+                    className="block w-full text-center text-sm font-medium text-gray-700 underline-offset-2 hover:underline"
+                  >
+                    {t('login.firstLoginLink')}
+                  </button>
+                  <Link
+                    href="/login/forgot-password"
+                    className="block w-full text-center text-sm font-medium text-accent transition-colors hover:text-accent/80"
+                  >
+                    {t('login.forgotPassword')}
+                  </Link>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLoginMode('signin')
+                    setError('')
+                    setPasswordConfirm('')
+                  }}
+                  className="block w-full text-center text-sm font-medium text-accent transition-colors hover:text-accent/80"
+                >
+                  {t('login.backToLogin')}
+                </button>
+              )}
             </form>
 
           {/* Help Links */}

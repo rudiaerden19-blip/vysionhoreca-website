@@ -1,6 +1,4 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { isGksZReportPilotTenant } from '@/lib/gks-kassa/pilot-config'
-
 const GKS_PAGE_SIZE = 1000
 const GKS_MAX_PAGES = 500
 
@@ -126,7 +124,8 @@ export function mergePilotReportingOrderRows(
   gksRows: Record<string, unknown>[],
   sort: 'asc' | 'desc',
 ): Record<string, unknown>[] {
-  if (!isGksZReportPilotTenant(tenantSlug)) return productionRows
+  void tenantSlug
+  if (gksRows.length === 0) return productionRows
   const byId = new Map<string, Record<string, unknown>>()
   for (const row of productionRows) {
     const id = String(row.id ?? '')

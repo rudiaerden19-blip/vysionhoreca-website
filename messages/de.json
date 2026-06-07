@@ -659,6 +659,13 @@
     "loginFailed": "Anmeldung fehlgeschlagen",
     "tenantNotFound": "Kein Betrieb gefunden. Bitte Support kontaktieren.",
     "somethingWentWrong": "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut.",
+    "firstLoginLink": "Erstes Mal? Passwort festlegen",
+    "firstLoginTitle": "Erstes Passwort festlegen",
+    "confirmPassword": "Passwort bestätigen",
+    "setPasswordButton": "Passwort speichern",
+    "savingPassword": "Speichern...",
+    "passwordMismatch": "Passwörter stimmen nicht überein",
+    "passwordMinLength": "Mindestens 8 Zeichen",
     "fillEmailFirst": "Bitte geben Sie zuerst Ihre E-Mail-Adresse ein",
     "databaseNotAvailable": "Datenbank nicht verfügbar",
     "troubleshooting": {
