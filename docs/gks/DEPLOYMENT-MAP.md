@@ -103,10 +103,21 @@ Alleen paden onder de website-repo. **Niet** committen: `apps/vysion-print-agent
 - Geen Supabase-migraties automatisch (tenzij jullie aparte CI hebben) → migratie handmatig of pipeline op Supabase.
 - Geen print agent installeren.
 
+### Track A — preview (geen productie-kassa wijzigen)
+
+| Stap | Actie |
+|------|--------|
+| Branch | `gks/fiscal-journal-preview` → Vercel **Preview** (niet `main` tenzij bewust) |
+| Vercel env (preview) | `NEXT_PUBLIC_GKS_PILOT_TENANTS=gkstest` (komma-gescheiden bij meerdere) |
+| Supabase | Migraties `*gks*` + `fiscal_journal` — zie `supabase/gks-pilot-A1-preview-verify.sql` |
+| GKS-URL | `/shop/gkstest/gks` (legacy `/admin/gks-kassa` redirect) |
+| Readiness API | `GET /api/gks-kassa/pilot-readiness?tenant_slug=gkstest` (ingelogd als zaak/superadmin) |
+| Productie-check | `git diff -- 'src/app/shop/[tenant]/admin/kassa/'` moet **leeg** blijven |
+
 ### Na push — checklist
 
-1. Vercel deployment **Ready**.
-2. Preview-URL openen → inloggen als tenant → `/admin/gks-kassa` (niet productie-kassa).
+1. Vercel deployment **Ready** (preview branch).
+2. Preview-URL → inloggen → `/shop/{pilot}/gks` (niet `/admin/kassa`).
 3. Optioneel: `npx tsc --noEmit` vóór commit (TypeScript).
 
 ---
