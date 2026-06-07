@@ -561,7 +561,7 @@ const KassaReservationsView = dynamic(() => import('@/components/KassaReservatio
 
 /** Categorie- en producttegel: witte kaart; foto alleen bovenin, titel in vaste strook eronder (niet over de foto). */
 const KASSA_MENU_TILE_BUTTON_CLASS_BASE =
-  `touch-manipulation select-none group relative flex min-h-0 w-full min-w-0 flex-col overflow-hidden ${GKS_BTN_SHAPE} border border-[#1a1a1a] bg-[#2a2a2a] text-left ${GKS_BTN_PRESS} ${GKS_TILE_LIFT_SHADOW}`
+  `touch-manipulation select-none group relative flex min-h-0 w-full min-w-0 flex-col overflow-hidden ${GKS_BTN_SHAPE} border border-[#1a1a1a] bg-[#2a2a2a] text-left !font-medium ${GKS_BTN_PRESS} ${GKS_TILE_LIFT_SHADOW}`
 
 /** Standaard: rastercel wordt **items-stretch** ⇒ knop moet **`h-full`**. */
 const KASSA_MENU_TILE_BUTTON_CLASS = `${KASSA_MENU_TILE_BUTTON_CLASS_BASE} h-full`
@@ -601,11 +601,11 @@ const KASSA_MENU_TILE_LABEL_WRAP_SXGA =
   `pointer-events-none shrink-0 w-full ${GKS_MENU_TILE_LABEL_SURFACE} px-2 pb-1.5 pt-0 mt-1.5 sm:px-3 sm:pb-2 sm:mt-1.5 sm:pt-0`
 
 const KASSA_MENU_TILE_LABEL_CLASS =
-  `m-0 line-clamp-2 text-center text-base ${GKS_FONT_UI} leading-snug tracking-tight text-white sm:text-lg md:text-xl`
+  `m-0 line-clamp-2 text-center text-[17px] !font-medium leading-snug tracking-tight text-white sm:text-lg md:text-xl`
 
 /** SXGA 17″: categorie + product gelijk (`md:text-xl` wordt te groot in smalle rastercel). */
 const KASSA_MENU_TILE_LABEL_CLASS_SXGA =
-  `m-0 line-clamp-2 text-center text-[15px] ${GKS_FONT_UI} leading-snug tracking-tight text-white sm:text-base`
+  `m-0 line-clamp-2 text-center text-[16px] !font-medium leading-snug tracking-tight text-white sm:text-[17px]`
 
 type KassaCategoryTileButtonProps = {
   category: MenuCategory
@@ -4153,7 +4153,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250607-menu-plate-lighter"
+      data-gks-ui="20250608-menu-tile-label-type"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
