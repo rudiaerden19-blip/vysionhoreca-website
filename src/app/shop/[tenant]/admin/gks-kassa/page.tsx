@@ -3739,6 +3739,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     () => staffClockList.some((s) => s.hasOpenSession),
     [staffClockList]
   )
+  const showKassaStaffClockButton = useMemo(
+    () =>
+      (GKS_MANDATORY_STAFF_SESSION || Boolean(tenantInfo?.kassa_staff_clock_enabled)) &&
+      !demoViewOnly,
+    [tenantInfo?.kassa_staff_clock_enabled, demoViewOnly],
+  )
+
   const requiresStaffSelectionForSale = useMemo(
     () =>
       (GKS_MANDATORY_STAFF_SESSION || Boolean(tenantInfo?.kassa_staff_clock_enabled)) &&
@@ -4446,7 +4453,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               {numpadPanelVisible ? (
               <div className="flex min-h-[15rem] flex-1 flex-col justify-end" data-testid="kassa-numpad-panel">
               <div className={`mb-3 flex shrink-0 items-center gap-2.5 rounded-xl px-2.5 py-2 ${ui.numpadBarBg}`}>
-                {tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? (
+                {showKassaStaffClockButton ? (
                   <button
                     type="button"
                     onClick={openStaffClockModal}
@@ -4458,7 +4465,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   </button>
                 ) : null}
                 <div
-                  className={`min-w-0 flex flex-col justify-center gap-0.5 ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1' : 'w-full'}`}
+                  className={`min-w-0 flex flex-col justify-center gap-0.5 ${showKassaStaffClockButton ? 'flex-1' : 'w-full'}`}
                 >
                   <p
                     className={`truncate whitespace-nowrap text-right text-xs font-semibold leading-tight tracking-tight sm:text-sm ${ui.numpadMeta}`}
@@ -4523,9 +4530,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 }`}
               >
               <div
-                className={`flex shrink-0 items-center gap-2 rounded-lg px-2 py-1 ${ui.numpadBarBg} ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? '' : 'justify-end'}`}
+                className={`flex shrink-0 items-center gap-2 rounded-lg px-2 py-1 ${ui.numpadBarBg} ${showKassaStaffClockButton ? '' : 'justify-end'}`}
               >
-                {tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? (
+                {showKassaStaffClockButton ? (
                   <button
                     type="button"
                     onClick={openStaffClockModal}
@@ -4537,7 +4544,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   </button>
                 ) : null}
                 <p
-                  className={`min-w-0 truncate whitespace-nowrap text-right text-[11px] font-semibold leading-tight tracking-tight ${ui.numpadMeta} ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1' : 'w-full'}`}
+                  className={`min-w-0 truncate whitespace-nowrap text-right text-[11px] font-semibold leading-tight tracking-tight ${ui.numpadMeta} ${showKassaStaffClockButton ? 'flex-1' : 'w-full'}`}
                   title={numpadHeaderDateLabel}
                   aria-live="polite"
                 >
