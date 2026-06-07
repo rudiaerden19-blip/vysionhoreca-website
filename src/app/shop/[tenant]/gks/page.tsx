@@ -359,7 +359,7 @@ const KASSA_STRIP_SCROLL_DELTA_PX = 4
 const KASSA_HEADER_HIDE_CUSTOMER_DISPLAY_AND_SOUND = true
 
 const KASSA_HEADER_QUICK_LINK_BTN =
-  'inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-xl bg-[#3C4D6B] font-bold text-white transition-colors hover:bg-[#2D3A52] min-h-[2.35rem] px-3 py-2 sm:min-h-[2.6rem] sm:px-3.5 sm:py-2.5'
+  'inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-xl bg-[#831100] font-bold text-white transition-colors hover:bg-[#9a1500] min-h-[2.35rem] px-3 py-2 sm:min-h-[2.6rem] sm:px-3.5 sm:py-2.5'
 const KASSA_HEADER_QUICK_LINK_LABEL = 'text-xs leading-snug sm:text-sm'
 
 /** Alleen Binnen/Terras — groter dan besteltype-knoppen eronder. */
@@ -4141,7 +4141,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250607-accent-831100"
+      data-gks-ui="20250607-nav-binnen-831100"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
     >
       <LogoutSoftwareConfirmModal
@@ -4349,7 +4349,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           {isOnline !== null && (
             <div
               className={`inline-flex max-w-[6.5rem] shrink-0 items-center justify-center gap-0.5 rounded-xl px-3 py-2 font-bold leading-tight min-h-[2.35rem] sm:min-h-[2.6rem] sm:max-w-[8rem] md:max-w-none ${KASSA_HEADER_QUICK_LINK_LABEL} ${
-                isOnline ? 'bg-[#3C4D6B] text-white' : 'bg-red-600/95 text-white'
+                isOnline ? 'bg-[#831100] text-white' : 'bg-red-600/95 text-white'
               }`}
               title={isOnline ? t('kassaApp.onlineModeLiveTitle') : t('kassaApp.offlineModeActive')}
               role="status"
@@ -4622,8 +4622,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   kassaSxgaDenseTiles,
                 )} ${
                   pickerBrowseZone === FLOOR_PLAN_ZONE_INSIDE && showTablePicker
-                    ? 'bg-[#3C4D6B] text-white ring-2 ring-[#831100]/55 ring-inset'
-                    : 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
+                    ? 'bg-[#831100] text-white ring-2 ring-white/45 ring-inset'
+                    : 'bg-[#831100] text-white hover:bg-[#9a1500]'
                 }`}
               >
                 <span className="font-bold">{t('kassaApp.floorZoneInside')}</span>
@@ -4650,8 +4650,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   kassaSxgaDenseTiles,
                 )} ${
                   pickerBrowseZone === FLOOR_PLAN_ZONE_TERRACE && showTablePicker
-                    ? 'bg-emerald-600 text-white ring-2 ring-emerald-300/80 ring-inset'
-                    : 'bg-emerald-600 text-white hover:bg-emerald-700'
+                    ? 'bg-[#831100] text-white ring-2 ring-white/45 ring-inset'
+                    : 'bg-[#831100] text-white hover:bg-[#9a1500]'
                 }`}
               >
                 <span className="font-bold">{t('kassaApp.floorZoneTerrace')}</span>
