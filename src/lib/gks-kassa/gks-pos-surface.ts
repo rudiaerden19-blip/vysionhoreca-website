@@ -32,9 +32,9 @@ export const GKS_CLOCK_BAR_LIFT_SHADOW = GKS_CLOCK_BAR_SHADOW
 const GKS_BTN_FACE =
   'bg-[linear-gradient(180deg,#161616_0%,#323232_46%,#1c1c1c_100%)]'
 
-/** Diepte achter knoppen — zwart, geen blauwe gloed. */
+/** Diepte achter knoppen — zwart, geen blauwe gloed (+10% t.o.v. vorige waarden). */
 export const GKS_SUBTLE_LIFT_SHADOW =
-  'shadow-[0_4px_8px_rgba(0,0,0,0.55),0_10px_22px_rgba(0,0,0,0.42)]'
+  'shadow-[0_4px_9px_rgba(0,0,0,0.61),0_11px_24px_rgba(0,0,0,0.46)]'
 
 /** Diepte achter menu-tegels — iets ruimer zwart. */
 export const GKS_TILE_LIFT_SHADOW =
@@ -42,7 +42,7 @@ export const GKS_TILE_LIFT_SHADOW =
 
 /** Geselecteerd / Afrekenen — sterkere zwarte lift (tekst blijft blauw waar van toepassing). */
 export const GKS_POS_SELECTED_LIFT_SHADOW =
-  'shadow-[0_4px_8px_rgba(0,0,0,0.58),0_10px_24px_rgba(0,0,0,0.46),0_14px_34px_rgba(0,0,0,0.36)]'
+  'shadow-[0_4px_9px_rgba(0,0,0,0.64),0_11px_26px_rgba(0,0,0,0.51),0_15px_37px_rgba(0,0,0,0.40)]'
 
 /** Geselecteerde POS-knoppen + Afrekenen (constant). */
 export const GKS_POS_SELECTED_ACCENT_TEXT = 'text-[#6eb5ff]'
