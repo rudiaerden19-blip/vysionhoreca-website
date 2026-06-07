@@ -582,10 +582,10 @@ const GKS_CATEGORY_STRIP_REVEAL = {
 
 /** Num pad: omhoog inschuiven, terug omlaag (geen pop). */
 const GKS_NUMPAD_PANEL_SLIDE = {
-  initial: { opacity: 0, y: 52 },
+  initial: { opacity: 0, y: 36 },
   animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: 52 },
-  transition: { duration: 0.38, ease: [0.22, 1, 0.36, 1] as const },
+  exit: { opacity: 0, y: 36 },
+  transition: { duration: 0.2, ease: [0.33, 1, 0.32, 1] as const },
 }
 
 /** Standaard: rastercel wordt **items-stretch** ⇒ knop moet **`h-full`**. */
@@ -4178,7 +4178,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250608-numpad-slide-strip-match"
+      data-gks-ui="20250608-numpad-slide-fast"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
