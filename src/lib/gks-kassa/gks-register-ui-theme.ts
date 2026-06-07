@@ -7,6 +7,7 @@ import {
   GKS_MENU_PLATE_SHELL_BG_CLASS,
   GKS_MENU_PLATE_TRANSPARENT_CLASS,
   GKS_MENU_TILE_LABEL_SURFACE,
+  GKS_CLOCK_TILE_ON_BAR,
   GKS_POS_BTN,
   GKS_POS_FIELD,
 } from '@/lib/gks-kassa/gks-pos-surface'
@@ -42,7 +43,7 @@ export function createGksRegisterUiTheme(dark: boolean): KassaRegisterUiTheme {
     tablePickerHeader: 'bg-[#383838] border-b border-[#1a1a1a]',
     tablePickerFooterBar: `p-2 border-t border-[#333336] ${GKS_MENU_PLATE_TRANSPARENT_CLASS} flex gap-2`,
     numpadBarBg: GKS_MENU_PLATE_TRANSPARENT_CLASS,
-    clockTileBg: `${GKS_BTN_SHAPE} ${GKS_POS_BTN} p-1`,
+    clockTileBg: `${GKS_CLOCK_TILE_ON_BAR} p-1`,
     clockTileHover: 'hover:brightness-105',
     numpadKeyNum: `${GKS_BTN_SHAPE} ${GKS_POS_BTN}`,
     cartRowBg: `${GKS_POS_FIELD} p-2.5 flex items-center gap-2.5`,

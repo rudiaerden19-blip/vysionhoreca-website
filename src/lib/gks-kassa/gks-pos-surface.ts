@@ -22,9 +22,11 @@ export const GKS_BTN_SHAPE = 'rounded-[6px]'
 export const GKS_FONT_UI = 'font-semibold'
 export const GKS_FONT_UI_SOFT = 'font-medium'
 
-/** Klokbalk: zelfde lift als standaardknoppen (legacy export). */
+/** Klokbalk: sterkere zwarte lift (legacy export). */
 export const GKS_CLOCK_BAR_SHADOW =
-  'shadow-[0_4px_8px_rgba(0,0,0,0.55),0_10px_22px_rgba(0,0,0,0.42)]'
+  'shadow-[0_6px_12px_rgba(0,0,0,0.62),0_14px_30px_rgba(0,0,0,0.5),0_20px_44px_rgba(0,0,0,0.38)]'
+
+export const GKS_CLOCK_BAR_LIFT_SHADOW = GKS_CLOCK_BAR_SHADOW
 
 /** Zachte “bollig”: donker boven/onder, iets lichter midden — geen harde radiale flare. */
 const GKS_BTN_FACE =
@@ -65,6 +67,17 @@ export const GKS_BTN_PRESS = [
 
 const GKS_BTN_PRESS_FACE =
   'active:bg-[linear-gradient(180deg,#0e0e0e_0%,#242424_52%,#101010_100%)]'
+
+/** Analoge klok op de balk — lichtere schaduw + highlight, “ligt erop”. */
+export const GKS_CLOCK_TILE_ON_BAR = [
+  GKS_BTN_SHAPE,
+  GKS_BTN_FACE,
+  'relative z-[2]',
+  'border border-[#3d3d3d] border-t-[#4a4a4a]/80',
+  'shadow-[0_1px_0_rgba(255,255,255,0.14),0_3px_8px_rgba(0,0,0,0.38),0_8px_16px_rgba(0,0,0,0.28)]',
+  GKS_BTN_PRESS,
+  GKS_BTN_PRESS_FACE,
+].join(' ')
 
 /** Native `disabled` (zeldzaam): zelfde kleur, geen pointer-events. */
 export const GKS_BTN_DISABLED_SAME_LOOK =
@@ -134,8 +147,9 @@ export const GKS_MENU_TILE_LABEL_SURFACE = GKS_MENU_PLATE_SHELL_BG_CLASS
 export const GKS_CLOCK_BAR = [
   GKS_BTN_SHAPE,
   GKS_BTN_FACE,
+  'relative z-0',
   'border border-[#2a2a2a]',
-  GKS_SUBTLE_LIFT_SHADOW,
+  GKS_CLOCK_BAR_LIFT_SHADOW,
 ].join(' ')
 
 export function gksPosButtonClass(selected: boolean): string {
