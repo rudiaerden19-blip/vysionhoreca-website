@@ -33,8 +33,8 @@ export const GKS_TILE_LIFT_SHADOW =
 export const GKS_CHECKOUT_BLUE_SHADOW =
   'shadow-[0_3px_6px_rgba(0,0,0,0.45),0_8px_16px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,86,214,0.42)]'
 
-/** Zelfde blauw als gloed (0,86,214) — pilot: alleen Ter plaatse geselecteerd. */
-export const GKS_POS_SELECTED_ACCENT_TEXT = 'text-[#0056d6]'
+/** Lichter blauw (zelfde tint als gloed 0,86,214) — pilot: alleen Ter plaatse geselecteerd. */
+export const GKS_POS_SELECTED_ACCENT_TEXT = 'text-[#6eb5ff]'
 
 const GKS_BTN_EDGE = `border border-[#2a2a2a] ${GKS_SUBTLE_LIFT_SHADOW}`
 
