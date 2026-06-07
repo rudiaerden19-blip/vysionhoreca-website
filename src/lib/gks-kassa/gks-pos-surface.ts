@@ -2,9 +2,9 @@
  * GKS-pilot: POS-ref — zwart-grijs, lichte verticale overgang, subtiele schaduw (niet overdreven).
  */
 
-/** Eén effen vlak: tegels + sidebar + header (geen textuur). */
+/** Eén vlak: effen #333336 + subtiele CSS-korrel (globals `.gks-menu-plate-grain`). */
 export const GKS_MENU_PLATE_BG = '#333336'
-export const GKS_MENU_PLATE_SHELL_BG_CLASS = 'bg-[#333336]'
+export const GKS_MENU_PLATE_SHELL_BG_CLASS = 'gks-menu-plate-grain'
 
 /** Secties zonder eigen kleur — zelfde effen grijs als shell. */
 export const GKS_MENU_PLATE_TRANSPARENT_CLASS = 'bg-transparent'
