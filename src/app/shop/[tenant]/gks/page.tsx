@@ -4158,7 +4158,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250607-subtle-lift-shadow"
+      data-gks-ui="20250607-sidebar-spacing"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4633,8 +4633,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         >
 
         {/* Zone: Binnen / Terras — altijd zichtbaar (ook bij afhalen/leveren). */}
-        <div className="shrink-0 px-2 pt-1.5">
-            <div className="flex gap-1.5">
+        <div className="shrink-0 px-3 pt-2.5 pb-1">
+            <div className="flex gap-2.5">
               <button
                 type="button"
                 onClick={() => {
@@ -4691,8 +4691,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
 
         {/* Besteltype: drie losse knoppen (ter plaatse / afhalen / leveren) */}
-        <div className="mx-2 mt-1.5 shrink-0" data-testid="kassa-order-type-bar">
-          <div className="flex gap-2">
+        <div className="mx-3 mt-2 shrink-0 space-y-2" data-testid="kassa-order-type-bar">
+          <div className="flex gap-2.5">
             <button
               type="button"
               aria-pressed={orderType === 'DINE_IN'}
@@ -4747,7 +4747,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 playClick()
                 setTableNumber('')
               }}
-              className="mt-1 flex w-full items-center justify-center gap-1 rounded-lg border border-red-500/40 bg-red-950/40 py-1 text-[11px] font-bold text-red-200 transition-colors hover:bg-red-600/30 active:bg-red-600/50"
+              className="flex w-full items-center justify-center gap-1 rounded-lg border border-red-500/40 bg-red-950/40 py-1.5 text-[11px] font-bold text-red-200 transition-colors hover:bg-red-600/30 active:bg-red-600/50"
             >
               <span aria-hidden>✕</span>
               {t('kassaApp.clearTableBanner')}
@@ -4756,10 +4756,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
 
         {/* Cart / numpad (toggle via footer) */}
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-1.5 pt-0.5 touch-pan-y">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-3 pt-1 touch-pan-y">
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
               <div
-                className={`mb-2 flex shrink-0 items-center gap-2 px-2 py-1 ${GKS_BTN_SHAPE} ${GKS_POS_BTN}`}
+                className={`mb-3 mt-1 flex shrink-0 items-center gap-3 px-3 py-2 ${GKS_BTN_SHAPE} ${GKS_POS_BTN}`}
                 data-testid="kassa-sidebar-clock-bar"
               >
                 {showKassaStaffClockButton ? (
@@ -4974,7 +4974,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         {/* Totaal + knoppen — touch-vriendelijk (kiosk) */}
         <div
-          className={`sticky bottom-0 z-10 shrink-0 border-t ${kassaAppearanceDark ? `border-[#333336] ${GKS_MENU_PLATE_BG_CLASS}` : 'border-gray-200 bg-white'} p-1.5 space-y-1`}
+          className={`sticky bottom-0 z-10 shrink-0 border-t ${kassaAppearanceDark ? `border-[#333336] ${GKS_MENU_PLATE_BG_CLASS}` : 'border-gray-200 bg-white'} px-3 py-2.5 space-y-2.5`}
         >
           <div
             className={`flex items-center justify-between gap-2 px-2.5 py-2 ${GKS_POS_FIELD}`}
@@ -4990,7 +4990,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               €{total.toFixed(2)}
             </span>
           </div>
-          <div className="grid grid-cols-3 gap-2 touch-manipulation select-none">
+          <div className="grid grid-cols-3 gap-3 touch-manipulation select-none">
             <button
               type="button"
               onClick={() => { void openCashDrawer() }}
@@ -5062,7 +5062,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           </div>
           {orderType === 'DINE_IN' && tableNumber && cart.length > 0 && (
             <div
-              className="flex w-full gap-1.5 touch-manipulation select-none"
+              className="flex w-full gap-2.5 touch-manipulation select-none"
               data-testid="kassa-park-table-split"
             >
               <button
