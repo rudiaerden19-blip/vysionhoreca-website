@@ -46,9 +46,9 @@ const GKS_BTN_FACE =
 export const GKS_SUBTLE_LIFT_SHADOW =
   'shadow-[0_3px_6px_rgba(0,0,0,0.5),0_8px_18px_rgba(0,0,0,0.34)]'
 
-/** Diepte achter menu-tegels — iets ruimer dan knoppen. */
+/** Diepte achter menu-tegels — lift + blauwe gloed (zelfde tint als knoppen). */
 export const GKS_TILE_LIFT_SHADOW =
-  'shadow-[0_4px_8px_rgba(0,0,0,0.52),0_10px_24px_rgba(0,0,0,0.3)]'
+  'shadow-[0_4px_8px_rgba(0,0,0,0.52),0_10px_24px_rgba(0,0,0,0.3),0_14px_36px_rgba(0,86,214,0.4)]'
 
 /** Afrekenen: grijs vlak + blauwe gloed (geen blauwe fill). */
 export const GKS_CHECKOUT_BLUE_SHADOW =
