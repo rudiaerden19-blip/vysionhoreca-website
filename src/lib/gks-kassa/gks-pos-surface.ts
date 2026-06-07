@@ -47,9 +47,12 @@ export const GKS_BTN_PRESS = [
 const GKS_BTN_PRESS_FACE =
   'active:bg-[linear-gradient(180deg,#0e0e0e_0%,#242424_52%,#101010_100%)]'
 
-/** Uitgeschakeld: zelfde vlak/kleur; alleen geen tik (geen wash-out opacity). */
+/** Native `disabled` (zeldzaam): zelfde kleur, geen pointer-events. */
 export const GKS_BTN_DISABLED_SAME_LOOK =
   'disabled:opacity-100 disabled:cursor-not-allowed disabled:pointer-events-none'
+
+/** Footer: `aria-disabled` — ingedrukt-effect blijft, actie in onClick geblokkeerd. */
+export const GKS_BTN_ARIA_DISABLED = 'aria-disabled:cursor-not-allowed'
 
 /** Standaard knop. */
 export const GKS_POS_BTN = [
@@ -77,8 +80,8 @@ export const GKS_POS_BTN_SELECTED = [
 export const GKS_CHECKOUT_BTN = [
   GKS_BTN_SHAPE,
   GKS_POS_BTN_SELECTED,
-  GKS_BTN_DISABLED_SAME_LOOK,
-  'disabled:text-[#f0f0f0]',
+  GKS_BTN_ARIA_DISABLED,
+  'touch-manipulation',
 ].join(' ')
 
 /**

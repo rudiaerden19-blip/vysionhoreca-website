@@ -78,6 +78,7 @@ import type { KassaRegisterUiTheme } from '@/lib/kassa-register-ui-theme'
 import { createGksRegisterUiTheme } from '@/lib/gks-kassa/gks-register-ui-theme'
 import {
   GKS_ACCENT_BTN,
+  GKS_BTN_ARIA_DISABLED,
   GKS_CHECKOUT_BTN,
   GKS_BTN_SHAPE,
   GKS_MENU_PLATE_BG_CLASS,
@@ -4141,13 +4142,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       ? gksAvailabilityOverlayMessage(gksAvailability, t)
       : ''
 
+  const gksFooterBonDisabled =
+    gksFiscalBlocked || draftBonLineItems.length === 0 || draftBonPrinting
+  const gksFooterCheckoutDisabled = billLines.length === 0 || gksFiscalBlocked
+
   return (
     <div
       className={`flex min-h-0 flex-col overflow-hidden h-[100svh] max-h-[100svh] supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh] ${GKS_FONT_UI_SOFT} [&_button]:font-semibold ${
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250607-selected-blue-glow"
+      data-gks-ui="20250607-footer-press-fix"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -5004,12 +5009,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </button>
             <button
               type="button"
+              aria-disabled={gksFooterBonDisabled}
               onClick={() => {
+                if (gksFooterBonDisabled) return
                 void printDraftBonFromCart({ draftCopies: 1 })
               }}
-              disabled={gksFiscalBlocked || draftBonLineItems.length === 0 || draftBonPrinting}
               title={gksFiscalBlocked ? gksFiscalBlockedTitle : t('kassaApp.cartBonTitle')}
-              className={`flex items-center justify-center px-1 ${gksPosButtonClass(false)} ${kassaFooterActionTouchMinHClass(
+              className={`flex touch-manipulation items-center justify-center px-1 ${GKS_BTN_ARIA_DISABLED} ${gksPosButtonClass(false)} ${kassaFooterActionTouchMinHClass(
                 kassaSxgaDenseTiles,
                 kassaSidebarFooterTier === 'dense',
               )}`}
@@ -5078,14 +5084,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <button
               type="button"
               data-testid="kassa-checkout"
+              aria-disabled={gksFooterCheckoutDisabled}
               title={gksFiscalBlocked ? gksFiscalBlockedTitle : undefined}
               onClick={() => {
-                if (billLines.length === 0 || gksFiscalBlocked) return
+                if (gksFooterCheckoutDisabled) return
                 scheduleKassaTapSound(playCheckout)
                 setShowPaymentModal(true)
               }}
-              disabled={billLines.length === 0 || gksFiscalBlocked}
-              className={`flex w-full items-center justify-center disabled:cursor-not-allowed disabled:pointer-events-none ${GKS_CHECKOUT_BTN} ${
+              className={`flex w-full items-center justify-center ${GKS_CHECKOUT_BTN} ${
                 kassaSxgaDenseTiles
                   ? 'min-h-[4rem] py-3.5 text-xl'
                   : 'min-h-[3.5rem] py-3 text-lg'

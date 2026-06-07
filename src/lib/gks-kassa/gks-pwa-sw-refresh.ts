@@ -3,7 +3,7 @@
  * Gebruikers hoeven geen DevTools — bij eerste load na update: korte reload, daarna stabiel.
  * Token gelijk houden met CACHE-versie in public/sw.js (v18 bij SW-bump).
  */
-export const GKS_PWA_SW_CLEAR_TOKEN = 'v42'
+export const GKS_PWA_SW_CLEAR_TOKEN = 'v43'
 
 const SESSION_KEY = `vysion_gks_sw_cleared_${GKS_PWA_SW_CLEAR_TOKEN}`
 
