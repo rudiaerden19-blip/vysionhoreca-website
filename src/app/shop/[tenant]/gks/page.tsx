@@ -367,6 +367,11 @@ function kassaFloorZoneButtonTouchClass(sxga: boolean): string {
   return sxga ? 'min-h-[3.25rem] py-2.5 text-base' : 'min-h-[2.75rem] py-2 text-sm'
 }
 
+/** Ter plaatse / Afhalen / Leveren — touch-vriendelijk. */
+function kassaOrderTypeButtonTouchClass(sxga: boolean): string {
+  return sxga ? 'min-h-[3.25rem] py-2.5' : 'min-h-[3rem] py-2.5'
+}
+
 /** Sidebar-footer: touch-vriendelijke hoogte (Lade / Bon / Numpad). */
 function kassaFooterActionTouchMinHClass(sxga: boolean, denseBill: boolean): string {
   if (sxga) return 'min-h-[4.75rem] py-2.5'
@@ -4661,21 +4666,21 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
 
         {/* Besteltype: drie losse knoppen (ter plaatse / afhalen / leveren) */}
-        <div className="mx-2 mt-1 shrink-0" data-testid="kassa-order-type-bar">
-          <div className="flex gap-1.5">
+        <div className="mx-2 mt-1.5 shrink-0" data-testid="kassa-order-type-bar">
+          <div className="flex gap-2">
             <button
               type="button"
               aria-pressed={orderType === 'DINE_IN'}
               onClick={() => selectOrderType('DINE_IN')}
-              className={`flex min-w-0 flex-1 flex-col items-center justify-center rounded-lg px-1 text-center text-xs shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 ${
-                kassaSxgaDenseTiles ? 'min-h-[32px] py-1.5' : 'min-h-[28px] py-1'
-              } ${
+              className={`flex min-w-0 flex-1 flex-col items-center justify-center rounded-xl px-2 text-center shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 ${kassaOrderTypeButtonTouchClass(
+                kassaSxgaDenseTiles,
+              )} ${
                 orderType === 'DINE_IN'
                   ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
                   : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
               }`}
             >
-              <span className="text-center text-xs font-bold leading-tight sm:text-sm">
+              <span className="text-center text-sm font-bold leading-tight">
                 {t('kassaApp.orderTypeDineIn')}
               </span>
               {orderType === 'DINE_IN' && tableNumber ? (
@@ -4691,15 +4696,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               type="button"
               aria-pressed={orderType === 'TAKEAWAY'}
               onClick={() => selectOrderType('TAKEAWAY')}
-              className={`flex min-w-0 flex-1 flex-col items-center justify-center rounded-lg px-1 text-center text-xs shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 ${
-                kassaSxgaDenseTiles ? 'min-h-[32px] py-1.5' : 'min-h-[28px] py-1'
-              } ${
+              className={`flex min-w-0 flex-1 flex-col items-center justify-center rounded-xl px-2 text-center shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 ${kassaOrderTypeButtonTouchClass(
+                kassaSxgaDenseTiles,
+              )} ${
                 orderType === 'TAKEAWAY'
-                  ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
+                  ? 'bg-yellow-400 text-yellow-950 hover:bg-yellow-300 ring-yellow-600/25'
                   : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
               }`}
             >
-              <span className="text-center text-xs font-bold leading-tight sm:text-sm">
+              <span className="text-center text-sm font-bold leading-tight">
                 {t('kassaApp.orderTypeTakeaway')}
               </span>
             </button>
@@ -4707,15 +4712,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               type="button"
               aria-pressed={orderType === 'DELIVERY'}
               onClick={() => selectOrderType('DELIVERY')}
-              className={`flex min-w-0 flex-1 flex-col items-center justify-center rounded-lg px-1 text-center text-xs shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 ${
-                kassaSxgaDenseTiles ? 'min-h-[32px] py-1.5' : 'min-h-[28px] py-1'
-              } ${
+              className={`flex min-w-0 flex-1 flex-col items-center justify-center rounded-xl px-2 text-center shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 ${kassaOrderTypeButtonTouchClass(
+                kassaSxgaDenseTiles,
+              )} ${
                 orderType === 'DELIVERY'
                   ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
                   : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
               }`}
             >
-              <span className="text-center text-xs font-bold leading-tight sm:text-sm">
+              <span className="text-center text-sm font-bold leading-tight">
                 {t('kassaApp.orderTypeDelivery')}
               </span>
             </button>
