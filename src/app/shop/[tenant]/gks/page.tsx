@@ -4599,7 +4599,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* ── Rechts: numpad / cart ── */}
         <div
           className={`${kassaSxgaDenseTiles ? 'w-[300px]' : 'w-80 sm:w-96 lg:w-[380px]'} flex min-h-0 min-w-0 flex-shrink-0 flex-col overflow-x-hidden overflow-y-auto border-0 ${
-            kassaAppearanceDark ? 'bg-[#0f1319]' : 'bg-white'
+            kassaAppearanceDark ? `bg-[${GKS_SIDEBAR_SURFACE_BG}]` : 'bg-white'
           }`}
         >
 
@@ -4967,7 +4967,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         {/* Totaal + knoppen — touch-vriendelijk (kiosk) */}
         <div
-          className={`sticky bottom-0 z-10 shrink-0 border-t ${kassaAppearanceDark ? 'border-zinc-700 bg-[#0f1319]' : 'border-gray-200 bg-white'} p-1.5 space-y-1`}
+          className={`sticky bottom-0 z-10 shrink-0 border-t ${kassaAppearanceDark ? `border-zinc-700 bg-[${GKS_SIDEBAR_SURFACE_BG}]` : 'border-gray-200 bg-white'} p-1.5 space-y-1`}
         >
           <div
             className={`flex items-center justify-between border-b ${kassaAppearanceDark ? 'border-zinc-700' : 'border-gray-100'} py-1`}
