@@ -4756,7 +4756,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   </button>
                 ) : null}
                 <p
-                  className={`min-w-0 truncate whitespace-nowrap text-right text-xs font-semibold leading-tight tracking-tight sm:text-sm ${ui.numpadMeta} ${showKassaStaffClockButton ? 'flex-1' : 'w-full'}`}
+                  className={`min-w-0 truncate whitespace-nowrap text-right text-xs font-semibold leading-tight tracking-tight text-black sm:text-sm ${showKassaStaffClockButton ? 'flex-1' : 'w-full'}`}
                   title={numpadHeaderDateLabel}
                   aria-live="polite"
                 >
