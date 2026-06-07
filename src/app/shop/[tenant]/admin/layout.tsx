@@ -4,7 +4,8 @@ import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useLanguage } from '@/i18n'
-import { getTenantSettings, type TenantSettings } from '@/lib/admin-api'
+import { getTenantSettings } from '@/lib/admin-api'
+import { cache, cacheKey } from '@/lib/cache'
 import {
   adminPathToModule,
   allTenantModulesTrue,
@@ -58,7 +59,6 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   const router = useRouter()
   const { t } = useLanguage()
   const [tenantExists, setTenantExists] = useState<boolean | null>(null)
-  const [tenantData, setTenantData] = useState<TenantSettings | null | undefined>(undefined)
   const [adminHeaderTitle, setAdminHeaderTitle] = useState(() =>
     params.tenant
       .split('-')
@@ -92,22 +92,28 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     adminPath === baseUrl || adminPath === `${baseUrl}/`
 
   useEffect(() => {
+    let stale = false
     async function checkTenant() {
       setLoading(true)
-      setTenantData(undefined)
-      const fromSlug = params.tenant
+      setTenantExists(null)
+      const slug = params.tenant
+      const fromSlug = slug
         .split('-')
         .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
         .join(' ')
       setAdminHeaderTitle(fromSlug)
-      const fetched = await getTenantSettings(params.tenant)
-      setTenantData(fetched)
+      cache.invalidate(cacheKey('tenant_settings', slug))
+      const fetched = await getTenantSettings(slug)
+      if (stale) return
       setTenantExists(fetched !== null)
       const bn = fetched?.business_name?.trim()
       setAdminHeaderTitle(bn || fromSlug)
       setLoading(false)
     }
     checkTenant()
+    return () => {
+      stale = true
+    }
   }, [params.tenant])
 
   useEffect(() => {
@@ -344,7 +350,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     demoPublicUnauthenticated,
   ])
 
-  if (loading) {
+  if (loading || tenantExists === null) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
@@ -355,14 +361,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     )
   }
 
-  console.log('[AdminLayout] pre shopNotFound gate', {
-    tenantSlug: params.tenant,
-    loading,
-    tenantExists,
-    tenantData,
-  })
-
-  if (!tenantExists) {
+  if (tenantExists === false) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
         <div className="bg-white rounded-3xl p-12 shadow-xl max-w-md w-full text-center">
