@@ -4141,6 +4141,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
+      data-gks-ui="20250607-colors"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
     >
       <LogoutSoftwareConfirmModal
@@ -4698,10 +4699,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               onClick={() => selectOrderType('TAKEAWAY')}
               className={`flex min-w-0 flex-1 flex-col items-center justify-center rounded-xl px-2 text-center shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 ${kassaOrderTypeButtonTouchClass(
                 kassaSxgaDenseTiles,
-              )} ${
-                orderType === 'TAKEAWAY'
-                  ? 'bg-yellow-400 text-yellow-950 hover:bg-yellow-300 ring-yellow-600/25'
-                  : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
+              )} bg-yellow-400 text-yellow-950 hover:bg-yellow-300 ${
+                orderType === 'TAKEAWAY' ? 'ring-2 ring-yellow-700/50 ring-inset' : 'opacity-95'
               }`}
             >
               <span className="text-center text-sm font-bold leading-tight">
@@ -5101,7 +5100,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 setShowPaymentModal(true)
               }}
               disabled={billLines.length === 0 || gksFiscalBlocked}
-              className={`flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 font-bold text-white hover:bg-emerald-700 active:brightness-95 disabled:pointer-events-none disabled:opacity-45 disabled:hover:bg-emerald-600 ${
+              className={`flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 font-bold text-white shadow-sm hover:bg-emerald-700 active:brightness-95 disabled:cursor-not-allowed disabled:pointer-events-none disabled:hover:bg-emerald-600 ${
                 kassaSxgaDenseTiles
                   ? 'min-h-[4rem] py-3.5 text-xl'
                   : 'min-h-[3.5rem] py-3 text-lg'

@@ -1,9 +1,9 @@
 /**
  * GKS-pilot: éénmalig oude PWA service worker + Cache Storage opruimen na deploy.
  * Gebruikers hoeven geen DevTools — bij eerste load na update: korte reload, daarna stabiel.
- * Token gelijk houden met CACHE-versie in public/sw.js (v17 → v18 bij SW-bump).
+ * Token gelijk houden met CACHE-versie in public/sw.js (v18 bij SW-bump).
  */
-export const GKS_PWA_SW_CLEAR_TOKEN = 'v17'
+export const GKS_PWA_SW_CLEAR_TOKEN = 'v18'
 
 const SESSION_KEY = `vysion_gks_sw_cleared_${GKS_PWA_SW_CLEAR_TOKEN}`
 
