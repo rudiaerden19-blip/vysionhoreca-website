@@ -69,10 +69,10 @@ export async function gksPersistOpenTableCommercialOrder(
   tableNr: string,
   items: KassaCartItem[],
   customerTableLabel: string,
-): Promise<void> {
+): Promise<string | null> {
   if (items.length === 0) {
     await gksDeleteOpenTableCommercialOrders(tenantSlug, zone, tableNr)
-    return
+    return null
   }
 
   const rowPayload: Record<string, unknown> = {
@@ -102,15 +102,16 @@ export async function gksPersistOpenTableCommercialOrder(
     const up = await gksCommercialOrders.update(tenantSlug, rowPayload, {
       id: ids[0],
     })
-    if (up.ok) return
+    if (up.ok) return ids[0]
     console.warn('[gks-kassa] open commercial update failed, replace:', up.error)
   }
 
   await gksDeleteOpenTableCommercialOrders(tenantSlug, zone, tableNr)
 
   for (let attempt = 0; attempt < 3; attempt++) {
-    const ins = await gksCommercialOrders.insert(tenantSlug, rowPayload, 'id')
-    if (ins.ok) return
+    const ins = await gksCommercialOrders.insert<{ id?: string }>(tenantSlug, rowPayload, 'id')
+    if (ins.ok && ins.data?.id) return ins.data.id
+    if (ins.ok) return null
     console.warn('[gks-kassa] open commercial insert failed:', ins.error)
     const errMsg = ins.error || ''
     const uniqueOrConflict = ins.status === 409 || /duplicate|unique|23505/i.test(errMsg)
@@ -119,4 +120,5 @@ export async function gksPersistOpenTableCommercialOrder(
     if (!retryable) break
     await new Promise((r) => setTimeout(r, 650 * (attempt + 1)))
   }
+  return null
 }

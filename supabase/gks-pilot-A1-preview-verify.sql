@@ -39,6 +39,21 @@ WHERE fj.tenant_slug = 'gkstest'
 ORDER BY fj.created_at DESC
 LIMIT 5;
 
+-- 4b) Open tafelmanden (commercial mirror)
+SELECT
+  table_number,
+  floor_plan_zone,
+  status,
+  payment_status,
+  jsonb_array_length(items) AS regels,
+  updated_at AT TIME ZONE 'Europe/Brussels' AS tijd_belgie
+FROM gks_commercial_orders
+WHERE tenant_slug = 'gkstest'
+  AND order_type = 'DINE_IN'
+  AND status IN ('open', 'preparing')
+ORDER BY updated_at DESC
+LIMIT 10;
+
 -- 5) Migraties in repo (handmatig vergelijken met Supabase migration history):
 --    20260606120000_gks_commercial_orders_isolated.sql
 --    20260607100000_staff_insz_gks.sql

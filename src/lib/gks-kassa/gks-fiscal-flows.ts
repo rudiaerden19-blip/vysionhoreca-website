@@ -253,18 +253,74 @@ export async function gksPersistTableOrderP(
   tableNr: string,
   items: KassaCartItem[],
   resolveVatPercent: (line: KassaCartItem) => number,
+  opts?: { commercialOrderId?: string | null },
 ): Promise<GksFiscalFlowError | null> {
   if (items.length === 0) return null
   const gate = await gksEnsureFdmReady(tenantSlug, staff, vatNo)
   if (gate) return gate
+  const ctx = partnerCtx(tenantSlug, staff!, vatNo)
   const slotKey = tableOrderMapKey(zone, tableNr)
   const reference = getOrCreateCostCenterReference(tenantSlug, slotKey)
+  const costCenter = { id: tableNr, type: 'TABLE' as const, reference }
   const transaction = cartLinesToTransaction(items, resolveVatPercent)
-  await signOrder(partnerCtx(tenantSlug, staff!, vatNo), {
-    id: tableNr,
-    type: 'TABLE',
-    reference,
-  }, transaction)
+
+  const envelope = buildPendingEnvelope(ctx)
+  const idempotencyKey = newIdempotencyKey()
+  const commercialOrderId = opts?.commercialOrderId?.trim() || undefined
+
+  const pendingRes = await gksFiscalJournalCreatePending({
+    tenantSlug,
+    eventLabel: 'P',
+    mutation: 'signOrder',
+    idempotencyKey,
+    posId: envelope.posId,
+    terminalId: envelope.terminalId,
+    deviceId: envelope.deviceId,
+    posFiscalTicketNo: envelope.posFiscalTicketNo,
+    posDateTime: envelope.posDateTime,
+    bookingPeriodId: envelope.bookingPeriodId,
+    bookingDate: envelope.bookingDate,
+    employeeId: envelope.employeeId,
+    requestPayload: { costCenter, transaction, envelope },
+    ...(commercialOrderId ? { commercialOrderId } : {}),
+  })
+  if (!pendingRes.ok) {
+    return {
+      code: 'FISCAL_JOURNAL_PENDING',
+      message: pendingRes.error || 'Kon fiscaal journal (P) niet starten.',
+    }
+  }
+  const journalId = pendingRes.data.id
+
+  let result: GksSignResult
+  try {
+    result = await signOrder(ctx, costCenter, transaction)
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'signOrder mislukt'
+    await markJournalFailedSafe(tenantSlug, journalId, 'SIGN_ORDER_FAILED', message)
+    return { code: 'SIGN_ORDER_FAILED', message }
+  }
+
+  const successRes = await gksFiscalJournalMarkSuccess(
+    tenantSlug,
+    journalId,
+    signResultToResponsePayload(result),
+    commercialOrderId,
+  )
+  if (!successRes.ok || successRes.data.status !== 'SUCCESS') {
+    await markJournalFailedSafe(
+      tenantSlug,
+      journalId,
+      'MARK_SUCCESS_FAILED',
+      successRes.ok ? `status=${successRes.data.status}` : successRes.error,
+    )
+    return {
+      code: 'MARK_SUCCESS_FAILED',
+      message: successRes.ok
+        ? 'Fiscaal journal (P) kon niet op SUCCESS gezet worden.'
+        : successRes.error || 'mark_success mislukt',
+    }
+  }
   return null
 }
 

@@ -57,6 +57,7 @@ export type GksCreatePendingInput = {
   bookingDate: string
   employeeId: string
   requestPayload: Record<string, unknown>
+  commercialOrderId?: string
 }
 
 export async function gksFiscalJournalCreatePending(

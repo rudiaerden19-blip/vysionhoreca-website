@@ -1716,9 +1716,24 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     tblNr: string,
     items: CartItem[],
   ) => {
-    if (items.length === 0) return
+    if (items.length === 0) {
+      await gksDeleteOpenTableCommercialOrders(tenant, zone, tblNr)
+      return
+    }
 
     const vatNo = tenantInfo?.btw_number?.trim() || 'BE0000000000'
+
+    let customerTableLabel = t('kassaReceipt.tableLabel').replace(/\{number\}/g, String(tblNr))
+    if (zone === FLOOR_PLAN_ZONE_TERRACE) {
+      customerTableLabel = `${customerTableLabel} (${t('kassaApp.floorZoneTerrace')})`
+    }
+    const commercialOrderId = await gksPersistOpenTableCommercialOrder(
+      tenant,
+      zone,
+      tblNr,
+      items,
+      customerTableLabel,
+    )
     const err = await gksPersistTableOrderP(
       tenant,
       activeKassaStaff,
@@ -1727,18 +1742,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       tblNr,
       items,
       resolveCartLineVat,
+      { commercialOrderId },
     )
     if (err) {
-      console.warn('[gks-kassa] signOrder P:', err)
+      console.warn('[gks-kassa] signOrder P journal:', err)
       alert(err.message)
-      return
     }
-
-    let customerTableLabel = t('kassaReceipt.tableLabel').replace(/\{number\}/g, String(tblNr))
-    if (zone === FLOOR_PLAN_ZONE_TERRACE) {
-      customerTableLabel = `${customerTableLabel} (${t('kassaApp.floorZoneTerrace')})`
-    }
-    await gksPersistOpenTableCommercialOrder(tenant, zone, tblNr, items, customerTableLabel)
   }
 
   const persistOpenOrderRowToSupabase = (zone: FloorPlanZone, tblNr: string, items: CartItem[]) => {
