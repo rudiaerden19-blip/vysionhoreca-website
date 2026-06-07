@@ -34,20 +34,37 @@ export const GKS_TILE_LIFT_SHADOW =
 
 const GKS_BTN_EDGE = `border border-[#2a2a2a] ${GKS_SUBTLE_LIFT_SHADOW}`
 
+/** Tik/klik: ingedrukt (inset + 2px omlaag), losgelaten = weer raised. */
+export const GKS_BTN_PRESS = [
+  'transition-[transform,box-shadow,filter,background] duration-100 ease-out',
+  'active:translate-y-[2px]',
+  'active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.62),inset_0_1px_2px_rgba(0,0,0,0.38)]',
+  'active:brightness-[0.9]',
+  'active:border-[#1a1a1a]',
+].join(' ')
+
+const GKS_BTN_PRESS_FACE =
+  'active:bg-[linear-gradient(180deg,#0e0e0e_0%,#242424_52%,#101010_100%)]'
+
+const GKS_BTN_PRESS_FACE_SELECTED =
+  'active:bg-[linear-gradient(180deg,#141414_0%,#2c2c2c_52%,#161616_100%)]'
+
 /** Standaard knop. */
 export const GKS_POS_BTN = [
   GKS_BTN_FACE,
   GKS_BTN_EDGE,
+  GKS_BTN_PRESS,
+  GKS_BTN_PRESS_FACE,
   'text-[#f0f0f0]',
-  'active:brightness-[0.96]',
 ].join(' ')
 
 /** Geselecteerde knop. */
 export const GKS_POS_BTN_SELECTED = [
   GKS_BTN_FACE_SELECTED,
   GKS_BTN_EDGE,
+  GKS_BTN_PRESS,
+  GKS_BTN_PRESS_FACE_SELECTED,
   'text-white',
-  'active:brightness-[0.96]',
 ].join(' ')
 
 /**
@@ -59,7 +76,9 @@ export const GKS_ACCENT_BTN = [
   'text-white',
   'border border-[#003878] border-t-[#9ee8ff]/35',
   'shadow-[0_2px_5px_rgba(0,0,0,0.4),0_6px_14px_rgba(0,30,80,0.25)]',
-  'active:brightness-[0.96]',
+  GKS_BTN_PRESS,
+  'active:bg-[linear-gradient(180deg,#4a9fd0_0%,#0d5bb8_55%,#002f75_100%)]',
+  'active:border-[#002a66]',
 ].join(' ')
 
 /** Displayveld (totaal, numpad) — iets ingevallen, rustig. */

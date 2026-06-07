@@ -83,6 +83,7 @@ import {
   GKS_MENU_TILE_LABEL_SURFACE,
   GKS_POS_BTN,
   GKS_POS_FIELD,
+  GKS_BTN_PRESS,
   GKS_CLOCK_BAR,
   GKS_FONT_UI,
   GKS_FONT_UI_SOFT,
@@ -557,7 +558,7 @@ const KassaReservationsView = dynamic(() => import('@/components/KassaReservatio
 
 /** Categorie- en producttegel: witte kaart; foto alleen bovenin, titel in vaste strook eronder (niet over de foto). */
 const KASSA_MENU_TILE_BUTTON_CLASS_BASE =
-  `touch-manipulation select-none group relative flex min-h-0 w-full min-w-0 flex-col overflow-hidden ${GKS_BTN_SHAPE} border border-[#1a1a1a] bg-[#2a2a2a] text-left active:brightness-[0.92] ${GKS_TILE_LIFT_SHADOW}`
+  `touch-manipulation select-none group relative flex min-h-0 w-full min-w-0 flex-col overflow-hidden ${GKS_BTN_SHAPE} border border-[#1a1a1a] bg-[#2a2a2a] text-left ${GKS_BTN_PRESS} ${GKS_TILE_LIFT_SHADOW}`
 
 /** Standaard: rastercel wordt **items-stretch** ⇒ knop moet **`h-full`**. */
 const KASSA_MENU_TILE_BUTTON_CLASS = `${KASSA_MENU_TILE_BUTTON_CLASS_BASE} h-full`
@@ -4145,7 +4146,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250607-footer-text-only"
+      data-gks-ui="20250607-btn-press-inset"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4684,7 +4685,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               type="button"
               aria-pressed={orderType === 'DINE_IN'}
               onClick={() => selectOrderType('DINE_IN')}
-              className={`flex min-w-0 flex-1 flex-col items-center justify-center px-2 text-center transition-colors active:brightness-95 ${kassaOrderTypeButtonTouchClass(
+              className={`flex min-w-0 flex-1 flex-col items-center justify-center px-2 text-center ${kassaOrderTypeButtonTouchClass(
                 kassaSxgaDenseTiles,
               )} ${gksPosButtonClass(orderType === 'DINE_IN')}`}
             >
@@ -4704,7 +4705,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               type="button"
               aria-pressed={orderType === 'TAKEAWAY'}
               onClick={() => selectOrderType('TAKEAWAY')}
-              className={`flex min-w-0 flex-1 flex-col items-center justify-center px-2 text-center transition-colors active:brightness-95 ${kassaOrderTypeButtonTouchClass(
+              className={`flex min-w-0 flex-1 flex-col items-center justify-center px-2 text-center ${kassaOrderTypeButtonTouchClass(
                 kassaSxgaDenseTiles,
               )} ${gksPosButtonClass(orderType === 'TAKEAWAY')}`}
             >
@@ -4716,7 +4717,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               type="button"
               aria-pressed={orderType === 'DELIVERY'}
               onClick={() => selectOrderType('DELIVERY')}
-              className={`flex min-w-0 flex-1 flex-col items-center justify-center px-2 text-center transition-colors active:brightness-95 ${kassaOrderTypeButtonTouchClass(
+              className={`flex min-w-0 flex-1 flex-col items-center justify-center px-2 text-center ${kassaOrderTypeButtonTouchClass(
                 kassaSxgaDenseTiles,
               )} ${gksPosButtonClass(orderType === 'DELIVERY')}`}
             >
@@ -4822,7 +4823,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     key={key}
                     type="button"
                     data-kassa-numpad-key={key}
-                    className={`min-h-[2.75rem] font-semibold text-2xl touch-manipulation active:brightness-95 ${GKS_BTN_SHAPE} ${GKS_POS_BTN}`}
+                    className={`min-h-[2.75rem] font-semibold text-2xl touch-manipulation ${GKS_BTN_SHAPE} ${GKS_POS_BTN}`}
                   >
                     {key}
                   </button>
@@ -4833,7 +4834,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   type="button"
                   data-testid="kassa-add-custom-amount"
                   onClick={addCustomAmount}
-                  className={`mt-3 shrink-0 touch-manipulation py-4 font-semibold text-lg active:brightness-95 ${GKS_ACCENT_BTN}`}
+                  className={`mt-3 shrink-0 touch-manipulation py-4 font-semibold text-lg ${GKS_ACCENT_BTN}`}
                 >
                   {t('kassaApp.addAmount').replace(
                     '{amount}',
@@ -4940,7 +4941,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       <button
                         type="button"
                         onClick={() => updateQty(item.cartKey, item.quantity + 1)}
-                        className={`touch-manipulation font-semibold flex items-center justify-center active:brightness-95 ${GKS_BTN_SHAPE} ${GKS_POS_BTN} ${
+                        className={`touch-manipulation font-semibold flex items-center justify-center ${GKS_BTN_SHAPE} ${GKS_POS_BTN} ${
                           kassaSxgaDenseTiles ? 'h-9 w-9 text-lg' : 'h-8 w-8 text-base'
                         }`}
                         aria-label={t('kassaApp.ariaIncreaseQty')}
@@ -4981,7 +4982,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <button
               type="button"
               onClick={() => { void openCashDrawer() }}
-              className={`flex items-center justify-center px-1 active:brightness-95 ${gksPosButtonClass(false)} ${kassaFooterActionTouchMinHClass(
+              className={`flex items-center justify-center px-1 ${gksPosButtonClass(false)} ${kassaFooterActionTouchMinHClass(
                 kassaSxgaDenseTiles,
                 kassaSidebarFooterTier === 'dense',
               )}`}
@@ -5002,7 +5003,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               }}
               disabled={gksFiscalBlocked || draftBonLineItems.length === 0 || draftBonPrinting}
               title={gksFiscalBlocked ? gksFiscalBlockedTitle : t('kassaApp.cartBonTitle')}
-              className={`flex items-center justify-center px-1 active:brightness-95 disabled:pointer-events-none disabled:opacity-45 ${gksPosButtonClass(false)} ${kassaFooterActionTouchMinHClass(
+              className={`flex items-center justify-center px-1 disabled:pointer-events-none disabled:opacity-45 ${gksPosButtonClass(false)} ${kassaFooterActionTouchMinHClass(
                 kassaSxgaDenseTiles,
                 kassaSidebarFooterTier === 'dense',
               )}`}
@@ -5026,7 +5027,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 playClick()
                 setNumpadPanelVisible((v) => !v)
               }}
-              className={`flex items-center justify-center px-1 active:brightness-95 ${gksPosButtonClass(numpadPanelVisible)} ${kassaFooterActionTouchMinHClass(
+              className={`flex items-center justify-center px-1 ${gksPosButtonClass(numpadPanelVisible)} ${kassaFooterActionTouchMinHClass(
                 kassaSxgaDenseTiles,
                 kassaSidebarFooterTier === 'dense',
               )}`}
@@ -5048,7 +5049,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <button
                 type="button"
                 onClick={() => parkOrder({ printKitchen: true, printKassaSlip: false })}
-                className={`min-w-0 flex-1 font-semibold active:brightness-95 flex items-center justify-center text-center px-2 py-3 text-xs leading-tight sm:text-sm ${gksPosButtonClass(false)} ${
+                className={`min-w-0 flex-1 font-semibold flex items-center justify-center text-center px-2 py-3 text-xs leading-tight sm:text-sm ${gksPosButtonClass(false)} ${
                   kassaSxgaDenseTiles ? 'min-h-[2.875rem]' : 'min-h-[2.5rem]'
                 }`}
               >
@@ -5059,7 +5060,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 disabled={gksFiscalBlocked}
                 title={gksFiscalBlocked ? gksFiscalBlockedTitle : undefined}
                 onClick={() => parkOrder({ printKitchen: false, printKassaSlip: true })}
-                className={`min-w-0 flex-1 font-semibold active:brightness-95 flex items-center justify-center text-center disabled:opacity-45 disabled:pointer-events-none px-2 py-3 text-xs leading-tight sm:text-sm ${gksPosButtonClass(false)} ${
+                className={`min-w-0 flex-1 font-semibold flex items-center justify-center text-center disabled:opacity-45 disabled:pointer-events-none px-2 py-3 text-xs leading-tight sm:text-sm ${gksPosButtonClass(false)} ${
                   kassaSxgaDenseTiles ? 'min-h-[2.875rem]' : 'min-h-[2.5rem]'
                 }`}
               >
@@ -5078,7 +5079,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 setShowPaymentModal(true)
               }}
               disabled={billLines.length === 0 || gksFiscalBlocked}
-              className={`flex w-full items-center justify-center text-white active:brightness-95 disabled:cursor-not-allowed disabled:pointer-events-none ${GKS_ACCENT_BTN} ${
+              className={`flex w-full items-center justify-center text-white disabled:cursor-not-allowed disabled:pointer-events-none ${GKS_ACCENT_BTN} ${
                 kassaSxgaDenseTiles
                   ? 'min-h-[4rem] py-3.5 text-xl'
                   : 'min-h-[3.5rem] py-3 text-lg'
