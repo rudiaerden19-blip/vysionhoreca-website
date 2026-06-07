@@ -4179,7 +4179,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250608-clock-bar-match-buttons"
+      data-gks-ui="20250608-clock-bar-outside-clip-pill"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4806,34 +4806,36 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           ) : null}
         </div>
 
+        {/* Klokbalk buiten overflow-hidden cart — anders geen zichtbare schaduw */}
+        <div
+          className={`mx-3 mb-2 mt-2 flex shrink-0 items-center gap-3 px-3 ${gksClockBarClass()} ${kassaOrderTypeButtonTouchClass(
+            kassaSxgaDenseTiles,
+          )}`}
+          data-testid="kassa-sidebar-clock-bar"
+        >
+          {showKassaStaffClockButton ? (
+            <button
+              type="button"
+              onClick={openStaffClockModal}
+              className={`shrink-0 active:scale-[0.98] transition-all ${ui.clockTileBg} ${ui.clockTileHover}`}
+              title={t('staffClock.buttonTitle')}
+              aria-label={t('staffClock.buttonTitle')}
+            >
+              <KassaAnalogClock size={parkedOnlySidebarView ? 72 : 48} />
+            </button>
+          ) : null}
+          <p
+            className={`min-w-0 truncate whitespace-nowrap text-right text-xs font-semibold leading-tight tracking-tight text-white sm:text-sm ${showKassaStaffClockButton ? 'flex-1' : 'w-full'}`}
+            title={numpadHeaderDateLabel}
+            aria-live="polite"
+          >
+            {numpadHeaderDateLabel}
+          </p>
+        </div>
+
         {/* Cart / numpad (toggle via footer) */}
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-3 pt-2 touch-pan-y">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-3 pt-1 touch-pan-y">
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-              <div
-                className={`mb-3 mt-2.5 flex shrink-0 items-center gap-3 px-3 ${gksClockBarClass()} ${kassaOrderTypeButtonTouchClass(
-                  kassaSxgaDenseTiles,
-                )}`}
-                data-testid="kassa-sidebar-clock-bar"
-              >
-                {showKassaStaffClockButton ? (
-                  <button
-                    type="button"
-                    onClick={openStaffClockModal}
-                    className={`shrink-0 active:scale-[0.98] transition-all ${ui.clockTileBg} hover:border-[var(--gks-accent-hover)] hover:bg-[#263043]`}
-                    title={t('staffClock.buttonTitle')}
-                    aria-label={t('staffClock.buttonTitle')}
-                  >
-                    <KassaAnalogClock size={parkedOnlySidebarView ? 72 : 48} />
-                  </button>
-                ) : null}
-                <p
-                  className={`min-w-0 truncate whitespace-nowrap text-right text-xs font-semibold leading-tight tracking-tight text-white sm:text-sm ${showKassaStaffClockButton ? 'flex-1' : 'w-full'}`}
-                  title={numpadHeaderDateLabel}
-                  aria-live="polite"
-                >
-                  {numpadHeaderDateLabel}
-                </p>
-              </div>
               {parkedLinesByCategory.length > 0 &&
               (parkedOnlySidebarView || numpadPanelVisible) ? (
                 <div

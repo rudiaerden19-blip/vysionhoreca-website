@@ -15,8 +15,11 @@ export const GKS_MENU_PLATE_BG_CLASS = GKS_MENU_PLATE_SHELL_BG_CLASS
 /** Dunne zwarte scheidingslijnen (header-nav, sidebar, footer). */
 export const GKS_RULE_BLACK = 'border-black'
 
-/** Afgerond — zelfde hoek als Ter plaatse / footer-knoppen (visueel ronder op brede balken). */
+/** Menu-tegels, modals — niet de sidebar-pill-knoppen. */
 export const GKS_BTN_SHAPE = 'rounded-xl'
+
+/** Sidebar POS-knoppen + klokbalk: capsule/pill (zelfde als Binnen / Ter plaatse). */
+export const GKS_POS_BTN_SHAPE = 'rounded-full'
 
 /** Minder zwaar dan overal `font-bold`. */
 export const GKS_FONT_UI = 'font-semibold'
@@ -70,7 +73,7 @@ const GKS_BTN_PRESS_FACE =
 
 /** Analoge klok op de balk — lichtere schaduw + highlight, “ligt erop”. */
 export const GKS_CLOCK_TILE_ON_BAR = [
-  GKS_BTN_SHAPE,
+  GKS_POS_BTN_SHAPE,
   GKS_BTN_FACE,
   'relative z-[2]',
   'border border-[#3d3d3d] border-t-[#4a4a4a]/80',
@@ -110,7 +113,7 @@ export const GKS_POS_BTN_SELECTED = [
 
 /** Footer Afrekenen — geselecteerde look + altijd blauwe tekst. */
 export const GKS_CHECKOUT_BTN = [
-  GKS_BTN_SHAPE,
+  GKS_POS_BTN_SHAPE,
   GKS_POS_BTN_SELECTED,
   GKS_BTN_ARIA_DISABLED,
   'aria-disabled:text-[#6eb5ff]',
@@ -154,7 +157,7 @@ export const GKS_CLOCK_BAR = [
 ].join(' ')
 
 export function gksPosButtonClass(selected: boolean): string {
-  return `${GKS_BTN_SHAPE} ${selected ? GKS_POS_BTN_SELECTED : GKS_POS_BTN}`
+  return `${GKS_POS_BTN_SHAPE} ${selected ? GKS_POS_BTN_SELECTED : GKS_POS_BTN}`
 }
 
 /** Horizontale strook (totaal): exact dezelfde utility-reeks als een POS-knop. */
