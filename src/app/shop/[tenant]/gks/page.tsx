@@ -91,6 +91,7 @@ import {
   GKS_FONT_UI_SOFT,
   GKS_TILE_LIFT_SHADOW,
   gksPosButtonClass,
+  GKS_POS_SELECTED_ACCENT_TEXT,
 } from '@/lib/gks-kassa/gks-pos-surface'
 import { authFetch, buildShopInternalReturnPath } from '@/lib/auth-headers'
 import {
@@ -4152,7 +4153,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250607-footer-press-fix"
+      data-gks-ui="20250607-dine-in-selected-blue-text"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4188,7 +4189,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* ── Hamburger ── */}
         <div className="relative z-20 flex shrink-0 items-center gap-2">
           <button onClick={() => { setHamburgerOpen(!hamburgerOpen); setHamburgerSubOpen(null) }}
-            className={`flex items-center gap-1.5 px-2 py-1.5 transition-colors sm:gap-2 sm:px-3 ${gksPosButtonClass(hamburgerOpen)}`}
+            className={`flex items-center gap-1.5 px-2 py-1.5 transition-colors sm:gap-2 sm:px-3 ${gksPosButtonClass(true)}`}
             type="button"
             title={t('kassaApp.hamburgerMenu')}
             aria-expanded={hamburgerOpen}
@@ -4433,7 +4434,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             type="button"
             onClick={() => setLogoutSoftwareConfirmOpen(true)}
             title={t('kassaApp.logout')}
-            className={`inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap px-1.5 py-1 text-[11px] font-semibold transition-colors sm:gap-1 sm:px-2.5 sm:py-1.5 sm:text-sm ${gksPosButtonClass(false)}`}
+            className={`inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap px-1.5 py-1 text-[11px] font-semibold transition-colors sm:gap-1 sm:px-2.5 sm:py-1.5 sm:text-sm ${gksPosButtonClass(true)}`}
           >
             <span className="leading-snug">{t('kassaApp.logout')}</span>
           </button>
@@ -4697,11 +4698,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 kassaSxgaDenseTiles,
               )} ${gksPosButtonClass(orderType === 'DINE_IN')}`}
             >
-              <span className="text-center text-sm font-semibold leading-tight">
+              <span
+                className={`text-center text-sm font-semibold leading-tight ${
+                  orderType === 'DINE_IN' ? GKS_POS_SELECTED_ACCENT_TEXT : ''
+                }`}
+              >
                 {t('kassaApp.orderTypeDineIn')}
               </span>
               {orderType === 'DINE_IN' && tableNumber ? (
-                <span className="mt-0.5 max-w-full truncate text-[10px] font-semibold normal-case opacity-95 sm:text-xs">
+                <span
+                  className={`mt-0.5 max-w-full truncate text-[10px] font-semibold normal-case sm:text-xs ${GKS_POS_SELECTED_ACCENT_TEXT}`}
+                >
                   {t('kassaApp.tableWord')} {tableNumber}
                   {dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE
                     ? ` (${t('kassaApp.floorZoneTerraceShort')})`
