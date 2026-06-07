@@ -22,7 +22,7 @@ export function createGksRegisterUiTheme(dark: boolean): KassaRegisterUiTheme {
   return {
     ...base,
     shellBg: GKS_MENU_PLATE_SHELL_BG_CLASS,
-    soundBackdrop: 'bg-[#262628]',
+    soundBackdrop: 'bg-[#2e2e32]',
     flyMenuPanel: `${GKS_BTN_SHAPE} shadow-lg border border-[#1a1a1a] bg-[#333333]`,
     flyMenuBorder: 'border-[#4a4a4a]',
     flyMenuDivider: 'border-[#4a4a4a]',
@@ -37,7 +37,7 @@ export function createGksRegisterUiTheme(dark: boolean): KassaRegisterUiTheme {
     productTileSolidBorder: 'border-[#1a1a1a]',
     productTileFooterBar: `border-[#1a1a1a] ${GKS_MENU_TILE_LABEL_SURFACE}`,
     sidebarBg: GKS_MENU_PLATE_TRANSPARENT_CLASS,
-    ringOffset: 'ring-offset-[#262628]',
+    ringOffset: 'ring-offset-[#2e2e32]',
     tablePickerPanel: `absolute left-0 right-0 top-full mt-1 z-50 ${GKS_BTN_SHAPE} shadow-lg border border-[#1a1a1a] bg-[#333333] overflow-hidden`,
     tablePickerHeader: 'bg-[#383838] border-b border-[#1a1a1a]',
     tablePickerFooterBar: `p-2 border-t border-[#333336] ${GKS_MENU_PLATE_TRANSPARENT_CLASS} flex gap-2`,

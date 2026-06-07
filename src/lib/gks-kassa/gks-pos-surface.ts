@@ -4,15 +4,15 @@ import type { CSSProperties } from 'react'
  * GKS-pilot: POS-ref — zwart-grijs, lichte verticale overgang, subtiele schaduw (niet overdreven).
  */
 
-/** Fallback onder leisteen-textuur. */
-export const GKS_MENU_PLATE_BG = '#262628'
+/** Fallback onder leisteen-textuur (iets lichter dan #262628). */
+export const GKS_MENU_PLATE_BG = '#2e2e32'
 /** Seamless leisteen — één vlak, geen tile-repeat. */
 export const GKS_MENU_PLATE_TEXTURE_PATH = '/gks/menu-plate-leisteen.png'
 
 /** Inline background: cover + no-repeat (betrouwbaarder dan Tailwind arbitrary bg). */
 export const GKS_MENU_PLATE_SHELL_BG_STYLE: CSSProperties = {
   backgroundColor: GKS_MENU_PLATE_BG,
-  backgroundImage: `linear-gradient(rgba(0,0,0,0.08), rgba(0,0,0,0.08)), url('${GKS_MENU_PLATE_TEXTURE_PATH}')`,
+  backgroundImage: `linear-gradient(rgba(255,255,255,0.06), rgba(255,255,255,0.06)), url('${GKS_MENU_PLATE_TEXTURE_PATH}')`,
   backgroundSize: 'cover',
   backgroundRepeat: 'no-repeat',
   backgroundPosition: 'center center',
