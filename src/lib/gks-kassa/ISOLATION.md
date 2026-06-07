@@ -24,6 +24,7 @@ Pilot/certificatie onder `/shop/[tenant]/admin/gks-kassa` mag **geen** productie
 - Print agent (`sendToVysionPrintAgent`) — lokaal per zaak.
 - Webshop-order **alarm** uitgeschakeld (geen poll op productie `orders.status=new`).
 - Geen fullscreen «Activeer geluid»-gate: audio ontgrendelt op eerste tik op de POS (zelfde sessie-key `gks_kassa_audio_ok_*`).
+- **Admin shell:** `/admin/gks-kassa` gebruikt `GksPilotLayoutGate` — niet de gedeelde `AdminLayout` (tenant gate / herhaalde auth).
 
 ## Check vóór deploy
 

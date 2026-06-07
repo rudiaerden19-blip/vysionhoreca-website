@@ -45,6 +45,7 @@ import {
   publicDemoSessionMatchesTenant,
 } from '@/lib/demo-links'
 import { useKassaUiDarkSync } from '@/lib/kassa-register-ui-dark-preference'
+import { GksPilotLayoutGate } from '@/lib/gks-kassa/gks-pilot-layout-gate'
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -55,6 +56,35 @@ interface AdminLayoutProps {
 const LOCK_PAGES = ['categorieen']
 
 export default function AdminLayout({ children, params }: AdminLayoutProps) {
+  const pathname = usePathname()
+  const routeParams = useParams()
+  const routeTenantEarly =
+    typeof routeParams?.tenant === 'string'
+      ? routeParams.tenant
+      : Array.isArray(routeParams?.tenant)
+        ? routeParams.tenant[0] ?? ''
+        : ''
+  const tenantSlugEarly = resolveShopTenantSlug(pathname, routeTenantEarly || params.tenant)
+  const adminPathEarly = normalizeShopAdminPathname(pathname, tenantSlugEarly)
+  if (
+    Boolean(tenantSlugEarly) &&
+    isShopAdminGksKassaPosPath(adminPathEarly, tenantSlugEarly)
+  ) {
+    return (
+      <GksPilotLayoutGate tenantSlug={params.tenant}>{children}</GksPilotLayoutGate>
+    )
+  }
+
+  return <ShopAdminLayoutInner params={params}>{children}</ShopAdminLayoutInner>
+}
+
+function ShopAdminLayoutInner({
+  children,
+  params,
+}: {
+  children: React.ReactNode
+  params: { tenant: string }
+}) {
   const pathname = usePathname()
   const routeParams = useParams()
   const routeTenant =
@@ -103,14 +133,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   const isAdminDashboardRoot =
     adminPath === baseUrl || adminPath === `${baseUrl}/`
 
-  const onGksKassaPos =
-    Boolean(tenantSlug) && isShopAdminGksKassaPosPath(adminPath, tenantSlug)
-
   useEffect(() => {
-    if (onGksKassaPos) {
-      setLoading(false)
-      return
-    }
     const slug = resolveShopTenantSlug(pathname, routeTenant || params.tenant)
     const seq = ++tenantCheckSeq.current
 
@@ -164,7 +187,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     return () => {
       tenantCheckSeq.current += 1
     }
-  }, [pathname, routeTenant, params.tenant, onGksKassaPos])
+  }, [pathname, routeTenant, params.tenant])
 
   /** Alleen bij wissel van tenant — niet na mount (anders overschrijft dit verifying en flikkert de kassa). */
   useEffect(() => {
@@ -209,10 +232,8 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   }, [params.tenant, adminPath, baseUrl])
 
   useLayoutEffect(() => {
-    if (!onGksKassaPos) {
-      if (loading || tenantExists === null) return
-      if (tenantExists === false) return
-    }
+    if (loading || tenantExists === null) return
+    if (tenantExists === false) return
     if (typeof window === 'undefined') return
 
     const stripHandoffParamFromSearch = (search: string) => {
@@ -294,7 +315,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     }
 
     goTenantLogin()
-  }, [loading, tenantExists, params.tenant, demoPublicUnauthenticated, onGksKassaPos])
+  }, [loading, tenantExists, params.tenant, demoPublicUnauthenticated])
 
   /** Server moet dezelfde sessie zien als schrijf-API’s; ruimt verouderde `vysion_tenant` op bij mismatch. */
   useEffect(() => {
@@ -376,7 +397,6 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   }, [adminPath])
 
   useEffect(() => {
-    if (onGksKassaPos) return
     if (loading || modulesLoading || tenantExists === false) return
     if (demoPublicUnauthenticated) return
     if (typeof window !== 'undefined' && isSuperAdminLoggedIn()) return
@@ -411,32 +431,8 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     enabledModulesJson,
     router,
     demoPublicUnauthenticated,
-    onGksKassaPos,
     tenantSlug,
   ])
-
-  /** GKS POS: geen async tenant_settings-gate; één mount na auth (geen POS onder overlay). */
-  if (onGksKassaPos) {
-    if (demoPublicUnauthenticated) {
-      return <>{children}</>
-    }
-    if (typeof window !== 'undefined' && isSuperAdminLoggedIn()) {
-      return <>{children}</>
-    }
-    if (adminAccess !== 'ok') {
-      return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-gray-600">
-              {adminAccess === 'login' ? t('adminLayout.redirectLogin') : t('adminLayout.loading')}
-            </p>
-          </div>
-        </div>
-      )
-    }
-    return <>{children}</>
-  }
 
   if (loading || tenantExists === null) {
     return (
