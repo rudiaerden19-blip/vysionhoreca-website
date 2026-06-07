@@ -1,4 +1,5 @@
 import { isAdminTenant } from '@/lib/protected-tenants'
+import { gksPilotTenantSlugs } from '@/lib/gks-kassa/pilot-config'
 
 /** Keys align with kassa hamburger `modules[].key`. */
 export const TENANT_MODULE_IDS = [
@@ -308,6 +309,9 @@ export function getAdminKassaEntryHref(
   _enabledModulesJson: Record<string, boolean> | null
 ): string | null {
   if (!access.kassa) return null
+  if (gksPilotTenantSlugs().includes(tenantSlug)) {
+    return `/shop/${tenantSlug}/gks`
+  }
   return `/shop/${tenantSlug}/admin/kassa`
 }
 

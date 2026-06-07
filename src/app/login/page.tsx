@@ -22,6 +22,7 @@ import { mirrorSuperadminSessionFromCookieToLocalStorage } from '@/lib/superadmi
 import { LocaleFlagEmoji, LocaleFlagWithCode } from '@/components/LocaleFlagEmoji'
 import { LoginKassaCloseHintModal } from '@/components/LoginKassaCloseHintModal'
 import { LOGIN_QUERY_KASSA_CLOSE_TIP } from '@/lib/shop-login-kassa-tip'
+import { gksPilotTenantSlugs } from '@/lib/gks-kassa/pilot-config'
 
 /** Zelfde hosts als middleware `exactMainDomains` (+ dev): sessie blijft in localStorage van dit domein. */
 function stayOnMainDomainForShopSession(hostname: string): boolean {
@@ -80,7 +81,10 @@ export default function LoginPage() {
       }
       if (!tenantSlug) tenantSlug = tenantSlugFromLocation()
       if (tenantSlug) {
-        const safeNext = normalizeLoginNextPath(nextRaw, tenantSlug) ?? `/shop/${tenantSlug}/admin`
+        const pilotDefault = gksPilotTenantSlugs().includes(tenantSlug)
+          ? `/shop/${tenantSlug}/gks`
+          : `/shop/${tenantSlug}/admin`
+        const safeNext = normalizeLoginNextPath(nextRaw, tenantSlug) ?? pilotDefault
         const host = window.location.hostname.toLowerCase().split(':')[0]
         if (stayOnMainDomainForShopSession(host)) {
           router.replace(safeNext)
@@ -213,7 +217,9 @@ export default function LoginPage() {
       clearTerminalLogout()
 
       const safeNext = normalizeLoginNextPath(nextParam, tenant.tenant_slug)
-      const fallbackAfterLogin = `/shop/${tenant.tenant_slug}/admin`
+      const fallbackAfterLogin = gksPilotTenantSlugs().includes(tenant.tenant_slug)
+        ? `/shop/${tenant.tenant_slug}/gks`
+        : `/shop/${tenant.tenant_slug}/admin`
 
       const host =
         typeof window !== 'undefined' ? window.location.hostname : ''

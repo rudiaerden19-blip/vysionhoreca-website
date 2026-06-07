@@ -239,6 +239,21 @@ export function normalizeLoginNextPath(
     }
   }
 
+  if (pathOnly === '/gks' || pathOnly.startsWith('/gks/')) {
+    const rest = pathOnly === '/gks' ? '' : pathOnly.slice('/gks'.length)
+    if (rest.includes('..')) return null
+    search = stripMarketingDemoSearchForTenant(search, tenantSlug)
+    return `/shop/${tenantSlug}/gks${rest}${search}`
+  }
+
+  if (pathOnly === '/admin/gks-kassa' || pathOnly.startsWith('/admin/gks-kassa/')) {
+    const rest =
+      pathOnly === '/admin/gks-kassa' ? '' : pathOnly.slice('/admin/gks-kassa'.length)
+    if (rest.includes('..')) return null
+    search = stripMarketingDemoSearchForTenant(search, tenantSlug)
+    return `/shop/${tenantSlug}/gks${rest}${search}`
+  }
+
   if (pathOnly === '/admin' || pathOnly.startsWith('/admin/')) {
     const rest = pathOnly === '/admin' ? '' : pathOnly.slice('/admin'.length)
     if (rest.includes('..')) return null
@@ -269,6 +284,14 @@ export function buildShopInternalReturnPath(
 ): string {
   const path = browserPathname
   const search = browserSearch || ''
+  if (path === '/gks' || path.startsWith('/gks/')) {
+    const rest = path === '/gks' ? '' : path.slice('/gks'.length)
+    return `/shop/${tenantSlug}/gks${rest}${search}`
+  }
+  if (path === '/admin/gks-kassa' || path.startsWith('/admin/gks-kassa/')) {
+    const rest = path === '/admin/gks-kassa' ? '' : path.slice('/admin/gks-kassa'.length)
+    return `/shop/${tenantSlug}/gks${rest}${search}`
+  }
   if (path === '/admin' || path.startsWith('/admin/')) {
     return `/shop/${tenantSlug}/admin${path === '/admin' ? '' : path.slice('/admin'.length)}${search}`
   }
