@@ -36,7 +36,7 @@ export function createGksRegisterUiTheme(dark: boolean): KassaRegisterUiTheme {
     productTileSolidBorder: 'border-[#1a1a1a]',
     productTileFooterBar: `border-[#1a1a1a] ${GKS_MENU_TILE_LABEL_SURFACE}`,
     sidebarBg: GKS_MENU_PLATE_BG_CLASS,
-    ringOffset: 'ring-offset-[#333336]',
+    ringOffset: 'ring-offset-[#2c2c2e]',
     tablePickerPanel: `absolute left-0 right-0 top-full mt-1 z-50 ${GKS_BTN_SHAPE} shadow-lg border border-[#1a1a1a] bg-[#333333] overflow-hidden`,
     tablePickerHeader: 'bg-[#383838] border-b border-[#1a1a1a]',
     tablePickerFooterBar: `p-2 border-t border-[#333336] ${GKS_MENU_PLATE_BG_CLASS} flex gap-2`,

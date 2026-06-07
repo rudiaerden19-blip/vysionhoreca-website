@@ -2,9 +2,15 @@
  * GKS-pilot: POS-ref — zwart-grijs, lichte verticale overgang, subtiele schaduw (niet overdreven).
  */
 
-/** Eén vlak: tegels + sidebar + header (geen kleurverschil tussen kolommen). */
-export const GKS_MENU_PLATE_BG = '#333336'
-export const GKS_MENU_PLATE_BG_CLASS = 'bg-[#333336]'
+/** Eén vlak: tegels + sidebar + header (zelfde textuur, geen kleurverschil tussen kolommen). */
+export const GKS_MENU_PLATE_BG = '#2c2c2e'
+export const GKS_MENU_PLATE_TEXTURE_PATH = '/gks/menu-plate-texture.png'
+export const GKS_MENU_PLATE_BG_CLASS = [
+  'bg-[#2c2c2e]',
+  "bg-[url('/gks/menu-plate-texture.png')]",
+  'bg-repeat',
+  'bg-[length:190px_248px]',
+].join(' ')
 
 /** Subtiel afgerond — luxe POS, geen pill. */
 export const GKS_BTN_SHAPE = 'rounded-[6px]'
