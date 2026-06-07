@@ -4179,7 +4179,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250608-revert-pill-rounded-xl"
+      data-gks-ui="20250608-order-type-spacing"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4742,7 +4742,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
 
         {/* Besteltype: drie losse knoppen (ter plaatse / afhalen / leveren) */}
-        <div className="mx-3 mt-3.5 shrink-0 space-y-2.5" data-testid="kassa-order-type-bar">
+        <div className="mx-3 mb-2 mt-1 shrink-0 space-y-2.5" data-testid="kassa-order-type-bar">
           <div className="flex gap-3.5">
             <button
               type="button"
