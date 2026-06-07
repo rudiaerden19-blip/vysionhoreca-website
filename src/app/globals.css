@@ -447,15 +447,15 @@ html[data-vysion-web-kb-open] {
   scroll-padding-bottom: var(--vysion-web-kb-height, 17rem);
 }
 
-/* GKS-pilot: subtiele filmkorrel op effen menu-plate (#333336), geen tegel-foto */
+/* GKS-pilot: scherpe filmkorrel (#333336) — fijne noise + contrast, geen matte overlay-was. */
 /* Shell + tegel-titelstrook: één korrel (fixed = zelfde fase als achtergrond). */
 .gks-menu-plate-grain {
   background-color: #333336;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.15' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.95'/%3E%3C/svg%3E");
-  background-size: 120px 120px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2.45' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='2.15 0 0 0 -0.48 0 2.15 0 0 -0.48 0 0 2.15 0 -0.48 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='80' height='80' filter='url(%23n)' opacity='0.58'/%3E%3C/svg%3E");
+  background-size: 80px 80px;
   background-repeat: repeat;
   background-attachment: fixed;
-  background-blend-mode: overlay;
+  background-blend-mode: soft-light;
 }
 
 /* ===========================================
