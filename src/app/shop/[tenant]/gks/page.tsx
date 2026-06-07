@@ -107,6 +107,7 @@ import {
 } from '@/lib/gks-kassa/gks-bar-bon-watermark'
 import { offlineOrdersQueueStorageKey } from '@/lib/gks-kassa/gks-offline-order-queue'
 import { useGksKassaOfflineFlushBridge } from '@/lib/use-gks-kassa-offline-flush-bridge'
+import { useKassaServerOnline } from '@/lib/kassa-server-online'
 import {
   gksAudioOkSessionKey,
   gksCustomerDisplaySessionKey,
@@ -798,7 +799,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     [numpadBarDate, locale],
   )
   const [soundsOn, setSoundsOn] = useState(true)
-  const [isOnline, setIsOnline] = useState<boolean | null>(null)
+  const isOnline = useKassaServerOnline(tenant)
   const flushOfflineOrdersRef = useRef<() => Promise<void>>(async () => {})
   const [langOpen, setLangOpen] = useState(false)
   const [logoutSoftwareConfirmOpen, setLogoutSoftwareConfirmOpen] = useState(false)
@@ -2133,30 +2134,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   useEffect(() => {
     setSoundsOn(getSoundsEnabled())
   }, [])
-
-  // Online status check – gecombineerd: navigator.onLine + server ping
-  useEffect(() => {
-    const check = async () => {
-      if (!navigator.onLine) { setIsOnline(false); return }
-      try {
-        const res = await fetch('/api/ping', { method: 'HEAD', cache: 'no-store' })
-        setIsOnline(res.ok)
-      } catch {
-        setIsOnline(false)
-      }
-    }
-    const goOnline = () => { setIsOnline(true); check() }
-    const goOffline = () => setIsOnline(false)
-    window.addEventListener('online', goOnline)
-    window.addEventListener('offline', goOffline)
-    check()
-    const interval = setInterval(check, 30000)
-    return () => {
-      clearInterval(interval)
-      window.removeEventListener('online', goOnline)
-      window.removeEventListener('offline', goOffline)
-    }
-  }, [tenant])
 
   // Sluit taalmenu bij tik buiten (pointerdown: betrouwbaar op Windows-touch / Edge)
   useEffect(() => {

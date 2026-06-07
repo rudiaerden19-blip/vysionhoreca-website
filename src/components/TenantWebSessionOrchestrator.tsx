@@ -2,7 +2,11 @@
 
 import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
-import { buildShopInternalReturnPath } from '@/lib/auth-headers'
+import {
+  buildShopInternalReturnPath,
+  isOwnerSessionFreshForTenant,
+  isSuperAdminLoggedIn,
+} from '@/lib/auth-headers'
 import {
   SHOP_CUSTOMER_LOGOUT_CHANNEL,
   TENANT_OWNER_LOGOUT_CHANNEL,
@@ -11,6 +15,7 @@ import {
   attemptCloseCurrentWebview,
   attemptCloseThenOrNavigate,
   clearShopCustomerSessionLocal,
+  clearTerminalLogout,
   readTerminalLogout,
   setTerminalLogout,
   type OwnerLogoutMessage,
@@ -30,6 +35,10 @@ export function TenantWebSessionOrchestrator({ tenantSlug }: { tenantSlug: strin
     if (!stamp) return
 
     if (stamp.kind === 'superadmin') {
+      if (isSuperAdminLoggedIn()) {
+        clearTerminalLogout()
+        return
+      }
       const p = pathname || ''
       if (p.startsWith('/superadmin/login')) return
       window.location.replace(`${window.location.origin}/superadmin/login`)
@@ -37,6 +46,11 @@ export function TenantWebSessionOrchestrator({ tenantSlug }: { tenantSlug: strin
     }
 
     if (stamp.tenantSlug !== tenantSlug) return
+
+    if (isSuperAdminLoggedIn() || isOwnerSessionFreshForTenant(tenantSlug)) {
+      clearTerminalLogout()
+      return
+    }
 
     const p = pathname || ''
 

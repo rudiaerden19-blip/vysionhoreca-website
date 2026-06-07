@@ -66,6 +66,7 @@ export default function LoginPage() {
 
     mirrorSuperadminSessionFromCookieToLocalStorage()
     if (isSuperAdminLoggedIn()) {
+      clearTerminalLogout()
       let nextDecoded = (nextRaw || '').trim()
       try {
         if (nextRaw) nextDecoded = decodeURIComponent(nextRaw.trim())

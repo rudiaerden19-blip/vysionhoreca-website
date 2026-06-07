@@ -1,8 +1,8 @@
 // Vysion Kassa – Service Worker
 // Offline: kassa-app + statische assets + sector-marketingpagina’s; productafbeeldingen (externe URL's)
 
-const CACHE = 'vysion-kassa-v16'
-const STATIC_CACHE = 'vysion-static-v16'
+const CACHE = 'vysion-kassa-v17'
+const STATIC_CACHE = 'vysion-static-v17'
 const IMAGE_CACHE = 'vysion-images-v4'
 
 /** Eerste install: marketing-sectoren + start zodat PWA na één online bezoek ook zonder net start. */
@@ -173,11 +173,11 @@ self.addEventListener('fetch', event => {
     return
   }
 
-  /** Zaak-admin HTML: niet uit Cache Storage — oude bundles → fout gedrag bij Opslaan (INSERT-loop).
-   *  `/shop/:tenant/admin` heeft géén `/admin/` substring (geen slash ná admin); wel expliciet matchen. */
+  /** Zaak-admin + GKS-pilot HTML: niet uit Cache Storage — oude bundles / offline-shell → flikker + hydration. */
   const p = url.pathname
   const isTenantShopAdmin = /\/shop\/[^/]+\/admin(?:\/|$)/.test(p)
-  if (isTenantShopAdmin || p.includes('/admin/')) {
+  const isGksPilotPos = /\/shop\/[^/]+\/gks(?:\/|$)/.test(p)
+  if (isTenantShopAdmin || isGksPilotPos || p.includes('/admin/')) {
     event.respondWith(fetch(request, { cache: 'no-store' }))
     return
   }
