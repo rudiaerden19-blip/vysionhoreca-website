@@ -372,6 +372,13 @@ function kassaOrderTypeButtonTouchClass(sxga: boolean): string {
   return sxga ? 'min-h-[3.25rem] py-2.5' : 'min-h-[3rem] py-2.5'
 }
 
+/** GKS sidebar: één blauw (#0056d6) voor zone-, type- en afreken-knoppen. */
+function gksSidebarBlueButtonClass(selected: boolean): string {
+  return `bg-[#0056d6] text-white hover:bg-[#004bb8] ${
+    selected ? 'ring-2 ring-white/45 ring-inset' : 'opacity-95'
+  }`
+}
+
 /** Sidebar-footer: touch-vriendelijke hoogte (Lade / Bon / Numpad). */
 function kassaFooterActionTouchMinHClass(sxga: boolean, denseBill: boolean): string {
   if (sxga) return 'min-h-[4.75rem] py-2.5'
@@ -4620,11 +4627,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 }}
                 className={`flex flex-1 flex-col items-center justify-center rounded-xl px-3 font-bold transition-colors ${kassaFloorZoneButtonTouchClass(
                   kassaSxgaDenseTiles,
-                )} ${
-                  pickerBrowseZone === FLOOR_PLAN_ZONE_INSIDE && showTablePicker
-                    ? 'bg-[#0056d6] text-white ring-2 ring-white/45 ring-inset'
-                    : 'bg-[#0056d6] text-white hover:bg-[#004bb8]'
-                }`}
+                )} ${gksSidebarBlueButtonClass(
+                  pickerBrowseZone === FLOOR_PLAN_ZONE_INSIDE && showTablePicker,
+                )}`}
               >
                 <span className="font-bold">{t('kassaApp.floorZoneInside')}</span>
                 {orderType === 'DINE_IN' && tableNumber && dineInFloorZone === FLOOR_PLAN_ZONE_INSIDE ? (
@@ -4648,11 +4653,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 }}
                 className={`flex flex-1 flex-col items-center justify-center rounded-xl px-3 font-bold transition-colors ${kassaFloorZoneButtonTouchClass(
                   kassaSxgaDenseTiles,
-                )} ${
-                  pickerBrowseZone === FLOOR_PLAN_ZONE_TERRACE && showTablePicker
-                    ? 'bg-[#0056d6] text-white ring-2 ring-white/45 ring-inset'
-                    : 'bg-[#0056d6] text-white hover:bg-[#004bb8]'
-                }`}
+                )} ${gksSidebarBlueButtonClass(
+                  pickerBrowseZone === FLOOR_PLAN_ZONE_TERRACE && showTablePicker,
+                )}`}
               >
                 <span className="font-bold">{t('kassaApp.floorZoneTerrace')}</span>
                 {orderType === 'DINE_IN' && tableNumber && dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE ? (
@@ -4675,11 +4678,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               onClick={() => selectOrderType('DINE_IN')}
               className={`flex min-w-0 flex-1 flex-col items-center justify-center rounded-xl px-2 text-center shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 ${kassaOrderTypeButtonTouchClass(
                 kassaSxgaDenseTiles,
-              )} ${
-                orderType === 'DINE_IN'
-                  ? 'bg-[#0056d6] text-white hover:bg-[#004bb8]'
-                  : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
-              }`}
+              )} ${gksSidebarBlueButtonClass(orderType === 'DINE_IN')}`}
             >
               <span className="text-center text-sm font-bold leading-tight">
                 {t('kassaApp.orderTypeDineIn')}
@@ -4699,9 +4698,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               onClick={() => selectOrderType('TAKEAWAY')}
               className={`flex min-w-0 flex-1 flex-col items-center justify-center rounded-xl px-2 text-center shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 ${kassaOrderTypeButtonTouchClass(
                 kassaSxgaDenseTiles,
-              )} bg-yellow-400 text-yellow-950 hover:bg-yellow-300 ${
-                orderType === 'TAKEAWAY' ? 'ring-2 ring-yellow-700/50 ring-inset' : 'opacity-95'
-              }`}
+              )} ${gksSidebarBlueButtonClass(orderType === 'TAKEAWAY')}`}
             >
               <span className="text-center text-sm font-bold leading-tight">
                 {t('kassaApp.orderTypeTakeaway')}
@@ -4713,11 +4710,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               onClick={() => selectOrderType('DELIVERY')}
               className={`flex min-w-0 flex-1 flex-col items-center justify-center rounded-xl px-2 text-center shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 ${kassaOrderTypeButtonTouchClass(
                 kassaSxgaDenseTiles,
-              )} ${
-                orderType === 'DELIVERY'
-                  ? 'bg-[#0056d6] text-white hover:bg-[#004bb8]'
-                  : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
-              }`}
+              )} ${gksSidebarBlueButtonClass(orderType === 'DELIVERY')}`}
             >
               <span className="text-center text-sm font-bold leading-tight">
                 {t('kassaApp.orderTypeDelivery')}
@@ -5100,7 +5093,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 setShowPaymentModal(true)
               }}
               disabled={billLines.length === 0 || gksFiscalBlocked}
-              className={`flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 font-bold text-white shadow-sm hover:bg-emerald-700 active:brightness-95 disabled:cursor-not-allowed disabled:pointer-events-none disabled:hover:bg-emerald-600 ${
+              className={`flex w-full items-center justify-center gap-2 rounded-xl bg-[#0056d6] font-bold text-white shadow-sm hover:bg-[#004bb8] active:brightness-95 disabled:cursor-not-allowed disabled:pointer-events-none disabled:hover:bg-[#0056d6] ${
                 kassaSxgaDenseTiles
                   ? 'min-h-[4rem] py-3.5 text-xl'
                   : 'min-h-[3.5rem] py-3 text-lg'
