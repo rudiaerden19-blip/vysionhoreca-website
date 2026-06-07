@@ -200,7 +200,13 @@ export interface TenantSettings {
   report_register_opening_cash?: number
 }
 
-export async function getTenantSettings(tenantSlug: string, signal?: AbortSignal): Promise<TenantSettings | null> {
+export type GetTenantSettingsOptions = { bypassCache?: boolean }
+
+export async function getTenantSettings(
+  tenantSlug: string,
+  signal?: AbortSignal,
+  opts?: GetTenantSettingsOptions
+): Promise<TenantSettings | null> {
   const fetchTenantSettings = async (): Promise<TenantSettings | null> => {
     const base = supabase
       .from('tenant_settings')
@@ -224,8 +230,11 @@ export async function getTenantSettings(tenantSlug: string, signal?: AbortSignal
     return data
   }
 
-  // Publieke demo: geen in-memory cache — uurlijkse reset moet meteen zichtbaar zijn
-  if (isPublicDemoTenantSlug(tenantSlug)) {
+  // Publieke demo / admin tenant-gate: geen stale in-memory cache
+  if (isPublicDemoTenantSlug(tenantSlug) || opts?.bypassCache) {
+    if (opts?.bypassCache) {
+      cache.invalidate(cacheKey('tenant_settings', tenantSlug))
+    }
     return fetchTenantSettings()
   }
 

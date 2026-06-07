@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useLanguage } from '@/i18n'
 import { getTenantSettings } from '@/lib/admin-api'
-import { cache, cacheKey } from '@/lib/cache'
 import {
   adminPathToModule,
   allTenantModulesTrue,
@@ -14,6 +13,7 @@ import {
   hasModuleAccessForPathname,
   isShopAdminKassaPosPath,
   normalizeShopAdminPathname,
+  resolveShopTenantSlug,
   submenuParentAllowedForSubmenuId,
   type TenantModuleId,
 } from '@/lib/tenant-modules'
@@ -55,7 +55,8 @@ const LOCK_PAGES = ['categorieen']
 
 export default function AdminLayout({ children, params }: AdminLayoutProps) {
   const pathname = usePathname()
-  const adminPath = normalizeShopAdminPathname(pathname, params.tenant)
+  const tenantSlug = resolveShopTenantSlug(pathname, params.tenant)
+  const adminPath = normalizeShopAdminPathname(pathname, tenantSlug)
   const router = useRouter()
   const { t } = useLanguage()
   const [tenantExists, setTenantExists] = useState<boolean | null>(null)
@@ -93,28 +94,40 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
 
   useEffect(() => {
     let stale = false
+    const slug = resolveShopTenantSlug(pathname, params.tenant)
+
     async function checkTenant() {
       setLoading(true)
       setTenantExists(null)
-      const slug = params.tenant
+      if (!slug) {
+        setTenantExists(false)
+        setLoading(false)
+        return
+      }
       const fromSlug = slug
         .split('-')
         .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
         .join(' ')
       setAdminHeaderTitle(fromSlug)
-      cache.invalidate(cacheKey('tenant_settings', slug))
-      const fetched = await getTenantSettings(slug)
-      if (stale) return
-      setTenantExists(fetched !== null)
-      const bn = fetched?.business_name?.trim()
-      setAdminHeaderTitle(bn || fromSlug)
-      setLoading(false)
+      try {
+        const fetched = await getTenantSettings(slug, undefined, { bypassCache: true })
+        if (stale) return
+        setTenantExists(fetched !== null)
+        const bn = fetched?.business_name?.trim()
+        setAdminHeaderTitle(bn || fromSlug)
+      } catch (err) {
+        if (stale) return
+        console.error('[AdminLayout] checkTenant failed', err)
+        setTenantExists(false)
+      } finally {
+        if (!stale) setLoading(false)
+      }
     }
     checkTenant()
     return () => {
       stale = true
     }
-  }, [params.tenant])
+  }, [pathname, params.tenant])
 
   useEffect(() => {
     setAdminAccess('pending')

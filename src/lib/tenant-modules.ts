@@ -256,6 +256,18 @@ export function isKassaPosScreenEnabled(
  * Op tenant-subdomein (voorbeeld frituurnolim.ordervysion.com) toont de browser-URL `/admin/...`;
  * intern is de route `/shop/:tenant/admin/...`. Alle admin-guards gebruiken deze normalisatie.
  */
+/** Slug uit `/shop/:tenant/...` in de adresbalk (betrouwbaarder dan `params` bij sommige client-layouts). */
+export function tenantSlugFromShopPathname(pathname: string): string | null {
+  const m = pathname.split('?')[0].match(/^\/shop\/([^/]+)/)
+  return m?.[1]?.trim() || null
+}
+
+export function resolveShopTenantSlug(pathname: string, paramsTenant: string): string {
+  const fromPath = tenantSlugFromShopPathname(pathname)
+  const fromParams = (paramsTenant || '').trim()
+  return fromPath || fromParams
+}
+
 export function normalizeShopAdminPathname(pathname: string, tenantSlug: string): string {
   const base = `/shop/${tenantSlug}/admin`
   if (pathname.startsWith(base)) return pathname
