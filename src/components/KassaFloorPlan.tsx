@@ -1732,9 +1732,13 @@ export default function KassaFloorPlan({
           </div>
         ))}
         {isLocked ? (
-          <span className="text-orange-700/90 ml-4 text-xs">{t('kassaApp.floorPlanLegendLocked')}</span>
+          <span className={`ml-4 text-xs ${isGksUi ? 'text-[#f0f0f0]' : 'text-orange-700/90'}`}>
+            {t('kassaApp.floorPlanLegendLocked')}
+          </span>
         ) : (
-          <span className="text-orange-700/90 ml-4 text-xs">{t('kassaApp.floorPlanLegendEditMode')}</span>
+          <span className={`ml-4 text-xs ${isGksUi ? 'text-[#f0f0f0]' : 'text-orange-700/90'}`}>
+            {t('kassaApp.floorPlanLegendEditMode')}
+          </span>
         )}
       </div>
       </div>
