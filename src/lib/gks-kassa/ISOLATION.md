@@ -4,13 +4,13 @@ Deploy naar GitHub / Vercel / Supabase: zie [`docs/gks/DEPLOYMENT-MAP.md`](../..
 
 ## Doel
 
-Pilot/certificatie onder `/shop/[tenant]/admin/gks-kassa` mag **geen** productie-POS-data wijzigen.
+Pilot/certificatie onder `/shop/[tenant]/gks` (legacy `/admin/gks-kassa` → redirect) mag **geen** productie-POS-data wijzigen.
 
 ## Code
 
 | Productie | GKS |
 |-----------|-----|
-| `admin/kassa/page.tsx` | `admin/gks-kassa/page.tsx` (fork) |
+| `admin/kassa/page.tsx` | `gks/page.tsx` (fork, buiten `/admin`) |
 | `orders` | `gks_commercial_orders` via `/api/gks-kassa/commercial-orders` |
 | `kassa-z-sync-safe` → `z_reports` | `gks-kassa/z-sync-safe` (no-op) |
 | `vysion-kassa-offline` IDB | `vysion-gks-kassa-offline` |
@@ -24,7 +24,7 @@ Pilot/certificatie onder `/shop/[tenant]/admin/gks-kassa` mag **geen** productie
 - Print agent (`sendToVysionPrintAgent`) — lokaal per zaak.
 - Webshop-order **alarm** uitgeschakeld (geen poll op productie `orders.status=new`).
 - Geen fullscreen «Activeer geluid»-gate: audio ontgrendelt op eerste tik op de POS (zelfde sessie-key `gks_kassa_audio_ok_*`).
-- **Admin shell:** `/admin/gks-kassa` gebruikt `GksPilotLayoutGate` — niet de gedeelde `AdminLayout` (tenant gate / herhaalde auth).
+- **Route:** `/shop/{tenant}/gks` — geen `AdminLayout` (alleen shop-layout + `GksPilotLayoutGate`).
 
 ## Check vóór deploy
 

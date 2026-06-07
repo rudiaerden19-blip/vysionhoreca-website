@@ -185,6 +185,13 @@ export async function middleware(request: NextRequest) {
     const saMain = redirectSuperadminPastLoginOnMainHost(request, url, pathname)
     if (saMain) return saMain
 
+    const legacyGks = pathname.match(/^\/shop\/([^/]+)\/admin\/gks-kassa\/?$/)
+    if (legacyGks) {
+      const redir = request.nextUrl.clone()
+      redir.pathname = `/shop/${legacyGks[1]}/gks`
+      return NextResponse.redirect(redir)
+    }
+
     /** /shop/tenant/kiosk1 → menu (zonder ? in de URL). */
     const kioskPathMatch = pathname.match(/^\/shop\/([^/]+)\/kiosk1\/?$/)
     if (kioskPathMatch) {
@@ -241,6 +248,12 @@ export async function middleware(request: NextRequest) {
 
   if (isTenantPublicStaticBypass(pathname)) {
     return NextResponse.next()
+  }
+
+  if (pathname === '/admin/gks-kassa' || pathname === '/admin/gks-kassa/') {
+    const redir = request.nextUrl.clone()
+    redir.pathname = '/gks'
+    return NextResponse.redirect(redir)
   }
 
   /** tenant.domein/kiosk1 → menu, URL blijft /kiosk1 */

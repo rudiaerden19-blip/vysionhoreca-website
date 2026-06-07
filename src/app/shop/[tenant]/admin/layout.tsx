@@ -55,23 +55,6 @@ interface AdminLayoutProps {
 const LOCK_PAGES = ['categorieen']
 
 export default function AdminLayout({ children, params }: AdminLayoutProps) {
-  const pathname = usePathname()
-  const routeParams = useParams()
-  const routeTenantEarly =
-    typeof routeParams?.tenant === 'string'
-      ? routeParams.tenant
-      : Array.isArray(routeParams?.tenant)
-        ? routeParams.tenant[0] ?? ''
-        : ''
-  const tenantSlugEarly = resolveShopTenantSlug(pathname, routeTenantEarly || params.tenant)
-  const adminPathEarly = normalizeShopAdminPathname(pathname, tenantSlugEarly)
-  if (
-    Boolean(tenantSlugEarly) &&
-    isShopAdminGksKassaPosPath(adminPathEarly, tenantSlugEarly)
-  ) {
-    return <>{children}</>
-  }
-
   return <ShopAdminLayoutInner params={params}>{children}</ShopAdminLayoutInner>
 }
 

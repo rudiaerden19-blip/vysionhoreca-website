@@ -285,11 +285,17 @@ export function isShopAdminKassaPosPath(pathnameNormalized: string, tenantSlug: 
   return p === base
 }
 
-/** GKS-certificatie-POS `/shop/:slug/admin/gks-kassa` — eigen route, geen productie-kassa. */
-export function isShopAdminGksKassaPosPath(pathnameNormalized: string, tenantSlug: string): boolean {
-  const base = `/shop/${tenantSlug}/admin/gks-kassa`
+/** GKS-pilot POS `/shop/:slug/gks` (legacy `/admin/gks-kassa` redirect in middleware). */
+export function isShopGksPilotPosPath(pathnameNormalized: string, tenantSlug: string): boolean {
   const p = pathnameNormalized.split('?')[0].replace(/\/+$/, '')
-  return p === base
+  const pilot = `/shop/${tenantSlug}/gks`
+  const legacy = `/shop/${tenantSlug}/admin/gks-kassa`
+  return p === pilot || p === legacy
+}
+
+/** @deprecated Gebruik isShopGksPilotPosPath */
+export function isShopAdminGksKassaPosPath(pathnameNormalized: string, tenantSlug: string): boolean {
+  return isShopGksPilotPosPath(pathnameNormalized, tenantSlug)
 }
 
 /**
