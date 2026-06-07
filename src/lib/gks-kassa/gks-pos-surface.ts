@@ -24,13 +24,17 @@ const GKS_BTN_FACE =
 const GKS_BTN_FACE_SELECTED =
   'bg-[linear-gradient(180deg,#1e1e1e_0%,#3a3a3a_46%,#242424_100%)]'
 
-/** Subtiele diepte achter knoppen (dubbele zachte drop shadow). */
+/** Diepte achter knoppen. */
 export const GKS_SUBTLE_LIFT_SHADOW =
-  'shadow-[0_2px_4px_rgba(0,0,0,0.42),0_5px_12px_rgba(0,0,0,0.28)]'
+  'shadow-[0_3px_6px_rgba(0,0,0,0.5),0_8px_18px_rgba(0,0,0,0.34)]'
 
-/** Subtiele diepte achter menu-tegels — iets ruimer dan knoppen. */
+/** Diepte achter menu-tegels — iets ruimer dan knoppen. */
 export const GKS_TILE_LIFT_SHADOW =
-  'shadow-[0_3px_6px_rgba(0,0,0,0.45),0_8px_18px_rgba(0,0,0,0.22)]'
+  'shadow-[0_4px_8px_rgba(0,0,0,0.52),0_10px_24px_rgba(0,0,0,0.3)]'
+
+/** Afrekenen: grijs vlak + blauwe gloed (geen blauwe fill). */
+export const GKS_CHECKOUT_BLUE_SHADOW =
+  'shadow-[0_3px_6px_rgba(0,0,0,0.45),0_8px_16px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,86,214,0.42)]'
 
 const GKS_BTN_EDGE = `border border-[#2a2a2a] ${GKS_SUBTLE_LIFT_SHADOW}`
 
@@ -72,8 +76,20 @@ export const GKS_POS_BTN_SELECTED = [
   'text-white',
 ].join(' ')
 
+/** Footer Afrekenen — zelfde grijs als andere knoppen, blauwe schaduw. */
+export const GKS_CHECKOUT_BTN = [
+  GKS_BTN_SHAPE,
+  GKS_BTN_FACE,
+  'border border-[#2a2a2a]',
+  GKS_CHECKOUT_BLUE_SHADOW,
+  GKS_BTN_PRESS,
+  GKS_BTN_PRESS_FACE,
+  GKS_BTN_DISABLED_SAME_LOOK,
+  'text-[#f0f0f0] disabled:text-[#f0f0f0]',
+].join(' ')
+
 /**
- * Primaire actie (Afrekenen) — POS-ref “Kassa”: cyan boven → koningsblauw onder.
+ * Accent (actieve categorie-tab, bevestigingen) — cyan → koningsblauw.
  */
 export const GKS_ACCENT_BTN = [
   GKS_BTN_SHAPE,

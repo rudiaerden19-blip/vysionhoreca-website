@@ -78,6 +78,7 @@ import type { KassaRegisterUiTheme } from '@/lib/kassa-register-ui-theme'
 import { createGksRegisterUiTheme } from '@/lib/gks-kassa/gks-register-ui-theme'
 import {
   GKS_ACCENT_BTN,
+  GKS_CHECKOUT_BTN,
   GKS_BTN_SHAPE,
   GKS_MENU_PLATE_BG_CLASS,
   GKS_MENU_TILE_LABEL_SURFACE,
@@ -4146,7 +4147,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250607-header-quicklinks-gap"
+      data-gks-ui="20250607-checkout-grey-blue-glow"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -5084,7 +5085,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 setShowPaymentModal(true)
               }}
               disabled={billLines.length === 0 || gksFiscalBlocked}
-              className={`flex w-full items-center justify-center text-white disabled:cursor-not-allowed disabled:pointer-events-none ${GKS_ACCENT_BTN} ${
+              className={`flex w-full items-center justify-center disabled:cursor-not-allowed disabled:pointer-events-none ${GKS_CHECKOUT_BTN} ${
                 kassaSxgaDenseTiles
                   ? 'min-h-[4rem] py-3.5 text-xl'
                   : 'min-h-[3.5rem] py-3 text-lg'
