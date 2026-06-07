@@ -117,7 +117,7 @@ export function StaffClockPinPortal({
             value={pinValue}
             onChange={(e) => onPinChange(e.target.value.replace(/\D/g, '').slice(0, STAFF_PIN_MAX_LEN))}
             placeholder={placeholder}
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 text-lg font-mono tracking-widest text-gray-900"
+            className="w-full bg-white px-4 py-3 rounded-xl border border-gray-300 text-lg font-mono tracking-widest text-gray-900 placeholder:text-gray-500 caret-gray-900"
             aria-invalid={pinError ? true : undefined}
             aria-describedby={pinError ? `${titleId}-error` : undefined}
           />

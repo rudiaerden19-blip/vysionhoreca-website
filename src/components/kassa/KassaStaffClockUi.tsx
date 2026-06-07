@@ -220,6 +220,70 @@ export function KassaStaffSalesSummaryModal({
   )
 }
 
+/** GKS / kassa: kies ingeklokte medewerker voor verkoop — geen PIN. */
+export function KassaStaffSalesPickModal({
+  open,
+  staffList,
+  busy,
+  onClose,
+  onPick,
+}: {
+  open: boolean
+  staffList: KassaStaffClockRow[]
+  busy: boolean
+  onClose: () => void
+  onPick: (row: KassaStaffClockRow) => void
+}) {
+  const { t } = useLanguage()
+  const clockedIn = staffList.filter((s) => s.hasOpenSession)
+  if (!open) return null
+
+  return (
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 p-4">
+      <div
+        className="flex w-full max-w-md max-h-[85vh] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="kassa-staff-sales-pick-title"
+      >
+        <div className="border-b border-gray-100 px-5 py-4">
+          <h2 id="kassa-staff-sales-pick-title" className="text-xl font-bold text-gray-900">
+            {t('staffClock.salesPickTitle')}
+          </h2>
+          <p className="mt-1 text-sm text-gray-600">{t('staffClock.salesPickIntro')}</p>
+        </div>
+        <div className="flex-1 overflow-y-auto p-4 space-y-2">
+          {clockedIn.length === 0 ? (
+            <p className="py-8 text-center text-sm text-gray-500">{t('staffClock.salesPickNone')}</p>
+          ) : (
+            clockedIn.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                disabled={busy}
+                onClick={() => onPick(s)}
+                className="w-full min-h-[52px] rounded-xl border-2 border-emerald-200 bg-emerald-50 px-4 py-3 text-left text-lg font-bold text-gray-900 hover:bg-emerald-100 disabled:opacity-50"
+              >
+                {s.name}
+              </button>
+            ))
+          )}
+        </div>
+        <div className="border-t border-gray-100 p-4">
+          <button
+            type="button"
+            disabled={busy}
+            onClick={onClose}
+            className="w-full min-h-[44px] rounded-xl bg-gray-100 font-semibold text-gray-700 hover:bg-gray-200"
+          >
+            {t('staffClock.cancel')}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function KassaProductStaffGatePopup({ open, onDismiss }: { open: boolean; onDismiss: () => void }) {
   const { t } = useLanguage()
   if (!open) return null

@@ -136,6 +136,7 @@ import { KassaProductOptionsModal } from '@/components/kassa/KassaProductOptions
 import {
   KassaProductStaffGatePopup,
   KassaStaffClockModal,
+  KassaStaffSalesPickModal,
   KassaStaffSalesSummaryModal,
 } from '@/components/kassa/KassaStaffClockUi'
 import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
@@ -1956,6 +1957,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   /** Verhoog bij annuleren/sluiten zodat late API-antwoorden geen state meer zetten (busy blijft niet hangen). */
   const staffClockPinReqGen = useRef(0)
   const [activeKassaStaff, setActiveKassaStaff] = useState<GksActiveStaff | null>(null)
+  const [staffSalesPickOpen, setStaffSalesPickOpen] = useState(false)
 
   // Opties modal (editingCartKey = bestaande winkelmandregel aanpassen)
   const [optionsModal, setOptionsModal] = useState<{
@@ -3659,7 +3661,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           data.staff.map((s) => ({
             id: s.id,
             name: s.name,
-            hasOpenSession: GKS_MANDATORY_STAFF_SESSION ? Boolean(s.hasInsz) : Boolean(s.hasOpenSession),
+            hasOpenSession: Boolean(s.hasOpenSession),
           })),
         )
       } else if (!background) setStaffClockList([])
@@ -3708,22 +3710,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setStaffClockBusy(true)
     setStaffClockPinError(null)
     try {
-      const res = await authFetch(
-        GKS_MANDATORY_STAFF_SESSION && modal.action === 'in'
-          ? '/api/gks-kassa/staff'
-          : '/api/kassa/staff-clock',
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            tenant_slug: tenant,
-            staff_id: modal.staffId,
-            pin,
-            ...(GKS_MANDATORY_STAFF_SESSION && modal.action === 'in'
-              ? {}
-              : { action: modal.action }),
-          }),
-        },
-      )
+      const res = await authFetch('/api/kassa/staff-clock', {
+        method: 'POST',
+        body: JSON.stringify({
+          tenant_slug: tenant,
+          staff_id: modal.staffId,
+          pin,
+          action: modal.action,
+        }),
+      })
       let data: {
         ok?: boolean
         error?: string
@@ -3743,14 +3738,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         playSuccess()
         setStaffClockPinModal(null)
         setStaffClockPinInput('')
-        if (GKS_MANDATORY_STAFF_SESSION && modal.action === 'in' && data.staff?.insz) {
-          setActiveKassaStaff({
-            id: data.staff.id,
-            name: data.staff.name,
-            insz: data.staff.insz,
-          })
-          setStaffClockOpen(false)
-        }
         if (modal.action === 'out' && activeKassaStaff?.id === modal.staffId) {
           setActiveKassaStaff(null)
         }
@@ -3777,24 +3764,65 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
   }
 
-  const startStaffSales = (s: { id: string; name: string }) => {
-    if (GKS_MANDATORY_STAFF_SESSION) {
-      setStaffClockPinModal({ staffId: s.id, staffName: s.name, action: 'in' })
-      return
-    }
-    flushSync(() => {
-      staffClockPinReqGen.current += 1
-      setStaffClockBusy(false)
-      setActiveKassaStaff({ id: s.id, name: s.name, insz: '' })
-      setStaffClockOpen(false)
-      setStaffClockPinModal(null)
-      setStaffClockPinInput('')
-      setStaffClockPinError(null)
-    })
+  const startStaffSales = () => {
+    playClick()
+    setStaffSalesPickOpen(true)
+  }
+
+  const confirmStaffSalesPick = async (s: { id: string; name: string }) => {
+    const reqGen = ++staffClockPinReqGen.current
+    setStaffClockBusy(true)
     try {
-      playSuccess()
+      const res = await authFetch('/api/gks-kassa/staff', {
+        method: 'POST',
+        body: JSON.stringify({
+          tenant_slug: tenant,
+          staff_id: s.id,
+          action: 'sales_pick',
+        }),
+      })
+      let data: {
+        ok?: boolean
+        error?: string
+        staff?: { id: string; name: string; insz: string }
+      }
+      try {
+        data = (await res.json()) as typeof data
+      } catch {
+        if (staffClockPinReqGen.current !== reqGen) return
+        alert(staffClockErrorText('server'))
+        return
+      }
+      if (staffClockPinReqGen.current !== reqGen) return
+      if (!data.ok || !data.staff?.insz) {
+        playClick()
+        alert(staffClockErrorText(data.error || 'unknown'))
+        return
+      }
+      flushSync(() => {
+        setActiveKassaStaff({
+          id: data.staff!.id,
+          name: data.staff!.name,
+          insz: data.staff!.insz,
+        })
+        setStaffSalesPickOpen(false)
+        setStaffClockOpen(false)
+        setStaffClockPinModal(null)
+        setStaffClockPinInput('')
+        setStaffClockPinError(null)
+      })
+      try {
+        playSuccess()
+      } catch {
+        /* optional */
+      }
     } catch {
-      /* geluid optioneel — modal moet altijd dicht */
+      if (staffClockPinReqGen.current !== reqGen) return
+      alert(staffClockErrorText('server'))
+    } finally {
+      if (staffClockPinReqGen.current === reqGen) {
+        setStaffClockBusy(false)
+      }
     }
   }
 
@@ -4949,7 +4977,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           setStaffClockPinInput('')
           setStaffClockPinError(null)
         }}
-        onSales={(s) => startStaffSales(s)}
+        onSales={() => startStaffSales()}
         onPinCancel={() => {
           playClick()
           staffClockPinReqGen.current += 1
@@ -4959,6 +4987,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           setStaffClockPinError(null)
         }}
         onPinConfirm={() => void submitStaffClockPin()}
+      />
+
+      <KassaStaffSalesPickModal
+        open={staffSalesPickOpen}
+        staffList={staffClockList}
+        busy={staffClockBusy}
+        onClose={() => {
+          playClick()
+          setStaffSalesPickOpen(false)
+        }}
+        onPick={(s) => void confirmStaffSalesPick(s)}
       />
 
       {staffClockSummary ? (

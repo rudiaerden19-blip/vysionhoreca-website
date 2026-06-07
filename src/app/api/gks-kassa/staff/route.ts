@@ -27,25 +27,41 @@ export async function GET(req: NextRequest) {
   if (!supabase) {
     return NextResponse.json({ ok: false, error: 'server_config' }, { status: 500 })
   }
-  const { data, error } = await supabase
-    .from('staff')
-    .select('id, name, pin, insz')
-    .eq('tenant_slug', tenant_slug)
-    .eq('is_active', true)
-    .order('name', { ascending: true })
+  const [{ data, error }, sessionsResult] = await Promise.all([
+    supabase
+      .from('staff')
+      .select('id, name, pin, insz')
+      .eq('tenant_slug', tenant_slug)
+      .eq('is_active', true)
+      .order('name', { ascending: true }),
+    supabase
+      .from('staff_clock_sessions')
+      .select('staff_id')
+      .eq('tenant_slug', tenant_slug)
+      .is('clock_out_at', null),
+  ])
   if (error) {
     console.error('gks-kassa staff GET', error)
     return NextResponse.json({ ok: false, error: 'server' }, { status: 500 })
   }
+  const openSet = new Set(
+    (sessionsResult.data || []).map((r) => r.staff_id as string).filter(Boolean),
+  )
   const staff = (data || []).map((s) => ({
     id: s.id as string,
     name: s.name as string,
     hasInsz: Boolean(normalizeInsz(s.insz as string | null)),
+    hasOpenSession: openSet.has(s.id as string),
   }))
   return NextResponse.json({ ok: true, staff })
 }
 
-type PostBody = { tenant_slug?: string; staff_id?: string; pin?: string }
+type PostBody = {
+  tenant_slug?: string
+  staff_id?: string
+  pin?: string
+  action?: 'verify_pin' | 'sales_pick'
+}
 
 export async function POST(req: NextRequest) {
   let body: PostBody
@@ -56,8 +72,12 @@ export async function POST(req: NextRequest) {
   }
   const tenant_slug = body.tenant_slug?.trim()
   const staff_id = body.staff_id?.trim()
+  const action = body.action === 'sales_pick' ? 'sales_pick' : 'verify_pin'
   const pin = body.pin?.trim()
-  if (!tenant_slug || !staff_id || !pin) {
+  if (!tenant_slug || !staff_id) {
+    return NextResponse.json({ ok: false, error: 'bad_request' }, { status: 400 })
+  }
+  if (action === 'verify_pin' && !pin) {
     return NextResponse.json({ ok: false, error: 'bad_request' }, { status: 400 })
   }
   const access = await verifyTenantOrSuperAdmin(req, tenant_slug)
@@ -77,7 +97,22 @@ export async function POST(req: NextRequest) {
   if (error || !row || !row.is_active) {
     return NextResponse.json({ ok: false, error: 'staff_not_found' }, { status: 404 })
   }
-  if (String(row.pin).trim() !== pin) {
+  if (action === 'sales_pick') {
+    const { data: openSess, error: sessErr } = await supabase
+      .from('staff_clock_sessions')
+      .select('id')
+      .eq('tenant_slug', tenant_slug)
+      .eq('staff_id', staff_id)
+      .is('clock_out_at', null)
+      .maybeSingle()
+    if (sessErr) {
+      console.error('gks-kassa staff sales_pick session', sessErr)
+      return NextResponse.json({ ok: false, error: 'server' }, { status: 500 })
+    }
+    if (!openSess) {
+      return NextResponse.json({ ok: false, error: 'not_clocked_in' }, { status: 403 })
+    }
+  } else if (String(row.pin).trim() !== pin) {
     return NextResponse.json({ ok: false, error: 'bad_pin' }, { status: 401 })
   }
   const insz = normalizeInsz(row.insz as string | null)
