@@ -566,14 +566,6 @@ const KassaReservationsView = dynamic(() => import('@/components/KassaReservatio
 const KASSA_MENU_TILE_BUTTON_CLASS_BASE =
   `touch-manipulation select-none group relative flex min-h-0 w-full min-w-0 flex-col overflow-hidden ${GKS_BTN_SHAPE} border border-[#1a1a1a] bg-transparent text-left !font-medium ${GKS_TILE_PRESS} ${GKS_TILE_LIFT_SHADOW}`
 
-/** Categorie ↔ producten: luxe slide i.p.v. harde swap. */
-const GKS_MENU_VIEW_SLIDE = {
-  initial: { opacity: 0, x: 36 },
-  animate: { opacity: 1, x: 0 },
-  exit: { opacity: 0, x: -36 },
-  transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const },
-}
-
 const GKS_CATEGORY_STRIP_REVEAL = {
   initial: { opacity: 0, y: -10 },
   animate: { opacity: 1, y: 0 },
@@ -4179,7 +4171,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250608-grain-rough"
+      data-gks-ui="20250608-menu-tiles-no-slide"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4582,13 +4574,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               kassaAppearanceDark ? GKS_MENU_PLATE_TRANSPARENT_CLASS : ''
             }`}
           >
-            <AnimatePresence mode="wait" initial={false}>
             {!selectedCategory ? (
-              <motion.div
-                key="kassa-menu-categories"
-                className="min-h-0 w-full"
-                {...GKS_MENU_VIEW_SLIDE}
-              >
+              <div key="kassa-menu-categories" className="min-h-0 w-full">
               {/* Categorieën: responsief raster; rijhoogte vult viewport; gap-4 = KASSA_MENU_GRID_GAP_PX */}
               {categories.length === 0 ? (
                 <div className={`flex flex-col items-center justify-center h-full ${ui.menuEmptyMuted}`}>
@@ -4625,12 +4612,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   })}
                 </div>
               )}
-              </motion.div>
+              </div>
             ) : (
-              <motion.div
+              <div
                 key={`kassa-menu-products-${selectedCategory.id ?? selectedCategory.name}`}
                 className="min-h-0 w-full"
-                {...GKS_MENU_VIEW_SLIDE}
               >
               {productsInSelectedCategory.length === 0 ? (
                   <div className={`flex flex-col items-center justify-center h-full ${ui.menuEmptyMuted}`}>
@@ -4670,9 +4656,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     })}
                   </div>
                 )}
-              </motion.div>
+              </div>
             )}
-            </AnimatePresence>
           </div>
         </div>
 
