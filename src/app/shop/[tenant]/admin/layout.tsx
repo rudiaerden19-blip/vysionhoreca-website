@@ -4,7 +4,7 @@ import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useLanguage } from '@/i18n'
-import { getTenantSettings } from '@/lib/admin-api'
+import { getTenantSettings, type TenantSettings } from '@/lib/admin-api'
 import {
   adminPathToModule,
   allTenantModulesTrue,
@@ -58,6 +58,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   const router = useRouter()
   const { t } = useLanguage()
   const [tenantExists, setTenantExists] = useState<boolean | null>(null)
+  const [tenantData, setTenantData] = useState<TenantSettings | null | undefined>(undefined)
   const [adminHeaderTitle, setAdminHeaderTitle] = useState(() =>
     params.tenant
       .split('-')
@@ -93,14 +94,16 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   useEffect(() => {
     async function checkTenant() {
       setLoading(true)
+      setTenantData(undefined)
       const fromSlug = params.tenant
         .split('-')
         .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
         .join(' ')
       setAdminHeaderTitle(fromSlug)
-      const tenantData = await getTenantSettings(params.tenant)
-      setTenantExists(tenantData !== null)
-      const bn = tenantData?.business_name?.trim()
+      const fetched = await getTenantSettings(params.tenant)
+      setTenantData(fetched)
+      setTenantExists(fetched !== null)
+      const bn = fetched?.business_name?.trim()
       setAdminHeaderTitle(bn || fromSlug)
       setLoading(false)
     }
@@ -351,6 +354,13 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
       </div>
     )
   }
+
+  console.log('[AdminLayout] pre shopNotFound gate', {
+    tenantSlug: params.tenant,
+    loading,
+    tenantExists,
+    tenantData,
+  })
 
   if (!tenantExists) {
     return (
