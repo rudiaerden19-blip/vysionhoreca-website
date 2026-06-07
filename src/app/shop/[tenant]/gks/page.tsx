@@ -424,6 +424,21 @@ function cartLinesTotalUnits(lines: CartItem[]): number {
   return lines.reduce((sum, line) => sum + (line.quantity || 0), 0)
 }
 
+function cartLineKeySet(lines: CartItem[]): Set<string> {
+  return new Set(lines.map((l) => l.cartKey).filter(Boolean))
+}
+
+/** Lokale mand behouden als die meer/unieke regels heeft dan server (2e product, zelfde stuks). */
+function preferLocalTableSlotOverServer(local: CartItem[], server: CartItem[]): boolean {
+  if (local.length > server.length) return true
+  const localKeys = cartLineKeySet(local)
+  const serverKeys = cartLineKeySet(server)
+  for (const key of localKeys) {
+    if (!serverKeys.has(key)) return true
+  }
+  return cartLinesTotalUnits(local) > cartLinesTotalUnits(server)
+}
+
 function mergeOpenTableOrdersServerWithPendingLocal(
   prev: Record<string, CartItem[]>,
   fromServer: Record<string, CartItem[]>,
@@ -441,7 +456,7 @@ function mergeOpenTableOrdersServerWithPendingLocal(
       merged[k] = local
       continue
     }
-    if (inflight || cartLinesTotalUnits(local) > cartLinesTotalUnits(merged[k])) {
+    if (inflight || preferLocalTableSlotOverServer(local, merged[k])) {
       merged[k] = local
     }
   }
@@ -1744,8 +1759,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     items: CartItem[],
   ) => {
     const slotKey = tableOrderMapKey(zone, tblNr)
-    openOrderPersistInflightRef.current[slotKey] =
-      (openOrderPersistInflightRef.current[slotKey] ?? 0) + 1
     try {
     if (items.length === 0) {
       await gksDeleteOpenTableCommercialOrders(tenant, zone, tblNr)
@@ -1791,6 +1804,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const persistOpenOrderRowToSupabase = (zone: FloorPlanZone, tblNr: string, items: CartItem[]) => {
     const slotKey = tableOrderMapKey(zone, tblNr)
+    openOrderPersistInflightRef.current[slotKey] =
+      (openOrderPersistInflightRef.current[slotKey] ?? 0) + 1
     const prev = openOrderPersistChainRef.current[slotKey] ?? Promise.resolve()
     openOrderPersistChainRef.current[slotKey] = prev
       .then(() => persistOpenOrderRowToSupabaseImpl(zone, tblNr, items))
@@ -1912,15 +1927,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const zone = dineInFloorZone
     const tbl = tableNumber
     const slotKey = tableOrderMapKey(zone, tbl)
-    setTableOrders((prev) => {
-      const merged = mergeCartLinesForTable(prev[slotKey] || [], cart)
-      const next = { ...prev, [slotKey]: merged }
-      localStorage.setItem(tableOrdersKey, JSON.stringify(next))
-      updateTableStatus(tbl, merged.length > 0, zone)
-      cancelPersistTimer(slotKey)
-      queueMicrotask(() => void persistOpenOrderRowToSupabase(zone, tbl, merged))
-      return next
+    let mergedForPersist: CartItem[] = []
+    flushSync(() => {
+      setTableOrders((prev) => {
+        const merged = mergeCartLinesForTable(prev[slotKey] || [], cart)
+        mergedForPersist = merged
+        const next = { ...prev, [slotKey]: merged }
+        localStorage.setItem(tableOrdersKey, JSON.stringify(next))
+        updateTableStatus(tbl, merged.length > 0, zone)
+        return next
+      })
     })
+    cancelPersistTimer(slotKey)
+    void persistOpenOrderRowToSupabase(zone, tbl, mergedForPersist)
     void flushBarDeltaSlipRef.current(zone, tbl, snap, opts)
     setCart([])
     setTableNumber('')
