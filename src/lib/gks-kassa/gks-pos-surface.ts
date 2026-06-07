@@ -49,13 +49,18 @@ const GKS_BTN_PRESS_FACE =
 const GKS_BTN_PRESS_FACE_SELECTED =
   'active:bg-[linear-gradient(180deg,#141414_0%,#2c2c2c_52%,#161616_100%)]'
 
+/** Uitgeschakeld: zelfde vlak/kleur; alleen geen tik (geen wash-out opacity). */
+export const GKS_BTN_DISABLED_SAME_LOOK =
+  'disabled:opacity-100 disabled:cursor-not-allowed disabled:pointer-events-none'
+
 /** Standaard knop. */
 export const GKS_POS_BTN = [
   GKS_BTN_FACE,
   GKS_BTN_EDGE,
   GKS_BTN_PRESS,
   GKS_BTN_PRESS_FACE,
-  'text-[#f0f0f0]',
+  GKS_BTN_DISABLED_SAME_LOOK,
+  'text-[#f0f0f0] disabled:text-[#f0f0f0]',
 ].join(' ')
 
 /** Geselecteerde knop. */
@@ -77,8 +82,10 @@ export const GKS_ACCENT_BTN = [
   'border border-[#003878] border-t-[#9ee8ff]/35',
   'shadow-[0_2px_5px_rgba(0,0,0,0.4),0_6px_14px_rgba(0,30,80,0.25)]',
   GKS_BTN_PRESS,
+  GKS_BTN_DISABLED_SAME_LOOK,
   'active:bg-[linear-gradient(180deg,#4a9fd0_0%,#0d5bb8_55%,#002f75_100%)]',
   'active:border-[#002a66]',
+  'disabled:text-white',
 ].join(' ')
 
 /** Displayveld (totaal, numpad) — iets ingevallen, rustig. */

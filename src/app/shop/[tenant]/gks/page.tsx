@@ -4146,7 +4146,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250607-btn-press-inset"
+      data-gks-ui="20250607-bon-same-grey"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -5003,7 +5003,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               }}
               disabled={gksFiscalBlocked || draftBonLineItems.length === 0 || draftBonPrinting}
               title={gksFiscalBlocked ? gksFiscalBlockedTitle : t('kassaApp.cartBonTitle')}
-              className={`flex items-center justify-center px-1 disabled:pointer-events-none disabled:opacity-45 ${gksPosButtonClass(false)} ${kassaFooterActionTouchMinHClass(
+              className={`flex items-center justify-center px-1 ${gksPosButtonClass(false)} ${kassaFooterActionTouchMinHClass(
                 kassaSxgaDenseTiles,
                 kassaSidebarFooterTier === 'dense',
               )}`}
@@ -5060,7 +5060,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 disabled={gksFiscalBlocked}
                 title={gksFiscalBlocked ? gksFiscalBlockedTitle : undefined}
                 onClick={() => parkOrder({ printKitchen: false, printKassaSlip: true })}
-                className={`min-w-0 flex-1 font-semibold flex items-center justify-center text-center disabled:opacity-45 disabled:pointer-events-none px-2 py-3 text-xs leading-tight sm:text-sm ${gksPosButtonClass(false)} ${
+                className={`min-w-0 flex-1 font-semibold flex items-center justify-center text-center px-2 py-3 text-xs leading-tight sm:text-sm ${gksPosButtonClass(false)} ${
                   kassaSxgaDenseTiles ? 'min-h-[2.875rem]' : 'min-h-[2.5rem]'
                 }`}
               >
