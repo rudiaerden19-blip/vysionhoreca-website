@@ -90,6 +90,7 @@ import {
   GKS_FONT_UI,
   GKS_FONT_UI_SOFT,
   GKS_TILE_LIFT_SHADOW,
+  GKS_RULE_BLACK,
   gksPosButtonClass,
 } from '@/lib/gks-kassa/gks-pos-surface'
 import { authFetch, buildShopInternalReturnPath } from '@/lib/auth-headers'
@@ -4152,7 +4153,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250608-menu-plate-grain-max"
+      data-gks-ui="20250608-gks-black-rules"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4288,7 +4289,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
 
         {/* Snelkoppelingen: 4cm naar rechts; tenantnaam links ongewijzigd */}
-        <div className="relative z-20 ml-[4cm] flex min-h-0 min-w-0 flex-1 items-center">
+        <div
+          className={`relative z-20 ml-[4cm] flex min-h-0 min-w-0 flex-1 items-center self-stretch border-b ${GKS_RULE_BLACK}`}
+        >
           <nav
             aria-label={t('kassaApp.quickLinksAria')}
             className="flex min-h-0 min-w-0 flex-1 flex-nowrap items-center justify-start gap-2.5 sm:gap-3"
@@ -4625,8 +4628,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         {/* ── Rechts: numpad / cart ── */}
         <div
-          className={`${kassaSxgaDenseTiles ? 'w-[300px]' : 'w-80 sm:w-96 lg:w-[380px]'} flex min-h-0 min-w-0 flex-shrink-0 flex-col overflow-x-hidden overflow-y-auto border-0 ${
-            kassaAppearanceDark ? GKS_MENU_PLATE_TRANSPARENT_CLASS : 'bg-white'
+          className={`${kassaSxgaDenseTiles ? 'w-[300px]' : 'w-80 sm:w-96 lg:w-[380px]'} flex min-h-0 min-w-0 flex-shrink-0 flex-col overflow-x-hidden overflow-y-auto ${
+            kassaAppearanceDark ? `border-l ${GKS_RULE_BLACK} ${GKS_MENU_PLATE_TRANSPARENT_CLASS}` : 'border-0 bg-white'
           }`}
         >
 
@@ -4963,7 +4966,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         {/* Totaal + knoppen — touch-vriendelijk (kiosk) */}
         <div
-          className={`sticky bottom-0 z-10 shrink-0 border-t ${kassaAppearanceDark ? `border-[#333336] ${GKS_MENU_PLATE_TRANSPARENT_CLASS}` : 'border-gray-200 bg-white'} px-3 py-2.5 space-y-2.5`}
+          className={`sticky bottom-0 z-10 shrink-0 border-t ${kassaAppearanceDark ? `${GKS_RULE_BLACK} ${GKS_MENU_PLATE_TRANSPARENT_CLASS}` : 'border-gray-200 bg-white'} px-3 py-2.5 space-y-2.5`}
         >
           <div
             className={`flex items-center justify-between gap-2 px-2.5 py-2 ${GKS_POS_FIELD}`}

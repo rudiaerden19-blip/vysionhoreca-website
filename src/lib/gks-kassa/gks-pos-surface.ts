@@ -12,6 +12,9 @@ export const GKS_MENU_PLATE_TRANSPARENT_CLASS = 'bg-transparent'
 /** @deprecated Gebruik SHELL op wrapper; TRANSPARENT alleen waar shell doorloopt. */
 export const GKS_MENU_PLATE_BG_CLASS = GKS_MENU_PLATE_SHELL_BG_CLASS
 
+/** Dunne zwarte scheidingslijnen (header-nav, sidebar, footer). */
+export const GKS_RULE_BLACK = 'border-black'
+
 /** Subtiel afgerond — luxe POS, geen pill. */
 export const GKS_BTN_SHAPE = 'rounded-[6px]'
 
