@@ -4412,7 +4412,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <button
             type="button"
             onClick={() => toggleKassaAppearance()}
-            className={`inline-flex touch-manipulation shrink-0 items-center gap-0.5 whitespace-nowrap px-1.5 py-1.5 font-semibold sm:gap-1 sm:px-2 sm:py-2 md:px-3 ${gksPosButtonClass(kassaAppearanceDark)}`}
+            className={`inline-flex touch-manipulation shrink-0 items-center gap-0.5 whitespace-nowrap px-1.5 py-1.5 font-semibold sm:gap-1 sm:px-2 sm:py-2 md:px-3 ${gksPosButtonClass(false)}`}
             title={
               kassaAppearanceDark ? t('adminLayout.kassaAppearanceLightAria') : t('adminLayout.kassaAppearanceDarkAria')
             }
