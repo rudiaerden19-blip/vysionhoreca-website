@@ -1,6 +1,6 @@
--- Eenmalig: zaak-login voor gkstest (RESET_REQUIRED → bcrypt).
--- Wachtwoord na run: GkstestPilot2026!
+-- Eenmalig: zaak-login voor gkstest (RESET_REQUIRED → bcrypt-hash).
 -- Supabase SQL Editor → Run (zelfde project als Vercel preview).
+-- Of: na deploy /login → "Eerste wachtwoord instellen" (geen SQL nodig).
 
 UPDATE public.business_profiles
 SET password_hash = '$2b$12$XvaIAxWSHbNKptdtUVLeCuffGpeaZHFZzSbyPX30c1wIrlFXzJPve',
