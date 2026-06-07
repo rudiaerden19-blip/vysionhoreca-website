@@ -73,6 +73,19 @@ export function normalizeGksCommercialItemsToCartLines(items: unknown): KassaCar
   return out
 }
 
+/** localStorage / legacy keys — elke slot door plat→mand normalizer. */
+export function normalizeGksTableOrdersRecord(
+  raw: Record<string, unknown> | null | undefined,
+): Record<string, KassaCartItem[]> {
+  if (!raw || typeof raw !== 'object') return {}
+  const out: Record<string, KassaCartItem[]> = {}
+  for (const [key, val] of Object.entries(raw)) {
+    const lines = normalizeGksCommercialItemsToCartLines(val)
+    if (lines.length > 0) out[key] = lines
+  }
+  return out
+}
+
 export async function fetchGksOpenTableOrdersForTenant(
   tenantSlug: string,
 ): Promise<GksOpenTableOrderRow[] | null> {

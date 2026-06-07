@@ -88,6 +88,7 @@ import type { GksPersistPaidCommercialResult } from '@/lib/gks-kassa/gks-persist
 import {
   fetchGksOpenTableOrdersForTenant,
   normalizeGksCommercialItemsToCartLines,
+  normalizeGksTableOrdersRecord,
   gksDeleteOpenTableCommercialOrders,
   gksPersistOpenTableCommercialOrder,
 } from '@/lib/gks-kassa/gks-open-table-commercial'
@@ -426,7 +427,7 @@ function mergeOpenTableOrdersServerWithPendingLocal(
   const merged: Record<string, CartItem[]> = { ...fromServer }
   for (const [k, v] of Object.entries(prev)) {
     if (!(k in fromServer) && (v?.length ?? 0) > 0) {
-      merged[k] = v
+      merged[k] = normalizeGksCommercialItemsToCartLines(v)
     }
   }
   return merged
@@ -1448,7 +1449,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const ordersRaw = localStorage.getItem(tableOrdersKey)
     if (ordersRaw) {
       try {
-        setTableOrders(migrateLegacyTableOrdersKeys(JSON.parse(ordersRaw)))
+        setTableOrders(
+          normalizeGksTableOrdersRecord(
+            migrateLegacyTableOrdersKeys(JSON.parse(ordersRaw)) as Record<string, unknown>,
+          ),
+        )
       } catch {
         /* empty */
       }
@@ -2335,7 +2340,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const parkedOnTableLines = useMemo((): CartItem[] => {
     if (!activeTableSlotKey) return []
-    return tableOrders[activeTableSlotKey] ?? []
+    return normalizeGksCommercialItemsToCartLines(tableOrders[activeTableSlotKey] ?? [])
   }, [activeTableSlotKey, tableOrders])
 
   /** Alleen «Al op tafel», geen kar/numpad: lijst vult het zwarte vlak. */
