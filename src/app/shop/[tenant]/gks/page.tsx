@@ -4146,7 +4146,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250607-numpad-in-total-bar"
+      data-gks-ui="20250607-header-util-gap"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4378,11 +4378,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           )}
           </nav>
         </div>
+        </div>
 
+        <div className="relative z-40 flex shrink-0 items-center gap-2.5 sm:gap-3">
           <button
             type="button"
             onClick={() => toggleKassaAppearance()}
-            className={`relative z-[40] inline-flex touch-manipulation shrink-0 items-center gap-1 whitespace-nowrap px-1.5 py-1 font-semibold sm:px-2 sm:py-1.5 ${gksPosButtonClass(kassaAppearanceDark)}`}
+            className={`inline-flex touch-manipulation shrink-0 items-center gap-1 whitespace-nowrap px-1.5 py-1 font-semibold sm:px-2 sm:py-1.5 ${gksPosButtonClass(kassaAppearanceDark)}`}
             title={
               kassaAppearanceDark ? t('adminLayout.kassaAppearanceLightAria') : t('adminLayout.kassaAppearanceDarkAria')
             }
@@ -4421,14 +4423,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             )}
           </div>
 
-        <button
-          type="button"
-          onClick={() => setLogoutSoftwareConfirmOpen(true)}
-          title={t('kassaApp.logout')}
-          className={`relative z-20 inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap px-1.5 py-1 text-[11px] font-semibold transition-colors sm:gap-1 sm:px-2.5 sm:py-1.5 sm:text-sm ${gksPosButtonClass(false)}`}
-        >
-          <span className="leading-snug">{t('kassaApp.logout')}</span>
-        </button>
+          <button
+            type="button"
+            onClick={() => setLogoutSoftwareConfirmOpen(true)}
+            title={t('kassaApp.logout')}
+            className={`inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap px-1.5 py-1 text-[11px] font-semibold transition-colors sm:gap-1 sm:px-2.5 sm:py-1.5 sm:text-sm ${gksPosButtonClass(false)}`}
+          >
+            <span className="leading-snug">{t('kassaApp.logout')}</span>
+          </button>
         </div>
 
       </div>
