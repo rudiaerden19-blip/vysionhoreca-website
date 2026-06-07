@@ -22,9 +22,9 @@ export const GKS_BTN_SHAPE = 'rounded-[6px]'
 export const GKS_FONT_UI = 'font-semibold'
 export const GKS_FONT_UI_SOFT = 'font-medium'
 
-/** Klokbalk: zelfde vlak, lichtere schaduw dan knoppen. */
+/** Klokbalk: zelfde lift als standaardknoppen (legacy export). */
 export const GKS_CLOCK_BAR_SHADOW =
-  'shadow-[0_1px_3px_rgba(0,0,0,0.16),0_3px_8px_rgba(0,0,0,0.1)]'
+  'shadow-[0_4px_8px_rgba(0,0,0,0.55),0_10px_22px_rgba(0,0,0,0.42)]'
 
 /** Zachte “bollig”: donker boven/onder, iets lichter midden — geen harde radiale flare. */
 const GKS_BTN_FACE =
@@ -113,12 +113,12 @@ export const GKS_ACCENT_BTN = [
   'disabled:text-white',
 ].join(' ')
 
-/** Displayveld (totaal, numpad) — iets ingevallen, rustig. */
+/** Displayveld (totaal, numpad) — zelfde raised look als knoppen. */
 export const GKS_POS_FIELD = [
   GKS_BTN_SHAPE,
-  'bg-[linear-gradient(180deg,#3a3a3a_0%,#222222_100%)]',
+  GKS_BTN_FACE,
   'border border-[#2a2a2a]',
-  'shadow-[inset_0_2px_5px_rgba(0,0,0,0.45)]',
+  GKS_SUBTLE_LIFT_SHADOW,
 ].join(' ')
 
 /** Onderstrook tegel — exact zelfde vlak als shell (`.gks-menu-plate-grain`). */
@@ -128,7 +128,7 @@ export const GKS_CLOCK_BAR = [
   GKS_BTN_SHAPE,
   GKS_BTN_FACE,
   'border border-[#2a2a2a]',
-  GKS_CLOCK_BAR_SHADOW,
+  GKS_SUBTLE_LIFT_SHADOW,
 ].join(' ')
 
 export function gksPosButtonClass(selected: boolean): string {
