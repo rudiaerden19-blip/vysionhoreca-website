@@ -2299,6 +2299,8 @@ export interface Staff {
   commute_distance_km?: number  // Enkele reis in km
   has_meal_vouchers?: boolean   // Heeft recht op maaltijdcheques
   km_rate?: number              // Vergoeding per km (standaard €0.4297)
+  /** Rijksregisternummer / INSZ — 11 cijfers in DB */
+  insz?: string | null
   is_active: boolean
   created_at?: string
   updated_at?: string
@@ -2348,6 +2350,7 @@ export async function saveStaff(staff: Staff): Promise<Staff | null> {
     commute_distance_km: staff.commute_distance_km,
     has_meal_vouchers: staff.has_meal_vouchers,
     km_rate: staff.km_rate,
+    insz: staff.insz ?? null,
     is_active: staff.is_active,
   }
   if (staff.id) {

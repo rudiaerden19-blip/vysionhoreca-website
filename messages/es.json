@@ -3165,7 +3165,10 @@
       "pinHint": "el empleado elige",
       "pinPlaceholder": "Introduce 4 dígitos",
       "role": "Rol",
-      "color": "Color"
+      "color": "Color",
+      "insz": "Nº nacional (INSZ)",
+      "inszPlaceholder": "00.00.00-000.00",
+      "inszHint": "11 dígitos — puntos y guion automáticos"
     },
     "contractForm": {
       "type": "Tipo de contrato",
@@ -3203,6 +3206,7 @@
     },
     "alerts": {
       "nameAndPinRequired": "Introduce nombre y PIN",
+      "inszInvalid": "INSZ válido (11 dígitos, formato 00.00.00-000.00)",
       "confirmDelete": "¿Seguro que quieres eliminar:",
       "deleteFailed": "Error al eliminar"
     }

@@ -3165,7 +3165,10 @@
       "pinHint": "الموظف يختار بنفسه",
       "pinPlaceholder": "أدخل 4 أرقام",
       "role": "الدور",
-      "color": "اللون"
+      "color": "اللون",
+      "insz": "الرقم الوطني (INSZ)",
+      "inszPlaceholder": "00.00.00-000.00",
+      "inszHint": "11 رقمًا — النقاط والشرطة تُضاف تلقائيًا"
     },
     "contractForm": {
       "type": "نوع العقد",
@@ -3203,6 +3206,7 @@
     },
     "alerts": {
       "nameAndPinRequired": "أدخل الاسم ورمز PIN",
+      "inszInvalid": "أدخل INSZ صالحًا (11 رقمًا، التنسيق 00.00.00-000.00)",
       "confirmDelete": "هل أنت متأكد من الحذف:",
       "deleteFailed": "فشل الحذف"
     }

@@ -3639,7 +3639,10 @@
       "pinHint": "medewerker kiest zelf",
       "pinPlaceholder": "Vul 4 cijfers in",
       "role": "Rol",
-      "color": "Kleur"
+      "color": "Kleur",
+      "insz": "INSZ / rijksregisternummer",
+      "inszPlaceholder": "00.00.00-000.00",
+      "inszHint": "11 cijfers — punten en streepje worden automatisch gezet"
     },
     "contractForm": {
       "type": "Contracttype",
@@ -3677,6 +3680,7 @@
     },
     "alerts": {
       "nameAndPinRequired": "Vul naam en PIN in",
+      "inszInvalid": "Vul een geldig INSZ in (11 cijfers, formaat 00.00.00-000.00)",
       "confirmDelete": "Weet je zeker dat je wilt verwijderen:",
       "deleteFailed": "Verwijderen mislukt"
     }

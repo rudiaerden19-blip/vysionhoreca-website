@@ -3165,7 +3165,10 @@
       "pinHint": "従業員が選択",
       "pinPlaceholder": "4桁を入力",
       "role": "役割",
-      "color": "色"
+      "color": "色",
+      "insz": "国民登録番号（INSZ）",
+      "inszPlaceholder": "00.00.00-000.00",
+      "inszHint": "11桁 — ピリオドとハイフンは自動入力"
     },
     "contractForm": {
       "type": "契約タイプ",
@@ -3203,6 +3206,7 @@
     },
     "alerts": {
       "nameAndPinRequired": "名前とPINを入力",
+      "inszInvalid": "有効なINSZ（11桁、形式 00.00.00-000.00）",
       "confirmDelete": "削除してもよろしいですか：",
       "deleteFailed": "削除に失敗"
     }

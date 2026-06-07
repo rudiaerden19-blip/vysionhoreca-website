@@ -3639,7 +3639,10 @@
       "pinHint": "employee chooses their own",
       "pinPlaceholder": "Enter 4 digits",
       "role": "Role",
-      "color": "Color"
+      "color": "Color",
+      "insz": "National ID (INSZ)",
+      "inszPlaceholder": "00.00.00-000.00",
+      "inszHint": "11 digits — dots and dash are added automatically"
     },
     "contractForm": {
       "type": "Contract type",
@@ -3677,6 +3680,7 @@
     },
     "alerts": {
       "nameAndPinRequired": "Enter name and PIN",
+      "inszInvalid": "Enter a valid national ID (11 digits, format 00.00.00-000.00)",
       "confirmDelete": "Are you sure you want to delete:",
       "deleteFailed": "Delete failed"
     }

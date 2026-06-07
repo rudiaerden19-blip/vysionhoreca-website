@@ -2665,7 +2665,10 @@
       "pinHint": "l'employé choisit lui-même",
       "pinPlaceholder": "Entrer 4 chiffres",
       "role": "Rôle",
-      "color": "Couleur"
+      "color": "Couleur",
+      "insz": "N° national (INSZ)",
+      "inszPlaceholder": "00.00.00-000.00",
+      "inszHint": "11 chiffres — points et tiret ajoutés automatiquement"
     },
     "contractForm": {
       "type": "Type de contrat",
@@ -2703,6 +2706,7 @@
     },
     "alerts": {
       "nameAndPinRequired": "Entrez nom et PIN",
+      "inszInvalid": "INSZ valide requis (11 chiffres, format 00.00.00-000.00)",
       "confirmDelete": "Êtes-vous sûr de vouloir supprimer:",
       "deleteFailed": "Échec de la suppression"
     }

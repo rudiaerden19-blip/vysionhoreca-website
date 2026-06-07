@@ -14,6 +14,11 @@ import {
   StaffRole,
   ContractType
 } from '@/lib/admin-api'
+import {
+  formatBelgianInszDisplay,
+  inszDigitsOnly,
+  isValidBelgianInszDigits,
+} from '@/lib/insz-format'
 
 const STAFF_COLORS = [
   '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16', 
@@ -59,11 +64,13 @@ export default function PersoneelPage() {
     name: '',
     email: '',
     phone: '',
+    insz: '',
     pin: '',
     role: 'EMPLOYEE',
     color: '#3b82f6',
     is_active: true,
   })
+  const [inszDisplay, setInszDisplay] = useState('')
   
   const [contractData, setContractData] = useState<Partial<Staff>>({
     contract_type: undefined,
@@ -95,25 +102,30 @@ export default function PersoneelPage() {
       name: '',
       email: '',
       phone: '',
+      insz: '',
       pin: '',
       role: 'EMPLOYEE',
       color: STAFF_COLORS[Math.floor(Math.random() * STAFF_COLORS.length)],
       is_active: true,
     })
+    setInszDisplay('')
     setShowModal(true)
   }
 
   function openEditModal(member: Staff) {
     setEditingStaff(member)
+    const digits = inszDigitsOnly(member.insz)
     setFormData({
       name: member.name,
       email: member.email || '',
       phone: member.phone || '',
+      insz: digits,
       pin: member.pin,
       role: member.role,
       color: member.color,
       is_active: member.is_active,
     })
+    setInszDisplay(formatBelgianInszDisplay(digits))
     setShowModal(true)
   }
 
@@ -142,15 +154,21 @@ export default function PersoneelPage() {
       alert(t('personeelPage.alerts.nameAndPinRequired'))
       return
     }
-    
+    const inszDigits = inszDigitsOnly(formData.insz ?? inszDisplay)
+    if (!isValidBelgianInszDigits(inszDigits)) {
+      alert(t('personeelPage.alerts.inszInvalid'))
+      return
+    }
+
     setSaving(true)
-    
+
     const staffData: Staff = {
       ...(editingStaff || {}),
       tenant_slug: tenant,
       name: formData.name.trim(),
       email: formData.email || undefined,
       phone: formData.phone || undefined,
+      insz: inszDigits,
       pin: formData.pin,
       role: formData.role as StaffRole,
       color: formData.color || '#3b82f6',
@@ -428,6 +446,27 @@ export default function PersoneelPage() {
                   className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder={t('personeelPage.form.phonePlaceholder')}
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('personeelPage.form.insz')} <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="off"
+                  value={inszDisplay}
+                  onChange={(e) => {
+                    const digits = inszDigitsOnly(e.target.value)
+                    setInszDisplay(formatBelgianInszDisplay(digits))
+                    setFormData({ ...formData, insz: digits })
+                  }}
+                  className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono tracking-wide"
+                  placeholder={t('personeelPage.form.inszPlaceholder')}
+                  maxLength={15}
+                />
+                <p className="text-xs text-gray-500 mt-1">{t('personeelPage.form.inszHint')}</p>
               </div>
 
               <div>

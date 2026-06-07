@@ -2665,7 +2665,10 @@
       "pinHint": "Mitarbeiter wählt selbst",
       "pinPlaceholder": "4 Ziffern eingeben",
       "role": "Rolle",
-      "color": "Farbe"
+      "color": "Farbe",
+      "insz": "INSZ / nationale Kennnummer",
+      "inszPlaceholder": "00.00.00-000.00",
+      "inszHint": "11 Ziffern — Punkte und Bindestrich werden automatisch gesetzt"
     },
     "contractForm": {
       "type": "Vertragsart",
@@ -2703,6 +2706,7 @@
     },
     "alerts": {
       "nameAndPinRequired": "Name und PIN eingeben",
+      "inszInvalid": "Gültige INSZ eingeben (11 Ziffern, Format 00.00.00-000.00)",
       "confirmDelete": "Möchten Sie wirklich löschen:",
       "deleteFailed": "Löschen fehlgeschlagen"
     }

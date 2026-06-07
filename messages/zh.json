@@ -3165,7 +3165,10 @@
       "pinHint": "员工自行选择",
       "pinPlaceholder": "输入4位数字",
       "role": "角色",
-      "color": "颜色"
+      "color": "颜色",
+      "insz": "国民登记号（INSZ）",
+      "inszPlaceholder": "00.00.00-000.00",
+      "inszHint": "11位数字 — 点和横线自动添加"
     },
     "contractForm": {
       "type": "合同类型",
@@ -3203,6 +3206,7 @@
     },
     "alerts": {
       "nameAndPinRequired": "请输入姓名和PIN码",
+      "inszInvalid": "请输入有效INSZ（11位，格式 00.00.00-000.00）",
       "confirmDelete": "确定要删除吗：",
       "deleteFailed": "删除失败"
     }
