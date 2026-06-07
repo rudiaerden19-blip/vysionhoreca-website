@@ -16,9 +16,15 @@ const GKS_BTN_FACE =
 const GKS_BTN_FACE_SELECTED =
   'bg-[linear-gradient(180deg,#1e1e1e_0%,#3a3a3a_46%,#242424_100%)]'
 
-/** Dunne rand + lichte drop shadow (referentie-POS). */
-const GKS_BTN_EDGE =
-  'border border-[#2a2a2a] shadow-[0_2px_3px_rgba(0,0,0,0.42)]'
+/** Subtiele diepte achter knoppen (dubbele zachte drop shadow). */
+export const GKS_SUBTLE_LIFT_SHADOW =
+  'shadow-[0_2px_4px_rgba(0,0,0,0.42),0_5px_12px_rgba(0,0,0,0.28)]'
+
+/** Subtiele diepte achter menu-tegels — iets ruimer dan knoppen. */
+export const GKS_TILE_LIFT_SHADOW =
+  'shadow-[0_3px_6px_rgba(0,0,0,0.45),0_8px_18px_rgba(0,0,0,0.22)]'
+
+const GKS_BTN_EDGE = `border border-[#2a2a2a] ${GKS_SUBTLE_LIFT_SHADOW}`
 
 /** Standaard knop. */
 export const GKS_POS_BTN = [
@@ -44,7 +50,7 @@ export const GKS_ACCENT_BTN = [
   'bg-[linear-gradient(180deg,#7ad9ff_0%,#4fb8f0_32%,#1a7fd8_62%,#004aad_100%)]',
   'text-white',
   'border border-[#003878] border-t-[#9ee8ff]/35',
-  'shadow-[0_2px_4px_rgba(0,0,0,0.38)]',
+  'shadow-[0_2px_5px_rgba(0,0,0,0.4),0_6px_14px_rgba(0,30,80,0.25)]',
   'active:brightness-[0.96]',
 ].join(' ')
 
