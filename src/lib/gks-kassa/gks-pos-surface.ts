@@ -154,7 +154,7 @@ export const GKS_CLOCK_BAR = [
 ].join(' ')
 
 export function gksPosButtonClass(selected: boolean): string {
-  return `${GKS_POS_BTN_SHAPE} ${selected ? GKS_POS_BTN_SELECTED : GKS_POS_BTN}`
+  return `${GKS_BTN_SHAPE} ${selected ? GKS_POS_BTN_SELECTED : GKS_POS_BTN}`
 }
 
 /** Horizontale strook (totaal): exact dezelfde utility-reeks als een POS-knop. */
