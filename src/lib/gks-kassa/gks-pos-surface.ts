@@ -21,9 +21,6 @@ export const GKS_CLOCK_BAR_SHADOW =
 const GKS_BTN_FACE =
   'bg-[linear-gradient(180deg,#161616_0%,#323232_46%,#1c1c1c_100%)]'
 
-const GKS_BTN_FACE_SELECTED =
-  'bg-[linear-gradient(180deg,#1e1e1e_0%,#3a3a3a_46%,#242424_100%)]'
-
 /** Diepte achter knoppen. */
 export const GKS_SUBTLE_LIFT_SHADOW =
   'shadow-[0_3px_6px_rgba(0,0,0,0.5),0_8px_18px_rgba(0,0,0,0.34)]'
@@ -50,9 +47,6 @@ export const GKS_BTN_PRESS = [
 const GKS_BTN_PRESS_FACE =
   'active:bg-[linear-gradient(180deg,#0e0e0e_0%,#242424_52%,#101010_100%)]'
 
-const GKS_BTN_PRESS_FACE_SELECTED =
-  'active:bg-[linear-gradient(180deg,#141414_0%,#2c2c2c_52%,#161616_100%)]'
-
 /** Uitgeschakeld: zelfde vlak/kleur; alleen geen tik (geen wash-out opacity). */
 export const GKS_BTN_DISABLED_SAME_LOOK =
   'disabled:opacity-100 disabled:cursor-not-allowed disabled:pointer-events-none'
@@ -67,25 +61,24 @@ export const GKS_POS_BTN = [
   'text-[#f0f0f0] disabled:text-[#f0f0f0]',
 ].join(' ')
 
-/** Geselecteerde knop. */
+/**
+ * Geselecteerd (Menu open, NL, Ter plaatse, …): zelfde grijs als normaal + blauwe gloed als Afrekenen.
+ */
 export const GKS_POS_BTN_SELECTED = [
-  GKS_BTN_FACE_SELECTED,
-  GKS_BTN_EDGE,
-  GKS_BTN_PRESS,
-  GKS_BTN_PRESS_FACE_SELECTED,
-  'text-white',
-].join(' ')
-
-/** Footer Afrekenen — zelfde grijs als andere knoppen, blauwe schaduw. */
-export const GKS_CHECKOUT_BTN = [
-  GKS_BTN_SHAPE,
   GKS_BTN_FACE,
   'border border-[#2a2a2a]',
   GKS_CHECKOUT_BLUE_SHADOW,
   GKS_BTN_PRESS,
   GKS_BTN_PRESS_FACE,
+  'text-[#f0f0f0]',
+].join(' ')
+
+/** Footer Afrekenen — zelfde stijl als geselecteerde grijze knop. */
+export const GKS_CHECKOUT_BTN = [
+  GKS_BTN_SHAPE,
+  GKS_POS_BTN_SELECTED,
   GKS_BTN_DISABLED_SAME_LOOK,
-  'text-[#f0f0f0] disabled:text-[#f0f0f0]',
+  'disabled:text-[#f0f0f0]',
 ].join(' ')
 
 /**
