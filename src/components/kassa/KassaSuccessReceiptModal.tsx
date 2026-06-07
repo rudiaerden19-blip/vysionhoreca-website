@@ -109,6 +109,28 @@ export function KassaSuccessReceiptModal({
               )}
             </div>
             <div className="border-t-2 border-dashed border-gray-400 my-3" />
+            {order.gksFiscal ? (
+              <div className="mb-3 text-center text-xs font-bold text-gray-900">
+                <p className="text-sm tracking-wide">{t('gksReceipt.fiscalTicketHeader')}</p>
+                <p className="mt-2 font-normal">
+                  {t('gksReceipt.eventCounter')} {order.gksFiscal.fdmRef.eventLabel}-
+                  {order.gksFiscal.fdmRef.eventCounter} / {order.gksFiscal.fdmRef.totalCounter}
+                </p>
+                {order.gksFiscal.shortSignature ? (
+                  <p className="mt-1 font-normal">
+                    {t('gksReceipt.shortSignature')} {order.gksFiscal.shortSignature}
+                  </p>
+                ) : null}
+                {order.gksFiscal.verificationUrl ? (
+                  <p className="mt-2 break-all font-normal text-[10px] leading-snug">
+                    {t('gksReceipt.verifyAt')}
+                    <br />
+                    {order.gksFiscal.verificationUrl}
+                  </p>
+                ) : null}
+                <div className="border-t border-dashed border-gray-400 my-2" />
+              </div>
+            ) : null}
             <div className="text-center mb-3">
               <p className="font-bold text-lg">{orderTypeLabel}</p>
               {receiptTableNr ? (
