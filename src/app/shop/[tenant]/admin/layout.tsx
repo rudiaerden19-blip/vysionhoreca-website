@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname, useParams, useRouter } from 'next/navigation'
 import { useLanguage } from '@/i18n'
 import { getTenantSettings } from '@/lib/admin-api'
 import {
@@ -55,7 +55,16 @@ const LOCK_PAGES = ['categorieen']
 
 export default function AdminLayout({ children, params }: AdminLayoutProps) {
   const pathname = usePathname()
-  const tenantSlug = resolveShopTenantSlug(pathname, params.tenant)
+  const routeParams = useParams()
+  const routeTenant =
+    typeof routeParams?.tenant === 'string'
+      ? routeParams.tenant
+      : Array.isArray(routeParams?.tenant)
+        ? routeParams.tenant[0] ?? ''
+        : ''
+  const tenantSlug = resolveShopTenantSlug(pathname, routeTenant || params.tenant)
+  const tenantCheckSeq = useRef(0)
+  const tenantGateSlugRef = useRef<string | null>(null)
   const adminPath = normalizeShopAdminPathname(pathname, tenantSlug)
   const router = useRouter()
   const { t } = useLanguage()
@@ -70,7 +79,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   /** Na mount: superadmin (platform) óf zaak-eigenaar met wachtwoord vandaag. Klanten zonder geldige `vysion_tenant` blijven naar /login — géén automatische tenant-sessie via cookies. */
   /** `verifying` = client dacht ingelogd; wacht op `/api/auth/verify-tenant-session` (zelfde regels als schrijf-API’s). */
   const [adminAccess, setAdminAccess] = useState<'pending' | 'verifying' | 'ok' | 'login'>('pending')
-  const baseUrl = `/shop/${params.tenant}/admin`
+  const baseUrl = `/shop/${tenantSlug || params.tenant}/admin`
   const { dark: kassaAppearanceDark, toggle: toggleKassaAppearance } = useKassaUiDarkSync(params.tenant)
 
   const {
@@ -93,13 +102,17 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     adminPath === baseUrl || adminPath === `${baseUrl}/`
 
   useEffect(() => {
-    let stale = false
-    const slug = resolveShopTenantSlug(pathname, params.tenant)
+    const slug = resolveShopTenantSlug(pathname, routeTenant || params.tenant)
+    const seq = ++tenantCheckSeq.current
 
     async function checkTenant() {
       setLoading(true)
-      setTenantExists(null)
+      if (tenantGateSlugRef.current !== slug) {
+        tenantGateSlugRef.current = slug
+        setTenantExists(null)
+      }
       if (!slug) {
+        if (tenantCheckSeq.current !== seq) return
         setTenantExists(false)
         setLoading(false)
         return
@@ -109,25 +122,40 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
         .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
         .join(' ')
       setAdminHeaderTitle(fromSlug)
+
+      let exists = false
+      let lastSettings: Awaited<ReturnType<typeof getTenantSettings>> = null
       try {
-        const fetched = await getTenantSettings(slug, undefined, { bypassCache: true })
-        if (stale) return
-        setTenantExists(fetched !== null)
-        const bn = fetched?.business_name?.trim()
-        setAdminHeaderTitle(bn || fromSlug)
+        for (let attempt = 0; attempt < 3; attempt++) {
+          if (tenantCheckSeq.current !== seq) return
+          lastSettings = await getTenantSettings(slug, undefined, {
+            bypassCache: true,
+          })
+          if (tenantCheckSeq.current !== seq) return
+          if (lastSettings !== null) {
+            exists = true
+            break
+          }
+          if (attempt < 2) {
+            await new Promise((r) => setTimeout(r, 200 * (attempt + 1)))
+          }
+        }
       } catch (err) {
-        if (stale) return
+        if (tenantCheckSeq.current !== seq) return
         console.error('[AdminLayout] checkTenant failed', err)
-        setTenantExists(false)
-      } finally {
-        if (!stale) setLoading(false)
       }
+
+      if (tenantCheckSeq.current !== seq) return
+      setTenantExists(exists)
+      const bn = lastSettings?.business_name?.trim()
+      setAdminHeaderTitle(bn || fromSlug)
+      setLoading(false)
     }
-    checkTenant()
+    void checkTenant()
     return () => {
-      stale = true
+      tenantCheckSeq.current += 1
     }
-  }, [pathname, params.tenant])
+  }, [pathname, routeTenant, params.tenant])
 
   useEffect(() => {
     setAdminAccess('pending')
