@@ -18,6 +18,11 @@ import {
   type FloorPlanZone,
 } from '@/lib/kassa-floor-plan-zone'
 import { useLanguage } from '@/i18n'
+import {
+  GKS_MENU_PLATE_SHELL_BG_CLASS,
+  GKS_RULE_BLACK,
+  gksPosButtonClass,
+} from '@/lib/gks-kassa/gks-pos-surface'
 
 export type TableShape = FloorPlanTable['shape']
 export type TableStatus = FloorPlanTable['status']
@@ -62,6 +67,8 @@ interface Props {
   onFloorPlanTablesPersisted?: (planZone: FloorPlanZone, tables: KassaTable[]) => void
   /** Start/einde van plattegrond-upsert: parent blokkeert poll/realtime die kortere snapshots pusht. */
   onFloorPlanTablesPersistLifecycle?: (planZone: FloorPlanZone, phase: 'start' | 'end') => void
+  /** GKS-pilot: korrelvloer + POS-knoppen; productie-kassa blijft `default`. */
+  uiVariant?: 'default' | 'gks'
 }
 
 function makeId() { return Math.random().toString(36).slice(2, 10) }
@@ -386,7 +393,10 @@ export default function KassaFloorPlan({
   seedTables,
   onFloorPlanTablesPersisted,
   onFloorPlanTablesPersistLifecycle,
+  uiVariant = 'default',
 }: Props) {
+  const isGksUi = uiVariant === 'gks'
+  const gksPosBtn = gksPosButtonClass(false)
   const { t } = useLanguage()
   const statusLabels = useMemo(
     () => ({
@@ -801,6 +811,12 @@ export default function KassaFloorPlan({
   }
 
   const floorSurfaceStyle = useMemo(() => {
+    if (isGksUi) {
+      return {
+        cursor: 'default',
+        touchAction: 'none' as const,
+      }
+    }
     if (planZone === FLOOR_PLAN_ZONE_TERRACE) {
       return {
         backgroundColor: '#6b9b72',
@@ -825,7 +841,7 @@ export default function KassaFloorPlan({
       cursor: 'default',
       touchAction: 'none' as const,
     }
-  }, [planZone])
+  }, [planZone, isGksUi])
 
   const addDecor = (type: DecorType) => {
     const d: DecorItem = { id: makeId(), type, x: 20 + Math.random() * 60, y: 20 + Math.random() * 60, rotation: 0 }
@@ -1197,50 +1213,113 @@ export default function KassaFloorPlan({
   const modalOpen = showAddModal || showAddBarModal
 
   return (
-    <div className="fixed inset-0 bg-[#e3e3e3] z-50 flex flex-col">
+    <div
+      className={`fixed inset-0 z-50 flex flex-col ${isGksUi ? GKS_MENU_PLATE_SHELL_BG_CLASS : 'bg-[#e3e3e3]'}`}
+    >
       {/* Bij open modal: geen pointer-events naar vloer/header (iPad raakte vast na capture) */}
       <div className={`flex min-h-0 flex-1 flex-col ${modalOpen ? 'pointer-events-none' : ''}`}>
       {/* Header */}
-      <div className="h-14 flex-shrink-0 bg-[#e3e3e3] border-b border-gray-300 flex items-center justify-between px-4">
-        <div className="flex items-center gap-3">
-          <h2 className="text-gray-900 font-bold text-lg">
-            {t('kassaApp.pickTableTitle')}
-            <span className="ml-2 rounded-md bg-gray-200 px-2 py-0.5 text-xs font-semibold text-gray-700">
-              {planZone === FLOOR_PLAN_ZONE_TERRACE ? t('kassaApp.floorZoneTerrace') : t('kassaApp.floorZoneInside')}
-            </span>
-          </h2>
-          <span className="text-gray-500 text-sm">
-            {t('kassaApp.floorPlanFreeCount')
-              .replace('{free}', String(tables.filter((tbl) => tbl.status === 'FREE').length))
-              .replace('{total}', String(tables.length))}
-          </span>
+      <div
+        className={`flex h-14 flex-shrink-0 items-center justify-between px-4 ${
+          isGksUi
+            ? `border-b ${GKS_RULE_BLACK} ${GKS_MENU_PLATE_SHELL_BG_CLASS}`
+            : 'border-b border-gray-300 bg-[#e3e3e3]'
+        }`}
+      >
+        <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+          {isGksUi ? (
+            <>
+              <span
+                className={`inline-flex shrink-0 touch-manipulation items-center whitespace-nowrap px-2 py-1.5 text-sm font-semibold !text-[#f0f0f0] sm:px-3 sm:py-2 ${gksPosBtn}`}
+              >
+                {t('kassaApp.pickTableTitle')}
+              </span>
+              <span
+                className={`inline-flex shrink-0 items-center whitespace-nowrap px-2 py-1.5 text-xs font-semibold !text-[#f0f0f0] sm:px-2.5 sm:py-2 sm:text-sm ${gksPosBtn}`}
+              >
+                {planZone === FLOOR_PLAN_ZONE_TERRACE ? t('kassaApp.floorZoneTerrace') : t('kassaApp.floorZoneInside')}
+              </span>
+              <span className="hidden truncate text-sm font-medium text-[#b8b8b8] sm:inline">
+                {t('kassaApp.floorPlanFreeCount')
+                  .replace('{free}', String(tables.filter((tbl) => tbl.status === 'FREE').length))
+                  .replace('{total}', String(tables.length))}
+              </span>
+            </>
+          ) : (
+            <>
+              <h2 className="text-lg font-bold text-gray-900">
+                {t('kassaApp.pickTableTitle')}
+                <span className="ml-2 rounded-md bg-gray-200 px-2 py-0.5 text-xs font-semibold text-gray-700">
+                  {planZone === FLOOR_PLAN_ZONE_TERRACE ? t('kassaApp.floorZoneTerrace') : t('kassaApp.floorZoneInside')}
+                </span>
+              </h2>
+              <span className="text-sm text-gray-500">
+                {t('kassaApp.floorPlanFreeCount')
+                  .replace('{free}', String(tables.filter((tbl) => tbl.status === 'FREE').length))
+                  .replace('{total}', String(tables.length))}
+              </span>
+            </>
+          )}
         </div>
-        <div className="flex gap-2 items-center">
+        <div className="flex shrink-0 items-center gap-2">
           {!isLocked && (
             <>
-              <button onClick={() => setShowAddModal(true)}
-                className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-semibold transition-colors">
+              <button
+                type="button"
+                onClick={() => setShowAddModal(true)}
+                className={
+                  isGksUi
+                    ? `touch-manipulation px-3 py-2 text-sm font-semibold !text-[#f0f0f0] ${gksPosBtn}`
+                    : 'rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-600'
+                }
+              >
                 {t('kassaApp.floorPlanAddTable')}
               </button>
-              <button onClick={openAddBarModal}
-                className="px-4 py-2 bg-amber-700 hover:bg-amber-800 text-white rounded-lg text-sm font-semibold transition-colors">
+              <button
+                type="button"
+                onClick={openAddBarModal}
+                className={
+                  isGksUi
+                    ? `touch-manipulation px-3 py-2 text-sm font-semibold !text-[#f0f0f0] ${gksPosBtn}`
+                    : 'rounded-lg bg-amber-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-amber-800'
+                }
+              >
                 {t('kassaApp.floorPlanAddBar')}
               </button>
-              <button onClick={() => addDecor('plant')}
-                className="px-4 py-2 bg-green-700 hover:bg-green-800 text-white rounded-lg text-sm font-semibold transition-colors">
+              <button
+                type="button"
+                onClick={() => addDecor('plant')}
+                className={
+                  isGksUi
+                    ? `touch-manipulation px-3 py-2 text-sm font-semibold !text-[#f0f0f0] ${gksPosBtn}`
+                    : 'rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800'
+                }
+              >
                 {t('kassaApp.floorPlanAddPlant')}
               </button>
             </>
           )}
           <button
+            type="button"
             onClick={() => setIsLocked(prev => !prev)}
             title={isLocked ? t('kassaApp.floorPlanLockTitleLocked') : t('kassaApp.floorPlanLockTitleUnlocked')}
-            className="flex items-center gap-2 rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-orange-600"
+            className={
+              isGksUi
+                ? `flex touch-manipulation items-center gap-2 px-3 py-2 text-sm font-semibold !text-[#f0f0f0] ${gksPosBtn}`
+                : 'flex items-center gap-2 rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-orange-600'
+            }
           >
             {isLocked ? t('kassaApp.floorPlanLocked') : t('kassaApp.floorPlanEditing')}
           </button>
-          <button onClick={onClose}
-            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg text-sm font-semibold transition-colors">
+          <button
+            type="button"
+            onClick={onClose}
+            className={
+              isGksUi
+                ? `touch-manipulation px-3 py-2 text-sm font-semibold !text-[#f0f0f0] ${gksPosBtn}`
+                : 'rounded-lg bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-800 transition-colors hover:bg-gray-300'
+            }
+          >
             ✕ {t('kassaApp.closeAria')}
           </button>
         </div>
@@ -1248,8 +1327,11 @@ export default function KassaFloorPlan({
 
       {/* Floor + Sidebar */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Floor plan — tegelpatroon vast; alleen tafels/decor verschuiven */}
-        <div className="floor-plan flex-1 relative overflow-hidden select-none" style={floorSurfaceStyle}>
+        {/* Floor plan — default: tegelpatroon; GKS: korrel (zelfde als kassa-shell) */}
+        <div
+          className={`floor-plan relative flex-1 select-none overflow-hidden ${isGksUi ? GKS_MENU_PLATE_SHELL_BG_CLASS : ''}`}
+          style={floorSurfaceStyle}
+        >
           <div
             ref={innerCanvasRef}
             style={{ position: 'absolute', inset: 0, touchAction: 'manipulation' }}
@@ -1636,7 +1718,13 @@ export default function KassaFloorPlan({
       </div>
 
       {/* Legend */}
-      <div className="h-10 flex-shrink-0 bg-[#e3e3e3] border-t border-gray-300 flex items-center justify-center gap-6 text-sm text-gray-600">
+      <div
+        className={`flex h-10 flex-shrink-0 items-center justify-center gap-6 border-t text-sm ${
+          isGksUi
+            ? `${GKS_RULE_BLACK} ${GKS_MENU_PLATE_SHELL_BG_CLASS} text-[#d0d0d0]`
+            : 'border-gray-300 bg-[#e3e3e3] text-gray-600'
+        }`}
+      >
         {(Object.entries(STATUS_COLORS) as [TableStatus, string][]).map(([s, c]) => (
           <div key={s} className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: c }} />
