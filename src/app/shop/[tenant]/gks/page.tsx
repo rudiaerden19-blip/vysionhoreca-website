@@ -4141,7 +4141,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250607-colors"
+      data-gks-ui="20250607-accent-831100"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
     >
       <LogoutSoftwareConfirmModal
@@ -4172,7 +4172,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* ── Hamburger ── */}
         <div className="relative z-20 flex shrink-0 items-center gap-2">
           <button onClick={() => { setHamburgerOpen(!hamburgerOpen); setHamburgerSubOpen(null) }}
-            className={`flex items-center gap-1.5 rounded-xl px-2 py-1.5 transition-colors sm:gap-2 sm:px-3 ${hamburgerOpen ? 'bg-[#47c6fe] text-[#063042]' : 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'}`}
+            className={`flex items-center gap-1.5 rounded-xl px-2 py-1.5 transition-colors sm:gap-2 sm:px-3 ${hamburgerOpen ? 'bg-[#9a1500] text-white' : 'bg-[#831100] text-white hover:bg-[#9a1500]'}`}
             type="button"
             title={t('kassaApp.hamburgerMenu')}
             aria-expanded={hamburgerOpen}
@@ -4415,7 +4415,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           type="button"
           onClick={() => setLogoutSoftwareConfirmOpen(true)}
           title={t('kassaApp.logout')}
-          className="relative z-20 inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-lg bg-[#58CCFF] px-1.5 py-1 text-[11px] font-bold text-black transition-colors hover:bg-[#47c6fe] sm:gap-1 sm:px-2.5 sm:py-1.5 sm:text-sm"
+          className="relative z-20 inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-lg bg-[#831100] px-1.5 py-1 text-[11px] font-bold text-white transition-colors hover:bg-[#9a1500] sm:gap-1 sm:px-2.5 sm:py-1.5 sm:text-sm"
         >
           <span className="leading-snug">{t('kassaApp.logout')}</span>
         </button>
@@ -4495,7 +4495,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           : 'px-2.5 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm'
                       } ${
                         active
-                          ? 'border-[#58CCFF] bg-[#58CCFF] text-black shadow-sm'
+                          ? 'border-[#831100] bg-[#831100] text-white shadow-sm'
                           : kassaAppearanceDark
                             ? `border-zinc-500 bg-[#1a2230] ${ui.categoryStripText} ${ui.categoryStripHover}`
                             : `border-gray-300 bg-white ${ui.categoryStripText} ${ui.categoryStripHover}`
@@ -4622,7 +4622,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   kassaSxgaDenseTiles,
                 )} ${
                   pickerBrowseZone === FLOOR_PLAN_ZONE_INSIDE && showTablePicker
-                    ? 'bg-[#3C4D6B] text-white ring-2 ring-[#58CCFF]/55 ring-inset'
+                    ? 'bg-[#3C4D6B] text-white ring-2 ring-[#831100]/55 ring-inset'
                     : 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
                 }`}
               >
@@ -4677,7 +4677,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 kassaSxgaDenseTiles,
               )} ${
                 orderType === 'DINE_IN'
-                  ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
+                  ? 'bg-[#831100] text-white hover:bg-[#9a1500]'
                   : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
               }`}
             >
@@ -4715,7 +4715,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 kassaSxgaDenseTiles,
               )} ${
                 orderType === 'DELIVERY'
-                  ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
+                  ? 'bg-[#831100] text-white hover:bg-[#9a1500]'
                   : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
               }`}
             >
@@ -4745,14 +4745,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-1.5 pt-0.5 touch-pan-y">
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
               <div
-                className="mb-2 flex shrink-0 items-center gap-2 rounded-lg bg-[#58CCFF] px-2 py-1"
+                className="mb-2 flex shrink-0 items-center gap-2 rounded-lg bg-[#831100] px-2 py-1"
                 data-testid="kassa-sidebar-clock-bar"
               >
                 {showKassaStaffClockButton ? (
                   <button
                     type="button"
                     onClick={openStaffClockModal}
-                    className={`shrink-0 active:scale-[0.98] transition-all ${ui.clockTileBg} ${ui.clockTileHover}`}
+                    className={`shrink-0 active:scale-[0.98] transition-all ${ui.clockTileBg} hover:border-[#9a1500] hover:bg-[#263043]`}
                     title={t('staffClock.buttonTitle')}
                     aria-label={t('staffClock.buttonTitle')}
                   >
@@ -4760,7 +4760,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   </button>
                 ) : null}
                 <p
-                  className={`min-w-0 truncate whitespace-nowrap text-right text-xs font-semibold leading-tight tracking-tight text-black sm:text-sm ${showKassaStaffClockButton ? 'flex-1' : 'w-full'}`}
+                  className={`min-w-0 truncate whitespace-nowrap text-right text-xs font-semibold leading-tight tracking-tight text-white sm:text-sm ${showKassaStaffClockButton ? 'flex-1' : 'w-full'}`}
                   title={numpadHeaderDateLabel}
                   aria-live="polite"
                 >
@@ -4986,7 +4986,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <button
               type="button"
               onClick={() => { void openCashDrawer() }}
-              className={`flex flex-col items-center justify-center gap-1 rounded-xl bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe] active:brightness-95 ${kassaFooterActionTouchMinHClass(
+              className={`flex flex-col items-center justify-center gap-1 rounded-xl bg-[#831100] text-white hover:bg-[#9a1500] active:brightness-95 ${kassaFooterActionTouchMinHClass(
                 kassaSxgaDenseTiles,
                 kassaSidebarFooterTier === 'dense',
               )}`}
@@ -5037,8 +5037,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 playClick()
                 setNumpadPanelVisible((v) => !v)
               }}
-              className={`flex flex-col items-center justify-center gap-1 rounded-xl bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe] active:brightness-95 ${
-                numpadPanelVisible ? 'ring-2 ring-[#063042]/35' : ''
+              className={`flex flex-col items-center justify-center gap-1 rounded-xl bg-[#831100] text-white hover:bg-[#9a1500] active:brightness-95 ${
+                numpadPanelVisible ? 'ring-2 ring-white/45 ring-inset' : ''
               } ${kassaFooterActionTouchMinHClass(
                 kassaSxgaDenseTiles,
                 kassaSidebarFooterTier === 'dense',
@@ -5080,7 +5080,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 className={`min-w-0 flex-1 rounded-lg font-bold shadow-sm ring-1 ring-black/10 active:brightness-95 flex items-center justify-center text-center disabled:opacity-45 disabled:pointer-events-none ${
                   dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE
                     ? 'bg-emerald-400 text-emerald-950 hover:bg-emerald-300'
-                    : 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
+                    : 'bg-[#831100] text-white hover:bg-[#9a1500]'
                 } px-2 py-3 text-xs leading-tight sm:text-sm ${
                   kassaSxgaDenseTiles ? 'min-h-[2.875rem]' : 'min-h-[2.5rem]'
                 }`}
