@@ -144,6 +144,7 @@ export const GKS_POS_FIELD = [
 /** Onderstrook tegel — exact zelfde vlak als shell (`.gks-menu-plate-grain`). */
 export const GKS_MENU_TILE_LABEL_SURFACE = GKS_MENU_PLATE_SHELL_BG_CLASS
 
+/** @deprecated Gebruik `gksClockBarClass()` — zelfde basis als POS-knoppen. */
 export const GKS_CLOCK_BAR = [
   GKS_BTN_SHAPE,
   GKS_BTN_FACE,
@@ -154,4 +155,10 @@ export const GKS_CLOCK_BAR = [
 
 export function gksPosButtonClass(selected: boolean): string {
   return `${GKS_BTN_SHAPE} ${selected ? GKS_POS_BTN_SELECTED : GKS_POS_BTN}`
+}
+
+/** Klokbalk: exact dezelfde vorm/afgerondheid als Ter plaatse-knoppen + diepere schaduw. */
+export function gksClockBarClass(): string {
+  const lift = GKS_CLOCK_BAR_LIFT_SHADOW.replace(/^shadow-/, '!shadow-')
+  return `${gksPosButtonClass(false)} relative z-0 ${lift}`
 }

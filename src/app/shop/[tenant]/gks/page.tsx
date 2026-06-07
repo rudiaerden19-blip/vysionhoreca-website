@@ -87,7 +87,7 @@ import {
   GKS_POS_BTN,
   GKS_POS_FIELD,
   GKS_BTN_PRESS,
-  GKS_CLOCK_BAR,
+  gksClockBarClass,
   GKS_FONT_UI,
   GKS_FONT_UI_SOFT,
   GKS_TILE_LIFT_SHADOW,
@@ -4170,7 +4170,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250608-clock-bar-shadow-depth"
+      data-gks-ui="20250608-build-jsx-clock-bar-match"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4580,8 +4580,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 className="min-h-0 w-full"
                 {...GKS_MENU_VIEW_SLIDE}
               >
-              /* Categorieën: responsief raster; rijhoogte vult viewport; gap-4 = KASSA_MENU_GRID_GAP_PX */
-              categories.length === 0 ? (
+              {/* Categorieën: responsief raster; rijhoogte vult viewport; gap-4 = KASSA_MENU_GRID_GAP_PX */}
+              {categories.length === 0 ? (
                 <div className={`flex flex-col items-center justify-center h-full ${ui.menuEmptyMuted}`}>
                   <span className="text-5xl mb-3">📂</span>
                   <p className="font-semibold">{t('kassaApp.noCategoriesTitle')}</p>
@@ -4615,7 +4615,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     )
                   })}
                 </div>
-              )
+              )}
               </motion.div>
             ) : (
               <motion.div
@@ -4801,7 +4801,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-3 pt-2 touch-pan-y">
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
               <div
-                className={`mb-3 mt-2.5 flex shrink-0 items-center gap-3 px-3 py-2 ${GKS_CLOCK_BAR}`}
+                className={`mb-3 mt-2.5 flex shrink-0 items-center gap-3 px-3 py-2 ${gksClockBarClass()}`}
                 data-testid="kassa-sidebar-clock-bar"
               >
                 {showKassaStaffClockButton ? (
