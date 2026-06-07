@@ -82,10 +82,11 @@ import {
   broadcastTenantOwnerLogout,
   setTerminalLogout,
 } from '@/lib/session-broadcast'
-import { gksCompleteSaleN, gksPersistTableOrderP } from '@/lib/gks-kassa/gks-fiscal-flows'
+import { gksCompleteSaleN, gksPersistTableOrderP, gksSignPreBill } from '@/lib/gks-kassa/gks-fiscal-flows'
 import {
   appendGksFiscalPaidReceiptLines,
   appendGksProFormaDraftLines,
+  appendGksProFormaFdmRefLines,
   gksVatSplitFromFdmVatCalc,
   prependGksFiscalTicketHeader,
 } from '@/lib/gks-kassa/gks-fiscal-receipt'
@@ -3314,7 +3315,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const receiptRefDisplay = isDraft
       ? barKitchenDelta
         ? t('kassaReceipt.barToogReceiptRef')
-        : t('kassaReceipt.draftReceiptRef')
+        : order.gksFiscal?.posFiscalTicketNo
+          ? String(order.gksFiscal.posFiscalTicketNo)
+          : order.orderNumber > 0
+            ? String(order.orderNumber)
+            : t('kassaReceipt.draftReceiptRef')
       : order.checkoutReference ??
         (order.orderNumber > 0 ? String(order.orderNumber) : '—')
 
@@ -3373,6 +3378,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         bonLines.push(t('kassaReceipt.draftBanner'))
       }
       appendGksProFormaDraftLines(bonLines, gksFiscalLabels)
+      if (order.gksFiscal) {
+        appendGksProFormaFdmRefLines(bonLines, order.gksFiscal, gksFiscalLabels)
+      }
       bonLines.push('--------------------------------')
     }
     bonLines.push(
@@ -3642,6 +3650,24 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         }
 
         if (printKassaSlip) {
+          if (!getGksInternetOnline()) return
+          const fiscalGate = await assertGksCanFiscalize({
+            tenantSlug: tenant,
+            staff: activeKassaStaff,
+            vatNo: tenantInfo?.btw_number?.trim() || 'BE0000000000',
+          })
+          if (fiscalGate) return
+          const preBillRes = await gksSignPreBill(
+            tenant,
+            activeKassaStaff,
+            tenantInfo?.btw_number?.trim() || 'BE0000000000',
+            deltaLines,
+            resolveCartLineVat,
+            { zone, tableNumber: tblNr },
+          )
+          if (!preBillRes.ok) return
+          draftOrder.orderNumber = preBillRes.posFiscalTicketNo
+          draftOrder.gksFiscal = preBillRes.fiscalSnapshot
           await printReceipt(draftOrder, {
             draft: true,
             barTableDelta: true,
@@ -3673,6 +3699,22 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       setThermalPrintBanner({ variant: 'error', message: fiscalGate.message })
       return
     }
+    const vatNoPre = tenantInfo?.btw_number?.trim() || 'BE0000000000'
+    const preBillRes = await gksSignPreBill(
+      tenant,
+      activeKassaStaff,
+      vatNoPre,
+      draftBonLineItems,
+      resolveCartLineVat,
+      {
+        zone: orderType === 'DINE_IN' && tableNumber ? dineInFloorZone : undefined,
+        tableNumber: orderType === 'DINE_IN' ? tableNumber || undefined : undefined,
+      },
+    )
+    if (!preBillRes.ok) {
+      setThermalPrintBanner({ variant: 'error', message: preBillRes.error.message })
+      return
+    }
     try {
       setDraftBonPrinting(true)
       playClick()
@@ -3693,7 +3735,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
       const draftSplit = computeInclusiveVatSplitFromCart(draftBonLineItems, resolveCartLineVat)
       const draftOrder: KassaLastOrderReceipt = {
-        orderNumber: 0,
+        orderNumber: preBillRes.posFiscalTicketNo,
         items: sortKassaCartLinesByMenuCategory(draftBonLineItems, categories),
         total: draftBonTotal,
         vatSplit: draftSplit.byRate.map((l) => ({
@@ -3709,6 +3751,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         floorPlanZone: orderType === 'DINE_IN' && tableNumber ? dineInFloorZone : undefined,
         createdAt: new Date(),
         helpedByStaffName: activeKassaStaff?.name ?? null,
+        gksFiscal: preBillRes.fiscalSnapshot,
       }
 
       await printReceipt(draftOrder, {

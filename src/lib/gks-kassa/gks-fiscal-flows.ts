@@ -9,7 +9,7 @@ import type { GksPaymentLineInput } from '@/lib/gks-kassa/fdm-types'
 import { assertGksStaffForFiscal, type GksActiveStaff } from '@/lib/gks-kassa/gks-staff'
 import { assertGksCanFiscalize, gksAvailabilityToFlowError } from '@/lib/gks-kassa/gks-availability'
 import { getGksInternetOnline } from '@/lib/gks-kassa/gks-internet-lock'
-import { signOrder, signSale, type GksPartnerContext } from '@/services/gksPartnerService'
+import { signOrder, signPreBill, signSale, type GksPartnerContext } from '@/services/gksPartnerService'
 import type { FloorPlanZone } from '@/lib/kassa-floor-plan-zone'
 import { tableOrderMapKey } from '@/lib/kassa-floor-plan-zone'
 import {
@@ -326,6 +326,107 @@ export async function gksPersistTableOrderP(
     }
   }
   return null
+}
+
+/**
+ * Voorlopige rekening (PRO FORMA) — signPreBill (P) vóór afdruk; geen geldig btw-kasticket.
+ */
+export async function gksSignPreBill(
+  tenantSlug: string,
+  staff: GksActiveStaff | null,
+  vatNo: string,
+  lines: KassaCartItem[],
+  resolveVatPercent: (line: KassaCartItem) => number,
+  opts?: { zone?: FloorPlanZone; tableNumber?: string },
+): Promise<
+  | { ok: true; fiscalSnapshot: GksFiscalReceiptSnapshot; journalId: string; posFiscalTicketNo: number }
+  | { ok: false; error: GksFiscalFlowError }
+> {
+  if (lines.length === 0) {
+    return { ok: false, error: { code: 'EMPTY_CART', message: 'Geen regels voor voorlopige rekening.' } }
+  }
+  const gate = await gksEnsureFdmReady(tenantSlug, staff, vatNo)
+  if (gate) return { ok: false, error: gate }
+  const ctx = partnerCtx(tenantSlug, staff!, vatNo)
+  const transaction = cartLinesToTransaction(lines, resolveVatPercent)
+  let costCenter: { id: string; type: 'TABLE'; reference: string } | undefined
+  if (opts?.tableNumber && opts.zone) {
+    const slotKey = tableOrderMapKey(opts.zone, opts.tableNumber)
+    costCenter = {
+      id: opts.tableNumber,
+      type: 'TABLE',
+      reference: getOrCreateCostCenterReference(tenantSlug, slotKey),
+    }
+  }
+
+  const envelope = buildPendingEnvelope(ctx)
+  const idempotencyKey = newIdempotencyKey()
+
+  const pendingRes = await gksFiscalJournalCreatePending({
+    tenantSlug,
+    eventLabel: 'P',
+    mutation: 'signPreBill',
+    idempotencyKey,
+    posId: envelope.posId,
+    terminalId: envelope.terminalId,
+    deviceId: envelope.deviceId,
+    posFiscalTicketNo: envelope.posFiscalTicketNo,
+    posDateTime: envelope.posDateTime,
+    bookingPeriodId: envelope.bookingPeriodId,
+    bookingDate: envelope.bookingDate,
+    employeeId: envelope.employeeId,
+    requestPayload: { costCenter, transaction, envelope },
+  })
+  if (!pendingRes.ok) {
+    return {
+      ok: false,
+      error: {
+        code: 'FISCAL_JOURNAL_PENDING',
+        message: pendingRes.error || 'Kon fiscaal journal (preBill) niet starten.',
+      },
+    }
+  }
+  const journalId = pendingRes.data.id
+
+  let result: GksSignResult
+  try {
+    result = await signPreBill(ctx, costCenter, transaction, [])
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'signPreBill mislukt'
+    await markJournalFailedSafe(tenantSlug, journalId, 'SIGN_PREBILL_FAILED', message)
+    return { ok: false, error: { code: 'SIGN_PREBILL_FAILED', message } }
+  }
+
+  const successRes = await gksFiscalJournalMarkSuccess(
+    tenantSlug,
+    journalId,
+    signResultToResponsePayload(result),
+  )
+  if (!successRes.ok || successRes.data.status !== 'SUCCESS') {
+    await markJournalFailedSafe(
+      tenantSlug,
+      journalId,
+      'MARK_SUCCESS_FAILED',
+      successRes.ok ? `status=${successRes.data.status}` : successRes.error,
+    )
+    return {
+      ok: false,
+      error: {
+        code: 'MARK_SUCCESS_FAILED',
+        message: successRes.ok
+          ? 'Fiscaal journal (preBill) kon niet op SUCCESS gezet worden.'
+          : successRes.error || 'mark_success mislukt',
+      },
+    }
+  }
+
+  const fiscalSnapshot = gksFiscalSnapshotFromSignResult(result)
+  return {
+    ok: true,
+    fiscalSnapshot,
+    journalId,
+    posFiscalTicketNo: result.posFiscalTicketNo,
+  }
 }
 
 export async function gksCompleteSaleN(

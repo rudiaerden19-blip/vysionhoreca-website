@@ -97,6 +97,19 @@ export function appendGksProFormaDraftLines(
   bonLines.push(labels.notValidFiscalTicket)
 }
 
+/** Na signPreBill (P): teller op pro forma — geen QR / geen BTW-KASTICKET-header. */
+export function appendGksProFormaFdmRefLines(
+  bonLines: string[],
+  fiscal: GksFiscalReceiptSnapshot,
+  labels: Pick<GksReceiptFiscalLabels, 'eventCounter'>,
+): void {
+  bonLines.push('--------------------------------')
+  bonLines.push(
+    `${labels.eventCounter} ${fiscal.fdmRef.eventLabel}-${fiscal.fdmRef.eventCounter} / ${fiscal.fdmRef.totalCounter}`,
+  )
+  bonLines.push(`#${fiscal.posFiscalTicketNo}`)
+}
+
 export function prependGksFiscalTicketHeader(bonLines: string[], header: string): void {
   const idx = bonLines.findIndex((l) => l.startsWith('---'))
   if (idx >= 0) {
