@@ -1,24 +1,30 @@
+import type { CSSProperties } from 'react'
+
 /**
  * GKS-pilot: POS-ref — zwart-grijs, lichte verticale overgang, subtiele schaduw (niet overdreven).
  */
 
-/** Fallback onder textuur — iets donkerder dan #2c2c2e, geen harde zwart. */
+/** Fallback onder leisteen-textuur. */
 export const GKS_MENU_PLATE_BG = '#262628'
-export const GKS_MENU_PLATE_TEXTURE_PATH = '/gks/menu-plate-texture.png'
+/** Seamless leisteen — één vlak, geen tile-repeat. */
+export const GKS_MENU_PLATE_TEXTURE_PATH = '/gks/menu-plate-leisteen.png'
 
-/** Eén doorlopend vlak (alleen shell); kinderen transparant. */
-export const GKS_MENU_PLATE_SHELL_BG_CLASS = [
-  'bg-[#262628]',
-  "bg-[linear-gradient(rgba(0,0,0,0.14),rgba(0,0,0,0.14)),url('/gks/menu-plate-texture.png')]",
-  'bg-cover',
-  'bg-center',
-  'bg-no-repeat',
-].join(' ')
+/** Inline background: cover + no-repeat (betrouwbaarder dan Tailwind arbitrary bg). */
+export const GKS_MENU_PLATE_SHELL_BG_STYLE: CSSProperties = {
+  backgroundColor: GKS_MENU_PLATE_BG,
+  backgroundImage: `linear-gradient(rgba(0,0,0,0.08), rgba(0,0,0,0.08)), url('${GKS_MENU_PLATE_TEXTURE_PATH}')`,
+  backgroundSize: 'cover',
+  backgroundRepeat: 'no-repeat',
+  backgroundPosition: 'center center',
+}
 
-/** Donkere zones zonder eigen herhaling — shell-textuur schijnt door. */
+/** Shell: geen Tailwind-bg; stijl via GKS_MENU_PLATE_SHELL_BG_STYLE op de wrapper. */
+export const GKS_MENU_PLATE_SHELL_BG_CLASS = 'bg-transparent'
+
+/** Donkere zones zonder eigen achtergrond — shell-textuur schijnt door. */
 export const GKS_MENU_PLATE_TRANSPARENT_CLASS = 'bg-transparent'
 
-/** @deprecated Gebruik SHELL op wrapper + TRANSPARENT op secties. */
+/** @deprecated Gebruik SHELL style + TRANSPARENT op secties. */
 export const GKS_MENU_PLATE_BG_CLASS = GKS_MENU_PLATE_SHELL_BG_CLASS
 
 /** Subtiel afgerond — luxe POS, geen pill. */

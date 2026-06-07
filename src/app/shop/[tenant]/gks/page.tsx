@@ -81,6 +81,7 @@ import {
   GKS_BTN_ARIA_DISABLED,
   GKS_CHECKOUT_BTN,
   GKS_BTN_SHAPE,
+  GKS_MENU_PLATE_SHELL_BG_STYLE,
   GKS_MENU_PLATE_TRANSPARENT_CLASS,
   GKS_MENU_TILE_LABEL_SURFACE,
   GKS_POS_BTN,
@@ -4152,7 +4153,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250607-menu-plate-single-surface"
+      data-gks-ui="20250607-menu-plate-leisteen-cover"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4164,7 +4165,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           performLogout()
         }}
       />
-      <div className={`flex min-h-0 flex-1 flex-col overflow-hidden ${ui.shellBg}`}>
+      <div
+        className={`flex min-h-0 flex-1 flex-col overflow-hidden ${ui.shellBg}`}
+        style={kassaAppearanceDark ? GKS_MENU_PLATE_SHELL_BG_STYLE : undefined}
+      >
 
       {/* ── Blauwe balk: één rij — kleine tenantnaam zodat snelkoppelingen naast elkaar passen zonder horizontale scrollbar ── */}
       <div
