@@ -4225,7 +4225,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <div className="absolute top-full left-0 mt-1 flex z-30">
                 {/* Eerste kolom: modules */}
                 <div className={`${ui.flyMenuPanel} overflow-y-auto`} style={{ width: 240, maxHeight: '85vh' }}>
-                  <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-semibold uppercase tracking-wider sticky top-0 rounded-t-2xl">
+                  <div
+                    className={`sticky top-0 border-b px-4 py-2.5 text-xs font-semibold uppercase tracking-wider ${ui.flyMenuDivider} ${ui.flyMenuText}`}
+                  >
                     {t('adminLayout.menu')}
                   </div>
                   <Link
@@ -4235,11 +4237,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       setHamburgerOpen(false)
                       setHamburgerSubOpen(null)
                     }}
-                    className={`flex items-center gap-3 border-b ${ui.flyMenuDivider} px-4 py-3 text-sm font-semibold ${ui.flyMenuText} transition-colors ${ui.flyMenuRowHover}`}
+                    className={`flex items-center border-b ${ui.flyMenuDivider} px-4 py-3 text-sm font-semibold ${ui.flyMenuText} transition-colors ${ui.flyMenuRowHover}`}
                   >
-                    <span className="text-lg" aria-hidden>
-                      🏠
-                    </span>
                     <span>{t('adminLayout.overview')}</span>
                   </Link>
                   {modules.map(mod => (
@@ -4247,12 +4246,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       {(
                         <button onClick={() => setHamburgerSubOpen(hamburgerSubOpen === mod.rowKey ? null : mod.rowKey)}
                           className={`w-full flex items-center justify-between px-4 py-3 transition-colors ${hamburgerSubOpen === mod.rowKey ? ui.flyMenuRowActive : ui.flyMenuRowHover}`}>
-                          <div className="flex items-center gap-3">
-                            <span className="text-lg">{mod.icon}</span>
-                            <span className={`font-semibold text-sm ${ui.flyMenuTextMuted}`}>
-                              {mod.labelKey ? t(mod.labelKey) : mod.label}
-                            </span>
-                          </div>
+                          <span className={`font-semibold text-sm ${ui.flyMenuTextMuted}`}>
+                            {mod.labelKey ? t(mod.labelKey) : mod.label}
+                          </span>
                           <svg className={`w-4 h-4 ${ui.flyMenuChevron}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                         </button>
                       )}
