@@ -4179,7 +4179,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250608-clock-bar-outside-clip-pill"
+      data-gks-ui="20250608-header-footer-type"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4305,11 +4305,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               if (draftBonLineItems.length === 0 || draftBonPrinting || gksFiscalBlocked) return
               void printDraftBonFromCart({ draftCopies: 2 })
             }}
-            className="max-w-full rounded-md px-1 py-0.5 text-center text-sm font-semibold leading-tight tracking-tight text-white transition-colors hover:bg-white/15 active:bg-white/25 disabled:opacity-45 disabled:pointer-events-none sm:text-base md:text-lg"
+            className="max-w-full rounded-md px-1 py-0.5 text-center text-sm font-semibold leading-tight tracking-tight !text-white transition-colors hover:bg-white/15 active:bg-white/25 disabled:pointer-events-none disabled:!text-white/45 sm:text-base md:text-lg"
             title={gksFiscalBlocked ? gksFiscalBlockedTitle : t('kassaApp.cartBonTitle')}
             aria-label={`${tenantInfo?.business_name || tenant} — ${t('kassaApp.cartBonTitle')}`}
           >
-            <span className="block max-w-full truncate pl-[1cm]">
+            <span className="block max-w-full truncate pl-[1cm] !text-white">
               {tenantInfo?.business_name ||
                 tenant.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
             </span>
@@ -4421,7 +4421,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <button
             type="button"
             onClick={() => toggleKassaAppearance()}
-            className={`inline-flex touch-manipulation shrink-0 items-center gap-1 whitespace-nowrap px-1.5 py-1 font-semibold sm:px-2 sm:py-1.5 ${gksPosButtonClass(kassaAppearanceDark)}`}
+            className={`inline-flex touch-manipulation shrink-0 items-center gap-0.5 whitespace-nowrap px-1.5 py-1.5 font-semibold sm:gap-1 sm:px-2 sm:py-2 md:px-3 ${gksPosButtonClass(kassaAppearanceDark)}`}
             title={
               kassaAppearanceDark ? t('adminLayout.kassaAppearanceLightAria') : t('adminLayout.kassaAppearanceDarkAria')
             }
@@ -4430,7 +4430,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               kassaAppearanceDark ? t('adminLayout.kassaAppearanceLightAria') : t('adminLayout.kassaAppearanceDarkAria')
             }
           >
-            <span className="text-[11px] leading-snug !text-[#f0f0f0] sm:text-xs">
+            <span className="text-sm font-semibold leading-snug !text-[#f0f0f0] sm:text-[15px]">
               {kassaAppearanceDark ? t('adminLayout.kassaAppearanceLight') : t('adminLayout.kassaAppearanceDark')}
             </span>
           </button>
@@ -5071,11 +5071,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               )}`}
               title={t('kassaApp.drawerOpen')}
             >
-              <span
-                className={`text-center leading-tight ${
-                  kassaSxgaDenseTiles ? 'text-xs' : 'text-[11px] sm:text-xs'
-                }`}
-              >
+              <span className="text-center text-sm font-semibold leading-tight">
                 {t('kassaApp.drawerOpen')}
               </span>
             </button>
@@ -5093,11 +5089,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               )}`}
               aria-label={t('kassaApp.cartBonTitle')}
             >
-              <span
-                className={`text-center leading-tight ${
-                  kassaSxgaDenseTiles ? 'text-xs' : 'text-[11px] sm:text-xs'
-                }`}
-              >
+              <span className="text-center text-sm font-semibold leading-tight">
                 {t('kassaApp.cartBon')}
               </span>
             </button>
@@ -5116,11 +5108,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 kassaSidebarFooterTier === 'dense',
               )}`}
             >
-              <span
-                className={`text-center leading-tight ${
-                  kassaSxgaDenseTiles ? 'text-xs' : 'text-[11px] sm:text-xs'
-                }`}
-              >
+              <span className="text-center text-sm font-semibold leading-tight">
                 {t('kassaApp.numpadToggle')}
               </span>
             </button>
