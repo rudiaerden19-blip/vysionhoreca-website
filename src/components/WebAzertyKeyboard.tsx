@@ -5,6 +5,11 @@ import type { ReactNode } from 'react'
 import { STAFF_PIN_MAX_LEN } from '@/components/staff-clock/StaffClockPinPortal'
 import { useLanguage } from '@/i18n'
 import { ATTR_VYSION_KB_MANAGED, focusInputForProgrammaticEdit, setNativeInputValue } from '@/lib/dom-input-value'
+import {
+  clearWebTouchKeyboardInset,
+  scrollInputAboveWebKeyboard,
+  setWebTouchKeyboardInset,
+} from '@/lib/web-touch-keyboard-scroll'
 import { usePathname } from 'next/navigation'
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
@@ -382,17 +387,48 @@ export function WebAzertyKeyboard() {
     }
   }, [target])
 
-  useLayoutEffect(() => {
-    if (!target) return
+  const syncKeyboardInsetAndScroll = useCallback(() => {
+    const panel = panelRef.current
+    if (!target || !panel) return
+    const h = panel.getBoundingClientRect().height
+    setWebTouchKeyboardInset(h)
     requestAnimationFrame(() => {
-      try {
-        /** nearest + auto = minder “springen” waardoor het veld niet eindeloos tegen het blok duwt */
-        target.scrollIntoView({ block: 'nearest', behavior: 'auto' })
-      } catch {
-        /* noop */
-      }
+      if (target.isConnected) scrollInputAboveWebKeyboard(target, h)
     })
-  }, [target, legacyNumericMode, pinCompactMode])
+  }, [target])
+
+  useLayoutEffect(() => {
+    if (!target) {
+      clearWebTouchKeyboardInset()
+      return
+    }
+    syncKeyboardInsetAndScroll()
+    return () => {
+      clearWebTouchKeyboardInset()
+    }
+  }, [target, legacyNumericMode, pinCompactMode, syncKeyboardInsetAndScroll])
+
+  useEffect(() => {
+    if (!target) return
+    const panel = panelRef.current
+    if (!panel) return
+
+    const ro = new ResizeObserver(() => syncKeyboardInsetAndScroll())
+    ro.observe(panel)
+
+    const vv = window.visualViewport
+    const onViewportChange = () => syncKeyboardInsetAndScroll()
+    vv?.addEventListener('resize', onViewportChange)
+    vv?.addEventListener('scroll', onViewportChange)
+    window.addEventListener('resize', onViewportChange)
+
+    return () => {
+      ro.disconnect()
+      vv?.removeEventListener('resize', onViewportChange)
+      vv?.removeEventListener('scroll', onViewportChange)
+      window.removeEventListener('resize', onViewportChange)
+    }
+  }, [target, syncKeyboardInsetAndScroll])
 
   const closePanel = () => {
     try {

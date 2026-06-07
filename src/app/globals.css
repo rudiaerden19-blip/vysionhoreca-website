@@ -437,6 +437,16 @@ input[type="number"] {
   appearance: textfield;
 }
 
+/* Schermtoetsenbord (WebAzertyKeyboard): extra scrollruimte zodat velden niet achter het paneel zitten */
+html[data-vysion-web-kb-open] body {
+  padding-bottom: var(--vysion-web-kb-height, 17rem);
+  scroll-padding-bottom: var(--vysion-web-kb-height, 17rem);
+}
+
+html[data-vysion-web-kb-open] {
+  scroll-padding-bottom: var(--vysion-web-kb-height, 17rem);
+}
+
 /* ===========================================
    SCROLLBAR HIDE
    =========================================== */
