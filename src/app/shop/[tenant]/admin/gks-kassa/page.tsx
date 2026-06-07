@@ -1074,7 +1074,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [categories, setCategories] = useState<MenuCategory[]>([])
   const [products, setProducts] = useState<MenuProduct[]>([])
   const [selectedCategory, setSelectedCategory] = useState<MenuCategory | null>(null)
-  const [menuLoading, setMenuLoading] = useState(true)
+  const [menuLoading, setMenuLoading] = useState(() => {
+    if (typeof window === 'undefined') return true
+    try {
+      const cats = localStorage.getItem(gksMenuCatsCacheKey(tenant))
+      const prods = localStorage.getItem(gksMenuProdsCacheKey(tenant))
+      const opts = localStorage.getItem(gksMenuOptsCacheKey(tenant))
+      return !(cats && prods && opts)
+    } catch {
+      return true
+    }
+  })
   const [productsWithOptions, setProductsWithOptions] = useState<string[]>([])
   const productIdsWithOptionsSet = useMemo(
     () => new Set(productsWithOptions),
@@ -1976,11 +1986,39 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const CACHE_PRODS = gksMenuProdsCacheKey(tenant)
   const CACHE_OPTS = gksMenuOptsCacheKey(tenant)
 
+  useLayoutEffect(() => {
+    try {
+      const cachedCats = localStorage.getItem(CACHE_CATS)
+      const cachedProds = localStorage.getItem(CACHE_PRODS)
+      const cachedOpts = localStorage.getItem(CACHE_OPTS)
+      if (cachedCats && cachedProds && cachedOpts) {
+        setCategories(dedupeCatalogById(JSON.parse(cachedCats)))
+        setProducts(dedupeCatalogById(JSON.parse(cachedProds)))
+        setProductsWithOptions([...new Set(JSON.parse(cachedOpts) as string[])])
+        setMenuLoading(false)
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [tenant, CACHE_CATS, CACHE_PRODS, CACHE_OPTS])
+
   // Laad categorieën, producten en welke producten opties hebben
   // Offline: laad uit localStorage-cache; online: laad van Supabase en update cache
   const loadMenu = useCallback(async (opts?: { silent?: boolean }) => {
     const silent = !!opts?.silent
-    if (!silent) setMenuLoading(true)
+    let hasWarmCache = false
+    if (typeof window !== 'undefined') {
+      try {
+        hasWarmCache = !!(
+          localStorage.getItem(CACHE_CATS) &&
+          localStorage.getItem(CACHE_PRODS) &&
+          localStorage.getItem(CACHE_OPTS)
+        )
+      } catch {
+        hasWarmCache = false
+      }
+    }
+    if (!silent && !hasWarmCache) setMenuLoading(true)
 
     // 1) IndexedDB (meest recente snapshot na eerdere sessie)
     try {

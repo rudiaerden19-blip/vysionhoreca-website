@@ -66,6 +66,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   const tenantSlug = resolveShopTenantSlug(pathname, routeTenant || params.tenant)
   const tenantCheckSeq = useRef(0)
   const tenantGateSlugRef = useRef<string | null>(null)
+  const adminAccessTenantRef = useRef<string | null>(null)
   const adminPath = normalizeShopAdminPathname(pathname, tenantSlug)
   const router = useRouter()
   const { t } = useLanguage()
@@ -165,8 +166,17 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     }
   }, [pathname, routeTenant, params.tenant, onGksKassaPos])
 
+  /** Alleen bij wissel van tenant — niet na mount (anders overschrijft dit verifying en flikkert de kassa). */
   useEffect(() => {
-    setAdminAccess('pending')
+    const slug = params.tenant
+    if (adminAccessTenantRef.current === null) {
+      adminAccessTenantRef.current = slug
+      return
+    }
+    if (adminAccessTenantRef.current !== slug) {
+      adminAccessTenantRef.current = slug
+      setAdminAccess('pending')
+    }
   }, [params.tenant])
 
   /**
@@ -405,27 +415,27 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     tenantSlug,
   ])
 
-  /** GKS POS: geen async tenant_settings-gate; kinderen blijven gemount (geen remount-flikker). */
+  /** GKS POS: geen async tenant_settings-gate; één mount na auth (geen POS onder overlay). */
   if (onGksKassaPos) {
-    const gksAuthOverlay =
-      !demoPublicUnauthenticated &&
-      adminAccess !== 'ok' &&
-      !(typeof window !== 'undefined' && isSuperAdminLoggedIn())
-    return (
-      <>
-        {children}
-        {gksAuthOverlay ? (
-          <div className="fixed inset-0 z-[500] flex min-h-screen items-center justify-center bg-gray-100">
-            <div className="text-center">
-              <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-              <p className="text-gray-600">
-                {adminAccess === 'login' ? t('adminLayout.redirectLogin') : t('adminLayout.loading')}
-              </p>
-            </div>
+    if (demoPublicUnauthenticated) {
+      return <>{children}</>
+    }
+    if (typeof window !== 'undefined' && isSuperAdminLoggedIn()) {
+      return <>{children}</>
+    }
+    if (adminAccess !== 'ok') {
+      return (
+        <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-gray-600">
+              {adminAccess === 'login' ? t('adminLayout.redirectLogin') : t('adminLayout.loading')}
+            </p>
           </div>
-        ) : null}
-      </>
-    )
+        </div>
+      )
+    }
+    return <>{children}</>
   }
 
   if (loading || tenantExists === null) {
