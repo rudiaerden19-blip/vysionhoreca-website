@@ -4007,7 +4007,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const kassaQuickMenuPanelBtnClass = useCallback(
     (enabled: boolean) =>
       [
-        'flex min-h-[3.25rem] items-center justify-center px-2 py-2.5 text-center text-[11px] font-bold leading-tight sm:min-h-[3.5rem] sm:text-xs',
+        'flex min-h-[7.25rem] min-w-0 items-center justify-center px-1 py-2 text-center text-[9px] font-bold leading-[1.15] sm:min-h-[7.75rem] sm:px-1.5 sm:text-[10px] md:text-xs',
         kassaAppearanceDark
           ? kassaPosButtonClass(false)
           : 'rounded-xl bg-[#161616] text-[#f0f0f0] shadow-md hover:brightness-110 active:brightness-90',
@@ -4691,7 +4691,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   : 'linear-gradient(to top, rgba(0,0,0,0.88) 72%, transparent)',
               }}
             >
-              <div className="grid grid-cols-4 gap-2.5 sm:gap-3">
+              <div className="grid w-full grid-cols-8 gap-1.5 sm:gap-2">
                 {kassaQuickMenuActions.map((action) => {
                   const enabled = isKassaQuickMenuActionEnabled(action)
                   const label = t(action.labelKey)
