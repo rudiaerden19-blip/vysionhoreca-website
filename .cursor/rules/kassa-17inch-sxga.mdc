@@ -22,8 +22,7 @@ alwaysApply: false
 |-----------|-----------|
 | Zijbalk breedte SXGA | `KASSA_SIDEBAR_WIDTH_SXGA_COMPACT_PX` = **332**; UI `w-[332px]` (sync met constante + `estimateKassaMenuGridInnerWidthPx`) |
 | Zijbalk overflow | **Geen** `overflow-hidden` die POS-schaduwen horizontaal afknipt; SXGA: `overflow-y-hidden` + `overflow-x-visible` |
-| Header 17″ | **Geen** `ml-[4cm]` op SXGA. Zaaknaam **boven** snelkoppelingen (twee regels); volledige naam (`whitespace-normal`), knoppen op tweede regel (horizontaal scrollbaar indien nodig). Tenantblok `ml-2`, geen `max-w-[6.5rem]`. |
-| Touch-scroll SXGA | Menu + winkelmand: `touch-pan-y` + `-webkit-overflow-scrolling: touch`; tegel-rasters `touch-pan-y` (niet `touch-manipulation`); tap-slop **26px** op tegels. |
+| Header 17″ | **Geen** `ml-[4cm]` / `ml-[1cm]` op SXGA — tenant `ml-2` + compacte naam; snelkoppelingen `ml-[2cm]` (niet over zaaknaam). |
 | Rij-gaps zijbalk (donker + SXGA) | `gap-2` (zone, besteltype, footer grids) — **niet** `gap-4` op 17″ |
 | Labels zijbalk (donker + SXGA) | Compact: `text-[11px]` (`kassaSidebarActionLabelClass` / zone variant) — **niet** footer `15px` op smalle rijen |
 | Menu-raster SXGA | Max **5** kolommen (`xl:grid-cols-5`), vierkante fotobak, `items-start` |
