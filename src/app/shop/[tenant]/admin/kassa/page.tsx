@@ -354,22 +354,23 @@ function kassaFooterActionTouchMinHClass(sxga: boolean, denseBill: boolean): str
   return 'min-h-[4.25rem] py-2.5'
 }
 
-/** Draadmand-vuilbak (POS-preview), niet Heroicons-prullenbak. */
+/** Mand-vuilbak — rechthoek + 5 horizontale lijnen (POS-preview afb. 2). */
 function KassaCartTrashIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" d="M10 4.25h4" />
+      <path stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" d="M7.25 6.75h9.5" />
       <path
         stroke="currentColor"
         strokeWidth={1.5}
-        strokeLinecap="round"
         strokeLinejoin="round"
-        d="M9 3.25h6M7.75 5.25h8.5l-1.1 14.2c-.05.75-.7 1.35-1.45 1.35h-3.8c-.75 0-1.4-.6-1.45-1.35L7.75 5.25z"
+        d="M8.25 8.5v11.75c0 .55.45 1 1 1h5.5c.55 0 1-.45 1-1V8.5"
       />
       <path
         stroke="currentColor"
-        strokeWidth={1.25}
+        strokeWidth={1.2}
         strokeLinecap="round"
-        d="M9.25 9.25h5.5M9.25 12h5.5M9.25 14.75h5.5M9.25 17.5h5"
+        d="M9.35 10.75h5.3M9.35 12.85h5.3M9.35 14.95h5.3M9.35 17.05h5.3M9.35 19.15h5.3"
       />
     </svg>
   )
