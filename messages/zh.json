@@ -3491,7 +3491,7 @@
     "summaryPrint": "打印",
     "summaryReceiptPrinted": "打印时间：{date}",
     "close": "关闭",
-    "productTapRequiresStaff": "请先点击时钟，再为员工选择“销售”，之后即可添加商品。",
+    "productTapRequiresStaff": "请先点击“销售”按钮，再为员工选择“销售”，之后即可添加商品。",
     "successIn": "已记录上班。",
     "successOut": "已记录下班。",
     "errors": {

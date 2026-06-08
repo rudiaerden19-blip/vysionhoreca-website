@@ -3491,7 +3491,7 @@
     "summaryPrint": "印刷",
     "summaryReceiptPrinted": "印刷日時: {date}",
     "close": "閉じる",
-    "productTapRequiresStaff": "時計をタップし、スタッフの「販売」を選んでください。その後に商品を追加できます。",
+    "productTapRequiresStaff": "「販売」ボタンをタップし、スタッフの「販売」を選んでください。その後に商品を追加できます。",
     "successIn": "出勤を記録しました。",
     "successOut": "退勤を記録しました。",
     "errors": {

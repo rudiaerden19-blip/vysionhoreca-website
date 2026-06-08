@@ -3491,7 +3491,7 @@
     "summaryPrint": "Stampa",
     "summaryReceiptPrinted": "Stampato: {date}",
     "close": "Chiudi",
-    "productTapRequiresStaff": "Tocca l’orologio e scegli Vendite per un collaboratore. Poi potrai aggiungere il prodotto.",
+    "productTapRequiresStaff": "Tocca il pulsante Vendite e scegli Vendite per un collaboratore. Poi potrai aggiungere il prodotto.",
     "successIn": "Entrata registrata.",
     "successOut": "Uscita registrata.",
     "errors": {

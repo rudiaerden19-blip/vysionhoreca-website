@@ -2,6 +2,10 @@
 
 import { useLanguage } from '@/i18n'
 import { StaffClockPinPortal } from '@/components/staff-clock/StaffClockPinPortal'
+import {
+  KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
+  kassaPosButtonClass,
+} from '@/lib/kassa-pos-surface'
 
 export type KassaStaffClockRow = { id: string; name: string; hasOpenSession: boolean }
 
@@ -231,19 +235,19 @@ export function KassaProductStaffGatePopup({ open, onDismiss }: { open: boolean;
       role="presentation"
     >
       <div
-        className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl"
+        className={`w-full max-w-sm rounded-2xl border border-black p-6 shadow-2xl ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-labelledby="product-staff-gate-title"
       >
-        <p id="product-staff-gate-title" className="text-center text-base font-semibold leading-snug text-gray-900">
+        <p id="product-staff-gate-title" className="text-center text-base font-semibold leading-snug text-white">
           {t('staffClock.productTapRequiresStaff')}
         </p>
         <button
           type="button"
           onClick={onDismiss}
-          className="mt-5 w-full min-h-[48px] rounded-xl bg-[#3C4D6B] font-bold text-white transition-colors hover:bg-[#2D3A52]"
+          className={`mt-5 w-full min-h-[48px] font-bold ${kassaPosButtonClass(false)}`}
         >
           {t('staffClock.close')}
         </button>

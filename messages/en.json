@@ -3967,7 +3967,7 @@
     "summaryPrint": "Print",
     "summaryReceiptPrinted": "Printed: {date}",
     "close": "Close",
-    "productTapRequiresStaff": "Tap the clock, then choose Sales for a team member. You can add the product after that.",
+    "productTapRequiresStaff": "Tap the Sales button, then choose Sales for a team member. You can add the product after that.",
     "successIn": "Clocked in.",
     "successOut": "Clocked out.",
     "errors": {

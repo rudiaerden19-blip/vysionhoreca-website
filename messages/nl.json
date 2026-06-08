@@ -3967,7 +3967,7 @@
     "summaryPrint": "Afdrukken",
     "summaryReceiptPrinted": "Afgedrukt: {date}",
     "close": "Sluiten",
-    "productTapRequiresStaff": "Druk op de klok en kies Verkoop bij een medewerker. Daarna kun je het product toevoegen.",
+    "productTapRequiresStaff": "Druk op de Verkoop-knop en kies Verkoop bij een medewerker. Daarna kun je het product toevoegen.",
     "successIn": "Ingeklokt.",
     "successOut": "Uitgeklokt.",
     "errors": {

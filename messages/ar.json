@@ -3491,7 +3491,7 @@
     "summaryPrint": "طباعة",
     "summaryReceiptPrinted": "طُبع في: {date}",
     "close": "إغلاق",
-    "productTapRequiresStaff": "اضغط الساعة ثم اختر «مبيعات» لأحد الموظفين. بعدها يمكنك إضافة المنتج.",
+    "productTapRequiresStaff": "اضغط زر «المبيعات» ثم اختر «مبيعات» لأحد الموظفين. بعدها يمكنك إضافة المنتج.",
     "successIn": "تم تسجيل الدخول.",
     "successOut": "تم تسجيل الخروج.",
     "errors": {

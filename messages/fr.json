@@ -2991,7 +2991,7 @@
     "summaryPrint": "Imprimer",
     "summaryReceiptPrinted": "Imprimé : {date}",
     "close": "Fermer",
-    "productTapRequiresStaff": "Appuie sur l’horloge, puis choisis Vente pour un collaborateur. Ensuite tu pourras ajouter le produit.",
+    "productTapRequiresStaff": "Appuie sur le bouton Vente, puis choisis Vente pour un collaborateur. Ensuite tu pourras ajouter le produit.",
     "successIn": "Entrée enregistrée.",
     "successOut": "Sortie enregistrée.",
     "errors": {
