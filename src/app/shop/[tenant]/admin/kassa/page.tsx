@@ -83,7 +83,9 @@ import {
   kassaClockBarClass,
   KASSA_NUMPAD_CART_RECESS_MOTION,
   KASSA_NUMPAD_PANEL_SLIDE_MOTION,
+  KASSA_POS_CART_THUMB_SHELL,
   kassaPosButtonClass,
+  kassaPosCartQtyButtonClass,
   kassaPosRaisedStripClass,
 } from '@/lib/kassa-pos-surface'
 import { authFetch, buildShopInternalReturnPath } from '@/lib/auth-headers'
@@ -348,6 +350,18 @@ function kassaFooterActionTouchMinHClass(sxga: boolean, denseBill: boolean): str
   if (sxga) return 'min-h-[4.75rem] py-2.5'
   if (denseBill) return 'min-h-[4rem] py-2'
   return 'min-h-[4.25rem] py-2.5'
+}
+
+function KassaCartTrashIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+      />
+    </svg>
+  )
 }
 
 function stoolsFromFloorDecorPayload(data: unknown): { stoolNumber: string; segmentId: string }[] {
@@ -3985,6 +3999,111 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const headerUtilityBtnClass = (selected: boolean) =>
     kassaAppearanceDark ? `${kassaDarkHeaderBtnShell} gap-0.5 sm:gap-1 ${kassaPosButtonClass(selected)}` : ''
 
+  const cartLineQtyBtnCompact = kassaSxgaDenseTiles && kassaSidebarFooterTier === 'dense'
+
+  const renderSidebarCartLine = (item: (typeof cartLinesByCategory)[number]) => {
+    const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
+    const lineTotal = ((item.product.price + choicesTotal) * item.quantity).toFixed(2)
+    const thumbClass = kassaAppearanceDark
+      ? `${KASSA_POS_CART_THUMB_SHELL} h-12 w-12`
+      : `h-12 w-12 rounded-lg flex-shrink-0 ${ui.cartThumbPlaceholder}`
+
+    return (
+      <div key={item.cartKey} className={ui.cartRowBg}>
+        {item.product.image_url ? (
+          <img
+            src={item.product.image_url}
+            alt={item.product.name}
+            decoding="async"
+            loading="eager"
+            onError={kassaProductImageRetryOnError}
+            className={`${thumbClass} ${
+              item.product.image_display_mode === 'contain' ? 'object-contain p-0.5' : 'object-cover'
+            }`}
+          />
+        ) : (
+          <div className={`${thumbClass} flex items-center justify-center text-xl`}>🍽️</div>
+        )}
+        <div className="min-w-0 flex-1">
+          <p className={`truncate text-sm font-bold ${ui.cartTitle}`}>{item.product.name}</p>
+          {item.choices && item.choices.length > 0 ? (
+            <p className={`truncate text-xs ${ui.cartChoices}`}>{item.choices.map((c) => c.choiceName).join(', ')}</p>
+          ) : null}
+          <p className={`text-sm font-bold ${kassaAppearanceDark ? ui.priceAccentClass : 'text-emerald-600'}`}>
+            €{lineTotal}
+          </p>
+        </div>
+        <div className="flex shrink-0 items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => updateQty(item.cartKey, item.quantity - 1)}
+            className={
+              kassaAppearanceDark
+                ? `touch-manipulation ${kassaPosCartQtyButtonClass(cartLineQtyBtnCompact)}`
+                : `touch-manipulation rounded-lg bg-red-500 text-white font-bold flex items-center justify-center hover:bg-red-600 active:brightness-95 ${
+                    cartLineQtyBtnCompact ? 'h-8 w-8 text-base' : 'h-9 w-9 text-lg'
+                  }`
+            }
+            aria-label={item.quantity === 1 ? t('kassaApp.ariaRemoveLine') : t('kassaApp.ariaDecreaseQty')}
+          >
+            {item.quantity === 1 ? (
+              kassaAppearanceDark ? (
+                <KassaCartTrashIcon className="h-[1.05rem] w-[1.05rem] text-[#c8c8c8]" />
+              ) : (
+                '🗑'
+              )
+            ) : (
+              '−'
+            )}
+          </button>
+          {!demoViewOnly &&
+            item.product.id &&
+            !String(item.product.id).startsWith('custom-') &&
+            productIdsWithOptionsSet.has(item.product.id) && (
+              <button
+                type="button"
+                onClick={() => void openEditCartItem(item)}
+                className={
+                  kassaAppearanceDark
+                    ? `touch-manipulation ${kassaPosCartQtyButtonClass(cartLineQtyBtnCompact)} text-sm`
+                    : `touch-manipulation rounded-lg bg-amber-500 text-white flex items-center justify-center hover:bg-amber-600 active:brightness-95 ${
+                        cartLineQtyBtnCompact ? 'h-8 w-8 text-sm' : 'h-9 w-9 text-sm'
+                      }`
+                }
+                title={t('kassaApp.ariaEditOptions')}
+                aria-label={t('kassaApp.ariaEditOptions')}
+              >
+                ✏️
+              </button>
+            )}
+          <span className={`w-6 text-center text-base font-bold ${ui.numpadInput}`}>{item.quantity}</span>
+          <button
+            type="button"
+            onClick={() => updateQty(item.cartKey, item.quantity + 1)}
+            className={
+              kassaAppearanceDark
+                ? `touch-manipulation ${kassaPosCartQtyButtonClass(cartLineQtyBtnCompact)}`
+                : `touch-manipulation rounded-lg bg-[#3C4D6B] text-white font-bold flex items-center justify-center hover:bg-[#2D3A52] active:brightness-95 ${
+                    cartLineQtyBtnCompact ? 'h-8 w-8 text-base' : 'h-9 w-9 text-lg'
+                  }`
+            }
+            aria-label={t('kassaApp.ariaIncreaseQty')}
+          >
+            +
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  const sidebarCartSectionLabelClass = kassaAppearanceDark
+    ? 'shrink-0 text-[11px] font-bold uppercase tracking-[0.14em] text-white/90'
+    : `shrink-0 text-[10px] font-bold uppercase tracking-wide ${ui.numpadMeta}`
+
+  const sidebarCartLinesScrollClass = kassaAppearanceDark
+    ? 'min-h-0 flex-1 space-y-2.5 overflow-y-auto overscroll-y-contain py-0.5'
+    : 'min-h-0 flex-1 overflow-y-auto overscroll-y-contain'
+
   return (
     <div
       className="flex min-h-0 flex-col overflow-hidden h-[100svh] max-h-[100svh] supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh]"
@@ -4778,80 +4897,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   </div>
                 </div>
               ) : null}
-              <p
-                className={`shrink-0 text-[10px] font-bold uppercase tracking-wide ${ui.numpadMeta}`}
-              >
-                {t('kassaApp.cartNewLinesSection')}
-              </p>
+              <p className={sidebarCartSectionLabelClass}>{t('kassaApp.cartNewLinesSection')}</p>
               <div
                 ref={cartLinesScrollRef}
-                className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain"
+                className={sidebarCartLinesScrollClass}
                 data-testid="kassa-cart-lines"
               >
-              {cartLinesByCategory.map(item => {
-                const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
-                return (
-                  <div key={item.cartKey} className={ui.cartRowBg}>
-                    {item.product.image_url ? (
-                      <img src={item.product.image_url} alt={item.product.name}
-                        decoding="async"
-                        loading="eager"
-                        onError={kassaProductImageRetryOnError}
-                        className={`w-12 h-12 rounded-lg flex-shrink-0 ${item.product.image_display_mode === 'contain' ? `object-contain ${ui.cartThumbPlaceholder}` : 'object-cover'}`} />
-                    ) : (
-                      <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 text-xl ${ui.cartThumbPlaceholder}`}>🍽️</div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className={`font-bold text-sm truncate ${ui.cartTitle}`}>{item.product.name}</p>
-                      {item.choices && item.choices.length > 0 && (
-                        <p className={`text-xs truncate ${ui.cartChoices}`}>{item.choices.map(c => c.choiceName).join(', ')}</p>
-                      )}
-                      <p className={`font-bold text-sm ${ui.priceAccentClass}`}>€{((item.product.price + choicesTotal) * item.quantity).toFixed(2)}</p>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        type="button"
-                        onClick={() => updateQty(item.cartKey, item.quantity - 1)}
-                        className={`touch-manipulation ${kassaPosButtonClass(false)} font-bold flex items-center justify-center ${
-                          kassaSxgaDenseTiles ? 'h-9 w-9 text-lg' : 'h-8 w-8 text-base'
-                        }`}
-                        aria-label={
-                          item.quantity === 1 ? t('kassaApp.ariaRemoveLine') : t('kassaApp.ariaDecreaseQty')
-                        }
-                      >
-                        {item.quantity === 1 ? '🗑' : '−'}
-                      </button>
-                      {!demoViewOnly &&
-                        item.product.id &&
-                        !String(item.product.id).startsWith('custom-') &&
-                        productIdsWithOptionsSet.has(item.product.id) && (
-                          <button
-                            type="button"
-                            onClick={() => void openEditCartItem(item)}
-                            className={`touch-manipulation ${kassaPosButtonClass(false)} flex items-center justify-center ${
-                              kassaSxgaDenseTiles ? 'h-9 w-9 text-sm' : 'h-8 w-8 text-sm'
-                            }`}
-                            title={t('kassaApp.ariaEditOptions')}
-                            aria-label={t('kassaApp.ariaEditOptions')}
-                          >
-                            ✏️
-                          </button>
-                        )}
-                      <span className={`w-6 text-center font-bold text-base ${ui.numpadInput}`}>{item.quantity}</span>
-                      <button
-                        type="button"
-                        onClick={() => updateQty(item.cartKey, item.quantity + 1)}
-                        className={`touch-manipulation ${kassaPosButtonClass(false)} font-bold flex items-center justify-center ${
-                          kassaSxgaDenseTiles ? 'h-9 w-9 text-lg' : 'h-8 w-8 text-base'
-                        }`}
-                        aria-label={t('kassaApp.ariaIncreaseQty')}
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                )
-              })}
+                {cartLinesByCategory.map(renderSidebarCartLine)}
               </div>
               </div>
               ) : null}
@@ -5081,81 +5133,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   </div>
                 </div>
               ) : null}
-              <p
-                className={`shrink-0 text-[10px] font-bold uppercase tracking-wide ${ui.numpadMeta}`}
-              >
-                {t('kassaApp.cartNewLinesSection')}
-              </p>
+              <p className={sidebarCartSectionLabelClass}>{t('kassaApp.cartNewLinesSection')}</p>
               <div
                 ref={cartLinesScrollRef}
-                className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain"
+                className={sidebarCartLinesScrollClass}
                 data-testid="kassa-cart-lines"
               >
-              {cartLinesByCategory.map(item => {
-                const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
-                return (
-                  <div key={item.cartKey} className={ui.cartRowBg}>
-                    {/* Productfoto */}
-                    {item.product.image_url ? (
-                      <img src={item.product.image_url} alt={item.product.name}
-                        decoding="async"
-                        loading="eager"
-                        onError={kassaProductImageRetryOnError}
-                        className={`w-12 h-12 rounded-lg flex-shrink-0 ${item.product.image_display_mode === 'contain' ? `object-contain ${ui.cartThumbPlaceholder}` : 'object-cover'}`} />
-                    ) : (
-                      <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 text-xl ${ui.cartThumbPlaceholder}`}>🍽️</div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className={`font-bold text-sm truncate ${ui.cartTitle}`}>{item.product.name}</p>
-                      {item.choices && item.choices.length > 0 && (
-                        <p className={`text-xs truncate ${ui.cartChoices}`}>{item.choices.map(c => c.choiceName).join(', ')}</p>
-                      )}
-                      <p className="text-emerald-600 font-bold text-sm">€{((item.product.price + choicesTotal) * item.quantity).toFixed(2)}</p>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        type="button"
-                        onClick={() => updateQty(item.cartKey, item.quantity - 1)}
-                        className={`touch-manipulation rounded-lg bg-red-500 text-white font-bold flex items-center justify-center hover:bg-red-600 active:brightness-95 ${
-                          kassaSxgaDenseTiles ? 'h-9 w-9 text-lg' : 'h-8 w-8 text-base'
-                        }`}
-                        aria-label={
-                          item.quantity === 1 ? t('kassaApp.ariaRemoveLine') : t('kassaApp.ariaDecreaseQty')
-                        }
-                      >
-                        {item.quantity === 1 ? '🗑' : '−'}
-                      </button>
-                      {!demoViewOnly &&
-                        item.product.id &&
-                        !String(item.product.id).startsWith('custom-') &&
-                        productIdsWithOptionsSet.has(item.product.id) && (
-                          <button
-                            type="button"
-                            onClick={() => void openEditCartItem(item)}
-                            className={`touch-manipulation rounded-lg bg-amber-500 text-white flex items-center justify-center hover:bg-amber-600 active:brightness-95 ${
-                              kassaSxgaDenseTiles ? 'h-9 w-9 text-sm' : 'h-8 w-8 text-sm'
-                            }`}
-                            title={t('kassaApp.ariaEditOptions')}
-                            aria-label={t('kassaApp.ariaEditOptions')}
-                          >
-                            ✏️
-                          </button>
-                        )}
-                      <span className={`w-6 text-center font-bold text-base ${ui.numpadInput}`}>{item.quantity}</span>
-                      <button
-                        type="button"
-                        onClick={() => updateQty(item.cartKey, item.quantity + 1)}
-                        className={`touch-manipulation rounded-lg bg-[#3C4D6B] text-white font-bold flex items-center justify-center hover:bg-[#2D3A52] active:brightness-95 ${
-                          kassaSxgaDenseTiles ? 'h-9 w-9 text-lg' : 'h-8 w-8 text-base'
-                        }`}
-                        aria-label={t('kassaApp.ariaIncreaseQty')}
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                )
-              })}
+                {cartLinesByCategory.map(renderSidebarCartLine)}
               </div>
             </div>
               ) : null}
