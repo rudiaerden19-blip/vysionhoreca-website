@@ -354,28 +354,6 @@ function kassaFooterActionTouchMinHClass(sxga: boolean, denseBill: boolean): str
   return 'min-h-[4.25rem] py-2.5'
 }
 
-/** Mand-vuilbak — rechthoek + 5 horizontale lijnen (POS-preview afb. 2). */
-function KassaCartTrashIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" d="M10 4.25h4" />
-      <path stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" d="M7.25 6.75h9.5" />
-      <path
-        stroke="currentColor"
-        strokeWidth={1.5}
-        strokeLinejoin="round"
-        d="M8.25 8.5v11.75c0 .55.45 1 1 1h5.5c.55 0 1-.45 1-1V8.5"
-      />
-      <path
-        stroke="currentColor"
-        strokeWidth={1.2}
-        strokeLinecap="round"
-        d="M9.35 10.75h5.3M9.35 12.85h5.3M9.35 14.95h5.3M9.35 17.05h5.3M9.35 19.15h5.3"
-      />
-    </svg>
-  )
-}
-
 function stoolsFromFloorDecorPayload(data: unknown): { stoolNumber: string; segmentId: string }[] {
   const rawItems = Array.isArray(data)
     ? data
@@ -4065,11 +4043,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             aria-label={item.quantity === 1 ? t('kassaApp.ariaRemoveLine') : t('kassaApp.ariaDecreaseQty')}
           >
             {item.quantity === 1 ? (
-              kassaAppearanceDark ? (
-                <KassaCartTrashIcon className="h-[1.15rem] w-[1.15rem] text-[#9ca3af]" />
-              ) : (
-                '🗑'
-              )
+              <span
+                className={kassaAppearanceDark ? 'text-[1.05rem] leading-none' : undefined}
+                aria-hidden
+              >
+                🗑
+              </span>
             ) : (
               '−'
             )}
