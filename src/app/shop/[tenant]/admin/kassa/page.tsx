@@ -81,7 +81,6 @@ import {
   KASSA_POS_QUICK_MENU_LIFT_SHADOW,
   KASSA_POS_SELECTED_ACCENT_TEXT,
   KASSA_POS_ZONE_BTN_LABEL,
-  KASSA_SIDEBAR_CLOCK_DATE_LABEL,
   KASSA_SIDEBAR_FOOTER_BTN_LABEL,
   KASSA_SIDEBAR_FOOTER_LEFT_COL,
   KASSA_NUMPAD_CART_RECESS_MOTION,
@@ -4915,17 +4914,28 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           }`}
         >
 
-        {/* Zone: Verkoop / Binnen / Terras — drie gelijke kolommen; klok+datum op Verkoop (donker). */}
+        {/* Zone: Verkoop / Binnen / Terras — drie gelijke knoppen; geen aparte klok-/datumbalk. */}
         <div
           className={`shrink-0 ${kassaAppearanceDark ? 'px-2.5 pt-3 pb-3 sm:px-3' : 'px-2 pt-1.5'}`}
         >
             <div className={`flex min-w-0 ${kassaSidebarRowGapClass}`}>
-              <div
-                className={`relative flex min-w-0 flex-1 flex-col ${kassaFloorZoneButtonTouchClass(
+              <button
+                type="button"
+                aria-pressed={kassaZoneTab === 'sales'}
+                title={showKassaStaffClockButton ? t('staffClock.buttonTitle') : undefined}
+                onClick={() => {
+                  playClick()
+                  setKassaZoneTab('sales')
+                  setShowTablePicker(false)
+                  if (showKassaStaffClockButton && requiresStaffSelectionForSale) {
+                    openStaffClockModal()
+                  }
+                }}
+                className={`flex min-w-0 flex-1 flex-col items-center justify-center px-2 transition-colors sm:px-3 ${kassaFloorZoneButtonTouchClass(
                   kassaSxgaDenseTiles,
                 )} ${
                   kassaAppearanceDark
-                    ? kassaPosButtonClass(kassaZoneTab === 'sales')
+                    ? `font-semibold ${kassaPosButtonClass(kassaZoneTab === 'sales')}`
                     : `rounded-xl font-bold ${
                         kassaZoneTab === 'sales'
                           ? `bg-[#3C4D6B] text-white ring-2 ring-[#58CCFF]/55 ring-offset-2 ${ui.ringOffset}`
@@ -4933,43 +4943,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       }`
                 }`}
               >
-                {kassaAppearanceDark && showKassaStaffClockButton ? (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      playClick()
-                      openStaffClockModal()
-                    }}
-                    className={`absolute left-0.5 top-0.5 z-10 shrink-0 active:scale-[0.98] transition-all ${ui.clockTileBg} ${ui.clockTileHover}`}
-                    title={t('staffClock.buttonTitle')}
-                    aria-label={t('staffClock.buttonTitle')}
-                  >
-                    <KassaAnalogClock size={kassaSxgaDenseTiles ? 30 : 34} />
-                  </button>
-                ) : null}
-                <button
-                  type="button"
-                  aria-pressed={kassaZoneTab === 'sales'}
-                  onClick={() => {
-                    playClick()
-                    setKassaZoneTab('sales')
-                    setShowTablePicker(false)
-                  }}
-                  className={`flex min-h-0 w-full flex-1 flex-col items-center justify-center gap-0.5 px-1 py-1.5 text-center ${
-                    kassaAppearanceDark ? 'font-semibold' : ''
-                  } ${kassaAppearanceDark && showKassaStaffClockButton ? 'pl-7' : ''}`}
-                >
-                  <span className={kassaSidebarZoneLabelClass}>{t('kassaApp.floorZoneSales')}</span>
-                  {kassaAppearanceDark ? (
-                    <span
-                      className={`max-w-full truncate text-white/85 ${KASSA_SIDEBAR_CLOCK_DATE_LABEL} text-[10px] sm:text-[11px]`}
-                      title={numpadHeaderDateLabel}
-                    >
-                      {numpadHeaderDateLabel}
-                    </span>
-                  ) : null}
-                </button>
-              </div>
+                <span className={kassaSidebarZoneLabelClass}>{t('kassaApp.floorZoneSales')}</span>
+              </button>
               <button
                 type="button"
                 aria-pressed={kassaZoneTab === 'inside'}
