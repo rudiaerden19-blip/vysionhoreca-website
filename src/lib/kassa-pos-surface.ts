@@ -104,6 +104,23 @@ export const KASSA_POS_CHECKOUT_BTN = [
   'font-bold',
 ].join(' ')
 
+export const KASSA_POS_QUICK_MENU_LIFT_SHADOW =
+  'shadow-[0_4px_9px_rgba(0,0,0,0.61),0_11px_24px_rgba(0,0,0,0.46),0_0_20px_rgba(110,181,255,0.46),0_0_34px_rgba(26,127,216,0.42),0_0_12px_rgba(110,181,255,0.55)]'
+
+/** Snelmenu-balk: zwarte POS-knop met blauwe gloed achter elk tegel. */
+export function kassaPosQuickMenuPanelButtonClass(): string {
+  return [
+    KASSA_POS_BTN_SHAPE,
+    KASSA_BTN_FACE,
+    'border border-[#2a2a2a]',
+    KASSA_POS_QUICK_MENU_LIFT_SHADOW,
+    KASSA_POS_BTN_PRESS,
+    KASSA_BTN_PRESS_FACE,
+    KASSA_POS_BTN_DISABLED_SAME_LOOK,
+    'text-[#f0f0f0] disabled:text-[#f0f0f0]',
+  ].join(' ')
+}
+
 export function kassaPosButtonClass(selected: boolean): string {
   return `${KASSA_POS_BTN_SHAPE} ${selected ? KASSA_POS_BTN_SELECTED : KASSA_POS_BTN}`
 }
