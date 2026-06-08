@@ -81,6 +81,8 @@ import {
   KASSA_POS_SELECTED_ACCENT_TEXT,
   KASSA_SIDEBAR_FOOTER_BTN_LABEL,
   kassaClockBarClass,
+  KASSA_NUMPAD_CART_RECESS_MOTION,
+  KASSA_NUMPAD_PANEL_SLIDE_MOTION,
   kassaPosButtonClass,
   kassaPosRaisedStripClass,
 } from '@/lib/kassa-pos-surface'
@@ -4738,7 +4740,215 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   </div>
                 </div>
               ) : null}
-              {numpadPanelVisible ? (
+              {kassaAppearanceDark ? (
+              <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
+              {cart.length > 0 ? (
+              <div
+                className={`flex min-h-0 flex-1 flex-col overflow-hidden ${KASSA_NUMPAD_CART_RECESS_MOTION} ${
+                  numpadPanelVisible ? 'pointer-events-none opacity-[0.28]' : 'opacity-100'
+                } ${
+                  kassaSidebarFooterTier === 'comfort' ? 'gap-2' : kassaSidebarFooterTier === 'compact' ? 'gap-1.5' : 'gap-1'
+                }`}
+              >
+              {parkedLinesByCategory.length > 0 ? (
+                <div
+                  className="max-h-[min(20vh,6.5rem)] shrink-0 overflow-y-auto overscroll-y-contain"
+                  data-testid="kassa-parked-on-table"
+                >
+                  <p className={`mb-1 text-xs font-bold uppercase tracking-wide ${ui.numpadMeta}`}>
+                    {t('kassaApp.parkedOnTableSection')}
+                  </p>
+                  <div className="space-y-1">
+                    {parkedLinesByCategory.map((item) => {
+                      const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
+                      return (
+                        <div
+                          key={`parked-cart-${item.cartKey}`}
+                          className={`flex items-center gap-2 rounded-lg px-2 py-1.5 opacity-80 ${ui.cartRowBg}`}
+                        >
+                          <div className="flex-1 min-w-0">
+                            <p className={`truncate text-sm font-semibold ${ui.cartTitle}`}>{item.product.name}</p>
+                            <p className={`text-xs ${ui.cartChoices}`}>
+                              {item.quantity}× · €{((item.product.price + choicesTotal) * item.quantity).toFixed(2)}
+                            </p>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              ) : null}
+              <p
+                className={`shrink-0 text-[10px] font-bold uppercase tracking-wide ${ui.numpadMeta}`}
+              >
+                {t('kassaApp.cartNewLinesSection')}
+              </p>
+              <div
+                ref={cartLinesScrollRef}
+                className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain"
+                data-testid="kassa-cart-lines"
+              >
+              {cartLinesByCategory.map(item => {
+                const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
+                return (
+                  <div key={item.cartKey} className={ui.cartRowBg}>
+                    {item.product.image_url ? (
+                      <img src={item.product.image_url} alt={item.product.name}
+                        decoding="async"
+                        loading="eager"
+                        onError={kassaProductImageRetryOnError}
+                        className={`w-12 h-12 rounded-lg flex-shrink-0 ${item.product.image_display_mode === 'contain' ? `object-contain ${ui.cartThumbPlaceholder}` : 'object-cover'}`} />
+                    ) : (
+                      <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 text-xl ${ui.cartThumbPlaceholder}`}>🍽️</div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className={`font-bold text-sm truncate ${ui.cartTitle}`}>{item.product.name}</p>
+                      {item.choices && item.choices.length > 0 && (
+                        <p className={`text-xs truncate ${ui.cartChoices}`}>{item.choices.map(c => c.choiceName).join(', ')}</p>
+                      )}
+                      <p className={`font-bold text-sm ${ui.priceAccentClass}`}>€{((item.product.price + choicesTotal) * item.quantity).toFixed(2)}</p>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => updateQty(item.cartKey, item.quantity - 1)}
+                        className={`touch-manipulation ${kassaPosButtonClass(false)} font-bold flex items-center justify-center ${
+                          kassaSxgaDenseTiles ? 'h-9 w-9 text-lg' : 'h-8 w-8 text-base'
+                        }`}
+                        aria-label={
+                          item.quantity === 1 ? t('kassaApp.ariaRemoveLine') : t('kassaApp.ariaDecreaseQty')
+                        }
+                      >
+                        {item.quantity === 1 ? '🗑' : '−'}
+                      </button>
+                      {!demoViewOnly &&
+                        item.product.id &&
+                        !String(item.product.id).startsWith('custom-') &&
+                        productIdsWithOptionsSet.has(item.product.id) && (
+                          <button
+                            type="button"
+                            onClick={() => void openEditCartItem(item)}
+                            className={`touch-manipulation ${kassaPosButtonClass(false)} flex items-center justify-center ${
+                              kassaSxgaDenseTiles ? 'h-9 w-9 text-sm' : 'h-8 w-8 text-sm'
+                            }`}
+                            title={t('kassaApp.ariaEditOptions')}
+                            aria-label={t('kassaApp.ariaEditOptions')}
+                          >
+                            ✏️
+                          </button>
+                        )}
+                      <span className={`w-6 text-center font-bold text-base ${ui.numpadInput}`}>{item.quantity}</span>
+                      <button
+                        type="button"
+                        onClick={() => updateQty(item.cartKey, item.quantity + 1)}
+                        className={`touch-manipulation ${kassaPosButtonClass(false)} font-bold flex items-center justify-center ${
+                          kassaSxgaDenseTiles ? 'h-9 w-9 text-lg' : 'h-8 w-8 text-base'
+                        }`}
+                        aria-label={t('kassaApp.ariaIncreaseQty')}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
+              </div>
+              </div>
+              ) : null}
+              <div
+                className={`absolute inset-0 z-[3] flex min-h-0 flex-col justify-end overflow-hidden ${KASSA_NUMPAD_PANEL_SLIDE_MOTION} ${
+                  numpadPanelVisible ? 'translate-y-0 pointer-events-auto' : 'translate-y-full pointer-events-none'
+                }`}
+                data-testid="kassa-numpad-panel"
+                aria-hidden={!numpadPanelVisible}
+              >
+              <div className="flex min-h-[15rem] flex-1 flex-col justify-end">
+              <div className={`mb-3 flex shrink-0 items-center gap-2.5 rounded-xl px-2.5 py-2 ${ui.numpadBarBg}`}>
+                {!kassaAppearanceDark && tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? (
+                  <button
+                    type="button"
+                    onClick={openStaffClockModal}
+                    className={`shrink-0 active:scale-[0.98] transition-all ${ui.clockTileBg} ${ui.clockTileHover}`}
+                    title={t('staffClock.buttonTitle')}
+                    aria-label={t('staffClock.buttonTitle')}
+                  >
+                    <KassaAnalogClock size={72} />
+                  </button>
+                ) : null}
+                <div
+                  className={`min-w-0 flex flex-col justify-center gap-0.5 ${
+                    !kassaAppearanceDark && tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1' : 'w-full'
+                  }`}
+                >
+                  {!kassaAppearanceDark ? (
+                    <p
+                      className={`truncate whitespace-nowrap text-right text-xs font-semibold leading-tight tracking-tight sm:text-sm ${ui.numpadMeta}`}
+                      title={numpadHeaderDateLabel}
+                      aria-live="polite"
+                    >
+                      {numpadHeaderDateLabel}
+                    </p>
+                  ) : null}
+                  <input
+                    type="text"
+                    value={numpadValue}
+                    readOnly
+                    aria-label={t('kassaApp.numpadPlaceholder')}
+                    className={`w-full min-w-0 border-none bg-transparent text-right text-2xl font-bold outline-none sm:text-3xl ${ui.numpadInput}`}
+                  />
+                </div>
+              </div>
+              <div
+                className={`grid shrink-0 grid-cols-4 touch-manipulation select-none [grid-template-rows:repeat(4,minmax(2.75rem,1fr))] ${
+                  kassaAppearanceDark ? 'gap-2.5' : 'gap-2'
+                }`}
+                onClick={(e) => {
+                  const el = (e.target as HTMLElement).closest('[data-kassa-numpad-key]')
+                  if (!el || !(el instanceof HTMLElement)) return
+                  const k = el.dataset.kassaNumpadKey
+                  if (k) handleNumpad(k)
+                }}
+              >
+                {KASSA_NUMPAD_KEYS.map((key) => (
+                  <button
+                    key={key}
+                    type="button"
+                    data-kassa-numpad-key={key}
+                    className={
+                      kassaAppearanceDark
+                        ? ui.numpadKeyNum
+                        : `min-h-[2.75rem] rounded-xl font-bold text-2xl shadow-sm touch-manipulation active:brightness-95 ${
+                            key === 'C' || ['+', '-', '×', '='].includes(key)
+                              ? 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
+                              : ui.numpadKeyNum
+                          }`
+                    }
+                  >
+                    {key}
+                  </button>
+                ))}
+              </div>
+              {numpadValue && parseFloat(numpadValue) > 0 && (
+                <button
+                  type="button"
+                  data-testid="kassa-add-custom-amount"
+                  onClick={addCustomAmount}
+                  className={
+                    kassaAppearanceDark
+                      ? `mt-3 shrink-0 touch-manipulation py-4 font-bold text-lg ${kassaPosButtonClass(true)}`
+                      : 'mt-3 shrink-0 touch-manipulation py-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-lg active:brightness-95'
+                  }
+                >
+                  {t('kassaApp.addAmount').replace(
+                    '{amount}',
+                    parseFloat(numpadValue || '0').toFixed(2),
+                  )}
+                </button>
+              )}
+              </div>
+              </div>
+              </div>
+              ) : numpadPanelVisible ? (
               <div className="flex min-h-[15rem] flex-1 flex-col justify-end" data-testid="kassa-numpad-panel">
               <div className={`mb-3 flex shrink-0 items-center gap-2.5 rounded-xl px-2.5 py-2 ${ui.numpadBarBg}`}>
                 {!kassaAppearanceDark && tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? (
@@ -4790,11 +5000,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     type="button"
                     data-kassa-numpad-key={key}
                     className={`min-h-[2.75rem] rounded-xl font-bold text-2xl shadow-sm touch-manipulation active:brightness-95 ${
-                      key === 'C'
+                      key === 'C' || ['+', '-', '×', '='].includes(key)
                         ? 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
-                        : ['+', '-', '×', '='].includes(key)
-                          ? 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
-                          : ui.numpadKeyNum
+                        : ui.numpadKeyNum
                     }`}
                   >
                     {key}

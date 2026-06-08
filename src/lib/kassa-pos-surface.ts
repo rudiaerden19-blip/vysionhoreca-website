@@ -56,6 +56,26 @@ export const KASSA_POS_BTN = [
   'text-[#f0f0f0] disabled:text-[#f0f0f0]',
 ].join(' ')
 
+/** Numpad-toetsen — zelfde lift/schaduw als overige POS-knoppen. */
+export const KASSA_POS_NUMPAD_KEY = [
+  KASSA_POS_BTN_SHAPE,
+  KASSA_BTN_FACE,
+  KASSA_BTN_EDGE,
+  KASSA_POS_BTN_PRESS,
+  KASSA_BTN_PRESS_FACE,
+  'text-[#f0f0f0]',
+  'font-bold text-2xl',
+  'touch-manipulation select-none',
+  'min-h-[2.75rem]',
+].join(' ')
+
+/** Numpad-paneel: omhoog schuiven i.p.v. direct tonen. */
+export const KASSA_NUMPAD_PANEL_SLIDE_MOTION =
+  'transition-transform duration-[560ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform'
+
+export const KASSA_NUMPAD_CART_RECESS_MOTION =
+  'transition-[opacity,transform] duration-[560ms] ease-[cubic-bezier(0.22,1,0.36,1)]'
+
 export const KASSA_POS_BTN_SELECTED = [
   KASSA_BTN_FACE,
   'border border-[#2a2a2a]',

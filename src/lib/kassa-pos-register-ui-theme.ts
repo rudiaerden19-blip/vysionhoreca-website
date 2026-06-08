@@ -7,6 +7,7 @@ import {
   KASSA_POS_BTN,
   KASSA_POS_BTN_SHAPE,
   KASSA_POS_FIELD,
+  KASSA_POS_NUMPAD_KEY,
   KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
   KASSA_POS_MENU_TRANSPARENT_CLASS,
 } from '@/lib/kassa-pos-surface'
@@ -41,7 +42,7 @@ export function createKassaPosRegisterUiTheme(dark: boolean): KassaRegisterUiThe
     numpadBarBg: KASSA_POS_MENU_TRANSPARENT_CLASS,
     clockTileBg: `${KASSA_CLOCK_TILE_ON_BAR} p-1`,
     clockTileHover: 'hover:brightness-105',
-    numpadKeyNum: `${KASSA_POS_BTN_SHAPE} ${KASSA_POS_BTN}`,
+    numpadKeyNum: KASSA_POS_NUMPAD_KEY,
     cartRowBg: `${KASSA_POS_FIELD} p-2.5 flex items-center gap-2.5`,
     cartThumbPlaceholder: 'bg-[#3a3a3a]',
     modalConfirmBg: `${KASSA_POS_BTN_SHAPE} w-full max-w-sm shadow-lg p-6 flex flex-col gap-4 bg-[#333333] border border-[#1a1a1a]`,
