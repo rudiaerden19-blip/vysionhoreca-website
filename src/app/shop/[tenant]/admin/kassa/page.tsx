@@ -84,7 +84,6 @@ import {
   KASSA_SIDEBAR_CLOCK_DATE_LABEL,
   KASSA_SIDEBAR_FOOTER_BTN_LABEL,
   KASSA_SIDEBAR_FOOTER_LEFT_COL,
-  kassaClockBarClass,
   KASSA_NUMPAD_CART_RECESS_MOTION,
   KASSA_NUMPAD_PANEL_SLIDE_MOTION,
   KASSA_POS_CART_THUMB_SHELL,
@@ -4918,26 +4917,66 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           className={`shrink-0 ${kassaAppearanceDark ? 'px-2.5 pt-3 pb-3 sm:px-3' : 'px-2 pt-1.5'}`}
         >
             <div className={`flex min-w-0 ${kassaSidebarRowGapClass}`}>
-              <button
-                type="button"
-                onClick={() => {
-                  playClick()
-                  setShowTablePicker(false)
-                }}
-                className={`flex min-w-0 flex-1 flex-col items-center justify-center px-2 transition-colors sm:px-3 ${kassaFloorZoneButtonTouchClass(
-                  kassaSxgaDenseTiles,
-                )} ${
-                  kassaAppearanceDark
-                    ? `font-semibold ${kassaPosButtonClass(!showTablePicker)}`
-                    : `rounded-xl font-bold ${
-                        !showTablePicker
-                          ? `bg-[#3C4D6B] text-white ring-2 ring-[#58CCFF]/55 ring-offset-2 ${ui.ringOffset}`
-                          : 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
-                      }`
-                }`}
-              >
-                <span className={kassaSidebarZoneLabelClass}>{t('kassaApp.floorZoneSales')}</span>
-              </button>
+              {kassaAppearanceDark ? (
+                <div
+                  className={`relative flex min-w-0 flex-1 flex-col overflow-hidden ${kassaFloorZoneButtonTouchClass(
+                    kassaSxgaDenseTiles,
+                  )} ${kassaPosButtonClass(!showTablePicker)}`}
+                >
+                  <button
+                    type="button"
+                    className="absolute inset-0 z-0 rounded-xl"
+                    aria-label={t('kassaApp.floorZoneSales')}
+                    onClick={() => {
+                      playClick()
+                      setShowTablePicker(false)
+                    }}
+                  />
+                  {showKassaStaffClockButton ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        playClick()
+                        openStaffClockModal()
+                      }}
+                      className={`relative z-10 m-0.5 shrink-0 self-start active:scale-[0.98] transition-all ${ui.clockTileBg} ${ui.clockTileHover}`}
+                      title={t('staffClock.buttonTitle')}
+                      aria-label={t('staffClock.buttonTitle')}
+                    >
+                      <KassaAnalogClock size={kassaSxgaDenseTiles ? 32 : 36} />
+                    </button>
+                  ) : null}
+                  <div className="pointer-events-none relative z-[1] flex min-h-0 flex-1 flex-col items-center justify-center gap-0.5 px-1 pb-1.5 pt-0.5 text-center">
+                    <span className={`font-semibold ${kassaSidebarZoneLabelClass}`}>
+                      {t('kassaApp.floorZoneSales')}
+                    </span>
+                    <span
+                      className={`max-w-full truncate text-white/90 ${KASSA_SIDEBAR_CLOCK_DATE_LABEL} text-[10px] sm:text-[11px]`}
+                      title={numpadHeaderDateLabel}
+                      aria-live="polite"
+                    >
+                      {numpadHeaderDateLabel}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    playClick()
+                    setShowTablePicker(false)
+                  }}
+                  className={`flex min-w-0 flex-1 flex-col items-center justify-center px-2 transition-colors sm:px-3 ${kassaFloorZoneButtonTouchClass(
+                    kassaSxgaDenseTiles,
+                  )} rounded-xl font-bold ${
+                    !showTablePicker
+                      ? `bg-[#3C4D6B] text-white ring-2 ring-[#58CCFF]/55 ring-offset-2 ${ui.ringOffset}`
+                      : 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
+                  }`}
+                >
+                  <span className={kassaSidebarZoneLabelClass}>{t('kassaApp.floorZoneSales')}</span>
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => {
@@ -5100,34 +5139,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </button>
           ) : null}
         </div>
-
-        {kassaAppearanceDark ? (
-          <div
-            className={`mx-3 mb-3 mt-3 flex shrink-0 items-center gap-3 px-3 ${kassaClockBarClass()} ${kassaOrderTypeButtonTouchClass(
-              kassaSxgaDenseTiles,
-            )}`}
-            data-testid="kassa-sidebar-clock-bar"
-          >
-            {showKassaStaffClockButton ? (
-              <button
-                type="button"
-                onClick={openStaffClockModal}
-                className={`shrink-0 active:scale-[0.98] transition-all ${ui.clockTileBg} ${ui.clockTileHover}`}
-                title={t('staffClock.buttonTitle')}
-                aria-label={t('staffClock.buttonTitle')}
-              >
-                <KassaAnalogClock size={parkedOnlySidebarView ? 72 : 48} />
-              </button>
-            ) : null}
-            <p
-              className={`min-w-0 truncate whitespace-nowrap text-right text-white ${KASSA_SIDEBAR_CLOCK_DATE_LABEL} ${showKassaStaffClockButton ? 'flex-1' : 'w-full'}`}
-              title={numpadHeaderDateLabel}
-              aria-live="polite"
-            >
-              {numpadHeaderDateLabel}
-            </p>
-          </div>
-        ) : null}
 
         {/* Cart / numpad (toggle via footer) */}
         <div
