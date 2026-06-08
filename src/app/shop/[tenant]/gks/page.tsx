@@ -4178,7 +4178,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250608-checkout-glow-less-2"
+      data-gks-ui="20250608-cart-scroll-fix"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4680,7 +4680,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         {/* ── Rechts: numpad / cart ── */}
         <div
-          className={`${kassaSxgaDenseTiles ? 'w-[300px]' : 'w-80 sm:w-96 lg:w-[380px]'} flex min-h-0 min-w-0 flex-shrink-0 flex-col overflow-x-hidden overflow-y-auto ${
+          className={`${kassaSxgaDenseTiles ? 'w-[300px]' : 'w-80 sm:w-96 lg:w-[380px]'} flex min-h-0 min-w-0 flex-shrink-0 flex-col overflow-hidden ${
             kassaAppearanceDark ? `border-l ${GKS_RULE_BLACK} ${GKS_MENU_PLATE_SHELL_BG_CLASS}` : 'border-0 bg-white'
           }`}
         >
@@ -4952,7 +4952,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               </p>
               <div
                 ref={cartLinesScrollRef}
-                className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain"
+                className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain touch-pan-y [scrollbar-gutter:stable] [-webkit-overflow-scrolling:touch]"
                 data-testid="kassa-cart-lines"
               >
               {cartLinesByCategory.map(item => {
