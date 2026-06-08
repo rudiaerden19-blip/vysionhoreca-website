@@ -309,8 +309,8 @@ function shouldApplyKassaCompactSquareMonitorTileCap(): boolean {
 const KASSA_SIDEBAR_WIDTH_BASE_PX = 320
 const KASSA_SIDEBAR_WIDTH_SM_PX = 384
 const KASSA_SIDEBAR_WIDTH_LG_PX = 380
-/** Smaller alleen bij `shouldApplyKassaCompactSquareMonitorTileCap()` — meer ruimte voor 5 tegels breed. */
-const KASSA_SIDEBAR_WIDTH_SXGA_COMPACT_PX = 300
+/** 17″ kiosk: iets smaller dan 380px maar breed genoeg voor zone/order/footer-knoppen. */
+const KASSA_SIDEBAR_WIDTH_SXGA_COMPACT_PX = 332
 
 /**
  * SXGA (~17″): rij gelijk aan **vierkante foto** (celbreedte) + lichte gap + titel — overige schermen ongemoeid.
@@ -4199,6 +4199,26 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const cartLineQtyBtnCompact = kassaSxgaDenseTiles && kassaSidebarFooterTier === 'dense'
 
+  const kassaSidebarRowGapClass = kassaAppearanceDark
+    ? kassaSxgaDenseTiles
+      ? 'gap-2'
+      : 'gap-4'
+    : 'gap-1.5'
+
+  const kassaSidebarActionLabelClass =
+    kassaAppearanceDark && kassaSxgaDenseTiles
+      ? 'text-center text-[11px] font-medium leading-tight tracking-[0.02em]'
+      : kassaAppearanceDark
+        ? `text-center ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`
+        : 'text-center text-xs font-bold leading-tight sm:text-sm'
+
+  const kassaSidebarZoneLabelClass =
+    kassaAppearanceDark && kassaSxgaDenseTiles
+      ? 'text-xs font-medium tracking-[0.02em]'
+      : kassaAppearanceDark
+        ? KASSA_POS_ZONE_BTN_LABEL
+        : 'font-bold'
+
   const renderSidebarCartLine = (item: (typeof cartLinesByCategory)[number]) => {
     const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
     const lineTotal = ((item.product.price + choicesTotal) * item.quantity).toFixed(2)
@@ -4434,7 +4454,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
 
         <div className="flex min-w-0 flex-1 items-center gap-1 sm:gap-1.5">
-        <div className="relative z-20 ml-[1cm] flex min-w-0 max-w-[9rem] shrink-0 flex-col justify-center px-0.5 sm:max-w-[11rem] md:max-w-[14rem] lg:max-w-[16rem]">
+        <div
+          className={`relative z-20 flex min-w-0 shrink-0 flex-col justify-center px-0.5 ${
+            kassaSxgaDenseTiles
+              ? 'ml-2 max-w-[6.5rem]'
+              : 'ml-[1cm] max-w-[9rem] sm:max-w-[11rem] md:max-w-[14rem] lg:max-w-[16rem]'
+          }`}
+        >
           <button
             type="button"
             onClick={() => {
@@ -4451,7 +4477,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
 
         {/* Snelkoppelingen: 4cm naar rechts; tenantnaam links ongewijzigd */}
-        <div className="relative z-20 ml-[4cm] flex min-h-0 min-w-0 flex-1 items-center">
+        <div
+          className={`relative z-20 flex min-h-0 min-w-0 flex-1 items-center ${
+            kassaSxgaDenseTiles ? 'ml-1.5' : 'ml-[4cm]'
+          }`}
+        >
           <nav
             aria-label={t('kassaApp.quickLinksAria')}
             className="flex min-h-0 min-w-0 flex-1 flex-nowrap items-center justify-start gap-1.5 sm:gap-2"
@@ -4869,7 +4899,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         {/* ── Rechts: numpad / cart ── */}
         <div
-          className={`${kassaSxgaDenseTiles ? 'w-[300px]' : 'w-80 sm:w-96 lg:w-[380px]'} flex min-h-0 min-w-0 flex-shrink-0 flex-col overflow-hidden ${
+          className={`${
+            kassaSxgaDenseTiles ? 'w-[332px] max-w-[38vw]' : 'w-80 sm:w-96 lg:w-[380px]'
+          } flex min-h-0 min-w-0 flex-shrink-0 flex-col overflow-y-hidden ${
+            kassaSxgaDenseTiles ? 'overflow-x-visible' : 'overflow-hidden'
+          } ${
             kassaAppearanceDark
               ? `border-l ${KASSA_POS_RULE_BLACK} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`
               : ui.sidebarBg
@@ -4877,8 +4911,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         >
 
         {/* Zone: Binnen / Terras — altijd zichtbaar (ook bij afhalen/leveren). */}
-        <div className={`shrink-0 ${kassaAppearanceDark ? 'px-3 pt-3 pb-3' : 'px-2 pt-1.5'}`}>
-            <div className={`flex ${kassaAppearanceDark ? 'gap-4' : 'gap-1.5'}`}>
+        <div
+          className={`shrink-0 ${kassaAppearanceDark ? 'px-2.5 pt-3 pb-3 sm:px-3' : 'px-2 pt-1.5'}`}
+        >
+            <div className={`flex ${kassaSidebarRowGapClass}`}>
               <button
                 type="button"
                 onClick={() => {
@@ -4904,9 +4940,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       }`
                 }`}
               >
-                <span className={kassaAppearanceDark ? KASSA_POS_ZONE_BTN_LABEL : 'font-bold'}>
-                  {t('kassaApp.floorZoneInside')}
-                </span>
+                <span className={kassaSidebarZoneLabelClass}>{t('kassaApp.floorZoneInside')}</span>
                 {orderType === 'DINE_IN' && tableNumber && dineInFloorZone === FLOOR_PLAN_ZONE_INSIDE ? (
                   <span className="mt-0.5 text-xs font-semibold opacity-95">
                     {kassaStoolsByZone[FLOOR_PLAN_ZONE_INSIDE].some((s) => s.stoolNumber === tableNumber)
@@ -4940,9 +4974,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       }`
                 }`}
               >
-                <span className={kassaAppearanceDark ? KASSA_POS_ZONE_BTN_LABEL : 'font-bold'}>
-                  {t('kassaApp.floorZoneTerrace')}
-                </span>
+                <span className={kassaSidebarZoneLabelClass}>{t('kassaApp.floorZoneTerrace')}</span>
                 {orderType === 'DINE_IN' && tableNumber && dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE ? (
                   <span className="mt-0.5 text-xs font-semibold opacity-95">
                     {kassaStoolsByZone[FLOOR_PLAN_ZONE_TERRACE].some((s) => s.stoolNumber === tableNumber)
@@ -4956,10 +4988,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         {/* Besteltype: drie losse knoppen (ter plaatse / afhalen / leveren) */}
         <div
-          className={`shrink-0 ${kassaAppearanceDark ? 'mx-3 mb-3 mt-2.5 space-y-3' : 'mx-2 mt-1'}`}
+          className={`shrink-0 ${
+            kassaAppearanceDark
+              ? kassaSxgaDenseTiles
+                ? 'mx-2.5 mb-3 mt-2 space-y-2'
+                : 'mx-3 mb-3 mt-2.5 space-y-3'
+              : 'mx-2 mt-1'
+          }`}
           data-testid="kassa-order-type-bar"
         >
-          <div className={`flex ${kassaAppearanceDark ? 'gap-4' : 'gap-1.5'}`}>
+          <div className={`flex ${kassaSidebarRowGapClass}`}>
             <button
               type="button"
               aria-pressed={orderType === 'DINE_IN'}
@@ -4976,15 +5014,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     }`
               }`}
             >
-              <span
-                className={
-                  kassaAppearanceDark
-                    ? `text-center ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`
-                    : 'text-center text-xs font-bold leading-tight sm:text-sm'
-                }
-              >
-                {t('kassaApp.orderTypeDineIn')}
-              </span>
+              <span className={kassaSidebarActionLabelClass}>{t('kassaApp.orderTypeDineIn')}</span>
               {orderType === 'DINE_IN' && tableNumber ? (
                 <span className="mt-0.5 max-w-full truncate text-[10px] font-semibold normal-case opacity-95 sm:text-xs">
                   {t('kassaApp.tableWord')} {tableNumber}
@@ -5010,15 +5040,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     }`
               }`}
             >
-              <span
-                className={
-                  kassaAppearanceDark
-                    ? `text-center ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`
-                    : 'text-center text-xs font-bold leading-tight sm:text-sm'
-                }
-              >
-                {t('kassaApp.orderTypeTakeaway')}
-              </span>
+              <span className={kassaSidebarActionLabelClass}>{t('kassaApp.orderTypeTakeaway')}</span>
             </button>
             <button
               type="button"
@@ -5036,15 +5058,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     }`
               }`}
             >
-              <span
-                className={
-                  kassaAppearanceDark
-                    ? `text-center ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`
-                    : 'text-center text-xs font-bold leading-tight sm:text-sm'
-                }
-              >
-                {t('kassaApp.orderTypeDelivery')}
-              </span>
+              <span className={kassaSidebarActionLabelClass}>{t('kassaApp.orderTypeDelivery')}</span>
             </button>
           </div>
           {orderType === 'DINE_IN' && tableNumber ? (
@@ -5428,10 +5442,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* Totaal + knoppen — zelfde flow/labels als vóór UI-pass; donker = alleen POS-styling */}
         {kassaAppearanceDark ? (
           <div
-            className={`sticky bottom-0 z-10 shrink-0 border-t ${KASSA_POS_RULE_BLACK} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} px-3 py-2.5 space-y-2.5`}
+            className={`sticky bottom-0 z-10 shrink-0 border-t ${KASSA_POS_RULE_BLACK} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} ${
+              kassaSxgaDenseTiles ? 'px-2.5 py-2 space-y-2' : 'px-3 py-2.5 space-y-2.5'
+            }`}
           >
             <div
-              className={`flex w-full gap-3 touch-manipulation select-none ${kassaFooterActionTouchMinHClass(
+              className={`flex w-full touch-manipulation select-none ${kassaSxgaDenseTiles ? 'gap-2' : 'gap-3'} ${kassaFooterActionTouchMinHClass(
                 kassaSxgaDenseTiles,
                 kassaSidebarFooterTier === 'dense',
               )}`}
@@ -5444,9 +5460,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 className={`flex items-center justify-center px-3 ${KASSA_SIDEBAR_FOOTER_LEFT_COL} ${kassaPosButtonClass(quickMenuPanelOpen)}`}
                 title={t('kassaApp.quickMenu')}
               >
-                <span className={`text-center leading-tight ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`}>
-                  {t('kassaApp.quickMenu')}
-                </span>
+                <span className={`leading-tight ${kassaSidebarActionLabelClass}`}>{t('kassaApp.quickMenu')}</span>
               </button>
               <div
                 role="status"
@@ -5465,7 +5479,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 </span>
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-3 touch-manipulation select-none">
+            <div
+              className={`grid grid-cols-3 touch-manipulation select-none ${kassaSxgaDenseTiles ? 'gap-2' : 'gap-3'}`}
+            >
               <button
                 type="button"
                 onClick={() => { void openCashDrawer() }}
@@ -5475,9 +5491,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 )}`}
                 title={t('kassaApp.drawerOpen')}
               >
-                <span className={`text-center ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`}>
-                  {t('kassaApp.drawerOpen')}
-                </span>
+                <span className={kassaSidebarActionLabelClass}>{t('kassaApp.drawerOpen')}</span>
               </button>
               <button
                 type="button"
@@ -5492,9 +5506,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 title={t('kassaApp.cartBonTitle')}
                 aria-label={t('kassaApp.cartBonTitle')}
               >
-                <span className={`text-center ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`}>
-                  {t('kassaApp.cartBon')}
-                </span>
+                <span className={kassaSidebarActionLabelClass}>{t('kassaApp.cartBon')}</span>
               </button>
               <button
                 type="button"
@@ -5507,9 +5519,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 title={t('kassaApp.remove')}
                 aria-label={t('kassaApp.remove')}
               >
-                <span className={`text-center ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`}>
-                  {t('kassaApp.remove')}
-                </span>
+                <span className={kassaSidebarActionLabelClass}>{t('kassaApp.remove')}</span>
               </button>
             </div>
             {orderType === 'DINE_IN' && tableNumber && cart.length > 0 && (
@@ -5534,7 +5544,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 </button>
               </div>
             )}
-            <div className="flex gap-2.5 touch-manipulation select-none">
+            <div className={`flex touch-manipulation select-none ${kassaSxgaDenseTiles ? 'gap-2' : 'gap-2.5'}`}>
               <button
                 type="button"
                 aria-pressed={numpadPanelVisible}
@@ -5549,9 +5559,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   kassaSxgaDenseTiles ? 'min-h-[4rem] py-3.5' : 'min-h-[3.5rem] py-3'
                 }`}
               >
-                <span className={`text-center ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`}>
-                  {t('kassaApp.numpadToggle')}
-                </span>
+                <span className={kassaSidebarActionLabelClass}>{t('kassaApp.numpadToggle')}</span>
               </button>
               <button
                 type="button"
@@ -5563,7 +5571,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 }}
                 disabled={billLines.length === 0}
                 className={`flex min-w-0 flex-1 items-center justify-center ${KASSA_POS_CHECKOUT_BTN} ${
-                  kassaSxgaDenseTiles ? 'min-h-[4rem] py-3.5 text-xl' : 'min-h-[3.5rem] py-3 text-lg'
+                  kassaSxgaDenseTiles ? 'min-h-[4rem] py-3.5 text-lg' : 'min-h-[3.5rem] py-3 text-lg'
                 }`}
               >
                 {t('kassaApp.checkout')}
