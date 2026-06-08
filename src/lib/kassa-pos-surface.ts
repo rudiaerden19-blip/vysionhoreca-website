@@ -135,14 +135,14 @@ export const KASSA_POS_CART_ROW = [
   'bg-[linear-gradient(180deg,#1c1c1c_0%,#101010_48%,#060606_100%)]',
   'border border-[#2a2a2a]',
   'shadow-[0_3px_8px_rgba(0,0,0,0.52),0_10px_22px_rgba(0,0,0,0.44),0_1px_0_rgba(255,255,255,0.06)_inset]',
-  'p-2.5 flex items-center gap-2.5',
+  'p-2 flex items-center gap-2',
 ].join(' ')
 
 export const KASSA_POS_CART_THUMB_SHELL =
   'rounded-lg border border-[#3a3a3a] bg-[#252528] overflow-hidden shrink-0'
 
 export function kassaPosCartQtyButtonClass(compact?: boolean): string {
-  const size = compact ? 'h-8 w-8 min-h-8 min-w-8 text-base' : 'h-9 w-9 min-h-9 min-w-9 text-lg'
+  const size = compact ? 'h-7 w-7 min-h-7 min-w-7 text-sm' : 'h-8 w-8 min-h-8 min-w-8 text-base'
   return `${kassaPosButtonClass(false)} ${size} shrink-0 flex items-center justify-center leading-none`
 }
 

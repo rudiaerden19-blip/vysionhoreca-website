@@ -354,13 +354,22 @@ function kassaFooterActionTouchMinHClass(sxga: boolean, denseBill: boolean): str
   return 'min-h-[4.25rem] py-2.5'
 }
 
+/** Draadmand-vuilbak (POS-preview), niet Heroicons-prullenbak. */
 function KassaCartTrashIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden>
+    <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden>
       <path
+        stroke="currentColor"
+        strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
-        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+        d="M9 3.25h6M7.75 5.25h8.5l-1.1 14.2c-.05.75-.7 1.35-1.45 1.35h-3.8c-.75 0-1.4-.6-1.45-1.35L7.75 5.25z"
+      />
+      <path
+        stroke="currentColor"
+        strokeWidth={1.25}
+        strokeLinecap="round"
+        d="M9.25 9.25h5.5M9.25 12h5.5M9.25 14.75h5.5M9.25 17.5h5"
       />
     </svg>
   )
@@ -4007,7 +4016,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
     const lineTotal = ((item.product.price + choicesTotal) * item.quantity).toFixed(2)
     const thumbClass = kassaAppearanceDark
-      ? `${KASSA_POS_CART_THUMB_SHELL} h-12 w-12`
+      ? `${KASSA_POS_CART_THUMB_SHELL} h-10 w-10`
       : `h-12 w-12 rounded-lg flex-shrink-0 ${ui.cartThumbPlaceholder}`
 
     return (
@@ -4027,11 +4036,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <div className={`${thumbClass} flex items-center justify-center text-xl`}>🍽️</div>
         )}
         <div className="min-w-0 flex-1">
-          <p className={`truncate text-sm font-bold ${ui.cartTitle}`}>{item.product.name}</p>
+          <p
+            className={`truncate font-bold ${ui.cartTitle} ${kassaAppearanceDark ? 'text-[13px] leading-tight' : 'text-sm'}`}
+          >
+            {item.product.name}
+          </p>
           {item.choices && item.choices.length > 0 ? (
             <p className={`truncate text-xs ${ui.cartChoices}`}>{item.choices.map((c) => c.choiceName).join(', ')}</p>
           ) : null}
-          <p className={`text-sm font-bold ${kassaAppearanceDark ? ui.priceAccentClass : 'text-emerald-600'}`}>
+          <p
+            className={`font-bold ${kassaAppearanceDark ? `text-xs ${ui.priceAccentClass}` : 'text-sm text-emerald-600'}`}
+          >
             €{lineTotal}
           </p>
         </div>
@@ -4050,7 +4065,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           >
             {item.quantity === 1 ? (
               kassaAppearanceDark ? (
-                <KassaCartTrashIcon className="h-[1.05rem] w-[1.05rem] text-[#c8c8c8]" />
+                <KassaCartTrashIcon className="h-[1.15rem] w-[1.15rem] text-[#9ca3af]" />
               ) : (
                 '🗑'
               )
@@ -4103,7 +4118,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     : `shrink-0 text-[10px] font-bold uppercase tracking-wide ${ui.numpadMeta}`
 
   const sidebarCartLinesScrollClass = kassaAppearanceDark
-    ? 'min-h-0 flex-1 space-y-2.5 overflow-y-auto overscroll-y-contain py-0.5'
+    ? 'min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-y-contain py-0.5'
     : 'min-h-0 flex-1 overflow-y-auto overscroll-y-contain'
 
   return (
