@@ -5474,7 +5474,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   {t('kassaApp.cartTotal')}
                 </span>
                 <span
-                  className={`min-w-0 truncate text-right font-bold tabular-nums tracking-tight text-white ${
+                  className={`min-w-0 truncate text-right font-bold tabular-nums tracking-tight text-red-500 ${
                     kassaSxgaDenseTiles || kassaSidebarFooterTier !== 'dense' ? 'text-2xl sm:text-[1.65rem]' : 'text-xl'
                   }`}
                 >
