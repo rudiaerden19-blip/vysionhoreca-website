@@ -2971,6 +2971,8 @@
     "clockInCode": "Einstempeln / PIN",
     "clockOutCode": "Ausstempeln / PIN",
     "sales": "Verkauf",
+    "salesPickTitle": "Mitarbeiter wählen",
+    "salesPickNoClockedIn": "Niemand ist eingestempelt. Zuerst über das Schnellmenü einstempeln.",
     "salesHint": "Keine PIN: eingestempelt",
     "salesNeedsClock": "Zuerst einstempeln",
     "loadingList": "Laden…",
@@ -2991,7 +2993,7 @@
     "summaryPrint": "Drucken",
     "summaryReceiptPrinted": "Gedruckt: {date}",
     "close": "Schließen",
-    "productTapRequiresStaff": "Tippe auf die Verkauf-Taste und wähle Verkauf bei einem Mitarbeiter. Danach kannst du das Produkt hinzufügen.",
+    "productTapRequiresStaff": "Tippe auf die Verkoop-Taste und wähle einen Mitarbeiter. Danach kannst du das Produkt hinzufügen.",
     "successIn": "Eingestempelt.",
     "successOut": "Ausgestempelt.",
     "errors": {

@@ -3947,6 +3947,8 @@
     "clockInCode": "Inklokken / code",
     "clockOutCode": "Uitklokken / code",
     "sales": "Verkoop",
+    "salesPickTitle": "Kies medewerker",
+    "salesPickNoClockedIn": "Niemand is ingeklokt. Laat medewerkers eerst inklokken via het snelmenu.",
     "salesHint": "Geen code: je bent ingeklokt",
     "salesNeedsClock": "Eerst inklokken",
     "loadingList": "Laden…",
@@ -3967,7 +3969,7 @@
     "summaryPrint": "Afdrukken",
     "summaryReceiptPrinted": "Afgedrukt: {date}",
     "close": "Sluiten",
-    "productTapRequiresStaff": "Druk op de Verkoop-knop en kies Verkoop bij een medewerker. Daarna kun je het product toevoegen.",
+    "productTapRequiresStaff": "Druk op de knop Verkoop en kies een medewerker. Daarna kun je het product toevoegen.",
     "successIn": "Ingeklokt.",
     "successOut": "Uitgeklokt.",
     "errors": {

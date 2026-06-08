@@ -3471,6 +3471,8 @@
     "clockInCode": "上班 / PIN",
     "clockOutCode": "下班 / PIN",
     "sales": "销售",
+    "salesPickTitle": "选择员工",
+    "salesPickNoClockedIn": "暂无已上班员工。请先从快捷菜单打卡上班。",
     "salesHint": "无需PIN：已上班",
     "salesNeedsClock": "请先上班打卡",
     "loadingList": "加载中…",
@@ -3491,7 +3493,7 @@
     "summaryPrint": "打印",
     "summaryReceiptPrinted": "打印时间：{date}",
     "close": "关闭",
-    "productTapRequiresStaff": "请先点击“销售”按钮，再为员工选择“销售”，之后即可添加商品。",
+    "productTapRequiresStaff": "请先按 Verkoop 按钮并选择一名员工，之后即可添加商品。",
     "successIn": "已记录上班。",
     "successOut": "已记录下班。",
     "errors": {

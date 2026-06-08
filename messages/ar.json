@@ -3471,6 +3471,8 @@
     "clockInCode": "دخول / PIN",
     "clockOutCode": "خروج / PIN",
     "sales": "مبيعات",
+    "salesPickTitle": "اختر موظفاً",
+    "salesPickNoClockedIn": "لا أحد مسجّل دخولاً. اطلب تسجيل الدخول من القائمة السريعة أولاً.",
     "salesHint": "بدون PIN: مسجّل دخول",
     "salesNeedsClock": "سجّل الدخول أولاً",
     "loadingList": "جاري التحميل…",
@@ -3491,7 +3493,7 @@
     "summaryPrint": "طباعة",
     "summaryReceiptPrinted": "طُبع في: {date}",
     "close": "إغلاق",
-    "productTapRequiresStaff": "اضغط زر «المبيعات» ثم اختر «مبيعات» لأحد الموظفين. بعدها يمكنك إضافة المنتج.",
+    "productTapRequiresStaff": "اضغط زر Verkoop واختر موظفاً. بعدها يمكنك إضافة المنتج.",
     "successIn": "تم تسجيل الدخول.",
     "successOut": "تم تسجيل الخروج.",
     "errors": {

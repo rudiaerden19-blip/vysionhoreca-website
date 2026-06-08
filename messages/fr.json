@@ -2971,6 +2971,8 @@
     "clockInCode": "Entrée / PIN",
     "clockOutCode": "Sortie / PIN",
     "sales": "Vente",
+    "salesPickTitle": "Choisir un collaborateur",
+    "salesPickNoClockedIn": "Personne n’est en service. Faites pointer via le menu rapide d’abord.",
     "salesHint": "Sans PIN : vous êtes en service",
     "salesNeedsClock": "Pointez d'abord l'entrée",
     "loadingList": "Chargement…",
@@ -2991,7 +2993,7 @@
     "summaryPrint": "Imprimer",
     "summaryReceiptPrinted": "Imprimé : {date}",
     "close": "Fermer",
-    "productTapRequiresStaff": "Appuie sur le bouton Vente, puis choisis Vente pour un collaborateur. Ensuite tu pourras ajouter le produit.",
+    "productTapRequiresStaff": "Appuie sur le bouton Verkoop et choisis un collaborateur. Ensuite tu pourras ajouter le produit.",
     "successIn": "Entrée enregistrée.",
     "successOut": "Sortie enregistrée.",
     "errors": {

@@ -153,6 +153,7 @@ import { KassaProductOptionsModal } from '@/components/kassa/KassaProductOptions
 import {
   KassaProductStaffGatePopup,
   KassaStaffClockModal,
+  type KassaStaffClockModalMode,
   KassaStaffSalesSummaryModal,
 } from '@/components/kassa/KassaStaffClockUi'
 import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
@@ -2142,6 +2143,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [lastOrder, setLastOrder] = useState<KassaLastOrderReceipt | null>(null)
 
   const [staffClockOpen, setStaffClockOpen] = useState(false)
+  const [staffClockModalMode, setStaffClockModalMode] = useState<KassaStaffClockModalMode>('clock')
   const [staffClockList, setStaffClockList] = useState<
     { id: string; name: string; hasOpenSession: boolean }[]
   >([])
@@ -3938,9 +3940,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     void loadStaffClockList({ background: true })
   }, [tenant, demoViewOnly, tenantInfo?.kassa_staff_clock_enabled, loadStaffClockList])
 
-  const openStaffClockModal = () => {
+  const openStaffClockModal = (mode: KassaStaffClockModalMode = 'clock') => {
     playClick()
     staffClockPinReqGen.current += 1
+    setStaffClockModalMode(mode)
     setStaffClockBusy(false)
     setStaffClockOpen(true)
     setStaffClockPinModal(null)
@@ -4928,7 +4931,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   setKassaZoneTab('sales')
                   setShowTablePicker(false)
                   if (showKassaStaffClockButton && !activeKassaStaff) {
-                    openStaffClockModal()
+                    openStaffClockModal('salesPick')
                   }
                 }}
                 className={`flex min-w-0 flex-1 items-center justify-center px-2 transition-colors sm:px-3 ${kassaFloorZoneButtonTouchClass(
@@ -5726,6 +5729,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
       <KassaStaffClockModal
         open={staffClockOpen}
+        mode={staffClockModalMode}
         listLoading={staffClockListLoading}
         staffList={staffClockList}
         busy={staffClockBusy}

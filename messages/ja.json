@@ -3471,6 +3471,8 @@
     "clockInCode": "出勤 / PIN",
     "clockOutCode": "退勤 / PIN",
     "sales": "販売",
+    "salesPickTitle": "スタッフを選択",
+    "salesPickNoClockedIn": "出勤中のスタッフがいません。クイックメニューから出勤してください。",
     "salesHint": "PIN不要：出勤中",
     "salesNeedsClock": "先に出勤してください",
     "loadingList": "読み込み中…",
@@ -3491,7 +3493,7 @@
     "summaryPrint": "印刷",
     "summaryReceiptPrinted": "印刷日時: {date}",
     "close": "閉じる",
-    "productTapRequiresStaff": "「販売」ボタンをタップし、スタッフの「販売」を選んでください。その後に商品を追加できます。",
+    "productTapRequiresStaff": "Verkoopボタンを押してスタッフを選んでください。その後に商品を追加できます。",
     "successIn": "出勤を記録しました。",
     "successOut": "退勤を記録しました。",
     "errors": {

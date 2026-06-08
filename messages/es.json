@@ -3471,6 +3471,8 @@
     "clockInCode": "Entrada / PIN",
     "clockOutCode": "Salida / PIN",
     "sales": "Venta",
+    "salesPickTitle": "Elegir empleado",
+    "salesPickNoClockedIn": "Nadie ha fichado entrada. Primero fichar desde el menú rápido.",
     "salesHint": "Sin PIN: estás fichado",
     "salesNeedsClock": "Ficha entrada primero",
     "loadingList": "Cargando…",
@@ -3491,7 +3493,7 @@
     "summaryPrint": "Imprimir",
     "summaryReceiptPrinted": "Impreso: {date}",
     "close": "Cerrar",
-    "productTapRequiresStaff": "Pulsa el botón Venta y elige Venta para un empleado. Después podrás añadir el producto.",
+    "productTapRequiresStaff": "Pulsa el botón Verkoop y elige un empleado. Después podrás añadir el producto.",
     "successIn": "Entrada registrada.",
     "successOut": "Salida registrada.",
     "errors": {

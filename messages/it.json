@@ -3471,6 +3471,8 @@
     "clockInCode": "Entrata / PIN",
     "clockOutCode": "Uscita / PIN",
     "sales": "Vendite",
+    "salesPickTitle": "Scegli collaboratore",
+    "salesPickNoClockedIn": "Nessuno in servizio. Prima timbrare dal menu rapido.",
     "salesHint": "Senza PIN: sei in servizio",
     "salesNeedsClock": "Timbra prima l'entrata",
     "loadingList": "Caricamento…",
@@ -3491,7 +3493,7 @@
     "summaryPrint": "Stampa",
     "summaryReceiptPrinted": "Stampato: {date}",
     "close": "Chiudi",
-    "productTapRequiresStaff": "Tocca il pulsante Vendite e scegli Vendite per un collaboratore. Poi potrai aggiungere il prodotto.",
+    "productTapRequiresStaff": "Tocca il pulsante Verkoop e scegli un collaboratore. Poi potrai aggiungere il prodotto.",
     "successIn": "Entrata registrata.",
     "successOut": "Uscita registrata.",
     "errors": {

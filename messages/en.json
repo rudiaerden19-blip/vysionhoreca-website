@@ -3947,6 +3947,8 @@
     "clockInCode": "Clock in / PIN",
     "clockOutCode": "Clock out / PIN",
     "sales": "Sales",
+    "salesPickTitle": "Choose team member",
+    "salesPickNoClockedIn": "No one is clocked in. Ask staff to clock in via the quick menu first.",
     "salesHint": "No PIN: you are clocked in",
     "salesNeedsClock": "Clock in first",
     "loadingList": "Loading…",
@@ -3967,7 +3969,7 @@
     "summaryPrint": "Print",
     "summaryReceiptPrinted": "Printed: {date}",
     "close": "Close",
-    "productTapRequiresStaff": "Tap the Sales button, then choose Sales for a team member. You can add the product after that.",
+    "productTapRequiresStaff": "Press the Verkoop button and choose a team member. Then you can add the product.",
     "successIn": "Clocked in.",
     "successOut": "Clocked out.",
     "errors": {
