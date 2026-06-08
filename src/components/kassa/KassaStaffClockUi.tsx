@@ -2,7 +2,7 @@
 
 import { useLanguage } from '@/i18n'
 import { StaffClockPinPortal } from '@/components/staff-clock/StaffClockPinPortal'
-import { gksPosButtonClass } from '@/lib/gks-kassa/gks-pos-surface'
+import { GKS_POS_SELECTED_ACCENT_TEXT, gksPosButtonClass } from '@/lib/gks-kassa/gks-pos-surface'
 
 export type KassaStaffClockRow = { id: string; name: string; hasOpenSession: boolean }
 
@@ -229,6 +229,8 @@ export function KassaStaffSalesPickModal({
   onClose,
   onPick,
   onOpenClockManage,
+  activeStaffId,
+  appearance = 'light',
 }: {
   open: boolean
   staffList: KassaStaffClockRow[]
@@ -237,8 +239,12 @@ export function KassaStaffSalesPickModal({
   onPick: (row: KassaStaffClockRow) => void
   /** GKS: in-/uitklokken zonder extra «Verkoop»-stap; optioneel onderaan. */
   onOpenClockManage?: () => void
+  /** Huidige verkoopmedewerker — naam in accentkleur. */
+  activeStaffId?: string | null
+  appearance?: 'light' | 'gks'
 }) {
   const { t } = useLanguage()
+  const isGks = appearance === 'gks'
   const clockedIn = staffList.filter((s) => s.hasOpenSession)
   if (!open) return null
 
@@ -260,17 +266,30 @@ export function KassaStaffSalesPickModal({
           {clockedIn.length === 0 ? (
             <p className="py-8 text-center text-sm text-gray-500">{t('staffClock.salesPickNone')}</p>
           ) : (
-            clockedIn.map((s) => (
-              <button
-                key={s.id}
-                type="button"
-                disabled={busy}
-                onClick={() => onPick(s)}
-                className="w-full min-h-[52px] rounded-xl border-2 border-emerald-200 bg-emerald-50 px-4 py-3 text-left text-lg font-bold text-gray-900 hover:bg-emerald-100 disabled:opacity-50"
-              >
-                {s.name}
-              </button>
-            ))
+            clockedIn.map((s) => {
+              const isActive = activeStaffId != null && s.id === activeStaffId
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  disabled={busy}
+                  onClick={() => onPick(s)}
+                  className={
+                    isGks
+                      ? `w-full min-h-[52px] touch-manipulation px-4 py-3 text-left text-lg font-semibold disabled:opacity-50 ${
+                          isActive
+                            ? `${gksPosButtonClass(true)} ${GKS_POS_SELECTED_ACCENT_TEXT}`
+                            : `${gksPosButtonClass(false)} !text-[#f0f0f0]`
+                        }`
+                      : `w-full min-h-[52px] rounded-xl border-2 border-emerald-200 bg-emerald-50 px-4 py-3 text-left text-lg font-bold hover:bg-emerald-100 disabled:opacity-50 ${
+                          isActive ? 'border-[#3C4D6B] text-[#3C4D6B]' : 'text-gray-900'
+                        }`
+                  }
+                >
+                  {s.name}
+                </button>
+              )
+            })
           )}
         </div>
         <div className="border-t border-gray-100 p-4 space-y-2">

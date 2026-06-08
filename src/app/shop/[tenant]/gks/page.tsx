@@ -4178,7 +4178,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250608-cart-scroll-fix"
+      data-gks-ui="20250608-active-staff-blue"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4403,11 +4403,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
           {activeKassaStaff && !demoViewOnly && (
             <div
-              className={`hidden max-w-[7rem] shrink-0 sm:inline-flex md:max-w-[10rem] ${KASSA_HEADER_QUICK_LINK_BTN} ${GKS_POS_SELECTED_ACCENT_TEXT}`}
+              className={`hidden max-w-[7rem] shrink-0 sm:inline-flex md:max-w-[10rem] ${KASSA_HEADER_QUICK_LINK_BTN}`}
               role="status"
               title={activeKassaStaff.name}
             >
-              <span className={`truncate ${KASSA_HEADER_QUICK_LINK_LABEL}`}>{activeKassaStaff.name}</span>
+              <span
+                className={`truncate text-sm font-semibold leading-snug tracking-[0.04em] ${GKS_POS_SELECTED_ACCENT_TEXT}`}
+              >
+                {activeKassaStaff.name}
+              </span>
             </div>
           )}
           </nav>
@@ -5246,6 +5250,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       />
 
       <KassaStaffSalesPickModal
+        appearance="gks"
+        activeStaffId={activeKassaStaff?.id ?? null}
         open={staffSalesPickOpen}
         staffList={staffClockList}
         busy={staffClockBusy}
