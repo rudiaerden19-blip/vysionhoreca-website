@@ -4931,7 +4931,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     openStaffClockModal()
                   }
                 }}
-                className={`flex min-w-0 flex-1 flex-col items-center justify-center px-2 transition-colors sm:px-3 ${kassaFloorZoneButtonTouchClass(
+                className={`flex min-w-0 flex-1 items-center justify-center px-2 transition-colors sm:px-3 ${kassaFloorZoneButtonTouchClass(
                   kassaSxgaDenseTiles,
                 )} ${
                   kassaAppearanceDark
@@ -4942,8 +4942,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           : 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
                       }`
                 }`}
+                data-testid="kassa-zone-sales"
               >
-                <span className={kassaSidebarZoneLabelClass}>{t('kassaApp.floorZoneSales')}</span>
+                <span className={`${kassaSidebarZoneLabelClass} whitespace-nowrap`}>
+                  {t('kassaApp.floorZoneSales')}
+                </span>
               </button>
               <button
                 type="button"
