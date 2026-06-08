@@ -390,9 +390,12 @@ const KASSA_HEADER_QUICK_LINK_BTN =
   `inline-flex shrink-0 items-center justify-center whitespace-nowrap ${GKS_BTN_SHAPE} ${GKS_POS_BTN} ${GKS_FONT_UI} transition-colors min-h-[2.35rem] px-3 py-2 sm:min-h-[2.6rem] sm:px-3.5 sm:py-2.5`
 const KASSA_HEADER_QUICK_LINK_LABEL = 'text-xs leading-snug sm:text-sm'
 
+/** Zijbalk-knoppen — iets grotere labels (kiosk). */
+const GKS_SIDEBAR_BTN_LABEL = 'text-base font-semibold leading-tight sm:text-[17px]'
+
 /** Alleen Binnen/Terras — groter dan besteltype-knoppen eronder. */
 function kassaFloorZoneButtonTouchClass(sxga: boolean): string {
-  return sxga ? 'min-h-[3.25rem] py-2.5 text-base' : 'min-h-[2.75rem] py-2 text-sm'
+  return sxga ? 'min-h-[3.25rem] py-2.5 text-lg' : 'min-h-[2.75rem] py-2 text-base'
 }
 
 /** Ter plaatse / Afhalen / Leveren — touch-vriendelijk. */
@@ -4736,11 +4739,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 kassaSxgaDenseTiles,
               )} ${gksPosButtonClass(orderType === 'DINE_IN')}`}
             >
-              <span className="text-center text-sm font-semibold leading-tight">
+              <span className={`text-center ${GKS_SIDEBAR_BTN_LABEL}`}>
                 {t('kassaApp.orderTypeDineIn')}
               </span>
               {orderType === 'DINE_IN' && tableNumber ? (
-                <span className="mt-0.5 max-w-full truncate text-[10px] font-semibold normal-case opacity-95 sm:text-xs">
+                <span className="mt-0.5 max-w-full truncate text-[11px] font-semibold normal-case opacity-95 sm:text-xs">
                   {t('kassaApp.tableWord')} {tableNumber}
                   {dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE
                     ? ` (${t('kassaApp.floorZoneTerraceShort')})`
@@ -4756,7 +4759,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 kassaSxgaDenseTiles,
               )} ${gksPosButtonClass(orderType === 'TAKEAWAY')}`}
             >
-              <span className="text-center text-sm font-semibold leading-tight">
+              <span className={`text-center ${GKS_SIDEBAR_BTN_LABEL}`}>
                 {t('kassaApp.orderTypeTakeaway')}
               </span>
             </button>
@@ -4768,7 +4771,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 kassaSxgaDenseTiles,
               )} ${gksPosButtonClass(orderType === 'DELIVERY')}`}
             >
-              <span className="text-center text-sm font-semibold leading-tight">
+              <span className={`text-center ${GKS_SIDEBAR_BTN_LABEL}`}>
                 {t('kassaApp.orderTypeDelivery')}
               </span>
             </button>
@@ -5022,7 +5025,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               kassaSidebarFooterTier === 'dense',
             )}`}
           >
-            <span className={`text-sm font-semibold ${ui.numpadMeta}`}>
+            <span className={`text-base font-semibold sm:text-[17px] ${ui.numpadMeta}`}>
               {t('kassaApp.cartTotal')}
             </span>
             {numpadPanelVisible ? (
@@ -5055,7 +5058,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               )}`}
               title={t('kassaApp.drawerOpen')}
             >
-              <span className="text-center text-sm font-semibold leading-tight">
+              <span className={`text-center ${GKS_SIDEBAR_BTN_LABEL}`}>
                 {t('kassaApp.drawerOpen')}
               </span>
             </button>
@@ -5073,7 +5076,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               )}`}
               aria-label={t('kassaApp.cartBonTitle')}
             >
-              <span className="text-center text-sm font-semibold leading-tight">
+              <span className={`text-center ${GKS_SIDEBAR_BTN_LABEL}`}>
                 {t('kassaApp.cartBon')}
               </span>
             </button>
@@ -5092,7 +5095,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 kassaSidebarFooterTier === 'dense',
               )}`}
             >
-              <span className="text-center text-sm font-semibold leading-tight">
+              <span className={`text-center ${GKS_SIDEBAR_BTN_LABEL}`}>
                 {t('kassaApp.numpadToggle')}
               </span>
             </button>
