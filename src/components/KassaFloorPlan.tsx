@@ -321,25 +321,25 @@ function TableSVG({ table, isSelected, onClick, effectiveStatus }: {
         </g>
       ))}
 
-      {/* Tafel — zelfde grijze stijl als toog */}
+      {/* Tafel — bruin hout; stoelen ongewijzigd */}
       {table.shape === 'ROUND' ? (
         <ellipse cx={cx} cy={cy} rx={tableSize / 2} ry={tableSize / 2}
           fill="url(#table-grad-round)"
-          stroke={isSelected ? color : '#333'}
+          stroke={isSelected ? color : '#4a3220'}
           strokeWidth={isSelected ? 4 : 2}
           filter="url(#shadow)"
         />
       ) : table.shape === 'RECTANGLE' ? (
         <rect x={cx - tw / 2} y={cy - th / 2} width={tw} height={th} rx={10}
           fill="url(#table-grad-rect)"
-          stroke={isSelected ? color : '#333'}
+          stroke={isSelected ? color : '#4a3220'}
           strokeWidth={isSelected ? 4 : 2}
           filter="url(#shadow)"
         />
       ) : (
         <rect x={cx - tableSize / 2} y={cy - tableSize / 2} width={tableSize} height={tableSize} rx={10}
           fill="url(#table-grad-rect)"
-          stroke={isSelected ? color : '#333'}
+          stroke={isSelected ? color : '#4a3220'}
           strokeWidth={isSelected ? 4 : 2}
           filter="url(#shadow)"
         />
@@ -355,7 +355,7 @@ function TableSVG({ table, isSelected, onClick, effectiveStatus }: {
       <text x={cx} y={cy - 6} textAnchor="middle" fill="white" fontSize={20} fontWeight="bold" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))' }}>
         {table.number}
       </text>
-      <text x={cx} y={cy + 14} textAnchor="middle" fill="rgba(255,255,255,0.6)" fontSize={12}>
+      <text x={cx} y={cy + 14} textAnchor="middle" fill="white" fontSize={12} fontWeight="600">
         {seats}p
       </text>
 
@@ -365,14 +365,14 @@ function TableSVG({ table, isSelected, onClick, effectiveStatus }: {
       {/* Defs */}
       <defs>
         <linearGradient id="table-grad-round" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#6b6b6b" />
-          <stop offset="40%" stopColor="#4a4a4a" />
-          <stop offset="100%" stopColor="#2a2a2a" />
+          <stop offset="0%" stopColor="#a67c52" />
+          <stop offset="42%" stopColor="#7a5230" />
+          <stop offset="100%" stopColor="#4a3220" />
         </linearGradient>
         <linearGradient id="table-grad-rect" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#6b6b6b" />
-          <stop offset="40%" stopColor="#4a4a4a" />
-          <stop offset="100%" stopColor="#2a2a2a" />
+          <stop offset="0%" stopColor="#a67c52" />
+          <stop offset="42%" stopColor="#7a5230" />
+          <stop offset="100%" stopColor="#4a3220" />
         </linearGradient>
         <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
           <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.5" />
@@ -1639,9 +1639,9 @@ export default function KassaFloorPlan({
           </div>
         ))}
         {isLocked ? (
-          <span className="text-orange-700/90 ml-4 text-xs">{t('kassaApp.floorPlanLegendLocked')}</span>
+          <span className="ml-4 text-xs text-white/90">{t('kassaApp.floorPlanLegendLocked')}</span>
         ) : (
-          <span className="text-orange-700/90 ml-4 text-xs">{t('kassaApp.floorPlanLegendEditMode')}</span>
+          <span className="ml-4 text-xs text-white/90">{t('kassaApp.floorPlanLegendEditMode')}</span>
         )}
       </div>
       </div>
