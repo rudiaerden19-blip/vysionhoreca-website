@@ -5178,7 +5178,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 {t('kassaApp.cartTotal')}
               </span>
               <span
-                className={`font-bold tabular-nums tracking-tight ${ui.priceAccentClass} ${
+                className={`font-bold tabular-nums tracking-tight text-white ${
                   kassaSxgaDenseTiles || kassaSidebarFooterTier !== 'dense' ? 'text-2xl sm:text-[1.65rem]' : 'text-xl'
                 }`}
               >
