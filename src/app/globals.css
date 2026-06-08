@@ -451,11 +451,25 @@ html[data-vysion-web-kb-open] {
 /* Shell + tegel-titelstrook: één korrel (fixed = zelfde fase als achtergrond). */
 .gks-menu-plate-grain {
   background-color: #333336;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='88' height='88'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.62' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeColorMatrix type='matrix' values='1.48 0 0 0 -0.16 0 1.48 0 0 -0.16 0 0 1.48 0 -0.16 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='88' height='88' filter='url(%23n)' opacity='0.9'/%3E%3C/svg%3E");
-  background-size: 88px 88px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeColorMatrix type='matrix' values='1.32 0 0 0 -0.12 0 1.32 0 0 -0.12 0 0 1.32 0 -0.12 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='96' height='96' filter='url(%23n)' opacity='0.72'/%3E%3C/svg%3E");
+  background-size: 96px 96px;
   background-repeat: repeat;
   background-attachment: fixed;
   background-blend-mode: overlay;
+}
+
+/* GKS menu: subtiele vignette — diepte zonder extra kleur. */
+.gks-menu-vignette {
+  position: relative;
+  isolation: isolate;
+}
+.gks-menu-vignette::after {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  box-shadow: inset 0 0 72px rgba(0, 0, 0, 0.28), inset 0 0 24px rgba(0, 0, 0, 0.12);
 }
 
 /* ===========================================
