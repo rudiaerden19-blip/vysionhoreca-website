@@ -27,6 +27,20 @@ import {
   orderItemLineTotalEur,
 } from '@/lib/order-items-display'
 import { adminDineInSeatAuditLine, dineInSeatLineNl } from '@/lib/admin-order-display'
+import {
+  KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
+  KASSA_POS_MENU_RECESS_TRAY_CLASS,
+  KASSA_POS_BTN_SHAPE,
+  KASSA_POS_SELECTED_ACCENT_TEXT,
+  kassaPosButtonClass,
+} from '@/lib/kassa-pos-surface'
+
+const KITCHEN_POS_BTN = `${kassaPosButtonClass(false)} touch-manipulation font-semibold text-[#f0f0f0]`
+const KITCHEN_POS_BTN_ACCENT = `${kassaPosButtonClass(true)} touch-manipulation font-bold`
+const KITCHEN_CARD_SHELL = `${KASSA_POS_BTN_SHAPE} border border-[#2a2a2a] ${KASSA_POS_MENU_RECESS_TRAY_CLASS} text-[#f0f0f0]`
+const KITCHEN_CARD_HEAD = 'border-b border-black/40 bg-[linear-gradient(180deg,#1c1c1c_0%,#101010_48%,#060606_100%)]'
+const KITCHEN_MUTED = 'text-white/70'
+const KITCHEN_SUBSTRIP = 'border-b border-white/10 bg-black/25 text-center text-sm font-medium text-white/90'
 
 interface Order {
   id: string
@@ -439,7 +453,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   if (loading) {
     return (
       <div
-        className="min-h-[100dvh] w-full min-w-0 max-w-full bg-[#e3e3e3] flex items-center justify-center"
+        className={`min-h-[100dvh] w-full min-w-0 max-w-full ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} flex items-center justify-center text-white`}
         style={{
           paddingTop: 'env(safe-area-inset-top, 0px)',
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
@@ -448,7 +462,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full"
+          className="h-16 w-16 rounded-full border-4 border-[#5a9fd4] border-t-transparent"
         />
       </div>
     )
@@ -457,28 +471,25 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
 
   return (
     <div
-      className="flex min-h-0 h-[100dvh] max-h-[100dvh] w-full min-w-0 max-w-full flex-col overflow-hidden bg-[#e3e3e3] text-gray-900"
+      className={`flex min-h-0 h-[100dvh] max-h-[100dvh] w-full min-w-0 max-w-full flex-col overflow-hidden ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} text-[#f0f0f0]`}
       style={{
         paddingTop: 'env(safe-area-inset-top, 0px)',
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
       }}
     >
       {/* Header */}
-      <header className="shrink-0 bg-blue-600 px-4 py-3 text-white">
+      <header className={`shrink-0 border-b border-black px-4 py-3 ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`}>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-2 sm:gap-3">
             {kassaEntryHref && (
-              <Link
-                href={kassaEntryHref}
-                className="flex shrink-0 items-center gap-2 rounded-xl bg-[#58CCFF] px-3 py-2 text-sm font-bold text-[#063042] shadow-md transition-colors hover:bg-[#47c6fe]"
-              >
+              <Link href={kassaEntryHref} className={`flex shrink-0 items-center gap-2 px-3 py-2 text-sm ${KITCHEN_POS_BTN_ACCENT}`}>
                 <span className="text-base leading-none" aria-hidden>
                   🧾
                 </span>
                 {t('adminLayout.pos')}
               </Link>
             )}
-            <div className="h-10 w-10 shrink-0 bg-white/20 rounded-xl flex items-center justify-center text-xl">
+            <div className={`flex h-10 w-10 shrink-0 items-center justify-center text-xl ${KITCHEN_POS_BTN}`}>
               👨‍🍳
             </div>
             <div className="min-w-0">
@@ -489,23 +500,17 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
 
           <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-4">
             {/* Sound - ALTIJD AAN */}
-            <span 
-              onClick={enableSound}
-              className="px-3 py-2 bg-green-500/30 text-green-300 rounded-xl flex items-center gap-2 text-sm cursor-pointer"
-            >
+            <span onClick={enableSound} className={`flex cursor-pointer items-center gap-2 px-3 py-2 text-sm ${KITCHEN_POS_BTN}`}>
               🔊 {tx('soundEnabled')}
             </span>
 
             {/* Order count */}
-            <div className="px-4 py-2 bg-white/20 rounded-xl font-bold">
+            <div className={`px-4 py-2 font-bold ${KITCHEN_POS_BTN}`}>
               📋 {orders.length} {tx('toMake')}
             </div>
 
             {/* Alles klaar */}
-            <button
-              onClick={handleAllReady}
-              className="px-4 py-2 bg-green-500 hover:bg-green-600 rounded-xl font-bold text-white transition-colors"
-            >
+            <button type="button" onClick={handleAllReady} className={`px-4 py-2 ${KITCHEN_POS_BTN_ACCENT}`}>
               ✓ Alles klaar
             </button>
 
@@ -514,14 +519,14 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
               <motion.div
                 animate={{ scale: [1, 1.1, 1] }}
                 transition={{ repeat: Infinity, duration: 0.5 }}
-                className="px-4 py-2 bg-red-500 rounded-xl font-bold"
+                className={`border border-red-500/60 bg-red-950/80 px-4 py-2 font-bold text-red-200 ${KASSA_POS_BTN_SHAPE}`}
               >
                 🚨 {newOrderIds.size} {tx('newOrder')}
               </motion.div>
             )}
 
             {/* Clock */}
-            <div className="text-2xl font-mono font-bold">
+            <div className={`font-mono text-2xl font-bold tabular-nums ${KASSA_POS_SELECTED_ACCENT_TEXT}`}>
               {currentTime.toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' })}
             </div>
 
@@ -529,7 +534,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
               <button
                 type="button"
                 onClick={() => setKeukenLangOpen((o) => !o)}
-                className="inline-flex touch-manipulation items-center gap-1 rounded-xl bg-white/10 px-3 py-2 text-sm font-bold text-white hover:bg-white/20"
+                className={`inline-flex items-center gap-1 px-3 py-2 text-sm font-bold ${KITCHEN_POS_BTN}`}
                 title={t('languageSwitcher.selectLanguage')}
               >
                 <LocaleFlagEmoji locale={locale} className="text-base text-white" />
@@ -543,7 +548,9 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                 </svg>
               </button>
               {keukenLangOpen && (
-                <div className="absolute right-0 top-full z-[130] mt-1 max-h-80 min-w-[180px] overflow-y-auto rounded-xl border border-white/20 bg-blue-800 shadow-xl">
+                <div
+                  className={`absolute right-0 top-full z-[130] mt-1 max-h-80 min-w-[180px] overflow-y-auto border border-black shadow-xl ${KASSA_POS_BTN_SHAPE} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`}
+                >
                   {locales.map((lang) => (
                     <button
                       key={lang}
@@ -552,8 +559,8 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                         setLocale(lang)
                         setKeukenLangOpen(false)
                       }}
-                      className={`flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm transition-colors hover:bg-white/15 ${
-                        locale === lang ? 'bg-white/20 font-semibold text-white' : 'text-white/95'
+                      className={`flex w-full items-center gap-2 border-b border-white/10 px-4 py-2.5 text-left text-sm transition-colors last:border-0 hover:bg-white/10 ${
+                        locale === lang ? 'bg-white/10 font-semibold text-white' : 'text-white/90'
                       }`}
                     >
                       <LocaleFlagEmoji locale={lang} />
@@ -571,10 +578,10 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
       {/* Orders Grid — flex-1 + min-h-0: correcte scroll op iPad Safari / PWA */}
       <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-4">
         {orders.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-gray-500">
-            <span className="text-8xl mb-6">✅</span>
-            <p className="text-2xl font-bold">{tx('allDone')}</p>
-            <p className="text-lg mt-2">{tx('ordersAppearHere')}</p>
+          <div className={`flex h-full flex-col items-center justify-center ${KITCHEN_MUTED}`}>
+            <span className="mb-6 text-8xl">✅</span>
+            <p className="text-2xl font-bold text-white">{tx('allDone')}</p>
+            <p className="mt-2 text-lg">{tx('ordersAppearHere')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
@@ -588,10 +595,10 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                className={`rounded-xl overflow-hidden cursor-pointer transition-all border border-gray-200 bg-white shadow-sm text-gray-900 ${
+                className={`cursor-pointer overflow-hidden transition-all ${KITCHEN_CARD_SHELL} ${
                   newOrderIds.has(order.id)
-                    ? 'ring-2 ring-[#0f2744] shadow-md'
-                    : 'hover:border-gray-300'
+                    ? 'shadow-[0_0_0_2px_rgba(90,159,212,0.75),0_8px_24px_rgba(0,0,0,0.45)]'
+                    : 'hover:brightness-[1.04]'
                 }`}
                 onClick={() => {
                   setSelectedOrder(order)
@@ -603,33 +610,31 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                 }}
               >
                 {/* Orderkop — zelfde donkerblauw + wit als onlinescherm */}
-                <div className="bg-[#0f2744] text-white px-4 py-2.5 flex items-center justify-between border-b border-black/20">
-                  <span className="font-bold text-lg tabular-nums">#{order.order_number}</span>
-                  <span className="text-xs font-semibold uppercase tracking-wide text-white bg-white/15 px-2 py-1 rounded-md border border-white/25 max-w-[55%] text-right leading-tight">
+                <div className={`${KITCHEN_CARD_HEAD} flex items-center justify-between px-4 py-2.5 text-white`}>
+                  <span className="text-lg font-bold tabular-nums">#{order.order_number}</span>
+                  <span className={`max-w-[55%] text-right text-xs font-semibold uppercase leading-tight tracking-wide ${KITCHEN_POS_BTN} px-2 py-1`}>
                     {kitchenHeaderStatus(order.status)}
                   </span>
                 </div>
 
                 {isWebshopOrder(order) ? (
-                  <div className="px-3 py-2 bg-gray-50 border-b border-gray-100 text-center">
-                    <div className="text-sm font-bold text-gray-900">{t('shopDisplay.onlineOrder')}</div>
-                    <div className="text-xs sm:text-sm text-gray-700 mt-1 leading-snug">
+                  <div className={`px-3 py-2 ${KITCHEN_SUBSTRIP}`}>
+                    <div className="text-sm font-bold text-white">{t('shopDisplay.onlineOrder')}</div>
+                    <div className={`mt-1 text-xs leading-snug sm:text-sm ${KITCHEN_MUTED}`}>
                       {t(`shopDisplay.${shopDisplayOrderTypeKey(order.order_type)}`)}
                       {schedLine ? ` · ${schedLine}` : ''}
                     </div>
                   </div>
                 ) : (
                   <>
-                    <div className="px-3 py-2 text-sm font-medium text-gray-800 bg-gray-50 border-b border-gray-100 text-center">
-                      {orderTypeLabelShort(order)}
-                    </div>
+                    <div className={KITCHEN_SUBSTRIP}>{orderTypeLabelShort(order)}</div>
                     {dineInSeat && (
-                      <div className="px-3 py-1.5 bg-emerald-50 border-b border-emerald-100 text-center text-xs sm:text-sm font-bold text-emerald-900">
+                      <div className="border-b border-[#5a9fd4]/30 bg-[#5a9fd4]/10 px-3 py-1.5 text-center text-xs font-bold text-[#b8d4ef] sm:text-sm">
                         {dineInSeat}
                       </div>
                     )}
                     {(order.scheduled_date || order.scheduled_time) && (
-                      <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 text-gray-800 text-sm font-medium text-center">
+                      <div className={`px-3 py-2 text-sm font-medium ${KITCHEN_SUBSTRIP}`}>
                         📅 {order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit' }) : ''}{order.scheduled_time ? ` om ${order.scheduled_time}` : ''}
                       </div>
                     )}
@@ -637,12 +642,14 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                 )}
 
                 <div className="p-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-semibold truncate">{order.customer_name}</span>
-                    <span className="text-gray-500 text-xs shrink-0 ml-2 tabular-nums">{getTimeSince(order.created_at)}</span>
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="truncate font-semibold">{order.customer_name}</span>
+                    <span className={`ml-2 shrink-0 text-xs tabular-nums ${KITCHEN_MUTED}`}>{getTimeSince(order.created_at)}</span>
                   </div>
 
-                  <div className="space-y-2 max-h-[min(20rem,48vh)] overflow-y-auto overscroll-y-contain rounded-lg border border-gray-200 bg-white px-2 py-1 [scrollbar-gutter:stable]">
+                  <div
+                    className={`max-h-[min(20rem,48vh)] space-y-2 overflow-y-auto overscroll-y-contain px-2 py-1 [scrollbar-gutter:stable] ${KASSA_POS_BTN_SHAPE} ${KASSA_POS_MENU_RECESS_TRAY_CLASS}`}
+                  >
                     {order.items?.map((item: unknown, i: number) => {
                       const label = orderItemDisplayName(item)
                       const optLines = orderItemDisplayOptionLines(item)
@@ -651,19 +658,19 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                       const noteStr =
                         noteRaw != null && String(noteRaw).trim() !== '' ? String(noteRaw) : ''
                       return (
-                      <div key={i} className="flex items-start gap-3 pb-2 border-b border-gray-100 last:border-0">
-                        <span className="w-9 h-9 bg-[#0f2744] text-white rounded-md flex items-center justify-center font-bold text-sm shrink-0">
+                      <div key={i} className="flex items-start gap-3 border-b border-white/10 pb-2 last:border-0">
+                        <span className={`flex h-9 w-9 shrink-0 items-center justify-center text-sm font-bold ${KITCHEN_POS_BTN}`}>
                           {qty}
                         </span>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-gray-900 text-sm leading-snug">{label}</p>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-semibold leading-snug text-white">{label}</p>
                           {optLines.map((line, j) => (
-                            <p key={j} className="text-sm text-gray-800 font-medium mt-0.5 pl-2 border-l-2 border-gray-200">
+                            <p key={j} className="mt-0.5 border-l-2 border-white/20 pl-2 text-sm font-medium text-white/85">
                               + {line}
                             </p>
                           ))}
                           {noteStr ? (
-                            <p className="text-sm text-gray-700 mt-0.5 font-medium">Opmerking: {noteStr}</p>
+                            <p className="mt-0.5 text-sm font-medium text-white/75">Opmerking: {noteStr}</p>
                           ) : null}
                         </div>
                       </div>
@@ -672,21 +679,21 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                   </div>
 
                   {order.customer_notes && (
-                    <div className="mt-3 p-2 bg-gray-50 border border-gray-200 rounded-lg">
-                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-0.5">Opmerking</p>
-                      <p className="text-sm text-gray-800">{order.customer_notes}</p>
+                    <div className={`mt-3 p-2 ${KASSA_POS_BTN_SHAPE} ${KASSA_POS_MENU_RECESS_TRAY_CLASS}`}>
+                      <p className="mb-0.5 text-xs font-semibold uppercase tracking-wide text-white/60">Opmerking</p>
+                      <p className="text-sm text-white/90">{order.customer_notes}</p>
                     </div>
                   )}
                 </div>
 
-                <div className="p-3 border-t border-gray-200 bg-gray-50 flex gap-2">
+                <div className="flex gap-2 border-t border-black/40 bg-black/20 p-3">
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation()
                       printOrder(order)
                     }}
-                    className="flex-1 py-3 rounded-lg font-semibold border border-gray-300 bg-white hover:bg-gray-50 text-gray-800"
+                    className={`flex-1 py-3 ${KITCHEN_POS_BTN}`}
                   >
                     {tx('print')}
                   </button>
@@ -696,7 +703,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                       e.stopPropagation()
                       handleReady(order)
                     }}
-                    className="flex-1 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-semibold"
+                    className={`flex-1 py-3 ${KITCHEN_POS_BTN_ACCENT}`}
                   >
                     {tx('ready')}
                   </button>
@@ -715,18 +722,17 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
             onClick={() => setSelectedOrder(null)}
           >
             <motion.div
               initial={{ scale: 0.96, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.96, opacity: 0 }}
-              className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-gray-200 shadow-2xl text-gray-900"
+              className={`max-h-[90vh] w-full max-w-3xl overflow-y-auto border border-black shadow-2xl ${KASSA_POS_BTN_SHAPE} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} text-[#f0f0f0]`}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Kop — donkerblauw + wit (zelfde als onlinescherm) */}
-              <div className="bg-[#0f2744] text-white p-6 rounded-t-2xl border-b border-black/20">
+              <div className={`rounded-t-2xl border-b border-black p-6 text-white ${KITCHEN_CARD_HEAD}`}>
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight tabular-nums">#{selectedOrder.order_number}</h2>
@@ -756,7 +762,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                   <button
                     type="button"
                     onClick={() => setSelectedOrder(null)}
-                    className="w-11 h-11 shrink-0 rounded-full bg-white/15 flex items-center justify-center text-xl text-white hover:bg-white/25"
+                    className={`flex h-11 w-11 shrink-0 items-center justify-center text-xl ${KITCHEN_POS_BTN}`}
                     aria-label={t('shopDisplay.cancel')}
                   >
                     ✕
@@ -769,31 +775,33 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                   const schedStr = formatOrderScheduleDetail(selectedOrder, locale)
                   if (!schedStr) return null
                   return (
-                    <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-4 text-center">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">{t('shopDisplay.desiredTimeLabel')}</p>
-                      <p className="text-lg font-semibold text-gray-900 mt-1">{schedStr}</p>
+                    <div className={`mb-4 p-4 text-center ${KASSA_POS_BTN_SHAPE} ${KASSA_POS_MENU_RECESS_TRAY_CLASS}`}>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-white/60">{t('shopDisplay.desiredTimeLabel')}</p>
+                      <p className="mt-1 text-lg font-semibold text-white">{schedStr}</p>
                     </div>
                   )
                 })()}
 
-                <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-4">
+                <div className={`mb-4 p-4 ${KASSA_POS_BTN_SHAPE} ${KASSA_POS_MENU_RECESS_TRAY_CLASS}`}>
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
-                      <p className="text-gray-500 text-sm">{tx('customer')}</p>
-                      <p className="font-semibold text-xl">{selectedOrder.customer_name}</p>
+                      <p className={`text-sm ${KITCHEN_MUTED}`}>{tx('customer')}</p>
+                      <p className="text-xl font-semibold text-white">{selectedOrder.customer_name}</p>
                     </div>
                     {selectedOrder.customer_phone && (
                       <div className="text-left sm:text-right">
-                        <p className="text-gray-500 text-sm">{tx('phone')}</p>
-                        <p className="font-semibold text-lg tabular-nums">{selectedOrder.customer_phone}</p>
+                        <p className={`text-sm ${KITCHEN_MUTED}`}>{tx('phone')}</p>
+                        <p className="text-lg font-semibold tabular-nums text-white">{selectedOrder.customer_phone}</p>
                       </div>
                     )}
                   </div>
                 </div>
 
-                <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-4 min-h-0">
-                  <h3 className="font-semibold text-sm uppercase tracking-wide text-gray-600 mb-4">{tx('toPrepare')}</h3>
-                  <div className="max-h-[min(62vh,32rem)] overflow-y-auto overscroll-y-contain space-y-4 pr-1 rounded-lg border border-gray-200 bg-white p-4 [scrollbar-gutter:stable]">
+                <div className={`mb-4 min-h-0 p-4 ${KASSA_POS_BTN_SHAPE} ${KASSA_POS_MENU_RECESS_TRAY_CLASS}`}>
+                  <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-white/70">{tx('toPrepare')}</h3>
+                  <div
+                    className={`max-h-[min(62vh,32rem)] space-y-4 overflow-y-auto overscroll-y-contain rounded-lg p-4 pr-1 [scrollbar-gutter:stable] ${KASSA_POS_MENU_RECESS_TRAY_CLASS}`}
+                  >
                     {selectedOrder.items?.map((item: unknown, i: number) => {
                       const label = orderItemDisplayName(item)
                       const optLines = orderItemDisplayOptionLines(item)
@@ -802,21 +810,21 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                       const noteStr =
                         noteRaw != null && String(noteRaw).trim() !== '' ? String(noteRaw) : ''
                       return (
-                      <div key={i} className="flex items-start gap-4 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
-                        <span className="w-12 h-12 sm:w-14 sm:h-14 bg-[#0f2744] text-white rounded-lg flex items-center justify-center font-bold text-xl sm:text-2xl shrink-0">
+                      <div key={i} className="flex items-start gap-4 border-b border-white/10 pb-4 last:border-0 last:pb-0">
+                        <span className={`flex h-12 w-12 shrink-0 items-center justify-center text-xl font-bold sm:h-14 sm:w-14 sm:text-2xl ${KITCHEN_POS_BTN}`}>
                           {qty}
                         </span>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-xl sm:text-2xl leading-tight text-gray-900">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xl font-semibold leading-tight text-white sm:text-2xl">
                             {label}
                           </p>
                           {optLines.map((line, j) => (
-                            <p key={j} className="text-base text-gray-800 font-medium mt-1 pl-3 border-l-2 border-gray-200">
+                            <p key={j} className="mt-1 border-l-2 border-white/20 pl-3 text-base font-medium text-white/85">
                               + {line}
                             </p>
                           ))}
                           {noteStr ? (
-                            <p className="text-base text-gray-800 mt-2 p-2 bg-gray-50 border border-gray-200 rounded-lg font-medium">
+                            <p className="mt-2 rounded-lg border border-white/10 bg-black/30 p-2 text-base font-medium text-white/80">
                               Opmerking: {noteStr}
                             </p>
                           ) : null}
@@ -828,9 +836,9 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                 </div>
 
                 {selectedOrder.customer_notes && (
-                  <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-4">
-                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">{tx('notes')}</p>
-                    <p className="text-lg font-medium text-gray-900">{selectedOrder.customer_notes}</p>
+                  <div className={`mb-4 p-4 ${KASSA_POS_BTN_SHAPE} ${KASSA_POS_MENU_RECESS_TRAY_CLASS}`}>
+                    <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-white/60">{tx('notes')}</p>
+                    <p className="text-lg font-medium text-white">{selectedOrder.customer_notes}</p>
                   </div>
                 )}
 
@@ -840,7 +848,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                     whileTap={{ scale: 0.99 }}
                     type="button"
                     onClick={() => printOrder(selectedOrder)}
-                    className="py-5 rounded-xl font-semibold text-lg border border-gray-300 bg-white hover:bg-gray-50 text-gray-900"
+                    className={`py-5 text-lg ${KITCHEN_POS_BTN}`}
                   >
                     {tx('printReceipt')}
                   </motion.button>
@@ -849,7 +857,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                     whileTap={{ scale: 0.99 }}
                     type="button"
                     onClick={() => handleReady(selectedOrder)}
-                    className="py-5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-semibold text-lg"
+                    className={`py-5 text-lg ${KITCHEN_POS_BTN_ACCENT}`}
                   >
                     {tx('markReady')}
                   </motion.button>
