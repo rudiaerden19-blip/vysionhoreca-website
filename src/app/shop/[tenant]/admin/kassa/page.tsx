@@ -3989,14 +3989,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     )
   }
 
+  const kassaDarkHeaderBtnShell =
+    'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.35rem] px-3 py-2 sm:min-h-[2.6rem] sm:px-3.5 sm:py-2.5'
+
   const headerQuickLinkBtnClass = kassaAppearanceDark
-    ? `inline-flex shrink-0 items-center justify-center whitespace-nowrap ${kassaPosButtonClass(false)} font-semibold transition-colors min-h-[2.35rem] px-3 py-2 sm:min-h-[2.6rem] sm:px-3.5 sm:py-2.5`
+    ? `${kassaDarkHeaderBtnShell} ${kassaPosButtonClass(false)}`
     : KASSA_HEADER_QUICK_LINK_BTN
 
   const headerUtilityBtnClass = (selected: boolean) =>
-    kassaAppearanceDark
-      ? `inline-flex touch-manipulation shrink-0 items-center gap-0.5 whitespace-nowrap px-1.5 py-1.5 font-semibold sm:gap-1 sm:px-2 sm:py-2 md:px-3 ${kassaPosButtonClass(selected)}`
-      : ''
+    kassaAppearanceDark ? `${kassaDarkHeaderBtnShell} gap-0.5 sm:gap-1 ${kassaPosButtonClass(selected)}` : ''
 
   return (
     <div
@@ -4222,7 +4223,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 kassaAppearanceDark
                   ? isOnline
                     ? headerQuickLinkBtnClass
-                    : `${kassaPosButtonClass(false)} bg-red-600/95 px-3 py-2 font-semibold text-white`
+                    : `${kassaDarkHeaderBtnShell} ${kassaPosButtonClass(false)} bg-red-600/95 text-white`
                   : isOnline
                     ? 'rounded-xl bg-[#3C4D6B] px-3 py-2 font-bold text-white'
                     : 'rounded-xl bg-red-600/95 px-3 py-2 font-bold text-white'
@@ -4261,7 +4262,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               kassaAppearanceDark ? t('adminLayout.kassaAppearanceLightAria') : t('adminLayout.kassaAppearanceDarkAria')
             }
           >
-            <span className="text-[11px] leading-snug sm:text-xs">
+            <span className={kassaAppearanceDark ? KASSA_HEADER_QUICK_LINK_LABEL : 'text-[11px] leading-snug sm:text-xs'}>
               {kassaAppearanceDark ? t('adminLayout.kassaAppearanceLight') : t('adminLayout.kassaAppearanceDark')}
             </span>
           </button>
@@ -4301,11 +4302,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           title={t('kassaApp.logout')}
           className={
             kassaAppearanceDark
-              ? `relative z-20 text-[11px] sm:text-sm ${headerUtilityBtnClass(true)}`
+              ? `relative z-20 ${headerUtilityBtnClass(true)}`
               : 'relative z-20 inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-lg bg-[#58CCFF] px-1.5 py-1 text-[11px] font-bold text-black transition-colors hover:bg-[#47c6fe] sm:gap-1 sm:px-2.5 sm:py-1.5 sm:text-sm'
           }
         >
-          <span className="leading-snug">{t('kassaApp.logout')}</span>
+          <span className={kassaAppearanceDark ? KASSA_HEADER_QUICK_LINK_LABEL : 'leading-snug'}>
+            {t('kassaApp.logout')}
+          </span>
         </button>
         </div>
 
