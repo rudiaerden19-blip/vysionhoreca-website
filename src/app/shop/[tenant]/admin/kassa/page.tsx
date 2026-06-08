@@ -3993,6 +3993,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     ? `inline-flex shrink-0 items-center justify-center whitespace-nowrap ${kassaPosButtonClass(false)} font-semibold transition-colors min-h-[2.35rem] px-3 py-2 sm:min-h-[2.6rem] sm:px-3.5 sm:py-2.5`
     : KASSA_HEADER_QUICK_LINK_BTN
 
+  const headerUtilityBtnClass = (selected: boolean) =>
+    kassaAppearanceDark
+      ? `inline-flex touch-manipulation shrink-0 items-center gap-0.5 whitespace-nowrap px-1.5 py-1.5 font-semibold sm:gap-1 sm:px-2 sm:py-2 md:px-3 ${kassaPosButtonClass(selected)}`
+      : ''
+
   return (
     <div
       className="flex min-h-0 flex-col overflow-hidden h-[100svh] max-h-[100svh] supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh]"
@@ -4213,8 +4218,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
           {isOnline !== null && (
             <div
-              className={`inline-flex max-w-[6.5rem] shrink-0 items-center justify-center gap-0.5 rounded-xl px-3 py-2 font-bold leading-tight min-h-[2.35rem] sm:min-h-[2.6rem] sm:max-w-[8rem] md:max-w-none ${KASSA_HEADER_QUICK_LINK_LABEL} ${
-                isOnline ? 'bg-[#3C4D6B] text-white' : 'bg-red-600/95 text-white'
+              className={`inline-flex max-w-[6.5rem] shrink-0 items-center justify-center gap-0.5 leading-tight min-h-[2.35rem] sm:min-h-[2.6rem] sm:max-w-[8rem] md:max-w-none ${KASSA_HEADER_QUICK_LINK_LABEL} ${
+                kassaAppearanceDark
+                  ? isOnline
+                    ? headerQuickLinkBtnClass
+                    : `${kassaPosButtonClass(false)} bg-red-600/95 px-3 py-2 font-semibold text-white`
+                  : isOnline
+                    ? 'rounded-xl bg-[#3C4D6B] px-3 py-2 font-bold text-white'
+                    : 'rounded-xl bg-red-600/95 px-3 py-2 font-bold text-white'
               }`}
               title={isOnline ? t('kassaApp.onlineModeLiveTitle') : t('kassaApp.offlineModeActive')}
               role="status"
@@ -4237,7 +4248,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <button
             type="button"
             onClick={() => toggleKassaAppearance()}
-            className="relative z-[40] inline-flex touch-manipulation shrink-0 items-center gap-1 whitespace-nowrap rounded-lg bg-white/10 px-1.5 py-1 font-bold text-white transition-colors hover:bg-white/20 sm:px-2 sm:py-1.5"
+            className={
+              kassaAppearanceDark
+                ? `relative z-[40] ${headerUtilityBtnClass(false)}`
+                : 'relative z-[40] inline-flex touch-manipulation shrink-0 items-center gap-1 whitespace-nowrap rounded-lg bg-white/10 px-1.5 py-1 font-bold text-white transition-colors hover:bg-white/20 sm:px-2 sm:py-1.5'
+            }
             title={
               kassaAppearanceDark ? t('adminLayout.kassaAppearanceLightAria') : t('adminLayout.kassaAppearanceDarkAria')
             }
@@ -4258,7 +4273,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               aria-expanded={langOpen}
               aria-label={`${t('nav.language')}: ${localeNames[locale]}`}
               onClick={() => setLangOpen(o => !o)}
-              className="inline-flex touch-manipulation items-center gap-0.5 whitespace-nowrap rounded-lg bg-white/10 px-1.5 py-1.5 font-medium text-white transition-colors hover:bg-white/20 sm:gap-1 sm:rounded-xl sm:px-2 sm:py-2 md:px-3"
+              className={
+                kassaAppearanceDark
+                  ? headerUtilityBtnClass(langOpen)
+                  : 'inline-flex touch-manipulation items-center gap-0.5 whitespace-nowrap rounded-lg bg-white/10 px-1.5 py-1.5 font-medium text-white transition-colors hover:bg-white/20 sm:gap-1 sm:rounded-xl sm:px-2 sm:py-2 md:px-3'
+              }
             >
               <LocaleFlagEmoji locale={locale} variant="inline" className="text-sm text-white sm:text-[15px]" />
               <svg className={`size-4 shrink-0 transition-transform ${langOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
@@ -4280,7 +4299,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           type="button"
           onClick={() => setLogoutSoftwareConfirmOpen(true)}
           title={t('kassaApp.logout')}
-          className="relative z-20 inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-lg bg-[#58CCFF] px-1.5 py-1 text-[11px] font-bold text-black transition-colors hover:bg-[#47c6fe] sm:gap-1 sm:px-2.5 sm:py-1.5 sm:text-sm"
+          className={
+            kassaAppearanceDark
+              ? `relative z-20 text-[11px] sm:text-sm ${headerUtilityBtnClass(true)}`
+              : 'relative z-20 inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-lg bg-[#58CCFF] px-1.5 py-1 text-[11px] font-bold text-black transition-colors hover:bg-[#47c6fe] sm:gap-1 sm:px-2.5 sm:py-1.5 sm:text-sm'
+          }
         >
           <span className="leading-snug">{t('kassaApp.logout')}</span>
         </button>
