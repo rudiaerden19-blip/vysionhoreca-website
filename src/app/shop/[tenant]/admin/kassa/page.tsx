@@ -4965,7 +4965,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </div>
         </div>
 
-        {/* Totaal + knoppen — donker: zelfde layout als GKS-preview; licht: klassieke footer */}
+        {/* Totaal + knoppen — zelfde flow/labels als vóór UI-pass; donker = alleen POS-styling */}
         {kassaAppearanceDark ? (
           <div
             className={`sticky bottom-0 z-10 shrink-0 border-t ${KASSA_POS_RULE_BLACK} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} px-3 py-2.5 space-y-2.5`}
@@ -4979,25 +4979,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <span className={`text-base font-bold tracking-[0.04em] sm:text-lg ${ui.numpadMeta}`}>
                 {t('kassaApp.cartTotal')}
               </span>
-              {numpadPanelVisible ? (
-                <span
-                  className={`min-w-0 truncate text-right font-semibold tabular-nums ${ui.numpadInput} ${
-                    kassaSxgaDenseTiles ? 'text-2xl' : 'text-xl sm:text-2xl'
-                  }`}
-                  aria-live="polite"
-                  aria-label={t('kassaApp.numpadPlaceholder')}
-                >
-                  €{numpadValue || '0'}
-                </span>
-              ) : (
-                <span
-                  className={`font-bold tabular-nums tracking-tight ${ui.priceAccentClass} ${
-                    kassaSxgaDenseTiles || kassaSidebarFooterTier !== 'dense' ? 'text-2xl sm:text-[1.65rem]' : 'text-xl'
-                  }`}
-                >
-                  €{total.toFixed(2)}
-                </span>
-              )}
+              <span
+                className={`font-bold tabular-nums tracking-tight ${ui.priceAccentClass} ${
+                  kassaSxgaDenseTiles || kassaSidebarFooterTier !== 'dense' ? 'text-2xl sm:text-[1.65rem]' : 'text-xl'
+                }`}
+              >
+                €{total.toFixed(2)}
+              </span>
             </div>
             <div className="grid grid-cols-3 gap-3 touch-manipulation select-none">
               <button
@@ -5016,7 +5004,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <button
                 type="button"
                 onClick={() => {
-                  if (draftBonLineItems.length === 0 || draftBonPrinting) return
                   void printDraftBonFromCart({ draftCopies: 1 })
                 }}
                 disabled={draftBonLineItems.length === 0 || draftBonPrinting}
@@ -5033,21 +5020,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               </button>
               <button
                 type="button"
-                aria-pressed={numpadPanelVisible}
-                data-testid="kassa-numpad-toggle"
-                title={t('kassaApp.numpadToggle')}
-                aria-label={t('kassaApp.numpadToggle')}
-                onClick={() => {
-                  playClick()
-                  setNumpadPanelVisible((v) => !v)
-                }}
-                className={`flex items-center justify-center px-1 ${kassaPosButtonClass(numpadPanelVisible)} ${kassaFooterActionTouchMinHClass(
+                onClick={clearCart}
+                disabled={billLines.length === 0}
+                className={`flex items-center justify-center px-1 ${kassaPosButtonClass(false)} ${kassaFooterActionTouchMinHClass(
                   kassaSxgaDenseTiles,
                   kassaSidebarFooterTier === 'dense',
                 )}`}
+                title={t('kassaApp.remove')}
+                aria-label={t('kassaApp.remove')}
               >
                 <span className={`text-center ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`}>
-                  {t('kassaApp.numpadToggle')}
+                  {t('kassaApp.remove')}
                 </span>
               </button>
             </div>
@@ -5073,7 +5056,23 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 </button>
               </div>
             )}
-            <div className="w-full touch-manipulation select-none border-t border-white/10 pt-3">
+            <div className="flex gap-2 touch-manipulation select-none">
+              <button
+                type="button"
+                aria-pressed={numpadPanelVisible}
+                data-testid="kassa-numpad-toggle"
+                title={t('kassaApp.numpadToggle')}
+                aria-label={t('kassaApp.numpadToggle')}
+                onClick={() => {
+                  playClick()
+                  setNumpadPanelVisible((v) => !v)
+                }}
+                className={`flex shrink-0 items-center justify-center p-1.5 ${kassaPosButtonClass(numpadPanelVisible)} ${
+                  kassaSxgaDenseTiles ? 'h-[3.25rem] w-[3.25rem]' : 'h-[3rem] w-[3rem]'
+                }`}
+              >
+                <KassaNumpadToggleIcon className={kassaSxgaDenseTiles ? 'h-8 w-8' : 'h-7 w-7'} />
+              </button>
               <button
                 type="button"
                 data-testid="kassa-checkout"
@@ -5083,11 +5082,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   setShowPaymentModal(true)
                 }}
                 disabled={billLines.length === 0}
-                className={`flex w-full items-center justify-center ${KASSA_POS_CHECKOUT_BTN} ${
-                  kassaSxgaDenseTiles ? 'min-h-[4.25rem] py-4 text-2xl' : 'min-h-[3.85rem] py-3.5 text-xl'
+                className={`flex min-w-0 flex-1 items-center justify-center gap-2 ${KASSA_POS_CHECKOUT_BTN} ${
+                  kassaSxgaDenseTiles ? 'min-h-[4rem] py-3.5 text-xl' : 'min-h-[3.5rem] py-3 text-lg'
                 }`}
               >
-                {t('kassaApp.checkout')}
+                💳 {t('kassaApp.checkout')}
               </button>
             </div>
           </div>

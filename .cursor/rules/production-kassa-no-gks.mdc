@@ -11,6 +11,7 @@ alwaysApply: true
 - UI-styling via **`src/lib/kassa-pos-surface.ts`** en **`kassa-register-ui-theme`** — **geen** imports uit `src/lib/gks-kassa/**`.
 - **Geen** routes, pages, API’s of fiscale flow van GKS op `main` toevoegen of meenemen.
 - Wijzigingen gelden **alle tenants** (500+); nooit hardcoded één slug.
+- **Flow en knoppen** van productie-kassa **nooit** overnemen van GKS (b.v. geen Numpad i.p.v. Verwijder in footer, geen GKS-footer-layout). Alleen **kleur/vorm** via `kassa-pos-surface`.
 
 ## GKS-pilot (branch `gks/fiscal-journal-preview` → Vercel preview)
 
