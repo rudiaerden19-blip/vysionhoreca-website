@@ -18,12 +18,9 @@ export type KassaStaffSummaryState = {
   orders: { order_number: number; total: number }[]
 }
 
-export type KassaStaffClockModalMode = 'clock' | 'salesPick'
-
 /** Personeelsklok: lijst + gedeelde PIN-portal (document.body, focus, Enter = bevestigen). */
 export function KassaStaffClockModal({
   open,
-  mode = 'clock',
   listLoading,
   staffList,
   busy,
@@ -39,8 +36,6 @@ export function KassaStaffClockModal({
   onPinConfirm,
 }: {
   open: boolean
-  /** `salesPick` = alleen ingeklokte medewerker tikken (Verkoop-knop); geen in/uitklok-knoppen. */
-  mode?: KassaStaffClockModalMode
   listLoading: boolean
   staffList: KassaStaffClockRow[]
   busy: boolean
@@ -59,9 +54,6 @@ export function KassaStaffClockModal({
 
   if (!open) return null
 
-  const salesPick = mode === 'salesPick'
-  const clockedInStaff = salesPick ? staffList.filter((s) => s.hasOpenSession) : staffList
-
   const pinTitle =
     pinModal &&
     (pinModal.action === 'in' ? t('staffClock.pinTitleIn') : t('staffClock.pinTitleOut')).replace(
@@ -69,60 +61,26 @@ export function KassaStaffClockModal({
       pinModal.staffName,
     )
 
-  const panelShellClass = salesPick
-    ? `rounded-2xl border border-black text-white shadow-2xl ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`
-    : 'bg-white rounded-2xl shadow-2xl'
-  const headerTitleClass = salesPick ? 'font-bold text-xl text-white' : 'font-bold text-xl text-gray-900'
-  const headerCloseClass = salesPick
-    ? 'p-2 hover:bg-white/10 rounded-xl text-white/80'
-    : 'p-2 hover:bg-gray-100 rounded-xl text-gray-500'
-
   return (
     <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-3 sm:p-4">
       <div
-        className={`w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden z-[61] ${panelShellClass}`}
-        data-testid={salesPick ? 'kassa-staff-sales-pick' : 'kassa-staff-clock'}
+        className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] shadow-2xl flex flex-col overflow-hidden z-[61]"
+        data-testid="kassa-staff-clock"
       >
-        <div
-          className={`flex items-center justify-between gap-3 px-5 py-4 ${
-            salesPick ? 'border-b border-black/40' : 'border-b border-gray-100'
-          }`}
-        >
-          <h2 className={headerTitleClass}>
-            {salesPick ? t('staffClock.salesPickTitle') : t('staffClock.modalTitle')}
-          </h2>
+        <div className="flex items-center justify-between gap-3 border-b border-gray-100 px-5 py-4">
+          <h2 className="font-bold text-xl text-gray-900">{t('staffClock.modalTitle')}</h2>
           <button
             type="button"
             onClick={onClose}
-            className={headerCloseClass}
+            className="p-2 hover:bg-gray-100 rounded-xl text-gray-500"
             aria-label={t('staffClock.close')}
           >
             ✕
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto p-5 space-y-3">
+        <div className="flex-1 overflow-y-auto p-5 space-y-4">
           {listLoading && staffList.length === 0 ? (
-            <div className={`py-12 text-center ${salesPick ? 'text-white/80' : 'text-gray-500'}`}>
-              {t('staffClock.loadingList')}
-            </div>
-          ) : salesPick ? (
-            clockedInStaff.length === 0 ? (
-              <div className="py-10 text-center text-sm font-medium text-white/85">
-                {t('staffClock.salesPickNoClockedIn')}
-              </div>
-            ) : (
-              clockedInStaff.map((s) => (
-                <button
-                  key={s.id}
-                  type="button"
-                  disabled={busy}
-                  onClick={() => onSales(s)}
-                  className={`w-full min-h-[52px] px-4 py-3 text-left text-base font-bold break-words ${kassaPosButtonClass(false)}`}
-                >
-                  {s.name}
-                </button>
-              ))
-            )
+            <div className="py-12 text-center text-gray-500">{t('staffClock.loadingList')}</div>
           ) : staffList.length === 0 ? (
             <div className="py-10 text-center text-gray-500">{t('staffClock.noStaff')}</div>
           ) : (
@@ -173,15 +131,11 @@ export function KassaStaffClockModal({
             ))
           )}
         </div>
-        <div className={`p-4 ${salesPick ? 'border-t border-black/40' : 'border-t border-gray-100'}`}>
+        <div className="border-t border-gray-100 p-4">
           <button
             type="button"
             onClick={onClose}
-            className={
-              salesPick
-                ? `w-full min-h-[44px] font-bold ${kassaPosButtonClass(false)}`
-                : 'w-full min-h-[44px] py-3 rounded-xl bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 transition-colors'
-            }
+            className="w-full min-h-[44px] py-3 rounded-xl bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 transition-colors"
           >
             {t('staffClock.close')}
           </button>
@@ -189,7 +143,7 @@ export function KassaStaffClockModal({
       </div>
 
       <StaffClockPinPortal
-        open={!salesPick && Boolean(pinModal)}
+        open={Boolean(pinModal)}
         titleId="kassa-staff-pin-title"
         title={pinTitle || ''}
         placeholder={t('staffClock.pinPlaceholder')}

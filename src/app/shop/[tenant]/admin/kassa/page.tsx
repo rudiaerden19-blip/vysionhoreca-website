@@ -150,12 +150,8 @@ import { KassaPaymentModal } from '@/components/kassa/KassaPaymentModal'
 import { KassaSplitPaymentModal } from '@/components/kassa/KassaSplitPaymentModal'
 import { KassaSuccessReceiptModal } from '@/components/kassa/KassaSuccessReceiptModal'
 import { KassaProductOptionsModal } from '@/components/kassa/KassaProductOptionsModal'
-import {
-  KassaProductStaffGatePopup,
-  KassaStaffClockModal,
-  type KassaStaffClockModalMode,
-  KassaStaffSalesSummaryModal,
-} from '@/components/kassa/KassaStaffClockUi'
+import { KassaStaffClockModal, KassaStaffSalesSummaryModal } from '@/components/kassa/KassaStaffClockUi'
+import { KassaStaffSalesPickModal } from '@/components/kassa/KassaStaffSalesPickModal'
 import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
 import { parseFloorPlanTablesJson, sanitizeFloorPlanTables, type FloorPlanTable } from '@/lib/kassa-floor-plan-tables'
 import {
@@ -2143,14 +2139,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [lastOrder, setLastOrder] = useState<KassaLastOrderReceipt | null>(null)
 
   const [staffClockOpen, setStaffClockOpen] = useState(false)
-  const [staffClockModalMode, setStaffClockModalMode] = useState<KassaStaffClockModalMode>('clock')
+  const [staffSalesPickOpen, setStaffSalesPickOpen] = useState(false)
   const [staffClockList, setStaffClockList] = useState<
     { id: string; name: string; hasOpenSession: boolean }[]
   >([])
   const [staffClockListLoading, setStaffClockListLoading] = useState(false)
   /** Minstens één GET staff-lijst afgerond terwijl klok aan staat (voorkomt korte “niemand ingeklokt”-race). */
   const [staffClockListHydrated, setStaffClockListHydrated] = useState(false)
-  const [productStaffGatePopupOpen, setProductStaffGatePopupOpen] = useState(false)
   const [staffClockBusy, setStaffClockBusy] = useState(false)
   const [staffClockPinModal, setStaffClockPinModal] = useState<{
     staffId: string
@@ -3940,10 +3935,22 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     void loadStaffClockList({ background: true })
   }, [tenant, demoViewOnly, tenantInfo?.kassa_staff_clock_enabled, loadStaffClockList])
 
-  const openStaffClockModal = (mode: KassaStaffClockModalMode = 'clock') => {
+  const openStaffSalesPickModal = useCallback(() => {
     playClick()
     staffClockPinReqGen.current += 1
-    setStaffClockModalMode(mode)
+    setStaffClockBusy(false)
+    setStaffClockOpen(false)
+    setStaffClockPinModal(null)
+    setStaffClockPinInput('')
+    setStaffClockPinError(null)
+    setStaffSalesPickOpen(true)
+    void loadStaffClockList({ background: staffClockList.length > 0 })
+  }, [loadStaffClockList, staffClockList.length])
+
+  const openStaffClockModal = () => {
+    playClick()
+    staffClockPinReqGen.current += 1
+    setStaffSalesPickOpen(false)
     setStaffClockBusy(false)
     setStaffClockOpen(true)
     setStaffClockPinModal(null)
@@ -4024,6 +4031,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       setStaffClockBusy(false)
       setActiveKassaStaff({ id: s.id, name: s.name })
       setKassaZoneTab(null)
+      setStaffSalesPickOpen(false)
       setStaffClockOpen(false)
       setStaffClockPinModal(null)
       setStaffClockPinInput('')
@@ -4151,10 +4159,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const blockSaleWithoutStaffIfNeeded = useCallback((): boolean => {
     if (!requiresStaffSelectionForSale) return false
-    playClick()
-    setProductStaffGatePopupOpen(true)
+    openStaffSalesPickModal()
     return true
-  }, [requiresStaffSelectionForSale])
+  }, [requiresStaffSelectionForSale, openStaffSalesPickModal])
 
   blockSaleWithoutStaffIfNeededRef.current = blockSaleWithoutStaffIfNeeded
 
@@ -4926,14 +4933,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <button
                 type="button"
                 aria-pressed={kassaZoneTab === 'sales'}
-                title={showKassaStaffClockButton ? t('staffClock.buttonTitle') : undefined}
+                title={showKassaStaffClockButton ? t('staffClock.salesPickTitle') : undefined}
                 onClick={() => {
-                  playClick()
                   setShowTablePicker(false)
-                  if (showKassaStaffClockButton && !activeKassaStaff) {
+                  if (showKassaStaffClockButton) {
                     setKassaZoneTab('sales')
-                    openStaffClockModal('salesPick')
+                    openStaffSalesPickModal()
                   } else {
+                    playClick()
                     setKassaZoneTab(null)
                   }
                 }}
@@ -5730,9 +5737,21 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
       )}
 
+      <KassaStaffSalesPickModal
+        open={staffSalesPickOpen}
+        listLoading={staffClockListLoading}
+        staffList={staffClockList}
+        busy={staffClockBusy}
+        onClose={() => {
+          playClick()
+          setStaffSalesPickOpen(false)
+          setKassaZoneTab(null)
+        }}
+        onPickStaff={(s) => startStaffSales(s)}
+      />
+
       <KassaStaffClockModal
         open={staffClockOpen}
-        mode={staffClockModalMode}
         listLoading={staffClockListLoading}
         staffList={staffClockList}
         busy={staffClockBusy}
@@ -5744,9 +5763,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           staffClockPinReqGen.current += 1
           setStaffClockBusy(false)
           setStaffClockOpen(false)
-          if (staffClockModalMode === 'salesPick') {
-            setKassaZoneTab(null)
-          }
           setStaffClockPinModal(null)
           setStaffClockPinInput('')
           setStaffClockPinError(null)
@@ -5786,14 +5802,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           }}
         />
       ) : null}
-
-      <KassaProductStaffGatePopup
-        open={productStaffGatePopupOpen}
-        onDismiss={() => {
-          playClick()
-          setProductStaffGatePopupOpen(false)
-        }}
-      />
 
       {optionsModal ? (
         <KassaProductOptionsModal
