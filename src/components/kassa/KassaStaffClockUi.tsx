@@ -2,6 +2,7 @@
 
 import { useLanguage } from '@/i18n'
 import { StaffClockPinPortal } from '@/components/staff-clock/StaffClockPinPortal'
+import { gksPosButtonClass } from '@/lib/gks-kassa/gks-pos-surface'
 
 export type KassaStaffClockRow = { id: string; name: string; hasOpenSession: boolean }
 
@@ -297,8 +298,18 @@ export function KassaStaffSalesPickModal({
   )
 }
 
-export function KassaProductStaffGatePopup({ open, onDismiss }: { open: boolean; onDismiss: () => void }) {
+export function KassaProductStaffGatePopup({
+  open,
+  onDismiss,
+  appearance = 'light',
+}: {
+  open: boolean
+  onDismiss: () => void
+  /** GKS-pilot: grijze POS-knop (korrel-shell); productie-kassa blijft `light`. */
+  appearance?: 'light' | 'gks'
+}) {
   const { t } = useLanguage()
+  const isGks = appearance === 'gks'
   if (!open) return null
 
   return (
@@ -320,7 +331,11 @@ export function KassaProductStaffGatePopup({ open, onDismiss }: { open: boolean;
         <button
           type="button"
           onClick={onDismiss}
-          className="mt-5 w-full min-h-[48px] rounded-xl bg-[#3C4D6B] font-bold text-white transition-colors hover:bg-[#2D3A52]"
+          className={
+            isGks
+              ? `mt-5 w-full min-h-[48px] touch-manipulation text-sm font-semibold !text-[#f0f0f0] ${gksPosButtonClass(false)}`
+              : 'mt-5 w-full min-h-[48px] rounded-xl bg-[#3C4D6B] font-bold text-white transition-colors hover:bg-[#2D3A52]'
+          }
         >
           {t('staffClock.close')}
         </button>

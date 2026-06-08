@@ -4172,7 +4172,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250608-floor-plan-titles"
+      data-gks-ui="20250608-staff-gate-btn"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -5251,6 +5251,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       ) : null}
 
       <KassaProductStaffGatePopup
+        appearance="gks"
         open={productStaffGatePopupOpen}
         onDismiss={() => {
           playClick()
