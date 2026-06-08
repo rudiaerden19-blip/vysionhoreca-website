@@ -348,22 +348,6 @@ function kassaFooterActionTouchMinHClass(sxga: boolean, denseBill: boolean): str
   return 'min-h-[4.25rem] py-2.5'
 }
 
-/** Icoon voor numpad-toggle (geen tekstlabel op de knop). */
-function KassaNumpadToggleIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <rect x="3" y="3" width="5.5" height="5.5" rx="1.25" />
-      <rect x="10.5" y="3" width="5.5" height="5.5" rx="1.25" />
-      <rect x="18" y="3" width="3" height="5.5" rx="1" />
-      <rect x="3" y="10.5" width="5.5" height="5.5" rx="1.25" />
-      <rect x="10.5" y="10.5" width="5.5" height="5.5" rx="1.25" />
-      <rect x="18" y="10.5" width="3" height="5.5" rx="1" />
-      <rect x="3" y="18" width="12" height="3" rx="1" />
-      <rect x="16.5" y="18" width="4.5" height="3" rx="1" />
-    </svg>
-  )
-}
-
 function stoolsFromFloorDecorPayload(data: unknown): { stoolNumber: string; segmentId: string }[] {
   const rawItems = Array.isArray(data)
     ? data
@@ -5082,7 +5066,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 </button>
               </div>
             )}
-            <div className="flex gap-2 touch-manipulation select-none">
+            <div className="flex gap-2.5 touch-manipulation select-none">
               <button
                 type="button"
                 aria-pressed={numpadPanelVisible}
@@ -5093,11 +5077,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   playClick()
                   setNumpadPanelVisible((v) => !v)
                 }}
-                className={`flex shrink-0 items-center justify-center p-1.5 ${kassaPosButtonClass(numpadPanelVisible)} ${
-                  kassaSxgaDenseTiles ? 'h-[3.25rem] w-[3.25rem]' : 'h-[3rem] w-[3rem]'
+                className={`flex shrink-0 items-center justify-center px-3 ${kassaPosButtonClass(numpadPanelVisible)} ${
+                  kassaSxgaDenseTiles ? 'min-h-[4rem] py-3.5' : 'min-h-[3.5rem] py-3'
                 }`}
               >
-                <KassaNumpadToggleIcon className={kassaSxgaDenseTiles ? 'h-8 w-8' : 'h-7 w-7'} />
+                <span className={`text-center ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`}>
+                  {t('kassaApp.numpadToggle')}
+                </span>
               </button>
               <button
                 type="button"
@@ -5108,11 +5094,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   setShowPaymentModal(true)
                 }}
                 disabled={billLines.length === 0}
-                className={`flex min-w-0 flex-1 items-center justify-center gap-2 ${KASSA_POS_CHECKOUT_BTN} ${
+                className={`flex min-w-0 flex-1 items-center justify-center ${KASSA_POS_CHECKOUT_BTN} ${
                   kassaSxgaDenseTiles ? 'min-h-[4rem] py-3.5 text-xl' : 'min-h-[3.5rem] py-3 text-lg'
                 }`}
               >
-                💳 {t('kassaApp.checkout')}
+                {t('kassaApp.checkout')}
               </button>
             </div>
           </div>
@@ -5157,32 +5143,35 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 <span className="text-center text-xs font-bold">{t('kassaApp.remove')}</span>
               </button>
             </div>
-            <div className="flex gap-2 touch-manipulation select-none">
+            <div className="flex gap-2.5 touch-manipulation select-none">
               <button
                 type="button"
                 aria-pressed={numpadPanelVisible}
                 data-testid="kassa-numpad-toggle"
+                title={t('kassaApp.numpadToggle')}
+                aria-label={t('kassaApp.numpadToggle')}
                 onClick={() => {
                   playClick()
                   setNumpadPanelVisible((v) => !v)
                 }}
-                className={`flex shrink-0 items-center justify-center rounded-xl bg-black text-white p-1.5 ${
-                  kassaSxgaDenseTiles ? 'h-[3.25rem] w-[3.25rem]' : 'h-[3rem] w-[3rem]'
+                className={`flex shrink-0 items-center justify-center rounded-xl bg-black px-3 font-bold text-white hover:bg-zinc-800 min-h-[3.5rem] py-3 text-sm sm:text-base ${
+                  numpadPanelVisible ? 'ring-2 ring-white/40' : ''
                 }`}
               >
-                <KassaNumpadToggleIcon className={kassaSxgaDenseTiles ? 'h-8 w-8' : 'h-7 w-7'} />
+                {t('kassaApp.numpadToggle')}
               </button>
               <button
                 type="button"
+                data-testid="kassa-checkout"
                 onClick={() => {
                   if (billLines.length === 0) return
                   scheduleKassaTapSound(playCheckout)
                   setShowPaymentModal(true)
                 }}
                 disabled={billLines.length === 0}
-                className={`flex min-w-0 flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-500 font-bold text-white hover:bg-emerald-600 disabled:bg-emerald-900/45 min-h-[3.5rem] py-3 text-lg`}
+                className="flex min-w-0 flex-1 items-center justify-center rounded-xl bg-emerald-500 font-bold text-white hover:bg-emerald-600 disabled:bg-emerald-900/45 min-h-[3.5rem] py-3 text-lg"
               >
-                💳 {t('kassaApp.checkout')}
+                {t('kassaApp.checkout')}
               </button>
             </div>
           </div>
