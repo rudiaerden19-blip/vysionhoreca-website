@@ -1193,7 +1193,9 @@ export default function KassaFloorPlan({
       >
         <div className="min-w-0">
           <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-            {t('kassaApp.floorPlanSameFloorTitle')}
+            {planZone === FLOOR_PLAN_ZONE_TERRACE
+              ? t('kassaApp.floorPlanTerraceTitle')
+              : t('kassaApp.floorPlanSameFloorTitle')}
           </h2>
           <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-white/75">
             <span className="font-semibold text-white/90">
