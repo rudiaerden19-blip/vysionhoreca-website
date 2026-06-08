@@ -1236,14 +1236,7 @@ export default function KassaFloorPlan({
               >
                 {t('kassaApp.pickTableTitle')}
               </span>
-              <span
-                className={`inline-flex max-w-[min(42vw,11rem)] shrink-0 items-center whitespace-nowrap px-2 py-1.5 text-[10px] font-semibold leading-tight !text-[#f0f0f0] sm:max-w-none sm:px-2.5 sm:py-2 sm:text-xs ${gksPosBtn}`}
-              >
-                {planZone === FLOOR_PLAN_ZONE_TERRACE
-                  ? t('kassaApp.gksFloorPlanZoneBtnTerrace')
-                  : t('kassaApp.gksFloorPlanZoneBtnInside')}
-              </span>
-              <span className="hidden truncate text-sm font-medium text-[#b8b8b8] lg:inline">
+              <span className="hidden truncate text-sm font-medium text-[#b8b8b8] sm:inline">
                 {t('kassaApp.floorPlanFreeCount')
                   .replace('{free}', String(tables.filter((tbl) => tbl.status === 'FREE').length))
                   .replace('{total}', String(tables.length))}
