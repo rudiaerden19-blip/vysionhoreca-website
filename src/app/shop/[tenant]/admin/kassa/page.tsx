@@ -4927,7 +4927,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   playClick()
                   setKassaZoneTab('sales')
                   setShowTablePicker(false)
-                  if (showKassaStaffClockButton && requiresStaffSelectionForSale) {
+                  if (showKassaStaffClockButton && !activeKassaStaff) {
                     openStaffClockModal()
                   }
                 }}
