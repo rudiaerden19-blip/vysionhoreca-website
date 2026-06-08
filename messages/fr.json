@@ -2797,6 +2797,7 @@
     "orderTypeWithTable": " • Table {number}",
     "addAmount": "+ Ajouter €{amount}",
     "cartTotal": "Total",
+    "quickMenu": "Menu rapide",
     "parkedOnTableSection": "Déjà à la table",
     "cartNewLinesSection": "Nouvelle commande",
     "drawerOpen": "Ouvrir le tiroir",

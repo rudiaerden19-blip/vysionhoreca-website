@@ -3771,6 +3771,7 @@
     "orderTypeWithTable": " • Tafel {number}",
     "addAmount": "+ €{amount} toevoegen",
     "cartTotal": "Totaal",
+    "quickMenu": "Snel menu",
     "parkedOnTableSection": "Al op tafel",
     "cartNewLinesSection": "Nieuwe bestelling",
     "drawerOpen": "Lade open",

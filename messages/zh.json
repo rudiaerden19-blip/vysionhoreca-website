@@ -3297,6 +3297,7 @@
     "orderTypeWithTable": " • 桌 {number}",
     "addAmount": "+ 添加 €{amount}",
     "cartTotal": "Total",
+    "quickMenu": "快捷菜单",
     "parkedOnTableSection": "已在餐桌",
     "cartNewLinesSection": "新点单",
     "drawerOpen": "打开钱箱",

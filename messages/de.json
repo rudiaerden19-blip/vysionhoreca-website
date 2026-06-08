@@ -2797,6 +2797,7 @@
     "orderTypeWithTable": " • Tisch {number}",
     "addAmount": "+ €{amount} hinzufügen",
     "cartTotal": "Summe",
+    "quickMenu": "Schnellmenü",
     "parkedOnTableSection": "Bereits am Tisch",
     "cartNewLinesSection": "Neue Bestellung",
     "drawerOpen": "Schublade öffnen",

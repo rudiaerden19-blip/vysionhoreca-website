@@ -3297,6 +3297,7 @@
     "orderTypeWithTable": " • Tavolo {number}",
     "addAmount": "+ Aggiungi €{amount}",
     "cartTotal": "Total",
+    "quickMenu": "Menu rapido",
     "parkedOnTableSection": "Già al tavolo",
     "cartNewLinesSection": "Nuovo ordine",
     "drawerOpen": "Apri cassetto",

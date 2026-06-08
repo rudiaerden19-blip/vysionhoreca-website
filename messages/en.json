@@ -3771,6 +3771,7 @@
     "orderTypeWithTable": " • Table {number}",
     "addAmount": "+ Add €{amount}",
     "cartTotal": "Total",
+    "quickMenu": "Quick menu",
     "parkedOnTableSection": "Already on table",
     "cartNewLinesSection": "New order",
     "drawerOpen": "Open drawer",

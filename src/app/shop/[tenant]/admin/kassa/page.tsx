@@ -2333,6 +2333,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     startTransition(() => setSelectedCategory(null))
   }, [])
 
+  const openKassaQuickMenu = useCallback(() => {
+    playClick()
+    handleCategoryClear()
+    kassaMenuScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [handleCategoryClear])
+
   /** Open opties-modal om toppings/sauzen van een mandregel te wijzigen (alle tenants). */
   const openEditCartItem = async (item: CartItem) => {
     if (demoViewOnly) return
