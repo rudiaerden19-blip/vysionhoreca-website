@@ -699,7 +699,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setDemoFromMarketingSession(publicDemoSessionMatchesTenant(tenant))
   }, [tenant, searchParams])
   const demoViewOnly = demoFromUrl || demoFromMarketingSession
-  const { dark: kassaAppearanceDark, toggle: toggleKassaAppearance } = useKassaUiDarkSync(tenant)
+  const { dark: kassaAppearanceDark } = useKassaUiDarkSync(tenant)
   const ui = useMemo(
     () =>
       kassaAppearanceDark
@@ -4229,27 +4229,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           )}
           </nav>
         </div>
-
-          <button
-            type="button"
-            onClick={() => toggleKassaAppearance()}
-            className={
-              kassaAppearanceDark
-                ? `relative z-[40] ${headerUtilityBtnClass(false)}`
-                : 'relative z-[40] inline-flex touch-manipulation shrink-0 items-center gap-1 whitespace-nowrap rounded-lg bg-white/10 px-1.5 py-1 font-bold text-white transition-colors hover:bg-white/20 sm:px-2 sm:py-1.5'
-            }
-            title={
-              kassaAppearanceDark ? t('adminLayout.kassaAppearanceLightAria') : t('adminLayout.kassaAppearanceDarkAria')
-            }
-            aria-pressed={kassaAppearanceDark}
-            aria-label={
-              kassaAppearanceDark ? t('adminLayout.kassaAppearanceLightAria') : t('adminLayout.kassaAppearanceDarkAria')
-            }
-          >
-            <span className={kassaAppearanceDark ? KASSA_HEADER_QUICK_LINK_LABEL : 'text-[11px] leading-snug sm:text-xs'}>
-              {kassaAppearanceDark ? t('adminLayout.kassaAppearanceLight') : t('adminLayout.kassaAppearanceDark')}
-            </span>
-          </button>
 
           <div ref={langRef} className="relative z-[40] shrink-0">
             <button
