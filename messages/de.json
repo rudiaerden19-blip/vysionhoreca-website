@@ -2889,6 +2889,7 @@
     "walkInCustomerName": "Kasse",
     "newOrderSplashTitle": "NEUE BESTELLUNG!",
     "newOrderSplashTap": "👆 Tippen zum Ansehen",
+    "optionBadgeShort": "Opt",
     "optionChoosePrompt": "Bitte eine Option wählen bei: {name}",
     "floorPlanFreeCount": "{free}/{total} frei",
     "floorPlanAddTable": "🪑 Tisch",

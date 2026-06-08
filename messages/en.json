@@ -3865,6 +3865,7 @@
     "walkInCustomerName": "Counter",
     "newOrderSplashTitle": "NEW ORDER!",
     "newOrderSplashTap": "👆 Tap to view",
+    "optionBadgeShort": "Opt",
     "optionChoosePrompt": "Choose an option for: {name}",
     "floorPlanFreeCount": "{free}/{total} free",
     "floorPlanAddTable": "🪑 Table",

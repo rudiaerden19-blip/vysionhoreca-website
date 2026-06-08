@@ -179,6 +179,66 @@ export const KASSA_SIDEBAR_FOOTER_LEFT_COL =
 export const KASSA_POS_ZONE_BTN_LABEL =
   'text-sm font-medium tracking-[0.03em] sm:text-[15px]'
 
+const KASSA_MENU_TILE_FACE =
+  'bg-[linear-gradient(180deg,#3a3a3e_0%,#2c2c30_48%,#232327_100%)]'
+
+/** Categorie-/producttegel — luxe donkere kaart op korrelvlak. */
+export const KASSA_POS_MENU_TILE_BUTTON_BASE = [
+  'touch-manipulation select-none group relative flex min-h-0 w-full min-w-0 flex-col overflow-hidden text-left',
+  KASSA_POS_BTN_SHAPE,
+  KASSA_MENU_TILE_FACE,
+  'border border-[#3d3d3d] border-t-[#5c5c62]/40',
+  KASSA_POS_SUBTLE_LIFT_SHADOW,
+  'transition-[transform,box-shadow,filter] duration-150 ease-out',
+  'hover:brightness-[1.04]',
+  'hover:shadow-[0_6px_14px_rgba(0,0,0,0.58),0_0_14px_rgba(110,181,255,0.14)]',
+  'active:translate-y-[1px] active:brightness-[0.93]',
+].join(' ')
+
+export const KASSA_POS_MENU_TILE_IMAGE_WELL =
+  'pointer-events-none relative min-h-0 w-full min-w-0 flex-1 overflow-hidden bg-[#121216] p-1.5 shadow-[inset_0_3px_12px_rgba(0,0,0,0.62)] sm:p-2'
+
+export const KASSA_POS_MENU_TILE_IMAGE_WELL_SXGA =
+  'pointer-events-none relative w-full shrink-0 flex-none aspect-square overflow-hidden bg-[#121216] p-1.5 shadow-[inset_0_3px_12px_rgba(0,0,0,0.62)] sm:p-2'
+
+export const KASSA_POS_MENU_TILE_IMG_FRAME =
+  'pointer-events-none relative h-full w-full min-h-0 overflow-hidden rounded-lg bg-[#1a1a1e] ring-1 ring-white/[0.06]'
+
+export const KASSA_POS_MENU_TILE_PLACEHOLDER_WELL =
+  'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-[#1a1a1e] px-2 shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]'
+
+export const KASSA_POS_MENU_TILE_PLACEHOLDER_WELL_SXGA =
+  'pointer-events-none flex w-full shrink-0 flex-none flex-col items-center justify-center overflow-hidden bg-[#1a1a1e] px-2 aspect-square shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]'
+
+export const KASSA_POS_MENU_TILE_LABEL_WRAP =
+  'pointer-events-none shrink-0 w-full border-t border-[#45454a]/80 bg-[linear-gradient(180deg,#343438_0%,#2a2a2e_100%)] px-2 pb-2 pt-1.5 sm:px-3'
+
+export const KASSA_POS_MENU_TILE_LABEL_WRAP_SXGA =
+  'pointer-events-none shrink-0 w-full border-t border-[#45454a]/80 bg-[linear-gradient(180deg,#343438_0%,#2a2a2e_100%)] px-2 pb-1.5 pt-0 mt-0 sm:px-3 sm:pb-2 sm:pt-0'
+
+export const KASSA_POS_MENU_TILE_LABEL_CLASS =
+  'm-0 line-clamp-2 text-center text-base font-bold leading-snug tracking-[0.03em] text-[#f2f2f2] sm:text-lg md:text-xl'
+
+export const KASSA_POS_MENU_TILE_LABEL_CLASS_SXGA =
+  'm-0 line-clamp-2 text-center text-[15px] font-bold leading-snug tracking-[0.03em] text-[#f2f2f2] sm:text-base'
+
+export const KASSA_POS_MENU_TILE_QTY_BADGE = [
+  'absolute top-1.5 right-1.5 z-20 flex h-7 w-7 items-center justify-center text-xs font-bold',
+  KASSA_POS_BTN_SHAPE,
+  KASSA_BTN_FACE,
+  'border border-[#3d3d3d]',
+  KASSA_POS_SUBTLE_LIFT_SHADOW,
+  KASSA_POS_SELECTED_ACCENT_TEXT,
+].join(' ')
+
+export const KASSA_POS_MENU_TILE_OPTS_BADGE = [
+  'absolute top-1.5 left-1.5 z-20 px-1.5 py-0.5 text-[10px] font-bold text-[#e8e8e8]',
+  KASSA_POS_BTN_SHAPE,
+  KASSA_BTN_FACE,
+  'border border-[#3d3d3d]',
+  KASSA_POS_SUBTLE_LIFT_SHADOW,
+].join(' ')
+
 /** Klok+databalk in zijbalk — bewust iets groter dan overige knoppen. */
 export const KASSA_SIDEBAR_CLOCK_DATE_LABEL =
   'text-xs font-semibold leading-tight tracking-tight sm:text-sm'

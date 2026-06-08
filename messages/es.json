@@ -3389,6 +3389,7 @@
     "walkInCustomerName": "Caja",
     "newOrderSplashTitle": "¡NUEVO PEDIDO!",
     "newOrderSplashTap": "👆 Toca para ver",
+    "optionBadgeShort": "Opt",
     "optionChoosePrompt": "Elige una opción para: {name}",
     "floorPlanFreeCount": "{free}/{total} libre(s)",
     "floorPlanAddTable": "🪑 Mesa",

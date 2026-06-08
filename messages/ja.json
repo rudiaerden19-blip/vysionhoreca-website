@@ -3389,6 +3389,7 @@
     "walkInCustomerName": "レジ",
     "newOrderSplashTitle": "新しい注文！",
     "newOrderSplashTap": "👆 タップして表示",
+    "optionBadgeShort": "Opt",
     "optionChoosePrompt": "次のオプションを選択: {name}",
     "floorPlanFreeCount": "{free}/{total} 空",
     "floorPlanAddTable": "🪑 テーブル",

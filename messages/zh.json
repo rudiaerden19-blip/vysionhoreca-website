@@ -3389,6 +3389,7 @@
     "walkInCustomerName": "收银台",
     "newOrderSplashTitle": "新订单！",
     "newOrderSplashTap": "👆 点击查看",
+    "optionBadgeShort": "Opt",
     "optionChoosePrompt": "请选择：{name}",
     "floorPlanFreeCount": "{free}/{total} 空闲",
     "floorPlanAddTable": "🪑 桌台",

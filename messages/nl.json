@@ -3865,6 +3865,7 @@
     "walkInCustomerName": "Kassa",
     "newOrderSplashTitle": "NIEUWE BESTELLING!",
     "newOrderSplashTap": "👆 Klik om te bekijken",
+    "optionBadgeShort": "Opt",
     "optionChoosePrompt": "Kies een optie bij: {name}",
     "floorPlanFreeCount": "{free}/{total} vrij",
     "floorPlanAddTable": "🪑 Tafel",

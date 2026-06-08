@@ -3389,6 +3389,7 @@
     "walkInCustomerName": "Cassa",
     "newOrderSplashTitle": "NUOVO ORDINE!",
     "newOrderSplashTap": "👆 Tocca per vedere",
+    "optionBadgeShort": "Opt",
     "optionChoosePrompt": "Scegli un’opzione per: {name}",
     "floorPlanFreeCount": "{free}/{total} libero/i",
     "floorPlanAddTable": "🪑 Tavolo",
