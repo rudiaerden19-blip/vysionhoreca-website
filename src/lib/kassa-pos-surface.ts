@@ -3,8 +3,10 @@
  * Geen import uit `gks-kassa/` — GKS-pilot blijft op preview-branch.
  */
 
-/** CSS-class in globals (historische naam `.gks-menu-plate-grain`). */
+/** Korrelgrijs — header, zijbalk, kader (zie `globals.css`). */
 export const KASSA_POS_MENU_PLATE_SHELL_BG_CLASS = 'gks-menu-plate-grain'
+
+/** Effen grijs tegelvlak — ingesprongen t.o.v. korrelkader. */
 
 export const KASSA_POS_MENU_TRANSPARENT_CLASS = 'bg-transparent'
 
