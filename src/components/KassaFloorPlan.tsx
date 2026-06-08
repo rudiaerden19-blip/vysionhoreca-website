@@ -19,6 +19,7 @@ import {
 } from '@/lib/kassa-floor-plan-zone'
 import { useLanguage } from '@/i18n'
 import {
+  KASSA_FLOOR_TERRACE_GRAIN_CLASS,
   KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
   kassaPosButtonClass,
 } from '@/lib/kassa-pos-surface'
@@ -1400,7 +1401,9 @@ export default function KassaFloorPlan({
       <div className="flex flex-1 overflow-hidden">
         {/* Floor plan — tegelpatroon vast; alleen tafels/decor verschuiven */}
         <div
-          className={`floor-plan relative flex-1 select-none overflow-hidden ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`}
+          className={`floor-plan relative flex-1 select-none overflow-hidden ${
+            planZone === FLOOR_PLAN_ZONE_TERRACE ? KASSA_FLOOR_TERRACE_GRAIN_CLASS : KASSA_POS_MENU_PLATE_SHELL_BG_CLASS
+          }`}
           style={floorSurfaceStyle}
         >
           <div

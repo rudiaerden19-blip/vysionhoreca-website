@@ -447,6 +447,16 @@ input[type="number"] {
   background-blend-mode: overlay;
 }
 
+/** Terras-plattegrond: gedempt groen met dezelfde korrel (niet fel). */
+.gks-floor-terrace-grain {
+  background-color: #3a4d3c;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeColorMatrix type='matrix' values='1.32 0 0 0 -0.12 0 1.32 0 0 -0.12 0 0 1.32 0 -0.12 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='96' height='96' filter='url(%23n)' opacity='0.72'/%3E%3C/svg%3E");
+  background-size: 96px 96px;
+  background-repeat: repeat;
+  background-attachment: fixed;
+  background-blend-mode: overlay;
+}
+
 .gks-menu-vignette {
   position: relative;
   isolation: isolate;
