@@ -5735,7 +5735,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           />
           <div
             className={`relative z-10 flex w-full max-w-3xl max-h-[min(88vh,780px)] min-h-0 flex-col overflow-hidden rounded-2xl border shadow-2xl ${ui.tablePickerBorder} ${
-              kassaAppearanceDark ? 'bg-[#151a21]' : 'bg-white'
+              kassaAppearanceDark ? KASSA_POS_MENU_PLATE_SHELL_BG_CLASS : 'bg-white'
             }`}
           >
             <div className={`flex shrink-0 items-center gap-3 border-b px-4 py-3 ${ui.tablePickerHeader}`}>
@@ -5870,9 +5870,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     setShowTablePicker(false)
                     setShowFloorPlan(true)
                   }}
-                  className={`rounded-xl bg-[#3C4D6B] py-3 text-sm font-semibold text-white transition-colors hover:bg-[#2D3A52] ${tableNumber ? 'flex-1' : 'w-full'}`}
+                  className={`flex items-center justify-center py-3 text-sm font-semibold ${tableNumber ? 'flex-1' : 'w-full'} ${
+                    kassaAppearanceDark
+                      ? kassaPosButtonClass(false)
+                      : 'rounded-xl bg-[#3C4D6B] text-white transition-colors hover:bg-[#2D3A52]'
+                  }`}
                 >
-                  🗺️ {t('kassaApp.floorPlan')}
+                  {t('kassaApp.floorPlan')}
                 </button>
               )}
             </div>
