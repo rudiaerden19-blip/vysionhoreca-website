@@ -91,6 +91,7 @@ import {
   KASSA_POS_MENU_TILE_BUTTON_BASE,
   KASSA_POS_MENU_TILE_IMAGE_WELL,
   KASSA_POS_MENU_TILE_IMAGE_WELL_SXGA,
+  KASSA_POS_MENU_TILE_IMG_CLASS,
   KASSA_POS_MENU_TILE_IMG_FRAME,
   KASSA_POS_MENU_TILE_LABEL_CLASS,
   KASSA_POS_MENU_TILE_LABEL_CLASS_SXGA,
@@ -613,7 +614,11 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
       ? KASSA_MENU_TILE_PLACEHOLDER_WELL_SXGA
       : 'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-white px-2'
 
-  const imgClass = sxgaDenseTileLayout ? KASSA_MENU_TILE_IMG_CLASS_SXGA_COVER : KASSA_MENU_TILE_IMG_CLASS
+  const imgClass = posLuxuryAppearance
+    ? KASSA_POS_MENU_TILE_IMG_CLASS
+    : sxgaDenseTileLayout
+      ? KASSA_MENU_TILE_IMG_CLASS_SXGA_COVER
+      : KASSA_MENU_TILE_IMG_CLASS
 
   return (
     <button
@@ -708,7 +713,11 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
       ? KASSA_MENU_TILE_PLACEHOLDER_WELL_SXGA
       : 'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-white px-2 pt-4'
 
-  const imgClass = sxgaDenseTileLayout ? KASSA_MENU_TILE_IMG_CLASS_SXGA_COVER : KASSA_MENU_TILE_IMG_CLASS
+  const imgClass = posLuxuryAppearance
+    ? KASSA_POS_MENU_TILE_IMG_CLASS
+    : sxgaDenseTileLayout
+      ? KASSA_MENU_TILE_IMG_CLASS_SXGA_COVER
+      : KASSA_MENU_TILE_IMG_CLASS
 
   return (
     <button
