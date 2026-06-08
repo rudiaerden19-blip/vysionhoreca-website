@@ -195,18 +195,29 @@ export const KASSA_POS_MENU_TILE_BUTTON_BASE = [
   'active:translate-y-[1px] active:brightness-[0.93]',
 ].join(' ')
 
-/** Fotovlak rand-tot-rand; wit zodat `object-contain` geen grijze letterbox toont. */
-export const KASSA_POS_MENU_TILE_IMAGE_WELL =
-  'pointer-events-none relative min-h-0 w-full min-w-0 flex-1 overflow-hidden bg-white'
+/**
+ * Fotovlak rand-tot-rand — zacht lichtgrijs (geen puur wit) zodat tegels minder afsteken op donkere kassa,
+ * maar producten nog helder en “horeca-licht” ogen. Wit in de PNG/JPG zelf blijft zoals geüpload.
+ */
+export const KASSA_POS_MENU_TILE_PHOTO_BG = 'bg-[#e2e2e8]'
 
-export const KASSA_POS_MENU_TILE_IMAGE_WELL_SXGA =
-  'pointer-events-none relative w-full shrink-0 flex-none aspect-square overflow-hidden bg-white'
+export const KASSA_POS_MENU_TILE_IMAGE_WELL = [
+  'pointer-events-none relative min-h-0 w-full min-w-0 flex-1 overflow-hidden',
+  KASSA_POS_MENU_TILE_PHOTO_BG,
+].join(' ')
+
+export const KASSA_POS_MENU_TILE_IMAGE_WELL_SXGA = [
+  'pointer-events-none relative w-full shrink-0 flex-none aspect-square overflow-hidden',
+  KASSA_POS_MENU_TILE_PHOTO_BG,
+].join(' ')
 
 export const KASSA_POS_MENU_TILE_IMG_CLASS =
   'pointer-events-none absolute inset-0 box-border h-full w-full select-none object-contain object-center'
 
-export const KASSA_POS_MENU_TILE_IMG_FRAME =
-  'pointer-events-none relative h-full w-full min-h-0 min-w-0 overflow-hidden bg-white'
+export const KASSA_POS_MENU_TILE_IMG_FRAME = [
+  'pointer-events-none relative h-full w-full min-h-0 min-w-0 overflow-hidden',
+  KASSA_POS_MENU_TILE_PHOTO_BG,
+].join(' ')
 
 export const KASSA_POS_MENU_TILE_PLACEHOLDER_WELL =
   'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-[#1a1a1e] px-2 shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]'
