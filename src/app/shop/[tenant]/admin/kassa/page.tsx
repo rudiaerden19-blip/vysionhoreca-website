@@ -4633,17 +4633,25 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           {/* Categoriebalk boven producten: alle tenant-categorieën, horizontaal scrollbaar */}
           {selectedCategory && categories.length > 0 && (
             <div
-              className={`flex shrink-0 items-stretch border-b ${ui.categoryStripBorder} ${ui.categoryStripBg}`}
+              className={`flex shrink-0 items-stretch border-b ${ui.categoryStripBorder} ${ui.categoryStripBg} ${
+                kassaAppearanceDark ? 'pl-2' : ''
+              }`}
             >
               <button
                 type="button"
                 onClick={handleCategoryClear}
                 title={t('kassaApp.backToCategories')}
                 aria-label={t('kassaApp.backToCategories')}
-                className={`touch-manipulation select-none flex shrink-0 items-center justify-center px-2 transition-colors active:brightness-95 ${ui.categoryStripHover} border-r ${ui.categoryStripBorder}`}
+                className={`touch-manipulation select-none flex shrink-0 items-center justify-center min-h-[3rem] min-w-[3.75rem] px-3 pl-4 transition-colors active:brightness-95 sm:min-h-[3.25rem] sm:min-w-[4.25rem] sm:pl-5 ${ui.categoryStripHover} border-r ${ui.categoryStripBorder}`}
               >
-                <svg className={`h-4 w-4 shrink-0 ${ui.categoryStripIcon}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                <svg
+                  className={`h-7 w-7 shrink-0 sm:h-8 sm:w-8 ${kassaAppearanceDark ? 'text-[#f0f0f0]' : ui.categoryStripIcon}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
               <div
