@@ -1220,13 +1220,15 @@ export default function KassaFloorPlan({
       <div className={`flex min-h-0 flex-1 flex-col ${modalOpen ? 'pointer-events-none' : ''}`}>
       {/* Header */}
       <div
-        className={`flex h-14 flex-shrink-0 items-center justify-between px-4 ${
+        className={`flex flex-shrink-0 items-center justify-between px-4 ${
+          isGksUi ? 'relative h-16 sm:h-[4.25rem]' : 'h-14'
+        } ${
           isGksUi
             ? `border-b ${GKS_RULE_BLACK} ${GKS_MENU_PLATE_SHELL_BG_CLASS}`
             : 'border-b border-gray-300 bg-[#e3e3e3]'
         }`}
       >
-        <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+        <div className={`flex min-w-0 items-center gap-2 sm:gap-3 ${isGksUi ? 'relative z-10 flex-1' : 'flex-1'}`}>
           {isGksUi ? (
             <>
               <span
@@ -1235,11 +1237,13 @@ export default function KassaFloorPlan({
                 {t('kassaApp.pickTableTitle')}
               </span>
               <span
-                className={`inline-flex shrink-0 items-center whitespace-nowrap px-2 py-1.5 text-xs font-semibold !text-[#f0f0f0] sm:px-2.5 sm:py-2 sm:text-sm ${gksPosBtn}`}
+                className={`inline-flex max-w-[min(42vw,11rem)] shrink-0 items-center whitespace-nowrap px-2 py-1.5 text-[10px] font-semibold leading-tight !text-[#f0f0f0] sm:max-w-none sm:px-2.5 sm:py-2 sm:text-xs ${gksPosBtn}`}
               >
-                {planZone === FLOOR_PLAN_ZONE_TERRACE ? t('kassaApp.floorZoneTerrace') : t('kassaApp.floorZoneInside')}
+                {planZone === FLOOR_PLAN_ZONE_TERRACE
+                  ? t('kassaApp.gksFloorPlanZoneBtnTerrace')
+                  : t('kassaApp.gksFloorPlanZoneBtnInside')}
               </span>
-              <span className="hidden truncate text-sm font-medium text-[#b8b8b8] sm:inline">
+              <span className="hidden truncate text-sm font-medium text-[#b8b8b8] lg:inline">
                 {t('kassaApp.floorPlanFreeCount')
                   .replace('{free}', String(tables.filter((tbl) => tbl.status === 'FREE').length))
                   .replace('{total}', String(tables.length))}
@@ -1261,7 +1265,19 @@ export default function KassaFloorPlan({
             </>
           )}
         </div>
-        <div className="flex shrink-0 items-center gap-2">
+        {isGksUi ? (
+          <div
+            className="pointer-events-none absolute inset-x-4 inset-y-0 z-[5] flex items-center justify-center px-[min(28vw,9rem)]"
+            aria-hidden
+          >
+            <p className="text-center text-base font-bold uppercase tracking-[0.12em] text-[#f0f0f0] sm:text-xl md:text-2xl">
+              {planZone === FLOOR_PLAN_ZONE_TERRACE
+                ? t('kassaApp.gksFloorPlanTitleTerrace')
+                : t('kassaApp.gksFloorPlanTitleInside')}
+            </p>
+          </div>
+        ) : null}
+        <div className={`flex shrink-0 items-center gap-2 ${isGksUi ? 'relative z-10' : ''}`}>
           {!isLocked && (
             <>
               <button
