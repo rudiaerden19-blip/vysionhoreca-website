@@ -4913,11 +4913,31 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           }`}
         >
 
-        {/* Zone: Binnen / Terras — altijd zichtbaar (ook bij afhalen/leveren). */}
+        {/* Zone: Verkoop / Binnen / Terras — drie gelijke knoppen. */}
         <div
           className={`shrink-0 ${kassaAppearanceDark ? 'px-2.5 pt-3 pb-3 sm:px-3' : 'px-2 pt-1.5'}`}
         >
-            <div className={`flex ${kassaSidebarRowGapClass}`}>
+            <div className={`flex min-w-0 ${kassaSidebarRowGapClass}`}>
+              <button
+                type="button"
+                onClick={() => {
+                  playClick()
+                  setShowTablePicker(false)
+                }}
+                className={`flex min-w-0 flex-1 flex-col items-center justify-center px-2 transition-colors sm:px-3 ${kassaFloorZoneButtonTouchClass(
+                  kassaSxgaDenseTiles,
+                )} ${
+                  kassaAppearanceDark
+                    ? `font-semibold ${kassaPosButtonClass(!showTablePicker)}`
+                    : `rounded-xl font-bold ${
+                        !showTablePicker
+                          ? `bg-[#3C4D6B] text-white ring-2 ring-[#58CCFF]/55 ring-offset-2 ${ui.ringOffset}`
+                          : 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
+                      }`
+                }`}
+              >
+                <span className={kassaSidebarZoneLabelClass}>{t('kassaApp.floorZoneSales')}</span>
+              </button>
               <button
                 type="button"
                 onClick={() => {
@@ -4929,7 +4949,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   setPickerBrowseZone(FLOOR_PLAN_ZONE_INSIDE)
                   setShowTablePicker(true)
                 }}
-                className={`flex flex-1 flex-col items-center justify-center px-3 transition-colors ${kassaFloorZoneButtonTouchClass(
+                className={`flex min-w-0 flex-1 flex-col items-center justify-center px-2 transition-colors sm:px-3 ${kassaFloorZoneButtonTouchClass(
                   kassaSxgaDenseTiles,
                 )} ${
                   kassaAppearanceDark
@@ -4963,7 +4983,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   setPickerBrowseZone(FLOOR_PLAN_ZONE_TERRACE)
                   setShowTablePicker(true)
                 }}
-                className={`flex flex-1 flex-col items-center justify-center px-3 transition-colors ${kassaFloorZoneButtonTouchClass(
+                className={`flex min-w-0 flex-1 flex-col items-center justify-center px-2 transition-colors sm:px-3 ${kassaFloorZoneButtonTouchClass(
                   kassaSxgaDenseTiles,
                 )} ${
                   kassaAppearanceDark
