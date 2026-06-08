@@ -4,6 +4,11 @@ import type { MenuProduct, ProductOption, ProductOptionChoice } from '@/lib/admi
 import type { KassaSelectedChoice } from '@/lib/kassa-cart-types'
 import { useLanguage } from '@/i18n'
 import { kassaProductImageRetryOnError } from '@/lib/kassa-img-retry'
+import {
+  KASSA_POS_BTN_SHAPE,
+  KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
+  kassaPosButtonClass,
+} from '@/lib/kassa-pos-surface'
 
 export interface KassaProductOptionsModalModel {
   product: MenuProduct
@@ -36,11 +41,13 @@ export function KassaProductOptionsModal({
       <div
         className={
           dark
-            ? 'rounded-2xl w-full max-w-lg max-h-[80vh] flex flex-col shadow-2xl overflow-hidden bg-[#151a21] border border-zinc-600'
+            ? `${KASSA_POS_BTN_SHAPE} w-full max-w-lg max-h-[80vh] flex flex-col shadow-2xl overflow-hidden border border-[#1a1a1a] ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`
             : 'bg-white rounded-2xl w-full max-w-lg max-h-[80vh] flex flex-col shadow-2xl overflow-hidden'
         }
       >
-        <div className={`flex items-center gap-3 p-4 border-b ${dark ? 'border-zinc-600' : ''}`}>
+        <div
+          className={`flex items-center gap-3 p-4 border-b ${dark ? `border-[#1a1a1a] ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}` : ''}`}
+        >
           {model.product.image_url && (
             <img
               src={model.product.image_url}
@@ -61,14 +68,20 @@ export function KassaProductOptionsModal({
           <button
             type="button"
             onClick={onClose}
-            className={dark ? 'p-2 hover:bg-zinc-800 rounded-xl text-zinc-200' : 'p-2 hover:bg-gray-100 rounded-xl'}
+            className={
+              dark
+                ? `p-2 text-[#f0f0f0] ${KASSA_POS_BTN_SHAPE} ${kassaPosButtonClass(false)}`
+                : 'p-2 hover:bg-gray-100 rounded-xl'
+            }
             aria-label={t('kassaApp.closeAria')}
           >
             ✕
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-5">
+        <div
+          className={`flex-1 overflow-y-auto p-4 space-y-5 ${dark ? KASSA_POS_MENU_PLATE_SHELL_BG_CLASS : ''}`}
+        >
           {model.options.map((option) => (
             <div key={option.id}>
               <div className="flex items-center gap-2 mb-3">
@@ -76,12 +89,24 @@ export function KassaProductOptionsModal({
                   {option.name}
                 </p>
                 {option.required && (
-                  <span className="text-xs bg-red-50 text-red-500 border border-red-200 px-2 py-0.5 rounded-full font-semibold">
+                  <span
+                    className={
+                      dark
+                        ? `text-xs px-2 py-0.5 font-semibold text-red-300 ${KASSA_POS_BTN_SHAPE} border border-[#3d3d3d] ${kassaPosButtonClass(false)}`
+                        : 'text-xs bg-red-50 text-red-500 border border-red-200 px-2 py-0.5 rounded-full font-semibold'
+                    }
+                  >
                     {t('kassaApp.optionRequired')}
                   </span>
                 )}
                 {option.type === 'multiple' && (
-                  <span className="text-xs bg-blue-50 text-blue-500 border border-blue-200 px-2 py-0.5 rounded-full">
+                  <span
+                    className={
+                      dark
+                        ? `text-xs px-2 py-0.5 font-semibold text-[#5a9fd4] ${KASSA_POS_BTN_SHAPE} border border-[#3d3d3d] ${kassaPosButtonClass(false)}`
+                        : 'text-xs bg-blue-50 text-blue-500 border border-blue-200 px-2 py-0.5 rounded-full'
+                    }
+                  >
                     {t('kassaApp.optionMultiple')}
                   </span>
                 )}
@@ -94,19 +119,23 @@ export function KassaProductOptionsModal({
                       key={choice.id}
                       type="button"
                       onClick={() => onToggleChoice(option, choice)}
-                      className={`relative flex flex-col items-center justify-center px-2 py-3 rounded-xl border-2 text-sm font-medium transition-all ${
-                        isSelected
-                          ? dark
-                            ? 'border-[#58CCFF] bg-[#58CCFF]/15 ring-2 ring-[#58CCFF]/80 scale-[1.03]'
-                            : 'border-[#3C4D6B] bg-[#3C4D6B]/10 ring-2 ring-[#3C4D6B] scale-[1.03]'
-                          : dark
-                            ? 'border-zinc-600 hover:border-[#58CCFF] bg-[#263043] text-zinc-200'
-                            : 'border-gray-200 hover:border-[#3C4D6B] bg-white text-gray-700'
+                      className={`relative flex flex-col items-center justify-center px-2 py-3 text-sm font-medium transition-all ${
+                        dark
+                          ? `${kassaPosButtonClass(isSelected)} min-h-[4.25rem] ${isSelected ? 'scale-[1.02]' : ''}`
+                          : isSelected
+                            ? 'rounded-xl border-2 border-[#3C4D6B] bg-[#3C4D6B]/10 ring-2 ring-[#3C4D6B] scale-[1.03]'
+                            : 'rounded-xl border-2 border-gray-200 hover:border-[#3C4D6B] bg-white text-gray-700'
                       }`}
                     >
                       {isSelected && (
-                        <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-[#3C4D6B] flex items-center justify-center">
-                          <span className="text-white text-xs font-bold">✓</span>
+                        <div
+                          className={
+                            dark
+                              ? 'absolute top-1.5 right-1.5 flex h-5 w-5 items-center justify-center rounded-md border border-[#3d3d3d] bg-[#1c1c1c] text-[10px] font-bold text-[#5a9fd4]'
+                              : 'absolute top-1.5 right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#3C4D6B] text-xs font-bold text-white'
+                          }
+                        >
+                          ✓
                         </div>
                       )}
                       <span
@@ -131,7 +160,9 @@ export function KassaProductOptionsModal({
 
         <div
           className={
-            dark ? 'p-4 border-t border-zinc-600 flex gap-3 bg-[#121821]' : 'p-4 border-t flex gap-3 bg-gray-50'
+            dark
+              ? `flex gap-3 border-t border-[#1a1a1a] p-4 ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`
+              : 'p-4 border-t flex gap-3 bg-gray-50'
           }
         >
           <button
@@ -140,7 +171,7 @@ export function KassaProductOptionsModal({
             onClick={onClose}
             className={
               dark
-                ? 'flex-1 py-3 rounded-xl bg-[#263043] border border-zinc-600 font-semibold text-zinc-200 hover:bg-[#324056] transition-colors'
+                ? `flex-1 py-3 font-semibold ${kassaPosButtonClass(false)}`
                 : 'flex-1 py-3 rounded-xl bg-white border border-gray-200 font-semibold text-gray-600 hover:bg-gray-100 transition-colors'
             }
           >
@@ -150,7 +181,11 @@ export function KassaProductOptionsModal({
             type="button"
             data-testid="kassa-options-confirm"
             onClick={onConfirm}
-            className="flex-[2] py-3.5 rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold text-lg shadow-md transition-colors"
+            className={
+              dark
+                ? `flex-[2] py-3.5 text-lg font-bold ${kassaPosButtonClass(false)}`
+                : 'flex-[2] py-3.5 rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold text-lg shadow-md transition-colors'
+            }
           >
             {model.editingCartKey ? t('kassaApp.optionsSave') : t('kassaApp.optionsAdd')} — €
             {(model.product.price + model.selected.reduce((s, c) => s + c.price, 0)).toFixed(2)}
