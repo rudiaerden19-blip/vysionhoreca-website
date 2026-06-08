@@ -6,6 +6,10 @@
 /** CSS-class in globals (historische naam `.gks-menu-plate-grain`). */
 export const KASSA_POS_MENU_PLATE_SHELL_BG_CLASS = 'gks-menu-plate-grain'
 
+export const KASSA_POS_MENU_TRANSPARENT_CLASS = 'bg-transparent'
+
+export const KASSA_POS_MENU_RECESS_TRAY_CLASS = 'gks-menu-recess-tray'
+
 export const KASSA_POS_RULE_BLACK = 'border-black'
 
 export const KASSA_POS_BTN_SHAPE = 'rounded-xl'
@@ -84,6 +88,27 @@ export function kassaPosButtonClass(selected: boolean): string {
 
 export function kassaPosRaisedStripClass(): string {
   return kassaPosButtonClass(false)
+}
+
+export const KASSA_CLOCK_TILE_ON_BAR = [
+  KASSA_POS_BTN_SHAPE,
+  KASSA_BTN_FACE,
+  'relative z-[2]',
+  'border border-[#3d3d3d] border-t-[#4a4a4a]/80',
+  'shadow-[0_1px_0_rgba(255,255,255,0.14),0_3px_8px_rgba(0,0,0,0.38),0_8px_16px_rgba(0,0,0,0.28)]',
+  KASSA_POS_BTN_PRESS,
+  KASSA_BTN_PRESS_FACE,
+].join(' ')
+
+export const KASSA_POS_FIELD = [
+  KASSA_POS_BTN_SHAPE,
+  KASSA_BTN_FACE,
+  'border border-[#2a2a2a]',
+  KASSA_POS_SUBTLE_LIFT_SHADOW,
+].join(' ')
+
+export function kassaClockBarClass(): string {
+  return `${kassaPosButtonClass(false)} relative z-0`
 }
 
 /** Zijbalk-footer — zelfde labels, GKS-typografie. */

@@ -71,10 +71,16 @@ import {
 } from '@/lib/demo-links'
 import { useKassaUiDarkSync } from '@/lib/kassa-register-ui-dark-preference'
 import { createKassaRegisterUiTheme, type KassaRegisterUiTheme } from '@/lib/kassa-register-ui-theme'
+import { createKassaPosRegisterUiTheme } from '@/lib/kassa-pos-register-ui-theme'
 import {
+  KASSA_POS_BTN_SHAPE,
   KASSA_POS_CHECKOUT_BTN,
+  KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
+  KASSA_POS_MENU_RECESS_TRAY_CLASS,
+  KASSA_POS_RULE_BLACK,
   KASSA_POS_SELECTED_ACCENT_TEXT,
   KASSA_SIDEBAR_FOOTER_BTN_LABEL,
+  kassaClockBarClass,
   kassaPosButtonClass,
   kassaPosRaisedStripClass,
 } from '@/lib/kassa-pos-surface'
@@ -328,7 +334,11 @@ const KASSA_HEADER_QUICK_LINK_LABEL = 'text-xs leading-snug sm:text-sm'
 
 /** Alleen Binnen/Terras — groter dan besteltype-knoppen eronder. */
 function kassaFloorZoneButtonTouchClass(sxga: boolean): string {
-  return sxga ? 'min-h-[3.25rem] py-2.5 text-base' : 'min-h-[2.75rem] py-2 text-sm'
+  return sxga ? 'min-h-[3.25rem] py-2.5 text-lg' : 'min-h-[2.75rem] py-2 text-base'
+}
+
+function kassaOrderTypeButtonTouchClass(sxga: boolean): string {
+  return sxga ? 'min-h-[3.25rem] py-2.5' : 'min-h-[3rem] py-2.5'
 }
 
 /** Sidebar-footer: touch-vriendelijke hoogte (Lade / Bon / Verwijder). */
@@ -706,7 +716,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [tenant, searchParams])
   const demoViewOnly = demoFromUrl || demoFromMarketingSession
   const { dark: kassaAppearanceDark, toggle: toggleKassaAppearance } = useKassaUiDarkSync(tenant)
-  const ui = useMemo(() => createKassaRegisterUiTheme(kassaAppearanceDark), [kassaAppearanceDark])
+  const ui = useMemo(
+    () =>
+      kassaAppearanceDark
+        ? createKassaPosRegisterUiTheme(true)
+        : createKassaRegisterUiTheme(false),
+    [kassaAppearanceDark],
+  )
 
   useEffect(() => {
     const html = document.documentElement
@@ -3908,6 +3924,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     () => staffClockList.some((s) => s.hasOpenSession),
     [staffClockList]
   )
+  const showKassaStaffClockButton = useMemo(
+    () => Boolean(tenantInfo?.kassa_staff_clock_enabled) && !demoViewOnly,
+    [tenantInfo?.kassa_staff_clock_enabled, demoViewOnly],
+  )
   const requiresStaffSelectionForSale = useMemo(
     () =>
       Boolean(tenantInfo?.kassa_staff_clock_enabled) &&
@@ -3969,6 +3989,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     )
   }
 
+  const headerQuickLinkBtnClass = kassaAppearanceDark
+    ? `inline-flex shrink-0 items-center justify-center whitespace-nowrap ${kassaPosButtonClass(false)} font-semibold transition-colors min-h-[2.35rem] px-3 py-2 sm:min-h-[2.6rem] sm:px-3.5 sm:py-2.5`
+    : KASSA_HEADER_QUICK_LINK_BTN
+
   return (
     <div
       className="flex min-h-0 flex-col overflow-hidden h-[100svh] max-h-[100svh] supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh]"
@@ -3985,7 +4009,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       <div className={`flex min-h-0 flex-1 flex-col overflow-hidden ${ui.shellBg}`}>
 
       {/* ── Blauwe balk: één rij — kleine tenantnaam zodat snelkoppelingen naast elkaar passen zonder horizontale scrollbar ── */}
-      <div className="relative z-30 flex min-h-[56px] w-full min-w-0 shrink-0 items-center gap-1.5 bg-black px-2 py-2 sm:gap-2 sm:px-3">
+      <div
+        className={`relative z-30 flex min-h-[56px] w-full min-w-0 shrink-0 items-center gap-1.5 px-2 py-2 sm:gap-2 sm:px-3 ${
+          kassaAppearanceDark
+            ? `pb-3 ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`
+            : 'bg-black'
+        }`}
+      >
 
         {/* Backdrop sluit menu/flyout (printer-bridge-modal heeft eigen overlay) */}
         {(hamburgerOpen || flyoutOpen) && (
@@ -4002,7 +4032,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* ── Hamburger ── */}
         <div className="relative z-20 flex shrink-0 items-center gap-2">
           <button onClick={() => { setHamburgerOpen(!hamburgerOpen); setHamburgerSubOpen(null) }}
-            className={`flex items-center gap-1.5 rounded-xl px-2 py-1.5 transition-colors sm:gap-2 sm:px-3 ${hamburgerOpen ? 'bg-[#47c6fe] text-[#063042]' : 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'}`}
+            className={`flex items-center gap-1.5 px-2 py-1.5 transition-colors sm:gap-2 sm:px-3 ${
+              kassaAppearanceDark
+                ? kassaPosButtonClass(true)
+                : hamburgerOpen
+                  ? 'rounded-xl bg-[#47c6fe] text-[#063042]'
+                  : 'rounded-xl bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
+            }`}
             type="button"
             title={t('kassaApp.hamburgerMenu')}
             aria-expanded={hamburgerOpen}
@@ -4114,7 +4150,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 setShowReservations(true)
               }}
               title={t('kassaApp.navReservations')}
-              className={`relative ${KASSA_HEADER_QUICK_LINK_BTN}`}
+              className={`relative ${headerQuickLinkBtnClass}`}
             >
               <span className={KASSA_HEADER_QUICK_LINK_LABEL}>{t('kassaApp.navReservations')}</span>
               {pendingReservCount > 0 && (
@@ -4132,7 +4168,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               title={t('kassaApp.customerDisplayHint')}
               aria-hidden={KASSA_HEADER_HIDE_CUSTOMER_DISPLAY_AND_SOUND}
               tabIndex={KASSA_HEADER_HIDE_CUSTOMER_DISPLAY_AND_SOUND ? -1 : 0}
-              className={`relative ${KASSA_HEADER_QUICK_LINK_BTN} ${
+              className={`relative ${headerQuickLinkBtnClass} ${
                 KASSA_HEADER_HIDE_CUSTOMER_DISPLAY_AND_SOUND ? 'hidden' : ''
               }`}
             >
@@ -4144,7 +4180,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <Link
               href={`/shop/${tenant}/display`}
               title={t('kassaApp.navShopDisplay')}
-              className={KASSA_HEADER_QUICK_LINK_BTN}
+              className={headerQuickLinkBtnClass}
             >
               <span className={KASSA_HEADER_QUICK_LINK_LABEL}>{t('kassaApp.navShopDisplay')}</span>
             </Link>
@@ -4154,7 +4190,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <Link
               href={`/keuken/${tenant}`}
               title={t('kassaApp.navKitchenDisplay')}
-              className={KASSA_HEADER_QUICK_LINK_BTN}
+              className={headerQuickLinkBtnClass}
             >
               <span className={KASSA_HEADER_QUICK_LINK_LABEL}>{t('kassaApp.navKitchenDisplay')}</span>
             </Link>
@@ -4165,8 +4201,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             onClick={toggleSound}
             aria-hidden={KASSA_HEADER_HIDE_CUSTOMER_DISPLAY_AND_SOUND}
             tabIndex={KASSA_HEADER_HIDE_CUSTOMER_DISPLAY_AND_SOUND ? -1 : 0}
-            className={`${KASSA_HEADER_QUICK_LINK_BTN} ${
-              soundsOn ? '' : 'bg-white/10 text-white hover:bg-white/20'
+            className={`${headerQuickLinkBtnClass} ${
+              soundsOn || kassaAppearanceDark ? '' : 'bg-white/10 text-white hover:bg-white/20'
             } ${KASSA_HEADER_HIDE_CUSTOMER_DISPLAY_AND_SOUND ? 'hidden' : ''}`}
             title={soundsOn ? t('kassaApp.soundOnTitle') : t('kassaApp.soundOffTitle')}
           >
@@ -4273,7 +4309,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       <div className="flex min-h-0 flex-1 overflow-hidden w-full">
 
         {/* ── Midden: categorieën / producten ── */}
-        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+        <div
+          className={`flex min-h-0 flex-1 flex-col overflow-hidden ${
+            kassaAppearanceDark ? KASSA_POS_MENU_PLATE_SHELL_BG_CLASS : 'bg-[#e3e3e3]'
+          }`}
+        >
 
           {/* Categoriebalk boven producten: alle tenant-categorieën, horizontaal scrollbaar */}
           {selectedCategory && categories.length > 0 && (
@@ -4318,16 +4358,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       role="tab"
                       aria-selected={active}
                       data-kassa-strip-category-id={cat.id != null ? String(cat.id) : undefined}
-                      className={`shrink-0 touch-pan-x whitespace-nowrap rounded-lg border font-bold leading-tight transition-colors active:brightness-95 ${
+                      className={`shrink-0 touch-pan-x whitespace-nowrap border font-bold leading-tight transition-colors active:brightness-95 ${
                         kassaSxgaDenseTiles
                           ? 'px-3 py-1.5 text-sm'
                           : 'px-2.5 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm'
                       } ${
-                        active
-                          ? 'border-[#58CCFF] bg-[#58CCFF] text-black shadow-sm'
-                          : kassaAppearanceDark
-                            ? `border-zinc-500 bg-[#1a2230] ${ui.categoryStripText} ${ui.categoryStripHover}`
-                            : `border-gray-300 bg-white ${ui.categoryStripText} ${ui.categoryStripHover}`
+                        kassaAppearanceDark
+                          ? kassaPosButtonClass(active)
+                          : active
+                            ? 'rounded-lg border-[#58CCFF] bg-[#58CCFF] text-black shadow-sm'
+                            : `rounded-lg border-gray-300 bg-white ${ui.categoryStripText} ${ui.categoryStripHover}`
                       }`}
                     >
                       {cat.icon ? <span className="mr-0.5 text-sm sm:text-base">{cat.icon}</span> : null}
@@ -4339,11 +4379,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </div>
           )}
 
+          <div className={`flex min-h-0 flex-1 flex-col ${kassaAppearanceDark ? 'px-3 pb-3 pt-1.5' : ''}`}>
+            <div
+              className={`flex min-h-0 flex-1 flex-col overflow-hidden ${
+                kassaAppearanceDark ? `${KASSA_POS_MENU_RECESS_TRAY_CLASS} ${KASSA_POS_BTN_SHAPE}` : ''
+              }`}
+            >
           {/* Grid — min-h-0 nodig: anders groeit de flex-child mee met alle tegels en wordt onderaan afgekapt zonder scroll */}
           <div
             ref={kassaMenuScrollRef}
             data-testid="kassa-menu-scroll"
-            className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4 touch-manipulation [overflow-anchor:none] [scrollbar-gutter:stable]"
+            className={`relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4 touch-manipulation [overflow-anchor:none] [scrollbar-gutter:stable] ${
+              kassaAppearanceDark ? 'gks-menu-vignette' : ''
+            }`}
           >
             {menuLoading ? (
               <div data-testid="kassa-menu-loading" className={`flex items-center justify-center h-full text-lg ${ui.menuEmptyMuted}`}>{t('kassaApp.loading')}</div>
@@ -4426,14 +4474,22 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 )
             )}
           </div>
+            </div>
+          </div>
         </div>
 
         {/* ── Rechts: numpad / cart ── */}
-        <div className={`${kassaSxgaDenseTiles ? 'w-[300px]' : 'w-80 sm:w-96 lg:w-[380px]'} flex flex-col flex-shrink-0 min-h-0 min-w-0 overflow-hidden ${ui.sidebarBg}`}>
+        <div
+          className={`${kassaSxgaDenseTiles ? 'w-[300px]' : 'w-80 sm:w-96 lg:w-[380px]'} flex min-h-0 min-w-0 flex-shrink-0 flex-col overflow-hidden ${
+            kassaAppearanceDark
+              ? `border-l ${KASSA_POS_RULE_BLACK} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`
+              : ui.sidebarBg
+          }`}
+        >
 
         {/* Zone: Binnen / Terras — altijd zichtbaar (ook bij afhalen/leveren). */}
-        <div className="shrink-0 px-2 pt-1.5">
-            <div className="flex gap-1.5">
+        <div className={`shrink-0 ${kassaAppearanceDark ? 'px-3 pt-3 pb-3' : 'px-2 pt-1.5'}`}>
+            <div className={`flex ${kassaAppearanceDark ? 'gap-4' : 'gap-1.5'}`}>
               <button
                 type="button"
                 onClick={() => {
@@ -4445,15 +4501,23 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   setPickerBrowseZone(FLOOR_PLAN_ZONE_INSIDE)
                   setShowTablePicker(true)
                 }}
-                className={`flex flex-1 flex-col items-center justify-center rounded-xl px-3 font-bold transition-colors ${kassaFloorZoneButtonTouchClass(
+                className={`flex flex-1 flex-col items-center justify-center px-3 transition-colors ${kassaFloorZoneButtonTouchClass(
                   kassaSxgaDenseTiles,
                 )} ${
-                  pickerBrowseZone === FLOOR_PLAN_ZONE_INSIDE && showTablePicker
-                    ? `bg-[#3C4D6B] text-white ring-2 ring-[#58CCFF]/55 ring-offset-2 ${ui.ringOffset}`
-                    : 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
+                  kassaAppearanceDark
+                    ? `font-semibold ${kassaPosButtonClass(
+                        pickerBrowseZone === FLOOR_PLAN_ZONE_INSIDE && showTablePicker,
+                      )}`
+                    : `rounded-xl font-bold ${
+                        pickerBrowseZone === FLOOR_PLAN_ZONE_INSIDE && showTablePicker
+                          ? `bg-[#3C4D6B] text-white ring-2 ring-[#58CCFF]/55 ring-offset-2 ${ui.ringOffset}`
+                          : 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
+                      }`
                 }`}
               >
-                <span className="font-bold">{t('kassaApp.floorZoneInside')}</span>
+                <span className={kassaAppearanceDark ? 'font-medium tracking-[0.03em]' : 'font-bold'}>
+                  {t('kassaApp.floorZoneInside')}
+                </span>
                 {orderType === 'DINE_IN' && tableNumber && dineInFloorZone === FLOOR_PLAN_ZONE_INSIDE ? (
                   <span className="mt-0.5 text-xs font-semibold opacity-95">
                     {kassaStoolsByZone[FLOOR_PLAN_ZONE_INSIDE].some((s) => s.stoolNumber === tableNumber)
@@ -4473,15 +4537,23 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   setPickerBrowseZone(FLOOR_PLAN_ZONE_TERRACE)
                   setShowTablePicker(true)
                 }}
-                className={`flex flex-1 flex-col items-center justify-center rounded-xl px-3 font-bold transition-colors ${kassaFloorZoneButtonTouchClass(
+                className={`flex flex-1 flex-col items-center justify-center px-3 transition-colors ${kassaFloorZoneButtonTouchClass(
                   kassaSxgaDenseTiles,
                 )} ${
-                  pickerBrowseZone === FLOOR_PLAN_ZONE_TERRACE && showTablePicker
-                    ? `bg-emerald-600 text-white ring-2 ring-emerald-300/80 ring-offset-2 ${ui.ringOffset}`
-                    : 'bg-emerald-600 text-white hover:bg-emerald-700'
+                  kassaAppearanceDark
+                    ? `font-semibold ${kassaPosButtonClass(
+                        pickerBrowseZone === FLOOR_PLAN_ZONE_TERRACE && showTablePicker,
+                      )}`
+                    : `rounded-xl font-bold ${
+                        pickerBrowseZone === FLOOR_PLAN_ZONE_TERRACE && showTablePicker
+                          ? `bg-emerald-600 text-white ring-2 ring-emerald-300/80 ring-offset-2 ${ui.ringOffset}`
+                          : 'bg-emerald-600 text-white hover:bg-emerald-700'
+                      }`
                 }`}
               >
-                <span className="font-bold">{t('kassaApp.floorZoneTerrace')}</span>
+                <span className={kassaAppearanceDark ? 'font-medium tracking-[0.03em]' : 'font-bold'}>
+                  {t('kassaApp.floorZoneTerrace')}
+                </span>
                 {orderType === 'DINE_IN' && tableNumber && dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE ? (
                   <span className="mt-0.5 text-xs font-semibold opacity-95">
                     {kassaStoolsByZone[FLOOR_PLAN_ZONE_TERRACE].some((s) => s.stoolNumber === tableNumber)
@@ -4494,21 +4566,34 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
 
         {/* Besteltype: drie losse knoppen (ter plaatse / afhalen / leveren) */}
-        <div className="mx-2 mt-1 shrink-0" data-testid="kassa-order-type-bar">
-          <div className="flex gap-1.5">
+        <div
+          className={`shrink-0 ${kassaAppearanceDark ? 'mx-3 mb-3 mt-2.5 space-y-3' : 'mx-2 mt-1'}`}
+          data-testid="kassa-order-type-bar"
+        >
+          <div className={`flex ${kassaAppearanceDark ? 'gap-4' : 'gap-1.5'}`}>
             <button
               type="button"
               aria-pressed={orderType === 'DINE_IN'}
               onClick={() => selectOrderType('DINE_IN')}
-              className={`flex min-w-0 flex-1 flex-col items-center justify-center rounded-lg px-1 text-center text-xs shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 ${
-                kassaSxgaDenseTiles ? 'min-h-[32px] py-1.5' : 'min-h-[28px] py-1'
-              } ${
-                orderType === 'DINE_IN'
-                  ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
-                  : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
+              className={`flex min-w-0 flex-1 flex-col items-center justify-center text-center ${
+                kassaAppearanceDark
+                  ? `px-2 ${kassaOrderTypeButtonTouchClass(kassaSxgaDenseTiles)} ${kassaPosButtonClass(orderType === 'DINE_IN')}`
+                  : `rounded-lg px-1 text-xs shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 ${
+                      kassaSxgaDenseTiles ? 'min-h-[32px] py-1.5' : 'min-h-[28px] py-1'
+                    } ${
+                      orderType === 'DINE_IN'
+                        ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
+                        : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
+                    }`
               }`}
             >
-              <span className="text-center text-xs font-bold leading-tight sm:text-sm">
+              <span
+                className={
+                  kassaAppearanceDark
+                    ? `text-center ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`
+                    : 'text-center text-xs font-bold leading-tight sm:text-sm'
+                }
+              >
                 {t('kassaApp.orderTypeDineIn')}
               </span>
               {orderType === 'DINE_IN' && tableNumber ? (
@@ -4524,15 +4609,25 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               type="button"
               aria-pressed={orderType === 'TAKEAWAY'}
               onClick={() => selectOrderType('TAKEAWAY')}
-              className={`flex min-w-0 flex-1 flex-col items-center justify-center rounded-lg px-1 text-center text-xs shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 ${
-                kassaSxgaDenseTiles ? 'min-h-[32px] py-1.5' : 'min-h-[28px] py-1'
-              } ${
-                orderType === 'TAKEAWAY'
-                  ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
-                  : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
+              className={`flex min-w-0 flex-1 flex-col items-center justify-center text-center ${
+                kassaAppearanceDark
+                  ? `px-2 ${kassaOrderTypeButtonTouchClass(kassaSxgaDenseTiles)} ${kassaPosButtonClass(orderType === 'TAKEAWAY')}`
+                  : `rounded-lg px-1 text-xs shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 ${
+                      kassaSxgaDenseTiles ? 'min-h-[32px] py-1.5' : 'min-h-[28px] py-1'
+                    } ${
+                      orderType === 'TAKEAWAY'
+                        ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
+                        : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
+                    }`
               }`}
             >
-              <span className="text-center text-xs font-bold leading-tight sm:text-sm">
+              <span
+                className={
+                  kassaAppearanceDark
+                    ? `text-center ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`
+                    : 'text-center text-xs font-bold leading-tight sm:text-sm'
+                }
+              >
                 {t('kassaApp.orderTypeTakeaway')}
               </span>
             </button>
@@ -4540,15 +4635,25 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               type="button"
               aria-pressed={orderType === 'DELIVERY'}
               onClick={() => selectOrderType('DELIVERY')}
-              className={`flex min-w-0 flex-1 flex-col items-center justify-center rounded-lg px-1 text-center text-xs shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 ${
-                kassaSxgaDenseTiles ? 'min-h-[32px] py-1.5' : 'min-h-[28px] py-1'
-              } ${
-                orderType === 'DELIVERY'
-                  ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
-                  : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
+              className={`flex min-w-0 flex-1 flex-col items-center justify-center text-center ${
+                kassaAppearanceDark
+                  ? `px-2 ${kassaOrderTypeButtonTouchClass(kassaSxgaDenseTiles)} ${kassaPosButtonClass(orderType === 'DELIVERY')}`
+                  : `rounded-lg px-1 text-xs shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 ${
+                      kassaSxgaDenseTiles ? 'min-h-[32px] py-1.5' : 'min-h-[28px] py-1'
+                    } ${
+                      orderType === 'DELIVERY'
+                        ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
+                        : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
+                    }`
               }`}
             >
-              <span className="text-center text-xs font-bold leading-tight sm:text-sm">
+              <span
+                className={
+                  kassaAppearanceDark
+                    ? `text-center ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`
+                    : 'text-center text-xs font-bold leading-tight sm:text-sm'
+                }
+              >
                 {t('kassaApp.orderTypeDelivery')}
               </span>
             </button>
@@ -4570,8 +4675,40 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           ) : null}
         </div>
 
+        {kassaAppearanceDark ? (
+          <div
+            className={`mx-3 mb-3 mt-3 flex shrink-0 items-center gap-3 px-3 ${kassaClockBarClass()} ${kassaOrderTypeButtonTouchClass(
+              kassaSxgaDenseTiles,
+            )}`}
+            data-testid="kassa-sidebar-clock-bar"
+          >
+            {showKassaStaffClockButton ? (
+              <button
+                type="button"
+                onClick={openStaffClockModal}
+                className={`shrink-0 active:scale-[0.98] transition-all ${ui.clockTileBg} ${ui.clockTileHover}`}
+                title={t('staffClock.buttonTitle')}
+                aria-label={t('staffClock.buttonTitle')}
+              >
+                <KassaAnalogClock size={parkedOnlySidebarView ? 72 : 48} />
+              </button>
+            ) : null}
+            <p
+              className={`min-w-0 truncate whitespace-nowrap text-right text-xs font-semibold leading-tight tracking-tight text-white sm:text-sm ${showKassaStaffClockButton ? 'flex-1' : 'w-full'}`}
+              title={numpadHeaderDateLabel}
+              aria-live="polite"
+            >
+              {numpadHeaderDateLabel}
+            </p>
+          </div>
+        ) : null}
+
         {/* Cart / numpad (toggle via footer) */}
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-2.5 pt-1.5 touch-pan-y">
+        <div
+          className={`flex min-h-0 flex-1 flex-col overflow-hidden touch-pan-y ${
+            kassaAppearanceDark ? 'px-3 pt-1' : 'px-2.5 pt-1.5'
+          }`}
+        >
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
               {parkedLinesByCategory.length > 0 &&
               (parkedOnlySidebarView || numpadPanelVisible) ? (
@@ -4615,7 +4752,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               {numpadPanelVisible ? (
               <div className="flex min-h-[15rem] flex-1 flex-col justify-end" data-testid="kassa-numpad-panel">
               <div className={`mb-3 flex shrink-0 items-center gap-2.5 rounded-xl px-2.5 py-2 ${ui.numpadBarBg}`}>
-                {tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? (
+                {!kassaAppearanceDark && tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? (
                   <button
                     type="button"
                     onClick={openStaffClockModal}
@@ -4627,15 +4764,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   </button>
                 ) : null}
                 <div
-                  className={`min-w-0 flex flex-col justify-center gap-0.5 ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1' : 'w-full'}`}
+                  className={`min-w-0 flex flex-col justify-center gap-0.5 ${
+                    !kassaAppearanceDark && tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1' : 'w-full'
+                  }`}
                 >
-                  <p
-                    className={`truncate whitespace-nowrap text-right text-xs font-semibold leading-tight tracking-tight sm:text-sm ${ui.numpadMeta}`}
-                    title={numpadHeaderDateLabel}
-                    aria-live="polite"
-                  >
-                    {numpadHeaderDateLabel}
-                  </p>
+                  {!kassaAppearanceDark ? (
+                    <p
+                      className={`truncate whitespace-nowrap text-right text-xs font-semibold leading-tight tracking-tight sm:text-sm ${ui.numpadMeta}`}
+                      title={numpadHeaderDateLabel}
+                      aria-live="polite"
+                    >
+                      {numpadHeaderDateLabel}
+                    </p>
+                  ) : null}
                   <input
                     type="text"
                     value={numpadValue}
@@ -4691,28 +4832,30 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   kassaSidebarFooterTier === 'comfort' ? 'gap-2' : kassaSidebarFooterTier === 'compact' ? 'gap-1.5' : 'gap-1'
                 }`}
               >
-              <div
-                className={`flex shrink-0 items-center gap-2 rounded-lg px-2 py-1 ${ui.numpadBarBg} ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? '' : 'justify-end'}`}
-              >
-                {tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? (
-                  <button
-                    type="button"
-                    onClick={openStaffClockModal}
-                    className={`shrink-0 active:scale-[0.98] transition-all ${ui.clockTileBg} ${ui.clockTileHover}`}
-                    title={t('staffClock.buttonTitle')}
-                    aria-label={t('staffClock.buttonTitle')}
-                  >
-                    <KassaAnalogClock size={48} />
-                  </button>
-                ) : null}
-                <p
-                  className={`min-w-0 truncate whitespace-nowrap text-right text-[11px] font-semibold leading-tight tracking-tight ${ui.numpadMeta} ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1' : 'w-full'}`}
-                  title={numpadHeaderDateLabel}
-                  aria-live="polite"
+              {!kassaAppearanceDark ? (
+                <div
+                  className={`flex shrink-0 items-center gap-2 rounded-lg px-2 py-1 ${ui.numpadBarBg} ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? '' : 'justify-end'}`}
                 >
-                  {numpadHeaderDateLabel}
-                </p>
-              </div>
+                  {tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? (
+                    <button
+                      type="button"
+                      onClick={openStaffClockModal}
+                      className={`shrink-0 active:scale-[0.98] transition-all ${ui.clockTileBg} ${ui.clockTileHover}`}
+                      title={t('staffClock.buttonTitle')}
+                      aria-label={t('staffClock.buttonTitle')}
+                    >
+                      <KassaAnalogClock size={48} />
+                    </button>
+                  ) : null}
+                  <p
+                    className={`min-w-0 truncate whitespace-nowrap text-right text-[11px] font-semibold leading-tight tracking-tight ${ui.numpadMeta} ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1' : 'w-full'}`}
+                    title={numpadHeaderDateLabel}
+                    aria-live="polite"
+                  >
+                    {numpadHeaderDateLabel}
+                  </p>
+                </div>
+              ) : null}
               {parkedLinesByCategory.length > 0 ? (
                 <div
                   className="max-h-[min(20vh,6.5rem)] shrink-0 overflow-y-auto overscroll-y-contain"
@@ -4822,136 +4965,203 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </div>
         </div>
 
-        {/* Totaal + knoppen — touch-vriendelijk (kiosk); zelfde tekst/flow, POS-surface als GKS */}
-        <div
-          className={`shrink-0 border-t ${kassaAppearanceDark ? 'border-zinc-700' : 'border-gray-200'} px-3 py-2.5 space-y-2.5`}
-        >
+        {/* Totaal + knoppen — donker: zelfde layout als GKS-preview; licht: klassieke footer */}
+        {kassaAppearanceDark ? (
           <div
-            className={`flex items-center justify-between gap-2 px-2.5 ${kassaPosRaisedStripClass()} ${kassaFooterActionTouchMinHClass(
-              kassaSxgaDenseTiles,
-              kassaSidebarFooterTier === 'dense',
-            )}`}
+            className={`sticky bottom-0 z-10 shrink-0 border-t ${KASSA_POS_RULE_BLACK} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} px-3 py-2.5 space-y-2.5`}
           >
-            <span className={`text-base font-bold tracking-[0.04em] sm:text-lg ${ui.numpadMeta}`}>
-              {t('kassaApp.cartTotal')}
-            </span>
-            <span
-              className={`font-bold tabular-nums tracking-tight ${KASSA_POS_SELECTED_ACCENT_TEXT} ${
-                kassaSxgaDenseTiles || kassaSidebarFooterTier !== 'dense' ? 'text-2xl sm:text-[1.65rem]' : 'text-xl'
-              }`}
-            >
-              €{total.toFixed(2)}
-            </span>
-          </div>
-          <div className="grid grid-cols-3 gap-3 touch-manipulation select-none">
-            <button
-              type="button"
-              onClick={() => { void openCashDrawer() }}
-              className={`flex items-center justify-center px-1 ${kassaPosButtonClass(false)} ${kassaFooterActionTouchMinHClass(
-                kassaSxgaDenseTiles,
-                kassaSidebarFooterTier === 'dense',
-              )}`}
-              title={t('kassaApp.drawerOpen')}
-            >
-              <span className={`text-center ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`}>
-                {t('kassaApp.drawerOpen')}
-              </span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                void printDraftBonFromCart({ draftCopies: 1 })
-              }}
-              disabled={draftBonLineItems.length === 0 || draftBonPrinting}
-              className={`flex items-center justify-center px-1 ${kassaPosButtonClass(false)} ${kassaFooterActionTouchMinHClass(
-                kassaSxgaDenseTiles,
-                kassaSidebarFooterTier === 'dense',
-              )}`}
-              title={t('kassaApp.cartBonTitle')}
-              aria-label={t('kassaApp.cartBonTitle')}
-            >
-              <span className={`text-center ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`}>
-                {t('kassaApp.cartBon')}
-              </span>
-            </button>
-            <button
-              type="button"
-              onClick={clearCart}
-              disabled={billLines.length === 0}
-              className={`flex items-center justify-center px-1 ${kassaPosButtonClass(false)} ${kassaFooterActionTouchMinHClass(
-                kassaSxgaDenseTiles,
-                kassaSidebarFooterTier === 'dense',
-              )}`}
-              title={t('kassaApp.remove')}
-              aria-label={t('kassaApp.remove')}
-            >
-              <span className={`text-center ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`}>
-                {t('kassaApp.remove')}
-              </span>
-            </button>
-          </div>
-          {orderType === 'DINE_IN' && tableNumber && cart.length > 0 && (
             <div
-              className="flex w-full gap-2.5 touch-manipulation select-none"
-              data-testid="kassa-park-table-split"
+              className={`flex items-center justify-between gap-2 px-2.5 ${kassaPosRaisedStripClass()} ${kassaFooterActionTouchMinHClass(
+                kassaSxgaDenseTiles,
+                kassaSidebarFooterTier === 'dense',
+              )}`}
             >
+              <span className={`text-base font-bold tracking-[0.04em] sm:text-lg ${ui.numpadMeta}`}>
+                {t('kassaApp.cartTotal')}
+              </span>
+              {numpadPanelVisible ? (
+                <span
+                  className={`min-w-0 truncate text-right font-semibold tabular-nums ${ui.numpadInput} ${
+                    kassaSxgaDenseTiles ? 'text-2xl' : 'text-xl sm:text-2xl'
+                  }`}
+                  aria-live="polite"
+                  aria-label={t('kassaApp.numpadPlaceholder')}
+                >
+                  €{numpadValue || '0'}
+                </span>
+              ) : (
+                <span
+                  className={`font-bold tabular-nums tracking-tight ${ui.priceAccentClass} ${
+                    kassaSxgaDenseTiles || kassaSidebarFooterTier !== 'dense' ? 'text-2xl sm:text-[1.65rem]' : 'text-xl'
+                  }`}
+                >
+                  €{total.toFixed(2)}
+                </span>
+              )}
+            </div>
+            <div className="grid grid-cols-3 gap-3 touch-manipulation select-none">
               <button
                 type="button"
-                onClick={() => parkOrder({ printKitchen: true, printKassaSlip: false })}
-                className={`min-w-0 flex-1 font-semibold flex items-center justify-center text-center px-2 py-3 text-xs leading-tight sm:text-sm ${kassaPosButtonClass(false)} ${
-                  kassaSxgaDenseTiles ? 'min-h-[2.875rem]' : 'min-h-[2.5rem]'
-                }`}
+                onClick={() => { void openCashDrawer() }}
+                className={`flex items-center justify-center px-1 ${kassaPosButtonClass(false)} ${kassaFooterActionTouchMinHClass(
+                  kassaSxgaDenseTiles,
+                  kassaSidebarFooterTier === 'dense',
+                )}`}
+                title={t('kassaApp.drawerOpen')}
               >
-                {t('kassaApp.parkTableKitchenBon')}
+                <span className={`text-center ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`}>
+                  {t('kassaApp.drawerOpen')}
+                </span>
               </button>
               <button
                 type="button"
-                onClick={() => parkOrder({ printKitchen: false, printKassaSlip: true })}
-                className={`min-w-0 flex-1 font-semibold flex items-center justify-center text-center px-2 py-3 text-xs leading-tight sm:text-sm ${kassaPosButtonClass(false)} ${
-                  kassaSxgaDenseTiles ? 'min-h-[2.875rem]' : 'min-h-[2.5rem]'
-                }`}
+                onClick={() => {
+                  if (draftBonLineItems.length === 0 || draftBonPrinting) return
+                  void printDraftBonFromCart({ draftCopies: 1 })
+                }}
+                disabled={draftBonLineItems.length === 0 || draftBonPrinting}
+                className={`flex items-center justify-center px-1 ${kassaPosButtonClass(false)} ${kassaFooterActionTouchMinHClass(
+                  kassaSxgaDenseTiles,
+                  kassaSidebarFooterTier === 'dense',
+                )}`}
+                title={t('kassaApp.cartBonTitle')}
+                aria-label={t('kassaApp.cartBonTitle')}
               >
-                {t('kassaApp.parkTableKassaBon')}
+                <span className={`text-center ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`}>
+                  {t('kassaApp.cartBon')}
+                </span>
+              </button>
+              <button
+                type="button"
+                aria-pressed={numpadPanelVisible}
+                data-testid="kassa-numpad-toggle"
+                title={t('kassaApp.numpadToggle')}
+                aria-label={t('kassaApp.numpadToggle')}
+                onClick={() => {
+                  playClick()
+                  setNumpadPanelVisible((v) => !v)
+                }}
+                className={`flex items-center justify-center px-1 ${kassaPosButtonClass(numpadPanelVisible)} ${kassaFooterActionTouchMinHClass(
+                  kassaSxgaDenseTiles,
+                  kassaSidebarFooterTier === 'dense',
+                )}`}
+              >
+                <span className={`text-center ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`}>
+                  {t('kassaApp.numpadToggle')}
+                </span>
               </button>
             </div>
-          )}
-          <div className="flex gap-2 touch-manipulation select-none">
-            <button
-              type="button"
-              aria-pressed={numpadPanelVisible}
-              data-testid="kassa-numpad-toggle"
-              title={t('kassaApp.numpadToggle')}
-              aria-label={t('kassaApp.numpadToggle')}
-              onClick={() => {
-                playClick()
-                setNumpadPanelVisible((v) => !v)
-              }}
-              className={`flex shrink-0 items-center justify-center p-1.5 ${kassaPosButtonClass(numpadPanelVisible)} ${
-                kassaSxgaDenseTiles
-                  ? 'h-[3.25rem] w-[3.25rem]'
-                  : 'h-[3rem] w-[3rem]'
-              }`}
-            >
-              <KassaNumpadToggleIcon className={kassaSxgaDenseTiles ? 'h-8 w-8' : 'h-7 w-7'} />
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                if (billLines.length === 0) return
-                scheduleKassaTapSound(playCheckout)
-                setShowPaymentModal(true)
-              }}
-              disabled={billLines.length === 0}
-              className={`flex min-w-0 flex-1 items-center justify-center gap-2 ${KASSA_POS_CHECKOUT_BTN} ${
-                kassaSxgaDenseTiles
-                  ? 'min-h-[4rem] py-3.5 text-xl'
-                  : 'min-h-[3.5rem] py-3 text-lg'
-              }`}
-            >
-              💳 {t('kassaApp.checkout')}
-            </button>
+            {orderType === 'DINE_IN' && tableNumber && cart.length > 0 && (
+              <div className="flex w-full gap-2.5 touch-manipulation select-none" data-testid="kassa-park-table-split">
+                <button
+                  type="button"
+                  onClick={() => parkOrder({ printKitchen: true, printKassaSlip: false })}
+                  className={`min-w-0 flex-1 font-semibold flex items-center justify-center text-center px-2 py-3 text-xs leading-tight sm:text-sm ${kassaPosButtonClass(false)} ${
+                    kassaSxgaDenseTiles ? 'min-h-[2.875rem]' : 'min-h-[2.5rem]'
+                  }`}
+                >
+                  {t('kassaApp.parkTableKitchenBon')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => parkOrder({ printKitchen: false, printKassaSlip: true })}
+                  className={`min-w-0 flex-1 font-semibold flex items-center justify-center text-center px-2 py-3 text-xs leading-tight sm:text-sm ${kassaPosButtonClass(false)} ${
+                    kassaSxgaDenseTiles ? 'min-h-[2.875rem]' : 'min-h-[2.5rem]'
+                  }`}
+                >
+                  {t('kassaApp.parkTableKassaBon')}
+                </button>
+              </div>
+            )}
+            <div className="w-full touch-manipulation select-none border-t border-white/10 pt-3">
+              <button
+                type="button"
+                data-testid="kassa-checkout"
+                onClick={() => {
+                  if (billLines.length === 0) return
+                  scheduleKassaTapSound(playCheckout)
+                  setShowPaymentModal(true)
+                }}
+                disabled={billLines.length === 0}
+                className={`flex w-full items-center justify-center ${KASSA_POS_CHECKOUT_BTN} ${
+                  kassaSxgaDenseTiles ? 'min-h-[4.25rem] py-4 text-2xl' : 'min-h-[3.85rem] py-3.5 text-xl'
+                }`}
+              >
+                {t('kassaApp.checkout')}
+              </button>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="shrink-0 border-t border-gray-200 px-3 py-2.5 space-y-2.5">
+            <div className="flex items-center justify-between border-b border-gray-100 py-1">
+              <span className={`text-sm font-bold ${ui.numpadMeta}`}>{t('kassaApp.cartTotal')}</span>
+              <span className={`font-bold ${ui.priceAccentClass} text-xl`}>€{total.toFixed(2)}</span>
+            </div>
+            <div className="grid grid-cols-3 gap-2 touch-manipulation select-none">
+              <button
+                type="button"
+                onClick={() => { void openCashDrawer() }}
+                className={`flex flex-col items-center justify-center gap-1 rounded-xl bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe] active:brightness-95 ${kassaFooterActionTouchMinHClass(
+                  kassaSxgaDenseTiles,
+                  kassaSidebarFooterTier === 'dense',
+                )}`}
+                title={t('kassaApp.drawerOpen')}
+              >
+                <span className="text-center text-xs font-bold">{t('kassaApp.drawerOpen')}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => { void printDraftBonFromCart({ draftCopies: 1 }) }}
+                disabled={draftBonLineItems.length === 0 || draftBonPrinting}
+                className={`flex flex-col items-center justify-center gap-1 rounded-xl bg-yellow-400 text-yellow-950 hover:bg-yellow-300 active:brightness-95 disabled:pointer-events-none disabled:opacity-45 ${kassaFooterActionTouchMinHClass(
+                  kassaSxgaDenseTiles,
+                  kassaSidebarFooterTier === 'dense',
+                )}`}
+              >
+                <span className="text-center text-xs font-bold">{t('kassaApp.cartBon')}</span>
+              </button>
+              <button
+                type="button"
+                onClick={clearCart}
+                disabled={billLines.length === 0}
+                className={`flex flex-col items-center justify-center gap-1 rounded-xl bg-rose-500 text-white hover:bg-rose-600 active:brightness-95 disabled:bg-rose-900/50 ${kassaFooterActionTouchMinHClass(
+                  kassaSxgaDenseTiles,
+                  kassaSidebarFooterTier === 'dense',
+                )}`}
+              >
+                <span className="text-center text-xs font-bold">{t('kassaApp.remove')}</span>
+              </button>
+            </div>
+            <div className="flex gap-2 touch-manipulation select-none">
+              <button
+                type="button"
+                aria-pressed={numpadPanelVisible}
+                data-testid="kassa-numpad-toggle"
+                onClick={() => {
+                  playClick()
+                  setNumpadPanelVisible((v) => !v)
+                }}
+                className={`flex shrink-0 items-center justify-center rounded-xl bg-black text-white p-1.5 ${
+                  kassaSxgaDenseTiles ? 'h-[3.25rem] w-[3.25rem]' : 'h-[3rem] w-[3rem]'
+                }`}
+              >
+                <KassaNumpadToggleIcon className={kassaSxgaDenseTiles ? 'h-8 w-8' : 'h-7 w-7'} />
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (billLines.length === 0) return
+                  scheduleKassaTapSound(playCheckout)
+                  setShowPaymentModal(true)
+                }}
+                disabled={billLines.length === 0}
+                className={`flex min-w-0 flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-500 font-bold text-white hover:bg-emerald-600 disabled:bg-emerald-900/45 min-h-[3.5rem] py-3 text-lg`}
+              >
+                💳 {t('kassaApp.checkout')}
+              </button>
+            </div>
+          </div>
+        )}
         </div>
       </div>
 
