@@ -4023,6 +4023,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       staffClockPinReqGen.current += 1
       setStaffClockBusy(false)
       setActiveKassaStaff({ id: s.id, name: s.name })
+      setKassaZoneTab(null)
       setStaffClockOpen(false)
       setStaffClockPinModal(null)
       setStaffClockPinInput('')
@@ -4928,10 +4929,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 title={showKassaStaffClockButton ? t('staffClock.buttonTitle') : undefined}
                 onClick={() => {
                   playClick()
-                  setKassaZoneTab('sales')
                   setShowTablePicker(false)
                   if (showKassaStaffClockButton && !activeKassaStaff) {
+                    setKassaZoneTab('sales')
                     openStaffClockModal('salesPick')
+                  } else {
+                    setKassaZoneTab(null)
                   }
                 }}
                 className={`flex min-w-0 flex-1 items-center justify-center px-2 transition-colors sm:px-3 ${kassaFloorZoneButtonTouchClass(
@@ -5222,7 +5225,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 {!kassaAppearanceDark && tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? (
                   <button
                     type="button"
-                    onClick={openStaffClockModal}
+                    onClick={() => openStaffClockModal()}
                     className={`shrink-0 active:scale-[0.98] transition-all ${ui.clockTileBg} ${ui.clockTileHover}`}
                     title={t('staffClock.buttonTitle')}
                     aria-label={t('staffClock.buttonTitle')}
@@ -5309,7 +5312,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 {!kassaAppearanceDark && tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? (
                   <button
                     type="button"
-                    onClick={openStaffClockModal}
+                    onClick={() => openStaffClockModal()}
                     className={`shrink-0 active:scale-[0.98] transition-all ${ui.clockTileBg} ${ui.clockTileHover}`}
                     title={t('staffClock.buttonTitle')}
                     aria-label={t('staffClock.buttonTitle')}
@@ -5391,7 +5394,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   {tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? (
                     <button
                       type="button"
-                      onClick={openStaffClockModal}
+                      onClick={() => openStaffClockModal()}
                       className={`shrink-0 active:scale-[0.98] transition-all ${ui.clockTileBg} ${ui.clockTileHover}`}
                       title={t('staffClock.buttonTitle')}
                       aria-label={t('staffClock.buttonTitle')}
@@ -5741,6 +5744,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           staffClockPinReqGen.current += 1
           setStaffClockBusy(false)
           setStaffClockOpen(false)
+          if (staffClockModalMode === 'salesPick') {
+            setKassaZoneTab(null)
+          }
           setStaffClockPinModal(null)
           setStaffClockPinInput('')
           setStaffClockPinError(null)
