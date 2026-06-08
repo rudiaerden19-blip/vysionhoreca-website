@@ -187,15 +187,62 @@ function DecorSVG({
   )
 }
 
-function TableSVG({ table, isSelected, onClick, effectiveStatus }: {
+type TableVisualZone = 'indoor' | 'terrace'
+
+function TerraceChairTop({ chairW, chairH }: { chairW: number; chairH: number }) {
+  const hw = chairW / 2
+  const hh = chairH / 2
+  return (
+    <>
+      <ellipse cx={1} cy={3} rx={hw} ry={hh} fill="rgba(0,0,0,0.32)" />
+      <ellipse cx={0} cy={0} rx={hw} ry={hh} fill="none" stroke="#2a3340" strokeWidth={3.5} />
+      <ellipse cx={0} cy={0} rx={hw - 3} ry={hh - 2.5} fill="#4a5568" stroke="#353f4d" strokeWidth={1} />
+      <ellipse cx={-4} cy={-3} rx={hw * 0.35} ry={hh * 0.28} fill="rgba(255,255,255,0.14)" />
+      <path
+        d={`M ${-hw * 0.55} ${-hh - 1} Q 0 ${-hh - 11} ${hw * 0.55} ${-hh - 1}`}
+        fill="none"
+        stroke="#2a3340"
+        strokeWidth={4.5}
+        strokeLinecap="round"
+      />
+      <line x1={-hw + 2} y1={hh - 1} x2={-hw - 5} y2={hh + 5} stroke="#1f2630" strokeWidth={3} strokeLinecap="round" />
+      <line x1={hw - 2} y1={hh - 1} x2={hw + 5} y2={hh + 5} stroke="#1f2630" strokeWidth={3} strokeLinecap="round" />
+    </>
+  )
+}
+
+function IndoorChairTop({ chairW, chairH }: { chairW: number; chairH: number }) {
+  return (
+    <>
+      <rect x={-chairW / 2 + 1} y={-chairH / 2 + 2} width={chairW} height={chairH + 4} rx={5} fill="rgba(0,0,0,0.35)" />
+      <rect x={-chairW / 2} y={-chairH / 2} width={chairW} height={9} rx={4} fill="#888" stroke="#555" strokeWidth={1} />
+      <rect x={-chairW / 2 + 3} y={-chairH / 2 + 2} width={chairW - 6} height={3} rx={2} fill="rgba(255,255,255,0.3)" />
+      <rect x={-chairW / 2} y={-chairH / 2 + 10} width={chairW} height={chairH - 8} rx={4} fill="#bbb" stroke="#888" strokeWidth={1} />
+      <rect x={-chairW / 2 + 4} y={-chairH / 2 + 12} width={chairW - 6} height={4} rx={2} fill="rgba(255,255,255,0.35)" />
+      <rect x={-chairW / 2 - 1} y={-chairH / 2 + chairH - 2} width={5} height={4} rx={1} fill="#777" />
+      <rect x={chairW / 2 - 4} y={-chairH / 2 + chairH - 2} width={5} height={4} rx={1} fill="#777" />
+    </>
+  )
+}
+
+function TableSVG({
+  table,
+  isSelected,
+  onClick,
+  effectiveStatus,
+  visualZone = 'indoor',
+}: {
   table: KassaTable
   isSelected: boolean
   /** Weglaten → click bubbelt naar de wrapper (nodig voor touch-selectie bij vergrendelde plattegrond). */
   onClick?: (e?: React.MouseEvent) => void
   effectiveStatus?: TableStatus
+  visualZone?: TableVisualZone
 }) {
   const seats = table.seats
   const color = STATUS_COLORS[effectiveStatus ?? table.status]
+  const isTerrace = visualZone === 'terrace'
+  const gradKey = table.id.replace(/[^a-zA-Z0-9_-]/g, '')
 
   // Table dimensions
   const tableSize = 90
@@ -302,54 +349,157 @@ function TableSVG({ table, isSelected, onClick, effectiveStatus }: {
       {...(onClick ? { onClick } : {})}
       style={{ cursor: 'pointer', overflow: 'visible', display: 'block' }}
     >
-      {/* Chairs — bovenaanzicht echte stoelen */}
+      {/* Stoelen — binnen: gestoffeerd; terras: metalen bistro */}
       {chairs.map((c, i) => (
         <g key={i} transform={`translate(${cx + c.x}, ${cy + c.y}) rotate(${c.angle})`}>
-          {/* Schaduw */}
-          <rect x={-chairW / 2 + 1} y={-chairH / 2 + 2} width={chairW} height={chairH + 4} rx={5} fill="rgba(0,0,0,0.35)" />
-          {/* Rugsteun — dik en donker bovenaan */}
-          <rect x={-chairW / 2} y={-chairH / 2} width={chairW} height={9} rx={4} fill="#888" stroke="#555" strokeWidth={1} />
-          {/* Rugleuning highlight */}
-          <rect x={-chairW / 2 + 3} y={-chairH / 2 + 2} width={chairW - 6} height={3} rx={2} fill="rgba(255,255,255,0.3)" />
-          {/* Zitting — lichter, iets breder */}
-          <rect x={-chairW / 2} y={-chairH / 2 + 10} width={chairW} height={chairH - 8} rx={4} fill="#bbb" stroke="#888" strokeWidth={1} />
-          {/* Zitting glans */}
-          <rect x={-chairW / 2 + 4} y={-chairH / 2 + 12} width={chairW - 12} height={4} rx={2} fill="rgba(255,255,255,0.35)" />
-          {/* Pootjes (kleine hoekjes) */}
-          <rect x={-chairW / 2 - 1} y={-chairH / 2 + chairH - 2} width={5} height={4} rx={1} fill="#777" />
-          <rect x={chairW / 2 - 4} y={-chairH / 2 + chairH - 2} width={5} height={4} rx={1} fill="#777" />
+          {isTerrace ? <TerraceChairTop chairW={chairW} chairH={chairH} /> : <IndoorChairTop chairW={chairW} chairH={chairH} />}
         </g>
       ))}
 
-      {/* Tafel — bruin hout; stoelen ongewijzigd */}
-      {table.shape === 'ROUND' ? (
-        <ellipse cx={cx} cy={cy} rx={tableSize / 2} ry={tableSize / 2}
-          fill="url(#table-grad-round)"
-          stroke={isSelected ? color : '#4a3220'}
-          strokeWidth={isSelected ? 4 : 2}
-          filter="url(#shadow)"
-        />
-      ) : table.shape === 'RECTANGLE' ? (
-        <rect x={cx - tw / 2} y={cy - th / 2} width={tw} height={th} rx={10}
-          fill="url(#table-grad-rect)"
-          stroke={isSelected ? color : '#4a3220'}
-          strokeWidth={isSelected ? 4 : 2}
-          filter="url(#shadow)"
-        />
+      {/* Tafelblad */}
+      {isTerrace ? (
+        <>
+          {table.shape === 'ROUND' ? (
+            <>
+              <ellipse
+                cx={cx}
+                cy={cy}
+                rx={tableSize / 2 + 3}
+                ry={tableSize / 2 + 3}
+                fill="none"
+                stroke="#2f3640"
+                strokeWidth={5}
+                filter={`url(#shadow-${gradKey})`}
+              />
+              <ellipse
+                cx={cx}
+                cy={cy}
+                rx={tableSize / 2}
+                ry={tableSize / 2}
+                fill={`url(#terrace-round-${gradKey})`}
+                stroke={isSelected ? color : '#5c4a32'}
+                strokeWidth={isSelected ? 4 : 2.5}
+              />
+              {[-24, -12, 0, 12, 24].map((off) => (
+                <line
+                  key={off}
+                  x1={cx + off}
+                  y1={cy - tableSize / 2 + 6}
+                  x2={cx + off}
+                  y2={cy + tableSize / 2 - 6}
+                  stroke="rgba(30,22,14,0.22)"
+                  strokeWidth={2}
+                />
+              ))}
+              <circle cx={cx} cy={cy} r={5} fill="#1e242c" stroke="#3d4654" strokeWidth={1.5} />
+            </>
+          ) : (
+            <rect
+              x={cx - (table.shape === 'RECTANGLE' ? tw : tableSize) / 2}
+              y={cy - (table.shape === 'RECTANGLE' ? th : tableSize) / 2}
+              width={table.shape === 'RECTANGLE' ? tw : tableSize}
+              height={table.shape === 'RECTANGLE' ? th : tableSize}
+              rx={table.shape === 'RECTANGLE' ? 8 : 10}
+              fill={`url(#terrace-rect-${gradKey})`}
+              stroke={isSelected ? color : '#5c4a32'}
+              strokeWidth={isSelected ? 4 : 2.5}
+              filter={`url(#shadow-${gradKey})`}
+            />
+          )}
+          {table.shape !== 'ROUND' && (
+            <>
+              {Array.from({ length: 6 }).map((_, i) => {
+                const top = cy - (table.shape === 'RECTANGLE' ? th : tableSize) / 2 + 8
+                const w = table.shape === 'RECTANGLE' ? tw : tableSize
+                const step = w / 7
+                return (
+                  <line
+                    key={i}
+                    x1={cx - w / 2 + step * (i + 0.5)}
+                    y1={top}
+                    x2={cx - w / 2 + step * (i + 0.5)}
+                    y2={top + (table.shape === 'RECTANGLE' ? th : tableSize) - 16}
+                    stroke="rgba(30,22,14,0.2)"
+                    strokeWidth={2}
+                  />
+                )
+              })}
+            </>
+          )}
+          {table.shape !== 'ROUND' &&
+            [
+              [-1, -1],
+              [1, -1],
+              [-1, 1],
+              [1, 1],
+            ].map(([sx, sy], i) => {
+              const hw = (table.shape === 'RECTANGLE' ? tw : tableSize) / 2 - 10
+              const hh = (table.shape === 'RECTANGLE' ? th : tableSize) / 2 - 10
+              return (
+                <circle
+                  key={i}
+                  cx={cx + sx * hw}
+                  cy={cy + sy * hh}
+                  r={5}
+                  fill="#2f3640"
+                  stroke="#1a1f27"
+                  strokeWidth={1}
+                />
+              )
+            })}
+        </>
       ) : (
-        <rect x={cx - tableSize / 2} y={cy - tableSize / 2} width={tableSize} height={tableSize} rx={10}
-          fill="url(#table-grad-rect)"
-          stroke={isSelected ? color : '#4a3220'}
-          strokeWidth={isSelected ? 4 : 2}
-          filter="url(#shadow)"
-        />
+        <>
+          {table.shape === 'ROUND' ? (
+            <ellipse
+              cx={cx}
+              cy={cy}
+              rx={tableSize / 2}
+              ry={tableSize / 2}
+              fill={`url(#table-grad-round-${gradKey})`}
+              stroke={isSelected ? color : '#4a3220'}
+              strokeWidth={isSelected ? 4 : 2}
+              filter={`url(#shadow-${gradKey})`}
+            />
+          ) : table.shape === 'RECTANGLE' ? (
+            <rect
+              x={cx - tw / 2}
+              y={cy - th / 2}
+              width={tw}
+              height={th}
+              rx={10}
+              fill={`url(#table-grad-rect-${gradKey})`}
+              stroke={isSelected ? color : '#4a3220'}
+              strokeWidth={isSelected ? 4 : 2}
+              filter={`url(#shadow-${gradKey})`}
+            />
+          ) : (
+            <rect
+              x={cx - tableSize / 2}
+              y={cy - tableSize / 2}
+              width={tableSize}
+              height={tableSize}
+              rx={10}
+              fill={`url(#table-grad-rect-${gradKey})`}
+              stroke={isSelected ? color : '#4a3220'}
+              strokeWidth={isSelected ? 4 : 2}
+              filter={`url(#shadow-${gradKey})`}
+            />
+          )}
+          {table.shape === 'ROUND' ? (
+            <ellipse cx={cx - 12} cy={cy - 14} rx={16} ry={10} fill="rgba(255,255,255,0.08)" />
+          ) : (
+            <rect
+              x={cx - tw / 2 + 8}
+              y={cy - th / 2 + 6}
+              width={tw * 0.35}
+              height={th * 0.25}
+              rx={4}
+              fill="rgba(255,255,255,0.07)"
+            />
+          )}
+        </>
       )}
-
-      {/* Glans op tafel */}
-      {table.shape === 'ROUND'
-        ? <ellipse cx={cx - 12} cy={cy - 14} rx={16} ry={10} fill="rgba(255,255,255,0.08)" />
-        : <rect x={cx - (tw / 2) + 8} y={cy - (th / 2) + 6} width={tw * 0.35} height={th * 0.25} rx={4} fill="rgba(255,255,255,0.07)" />
-      }
 
       {/* Tafelnummer */}
       <text x={cx} y={cy - 6} textAnchor="middle" fill="white" fontSize={20} fontWeight="bold" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))' }}>
@@ -362,20 +512,29 @@ function TableSVG({ table, isSelected, onClick, effectiveStatus }: {
       {/* Status dot */}
       <circle cx={cx + (table.shape === 'RECTANGLE' ? tw / 2 : tableSize / 2) - 4} cy={cy - (table.shape === 'RECTANGLE' ? th / 2 : tableSize / 2) + 4} r={8} fill={color} stroke="white" strokeWidth={2} />
 
-      {/* Defs */}
       <defs>
-        <linearGradient id="table-grad-round" x1="0%" y1="0%" x2="100%" y2="100%">
+        <linearGradient id={`table-grad-round-${gradKey}`} x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#a67c52" />
           <stop offset="42%" stopColor="#7a5230" />
           <stop offset="100%" stopColor="#4a3220" />
         </linearGradient>
-        <linearGradient id="table-grad-rect" x1="0%" y1="0%" x2="100%" y2="100%">
+        <linearGradient id={`table-grad-rect-${gradKey}`} x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#a67c52" />
           <stop offset="42%" stopColor="#7a5230" />
           <stop offset="100%" stopColor="#4a3220" />
         </linearGradient>
-        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.5" />
+        <linearGradient id={`terrace-round-${gradKey}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#c9a66b" />
+          <stop offset="45%" stopColor="#9a7a4e" />
+          <stop offset="100%" stopColor="#6b5435" />
+        </linearGradient>
+        <linearGradient id={`terrace-rect-${gradKey}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#c4a064" />
+          <stop offset="50%" stopColor="#957648" />
+          <stop offset="100%" stopColor="#6a5234" />
+        </linearGradient>
+        <filter id={`shadow-${gradKey}`} x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy={isTerrace ? 5 : 4} stdDeviation={isTerrace ? 7 : 6} floodOpacity="0.5" />
         </filter>
       </defs>
     </svg>
@@ -1296,6 +1455,7 @@ export default function KassaFloorPlan({
                 table={t}
                 isSelected={selected?.id === t.id}
                 effectiveStatus={getTableEffectiveStatus(t.number, t.status)}
+                visualZone={planZone === FLOOR_PLAN_ZONE_TERRACE ? 'terrace' : 'indoor'}
               />
             </div>
             )
