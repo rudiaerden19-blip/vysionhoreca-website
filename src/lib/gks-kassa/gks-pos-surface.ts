@@ -115,11 +115,11 @@ export const GKS_POS_BTN_SELECTED = [
   GKS_POS_SELECTED_ACCENT_TEXT,
 ].join(' ')
 
-/** Afrekenen — zelfde basis als geselecteerd + lichte extra halo (iets minder dan vóór). */
+/** Afrekenen — zelfde zwarte lift; blauwe gloed iets zachter dan geselecteerde knoppen. */
 export const GKS_CHECKOUT_LIFT_SHADOW =
-  'shadow-[0_4px_9px_rgba(0,0,0,0.64),0_11px_26px_rgba(0,0,0,0.51),0_15px_37px_rgba(0,0,0,0.40),-7px_0_16px_rgba(0,0,0,0.40),7px_0_16px_rgba(0,0,0,0.40),0_7px_28px_rgba(26,127,216,0.50),0_0_26px_rgba(110,181,255,0.38),0_0_14px_rgba(110,181,255,0.44),0_8px_30px_rgba(26,127,216,0.34),0_0_22px_rgba(110,181,255,0.22)]'
+  'shadow-[0_4px_9px_rgba(0,0,0,0.64),0_11px_26px_rgba(0,0,0,0.51),0_15px_37px_rgba(0,0,0,0.40),-7px_0_16px_rgba(0,0,0,0.40),7px_0_16px_rgba(0,0,0,0.40),0_6px_22px_rgba(26,127,216,0.36),0_0_18px_rgba(110,181,255,0.24),0_0_10px_rgba(110,181,255,0.28)]'
 
-/** Footer Afrekenen — signature-stap; checkout-gloed net onder geselecteerde knoppen. */
+/** Footer Afrekenen — signature-stap; minder blauwe halo dan Ter plaatse/Menu. */
 export const GKS_CHECKOUT_BTN = [
   GKS_BTN_SHAPE,
   GKS_BTN_FACE,
