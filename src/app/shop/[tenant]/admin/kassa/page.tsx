@@ -84,7 +84,6 @@ import {
   KASSA_SIDEBAR_CLOCK_DATE_LABEL,
   KASSA_SIDEBAR_FOOTER_BTN_LABEL,
   KASSA_SIDEBAR_FOOTER_LEFT_COL,
-  kassaClockBarClass,
   KASSA_NUMPAD_CART_RECESS_MOTION,
   KASSA_NUMPAD_PANEL_SLIDE_MOTION,
   KASSA_POS_CART_THUMB_SHELL,
@@ -1359,6 +1358,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [pendingReservCount, setPendingReservCount] = useState(0)
   const [showFloorPlan, setShowFloorPlan] = useState(false)
   const [showTablePicker, setShowTablePicker] = useState(false)
+  /** Verkoop / Binnen / Terras — los van besteltype (Ter plaatse); accent alleen na tik. */
+  const [kassaZoneTab, setKassaZoneTab] = useState<'sales' | 'inside' | 'terrace' | null>(null)
   const [pickerBrowseZone, setPickerBrowseZone] = useState<FloorPlanZone>(FLOOR_PLAN_ZONE_INSIDE)
   const [dineInFloorZone, setDineInFloorZone] = useState<FloorPlanZone>(FLOOR_PLAN_ZONE_INSIDE)
   const [kassaTablesByZone, setKassaTablesByZone] = useState<Record<FloorPlanZone, FloorPlanTable[]>>({
@@ -2066,6 +2067,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setDineInFloorZone(zone)
     setOrderType('DINE_IN')
     setShowTablePicker(false)
+    setKassaZoneTab(null)
     setSwitchConfirm(null)
     if (openPaymentAfterFloorPlanSwitchRef.current) {
       openPaymentAfterFloorPlanSwitchRef.current = false
@@ -4913,31 +4915,82 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           }`}
         >
 
-        {/* Zone: Binnen / Terras — altijd zichtbaar (ook bij afhalen/leveren). */}
+        {/* Zone: Verkoop / Binnen / Terras — drie gelijke kolommen; klok+datum op Verkoop (donker). */}
         <div
           className={`shrink-0 ${kassaAppearanceDark ? 'px-2.5 pt-3 pb-3 sm:px-3' : 'px-2 pt-1.5'}`}
         >
-            <div className={`flex ${kassaSidebarRowGapClass}`}>
-              <button
-                type="button"
-                onClick={() => {
-                  playClick()
-                  if (showTablePicker && pickerBrowseZone === FLOOR_PLAN_ZONE_INSIDE) {
-                    setShowTablePicker(false)
-                    return
-                  }
-                  setPickerBrowseZone(FLOOR_PLAN_ZONE_INSIDE)
-                  setShowTablePicker(true)
-                }}
-                className={`flex flex-1 flex-col items-center justify-center px-3 transition-colors ${kassaFloorZoneButtonTouchClass(
+            <div className={`flex min-w-0 ${kassaSidebarRowGapClass}`}>
+              <div
+                className={`relative flex min-w-0 flex-1 flex-col ${kassaFloorZoneButtonTouchClass(
                   kassaSxgaDenseTiles,
                 )} ${
                   kassaAppearanceDark
-                    ? `font-semibold ${kassaPosButtonClass(
-                        pickerBrowseZone === FLOOR_PLAN_ZONE_INSIDE && showTablePicker,
-                      )}`
+                    ? kassaPosButtonClass(kassaZoneTab === 'sales')
                     : `rounded-xl font-bold ${
-                        pickerBrowseZone === FLOOR_PLAN_ZONE_INSIDE && showTablePicker
+                        kassaZoneTab === 'sales'
+                          ? `bg-[#3C4D6B] text-white ring-2 ring-[#58CCFF]/55 ring-offset-2 ${ui.ringOffset}`
+                          : 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
+                      }`
+                }`}
+              >
+                {kassaAppearanceDark && showKassaStaffClockButton ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      playClick()
+                      openStaffClockModal()
+                    }}
+                    className={`absolute left-0.5 top-0.5 z-10 shrink-0 active:scale-[0.98] transition-all ${ui.clockTileBg} ${ui.clockTileHover}`}
+                    title={t('staffClock.buttonTitle')}
+                    aria-label={t('staffClock.buttonTitle')}
+                  >
+                    <KassaAnalogClock size={kassaSxgaDenseTiles ? 30 : 34} />
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  aria-pressed={kassaZoneTab === 'sales'}
+                  onClick={() => {
+                    playClick()
+                    setKassaZoneTab('sales')
+                    setShowTablePicker(false)
+                  }}
+                  className={`flex min-h-0 w-full flex-1 flex-col items-center justify-center gap-0.5 px-1 py-1.5 text-center ${
+                    kassaAppearanceDark ? 'font-semibold' : ''
+                  } ${kassaAppearanceDark && showKassaStaffClockButton ? 'pl-7' : ''}`}
+                >
+                  <span className={kassaSidebarZoneLabelClass}>{t('kassaApp.floorZoneSales')}</span>
+                  {kassaAppearanceDark ? (
+                    <span
+                      className={`max-w-full truncate text-white/85 ${KASSA_SIDEBAR_CLOCK_DATE_LABEL} text-[10px] sm:text-[11px]`}
+                      title={numpadHeaderDateLabel}
+                    >
+                      {numpadHeaderDateLabel}
+                    </span>
+                  ) : null}
+                </button>
+              </div>
+              <button
+                type="button"
+                aria-pressed={kassaZoneTab === 'inside'}
+                onClick={() => {
+                  playClick()
+                  if (kassaZoneTab === 'inside' && showTablePicker) {
+                    setShowTablePicker(false)
+                    setKassaZoneTab(null)
+                    return
+                  }
+                  setPickerBrowseZone(FLOOR_PLAN_ZONE_INSIDE)
+                  setKassaZoneTab('inside')
+                  setShowTablePicker(true)
+                }}
+                className={`flex min-w-0 flex-1 flex-col items-center justify-center px-2 transition-colors sm:px-3 ${kassaFloorZoneButtonTouchClass(
+                  kassaSxgaDenseTiles,
+                )} ${
+                  kassaAppearanceDark
+                    ? `font-semibold ${kassaPosButtonClass(kassaZoneTab === 'inside')}`
+                    : `rounded-xl font-bold ${
+                        kassaZoneTab === 'inside'
                           ? `bg-[#3C4D6B] text-white ring-2 ring-[#58CCFF]/55 ring-offset-2 ${ui.ringOffset}`
                           : 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
                       }`
@@ -4954,24 +5007,25 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               </button>
               <button
                 type="button"
+                aria-pressed={kassaZoneTab === 'terrace'}
                 onClick={() => {
                   playClick()
-                  if (showTablePicker && pickerBrowseZone === FLOOR_PLAN_ZONE_TERRACE) {
+                  if (kassaZoneTab === 'terrace' && showTablePicker) {
                     setShowTablePicker(false)
+                    setKassaZoneTab(null)
                     return
                   }
                   setPickerBrowseZone(FLOOR_PLAN_ZONE_TERRACE)
+                  setKassaZoneTab('terrace')
                   setShowTablePicker(true)
                 }}
-                className={`flex flex-1 flex-col items-center justify-center px-3 transition-colors ${kassaFloorZoneButtonTouchClass(
+                className={`flex min-w-0 flex-1 flex-col items-center justify-center px-2 transition-colors sm:px-3 ${kassaFloorZoneButtonTouchClass(
                   kassaSxgaDenseTiles,
                 )} ${
                   kassaAppearanceDark
-                    ? `font-semibold ${kassaPosButtonClass(
-                        pickerBrowseZone === FLOOR_PLAN_ZONE_TERRACE && showTablePicker,
-                      )}`
+                    ? `font-semibold ${kassaPosButtonClass(kassaZoneTab === 'terrace')}`
                     : `rounded-xl font-bold ${
-                        pickerBrowseZone === FLOOR_PLAN_ZONE_TERRACE && showTablePicker
+                        kassaZoneTab === 'terrace'
                           ? `bg-emerald-600 text-white ring-2 ring-emerald-300/80 ring-offset-2 ${ui.ringOffset}`
                           : 'bg-emerald-600 text-white hover:bg-emerald-700'
                       }`
@@ -5080,34 +5134,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </button>
           ) : null}
         </div>
-
-        {kassaAppearanceDark ? (
-          <div
-            className={`mx-3 mb-3 mt-3 flex shrink-0 items-center gap-3 px-3 ${kassaClockBarClass()} ${kassaOrderTypeButtonTouchClass(
-              kassaSxgaDenseTiles,
-            )}`}
-            data-testid="kassa-sidebar-clock-bar"
-          >
-            {showKassaStaffClockButton ? (
-              <button
-                type="button"
-                onClick={openStaffClockModal}
-                className={`shrink-0 active:scale-[0.98] transition-all ${ui.clockTileBg} ${ui.clockTileHover}`}
-                title={t('staffClock.buttonTitle')}
-                aria-label={t('staffClock.buttonTitle')}
-              >
-                <KassaAnalogClock size={parkedOnlySidebarView ? 72 : 48} />
-              </button>
-            ) : null}
-            <p
-              className={`min-w-0 truncate whitespace-nowrap text-right text-white ${KASSA_SIDEBAR_CLOCK_DATE_LABEL} ${showKassaStaffClockButton ? 'flex-1' : 'w-full'}`}
-              title={numpadHeaderDateLabel}
-              aria-live="polite"
-            >
-              {numpadHeaderDateLabel}
-            </p>
-          </div>
-        ) : null}
 
         {/* Cart / numpad (toggle via footer) */}
         <div
@@ -5861,7 +5887,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             type="button"
             className="absolute inset-0 bg-black/60 touch-manipulation"
             aria-label={t('kassaApp.closeAria')}
-            onClick={() => setShowTablePicker(false)}
+            onClick={() => {
+              setShowTablePicker(false)
+              setKassaZoneTab(null)
+            }}
           />
           <div
             className={`relative z-10 flex w-full max-w-3xl max-h-[min(88vh,780px)] min-h-0 flex-col overflow-hidden rounded-2xl border shadow-2xl ${ui.tablePickerBorder} ${
@@ -5887,6 +5916,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 onClick={() => {
                   playClick()
                   setShowTablePicker(false)
+                  setKassaZoneTab(null)
                 }}
                 className={`shrink-0 rounded-xl px-3 py-2 text-lg font-bold leading-none transition-colors ${ui.categoryStripHover} ${ui.flyMenuText}`}
                 aria-label={t('kassaApp.closeAria')}
@@ -5986,6 +6016,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     setTableNumber('')
                     setDineInFloorZone(pickerBrowseZone)
                     setShowTablePicker(false)
+                    setKassaZoneTab(null)
                   }}
                   className="flex-1 rounded-xl bg-red-50 py-3 text-sm font-semibold text-red-600 transition-colors hover:bg-red-100"
                 >
