@@ -64,7 +64,7 @@ export const KASSA_POS_NUMPAD_KEY = [
   KASSA_POS_BTN_PRESS,
   KASSA_BTN_PRESS_FACE,
   'text-[#f0f0f0]',
-  'font-bold text-2xl',
+  'font-bold text-xl',
   'touch-manipulation select-none',
   'min-h-[2.75rem]',
 ].join(' ')
@@ -150,6 +150,14 @@ export function kassaClockBarClass(): string {
   return `${kassaPosButtonClass(false)} relative z-0`
 }
 
-/** Zijbalk-footer — zelfde labels, GKS-typografie. */
+/** Zijbalk-footer — Lade/Bon/Verwijder, besteltype, Num pad (niet Afrekenen). */
 export const KASSA_SIDEBAR_FOOTER_BTN_LABEL =
-  'text-base font-medium leading-tight tracking-[0.03em] sm:text-[17px]'
+  'text-sm font-medium leading-tight tracking-[0.03em] sm:text-[15px]'
+
+/** Binnen / Terras zoneknoppen. */
+export const KASSA_POS_ZONE_BTN_LABEL =
+  'text-sm font-medium tracking-[0.03em] sm:text-[15px]'
+
+/** Klok+databalk in zijbalk — bewust iets groter dan overige knoppen. */
+export const KASSA_SIDEBAR_CLOCK_DATE_LABEL =
+  'text-xs font-semibold leading-tight tracking-tight sm:text-sm'

@@ -79,6 +79,8 @@ import {
   KASSA_POS_MENU_RECESS_TRAY_CLASS,
   KASSA_POS_RULE_BLACK,
   KASSA_POS_SELECTED_ACCENT_TEXT,
+  KASSA_POS_ZONE_BTN_LABEL,
+  KASSA_SIDEBAR_CLOCK_DATE_LABEL,
   KASSA_SIDEBAR_FOOTER_BTN_LABEL,
   kassaClockBarClass,
   KASSA_NUMPAD_CART_RECESS_MOTION,
@@ -334,11 +336,11 @@ const KASSA_HEADER_HIDE_CUSTOMER_DISPLAY_AND_SOUND = true
 
 const KASSA_HEADER_QUICK_LINK_BTN =
   'inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-xl bg-[#3C4D6B] font-bold text-white transition-colors hover:bg-[#2D3A52] min-h-[2.35rem] px-3 py-2 sm:min-h-[2.6rem] sm:px-3.5 sm:py-2.5'
-const KASSA_HEADER_QUICK_LINK_LABEL = 'text-xs leading-snug sm:text-sm'
+const KASSA_HEADER_QUICK_LINK_LABEL = 'text-[11px] leading-snug sm:text-xs'
 
 /** Alleen Binnen/Terras — groter dan besteltype-knoppen eronder. */
 function kassaFloorZoneButtonTouchClass(sxga: boolean): string {
-  return sxga ? 'min-h-[3.25rem] py-2.5 text-lg' : 'min-h-[2.75rem] py-2 text-base'
+  return sxga ? 'min-h-[3.25rem] py-2.5' : 'min-h-[2.75rem] py-2'
 }
 
 function kassaOrderTypeButtonTouchClass(sxga: boolean): string {
@@ -4155,7 +4157,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             aria-expanded={hamburgerOpen}
           >
             <svg className="h-5 w-5 shrink-0 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
-            <span className="font-bold text-xs leading-tight sm:text-sm">{t('kassaApp.hamburgerMenu')}</span>
+            <span className="font-bold text-[11px] leading-tight sm:text-xs">{t('kassaApp.hamburgerMenu')}</span>
           </button>
           {hamburgerOpen && (() => {
             const modules = filteredHamburgerModules
@@ -4625,7 +4627,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       }`
                 }`}
               >
-                <span className={kassaAppearanceDark ? 'font-medium tracking-[0.03em]' : 'font-bold'}>
+                <span className={kassaAppearanceDark ? KASSA_POS_ZONE_BTN_LABEL : 'font-bold'}>
                   {t('kassaApp.floorZoneInside')}
                 </span>
                 {orderType === 'DINE_IN' && tableNumber && dineInFloorZone === FLOOR_PLAN_ZONE_INSIDE ? (
@@ -4661,7 +4663,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       }`
                 }`}
               >
-                <span className={kassaAppearanceDark ? 'font-medium tracking-[0.03em]' : 'font-bold'}>
+                <span className={kassaAppearanceDark ? KASSA_POS_ZONE_BTN_LABEL : 'font-bold'}>
                   {t('kassaApp.floorZoneTerrace')}
                 </span>
                 {orderType === 'DINE_IN' && tableNumber && dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE ? (
@@ -4804,7 +4806,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               </button>
             ) : null}
             <p
-              className={`min-w-0 truncate whitespace-nowrap text-right text-xs font-semibold leading-tight tracking-tight text-white sm:text-sm ${showKassaStaffClockButton ? 'flex-1' : 'w-full'}`}
+              className={`min-w-0 truncate whitespace-nowrap text-right text-white ${KASSA_SIDEBAR_CLOCK_DATE_LABEL} ${showKassaStaffClockButton ? 'flex-1' : 'w-full'}`}
               title={numpadHeaderDateLabel}
               aria-live="polite"
             >
@@ -4987,7 +4989,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   onClick={addCustomAmount}
                   className={
                     kassaAppearanceDark
-                      ? `mt-3 shrink-0 touch-manipulation py-4 font-bold text-lg ${kassaPosButtonClass(true)}`
+                      ? `mt-3 shrink-0 touch-manipulation py-4 font-bold text-base ${kassaPosButtonClass(true)}`
                       : 'mt-3 shrink-0 touch-manipulation py-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-lg active:brightness-95'
                   }
                 >
@@ -5220,7 +5222,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 <button
                   type="button"
                   onClick={() => parkOrder({ printKitchen: true, printKassaSlip: false })}
-                  className={`min-w-0 flex-1 font-semibold flex items-center justify-center text-center px-2 py-3 text-xs leading-tight sm:text-sm ${kassaPosButtonClass(false)} ${
+                  className={`min-w-0 flex-1 font-semibold flex items-center justify-center text-center px-2 py-3 text-[11px] leading-tight sm:text-xs ${kassaPosButtonClass(false)} ${
                     kassaSxgaDenseTiles ? 'min-h-[2.875rem]' : 'min-h-[2.5rem]'
                   }`}
                 >
@@ -5229,7 +5231,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 <button
                   type="button"
                   onClick={() => parkOrder({ printKitchen: false, printKassaSlip: true })}
-                  className={`min-w-0 flex-1 font-semibold flex items-center justify-center text-center px-2 py-3 text-xs leading-tight sm:text-sm ${kassaPosButtonClass(false)} ${
+                  className={`min-w-0 flex-1 font-semibold flex items-center justify-center text-center px-2 py-3 text-[11px] leading-tight sm:text-xs ${kassaPosButtonClass(false)} ${
                     kassaSxgaDenseTiles ? 'min-h-[2.875rem]' : 'min-h-[2.5rem]'
                   }`}
                 >
