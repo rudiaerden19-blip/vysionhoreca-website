@@ -1,0 +1,88 @@
+/**
+ * Gedeelde POS-knoppenstijl (gunmetal gradient) — productie-kassa + GKS-preview.
+ * Geen fiscale of order-logica.
+ */
+
+export const KASSA_POS_MENU_PLATE_SHELL_BG_CLASS = 'gks-menu-plate-grain'
+
+export const KASSA_POS_BTN_SHAPE = 'rounded-xl'
+
+export const KASSA_POS_SELECTED_ACCENT_TEXT = 'text-[#5a9fd4]'
+
+export const KASSA_POS_SELECTED_TOP_RIM = 'border-t-[#7a9ab8]/28'
+
+const KASSA_BTN_FACE =
+  'bg-[linear-gradient(180deg,#161616_0%,#323232_46%,#1c1c1c_100%)]'
+
+export const KASSA_POS_SUBTLE_LIFT_SHADOW =
+  'shadow-[0_4px_9px_rgba(0,0,0,0.61),0_11px_24px_rgba(0,0,0,0.46),-6px_0_14px_rgba(0,0,0,0.38),6px_0_14px_rgba(0,0,0,0.38)]'
+
+export const KASSA_POS_SELECTED_LIFT_SHADOW =
+  'shadow-[0_4px_9px_rgba(0,0,0,0.64),0_11px_26px_rgba(0,0,0,0.51),0_15px_37px_rgba(0,0,0,0.40),-7px_0_16px_rgba(0,0,0,0.40),7px_0_16px_rgba(0,0,0,0.40),0_7px_28px_rgba(26,127,216,0.50),0_0_26px_rgba(110,181,255,0.38),0_0_14px_rgba(110,181,255,0.44)]'
+
+const KASSA_BTN_EDGE = `border border-[#2a2a2a] ${KASSA_POS_SUBTLE_LIFT_SHADOW}`
+
+export const KASSA_POS_BTN_PRESS = [
+  'transition-[transform,box-shadow,filter,background] duration-100 ease-out',
+  'active:translate-y-[2px]',
+  'active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.62),inset_0_1px_2px_rgba(0,0,0,0.38)]',
+  'active:brightness-[0.9]',
+  'active:border-[#1a1a1a]',
+].join(' ')
+
+const KASSA_BTN_PRESS_FACE =
+  'active:bg-[linear-gradient(180deg,#0e0e0e_0%,#242424_52%,#101010_100%)]'
+
+export const KASSA_POS_BTN_DISABLED_SAME_LOOK =
+  'disabled:opacity-100 disabled:cursor-not-allowed disabled:pointer-events-none'
+
+export const KASSA_POS_BTN_ARIA_DISABLED = 'aria-disabled:cursor-not-allowed'
+
+export const KASSA_POS_BTN = [
+  KASSA_BTN_FACE,
+  KASSA_BTN_EDGE,
+  KASSA_POS_BTN_PRESS,
+  KASSA_BTN_PRESS_FACE,
+  KASSA_POS_BTN_DISABLED_SAME_LOOK,
+  'text-[#f0f0f0] disabled:text-[#f0f0f0]',
+].join(' ')
+
+export const KASSA_POS_BTN_SELECTED = [
+  KASSA_BTN_FACE,
+  'border border-[#2a2a2a]',
+  KASSA_POS_SELECTED_TOP_RIM,
+  KASSA_POS_SELECTED_LIFT_SHADOW,
+  KASSA_POS_BTN_PRESS,
+  KASSA_BTN_PRESS_FACE,
+  KASSA_POS_SELECTED_ACCENT_TEXT,
+].join(' ')
+
+export const KASSA_POS_CHECKOUT_LIFT_SHADOW =
+  'shadow-[0_4px_9px_rgba(0,0,0,0.64),0_11px_26px_rgba(0,0,0,0.51),0_15px_37px_rgba(0,0,0,0.40),-7px_0_16px_rgba(0,0,0,0.40),7px_0_16px_rgba(0,0,0,0.40),0_6px_22px_rgba(26,127,216,0.36),0_0_18px_rgba(110,181,255,0.24),0_0_10px_rgba(110,181,255,0.28)]'
+
+export const KASSA_POS_CHECKOUT_BTN = [
+  KASSA_POS_BTN_SHAPE,
+  KASSA_BTN_FACE,
+  'border border-[#2a2a2a]',
+  KASSA_POS_SELECTED_TOP_RIM,
+  KASSA_POS_CHECKOUT_LIFT_SHADOW,
+  KASSA_POS_BTN_PRESS,
+  KASSA_BTN_PRESS_FACE,
+  KASSA_POS_SELECTED_ACCENT_TEXT,
+  KASSA_POS_BTN_ARIA_DISABLED,
+  'aria-disabled:text-[#5a9fd4]',
+  'touch-manipulation',
+  'font-bold',
+].join(' ')
+
+export function kassaPosButtonClass(selected: boolean): string {
+  return `${KASSA_POS_BTN_SHAPE} ${selected ? KASSA_POS_BTN_SELECTED : KASSA_POS_BTN}`
+}
+
+export function kassaPosRaisedStripClass(): string {
+  return kassaPosButtonClass(false)
+}
+
+/** Zijbalk-footer — zelfde labels, GKS-typografie. */
+export const KASSA_SIDEBAR_FOOTER_BTN_LABEL =
+  'text-base font-medium leading-tight tracking-[0.03em] sm:text-[17px]'
