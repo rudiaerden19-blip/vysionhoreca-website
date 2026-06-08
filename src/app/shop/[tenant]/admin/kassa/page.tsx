@@ -309,7 +309,10 @@ function shouldApplyKassaCompactSquareMonitorTileCap(): boolean {
 const KASSA_SIDEBAR_WIDTH_BASE_PX = 320
 const KASSA_SIDEBAR_WIDTH_SM_PX = 384
 const KASSA_SIDEBAR_WIDTH_LG_PX = 380
-/** 17″ kiosk: iets smaller dan 380px maar breed genoeg voor zone/order/footer-knoppen. */
+/**
+ * 17″ kiosk (SXGA): zijbalkbreedte — sync met `w-[332px]` en `.cursor/rules/kassa-17inch-sxga.mdc`.
+ * Niet verkleinen zonder footer/header opnieuw te meten op 1280×1024.
+ */
 const KASSA_SIDEBAR_WIDTH_SXGA_COMPACT_PX = 332
 
 /**

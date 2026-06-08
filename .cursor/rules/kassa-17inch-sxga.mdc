@@ -1,0 +1,38 @@
+---
+description: Vaste 17″ kiosk/SXGA-layout productie-kassa — niet versoberen zonder expliciete opdracht
+globs:
+  - src/app/shop/**/admin/kassa/**
+  - src/lib/kassa-pos-surface.ts
+  - src/lib/kassa-pos-register-ui-theme.ts
+alwaysApply: false
+---
+
+# 17″ kiosk / SXGA (~1280×1024) — productie-kassa
+
+**Doel:** op klassieke **17″ kassa-touchscreens** (Elo, 1280×1024-klasse, 4∶3) blijven **alle zijbalk- en header-knoppen volledig zichtbaar en tikbaar**. Dit is bewust getuned; **niet** terug naar “te smalle” sidebar of grote header-marges.
+
+## Detectie (ongewijzigd laten tenzij bug)
+
+- `shouldApplyKassaCompactSquareMonitorTileCap()` → `kassaSxgaDenseTiles`
+- Geen tenant-specifieke uitzonderingen; geldt voor **alle** tenants op hetzelfde viewport-profiel.
+
+## Vaste waarden — niet verkleinen zonder reden
+
+| Onderdeel | Richtlijn |
+|-----------|-----------|
+| Zijbalk breedte SXGA | `KASSA_SIDEBAR_WIDTH_SXGA_COMPACT_PX` = **332**; UI `w-[332px]` (sync met constante + `estimateKassaMenuGridInnerWidthPx`) |
+| Zijbalk overflow | **Geen** `overflow-hidden` die POS-schaduwen horizontaal afknipt; SXGA: `overflow-y-hidden` + `overflow-x-visible` |
+| Header 17″ | **Geen** `ml-[4cm]` / `ml-[1cm]` op SXGA — gebruik `ml-1.5` / `ml-2` + compacte tenantnaam |
+| Rij-gaps zijbalk (donker + SXGA) | `gap-2` (zone, besteltype, footer grids) — **niet** `gap-4` op 17″ |
+| Labels zijbalk (donker + SXGA) | Compact: `text-[11px]` (`kassaSidebarActionLabelClass` / zone variant) — **niet** footer `15px` op smalle rijen |
+| Menu-raster SXGA | Max **5** kolommen (`xl:grid-cols-5`), vierkante fotobak, `items-start` |
+
+## Bij elke kassa-UI-wijziging die header/zijbalk/footer raakt
+
+1. Controleren of SXGA-pad (`kassaSxgaDenseTiles`) nog dezelfde classes gebruikt.
+2. Niet de sidebar terug naar **300px** of smaller “voor meer tegels” zonder footer/header te hermeten.
+3. Productie-pad alleen: `src/app/shop/[tenant]/admin/kassa/**` — **niet** `gks-kassa` / `gks-kassa/**`.
+
+## Test (handmatig)
+
+Viewport ~**1280×1024** (of kiosk): Binnen/Terras, Ter plaatse/Afhalen/Levering, Snel menu, Lade/Bon/Verwijder, Num pad, Afrekenen, NL/Uitloggen — **geen** afgeknipte randen.
