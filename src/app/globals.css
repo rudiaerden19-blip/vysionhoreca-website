@@ -472,6 +472,27 @@ html[data-vysion-web-kb-open] {
   box-shadow: inset 0 0 72px rgba(0, 0, 0, 0.28), inset 0 0 24px rgba(0, 0, 0, 0.12);
 }
 
+/* GKS menu: tegelvlak iets ingesprongen t.o.v. shell (rand + inset-schaduw). */
+.gks-menu-recess-tray {
+  position: relative;
+  isolation: isolate;
+  background-color: #2a2a2e;
+  border: 1px solid #121212;
+  box-shadow:
+    inset 0 3px 12px rgba(0, 0, 0, 0.62),
+    inset 0 1px 3px rgba(0, 0, 0, 0.48),
+    0 1px 0 rgba(255, 255, 255, 0.05);
+}
+.gks-menu-recess-tray::after {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
 /* ===========================================
    SCROLLBAR HIDE
    =========================================== */

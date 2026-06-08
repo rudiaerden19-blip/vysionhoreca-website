@@ -83,6 +83,7 @@ import {
   GKS_CHECKOUT_BTN,
   GKS_BTN_SHAPE,
   GKS_MENU_PLATE_SHELL_BG_CLASS,
+  GKS_MENU_RECESS_TRAY_CLASS,
   GKS_MENU_PLATE_TRANSPARENT_CLASS,
   GKS_MENU_TILE_LABEL_SURFACE,
   GKS_POS_BTN,
@@ -597,17 +598,17 @@ const KASSA_MENU_TILE_BUTTON_CLASS = `${KASSA_MENU_TILE_BUTTON_CLASS_BASE} h-ful
 const KASSA_MENU_TILE_BUTTON_CLASS_SXGA = `${KASSA_MENU_TILE_BUTTON_CLASS_BASE} h-auto justify-start`
 
 const KASSA_MENU_TILE_IMAGE_WELL =
-  'pointer-events-none relative min-h-0 w-full min-w-0 flex-1 overflow-hidden bg-white shadow-[inset_0_0_14px_rgba(0,0,0,0.22)] ring-1 ring-inset ring-black/45'
+  'pointer-events-none relative min-h-0 w-full min-w-0 flex-1 overflow-hidden border border-[#1c1c1c] bg-white shadow-[inset_0_2px_8px_rgba(0,0,0,0.32),inset_0_0_0_1px_rgba(0,0,0,0.2)] ring-1 ring-inset ring-black/50'
 
 /**
  * SXGA ~17″: **vierkante** fotobak iets grotere tik‑/kijkvlak bij zelfde celbreedte; abs.‑img heeft wél echte hoogte.
  */
 const KASSA_MENU_TILE_IMAGE_WELL_SXGA =
-  'pointer-events-none relative w-full shrink-0 flex-none aspect-square overflow-hidden bg-white shadow-[inset_0_0_14px_rgba(0,0,0,0.22)] ring-1 ring-inset ring-black/45'
+  'pointer-events-none relative w-full shrink-0 flex-none aspect-square overflow-hidden border border-[#1c1c1c] bg-white shadow-[inset_0_2px_8px_rgba(0,0,0,0.32),inset_0_0_0_1px_rgba(0,0,0,0.2)] ring-1 ring-inset ring-black/50'
 
 /** SXGA placeholder (geen afbeeldings‑URL):zelfde vorm als fotobak. */
 const KASSA_MENU_TILE_PLACEHOLDER_WELL_SXGA =
-  'pointer-events-none flex w-full shrink-0 flex-none flex-col items-center justify-center overflow-hidden bg-white px-2 aspect-square shadow-[inset_0_0_14px_rgba(0,0,0,0.22)] ring-1 ring-inset ring-black/45'
+  'pointer-events-none flex w-full shrink-0 flex-none flex-col items-center justify-center overflow-hidden border border-[#1c1c1c] bg-white px-2 aspect-square shadow-[inset_0_2px_8px_rgba(0,0,0,0.32),inset_0_0_0_1px_rgba(0,0,0,0.2)] ring-1 ring-inset ring-black/50'
 
 const KASSA_MENU_TILE_IMG_CLASS =
   'pointer-events-none absolute inset-0 box-border h-full w-full select-none object-contain object-center'
@@ -4177,7 +4178,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         gksShowLockOverlay ? 'pointer-events-none select-none' : ''
       }`}
       data-testid="kassa-app"
-      data-gks-ui="20250608-checkout-glow-slight-less"
+      data-gks-ui="20250608-menu-recess-tray"
       data-gks-internet-locked={gksInternetLocked ? '1' : '0'}
       style={GKS_ACCENT_ROOT_STYLE}
     >
@@ -4570,12 +4571,22 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           )}
           </AnimatePresence>
 
-          {/* Grid — min-h-0 nodig: anders groeit de flex-child mee met alle tegels en wordt onderaan afgekapt zonder scroll */}
+          {/* Grid — ingesprongen tray (donker) + tegels; min-h-0 voorkomt afkappen zonder scroll */}
+          <div
+            className={`flex min-h-0 flex-1 flex-col ${
+              kassaAppearanceDark ? 'px-3 pb-3 pt-1.5' : ''
+            }`}
+          >
+            <div
+              className={`flex min-h-0 flex-1 flex-col overflow-hidden ${
+                kassaAppearanceDark ? `${GKS_MENU_RECESS_TRAY_CLASS} ${GKS_BTN_SHAPE}` : ''
+              }`}
+            >
           <div
             ref={kassaMenuScrollRef}
             data-testid="kassa-menu-scroll"
             className={`relative flex-1 min-h-0 overflow-x-hidden overflow-y-auto overscroll-y-contain p-4 touch-manipulation [overflow-anchor:none] [scrollbar-gutter:stable] ${
-              kassaAppearanceDark ? `gks-menu-vignette ${GKS_MENU_PLATE_SHELL_BG_CLASS}` : ''
+              kassaAppearanceDark ? 'gks-menu-vignette' : ''
             }`}
           >
             {!selectedCategory ? (
@@ -4662,6 +4673,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 )}
               </div>
             )}
+          </div>
+            </div>
           </div>
         </div>
 

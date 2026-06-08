@@ -6,6 +6,9 @@
 export const GKS_MENU_PLATE_BG = '#333336'
 export const GKS_MENU_PLATE_SHELL_BG_CLASS = 'gks-menu-plate-grain'
 
+/** Ingesprongen vlak waar categorie-/producttegels staan (zie globals `.gks-menu-recess-tray`). */
+export const GKS_MENU_RECESS_TRAY_CLASS = 'gks-menu-recess-tray'
+
 /** Secties zonder eigen kleur — zelfde effen grijs als shell. */
 export const GKS_MENU_PLATE_TRANSPARENT_CLASS = 'bg-transparent'
 
