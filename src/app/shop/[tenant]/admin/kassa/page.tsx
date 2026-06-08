@@ -4009,7 +4009,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const kassaQuickMenuPanelBtnClass = useCallback(
     (enabled: boolean) =>
       [
-        'flex min-h-[7.25rem] min-w-0 items-center justify-center px-1 py-2 text-center text-[9px] font-bold leading-[1.15] sm:min-h-[7.75rem] sm:px-1.5 sm:text-[10px] md:text-xs',
+        `flex min-h-[7.25rem] min-w-0 items-center justify-center px-1 py-2 text-center sm:min-h-[7.75rem] sm:px-1.5 leading-tight ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`,
         kassaAppearanceDark
           ? kassaPosQuickMenuPanelButtonClass()
           : `rounded-xl bg-[#161616] text-[#f0f0f0] ${KASSA_POS_QUICK_MENU_LIFT_SHADOW} hover:brightness-110 active:brightness-90`,
