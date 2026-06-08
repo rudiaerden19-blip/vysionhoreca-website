@@ -3286,6 +3286,7 @@
     "clearTable": "Sin mesa",
     "clearTableBanner": "Quitar mesa seleccionada",
     "floorPlan": "Plano",
+    "floorPlanSameFloorTitle": "Plano igual que el local",
     "floorZoneInside": "Interior",
     "floorZoneTerrace": "Terraza",
     "floorZoneTerraceShort": "Terraza",

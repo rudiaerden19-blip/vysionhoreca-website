@@ -3760,6 +3760,7 @@
     "clearTable": "No table",
     "clearTableBanner": "Clear table selection",
     "floorPlan": "Floor plan",
+    "floorPlanSameFloorTitle": "Floor plan matches venue",
     "floorZoneInside": "Inside",
     "floorZoneTerrace": "Terrace",
     "floorZoneTerraceShort": "Terrace",

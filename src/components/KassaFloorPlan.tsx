@@ -18,6 +18,10 @@ import {
   type FloorPlanZone,
 } from '@/lib/kassa-floor-plan-zone'
 import { useLanguage } from '@/i18n'
+import {
+  KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
+  kassaPosButtonClass,
+} from '@/lib/kassa-pos-surface'
 
 export type TableShape = FloorPlanTable['shape']
 export type TableStatus = FloorPlanTable['status']
@@ -26,6 +30,8 @@ export type KassaTable = FloorPlanTable
 
 const FLOOR_MODAL_TOUCH =
   'min-h-[44px] touch-manipulation [-webkit-tap-highlight-color:transparent]'
+
+const FLOOR_TOOLBAR_BTN = `px-3 py-2 text-sm font-semibold whitespace-nowrap ${kassaPosButtonClass(false)}`
 
 /** Witte invoer op plattegrond-modals — voorkomt kassa-dark input-styling op het hele veld. */
 const FLOOR_MODAL_INPUT_LIGHT =
@@ -800,32 +806,13 @@ export default function KassaFloorPlan({
     return 'OCCUPIED'
   }
 
-  const floorSurfaceStyle = useMemo(() => {
-    if (planZone === FLOOR_PLAN_ZONE_TERRACE) {
-      return {
-        backgroundColor: '#6b9b72',
-        backgroundPosition: '0 0',
-        backgroundImage: `
-          linear-gradient(to right, rgba(255,255,255,0.14) 0px, rgba(255,255,255,0.14) 2px, transparent 2px),
-          linear-gradient(to bottom, rgba(255,255,255,0.14) 0px, rgba(255,255,255,0.14) 2px, transparent 2px)
-        `,
-        backgroundSize: '100px 100px',
-        cursor: 'default',
-        touchAction: 'none' as const,
-      }
-    }
-    return {
-      backgroundColor: '#4a4a4a',
-      backgroundPosition: '0 0',
-      backgroundImage: `
-        linear-gradient(to right, rgba(200,200,200,0.25) 0px, rgba(200,200,200,0.25) 2px, transparent 2px),
-        linear-gradient(to bottom, rgba(200,200,200,0.25) 0px, rgba(200,200,200,0.25) 2px, transparent 2px)
-      `,
-      backgroundSize: '100px 100px',
+  const floorSurfaceStyle = useMemo(
+    () => ({
       cursor: 'default',
       touchAction: 'none' as const,
-    }
-  }, [planZone])
+    }),
+    [],
+  )
 
   const addDecor = (type: DecorType) => {
     const d: DecorItem = { id: makeId(), type, x: 20 + Math.random() * 60, y: 20 + Math.random() * 60, rotation: 0 }
@@ -1197,51 +1184,53 @@ export default function KassaFloorPlan({
   const modalOpen = showAddModal || showAddBarModal
 
   return (
-    <div className="fixed inset-0 bg-[#e3e3e3] z-50 flex flex-col">
+    <div className={`fixed inset-0 z-50 flex flex-col ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`}>
       {/* Bij open modal: geen pointer-events naar vloer/header (iPad raakte vast na capture) */}
       <div className={`flex min-h-0 flex-1 flex-col ${modalOpen ? 'pointer-events-none' : ''}`}>
       {/* Header */}
-      <div className="h-14 flex-shrink-0 bg-[#e3e3e3] border-b border-gray-300 flex items-center justify-between px-4">
-        <div className="flex items-center gap-3">
-          <h2 className="text-gray-900 font-bold text-lg">
-            {t('kassaApp.pickTableTitle')}
-            <span className="ml-2 rounded-md bg-gray-200 px-2 py-0.5 text-xs font-semibold text-gray-700">
+      <div
+        className={`flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-[#1a1a1a] px-4 py-3 ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`}
+      >
+        <div className="min-w-0">
+          <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+            {t('kassaApp.floorPlanSameFloorTitle')}
+          </h2>
+          <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-white/75">
+            <span className="font-semibold text-white/90">
               {planZone === FLOOR_PLAN_ZONE_TERRACE ? t('kassaApp.floorZoneTerrace') : t('kassaApp.floorZoneInside')}
             </span>
-          </h2>
-          <span className="text-gray-500 text-sm">
-            {t('kassaApp.floorPlanFreeCount')
-              .replace('{free}', String(tables.filter((tbl) => tbl.status === 'FREE').length))
-              .replace('{total}', String(tables.length))}
-          </span>
+            <span aria-hidden>·</span>
+            <span>
+              {t('kassaApp.floorPlanFreeCount')
+                .replace('{free}', String(tables.filter((tbl) => tbl.status === 'FREE').length))
+                .replace('{total}', String(tables.length))}
+            </span>
+          </div>
         </div>
-        <div className="flex gap-2 items-center">
+        <div className="flex flex-wrap items-center justify-end gap-2">
           {!isLocked && (
             <>
-              <button onClick={() => setShowAddModal(true)}
-                className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-semibold transition-colors">
+              <button type="button" onClick={() => setShowAddModal(true)} className={FLOOR_TOOLBAR_BTN}>
                 {t('kassaApp.floorPlanAddTable')}
               </button>
-              <button onClick={openAddBarModal}
-                className="px-4 py-2 bg-amber-700 hover:bg-amber-800 text-white rounded-lg text-sm font-semibold transition-colors">
+              <button type="button" onClick={openAddBarModal} className={FLOOR_TOOLBAR_BTN}>
                 {t('kassaApp.floorPlanAddBar')}
               </button>
-              <button onClick={() => addDecor('plant')}
-                className="px-4 py-2 bg-green-700 hover:bg-green-800 text-white rounded-lg text-sm font-semibold transition-colors">
+              <button type="button" onClick={() => addDecor('plant')} className={FLOOR_TOOLBAR_BTN}>
                 {t('kassaApp.floorPlanAddPlant')}
               </button>
             </>
           )}
           <button
+            type="button"
             onClick={() => setIsLocked(prev => !prev)}
             title={isLocked ? t('kassaApp.floorPlanLockTitleLocked') : t('kassaApp.floorPlanLockTitleUnlocked')}
-            className="flex items-center gap-2 rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-orange-600"
+            className={FLOOR_TOOLBAR_BTN}
           >
             {isLocked ? t('kassaApp.floorPlanLocked') : t('kassaApp.floorPlanEditing')}
           </button>
-          <button onClick={onClose}
-            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg text-sm font-semibold transition-colors">
-            ✕ {t('kassaApp.closeAria')}
+          <button type="button" onClick={onClose} className={FLOOR_TOOLBAR_BTN}>
+            {t('kassaApp.closeAria')}
           </button>
         </div>
       </div>
@@ -1249,7 +1238,10 @@ export default function KassaFloorPlan({
       {/* Floor + Sidebar */}
       <div className="flex flex-1 overflow-hidden">
         {/* Floor plan — tegelpatroon vast; alleen tafels/decor verschuiven */}
-        <div className="floor-plan flex-1 relative overflow-hidden select-none" style={floorSurfaceStyle}>
+        <div
+          className={`floor-plan relative flex-1 select-none overflow-hidden ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`}
+          style={floorSurfaceStyle}
+        >
           <div
             ref={innerCanvasRef}
             style={{ position: 'absolute', inset: 0, touchAction: 'manipulation' }}
@@ -1613,15 +1605,16 @@ export default function KassaFloorPlan({
                   <button
                     type="button"
                     onClick={() => onCheckoutTable(selected.number)}
-                    className="w-full py-3 rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold transition-colors"
+                    className={`w-full py-3 font-bold ${kassaPosButtonClass(false)}`}
                   >
                     💳 {t('kassaApp.floorPlanCheckoutTable')}
                   </button>
                 )}
                 <button
                   onClick={() => { onSelectTable(selected.number); onClose() }}
-                  className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition-colors">
-                  🛒 {hasItems ? t('kassaApp.floorPlanAddToOrderTable') : t('kassaApp.floorPlanNewOrderTable')}
+                  className={`w-full py-3 font-bold ${kassaPosButtonClass(false)}`}
+                >
+                  {hasItems ? t('kassaApp.floorPlanAddToOrderTable') : t('kassaApp.floorPlanNewOrderTable')}
                 </button>
                 {!isLocked && (
                   <button onClick={() => deleteTable(selected.id)}
@@ -1636,7 +1629,9 @@ export default function KassaFloorPlan({
       </div>
 
       {/* Legend */}
-      <div className="h-10 flex-shrink-0 bg-[#e3e3e3] border-t border-gray-300 flex items-center justify-center gap-6 text-sm text-gray-600">
+      <div
+        className={`flex h-10 shrink-0 items-center justify-center gap-6 border-t border-[#1a1a1a] text-sm text-white/80 ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`}
+      >
         {(Object.entries(STATUS_COLORS) as [TableStatus, string][]).map(([s, c]) => (
           <div key={s} className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: c }} />
