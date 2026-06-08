@@ -23,7 +23,7 @@ export function createKassaPosRegisterUiTheme(dark: boolean): KassaRegisterUiThe
     ...base,
     shellBg: KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
     soundBackdrop: 'bg-[#333336]',
-    flyMenuPanel: `${KASSA_POS_BTN_SHAPE} shadow-lg border border-[#1a1a1a] bg-[#333333]`,
+    flyMenuPanel: `${KASSA_POS_BTN_SHAPE} shadow-lg border border-[#1a1a1a] ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`,
     flyMenuBorder: 'border-[#4a4a4a]',
     flyMenuDivider: 'border-[#4a4a4a]',
     flyMenuRowHover: 'hover:bg-[#454545]',
