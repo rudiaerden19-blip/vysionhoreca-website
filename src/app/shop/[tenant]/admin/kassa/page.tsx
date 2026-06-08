@@ -5155,38 +5155,38 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             className={`sticky bottom-0 z-10 shrink-0 border-t ${KASSA_POS_RULE_BLACK} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} px-3 py-2.5 space-y-2.5`}
           >
             <div
-              className={`grid w-full grid-cols-2 gap-3 touch-manipulation select-none ${kassaFooterActionTouchMinHClass(
+              className={`grid w-full grid-cols-[minmax(6.25rem,34%)_minmax(0,1fr)] gap-3 touch-manipulation select-none ${kassaFooterActionTouchMinHClass(
                 kassaSxgaDenseTiles,
                 kassaSidebarFooterTier === 'dense',
               )}`}
             >
+              <button
+                type="button"
+                data-testid="kassa-quick-menu"
+                onClick={openKassaQuickMenu}
+                className={`flex min-w-0 w-full items-center justify-center px-1.5 ${kassaPosButtonClass(false)}`}
+                title={t('kassaApp.quickMenu')}
+              >
+                <span className="text-center text-[11px] font-medium leading-tight tracking-[0.02em] sm:text-xs">
+                  {t('kassaApp.quickMenu')}
+                </span>
+              </button>
               <div
                 role="status"
                 aria-live="polite"
-                className={`flex min-w-0 items-center justify-between gap-1.5 px-2.5 ${kassaPosRaisedStripClass()}`}
+                className={`flex min-w-0 items-center justify-between gap-2 px-2.5 ${kassaPosRaisedStripClass()}`}
               >
-                <span className={`shrink-0 ${KASSA_SIDEBAR_FOOTER_BTN_LABEL} ${ui.numpadMeta}`}>
+                <span className={`shrink-0 text-base font-bold tracking-[0.04em] sm:text-lg ${ui.numpadMeta}`}>
                   {t('kassaApp.cartTotal')}
                 </span>
                 <span
                   className={`min-w-0 truncate text-right font-bold tabular-nums tracking-tight text-white ${
-                    kassaSxgaDenseTiles || kassaSidebarFooterTier !== 'dense' ? 'text-xl sm:text-2xl' : 'text-lg'
+                    kassaSxgaDenseTiles || kassaSidebarFooterTier !== 'dense' ? 'text-2xl sm:text-[1.65rem]' : 'text-xl'
                   }`}
                 >
                   €{total.toFixed(2)}
                 </span>
               </div>
-              <button
-                type="button"
-                data-testid="kassa-quick-menu"
-                onClick={openKassaQuickMenu}
-                className={`flex min-w-0 w-full items-center justify-center px-2 ${kassaPosButtonClass(false)}`}
-                title={t('kassaApp.quickMenu')}
-              >
-                <span className={`text-center leading-tight ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`}>
-                  {t('kassaApp.quickMenu')}
-                </span>
-              </button>
             </div>
             <div className="grid grid-cols-3 gap-3 touch-manipulation select-none">
               <button
@@ -5296,30 +5296,30 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         ) : (
           <div className="shrink-0 border-t border-gray-200 px-3 py-2.5 space-y-2.5">
             <div
-              className={`grid w-full grid-cols-2 gap-2 ${kassaFooterActionTouchMinHClass(
+              className={`grid w-full grid-cols-[minmax(6.25rem,34%)_minmax(0,1fr)] gap-2 ${kassaFooterActionTouchMinHClass(
                 kassaSxgaDenseTiles,
                 kassaSidebarFooterTier === 'dense',
               )}`}
             >
-              <div
-                role="status"
-                aria-live="polite"
-                className="flex min-w-0 items-center justify-between gap-1 rounded-xl border border-gray-200 bg-gray-50 px-2.5 py-2"
-              >
-                <span className={`text-sm font-bold ${ui.numpadMeta}`}>{t('kassaApp.cartTotal')}</span>
-                <span className={`truncate text-right font-bold ${ui.priceAccentClass} text-lg`}>
-                  €{total.toFixed(2)}
-                </span>
-              </div>
               <button
                 type="button"
                 data-testid="kassa-quick-menu"
                 onClick={openKassaQuickMenu}
-                className="flex min-w-0 w-full items-center justify-center rounded-xl bg-[#3C4D6B] px-2 py-2 text-xs font-bold text-white hover:bg-[#2D3A52] sm:text-sm"
+                className="flex min-w-0 w-full items-center justify-center rounded-xl bg-[#3C4D6B] px-1.5 py-2 text-[11px] font-bold leading-tight text-white hover:bg-[#2D3A52] sm:text-xs"
                 title={t('kassaApp.quickMenu')}
               >
                 {t('kassaApp.quickMenu')}
               </button>
+              <div
+                role="status"
+                aria-live="polite"
+                className="flex min-w-0 items-center justify-between gap-2 rounded-xl border border-gray-200 bg-gray-50 px-2.5 py-2"
+              >
+                <span className={`text-sm font-bold ${ui.numpadMeta}`}>{t('kassaApp.cartTotal')}</span>
+                <span className={`truncate text-right font-bold ${ui.priceAccentClass} text-xl`}>
+                  €{total.toFixed(2)}
+                </span>
+              </div>
             </div>
             <div className="grid grid-cols-3 gap-2 touch-manipulation select-none">
               <button
