@@ -154,6 +154,10 @@ export function kassaClockBarClass(): string {
 export const KASSA_SIDEBAR_FOOTER_BTN_LABEL =
   'text-sm font-medium leading-tight tracking-[0.03em] sm:text-[15px]'
 
+/** Zelfde breedte: Snel menu (boven) en Num pad (onder). */
+export const KASSA_SIDEBAR_FOOTER_LEFT_COL =
+  'w-[7.65rem] min-w-[7.65rem] max-w-[7.65rem] shrink-0'
+
 /** Binnen / Terras zoneknoppen. */
 export const KASSA_POS_ZONE_BTN_LABEL =
   'text-sm font-medium tracking-[0.03em] sm:text-[15px]'
