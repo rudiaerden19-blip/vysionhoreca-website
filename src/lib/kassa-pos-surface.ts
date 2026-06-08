@@ -1,9 +1,12 @@
 /**
- * Gedeelde POS-knoppenstijl (gunmetal gradient) — productie-kassa + GKS-preview.
- * Geen fiscale of order-logica.
+ * Productie-kassa POS-knoppenstijl (gunmetal gradient).
+ * Geen import uit `gks-kassa/` — GKS-pilot blijft op preview-branch.
  */
 
+/** CSS-class in globals (historische naam `.gks-menu-plate-grain`). */
 export const KASSA_POS_MENU_PLATE_SHELL_BG_CLASS = 'gks-menu-plate-grain'
+
+export const KASSA_POS_RULE_BLACK = 'border-black'
 
 export const KASSA_POS_BTN_SHAPE = 'rounded-xl'
 
