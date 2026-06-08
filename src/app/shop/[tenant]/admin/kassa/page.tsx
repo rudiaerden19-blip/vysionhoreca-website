@@ -93,6 +93,7 @@ import {
   KASSA_POS_MENU_TILE_IMAGE_WELL_SXGA,
   KASSA_POS_MENU_TILE_IMG_CLASS,
   KASSA_POS_MENU_TILE_IMG_FRAME,
+  KASSA_POS_MENU_TILE_IMAGE_FILM,
   KASSA_POS_MENU_TILE_LABEL_CLASS,
   KASSA_POS_MENU_TILE_LABEL_CLASS_SXGA,
   KASSA_POS_MENU_TILE_LABEL_WRAP,
@@ -639,6 +640,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
                 className={imgClass}
               />
             </div>
+            {posLuxuryAppearance ? <div className={KASSA_POS_MENU_TILE_IMAGE_FILM} aria-hidden /> : null}
           </div>
           <div className={labelWrap}>
             <p className={labelClass}>{category.name}</p>
@@ -738,6 +740,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
                 className={imgClass}
               />
             </div>
+            {posLuxuryAppearance ? <div className={KASSA_POS_MENU_TILE_IMAGE_FILM} aria-hidden /> : null}
           </div>
           <div className={labelWrap}>
             <p className={labelClass}>{product.name}</p>

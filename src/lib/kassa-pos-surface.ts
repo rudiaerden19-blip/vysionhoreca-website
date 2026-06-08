@@ -206,7 +206,11 @@ export const KASSA_POS_MENU_TILE_IMG_CLASS =
   'pointer-events-none absolute inset-0 box-border h-full w-full select-none object-contain object-center'
 
 export const KASSA_POS_MENU_TILE_IMG_FRAME =
-  'pointer-events-none relative h-full w-full min-h-0 min-w-0 overflow-hidden bg-white'
+  'pointer-events-none relative z-0 h-full w-full min-h-0 min-w-0 overflow-hidden bg-white'
+
+/** Dunne donkere laag over foto (niet over titel); tegels blenden in donkere kassa. */
+export const KASSA_POS_MENU_TILE_IMAGE_FILM =
+  'pointer-events-none absolute inset-0 z-[1] bg-black/[0.16]'
 
 export const KASSA_POS_MENU_TILE_PLACEHOLDER_WELL =
   'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-[#1a1a1e] px-2 shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]'
