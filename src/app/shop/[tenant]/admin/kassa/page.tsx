@@ -562,11 +562,11 @@ const KASSA_MENU_TILE_LABEL_WRAP_SXGA =
   'pointer-events-none shrink-0 w-full bg-white px-2 pb-1.5 pt-0 mt-1.5 sm:px-3 sm:pb-2 sm:mt-1.5 sm:pt-0'
 
 const KASSA_MENU_TILE_LABEL_CLASS =
-  'm-0 line-clamp-2 text-center text-base font-black leading-snug tracking-tight text-black sm:text-lg md:text-xl'
+  'm-0 line-clamp-1 text-center text-sm font-black leading-tight tracking-tight text-black sm:text-[15px] md:text-base'
 
 /** SXGA 17″: categorie + product gelijk (`md:text-xl` wordt te groot in smalle rastercel). */
 const KASSA_MENU_TILE_LABEL_CLASS_SXGA =
-  'm-0 line-clamp-2 text-center text-[15px] font-black leading-snug tracking-tight text-black sm:text-base'
+  'm-0 line-clamp-1 text-center text-xs font-black leading-tight tracking-tight text-black sm:text-[13px]'
 
 type KassaCategoryTileButtonProps = {
   category: MenuCategory

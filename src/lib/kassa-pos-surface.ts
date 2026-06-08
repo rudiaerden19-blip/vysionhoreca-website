@@ -228,10 +228,10 @@ export const KASSA_POS_MENU_TILE_LABEL_WRAP_SXGA =
   'pointer-events-none shrink-0 w-full border-t border-[#45454a]/80 bg-[linear-gradient(180deg,#343438_0%,#2a2a2e_100%)] px-2 pb-1.5 pt-0 mt-0 sm:px-3 sm:pb-2 sm:pt-0'
 
 export const KASSA_POS_MENU_TILE_LABEL_CLASS =
-  'm-0 line-clamp-2 text-center text-base font-bold leading-snug tracking-[0.03em] text-[#f2f2f2] sm:text-lg md:text-xl'
+  'm-0 line-clamp-1 text-center text-sm font-bold leading-tight tracking-[0.02em] text-[#f2f2f2] sm:text-[15px] md:text-base'
 
 export const KASSA_POS_MENU_TILE_LABEL_CLASS_SXGA =
-  'm-0 line-clamp-2 text-center text-[15px] font-bold leading-snug tracking-[0.03em] text-[#f2f2f2] sm:text-base'
+  'm-0 line-clamp-1 text-center text-xs font-bold leading-tight tracking-[0.02em] text-[#f2f2f2] sm:text-[13px]'
 
 export const KASSA_POS_MENU_TILE_QTY_BADGE = [
   'absolute top-1.5 right-1.5 z-20 flex h-7 w-7 items-center justify-center text-xs font-bold',
