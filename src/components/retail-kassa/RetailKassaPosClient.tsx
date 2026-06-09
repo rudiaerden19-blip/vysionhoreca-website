@@ -1056,17 +1056,16 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                   {t('retailKassaPage.modeSales')}
                 </span>
               </button>
-              <button
-                type="button"
-                data-testid="retail-mode-stock-count"
-                aria-pressed={mode === 'stockCount'}
-                onClick={() => switchMode('stockCount')}
-                className={`min-h-[2.75rem] flex-1 px-2 ${kassaPosButtonClass(mode === 'stockCount')}`}
+              <Link
+                href={`${baseUrl}/voorraad`}
+                data-testid="retail-nav-voorraad"
+                onClick={() => playClick()}
+                className={`min-h-[2.75rem] flex-1 px-2 flex items-center justify-center ${kassaPosButtonClass(false)}`}
               >
                 <span className={`block text-center ${kassaSidebarActionLabelClass}`}>
                   {t('retailKassaPage.modeStockCount')}
                 </span>
-              </button>
+              </Link>
               <button
                 type="button"
                 data-testid="retail-mode-goods-receipt"
