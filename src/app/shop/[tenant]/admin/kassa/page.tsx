@@ -4271,6 +4271,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         ? `text-center ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`
         : 'text-center text-xs font-bold leading-tight sm:text-sm'
 
+  const kassaLightOrderTypeButtonSizeClass = kassaSxgaDenseTiles
+    ? 'min-h-[38px] px-2 py-2'
+    : 'min-h-[36px] px-2 py-2.5'
+
+  const kassaLightOrderTypeButtonClass = (selected: boolean) =>
+    `flex min-w-0 flex-1 flex-col items-center justify-center text-center rounded-lg text-sm font-bold shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 ${kassaLightOrderTypeButtonSizeClass} ${
+      selected
+        ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
+        : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
+    }`
+
   const kassaSidebarZoneLabelClass =
     kassaAppearanceDark && kassaSxgaDenseTiles
       ? 'text-xs font-medium tracking-[0.02em]'
@@ -5107,17 +5118,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               type="button"
               aria-pressed={orderType === 'DINE_IN'}
               onClick={() => selectOrderType('DINE_IN')}
-              className={`flex min-w-0 flex-1 flex-col items-center justify-center text-center ${
+              className={
                 kassaAppearanceDark
-                  ? `px-2 ${kassaOrderTypeButtonTouchClass(kassaSxgaDenseTiles)} ${kassaPosButtonClass(orderType === 'DINE_IN')}`
-                  : `rounded-lg px-1 text-xs shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 ${
-                      kassaSxgaDenseTiles ? 'min-h-[32px] py-1.5' : 'min-h-[28px] py-1'
-                    } ${
-                      orderType === 'DINE_IN'
-                        ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
-                        : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
-                    }`
-              }`}
+                  ? `flex min-w-0 flex-1 flex-col items-center justify-center text-center px-2 ${kassaOrderTypeButtonTouchClass(kassaSxgaDenseTiles)} ${kassaPosButtonClass(orderType === 'DINE_IN')}`
+                  : kassaLightOrderTypeButtonClass(orderType === 'DINE_IN')
+              }
             >
               <span className={kassaSidebarActionLabelClass}>{t('kassaApp.orderTypeDineIn')}</span>
               {orderType === 'DINE_IN' && tableNumber ? (
@@ -5133,17 +5138,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               type="button"
               aria-pressed={orderType === 'TAKEAWAY'}
               onClick={() => selectOrderType('TAKEAWAY')}
-              className={`flex min-w-0 flex-1 flex-col items-center justify-center text-center ${
+              className={
                 kassaAppearanceDark
-                  ? `px-2 ${kassaOrderTypeButtonTouchClass(kassaSxgaDenseTiles)} ${kassaPosButtonClass(orderType === 'TAKEAWAY')}`
-                  : `rounded-lg px-1 text-xs shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 ${
-                      kassaSxgaDenseTiles ? 'min-h-[32px] py-1.5' : 'min-h-[28px] py-1'
-                    } ${
-                      orderType === 'TAKEAWAY'
-                        ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
-                        : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
-                    }`
-              }`}
+                  ? `flex min-w-0 flex-1 flex-col items-center justify-center text-center px-2 ${kassaOrderTypeButtonTouchClass(kassaSxgaDenseTiles)} ${kassaPosButtonClass(orderType === 'TAKEAWAY')}`
+                  : kassaLightOrderTypeButtonClass(orderType === 'TAKEAWAY')
+              }
             >
               <span className={kassaSidebarActionLabelClass}>{t('kassaApp.orderTypeTakeaway')}</span>
             </button>
@@ -5151,17 +5150,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               type="button"
               aria-pressed={orderType === 'DELIVERY'}
               onClick={() => selectOrderType('DELIVERY')}
-              className={`flex min-w-0 flex-1 flex-col items-center justify-center text-center ${
+              className={
                 kassaAppearanceDark
-                  ? `px-2 ${kassaOrderTypeButtonTouchClass(kassaSxgaDenseTiles)} ${kassaPosButtonClass(orderType === 'DELIVERY')}`
-                  : `rounded-lg px-1 text-xs shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 ${
-                      kassaSxgaDenseTiles ? 'min-h-[32px] py-1.5' : 'min-h-[28px] py-1'
-                    } ${
-                      orderType === 'DELIVERY'
-                        ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
-                        : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
-                    }`
-              }`}
+                  ? `flex min-w-0 flex-1 flex-col items-center justify-center text-center px-2 ${kassaOrderTypeButtonTouchClass(kassaSxgaDenseTiles)} ${kassaPosButtonClass(orderType === 'DELIVERY')}`
+                  : kassaLightOrderTypeButtonClass(orderType === 'DELIVERY')
+              }
             >
               <span className={kassaSidebarActionLabelClass}>{t('kassaApp.orderTypeDelivery')}</span>
             </button>
@@ -5681,7 +5674,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 className="flex min-w-0 flex-1 items-center justify-between gap-2 rounded-xl border border-gray-200 bg-gray-50 px-2.5 py-2"
               >
                 <span className={`text-sm font-bold ${ui.numpadMeta}`}>{t('kassaApp.cartTotal')}</span>
-                <span className={`truncate text-right font-bold ${ui.priceAccentClass} text-xl`}>
+                <span className="truncate text-right text-xl font-bold tabular-nums text-black">
                   €{total.toFixed(2)}
                 </span>
               </div>
