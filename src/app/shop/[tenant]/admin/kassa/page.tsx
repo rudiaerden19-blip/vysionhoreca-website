@@ -4996,7 +4996,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* Zone: Verkoop / Binnen / Terras — drie gelijke knoppen; geen aparte klok-/datumbalk. */}
         <div
           className={`shrink-0 ${
-            kassaAppearanceDark ? 'px-2.5 pt-3 pb-2 sm:px-3' : 'px-2 pt-1.5 pb-2'
+            kassaAppearanceDark ? 'px-2.5 pt-3 pb-1 sm:px-3' : 'px-2 pt-1.5 pb-1'
           }`}
         >
             <div className={`flex min-w-0 ${kassaSidebarRowGapClass}`}>
@@ -5109,9 +5109,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           className={`shrink-0 ${
             kassaAppearanceDark
               ? kassaSxgaDenseTiles
-                ? 'mx-2.5 mb-3 mt-4 space-y-2'
-                : 'mx-3 mb-3 mt-5 space-y-3'
-              : 'mx-2 mt-4 mb-2'
+                ? 'mx-2.5 mb-3 mt-2.5 space-y-2'
+                : 'mx-3 mb-3 mt-3 space-y-3'
+              : 'mx-2 mt-2.5 mb-2'
           }`}
           data-testid="kassa-order-type-bar"
         >
