@@ -113,9 +113,8 @@ export default function TenantModulesPage({ params }: { params: { tenant: string
       for (const it of m.items) {
         if (seen.has(it.id)) continue
         seen.add(it.id)
-        const parentOn = m.key === 'account' ? true : !!moduleToggles[m.key]
         if (SUBMENU_IDS_ALWAYS_ON.has(it.id)) payload[it.id] = true
-        else payload[it.id] = parentOn && !!subToggles[it.id]
+        else payload[it.id] = !!subToggles[it.id]
       }
     }
 
@@ -158,7 +157,6 @@ export default function TenantModulesPage({ params }: { params: { tenant: string
       <div className="mt-8 space-y-5">
         {TENANT_MODULE_IDS.map((id) => {
           const mod = hamburgerByKey[id]
-          const parentOn = id === 'account' ? true : !!moduleToggles[id]
           const nestedItems = mod?.items.filter((it) => !SUBMENU_IDS_ALWAYS_ON.has(it.id)) ?? []
           const label = t(`tenantModulesPage.modules.${id}`)
 
@@ -179,18 +177,7 @@ export default function TenantModulesPage({ params }: { params: { tenant: string
                   <ModuleToggleSlider
                     checked={!!moduleToggles[id]}
                     ariaLabel={label}
-                    onChange={(next) => {
-                      setModuleToggles((prev) => ({ ...prev, [id]: next }))
-                      if (!next) {
-                        setSubToggles((s) => {
-                          const nextS = { ...s }
-                          for (const it of nestedItems) {
-                            if (!SUBMENU_IDS_ALWAYS_ON.has(it.id)) nextS[it.id] = false
-                          }
-                          return nextS
-                        })
-                      }
-                    }}
+                    onChange={(next) => setModuleToggles((prev) => ({ ...prev, [id]: next }))}
                   />
                 )}
               </div>
@@ -206,8 +193,7 @@ export default function TenantModulesPage({ params }: { params: { tenant: string
                         {it.labelKey ? t(it.labelKey) : it.label}
                       </span>
                       <ModuleToggleSlider
-                        checked={!!subToggles[it.id] && parentOn}
-                        disabled={!parentOn}
+                        checked={!!subToggles[it.id]}
                         ariaLabel={it.labelKey ? t(it.labelKey) : it.label}
                         onChange={(next) =>
                           setSubToggles((s) => ({

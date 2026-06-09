@@ -8,7 +8,6 @@ import { getTenantSettings } from '@/lib/admin-api'
 import {
   adminPathToModule,
   getFirstAccessibleAdminPath,
-  hasModuleAccessForPathname,
   isShopAdminAnyPosPath,
   isShopAdminKassaPosPath,
   isShopAdminRetailKassaPosPath,
@@ -18,6 +17,7 @@ import {
 } from '@/lib/tenant-modules'
 import {
   getSubmenuIdForPathname,
+  hasShopAdminPathAccess,
   isSubmenuEnabledInTenantConfig,
   isSubmenuForcedOn,
 } from '@/lib/admin-hamburger-modules'
@@ -310,7 +310,10 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
     if (loading || modulesLoading || tenantExists === false) return
     if (demoPublicUnauthenticated) return
     const gate = adminPathToModule(adminPath, params.tenant)
-    if (gate.kind === 'module' && !hasModuleAccessForPathname(adminPath, params.tenant, moduleAccess)) {
+    if (
+      gate.kind === 'module' &&
+      !hasShopAdminPathAccess(adminPath, params.tenant, moduleAccess, enabledModulesJson)
+    ) {
       router.replace(
         getFirstAccessibleAdminPath(params.tenant, moduleAccess, enabledModulesJson)
       )

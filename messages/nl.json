@@ -5565,7 +5565,7 @@
   },
   "tenantModulesPage": {
     "title": "Modules",
-    "subtitle": "Zet onderdelen van je admin-menu aan of uit. Account blijft altijd beschikbaar.",
+    "subtitle": "Schakel hoofdmodules en submenu’s los van elkaar in. Hoofd «Kassa» = verkoopscherm; bv. pincode kan apart aan. Account blijft altijd beschikbaar.",
     "save": "Opslaan",
     "saving": "Opslaan…",
     "saved": "Opgeslagen",

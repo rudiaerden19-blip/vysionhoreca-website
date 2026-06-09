@@ -5629,7 +5629,7 @@
   },
   "tenantModulesPage": {
     "title": "Module",
-    "subtitle": "Schalten Sie Teile Ihres Admin-Menüs ein oder aus. Das Konto bleibt immer verfügbar.",
+    "subtitle": "Hauptmodule und Untermenüs unabhängig schalten. Hauptmodul «Kassa» = Verkaufsschirm; z. B. Pincode einzeln möglich. Konto bleibt immer verfügbar.",
     "save": "Speichern",
     "saving": "Speichern…",
     "saved": "Gespeichert",

@@ -5565,7 +5565,7 @@
   },
   "tenantModulesPage": {
     "title": "Modules",
-    "subtitle": "Turn parts of your admin menu on or off. Account always stays available.",
+    "subtitle": "Toggle main modules and submenus independently. Main «Kassa» = POS screen; e.g. pincode can be on alone. Account always stays available.",
     "save": "Save",
     "saving": "Saving…",
     "saved": "Saved",

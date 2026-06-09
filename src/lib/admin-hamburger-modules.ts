@@ -1,5 +1,11 @@
 import type { TenantModuleId } from '@/lib/tenant-modules'
-import { isTenantSubmenuEffectiveOn } from '@/lib/tenant-modules'
+import {
+  adminPathToModule,
+  hasExplicitEnabledModules,
+  hasModuleAccessForPathname,
+  isTenantSubmenuEffectiveOn,
+  submenuParentAllowedForSubmenuId,
+} from '@/lib/tenant-modules'
 
 /** Altijd bereikbaar in menu en routes (abonnement / facturatie). */
 export const SUBMENU_IDS_ALWAYS_ON = new Set<string>([
@@ -609,6 +615,34 @@ export function isSubmenuEnabledInTenantConfig(
   return isTenantSubmenuEffectiveOn(subId, enabledJson, parentModuleAllowed)
 }
 
+/** Route-toegang: hoofdmodule óf los ingeschakeld submenu (bv. pincode zonder kassa-POS). */
+export function hasShopAdminPathAccess(
+  pathname: string,
+  tenantSlug: string,
+  moduleAccess: Record<TenantModuleId, boolean>,
+  enabledModulesJson: Record<string, boolean> | null
+): boolean {
+  if (hasModuleAccessForPathname(pathname, tenantSlug, moduleAccess)) return true
+  const gate = adminPathToModule(pathname, tenantSlug)
+  const subId = getSubmenuIdForPathname(pathname, tenantSlug, moduleAccess)
+  if (!subId) return false
+  const parentAllowed = submenuParentAllowedForSubmenuId(subId, gate, moduleAccess)
+  return isSubmenuEnabledInTenantConfig(subId, enabledModulesJson, parentAllowed)
+}
+
+function moduleRowVisibleInMenu(
+  m: AdminHamburgerModule,
+  menuAccess: Record<TenantModuleId, boolean>,
+  enabledModulesJson: Record<string, boolean> | null
+): boolean {
+  if (m.key === 'website') {
+    return menuAccess.website || menuAccess.instellingen || menuAccess.online
+  }
+  if (menuAccess[m.key]) return true
+  if (!enabledModulesJson || !hasExplicitEnabledModules(enabledModulesJson)) return false
+  return m.items.some((item) => enabledModulesJson[item.id] === true)
+}
+
 export function filterHamburgerModulesForAccess(
   modules: AdminHamburgerModule[],
   effectiveAccess: Record<TenantModuleId, boolean>,
@@ -619,12 +653,7 @@ export function filterHamburgerModulesForAccess(
   const menuAccess: Record<TenantModuleId, boolean> = { ...effectiveAccess, account: true }
 
   return modules
-    .filter((m) => {
-      if (m.key === 'website') {
-        return menuAccess.website || menuAccess.instellingen || menuAccess.online
-      }
-      return menuAccess[m.key]
-    })
+    .filter((m) => moduleRowVisibleInMenu(m, menuAccess, enabledModulesJson))
     .map((m) => ({
       ...m,
       items: m.items.filter((item) => {

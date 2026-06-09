@@ -5606,7 +5606,7 @@
   },
   "tenantModulesPage": {
     "title": "Módulos",
-    "subtitle": "Activa o desactiva partes del menú de administración. La cuenta siempre permanece disponible.",
+    "subtitle": "Activa módulos principales y submenús por separado. «Caja» principal = pantalla de venta; p. ej. pincode solo. La cuenta sigue siempre disponible.",
     "save": "Guardar",
     "saving": "Guardando…",
     "saved": "Guardado",

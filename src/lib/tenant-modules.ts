@@ -250,10 +250,12 @@ export function isTenantSubmenuEffectiveOn(
   enabledJson: Record<string, boolean> | null,
   parentModuleOn: boolean
 ): boolean {
-  if (!parentModuleOn) return false
-  if (!enabledJson || !hasExplicitEnabledModules(enabledJson)) return true
+  if (!enabledJson || !hasExplicitEnabledModules(enabledJson)) {
+    return parentModuleOn
+  }
+  if (enabledJson[subId] === true) return true
   if (enabledJson[subId] === false) return false
-  return true
+  return parentModuleOn
 }
 
 /** Mag /shop/:tenant/admin/kassa (POS) geopend worden? */

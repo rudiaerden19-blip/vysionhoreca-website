@@ -154,9 +154,8 @@ export default function SuperadminTenantModulesPage() {
         for (const it of m.items) {
           if (seen.has(it.id)) continue
           seen.add(it.id)
-          const parentOn = m.key === 'account' ? true : !!moduleToggles[m.key]
           if (SUBMENU_IDS_ALWAYS_ON.has(it.id)) payload[it.id] = true
-          else payload[it.id] = parentOn && !!subToggles[it.id]
+          else payload[it.id] = !!subToggles[it.id]
         }
       }
       enabledModules = payload
@@ -285,18 +284,7 @@ export default function SuperadminTenantModulesPage() {
                       <ModuleSlider
                         checked={!!moduleToggles[id]}
                         disabled={false}
-                        onChange={(next) => {
-                          setModuleToggles((prev) => ({ ...prev, [id]: next }))
-                          if (!next) {
-                            setSubToggles((s) => {
-                              const nextS = { ...s }
-                              for (const it of nestedItems) {
-                                if (!SUBMENU_IDS_ALWAYS_ON.has(it.id)) nextS[it.id] = false
-                              }
-                              return nextS
-                            })
-                          }
-                        }}
+                        onChange={(next) => setModuleToggles((prev) => ({ ...prev, [id]: next }))}
                       />
                     )}
                   </div>
@@ -312,8 +300,8 @@ export default function SuperadminTenantModulesPage() {
                             {it.labelKey ? t(it.labelKey) : it.label}
                           </span>
                           <ModuleSlider
-                            checked={!!subToggles[it.id] && parentOn}
-                            disabled={!parentOn}
+                            checked={!!subToggles[it.id]}
+                            disabled={false}
                             onChange={(next) =>
                               setSubToggles((s) => ({
                                 ...s,

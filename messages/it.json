@@ -5606,7 +5606,7 @@
   },
   "tenantModulesPage": {
     "title": "Moduli",
-    "subtitle": "Attiva o disattiva le sezioni del menu admin. L'account resta sempre disponibile.",
+    "subtitle": "Attiva moduli principali e sottomenu in modo indipendente. «Cassa» principale = schermo vendite; es. pincode da solo. L'account resta sempre disponibile.",
     "save": "Salva",
     "saving": "Salvataggio…",
     "saved": "Salvato",

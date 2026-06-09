@@ -5629,7 +5629,7 @@
   },
   "tenantModulesPage": {
     "title": "Modules",
-    "subtitle": "Activez ou désactivez des parties du menu admin. Le compte reste toujours disponible.",
+    "subtitle": "Activez modules principaux et sous-menus séparément. « Caisse » principal = écran de vente ; ex. code PIN seul. Le compte reste toujours disponible.",
     "save": "Enregistrer",
     "saving": "Enregistrement…",
     "saved": "Enregistré",
