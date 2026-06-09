@@ -1338,8 +1338,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
           </div>
 
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden w-full">
-            <div className="flex h-0 min-h-0 flex-1 overflow-hidden w-full">
-          <div className={`relative flex h-0 min-h-0 min-w-0 flex-1 flex-col overflow-hidden ${ui.shellBg}`}>
+            <div className="flex min-h-0 flex-1 overflow-hidden w-full">
+          <div className={`relative flex min-h-0 flex-1 flex-col overflow-hidden ${ui.shellBg}`}>
             <input
               ref={barcodeCaptureRef}
               type="text"
@@ -1395,110 +1395,107 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               </button>
             </form>
 
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-3 pb-2 pt-2 sm:px-4">
+            <div className="flex min-h-0 flex-1 flex-col px-3 pb-3 pt-2 sm:px-4">
               <div
-                className={`flex h-[min(40vh,22rem)] w-full shrink-0 flex-col overflow-hidden sm:h-[min(44vh,24rem)] ${KASSA_POS_MENU_RECESS_TRAY_CLASS} ${KASSA_POS_BTN_SHAPE} gks-menu-vignette`}
-                data-testid="retail-kassa-recess-tray"
+                className={`flex min-h-0 flex-1 flex-col overflow-hidden justify-start ${KASSA_POS_MENU_RECESS_TRAY_CLASS} ${KASSA_POS_BTN_SHAPE} gks-menu-vignette`}
               >
                 {loading && !barHasLines ? (
-                  <p className={`flex flex-1 items-center justify-center px-4 text-center text-sm ${ui.menuEmptyMuted}`}>
-                    {t('retailKassaPage.loading')}
-                  </p>
-                ) : (
-                  <div className="flex h-0 min-h-0 flex-1 flex-col overflow-hidden">
-                    {barHasLines ? (
-                      <div className="flex h-0 min-h-0 w-full flex-1 flex-col overflow-hidden">
-                        <div
-                          className={`${scanBarRowGridClass} shrink-0 border-b border-white/15 px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-white/45 sm:px-4`}
-                        >
-                          <span>{t('retailKassaPage.barcodeCol')}</span>
-                          <span>{t('retailKassaPage.nameCol')}</span>
-                          <span>{t('retailKassaPage.size')}</span>
-                          <span>{t('retailKassaPage.color')}</span>
-                          <span>{t('retailKassaPage.stock')}</span>
-                          <span>{t('retailKassaPage.price')}</span>
-                          <span className="sr-only">{t('common.delete')}</span>
-                        </div>
-                        <div
-                          ref={scanBarRef}
-                          data-testid="retail-kassa-scan-bar"
-                          className="h-0 min-h-0 flex-1 space-y-0 overflow-y-auto overflow-x-auto overscroll-y-contain touch-manipulation p-1.5 sm:p-2 [scrollbar-gutter:stable]"
-                        >
-                          {mode === 'sales'
-                            ? cart.map((l) =>
-                                renderScanBarRow(l.sku.lineKey, l.sku, {
-                                  quantity: l.quantity,
-                                  onRemove: () => {
-                                    playClick()
-                                    updateQty(l.sku.lineKey, 0)
-                                  },
-                                }),
-                              )
-                            : stockActivity.map((row) => {
-                                const note =
-                                  row.mode === 'goodsReceipt'
-                                    ? `${t('retailKassaPage.stockAdded').replace('{n}', String(row.delta))} · ${row.sku.stock_quantity}`
-                                    : `${t('retailKassaPage.stockPlusOne')} · ${row.sku.stock_quantity}`
-                                return renderScanBarRow(row.key, row.sku, {
-                                  stockNote: note,
-                                  onRemove: () => removeStockActivityLine(row.key),
-                                })
-                              })}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="min-h-0 flex-1" aria-hidden />
-                    )}
-                    {quickMenuPanelOpen ? (
-                      <div
-                        className={`shrink-0 border-t ${KASSA_POS_RULE_BLACK} p-2 sm:p-2.5`}
-                        data-testid="retail-quick-menu-tray"
-                      >
-                        <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
-                          {RETAIL_QUICK_MENU_ACTIONS.map((action) => {
-                            const enabled = quickMenuAllowedSubmenuIds.has(action.submenuId)
-                            const label = t(action.labelKey)
-                            const tileClass = `${kassaPosQuickMenuPanelButtonClass()} flex min-h-[2.65rem] touch-manipulation select-none items-center justify-center px-1.5 py-2 text-center text-[10px] font-semibold leading-tight sm:min-h-[3rem] sm:px-2 sm:text-[11px]`
-                            if (!enabled) {
-                              return (
-                                <button key={action.key} type="button" disabled className={tileClass}>
-                                  {label}
-                                </button>
-                              )
-                            }
-                            return (
-                              <Link
-                                key={action.key}
-                                href={`${baseUrl}${action.hrefSuffix}`}
-                                prefetch={false}
-                                className={tileClass}
-                                onClick={() => {
-                                  playClick()
-                                  setQuickMenuPanelOpen(false)
-                                }}
-                              >
-                                {label}
-                              </Link>
-                            )
+                  <p className={`px-4 text-center text-sm ${ui.menuEmptyMuted}`}>{t('retailKassaPage.loading')}</p>
+                ) : !barHasLines ? null : (
+                  <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden">
+                    <div
+                      className={`${scanBarRowGridClass} shrink-0 border-b border-white/15 px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-white/45 sm:px-4`}
+                    >
+                      <span>{t('retailKassaPage.barcodeCol')}</span>
+                      <span>{t('retailKassaPage.nameCol')}</span>
+                      <span>{t('retailKassaPage.size')}</span>
+                      <span>{t('retailKassaPage.color')}</span>
+                      <span>{t('retailKassaPage.stock')}</span>
+                      <span>{t('retailKassaPage.price')}</span>
+                      <span className="sr-only">{t('common.delete')}</span>
+                    </div>
+                    <div
+                      ref={scanBarRef}
+                      data-testid="retail-kassa-scan-bar"
+                      className="min-h-0 flex-1 space-y-0 overflow-y-auto overflow-x-auto overscroll-y-contain touch-manipulation p-1.5 sm:p-2 [scrollbar-gutter:stable]"
+                    >
+                      {mode === 'sales'
+                        ? cart.map((l) =>
+                            renderScanBarRow(l.sku.lineKey, l.sku, {
+                              quantity: l.quantity,
+                              onRemove: () => {
+                                playClick()
+                                updateQty(l.sku.lineKey, 0)
+                              },
+                            }),
+                          )
+                        : stockActivity.map((row) => {
+                            const note =
+                              row.mode === 'goodsReceipt'
+                                ? `${t('retailKassaPage.stockAdded').replace('{n}', String(row.delta))} · ${row.sku.stock_quantity}`
+                                : `${t('retailKassaPage.stockPlusOne')} · ${row.sku.stock_quantity}`
+                            return renderScanBarRow(row.key, row.sku, {
+                              stockNote: note,
+                              onRemove: () => removeStockActivityLine(row.key),
+                            })
                           })}
-                        </div>
-                      </div>
-                    ) : null}
+                    </div>
                   </div>
                 )}
               </div>
             </div>
+
+            {quickMenuPanelOpen ? (
+              <div
+                className="pointer-events-auto absolute inset-x-0 bottom-0 z-[60] px-3 pb-3 pt-6"
+                style={{
+                  background: 'linear-gradient(to top, rgba(12,12,12,0.97) 72%, transparent)',
+                }}
+              >
+                <div className="grid w-full grid-cols-4 gap-2 sm:grid-cols-8">
+                  {RETAIL_QUICK_MENU_ACTIONS.map((action) => {
+                    const enabled = quickMenuAllowedSubmenuIds.has(action.submenuId)
+                    const label = t(action.labelKey)
+                    if (!enabled) {
+                      return (
+                        <button
+                          key={action.key}
+                          type="button"
+                          disabled
+                          className={kassaPosQuickMenuPanelButtonClass()}
+                        >
+                          {label}
+                        </button>
+                      )
+                    }
+                    return (
+                      <Link
+                        key={action.key}
+                        href={`${baseUrl}${action.hrefSuffix}`}
+                        prefetch={false}
+                        className={kassaPosQuickMenuPanelButtonClass()}
+                        onClick={() => {
+                          playClick()
+                          setQuickMenuPanelOpen(false)
+                        }}
+                      >
+                        {label}
+                      </Link>
+                    )
+                  })}
+                </div>
+              </div>
+            ) : null}
           </div>
 
           <div
-            className={`flex h-0 min-h-0 w-80 min-w-0 flex-shrink-0 flex-col overflow-hidden border-l sm:w-96 lg:w-[380px] ${KASSA_POS_RULE_BLACK} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`}
+            className={`w-80 sm:w-96 lg:w-[380px] flex min-h-0 min-w-0 flex-shrink-0 flex-col overflow-hidden border-l ${KASSA_POS_RULE_BLACK} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`}
           >
-            <div className="relative flex h-0 min-h-0 flex-1 flex-col overflow-hidden px-2.5 pt-3 pb-2 sm:px-3">
+            <div className="relative min-h-0 flex-1 flex flex-col px-2.5 pt-3 pb-2 sm:px-3">
               <div
-                className={`h-0 min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-y-contain py-0.5 transition-opacity ${
+                className={`min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-y-contain py-0.5 transition-opacity ${
                   numpadPanelVisible ? 'pointer-events-none opacity-[0.28]' : 'opacity-100'
                 }`}
-                data-testid="retail-kassa-cart-scroll"
               >
                 {mode !== 'sales' ? (
                   stockActivity.length === 0 ? null : (
