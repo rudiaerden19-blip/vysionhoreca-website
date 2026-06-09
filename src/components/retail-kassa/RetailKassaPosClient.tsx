@@ -17,10 +17,7 @@ import {
   KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
   KASSA_POS_MENU_RECESS_TRAY_CLASS,
   KASSA_POS_MENU_TILE_BUTTON_BASE,
-  KASSA_POS_MENU_TILE_IMG_CLASS,
-  KASSA_POS_MENU_TILE_IMAGE_WELL,
   KASSA_POS_MENU_TILE_LABEL_CLASS,
-  KASSA_POS_MENU_TILE_LABEL_WRAP,
   KASSA_POS_RULE_BLACK,
   KASSA_POS_BTN_SHAPE,
   KASSA_SIDEBAR_FOOTER_BTN_LABEL,
@@ -718,36 +715,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 {t('retailKassaPage.add')}
               </button>
             </form>
-
-            {mode === 'sales' && skus.length > 0 ? (
-              <div
-                data-testid="retail-touch-tiles"
-                className="shrink-0 flex gap-2 overflow-x-auto overscroll-x-contain px-3 pb-2 sm:px-4 touch-manipulation [scrollbar-gutter:stable]"
-              >
-                {skus.map((sku) => (
-                  <button
-                    key={sku.lineKey}
-                    type="button"
-                    onClick={() => addToCart(sku, 1)}
-                    className={`${KASSA_POS_MENU_TILE_BUTTON_BASE} h-[5.5rem] w-[5.5rem] shrink-0 sm:h-[6rem] sm:w-[6rem]`}
-                  >
-                    <div className={`${KASSA_POS_MENU_TILE_IMAGE_WELL} h-[3.25rem] sm:h-[3.5rem]`}>
-                      {sku.image_url ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={sku.image_url} alt="" className={KASSA_POS_MENU_TILE_IMG_CLASS} />
-                      ) : (
-                        <span className="flex h-full items-center justify-center text-[10px] text-white/40">📦</span>
-                      )}
-                    </div>
-                    <div className={`${KASSA_POS_MENU_TILE_LABEL_WRAP} py-1`}>
-                      <p className={`${KASSA_POS_MENU_TILE_LABEL_CLASS} line-clamp-2 text-[10px] sm:text-[11px]`}>
-                        {sku.name}
-                      </p>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            ) : null}
 
             <div className="flex min-h-0 flex-1 flex-col px-3 pb-3 pt-0.5 sm:px-4">
               <div
