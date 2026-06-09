@@ -10,6 +10,11 @@ import {
 } from '@/lib/admin-hamburger-modules'
 import { useTenantModuleFlagsContext } from '@/lib/tenant-module-flags-context'
 import { createKassaPosRegisterUiTheme } from '@/lib/kassa-pos-register-ui-theme'
+import { createKassaRegisterUiTheme } from '@/lib/kassa-register-ui-theme'
+import {
+  KASSA_UI_APPEARANCE_TOGGLE_ENABLED,
+  useKassaUiDarkSync,
+} from '@/lib/kassa-register-ui-dark-preference'
 import {
   KASSA_POS_CART_ROW,
   KASSA_POS_CHECKOUT_BTN,
@@ -89,7 +94,14 @@ const RETAIL_QUICK_MENU_ACTIONS = [
 export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const baseUrl = `/shop/${tenant}/admin`
   const { t, locale, setLocale, locales, localeNames } = useLanguage()
-  const ui = useMemo(() => createKassaPosRegisterUiTheme(true), [])
+  const { dark: appearanceDark, toggle: toggleKassaAppearance } = useKassaUiDarkSync(tenant)
+  const ui = useMemo(
+    () =>
+      appearanceDark
+        ? createKassaPosRegisterUiTheme(true)
+        : createKassaRegisterUiTheme(false),
+    [appearanceDark],
+  )
 
   const {
     moduleAccess,
@@ -164,13 +176,15 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   useEffect(() => {
     const html = document.documentElement
     const body = document.body
-    html.classList.add('kassa-dark-appearance', 'vysion-kassa-root')
+    html.classList.add('vysion-kassa-root')
     body.classList.add('vysion-kassa-root')
+    if (appearanceDark) html.classList.add('kassa-dark-appearance')
+    else html.classList.remove('kassa-dark-appearance')
     return () => {
       html.classList.remove('kassa-dark-appearance', 'vysion-kassa-root')
       body.classList.remove('vysion-kassa-root')
     }
-  }, [])
+  }, [appearanceDark])
 
   const focusBarcodeCapture = useCallback(() => {
     if (priceFixInputRef.current && document.activeElement === priceFixInputRef.current) return
@@ -258,8 +272,16 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const kassaDarkHeaderBtnShell =
     'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.35rem] px-3 py-2 sm:min-h-[2.6rem] sm:px-3.5 sm:py-2.5'
 
+  const headerQuickLinkBtnClass = appearanceDark
+    ? `${kassaDarkHeaderBtnShell} ${kassaPosButtonClass(false)}`
+    : 'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap rounded-lg bg-white/10 px-2 py-1.5 font-bold text-white transition-colors hover:bg-white/20 sm:rounded-xl sm:px-3 sm:py-2'
+
   const headerUtilityBtnClass = (selected: boolean) =>
-    `${kassaDarkHeaderBtnShell} gap-0.5 sm:gap-1 ${kassaPosButtonClass(selected)}`
+    appearanceDark
+      ? `${kassaDarkHeaderBtnShell} gap-0.5 sm:gap-1 ${kassaPosButtonClass(selected)}`
+      : `inline-flex shrink-0 touch-manipulation items-center gap-0.5 whitespace-nowrap rounded-lg px-1.5 py-1.5 font-medium text-white transition-colors hover:bg-white/20 sm:gap-1 sm:rounded-xl sm:px-2 sm:py-2 ${
+          selected ? 'bg-white/20' : 'bg-white/10'
+        }`
 
   const kassaSidebarActionLabelClass = `text-center ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`
 
@@ -653,7 +675,9 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
 
       <div className={`flex min-h-0 flex-1 flex-col overflow-hidden ${ui.shellBg}`}>
         <div
-          className={`relative z-30 flex min-h-[56px] w-full min-w-0 shrink-0 items-center gap-1.5 px-2 py-2 sm:gap-2 sm:px-3 pb-3 ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`}
+          className={`relative z-30 flex min-h-[56px] w-full min-w-0 shrink-0 items-center gap-1.5 px-2 py-2 sm:gap-2 sm:px-3 ${
+            appearanceDark ? `pb-3 ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}` : 'bg-black'
+          }`}
         >
           {(hamburgerOpen || quickMenuPanelOpen) && (
             <div
@@ -673,7 +697,13 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 setHamburgerOpen(!hamburgerOpen)
                 setHamburgerSubOpen(null)
               }}
-              className={`flex items-center gap-1.5 px-2 py-1.5 transition-colors sm:gap-2 sm:px-3 ${kassaPosButtonClass(true)}`}
+              className={`flex items-center gap-1.5 px-2 py-1.5 transition-colors sm:gap-2 sm:px-3 ${
+                appearanceDark
+                  ? kassaPosButtonClass(true)
+                  : hamburgerOpen
+                    ? 'rounded-xl bg-[#47c6fe] text-[#063042]'
+                    : 'rounded-xl bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
+              }`}
               title={t('kassaApp.hamburgerMenu')}
               aria-expanded={hamburgerOpen}
             >
@@ -766,6 +796,19 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             </span>
           </div>
 
+          {KASSA_UI_APPEARANCE_TOGGLE_ENABLED ? (
+            <button
+              type="button"
+              onClick={toggleKassaAppearance}
+              className={headerQuickLinkBtnClass}
+              title={appearanceDark ? t('kassaApp.lightMode') : t('kassaApp.darkMode')}
+            >
+              <span className={KASSA_HEADER_QUICK_LINK_LABEL}>
+                {appearanceDark ? t('kassaApp.lightMode') : t('kassaApp.darkMode')}
+              </span>
+            </button>
+          ) : null}
+
           <div ref={langRef} className="relative z-[40] shrink-0">
             <button
               type="button"
@@ -809,14 +852,18 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             type="button"
             onClick={() => setLogoutSoftwareConfirmOpen(true)}
             title={t('kassaApp.logout')}
-            className={`relative z-20 ${headerUtilityBtnClass(true)}`}
+            className={`relative z-20 ${
+              appearanceDark
+                ? headerUtilityBtnClass(true)
+                : 'relative z-20 inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-lg bg-[#58CCFF] px-1.5 py-1 text-[11px] font-bold text-black transition-colors hover:bg-[#47c6fe] sm:gap-1 sm:px-2.5 sm:py-1.5 sm:text-sm'
+            }`}
           >
             <span className={KASSA_HEADER_QUICK_LINK_LABEL}>{t('kassaApp.logout')}</span>
           </button>
         </div>
 
         <div className="flex min-h-0 flex-1 overflow-hidden w-full">
-          <div className={`relative flex min-h-0 flex-1 flex-col overflow-hidden ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`}>
+          <div className={`relative flex min-h-0 flex-1 flex-col overflow-hidden ${ui.shellBg}`}>
             <div className="shrink-0 flex gap-2 px-3 pt-2 sm:px-4">
               <button
                 type="button"
