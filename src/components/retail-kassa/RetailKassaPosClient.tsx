@@ -101,6 +101,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   )
 
   const scanRef = useRef<HTMLInputElement>(null)
+  const barcodeCaptureRef = useRef<HTMLInputElement>(null)
   const scanBarRef = useRef<HTMLDivElement>(null)
   const langRef = useRef<HTMLDivElement>(null)
 
@@ -141,9 +142,13 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     }
   }, [])
 
-  useEffect(() => {
-    scanRef.current?.focus()
+  const focusBarcodeCapture = useCallback(() => {
+    barcodeCaptureRef.current?.focus({ preventScroll: true })
   }, [])
+
+  useEffect(() => {
+    focusBarcodeCapture()
+  }, [focusBarcodeCapture])
 
   useEffect(() => {
     if (!langOpen) return
@@ -171,6 +176,14 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
 
   const kassaSidebarActionLabelClass = `text-center ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`
 
+  function processBarcode(code: string) {
+    const trimmed = code.trim()
+    if (!trimmed) return
+    const hit = findRetailProductByBarcode(products, trimmed)
+    if (hit) addToCart(hit, 1)
+    else alert(t('retailKassaPage.barcodeNotFound'))
+  }
+
   function addToCart(p: RetailPosProduct, qty = 1) {
     if (!retailLineInStock(p, qty)) {
       alert(t('retailKassaPage.outOfStock'))
@@ -189,7 +202,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       return next
     })
     setScanValue('')
-    scanRef.current?.focus()
+    if (barcodeCaptureRef.current) barcodeCaptureRef.current.value = ''
+    focusBarcodeCapture()
     requestAnimationFrame(() => {
       const el = scanBarRef.current
       if (el) el.scrollLeft = el.scrollWidth
@@ -219,14 +233,22 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     if (cart.length === 0) return
     playClick()
     setCart([])
-    scanRef.current?.focus()
+    focusBarcodeCapture()
   }
 
   function onScanSubmit(e: React.FormEvent) {
     e.preventDefault()
-    const hit = findRetailProductByBarcode(products, scanValue)
-    if (hit) addToCart(hit, 1)
-    else alert(t('retailKassaPage.barcodeNotFound'))
+    processBarcode(scanValue)
+    setScanValue('')
+    focusBarcodeCapture()
+  }
+
+  function onBarcodeWedgeKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key !== 'Enter') return
+    e.preventDefault()
+    processBarcode(e.currentTarget.value)
+    e.currentTarget.value = ''
+    focusBarcodeCapture()
   }
 
   async function payCash() {
@@ -242,7 +264,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     setLastOrder(res.orderNumber ?? null)
     setCart([])
     await reload()
-    scanRef.current?.focus()
+    focusBarcodeCapture()
   }
 
   const performLogout = () => {
@@ -463,6 +485,16 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
 
         <div className="flex min-h-0 flex-1 overflow-hidden w-full">
           <div className={`relative flex min-h-0 flex-1 flex-col overflow-hidden ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`}>
+            <input
+              ref={barcodeCaptureRef}
+              type="text"
+              tabIndex={-1}
+              autoComplete="off"
+              data-kassa-no-web-keyboard
+              aria-hidden
+              onKeyDown={onBarcodeWedgeKeyDown}
+              className="pointer-events-none fixed left-0 top-0 h-px w-px opacity-0 overflow-hidden"
+            />
             <form
               onSubmit={onScanSubmit}
               className="shrink-0 flex gap-2 px-3 pt-2 pb-1.5 sm:px-4"
@@ -475,6 +507,14 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 placeholder={t('retailKassaPage.scanPlaceholder')}
                 value={scanValue}
                 onChange={(e) => setScanValue(e.target.value)}
+                onBlur={() => {
+                  window.setTimeout(() => {
+                    const active = document.activeElement
+                    if (active === scanRef.current) return
+                    if (active instanceof HTMLElement && active.closest('[data-web-touch-keyboard-panel]')) return
+                    focusBarcodeCapture()
+                  }, 120)
+                }}
                 className={`flex-1 px-4 py-2.5 text-base text-[#f0f0f0] placeholder:text-white/45 focus:outline-none ${KASSA_POS_FIELD}`}
               />
               <button type="submit" className={`shrink-0 px-5 py-2.5 font-bold ${kassaPosButtonClass(true)}`}>
