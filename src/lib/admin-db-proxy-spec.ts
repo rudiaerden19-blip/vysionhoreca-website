@@ -48,6 +48,12 @@ export const ADMIN_DB_TABLES: Record<string, AdminDbTableSpec> = {
     forbiddenColumns: ['id', 'created_at'],
     maxRows: 1000,
   },
+  menu_product_variants: {
+    tenantSlugColumn: 'tenant_slug',
+    allowedOps: ['insert', 'update', 'upsert', 'delete'],
+    forbiddenColumns: ['id', 'created_at'],
+    maxRows: 2000,
+  },
   product_options: {
     tenantSlugColumn: 'tenant_slug',
     allowedOps: ['insert', 'update', 'upsert', 'delete'],

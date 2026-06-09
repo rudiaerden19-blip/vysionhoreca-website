@@ -17,7 +17,10 @@ import {
   KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
   KASSA_POS_MENU_RECESS_TRAY_CLASS,
   KASSA_POS_MENU_TILE_BUTTON_BASE,
+  KASSA_POS_MENU_TILE_IMG_CLASS,
+  KASSA_POS_MENU_TILE_IMAGE_WELL,
   KASSA_POS_MENU_TILE_LABEL_CLASS,
+  KASSA_POS_MENU_TILE_LABEL_WRAP,
   KASSA_POS_RULE_BLACK,
   KASSA_POS_BTN_SHAPE,
   KASSA_SIDEBAR_FOOTER_BTN_LABEL,
@@ -31,19 +34,21 @@ import {
   applyRetailGoodsReceipt,
   applyRetailStockScanIncrement,
   completeRetailCashSale,
-  fetchRetailPosProducts,
-  findRetailProductByBarcode,
+  fetchRetailPosSkus,
   parseRetailScanPayload,
-  retailLineInStock,
+  resolveRetailSkuForGoodsReceipt,
+  resolveRetailSkuLookup,
+  retailSkuInStock,
   type RetailCartLine,
-  type RetailPosProduct,
+  type RetailPosSku,
 } from '@/lib/retail-kassa-pos'
+import { patchSkuInList } from '@/lib/retail-pos-catalog'
 
 type RetailKassaMode = 'sales' | 'stockCount' | 'goodsReceipt'
 
 type StockActivityLine = {
   key: string
-  product: RetailPosProduct
+  sku: RetailPosSku
   delta: number
   mode: RetailKassaMode
 }
@@ -119,7 +124,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const langRef = useRef<HTMLDivElement>(null)
 
   const [tenantInfo, setTenantInfo] = useState<TenantSettings | null>(null)
-  const [products, setProducts] = useState<RetailPosProduct[]>([])
+  const [skus, setSkus] = useState<RetailPosSku[]>([])
   const [loading, setLoading] = useState(true)
   const [scanValue, setScanValue] = useState('')
   const [cart, setCart] = useState<RetailCartLine[]>([])
@@ -139,8 +144,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
 
   const reload = useCallback(async () => {
     setLoading(true)
-    const list = await fetchRetailPosProducts(tenant)
-    setProducts(list)
+    const list = await fetchRetailPosSkus(tenant)
+    setSkus(list)
     setLoading(false)
   }, [tenant])
 
@@ -224,7 +229,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   }, [langOpen])
 
   const total = useMemo(
-    () => cart.reduce((s, l) => s + l.product.price * l.quantity, 0),
+    () => cart.reduce((s, l) => s + l.sku.price * l.quantity, 0),
     [cart],
   )
 
@@ -257,17 +262,17 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     closeArticleSearchKeyboard()
   }
 
-  function pushStockActivity(product: RetailPosProduct, delta: number, activityMode: RetailKassaMode) {
-    const key = `${product.id}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
-    setStockActivity((prev) => [...prev, { key, product, delta, mode: activityMode }])
+  function pushStockActivity(sku: RetailPosSku, delta: number, activityMode: RetailKassaMode) {
+    const key = `${sku.lineKey}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
+    setStockActivity((prev) => [...prev, { key, sku, delta, mode: activityMode }])
     requestAnimationFrame(() => {
       const el = scanBarRef.current
       if (el) el.scrollLeft = el.scrollWidth
     })
   }
 
-  function replaceProductInCatalog(next: RetailPosProduct) {
-    setProducts((prev) => prev.map((p) => (p.id === next.id ? next : p)))
+  function replaceSkuInCatalog(next: RetailPosSku) {
+    setSkus((prev) => patchSkuInList(prev, next))
   }
 
   async function processBarcode(code: string) {
@@ -275,14 +280,17 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     if (!trimmed || stockBusy) return
 
     if (mode === 'sales') {
-      const hit = findRetailProductByBarcode(products, trimmed)
+      const hit = resolveRetailSkuLookup(skus, trimmed)
       if (hit) addToCart(hit, 1)
       else alert(t('retailKassaPage.barcodeNotFound'))
       return
     }
 
     const payload = parseRetailScanPayload(trimmed)
-    const hit = findRetailProductByBarcode(products, payload.lookupCode)
+    const hit =
+      mode === 'goodsReceipt'
+        ? resolveRetailSkuForGoodsReceipt(skus, payload)
+        : resolveRetailSkuLookup(skus, payload.lookupCode)
     if (!hit) {
       alert(t('retailKassaPage.barcodeNotFound'))
       return
@@ -292,20 +300,20 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     try {
       if (mode === 'stockCount') {
         const res = await applyRetailStockScanIncrement(tenant, hit)
-        if (!res.ok || !res.product) {
+        if (!res.ok || !res.sku) {
           alert(t('retailKassaPage.stockUpdateError'))
           return
         }
-        replaceProductInCatalog(res.product)
-        pushStockActivity(res.product, 1, 'stockCount')
+        replaceSkuInCatalog(res.sku)
+        pushStockActivity(res.sku, 1, 'stockCount')
       } else {
         const res = await applyRetailGoodsReceipt(tenant, hit, payload)
-        if (!res.ok || !res.product) {
+        if (!res.ok || !res.sku) {
           alert(t('retailKassaPage.stockUpdateError'))
           return
         }
-        replaceProductInCatalog(res.product)
-        pushStockActivity(res.product, payload.quantity, 'goodsReceipt')
+        replaceSkuInCatalog(res.sku)
+        pushStockActivity(res.sku, payload.quantity, 'goodsReceipt')
       }
     } finally {
       setStockBusy(false)
@@ -315,17 +323,17 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     }
   }
 
-  function addToCart(p: RetailPosProduct, qty = 1) {
-    if (!retailLineInStock(p, qty)) {
+  function addToCart(sku: RetailPosSku, qty = 1) {
+    if (!retailSkuInStock(sku, qty)) {
       alert(t('retailKassaPage.outOfStock'))
       return
     }
     setCart((prev) => {
-      const i = prev.findIndex((l) => l.product.id === p.id)
-      if (i < 0) return [...prev, { product: p, quantity: qty }]
+      const i = prev.findIndex((l) => l.sku.lineKey === sku.lineKey)
+      if (i < 0) return [...prev, { sku, quantity: qty }]
       const next = [...prev]
       const merged = next[i].quantity + qty
-      if (!retailLineInStock(p, merged)) {
+      if (!retailSkuInStock(sku, merged)) {
         alert(t('retailKassaPage.outOfStock'))
         return prev
       }
@@ -341,16 +349,16 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     })
   }
 
-  function updateQty(productId: string, qty: number) {
+  function updateQty(lineKey: string, qty: number) {
     if (qty < 1) {
-      setCart((prev) => prev.filter((l) => l.product.id !== productId))
+      setCart((prev) => prev.filter((l) => l.sku.lineKey !== lineKey))
       return
     }
     setCart((prev) => {
-      const i = prev.findIndex((l) => l.product.id === productId)
+      const i = prev.findIndex((l) => l.sku.lineKey === lineKey)
       if (i < 0) return prev
-      const p = prev[i].product
-      if (!retailLineInStock(p, qty)) {
+      const sku = prev[i].sku
+      if (!retailSkuInStock(sku, qty)) {
         alert(t('retailKassaPage.outOfStock'))
         return prev
       }
@@ -711,6 +719,36 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               </button>
             </form>
 
+            {mode === 'sales' && skus.length > 0 ? (
+              <div
+                data-testid="retail-touch-tiles"
+                className="shrink-0 flex gap-2 overflow-x-auto overscroll-x-contain px-3 pb-2 sm:px-4 touch-manipulation [scrollbar-gutter:stable]"
+              >
+                {skus.map((sku) => (
+                  <button
+                    key={sku.lineKey}
+                    type="button"
+                    onClick={() => addToCart(sku, 1)}
+                    className={`${KASSA_POS_MENU_TILE_BUTTON_BASE} h-[5.5rem] w-[5.5rem] shrink-0 sm:h-[6rem] sm:w-[6rem]`}
+                  >
+                    <div className={`${KASSA_POS_MENU_TILE_IMAGE_WELL} h-[3.25rem] sm:h-[3.5rem]`}>
+                      {sku.image_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={sku.image_url} alt="" className={KASSA_POS_MENU_TILE_IMG_CLASS} />
+                      ) : (
+                        <span className="flex h-full items-center justify-center text-[10px] text-white/40">📦</span>
+                      )}
+                    </div>
+                    <div className={`${KASSA_POS_MENU_TILE_LABEL_WRAP} py-1`}>
+                      <p className={`${KASSA_POS_MENU_TILE_LABEL_CLASS} line-clamp-2 text-[10px] sm:text-[11px]`}>
+                        {sku.name}
+                      </p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            ) : null}
+
             <div className="flex min-h-0 flex-1 flex-col px-3 pb-3 pt-0.5 sm:px-4">
               <div
                 className={`flex min-h-0 flex-1 flex-col overflow-hidden justify-center ${KASSA_POS_MENU_RECESS_TRAY_CLASS} ${KASSA_POS_BTN_SHAPE} gks-menu-vignette`}
@@ -729,10 +767,10 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                   >
                     {mode === 'sales'
                       ? cart.map((l) => {
-                          const p = l.product
+                          const p = l.sku
                           return (
                             <div
-                              key={p.id}
+                              key={p.lineKey}
                               className={`${KASSA_POS_MENU_TILE_BUTTON_BASE} shrink-0 w-[11.5rem] sm:w-[12.5rem] min-h-[8.5rem] pointer-events-none`}
                             >
                               <div className="shrink-0 w-full border-b border-[#45454a]/80 bg-[linear-gradient(180deg,#343438_0%,#2a2a2e_100%)] px-2 py-2 sm:px-3">
@@ -763,7 +801,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                           )
                         })
                       : stockActivity.map((row) => {
-                          const p = row.product
+                          const p = row.sku
                           return (
                             <div
                               key={row.key}
@@ -857,12 +895,12 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                       .map((row) => (
                         <div key={row.key} className={KASSA_POS_CART_ROW}>
                           <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-semibold text-[#f2f2f2]">{row.product.name}</p>
+                            <p className="truncate text-sm font-semibold text-[#f2f2f2]">{row.sku.name}</p>
                             <p className="text-xs text-white/70">
                               {row.mode === 'goodsReceipt'
                                 ? t('retailKassaPage.stockAdded').replace('{n}', String(row.delta))
                                 : t('retailKassaPage.stockPlusOne')}{' '}
-                              · {t('retailKassaPage.stockNow')}: {row.product.stock_quantity}
+                              · {t('retailKassaPage.stockNow')}: {row.sku.stock_quantity}
                             </p>
                           </div>
                         </div>
@@ -872,17 +910,17 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                   <p className="px-2 py-8 text-center text-sm text-white/50">{t('retailKassaPage.cartEmpty')}</p>
                 ) : (
                   cart.map((l) => (
-                    <div key={l.product.id} className={KASSA_POS_CART_ROW}>
+                    <div key={l.sku.lineKey} className={KASSA_POS_CART_ROW}>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold text-[#f2f2f2]">{l.product.name}</p>
+                        <p className="truncate text-sm font-semibold text-[#f2f2f2]">{l.sku.name}</p>
                         <p className="text-xs tabular-nums text-white/70">
-                          €{l.product.price.toFixed(2)} × {l.quantity}
+                          €{l.sku.price.toFixed(2)} × {l.quantity}
                         </p>
                       </div>
                       <div className="flex shrink-0 items-center gap-1">
                         <button
                           type="button"
-                          onClick={() => updateQty(l.product.id, l.quantity - 1)}
+                          onClick={() => updateQty(l.sku.lineKey, l.quantity - 1)}
                           className={kassaPosCartQtyButtonClass(true)}
                           aria-label={t('kassaApp.ariaDecreaseQty')}
                         >
@@ -891,7 +929,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                         <span className="w-6 text-center text-sm font-bold text-[#f0f0f0]">{l.quantity}</span>
                         <button
                           type="button"
-                          onClick={() => updateQty(l.product.id, l.quantity + 1)}
+                          onClick={() => updateQty(l.sku.lineKey, l.quantity + 1)}
                           className={kassaPosCartQtyButtonClass(true)}
                           aria-label={t('kassaApp.ariaIncreaseQty')}
                         >
