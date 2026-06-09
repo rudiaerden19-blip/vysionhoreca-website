@@ -33,6 +33,7 @@ import {
   completeRetailCashSale,
   createRetailSkuFromScan,
   fetchRetailPosSkus,
+  updateRetailSkuPrice,
   parseRetailScanPayload,
   resolveRetailSkuForGoodsReceipt,
   resolveRetailSkuLookup,
@@ -139,6 +140,10 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [stockBusy, setStockBusy] = useState(false)
   /** Schermtoetsenbord alleen na expliciete tik op «Artikel zoeken». */
   const [articleSearchActive, setArticleSearchActive] = useState(false)
+  const [priceFixSku, setPriceFixSku] = useState<RetailPosSku | null>(null)
+  const [priceFixValue, setPriceFixValue] = useState('')
+  const [priceFixSaving, setPriceFixSaving] = useState(false)
+  const priceFixInputRef = useRef<HTMLInputElement>(null)
 
   const reload = useCallback(async () => {
     setLoading(true)
@@ -367,6 +372,32 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     }
   }
 
+  async function savePriceFix() {
+    if (!priceFixSku || priceFixSaving) return
+    const price = Number.parseFloat(priceFixValue.replace(',', '.'))
+    if (!Number.isFinite(price) || price < 0) {
+      alert(t('retailKassaPage.unknownScanPriceRequired'))
+      return
+    }
+    setPriceFixSaving(true)
+    try {
+      const res = await updateRetailSkuPrice(tenant, priceFixSku, price)
+      if (!res.ok || !res.sku) {
+        alert(t('retailKassaPage.priceFixError'))
+        return
+      }
+      replaceSkuInCatalog(res.sku)
+      setCart((prev) =>
+        prev.map((l) => (l.sku.lineKey === res.sku!.lineKey ? { ...l, sku: res.sku! } : l)),
+      )
+      setPriceFixSku(null)
+      setPriceFixValue('')
+      focusBarcodeCapture()
+    } finally {
+      setPriceFixSaving(false)
+    }
+  }
+
   function addToCart(sku: RetailPosSku, qty = 1) {
     if (!retailSkuInStock(sku, qty)) {
       alert(t('retailKassaPage.outOfStock'))
@@ -391,6 +422,11 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       const el = scanBarRef.current
       if (el) el.scrollLeft = el.scrollWidth
     })
+    if (sku.price <= 0) {
+      setPriceFixSku(sku)
+      setPriceFixValue('')
+      requestAnimationFrame(() => priceFixInputRef.current?.focus())
+    }
   }
 
   function updateQty(lineKey: string, qty: number) {
@@ -484,6 +520,35 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
           performLogout()
         }}
       />
+
+      {priceFixSku ? (
+        <div className="fixed inset-0 z-[135] flex items-center justify-center bg-black/70 p-4">
+          <div
+            className={`w-full max-w-sm space-y-3 p-5 ${KASSA_POS_BTN_SHAPE} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} border ${KASSA_POS_RULE_BLACK}`}
+          >
+            <p className="text-lg font-bold text-white">{t('retailKassaPage.priceFixTitle')}</p>
+            <p className="text-sm text-white/80">{priceFixSku.name}</p>
+            <p className="text-xs text-white/60">{t('retailKassaPage.priceFixHint')}</p>
+            <input
+              ref={priceFixInputRef}
+              type="text"
+              inputMode="decimal"
+              value={priceFixValue}
+              onChange={(e) => setPriceFixValue(e.target.value)}
+              className={`w-full px-3 py-2.5 text-sm tabular-nums ${KASSA_POS_FIELD}`}
+              placeholder="0,00"
+            />
+            <button
+              type="button"
+              disabled={priceFixSaving}
+              onClick={() => void savePriceFix()}
+              className={`w-full py-3 font-bold ${kassaPosButtonClass(true)}`}
+            >
+              {priceFixSaving ? t('retailKassaPage.paying') : t('retailKassaPage.priceFixSave')}
+            </button>
+          </div>
+        </div>
+      ) : null}
 
       {showPayModal && (
         <div className="fixed inset-0 z-[130] flex items-center justify-center bg-black/70 p-4">
@@ -798,7 +863,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                                   {t('retailKassaPage.price')}: €{p.price.toFixed(2)}
                                 </span>
                                 <span>
-                                  {t('retailKassaPage.article')}: {p.article_number || '—'}
+                                  {t('retailKassaPage.article')}: {p.article_number || p.barcode || '—'}
                                 </span>
                                 <span>
                                   {t('retailKassaPage.size')}: {p.size_label || '—'}
@@ -831,7 +896,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                               </div>
                               <div className="flex-1 p-2 sm:p-2.5 text-[10px] sm:text-[11px] text-[#d8d8dc] grid grid-cols-2 gap-x-2 gap-y-1 content-start">
                                 <span>
-                                  {t('retailKassaPage.article')}: {p.article_number || '—'}
+                                  {t('retailKassaPage.article')}: {p.article_number || p.barcode || '—'}
                                 </span>
                                 <span>
                                   {t('retailKassaPage.size')}: {p.size_label || '—'}

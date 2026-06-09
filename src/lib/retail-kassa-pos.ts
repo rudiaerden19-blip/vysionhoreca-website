@@ -192,6 +192,7 @@ export async function createRetailSkuFromScan(
       description: '',
       price,
       barcode: storeBarcode,
+      article_number: storeBarcode,
       is_active: true,
       track_stock: false,
       stock_quantity: 0,
@@ -208,6 +209,36 @@ export async function createRetailSkuFromScan(
   const refreshed = await fetchRetailPosSkus(tenantSlug)
   const sku = findRetailSkuByCode(refreshed, barcodeRaw) ?? refreshed[refreshed.length - 1]
   return sku ? { ok: true, sku } : { ok: false, error: 'sku_missing' }
+}
+
+export async function updateRetailSkuPrice(
+  tenantSlug: string,
+  sku: RetailPosSku,
+  price: number,
+): Promise<{ ok: boolean; sku?: RetailPosSku; error?: string }> {
+  const nextPrice = Math.round(price * 100) / 100
+  if (!(nextPrice >= 0)) return { ok: false, error: 'invalid_price' }
+
+  const id = sku.variantId ?? sku.productId
+  const r = sku.variantId
+    ? await adminDb.update(
+        'menu_product_variants',
+        { price_override: nextPrice },
+        { id, tenant_slug: tenantSlug },
+        { tenantSlug },
+      )
+    : await adminDb.update(
+        'menu_products',
+        { price: nextPrice },
+        { id, tenant_slug: tenantSlug },
+        { tenantSlug },
+      )
+  if (!r.ok) return { ok: false, error: r.error || 'update_failed' }
+
+  const refreshed = await fetchRetailPosSkus(tenantSlug)
+  const updated = refreshed.find((s) => s.lineKey === sku.lineKey)
+  if (!updated) return { ok: false, error: 'sku_missing' }
+  return { ok: true, sku: updated }
 }
 
 export async function applyRetailGoodsReceipt(
