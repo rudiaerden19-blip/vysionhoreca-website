@@ -5769,6 +5769,7 @@
     "outOfStock": "Nicht genug auf Lager",
     "barcodeCol": "Barcode",
     "nameCol": "Artikel",
+    "removeLine": "Zeile entfernen",
     "barcodeNotFound": "Artikel nicht gefunden",
     "unknownScanTitle": "Neuer Barcode",
     "unknownScanHint": "Erstes Mal: Name prüfen, Preis eingeben. Weitere Scans gehen automatisch.",

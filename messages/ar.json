@@ -5746,6 +5746,7 @@
     "outOfStock": "Insufficient stock",
     "barcodeCol": "باركود",
     "nameCol": "منتج",
+    "removeLine": "إزالة السطر",
     "barcodeNotFound": "Article not found",
     "unknownScanTitle": "باركود جديد",
     "unknownScanHint": "أول مرة: تحقق من الاسم وأدخل السعر. المسح التالي تلقائي.",

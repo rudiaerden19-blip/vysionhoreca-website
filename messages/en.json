@@ -5705,6 +5705,7 @@
     "outOfStock": "Insufficient stock",
     "barcodeCol": "Barcode",
     "nameCol": "Product",
+    "removeLine": "Remove line",
     "barcodeNotFound": "Article not found",
     "unknownScanTitle": "New barcode",
     "unknownScanHint": "First time for this item: check the name, enter the price. Next scans work automatically.",

@@ -5746,6 +5746,7 @@
     "outOfStock": "Giacenza insufficiente",
     "barcodeCol": "Barcode",
     "nameCol": "Articolo",
+    "removeLine": "Rimuovi riga",
     "barcodeNotFound": "Articolo non trovato",
     "unknownScanTitle": "Nuovo barcode",
     "unknownScanHint": "Prima volta: controlla il nome, inserisci il prezzo. Le scansioni successive sono automatiche.",

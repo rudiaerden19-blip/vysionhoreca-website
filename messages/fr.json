@@ -5769,6 +5769,7 @@
     "outOfStock": "Stock insuffisant",
     "barcodeCol": "Code-barres",
     "nameCol": "Article",
+    "removeLine": "Supprimer la ligne",
     "barcodeNotFound": "Article introuvable",
     "unknownScanTitle": "Nouveau code-barres",
     "unknownScanHint": "Première fois : vérifiez le nom, saisissez le prix. Les scans suivants sont automatiques.",

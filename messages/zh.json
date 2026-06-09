@@ -5746,6 +5746,7 @@
     "outOfStock": "Insufficient stock",
     "barcodeCol": "条码",
     "nameCol": "商品",
+    "removeLine": "删除行",
     "barcodeNotFound": "Article not found",
     "unknownScanTitle": "新条码",
     "unknownScanHint": "首次扫描：核对名称并输入价格。之后扫描将自动识别。",

@@ -256,7 +256,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const barHasLines = mode === 'sales' ? cart.length > 0 : stockActivity.length > 0
 
   const scanBarRowGridClass =
-    'grid w-full min-w-[36rem] grid-cols-[minmax(6.5rem,1.1fr)_minmax(7rem,2fr)_minmax(3rem,0.7fr)_minmax(3rem,0.7fr)_minmax(3.5rem,0.8fr)] items-center gap-2 sm:gap-3'
+    'grid w-full min-w-[42rem] grid-cols-[minmax(5.5rem,1fr)_minmax(6rem,1.6fr)_minmax(2.5rem,0.5fr)_minmax(2.5rem,0.5fr)_minmax(2.75rem,0.55fr)_minmax(3.25rem,0.65fr)_2.75rem] items-center gap-1.5 sm:gap-2'
 
   function scrollScanBarToEnd() {
     requestAnimationFrame(() => {
@@ -265,17 +265,23 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     })
   }
 
+  function removeStockActivityLine(activityKey: string) {
+    playClick()
+    setStockActivity((prev) => prev.filter((row) => row.key !== activityKey))
+  }
+
   function renderScanBarRow(
     key: string,
     sku: RetailPosSku,
-    opts?: { quantity?: number; stockNote?: string },
+    opts?: { quantity?: number; stockNote?: string; onRemove?: () => void },
   ) {
     const barcode = sku.barcode || sku.article_number || '—'
     const stock =
       opts?.stockNote ??
       (sku.track_stock ? String(sku.stock_quantity) : t('retailKassaPage.stockNotTracked'))
-    const name =
-      opts?.quantity && opts.quantity > 1 ? `${sku.name} × ${opts.quantity}` : sku.name
+    const qty = Math.max(1, opts?.quantity ?? 1)
+    const name = qty > 1 ? `${sku.name} × ${qty}` : sku.name
+    const lineTotal = sku.price * qty
     return (
       <div
         key={key}
@@ -286,6 +292,19 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         <span className="truncate text-white/75">{sku.size_label || '—'}</span>
         <span className="truncate text-white/75">{sku.color_label || '—'}</span>
         <span className="truncate tabular-nums text-white/75">{stock}</span>
+        <span className="truncate tabular-nums font-semibold text-[#f2f2f2]">€{lineTotal.toFixed(2)}</span>
+        {opts?.onRemove ? (
+          <button
+            type="button"
+            onClick={opts.onRemove}
+            aria-label={t('retailKassaPage.removeLine')}
+            className={`flex h-8 w-8 shrink-0 items-center justify-center text-base font-bold leading-none ${kassaPosCartQtyButtonClass(true)}`}
+          >
+            ×
+          </button>
+        ) : (
+          <span aria-hidden className="w-8 shrink-0" />
+        )}
       </div>
     )
   }
@@ -855,50 +874,57 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               </button>
             </form>
 
-            {barHasLines ? (
-              <div
-                className={`shrink-0 w-full border-b ${KASSA_POS_RULE_BLACK} bg-[linear-gradient(180deg,#2e2e32_0%,#26262a_100%)]`}
-              >
-                <div
-                  className={`${scanBarRowGridClass} px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-white/45 sm:px-4`}
-                >
-                  <span>{t('retailKassaPage.barcodeCol')}</span>
-                  <span>{t('retailKassaPage.nameCol')}</span>
-                  <span>{t('retailKassaPage.size')}</span>
-                  <span>{t('retailKassaPage.color')}</span>
-                  <span>{t('retailKassaPage.stock')}</span>
-                </div>
-                <div
-                  ref={scanBarRef}
-                  data-testid="retail-kassa-scan-bar"
-                  className="max-h-[min(40vh,14rem)] overflow-y-auto overflow-x-auto overscroll-y-contain touch-manipulation [scrollbar-gutter:stable]"
-                >
-                  {mode === 'sales'
-                    ? cart.map((l) =>
-                        renderScanBarRow(l.sku.lineKey, l.sku, { quantity: l.quantity }),
-                      )
-                    : stockActivity.map((row) => {
-                        const note =
-                          row.mode === 'goodsReceipt'
-                            ? `${t('retailKassaPage.stockAdded').replace('{n}', String(row.delta))} · ${row.sku.stock_quantity}`
-                            : `${t('retailKassaPage.stockPlusOne')} · ${row.sku.stock_quantity}`
-                        return renderScanBarRow(row.key, row.sku, { stockNote: note })
-                      })}
-                </div>
-              </div>
-            ) : null}
-
             <div className="flex min-h-0 flex-1 flex-col px-3 pb-3 pt-2 sm:px-4">
               <div
-                className={`flex min-h-0 flex-1 flex-col overflow-hidden justify-center ${KASSA_POS_MENU_RECESS_TRAY_CLASS} ${KASSA_POS_BTN_SHAPE} gks-menu-vignette`}
+                className={`flex min-h-0 flex-1 flex-col overflow-hidden ${barHasLines ? 'justify-start' : 'justify-center'} ${KASSA_POS_MENU_RECESS_TRAY_CLASS} ${KASSA_POS_BTN_SHAPE} gks-menu-vignette`}
               >
-                {loading ? (
+                {loading && !barHasLines ? (
                   <p className={`px-4 text-center text-sm ${ui.menuEmptyMuted}`}>{t('retailKassaPage.loading')}</p>
                 ) : !barHasLines ? (
                   <p className={`px-6 text-center text-base font-medium sm:text-lg ${ui.menuEmptyMuted}`}>
                     {t(modeHintKey)}
                   </p>
-                ) : null}
+                ) : (
+                  <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden">
+                    <div
+                      className={`${scanBarRowGridClass} shrink-0 border-b border-white/15 px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-white/45 sm:px-4`}
+                    >
+                      <span>{t('retailKassaPage.barcodeCol')}</span>
+                      <span>{t('retailKassaPage.nameCol')}</span>
+                      <span>{t('retailKassaPage.size')}</span>
+                      <span>{t('retailKassaPage.color')}</span>
+                      <span>{t('retailKassaPage.stock')}</span>
+                      <span>{t('retailKassaPage.price')}</span>
+                      <span className="sr-only">{t('common.delete')}</span>
+                    </div>
+                    <div
+                      ref={scanBarRef}
+                      data-testid="retail-kassa-scan-bar"
+                      className="min-h-0 flex-1 overflow-y-auto overflow-x-auto overscroll-y-contain touch-manipulation [scrollbar-gutter:stable]"
+                    >
+                      {mode === 'sales'
+                        ? cart.map((l) =>
+                            renderScanBarRow(l.sku.lineKey, l.sku, {
+                              quantity: l.quantity,
+                              onRemove: () => {
+                                playClick()
+                                updateQty(l.sku.lineKey, 0)
+                              },
+                            }),
+                          )
+                        : stockActivity.map((row) => {
+                            const note =
+                              row.mode === 'goodsReceipt'
+                                ? `${t('retailKassaPage.stockAdded').replace('{n}', String(row.delta))} · ${row.sku.stock_quantity}`
+                                : `${t('retailKassaPage.stockPlusOne')} · ${row.sku.stock_quantity}`
+                            return renderScanBarRow(row.key, row.sku, {
+                              stockNote: note,
+                              onRemove: () => removeStockActivityLine(row.key),
+                            })
+                          })}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 

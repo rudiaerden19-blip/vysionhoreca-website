@@ -5746,6 +5746,7 @@
     "outOfStock": "Insufficient stock",
     "barcodeCol": "バーコード",
     "nameCol": "商品",
+    "removeLine": "行を削除",
     "barcodeNotFound": "Article not found",
     "unknownScanTitle": "新しいバーコード",
     "unknownScanHint": "初回のみ：名前を確認し価格を入力。次回からは自動で認識します。",
