@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useLanguage } from '@/i18n'
 import { getTenantSettings, type TenantSettings } from '@/lib/admin-api'
@@ -113,6 +113,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   )
 
   const scanRef = useRef<HTMLInputElement>(null)
+  const articleSearchActiveRef = useRef(false)
   const barcodeCaptureRef = useRef<HTMLInputElement>(null)
   const scanBarRef = useRef<HTMLDivElement>(null)
   const langRef = useRef<HTMLDivElement>(null)
@@ -133,6 +134,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [mode, setMode] = useState<RetailKassaMode>('sales')
   const [stockActivity, setStockActivity] = useState<StockActivityLine[]>([])
   const [stockBusy, setStockBusy] = useState(false)
+  /** Schermtoetsenbord alleen na expliciete tik op «Artikel zoeken». */
+  const [articleSearchActive, setArticleSearchActive] = useState(false)
 
   const reload = useCallback(async () => {
     setLoading(true)
@@ -161,9 +164,55 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     barcodeCaptureRef.current?.focus({ preventScroll: true })
   }, [])
 
-  useEffect(() => {
+  const applyArticleSearchDomInactive = useCallback((el: HTMLInputElement) => {
+    articleSearchActiveRef.current = false
+    el.readOnly = true
+    el.setAttribute('inputmode', 'none')
+    el.setAttribute('data-kassa-no-web-keyboard', 'true')
+  }, [])
+
+  const applyArticleSearchDomActive = useCallback((el: HTMLInputElement) => {
+    articleSearchActiveRef.current = true
+    el.readOnly = false
+    el.setAttribute('inputmode', 'search')
+    el.removeAttribute('data-kassa-no-web-keyboard')
+  }, [])
+
+  const closeArticleSearchKeyboard = useCallback(() => {
+    setArticleSearchActive(false)
+    const el = scanRef.current
+    if (el) applyArticleSearchDomInactive(el)
+    el?.blur()
     focusBarcodeCapture()
-  }, [focusBarcodeCapture])
+  }, [applyArticleSearchDomInactive, focusBarcodeCapture])
+
+  const openArticleSearchKeyboard = useCallback(() => {
+    setArticleSearchActive(true)
+    requestAnimationFrame(() => {
+      const el = scanRef.current
+      if (!el) return
+      applyArticleSearchDomActive(el)
+      el.focus({ preventScroll: true })
+    })
+  }, [applyArticleSearchDomActive])
+
+  useLayoutEffect(() => {
+    setArticleSearchActive(false)
+    const active = document.activeElement
+    if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) {
+      active.blur()
+    }
+    const el = scanRef.current
+    if (el) applyArticleSearchDomInactive(el)
+    el?.blur()
+    focusBarcodeCapture()
+  }, [applyArticleSearchDomInactive, focusBarcodeCapture])
+
+  useEffect(() => {
+    return () => {
+      scanRef.current?.blur()
+    }
+  }, [])
 
   useEffect(() => {
     if (!langOpen) return
@@ -205,7 +254,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     playClick()
     setMode(next)
     setStockActivity([])
-    focusBarcodeCapture()
+    closeArticleSearchKeyboard()
   }
 
   function pushStockActivity(product: RetailPosProduct, delta: number, activityMode: RetailKassaMode) {
@@ -627,18 +676,32 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             >
               <input
                 ref={scanRef}
-                type="search"
-                inputMode="search"
+                type="text"
+                inputMode={articleSearchActive ? 'search' : 'none'}
                 autoComplete="off"
+                readOnly={!articleSearchActive}
+                data-retail-article-search
+                {...(articleSearchActive ? {} : { 'data-kassa-no-web-keyboard': true })}
                 placeholder={t('retailKassaPage.scanPlaceholder')}
                 value={scanValue}
                 onChange={(e) => setScanValue(e.target.value)}
+                onPointerDown={() => {
+                  if (!articleSearchActive) openArticleSearchKeyboard()
+                }}
+                onFocus={(e) => {
+                  if (!articleSearchActiveRef.current) {
+                    applyArticleSearchDomInactive(e.currentTarget)
+                    e.currentTarget.blur()
+                    focusBarcodeCapture()
+                  }
+                }}
                 onBlur={() => {
                   window.setTimeout(() => {
                     const active = document.activeElement
                     if (active === scanRef.current) return
                     if (active instanceof HTMLElement && active.closest('[data-web-touch-keyboard-panel]')) return
-                    focusBarcodeCapture()
+                    if (!articleSearchActiveRef.current) return
+                    closeArticleSearchKeyboard()
                   }, 120)
                 }}
                 className={`flex-1 rounded-full px-5 py-2.5 text-base text-[#f0f0f0] placeholder:text-white/45 focus:outline-none ${KASSA_POS_FIELD}`}
@@ -925,7 +988,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               <div className="flex touch-manipulation select-none gap-2.5">
                 <button
                   type="button"
-                  onClick={() => scanRef.current?.focus()}
+                  onClick={() => openArticleSearchKeyboard()}
                   className={`flex items-center justify-center px-3 min-h-[3.5rem] py-3 ${KASSA_SIDEBAR_FOOTER_LEFT_COL} ${kassaPosButtonClass(false)}`}
                   title={t('retailKassaPage.scanPlaceholder')}
                 >
