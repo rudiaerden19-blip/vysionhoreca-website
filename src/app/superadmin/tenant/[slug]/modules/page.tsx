@@ -254,16 +254,7 @@ export default function SuperadminTenantModulesPage() {
                       <ModuleSlider
                         checked={!!moduleToggles[id]}
                         disabled={false}
-                        onChange={(next) => {
-                          setModuleToggles((prev) => ({ ...prev, [id]: next }))
-                          if (!next && id === 'retail-kassa') {
-                            setSubToggles((s) => {
-                              const out = { ...s }
-                              for (const it of nestedItems) out[it.id] = false
-                              return out
-                            })
-                          }
-                        }}
+                        onChange={(next) => setModuleToggles((prev) => ({ ...prev, [id]: next }))}
                       />
                     )}
                   </div>

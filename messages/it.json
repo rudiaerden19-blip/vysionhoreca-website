@@ -5606,7 +5606,7 @@
   },
   "tenantModulesPage": {
     "title": "Moduli",
-    "subtitle": "Ogni interruttore (modulo principale e ogni sottomenu) è autonomo. Dopo il salvataggio vale esattamente la tua scelta — anche in prova. «Cassa» principale = vendita; retail separato. Il modulo account resta attivo.",
+    "subtitle": "Ogni interruttore in un blocco vale uguale: uno attivo e gli altri off, o qualsiasi combinazione. Nessun collegamento automatico. Dopo il salvataggio vale la tua scelta. Solo l’account resta sempre attivo.",
     "save": "Salva",
     "saving": "Salvataggio…",
     "saved": "Salvato",

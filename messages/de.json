@@ -5629,7 +5629,7 @@
   },
   "tenantModulesPage": {
     "title": "Module",
-    "subtitle": "Jeder Schieberegler (Hauptmodul und jedes Untermenü) steht für sich. Nach dem Speichern gilt exakt Ihre Wahl — auch in der Testphase. Haupt «Kassa» = Verkauf; Einzelhandel separat. Konto-Hauptmodul bleibt an.",
+    "subtitle": "Jeder Schieberegler in einem Block gilt gleich: einer an, der Rest aus — oder beliebig gemischt. Nichts wird automatisch gekoppelt. Nach dem Speichern gilt Ihre Wahl exakt. Nur Konto bleibt immer an.",
     "save": "Speichern",
     "saving": "Speichern…",
     "saved": "Gespeichert",

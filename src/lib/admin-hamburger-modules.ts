@@ -589,12 +589,10 @@ export function buildEnabledModulesSavePayload(
   const seen = new Set<string>()
   const hmods = buildHamburgerModules(`/shop/${tenantSlug}/admin`, tenantSlug)
   for (const m of hmods) {
-    const parentOn = m.key === 'account' ? true : !!moduleToggles[m.key]
     for (const it of m.items) {
       if (seen.has(it.id)) continue
       seen.add(it.id)
-      if (m.key === 'retail-kassa' && !parentOn) payload[it.id] = false
-      else payload[it.id] = !!subToggles[it.id]
+      payload[it.id] = !!subToggles[it.id]
     }
   }
   return payload
@@ -678,6 +676,10 @@ export function isAdminSubmenuEnabled(
   moduleAccess: Record<TenantModuleId, boolean>,
   enabledJson: Record<string, boolean> | null
 ): boolean {
+  if (enabledJson && hasExplicitEnabledModules(enabledJson)) {
+    return enabledJson[subId] === true
+  }
+
   const baseUrl = `/shop/${tenantSlug}/admin`
   const mods = buildHamburgerModules(baseUrl, tenantSlug)
   const mod = mods.find((m) => m.items.some((it) => it.id === subId))
@@ -714,9 +716,12 @@ export function hasShopAdminPathAccess(
   }
 
   if (hasModuleAccessForPathname(pathname, tenantSlug, moduleAccess)) return true
-  const gate = adminPathToModule(pathname, tenantSlug)
   const subId = getSubmenuIdForPathname(pathname, tenantSlug, moduleAccess)
   if (!subId) return false
+  if (enabledModulesJson && hasExplicitEnabledModules(enabledModulesJson)) {
+    return enabledModulesJson[subId] === true
+  }
+  const gate = adminPathToModule(pathname, tenantSlug)
   const parentAllowed = submenuParentAllowedForSubmenuId(subId, gate, moduleAccess)
   return isSubmenuEnabledInTenantConfig(subId, enabledModulesJson, parentAllowed)
 }
@@ -727,7 +732,10 @@ function moduleRowVisibleInMenu(
   enabledModulesJson: Record<string, boolean> | null
 ): boolean {
   if (enabledModulesJson && hasExplicitEnabledModules(enabledModulesJson)) {
-    return m.items.some((item) => enabledModulesJson[item.id] === true)
+    return (
+      enabledModulesJson[m.key] === true ||
+      m.items.some((item) => enabledModulesJson[item.id] === true)
+    )
   }
   if (m.key === 'website') {
     return menuAccess.website || menuAccess.instellingen || menuAccess.online
@@ -750,6 +758,9 @@ export function filterHamburgerModulesForAccess(
       ...m,
       items: m.items.filter((item) => {
         if (item.href.includes('/labels') && !effectiveLabelPrinting) return false
+        if (enabledModulesJson && hasExplicitEnabledModules(enabledModulesJson)) {
+          return enabledModulesJson[item.id] === true
+        }
         let parentOn = effectiveAccess[m.key]
         if (m.key === 'website') {
           if (item.id === 'sm_inst_opening' || item.id === 'sm_inst_levering') {

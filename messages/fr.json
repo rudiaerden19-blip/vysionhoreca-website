@@ -5629,7 +5629,7 @@
   },
   "tenantModulesPage": {
     "title": "Modules",
-    "subtitle": "Chaque curseur (module principal et chaque sous-menu) est indépendant. Après enregistrement, votre choix s’applique exactement — essai inclus. « Caisse » principal = vente ; retail séparé. Le module compte reste actif.",
+    "subtitle": "Chaque curseur d’un bloc fonctionne pareil : un seul activé, les autres off, ou tout mélange. Aucun lien automatique. Après enregistrement, votre choix s’applique exactement. Seul le compte reste toujours actif.",
     "save": "Enregistrer",
     "saving": "Enregistrement…",
     "saved": "Enregistré",

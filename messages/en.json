@@ -5565,7 +5565,7 @@
   },
   "tenantModulesPage": {
     "title": "Modules",
-    "subtitle": "Every slider (main module and each submenu) works on its own. After save, your choices apply exactly — including during trial. Main «Kassa» = POS; retail sales can be separate. Account main module stays on.",
+    "subtitle": "Every slider in a block works the same: turn one on and the rest off, or any mix. Nothing is linked automatically. After save, your choices apply exactly. Only account stays always on.",
     "save": "Save",
     "saving": "Saving…",
     "saved": "Saved",

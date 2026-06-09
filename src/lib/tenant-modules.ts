@@ -247,18 +247,23 @@ export function isTenantSubmenuEffectiveOn(
   return false
 }
 
-/** Hoofdmodule «Kassa» = horeca-verkoopscherm `/admin/kassa`. */
+/** Schuif `kassa` in Modules (zelfde vlak als pincode/producten …). */
 export function isHorecaKassaPosScreenEnabled(
   moduleAccess: Record<TenantModuleId, boolean>
 ): boolean {
   return !!moduleAccess.kassa
 }
 
-/** Winkelkassa-POS: hoofdmodule óf submenu «Verkoop (barcode)». */
+/** Schuif `retail-kassa` of submenu «Verkoop (barcode)» — elk apart. */
 export function isRetailKassaPosScreenEnabled(
   moduleAccess: Record<TenantModuleId, boolean>,
   enabledJson: Record<string, boolean> | null
 ): boolean {
+  if (enabledJson && hasExplicitEnabledModules(enabledJson)) {
+    return (
+      enabledJson['retail-kassa'] === true || enabledJson.sm_retail_kassa_pos === true
+    )
+  }
   if (moduleAccess['retail-kassa']) return true
   return isTenantSubmenuEffectiveOn('sm_retail_kassa_pos', enabledJson, false)
 }
