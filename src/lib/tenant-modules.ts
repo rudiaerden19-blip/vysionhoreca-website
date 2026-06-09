@@ -288,6 +288,20 @@ export function isShopAdminKassaPosPath(pathnameNormalized: string, tenantSlug: 
   return p === base
 }
 
+/** Winkelkassa `/shop/:slug/admin/retail-kassa` — zelfde vrije toegang als horeca-POS (geen submenu-redirect). */
+export function isShopAdminRetailKassaPosPath(pathnameNormalized: string, tenantSlug: string): boolean {
+  const base = `/shop/${tenantSlug}/admin/retail-kassa`
+  const p = pathnameNormalized.split('?')[0].replace(/\/+$/, '')
+  return p === base
+}
+
+export function isShopAdminAnyPosPath(pathnameNormalized: string, tenantSlug: string): boolean {
+  return (
+    isShopAdminKassaPosPath(pathnameNormalized, tenantSlug) ||
+    isShopAdminRetailKassaPosPath(pathnameNormalized, tenantSlug)
+  )
+}
+
 /**
  * Bestemming voor de admin-topbalk «terug naar kassa» — het verkoopscherm.
  * Submenu’s (categorieën, producten, …) gelden voor de hamburger-setup, niet voor toegang tot `/kassa`.

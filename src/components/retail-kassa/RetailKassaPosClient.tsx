@@ -630,18 +630,45 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                       <span>{t('adminLayout.overview')}</span>
                     </Link>
                     {modules.map((mod) => (
-                      <div key={mod.rowKey} className={`border-b ${ui.flyMenuDivider} last:border-0`}>
+                      <div
+                        key={mod.rowKey}
+                        className={`flex items-stretch border-b ${ui.flyMenuDivider} last:border-0`}
+                      >
+                        {mod.entryHref ? (
+                          <Link
+                            href={mod.entryHref}
+                            prefetch={false}
+                            onClick={() => {
+                              setHamburgerOpen(false)
+                              setHamburgerSubOpen(null)
+                            }}
+                            className={`flex min-w-0 flex-1 items-center px-4 py-3 no-underline transition-colors ${ui.flyMenuRowHover}`}
+                          >
+                            <span className={`font-semibold text-sm ${ui.flyMenuTextMuted}`}>
+                              {mod.labelKey ? t(mod.labelKey) : mod.label}
+                            </span>
+                          </Link>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setHamburgerSubOpen(hamburgerSubOpen === mod.rowKey ? null : mod.rowKey)
+                            }
+                            className={`flex min-w-0 flex-1 items-center px-4 py-3 text-left transition-colors ${hamburgerSubOpen === mod.rowKey ? ui.flyMenuRowActive : ui.flyMenuRowHover}`}
+                          >
+                            <span className={`font-semibold text-sm ${ui.flyMenuTextMuted}`}>
+                              {mod.labelKey ? t(mod.labelKey) : mod.label}
+                            </span>
+                          </button>
+                        )}
                         <button
                           type="button"
                           onClick={() =>
                             setHamburgerSubOpen(hamburgerSubOpen === mod.rowKey ? null : mod.rowKey)
                           }
-                          className={`w-full flex items-center justify-between px-4 py-3 transition-colors ${hamburgerSubOpen === mod.rowKey ? ui.flyMenuRowActive : ui.flyMenuRowHover}`}
+                          className={`flex shrink-0 items-center px-3 py-3 ${ui.flyMenuChevron}`}
                         >
-                          <span className={`font-semibold text-sm ${ui.flyMenuTextMuted}`}>
-                            {mod.labelKey ? t(mod.labelKey) : mod.label}
-                          </span>
-                          <svg className={`w-4 h-4 ${ui.flyMenuChevron}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                           </svg>
                         </button>

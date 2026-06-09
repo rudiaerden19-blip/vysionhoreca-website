@@ -2,7 +2,11 @@ import type { TenantModuleId } from '@/lib/tenant-modules'
 import { isTenantSubmenuEffectiveOn } from '@/lib/tenant-modules'
 
 /** Altijd bereikbaar in menu en routes (abonnement / facturatie). */
-export const SUBMENU_IDS_ALWAYS_ON = new Set<string>(['sm_abonnement', 'sm_retail_kassa_pos'])
+export const SUBMENU_IDS_ALWAYS_ON = new Set<string>([
+  'sm_abonnement',
+  'sm_retail_kassa_pos',
+  'sm_retail_kassa_producten',
+])
 
 export type AdminHamburgerItem = {
   id: string
@@ -550,10 +554,14 @@ export function collectAllSubmenuIds(): string[] {
   return out
 }
 
-export function getSubmenuIdForPathname(pathname: string, tenantSlug: string): string | null {
+export function getSubmenuIdForPathname(
+  pathname: string,
+  tenantSlug: string,
+  moduleAccess?: Partial<Record<TenantModuleId, boolean>>,
+): string | null {
   const baseUrl = `/shop/${tenantSlug}/admin`
   const pathNoQuery = pathname.split('?')[0].replace(/\/+$/, '')
-  if (pathNoQuery === `${baseUrl}/kassa`) return null
+  if (pathNoQuery === `${baseUrl}/kassa` || pathNoQuery === `${baseUrl}/retail-kassa`) return null
 
   const modules = buildHamburgerModules(baseUrl, tenantSlug)
   let best: { id: string; len: number } | null = null
@@ -562,8 +570,25 @@ export function getSubmenuIdForPathname(pathname: string, tenantSlug: string): s
       if (pathname === item.href || pathname.startsWith(item.href + '/')) {
         const len = item.href.length
         if (!best || len > best.len) best = { id: item.id, len }
+        else if (best && len === best.len) {
+          if (
+            item.id === 'sm_retail_kassa_producten' &&
+            best.id === 'sm_kassa_producten' &&
+            moduleAccess?.['retail-kassa'] &&
+            !moduleAccess?.kassa
+          ) {
+            best = { id: item.id, len }
+          }
+        }
       }
     }
+  }
+  if (
+    pathNoQuery === `${baseUrl}/producten` &&
+    moduleAccess?.['retail-kassa'] &&
+    !moduleAccess?.kassa
+  ) {
+    return 'sm_retail_kassa_producten'
   }
   return best?.id ?? null
 }

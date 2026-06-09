@@ -9,7 +9,9 @@ import {
   adminPathToModule,
   getFirstAccessibleAdminPath,
   hasModuleAccessForPathname,
+  isShopAdminAnyPosPath,
   isShopAdminKassaPosPath,
+  isShopAdminRetailKassaPosPath,
   normalizeShopAdminPathname,
   submenuParentAllowedForSubmenuId,
   type TenantModuleId,
@@ -314,9 +316,9 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
       )
       return
     }
-    const subId = getSubmenuIdForPathname(adminPath, params.tenant)
+    const subId = getSubmenuIdForPathname(adminPath, params.tenant, moduleAccess)
     if (
-      !isShopAdminKassaPosPath(adminPath, params.tenant) &&
+      !isShopAdminAnyPosPath(adminPath, params.tenant) &&
       subId &&
       !isSubmenuForcedOn(subId) &&
       !isSubmenuEnabledInTenantConfig(
@@ -379,7 +381,7 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
   }
 
   const isHorecaKassaPos = isShopAdminKassaPosPath(adminPath, params.tenant)
-  const isRetailKassaPos = adminPath.includes('/retail-kassa')
+  const isRetailKassaPos = isShopAdminRetailKassaPosPath(adminPath, params.tenant)
 
   if (isHorecaKassaPos) {
     if (demoPublicUnauthenticated) {
