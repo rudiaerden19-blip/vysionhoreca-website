@@ -3737,6 +3737,8 @@
     "thermalPrinterOnlineHint": "Receipt printer online",
     "soundOnTitle": "Sound on",
     "soundOffTitle": "Sound off",
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode",
     "logout": "Log out",
     "offlineBanner": "Offline – menu loaded from cache. Orders are saved and sent when you reconnect.",
     "offlineModeActive": "Offline mode active",

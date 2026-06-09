@@ -4,11 +4,8 @@ import { useCallback, useEffect, useState } from 'react'
 
 export const KASSA_UI_DARK_EVENT = 'vysion:kassa-ui-dark-change'
 
-/**
- * Kassa altijd donker; lichte modus + toggle tijdelijk uit (support kan flag terugzetten).
- * Bij `true`: lees localStorage; zet ook Licht-knop terug in admin/kassa + layout.
- */
-export const KASSA_UI_APPEARANCE_TOGGLE_ENABLED = false
+/** Donker/licht-toggle in kassa-titelbalk (per tenant, localStorage). */
+export const KASSA_UI_APPEARANCE_TOGGLE_ENABLED = true
 
 export function kassaUiDarkStorageKey(tenantSlug: string): string {
   return `vysion:kassa-pro-dark:v1:${tenantSlug}`

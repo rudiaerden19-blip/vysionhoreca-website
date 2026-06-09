@@ -3263,6 +3263,8 @@
     "thermalPrinterOnlineHint": "小票打印机在线",
     "soundOnTitle": "声音开",
     "soundOffTitle": "声音关",
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode",
     "logout": "退出登录",
     "offlineBanner": "离线 – 菜单来自缓存。订单会保存并在恢复网络后发送。",
     "offlineModeActive": "离线模式已开启",

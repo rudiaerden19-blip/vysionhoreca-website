@@ -3263,6 +3263,8 @@
     "thermalPrinterOnlineHint": "レシートプリンター接続中",
     "soundOnTitle": "音オン",
     "soundOffTitle": "音オフ",
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode",
     "logout": "ログアウト",
     "offlineBanner": "オフライン – メニューはキャッシュから。注文は保存され再接続時に送信されます。",
     "offlineModeActive": "オフラインモード有効",

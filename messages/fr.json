@@ -2763,6 +2763,8 @@
     "thermalPrinterOnlineHint": "Imprimante tickets en ligne",
     "soundOnTitle": "Son activé",
     "soundOffTitle": "Son coupé",
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode",
     "logout": "Déconnexion",
     "offlineBanner": "Hors ligne – menu en cache. Les commandes sont enregistrées et envoyées à la reconnexion.",
     "offlineModeActive": "Mode hors ligne actif",

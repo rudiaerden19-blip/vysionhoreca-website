@@ -3263,6 +3263,8 @@
     "thermalPrinterOnlineHint": "طابعة الإيصالات متصلة",
     "soundOnTitle": "صوت مفعّل",
     "soundOffTitle": "صوت متوقف",
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode",
     "logout": "تسجيل الخروج",
     "offlineBanner": "غير متصل – القائمة من الذاكرة المؤقتة. تُحفظ الطلبات وتُرسل عند الاتصال.",
     "offlineModeActive": "وضع عدم الاتصال نشط",

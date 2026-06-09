@@ -74,7 +74,10 @@ import {
   isMarketingDemoTenantSlug,
   publicDemoSessionMatchesTenant,
 } from '@/lib/demo-links'
-import { useKassaUiDarkSync } from '@/lib/kassa-register-ui-dark-preference'
+import {
+  KASSA_UI_APPEARANCE_TOGGLE_ENABLED,
+  useKassaUiDarkSync,
+} from '@/lib/kassa-register-ui-dark-preference'
 import { createKassaRegisterUiTheme, type KassaRegisterUiTheme } from '@/lib/kassa-register-ui-theme'
 import { createKassaPosRegisterUiTheme } from '@/lib/kassa-pos-register-ui-theme'
 import {
@@ -820,7 +823,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setDemoFromMarketingSession(publicDemoSessionMatchesTenant(tenant))
   }, [tenant, searchParams])
   const demoViewOnly = demoFromUrl || demoFromMarketingSession
-  const { dark: kassaAppearanceDark } = useKassaUiDarkSync(tenant)
+  const { dark: kassaAppearanceDark, toggle: toggleKassaAppearance } = useKassaUiDarkSync(tenant)
   const ui = useMemo(
     () =>
       kassaAppearanceDark
@@ -4597,6 +4600,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <span className={KASSA_HEADER_QUICK_LINK_LABEL}>{t('kassaApp.navKitchenDisplay')}</span>
             </Link>
           )}
+
+          {KASSA_UI_APPEARANCE_TOGGLE_ENABLED && !demoViewOnly ? (
+            <button
+              type="button"
+              onClick={toggleKassaAppearance}
+              className={headerQuickLinkBtnClass}
+              title={kassaAppearanceDark ? t('kassaApp.lightMode') : t('kassaApp.darkMode')}
+            >
+              <span className={KASSA_HEADER_QUICK_LINK_LABEL}>
+                {kassaAppearanceDark ? t('kassaApp.lightMode') : t('kassaApp.darkMode')}
+              </span>
+            </button>
+          ) : null}
 
           <button
             type="button"

@@ -3263,6 +3263,8 @@
     "thermalPrinterOnlineHint": "Stampante scontrini online",
     "soundOnTitle": "Audio on",
     "soundOffTitle": "Audio off",
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode",
     "logout": "Esci",
     "offlineBanner": "Offline – menu dalla cache. Gli ordini vengono salvati e inviati alla riconnessione.",
     "offlineModeActive": "Modalità offline attiva",

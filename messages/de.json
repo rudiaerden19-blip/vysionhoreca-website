@@ -2763,6 +2763,8 @@
     "thermalPrinterOnlineHint": "Bondrucker online",
     "soundOnTitle": "Ton an",
     "soundOffTitle": "Ton aus",
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode",
     "logout": "Abmelden",
     "offlineBanner": "Offline – Menü aus dem Cache. Bestellungen werden gespeichert und bei Verbindung gesendet.",
     "offlineModeActive": "Offline-Modus aktiv",
