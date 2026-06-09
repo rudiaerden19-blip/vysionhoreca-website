@@ -339,6 +339,12 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     ? kassaPosButtonClass(true)
     : 'rounded-xl bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe] font-bold text-[11px] leading-tight sm:text-xs inline-flex shrink-0 items-center gap-1.5 px-2 py-1.5 transition-colors sm:gap-2 sm:px-3 sm:py-1.5'
 
+  const retailTopNavLabelClass =
+    'block text-center text-[10px] font-medium leading-tight sm:text-[11px]'
+  const retailTopNavBtnClass = (selected: boolean) =>
+    `shrink-0 min-h-[2rem] px-2 py-1 ${kassaPosButtonClass(selected)}`
+  const retailTopNavLinkClass = `shrink-0 min-h-[2rem] px-2 py-1 flex items-center justify-center ${kassaPosButtonClass(false)}`
+
   const kassaDarkHeaderBtnShell =
     'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.35rem] px-3 py-2 sm:min-h-[2.6rem] sm:px-3.5 sm:py-2.5'
 
@@ -1202,39 +1208,58 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
 
         <div className="flex min-h-0 flex-1 overflow-hidden w-full">
           <div className={`relative flex min-h-0 flex-1 flex-col overflow-hidden ${ui.shellBg}`}>
-            <div className="shrink-0 flex gap-2 px-3 pt-2 sm:px-4">
+            <div className="shrink-0 flex gap-1.5 overflow-x-auto px-3 pt-2 sm:px-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               <button
                 type="button"
                 data-testid="retail-mode-sales"
                 aria-pressed={mode === 'sales'}
                 onClick={() => switchMode('sales')}
-                className={`min-h-[2.75rem] flex-1 px-2 ${kassaPosButtonClass(mode === 'sales')}`}
+                className={retailTopNavBtnClass(mode === 'sales')}
               >
-                <span className={`block text-center ${kassaSidebarActionLabelClass}`}>
-                  {t('retailKassaPage.modeSales')}
-                </span>
+                <span className={retailTopNavLabelClass}>{t('retailKassaPage.modeSales')}</span>
               </button>
-              <Link
-                href={`${baseUrl}/voorraad`}
-                data-testid="retail-nav-voorraad"
-                onClick={() => playClick()}
-                className={`min-h-[2.75rem] flex-1 px-2 flex items-center justify-center ${kassaPosButtonClass(false)}`}
+              <button
+                type="button"
+                data-testid="retail-mode-stock-count"
+                aria-pressed={mode === 'stockCount'}
+                onClick={() => switchMode('stockCount')}
+                className={retailTopNavBtnClass(mode === 'stockCount')}
               >
-                <span className={`block text-center ${kassaSidebarActionLabelClass}`}>
-                  {t('retailKassaPage.modeStockCount')}
-                </span>
-              </Link>
+                <span className={retailTopNavLabelClass}>{t('retailKassaPage.modeStockCount')}</span>
+              </button>
               <button
                 type="button"
                 data-testid="retail-mode-goods-receipt"
                 aria-pressed={mode === 'goodsReceipt'}
                 onClick={() => switchMode('goodsReceipt')}
-                className={`min-h-[2.75rem] flex-1 px-2 ${kassaPosButtonClass(mode === 'goodsReceipt')}`}
+                className={retailTopNavBtnClass(mode === 'goodsReceipt')}
               >
-                <span className={`block text-center text-[11px] sm:text-sm font-medium leading-tight`}>
-                  {t('retailKassaPage.modeGoodsReceipt')}
-                </span>
+                <span className={retailTopNavLabelClass}>{t('retailKassaPage.modeGoodsReceipt')}</span>
               </button>
+              <Link
+                href={`${baseUrl}/voorraad`}
+                data-testid="retail-nav-voorraad"
+                onClick={() => playClick()}
+                className={retailTopNavLinkClass}
+              >
+                <span className={retailTopNavLabelClass}>{t('adminHamburger.rows.voorraad')}</span>
+              </Link>
+              <Link
+                href={`${baseUrl}/rapporten`}
+                data-testid="retail-nav-rapporten"
+                onClick={() => playClick()}
+                className={retailTopNavLinkClass}
+              >
+                <span className={retailTopNavLabelClass}>{t('adminHamburger.rows.rapporten')}</span>
+              </Link>
+              <Link
+                href={`${baseUrl}/modules`}
+                data-testid="retail-nav-instellingen"
+                onClick={() => playClick()}
+                className={retailTopNavLinkClass}
+              >
+                <span className={retailTopNavLabelClass}>{t('adminHamburger.rows.instellingen')}</span>
+              </Link>
             </div>
             <input
               ref={barcodeCaptureRef}
