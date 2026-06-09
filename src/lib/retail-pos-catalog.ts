@@ -148,15 +148,48 @@ export async function fetchRetailPosSkus(tenantSlug: string): Promise<RetailPosS
   )
 }
 
-export function findRetailSkuByCode(skus: RetailPosSku[], code: string): RetailPosSku | null {
-  const norm = code.trim()
-  if (!norm) return null
-  const lower = norm.toLowerCase()
+/** Varianten van gescande code (UPC-A 12 ↔ EAN-13 met voorloopnul, alleen cijfers). */
+export function retailBarcodeLookupCandidates(raw: string): string[] {
+  const trimmed = raw.trim()
+  if (!trimmed) return []
+
+  const out: string[] = []
+  const seen = new Set<string>()
+  const push = (s: string) => {
+    const t = s.trim()
+    if (!t) return
+    const key = t.toLowerCase()
+    if (seen.has(key)) return
+    seen.add(key)
+    out.push(t)
+  }
+
+  push(trimmed)
+
+  const digits = trimmed.replace(/\D/g, '')
+  if (digits.length > 0) {
+    push(digits)
+    if (digits.length === 12) push(`0${digits}`)
+    if (digits.length === 13 && digits.startsWith('0')) push(digits.slice(1))
+  }
+
+  return out
+}
+
+function skuMatchesCode(sku: RetailPosSku, lowerCode: string): boolean {
   return (
-    skus.find((s) => s.barcode && s.barcode.toLowerCase() === lower) ||
-    skus.find((s) => s.article_number && s.article_number.toLowerCase() === lower) ||
-    null
+    (!!sku.barcode && sku.barcode.toLowerCase() === lowerCode) ||
+    (!!sku.article_number && sku.article_number.toLowerCase() === lowerCode)
   )
+}
+
+export function findRetailSkuByCode(skus: RetailPosSku[], code: string): RetailPosSku | null {
+  for (const candidate of retailBarcodeLookupCandidates(code)) {
+    const lower = candidate.toLowerCase()
+    const hit = skus.find((s) => skuMatchesCode(s, lower))
+    if (hit) return hit
+  }
+  return null
 }
 
 /** Zoek op barcode/artikelnr., anders unieke naam-treffer (artikel zoeken). */

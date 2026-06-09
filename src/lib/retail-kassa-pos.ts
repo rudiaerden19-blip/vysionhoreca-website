@@ -163,6 +163,53 @@ export async function applyRetailStockScanIncrement(
   return { ...res, product: res.sku }
 }
 
+/** Eerste scan onbekende EAN: product aanmaken (naam + prijs), daarna normale lookup. */
+export async function createRetailSkuFromScan(
+  tenantSlug: string,
+  input: { barcode: string; name: string; price: number },
+): Promise<{ ok: boolean; sku?: RetailPosSku; error?: string }> {
+  const name = input.name.trim()
+  const barcodeRaw = input.barcode.trim()
+  const price = Math.round(Number(input.price) * 100) / 100
+  if (!name || !barcodeRaw || !(price >= 0)) {
+    return { ok: false, error: 'invalid_input' }
+  }
+
+  const catalog = await fetchRetailPosSkus(tenantSlug)
+  const existing = findRetailSkuByCode(catalog, barcodeRaw)
+  if (existing) {
+    return { ok: true, sku: existing }
+  }
+
+  const digits = barcodeRaw.replace(/\D/g, '')
+  const storeBarcode = digits.length >= 8 ? digits : barcodeRaw
+
+  const ins = await adminDb.insert(
+    'menu_products',
+    {
+      tenant_slug: tenantSlug,
+      name,
+      description: '',
+      price,
+      barcode: storeBarcode,
+      is_active: true,
+      track_stock: false,
+      stock_quantity: 0,
+      low_stock_threshold: 5,
+      image_url: '',
+      sort_order: 0,
+    },
+    { tenantSlug, select: PRODUCT_STOCK_SELECT },
+  )
+  if (!ins.ok) {
+    return { ok: false, error: ins.error || 'insert_failed' }
+  }
+
+  const refreshed = await fetchRetailPosSkus(tenantSlug)
+  const sku = findRetailSkuByCode(refreshed, barcodeRaw) ?? refreshed[refreshed.length - 1]
+  return sku ? { ok: true, sku } : { ok: false, error: 'sku_missing' }
+}
+
 export async function applyRetailGoodsReceipt(
   tenantSlug: string,
   sku: RetailPosSku,

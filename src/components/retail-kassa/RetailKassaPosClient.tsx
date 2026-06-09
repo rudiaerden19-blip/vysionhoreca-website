@@ -31,6 +31,7 @@ import {
   applyRetailGoodsReceipt,
   applyRetailStockScanIncrement,
   completeRetailCashSale,
+  createRetailSkuFromScan,
   fetchRetailPosSkus,
   parseRetailScanPayload,
   resolveRetailSkuForGoodsReceipt,
@@ -272,22 +273,68 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     setSkus((prev) => patchSkuInList(prev, next))
   }
 
+  /** Onbekende EAN: opzoeken, artikel aanmaken, daarna normale scan. */
+  async function importSkuFromBarcode(code: string): Promise<RetailPosSku | null> {
+    const trimmed = code.trim()
+    if (!trimmed) return null
+
+    let lookup: { ok?: boolean; name?: string; price?: number | null } = {}
+    try {
+      const r = await fetch(`/api/retail/ean-lookup?ean=${encodeURIComponent(trimmed)}`)
+      lookup = (await r.json()) as typeof lookup
+    } catch {
+      lookup = {}
+    }
+
+    const digits = trimmed.replace(/\D/g, '')
+    const name =
+      lookup.name?.trim() || (digits.length >= 8 ? `EAN ${digits}` : trimmed)
+    const price =
+      lookup.price != null && Number.isFinite(Number(lookup.price))
+        ? Math.round(Number(lookup.price) * 100) / 100
+        : 0
+
+    const res = await createRetailSkuFromScan(tenant, { barcode: trimmed, name, price })
+    if (!res.ok) return null
+
+    const list = await fetchRetailPosSkus(tenant)
+    setSkus(list)
+    return resolveRetailSkuLookup(list, trimmed) ?? res.sku ?? null
+  }
+
+  async function resolveOrImportSku(code: string): Promise<RetailPosSku | null> {
+    const hit = resolveRetailSkuLookup(skus, code)
+    if (hit) return hit
+    return importSkuFromBarcode(code)
+  }
+
   async function processBarcode(code: string) {
     const trimmed = code.trim()
     if (!trimmed || stockBusy) return
 
     if (mode === 'sales') {
-      const hit = resolveRetailSkuLookup(skus, trimmed)
-      if (hit) addToCart(hit, 1)
-      else alert(t('retailKassaPage.barcodeNotFound'))
+      setStockBusy(true)
+      try {
+        const hit = await resolveOrImportSku(trimmed)
+        if (hit) addToCart(hit, 1)
+        else alert(t('retailKassaPage.autoScanImportError'))
+      } finally {
+        setStockBusy(false)
+        setScanValue('')
+        if (barcodeCaptureRef.current) barcodeCaptureRef.current.value = ''
+        focusBarcodeCapture()
+      }
       return
     }
 
     const payload = parseRetailScanPayload(trimmed)
-    const hit =
+    let hit =
       mode === 'goodsReceipt'
         ? resolveRetailSkuForGoodsReceipt(skus, payload)
         : resolveRetailSkuLookup(skus, payload.lookupCode)
+    if (!hit) {
+      hit = await importSkuFromBarcode(payload.lookupCode || trimmed)
+    }
     if (!hit) {
       alert(t('retailKassaPage.barcodeNotFound'))
       return
