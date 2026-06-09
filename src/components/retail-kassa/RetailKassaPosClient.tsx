@@ -33,7 +33,14 @@ import {
 import type { KassaPayOption } from '@/components/kassa/KassaPaymentModal'
 import { KassaPaymentModal } from '@/components/kassa/KassaPaymentModal'
 import { KassaSplitPaymentModal } from '@/components/kassa/KassaSplitPaymentModal'
-import type { KassaPaymentMethod } from '@/lib/kassa-cart-types'
+import { KassaSuccessReceiptModal } from '@/components/kassa/KassaSuccessReceiptModal'
+import type { KassaLastOrderReceipt, KassaPaymentMethod } from '@/lib/kassa-cart-types'
+import {
+  buildRetailLastOrderReceipt,
+  printRetailKassaReceipt,
+  tryBrowserPrintFallback,
+  type RetailReceiptI18n,
+} from '@/lib/retail-kassa-receipt'
 import {
   applyRetailGoodsReceipt,
   applyRetailStockScanIncrement,
@@ -69,7 +76,7 @@ import {
   setTerminalLogout,
 } from '@/lib/session-broadcast'
 import { appendKassaCloseTipToAbsoluteLoginUrl } from '@/lib/shop-login-kassa-tip'
-import { openCashDrawer } from '@/lib/vysion-print-agent-client'
+import { isAndroidTabletPrintClient, openCashDrawer } from '@/lib/vysion-print-agent-client'
 import { playClick } from '@/lib/sounds'
 
 const KASSA_HEADER_QUICK_LINK_LABEL = 'text-[11px] leading-snug sm:text-xs'
@@ -142,7 +149,12 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [scanValue, setScanValue] = useState('')
   const [cart, setCart] = useState<RetailCartLine[]>([])
   const [paying, setPaying] = useState(false)
-  const [lastOrder, setLastOrder] = useState<number | null>(null)
+  const [lastOrderReceipt, setLastOrderReceipt] = useState<KassaLastOrderReceipt | null>(null)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [successReceiptPrintBusy, setSuccessReceiptPrintBusy] = useState(false)
+  const [draftBonPrinting, setDraftBonPrinting] = useState(false)
+  const [printAgentFallbackHtml, setPrintAgentFallbackHtml] = useState<string | null>(null)
+  const [thermalPrintBanner, setThermalPrintBanner] = useState<string | null>(null)
   const [hamburgerOpen, setHamburgerOpen] = useState(false)
   const [hamburgerSubOpen, setHamburgerSubOpen] = useState<string | null>(null)
   const [quickMenuPanelOpen, setQuickMenuPanelOpen] = useState(false)
@@ -279,6 +291,32 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       { method: 'IDEAL', label: t('kassaApp.payIdeal'), icon: '📱', color: '#ec4899' },
       { method: 'BANCONTACT', label: t('kassaApp.payBancontact'), icon: '🏦', color: '#f59e0b' },
     ],
+    [t],
+  )
+
+  const receiptLabels = useMemo<RetailReceiptI18n>(
+    () => ({
+      defaultBusinessName: t('kassaApp.defaultBusinessName'),
+      orderTypeTakeaway: t('kassaReceipt.orderTypeTakeaway'),
+      receiptNo: t('kassaReceipt.receiptNo'),
+      telPrefix: t('kassaReceipt.telPrefix'),
+      subtotal: t('kassaReceipt.subtotal'),
+      vatLabel: (rate) => t('kassaReceipt.vat').replace('{rate}', String(rate)),
+      total: t('kassaReceipt.total'),
+      paidWith: t('kassaReceipt.paidWith'),
+      payCash: t('kassaApp.payCash'),
+      payCard: t('kassaApp.payCard'),
+      payIdeal: t('kassaApp.payIdeal'),
+      payBancontact: t('kassaApp.payBancontact'),
+      paidSplit: (cash, card) =>
+        t('kassaReceipt.paidSplit').replace('{cash}', cash).replace('{card}', card),
+      businessVatLabel: (vatNumber) =>
+        t('kassaReceipt.businessVatLabel').replace('{vatNumber}', vatNumber),
+      thanks: t('kassaReceipt.thanks'),
+      draftBanner: t('kassaReceipt.draftBanner'),
+      draftNotPaid: t('kassaReceipt.draftNotPaid'),
+      draftFooter: t('kassaReceipt.draftFooter'),
+    }),
     [t],
   )
 
@@ -593,13 +631,51 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     focusBarcodeCapture()
   }
 
+  async function printRetailReceipt(order: KassaLastOrderReceipt, draft?: boolean) {
+    const result = await printRetailKassaReceipt({
+      tenantInfo,
+      order,
+      labels: receiptLabels,
+      locale,
+      draft,
+    })
+    if (result.ok) {
+      setThermalPrintBanner(null)
+      setPrintAgentFallbackHtml(null)
+      return
+    }
+    setThermalPrintBanner(
+      `${t('kassaApp.printAgentFailedDebugTitle')}\n\n${result.error}\n\n${t('kassaApp.printAgentFailedDebugFooter')}`,
+    )
+    setPrintAgentFallbackHtml(result.fallbackHtml)
+  }
+
+  async function printDraftBonFromCart() {
+    if (cart.length === 0 || draftBonPrinting) return
+    playClick()
+    setDraftBonPrinting(true)
+    try {
+      const draftOrder = buildRetailLastOrderReceipt(
+        cart,
+        'CARD',
+        0,
+        tenantInfo?.btw_percentage ?? 21,
+      )
+      await printRetailReceipt(draftOrder, true)
+    } finally {
+      setDraftBonPrinting(false)
+      focusBarcodeCapture()
+    }
+  }
+
   async function completePayment(
     method: KassaPaymentMethod,
     splitAmounts?: { cash: number; card: number },
   ) {
     if (cart.length === 0 || paying) return
+    const linesSnapshot = [...cart]
     setPaying(true)
-    const res = await completeRetailSale(tenant, cart, method, splitAmounts)
+    const res = await completeRetailSale(tenant, linesSnapshot, method, splitAmounts)
     setPaying(false)
     setShowPaymentModal(false)
     setShowSplitModal(false)
@@ -607,9 +683,18 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       alert(t('retailKassaPage.payError'))
       return
     }
-    setLastOrder(res.orderNumber ?? null)
+    const orderNumber = res.orderNumber ?? 0
+    const receipt = buildRetailLastOrderReceipt(
+      linesSnapshot,
+      method,
+      orderNumber,
+      tenantInfo?.btw_percentage ?? 21,
+      splitAmounts,
+    )
+    setLastOrderReceipt(receipt)
     setCart([])
     await reload()
+    setShowSuccessModal(true)
     focusBarcodeCapture()
   }
 
@@ -697,6 +782,76 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         onConfirm={() => void completePayment('SPLIT', { cash: splitCash, card: splitCard })}
         appearance={appearanceDark ? 'dark' : 'light'}
       />
+
+      {lastOrderReceipt ? (
+        <KassaSuccessReceiptModal
+          open={showSuccessModal}
+          order={lastOrderReceipt}
+          tenantInfo={tenantInfo}
+          locale={locale}
+          onClose={() => setShowSuccessModal(false)}
+          printDisabled={successReceiptPrintBusy}
+          onPrint={async () => {
+            try {
+              setSuccessReceiptPrintBusy(true)
+              await printRetailReceipt(lastOrderReceipt)
+            } finally {
+              setSuccessReceiptPrintBusy(false)
+              setShowSuccessModal(false)
+            }
+          }}
+        />
+      ) : null}
+
+      {printAgentFallbackHtml !== null && (
+        <div
+          className="fixed inset-0 z-[220] flex items-center justify-center bg-black/55 p-4"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className={`w-full max-w-md space-y-3 p-5 ${KASSA_POS_BTN_SHAPE} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} border ${KASSA_POS_RULE_BLACK}`}
+          >
+            <p className="text-sm font-semibold text-white">{t('kassaApp.printAgentFallbackModalTitle')}</p>
+            <p className="text-xs text-white/75">{t('kassaApp.printAgentFallbackModalBody')}</p>
+            <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                className={`w-full py-2.5 sm:w-auto ${kassaPosButtonClass(false)}`}
+                onClick={() => setPrintAgentFallbackHtml(null)}
+              >
+                {t('kassaApp.printAgentFallbackModalClose')}
+              </button>
+              <button
+                type="button"
+                disabled={!printAgentFallbackHtml || isAndroidTabletPrintClient()}
+                className={`w-full py-2.5 sm:w-auto ${kassaPosButtonClass(true)} disabled:opacity-50`}
+                onClick={() => {
+                  const h = printAgentFallbackHtml
+                  setPrintAgentFallbackHtml(null)
+                  setThermalPrintBanner(null)
+                  if (h) tryBrowserPrintFallback(h)
+                }}
+              >
+                {t('kassaApp.printAgentFallbackModalContinue')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {thermalPrintBanner ? (
+        <div className="fixed inset-x-0 top-0 z-[210] bg-red-900/95 px-4 py-3 text-center text-xs text-white whitespace-pre-line">
+          {thermalPrintBanner}
+          <button
+            type="button"
+            className="ml-3 underline"
+            onClick={() => setThermalPrintBanner(null)}
+          >
+            {t('common.close')}
+          </button>
+        </div>
+      ) : null}
 
       <div className={`flex min-h-0 flex-1 flex-col overflow-hidden ${ui.shellBg}`}>
         <div
@@ -1139,9 +1294,9 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                   ))
                 )}
               </div>
-              {lastOrder != null && (
+              {lastOrderReceipt != null && lastOrderReceipt.orderNumber > 0 && (
                 <p className="shrink-0 text-center text-xs text-emerald-300/90 py-1">
-                  {t('retailKassaPage.lastOrder').replace('{n}', String(lastOrder))}
+                  {t('retailKassaPage.lastOrder').replace('{n}', String(lastOrderReceipt.orderNumber))}
                 </p>
               )}
             </div>
@@ -1194,11 +1349,14 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                     </button>
                     <button
                       type="button"
-                      disabled
+                      disabled={cart.length === 0 || draftBonPrinting}
+                      onClick={() => void printDraftBonFromCart()}
                       className={`flex items-center justify-center px-1 min-h-[2.5rem] ${kassaPosButtonClass(false)}`}
                       title={t('kassaApp.cartBonTitle')}
                     >
-                      <span className={kassaSidebarActionLabelClass}>{t('kassaApp.cartBon')}</span>
+                      <span className={kassaSidebarActionLabelClass}>
+                        {draftBonPrinting ? t('kassaReceipt.printSending') : t('kassaApp.cartBon')}
+                      </span>
                     </button>
                     <button
                       type="button"
