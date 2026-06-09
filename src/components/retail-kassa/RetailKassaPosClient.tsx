@@ -16,7 +16,6 @@ import {
   useKassaUiDarkSync,
 } from '@/lib/kassa-register-ui-dark-preference'
 import {
-  KASSA_POS_CART_ROW,
   KASSA_POS_CHECKOUT_BTN,
   KASSA_POS_FIELD,
   KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
