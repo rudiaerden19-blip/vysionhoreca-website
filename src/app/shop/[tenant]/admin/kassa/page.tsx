@@ -45,6 +45,10 @@ import {
 } from '@/lib/admin-hamburger-modules'
 import { useTenantModuleFlagsContext } from '@/lib/tenant-module-flags-context'
 import {
+  tenantShouldPollReservations,
+  tenantShouldPollWebshopNewOrders,
+} from '@/lib/tenant-module-runtime'
+import {
   appLocaleToBcp47,
   escapeReceiptHtml,
   KASSA_PRINT_RECEIPT_STYLES,
@@ -1064,34 +1068,56 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     } catch { /* ignore */ }
   }, [demoViewOnly, SESSION_KEY])
 
-  // Poll elke 3s: online bestellingen + reserveringen — één alarm (startAlarm/stopAlarm) zoals voor orders.
-  // Tab verborgen → geen interval (minder CPU op zwakkere kassa-PC's); bij terugkeren meteen één check.
+  // Poll elke 3s: alleen modules die aan staan (geen geheugen/CPU voor uitgeschakelde onderdelen).
   useEffect(() => {
-    if (demoViewOnly) return
+    if (demoViewOnly || moduleFlagsLoading) return
+    const pollOrders = tenantShouldPollWebshopNewOrders(effectiveAccess)
+    const pollReserv = tenantShouldPollReservations(effectiveAccess)
+    if (!pollOrders && !pollReserv) {
+      setPendingReservCount(0)
+      previousOrderIdsRef.current = []
+      previousReservIdsRef.current = []
+      previousPendingReservCountRef.current = null
+      reservationAlarmLatchedRef.current = false
+      return
+    }
+
     let isFirstOrderCheck = true
     let isFirstReservCheck = true
     let intervalId: ReturnType<typeof setInterval> | null = null
     const check = async () => {
       try {
+        const ordersPromise = pollOrders
+          ? supabase
+              .from('orders')
+              .select('id,order_number,total,status,order_type')
+              .eq('tenant_slug', tenant)
+              .eq('status', 'new')
+              .order('created_at', { ascending: false })
+              .limit(50)
+          : Promise.resolve({ data: [] as { id: string; order_number?: string; total?: number; order_type?: string | null }[] })
+
+        const reservIdsPromise = pollReserv
+          ? supabase
+              .from('reservations')
+              .select('id')
+              .eq('tenant_slug', tenant)
+              .order('created_at', { ascending: false })
+              .limit(50)
+          : Promise.resolve({ data: [] as { id: string }[] })
+
+        const pendingResPromise = pollReserv
+          ? supabase
+              .from('reservations')
+              .select('*', { count: 'exact', head: true })
+              .eq('tenant_slug', tenant)
+              .or('status.eq.PENDING,status.eq.pending,status.eq.WAITLIST,status.eq.waitlist')
+          : Promise.resolve({ count: 0 })
+
         const [{ data: orders }, { data: idRows }, pendingRes] = await Promise.all([
-          supabase
-            .from('orders')
-            .select('id,order_number,total,status,order_type')
-            .eq('tenant_slug', tenant)
-            .eq('status', 'new')
-            .order('created_at', { ascending: false })
-            .limit(50),
-          supabase
-            .from('reservations')
-            .select('id')
-            .eq('tenant_slug', tenant)
-            .order('created_at', { ascending: false })
-            .limit(50),
-          supabase
-            .from('reservations')
-            .select('*', { count: 'exact', head: true })
-            .eq('tenant_slug', tenant)
-            .or('status.eq.PENDING,status.eq.pending,status.eq.WAITLIST,status.eq.waitlist'),
+          ordersPromise,
+          reservIdsPromise,
+          pendingResPromise,
         ])
         const list = orders || []
         /** Alleen webshop/kiosk `new` — kassa-POS schrijft direct `confirmed`; die mogen geen oranje alarm geven. */
@@ -1099,24 +1125,27 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           isWebshopChannelNewOrder(o),
         )
         const reservList = idRows || []
-        const pendingAndWl = pendingRes.count ?? 0
-        setPendingReservCount(pendingAndWl)
+        const pendingAndWl = pollReserv ? (pendingRes.count ?? 0) : 0
+        if (pollReserv) setPendingReservCount(pendingAndWl)
+        else setPendingReservCount(0)
 
         const prevPendingCnt = previousPendingReservCountRef.current
-        if (prevPendingCnt !== null && pendingAndWl > prevPendingCnt) {
+        if (pollReserv && prevPendingCnt !== null && pendingAndWl > prevPendingCnt) {
           reservationAlarmLatchedRef.current = true
         }
-        previousPendingReservCountRef.current = pendingAndWl
-        if (pendingAndWl === 0) {
+        if (pollReserv) previousPendingReservCountRef.current = pendingAndWl
+        if (!pollReserv || pendingAndWl === 0) {
           reservationAlarmLatchedRef.current = false
         }
 
         let newReservOnes: { id: string }[] = []
 
         // ── Orders: alleen webshop-kanaal (pickup / delivery / group) ──
-        const currentOrderIds = webshopNewList.map((o: { id: string }) => o.id)
+        const currentOrderIds = pollOrders
+          ? webshopNewList.map((o: { id: string }) => o.id)
+          : []
         const prevOrderIds = previousOrderIdsRef.current
-        if (!isFirstOrderCheck) {
+        if (pollOrders && !isFirstOrderCheck) {
           const newOrderOnes = webshopNewList.filter((o: { id: string }) => !prevOrderIds.includes(o.id))
           if (newOrderOnes.length > 0) {
             startAlarm()
@@ -1143,16 +1172,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             newOrderAlertRef.current = alert
             setNewOrderAlert(alert)
           }
-        } else {
+        } else if (pollOrders) {
           isFirstOrderCheck = false
           if (webshopNewList.length > 0) startAlarm()
         }
-        previousOrderIdsRef.current = currentOrderIds
+
+        if (pollOrders) previousOrderIdsRef.current = currentOrderIds
 
         // ── Reserveringen: zelfde startAlarm, geen apart interval ──
-        const currentReservIds = reservList.map((r: { id: string }) => r.id)
+        const currentReservIds = pollReserv
+          ? reservList.map((r: { id: string }) => r.id)
+          : []
         const prevReservIds = previousReservIdsRef.current
-        if (!isFirstReservCheck) {
+        if (pollReserv && !isFirstReservCheck) {
           newReservOnes = reservList.filter((r: { id: string }) => !prevReservIds.includes(r.id))
           if (newReservOnes.length > 0) {
             reservationAlarmLatchedRef.current = true
@@ -1173,14 +1205,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             newReservAlertRef.current = alert
             setNewReservAlert(alert)
           }
-        } else {
+        } else if (pollReserv) {
           isFirstReservCheck = false
         }
-        previousReservIdsRef.current = currentReservIds
+        if (pollReserv) previousReservIdsRef.current = currentReservIds
 
         // ── Alarm aan/uit: alleen webshop `new` OF reservering-alarm ──
-        const needOrderAlarm = webshopNewList.length > 0
-        const needReservAlarm = reservationAlarmLatchedRef.current && pendingAndWl > 0
+        const needOrderAlarm = pollOrders && webshopNewList.length > 0
+        const needReservAlarm =
+          pollReserv && reservationAlarmLatchedRef.current && pendingAndWl > 0
         if (needOrderAlarm || needReservAlarm) {
           if (!alarmIntervalRef.current) startAlarm()
         } else {
@@ -1224,7 +1257,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       previousPendingReservCountRef.current = null
       reservationAlarmLatchedRef.current = false
     }
-  }, [tenant, startAlarm, stopAlarm, demoViewOnly, t])
+  }, [
+    tenant,
+    startAlarm,
+    stopAlarm,
+    demoViewOnly,
+    moduleFlagsLoading,
+    effectiveAccess,
+    t,
+  ])
 
   // Menu
   const [categories, setCategories] = useState<MenuCategory[]>([])
@@ -5856,7 +5897,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
       )}
 
-      {showReservations && (
+      {showReservations && effectiveAccess.reservaties && (
         <KassaReservationsView
           tenant={tenant}
           kassaTables={kassaTablesByZone.inside}

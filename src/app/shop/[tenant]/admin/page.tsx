@@ -14,7 +14,12 @@ import {
   type Order,
 } from '@/lib/admin-api'
 import PinGate from '@/components/PinGate'
-import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
+import { useTenantModuleFlagsContext } from '@/lib/tenant-module-flags-context'
+import {
+  tenantShouldLoadOrderDashboardData,
+  tenantShouldLoadPopularItemsStats,
+  tenantShouldLoadWebsiteReviews,
+} from '@/lib/tenant-module-runtime'
 import { isOwnerSessionFreshForTenant, isSuperAdminLoggedIn } from '@/lib/auth-headers'
 import {
   adminDashboardBackgroundImageStyle,
@@ -48,7 +53,7 @@ interface RecentOrder {
 export default function AdminDashboard({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
   const router = useRouter()
-  const { moduleAccess } = useTenantModuleFlags(params.tenant)
+  const { moduleAccess, loading: modulesLoading } = useTenantModuleFlagsContext()
   const [businessName, setBusinessName] = useState<string>('')
   const [dashboardBackground, setDashboardBackground] = useState<
     ReturnType<typeof resolveAdminDashboardBackground>
@@ -103,107 +108,117 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
   }, [params.tenant])
 
   useEffect(() => {
-    loadDashboardData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.tenant])
+    if (modulesLoading) return
+    void loadDashboardData(moduleAccess)
+  }, [params.tenant, modulesLoading, moduleAccess])
 
-  async function loadDashboardData() {
+  async function loadDashboardData(access: typeof moduleAccess) {
     setLoading(true)
-    
-    // Check if supabase is available
+
     if (!supabase) {
       console.warn('Supabase not configured - showing empty dashboard')
       setLoading(false)
       return
     }
-    
+
     const today = new Date()
     today.setHours(0, 0, 0, 0)
-    const todayISO = today.toISOString()
-    
+
     const yesterday = new Date(today)
     yesterday.setDate(yesterday.getDate() - 1)
-    const yesterdayISO = yesterday.toISOString()
-    
+
     const weekAgo = new Date(today)
     weekAgo.setDate(weekAgo.getDate() - 7)
-    const weekAgoISO = weekAgo.toISOString()
 
-    const allOrdersList = (await fetchAllTenantOrdersForDashboard(
-      params.tenant
-    )) as unknown as Order[]
+    const loadOrders = tenantShouldLoadOrderDashboardData(access)
+    const loadPopular = tenantShouldLoadPopularItemsStats(access)
+    const loadReviews = tenantShouldLoadWebsiteReviews(access)
 
-    // Webshop: omzet vanaf bevestigd; kassa: alleen betaald (zelfde als Z-rapport/rapporten)
-    const paidOrders = allOrdersList.filter(o => orderCountsTowardRevenueAndZReport(o))
+    let todayOrdersCount = 0
+    let todayRevenue = 0
+    let yesterdayOrdersCount = 0
+    let yesterdayRevenue = 0
+    let weekOrdersCount = 0
+    let weekRevenue = 0
+    let pendingOrders = 0
+    let popularItems: { name: string; count: number }[] = []
+    let recentOrdersData: RecentOrder[] = []
 
-    // Today's stats
-    const todayOrders = paidOrders.filter(
-      (o) => o.created_at && new Date(o.created_at) >= today
-    )
-    const todayOrdersCount = todayOrders.length
-    const todayRevenue = todayOrders.reduce((sum, o) => sum + (o.total || 0), 0)
+    if (loadOrders) {
+      const allOrdersList = (await fetchAllTenantOrdersForDashboard(
+        params.tenant,
+      )) as unknown as Order[]
 
-    // Yesterday's stats
-    const yesterdayOrders = paidOrders.filter((o) => {
-      if (!o.created_at) return false
-      const date = new Date(o.created_at)
-      return date >= yesterday && date < today
-    })
-    const yesterdayOrdersCount = yesterdayOrders.length
-    const yesterdayRevenue = yesterdayOrders.reduce((sum, o) => sum + (o.total || 0), 0)
+      const paidOrders = allOrdersList.filter((o) => orderCountsTowardRevenueAndZReport(o))
 
-    // Week stats
-    const weekOrders = paidOrders.filter(
-      (o) => o.created_at && new Date(o.created_at) >= weekAgo
-    )
-    const weekOrdersCount = weekOrders.length
-    const weekRevenue = weekOrders.reduce((sum, o) => sum + (o.total || 0), 0)
+      const todayOrders = paidOrders.filter(
+        (o) => o.created_at && new Date(o.created_at) >= today,
+      )
+      todayOrdersCount = todayOrders.length
+      todayRevenue = todayOrders.reduce((sum, o) => sum + (o.total || 0), 0)
 
-    // Wachtende = actief vandaag (zelfde statuslogica als Bestellingen › Actief, niet oude confirmed in archief)
-    const pendingOrders = allOrdersList.filter((o) => {
-      if (!isActiveTenantOrderStatus(o.status)) return false
-      if (!o.created_at) return false
-      return new Date(o.created_at) >= today
-    }).length
-
-    // Recent orders (last 5, alle statussen voor weergave)
-    const recentOrdersData = allOrdersList.slice(0, 5).map((o) => ({
-      id: o.id!,
-      order_number:
-        o.order_number != null ? String(o.order_number) : `#${(o.id || '').slice(-4)}`,
-      customer_name: o.customer_name || 'Onbekend',
-      total: o.total || 0,
-      status: o.status || 'new',
-      created_at: o.created_at || '',
-      items: o.items || [],
-    }))
-
-    // Popular items — alleen van betaalde orders
-    const itemCounts: Record<string, number> = {}
-    paidOrders.forEach(order => {
-      const items = order.items || []
-      items.forEach((item: any) => {
-        const name = item.product_name || item.name || 'Onbekend'
-        const qty = item.quantity || 1
-        itemCounts[name] = (itemCounts[name] || 0) + qty
+      const yesterdayOrders = paidOrders.filter((o) => {
+        if (!o.created_at) return false
+        const date = new Date(o.created_at)
+        return date >= yesterday && date < today
       })
-    })
-    
-    const popularItems = Object.entries(itemCounts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 4)
-      .map(([name, count]) => ({ name, count }))
+      yesterdayOrdersCount = yesterdayOrders.length
+      yesterdayRevenue = yesterdayOrders.reduce((sum, o) => sum + (o.total || 0), 0)
 
-    // Fetch reviews
-    const { data: reviews } = await supabase
-      .from('reviews')
-      .select('rating')
-      .eq('tenant_slug', params.tenant)
+      const weekOrders = paidOrders.filter(
+        (o) => o.created_at && new Date(o.created_at) >= weekAgo,
+      )
+      weekOrdersCount = weekOrders.length
+      weekRevenue = weekOrders.reduce((sum, o) => sum + (o.total || 0), 0)
 
-    const totalReviews = reviews?.length || 0
-    const averageRating = totalReviews > 0 
-      ? reviews!.reduce((sum, r) => sum + r.rating, 0) / totalReviews 
-      : 0
+      pendingOrders = allOrdersList.filter((o) => {
+        if (!isActiveTenantOrderStatus(o.status)) return false
+        if (!o.created_at) return false
+        return new Date(o.created_at) >= today
+      }).length
+
+      recentOrdersData = allOrdersList.slice(0, 5).map((o) => ({
+        id: o.id!,
+        order_number:
+          o.order_number != null ? String(o.order_number) : `#${(o.id || '').slice(-4)}`,
+        customer_name: o.customer_name || 'Onbekend',
+        total: o.total || 0,
+        status: o.status || 'new',
+        created_at: o.created_at || '',
+        items: o.items || [],
+      }))
+
+      if (loadPopular) {
+        const itemCounts: Record<string, number> = {}
+        paidOrders.forEach((order) => {
+          const items = order.items || []
+          items.forEach((item: { product_name?: string; name?: string; quantity?: number }) => {
+            const name = item.product_name || item.name || 'Onbekend'
+            const qty = item.quantity || 1
+            itemCounts[name] = (itemCounts[name] || 0) + qty
+          })
+        })
+        popularItems = Object.entries(itemCounts)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 4)
+          .map(([name, count]) => ({ name, count }))
+      }
+    }
+
+    let totalReviews = 0
+    let averageRating = 0
+    if (loadReviews) {
+      const { data: reviews } = await supabase
+        .from('reviews')
+        .select('rating')
+        .eq('tenant_slug', params.tenant)
+
+      totalReviews = reviews?.length || 0
+      averageRating =
+        totalReviews > 0
+          ? reviews!.reduce((sum, r) => sum + r.rating, 0) / totalReviews
+          : 0
+    }
 
     setStats({
       todayOrders: todayOrdersCount,
@@ -215,7 +230,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
       pendingOrders,
       averageRating: Math.round(averageRating * 10) / 10,
       totalReviews,
-      popularItems
+      popularItems,
     })
 
     setRecentOrders(recentOrdersData)
@@ -267,7 +282,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
     document.body.scrollTop = 0
   }, [])
 
-  if (loading) {
+  if (loading || modulesLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
