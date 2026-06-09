@@ -15,6 +15,7 @@ import {
   KASSA_UI_APPEARANCE_TOGGLE_ENABLED,
   useKassaUiDarkSync,
 } from '@/lib/kassa-register-ui-dark-preference'
+import { kassaProductImageRetryOnError } from '@/lib/kassa-img-retry'
 import {
   KASSA_POS_CHECKOUT_BTN,
   KASSA_POS_FIELD,
@@ -181,6 +182,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [priceFixName, setPriceFixName] = useState('')
   const [priceFixValue, setPriceFixValue] = useState('')
   const [priceFixSaving, setPriceFixSaving] = useState(false)
+  const [lastScannedSku, setLastScannedSku] = useState<RetailPosSku | null>(null)
   const priceFixNameInputRef = useRef<HTMLInputElement>(null)
   const priceFixInputRef = useRef<HTMLInputElement>(null)
   const skusRef = useRef<RetailPosSku[]>([])
@@ -450,7 +452,12 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     closeArticleSearchKeyboard()
   }
 
+  function rememberLastScannedSku(sku: RetailPosSku) {
+    setLastScannedSku(sku)
+  }
+
   function pushStockActivity(sku: RetailPosSku, delta: number, activityMode: RetailKassaMode) {
+    rememberLastScannedSku(sku)
     const key = `${sku.lineKey}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
     setStockActivity((prev) => [...prev, { key, sku, delta, mode: activityMode }])
     scrollScanBarToEnd()
@@ -590,6 +597,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         return
       }
       replaceSkuInCatalog(res.sku)
+      rememberLastScannedSku(res.sku)
       setCart((prev) =>
         prev.map((l) => (l.sku.lineKey === res.sku!.lineKey ? { ...l, sku: res.sku! } : l)),
       )
@@ -666,6 +674,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       category_id: null,
     }
     setCart((prev) => [...prev, { sku, quantity: 1 }])
+    rememberLastScannedSku(sku)
     setNumpadValue('')
     setNumpadPanelVisible(false)
     scrollScanBarToEnd()
@@ -696,6 +705,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       next[i] = { ...next[i], quantity: merged }
       return next
     })
+    rememberLastScannedSku(sku)
     scrollScanBarToEnd()
     if (sku.price <= 0) {
       openPriceFixModal(sku)
@@ -1677,7 +1687,32 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             <div className={`shrink-0 border-t ${KASSA_POS_RULE_BLACK}`} aria-hidden />
 
             <div className={`flex w-full shrink-0 ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`}>
-              <div className={`min-w-0 flex-1 ${ui.shellBg}`} aria-hidden />
+              <div
+                className={`flex min-w-0 flex-1 items-center justify-end border-r py-2 pl-3 pr-2.5 sm:pr-3 ${KASSA_POS_RULE_BLACK}`}
+              >
+                <div
+                  className={`size-[4cm] shrink-0 overflow-hidden rounded-lg border ${KASSA_POS_RULE_BLACK} bg-black/20`}
+                  data-testid="retail-last-scan-thumb"
+                >
+                  {lastScannedSku?.image_url?.trim() ? (
+                    <img
+                      src={lastScannedSku.image_url.trim()}
+                      alt={lastScannedSku.name}
+                      decoding="async"
+                      loading="eager"
+                      onError={kassaProductImageRetryOnError}
+                      className="size-full object-cover"
+                    />
+                  ) : (
+                    <div
+                      className="flex size-full items-center justify-center text-2xl text-white/25"
+                      aria-hidden={!lastScannedSku}
+                    >
+                      {lastScannedSku ? '📦' : null}
+                    </div>
+                  )}
+                </div>
+              </div>
               <div
                 className={`w-80 sm:w-96 lg:w-[380px] shrink-0 border-l ${KASSA_POS_RULE_BLACK} px-3 py-2.5 space-y-2.5`}
               >
