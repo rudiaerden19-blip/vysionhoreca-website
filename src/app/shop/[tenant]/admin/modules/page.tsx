@@ -9,36 +9,16 @@ import {
   TENANT_MODULE_IDS,
   type TenantModuleId,
   mergeEnabledModulesFromDb,
-  parseEnabledModulesJson,
 } from '@/lib/tenant-modules'
 import {
   buildHamburgerModules,
+  buildEnabledModulesSavePayload,
+  buildSubToggleStateFromDb,
+  dedupeHamburgerItems,
   mergeHamburgerRowsByTenantModule,
-  SUBMENU_IDS_ALWAYS_ON,
 } from '@/lib/admin-hamburger-modules'
 import { isMissingPostTrialModulesColumnError } from '@/lib/supabase-post-trial-column'
 import { invalidateTenantModuleFlags } from '@/lib/use-tenant-modules'
-
-function buildSubToggleState(
-  raw: unknown,
-  moduleToggles: Record<TenantModuleId, boolean>,
-  tenantSlug: string,
-): Record<string, boolean> {
-  const p = parseEnabledModulesJson(raw)
-  const baseUrl = `/shop/${tenantSlug}/admin`
-  const hmods = buildHamburgerModules(baseUrl, tenantSlug)
-  const subs: Record<string, boolean> = {}
-  for (const m of hmods) {
-    for (const it of m.items) {
-      if (subs[it.id] !== undefined) continue
-      const parentOn = !!moduleToggles[m.key]
-      if (SUBMENU_IDS_ALWAYS_ON.has(it.id)) subs[it.id] = true
-      else if (p && typeof p[it.id] === 'boolean') subs[it.id] = p[it.id]
-      else subs[it.id] = parentOn
-    }
-  }
-  return subs
-}
 
 export default function TenantModulesPage({ params }: { params: { tenant: string } }) {
   const tenant = params.tenant
@@ -85,7 +65,7 @@ export default function TenantModulesPage({ params }: { params: { tenant: string
     const mod = mergeEnabledModulesFromDb(row?.enabled_modules, ptOk)
     const withAccount = { ...mod, account: true as const }
     setModuleToggles(withAccount)
-    setSubToggles(buildSubToggleState(row?.enabled_modules, withAccount, tenant))
+    setSubToggles(buildSubToggleStateFromDb(row?.enabled_modules, withAccount, tenant))
   }, [tenant])
 
   useEffect(() => {
@@ -103,20 +83,7 @@ export default function TenantModulesPage({ params }: { params: { tenant: string
     setSaving(true)
     setSaveMsg(null)
 
-    const payload: Record<string, boolean> = {}
-    for (const id of TENANT_MODULE_IDS) {
-      payload[id] = id === 'account' ? true : !!moduleToggles[id]
-    }
-    const seen = new Set<string>()
-    const hmods = buildHamburgerModules(baseUrl, tenant)
-    for (const m of hmods) {
-      for (const it of m.items) {
-        if (seen.has(it.id)) continue
-        seen.add(it.id)
-        if (SUBMENU_IDS_ALWAYS_ON.has(it.id)) payload[it.id] = true
-        else payload[it.id] = !!subToggles[it.id]
-      }
-    }
+    const payload = buildEnabledModulesSavePayload(moduleToggles, subToggles, tenant)
 
     const res = await authFetch('/api/tenant/confirm-modules', {
       method: 'POST',
@@ -157,7 +124,7 @@ export default function TenantModulesPage({ params }: { params: { tenant: string
       <div className="mt-8 space-y-5">
         {TENANT_MODULE_IDS.map((id) => {
           const mod = hamburgerByKey[id]
-          const nestedItems = mod?.items.filter((it) => !SUBMENU_IDS_ALWAYS_ON.has(it.id)) ?? []
+          const nestedItems = dedupeHamburgerItems(mod?.items ?? [])
           const label = t(`tenantModulesPage.modules.${id}`)
 
           return (

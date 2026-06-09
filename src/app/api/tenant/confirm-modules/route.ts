@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { verifySuperAdminAccess, verifyTenantAccess } from '@/lib/verify-tenant-access'
-import { TENANT_MODULE_IDS, parseEnabledModulesJson } from '@/lib/tenant-modules'
+import { TENANT_MODULE_IDS } from '@/lib/tenant-modules'
 import { collectAllSubmenuIds } from '@/lib/admin-hamburger-modules'
 import {
   isMissingPostTrialModulesColumnError,
@@ -34,21 +34,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Geen toegang' }, { status: 403 })
     }
 
-    const { data: existingRow } = await supabase
-      .from('tenants')
-      .select('enabled_modules')
-      .eq('slug', tenantSlug)
-      .maybeSingle()
-    const prev = parseEnabledModulesJson(existingRow?.enabled_modules) ?? {}
-
     const validSubs = new Set(collectAllSubmenuIds())
-    const merged: Record<string, boolean> = { ...prev }
+    const merged: Record<string, boolean> = {}
 
     for (const id of TENANT_MODULE_IDS) {
       merged[id] = id === 'account' ? true : !!enabled_modules[id]
     }
-    for (const [k, v] of Object.entries(enabled_modules)) {
-      if (validSubs.has(k)) merged[k] = !!v
+    for (const subId of validSubs) {
+      merged[subId] = !!enabled_modules[subId]
     }
     merged.account = true
 

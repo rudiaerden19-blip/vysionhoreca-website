@@ -1,18 +1,20 @@
-import type { TenantModuleId } from '@/lib/tenant-modules'
 import {
   adminPathToModule,
   hasExplicitEnabledModules,
   hasModuleAccessForPathname,
+  isHorecaKassaPosScreenEnabled,
+  isRetailKassaPosScreenEnabled,
+  isShopAdminKassaPosPath,
+  isShopAdminRetailKassaPosPath,
   isTenantSubmenuEffectiveOn,
+  parseEnabledModulesJson,
   submenuParentAllowedForSubmenuId,
+  TENANT_MODULE_IDS,
+  type TenantModuleId,
 } from '@/lib/tenant-modules'
 
-/** Altijd bereikbaar in menu en routes (abonnement / facturatie). */
-export const SUBMENU_IDS_ALWAYS_ON = new Set<string>([
-  'sm_abonnement',
-  'sm_retail_kassa_pos',
-  'sm_retail_kassa_producten',
-])
+/** Geen submenu’s meer geforceerd — alles via Modules-pagina. */
+export const SUBMENU_IDS_ALWAYS_ON = new Set<string>()
 
 export type AdminHamburgerItem = {
   id: string
@@ -544,6 +546,58 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
 }
 
 /** Alle submenu-id's (uniek) voor superadmin en guards. */
+export function dedupeHamburgerItems(items: AdminHamburgerItem[]): AdminHamburgerItem[] {
+  const seen = new Set<string>()
+  return items.filter((it) => {
+    if (seen.has(it.id)) return false
+    seen.add(it.id)
+    return true
+  })
+}
+
+/** UI + opslaan: elke submenu-key apart, zonder parent-afhankelijkheid. */
+export function buildSubToggleStateFromDb(
+  raw: unknown,
+  moduleToggles: Record<TenantModuleId, boolean>,
+  tenantSlug: string
+): Record<string, boolean> {
+  const p = parseEnabledModulesJson(raw)
+  const explicit = !!(p && hasExplicitEnabledModules(p))
+  const baseUrl = `/shop/${tenantSlug}/admin`
+  const hmods = buildHamburgerModules(baseUrl, tenantSlug)
+  const subs: Record<string, boolean> = {}
+  for (const m of hmods) {
+    for (const it of m.items) {
+      if (subs[it.id] !== undefined) continue
+      if (typeof p?.[it.id] === 'boolean') subs[it.id] = p[it.id]
+      else if (explicit) subs[it.id] = false
+      else subs[it.id] = !!moduleToggles[m.key]
+    }
+  }
+  return subs
+}
+
+export function buildEnabledModulesSavePayload(
+  moduleToggles: Record<TenantModuleId, boolean>,
+  subToggles: Record<string, boolean>,
+  tenantSlug: string
+): Record<string, boolean> {
+  const payload: Record<string, boolean> = {}
+  for (const id of TENANT_MODULE_IDS) {
+    payload[id] = id === 'account' ? true : !!moduleToggles[id]
+  }
+  const seen = new Set<string>()
+  const hmods = buildHamburgerModules(`/shop/${tenantSlug}/admin`, tenantSlug)
+  for (const m of hmods) {
+    for (const it of m.items) {
+      if (seen.has(it.id)) continue
+      seen.add(it.id)
+      payload[it.id] = !!subToggles[it.id]
+    }
+  }
+  return payload
+}
+
 export function collectAllSubmenuIds(): string[] {
   const seen = new Set<string>()
   const out: string[] = []
@@ -622,6 +676,14 @@ export function hasShopAdminPathAccess(
   moduleAccess: Record<TenantModuleId, boolean>,
   enabledModulesJson: Record<string, boolean> | null
 ): boolean {
+  const pathNoQuery = pathname.split('?')[0].replace(/\/+$/, '')
+  if (isShopAdminKassaPosPath(pathNoQuery, tenantSlug)) {
+    return isHorecaKassaPosScreenEnabled(moduleAccess)
+  }
+  if (isShopAdminRetailKassaPosPath(pathNoQuery, tenantSlug)) {
+    return isRetailKassaPosScreenEnabled(moduleAccess, enabledModulesJson)
+  }
+
   if (hasModuleAccessForPathname(pathname, tenantSlug, moduleAccess)) return true
   const gate = adminPathToModule(pathname, tenantSlug)
   const subId = getSubmenuIdForPathname(pathname, tenantSlug, moduleAccess)
@@ -635,12 +697,13 @@ function moduleRowVisibleInMenu(
   menuAccess: Record<TenantModuleId, boolean>,
   enabledModulesJson: Record<string, boolean> | null
 ): boolean {
+  if (enabledModulesJson && hasExplicitEnabledModules(enabledModulesJson)) {
+    return m.items.some((item) => enabledModulesJson[item.id] === true)
+  }
   if (m.key === 'website') {
     return menuAccess.website || menuAccess.instellingen || menuAccess.online
   }
-  if (menuAccess[m.key]) return true
-  if (!enabledModulesJson || !hasExplicitEnabledModules(enabledModulesJson)) return false
-  return m.items.some((item) => enabledModulesJson[item.id] === true)
+  return menuAccess[m.key]
 }
 
 export function filterHamburgerModulesForAccess(

@@ -9,6 +9,8 @@ import {
   adminPathToModule,
   getFirstAccessibleAdminPath,
   isShopAdminAnyPosPath,
+  isHorecaKassaPosScreenEnabled,
+  isRetailKassaPosScreenEnabled,
   isShopAdminKassaPosPath,
   isShopAdminRetailKassaPosPath,
   normalizeShopAdminPathname,
@@ -393,7 +395,7 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
     if (typeof window !== 'undefined' && isSuperAdminLoggedIn()) {
       return <>{children}</>
     }
-    if (!modulesLoading && moduleAccess.kassa === false) {
+    if (!modulesLoading && !isHorecaKassaPosScreenEnabled(moduleAccess)) {
       return (
         <RedirectToFirstAccessibleModule
           tenant={params.tenant}
@@ -406,7 +408,10 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
   }
 
   if (isRetailKassaPos) {
-    if (!modulesLoading && moduleAccess['retail-kassa'] === false) {
+    if (
+      !modulesLoading &&
+      !isRetailKassaPosScreenEnabled(moduleAccess, enabledModulesJson)
+    ) {
       return (
         <RedirectToFirstAccessibleModule
           tenant={params.tenant}

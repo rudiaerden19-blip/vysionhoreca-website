@@ -5606,7 +5606,7 @@
   },
   "tenantModulesPage": {
     "title": "Moduli",
-    "subtitle": "Attiva moduli principali e sottomenu in modo indipendente. «Cassa» principale = schermo vendite; es. pincode da solo. L'account resta sempre disponibile.",
+    "subtitle": "Ogni interruttore (modulo principale e ogni sottomenu) è autonomo. Dopo il salvataggio vale esattamente la tua scelta — anche in prova. «Cassa» principale = vendita; retail separato. Il modulo account resta attivo.",
     "save": "Salva",
     "saving": "Salvataggio…",
     "saved": "Salvato",

@@ -20,8 +20,10 @@ import {
 } from '@/lib/supabase-post-trial-column'
 import {
   buildHamburgerModules,
+  buildEnabledModulesSavePayload,
+  buildSubToggleStateFromDb,
+  dedupeHamburgerItems,
   mergeHamburgerRowsByTenantModule,
-  SUBMENU_IDS_ALWAYS_ON,
 } from '@/lib/admin-hamburger-modules'
 import { mirrorSuperadminSessionFromCookieToLocalStorage } from '@/lib/superadmin-cookies'
 import { useLanguage } from '@/i18n'
@@ -30,27 +32,6 @@ interface TenantsCoreRow {
   slug: string
   enabled_modules: Record<string, boolean> | null
   post_trial_modules_confirmed?: boolean | null
-}
-
-function buildSubToggleState(
-  raw: unknown,
-  moduleToggles: Record<TenantModuleId, boolean>,
-  tenantSlug: string
-): Record<string, boolean> {
-  const p = parseEnabledModulesJson(raw)
-  const baseUrl = `/shop/${tenantSlug}/admin`
-  const hmods = buildHamburgerModules(baseUrl, tenantSlug)
-  const subs: Record<string, boolean> = {}
-  for (const m of hmods) {
-    for (const it of m.items) {
-      if (subs[it.id] !== undefined) continue
-      const parentOn = !!moduleToggles[m.key]
-      if (SUBMENU_IDS_ALWAYS_ON.has(it.id)) subs[it.id] = true
-      else if (p && typeof p[it.id] === 'boolean') subs[it.id] = p[it.id]
-      else subs[it.id] = parentOn
-    }
-  }
-  return subs
 }
 
 export default function SuperadminTenantModulesPage() {
@@ -110,12 +91,12 @@ export default function SuperadminTenantModulesPage() {
       setModulesFullAccess(isFull)
       const mod = mergeEnabledModulesFromDb(em, ptOk)
       setModuleToggles({ ...mod, account: true })
-      setSubToggles(buildSubToggleState(em, { ...mod, account: true }, slug))
+      setSubToggles(buildSubToggleStateFromDb(em, { ...mod, account: true }, slug))
     } else {
       setModulesFullAccess(true)
       const mod = mergeEnabledModulesFromDb(null, true)
       setModuleToggles({ ...mod, account: true })
-      setSubToggles(buildSubToggleState(null, { ...mod, account: true }, slug))
+      setSubToggles(buildSubToggleStateFromDb(null, { ...mod, account: true }, slug))
     }
   }, [slug])
 
@@ -144,21 +125,11 @@ export default function SuperadminTenantModulesPage() {
     if (modulesFullAccess) {
       enabledModules = null
     } else {
-      const payload: Record<string, boolean> = {}
-      for (const id of TENANT_MODULE_IDS) {
-        payload[id] = id === 'account' ? true : !!moduleToggles[id]
-      }
-      const seen = new Set<string>()
-      const hmods = buildHamburgerModules(baseUrl, slug)
-      for (const m of hmods) {
-        for (const it of m.items) {
-          if (seen.has(it.id)) continue
-          seen.add(it.id)
-          if (SUBMENU_IDS_ALWAYS_ON.has(it.id)) payload[it.id] = true
-          else payload[it.id] = !!subToggles[it.id]
-        }
-      }
-      enabledModules = payload
+      enabledModules = buildEnabledModulesSavePayload(
+        { ...moduleToggles, account: true },
+        subToggles,
+        slug
+      )
     }
 
     const res = await authFetch('/api/superadmin/tenants', {
@@ -238,7 +209,7 @@ export default function SuperadminTenantModulesPage() {
                 setModulesFullAccess(on)
                 const mod = mergeEnabledModulesFromDb(null, true)
                 setModuleToggles({ ...mod, account: true })
-                setSubToggles(buildSubToggleState(null, { ...mod, account: true }, slug))
+                setSubToggles(buildSubToggleStateFromDb(null, { ...mod, account: true }, slug))
               }}
             />
           </div>
@@ -271,8 +242,7 @@ export default function SuperadminTenantModulesPage() {
             {TENANT_MODULE_IDS.map((id) => {
               const mod = hamburgerByKey[id]
               const parentOn = id === 'account' ? true : !!moduleToggles[id]
-              const nestedItems =
-                mod?.items.filter((it) => !SUBMENU_IDS_ALWAYS_ON.has(it.id)) ?? []
+              const nestedItems = dedupeHamburgerItems(mod?.items ?? [])
 
               return (
                 <div key={id} className="rounded-2xl border border-slate-600 bg-slate-800/50 p-4 sm:p-5">
@@ -334,7 +304,7 @@ export default function SuperadminTenantModulesPage() {
               onClick={() => {
                 const s = getStarterEnabledModulesRecord()
                 setModuleToggles({ ...s, account: true })
-                setSubToggles(buildSubToggleState(null, { ...s, account: true }, slug))
+                setSubToggles(buildSubToggleStateFromDb(null, { ...s, account: true }, slug))
               }}
               className="rounded-xl bg-slate-700 px-4 py-3 text-sm text-slate-200 hover:bg-slate-600"
             >

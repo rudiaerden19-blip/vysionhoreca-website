@@ -5565,7 +5565,7 @@
   },
   "tenantModulesPage": {
     "title": "Modules",
-    "subtitle": "Schakel hoofdmodules en submenu’s los van elkaar in. Hoofd «Kassa» = verkoopscherm; bv. pincode kan apart aan. Account blijft altijd beschikbaar.",
+    "subtitle": "Elke schuif (hoofdmodule én elk submenu) staat op zichzelf. Na opslaan geldt exact jouw keuze — ook tijdens trial. Hoofd «Kassa» = verkoopscherm; «Winkelkassa» of «Verkoop (barcode)» kan los. Account-hoofdmodule blijft aan.",
     "save": "Opslaan",
     "saving": "Opslaan…",
     "saved": "Opgeslagen",

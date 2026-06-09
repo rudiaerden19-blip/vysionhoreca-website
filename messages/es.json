@@ -5606,7 +5606,7 @@
   },
   "tenantModulesPage": {
     "title": "Módulos",
-    "subtitle": "Activa módulos principales y submenús por separado. «Caja» principal = pantalla de venta; p. ej. pincode solo. La cuenta sigue siempre disponible.",
+    "subtitle": "Cada control (módulo principal y cada submenú) es independiente. Tras guardar se aplica exactamente tu elección — también en prueba. «Caja» principal = venta; retail aparte. El módulo cuenta sigue activo.",
     "save": "Guardar",
     "saving": "Guardando…",
     "saved": "Guardado",

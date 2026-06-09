@@ -169,24 +169,14 @@ export function resolveTenantModules(opts: {
   }
 
   const postTrialOk = tenantRow?.post_trial_modules_confirmed !== false
-  if (
-    postTrialOk &&
-    enabledModulesJson &&
-    hasExplicitEnabledModules(enabledModulesJson)
-  ) {
+  if (enabledModulesJson && hasExplicitEnabledModules(enabledModulesJson)) {
     return mergeEnabledModulesFromDb(enabledModulesJson, postTrialOk)
   }
 
   if (isTrialSubscriptionActive(subscription, tenantRow)) {
-    if (hasExplicitEnabledModules(enabledModulesJson) && enabledModulesJson) {
-      return mergeFullAccessWithExplicitJson(enabledModulesJson)
-    }
     return allTenantModulesTrue()
   }
   if (isTenantProPlan(subscription, tenantRow)) {
-    if (hasExplicitEnabledModules(enabledModulesJson) && enabledModulesJson) {
-      return mergeFullAccessWithExplicitJson(enabledModulesJson)
-    }
     return allTenantModulesTrue()
   }
 
@@ -254,19 +244,31 @@ export function isTenantSubmenuEffectiveOn(
     return parentModuleOn
   }
   if (enabledJson[subId] === true) return true
-  if (enabledJson[subId] === false) return false
-  return parentModuleOn
+  return false
 }
 
-/** Mag /shop/:tenant/admin/kassa (POS) geopend worden? */
+/** Hoofdmodule «Kassa» = horeca-verkoopscherm `/admin/kassa`. */
+export function isHorecaKassaPosScreenEnabled(
+  moduleAccess: Record<TenantModuleId, boolean>
+): boolean {
+  return !!moduleAccess.kassa
+}
+
+/** Winkelkassa-POS: hoofdmodule óf submenu «Verkoop (barcode)». */
+export function isRetailKassaPosScreenEnabled(
+  moduleAccess: Record<TenantModuleId, boolean>,
+  enabledJson: Record<string, boolean> | null
+): boolean {
+  if (moduleAccess['retail-kassa']) return true
+  return isTenantSubmenuEffectiveOn('sm_retail_kassa_pos', enabledJson, false)
+}
+
+/** @deprecated Gebruik isHorecaKassaPosScreenEnabled — subs bepalen POS niet meer. */
 export function isKassaPosScreenEnabled(
-  enabledJson: Record<string, boolean> | null,
+  _enabledJson: Record<string, boolean> | null,
   parentKassaOn: boolean
 ): boolean {
-  if (!parentKassaOn) return false
-  return KASSA_POS_SUBMENU_IDS.some((id) =>
-    isTenantSubmenuEffectiveOn(id, enabledJson, parentKassaOn)
-  )
+  return parentKassaOn
 }
 
 /**
@@ -311,10 +313,12 @@ export function isShopAdminAnyPosPath(pathnameNormalized: string, tenantSlug: st
 export function getAdminKassaEntryHref(
   tenantSlug: string,
   access: Record<TenantModuleId, boolean>,
-  _enabledModulesJson: Record<string, boolean> | null
+  enabledModulesJson: Record<string, boolean> | null
 ): string | null {
-  if (access.kassa) return `/shop/${tenantSlug}/admin/kassa`
-  if (access['retail-kassa']) return `/shop/${tenantSlug}/admin/retail-kassa`
+  if (isHorecaKassaPosScreenEnabled(access)) return `/shop/${tenantSlug}/admin/kassa`
+  if (isRetailKassaPosScreenEnabled(access, enabledModulesJson)) {
+    return `/shop/${tenantSlug}/admin/retail-kassa`
+  }
   return null
 }
 
