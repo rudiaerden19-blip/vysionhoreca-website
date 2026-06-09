@@ -562,7 +562,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               inputMode="decimal"
               value={priceFixValue}
               onChange={(e) => setPriceFixValue(e.target.value)}
-              className={`w-full px-3 py-2.5 text-sm tabular-nums ${KASSA_POS_FIELD}`}
+              className={`w-full px-3 py-2.5 text-sm tabular-nums text-[#f0f0f0] placeholder:text-white/45 focus:outline-none ${KASSA_POS_FIELD}`}
               placeholder="0,00"
             />
             <button
