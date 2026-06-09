@@ -337,7 +337,7 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs min-w-[280px]">
                     <div>
                       <span className="text-gray-400">{t('stockPage.article')}</span>
-                      <p className="font-medium">{sku.article_number || '—'}</p>
+                      <p className="font-medium font-mono">{sku.article_number || sku.barcode || '—'}</p>
                     </div>
                     <div>
                       <span className="text-gray-400">{t('stockPage.barcode')}</span>

@@ -5695,7 +5695,7 @@
   },
   "stockPage": {
     "title": "Magazzino",
-    "subtitle": "Per taglia/colore (variante) con barcode e giacenza propri",
+    "subtitle": "Gli articoli scansionati si creano da soli — qui solo prezzo o giacenza se serve",
     "search": "Cerca nome, cod. o barcode…",
     "article": "Cod.",
     "barcode": "Barcode",

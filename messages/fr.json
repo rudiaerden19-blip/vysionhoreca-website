@@ -5718,7 +5718,7 @@
   },
   "stockPage": {
     "title": "Stock",
-    "subtitle": "Par taille/couleur (variante) avec code-barres et stock propres",
+    "subtitle": "Les articles scannés arrivent automatiquement — ajustez prix ou stock ici si besoin",
     "search": "Rechercher nom, réf. ou code-barres…",
     "article": "Réf.",
     "barcode": "Code-barres",

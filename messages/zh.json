@@ -5695,7 +5695,7 @@
   },
   "stockPage": {
     "title": "库存",
-    "subtitle": "按尺码/颜色（变体），各自条码与库存",
+    "subtitle": "扫描自动入库 — 仅在此调整价格或库存",
     "search": "按名称、SKU 或条码搜索…",
     "article": "SKU",
     "barcode": "条码",

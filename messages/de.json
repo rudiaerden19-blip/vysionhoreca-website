@@ -5718,7 +5718,7 @@
   },
   "stockPage": {
     "title": "Lager",
-    "subtitle": "Pro Größe/Farbe (Variante) mit eigenem Barcode und Bestand",
+    "subtitle": "Gescannte Artikel kommen automatisch — hier nur Preis oder Bestand anpassen",
     "search": "Suche Name, Art.-Nr. oder Barcode…",
     "article": "Art.-Nr.",
     "barcode": "Barcode",

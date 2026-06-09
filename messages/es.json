@@ -5695,7 +5695,7 @@
   },
   "stockPage": {
     "title": "Stock",
-    "subtitle": "Por talla/color (variante) con código y stock propios",
+    "subtitle": "Los artículos escaneados se crean solos — ajuste precio o stock aquí si hace falta",
     "search": "Buscar nombre, ref. o código…",
     "article": "Ref.",
     "barcode": "Código",

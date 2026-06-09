@@ -5654,7 +5654,7 @@
   },
   "stockPage": {
     "title": "Stock",
-    "subtitle": "Per size/color variant with its own barcode and stock",
+    "subtitle": "Scanned items are added automatically — adjust price or stock here only if needed",
     "search": "Search name, SKU or barcode…",
     "article": "SKU",
     "barcode": "Barcode",

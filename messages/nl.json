@@ -5587,7 +5587,7 @@
   },
   "stockPage": {
     "title": "Voorraad",
-    "subtitle": "Per maat/kleur (variant) met eigen barcode en voorraad",
+    "subtitle": "Artikelen uit de scan komen automatisch binnen — hier alleen prijs of voorraad bijstellen indien nodig",
     "search": "Zoek op naam, artikelnr. of barcode…",
     "article": "Artikelnr.",
     "barcode": "Barcode",

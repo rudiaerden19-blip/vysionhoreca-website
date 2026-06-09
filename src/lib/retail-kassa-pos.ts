@@ -229,7 +229,11 @@ export async function updateRetailSkuPrice(
       )
     : await adminDb.update(
         'menu_products',
-        { price: nextPrice },
+        {
+          price: nextPrice,
+          track_stock: false,
+          ...(sku.barcode && !sku.article_number ? { article_number: sku.barcode } : {}),
+        },
         { id, tenant_slug: tenantSlug },
         { tenantSlug },
       )
