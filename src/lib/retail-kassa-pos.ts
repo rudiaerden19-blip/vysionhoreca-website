@@ -11,6 +11,7 @@ import {
   type RetailScanPayload,
 } from '@/lib/retail-pos-catalog'
 import { syncZReportAfterOrderSafe } from '@/lib/kassa-z-sync-safe'
+import type { KassaPaymentMethod } from '@/lib/kassa-cart-types'
 
 export type { RetailCartLine, RetailPosSku, RetailScanPayload }
 export {
@@ -91,15 +92,27 @@ async function updateSkuStock(
   return updated ? { ok: true, sku: updated } : { ok: true, sku }
 }
 
-export async function completeRetailCashSale(
+export async function completeRetailSale(
   tenantSlug: string,
   lines: RetailCartLine[],
+  method: KassaPaymentMethod,
+  splitAmounts?: { cash: number; card: number },
 ): Promise<{ ok: boolean; orderNumber?: number; error?: string }> {
   if (lines.length === 0) return { ok: false, error: 'empty_cart' }
 
   const total = lines.reduce((s, l) => s + l.sku.price * l.quantity, 0)
-  const subtotal = Math.round((total / 1.21) * 100) / 100
-  const tax = Math.round((total - subtotal) * 100) / 100
+  const roundedTotal = Math.round(total * 100) / 100
+
+  if (method === 'SPLIT') {
+    const sc = splitAmounts?.cash ?? 0
+    const sd = splitAmounts?.card ?? 0
+    if (Math.abs(roundedTotal - sc - sd) > 0.02) {
+      return { ok: false, error: 'split_mismatch' }
+    }
+  }
+
+  const subtotal = Math.round((roundedTotal / 1.21) * 100) / 100
+  const tax = Math.round((roundedTotal - subtotal) * 100) / 100
   const createdAt = new Date()
   const kassa_client_uuid =
     typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
@@ -112,11 +125,11 @@ export async function completeRetailCashSale(
     customer_name: 'Winkel',
     status: 'confirmed',
     payment_status: 'paid',
-    payment_method: 'CASH',
+    payment_method: method === 'SPLIT' ? 'SPLIT' : method,
     order_type: 'TAKEAWAY',
     subtotal,
     tax,
-    total: Math.round(total * 100) / 100,
+    total: roundedTotal,
     items: lines.map((l) => ({
       product_id: l.sku.productId,
       variant_id: l.sku.variantId,
@@ -129,6 +142,11 @@ export async function completeRetailCashSale(
       color_label: l.sku.color_label,
     })),
     created_at: createdAt.toISOString(),
+  }
+
+  if (method === 'SPLIT' && splitAmounts) {
+    orderPayload.payment_split_cash = Math.round(splitAmounts.cash * 100) / 100
+    orderPayload.payment_split_card = Math.round(splitAmounts.card * 100) / 100
   }
 
   const insRes = await adminDb.insert('orders', orderPayload, {
@@ -152,6 +170,14 @@ export async function completeRetailCashSale(
 
   syncZReportAfterOrderSafe(tenantSlug, createdAt.toISOString())
   return { ok: true, orderNumber }
+}
+
+/** @deprecated gebruik completeRetailSale */
+export async function completeRetailCashSale(
+  tenantSlug: string,
+  lines: RetailCartLine[],
+): Promise<{ ok: boolean; orderNumber?: number; error?: string }> {
+  return completeRetailSale(tenantSlug, lines, 'CASH')
 }
 
 export async function applyRetailStockScanIncrement(

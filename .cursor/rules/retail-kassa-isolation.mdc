@@ -1,0 +1,22 @@
+# Winkelkassa vs horeca-kassa — strikte scheiding
+
+## Verboden zonder expliciet verzoek van de eigenaar
+
+- **Geen wijzigingen** onder `src/app/shop/[tenant]/admin/kassa/**` (horeca POS-flow, UI, logica).
+- Geen gedragswijzigingen aan horeca-kassa via gedeelde hooks die retail en horeca koppelen.
+
+## Winkelkassa — alleen hier bouwen
+
+- `src/app/shop/[tenant]/admin/retail-kassa/**`
+- `src/components/retail-kassa/**`
+- `src/lib/retail-kassa-pos.ts`, `src/lib/retail-pos-catalog.ts`, retail-API’s onder `src/app/api/retail/**`
+
+## Gedeelde code
+
+- Module-menu, tenant flags, admin layout: OK als **multi-tenant** en geen horeca-POS-gedrag wijzigt.
+- **Donker/licht:** horeca-POS **altijd donker** (geen toggle); winkelkassa gebruikt `surface: 'retail'` en eigen localStorage-key in `kassa-register-ui-dark-preference.ts`.
+- Bij twijfel: feature alleen in retail-component of `retail-*` lib, niet in kassa-page of gedeelde kassa-POS libs tenzij alleen horeca daar al gebruikte.
+
+## Commit
+
+- `git diff -- 'src/app/shop/[tenant]/admin/kassa/'` moet **leeg** zijn na retail-only taken.

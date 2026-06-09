@@ -30,10 +30,14 @@ import {
   kassaPosQuickMenuPanelButtonClass,
   kassaPosRaisedStripClass,
 } from '@/lib/kassa-pos-surface'
+import type { KassaPayOption } from '@/components/kassa/KassaPaymentModal'
+import { KassaPaymentModal } from '@/components/kassa/KassaPaymentModal'
+import { KassaSplitPaymentModal } from '@/components/kassa/KassaSplitPaymentModal'
+import type { KassaPaymentMethod } from '@/lib/kassa-cart-types'
 import {
   applyRetailGoodsReceipt,
   applyRetailStockScanIncrement,
-  completeRetailCashSale,
+  completeRetailSale,
   createRetailSkuFromScan,
   fetchRetailPosSkus,
   updateRetailSkuPrice,
@@ -144,7 +148,10 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [quickMenuPanelOpen, setQuickMenuPanelOpen] = useState(false)
   const [langOpen, setLangOpen] = useState(false)
   const [logoutSoftwareConfirmOpen, setLogoutSoftwareConfirmOpen] = useState(false)
-  const [showPayModal, setShowPayModal] = useState(false)
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
+  const [showSplitModal, setShowSplitModal] = useState(false)
+  const [splitCash, setSplitCash] = useState(0)
+  const [splitCard, setSplitCard] = useState(0)
   const [mode, setMode] = useState<RetailKassaMode>('sales')
   const [stockActivity, setStockActivity] = useState<StockActivityLine[]>([])
   const [stockBusy, setStockBusy] = useState(false)
@@ -263,6 +270,16 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const total = useMemo(
     () => cart.reduce((s, l) => s + l.sku.price * l.quantity, 0),
     [cart],
+  )
+
+  const paymentMethodOptions = useMemo<KassaPayOption[]>(
+    () => [
+      { method: 'CASH', label: t('kassaApp.payCash'), icon: '💵', color: '#10b981' },
+      { method: 'CARD', label: t('kassaApp.payCard'), icon: '💳', color: '#3b82f6' },
+      { method: 'IDEAL', label: t('kassaApp.payIdeal'), icon: '📱', color: '#ec4899' },
+      { method: 'BANCONTACT', label: t('kassaApp.payBancontact'), icon: '🏦', color: '#f59e0b' },
+    ],
+    [t],
   )
 
   const businessTitle =
@@ -576,12 +593,16 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     focusBarcodeCapture()
   }
 
-  async function payCash() {
+  async function completePayment(
+    method: KassaPaymentMethod,
+    splitAmounts?: { cash: number; card: number },
+  ) {
     if (cart.length === 0 || paying) return
     setPaying(true)
-    const res = await completeRetailCashSale(tenant, cart)
+    const res = await completeRetailSale(tenant, cart, method, splitAmounts)
     setPaying(false)
-    setShowPayModal(false)
+    setShowPaymentModal(false)
+    setShowSplitModal(false)
     if (!res.ok) {
       alert(t('retailKassaPage.payError'))
       return
@@ -647,31 +668,35 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         </div>
       ) : null}
 
-      {showPayModal && (
-        <div className="fixed inset-0 z-[130] flex items-center justify-center bg-black/70 p-4">
-          <div
-            className={`w-full max-w-sm space-y-4 p-5 ${KASSA_POS_BTN_SHAPE} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} border ${KASSA_POS_RULE_BLACK}`}
-          >
-            <p className="text-center text-lg font-bold text-white">{t('kassaApp.checkout')}</p>
-            <p className="text-center text-2xl font-bold tabular-nums text-red-500">€{total.toFixed(2)}</p>
-            <button
-              type="button"
-              disabled={paying}
-              onClick={() => void payCash()}
-              className={`w-full py-3 ${KASSA_POS_CHECKOUT_BTN}`}
-            >
-              {paying ? t('retailKassaPage.paying') : t('retailKassaPage.payCash')}
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowPayModal(false)}
-              className={`w-full py-2.5 ${kassaPosButtonClass(false)}`}
-            >
-              {t('common.cancel')}
-            </button>
-          </div>
-        </div>
-      )}
+      <KassaPaymentModal
+        open={showPaymentModal}
+        total={total}
+        options={paymentMethodOptions}
+        onClose={() => !paying && setShowPaymentModal(false)}
+        onPay={(method) => void completePayment(method)}
+        onOpenSplit={() => {
+          setSplitCash(0)
+          setSplitCard(total)
+          setShowSplitModal(true)
+          setShowPaymentModal(false)
+        }}
+        appearance={appearanceDark ? 'dark' : 'light'}
+      />
+
+      <KassaSplitPaymentModal
+        open={showSplitModal}
+        total={total}
+        splitCash={splitCash}
+        splitCard={splitCard}
+        setSplitCash={setSplitCash}
+        setSplitCard={setSplitCard}
+        onCloseBack={() => {
+          setShowSplitModal(false)
+          setShowPaymentModal(true)
+        }}
+        onConfirm={() => void completePayment('SPLIT', { cash: splitCash, card: splitCard })}
+        appearance={appearanceDark ? 'dark' : 'light'}
+      />
 
       <div className={`flex min-h-0 flex-1 flex-col overflow-hidden ${ui.shellBg}`}>
         <div
@@ -1213,7 +1238,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                     onClick={() => {
                       if (cart.length === 0) return
                       playClick()
-                      setShowPayModal(true)
+                      setShowPaymentModal(true)
                     }}
                     disabled={cart.length === 0}
                     className={`flex min-w-0 flex-1 items-center justify-center min-h-[3.5rem] py-3 text-lg ${KASSA_POS_CHECKOUT_BTN}`}
