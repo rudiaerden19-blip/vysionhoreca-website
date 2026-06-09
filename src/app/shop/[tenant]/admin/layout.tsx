@@ -20,6 +20,7 @@ import {
 import {
   getSubmenuIdForPathname,
   hasShopAdminPathAccess,
+  isAdminSubmenuEnabled,
   isSubmenuEnabledInTenantConfig,
   isSubmenuForcedOn,
 } from '@/lib/admin-hamburger-modules'
@@ -433,11 +434,10 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
         <div className="flex min-w-0 shrink-0 items-center gap-2">
           <AdminHamburgerMenu tenantSlug={params.tenant} />
           {!modulesLoading &&
-            (isSuperAdminLoggedIn() ||
-              moduleAccess.kassa ||
-              moduleAccess['retail-kassa']) && (
+            (isHorecaKassaPosScreenEnabled(moduleAccess) ||
+              isRetailKassaPosScreenEnabled(moduleAccess, enabledModulesJson)) && (
             <>
-              {moduleAccess.kassa ? (
+              {isHorecaKassaPosScreenEnabled(moduleAccess) ? (
                 <a
                   href={`${baseUrl}/kassa`}
                   className="touch-manipulation [-webkit-tap-highlight-color:transparent] flex shrink-0 items-center gap-2 rounded-xl bg-[#58CCFF] px-3 py-2 text-sm font-bold text-[#063042] shadow-md transition-colors hover:bg-[#47c6fe] no-underline"
@@ -448,7 +448,7 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
                   <span>{t('adminLayout.pos')}</span>
                 </a>
               ) : null}
-              {moduleAccess['retail-kassa'] ? (
+              {isRetailKassaPosScreenEnabled(moduleAccess, enabledModulesJson) ? (
                 <a
                   href={`${baseUrl}/retail-kassa`}
                   className="touch-manipulation [-webkit-tap-highlight-color:transparent] flex shrink-0 items-center gap-2 rounded-xl bg-emerald-400 px-3 py-2 text-sm font-bold text-[#063042] shadow-md transition-colors hover:bg-emerald-300 no-underline"
@@ -472,7 +472,12 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
 
         {/* Rechts: display knop + vergrendel + taal */}
         <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-          {(isSuperAdminLoggedIn() || moduleAccess['online-bestellingen']) && (
+          {isAdminSubmenuEnabled(
+            'sm_orders_display',
+            params.tenant,
+            moduleAccess,
+            enabledModulesJson
+          ) && (
             <Link
               href={`/shop/${params.tenant}/display`}
               className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors"

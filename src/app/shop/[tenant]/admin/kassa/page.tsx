@@ -42,6 +42,7 @@ import { allTenantModulesTrue, type TenantModuleId } from '@/lib/tenant-modules'
 import {
   buildHamburgerModules,
   filterHamburgerModulesForAccess,
+  isAdminSubmenuEnabled,
 } from '@/lib/admin-hamburger-modules'
 import { useTenantModuleFlagsContext } from '@/lib/tenant-module-flags-context'
 import {
@@ -4577,7 +4578,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </button>
           )}
 
-          {effectiveAccess['online-bestellingen'] && (
+          {isAdminSubmenuEnabled('sm_orders_display', tenant, effectiveAccess, effectiveJson) && (
             <Link
               href={`/shop/${tenant}/display`}
               title={t('kassaApp.navShopDisplay')}
@@ -4587,7 +4588,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </Link>
           )}
 
-          {effectiveAccess['online-bestellingen'] && (
+          {isAdminSubmenuEnabled('sm_orders_keuken', tenant, effectiveAccess, effectiveJson) && (
             <Link
               href={`/keuken/${tenant}`}
               title={t('kassaApp.navKitchenDisplay')}

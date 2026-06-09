@@ -589,10 +589,12 @@ export function buildEnabledModulesSavePayload(
   const seen = new Set<string>()
   const hmods = buildHamburgerModules(`/shop/${tenantSlug}/admin`, tenantSlug)
   for (const m of hmods) {
+    const parentOn = m.key === 'account' ? true : !!moduleToggles[m.key]
     for (const it of m.items) {
       if (seen.has(it.id)) continue
       seen.add(it.id)
-      payload[it.id] = !!subToggles[it.id]
+      if (m.key === 'retail-kassa' && !parentOn) payload[it.id] = false
+      else payload[it.id] = !!subToggles[it.id]
     }
   }
   return payload
@@ -667,6 +669,33 @@ export function isSubmenuEnabledInTenantConfig(
 ): boolean {
   if (isSubmenuForcedOn(subId)) return true
   return isTenantSubmenuEffectiveOn(subId, enabledJson, parentModuleAllowed)
+}
+
+/** Eén submenu (bv. sm_orders_display) — zelfde logica als hamburger-filter. */
+export function isAdminSubmenuEnabled(
+  subId: string,
+  tenantSlug: string,
+  moduleAccess: Record<TenantModuleId, boolean>,
+  enabledJson: Record<string, boolean> | null
+): boolean {
+  const baseUrl = `/shop/${tenantSlug}/admin`
+  const mods = buildHamburgerModules(baseUrl, tenantSlug)
+  const mod = mods.find((m) => m.items.some((it) => it.id === subId))
+  if (!mod) return false
+
+  let parentOn = !!moduleAccess[mod.key]
+  if (mod.key === 'website') {
+    if (subId === 'sm_inst_opening' || subId === 'sm_inst_levering') {
+      parentOn = !!(moduleAccess.website || moduleAccess.instellingen)
+    } else if (subId === 'sm_online_cadeaubonnen') {
+      parentOn = !!(moduleAccess.website || moduleAccess.online)
+    }
+  }
+  if (subId === 'sm_retail_kassa_producten' || subId === 'sm_voorraad_producten') {
+    parentOn = !!(moduleAccess.kassa || moduleAccess['retail-kassa'] || moduleAccess.voorraad)
+  }
+
+  return isSubmenuEnabledInTenantConfig(subId, enabledJson, parentOn)
 }
 
 /** Route-toegang: hoofdmodule óf los ingeschakeld submenu (bv. pincode zonder kassa-POS). */
