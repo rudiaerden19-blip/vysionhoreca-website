@@ -285,9 +285,13 @@ export async function updateRetailSkuPrice(
   tenantSlug: string,
   sku: RetailPosSku,
   price: number,
+  name?: string,
 ): Promise<{ ok: boolean; sku?: RetailPosSku; error?: string }> {
   const nextPrice = Math.round(price * 100) / 100
   if (!(nextPrice >= 0)) return { ok: false, error: 'invalid_price' }
+
+  const trimmedName = name?.trim()
+  if (name !== undefined && !trimmedName) return { ok: false, error: 'invalid_name' }
 
   const id = sku.variantId ?? sku.productId
   const r = sku.variantId
@@ -302,12 +306,23 @@ export async function updateRetailSkuPrice(
         {
           price: nextPrice,
           track_stock: false,
+          ...(trimmedName ? { name: trimmedName } : {}),
           ...(sku.barcode && !sku.article_number ? { article_number: sku.barcode } : {}),
         },
         { id, tenant_slug: tenantSlug },
         { tenantSlug },
       )
   if (!r.ok) return { ok: false, error: r.error || 'update_failed' }
+
+  if (trimmedName && sku.variantId) {
+    const nameRes = await adminDb.update(
+      'menu_products',
+      { name: trimmedName },
+      { id: sku.productId, tenant_slug: tenantSlug },
+      { tenantSlug },
+    )
+    if (!nameRes.ok) return { ok: false, error: nameRes.error || 'update_failed' }
+  }
 
   const refreshed = await fetchRetailPosSkus(tenantSlug)
   const updated = refreshed.find((s) => s.lineKey === sku.lineKey)

@@ -178,8 +178,10 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   /** Schermtoetsenbord alleen na expliciete tik op «Artikel zoeken». */
   const [articleSearchActive, setArticleSearchActive] = useState(false)
   const [priceFixSku, setPriceFixSku] = useState<RetailPosSku | null>(null)
+  const [priceFixName, setPriceFixName] = useState('')
   const [priceFixValue, setPriceFixValue] = useState('')
   const [priceFixSaving, setPriceFixSaving] = useState(false)
+  const priceFixNameInputRef = useRef<HTMLInputElement>(null)
   const priceFixInputRef = useRef<HTMLInputElement>(null)
   const skusRef = useRef<RetailPosSku[]>([])
   const stockBusyRef = useRef(false)
@@ -226,6 +228,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   }, [appearanceDark])
 
   const focusBarcodeCapture = useCallback(() => {
+    if (priceFixNameInputRef.current && document.activeElement === priceFixNameInputRef.current) return
     if (priceFixInputRef.current && document.activeElement === priceFixInputRef.current) return
     barcodeCaptureRef.current?.focus({ preventScroll: true })
   }, [])
@@ -560,8 +563,20 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     }
   }
 
+  function openPriceFixModal(sku: RetailPosSku) {
+    setPriceFixSku(sku)
+    setPriceFixValue('')
+    setPriceFixName(/^EAN\s+/i.test(sku.name.trim()) ? '' : sku.name.trim())
+    requestAnimationFrame(() => priceFixNameInputRef.current?.focus())
+  }
+
   async function savePriceFix() {
     if (!priceFixSku || priceFixSaving) return
+    const name = priceFixName.trim()
+    if (!name) {
+      alert(t('retailKassaPage.unknownScanNameRequired'))
+      return
+    }
     const price = Number.parseFloat(priceFixValue.replace(',', '.'))
     if (!Number.isFinite(price) || price < 0) {
       alert(t('retailKassaPage.unknownScanPriceRequired'))
@@ -569,7 +584,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     }
     setPriceFixSaving(true)
     try {
-      const res = await updateRetailSkuPrice(tenant, priceFixSku, price)
+      const res = await updateRetailSkuPrice(tenant, priceFixSku, price, name)
       if (!res.ok || !res.sku) {
         alert(t('retailKassaPage.priceFixError'))
         return
@@ -579,6 +594,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         prev.map((l) => (l.sku.lineKey === res.sku!.lineKey ? { ...l, sku: res.sku! } : l)),
       )
       setPriceFixSku(null)
+      setPriceFixName('')
       setPriceFixValue('')
       releaseScanFocus()
     } finally {
@@ -591,6 +607,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     playClick()
     const sku = priceFixSku
     setPriceFixSku(null)
+    setPriceFixName('')
     setPriceFixValue('')
     if (sku) {
       setCart((prev) =>
@@ -681,9 +698,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     })
     scrollScanBarToEnd()
     if (sku.price <= 0) {
-      setPriceFixSku(sku)
-      setPriceFixValue('')
-      requestAnimationFrame(() => priceFixInputRef.current?.focus())
+      openPriceFixModal(sku)
     } else {
       releaseScanFocus()
     }
@@ -890,21 +905,40 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       {priceFixSku ? (
         <div className="fixed inset-0 z-[135] flex items-center justify-center bg-black/70 p-4">
           <div
-            className={`w-full max-w-sm space-y-3 p-5 ${KASSA_POS_BTN_SHAPE} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} border ${KASSA_POS_RULE_BLACK}`}
+            className={`w-full max-w-md space-y-4 p-6 sm:max-w-lg ${KASSA_POS_BTN_SHAPE} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} border ${KASSA_POS_RULE_BLACK}`}
           >
-            <p className="text-lg font-bold text-white">{t('retailKassaPage.priceFixTitle')}</p>
-            <p className="text-sm text-white/80">{priceFixSku.name}</p>
-            <p className="text-xs text-white/60">{t('retailKassaPage.priceFixHint')}</p>
-            <input
-              ref={priceFixInputRef}
-              type="text"
-              inputMode="decimal"
-              data-vysion-kb-decimal="1"
-              value={priceFixValue}
-              onChange={(e) => setPriceFixValue(e.target.value)}
-              className={`w-full px-3 py-2.5 text-sm tabular-nums text-[#f0f0f0] placeholder:text-white/45 focus:outline-none ${KASSA_POS_FIELD}`}
-              placeholder="0,00"
-            />
+            <p className="text-xl font-bold text-white">{t('retailKassaPage.priceFixTitle')}</p>
+            {priceFixSku.barcode ? (
+              <p className="text-sm text-white/70">
+                {t('retailKassaPage.unknownScanBarcode')}:{' '}
+                <span className="font-mono tabular-nums text-white/90">{priceFixSku.barcode}</span>
+              </p>
+            ) : null}
+            <label className="block space-y-1.5">
+              <span className="text-sm font-semibold text-white/90">{t('retailKassaPage.unknownScanName')}</span>
+              <input
+                ref={priceFixNameInputRef}
+                type="text"
+                value={priceFixName}
+                onChange={(e) => setPriceFixName(e.target.value)}
+                className={`w-full px-4 py-3 text-base text-[#f0f0f0] placeholder:text-white/45 focus:outline-none ${KASSA_POS_FIELD}`}
+                placeholder={t('retailKassaPage.unknownScanNamePlaceholder')}
+                autoComplete="off"
+              />
+            </label>
+            <label className="block space-y-1.5">
+              <span className="text-sm font-semibold text-white/90">{t('retailKassaPage.unknownScanPrice')}</span>
+              <input
+                ref={priceFixInputRef}
+                type="text"
+                inputMode="decimal"
+                data-vysion-kb-decimal="1"
+                value={priceFixValue}
+                onChange={(e) => setPriceFixValue(e.target.value)}
+                className={`w-full px-4 py-3 text-base tabular-nums text-[#f0f0f0] placeholder:text-white/45 focus:outline-none ${KASSA_POS_FIELD}`}
+                placeholder="0,00"
+              />
+            </label>
             <div className="flex gap-2.5">
               <button
                 type="button"
