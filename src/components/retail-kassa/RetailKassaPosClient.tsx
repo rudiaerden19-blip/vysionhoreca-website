@@ -101,12 +101,12 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   )
 
   const scanRef = useRef<HTMLInputElement>(null)
+  const scanBarRef = useRef<HTMLDivElement>(null)
   const langRef = useRef<HTMLDivElement>(null)
 
   const [tenantInfo, setTenantInfo] = useState<TenantSettings | null>(null)
   const [products, setProducts] = useState<RetailPosProduct[]>([])
   const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState('')
   const [scanValue, setScanValue] = useState('')
   const [cart, setCart] = useState<RetailCartLine[]>([])
   const [paying, setPaying] = useState(false)
@@ -154,20 +154,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     return () => document.removeEventListener('mousedown', onDoc)
   }, [langOpen])
 
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase()
-    if (!q) return products
-    return products.filter(
-      (p) =>
-        p.name.toLowerCase().includes(q) ||
-        (p.description && p.description.toLowerCase().includes(q)) ||
-        (p.article_number && p.article_number.toLowerCase().includes(q)) ||
-        (p.barcode && p.barcode.toLowerCase().includes(q)) ||
-        (p.size_label && p.size_label.toLowerCase().includes(q)) ||
-        (p.color_label && p.color_label.toLowerCase().includes(q)),
-    )
-  }, [products, search])
-
   const total = useMemo(
     () => cart.reduce((s, l) => s + l.product.price * l.quantity, 0),
     [cart],
@@ -204,6 +190,10 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     })
     setScanValue('')
     scanRef.current?.focus()
+    requestAnimationFrame(() => {
+      const el = scanBarRef.current
+      if (el) el.scrollLeft = el.scrollWidth
+    })
   }
 
   function updateQty(productId: string, qty: number) {
@@ -494,41 +484,31 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
 
             <div className="flex min-h-0 flex-1 flex-col px-3 pb-3 pt-0.5 sm:px-4">
               <div
-                className={`flex min-h-0 flex-1 flex-col overflow-hidden ${KASSA_POS_MENU_RECESS_TRAY_CLASS} ${KASSA_POS_BTN_SHAPE}`}
+                className={`flex min-h-0 flex-1 flex-col overflow-hidden justify-center ${KASSA_POS_MENU_RECESS_TRAY_CLASS} ${KASSA_POS_BTN_SHAPE} gks-menu-vignette`}
               >
-                <div className="shrink-0 p-3 pb-2">
-                  <input
-                    type="search"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder={t('retailKassaPage.search')}
-                    className={`w-full px-4 py-2 text-sm text-[#f0f0f0] placeholder:text-white/45 focus:outline-none ${KASSA_POS_FIELD}`}
-                  />
-                </div>
-                <div className="relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4 pt-0 touch-manipulation gks-menu-vignette">
-                  {loading ? (
-                    <div className={`flex items-center justify-center h-full text-lg ${ui.menuEmptyMuted}`}>
-                      {t('retailKassaPage.loading')}
-                    </div>
-                  ) : filtered.length === 0 ? (
-                    <div className={`flex flex-col items-center justify-center h-full ${ui.menuEmptyMuted}`}>
-                      <p className="font-semibold">{t('retailKassaPage.search')}</p>
-                    </div>
-                  ) : (
-                    <div className="grid min-h-0 w-full grid-cols-2 gap-4 pb-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 [&>*]:min-h-0 items-stretch">
-                      {filtered.map((p) => (
-                        <button
+                {loading && cart.length === 0 ? (
+                  <p className={`px-4 text-center text-sm ${ui.menuEmptyMuted}`}>{t('retailKassaPage.loading')}</p>
+                ) : cart.length === 0 ? (
+                  <p className={`px-6 text-center text-base font-medium sm:text-lg ${ui.menuEmptyMuted}`}>
+                    {t('retailKassaPage.scanOnlyHint')}
+                  </p>
+                ) : (
+                  <div
+                    ref={scanBarRef}
+                    data-testid="retail-kassa-scan-bar"
+                    className="flex w-full min-h-[9.5rem] max-h-[42vh] flex-row items-stretch gap-3 overflow-x-auto overflow-y-hidden overscroll-x-contain px-4 py-5 touch-manipulation [scrollbar-gutter:stable]"
+                  >
+                    {cart.map((l) => {
+                      const p = l.product
+                      return (
+                        <div
                           key={p.id}
-                          type="button"
-                          onClick={() => addToCart(p, 1)}
-                          className={`${KASSA_POS_MENU_TILE_BUTTON_BASE} h-full min-h-[8.5rem]`}
+                          className={`${KASSA_POS_MENU_TILE_BUTTON_BASE} shrink-0 w-[11.5rem] sm:w-[12.5rem] min-h-[8.5rem] pointer-events-none`}
                         >
                           <div className="shrink-0 w-full border-b border-[#45454a]/80 bg-[linear-gradient(180deg,#343438_0%,#2a2a2e_100%)] px-2 py-2 sm:px-3">
                             <p className={`${KASSA_POS_MENU_TILE_LABEL_CLASS} line-clamp-2 text-left`}>{p.name}</p>
-                            {p.description ? (
-                              <p className="mt-0.5 line-clamp-2 text-left text-[10px] font-medium text-white/55 sm:text-[11px]">
-                                {p.description}
-                              </p>
+                            {l.quantity > 1 ? (
+                              <p className="mt-0.5 text-left text-[11px] font-bold text-[#5a9fd4]">× {l.quantity}</p>
                             ) : null}
                           </div>
                           <div className="flex-1 p-2 sm:p-2.5 text-[10px] sm:text-[11px] text-[#d8d8dc] grid grid-cols-2 gap-x-2 gap-y-1 content-start">
@@ -549,11 +529,11 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                               {p.track_stock ? p.stock_quantity : t('retailKassaPage.stockNotTracked')}
                             </span>
                           </div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
               </div>
             </div>
 
