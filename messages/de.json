@@ -5751,6 +5751,18 @@
     "outOfStock": "Nicht genug auf Lager",
     "barcodeNotFound": "Artikel nicht gefunden",
     "lastOrder": "Beleg #{n}",
-    "color": "Farbe"
+    "color": "Farbe",
+    "modeSales": "Verkauf",
+    "modeStockCount": "In stock",
+    "modeGoodsReceipt": "Wareneingang",
+    "modeStockCountHint": "Artikel in der Filiale scannen — Bestand +1 pro Scan",
+    "modeGoodsReceiptHint": "Karton-Barcode scannen (Menge, Größe, Farbe) — Bestand wird erhöht",
+    "stockUpdateError": "Bestand konnte nicht aktualisiert werden",
+    "stockPlusOne": "+1 Bestand",
+    "stockAdded": "+{n} Bestand",
+    "stockNow": "Bestand jetzt",
+    "stockScans": "Gescannt",
+    "stockAutoSave": "Bestand wird sofort gespeichert",
+    "clearStockLog": "Liste leeren"
   }
 }

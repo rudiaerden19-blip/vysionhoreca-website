@@ -5728,6 +5728,18 @@
     "outOfStock": "Insufficient stock",
     "barcodeNotFound": "Article not found",
     "lastOrder": "Receipt #{n}",
-    "color": "اللون"
+    "color": "اللون",
+    "modeSales": "بيع",
+    "modeStockCount": "In stock",
+    "modeGoodsReceipt": "استلام بضاعة",
+    "modeStockCountHint": "امسح كل منتج في المتجر — +1 للمخزون لكل مسح",
+    "modeGoodsReceiptHint": "امسح باركود الصندوق (الكمية، المقاس، اللون) — يُضاف للمخزون",
+    "stockUpdateError": "تعذّر تحديث المخزون",
+    "stockPlusOne": "+1 مخزون",
+    "stockAdded": "+{n} مخزون",
+    "stockNow": "المخزون الآن",
+    "stockScans": "الممسوح",
+    "stockAutoSave": "يُحفظ المخزون فورًا",
+    "clearStockLog": "مسح القائمة"
   }
 }

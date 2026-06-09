@@ -5728,6 +5728,18 @@
     "outOfStock": "Stock insuficiente",
     "barcodeNotFound": "Artículo no encontrado",
     "lastOrder": "Ticket #{n}",
-    "color": "Color"
+    "color": "Color",
+    "modeSales": "Venta",
+    "modeStockCount": "In stock",
+    "modeGoodsReceipt": "Recepción de mercancía",
+    "modeStockCountHint": "Escanee cada artículo en tienda — stock +1 por escaneo",
+    "modeGoodsReceiptHint": "Escanee el código de la caja (cant., talla, color) — se suma al stock",
+    "stockUpdateError": "No se pudo actualizar el stock",
+    "stockPlusOne": "+1 stock",
+    "stockAdded": "+{n} stock",
+    "stockNow": "Stock actual",
+    "stockScans": "Escaneados",
+    "stockAutoSave": "El stock se guarda al instante",
+    "clearStockLog": "Borrar lista"
   }
 }

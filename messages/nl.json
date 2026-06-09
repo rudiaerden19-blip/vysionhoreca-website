@@ -5620,7 +5620,19 @@
     "outOfStock": "Niet genoeg voorraad",
     "barcodeNotFound": "Geen artikel gevonden",
     "lastOrder": "Bon #{n}",
-    "color": "Kleur"
+    "color": "Kleur",
+    "modeSales": "Verkoop",
+    "modeStockCount": "In stock",
+    "modeGoodsReceipt": "Goederenontvangst",
+    "modeStockCountHint": "Scan elk artikel op de winkelvloer — voorraad +1 per scan",
+    "modeGoodsReceiptHint": "Scan de doos-barcode (aantal, maat, kleur) — voorraad wordt bijgeboekt",
+    "stockUpdateError": "Voorraad bijwerken mislukt",
+    "stockPlusOne": "+1 voorraad",
+    "stockAdded": "+{n} voorraad",
+    "stockNow": "Voorraad nu",
+    "stockScans": "Gescand",
+    "stockAutoSave": "Voorraad wordt direct opgeslagen",
+    "clearStockLog": "Lijst wissen"
   },
   "sectorPages": {
     "breadcrumb": "Sectoren",

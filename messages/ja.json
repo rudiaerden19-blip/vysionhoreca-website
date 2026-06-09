@@ -5728,6 +5728,18 @@
     "outOfStock": "Insufficient stock",
     "barcodeNotFound": "Article not found",
     "lastOrder": "Receipt #{n}",
-    "color": "色"
+    "color": "色",
+    "modeSales": "販売",
+    "modeStockCount": "In stock",
+    "modeGoodsReceipt": "入荷",
+    "modeStockCountHint": "店内で商品をスキャン — 1回ごとに在庫+1",
+    "modeGoodsReceiptHint": "箱のバーコード（数量・サイズ・色）をスキャン — 在庫に加算",
+    "stockUpdateError": "在庫の更新に失敗しました",
+    "stockPlusOne": "在庫+1",
+    "stockAdded": "在庫+{n}",
+    "stockNow": "現在の在庫",
+    "stockScans": "スキャン数",
+    "stockAutoSave": "在庫はすぐに保存されます",
+    "clearStockLog": "一覧をクリア"
   }
 }

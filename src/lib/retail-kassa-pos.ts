@@ -49,6 +49,69 @@ export async function fetchRetailPosProducts(tenantSlug: string): Promise<Retail
   }))
 }
 
+/** Geparsede scan (doos-label of handmatige invoer). */
+export type RetailScanPayload = {
+  lookupCode: string
+  quantity: number
+  size_label: string | null
+  color_label: string | null
+}
+
+/**
+ * Barcode-formaten (één regel):
+ * - alleen EAN/SKU → qty 1
+ * - `EAN|12` of `EAN|12|M|Blauw` (maat/kleur optioneel)
+ * - `12*EAN` (qty vooraan)
+ * - `VYSION;bc=EAN;qty=12;size=M;color=Blauw` (hoofdletter keys)
+ */
+export function parseRetailScanPayload(raw: string): RetailScanPayload {
+  const trimmed = raw.trim()
+  if (!trimmed) {
+    return { lookupCode: '', quantity: 1, size_label: null, color_label: null }
+  }
+
+  if (/^VYSION;/i.test(trimmed)) {
+    const parts = trimmed.split(';').slice(1)
+    const map: Record<string, string> = {}
+    for (const p of parts) {
+      const eq = p.indexOf('=')
+      if (eq < 0) continue
+      map[p.slice(0, eq).trim().toLowerCase()] = p.slice(eq + 1).trim()
+    }
+    const lookupCode = map.bc || map.barcode || map.sku || map.ean || ''
+    const qty = Math.max(1, Math.floor(Number(map.qty || map.quantity || '1') || 1))
+    return {
+      lookupCode: lookupCode || trimmed,
+      quantity: qty,
+      size_label: map.size || map.maat || map.size_label || null,
+      color_label: map.color || map.kleur || map.color_label || null,
+    }
+  }
+
+  if (trimmed.includes('|')) {
+    const [code, qtyRaw, size, color] = trimmed.split('|').map((s) => s.trim())
+    const qty = Math.max(1, Math.floor(Number(qtyRaw) || 1))
+    return {
+      lookupCode: code || trimmed,
+      quantity: qty,
+      size_label: size || null,
+      color_label: color || null,
+    }
+  }
+
+  const star = trimmed.match(/^(\d+)\*(.+)$/)
+  if (star) {
+    return {
+      lookupCode: star[2].trim(),
+      quantity: Math.max(1, Math.floor(Number(star[1]) || 1)),
+      size_label: null,
+      color_label: null,
+    }
+  }
+
+  return { lookupCode: trimmed, quantity: 1, size_label: null, color_label: null }
+}
+
 export function findRetailProductByBarcode(
   products: RetailPosProduct[],
   code: string,
@@ -133,4 +196,70 @@ export async function completeRetailCashSale(
 
   syncZReportAfterOrderSafe(tenantSlug, createdAt.toISOString())
   return { ok: true, orderNumber }
+}
+
+function mapRetailRow(p: Record<string, unknown>): RetailPosProduct {
+  return {
+    id: String(p.id),
+    name: String(p.name ?? ''),
+    description: String(p.description ?? ''),
+    price: Number(p.price) || 0,
+    article_number: typeof p.article_number === 'string' ? p.article_number.trim() || null : null,
+    barcode: typeof p.barcode === 'string' ? p.barcode.trim() || null : null,
+    size_label: typeof p.size_label === 'string' ? p.size_label.trim() || null : null,
+    color_label: typeof p.color_label === 'string' ? p.color_label.trim() || null : null,
+    track_stock: !!p.track_stock,
+    stock_quantity: Number(p.stock_quantity) || 0,
+  }
+}
+
+/** Winkelronde: +1 voorraad per scan. */
+export async function applyRetailStockScanIncrement(
+  tenantSlug: string,
+  product: RetailPosProduct,
+): Promise<{ ok: boolean; product?: RetailPosProduct; error?: string }> {
+  const nextQty = (product.track_stock ? product.stock_quantity : 0) + 1
+  const patch: Record<string, unknown> = {
+    track_stock: true,
+    stock_quantity: nextQty,
+  }
+  const r = await adminDb.update(
+    'menu_products',
+    patch,
+    { id: product.id, tenant_slug: tenantSlug },
+    { tenantSlug, select: RETAIL_SELECT },
+  )
+  if (!r.ok) return { ok: false, error: r.error || 'update_failed' }
+  const raw = r.data as unknown
+  const row = (Array.isArray(raw) ? raw[0] : raw) as Record<string, unknown> | undefined
+  if (!row) return { ok: false, error: 'empty_row' }
+  return { ok: true, product: mapRetailRow(row) }
+}
+
+/** Goederenontvangst: qty (en optioneel maat/kleur) van doos-barcode bijboeken. */
+export async function applyRetailGoodsReceipt(
+  tenantSlug: string,
+  product: RetailPosProduct,
+  payload: Pick<RetailScanPayload, 'quantity' | 'size_label' | 'color_label'>,
+): Promise<{ ok: boolean; product?: RetailPosProduct; error?: string }> {
+  const add = Math.max(1, Math.floor(payload.quantity || 1))
+  const nextQty = (product.track_stock ? product.stock_quantity : 0) + add
+  const patch: Record<string, unknown> = {
+    track_stock: true,
+    stock_quantity: nextQty,
+  }
+  if (payload.size_label?.trim()) patch.size_label = payload.size_label.trim()
+  if (payload.color_label?.trim()) patch.color_label = payload.color_label.trim()
+
+  const r = await adminDb.update(
+    'menu_products',
+    patch,
+    { id: product.id, tenant_slug: tenantSlug },
+    { tenantSlug, select: RETAIL_SELECT },
+  )
+  if (!r.ok) return { ok: false, error: r.error || 'update_failed' }
+  const raw = r.data as unknown
+  const row = (Array.isArray(raw) ? raw[0] : raw) as Record<string, unknown> | undefined
+  if (!row) return { ok: false, error: 'empty_row' }
+  return { ok: true, product: mapRetailRow(row) }
 }

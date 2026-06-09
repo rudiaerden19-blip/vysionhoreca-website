@@ -5687,6 +5687,18 @@
     "outOfStock": "Insufficient stock",
     "barcodeNotFound": "Article not found",
     "lastOrder": "Receipt #{n}",
-    "color": "Color"
+    "color": "Color",
+    "modeSales": "Sales",
+    "modeStockCount": "In stock",
+    "modeGoodsReceipt": "Goods receipt",
+    "modeStockCountHint": "Scan each item on the shop floor — stock +1 per scan",
+    "modeGoodsReceiptHint": "Scan the box barcode (qty, size, color) — stock is added",
+    "stockUpdateError": "Failed to update stock",
+    "stockPlusOne": "+1 stock",
+    "stockAdded": "+{n} stock",
+    "stockNow": "Stock now",
+    "stockScans": "Scanned",
+    "stockAutoSave": "Stock is saved immediately",
+    "clearStockLog": "Clear list"
   }
 }

@@ -5728,6 +5728,18 @@
     "outOfStock": "Insufficient stock",
     "barcodeNotFound": "Article not found",
     "lastOrder": "Receipt #{n}",
-    "color": "颜色"
+    "color": "颜色",
+    "modeSales": "销售",
+    "modeStockCount": "In stock",
+    "modeGoodsReceipt": "收货入库",
+    "modeStockCountHint": "在店内扫描每件商品 — 每次扫描库存+1",
+    "modeGoodsReceiptHint": "扫描箱条码（数量、尺码、颜色）— 增加库存",
+    "stockUpdateError": "更新库存失败",
+    "stockPlusOne": "库存+1",
+    "stockAdded": "库存+{n}",
+    "stockNow": "当前库存",
+    "stockScans": "已扫描",
+    "stockAutoSave": "库存会立即保存",
+    "clearStockLog": "清空列表"
   }
 }
