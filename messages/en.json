@@ -5739,6 +5739,17 @@
     "stockNow": "Stock now",
     "stockScans": "Scanned",
     "stockAutoSave": "Stock is saved immediately",
-    "clearStockLog": "Clear list"
+    "clearStockLog": "Clear list",
+    "importCsv": "CSV",
+    "importExcel": "Excel",
+    "importCsvTitle": "Import products from CSV",
+    "importExcelTitle": "Import products from Excel",
+    "importTitle": "Import products",
+    "importPreview": "{count} products found",
+    "importConfirm": "Import",
+    "importBusy": "Importing…",
+    "importDone": "{created} added, {skipped} skipped (already known)",
+    "importEmpty": "No valid rows. Use columns: name, barcode/EAN, price.",
+    "importFailed": "Could not read file or import failed"
   }
 }

@@ -5780,6 +5780,17 @@
     "stockNow": "Giacenza ora",
     "stockScans": "Scansionati",
     "stockAutoSave": "La giacenza viene salvata subito",
-    "clearStockLog": "Svuota elenco"
+    "clearStockLog": "Svuota elenco",
+    "importCsv": "CSV",
+    "importExcel": "Excel",
+    "importCsvTitle": "Importa articoli da CSV",
+    "importExcelTitle": "Importa articoli da Excel",
+    "importTitle": "Importa articoli",
+    "importPreview": "{count} articoli trovati",
+    "importConfirm": "Importa",
+    "importBusy": "Importazione…",
+    "importDone": "{created} aggiunti, {skipped} saltati (già presenti)",
+    "importEmpty": "Nessuna riga valida. Colonne: nome, barcode/EAN, prezzo.",
+    "importFailed": "Lettura file o importazione non riuscita"
   }
 }

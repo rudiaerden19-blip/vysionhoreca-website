@@ -47,6 +47,7 @@ import {
   completeRetailSale,
   createRetailSkuFromScan,
   fetchRetailPosSkus,
+  importRetailProductsBatch,
   updateRetailSkuPrice,
   parseRetailScanPayload,
   resolveRetailSkuForGoodsReceipt,
@@ -56,6 +57,11 @@ import {
   type RetailPosSku,
 } from '@/lib/retail-kassa-pos'
 import { patchSkuInList } from '@/lib/retail-pos-catalog'
+import {
+  parseRetailCsvText,
+  parseRetailExcelBuffer,
+  type RetailImportRow,
+} from '@/lib/retail-product-import'
 
 type RetailKassaMode = 'sales' | 'stockCount' | 'goodsReceipt'
 
@@ -175,6 +181,11 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const priceFixInputRef = useRef<HTMLInputElement>(null)
   const skusRef = useRef<RetailPosSku[]>([])
   const stockBusyRef = useRef(false)
+  const csvImportInputRef = useRef<HTMLInputElement>(null)
+  const excelImportInputRef = useRef<HTMLInputElement>(null)
+  const [importPreview, setImportPreview] = useState<RetailImportRow[]>([])
+  const [importModalOpen, setImportModalOpen] = useState(false)
+  const [importBusy, setImportBusy] = useState(false)
 
   const reload = useCallback(async () => {
     setLoading(true)
@@ -323,6 +334,10 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const businessTitle =
     tenantInfo?.business_name ||
     tenant.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+
+  const headerMenuLikeBtnClass = appearanceDark
+    ? kassaPosButtonClass(true)
+    : 'rounded-xl bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe] font-bold text-[11px] leading-tight sm:text-xs inline-flex shrink-0 items-center gap-1.5 px-2 py-1.5 transition-colors sm:gap-2 sm:px-3 sm:py-1.5'
 
   const kassaDarkHeaderBtnShell =
     'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.35rem] px-3 py-2 sm:min-h-[2.6rem] sm:px-3.5 sm:py-2.5'
@@ -624,6 +639,52 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     void processBarcode(v)
   }
 
+  function openImportPreview(rows: RetailImportRow[]) {
+    if (rows.length === 0) {
+      alert(t('retailKassaPage.importEmpty'))
+      return
+    }
+    setImportPreview(rows)
+    setImportModalOpen(true)
+  }
+
+  async function onImportFileSelected(file: File | undefined, kind: 'csv' | 'excel') {
+    if (!file) return
+    playClick()
+    try {
+      const rows =
+        kind === 'csv'
+          ? parseRetailCsvText(await file.text())
+          : parseRetailExcelBuffer(await file.arrayBuffer())
+      openImportPreview(rows)
+    } catch {
+      alert(t('retailKassaPage.importFailed'))
+    }
+  }
+
+  async function confirmProductImport() {
+    if (importPreview.length === 0 || importBusy) return
+    setImportBusy(true)
+    try {
+      const res = await importRetailProductsBatch(tenant, importPreview)
+      if (!res.ok && res.created === 0) {
+        alert(t('retailKassaPage.importFailed'))
+        return
+      }
+      alert(
+        t('retailKassaPage.importDone')
+          .replace('{created}', String(res.created))
+          .replace('{skipped}', String(res.skipped)),
+      )
+      setImportModalOpen(false)
+      setImportPreview([])
+      await reload()
+      focusBarcodeCapture()
+    } finally {
+      setImportBusy(false)
+    }
+  }
+
   function clearStockActivity() {
     if (stockActivity.length === 0) return
     playClick()
@@ -840,6 +901,65 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         </div>
       )}
 
+      {importModalOpen ? (
+        <div className="fixed inset-0 z-[125] flex items-center justify-center bg-black/70 p-4">
+          <div
+            className={`flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden ${KASSA_POS_BTN_SHAPE} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} border ${KASSA_POS_RULE_BLACK}`}
+          >
+            <div className="border-b border-white/10 px-4 py-3">
+              <p className="text-lg font-bold text-white">{t('retailKassaPage.importTitle')}</p>
+              <p className="text-sm text-white/70">
+                {t('retailKassaPage.importPreview').replace('{count}', String(importPreview.length))}
+              </p>
+            </div>
+            <div className="min-h-0 flex-1 overflow-y-auto px-4 py-2 text-xs text-white/85">
+              <table className="w-full">
+                <thead>
+                  <tr className="text-left text-white/50">
+                    <th className="py-1 pr-2">{t('retailKassaPage.barcodeCol')}</th>
+                    <th className="py-1 pr-2">{t('retailKassaPage.nameCol')}</th>
+                    <th className="py-1">{t('retailKassaPage.price')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {importPreview.slice(0, 12).map((row, i) => (
+                    <tr key={`${row.barcode}-${i}`} className="border-t border-white/10">
+                      <td className="py-1 pr-2 font-mono tabular-nums">{row.barcode}</td>
+                      <td className="py-1 pr-2">{row.name}</td>
+                      <td className="py-1 tabular-nums">€{row.price.toFixed(2)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {importPreview.length > 12 ? (
+                <p className="mt-2 text-white/50">+{importPreview.length - 12} …</p>
+              ) : null}
+            </div>
+            <div className="flex gap-2 border-t border-white/10 p-4">
+              <button
+                type="button"
+                disabled={importBusy}
+                onClick={() => {
+                  setImportModalOpen(false)
+                  setImportPreview([])
+                }}
+                className={`flex-1 py-2.5 ${kassaPosButtonClass(false)}`}
+              >
+                {t('common.cancel')}
+              </button>
+              <button
+                type="button"
+                disabled={importBusy}
+                onClick={() => void confirmProductImport()}
+                className={`flex-1 py-2.5 font-bold ${kassaPosButtonClass(true)}`}
+              >
+                {importBusy ? t('retailKassaPage.importBusy') : t('retailKassaPage.importConfirm')}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       {thermalPrintBanner ? (
         <div className="fixed inset-x-0 top-0 z-[210] bg-red-900/95 px-4 py-3 text-center text-xs text-white whitespace-pre-line">
           {thermalPrintBanner}
@@ -891,6 +1011,44 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
               <span className="font-bold text-[11px] leading-tight sm:text-xs">{t('kassaApp.hamburgerMenu')}</span>
+            </button>
+            <input
+              ref={csvImportInputRef}
+              type="file"
+              accept=".csv,text/csv,text/plain"
+              className="hidden"
+              onChange={(e) => {
+                void onImportFileSelected(e.target.files?.[0], 'csv')
+                e.target.value = ''
+              }}
+            />
+            <input
+              ref={excelImportInputRef}
+              type="file"
+              accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+              className="hidden"
+              onChange={(e) => {
+                void onImportFileSelected(e.target.files?.[0], 'excel')
+                e.target.value = ''
+              }}
+            />
+            <button
+              type="button"
+              data-testid="retail-import-csv"
+              className={headerMenuLikeBtnClass}
+              title={t('retailKassaPage.importCsvTitle')}
+              onClick={() => csvImportInputRef.current?.click()}
+            >
+              <span>{t('retailKassaPage.importCsv')}</span>
+            </button>
+            <button
+              type="button"
+              data-testid="retail-import-excel"
+              className={headerMenuLikeBtnClass}
+              title={t('retailKassaPage.importExcelTitle')}
+              onClick={() => excelImportInputRef.current?.click()}
+            >
+              <span>{t('retailKassaPage.importExcel')}</span>
             </button>
             {hamburgerOpen && (() => {
               const modules = filteredHamburgerModules

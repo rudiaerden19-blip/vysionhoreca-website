@@ -5780,6 +5780,17 @@
     "stockNow": "現在の在庫",
     "stockScans": "スキャン数",
     "stockAutoSave": "在庫はすぐに保存されます",
-    "clearStockLog": "一覧をクリア"
+    "clearStockLog": "一覧をクリア",
+    "importCsv": "CSV",
+    "importExcel": "Excel",
+    "importCsvTitle": "CSVから商品をインポート",
+    "importExcelTitle": "Excelから商品をインポート",
+    "importTitle": "商品をインポート",
+    "importPreview": "{count} 件の商品",
+    "importConfirm": "インポート",
+    "importBusy": "インポート中…",
+    "importDone": "{created} 件追加、{skipped} 件スキップ（既存）",
+    "importEmpty": "有効な行がありません。列：名前、バーコード/EAN、価格。",
+    "importFailed": "ファイルの読み込みまたはインポートに失敗しました"
   }
 }

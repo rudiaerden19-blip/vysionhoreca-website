@@ -5803,6 +5803,17 @@
     "stockNow": "Stock actuel",
     "stockScans": "Scannés",
     "stockAutoSave": "Le stock est enregistré immédiatement",
-    "clearStockLog": "Effacer la liste"
+    "clearStockLog": "Effacer la liste",
+    "importCsv": "CSV",
+    "importExcel": "Excel",
+    "importCsvTitle": "Importer des articles depuis CSV",
+    "importExcelTitle": "Importer des articles depuis Excel",
+    "importTitle": "Importer des articles",
+    "importPreview": "{count} articles trouvés",
+    "importConfirm": "Importer",
+    "importBusy": "Import en cours…",
+    "importDone": "{created} ajoutés, {skipped} ignorés (déjà connus)",
+    "importEmpty": "Aucune ligne valide. Colonnes : nom, code-barres/EAN, prix.",
+    "importFailed": "Lecture du fichier ou import échoué"
   }
 }

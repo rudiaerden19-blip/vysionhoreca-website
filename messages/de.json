@@ -5803,6 +5803,17 @@
     "stockNow": "Bestand jetzt",
     "stockScans": "Gescannt",
     "stockAutoSave": "Bestand wird sofort gespeichert",
-    "clearStockLog": "Liste leeren"
+    "clearStockLog": "Liste leeren",
+    "importCsv": "CSV",
+    "importExcel": "Excel",
+    "importCsvTitle": "Artikel aus CSV importieren",
+    "importExcelTitle": "Artikel aus Excel importieren",
+    "importTitle": "Artikel importieren",
+    "importPreview": "{count} Artikel gefunden",
+    "importConfirm": "Importieren",
+    "importBusy": "Import läuft…",
+    "importDone": "{created} hinzugefügt, {skipped} übersprungen (bereits vorhanden)",
+    "importEmpty": "Keine gültigen Zeilen. Spalten: Name, Barcode/EAN, Preis.",
+    "importFailed": "Datei lesen oder Import fehlgeschlagen"
   }
 }

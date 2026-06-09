@@ -5780,6 +5780,17 @@
     "stockNow": "当前库存",
     "stockScans": "已扫描",
     "stockAutoSave": "库存会立即保存",
-    "clearStockLog": "清空列表"
+    "clearStockLog": "清空列表",
+    "importCsv": "CSV",
+    "importExcel": "Excel",
+    "importCsvTitle": "从 CSV 导入商品",
+    "importExcelTitle": "从 Excel 导入商品",
+    "importTitle": "导入商品",
+    "importPreview": "找到 {count} 个商品",
+    "importConfirm": "导入",
+    "importBusy": "正在导入…",
+    "importDone": "已添加 {created} 个，跳过 {skipped} 个（已存在）",
+    "importEmpty": "无有效行。列：名称、条码/EAN、价格。",
+    "importFailed": "无法读取文件或导入失败"
   }
 }

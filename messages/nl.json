@@ -5672,7 +5672,18 @@
     "stockNow": "Voorraad nu",
     "stockScans": "Gescand",
     "stockAutoSave": "Voorraad wordt direct opgeslagen",
-    "clearStockLog": "Lijst wissen"
+    "clearStockLog": "Lijst wissen",
+    "importCsv": "CSV",
+    "importExcel": "Excel",
+    "importCsvTitle": "Artikelen importeren uit CSV",
+    "importExcelTitle": "Artikelen importeren uit Excel",
+    "importTitle": "Artikelen importeren",
+    "importPreview": "{count} artikelen gevonden",
+    "importConfirm": "Importeren",
+    "importBusy": "Importeren…",
+    "importDone": "{created} toegevoegd, {skipped} al bekend overgeslagen",
+    "importEmpty": "Geen geldige rijen. Kolommen: naam, barcode/EAN, prijs.",
+    "importFailed": "Bestand lezen of import mislukt"
   },
   "sectorPages": {
     "breadcrumb": "Sectoren",

@@ -5780,6 +5780,17 @@
     "stockNow": "المخزون الآن",
     "stockScans": "الممسوح",
     "stockAutoSave": "يُحفظ المخزون فورًا",
-    "clearStockLog": "مسح القائمة"
+    "clearStockLog": "مسح القائمة",
+    "importCsv": "CSV",
+    "importExcel": "Excel",
+    "importCsvTitle": "استيراد منتجات من CSV",
+    "importExcelTitle": "استيراد منتجات من Excel",
+    "importTitle": "استيراد المنتجات",
+    "importPreview": "تم العثور على {count} منتجًا",
+    "importConfirm": "استيراد",
+    "importBusy": "جارٍ الاستيراد…",
+    "importDone": "أُضيف {created}، تُخطّى {skipped} (موجود مسبقًا)",
+    "importEmpty": "لا صفوف صالحة. الأعمدة: الاسم، الباركود/EAN، السعر.",
+    "importFailed": "تعذّر قراءة الملف أو فشل الاستيراد"
   }
 }

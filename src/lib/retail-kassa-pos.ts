@@ -12,6 +12,7 @@ import {
 } from '@/lib/retail-pos-catalog'
 import { syncZReportAfterOrderSafe } from '@/lib/kassa-z-sync-safe'
 import type { KassaPaymentMethod } from '@/lib/kassa-cart-types'
+import type { RetailImportRow } from '@/lib/retail-product-import'
 
 export type { RetailCartLine, RetailPosSku, RetailScanPayload }
 export {
@@ -235,6 +236,49 @@ export async function createRetailSkuFromScan(
   const refreshed = await fetchRetailPosSkus(tenantSlug)
   const sku = findRetailSkuByCode(refreshed, barcodeRaw) ?? refreshed[refreshed.length - 1]
   return sku ? { ok: true, sku } : { ok: false, error: 'sku_missing' }
+}
+
+/** CSV/Excel → menu_products (bestaande barcode wordt overgeslagen). */
+export async function importRetailProductsBatch(
+  tenantSlug: string,
+  rows: RetailImportRow[],
+): Promise<{ ok: boolean; created: number; skipped: number; failed: number }> {
+  let created = 0
+  let skipped = 0
+  let failed = 0
+  const catalog = await fetchRetailPosSkus(tenantSlug)
+  const seenBarcodes = new Set<string>()
+  for (const row of rows) {
+    const bc = row.barcode.trim()
+    if (seenBarcodes.has(bc) || findRetailSkuByCode(catalog, bc)) {
+      skipped++
+      continue
+    }
+    const ins = await adminDb.insert(
+      'menu_products',
+      {
+        tenant_slug: tenantSlug,
+        name: row.name.trim(),
+        description: '',
+        price: row.price,
+        barcode: row.barcode,
+        article_number: row.article_number?.trim() || row.barcode,
+        is_active: true,
+        track_stock: row.stock > 0,
+        stock_quantity: row.stock,
+        low_stock_threshold: 5,
+        image_url: '',
+        sort_order: 0,
+      },
+      { tenantSlug, select: 'id' },
+    )
+    if (!ins.ok) failed++
+    else {
+      created++
+      seenBarcodes.add(bc)
+    }
+  }
+  return { ok: created > 0 || (skipped > 0 && failed === 0), created, skipped, failed }
 }
 
 export async function updateRetailSkuPrice(
