@@ -254,13 +254,13 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   }, [closeArticleSearchKeyboard, focusBarcodeCapture])
 
   const openArticleSearchKeyboard = useCallback(() => {
+    const el = scanRef.current
+    if (!el) return
+    /** Ref vóór focus — anders blur van barcode-capture → releaseScanFocus sluit keyboard. */
+    articleSearchActiveRef.current = true
     setArticleSearchActive(true)
-    requestAnimationFrame(() => {
-      const el = scanRef.current
-      if (!el) return
-      applyArticleSearchDomActive(el)
-      el.focus({ preventScroll: true })
-    })
+    applyArticleSearchDomActive(el)
+    el.focus({ preventScroll: true })
   }, [applyArticleSearchDomActive])
 
   useLayoutEffect(() => {
@@ -1282,6 +1282,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               onBlur={() => {
                 if (priceFixSku || articleSearchActiveRef.current) return
                 const ae = document.activeElement
+                if (ae === scanRef.current) return
                 if (ae && ae !== document.body && ae !== barcodeCaptureRef.current) return
                 window.setTimeout(() => releaseScanFocus(), 80)
               }}
@@ -1303,14 +1304,10 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 placeholder={t('retailKassaPage.scanPlaceholder')}
                 value={scanValue}
                 onChange={(e) => setScanValue(e.target.value)}
-                onPointerDown={() => {
-                  if (!articleSearchActive) openArticleSearchKeyboard()
-                }}
-                onFocus={(e) => {
+                onPointerDown={(e) => {
                   if (!articleSearchActiveRef.current) {
-                    applyArticleSearchDomInactive(e.currentTarget)
-                    e.currentTarget.blur()
-                    focusBarcodeCapture()
+                    e.preventDefault()
+                    openArticleSearchKeyboard()
                   }
                 }}
                 onBlur={() => {
