@@ -5709,7 +5709,7 @@
   "retailKassaPage": {
     "title": "Cassa retail",
     "back": "Admin",
-    "scanPlaceholder": "Scansiona barcode o cod.…",
+    "scanPlaceholder": "Cerca articolo…",
     "add": "Aggiungi",
     "search": "Cerca articolo…",
     "loading": "Caricamento…",

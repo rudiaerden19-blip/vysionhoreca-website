@@ -5601,7 +5601,7 @@
   "retailKassaPage": {
     "title": "Winkelkassa",
     "back": "Admin",
-    "scanPlaceholder": "Scan barcode of artikelnr…",
+    "scanPlaceholder": "Artikel zoeken…",
     "add": "Toevoegen",
     "search": "Zoek artikel…",
     "loading": "Artikelen laden…",

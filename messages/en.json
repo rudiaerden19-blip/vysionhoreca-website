@@ -5668,7 +5668,7 @@
   "retailKassaPage": {
     "title": "Retail POS",
     "back": "Admin",
-    "scanPlaceholder": "Scan barcode or SKU…",
+    "scanPlaceholder": "Search article…",
     "add": "Add",
     "search": "Search article…",
     "loading": "Loading articles…",

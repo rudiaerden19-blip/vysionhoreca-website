@@ -627,8 +627,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             >
               <input
                 ref={scanRef}
-                type="text"
-                inputMode="numeric"
+                type="search"
+                inputMode="search"
                 autoComplete="off"
                 placeholder={t('retailKassaPage.scanPlaceholder')}
                 value={scanValue}
@@ -641,7 +641,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                     focusBarcodeCapture()
                   }, 120)
                 }}
-                className={`flex-1 px-4 py-2.5 text-base text-[#f0f0f0] placeholder:text-white/45 focus:outline-none ${KASSA_POS_FIELD}`}
+                className={`flex-1 rounded-full px-5 py-2.5 text-base text-[#f0f0f0] placeholder:text-white/45 focus:outline-none ${KASSA_POS_FIELD}`}
               />
               <button type="submit" className={`shrink-0 px-5 py-2.5 font-bold ${kassaPosButtonClass(true)}`}>
                 {t('retailKassaPage.add')}

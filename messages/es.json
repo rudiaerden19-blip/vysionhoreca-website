@@ -5709,7 +5709,7 @@
   "retailKassaPage": {
     "title": "TPV retail",
     "back": "Admin",
-    "scanPlaceholder": "Escanear código o ref.…",
+    "scanPlaceholder": "Buscar artículo…",
     "add": "Añadir",
     "search": "Buscar artículo…",
     "loading": "Cargando…",

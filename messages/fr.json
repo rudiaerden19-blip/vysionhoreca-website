@@ -5732,7 +5732,7 @@
   "retailKassaPage": {
     "title": "Caisse retail",
     "back": "Admin",
-    "scanPlaceholder": "Scanner code-barres ou réf.…",
+    "scanPlaceholder": "Rechercher un article…",
     "add": "Ajouter",
     "search": "Rechercher…",
     "loading": "Chargement…",

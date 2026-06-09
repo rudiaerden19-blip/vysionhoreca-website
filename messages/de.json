@@ -5732,7 +5732,7 @@
   "retailKassaPage": {
     "title": "Einzelhandel-Kasse",
     "back": "Admin",
-    "scanPlaceholder": "Barcode oder Art.-Nr. scannen…",
+    "scanPlaceholder": "Artikel suchen…",
     "add": "Hinzufügen",
     "search": "Artikel suchen…",
     "loading": "Artikel laden…",
