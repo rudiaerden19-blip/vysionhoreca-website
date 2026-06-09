@@ -20,7 +20,10 @@ import {
   isSubmenuEnabledInTenantConfig,
   isSubmenuForcedOn,
 } from '@/lib/admin-hamburger-modules'
-import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
+import {
+  TenantModuleFlagsProvider,
+  useTenantModuleFlagsContext,
+} from '@/lib/tenant-module-flags-context'
 import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
 import { AdminHamburgerMenu } from '@/components/AdminHamburgerMenu'
 import {
@@ -51,6 +54,14 @@ interface AdminLayoutProps {
 const LOCK_PAGES = ['categorieen']
 
 export default function AdminLayout({ children, params }: AdminLayoutProps) {
+  return (
+    <TenantModuleFlagsProvider tenantSlug={params.tenant}>
+      <AdminLayoutBody params={params}>{children}</AdminLayoutBody>
+    </TenantModuleFlagsProvider>
+  )
+}
+
+function AdminLayoutBody({ children, params }: AdminLayoutProps) {
   const pathname = usePathname()
   const adminPath = normalizeShopAdminPathname(pathname, params.tenant)
   const router = useRouter()
@@ -72,7 +83,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     enabledModulesJson,
     featureLabelPrinting,
     loading: modulesLoading,
-  } = useTenantModuleFlags(params.tenant)
+  } = useTenantModuleFlagsContext()
 
   const adminPosHref =
     getAdminKassaEntryHref(params.tenant, moduleAccess, enabledModulesJson) ?? `${baseUrl}/kassa`
@@ -402,13 +413,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
         style={{ height: 56 }}
       >
         <div className="flex min-w-0 shrink-0 items-center gap-2">
-          <AdminHamburgerMenu
-            tenantSlug={params.tenant}
-            moduleAccess={moduleAccess}
-            featureLabelPrinting={featureLabelPrinting}
-            enabledModulesJson={enabledModulesJson}
-            loading={modulesLoading}
-          />
+          <AdminHamburgerMenu tenantSlug={params.tenant} />
           {!modulesLoading && (isSuperAdminLoggedIn() || moduleAccess['kassa']) && (
             <>
               <a

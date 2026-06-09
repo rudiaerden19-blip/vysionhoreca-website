@@ -1,6 +1,7 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import {
   customerNeedsPostTrialModulePicker,
@@ -124,6 +125,8 @@ export function useTenantModuleFlags(tenantSlug: string | undefined): TenantModu
 } {
   const [result, setResult] = useState<TenantModuleFlagsResult>(DEFAULT_FLAGS)
   const [tick, setTick] = useState(0)
+  const pathname = usePathname()
+  const loadGenRef = useRef(0)
 
   const refetch = useCallback(() => {
     if (tenantSlug) invalidateTenantModuleFlags(tenantSlug)
@@ -149,14 +152,11 @@ export function useTenantModuleFlags(tenantSlug: string | undefined): TenantModu
     }
 
     const slug = tenantSlug
-
-    let cancelled = false
+    const gen = ++loadGenRef.current
 
     async function load() {
-      // 60s cache per slug (in-memory, reset bij refresh) → admin-module-wissels binnen
-      // dezelfde sessie zijn 0 round-trips i.p.v. 2 Supabase-queries.
       const { row: rawRow, sub: rawSub } = await fetchRawModuleFlags(slug)
-      if (cancelled) return
+      if (gen !== loadGenRef.current) return
 
       let row = rawRow
       let sub = rawSub
@@ -194,11 +194,8 @@ export function useTenantModuleFlags(tenantSlug: string | undefined): TenantModu
       })
     }
 
-    load()
-    return () => {
-      cancelled = true
-    }
-  }, [tenantSlug, tick])
+    void load()
+  }, [tenantSlug, tick, pathname])
 
   useEffect(() => {
     if (!tenantSlug || typeof window === 'undefined') return

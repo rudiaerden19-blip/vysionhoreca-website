@@ -43,7 +43,7 @@ import {
   buildHamburgerModules,
   filterHamburgerModulesForAccess,
 } from '@/lib/admin-hamburger-modules'
-import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
+import { useTenantModuleFlagsContext } from '@/lib/tenant-module-flags-context'
 import {
   appLocaleToBcp47,
   escapeReceiptHtml,
@@ -839,22 +839,21 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     enabledModulesJson,
     featureLabelPrinting,
     loading: moduleFlagsLoading,
-  } = useTenantModuleFlags(tenant)
-  const effectiveAccess =
-    demoViewOnly || moduleFlagsLoading ? allTenantModulesTrue() : moduleAccess
-  const effectiveLabelPrinting = demoViewOnly || moduleFlagsLoading ? true : featureLabelPrinting
-  const effectiveJson =
-    demoViewOnly || moduleFlagsLoading ? null : enabledModulesJson
+  } = useTenantModuleFlagsContext()
+  const effectiveAccess = demoViewOnly ? allTenantModulesTrue() : moduleAccess
+  const effectiveLabelPrinting = demoViewOnly ? true : featureLabelPrinting
+  const effectiveJson = demoViewOnly ? null : enabledModulesJson
 
   const filteredHamburgerModules = useMemo(() => {
     const all = buildHamburgerModules(baseUrl, tenant)
+    if (!demoViewOnly && moduleFlagsLoading) return []
     return filterHamburgerModulesForAccess(
       all,
       effectiveAccess,
       effectiveLabelPrinting,
       effectiveJson
     )
-  }, [baseUrl, tenant, effectiveAccess, effectiveLabelPrinting, effectiveJson])
+  }, [baseUrl, tenant, demoViewOnly, moduleFlagsLoading, effectiveAccess, effectiveLabelPrinting, effectiveJson])
 
   const [navOpen, setNavOpen] = useState(false)
   const [kassaOpen, setKassaOpen] = useState(false)
