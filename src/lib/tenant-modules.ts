@@ -161,6 +161,16 @@ export function resolveTenantModules(opts: {
   if (isAdminTenant(tenantSlug)) {
     return allTenantModulesTrue()
   }
+
+  const postTrialOk = tenantRow?.post_trial_modules_confirmed !== false
+  if (
+    postTrialOk &&
+    enabledModulesJson &&
+    hasExplicitEnabledModules(enabledModulesJson)
+  ) {
+    return mergeEnabledModulesFromDb(enabledModulesJson, postTrialOk)
+  }
+
   if (isTrialSubscriptionActive(subscription, tenantRow)) {
     if (hasExplicitEnabledModules(enabledModulesJson) && enabledModulesJson) {
       return mergeFullAccessWithExplicitJson(enabledModulesJson)

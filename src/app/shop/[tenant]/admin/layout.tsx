@@ -7,7 +7,6 @@ import { useLanguage } from '@/i18n'
 import { getTenantSettings } from '@/lib/admin-api'
 import {
   adminPathToModule,
-  allTenantModulesTrue,
   getAdminKassaEntryHref,
   getFirstAccessibleAdminPath,
   hasModuleAccessForPathname,
@@ -76,11 +75,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   } = useTenantModuleFlags(params.tenant)
 
   const adminPosHref =
-    getAdminKassaEntryHref(
-      params.tenant,
-      isSuperAdminLoggedIn() ? allTenantModulesTrue() : moduleAccess,
-      isSuperAdminLoggedIn() ? null : enabledModulesJson
-    ) ?? `${baseUrl}/kassa`
+    getAdminKassaEntryHref(params.tenant, moduleAccess, enabledModulesJson) ?? `${baseUrl}/kassa`
 
   const showLockButton = LOCK_PAGES.some(p => adminPath.includes(`/admin/${p}`))
 
@@ -305,7 +300,6 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   useEffect(() => {
     if (loading || modulesLoading || tenantExists === false) return
     if (demoPublicUnauthenticated) return
-    if (typeof window !== 'undefined' && isSuperAdminLoggedIn()) return
     const gate = adminPathToModule(adminPath, params.tenant)
     if (gate.kind === 'module' && !hasModuleAccessForPathname(adminPath, params.tenant, moduleAccess)) {
       router.replace(

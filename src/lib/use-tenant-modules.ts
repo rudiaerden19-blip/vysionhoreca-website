@@ -39,6 +39,22 @@ async function fetchRawModuleFlags(
   return cache.getOrFetch(
     cacheKey('tenant_module_flags', slug),
     async () => {
+      try {
+        const res = await fetch(`/api/tenant/module-flags?tenant=${encodeURIComponent(slug)}`)
+        if (res.ok) {
+          const json = (await res.json()) as {
+            tenant?: RawModuleFlagRow
+            subscription?: RawModuleFlagSub
+          }
+          return {
+            row: json.tenant ?? null,
+            sub: json.subscription ?? null,
+          }
+        }
+      } catch {
+        /* fallback */
+      }
+
       const [tRes, sRes] = await Promise.all([
         supabase
           .from('tenants')

@@ -59,15 +59,26 @@ export default function TenantModulesPage({ params }: { params: { tenant: string
   const [saveMsg, setSaveMsg] = useState<'ok' | 'err' | null>(null)
 
   const loadData = useCallback(async () => {
-    let { data: row, error } = await supabase
-      .from('tenants')
-      .select('enabled_modules, post_trial_modules_confirmed')
-      .eq('slug', tenant)
-      .maybeSingle()
+    let row: {
+      enabled_modules?: unknown
+      post_trial_modules_confirmed?: boolean | null
+    } | null = null
 
-    if (error && isMissingPostTrialModulesColumnError(error)) {
-      const r2 = await supabase.from('tenants').select('enabled_modules').eq('slug', tenant).maybeSingle()
-      row = r2.data ? { ...r2.data, post_trial_modules_confirmed: true } : null
+    const res = await authFetch(`/api/tenant/module-flags?tenant=${encodeURIComponent(tenant)}`)
+    if (res.ok) {
+      const json = (await res.json()) as { tenant?: typeof row }
+      row = json.tenant ?? null
+    } else {
+      let { data, error } = await supabase
+        .from('tenants')
+        .select('enabled_modules, post_trial_modules_confirmed')
+        .eq('slug', tenant)
+        .maybeSingle()
+      if (error && isMissingPostTrialModulesColumnError(error)) {
+        const r2 = await supabase.from('tenants').select('enabled_modules').eq('slug', tenant).maybeSingle()
+        data = r2.data ? { ...r2.data, post_trial_modules_confirmed: true } : null
+      }
+      row = data
     }
 
     const ptOk = row?.post_trial_modules_confirmed !== false
