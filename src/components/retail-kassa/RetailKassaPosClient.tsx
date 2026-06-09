@@ -376,13 +376,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
 
   const kassaSidebarActionLabelClass = `text-center ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`
 
-  const modeHintKey =
-    mode === 'sales'
-      ? 'retailKassaPage.scanOnlyHint'
-      : mode === 'stockCount'
-        ? 'retailKassaPage.modeStockCountHint'
-        : 'retailKassaPage.modeGoodsReceiptHint'
-
   const barHasLines = mode === 'sales' ? cart.length > 0 : stockActivity.length > 0
 
   const scanBarRowGridClass =
@@ -1071,7 +1064,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
 
       <div className={`flex min-h-0 flex-1 flex-col overflow-hidden ${ui.shellBg}`}>
         <div
-          className={`relative z-30 flex min-h-[56px] w-full min-w-0 shrink-0 items-center gap-1.5 px-2 py-2 sm:gap-2 sm:px-3 ${
+          className={`relative z-30 flex min-h-[56px] w-full min-w-0 shrink-0 items-center gap-1.5 border-b px-2 py-2 sm:gap-2 sm:px-3 ${KASSA_POS_RULE_BLACK} ${
             appearanceDark ? `pb-3 ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}` : 'bg-black'
           }`}
         >
@@ -1296,52 +1289,57 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
           </button>
         </div>
 
-        <div className="flex min-h-0 flex-1 overflow-hidden w-full">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden w-full">
+          <div
+            className={`shrink-0 flex gap-2 overflow-x-auto border-b px-3 py-2 sm:gap-2.5 sm:px-4 ${KASSA_POS_RULE_BLACK} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`}
+          >
+            <button
+              type="button"
+              data-testid="retail-mode-sales"
+              aria-pressed={mode === 'sales'}
+              onClick={() => switchMode('sales')}
+              className={retailTopNavBtnClass(mode === 'sales')}
+            >
+              {t('retailKassaPage.modeSales')}
+            </button>
+            <button
+              type="button"
+              data-testid="retail-mode-goods-receipt"
+              aria-pressed={mode === 'goodsReceipt'}
+              onClick={() => switchMode('goodsReceipt')}
+              className={retailTopNavBtnClass(mode === 'goodsReceipt')}
+            >
+              {t('retailKassaPage.modeGoodsReceipt')}
+            </button>
+            <Link
+              href={`${baseUrl}/voorraad`}
+              data-testid="retail-nav-voorraad"
+              onClick={() => playClick()}
+              className={retailTopNavLinkClass}
+            >
+              {t('adminHamburger.rows.voorraad')}
+            </Link>
+            <Link
+              href={`${baseUrl}/rapporten`}
+              data-testid="retail-nav-rapporten"
+              onClick={() => playClick()}
+              className={retailTopNavLinkClass}
+            >
+              {t('adminHamburger.rows.rapporten')}
+            </Link>
+            <Link
+              href={`${baseUrl}/modules`}
+              data-testid="retail-nav-instellingen"
+              onClick={() => playClick()}
+              className={retailTopNavLinkClass}
+            >
+              {t('adminHamburger.rows.instellingen')}
+            </Link>
+          </div>
+
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden w-full">
+            <div className="flex min-h-0 flex-1 overflow-hidden w-full">
           <div className={`relative flex min-h-0 flex-1 flex-col overflow-hidden ${ui.shellBg}`}>
-            <div className="shrink-0 flex gap-2 overflow-x-auto px-3 pt-2 sm:gap-2.5 sm:px-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              <button
-                type="button"
-                data-testid="retail-mode-sales"
-                aria-pressed={mode === 'sales'}
-                onClick={() => switchMode('sales')}
-                className={retailTopNavBtnClass(mode === 'sales')}
-              >
-                {t('retailKassaPage.modeSales')}
-              </button>
-              <button
-                type="button"
-                data-testid="retail-mode-goods-receipt"
-                aria-pressed={mode === 'goodsReceipt'}
-                onClick={() => switchMode('goodsReceipt')}
-                className={retailTopNavBtnClass(mode === 'goodsReceipt')}
-              >
-                {t('retailKassaPage.modeGoodsReceipt')}
-              </button>
-              <Link
-                href={`${baseUrl}/voorraad`}
-                data-testid="retail-nav-voorraad"
-                onClick={() => playClick()}
-                className={retailTopNavLinkClass}
-              >
-                {t('adminHamburger.rows.voorraad')}
-              </Link>
-              <Link
-                href={`${baseUrl}/rapporten`}
-                data-testid="retail-nav-rapporten"
-                onClick={() => playClick()}
-                className={retailTopNavLinkClass}
-              >
-                {t('adminHamburger.rows.rapporten')}
-              </Link>
-              <Link
-                href={`${baseUrl}/modules`}
-                data-testid="retail-nav-instellingen"
-                onClick={() => playClick()}
-                className={retailTopNavLinkClass}
-              >
-                {t('adminHamburger.rows.instellingen')}
-              </Link>
-            </div>
             <input
               ref={barcodeCaptureRef}
               type="text"
@@ -1362,7 +1360,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             />
             <form
               onSubmit={onScanSubmit}
-              className="shrink-0 flex gap-2 px-3 pt-2 pb-1.5 sm:px-4"
+              className={`shrink-0 flex gap-2 border-b px-3 pt-2 pb-2 sm:px-4 ${KASSA_POS_RULE_BLACK}`}
             >
               <input
                 ref={scanRef}
@@ -1399,15 +1397,11 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
 
             <div className="flex min-h-0 flex-1 flex-col px-3 pb-3 pt-2 sm:px-4">
               <div
-                className={`flex min-h-0 flex-1 flex-col overflow-hidden ${barHasLines ? 'justify-start' : 'justify-center'} ${KASSA_POS_MENU_RECESS_TRAY_CLASS} ${KASSA_POS_BTN_SHAPE} gks-menu-vignette`}
+                className={`flex min-h-0 flex-1 flex-col overflow-hidden justify-start ${KASSA_POS_MENU_RECESS_TRAY_CLASS} ${KASSA_POS_BTN_SHAPE} gks-menu-vignette`}
               >
                 {loading && !barHasLines ? (
                   <p className={`px-4 text-center text-sm ${ui.menuEmptyMuted}`}>{t('retailKassaPage.loading')}</p>
-                ) : !barHasLines ? (
-                  <p className={`px-6 text-center text-base font-medium sm:text-lg ${ui.menuEmptyMuted}`}>
-                    {t(modeHintKey)}
-                  </p>
-                ) : (
+                ) : !barHasLines ? null : (
                   <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden">
                     <div
                       className={`${scanBarRowGridClass} shrink-0 border-b border-white/15 px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-white/45 sm:px-4`}
@@ -1504,9 +1498,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 }`}
               >
                 {mode !== 'sales' ? (
-                  stockActivity.length === 0 ? (
-                    <p className="px-2 py-8 text-center text-sm text-white/50">{t(modeHintKey)}</p>
-                  ) : (
+                  stockActivity.length === 0 ? null : (
                     stockActivity
                       .slice()
                       .reverse()
@@ -1527,9 +1519,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                         </div>
                       ))
                   )
-                ) : cart.length === 0 ? (
-                  <p className="px-2 py-8 text-center text-sm text-white/50">{t('retailKassaPage.cartEmpty')}</p>
-                ) : (
+                ) : cart.length === 0 ? null : (
                   cart.map((l) => (
                     <div
                       key={l.sku.lineKey}
@@ -1621,10 +1611,16 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 </div>
               </div>
             </div>
+          </div>
+            </div>
 
-            <div
-              className={`sticky bottom-0 z-10 shrink-0 border-t ${KASSA_POS_RULE_BLACK} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} px-3 py-2.5 space-y-2.5`}
-            >
+            <div className={`shrink-0 border-t ${KASSA_POS_RULE_BLACK}`} aria-hidden />
+
+            <div className={`flex w-full shrink-0 ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`}>
+              <div className={`min-w-0 flex-1 ${ui.shellBg}`} aria-hidden />
+              <div
+                className={`w-80 sm:w-96 lg:w-[380px] shrink-0 border-l ${KASSA_POS_RULE_BLACK} px-3 py-2.5 space-y-2.5`}
+              >
               <div className="flex w-full touch-manipulation select-none gap-3">
                 <button
                   type="button"
@@ -1733,6 +1729,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                     {stockBusy ? t('retailKassaPage.paying') : t('retailKassaPage.stockAutoSave')}
                   </div>
                 )}
+              </div>
               </div>
             </div>
           </div>
