@@ -5595,7 +5595,8 @@
     "price": "Prijs",
     "stock": "Voorraad",
     "saveMeta": "Opslaan",
-    "loading": "Laden…"
+    "loading": "Laden…",
+    "color": "Kleur"
   },
   "retailKassaPage": {
     "title": "Winkelkassa",
@@ -5617,7 +5618,8 @@
     "payError": "Betaling mislukt",
     "outOfStock": "Niet genoeg voorraad",
     "barcodeNotFound": "Geen artikel gevonden",
-    "lastOrder": "Bon #{n}"
+    "lastOrder": "Bon #{n}",
+    "color": "Kleur"
   },
   "sectorPages": {
     "breadcrumb": "Sectoren",

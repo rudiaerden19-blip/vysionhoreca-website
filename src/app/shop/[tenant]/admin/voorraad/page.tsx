@@ -16,6 +16,7 @@ interface Product {
   article_number: string | null
   barcode: string | null
   size_label: string | null
+  color_label: string | null
   track_stock: boolean
   stock_quantity: number
   low_stock_threshold: number
@@ -40,6 +41,7 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
     article_number: '',
     barcode: '',
     size_label: '',
+    color_label: '',
   })
   const [saving, setSaving] = useState<string | null>(null)
 
@@ -49,7 +51,7 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
       supabase
         .from('menu_products')
         .select(
-          'id, name, description, price, image_url, category_id, article_number, barcode, size_label, track_stock, stock_quantity, low_stock_threshold',
+          'id, name, description, price, image_url, category_id, article_number, barcode, size_label, color_label, track_stock, stock_quantity, low_stock_threshold',
         )
         .eq('tenant_slug', tenant)
         .eq('is_active', true)
@@ -64,6 +66,7 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
         article_number: p.article_number?.trim() || null,
         barcode: p.barcode?.trim() || null,
         size_label: p.size_label?.trim() || null,
+        color_label: p.color_label?.trim() || null,
         track_stock: p.track_stock ?? false,
         stock_quantity: p.stock_quantity ?? 0,
         low_stock_threshold: p.low_stock_threshold ?? 5,
@@ -102,6 +105,7 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
       article_number: metaDraft.article_number.trim() || null,
       barcode: metaDraft.barcode.trim() || null,
       size_label: metaDraft.size_label.trim() || null,
+      color_label: metaDraft.color_label.trim() || null,
     })
     setEditingId(null)
   }
@@ -114,6 +118,7 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
       article_number: p.article_number || '',
       barcode: p.barcode || '',
       size_label: p.size_label || '',
+      color_label: p.color_label || '',
     })
   }
 
@@ -219,7 +224,7 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
                       {status.label}
                     </span>
                   </div>
-                  <div className="grid grid-cols-3 gap-2 text-xs min-w-[240px]">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs min-w-[280px]">
                     <div>
                       <span className="text-gray-400">{t('stockPage.article')}</span>
                       <p className="font-medium">{p.article_number || '—'}</p>
@@ -231,6 +236,10 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
                     <div>
                       <span className="text-gray-400">{t('stockPage.size')}</span>
                       <p className="font-medium">{p.size_label || '—'}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-400">{t('stockPage.color')}</span>
+                      <p className="font-medium">{p.color_label || '—'}</p>
                     </div>
                   </div>
                   {isSaving ? (
@@ -255,6 +264,12 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
                           placeholder={t('stockPage.size')}
                           value={metaDraft.size_label}
                           onChange={(e) => setMetaDraft((m) => ({ ...m, size_label: e.target.value }))}
+                        />
+                        <input
+                          className="w-24 px-2 py-1 border rounded-lg text-sm"
+                          placeholder={t('stockPage.color')}
+                          value={metaDraft.color_label}
+                          onChange={(e) => setMetaDraft((m) => ({ ...m, color_label: e.target.value }))}
                         />
                       </div>
                       <div className="flex gap-2 items-center">

@@ -10,6 +10,7 @@ export type RetailPosProduct = {
   article_number: string | null
   barcode: string | null
   size_label: string | null
+  color_label: string | null
   track_stock: boolean
   stock_quantity: number
 }
@@ -20,7 +21,7 @@ export type RetailCartLine = {
 }
 
 const RETAIL_SELECT =
-  'id, name, description, price, article_number, barcode, size_label, track_stock, stock_quantity'
+  'id, name, description, price, article_number, barcode, size_label, color_label, track_stock, stock_quantity'
 
 export async function fetchRetailPosProducts(tenantSlug: string): Promise<RetailPosProduct[]> {
   if (!supabase) return []
@@ -42,6 +43,7 @@ export async function fetchRetailPosProducts(tenantSlug: string): Promise<Retail
     article_number: p.article_number?.trim() || null,
     barcode: p.barcode?.trim() || null,
     size_label: p.size_label?.trim() || null,
+    color_label: p.color_label?.trim() || null,
     track_stock: !!p.track_stock,
     stock_quantity: Number(p.stock_quantity) || 0,
   }))
@@ -100,6 +102,7 @@ export async function completeRetailCashSale(
       article_number: l.product.article_number,
       barcode: l.product.barcode,
       size_label: l.product.size_label,
+      color_label: l.product.color_label,
     })),
     created_at: createdAt.toISOString(),
   }

@@ -5726,7 +5726,8 @@
     "price": "Preis",
     "stock": "Bestand",
     "saveMeta": "Speichern",
-    "loading": "Laden…"
+    "loading": "Laden…",
+    "color": "Farbe"
   },
   "retailKassaPage": {
     "title": "Einzelhandel-Kasse",
@@ -5748,6 +5749,7 @@
     "payError": "Zahlung fehlgeschlagen",
     "outOfStock": "Nicht genug auf Lager",
     "barcodeNotFound": "Artikel nicht gefunden",
-    "lastOrder": "Beleg #{n}"
+    "lastOrder": "Beleg #{n}",
+    "color": "Farbe"
   }
 }

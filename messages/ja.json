@@ -5703,7 +5703,8 @@
     "price": "Price",
     "stock": "Stock",
     "saveMeta": "Save",
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "color": "色"
   },
   "retailKassaPage": {
     "title": "Retail POS",
@@ -5725,6 +5726,7 @@
     "payError": "Payment failed",
     "outOfStock": "Insufficient stock",
     "barcodeNotFound": "Article not found",
-    "lastOrder": "Receipt #{n}"
+    "lastOrder": "Receipt #{n}",
+    "color": "色"
   }
 }

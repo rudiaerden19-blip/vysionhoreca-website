@@ -5703,7 +5703,8 @@
     "price": "Precio",
     "stock": "Stock",
     "saveMeta": "Guardar",
-    "loading": "Cargando…"
+    "loading": "Cargando…",
+    "color": "Color"
   },
   "retailKassaPage": {
     "title": "TPV retail",
@@ -5725,6 +5726,7 @@
     "payError": "Pago fallido",
     "outOfStock": "Stock insuficiente",
     "barcodeNotFound": "Artículo no encontrado",
-    "lastOrder": "Ticket #{n}"
+    "lastOrder": "Ticket #{n}",
+    "color": "Color"
   }
 }

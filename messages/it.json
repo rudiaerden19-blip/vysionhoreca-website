@@ -5703,7 +5703,8 @@
     "price": "Prezzo",
     "stock": "Giacenza",
     "saveMeta": "Salva",
-    "loading": "Caricamento…"
+    "loading": "Caricamento…",
+    "color": "Colore"
   },
   "retailKassaPage": {
     "title": "Cassa retail",
@@ -5725,6 +5726,7 @@
     "payError": "Pagamento fallito",
     "outOfStock": "Giacenza insufficiente",
     "barcodeNotFound": "Articolo non trovato",
-    "lastOrder": "Scontrino #{n}"
+    "lastOrder": "Scontrino #{n}",
+    "color": "Colore"
   }
 }

@@ -5662,7 +5662,8 @@
     "price": "Price",
     "stock": "Stock",
     "saveMeta": "Save",
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "color": "Color"
   },
   "retailKassaPage": {
     "title": "Retail POS",
@@ -5684,6 +5685,7 @@
     "payError": "Payment failed",
     "outOfStock": "Insufficient stock",
     "barcodeNotFound": "Article not found",
-    "lastOrder": "Receipt #{n}"
+    "lastOrder": "Receipt #{n}",
+    "color": "Color"
   }
 }

@@ -27,6 +27,7 @@ export interface MenuProduct {
   article_number?: string | null
   barcode?: string | null
   size_label?: string | null
+  color_label?: string | null
 }
 
 export const KASSA_PRODUCT_IMAGE_ZOOM_MIN = 0.65

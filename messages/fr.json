@@ -5726,7 +5726,8 @@
     "price": "Prix",
     "stock": "Stock",
     "saveMeta": "Enregistrer",
-    "loading": "Chargement…"
+    "loading": "Chargement…",
+    "color": "Couleur"
   },
   "retailKassaPage": {
     "title": "Caisse retail",
@@ -5748,6 +5749,7 @@
     "payError": "Échec paiement",
     "outOfStock": "Stock insuffisant",
     "barcodeNotFound": "Article introuvable",
-    "lastOrder": "Ticket #{n}"
+    "lastOrder": "Ticket #{n}",
+    "color": "Couleur"
   }
 }

@@ -49,7 +49,8 @@ export default function RetailKassaPage({ params }: { params: { tenant: string }
         p.name.toLowerCase().includes(q) ||
         (p.article_number && p.article_number.toLowerCase().includes(q)) ||
         (p.barcode && p.barcode.toLowerCase().includes(q)) ||
-        (p.size_label && p.size_label.toLowerCase().includes(q)),
+        (p.size_label && p.size_label.toLowerCase().includes(q)) ||
+        (p.color_label && p.color_label.toLowerCase().includes(q)),
     )
   }, [products, search])
 
@@ -165,6 +166,9 @@ export default function RetailKassaPage({ params }: { params: { tenant: string }
                     </span>
                     <span>
                       {t('retailKassaPage.size')}: {p.size_label || '—'}
+                    </span>
+                    <span>
+                      {t('retailKassaPage.color')}: {p.color_label || '—'}
                     </span>
                     <span>
                       {t('retailKassaPage.stock')}:{' '}
