@@ -142,6 +142,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [priceFixValue, setPriceFixValue] = useState('')
   const [priceFixSaving, setPriceFixSaving] = useState(false)
   const priceFixInputRef = useRef<HTMLInputElement>(null)
+  const skusRef = useRef<RetailPosSku[]>([])
+  const stockBusyRef = useRef(false)
 
   const reload = useCallback(async () => {
     setLoading(true)
@@ -149,6 +151,10 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     setSkus(list)
     setLoading(false)
   }, [tenant])
+
+  useEffect(() => {
+    skusRef.current = skus
+  }, [skus])
 
   useEffect(() => {
     void reload()
@@ -167,6 +173,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   }, [])
 
   const focusBarcodeCapture = useCallback(() => {
+    if (priceFixInputRef.current && document.activeElement === priceFixInputRef.current) return
     barcodeCaptureRef.current?.focus({ preventScroll: true })
   }, [])
 
@@ -191,6 +198,16 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     el?.blur()
     focusBarcodeCapture()
   }, [applyArticleSearchDomInactive, focusBarcodeCapture])
+
+  const releaseScanFocus = useCallback(() => {
+    setScanValue('')
+    if (barcodeCaptureRef.current) barcodeCaptureRef.current.value = ''
+    if (articleSearchActiveRef.current) {
+      closeArticleSearchKeyboard()
+    } else {
+      requestAnimationFrame(() => focusBarcodeCapture())
+    }
+  }, [closeArticleSearchKeyboard, focusBarcodeCapture])
 
   const openArticleSearchKeyboard = useCallback(() => {
     setArticleSearchActive(true)
@@ -268,6 +285,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   function removeStockActivityLine(activityKey: string) {
     playClick()
     setStockActivity((prev) => prev.filter((row) => row.key !== activityKey))
+    releaseScanFocus()
   }
 
   function renderScanBarRow(
@@ -353,30 +371,40 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
 
     const list = await fetchRetailPosSkus(tenant)
     setSkus(list)
+    skusRef.current = list
     return resolveRetailSkuLookup(list, trimmed) ?? res.sku ?? null
   }
 
   async function resolveOrImportSku(code: string): Promise<RetailPosSku | null> {
-    const hit = resolveRetailSkuLookup(skus, code)
+    let catalog = skusRef.current
+    let hit = resolveRetailSkuLookup(catalog, code)
     if (hit) return hit
+
+    const refreshed = await fetchRetailPosSkus(tenant)
+    setSkus(refreshed)
+    skusRef.current = refreshed
+    hit = resolveRetailSkuLookup(refreshed, code)
+    if (hit) return hit
+
     return importSkuFromBarcode(code)
   }
 
   async function processBarcode(code: string) {
     const trimmed = code.trim()
-    if (!trimmed || stockBusy) return
+    if (!trimmed) return
+    if (stockBusyRef.current) return
 
     if (mode === 'sales') {
+      stockBusyRef.current = true
       setStockBusy(true)
       try {
         const hit = await resolveOrImportSku(trimmed)
         if (hit) addToCart(hit, 1)
         else alert(t('retailKassaPage.autoScanImportError'))
       } finally {
+        stockBusyRef.current = false
         setStockBusy(false)
-        setScanValue('')
-        if (barcodeCaptureRef.current) barcodeCaptureRef.current.value = ''
-        focusBarcodeCapture()
+        releaseScanFocus()
       }
       return
     }
@@ -414,10 +442,9 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         pushStockActivity(res.sku, payload.quantity, 'goodsReceipt')
       }
     } finally {
+      stockBusyRef.current = false
       setStockBusy(false)
-      setScanValue('')
-      if (barcodeCaptureRef.current) barcodeCaptureRef.current.value = ''
-      focusBarcodeCapture()
+      releaseScanFocus()
     }
   }
 
@@ -441,7 +468,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       )
       setPriceFixSku(null)
       setPriceFixValue('')
-      focusBarcodeCapture()
+      releaseScanFocus()
     } finally {
       setPriceFixSaving(false)
     }
@@ -464,20 +491,21 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       next[i] = { ...next[i], quantity: merged }
       return next
     })
-    setScanValue('')
-    if (barcodeCaptureRef.current) barcodeCaptureRef.current.value = ''
-    focusBarcodeCapture()
     scrollScanBarToEnd()
     if (sku.price <= 0) {
       setPriceFixSku(sku)
       setPriceFixValue('')
       requestAnimationFrame(() => priceFixInputRef.current?.focus())
+    } else {
+      releaseScanFocus()
     }
   }
 
   function updateQty(lineKey: string, qty: number) {
     if (qty < 1) {
       setCart((prev) => prev.filter((l) => l.sku.lineKey !== lineKey))
+      setPriceFixSku((prev) => (prev?.lineKey === lineKey ? null : prev))
+      releaseScanFocus()
       return
     }
     setCart((prev) => {
@@ -498,7 +526,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     if (cart.length === 0) return
     playClick()
     setCart([])
-    focusBarcodeCapture()
+    setPriceFixSku(null)
+    releaseScanFocus()
   }
 
   function onScanSubmit(e: React.FormEvent) {
@@ -831,7 +860,12 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               data-kassa-no-web-keyboard
               aria-hidden
               onKeyDown={onBarcodeWedgeKeyDown}
-              className="pointer-events-none fixed left-0 top-0 h-px w-px opacity-0 overflow-hidden"
+              onBlur={() => {
+                if (priceFixSku) return
+                window.setTimeout(() => releaseScanFocus(), 50)
+              }}
+              className="fixed left-0 top-0 h-px w-px opacity-0 overflow-hidden"
+              aria-label={t('retailKassaPage.scanPlaceholder')}
             />
             <form
               onSubmit={onScanSubmit}
