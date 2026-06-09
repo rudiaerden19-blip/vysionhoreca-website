@@ -1338,8 +1338,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
           </div>
 
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden w-full">
-            <div className="flex min-h-0 flex-1 overflow-hidden w-full">
-          <div className={`relative flex min-h-0 flex-1 flex-col overflow-hidden ${ui.shellBg}`}>
+            <div className="flex h-0 min-h-0 flex-1 overflow-hidden w-full">
+          <div className={`relative flex h-0 min-h-0 min-w-0 flex-1 flex-col overflow-hidden ${ui.shellBg}`}>
             <input
               ref={barcodeCaptureRef}
               type="text"
@@ -1395,14 +1395,14 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               </button>
             </form>
 
-            <div className="flex min-h-0 flex-1 flex-col px-3 pb-3 pt-2 sm:px-4">
+            <div className="flex h-0 min-h-0 flex-1 flex-col overflow-hidden px-3 pb-3 pt-2 sm:px-4">
               <div
-                className={`flex min-h-0 flex-1 flex-col overflow-hidden justify-start ${KASSA_POS_MENU_RECESS_TRAY_CLASS} ${KASSA_POS_BTN_SHAPE} gks-menu-vignette`}
+                className={`flex h-0 min-h-0 flex-1 flex-col overflow-hidden justify-start ${KASSA_POS_MENU_RECESS_TRAY_CLASS} ${KASSA_POS_BTN_SHAPE} gks-menu-vignette`}
               >
                 {loading && !barHasLines ? (
                   <p className={`px-4 text-center text-sm ${ui.menuEmptyMuted}`}>{t('retailKassaPage.loading')}</p>
                 ) : !barHasLines ? null : (
-                  <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden">
+                  <div className="flex h-0 min-h-0 w-full flex-1 flex-col overflow-hidden">
                     <div
                       className={`${scanBarRowGridClass} shrink-0 border-b border-white/15 px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-white/45 sm:px-4`}
                     >
@@ -1417,7 +1417,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                     <div
                       ref={scanBarRef}
                       data-testid="retail-kassa-scan-bar"
-                      className="min-h-0 flex-1 space-y-0 overflow-y-auto overflow-x-auto overscroll-y-contain touch-manipulation p-1.5 sm:p-2 [scrollbar-gutter:stable]"
+                      className="h-0 min-h-0 flex-1 space-y-0 overflow-y-auto overflow-x-auto overscroll-y-contain touch-manipulation p-1.5 sm:p-2 [scrollbar-gutter:stable]"
                     >
                       {mode === 'sales'
                         ? cart.map((l) =>
@@ -1489,13 +1489,14 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
           </div>
 
           <div
-            className={`w-80 sm:w-96 lg:w-[380px] flex min-h-0 min-w-0 flex-shrink-0 flex-col overflow-hidden border-l ${KASSA_POS_RULE_BLACK} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`}
+            className={`flex h-0 min-h-0 w-80 min-w-0 flex-shrink-0 flex-col overflow-hidden border-l sm:w-96 lg:w-[380px] ${KASSA_POS_RULE_BLACK} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`}
           >
-            <div className="relative min-h-0 flex-1 flex flex-col px-2.5 pt-3 pb-2 sm:px-3">
+            <div className="relative flex h-0 min-h-0 flex-1 flex-col overflow-hidden px-2.5 pt-3 pb-2 sm:px-3">
               <div
-                className={`min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-y-contain py-0.5 transition-opacity ${
+                className={`h-0 min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-y-contain py-0.5 transition-opacity ${
                   numpadPanelVisible ? 'pointer-events-none opacity-[0.28]' : 'opacity-100'
                 }`}
+                data-testid="retail-kassa-cart-scroll"
               >
                 {mode !== 'sales' ? (
                   stockActivity.length === 0 ? null : (
