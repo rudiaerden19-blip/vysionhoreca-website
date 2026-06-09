@@ -586,6 +586,20 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     }
   }
 
+  function cancelPriceFix() {
+    if (priceFixSaving) return
+    playClick()
+    const sku = priceFixSku
+    setPriceFixSku(null)
+    setPriceFixValue('')
+    if (sku) {
+      setCart((prev) =>
+        prev.filter((l) => !(l.sku.lineKey === sku.lineKey && l.sku.price <= 0)),
+      )
+    }
+    releaseScanFocus()
+  }
+
   const handleNumpad = useCallback((key: string) => {
     setNumpadValue((prev) => {
       if (key === 'C') return ''
@@ -891,14 +905,24 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               className={`w-full px-3 py-2.5 text-sm tabular-nums text-[#f0f0f0] placeholder:text-white/45 focus:outline-none ${KASSA_POS_FIELD}`}
               placeholder="0,00"
             />
-            <button
-              type="button"
-              disabled={priceFixSaving}
-              onClick={() => void savePriceFix()}
-              className={`w-full py-3 font-bold ${kassaPosButtonClass(true)}`}
-            >
-              {priceFixSaving ? t('retailKassaPage.paying') : t('retailKassaPage.priceFixSave')}
-            </button>
+            <div className="flex gap-2.5">
+              <button
+                type="button"
+                disabled={priceFixSaving}
+                onClick={cancelPriceFix}
+                className={`flex-1 py-3 font-bold ${kassaPosButtonClass(false)}`}
+              >
+                {t('common.cancel')}
+              </button>
+              <button
+                type="button"
+                disabled={priceFixSaving}
+                onClick={() => void savePriceFix()}
+                className={`flex-1 py-3 font-bold ${kassaPosButtonClass(true)}`}
+              >
+                {priceFixSaving ? t('retailKassaPage.paying') : t('retailKassaPage.priceFixSave')}
+              </button>
+            </div>
           </div>
         </div>
       ) : null}
