@@ -186,6 +186,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [importPreview, setImportPreview] = useState<RetailImportRow[]>([])
   const [importModalOpen, setImportModalOpen] = useState(false)
   const [importBusy, setImportBusy] = useState(false)
+  const [importHighlight, setImportHighlight] = useState<'csv' | 'excel' | null>(null)
 
   const reload = useCallback(async () => {
     setLoading(true)
@@ -335,9 +336,14 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     tenantInfo?.business_name ||
     tenant.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
 
-  const headerMenuLikeBtnClass = appearanceDark
-    ? kassaPosButtonClass(true)
-    : 'rounded-xl bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe] font-bold text-[11px] leading-tight sm:text-xs inline-flex shrink-0 items-center gap-1.5 px-2 py-1.5 transition-colors sm:gap-2 sm:px-3 sm:py-1.5'
+  const headerFileBtnClass = (active: boolean) =>
+    `inline-flex shrink-0 items-center gap-1.5 px-2 py-1.5 transition-colors sm:gap-2 sm:px-3 sm:py-1.5 font-bold text-[11px] leading-tight sm:text-xs ${
+      appearanceDark
+        ? kassaPosButtonClass(active)
+        : active
+          ? 'rounded-xl bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
+          : 'rounded-xl border border-white/25 bg-transparent text-white hover:bg-white/10'
+    }`
 
   const retailTopNavLabelClass =
     'block text-center text-[10px] font-medium leading-tight sm:text-[11px]'
@@ -655,8 +661,12 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   }
 
   async function onImportFileSelected(file: File | undefined, kind: 'csv' | 'excel') {
-    if (!file) return
+    if (!file) {
+      setImportHighlight(null)
+      return
+    }
     playClick()
+    setImportHighlight(kind)
     try {
       const rows =
         kind === 'csv'
@@ -664,6 +674,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
           : parseRetailExcelBuffer(await file.arrayBuffer())
       openImportPreview(rows)
     } catch {
+      setImportHighlight(null)
       alert(t('retailKassaPage.importFailed'))
     }
   }
@@ -684,6 +695,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       )
       setImportModalOpen(false)
       setImportPreview([])
+      setImportHighlight(null)
       await reload()
       focusBarcodeCapture()
     } finally {
@@ -948,6 +960,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 onClick={() => {
                   setImportModalOpen(false)
                   setImportPreview([])
+                  setImportHighlight(null)
                 }}
                 className={`flex-1 py-2.5 ${kassaPosButtonClass(false)}`}
               >
@@ -1041,7 +1054,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             <button
               type="button"
               data-testid="retail-import-csv"
-              className={headerMenuLikeBtnClass}
+              className={headerFileBtnClass(importHighlight === 'csv')}
               title={t('retailKassaPage.importCsvTitle')}
               onClick={() => csvImportInputRef.current?.click()}
             >
@@ -1050,7 +1063,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             <button
               type="button"
               data-testid="retail-import-excel"
-              className={headerMenuLikeBtnClass}
+              className={headerFileBtnClass(importHighlight === 'excel')}
               title={t('retailKassaPage.importExcelTitle')}
               onClick={() => excelImportInputRef.current?.click()}
             >
