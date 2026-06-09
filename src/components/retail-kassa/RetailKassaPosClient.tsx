@@ -379,6 +379,12 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const scanBarRowGridClass =
     'grid w-full min-w-[42rem] grid-cols-[minmax(5.5rem,1fr)_minmax(6rem,1.6fr)_minmax(2.5rem,0.5fr)_minmax(2.5rem,0.5fr)_minmax(2.75rem,0.55fr)_minmax(3.25rem,0.65fr)_2.75rem] items-center gap-1.5 sm:gap-2'
 
+  /** Scan-/lijstregels: altijd wit vlak, zwarte tekst (ook nieuwe scans). */
+  const retailListBarShellClass =
+    'rounded-lg border border-black/10 bg-white text-black shadow-[0_1px_3px_rgba(0,0,0,0.12)]'
+  const retailListBarRemoveBtnClass =
+    'flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-black/20 bg-neutral-100 text-base font-bold leading-none text-black hover:bg-neutral-200'
+
   function scrollScanBarToEnd() {
     requestAnimationFrame(() => {
       const el = scanBarRef.current
@@ -407,20 +413,20 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     return (
       <div
         key={key}
-        className={`${scanBarRowGridClass} border-b border-white/10 px-3 py-2.5 sm:px-4 sm:py-3 text-[11px] sm:text-sm`}
+        className={`${scanBarRowGridClass} ${retailListBarShellClass} mb-1.5 px-3 py-2.5 last:mb-0 sm:px-4 sm:py-3 text-[11px] sm:text-sm`}
       >
-        <span className="truncate font-mono tabular-nums text-white/85">{barcode}</span>
-        <span className="truncate font-semibold text-[#f2f2f2]">{name}</span>
-        <span className="truncate text-white/75">{sku.size_label || '—'}</span>
-        <span className="truncate text-white/75">{sku.color_label || '—'}</span>
-        <span className="truncate tabular-nums text-white/75">{stock}</span>
-        <span className="truncate tabular-nums font-semibold text-[#f2f2f2]">€{lineTotal.toFixed(2)}</span>
+        <span className="truncate font-mono tabular-nums text-black/85">{barcode}</span>
+        <span className="truncate font-semibold text-black">{name}</span>
+        <span className="truncate text-black/75">{sku.size_label || '—'}</span>
+        <span className="truncate text-black/75">{sku.color_label || '—'}</span>
+        <span className="truncate tabular-nums text-black/75">{stock}</span>
+        <span className="truncate tabular-nums font-semibold text-black">€{lineTotal.toFixed(2)}</span>
         {opts?.onRemove ? (
           <button
             type="button"
             onClick={opts.onRemove}
             aria-label={t('retailKassaPage.removeLine')}
-            className={`flex h-8 w-8 shrink-0 items-center justify-center text-base font-bold leading-none ${kassaPosCartQtyButtonClass(true)}`}
+            className={retailListBarRemoveBtnClass}
           >
             ×
           </button>
@@ -1358,7 +1364,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                     <div
                       ref={scanBarRef}
                       data-testid="retail-kassa-scan-bar"
-                      className="min-h-0 flex-1 overflow-y-auto overflow-x-auto overscroll-y-contain touch-manipulation [scrollbar-gutter:stable]"
+                      className="min-h-0 flex-1 space-y-0 overflow-y-auto overflow-x-auto overscroll-y-contain touch-manipulation p-1.5 sm:p-2 [scrollbar-gutter:stable]"
                     >
                       {mode === 'sales'
                         ? cart.map((l) =>
@@ -1442,10 +1448,13 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                       .slice()
                       .reverse()
                       .map((row) => (
-                        <div key={row.key} className={KASSA_POS_CART_ROW}>
+                        <div
+                          key={row.key}
+                          className={`${retailListBarShellClass} flex items-center gap-2 p-2`}
+                        >
                           <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-semibold text-[#f2f2f2]">{row.sku.name}</p>
-                            <p className="text-xs text-white/70">
+                            <p className="truncate text-sm font-semibold text-black">{row.sku.name}</p>
+                            <p className="text-xs text-black/70">
                               {row.mode === 'goodsReceipt'
                                 ? t('retailKassaPage.stockAdded').replace('{n}', String(row.delta))
                                 : t('retailKassaPage.stockPlusOne')}{' '}
@@ -1459,10 +1468,13 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                   <p className="px-2 py-8 text-center text-sm text-white/50">{t('retailKassaPage.cartEmpty')}</p>
                 ) : (
                   cart.map((l) => (
-                    <div key={l.sku.lineKey} className={KASSA_POS_CART_ROW}>
+                    <div
+                      key={l.sku.lineKey}
+                      className={`${retailListBarShellClass} flex items-center gap-2 p-2`}
+                    >
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold text-[#f2f2f2]">{l.sku.name}</p>
-                        <p className="text-xs tabular-nums text-white/70">
+                        <p className="truncate text-sm font-semibold text-black">{l.sku.name}</p>
+                        <p className="text-xs tabular-nums text-black/70">
                           €{l.sku.price.toFixed(2)} × {l.quantity}
                         </p>
                       </div>
@@ -1470,16 +1482,16 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                         <button
                           type="button"
                           onClick={() => updateQty(l.sku.lineKey, l.quantity - 1)}
-                          className={kassaPosCartQtyButtonClass(true)}
+                          className={retailListBarRemoveBtnClass}
                           aria-label={t('kassaApp.ariaDecreaseQty')}
                         >
                           {l.quantity === 1 ? '🗑' : '−'}
                         </button>
-                        <span className="w-6 text-center text-sm font-bold text-[#f0f0f0]">{l.quantity}</span>
+                        <span className="w-6 text-center text-sm font-bold text-black">{l.quantity}</span>
                         <button
                           type="button"
                           onClick={() => updateQty(l.sku.lineKey, l.quantity + 1)}
-                          className={kassaPosCartQtyButtonClass(true)}
+                          className={retailListBarRemoveBtnClass}
                           aria-label={t('kassaApp.ariaIncreaseQty')}
                         >
                           +
