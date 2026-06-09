@@ -5512,6 +5512,7 @@
     "shopNotFoundDesc": "Dieser Shop existiert nicht oder wurde entfernt.",
     "backToVysion": "← Zurück zu Vysion",
     "pos": "Zur Kasse",
+    "retailPos": "Einzelhandel-Kasse",
     "kassaAppearanceDark": "Dunkel",
     "kassaAppearanceLight": "Hell",
     "kassaAppearanceDarkAria": "Professioneller Dunkelmodus für die Kasse auf diesem Gerät (dieser Betrieb)",

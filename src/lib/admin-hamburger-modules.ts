@@ -2,7 +2,7 @@ import type { TenantModuleId } from '@/lib/tenant-modules'
 import { isTenantSubmenuEffectiveOn } from '@/lib/tenant-modules'
 
 /** Altijd bereikbaar in menu en routes (abonnement / facturatie). */
-export const SUBMENU_IDS_ALWAYS_ON = new Set<string>(['sm_abonnement'])
+export const SUBMENU_IDS_ALWAYS_ON = new Set<string>(['sm_abonnement', 'sm_retail_kassa_pos'])
 
 export type AdminHamburgerItem = {
   id: string
@@ -22,6 +22,8 @@ export type AdminHamburgerModule = {
   label: string
   /** Vertaalde titel van de submenu-rij */
   labelKey?: string
+  /** Directe link bij tik op de rij (winkelkassa → verkoopscherm). Horeca-kassa blijft alleen submenu. */
+  entryHref?: string
   items: AdminHamburgerItem[]
 }
 
@@ -140,6 +142,7 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
       icon: '🏪',
       label: 'Winkelkassa',
       labelKey: rowLabelKey('retail-kassa'),
+      entryHref: `${baseUrl}/retail-kassa`,
       items: [
         {
           id: 'sm_retail_kassa_pos',

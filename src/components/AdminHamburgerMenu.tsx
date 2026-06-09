@@ -97,23 +97,46 @@ export function AdminHamburgerMenu({ tenantSlug }: { tenantSlug: string }) {
             </Link>
             {filteredModules.map((mod) => (
               <div key={mod.rowKey} className="border-b border-gray-100 last:border-0">
-                <button
-                  type="button"
-                  onClick={() => setSubOpen(subOpen === mod.rowKey ? null : mod.rowKey)}
-                  className={`flex w-full items-center justify-between px-4 py-3 transition-colors ${
+                <div
+                  className={`flex w-full items-stretch transition-colors ${
                     subOpen === mod.rowKey ? 'bg-blue-50' : 'hover:bg-gray-50'
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="text-lg">{mod.icon}</span>
-                    <span className="text-sm font-semibold text-gray-700">
-                      {mod.labelKey ? t(mod.labelKey) : mod.label}
-                    </span>
-                  </div>
-                  <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
+                  {mod.entryHref ? (
+                    <Link
+                      href={mod.entryHref}
+                      prefetch={false}
+                      onClick={closeAll}
+                      className="flex min-w-0 flex-1 items-center gap-3 px-4 py-3 no-underline"
+                    >
+                      <span className="text-lg">{mod.icon}</span>
+                      <span className="text-sm font-semibold text-gray-700">
+                        {mod.labelKey ? t(mod.labelKey) : mod.label}
+                      </span>
+                    </Link>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setSubOpen(subOpen === mod.rowKey ? null : mod.rowKey)}
+                      className="flex min-w-0 flex-1 items-center gap-3 px-4 py-3 text-left"
+                    >
+                      <span className="text-lg">{mod.icon}</span>
+                      <span className="text-sm font-semibold text-gray-700">
+                        {mod.labelKey ? t(mod.labelKey) : mod.label}
+                      </span>
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    aria-label={t('adminLayout.menu')}
+                    onClick={() => setSubOpen(subOpen === mod.rowKey ? null : mod.rowKey)}
+                    className="flex shrink-0 items-center px-3 py-3 text-gray-400 hover:text-gray-600"
+                  >
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             ))}
           </div>

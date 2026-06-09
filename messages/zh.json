@@ -5489,6 +5489,7 @@
     "shopNotFoundDesc": "该店铺不存在或已被删除。",
     "backToVysion": "← 返回 Vysion",
     "pos": "去收银台",
+    "retailPos": "零售收银",
     "kassaAppearanceDark": "深色",
     "kassaAppearanceLight": "浅色",
     "kassaAppearanceDarkAria": "在本设备上以专业深色界面显示收银台（本商户）",

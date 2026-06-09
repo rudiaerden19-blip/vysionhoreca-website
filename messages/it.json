@@ -5489,6 +5489,7 @@
     "shopNotFoundDesc": "Questo negozio non esiste o è stato rimosso.",
     "backToVysion": "← Torna a Vysion",
     "pos": "Alla cassa",
+    "retailPos": "Cassa negozio",
     "kassaAppearanceDark": "Scuro",
     "kassaAppearanceLight": "Chiaro",
     "kassaAppearanceDarkAria": "Cassa in modalità scura professionale su questo dispositivo (questa attività)",

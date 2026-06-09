@@ -5489,6 +5489,7 @@
     "shopNotFoundDesc": "Esta tienda no existe o fue eliminada.",
     "backToVysion": "← Volver a Vysion",
     "pos": "Ir al TPV",
+    "retailPos": "TPV tienda",
     "kassaAppearanceDark": "Oscuro",
     "kassaAppearanceLight": "Claro",
     "kassaAppearanceDarkAria": "Mostrar el TPV en modo oscuro profesional en este dispositivo (este negocio)",

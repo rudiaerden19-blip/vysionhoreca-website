@@ -5489,6 +5489,7 @@
     "shopNotFoundDesc": "هذا المتجر غير موجود أو تم حذفه.",
     "backToVysion": "← العودة إلى Vysion",
     "pos": "إلى الكاشير",
+    "retailPos": "كاشير المتجر",
     "kassaAppearanceDark": "داكن",
     "kassaAppearanceLight": "فاتح",
     "kassaAppearanceDarkAria": "عرض واجهة الكاشير بالوضع الداكن الاحترافي على هذا الجهاز (لهذا المتجر)",

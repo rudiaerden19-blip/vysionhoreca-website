@@ -5489,6 +5489,7 @@
     "shopNotFoundDesc": "このショップは存在しないか削除されました。",
     "backToVysion": "← Vysion に戻る",
     "pos": "レジへ",
+    "retailPos": "小売レジ",
     "kassaAppearanceDark": "ダーク",
     "kassaAppearanceLight": "ライト",
     "kassaAppearanceDarkAria": "この端末・この店舗でレジをプロフェッショナルなダーク表示にします",

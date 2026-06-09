@@ -5512,6 +5512,7 @@
     "shopNotFoundDesc": "Cette boutique n'existe pas ou a été supprimée.",
     "backToVysion": "← Retour à Vysion",
     "pos": "Vers la caisse",
+    "retailPos": "Caisse magasin",
     "kassaAppearanceDark": "Sombre",
     "kassaAppearanceLight": "Clair",
     "kassaAppearanceDarkAria": "Afficher la caisse en mode sombre professionnel sur cet appareil (cet établissement)",

@@ -7,7 +7,6 @@ import { useLanguage } from '@/i18n'
 import { getTenantSettings } from '@/lib/admin-api'
 import {
   adminPathToModule,
-  getAdminKassaEntryHref,
   getFirstAccessibleAdminPath,
   hasModuleAccessForPathname,
   isShopAdminKassaPosPath,
@@ -84,9 +83,6 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
     featureLabelPrinting,
     loading: modulesLoading,
   } = useTenantModuleFlagsContext()
-
-  const adminPosHref =
-    getAdminKassaEntryHref(params.tenant, moduleAccess, enabledModulesJson) ?? `${baseUrl}/kassa`
 
   const showLockButton = LOCK_PAGES.some(p => adminPath.includes(`/admin/${p}`))
 
@@ -431,15 +427,28 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
               moduleAccess.kassa ||
               moduleAccess['retail-kassa']) && (
             <>
-              <a
-                href={adminPosHref}
-                className="touch-manipulation [-webkit-tap-highlight-color:transparent] flex shrink-0 items-center gap-2 rounded-xl bg-[#58CCFF] px-3 py-2 text-sm font-bold text-[#063042] shadow-md transition-colors hover:bg-[#47c6fe] no-underline"
-              >
-                <span className="text-base leading-none" aria-hidden>
-                  🧾
-                </span>
-                <span>{t('adminLayout.pos')}</span>
-              </a>
+              {moduleAccess.kassa ? (
+                <a
+                  href={`${baseUrl}/kassa`}
+                  className="touch-manipulation [-webkit-tap-highlight-color:transparent] flex shrink-0 items-center gap-2 rounded-xl bg-[#58CCFF] px-3 py-2 text-sm font-bold text-[#063042] shadow-md transition-colors hover:bg-[#47c6fe] no-underline"
+                >
+                  <span className="text-base leading-none" aria-hidden>
+                    🧾
+                  </span>
+                  <span>{t('adminLayout.pos')}</span>
+                </a>
+              ) : null}
+              {moduleAccess['retail-kassa'] ? (
+                <a
+                  href={`${baseUrl}/retail-kassa`}
+                  className="touch-manipulation [-webkit-tap-highlight-color:transparent] flex shrink-0 items-center gap-2 rounded-xl bg-emerald-400 px-3 py-2 text-sm font-bold text-[#063042] shadow-md transition-colors hover:bg-emerald-300 no-underline"
+                >
+                  <span className="text-base leading-none" aria-hidden>
+                    🏪
+                  </span>
+                  <span>{t('adminLayout.retailPos')}</span>
+                </a>
+              ) : null}
             </>
           )}
         </div>
