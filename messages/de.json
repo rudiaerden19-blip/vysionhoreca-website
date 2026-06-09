@@ -5615,8 +5615,30 @@
       "sm_rpt_verkoop": "Verkauf",
       "sm_rpt_populair": "Beliebte Artikel",
       "sm_inst_betaling": "Zahlungsarten",
+      "sm_inst_modules": "Module",
       "sm_inst_bonprinter_windows": "Windows-Bondrucker",
       "sm_abonnement": "Abonnement"
+    }
+  },
+  "tenantModulesPage": {
+    "title": "Module",
+    "subtitle": "Schalten Sie Teile Ihres Admin-Menüs ein oder aus. Das Konto bleibt immer verfügbar.",
+    "save": "Speichern",
+    "saving": "Speichern…",
+    "saved": "Gespeichert",
+    "saveError": "Speichern fehlgeschlagen: {detail}",
+    "alwaysOn": "Immer an",
+    "modules": {
+      "kassa": "Kasse",
+      "online-bestellingen": "Online-Bestellungen",
+      "instellingen": "Einstellungen",
+      "online": "Online-Plattform",
+      "reservaties": "Reservierungen",
+      "personeel": "Personal",
+      "kosten": "Kosten",
+      "rapporten": "Berichte",
+      "website": "Website",
+      "account": "Konto"
     }
   },
   "sectorPages": {

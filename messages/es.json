@@ -5592,8 +5592,30 @@
       "sm_rpt_verkoop": "Ventas",
       "sm_rpt_populair": "Productos populares",
       "sm_inst_betaling": "Métodos de pago",
+      "sm_inst_modules": "Módulos",
       "sm_inst_bonprinter_windows": "Impresora de tickets (Windows)",
       "sm_abonnement": "Suscripción"
+    }
+  },
+  "tenantModulesPage": {
+    "title": "Módulos",
+    "subtitle": "Activa o desactiva partes del menú de administración. La cuenta siempre permanece disponible.",
+    "save": "Guardar",
+    "saving": "Guardando…",
+    "saved": "Guardado",
+    "saveError": "Error al guardar: {detail}",
+    "alwaysOn": "Siempre activo",
+    "modules": {
+      "kassa": "Caja",
+      "online-bestellingen": "Pedidos en línea",
+      "instellingen": "Ajustes",
+      "online": "Plataforma en línea",
+      "reservaties": "Reservas",
+      "personeel": "Personal",
+      "kosten": "Costes",
+      "rapporten": "Informes",
+      "website": "Sitio web",
+      "account": "Cuenta"
     }
   },
   "sectorPages": {

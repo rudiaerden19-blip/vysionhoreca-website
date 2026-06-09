@@ -5592,8 +5592,30 @@
       "sm_rpt_verkoop": "Vendite",
       "sm_rpt_populair": "Articoli popolari",
       "sm_inst_betaling": "Metodi di pagamento",
+      "sm_inst_modules": "Moduli",
       "sm_inst_bonprinter_windows": "Stampante scontrini (Windows)",
       "sm_abonnement": "Abbonamento"
+    }
+  },
+  "tenantModulesPage": {
+    "title": "Moduli",
+    "subtitle": "Attiva o disattiva le sezioni del menu admin. L'account resta sempre disponibile.",
+    "save": "Salva",
+    "saving": "Salvataggio…",
+    "saved": "Salvato",
+    "saveError": "Salvataggio non riuscito: {detail}",
+    "alwaysOn": "Sempre attivo",
+    "modules": {
+      "kassa": "Cassa",
+      "online-bestellingen": "Ordini online",
+      "instellingen": "Impostazioni",
+      "online": "Piattaforma online",
+      "reservaties": "Prenotazioni",
+      "personeel": "Personale",
+      "kosten": "Costi",
+      "rapporten": "Report",
+      "website": "Sito web",
+      "account": "Account"
     }
   },
   "sectorPages": {

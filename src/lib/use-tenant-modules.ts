@@ -184,5 +184,15 @@ export function useTenantModuleFlags(tenantSlug: string | undefined): TenantModu
     }
   }, [tenantSlug, tick])
 
+  useEffect(() => {
+    if (!tenantSlug || typeof window === 'undefined') return
+    const onUpdate = (e: Event) => {
+      const slug = (e as CustomEvent<{ tenantSlug?: string }>).detail?.tenantSlug
+      if (!slug || slug === tenantSlug) refetch()
+    }
+    window.addEventListener('vysion-tenant-modules-updated', onUpdate)
+    return () => window.removeEventListener('vysion-tenant-modules-updated', onUpdate)
+  }, [tenantSlug, refetch])
+
   return { ...result, refetch }
 }

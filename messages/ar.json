@@ -5592,8 +5592,30 @@
       "sm_rpt_verkoop": "Sales",
       "sm_rpt_populair": "Popular items",
       "sm_inst_betaling": "Payment methods",
+      "sm_inst_modules": "الوحدات",
       "sm_inst_bonprinter_windows": "طابعة الإيصالات (Windows)",
       "sm_abonnement": "Subscription"
+    }
+  },
+  "tenantModulesPage": {
+    "title": "الوحدات",
+    "subtitle": "فعّل أو عطّل أجزاء قائمة الإدارة. يبقى الحساب متاحًا دائمًا.",
+    "save": "حفظ",
+    "saving": "جارٍ الحفظ…",
+    "saved": "تم الحفظ",
+    "saveError": "تعذّر الحفظ: {detail}",
+    "alwaysOn": "دائمًا مفعّل",
+    "modules": {
+      "kassa": "الكاشير",
+      "online-bestellingen": "الطلبات عبر الإنترنت",
+      "instellingen": "الإعدادات",
+      "online": "المنصة الإلكترونية",
+      "reservaties": "الحجوزات",
+      "personeel": "الموظفون",
+      "kosten": "التكاليف",
+      "rapporten": "التقارير",
+      "website": "الموقع",
+      "account": "الحساب"
     }
   },
   "sectorPages": {

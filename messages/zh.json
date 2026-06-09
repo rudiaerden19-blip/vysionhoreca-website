@@ -5592,8 +5592,30 @@
       "sm_rpt_verkoop": "Sales",
       "sm_rpt_populair": "Popular items",
       "sm_inst_betaling": "Payment methods",
+      "sm_inst_modules": "模块",
       "sm_inst_bonprinter_windows": "Windows 小票打印机",
       "sm_abonnement": "Subscription"
+    }
+  },
+  "tenantModulesPage": {
+    "title": "模块",
+    "subtitle": "开启或关闭管理菜单中的功能。账户始终可用。",
+    "save": "保存",
+    "saving": "保存中…",
+    "saved": "已保存",
+    "saveError": "保存失败：{detail}",
+    "alwaysOn": "始终开启",
+    "modules": {
+      "kassa": "收银",
+      "online-bestellingen": "在线订单",
+      "instellingen": "设置",
+      "online": "在线平台",
+      "reservaties": "预订",
+      "personeel": "员工",
+      "kosten": "成本",
+      "rapporten": "报表",
+      "website": "网站",
+      "account": "账户"
     }
   },
   "sectorPages": {

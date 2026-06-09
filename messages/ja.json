@@ -5592,8 +5592,30 @@
       "sm_rpt_verkoop": "Sales",
       "sm_rpt_populair": "Popular items",
       "sm_inst_betaling": "Payment methods",
+      "sm_inst_modules": "モジュール",
       "sm_inst_bonprinter_windows": "Windowsレシートプリンター",
       "sm_abonnement": "Subscription"
+    }
+  },
+  "tenantModulesPage": {
+    "title": "モジュール",
+    "subtitle": "管理メニューの各機能のオン／オフを切り替えます。アカウントは常に利用できます。",
+    "save": "保存",
+    "saving": "保存中…",
+    "saved": "保存しました",
+    "saveError": "保存に失敗しました: {detail}",
+    "alwaysOn": "常にオン",
+    "modules": {
+      "kassa": "レジ",
+      "online-bestellingen": "オンライン注文",
+      "instellingen": "設定",
+      "online": "オンラインプラットフォーム",
+      "reservaties": "予約",
+      "personeel": "スタッフ",
+      "kosten": "コスト",
+      "rapporten": "レポート",
+      "website": "ウェブサイト",
+      "account": "アカウント"
     }
   },
   "sectorPages": {

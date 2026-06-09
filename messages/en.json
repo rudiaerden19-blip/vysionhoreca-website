@@ -5551,8 +5551,30 @@
       "sm_rpt_verkoop": "Sales",
       "sm_rpt_populair": "Popular items",
       "sm_inst_betaling": "Payment methods",
+      "sm_inst_modules": "Modules",
       "sm_inst_bonprinter_windows": "Windows receipt printer",
       "sm_abonnement": "Subscription"
+    }
+  },
+  "tenantModulesPage": {
+    "title": "Modules",
+    "subtitle": "Turn parts of your admin menu on or off. Account always stays available.",
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "saveError": "Could not save: {detail}",
+    "alwaysOn": "Always on",
+    "modules": {
+      "kassa": "POS / till",
+      "online-bestellingen": "Online orders",
+      "instellingen": "Settings",
+      "online": "Online platform",
+      "reservaties": "Reservations",
+      "personeel": "Staff",
+      "kosten": "Costs",
+      "rapporten": "Reports",
+      "website": "Website",
+      "account": "Account"
     }
   },
   "sectorPages": {

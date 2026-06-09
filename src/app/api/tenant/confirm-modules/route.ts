@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
-import { verifySuperAdminAccess } from '@/lib/verify-tenant-access'
+import { verifySuperAdminAccess, verifyTenantAccess } from '@/lib/verify-tenant-access'
 import { TENANT_MODULE_IDS, parseEnabledModulesJson } from '@/lib/tenant-modules'
+import { collectAllSubmenuIds } from '@/lib/admin-hamburger-modules'
 import {
   isMissingPostTrialModulesColumnError,
   withoutPostTrialModulesConfirmed,
 } from '@/lib/supabase-post-trial-column'
 
-// Voor 50+ tenants: alleen superadmin mag modules per tenant aan/uit zetten.
-// (De vroegere "post-trial modulekeuze" door de zaak zelf is verwijderd; betaling/blokkade
-//  loopt nu via de superadmin-blokkeer-knop op `tenants.is_blocked`.)
+/** Superadmin of ingelogde zaak mag `enabled_modules` (+ submenu-keys) opslaan. */
 export async function POST(request: NextRequest) {
   try {
     const supabase = getServerSupabaseClient()
@@ -26,8 +25,13 @@ export async function POST(request: NextRequest) {
     }
 
     const superAccess = await verifySuperAdminAccess(request)
-    if (!superAccess.authorized) {
-      return NextResponse.json({ error: 'Alleen superadmin' }, { status: 403 })
+    let authorized = superAccess.authorized
+    if (!authorized) {
+      const tenantAccess = await verifyTenantAccess(request, tenantSlug)
+      authorized = tenantAccess.authorized
+    }
+    if (!authorized) {
+      return NextResponse.json({ error: 'Geen toegang' }, { status: 403 })
     }
 
     const { data: existingRow } = await supabase
@@ -37,10 +41,16 @@ export async function POST(request: NextRequest) {
       .maybeSingle()
     const prev = parseEnabledModulesJson(existingRow?.enabled_modules) ?? {}
 
+    const validSubs = new Set(collectAllSubmenuIds())
     const merged: Record<string, boolean> = { ...prev }
+
     for (const id of TENANT_MODULE_IDS) {
-      merged[id] = !!enabled_modules[id]
+      merged[id] = id === 'account' ? true : !!enabled_modules[id]
     }
+    for (const [k, v] of Object.entries(enabled_modules)) {
+      if (validSubs.has(k)) merged[k] = !!v
+    }
+    merged.account = true
 
     const updPayload = {
       enabled_modules: merged,

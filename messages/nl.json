@@ -5551,8 +5551,30 @@
       "sm_rpt_verkoop": "Verkoop",
       "sm_rpt_populair": "Populaire items",
       "sm_inst_betaling": "Betaalmethodes",
+      "sm_inst_modules": "Modules",
       "sm_inst_bonprinter_windows": "Bonprinter Windows",
       "sm_abonnement": "Abonnement"
+    }
+  },
+  "tenantModulesPage": {
+    "title": "Modules",
+    "subtitle": "Zet onderdelen van je admin-menu aan of uit. Account blijft altijd beschikbaar.",
+    "save": "Opslaan",
+    "saving": "Opslaan…",
+    "saved": "Opgeslagen",
+    "saveError": "Opslaan mislukt: {detail}",
+    "alwaysOn": "Altijd aan",
+    "modules": {
+      "kassa": "Kassa",
+      "online-bestellingen": "Online bestellingen",
+      "instellingen": "Instellingen",
+      "online": "Online platform",
+      "reservaties": "Reservaties",
+      "personeel": "Personeel",
+      "kosten": "Kosten",
+      "rapporten": "Rapporten",
+      "website": "Website",
+      "account": "Account"
     }
   },
   "sectorPages": {

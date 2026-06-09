@@ -457,6 +457,13 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
           href: `${baseUrl}/betaling`,
         },
         {
+          id: 'sm_inst_modules',
+          icon: '🧩',
+          label: 'Modules',
+          labelKey: itemLabelKey('sm_inst_modules'),
+          href: `${baseUrl}/modules`,
+        },
+        {
           id: 'sm_abonnement',
           icon: '📦',
           label: 'Abonnement',
