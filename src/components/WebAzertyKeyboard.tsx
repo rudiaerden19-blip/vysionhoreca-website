@@ -28,6 +28,9 @@ const IGNORE_TYPES = new Set([
 
 const STORAGE_KEYBOARD_LAYOUT = 'vysion_web_kb_layout'
 
+/** Blijft op het veld staan terwijl `inputmode` tijdelijk `none` is (decimale toetsen tonen). */
+const ATTR_VYSION_KB_DECIMAL = 'data-vysion-kb-decimal'
+
 type KeyboardLetterLayout = 'azerty' | 'qwerty'
 
 function readStoredLetterLayout(): KeyboardLetterLayout {
@@ -162,7 +165,11 @@ function isCompactPinField(el: HTMLInputElement | HTMLTextAreaElement): boolean 
 }
 
 function numericAllowDecimal(el: HTMLInputElement | HTMLTextAreaElement): boolean {
-  return el instanceof HTMLInputElement && el.type === 'number'
+  if (!(el instanceof HTMLInputElement)) return false
+  if (el.type === 'number') return true
+  if (el.getAttribute(ATTR_VYSION_KB_DECIMAL) === '1') return true
+  const im = (el.getAttribute('inputmode') || '').toLowerCase()
+  return im === 'decimal'
 }
 
 function insertSnippet(el: HTMLInputElement | HTMLTextAreaElement, snippet: string): void {
@@ -356,8 +363,18 @@ export function WebAzertyKeyboard() {
 
     let prevInputmode: string | null = null
     let prevKbManaged: string | null = null
+    let hadDecimalAttr = false
     try {
       if (target.hasAttribute('inputmode')) prevInputmode = target.getAttribute('inputmode')
+      const im = (prevInputmode || '').toLowerCase()
+      const wantsDecimal =
+        target instanceof HTMLInputElement &&
+        (target.type === 'number' || im === 'decimal' || target.getAttribute(ATTR_VYSION_KB_DECIMAL) === '1')
+      if (wantsDecimal) {
+        hadDecimalAttr = target.getAttribute(ATTR_VYSION_KB_DECIMAL) === '1'
+        target.setAttribute(ATTR_VYSION_KB_DECIMAL, '1')
+      }
+
       target.setAttribute('inputmode', 'none')
 
       prevKbManaged = target.getAttribute(ATTR_VYSION_KB_MANAGED)
@@ -365,6 +382,7 @@ export function WebAzertyKeyboard() {
     } catch {
       prevInputmode = null
       prevKbManaged = null
+      hadDecimalAttr = false
     }
 
     const elCleanup = target
@@ -376,6 +394,8 @@ export function WebAzertyKeyboard() {
 
         if (prevKbManaged === null) elCleanup.removeAttribute(ATTR_VYSION_KB_MANAGED)
         else elCleanup.setAttribute(ATTR_VYSION_KB_MANAGED, prevKbManaged)
+
+        if (!hadDecimalAttr) elCleanup.removeAttribute(ATTR_VYSION_KB_DECIMAL)
       } catch {
         /* noop */
       }

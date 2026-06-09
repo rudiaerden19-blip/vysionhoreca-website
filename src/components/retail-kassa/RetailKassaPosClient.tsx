@@ -885,6 +885,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               ref={priceFixInputRef}
               type="text"
               inputMode="decimal"
+              data-vysion-kb-decimal="1"
               value={priceFixValue}
               onChange={(e) => setPriceFixValue(e.target.value)}
               className={`w-full px-3 py-2.5 text-sm tabular-nums text-[#f0f0f0] placeholder:text-white/45 focus:outline-none ${KASSA_POS_FIELD}`}
