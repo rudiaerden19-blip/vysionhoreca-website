@@ -5744,6 +5744,8 @@
     "paying": "Processing…",
     "payError": "Payment failed",
     "outOfStock": "Insufficient stock",
+    "barcodeCol": "باركود",
+    "nameCol": "منتج",
     "barcodeNotFound": "Article not found",
     "unknownScanTitle": "باركود جديد",
     "unknownScanHint": "أول مرة: تحقق من الاسم وأدخل السعر. المسح التالي تلقائي.",

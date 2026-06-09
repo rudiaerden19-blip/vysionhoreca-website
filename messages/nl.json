@@ -5636,6 +5636,8 @@
     "paying": "Bezig…",
     "payError": "Betaling mislukt",
     "outOfStock": "Niet genoeg voorraad",
+    "barcodeCol": "Barcode",
+    "nameCol": "Artikel",
     "barcodeNotFound": "Geen artikel gevonden",
     "unknownScanTitle": "Nieuwe barcode",
     "unknownScanHint": "Eerste keer dit artikel: controleer de naam, vul de prijs in. Volgende scans gaan vanzelf.",

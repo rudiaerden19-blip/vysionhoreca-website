@@ -16,8 +16,6 @@ import {
   KASSA_POS_FIELD,
   KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
   KASSA_POS_MENU_RECESS_TRAY_CLASS,
-  KASSA_POS_MENU_TILE_BUTTON_BASE,
-  KASSA_POS_MENU_TILE_LABEL_CLASS,
   KASSA_POS_RULE_BLACK,
   KASSA_POS_BTN_SHAPE,
   KASSA_SIDEBAR_FOOTER_BTN_LABEL,
@@ -257,6 +255,41 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
 
   const barHasLines = mode === 'sales' ? cart.length > 0 : stockActivity.length > 0
 
+  const scanBarRowGridClass =
+    'grid w-full min-w-[36rem] grid-cols-[minmax(6.5rem,1.1fr)_minmax(7rem,2fr)_minmax(3rem,0.7fr)_minmax(3rem,0.7fr)_minmax(3.5rem,0.8fr)] items-center gap-2 sm:gap-3'
+
+  function scrollScanBarToEnd() {
+    requestAnimationFrame(() => {
+      const el = scanBarRef.current
+      if (el) el.scrollTop = el.scrollHeight
+    })
+  }
+
+  function renderScanBarRow(
+    key: string,
+    sku: RetailPosSku,
+    opts?: { quantity?: number; stockNote?: string },
+  ) {
+    const barcode = sku.barcode || sku.article_number || '—'
+    const stock =
+      opts?.stockNote ??
+      (sku.track_stock ? String(sku.stock_quantity) : t('retailKassaPage.stockNotTracked'))
+    const name =
+      opts?.quantity && opts.quantity > 1 ? `${sku.name} × ${opts.quantity}` : sku.name
+    return (
+      <div
+        key={key}
+        className={`${scanBarRowGridClass} border-b border-white/10 px-3 py-2.5 sm:px-4 sm:py-3 text-[11px] sm:text-sm`}
+      >
+        <span className="truncate font-mono tabular-nums text-white/85">{barcode}</span>
+        <span className="truncate font-semibold text-[#f2f2f2]">{name}</span>
+        <span className="truncate text-white/75">{sku.size_label || '—'}</span>
+        <span className="truncate text-white/75">{sku.color_label || '—'}</span>
+        <span className="truncate tabular-nums text-white/75">{stock}</span>
+      </div>
+    )
+  }
+
   function switchMode(next: RetailKassaMode) {
     if (next === mode) return
     playClick()
@@ -268,10 +301,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   function pushStockActivity(sku: RetailPosSku, delta: number, activityMode: RetailKassaMode) {
     const key = `${sku.lineKey}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
     setStockActivity((prev) => [...prev, { key, sku, delta, mode: activityMode }])
-    requestAnimationFrame(() => {
-      const el = scanBarRef.current
-      if (el) el.scrollLeft = el.scrollWidth
-    })
+    scrollScanBarToEnd()
   }
 
   function replaceSkuInCatalog(next: RetailPosSku) {
@@ -418,10 +448,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     setScanValue('')
     if (barcodeCaptureRef.current) barcodeCaptureRef.current.value = ''
     focusBarcodeCapture()
-    requestAnimationFrame(() => {
-      const el = scanBarRef.current
-      if (el) el.scrollLeft = el.scrollWidth
-    })
+    scrollScanBarToEnd()
     if (sku.price <= 0) {
       setPriceFixSku(sku)
       setPriceFixValue('')
@@ -630,45 +657,18 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                       <span>{t('adminLayout.overview')}</span>
                     </Link>
                     {modules.map((mod) => (
-                      <div
-                        key={mod.rowKey}
-                        className={`flex items-stretch border-b ${ui.flyMenuDivider} last:border-0`}
-                      >
-                        {mod.entryHref ? (
-                          <Link
-                            href={mod.entryHref}
-                            prefetch={false}
-                            onClick={() => {
-                              setHamburgerOpen(false)
-                              setHamburgerSubOpen(null)
-                            }}
-                            className={`flex min-w-0 flex-1 items-center px-4 py-3 no-underline transition-colors ${ui.flyMenuRowHover}`}
-                          >
-                            <span className={`font-semibold text-sm ${ui.flyMenuTextMuted}`}>
-                              {mod.labelKey ? t(mod.labelKey) : mod.label}
-                            </span>
-                          </Link>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setHamburgerSubOpen(hamburgerSubOpen === mod.rowKey ? null : mod.rowKey)
-                            }
-                            className={`flex min-w-0 flex-1 items-center px-4 py-3 text-left transition-colors ${hamburgerSubOpen === mod.rowKey ? ui.flyMenuRowActive : ui.flyMenuRowHover}`}
-                          >
-                            <span className={`font-semibold text-sm ${ui.flyMenuTextMuted}`}>
-                              {mod.labelKey ? t(mod.labelKey) : mod.label}
-                            </span>
-                          </button>
-                        )}
+                      <div key={mod.rowKey} className={`border-b ${ui.flyMenuDivider} last:border-0`}>
                         <button
                           type="button"
                           onClick={() =>
                             setHamburgerSubOpen(hamburgerSubOpen === mod.rowKey ? null : mod.rowKey)
                           }
-                          className={`flex shrink-0 items-center px-3 py-3 ${ui.flyMenuChevron}`}
+                          className={`flex w-full items-center justify-between px-4 py-3 transition-colors ${hamburgerSubOpen === mod.rowKey ? ui.flyMenuRowActive : ui.flyMenuRowHover}`}
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <span className={`font-semibold text-sm ${ui.flyMenuTextMuted}`}>
+                            {mod.labelKey ? t(mod.labelKey) : mod.label}
+                          </span>
+                          <svg className={`w-4 h-4 ${ui.flyMenuChevron}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                           </svg>
                         </button>
@@ -855,91 +855,50 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               </button>
             </form>
 
-            <div className="flex min-h-0 flex-1 flex-col px-3 pb-3 pt-0.5 sm:px-4">
+            {barHasLines ? (
+              <div
+                className={`shrink-0 w-full border-b ${KASSA_POS_RULE_BLACK} bg-[linear-gradient(180deg,#2e2e32_0%,#26262a_100%)]`}
+              >
+                <div
+                  className={`${scanBarRowGridClass} px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-white/45 sm:px-4`}
+                >
+                  <span>{t('retailKassaPage.barcodeCol')}</span>
+                  <span>{t('retailKassaPage.nameCol')}</span>
+                  <span>{t('retailKassaPage.size')}</span>
+                  <span>{t('retailKassaPage.color')}</span>
+                  <span>{t('retailKassaPage.stock')}</span>
+                </div>
+                <div
+                  ref={scanBarRef}
+                  data-testid="retail-kassa-scan-bar"
+                  className="max-h-[min(40vh,14rem)] overflow-y-auto overflow-x-auto overscroll-y-contain touch-manipulation [scrollbar-gutter:stable]"
+                >
+                  {mode === 'sales'
+                    ? cart.map((l) =>
+                        renderScanBarRow(l.sku.lineKey, l.sku, { quantity: l.quantity }),
+                      )
+                    : stockActivity.map((row) => {
+                        const note =
+                          row.mode === 'goodsReceipt'
+                            ? `${t('retailKassaPage.stockAdded').replace('{n}', String(row.delta))} · ${row.sku.stock_quantity}`
+                            : `${t('retailKassaPage.stockPlusOne')} · ${row.sku.stock_quantity}`
+                        return renderScanBarRow(row.key, row.sku, { stockNote: note })
+                      })}
+                </div>
+              </div>
+            ) : null}
+
+            <div className="flex min-h-0 flex-1 flex-col px-3 pb-3 pt-2 sm:px-4">
               <div
                 className={`flex min-h-0 flex-1 flex-col overflow-hidden justify-center ${KASSA_POS_MENU_RECESS_TRAY_CLASS} ${KASSA_POS_BTN_SHAPE} gks-menu-vignette`}
               >
-                {loading && !barHasLines ? (
+                {loading ? (
                   <p className={`px-4 text-center text-sm ${ui.menuEmptyMuted}`}>{t('retailKassaPage.loading')}</p>
                 ) : !barHasLines ? (
                   <p className={`px-6 text-center text-base font-medium sm:text-lg ${ui.menuEmptyMuted}`}>
                     {t(modeHintKey)}
                   </p>
-                ) : (
-                  <div
-                    ref={scanBarRef}
-                    data-testid="retail-kassa-scan-bar"
-                    className="flex w-full min-h-[9.5rem] max-h-[42vh] flex-row items-stretch gap-3 overflow-x-auto overflow-y-hidden overscroll-x-contain px-4 py-5 touch-manipulation [scrollbar-gutter:stable]"
-                  >
-                    {mode === 'sales'
-                      ? cart.map((l) => {
-                          const p = l.sku
-                          return (
-                            <div
-                              key={p.lineKey}
-                              className={`${KASSA_POS_MENU_TILE_BUTTON_BASE} shrink-0 w-[11.5rem] sm:w-[12.5rem] min-h-[8.5rem] pointer-events-none`}
-                            >
-                              <div className="shrink-0 w-full border-b border-[#45454a]/80 bg-[linear-gradient(180deg,#343438_0%,#2a2a2e_100%)] px-2 py-2 sm:px-3">
-                                <p className={`${KASSA_POS_MENU_TILE_LABEL_CLASS} line-clamp-2 text-left`}>{p.name}</p>
-                                {l.quantity > 1 ? (
-                                  <p className="mt-0.5 text-left text-[11px] font-bold text-[#5a9fd4]">× {l.quantity}</p>
-                                ) : null}
-                              </div>
-                              <div className="flex-1 p-2 sm:p-2.5 text-[10px] sm:text-[11px] text-[#d8d8dc] grid grid-cols-2 gap-x-2 gap-y-1 content-start">
-                                <span>
-                                  {t('retailKassaPage.price')}: €{p.price.toFixed(2)}
-                                </span>
-                                <span>
-                                  {t('retailKassaPage.article')}: {p.article_number || p.barcode || '—'}
-                                </span>
-                                <span>
-                                  {t('retailKassaPage.size')}: {p.size_label || '—'}
-                                </span>
-                                <span>
-                                  {t('retailKassaPage.color')}: {p.color_label || '—'}
-                                </span>
-                                <span className="col-span-2">
-                                  {t('retailKassaPage.stock')}:{' '}
-                                  {p.track_stock ? p.stock_quantity : t('retailKassaPage.stockNotTracked')}
-                                </span>
-                              </div>
-                            </div>
-                          )
-                        })
-                      : stockActivity.map((row) => {
-                          const p = row.sku
-                          return (
-                            <div
-                              key={row.key}
-                              className={`${KASSA_POS_MENU_TILE_BUTTON_BASE} shrink-0 w-[11.5rem] sm:w-[12.5rem] min-h-[8.5rem] pointer-events-none`}
-                            >
-                              <div className="shrink-0 w-full border-b border-[#45454a]/80 bg-[linear-gradient(180deg,#343438_0%,#2a2a2e_100%)] px-2 py-2 sm:px-3">
-                                <p className={`${KASSA_POS_MENU_TILE_LABEL_CLASS} line-clamp-2 text-left`}>{p.name}</p>
-                                <p className="mt-0.5 text-left text-[11px] font-bold text-emerald-300/90">
-                                  {row.mode === 'goodsReceipt'
-                                    ? t('retailKassaPage.stockAdded').replace('{n}', String(row.delta))
-                                    : t('retailKassaPage.stockPlusOne')}
-                                </p>
-                              </div>
-                              <div className="flex-1 p-2 sm:p-2.5 text-[10px] sm:text-[11px] text-[#d8d8dc] grid grid-cols-2 gap-x-2 gap-y-1 content-start">
-                                <span>
-                                  {t('retailKassaPage.article')}: {p.article_number || p.barcode || '—'}
-                                </span>
-                                <span>
-                                  {t('retailKassaPage.size')}: {p.size_label || '—'}
-                                </span>
-                                <span>
-                                  {t('retailKassaPage.color')}: {p.color_label || '—'}
-                                </span>
-                                <span className="col-span-2">
-                                  {t('retailKassaPage.stockNow')}: {p.stock_quantity}
-                                </span>
-                              </div>
-                            </div>
-                          )
-                        })}
-                  </div>
-                )}
+                ) : null}
               </div>
             </div>
 

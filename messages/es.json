@@ -5744,6 +5744,8 @@
     "paying": "Procesando…",
     "payError": "Pago fallido",
     "outOfStock": "Stock insuficiente",
+    "barcodeCol": "Código",
+    "nameCol": "Artículo",
     "barcodeNotFound": "Artículo no encontrado",
     "unknownScanTitle": "Nuevo código",
     "unknownScanHint": "Primera vez: revise el nombre e introduzca el precio. Los siguientes escaneos son automáticos.",

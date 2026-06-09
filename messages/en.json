@@ -5703,6 +5703,8 @@
     "paying": "Processing…",
     "payError": "Payment failed",
     "outOfStock": "Insufficient stock",
+    "barcodeCol": "Barcode",
+    "nameCol": "Product",
     "barcodeNotFound": "Article not found",
     "unknownScanTitle": "New barcode",
     "unknownScanHint": "First time for this item: check the name, enter the price. Next scans work automatically.",

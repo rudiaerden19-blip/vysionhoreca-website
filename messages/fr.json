@@ -5767,6 +5767,8 @@
     "paying": "En cours…",
     "payError": "Échec paiement",
     "outOfStock": "Stock insuffisant",
+    "barcodeCol": "Code-barres",
+    "nameCol": "Article",
     "barcodeNotFound": "Article introuvable",
     "unknownScanTitle": "Nouveau code-barres",
     "unknownScanHint": "Première fois : vérifiez le nom, saisissez le prix. Les scans suivants sont automatiques.",

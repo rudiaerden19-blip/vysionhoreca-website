@@ -5744,6 +5744,8 @@
     "paying": "Attendere…",
     "payError": "Pagamento fallito",
     "outOfStock": "Giacenza insufficiente",
+    "barcodeCol": "Barcode",
+    "nameCol": "Articolo",
     "barcodeNotFound": "Articolo non trovato",
     "unknownScanTitle": "Nuovo barcode",
     "unknownScanHint": "Prima volta: controlla il nome, inserisci il prezzo. Le scansioni successive sono automatiche.",
