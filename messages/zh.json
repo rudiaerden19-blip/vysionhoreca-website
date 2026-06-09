@@ -5544,7 +5544,9 @@
       "kosten": "Costing",
       "rapporten": "Reports",
       "instellingen": "Settings",
-      "account": "Account"
+      "account": "Account",
+      "retail-kassa": "零售收银",
+      "voorraad": "库存"
     },
     "items": {
       "sm_orders_bestellingen": "Orders",
@@ -5594,7 +5596,11 @@
       "sm_inst_betaling": "Payment methods",
       "sm_inst_modules": "模块",
       "sm_inst_bonprinter_windows": "Windows 小票打印机",
-      "sm_abonnement": "Subscription"
+      "sm_abonnement": "Subscription",
+      "sm_retail_kassa_pos": "销售（条码）",
+      "sm_retail_kassa_producten": "商品",
+      "sm_voorraad_beheer": "库存管理",
+      "sm_voorraad_producten": "商品"
     }
   },
   "tenantModulesPage": {
@@ -5615,7 +5621,9 @@
       "kosten": "成本",
       "rapporten": "报表",
       "website": "网站",
-      "account": "账户"
+      "account": "账户",
+      "retail-kassa": "零售收银",
+      "voorraad": "库存"
     }
   },
   "sectorPages": {
@@ -5684,5 +5692,39 @@
       "cta": "免费开始",
       "ownership24": "别再只租不买。24 个月后，这台 i7 收银机 100% 归您所有。"
     }
+  },
+  "stockPage": {
+    "title": "Stock",
+    "subtitle": "Articles, barcode, size and stock per product",
+    "search": "Search name, SKU or barcode…",
+    "article": "SKU",
+    "barcode": "Barcode",
+    "size": "Size",
+    "price": "Price",
+    "stock": "Stock",
+    "saveMeta": "Save",
+    "loading": "Loading…"
+  },
+  "retailKassaPage": {
+    "title": "Retail POS",
+    "back": "Admin",
+    "scanPlaceholder": "Scan barcode or SKU…",
+    "add": "Add",
+    "search": "Search article…",
+    "loading": "Loading articles…",
+    "price": "Price",
+    "article": "SKU",
+    "size": "Size",
+    "stock": "Stock",
+    "stockNotTracked": "n/a",
+    "cart": "Cart",
+    "cartEmpty": "Empty — scan or tap a block",
+    "total": "Total",
+    "payCash": "Pay cash",
+    "paying": "Processing…",
+    "payError": "Payment failed",
+    "outOfStock": "Insufficient stock",
+    "barcodeNotFound": "Article not found",
+    "lastOrder": "Receipt #{n}"
   }
 }

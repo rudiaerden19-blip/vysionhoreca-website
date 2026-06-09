@@ -5544,7 +5544,9 @@
       "kosten": "Costi",
       "rapporten": "Report",
       "instellingen": "Impostazioni",
-      "account": "Account"
+      "account": "Account",
+      "retail-kassa": "Cassa retail",
+      "voorraad": "Magazzino"
     },
     "items": {
       "sm_orders_bestellingen": "Ordini",
@@ -5594,7 +5596,11 @@
       "sm_inst_betaling": "Metodi di pagamento",
       "sm_inst_modules": "Moduli",
       "sm_inst_bonprinter_windows": "Stampante scontrini (Windows)",
-      "sm_abonnement": "Abbonamento"
+      "sm_abonnement": "Abbonamento",
+      "sm_retail_kassa_pos": "Vendita (barcode)",
+      "sm_retail_kassa_producten": "Articoli",
+      "sm_voorraad_beheer": "Gestione magazzino",
+      "sm_voorraad_producten": "Articoli"
     }
   },
   "tenantModulesPage": {
@@ -5615,7 +5621,9 @@
       "kosten": "Costi",
       "rapporten": "Report",
       "website": "Sito web",
-      "account": "Account"
+      "account": "Account",
+      "retail-kassa": "Cassa retail",
+      "voorraad": "Magazzino"
     }
   },
   "sectorPages": {
@@ -5684,5 +5692,39 @@
       "cta": "Inizia gratis",
       "ownership24": "Smetti di noleggiare. Dopo 24 mesi questa cassa i7 è 100% tua."
     }
+  },
+  "stockPage": {
+    "title": "Magazzino",
+    "subtitle": "Articoli, barcode, taglia e giacenza",
+    "search": "Cerca nome, cod. o barcode…",
+    "article": "Cod.",
+    "barcode": "Barcode",
+    "size": "Taglia",
+    "price": "Prezzo",
+    "stock": "Giacenza",
+    "saveMeta": "Salva",
+    "loading": "Caricamento…"
+  },
+  "retailKassaPage": {
+    "title": "Cassa retail",
+    "back": "Admin",
+    "scanPlaceholder": "Scansiona barcode o cod.…",
+    "add": "Aggiungi",
+    "search": "Cerca articolo…",
+    "loading": "Caricamento…",
+    "price": "Prezzo",
+    "article": "Cod.",
+    "size": "Taglia",
+    "stock": "Giacenza",
+    "stockNotTracked": "n/d",
+    "cart": "Carrello",
+    "cartEmpty": "Vuoto — scansiona o tocca",
+    "total": "Totale",
+    "payCash": "Paga contanti",
+    "paying": "Attendere…",
+    "payError": "Pagamento fallito",
+    "outOfStock": "Giacenza insufficiente",
+    "barcodeNotFound": "Articolo non trovato",
+    "lastOrder": "Scontrino #{n}"
   }
 }

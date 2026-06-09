@@ -5503,7 +5503,9 @@
       "kosten": "Costing",
       "rapporten": "Reports",
       "instellingen": "Settings",
-      "account": "Account"
+      "account": "Account",
+      "retail-kassa": "Retail POS",
+      "voorraad": "Stock"
     },
     "items": {
       "sm_orders_bestellingen": "Orders",
@@ -5553,7 +5555,11 @@
       "sm_inst_betaling": "Payment methods",
       "sm_inst_modules": "Modules",
       "sm_inst_bonprinter_windows": "Windows receipt printer",
-      "sm_abonnement": "Subscription"
+      "sm_abonnement": "Subscription",
+      "sm_retail_kassa_pos": "Sales (barcode)",
+      "sm_retail_kassa_producten": "Articles",
+      "sm_voorraad_beheer": "Stock management",
+      "sm_voorraad_producten": "Articles"
     }
   },
   "tenantModulesPage": {
@@ -5574,7 +5580,9 @@
       "kosten": "Costs",
       "rapporten": "Reports",
       "website": "Website",
-      "account": "Account"
+      "account": "Account",
+      "retail-kassa": "Retail POS",
+      "voorraad": "Stock"
     }
   },
   "sectorPages": {
@@ -5643,5 +5651,39 @@
       "cta": "Start free",
       "ownership24": "Stop renting. After 24 months, this i7 POS is 100% yours."
     }
+  },
+  "stockPage": {
+    "title": "Stock",
+    "subtitle": "Articles, barcode, size and stock per product",
+    "search": "Search name, SKU or barcode…",
+    "article": "SKU",
+    "barcode": "Barcode",
+    "size": "Size",
+    "price": "Price",
+    "stock": "Stock",
+    "saveMeta": "Save",
+    "loading": "Loading…"
+  },
+  "retailKassaPage": {
+    "title": "Retail POS",
+    "back": "Admin",
+    "scanPlaceholder": "Scan barcode or SKU…",
+    "add": "Add",
+    "search": "Search article…",
+    "loading": "Loading articles…",
+    "price": "Price",
+    "article": "SKU",
+    "size": "Size",
+    "stock": "Stock",
+    "stockNotTracked": "n/a",
+    "cart": "Cart",
+    "cartEmpty": "Empty — scan or tap a block",
+    "total": "Total",
+    "payCash": "Pay cash",
+    "paying": "Processing…",
+    "payError": "Payment failed",
+    "outOfStock": "Insufficient stock",
+    "barcodeNotFound": "Article not found",
+    "lastOrder": "Receipt #{n}"
   }
 }

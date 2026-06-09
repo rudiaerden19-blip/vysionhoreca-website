@@ -5495,6 +5495,8 @@
     "rows": {
       "bestellingen": "Bestellingen",
       "kassa": "Kassa",
+      "retail-kassa": "Winkelkassa",
+      "voorraad": "Voorraad",
       "online-platform": "Online platform",
       "website": "Website",
       "reservaties": "Reservaties",
@@ -5551,6 +5553,10 @@
       "sm_rpt_verkoop": "Verkoop",
       "sm_rpt_populair": "Populaire items",
       "sm_inst_betaling": "Betaalmethodes",
+      "sm_retail_kassa_pos": "Verkoop (barcode)",
+      "sm_retail_kassa_producten": "Artikelen",
+      "sm_voorraad_beheer": "Voorraad beheer",
+      "sm_voorraad_producten": "Artikelen",
       "sm_inst_modules": "Modules",
       "sm_inst_bonprinter_windows": "Bonprinter Windows",
       "sm_abonnement": "Abonnement"
@@ -5566,6 +5572,8 @@
     "alwaysOn": "Altijd aan",
     "modules": {
       "kassa": "Kassa",
+      "retail-kassa": "Winkelkassa",
+      "voorraad": "Voorraad",
       "online-bestellingen": "Online bestellingen",
       "instellingen": "Instellingen",
       "online": "Online platform",
@@ -5576,6 +5584,40 @@
       "website": "Website",
       "account": "Account"
     }
+  },
+  "stockPage": {
+    "title": "Voorraad",
+    "subtitle": "Artikelen, barcode, maat en stock per product",
+    "search": "Zoek op naam, artikelnr. of barcode…",
+    "article": "Artikelnr.",
+    "barcode": "Barcode",
+    "size": "Maat",
+    "price": "Prijs",
+    "stock": "Voorraad",
+    "saveMeta": "Opslaan",
+    "loading": "Laden…"
+  },
+  "retailKassaPage": {
+    "title": "Winkelkassa",
+    "back": "Admin",
+    "scanPlaceholder": "Scan barcode of artikelnr…",
+    "add": "Toevoegen",
+    "search": "Zoek artikel…",
+    "loading": "Artikelen laden…",
+    "price": "Prijs",
+    "article": "Art.nr.",
+    "size": "Maat",
+    "stock": "Voorraad",
+    "stockNotTracked": "n.v.t.",
+    "cart": "Mandje",
+    "cartEmpty": "Leeg — scan of tik een blok",
+    "total": "Totaal",
+    "payCash": "Contant betalen",
+    "paying": "Bezig…",
+    "payError": "Betaling mislukt",
+    "outOfStock": "Niet genoeg voorraad",
+    "barcodeNotFound": "Geen artikel gevonden",
+    "lastOrder": "Bon #{n}"
   },
   "sectorPages": {
     "breadcrumb": "Sectoren",

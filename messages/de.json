@@ -5567,7 +5567,9 @@
       "kosten": "Kostenkalkulation",
       "rapporten": "Berichte",
       "instellingen": "Einstellungen",
-      "account": "Konto"
+      "account": "Konto",
+      "retail-kassa": "Einzelhandel-Kasse",
+      "voorraad": "Lager"
     },
     "items": {
       "sm_orders_bestellingen": "Bestellungen",
@@ -5617,7 +5619,11 @@
       "sm_inst_betaling": "Zahlungsarten",
       "sm_inst_modules": "Module",
       "sm_inst_bonprinter_windows": "Windows-Bondrucker",
-      "sm_abonnement": "Abonnement"
+      "sm_abonnement": "Abonnement",
+      "sm_retail_kassa_pos": "Verkauf (Barcode)",
+      "sm_retail_kassa_producten": "Artikel",
+      "sm_voorraad_beheer": "Lagerverwaltung",
+      "sm_voorraad_producten": "Artikel"
     }
   },
   "tenantModulesPage": {
@@ -5638,7 +5644,9 @@
       "kosten": "Kosten",
       "rapporten": "Berichte",
       "website": "Website",
-      "account": "Konto"
+      "account": "Konto",
+      "retail-kassa": "Einzelhandel-Kasse",
+      "voorraad": "Lager"
     }
   },
   "sectorPages": {
@@ -5707,5 +5715,39 @@
       "cta": "Kostenlos starten",
       "ownership24": "Schluss mit Mieten. Nach 24 Monaten ist diese i7-Kasse zu 100 % Ihr Eigentum."
     }
+  },
+  "stockPage": {
+    "title": "Lager",
+    "subtitle": "Artikel, Barcode, Größe und Bestand",
+    "search": "Suche Name, Art.-Nr. oder Barcode…",
+    "article": "Art.-Nr.",
+    "barcode": "Barcode",
+    "size": "Größe",
+    "price": "Preis",
+    "stock": "Bestand",
+    "saveMeta": "Speichern",
+    "loading": "Laden…"
+  },
+  "retailKassaPage": {
+    "title": "Einzelhandel-Kasse",
+    "back": "Admin",
+    "scanPlaceholder": "Barcode oder Art.-Nr. scannen…",
+    "add": "Hinzufügen",
+    "search": "Artikel suchen…",
+    "loading": "Artikel laden…",
+    "price": "Preis",
+    "article": "Art.-Nr.",
+    "size": "Größe",
+    "stock": "Bestand",
+    "stockNotTracked": "k. A.",
+    "cart": "Warenkorb",
+    "cartEmpty": "Leer — scannen oder tippen",
+    "total": "Summe",
+    "payCash": "Bar bezahlen",
+    "paying": "Bitte warten…",
+    "payError": "Zahlung fehlgeschlagen",
+    "outOfStock": "Nicht genug auf Lager",
+    "barcodeNotFound": "Artikel nicht gefunden",
+    "lastOrder": "Beleg #{n}"
   }
 }

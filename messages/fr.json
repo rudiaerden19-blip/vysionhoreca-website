@@ -5567,7 +5567,9 @@
       "kosten": "Calcul des coûts",
       "rapporten": "Rapports",
       "instellingen": "Paramètres",
-      "account": "Compte"
+      "account": "Compte",
+      "retail-kassa": "Caisse retail",
+      "voorraad": "Stock"
     },
     "items": {
       "sm_orders_bestellingen": "Commandes",
@@ -5617,7 +5619,11 @@
       "sm_inst_betaling": "Moyens de paiement",
       "sm_inst_modules": "Modules",
       "sm_inst_bonprinter_windows": "Imprimante tickets (Windows)",
-      "sm_abonnement": "Abonnement"
+      "sm_abonnement": "Abonnement",
+      "sm_retail_kassa_pos": "Vente (code-barres)",
+      "sm_retail_kassa_producten": "Articles",
+      "sm_voorraad_beheer": "Gestion stock",
+      "sm_voorraad_producten": "Articles"
     }
   },
   "tenantModulesPage": {
@@ -5638,7 +5644,9 @@
       "kosten": "Coûts",
       "rapporten": "Rapports",
       "website": "Site web",
-      "account": "Compte"
+      "account": "Compte",
+      "retail-kassa": "Caisse retail",
+      "voorraad": "Stock"
     }
   },
   "sectorPages": {
@@ -5707,5 +5715,39 @@
       "cta": "Commencer gratuitement",
       "ownership24": "Arrêtez de louer. Après 24 mois, cette caisse i7 est 100 % à vous."
     }
+  },
+  "stockPage": {
+    "title": "Stock",
+    "subtitle": "Articles, code-barres, taille et stock",
+    "search": "Rechercher nom, réf. ou code-barres…",
+    "article": "Réf.",
+    "barcode": "Code-barres",
+    "size": "Taille",
+    "price": "Prix",
+    "stock": "Stock",
+    "saveMeta": "Enregistrer",
+    "loading": "Chargement…"
+  },
+  "retailKassaPage": {
+    "title": "Caisse retail",
+    "back": "Admin",
+    "scanPlaceholder": "Scanner code-barres ou réf.…",
+    "add": "Ajouter",
+    "search": "Rechercher…",
+    "loading": "Chargement…",
+    "price": "Prix",
+    "article": "Réf.",
+    "size": "Taille",
+    "stock": "Stock",
+    "stockNotTracked": "n/d",
+    "cart": "Panier",
+    "cartEmpty": "Vide — scanner ou toucher",
+    "total": "Total",
+    "payCash": "Payer cash",
+    "paying": "En cours…",
+    "payError": "Échec paiement",
+    "outOfStock": "Stock insuffisant",
+    "barcodeNotFound": "Article introuvable",
+    "lastOrder": "Ticket #{n}"
   }
 }

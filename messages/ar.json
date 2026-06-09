@@ -5544,7 +5544,9 @@
       "kosten": "Costing",
       "rapporten": "Reports",
       "instellingen": "Settings",
-      "account": "Account"
+      "account": "Account",
+      "retail-kassa": "كاشير التجزئة",
+      "voorraad": "المخزون"
     },
     "items": {
       "sm_orders_bestellingen": "Orders",
@@ -5594,7 +5596,11 @@
       "sm_inst_betaling": "Payment methods",
       "sm_inst_modules": "الوحدات",
       "sm_inst_bonprinter_windows": "طابعة الإيصالات (Windows)",
-      "sm_abonnement": "Subscription"
+      "sm_abonnement": "Subscription",
+      "sm_retail_kassa_pos": "بيع (باركود)",
+      "sm_retail_kassa_producten": "المنتجات",
+      "sm_voorraad_beheer": "إدارة المخزون",
+      "sm_voorraad_producten": "المنتجات"
     }
   },
   "tenantModulesPage": {
@@ -5615,7 +5621,9 @@
       "kosten": "التكاليف",
       "rapporten": "التقارير",
       "website": "الموقع",
-      "account": "الحساب"
+      "account": "الحساب",
+      "retail-kassa": "كاشير التجزئة",
+      "voorraad": "المخزون"
     }
   },
   "sectorPages": {
@@ -5684,5 +5692,39 @@
       "cta": "ابدأ مجانًا",
       "ownership24": "توقف عن الإيجار. بعد 24 شهرًا، جهاز الكاشير i7 هذا ملكك بالكامل."
     }
+  },
+  "stockPage": {
+    "title": "Stock",
+    "subtitle": "Articles, barcode, size and stock per product",
+    "search": "Search name, SKU or barcode…",
+    "article": "SKU",
+    "barcode": "Barcode",
+    "size": "Size",
+    "price": "Price",
+    "stock": "Stock",
+    "saveMeta": "Save",
+    "loading": "Loading…"
+  },
+  "retailKassaPage": {
+    "title": "Retail POS",
+    "back": "Admin",
+    "scanPlaceholder": "Scan barcode or SKU…",
+    "add": "Add",
+    "search": "Search article…",
+    "loading": "Loading articles…",
+    "price": "Price",
+    "article": "SKU",
+    "size": "Size",
+    "stock": "Stock",
+    "stockNotTracked": "n/a",
+    "cart": "Cart",
+    "cartEmpty": "Empty — scan or tap a block",
+    "total": "Total",
+    "payCash": "Pay cash",
+    "paying": "Processing…",
+    "payError": "Payment failed",
+    "outOfStock": "Insufficient stock",
+    "barcodeNotFound": "Article not found",
+    "lastOrder": "Receipt #{n}"
   }
 }

@@ -24,6 +24,9 @@ export interface MenuProduct {
   track_stock?: boolean
   stock_quantity?: number
   low_stock_threshold?: number
+  article_number?: string | null
+  barcode?: string | null
+  size_label?: string | null
 }
 
 export const KASSA_PRODUCT_IMAGE_ZOOM_MIN = 0.65

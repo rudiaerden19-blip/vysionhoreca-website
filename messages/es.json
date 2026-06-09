@@ -5544,7 +5544,9 @@
       "kosten": "Costes",
       "rapporten": "Informes",
       "instellingen": "Ajustes",
-      "account": "Cuenta"
+      "account": "Cuenta",
+      "retail-kassa": "TPV retail",
+      "voorraad": "Stock"
     },
     "items": {
       "sm_orders_bestellingen": "Pedidos",
@@ -5594,7 +5596,11 @@
       "sm_inst_betaling": "Métodos de pago",
       "sm_inst_modules": "Módulos",
       "sm_inst_bonprinter_windows": "Impresora de tickets (Windows)",
-      "sm_abonnement": "Suscripción"
+      "sm_abonnement": "Suscripción",
+      "sm_retail_kassa_pos": "Venta (código de barras)",
+      "sm_retail_kassa_producten": "Artículos",
+      "sm_voorraad_beheer": "Gestión de stock",
+      "sm_voorraad_producten": "Artículos"
     }
   },
   "tenantModulesPage": {
@@ -5615,7 +5621,9 @@
       "kosten": "Costes",
       "rapporten": "Informes",
       "website": "Sitio web",
-      "account": "Cuenta"
+      "account": "Cuenta",
+      "retail-kassa": "TPV retail",
+      "voorraad": "Stock"
     }
   },
   "sectorPages": {
@@ -5684,5 +5692,39 @@
       "cta": "Empezar gratis",
       "ownership24": "Deja de alquilar. A los 24 meses, este TPV i7 es 100 % tuyo."
     }
+  },
+  "stockPage": {
+    "title": "Stock",
+    "subtitle": "Artículos, código de barras, talla y existencias",
+    "search": "Buscar nombre, ref. o código…",
+    "article": "Ref.",
+    "barcode": "Código",
+    "size": "Talla",
+    "price": "Precio",
+    "stock": "Stock",
+    "saveMeta": "Guardar",
+    "loading": "Cargando…"
+  },
+  "retailKassaPage": {
+    "title": "TPV retail",
+    "back": "Admin",
+    "scanPlaceholder": "Escanear código o ref.…",
+    "add": "Añadir",
+    "search": "Buscar artículo…",
+    "loading": "Cargando…",
+    "price": "Precio",
+    "article": "Ref.",
+    "size": "Talla",
+    "stock": "Stock",
+    "stockNotTracked": "n/d",
+    "cart": "Cesta",
+    "cartEmpty": "Vacía — escanear o tocar",
+    "total": "Total",
+    "payCash": "Pagar en efectivo",
+    "paying": "Procesando…",
+    "payError": "Pago fallido",
+    "outOfStock": "Stock insuficiente",
+    "barcodeNotFound": "Artículo no encontrado",
+    "lastOrder": "Ticket #{n}"
   }
 }

@@ -3,6 +3,8 @@ import { isAdminTenant } from '@/lib/protected-tenants'
 /** Keys align with kassa hamburger `modules[].key`. */
 export const TENANT_MODULE_IDS = [
   'kassa',
+  'retail-kassa',
+  'voorraad',
   'online-bestellingen',
   'instellingen',
   'online',
@@ -18,6 +20,8 @@ export type TenantModuleId = (typeof TENANT_MODULE_IDS)[number]
 
 export const TENANT_MODULE_LABELS: Record<TenantModuleId, string> = {
   kassa: 'Kassa (producten, categorieën, …)',
+  'retail-kassa': 'Winkelkassa (blokken + barcode)',
+  voorraad: 'Voorraad & artikelen',
   'online-bestellingen': 'Online bestellingen (schermen, bestellijst)',
   instellingen: 'Instellingen (uren, levering, betaling)',
   online: 'Online platform (klanten, promoties, WhatsApp, …)',
@@ -33,6 +37,8 @@ export const TENANT_MODULE_LABELS: Record<TenantModuleId, string> = {
 export function getStarterEnabledModulesRecord(): Record<TenantModuleId, boolean> {
   return {
     kassa: true,
+    'retail-kassa': false,
+    voorraad: false,
     'online-bestellingen': true,
     instellingen: true,
     online: true,
@@ -234,7 +240,6 @@ export const KASSA_POS_SUBMENU_IDS = [
   'sm_kassa_categorieen',
   'sm_kassa_producten',
   'sm_kassa_opties',
-  'sm_kassa_voorraad',
   'sm_kassa_allergenen',
   'sm_kassa_labels',
 ] as const
@@ -292,8 +297,9 @@ export function getAdminKassaEntryHref(
   access: Record<TenantModuleId, boolean>,
   _enabledModulesJson: Record<string, boolean> | null
 ): string | null {
-  if (!access.kassa) return null
-  return `/shop/${tenantSlug}/admin/kassa`
+  if (access.kassa) return `/shop/${tenantSlug}/admin/kassa`
+  if (access['retail-kassa']) return `/shop/${tenantSlug}/admin/retail-kassa`
+  return null
 }
 
 /**
@@ -306,12 +312,11 @@ export function getFirstAccessibleAdminPath(
 ): string {
   const base = `/shop/${tenantSlug}/admin`
 
-  if (access.kassa) {
-    const kassaHref = getAdminKassaEntryHref(tenantSlug, access, enabledModulesJson)
-    if (kassaHref) return kassaHref
-  }
+  const posHref = getAdminKassaEntryHref(tenantSlug, access, enabledModulesJson)
+  if (posHref) return posHref
 
   const candidates: { m: TenantModuleId; path: string }[] = [
+    { m: 'voorraad', path: '/voorraad' },
     { m: 'online-bestellingen', path: '/bestellingen' },
     { m: 'reservaties', path: '/reserveringen' },
     { m: 'instellingen', path: '/betaling' },
@@ -352,6 +357,12 @@ export function hasModuleAccessForPathname(
   if (rest.startsWith('/cadeaubonnen') && moduleAccess.online) {
     return true
   }
+  if (
+    rest.startsWith('/producten') &&
+    (moduleAccess['retail-kassa'] || moduleAccess.voorraad)
+  ) {
+    return true
+  }
   return false
 }
 
@@ -368,6 +379,11 @@ export function submenuParentAllowedForSubmenuId(
   if (subId === 'sm_online_cadeaubonnen') {
     return moduleAccess.website || moduleAccess.online
   }
+  if (subId === 'sm_retail_kassa_producten' || subId === 'sm_voorraad_producten') {
+    return (
+      moduleAccess.kassa || moduleAccess['retail-kassa'] || moduleAccess.voorraad
+    )
+  }
   return moduleAccess[gate.module]
 }
 
@@ -383,8 +399,10 @@ export function adminPathToModule(pathname: string, tenantSlug: string): AdminMo
 
   if (rest === '/' || rest === '') return { kind: 'always' }
   if (rest.startsWith('/welkom')) return { kind: 'always' }
+  if (rest.startsWith('/retail-kassa')) return { kind: 'module', module: 'retail-kassa' }
   if (rest.startsWith('/kassa-terminal')) return { kind: 'module', module: 'kassa' }
   if (rest.startsWith('/kassa')) return { kind: 'module', module: 'kassa' }
+  if (rest.startsWith('/voorraad')) return { kind: 'module', module: 'voorraad' }
   if (rest.startsWith('/pincode')) return { kind: 'module', module: 'kassa' }
   if (rest.startsWith('/abonnement')) return { kind: 'always' }
   if (rest.startsWith('/modules')) return { kind: 'always' }
@@ -393,7 +411,6 @@ export function adminPathToModule(pathname: string, tenantSlug: string): AdminMo
     rest.startsWith('/categorieen') ||
     rest.startsWith('/producten') ||
     rest.startsWith('/opties') ||
-    rest.startsWith('/voorraad') ||
     rest.startsWith('/allergenen') ||
     rest.startsWith('/labels')
   ) {

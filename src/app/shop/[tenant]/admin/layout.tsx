@@ -382,18 +382,30 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
     )
   }
 
-  // Kassa POS: geen layout-wrapper; submodule-toggles blokkeren /kassa niet meer (verkoopscherm = altijd beschikbaar bij kassa-module).
-  if (adminPath.includes('/kassa')) {
+  const isHorecaKassaPos = isShopAdminKassaPosPath(adminPath, params.tenant)
+  const isRetailKassaPos = adminPath.includes('/retail-kassa')
+
+  if (isHorecaKassaPos) {
     if (demoPublicUnauthenticated) {
       return <>{children}</>
     }
-    if (
-      typeof window !== 'undefined' &&
-      isSuperAdminLoggedIn()
-    ) {
+    if (typeof window !== 'undefined' && isSuperAdminLoggedIn()) {
       return <>{children}</>
     }
-    if (!modulesLoading && moduleAccess['kassa'] === false) {
+    if (!modulesLoading && moduleAccess.kassa === false) {
+      return (
+        <RedirectToFirstAccessibleModule
+          tenant={params.tenant}
+          access={moduleAccess}
+          enabledModulesJson={enabledModulesJson}
+        />
+      )
+    }
+    return <>{children}</>
+  }
+
+  if (isRetailKassaPos) {
+    if (!modulesLoading && moduleAccess['retail-kassa'] === false) {
       return (
         <RedirectToFirstAccessibleModule
           tenant={params.tenant}
@@ -414,7 +426,10 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
       >
         <div className="flex min-w-0 shrink-0 items-center gap-2">
           <AdminHamburgerMenu tenantSlug={params.tenant} />
-          {!modulesLoading && (isSuperAdminLoggedIn() || moduleAccess['kassa']) && (
+          {!modulesLoading &&
+            (isSuperAdminLoggedIn() ||
+              moduleAccess.kassa ||
+              moduleAccess['retail-kassa']) && (
             <>
               <a
                 href={adminPosHref}

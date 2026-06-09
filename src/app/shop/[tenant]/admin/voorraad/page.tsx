@@ -4,12 +4,18 @@ import { useState, useEffect, useMemo, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
 import { getMenuCategories, MenuCategory } from '@/lib/admin-api'
+import { useLanguage } from '@/i18n'
 
 interface Product {
   id: string
   name: string
   image_url: string
   category_id: string | null
+  price: number
+  description: string
+  article_number: string | null
+  barcode: string | null
+  size_label: string | null
   track_stock: boolean
   stock_quantity: number
   low_stock_threshold: number
@@ -19,6 +25,7 @@ type FilterType = 'all' | 'tracked' | 'low' | 'out'
 
 export default function VoorraadPage({ params }: { params: { tenant: string } }) {
   const tenant = params.tenant
+  const { t } = useLanguage()
 
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<MenuCategory[]>([])
@@ -29,6 +36,11 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editStock, setEditStock] = useState(0)
   const [editThreshold, setEditThreshold] = useState(5)
+  const [metaDraft, setMetaDraft] = useState({
+    article_number: '',
+    barcode: '',
+    size_label: '',
+  })
   const [saving, setSaving] = useState<string | null>(null)
 
   const loadData = useCallback(async () => {
@@ -36,39 +48,44 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
     const [{ data: prods }, cats] = await Promise.all([
       supabase
         .from('menu_products')
-        .select('id, name, image_url, category_id, track_stock, stock_quantity, low_stock_threshold')
+        .select(
+          'id, name, description, price, image_url, category_id, article_number, barcode, size_label, track_stock, stock_quantity, low_stock_threshold',
+        )
         .eq('tenant_slug', tenant)
         .eq('is_active', true)
         .order('name'),
       getMenuCategories(tenant),
     ])
     setProducts(
-      (prods || []).map(p => ({
+      (prods || []).map((p) => ({
         ...p,
+        price: Number(p.price) || 0,
+        description: p.description || '',
+        article_number: p.article_number?.trim() || null,
+        barcode: p.barcode?.trim() || null,
+        size_label: p.size_label?.trim() || null,
         track_stock: p.track_stock ?? false,
         stock_quantity: p.stock_quantity ?? 0,
         low_stock_threshold: p.low_stock_threshold ?? 5,
-      }))
+      })),
     )
     setCategories(cats)
     setLoading(false)
   }, [tenant])
 
-  useEffect(() => { loadData() }, [loadData])
+  useEffect(() => {
+    void loadData()
+  }, [loadData])
 
   const updateProduct = async (id: string, patch: Partial<Product>) => {
     setSaving(id)
-    const r = await adminDb.update(
-      'menu_products',
-      patch as any,
-      { id, tenant_slug: tenant },
-      { tenantSlug: tenant }
-    )
+    const r = await adminDb.update('menu_products', patch as Record<string, unknown>, { id, tenant_slug: tenant }, {
+      tenantSlug: tenant,
+    })
     if (!r.ok) {
-      console.error('[voorraad] update:', r.error)
       alert(`Bijwerken mislukt: ${r.error}`)
     } else {
-      setProducts(prev => prev.map(p => p.id === id ? { ...p, ...patch } : p))
+      setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p)))
     }
     setSaving(null)
   }
@@ -79,7 +96,13 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
   }
 
   const saveEdit = async (p: Product) => {
-    await updateProduct(p.id, { stock_quantity: editStock, low_stock_threshold: editThreshold })
+    await updateProduct(p.id, {
+      stock_quantity: editStock,
+      low_stock_threshold: editThreshold,
+      article_number: metaDraft.article_number.trim() || null,
+      barcode: metaDraft.barcode.trim() || null,
+      size_label: metaDraft.size_label.trim() || null,
+    })
     setEditingId(null)
   }
 
@@ -87,253 +110,225 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
     setEditingId(p.id)
     setEditStock(p.stock_quantity)
     setEditThreshold(p.low_stock_threshold)
+    setMetaDraft({
+      article_number: p.article_number || '',
+      barcode: p.barcode || '',
+      size_label: p.size_label || '',
+    })
   }
 
-  const getCatName = (catId: string | null) =>
-    categories.find(c => c.id === catId)?.name ?? '—'
+  const getCatName = (catId: string | null) => categories.find((c) => c.id === catId)?.name ?? '—'
 
   const getStatus = (p: Product) => {
     if (!p.track_stock) return { label: 'Niet bijgehouden', color: 'text-gray-400', bg: 'bg-gray-100' }
     if (p.stock_quantity === 0) return { label: 'Uitverkocht', color: 'text-red-600', bg: 'bg-red-100' }
-    if (p.stock_quantity <= p.low_stock_threshold) return { label: 'Laag', color: 'text-amber-600', bg: 'bg-amber-100' }
+    if (p.stock_quantity <= p.low_stock_threshold)
+      return { label: 'Laag', color: 'text-amber-600', bg: 'bg-amber-100' }
     return { label: 'Op voorraad', color: 'text-emerald-600', bg: 'bg-emerald-100' }
   }
 
   const filtered = useMemo(() => {
     let list = products
-    if (search) list = list.filter(p => p.name.toLowerCase().includes(search.toLowerCase()))
-    if (selectedCat) list = list.filter(p => p.category_id === selectedCat)
-    if (filter === 'tracked') list = list.filter(p => p.track_stock)
-    if (filter === 'low') list = list.filter(p => p.track_stock && p.stock_quantity > 0 && p.stock_quantity <= p.low_stock_threshold)
-    if (filter === 'out') list = list.filter(p => p.track_stock && p.stock_quantity === 0)
+    const q = search.trim().toLowerCase()
+    if (q) {
+      list = list.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          (p.article_number && p.article_number.toLowerCase().includes(q)) ||
+          (p.barcode && p.barcode.toLowerCase().includes(q)),
+      )
+    }
+    if (selectedCat) list = list.filter((p) => p.category_id === selectedCat)
+    if (filter === 'tracked') list = list.filter((p) => p.track_stock)
+    if (filter === 'low')
+      list = list.filter(
+        (p) => p.track_stock && p.stock_quantity > 0 && p.stock_quantity <= p.low_stock_threshold,
+      )
+    if (filter === 'out') list = list.filter((p) => p.track_stock && p.stock_quantity === 0)
     return list
   }, [products, search, selectedCat, filter])
 
   const stats = useMemo(() => {
-    const tracked = products.filter(p => p.track_stock)
+    const tracked = products.filter((p) => p.track_stock)
     return {
       total: products.length,
       tracked: tracked.length,
-      low: tracked.filter(p => p.stock_quantity > 0 && p.stock_quantity <= p.low_stock_threshold).length,
-      out: tracked.filter(p => p.stock_quantity === 0).length,
+      low: tracked.filter((p) => p.stock_quantity > 0 && p.stock_quantity <= p.low_stock_threshold).length,
+      out: tracked.filter((p) => p.stock_quantity === 0).length,
     }
   }, [products])
 
-  const lowStockItems = useMemo(() =>
-    products.filter(p => p.track_stock && p.stock_quantity <= p.low_stock_threshold && p.stock_quantity > 0),
-    [products]
-  )
-
   return (
-    <div className="max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">📦 Voorraad</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Beheer de stockniveaus van je producten</p>
-        </div>
+    <div className="max-w-5xl mx-auto">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">📦 {t('stockPage.title')}</h1>
+        <p className="text-sm text-gray-500 mt-0.5">{t('stockPage.subtitle')}</p>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
         {[
-          { label: 'Totaal', value: stats.total, icon: '📦', color: 'bg-gray-50 border-gray-200' },
-          { label: 'Bijgehouden', value: stats.tracked, icon: '✅', color: 'bg-blue-50 border-blue-200' },
-          { label: 'Laag', value: stats.low, icon: '⚠️', color: 'bg-amber-50 border-amber-200' },
-          { label: 'Uitverkocht', value: stats.out, icon: '❌', color: 'bg-red-50 border-red-200' },
-        ].map(s => (
-          <div key={s.label} className={`rounded-2xl border p-4 ${s.color}`}>
-            <div className="text-2xl mb-1">{s.icon}</div>
-            <div className="text-2xl font-bold text-gray-900">{s.value}</div>
-            <div className="text-xs text-gray-500 mt-0.5">{s.label}</div>
+          { label: 'Totaal', value: stats.total },
+          { label: 'Bijgehouden', value: stats.tracked },
+          { label: 'Laag', value: stats.low },
+          { label: 'Uitverkocht', value: stats.out },
+        ].map((s) => (
+          <div key={s.label} className="rounded-2xl border border-gray-200 bg-white p-4">
+            <div className="text-2xl font-bold">{s.value}</div>
+            <div className="text-xs text-gray-500">{s.label}</div>
           </div>
         ))}
       </div>
 
-      {/* Lage voorraad alert */}
-      {lowStockItems.length > 0 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6">
-          <p className="font-semibold text-amber-700 mb-2">⚠️ Lage voorraad</p>
-          <div className="flex flex-wrap gap-2">
-            {lowStockItems.map(p => (
-              <span key={p.id} className="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-sm font-medium">
-                {p.name}: {p.stock_quantity} stuks
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Filters */}
       <div className="flex flex-col md:flex-row gap-3 mb-6">
         <input
           type="text"
-          placeholder="🔍 Zoek product..."
+          placeholder={t('stockPage.search')}
           value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-400 focus:outline-none bg-white text-sm"
+          onChange={(e) => setSearch(e.target.value)}
+          className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm"
         />
         <select
           value={selectedCat}
-          onChange={e => setSelectedCat(e.target.value)}
-          className="px-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-400 focus:outline-none bg-white text-sm min-w-[160px]"
+          onChange={(e) => setSelectedCat(e.target.value)}
+          className="px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm min-w-[160px]"
         >
           <option value="">Alle categorieën</option>
-          {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-        </select>
-        <div className="flex gap-1.5">
-          {([
-            { id: 'all', label: 'Alle' },
-            { id: 'tracked', label: 'Bijgehouden' },
-            { id: 'low', label: 'Laag' },
-            { id: 'out', label: 'Uitverkocht' },
-          ] as { id: FilterType; label: string }[]).map(f => (
-            <button
-              key={f.id}
-              onClick={() => setFilter(f.id)}
-              className={`px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
-                filter === f.id
-                  ? 'bg-[#1e293b] text-white'
-                  : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              {f.label}
-            </button>
+          {categories.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
           ))}
-        </div>
+        </select>
       </div>
 
-      {/* Productenlijst */}
       {loading ? (
-        <div className="flex items-center justify-center h-48 text-gray-400">
-          <div className="text-center">
-            <div className="w-8 h-8 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin mx-auto mb-3" />
-            <p className="text-sm">Laden...</p>
-          </div>
-        </div>
-      ) : filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-48 text-gray-400">
-          <span className="text-4xl mb-2">📦</span>
-          <p className="font-medium">Geen producten gevonden</p>
-        </div>
+        <p className="text-center text-gray-500 py-12">{t('stockPage.loading')}</p>
       ) : (
-        <div className="space-y-2">
-          {filtered.map(p => {
+        <div className="space-y-3">
+          {filtered.map((p) => {
             const status = getStatus(p)
             const isEditing = editingId === p.id
             const isSaving = saving === p.id
-
             return (
-              <div key={p.id} className="bg-white rounded-2xl border border-gray-200 p-4 flex items-center gap-4">
-                {/* Afbeelding */}
-                <div className="w-14 h-14 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
-                  {p.image_url
-                    ? <img src={p.image_url} alt={p.name} className="w-full h-full object-cover" />
-                    : <div className="w-full h-full flex items-center justify-center text-2xl text-gray-300">🍽️</div>
-                  }
-                </div>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-gray-900 truncate">{p.name}</p>
-                  <p className="text-xs text-gray-400">{getCatName(p.category_id)}</p>
-                  <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium ${status.bg} ${status.color}`}>
-                    {status.label}
-                  </span>
-                </div>
-
-                {/* Controls */}
-                {isSaving ? (
-                  <div className="w-8 h-8 border-2 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
-                ) : p.track_stock ? (
-                  isEditing ? (
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <div className="text-center">
-                        <p className="text-[10px] text-gray-400 mb-0.5">Stuks</p>
+              <div key={p.id} className="bg-white rounded-2xl border border-gray-200 p-4">
+                <div className="flex flex-wrap gap-4 items-start">
+                  <div className="flex-1 min-w-[200px]">
+                    <p className="font-semibold text-gray-900">{p.name}</p>
+                    <p className="text-xs text-gray-400">{getCatName(p.category_id)} · €{p.price.toFixed(2)}</p>
+                    <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-xs ${status.bg} ${status.color}`}>
+                      {status.label}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 text-xs min-w-[240px]">
+                    <div>
+                      <span className="text-gray-400">{t('stockPage.article')}</span>
+                      <p className="font-medium">{p.article_number || '—'}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-400">{t('stockPage.barcode')}</span>
+                      <p className="font-medium font-mono">{p.barcode || '—'}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-400">{t('stockPage.size')}</span>
+                      <p className="font-medium">{p.size_label || '—'}</p>
+                    </div>
+                  </div>
+                  {isSaving ? (
+                    <div className="w-8 h-8 border-2 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
+                  ) : isEditing ? (
+                    <div className="flex flex-col gap-2 w-full md:w-auto">
+                      <div className="flex gap-2 flex-wrap">
+                        <input
+                          className="w-28 px-2 py-1 border rounded-lg text-sm"
+                          placeholder={t('stockPage.article')}
+                          value={metaDraft.article_number}
+                          onChange={(e) => setMetaDraft((m) => ({ ...m, article_number: e.target.value }))}
+                        />
+                        <input
+                          className="w-36 px-2 py-1 border rounded-lg text-sm font-mono"
+                          placeholder={t('stockPage.barcode')}
+                          value={metaDraft.barcode}
+                          onChange={(e) => setMetaDraft((m) => ({ ...m, barcode: e.target.value }))}
+                        />
+                        <input
+                          className="w-24 px-2 py-1 border rounded-lg text-sm"
+                          placeholder={t('stockPage.size')}
+                          value={metaDraft.size_label}
+                          onChange={(e) => setMetaDraft((m) => ({ ...m, size_label: e.target.value }))}
+                        />
+                      </div>
+                      <div className="flex gap-2 items-center">
                         <input
                           type="number"
                           value={editStock}
-                          onChange={e => setEditStock(Math.max(0, parseInt(e.target.value) || 0))}
-                          className="w-16 px-2 py-1.5 rounded-lg border border-gray-200 text-center text-sm font-bold focus:border-blue-400 focus:outline-none"
+                          onChange={(e) => setEditStock(Math.max(0, parseInt(e.target.value, 10) || 0))}
+                          className="w-16 px-2 py-1 border rounded-lg text-center font-bold"
                           min={0}
                         />
-                      </div>
-                      <div className="text-center">
-                        <p className="text-[10px] text-gray-400 mb-0.5">Min.</p>
                         <input
                           type="number"
                           value={editThreshold}
-                          onChange={e => setEditThreshold(Math.max(0, parseInt(e.target.value) || 0))}
-                          className="w-16 px-2 py-1.5 rounded-lg border border-gray-200 text-center text-sm font-bold focus:border-blue-400 focus:outline-none"
+                          onChange={(e) => setEditThreshold(Math.max(0, parseInt(e.target.value, 10) || 0))}
+                          className="w-16 px-2 py-1 border rounded-lg text-center"
                           min={0}
                         />
+                        <button
+                          type="button"
+                          onClick={() => void saveEdit(p)}
+                          className="px-3 py-1.5 rounded-lg bg-emerald-500 text-white text-sm font-semibold"
+                        >
+                          {t('stockPage.saveMeta')}
+                        </button>
+                        <button type="button" onClick={() => setEditingId(null)} className="text-sm text-gray-500">
+                          ✕
+                        </button>
                       </div>
-                      <button
-                        onClick={() => saveEdit(p)}
-                        className="w-9 h-9 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center transition-colors"
-                      >
-                        ✓
-                      </button>
-                      <button
-                        onClick={() => setEditingId(null)}
-                        className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition-colors"
-                      >
-                        ✕
-                      </button>
                     </div>
-                  ) : (
-                    <div className="flex items-center gap-2 flex-shrink-0">
+                  ) : p.track_stock ? (
+                    <div className="flex items-center gap-2">
                       <button
-                        onClick={() => quickAdjust(p, -1)}
-                        disabled={p.stock_quantity === 0}
-                        className="w-9 h-9 rounded-xl bg-red-100 hover:bg-red-200 text-red-600 font-bold text-lg flex items-center justify-center transition-colors disabled:opacity-30"
+                        type="button"
+                        onClick={() => void quickAdjust(p, -1)}
+                        className="w-9 h-9 rounded-xl bg-red-100 text-red-600 font-bold"
                       >
                         −
                       </button>
                       <button
+                        type="button"
                         onClick={() => startEdit(p)}
-                        className="min-w-[48px] px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-center font-bold text-lg transition-colors"
+                        className="min-w-[48px] px-3 py-2 rounded-xl bg-gray-100 font-bold"
                       >
                         {p.stock_quantity}
                       </button>
                       <button
-                        onClick={() => quickAdjust(p, 1)}
-                        className="w-9 h-9 rounded-xl bg-emerald-100 hover:bg-emerald-200 text-emerald-600 font-bold text-lg flex items-center justify-center transition-colors"
+                        type="button"
+                        onClick={() => void quickAdjust(p, 1)}
+                        className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-600 font-bold"
                       >
                         +
                       </button>
-                      <button
-                        onClick={() => updateProduct(p.id, { track_stock: false })}
-                        className="px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-500 text-xs font-medium transition-colors"
-                      >
-                        Uit
-                      </button>
                     </div>
-                  )
-                ) : (
-                  <button
-                    onClick={() => updateProduct(p.id, { track_stock: true, stock_quantity: 0, low_stock_threshold: 5 })}
-                    className="px-4 py-2 rounded-xl bg-[#1e293b] hover:bg-[#0f172a] text-white text-sm font-medium transition-colors flex-shrink-0"
-                  >
-                    Bijhouden
-                  </button>
-                )}
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        void updateProduct(p.id, {
+                          track_stock: true,
+                          stock_quantity: 0,
+                          low_stock_threshold: 5,
+                        })
+                      }
+                      className="px-4 py-2 rounded-xl bg-[#1e293b] text-white text-sm"
+                    >
+                      Bijhouden
+                    </button>
+                  )}
+                </div>
               </div>
             )
           })}
         </div>
       )}
-
-      {/* Info onderaan */}
-      <div className="mt-8 p-4 bg-blue-50 border border-blue-100 rounded-2xl text-sm text-blue-700">
-        <p className="font-semibold mb-1">💡 Hoe werkt voorraad?</p>
-        <ul className="space-y-1 text-blue-600 text-xs">
-          <li>• Klik op <strong>Bijhouden</strong> om stockbeheer in te schakelen voor een product.</li>
-          <li>• Gebruik <strong>+</strong> en <strong>−</strong> voor snelle aanpassingen.</li>
-          <li>• Klik op het getal om stock en minimumniveau in te stellen.</li>
-          <li>• Bij <strong>laag</strong> of <strong>uitverkocht</strong> verschijnt een waarschuwing bovenaan.</li>
-        </ul>
-      </div>
     </div>
   )
 }

@@ -4,7 +4,12 @@ export type TenantModuleAccess = Record<TenantModuleId, boolean>
 
 /** Dashboard / omzet-widgets: orders alleen als kassa, weborders of rapporten aan staat. */
 export function tenantShouldLoadOrderDashboardData(access: TenantModuleAccess): boolean {
-  return !!(access.kassa || access['online-bestellingen'] || access.rapporten)
+  return !!(
+    access.kassa ||
+    access['retail-kassa'] ||
+    access['online-bestellingen'] ||
+    access.rapporten
+  )
 }
 
 export function tenantShouldLoadWebsiteReviews(access: TenantModuleAccess): boolean {

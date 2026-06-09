@@ -5544,7 +5544,9 @@
       "kosten": "Costing",
       "rapporten": "Reports",
       "instellingen": "Settings",
-      "account": "Account"
+      "account": "Account",
+      "retail-kassa": "小売レジ",
+      "voorraad": "在庫"
     },
     "items": {
       "sm_orders_bestellingen": "Orders",
@@ -5594,7 +5596,11 @@
       "sm_inst_betaling": "Payment methods",
       "sm_inst_modules": "モジュール",
       "sm_inst_bonprinter_windows": "Windowsレシートプリンター",
-      "sm_abonnement": "Subscription"
+      "sm_abonnement": "Subscription",
+      "sm_retail_kassa_pos": "販売（バーコード）",
+      "sm_retail_kassa_producten": "商品",
+      "sm_voorraad_beheer": "在庫管理",
+      "sm_voorraad_producten": "商品"
     }
   },
   "tenantModulesPage": {
@@ -5615,7 +5621,9 @@
       "kosten": "コスト",
       "rapporten": "レポート",
       "website": "ウェブサイト",
-      "account": "アカウント"
+      "account": "アカウント",
+      "retail-kassa": "小売レジ",
+      "voorraad": "在庫"
     }
   },
   "sectorPages": {
@@ -5684,5 +5692,39 @@
       "cta": "無料で開始",
       "ownership24": "レンタルをやめましょう。24か月後、このi7レジは100％あなたの資産です。"
     }
+  },
+  "stockPage": {
+    "title": "Stock",
+    "subtitle": "Articles, barcode, size and stock per product",
+    "search": "Search name, SKU or barcode…",
+    "article": "SKU",
+    "barcode": "Barcode",
+    "size": "Size",
+    "price": "Price",
+    "stock": "Stock",
+    "saveMeta": "Save",
+    "loading": "Loading…"
+  },
+  "retailKassaPage": {
+    "title": "Retail POS",
+    "back": "Admin",
+    "scanPlaceholder": "Scan barcode or SKU…",
+    "add": "Add",
+    "search": "Search article…",
+    "loading": "Loading articles…",
+    "price": "Price",
+    "article": "SKU",
+    "size": "Size",
+    "stock": "Stock",
+    "stockNotTracked": "n/a",
+    "cart": "Cart",
+    "cartEmpty": "Empty — scan or tap a block",
+    "total": "Total",
+    "payCash": "Pay cash",
+    "paying": "Processing…",
+    "payError": "Payment failed",
+    "outOfStock": "Insufficient stock",
+    "barcodeNotFound": "Article not found",
+    "lastOrder": "Receipt #{n}"
   }
 }
