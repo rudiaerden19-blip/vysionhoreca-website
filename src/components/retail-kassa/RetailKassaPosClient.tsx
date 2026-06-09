@@ -344,11 +344,12 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
           : 'rounded-xl border border-white/25 bg-transparent text-white hover:bg-white/10'
     }`
 
-  const retailTopNavLabelClass =
-    'block text-center text-[10px] font-medium leading-tight sm:text-[11px]'
+  /** Zelfde maat als Menu-knop in de titelbalk. */
+  const retailTopNavShellClass =
+    'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap px-3 py-2 font-bold text-[11px] leading-tight transition-colors sm:px-4 sm:py-2.5 sm:text-xs min-h-[2.35rem] sm:min-h-[2.6rem]'
   const retailTopNavBtnClass = (selected: boolean) =>
-    `shrink-0 min-h-[2rem] px-2 py-1 ${kassaPosButtonClass(selected)}`
-  const retailTopNavLinkClass = `shrink-0 min-h-[2rem] px-2 py-1 flex items-center justify-center ${kassaPosButtonClass(false)}`
+    `${retailTopNavShellClass} ${kassaPosButtonClass(selected)}`
+  const retailTopNavLinkClass = `${retailTopNavShellClass} ${kassaPosButtonClass(false)}`
 
   const kassaDarkHeaderBtnShell =
     'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.35rem] px-3 py-2 sm:min-h-[2.6rem] sm:px-3.5 sm:py-2.5'
@@ -1226,7 +1227,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
 
         <div className="flex min-h-0 flex-1 overflow-hidden w-full">
           <div className={`relative flex min-h-0 flex-1 flex-col overflow-hidden ${ui.shellBg}`}>
-            <div className="shrink-0 flex gap-1.5 overflow-x-auto px-3 pt-2 sm:px-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="shrink-0 flex gap-2 overflow-x-auto px-3 pt-2 sm:gap-2.5 sm:px-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               <button
                 type="button"
                 data-testid="retail-mode-sales"
@@ -1234,16 +1235,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 onClick={() => switchMode('sales')}
                 className={retailTopNavBtnClass(mode === 'sales')}
               >
-                <span className={retailTopNavLabelClass}>{t('retailKassaPage.modeSales')}</span>
-              </button>
-              <button
-                type="button"
-                data-testid="retail-mode-stock-count"
-                aria-pressed={mode === 'stockCount'}
-                onClick={() => switchMode('stockCount')}
-                className={retailTopNavBtnClass(mode === 'stockCount')}
-              >
-                <span className={retailTopNavLabelClass}>{t('retailKassaPage.modeStockCount')}</span>
+                {t('retailKassaPage.modeSales')}
               </button>
               <button
                 type="button"
@@ -1252,7 +1244,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 onClick={() => switchMode('goodsReceipt')}
                 className={retailTopNavBtnClass(mode === 'goodsReceipt')}
               >
-                <span className={retailTopNavLabelClass}>{t('retailKassaPage.modeGoodsReceipt')}</span>
+                {t('retailKassaPage.modeGoodsReceipt')}
               </button>
               <Link
                 href={`${baseUrl}/voorraad`}
@@ -1260,7 +1252,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 onClick={() => playClick()}
                 className={retailTopNavLinkClass}
               >
-                <span className={retailTopNavLabelClass}>{t('adminHamburger.rows.voorraad')}</span>
+                {t('adminHamburger.rows.voorraad')}
               </Link>
               <Link
                 href={`${baseUrl}/rapporten`}
@@ -1268,7 +1260,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 onClick={() => playClick()}
                 className={retailTopNavLinkClass}
               >
-                <span className={retailTopNavLabelClass}>{t('adminHamburger.rows.rapporten')}</span>
+                {t('adminHamburger.rows.rapporten')}
               </Link>
               <Link
                 href={`${baseUrl}/modules`}
@@ -1276,7 +1268,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 onClick={() => playClick()}
                 className={retailTopNavLinkClass}
               >
-                <span className={retailTopNavLabelClass}>{t('adminHamburger.rows.instellingen')}</span>
+                {t('adminHamburger.rows.instellingen')}
               </Link>
             </div>
             <input
