@@ -28,7 +28,10 @@ import {
   kassaPosCartQtyButtonClass,
   kassaPosQuickMenuPanelButtonClass,
   kassaPosRaisedStripClass,
+  KASSA_NUMPAD_PANEL_SLIDE_MOTION,
 } from '@/lib/kassa-pos-surface'
+
+const RETAIL_NUMPAD_KEYS = ['7', '8', '9', '+', '4', '5', '6', '-', '1', '2', '3', '×', 'C', '0', '.', '='] as const
 import type { KassaPayOption } from '@/components/kassa/KassaPaymentModal'
 import { KassaPaymentModal } from '@/components/kassa/KassaPaymentModal'
 import { KassaSplitPaymentModal } from '@/components/kassa/KassaSplitPaymentModal'
@@ -186,6 +189,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [importModalOpen, setImportModalOpen] = useState(false)
   const [importBusy, setImportBusy] = useState(false)
   const [importHighlight, setImportHighlight] = useState<'csv' | 'excel' | null>(null)
+  const [numpadPanelVisible, setNumpadPanelVisible] = useState(false)
+  const [numpadValue, setNumpadValue] = useState('')
 
   const reload = useCallback(async () => {
     setLoading(true)
@@ -202,6 +207,10 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     void reload()
     void getTenantSettings(tenant).then(setTenantInfo)
   }, [reload, tenant])
+
+  useEffect(() => {
+    if (mode === 'sales' && cart.length > 0) setNumpadPanelVisible(false)
+  }, [cart.length, mode])
 
   useEffect(() => {
     const html = document.documentElement
@@ -582,6 +591,68 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     } finally {
       setPriceFixSaving(false)
     }
+  }
+
+  const handleNumpad = useCallback((key: string) => {
+    setNumpadValue((prev) => {
+      if (key === 'C') return ''
+      if (key === '=') {
+        try {
+          const expr = prev.replace(/×/g, '*')
+          // eslint-disable-next-line no-new-func
+          const result = Function('"use strict"; return (' + expr + ')')()
+          return String(result)
+        } catch {
+          return prev
+        }
+      }
+      if (['+', '-', '×'].includes(key)) {
+        if (prev && !['+', '-', '×'].some((op) => prev.endsWith(op))) return prev + key
+        return prev
+      }
+      if (key === '.') {
+        const parts = prev.split(/[+\-×]/)
+        if (!parts[parts.length - 1]?.includes('.')) return prev + '.'
+        return prev
+      }
+      return prev + key
+    })
+  }, [])
+
+  function addCustomAmountFromNumpad() {
+    const amount = parseFloat(numpadValue)
+    if (!(amount > 0)) return
+    playClick()
+    const key = `custom-${Date.now()}`
+    const sku: RetailPosSku = {
+      lineKey: key,
+      productId: key,
+      variantId: null,
+      name: t('kassaApp.addAmount').replace('{amount}', amount.toFixed(2)),
+      description: '',
+      price: Math.round(amount * 100) / 100,
+      image_url: '',
+      article_number: null,
+      barcode: null,
+      size_label: null,
+      color_label: null,
+      track_stock: false,
+      stock_quantity: 0,
+      low_stock_threshold: 0,
+      category_id: null,
+    }
+    setCart((prev) => [...prev, { sku, quantity: 1 }])
+    setNumpadValue('')
+    setNumpadPanelVisible(false)
+    scrollScanBarToEnd()
+    releaseScanFocus()
+  }
+
+  function toggleNumpadPanel() {
+    playClick()
+    if (articleSearchActiveRef.current) closeArticleSearchKeyboard()
+    setNumpadPanelVisible((v) => !v)
+    focusBarcodeCapture()
   }
 
   function addToCart(sku: RetailPosSku, qty = 1) {
@@ -1426,8 +1497,12 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
           <div
             className={`w-80 sm:w-96 lg:w-[380px] flex min-h-0 min-w-0 flex-shrink-0 flex-col overflow-hidden border-l ${KASSA_POS_RULE_BLACK} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`}
           >
-            <div className="min-h-0 flex-1 flex flex-col px-2.5 pt-3 pb-2 sm:px-3">
-              <div className="min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-y-contain py-0.5">
+            <div className="relative min-h-0 flex-1 flex flex-col px-2.5 pt-3 pb-2 sm:px-3">
+              <div
+                className={`min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-y-contain py-0.5 transition-opacity ${
+                  numpadPanelVisible ? 'pointer-events-none opacity-[0.28]' : 'opacity-100'
+                }`}
+              >
                 {mode !== 'sales' ? (
                   stockActivity.length === 0 ? (
                     <p className="px-2 py-8 text-center text-sm text-white/50">{t(modeHintKey)}</p>
@@ -1494,6 +1569,57 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                   {t('retailKassaPage.lastOrder').replace('{n}', String(lastOrderReceipt.orderNumber))}
                 </p>
               )}
+
+              <div
+                className={`absolute inset-0 z-[3] flex min-h-0 flex-col justify-end overflow-hidden ${KASSA_NUMPAD_PANEL_SLIDE_MOTION} ${
+                  numpadPanelVisible ? 'translate-y-0 pointer-events-auto' : 'translate-y-full pointer-events-none'
+                }`}
+                data-testid="retail-numpad-panel"
+                aria-hidden={!numpadPanelVisible}
+              >
+                <div className="flex min-h-[15rem] flex-1 flex-col justify-end">
+                  <div className={`mb-3 flex shrink-0 items-center gap-2.5 rounded-xl px-2.5 py-2 ${ui.numpadBarBg}`}>
+                    <input
+                      type="text"
+                      value={numpadValue}
+                      readOnly
+                      tabIndex={-1}
+                      aria-label={t('kassaApp.numpadPlaceholder')}
+                      className={`w-full min-w-0 border-none bg-transparent text-right text-2xl font-bold outline-none sm:text-3xl ${ui.numpadInput}`}
+                    />
+                  </div>
+                  <div
+                    className="grid shrink-0 grid-cols-4 touch-manipulation select-none gap-2.5 [grid-template-rows:repeat(4,minmax(2.75rem,1fr))]"
+                    onClick={(e) => {
+                      const el = (e.target as HTMLElement).closest('[data-retail-numpad-key]')
+                      if (!el || !(el instanceof HTMLElement)) return
+                      const k = el.dataset.retailNumpadKey
+                      if (k) handleNumpad(k)
+                    }}
+                  >
+                    {RETAIL_NUMPAD_KEYS.map((key) => (
+                      <button
+                        key={key}
+                        type="button"
+                        data-retail-numpad-key={key}
+                        className={ui.numpadKeyNum}
+                      >
+                        {key}
+                      </button>
+                    ))}
+                  </div>
+                  {numpadValue && parseFloat(numpadValue) > 0 ? (
+                    <button
+                      type="button"
+                      data-testid="retail-add-custom-amount"
+                      onClick={addCustomAmountFromNumpad}
+                      className={`mt-3 shrink-0 touch-manipulation py-4 text-base font-bold ${kassaPosButtonClass(true)}`}
+                    >
+                      {t('kassaApp.addAmount').replace('{amount}', parseFloat(numpadValue || '0').toFixed(2))}
+                    </button>
+                  ) : null}
+                </div>
+              </div>
             </div>
 
             <div
@@ -1578,9 +1704,11 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               <div className="flex touch-manipulation select-none gap-2.5">
                 <button
                   type="button"
-                  onClick={() => openArticleSearchKeyboard()}
-                  className={`flex items-center justify-center px-3 min-h-[3.5rem] py-3 ${KASSA_SIDEBAR_FOOTER_LEFT_COL} ${kassaPosButtonClass(false)}`}
-                  title={t('retailKassaPage.scanPlaceholder')}
+                  aria-pressed={numpadPanelVisible}
+                  data-testid="retail-numpad-toggle"
+                  onClick={toggleNumpadPanel}
+                  className={`flex items-center justify-center px-3 min-h-[3.5rem] py-3 ${KASSA_SIDEBAR_FOOTER_LEFT_COL} ${kassaPosButtonClass(numpadPanelVisible)}`}
+                  title={t('kassaApp.numpadToggle')}
                 >
                   <span className={kassaSidebarActionLabelClass}>{t('kassaApp.numpadToggle')}</span>
                 </button>
