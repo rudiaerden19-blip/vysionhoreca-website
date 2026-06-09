@@ -861,8 +861,10 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               aria-hidden
               onKeyDown={onBarcodeWedgeKeyDown}
               onBlur={() => {
-                if (priceFixSku) return
-                window.setTimeout(() => releaseScanFocus(), 50)
+                if (priceFixSku || articleSearchActiveRef.current) return
+                const ae = document.activeElement
+                if (ae && ae !== document.body && ae !== barcodeCaptureRef.current) return
+                window.setTimeout(() => releaseScanFocus(), 80)
               }}
               className="fixed left-0 top-0 h-px w-px opacity-0 overflow-hidden"
               aria-label={t('retailKassaPage.scanPlaceholder')}

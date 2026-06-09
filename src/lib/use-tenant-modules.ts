@@ -1,7 +1,6 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { usePathname } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import {
   customerNeedsPostTrialModulePicker,
@@ -106,6 +105,30 @@ export interface TenantModuleFlagsResult {
   needsPostTrialModulePicker: boolean
 }
 
+function tenantModuleFlagsEqual(a: TenantModuleFlagsResult, b: TenantModuleFlagsResult): boolean {
+  if (
+    a.loading !== b.loading ||
+    a.featureGroupOrders !== b.featureGroupOrders ||
+    a.featureLabelPrinting !== b.featureLabelPrinting ||
+    a.needsPostTrialModulePicker !== b.needsPostTrialModulePicker
+  ) {
+    return false
+  }
+  const accessKeys = Object.keys(a.moduleAccess) as TenantModuleId[]
+  for (const id of accessKeys) {
+    if (a.moduleAccess[id] !== b.moduleAccess[id]) return false
+  }
+  const ej = a.enabledModulesJson
+  const ej2 = b.enabledModulesJson
+  if (ej === ej2) return true
+  if (!ej || !ej2) return ej === ej2
+  const keys = new Set([...Object.keys(ej), ...Object.keys(ej2)])
+  for (const k of keys) {
+    if (ej[k] !== ej2[k]) return false
+  }
+  return true
+}
+
 const DEFAULT_FLAGS: TenantModuleFlagsResult = {
   moduleAccess: resolveTenantModules({
     tenantSlug: '',
@@ -125,7 +148,6 @@ export function useTenantModuleFlags(tenantSlug: string | undefined): TenantModu
 } {
   const [result, setResult] = useState<TenantModuleFlagsResult>(DEFAULT_FLAGS)
   const [tick, setTick] = useState(0)
-  const pathname = usePathname()
   const loadGenRef = useRef(0)
 
   const refetch = useCallback(() => {
@@ -184,18 +206,19 @@ export function useTenantModuleFlags(tenantSlug: string | undefined): TenantModu
 
       const needsPostTrialModulePicker = customerNeedsPostTrialModulePicker(slug, sub, row)
 
-      setResult({
+      const next: TenantModuleFlagsResult = {
         moduleAccess,
         enabledModulesJson: enabled,
         featureGroupOrders: !!(row as { feature_group_orders?: boolean })?.feature_group_orders,
         featureLabelPrinting: !!(row as { feature_label_printing?: boolean })?.feature_label_printing,
         loading: false,
         needsPostTrialModulePicker,
-      })
+      }
+      setResult((prev) => (tenantModuleFlagsEqual(prev, next) ? prev : next))
     }
 
     void load()
-  }, [tenantSlug, tick, pathname])
+  }, [tenantSlug, tick])
 
   useEffect(() => {
     if (!tenantSlug || typeof window === 'undefined') return
