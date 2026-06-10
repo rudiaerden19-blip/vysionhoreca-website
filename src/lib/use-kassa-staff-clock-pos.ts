@@ -5,6 +5,10 @@ import { flushSync } from 'react-dom'
 import { authFetch } from '@/lib/auth-headers'
 import { playClick, playSuccess } from '@/lib/sounds'
 import type { KassaStaffClockRow, KassaStaffPinState } from '@/components/kassa/KassaStaffClockUi'
+import {
+  readKassaActiveStaffPreference,
+  writeKassaActiveStaffPreference,
+} from '@/lib/kassa-active-staff-preference'
 
 export type KassaActiveStaff = { id: string; name: string }
 
@@ -25,8 +29,22 @@ export function useKassaStaffClockPos(opts: {
   const [staffClockPinModal, setStaffClockPinModal] = useState<KassaStaffPinState | null>(null)
   const [staffClockPinInput, setStaffClockPinInput] = useState('')
   const [staffClockPinError, setStaffClockPinError] = useState<string | null>(null)
-  const [activeKassaStaff, setActiveKassaStaff] = useState<KassaActiveStaff | null>(null)
+  const [activeKassaStaff, setActiveKassaStaffState] = useState<KassaActiveStaff | null>(() =>
+    readKassaActiveStaffPreference(tenant),
+  )
   const staffClockPinReqGen = useRef(0)
+
+  const setActiveKassaStaff = useCallback(
+    (next: KassaActiveStaff | null) => {
+      setActiveKassaStaffState(next)
+      writeKassaActiveStaffPreference(tenant, next)
+    },
+    [tenant],
+  )
+
+  useEffect(() => {
+    setActiveKassaStaffState(readKassaActiveStaffPreference(tenant))
+  }, [tenant])
 
   const loadStaffClockList = useCallback(async (loadOpts?: { background?: boolean }) => {
     const background = loadOpts?.background === true
@@ -68,7 +86,7 @@ export function useKassaStaffClockPos(opts: {
     if (!activeKassaStaff && clockedIn.length === 1) {
       setActiveKassaStaff({ id: clockedIn[0].id, name: clockedIn[0].name })
     }
-  }, [staffClockEnabled, staffClockListHydrated, staffClockList, activeKassaStaff])
+  }, [staffClockEnabled, staffClockListHydrated, staffClockList, activeKassaStaff, setActiveKassaStaff])
 
   const clockedInStaff = useMemo(
     () => staffClockList.filter((s) => s.hasOpenSession),
@@ -91,7 +109,7 @@ export function useKassaStaffClockPos(opts: {
     } catch {
       /* optional */
     }
-  }, [])
+  }, [setActiveKassaStaff])
 
   const openStaffSalesPickModal = useCallback(() => {
     playClick()
@@ -171,7 +189,7 @@ export function useKassaStaffClockPos(opts: {
         setStaffClockBusy(false)
       }
     }
-  }, [staffClockPinModal, staffClockPinInput, tenant, activeKassaStaff?.id, loadStaffClockList, staffClockErrorText, t])
+  }, [staffClockPinModal, staffClockPinInput, tenant, activeKassaStaff?.id, loadStaffClockList, staffClockErrorText, t, setActiveKassaStaff])
 
   const hasAnyStaffClockedIn = useMemo(
     () => staffClockList.some((s) => s.hasOpenSession),
@@ -188,10 +206,13 @@ export function useKassaStaffClockPos(opts: {
     [staffClockEnabled, staffClockListHydrated, hasAnyStaffClockedIn, activeKassaStaff],
   )
 
-  const selectActiveKassaStaff = useCallback((s: { id: string; name: string }) => {
-    playClick()
-    setActiveKassaStaff({ id: s.id, name: s.name })
-  }, [])
+  const selectActiveKassaStaff = useCallback(
+    (s: { id: string; name: string }) => {
+      playClick()
+      setActiveKassaStaff({ id: s.id, name: s.name })
+    },
+    [setActiveKassaStaff],
+  )
 
   const blockSaleWithoutStaffIfNeeded = useCallback((): boolean => {
     if (!requiresStaffSelectionForSale) return false
