@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
-import { lookupRetailLoyaltyMemberByScan } from '@/lib/retail-loyalty/server'
+import { lookupRetailLoyaltyMemberForKassaPos } from '@/lib/retail-loyalty/server'
 
 export async function GET(req: NextRequest) {
   const tenantSlug = req.nextUrl.searchParams.get('tenant')?.trim() || ''
@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: false, error: access.error || 'forbidden' }, { status: 403 })
   }
 
-  const member = await lookupRetailLoyaltyMemberByScan(tenantSlug, code)
+  const member = await lookupRetailLoyaltyMemberForKassaPos(tenantSlug, code)
   if (!member) {
     return NextResponse.json({ ok: false, member: null })
   }

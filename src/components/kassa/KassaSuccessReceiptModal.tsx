@@ -15,6 +15,10 @@ export function KassaSuccessReceiptModal({
   onClose,
   onPrint,
   printDisabled = false,
+  footerActions = 'print-close',
+  onEmail,
+  emailDisabled = false,
+  emailDisabledHint,
 }: {
   open: boolean
   order: KassaLastOrderReceipt
@@ -24,14 +28,25 @@ export function KassaSuccessReceiptModal({
   onPrint: () => Promise<void>
   /** Voorkom dubbeltik tijdens print / guard-ref sync. */
   printDisabled?: boolean
+  /** Winkelkassa: afdrukken + naar mail + sluiten. */
+  footerActions?: 'print-close' | 'print-email-close'
+  onEmail?: () => Promise<void>
+  emailDisabled?: boolean
+  emailDisabledHint?: string
 }) {
   const { t } = useLanguage()
   /** Meteen spinner na tik (parent `printDisabled` komt pas na re-render). */
   const [optimisticPrintBusy, setOptimisticPrintBusy] = useState(false)
+  const [optimisticEmailBusy, setOptimisticEmailBusy] = useState(false)
   const printBusy = printDisabled || optimisticPrintBusy
+  const emailBusy = optimisticEmailBusy
+  const anyBusy = printBusy || emailBusy
 
   useEffect(() => {
-    if (!open) setOptimisticPrintBusy(false)
+    if (!open) {
+      setOptimisticPrintBusy(false)
+      setOptimisticEmailBusy(false)
+    }
   }, [open])
 
   if (!open) return null
@@ -230,10 +245,10 @@ export function KassaSuccessReceiptModal({
           </div>
         </div>
 
-        <div className="p-4 border-t flex gap-3">
+        <div className="p-4 border-t flex flex-col gap-2 sm:flex-row sm:gap-3">
           <button
             type="button"
-            disabled={printBusy}
+            disabled={anyBusy}
             aria-busy={printBusy}
             onClick={() => {
               if (printBusy) return
@@ -273,9 +288,36 @@ export function KassaSuccessReceiptModal({
               </>
             )}
           </button>
+          {footerActions === 'print-email-close' && onEmail ? (
+            <button
+              type="button"
+              disabled={anyBusy || emailDisabled}
+              title={emailDisabled ? emailDisabledHint : undefined}
+              aria-busy={emailBusy}
+              onClick={() => {
+                if (emailBusy || emailDisabled) return
+                setOptimisticEmailBusy(true)
+                void onEmail().finally(() => setOptimisticEmailBusy(false))
+              }}
+              className={`flex-1 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 touch-manipulation min-h-[44px] transition-colors disabled:opacity-45 disabled:pointer-events-none ${
+                emailBusy
+                  ? 'cursor-wait bg-blue-50 text-blue-900'
+                  : 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800'
+              }`}
+            >
+              {emailBusy ? (
+                <span className="tabular-nums">{t('retailKassaPage.receiptEmailSending')}</span>
+              ) : (
+                <>
+                  <span aria-hidden>✉️</span>
+                  <span>{t('retailKassaPage.receiptEmailButton')}</span>
+                </>
+              )}
+            </button>
+          ) : null}
           <button
             type="button"
-            disabled={printBusy}
+            disabled={anyBusy}
             onClick={onClose}
             className="flex-1 py-3 rounded-xl bg-[#3C4D6B] text-white font-bold disabled:opacity-45 disabled:pointer-events-none"
           >

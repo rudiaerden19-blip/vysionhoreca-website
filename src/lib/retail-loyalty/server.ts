@@ -5,7 +5,7 @@ import {
   maxRetailLoyaltyRedeemPoints,
 } from '@/lib/retail-loyalty/redeem-math'
 import { sendRetailLoyaltyPassEmail } from '@/lib/retail-loyalty/send-pass-email'
-import type { RetailLoyaltyMemberPublic, RetailLoyaltySettings } from '@/lib/retail-loyalty/types'
+import type { RetailLoyaltyMemberPos, RetailLoyaltyMemberPublic, RetailLoyaltySettings } from '@/lib/retail-loyalty/types'
 import bcrypt from 'bcryptjs'
 
 const SETTINGS_SELECT =
@@ -80,10 +80,39 @@ export async function upsertRetailLoyaltySettings(
   return { ok: true }
 }
 
+async function resolveRetailLoyaltyMemberEmail(
+  supabase: NonNullable<ReturnType<typeof getServerSupabaseClient>>,
+  tenantSlug: string,
+  member: { email?: string | null; shop_customer_id?: string | null },
+): Promise<string | null> {
+  const direct = member.email?.trim().toLowerCase() || ''
+  if (direct.includes('@')) return direct
+  const customerId = member.shop_customer_id
+  if (!customerId) return null
+  const { data: cust } = await supabase
+    .from('shop_customers')
+    .select('email')
+    .eq('tenant_slug', tenantSlug)
+    .eq('id', customerId)
+    .maybeSingle()
+  const fromCustomer = cust?.email?.trim().toLowerCase() || ''
+  return fromCustomer.includes('@') ? fromCustomer : null
+}
+
 export async function lookupRetailLoyaltyMemberByScan(
   tenantSlug: string,
   rawCode: string,
 ): Promise<RetailLoyaltyMemberPublic | null> {
+  const pos = await lookupRetailLoyaltyMemberForKassaPos(tenantSlug, rawCode)
+  if (!pos) return null
+  const { email: _e, ...pub } = pos
+  return pub
+}
+
+export async function lookupRetailLoyaltyMemberForKassaPos(
+  tenantSlug: string,
+  rawCode: string,
+): Promise<RetailLoyaltyMemberPos | null> {
   const cardCode = normalizeRetailLoyaltyCardCode(rawCode)
   if (!cardCode) return null
 
@@ -100,12 +129,15 @@ export async function lookupRetailLoyaltyMemberByScan(
 
   if (!data) return null
 
+  const email = await resolveRetailLoyaltyMemberEmail(supabase, tenantSlug, data)
+
   return {
     id: data.id,
     card_code: data.card_code,
     display_name: data.display_name,
     phone: data.phone,
     points_balance: Number(data.points_balance) || 0,
+    email,
   }
 }
 

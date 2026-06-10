@@ -81,7 +81,7 @@ import { AccountMenuSessionBlock } from '@/components/AccountMenuSessionBlock'
 import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
 import { authFetch, buildShopInternalReturnPath } from '@/lib/auth-headers'
 import { isRetailLoyaltyCardScan } from '@/lib/retail-loyalty/card-code'
-import type { RetailLoyaltyMemberPublic, RetailLoyaltySettings } from '@/lib/retail-loyalty/types'
+import type { RetailLoyaltyMemberPos, RetailLoyaltySettings } from '@/lib/retail-loyalty/types'
 import {
   computeRetailLoyaltyRedeemEuroDiscount,
   maxRetailLoyaltyRedeemPoints,
@@ -247,6 +247,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [lastOrderReceipt, setLastOrderReceipt] = useState<KassaLastOrderReceipt | null>(null)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [successReceiptPrintBusy, setSuccessReceiptPrintBusy] = useState(false)
+  const [lastSaleCustomerEmail, setLastSaleCustomerEmail] = useState<string | null>(null)
   const [draftBonPrinting, setDraftBonPrinting] = useState(false)
   const [printAgentFallbackHtml, setPrintAgentFallbackHtml] = useState<string | null>(null)
   const [thermalPrintBanner, setThermalPrintBanner] = useState<string | null>(null)
@@ -291,7 +292,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     redeem_enabled: true,
     redeem_points_per_euro: 100,
   })
-  const [linkedLoyaltyMember, setLinkedLoyaltyMember] = useState<RetailLoyaltyMemberPublic | null>(
+  const [linkedLoyaltyMember, setLinkedLoyaltyMember] = useState<RetailLoyaltyMemberPos | null>(
     null,
   )
   const [loyaltyRedeemPoints, setLoyaltyRedeemPoints] = useState(0)
@@ -867,7 +868,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     const res = await authFetch(
       `/api/retail/loyalty/lookup?tenant=${encodeURIComponent(tenant)}&code=${encodeURIComponent(raw)}`,
     )
-    const data = (await res.json()) as { ok?: boolean; member?: RetailLoyaltyMemberPublic }
+    const data = (await res.json()) as { ok?: boolean; member?: RetailLoyaltyMemberPos }
     if (data.ok && data.member) {
       setLinkedLoyaltyMember(data.member)
       flashAddOkButton()
@@ -1305,6 +1306,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     const loyaltyMemberId =
       loyaltyEnabled && linkedLoyaltyMember ? linkedLoyaltyMember.id : undefined
     const loyaltyMemberSnapshot = linkedLoyaltyMember
+    const saleCustomerEmail = linkedLoyaltyMember?.email?.trim().toLowerCase() || null
     const redeemPointsForSale =
       loyaltyMemberId && loyaltyRedeemPoints > 0 ? loyaltyRedeemPoints : 0
     setPaying(true)
@@ -1332,6 +1334,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       activeKassaStaff?.name ?? null,
     )
     setLastOrderReceipt(receipt)
+    setLastSaleCustomerEmail(saleCustomerEmail && saleCustomerEmail.includes('@') ? saleCustomerEmail : null)
     setLoyaltyRedeemPoints(0)
     setLinkedLoyaltyMember(null)
     setCart([])
@@ -1642,6 +1645,9 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
           order={lastOrderReceipt}
           tenantInfo={tenantInfo}
           locale={locale}
+          footerActions="print-email-close"
+          emailDisabled={!lastSaleCustomerEmail}
+          emailDisabledHint={t('retailKassaPage.receiptEmailNoCustomer')}
           onClose={() => setShowSuccessModal(false)}
           printDisabled={successReceiptPrintBusy}
           onPrint={async () => {
@@ -1650,8 +1656,32 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               await printRetailReceipt(lastOrderReceipt)
             } finally {
               setSuccessReceiptPrintBusy(false)
-              setShowSuccessModal(false)
             }
+          }}
+          onEmail={async () => {
+            if (!lastSaleCustomerEmail || !lastOrderReceipt) return
+            const res = await authFetch('/api/retail/kassa/receipt-email', {
+              method: 'POST',
+              body: JSON.stringify({
+                tenantSlug: tenant,
+                toEmail: lastSaleCustomerEmail,
+                locale,
+                order: {
+                  ...lastOrderReceipt,
+                  createdAt: lastOrderReceipt.createdAt.toISOString(),
+                },
+              }),
+            })
+            const json = (await res.json()) as { ok?: boolean; error?: string }
+            if (!json.ok) {
+              if (json.error === 'smtp_not_configured') {
+                alert(t('retailLoyalty.emailNotConfigured'))
+              } else {
+                alert(t('retailKassaPage.receiptEmailFailed'))
+              }
+              return
+            }
+            alert(t('retailKassaPage.receiptEmailSent'))
           }}
         />
       ) : null}
