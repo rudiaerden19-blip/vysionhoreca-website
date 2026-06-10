@@ -3,6 +3,10 @@
 import { useState } from 'react'
 import { useLanguage } from '@/i18n'
 import { authFetch } from '@/lib/auth-headers'
+import {
+  capitalizeCustomerWords,
+  normalizeCustomerBtwNumber,
+} from '@/lib/capitalize-customer-fields'
 import { RetailLoyaltyPassShare } from '@/components/retail-loyalty/RetailLoyaltyPassShare'
 import type { RetailLoyaltyMemberPublic } from '@/lib/retail-loyalty/types'
 
@@ -15,11 +19,19 @@ type SearchHit = {
     address: string | null
     postal_code: string | null
     city: string | null
+    btw_number: string | null
   }
   loyaltyMember: RetailLoyaltyMemberPublic | null
 }
 
 type SearchPhase = 'idle' | 'searching' | 'done'
+
+function splitCustomerName(full: string): { first: string; last: string } {
+  const parts = full.trim().split(/\s+/).filter(Boolean)
+  if (parts.length === 0) return { first: '', last: '' }
+  if (parts.length === 1) return { first: parts[0], last: '' }
+  return { first: parts[0], last: parts.slice(1).join(' ') }
+}
 
 export function RetailLoyaltyNewPassPanel({
   tenant,
@@ -35,10 +47,14 @@ export function RetailLoyaltyNewPassPanel({
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null)
   const [showNewCustomerForm, setShowNewCustomerForm] = useState(false)
 
-  const [name, setName] = useState('')
-  const [address, setAddress] = useState('')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [street, setStreet] = useState('')
+  const [postalCode, setPostalCode] = useState('')
+  const [city, setCity] = useState('')
   const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
+  const [btwNumber, setBtwNumber] = useState('')
 
   const [creating, setCreating] = useState(false)
   const [lastCreatedCode, setLastCreatedCode] = useState<string | null>(null)
@@ -50,13 +66,15 @@ export function RetailLoyaltyNewPassPanel({
   function applyHitToForm(hit: SearchHit) {
     setSelectedCustomerId(hit.customer.id)
     setShowNewCustomerForm(false)
-    setName(hit.customer.name)
+    const { first, last } = splitCustomerName(hit.customer.name)
+    setFirstName(capitalizeCustomerWords(first))
+    setLastName(capitalizeCustomerWords(last))
     setEmail(hit.customer.email)
     setPhone(hit.customer.phone ?? '')
-    const addrParts = [hit.customer.address, hit.customer.postal_code, hit.customer.city].filter(
-      Boolean,
-    )
-    setAddress(addrParts.join(', '))
+    setStreet(capitalizeCustomerWords(hit.customer.address ?? ''))
+    setPostalCode(hit.customer.postal_code ?? '')
+    setCity(capitalizeCustomerWords(hit.customer.city ?? ''))
+    setBtwNumber(hit.customer.btw_number ?? '')
     if (hit.loyaltyMember) {
       setLastCreatedCode(hit.loyaltyMember.card_code)
     } else {
@@ -83,7 +101,11 @@ export function RetailLoyaltyNewPassPanel({
         setShowNewCustomerForm(true)
         if (q.includes('@')) setEmail(q)
         else if (/^[\d+\s()-]+$/.test(q)) setPhone(q)
-        else setName(q)
+        else {
+          const { first, last } = splitCustomerName(q)
+          setFirstName(capitalizeCustomerWords(first))
+          setLastName(capitalizeCustomerWords(last))
+        }
       } else if (list.length === 1) {
         applyHitToForm(list[0])
       }
@@ -98,10 +120,14 @@ export function RetailLoyaltyNewPassPanel({
     setResults([])
     setSelectedCustomerId(null)
     setShowNewCustomerForm(false)
-    setName('')
-    setAddress('')
+    setFirstName('')
+    setLastName('')
+    setStreet('')
+    setPostalCode('')
+    setCity('')
     setPhone('')
     setEmail('')
+    setBtwNumber('')
     if (keepSuccess) {
       setLastCreatedCode(keepSuccess.cardCode)
     } else {
@@ -109,9 +135,18 @@ export function RetailLoyaltyNewPassPanel({
     }
   }
 
+  function buildDisplayName(): string {
+    return capitalizeCustomerWords(`${firstName.trim()} ${lastName.trim()}`.trim())
+  }
+
   async function savePass(sendEmail: boolean, opts?: { resendExistingPass?: boolean }) {
-    if (!name.trim()) {
-      alert(t('retailLoyalty.newPassNameRequired'))
+    const displayName = buildDisplayName()
+    if (!firstName.trim()) {
+      alert(t('retailLoyalty.newPassFirstNameRequired'))
+      return
+    }
+    if (!lastName.trim()) {
+      alert(t('retailLoyalty.newPassLastNameRequired'))
       return
     }
     if (!email.trim()) {
@@ -121,14 +156,18 @@ export function RetailLoyaltyNewPassPanel({
     setCreating(true)
     setFeedback(null)
     try {
+      const btw = btwNumber.trim() ? normalizeCustomerBtwNumber(btwNumber) : undefined
       const res = await authFetch('/api/retail/loyalty/members', {
         method: 'POST',
         body: JSON.stringify({
           tenantSlug: tenant,
-          display_name: name.trim(),
+          display_name: displayName,
           phone: phone.trim() || undefined,
           email: email.trim(),
-          address: address.trim() || undefined,
+          address: street.trim() ? capitalizeCustomerWords(street.trim()) : undefined,
+          postal_code: postalCode.trim() || undefined,
+          city: city.trim() ? capitalizeCustomerWords(city.trim()) : undefined,
+          btw_number: btw || undefined,
           shop_customer_id: selectedCustomerId ?? undefined,
           sendPassEmail: sendEmail,
           resendExistingPass: opts?.resendExistingPass === true,
@@ -151,9 +190,8 @@ export function RetailLoyaltyNewPassPanel({
         }
         return
       }
-      const savedName = name.trim()
-      resetNewPassForm({ cardCode: json.member.card_code, displayName: savedName })
-      setLastCreatedDisplayName(savedName)
+      resetNewPassForm({ cardCode: json.member.card_code, displayName })
+      setLastCreatedDisplayName(displayName)
       if (json.warning === 'smtp_not_configured' || json.error === 'smtp_not_configured') {
         setFeedback(t('retailLoyalty.emailNotConfigured'))
       } else if (json.warning === 'existing_pass_mailed' || json.error === 'existing_pass_mailed') {
@@ -247,23 +285,69 @@ export function RetailLoyaltyNewPassPanel({
       showNewCustomerForm ? (
         <div className="space-y-3">
           <div className="grid gap-3 sm:grid-cols-2">
-            <label className="block text-sm sm:col-span-2">
-              <span className="font-medium text-gray-700">{t('retailLoyalty.fieldName')}</span>
+            <label className="block text-sm">
+              <span className="font-medium text-gray-700">{t('retailLoyalty.fieldFirstName')}</span>
               <input
                 type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                onBlur={() => setFirstName((v) => capitalizeCustomerWords(v))}
+                className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+              />
+            </label>
+            <label className="block text-sm">
+              <span className="font-medium text-gray-700">{t('retailLoyalty.fieldLastName')}</span>
+              <input
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                onBlur={() => setLastName((v) => capitalizeCustomerWords(v))}
                 className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
               />
             </label>
             <label className="block text-sm sm:col-span-2">
-              <span className="font-medium text-gray-700">{t('retailLoyalty.fieldAddress')}</span>
+              <span className="font-medium text-gray-700">{t('retailLoyalty.fieldStreet')}</span>
               <input
                 type="text"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
+                value={street}
+                onChange={(e) => setStreet(e.target.value)}
+                onBlur={() => setStreet((v) => capitalizeCustomerWords(v))}
                 className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
               />
+            </label>
+            <label className="block text-sm">
+              <span className="font-medium text-gray-700">{t('retailLoyalty.fieldPostalCode')}</span>
+              <input
+                type="text"
+                value={postalCode}
+                onChange={(e) => setPostalCode(e.target.value)}
+                className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+              />
+            </label>
+            <label className="block text-sm">
+              <span className="font-medium text-gray-700">{t('retailLoyalty.fieldCity')}</span>
+              <input
+                type="text"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                onBlur={() => setCity((v) => capitalizeCustomerWords(v))}
+                className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+              />
+            </label>
+            <label className="block text-sm sm:col-span-2">
+              <span className="font-medium text-gray-700">{t('retailLoyalty.fieldBtwNumber')}</span>
+              <input
+                type="text"
+                value={btwNumber}
+                onChange={(e) => setBtwNumber(e.target.value)}
+                onBlur={() => {
+                  const n = btwNumber.trim()
+                  if (n) setBtwNumber(normalizeCustomerBtwNumber(n))
+                }}
+                placeholder="BE0123456789"
+                className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+              />
+              <span className="mt-1 block text-xs text-gray-500">{t('retailLoyalty.fieldBtwHint')}</span>
             </label>
             <label className="block text-sm">
               <span className="font-medium text-gray-700">{t('retailLoyalty.fieldPhone')}</span>

@@ -36,6 +36,10 @@ export function retailReceiptI18nForLocale(locale: string): RetailReceiptI18n {
     defaultBusinessName: k.defaultBusinessName ?? 'Winkel',
     orderTypeTakeaway: r.orderTypeTakeaway ?? '',
     receiptNo: r.receiptNo ?? '',
+    invoiceTitle: r.invoiceTitle ?? 'FACTUUR',
+    invoiceNo: r.invoiceNo ?? r.receiptNo ?? '',
+    customerVatLabel: (vatNumber) =>
+      (r.customerVatLabel ?? '').replace('{vatNumber}', vatNumber),
     telPrefix: r.telPrefix ?? '',
     subtotal: r.subtotal ?? '',
     vatLabel: (rate: number) => (r.vat ?? 'BTW {rate}%').replace('{rate}', String(rate)),

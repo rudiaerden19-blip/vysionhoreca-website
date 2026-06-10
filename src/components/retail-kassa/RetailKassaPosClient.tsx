@@ -94,6 +94,7 @@ import {
 import { appendKassaCloseTipToAbsoluteLoginUrl } from '@/lib/shop-login-kassa-tip'
 import { isAndroidTabletPrintClient, openCashDrawer } from '@/lib/vysion-print-agent-client'
 import { playClick } from '@/lib/sounds'
+import { retailCustomerInvoiceFromLoyaltyMember } from '@/lib/retail-kassa/customer-invoice-receipt'
 import { useKassaStaffClockPos } from '@/lib/use-kassa-staff-clock-pos'
 
 const KASSA_HEADER_QUICK_LINK_LABEL = 'text-[11px] leading-snug sm:text-xs'
@@ -489,6 +490,10 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       defaultBusinessName: t('kassaApp.defaultBusinessName'),
       orderTypeTakeaway: t('kassaReceipt.orderTypeTakeaway'),
       receiptNo: t('kassaReceipt.receiptNo'),
+      invoiceTitle: t('kassaReceipt.invoiceTitle'),
+      invoiceNo: t('kassaReceipt.invoiceNo'),
+      customerVatLabel: (vatNumber) =>
+        t('kassaReceipt.customerVatLabel').replace('{vatNumber}', vatNumber),
       telPrefix: t('kassaReceipt.telPrefix'),
       subtotal: t('kassaReceipt.subtotal'),
       vatLabel: (rate) => t('kassaReceipt.vat').replace('{rate}', String(rate)),
@@ -1330,6 +1335,10 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       discountEuro > 0 ? discountEuro : undefined,
       activeKassaStaff?.name ?? null,
     )
+    const customerInvoice = retailCustomerInvoiceFromLoyaltyMember(loyaltyMemberSnapshot)
+    if (customerInvoice) {
+      receipt.retailCustomerInvoice = customerInvoice
+    }
     setLastOrderReceipt(receipt)
     setLastSaleCustomerEmail(saleCustomerEmail && saleCustomerEmail.includes('@') ? saleCustomerEmail : null)
     setLoyaltyRedeemPoints(0)

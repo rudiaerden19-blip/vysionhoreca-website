@@ -6,6 +6,10 @@ import {
 } from '@/lib/retail-loyalty/redeem-math'
 import { sendRetailLoyaltyPassEmail } from '@/lib/retail-loyalty/send-pass-email'
 import type { RetailLoyaltyMemberPos, RetailLoyaltyMemberPublic, RetailLoyaltySettings } from '@/lib/retail-loyalty/types'
+import {
+  capitalizeCustomerWords,
+  normalizeCustomerBtwNumber,
+} from '@/lib/capitalize-customer-fields'
 import bcrypt from 'bcryptjs'
 
 const SETTINGS_SELECT =
@@ -130,6 +134,9 @@ export async function lookupRetailLoyaltyMemberForKassaPos(
   if (!data) return null
 
   const email = await resolveRetailLoyaltyMemberEmail(supabase, tenantSlug, data)
+  const customerFields = data.shop_customer_id
+    ? await loadShopCustomerReceiptFields(supabase, tenantSlug, data.shop_customer_id)
+    : null
 
   return {
     id: data.id,
@@ -138,6 +145,38 @@ export async function lookupRetailLoyaltyMemberForKassaPos(
     phone: data.phone,
     points_balance: Number(data.points_balance) || 0,
     email,
+    customer_name: customerFields?.name ?? null,
+    customer_address: customerFields?.address ?? null,
+    customer_postal_code: customerFields?.postal_code ?? null,
+    customer_city: customerFields?.city ?? null,
+    customer_btw_number: customerFields?.btw_number ?? null,
+  }
+}
+
+async function loadShopCustomerReceiptFields(
+  supabase: NonNullable<ReturnType<typeof getServerSupabaseClient>>,
+  tenantSlug: string,
+  shopCustomerId: string,
+): Promise<{
+  name: string
+  address: string | null
+  postal_code: string | null
+  city: string | null
+  btw_number: string | null
+} | null> {
+  const { data } = await supabase
+    .from('shop_customers')
+    .select('name, address, postal_code, city, btw_number')
+    .eq('tenant_slug', tenantSlug)
+    .eq('id', shopCustomerId)
+    .maybeSingle()
+  if (!data) return null
+  return {
+    name: data.name ?? '',
+    address: data.address ?? null,
+    postal_code: data.postal_code ?? null,
+    city: data.city ?? null,
+    btw_number: data.btw_number?.trim() || null,
   }
 }
 
@@ -149,6 +188,7 @@ export type RetailLoyaltyShopCustomerHit = {
   address: string | null
   postal_code: string | null
   city: string | null
+  btw_number: string | null
 }
 
 export type RetailLoyaltyCustomerSearchHit = {
@@ -171,7 +211,7 @@ export async function searchRetailLoyaltyCustomers(
 
   let customerQuery = supabase
     .from('shop_customers')
-    .select('id, name, email, phone, address, postal_code, city')
+    .select('id, name, email, phone, address, postal_code, city, btw_number')
     .eq('tenant_slug', tenantSlug)
     .limit(12)
 
@@ -197,6 +237,7 @@ export async function searchRetailLoyaltyCustomers(
       address: row.address ?? null,
       postal_code: row.postal_code ?? null,
       city: row.city ?? null,
+      btw_number: row.btw_number?.trim() || null,
     }
     let loyaltyMember: RetailLoyaltyMemberPublic | null = null
 
@@ -250,21 +291,30 @@ async function upsertShopCustomerForLoyalty(
     email: string
     phone?: string
     address?: string
+    postal_code?: string
+    city?: string
+    btw_number?: string
   },
 ): Promise<{ ok: boolean; customerId?: string; error?: string }> {
   const supabase = getServerSupabaseClient()
   if (!supabase) return { ok: false, error: 'db_unavailable' }
 
   const email = input.email.trim().toLowerCase()
-  const name = input.name.trim()
+  const name = capitalizeCustomerWords(input.name.trim())
   if (!email || !email.includes('@')) return { ok: false, error: 'email_required' }
   if (!name) return { ok: false, error: 'name_required' }
+
+  const btwRaw = input.btw_number?.trim()
+  const btw_number = btwRaw ? normalizeCustomerBtwNumber(btwRaw) || null : null
 
   const patch = {
     name,
     email,
     phone: input.phone?.trim() || null,
-    address: input.address?.trim() || null,
+    address: input.address?.trim() ? capitalizeCustomerWords(input.address.trim()) : null,
+    postal_code: input.postal_code?.trim() || null,
+    city: input.city?.trim() ? capitalizeCustomerWords(input.city.trim()) : null,
+    btw_number,
     updated_at: new Date().toISOString(),
   }
 
@@ -324,6 +374,9 @@ export async function createRetailLoyaltyMember(
     phone?: string
     email?: string
     address?: string
+    postal_code?: string
+    city?: string
+    btw_number?: string
     shop_customer_id?: string
     card_code?: string
     sendPassEmail?: boolean
@@ -340,10 +393,13 @@ export async function createRetailLoyaltyMember(
   if (emailNorm && input.display_name?.trim()) {
     const custRes = await upsertShopCustomerForLoyalty(tenantSlug, {
       shop_customer_id: shopCustomerId,
-      name: input.display_name.trim(),
+      name: capitalizeCustomerWords(input.display_name.trim()),
       email: emailNorm,
       phone: input.phone,
       address: input.address,
+      postal_code: input.postal_code,
+      city: input.city,
+      btw_number: input.btw_number,
     })
     if (!custRes.ok) return { ok: false, error: custRes.error }
     shopCustomerId = custRes.customerId
@@ -451,7 +507,7 @@ export async function createRetailLoyaltyMember(
     .insert({
       tenant_slug: tenantSlug,
       card_code: cardCode,
-      display_name: input.display_name?.trim() || null,
+      display_name: capitalizeCustomerWords(input.display_name?.trim() ?? '') || null,
       phone: input.phone?.trim() || null,
       email: emailNorm || null,
       shop_customer_id: shopCustomerId ?? null,

@@ -9,6 +9,9 @@ const CreateSchema = z.object({
   phone: z.string().max(40).optional(),
   email: z.string().email().max(200).optional(),
   address: z.string().max(500).optional(),
+  postal_code: z.string().max(20).optional(),
+  city: z.string().max(255).optional(),
+  btw_number: z.string().max(50).optional(),
   shop_customer_id: z.string().uuid().optional(),
   sendPassEmail: z.boolean().optional(),
   resendExistingPass: z.boolean().optional(),
@@ -35,7 +38,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: 'invalid_body' }, { status: 400 })
   }
 
-  const { tenantSlug, display_name, phone, email, address, shop_customer_id, sendPassEmail, resendExistingPass } =
+  const { tenantSlug, display_name, phone, email, address, postal_code, city, btw_number, shop_customer_id, sendPassEmail, resendExistingPass } =
     parsed.data
   const access = await verifyTenantOrSuperAdmin(req, tenantSlug)
   if (!access.authorized) {
@@ -52,6 +55,9 @@ export async function POST(req: NextRequest) {
     phone,
     email,
     address,
+    postal_code,
+    city,
+    btw_number,
     shop_customer_id,
     sendPassEmail: sendPassEmail === true,
     emailOrigin: origin,

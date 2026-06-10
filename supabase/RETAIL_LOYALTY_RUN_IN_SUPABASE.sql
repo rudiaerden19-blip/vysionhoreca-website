@@ -6,6 +6,9 @@
 
 BEGIN;
 
+ALTER TABLE shop_customers
+  ADD COLUMN IF NOT EXISTS btw_number VARCHAR(50);
+
 -- ── Instellingen per tenant ───────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS retail_loyalty_settings (
   tenant_slug TEXT PRIMARY KEY,

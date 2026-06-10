@@ -27,4 +27,9 @@ export type RetailLoyaltyMemberPublic = Pick<
 /** POS-kassa: e-mail voor bon versturen (niet op publieke winkelpas-pagina). */
 export type RetailLoyaltyMemberPos = RetailLoyaltyMemberPublic & {
   email: string | null
+  customer_name?: string | null
+  customer_address?: string | null
+  customer_postal_code?: string | null
+  customer_city?: string | null
+  customer_btw_number?: string | null
 }

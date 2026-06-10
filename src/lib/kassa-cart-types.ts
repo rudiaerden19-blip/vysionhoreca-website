@@ -36,6 +36,13 @@ export interface KassaReceiptVatLine {
   tax: number
 }
 
+export interface KassaReceiptRetailCustomerInvoice {
+  name: string
+  addressLine?: string
+  postalCity?: string
+  vatNumber: string
+}
+
 export interface KassaReceiptRetailLoyalty {
   memberLabel?: string
   pointsEarned: number
@@ -63,4 +70,6 @@ export interface KassaLastOrderReceipt {
   helpedByStaffName?: string | null
   /** Alleen winkelkassa — punten op bon / success-modal */
   retailLoyalty?: KassaReceiptRetailLoyalty
+  /** Klant met BTW-nummer: bon wordt factuur op print/mail */
+  retailCustomerInvoice?: KassaReceiptRetailCustomerInvoice
 }

@@ -14,6 +14,9 @@ export type RetailReceiptI18n = {
   defaultBusinessName: string
   orderTypeTakeaway: string
   receiptNo: string
+  invoiceTitle: string
+  invoiceNo: string
+  customerVatLabel: (vatNumber: string) => string
   telPrefix: string
   subtotal: string
   vatLabel: (rate: number) => string
@@ -153,11 +156,13 @@ export function buildRetailKassaReceiptHtmlDocument(opts: {
   }
 
   const orderTypePlain = labels.orderTypeTakeaway
+  const invoice = order.retailCustomerInvoice
   const receiptRefDisplay = isDraft
     ? '—'
     : order.checkoutReference ?? (order.orderNumber > 0 ? String(order.orderNumber) : '—')
+  const refLabel = invoice ? labels.invoiceNo : labels.receiptNo
   const payLabel = payLabelForOrder(order, labels, isDraft)
-  const docTitle = `${labels.receiptNo}${receiptRefDisplay}`
+  const docTitle = `${refLabel}${receiptRefDisplay}`
   const dateStr = order.createdAt.toLocaleString(appLocaleToBcp47(locale), {
     day: '2-digit',
     month: '2-digit',
@@ -177,9 +182,20 @@ export function buildRetailKassaReceiptHtmlDocument(opts: {
       </div>
       <div class="divider"></div>
       ${isDraft ? `<div class="center bold">${escapeReceiptHtml(labels.draftBanner)}</div><div class="divider-solid"></div>` : ''}
+      ${
+        invoice
+          ? `<div class="center bold big">${escapeReceiptHtml(labels.invoiceTitle)}</div>
+      <div class="divider-solid"></div>
+      <div class="small">${escapeReceiptHtml(invoice.name)}</div>
+      ${invoice.addressLine ? `<div class="small">${escapeReceiptHtml(invoice.addressLine)}</div>` : ''}
+      ${invoice.postalCity ? `<div class="small">${escapeReceiptHtml(invoice.postalCity)}</div>` : ''}
+      <div class="small bold">${escapeReceiptHtml(labels.customerVatLabel(invoice.vatNumber))}</div>
+      <div class="divider-solid"></div>`
+          : ''
+      }
       <div class="center order-type">${escapeReceiptHtml(orderTypeLabel)}</div>
       <div class="row small">
-        <span>${escapeReceiptHtml(labels.receiptNo)}${escapeReceiptHtml(receiptRefDisplay)}</span>
+        <span>${escapeReceiptHtml(refLabel)}${escapeReceiptHtml(receiptRefDisplay)}</span>
         <span>${escapeReceiptHtml(dateStr)}</span>
       </div>
       <div class="divider-solid"></div>
@@ -272,11 +288,13 @@ export async function printRetailKassaReceipt(opts: {
   }
 
   const orderTypePlain = labels.orderTypeTakeaway
+  const invoice = order.retailCustomerInvoice
   const receiptRefDisplay = isDraft
     ? '—'
     : order.checkoutReference ?? (order.orderNumber > 0 ? String(order.orderNumber) : '—')
+  const refLabel = invoice ? labels.invoiceNo : labels.receiptNo
   const payLabel = payLabelForOrder(order, labels, isDraft)
-  const docTitle = `${labels.receiptNo}${receiptRefDisplay}`
+  const docTitle = `${refLabel}${receiptRefDisplay}`
   const dateStr = order.createdAt.toLocaleString(appLocaleToBcp47(locale), {
     day: '2-digit',
     month: '2-digit',
@@ -297,8 +315,17 @@ export async function printRetailKassaReceipt(opts: {
     bonLines.push(labels.draftBanner)
     bonLines.push('--------------------------------')
   }
+  if (invoice) {
+    bonLines.push(labels.invoiceTitle)
+    bonLines.push('--------------------------------')
+    bonLines.push(invoice.name)
+    if (invoice.addressLine) bonLines.push(invoice.addressLine)
+    if (invoice.postalCity) bonLines.push(invoice.postalCity)
+    bonLines.push(labels.customerVatLabel(invoice.vatNumber))
+    bonLines.push('--------------------------------')
+  }
   bonLines.push(orderTypePlain)
-  bonLines.push(`${labels.receiptNo}${receiptRefDisplay}  ${dateStr}`)
+  bonLines.push(`${refLabel}${receiptRefDisplay}  ${dateStr}`)
   bonLines.push('--------------------------------')
   for (const i of order.items) {
     const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
