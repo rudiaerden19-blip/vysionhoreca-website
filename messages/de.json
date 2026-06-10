@@ -5933,6 +5933,8 @@
     "newPassNameRequired": "Bitte Name eingeben.",
     "newPassEmailRequired": "E-Mail für den Barcode-Versand eingeben.",
     "passEmailSent": "Der Pass wurde per E-Mail gesendet.",
+    "passEmailSavePhotosLink": "Barcode in Fotos speichern",
+    "passEmailSavePhotosHint": "Link auf dem Handy öffnen und «Barcode speichern (Bild)» tippen — Fotos oder Dateien wählen.",
     "passEmailFailed": "Pass erstellt, E-Mail-Versand fehlgeschlagen.",
     "emailNotConfigured": "Pass erstellt. E-Mail unter Profil → E-Mail-Einstellungen einrichten.",
     "deletePass": "Löschen",

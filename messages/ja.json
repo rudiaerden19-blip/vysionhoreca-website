@@ -5910,6 +5910,8 @@
     "newPassNameRequired": "名前を入力してください。",
     "newPassEmailRequired": "バーコード送信のためメールを入力してください。",
     "passEmailSent": "パスをメールで送信しました。",
+    "passEmailSavePhotosLink": "バーコードを写真に保存",
+    "passEmailSavePhotosHint": "スマホでリンクを開き「バーコードを保存（画像）」をタップ — 写真またはファイルを選択。",
     "passEmailFailed": "パスは作成しましたが、メール送信に失敗しました。",
     "emailNotConfigured": "パスを作成しました。プロフィールのメール設定を行ってください。",
     "deletePass": "削除",

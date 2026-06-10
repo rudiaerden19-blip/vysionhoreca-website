@@ -1,7 +1,14 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import nlMessages from '../../../messages/nl.json'
 import { buildEan13BarcodeEmailHtml } from '@/lib/retail-loyalty/ean13-barcode-svg'
+import { buildRetailLoyaltyPassAbsoluteUrl } from '@/lib/retail-loyalty/pass-url'
 import { createMailTransporter, resolveTenantSmtp } from '@/lib/retail-loyalty/tenant-smtp'
 import { logger } from '@/lib/logger'
+
+const passEmailCopy = nlMessages.retailLoyalty as {
+  passEmailSavePhotosLink?: string
+  passEmailSavePhotosHint?: string
+}
 
 function escapeHtml(s: string): string {
   return s
@@ -46,11 +53,21 @@ export async function sendRetailLoyaltyPassEmail(opts: {
 
   const shopName = await loadShopDisplayName(supabase, tenantSlug, smtpRes.smtp.fromName)
   const barcodeHtml = buildEan13BarcodeEmailHtml(cardCode, { barHeightPx: 88, moduleWidthPx: 3 })
+  const passPageUrl = buildRetailLoyaltyPassAbsoluteUrl(opts.origin, tenantSlug, cardCode)
+  const saveLinkLabel =
+    passEmailCopy.passEmailSavePhotosLink?.trim() || 'Barcode opslaan in Foto\'s'
+  const saveLinkHint =
+    passEmailCopy.passEmailSavePhotosHint?.trim() ||
+    'Open deze link op je telefoon en tik op «Barcode opslaan (foto)».'
 
   const html = `
     <div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto;color:#111;text-align:center;">
       <p style="margin:0 0 24px;font-size:20px;font-weight:700;">${escapeHtml(shopName)}</p>
       ${barcodeHtml ?? ''}
+      <p style="margin:28px 0 10px;font-size:16px;line-height:1.4;">
+        <a href="${escapeHtml(passPageUrl)}" style="color:#1d4ed8;font-weight:700;text-decoration:underline;">${escapeHtml(saveLinkLabel)}</a>
+      </p>
+      <p style="margin:0;font-size:13px;line-height:1.45;color:#444;">${escapeHtml(saveLinkHint)}</p>
     </div>
   `.trim()
 
@@ -61,7 +78,7 @@ export async function sendRetailLoyaltyPassEmail(opts: {
       to: email,
       subject: shopName,
       html,
-      text: shopName,
+      text: `${shopName}\n\n${saveLinkLabel}\n${passPageUrl}\n\n${saveLinkHint}`,
     })
     return { ok: true }
   } catch (err) {

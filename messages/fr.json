@@ -5933,6 +5933,8 @@
     "newPassNameRequired": "Indiquez un nom.",
     "newPassEmailRequired": "Indiquez un e-mail pour envoyer le code-barres.",
     "passEmailSent": "La carte a été envoyée par e-mail.",
+    "passEmailSavePhotosLink": "Enregistrer le code-barres dans Photos",
+    "passEmailSavePhotosHint": "Ouvrez ce lien sur votre téléphone et touchez « Enregistrer le code-barres (image) » — choisissez Photos ou Fichiers.",
     "passEmailFailed": "Carte créée, mais l'e-mail n'a pas pu être envoyé.",
     "emailNotConfigured": "Carte créée. Configurez l'e-mail dans Profil → paramètres e-mail.",
     "deletePass": "Supprimer",

@@ -5910,6 +5910,8 @@
     "newPassNameRequired": "Introduzca un nombre.",
     "newPassEmailRequired": "Introduzca un email para enviar el código.",
     "passEmailSent": "La tarjeta se envió por email.",
+    "passEmailSavePhotosLink": "Guardar código en Fotos",
+    "passEmailSavePhotosHint": "Abre este enlace en el móvil y pulsa «Guardar código de barras (imagen)» — elige Fotos o Archivos.",
     "passEmailFailed": "Tarjeta creada, pero falló el envío del email.",
     "emailNotConfigured": "Tarjeta creada. Configure el email en Perfil → ajustes de email.",
     "deletePass": "Eliminar",

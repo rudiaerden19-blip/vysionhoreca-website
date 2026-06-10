@@ -5910,6 +5910,8 @@
     "newPassNameRequired": "Inserisci un nome.",
     "newPassEmailRequired": "Inserisci un'email per inviare il codice.",
     "passEmailSent": "La tessera è stata inviata via email.",
+    "passEmailSavePhotosLink": "Salva codice in Foto",
+    "passEmailSavePhotosHint": "Apri il link sul telefono e tocca «Salva codice a barre (immagine)» — scegli Foto o File.",
     "passEmailFailed": "Tessera creata, invio email non riuscito.",
     "emailNotConfigured": "Tessera creata. Configura l'email in Profilo → impostazioni email.",
     "deletePass": "Elimina",

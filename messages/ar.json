@@ -5910,6 +5910,8 @@
     "newPassNameRequired": "أدخل الاسم.",
     "newPassEmailRequired": "أدخل البريد لإرسال الرمز.",
     "passEmailSent": "تم إرسال البطاقة بالبريد.",
+    "passEmailSavePhotosLink": "حفظ الرمز الشريطي في الصور",
+    "passEmailSavePhotosHint": "افتح الرابط على هاتفك واضغط «حفظ الرمز (صورة)» — اختر الصور أو الملفات.",
     "passEmailFailed": "تم إنشاء البطاقة، فشل إرسال البريد.",
     "emailNotConfigured": "تم إنشاء البطاقة. اضبط البريد من الملف الشخصي → إعدادات البريد.",
     "deletePass": "حذف",

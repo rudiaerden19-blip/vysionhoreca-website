@@ -5869,6 +5869,8 @@
     "newPassNameRequired": "Enter a name.",
     "newPassEmailRequired": "Enter an email address to send the barcode.",
     "passEmailSent": "The store pass was sent by email.",
+    "passEmailSavePhotosLink": "Save barcode to Photos",
+    "passEmailSavePhotosHint": "Open this link on your phone and tap «Save barcode (image)» — choose Photos or Files.",
     "passEmailFailed": "Pass created, but sending email failed.",
     "emailNotConfigured": "Pass created. Configure email under Profile → email settings to send mail.",
     "deletePass": "Delete",
