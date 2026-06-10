@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import { CACHE_TTL, cache, cacheKey } from '@/lib/cache'
 
 /** Verkoopbare eenheid: variant-SKU of legacy product zonder varianten. */
 export type RetailPosSku = {
@@ -124,7 +125,7 @@ export function buildRetailSkusFromRows(products: ProductRow[], variants: Varian
   return skus
 }
 
-export async function fetchRetailPosSkus(tenantSlug: string): Promise<RetailPosSku[]> {
+async function fetchRetailPosSkusFromDb(tenantSlug: string): Promise<RetailPosSku[]> {
   if (!supabase) return []
   const [prodRes, varRes] = await Promise.all([
     supabase
@@ -145,6 +146,24 @@ export async function fetchRetailPosSkus(tenantSlug: string): Promise<RetailPosS
   return buildRetailSkusFromRows(
     (prodRes.data || []) as ProductRow[],
     (varRes.data || []) as VariantRow[],
+  )
+}
+
+export function invalidateRetailPosSkuCache(tenantSlug: string): void {
+  cache.invalidate(cacheKey('retail_pos_skus', tenantSlug))
+}
+
+/** Gecachte catalogus — `fresh` na writes of expliciete reload. */
+export async function fetchRetailPosSkus(
+  tenantSlug: string,
+  options?: { fresh?: boolean },
+): Promise<RetailPosSku[]> {
+  const key = cacheKey('retail_pos_skus', tenantSlug)
+  if (options?.fresh) invalidateRetailPosSkuCache(tenantSlug)
+  return cache.getOrFetch(
+    key,
+    () => fetchRetailPosSkusFromDb(tenantSlug),
+    CACHE_TTL.RETAIL_POS_SKUS,
   )
 }
 

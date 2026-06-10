@@ -69,7 +69,7 @@ async function updateSkuStock(
     const row = (Array.isArray(r.data) ? r.data[0] : r.data) as Record<string, unknown> | undefined
     if (!row) return { ok: false, error: 'empty_row' }
 
-    const refreshed = await fetchRetailPosSkus(tenantSlug)
+    const refreshed = await fetchRetailPosSkus(tenantSlug, { fresh: true })
     const updated = refreshed.find((s) => s.lineKey === sku.lineKey)
     return updated ? { ok: true, sku: updated } : { ok: true, sku }
   }
@@ -88,7 +88,7 @@ async function updateSkuStock(
     { tenantSlug, select: PRODUCT_STOCK_SELECT },
   )
   if (!r.ok) return { ok: false, error: r.error || 'update_failed' }
-  const refreshed = await fetchRetailPosSkus(tenantSlug)
+  const refreshed = await fetchRetailPosSkus(tenantSlug, { fresh: true })
   const updated = refreshed.find((s) => s.lineKey === sku.lineKey)
   return updated ? { ok: true, sku: updated } : { ok: true, sku }
 }
@@ -233,7 +233,7 @@ export async function createRetailSkuFromScan(
     return { ok: false, error: ins.error || 'insert_failed' }
   }
 
-  const refreshed = await fetchRetailPosSkus(tenantSlug)
+  const refreshed = await fetchRetailPosSkus(tenantSlug, { fresh: true })
   const sku = findRetailSkuByCode(refreshed, barcodeRaw) ?? refreshed[refreshed.length - 1]
   return sku ? { ok: true, sku } : { ok: false, error: 'sku_missing' }
 }
@@ -324,7 +324,7 @@ export async function updateRetailSkuPrice(
     if (!nameRes.ok) return { ok: false, error: nameRes.error || 'update_failed' }
   }
 
-  const refreshed = await fetchRetailPosSkus(tenantSlug)
+  const refreshed = await fetchRetailPosSkus(tenantSlug, { fresh: true })
   const updated = refreshed.find((s) => s.lineKey === sku.lineKey)
   if (!updated) return { ok: false, error: 'sku_missing' }
   return { ok: true, sku: updated }

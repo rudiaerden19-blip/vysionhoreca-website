@@ -169,6 +169,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const scanBarRef = useRef<HTMLDivElement>(null)
   const cartScrollRef = useRef<HTMLDivElement>(null)
   const listScrollTargetRef = useRef<string | null>(null)
+  const [listScrollTick, setListScrollTick] = useState(0)
   const langRef = useRef<HTMLDivElement>(null)
 
   const [tenantInfo, setTenantInfo] = useState<TenantSettings | null>(null)
@@ -217,10 +218,11 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [addOkFlash, setAddOkFlash] = useState(false)
   const addOkFlashTimersRef = useRef<ReturnType<typeof setTimeout>[]>([])
 
-  const reload = useCallback(async () => {
-    setLoading(true)
-    const list = await fetchRetailPosSkus(tenant)
+  const reload = useCallback(async (options?: { fresh?: boolean }) => {
+    if (skusRef.current.length === 0 || options?.fresh) setLoading(true)
+    const list = await fetchRetailPosSkus(tenant, options?.fresh ? { fresh: true } : undefined)
     setSkus(list)
+    skusRef.current = list
     setLoading(false)
   }, [tenant])
 
@@ -453,6 +455,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
 
   function queueListScroll(lineKey: string) {
     listScrollTargetRef.current = lineKey
+    setListScrollTick((n) => n + 1)
   }
 
   useLayoutEffect(() => {
@@ -465,7 +468,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     const cartRow = cart?.querySelector(`[data-retail-cart-line="${target}"]`)
     scanRow?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
     cartRow?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
-  }, [cart, stockActivity])
+  }, [listScrollTick])
 
   function removeStockActivityLine(activityKey: string) {
     playClick()
@@ -659,22 +662,24 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     const res = await createRetailSkuFromScan(tenant, { barcode: trimmed, name, price })
     if (!res.ok) return null
 
-    const list = await fetchRetailPosSkus(tenant)
+    const list = await fetchRetailPosSkus(tenant, { fresh: true })
     setSkus(list)
     skusRef.current = list
     return resolveRetailSkuLookup(list, trimmed) ?? res.sku ?? null
   }
 
   async function resolveOrImportSku(code: string): Promise<RetailPosSku | null> {
-    let catalog = skusRef.current
-    let hit = resolveRetailSkuLookup(catalog, code)
+    const catalog = skusRef.current
+    const hit = resolveRetailSkuLookup(catalog, code)
     if (hit) return hit
 
-    const refreshed = await fetchRetailPosSkus(tenant)
-    setSkus(refreshed)
-    skusRef.current = refreshed
-    hit = resolveRetailSkuLookup(refreshed, code)
-    if (hit) return hit
+    if (catalog.length === 0) {
+      const list = await fetchRetailPosSkus(tenant)
+      setSkus(list)
+      skusRef.current = list
+      const retry = resolveRetailSkuLookup(list, code)
+      if (retry) return retry
+    }
 
     return importSkuFromBarcode(code)
   }
@@ -986,7 +991,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       setImportModalOpen(false)
       setImportPreview([])
       setImportHighlight(null)
-      await reload()
+      await reload({ fresh: true })
       focusBarcodeCapture()
     } finally {
       setImportBusy(false)
@@ -1066,7 +1071,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     setCart([])
     setSelectedListLineKey(null)
     setLastScannedSku(null)
-    await reload()
+    await reload({ fresh: true })
     setShowSuccessModal(true)
     focusBarcodeCapture()
   }
@@ -1566,6 +1571,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             </button>
             <Link
               href={`${baseUrl}/voorraad`}
+              prefetch={false}
               data-testid="retail-nav-voorraad"
               onClick={() => playClick()}
               className={retailTopNavLinkClass}
@@ -1574,6 +1580,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             </Link>
             <Link
               href={`${baseUrl}/rapporten`}
+              prefetch={false}
               data-testid="retail-nav-rapporten"
               onClick={() => playClick()}
               className={retailTopNavLinkClass}
@@ -1582,6 +1589,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             </Link>
             <Link
               href={`${baseUrl}/modules`}
+              prefetch={false}
               data-testid="retail-nav-instellingen"
               onClick={() => playClick()}
               className={retailTopNavLinkClass}

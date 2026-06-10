@@ -91,6 +91,7 @@ export const CACHE_TTL = {
   TENANT_MODULE_FLAGS: 60000, // 1 minute - module-toggles + plan veranderen zelden tijdens een sessie
   MENU_CATEGORIES: 60000,     // 1 minute
   MENU_PRODUCTS: 30000,       // 30 seconds
+  RETAIL_POS_SKUS: 60000,     // 1 minute — winkelkassa module-wissels
   OPENING_HOURS: 300000,      // 5 minutes - very static
   DELIVERY_SETTINGS: 60000,   // 1 minute
   PRODUCT_OPTIONS: 60000,     // 1 minute
