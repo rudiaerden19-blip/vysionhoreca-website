@@ -170,6 +170,13 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
           labelKey: itemLabelKey('sm_retail_kassa_producten'),
           href: `${baseUrl}/producten`,
         },
+        {
+          id: 'sm_retail_loyalty',
+          icon: '🎫',
+          label: 'Winkelpas',
+          labelKey: itemLabelKey('sm_retail_loyalty'),
+          href: `${baseUrl}/retail-loyalty`,
+        },
       ],
     },
     {

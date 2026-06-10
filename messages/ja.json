@@ -5602,6 +5602,7 @@
       "sm_abonnement": "Subscription",
       "sm_retail_kassa_pos": "販売（バーコード）",
       "sm_retail_kassa_producten": "商品",
+      "sm_retail_loyalty": "Store pass & points",
       "sm_voorraad_beheer": "在庫管理",
       "sm_voorraad_producten": "商品"
     }
@@ -5797,6 +5798,36 @@
     "trayTileAddProduct": "商品を追加",
     "trayTileSalesOverview": "売上概要",
     "trayTileClockInOut": "出退勤打刻",
-    "trayTileStaff": "スタッフ"
+    "trayTileStaff": "スタッフ",
+    "loyaltyLinked": "Pass: {name}",
+    "loyaltyPointsBalance": "{points} points",
+    "loyaltyUnlink": "Unlink",
+    "loyaltyEarnedToast": "+{points} points — balance {balance}"
+  },
+  "retailLoyalty": {
+    "title": "Store pass & points",
+    "intro": "Store passes start with 899 (EAN). Scan at the POS to earn points.",
+    "backToPos": "Back to retail POS",
+    "settingsTitle": "Settings",
+    "enabled": "Loyalty active in retail POS",
+    "pointsPerEuro": "Points per euro",
+    "minOrderTotal": "Minimum receipt total (€)",
+    "saveSettings": "Save settings",
+    "saving": "Saving…",
+    "saveError": "Save failed",
+    "newPassTitle": "New store pass",
+    "namePlaceholder": "Name (optional)",
+    "phonePlaceholder": "Phone (optional)",
+    "createPass": "Create pass",
+    "creating": "Working…",
+    "createError": "Could not create pass",
+    "cardCodeLabel": "Pass code (scan)",
+    "cardCodeHint": "Show this code as a barcode/QR on a phone.",
+    "membersTitle": "Active passes",
+    "loading": "Loading…",
+    "noMembers": "No passes yet.",
+    "unnamed": "Customer",
+    "pointsShort": "pt",
+    "cardNotFound": "No active store pass for this code."
   }
 }

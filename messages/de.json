@@ -5625,6 +5625,7 @@
       "sm_abonnement": "Abonnement",
       "sm_retail_kassa_pos": "Verkauf (Barcode)",
       "sm_retail_kassa_producten": "Artikel",
+      "sm_retail_loyalty": "Shopkarte & Punkte",
       "sm_voorraad_beheer": "Lagerverwaltung",
       "sm_voorraad_producten": "Artikel"
     }
@@ -5820,6 +5821,36 @@
     "trayTileAddProduct": "Produkt hinzufügen",
     "trayTileSalesOverview": "Verkaufsübersicht",
     "trayTileClockInOut": "Ein-/ausstempeln",
-    "trayTileStaff": "Mitarbeiter"
+    "trayTileStaff": "Mitarbeiter",
+    "loyaltyLinked": "Karte: {name}",
+    "loyaltyPointsBalance": "{points} Punkte",
+    "loyaltyUnlink": "Trennen",
+    "loyaltyEarnedToast": "+{points} Punkte — Stand {balance}"
+  },
+  "retailLoyalty": {
+    "title": "Shopkarte & Punkte",
+    "intro": "Shopkarten beginnen mit 899 (EAN). An der Kasse scannen für Punkte. Gleicher Code als Handy-Barcode.",
+    "backToPos": "Zurück zur Winkelkasse",
+    "settingsTitle": "Einstellungen",
+    "enabled": "Loyalität in der Winkelkasse aktiv",
+    "pointsPerEuro": "Punkte pro Euro",
+    "minOrderTotal": "Mindestbon (€)",
+    "saveSettings": "Speichern",
+    "saving": "Speichern…",
+    "saveError": "Speichern fehlgeschlagen",
+    "newPassTitle": "Neue Shopkarte",
+    "namePlaceholder": "Name (optional)",
+    "phonePlaceholder": "Telefon (optional)",
+    "createPass": "Karte anlegen",
+    "creating": "Bitte warten…",
+    "createError": "Karte konnte nicht angelegt werden",
+    "cardCodeLabel": "Kartencode (Scan)",
+    "cardCodeHint": "Code als Barcode/QR drucken oder auf dem Handy zeigen.",
+    "membersTitle": "Aktive Karten",
+    "loading": "Laden…",
+    "noMembers": "Noch keine Karten.",
+    "unnamed": "Kunde",
+    "pointsShort": "Pkt",
+    "cardNotFound": "Keine aktive Shopkarte für diesen Code."
   }
 }

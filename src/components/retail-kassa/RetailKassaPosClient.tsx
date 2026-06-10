@@ -76,7 +76,9 @@ type StockActivityLine = {
 import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
 import { AccountMenuSessionBlock } from '@/components/AccountMenuSessionBlock'
 import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
-import { buildShopInternalReturnPath } from '@/lib/auth-headers'
+import { authFetch, buildShopInternalReturnPath } from '@/lib/auth-headers'
+import { isRetailLoyaltyCardScan } from '@/lib/retail-loyalty/card-code'
+import type { RetailLoyaltyMemberPublic } from '@/lib/retail-loyalty/types'
 import {
   attemptCloseThenOrNavigate,
   applyOwnerOnlyLogoutCleanup,
@@ -217,6 +219,10 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [numpadValue, setNumpadValue] = useState('')
   const [addOkFlash, setAddOkFlash] = useState(false)
   const addOkFlashTimersRef = useRef<ReturnType<typeof setTimeout>[]>([])
+  const [loyaltyEnabled, setLoyaltyEnabled] = useState(true)
+  const [linkedLoyaltyMember, setLinkedLoyaltyMember] = useState<RetailLoyaltyMemberPublic | null>(
+    null,
+  )
 
   const reload = useCallback(async (options?: { fresh?: boolean }) => {
     if (skusRef.current.length === 0 || options?.fresh) setLoading(true)
@@ -240,6 +246,12 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   useEffect(() => {
     void reload()
     void getTenantSettings(tenant).then(setTenantInfo)
+    void authFetch(`/api/retail/loyalty/settings?tenant=${encodeURIComponent(tenant)}`)
+      .then((r) => r.json())
+      .then((j: { ok?: boolean; settings?: { enabled?: boolean } }) => {
+        if (j.ok && j.settings) setLoyaltyEnabled(!!j.settings.enabled)
+      })
+      .catch(() => {})
   }, [reload, tenant])
 
   useEffect(() => {
@@ -684,10 +696,37 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     return importSkuFromBarcode(code)
   }
 
+  async function linkLoyaltyCardFromScan(raw: string) {
+    const res = await authFetch(
+      `/api/retail/loyalty/lookup?tenant=${encodeURIComponent(tenant)}&code=${encodeURIComponent(raw)}`,
+    )
+    const data = (await res.json()) as { ok?: boolean; member?: RetailLoyaltyMemberPublic }
+    if (data.ok && data.member) {
+      setLinkedLoyaltyMember(data.member)
+      flashAddOkButton()
+      return true
+    }
+    alert(t('retailLoyalty.cardNotFound'))
+    return false
+  }
+
   async function processBarcode(code: string) {
     const trimmed = code.trim()
     if (!trimmed) return
     if (stockBusyRef.current) return
+
+    if (mode === 'sales' && loyaltyEnabled && isRetailLoyaltyCardScan(trimmed)) {
+      stockBusyRef.current = true
+      setStockBusy(true)
+      try {
+        await linkLoyaltyCardFromScan(trimmed)
+      } finally {
+        stockBusyRef.current = false
+        setStockBusy(false)
+        releaseScanFocus()
+      }
+      return
+    }
 
     if (mode === 'sales') {
       stockBusyRef.current = true
@@ -1050,8 +1089,13 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   ) {
     if (cart.length === 0 || paying) return
     const linesSnapshot = [...cart]
+    const orderTotal = linesSnapshot.reduce((s, l) => s + l.sku.price * l.quantity, 0)
+    const loyaltyMemberId =
+      loyaltyEnabled && linkedLoyaltyMember ? linkedLoyaltyMember.id : undefined
     setPaying(true)
-    const res = await completeRetailSale(tenant, linesSnapshot, method, splitAmounts)
+    const res = await completeRetailSale(tenant, linesSnapshot, method, splitAmounts, {
+      loyaltyMemberId,
+    })
     setPaying(false)
     setShowPaymentModal(false)
     setShowSplitModal(false)
@@ -1068,6 +1112,31 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       splitAmounts,
     )
     setLastOrderReceipt(receipt)
+    if (loyaltyMemberId && orderTotal > 0) {
+      try {
+        const earnRes = await authFetch('/api/retail/loyalty/earn', {
+          method: 'POST',
+          body: JSON.stringify({
+            tenantSlug: tenant,
+            memberId: loyaltyMemberId,
+            orderTotal,
+            orderNumber: orderNumber > 0 ? orderNumber : undefined,
+          }),
+        })
+        const earnJson = (await earnRes.json()) as {
+          ok?: boolean
+          points?: number
+          balance?: number
+        }
+        if (earnJson.ok && (earnJson.points ?? 0) > 0 && earnJson.balance != null) {
+          setLinkedLoyaltyMember((m) =>
+            m && m.id === loyaltyMemberId ? { ...m, points_balance: earnJson.balance! } : m,
+          )
+        }
+      } catch {
+        /* puntenfout blokkeert verkoop niet */
+      }
+    }
     setCart([])
     setSelectedListLineKey(null)
     setLastScannedSku(null)
@@ -1679,6 +1748,40 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 {t('retailKassaPage.addOk')}
               </button>
             </form>
+
+            {loyaltyEnabled && linkedLoyaltyMember ? (
+              <div
+                className={`flex shrink-0 flex-wrap items-center justify-between gap-2 border-b px-3 py-1.5 sm:px-4 ${KASSA_POS_RULE_BLACK} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`}
+                data-testid="retail-loyalty-linked"
+              >
+                <div className="min-w-0 text-sm font-semibold text-white">
+                  <span>
+                    {t('retailKassaPage.loyaltyLinked').replace(
+                      '{name}',
+                      linkedLoyaltyMember.display_name?.trim() ||
+                        linkedLoyaltyMember.card_code,
+                    )}
+                  </span>
+                  <span className="ml-2 tabular-nums text-emerald-300">
+                    {t('retailKassaPage.loyaltyPointsBalance').replace(
+                      '{points}',
+                      String(linkedLoyaltyMember.points_balance),
+                    )}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  className={`shrink-0 px-3 py-1.5 text-xs font-bold ${retailScanRowBtnClass(false)}`}
+                  onClick={() => {
+                    playClick()
+                    setLinkedLoyaltyMember(null)
+                    focusBarcodeCapture()
+                  }}
+                >
+                  {t('retailKassaPage.loyaltyUnlink')}
+                </button>
+              </div>
+            ) : null}
 
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-3 pb-1 pt-1 sm:px-4">
               <div

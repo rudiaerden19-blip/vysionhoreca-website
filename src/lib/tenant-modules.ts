@@ -424,7 +424,9 @@ export function adminPathToModule(pathname: string, tenantSlug: string): AdminMo
 
   if (rest === '/' || rest === '') return { kind: 'always' }
   if (rest.startsWith('/welkom')) return { kind: 'always' }
-  if (rest.startsWith('/retail-kassa')) return { kind: 'module', module: 'retail-kassa' }
+  if (rest.startsWith('/retail-kassa') || rest.startsWith('/retail-loyalty')) {
+    return { kind: 'module', module: 'retail-kassa' }
+  }
   if (rest.startsWith('/kassa-terminal')) return { kind: 'module', module: 'kassa' }
   if (rest.startsWith('/kassa')) return { kind: 'module', module: 'kassa' }
   if (rest.startsWith('/voorraad')) return { kind: 'module', module: 'voorraad' }

@@ -191,6 +191,19 @@ export const ADMIN_DB_TABLES: Record<string, AdminDbTableSpec> = {
     maxRows: 1,
   },
 
+  retail_loyalty_settings: {
+    tenantSlugColumn: 'tenant_slug',
+    allowedOps: ['insert', 'update', 'upsert'],
+    forbiddenColumns: ['created_at'],
+    maxRows: 1,
+  },
+  retail_loyalty_members: {
+    tenantSlugColumn: 'tenant_slug',
+    allowedOps: ['insert', 'update'],
+    forbiddenColumns: ['id', 'created_at', 'points_balance'],
+    maxRows: 50,
+  },
+
   // --- Klanten ---
   shop_customers: {
     tenantSlugColumn: 'tenant_slug',

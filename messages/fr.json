@@ -5625,6 +5625,7 @@
       "sm_abonnement": "Abonnement",
       "sm_retail_kassa_pos": "Vente (code-barres)",
       "sm_retail_kassa_producten": "Articles",
+      "sm_retail_loyalty": "Carte magasin & points",
       "sm_voorraad_beheer": "Gestion stock",
       "sm_voorraad_producten": "Articles"
     }
@@ -5820,6 +5821,36 @@
     "trayTileAddProduct": "Ajouter un produit",
     "trayTileSalesOverview": "Aperçu des ventes",
     "trayTileClockInOut": "Pointer entrée/sortie",
-    "trayTileStaff": "Employés"
+    "trayTileStaff": "Employés",
+    "loyaltyLinked": "Carte : {name}",
+    "loyaltyPointsBalance": "{points} points",
+    "loyaltyUnlink": "Détacher",
+    "loyaltyEarnedToast": "+{points} points — solde {balance}"
+  },
+  "retailLoyalty": {
+    "title": "Carte magasin & points",
+    "intro": "Les cartes commencent par 899 (EAN). Scannez en caisse pour gagner des points. Même code en barcode sur téléphone.",
+    "backToPos": "Retour caisse magasin",
+    "settingsTitle": "Paramètres",
+    "enabled": "Fidélité active en caisse magasin",
+    "pointsPerEuro": "Points par euro",
+    "minOrderTotal": "Montant minimum (€)",
+    "saveSettings": "Enregistrer",
+    "saving": "Enregistrement…",
+    "saveError": "Échec de l'enregistrement",
+    "newPassTitle": "Nouvelle carte",
+    "namePlaceholder": "Nom (optionnel)",
+    "phonePlaceholder": "Téléphone (optionnel)",
+    "createPass": "Créer la carte",
+    "creating": "En cours…",
+    "createError": "Impossible de créer la carte",
+    "cardCodeLabel": "Code carte (scan)",
+    "cardCodeHint": "Imprimez ou affichez ce code en QR/barcode sur le téléphone.",
+    "membersTitle": "Cartes actives",
+    "loading": "Chargement…",
+    "noMembers": "Aucune carte pour l'instant.",
+    "unnamed": "Client",
+    "pointsShort": "pt",
+    "cardNotFound": "Aucune carte active pour ce code."
   }
 }

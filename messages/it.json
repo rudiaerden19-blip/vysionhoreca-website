@@ -5602,6 +5602,7 @@
       "sm_abonnement": "Abbonamento",
       "sm_retail_kassa_pos": "Vendita (barcode)",
       "sm_retail_kassa_producten": "Articoli",
+      "sm_retail_loyalty": "Tessera negozio e punti",
       "sm_voorraad_beheer": "Gestione magazzino",
       "sm_voorraad_producten": "Articoli"
     }
@@ -5797,6 +5798,36 @@
     "trayTileAddProduct": "Aggiungi prodotto",
     "trayTileSalesOverview": "Panoramica vendite",
     "trayTileClockInOut": "Timbratura entrata/uscita",
-    "trayTileStaff": "Collaboratori"
+    "trayTileStaff": "Collaboratori",
+    "loyaltyLinked": "Tessera: {name}",
+    "loyaltyPointsBalance": "{points} punti",
+    "loyaltyUnlink": "Scollega",
+    "loyaltyEarnedToast": "+{points} punti — saldo {balance}"
+  },
+  "retailLoyalty": {
+    "title": "Tessera negozio e punti",
+    "intro": "Le tessere iniziano con 899 (EAN). Scansiona in cassa per i punti. Stesso codice come barcode sul telefono.",
+    "backToPos": "Torna alla cassa negozio",
+    "settingsTitle": "Impostazioni",
+    "enabled": "Fedeltà attiva in cassa negozio",
+    "pointsPerEuro": "Punti per euro",
+    "minOrderTotal": "Importo minimo (€)",
+    "saveSettings": "Salva",
+    "saving": "Salvataggio…",
+    "saveError": "Salvataggio non riuscito",
+    "newPassTitle": "Nuova tessera",
+    "namePlaceholder": "Nome (opzionale)",
+    "phonePlaceholder": "Telefono (opzionale)",
+    "createPass": "Crea tessera",
+    "creating": "Attendere…",
+    "createError": "Impossibile creare la tessera",
+    "cardCodeLabel": "Codice tessera (scan)",
+    "cardCodeHint": "Stampa o mostra questo codice come barcode/QR sul telefono.",
+    "membersTitle": "Tessere attive",
+    "loading": "Caricamento…",
+    "noMembers": "Nessuna tessera ancora.",
+    "unnamed": "Cliente",
+    "pointsShort": "pt",
+    "cardNotFound": "Nessuna tessera attiva per questo codice."
   }
 }

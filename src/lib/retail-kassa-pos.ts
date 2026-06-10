@@ -98,6 +98,7 @@ export async function completeRetailSale(
   lines: RetailCartLine[],
   method: KassaPaymentMethod,
   splitAmounts?: { cash: number; card: number },
+  options?: { loyaltyMemberId?: string | null },
 ): Promise<{ ok: boolean; orderNumber?: number; error?: string }> {
   if (lines.length === 0) return { ok: false, error: 'empty_cart' }
 
@@ -143,6 +144,10 @@ export async function completeRetailSale(
       color_label: l.sku.color_label,
     })),
     created_at: createdAt.toISOString(),
+  }
+
+  if (options?.loyaltyMemberId) {
+    orderPayload.retail_loyalty_member_id = options.loyaltyMemberId
   }
 
   if (method === 'SPLIT' && splitAmounts) {
