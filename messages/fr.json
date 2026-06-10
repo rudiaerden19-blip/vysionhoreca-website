@@ -5933,6 +5933,10 @@
     "newPassEmailRequired": "Indiquez un e-mail pour envoyer le code-barres.",
     "passEmailSent": "La carte a été envoyée par e-mail.",
     "passEmailFailed": "Carte créée, mais l'e-mail n'a pas pu être envoyé.",
-    "emailNotConfigured": "Carte créée. Configurez l'e-mail dans Profil → paramètres e-mail."
+    "emailNotConfigured": "Carte créée. Configurez l'e-mail dans Profil → paramètres e-mail.",
+    "deletePass": "Supprimer",
+    "deletingPass": "Suppression…",
+    "deletePassConfirm": "Supprimer définitivement la carte de {name} ? L'historique des points sera effacé. Irréversible.",
+    "deletePassError": "Suppression impossible"
   }
 }

@@ -5869,6 +5869,10 @@
     "newPassEmailRequired": "Enter an email address to send the barcode.",
     "passEmailSent": "The store pass was sent by email.",
     "passEmailFailed": "Pass created, but sending email failed.",
-    "emailNotConfigured": "Pass created. Configure email under Profile → email settings to send mail."
+    "emailNotConfigured": "Pass created. Configure email under Profile → email settings to send mail.",
+    "deletePass": "Delete",
+    "deletingPass": "Deleting…",
+    "deletePassConfirm": "Permanently delete the store pass for {name}? Point history will be removed. This cannot be undone.",
+    "deletePassError": "Could not delete pass"
   }
 }

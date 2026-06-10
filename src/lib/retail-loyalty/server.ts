@@ -578,6 +578,23 @@ export async function updateRetailLoyaltyMember(
   return { ok: true }
 }
 
+export async function deleteRetailLoyaltyMember(
+  tenantSlug: string,
+  memberId: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const supabase = getServerSupabaseClient()
+  if (!supabase) return { ok: false, error: 'db_unavailable' }
+
+  const { error } = await supabase
+    .from('retail_loyalty_members')
+    .delete()
+    .eq('tenant_slug', tenantSlug)
+    .eq('id', memberId)
+
+  if (error) return { ok: false, error: error.message }
+  return { ok: true }
+}
+
 export async function adjustRetailLoyaltyMemberPoints(
   tenantSlug: string,
   memberId: string,

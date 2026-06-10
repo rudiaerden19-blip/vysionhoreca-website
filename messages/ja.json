@@ -5910,6 +5910,10 @@
     "newPassEmailRequired": "バーコード送信のためメールを入力してください。",
     "passEmailSent": "パスをメールで送信しました。",
     "passEmailFailed": "パスは作成しましたが、メール送信に失敗しました。",
-    "emailNotConfigured": "パスを作成しました。プロフィールのメール設定を行ってください。"
+    "emailNotConfigured": "パスを作成しました。プロフィールのメール設定を行ってください。",
+    "deletePass": "削除",
+    "deletingPass": "削除中…",
+    "deletePassConfirm": "{name} のパスを完全に削除しますか？ポイント履歴も消えます。元に戻せません。",
+    "deletePassError": "削除できませんでした"
   }
 }

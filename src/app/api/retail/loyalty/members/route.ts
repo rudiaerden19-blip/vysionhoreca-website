@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
-import { createRetailLoyaltyMember, updateRetailLoyaltyMember } from '@/lib/retail-loyalty/server'
+import { createRetailLoyaltyMember, deleteRetailLoyaltyMember, updateRetailLoyaltyMember } from '@/lib/retail-loyalty/server'
 
 const CreateSchema = z.object({
   tenantSlug: z.string().min(1),
@@ -93,6 +93,38 @@ export async function PATCH(req: NextRequest) {
   })
   if (!res.ok) {
     return NextResponse.json({ ok: false, error: res.error || 'update_failed' }, { status: 500 })
+  }
+
+  return NextResponse.json({ ok: true })
+}
+
+const DeleteSchema = z.object({
+  tenantSlug: z.string().min(1),
+  memberId: z.string().uuid(),
+})
+
+export async function DELETE(req: NextRequest) {
+  let body: unknown
+  try {
+    body = await req.json()
+  } catch {
+    return NextResponse.json({ ok: false, error: 'invalid_json' }, { status: 400 })
+  }
+
+  const parsed = DeleteSchema.safeParse(body)
+  if (!parsed.success) {
+    return NextResponse.json({ ok: false, error: 'invalid_body' }, { status: 400 })
+  }
+
+  const { tenantSlug, memberId } = parsed.data
+  const access = await verifyTenantOrSuperAdmin(req, tenantSlug)
+  if (!access.authorized) {
+    return NextResponse.json({ ok: false, error: access.error || 'forbidden' }, { status: 403 })
+  }
+
+  const res = await deleteRetailLoyaltyMember(tenantSlug, memberId)
+  if (!res.ok) {
+    return NextResponse.json({ ok: false, error: res.error || 'delete_failed' }, { status: 500 })
   }
 
   return NextResponse.json({ ok: true })

@@ -216,6 +216,7 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
   const [expandedPassId, setExpandedPassId] = useState<string | null>(null)
   const [managePassId, setManagePassId] = useState<string | null>(null)
   const [showInactive, setShowInactive] = useState(false)
+  const [deletingMemberId, setDeletingMemberId] = useState<string | null>(null)
 
   const loadMembers = useCallback(async () => {
     const res = await adminDb.select<RetailLoyaltyMember[]>('retail_loyalty_members', {
@@ -274,6 +275,30 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
       if (!json.ok) alert(t('retailLoyalty.saveError'))
     } finally {
       setSavingSettings(false)
+    }
+  }
+
+  async function deleteMember(member: RetailLoyaltyMember) {
+    const label = member.display_name?.trim() || member.card_code
+    if (!window.confirm(t('retailLoyalty.deletePassConfirm').replace('{name}', label))) {
+      return
+    }
+    setDeletingMemberId(member.id)
+    try {
+      const res = await authFetch('/api/retail/loyalty/members', {
+        method: 'DELETE',
+        body: JSON.stringify({ tenantSlug: params.tenant, memberId: member.id }),
+      })
+      const json = (await res.json()) as { ok?: boolean }
+      if (!json.ok) {
+        alert(t('retailLoyalty.deletePassError'))
+        return
+      }
+      if (managePassId === member.id) setManagePassId(null)
+      if (expandedPassId === member.id) setExpandedPassId(null)
+      await loadMembers()
+    } finally {
+      setDeletingMemberId(null)
     }
   }
 
@@ -427,6 +452,16 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
                       {expandedPassId === m.id
                         ? t('retailLoyalty.hidePassBarcode')
                         : t('retailLoyalty.showPassBarcode')}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={deletingMemberId === m.id}
+                      className="rounded-lg border border-red-300 bg-white px-3 py-1.5 text-xs font-semibold text-red-800 disabled:opacity-50"
+                      onClick={() => void deleteMember(m)}
+                    >
+                      {deletingMemberId === m.id
+                        ? t('retailLoyalty.deletingPass')
+                        : t('retailLoyalty.deletePass')}
                     </button>
                   </div>
                 </div>

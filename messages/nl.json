@@ -5802,7 +5802,11 @@
     "newPassEmailRequired": "Vul een e-mailadres in om de barcode te kunnen mailen.",
     "passEmailSent": "De winkelpas is per e-mail verstuurd.",
     "passEmailFailed": "Pas aangemaakt, maar e-mail versturen is mislukt.",
-    "emailNotConfigured": "Pas aangemaakt. Stel eerst e-mail in onder Profiel → e-mailinstellingen om te kunnen mailen."
+    "emailNotConfigured": "Pas aangemaakt. Stel eerst e-mail in onder Profiel → e-mailinstellingen om te kunnen mailen.",
+    "deletePass": "Verwijderen",
+    "deletingPass": "Bezig…",
+    "deletePassConfirm": "Winkelpas van {name} definitief verwijderen? Puntenhistoriek verdwijnt ook. Dit kan niet ongedaan.",
+    "deletePassError": "Verwijderen mislukt"
   },
   "sectorPages": {
     "breadcrumb": "Sectoren",

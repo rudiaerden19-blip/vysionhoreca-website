@@ -5933,6 +5933,10 @@
     "newPassEmailRequired": "E-Mail für den Barcode-Versand eingeben.",
     "passEmailSent": "Der Pass wurde per E-Mail gesendet.",
     "passEmailFailed": "Pass erstellt, E-Mail-Versand fehlgeschlagen.",
-    "emailNotConfigured": "Pass erstellt. E-Mail unter Profil → E-Mail-Einstellungen einrichten."
+    "emailNotConfigured": "Pass erstellt. E-Mail unter Profil → E-Mail-Einstellungen einrichten.",
+    "deletePass": "Löschen",
+    "deletingPass": "Wird gelöscht…",
+    "deletePassConfirm": "Kundenpass von {name} endgültig löschen? Punktehistorie wird entfernt. Nicht rückgängig.",
+    "deletePassError": "Löschen fehlgeschlagen"
   }
 }

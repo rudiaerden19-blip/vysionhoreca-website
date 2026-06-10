@@ -5910,6 +5910,10 @@
     "newPassEmailRequired": "请填写邮箱以发送条码。",
     "passEmailSent": "会员卡已通过邮件发送。",
     "passEmailFailed": "会员卡已创建，但邮件发送失败。",
-    "emailNotConfigured": "会员卡已创建。请在个人资料中配置邮件后再发送。"
+    "emailNotConfigured": "会员卡已创建。请在个人资料中配置邮件后再发送。",
+    "deletePass": "删除",
+    "deletingPass": "删除中…",
+    "deletePassConfirm": "永久删除 {name} 的会员卡？积分记录也将删除，无法恢复。",
+    "deletePassError": "删除失败"
   }
 }
