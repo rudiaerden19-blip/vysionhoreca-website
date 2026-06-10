@@ -150,6 +150,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const articleSearchActiveRef = useRef(false)
   const barcodeCaptureRef = useRef<HTMLInputElement>(null)
   const scanBarRef = useRef<HTMLDivElement>(null)
+  const cartScrollRef = useRef<HTMLDivElement>(null)
+  const listScrollTargetRef = useRef<string | null>(null)
   const langRef = useRef<HTMLDivElement>(null)
 
   const [tenantInfo, setTenantInfo] = useState<TenantSettings | null>(null)
@@ -392,12 +394,21 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const retailListBarRemoveBtnClass =
     'flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-black/20 bg-neutral-100 text-base font-bold leading-none text-black hover:bg-neutral-200'
 
-  function scrollScanBarToEnd() {
-    requestAnimationFrame(() => {
-      const el = scanBarRef.current
-      if (el) el.scrollTop = el.scrollHeight
-    })
+  function queueListScroll(lineKey: string) {
+    listScrollTargetRef.current = lineKey
   }
+
+  useLayoutEffect(() => {
+    const target = listScrollTargetRef.current
+    if (!target) return
+    listScrollTargetRef.current = null
+    const scan = scanBarRef.current
+    const cart = cartScrollRef.current
+    const scanRow = scan?.querySelector(`[data-retail-scan-line="${target}"]`)
+    const cartRow = cart?.querySelector(`[data-retail-cart-line="${target}"]`)
+    scanRow?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+    cartRow?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+  }, [cart, stockActivity])
 
   function removeStockActivityLine(activityKey: string) {
     playClick()
@@ -420,7 +431,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     return (
       <div
         key={key}
-        className={`${scanBarRowGridClass} ${retailListBarShellClass} mb-1.5 px-3 py-2.5 last:mb-0 sm:px-4 sm:py-3 text-[11px] sm:text-sm`}
+        data-retail-scan-line={key}
+        className={`${scanBarRowGridClass} ${retailListBarShellClass} shrink-0 px-3 py-2.5 sm:px-4 sm:py-3 text-[11px] sm:text-sm`}
       >
         <span className="truncate font-mono tabular-nums text-black/85">{barcode}</span>
         <span className="truncate font-semibold text-black">{name}</span>
@@ -460,7 +472,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     rememberLastScannedSku(sku)
     const key = `${sku.lineKey}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
     setStockActivity((prev) => [...prev, { key, sku, delta, mode: activityMode }])
-    scrollScanBarToEnd()
+    queueListScroll(key)
   }
 
   function replaceSkuInCatalog(next: RetailPosSku) {
@@ -598,6 +610,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       }
       replaceSkuInCatalog(res.sku)
       rememberLastScannedSku(res.sku)
+      queueListScroll(res.sku.lineKey)
       setCart((prev) =>
         prev.map((l) => (l.sku.lineKey === res.sku!.lineKey ? { ...l, sku: res.sku! } : l)),
       )
@@ -675,9 +688,9 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     }
     setCart((prev) => [...prev, { sku, quantity: 1 }])
     rememberLastScannedSku(sku)
+    queueListScroll(key)
     setNumpadValue('')
     setNumpadPanelVisible(false)
-    scrollScanBarToEnd()
     releaseScanFocus()
   }
 
@@ -706,7 +719,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       return next
     })
     rememberLastScannedSku(sku)
-    scrollScanBarToEnd()
+    queueListScroll(sku.lineKey)
     if (sku.price <= 0) {
       openPriceFixModal(sku)
     } else {
@@ -1486,7 +1499,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                     <div
                       ref={scanBarRef}
                       data-testid="retail-kassa-scan-bar"
-                      className="min-h-0 flex-1 space-y-0 overflow-y-auto overflow-x-auto overscroll-y-contain touch-manipulation p-1.5 sm:p-2 [scrollbar-gutter:stable]"
+                      className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overflow-x-auto overscroll-y-contain touch-manipulation p-1.5 sm:p-2 [scrollbar-gutter:stable]"
                     >
                       {mode === 'sales'
                         ? cart.map((l) =>
@@ -1562,7 +1575,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
           >
             <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden px-2.5 pt-3 pb-2 sm:px-3">
               <div
-                className={`min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-y-contain py-0.5 transition-opacity ${
+                ref={cartScrollRef}
+                className={`flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-y-contain py-0.5 transition-opacity ${
                   numpadPanelVisible ? 'pointer-events-none opacity-[0.28]' : 'opacity-100'
                 }`}
                 data-testid="retail-kassa-cart-scroll"
@@ -1575,7 +1589,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                       .map((row) => (
                         <div
                           key={row.key}
-                          className={`${retailListBarShellClass} flex items-center gap-2 p-2`}
+                          data-retail-cart-line={row.key}
+                          className={`${retailListBarShellClass} flex shrink-0 items-center gap-2 p-2`}
                         >
                           <div className="min-w-0 flex-1">
                             <p className="truncate text-sm font-semibold text-black">{row.sku.name}</p>
@@ -1593,7 +1608,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                   cart.map((l) => (
                     <div
                       key={l.sku.lineKey}
-                      className={`${retailListBarShellClass} flex items-center gap-2 p-2`}
+                      data-retail-cart-line={l.sku.lineKey}
+                      className={`${retailListBarShellClass} flex shrink-0 items-center gap-2 p-2`}
                     >
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold text-black">{l.sku.name}</p>
