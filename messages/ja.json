@@ -3481,6 +3481,7 @@
     "noStaff": "有効なスタッフがいません。スタッフで追加してください。",
     "statusClockedIn": "出勤中",
     "statusClockedOut": "未出勤",
+    "salesActiveBadge": "販売: {name}",
     "pinTitleIn": "出勤のPIN — {name}",
     "pinTitleOut": "退勤のPIN — {name}",
     "cancel": "キャンセル",

@@ -3481,6 +3481,7 @@
     "noStaff": "没有在职员工。请在人员中添加。",
     "statusClockedIn": "已上班",
     "statusClockedOut": "未上班",
+    "salesActiveBadge": "销售: {name}",
     "pinTitleIn": "上班 PIN — {name}",
     "pinTitleOut": "下班 PIN — {name}",
     "cancel": "取消",

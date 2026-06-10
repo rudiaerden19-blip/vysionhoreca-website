@@ -58,6 +58,23 @@ export function useKassaStaffClockPos(opts: {
     void loadStaffClockList({ background: true })
   }, [staffClockEnabled, loadStaffClockList])
 
+  useEffect(() => {
+    if (!staffClockEnabled || !staffClockListHydrated) return
+    const clockedIn = staffClockList.filter((s) => s.hasOpenSession)
+    if (activeKassaStaff && !clockedIn.some((s) => s.id === activeKassaStaff.id)) {
+      setActiveKassaStaff(null)
+      return
+    }
+    if (!activeKassaStaff && clockedIn.length === 1) {
+      setActiveKassaStaff({ id: clockedIn[0].id, name: clockedIn[0].name })
+    }
+  }, [staffClockEnabled, staffClockListHydrated, staffClockList, activeKassaStaff])
+
+  const clockedInStaff = useMemo(
+    () => staffClockList.filter((s) => s.hasOpenSession),
+    [staffClockList],
+  )
+
   const startStaffSales = useCallback((s: { id: string; name: string }) => {
     flushSync(() => {
       staffClockPinReqGen.current += 1
@@ -135,6 +152,9 @@ export function useKassaStaffClockPos(opts: {
         playSuccess()
         setStaffClockPinModal(null)
         setStaffClockPinInput('')
+        if (modal.action === 'in') {
+          setActiveKassaStaff({ id: modal.staffId, name: modal.staffName })
+        }
         if (modal.action === 'out' && activeKassaStaff?.id === modal.staffId) {
           setActiveKassaStaff(null)
         }
@@ -176,6 +196,7 @@ export function useKassaStaffClockPos(opts: {
 
   return {
     activeKassaStaff,
+    clockedInStaff,
     showKassaStaffClockButton,
     requiresStaffSelectionForSale,
     blockSaleWithoutStaffIfNeeded,

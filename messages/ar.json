@@ -3481,6 +3481,7 @@
     "noStaff": "لا يوجد موظفون نشطون. أضفهم في الموظفين.",
     "statusClockedIn": "مسجّل دخول",
     "statusClockedOut": "غير مسجّل",
+    "salesActiveBadge": "المبيعات: {name}",
     "pinTitleIn": "PIN للدخول — {name}",
     "pinTitleOut": "PIN للخروج — {name}",
     "cancel": "إلغاء",

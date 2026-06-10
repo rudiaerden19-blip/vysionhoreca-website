@@ -3957,6 +3957,7 @@
     "noStaff": "No active staff. Add them under Staff.",
     "statusClockedIn": "Clocked in",
     "statusClockedOut": "Not clocked in",
+    "salesActiveBadge": "Sales: {name}",
     "pinTitleIn": "PIN to clock in — {name}",
     "pinTitleOut": "PIN to clock out — {name}",
     "cancel": "Cancel",

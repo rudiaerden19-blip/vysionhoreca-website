@@ -2981,6 +2981,7 @@
     "noStaff": "Aucun employé actif. Ajoutez-les dans Personnel.",
     "statusClockedIn": "En service",
     "statusClockedOut": "Pas en service",
+    "salesActiveBadge": "Vente : {name}",
     "pinTitleIn": "PIN pour l'entrée — {name}",
     "pinTitleOut": "PIN pour la sortie — {name}",
     "cancel": "Annuler",

@@ -217,6 +217,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   )
   const {
     activeKassaStaff,
+    clockedInStaff,
     showKassaStaffClockButton,
     blockSaleWithoutStaffIfNeeded,
     openStaffSalesPickModal,
@@ -2061,13 +2062,26 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             </button>
           ) : null}
 
-          {activeKassaStaff ? (
-            <div
-              className="hidden max-w-[7rem] shrink-0 items-center rounded-md bg-emerald-600/90 px-1.5 py-1 text-[10px] font-bold text-white sm:flex md:max-w-[10rem] md:text-xs"
-              title={activeKassaStaff.name}
+          {showKassaStaffClockButton && (activeKassaStaff || clockedInStaff.length > 0) ? (
+            <button
+              type="button"
+              onClick={() => openStaffSalesPickModal()}
+              className="inline-flex max-w-[min(42vw,11rem)] shrink-0 items-center gap-1 rounded-md bg-emerald-600 px-2 py-1 text-[10px] font-bold text-white shadow-sm ring-1 ring-emerald-400/40 sm:max-w-[14rem] sm:text-xs"
+              title={
+                activeKassaStaff
+                  ? t('staffClock.salesActiveBadge').replace('{name}', activeKassaStaff.name)
+                  : clockedInStaff.map((s) => s.name).join(', ')
+              }
             >
-              <span className="truncate">{activeKassaStaff.name}</span>
-            </div>
+              <span className="shrink-0 opacity-90" aria-hidden>
+                ●
+              </span>
+              <span className="truncate">
+                {activeKassaStaff
+                  ? activeKassaStaff.name
+                  : clockedInStaff.map((s) => s.name).join(', ')}
+              </span>
+            </button>
           ) : null}
 
           <div ref={langRef} className="relative z-[40] shrink-0">
@@ -2187,6 +2201,38 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               {t('adminHamburger.rows.instellingen')}
             </Link>
           </div>
+
+          {showKassaStaffClockButton && clockedInStaff.length > 0 ? (
+            <div
+              className={`shrink-0 flex items-center gap-2 border-b px-3 py-1.5 text-xs font-semibold sm:px-4 sm:text-sm ${
+                appearanceDark
+                  ? 'border-emerald-500/30 bg-emerald-950/50 text-emerald-100'
+                  : 'border-emerald-200 bg-emerald-50 text-emerald-900'
+              }`}
+              role="status"
+              aria-live="polite"
+            >
+              <span className="shrink-0 text-emerald-400" aria-hidden>
+                ●
+              </span>
+              <span className="min-w-0 truncate">
+                {activeKassaStaff
+                  ? t('staffClock.salesActiveBadge').replace('{name}', activeKassaStaff.name)
+                  : `${t('staffClock.statusClockedIn')}: ${clockedInStaff.map((s) => s.name).join(', ')}`}
+              </span>
+              {!activeKassaStaff && clockedInStaff.length > 1 ? (
+                <button
+                  type="button"
+                  onClick={() => openStaffSalesPickModal()}
+                  className={`ml-auto shrink-0 rounded-md px-2 py-0.5 text-[11px] font-bold underline-offset-2 hover:underline sm:text-xs ${
+                    appearanceDark ? 'text-emerald-200' : 'text-emerald-800'
+                  }`}
+                >
+                  {t('staffClock.salesPickTitle')}
+                </button>
+              ) : null}
+            </div>
+          ) : null}
 
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden w-full">
             <div className="flex min-h-0 flex-1 overflow-hidden w-full">

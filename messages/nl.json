@@ -3957,6 +3957,7 @@
     "noStaff": "Geen actieve medewerkers. Voeg ze toe bij Personeel.",
     "statusClockedIn": "Ingeklokt",
     "statusClockedOut": "Niet ingeklokt",
+    "salesActiveBadge": "Verkoop: {name}",
     "pinTitleIn": "PIN voor inklokken — {name}",
     "pinTitleOut": "PIN voor uitklokken — {name}",
     "cancel": "Annuleer",

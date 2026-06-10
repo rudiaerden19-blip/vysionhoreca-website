@@ -2981,6 +2981,7 @@
     "noStaff": "Keine aktiven Mitarbeiter. Unter Personal anlegen.",
     "statusClockedIn": "Eingestempelt",
     "statusClockedOut": "Nicht eingestempelt",
+    "salesActiveBadge": "Verkauf: {name}",
     "pinTitleIn": "PIN zum Einstempeln — {name}",
     "pinTitleOut": "PIN zum Ausstempeln — {name}",
     "cancel": "Abbrechen",
