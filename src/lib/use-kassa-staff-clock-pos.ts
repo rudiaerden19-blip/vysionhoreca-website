@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { authFetch } from '@/lib/auth-headers'
 import { playClick, playSuccess } from '@/lib/sounds'
@@ -29,9 +29,7 @@ export function useKassaStaffClockPos(opts: {
   const [staffClockPinModal, setStaffClockPinModal] = useState<KassaStaffPinState | null>(null)
   const [staffClockPinInput, setStaffClockPinInput] = useState('')
   const [staffClockPinError, setStaffClockPinError] = useState<string | null>(null)
-  const [activeKassaStaff, setActiveKassaStaffState] = useState<KassaActiveStaff | null>(() =>
-    readKassaActiveStaffPreference(tenant),
-  )
+  const [activeKassaStaff, setActiveKassaStaffState] = useState<KassaActiveStaff | null>(null)
   const staffClockPinReqGen = useRef(0)
 
   const setActiveKassaStaff = useCallback(
@@ -42,7 +40,8 @@ export function useKassaStaffClockPos(opts: {
     [tenant],
   )
 
-  useEffect(() => {
+  /** localStorage pas op client — vóór paint, vóór staff-sync effect. */
+  useLayoutEffect(() => {
     setActiveKassaStaffState(readKassaActiveStaffPreference(tenant))
   }, [tenant])
 
@@ -68,10 +67,7 @@ export function useKassaStaffClockPos(opts: {
   }, [tenant])
 
   useEffect(() => {
-    if (!staffClockEnabled) {
-      setStaffClockListHydrated(true)
-      return
-    }
+    if (!staffClockEnabled) return
     setStaffClockListHydrated(false)
     void loadStaffClockList({ background: true })
   }, [staffClockEnabled, loadStaffClockList])
@@ -79,14 +75,37 @@ export function useKassaStaffClockPos(opts: {
   useEffect(() => {
     if (!staffClockEnabled || !staffClockListHydrated) return
     const clockedIn = staffClockList.filter((s) => s.hasOpenSession)
-    if (activeKassaStaff && !clockedIn.some((s) => s.id === activeKassaStaff.id)) {
-      setActiveKassaStaff(null)
+
+    if (activeKassaStaff) {
+      if (staffClockList.length === 0) return
+      const row = staffClockList.find((s) => s.id === activeKassaStaff.id)
+      if (row && !row.hasOpenSession) {
+        setActiveKassaStaff(null)
+        return
+      }
+      if (!row) {
+        setActiveKassaStaff(null)
+        return
+      }
       return
     }
-    if (!activeKassaStaff && clockedIn.length === 1) {
+
+    const stored = readKassaActiveStaffPreference(tenant)
+    if (stored && clockedIn.some((s) => s.id === stored.id)) {
+      setActiveKassaStaff(stored)
+      return
+    }
+    if (clockedIn.length === 1) {
       setActiveKassaStaff({ id: clockedIn[0].id, name: clockedIn[0].name })
     }
-  }, [staffClockEnabled, staffClockListHydrated, staffClockList, activeKassaStaff, setActiveKassaStaff])
+  }, [
+    staffClockEnabled,
+    staffClockListHydrated,
+    staffClockList,
+    activeKassaStaff,
+    setActiveKassaStaff,
+    tenant,
+  ])
 
   const clockedInStaff = useMemo(
     () => staffClockList.filter((s) => s.hasOpenSession),
