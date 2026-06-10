@@ -185,6 +185,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [priceFixValue, setPriceFixValue] = useState('')
   const [priceFixSaving, setPriceFixSaving] = useState(false)
   const [lastScannedSku, setLastScannedSku] = useState<RetailPosSku | null>(null)
+  const [selectedListLineKey, setSelectedListLineKey] = useState<string | null>(null)
   const priceFixNameInputRef = useRef<HTMLInputElement>(null)
   const priceFixInputRef = useRef<HTMLInputElement>(null)
   const skusRef = useRef<RetailPosSku[]>([])
@@ -385,12 +386,27 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
 
   const barHasLines = mode === 'sales' ? cart.length > 0 : stockActivity.length > 0
 
+  const selectedPreviewSku = useMemo(() => {
+    if (selectedListLineKey) {
+      if (mode === 'sales') {
+        const line = cart.find((l) => l.sku.lineKey === selectedListLineKey)
+        if (line) return line.sku
+      } else {
+        const row = stockActivity.find((r) => r.key === selectedListLineKey)
+        if (row) return row.sku
+      }
+    }
+    return lastScannedSku
+  }, [selectedListLineKey, cart, stockActivity, mode, lastScannedSku])
+
   const scanBarRowGridClass =
     'grid w-full min-w-[42rem] grid-cols-[minmax(5.5rem,1fr)_minmax(6rem,1.6fr)_minmax(2.5rem,0.5fr)_minmax(2.5rem,0.5fr)_minmax(2.75rem,0.55fr)_minmax(3.25rem,0.65fr)_2.75rem] items-center gap-1.5 sm:gap-2'
 
   /** Scan-/lijstregels: altijd wit vlak, zwarte tekst (ook nieuwe scans). */
   const retailListBarShellClass =
     'rounded-lg border border-black/10 bg-white text-black shadow-[0_1px_3px_rgba(0,0,0,0.12)]'
+  const retailListBarSelectedClass =
+    'border-[#5a9fd4] bg-[#d6ebfa] ring-2 ring-[#5a9fd4]/40 shadow-[0_0_14px_rgba(90,159,212,0.38)]'
   const retailListBarRemoveBtnClass =
     'flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-black/20 bg-neutral-100 text-base font-bold leading-none text-black hover:bg-neutral-200'
 
@@ -413,6 +429,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   function removeStockActivityLine(activityKey: string) {
     playClick()
     setStockActivity((prev) => prev.filter((row) => row.key !== activityKey))
+    setSelectedListLineKey((prev) => (prev === activityKey ? null : prev))
     releaseScanFocus()
   }
 
@@ -428,11 +445,24 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     const qty = Math.max(1, opts?.quantity ?? 1)
     const name = qty > 1 ? `${sku.name} × ${qty}` : sku.name
     const lineTotal = sku.price * qty
+    const selected = selectedListLineKey === key
     return (
       <div
         key={key}
+        role="button"
+        tabIndex={0}
         data-retail-scan-line={key}
-        className={`${scanBarRowGridClass} ${retailListBarShellClass} shrink-0 px-3 py-2.5 sm:px-4 sm:py-3 text-[11px] sm:text-sm`}
+        aria-pressed={selected}
+        onClick={() => selectRetailListLine(key, sku)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            selectRetailListLine(key, sku)
+          }
+        }}
+        className={`${scanBarRowGridClass} ${retailListBarShellClass} shrink-0 cursor-pointer touch-manipulation px-3 py-2.5 transition-[background-color,box-shadow,border-color] sm:px-4 sm:py-3 text-[11px] sm:text-sm ${
+          selected ? retailListBarSelectedClass : 'hover:bg-neutral-50'
+        }`}
       >
         <span className="truncate font-mono tabular-nums text-black/85">{barcode}</span>
         <span className="truncate font-semibold text-black">{name}</span>
@@ -443,7 +473,10 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         {opts?.onRemove ? (
           <button
             type="button"
-            onClick={opts.onRemove}
+            onClick={(e) => {
+              e.stopPropagation()
+              opts.onRemove?.()
+            }}
             aria-label={t('retailKassaPage.removeLine')}
             className={retailListBarRemoveBtnClass}
           >
@@ -461,16 +494,23 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     playClick()
     setMode(next)
     setStockActivity([])
+    setSelectedListLineKey(null)
     closeArticleSearchKeyboard()
   }
 
-  function rememberLastScannedSku(sku: RetailPosSku) {
+  function focusRetailListLine(lineKey: string, sku: RetailPosSku) {
+    setSelectedListLineKey(lineKey)
     setLastScannedSku(sku)
   }
 
+  function selectRetailListLine(lineKey: string, sku: RetailPosSku) {
+    playClick()
+    focusRetailListLine(lineKey, sku)
+  }
+
   function pushStockActivity(sku: RetailPosSku, delta: number, activityMode: RetailKassaMode) {
-    rememberLastScannedSku(sku)
     const key = `${sku.lineKey}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
+    focusRetailListLine(key, sku)
     setStockActivity((prev) => [...prev, { key, sku, delta, mode: activityMode }])
     queueListScroll(key)
   }
@@ -609,7 +649,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         return
       }
       replaceSkuInCatalog(res.sku)
-      rememberLastScannedSku(res.sku)
+      focusRetailListLine(res.sku.lineKey, res.sku)
       queueListScroll(res.sku.lineKey)
       setCart((prev) =>
         prev.map((l) => (l.sku.lineKey === res.sku!.lineKey ? { ...l, sku: res.sku! } : l)),
@@ -687,7 +727,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       category_id: null,
     }
     setCart((prev) => [...prev, { sku, quantity: 1 }])
-    rememberLastScannedSku(sku)
+    focusRetailListLine(key, sku)
     queueListScroll(key)
     setNumpadValue('')
     setNumpadPanelVisible(false)
@@ -718,7 +758,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       next[i] = { ...next[i], quantity: merged }
       return next
     })
-    rememberLastScannedSku(sku)
+    focusRetailListLine(sku.lineKey, sku)
     queueListScroll(sku.lineKey)
     if (sku.price <= 0) {
       openPriceFixModal(sku)
@@ -730,6 +770,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   function updateQty(lineKey: string, qty: number) {
     if (qty < 1) {
       setCart((prev) => prev.filter((l) => l.sku.lineKey !== lineKey))
+      setSelectedListLineKey((prev) => (prev === lineKey ? null : prev))
       setPriceFixSku((prev) => (prev?.lineKey === lineKey ? null : prev))
       releaseScanFocus()
       return
@@ -752,6 +793,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     if (cart.length === 0) return
     playClick()
     setCart([])
+    setSelectedListLineKey(null)
     setPriceFixSku(null)
     releaseScanFocus()
   }
@@ -894,6 +936,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     )
     setLastOrderReceipt(receipt)
     setCart([])
+    setSelectedListLineKey(null)
     await reload()
     setShowSuccessModal(true)
     focusBarcodeCapture()
@@ -1589,8 +1632,20 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                       .map((row) => (
                         <div
                           key={row.key}
+                          role="button"
+                          tabIndex={0}
                           data-retail-cart-line={row.key}
-                          className={`${retailListBarShellClass} flex shrink-0 items-center gap-2 p-2`}
+                          aria-pressed={selectedListLineKey === row.key}
+                          onClick={() => selectRetailListLine(row.key, row.sku)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault()
+                              selectRetailListLine(row.key, row.sku)
+                            }
+                          }}
+                          className={`${retailListBarShellClass} flex shrink-0 cursor-pointer touch-manipulation items-center gap-2 p-2 transition-[background-color,box-shadow,border-color] ${
+                            selectedListLineKey === row.key ? retailListBarSelectedClass : 'hover:bg-neutral-50'
+                          }`}
                         >
                           <div className="min-w-0 flex-1">
                             <p className="truncate text-sm font-semibold text-black">{row.sku.name}</p>
@@ -1608,8 +1663,20 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                   cart.map((l) => (
                     <div
                       key={l.sku.lineKey}
+                      role="button"
+                      tabIndex={0}
                       data-retail-cart-line={l.sku.lineKey}
-                      className={`${retailListBarShellClass} flex shrink-0 items-center gap-2 p-2`}
+                      aria-pressed={selectedListLineKey === l.sku.lineKey}
+                      onClick={() => selectRetailListLine(l.sku.lineKey, l.sku)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          selectRetailListLine(l.sku.lineKey, l.sku)
+                        }
+                      }}
+                      className={`${retailListBarShellClass} flex shrink-0 cursor-pointer touch-manipulation items-center gap-2 p-2 transition-[background-color,box-shadow,border-color] ${
+                        selectedListLineKey === l.sku.lineKey ? retailListBarSelectedClass : 'hover:bg-neutral-50'
+                      }`}
                     >
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold text-black">{l.sku.name}</p>
@@ -1617,7 +1684,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                           €{l.sku.price.toFixed(2)} × {l.quantity}
                         </p>
                       </div>
-                      <div className="flex shrink-0 items-center gap-1">
+                      <div className="flex shrink-0 items-center gap-1" onClick={(e) => e.stopPropagation()}>
                         <button
                           type="button"
                           onClick={() => updateQty(l.sku.lineKey, l.quantity - 1)}
@@ -1710,10 +1777,10 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                   className={`size-[4cm] shrink-0 overflow-hidden rounded-lg border ${KASSA_POS_RULE_BLACK} bg-black/20`}
                   data-testid="retail-last-scan-thumb"
                 >
-                  {lastScannedSku?.image_url?.trim() ? (
+                  {selectedPreviewSku?.image_url?.trim() ? (
                     <img
-                      src={lastScannedSku.image_url.trim()}
-                      alt={lastScannedSku.name}
+                      src={selectedPreviewSku.image_url.trim()}
+                      alt={selectedPreviewSku.name}
                       decoding="async"
                       loading="eager"
                       onError={kassaProductImageRetryOnError}
@@ -1722,9 +1789,9 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                   ) : (
                     <div
                       className="flex size-full items-center justify-center text-2xl text-white/25"
-                      aria-hidden={!lastScannedSku}
+                      aria-hidden={!selectedPreviewSku}
                     >
-                      {lastScannedSku ? '📦' : null}
+                      {selectedPreviewSku ? '📦' : null}
                     </div>
                   )}
                 </div>
