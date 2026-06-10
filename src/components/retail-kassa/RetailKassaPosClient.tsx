@@ -214,6 +214,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [importHighlight, setImportHighlight] = useState<'csv' | 'excel' | null>(null)
   const [numpadPanelVisible, setNumpadPanelVisible] = useState(false)
   const [numpadValue, setNumpadValue] = useState('')
+  const [addOkFlash, setAddOkFlash] = useState(false)
+  const addOkFlashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const reload = useCallback(async () => {
     setLoading(true)
@@ -225,6 +227,12 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   useEffect(() => {
     skusRef.current = skus
   }, [skus])
+
+  useEffect(() => {
+    return () => {
+      if (addOkFlashTimerRef.current) clearTimeout(addOkFlashTimerRef.current)
+    }
+  }, [])
 
   useEffect(() => {
     void reload()
@@ -570,11 +578,21 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     })
   }
 
+  function flashAddOkButton() {
+    setAddOkFlash(true)
+    if (addOkFlashTimerRef.current) clearTimeout(addOkFlashTimerRef.current)
+    addOkFlashTimerRef.current = setTimeout(() => {
+      setAddOkFlash(false)
+      addOkFlashTimerRef.current = null
+    }, 650)
+  }
+
   function pushStockActivity(sku: RetailPosSku, delta: number, activityMode: RetailKassaMode) {
     const key = `${sku.lineKey}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
     focusRetailListLine(key, sku)
     setStockActivity((prev) => [...prev, { key, sku, delta, mode: activityMode }])
     queueListScroll(key)
+    flashAddOkButton()
   }
 
   function replaceSkuInCatalog(next: RetailPosSku) {
@@ -788,7 +806,10 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       low_stock_threshold: 0,
       category_id: null,
     }
-    setCart((prev) => [...prev, { sku, quantity: 1 }])
+    setCart((prev) => {
+      queueMicrotask(flashAddOkButton)
+      return [...prev, { sku, quantity: 1 }]
+    })
     focusRetailListLine(key, sku)
     queueListScroll(key)
     setNumpadValue('')
@@ -810,7 +831,11 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     }
     setCart((prev) => {
       const i = prev.findIndex((l) => l.sku.lineKey === sku.lineKey)
-      if (i < 0) return [...prev, { sku, quantity: qty }]
+      if (i < 0) {
+        const next = [...prev, { sku, quantity: qty }]
+        queueMicrotask(flashAddOkButton)
+        return next
+      }
       const next = [...prev]
       const merged = next[i].quantity + qty
       if (!retailSkuInStock(sku, merged)) {
@@ -818,6 +843,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         return prev
       }
       next[i] = { ...next[i], quantity: merged }
+      queueMicrotask(flashAddOkButton)
       return next
     })
     focusRetailListLine(sku.lineKey, sku)
@@ -1546,7 +1572,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             />
             <form
               onSubmit={onScanSubmit}
-              className={`shrink-0 flex gap-2 border-b px-3 pt-2 pb-2 sm:px-4 ${KASSA_POS_RULE_BLACK}`}
+              className={`shrink-0 grid grid-cols-[minmax(0,1fr)_minmax(5.25rem,1fr)_minmax(5.25rem,1fr)] gap-2 border-b px-3 pt-2 pb-2 sm:px-4 ${KASSA_POS_RULE_BLACK}`}
             >
               <input
                 ref={scanRef}
@@ -1574,10 +1600,37 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                     closeArticleSearchKeyboard()
                   }, 120)
                 }}
-                className={`flex-1 rounded-full px-5 py-2.5 text-base text-[#f0f0f0] placeholder:text-white/45 focus:outline-none ${KASSA_POS_FIELD}`}
+                className={`min-w-0 w-full rounded-full px-4 py-2.5 text-base text-[#f0f0f0] placeholder:text-white/45 focus:outline-none ${KASSA_POS_FIELD}`}
               />
-              <button type="submit" className={`shrink-0 px-5 py-2.5 font-bold ${kassaPosButtonClass(true)}`}>
+              <button
+                type="submit"
+                className={`min-w-0 px-3 py-2.5 font-bold ${kassaPosButtonClass(true)}`}
+              >
                 {t('retailKassaPage.add')}
+              </button>
+              <button
+                type="button"
+                data-testid="retail-add-ok"
+                aria-live="polite"
+                className={
+                  addOkFlash
+                    ? `min-w-0 rounded-xl border-2 border-emerald-300/90 bg-emerald-500 px-3 py-2.5 font-bold text-white shadow-[0_0_22px_rgba(52,211,153,0.85)] transition-colors duration-150`
+                    : `min-w-0 px-3 py-2.5 font-bold transition-colors duration-300 ${kassaPosButtonClass(false)}`
+                }
+                onClick={() => {
+                  playClick()
+                  if (scanValue.trim()) {
+                    void processBarcode(scanValue)
+                    if (mode === 'sales') {
+                      setScanValue('')
+                      focusBarcodeCapture()
+                    }
+                  } else {
+                    releaseScanFocus()
+                  }
+                }}
+              >
+                {t('retailKassaPage.addOk')}
               </button>
             </form>
 
