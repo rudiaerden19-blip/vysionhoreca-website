@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useTenantModuleFlagsContext } from '@/lib/tenant-module-flags-context'
 import {
@@ -65,6 +65,10 @@ const ALLERGEN_IDS = [
   { id: 'lupine', icon: '🌸' },
   { id: 'weekdieren', icon: '🐚' },
 ]
+
+function normalizeProductBarcodeScan(raw: string): string {
+  return raw.replace(/\s/g, '').trim()
+}
 
 /** Tekst prijs zoals gebruiker tikt — komma of punt als decimaal (BE/NL). */
 function parseLocalizedMoneyInput(raw: string): number {
@@ -283,6 +287,8 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
   const [priceInputStr, setPriceInputStr] = useState('')
   const [promoPriceInputStr, setPromoPriceInputStr] = useState('')
   const [catalogMode, setCatalogMode] = useState<ProductCatalogMode>('horeca')
+  const productBarcodeScanRef = useRef<HTMLInputElement>(null)
+  const [productBarcodeScanActive, setProductBarcodeScanActive] = useState(false)
 
   const isRetailForm = catalogMode === 'retail'
 
@@ -510,6 +516,27 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     setError('')
     setPriceInputStr('')
     setPromoPriceInputStr('')
+    setProductBarcodeScanActive(false)
+  }
+
+  const applyProductBarcodeScan = useCallback((raw: string) => {
+    const code = normalizeProductBarcodeScan(raw)
+    if (!code) return
+    setFormData((prev) => ({ ...prev, barcode: code }))
+    setProductBarcodeScanActive(false)
+    if (productBarcodeScanRef.current) productBarcodeScanRef.current.value = ''
+  }, [])
+
+  const startProductBarcodeScan = useCallback(() => {
+    setProductBarcodeScanActive(true)
+    if (productBarcodeScanRef.current) productBarcodeScanRef.current.value = ''
+    requestAnimationFrame(() => productBarcodeScanRef.current?.focus({ preventScroll: true }))
+  }, [])
+
+  const onProductBarcodeScanKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key !== 'Enter') return
+    e.preventDefault()
+    applyProductBarcodeScan(e.currentTarget.value)
   }
 
   const toggleOptionSelection = (optionId: string) => {
@@ -559,6 +586,15 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
       }
 
       const saveMode = forcedCatalogMode ?? catalogMode
+      if (saveMode === 'retail') {
+        const bc = normalizeProductBarcodeScan(formData.barcode || '')
+        if (!bc) {
+          setError(t('adminPages.producten.barcodeRequired'))
+          setSaving(false)
+          return
+        }
+      }
+
       const productData: MenuProduct = {
         id: editingProduct?.id,
         tenant_slug: params.tenant,
@@ -578,7 +614,10 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
           saveMode === 'retail' ? 1 : clampKassaProductImageZoom(formData.kassa_image_zoom as number),
         print_label: saveMode === 'retail' ? false : (formData.print_label ?? false),
         catalog_mode: saveMode,
-        barcode: saveMode === 'retail' ? formData.barcode?.trim() || null : formData.barcode ?? null,
+        barcode:
+          saveMode === 'retail'
+            ? normalizeProductBarcodeScan(formData.barcode || '') || null
+            : formData.barcode ?? null,
         article_number:
           saveMode === 'retail' ? formData.article_number?.trim() || null : formData.article_number ?? null,
         size_label: saveMode === 'retail' ? formData.size_label?.trim() || null : formData.size_label ?? null,
@@ -1132,19 +1171,56 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                         {t('adminPages.producten.retailFieldsTitle')}
                       </p>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
+                        <div className="sm:col-span-2">
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            {t('adminPages.producten.barcode')}
+                            {t('adminPages.producten.barcode')}{' '}
+                            <span className="text-red-500">*</span>
                           </label>
+                          <div className="flex flex-col sm:flex-row gap-2">
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              autoComplete="off"
+                              value={formData.barcode || ''}
+                              onChange={(e) =>
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  barcode: normalizeProductBarcodeScan(e.target.value),
+                                }))
+                              }
+                              className="flex-1 min-w-0 px-3 py-2.5 border border-gray-200 rounded-xl font-mono tabular-nums"
+                              placeholder=""
+                            />
+                            <button
+                              type="button"
+                              onClick={startProductBarcodeScan}
+                              className={`shrink-0 px-4 py-2.5 rounded-xl text-sm font-semibold border transition-colors ${
+                                productBarcodeScanActive
+                                  ? 'border-blue-600 bg-blue-50 text-blue-800'
+                                  : 'border-gray-200 bg-white text-gray-800 hover:bg-gray-50'
+                              }`}
+                            >
+                              {productBarcodeScanActive
+                                ? t('adminPages.producten.scanProductListening')
+                                : t('adminPages.producten.scanProductButton')}
+                            </button>
+                          </div>
+                          <p className="mt-1.5 text-xs text-gray-500">
+                            {productBarcodeScanActive
+                              ? t('adminPages.producten.scanProductListeningHint')
+                              : t('adminPages.producten.scanProductHint')}
+                          </p>
                           <input
+                            ref={productBarcodeScanRef}
                             type="text"
-                            inputMode="numeric"
-                            value={formData.barcode || ''}
-                            onChange={(e) =>
-                              setFormData((prev) => ({ ...prev, barcode: e.target.value }))
-                            }
-                            className="w-full px-3 py-2.5 border border-gray-200 rounded-xl"
-                            placeholder=""
+                            tabIndex={-1}
+                            autoComplete="off"
+                            aria-hidden
+                            onKeyDown={onProductBarcodeScanKeyDown}
+                            onBlur={() => {
+                              window.setTimeout(() => setProductBarcodeScanActive(false), 120)
+                            }}
+                            className="fixed left-0 top-0 h-px w-px opacity-0 overflow-hidden pointer-events-none"
                           />
                         </div>
                         <div>
