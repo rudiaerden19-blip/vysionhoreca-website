@@ -5822,6 +5822,8 @@
     "trayTileSalesOverview": "Aperçu des ventes",
     "trayTileClockInOut": "Pointer entrée/sortie",
     "trayTileStaff": "Employés",
+    "trayTileLoyaltyNoCard": "Client sans carte",
+    "trayTileLoyaltyScan": "Scanner carte client",
     "loyaltyLinked": "Carte : {name}",
     "loyaltyPointsBalance": "{points} points",
     "loyaltyUnlink": "Détacher",

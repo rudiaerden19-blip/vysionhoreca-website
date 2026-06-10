@@ -5799,6 +5799,8 @@
     "trayTileSalesOverview": "Panoramica vendite",
     "trayTileClockInOut": "Timbratura entrata/uscita",
     "trayTileStaff": "Collaboratori",
+    "trayTileLoyaltyNoCard": "Cliente senza tessera",
+    "trayTileLoyaltyScan": "Scansiona tessera cliente",
     "loyaltyLinked": "Tessera: {name}",
     "loyaltyPointsBalance": "{points} punti",
     "loyaltyUnlink": "Scollega",

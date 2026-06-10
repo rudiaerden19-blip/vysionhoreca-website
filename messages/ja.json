@@ -5799,6 +5799,8 @@
     "trayTileSalesOverview": "売上概要",
     "trayTileClockInOut": "出退勤打刻",
     "trayTileStaff": "スタッフ",
+    "trayTileLoyaltyNoCard": "カードなしのお客様",
+    "trayTileLoyaltyScan": "会員カードをスキャン",
     "loyaltyLinked": "Pass: {name}",
     "loyaltyPointsBalance": "{points} points",
     "loyaltyUnlink": "Unlink",

@@ -5799,6 +5799,8 @@
     "trayTileSalesOverview": "销售概览",
     "trayTileClockInOut": "上下班打卡",
     "trayTileStaff": "员工",
+    "trayTileLoyaltyNoCard": "无卡顾客",
+    "trayTileLoyaltyScan": "扫描会员卡",
     "loyaltyLinked": "Pass: {name}",
     "loyaltyPointsBalance": "{points} points",
     "loyaltyUnlink": "Unlink",

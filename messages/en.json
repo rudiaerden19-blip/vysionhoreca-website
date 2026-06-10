@@ -5758,6 +5758,8 @@
     "trayTileSalesOverview": "Sales overview",
     "trayTileClockInOut": "Clock in/out",
     "trayTileStaff": "Staff",
+    "trayTileLoyaltyNoCard": "Customer without card",
+    "trayTileLoyaltyScan": "Scan loyalty card",
     "loyaltyLinked": "Pass: {name}",
     "loyaltyPointsBalance": "{points} points",
     "loyaltyUnlink": "Unlink",

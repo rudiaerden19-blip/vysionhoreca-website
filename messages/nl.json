@@ -5691,6 +5691,8 @@
     "trayTileSalesOverview": "Overzicht verkoop",
     "trayTileClockInOut": "In/uitklokken",
     "trayTileStaff": "Medewerkers",
+    "trayTileLoyaltyNoCard": "Klant zonder kaart",
+    "trayTileLoyaltyScan": "Klantenkaart scannen",
     "loyaltyLinked": "Pas: {name}",
     "loyaltyPointsBalance": "{points} punten",
     "loyaltyUnlink": "Loskoppelen",

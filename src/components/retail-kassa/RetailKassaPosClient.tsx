@@ -93,42 +93,58 @@ const KASSA_HEADER_QUICK_LINK_LABEL = 'text-[11px] leading-snug sm:text-xs'
 
 const RETAIL_TRAY_TILE_SIZE_CLASS = 'size-[4cm]'
 
-const RETAIL_GRAY_TRAY_TILES = [
+type RetailGrayTrayTile =
+  | { key: string; kind: 'logout'; labelKey: string; submenuIds: string[] }
+  | { key: string; kind: 'link'; hrefSuffix: string; labelKey: string; submenuIds: string[] }
+  | { key: string; kind: 'loyaltyNoCard'; labelKey: string }
+  | { key: string; kind: 'loyaltyScan'; labelKey: string }
+
+const RETAIL_GRAY_TRAY_TILES: RetailGrayTrayTile[] = [
   {
     key: 'logout',
-    kind: 'logout' as const,
+    kind: 'logout',
     labelKey: 'retailKassaPage.trayTileLogout',
-    submenuIds: [] as string[],
+    submenuIds: [],
   },
   {
     key: 'addProduct',
-    kind: 'link' as const,
+    kind: 'link',
     hrefSuffix: '/producten',
     labelKey: 'retailKassaPage.trayTileAddProduct',
     submenuIds: ['sm_kassa_producten', 'sm_retail_kassa_producten'],
   },
   {
     key: 'salesOverview',
-    kind: 'link' as const,
+    kind: 'link',
     hrefSuffix: '/verkoop',
     labelKey: 'retailKassaPage.trayTileSalesOverview',
     submenuIds: ['sm_rpt_verkoop'],
   },
   {
     key: 'clock',
-    kind: 'link' as const,
+    kind: 'link',
     hrefSuffix: '/inklokken',
     labelKey: 'retailKassaPage.trayTileClockInOut',
     submenuIds: ['sm_personeel_inuitklokken'],
   },
   {
     key: 'staff',
-    kind: 'link' as const,
+    kind: 'link',
     hrefSuffix: '/personeel',
     labelKey: 'retailKassaPage.trayTileStaff',
     submenuIds: ['sm_personeel_team'],
   },
-] as const
+  {
+    key: 'loyaltyNoCard',
+    kind: 'loyaltyNoCard',
+    labelKey: 'retailKassaPage.trayTileLoyaltyNoCard',
+  },
+  {
+    key: 'loyaltyScan',
+    kind: 'loyaltyScan',
+    labelKey: 'retailKassaPage.trayTileLoyaltyScan',
+  },
+]
 
 export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const baseUrl = `/shop/${tenant}/admin`
@@ -576,6 +592,40 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     const tileClass = `${kassaPosQuickMenuPanelButtonClass()} ${RETAIL_TRAY_TILE_SIZE_CLASS} flex shrink-0 touch-manipulation select-none flex-col items-center justify-center px-2 py-2 text-center text-[13px] font-bold leading-[1.15] sm:text-sm sm:leading-snug`
     return RETAIL_GRAY_TRAY_TILES.map((tile) => {
       const label = t(tile.labelKey)
+      if (tile.kind === 'loyaltyNoCard' || tile.kind === 'loyaltyScan') {
+        if (!loyaltyEnabled || mode !== 'sales') return null
+        if (tile.kind === 'loyaltyNoCard') {
+          return (
+            <button
+              key={tile.key}
+              type="button"
+              onClick={() => {
+                playClick()
+                setLinkedLoyaltyMember(null)
+                closeArticleSearchKeyboard()
+                focusBarcodeCapture()
+              }}
+              className={tileClass}
+            >
+              {label}
+            </button>
+          )
+        }
+        return (
+          <button
+            key={tile.key}
+            type="button"
+            onClick={() => {
+              playClick()
+              closeArticleSearchKeyboard()
+              focusBarcodeCapture()
+            }}
+            className={tileClass}
+          >
+            {label}
+          </button>
+        )
+      }
       const enabled =
         tile.kind === 'logout' || tile.submenuIds.some((id) => quickMenuAllowedSubmenuIds.has(id))
       if (tile.kind === 'logout') {

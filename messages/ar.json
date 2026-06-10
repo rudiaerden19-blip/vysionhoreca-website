@@ -5799,6 +5799,8 @@
     "trayTileSalesOverview": "نظرة عامة على المبيعات",
     "trayTileClockInOut": "تسجيل دخول/خروج",
     "trayTileStaff": "الموظفون",
+    "trayTileLoyaltyNoCard": "عميل بدون بطاقة",
+    "trayTileLoyaltyScan": "مسح بطاقة العميل",
     "loyaltyLinked": "Pass: {name}",
     "loyaltyPointsBalance": "{points} points",
     "loyaltyUnlink": "Unlink",
