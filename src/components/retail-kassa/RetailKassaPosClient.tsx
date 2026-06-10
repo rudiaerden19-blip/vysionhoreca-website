@@ -399,7 +399,10 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
           selected ? 'bg-white/20' : 'bg-white/10'
         }`
 
-  const kassaSidebarActionLabelClass = `text-center ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`
+  const kassaSidebarActionLabelClass =
+    'text-center text-base font-semibold leading-tight tracking-[0.03em] sm:text-[17px]'
+  const retailSidebarFooterActionMinH = 'min-h-[3.35rem] sm:min-h-[3.65rem]'
+  const retailSidebarFooterPrimaryMinH = 'min-h-[4.25rem] sm:min-h-[4.5rem]'
 
   const barHasLines = mode === 'sales' ? cart.length > 0 : stockActivity.length > 0
 
@@ -1825,19 +1828,19 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 </div>
               </div>
               <div
-                className={`w-80 sm:w-96 lg:w-[380px] shrink-0 border-l ${KASSA_POS_RULE_BLACK} px-3 py-2.5 space-y-2.5`}
+                className={`w-80 sm:w-96 lg:w-[380px] shrink-0 border-l ${KASSA_POS_RULE_BLACK} px-3 py-3 space-y-3`}
               >
               <div className="flex w-full touch-manipulation select-none gap-3">
                 <div
                   role="status"
                   aria-live="polite"
-                  className={`flex min-w-0 w-full items-center justify-between gap-2 px-2.5 ${kassaPosRaisedStripClass()}`}
+                  className={`flex min-h-[3.35rem] w-full min-w-0 items-center justify-between gap-2 px-3 py-2.5 sm:min-h-[3.65rem] ${kassaPosRaisedStripClass()}`}
                 >
-                  <span className={`shrink-0 text-base font-bold tracking-[0.04em] sm:text-lg ${ui.numpadMeta}`}>
+                  <span className={`shrink-0 text-lg font-bold tracking-[0.04em] sm:text-xl ${ui.numpadMeta}`}>
                     {mode === 'sales' ? t('kassaApp.cartTotal') : t('retailKassaPage.stockScans')}
                   </span>
                   <span
-                    className={`min-w-0 truncate text-right font-bold tabular-nums tracking-tight text-2xl sm:text-[1.65rem] ${
+                    className={`min-w-0 truncate text-right font-bold tabular-nums tracking-tight text-[1.75rem] sm:text-[2rem] ${
                       mode === 'sales' ? 'text-red-500' : 'text-emerald-300'
                     }`}
                   >
@@ -1853,7 +1856,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                     <button
                       type="button"
                       onClick={() => void openCashDrawer()}
-                      className={`flex items-center justify-center px-1 min-h-[2.5rem] ${kassaPosButtonClass(false)}`}
+                      className={`flex items-center justify-center px-2 py-3 ${retailSidebarFooterActionMinH} ${kassaPosButtonClass(false)}`}
                       title={t('kassaApp.drawerOpen')}
                     >
                       <span className={kassaSidebarActionLabelClass}>{t('kassaApp.drawerOpen')}</span>
@@ -1862,7 +1865,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                       type="button"
                       disabled={cart.length === 0 || draftBonPrinting}
                       onClick={() => void printDraftBonFromCart()}
-                      className={`flex items-center justify-center px-1 min-h-[2.5rem] ${kassaPosButtonClass(false)}`}
+                      className={`flex items-center justify-center px-2 py-3 ${retailSidebarFooterActionMinH} ${kassaPosButtonClass(false)}`}
                       title={t('kassaApp.cartBonTitle')}
                     >
                       <span className={kassaSidebarActionLabelClass}>
@@ -1873,7 +1876,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                       type="button"
                       onClick={clearCart}
                       disabled={cart.length === 0}
-                      className={`flex items-center justify-center px-1 min-h-[2.5rem] ${kassaPosButtonClass(false)}`}
+                      className={`flex items-center justify-center px-2 py-3 ${retailSidebarFooterActionMinH} ${kassaPosButtonClass(false)}`}
                       title={t('kassaApp.remove')}
                     >
                       <span className={kassaSidebarActionLabelClass}>{t('kassaApp.remove')}</span>
@@ -1884,7 +1887,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                     type="button"
                     onClick={clearStockActivity}
                     disabled={stockActivity.length === 0}
-                    className={`col-span-3 flex items-center justify-center px-1 min-h-[2.5rem] ${kassaPosButtonClass(false)}`}
+                    className={`col-span-3 flex items-center justify-center px-2 py-3 ${retailSidebarFooterActionMinH} ${kassaPosButtonClass(false)}`}
                     title={t('kassaApp.remove')}
                   >
                     <span className={kassaSidebarActionLabelClass}>{t('retailKassaPage.clearStockLog')}</span>
@@ -1897,7 +1900,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                   aria-pressed={numpadPanelVisible}
                   data-testid="retail-numpad-toggle"
                   onClick={toggleNumpadPanel}
-                  className={`flex items-center justify-center px-3 min-h-[3.5rem] py-3 ${KASSA_SIDEBAR_FOOTER_LEFT_COL} ${kassaPosButtonClass(numpadPanelVisible)}`}
+                  className={`flex items-center justify-center px-3 py-3.5 ${retailSidebarFooterPrimaryMinH} ${KASSA_SIDEBAR_FOOTER_LEFT_COL} ${kassaPosButtonClass(numpadPanelVisible)}`}
                   title={t('kassaApp.numpadToggle')}
                 >
                   <span className={kassaSidebarActionLabelClass}>{t('kassaApp.numpadToggle')}</span>
@@ -1912,13 +1915,13 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                       setShowPaymentModal(true)
                     }}
                     disabled={cart.length === 0}
-                    className={`flex min-w-0 flex-1 items-center justify-center min-h-[3.5rem] py-3 text-lg ${KASSA_POS_CHECKOUT_BTN}`}
+                    className={`flex min-w-0 flex-1 items-center justify-center py-3.5 text-xl font-bold sm:text-[1.35rem] ${retailSidebarFooterPrimaryMinH} ${KASSA_POS_CHECKOUT_BTN}`}
                   >
                     {t('kassaApp.checkout')}
                   </button>
                 ) : (
                   <div
-                    className={`flex min-w-0 flex-1 items-center justify-center min-h-[3.5rem] py-3 text-sm font-semibold text-white/80 ${kassaPosRaisedStripClass()}`}
+                    className={`flex min-w-0 flex-1 items-center justify-center py-3.5 text-base font-semibold text-white/80 sm:text-lg ${retailSidebarFooterPrimaryMinH} ${kassaPosRaisedStripClass()}`}
                   >
                     {stockBusy ? t('retailKassaPage.paying') : t('retailKassaPage.stockAutoSave')}
                   </div>
