@@ -423,7 +423,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const retailListBarShellClass =
     'rounded-lg border border-black/10 bg-white text-black shadow-[0_1px_3px_rgba(0,0,0,0.12)]'
   const retailListBarSelectedClass =
-    'border-[#5a9fd4] bg-[#d6ebfa] ring-2 ring-[#5a9fd4]/40 shadow-[0_0_14px_rgba(90,159,212,0.38)]'
+    'border-2 border-[#3b8fd4] border-b-[5px] border-b-[#1565b8] bg-[#b8ddf7] shadow-[0_0_0_2px_rgba(88,204,255,0.65),0_0_22px_rgba(43,127,201,0.55)] ring-2 ring-[#58CCFF]/70'
   const retailListBarRemoveBtnClass =
     'flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-black/20 bg-neutral-100 text-base font-bold leading-none text-black hover:bg-neutral-200'
 
@@ -480,6 +480,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         className={`${scanBarRowGridClass} ${retailListBarShellClass} shrink-0 cursor-pointer touch-manipulation px-3 py-2.5 transition-[background-color,box-shadow,border-color] sm:px-4 sm:py-3 text-[11px] sm:text-sm ${
           selected ? retailListBarSelectedClass : 'hover:bg-neutral-50'
         }`}
+        data-retail-line-selected={selected ? 'true' : undefined}
       >
         <span className="truncate font-mono tabular-nums text-black/85">{barcode}</span>
         <span className="truncate font-semibold text-black">{name}</span>
@@ -1665,6 +1666,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                           className={`${retailListBarShellClass} flex shrink-0 cursor-pointer touch-manipulation items-center gap-2 p-2 transition-[background-color,box-shadow,border-color] ${
                             selectedListLineKey === row.key ? retailListBarSelectedClass : 'hover:bg-neutral-50'
                           }`}
+                          data-retail-line-selected={selectedListLineKey === row.key ? 'true' : undefined}
                         >
                           <div className="min-w-0 flex-1">
                             <p className="truncate text-sm font-semibold text-black">{row.sku.name}</p>
@@ -1696,6 +1698,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                       className={`${retailListBarShellClass} flex shrink-0 cursor-pointer touch-manipulation items-center gap-2 p-2 transition-[background-color,box-shadow,border-color] ${
                         selectedListLineKey === l.sku.lineKey ? retailListBarSelectedClass : 'hover:bg-neutral-50'
                       }`}
+                      data-retail-line-selected={selectedListLineKey === l.sku.lineKey ? 'true' : undefined}
                     >
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold text-black">{l.sku.name}</p>
