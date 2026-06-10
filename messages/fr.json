@@ -5814,6 +5814,11 @@
     "importBusy": "Import en cours…",
     "importDone": "{created} ajoutés, {skipped} ignorés (déjà connus)",
     "importEmpty": "Aucune ligne valide. Colonnes : nom, code-barres/EAN, prix.",
-    "importFailed": "Lecture du fichier ou import échoué"
+    "importFailed": "Lecture du fichier ou import échoué",
+    "trayTileLogout": "Déconnexion du compte",
+    "trayTileAddProduct": "Ajouter un produit",
+    "trayTileSalesOverview": "Aperçu des ventes",
+    "trayTileClockInOut": "Pointer entrée/sortie",
+    "trayTileStaff": "Employés"
   }
 }

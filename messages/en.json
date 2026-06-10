@@ -5750,6 +5750,11 @@
     "importBusy": "Importing…",
     "importDone": "{created} added, {skipped} skipped (already known)",
     "importEmpty": "No valid rows. Use columns: name, barcode/EAN, price.",
-    "importFailed": "Could not read file or import failed"
+    "importFailed": "Could not read file or import failed",
+    "trayTileLogout": "Log out account",
+    "trayTileAddProduct": "Add product",
+    "trayTileSalesOverview": "Sales overview",
+    "trayTileClockInOut": "Clock in/out",
+    "trayTileStaff": "Staff"
   }
 }

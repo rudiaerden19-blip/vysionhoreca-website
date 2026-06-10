@@ -5791,6 +5791,11 @@
     "importBusy": "インポート中…",
     "importDone": "{created} 件追加、{skipped} 件スキップ（既存）",
     "importEmpty": "有効な行がありません。列：名前、バーコード/EAN、価格。",
-    "importFailed": "ファイルの読み込みまたはインポートに失敗しました"
+    "importFailed": "ファイルの読み込みまたはインポートに失敗しました",
+    "trayTileLogout": "アカウントからログアウト",
+    "trayTileAddProduct": "商品を追加",
+    "trayTileSalesOverview": "売上概要",
+    "trayTileClockInOut": "出退勤打刻",
+    "trayTileStaff": "スタッフ"
   }
 }

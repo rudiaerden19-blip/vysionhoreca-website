@@ -5791,6 +5791,11 @@
     "importBusy": "جارٍ الاستيراد…",
     "importDone": "أُضيف {created}، تُخطّى {skipped} (موجود مسبقًا)",
     "importEmpty": "لا صفوف صالحة. الأعمدة: الاسم، الباركود/EAN، السعر.",
-    "importFailed": "تعذّر قراءة الملف أو فشل الاستيراد"
+    "importFailed": "تعذّر قراءة الملف أو فشل الاستيراد",
+    "trayTileLogout": "تسجيل خروج الحساب",
+    "trayTileAddProduct": "إضافة منتج",
+    "trayTileSalesOverview": "نظرة عامة على المبيعات",
+    "trayTileClockInOut": "تسجيل دخول/خروج",
+    "trayTileStaff": "الموظفون"
   }
 }

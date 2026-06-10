@@ -5791,6 +5791,11 @@
     "importBusy": "Importando…",
     "importDone": "{created} añadidos, {skipped} omitidos (ya existían)",
     "importEmpty": "Sin filas válidas. Columnas: nombre, código de barras/EAN, precio.",
-    "importFailed": "No se pudo leer el archivo o falló la importación"
+    "importFailed": "No se pudo leer el archivo o falló la importación",
+    "trayTileLogout": "Cerrar sesión",
+    "trayTileAddProduct": "Añadir producto",
+    "trayTileSalesOverview": "Resumen de ventas",
+    "trayTileClockInOut": "Fichar entrada/salida",
+    "trayTileStaff": "Empleados"
   }
 }

@@ -5683,7 +5683,12 @@
     "importBusy": "Importeren…",
     "importDone": "{created} toegevoegd, {skipped} al bekend overgeslagen",
     "importEmpty": "Geen geldige rijen. Kolommen: naam, barcode/EAN, prijs.",
-    "importFailed": "Bestand lezen of import mislukt"
+    "importFailed": "Bestand lezen of import mislukt",
+    "trayTileLogout": "Account uitloggen",
+    "trayTileAddProduct": "Product toevoegen",
+    "trayTileSalesOverview": "Overzicht verkoop",
+    "trayTileClockInOut": "In/uitklokken",
+    "trayTileStaff": "Medewerkers"
   },
   "sectorPages": {
     "breadcrumb": "Sectoren",
