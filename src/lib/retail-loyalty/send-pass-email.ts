@@ -10,6 +10,13 @@ import {
   wrapRetailTransactionalEmailHtml,
 } from '@/lib/retail-loyalty/transactional-email'
 import { logger } from '@/lib/logger'
+import messagesNl from '../../../messages/nl.json'
+
+function passEmailSaveCopy(): { linkLabel: string; hint: string } {
+  const r = (messagesNl as { retailLoyalty: { passEmailSavePhotosLink: string; passEmailSavePhotosHint: string } })
+    .retailLoyalty
+  return { linkLabel: r.passEmailSavePhotosLink, hint: r.passEmailSavePhotosHint }
+}
 
 export async function sendRetailLoyaltyPassEmail(opts: {
   supabase: SupabaseClient
@@ -31,10 +38,15 @@ export async function sendRetailLoyaltyPassEmail(opts: {
   const barcodeHtml = buildEan13BarcodeEmailHtml(cardCode, { barHeightPx: 88, moduleWidthPx: 3 })
   const passPageUrl = buildRetailLoyaltyPassAbsoluteUrl(origin, tenantSlug, cardCode)
   const subject = shopName
+  const saveCopy = passEmailSaveCopy()
 
   const bodyHtml = `
       <p style="margin:0 0 28px;font-size:22px;font-weight:700;text-align:center;color:#111;text-transform:uppercase;letter-spacing:0.04em;">${escapeHtml(shopName)}</p>
       <div style="margin:0 auto;text-align:center;">${barcodeHtml ?? ''}</div>
+      <p style="margin:32px 0 0;text-align:center;">
+        <a href="${escapeHtml(passPageUrl)}" style="display:inline-block;padding:14px 22px;background:#1d4ed8;color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;border-radius:10px;">${escapeHtml(saveCopy.linkLabel)}</a>
+      </p>
+      <p style="margin:12px 0 0;font-size:13px;line-height:1.45;color:#52525b;text-align:center;">${escapeHtml(saveCopy.hint)}</p>
   `.trim()
 
   const html = wrapRetailTransactionalEmailHtml({
@@ -43,7 +55,7 @@ export async function sendRetailLoyaltyPassEmail(opts: {
     bodyHtml,
   })
 
-  const text = [shopName, '', passPageUrl].join('\n')
+  const text = [shopName, '', saveCopy.linkLabel, passPageUrl, '', saveCopy.hint].join('\n')
   const replyTo = contact.replyToEmail || smtpRes.smtp.user
 
   const transporter = createMailTransporter(smtpRes.smtp)

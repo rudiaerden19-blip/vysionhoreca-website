@@ -11,7 +11,7 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 
 /** PNG in Foto's/Files of via deelmenu — zelfde 899-code scant aan de kassa. */
 export async function saveRetailLoyaltyBarcodeToPhone(cardCode: string): Promise<void> {
-  const svg = buildEan13BarcodeSvg(cardCode, { moduleWidth: 3, barHeight: 100 })
+  const svg = buildEan13BarcodeSvg(cardCode, { moduleWidth: 3, barHeight: 100, showCodeText: false })
   if (!svg) throw new Error('invalid_code')
 
   const svgBlob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' })

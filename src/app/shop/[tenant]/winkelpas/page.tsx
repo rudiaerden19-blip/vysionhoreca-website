@@ -5,6 +5,7 @@ import { Suspense, useEffect, useState } from 'react'
 import { useLanguage } from '@/i18n'
 import { normalizeRetailLoyaltyCardCode } from '@/lib/retail-loyalty/card-code'
 import { RetailLoyaltyPassBarcode } from '@/components/retail-loyalty/RetailLoyaltyPassBarcode'
+import { RetailLoyaltyPassPhoneSave } from '@/components/retail-loyalty/RetailLoyaltyPassPhoneSave'
 
 type PassData = {
   card_code: string
@@ -98,6 +99,7 @@ function WinkelpasInner({ tenant }: { tenant: string }) {
         showCodeText={false}
         className="w-full max-w-sm"
       />
+      <RetailLoyaltyPassPhoneSave cardCode={pass.card_code} minimal />
     </div>
   )
 }

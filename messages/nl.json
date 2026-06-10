@@ -5813,7 +5813,7 @@
     "passEmailIntro": "Beste{greeting}, hier is uw winkelpas van {shop}. Toon de streepjescode aan de kassa.",
     "passEmailFooter": "Automatisch bericht over uw klantenkaart. Vragen? Antwoord op deze e-mail of bel ons.",
     "passEmailSavePhotosLink": "Barcode opslaan in Foto's",
-    "passEmailSavePhotosHint": "Open deze link op je telefoon en tik op «Barcode opslaan (foto)» — kies Foto's of Bestanden.",
+    "passEmailSavePhotosHint": "Open de link op je telefoon en tik op «Barcode opslaan (foto)» — kies Foto's of Bestanden.",
     "passEmailFailed": "Pas aangemaakt, maar e-mail versturen is mislukt.",
     "emailNotConfigured": "Pas aangemaakt. Stel eerst e-mail in onder Profiel → e-mailinstellingen om te kunnen mailen.",
     "deletePass": "Verwijderen",

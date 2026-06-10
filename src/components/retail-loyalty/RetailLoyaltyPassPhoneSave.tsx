@@ -4,7 +4,14 @@ import { useState } from 'react'
 import { useLanguage } from '@/i18n'
 import { saveRetailLoyaltyBarcodeToPhone } from '@/lib/retail-loyalty/download-barcode-png'
 
-export function RetailLoyaltyPassPhoneSave({ cardCode }: { cardCode: string }) {
+export function RetailLoyaltyPassPhoneSave({
+  cardCode,
+  minimal = false,
+}: {
+  cardCode: string
+  /** Alleen knop — geen blauwe uitlegbox (winkelpas-pagina). */
+  minimal?: boolean
+}) {
   const { t } = useLanguage()
   const [busy, setBusy] = useState(false)
   const [done, setDone] = useState(false)
@@ -21,6 +28,25 @@ export function RetailLoyaltyPassPhoneSave({ cardCode }: { cardCode: string }) {
     } finally {
       setBusy(false)
     }
+  }
+
+  if (minimal) {
+    return (
+      <div className="mt-10 w-full max-w-sm">
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => void onSave()}
+          className="w-full rounded-xl bg-blue-700 px-4 py-3.5 text-sm font-bold text-white disabled:opacity-60"
+        >
+          {busy
+            ? t('retailLoyalty.passPageSaveBusy')
+            : done
+              ? t('retailLoyalty.passPageSaveDone')
+              : t('retailLoyalty.passPageSaveDownload')}
+        </button>
+      </div>
+    )
   }
 
   return (
