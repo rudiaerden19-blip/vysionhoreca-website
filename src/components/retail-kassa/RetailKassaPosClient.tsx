@@ -394,6 +394,11 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const retailTopNavLinkClass = `${retailTopNavShellClass} ${kassaPosButtonClass(false)}`
   const retailScanRowBtnClass = (selected: boolean) =>
     `${retailTopNavShellClass} ${kassaPosButtonClass(selected)}`
+  /** Toevoegen + OK:zelfde breedte (past op langste label). */
+  const retailScanRowActionSizeClass =
+    'min-w-[7.25rem] w-[7.25rem] max-w-[7.25rem] justify-center sm:min-w-[7.75rem] sm:w-[7.75rem] sm:max-w-[7.75rem]'
+  const retailScanRowActionBtnClass = (selected: boolean) =>
+    `${retailScanRowBtnClass(selected)} ${retailScanRowActionSizeClass}`
 
   const kassaDarkHeaderBtnShell =
     'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.35rem] px-3 py-2 sm:min-h-[2.6rem] sm:px-3.5 sm:py-2.5'
@@ -1638,7 +1643,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 }}
                 className={`min-h-[2.35rem] min-w-0 flex-1 rounded-full px-5 py-2 text-base text-[#f0f0f0] placeholder:text-white/45 focus:outline-none sm:min-h-[2.6rem] sm:py-2.5 ${KASSA_POS_FIELD}`}
               />
-              <button type="submit" className={retailScanRowBtnClass(true)}>
+              <button type="submit" className={retailScanRowActionBtnClass(true)}>
                 {t('retailKassaPage.add')}
               </button>
               <button
@@ -1647,8 +1652,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 aria-live="polite"
                 className={
                   addOkFlash
-                    ? `${retailTopNavShellClass} rounded-xl border-2 border-emerald-300/90 bg-emerald-500 font-bold text-white shadow-[0_0_22px_rgba(52,211,153,0.85)] transition-colors duration-150`
-                    : `${retailScanRowBtnClass(false)} transition-colors duration-300`
+                    ? `${retailTopNavShellClass} ${retailScanRowActionSizeClass} rounded-xl border-2 border-emerald-300/90 bg-emerald-500 font-bold text-white shadow-[0_0_22px_rgba(52,211,153,0.85)] transition-colors duration-150`
+                    : `${retailScanRowActionBtnClass(false)} transition-colors duration-300`
                 }
                 onClick={() => {
                   playClick()
