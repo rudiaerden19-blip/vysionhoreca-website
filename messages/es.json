@@ -3482,6 +3482,8 @@
     "statusClockedIn": "Fichado",
     "statusClockedOut": "No fichado",
     "salesActiveBadge": "Venta: {name}",
+    "pickStaffInHeader": "Pulse arriba su nombre para vender a su nombre. Se mantiene hasta que otro empleado cambie.",
+    "salesPickStaffButton": "Vender como {name}",
     "pinTitleIn": "PIN para entrada — {name}",
     "pinTitleOut": "PIN para salida — {name}",
     "cancel": "Cancelar",

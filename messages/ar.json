@@ -3482,6 +3482,8 @@
     "statusClockedIn": "مسجّل دخول",
     "statusClockedOut": "غير مسجّل",
     "salesActiveBadge": "المبيعات: {name}",
+    "pickStaffInHeader": "اضغط على اسمك في الأعلى للبيع باسمك. يبقى حتى يبدّل موظف آخر.",
+    "salesPickStaffButton": "البيع باسم {name}",
     "pinTitleIn": "PIN للدخول — {name}",
     "pinTitleOut": "PIN للخروج — {name}",
     "cancel": "إلغاء",

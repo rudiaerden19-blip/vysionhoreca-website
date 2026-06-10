@@ -3482,6 +3482,8 @@
     "statusClockedIn": "出勤中",
     "statusClockedOut": "未出勤",
     "salesActiveBadge": "販売: {name}",
+    "pickStaffInHeader": "上部の自分の名前をタップして、その名前で販売します。他のスタッフが切り替えるまで続きます。",
+    "salesPickStaffButton": "{name} として販売",
     "pinTitleIn": "出勤のPIN — {name}",
     "pinTitleOut": "退勤のPIN — {name}",
     "cancel": "キャンセル",

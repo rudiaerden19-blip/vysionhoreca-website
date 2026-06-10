@@ -3482,6 +3482,8 @@
     "statusClockedIn": "In servizio",
     "statusClockedOut": "Non in servizio",
     "salesActiveBadge": "Vendita: {name}",
+    "pickStaffInHeader": "Tocca il tuo nome in alto per vendere a tuo nome. Resta finché un altro collega non cambia.",
+    "salesPickStaffButton": "Vendi come {name}",
     "pinTitleIn": "PIN per entrata — {name}",
     "pinTitleOut": "PIN per uscita — {name}",
     "cancel": "Annulla",

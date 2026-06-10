@@ -38,7 +38,6 @@ import { KassaSplitPaymentModal } from '@/components/kassa/KassaSplitPaymentModa
 import { KassaSuccessReceiptModal } from '@/components/kassa/KassaSuccessReceiptModal'
 import { KassaAnalogClock } from '@/components/kassa/KassaAnalogClock'
 import { KassaStaffClockModal } from '@/components/kassa/KassaStaffClockUi'
-import { KassaStaffSalesPickModal } from '@/components/kassa/KassaStaffSalesPickModal'
 import type { KassaLastOrderReceipt, KassaPaymentMethod } from '@/lib/kassa-cart-types'
 import {
   buildRetailLastOrderReceipt,
@@ -214,13 +213,11 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     clockedInStaff,
     showKassaStaffClockButton,
     blockSaleWithoutStaffIfNeeded,
-    openStaffSalesPickModal,
     openStaffClockModal,
     startStaffSales,
+    selectActiveKassaStaff,
     staffClockOpen,
     setStaffClockOpen,
-    staffSalesPickOpen,
-    setStaffSalesPickOpen,
     staffClockList,
     staffClockListLoading,
     staffClockBusy,
@@ -1555,18 +1552,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         </div>
       ) : null}
 
-      <KassaStaffSalesPickModal
-        open={staffSalesPickOpen}
-        listLoading={staffClockListLoading}
-        staffList={staffClockList}
-        busy={staffClockBusy}
-        onClose={() => {
-          playClick()
-          setStaffSalesPickOpen(false)
-        }}
-        onPickStaff={(s) => startStaffSales(s)}
-      />
-
       <KassaStaffClockModal
         open={staffClockOpen}
         listLoading={staffClockListLoading}
@@ -1969,26 +1954,39 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             </button>
           ) : null}
 
-          {showKassaStaffClockButton && (activeKassaStaff || clockedInStaff.length > 0) ? (
-            <button
-              type="button"
-              onClick={() => openStaffSalesPickModal()}
-              className="inline-flex max-w-[min(42vw,11rem)] shrink-0 items-center gap-1 rounded-md bg-emerald-600 px-2 py-1 text-[10px] font-bold text-white shadow-sm ring-1 ring-emerald-400/40 sm:max-w-[14rem] sm:text-xs"
-              title={
-                activeKassaStaff
-                  ? t('staffClock.salesActiveBadge').replace('{name}', activeKassaStaff.name)
-                  : clockedInStaff.map((s) => s.name).join(', ')
-              }
+          {showKassaStaffClockButton && clockedInStaff.length > 0 ? (
+            <div
+              className="flex min-w-0 max-w-[min(62vw,22rem)] shrink-0 flex-wrap items-center justify-end gap-1 sm:max-w-[28rem] sm:gap-1.5"
+              role="group"
+              aria-label={t('staffClock.salesPickTitle')}
             >
-              <span className="shrink-0 opacity-90" aria-hidden>
-                ●
-              </span>
-              <span className="truncate">
-                {activeKassaStaff
-                  ? activeKassaStaff.name
-                  : clockedInStaff.map((s) => s.name).join(', ')}
-              </span>
-            </button>
+              {clockedInStaff.map((s) => {
+                const active = activeKassaStaff?.id === s.id
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    aria-pressed={active}
+                    title={
+                      active
+                        ? t('staffClock.salesActiveBadge').replace('{name}', s.name)
+                        : t('staffClock.salesPickStaffButton').replace('{name}', s.name)
+                    }
+                    onClick={() => selectActiveKassaStaff(s)}
+                    className={`inline-flex max-w-[9.5rem] shrink-0 items-center gap-1 rounded-md px-2 py-1 text-[10px] font-bold touch-manipulation sm:max-w-[11rem] sm:text-xs ${
+                      active
+                        ? 'bg-emerald-500 text-white shadow-sm ring-2 ring-emerald-200/80'
+                        : 'bg-emerald-950/70 text-emerald-100 ring-1 ring-emerald-500/35 hover:bg-emerald-800'
+                    }`}
+                  >
+                    <span className="shrink-0 opacity-90" aria-hidden>
+                      ●
+                    </span>
+                    <span className="truncate">{s.name}</span>
+                  </button>
+                )
+              })}
+            </div>
           ) : null}
 
           <div ref={langRef} className="relative z-[40] shrink-0">
@@ -2052,21 +2050,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               type="button"
               data-testid="retail-mode-sales"
               aria-pressed={mode === 'sales'}
-              title={showKassaStaffClockButton ? t('staffClock.salesPickTitle') : undefined}
-              onClick={() => {
-                if (showKassaStaffClockButton) {
-                  if (mode !== 'sales') {
-                    playClick()
-                    setMode('sales')
-                    setStockActivity([])
-                    setSelectedListLineKey(null)
-                    closeArticleSearchKeyboard()
-                  }
-                  openStaffSalesPickModal()
-                  return
-                }
-                switchMode('sales')
-              }}
+              onClick={() => switchMode('sales')}
               className={retailTopNavBtnClass(mode === 'sales')}
             >
               {t('retailKassaPage.modeSales')}
@@ -2108,38 +2092,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               {t('adminHamburger.rows.instellingen')}
             </Link>
           </div>
-
-          {showKassaStaffClockButton && clockedInStaff.length > 0 ? (
-            <div
-              className={`shrink-0 flex items-center gap-2 border-b px-3 py-1.5 text-xs font-semibold sm:px-4 sm:text-sm ${
-                appearanceDark
-                  ? 'border-emerald-500/30 bg-emerald-950/50 text-emerald-100'
-                  : 'border-emerald-200 bg-emerald-50 text-emerald-900'
-              }`}
-              role="status"
-              aria-live="polite"
-            >
-              <span className="shrink-0 text-emerald-400" aria-hidden>
-                ●
-              </span>
-              <span className="min-w-0 truncate">
-                {activeKassaStaff
-                  ? t('staffClock.salesActiveBadge').replace('{name}', activeKassaStaff.name)
-                  : `${t('staffClock.statusClockedIn')}: ${clockedInStaff.map((s) => s.name).join(', ')}`}
-              </span>
-              {!activeKassaStaff && clockedInStaff.length > 1 ? (
-                <button
-                  type="button"
-                  onClick={() => openStaffSalesPickModal()}
-                  className={`ml-auto shrink-0 rounded-md px-2 py-0.5 text-[11px] font-bold underline-offset-2 hover:underline sm:text-xs ${
-                    appearanceDark ? 'text-emerald-200' : 'text-emerald-800'
-                  }`}
-                >
-                  {t('staffClock.salesPickTitle')}
-                </button>
-              ) : null}
-            </div>
-          ) : null}
 
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden w-full">
             <div className="flex min-h-0 flex-1 overflow-hidden w-full">

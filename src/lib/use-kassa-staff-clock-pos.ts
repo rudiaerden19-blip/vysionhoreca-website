@@ -188,11 +188,17 @@ export function useKassaStaffClockPos(opts: {
     [staffClockEnabled, staffClockListHydrated, hasAnyStaffClockedIn, activeKassaStaff],
   )
 
+  const selectActiveKassaStaff = useCallback((s: { id: string; name: string }) => {
+    playClick()
+    setActiveKassaStaff({ id: s.id, name: s.name })
+  }, [])
+
   const blockSaleWithoutStaffIfNeeded = useCallback((): boolean => {
     if (!requiresStaffSelectionForSale) return false
-    openStaffSalesPickModal()
+    playClick()
+    alert(t('staffClock.pickStaffInHeader'))
     return true
-  }, [requiresStaffSelectionForSale, openStaffSalesPickModal])
+  }, [requiresStaffSelectionForSale, t])
 
   return {
     activeKassaStaff,
@@ -203,6 +209,7 @@ export function useKassaStaffClockPos(opts: {
     openStaffSalesPickModal,
     openStaffClockModal,
     startStaffSales,
+    selectActiveKassaStaff,
     staffClockOpen,
     setStaffClockOpen,
     staffSalesPickOpen,

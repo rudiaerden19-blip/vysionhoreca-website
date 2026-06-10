@@ -2982,6 +2982,8 @@
     "statusClockedIn": "Eingestempelt",
     "statusClockedOut": "Nicht eingestempelt",
     "salesActiveBadge": "Verkauf: {name}",
+    "pickStaffInHeader": "Tippe oben auf deinen Namen, um unter deinem Namen zu verkaufen. Das bleibt, bis jemand anderes wechselt.",
+    "salesPickStaffButton": "Verkauf als {name}",
     "pinTitleIn": "PIN zum Einstempeln — {name}",
     "pinTitleOut": "PIN zum Ausstempeln — {name}",
     "cancel": "Abbrechen",

@@ -3482,6 +3482,8 @@
     "statusClockedIn": "已上班",
     "statusClockedOut": "未上班",
     "salesActiveBadge": "销售: {name}",
+    "pickStaffInHeader": "点击顶部您的姓名，即以您的名义销售。在其他员工切换之前保持不变。",
+    "salesPickStaffButton": "以 {name} 销售",
     "pinTitleIn": "上班 PIN — {name}",
     "pinTitleOut": "下班 PIN — {name}",
     "cancel": "取消",

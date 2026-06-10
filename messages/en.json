@@ -3958,6 +3958,8 @@
     "statusClockedIn": "Clocked in",
     "statusClockedOut": "Not clocked in",
     "salesActiveBadge": "Sales: {name}",
+    "pickStaffInHeader": "Tap your name at the top to sell under your name. That stays until another employee switches.",
+    "salesPickStaffButton": "Sell as {name}",
     "pinTitleIn": "PIN to clock in — {name}",
     "pinTitleOut": "PIN to clock out — {name}",
     "cancel": "Cancel",

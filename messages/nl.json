@@ -3958,6 +3958,8 @@
     "statusClockedIn": "Ingeklokt",
     "statusClockedOut": "Niet ingeklokt",
     "salesActiveBadge": "Verkoop: {name}",
+    "pickStaffInHeader": "Tik bovenaan op je naam om op jouw naam te verkopen. Die keuze blijft staan tot een andere medewerker wisselt.",
+    "salesPickStaffButton": "Verkoop op naam van {name}",
     "pinTitleIn": "PIN voor inklokken — {name}",
     "pinTitleOut": "PIN voor uitklokken — {name}",
     "cancel": "Annuleer",
