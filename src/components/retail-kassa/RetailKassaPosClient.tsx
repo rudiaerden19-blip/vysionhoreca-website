@@ -417,6 +417,11 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const barHasLines = mode === 'sales' ? cart.length > 0 : stockActivity.length > 0
 
   const selectedPreviewSku = useMemo(() => {
+    const skuStillInList = (sku: RetailPosSku) =>
+      mode === 'sales'
+        ? cart.some((l) => l.sku.lineKey === sku.lineKey)
+        : stockActivity.some((r) => r.sku.lineKey === sku.lineKey)
+
     if (selectedListLineKey) {
       if (mode === 'sales') {
         const line = cart.find((l) => l.sku.lineKey === selectedListLineKey)
@@ -426,7 +431,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         if (row) return row.sku
       }
     }
-    return lastScannedSku
+    if (lastScannedSku && skuStillInList(lastScannedSku)) return lastScannedSku
+    return null
   }, [selectedListLineKey, cart, stockActivity, mode, lastScannedSku])
 
   const scanBarRowGridClass =
@@ -458,7 +464,14 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
 
   function removeStockActivityLine(activityKey: string) {
     playClick()
-    setStockActivity((prev) => prev.filter((row) => row.key !== activityKey))
+    setStockActivity((prev) => {
+      const removed = prev.find((row) => row.key === activityKey)
+      const next = prev.filter((row) => row.key !== activityKey)
+      if (removed && !next.some((r) => r.sku.lineKey === removed.sku.lineKey)) {
+        setLastScannedSku((s) => (s?.lineKey === removed.sku.lineKey ? null : s))
+      }
+      return next
+    })
     setSelectedListLineKey((prev) => (prev === activityKey ? null : prev))
     releaseScanFocus()
   }
@@ -877,6 +890,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     if (qty < 1) {
       setCart((prev) => prev.filter((l) => l.sku.lineKey !== lineKey))
       setSelectedListLineKey((prev) => (prev === lineKey ? null : prev))
+      setLastScannedSku((prev) => (prev?.lineKey === lineKey ? null : prev))
       setPriceFixSku((prev) => (prev?.lineKey === lineKey ? null : prev))
       releaseScanFocus()
       return
@@ -900,6 +914,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     playClick()
     setCart([])
     setSelectedListLineKey(null)
+    setLastScannedSku(null)
     setPriceFixSku(null)
     releaseScanFocus()
   }
@@ -977,6 +992,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     if (stockActivity.length === 0) return
     playClick()
     setStockActivity([])
+    setSelectedListLineKey(null)
+    setLastScannedSku(null)
     focusBarcodeCapture()
   }
 
@@ -1043,6 +1060,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     setLastOrderReceipt(receipt)
     setCart([])
     setSelectedListLineKey(null)
+    setLastScannedSku(null)
     await reload()
     setShowSuccessModal(true)
     focusBarcodeCapture()
