@@ -1783,7 +1783,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
 
       <div className={`flex min-h-0 flex-1 flex-col overflow-hidden ${ui.shellBg}`}>
         <div
-          className={`relative z-30 flex min-h-[56px] w-full min-w-0 shrink-0 items-center gap-1.5 border-b px-2 py-2 sm:gap-2 sm:px-3 ${KASSA_POS_RULE_BLACK} ${
+          data-testid="retail-kassa-title-header"
+          className={`relative z-30 flex min-h-[56px] w-full min-w-0 shrink-0 flex-nowrap items-center gap-1.5 border-b px-2 py-2 sm:gap-2 sm:px-3 ${KASSA_POS_RULE_BLACK} ${
             appearanceDark ? `pb-3 ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}` : 'bg-black'
           }`}
         >
@@ -2009,6 +2010,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
 
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden w-full">
           <div
+            data-testid="retail-kassa-mode-bar"
             className={`shrink-0 flex gap-2 overflow-x-auto border-b px-3 py-2 sm:gap-2.5 sm:px-4 ${KASSA_POS_RULE_BLACK} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`}
           >
             <button
