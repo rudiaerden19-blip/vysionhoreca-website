@@ -8,20 +8,22 @@ import {
   buildRetailLoyaltyPassPath,
 } from '@/lib/retail-loyalty/pass-url'
 import { RetailLoyaltyPassBarcode } from '@/components/retail-loyalty/RetailLoyaltyPassBarcode'
-import { RetailLoyaltyPassPhoneSave } from '@/components/retail-loyalty/RetailLoyaltyPassPhoneSave'
 
 export function RetailLoyaltyPassShare({
   tenantSlug,
   cardCode,
-  displayName,
-  pointsBalance,
+  shopName,
   compact = false,
 }: {
   tenantSlug: string
   cardCode: string
-  displayName?: string | null
-  pointsBalance?: number
+  /** Winkelnaam zoals op telefoon (business_name). */
+  shopName?: string | null
   compact?: boolean
+  /** @deprecated niet meer getoond op klantweergave */
+  displayName?: string | null
+  /** @deprecated niet meer getoond op klantweergave */
+  pointsBalance?: number
 }) {
   const { t } = useLanguage()
   const [copied, setCopied] = useState(false)
@@ -29,6 +31,8 @@ export function RetailLoyaltyPassShare({
     if (typeof window === 'undefined') return buildRetailLoyaltyPassAbsoluteUrl('', tenantSlug, cardCode)
     return buildRetailLoyaltyPassAbsoluteUrl(window.location.origin, tenantSlug, cardCode)
   }, [tenantSlug, cardCode])
+
+  const title = shopName?.trim() || tenantSlug
 
   async function copyLink() {
     try {
@@ -46,25 +50,16 @@ export function RetailLoyaltyPassShare({
 
   return (
     <div
-      className={`rounded-xl border border-emerald-200 bg-emerald-50/80 ${compact ? 'p-3' : 'p-4'}`}
+      className={`rounded-xl border border-emerald-200 bg-white ${compact ? 'p-3' : 'p-4'}`}
     >
       {!compact ? (
-        <p className="mb-2 text-sm font-semibold text-emerald-900">{t('retailLoyalty.passShareTitle')}</p>
+        <p className="mb-3 text-xs leading-snug text-gray-500">{t('retailLoyalty.passShareHint')}</p>
       ) : null}
-      <p className="mb-3 text-xs leading-snug text-emerald-800">{t('retailLoyalty.passShareHint')}</p>
-      <div className="flex w-full flex-col items-center gap-2">
-        <RetailLoyaltyPassBarcode cardCode={cardCode} large className="w-full max-w-md" />
-        <p className="text-center font-mono text-xs tabular-nums text-gray-600">{cardCode}</p>
+      <div className="flex w-full flex-col items-center gap-6 rounded-lg bg-white py-4">
+        <p className="text-center text-xl font-bold uppercase tracking-wide text-gray-900">{title.toUpperCase()}</p>
+        <RetailLoyaltyPassBarcode cardCode={cardCode} large showCodeText={false} className="w-full max-w-md" />
       </div>
-      {displayName?.trim() ? (
-        <p className="mt-3 text-center text-sm font-semibold text-gray-900">{displayName.trim()}</p>
-      ) : null}
-      {pointsBalance != null ? (
-        <p className="text-center text-sm text-amber-900">
-          {t('retailLoyalty.passPointsLine').replace('{points}', String(pointsBalance))}
-        </p>
-      ) : null}
-      <div className="mt-3 flex flex-wrap justify-center gap-2">
+      <div className="mt-4 flex flex-wrap justify-center gap-2 border-t border-gray-100 pt-4">
         <button
           type="button"
           onClick={() => void copyLink()}
@@ -81,7 +76,6 @@ export function RetailLoyaltyPassShare({
           {t('retailLoyalty.openPassOnPhone')}
         </Link>
       </div>
-      <RetailLoyaltyPassPhoneSave cardCode={cardCode} />
     </div>
   )
 }

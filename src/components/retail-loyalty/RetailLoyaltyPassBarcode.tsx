@@ -7,18 +7,22 @@ export function RetailLoyaltyPassBarcode({
   cardCode,
   className = '',
   large = false,
+  showCodeText = true,
 }: {
   cardCode: string
   className?: string
   large?: boolean
+  /** Winkelpas op telefoon: alleen strepen, geen cijfers onder de barcode. */
+  showCodeText?: boolean
 }) {
   const svg = useMemo(
     () =>
       buildEan13BarcodeSvg(cardCode, {
         moduleWidth: large ? 3 : 2,
         barHeight: large ? 112 : 80,
+        showCodeText,
       }),
-    [cardCode, large],
+    [cardCode, large, showCodeText],
   )
   if (!svg) {
     return (

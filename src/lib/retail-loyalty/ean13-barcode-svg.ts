@@ -118,15 +118,17 @@ export function buildEan13BarcodeEmailHtml(
 
 export function buildEan13BarcodeSvg(
   code13: string,
-  options?: { barHeight?: number; moduleWidth?: number },
+  options?: { barHeight?: number; moduleWidth?: number; showCodeText?: boolean },
 ): string | null {
   const bits = encodeEan13Modules(code13)
   if (!bits) return null
   const modulePx = options?.moduleWidth ?? 2
   const barH = options?.barHeight ?? 72
+  const showCodeText = options?.showCodeText !== false
   const quiet = 10 * modulePx
   const width = bits.length * modulePx + quiet * 2
-  const height = barH + 24
+  const textBand = showCodeText ? 24 : 0
+  const height = barH + textBand
   let x = quiet
   const rects: string[] = []
   for (let i = 0; i < bits.length; i++) {
@@ -138,5 +140,8 @@ export function buildEan13BarcodeSvg(
     x += modulePx
   }
   const label = code13.replace(/\D/g, '')
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="EAN ${label}"><g>${rects.join('')}</g><text x="${width / 2}" y="${barH + 18}" text-anchor="middle" font-family="ui-monospace,monospace" font-size="14" fill="#111">${label}</text></svg>`
+  const textEl = showCodeText
+    ? `<text x="${width / 2}" y="${barH + 18}" text-anchor="middle" font-family="ui-monospace,monospace" font-size="14" fill="#111">${label}</text>`
+    : ''
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="EAN ${label}"><g>${rects.join('')}</g>${textEl}</svg>`
 }
