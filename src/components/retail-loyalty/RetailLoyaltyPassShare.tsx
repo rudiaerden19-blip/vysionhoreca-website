@@ -2,13 +2,13 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
-import QRCode from '@/components/QRCode'
 import { useLanguage } from '@/i18n'
 import {
   buildRetailLoyaltyPassAbsoluteUrl,
   buildRetailLoyaltyPassPath,
 } from '@/lib/retail-loyalty/pass-url'
 import { RetailLoyaltyPassBarcode } from '@/components/retail-loyalty/RetailLoyaltyPassBarcode'
+import { RetailLoyaltyPassPhoneSave } from '@/components/retail-loyalty/RetailLoyaltyPassPhoneSave'
 
 export function RetailLoyaltyPassShare({
   tenantSlug,
@@ -52,12 +52,9 @@ export function RetailLoyaltyPassShare({
         <p className="mb-2 text-sm font-semibold text-emerald-900">{t('retailLoyalty.passShareTitle')}</p>
       ) : null}
       <p className="mb-3 text-xs leading-snug text-emerald-800">{t('retailLoyalty.passShareHint')}</p>
-      <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-start sm:justify-center">
-        <RetailLoyaltyPassBarcode cardCode={cardCode} />
-        <div className="flex flex-col items-center gap-2">
-          <QRCode url={passUrl} size={compact ? 120 : 140} />
-          <span className="text-[10px] text-gray-500">{t('retailLoyalty.passQrCaption')}</span>
-        </div>
+      <div className="flex w-full flex-col items-center gap-2">
+        <RetailLoyaltyPassBarcode cardCode={cardCode} large className="w-full max-w-md" />
+        <p className="text-center font-mono text-xs tabular-nums text-gray-600">{cardCode}</p>
       </div>
       {displayName?.trim() ? (
         <p className="mt-3 text-center text-sm font-semibold text-gray-900">{displayName.trim()}</p>
@@ -84,6 +81,7 @@ export function RetailLoyaltyPassShare({
           {t('retailLoyalty.openPassOnPhone')}
         </Link>
       </div>
+      <RetailLoyaltyPassPhoneSave cardCode={cardCode} />
     </div>
   )
 }
