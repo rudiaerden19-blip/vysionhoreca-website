@@ -5841,7 +5841,11 @@
     "loyaltyRedeemPointsLabel": "Nombre de points",
     "loyaltyRedeemPreview": "Réduction : €{euro}",
     "loyaltyRedeemModalConfirm": "Appliquer",
-    "loyaltyDiscountLine": "Carte : −{points} pt (−€{euro})"
+    "loyaltyDiscountLine": "Carte : −{points} pt (−€{euro})",
+    "receiptLoyaltyPass": "Carte : {name}",
+    "receiptLoyaltyEarned": "+{points} points ce ticket",
+    "receiptLoyaltyRedeemed": "−{points} points utilisés",
+    "receiptLoyaltyBalance": "Solde total : {points} points"
   },
   "retailLoyalty": {
     "title": "Carte magasin & points",

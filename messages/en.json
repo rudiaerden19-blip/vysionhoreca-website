@@ -5777,7 +5777,11 @@
     "loyaltyRedeemPointsLabel": "Points to redeem",
     "loyaltyRedeemPreview": "Discount: €{euro}",
     "loyaltyRedeemModalConfirm": "Apply",
-    "loyaltyDiscountLine": "Pass: −{points} pt (−€{euro})"
+    "loyaltyDiscountLine": "Pass: −{points} pt (−€{euro})",
+    "receiptLoyaltyPass": "Store pass: {name}",
+    "receiptLoyaltyEarned": "+{points} points this sale",
+    "receiptLoyaltyRedeemed": "−{points} points redeemed",
+    "receiptLoyaltyBalance": "Total balance: {points} points"
   },
   "retailLoyalty": {
     "title": "Store pass & points",

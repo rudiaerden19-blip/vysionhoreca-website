@@ -29,6 +29,10 @@ export type RetailReceiptI18n = {
   draftBanner: string
   draftNotPaid: string
   draftFooter: string
+  loyaltyPassLabel?: (name: string) => string
+  loyaltyEarnedLine?: (points: number) => string
+  loyaltyRedeemedLine?: (points: number) => string
+  loyaltyBalanceLine?: (points: number) => string
 }
 
 function retailLineToCartItem(line: RetailCartLine): KassaCartItem {
@@ -83,6 +87,26 @@ export function buildRetailLastOrderReceipt(
     tableNumber: '',
     createdAt: new Date(),
   }
+}
+
+function appendRetailLoyaltyReceiptLines(
+  order: KassaLastOrderReceipt,
+  labels: RetailReceiptI18n,
+  lines: string[],
+): void {
+  const L = order.retailLoyalty
+  if (!L || !labels.loyaltyBalanceLine) return
+  lines.push('--------------------------------')
+  if (L.memberLabel && labels.loyaltyPassLabel) {
+    lines.push(labels.loyaltyPassLabel(L.memberLabel))
+  }
+  if (L.pointsRedeemed > 0 && labels.loyaltyRedeemedLine) {
+    lines.push(labels.loyaltyRedeemedLine(L.pointsRedeemed))
+  }
+  if (L.pointsEarned > 0 && labels.loyaltyEarnedLine) {
+    lines.push(labels.loyaltyEarnedLine(L.pointsEarned))
+  }
+  lines.push(labels.loyaltyBalanceLine(L.pointsBalance))
 }
 
 function payLabelForOrder(order: KassaLastOrderReceipt, labels: RetailReceiptI18n, isDraft: boolean): string {
@@ -170,6 +194,7 @@ export async function printRetailKassaReceipt(opts: {
   }
   bonLines.push(`${labels.total}  EUR ${order.total.toFixed(2)}`)
   bonLines.push(`${labels.paidWith} ${payLabel}`)
+  appendRetailLoyaltyReceiptLines(order, labels, bonLines)
   if (tenantInfo?.btw_number) {
     bonLines.push(labels.businessVatLabel(tenantInfo.btw_number))
   }
@@ -253,6 +278,33 @@ export async function printRetailKassaReceipt(opts: {
       <div class="row total"><span>${escapeReceiptHtml(labels.total)}</span><span>€${order.total.toFixed(2)}</span></div>
       <div class="divider"></div>
       <div class="center small">${escapeReceiptHtml(labels.paidWith)} ${escapeReceiptHtml(payLabel)}</div>
+      ${
+        order.retailLoyalty && labels.loyaltyBalanceLine
+          ? (() => {
+              const L = order.retailLoyalty!
+              const parts: string[] = ['<div class="divider-solid"></div>']
+              if (L.memberLabel && labels.loyaltyPassLabel) {
+                parts.push(
+                  `<div class="center small bold">${escapeReceiptHtml(labels.loyaltyPassLabel(L.memberLabel))}</div>`,
+                )
+              }
+              if (L.pointsRedeemed > 0 && labels.loyaltyRedeemedLine) {
+                parts.push(
+                  `<div class="center small">${escapeReceiptHtml(labels.loyaltyRedeemedLine(L.pointsRedeemed))}</div>`,
+                )
+              }
+              if (L.pointsEarned > 0 && labels.loyaltyEarnedLine) {
+                parts.push(
+                  `<div class="center small">${escapeReceiptHtml(labels.loyaltyEarnedLine(L.pointsEarned))}</div>`,
+                )
+              }
+              parts.push(
+                `<div class="center small bold">${escapeReceiptHtml(labels.loyaltyBalanceLine(L.pointsBalance))}</div>`,
+              )
+              return parts.join('')
+            })()
+          : ''
+      }
       <div class="divider"></div>
       <div class="center small">
         ${tenantInfo?.btw_number ? `${escapeReceiptHtml(labels.businessVatLabel(tenantInfo.btw_number))}<br/>` : ''}

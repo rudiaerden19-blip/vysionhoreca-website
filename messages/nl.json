@@ -5710,7 +5710,11 @@
     "loyaltyRedeemPointsLabel": "Aantal punten",
     "loyaltyRedeemPreview": "Korting: €{euro}",
     "loyaltyRedeemModalConfirm": "Toepassen",
-    "loyaltyDiscountLine": "Pas: −{points} pt (−€{euro})"
+    "loyaltyDiscountLine": "Pas: −{points} pt (−€{euro})",
+    "receiptLoyaltyPass": "Winkelpas: {name}",
+    "receiptLoyaltyEarned": "+{points} punten deze bon",
+    "receiptLoyaltyRedeemed": "−{points} punten ingewisseld",
+    "receiptLoyaltyBalance": "Totaal saldo: {points} punten"
   },
   "retailLoyalty": {
     "title": "Winkelpas & punten",

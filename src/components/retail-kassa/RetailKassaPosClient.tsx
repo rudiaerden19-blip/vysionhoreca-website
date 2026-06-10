@@ -487,6 +487,13 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       draftBanner: t('kassaReceipt.draftBanner'),
       draftNotPaid: t('kassaReceipt.draftNotPaid'),
       draftFooter: t('kassaReceipt.draftFooter'),
+      loyaltyPassLabel: (name) => t('retailKassaPage.receiptLoyaltyPass').replace('{name}', name),
+      loyaltyEarnedLine: (points) =>
+        t('retailKassaPage.receiptLoyaltyEarned').replace('{points}', String(points)),
+      loyaltyRedeemedLine: (points) =>
+        t('retailKassaPage.receiptLoyaltyRedeemed').replace('{points}', String(points)),
+      loyaltyBalanceLine: (points) =>
+        t('retailKassaPage.receiptLoyaltyBalance').replace('{points}', String(points)),
     }),
     [t],
   )
@@ -1318,7 +1325,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       return
     }
     const orderNumber = res.orderNumber ?? 0
-    const receipt = buildRetailLastOrderReceipt(
+    let receipt = buildRetailLastOrderReceipt(
       linesSnapshot,
       method,
       orderNumber,
@@ -1326,8 +1333,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       splitAmounts,
       discountEuro > 0 ? discountEuro : undefined,
     )
-    setLastOrderReceipt(receipt)
-    if (loyaltyMemberId) {
+    if (loyaltyMemberId && linkedLoyaltyMember) {
       try {
         const settleRes = await authFetch('/api/retail/loyalty/settle', {
           method: 'POST',
@@ -1342,16 +1348,30 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         const settleJson = (await settleRes.json()) as {
           ok?: boolean
           balance?: number
+          earned?: number
+          redeemed?: number
         }
         if (settleJson.ok && settleJson.balance != null) {
+          const balance = settleJson.balance
           setLinkedLoyaltyMember((m) =>
-            m && m.id === loyaltyMemberId ? { ...m, points_balance: settleJson.balance! } : m,
+            m && m.id === loyaltyMemberId ? { ...m, points_balance: balance } : m,
           )
+          receipt = {
+            ...receipt,
+            retailLoyalty: {
+              memberLabel:
+                linkedLoyaltyMember.display_name?.trim() || linkedLoyaltyMember.card_code,
+              pointsEarned: settleJson.earned ?? 0,
+              pointsRedeemed: settleJson.redeemed ?? 0,
+              pointsBalance: balance,
+            },
+          }
         }
       } catch {
         /* puntenfout blokkeert verkoop niet */
       }
     }
+    setLastOrderReceipt(receipt)
     setLoyaltyRedeemPoints(0)
     setCart([])
     setSelectedListLineKey(null)

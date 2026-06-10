@@ -180,6 +180,40 @@ export function KassaSuccessReceiptModal({
                 {t('kassaReceipt.paidWith')} {payLabel}
               </p>
             </div>
+            {order.retailLoyalty ? (
+              <div className="mt-3 space-y-1 border-t border-dashed border-gray-400 pt-3 text-center text-sm">
+                {order.retailLoyalty.memberLabel ? (
+                  <p className="font-semibold text-gray-900">
+                    {t('retailKassaPage.receiptLoyaltyPass').replace(
+                      '{name}',
+                      order.retailLoyalty.memberLabel,
+                    )}
+                  </p>
+                ) : null}
+                {order.retailLoyalty.pointsRedeemed > 0 ? (
+                  <p className="text-amber-800">
+                    {t('retailKassaPage.receiptLoyaltyRedeemed').replace(
+                      '{points}',
+                      String(order.retailLoyalty.pointsRedeemed),
+                    )}
+                  </p>
+                ) : null}
+                {order.retailLoyalty.pointsEarned > 0 ? (
+                  <p className="font-semibold text-emerald-700">
+                    {t('retailKassaPage.receiptLoyaltyEarned').replace(
+                      '{points}',
+                      String(order.retailLoyalty.pointsEarned),
+                    )}
+                  </p>
+                ) : null}
+                <p className="font-bold text-gray-900">
+                  {t('retailKassaPage.receiptLoyaltyBalance').replace(
+                    '{points}',
+                    String(order.retailLoyalty.pointsBalance),
+                  )}
+                </p>
+              </div>
+            ) : null}
             {order.helpedByStaffName && (
               <div className="text-center mt-3 text-sm font-semibold text-gray-800 px-1">
                 {t('kassaReceipt.helpedBy').replace('{name}', order.helpedByStaffName)}

@@ -5841,7 +5841,11 @@
     "loyaltyRedeemPointsLabel": "Anzahl Punkte",
     "loyaltyRedeemPreview": "Rabatt: €{euro}",
     "loyaltyRedeemModalConfirm": "Anwenden",
-    "loyaltyDiscountLine": "Karte: −{points} Pt (−€{euro})"
+    "loyaltyDiscountLine": "Karte: −{points} Pt (−€{euro})",
+    "receiptLoyaltyPass": "Shopkarte: {name}",
+    "receiptLoyaltyEarned": "+{points} Punkte dieser Bon",
+    "receiptLoyaltyRedeemed": "−{points} Punkte eingelöst",
+    "receiptLoyaltyBalance": "Gesamtstand: {points} Punkte"
   },
   "retailLoyalty": {
     "title": "Shopkarte & Punkte",

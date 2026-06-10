@@ -5818,7 +5818,11 @@
     "loyaltyRedeemPointsLabel": "Puntos a canjear",
     "loyaltyRedeemPreview": "Descuento: €{euro}",
     "loyaltyRedeemModalConfirm": "Aplicar",
-    "loyaltyDiscountLine": "Tarjeta: −{points} pt (−€{euro})"
+    "loyaltyDiscountLine": "Tarjeta: −{points} pt (−€{euro})",
+    "receiptLoyaltyPass": "Tarjeta: {name}",
+    "receiptLoyaltyEarned": "+{points} puntos en esta venta",
+    "receiptLoyaltyRedeemed": "−{points} puntos canjeados",
+    "receiptLoyaltyBalance": "Saldo total: {points} puntos"
   },
   "retailLoyalty": {
     "title": "Tarjeta tienda y puntos",

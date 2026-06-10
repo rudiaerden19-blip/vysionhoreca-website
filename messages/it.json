@@ -5818,7 +5818,11 @@
     "loyaltyRedeemPointsLabel": "Punti da usare",
     "loyaltyRedeemPreview": "Sconto: €{euro}",
     "loyaltyRedeemModalConfirm": "Applica",
-    "loyaltyDiscountLine": "Tessera: −{points} pt (−€{euro})"
+    "loyaltyDiscountLine": "Tessera: −{points} pt (−€{euro})",
+    "receiptLoyaltyPass": "Tessera: {name}",
+    "receiptLoyaltyEarned": "+{points} punti su questo scontrino",
+    "receiptLoyaltyRedeemed": "−{points} punti usati",
+    "receiptLoyaltyBalance": "Saldo totale: {points} punti"
   },
   "retailLoyalty": {
     "title": "Tessera negozio e punti",

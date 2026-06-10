@@ -36,6 +36,13 @@ export interface KassaReceiptVatLine {
   tax: number
 }
 
+export interface KassaReceiptRetailLoyalty {
+  memberLabel?: string
+  pointsEarned: number
+  pointsRedeemed: number
+  pointsBalance: number
+}
+
 export interface KassaLastOrderReceipt {
   orderNumber: number
   checkoutReference?: string
@@ -54,4 +61,6 @@ export interface KassaLastOrderReceipt {
   floorPlanZone?: FloorPlanZone
   createdAt: Date
   helpedByStaffName?: string | null
+  /** Alleen winkelkassa — punten op bon / success-modal */
+  retailLoyalty?: KassaReceiptRetailLoyalty
 }
