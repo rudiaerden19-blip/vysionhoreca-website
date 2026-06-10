@@ -29,6 +29,7 @@ export type RetailReceiptI18n = {
   draftBanner: string
   draftNotPaid: string
   draftFooter: string
+  helpedByLine?: (name: string) => string
   loyaltyPassLabel?: (name: string) => string
   loyaltyEarnedLine?: (points: number) => string
   loyaltyRedeemedLine?: (points: number) => string
@@ -66,6 +67,7 @@ export function buildRetailLastOrderReceipt(
   tenantDefaultBtw: number,
   splitAmounts?: { cash: number; card: number },
   loyaltyDiscountEuro?: number,
+  helpedByStaffName?: string | null,
 ): KassaLastOrderReceipt {
   const gross = Math.round(lines.reduce((s, l) => s + l.sku.price * l.quantity, 0) * 100) / 100
   const discount = Math.round(Math.min(Math.max(0, loyaltyDiscountEuro ?? 0), gross) * 100) / 100
@@ -86,6 +88,7 @@ export function buildRetailLastOrderReceipt(
     orderType: 'TAKEAWAY',
     tableNumber: '',
     createdAt: new Date(),
+    helpedByStaffName: helpedByStaffName?.trim() || null,
   }
 }
 
@@ -194,6 +197,9 @@ export async function printRetailKassaReceipt(opts: {
   }
   bonLines.push(`${labels.total}  EUR ${order.total.toFixed(2)}`)
   bonLines.push(`${labels.paidWith} ${payLabel}`)
+  if (order.helpedByStaffName?.trim() && labels.helpedByLine) {
+    bonLines.push(labels.helpedByLine(order.helpedByStaffName.trim()))
+  }
   appendRetailLoyaltyReceiptLines(order, labels, bonLines)
   if (tenantInfo?.btw_number) {
     bonLines.push(labels.businessVatLabel(tenantInfo.btw_number))
@@ -278,6 +284,11 @@ export async function printRetailKassaReceipt(opts: {
       <div class="row total"><span>${escapeReceiptHtml(labels.total)}</span><span>€${order.total.toFixed(2)}</span></div>
       <div class="divider"></div>
       <div class="center small">${escapeReceiptHtml(labels.paidWith)} ${escapeReceiptHtml(payLabel)}</div>
+      ${
+        order.helpedByStaffName?.trim() && labels.helpedByLine
+          ? `<div class="center bold">${escapeReceiptHtml(labels.helpedByLine(order.helpedByStaffName.trim()))}</div>`
+          : ''
+      }
       ${
         order.retailLoyalty && labels.loyaltyBalanceLine
           ? (() => {

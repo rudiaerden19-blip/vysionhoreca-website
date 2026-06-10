@@ -110,6 +110,7 @@ export async function completeRetailSale(
     loyaltyMemberId?: string | null
     loyaltyDiscountEuro?: number
     loyaltyRedeemPoints?: number
+    kassaStaffId?: string | null
   },
 ): Promise<{ ok: boolean; orderNumber?: number; error?: string }> {
   if (lines.length === 0) return { ok: false, error: 'empty_cart' }
@@ -167,6 +168,9 @@ export async function completeRetailSale(
   const redeemPts = options?.loyaltyRedeemPoints
   if (redeemPts != null && redeemPts > 0) {
     orderPayload.retail_loyalty_points_redeemed = Math.floor(redeemPts)
+  }
+  if (options?.kassaStaffId) {
+    orderPayload.kassa_staff_id = options.kassaStaffId
   }
 
   if (method === 'SPLIT' && splitAmounts) {

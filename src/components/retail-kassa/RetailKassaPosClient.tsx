@@ -36,6 +36,9 @@ import type { KassaPayOption } from '@/components/kassa/KassaPaymentModal'
 import { KassaPaymentModal } from '@/components/kassa/KassaPaymentModal'
 import { KassaSplitPaymentModal } from '@/components/kassa/KassaSplitPaymentModal'
 import { KassaSuccessReceiptModal } from '@/components/kassa/KassaSuccessReceiptModal'
+import { KassaAnalogClock } from '@/components/kassa/KassaAnalogClock'
+import { KassaStaffClockModal } from '@/components/kassa/KassaStaffClockUi'
+import { KassaStaffSalesPickModal } from '@/components/kassa/KassaStaffSalesPickModal'
 import type { KassaLastOrderReceipt, KassaPaymentMethod } from '@/lib/kassa-cart-types'
 import {
   buildRetailLastOrderReceipt,
@@ -92,6 +95,7 @@ import {
 import { appendKassaCloseTipToAbsoluteLoginUrl } from '@/lib/shop-login-kassa-tip'
 import { isAndroidTabletPrintClient, openCashDrawer } from '@/lib/vysion-print-agent-client'
 import { playClick } from '@/lib/sounds'
+import { useKassaStaffClockPos } from '@/lib/use-kassa-staff-clock-pos'
 
 const KASSA_HEADER_QUICK_LINK_LABEL = 'text-[11px] leading-snug sm:text-xs'
 
@@ -202,6 +206,44 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const langRef = useRef<HTMLDivElement>(null)
 
   const [tenantInfo, setTenantInfo] = useState<TenantSettings | null>(null)
+  const staffClockEnabled = !!tenantInfo?.kassa_staff_clock_enabled
+  const staffClockErrorText = useCallback(
+    (code: string) => {
+      const key = `staffClock.errors.${code}`
+      const msg = t(key)
+      return msg === key ? t('staffClock.errors.unknown') : msg
+    },
+    [t],
+  )
+  const {
+    activeKassaStaff,
+    showKassaStaffClockButton,
+    blockSaleWithoutStaffIfNeeded,
+    openStaffSalesPickModal,
+    openStaffClockModal,
+    startStaffSales,
+    staffClockOpen,
+    setStaffClockOpen,
+    staffSalesPickOpen,
+    setStaffSalesPickOpen,
+    staffClockList,
+    staffClockListLoading,
+    staffClockBusy,
+    staffClockPinModal,
+    setStaffClockPinModal,
+    staffClockPinInput,
+    setStaffClockPinInput,
+    staffClockPinError,
+    setStaffClockPinError,
+    staffClockPinReqGen,
+    setStaffClockBusy,
+    submitStaffClockPin,
+  } = useKassaStaffClockPos({
+    tenant,
+    staffClockEnabled,
+    staffClockErrorText,
+    t,
+  })
   const [skus, setSkus] = useState<RetailPosSku[]>([])
   const [loading, setLoading] = useState(true)
   const [scanValue, setScanValue] = useState('')
@@ -494,6 +536,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         t('retailKassaPage.receiptLoyaltyRedeemed').replace('{points}', String(points)),
       loyaltyBalanceLine: (points) =>
         t('retailKassaPage.receiptLoyaltyBalance').replace('{points}', String(points)),
+      helpedByLine: (name) => t('kassaReceipt.helpedBy').replace('{name}', name),
     }),
     [t],
   )
@@ -742,6 +785,21 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
           </button>
         )
       }
+      if (tile.key === 'clock' && showKassaStaffClockButton) {
+        return (
+          <button
+            key={tile.key}
+            type="button"
+            onClick={() => {
+              closeArticleSearchKeyboard()
+              openStaffClockModal()
+            }}
+            className={tileClass}
+          >
+            {label}
+          </button>
+        )
+      }
       return (
         <Link
           key={tile.key}
@@ -938,6 +996,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     }
 
     if (mode === 'sales') {
+      if (blockSaleWithoutStaffIfNeeded()) return
       stockBusyRef.current = true
       setStockBusy(true)
       try {
@@ -1114,6 +1173,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   }
 
   function addToCart(sku: RetailPosSku, qty = 1) {
+    if (blockSaleWithoutStaffIfNeeded()) return
     if (!retailSkuInStock(sku, qty)) {
       alert(t('retailKassaPage.outOfStock'))
       return
@@ -1297,6 +1357,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     splitAmounts?: { cash: number; card: number },
   ) {
     if (cart.length === 0 || paying) return
+    if (blockSaleWithoutStaffIfNeeded()) return
     const linesSnapshot = [...cart]
     const grossTotal = linesSnapshot.reduce((s, l) => s + l.sku.price * l.quantity, 0)
     const discountEuro =
@@ -1317,6 +1378,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       loyaltyMemberId,
       loyaltyDiscountEuro: discountEuro,
       loyaltyRedeemPoints: redeemPointsForSale,
+      kassaStaffId: activeKassaStaff?.id ?? null,
     })
     setPaying(false)
     setShowPaymentModal(false)
@@ -1333,6 +1395,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       tenantInfo?.btw_percentage ?? 21,
       splitAmounts,
       discountEuro > 0 ? discountEuro : undefined,
+      activeKassaStaff?.name ?? null,
     )
     setLastOrderReceipt(receipt)
     setLoyaltyRedeemPoints(0)
@@ -1610,6 +1673,60 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
           </div>
         </div>
       ) : null}
+
+      <KassaStaffSalesPickModal
+        open={staffSalesPickOpen}
+        listLoading={staffClockListLoading}
+        staffList={staffClockList}
+        busy={staffClockBusy}
+        onClose={() => {
+          playClick()
+          setStaffSalesPickOpen(false)
+        }}
+        onPickStaff={(s) => startStaffSales(s)}
+      />
+
+      <KassaStaffClockModal
+        open={staffClockOpen}
+        listLoading={staffClockListLoading}
+        staffList={staffClockList}
+        busy={staffClockBusy}
+        pinModal={staffClockPinModal}
+        pinInput={staffClockPinInput}
+        pinError={staffClockPinError}
+        onClose={() => {
+          playClick()
+          staffClockPinReqGen.current += 1
+          setStaffClockBusy(false)
+          setStaffClockOpen(false)
+          setStaffClockPinModal(null)
+          setStaffClockPinInput('')
+          setStaffClockPinError(null)
+        }}
+        onPinInputChange={setStaffClockPinInput}
+        onStartClockIn={(s) => {
+          playClick()
+          setStaffClockPinModal({ staffId: s.id, staffName: s.name, action: 'in' })
+          setStaffClockPinInput('')
+          setStaffClockPinError(null)
+        }}
+        onStartClockOut={(s) => {
+          playClick()
+          setStaffClockPinModal({ staffId: s.id, staffName: s.name, action: 'out' })
+          setStaffClockPinInput('')
+          setStaffClockPinError(null)
+        }}
+        onSales={(s) => startStaffSales(s)}
+        onPinCancel={() => {
+          playClick()
+          staffClockPinReqGen.current += 1
+          setStaffClockBusy(false)
+          setStaffClockPinModal(null)
+          setStaffClockPinInput('')
+          setStaffClockPinError(null)
+        }}
+        onPinConfirm={() => void submitStaffClockPin()}
+      />
 
       <KassaPaymentModal
         open={showPaymentModal}
@@ -1944,6 +2061,15 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             </button>
           ) : null}
 
+          {activeKassaStaff ? (
+            <div
+              className="hidden max-w-[7rem] shrink-0 items-center rounded-md bg-emerald-600/90 px-1.5 py-1 text-[10px] font-bold text-white sm:flex md:max-w-[10rem] md:text-xs"
+              title={activeKassaStaff.name}
+            >
+              <span className="truncate">{activeKassaStaff.name}</span>
+            </div>
+          ) : null}
+
           <div ref={langRef} className="relative z-[40] shrink-0">
             <button
               type="button"
@@ -2005,7 +2131,21 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               type="button"
               data-testid="retail-mode-sales"
               aria-pressed={mode === 'sales'}
-              onClick={() => switchMode('sales')}
+              title={showKassaStaffClockButton ? t('staffClock.salesPickTitle') : undefined}
+              onClick={() => {
+                if (showKassaStaffClockButton) {
+                  if (mode !== 'sales') {
+                    playClick()
+                    setMode('sales')
+                    setStockActivity([])
+                    setSelectedListLineKey(null)
+                    closeArticleSearchKeyboard()
+                  }
+                  openStaffSalesPickModal()
+                  return
+                }
+                switchMode('sales')
+              }}
               className={retailTopNavBtnClass(mode === 'sales')}
             >
               {t('retailKassaPage.modeSales')}
@@ -2393,13 +2533,24 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               >
                 <div className="flex min-h-[15rem] flex-1 flex-col justify-end">
                   <div className={`mb-3 flex shrink-0 items-center gap-2.5 rounded-xl px-2.5 py-2 ${ui.numpadBarBg}`}>
+                    {showKassaStaffClockButton ? (
+                      <button
+                        type="button"
+                        onClick={() => openStaffClockModal()}
+                        className={`shrink-0 active:scale-[0.98] transition-all ${ui.clockTileBg} ${ui.clockTileHover}`}
+                        title={t('staffClock.buttonTitle')}
+                        aria-label={t('staffClock.buttonTitle')}
+                      >
+                        <KassaAnalogClock size={72} />
+                      </button>
+                    ) : null}
                     <input
                       type="text"
                       value={numpadValue}
                       readOnly
                       tabIndex={-1}
                       aria-label={t('kassaApp.numpadPlaceholder')}
-                      className={`w-full min-w-0 border-none bg-transparent text-right text-2xl font-bold outline-none sm:text-3xl ${ui.numpadInput}`}
+                      className={`min-w-0 flex-1 border-none bg-transparent text-right text-2xl font-bold outline-none sm:text-3xl ${ui.numpadInput}`}
                     />
                   </div>
                   <div
@@ -2529,6 +2680,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                     data-testid="retail-kassa-checkout"
                     onClick={() => {
                       if (cart.length === 0) return
+                      if (blockSaleWithoutStaffIfNeeded()) return
                       playClick()
                       startTransition(() => setShowPaymentModal(true))
                     }}
