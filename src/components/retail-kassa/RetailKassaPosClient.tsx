@@ -391,6 +391,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const retailTopNavBtnClass = (selected: boolean) =>
     `${retailTopNavShellClass} ${kassaPosButtonClass(selected)}`
   const retailTopNavLinkClass = `${retailTopNavShellClass} ${kassaPosButtonClass(false)}`
+  const retailScanRowBtnClass = (selected: boolean) =>
+    `${retailTopNavShellClass} ${kassaPosButtonClass(selected)}`
 
   const kassaDarkHeaderBtnShell =
     'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.35rem] px-3 py-2 sm:min-h-[2.6rem] sm:px-3.5 sm:py-2.5'
@@ -1572,7 +1574,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             />
             <form
               onSubmit={onScanSubmit}
-              className={`shrink-0 grid grid-cols-[minmax(0,1fr)_minmax(5.25rem,1fr)_minmax(5.25rem,1fr)] gap-2 border-b px-3 pt-2 pb-2 sm:px-4 ${KASSA_POS_RULE_BLACK}`}
+              className={`shrink-0 flex items-center gap-2 border-b px-3 pt-2 pb-2 sm:px-4 ${KASSA_POS_RULE_BLACK}`}
             >
               <input
                 ref={scanRef}
@@ -1600,12 +1602,9 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                     closeArticleSearchKeyboard()
                   }, 120)
                 }}
-                className={`min-w-0 w-full rounded-full px-4 py-2.5 text-base text-[#f0f0f0] placeholder:text-white/45 focus:outline-none ${KASSA_POS_FIELD}`}
+                className={`min-h-[2.35rem] min-w-0 flex-1 rounded-full px-5 py-2 text-base text-[#f0f0f0] placeholder:text-white/45 focus:outline-none sm:min-h-[2.6rem] sm:py-2.5 ${KASSA_POS_FIELD}`}
               />
-              <button
-                type="submit"
-                className={`min-w-0 px-3 py-2.5 font-bold ${kassaPosButtonClass(true)}`}
-              >
+              <button type="submit" className={retailScanRowBtnClass(true)}>
                 {t('retailKassaPage.add')}
               </button>
               <button
@@ -1614,8 +1613,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 aria-live="polite"
                 className={
                   addOkFlash
-                    ? `min-w-0 rounded-xl border-2 border-emerald-300/90 bg-emerald-500 px-3 py-2.5 font-bold text-white shadow-[0_0_22px_rgba(52,211,153,0.85)] transition-colors duration-150`
-                    : `min-w-0 px-3 py-2.5 font-bold transition-colors duration-300 ${kassaPosButtonClass(false)}`
+                    ? `${retailTopNavShellClass} rounded-xl border-2 border-emerald-300/90 bg-emerald-500 font-bold text-white shadow-[0_0_22px_rgba(52,211,153,0.85)] transition-colors duration-150`
+                    : `${retailScanRowBtnClass(false)} transition-colors duration-300`
                 }
                 onClick={() => {
                   playClick()
