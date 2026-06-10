@@ -527,7 +527,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   }
 
   function renderRetailPlateTiles() {
-    const tileClass = `${kassaPosQuickMenuPanelButtonClass()} ${RETAIL_TRAY_TILE_SIZE_CLASS} flex shrink-0 touch-manipulation select-none flex-col items-center justify-center px-1.5 py-2 text-center text-[9px] font-semibold leading-tight sm:text-[10px]`
+    const tileClass = `${kassaPosQuickMenuPanelButtonClass()} ${RETAIL_TRAY_TILE_SIZE_CLASS} flex shrink-0 touch-manipulation select-none flex-col items-center justify-center px-2 py-2 text-center text-[13px] font-bold leading-[1.15] sm:text-sm sm:leading-snug`
     return RETAIL_GRAY_TRAY_TILES.map((tile) => {
       const label = t(tile.labelKey)
       const enabled =
