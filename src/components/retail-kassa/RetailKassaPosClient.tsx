@@ -1634,7 +1634,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               </button>
             </form>
 
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-3 pb-3 pt-2 sm:px-4">
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-3 pb-1 pt-1 sm:px-4">
               <div
                 className={`flex min-h-0 flex-1 flex-col overflow-hidden ${KASSA_POS_MENU_RECESS_TRAY_CLASS} ${KASSA_POS_BTN_SHAPE} gks-menu-vignette`}
                 data-testid="retail-gray-tray"
@@ -1682,6 +1682,39 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                             })
                           })}
                     </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div
+              className={`flex shrink-0 items-center gap-2 border-t py-1 pl-3 pr-2 sm:gap-2.5 sm:pr-3 ${KASSA_POS_RULE_BLACK} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`}
+            >
+              <div
+                className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto sm:gap-2.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                data-testid="retail-plate-tiles"
+              >
+                {renderRetailPlateTiles()}
+              </div>
+              <div
+                className={`size-[4cm] shrink-0 overflow-hidden rounded-lg border ${KASSA_POS_RULE_BLACK} bg-black/20`}
+                data-testid="retail-last-scan-thumb"
+              >
+                {selectedPreviewSku?.image_url?.trim() ? (
+                  <img
+                    src={selectedPreviewSku.image_url.trim()}
+                    alt={selectedPreviewSku.name}
+                    decoding="async"
+                    loading="eager"
+                    onError={kassaProductImageRetryOnError}
+                    className="size-full object-cover"
+                  />
+                ) : (
+                  <div
+                    className="flex size-full items-center justify-center text-2xl text-white/25"
+                    aria-hidden={!selectedPreviewSku}
+                  >
+                    {selectedPreviewSku ? '📦' : null}
                   </div>
                 )}
               </div>
@@ -1841,47 +1874,10 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 </div>
               </div>
             </div>
-          </div>
-            </div>
 
-            <div className={`shrink-0 border-t ${KASSA_POS_RULE_BLACK}`} aria-hidden />
-
-            <div className={`flex w-full shrink-0 ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`}>
-              <div
-                className={`flex min-w-0 flex-1 items-center gap-2.5 border-r py-2 pl-3 pr-2.5 sm:gap-3 sm:pr-3 ${KASSA_POS_RULE_BLACK}`}
-              >
-                <div
-                  className="flex min-w-0 flex-1 flex-wrap items-center gap-2 sm:gap-2.5"
-                  data-testid="retail-plate-tiles"
-                >
-                  {renderRetailPlateTiles()}
-                </div>
-                <div
-                  className={`size-[4cm] shrink-0 overflow-hidden rounded-lg border ${KASSA_POS_RULE_BLACK} bg-black/20`}
-                  data-testid="retail-last-scan-thumb"
-                >
-                  {selectedPreviewSku?.image_url?.trim() ? (
-                    <img
-                      src={selectedPreviewSku.image_url.trim()}
-                      alt={selectedPreviewSku.name}
-                      decoding="async"
-                      loading="eager"
-                      onError={kassaProductImageRetryOnError}
-                      className="size-full object-cover"
-                    />
-                  ) : (
-                    <div
-                      className="flex size-full items-center justify-center text-2xl text-white/25"
-                      aria-hidden={!selectedPreviewSku}
-                    >
-                      {selectedPreviewSku ? '📦' : null}
-                    </div>
-                  )}
-                </div>
-              </div>
-              <div
-                className={`w-80 sm:w-96 lg:w-[380px] shrink-0 border-l ${KASSA_POS_RULE_BLACK} px-3 py-3 space-y-3`}
-              >
+            <div
+              className={`shrink-0 border-t px-3 py-2 space-y-2.5 ${KASSA_POS_RULE_BLACK}`}
+            >
               <div className="flex w-full touch-manipulation select-none gap-3">
                 <div
                   role="status"
@@ -1979,7 +1975,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                   </div>
                 )}
               </div>
-              </div>
+            </div>
+          </div>
             </div>
           </div>
         </div>
