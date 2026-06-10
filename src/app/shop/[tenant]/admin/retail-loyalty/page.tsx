@@ -6,6 +6,7 @@ import { useLanguage } from '@/i18n'
 import { authFetch } from '@/lib/auth-headers'
 import { adminDb } from '@/lib/admin-db-client'
 import { RetailLoyaltyPassShare } from '@/components/retail-loyalty/RetailLoyaltyPassShare'
+import { RetailLoyaltyNewPassPanel } from '@/components/retail-loyalty/RetailLoyaltyNewPassPanel'
 import type { RetailLoyaltyMember } from '@/lib/retail-loyalty/types'
 
 type Settings = {
@@ -212,10 +213,6 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
   const [members, setMembers] = useState<RetailLoyaltyMember[]>([])
   const [loading, setLoading] = useState(true)
   const [savingSettings, setSavingSettings] = useState(false)
-  const [creating, setCreating] = useState(false)
-  const [newName, setNewName] = useState('')
-  const [newPhone, setNewPhone] = useState('')
-  const [lastCreatedCode, setLastCreatedCode] = useState<string | null>(null)
   const [expandedPassId, setExpandedPassId] = useState<string | null>(null)
   const [managePassId, setManagePassId] = useState<string | null>(null)
   const [showInactive, setShowInactive] = useState(false)
@@ -223,7 +220,7 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
   const loadMembers = useCallback(async () => {
     const res = await adminDb.select<RetailLoyaltyMember[]>('retail_loyalty_members', {
       tenantSlug: params.tenant,
-      select: 'id, tenant_slug, card_code, display_name, phone, points_balance, is_active',
+      select: 'id, tenant_slug, card_code, display_name, phone, email, points_balance, is_active',
       match: showInactive ? undefined : { is_active: true },
       order: { column: 'created_at', ascending: false },
       limit: 500,
@@ -280,32 +277,6 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
     }
   }
 
-  async function createMember() {
-    setCreating(true)
-    setLastCreatedCode(null)
-    try {
-      const res = await authFetch('/api/retail/loyalty/members', {
-        method: 'POST',
-        body: JSON.stringify({
-          tenantSlug: params.tenant,
-          display_name: newName.trim() || undefined,
-          phone: newPhone.trim() || undefined,
-        }),
-      })
-      const json = (await res.json()) as { ok?: boolean; member?: { card_code: string } }
-      if (!json.ok || !json.member) {
-        alert(t('retailLoyalty.createError'))
-        return
-      }
-      setLastCreatedCode(json.member.card_code)
-      setNewName('')
-      setNewPhone('')
-      await loadMembers()
-    } finally {
-      setCreating(false)
-    }
-  }
-
   return (
     <div className="mx-auto max-w-3xl p-4 sm:p-6">
       <div className="mb-6 flex flex-wrap items-center gap-3">
@@ -320,43 +291,7 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
 
       <p className="mb-6 text-sm text-gray-600">{t('retailLoyalty.intro')}</p>
 
-      <section className="mb-8 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-        <h2 className="mb-3 text-lg font-semibold">{t('retailLoyalty.newPassTitle')}</h2>
-        <div className="mb-3 grid gap-3 sm:grid-cols-2">
-          <input
-            type="text"
-            placeholder={t('retailLoyalty.namePlaceholder')}
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            className="rounded-lg border px-3 py-2 text-sm"
-          />
-          <input
-            type="tel"
-            placeholder={t('retailLoyalty.phonePlaceholder')}
-            value={newPhone}
-            onChange={(e) => setNewPhone(e.target.value)}
-            className="rounded-lg border px-3 py-2 text-sm"
-          />
-        </div>
-        <button
-          type="button"
-          disabled={creating}
-          onClick={() => void createMember()}
-          className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
-        >
-          {creating ? t('retailLoyalty.creating') : t('retailLoyalty.createPass')}
-        </button>
-        {lastCreatedCode ? (
-          <div className="mt-4">
-            <RetailLoyaltyPassShare
-              tenantSlug={params.tenant}
-              cardCode={lastCreatedCode}
-              pointsBalance={0}
-            />
-          </div>
-        ) : null}
-        <p className="mt-2 text-xs text-gray-500">{t('retailLoyalty.cardCodeHint')}</p>
-      </section>
+      <RetailLoyaltyNewPassPanel tenant={params.tenant} onCreated={loadMembers} />
 
       <section className="mb-8 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
         <h2 className="mb-3 text-lg font-semibold">{t('retailLoyalty.settingsTitle')}</h2>

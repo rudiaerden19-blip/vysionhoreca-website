@@ -5890,6 +5890,26 @@
     "adjustPointsNotePlaceholder": "Reason (optional)",
     "adjustPointsApply": "Update balance",
     "adjustPointsHint": "Positive adds points, negative removes. Use for corrections or gifts.",
-    "adjustError": "Could not adjust points"
+    "adjustError": "Could not adjust points",
+    "customerSearchPlaceholder": "按姓名、邮箱或手机搜索…",
+    "customerSearch": "搜索",
+    "customerSearching": "搜索中…",
+    "customerSearchHint": "请先搜索客户。若不在系统中，可在下方添加。",
+    "customerNotFound": "还不是客户 — 请填写下方信息并创建会员卡。",
+    "customerHasPass": "已有会员卡",
+    "customerExistingPass": "该客户已有有效会员卡，可重新发送条码邮件。",
+    "customerFoundNoPass": "已找到客户 — 尚无会员卡。请补充信息并创建。",
+    "fieldName": "姓名",
+    "fieldAddress": "地址",
+    "fieldPhone": "电话",
+    "fieldEmail": "邮箱",
+    "createPassAndEmail": "保存并邮件发送条码",
+    "createPassOnly": "仅创建会员卡",
+    "resendPassEmail": "重新发送条码邮件",
+    "newPassNameRequired": "请填写姓名。",
+    "newPassEmailRequired": "请填写邮箱以发送条码。",
+    "passEmailSent": "会员卡已通过邮件发送。",
+    "passEmailFailed": "会员卡已创建，但邮件发送失败。",
+    "emailNotConfigured": "会员卡已创建。请在个人资料中配置邮件后再发送。"
   }
 }

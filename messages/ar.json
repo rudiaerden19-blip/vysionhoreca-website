@@ -5890,6 +5890,26 @@
     "adjustPointsNotePlaceholder": "Reason (optional)",
     "adjustPointsApply": "Update balance",
     "adjustPointsHint": "Positive adds points, negative removes. Use for corrections or gifts.",
-    "adjustError": "Could not adjust points"
+    "adjustError": "Could not adjust points",
+    "customerSearchPlaceholder": "ابحث بالاسم أو البريد أو الهاتف…",
+    "customerSearch": "بحث",
+    "customerSearching": "جاري البحث…",
+    "customerSearchHint": "ابحث عن العميل أولاً. إن لم يكن في النظام، أضفه أدناه.",
+    "customerNotFound": "ليس عميلاً بعد — أكمل البيانات أدناه وأنشئ البطاقة.",
+    "customerHasPass": "لديه بطاقة بالفعل",
+    "customerExistingPass": "هذا العميل لديه بطاقة نشطة. يمكنك إعادة إرسال الرمز.",
+    "customerFoundNoPass": "تم العثور على العميل — لا بطاقة بعد. أكمل وأنشئ البطاقة.",
+    "fieldName": "الاسم",
+    "fieldAddress": "العنوان",
+    "fieldPhone": "رقم الهاتف",
+    "fieldEmail": "البريد الإلكتروني",
+    "createPassAndEmail": "حفظ وإرسال الرمز بالبريد",
+    "createPassOnly": "إنشاء البطاقة فقط",
+    "resendPassEmail": "إعادة إرسال البريد",
+    "newPassNameRequired": "أدخل الاسم.",
+    "newPassEmailRequired": "أدخل البريد لإرسال الرمز.",
+    "passEmailSent": "تم إرسال البطاقة بالبريد.",
+    "passEmailFailed": "تم إنشاء البطاقة، فشل إرسال البريد.",
+    "emailNotConfigured": "تم إنشاء البطاقة. اضبط البريد من الملف الشخصي → إعدادات البريد."
   }
 }

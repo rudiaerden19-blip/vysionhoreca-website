@@ -5890,6 +5890,26 @@
     "adjustPointsNotePlaceholder": "Motivo (opzionale)",
     "adjustPointsApply": "Aggiorna saldo",
     "adjustPointsHint": "Positivo aggiunge, negativo toglie.",
-    "adjustError": "Impossibile aggiornare i punti"
+    "adjustError": "Impossibile aggiornare i punti",
+    "customerSearchPlaceholder": "Cerca per nome, email o cellulare…",
+    "customerSearch": "Cerca",
+    "customerSearching": "Ricerca…",
+    "customerSearchHint": "Cerca prima un cliente. Se non è nel sistema, aggiungilo sotto.",
+    "customerNotFound": "Non è ancora cliente — compila i dati e crea la tessera.",
+    "customerHasPass": "Ha già una tessera",
+    "customerExistingPass": "Questo cliente ha già una tessera attiva. Puoi reinviare il codice a barre.",
+    "customerFoundNoPass": "Cliente trovato — nessuna tessera. Completa e crea la tessera.",
+    "fieldName": "Nome",
+    "fieldAddress": "Indirizzo",
+    "fieldPhone": "Telefono",
+    "fieldEmail": "Email",
+    "createPassAndEmail": "Salva e invia codice a barre",
+    "createPassOnly": "Solo crea tessera",
+    "resendPassEmail": "Reinvia email codice",
+    "newPassNameRequired": "Inserisci un nome.",
+    "newPassEmailRequired": "Inserisci un'email per inviare il codice.",
+    "passEmailSent": "La tessera è stata inviata via email.",
+    "passEmailFailed": "Tessera creata, invio email non riuscito.",
+    "emailNotConfigured": "Tessera creata. Configura l'email in Profilo → impostazioni email."
   }
 }

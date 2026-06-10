@@ -5849,6 +5849,26 @@
     "adjustPointsNotePlaceholder": "Reason (optional)",
     "adjustPointsApply": "Update balance",
     "adjustPointsHint": "Positive adds points, negative removes. Use for corrections or gifts.",
-    "adjustError": "Could not adjust points"
+    "adjustError": "Could not adjust points",
+    "customerSearchPlaceholder": "Search by name, email or phone…",
+    "customerSearch": "Search",
+    "customerSearching": "Searching…",
+    "customerSearchHint": "Search for a customer first. If they are not in the system, you can add them below.",
+    "customerNotFound": "Not a customer yet — fill in the details below and create a store pass.",
+    "customerHasPass": "Already has a store pass",
+    "customerExistingPass": "This customer already has an active pass. You can resend the barcode by email.",
+    "customerFoundNoPass": "Customer found — no pass yet. Complete if needed and create the pass.",
+    "fieldName": "Name",
+    "fieldAddress": "Address",
+    "fieldPhone": "Phone number",
+    "fieldEmail": "Email",
+    "createPassAndEmail": "Save & email barcode",
+    "createPassOnly": "Create pass only",
+    "resendPassEmail": "Resend barcode email",
+    "newPassNameRequired": "Enter a name.",
+    "newPassEmailRequired": "Enter an email address to send the barcode.",
+    "passEmailSent": "The store pass was sent by email.",
+    "passEmailFailed": "Pass created, but sending email failed.",
+    "emailNotConfigured": "Pass created. Configure email under Profile → email settings to send mail."
   }
 }

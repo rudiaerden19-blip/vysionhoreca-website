@@ -5913,6 +5913,26 @@
     "adjustPointsNotePlaceholder": "Grund (optional)",
     "adjustPointsApply": "Stand anpassen",
     "adjustPointsHint": "Positiv = hinzufügen, negativ = abziehen.",
-    "adjustError": "Punkte konnten nicht angepasst werden"
+    "adjustError": "Punkte konnten nicht angepasst werden",
+    "customerSearchPlaceholder": "Suche nach Name, E-Mail oder Handy…",
+    "customerSearch": "Suchen",
+    "customerSearching": "Suche…",
+    "customerSearchHint": "Zuerst Kunde suchen. Wenn nicht im System, unten anlegen.",
+    "customerNotFound": "Noch kein Kunde — Daten unten ausfüllen und Pass anlegen.",
+    "customerHasPass": "Hat bereits einen Pass",
+    "customerExistingPass": "Dieser Kunde hat bereits einen aktiven Pass. Barcode erneut mailen möglich.",
+    "customerFoundNoPass": "Kunde gefunden — noch kein Pass. Ergänzen und Pass anlegen.",
+    "fieldName": "Name",
+    "fieldAddress": "Adresse",
+    "fieldPhone": "Telefonnummer",
+    "fieldEmail": "E-Mail",
+    "createPassAndEmail": "Speichern & Barcode mailen",
+    "createPassOnly": "Nur Pass anlegen",
+    "resendPassEmail": "Barcode erneut mailen",
+    "newPassNameRequired": "Bitte Name eingeben.",
+    "newPassEmailRequired": "E-Mail für den Barcode-Versand eingeben.",
+    "passEmailSent": "Der Pass wurde per E-Mail gesendet.",
+    "passEmailFailed": "Pass erstellt, E-Mail-Versand fehlgeschlagen.",
+    "emailNotConfigured": "Pass erstellt. E-Mail unter Profil → E-Mail-Einstellungen einrichten."
   }
 }

@@ -7,6 +7,10 @@ const CreateSchema = z.object({
   tenantSlug: z.string().min(1),
   display_name: z.string().max(120).optional(),
   phone: z.string().max(40).optional(),
+  email: z.string().email().max(200).optional(),
+  address: z.string().max(500).optional(),
+  shop_customer_id: z.string().uuid().optional(),
+  sendPassEmail: z.boolean().optional(),
 })
 
 const PatchSchema = z.object({
@@ -30,18 +34,37 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: 'invalid_body' }, { status: 400 })
   }
 
-  const { tenantSlug, display_name, phone } = parsed.data
+  const { tenantSlug, display_name, phone, email, address, shop_customer_id, sendPassEmail } =
+    parsed.data
   const access = await verifyTenantOrSuperAdmin(req, tenantSlug)
   if (!access.authorized) {
     return NextResponse.json({ ok: false, error: access.error || 'forbidden' }, { status: 403 })
   }
 
-  const res = await createRetailLoyaltyMember(tenantSlug, { display_name, phone })
+  const origin =
+    req.headers.get('x-forwarded-proto') && req.headers.get('x-forwarded-host')
+      ? `${req.headers.get('x-forwarded-proto')}://${req.headers.get('x-forwarded-host')}`
+      : req.nextUrl.origin
+
+  const res = await createRetailLoyaltyMember(tenantSlug, {
+    display_name,
+    phone,
+    email,
+    address,
+    shop_customer_id,
+    sendPassEmail: sendPassEmail === true,
+    emailOrigin: origin,
+  })
   if (!res.ok || !res.member) {
     return NextResponse.json({ ok: false, error: res.error || 'create_failed' }, { status: 500 })
   }
 
-  return NextResponse.json({ ok: true, member: res.member })
+  return NextResponse.json({
+    ok: true,
+    member: res.member,
+    emailSent: res.emailSent === true,
+    warning: res.error,
+  })
 }
 
 export async function PATCH(req: NextRequest) {

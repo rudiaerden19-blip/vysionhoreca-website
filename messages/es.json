@@ -5890,6 +5890,26 @@
     "adjustPointsNotePlaceholder": "Motivo (opcional)",
     "adjustPointsApply": "Actualizar saldo",
     "adjustPointsHint": "Positivo suma, negativo resta.",
-    "adjustError": "No se pudieron ajustar los puntos"
+    "adjustError": "No se pudieron ajustar los puntos",
+    "customerSearchPlaceholder": "Buscar por nombre, email o móvil…",
+    "customerSearch": "Buscar",
+    "customerSearching": "Buscando…",
+    "customerSearchHint": "Busque primero un cliente. Si no está en el sistema, añádalo abajo.",
+    "customerNotFound": "Aún no es cliente — complete los datos y cree la tarjeta.",
+    "customerHasPass": "Ya tiene tarjeta",
+    "customerExistingPass": "Este cliente ya tiene una tarjeta activa. Puede reenviar el código de barras.",
+    "customerFoundNoPass": "Cliente encontrado — sin tarjeta aún. Complete y cree la tarjeta.",
+    "fieldName": "Nombre",
+    "fieldAddress": "Dirección",
+    "fieldPhone": "Teléfono",
+    "fieldEmail": "Email",
+    "createPassAndEmail": "Guardar y enviar código de barras",
+    "createPassOnly": "Solo crear tarjeta",
+    "resendPassEmail": "Reenviar email del código",
+    "newPassNameRequired": "Introduzca un nombre.",
+    "newPassEmailRequired": "Introduzca un email para enviar el código.",
+    "passEmailSent": "La tarjeta se envió por email.",
+    "passEmailFailed": "Tarjeta creada, pero falló el envío del email.",
+    "emailNotConfigured": "Tarjeta creada. Configure el email en Perfil → ajustes de email."
   }
 }

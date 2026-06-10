@@ -5913,6 +5913,26 @@
     "adjustPointsNotePlaceholder": "Motif (optionnel)",
     "adjustPointsApply": "Mettre à jour le solde",
     "adjustPointsHint": "Positif = ajouter, négatif = retirer.",
-    "adjustError": "Impossible d'ajuster les points"
+    "adjustError": "Impossible d'ajuster les points",
+    "customerSearchPlaceholder": "Rechercher par nom, e-mail ou gsm…",
+    "customerSearch": "Rechercher",
+    "customerSearching": "Recherche…",
+    "customerSearchHint": "Recherchez d'abord un client. S'il n'est pas dans le système, ajoutez-le ci-dessous.",
+    "customerNotFound": "Pas encore client — complétez les données ci-dessous et créez la carte.",
+    "customerHasPass": "A déjà une carte",
+    "customerExistingPass": "Ce client a déjà une carte active. Vous pouvez renvoyer le code-barres.",
+    "customerFoundNoPass": "Client trouvé — pas encore de carte. Complétez et créez la carte.",
+    "fieldName": "Nom",
+    "fieldAddress": "Adresse",
+    "fieldPhone": "Téléphone",
+    "fieldEmail": "E-mail",
+    "createPassAndEmail": "Enregistrer et envoyer le code-barres",
+    "createPassOnly": "Créer la carte seulement",
+    "resendPassEmail": "Renvoyer l'e-mail du code-barres",
+    "newPassNameRequired": "Indiquez un nom.",
+    "newPassEmailRequired": "Indiquez un e-mail pour envoyer le code-barres.",
+    "passEmailSent": "La carte a été envoyée par e-mail.",
+    "passEmailFailed": "Carte créée, mais l'e-mail n'a pas pu être envoyé.",
+    "emailNotConfigured": "Carte créée. Configurez l'e-mail dans Profil → paramètres e-mail."
   }
 }

@@ -4,11 +4,14 @@ import {
   computeRetailLoyaltyRedeemEuroDiscount,
   maxRetailLoyaltyRedeemPoints,
 } from '@/lib/retail-loyalty/redeem-math'
+import { sendRetailLoyaltyPassEmail } from '@/lib/retail-loyalty/send-pass-email'
 import type { RetailLoyaltyMemberPublic, RetailLoyaltySettings } from '@/lib/retail-loyalty/types'
+import bcrypt from 'bcryptjs'
 
 const SETTINGS_SELECT =
   'tenant_slug, enabled, points_per_euro, min_order_total_for_points, redeem_enabled, redeem_points_per_euro'
-const MEMBER_SELECT = 'id, tenant_slug, card_code, display_name, phone, points_balance, is_active'
+const MEMBER_SELECT =
+  'id, tenant_slug, card_code, display_name, phone, email, shop_customer_id, points_balance, is_active'
 
 export async function getRetailLoyaltySettings(tenantSlug: string): Promise<RetailLoyaltySettings> {
   const supabase = getServerSupabaseClient()
@@ -106,12 +109,247 @@ export async function lookupRetailLoyaltyMemberByScan(
   }
 }
 
-export async function createRetailLoyaltyMember(
+export type RetailLoyaltyShopCustomerHit = {
+  id: string
+  name: string
+  email: string
+  phone: string | null
+  address: string | null
+  postal_code: string | null
+  city: string | null
+}
+
+export type RetailLoyaltyCustomerSearchHit = {
+  customer: RetailLoyaltyShopCustomerHit
+  loyaltyMember: RetailLoyaltyMemberPublic | null
+}
+
+export async function searchRetailLoyaltyCustomers(
   tenantSlug: string,
-  input: { display_name?: string; phone?: string; card_code?: string },
-): Promise<{ ok: boolean; member?: RetailLoyaltyMemberPublic; error?: string }> {
+  rawQuery: string,
+): Promise<{ ok: boolean; results: RetailLoyaltyCustomerSearchHit[]; error?: string }> {
+  const q = rawQuery.trim()
+  if (q.length < 2) return { ok: true, results: [] }
+
+  const supabase = getServerSupabaseClient()
+  if (!supabase) return { ok: false, results: [], error: 'db_unavailable' }
+
+  const safe = q.replace(/[%_\\]/g, '')
+  const emailExact = q.includes('@') ? q.toLowerCase().trim() : null
+
+  let customerQuery = supabase
+    .from('shop_customers')
+    .select('id, name, email, phone, address, postal_code, city')
+    .eq('tenant_slug', tenantSlug)
+    .limit(12)
+
+  if (emailExact) {
+    customerQuery = customerQuery.ilike('email', emailExact)
+  } else {
+    const quoted = `"${safe.replace(/"/g, '')}"`
+    customerQuery = customerQuery.or(
+      `name.ilike.${quoted},email.ilike.${quoted},phone.ilike.${quoted}`,
+    )
+  }
+
+  const { data: customers, error } = await customerQuery
+  if (error) return { ok: false, results: [], error: error.message }
+
+  const hits: RetailLoyaltyCustomerSearchHit[] = []
+  for (const row of customers ?? []) {
+    const customer: RetailLoyaltyShopCustomerHit = {
+      id: row.id,
+      name: row.name ?? '',
+      email: row.email ?? '',
+      phone: row.phone ?? null,
+      address: row.address ?? null,
+      postal_code: row.postal_code ?? null,
+      city: row.city ?? null,
+    }
+    let loyaltyMember: RetailLoyaltyMemberPublic | null = null
+
+    const { data: byLink } = await supabase
+      .from('retail_loyalty_members')
+      .select(MEMBER_SELECT)
+      .eq('tenant_slug', tenantSlug)
+      .eq('shop_customer_id', customer.id)
+      .eq('is_active', true)
+      .maybeSingle()
+
+    if (byLink) {
+      loyaltyMember = {
+        id: byLink.id,
+        card_code: byLink.card_code,
+        display_name: byLink.display_name,
+        phone: byLink.phone,
+        points_balance: Number(byLink.points_balance) || 0,
+      }
+    } else if (customer.phone?.trim()) {
+      const phone = customer.phone.trim()
+      const { data: byPhone } = await supabase
+        .from('retail_loyalty_members')
+        .select(MEMBER_SELECT)
+        .eq('tenant_slug', tenantSlug)
+        .eq('phone', phone)
+        .eq('is_active', true)
+        .maybeSingle()
+      if (byPhone) {
+        loyaltyMember = {
+          id: byPhone.id,
+          card_code: byPhone.card_code,
+          display_name: byPhone.display_name,
+          phone: byPhone.phone,
+          points_balance: Number(byPhone.points_balance) || 0,
+        }
+      }
+    }
+
+    hits.push({ customer, loyaltyMember })
+  }
+
+  return { ok: true, results: hits }
+}
+
+async function upsertShopCustomerForLoyalty(
+  tenantSlug: string,
+  input: {
+    shop_customer_id?: string
+    name: string
+    email: string
+    phone?: string
+    address?: string
+  },
+): Promise<{ ok: boolean; customerId?: string; error?: string }> {
   const supabase = getServerSupabaseClient()
   if (!supabase) return { ok: false, error: 'db_unavailable' }
+
+  const email = input.email.trim().toLowerCase()
+  const name = input.name.trim()
+  if (!email || !email.includes('@')) return { ok: false, error: 'email_required' }
+  if (!name) return { ok: false, error: 'name_required' }
+
+  const patch = {
+    name,
+    email,
+    phone: input.phone?.trim() || null,
+    address: input.address?.trim() || null,
+    updated_at: new Date().toISOString(),
+  }
+
+  if (input.shop_customer_id) {
+    const { error } = await supabase
+      .from('shop_customers')
+      .update(patch)
+      .eq('tenant_slug', tenantSlug)
+      .eq('id', input.shop_customer_id)
+    if (error) return { ok: false, error: error.message }
+    return { ok: true, customerId: input.shop_customer_id }
+  }
+
+  const { data: existing } = await supabase
+    .from('shop_customers')
+    .select('id')
+    .eq('tenant_slug', tenantSlug)
+    .eq('email', email)
+    .maybeSingle()
+
+  if (existing?.id) {
+    const { error } = await supabase
+      .from('shop_customers')
+      .update(patch)
+      .eq('tenant_slug', tenantSlug)
+      .eq('id', existing.id)
+    if (error) return { ok: false, error: error.message }
+    return { ok: true, customerId: existing.id }
+  }
+
+  const randomPass = crypto.randomUUID() + crypto.randomUUID()
+  const password_hash = await bcrypt.hash(randomPass, 12)
+
+  const { data: inserted, error: insErr } = await supabase
+    .from('shop_customers')
+    .insert({
+      tenant_slug: tenantSlug,
+      ...patch,
+      password_hash,
+      loyalty_points: 0,
+      total_spent: 0,
+      total_orders: 0,
+      is_active: true,
+      email_verified: false,
+    })
+    .select('id')
+    .single()
+
+  if (insErr || !inserted) return { ok: false, error: insErr?.message || 'customer_insert_failed' }
+  return { ok: true, customerId: inserted.id }
+}
+
+export async function createRetailLoyaltyMember(
+  tenantSlug: string,
+  input: {
+    display_name?: string
+    phone?: string
+    email?: string
+    address?: string
+    shop_customer_id?: string
+    card_code?: string
+    sendPassEmail?: boolean
+    emailOrigin?: string
+  },
+): Promise<{ ok: boolean; member?: RetailLoyaltyMemberPublic; error?: string; emailSent?: boolean }> {
+  const supabase = getServerSupabaseClient()
+  if (!supabase) return { ok: false, error: 'db_unavailable' }
+
+  let shopCustomerId = input.shop_customer_id
+  const emailNorm = input.email?.trim().toLowerCase()
+
+  if (emailNorm && input.display_name?.trim()) {
+    const custRes = await upsertShopCustomerForLoyalty(tenantSlug, {
+      shop_customer_id: shopCustomerId,
+      name: input.display_name.trim(),
+      email: emailNorm,
+      phone: input.phone,
+      address: input.address,
+    })
+    if (!custRes.ok) return { ok: false, error: custRes.error }
+    shopCustomerId = custRes.customerId
+  }
+
+  if (shopCustomerId) {
+    const { data: existingPass } = await supabase
+      .from('retail_loyalty_members')
+      .select(MEMBER_SELECT)
+      .eq('tenant_slug', tenantSlug)
+      .eq('shop_customer_id', shopCustomerId)
+      .eq('is_active', true)
+      .maybeSingle()
+    if (existingPass) {
+      const member: RetailLoyaltyMemberPublic = {
+        id: existingPass.id,
+        card_code: existingPass.card_code,
+        display_name: existingPass.display_name,
+        phone: existingPass.phone,
+        points_balance: Number(existingPass.points_balance) || 0,
+      }
+      let emailSent = false
+      if (input.sendPassEmail && emailNorm && input.emailOrigin) {
+        const mail = await sendRetailLoyaltyPassEmail({
+          supabase,
+          tenantSlug,
+          toEmail: emailNorm,
+          cardCode: existingPass.card_code,
+          displayName: existingPass.display_name,
+          origin: input.emailOrigin,
+        })
+        emailSent = mail.ok
+        if (!mail.ok && mail.error === 'smtp_not_configured') {
+          return { ok: true, member, emailSent: false, error: 'smtp_not_configured' }
+        }
+      }
+      return { ok: true, member, emailSent }
+    }
+  }
 
   let cardCode = input.card_code ? normalizeRetailLoyaltyCardCode(input.card_code) : null
   if (!cardCode) {
@@ -138,22 +376,40 @@ export async function createRetailLoyaltyMember(
       card_code: cardCode,
       display_name: input.display_name?.trim() || null,
       phone: input.phone?.trim() || null,
+      email: emailNorm || null,
+      shop_customer_id: shopCustomerId ?? null,
     })
     .select(MEMBER_SELECT)
     .single()
 
   if (error || !data) return { ok: false, error: error?.message || 'insert_failed' }
 
-  return {
-    ok: true,
-    member: {
-      id: data.id,
-      card_code: data.card_code,
-      display_name: data.display_name,
-      phone: data.phone,
-      points_balance: 0,
-    },
+  const member: RetailLoyaltyMemberPublic = {
+    id: data.id,
+    card_code: data.card_code,
+    display_name: data.display_name,
+    phone: data.phone,
+    points_balance: 0,
   }
+
+  let emailSent = false
+  if (input.sendPassEmail && emailNorm && input.emailOrigin) {
+    const mail = await sendRetailLoyaltyPassEmail({
+      supabase,
+      tenantSlug,
+      toEmail: emailNorm,
+      cardCode: data.card_code,
+      displayName: data.display_name,
+      origin: input.emailOrigin,
+    })
+    emailSent = mail.ok
+    if (!mail.ok && mail.error === 'smtp_not_configured') {
+      return { ok: true, member, emailSent: false, error: 'smtp_not_configured' }
+    }
+    if (!mail.ok) return { ok: true, member, emailSent: false, error: 'email_send_failed' }
+  }
+
+  return { ok: true, member, emailSent }
 }
 
 export function computeRetailLoyaltyPoints(

@@ -5890,6 +5890,26 @@
     "adjustPointsNotePlaceholder": "Reason (optional)",
     "adjustPointsApply": "Update balance",
     "adjustPointsHint": "Positive adds points, negative removes. Use for corrections or gifts.",
-    "adjustError": "Could not adjust points"
+    "adjustError": "Could not adjust points",
+    "customerSearchPlaceholder": "名前・メール・電話で検索…",
+    "customerSearch": "検索",
+    "customerSearching": "検索中…",
+    "customerSearchHint": "まず顧客を検索。未登録の場合は下で追加できます。",
+    "customerNotFound": "まだ顧客ではありません — 下記を入力してパスを作成してください。",
+    "customerHasPass": "すでにパスあり",
+    "customerExistingPass": "この顧客は有効なパスがあります。バーコードを再送できます。",
+    "customerFoundNoPass": "顧客が見つかりました — パス未作成。必要に応じて入力して作成。",
+    "fieldName": "名前",
+    "fieldAddress": "住所",
+    "fieldPhone": "電話番号",
+    "fieldEmail": "メール",
+    "createPassAndEmail": "保存してバーコードを送信",
+    "createPassOnly": "パスのみ作成",
+    "resendPassEmail": "バーコードメールを再送",
+    "newPassNameRequired": "名前を入力してください。",
+    "newPassEmailRequired": "バーコード送信のためメールを入力してください。",
+    "passEmailSent": "パスをメールで送信しました。",
+    "passEmailFailed": "パスは作成しましたが、メール送信に失敗しました。",
+    "emailNotConfigured": "パスを作成しました。プロフィールのメール設定を行ってください。"
   }
 }

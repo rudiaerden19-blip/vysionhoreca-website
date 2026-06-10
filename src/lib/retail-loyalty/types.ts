@@ -13,6 +13,8 @@ export type RetailLoyaltyMember = {
   card_code: string
   display_name: string | null
   phone: string | null
+  email: string | null
+  shop_customer_id: string | null
   points_balance: number
   is_active: boolean
 }
