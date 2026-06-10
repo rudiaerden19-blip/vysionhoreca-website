@@ -5874,6 +5874,10 @@
     "deletingPass": "Deleting…",
     "deletePassConfirm": "Permanently delete the store pass for {name}? Point history will be removed. This cannot be undone.",
     "deletePassError": "Could not delete pass",
-    "emailAlreadyHasPass": "This email already has a store pass. Search by email and use “Resend barcode email”, or use a different email."
+    "emailAlreadyHasPass": "This email already has a store pass. Search by email and use “Resend barcode email”, or use a different email.",
+    "existingPassMailed": "This email already had a pass — the barcode was sent again.",
+    "mailPassBarcode": "Email barcode",
+    "mailingPass": "Sending…",
+    "memberNoEmail": "No email on file for this pass. Add an email via Manage or when creating the pass."
   }
 }

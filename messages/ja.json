@@ -5915,6 +5915,10 @@
     "deletingPass": "削除中…",
     "deletePassConfirm": "{name} のパスを完全に削除しますか？ポイント履歴も消えます。元に戻せません。",
     "deletePassError": "削除できませんでした",
-    "emailAlreadyHasPass": "このメールには既にパスがあります。メールで検索し「バーコードメールを再送」するか、別のメールを使ってください。"
+    "emailAlreadyHasPass": "このメールには既にパスがあります。メールで検索し「バーコードメールを再送」するか、別のメールを使ってください。",
+    "existingPassMailed": "このメールには既にパスがありました — バーコードを再送しました。",
+    "mailPassBarcode": "バーコードをメール",
+    "mailingPass": "送信中…",
+    "memberNoEmail": "このパスにメールがありません。管理または作成時に追加してください。"
   }
 }

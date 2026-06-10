@@ -5915,6 +5915,10 @@
     "deletingPass": "Eliminazione…",
     "deletePassConfirm": "Eliminare definitivamente la tessera di {name}? Anche lo storico punti. Irreversibile.",
     "deletePassError": "Eliminazione non riuscita",
-    "emailAlreadyHasPass": "Questa email ha già una tessera. Cerca per email e usa «Reinvia email codice», o un'altra email."
+    "emailAlreadyHasPass": "Questa email ha già una tessera. Cerca per email e usa «Reinvia email codice», o un'altra email.",
+    "existingPassMailed": "Questa email aveva già una tessera — il codice a barre è stato reinviato.",
+    "mailPassBarcode": "Invia codice via email",
+    "mailingPass": "Invio…",
+    "memberNoEmail": "Nessuna email per questa tessera. Aggiungila in Gestisci o in creazione."
   }
 }

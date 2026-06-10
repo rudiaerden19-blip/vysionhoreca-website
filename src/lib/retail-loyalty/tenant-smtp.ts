@@ -26,7 +26,7 @@ export async function resolveTenantSmtp(
     .eq('tenant_slug', tenantSlug)
     .maybeSingle()
 
-  if (smtpSettings?.smtp_host && smtpSettings?.smtp_user && smtpSettings?.smtp_password) {
+  if (smtpSettings?.smtp_host && smtpSettings?.smtp_user && smtpSettings?.smtp_password?.trim()) {
     smtpHost = smtpSettings.smtp_host
     smtpPort = smtpSettings.smtp_port || 465
     smtpUser = smtpSettings.smtp_user
@@ -45,18 +45,20 @@ export async function resolveTenantSmtp(
     smtp: {
       host: smtpHost,
       port: smtpPort,
-      user: smtpUser,
-      pass: smtpPass,
+      user: smtpUser.trim(),
+      pass: smtpPass.trim(),
       fromName,
     },
   }
 }
 
 export function createMailTransporter(smtp: TenantSmtpConfig) {
+  const secure = smtp.port === 465
   return nodemailer.createTransport({
     host: smtp.host,
     port: smtp.port,
-    secure: smtp.port === 465,
+    secure,
+    requireTLS: !secure && smtp.port === 587,
     auth: { user: smtp.user, pass: smtp.pass },
   })
 }

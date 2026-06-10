@@ -217,6 +217,7 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
   const [managePassId, setManagePassId] = useState<string | null>(null)
   const [showInactive, setShowInactive] = useState(false)
   const [deletingMemberId, setDeletingMemberId] = useState<string | null>(null)
+  const [mailingMemberId, setMailingMemberId] = useState<string | null>(null)
 
   const loadMembers = useCallback(async () => {
     const baseSelect = 'id, tenant_slug, card_code, display_name, phone, points_balance, is_active'
@@ -309,6 +310,31 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
       await loadMembers()
     } finally {
       setDeletingMemberId(null)
+    }
+  }
+
+  async function mailPassBarcode(member: RetailLoyaltyMember) {
+    if (!member.id) return
+    setMailingMemberId(member.id)
+    try {
+      const res = await authFetch('/api/retail/loyalty/send-pass-email', {
+        method: 'POST',
+        body: JSON.stringify({ tenantSlug: params.tenant, memberId: member.id }),
+      })
+      const json = (await res.json()) as { ok?: boolean; error?: string }
+      if (!json.ok) {
+        if (json.error === 'smtp_not_configured') {
+          alert(t('retailLoyalty.emailNotConfigured'))
+        } else if (json.error === 'member_no_email') {
+          alert(t('retailLoyalty.memberNoEmail'))
+        } else {
+          alert(t('retailLoyalty.passEmailFailed'))
+        }
+        return
+      }
+      alert(t('retailLoyalty.passEmailSent'))
+    } finally {
+      setMailingMemberId(null)
     }
   }
 
@@ -462,6 +488,16 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
                       {expandedPassId === m.id
                         ? t('retailLoyalty.hidePassBarcode')
                         : t('retailLoyalty.showPassBarcode')}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={mailingMemberId === m.id}
+                      className="rounded-lg border border-emerald-600 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-900 disabled:opacity-50"
+                      onClick={() => void mailPassBarcode(m)}
+                    >
+                      {mailingMemberId === m.id
+                        ? t('retailLoyalty.mailingPass')
+                        : t('retailLoyalty.mailPassBarcode')}
                     </button>
                     <button
                       type="button"

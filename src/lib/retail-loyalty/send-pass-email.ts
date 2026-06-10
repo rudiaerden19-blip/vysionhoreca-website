@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { buildEan13BarcodeEmailHtml } from '@/lib/retail-loyalty/ean13-barcode-svg'
 import { createMailTransporter, resolveTenantSmtp } from '@/lib/retail-loyalty/tenant-smtp'
+import { logger } from '@/lib/logger'
 
 function escapeHtml(s: string): string {
   return s
@@ -63,7 +64,12 @@ export async function sendRetailLoyaltyPassEmail(opts: {
       text: shopName,
     })
     return { ok: true }
-  } catch {
+  } catch (err) {
+    logger.warn('[retail-loyalty] pass email send failed', {
+      tenantSlug,
+      toEmail: email,
+      error: err instanceof Error ? err.message : String(err),
+    })
     return { ok: false, error: 'send_failed' }
   }
 }

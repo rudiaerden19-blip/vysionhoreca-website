@@ -327,6 +327,39 @@ export async function createRetailLoyaltyMember(
       .maybeSingle()
     if (existingPass) {
       if (!input.resendExistingPass) {
+        let emailSent = false
+        if (input.sendPassEmail && emailNorm) {
+          const mail = await sendRetailLoyaltyPassEmail({
+            supabase,
+            tenantSlug,
+            toEmail: emailNorm,
+            cardCode: existingPass.card_code,
+            displayName: existingPass.display_name,
+            origin: input.emailOrigin || '',
+          })
+          emailSent = mail.ok
+          if (!mail.ok && mail.error === 'smtp_not_configured') {
+            return { ok: false, error: 'smtp_not_configured' }
+          }
+          if (mail.ok) {
+            const member: RetailLoyaltyMemberPublic = {
+              id: existingPass.id,
+              card_code: existingPass.card_code,
+              display_name: existingPass.display_name,
+              phone: existingPass.phone,
+              points_balance: Number(existingPass.points_balance) || 0,
+            }
+            return { ok: true, member, emailSent: true, error: 'existing_pass_mailed' }
+          }
+          const member: RetailLoyaltyMemberPublic = {
+            id: existingPass.id,
+            card_code: existingPass.card_code,
+            display_name: existingPass.display_name,
+            phone: existingPass.phone,
+            points_balance: Number(existingPass.points_balance) || 0,
+          }
+          return { ok: true, member, emailSent: false, error: 'email_send_failed' }
+        }
         return { ok: false, error: 'email_has_active_pass' }
       }
       await updateRetailLoyaltyMember(tenantSlug, existingPass.id, {
@@ -342,18 +375,21 @@ export async function createRetailLoyaltyMember(
         points_balance: Number(existingPass.points_balance) || 0,
       }
       let emailSent = false
-      if (input.sendPassEmail && emailNorm && input.emailOrigin) {
+      if (input.sendPassEmail && emailNorm) {
         const mail = await sendRetailLoyaltyPassEmail({
           supabase,
           tenantSlug,
           toEmail: emailNorm,
           cardCode: existingPass.card_code,
           displayName: existingPass.display_name,
-          origin: input.emailOrigin,
+          origin: input.emailOrigin || '',
         })
         emailSent = mail.ok
         if (!mail.ok && mail.error === 'smtp_not_configured') {
           return { ok: true, member, emailSent: false, error: 'smtp_not_configured' }
+        }
+        if (!mail.ok) {
+          return { ok: true, member, emailSent: false, error: 'email_send_failed' }
         }
       }
       return { ok: true, member, emailSent }
@@ -402,14 +438,14 @@ export async function createRetailLoyaltyMember(
   }
 
   let emailSent = false
-  if (input.sendPassEmail && emailNorm && input.emailOrigin) {
+  if (input.sendPassEmail && emailNorm) {
     const mail = await sendRetailLoyaltyPassEmail({
       supabase,
       tenantSlug,
       toEmail: emailNorm,
       cardCode: data.card_code,
       displayName: data.display_name,
-      origin: input.emailOrigin,
+      origin: input.emailOrigin || '',
     })
     emailSent = mail.ok
     if (!mail.ok && mail.error === 'smtp_not_configured') {

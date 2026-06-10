@@ -144,6 +144,8 @@ export function RetailLoyaltyNewPassPanel({
       if (!json.ok || !json.member) {
         if (json.error === 'email_has_active_pass') {
           alert(t('retailLoyalty.emailAlreadyHasPass'))
+        } else if (json.error === 'smtp_not_configured') {
+          alert(t('retailLoyalty.emailNotConfigured'))
         } else {
           alert(t('retailLoyalty.createError'))
         }
@@ -152,8 +154,12 @@ export function RetailLoyaltyNewPassPanel({
       const savedName = name.trim()
       resetNewPassForm({ cardCode: json.member.card_code, displayName: savedName })
       setLastCreatedDisplayName(savedName)
-      if (json.warning === 'smtp_not_configured') {
+      if (json.warning === 'smtp_not_configured' || json.error === 'smtp_not_configured') {
         setFeedback(t('retailLoyalty.emailNotConfigured'))
+      } else if (json.warning === 'existing_pass_mailed' || json.error === 'existing_pass_mailed') {
+        setFeedback(t('retailLoyalty.existingPassMailed'))
+      } else if (json.warning === 'email_send_failed' || json.error === 'email_send_failed') {
+        setFeedback(t('retailLoyalty.passEmailFailed'))
       } else if (sendEmail && json.emailSent) {
         setFeedback(t('retailLoyalty.passEmailSent'))
       } else if (sendEmail && !json.emailSent) {
