@@ -2452,7 +2452,7 @@
       "addProduct": "添加产品",
       "editProduct": "编辑产品",
       "name": "名称",
-      "description": "描述",
+      "description": "产品描述",
       "price": "价格",
       "category": "分类",
       "image": "图片",

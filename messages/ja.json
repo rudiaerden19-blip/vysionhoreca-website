@@ -2452,7 +2452,7 @@
       "addProduct": "商品を追加",
       "editProduct": "商品を編集",
       "name": "名前",
-      "description": "説明",
+      "description": "商品説明",
       "price": "価格",
       "category": "カテゴリー",
       "image": "画像",

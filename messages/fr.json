@@ -1952,7 +1952,7 @@
       "addProduct": "Ajouter un produit",
       "editProduct": "Modifier le produit",
       "name": "Nom",
-      "description": "Texte à propos de nous",
+      "description": "Description du produit",
       "price": "Prix",
       "category": "Catégorie",
       "image": "Image",

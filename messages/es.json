@@ -2452,7 +2452,7 @@
       "addProduct": "Añadir producto",
       "editProduct": "Editar producto",
       "name": "Nombre",
-      "description": "Texto sobre nosotros",
+      "description": "Descripción del producto",
       "price": "Precio",
       "category": "Categoría",
       "image": "Imagen",
