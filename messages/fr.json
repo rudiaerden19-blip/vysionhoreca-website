@@ -2012,7 +2012,17 @@
       "colorLabel": "Couleur",
       "trackStock": "Suivi stock",
       "stockQuantity": "Stock",
-      "lowStockThreshold": "Alerte stock"
+      "lowStockThreshold": "Alerte stock",
+      "retailSaleUnitLabel": "Vente par",
+      "retailSaleUnit_stuk": "Unit (each)",
+      "retailSaleUnit_doos": "Box",
+      "retailSaleUnit_bak": "Caisse / palette",
+      "retailSaleUnit_pallet": "Pallet",
+      "retailUnitQuantityLabel": "Quantité par colis",
+      "retailUnitQuantityHint": "Optional, e.g. 24. Price above = one scan (one box/crate/pallet).",
+      "retailPricePerScanStuk": "Price = per unit (1 scan = 1 unit).",
+      "retailPricePackHintSingle": "Price = per 1 {unit} (1 scan = 1 {unit}).",
+      "retailPricePackHint": "Price = per 1 {unit} containing {n} units (1 scan = 1 {unit})."
     },
     "opties": {
       "title": "Options & Extras",

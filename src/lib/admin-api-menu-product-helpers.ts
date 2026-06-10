@@ -30,6 +30,10 @@ export interface MenuProduct {
   color_label?: string | null
   /** Admin productform: horeca vs winkelkassa-velden. */
   catalog_mode?: 'horeca' | 'retail' | null
+  /** Retail: stuk / doos / bak / pallet — prijs geldt per 1 scan (= 1 eenheid). */
+  retail_sale_unit?: 'stuk' | 'doos' | 'bak' | 'pallet' | null
+  /** Retail: bv. 24 flesjes in deze doos (informatief + bon). */
+  retail_unit_quantity?: number | null
 }
 
 export const KASSA_PRODUCT_IMAGE_ZOOM_MIN = 0.65

@@ -2012,7 +2012,17 @@
       "colorLabel": "Farbe",
       "trackStock": "Voorraad bijhouden",
       "stockQuantity": "Voorraad",
-      "lowStockThreshold": "Waarschuwing bij"
+      "lowStockThreshold": "Waarschuwing bij",
+      "retailSaleUnitLabel": "Verkopen per",
+      "retailSaleUnit_stuk": "Stuk",
+      "retailSaleUnit_doos": "Doos",
+      "retailSaleUnit_bak": "Bak / krat",
+      "retailSaleUnit_pallet": "Pallet",
+      "retailUnitQuantityLabel": "Aantal in verpakking",
+      "retailUnitQuantityHint": "Optioneel, bv. 24. Prijs hierboven = 1 scan.",
+      "retailPricePerScanStuk": "Prijs = per stuk (1 scan = 1 stuk).",
+      "retailPricePackHintSingle": "Prijs = per 1 {unit} (1 scan = 1 {unit}).",
+      "retailPricePackHint": "Prijs = per 1 {unit} met {n} stuks (1 scan = 1 {unit})."
     },
     "opties": {
       "title": "Optionen & Extras",

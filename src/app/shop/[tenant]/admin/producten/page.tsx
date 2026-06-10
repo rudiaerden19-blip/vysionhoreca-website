@@ -286,6 +286,22 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
 
   const isRetailForm = catalogMode === 'retail'
 
+  const retailPricePackHint = useMemo(() => {
+    if (!isRetailForm) return ''
+    const unit = formData.retail_sale_unit || 'stuk'
+    const qty = Math.floor(Number(formData.retail_unit_quantity) || 0)
+    const unitLabel = t(`adminPages.producten.retailSaleUnit_${unit}`)
+    if (unit === 'stuk' && qty <= 1) {
+      return t('adminPages.producten.retailPricePerScanStuk')
+    }
+    if (qty > 1) {
+      return t('adminPages.producten.retailPricePackHint')
+        .replace('{unit}', unitLabel)
+        .replace('{n}', String(qty))
+    }
+    return t('adminPages.producten.retailPricePackHintSingle').replace('{unit}', unitLabel)
+  }, [isRetailForm, formData.retail_sale_unit, formData.retail_unit_quantity, t])
+
   function resolveCatalogModeForProduct(product?: MenuProduct | null): ProductCatalogMode {
     if (forcedCatalogMode) return forcedCatalogMode
     const saved = product?.catalog_mode
@@ -477,6 +493,8 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
       size_label: '',
       color_label: '',
       catalog_mode: mode,
+      retail_sale_unit: 'stuk',
+      retail_unit_quantity: undefined,
     })
     setSelectedOptionIds([])
     setPriceInputStr('')
@@ -574,6 +592,17 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
           saveMode === 'retail'
             ? Math.max(0, Math.floor(Number(formData.low_stock_threshold) || 0))
             : formData.low_stock_threshold,
+        retail_sale_unit:
+          saveMode === 'retail'
+            ? (formData.retail_sale_unit as MenuProduct['retail_sale_unit']) || 'stuk'
+            : null,
+        retail_unit_quantity:
+          saveMode === 'retail'
+            ? (() => {
+                const n = Math.floor(Number(formData.retail_unit_quantity) || 0)
+                return n > 0 ? n : null
+              })()
+            : null,
       }
 
       const { data: result, error: saveError } = await saveMenuProduct(productData)
@@ -835,6 +864,9 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                           placeholder="0,00"
                         />
                       </div>
+                      {isRetailForm && retailPricePackHint ? (
+                        <p className="mt-1.5 text-xs text-gray-500">{retailPricePackHint}</p>
+                      ) : null}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -1156,6 +1188,58 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                             className="w-full px-3 py-2.5 border border-gray-200 rounded-xl"
                             placeholder=""
                           />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 rounded-xl border border-gray-100 bg-gray-50/80 p-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t('adminPages.producten.retailSaleUnitLabel')}
+                          </label>
+                          <select
+                            value={formData.retail_sale_unit || 'stuk'}
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                retail_sale_unit: e.target.value as MenuProduct['retail_sale_unit'],
+                              }))
+                            }
+                            className="w-full px-3 py-2.5 border border-gray-200 rounded-xl bg-white"
+                          >
+                            <option value="stuk">{t('adminPages.producten.retailSaleUnit_stuk')}</option>
+                            <option value="doos">{t('adminPages.producten.retailSaleUnit_doos')}</option>
+                            <option value="bak">{t('adminPages.producten.retailSaleUnit_bak')}</option>
+                            <option value="pallet">{t('adminPages.producten.retailSaleUnit_pallet')}</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t('adminPages.producten.retailUnitQuantityLabel')}
+                          </label>
+                          <input
+                            type="number"
+                            min={1}
+                            inputMode="numeric"
+                            value={
+                              formData.retail_unit_quantity != null &&
+                              formData.retail_unit_quantity !== undefined
+                                ? formData.retail_unit_quantity
+                                : ''
+                            }
+                            onChange={(e) => {
+                              const raw = e.target.value.trim()
+                              setFormData((prev) => ({
+                                ...prev,
+                                retail_unit_quantity: raw
+                                  ? Math.max(1, parseInt(raw, 10) || 0)
+                                  : undefined,
+                              }))
+                            }}
+                            className="w-full px-3 py-2.5 border border-gray-200 rounded-xl bg-white"
+                            placeholder=""
+                          />
+                          <p className="mt-1 text-xs text-gray-500">
+                            {t('adminPages.producten.retailUnitQuantityHint')}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">

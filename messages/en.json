@@ -2811,7 +2811,17 @@
       "colorLabel": "Colour",
       "trackStock": "Track stock",
       "stockQuantity": "Stock qty",
-      "lowStockThreshold": "Low stock at"
+      "lowStockThreshold": "Low stock at",
+      "retailSaleUnitLabel": "Sell per",
+      "retailSaleUnit_stuk": "Unit (each)",
+      "retailSaleUnit_doos": "Box",
+      "retailSaleUnit_bak": "Crate",
+      "retailSaleUnit_pallet": "Pallet",
+      "retailUnitQuantityLabel": "Qty in pack",
+      "retailUnitQuantityHint": "Optional, e.g. 24. Price above = one scan (one box/crate/pallet).",
+      "retailPricePerScanStuk": "Price = per unit (1 scan = 1 unit).",
+      "retailPricePackHintSingle": "Price = per 1 {unit} (1 scan = 1 {unit}).",
+      "retailPricePackHint": "Price = per 1 {unit} containing {n} units (1 scan = 1 {unit})."
     },
     "opties": {
       "title": "Options & Extras",
