@@ -28,6 +28,8 @@ export interface MenuProduct {
   barcode?: string | null
   size_label?: string | null
   color_label?: string | null
+  /** Admin productform: horeca vs winkelkassa-velden. */
+  catalog_mode?: 'horeca' | 'retail' | null
 }
 
 export const KASSA_PRODUCT_IMAGE_ZOOM_MIN = 0.65

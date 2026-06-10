@@ -1,6 +1,12 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { useTenantModuleFlagsContext } from '@/lib/tenant-module-flags-context'
+import {
+  isHorecaKassaPosScreenEnabled,
+  isRetailKassaPosScreenEnabled,
+} from '@/lib/tenant-modules'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   DndContext, 
@@ -40,6 +46,8 @@ import MediaPicker from '@/components/MediaPicker'
 import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
+
+type ProductCatalogMode = 'horeca' | 'retail'
 
 const ALLERGEN_IDS = [
   { id: 'gluten', icon: '🌾' },
@@ -231,6 +239,16 @@ function SortableProductCard({
 
 export default function ProductenPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
+  const searchParams = useSearchParams()
+  const { moduleAccess, enabledModulesJson } = useTenantModuleFlagsContext()
+  const horecaKassaOn = isHorecaKassaPosScreenEnabled(moduleAccess)
+  const retailKassaOn = isRetailKassaPosScreenEnabled(moduleAccess, enabledModulesJson)
+  const forcedCatalogMode: ProductCatalogMode | null = !horecaKassaOn
+    ? 'retail'
+    : !retailKassaOn
+      ? 'horeca'
+      : null
+  const showCatalogSlider = horecaKassaOn && retailKassaOn
   const { ask, ConfirmModal } = useAdminConfirm(t)
   const [products, setProducts] = useState<MenuProduct[]>([])
   const [categories, setCategories] = useState<MenuCategory[]>([])
@@ -264,6 +282,21 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
   /** Invoeveld tekst voor prijs (komma ok); numerieke payload zit pas in save. */
   const [priceInputStr, setPriceInputStr] = useState('')
   const [promoPriceInputStr, setPromoPriceInputStr] = useState('')
+  const [catalogMode, setCatalogMode] = useState<ProductCatalogMode>('horeca')
+
+  const isRetailForm = catalogMode === 'retail'
+
+  function resolveCatalogModeForProduct(product?: MenuProduct | null): ProductCatalogMode {
+    if (forcedCatalogMode) return forcedCatalogMode
+    const saved = product?.catalog_mode
+    if (saved === 'retail' || saved === 'horeca') return saved
+    if (product && (product.barcode || product.track_stock || product.article_number)) {
+      return 'retail'
+    }
+    const q = searchParams.get('mode')
+    if (q === 'retail') return 'retail'
+    return horecaKassaOn ? 'horeca' : 'retail'
+  }
 
   // Load data on mount
   useEffect(() => {
@@ -399,6 +432,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     const freshCategories = await getMenuCategories(params.tenant)
     setCategories(freshCategories)
     
+    setCatalogMode(resolveCatalogModeForProduct(product))
     setFormData({
       ...product,
     })
@@ -419,20 +453,30 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     const freshCategories = await getMenuCategories(params.tenant)
     setCategories(freshCategories)
     
+    const mode = resolveCatalogModeForProduct(null)
+    setCatalogMode(mode)
     setFormData({
       name: '',
       description: '',
       price: 0,
-      category_id: freshCategories[0]?.id || null,
+      category_id: null,
       image_url: '',
       is_active: true,
       is_popular: false,
       is_promo: false,
       promo_price: undefined,
       allergens: [],
-      image_display_mode: 'contain',
+      image_display_mode: mode === 'retail' ? null : 'contain',
       kassa_image_zoom: 1,
       print_label: false,
+      track_stock: mode === 'retail',
+      stock_quantity: 0,
+      low_stock_threshold: 5,
+      article_number: '',
+      barcode: '',
+      size_label: '',
+      color_label: '',
+      catalog_mode: mode,
     })
     setSelectedOptionIds([])
     setPriceInputStr('')
@@ -496,6 +540,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
         promoNum = undefined
       }
 
+      const saveMode = forcedCatalogMode ?? catalogMode
       const productData: MenuProduct = {
         id: editingProduct?.id,
         tenant_slug: params.tenant,
@@ -505,14 +550,30 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
         price: priceNum,
         image_url: formData.image_url || '',
         is_active: formData.is_active ?? true,
-        is_popular: formData.is_popular ?? false,
-        is_promo: formData.is_promo ?? false,
-        promo_price: promoNum,
+        is_popular: saveMode === 'retail' ? false : (formData.is_popular ?? false),
+        is_promo: saveMode === 'retail' ? false : (formData.is_promo ?? false),
+        promo_price: saveMode === 'retail' ? undefined : promoNum,
         sort_order: editingProduct?.sort_order || products.length,
-        allergens: formData.allergens || [],
-        image_display_mode: formData.image_display_mode || null,
-        kassa_image_zoom: clampKassaProductImageZoom(formData.kassa_image_zoom as number),
-        print_label: formData.print_label ?? false,
+        allergens: saveMode === 'retail' ? [] : formData.allergens || [],
+        image_display_mode: saveMode === 'retail' ? null : formData.image_display_mode || null,
+        kassa_image_zoom:
+          saveMode === 'retail' ? 1 : clampKassaProductImageZoom(formData.kassa_image_zoom as number),
+        print_label: saveMode === 'retail' ? false : (formData.print_label ?? false),
+        catalog_mode: saveMode,
+        barcode: saveMode === 'retail' ? formData.barcode?.trim() || null : formData.barcode ?? null,
+        article_number:
+          saveMode === 'retail' ? formData.article_number?.trim() || null : formData.article_number ?? null,
+        size_label: saveMode === 'retail' ? formData.size_label?.trim() || null : formData.size_label ?? null,
+        color_label: saveMode === 'retail' ? formData.color_label?.trim() || null : formData.color_label ?? null,
+        track_stock: saveMode === 'retail' ? !!formData.track_stock : formData.track_stock,
+        stock_quantity:
+          saveMode === 'retail' && formData.track_stock
+            ? Math.max(0, Math.floor(Number(formData.stock_quantity) || 0))
+            : formData.stock_quantity,
+        low_stock_threshold:
+          saveMode === 'retail'
+            ? Math.max(0, Math.floor(Number(formData.low_stock_threshold) || 0))
+            : formData.low_stock_threshold,
       }
 
       const { data: result, error: saveError } = await saveMenuProduct(productData)
@@ -522,7 +583,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
         return
       }
 
-      if (result.id) {
+      if (result.id && saveMode === 'horeca') {
         await saveProductOptionLinks(result.id, selectedOptionIds, params.tenant)
       }
 
@@ -738,7 +799,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                         setFormData(prev => ({ ...prev, name: val.charAt(0).toUpperCase() + val.slice(1) }))
                       }}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
-                      placeholder={t('adminPages.producten.namePlaceholder')}
+                      placeholder=""
                     />
                   </div>
 
@@ -751,7 +812,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                       onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                       rows={2}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                      placeholder={t('adminPages.producten.descriptionPlaceholder')}
+                      placeholder=""
                     />
                   </div>
 
@@ -784,7 +845,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                         onChange={(e) => setFormData(prev => ({ ...prev, category_id: e.target.value || null }))}
                         className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
-                        <option value="">{t('adminPages.producten.selectCategory')}</option>
+                        <option value="">{isRetailForm ? '' : t('adminPages.producten.selectCategory')}</option>
                         {categories.map(cat => (
                           <option key={cat.id} value={cat.id}>{cat.name}</option>
                         ))}
@@ -801,6 +862,8 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                     value={formData.image_url || ''}
                     onChange={(url) => setFormData(prev => ({ ...prev, image_url: url }))}
                   />
+                  {!isRetailForm ? (
+                  <>
                   <div className="space-y-2 rounded-xl border border-gray-100 bg-gray-50/80 p-4">
                     <label className="block text-sm font-medium text-gray-800">
                       {t('adminPages.producten.imageDisplayMode')}
@@ -893,6 +956,8 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                       )}
                     </div>
                   )}
+                  </>
+                  ) : null}
                 </div>
 
                 {/* ── SECTIE 3: Status toggles ── */}
@@ -901,9 +966,13 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
 
                   {[
                     { key: 'is_active', label: 'Beschikbaar', sub: 'Zichtbaar in menu & kassa', color: 'bg-green-500' },
-                    { key: 'is_popular', label: '🔥 Populair', sub: 'Wordt gemarkeerd als bestseller', color: 'bg-blue-500' },
-                    { key: 'is_promo', label: '🎁 Promotie', sub: 'Toon actieprijs', color: 'bg-orange-500' },
-                    { key: 'print_label', label: '🏷️ Print label', sub: 'Druk sticker af bij bestelling', color: 'bg-purple-500' },
+                    ...(isRetailForm
+                      ? []
+                      : [
+                          { key: 'is_popular', label: '🔥 Populair', sub: 'Wordt gemarkeerd als bestseller', color: 'bg-blue-500' },
+                          { key: 'is_promo', label: '🎁 Promotie', sub: 'Toon actieprijs', color: 'bg-orange-500' },
+                          { key: 'print_label', label: '🏷️ Print label', sub: 'Druk sticker af bij bestelling', color: 'bg-purple-500' },
+                        ]),
                   ].map(({ key, label, sub, color }) => {
                     const val = !!(formData as any)[key]
                     return (
@@ -924,7 +993,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                   })}
 
                   {/* Promo prijs */}
-                  {formData.is_promo && (
+                  {formData.is_promo && !isRetailForm && (
                     <div className="p-4 bg-orange-50 border border-orange-200 rounded-xl">
                       <label className="block text-sm font-semibold text-orange-800 mb-2">Actieprijs</label>
                       <div className="relative">
@@ -952,7 +1021,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                 </div>
 
                 {/* ── SECTIE 4: Opties ── */}
-                {availableOptions.length > 0 && (
+                {availableOptions.length > 0 && !isRetailForm && (
                   <div className="space-y-3 pt-2 border-t">
                     <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider pt-2">🔧 Opties koppelen</p>
                     <div className="space-y-2">
@@ -988,30 +1057,194 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                   </div>
                 )}
 
-                {/* ── SECTIE 5: Allergenen ── */}
+                {/* ── Catalogus: Horeca / Retail ── */}
                 <div className="space-y-3 pt-2 border-t">
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider pt-2">⚠️ Allergenen</p>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {ALLERGEN_IDS.map(allergen => {
-                      const isSelected = formData.allergens?.includes(allergen.id) || false
-                      const allergenName = t(`adminPages.allergenen.allergenNames.${allergen.id}`)
-                      return (
+                  {showCatalogSlider ? (
+                    <div className="space-y-2">
+                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider pt-2">
+                        {t('adminPages.producten.catalogModeLabel')}
+                      </p>
+                      <div className="flex gap-2 rounded-xl bg-gray-100 p-1">
                         <button
-                          key={allergen.id}
                           type="button"
-                          onClick={() => toggleAllergen(allergen.id)}
-                          className={`flex items-center gap-2 p-2.5 rounded-xl text-left transition-all border-2 ${
-                            isSelected ? 'border-blue-500 bg-blue-50' : 'border-transparent bg-gray-50 hover:bg-gray-100'
+                          onClick={() => setCatalogMode('horeca')}
+                          className={`flex-1 rounded-lg py-2.5 text-sm font-semibold transition-colors ${
+                            catalogMode === 'horeca'
+                              ? 'bg-white text-gray-900 shadow-sm'
+                              : 'text-gray-600 hover:text-gray-900'
                           }`}
                         >
-                          <span className="text-xl">{allergen.icon}</span>
-                          <span className={`text-sm font-medium ${isSelected ? 'text-blue-700' : 'text-gray-600'}`}>
-                            {allergenName}
-                          </span>
+                          {t('adminPages.producten.catalogModeHoreca')}
                         </button>
-                      )
-                    })}
-                  </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCatalogMode('retail')
+                            setFormData((prev) => ({ ...prev, allergens: [] }))
+                          }}
+                          className={`flex-1 rounded-lg py-2.5 text-sm font-semibold transition-colors ${
+                            catalogMode === 'retail'
+                              ? 'bg-white text-gray-900 shadow-sm'
+                              : 'text-gray-600 hover:text-gray-900'
+                          }`}
+                        >
+                          {t('adminPages.producten.catalogModeRetail')}
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {isRetailForm ? (
+                    <div className="space-y-3">
+                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        {t('adminPages.producten.retailFieldsTitle')}
+                      </p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t('adminPages.producten.barcode')}
+                          </label>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            value={formData.barcode || ''}
+                            onChange={(e) =>
+                              setFormData((prev) => ({ ...prev, barcode: e.target.value }))
+                            }
+                            className="w-full px-3 py-2.5 border border-gray-200 rounded-xl"
+                            placeholder=""
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t('adminPages.producten.articleNumber')}
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.article_number || ''}
+                            onChange={(e) =>
+                              setFormData((prev) => ({ ...prev, article_number: e.target.value }))
+                            }
+                            className="w-full px-3 py-2.5 border border-gray-200 rounded-xl"
+                            placeholder=""
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t('adminPages.producten.sizeLabel')}
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.size_label || ''}
+                            onChange={(e) =>
+                              setFormData((prev) => ({ ...prev, size_label: e.target.value }))
+                            }
+                            className="w-full px-3 py-2.5 border border-gray-200 rounded-xl"
+                            placeholder=""
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t('adminPages.producten.colorLabel')}
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.color_label || ''}
+                            onChange={(e) =>
+                              setFormData((prev) => ({ ...prev, color_label: e.target.value }))
+                            }
+                            className="w-full px-3 py-2.5 border border-gray-200 rounded-xl"
+                            placeholder=""
+                          />
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                        <div>
+                          <p className="font-medium text-gray-800 text-sm">
+                            {t('adminPages.producten.trackStock')}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setFormData((prev) => ({ ...prev, track_stock: !prev.track_stock }))
+                          }
+                          className={`relative w-12 h-6 rounded-full transition-colors duration-200 ${
+                            formData.track_stock ? 'bg-green-500' : 'bg-gray-300'
+                          }`}
+                        >
+                          <span
+                            className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${
+                              formData.track_stock ? 'translate-x-6' : 'translate-x-0'
+                            }`}
+                          />
+                        </button>
+                      </div>
+                      {formData.track_stock ? (
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              {t('adminPages.producten.stockQuantity')}
+                            </label>
+                            <input
+                              type="number"
+                              min={0}
+                              value={formData.stock_quantity ?? 0}
+                              onChange={(e) =>
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  stock_quantity: parseInt(e.target.value || '0', 10) || 0,
+                                }))
+                              }
+                              className="w-full px-3 py-2.5 border border-gray-200 rounded-xl"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              {t('adminPages.producten.lowStockThreshold')}
+                            </label>
+                            <input
+                              type="number"
+                              min={0}
+                              value={formData.low_stock_threshold ?? 5}
+                              onChange={(e) =>
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  low_stock_threshold: parseInt(e.target.value || '0', 10) || 0,
+                                }))
+                              }
+                              className="w-full px-3 py-2.5 border border-gray-200 rounded-xl"
+                            />
+                          </div>
+                        </div>
+                      ) : null}
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider pt-2">⚠️ Allergenen</p>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {ALLERGEN_IDS.map(allergen => {
+                          const isSelected = formData.allergens?.includes(allergen.id) || false
+                          const allergenName = t(`adminPages.allergenen.allergenNames.${allergen.id}`)
+                          return (
+                            <button
+                              key={allergen.id}
+                              type="button"
+                              onClick={() => toggleAllergen(allergen.id)}
+                              className={`flex items-center gap-2 p-2.5 rounded-xl text-left transition-all border-2 ${
+                                isSelected ? 'border-blue-500 bg-blue-50' : 'border-transparent bg-gray-50 hover:bg-gray-100'
+                              }`}
+                            >
+                              <span className="text-xl">{allergen.icon}</span>
+                              <span className={`text-sm font-medium ${isSelected ? 'text-blue-700' : 'text-gray-600'}`}>
+                                {allergenName}
+                              </span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
               </div>

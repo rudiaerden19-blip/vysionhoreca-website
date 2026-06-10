@@ -124,7 +124,7 @@ const RETAIL_GRAY_TRAY_TILES: RetailGrayTrayTile[] = [
   {
     key: 'addProduct',
     kind: 'link',
-    hrefSuffix: '/producten',
+    hrefSuffix: '/producten?mode=retail',
     labelKey: 'retailKassaPage.trayTileAddProduct',
     submenuIds: ['sm_kassa_producten', 'sm_retail_kassa_producten'],
   },
