@@ -105,7 +105,6 @@ type RetailGrayTrayTile =
   | { key: string; kind: 'logout'; labelKey: string; submenuIds: string[] }
   | { key: string; kind: 'link'; hrefSuffix: string; labelKey: string; submenuIds: string[] }
   | { key: string; kind: 'loyaltyNoCard'; labelKey: string }
-  | { key: string; kind: 'loyaltyScan'; labelKey: string }
 
 const RETAIL_GRAY_TRAY_TILES: RetailGrayTrayTile[] = [
   {
@@ -146,11 +145,6 @@ const RETAIL_GRAY_TRAY_TILES: RetailGrayTrayTile[] = [
     key: 'loyaltyNoCard',
     kind: 'loyaltyNoCard',
     labelKey: 'retailKassaPage.trayTileLoyaltyNoCard',
-  },
-  {
-    key: 'loyaltyScan',
-    kind: 'loyaltyScan',
-    labelKey: 'retailKassaPage.trayTileLoyaltyScan',
   },
   {
     key: 'loyaltyAdmin',
@@ -303,11 +297,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [loyaltyRedeemPoints, setLoyaltyRedeemPoints] = useState(0)
   const [loyaltyRedeemModalOpen, setLoyaltyRedeemModalOpen] = useState(false)
   const [loyaltyRedeemDraft, setLoyaltyRedeemDraft] = useState('')
-  const [loyaltyScanModalOpen, setLoyaltyScanModalOpen] = useState(false)
-  const [loyaltyScanInput, setLoyaltyScanInput] = useState('')
-  const [loyaltyScanBusy, setLoyaltyScanBusy] = useState(false)
-  const loyaltyScanModalOpenRef = useRef(false)
-  const loyaltyScanInputRef = useRef<HTMLInputElement>(null)
 
   const reload = useCallback(async (options?: { fresh?: boolean }) => {
     if (skusRef.current.length === 0 || options?.fresh) setLoading(true)
@@ -355,16 +344,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   }, [cart.length, mode])
 
   useEffect(() => {
-    loyaltyScanModalOpenRef.current = loyaltyScanModalOpen
-  }, [loyaltyScanModalOpen])
-
-  useEffect(() => {
-    if (!loyaltyScanModalOpen) return
-    const id = requestAnimationFrame(() => loyaltyScanInputRef.current?.focus())
-    return () => cancelAnimationFrame(id)
-  }, [loyaltyScanModalOpen])
-
-  useEffect(() => {
     const html = document.documentElement
     const body = document.body
     html.classList.add('vysion-kassa-root')
@@ -378,7 +357,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   }, [appearanceDark])
 
   const focusBarcodeCapture = useCallback(() => {
-    if (loyaltyScanModalOpenRef.current) return
     if (priceFixNameInputRef.current && document.activeElement === priceFixNameInputRef.current) return
     if (priceFixInputRef.current && document.activeElement === priceFixInputRef.current) return
     barcodeCaptureRef.current?.focus({ preventScroll: true })
@@ -731,31 +709,19 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     const tileClass = `${kassaPosQuickMenuPanelButtonClass()} ${RETAIL_TRAY_TILE_SIZE_CLASS} flex shrink-0 touch-manipulation select-none flex-col items-center justify-center px-2 py-2 text-center text-[13px] font-bold leading-[1.15] sm:text-sm sm:leading-snug`
     return RETAIL_GRAY_TRAY_TILES.map((tile) => {
       const label = t(tile.labelKey)
-      if (tile.kind === 'loyaltyNoCard' || tile.kind === 'loyaltyScan') {
+      if (tile.kind === 'loyaltyNoCard') {
         if (!loyaltyEnabled || mode !== 'sales') return null
-        if (tile.kind === 'loyaltyNoCard') {
-          return (
-            <button
-              key={tile.key}
-              type="button"
-              onClick={() => {
-                playClick()
-                setLinkedLoyaltyMember(null)
-                setLoyaltyRedeemPoints(0)
-                closeArticleSearchKeyboard()
-                focusBarcodeCapture()
-              }}
-              className={tileClass}
-            >
-              {label}
-            </button>
-          )
-        }
         return (
           <button
             key={tile.key}
             type="button"
-            onClick={() => openLoyaltyScanModal()}
+            onClick={() => {
+              playClick()
+              setLinkedLoyaltyMember(null)
+              setLoyaltyRedeemPoints(0)
+              closeArticleSearchKeyboard()
+              focusBarcodeCapture()
+            }}
             className={tileClass}
           >
             {label}
@@ -911,20 +877,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     return false
   }
 
-  function closeLoyaltyScanModal() {
-    if (loyaltyScanBusy) return
-    setLoyaltyScanModalOpen(false)
-    setLoyaltyScanInput('')
-    focusBarcodeCapture()
-  }
-
-  function openLoyaltyScanModal() {
-    playClick()
-    closeArticleSearchKeyboard()
-    setLoyaltyScanInput('')
-    setLoyaltyScanModalOpen(true)
-  }
-
   function openLoyaltyRedeemModal() {
     if (!linkedLoyaltyMember || !loyaltySettings.redeem_enabled) return
     playClick()
@@ -957,25 +909,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   function clearLoyaltyRedeem() {
     setLoyaltyRedeemPoints(0)
     setLoyaltyRedeemDraft('')
-  }
-
-  async function submitLoyaltyScanModal() {
-    const raw = loyaltyScanInput.trim()
-    if (!raw || loyaltyScanBusy) return
-    setLoyaltyScanBusy(true)
-    try {
-      const ok = await linkLoyaltyCardFromScan(raw)
-      if (ok) {
-        setLoyaltyScanModalOpen(false)
-        setLoyaltyScanInput('')
-        focusBarcodeCapture()
-      } else {
-        setLoyaltyScanInput('')
-        requestAnimationFrame(() => loyaltyScanInputRef.current?.focus())
-      }
-    } finally {
-      setLoyaltyScanBusy(false)
-    }
   }
 
   async function processBarcode(code: string) {
@@ -1474,62 +1407,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
           performLogout()
         }}
       />
-
-      {loyaltyScanModalOpen ? (
-        <div className="fixed inset-0 z-[136] flex items-center justify-center bg-black/70 p-4">
-          <div
-            className={`w-full max-w-md space-y-4 p-6 sm:max-w-lg ${KASSA_POS_BTN_SHAPE} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} border ${KASSA_POS_RULE_BLACK}`}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="retail-loyalty-scan-title"
-          >
-            <p id="retail-loyalty-scan-title" className="text-xl font-bold text-white">
-              {t('retailKassaPage.loyaltyScanModalTitle')}
-            </p>
-            <p className="text-sm leading-snug text-white/75">{t('retailKassaPage.loyaltyScanModalHint')}</p>
-            <label className="block space-y-1.5">
-              <span className="text-sm font-semibold text-white/90">
-                {t('retailLoyalty.cardCodeLabel')}
-              </span>
-              <input
-                ref={loyaltyScanInputRef}
-                type="text"
-                inputMode="numeric"
-                autoComplete="off"
-                value={loyaltyScanInput}
-                disabled={loyaltyScanBusy}
-                onChange={(e) => setLoyaltyScanInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    void submitLoyaltyScanModal()
-                  }
-                }}
-                className={`w-full px-4 py-4 text-center font-mono text-xl tabular-nums tracking-wide text-[#f0f0f0] placeholder:text-white/45 focus:outline-none ${KASSA_POS_FIELD}`}
-                placeholder={t('retailKassaPage.loyaltyScanModalPlaceholder')}
-              />
-            </label>
-            <div className="flex gap-2.5">
-              <button
-                type="button"
-                disabled={loyaltyScanBusy}
-                onClick={() => closeLoyaltyScanModal()}
-                className={`flex-1 py-3 font-bold ${kassaPosButtonClass(false)}`}
-              >
-                {t('common.cancel')}
-              </button>
-              <button
-                type="button"
-                disabled={loyaltyScanBusy || !loyaltyScanInput.trim()}
-                onClick={() => void submitLoyaltyScanModal()}
-                className={`flex-1 py-3 font-bold ${kassaPosButtonClass(true)}`}
-              >
-                {loyaltyScanBusy ? t('retailKassaPage.paying') : t('retailKassaPage.loyaltyScanModalConfirm')}
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
 
       {loyaltyRedeemModalOpen && linkedLoyaltyMember ? (
         <div className="fixed inset-0 z-[136] flex items-center justify-center bg-black/70 p-4">
@@ -2246,7 +2123,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               aria-hidden
               onKeyDown={onBarcodeWedgeKeyDown}
               onBlur={() => {
-                if (loyaltyScanModalOpenRef.current || priceFixSku || articleSearchActiveRef.current) return
+                if (priceFixSku || articleSearchActiveRef.current) return
                 const ae = document.activeElement
                 if (ae === scanRef.current) return
                 if (ae && ae !== document.body && ae !== barcodeCaptureRef.current) return
