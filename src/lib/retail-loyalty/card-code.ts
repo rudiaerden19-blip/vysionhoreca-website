@@ -14,9 +14,15 @@ export function isRetailLoyaltyCardScan(raw: string): boolean {
 }
 
 export function generateRetailLoyaltyCardCode(): string {
-  let suffix = ''
-  for (let i = 0; i < 10; i++) {
-    suffix += String(Math.floor(Math.random() * 10))
+  let body = RETAIL_LOYALTY_CARD_PREFIX
+  while (body.length < 12) {
+    body += String(Math.floor(Math.random() * 10))
   }
-  return `${RETAIL_LOYALTY_CARD_PREFIX}${suffix}`
+  let sum = 0
+  for (let i = 0; i < 12; i++) {
+    const n = Number(body[i])
+    sum += i % 2 === 0 ? n : n * 3
+  }
+  const check = String((10 - (sum % 10)) % 10)
+  return body + check
 }

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useLanguage } from '@/i18n'
 import { authFetch } from '@/lib/auth-headers'
 import { adminDb } from '@/lib/admin-db-client'
+import { RetailLoyaltyPassShare } from '@/components/retail-loyalty/RetailLoyaltyPassShare'
 import type { RetailLoyaltyMember } from '@/lib/retail-loyalty/types'
 
 type Settings = {
@@ -28,6 +29,7 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
   const [newName, setNewName] = useState('')
   const [newPhone, setNewPhone] = useState('')
   const [lastCreatedCode, setLastCreatedCode] = useState<string | null>(null)
+  const [expandedPassId, setExpandedPassId] = useState<string | null>(null)
 
   const loadMembers = useCallback(async () => {
     const res = await adminDb.select<RetailLoyaltyMember[]>('retail_loyalty_members', {
@@ -152,9 +154,13 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
           {creating ? t('retailLoyalty.creating') : t('retailLoyalty.createPass')}
         </button>
         {lastCreatedCode ? (
-          <p className="mt-4 rounded-lg bg-emerald-50 p-3 font-mono text-lg font-bold text-emerald-900">
-            {t('retailLoyalty.cardCodeLabel')}: {lastCreatedCode}
-          </p>
+          <div className="mt-4">
+            <RetailLoyaltyPassShare
+              tenantSlug={params.tenant}
+              cardCode={lastCreatedCode}
+              pointsBalance={0}
+            />
+          </div>
         ) : null}
         <p className="mt-2 text-xs text-gray-500">{t('retailLoyalty.cardCodeHint')}</p>
       </section>
@@ -219,17 +225,43 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
         ) : (
           <ul className="divide-y divide-gray-100">
             {members.map((m) => (
-              <li key={m.id} className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm">
-                <div>
-                  <p className="font-semibold text-gray-900">
-                    {m.display_name?.trim() || t('retailLoyalty.unnamed')}
-                  </p>
-                  <p className="font-mono text-xs text-gray-600">{m.card_code}</p>
-                  {m.phone ? <p className="text-xs text-gray-500">{m.phone}</p> : null}
+              <li key={m.id} className="py-3 text-sm">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <p className="font-semibold text-gray-900">
+                      {m.display_name?.trim() || t('retailLoyalty.unnamed')}
+                    </p>
+                    <p className="font-mono text-xs text-gray-600">{m.card_code}</p>
+                    {m.phone ? <p className="text-xs text-gray-500">{m.phone}</p> : null}
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded-full bg-amber-100 px-3 py-1 font-bold text-amber-900">
+                      {m.points_balance} {t('retailLoyalty.pointsShort')}
+                    </span>
+                    <button
+                      type="button"
+                      className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-800"
+                      onClick={() =>
+                        setExpandedPassId((id) => (id === m.id ? null : m.id))
+                      }
+                    >
+                      {expandedPassId === m.id
+                        ? t('retailLoyalty.hidePassBarcode')
+                        : t('retailLoyalty.showPassBarcode')}
+                    </button>
+                  </div>
                 </div>
-                <span className="rounded-full bg-amber-100 px-3 py-1 font-bold text-amber-900">
-                  {m.points_balance} {t('retailLoyalty.pointsShort')}
-                </span>
+                {expandedPassId === m.id ? (
+                  <div className="mt-3">
+                    <RetailLoyaltyPassShare
+                      tenantSlug={params.tenant}
+                      cardCode={m.card_code}
+                      displayName={m.display_name}
+                      pointsBalance={m.points_balance}
+                      compact
+                    />
+                  </div>
+                ) : null}
               </li>
             ))}
           </ul>
