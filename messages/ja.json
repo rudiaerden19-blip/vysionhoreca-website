@@ -5808,7 +5808,17 @@
     "loyaltyLinked": "Pass: {name}",
     "loyaltyPointsBalance": "{points} points",
     "loyaltyUnlink": "Unlink",
-    "loyaltyEarnedToast": "+{points} points — balance {balance}"
+    "loyaltyEarnedToast": "+{points} points — balance {balance}",
+    "trayTileLoyaltyAdmin": "Store pass admin",
+    "loyaltyRedeemOpen": "Redeem points",
+    "loyaltyRedeemActive": "{points} pt redeemed",
+    "loyaltyRedeemClear": "No discount",
+    "loyaltyRedeemModalTitle": "Redeem points",
+    "loyaltyRedeemModalHint": "Up to {max} points (€{euro} off this sale).",
+    "loyaltyRedeemPointsLabel": "Points to redeem",
+    "loyaltyRedeemPreview": "Discount: €{euro}",
+    "loyaltyRedeemModalConfirm": "Apply",
+    "loyaltyDiscountLine": "Pass: −{points} pt (−€{euro})"
   },
   "retailLoyalty": {
     "title": "Store pass & points",
@@ -5848,6 +5858,26 @@
     "noMembers": "No passes yet.",
     "unnamed": "Customer",
     "pointsShort": "pt",
-    "cardNotFound": "No active store pass for this code."
+    "cardNotFound": "No active store pass for this code.",
+    "redeemEnabled": "Allow point redemption at POS",
+    "redeemPointsPerEuro": "Points per €1 discount",
+    "redeemPointsPerEuroHint": "Example: 100 means 100 points = €1 off the receipt.",
+    "membersManageTitle": "Manage passes",
+    "managePass": "Manage",
+    "hideManagePass": "Close",
+    "showInactive": "Show deactivated passes",
+    "passInactive": "Inactive",
+    "editMemberTitle": "Details",
+    "saveMember": "Save",
+    "memberSaveError": "Save failed",
+    "deactivatePass": "Deactivate pass",
+    "reactivatePass": "Reactivate pass",
+    "deactivateConfirm": "Deactivate this pass? It can no longer be scanned at the POS.",
+    "adjustPointsTitle": "Manual points",
+    "adjustPointsDeltaPlaceholder": "+50 or -20",
+    "adjustPointsNotePlaceholder": "Reason (optional)",
+    "adjustPointsApply": "Update balance",
+    "adjustPointsHint": "Positive adds points, negative removes. Use for corrections or gifts.",
+    "adjustError": "Could not adjust points"
   }
 }

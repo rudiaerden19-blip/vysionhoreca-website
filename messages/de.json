@@ -5831,7 +5831,17 @@
     "loyaltyLinked": "Karte: {name}",
     "loyaltyPointsBalance": "{points} Punkte",
     "loyaltyUnlink": "Trennen",
-    "loyaltyEarnedToast": "+{points} Punkte — Stand {balance}"
+    "loyaltyEarnedToast": "+{points} Punkte — Stand {balance}",
+    "trayTileLoyaltyAdmin": "Shopkarte verwalten",
+    "loyaltyRedeemOpen": "Punkte einlösen",
+    "loyaltyRedeemActive": "{points} Pt eingelöst",
+    "loyaltyRedeemClear": "Kein Rabatt",
+    "loyaltyRedeemModalTitle": "Punkte einlösen",
+    "loyaltyRedeemModalHint": "Max. {max} Punkte (€{euro} Rabatt auf diesen Bon).",
+    "loyaltyRedeemPointsLabel": "Anzahl Punkte",
+    "loyaltyRedeemPreview": "Rabatt: €{euro}",
+    "loyaltyRedeemModalConfirm": "Anwenden",
+    "loyaltyDiscountLine": "Karte: −{points} Pt (−€{euro})"
   },
   "retailLoyalty": {
     "title": "Shopkarte & Punkte",
@@ -5871,6 +5881,26 @@
     "noMembers": "Noch keine Karten.",
     "unnamed": "Kunde",
     "pointsShort": "Pkt",
-    "cardNotFound": "Keine aktive Shopkarte für diesen Code."
+    "cardNotFound": "Keine aktive Shopkarte für diesen Code.",
+    "redeemEnabled": "Punkte an der Kasse einlösbar",
+    "redeemPointsPerEuro": "Punkte pro €1 Rabatt",
+    "redeemPointsPerEuroHint": "Beispiel: 100 = 100 Punkte für €1 Rabatt auf dem Bon.",
+    "membersManageTitle": "Karten verwalten",
+    "managePass": "Verwalten",
+    "hideManagePass": "Schließen",
+    "showInactive": "Deaktivierte Karten anzeigen",
+    "passInactive": "Inaktiv",
+    "editMemberTitle": "Daten",
+    "saveMember": "Speichern",
+    "memberSaveError": "Speichern fehlgeschlagen",
+    "deactivatePass": "Karte deaktivieren",
+    "reactivatePass": "Karte reaktivieren",
+    "deactivateConfirm": "Karte deaktivieren? Scan an der Kasse funktioniert dann nicht mehr.",
+    "adjustPointsTitle": "Punkte manuell",
+    "adjustPointsDeltaPlaceholder": "+50 oder -20",
+    "adjustPointsNotePlaceholder": "Grund (optional)",
+    "adjustPointsApply": "Stand anpassen",
+    "adjustPointsHint": "Positiv = hinzufügen, negativ = abziehen.",
+    "adjustError": "Punkte konnten nicht angepasst werden"
   }
 }

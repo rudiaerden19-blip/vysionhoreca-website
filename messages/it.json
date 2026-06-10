@@ -5808,7 +5808,17 @@
     "loyaltyLinked": "Tessera: {name}",
     "loyaltyPointsBalance": "{points} punti",
     "loyaltyUnlink": "Scollega",
-    "loyaltyEarnedToast": "+{points} punti — saldo {balance}"
+    "loyaltyEarnedToast": "+{points} punti — saldo {balance}",
+    "trayTileLoyaltyAdmin": "Gestione tessera",
+    "loyaltyRedeemOpen": "Usa punti",
+    "loyaltyRedeemActive": "{points} pt usati",
+    "loyaltyRedeemClear": "Nessuno sconto",
+    "loyaltyRedeemModalTitle": "Usa punti",
+    "loyaltyRedeemModalHint": "Max {max} punti (€{euro} di sconto su questo scontrino).",
+    "loyaltyRedeemPointsLabel": "Punti da usare",
+    "loyaltyRedeemPreview": "Sconto: €{euro}",
+    "loyaltyRedeemModalConfirm": "Applica",
+    "loyaltyDiscountLine": "Tessera: −{points} pt (−€{euro})"
   },
   "retailLoyalty": {
     "title": "Tessera negozio e punti",
@@ -5848,6 +5858,26 @@
     "noMembers": "Nessuna tessera ancora.",
     "unnamed": "Cliente",
     "pointsShort": "pt",
-    "cardNotFound": "Nessuna tessera attiva per questo codice."
+    "cardNotFound": "Nessuna tessera attiva per questo codice.",
+    "redeemEnabled": "Uso punti in cassa",
+    "redeemPointsPerEuro": "Punti per €1 di sconto",
+    "redeemPointsPerEuroHint": "Esempio: 100 = 100 punti per €1 di sconto.",
+    "membersManageTitle": "Gestione tessere",
+    "managePass": "Gestisci",
+    "hideManagePass": "Chiudi",
+    "showInactive": "Mostra tessere disattivate",
+    "passInactive": "Inattiva",
+    "editMemberTitle": "Dati",
+    "saveMember": "Salva",
+    "memberSaveError": "Salvataggio non riuscito",
+    "deactivatePass": "Disattiva tessera",
+    "reactivatePass": "Riattiva tessera",
+    "deactivateConfirm": "Disattivare la tessera? Non sarà più scansionabile in cassa.",
+    "adjustPointsTitle": "Punti manuali",
+    "adjustPointsDeltaPlaceholder": "+50 o -20",
+    "adjustPointsNotePlaceholder": "Motivo (opzionale)",
+    "adjustPointsApply": "Aggiorna saldo",
+    "adjustPointsHint": "Positivo aggiunge, negativo toglie.",
+    "adjustError": "Impossibile aggiornare i punti"
   }
 }

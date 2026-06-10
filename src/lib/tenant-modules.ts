@@ -409,6 +409,9 @@ export function submenuParentAllowedForSubmenuId(
       moduleAccess.kassa || moduleAccess['retail-kassa'] || moduleAccess.voorraad
     )
   }
+  if (subId === 'sm_retail_loyalty') {
+    return moduleAccess['retail-kassa']
+  }
   return moduleAccess[gate.module]
 }
 

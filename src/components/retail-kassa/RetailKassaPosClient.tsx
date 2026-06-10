@@ -78,7 +78,11 @@ import { AccountMenuSessionBlock } from '@/components/AccountMenuSessionBlock'
 import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
 import { authFetch, buildShopInternalReturnPath } from '@/lib/auth-headers'
 import { isRetailLoyaltyCardScan } from '@/lib/retail-loyalty/card-code'
-import type { RetailLoyaltyMemberPublic } from '@/lib/retail-loyalty/types'
+import type { RetailLoyaltyMemberPublic, RetailLoyaltySettings } from '@/lib/retail-loyalty/types'
+import {
+  computeRetailLoyaltyRedeemEuroDiscount,
+  maxRetailLoyaltyRedeemPoints,
+} from '@/lib/retail-loyalty/redeem-math'
 import {
   attemptCloseThenOrNavigate,
   applyOwnerOnlyLogoutCleanup,
@@ -143,6 +147,13 @@ const RETAIL_GRAY_TRAY_TILES: RetailGrayTrayTile[] = [
     key: 'loyaltyScan',
     kind: 'loyaltyScan',
     labelKey: 'retailKassaPage.trayTileLoyaltyScan',
+  },
+  {
+    key: 'loyaltyAdmin',
+    kind: 'link',
+    hrefSuffix: '/retail-loyalty',
+    labelKey: 'retailKassaPage.trayTileLoyaltyAdmin',
+    submenuIds: ['sm_retail_loyalty'],
   },
 ]
 
@@ -236,9 +247,19 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [addOkFlash, setAddOkFlash] = useState(false)
   const addOkFlashTimersRef = useRef<ReturnType<typeof setTimeout>[]>([])
   const [loyaltyEnabled, setLoyaltyEnabled] = useState(true)
+  const [loyaltySettings, setLoyaltySettings] = useState<Pick<
+    RetailLoyaltySettings,
+    'redeem_enabled' | 'redeem_points_per_euro'
+  >>({
+    redeem_enabled: true,
+    redeem_points_per_euro: 100,
+  })
   const [linkedLoyaltyMember, setLinkedLoyaltyMember] = useState<RetailLoyaltyMemberPublic | null>(
     null,
   )
+  const [loyaltyRedeemPoints, setLoyaltyRedeemPoints] = useState(0)
+  const [loyaltyRedeemModalOpen, setLoyaltyRedeemModalOpen] = useState(false)
+  const [loyaltyRedeemDraft, setLoyaltyRedeemDraft] = useState('')
   const [loyaltyScanModalOpen, setLoyaltyScanModalOpen] = useState(false)
   const [loyaltyScanInput, setLoyaltyScanInput] = useState('')
   const [loyaltyScanBusy, setLoyaltyScanBusy] = useState(false)
@@ -269,9 +290,20 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     void getTenantSettings(tenant).then(setTenantInfo)
     void authFetch(`/api/retail/loyalty/settings?tenant=${encodeURIComponent(tenant)}`)
       .then((r) => r.json())
-      .then((j: { ok?: boolean; settings?: { enabled?: boolean } }) => {
-        if (j.ok && j.settings) setLoyaltyEnabled(!!j.settings.enabled)
-      })
+      .then(
+        (j: {
+          ok?: boolean
+          settings?: Partial<RetailLoyaltySettings>
+        }) => {
+          if (j.ok && j.settings) {
+            setLoyaltyEnabled(!!j.settings.enabled)
+            setLoyaltySettings({
+              redeem_enabled: j.settings.redeem_enabled !== false,
+              redeem_points_per_euro: Number(j.settings.redeem_points_per_euro) || 100,
+            })
+          }
+        },
+      )
       .catch(() => {})
   }, [reload, tenant])
 
@@ -378,10 +410,50 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     return () => document.removeEventListener('mousedown', onDoc)
   }, [langOpen])
 
-  const total = useMemo(
+  const cartTotal = useMemo(
     () => cart.reduce((s, l) => s + l.sku.price * l.quantity, 0),
     [cart],
   )
+
+  const loyaltyDiscountEuro = useMemo(() => {
+    if (!loyaltyEnabled || !linkedLoyaltyMember || loyaltyRedeemPoints <= 0) return 0
+    if (!loyaltySettings.redeem_enabled) return 0
+    return computeRetailLoyaltyRedeemEuroDiscount(
+      loyaltyRedeemPoints,
+      loyaltySettings.redeem_points_per_euro,
+    )
+  }, [
+    cartTotal,
+    linkedLoyaltyMember,
+    loyaltyEnabled,
+    loyaltyRedeemPoints,
+    loyaltySettings.redeem_enabled,
+    loyaltySettings.redeem_points_per_euro,
+  ])
+
+  const payTotal = useMemo(
+    () => Math.round(Math.max(0, cartTotal - loyaltyDiscountEuro) * 100) / 100,
+    [cartTotal, loyaltyDiscountEuro],
+  )
+
+  useEffect(() => {
+    if (!linkedLoyaltyMember || loyaltyRedeemPoints <= 0) return
+    const maxPts = maxRetailLoyaltyRedeemPoints(
+      linkedLoyaltyMember.points_balance,
+      cartTotal,
+      loyaltySettings.redeem_points_per_euro,
+    )
+    if (loyaltyRedeemPoints > maxPts) setLoyaltyRedeemPoints(maxPts)
+  }, [
+    cartTotal,
+    linkedLoyaltyMember,
+    loyaltyRedeemPoints,
+    loyaltySettings.redeem_points_per_euro,
+  ])
+
+  useEffect(() => {
+    if (!linkedLoyaltyMember) setLoyaltyRedeemPoints(0)
+  }, [linkedLoyaltyMember])
 
   const paymentMethodOptions = useMemo<KassaPayOption[]>(
     () => [
@@ -618,6 +690,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               onClick={() => {
                 playClick()
                 setLinkedLoyaltyMember(null)
+                setLoyaltyRedeemPoints(0)
                 closeArticleSearchKeyboard()
                 focusBarcodeCapture()
               }}
@@ -784,6 +857,40 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     closeArticleSearchKeyboard()
     setLoyaltyScanInput('')
     setLoyaltyScanModalOpen(true)
+  }
+
+  function openLoyaltyRedeemModal() {
+    if (!linkedLoyaltyMember || !loyaltySettings.redeem_enabled) return
+    playClick()
+    const maxPts = maxRetailLoyaltyRedeemPoints(
+      linkedLoyaltyMember.points_balance,
+      cartTotal,
+      loyaltySettings.redeem_points_per_euro,
+    )
+    setLoyaltyRedeemDraft(String(loyaltyRedeemPoints > 0 ? loyaltyRedeemPoints : maxPts))
+    setLoyaltyRedeemModalOpen(true)
+  }
+
+  function applyLoyaltyRedeemModal() {
+    const raw = loyaltyRedeemDraft.replace(/\D/g, '')
+    const pts = raw ? Math.max(0, parseInt(raw, 10)) : 0
+    if (!linkedLoyaltyMember) {
+      setLoyaltyRedeemModalOpen(false)
+      return
+    }
+    const maxPts = maxRetailLoyaltyRedeemPoints(
+      linkedLoyaltyMember.points_balance,
+      cartTotal,
+      loyaltySettings.redeem_points_per_euro,
+    )
+    setLoyaltyRedeemPoints(Math.min(pts, maxPts))
+    setLoyaltyRedeemModalOpen(false)
+    focusBarcodeCapture()
+  }
+
+  function clearLoyaltyRedeem() {
+    setLoyaltyRedeemPoints(0)
+    setLoyaltyRedeemDraft('')
   }
 
   async function submitLoyaltyScanModal() {
@@ -1184,12 +1291,24 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   ) {
     if (cart.length === 0 || paying) return
     const linesSnapshot = [...cart]
-    const orderTotal = linesSnapshot.reduce((s, l) => s + l.sku.price * l.quantity, 0)
+    const grossTotal = linesSnapshot.reduce((s, l) => s + l.sku.price * l.quantity, 0)
+    const discountEuro =
+      loyaltyRedeemPoints > 0
+        ? computeRetailLoyaltyRedeemEuroDiscount(
+            loyaltyRedeemPoints,
+            loyaltySettings.redeem_points_per_euro,
+          )
+        : 0
+    const orderTotal = Math.round(Math.max(0, grossTotal - discountEuro) * 100) / 100
     const loyaltyMemberId =
       loyaltyEnabled && linkedLoyaltyMember ? linkedLoyaltyMember.id : undefined
+    const redeemPointsForSale =
+      loyaltyMemberId && loyaltyRedeemPoints > 0 ? loyaltyRedeemPoints : 0
     setPaying(true)
     const res = await completeRetailSale(tenant, linesSnapshot, method, splitAmounts, {
       loyaltyMemberId,
+      loyaltyDiscountEuro: discountEuro,
+      loyaltyRedeemPoints: redeemPointsForSale,
     })
     setPaying(false)
     setShowPaymentModal(false)
@@ -1205,33 +1324,35 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       orderNumber,
       tenantInfo?.btw_percentage ?? 21,
       splitAmounts,
+      discountEuro > 0 ? discountEuro : undefined,
     )
     setLastOrderReceipt(receipt)
-    if (loyaltyMemberId && orderTotal > 0) {
+    if (loyaltyMemberId) {
       try {
-        const earnRes = await authFetch('/api/retail/loyalty/earn', {
+        const settleRes = await authFetch('/api/retail/loyalty/settle', {
           method: 'POST',
           body: JSON.stringify({
             tenantSlug: tenant,
             memberId: loyaltyMemberId,
             orderTotal,
             orderNumber: orderNumber > 0 ? orderNumber : undefined,
+            redeemPoints: redeemPointsForSale > 0 ? redeemPointsForSale : undefined,
           }),
         })
-        const earnJson = (await earnRes.json()) as {
+        const settleJson = (await settleRes.json()) as {
           ok?: boolean
-          points?: number
           balance?: number
         }
-        if (earnJson.ok && (earnJson.points ?? 0) > 0 && earnJson.balance != null) {
+        if (settleJson.ok && settleJson.balance != null) {
           setLinkedLoyaltyMember((m) =>
-            m && m.id === loyaltyMemberId ? { ...m, points_balance: earnJson.balance! } : m,
+            m && m.id === loyaltyMemberId ? { ...m, points_balance: settleJson.balance! } : m,
           )
         }
       } catch {
         /* puntenfout blokkeert verkoop niet */
       }
     }
+    setLoyaltyRedeemPoints(0)
     setCart([])
     setSelectedListLineKey(null)
     setLastScannedSku(null)
@@ -1322,6 +1443,91 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         </div>
       ) : null}
 
+      {loyaltyRedeemModalOpen && linkedLoyaltyMember ? (
+        <div className="fixed inset-0 z-[136] flex items-center justify-center bg-black/70 p-4">
+          <div
+            className={`w-full max-w-md space-y-4 p-6 sm:max-w-lg ${KASSA_POS_BTN_SHAPE} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} border ${KASSA_POS_RULE_BLACK}`}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="retail-loyalty-redeem-title"
+          >
+            <p id="retail-loyalty-redeem-title" className="text-xl font-bold text-white">
+              {t('retailKassaPage.loyaltyRedeemModalTitle')}
+            </p>
+            <p className="text-sm leading-snug text-white/75">
+              {t('retailKassaPage.loyaltyRedeemModalHint')
+                .replace('{max}', String(
+                  maxRetailLoyaltyRedeemPoints(
+                    linkedLoyaltyMember.points_balance,
+                    cartTotal,
+                    loyaltySettings.redeem_points_per_euro,
+                  ),
+                ))
+                .replace(
+                  '{euro}',
+                  computeRetailLoyaltyRedeemEuroDiscount(
+                    maxRetailLoyaltyRedeemPoints(
+                      linkedLoyaltyMember.points_balance,
+                      cartTotal,
+                      loyaltySettings.redeem_points_per_euro,
+                    ),
+                    loyaltySettings.redeem_points_per_euro,
+                  ).toFixed(2),
+                )}
+            </p>
+            <label className="block space-y-1.5">
+              <span className="text-sm font-semibold text-white/90">
+                {t('retailKassaPage.loyaltyRedeemPointsLabel')}
+              </span>
+              <input
+                type="text"
+                inputMode="numeric"
+                autoComplete="off"
+                value={loyaltyRedeemDraft}
+                onChange={(e) => setLoyaltyRedeemDraft(e.target.value.replace(/\D/g, ''))}
+                className={`w-full px-4 py-4 text-center font-mono text-xl tabular-nums tracking-wide text-[#f0f0f0] placeholder:text-white/45 focus:outline-none ${KASSA_POS_FIELD}`}
+              />
+            </label>
+            <p className="text-center text-sm text-emerald-300">
+              {t('retailKassaPage.loyaltyRedeemPreview')
+                .replace(
+                  '{euro}',
+                  computeRetailLoyaltyRedeemEuroDiscount(
+                    Math.min(
+                      parseInt(loyaltyRedeemDraft.replace(/\D/g, '') || '0', 10) || 0,
+                      maxRetailLoyaltyRedeemPoints(
+                        linkedLoyaltyMember.points_balance,
+                        cartTotal,
+                        loyaltySettings.redeem_points_per_euro,
+                      ),
+                    ),
+                    loyaltySettings.redeem_points_per_euro,
+                  ).toFixed(2),
+                )}
+            </p>
+            <div className="flex gap-2.5">
+              <button
+                type="button"
+                onClick={() => {
+                  setLoyaltyRedeemModalOpen(false)
+                  focusBarcodeCapture()
+                }}
+                className={`flex-1 py-3 font-bold ${kassaPosButtonClass(false)}`}
+              >
+                {t('common.cancel')}
+              </button>
+              <button
+                type="button"
+                onClick={() => applyLoyaltyRedeemModal()}
+                className={`flex-1 py-3 font-bold ${kassaPosButtonClass(true)}`}
+              >
+                {t('retailKassaPage.loyaltyRedeemModalConfirm')}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       {priceFixSku ? (
         <div className="fixed inset-0 z-[135] flex items-center justify-center bg-black/70 p-4">
           <div
@@ -1383,13 +1589,13 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
 
       <KassaPaymentModal
         open={showPaymentModal}
-        total={total}
+        total={payTotal}
         options={paymentMethodOptions}
         onClose={() => !paying && setShowPaymentModal(false)}
         onPay={(method) => void completePayment(method)}
         onOpenSplit={() => {
           setSplitCash(0)
-          setSplitCard(total)
+          setSplitCard(payTotal)
           setShowSplitModal(true)
           setShowPaymentModal(false)
         }}
@@ -1398,7 +1604,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
 
       <KassaSplitPaymentModal
         open={showSplitModal}
-        total={total}
+        total={payTotal}
         splitCash={splitCash}
         splitCard={splitCard}
         setSplitCash={setSplitCash}
@@ -1920,17 +2126,48 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                     )}
                   </span>
                 </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  {loyaltySettings.redeem_enabled &&
+                  cartTotal > 0 &&
+                  linkedLoyaltyMember.points_balance > 0 ? (
+                    <button
+                      type="button"
+                      className={`shrink-0 px-3 py-1.5 text-xs font-bold ${retailScanRowBtnClass(false)}`}
+                      onClick={() => openLoyaltyRedeemModal()}
+                    >
+                      {loyaltyRedeemPoints > 0
+                        ? t('retailKassaPage.loyaltyRedeemActive').replace(
+                            '{points}',
+                            String(loyaltyRedeemPoints),
+                          )
+                        : t('retailKassaPage.loyaltyRedeemOpen')}
+                    </button>
+                  ) : null}
+                  {loyaltyRedeemPoints > 0 ? (
+                    <button
+                      type="button"
+                      className={`shrink-0 px-3 py-1.5 text-xs font-bold ${retailScanRowBtnClass(false)}`}
+                      onClick={() => {
+                        playClick()
+                        clearLoyaltyRedeem()
+                      }}
+                    >
+                      {t('retailKassaPage.loyaltyRedeemClear')}
+                    </button>
+                  ) : null}
                 <button
                   type="button"
                   className={`shrink-0 px-3 py-1.5 text-xs font-bold ${retailScanRowBtnClass(false)}`}
                   onClick={() => {
                     playClick()
                     setLinkedLoyaltyMember(null)
+                    setLoyaltyRedeemPoints(0)
                     focusBarcodeCapture()
                   }}
                 >
                   {t('retailKassaPage.loyaltyUnlink')}
                 </button>
+                </div>
               </div>
             ) : null}
 
@@ -2193,10 +2430,19 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                     }`}
                   >
                     {mode === 'sales'
-                      ? `€${total.toFixed(2)}`
+                      ? loyaltyDiscountEuro > 0
+                        ? `€${payTotal.toFixed(2)}`
+                        : `€${cartTotal.toFixed(2)}`
                       : String(stockActivity.reduce((s, r) => s + r.delta, 0))}
                   </span>
                 </div>
+                {mode === 'sales' && loyaltyDiscountEuro > 0 ? (
+                  <p className="text-right text-xs font-semibold text-emerald-300">
+                    {t('retailKassaPage.loyaltyDiscountLine')
+                      .replace('{points}', String(loyaltyRedeemPoints))
+                      .replace('{euro}', loyaltyDiscountEuro.toFixed(2))}
+                  </p>
+                ) : null}
               </div>
               <div className="grid grid-cols-3 touch-manipulation select-none gap-3">
                 {mode === 'sales' ? (

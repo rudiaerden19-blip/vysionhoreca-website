@@ -3,6 +3,8 @@ export type RetailLoyaltySettings = {
   enabled: boolean
   points_per_euro: number
   min_order_total_for_points: number
+  redeem_enabled: boolean
+  redeem_points_per_euro: number
 }
 
 export type RetailLoyaltyMember = {

@@ -26,6 +26,8 @@ const PatchSchema = z.object({
   enabled: z.boolean().optional(),
   points_per_euro: z.number().min(0).max(1000).optional(),
   min_order_total_for_points: z.number().min(0).max(1_000_000).optional(),
+  redeem_enabled: z.boolean().optional(),
+  redeem_points_per_euro: z.number().min(1).max(1_000_000).optional(),
 })
 
 export async function POST(req: NextRequest) {

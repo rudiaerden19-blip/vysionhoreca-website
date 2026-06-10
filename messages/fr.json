@@ -5831,7 +5831,17 @@
     "loyaltyLinked": "Carte : {name}",
     "loyaltyPointsBalance": "{points} points",
     "loyaltyUnlink": "Détacher",
-    "loyaltyEarnedToast": "+{points} points — solde {balance}"
+    "loyaltyEarnedToast": "+{points} points — solde {balance}",
+    "trayTileLoyaltyAdmin": "Gestion carte",
+    "loyaltyRedeemOpen": "Utiliser les points",
+    "loyaltyRedeemActive": "{points} pt utilisés",
+    "loyaltyRedeemClear": "Pas de réduction",
+    "loyaltyRedeemModalTitle": "Utiliser les points",
+    "loyaltyRedeemModalHint": "Max. {max} points (€{euro} de réduction sur ce ticket).",
+    "loyaltyRedeemPointsLabel": "Nombre de points",
+    "loyaltyRedeemPreview": "Réduction : €{euro}",
+    "loyaltyRedeemModalConfirm": "Appliquer",
+    "loyaltyDiscountLine": "Carte : −{points} pt (−€{euro})"
   },
   "retailLoyalty": {
     "title": "Carte magasin & points",
@@ -5871,6 +5881,26 @@
     "noMembers": "Aucune carte pour l'instant.",
     "unnamed": "Client",
     "pointsShort": "pt",
-    "cardNotFound": "Aucune carte active pour ce code."
+    "cardNotFound": "Aucune carte active pour ce code.",
+    "redeemEnabled": "Utilisation des points à la caisse",
+    "redeemPointsPerEuro": "Points par €1 de réduction",
+    "redeemPointsPerEuroHint": "Exemple : 100 = 100 points pour €1 de réduction.",
+    "membersManageTitle": "Gérer les cartes",
+    "managePass": "Gérer",
+    "hideManagePass": "Fermer",
+    "showInactive": "Afficher les cartes désactivées",
+    "passInactive": "Inactive",
+    "editMemberTitle": "Coordonnées",
+    "saveMember": "Enregistrer",
+    "memberSaveError": "Enregistrement impossible",
+    "deactivatePass": "Désactiver la carte",
+    "reactivatePass": "Réactiver la carte",
+    "deactivateConfirm": "Désactiver cette carte ? Elle ne pourra plus être scannée à la caisse.",
+    "adjustPointsTitle": "Points manuels",
+    "adjustPointsDeltaPlaceholder": "+50 ou -20",
+    "adjustPointsNotePlaceholder": "Motif (optionnel)",
+    "adjustPointsApply": "Mettre à jour le solde",
+    "adjustPointsHint": "Positif = ajouter, négatif = retirer.",
+    "adjustError": "Impossible d'ajuster les points"
   }
 }

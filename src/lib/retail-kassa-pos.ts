@@ -98,12 +98,18 @@ export async function completeRetailSale(
   lines: RetailCartLine[],
   method: KassaPaymentMethod,
   splitAmounts?: { cash: number; card: number },
-  options?: { loyaltyMemberId?: string | null },
+  options?: {
+    loyaltyMemberId?: string | null
+    loyaltyDiscountEuro?: number
+    loyaltyRedeemPoints?: number
+  },
 ): Promise<{ ok: boolean; orderNumber?: number; error?: string }> {
   if (lines.length === 0) return { ok: false, error: 'empty_cart' }
 
-  const total = lines.reduce((s, l) => s + l.sku.price * l.quantity, 0)
-  const roundedTotal = Math.round(total * 100) / 100
+  const grossTotal = lines.reduce((s, l) => s + l.sku.price * l.quantity, 0)
+  const discountRaw = Math.max(0, options?.loyaltyDiscountEuro ?? 0)
+  const discount = Math.round(Math.min(discountRaw, grossTotal) * 100) / 100
+  const roundedTotal = Math.round((grossTotal - discount) * 100) / 100
 
   if (method === 'SPLIT') {
     const sc = splitAmounts?.cash ?? 0
@@ -132,6 +138,7 @@ export async function completeRetailSale(
     subtotal,
     tax,
     total: roundedTotal,
+    discount_amount: discount > 0 ? discount : 0,
     items: lines.map((l) => ({
       product_id: l.sku.productId,
       variant_id: l.sku.variantId,
@@ -148,6 +155,10 @@ export async function completeRetailSale(
 
   if (options?.loyaltyMemberId) {
     orderPayload.retail_loyalty_member_id = options.loyaltyMemberId
+  }
+  const redeemPts = options?.loyaltyRedeemPoints
+  if (redeemPts != null && redeemPts > 0) {
+    orderPayload.retail_loyalty_points_redeemed = Math.floor(redeemPts)
   }
 
   if (method === 'SPLIT' && splitAmounts) {

@@ -5808,7 +5808,17 @@
     "loyaltyLinked": "Tarjeta: {name}",
     "loyaltyPointsBalance": "{points} puntos",
     "loyaltyUnlink": "Desvincular",
-    "loyaltyEarnedToast": "+{points} puntos — saldo {balance}"
+    "loyaltyEarnedToast": "+{points} puntos — saldo {balance}",
+    "trayTileLoyaltyAdmin": "Gestionar tarjeta",
+    "loyaltyRedeemOpen": "Canjear puntos",
+    "loyaltyRedeemActive": "{points} pt canjeados",
+    "loyaltyRedeemClear": "Sin descuento",
+    "loyaltyRedeemModalTitle": "Canjear puntos",
+    "loyaltyRedeemModalHint": "Máx. {max} puntos (€{euro} de descuento en este ticket).",
+    "loyaltyRedeemPointsLabel": "Puntos a canjear",
+    "loyaltyRedeemPreview": "Descuento: €{euro}",
+    "loyaltyRedeemModalConfirm": "Aplicar",
+    "loyaltyDiscountLine": "Tarjeta: −{points} pt (−€{euro})"
   },
   "retailLoyalty": {
     "title": "Tarjeta tienda y puntos",
@@ -5848,6 +5858,26 @@
     "noMembers": "Aún no hay tarjetas.",
     "unnamed": "Cliente",
     "pointsShort": "pt",
-    "cardNotFound": "No hay tarjeta activa para este código."
+    "cardNotFound": "No hay tarjeta activa para este código.",
+    "redeemEnabled": "Canje de puntos en caja",
+    "redeemPointsPerEuro": "Puntos por €1 de descuento",
+    "redeemPointsPerEuroHint": "Ejemplo: 100 = 100 puntos por €1 de descuento.",
+    "membersManageTitle": "Gestionar tarjetas",
+    "managePass": "Gestionar",
+    "hideManagePass": "Cerrar",
+    "showInactive": "Mostrar tarjetas desactivadas",
+    "passInactive": "Inactiva",
+    "editMemberTitle": "Datos",
+    "saveMember": "Guardar",
+    "memberSaveError": "Error al guardar",
+    "deactivatePass": "Desactivar tarjeta",
+    "reactivatePass": "Reactivar tarjeta",
+    "deactivateConfirm": "¿Desactivar esta tarjeta? Ya no se podrá escanear en caja.",
+    "adjustPointsTitle": "Puntos manuales",
+    "adjustPointsDeltaPlaceholder": "+50 o -20",
+    "adjustPointsNotePlaceholder": "Motivo (opcional)",
+    "adjustPointsApply": "Actualizar saldo",
+    "adjustPointsHint": "Positivo suma, negativo resta.",
+    "adjustError": "No se pudieron ajustar los puntos"
   }
 }

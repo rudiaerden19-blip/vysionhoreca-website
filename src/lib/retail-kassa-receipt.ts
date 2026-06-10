@@ -61,8 +61,11 @@ export function buildRetailLastOrderReceipt(
   orderNumber: number,
   tenantDefaultBtw: number,
   splitAmounts?: { cash: number; card: number },
+  loyaltyDiscountEuro?: number,
 ): KassaLastOrderReceipt {
-  const total = Math.round(lines.reduce((s, l) => s + l.sku.price * l.quantity, 0) * 100) / 100
+  const gross = Math.round(lines.reduce((s, l) => s + l.sku.price * l.quantity, 0) * 100) / 100
+  const discount = Math.round(Math.min(Math.max(0, loyaltyDiscountEuro ?? 0), gross) * 100) / 100
+  const total = Math.round((gross - discount) * 100) / 100
   const vatRate = normalizeCategoryVatPercent(tenantDefaultBtw, 21)
   const subtotal = Math.round((total / (1 + vatRate / 100)) * 100) / 100
   const tax = Math.round((total - subtotal) * 100) / 100
