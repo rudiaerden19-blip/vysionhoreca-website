@@ -215,7 +215,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [numpadPanelVisible, setNumpadPanelVisible] = useState(false)
   const [numpadValue, setNumpadValue] = useState('')
   const [addOkFlash, setAddOkFlash] = useState(false)
-  const addOkFlashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const addOkFlashTimersRef = useRef<ReturnType<typeof setTimeout>[]>([])
 
   const reload = useCallback(async () => {
     setLoading(true)
@@ -230,7 +230,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
 
   useEffect(() => {
     return () => {
-      if (addOkFlashTimerRef.current) clearTimeout(addOkFlashTimerRef.current)
+      for (const id of addOkFlashTimersRef.current) clearTimeout(id)
+      addOkFlashTimersRef.current = []
     }
   }, [])
 
@@ -580,13 +581,28 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     })
   }
 
+  function clearAddOkFlashTimers() {
+    for (const id of addOkFlashTimersRef.current) clearTimeout(id)
+    addOkFlashTimersRef.current = []
+    setAddOkFlash(false)
+  }
+
+  /** Drie zichtbare groene flitsen — lang genoeg om te zien na scan/toevoegen. */
   function flashAddOkButton() {
-    setAddOkFlash(true)
-    if (addOkFlashTimerRef.current) clearTimeout(addOkFlashTimerRef.current)
-    addOkFlashTimerRef.current = setTimeout(() => {
-      setAddOkFlash(false)
-      addOkFlashTimerRef.current = null
-    }, 650)
+    clearAddOkFlashTimers()
+    const onMs = 520
+    const offMs = 480
+    const flashes = 3
+    let delay = 0
+    const schedule = (fn: () => void, ms: number) => {
+      addOkFlashTimersRef.current.push(setTimeout(fn, ms))
+    }
+    for (let i = 0; i < flashes; i++) {
+      schedule(() => setAddOkFlash(true), delay)
+      delay += onMs
+      schedule(() => setAddOkFlash(false), delay)
+      delay += offMs
+    }
   }
 
   function pushStockActivity(sku: RetailPosSku, delta: number, activityMode: RetailKassaMode) {
