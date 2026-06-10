@@ -5,6 +5,7 @@ import { Suspense, useEffect, useState } from 'react'
 import { useLanguage } from '@/i18n'
 import { normalizeRetailLoyaltyCardCode } from '@/lib/retail-loyalty/card-code'
 import { RetailLoyaltyPassBarcode } from '@/components/retail-loyalty/RetailLoyaltyPassBarcode'
+import { RetailLoyaltyPassPhoneSave } from '@/components/retail-loyalty/RetailLoyaltyPassPhoneSave'
 
 type PassData = {
   card_code: string
@@ -83,6 +84,7 @@ function WinkelpasInner({ tenant }: { tenant: string }) {
             {t('retailLoyalty.passPointsLine').replace('{points}', String(pass.points_balance))}
           </p>
           <p className="text-center text-xs text-gray-500">{t('retailLoyalty.passPageScanAtPos')}</p>
+          <RetailLoyaltyPassPhoneSave cardCode={pass.card_code} />
         </div>
       )}
     </div>
