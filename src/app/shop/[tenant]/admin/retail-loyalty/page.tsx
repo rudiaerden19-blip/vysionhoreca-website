@@ -126,6 +126,40 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
       <p className="mb-6 text-sm text-gray-600">{t('retailLoyalty.intro')}</p>
 
       <section className="mb-8 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+        <h2 className="mb-3 text-lg font-semibold">{t('retailLoyalty.newPassTitle')}</h2>
+        <div className="mb-3 grid gap-3 sm:grid-cols-2">
+          <input
+            type="text"
+            placeholder={t('retailLoyalty.namePlaceholder')}
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            className="rounded-lg border px-3 py-2 text-sm"
+          />
+          <input
+            type="tel"
+            placeholder={t('retailLoyalty.phonePlaceholder')}
+            value={newPhone}
+            onChange={(e) => setNewPhone(e.target.value)}
+            className="rounded-lg border px-3 py-2 text-sm"
+          />
+        </div>
+        <button
+          type="button"
+          disabled={creating}
+          onClick={() => void createMember()}
+          className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+        >
+          {creating ? t('retailLoyalty.creating') : t('retailLoyalty.createPass')}
+        </button>
+        {lastCreatedCode ? (
+          <p className="mt-4 rounded-lg bg-emerald-50 p-3 font-mono text-lg font-bold text-emerald-900">
+            {t('retailLoyalty.cardCodeLabel')}: {lastCreatedCode}
+          </p>
+        ) : null}
+        <p className="mt-2 text-xs text-gray-500">{t('retailLoyalty.cardCodeHint')}</p>
+      </section>
+
+      <section className="mb-8 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
         <h2 className="mb-3 text-lg font-semibold">{t('retailLoyalty.settingsTitle')}</h2>
         <label className="mb-3 flex items-center gap-2 text-sm">
           <input
@@ -174,40 +208,6 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
         >
           {savingSettings ? t('retailLoyalty.saving') : t('retailLoyalty.saveSettings')}
         </button>
-      </section>
-
-      <section className="mb-8 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-        <h2 className="mb-3 text-lg font-semibold">{t('retailLoyalty.newPassTitle')}</h2>
-        <div className="mb-3 grid gap-3 sm:grid-cols-2">
-          <input
-            type="text"
-            placeholder={t('retailLoyalty.namePlaceholder')}
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            className="rounded-lg border px-3 py-2 text-sm"
-          />
-          <input
-            type="tel"
-            placeholder={t('retailLoyalty.phonePlaceholder')}
-            value={newPhone}
-            onChange={(e) => setNewPhone(e.target.value)}
-            className="rounded-lg border px-3 py-2 text-sm"
-          />
-        </div>
-        <button
-          type="button"
-          disabled={creating}
-          onClick={() => void createMember()}
-          className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
-        >
-          {creating ? t('retailLoyalty.creating') : t('retailLoyalty.createPass')}
-        </button>
-        {lastCreatedCode ? (
-          <p className="mt-4 rounded-lg bg-emerald-50 p-3 font-mono text-lg font-bold text-emerald-900">
-            {t('retailLoyalty.cardCodeLabel')}: {lastCreatedCode}
-          </p>
-        ) : null}
-        <p className="mt-2 text-xs text-gray-500">{t('retailLoyalty.cardCodeHint')}</p>
       </section>
 
       <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">

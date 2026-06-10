@@ -51,6 +51,55 @@ function persistLetterLayout(layout: KeyboardLetterLayout) {
   }
 }
 
+const ADMIN_SCROLL_SELECTOR = '[data-vysion-admin-scroll]'
+
+function findVerticalScrollParent(el: HTMLElement): HTMLElement {
+  const adminMain = el.closest(ADMIN_SCROLL_SELECTOR)
+  if (adminMain instanceof HTMLElement) return adminMain
+
+  let node: HTMLElement | null = el.parentElement
+  while (node && node !== document.body) {
+    const { overflowY } = getComputedStyle(node)
+    if (
+      (overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'overlay') &&
+      node.scrollHeight > node.clientHeight + 2
+    ) {
+      return node
+    }
+    node = node.parentElement
+  }
+  return document.documentElement
+}
+
+function scrollFieldClearOfKeyboard(target: HTMLElement, panelH: number, headerPx: number) {
+  const margin = 16
+  const visibleBottom = window.innerHeight - panelH - margin
+  const rect = target.getBoundingClientRect()
+  if (rect.bottom <= visibleBottom && rect.top >= headerPx + 8) return
+
+  const scrollParent = findVerticalScrollParent(target)
+
+  if (scrollParent === document.documentElement) {
+    const y = window.scrollY + rect.top - headerPx - 20
+    const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight)
+    window.scrollTo({ top: Math.min(maxScroll, Math.max(0, y)), behavior: 'smooth' })
+    return
+  }
+
+  let delta = 0
+  if (rect.bottom > visibleBottom) {
+    delta = rect.bottom - visibleBottom + 12
+  } else if (rect.top < headerPx + 8) {
+    delta = rect.top - headerPx - 20
+  }
+  if (delta !== 0) {
+    scrollParent.scrollTo({
+      top: Math.max(0, scrollParent.scrollTop + delta),
+      behavior: 'smooth',
+    })
+  }
+}
+
 /**
  * Zaak-shell + keuken + interne dashboards: altijd groot webtoetsenbord (kassa-/touch-pc stack).
  * Publieke landingspagina’s: vooral bij touch-/tablet-pointer.
@@ -403,15 +452,47 @@ export function WebAzertyKeyboard() {
   }, [target])
 
   useLayoutEffect(() => {
-    if (!target) return
-    requestAnimationFrame(() => {
+    const root = document.documentElement
+    if (!target) {
+      root.classList.remove('vysion-web-kb-open')
+      root.style.removeProperty('--vysion-web-kb-height')
+      return
+    }
+
+    const syncKbInset = () => {
+      const h = panelRef.current?.offsetHeight ?? 300
+      root.classList.add('vysion-web-kb-open')
+      root.style.setProperty('--vysion-web-kb-height', `${h}px`)
+    }
+
+    syncKbInset()
+    requestAnimationFrame(syncKbInset)
+
+    const ro =
+      typeof ResizeObserver !== 'undefined' && panelRef.current
+        ? new ResizeObserver(syncKbInset)
+        : null
+    if (ro && panelRef.current) ro.observe(panelRef.current)
+
+    return () => {
+      ro?.disconnect()
+      root.classList.remove('vysion-web-kb-open')
+      root.style.removeProperty('--vysion-web-kb-height')
+    }
+  }, [target, legacyNumericMode, pinCompactMode])
+
+  useLayoutEffect(() => {
+    if (!target || !target.isConnected) return
+    const run = () => {
       try {
-        /** nearest + auto = minder “springen” waardoor het veld niet eindeloos tegen het blok duwt */
-        target.scrollIntoView({ block: 'nearest', behavior: 'auto' })
+        const panelH = panelRef.current?.offsetHeight ?? 300
+        scrollFieldClearOfKeyboard(target, panelH, 56)
       } catch {
         /* noop */
       }
-    })
+    }
+    requestAnimationFrame(run)
+    requestAnimationFrame(() => requestAnimationFrame(run))
   }, [target, legacyNumericMode, pinCompactMode])
 
   const closePanel = () => {

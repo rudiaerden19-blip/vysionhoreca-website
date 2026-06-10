@@ -46,6 +46,17 @@ html.vysion-kassa-root body {
   text-rendering: geometricPrecision;
 }
 
+/* Schermtoetsenbord: pagina kan scrollen; focusveld niet achter het paneel */
+html.vysion-web-kb-open {
+  scroll-padding-bottom: var(--vysion-web-kb-height, 320px);
+}
+html.vysion-web-kb-open body {
+  padding-bottom: var(--vysion-web-kb-height, 320px);
+}
+html.vysion-web-kb-open [data-vysion-admin-scroll] {
+  scroll-padding-bottom: var(--vysion-web-kb-height, 320px);
+}
+
 /*
  * Embedded touch / kiosk-WebView (o.a. Elo): hint naar manipulation om dubbeltik-zoom-vertraging te beperken.
  * Scrollports met eigen touch-action (bv. menu-scroll met touch-manipulation) blijven werken voor verticaal slepen.
