@@ -1954,41 +1954,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             </button>
           ) : null}
 
-          {showKassaStaffClockButton && clockedInStaff.length > 0 ? (
-            <div
-              className="flex min-w-0 max-w-[min(62vw,22rem)] shrink-0 flex-wrap items-center justify-end gap-1 sm:max-w-[28rem] sm:gap-1.5"
-              role="group"
-              aria-label={t('staffClock.salesPickTitle')}
-            >
-              {clockedInStaff.map((s) => {
-                const active = activeKassaStaff?.id === s.id
-                return (
-                  <button
-                    key={s.id}
-                    type="button"
-                    aria-pressed={active}
-                    title={
-                      active
-                        ? t('staffClock.salesActiveBadge').replace('{name}', s.name)
-                        : t('staffClock.salesPickStaffButton').replace('{name}', s.name)
-                    }
-                    onClick={() => selectActiveKassaStaff(s)}
-                    className={`inline-flex max-w-[9.5rem] shrink-0 items-center gap-1 rounded-md px-2 py-1 text-[10px] font-bold touch-manipulation sm:max-w-[11rem] sm:text-xs ${
-                      active
-                        ? 'bg-emerald-500 text-white shadow-sm ring-2 ring-emerald-200/80'
-                        : 'bg-emerald-950/70 text-emerald-100 ring-1 ring-emerald-500/35 hover:bg-emerald-800'
-                    }`}
-                  >
-                    <span className="shrink-0 opacity-90" aria-hidden>
-                      ●
-                    </span>
-                    <span className="truncate">{s.name}</span>
-                  </button>
-                )
-              })}
-            </div>
-          ) : null}
-
           <div ref={langRef} className="relative z-[40] shrink-0">
             <button
               type="button"
@@ -2091,6 +2056,39 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             >
               {t('adminHamburger.rows.instellingen')}
             </Link>
+            {showKassaStaffClockButton && clockedInStaff.length > 0 ? (
+              <>
+                <span
+                  className="mx-0.5 hidden h-7 w-px shrink-0 self-center bg-white/30 sm:mx-1 sm:block"
+                  aria-hidden
+                />
+                <div
+                  className="flex shrink-0 items-center gap-2"
+                  role="group"
+                  aria-label={t('staffClock.salesPickTitle')}
+                >
+                  {clockedInStaff.map((s) => {
+                    const active = activeKassaStaff?.id === s.id
+                    return (
+                      <button
+                        key={s.id}
+                        type="button"
+                        aria-pressed={active}
+                        title={
+                          active
+                            ? t('staffClock.salesActiveBadge').replace('{name}', s.name)
+                            : t('staffClock.salesPickStaffButton').replace('{name}', s.name)
+                        }
+                        onClick={() => selectActiveKassaStaff(s)}
+                        className={`${retailTopNavBtnClass(active)} max-w-[9rem] truncate sm:max-w-[10.5rem]`}
+                      >
+                        <span className="truncate">{s.name}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </>
+            ) : null}
           </div>
 
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden w-full">
