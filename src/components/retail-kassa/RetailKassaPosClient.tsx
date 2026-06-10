@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, startTransition } from 'react'
 import Link from 'next/link'
 import { useLanguage } from '@/i18n'
 import { getTenantSettings, type TenantSettings } from '@/lib/admin-api'
@@ -1309,6 +1309,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     const orderTotal = Math.round(Math.max(0, grossTotal - discountEuro) * 100) / 100
     const loyaltyMemberId =
       loyaltyEnabled && linkedLoyaltyMember ? linkedLoyaltyMember.id : undefined
+    const loyaltyMemberSnapshot = linkedLoyaltyMember
     const redeemPointsForSale =
       loyaltyMemberId && loyaltyRedeemPoints > 0 ? loyaltyRedeemPoints : 0
     setPaying(true)
@@ -1325,7 +1326,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       return
     }
     const orderNumber = res.orderNumber ?? 0
-    let receipt = buildRetailLastOrderReceipt(
+    const receipt = buildRetailLastOrderReceipt(
       linesSnapshot,
       method,
       orderNumber,
@@ -1333,52 +1334,57 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       splitAmounts,
       discountEuro > 0 ? discountEuro : undefined,
     )
-    if (loyaltyMemberId && linkedLoyaltyMember) {
-      try {
-        const settleRes = await authFetch('/api/retail/loyalty/settle', {
-          method: 'POST',
-          body: JSON.stringify({
-            tenantSlug: tenant,
-            memberId: loyaltyMemberId,
-            orderTotal,
-            orderNumber: orderNumber > 0 ? orderNumber : undefined,
-            redeemPoints: redeemPointsForSale > 0 ? redeemPointsForSale : undefined,
-          }),
-        })
-        const settleJson = (await settleRes.json()) as {
-          ok?: boolean
-          balance?: number
-          earned?: number
-          redeemed?: number
-        }
-        if (settleJson.ok && settleJson.balance != null) {
-          const balance = settleJson.balance
-          setLinkedLoyaltyMember((m) =>
-            m && m.id === loyaltyMemberId ? { ...m, points_balance: balance } : m,
-          )
-          receipt = {
-            ...receipt,
-            retailLoyalty: {
-              memberLabel:
-                linkedLoyaltyMember.display_name?.trim() || linkedLoyaltyMember.card_code,
-              pointsEarned: settleJson.earned ?? 0,
-              pointsRedeemed: settleJson.redeemed ?? 0,
-              pointsBalance: balance,
-            },
-          }
-        }
-      } catch {
-        /* puntenfout blokkeert verkoop niet */
-      }
-    }
     setLastOrderReceipt(receipt)
     setLoyaltyRedeemPoints(0)
     setCart([])
     setSelectedListLineKey(null)
     setLastScannedSku(null)
-    await reload({ fresh: true })
     setShowSuccessModal(true)
     focusBarcodeCapture()
+    void reload({ fresh: true })
+
+    if (loyaltyMemberId && loyaltyMemberSnapshot) {
+      void authFetch('/api/retail/loyalty/settle', {
+        method: 'POST',
+        body: JSON.stringify({
+          tenantSlug: tenant,
+          memberId: loyaltyMemberId,
+          orderTotal,
+          orderNumber: orderNumber > 0 ? orderNumber : undefined,
+          redeemPoints: redeemPointsForSale > 0 ? redeemPointsForSale : undefined,
+        }),
+      })
+        .then((r) => r.json())
+        .then(
+          (settleJson: {
+            ok?: boolean
+            balance?: number
+            earned?: number
+            redeemed?: number
+          }) => {
+            if (!settleJson.ok || settleJson.balance == null) return
+            setLinkedLoyaltyMember((m) =>
+              m && m.id === loyaltyMemberId ? { ...m, points_balance: settleJson.balance! } : m,
+            )
+            setLastOrderReceipt((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    retailLoyalty: {
+                      memberLabel:
+                        loyaltyMemberSnapshot.display_name?.trim() ||
+                        loyaltyMemberSnapshot.card_code,
+                      pointsEarned: settleJson.earned ?? 0,
+                      pointsRedeemed: settleJson.redeemed ?? 0,
+                      pointsBalance: settleJson.balance!,
+                    },
+                  }
+                : prev,
+            )
+          },
+        )
+        .catch(() => {})
+    }
   }
 
   const performLogout = () => {
@@ -2526,7 +2532,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                     onClick={() => {
                       if (cart.length === 0) return
                       playClick()
-                      setShowPaymentModal(true)
+                      startTransition(() => setShowPaymentModal(true))
                     }}
                     disabled={cart.length === 0}
                     className={`flex min-w-0 flex-1 items-center justify-center py-3.5 text-xl font-bold sm:text-[1.35rem] ${retailSidebarFooterPrimaryMinH} ${KASSA_POS_CHECKOUT_BTN}`}

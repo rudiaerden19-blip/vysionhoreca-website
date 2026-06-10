@@ -2,6 +2,7 @@ import { adminDb } from '@/lib/admin-db-client'
 import {
   fetchRetailPosSkus,
   findRetailSkuByCode,
+  invalidateRetailPosSkuCache,
   parseRetailScanPayload,
   resolveRetailSkuForGoodsReceipt,
   resolveRetailSkuLookup,
@@ -50,6 +51,7 @@ async function updateSkuStock(
   sku: RetailPosSku,
   nextQty: number,
   extra?: { size_label?: string; color_label?: string },
+  opts?: { skipCatalogRefresh?: boolean },
 ): Promise<{ ok: boolean; sku?: RetailPosSku; error?: string }> {
   if (sku.variantId) {
     const patch: Record<string, unknown> = {
@@ -69,6 +71,9 @@ async function updateSkuStock(
     const row = (Array.isArray(r.data) ? r.data[0] : r.data) as Record<string, unknown> | undefined
     if (!row) return { ok: false, error: 'empty_row' }
 
+    if (opts?.skipCatalogRefresh) {
+      return { ok: true, sku: { ...sku, stock_quantity: nextQty, track_stock: true } }
+    }
     const refreshed = await fetchRetailPosSkus(tenantSlug, { fresh: true })
     const updated = refreshed.find((s) => s.lineKey === sku.lineKey)
     return updated ? { ok: true, sku: updated } : { ok: true, sku }
@@ -88,6 +93,9 @@ async function updateSkuStock(
     { tenantSlug, select: PRODUCT_STOCK_SELECT },
   )
   if (!r.ok) return { ok: false, error: r.error || 'update_failed' }
+  if (opts?.skipCatalogRefresh) {
+    return { ok: true, sku: { ...sku, stock_quantity: nextQty, track_stock: true } }
+  }
   const refreshed = await fetchRetailPosSkus(tenantSlug, { fresh: true })
   const updated = refreshed.find((s) => s.lineKey === sku.lineKey)
   return updated ? { ok: true, sku: updated } : { ok: true, sku }
@@ -182,8 +190,9 @@ export async function completeRetailSale(
   for (const line of lines) {
     if (!line.sku.track_stock) continue
     const nextQty = Math.max(0, line.sku.stock_quantity - line.quantity)
-    await updateSkuStock(tenantSlug, line.sku, nextQty)
+    await updateSkuStock(tenantSlug, line.sku, nextQty, undefined, { skipCatalogRefresh: true })
   }
+  invalidateRetailPosSkuCache(tenantSlug)
 
   syncZReportAfterOrderSafe(tenantSlug, createdAt.toISOString())
   return { ok: true, orderNumber }
