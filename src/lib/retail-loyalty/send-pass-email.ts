@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { buildEan13BarcodeSvg } from '@/lib/retail-loyalty/ean13-barcode-svg'
+import { buildEan13BarcodeEmailHtml } from '@/lib/retail-loyalty/ean13-barcode-svg'
 import { createMailTransporter, resolveTenantSmtp } from '@/lib/retail-loyalty/tenant-smtp'
 
 function escapeHtml(s: string): string {
@@ -44,14 +44,12 @@ export async function sendRetailLoyaltyPassEmail(opts: {
   if (!smtpRes.ok) return { ok: false, error: smtpRes.error }
 
   const shopName = await loadShopDisplayName(supabase, tenantSlug, smtpRes.smtp.fromName)
-  const svg = buildEan13BarcodeSvg(cardCode, { barHeight: 80, moduleWidth: 2 })
+  const barcodeHtml = buildEan13BarcodeEmailHtml(cardCode, { barHeightPx: 88, moduleWidthPx: 3 })
 
   const html = `
     <div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto;color:#111;text-align:center;">
       <p style="margin:0 0 24px;font-size:20px;font-weight:700;">${escapeHtml(shopName)}</p>
-      <div style="display:inline-block;padding:16px;background:#fff;">
-        ${svg ?? ''}
-      </div>
+      ${barcodeHtml ?? ''}
     </div>
   `.trim()
 

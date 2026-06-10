@@ -11,6 +11,7 @@ const CreateSchema = z.object({
   address: z.string().max(500).optional(),
   shop_customer_id: z.string().uuid().optional(),
   sendPassEmail: z.boolean().optional(),
+  resendExistingPass: z.boolean().optional(),
 })
 
 const PatchSchema = z.object({
@@ -34,7 +35,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: 'invalid_body' }, { status: 400 })
   }
 
-  const { tenantSlug, display_name, phone, email, address, shop_customer_id, sendPassEmail } =
+  const { tenantSlug, display_name, phone, email, address, shop_customer_id, sendPassEmail, resendExistingPass } =
     parsed.data
   const access = await verifyTenantOrSuperAdmin(req, tenantSlug)
   if (!access.authorized) {
@@ -54,9 +55,11 @@ export async function POST(req: NextRequest) {
     shop_customer_id,
     sendPassEmail: sendPassEmail === true,
     emailOrigin: origin,
+    resendExistingPass: resendExistingPass === true,
   })
   if (!res.ok || !res.member) {
-    return NextResponse.json({ ok: false, error: res.error || 'create_failed' }, { status: 500 })
+    const status = res.error === 'email_has_active_pass' ? 409 : 500
+    return NextResponse.json({ ok: false, error: res.error || 'create_failed' }, { status })
   }
 
   return NextResponse.json({

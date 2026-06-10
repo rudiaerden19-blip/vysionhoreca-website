@@ -5806,7 +5806,8 @@
     "deletePass": "Verwijderen",
     "deletingPass": "Bezig…",
     "deletePassConfirm": "Winkelpas van {name} definitief verwijderen? Puntenhistoriek verdwijnt ook. Dit kan niet ongedaan.",
-    "deletePassError": "Verwijderen mislukt"
+    "deletePassError": "Verwijderen mislukt",
+    "emailAlreadyHasPass": "Dit e-mailadres heeft al een winkelpas. Zoek de klant op e-mail en gebruik «Barcode opnieuw mailen», of kies een ander e-mailadres."
   },
   "sectorPages": {
     "breadcrumb": "Sectoren",

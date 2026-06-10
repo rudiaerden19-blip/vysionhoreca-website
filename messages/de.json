@@ -5937,6 +5937,7 @@
     "deletePass": "Löschen",
     "deletingPass": "Wird gelöscht…",
     "deletePassConfirm": "Kundenpass von {name} endgültig löschen? Punktehistorie wird entfernt. Nicht rückgängig.",
-    "deletePassError": "Löschen fehlgeschlagen"
+    "deletePassError": "Löschen fehlgeschlagen",
+    "emailAlreadyHasPass": "Diese E-Mail hat bereits einen Pass. Suche per E-Mail und nutze «Barcode erneut mailen» oder eine andere E-Mail."
   }
 }

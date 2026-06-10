@@ -5873,6 +5873,7 @@
     "deletePass": "Delete",
     "deletingPass": "Deleting…",
     "deletePassConfirm": "Permanently delete the store pass for {name}? Point history will be removed. This cannot be undone.",
-    "deletePassError": "Could not delete pass"
+    "deletePassError": "Could not delete pass",
+    "emailAlreadyHasPass": "This email already has a store pass. Search by email and use “Resend barcode email”, or use a different email."
   }
 }

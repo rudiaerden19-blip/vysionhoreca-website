@@ -5937,6 +5937,7 @@
     "deletePass": "Supprimer",
     "deletingPass": "Suppression…",
     "deletePassConfirm": "Supprimer définitivement la carte de {name} ? L'historique des points sera effacé. Irréversible.",
-    "deletePassError": "Suppression impossible"
+    "deletePassError": "Suppression impossible",
+    "emailAlreadyHasPass": "Cet e-mail a déjà une carte. Recherchez par e-mail et utilisez « Renvoyer le code-barres », ou un autre e-mail."
   }
 }

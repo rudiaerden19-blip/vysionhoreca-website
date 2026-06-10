@@ -5914,6 +5914,7 @@
     "deletePass": "删除",
     "deletingPass": "删除中…",
     "deletePassConfirm": "永久删除 {name} 的会员卡？积分记录也将删除，无法恢复。",
-    "deletePassError": "删除失败"
+    "deletePassError": "删除失败",
+    "emailAlreadyHasPass": "该邮箱已有会员卡。请用邮箱搜索并使用「重新发送条码邮件」，或换用其他邮箱。"
   }
 }

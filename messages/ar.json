@@ -5914,6 +5914,7 @@
     "deletePass": "حذف",
     "deletingPass": "جاري الحذف…",
     "deletePassConfirm": "حذف بطاقة {name} نهائياً؟ سيتم حذف سجل النقاط. لا يمكن التراجع.",
-    "deletePassError": "تعذّر الحذف"
+    "deletePassError": "تعذّر الحذف",
+    "emailAlreadyHasPass": "هذا البريد لديه بطاقة بالفعل. ابحث بالبريد واستخدم «إعادة إرسال البريد» أو بريداً آخر."
   }
 }

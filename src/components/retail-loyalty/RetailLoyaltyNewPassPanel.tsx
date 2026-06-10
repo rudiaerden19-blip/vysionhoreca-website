@@ -42,6 +42,7 @@ export function RetailLoyaltyNewPassPanel({
 
   const [creating, setCreating] = useState(false)
   const [lastCreatedCode, setLastCreatedCode] = useState<string | null>(null)
+  const [lastCreatedDisplayName, setLastCreatedDisplayName] = useState<string | null>(null)
   const [feedback, setFeedback] = useState<string | null>(null)
 
   const selectedHit = results.find((r) => r.customer.id === selectedCustomerId) ?? null
@@ -91,7 +92,24 @@ export function RetailLoyaltyNewPassPanel({
     }
   }
 
-  async function savePass(sendEmail: boolean) {
+  function resetNewPassForm(keepSuccess?: { cardCode: string; displayName?: string }) {
+    setSearchQuery('')
+    setSearchPhase('idle')
+    setResults([])
+    setSelectedCustomerId(null)
+    setShowNewCustomerForm(false)
+    setName('')
+    setAddress('')
+    setPhone('')
+    setEmail('')
+    if (keepSuccess) {
+      setLastCreatedCode(keepSuccess.cardCode)
+    } else {
+      setLastCreatedCode(null)
+    }
+  }
+
+  async function savePass(sendEmail: boolean, opts?: { resendExistingPass?: boolean }) {
     if (!name.trim()) {
       alert(t('retailLoyalty.newPassNameRequired'))
       return
@@ -113,6 +131,7 @@ export function RetailLoyaltyNewPassPanel({
           address: address.trim() || undefined,
           shop_customer_id: selectedCustomerId ?? undefined,
           sendPassEmail: sendEmail,
+          resendExistingPass: opts?.resendExistingPass === true,
         }),
       })
       const json = (await res.json()) as {
@@ -123,10 +142,16 @@ export function RetailLoyaltyNewPassPanel({
         error?: string
       }
       if (!json.ok || !json.member) {
-        alert(t('retailLoyalty.createError'))
+        if (json.error === 'email_has_active_pass') {
+          alert(t('retailLoyalty.emailAlreadyHasPass'))
+        } else {
+          alert(t('retailLoyalty.createError'))
+        }
         return
       }
-      setLastCreatedCode(json.member.card_code)
+      const savedName = name.trim()
+      resetNewPassForm({ cardCode: json.member.card_code, displayName: savedName })
+      setLastCreatedDisplayName(savedName)
       if (json.warning === 'smtp_not_configured') {
         setFeedback(t('retailLoyalty.emailNotConfigured'))
       } else if (sendEmail && json.emailSent) {
@@ -274,7 +299,7 @@ export function RetailLoyaltyNewPassPanel({
               <button
                 type="button"
                 disabled={creating || !email.trim()}
-                onClick={() => void savePass(true)}
+                onClick={() => void savePass(true, { resendExistingPass: true })}
                 className="rounded-lg border border-emerald-600 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-900 disabled:opacity-50"
               >
                 {t('retailLoyalty.resendPassEmail')}
@@ -293,7 +318,7 @@ export function RetailLoyaltyNewPassPanel({
           <RetailLoyaltyPassShare
             tenantSlug={tenant}
             cardCode={lastCreatedCode}
-            displayName={name.trim() || undefined}
+            displayName={lastCreatedDisplayName ?? undefined}
             pointsBalance={selectedHit?.loyaltyMember?.points_balance ?? 0}
           />
         </div>

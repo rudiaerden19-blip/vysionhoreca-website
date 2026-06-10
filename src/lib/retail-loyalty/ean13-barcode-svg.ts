@@ -86,6 +86,36 @@ function encodeEan13Modules(digits13: string): string | null {
   return bits
 }
 
+/** E-mailclients tonen geen SVG; HTML-tabel met zwarte strepen scant hetzelfde als EAN-13. */
+export function buildEan13BarcodeEmailHtml(
+  code13: string,
+  options?: { barHeightPx?: number; moduleWidthPx?: number },
+): string | null {
+  const bits = encodeEan13Modules(code13)
+  if (!bits) return null
+  const moduleW = options?.moduleWidthPx ?? 3
+  const barH = options?.barHeightPx ?? 80
+  const quiet = 10
+  const cells: string[] = []
+  for (let i = 0; i < quiet; i++) {
+    cells.push(
+      `<td style="width:${moduleW}px;height:${barH}px;background:#ffffff;font-size:0;line-height:0;">&#8203;</td>`,
+    )
+  }
+  for (let i = 0; i < bits.length; i++) {
+    const bg = bits[i] === '1' ? '#000000' : '#ffffff'
+    cells.push(
+      `<td style="width:${moduleW}px;height:${barH}px;background:${bg};font-size:0;line-height:0;">&#8203;</td>`,
+    )
+  }
+  for (let i = 0; i < quiet; i++) {
+    cells.push(
+      `<td style="width:${moduleW}px;height:${barH}px;background:#ffffff;font-size:0;line-height:0;">&#8203;</td>`,
+    )
+  }
+  return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0 auto;border-collapse:collapse;"><tr>${cells.join('')}</tr></table>`
+}
+
 export function buildEan13BarcodeSvg(
   code13: string,
   options?: { barHeight?: number; moduleWidth?: number },

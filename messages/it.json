@@ -5914,6 +5914,7 @@
     "deletePass": "Elimina",
     "deletingPass": "Eliminazione…",
     "deletePassConfirm": "Eliminare definitivamente la tessera di {name}? Anche lo storico punti. Irreversibile.",
-    "deletePassError": "Eliminazione non riuscita"
+    "deletePassError": "Eliminazione non riuscita",
+    "emailAlreadyHasPass": "Questa email ha già una tessera. Cerca per email e usa «Reinvia email codice», o un'altra email."
   }
 }

@@ -219,13 +219,23 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
   const [deletingMemberId, setDeletingMemberId] = useState<string | null>(null)
 
   const loadMembers = useCallback(async () => {
-    const res = await adminDb.select<RetailLoyaltyMember[]>('retail_loyalty_members', {
+    const baseSelect = 'id, tenant_slug, card_code, display_name, phone, points_balance, is_active'
+    const opts = {
       tenantSlug: params.tenant,
-      select: 'id, tenant_slug, card_code, display_name, phone, email, points_balance, is_active',
       match: showInactive ? undefined : { is_active: true },
-      order: { column: 'created_at', ascending: false },
+      order: { column: 'created_at', ascending: false as const },
       limit: 500,
+    }
+    let res = await adminDb.select<RetailLoyaltyMember[]>('retail_loyalty_members', {
+      ...opts,
+      select: `${baseSelect}, email`,
     })
+    if (!res.ok) {
+      res = await adminDb.select<RetailLoyaltyMember[]>('retail_loyalty_members', {
+        ...opts,
+        select: baseSelect,
+      })
+    }
     if (res.ok && Array.isArray(res.data)) {
       setMembers(res.data)
     }

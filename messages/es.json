@@ -5914,6 +5914,7 @@
     "deletePass": "Eliminar",
     "deletingPass": "Eliminando…",
     "deletePassConfirm": "¿Eliminar definitivamente la tarjeta de {name}? Se borra el historial de puntos. No se puede deshacer.",
-    "deletePassError": "No se pudo eliminar"
+    "deletePassError": "No se pudo eliminar",
+    "emailAlreadyHasPass": "Este email ya tiene una tarjeta. Busque por email y use «Reenviar email del código», u otro email."
   }
 }

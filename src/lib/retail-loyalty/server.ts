@@ -296,6 +296,7 @@ export async function createRetailLoyaltyMember(
     card_code?: string
     sendPassEmail?: boolean
     emailOrigin?: string
+    resendExistingPass?: boolean
   },
 ): Promise<{ ok: boolean; member?: RetailLoyaltyMemberPublic; error?: string; emailSent?: boolean }> {
   const supabase = getServerSupabaseClient()
@@ -325,11 +326,19 @@ export async function createRetailLoyaltyMember(
       .eq('is_active', true)
       .maybeSingle()
     if (existingPass) {
+      if (!input.resendExistingPass) {
+        return { ok: false, error: 'email_has_active_pass' }
+      }
+      await updateRetailLoyaltyMember(tenantSlug, existingPass.id, {
+        display_name: input.display_name?.trim() || existingPass.display_name,
+        phone: input.phone?.trim() || existingPass.phone,
+        email: emailNorm || null,
+      })
       const member: RetailLoyaltyMemberPublic = {
         id: existingPass.id,
         card_code: existingPass.card_code,
-        display_name: existingPass.display_name,
-        phone: existingPass.phone,
+        display_name: input.display_name?.trim() || existingPass.display_name,
+        phone: input.phone?.trim() || existingPass.phone,
         points_balance: Number(existingPass.points_balance) || 0,
       }
       let emailSent = false
@@ -554,7 +563,7 @@ async function applyRetailLoyaltyPointsDelta(
 export async function updateRetailLoyaltyMember(
   tenantSlug: string,
   memberId: string,
-  patch: { display_name?: string | null; phone?: string | null; is_active?: boolean },
+  patch: { display_name?: string | null; phone?: string | null; email?: string | null; is_active?: boolean },
 ): Promise<{ ok: boolean; error?: string }> {
   const supabase = getServerSupabaseClient()
   if (!supabase) return { ok: false, error: 'db_unavailable' }
@@ -565,6 +574,9 @@ export async function updateRetailLoyaltyMember(
   }
   if (patch.phone !== undefined) {
     row.phone = patch.phone?.trim() || null
+  }
+  if (patch.email !== undefined) {
+    row.email = patch.email?.trim().toLowerCase() || null
   }
   if (patch.is_active !== undefined) row.is_active = patch.is_active
 
