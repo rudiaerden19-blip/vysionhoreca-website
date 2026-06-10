@@ -127,6 +127,125 @@ export type RetailPrintReceiptResult =
   | { ok: true }
   | { ok: false; error: string; fallbackHtml: string }
 
+export function buildRetailKassaReceiptHtmlDocument(opts: {
+  tenantInfo: TenantSettings | null
+  order: KassaLastOrderReceipt
+  labels: RetailReceiptI18n
+  locale: string
+  draft?: boolean
+}): string {
+  const { tenantInfo, order, labels, locale } = opts
+  const isDraft = !!opts.draft
+  const fbVatRate = normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 21, 21)
+  const splitOk =
+    Array.isArray(order.vatSplit) &&
+    order.vatSplit.length > 0 &&
+    typeof order.subtotalExclVat === 'number' &&
+    typeof order.totalTax === 'number'
+  let subtotal: number
+  let tax: number
+  if (splitOk) {
+    subtotal = Math.round((order.subtotalExclVat as number) * 100) / 100
+    tax = Math.round((order.totalTax as number) * 100) / 100
+  } else {
+    subtotal = Math.round((order.total / (1 + fbVatRate / 100)) * 100) / 100
+    tax = Math.round((order.total - subtotal) * 100) / 100
+  }
+
+  const orderTypePlain = labels.orderTypeTakeaway
+  const receiptRefDisplay = isDraft
+    ? '—'
+    : order.checkoutReference ?? (order.orderNumber > 0 ? String(order.orderNumber) : '—')
+  const payLabel = payLabelForOrder(order, labels, isDraft)
+  const docTitle = `${labels.receiptNo}${receiptRefDisplay}`
+  const dateStr = order.createdAt.toLocaleString(appLocaleToBcp47(locale), {
+    day: '2-digit',
+    month: '2-digit',
+    year: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+
+  const bizName = escapeReceiptHtml(tenantInfo?.business_name || labels.defaultBusinessName)
+  const orderTypeLabel = `📦 ${orderTypePlain}`
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${escapeReceiptHtml(docTitle)}</title><style>${KASSA_PRINT_RECEIPT_STYLES}</style></head><body>
+      <div class="center">
+        <div class="bold big">${bizName}</div>
+        ${tenantInfo?.address ? `<div class="small">${escapeReceiptHtml(tenantInfo.address)}</div>` : ''}
+        ${tenantInfo?.postal_code || tenantInfo?.city ? `<div class="small">${escapeReceiptHtml(tenantInfo.postal_code ?? '')} ${escapeReceiptHtml(tenantInfo.city ?? '')}</div>` : ''}
+        ${tenantInfo?.phone ? `<div class="small">${escapeReceiptHtml(labels.telPrefix)} ${escapeReceiptHtml(tenantInfo.phone)}</div>` : ''}
+      </div>
+      <div class="divider"></div>
+      ${isDraft ? `<div class="center bold">${escapeReceiptHtml(labels.draftBanner)}</div><div class="divider-solid"></div>` : ''}
+      <div class="center order-type">${escapeReceiptHtml(orderTypeLabel)}</div>
+      <div class="row small">
+        <span>${escapeReceiptHtml(labels.receiptNo)}${escapeReceiptHtml(receiptRefDisplay)}</span>
+        <span>${escapeReceiptHtml(dateStr)}</span>
+      </div>
+      <div class="divider-solid"></div>
+      ${order.items
+        .map((i) => {
+          const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
+          const lineTotal = (i.product.price + choicesTotal) * i.quantity
+          return `<div class="row"><span>${i.quantity}x ${escapeReceiptHtml(i.product.name)}</span><span>€${lineTotal.toFixed(2)}</span></div>`
+        })
+        .join('')}
+      <div class="divider-solid"></div>
+      <div class="row"><span>${escapeReceiptHtml(labels.subtotal)}</span><span>€${subtotal.toFixed(2)}</span></div>
+      ${
+        splitOk && order.vatSplit!.length >= 1
+          ? order
+              .vatSplit!.map(
+                (l) =>
+                  `<div class="row"><span>${escapeReceiptHtml(labels.vatLabel(l.rate))}</span><span>€${l.tax.toFixed(2)}</span></div>`,
+              )
+              .join('')
+          : `<div class="row"><span>${escapeReceiptHtml(labels.vatLabel(fbVatRate))}</span><span>€${tax.toFixed(2)}</span></div>`
+      }
+      <div class="row total"><span>${escapeReceiptHtml(labels.total)}</span><span>€${order.total.toFixed(2)}</span></div>
+      <div class="divider"></div>
+      <div class="center small">${escapeReceiptHtml(labels.paidWith)} ${escapeReceiptHtml(payLabel)}</div>
+      ${
+        order.helpedByStaffName?.trim() && labels.helpedByLine
+          ? `<div class="center bold">${escapeReceiptHtml(labels.helpedByLine(order.helpedByStaffName.trim()))}</div>`
+          : ''
+      }
+      ${
+        order.retailLoyalty && labels.loyaltyBalanceLine
+          ? (() => {
+              const L = order.retailLoyalty!
+              const parts: string[] = ['<div class="divider-solid"></div>']
+              if (L.memberLabel && labels.loyaltyPassLabel) {
+                parts.push(
+                  `<div class="center small bold">${escapeReceiptHtml(labels.loyaltyPassLabel(L.memberLabel))}</div>`,
+                )
+              }
+              if (L.pointsRedeemed > 0 && labels.loyaltyRedeemedLine) {
+                parts.push(
+                  `<div class="center small">${escapeReceiptHtml(labels.loyaltyRedeemedLine(L.pointsRedeemed))}</div>`,
+                )
+              }
+              if (L.pointsEarned > 0 && labels.loyaltyEarnedLine) {
+                parts.push(
+                  `<div class="center small">${escapeReceiptHtml(labels.loyaltyEarnedLine(L.pointsEarned))}</div>`,
+                )
+              }
+              parts.push(
+                `<div class="center small bold">${escapeReceiptHtml(labels.loyaltyBalanceLine(L.pointsBalance))}</div>`,
+              )
+              return parts.join('')
+            })()
+          : ''
+      }
+      <div class="divider"></div>
+      <div class="center small">
+        ${tenantInfo?.btw_number ? `${escapeReceiptHtml(labels.businessVatLabel(tenantInfo.btw_number))}<br/>` : ''}
+        ${escapeReceiptHtml(isDraft ? labels.draftFooter : labels.thanks)}
+        ${tenantInfo?.website ? `<br/>${escapeReceiptHtml(tenantInfo.website)}` : ''}
+      </div>
+    </body></html>`
+}
+
 export async function printRetailKassaReceipt(opts: {
   tenantInfo: TenantSettings | null
   order: KassaLastOrderReceipt
@@ -245,84 +364,13 @@ export async function printRetailKassaReceipt(opts: {
 
   if (printResult.ok) return { ok: true }
 
-  const bizName = escapeReceiptHtml(tenantInfo?.business_name || labels.defaultBusinessName)
-  const orderTypeLabel = `📦 ${orderTypePlain}`
-  const receiptHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${escapeReceiptHtml(docTitle)}</title><style>${KASSA_PRINT_RECEIPT_STYLES}</style></head><body>
-      <div class="center">
-        <div class="bold big">${bizName}</div>
-        ${tenantInfo?.address ? `<div class="small">${escapeReceiptHtml(tenantInfo.address)}</div>` : ''}
-        ${tenantInfo?.postal_code || tenantInfo?.city ? `<div class="small">${escapeReceiptHtml(tenantInfo.postal_code ?? '')} ${escapeReceiptHtml(tenantInfo.city ?? '')}</div>` : ''}
-        ${tenantInfo?.phone ? `<div class="small">${escapeReceiptHtml(labels.telPrefix)} ${escapeReceiptHtml(tenantInfo.phone)}</div>` : ''}
-      </div>
-      <div class="divider"></div>
-      ${isDraft ? `<div class="center bold">${escapeReceiptHtml(labels.draftBanner)}</div><div class="divider-solid"></div>` : ''}
-      <div class="center order-type">${escapeReceiptHtml(orderTypeLabel)}</div>
-      <div class="row small">
-        <span>${escapeReceiptHtml(labels.receiptNo)}${escapeReceiptHtml(receiptRefDisplay)}</span>
-        <span>${escapeReceiptHtml(dateStr)}</span>
-      </div>
-      <div class="divider-solid"></div>
-      ${order.items
-        .map((i) => {
-          const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
-          const lineTotal = (i.product.price + choicesTotal) * i.quantity
-          return `<div class="row"><span>${i.quantity}x ${escapeReceiptHtml(i.product.name)}</span><span>€${lineTotal.toFixed(2)}</span></div>`
-        })
-        .join('')}
-      <div class="divider-solid"></div>
-      <div class="row"><span>${escapeReceiptHtml(labels.subtotal)}</span><span>€${subtotal.toFixed(2)}</span></div>
-      ${
-        splitOk && order.vatSplit!.length >= 1
-          ? order
-              .vatSplit!.map(
-                (l) =>
-                  `<div class="row"><span>${escapeReceiptHtml(labels.vatLabel(l.rate))}</span><span>€${l.tax.toFixed(2)}</span></div>`,
-              )
-              .join('')
-          : `<div class="row"><span>${escapeReceiptHtml(labels.vatLabel(fbVatRate))}</span><span>€${tax.toFixed(2)}</span></div>`
-      }
-      <div class="row total"><span>${escapeReceiptHtml(labels.total)}</span><span>€${order.total.toFixed(2)}</span></div>
-      <div class="divider"></div>
-      <div class="center small">${escapeReceiptHtml(labels.paidWith)} ${escapeReceiptHtml(payLabel)}</div>
-      ${
-        order.helpedByStaffName?.trim() && labels.helpedByLine
-          ? `<div class="center bold">${escapeReceiptHtml(labels.helpedByLine(order.helpedByStaffName.trim()))}</div>`
-          : ''
-      }
-      ${
-        order.retailLoyalty && labels.loyaltyBalanceLine
-          ? (() => {
-              const L = order.retailLoyalty!
-              const parts: string[] = ['<div class="divider-solid"></div>']
-              if (L.memberLabel && labels.loyaltyPassLabel) {
-                parts.push(
-                  `<div class="center small bold">${escapeReceiptHtml(labels.loyaltyPassLabel(L.memberLabel))}</div>`,
-                )
-              }
-              if (L.pointsRedeemed > 0 && labels.loyaltyRedeemedLine) {
-                parts.push(
-                  `<div class="center small">${escapeReceiptHtml(labels.loyaltyRedeemedLine(L.pointsRedeemed))}</div>`,
-                )
-              }
-              if (L.pointsEarned > 0 && labels.loyaltyEarnedLine) {
-                parts.push(
-                  `<div class="center small">${escapeReceiptHtml(labels.loyaltyEarnedLine(L.pointsEarned))}</div>`,
-                )
-              }
-              parts.push(
-                `<div class="center small bold">${escapeReceiptHtml(labels.loyaltyBalanceLine(L.pointsBalance))}</div>`,
-              )
-              return parts.join('')
-            })()
-          : ''
-      }
-      <div class="divider"></div>
-      <div class="center small">
-        ${tenantInfo?.btw_number ? `${escapeReceiptHtml(labels.businessVatLabel(tenantInfo.btw_number))}<br/>` : ''}
-        ${escapeReceiptHtml(isDraft ? labels.draftFooter : labels.thanks)}
-        ${tenantInfo?.website ? `<br/>${escapeReceiptHtml(tenantInfo.website)}` : ''}
-      </div>
-    </body></html>`
+  const receiptHtml = buildRetailKassaReceiptHtmlDocument({
+    tenantInfo,
+    order,
+    labels,
+    locale,
+    draft: isDraft,
+  })
 
   return { ok: false, error: printResult.error, fallbackHtml: receiptHtml }
 }
