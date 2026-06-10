@@ -11,6 +11,7 @@ import {
   type RetailPosSku,
   type RetailScanPayload,
 } from '@/lib/retail-pos-catalog'
+import { authFetch } from '@/lib/auth-headers'
 import { syncZReportAfterOrderSafe } from '@/lib/kassa-z-sync-safe'
 import type { KassaPaymentMethod } from '@/lib/kassa-cart-types'
 import type { RetailImportRow } from '@/lib/retail-product-import'
@@ -111,14 +112,20 @@ export async function completeRetailSale(
     loyaltyDiscountEuro?: number
     loyaltyRedeemPoints?: number
     kassaStaffId?: string | null
+    storeCreditId?: string | null
+    storeCreditEuro?: number
   },
-): Promise<{ ok: boolean; orderNumber?: number; error?: string }> {
+): Promise<{ ok: boolean; orderNumber?: number; orderId?: string; error?: string }> {
   if (lines.length === 0) return { ok: false, error: 'empty_cart' }
 
   const grossTotal = lines.reduce((s, l) => s + l.sku.price * l.quantity, 0)
-  const discountRaw = Math.max(0, options?.loyaltyDiscountEuro ?? 0)
-  const discount = Math.round(Math.min(discountRaw, grossTotal) * 100) / 100
-  const roundedTotal = Math.round((grossTotal - discount) * 100) / 100
+  const loyaltyDiscountRaw = Math.max(0, options?.loyaltyDiscountEuro ?? 0)
+  const afterLoyalty = Math.max(0, grossTotal - loyaltyDiscountRaw)
+  const creditRaw = Math.max(0, options?.storeCreditEuro ?? 0)
+  const creditApplied = Math.round(Math.min(creditRaw, afterLoyalty) * 100) / 100
+  const discount = Math.round(Math.min(loyaltyDiscountRaw, grossTotal) * 100) / 100
+  const totalDiscount = Math.round((discount + creditApplied) * 100) / 100
+  const roundedTotal = Math.round((grossTotal - totalDiscount) * 100) / 100
 
   if (method === 'SPLIT') {
     const sc = splitAmounts?.cash ?? 0
@@ -147,7 +154,7 @@ export async function completeRetailSale(
     subtotal,
     tax,
     total: roundedTotal,
-    discount_amount: discount > 0 ? discount : 0,
+    discount_amount: totalDiscount > 0 ? totalDiscount : 0,
     items: lines.map((l) => ({
       product_id: l.sku.productId,
       variant_id: l.sku.variantId,
@@ -180,7 +187,7 @@ export async function completeRetailSale(
 
   const insRes = await adminDb.insert('orders', orderPayload, {
     tenantSlug,
-    select: 'order_number',
+    select: 'id, order_number',
   })
 
   if (!insRes.ok) {
@@ -188,8 +195,28 @@ export async function completeRetailSale(
   }
 
   const raw = insRes.data as unknown
-  const row = (Array.isArray(raw) ? raw[0] : raw) as { order_number?: number } | undefined
+  const row = (Array.isArray(raw) ? raw[0] : raw) as
+    | { id?: string; order_number?: number }
+    | undefined
   const orderNumber = row?.order_number != null ? Number(row.order_number) : undefined
+  const orderId = row?.id
+
+  if (creditApplied > 0 && options?.storeCreditId && orderId && orderNumber) {
+    const redeemRes = await authFetch('/api/retail/store-credit/redeem', {
+      method: 'POST',
+      body: JSON.stringify({
+        tenantSlug,
+        creditId: options.storeCreditId,
+        amount: creditApplied,
+        orderId,
+        orderNumber,
+      }),
+    })
+    const redeemJson = (await redeemRes.json().catch(() => ({}))) as { ok?: boolean; error?: string }
+    if (!redeemRes.ok || !redeemJson.ok) {
+      return { ok: false, error: redeemJson.error || 'store_credit_redeem_failed' }
+    }
+  }
 
   for (const line of lines) {
     if (!line.sku.track_stock) continue
@@ -199,7 +226,7 @@ export async function completeRetailSale(
   invalidateRetailPosSkuCache(tenantSlug)
 
   syncZReportAfterOrderSafe(tenantSlug, createdAt.toISOString())
-  return { ok: true, orderNumber }
+  return { ok: true, orderNumber, orderId }
 }
 
 /** @deprecated gebruik completeRetailSale */

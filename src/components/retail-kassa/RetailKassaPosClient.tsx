@@ -67,19 +67,26 @@ import {
   type RetailImportRow,
 } from '@/lib/retail-product-import'
 
-type RetailKassaMode = 'sales' | 'stockCount' | 'goodsReceipt'
+type RetailKassaMode = 'sales' | 'stockCount' | 'goodsReceipt' | 'exchangeCredit'
 
 type StockActivityLine = {
   key: string
   sku: RetailPosSku
   delta: number
-  mode: RetailKassaMode
+  mode: 'stockCount' | 'goodsReceipt'
 }
 import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
 import { AccountMenuSessionBlock } from '@/components/AccountMenuSessionBlock'
 import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
 import { authFetch, buildShopInternalReturnPath } from '@/lib/auth-headers'
 import { isRetailLoyaltyCardScan } from '@/lib/retail-loyalty/card-code'
+import { isRetailStoreCreditScan } from '@/lib/retail-store-credit/code'
+import type { RetailOrderLineForReturn, RetailStoreCreditPos } from '@/lib/retail-store-credit/types'
+import {
+  printRetailStoreCreditVoucher,
+  tryBrowserPrintStoreCreditFallback,
+  type StoreCreditVoucherPrintLabels,
+} from '@/lib/retail-store-credit/print-voucher'
 import type { RetailLoyaltyMemberPos, RetailLoyaltySettings } from '@/lib/retail-loyalty/types'
 import {
   computeRetailLoyaltyRedeemEuroDiscount,
@@ -105,6 +112,7 @@ type RetailGrayTrayTile =
   | { key: string; kind: 'logout'; labelKey: string; submenuIds: string[] }
   | { key: string; kind: 'link'; hrefSuffix: string; labelKey: string; submenuIds: string[] }
   | { key: string; kind: 'loyaltyNoCard'; labelKey: string }
+  | { key: string; kind: 'exchangeCredit'; labelKey: string }
 
 const RETAIL_GRAY_TRAY_TILES: RetailGrayTrayTile[] = [
   {
@@ -152,6 +160,11 @@ const RETAIL_GRAY_TRAY_TILES: RetailGrayTrayTile[] = [
     hrefSuffix: '/retail-loyalty',
     labelKey: 'retailKassaPage.trayTileLoyaltyAdmin',
     submenuIds: ['sm_retail_loyalty'],
+  },
+  {
+    key: 'exchangeCredit',
+    kind: 'exchangeCredit',
+    labelKey: 'retailKassaPage.trayTileExchangeCredit',
   },
 ]
 
@@ -296,6 +309,14 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [loyaltyRedeemPoints, setLoyaltyRedeemPoints] = useState(0)
   const [loyaltyRedeemModalOpen, setLoyaltyRedeemModalOpen] = useState(false)
   const [loyaltyRedeemDraft, setLoyaltyRedeemDraft] = useState('')
+  const [linkedStoreCredit, setLinkedStoreCredit] = useState<RetailStoreCreditPos | null>(null)
+  const [exchangeOrderNumberDraft, setExchangeOrderNumberDraft] = useState('')
+  const [exchangeOrderLines, setExchangeOrderLines] = useState<RetailOrderLineForReturn[] | null>(
+    null,
+  )
+  const [exchangeReturnQty, setExchangeReturnQty] = useState<Record<string, number>>({})
+  const [exchangeLookupBusy, setExchangeLookupBusy] = useState(false)
+  const [exchangeIssueBusy, setExchangeIssueBusy] = useState(false)
 
   const reload = useCallback(async (options?: { fresh?: boolean }) => {
     if (skusRef.current.length === 0 || options?.fresh) setLoading(true)
@@ -451,10 +472,30 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     loyaltySettings.redeem_points_per_euro,
   ])
 
+  const storeCreditEuro = useMemo(() => {
+    if (!linkedStoreCredit) return 0
+    const afterLoyalty = Math.max(0, cartTotal - loyaltyDiscountEuro)
+    const cap = Math.min(linkedStoreCredit.amount_remaining, afterLoyalty)
+    return Math.round(cap * 100) / 100
+  }, [cartTotal, loyaltyDiscountEuro, linkedStoreCredit])
+
   const payTotal = useMemo(
-    () => Math.round(Math.max(0, cartTotal - loyaltyDiscountEuro) * 100) / 100,
-    [cartTotal, loyaltyDiscountEuro],
+    () => Math.round(Math.max(0, cartTotal - loyaltyDiscountEuro - storeCreditEuro) * 100) / 100,
+    [cartTotal, loyaltyDiscountEuro, storeCreditEuro],
   )
+
+  const exchangeCreditIssueTotal = useMemo(() => {
+    if (!exchangeOrderLines) return 0
+    let sum = 0
+    for (const line of exchangeOrderLines) {
+      const q = Math.min(
+        line.quantityReturnable,
+        Math.max(0, Math.floor(exchangeReturnQty[line.lineKey] ?? 0)),
+      )
+      sum += line.price * q
+    }
+    return Math.round(sum * 100) / 100
+  }, [exchangeOrderLines, exchangeReturnQty])
 
   useEffect(() => {
     if (!linkedLoyaltyMember || loyaltyRedeemPoints <= 0) return
@@ -696,6 +737,172 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     setStockActivity([])
     setSelectedListLineKey(null)
     closeArticleSearchKeyboard()
+    if (next !== 'exchangeCredit') {
+      setExchangeOrderLines(null)
+      setExchangeReturnQty({})
+    }
+  }
+
+  function openExchangeCreditMode() {
+    switchMode('exchangeCredit')
+    setExchangeOrderNumberDraft('')
+    setExchangeOrderLines(null)
+    setExchangeReturnQty({})
+    closeArticleSearchKeyboard()
+  }
+
+  function storeCreditErrorText(code: string): string {
+    const snakeToKey: Record<string, string> = {
+      unknown: 'storeCreditErrorUnknown',
+      order_not_found: 'storeCreditErrorOrderNotFound',
+      order_not_paid: 'storeCreditErrorOrderNotPaid',
+      order_is_credit_note: 'storeCreditErrorOrderIsCreditNote',
+      no_items: 'storeCreditErrorNoItems',
+      already_fully_returned: 'storeCreditErrorAlreadyFullyReturned',
+      invalid_order_number: 'storeCreditErrorInvalidOrderNumber',
+      qty_exceeds_returnable: 'storeCreditErrorQtyExceedsReturnable',
+      empty_return: 'storeCreditErrorEmptyReturn',
+      not_found: 'storeCreditErrorNotFound',
+      depleted: 'storeCreditErrorDepleted',
+      void: 'storeCreditErrorVoid',
+      invalid_code: 'storeCreditErrorInvalidCode',
+      insufficient_balance: 'storeCreditErrorInsufficientBalance',
+      store_credit_redeem_failed: 'storeCreditErrorRedeemFailed',
+    }
+    const key = snakeToKey[code] ?? 'storeCreditErrorUnknown'
+    return t(`retailKassaPage.${key}`)
+  }
+
+  async function loadExchangeOrder() {
+    const n = parseInt(exchangeOrderNumberDraft.replace(/\D/g, ''), 10)
+    if (!(n > 0)) {
+      alert(t('retailKassaPage.exchangeInvalidOrderNumber'))
+      return
+    }
+    setExchangeLookupBusy(true)
+    try {
+      const res = await authFetch(
+        `/api/retail/store-credit/order?tenant=${encodeURIComponent(tenant)}&orderNumber=${n}`,
+      )
+      const data = (await res.json()) as {
+        ok?: boolean
+        error?: string
+        lines?: RetailOrderLineForReturn[]
+      }
+      if (!data.ok || !data.lines) {
+        alert(storeCreditErrorText(data.error || 'unknown'))
+        setExchangeOrderLines(null)
+        return
+      }
+      setExchangeOrderLines(data.lines)
+      const qty: Record<string, number> = {}
+      for (const line of data.lines) {
+        if (line.quantityReturnable > 0) qty[line.lineKey] = 0
+      }
+      setExchangeReturnQty(qty)
+    } finally {
+      setExchangeLookupBusy(false)
+    }
+  }
+
+  async function issueExchangeStoreCredit() {
+    if (!exchangeOrderLines || exchangeIssueBusy) return
+    const orderNum = parseInt(exchangeOrderNumberDraft.replace(/\D/g, ''), 10)
+    if (!(orderNum > 0)) return
+    const returnLines = exchangeOrderLines
+      .map((line) => ({
+        lineKey: line.lineKey,
+        quantity: Math.min(
+          line.quantityReturnable,
+          Math.max(0, Math.floor(exchangeReturnQty[line.lineKey] ?? 0)),
+        ),
+      }))
+      .filter((r) => r.quantity > 0)
+    if (returnLines.length === 0) {
+      alert(t('retailKassaPage.exchangePickReturnQty'))
+      return
+    }
+    setExchangeIssueBusy(true)
+    try {
+      const res = await authFetch('/api/retail/store-credit/issue', {
+        method: 'POST',
+        body: JSON.stringify({
+          tenantSlug: tenant,
+          sourceOrderNumber: orderNum,
+          returnLines,
+          kassaStaffId: activeKassaStaff?.id ?? null,
+        }),
+      })
+      const data = (await res.json()) as {
+        ok?: boolean
+        error?: string
+        credit?: RetailStoreCreditPos
+        creditNoteOrderNumber?: number
+      }
+      if (!data.ok || !data.credit) {
+        alert(storeCreditErrorText(data.error || 'unknown'))
+        return
+      }
+      const returnedItems = returnLines.flatMap((r) => {
+        const line = exchangeOrderLines.find((l) => l.lineKey === r.lineKey)
+        if (!line) return []
+        return [
+          {
+            product_id: line.product_id,
+            variant_id: line.variant_id,
+            name: line.name,
+            price: line.price,
+            quantity: r.quantity,
+          },
+        ]
+      })
+      const printLabels: StoreCreditVoucherPrintLabels = {
+        creditNoteTitle: t('retailKassaPage.storeCreditPrintCreditNoteTitle'),
+        storeCreditTitle: t('retailKassaPage.storeCreditPrintStoreCreditTitle'),
+        sourceReceipt: (n) =>
+          t('retailKassaPage.storeCreditPrintSourceReceipt').replace('{n}', String(n)),
+        creditNoteNo: (n) =>
+          t('retailKassaPage.storeCreditPrintCreditNoteNo').replace('{n}', String(n)),
+        amountLine: (euro) =>
+          t('retailKassaPage.storeCreditPrintAmountLine').replace('{euro}', euro),
+        noCashRefund: t('retailKassaPage.storeCreditPrintNoCashRefund'),
+        scanHint: t('retailKassaPage.storeCreditPrintScanHint'),
+        thanks: t('retailKassaPage.storeCreditPrintThanks'),
+      }
+      const printRes = await printRetailStoreCreditVoucher({
+        tenantInfo,
+        creditCode: data.credit.credit_code,
+        amount: data.credit.amount_initial,
+        sourceOrderNumber: data.credit.source_order_number,
+        creditNoteOrderNumber: data.creditNoteOrderNumber,
+        returnedItems,
+        labels: printLabels,
+        locale,
+      })
+      if (!printRes.ok && printRes.fallbackHtml) {
+        tryBrowserPrintStoreCreditFallback(printRes.fallbackHtml)
+      }
+      setLinkedStoreCredit(data.credit)
+      alert(t('retailKassaPage.exchangeIssueOk'))
+      switchMode('sales')
+      void reload({ fresh: true })
+    } finally {
+      setExchangeIssueBusy(false)
+    }
+  }
+
+  async function linkStoreCreditFromScan(raw: string) {
+    const res = await authFetch(
+      `/api/retail/store-credit/lookup?tenant=${encodeURIComponent(tenant)}&code=${encodeURIComponent(raw)}`,
+    )
+    const data = (await res.json()) as { ok?: boolean; error?: string; credit?: RetailStoreCreditPos }
+    if (data.ok && data.credit) {
+      setLinkedStoreCredit(data.credit)
+      flashAddOkButton()
+      return true
+    }
+    alert(storeCreditErrorText(data.error || 'unknown'))
+    return false
   }
 
   function focusRetailListLine(lineKey: string, sku: RetailPosSku) {
@@ -726,6 +933,22 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               focusBarcodeCapture()
             }}
             className={tileClass}
+          >
+            {label}
+          </button>
+        )
+      }
+      if (tile.kind === 'exchangeCredit') {
+        return (
+          <button
+            key={tile.key}
+            type="button"
+            data-testid="retail-tile-exchange-credit"
+            onClick={() => {
+              playClick()
+              openExchangeCreditMode()
+            }}
+            className={`${tileClass} ${mode === 'exchangeCredit' ? 'ring-2 ring-sky-400' : ''}`}
           >
             {label}
           </button>
@@ -808,7 +1031,11 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     }
   }
 
-  function pushStockActivity(sku: RetailPosSku, delta: number, activityMode: RetailKassaMode) {
+  function pushStockActivity(
+    sku: RetailPosSku,
+    delta: number,
+    activityMode: 'stockCount' | 'goodsReceipt',
+  ) {
     const key = `${sku.lineKey}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
     focusRetailListLine(key, sku)
     setStockActivity((prev) => [...prev, { key, sku, delta, mode: activityMode }])
@@ -924,6 +1151,19 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       setStockBusy(true)
       try {
         await linkLoyaltyCardFromScan(trimmed)
+      } finally {
+        stockBusyRef.current = false
+        setStockBusy(false)
+        releaseScanFocus()
+      }
+      return
+    }
+
+    if (mode === 'sales' && isRetailStoreCreditScan(trimmed)) {
+      stockBusyRef.current = true
+      setStockBusy(true)
+      try {
+        await linkStoreCreditFromScan(trimmed)
       } finally {
         stockBusyRef.current = false
         setStockBusy(false)
@@ -1304,7 +1544,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             loyaltySettings.redeem_points_per_euro,
           )
         : 0
-    const orderTotal = Math.round(Math.max(0, grossTotal - discountEuro) * 100) / 100
+    const orderTotal = payTotal
     const loyaltyMemberId =
       loyaltyEnabled && linkedLoyaltyMember ? linkedLoyaltyMember.id : undefined
     const loyaltyMemberSnapshot = linkedLoyaltyMember
@@ -1317,6 +1557,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       loyaltyDiscountEuro: discountEuro,
       loyaltyRedeemPoints: redeemPointsForSale,
       kassaStaffId: activeKassaStaff?.id ?? null,
+      storeCreditId: linkedStoreCredit?.id ?? null,
+      storeCreditEuro: storeCreditEuro > 0 ? storeCreditEuro : undefined,
     })
     setPaying(false)
     setShowPaymentModal(false)
@@ -1343,6 +1585,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     setLastSaleCustomerEmail(saleCustomerEmail && saleCustomerEmail.includes('@') ? saleCustomerEmail : null)
     setLoyaltyRedeemPoints(0)
     setLinkedLoyaltyMember(null)
+    setLinkedStoreCredit(null)
     setCart([])
     setSelectedListLineKey(null)
     setLastScannedSku(null)
@@ -2184,6 +2427,31 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               </button>
             </form>
 
+            {linkedStoreCredit ? (
+              <div
+                className={`mx-3 mb-1 shrink-0 rounded-lg border border-sky-400/40 px-3 py-2 sm:mx-4 ${KASSA_POS_MENU_RECESS_TRAY_CLASS}`}
+                data-testid="retail-store-credit-linked"
+              >
+                <p className="text-sm font-semibold text-sky-200">
+                  {t('retailKassaPage.storeCreditLinked')
+                    .replace('{amount}', linkedStoreCredit.amount_remaining.toFixed(2))
+                    .replace('{n}', String(linkedStoreCredit.source_order_number))}
+                </p>
+                <p className="text-xs text-white/60">{linkedStoreCredit.credit_code}</p>
+                <button
+                  type="button"
+                  className="mt-1 text-xs font-semibold text-white/80 underline"
+                  onClick={() => {
+                    playClick()
+                    setLinkedStoreCredit(null)
+                    focusBarcodeCapture()
+                  }}
+                >
+                  {t('retailKassaPage.storeCreditUnlink')}
+                </button>
+              </div>
+            ) : null}
+
             {loyaltyEnabled && linkedLoyaltyMember ? (
               <div
                 className={`flex shrink-0 flex-wrap items-center justify-between gap-2 border-b px-3 py-1.5 sm:px-4 ${KASSA_POS_RULE_BLACK} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`}
@@ -2254,7 +2522,72 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 className={`flex min-h-0 flex-1 flex-col overflow-hidden ${KASSA_POS_MENU_RECESS_TRAY_CLASS} ${KASSA_POS_BTN_SHAPE} gks-menu-vignette`}
                 data-testid="retail-gray-tray"
               >
-                {loading && !barHasLines ? (
+                {mode === 'exchangeCredit' ? (
+                  <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-3 sm:p-4">
+                    <p className="text-sm font-bold text-white">{t('retailKassaPage.exchangeTitle')}</p>
+                    <p className="text-xs text-white/70">{t('retailKassaPage.exchangeHint')}</p>
+                    <div className="flex flex-wrap items-end gap-2">
+                      <label className="flex min-w-[8rem] flex-1 flex-col gap-1 text-xs text-white/80">
+                        {t('retailKassaPage.exchangeOrderNumberLabel')}
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          value={exchangeOrderNumberDraft}
+                          onChange={(e) => setExchangeOrderNumberDraft(e.target.value)}
+                          className={`rounded-lg px-3 py-2 text-base text-black ${KASSA_POS_FIELD}`}
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        disabled={exchangeLookupBusy}
+                        onClick={() => void loadExchangeOrder()}
+                        className={`shrink-0 px-4 py-2.5 font-semibold ${kassaPosButtonClass(true)}`}
+                      >
+                        {exchangeLookupBusy
+                          ? t('retailKassaPage.exchangeLoading')
+                          : t('retailKassaPage.exchangeLoadOrder')}
+                      </button>
+                    </div>
+                    {exchangeOrderLines ? (
+                      <div className="flex min-h-0 flex-1 flex-col gap-2">
+                        {exchangeOrderLines.map((line) =>
+                          line.quantityReturnable <= 0 ? null : (
+                            <div
+                              key={line.lineKey}
+                              className={`flex flex-wrap items-center gap-2 rounded-lg border border-white/15 px-3 py-2 ${KASSA_POS_MENU_RECESS_TRAY_CLASS}`}
+                            >
+                              <div className="min-w-0 flex-1">
+                                <p className="truncate text-sm font-semibold text-white">{line.name}</p>
+                                <p className="text-xs text-white/60">
+                                  €{line.price.toFixed(2)} · {t('retailKassaPage.exchangeSold')}{' '}
+                                  {line.quantitySold} · {t('retailKassaPage.exchangeReturnable')}{' '}
+                                  {line.quantityReturnable}
+                                </p>
+                              </div>
+                              <label className="flex items-center gap-1 text-xs text-white/80">
+                                {t('retailKassaPage.exchangeReturnQty')}
+                                <input
+                                  type="number"
+                                  min={0}
+                                  max={line.quantityReturnable}
+                                  value={exchangeReturnQty[line.lineKey] ?? 0}
+                                  onChange={(e) => {
+                                    const v = Math.min(
+                                      line.quantityReturnable,
+                                      Math.max(0, parseInt(e.target.value || '0', 10) || 0),
+                                    )
+                                    setExchangeReturnQty((prev) => ({ ...prev, [line.lineKey]: v }))
+                                  }}
+                                  className="w-14 rounded px-2 py-1 text-center text-black"
+                                />
+                              </label>
+                            </div>
+                          ),
+                        )}
+                      </div>
+                    ) : null}
+                  </div>
+                ) : loading && !barHasLines ? (
                   <p className={`flex flex-1 items-center justify-center px-4 text-center text-sm ${ui.menuEmptyMuted}`}>
                     {t('retailKassaPage.loading')}
                   </p>
@@ -2511,18 +2844,24 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                   className={`flex min-h-[3.35rem] w-full min-w-0 items-center justify-between gap-2 px-3 py-2.5 sm:min-h-[3.65rem] ${kassaPosRaisedStripClass()}`}
                 >
                   <span className={`shrink-0 text-lg font-bold tracking-[0.04em] sm:text-xl ${ui.numpadMeta}`}>
-                    {mode === 'sales' ? t('kassaApp.cartTotal') : t('retailKassaPage.stockScans')}
+                    {mode === 'sales'
+                      ? t('kassaApp.cartTotal')
+                      : mode === 'exchangeCredit'
+                        ? t('retailKassaPage.exchangeCreditTotalLabel')
+                        : t('retailKassaPage.stockScans')}
                   </span>
                   <span
                     className={`min-w-0 truncate text-right font-bold tabular-nums tracking-tight text-[1.75rem] sm:text-[2rem] ${
-                      mode === 'sales' ? 'text-red-500' : 'text-emerald-300'
+                      mode === 'sales' ? 'text-red-500' : mode === 'exchangeCredit' ? 'text-sky-300' : 'text-emerald-300'
                     }`}
                   >
                     {mode === 'sales'
-                      ? loyaltyDiscountEuro > 0
+                      ? loyaltyDiscountEuro > 0 || storeCreditEuro > 0
                         ? `€${payTotal.toFixed(2)}`
                         : `€${cartTotal.toFixed(2)}`
-                      : String(stockActivity.reduce((s, r) => s + r.delta, 0))}
+                      : mode === 'exchangeCredit'
+                        ? `€${exchangeCreditIssueTotal.toFixed(2)}`
+                        : String(stockActivity.reduce((s, r) => s + r.delta, 0))}
                   </span>
                 </div>
                 {mode === 'sales' && loyaltyDiscountEuro > 0 ? (
@@ -2530,6 +2869,14 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                     {t('retailKassaPage.loyaltyDiscountLine')
                       .replace('{points}', String(loyaltyRedeemPoints))
                       .replace('{euro}', loyaltyDiscountEuro.toFixed(2))}
+                  </p>
+                ) : null}
+                {mode === 'sales' && storeCreditEuro > 0 ? (
+                  <p className="text-right text-xs font-semibold text-sky-300">
+                    {t('retailKassaPage.storeCreditDiscountLine').replace(
+                      '{euro}',
+                      storeCreditEuro.toFixed(2),
+                    )}
                   </p>
                 ) : null}
               </div>
@@ -2565,6 +2912,16 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                       <span className={kassaSidebarActionLabelClass}>{t('kassaApp.remove')}</span>
                     </button>
                   </>
+                ) : mode === 'exchangeCredit' ? (
+                  <button
+                    type="button"
+                    onClick={() => switchMode('sales')}
+                    className={`col-span-3 flex items-center justify-center px-2 py-3 ${retailSidebarFooterActionMinH} ${kassaPosButtonClass(false)}`}
+                  >
+                    <span className={kassaSidebarActionLabelClass}>
+                      {t('retailKassaPage.exchangeGoToSales')}
+                    </span>
+                  </button>
                 ) : (
                   <button
                     type="button"
@@ -2602,6 +2959,22 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                     className={`flex min-w-0 flex-1 items-center justify-center py-3.5 text-xl font-bold sm:text-[1.35rem] ${retailSidebarFooterPrimaryMinH} ${KASSA_POS_CHECKOUT_BTN}`}
                   >
                     {t('kassaApp.checkout')}
+                  </button>
+                ) : mode === 'exchangeCredit' ? (
+                  <button
+                    type="button"
+                    data-testid="retail-issue-store-credit"
+                    disabled={
+                      !exchangeOrderLines ||
+                      exchangeCreditIssueTotal <= 0 ||
+                      exchangeIssueBusy
+                    }
+                    onClick={() => void issueExchangeStoreCredit()}
+                    className={`flex min-w-0 flex-1 items-center justify-center py-3.5 text-lg font-bold sm:text-xl ${retailSidebarFooterPrimaryMinH} ${KASSA_POS_CHECKOUT_BTN}`}
+                  >
+                    {exchangeIssueBusy
+                      ? t('retailKassaPage.exchangeIssuing')
+                      : t('retailKassaPage.exchangeIssueCredit')}
                   </button>
                 ) : (
                   <div
