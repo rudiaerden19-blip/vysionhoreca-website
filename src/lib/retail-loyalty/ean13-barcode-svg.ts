@@ -92,20 +92,20 @@ export function buildEan13BarcodeSvg(
 ): string | null {
   const bits = encodeEan13Modules(code13)
   if (!bits) return null
-  const module = options?.moduleWidth ?? 2
+  const modulePx = options?.moduleWidth ?? 2
   const barH = options?.barHeight ?? 72
-  const quiet = 10 * module
-  const width = bits.length * module + quiet * 2
+  const quiet = 10 * modulePx
+  const width = bits.length * modulePx + quiet * 2
   const height = barH + 24
   let x = quiet
   const rects: string[] = []
   for (let i = 0; i < bits.length; i++) {
     if (bits[i] === '1') {
       rects.push(
-        `<rect x="${x}" y="0" width="${module}" height="${barH}" fill="#000"/>`,
+        `<rect x="${x}" y="0" width="${modulePx}" height="${barH}" fill="#000"/>`,
       )
     }
-    x += module
+    x += modulePx
   }
   const label = code13.replace(/\D/g, '')
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="EAN ${label}"><g>${rects.join('')}</g><text x="${width / 2}" y="${barH + 18}" text-anchor="middle" font-family="ui-monospace,monospace" font-size="14" fill="#111">${label}</text></svg>`
