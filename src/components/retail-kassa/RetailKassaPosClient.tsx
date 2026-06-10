@@ -1336,6 +1336,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     )
     setLastOrderReceipt(receipt)
     setLoyaltyRedeemPoints(0)
+    setLinkedLoyaltyMember(null)
     setCart([])
     setSelectedListLineKey(null)
     setLastScannedSku(null)
@@ -1363,9 +1364,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             redeemed?: number
           }) => {
             if (!settleJson.ok || settleJson.balance == null) return
-            setLinkedLoyaltyMember((m) =>
-              m && m.id === loyaltyMemberId ? { ...m, points_balance: settleJson.balance! } : m,
-            )
             setLastOrderReceipt((prev) =>
               prev
                 ? {
