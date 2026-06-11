@@ -345,7 +345,7 @@ function KeyBtn({ label, onClick, className = '', 'aria-label': ariaLabel, title
         if (touchConsumedRef.current) return
         run()
       }}
-      className={`min-h-[40px] min-w-0 shrink-0 select-none rounded-[5px] border border-black/35 bg-[#474a54] px-0.5 text-base font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] touch-manipulation active:bg-[#2f323b] active:brightness-105 max-sm:min-h-[32px] max-sm:text-[13px] sm:min-w-[44px] ${className}`.trim()}
+      className={`min-h-[40px] min-w-0 shrink-0 select-none rounded-[6px] border border-black/35 bg-[#474a54] px-0.5 text-base font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] touch-manipulation active:bg-[#2f323b] active:brightness-105 max-sm:min-h-[44px] max-sm:text-[17px] sm:min-w-[44px] ${className}`.trim()}
     >
       {label}
     </button>
@@ -558,12 +558,12 @@ export function WebAzertyKeyboard() {
 
   const rowPad2 =
     letterLayout === 'azerty'
-      ? 'max-sm:pl-2 sm:pl-6 md:pl-10'
-      : 'max-sm:pl-3 sm:pl-8 md:pl-12'
+      ? 'max-sm:pl-0.5 sm:pl-6 md:pl-10'
+      : 'max-sm:pl-1 sm:pl-8 md:pl-12'
   const rowPad3 =
     letterLayout === 'azerty'
-      ? 'max-sm:pl-1 sm:pl-5 md:pl-10'
-      : 'max-sm:pl-2 sm:pl-6 md:pl-14'
+      ? 'max-sm:pl-0 sm:pl-5 md:pl-10'
+      : 'max-sm:pl-0.5 sm:pl-6 md:pl-14'
 
   const chooseLayout = (L: KeyboardLetterLayout) => {
     setLetterLayout(L)
@@ -573,7 +573,7 @@ export function WebAzertyKeyboard() {
   const DIGITS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
 
   const numericGrid = (
-    <div className="mx-auto grid max-w-[min(48rem,100vw)] grid-cols-12 gap-x-1 gap-y-1 px-1 pb-1.5 pt-0.5 max-sm:gap-0.5 sm:gap-x-2 sm:gap-y-2 sm:px-2 sm:pb-2 sm:pt-1">
+    <div className="mx-auto grid max-w-[min(48rem,100vw)] grid-cols-12 gap-x-1 gap-y-1 px-1 pb-1.5 pt-0.5 max-sm:gap-1 sm:gap-x-2 sm:gap-y-2 sm:px-2 sm:pb-2 sm:pt-1">
       {(['7', '8', '9'] as const).map((d) => (
         <KeyBtn key={d} label={d} className="col-span-3" onClick={() => onChar(d)} />
       ))}
@@ -627,7 +627,7 @@ export function WebAzertyKeyboard() {
 
   /** Compact ATM-stijl (PIN / OTP): minder breed en lager dan het grote numeriek rooster */
   const pinKeyCls =
-    '!min-h-0 min-h-[36px] h-9 shrink-0 rounded-lg border border-black/35 bg-[#474a54] px-0 text-[17px] font-bold leading-none text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] touch-manipulation active:bg-[#2f323b] max-sm:min-h-[32px] max-sm:h-8 max-sm:text-[15px]'
+    '!min-h-0 min-h-[40px] h-10 shrink-0 rounded-lg border border-black/35 bg-[#474a54] px-0 text-[17px] font-bold leading-none text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] touch-manipulation active:bg-[#2f323b] max-sm:min-h-[48px] max-sm:h-12 max-sm:text-[19px]'
 
   const pinCompactGrid = (
     <div className="mx-auto w-full max-w-[280px] px-3 pb-2.5 pt-1 sm:max-w-[300px]">
@@ -680,31 +680,32 @@ export function WebAzertyKeyboard() {
     </div>
   )
 
-  /** iPhone: min-w-0 + flex-1 zodat alle letters op één rij passen (geen overflow). */
+  /** Telefoon: min-w-0 + flex-1 (één rij) met grotere toetsen (~44px). */
   const rowWrap =
-    'mx-auto flex w-full max-w-[min(92rem,100vw)] justify-stretch gap-0.5 px-1 max-sm:gap-px max-sm:px-0.5 sm:gap-1.5 sm:px-1.5'
+    'mx-auto flex w-full max-w-[min(92rem,100vw)] justify-stretch gap-1 px-1 max-sm:gap-0.5 max-sm:px-0.5 sm:gap-1.5 sm:px-1.5'
 
   const letterKeyCls =
-    '!min-w-0 min-h-0 h-9 min-h-[34px] flex-[1_1_0] basis-0 px-0 py-0 text-[13px] font-normal leading-none tracking-tight max-sm:h-8 max-sm:min-h-[30px] max-sm:text-[11px] sm:h-10 sm:min-h-[40px] sm:text-[15px]'
+    '!min-w-0 min-h-0 flex-[1_1_0] basis-0 px-0 py-0 font-semibold leading-none tracking-tight h-10 min-h-[40px] text-[15px] max-sm:h-11 max-sm:min-h-[44px] max-sm:text-[17px]'
+
+  const digitKeyCls =
+    '!min-w-0 min-h-0 flex-[1_1_0] basis-0 px-0 font-semibold leading-none h-10 min-h-[40px] text-[15px] max-sm:h-11 max-sm:min-h-[44px] max-sm:text-[17px]'
 
   const SYMBOL_KEY_COMPACT =
-    'h-9 min-h-[34px] w-8 shrink-0 px-0 text-[13px] max-sm:h-8 max-sm:min-h-[30px] max-sm:w-7 max-sm:text-[11px] sm:h-10 sm:min-h-[40px] sm:w-10 sm:text-[15px]'
+    'h-10 min-h-[40px] w-9 shrink-0 px-0 text-[15px] max-sm:h-11 max-sm:min-h-[44px] max-sm:w-[2.35rem] max-sm:text-[16px] sm:w-10 sm:text-[15px]'
+
+  const actionKeyCls =
+    'h-10 min-h-[40px] max-sm:h-11 max-sm:min-h-[44px] max-sm:text-[15px] sm:min-h-[40px]'
 
   const letterBlock = (
     <div className="mx-auto w-full select-none pb-1.5">
       <div className={`${rowWrap} pt-0.5`}>
         {DIGITS.map((d) => (
-          <KeyBtn
-            key={d}
-            label={d}
-            className="!min-w-0 min-h-0 h-9 min-h-[34px] flex-[1_1_0] basis-0 px-0 text-[13px] max-sm:h-8 max-sm:min-h-[30px] max-sm:text-[11px] sm:h-10 sm:min-h-[40px] sm:text-[15px]"
-            onClick={() => onChar(d)}
-          />
+          <KeyBtn key={d} label={d} className={digitKeyCls} onClick={() => onChar(d)} />
         ))}
       </div>
 
       {/* Letterrijen (AZERTY of QWERTY) met trapjes */}
-      <div className="mt-0.5 space-y-0.5">
+      <div className="mt-0.5 space-y-1 max-sm:space-y-0.5">
         <div className={`${rowWrap}`}>
           {ROW1.map((chr) => (
             <KeyBtn
@@ -736,7 +737,7 @@ export function WebAzertyKeyboard() {
           ))}
           <KeyBtn
             label="⌫"
-            className="!min-w-0 min-h-0 h-9 min-h-[34px] flex-[1.35_1_0] basis-0 shrink px-1 text-base max-sm:h-8 max-sm:min-h-[30px] max-sm:px-0.5 max-sm:text-sm sm:h-10 sm:min-h-[40px] sm:min-w-[3.5rem] sm:flex-none"
+            className={`!min-w-0 min-h-0 flex-[1.35_1_0] basis-0 shrink px-1 text-lg max-sm:px-0.5 sm:min-w-[3.5rem] sm:flex-none ${actionKeyCls}`}
             onClick={() => {
               if (target?.isConnected) backspace(target)
             }}
@@ -744,12 +745,12 @@ export function WebAzertyKeyboard() {
         </div>
 
         {/* Eén onderrij: shift, tekens, spatiel met harde breedte-floor, enter — spaart hoogte t.o.v. twee rijen */}
-        <div className="mx-auto flex w-full max-w-[min(92rem,100vw)] flex-nowrap justify-start gap-0.5 overflow-x-auto px-0.5 pb-0.5 max-sm:gap-px max-sm:px-0.5 sm:justify-center sm:gap-1.5 sm:overflow-x-visible sm:px-1.5 [scrollbar-width:thin] [-webkit-overflow-scrolling:touch]">
+        <div className="mx-auto flex w-full max-w-[min(92rem,100vw)] flex-nowrap justify-start gap-1 overflow-x-auto px-0.5 pb-0.5 max-sm:gap-0.5 max-sm:px-0.5 sm:justify-center sm:gap-1.5 sm:overflow-x-visible sm:px-1.5 [scrollbar-width:thin] [-webkit-overflow-scrolling:touch]">
           <KeyBtn
             label="⇧"
             aria-label={t('kassaApp.webKbCaps')}
             title={t('kassaApp.webKbCaps')}
-            className={`h-9 min-h-[34px] shrink-0 border-zinc-900 bg-[#585c66] px-2 text-lg font-bold leading-none max-sm:h-8 max-sm:min-h-[30px] max-sm:px-1.5 max-sm:text-base sm:h-10 sm:min-h-[40px] sm:min-w-[3.25rem] ${
+            className={`shrink-0 border-zinc-900 bg-[#585c66] px-2 text-xl font-bold leading-none max-sm:px-1.5 sm:min-w-[3.25rem] ${actionKeyCls} ${
               caps ? 'ring-[3px] ring-amber-400 ring-offset-0 ring-offset-transparent' : ''
             }`}
             onClick={() => {
@@ -770,18 +771,18 @@ export function WebAzertyKeyboard() {
             label=".com"
             title={t('kassaApp.webKbDotComHint')}
             aria-label={t('kassaApp.webKbDotComHint')}
-            className="h-9 min-h-[34px] w-auto min-w-[2.5rem] shrink-0 px-1 text-[11px] font-bold tracking-tight max-sm:h-8 max-sm:min-h-[30px] max-sm:min-w-[2.25rem] sm:h-10 sm:min-h-[40px] sm:min-w-[3rem] sm:text-xs"
+            className={`w-auto min-w-[2.75rem] shrink-0 px-1 text-xs font-bold tracking-tight max-sm:min-w-[2.5rem] max-sm:text-[13px] sm:min-w-[3rem] ${actionKeyCls}`}
             onClick={() => onChar('.com')}
           />
           {/* Geen flex-1 + min-w-0: daar klapte dit op 0 bij smalle wrappers — blokkeerde tikken */}
           <KeyBtn
             label={t('kassaApp.webKbSpace')}
-            className="h-9 min-h-[34px] max-sm:min-w-[5rem] min-w-[6.5rem] flex-1 basis-[clamp(6rem,28vw,18rem)] px-2 text-xs font-semibold tracking-wide max-sm:h-8 max-sm:min-h-[30px] max-sm:text-[11px] sm:h-10 sm:min-h-[40px] sm:min-w-[8rem] sm:px-3 sm:text-sm"
+            className={`max-sm:min-w-[4.5rem] min-w-[6.5rem] flex-1 basis-[clamp(5.5rem,26vw,18rem)] px-2 text-sm font-semibold tracking-wide max-sm:text-[13px] sm:min-w-[8rem] sm:px-3 ${actionKeyCls}`}
             onClick={() => onChar(' ')}
           />
           <KeyBtn
             label={t('kassaApp.webKbEnter')}
-            className="h-9 min-h-[34px] w-[min(5.5rem,calc((100vw-32px)*0.26))] shrink-0 border-[#324160] bg-[#3f5380] px-2 text-xs font-semibold max-sm:h-8 max-sm:min-h-[30px] max-sm:text-[11px] sm:h-10 sm:min-h-[40px] sm:text-sm"
+            className={`w-[min(5.5rem,calc((100vw-32px)*0.26))] shrink-0 border-[#324160] bg-[#3f5380] px-2 text-sm font-semibold max-sm:text-[13px] ${actionKeyCls}`}
             onClick={() => {
               if (!target?.isConnected) return
               focusInputForProgrammaticEdit(target)
