@@ -7,13 +7,10 @@ import {
   Calculator,
   CalendarDays,
   ChefHat,
-  Coffee,
-  Croissant,
   ExternalLink,
   Flame,
   Globe,
   MessageCircle,
-  Milk,
   Monitor,
   Rocket,
   ShoppingBag,
@@ -23,11 +20,8 @@ import {
 import { useLanguage } from '@/i18n'
 import { PLATFORM_PAGES } from '@/lib/platform-pages'
 import {
-  DEMO_BAKERY_MENU_URL,
-  DEMO_CAFE_MENU_URL,
   DEMO_HERO_LIVE_URL,
   DEMO_ONLINE_SHOP_MENU_URL,
-  DEMO_SHOWCASE_CREMERIE_URL,
 } from '@/lib/demo-links'
 
 const ICONS: Record<string, LucideIcon> = {
@@ -143,38 +137,6 @@ export default function PlatformGridSection() {
             >
               <ShoppingBag className={ctaIconClass} aria-hidden />
               <span className="min-w-0">{t('platform.gridDemoShopCta')}</span>
-              <ExternalLink className={ctaExternalIconClass} aria-hidden />
-            </a>
-          </div>
-          <div className="flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-4">
-            <a
-              href={DEMO_CAFE_MENU_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full border-2 border-gray-900 bg-white px-6 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:min-w-[200px] sm:text-base"
-            >
-              <Coffee className={ctaIconClass} aria-hidden />
-              <span className="min-w-0">{t('platform.gridDemoCafeCta')}</span>
-              <ExternalLink className={ctaExternalIconClass} aria-hidden />
-            </a>
-            <a
-              href={DEMO_BAKERY_MENU_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full border-2 border-gray-900 bg-white px-6 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:min-w-[200px] sm:text-base"
-            >
-              <Croissant className={ctaIconClass} aria-hidden />
-              <span className="min-w-0">{t('platform.gridDemoBakeryCta')}</span>
-              <ExternalLink className={ctaExternalIconClass} aria-hidden />
-            </a>
-            <a
-              href={DEMO_SHOWCASE_CREMERIE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full border-2 border-gray-900 bg-white px-6 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:min-w-[200px] sm:text-base"
-            >
-              <Milk className={ctaIconClass} aria-hidden />
-              <span className="min-w-0">{t('platform.gridDemoCremerieCta')}</span>
               <ExternalLink className={ctaExternalIconClass} aria-hidden />
             </a>
           </div>
