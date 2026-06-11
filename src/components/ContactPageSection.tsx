@@ -82,8 +82,8 @@ export default function ContactPageSection({ className = '', sectionId }: Contac
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">{t('contact.email')}</p>
-                  <a href="mailto:info@vysionhoreca.com" className="text-gray-900 hover:text-accent">
-                    info@vysionhoreca.com
+                  <a href="mailto:info@vysionkassa.com" className="text-gray-900 hover:text-accent">
+                    info@vysionkassa.com
                   </a>
                 </div>
               </div>

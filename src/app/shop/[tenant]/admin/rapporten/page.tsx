@@ -675,7 +675,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     ${vatDetailRows.join('\n')}
     <tr><td><strong>Totaal BTW</strong></td><td class="amt"><strong>€${vatAggPdf.totalTax.toFixed(2)}</strong></td></tr>
     <tr><td><strong>Totaal incl. BTW</strong></td><td class="amt"><strong>€${totalRev.toFixed(2)}</strong></td></tr></table>
-    <div class="footer">Gegenereerd op ${new Date().toLocaleString('nl-NL')} — Vysion Horeca POS</div>
+    <div class="footer">Gegenereerd op ${new Date().toLocaleString('nl-NL')} — Vysion kassa's POS</div>
     <button class="noprint" onclick="window.print()" style="margin-top:20px;padding:10px 20px;background:#1e293b;color:white;border:none;border-radius:8px;cursor:pointer">🖨️ Afdrukken / PDF opslaan</button>
     </body></html>`
     const w = window.open('','_blank','width=900,height=700')
@@ -1478,7 +1478,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
       )}
 
       <div className="mt-12 pb-8 text-center">
-        <p className="text-xs text-gray-300">Vysion Horeca @ 2026</p>
+        <p className="text-xs text-gray-300">Vysion kassa's @ 2026</p>
       </div>
     </div>
       </PinGate>

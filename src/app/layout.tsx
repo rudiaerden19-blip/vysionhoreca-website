@@ -33,7 +33,7 @@ const organizationJsonLd = {
     {
       '@type': 'Organization',
       '@id': `${siteUrl}/#organization`,
-      name: 'Vysion Horeca',
+      name: "Vysion kassa's",
       legalName: 'Vysion Group International',
       url: siteUrl,
       logo: `${siteUrl}/favicon.svg`,
@@ -51,7 +51,7 @@ const organizationJsonLd = {
       contactPoint: {
         '@type': 'ContactPoint',
         contactType: 'customer support',
-        email: 'info@vysionhoreca.com',
+        email: 'info@vysionkassa.com',
         areaServed: ['BE', 'NL'],
         availableLanguage: ['Dutch', 'English', 'French', 'German'],
       },
@@ -65,7 +65,7 @@ const organizationJsonLd = {
       '@type': 'WebSite',
       '@id': `${siteUrl}/#website`,
       url: siteUrl,
-      name: 'Vysion Horeca',
+      name: "Vysion kassa's",
       description:
         'Zoek je horeca kassa, online bestelplatform of gratis uitproberen? Vysion combineert POS, bestellen, hardware en reserveringen voor België en Nederland.',
       publisher: { '@id': `${siteUrl}/#organization` },
@@ -78,8 +78,8 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
     default:
-      'Vysion Horeca | Horeca kassa, online bestelplatform, hardware POS & gratis proberen',
-    template: '%s | Vysion Horeca',
+      "Vysion kassa's | Horeca kassa, online bestelplatform, hardware POS & gratis proberen",
+    template: "%s | Vysion kassa's",
   },
   description:
     'Touchscreen horeca kassa (POS), online bestelplatform en webshop, premium kassahardware en software in één pakket. Gratis kassa 14 dagen uitproberen. Reserveringsplatform, keukenscherm, WhatsApp-bestellen, kosten en analyse. Bancontact, iDEAL. België & Nederland.',
@@ -123,7 +123,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Vysion Horeca',
+    title: "Vysion kassa's",
   },
   icons: {
     icon: [
@@ -134,19 +134,19 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title:
-      'Vysion Horeca | Horeca kassa, bestelplatform, hardware & gratis proberen',
+      "Vysion kassa's | Horeca kassa, bestelplatform, hardware & gratis proberen",
     description:
       'Kassa (POS), online bestelplatform en kassahardware — reserveringen, keukenscherm en analyse. Start 14 dagen gratis.',
     type: 'website',
     locale: 'nl_BE',
     url: siteUrl,
-    siteName: 'Vysion Horeca',
+    siteName: "Vysion kassa's",
     images: [{ url: '/images/online-order-platform-1.png' }],
   },
   twitter: {
     card: 'summary_large_image',
     title:
-      'Vysion Horeca | Horeca kassa, bestelplatform, hardware & gratis proberen',
+      "Vysion kassa's | Horeca kassa, bestelplatform, hardware & gratis proberen",
     description:
       'Touchscreen kassa, online bestelplatform en hardware POS — 14 dagen gratis. België & Nederland.',
     images: ['/images/online-order-platform-1.png'],

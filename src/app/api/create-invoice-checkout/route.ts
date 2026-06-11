@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
             currency: 'eur',
             product_data: {
               name: description || `Factuur ${invoice.invoice_number}`,
-              description: `Vysion Horeca - ${tenantSlug}`,
+              description: `Vysion kassa's - ${tenantSlug}`,
             },
             // SECURITY: Always use database amount, never trust client-supplied amount
             unit_amount: Math.round(Number(invoice.amount) * 100), // Convert to cents

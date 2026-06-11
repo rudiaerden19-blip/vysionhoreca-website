@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "title": "Vysion Horeca | オールインワンPOS＆決済プラットフォーム",
+    "title": "Vysion kassa's | オールインワンPOS＆決済プラットフォーム",
     "description": "飲食業向け完全POSシステム。レジ、オンライン注文、請求書、スタッフ管理など - すべて1つのプラットフォームで。14日間無料でお試し。"
   },
   "nav": {
@@ -235,9 +235,9 @@
   },
   "liveDemo": {
     "title": "プラットフォームの動作を見たいですか？",
-    "subtitle": "Vysion Horecaで稼働している本物のフライ店をご覧ください",
+    "subtitle": "Vysion kassa'sで稼働している本物のフライ店をご覧ください",
     "clientsLead": "すでに導入いただいているお客様",
-    "marquee": "外食 · フライ店 · レストラン · カフェ · 肉屋 · パン屋 · ケータリング · ブラッスリー · サンドイッチ · ワイン · ホテル · Vysion Horeca · ",
+    "marquee": "外食 · フライ店 · レストラン · カフェ · 肉屋 · パン屋 · ケータリング · ブラッスリー · サンドイッチ · ワイン · ホテル · Vysion kassa's · ",
     "successStories": {
       "vivaldi": {
         "name": "VIVALDI 2.0 Food & Drinks",
@@ -307,9 +307,9 @@
   },
   "comparison": {
     "title": "他のプラットフォームと比較",
-    "subtitle": "より多くの機能、より低い価格。Vysion Horecaが最良の選択である理由を発見してください。",
+    "subtitle": "より多くの機能、より低い価格。Vysion kassa'sが最良の選択である理由を発見してください。",
     "feature": "機能",
-    "cta": "今日からVysion Horecaを始める",
+    "cta": "今日からVysion kassa'sを始める",
     "features": {
       "kassaLicensePro": "レジライセンス Pro",
       "online": "オンライン注文プラットフォーム",
@@ -554,13 +554,13 @@
   },
   "cta": {
     "title": "成長する準備はできましたか？",
-    "subtitle": "今日からVysion Horecaを始めましょう。14日間無料、義務なし。",
+    "subtitle": "今日からVysion kassa'sを始めましょう。14日間無料、義務なし。",
     "primary": "無料トライアルを開始",
     "secondary": "情報を請求"
   },
   "contact": {
     "title": "お問い合わせ",
-    "subtitle": "Vysion Horecaについてご質問がありますか？私たちのチームがお待ちしています。",
+    "subtitle": "Vysion kassa'sについてご質問がありますか？私たちのチームがお待ちしています。",
     "email": "メール",
     "phone": "電話",
     "address": "住所",
@@ -605,9 +605,9 @@
     "navCompanyAria": "会社：概要・連絡・ポリシー",
     "featuresLinkTitle": "POS、予約、オンライン注文など全モジュール",
     "pricingLinkTitle": "飲食向けソフトの料金プラン",
-    "updatesLinkTitle": "Vysion Horecaの製品ニュース",
+    "updatesLinkTitle": "Vysion kassa'sの製品ニュース",
     "supportLinkTitle": "ヘルプとテクニカルサポート",
-    "aboutLinkTitle": "Vysion Horecaについて",
+    "aboutLinkTitle": "Vysion kassa'sについて",
     "contactLinkTitle": "デモ・お問い合わせ",
     "privacyLinkTitle": "プライバシーポリシー",
     "legalLinkTitle": "利用規約と法的情報",
@@ -744,7 +744,7 @@
     "heroSubtitle": "実践から構築。オフィスからではありません。",
     "story": {
       "title": "私たちのストーリー",
-      "p1": "Vysion Horecaは本当の経験から生まれました。飲食業者として、あなたと同じ問題に直面しました：システムが多すぎ、コストが多すぎ、見通しが少なすぎました。",
+      "p1": "Vysion kassa'sは本当の経験から生まれました。飲食業者として、あなたと同じ問題に直面しました：システムが多すぎ、コストが多すぎ、見通しが少なすぎました。",
       "p2": "毎月別々のツールに支払っていました：注文プラットフォーム、会計、決済、分析 — すべて別々で、本当に連携するものは何もありませんでした。コストは積み重なりました。手間も同様に。",
       "p3": "だから違うやり方をすることにしました。注文プラットフォームを中心に、必要なものすべてを単純に含む1つのスマートなプラットフォームを構築しました。不要な機能なし。別々のサブスクリプションなし。飲食業者のために機能する誠実なシステムだけです。"
     },
@@ -793,8 +793,8 @@
     },
     "company": {
       "title": "Vysion Group International",
-      "p1": "Vysion HorecaはVysion Group Internationalの一部で、飲食・小売業界向けソフトウェアを専門とするテクノロジー企業です。",
-      "p2": "Vysion Horecaに加えて、プロセスを自動化したい企業向けのカスタムアプリケーションやデジタルソリューションも開発しています。",
+      "p1": "Vysion kassa'sはVysion Group Internationalの一部で、飲食・小売業界向けソフトウェアを専門とするテクノロジー企業です。",
+      "p2": "Vysion kassa'sに加えて、プロセスを自動化したい企業向けのカスタムアプリケーションやデジタルソリューションも開発しています。",
       "happyBusinesses": "満足した事業所",
       "processedMonthly": "月間処理額",
       "supportAvailable": "サポート対応",
@@ -802,7 +802,7 @@
       "statVolume": "€250,000"
     },
     "ctaTitle": "始める準備はできましたか？",
-    "ctaSubtitle": "Vysion Horecaを14日間無料でお試しください。クレジットカードは不要です。",
+    "ctaSubtitle": "Vysion kassa'sを14日間無料でお試しください。クレジットカードは不要です。",
     "ctaPrimary": "無料トライアルを開始",
     "ctaSecondary": "お問い合わせ"
   },
@@ -1004,7 +1004,7 @@
   },
   "legal": {
     "title": "法的情報",
-    "subtitle": "Vysion Horecaの法的文書と条件",
+    "subtitle": "Vysion kassa'sの法的文書と条件",
     "backToLegal": "法的概要に戻る",
     "pages": {
       "cookies": {
@@ -1157,7 +1157,7 @@
     "sections": {
       "intro": {
         "title": "1. はじめに",
-        "content": "Vysion Group Internationalの一部であるVysion Horecaは、お客様の個人データの保護を非常に重視しています。このプライバシー声明では、どのようなデータを収集し、なぜ収集し、どのように取り扱うかを説明します。"
+        "content": "Vysion Group Internationalの一部であるVysion kassa'sは、お客様の個人データの保護を非常に重視しています。このプライバシー声明では、どのようなデータを収集し、なぜ収集し、どのように取り扱うかを説明します。"
       },
       "whatData": {
         "title": "2. 収集するデータ",
@@ -1195,7 +1195,7 @@
       },
       "gks": {
         "title": "5. GKSと税務コンプライアンス",
-        "content": "Vysion Horecaは完全にGKS認定を受けており、ベルギーのすべての税務要件に準拠しています。取引データは法定保存期間に従って安全に保存されます。"
+        "content": "Vysion kassa'sは完全にGKS認定を受けており、ベルギーのすべての税務要件に準拠しています。取引データは法定保存期間に従って安全に保存されます。"
       },
       "sharing": {
         "title": "6. データの共有",
@@ -1234,15 +1234,15 @@
         "title": "1. 定義",
         "content": "このデータ処理契約において、以下の用語は次の意味を持ちます：",
         "controller": "管理者:",
-        "controllerDef": "Vysion Horecaサービスを使用するお客様",
+        "controllerDef": "Vysion kassa'sサービスを使用するお客様",
         "processor": "処理者:",
-        "processorDef": "Vysion Horeca / Vysion Group International",
+        "processorDef": "Vysion kassa's / Vysion Group International",
         "personalData": "個人データ:",
         "personalDataDef": "識別された、または識別可能な自然人に関するすべてのデータ"
       },
       "subject": {
         "title": "2. 対象と期間",
-        "content": "この契約は、お客様に代わってVysion Horecaが行う個人データの処理を規定します。契約は、お客様が当社のサービスを使用している間有効です。"
+        "content": "この契約は、お客様に代わってVysion kassa'sが行う個人データの処理を規定します。契約は、お客様が当社のサービスを使用している間有効です。"
       },
       "purpose": {
         "title": "3. 処理の性質と目的",
@@ -1265,7 +1265,7 @@
       },
       "obligations": {
         "title": "5. 処理者の義務",
-        "intro": "Vysion Horecaは以下を行います：",
+        "intro": "Vysion kassa'sは以下を行います：",
         "items": {
           "1": "お客様の指示に従ってのみ個人データを処理する",
           "2": "適切な技術的・組織的措置を講じる",
@@ -1298,7 +1298,7 @@
     "sections": {
       "availability": {
         "title": "1. 可用性",
-        "content": "Vysion Horecaは、すべてのコアサービスに対して99.9%の稼働時間を保証します。事前に告知される計画メンテナンスは除きます。"
+        "content": "Vysion kassa'sは、すべてのコアサービスに対して99.9%の稼働時間を保証します。事前に告知される計画メンテナンスは除きます。"
       },
       "maintenance": {
         "title": "2. 計画メンテナンス",
@@ -1337,7 +1337,7 @@
         "email": "メール:",
         "phone": "電話:",
         "inApp": "アプリ内サポート:",
-        "inAppDesc": "Vysion Horecaアプリケーション内で利用可能"
+        "inAppDesc": "Vysion kassa'sアプリケーション内で利用可能"
       },
       "hours": {
         "title": "5. サポート時間",
@@ -1362,7 +1362,7 @@
     "sections": {
       "intro": {
         "title": "はじめに",
-        "content": "この利用規約は、Vysion Horecaサービスの使用ルールを説明します。当社のサービスを使用することにより、このポリシーに同意したことになります。"
+        "content": "この利用規約は、Vysion kassa'sサービスの使用ルールを説明します。当社のサービスを使用することにより、このポリシーに同意したことになります。"
       },
       "allowed": {
         "title": "許可される使用",
@@ -1405,7 +1405,7 @@
         "intro": "以下のブランド名とロゴはVysion Group Internationalの所有物です：",
         "items": {
           "1": "Vysion™",
-          "2": "Vysion Horeca™",
+          "2": "Vysion kassa's™",
           "3": "Vysion Apps™",
           "4": "SCARDA™",
           "5": "Vysionロゴとそのすべてのバリエーション"
@@ -1416,7 +1416,7 @@
         "intro": "以下の場合に当社のブランドを使用できます：",
         "items": {
           "1": "テキストで当社の製品やサービスに言及する",
-          "2": "ビジネスでVysion Horecaを使用していることを示す",
+          "2": "ビジネスでVysion kassa'sを使用していることを示す",
           "3": "当社のサービスに関するレビューや記事を書く"
         }
       },
@@ -1453,7 +1453,7 @@
     "sections": {
       "ownership": {
         "title": "1. Vysionの所有権",
-        "content": "Vysion Horecaソフトウェアに関連するすべての知的財産権（ソースコード、デザイン、ロゴ、商標、ドキュメントを含むがこれに限定されない）は、Vysion Group Internationalの所有物であり、今後もそうあり続けます。"
+        "content": "Vysion kassa'sソフトウェアに関連するすべての知的財産権（ソースコード、デザイン、ロゴ、商標、ドキュメントを含むがこれに限定されない）は、Vysion Group Internationalの所有物であり、今後もそうあり続けます。"
       },
       "license": {
         "title": "2. ライセンス",
@@ -1489,11 +1489,11 @@
     "sections": {
       "intro": {
         "title": "1. はじめに",
-        "content": "この契約は、Vysion Horecaプラットフォームを通じた決済サービスの使用条件を説明します。決済処理はパートナーのMollieとStripeを通じて行われます。"
+        "content": "この契約は、Vysion kassa'sプラットフォームを通じた決済サービスの使用条件を説明します。決済処理はパートナーのMollieとStripeを通じて行われます。"
       },
       "processing": {
         "title": "2. 決済処理",
-        "content": "Vysion Horecaは、安全な取引を保証するために認定された決済処理業者と統合しています。すべての取引は暗号化され、PCI-DSS標準に準拠しています。"
+        "content": "Vysion kassa'sは、安全な取引を保証するために認定された決済処理業者と統合しています。すべての取引は暗号化され、PCI-DSS標準に準拠しています。"
       },
       "methods": {
         "title": "3. サポートされる決済方法",
@@ -1530,7 +1530,7 @@
   "subprocessorsPage": {
     "title": "副処理者",
     "lastUpdated": "最終更新日: 2025年12月",
-    "intro": "Vysion Horecaはサービスを提供するために以下の副処理者を使用しています。すべての副処理者は慎重に選定され、GDPR要件に準拠しています。",
+    "intro": "Vysion kassa'sはサービスを提供するために以下の副処理者を使用しています。すべての副処理者は慎重に選定され、GDPR要件に準拠しています。",
     "table": {
       "subprocessor": "副処理者",
       "purpose": "目的",
@@ -1582,11 +1582,11 @@
     "sections": {
       "general": {
         "title": "1. 一般",
-        "content": "このサービス契約（「契約」）は、Vysion Group Internationalの一部であるVysion Horecaのサービスの使用に適用されます。当社のサービスを使用することにより、これらの条件に同意したことになります。"
+        "content": "このサービス契約（「契約」）は、Vysion Group Internationalの一部であるVysion kassa'sのサービスの使用に適用されます。当社のサービスを使用することにより、これらの条件に同意したことになります。"
       },
       "services": {
         "title": "2. サービス",
-        "content": "Vysion Horecaは、飲食業界向けにレジソフトウェア、オンライン注文プラットフォーム、会計ソフトウェア、および関連サービスを提供します。当社はサービスを変更、拡張、または制限する権利を留保します。"
+        "content": "Vysion kassa'sは、飲食業界向けにレジソフトウェア、オンライン注文プラットフォーム、会計ソフトウェア、および関連サービスを提供します。当社はサービスを変更、拡張、または制限する権利を留保します。"
       },
       "subscription": {
         "title": "3. サブスクリプションと支払い",
@@ -1607,7 +1607,7 @@
       },
       "liability": {
         "title": "6. 責任",
-        "content": "Vysion Horecaは、間接的損害、結果的損害、または逸失利益について責任を負いません。当社の総責任は、過去12ヶ月間にお客様が当社に支払った金額に限定されます。"
+        "content": "Vysion kassa'sは、間接的損害、結果的損害、または逸失利益について責任を負いません。当社の総責任は、過去12ヶ月間にお客様が当社に支払った金額に限定されます。"
       },
       "termination": {
         "title": "7. 終了",
@@ -1997,7 +1997,7 @@
   "troubleshootingPage": {
     "backToLogin": "ログインに戻る",
     "title": "トラブルシューティングとヘルプ",
-    "subtitle": "Vysion Horecaレジのよくある問題と解決策",
+    "subtitle": "Vysion kassa'sレジのよくある問題と解決策",
     "quickActions": {
       "callSupport": "サポートに電話",
       "emailSupport": "メールサポート",
@@ -3221,7 +3221,7 @@
       "signatureEmployee": "従業員署名",
       "signatureEmployer": "雇用者署名",
       "nameAndDate": "名前 + 日付",
-      "documentGenerated": "この書類はVysion Horecaにより作成されました",
+      "documentGenerated": "この書類はVysion kassa'sにより作成されました",
       "at": "",
       "monthClosed": "月締め日",
       "reopen": "再開",
@@ -3509,7 +3509,7 @@
     "floorPlanLocked": "🔓 ロック解除",
     "floorPlanEditing": "🔒 ロック",
     "floorPlanBarLabel": "バー",
-    "defaultBusinessName": "Vysion Horeca",
+    "defaultBusinessName": "Vysion kassa's",
     "floorPlanNoTablesYet": "テーブルがありません",
     "floorPlanAddTableButton": "+ テーブルを追加",
     "floorPlanSidebarTitlePlant": "🌿 Plant",
@@ -3956,7 +3956,7 @@
     "helpDescription": "SCRADAには充実したドキュメントとサポートがあります。",
     "documentation": "ドキュメント",
     "contactSupport": "サポートに連絡",
-    "legalNote": "SCRADAはSCRADA bvの外部サービスです。Vysion Horecaはプレミアムパッケージの一部としてSCRADAへのアクセスを提供しています。SCRADA機能に関するご質問は、SCRADAサポートにお問い合わせください。",
+    "legalNote": "SCRADAはSCRADA bvの外部サービスです。Vysion kassa'sはプレミアムパッケージの一部としてSCRADAへのアクセスを提供しています。SCRADA機能に関するご質問は、SCRADAサポートにお問い合わせください。",
     "important": "重要"
   },
   "websiteGiftCards": {
@@ -4905,7 +4905,7 @@
     "faq1Q": "メニューはどのように変更できますか?",
     "faq1A": "ダッシュボードにログインし、製品に移動してください。製品の追加、編集、削除が可能です。変更はすぐに反映されます。",
     "faq2Q": "決済端末の連携はどのように機能しますか?",
-    "faq2A": "Vysion HorecaはMollieとStripe経由でBancontact、Visa、Mastercardをサポートしています。設定から支払いを選択し決済プロバイダーを接続してください。",
+    "faq2A": "Vysion kassa'sはMollieとStripe経由でBancontact、Visa、Mastercardをサポートしています。設定から支払いを選択し決済プロバイダーを接続してください。",
     "faq3Q": "営業時間を変更できますか?",
     "faq3A": "はい、設定から営業時間を選択してください。曜日ごとに異なる時間を設定したり、休暇日や定休日を追加したりできます。",
     "faq4Q": "新しい従業員を追加するにはどうすればよいですか?",
@@ -4924,7 +4924,7 @@
   "resellersPage": {
     "badge": "パートナープログラム",
     "heroTitle": "Vysionリセラーになる",
-    "heroDesc": "お住まいの国や地域でVysion Horecaを販売してください。獲得したすべてのクライアントでコミッションを得られます。私たちはソフトウェアを提供し、あなたはクライアントを提供します。",
+    "heroDesc": "お住まいの国や地域でVysion kassa'sを販売してください。獲得したすべてのクライアントでコミッションを得られます。私たちはソフトウェアを提供し、あなたはクライアントを提供します。",
     "benefitsTitle": "なぜVysionリセラーになるのか?",
     "benefit1Title": "最大30%のコミッションを獲得",
     "benefit1Desc": "すべてのアクティブなクライアントに対して毎月コミッションを受け取れます。成長する受動的収入。",
@@ -4995,7 +4995,7 @@
     "ctaTitle": "始める準備はできていますか?",
     "ctaDesc": "今日Vysionリセラーになって稼ぎ始めましょう。",
     "ctaButton": "リセラーになる",
-    "footerCopyright": "2026 Vysion Horeca. 全著作権所有。"
+    "footerCopyright": "2026 Vysion kassa's. 全著作権所有。"
   },
   "shopOffline": {
     "title": "オンラインステータス",
@@ -5102,7 +5102,7 @@
     "kassasysteem": {
       "title": "POSシステム",
       "teaser": "あらゆる業種・予算向けレジ。バーコードスキャナーなど対応。",
-      "body": "レジは店舗の中心。迅速な会計、正確なレシート、注文フローとキッチンへのリアルタイム連携。\n\nVysion Horecaなら商品・テーブル・決済・スタッフを一か所で管理。ピーク時のミス削減と明確な日次締め。",
+      "body": "レジは店舗の中心。迅速な会計、正確なレシート、注文フローとキッチンへのリアルタイム連携。\n\nVysion kassa'sなら商品・テーブル・決済・スタッフを一か所で管理。ピーク時のミス削減と明確な日次締め。",
       "heroAlt": "カフェやレストランのカウンターでタッチPOSと決済端末を操作する手元",
       "horecaSectorTitle": "飲食向けPOS",
       "horecaImageAlt": "レストランのテーブルに置かれた最新のオールインワンPOS",
@@ -5203,7 +5203,7 @@
     "eigenWebsite": {
       "title": "自社ウェブサイト",
       "teaser": "独自ドメインとブランド——注文機能込み。",
-      "body": "汎用LPではなく、ロゴ・色・写真はあなたの店。一目でお店だと分かる。\n\nサイトとメニューはVysion Horecaの他機能と同じ管理画面から。"
+      "body": "汎用LPではなく、ロゴ・色・写真はあなたの店。一目でお店だと分かる。\n\nサイトとメニューはVysion kassa'sの他機能と同じ管理画面から。"
     },
     "whatsappBestellingen": {
       "title": "WhatsApp注文",

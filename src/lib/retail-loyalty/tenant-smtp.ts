@@ -18,7 +18,7 @@ export async function resolveTenantSmtp(
   let smtpPort = 465
   let smtpUser = process.env.ZOHO_EMAIL || ''
   let smtpPass = process.env.ZOHO_PASSWORD || ''
-  let fromName = businessNameFallback || 'Vysion Horeca'
+  let fromName = businessNameFallback || "Vysion kassa's"
 
   const { data: smtpSettings } = await supabase
     .from('tenant_settings')
@@ -35,7 +35,7 @@ export async function resolveTenantSmtp(
       smtpSettings.smtp_from_name ||
       smtpSettings.business_name ||
       businessNameFallback ||
-      'Vysion Horeca'
+      "Vysion kassa's"
   } else if (!process.env.ZOHO_EMAIL || !process.env.ZOHO_PASSWORD) {
     return { ok: false, error: 'smtp_not_configured' }
   }

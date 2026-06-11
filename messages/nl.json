@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "title": "Vysion Horeca | Alles-in-één Kassa & Betaalplatform",
+    "title": "Vysion kassa's | Alles-in-één Kassa & Betaalplatform",
     "description": "Het complete kassasysteem voor horeca. Kassa, online bestellingen, facturatie, personeelsbeheer en meer - allemaal in één platform. Probeer 14 dagen gratis."
   },
   "nav": {
@@ -374,7 +374,7 @@
     "kassasysteem": {
       "title": "Kassasysteem",
       "teaser": "Een kassasysteem voor iedere sector, voor ieders budget, met barcodescanner enz.",
-      "body": "Je kassa is het hart van de zaak: snelle verkoop, correcte bonnen en een realtime koppeling met je bestelplatform en keuken.\n\nMet Vysion Horeca beheer je producten, tafels, betalingen en personeel vanuit één omgeving: minder fouten tijdens piekuren en altijd zicht op de dagafsluiting.",
+      "body": "Je kassa is het hart van de zaak: snelle verkoop, correcte bonnen en een realtime koppeling met je bestelplatform en keuken.\n\nMet Vysion kassa's beheer je producten, tafels, betalingen en personeel vanuit één omgeving: minder fouten tijdens piekuren en altijd zicht op de dagafsluiting.",
       "heroAlt": "Hand bedient een touchscreen-kassa met betaalterminal aan de toonbank in een horecazaak",
       "horecaSectorTitle": "Horeca kassasysteem",
       "horecaImageAlt": "Moderne all-in-one horecakassa op een tafel in een restaurant",
@@ -475,7 +475,7 @@
     "eigenWebsite": {
       "title": "Eigen website",
       "teaser": "Jouw domein, jouw merk, met bestellen erin geïntegreerd.",
-      "body": "Geen generieke tussenpagina: jouw logo, kleuren en foto's. Klanten herkennen direct jouw zaak.\n\nBeheer je site en je menu vanuit hetzelfde admin als de rest van Vysion Horeca."
+      "body": "Geen generieke tussenpagina: jouw logo, kleuren en foto's. Klanten herkennen direct jouw zaak.\n\nBeheer je site en je menu vanuit hetzelfde admin als de rest van Vysion kassa's."
     },
     "whatsappBestellingen": {
       "title": "WhatsApp-bestellingen",
@@ -518,9 +518,9 @@
   },
   "liveDemo": {
     "title": "Wil je het platform in actie zien?",
-    "subtitle": "Bekijk een echte frituur die draait op Vysion Horeca",
+    "subtitle": "Bekijk een echte frituur die draait op Vysion kassa's",
     "clientsLead": "Deze klanten gingen u reeds voor",
-    "marquee": "Horeca · Frituur · Restaurant · Café · Slagerij · Bakkerij · Catering · Brasserie · Traiteur · Broodjeszaak · Wijnhandel · Hotel · Vysion Horeca · ",
+    "marquee": "Horeca · Frituur · Restaurant · Café · Slagerij · Bakkerij · Catering · Brasserie · Traiteur · Broodjeszaak · Wijnhandel · Hotel · Vysion kassa's · ",
     "successStories": {
       "vivaldi": {
         "name": "VIVALDI 2.0 Food & Drinks",
@@ -590,9 +590,9 @@
   },
   "comparison": {
     "title": "Vergelijk met andere platformen",
-    "subtitle": "Meer functies, lagere prijs. Ontdek waarom Vysion Horeca de beste keuze is.",
+    "subtitle": "Meer functies, lagere prijs. Ontdek waarom Vysion kassa's de beste keuze is.",
     "feature": "Functie",
-    "cta": "Start vandaag met Vysion Horeca",
+    "cta": "Start vandaag met Vysion kassa's",
     "features": {
       "kassaLicensePro": "Kassa licentie Pro",
       "online": "Online bestelplatform",
@@ -835,13 +835,13 @@
   },
   "cta": {
     "title": "Klaar om te groeien?",
-    "subtitle": "Start vandaag nog met Vysion Horeca. 14 dagen gratis, geen verplichtingen.",
+    "subtitle": "Start vandaag nog met Vysion kassa's. 14 dagen gratis, geen verplichtingen.",
     "primary": "Start gratis proefperiode",
     "secondary": "Vraag info aan"
   },
   "contact": {
     "title": "Neem contact op",
-    "subtitle": "Vragen over Vysion Horeca? Ons team staat voor je klaar.",
+    "subtitle": "Vragen over Vysion kassa's? Ons team staat voor je klaar.",
     "email": "Email",
     "phone": "Telefoon",
     "address": "Adres",
@@ -1284,7 +1284,7 @@
   },
   "legal": {
     "title": "Juridisch",
-    "subtitle": "Alle juridische documenten en voorwaarden van Vysion Horeca",
+    "subtitle": "Alle juridische documenten en voorwaarden van Vysion kassa's",
     "backToLegal": "Terug naar juridisch overzicht",
     "pages": {
       "cookies": {
@@ -1437,7 +1437,7 @@
     "sections": {
       "intro": {
         "title": "1. Inleiding",
-        "content": "Vysion Horeca, onderdeel van Vysion Group International, hecht veel waarde aan de bescherming van jouw persoonsgegevens. In deze privacyverklaring leggen wij uit welke gegevens wij verzamelen, waarom wij dit doen en hoe wij hiermee omgaan."
+        "content": "Vysion kassa's, onderdeel van Vysion Group International, hecht veel waarde aan de bescherming van jouw persoonsgegevens. In deze privacyverklaring leggen wij uit welke gegevens wij verzamelen, waarom wij dit doen en hoe wij hiermee omgaan."
       },
       "whatData": {
         "title": "2. Welke gegevens verzamelen wij?",
@@ -1475,7 +1475,7 @@
       },
       "gks": {
         "title": "5. GKS & Fiscale Compliance",
-        "content": "Vysion Horeca is volledig GKS-gecertificeerd en voldoet aan alle Belgische fiscale vereisten. Transactiegegevens worden veilig opgeslagen conform de wettelijke bewaartermijnen."
+        "content": "Vysion kassa's is volledig GKS-gecertificeerd en voldoet aan alle Belgische fiscale vereisten. Transactiegegevens worden veilig opgeslagen conform de wettelijke bewaartermijnen."
       },
       "sharing": {
         "title": "6. Delen van gegevens",
@@ -1514,15 +1514,15 @@
         "title": "1. Definities",
         "content": "In deze verwerkersovereenkomst wordt verstaan onder:",
         "controller": "Verwerkingsverantwoordelijke:",
-        "controllerDef": "de klant die gebruik maakt van Vysion Horeca diensten",
+        "controllerDef": "de klant die gebruik maakt van Vysion kassa's diensten",
         "processor": "Verwerker:",
-        "processorDef": "Vysion Horeca / Vysion Group International",
+        "processorDef": "Vysion kassa's / Vysion Group International",
         "personalData": "Persoonsgegevens:",
         "personalDataDef": "alle gegevens die betrekking hebben op een geïdentificeerde of identificeerbare natuurlijke persoon"
       },
       "subject": {
         "title": "2. Onderwerp en Duur",
-        "content": "Deze overeenkomst regelt de verwerking van persoonsgegevens door Vysion Horeca namens u. De overeenkomst is van kracht zolang u gebruik maakt van onze diensten."
+        "content": "Deze overeenkomst regelt de verwerking van persoonsgegevens door Vysion kassa's namens u. De overeenkomst is van kracht zolang u gebruik maakt van onze diensten."
       },
       "purpose": {
         "title": "3. Aard en Doel van de Verwerking",
@@ -1545,7 +1545,7 @@
       },
       "obligations": {
         "title": "5. Verplichtingen Verwerker",
-        "intro": "Vysion Horeca zal:",
+        "intro": "Vysion kassa's zal:",
         "items": {
           "1": "Persoonsgegevens alleen verwerken volgens uw instructies",
           "2": "Passende technische en organisatorische maatregelen nemen",
@@ -1578,7 +1578,7 @@
     "sections": {
       "availability": {
         "title": "1. Beschikbaarheid",
-        "content": "Vysion Horeca garandeert een uptime van 99,9% voor alle kernservices. Dit is exclusief gepland onderhoud, dat vooraf wordt aangekondigd."
+        "content": "Vysion kassa's garandeert een uptime van 99,9% voor alle kernservices. Dit is exclusief gepland onderhoud, dat vooraf wordt aangekondigd."
       },
       "maintenance": {
         "title": "2. Gepland Onderhoud",
@@ -1617,7 +1617,7 @@
         "email": "Email:",
         "phone": "Telefoon:",
         "inApp": "In-app support:",
-        "inAppDesc": "Beschikbaar in de Vysion Horeca applicatie"
+        "inAppDesc": "Beschikbaar in de Vysion kassa's applicatie"
       },
       "hours": {
         "title": "5. Support Uren",
@@ -1642,7 +1642,7 @@
     "sections": {
       "intro": {
         "title": "Inleiding",
-        "content": "Dit Beleid voor Aanvaardbaar Gebruik beschrijft de regels voor het gebruik van de diensten van Vysion Horeca. Door onze diensten te gebruiken, gaat u akkoord met dit beleid."
+        "content": "Dit Beleid voor Aanvaardbaar Gebruik beschrijft de regels voor het gebruik van de diensten van Vysion kassa's. Door onze diensten te gebruiken, gaat u akkoord met dit beleid."
       },
       "allowed": {
         "title": "Toegestaan Gebruik",
@@ -1685,7 +1685,7 @@
         "intro": "De volgende merknamen en logo's zijn eigendom van Vysion Group International:",
         "items": {
           "1": "Vysion™",
-          "2": "Vysion Horeca™",
+          "2": "Vysion kassa's™",
           "3": "Vysion Apps™",
           "4": "SCARDA™",
           "5": "Het Vysion logo en alle varianten"
@@ -1696,7 +1696,7 @@
         "intro": "U mag onze merknamen gebruiken om:",
         "items": {
           "1": "Naar onze producten of diensten te verwijzen in tekst",
-          "2": "Aan te geven dat u Vysion Horeca gebruikt in uw zaak",
+          "2": "Aan te geven dat u Vysion kassa's gebruikt in uw zaak",
           "3": "Reviews of artikelen over onze diensten te schrijven"
         }
       },
@@ -1733,7 +1733,7 @@
     "sections": {
       "ownership": {
         "title": "1. Eigendom van Vysion",
-        "content": "Alle intellectuele eigendomsrechten met betrekking tot de Vysion Horeca software, inclusief maar niet beperkt tot de broncode, ontwerpen, logo's, merknamen en documentatie, zijn en blijven eigendom van Vysion Group International."
+        "content": "Alle intellectuele eigendomsrechten met betrekking tot de Vysion kassa's software, inclusief maar niet beperkt tot de broncode, ontwerpen, logo's, merknamen en documentatie, zijn en blijven eigendom van Vysion Group International."
       },
       "license": {
         "title": "2. Licentie",
@@ -1769,11 +1769,11 @@
     "sections": {
       "intro": {
         "title": "1. Inleiding",
-        "content": "Deze overeenkomst beschrijft de voorwaarden voor het gebruik van betalingsdiensten via het Vysion Horeca platform. Betalingsverwerking gebeurt via onze partners Mollie en Stripe."
+        "content": "Deze overeenkomst beschrijft de voorwaarden voor het gebruik van betalingsdiensten via het Vysion kassa's platform. Betalingsverwerking gebeurt via onze partners Mollie en Stripe."
       },
       "processing": {
         "title": "2. Betalingsverwerking",
-        "content": "Vysion Horeca integreert met erkende betalingsverwerkers om veilige transacties te garanderen. Alle transacties worden versleuteld en voldoen aan PCI-DSS standaarden."
+        "content": "Vysion kassa's integreert met erkende betalingsverwerkers om veilige transacties te garanderen. Alle transacties worden versleuteld en voldoen aan PCI-DSS standaarden."
       },
       "methods": {
         "title": "3. Ondersteunde Betaalmethodes",
@@ -1810,7 +1810,7 @@
   "subprocessorsPage": {
     "title": "Subverwerkers",
     "lastUpdated": "Laatst bijgewerkt: december 2025",
-    "intro": "Vysion Horeca maakt gebruik van de volgende subverwerkers voor het leveren van onze diensten. Alle subverwerkers zijn zorgvuldig geselecteerd en voldoen aan de AVG/GDPR vereisten.",
+    "intro": "Vysion kassa's maakt gebruik van de volgende subverwerkers voor het leveren van onze diensten. Alle subverwerkers zijn zorgvuldig geselecteerd en voldoen aan de AVG/GDPR vereisten.",
     "table": {
       "subprocessor": "Subverwerker",
       "purpose": "Doel",
@@ -1862,11 +1862,11 @@
     "sections": {
       "general": {
         "title": "1. Algemeen",
-        "content": "Deze Dienstenovereenkomst (\"Overeenkomst\") is van toepassing op het gebruik van de diensten van Vysion Horeca, onderdeel van Vysion Group International. Door gebruik te maken van onze diensten gaat u akkoord met deze voorwaarden."
+        "content": "Deze Dienstenovereenkomst (\"Overeenkomst\") is van toepassing op het gebruik van de diensten van Vysion kassa's, onderdeel van Vysion Group International. Door gebruik te maken van onze diensten gaat u akkoord met deze voorwaarden."
       },
       "services": {
         "title": "2. Diensten",
-        "content": "Vysion Horeca biedt kassasoftware, online bestelplatform, boekhoudsoftware en aanverwante diensten voor de horecasector. Wij behouden ons het recht voor om onze diensten te wijzigen, uit te breiden of te beperken."
+        "content": "Vysion kassa's biedt kassasoftware, online bestelplatform, boekhoudsoftware en aanverwante diensten voor de horecasector. Wij behouden ons het recht voor om onze diensten te wijzigen, uit te breiden of te beperken."
       },
       "subscription": {
         "title": "3. Abonnement en Betaling",
@@ -1887,7 +1887,7 @@
       },
       "liability": {
         "title": "6. Aansprakelijkheid",
-        "content": "Vysion Horeca is niet aansprakelijk voor indirecte schade, gevolgschade of gederfde winst. Onze totale aansprakelijkheid is beperkt tot het bedrag dat u in de afgelopen 12 maanden aan ons heeft betaald."
+        "content": "Vysion kassa's is niet aansprakelijk voor indirecte schade, gevolgschade of gederfde winst. Onze totale aansprakelijkheid is beperkt tot het bedrag dat u in de afgelopen 12 maanden aan ons heeft betaald."
       },
       "termination": {
         "title": "7. Beëindiging",
@@ -2277,7 +2277,7 @@
   "troubleshootingPage": {
     "backToLogin": "Terug naar login",
     "title": "Troubleshooting & Hulp",
-    "subtitle": "Veelvoorkomende problemen en oplossingen voor je Vysion Horeca kassa",
+    "subtitle": "Veelvoorkomende problemen en oplossingen voor je Vysion kassa's kassa",
     "quickActions": {
       "callSupport": "Bel support",
       "emailSupport": "E-mail support",
@@ -3695,7 +3695,7 @@
       "signatureEmployee": "Handtekening medewerker",
       "signatureEmployer": "Handtekening werkgever",
       "nameAndDate": "Naam + datum",
-      "documentGenerated": "Dit document is gegenereerd door Vysion Horeca op",
+      "documentGenerated": "Dit document is gegenereerd door Vysion kassa's op",
       "at": "om",
       "monthClosed": "Maand is afgesloten op",
       "reopen": "Heropenen",
@@ -3985,7 +3985,7 @@
     "floorPlanLocked": "🔓 Ontgrendel",
     "floorPlanEditing": "🔒 Vergrendelen",
     "floorPlanBarLabel": "TOOG",
-    "defaultBusinessName": "Vysion Horeca",
+    "defaultBusinessName": "Vysion kassa's",
     "floorPlanNoTablesYet": "Nog geen tafels",
     "floorPlanAddTableButton": "+ Voeg tafel toe",
     "floorPlanSidebarTitlePlant": "🌿 Plant",
@@ -5161,13 +5161,13 @@
     "avgResponseTime": "Gemiddelde reactietijd",
     "satisfaction": "Klanttevredenheid",
     "ctaTitle": "Nog geen klant?",
-    "ctaDesc": "Probeer Vysion Horeca 14 dagen gratis. Geen creditcard nodig, direct aan de slag.",
+    "ctaDesc": "Probeer Vysion kassa's 14 dagen gratis. Geen creditcard nodig, direct aan de slag.",
     "ctaStart": "Start gratis proefperiode",
     "ctaBack": "Terug naar home",
     "faq1Q": "Hoe kan ik mijn menu aanpassen?",
     "faq1A": "Log in op je dashboard en ga naar Producten. Daar kun je producten toevoegen, bewerken of verwijderen. Wijzigingen zijn direct zichtbaar in je bestelplatform.",
     "faq2Q": "Hoe werkt de betaalterminal integratie?",
-    "faq2A": "Vysion Horeca ondersteunt Bancontact, Visa, Mastercard via Mollie en Stripe. Ga naar Instellingen > Betalingen om je betaalprovider te koppelen.",
+    "faq2A": "Vysion kassa's ondersteunt Bancontact, Visa, Mastercard via Mollie en Stripe. Ga naar Instellingen > Betalingen om je betaalprovider te koppelen.",
     "faq3Q": "Kan ik mijn openingsuren wijzigen?",
     "faq3A": "Ja, ga naar Instellingen > Openingsuren. Je kunt per dag verschillende tijden instellen en ook vakantiedagen of sluitingsdagen toevoegen.",
     "faq4Q": "Hoe voeg ik een nieuwe medewerker toe?",
@@ -5186,7 +5186,7 @@
   "resellersPage": {
     "badge": "Partner Programma",
     "heroTitle": "Word Vysion Reseller",
-    "heroDesc": "Verkoop Vysion Horeca in jouw land of regio. Verdien commissie op elke klant die je binnenhaalt. Wij leveren de software, jij levert de klanten.",
+    "heroDesc": "Verkoop Vysion kassa's in jouw land of regio. Verdien commissie op elke klant die je binnenhaalt. Wij leveren de software, jij levert de klanten.",
     "benefitsTitle": "Waarom Vysion Reseller worden?",
     "benefit1Title": "Verdien tot 30% commissie",
     "benefit1Desc": "Ontvang maandelijks commissie op elke actieve klant. Passief inkomen dat groeit.",
@@ -5257,7 +5257,7 @@
     "ctaTitle": "Klaar om te starten?",
     "ctaDesc": "Word vandaag nog Vysion Reseller en begin met verdienen.",
     "ctaButton": "Word Reseller",
-    "footerCopyright": "2026 Vysion Horeca. Alle rechten voorbehouden."
+    "footerCopyright": "2026 Vysion kassa's. Alle rechten voorbehouden."
   },
   "shopOffline": {
     "title": "Online Status",

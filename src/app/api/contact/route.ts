@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
 
     // Email content
     const mailOptions = {
-      from: `"Vysion Horeca Website" <${process.env.ZOHO_EMAIL}>`,
+      from: `"Vysion kassa's Website" <${process.env.ZOHO_EMAIL}>`,
       to: process.env.ZOHO_EMAIL,
       replyTo: email,
       subject: `Nieuw contactformulier: ${fn} ${ln}`,

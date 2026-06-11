@@ -98,9 +98,9 @@ async function sendResetEmail(email: string, name: string, token: string) {
   })
 
   const mailOptions = {
-    from: `"Vysion Horeca" <${process.env.ZOHO_EMAIL}>`,
+    from: `"Vysion kassa's" <${process.env.ZOHO_EMAIL}>`,
     to: email,
-    subject: 'Wachtwoord resetten - Vysion Horeca',
+    subject: "Wachtwoord resetten - Vysion kassa's",
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="text-align: center; margin-bottom: 30px;">

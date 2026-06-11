@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     let smtpPort = 465
     let smtpUser = process.env.ZOHO_EMAIL || ''
     let smtpPass = process.env.ZOHO_PASSWORD || ''
-    let fromName = businessName || 'Vysion Horeca'
+    let fromName = businessName || "Vysion kassa's"
 
     if (supabaseAdmin) {
       const { data: smtpSettings } = await supabaseAdmin
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
         smtpPort = smtpSettings.smtp_port || 465
         smtpUser = smtpSettings.smtp_user
         smtpPass = smtpSettings.smtp_password
-        fromName = smtpSettings.smtp_from_name || businessName || 'Vysion Horeca'
+        fromName = smtpSettings.smtp_from_name || businessName || "Vysion kassa's"
       } else if (!process.env.ZOHO_EMAIL || !process.env.ZOHO_PASSWORD) {
         return NextResponse.json(
           { error: 'Geen email ingesteld. Ga naar Profiel → Email instellingen en vul je emailgegevens in.' },
@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
   <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
     <!-- Header met logo/naam -->
     <div style="background: linear-gradient(135deg, #1e3a5f 0%, #2d4a6f 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
-      <h1 style="color: white; margin: 0; font-size: 24px;">${escapeHtml(businessName || 'Vysion Horeca')}</h1>
+      <h1 style="color: white; margin: 0; font-size: 24px;">${escapeHtml(businessName || "Vysion kassa's")}</h1>
     </div>
     
     <!-- Content -->
@@ -163,7 +163,7 @@ export async function POST(request: NextRequest) {
         </a>
       </p>
       <p style="margin: 0; color: #aaa;">
-        © ${new Date().getFullYear()} ${escapeHtml(businessName || 'Vysion Horeca')} | Powered by Vysion Horeca
+        © ${new Date().getFullYear()} ${escapeHtml(businessName || "Vysion kassa's")} | Powered by Vysion kassa's
       </p>
     </div>
   </div>

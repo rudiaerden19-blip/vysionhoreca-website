@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
       port: 465,
       secure: true,
       auth: {
-        user: process.env.ZOHO_EMAIL || 'info@vysionhoreca.com',
+        user: process.env.ZOHO_EMAIL || 'info@vysionkassa.com',
         pass: process.env.ZOHO_PASSWORD || '',
       },
     })
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
             </div>
           </div>
           <div class="footer">
-            Verzonden via Vysion Horeca<br>
+            Verzonden via Vysion kassa's<br>
             <a href="https://www.vysionhoreca.com" style="color: #f97316;">www.vysionhoreca.com</a>
           </div>
         </div>
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
     `
 
     await transporter.sendMail({
-      from: `"Vysion Horeca" <${process.env.ZOHO_EMAIL || 'info@vysionhoreca.com'}>`,
+      from: `"Vysion kassa's" <${process.env.ZOHO_EMAIL || 'info@vysionkassa.com'}>`,
       to,
       subject,
       text: message,

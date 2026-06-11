@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
       port: 465,
       secure: true,
       auth: {
-        user: process.env.ZOHO_USER || 'info@vysionhoreca.com',
+        user: process.env.ZOHO_USER || 'info@vysionkassa.com',
         pass: process.env.ZOHO_PASS,
       },
     })
@@ -143,7 +143,7 @@ export async function GET(request: NextRequest) {
       
       <div class="info-box">
         <h2>⏰ Uw abonnement loopt bijna af</h2>
-        <p style="margin: 0;">Uw Vysion Horeca abonnement verloopt binnenkort. Verleng op tijd om uw webshop online te houden!</p>
+        <p style="margin: 0;">Uw Vysion kassa's abonnement verloopt binnenkort. Verleng op tijd om uw webshop online te houden!</p>
       </div>
       
       <p class="deadline">📆 Vervaldatum: ${expiryDate}</p>
@@ -166,14 +166,14 @@ export async function GET(request: NextRequest) {
       
       <p>Na verlenging blijft alles gewoon werken zonder onderbreking.</p>
       
-      <p>Heeft u vragen? Stuur een email naar <a href="mailto:info@vysionhoreca.com">info@vysionhoreca.com</a></p>
+      <p>Heeft u vragen? Stuur een email naar <a href="mailto:info@vysionkassa.com">info@vysionkassa.com</a></p>
       
-      <p>Met vriendelijke groet,<br><strong>Team Vysion Horeca</strong></p>
+      <p>Met vriendelijke groet,<br><strong>Team Vysion kassa's</strong></p>
     </div>
     
     <div class="footer">
-      <p>Vysion Horeca - Bestelplatform voor de horeca</p>
-      <p>www.vysionhoreca.com | info@vysionhoreca.com</p>
+      <p>Vysion kassa's - Bestelplatform voor de horeca</p>
+      <p>www.vysionhoreca.com | info@vysionkassa.com</p>
     </div>
   </div>
 </body>
@@ -181,7 +181,7 @@ export async function GET(request: NextRequest) {
 `
 
         await transporter.sendMail({
-          from: '"Vysion Horeca" <info@vysionhoreca.com>',
+          from: `"Vysion kassa's" <info@vysionkassa.com>`,
           to: email,
           subject: `📅 Uw abonnement loopt bijna af - Verleng voor ${expiryDate}`,
           html: emailHtml,

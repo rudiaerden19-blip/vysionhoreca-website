@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "title": "Vysion Horeca | 一体化收银与支付平台",
+    "title": "Vysion kassa's | 一体化收银与支付平台",
     "description": "餐饮业完整收银系统。收银、在线订单、发票、员工管理等 - 全部在一个平台上。免费试用14天。"
   },
   "nav": {
@@ -235,9 +235,9 @@
   },
   "liveDemo": {
     "title": "想看看平台的实际运行效果吗？",
-    "subtitle": "查看使用Vysion Horeca运营的真实薯条店",
+    "subtitle": "查看使用Vysion kassa's运营的真实薯条店",
     "clientsLead": "这些客户已经走在了您前面",
-    "marquee": "餐饮 · 炸薯条店 · 餐厅 · 咖啡馆 · 肉铺 · 面包房 · 宴会服务 · 餐吧 · 三明治 · 酒庄 · 酒店 · Vysion Horeca · ",
+    "marquee": "餐饮 · 炸薯条店 · 餐厅 · 咖啡馆 · 肉铺 · 面包房 · 宴会服务 · 餐吧 · 三明治 · 酒庄 · 酒店 · Vysion kassa's · ",
     "successStories": {
       "vivaldi": {
         "name": "VIVALDI 2.0 Food & Drinks",
@@ -307,9 +307,9 @@
   },
   "comparison": {
     "title": "与其他平台比较",
-    "subtitle": "更多功能，更低价格。发现为什么Vysion Horeca是最佳选择。",
+    "subtitle": "更多功能，更低价格。发现为什么Vysion kassa's是最佳选择。",
     "feature": "功能",
-    "cta": "今天就开始使用Vysion Horeca",
+    "cta": "今天就开始使用Vysion kassa's",
     "features": {
       "kassaLicensePro": "收银系统专业版授权",
       "online": "在线订单平台",
@@ -554,13 +554,13 @@
   },
   "cta": {
     "title": "准备好成长了吗？",
-    "subtitle": "今天就开始使用Vysion Horeca。14天免费，无义务。",
+    "subtitle": "今天就开始使用Vysion kassa's。14天免费，无义务。",
     "primary": "开始免费试用",
     "secondary": "获取信息"
   },
   "contact": {
     "title": "联系我们",
-    "subtitle": "关于Vysion Horeca有问题？我们的团队随时为您服务。",
+    "subtitle": "关于Vysion kassa's有问题？我们的团队随时为您服务。",
     "email": "邮箱",
     "phone": "电话",
     "address": "地址",
@@ -605,9 +605,9 @@
     "navCompanyAria": "公司：简介、联系与政策",
     "featuresLinkTitle": "收银、订位、在线点单等全部模块",
     "pricingLinkTitle": "餐饮软件订阅与价格",
-    "updatesLinkTitle": "Vysion Horeca产品更新",
+    "updatesLinkTitle": "Vysion kassa's产品更新",
     "supportLinkTitle": "帮助与技术支持",
-    "aboutLinkTitle": "了解Vysion Horeca",
+    "aboutLinkTitle": "了解Vysion kassa's",
     "contactLinkTitle": "联系Vysion—演示或咨询",
     "privacyLinkTitle": "隐私政策",
     "legalLinkTitle": "条款与法律信息",
@@ -744,7 +744,7 @@
     "heroSubtitle": "从实践中构建。不是从办公室。",
     "story": {
       "title": "我们的故事",
-      "p1": "Vysion Horeca源于真实经验。作为餐饮业者，我们遇到了和你一样的问题：系统太多、成本太多、视野太少。",
+      "p1": "Vysion kassa's源于真实经验。作为餐饮业者，我们遇到了和你一样的问题：系统太多、成本太多、视野太少。",
       "p2": "我们每月为单独的工具付费：订单平台、会计、支付和分析 — 一切都是分开的，没有什么真正协同工作。成本在累积。麻烦也是如此。",
       "p3": "所以我们决定用不同的方式来做。我们构建了一个智能平台，以订单平台为核心，你需要的一切都简单地包含在内。没有不必要的功能。没有单独的订阅。只是一个为餐饮业者工作的诚实系统。"
     },
@@ -793,8 +793,8 @@
     },
     "company": {
       "title": "Vysion Group International",
-      "p1": "Vysion Horeca是Vysion Group International的一部分，这是一家专门为餐饮和零售行业提供软件的技术公司。",
-      "p2": "除了Vysion Horeca，我们还为希望自动化流程的企业开发定制应用程序和数字解决方案。",
+      "p1": "Vysion kassa's是Vysion Group International的一部分，这是一家专门为餐饮和零售行业提供软件的技术公司。",
+      "p2": "除了Vysion kassa's，我们还为希望自动化流程的企业开发定制应用程序和数字解决方案。",
       "happyBusinesses": "满意的商户",
       "processedMonthly": "每月处理金额",
       "supportAvailable": "可用支持",
@@ -802,7 +802,7 @@
       "statVolume": "€250,000"
     },
     "ctaTitle": "准备好开始了吗？",
-    "ctaSubtitle": "免费试用Vysion Horeca 14天。无需信用卡。",
+    "ctaSubtitle": "免费试用Vysion kassa's 14天。无需信用卡。",
     "ctaPrimary": "开始免费试用",
     "ctaSecondary": "联系我们"
   },
@@ -1004,7 +1004,7 @@
   },
   "legal": {
     "title": "法律",
-    "subtitle": "Vysion Horeca的所有法律文件和条款",
+    "subtitle": "Vysion kassa's的所有法律文件和条款",
     "backToLegal": "返回法律概览",
     "pages": {
       "cookies": {
@@ -1157,7 +1157,7 @@
     "sections": {
       "intro": {
         "title": "1. 简介",
-        "content": "Vysion Horeca是Vysion Group International的一部分，非常重视保护您的个人数据。在本隐私声明中，我们解释我们收集哪些数据、为什么收集以及如何处理它们。"
+        "content": "Vysion kassa's是Vysion Group International的一部分，非常重视保护您的个人数据。在本隐私声明中，我们解释我们收集哪些数据、为什么收集以及如何处理它们。"
       },
       "whatData": {
         "title": "2. 我们收集哪些数据？",
@@ -1195,7 +1195,7 @@
       },
       "gks": {
         "title": "5. GKS和税务合规",
-        "content": "Vysion Horeca已完全通过GKS认证，符合所有比利时税务要求。交易数据按照法定保留期限安全存储。"
+        "content": "Vysion kassa's已完全通过GKS认证，符合所有比利时税务要求。交易数据按照法定保留期限安全存储。"
       },
       "sharing": {
         "title": "6. 数据共享",
@@ -1234,15 +1234,15 @@
         "title": "1. 定义",
         "content": "在本数据处理协议中，以下术语的含义：",
         "controller": "数据控制者：",
-        "controllerDef": "使用Vysion Horeca服务的客户",
+        "controllerDef": "使用Vysion kassa's服务的客户",
         "processor": "数据处理者：",
-        "processorDef": "Vysion Horeca / Vysion Group International",
+        "processorDef": "Vysion kassa's / Vysion Group International",
         "personalData": "个人数据：",
         "personalDataDef": "与已识别或可识别的自然人相关的所有数据"
       },
       "subject": {
         "title": "2. 主题和期限",
-        "content": "本协议规范Vysion Horeca代表您进行的个人数据处理。本协议在您使用我们的服务期间有效。"
+        "content": "本协议规范Vysion kassa's代表您进行的个人数据处理。本协议在您使用我们的服务期间有效。"
       },
       "purpose": {
         "title": "3. 处理的性质和目的",
@@ -1265,7 +1265,7 @@
       },
       "obligations": {
         "title": "5. 处理者义务",
-        "intro": "Vysion Horeca将：",
+        "intro": "Vysion kassa's将：",
         "items": {
           "1": "仅按您的指示处理个人数据",
           "2": "采取适当的技术和组织措施",
@@ -1298,7 +1298,7 @@
     "sections": {
       "availability": {
         "title": "1. 可用性",
-        "content": "Vysion Horeca保证所有核心服务99.9%的正常运行时间。这不包括事先公布的计划维护。"
+        "content": "Vysion kassa's保证所有核心服务99.9%的正常运行时间。这不包括事先公布的计划维护。"
       },
       "maintenance": {
         "title": "2. 计划维护",
@@ -1337,7 +1337,7 @@
         "email": "邮箱：",
         "phone": "电话：",
         "inApp": "应用内支持：",
-        "inAppDesc": "在Vysion Horeca应用程序中可用"
+        "inAppDesc": "在Vysion kassa's应用程序中可用"
       },
       "hours": {
         "title": "5. 支持时间",
@@ -1362,7 +1362,7 @@
     "sections": {
       "intro": {
         "title": "简介",
-        "content": "本可接受使用政策描述了使用Vysion Horeca服务的规则。使用我们的服务即表示您同意本政策。"
+        "content": "本可接受使用政策描述了使用Vysion kassa's服务的规则。使用我们的服务即表示您同意本政策。"
       },
       "allowed": {
         "title": "允许的使用",
@@ -1405,7 +1405,7 @@
         "intro": "以下品牌名称和标志是Vysion Group International的财产：",
         "items": {
           "1": "Vysion™",
-          "2": "Vysion Horeca™",
+          "2": "Vysion kassa's™",
           "3": "Vysion Apps™",
           "4": "SCARDA™",
           "5": "Vysion标志及所有变体"
@@ -1416,7 +1416,7 @@
         "intro": "您可以使用我们的品牌：",
         "items": {
           "1": "在文本中引用我们的产品或服务",
-          "2": "表明您在业务中使用Vysion Horeca",
+          "2": "表明您在业务中使用Vysion kassa's",
           "3": "撰写关于我们服务的评论或文章"
         }
       },
@@ -1453,7 +1453,7 @@
     "sections": {
       "ownership": {
         "title": "1. Vysion的所有权",
-        "content": "与Vysion Horeca软件相关的所有知识产权，包括但不限于源代码、设计、标志、商标和文档，均为Vysion Group International的财产。"
+        "content": "与Vysion kassa's软件相关的所有知识产权，包括但不限于源代码、设计、标志、商标和文档，均为Vysion Group International的财产。"
       },
       "license": {
         "title": "2. 许可",
@@ -1489,11 +1489,11 @@
     "sections": {
       "intro": {
         "title": "1. 简介",
-        "content": "本协议描述了通过Vysion Horeca平台使用支付服务的条款。支付处理通过我们的合作伙伴Mollie和Stripe进行。"
+        "content": "本协议描述了通过Vysion kassa's平台使用支付服务的条款。支付处理通过我们的合作伙伴Mollie和Stripe进行。"
       },
       "processing": {
         "title": "2. 支付处理",
-        "content": "Vysion Horeca与认可的支付处理商集成，以确保安全交易。所有交易均经过加密并符合PCI-DSS标准。"
+        "content": "Vysion kassa's与认可的支付处理商集成，以确保安全交易。所有交易均经过加密并符合PCI-DSS标准。"
       },
       "methods": {
         "title": "3. 支持的支付方式",
@@ -1530,7 +1530,7 @@
   "subprocessorsPage": {
     "title": "次级处理者",
     "lastUpdated": "最后更新：2025年12月",
-    "intro": "Vysion Horeca使用以下次级处理者来提供我们的服务。所有次级处理者都经过精心挑选，符合GDPR要求。",
+    "intro": "Vysion kassa's使用以下次级处理者来提供我们的服务。所有次级处理者都经过精心挑选，符合GDPR要求。",
     "table": {
       "subprocessor": "次级处理者",
       "purpose": "目的",
@@ -1582,11 +1582,11 @@
     "sections": {
       "general": {
         "title": "1. 一般条款",
-        "content": "本服务协议（\"协议\"）适用于Vysion Horeca服务的使用，Vysion Horeca是Vysion Group International的一部分。使用我们的服务即表示您同意这些条款。"
+        "content": "本服务协议（\"协议\"）适用于Vysion kassa's服务的使用，Vysion kassa's是Vysion Group International的一部分。使用我们的服务即表示您同意这些条款。"
       },
       "services": {
         "title": "2. 服务",
-        "content": "Vysion Horeca为餐饮行业提供收银软件、在线订单平台、会计软件和相关服务。我们保留修改、扩展或限制我们服务的权利。"
+        "content": "Vysion kassa's为餐饮行业提供收银软件、在线订单平台、会计软件和相关服务。我们保留修改、扩展或限制我们服务的权利。"
       },
       "subscription": {
         "title": "3. 订阅和付款",
@@ -1607,7 +1607,7 @@
       },
       "liability": {
         "title": "6. 责任",
-        "content": "Vysion Horeca不对间接损害、后果性损害或利润损失负责。我们的总责任限于您过去12个月支付给我们的金额。"
+        "content": "Vysion kassa's不对间接损害、后果性损害或利润损失负责。我们的总责任限于您过去12个月支付给我们的金额。"
       },
       "termination": {
         "title": "7. 终止",
@@ -1997,7 +1997,7 @@
   "troubleshootingPage": {
     "backToLogin": "返回登录",
     "title": "故障排除与帮助",
-    "subtitle": "Vysion Horeca收银机常见问题和解决方案",
+    "subtitle": "Vysion kassa's收银机常见问题和解决方案",
     "quickActions": {
       "callSupport": "致电支持",
       "emailSupport": "邮件支持",
@@ -3221,7 +3221,7 @@
       "signatureEmployee": "员工签名",
       "signatureEmployer": "雇主签名",
       "nameAndDate": "姓名 + 日期",
-      "documentGenerated": "此文件由 Vysion Horeca 于以下时间生成",
+      "documentGenerated": "此文件由 Vysion kassa's 于以下时间生成",
       "at": "",
       "monthClosed": "月份已关闭于",
       "reopen": "重新打开",
@@ -3509,7 +3509,7 @@
     "floorPlanLocked": "🔓 解锁",
     "floorPlanEditing": "🔒 锁定",
     "floorPlanBarLabel": "吧台",
-    "defaultBusinessName": "Vysion Horeca",
+    "defaultBusinessName": "Vysion kassa's",
     "floorPlanNoTablesYet": "暂无桌台",
     "floorPlanAddTableButton": "+ 添加桌台",
     "floorPlanSidebarTitlePlant": "🌿 Plant",
@@ -3956,7 +3956,7 @@
     "helpDescription": "SCRADA提供广泛的文档和支持。",
     "documentation": "文档",
     "contactSupport": "联系支持",
-    "legalNote": "SCRADA是SCRADA bv的外部服务。Vysion Horeca作为高级套餐的一部分提供SCRADA访问权限。有关SCRADA功能的问题，请联系SCRADA支持。",
+    "legalNote": "SCRADA是SCRADA bv的外部服务。Vysion kassa's作为高级套餐的一部分提供SCRADA访问权限。有关SCRADA功能的问题，请联系SCRADA支持。",
     "important": "重要"
   },
   "websiteGiftCards": {
@@ -4899,13 +4899,13 @@
     "avgResponseTime": "平均响应时间",
     "satisfaction": "客户满意度",
     "ctaTitle": "还不是客户?",
-    "ctaDesc": "免费试用Vysion Horeca 14天，无需信用卡，立即开始。",
+    "ctaDesc": "免费试用Vysion kassa's 14天，无需信用卡，立即开始。",
     "ctaStart": "开始免费试用",
     "ctaBack": "返回首页",
     "faq1Q": "如何调整我的菜单?",
     "faq1A": "登录您的仪表板并进入产品。您可以添加、编辑或删除产品。更改立即在您的订购平台中可见。",
     "faq2Q": "支付终端集成如何工作?",
-    "faq2A": "Vysion Horeca通过Mollie和Stripe支持Bancontact、Visa、Mastercard。进入设置然后付款以连接您的支付提供商。",
+    "faq2A": "Vysion kassa's通过Mollie和Stripe支持Bancontact、Visa、Mastercard。进入设置然后付款以连接您的支付提供商。",
     "faq3Q": "我可以更改营业时间吗?",
     "faq3A": "是的，进入设置然后营业时间。您可以为每天设置不同的时间，也可以添加假期或休息日。",
     "faq4Q": "如何添加新员工?",
@@ -4924,7 +4924,7 @@
   "resellersPage": {
     "badge": "合作伙伴计划",
     "heroTitle": "成为Vysion经销商",
-    "heroDesc": "在您的国家或地区销售Vysion Horeca。为您带来的每位客户赚取佣金。我们提供软件，您提供客户。",
+    "heroDesc": "在您的国家或地区销售Vysion kassa's。为您带来的每位客户赚取佣金。我们提供软件，您提供客户。",
     "benefitsTitle": "为什么成为Vysion经销商?",
     "benefit1Title": "赚取高达30%的佣金",
     "benefit1Desc": "每月为每位活跃客户获得佣金。不断增长的被动收入。",
@@ -4995,7 +4995,7 @@
     "ctaTitle": "准备好开始了吗?",
     "ctaDesc": "今天就成为Vysion经销商，开始赚钱。",
     "ctaButton": "成为经销商",
-    "footerCopyright": "2026 Vysion Horeca. 版权所有。"
+    "footerCopyright": "2026 Vysion kassa's. 版权所有。"
   },
   "shopOffline": {
     "title": "在线状态",
@@ -5102,7 +5102,7 @@
     "kassasysteem": {
       "title": "收银系统",
       "teaser": "适合各行业与各预算的收银系统，含条码扫描等。",
-      "body": "收银是门店核心：快速销售、准确小票，与点餐与后厨实时联动。\n\n使用 Vysion Horeca，在同一处管理商品、桌台、付款与员工——高峰少出错，日结一目了然。",
+      "body": "收银是门店核心：快速销售、准确小票，与点餐与后厨实时联动。\n\n使用 Vysion kassa's，在同一处管理商品、桌台、付款与员工——高峰少出错，日结一目了然。",
       "heroAlt": "在咖啡馆或餐厅柜台使用触屏收银与收款终端的手部特写",
       "horecaSectorTitle": "餐饮收银",
       "horecaImageAlt": "餐厅餐桌上现代化的多合一收银机",
@@ -5203,7 +5203,7 @@
     "eigenWebsite": {
       "title": "自有网站",
       "teaser": "您的域名与品牌——内置点餐。",
-      "body": "不是千篇一律着陆页：您的标志、色彩与照片，顾客一眼认出。\n\n网站与菜单与 Vysion Horeca 其他模块同一后台管理。"
+      "body": "不是千篇一律着陆页：您的标志、色彩与照片，顾客一眼认出。\n\n网站与菜单与 Vysion kassa's 其他模块同一后台管理。"
     },
     "whatsappBestellingen": {
       "title": "WhatsApp 点餐",

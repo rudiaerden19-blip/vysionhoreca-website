@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Prijzen & abonnementen',
   description:
-    'Prijzen Vysion Horeca: horeca kassa (POS), online bestelplatform en kassahardware in transparante abonnementen. Starter en Pro, maandelijks of jaarlijks — 14 dagen gratis proberen.',
+    "Prijzen Vysion kassa's: horeca kassa (POS), online bestelplatform en kassahardware in transparante abonnementen. Starter en Pro, maandelijks of jaarlijks — 14 dagen gratis proberen.",
   keywords: [
     'vysion horeca prijzen',
     'kassa abonnement',
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     'België horeca POS',
   ],
   openGraph: {
-    title: 'Prijzen | Vysion Horeca',
+    title: "Prijzen | Vysion kassa's",
     description:
       'Abonnementen voor kassa, bestelplatform en hardware — duidelijke prijzen, gratis proefperiode.',
     url: '/prijzen',

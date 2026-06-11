@@ -427,7 +427,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       <div class="row total-row" style="font-size:18px;margin-top:16px;"><span>GRAND TOTAL:</span><span>€${((report.manual_total || 0) + (report.total || 0)).toFixed(2)}</span></div>
       <div class="footer">
         <p>Gegenereerd: ${new Date().toLocaleString('nl-BE')}</p>
-        <p>Vysion Horeca - ordervysion.com</p>
+        <p>Vysion kassa's - ordervysion.com</p>
       </div></body></html>`
     const w = window.open('', '_blank')
     if (w) { w.document.write(html); w.document.close(); setTimeout(() => w.print(), 250) }
@@ -570,7 +570,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           <p>Gegenereerd: ${new Date().toLocaleString('nl-BE')}</p>
           ${currentSavedReport?.closed_at ? `<p>Afgesloten: ${new Date(currentSavedReport.closed_at).toLocaleString('nl-BE')}</p>` : ''}
           <p>Hash: ${currentSavedReport?.report_hash?.substring(0, 16) || 'n.v.t.'}...</p>
-          <p>Vysion Horeca - ordervysion.com</p>
+          <p>Vysion kassa's - ordervysion.com</p>
         </div>
       </body>
       </html>
@@ -910,7 +910,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
 
                 <div className="text-center text-gray-500 text-sm pt-4">
                   <p>{t('zReport.generatedOn')} {new Date().toLocaleString('nl-BE')}</p>
-                  <p className="mt-1">Vysion Horeca - ordervysion.com</p>
+                  <p className="mt-1">Vysion kassa's - ordervysion.com</p>
                 </div>
 
               </div>

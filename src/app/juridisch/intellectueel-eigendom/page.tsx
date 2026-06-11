@@ -52,7 +52,7 @@ export default function IntellectueelEigendomPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">{trans('sections.contact.title')}</h2>
           <p className="text-gray-600 mb-8">
             {trans('sections.contact.content')}{' '}
-            <a href="mailto:info@vysionhoreca.com" className="text-accent hover:underline">info@vysionhoreca.com</a>
+            <a href="mailto:info@vysionkassa.com" className="text-accent hover:underline">info@vysionkassa.com</a>
           </p>
 
           <div className="mt-12 pt-8 border-t border-gray-200 flex gap-4">

@@ -67,7 +67,7 @@ export default function SLAPage() {
 
           <h2 className="text-2xl font-bold text-gray-900 mb-4">{trans('sections.channels.title')}</h2>
           <ul className="list-disc pl-6 text-gray-600 mb-8 space-y-2">
-            <li><strong>{trans('sections.channels.email')}</strong> info@vysionhoreca.com</li>
+            <li><strong>{trans('sections.channels.email')}</strong> info@vysionkassa.com</li>
             <li><strong>{trans('sections.channels.phone')}</strong> +32 (0) 49 21 29 9383</li>
             <li><strong>{trans('sections.channels.inApp')}</strong> {trans('sections.channels.inAppDesc')}</li>
           </ul>

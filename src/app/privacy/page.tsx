@@ -91,7 +91,7 @@ export default function PrivacyPage() {
             {trans('sections.contact.intro')}
           </p>
           <p className="text-gray-600 mb-8">
-            <strong>Email:</strong> <a href="mailto:info@vysionhoreca.com" className="text-accent hover:underline">info@vysionhoreca.com</a><br />
+            <strong>Email:</strong> <a href="mailto:info@vysionkassa.com" className="text-accent hover:underline">info@vysionkassa.com</a><br />
             <strong>Telefoon:</strong> +32 (0) 49 21 29 9383
           </p>
 

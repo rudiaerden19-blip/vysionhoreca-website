@@ -95,8 +95,8 @@ export default function SupportPage() {
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">{t('supportPage.emailTitle')}</h3>
               <p className="text-gray-600 mb-4">{t('supportPage.emailDesc')}</p>
-              <a href="mailto:info@vysionhoreca.com" className="text-2xl font-bold text-accent hover:underline break-all">
-                info@vysionhoreca.com
+              <a href="mailto:info@vysionkassa.com" className="text-2xl font-bold text-accent hover:underline break-all">
+                info@vysionkassa.com
               </a>
               <p className="text-sm text-gray-500 mt-2">{t('supportPage.emailNote')}</p>
             </div>

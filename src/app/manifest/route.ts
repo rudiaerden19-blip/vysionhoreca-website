@@ -3,7 +3,7 @@ import { getTenantSettings } from '@/lib/admin-api'
 import { TENANT_APP_SHELL_THEME_COLOR } from '@/lib/theme-color'
 import { tenantSlugFromOrdervysionHost } from '@/lib/tenant-slug-from-host'
 
-const DEFAULT_NAME = 'Vysion Horeca'
+const DEFAULT_NAME = "Vysion kassa's"
 const DEFAULT_SHORT = 'Vysion'
 
 /** Zaak heeft nog geen *.ordervysion subdomein → ze werken via www.vysionhoreca.com/shop/{slug}; PWA op hoofddomein moet nog steeds naar /login. */

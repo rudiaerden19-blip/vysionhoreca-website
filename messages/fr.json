@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "title": "Vysion Horeca | Caisse & Plateforme de Paiement Tout-en-Un",
+    "title": "Vysion kassa's | Caisse & Plateforme de Paiement Tout-en-Un",
     "description": "Le système de caisse complet pour l'hôtellerie. Caisse, commandes en ligne, facturation, gestion du personnel et plus - tout en une plateforme. Essayez 14 jours gratuits."
   },
   "nav": {
@@ -235,9 +235,9 @@
   },
   "liveDemo": {
     "title": "Vous voulez voir la plateforme en action ?",
-    "subtitle": "Découvrez une vraie friterie fonctionnant avec Vysion Horeca",
+    "subtitle": "Découvrez une vraie friterie fonctionnant avec Vysion kassa's",
     "clientsLead": "Ces clients vous ont précédé",
-    "marquee": "Horeca · Friterie · Restaurant · Café · Boucherie · Boulangerie · Traiteur · Brasserie · Sandwicherie · Bar à vins · Hôtel · Vysion Horeca · ",
+    "marquee": "Horeca · Friterie · Restaurant · Café · Boucherie · Boulangerie · Traiteur · Brasserie · Sandwicherie · Bar à vins · Hôtel · Vysion kassa's · ",
     "successStories": {
       "vivaldi": {
         "name": "VIVALDI 2.0 Food & Drinks",
@@ -307,9 +307,9 @@
   },
   "comparison": {
     "title": "Comparez avec d'autres plateformes",
-    "subtitle": "Plus de fonctionnalités, prix plus bas. Découvrez pourquoi Vysion Horeca est le meilleur choix.",
+    "subtitle": "Plus de fonctionnalités, prix plus bas. Découvrez pourquoi Vysion kassa's est le meilleur choix.",
     "feature": "Fonctionnalité",
-    "cta": "Commencez avec Vysion Horeca aujourd'hui",
+    "cta": "Commencez avec Vysion kassa's aujourd'hui",
     "features": {
       "kassaLicensePro": "Licence caisse Pro",
       "online": "Plateforme de commande en ligne",
@@ -554,13 +554,13 @@
   },
   "cta": {
     "title": "Prêt à grandir?",
-    "subtitle": "Commencez avec Vysion Horeca aujourd'hui. 14 jours gratuits, sans engagement.",
+    "subtitle": "Commencez avec Vysion kassa's aujourd'hui. 14 jours gratuits, sans engagement.",
     "primary": "Démarrer l'essai gratuit",
     "secondary": "Demander des infos"
   },
   "contact": {
     "title": "Contactez-nous",
-    "subtitle": "Questions sur Vysion Horeca? Notre équipe est prête à vous aider.",
+    "subtitle": "Questions sur Vysion kassa's? Notre équipe est prête à vous aider.",
     "email": "Email",
     "phone": "Téléphone",
     "address": "Adresse",
@@ -744,7 +744,7 @@
     "heroSubtitle": "Construit depuis le terrain. Pas depuis un bureau.",
     "story": {
       "title": "Notre histoire",
-      "p1": "Vysion Horeca est né d'une vraie expérience. En tant que restaurateurs, nous avons rencontré le même problème que vous: trop de systèmes, trop de coûts et trop peu de visibilité.",
+      "p1": "Vysion kassa's est né d'une vraie expérience. En tant que restaurateurs, nous avons rencontré le même problème que vous: trop de systèmes, trop de coûts et trop peu de visibilité.",
       "p2": "Nous payions chaque mois pour des outils séparés: une plateforme de commande, comptabilité, paiements et analyses — tout séparé, rien qui fonctionnait vraiment ensemble. Les coûts s'accumulaient. Les tracas aussi.",
       "p3": "Alors nous avons décidé de faire autrement. Nous avons construit une plateforme intelligente, avec la plateforme de commande au cœur, et tout ce dont vous avez besoin simplement inclus. Pas de fonctionnalités superflues. Pas d'abonnements séparés. Juste un système honnête qui fonctionne pour les restaurateurs."
     },
@@ -793,8 +793,8 @@
     },
     "company": {
       "title": "Vysion Group International",
-      "p1": "Vysion Horeca fait partie de Vysion Group International, une entreprise technologique spécialisée dans les logiciels pour le secteur de la restauration et du commerce de détail.",
-      "p2": "En plus de Vysion Horeca, nous développons également des applications personnalisées et des solutions numériques pour les entreprises qui souhaitent automatiser leurs processus.",
+      "p1": "Vysion kassa's fait partie de Vysion Group International, une entreprise technologique spécialisée dans les logiciels pour le secteur de la restauration et du commerce de détail.",
+      "p2": "En plus de Vysion kassa's, nous développons également des applications personnalisées et des solutions numériques pour les entreprises qui souhaitent automatiser leurs processus.",
       "happyBusinesses": "Établissements satisfaits",
       "processedMonthly": "Traité par mois",
       "supportAvailable": "Support disponible",
@@ -802,7 +802,7 @@
       "statVolume": "250 000 €"
     },
     "ctaTitle": "Prêt à commencer?",
-    "ctaSubtitle": "Essayez Vysion Horeca 14 jours gratuits. Aucune carte de crédit requise.",
+    "ctaSubtitle": "Essayez Vysion kassa's 14 jours gratuits. Aucune carte de crédit requise.",
     "ctaPrimary": "Démarrer l'essai gratuit",
     "ctaSecondary": "Contactez-nous"
   },
@@ -1004,7 +1004,7 @@
   },
   "legal": {
     "title": "Juridique",
-    "subtitle": "Tous les documents juridiques et conditions de Vysion Horeca",
+    "subtitle": "Tous les documents juridiques et conditions de Vysion kassa's",
     "backToLegal": "Retour à l'aperçu juridique",
     "pages": {
       "cookies": {
@@ -1497,7 +1497,7 @@
   "troubleshootingPage": {
     "backToLogin": "Retour à la connexion",
     "title": "Dépannage & Aide",
-    "subtitle": "Problèmes courants et solutions pour votre caisse Vysion Horeca",
+    "subtitle": "Problèmes courants et solutions pour votre caisse Vysion kassa's",
     "quickActions": {
       "callSupport": "Appeler le support",
       "emailSupport": "Support par email",
@@ -2721,7 +2721,7 @@
       "signatureEmployee": "Signature employé",
       "signatureEmployer": "Signature employeur",
       "nameAndDate": "Nom + date",
-      "documentGenerated": "Ce document a été généré par Vysion Horeca le",
+      "documentGenerated": "Ce document a été généré par Vysion kassa's le",
       "at": "à",
       "monthClosed": "Mois clôturé le",
       "reopen": "Rouvrir",
@@ -3009,7 +3009,7 @@
     "floorPlanLocked": "🔓 Déverrouiller",
     "floorPlanEditing": "🔒 Verrouiller",
     "floorPlanBarLabel": "BAR",
-    "defaultBusinessName": "Vysion Horeca",
+    "defaultBusinessName": "Vysion kassa's",
     "floorPlanNoTablesYet": "Pas encore de tables",
     "floorPlanAddTableButton": "+ Ajouter une table",
     "floorPlanSidebarTitlePlant": "🌿 Plante",
@@ -3456,7 +3456,7 @@
     "helpDescription": "SCRADA dispose d'une documentation et d'un support étendus.",
     "documentation": "Documentation",
     "contactSupport": "Contacter le support",
-    "legalNote": "SCRADA est un service externe de SCRADA bv. Vysion Horeca fournit l'accès à SCRADA dans le cadre du forfait Premium. Pour les questions sur les fonctionnalités SCRADA, contactez le support SCRADA.",
+    "legalNote": "SCRADA est un service externe de SCRADA bv. Vysion kassa's fournit l'accès à SCRADA dans le cadre du forfait Premium. Pour les questions sur les fonctionnalités SCRADA, contactez le support SCRADA.",
     "important": "Important"
   },
   "websiteGiftCards": {
@@ -3982,7 +3982,7 @@
     "sections": {
       "intro": {
         "title": "1. Introduction",
-        "content": "Vysion Horeca, membre de Vysion Group International, attache une grande importance à la protection de vos données personnelles. Cette politique explique quelles données nous collectons, pourquoi et comment nous les utilisons."
+        "content": "Vysion kassa's, membre de Vysion Group International, attache une grande importance à la protection de vos données personnelles. Cette politique explique quelles données nous collectons, pourquoi et comment nous les utilisons."
       },
       "whatData": {
         "title": "2. Quelles données collectons-nous ?",
@@ -4020,7 +4020,7 @@
       },
       "gks": {
         "title": "5. GKS et conformité fiscale",
-        "content": "Vysion Horeca est entièrement certifié GKS et respecte les exigences fiscales belges. Les données de transaction sont conservées en sécurité selon les délais légaux."
+        "content": "Vysion kassa's est entièrement certifié GKS et respecte les exigences fiscales belges. Les données de transaction sont conservées en sécurité selon les délais légaux."
       },
       "sharing": {
         "title": "6. Partage des données",
@@ -4059,15 +4059,15 @@
         "title": "1. Definities",
         "content": "In deze verwerkersovereenkomst wordt verstaan onder:",
         "controller": "Verwerkingsverantwoordelijke:",
-        "controllerDef": "de klant die gebruik maakt van Vysion Horeca diensten",
+        "controllerDef": "de klant die gebruik maakt van Vysion kassa's diensten",
         "processor": "Verwerker:",
-        "processorDef": "Vysion Horeca / Vysion Group International",
+        "processorDef": "Vysion kassa's / Vysion Group International",
         "personalData": "Persoonsgegevens:",
         "personalDataDef": "alle gegevens die betrekking hebben op een geïdentificeerde of identificeerbare natuurlijke persoon"
       },
       "subject": {
         "title": "2. Onderwerp en Duur",
-        "content": "Deze overeenkomst regelt de verwerking van persoonsgegevens door Vysion Horeca namens u. De overeenkomst is van kracht zolang u gebruik maakt van onze diensten."
+        "content": "Deze overeenkomst regelt de verwerking van persoonsgegevens door Vysion kassa's namens u. De overeenkomst is van kracht zolang u gebruik maakt van onze diensten."
       },
       "purpose": {
         "title": "3. Aard en Doel van de Verwerking",
@@ -4090,7 +4090,7 @@
       },
       "obligations": {
         "title": "5. Verplichtingen Verwerker",
-        "intro": "Vysion Horeca zal:",
+        "intro": "Vysion kassa's zal:",
         "items": {
           "1": "Persoonsgegevens alleen verwerken volgens uw instructies",
           "2": "Passende technische en organisatorische maatregelen nemen",
@@ -4123,7 +4123,7 @@
     "sections": {
       "availability": {
         "title": "1. Beschikbaarheid",
-        "content": "Vysion Horeca garandeert een uptime van 99,9% voor alle kernservices. Dit is exclusief gepland onderhoud, dat vooraf wordt aangekondigd."
+        "content": "Vysion kassa's garandeert een uptime van 99,9% voor alle kernservices. Dit is exclusief gepland onderhoud, dat vooraf wordt aangekondigd."
       },
       "maintenance": {
         "title": "2. Gepland Onderhoud",
@@ -4162,7 +4162,7 @@
         "email": "Email:",
         "phone": "Telefoon:",
         "inApp": "In-app support:",
-        "inAppDesc": "Beschikbaar in de Vysion Horeca applicatie"
+        "inAppDesc": "Beschikbaar in de Vysion kassa's applicatie"
       },
       "hours": {
         "title": "5. Support Uren",
@@ -4187,7 +4187,7 @@
     "sections": {
       "intro": {
         "title": "Inleiding",
-        "content": "Dit Beleid voor Aanvaardbaar Gebruik beschrijft de regels voor het gebruik van de diensten van Vysion Horeca. Door onze diensten te gebruiken, gaat u akkoord met dit beleid."
+        "content": "Dit Beleid voor Aanvaardbaar Gebruik beschrijft de regels voor het gebruik van de diensten van Vysion kassa's. Door onze diensten te gebruiken, gaat u akkoord met dit beleid."
       },
       "allowed": {
         "title": "Toegestaan Gebruik",
@@ -4230,7 +4230,7 @@
         "intro": "De volgende merknamen en logo's zijn eigendom van Vysion Group International:",
         "items": {
           "1": "Vysion™",
-          "2": "Vysion Horeca™",
+          "2": "Vysion kassa's™",
           "3": "Vysion Apps™",
           "4": "SCARDA™",
           "5": "Het Vysion logo en alle varianten"
@@ -4241,7 +4241,7 @@
         "intro": "U mag onze merknamen gebruiken om:",
         "items": {
           "1": "Naar onze producten of diensten te verwijzen in tekst",
-          "2": "Aan te geven dat u Vysion Horeca gebruikt in uw zaak",
+          "2": "Aan te geven dat u Vysion kassa's gebruikt in uw zaak",
           "3": "Reviews of artikelen over onze diensten te schrijven"
         }
       },
@@ -4278,7 +4278,7 @@
     "sections": {
       "ownership": {
         "title": "1. Eigendom van Vysion",
-        "content": "Alle intellectuele eigendomsrechten met betrekking tot de Vysion Horeca software, inclusief maar niet beperkt tot de broncode, ontwerpen, logo's, merknamen en documentatie, zijn en blijven eigendom van Vysion Group International."
+        "content": "Alle intellectuele eigendomsrechten met betrekking tot de Vysion kassa's software, inclusief maar niet beperkt tot de broncode, ontwerpen, logo's, merknamen en documentatie, zijn en blijven eigendom van Vysion Group International."
       },
       "license": {
         "title": "2. Licentie",
@@ -4314,11 +4314,11 @@
     "sections": {
       "intro": {
         "title": "1. Inleiding",
-        "content": "Deze overeenkomst beschrijft de voorwaarden voor het gebruik van betalingsdiensten via het Vysion Horeca platform. Betalingsverwerking gebeurt via onze partners Mollie en Stripe."
+        "content": "Deze overeenkomst beschrijft de voorwaarden voor het gebruik van betalingsdiensten via het Vysion kassa's platform. Betalingsverwerking gebeurt via onze partners Mollie en Stripe."
       },
       "processing": {
         "title": "2. Betalingsverwerking",
-        "content": "Vysion Horeca integreert met erkende betalingsverwerkers om veilige transacties te garanderen. Alle transacties worden versleuteld en voldoen aan PCI-DSS standaarden."
+        "content": "Vysion kassa's integreert met erkende betalingsverwerkers om veilige transacties te garanderen. Alle transacties worden versleuteld en voldoen aan PCI-DSS standaarden."
       },
       "methods": {
         "title": "3. Modes de paiement pris en charge",
@@ -4355,7 +4355,7 @@
   "subprocessorsPage": {
     "title": "Subverwerkers",
     "lastUpdated": "Laatst bijgewerkt: december 2025",
-    "intro": "Vysion Horeca maakt gebruik van de volgende subverwerkers voor het leveren van onze diensten. Alle subverwerkers zijn zorgvuldig geselecteerd en voldoen aan de AVG/GDPR vereisten.",
+    "intro": "Vysion kassa's maakt gebruik van de volgende subverwerkers voor het leveren van onze diensten. Alle subverwerkers zijn zorgvuldig geselecteerd en voldoen aan de AVG/GDPR vereisten.",
     "table": {
       "subprocessor": "Subverwerker",
       "purpose": "Doel",
@@ -4407,11 +4407,11 @@
     "sections": {
       "general": {
         "title": "1. Algemeen",
-        "content": "Deze Dienstenovereenkomst (\"Overeenkomst\") is van toepassing op het gebruik van de diensten van Vysion Horeca, onderdeel van Vysion Group International. Door gebruik te maken van onze diensten gaat u akkoord met deze voorwaarden."
+        "content": "Deze Dienstenovereenkomst (\"Overeenkomst\") is van toepassing op het gebruik van de diensten van Vysion kassa's, onderdeel van Vysion Group International. Door gebruik te maken van onze diensten gaat u akkoord met deze voorwaarden."
       },
       "services": {
         "title": "2. Diensten",
-        "content": "Vysion Horeca biedt kassasoftware, online bestelplatform, boekhoudsoftware en aanverwante diensten voor de horecasector. Wij behouden ons het recht voor om onze diensten te wijzigen, uit te breiden of te beperken."
+        "content": "Vysion kassa's biedt kassasoftware, online bestelplatform, boekhoudsoftware en aanverwante diensten voor de horecasector. Wij behouden ons het recht voor om onze diensten te wijzigen, uit te breiden of te beperken."
       },
       "subscription": {
         "title": "3. Abonnement en Betaling",
@@ -4432,7 +4432,7 @@
       },
       "liability": {
         "title": "6. Aansprakelijkheid",
-        "content": "Vysion Horeca is niet aansprakelijk voor indirecte schade, gevolgschade of gederfde winst. Onze totale aansprakelijkheid is beperkt tot het bedrag dat u in de afgelopen 12 maanden aan ons heeft betaald."
+        "content": "Vysion kassa's is niet aansprakelijk voor indirecte schade, gevolgschade of gederfde winst. Onze totale aansprakelijkheid is beperkt tot het bedrag dat u in de afgelopen 12 maanden aan ons heeft betaald."
       },
       "termination": {
         "title": "7. Beëindiging",
@@ -4922,13 +4922,13 @@
     "avgResponseTime": "Temps de reponse moyen",
     "satisfaction": "Satisfaction client",
     "ctaTitle": "Pas encore client?",
-    "ctaDesc": "Essayez Vysion Horeca gratuitement pendant 14 jours. Pas de carte de credit necessaire, demarrez immediatement.",
+    "ctaDesc": "Essayez Vysion kassa's gratuitement pendant 14 jours. Pas de carte de credit necessaire, demarrez immediatement.",
     "ctaStart": "Commencer l essai gratuit",
     "ctaBack": "Retour a l accueil",
     "faq1Q": "Comment puis-je modifier mon menu?",
     "faq1A": "Connectez-vous a votre tableau de bord et allez dans Produits. Vous pouvez ajouter, modifier ou supprimer des produits. Les changements sont immediatement visibles dans votre plateforme de commande.",
     "faq2Q": "Comment fonctionne l integration du terminal de paiement?",
-    "faq2A": "Vysion Horeca prend en charge Bancontact, Visa, Mastercard via Mollie et Stripe. Allez dans Parametres > Paiements pour connecter votre prestataire de paiement.",
+    "faq2A": "Vysion kassa's prend en charge Bancontact, Visa, Mastercard via Mollie et Stripe. Allez dans Parametres > Paiements pour connecter votre prestataire de paiement.",
     "faq3Q": "Puis-je modifier mes heures d ouverture?",
     "faq3A": "Oui, allez dans Parametres > Heures d ouverture. Vous pouvez definir des horaires differents par jour et ajouter des jours de vacances ou de fermeture.",
     "faq4Q": "Comment ajouter un nouvel employe?",
@@ -4947,7 +4947,7 @@
   "resellersPage": {
     "badge": "Programme Partenaire",
     "heroTitle": "Devenez Revendeur Vysion",
-    "heroDesc": "Vendez Vysion Horeca dans votre pays ou region. Gagnez une commission sur chaque client que vous apportez. Nous fournissons le logiciel, vous fournissez les clients.",
+    "heroDesc": "Vendez Vysion kassa's dans votre pays ou region. Gagnez une commission sur chaque client que vous apportez. Nous fournissons le logiciel, vous fournissez les clients.",
     "benefitsTitle": "Pourquoi devenir Revendeur Vysion?",
     "benefit1Title": "Gagnez jusqu a 30% de commission",
     "benefit1Desc": "Recevez une commission mensuelle sur chaque client actif. Des revenus passifs qui croissent.",
@@ -5018,7 +5018,7 @@
     "ctaTitle": "Pret a commencer?",
     "ctaDesc": "Devenez Revendeur Vysion aujourd hui et commencez a gagner.",
     "ctaButton": "Devenir Revendeur",
-    "footerCopyright": "2026 Vysion Horeca. Tous droits reserves."
+    "footerCopyright": "2026 Vysion kassa's. Tous droits reserves."
   },
   "shopOffline": {
     "title": "Statut en ligne",
@@ -5125,7 +5125,7 @@
     "kassasysteem": {
       "title": "Système de caisse",
       "teaser": "Une caisse pour chaque secteur et chaque budget, scanner code-barres, etc.",
-      "body": "Votre caisse est au cœur de l’établissement : ventes rapides, tickets corrects et lien temps réel avec votre flux de commandes et la cuisine.\n\nAvec Vysion Horeca vous gérez produits, tables, paiements et personnel depuis un seul endroit — moins d’erreurs aux heures de pointe et une clôture de journée claire.",
+      "body": "Votre caisse est au cœur de l’établissement : ventes rapides, tickets corrects et lien temps réel avec votre flux de commandes et la cuisine.\n\nAvec Vysion kassa's vous gérez produits, tables, paiements et personnel depuis un seul endroit — moins d’erreurs aux heures de pointe et une clôture de journée claire.",
       "heroAlt": "Main sur une caisse tactile avec terminal de paiement au comptoir d’un café ou restaurant",
       "horecaSectorTitle": "Caisse pour la restauration",
       "horecaImageAlt": "Caisse tout-en-un moderne sur une table dans un restaurant",
@@ -5226,7 +5226,7 @@
     "eigenWebsite": {
       "title": "Votre propre site",
       "teaser": "Votre domaine et votre marque — avec commande intégrée.",
-      "body": "Pas une landing générique : votre logo, couleurs et photos. Vos clients reconnaissent tout de suite votre établissement.\n\nSite et menu depuis le même admin que le reste de Vysion Horeca."
+      "body": "Pas une landing générique : votre logo, couleurs et photos. Vos clients reconnaissent tout de suite votre établissement.\n\nSite et menu depuis le même admin que le reste de Vysion kassa's."
     },
     "whatsappBestellingen": {
       "title": "Commandes WhatsApp",

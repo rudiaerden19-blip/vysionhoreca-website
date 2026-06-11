@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'nl_BE',
     url: siteUrl,
-    siteName: 'Vysion Horeca',
+    siteName: "Vysion kassa's",
     images: [{ url: '/images/online-order-platform-1.png' }],
   },
   twitter: {

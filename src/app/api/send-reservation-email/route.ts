@@ -219,7 +219,7 @@ export async function POST(request: NextRequest) {
             Dit is een automatische bevestiging van uw reservatie.
           </p>
           <p style="color: #999; font-size: 11px; margin: 10px 0 0;">
-            Powered by <a href="https://www.vysionhoreca.com" style="color: #f97316; text-decoration: none;">Vysion Horeca</a>
+            Powered by <a href="https://www.vysionhoreca.com" style="color: #f97316; text-decoration: none;">Vysion kassa's</a>
           </p>
         </div>
       </div>

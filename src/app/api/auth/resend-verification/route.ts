@@ -102,9 +102,9 @@ async function sendVerificationEmail(email: string, name: string, token: string)
   })
 
   const mailOptions = {
-    from: `"Vysion Horeca" <${process.env.ZOHO_EMAIL}>`,
+    from: `"Vysion kassa's" <${process.env.ZOHO_EMAIL}>`,
     to: email,
-    subject: 'Bevestig je emailadres - Vysion Horeca',
+    subject: "Bevestig je emailadres - Vysion kassa's",
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="text-align: center; margin-bottom: 30px;">
@@ -114,7 +114,7 @@ async function sendVerificationEmail(email: string, name: string, token: string)
         <h2 style="color: #333;">Welkom ${name}!</h2>
         
         <p style="color: #555; line-height: 1.6;">
-          Bedankt voor je registratie bij Vysion Horeca. 
+          Bedankt voor je registratie bij Vysion kassa's. 
           Klik op de onderstaande knop om je emailadres te bevestigen:
         </p>
         
@@ -146,7 +146,7 @@ async function sendVerificationEmail(email: string, name: string, token: string)
     text: `
 Welkom ${name}!
 
-Bedankt voor je registratie bij Vysion Horeca.
+Bedankt voor je registratie bij Vysion kassa's.
 
 Klik op deze link om je emailadres te bevestigen:
 ${verifyUrl}

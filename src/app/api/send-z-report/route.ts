@@ -188,7 +188,7 @@ export async function POST(request: NextRequest) {
           <div class="footer">
             <p>Dit is een automatisch gegenereerd Z-Rapport</p>
             <p>Gegenereerd op: ${new Date().toLocaleString('nl-NL')}</p>
-            <p style="margin-top: 10px;">Powered by <strong>Vysion Horeca</strong></p>
+            <p style="margin-top: 10px;">Powered by <strong>Vysion kassa's</strong></p>
           </div>
         </div>
       </body>
@@ -196,7 +196,7 @@ export async function POST(request: NextRequest) {
     `
 
     await transporter.sendMail({
-      from: `"${businessName || 'Vysion Horeca'}" <${process.env.ZOHO_EMAIL}>`,
+      from: `"${businessName || "Vysion kassa's"}" <${process.env.ZOHO_EMAIL}>`,
       to: to,
       subject: subject || `Z-Rapport - ${businessName}`,
       html: htmlContent,

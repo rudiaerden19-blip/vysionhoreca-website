@@ -28,7 +28,7 @@ function parsePrice(value: unknown): number | null {
 
 async function lookupOpenFoodFacts(code: string): Promise<{ name: string; price: number | null } | null> {
   const res = await fetch(`${OFF_API}/${code}.json`, {
-    headers: { 'User-Agent': 'VysionHoreca-RetailKassa/1.0 (contact: info@vysionhoreca.be)' },
+    headers: { 'User-Agent': 'VysionHoreca-RetailKassa/1.0 (contact: info@vysionkassa.com)' },
     signal: AbortSignal.timeout(8000),
     next: { revalidate: 3600 },
   })

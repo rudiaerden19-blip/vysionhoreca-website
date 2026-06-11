@@ -145,7 +145,7 @@ export function buildOmzetReportEmailHtml(p: OmzetReportEmailBodyInput): string 
                 </tr>
               </table>
 
-              <p style="margin:32px 0 0 0;font-size:11px;color:#9ca3af;">Gegenereerd op ${esc(p.generatedAtNl)} — Vysion Horeca POS</p>
+              <p style="margin:32px 0 0 0;font-size:11px;color:#9ca3af;">Gegenereerd op ${esc(p.generatedAtNl)} — Vysion kassa's POS</p>
             </td>
           </tr>
         </table>

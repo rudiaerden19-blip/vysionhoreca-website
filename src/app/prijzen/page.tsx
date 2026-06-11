@@ -205,7 +205,7 @@ export default function PrijzenPage() {
               {t('pricing.cta.primary')}
             </a>
             <a
-              href="mailto:info@vysionhoreca.com"
+              href="mailto:info@vysionkassa.com"
               className="inline-block border-2 border-gray-900 text-gray-900 px-8 py-4 rounded-full font-semibold hover:bg-gray-900 hover:text-white transition-colors"
             >
               {t('pricing.cta.secondary')}
