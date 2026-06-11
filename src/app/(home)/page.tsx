@@ -93,6 +93,11 @@ function WhyVysionSection() {
                   <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
                     {t(`whyVysion.${key}.body`)}
                   </p>
+                  {key === 'fullPlatform' ? (
+                    <p className="mt-3 text-sm sm:text-base text-gray-600 leading-relaxed">
+                      {t('whyVysion.fullPlatform.bodyExtra')}
+                    </p>
+                  ) : null}
                 </div>
               </li>
             ))}
