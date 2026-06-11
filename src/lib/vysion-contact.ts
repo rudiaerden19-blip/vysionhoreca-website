@@ -1,11 +1,15 @@
-/** Officieel support- en contactadres Vysion kassa's (Zoho / website). */
-export const VYSION_INFO_EMAIL = 'info@vysion-kassa.com' as const
+/**
+ * Publiek contact + SMTP-fallback.
+ * Blijf Zoho/Vercel op info@vysionhoreca.com tot de mailbox @vysion-kassa.com live is —
+ * anders falen contactformulier, registratie-mail en klant-e-mail (535).
+ */
+export const VYSION_INFO_EMAIL = 'info@vysionhoreca.com' as const
 
 export function vysionInfoMailto(): string {
   return `mailto:${VYSION_INFO_EMAIL}`
 }
 
-/** SMTP-login (Vercel: ZOHO_EMAIL of legacy ZOHO_MAIL). */
+/** SMTP-login (Vercel: ZOHO_EMAIL of legacy ZOHO_MAIL). Moet overeenkomen met actieve Zoho-mailbox. */
 export function resolveZohoEmail(): string {
   return (
     process.env.ZOHO_EMAIL ||
