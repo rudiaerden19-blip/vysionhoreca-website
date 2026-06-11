@@ -3435,7 +3435,7 @@
     "parkTableKassaBon": "Ticket de caja intermedio",
     "checkout": "Cobrar",
     "switchTableTitle": "¿Cambiar de mesa?",
-    "switchTableBody": "Aún tienes artículos en la mesa {current}. Ese pedido se guardará. ¿Continuar a la mesa {next}?",
+    "switchTableBody": "El pedido abierto de la mesa {current} pasa a la mesa {next}. ¿Continuar?",
     "cancel": "Cancelar",
     "switchToTable": "Ir a {number}",
     "optionRequired": "Obligatorio",

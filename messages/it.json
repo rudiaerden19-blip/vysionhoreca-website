@@ -3435,7 +3435,7 @@
     "parkTableKassaBon": "Scontrino cassa intermedio",
     "checkout": "Paga",
     "switchTableTitle": "Cambiare tavolo?",
-    "switchTableBody": "Hai ancora articoli al tavolo {current}. L’ordine verrà salvato. Continuare al tavolo {next}?",
+    "switchTableBody": "L’ordine aperto del tavolo {current} passa al tavolo {next}. Continuare?",
     "cancel": "Annulla",
     "switchToTable": "Vai a {number}",
     "optionRequired": "Obbligatorio",

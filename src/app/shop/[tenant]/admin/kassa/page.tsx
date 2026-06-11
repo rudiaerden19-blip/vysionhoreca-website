@@ -2072,37 +2072,59 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const switchToTable = (newTableNr: string) => {
     const zone = pickerBrowseZone
-    if (
-      tableNumber &&
-      cart.length > 0 &&
-      (tableNumber !== newTableNr || dineInFloorZone !== zone)
-    ) {
-      setSwitchConfirm(tableOrderMapKey(zone, newTableNr))
-      return
+    if (tableNumber) {
+      const oldSlot = tableOrderMapKey(dineInFloorZone, tableNumber)
+      const hasParked = (tableOrders[oldSlot]?.length ?? 0) > 0
+      const switchingAway =
+        tableNumber !== newTableNr || dineInFloorZone !== zone
+      if (switchingAway && (cart.length > 0 || hasParked)) {
+        setSwitchConfirm(tableOrderMapKey(zone, newTableNr))
+        return
+      }
     }
     doSwitchToTable(newTableNr, zone)
   }
 
   const doSwitchToTable = (newTableNr: string, zone: FloorPlanZone) => {
-    if (tableNumber && cart.length > 0) {
-      const snap = snapshotCartItemsForAsyncPrint(cart)
-      const oldZone = dineInFloorZone
-      const oldTbl = tableNumber
+    const oldZone = dineInFloorZone
+    const oldTbl = tableNumber.trim()
+    const moving = !!oldTbl && (oldTbl !== newTableNr || oldZone !== zone)
+
+    if (moving) {
       const oldSlot = tableOrderMapKey(oldZone, oldTbl)
+      const newSlot = tableOrderMapKey(zone, newTableNr)
+      const cartSnap = cart.length > 0 ? snapshotCartItemsForAsyncPrint(cart) : null
+
       setTableOrders((prev) => {
-        const merged = mergeCartLinesForTable(prev[oldSlot] || [], cart)
-        const next = { ...prev, [oldSlot]: merged }
+        const fromParked = prev[oldSlot] || []
+        const atDest = oldSlot === newSlot ? [] : prev[newSlot] || []
+        let merged = mergeCartLinesForTable(fromParked, cart)
+        merged = mergeCartLinesForTable(atDest, merged)
+        const next = { ...prev, [newSlot]: merged }
+        if (oldSlot !== newSlot) {
+          next[oldSlot] = []
+        }
         localStorage.setItem(tableOrdersKey, JSON.stringify(next))
-        updateTableStatus(oldTbl, merged.length > 0, oldZone)
-        schedulePersistOpenOrder(oldZone, oldTbl, merged)
+        updateTableStatus(oldTbl, false, oldZone)
+        updateTableStatus(newTableNr, merged.length > 0, zone)
+        if (oldSlot !== newSlot) {
+          schedulePersistOpenOrder(oldZone, oldTbl, [])
+        }
+        schedulePersistOpenOrder(zone, newTableNr, merged)
         return next
       })
-      void flushBarDeltaSlipRef.current(oldZone, oldTbl, snap, {
-        printKitchen: true,
-        printKassaSlip: false,
-      })
+
+      if (cartSnap && cartSnap.length > 0) {
+        void flushBarDeltaSlipRef.current(oldZone, oldTbl, cartSnap, {
+          printKitchen: true,
+          printKassaSlip: false,
+        })
+      }
+      setCart([])
+    } else if (!oldTbl && cart.length > 0) {
+      updateTableStatus(newTableNr, tableHasOpenOrder(zone, newTableNr, cart), zone)
     }
-    setCart([])
+
     setTableNumber(newTableNr)
     setDineInFloorZone(zone)
     setOrderType('DINE_IN')

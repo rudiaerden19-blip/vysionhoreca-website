@@ -3911,7 +3911,7 @@
     "parkTableKassaBon": "Tussentijdse kassa bon",
     "checkout": "Afrekenen",
     "switchTableTitle": "Tafel wisselen?",
-    "switchTableBody": "Je hebt nog items op tafel {current}. Die bestelling wordt opgeslagen. Wil je verder naar tafel {next}?",
+    "switchTableBody": "Open bestelling op tafel {current} verplaatst naar tafel {next}. Doorgaan?",
     "cancel": "Annuleer",
     "switchToTable": "Wissel naar {number}",
     "optionRequired": "Verplicht",

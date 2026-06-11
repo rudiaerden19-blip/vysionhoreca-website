@@ -3435,7 +3435,7 @@
     "parkTableKassaBon": "إيصال كاشير مؤقت",
     "checkout": "الدفع",
     "switchTableTitle": "تبديل الطاولة؟",
-    "switchTableBody": "لا تزال هناك أصناف على الطاولة {current}. سيتم حفظ الطلب. المتابعة إلى الطاولة {next}؟",
+    "switchTableBody": "الطلب المفتوح على الطاولة {current} ينتقل إلى الطاولة {next}. متابعة؟",
     "cancel": "إلغاء",
     "switchToTable": "انتقل إلى {number}",
     "optionRequired": "Obbligatorio",

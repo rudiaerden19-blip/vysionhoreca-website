@@ -3435,7 +3435,7 @@
     "parkTableKassaBon": "中間レシート",
     "checkout": "会計",
     "switchTableTitle": "テーブルを変更？",
-    "switchTableBody": "テーブル {current} に商品が残っています。注文は保存されます。テーブル {next} に移りますか？",
+    "switchTableBody": "テーブル {current} の未会計オーダーはテーブル {next} に移ります。続けますか？",
     "cancel": "キャンセル",
     "switchToTable": "{number} へ",
     "optionRequired": "Obbligatorio",

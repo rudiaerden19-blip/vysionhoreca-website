@@ -2935,7 +2935,7 @@
     "parkTableKassaBon": "Zwischenkassenbon",
     "checkout": "Bezahlen",
     "switchTableTitle": "Tisch wechseln?",
-    "switchTableBody": "Sie haben noch Artikel auf Tisch {current}. Diese Bestellung wird gespeichert. Weiter zu Tisch {next}?",
+    "switchTableBody": "Offene Bestellung von Tisch {current} wechselt zu Tisch {next}. Fortfahren?",
     "cancel": "Abbrechen",
     "switchToTable": "Wechseln zu {number}",
     "optionRequired": "Pflicht",

@@ -3435,7 +3435,7 @@
     "parkTableKassaBon": "临时收银小票",
     "checkout": "结账",
     "switchTableTitle": "切换桌台？",
-    "switchTableBody": "桌 {current} 上仍有商品。该订单将保存。是否继续到桌 {next}？",
+    "switchTableBody": "桌 {current} 的未结账订单将移至桌 {next}。继续？",
     "cancel": "取消",
     "switchToTable": "切换到 {number}",
     "optionRequired": "Obbligatorio",

@@ -3911,7 +3911,7 @@
     "parkTableKassaBon": "Interim receipt",
     "checkout": "Pay",
     "switchTableTitle": "Switch table?",
-    "switchTableBody": "You still have items on table {current}. That order will be saved. Continue to table {next}?",
+    "switchTableBody": "Open order on table {current} moves to table {next}. Continue?",
     "cancel": "Cancel",
     "switchToTable": "Switch to {number}",
     "optionRequired": "Required",

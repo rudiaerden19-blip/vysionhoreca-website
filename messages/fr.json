@@ -2935,7 +2935,7 @@
     "parkTableKassaBon": "Ticket de caisse intermédiaire",
     "checkout": "Payer",
     "switchTableTitle": "Changer de table ?",
-    "switchTableBody": "Il reste des articles sur la table {current}. La commande sera enregistrée. Continuer vers la table {next} ?",
+    "switchTableBody": "La commande ouverte de la table {current} passe à la table {next}. Continuer ?",
     "cancel": "Annuler",
     "switchToTable": "Aller à {number}",
     "optionRequired": "Obligatoire",
