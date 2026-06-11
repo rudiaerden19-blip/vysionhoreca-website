@@ -244,6 +244,11 @@ export function isTenantSubmenuEffectiveOn(
     return parentModuleOn
   }
   if (enabledJson[subId] === true) return true
+  /** Nieuwe retail-intake: bestaande tenants hebben deze key nog niet — volg Artikelen / winkelkassa. */
+  if (subId === 'sm_retail_product_intake') {
+    if (enabledJson.sm_retail_kassa_producten === true) return true
+    if (enabledJson['retail-kassa'] === true) return true
+  }
   return false
 }
 

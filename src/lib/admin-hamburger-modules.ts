@@ -658,6 +658,14 @@ export function getSubmenuIdForPathname(
     }
   }
   if (
+    pathNoQuery === `${baseUrl}/producten/intake` ||
+    pathNoQuery.startsWith(`${baseUrl}/producten/intake/`)
+  ) {
+    if (moduleAccess?.['retail-kassa'] && !moduleAccess?.kassa) {
+      return 'sm_retail_product_intake'
+    }
+  }
+  if (
     pathNoQuery === `${baseUrl}/producten` &&
     moduleAccess?.['retail-kassa'] &&
     !moduleAccess?.kassa
@@ -691,7 +699,14 @@ export function isAdminSubmenuEnabled(
   enabledJson: Record<string, boolean> | null
 ): boolean {
   if (enabledJson && hasExplicitEnabledModules(enabledJson)) {
-    return enabledJson[subId] === true
+    if (enabledJson[subId] === true) return true
+    if (
+      subId === 'sm_retail_product_intake' &&
+      (enabledJson.sm_retail_kassa_producten === true || enabledJson['retail-kassa'] === true)
+    ) {
+      return true
+    }
+    return false
   }
 
   const baseUrl = `/shop/${tenantSlug}/admin`
@@ -733,7 +748,15 @@ export function hasShopAdminPathAccess(
   const subId = getSubmenuIdForPathname(pathname, tenantSlug, moduleAccess)
   if (!subId) return false
   if (enabledModulesJson && hasExplicitEnabledModules(enabledModulesJson)) {
-    return enabledModulesJson[subId] === true
+    if (enabledModulesJson[subId] === true) return true
+    if (
+      subId === 'sm_retail_product_intake' &&
+      (enabledModulesJson.sm_retail_kassa_producten === true ||
+        enabledModulesJson['retail-kassa'] === true)
+    ) {
+      return true
+    }
+    return false
   }
   const gate = adminPathToModule(pathname, tenantSlug)
   const parentAllowed = submenuParentAllowedForSubmenuId(subId, gate, moduleAccess)
@@ -773,7 +796,15 @@ export function filterHamburgerModulesForAccess(
       items: m.items.filter((item) => {
         if (item.href.includes('/labels') && !effectiveLabelPrinting) return false
         if (enabledModulesJson && hasExplicitEnabledModules(enabledModulesJson)) {
-          return enabledModulesJson[item.id] === true
+          if (enabledModulesJson[item.id] === true) return true
+          if (
+            item.id === 'sm_retail_product_intake' &&
+            (enabledModulesJson.sm_retail_kassa_producten === true ||
+              enabledModulesJson['retail-kassa'] === true)
+          ) {
+            return true
+          }
+          return false
         }
         let parentOn = effectiveAccess[m.key]
         if (m.key === 'website') {
