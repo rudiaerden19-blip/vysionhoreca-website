@@ -17,7 +17,6 @@
     "sectors": "Sectores",
     "services": "Nuestros servicios",
     "integrations": "Integraciones",
-    "videos": "Vídeos",
     "subscriptions": "Suscripciones"
   },
   "subscriptionsPage": {
@@ -4819,108 +4818,6 @@
     "daysAgo": "días",
     "weeksAgo": "semanas",
     "monthsAgo": "meses"
-  },
-  "videosPage": {
-    "heroTitle": "Ayuda",
-    "heroTitleAccent": "vídeos",
-    "heroSubtitle": "Aprende todo sobre Vysion Horeca en vídeos cortos de unos 3 minutos.",
-    "videoCountOne": "1 vídeo",
-    "videoCountMany": "{{count}} vídeos",
-    "comingSoon": " — disponible pronto",
-    "openVideoInNewTab": "Abrir vídeo en una pestaña nueva",
-    "cats": {
-      "registreren": {
-        "title": "Registro",
-        "desc": "Crear cuenta y conocer el panel de administración"
-      },
-      "modules": {
-        "title": "Resumen",
-        "desc": "Pantalla de pedidos, análisis, ventas y más"
-      },
-      "instellingen": {
-        "title": "Ajustes",
-        "desc": "Configura todo para tu tienda online"
-      },
-      "menu": {
-        "title": "Menú",
-        "desc": "Gestiona productos, categorías y opciones"
-      },
-      "whatsapp-bestellingen": {
-        "title": "Pedidos WhatsApp",
-        "desc": "Recibe y gestiona pedidos por WhatsApp"
-      },
-      "personeel": {
-        "title": "Personal",
-        "desc": "Gestiona empleados, horas y vacantes"
-      },
-      "kostenberekening": {
-        "title": "Cálculo de costes",
-        "desc": "Calcula ingredientes y precios de productos"
-      },
-      "z-rapporten": {
-        "title": "Informes Z",
-        "desc": "Informes diarios y cierre"
-      },
-      "bestellingen": {
-        "title": "Pedidos",
-        "desc": "Gestiona pedidos y reservas"
-      },
-      "groepsbestellingen": {
-        "title": "Pedidos grupales",
-        "desc": "Gestiona pedidos para grupos"
-      },
-      "bonnenprinter": {
-        "title": "Impresora de tickets",
-        "desc": "Configura y usa la impresora de tickets"
-      },
-      "de-website": {
-        "title": "Tu sitio web",
-        "desc": "Gestiona y personaliza tu web"
-      },
-      "de-shop": {
-        "title": "La tienda",
-        "desc": "Configura y gestiona tu tienda online"
-      },
-      "restaurant-reserveringen": {
-        "title": "Reservas del restaurante",
-        "desc": "Gestiona reservas, mesas y walk-in"
-      }
-    },
-    "v": {
-      "registreren": "Registro",
-      "kassa-layout": "Diseño de caja",
-      "keukenscherm3": "Pantalla de pedidos",
-      "analyse-module4": "Análisis",
-      "verkoop5": "Ventas",
-      "populaire-items6": "Artículos populares",
-      "instellingen-online-shop": "Tienda online",
-      "zaakprofiel": "Perfil del local",
-      "openingstijden": "Horario",
-      "online-instellingen": "Entrega y recogida",
-      "betaal-methodes": "Métodos de pago",
-      "design-en-kleuren": "Diseño y colores",
-      "team": "Nuestro equipo",
-      "cadeau-bonnen": "Cheques regalo",
-      "producten": "Productos, categorías y opciones",
-      "whatsapp": "WhatsApp",
-      "medewerker-aanmaken": "Crear empleado",
-      "uren-registratie": "Registro horario",
-      "vacature": "Vacantes",
-      "berekening1": "Coste de ingredientes",
-      "prijs-berekening2": "Coste de producto",
-      "z-rapport": "Informe Z",
-      "bestellingen": "Pedidos",
-      "reserveringen": "Reservas",
-      "groepsbestellingen": "Pedidos grupales",
-      "printer": "Impresora tickets",
-      "de-website": "Tu sitio web",
-      "de-shop": "La tienda",
-      "res-rest-overzicht": "Resumen de reservas",
-      "res-rest-bewerken": "Editar una reserva",
-      "res-rest-online": "Reservas online",
-      "res-rest-tafel": "Crear una mesa",
-      "res-rest-walkin": "Walk-in"
-    }
   },
   "printAgentDownloadPage": {
     "heroTitle": "Print Agent para Windows",

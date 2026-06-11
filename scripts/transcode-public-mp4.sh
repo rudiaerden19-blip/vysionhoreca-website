@@ -3,11 +3,11 @@
 # Requires: ffmpeg (brew install ffmpeg)
 #
 # Usage:
-#   ./scripts/transcode-public-mp4.sh              # all *.mp4 under public/videos and public/images
+#   ./scripts/transcode-public-mp4.sh              # all *.mp4 under public/images
 #   ./scripts/transcode-public-mp4.sh path/to/a.mp4 ...
 #
 # Writes alongside each input: <name>.web.mp4 — compare sizes, then replace the original and commit.
-# Heaviest historical candidates: public/videos/registreren.mp4, de-shop.mp4, …
+# Heaviest historical candidates: public/images/*.mp4 (marketing)
 
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -39,7 +39,7 @@ if [[ $# -gt 0 ]]; then
     transcode_one "$f"
   done
 else
-  for dir in "$ROOT/public/videos" "$ROOT/public/images"; do
+  for dir in "$ROOT/public/images"; do
     [[ -d "$dir" ]] || continue
     while IFS= read -r -d '' f; do
       transcode_one "$f"

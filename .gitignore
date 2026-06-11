@@ -37,3 +37,9 @@ next-env.d.ts
 # Supabase CLI (lokaal)
 supabase/.temp/
 
+# Print Agent — lokaal, niet via website-repo deployen
+apps/vysion-print-agent/usb-stick/
+/settings.html
+
+# Help-video's (niet meer op de marketing-site)
+public/videos/

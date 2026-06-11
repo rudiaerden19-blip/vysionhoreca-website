@@ -17,7 +17,6 @@
     "sectors": "Settori",
     "services": "I nostri servizi",
     "integrations": "Integrazioni",
-    "videos": "Video",
     "subscriptions": "Abbonamenti"
   },
   "subscriptionsPage": {
@@ -4819,108 +4818,6 @@
     "daysAgo": "giorni fa",
     "weeksAgo": "settimane fa",
     "monthsAgo": "mesi fa"
-  },
-  "videosPage": {
-    "heroTitle": "Aiuto",
-    "heroTitleAccent": "video",
-    "heroSubtitle": "Scopri Vysion Horeca in video brevi di circa 3 minuti.",
-    "videoCountOne": "1 video",
-    "videoCountMany": "{{count}} video",
-    "comingSoon": " — in arrivo",
-    "openVideoInNewTab": "Apri il video in una nuova scheda",
-    "cats": {
-      "registreren": {
-        "title": "Registrazione",
-        "desc": "Crea un account e scopri il pannello admin"
-      },
-      "modules": {
-        "title": "Panoramica",
-        "desc": "Schermo ordini, analisi, vendite e altro"
-      },
-      "instellingen": {
-        "title": "Impostazioni",
-        "desc": "Configura tutto per il tuo shop online"
-      },
-      "menu": {
-        "title": "Menu",
-        "desc": "Gestisci prodotti, categorie e opzioni"
-      },
-      "whatsapp-bestellingen": {
-        "title": "Ordini WhatsApp",
-        "desc": "Ricevi e gestisci ordini via WhatsApp"
-      },
-      "personeel": {
-        "title": "Personale",
-        "desc": "Gestisci dipendenti, ore e posizioni aperte"
-      },
-      "kostenberekening": {
-        "title": "Calcolo costi",
-        "desc": "Calcola ingredienti e prezzi dei prodotti"
-      },
-      "z-rapporten": {
-        "title": "Rapporti Z",
-        "desc": "Rapporti giornalieri e chiusura"
-      },
-      "bestellingen": {
-        "title": "Ordini",
-        "desc": "Gestisci ordini e prenotazioni"
-      },
-      "groepsbestellingen": {
-        "title": "Ordini di gruppo",
-        "desc": "Gestisci ordini per gruppi"
-      },
-      "bonnenprinter": {
-        "title": "Stampante scontrini",
-        "desc": "Configura e usa la stampante"
-      },
-      "de-website": {
-        "title": "Il tuo sito",
-        "desc": "Gestisci e personalizza il sito"
-      },
-      "de-shop": {
-        "title": "Lo shop",
-        "desc": "Configura e gestisci lo shop online"
-      },
-      "restaurant-reserveringen": {
-        "title": "Prenotazioni ristorante",
-        "desc": "Gestisci prenotazioni, tavoli e walk-in"
-      }
-    },
-    "v": {
-      "registreren": "Registrazione",
-      "kassa-layout": "Layout cassa",
-      "keukenscherm3": "Schermo ordini",
-      "analyse-module4": "Analisi",
-      "verkoop5": "Vendite",
-      "populaire-items6": "Articoli popolari",
-      "instellingen-online-shop": "Shop online",
-      "zaakprofiel": "Profilo locale",
-      "openingstijden": "Orari",
-      "online-instellingen": "Consegna e ritiro",
-      "betaal-methodes": "Metodi di pagamento",
-      "design-en-kleuren": "Design e colori",
-      "team": "Il nostro team",
-      "cadeau-bonnen": "Buoni regalo",
-      "producten": "Prodotti, categorie e opzioni",
-      "whatsapp": "WhatsApp",
-      "medewerker-aanmaken": "Crea dipendente",
-      "uren-registratie": "Registro ore",
-      "vacature": "Posizioni aperte",
-      "berekening1": "Costo ingredienti",
-      "prijs-berekening2": "Costo prodotto",
-      "z-rapport": "Rapporto Z",
-      "bestellingen": "Ordini",
-      "reserveringen": "Prenotazioni",
-      "groepsbestellingen": "Ordini di gruppo",
-      "printer": "Stampante scontrini",
-      "de-website": "Il tuo sito",
-      "de-shop": "Lo shop",
-      "res-rest-overzicht": "Panoramica prenotazioni",
-      "res-rest-bewerken": "Modifica prenotazione",
-      "res-rest-online": "Prenotazioni online",
-      "res-rest-tafel": "Crea un tavolo",
-      "res-rest-walkin": "Walk-in"
-    }
   },
   "printAgentDownloadPage": {
     "heroTitle": "Print Agent per Windows",

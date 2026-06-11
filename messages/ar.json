@@ -17,7 +17,6 @@
     "sectors": "القطاعات",
     "services": "خدماتنا",
     "integrations": "التكاملات",
-    "videos": "فيديوهات",
     "subscriptions": "الاشتراكات"
   },
   "subscriptionsPage": {
@@ -4819,108 +4818,6 @@
     "daysAgo": "أيام",
     "weeksAgo": "أسابيع",
     "monthsAgo": "أشهر"
-  },
-  "videosPage": {
-    "heroTitle": "مساعدة",
-    "heroTitleAccent": "فيديوهات",
-    "heroSubtitle": "تعرّف على Vysion Horeca في فيديوهات قصيرة حوالي 3 دقائق.",
-    "videoCountOne": "فيديو واحد",
-    "videoCountMany": "{{count}} فيديوهات",
-    "comingSoon": " — قريباً",
-    "openVideoInNewTab": "فتح الفيديو في تبويب جديد",
-    "cats": {
-      "registreren": {
-        "title": "التسجيل",
-        "desc": "إنشاء حساب ولوحة الإدارة"
-      },
-      "modules": {
-        "title": "نظرة عامة",
-        "desc": "شاشة الطلبات والتحليلات والمزيد"
-      },
-      "instellingen": {
-        "title": "الإعدادات",
-        "desc": "ضبط كل شيء لمتجرك الإلكتروني"
-      },
-      "menu": {
-        "title": "القائمة",
-        "desc": "إدارة المنتجات والفئات والخيارات"
-      },
-      "whatsapp-bestellingen": {
-        "title": "طلبات واتساب",
-        "desc": "استلام وإدارة الطلبات عبر واتساب"
-      },
-      "personeel": {
-        "title": "الموظفون",
-        "desc": "إدارة الموظفين والساعات والوظائف"
-      },
-      "kostenberekening": {
-        "title": "حساب التكاليف",
-        "desc": "حساب المكونات وأسعار المنتجات"
-      },
-      "z-rapporten": {
-        "title": "تقارير Z",
-        "desc": "تقارير يومية وإقفال"
-      },
-      "bestellingen": {
-        "title": "الطلبات",
-        "desc": "إدارة الطلبات والحجوزات"
-      },
-      "groepsbestellingen": {
-        "title": "طلبات جماعية",
-        "desc": "إدارة طلبات المجموعات"
-      },
-      "bonnenprinter": {
-        "title": "طابعة الإيصالات",
-        "desc": "إعداد واستخدام الطابعة"
-      },
-      "de-website": {
-        "title": "موقعك",
-        "desc": "إدارة وتخصيص الموقع"
-      },
-      "de-shop": {
-        "title": "المتجر",
-        "desc": "إعداد وإدارة المتجر الإلكتروني"
-      },
-      "restaurant-reserveringen": {
-        "title": "حجوزات المطعم",
-        "desc": "إدارة الحجوزات والطاولات وزوار الممر"
-      }
-    },
-    "v": {
-      "registreren": "التسجيل",
-      "kassa-layout": "تخطيط الكاشير",
-      "keukenscherm3": "شاشة الطلبات",
-      "analyse-module4": "تحليل الأعمال",
-      "verkoop5": "المبيعات",
-      "populaire-items6": "عناصر شائعة",
-      "instellingen-online-shop": "المتجر الإلكتروني",
-      "zaakprofiel": "ملف المنشأة",
-      "openingstijden": "ساعات العمل",
-      "online-instellingen": "التوصيل والاستلام",
-      "betaal-methodes": "طرق الدفع",
-      "design-en-kleuren": "التصميم والألوان",
-      "team": "فريقنا",
-      "cadeau-bonnen": "قسائم الهدايا",
-      "producten": "المنتجات والفئات والخيارات",
-      "whatsapp": "واتساب",
-      "medewerker-aanmaken": "إنشاء موظف",
-      "uren-registratie": "تسجيل الوقت",
-      "vacature": "وظائف",
-      "berekening1": "تكلفة المكونات",
-      "prijs-berekening2": "تكلفة المنتج",
-      "z-rapport": "تقرير Z",
-      "bestellingen": "الطلبات",
-      "reserveringen": "الحجوزات",
-      "groepsbestellingen": "طلبات جماعية",
-      "printer": "طابعة إيصالات",
-      "de-website": "موقعك",
-      "de-shop": "المتجر",
-      "res-rest-overzicht": "نظرة عامة على الحجوزات",
-      "res-rest-bewerken": "تعديل حجز",
-      "res-rest-online": "حجوزات عبر الإنترنت",
-      "res-rest-tafel": "إنشاء طاولة",
-      "res-rest-walkin": "زوار بدون حجز"
-    }
   },
   "printAgentDownloadPage": {
     "heroTitle": "Print Agent لنظام Windows",

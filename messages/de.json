@@ -17,7 +17,6 @@
     "sectors": "Branchen",
     "services": "Unsere Leistungen",
     "integrations": "Integrationen",
-    "videos": "Videos",
     "subscriptions": "Abonnements"
   },
   "subscriptionsPage": {
@@ -4842,108 +4841,6 @@
     "daysAgo": "Tage her",
     "weeksAgo": "Wochen her",
     "monthsAgo": "Monate her"
-  },
-  "videosPage": {
-    "heroTitle": "Hilfe",
-    "heroTitleAccent": "Videos",
-    "heroSubtitle": "Lernen Sie Vysion Horeca in kurzen Videos von etwa 3 Minuten kennen.",
-    "videoCountOne": "1 Video",
-    "videoCountMany": "{{count}} Videos",
-    "comingSoon": " — demnaechst",
-    "openVideoInNewTab": "Video in neuem Tab öffnen",
-    "cats": {
-      "registreren": {
-        "title": "Registrieren",
-        "desc": "Konto erstellen und Admin-Bereich kennenlernen"
-      },
-      "modules": {
-        "title": "Ueberblick",
-        "desc": "Bestellbildschirm, Analyse, Verkauf und mehr"
-      },
-      "instellingen": {
-        "title": "Einstellungen",
-        "desc": "Alles fuer Ihren Onlineshop einrichten"
-      },
-      "menu": {
-        "title": "Menue",
-        "desc": "Produkte, Kategorien und Optionen verwalten"
-      },
-      "whatsapp-bestellingen": {
-        "title": "WhatsApp-Bestellungen",
-        "desc": "Bestellungen per WhatsApp empfangen und verwalten"
-      },
-      "personeel": {
-        "title": "Personal",
-        "desc": "Mitarbeiter, Zeiten und Stellen verwalten"
-      },
-      "kostenberekening": {
-        "title": "Kalkulation",
-        "desc": "Zutaten und Produktpreise berechnen"
-      },
-      "z-rapporten": {
-        "title": "Z-Berichte",
-        "desc": "Tagesberichte und Abschluss"
-      },
-      "bestellingen": {
-        "title": "Bestellungen",
-        "desc": "Bestellungen und Reservierungen verwalten"
-      },
-      "groepsbestellingen": {
-        "title": "Gruppenbestellungen",
-        "desc": "Bestellungen fuer Gruppen verwalten"
-      },
-      "bonnenprinter": {
-        "title": "Bonndrucker",
-        "desc": "Bonndrucker einrichten und nutzen"
-      },
-      "de-website": {
-        "title": "Ihre Website",
-        "desc": "Eigene Website verwalten und anpassen"
-      },
-      "de-shop": {
-        "title": "Der Shop",
-        "desc": "Onlineshop einrichten und verwalten"
-      },
-      "restaurant-reserveringen": {
-        "title": "Restaurant-Reservierungen",
-        "desc": "Reservierungen, Tische und Walk-ins verwalten"
-      }
-    },
-    "v": {
-      "registreren": "Registrieren",
-      "kassa-layout": "Kassa-Layout",
-      "keukenscherm3": "Bestellbildschirm",
-      "analyse-module4": "Betriebsanalyse",
-      "verkoop5": "Verkauf",
-      "populaire-items6": "Beliebte Artikel",
-      "instellingen-online-shop": "Onlineshop",
-      "zaakprofiel": "Betriebsprofil",
-      "openingstijden": "Oeffnungszeiten",
-      "online-instellingen": "Lieferung und Abholung",
-      "betaal-methodes": "Zahlungsmethoden",
-      "design-en-kleuren": "Design und Farben",
-      "team": "Unser Team",
-      "cadeau-bonnen": "Geschenkgutscheine",
-      "producten": "Produkte, Kategorien und Optionen",
-      "whatsapp": "WhatsApp",
-      "medewerker-aanmaken": "Mitarbeiter anlegen",
-      "uren-registratie": "Zeiterfassung",
-      "vacature": "Stellen",
-      "berekening1": "Zutatenkalkulation",
-      "prijs-berekening2": "Produktkalkulation",
-      "z-rapport": "Z-Bericht",
-      "bestellingen": "Bestellungen",
-      "reserveringen": "Reservierungen",
-      "groepsbestellingen": "Gruppenbestellungen",
-      "printer": "Bonndrucker",
-      "de-website": "Ihre Website",
-      "de-shop": "Der Shop",
-      "res-rest-overzicht": "Reservierungen Übersicht",
-      "res-rest-bewerken": "Reservierung bearbeiten",
-      "res-rest-online": "Online-Reservierungen",
-      "res-rest-tafel": "Tisch anlegen",
-      "res-rest-walkin": "Walk-in"
-    }
   },
   "printAgentDownloadPage": {
     "heroTitle": "Print Agent für Windows",

@@ -17,7 +17,6 @@
     "sectors": "行业",
     "services": "我们的服务",
     "integrations": "集成",
-    "videos": "视频",
     "subscriptions": "订阅"
   },
   "subscriptionsPage": {
@@ -4819,108 +4818,6 @@
     "daysAgo": "天前",
     "weeksAgo": "周前",
     "monthsAgo": "个月前"
-  },
-  "videosPage": {
-    "heroTitle": "帮助",
-    "heroTitleAccent": "视频",
-    "heroSubtitle": "通过约3分钟的短视频了解 Vysion Horeca。",
-    "videoCountOne": "1 个视频",
-    "videoCountMany": "{{count}} 个视频",
-    "comingSoon": " — 即将上线",
-    "openVideoInNewTab": "在新标签页中打开视频",
-    "cats": {
-      "registreren": {
-        "title": "注册",
-        "desc": "创建账户并了解管理后台"
-      },
-      "modules": {
-        "title": "概览",
-        "desc": "订单屏幕、分析、销售等"
-      },
-      "instellingen": {
-        "title": "设置",
-        "desc": "配置您的网店"
-      },
-      "menu": {
-        "title": "菜单",
-        "desc": "管理商品、分类与选项"
-      },
-      "whatsapp-bestellingen": {
-        "title": "WhatsApp 订单",
-        "desc": "接收并管理 WhatsApp 订单"
-      },
-      "personeel": {
-        "title": "员工",
-        "desc": "管理员工、工时与招聘"
-      },
-      "kostenberekening": {
-        "title": "成本计算",
-        "desc": "计算原料与商品价格"
-      },
-      "z-rapporten": {
-        "title": "Z 报表",
-        "desc": "日报与日结"
-      },
-      "bestellingen": {
-        "title": "订单",
-        "desc": "管理订单与预订"
-      },
-      "groepsbestellingen": {
-        "title": "团购",
-        "desc": "管理团体订单"
-      },
-      "bonnenprinter": {
-        "title": "票据打印机",
-        "desc": "设置并使用票据打印机"
-      },
-      "de-website": {
-        "title": "您的网站",
-        "desc": "管理并自定义网站"
-      },
-      "de-shop": {
-        "title": "商店",
-        "desc": "设置并管理网店"
-      },
-      "restaurant-reserveringen": {
-        "title": "餐厅预订",
-        "desc": "管理预订、桌位与临时到店客人"
-      }
-    },
-    "v": {
-      "registreren": "注册",
-      "kassa-layout": "收银台布局",
-      "keukenscherm3": "订单屏幕",
-      "analyse-module4": "经营分析",
-      "verkoop5": "销售",
-      "populaire-items6": "热门商品",
-      "instellingen-online-shop": "网店",
-      "zaakprofiel": "门店资料",
-      "openingstijden": "营业时间",
-      "online-instellingen": "配送与自取",
-      "betaal-methodes": "支付方式",
-      "design-en-kleuren": "设计与颜色",
-      "team": "我们的团队",
-      "cadeau-bonnen": "礼品券",
-      "producten": "商品、分类与选项",
-      "whatsapp": "WhatsApp",
-      "medewerker-aanmaken": "创建员工",
-      "uren-registratie": "工时登记",
-      "vacature": "职位空缺",
-      "berekening1": "原料成本",
-      "prijs-berekening2": "商品成本",
-      "z-rapport": "Z 报表",
-      "bestellingen": "订单",
-      "reserveringen": "预订",
-      "groepsbestellingen": "团购",
-      "printer": "票据打印机",
-      "de-website": "您的网站",
-      "de-shop": "商店",
-      "res-rest-overzicht": "预订总览",
-      "res-rest-bewerken": "编辑预订",
-      "res-rest-online": "在线预订",
-      "res-rest-tafel": "创建桌位",
-      "res-rest-walkin": "临时到店"
-    }
   },
   "printAgentDownloadPage": {
     "heroTitle": "Windows 版 Print Agent",

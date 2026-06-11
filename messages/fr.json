@@ -17,7 +17,6 @@
     "sectors": "Secteurs",
     "services": "Nos services",
     "integrations": "Intégrations",
-    "videos": "Vidéos",
     "subscriptions": "Abonnements"
   },
   "subscriptionsPage": {
@@ -4842,108 +4841,6 @@
     "daysAgo": "jours",
     "weeksAgo": "semaines",
     "monthsAgo": "mois"
-  },
-  "videosPage": {
-    "heroTitle": "Aide",
-    "heroTitleAccent": "vidéos",
-    "heroSubtitle": "Découvrez Vysion Horeca en courtes vidéos d'environ 3 minutes.",
-    "videoCountOne": "1 vidéo",
-    "videoCountMany": "{{count}} vidéos",
-    "comingSoon": " — bientôt disponible",
-    "openVideoInNewTab": "Ouvrir la vidéo dans un nouvel onglet",
-    "cats": {
-      "registreren": {
-        "title": "Inscription",
-        "desc": "Créer un compte et découvrir l'administration"
-      },
-      "modules": {
-        "title": "Vue d'ensemble",
-        "desc": "Écran commandes, analyse, ventes et plus"
-      },
-      "instellingen": {
-        "title": "Paramètres",
-        "desc": "Tout configurer pour votre boutique en ligne"
-      },
-      "menu": {
-        "title": "Menu",
-        "desc": "Gérer produits, catégories et options"
-      },
-      "whatsapp-bestellingen": {
-        "title": "Commandes WhatsApp",
-        "desc": "Recevoir et gérer les commandes via WhatsApp"
-      },
-      "personeel": {
-        "title": "Personnel",
-        "desc": "Gérer employés, horaires et offres d'emploi"
-      },
-      "kostenberekening": {
-        "title": "Calcul des coûts",
-        "desc": "Calculer ingrédients et prix produits"
-      },
-      "z-rapporten": {
-        "title": "Rapports Z",
-        "desc": "Rapports journaliers et clôture"
-      },
-      "bestellingen": {
-        "title": "Commandes",
-        "desc": "Gérer commandes et réservations"
-      },
-      "groepsbestellingen": {
-        "title": "Commandes de groupe",
-        "desc": "Gérer les commandes de groupe"
-      },
-      "bonnenprinter": {
-        "title": "Imprimante de tickets",
-        "desc": "Configurer et utiliser l'imprimante"
-      },
-      "de-website": {
-        "title": "Votre site",
-        "desc": "Gérer et personnaliser votre site"
-      },
-      "de-shop": {
-        "title": "La boutique",
-        "desc": "Configurer votre boutique en ligne"
-      },
-      "restaurant-reserveringen": {
-        "title": "Réservations restaurant",
-        "desc": "Gérer réservations, tables et walk-in"
-      }
-    },
-    "v": {
-      "registreren": "Inscription",
-      "kassa-layout": "Mise en page caisse",
-      "keukenscherm3": "Écran commandes",
-      "analyse-module4": "Analyse",
-      "verkoop5": "Ventes",
-      "populaire-items6": "Articles populaires",
-      "instellingen-online-shop": "Boutique en ligne",
-      "zaakprofiel": "Profil établissement",
-      "openingstijden": "Horaires",
-      "online-instellingen": "Livraison et retrait",
-      "betaal-methodes": "Moyens de paiement",
-      "design-en-kleuren": "Design et couleurs",
-      "team": "Notre équipe",
-      "cadeau-bonnen": "Chèques-cadeaux",
-      "producten": "Produits, catégories et options",
-      "whatsapp": "WhatsApp",
-      "medewerker-aanmaken": "Créer un employé",
-      "uren-registratie": "Pointage",
-      "vacature": "Offres d'emploi",
-      "berekening1": "Coût des ingrédients",
-      "prijs-berekening2": "Coût produit",
-      "z-rapport": "Rapport Z",
-      "bestellingen": "Commandes",
-      "reserveringen": "Réservations",
-      "groepsbestellingen": "Commandes de groupe",
-      "printer": "Imprimante tickets",
-      "de-website": "Votre site",
-      "de-shop": "La boutique",
-      "res-rest-overzicht": "Aperçu des réservations",
-      "res-rest-bewerken": "Modifier une réservation",
-      "res-rest-online": "Réservations en ligne",
-      "res-rest-tafel": "Créer une table",
-      "res-rest-walkin": "Walk-in"
-    }
   },
   "printAgentDownloadPage": {
     "heroTitle": "Print Agent pour Windows",
