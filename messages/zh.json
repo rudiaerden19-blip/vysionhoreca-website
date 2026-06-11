@@ -2541,7 +2541,7 @@
       "cameraPermissionDenied": "No camera access. Allow camera or type the barcode.",
       "cameraStartFailed": "无法启动相机。请再次点击或使用条形码扫描，或输入 EAN。",
       "cameraScanHint": "将相机对准条形码，直到号码出现在字段中。",
-      "cameraViewfinderHint": "将条形码对准绿色框 — 红线会自动扫描。",
+      "cameraViewfinderHint": "让条形码占满屏幕 — 距离 15–25 cm，光线充足。",
       "barcodeScanChoiceHint": "手机：相机条形码。蓝牙扫描枪：扫描商品。",
       "phoneProductScanHint": "点击扫描商品 — 将打开带绿色扫描框的相机。",
       "eanLookupBusy": "Looking up name…",

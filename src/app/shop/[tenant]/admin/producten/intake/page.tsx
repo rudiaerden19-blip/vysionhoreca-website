@@ -29,7 +29,7 @@ import {
   startZxingBarcodeVideoScan,
   type RetailBarcodeCameraScanStop,
 } from '@/lib/retail-barcode-camera-scan'
-import { RetailBarcodeScannerOverlay } from '@/components/retail/RetailBarcodeScannerOverlay'
+import { RetailBarcodeScannerFullscreen } from '@/components/retail/RetailBarcodeScannerFullscreen'
 import {
   playRetailBarcodeScanSuccessFeedback,
   primeRetailBarcodeScanAudio,
@@ -84,6 +84,15 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
   useEffect(() => {
     setPhoneCameraScan(isRetailPhoneCameraScanPreferred())
   }, [])
+
+  useEffect(() => {
+    if (!cameraScanActive) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [cameraScanActive])
 
   const wedgeRef = useRef<HTMLInputElement>(null)
   const photoInputRef = useRef<HTMLInputElement>(null)
@@ -504,31 +513,6 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
                 }}
               />
             </div>
-            <div
-              className={
-                cameraScanActive
-                  ? 'relative mt-3 aspect-[4/3] max-h-80 w-full overflow-hidden rounded-xl bg-black'
-                  : 'fixed left-0 top-0 h-px w-px overflow-hidden opacity-0 pointer-events-none'
-              }
-              aria-hidden={!cameraScanActive}
-            >
-              <video
-                ref={videoRef}
-                className={
-                  cameraScanActive
-                    ? 'absolute inset-0 h-full w-full object-cover'
-                    : 'h-px w-px'
-                }
-                playsInline
-                muted
-                autoPlay
-              />
-              {cameraScanActive ? (
-                <RetailBarcodeScannerOverlay
-                  hint={t('adminPages.productIntake.cameraViewfinderHint')}
-                />
-              ) : null}
-            </div>
             {eanBusy ? (
               <p className="mt-2 text-xs text-gray-500">{t('adminPages.productIntake.eanLookupBusy')}</p>
             ) : null}
@@ -673,6 +657,33 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
           </div>
         </div>
       </div>
+
+      <div
+        className={
+          cameraScanActive
+            ? 'fixed inset-0 z-[800] bg-black'
+            : 'fixed left-0 top-0 h-px w-px overflow-hidden opacity-0 pointer-events-none'
+        }
+        aria-hidden={!cameraScanActive}
+      >
+        <video
+          ref={videoRef}
+          className={
+            cameraScanActive ? 'absolute inset-0 h-full w-full object-cover' : 'h-px w-px'
+          }
+          playsInline
+          muted
+          autoPlay
+        />
+      </div>
+      {cameraScanActive ? (
+        <RetailBarcodeScannerFullscreen
+          hint={t('adminPages.productIntake.cameraViewfinderHint')}
+          onStop={stopCameraScan}
+          stopLabel={t('adminPages.productIntake.stopCameraScan')}
+          barcodePreview={barcode.trim() || undefined}
+        />
+      ) : null}
     </PinGate>
   )
 }

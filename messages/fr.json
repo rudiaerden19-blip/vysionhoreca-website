@@ -2041,7 +2041,7 @@
       "cameraPermissionDenied": "No camera access. Allow camera or type the barcode.",
       "cameraStartFailed": "Impossible de démarrer la caméra. Réessayez ou saisissez l'EAN.",
       "cameraScanHint": "Visez le code-barres jusqu'à ce que le numéro apparaisse.",
-      "cameraViewfinderHint": "Placez le code dans le cadre vert — la ligne rouge scanne automatiquement.",
+      "cameraViewfinderHint": "Remplissez l’écran avec le code — 15–25 cm, bonne lumière.",
       "barcodeScanChoiceHint": "Sur téléphone : Caméra code-barres. Avec scanner Bluetooth : Scanner le produit.",
       "phoneProductScanHint": "Appuyez sur Scanner le produit — la caméra s’ouvre avec le cadre vert.",
       "eanLookupBusy": "Looking up name…",
