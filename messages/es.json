@@ -421,7 +421,36 @@
     "choiceModalTitle": "Ver nuestros precios",
     "choiceHorecaPricing": "Ver precios para la caja hostelería",
     "choiceRetailPricing": "Ver precios retail y otros sectores",
-    "retailModalTitle": "Retail y otros sectores"
+    "retailModalTitle": "Retail y otros sectores",
+    "retail": {
+      "features": {
+        "1": "Licencia TPV incluida",
+        "2": "TPV con gestión de códigos de barras",
+        "3": "Stock automático",
+        "4": "Recepción de mercancía",
+        "5": "Productos y categorías",
+        "6": "Resumen de ventas",
+        "7": "Informes",
+        "8": "Empleados",
+        "9": "Tarjetas de clientes",
+        "10": "Devoluciones y vale",
+        "11": "Escanear productos con el móvil",
+        "12": "Listas de productos CSV y Excel",
+        "13": "Personal y nóminas",
+        "14": "Web propia totalmente personalizable",
+        "15": "Integración terminal de pago",
+        "16": "Análisis empresarial completo",
+        "17": "Códigos QR",
+        "18": "Códigos de barras",
+        "19": "Impresora de etiquetas por producto",
+        "20": "Visibilidad SEO",
+        "21": "Promociones",
+        "22": "Ticket por email",
+        "23": "Factura directa",
+        "24": "Formación gratuita completa",
+        "25": "Soporte email y teléfono"
+      }
+    }
   },
   "industry": {
     "sectionTitle": "Extra incluido en su suscripción",

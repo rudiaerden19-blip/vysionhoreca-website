@@ -479,7 +479,11 @@ function PromoMarqueeBand() {
 
 // Pricing Section
 /** Premium-kaart: alle Pro+-features in de vinkjeslijst (incl. reserveringsplatform). */
-const PREMIUM_CARD_FEATURES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const
+/** Retail-popup: vaste featurevolgorde (links → rechts, per kolom). */
+const RETAIL_POPUP_FEATURE_IDS = [
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
+] as const
+const RETAIL_POPUP_MID = Math.ceil(RETAIL_POPUP_FEATURE_IDS.length / 2)
 
 /** Vaste volgorde modules-popup (links → rechts, per kolom van boven naar beneden). */
 const MODULES_POPUP_ORDER = [
@@ -702,7 +706,6 @@ function PricingSection() {
                 />
               </div>
               <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6 sm:py-6">
-                <h4 className="mb-4 text-base font-bold text-accent sm:text-lg">{t('pricing.pro.name')}</h4>
                 {withHardware && (
                   <p className="mb-4 flex items-start gap-3 text-sm font-medium text-gray-800 sm:text-base">
                     <svg
@@ -717,11 +720,18 @@ function PricingSection() {
                     {t('pricing.pro.hardwareIncluded')}
                   </p>
                 )}
-                <ul className="space-y-3">
-                  {PREMIUM_CARD_FEATURES.map((i) => (
-                    <PricingFeatureCheck key={i} label={t(`pricing.pro.features.${i}`)} />
-                  ))}
-                </ul>
+                <div className="grid gap-8 md:grid-cols-2 md:gap-10">
+                  <ul className="space-y-3">
+                    {RETAIL_POPUP_FEATURE_IDS.slice(0, RETAIL_POPUP_MID).map((i) => (
+                      <PricingFeatureCheck key={`r-l-${i}`} label={t(`pricing.retail.features.${i}`)} />
+                    ))}
+                  </ul>
+                  <ul className="space-y-3">
+                    {RETAIL_POPUP_FEATURE_IDS.slice(RETAIL_POPUP_MID).map((i) => (
+                      <PricingFeatureCheck key={`r-r-${i}`} label={t(`pricing.retail.features.${i}`)} />
+                    ))}
+                  </ul>
+                </div>
               </div>
               <div className="shrink-0 border-t border-gray-100 bg-[#faf8f6] px-5 py-4 sm:px-6">
                 <a

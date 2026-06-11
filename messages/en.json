@@ -701,7 +701,36 @@
     "choiceModalTitle": "View our pricing",
     "choiceHorecaPricing": "View pricing for hospitality POS",
     "choiceRetailPricing": "View pricing for retail and other sectors",
-    "retailModalTitle": "Retail and other sectors"
+    "retailModalTitle": "Retail and other sectors",
+    "retail": {
+      "features": {
+        "1": "POS licence included",
+        "2": "POS with barcode management",
+        "3": "Automatic stock",
+        "4": "Goods receipt",
+        "5": "Products & categories",
+        "6": "Sales overview",
+        "7": "Reports",
+        "8": "Staff",
+        "9": "Customer loyalty cards",
+        "10": "Returns and store credit",
+        "11": "Scan products with your phone",
+        "12": "Product lists with CSV & Excel",
+        "13": "Staff & payroll administration",
+        "14": "Fully customisable own website",
+        "15": "Payment terminal integration",
+        "16": "Full business analytics",
+        "17": "QR codes",
+        "18": "Barcodes",
+        "19": "Label/sticker printer per product",
+        "20": "SEO visibility",
+        "21": "Promotions",
+        "22": "Receipt by email",
+        "23": "Instant invoice",
+        "24": "Full free training",
+        "25": "Email & phone support"
+      }
+    }
   },
   "industry": {
     "sectionTitle": "Extra included in your subscription",

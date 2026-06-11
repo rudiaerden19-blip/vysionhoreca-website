@@ -421,7 +421,36 @@
     "choiceModalTitle": "Unsere Preise ansehen",
     "choiceHorecaPricing": "Preise für die Gastronomie-Kasse ansehen",
     "choiceRetailPricing": "Preise für Einzelhandel und andere Branchen ansehen",
-    "retailModalTitle": "Einzelhandel und andere Branchen"
+    "retailModalTitle": "Einzelhandel und andere Branchen",
+    "retail": {
+      "features": {
+        "1": "Kassenlizenz inbegriffen",
+        "2": "Kasse mit Barcode-Verwaltung",
+        "3": "Automatischer Bestand",
+        "4": "Wareneingang",
+        "5": "Produkte & Kategorien",
+        "6": "Verkaufsübersicht",
+        "7": "Berichte",
+        "8": "Mitarbeiter",
+        "9": "Kundenkarten",
+        "10": "Retouren und Gutschein",
+        "11": "Produkte per Telefon scannen",
+        "12": "Produktlisten mit CSV & Excel",
+        "13": "Personal & Lohnadministration",
+        "14": "Eigene Website voll anpassbar",
+        "15": "Zahlterminal-Integration",
+        "16": "Vollständige Geschäftsanalyse",
+        "17": "QR-Codes",
+        "18": "Barcodes",
+        "19": "Etikett-/Stickerdrucker pro Produkt",
+        "20": "SEO-Sichtbarkeit",
+        "21": "Aktionen",
+        "22": "Bon per E-Mail",
+        "23": "Direkte Rechnung",
+        "24": "Vollständige kostenlose Schulung",
+        "25": "E-Mail- & Telefonsupport"
+      }
+    }
   },
   "industry": {
     "sectionTitle": "Extra in Ihrem Abonnement enthalten",

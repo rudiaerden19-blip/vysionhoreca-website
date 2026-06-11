@@ -421,7 +421,36 @@
     "choiceModalTitle": "Voir nos tarifs",
     "choiceHorecaPricing": "Voir les tarifs pour la caisse horeca",
     "choiceRetailPricing": "Voir les tarifs retail et autres secteurs",
-    "retailModalTitle": "Retail et autres secteurs"
+    "retailModalTitle": "Retail et autres secteurs",
+    "retail": {
+      "features": {
+        "1": "Licence caisse incluse",
+        "2": "Caisse avec gestion codes-barres",
+        "3": "Stock automatique",
+        "4": "Réception marchandises",
+        "5": "Produits & catégories",
+        "6": "Aperçu des ventes",
+        "7": "Rapports",
+        "8": "Employés",
+        "9": "Cartes clients",
+        "10": "Retours et avoir",
+        "11": "Scanner produits via téléphone",
+        "12": "Listes produits CSV & Excel",
+        "13": "Personnel & paie",
+        "14": "Site web entièrement personnalisable",
+        "15": "Intégration terminal de paiement",
+        "16": "Analyse business complète",
+        "17": "Codes QR",
+        "18": "Codes-barres",
+        "19": "Imprimante étiquettes par produit",
+        "20": "Visibilité SEO",
+        "21": "Promotions",
+        "22": "Ticket par e-mail",
+        "23": "Facture directe",
+        "24": "Formation gratuite complète",
+        "25": "Support e-mail & téléphone"
+      }
+    }
   },
   "industry": {
     "sectionTitle": "Extra inclus dans votre abonnement",

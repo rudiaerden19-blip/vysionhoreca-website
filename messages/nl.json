@@ -701,7 +701,36 @@
     "choiceModalTitle": "Bekijk onze prijzen",
     "choiceHorecaPricing": "Bekijk de prijzen voor de horeca kassa",
     "choiceRetailPricing": "Bekijk de prijzen voor de retail en andere sectoren",
-    "retailModalTitle": "Retail en andere sectoren"
+    "retailModalTitle": "Retail en andere sectoren",
+    "retail": {
+      "features": {
+        "1": "Kassa licentie inbegrepen",
+        "2": "Kassa met barcode beheer",
+        "3": "Automatische voorraad",
+        "4": "Goederen ontvangst",
+        "5": "Producten & categorieën",
+        "6": "Overzicht verkoop",
+        "7": "Rapporten",
+        "8": "Medewerkers",
+        "9": "Klantenkaarten",
+        "10": "Retour en tegoedbon",
+        "11": "Producten inscannen via telefoon",
+        "12": "Productlijsten met CSV & Excel",
+        "13": "Personeel & loonadministratie",
+        "14": "Eigen website volledig aanpasbaar",
+        "15": "Betaalterminal integratie",
+        "16": "Volledige bedrijfsanalyse",
+        "17": "QR codes",
+        "18": "Barcodes",
+        "19": "Label/sticker printer per product",
+        "20": "SEO vindbaarheid",
+        "21": "Promoties",
+        "22": "Bon per mail",
+        "23": "Direct factuur",
+        "24": "Volledige gratis opleiding",
+        "25": "Email & telefoon support"
+      }
+    }
   },
   "industry": {
     "sectionTitle": "Extra inbegrepen in uw abonnement",

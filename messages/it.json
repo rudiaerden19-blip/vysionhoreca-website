@@ -421,7 +421,36 @@
     "choiceModalTitle": "Vedi i nostri prezzi",
     "choiceHorecaPricing": "Vedi prezzi per la cassa ristorazione",
     "choiceRetailPricing": "Vedi prezzi retail e altri settori",
-    "retailModalTitle": "Retail e altri settori"
+    "retailModalTitle": "Retail e altri settori",
+    "retail": {
+      "features": {
+        "1": "Licenza cassa inclusa",
+        "2": "Cassa con gestione codici a barre",
+        "3": "Magazzino automatico",
+        "4": "Ricezione merci",
+        "5": "Prodotti e categorie",
+        "6": "Panoramica vendite",
+        "7": "Report",
+        "8": "Dipendenti",
+        "9": "Tessere clienti",
+        "10": "Resi e buono",
+        "11": "Scansione prodotti con telefono",
+        "12": "Liste prodotti CSV ed Excel",
+        "13": "Personale e amministrazione paghe",
+        "14": "Sito web completamente personalizzabile",
+        "15": "Integrazione terminale pagamento",
+        "16": "Analisi aziendale completa",
+        "17": "Codici QR",
+        "18": "Codici a barre",
+        "19": "Stampante etichette per prodotto",
+        "20": "Visibilità SEO",
+        "21": "Promozioni",
+        "22": "Scontrino via email",
+        "23": "Fattura diretta",
+        "24": "Formazione gratuita completa",
+        "25": "Supporto email e telefono"
+      }
+    }
   },
   "industry": {
     "sectionTitle": "Extra incluso nel tuo abbonamento",
