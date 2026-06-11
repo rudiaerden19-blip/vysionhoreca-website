@@ -166,6 +166,12 @@ export async function middleware(request: NextRequest) {
 
   const hostname = normalizedHost(request)
 
+  /** Alias-domein marketing → canoniek www.vysionhoreca.com (vóór tenant-subdomein-logica). */
+  if (hostname === 'vysionkassa.com' || hostname === 'www.vysionkassa.com') {
+    const dest = new URL(`https://www.vysionhoreca.com${pathname}${url.search}`)
+    return NextResponse.redirect(dest, 301)
+  }
+
   // Main domains - skip subdomain routing (exact match only)
   const exactMainDomains = [
     'www.vysionhoreca.com',

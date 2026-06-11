@@ -151,6 +151,19 @@ const nextConfig = {
         destination: 'https://www.vysionhoreca.com/:path*',
         permanent: true,
       },
+      /** vysionkassa.com = alias → zelfde app op www.vysionhoreca.com (tenants op *.ordervysion.com blijven apart). */
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'vysionkassa.com' }],
+        destination: 'https://www.vysionhoreca.com/:path*',
+        permanent: true,
+      },
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.vysionkassa.com' }],
+        destination: 'https://www.vysionhoreca.com/:path*',
+        permanent: true,
+      },
       {
         source: '/sectoren/cafe-frituur-kebab',
         destination: '/sectoren/cafe',
