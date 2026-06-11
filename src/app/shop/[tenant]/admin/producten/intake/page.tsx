@@ -22,9 +22,13 @@ import {
 import { uploadTenantMediaImage } from '@/lib/tenant-media-upload-client'
 import {
   attachEnvironmentCameraToVideo,
+  decodeEanFromImageFile,
   getNativeBarcodeDetectorCtor,
   isRetailBarcodeCameraScanAvailable,
+  isRetailCameraTorchAvailable,
   isRetailPhoneCameraScanPreferred,
+  refocusRetailCameraStream,
+  setRetailCameraTorch,
   startNativeBarcodeDetectorLoop,
   startZxingBarcodeVideoScan,
   type RetailBarcodeCameraScanStop,
@@ -80,6 +84,8 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
   const [cameraScanActive, setCameraScanActive] = useState(false)
   const [wedgeListening, setWedgeListening] = useState(false)
   const [phoneCameraScan, setPhoneCameraScan] = useState(false)
+  const [torchOn, setTorchOn] = useState(false)
+  const [torchAvailable, setTorchAvailable] = useState(false)
 
   useEffect(() => {
     setPhoneCameraScan(isRetailPhoneCameraScanPreferred())
@@ -96,7 +102,9 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
 
   const wedgeRef = useRef<HTMLInputElement>(null)
   const photoInputRef = useRef<HTMLInputElement>(null)
+  const barcodePhotoInputRef = useRef<HTMLInputElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
+  const cameraStreamRef = useRef<MediaStream | null>(null)
   const scanEngineStopRef = useRef<RetailBarcodeCameraScanStop | null>(null)
   const cameraScanActiveRef = useRef(false)
 
@@ -174,10 +182,16 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
     cameraScanActiveRef.current = false
     scanEngineStopRef.current?.()
     scanEngineStopRef.current = null
+    const stream = cameraStreamRef.current
+    if (stream) {
+      void setRetailCameraTorch(stream, false)
+      stream.getTracks().forEach((tr) => tr.stop())
+    }
+    cameraStreamRef.current = null
+    setTorchOn(false)
+    setTorchAvailable(false)
     const v = videoRef.current
     if (v?.srcObject) {
-      const stream = v.srcObject as MediaStream
-      stream.getTracks().forEach((tr) => tr.stop())
       v.srcObject = null
     }
   }, [])
@@ -223,6 +237,9 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
           video.srcObject = null
           return
         }
+        cameraStreamRef.current = stream
+        setTorchAvailable(isRetailCameraTorchAvailable(stream))
+        setTorchOn(false)
 
         const isActive = () => cameraScanActiveRef.current && videoRef.current != null
         const onDetected = (raw: string) => {
@@ -272,6 +289,34 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
     e.currentTarget.value = ''
     setWedgeListening(false)
   }
+
+  const onCameraTapFocus = useCallback(() => {
+    void refocusRetailCameraStream(cameraStreamRef.current)
+  }, [])
+
+  const onTorchToggle = useCallback(() => {
+    const stream = cameraStreamRef.current
+    if (!stream) return
+    const next = !torchOn
+    void setRetailCameraTorch(stream, next).then(() => setTorchOn(next))
+  }, [torchOn])
+
+  const onBarcodePhotoSelected = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0]
+      e.target.value = ''
+      if (!file) return
+      setError('')
+      const raw = await decodeEanFromImageFile(file)
+      if (raw) {
+        applyBarcode(raw, { scanSuccessFeedback: true })
+        stopCameraScan()
+        return
+      }
+      setError(t('adminPages.productIntake.cameraPhotoDecodeFailed'))
+    },
+    [applyBarcode, stopCameraScan, t],
+  )
 
   const onPhotoSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -682,8 +727,25 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
           onStop={stopCameraScan}
           stopLabel={t('adminPages.productIntake.stopCameraScan')}
           barcodePreview={barcode.trim() || undefined}
+          onTapFocus={onCameraTapFocus}
+          tapFocusLabel={t('adminPages.productIntake.cameraTapToFocus')}
+          torchAvailable={torchAvailable}
+          torchOn={torchOn}
+          onTorchToggle={onTorchToggle}
+          torchOnLabel={t('adminPages.productIntake.cameraTorchOn')}
+          torchOffLabel={t('adminPages.productIntake.cameraTorchOff')}
+          onPhotoScan={() => barcodePhotoInputRef.current?.click()}
+          photoScanLabel={t('adminPages.productIntake.cameraPhotoScanButton')}
         />
       ) : null}
+      <input
+        ref={barcodePhotoInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={(e) => void onBarcodePhotoSelected(e)}
+      />
     </PinGate>
   )
 }

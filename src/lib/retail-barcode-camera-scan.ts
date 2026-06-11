@@ -4,6 +4,7 @@ import {
   BarcodeFormat,
   BinaryBitmap,
   DecodeHintType,
+  GlobalHistogramBinarizer,
   HybridBinarizer,
   MultiFormatOneDReader,
   HTMLCanvasElementLuminanceSource,
@@ -40,6 +41,88 @@ export function prepareIntakeScanVideoElement(video: HTMLVideoElement): void {
   video.muted = true
 }
 
+type VideoTrackCaps = MediaTrackCapabilities & {
+  focusMode?: string[]
+  torch?: boolean
+}
+
+function getVideoTrack(stream: MediaStream): MediaStreamTrack | null {
+  return stream.getVideoTracks()[0] ?? null
+}
+
+export function isRetailCameraTorchAvailable(stream: MediaStream | null): boolean {
+  const track = stream ? getVideoTrack(stream) : null
+  if (!track?.getCapabilities) return false
+  const caps = track.getCapabilities() as VideoTrackCaps
+  return caps.torch === true
+}
+
+export async function setRetailCameraTorch(
+  stream: MediaStream | null,
+  on: boolean,
+): Promise<void> {
+  const track = stream ? getVideoTrack(stream) : null
+  if (!track) return
+  try {
+    await track.applyConstraints({ advanced: [{ torch: on }] as unknown as MediaTrackConstraintSet[] })
+  } catch {
+    try {
+      await track.applyConstraints({ torch: on } as MediaTrackConstraints)
+    } catch {
+      /* torch niet ondersteund */
+    }
+  }
+}
+
+export async function configureRetailIntakeCameraTrack(stream: MediaStream): Promise<void> {
+  const track = getVideoTrack(stream)
+  if (!track) return
+
+  try {
+    await track.applyConstraints({
+      width: { ideal: 1920 },
+      height: { ideal: 1080 },
+      frameRate: { ideal: 30, max: 30 },
+    })
+  } catch {
+    /* device kiest zelf */
+  }
+
+  const caps = track.getCapabilities?.() as VideoTrackCaps | undefined
+  if (caps?.focusMode?.includes('continuous')) {
+    try {
+      await track.applyConstraints({
+        advanced: [{ focusMode: 'continuous' }] as unknown as MediaTrackConstraintSet[],
+      })
+    } catch {
+      /* noop */
+    }
+  }
+}
+
+/** Tik-op-scherpstellen (vooral iPhone). */
+export async function refocusRetailCameraStream(stream: MediaStream | null): Promise<void> {
+  const track = stream ? getVideoTrack(stream) : null
+  if (!track?.getCapabilities) return
+  const caps = track.getCapabilities() as VideoTrackCaps
+  const modes = caps.focusMode ?? []
+  try {
+    if (modes.includes('single-shot')) {
+      await track.applyConstraints({
+        advanced: [{ focusMode: 'single-shot' }] as unknown as MediaTrackConstraintSet[],
+      })
+      await new Promise((r) => window.setTimeout(r, 450))
+    }
+    if (modes.includes('continuous')) {
+      await track.applyConstraints({
+        advanced: [{ focusMode: 'continuous' }] as unknown as MediaTrackConstraintSet[],
+      })
+    }
+  } catch {
+    /* noop */
+  }
+}
+
 export async function attachEnvironmentCameraToVideo(
   video: HTMLVideoElement,
 ): Promise<MediaStream> {
@@ -47,11 +130,12 @@ export async function attachEnvironmentCameraToVideo(
   const stream = await navigator.mediaDevices.getUserMedia({
     video: {
       facingMode: { ideal: 'environment' },
-      width: { ideal: 1920 },
-      height: { ideal: 1080 },
+      width: { ideal: 1920, min: 1280 },
+      height: { ideal: 1080, min: 720 },
     },
     audio: false,
   })
+  await configureRetailIntakeCameraTrack(stream)
   video.srcObject = stream
   await video.play()
 
@@ -65,9 +149,10 @@ export async function attachEnvironmentCameraToVideo(
       resolve()
     }
     video.addEventListener('loadedmetadata', onMeta)
-    window.setTimeout(onMeta, 800)
+    window.setTimeout(onMeta, 1200)
   })
 
+  await refocusRetailCameraStream(stream)
   return stream
 }
 
@@ -81,31 +166,77 @@ export function getNativeBarcodeDetectorCtor(): BarcodeDetectorCtor | null {
   return w.BarcodeDetector ?? null
 }
 
-function buildEanHints(): Map<DecodeHintType, unknown> {
+function buildEanHints(tryHarder: boolean): Map<DecodeHintType, unknown> {
   const hints = new Map<DecodeHintType, unknown>()
   hints.set(DecodeHintType.POSSIBLE_FORMATS, [
     BarcodeFormat.EAN_13,
     BarcodeFormat.EAN_8,
     BarcodeFormat.UPC_A,
   ])
+  if (tryHarder) hints.set(DecodeHintType.TRY_HARDER, true)
   return hints
 }
 
-/** Snelle 1D-decode op downscaled full frame (iPhone / ZXing). */
+function decodeCanvasWithReader(
+  canvas: HTMLCanvasElement,
+  reader: MultiFormatOneDReader,
+  useGlobalBinarizer: boolean,
+): string | null {
+  try {
+    const source = new HTMLCanvasElementLuminanceSource(canvas)
+    const binarizer = useGlobalBinarizer
+      ? new GlobalHistogramBinarizer(source)
+      : new HybridBinarizer(source)
+    const bitmap = new BinaryBitmap(binarizer)
+    return reader.decode(bitmap).getText() || null
+  } catch {
+    return null
+  }
+}
+
+function drawVideoCropToCanvas(
+  ctx: CanvasRenderingContext2D,
+  video: HTMLVideoElement,
+  canvas: HTMLCanvasElement,
+  mode: 'center' | 'full',
+): void {
+  const vw = video.videoWidth
+  const vh = video.videoHeight
+  const maxW = 1920
+  const scale = Math.min(1, maxW / vw)
+  const dw = Math.max(1, Math.floor(vw * scale))
+  const dh = Math.max(1, Math.floor(vh * scale))
+  if (canvas.width !== dw || canvas.height !== dh) {
+    canvas.width = dw
+    canvas.height = dh
+  }
+  ctx.imageSmoothingEnabled = false
+  if (mode === 'center') {
+    const cropW = vw * 0.88
+    const cropH = vh * 0.38
+    const sx = (vw - cropW) / 2
+    const sy = (vh - cropH) / 2
+    ctx.drawImage(video, sx, sy, cropW, cropH, 0, 0, dw, dh)
+  } else {
+    ctx.drawImage(video, 0, 0, dw, dh)
+  }
+}
+
+/** Snelle 1D-decode — meerdere crops/binarisatie per frame. */
 export function startFastEanVideoScan(
   video: HTMLVideoElement,
   isActive: () => boolean,
   onCode: (raw: string) => void,
 ): RetailBarcodeCameraScanStop {
-  const reader = new MultiFormatOneDReader(buildEanHints())
+  const readerFast = new MultiFormatOneDReader(buildEanHints(false))
+  const readerHard = new MultiFormatOneDReader(buildEanHints(true))
   const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d', { willReadFrequently: true })
 
   let rafId = 0
   let lastAttempt = 0
   let frameToggle = 0
-  const minIntervalMs = 32
-  const maxDecodeWidth = 1024
+  const minIntervalMs = 48
 
   const loop = (now: number) => {
     if (!isActive()) return
@@ -119,44 +250,26 @@ export function startFastEanVideoScan(
     }
     lastAttempt = now
 
-    const vw = video.videoWidth
-    const vh = video.videoHeight
-    if (vw < 80 || vh < 80) {
+    if (video.videoWidth < 80 || video.videoHeight < 80) {
       rafId = requestAnimationFrame(loop)
       return
     }
 
-    const scale = Math.min(1, maxDecodeWidth / vw)
-    const dw = Math.max(1, Math.floor(vw * scale))
-    const dh = Math.max(1, Math.floor(vh * scale))
-    if (canvas.width !== dw || canvas.height !== dh) {
-      canvas.width = dw
-      canvas.height = dh
-    }
-
     frameToggle += 1
-    const zoomCenter = frameToggle % 3 !== 0
-    if (zoomCenter) {
-      const cropW = vw * 0.92
-      const cropH = vh * 0.42
-      const sx = (vw - cropW) / 2
-      const sy = (vh - cropH) / 2
-      ctx.drawImage(video, sx, sy, cropW, cropH, 0, 0, dw, dh)
-    } else {
-      ctx.drawImage(video, 0, 0, dw, dh)
-    }
+    const modes: Array<'center' | 'full'> =
+      frameToggle % 2 === 0 ? ['center', 'full'] : ['full', 'center']
+    const useHard = frameToggle % 5 === 0
+    const reader = useHard ? readerHard : readerFast
 
-    try {
-      const source = new HTMLCanvasElementLuminanceSource(canvas)
-      const bitmap = new BinaryBitmap(new HybridBinarizer(source))
-      const result = reader.decode(bitmap)
-      const raw = result.getText()
+    for (const mode of modes) {
+      drawVideoCropToCanvas(ctx, video, canvas, mode)
+      const raw =
+        decodeCanvasWithReader(canvas, reader, false) ??
+        decodeCanvasWithReader(canvas, reader, true)
       if (raw) {
         onCode(raw)
         return
       }
-    } catch {
-      /* NotFoundException — volgende frame */
     }
 
     rafId = requestAnimationFrame(loop)
@@ -205,7 +318,56 @@ export function startNativeBarcodeDetectorLoop(
   }
 }
 
-/** ZXing fallback (iOS Safari) — snelle 1D-loop op heel beeld. */
+/** Scherpe foto (iPhone) — decode static frame. */
+export async function decodeEanFromImageFile(file: File): Promise<string | null> {
+  if (!file.type.startsWith('image/')) return null
+  let bitmap: ImageBitmap | null = null
+  try {
+    bitmap = await createImageBitmap(file)
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d', { willReadFrequently: true })
+    if (!ctx) return null
+
+    const tries: Array<{ sx: number; sy: number; sw: number; sh: number }> = [
+      { sx: 0, sy: 0, sw: bitmap.width, sh: bitmap.height },
+      {
+        sx: bitmap.width * 0.06,
+        sy: bitmap.height * 0.28,
+        sw: bitmap.width * 0.88,
+        sh: bitmap.height * 0.38,
+      },
+    ]
+
+    const reader = new MultiFormatOneDReader(buildEanHints(true))
+    for (const crop of tries) {
+      const maxW = 2400
+      const scale = Math.min(1, maxW / crop.sw)
+      canvas.width = Math.max(1, Math.floor(crop.sw * scale))
+      canvas.height = Math.max(1, Math.floor(crop.sh * scale))
+      ctx.imageSmoothingEnabled = false
+      ctx.drawImage(
+        bitmap,
+        crop.sx,
+        crop.sy,
+        crop.sw,
+        crop.sh,
+        0,
+        0,
+        canvas.width,
+        canvas.height,
+      )
+      const raw =
+        decodeCanvasWithReader(canvas, reader, false) ??
+        decodeCanvasWithReader(canvas, reader, true)
+      if (raw) return raw
+    }
+    return null
+  } finally {
+    bitmap?.close()
+  }
+}
+
+/** ZXing fallback (iOS Safari). */
 export async function startZxingBarcodeVideoScan(
   video: HTMLVideoElement,
   isActive: () => boolean,
