@@ -163,6 +163,7 @@ import { KassaStaffSalesPickModal } from '@/components/kassa/KassaStaffSalesPick
 import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
 import { parseFloorPlanTablesJson, sanitizeFloorPlanTables, type FloorPlanTable } from '@/lib/kassa-floor-plan-tables'
 import {
+  displayNumbersWithOpenOrdersInZone,
   FLOOR_PLAN_ZONE_INSIDE,
   FLOOR_PLAN_ZONE_TERRACE,
   floorPlanTablesLocalStorageKey,
@@ -171,6 +172,7 @@ import {
   migrateLegacyTableOrdersKeys,
   normalizeFloorPlanZone,
   parseTableOrderMapKey,
+  reconcileFloorPlanTablesWithOpenOrders,
   tableOrderMapKey,
   type FloorPlanZone,
 } from '@/lib/kassa-floor-plan-zone'
@@ -1408,11 +1410,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   })
   /** Tijdens plattegrond-upsert: poll/realtime mag geen kortere DB-snapshot over optimistische tafels zetten. */
   const floorPlanTablesPersistInflightRef = useRef<Partial<Record<FloorPlanZone, number>>>({})
+  /** Laatste open-manden snapshot — plattegrond-sync mag geen verouderde «bezet» uit DB terugzetten. */
+  const tableOrdersRef = useRef<Record<string, CartItem[]>>({})
 
   const applyKassaFloorPlanTablesPayload = useCallback((zone: FloorPlanZone, raw: unknown): boolean => {
     const parsed = parseFloorPlanTablesJson(raw)
     if (parsed === null) return false
-    const fixed = sanitizeFloorPlanTables(parsed)
+    const openNums = displayNumbersWithOpenOrdersInZone(tableOrdersRef.current, zone)
+    const fixed = reconcileFloorPlanTablesWithOpenOrders(sanitizeFloorPlanTables(parsed), openNums)
     setKassaTablesByZone((prev) => {
       const prevZone = prev[zone]
       const inflight = floorPlanTablesPersistInflightRef.current[zone] ?? 0
@@ -1481,10 +1486,51 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   // Openstaande bestellingen per tafel: { "1": CartItem[], "2": CartItem[], ... }
   const [tableOrders, setTableOrders] = useState<Record<string, CartItem[]>>({})
 
+  useEffect(() => {
+    tableOrdersRef.current = tableOrders
+  }, [tableOrders])
+
   const tableOrdersKey = `vysion_table_orders_${tenant}`
   const persistTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
   /** Één persist tegelijk per tafel-slot: voorkomt dat DELETE/INSERT door elkaar lopen (keuken ziet dan niets). */
   const openOrderPersistChainRef = useRef<Record<string, Promise<void>>>({})
+
+  const syncFloorPlanStatusesFromOpenOrders = useCallback(
+    (ordersMap: Record<string, CartItem[]>) => {
+      setKassaTablesByZone((prev) => {
+        let next: Record<FloorPlanZone, FloorPlanTable[]> | null = null
+        for (const zone of KASSA_FLOOR_ZONES) {
+          const zoneTables = prev[zone]
+          if (!zoneTables.length) continue
+          const openNums = displayNumbersWithOpenOrdersInZone(ordersMap, zone)
+          const reconciled = reconcileFloorPlanTablesWithOpenOrders(zoneTables, openNums)
+          const changed = reconciled.some(
+            (t, i) =>
+              t.status !== zoneTables[i]?.status ||
+              String(t.number) !== String(zoneTables[i]?.number),
+          )
+          if (!changed) continue
+          if (!next) next = { ...prev }
+          next[zone] = reconciled
+          try {
+            localStorage.setItem(
+              floorPlanTablesLocalStorageKey(tenant, zone),
+              JSON.stringify(reconciled),
+            )
+          } catch {
+            /* empty */
+          }
+          void adminDb.upsert(
+            'floor_plan_tables',
+            { tenant_slug: tenant, plan_zone: zone, data: reconciled } as any,
+            { tenantSlug: tenant, onConflict: 'tenant_slug,plan_zone' },
+          )
+        }
+        return next ?? prev
+      })
+    },
+    [tenant],
+  )
 
   const applyOpenOrdersFromServerRows = useCallback((rows: OpenTableOrderRow[] | null) => {
     if (rows === null) return
@@ -1492,9 +1538,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setTableOrders((prev) => {
       const merged = mergeOpenTableOrdersServerWithPendingLocal(prev, fromServer)
       localStorage.setItem(tableOrdersKey, JSON.stringify(merged))
+      queueMicrotask(() => syncFloorPlanStatusesFromOpenOrders(merged))
       return merged
     })
-  }, [tableOrdersKey])
+  }, [tableOrdersKey, syncFloorPlanStatusesFromOpenOrders])
 
   useEffect(() => {
     return () => {
@@ -2015,25 +2062,40 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }
 
   const updateTableStatus = (tblNr: string, occupied: boolean, zone: FloorPlanZone) => {
+    const nr = String(tblNr)
+    const newStatus = occupied ? 'OCCUPIED' : 'FREE'
     const lsKey = floorPlanTablesLocalStorageKey(tenant, zone)
-    const tablesRaw = localStorage.getItem(lsKey)
-    if (!tablesRaw) return
-    try {
-      const tbls = JSON.parse(tablesRaw)
-      const newStatus = occupied ? 'OCCUPIED' : 'FREE'
-      const updatedTbls = tbls.map((t: { number: string; status: string }) =>
-        t.number === tblNr ? { ...t, status: newStatus } : t,
+    setKassaTablesByZone((prev) => {
+      const zoneTables = prev[zone]
+      if (!zoneTables.length) return prev
+      let tbls: FloorPlanTable[] = zoneTables
+      const tablesRaw = localStorage.getItem(lsKey)
+      if (tablesRaw) {
+        try {
+          tbls = JSON.parse(tablesRaw) as FloorPlanTable[]
+        } catch {
+          tbls = zoneTables
+        }
+      }
+      const updatedTbls = tbls.map((t) =>
+        String(t.number) === nr ? { ...t, status: newStatus } : t,
       )
-      localStorage.setItem(lsKey, JSON.stringify(updatedTbls))
-      setKassaTablesByZone((prev) => ({ ...prev, [zone]: updatedTbls }))
+      const prior = zoneTables.find((t) => String(t.number) === nr)
+      if (prior?.status === newStatus && updatedTbls.every((t, i) => t.status === zoneTables[i]?.status)) {
+        return prev
+      }
+      try {
+        localStorage.setItem(lsKey, JSON.stringify(updatedTbls))
+      } catch {
+        /* empty */
+      }
       void adminDb.upsert(
         'floor_plan_tables',
         { tenant_slug: tenant, plan_zone: zone, data: updatedTbls } as any,
         { tenantSlug: tenant, onConflict: 'tenant_slug,plan_zone' },
       )
-    } catch {
-      /* empty */
-    }
+      return { ...prev, [zone]: updatedTbls }
+    })
   }
 
   const saveCartToTable = (zone: FloorPlanZone, tblNr: string, items: CartItem[]) => {
@@ -2078,6 +2140,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       const switchingAway =
         tableNumber !== newTableNr || dineInFloorZone !== zone
       if (switchingAway && (cart.length > 0 || hasParked)) {
+        setShowTablePicker(false)
+        setKassaZoneTab(null)
         setSwitchConfirm(tableOrderMapKey(zone, newTableNr))
         return
       }
@@ -3163,10 +3227,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const slotKey = tableOrderMapKey(zone, tblNr)
     cancelPersistTimer(slotKey)
     removeBarBonWatermarkSlot(tenant, slotKey)
-    const updated = { ...tableOrders }
-    delete updated[slotKey]
-    setTableOrders(updated)
-    localStorage.setItem(tableOrdersKey, JSON.stringify(updated))
+    setTableOrders((prev) => {
+      const next = { ...prev }
+      delete next[slotKey]
+      localStorage.setItem(tableOrdersKey, JSON.stringify(next))
+      queueMicrotask(() => syncFloorPlanStatusesFromOpenOrders(next))
+      return next
+    })
     updateTableStatus(tblNr, false, zone)
     const stoolStatusKey =
       zone === FLOOR_PLAN_ZONE_INSIDE
@@ -3184,16 +3251,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     } catch {
       /* empty */
     }
-    void adminDb.delete(
-      'orders',
-      { tenant_slug: tenant, table_number: tblNr, status: 'open', floor_plan_zone: zone },
-      { tenantSlug: tenant },
-    )
-    void adminDb.delete(
-      'orders',
-      { tenant_slug: tenant, table_number: tblNr, status: 'preparing', floor_plan_zone: zone },
-      { tenantSlug: tenant },
-    )
+    const prevChain = openOrderPersistChainRef.current[slotKey] ?? Promise.resolve()
+    openOrderPersistChainRef.current[slotKey] = prevChain
+      .then(() => persistOpenOrderRowToSupabaseImpl(zone, tblNr, []))
+      .catch((err) => {
+        console.warn('[kassa] clear table open-order persist:', err)
+      })
   }
 
   /** Kar leegmaken; bij tafel ook open mand + DB-order (na gele bon of bij fout). */
@@ -3218,6 +3281,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     splitAmounts?: { cash: number; card: number },
   ) => {
     if (billLines.length === 0) return
+
+    const dineInSettleAtCheckout =
+      orderType === 'DINE_IN' && tableNumber.trim()
+        ? { zone: dineInFloorZone, tblNr: tableNumber.trim() }
+        : null
 
     if (method === 'SPLIT') {
       const sc = splitAmounts?.cash ?? 0
@@ -3422,7 +3490,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       helpedByStaffName: activeKassaStaff?.name?.trim() || null,
     })
 
-    if (tableNumber && orderType === 'DINE_IN') clearTableAfterPayment(dineInFloorZone, tableNumber)
+    if (dineInSettleAtCheckout) {
+      clearTableAfterPayment(dineInSettleAtCheckout.zone, dineInSettleAtCheckout.tblNr)
+    }
 
     clearCart()
     setTableNumber('')
@@ -5776,7 +5846,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
       {/* ── Bevestiging: Tafel wisselen ── */}
       {switchConfirm && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/60 z-[220] flex items-center justify-center p-4">
           <div className={ui.modalConfirmBg}>
             <div className="text-center">
               <div className="text-4xl mb-2">🪑</div>

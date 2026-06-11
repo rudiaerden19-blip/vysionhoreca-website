@@ -90,3 +90,20 @@ export function displayNumbersWithOpenOrdersInZone(
   }
   return out
 }
+
+type FloorPlanTableStatusLike = 'FREE' | 'OCCUPIED' | 'UNPAID'
+
+/** Zet FREE/OCCUPIED op basis van open manden; UNPAID blijft zolang er geen mand is. */
+export function reconcileFloorPlanTablesWithOpenOrders<
+  T extends { number: string | number; status: FloorPlanTableStatusLike },
+>(tables: T[], openNumbersInZone: Set<string>): T[] {
+  return tables.map((t) => {
+    const num = String(t.number)
+    const hasOpen = openNumbersInZone.has(num)
+    if (hasOpen) {
+      if (t.status === 'UNPAID') return t
+      return t.status === 'OCCUPIED' ? t : { ...t, status: 'OCCUPIED' as const }
+    }
+    return t.status === 'FREE' ? t : { ...t, status: 'FREE' as const }
+  })
+}
