@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { VYSION_INFO_EMAIL } from '@/lib/vysion-contact'
 
 const OFF_API = 'https://world.openfoodfacts.org/api/v2/product'
 const UPC_TRIAL = 'https://api.upcitemdb.com/prod/trial/lookup'
@@ -28,7 +29,7 @@ function parsePrice(value: unknown): number | null {
 
 async function lookupOpenFoodFacts(code: string): Promise<{ name: string; price: number | null } | null> {
   const res = await fetch(`${OFF_API}/${code}.json`, {
-    headers: { 'User-Agent': 'VysionHoreca-RetailKassa/1.0 (contact: info@vysionkassa.com)' },
+    headers: { 'User-Agent': `VysionKassa-Retail/1.0 (contact: ${VYSION_INFO_EMAIL})` },
     signal: AbortSignal.timeout(8000),
     next: { revalidate: 3600 },
   })

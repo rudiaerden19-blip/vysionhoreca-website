@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
+import { VYSION_INFO_EMAIL, resolveZohoUser } from '@/lib/vysion-contact'
 
 import { logger } from '@/lib/logger'
 import { verifySuperAdminAccess } from '@/lib/verify-tenant-access'
@@ -47,7 +48,7 @@ export async function POST(request: NextRequest) {
       port: 465,
       secure: true,
       auth: {
-        user: process.env.ZOHO_USER || 'info@vysionkassa.com',
+        user: resolveZohoUser(),
         pass: process.env.ZOHO_PASS,
       },
     })
@@ -103,14 +104,14 @@ export async function POST(request: NextRequest) {
       
       <p>Heeft u al betaald? Neem dan contact met ons op zodat we uw account kunnen activeren.</p>
       
-      <p>Heeft u vragen over uw factuur? Stuur een email naar <a href="mailto:info@vysionkassa.com">info@vysionkassa.com</a></p>
+      <p>Heeft u vragen over uw factuur? Stuur een email naar <a href="mailto:${VYSION_INFO_EMAIL}">${VYSION_INFO_EMAIL}</a></p>
       
       <p>Met vriendelijke groet,<br><strong>Team Vysion kassa's</strong></p>
     </div>
     
     <div class="footer">
       <p>Vysion kassa's - Bestelplatform voor de horeca</p>
-      <p>www.vysionhoreca.com | info@vysionkassa.com</p>
+      <p>www.vysionhoreca.com | ${VYSION_INFO_EMAIL}</p>
     </div>
   </div>
 </body>
@@ -118,7 +119,7 @@ export async function POST(request: NextRequest) {
 `
 
     await transporter.sendMail({
-      from: `"Vysion kassa's" <info@vysionkassa.com>`,
+      from: `"Vysion kassa's" <${VYSION_INFO_EMAIL}>`,
       to: tenantEmail,
       subject: `⚠️ Betalingsherinnering - Uw abonnement wordt binnen 3 dagen gedeactiveerd`,
       html: emailHtml,

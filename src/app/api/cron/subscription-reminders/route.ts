@@ -3,6 +3,7 @@ import { requireCronSecret } from '@/lib/cron-auth'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
 import nodemailer from 'nodemailer'
+import { VYSION_INFO_EMAIL, resolveZohoUser } from '@/lib/vysion-contact'
 
 // Vercel Cron Job - runs daily at 9:00 AM
 // Configure in vercel.json: { "crons": [{ "path": "/api/cron/subscription-reminders", "schedule": "0 9 * * *" }] }
@@ -74,7 +75,7 @@ export async function GET(request: NextRequest) {
       port: 465,
       secure: true,
       auth: {
-        user: process.env.ZOHO_USER || 'info@vysionkassa.com',
+        user: resolveZohoUser(),
         pass: process.env.ZOHO_PASS,
       },
     })
@@ -166,14 +167,14 @@ export async function GET(request: NextRequest) {
       
       <p>Na verlenging blijft alles gewoon werken zonder onderbreking.</p>
       
-      <p>Heeft u vragen? Stuur een email naar <a href="mailto:info@vysionkassa.com">info@vysionkassa.com</a></p>
+      <p>Heeft u vragen? Stuur een email naar <a href="mailto:${VYSION_INFO_EMAIL}">${VYSION_INFO_EMAIL}</a></p>
       
       <p>Met vriendelijke groet,<br><strong>Team Vysion kassa's</strong></p>
     </div>
     
     <div class="footer">
       <p>Vysion kassa's - Bestelplatform voor de horeca</p>
-      <p>www.vysionhoreca.com | info@vysionkassa.com</p>
+      <p>www.vysionhoreca.com | ${VYSION_INFO_EMAIL}</p>
     </div>
   </div>
 </body>
@@ -181,7 +182,7 @@ export async function GET(request: NextRequest) {
 `
 
         await transporter.sendMail({
-          from: `"Vysion kassa's" <info@vysionkassa.com>`,
+          from: `"Vysion kassa's" <${VYSION_INFO_EMAIL}>`,
           to: email,
           subject: `📅 Uw abonnement loopt bijna af - Verleng voor ${expiryDate}`,
           html: emailHtml,

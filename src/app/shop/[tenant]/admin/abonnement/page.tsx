@@ -1,5 +1,6 @@
 'use client'
 
+import { VYSION_INFO_EMAIL } from '@/lib/vysion-contact'
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useParams, useSearchParams } from 'next/navigation'
@@ -1238,13 +1239,12 @@ export default function AbonnementPage() {
         <p className="text-gray-600 mb-4">{t('questionsDesc')}</p>
         <div className="flex flex-wrap gap-4">
           <a 
-            href="mailto:info@vysionkassa.com" 
+            href={`mailto:${VYSION_INFO_EMAIL}`} 
             className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-            info@vysionkassa.com
+            </svg>{VYSION_INFO_EMAIL}
           </a>
           <a 
             href="tel:+32492129383" 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
+import { VYSION_INFO_EMAIL, resolveZohoEmail } from '@/lib/vysion-contact'
 
 import { logger } from '@/lib/logger'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
@@ -41,7 +42,7 @@ export async function POST(request: NextRequest) {
       port: 465,
       secure: true,
       auth: {
-        user: process.env.ZOHO_EMAIL || 'info@vysionkassa.com',
+        user: resolveZohoEmail(),
         pass: process.env.ZOHO_PASSWORD || '',
       },
     })
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
     `
 
     await transporter.sendMail({
-      from: `"Vysion kassa's" <${process.env.ZOHO_EMAIL || 'info@vysionkassa.com'}>`,
+      from: `"Vysion kassa's" <${process.env.ZOHO_EMAIL || VYSION_INFO_EMAIL}>`,
       to,
       subject,
       text: message,

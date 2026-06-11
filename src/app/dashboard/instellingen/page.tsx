@@ -1,5 +1,6 @@
 'use client'
 
+import { VYSION_INFO_EMAIL } from '@/lib/vysion-contact'
 import { useState } from 'react'
 import Link from 'next/link'
 import { useLanguage } from '@/i18n'
@@ -245,7 +246,7 @@ export default function InstellingenPage() {
             </div>
           </Link>
           <a 
-            href="mailto:info@vysionkassa.com"
+            href={`mailto:${VYSION_INFO_EMAIL}`}
             className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:border-accent transition-colors"
           >
             <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center">
@@ -255,7 +256,7 @@ export default function InstellingenPage() {
             </div>
             <div>
               <p className="font-medium text-gray-900">{trans('sections.help.emailSupport')}</p>
-              <p className="text-sm text-gray-500">info@vysionkassa.com</p>
+              <p className="text-sm text-gray-500">{VYSION_INFO_EMAIL}</p>
             </div>
           </a>
           <a 

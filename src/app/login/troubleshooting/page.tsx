@@ -1,5 +1,6 @@
 'use client'
 
+import { VYSION_INFO_EMAIL } from '@/lib/vysion-contact'
 import { useState } from 'react'
 import Link from 'next/link'
 import { useLanguage } from '@/i18n'
@@ -107,7 +108,7 @@ export default function TroubleshootingPage() {
             </a>
 
             <a
-              href="mailto:info@vysionkassa.com"
+              href={`mailto:${VYSION_INFO_EMAIL}`}
               className="flex items-center gap-4 p-4 bg-white/5 hover:bg-white/10 rounded-xl border border-gray-700 transition-colors"
             >
               <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
@@ -117,7 +118,7 @@ export default function TroubleshootingPage() {
               </div>
               <div>
                 <p className="text-white font-semibold">{t('troubleshootingPage.quickActions.emailSupport')}</p>
-                <p className="text-sm text-gray-400">info@vysionkassa.com</p>
+                <p className="text-sm text-gray-400">{VYSION_INFO_EMAIL}</p>
               </div>
             </a>
 
@@ -198,7 +199,7 @@ export default function TroubleshootingPage() {
               {t('troubleshootingPage.stillNeedHelp.callNow')} +32 492 12 93 83
             </a>
             <a
-              href="mailto:info@vysionkassa.com"
+              href={`mailto:${VYSION_INFO_EMAIL}`}
               className="inline-flex items-center justify-center gap-2 border-2 border-gray-600 hover:border-gray-500 text-white px-8 py-4 rounded-full font-semibold transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

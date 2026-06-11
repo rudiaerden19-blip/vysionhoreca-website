@@ -10,6 +10,7 @@ import SectorChoiceGate from '@/components/SectorChoiceGate'
 import { OsTouchKeyboardAssist } from '@/components/OsTouchKeyboardAssist'
 import { WebAzertyKeyboard } from '@/components/WebAzertyKeyboard'
 import { TENANT_APP_SHELL_THEME_COLOR } from '@/lib/theme-color'
+import { VYSION_INFO_EMAIL } from '@/lib/vysion-contact'
 const inter = Inter({ 
   subsets: ['latin'],
   display: 'swap',
@@ -51,7 +52,7 @@ const organizationJsonLd = {
       contactPoint: {
         '@type': 'ContactPoint',
         contactType: 'customer support',
-        email: 'info@vysionkassa.com',
+        email: VYSION_INFO_EMAIL,
         areaServed: ['BE', 'NL'],
         availableLanguage: ['Dutch', 'English', 'French', 'German'],
       },

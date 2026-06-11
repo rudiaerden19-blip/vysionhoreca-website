@@ -1,5 +1,6 @@
 'use client'
 
+import { VYSION_INFO_EMAIL } from '@/lib/vysion-contact'
 import { useState } from 'react'
 import { useLanguage } from '@/i18n'
 
@@ -82,8 +83,7 @@ export default function ContactPageSection({ className = '', sectionId }: Contac
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">{t('contact.email')}</p>
-                  <a href="mailto:info@vysionkassa.com" className="text-gray-900 hover:text-accent">
-                    info@vysionkassa.com
+                  <a href={`mailto:${VYSION_INFO_EMAIL}`} className="text-gray-900 hover:text-accent">{VYSION_INFO_EMAIL}
                   </a>
                 </div>
               </div>

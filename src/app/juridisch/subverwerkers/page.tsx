@@ -1,5 +1,6 @@
 'use client'
 
+import { VYSION_INFO_EMAIL } from '@/lib/vysion-contact'
 import { useLanguage } from '@/i18n'
 
 export default function SubverwerkersPage() {
@@ -70,7 +71,7 @@ export default function SubverwerkersPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('subprocessorsPage.contact.title')}</h2>
           <p className="text-gray-600 mb-8">
             {t('subprocessorsPage.contact.content')}{' '}
-            <a href="mailto:info@vysionkassa.com" className="text-accent hover:underline">info@vysionkassa.com</a>
+            <a href={`mailto:${VYSION_INFO_EMAIL}`} className="text-accent hover:underline">{VYSION_INFO_EMAIL}</a>
           </p>
 
           <div className="mt-12 pt-8 border-t border-gray-200 flex gap-4">
