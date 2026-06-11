@@ -2543,6 +2543,7 @@
       "cameraScanHint": "Inquadrare il codice a barre finché compare il numero.",
       "cameraViewfinderHint": "Allinea il codice nel riquadro verde — la linea rossa scansiona da sola.",
       "barcodeScanChoiceHint": "Su telefono: Fotocamera barcode. Con scanner Bluetooth: Scansiona prodotto.",
+      "phoneProductScanHint": "Tocca Scansiona prodotto — si apre la fotocamera con il riquadro verde.",
       "eanLookupBusy": "Looking up name…",
       "barcodeRequired": "Barcode required.",
       "nameRequired": "Enter a product name.",

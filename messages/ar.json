@@ -2543,6 +2543,7 @@
       "cameraScanHint": "وجّه الكاميرا نحو الرمز حتى يظهر الرقم في الحقل.",
       "cameraViewfinderHint": "ضع الرمز داخل الإطار الأخضر — الخط الأحمر يمسح تلقائياً.",
       "barcodeScanChoiceHint": "على الهاتف: كاميرا الرمز. مع ماسح Bluetooth: مسح المنتج.",
+      "phoneProductScanHint": "اضغط مسح المنتج — تفتح الكاميرا مع الإطار الأخضر.",
       "eanLookupBusy": "Looking up name…",
       "barcodeRequired": "Barcode required.",
       "nameRequired": "Enter a product name.",

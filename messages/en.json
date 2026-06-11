@@ -2842,6 +2842,7 @@
       "cameraScanHint": "Point the camera at the barcode until the number appears in the field.",
       "cameraViewfinderHint": "Align the barcode inside the green frame — the red line scans automatically.",
       "barcodeScanChoiceHint": "On phone: Camera barcode. With Bluetooth scanner: Scan product.",
+      "phoneProductScanHint": "Tap Scan product — the camera opens with the green scan frame.",
       "eanLookupBusy": "Looking up name…",
       "barcodeRequired": "Barcode required.",
       "nameRequired": "Enter a product name.",

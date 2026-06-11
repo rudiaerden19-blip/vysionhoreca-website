@@ -6,6 +6,23 @@ export function isRetailBarcodeCameraScanAvailable(): boolean {
   return typeof navigator !== 'undefined' && Boolean(navigator.mediaDevices?.getUserMedia)
 }
 
+/** Telefoon/tablet: camera i.p.v. Bluetooth-wedge (geen handscanner). */
+export function isRetailPhoneCameraScanPreferred(): boolean {
+  if (typeof window === 'undefined') return false
+  if (!isRetailBarcodeCameraScanAvailable()) return false
+  try {
+    if (window.matchMedia('(pointer: coarse)').matches) return true
+    const touch =
+      'maxTouchPoints' in navigator && typeof navigator.maxTouchPoints === 'number'
+        ? navigator.maxTouchPoints
+        : 0
+    if (touch > 0 && window.innerWidth < 900) return true
+  } catch {
+    return false
+  }
+  return false
+}
+
 export function prepareIntakeScanVideoElement(video: HTMLVideoElement): void {
   video.setAttribute('playsinline', 'true')
   video.setAttribute('muted', 'true')

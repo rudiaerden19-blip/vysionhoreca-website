@@ -2043,6 +2043,7 @@
       "cameraScanHint": "Visez le code-barres jusqu'à ce que le numéro apparaisse.",
       "cameraViewfinderHint": "Placez le code dans le cadre vert — la ligne rouge scanne automatiquement.",
       "barcodeScanChoiceHint": "Sur téléphone : Caméra code-barres. Avec scanner Bluetooth : Scanner le produit.",
+      "phoneProductScanHint": "Appuyez sur Scanner le produit — la caméra s’ouvre avec le cadre vert.",
       "eanLookupBusy": "Looking up name…",
       "barcodeRequired": "Barcode required.",
       "nameRequired": "Enter a product name.",

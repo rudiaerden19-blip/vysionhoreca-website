@@ -2543,6 +2543,7 @@
       "cameraScanHint": "バーコードがフィールドに表示されるまでカメラを向けてください。",
       "cameraViewfinderHint": "緑の枠内にバーコードを合わせてください。赤い線が自動で読み取ります。",
       "barcodeScanChoiceHint": "スマホ：カメラバーコード。Bluetoothスキャナー：商品スキャン。",
+      "phoneProductScanHint": "「商品スキャン」をタップ — 緑の枠付きカメラが開きます。",
       "eanLookupBusy": "Looking up name…",
       "barcodeRequired": "Barcode required.",
       "nameRequired": "Enter a product name.",

@@ -24,6 +24,7 @@ import {
   attachEnvironmentCameraToVideo,
   getNativeBarcodeDetectorCtor,
   isRetailBarcodeCameraScanAvailable,
+  isRetailPhoneCameraScanPreferred,
   startNativeBarcodeDetectorLoop,
   startZxingBarcodeVideoScan,
   type RetailBarcodeCameraScanStop,
@@ -78,6 +79,11 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
   const [success, setSuccess] = useState('')
   const [cameraScanActive, setCameraScanActive] = useState(false)
   const [wedgeListening, setWedgeListening] = useState(false)
+  const [phoneCameraScan, setPhoneCameraScan] = useState(false)
+
+  useEffect(() => {
+    setPhoneCameraScan(isRetailPhoneCameraScanPreferred())
+  }, [])
 
   const wedgeRef = useRef<HTMLInputElement>(null)
   const photoInputRef = useRef<HTMLInputElement>(null)
@@ -235,7 +241,11 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
 
   useEffect(() => () => stopCameraScan(), [stopCameraScan])
 
-  const startWedgeScan = useCallback(() => {
+  const startProductScan = useCallback(() => {
+    if (phoneCameraScan) {
+      toggleCameraScan()
+      return
+    }
     if (cameraScanActive) stopCameraScan()
     setWedgeListening(true)
     if (wedgeRef.current) wedgeRef.current.value = ''
@@ -244,7 +254,7 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
       if (active instanceof HTMLElement && active !== wedgeRef.current) active.blur()
     }
     requestAnimationFrame(() => wedgeRef.current?.focus({ preventScroll: true }))
-  }, [cameraScanActive, stopCameraScan])
+  }, [phoneCameraScan, cameraScanActive, stopCameraScan, toggleCameraScan])
 
   const onWedgeKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key !== 'Enter') return
@@ -435,36 +445,48 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
             <div className="mt-3 flex flex-wrap gap-2">
               <button
                 type="button"
-                onClick={startWedgeScan}
+                onClick={startProductScan}
                 className={`rounded-xl border px-4 py-2.5 text-sm font-semibold ${
-                  wedgeListening
-                    ? 'border-blue-600 bg-blue-50 text-blue-800'
-                    : 'border-gray-200 bg-gray-50'
+                  phoneCameraScan
+                    ? cameraScanActive
+                      ? 'border-blue-600 bg-blue-50 text-blue-800'
+                      : 'border-emerald-600 bg-emerald-50 text-emerald-900'
+                    : wedgeListening
+                      ? 'border-blue-600 bg-blue-50 text-blue-800'
+                      : 'border-gray-200 bg-gray-50'
                 }`}
               >
-                {wedgeListening
-                  ? t('adminPages.producten.scanProductListening')
-                  : t('adminPages.producten.scanProductButton')}
+                {phoneCameraScan
+                  ? cameraScanActive
+                    ? t('adminPages.productIntake.stopCameraScan')
+                    : t('adminPages.producten.scanProductButton')
+                  : wedgeListening
+                    ? t('adminPages.producten.scanProductListening')
+                    : t('adminPages.producten.scanProductButton')}
               </button>
-              <button
-                type="button"
-                onClick={toggleCameraScan}
-                className={`rounded-xl border px-4 py-2.5 text-sm font-semibold ${
-                  cameraScanActive
-                    ? 'border-blue-600 bg-blue-50 text-blue-800'
-                    : 'border-gray-200 bg-white'
-                }`}
-              >
-                {cameraScanActive
-                  ? t('adminPages.productIntake.stopCameraScan')
-                  : t('adminPages.productIntake.startCameraScan')}
-              </button>
+              {!phoneCameraScan ? (
+                <button
+                  type="button"
+                  onClick={toggleCameraScan}
+                  className={`rounded-xl border px-4 py-2.5 text-sm font-semibold ${
+                    cameraScanActive
+                      ? 'border-blue-600 bg-blue-50 text-blue-800'
+                      : 'border-gray-200 bg-white'
+                  }`}
+                >
+                  {cameraScanActive
+                    ? t('adminPages.productIntake.stopCameraScan')
+                    : t('adminPages.productIntake.startCameraScan')}
+                </button>
+              ) : null}
             </div>
             {!cameraScanActive ? (
               <p className="mt-2 text-xs text-gray-500">
-                {wedgeListening
-                  ? t('adminPages.producten.scanProductListeningHint')
-                  : t('adminPages.productIntake.barcodeScanChoiceHint')}
+                {phoneCameraScan
+                  ? t('adminPages.productIntake.phoneProductScanHint')
+                  : wedgeListening
+                    ? t('adminPages.producten.scanProductListeningHint')
+                    : t('adminPages.productIntake.barcodeScanChoiceHint')}
               </p>
             ) : null}
             <div data-no-web-touch-keyboard>

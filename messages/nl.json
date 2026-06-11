@@ -2842,6 +2842,7 @@
       "cameraScanHint": "Richt de camera op de streepjescode tot het nummer in het veld staat.",
       "cameraViewfinderHint": "Plaats de streepjescode in het groene kader — rode lijn scant automatisch.",
       "barcodeScanChoiceHint": "Op telefoon: Camera barcode. Met Bluetooth-scanner: Product scannen.",
+      "phoneProductScanHint": "Tik Product scannen — de camera opent met het groene scan-kader.",
       "eanLookupBusy": "Naam opzoeken…",
       "barcodeRequired": "Barcode verplicht.",
       "nameRequired": "Vul een productnaam in.",
