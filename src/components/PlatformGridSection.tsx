@@ -58,9 +58,6 @@ export default function PlatformGridSection() {
           <p className="mt-4 text-lg sm:text-xl text-gray-800 font-medium leading-snug">
             {t('platform.sectionSubtitle1')}
           </p>
-          <p className="mt-2 text-base sm:text-lg text-gray-600 leading-relaxed">
-            {t('platform.sectionSubtitle2')}
-          </p>
         </header>
 
         <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-5 sm:gap-6 lg:gap-7">
