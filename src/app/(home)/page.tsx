@@ -481,6 +481,38 @@ function PromoMarqueeBand() {
 const PREMIUM_CARD_FEATURES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const
 const STARTER_CARD_FEATURES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] as const
 
+/** Vaste volgorde modules-popup (links → rechts, per kolom van boven naar beneden). */
+const MODULES_POPUP_ORDER = [
+  { plan: 'pro', i: 1 },
+  { plan: 'starter', i: 1 },
+  { plan: 'pro', i: 12 },
+  { plan: 'pro', i: 9 },
+  { plan: 'pro', i: 4 },
+  { plan: 'starter', i: 2 },
+  { plan: 'starter', i: 4 },
+  { plan: 'starter', i: 5 },
+  { plan: 'starter', i: 8 },
+  { plan: 'starter', i: 10 },
+  { plan: 'starter', i: 12 },
+  { plan: 'pro', i: 3 },
+  { plan: 'pro', i: 6 },
+  { plan: 'pro', i: 8 },
+  { plan: 'pro', i: 11 },
+  { plan: 'pro', i: 7 },
+  { plan: 'pro', i: 2 },
+  { plan: 'starter', i: 11 },
+  { plan: 'starter', i: 9 },
+  { plan: 'starter', i: 3 },
+  { plan: 'starter', i: 13 },
+  { plan: 'starter', i: 6 },
+] as const
+
+function modulePopupLabel(t: (key: string) => string, entry: (typeof MODULES_POPUP_ORDER)[number]) {
+  return t(`pricing.${entry.plan}.features.${entry.i}`)
+}
+
+const MODULES_POPUP_MID = Math.ceil(MODULES_POPUP_ORDER.length / 2)
+
 function PricingFeatureCheck({ label }: { label: string }) {
   return (
     <li className="flex items-start gap-3">
@@ -558,8 +590,11 @@ function PricingSection() {
                   <div>
                     <h4 className="mb-4 text-base font-bold text-accent sm:text-lg">{t('pricing.starter.name')}</h4>
                     <ul className="space-y-3">
-                      {STARTER_CARD_FEATURES.map((i) => (
-                        <PricingFeatureCheck key={`s-${i}`} label={t(`pricing.starter.features.${i}`)} />
+                      {MODULES_POPUP_ORDER.slice(0, MODULES_POPUP_MID).map((entry, idx) => (
+                        <PricingFeatureCheck
+                          key={`m-l-${entry.plan}-${entry.i}-${idx}`}
+                          label={modulePopupLabel(t, entry)}
+                        />
                       ))}
                     </ul>
                   </div>
@@ -568,8 +603,11 @@ function PricingSection() {
                       .
                     </div>
                     <ul className="space-y-3">
-                      {PREMIUM_CARD_FEATURES.map((i) => (
-                        <PricingFeatureCheck key={`p-${i}`} label={t(`pricing.pro.features.${i}`)} />
+                      {MODULES_POPUP_ORDER.slice(MODULES_POPUP_MID).map((entry, idx) => (
+                        <PricingFeatureCheck
+                          key={`m-r-${entry.plan}-${entry.i}-${idx}`}
+                          label={modulePopupLabel(t, entry)}
+                        />
                       ))}
                     </ul>
                   </div>
