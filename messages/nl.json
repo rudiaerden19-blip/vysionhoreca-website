@@ -5085,7 +5085,9 @@
   "videosPage": {
     "heroTitle": "Help",
     "heroTitleAccent": "Video's",
-    "heroSubtitle": "Leer alles over Vysion Horeca in korte video's van ongeveer 3 minuten.",
+    "heroSubtitle": "Alle uitlegvideo's staan op ons YouTube-kanaal Vysion horeca.",
+    "youtubeBody": "We tonen geen video's meer op deze pagina. Bekijk tutorials, demo's en tips rechtstreeks op YouTube.",
+    "youtubeCta": "Open YouTube-kanaal",
     "videoCountOne": "1 video",
     "videoCountMany": "{{count}} video's",
     "comingSoon": ", binnenkort beschikbaar",

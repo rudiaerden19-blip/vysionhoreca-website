@@ -1,0 +1,3 @@
+kassa install = Vysion Print Agent
+Dubbelklik: INSTALLEER-VANAF-USB.bat
+Daarna: Vysion Kassa op bureaublad

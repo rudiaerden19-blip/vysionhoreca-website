@@ -50,7 +50,6 @@ export default function Navigation() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1 ml-12">
             <a href="/" className={navLinkClass}>{t('nav.home')}</a>
-            <a href="/videos" className={navLinkClass}>{t('nav.videos')}</a>
             <a href="/#prijzen" className={navLinkClass}>{t('nav.pricing')}</a>
             <a href="/over-ons" className={navLinkClass}>{t('nav.about')}</a>
             <a href="/abonnementen" className={navLinkClass}>{t('nav.subscriptions')}</a>
@@ -133,7 +132,6 @@ export default function Navigation() {
           <div className="md:hidden py-4 border-t border-gray-700">
             <div className="flex flex-col gap-1">
               <a href="/" className={navLinkClassMobile}>{t('nav.home')}</a>
-              <a href="/videos" className={navLinkClassMobile}>{t('nav.videos')}</a>
               <a href="/#prijzen" className={navLinkClassMobile}>{t('nav.pricing')}</a>
               <a href="/over-ons" className={navLinkClassMobile}>{t('nav.about')}</a>
               <a href="/abonnementen" className={navLinkClassMobile}>{t('nav.subscriptions')}</a>

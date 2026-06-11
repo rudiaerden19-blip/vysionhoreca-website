@@ -161,6 +161,11 @@ const nextConfig = {
         destination: '/sectoren/retail',
         permanent: true,
       },
+      {
+        source: '/videos',
+        destination: '/',
+        permanent: true,
+      },
     ]
   },
 }
