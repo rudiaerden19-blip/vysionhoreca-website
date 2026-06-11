@@ -41,9 +41,9 @@ export default function Navigation() {
           <div className="flex items-center">
             <a
               href="/"
-              className="inline-flex min-h-11 items-center rounded-lg px-2 text-2xl font-bold touch-manipulation [-webkit-tap-highlight-color:transparent]"
+              className="inline-flex min-h-11 items-center rounded-lg px-2 text-xl sm:text-2xl font-bold touch-manipulation [-webkit-tap-highlight-color:transparent]"
             >
-              <span className="text-accent">Vysion</span>
+              <span className="text-accent">vysion kassa</span>
             </a>
           </div>
 
