@@ -2541,7 +2541,7 @@
       "cameraPermissionDenied": "No camera access. Allow camera or type the barcode.",
       "cameraStartFailed": "تعذر تشغيل الكاميرا. اضغط مرة أخرى أو أدخل رقم EAN.",
       "cameraScanHint": "وجّه الكاميرا نحو الرمز حتى يظهر الرقم في الحقل.",
-      "cameraViewfinderHint": "اضغط للتركيز. 25–40 سم — قريب جداً = ضبابي. أو صورة للرمز.",
+      "cameraViewfinderHint": "الرمز أفقي أو عمودي في الإطار. اضغط للتركيز. 25–40 سم. أو صورة.",
       "cameraTapToFocus": "اضغط للتركيز",
       "cameraTorchOn": "تشغيل المصباح",
       "cameraTorchOff": "إيقاف المصباح",

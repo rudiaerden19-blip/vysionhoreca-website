@@ -2041,7 +2041,7 @@
       "cameraPermissionDenied": "Kein Kamerazugriff. Kamera erlauben oder Barcode eingeben.",
       "cameraStartFailed": "Kamera konnte nicht starten. Erneut auf Kamera-Barcode tippen oder EAN eingeben.",
       "cameraScanHint": "Barcode in die Kamera halten, bis die Nummer im Feld steht.",
-      "cameraViewfinderHint": "Tippen zum Scharfstellen. 25–40 cm Abstand — zu nah ist unscharf. Oder Foto vom Barcode.",
+      "cameraViewfinderHint": "Barcode waagrecht of senkrecht ins Bild. Tippen zum Scharfstellen. 25–40 cm. Oder Foto.",
       "cameraTapToFocus": "Tippen zum Scharfstellen",
       "cameraTorchOn": "Taschenlampe an",
       "cameraTorchOff": "Taschenlampe aus",

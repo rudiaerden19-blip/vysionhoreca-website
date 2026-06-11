@@ -194,11 +194,72 @@ function decodeCanvasWithReader(
   }
 }
 
+type CanvasRotationDeg = 0 | 90 | 270
+
+let sharedRotateCanvas: HTMLCanvasElement | null = null
+let sharedRotateCtx: CanvasRenderingContext2D | null = null
+
+function getRotateCanvas(): { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D } | null {
+  if (typeof document === 'undefined') return null
+  if (!sharedRotateCanvas) {
+    sharedRotateCanvas = document.createElement('canvas')
+    sharedRotateCtx = sharedRotateCanvas.getContext('2d', { willReadFrequently: true })
+  }
+  if (!sharedRotateCtx) return null
+  return { canvas: sharedRotateCanvas, ctx: sharedRotateCtx }
+}
+
+function drawCanvasRotated(
+  src: HTMLCanvasElement,
+  degrees: CanvasRotationDeg,
+): HTMLCanvasElement {
+  if (degrees === 0) return src
+  const pair = getRotateCanvas()
+  if (!pair) return src
+  const { canvas: dest, ctx } = pair
+  const w = src.width
+  const h = src.height
+  ctx.imageSmoothingEnabled = false
+  ctx.setTransform(1, 0, 0, 1, 0, 0)
+  if (degrees === 90) {
+    dest.width = h
+    dest.height = w
+    ctx.clearRect(0, 0, dest.width, dest.height)
+    ctx.translate(dest.width, 0)
+    ctx.rotate(Math.PI / 2)
+    ctx.drawImage(src, 0, 0)
+  } else {
+    dest.width = h
+    dest.height = w
+    ctx.clearRect(0, 0, dest.width, dest.height)
+    ctx.translate(0, dest.height)
+    ctx.rotate(-Math.PI / 2)
+    ctx.drawImage(src, 0, 0)
+  }
+  ctx.setTransform(1, 0, 0, 1, 0, 0)
+  return dest
+}
+
+function decodeCanvasAllOrientations(
+  canvas: HTMLCanvasElement,
+  reader: MultiFormatOneDReader,
+  rotations: CanvasRotationDeg[],
+): string | null {
+  for (const deg of rotations) {
+    const sample = drawCanvasRotated(canvas, deg)
+    const raw =
+      decodeCanvasWithReader(sample, reader, false) ??
+      decodeCanvasWithReader(sample, reader, true)
+    if (raw) return raw
+  }
+  return null
+}
+
 function drawVideoCropToCanvas(
   ctx: CanvasRenderingContext2D,
   video: HTMLVideoElement,
   canvas: HTMLCanvasElement,
-  mode: 'center' | 'full',
+  mode: 'center' | 'full' | 'vertical',
 ): void {
   const vw = video.videoWidth
   const vh = video.videoHeight
@@ -214,6 +275,12 @@ function drawVideoCropToCanvas(
   if (mode === 'center') {
     const cropW = vw * 0.88
     const cropH = vh * 0.38
+    const sx = (vw - cropW) / 2
+    const sy = (vh - cropH) / 2
+    ctx.drawImage(video, sx, sy, cropW, cropH, 0, 0, dw, dh)
+  } else if (mode === 'vertical') {
+    const cropW = vw * 0.36
+    const cropH = vh * 0.9
     const sx = (vw - cropW) / 2
     const sy = (vh - cropH) / 2
     ctx.drawImage(video, sx, sy, cropW, cropH, 0, 0, dw, dh)
@@ -256,16 +323,20 @@ export function startFastEanVideoScan(
     }
 
     frameToggle += 1
-    const modes: Array<'center' | 'full'> =
-      frameToggle % 2 === 0 ? ['center', 'full'] : ['full', 'center']
+    const cropModes: Array<'center' | 'full' | 'vertical'> =
+      frameToggle % 3 === 0
+        ? ['vertical', 'center']
+        : frameToggle % 2 === 0
+          ? ['center', 'full']
+          : ['full', 'center']
+    const rotations: CanvasRotationDeg[] =
+      frameToggle % 3 === 1 ? [0, 90] : frameToggle % 3 === 2 ? [0, 270] : [0, 90, 270]
     const useHard = frameToggle % 5 === 0
     const reader = useHard ? readerHard : readerFast
 
-    for (const mode of modes) {
+    for (const mode of cropModes) {
       drawVideoCropToCanvas(ctx, video, canvas, mode)
-      const raw =
-        decodeCanvasWithReader(canvas, reader, false) ??
-        decodeCanvasWithReader(canvas, reader, true)
+      const raw = decodeCanvasAllOrientations(canvas, reader, rotations)
       if (raw) {
         onCode(raw)
         return
@@ -336,9 +407,16 @@ export async function decodeEanFromImageFile(file: File): Promise<string | null>
         sw: bitmap.width * 0.88,
         sh: bitmap.height * 0.38,
       },
+      {
+        sx: bitmap.width * 0.32,
+        sy: bitmap.height * 0.05,
+        sw: bitmap.width * 0.36,
+        sh: bitmap.height * 0.9,
+      },
     ]
 
     const reader = new MultiFormatOneDReader(buildEanHints(true))
+    const rotations: CanvasRotationDeg[] = [0, 90, 270]
     for (const crop of tries) {
       const maxW = 2400
       const scale = Math.min(1, maxW / crop.sw)
@@ -356,9 +434,7 @@ export async function decodeEanFromImageFile(file: File): Promise<string | null>
         canvas.width,
         canvas.height,
       )
-      const raw =
-        decodeCanvasWithReader(canvas, reader, false) ??
-        decodeCanvasWithReader(canvas, reader, true)
+      const raw = decodeCanvasAllOrientations(canvas, reader, rotations)
       if (raw) return raw
     }
     return null

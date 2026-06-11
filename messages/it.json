@@ -2541,7 +2541,7 @@
       "cameraPermissionDenied": "No camera access. Allow camera or type the barcode.",
       "cameraStartFailed": "Impossibile avviare la fotocamera. Riprovare o inserire l'EAN.",
       "cameraScanHint": "Inquadrare il codice a barre finché compare il numero.",
-      "cameraViewfinderHint": "Tocca per mettere a fuoco. 25–40 cm — troppo vicino = sfocato. O Foto del codice.",
+      "cameraViewfinderHint": "Codice orizzontale o verticale in inquadratura. Tocca per mettere a fuoco. 25–40 cm. O foto.",
       "cameraTapToFocus": "Tocca per mettere a fuoco",
       "cameraTorchOn": "Torcia accesa",
       "cameraTorchOff": "Torcia spenta",

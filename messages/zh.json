@@ -2541,7 +2541,7 @@
       "cameraPermissionDenied": "No camera access. Allow camera or type the barcode.",
       "cameraStartFailed": "无法启动相机。请再次点击或使用条形码扫描，或输入 EAN。",
       "cameraScanHint": "将相机对准条形码，直到号码出现在字段中。",
-      "cameraViewfinderHint": "点击屏幕对焦。距离 25–40 cm — 太近会模糊。或使用条形码照片。",
+      "cameraViewfinderHint": "横放或竖放条形码均可。点击对焦。距离 25–40 cm。或拍照。",
       "cameraTapToFocus": "点击屏幕对焦",
       "cameraTorchOn": "手电筒开",
       "cameraTorchOff": "手电筒关",

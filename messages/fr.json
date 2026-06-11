@@ -2041,7 +2041,7 @@
       "cameraPermissionDenied": "No camera access. Allow camera or type the barcode.",
       "cameraStartFailed": "Impossible de démarrer la caméra. Réessayez ou saisissez l'EAN.",
       "cameraScanHint": "Visez le code-barres jusqu'à ce que le numéro apparaisse.",
-      "cameraViewfinderHint": "Touchez pour faire la mise au point. 25–40 cm — trop près = flou. Ou Photo du code-barres.",
+      "cameraViewfinderHint": "Code horizontal ou vertical dans l’image. Touchez pour la mise au point. 25–40 cm. Ou photo.",
       "cameraTapToFocus": "Toucher pour faire la mise au point",
       "cameraTorchOn": "Lampe activée",
       "cameraTorchOff": "Lampe désactivée",

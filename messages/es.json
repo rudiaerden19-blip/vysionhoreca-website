@@ -2541,7 +2541,7 @@
       "cameraPermissionDenied": "No camera access. Allow camera or type the barcode.",
       "cameraStartFailed": "No se pudo iniciar la cámara. Toque de nuevo o escriba el EAN.",
       "cameraScanHint": "Apunte al código de barras hasta que aparezca el número.",
-      "cameraViewfinderHint": "Toque para enfocar. 25–40 cm — muy cerca = borroso. O Foto del código.",
+      "cameraViewfinderHint": "Código horizontal o vertical en pantalla. Toque para enfocar. 25–40 cm. O foto.",
       "cameraTapToFocus": "Toque para enfocar",
       "cameraTorchOn": "Linterna encendida",
       "cameraTorchOff": "Linterna apagada",

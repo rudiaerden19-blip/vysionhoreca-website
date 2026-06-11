@@ -2541,7 +2541,7 @@
       "cameraPermissionDenied": "No camera access. Allow camera or type the barcode.",
       "cameraStartFailed": "カメラを起動できませんでした。もう一度タップするかEANを入力してください。",
       "cameraScanHint": "バーコードがフィールドに表示されるまでカメラを向けてください。",
-      "cameraViewfinderHint": "タップでピント合わせ。25〜40 cm — 近すぎるとぼやけます。またはバーコード写真。",
+      "cameraViewfinderHint": "横でも縦でもバーコードを画面に。タップでピント。25〜40 cm。または写真。",
       "cameraTapToFocus": "タップでピント合わせ",
       "cameraTorchOn": "ライトオン",
       "cameraTorchOff": "ライトオフ",
