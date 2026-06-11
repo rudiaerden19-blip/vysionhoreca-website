@@ -414,6 +414,11 @@
       "secondary": "联系我们"
     },
     "viewModules": "查看模块",
+    "ctaOpenPricing": "查看餐饮收银价格",
+    "chooserModalTitle": "查看我们的价格",
+    "chooserHoreca": "查看餐饮收银价格",
+    "chooserRetail": "查看零售及其他行业价格",
+    "retailPricingModalTitle": "零售及其他行业",
     "modulesModalTitle": "全部模块",
     "modulesModalClose": "关闭"
   },

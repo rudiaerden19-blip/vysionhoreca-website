@@ -414,6 +414,11 @@
       "secondary": "تواصل معنا"
     },
     "viewModules": "عرض الوحدات",
+    "ctaOpenPricing": "عرض أسعار كassa المطاعم",
+    "chooserModalTitle": "عرض أسعارنا",
+    "chooserHoreca": "عرض أسعار كassa المطاعم",
+    "chooserRetail": "عرض أسعار التجزئة والقطاعات الأخرى",
+    "retailPricingModalTitle": "التجزئة والقطاعات الأخرى",
     "modulesModalTitle": "جميع الوحدات",
     "modulesModalClose": "إغلاق"
   },

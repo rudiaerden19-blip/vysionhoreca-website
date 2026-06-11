@@ -414,6 +414,11 @@
       "secondary": "Nous contacter"
     },
     "viewModules": "Voir les modules",
+    "ctaOpenPricing": "Voir les tarifs caisse horeca",
+    "chooserModalTitle": "Voir nos tarifs",
+    "chooserHoreca": "Voir les tarifs pour la caisse horeca",
+    "chooserRetail": "Voir les tarifs retail et autres secteurs",
+    "retailPricingModalTitle": "Retail et autres secteurs",
     "modulesModalTitle": "Tous les modules",
     "modulesModalClose": "Fermer"
   },

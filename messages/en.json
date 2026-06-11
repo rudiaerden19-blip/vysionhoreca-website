@@ -694,6 +694,11 @@
       "secondary": "Contact us"
     },
     "viewModules": "View modules",
+    "ctaOpenPricing": "View pricing for hospitality POS",
+    "chooserModalTitle": "View our pricing",
+    "chooserHoreca": "View pricing for hospitality POS",
+    "chooserRetail": "View pricing for retail and other sectors",
+    "retailPricingModalTitle": "Retail and other sectors",
     "modulesModalTitle": "All modules",
     "modulesModalClose": "Close"
   },

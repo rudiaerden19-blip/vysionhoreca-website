@@ -414,6 +414,11 @@
       "secondary": "お問い合わせ"
     },
     "viewModules": "モジュールを見る",
+    "ctaOpenPricing": "飲食向けレジの料金を見る",
+    "chooserModalTitle": "料金を見る",
+    "chooserHoreca": "飲食向けレジの料金を見る",
+    "chooserRetail": "小売・その他業種の料金を見る",
+    "retailPricingModalTitle": "小売・その他業種",
     "modulesModalTitle": "すべてのモジュール",
     "modulesModalClose": "閉じる"
   },

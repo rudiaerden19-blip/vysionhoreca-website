@@ -414,6 +414,11 @@
       "secondary": "Contattaci"
     },
     "viewModules": "Vedi i moduli",
+    "ctaOpenPricing": "Vedi i prezzi per cassa horeca",
+    "chooserModalTitle": "Vedi i nostri prezzi",
+    "chooserHoreca": "Vedi i prezzi per la cassa horeca",
+    "chooserRetail": "Vedi i prezzi per retail e altri settori",
+    "retailPricingModalTitle": "Retail e altri settori",
     "modulesModalTitle": "Tutti i moduli",
     "modulesModalClose": "Chiudi"
   },
