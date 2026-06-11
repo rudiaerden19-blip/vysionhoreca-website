@@ -286,14 +286,17 @@ export async function saveMenuProduct(product: MenuProduct): Promise<{ data: Men
     }
   }
 
-  const persist = async (includeZoom: boolean) => {
+  const persist = async (opts: { includeZoom: boolean; includeRetailPackaging: boolean }) => {
+    const { retail_sale_unit, retail_unit_quantity, ...baseWithoutRetailPackaging } =
+      baseProduct as MenuProduct
+    const core = opts.includeRetailPackaging ? baseProduct : baseWithoutRetailPackaging
     const fullProduct = {
-      ...baseProduct,
+      ...core,
       ...(is_promo !== undefined && { is_promo }),
       ...(promo_price !== undefined && { promo_price }),
       ...(image_display_mode !== undefined && { image_display_mode }),
       ...(print_label !== undefined && { print_label }),
-      ...(includeZoom && zoomForDb !== undefined && { kassa_image_zoom: zoomForDb }),
+      ...(opts.includeZoom && zoomForDb !== undefined && { kassa_image_zoom: zoomForDb }),
     }
     const tenant = product.tenant_slug
     const payload = fullProduct as unknown as Record<string, unknown>
@@ -307,17 +310,31 @@ export async function saveMenuProduct(product: MenuProduct): Promise<{ data: Men
       : adminDb.insert<MenuProduct[]>('menu_products', payload, { tenantSlug: tenant, select: '*' })
   }
 
+  const isMissingRetailPackagingColumn = (msg: string) =>
+    /retail_sale_unit|retail_unit_quantity/i.test(msg)
+
   /** Zelfde als categorieën: geen blind upsert — id wordt door de proxy gestript → zou dubbele rijen geven. */
-  let r = await persist(true)
+  let r = await persist({ includeZoom: true, includeRetailPackaging: true })
 
   if (r.ok) {
     return wrapOk(r.data)
   }
 
+  if (isMissingRetailPackagingColumn(r.error || '')) {
+    const rRetail = await persist({ includeZoom: true, includeRetailPackaging: false })
+    if (rRetail.ok) return wrapOk(rRetail.data)
+    r = rRetail
+  }
+
   // Fallback: kolom kassa_image_zoom mist nog in DB? probeer zonder.
   if (/kassa_image_zoom/i.test(r.error || '')) {
-    const r2 = await persist(false)
+    const r2 = await persist({ includeZoom: false, includeRetailPackaging: true })
     if (r2.ok) return wrapOk(r2.data)
+    if (isMissingRetailPackagingColumn(r2.error || '')) {
+      const r3 = await persist({ includeZoom: false, includeRetailPackaging: false })
+      if (r3.ok) return wrapOk(r3.data)
+      return { data: null, error: r3.error }
+    }
     return { data: null, error: r2.error }
   }
 
