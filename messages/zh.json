@@ -356,7 +356,7 @@
     "compareDiscountStarter": "-40%",
     "compareDiscountPro": "-23%",
     "starter": {
-      "name": "在线订餐平台",
+      "name": "面向餐饮",
       "features": {
         "1": "在线订单平台",
         "2": "完全可定制的独立网站",
@@ -375,7 +375,7 @@
     },
     "pro": {
       "name": "Vysion Premium",
-      "allOfStarter": "在线订餐平台的所有功能，外加：",
+      "allOfStarter": "餐饮套餐全部功能，外加：",
       "hardwareIncluded": "含硬件",
       "features": {
         "1": "包含POS授权",

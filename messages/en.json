@@ -636,7 +636,7 @@
     "compareDiscountStarter": "-40%",
     "compareDiscountPro": "-23%",
     "starter": {
-      "name": "Online ordering platform",
+      "name": "For hospitality",
       "features": {
         "1": "Online ordering platform",
         "2": "Fully customizable own website",
@@ -655,7 +655,7 @@
     },
     "pro": {
       "name": "Vysion Premium",
-      "allOfStarter": "Everything from the online ordering platform, plus:",
+      "allOfStarter": "Everything in this hospitality package, plus:",
       "hardwareIncluded": "Hardware included",
       "features": {
         "1": "POS license included",

@@ -636,7 +636,7 @@
     "compareDiscountStarter": "-40%",
     "compareDiscountPro": "-23%",
     "starter": {
-      "name": "Online bestelplatform",
+      "name": "Voor de horeca",
       "features": {
         "1": "Online bestelplatform",
         "2": "Eigen website volledig aanpasbaar",
@@ -655,7 +655,7 @@
     },
     "pro": {
       "name": "Vysion Premium",
-      "allOfStarter": "Alles van Online bestelplatform, plus:",
+      "allOfStarter": "Alles uit dit horeca-pakket, plus:",
       "hardwareIncluded": "Hardware inbegrepen",
       "features": {
         "1": "Kassa licentie inbegrepen",

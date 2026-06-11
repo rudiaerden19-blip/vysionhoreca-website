@@ -356,7 +356,7 @@
     "compareDiscountStarter": "-40%",
     "compareDiscountPro": "-23%",
     "starter": {
-      "name": "Online-Bestellplattform",
+      "name": "Für die Gastronomie",
       "features": {
         "1": "Online-Bestellplattform",
         "2": "Vollständig anpassbare eigene Website",
@@ -375,7 +375,7 @@
     },
     "pro": {
       "name": "Vysion Premium",
-      "allOfStarter": "Alles von der Online-Bestellplattform, plus:",
+      "allOfStarter": "Alles aus diesem Gastronomie-Paket, plus:",
       "hardwareIncluded": "Hardware inbegriffen",
       "features": {
         "1": "Kassenlizenz inbegriffen",

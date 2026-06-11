@@ -356,7 +356,7 @@
     "compareDiscountStarter": "-40%",
     "compareDiscountPro": "-23%",
     "starter": {
-      "name": "Plataforma de pedidos online",
+      "name": "Para hostelería",
       "features": {
         "1": "Plataforma de pedidos online",
         "2": "Sitio web propio totalmente personalizable",
@@ -375,7 +375,7 @@
     },
     "pro": {
       "name": "Vysion Premium",
-      "allOfStarter": "Todo de la plataforma de pedidos online, más:",
+      "allOfStarter": "Todo el pack horeca, más:",
       "hardwareIncluded": "Hardware incluido",
       "features": {
         "1": "Licencia de TPV incluida",

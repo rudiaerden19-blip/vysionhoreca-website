@@ -356,7 +356,7 @@
     "compareDiscountStarter": "-40 %",
     "compareDiscountPro": "-23 %",
     "starter": {
-      "name": "Plateforme de commande en ligne",
+      "name": "Pour l'horeca",
       "features": {
         "1": "Plateforme de commande en ligne",
         "2": "Site web propre entièrement personnalisable",
@@ -375,7 +375,7 @@
     },
     "pro": {
       "name": "Vysion Premium",
-      "allOfStarter": "Tout de la plateforme de commande en ligne, plus :",
+      "allOfStarter": "Tout le pack horeca, plus :",
       "hardwareIncluded": "Matériel inclus",
       "features": {
         "1": "Licence caisse incluse",

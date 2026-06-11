@@ -356,7 +356,7 @@
     "compareDiscountStarter": "-40%",
     "compareDiscountPro": "-23%",
     "starter": {
-      "name": "オンライン注文プラットフォーム",
+      "name": "ホスピタリティ向け",
       "features": {
         "1": "オンライン注文プラットフォーム",
         "2": "完全カスタマイズ可能な独自ウェブサイト",
@@ -375,7 +375,7 @@
     },
     "pro": {
       "name": "Vysion Premium",
-      "allOfStarter": "オンライン注文プラットフォームのすべてに加えて：",
+      "allOfStarter": "このホスピタリティパックのすべてに加えて：",
       "hardwareIncluded": "ハードウェア込み",
       "features": {
         "1": "POSライセンス込み",
