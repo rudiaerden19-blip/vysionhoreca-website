@@ -564,9 +564,10 @@ function PricingSection() {
                     </ul>
                   </div>
                   <div>
-                    <h4 className="mb-4 text-base font-bold text-accent sm:text-lg">{t('pricing.pro.name')}</h4>
+                    <div className="mb-4 hidden text-base font-bold sm:text-lg md:block md:invisible" aria-hidden>
+                      .
+                    </div>
                     <ul className="space-y-3">
-                      <PricingFeatureCheck label={t('pricing.pro.hardwareIncluded')} />
                       {PREMIUM_CARD_FEATURES.map((i) => (
                         <PricingFeatureCheck key={`p-${i}`} label={t(`pricing.pro.features.${i}`)} />
                       ))}
