@@ -414,13 +414,13 @@
       "secondary": "Contactar"
     },
     "viewModules": "Ver módulos",
-    "ctaOpenPricing": "Ver precios para caja hostelería",
-    "chooserModalTitle": "Ver nuestros precios",
-    "chooserHoreca": "Ver precios para la caja de hostelería",
-    "chooserRetail": "Ver precios para retail y otros sectores",
-    "retailPricingModalTitle": "Retail y otros sectores",
     "modulesModalTitle": "Todos los módulos",
-    "modulesModalClose": "Cerrar"
+    "modulesModalClose": "Cerrar",
+    "ctaHomeHorecaPricing": "Ver precios caja hostelería",
+    "choiceModalTitle": "Ver nuestros precios",
+    "choiceHorecaPricing": "Ver precios para la caja hostelería",
+    "choiceRetailPricing": "Ver precios retail y otros sectores",
+    "retailModalTitle": "Retail y otros sectores"
   },
   "industry": {
     "sectionTitle": "Extra incluido en su suscripción",

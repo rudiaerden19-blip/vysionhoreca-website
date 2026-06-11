@@ -694,13 +694,13 @@
       "secondary": "Contact opnemen"
     },
     "viewModules": "Bekijk de modules",
-    "ctaOpenPricing": "Bekijk de prijzen voor horeca kassa",
-    "chooserModalTitle": "Bekijk onze prijzen",
-    "chooserHoreca": "Bekijk de prijzen voor de horeca kassa",
-    "chooserRetail": "Bekijk de prijzen voor retail en andere sectoren",
-    "retailPricingModalTitle": "Retail en andere sectoren",
     "modulesModalTitle": "Alle modules",
-    "modulesModalClose": "Sluiten"
+    "modulesModalClose": "Sluiten",
+    "ctaHomeHorecaPricing": "Bekijk de prijzen voor horeca kassa",
+    "choiceModalTitle": "Bekijk onze prijzen",
+    "choiceHorecaPricing": "Bekijk de prijzen voor de horeca kassa",
+    "choiceRetailPricing": "Bekijk de prijzen voor de retail en andere sectoren",
+    "retailModalTitle": "Retail en andere sectoren"
   },
   "industry": {
     "sectionTitle": "Extra inbegrepen in uw abonnement",

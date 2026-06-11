@@ -414,13 +414,13 @@
       "secondary": "Kontakt aufnehmen"
     },
     "viewModules": "Module ansehen",
-    "ctaOpenPricing": "Preise für Gastronomie-Kasse ansehen",
-    "chooserModalTitle": "Unsere Preise ansehen",
-    "chooserHoreca": "Preise für die Gastronomie-Kasse ansehen",
-    "chooserRetail": "Preise für Einzelhandel und andere Branchen ansehen",
-    "retailPricingModalTitle": "Einzelhandel und andere Branchen",
     "modulesModalTitle": "Alle Module",
-    "modulesModalClose": "Schließen"
+    "modulesModalClose": "Schließen",
+    "ctaHomeHorecaPricing": "Preise für Gastronomie-Kasse ansehen",
+    "choiceModalTitle": "Unsere Preise ansehen",
+    "choiceHorecaPricing": "Preise für die Gastronomie-Kasse ansehen",
+    "choiceRetailPricing": "Preise für Einzelhandel und andere Branchen ansehen",
+    "retailModalTitle": "Einzelhandel und andere Branchen"
   },
   "industry": {
     "sectionTitle": "Extra in Ihrem Abonnement enthalten",

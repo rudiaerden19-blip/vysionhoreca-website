@@ -414,13 +414,13 @@
       "secondary": "Contattaci"
     },
     "viewModules": "Vedi i moduli",
-    "ctaOpenPricing": "Vedi i prezzi per cassa horeca",
-    "chooserModalTitle": "Vedi i nostri prezzi",
-    "chooserHoreca": "Vedi i prezzi per la cassa horeca",
-    "chooserRetail": "Vedi i prezzi per retail e altri settori",
-    "retailPricingModalTitle": "Retail e altri settori",
     "modulesModalTitle": "Tutti i moduli",
-    "modulesModalClose": "Chiudi"
+    "modulesModalClose": "Chiudi",
+    "ctaHomeHorecaPricing": "Vedi prezzi cassa ristorazione",
+    "choiceModalTitle": "Vedi i nostri prezzi",
+    "choiceHorecaPricing": "Vedi prezzi per la cassa ristorazione",
+    "choiceRetailPricing": "Vedi prezzi retail e altri settori",
+    "retailModalTitle": "Retail e altri settori"
   },
   "industry": {
     "sectionTitle": "Extra incluso nel tuo abbonamento",
