@@ -12,10 +12,10 @@ export const VYSION_MAIN_PORTAL_HOSTS = [
   'ordervysion.com',
 ] as const
 
-/** Oude / typo-domeinen → 301 naar canoniek. */
+/** Oude / typo-domeinen → 301 naar canoniek (niet vysion-kassa.com zelf). */
 export const VYSION_LEGACY_MARKETING_HOSTS = [
-  'www.vysion-kassa.com',
-  'vysion-kassa.com',
+  'www.vysionhoreca.com',
+  'vysionhoreca.com',
   'vysionkassa.com',
   'www.vysionkassa.com',
 ] as const
