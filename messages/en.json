@@ -690,7 +690,10 @@
       "subtitle": "Start your 14 day free trial today. No credit card required.",
       "primary": "Start free trial →",
       "secondary": "Contact us"
-    }
+    },
+    "viewModules": "View modules",
+    "modulesModalTitle": "All modules",
+    "modulesModalClose": "Close"
   },
   "industry": {
     "sectionTitle": "Extra included in your subscription",

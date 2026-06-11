@@ -410,7 +410,10 @@
       "subtitle": "Commencez votre essai gratuit de 14 jours aujourd'hui. Aucune carte de crédit requise.",
       "primary": "Commencer l'essai gratuit →",
       "secondary": "Nous contacter"
-    }
+    },
+    "viewModules": "Voir les modules",
+    "modulesModalTitle": "Tous les modules",
+    "modulesModalClose": "Fermer"
   },
   "industry": {
     "sectionTitle": "Extra inclus dans votre abonnement",

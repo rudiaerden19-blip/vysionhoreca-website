@@ -410,7 +410,10 @@
       "subtitle": "Starten Sie heute noch Ihre 14-tägige kostenlose Testphase. Keine Kreditkarte erforderlich.",
       "primary": "Kostenlos starten →",
       "secondary": "Kontakt aufnehmen"
-    }
+    },
+    "viewModules": "Module ansehen",
+    "modulesModalTitle": "Alle Module",
+    "modulesModalClose": "Schließen"
   },
   "industry": {
     "sectionTitle": "Extra in Ihrem Abonnement enthalten",

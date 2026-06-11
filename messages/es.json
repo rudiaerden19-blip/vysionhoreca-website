@@ -410,7 +410,10 @@
       "subtitle": "Comienza tu prueba gratuita de 14 días hoy. Sin tarjeta de crédito.",
       "primary": "Comenzar prueba gratis →",
       "secondary": "Contactar"
-    }
+    },
+    "viewModules": "Ver módulos",
+    "modulesModalTitle": "Todos los módulos",
+    "modulesModalClose": "Cerrar"
   },
   "industry": {
     "sectionTitle": "Extra incluido en su suscripción",

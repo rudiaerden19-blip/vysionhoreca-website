@@ -410,7 +410,10 @@
       "subtitle": "今日から14日間の無料トライアルを開始しましょう。クレジットカード不要。",
       "primary": "無料トライアルを開始 →",
       "secondary": "お問い合わせ"
-    }
+    },
+    "viewModules": "モジュールを見る",
+    "modulesModalTitle": "すべてのモジュール",
+    "modulesModalClose": "閉じる"
   },
   "industry": {
     "sectionTitle": "サブスクリプションに含まれる追加機能",

@@ -410,7 +410,10 @@
       "subtitle": "ابدأ تجربتك المجانية لمدة 14 أيام اليوم. بدون بطاقة ائتمان.",
       "primary": "ابدأ التجربة المجانية ←",
       "secondary": "تواصل معنا"
-    }
+    },
+    "viewModules": "عرض الوحدات",
+    "modulesModalTitle": "جميع الوحدات",
+    "modulesModalClose": "إغلاق"
   },
   "industry": {
     "sectionTitle": "إضافات مشمولة في اشتراكك",

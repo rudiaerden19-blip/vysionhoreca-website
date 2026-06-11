@@ -479,10 +479,30 @@ function PromoMarqueeBand() {
 // Pricing Section
 /** Premium-kaart: alle Pro+-features in de vinkjeslijst (incl. reserveringsplatform). */
 const PREMIUM_CARD_FEATURES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const
+const STARTER_CARD_FEATURES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] as const
+
+function PricingFeatureCheck({ label }: { label: string }) {
+  return (
+    <li className="flex items-start gap-3">
+      <svg
+        className="mt-0.5 h-5 w-5 flex-shrink-0 text-accent"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        aria-hidden
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+      </svg>
+      <span className="text-sm leading-snug text-gray-600 sm:text-base">{label}</span>
+    </li>
+  )
+}
 
 function PricingSection() {
   const { t, locale } = useLanguage()
   const [isYearly, setIsYearly] = useState(false)
+  const [modulesOpen, setModulesOpen] = useState(false)
+  const modulesCloseRef = useRef<HTMLButtonElement>(null)
   
   // Jaarlijks = 10% korting
   const starterMonthly = 59
@@ -490,6 +510,85 @@ function PricingSection() {
   const starterPrice = isYearly ? Math.round(starterMonthly * 12 * 0.9) : starterMonthly
   const proPrice = isYearly ? Math.round(proMonthly * 12 * 0.9) : proMonthly
   const periodLabel = isYearly ? t('pricing.perYear') : t('pricing.perMonth')
+
+  useEffect(() => {
+    if (!modulesOpen) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setModulesOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    modulesCloseRef.current?.focus()
+    return () => {
+      document.body.style.overflow = prev
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [modulesOpen])
+
+  const modulesModal =
+    modulesOpen && typeof document !== 'undefined'
+      ? createPortal(
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="pricing-modules-modal-title"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-4 sm:p-6"
+            onClick={() => setModulesOpen(false)}
+          >
+            <div
+              className="relative flex max-h-[min(90vh,880px)] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-home-image"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex shrink-0 items-start justify-between gap-4 border-b border-gray-100 bg-[#faf8f6] px-5 py-4 sm:px-6 sm:py-5">
+                <h3 id="pricing-modules-modal-title" className="text-lg font-bold text-gray-900 sm:text-xl">
+                  {t('pricing.modulesModalTitle')}
+                </h3>
+                <button
+                  ref={modulesCloseRef}
+                  type="button"
+                  onClick={() => setModulesOpen(false)}
+                  className="rounded-lg px-3 py-1.5 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-200/80 hover:text-gray-900"
+                >
+                  {t('pricing.modulesModalClose')}
+                </button>
+              </div>
+              <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6 sm:py-6">
+                <div className="grid gap-8 md:grid-cols-2 md:gap-10">
+                  <div>
+                    <h4 className="mb-4 text-base font-bold text-accent sm:text-lg">{t('pricing.starter.name')}</h4>
+                    <ul className="space-y-3">
+                      {STARTER_CARD_FEATURES.map((i) => (
+                        <PricingFeatureCheck key={`s-${i}`} label={t(`pricing.starter.features.${i}`)} />
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="mb-4 text-base font-bold text-accent sm:text-lg">{t('pricing.pro.name')}</h4>
+                    <p className="mb-3 text-sm font-medium text-gray-800 sm:text-base">{t('pricing.pro.allOfStarter')}</p>
+                    <ul className="space-y-3">
+                      <PricingFeatureCheck label={t('pricing.pro.hardwareIncluded')} />
+                      {PREMIUM_CARD_FEATURES.map((i) => (
+                        <PricingFeatureCheck key={`p-${i}`} label={t(`pricing.pro.features.${i}`)} />
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div className="shrink-0 border-t border-gray-100 bg-[#faf8f6] px-5 py-4 sm:px-6">
+                <button
+                  type="button"
+                  onClick={() => setModulesOpen(false)}
+                  className="w-full rounded-full bg-accent py-3.5 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:text-base"
+                >
+                  {t('pricing.modulesModalClose')}
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )
+      : null
 
   return (
     <section id="prijzen" className="py-28 sm:py-36 lg:py-40 bg-[#e3e3e3] relative overflow-hidden">
@@ -553,33 +652,18 @@ function PricingSection() {
                 </span>
                 <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-0.5 rounded-md">-40%</span>
               </div>
-              <div className="flex items-baseline mb-6">
+              <div className="flex items-baseline mb-8">
                 <span className="text-4xl sm:text-5xl font-bold text-gray-900 tabular-nums">€{starterPrice}</span>
                 <span className="text-accent font-medium ml-2">{periodLabel}</span>
               </div>
 
-              <ul className="space-y-3 mb-8">
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map((i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <svg
-                      className="w-5 h-5 text-accent mt-0.5 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span className="text-gray-600 text-sm sm:text-base leading-snug">{t(`pricing.starter.features.${i}`)}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <a
-                href={`/registreer?lang=${locale}&plan=starter&billing=${isYearly ? 'yearly' : 'monthly'}`}
+              <button
+                type="button"
+                onClick={() => setModulesOpen(true)}
                 className="block w-full border-2 border-gray-900 text-gray-900 text-center py-3.5 rounded-full font-semibold hover:bg-gray-900 hover:text-white transition-colors shadow-home-float"
               >
-                {t('pricing.chooseStarter')}
-              </a>
+                {t('pricing.viewModules')}
+              </button>
               <p className="text-center text-accent text-sm mt-3 font-medium">{t('pricing.cancelAnytime')}</p>
             </div>
           </div>
@@ -687,6 +771,7 @@ function PricingSection() {
           </a>
         </div>
       </div>
+      {modulesModal}
     </section>
   )
 }

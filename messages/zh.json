@@ -410,7 +410,10 @@
       "subtitle": "立即开始14天免费试用。无需信用卡。",
       "primary": "开始免费试用 →",
       "secondary": "联系我们"
-    }
+    },
+    "viewModules": "查看模块",
+    "modulesModalTitle": "全部模块",
+    "modulesModalClose": "关闭"
   },
   "industry": {
     "sectionTitle": "订阅中包含的额外功能",

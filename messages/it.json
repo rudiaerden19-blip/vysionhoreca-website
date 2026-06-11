@@ -410,7 +410,10 @@
       "subtitle": "Inizia oggi la tua prova gratuita di 14 giorni. Nessuna carta di credito richiesta.",
       "primary": "Inizia prova gratuita →",
       "secondary": "Contattaci"
-    }
+    },
+    "viewModules": "Vedi i moduli",
+    "modulesModalTitle": "Tutti i moduli",
+    "modulesModalClose": "Chiudi"
   },
   "industry": {
     "sectionTitle": "Extra incluso nel tuo abbonamento",

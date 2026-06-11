@@ -690,7 +690,10 @@
       "subtitle": "Start vandaag nog met je 14 dagen gratis proefperiode. Geen creditcard nodig.",
       "primary": "Start gratis proefperiode →",
       "secondary": "Contact opnemen"
-    }
+    },
+    "viewModules": "Bekijk de modules",
+    "modulesModalTitle": "Alle modules",
+    "modulesModalClose": "Sluiten"
   },
   "industry": {
     "sectionTitle": "Extra inbegrepen in uw abonnement",
