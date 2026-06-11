@@ -574,7 +574,7 @@
         "firstName": "Max",
         "lastName": "Mustermann",
         "email": "max@beispiel.de",
-        "message": "Erzählen Sie uns von Ihrem Gastronomiebetrieb..."
+        "message": "Erzählen Sie uns von Ihrem Betrieb..."
       },
       "submit": "Nachricht senden",
       "sending": "Wird gesendet...",

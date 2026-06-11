@@ -574,7 +574,7 @@
         "firstName": "Jean",
         "lastName": "Dupont",
         "email": "jean@exemple.be",
-        "message": "Parlez-nous de votre établissement..."
+        "message": "Parlez-nous de votre entreprise..."
       },
       "submit": "Envoyer le message",
       "sending": "Envoi en cours...",

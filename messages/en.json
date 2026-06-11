@@ -855,7 +855,7 @@
         "firstName": "John",
         "lastName": "Doe",
         "email": "john@example.com",
-        "message": "Tell us about your hospitality business..."
+        "message": "Tell us about your business..."
       },
       "submit": "Send message",
       "sending": "Sending...",

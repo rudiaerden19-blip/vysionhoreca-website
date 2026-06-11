@@ -574,7 +574,7 @@
         "firstName": "Juan",
         "lastName": "García",
         "email": "juan@ejemplo.es",
-        "message": "Cuéntanos sobre tu negocio de hostelería..."
+        "message": "Cuéntanos sobre tu negocio..."
       },
       "submit": "Enviar mensaje",
       "sending": "Enviando...",

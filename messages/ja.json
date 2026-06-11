@@ -574,7 +574,7 @@
         "firstName": "太郎",
         "lastName": "山田",
         "email": "taro@example.jp",
-        "message": "あなたの飲食ビジネスについて教えてください..."
+        "message": "あなたのお店について教えてください..."
       },
       "submit": "メッセージを送信",
       "sending": "送信中...",

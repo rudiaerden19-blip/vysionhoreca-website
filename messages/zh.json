@@ -574,7 +574,7 @@
         "firstName": "小明",
         "lastName": "王",
         "email": "xiaoming@example.cn",
-        "message": "告诉我们关于您的餐饮业务..."
+        "message": "告诉我们关于您的店铺..."
       },
       "submit": "发送消息",
       "sending": "发送中...",
