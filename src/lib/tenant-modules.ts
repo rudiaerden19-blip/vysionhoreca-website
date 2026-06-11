@@ -404,7 +404,7 @@ export function submenuParentAllowedForSubmenuId(
   if (subId === 'sm_online_cadeaubonnen') {
     return moduleAccess.website || moduleAccess.online
   }
-  if (subId === 'sm_retail_kassa_producten' || subId === 'sm_voorraad_producten') {
+  if (subId === 'sm_retail_kassa_producten' || subId === 'sm_voorraad_producten' || subId === 'sm_retail_product_intake') {
     return (
       moduleAccess.kassa || moduleAccess['retail-kassa'] || moduleAccess.voorraad
     )

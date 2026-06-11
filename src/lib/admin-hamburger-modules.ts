@@ -171,6 +171,13 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
           href: `${baseUrl}/producten`,
         },
         {
+          id: 'sm_retail_product_intake',
+          icon: '📱',
+          label: 'Scan met telefoon',
+          labelKey: itemLabelKey('sm_retail_product_intake'),
+          href: `${baseUrl}/producten/intake`,
+        },
+        {
           id: 'sm_retail_loyalty',
           icon: '🎫',
           label: 'Winkelpas',
@@ -700,7 +707,7 @@ export function isAdminSubmenuEnabled(
       parentOn = !!(moduleAccess.website || moduleAccess.online)
     }
   }
-  if (subId === 'sm_retail_kassa_producten' || subId === 'sm_voorraad_producten') {
+  if (subId === 'sm_retail_kassa_producten' || subId === 'sm_voorraad_producten' || subId === 'sm_retail_product_intake') {
     parentOn = !!(moduleAccess.kassa || moduleAccess['retail-kassa'] || moduleAccess.voorraad)
   }
 

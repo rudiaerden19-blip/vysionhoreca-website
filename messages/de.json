@@ -2029,6 +2029,30 @@
       "retailPricePackHintSingle": "Prijs = per 1 {unit} (1 scan = 1 {unit}).",
       "retailPricePackHint": "Prijs = per 1 {unit} met {n} stuks (1 scan = 1 {unit})."
     },
+    "productIntake": {
+      "title": "Mit Handy scannen",
+      "newProductHint": "Barcode scannen, Foto, Preis — Artikel landet in der Winkelkasse.",
+      "existingProductHint": "Barcode existiert bereits — Artikel wird aktualisiert.",
+      "photoLabel": "Produktfoto",
+      "takePhoto": "Foto aufnehmen",
+      "startCameraScan": "Kamera-Barcode",
+      "stopCameraScan": "Scan stoppen",
+      "cameraScanUnsupported": "Kamera-Barcode wird in diesem Browser nicht unterstützt. Code eingeben oder Produkt scannen.",
+      "cameraPermissionDenied": "Kein Kamerazugriff. Kamera erlauben oder Barcode eingeben.",
+      "eanLookupBusy": "Name wird gesucht…",
+      "barcodeRequired": "Barcode erforderlich.",
+      "nameRequired": "Produktname eingeben.",
+      "invalidPrice": "Gültigen Preis eingeben.",
+      "saveFailed": "Speichern fehlgeschlagen.",
+      "createdSuccess": "Produkt hinzugefügt — an der Winkelkasse scannbar.",
+      "updatedSuccess": "Produkt aktualisiert.",
+      "saveButton": "In Katalog speichern",
+      "saveAndOpenKassa": "Speichern & Winkelkasse",
+      "resetForm": "Nächster Artikel",
+      "backToProducts": "Artikel",
+      "retailModuleRequired": "Nur mit Winkelkassa-Modul verfügbar.",
+      "defaultPhotoName": "Produktfoto"
+    },
     "opties": {
       "title": "Optionen & Extras",
       "subtitle": "Produktoptionen und Extras verwalten",
@@ -5657,6 +5681,7 @@
       "sm_abonnement": "Abonnement",
       "sm_retail_kassa_pos": "Verkauf (Barcode)",
       "sm_retail_kassa_producten": "Artikel",
+      "sm_retail_product_intake": "Mit Handy scannen",
       "sm_retail_loyalty": "Shopkarte & Punkte",
       "sm_voorraad_beheer": "Lagerverwaltung",
       "sm_voorraad_producten": "Artikel"

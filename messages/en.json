@@ -2828,6 +2828,30 @@
       "retailPricePackHintSingle": "Price = per 1 {unit} (1 scan = 1 {unit}).",
       "retailPricePackHint": "Price = per 1 {unit} containing {n} units (1 scan = 1 {unit})."
     },
+    "productIntake": {
+      "title": "Scan with phone",
+      "newProductHint": "Scan barcode, take a photo, set price — item goes to the retail till catalog.",
+      "existingProductHint": "This barcode already exists — you are updating the item.",
+      "photoLabel": "Product photo",
+      "takePhoto": "Take photo",
+      "startCameraScan": "Camera barcode",
+      "stopCameraScan": "Stop scan",
+      "cameraScanUnsupported": "Camera barcode scanning is not supported in this browser. Type the code or use Scan product.",
+      "cameraPermissionDenied": "No camera access. Allow camera or type the barcode.",
+      "eanLookupBusy": "Looking up name…",
+      "barcodeRequired": "Barcode required.",
+      "nameRequired": "Enter a product name.",
+      "invalidPrice": "Enter a valid price.",
+      "saveFailed": "Save failed.",
+      "createdSuccess": "Product added — ready to scan at the retail till.",
+      "updatedSuccess": "Product updated.",
+      "saveButton": "Save to catalog",
+      "saveAndOpenKassa": "Save & open retail till",
+      "resetForm": "Next item",
+      "backToProducts": "Products",
+      "retailModuleRequired": "Only available with the retail till module.",
+      "defaultPhotoName": "Product photo"
+    },
     "opties": {
       "title": "Options & Extras",
       "subtitle": "Manage choices customers can make",
@@ -5593,6 +5617,7 @@
       "sm_abonnement": "Subscription",
       "sm_retail_kassa_pos": "Sales (barcode)",
       "sm_retail_kassa_producten": "Articles",
+      "sm_retail_product_intake": "Scan with phone",
       "sm_retail_loyalty": "Store pass & points",
       "sm_voorraad_beheer": "Stock management",
       "sm_voorraad_producten": "Articles"

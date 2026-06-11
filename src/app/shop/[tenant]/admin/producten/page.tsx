@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
+import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useTenantModuleFlagsContext } from '@/lib/tenant-module-flags-context'
 import {
@@ -701,7 +702,17 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
           <h1 className="text-2xl font-bold text-gray-900">{t('adminPages.producten.title')}</h1>
           <p className="text-gray-500">{products.length} {t('adminPages.producten.subtitle')}</p>
         </div>
-        <motion.button
+        <div className="flex flex-col sm:flex-row gap-2">
+          {retailKassaOn ? (
+            <Link
+              href={`/shop/${params.tenant}/admin/producten/intake`}
+              className="bg-emerald-700 hover:bg-emerald-800 text-white font-medium px-6 py-3 rounded-xl flex items-center justify-center gap-2"
+            >
+              <span>📱</span>
+              <span>{t('adminPages.productIntake.title')}</span>
+            </Link>
+          ) : null}
+          <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={openAddModal}
@@ -710,6 +721,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
           <span>➕</span>
           <span>{t('adminPages.producten.newProduct')}</span>
         </motion.button>
+        </div>
       </div>
 
       {/* Error Message */}
