@@ -29,6 +29,10 @@ import {
   type RetailBarcodeCameraScanStop,
 } from '@/lib/retail-barcode-camera-scan'
 import { RetailBarcodeScannerOverlay } from '@/components/retail/RetailBarcodeScannerOverlay'
+import {
+  playRetailBarcodeScanSuccessFeedback,
+  primeRetailBarcodeScanAudio,
+} from '@/lib/retail-barcode-scan-feedback'
 
 function parseLocalizedMoneyInput(raw: string): number {
   const n = raw.trim().replace(/\s/g, '').replace(',', '.')
@@ -100,9 +104,10 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
   }, [retailOn, loadCatalog])
 
   const applyBarcode = useCallback(
-    (raw: string) => {
+    (raw: string, opts?: { scanSuccessFeedback?: boolean }) => {
       const code = normalizeRetailProductBarcode(raw)
       if (!code) return
+      if (opts?.scanSuccessFeedback) playRetailBarcodeScanSuccessFeedback()
       setBarcode(code)
       setSuccess('')
       const hit = findProductByBarcode(catalog, code)
@@ -170,7 +175,10 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
       if (active instanceof HTMLElement) active.blur()
     }
     if (cameraScanActive) stopCameraScan()
-    else setCameraScanActive(true)
+    else {
+      primeRetailBarcodeScanAudio()
+      setCameraScanActive(true)
+    }
   }, [cameraScanActive, stopCameraScan])
 
   useLayoutEffect(() => {
@@ -203,7 +211,7 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
 
         const isActive = () => cameraScanActiveRef.current && videoRef.current != null
         const onDetected = (raw: string) => {
-          applyBarcode(raw)
+          applyBarcode(raw, { scanSuccessFeedback: true })
           stopCameraScan()
         }
 
@@ -241,7 +249,7 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
   const onWedgeKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key !== 'Enter') return
     e.preventDefault()
-    applyBarcode(e.currentTarget.value)
+    applyBarcode(e.currentTarget.value, { scanSuccessFeedback: true })
     e.currentTarget.value = ''
     setWedgeListening(false)
   }
