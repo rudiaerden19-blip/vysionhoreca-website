@@ -43,7 +43,7 @@ export default function Navigation() {
               href="/"
               className="inline-flex min-h-11 items-center rounded-lg px-2 text-xl sm:text-2xl font-bold touch-manipulation [-webkit-tap-highlight-color:transparent]"
             >
-              <span className="text-accent">vysion kassa</span>
+              <span className="text-accent">Vysion kassa&apos;s</span>
             </a>
           </div>
 
