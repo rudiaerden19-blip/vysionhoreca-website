@@ -153,13 +153,13 @@ const nextConfig = {
       },
       {
         source: '/:path*',
-        has: [{ type: 'host', value: 'www.vysion-kassa.com' }],
+        has: [{ type: 'host', value: 'vysionhoreca.com' }],
         destination: 'https://www.vysion-kassa.com/:path*',
         permanent: true,
       },
       {
         source: '/:path*',
-        has: [{ type: 'host', value: 'vysion-kassa.com' }],
+        has: [{ type: 'host', value: 'www.vysionhoreca.com' }],
         destination: 'https://www.vysion-kassa.com/:path*',
         permanent: true,
       },
