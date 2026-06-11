@@ -4862,7 +4862,7 @@
   "printAgentDownloadPage": {
     "heroTitle": "Windows 用 Print Agent",
     "heroSubtitle": "レジ用レシートプリンタの公式ダウンロード",
-    "intro": "アドレスバーに vysionhoreca.com と入力してこのページを開いてください — Google 検索は不要です。インストーラーが Microsoft でコード署名されていないため、Windows や Chrome が警告を表示することがあります。ファイルは公式の Vysion プロジェクト由来であり、ウイルスとは別の問題です。",
+    "intro": "アドレスバーに vysion-kassa.com と入力してこのページを開いてください — Google 検索は不要です。インストーラーが Microsoft でコード署名されていないため、Windows や Chrome が警告を表示することがあります。ファイルは公式の Vysion プロジェクト由来であり、ウイルスとは別の問題です。",
     "windowsNote": "Windows のみ。ブラウザの Ordervysion レジと Epson と同じ PC にインストールしてください。",
     "downloadCta": "インストーラーをダウンロード",
     "releaseNote": "技術情報（GitHub）",
@@ -5288,7 +5288,7 @@
     "tenantSlugPlaceholder": "my-shop",
     "tenantNamePlaceholder": "サンプルカフェ",
     "tenantEmailPlaceholder": "info@example.jp",
-    "superadminLoginPlaceholder": "admin@vysionkassa.com",
+    "superadminLoginPlaceholder": "admin@vysion-kassa.com",
     "invoiceEmailPlaceholder": "invoice@company.jp",
     "companyLegalPlaceholder": "株式会社サンプル",
     "companyVatPlaceholder": "BE0123456789",

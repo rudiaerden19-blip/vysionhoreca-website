@@ -234,7 +234,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error:
-            'Je zit op de site van een andere zaak (subdomein). Ga naar www.vysionhoreca.com/login om op elke zaak in te loggen, of gebruik het subdomein van jouw eigen zaak.',
+            'Je zit op de site van een andere zaak (subdomein). Ga naar www.vysion-kassa.com/login om op elke zaak in te loggen, of gebruik het subdomein van jouw eigen zaak.',
         },
         { status: 403 }
       )

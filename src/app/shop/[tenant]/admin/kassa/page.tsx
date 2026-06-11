@@ -6137,7 +6137,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </h2>
             <p className={ui.printFallbackBody}>{t('kassaApp.printAgentFallbackModalBody')}</p>
             <a
-              href="https://www.vysionhoreca.com/download/print-agent-windows"
+              href="https://www.vysion-kassa.com/download/print-agent-windows"
               target="_blank"
               rel="noopener noreferrer"
               className="mt-4 flex w-full items-center justify-center rounded-xl bg-[#3C4D6B] px-4 py-3 text-center text-sm font-bold text-white hover:bg-[#2D3A52]"

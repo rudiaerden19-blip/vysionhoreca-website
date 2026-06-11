@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Gemini AI prompt
-    const prompt = `Je bent een factuur-assistent voor een Belgisch horecabedrijf.
+    const prompt = `Je bent een factuur-assistent voor een Belgische zaak (restaurant, retail, …).
 Analyseer deze factuurtekst en geef de gevraagde info terug als JSON.
 
 FACTUURTEKST:
@@ -94,7 +94,7 @@ ${text.substring(0, 3000)}
 
 Geef ENKEL dit JSON terug, geen uitleg:
 {
-  "supplier": "naam van de leverancier/verkoper (NIET de bank, NIET het horecabedrijf zelf)",
+  "supplier": "naam van de leverancier/verkoper (NIET de bank, NIET de zaak zelf)",
   "invoiceNumber": "factuurnummer of leeg",
   "invoiceDate": "datum in formaat YYYY-MM-DD of leeg",
   "amount": getal (totaal te betalen bedrag incl BTW, enkel het getal zonder euroteken),

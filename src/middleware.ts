@@ -9,6 +9,11 @@ import {
 import { DEMO_TENANT_SLUG } from '@/lib/demo-links'
 import { isKioskSearchParams, KIOSK_COOKIE, KIOSK_REQUEST_HEADER } from '@/lib/kiosk-mode'
 import { VYSION_SUPERADMIN_COOKIE } from '@/lib/superadmin-cookies'
+import {
+  VYSION_CANONICAL_ORIGIN,
+  isVysionLegacyMarketingHost,
+  isVysionMainPortalHost,
+} from '@/lib/vysion-site'
 
 /**
  * Public bestanden uit /public — niet naar /shop/{tenant}/… herschrijven.
@@ -166,28 +171,15 @@ export async function middleware(request: NextRequest) {
 
   const hostname = normalizedHost(request)
 
-  /** Alias-domeinen marketing → canoniek www.vysionhoreca.com (vóór tenant-subdomein-logica). */
-  if (
-    hostname === 'vysion-kassa.com' ||
-    hostname === 'www.vysion-kassa.com' ||
-    hostname === 'vysionkassa.com' ||
-    hostname === 'www.vysionkassa.com'
-  ) {
-    const dest = new URL(`https://www.vysionhoreca.com${pathname}${url.search}`)
+  /** Legacy / typo-domeinen → canoniek www.vysion-kassa.com (vóór tenant-subdomein-logica). */
+  if (isVysionLegacyMarketingHost(hostname)) {
+    const dest = new URL(`${VYSION_CANONICAL_ORIGIN}${pathname}${url.search}`)
     return NextResponse.redirect(dest, 301)
   }
 
   // Main domains - skip subdomain routing (exact match only)
-  const exactMainDomains = [
-    'www.vysionhoreca.com',
-    'vysionhoreca.com',
-    'www.ordervysion.com',
-    'ordervysion.com',
-  ]
-
-  // Check for exact match or localhost/vercel
   const isMainDomain =
-    exactMainDomains.includes(hostname) ||
+    isVysionMainPortalHost(hostname) ||
     hostname.includes('localhost') ||
     hostname.includes('127.0.0.1') ||
     hostname.includes('vercel.app')

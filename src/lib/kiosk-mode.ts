@@ -2,6 +2,8 @@
  * Kiosk: pad …/kiosk1 (geen query), cookie vysion_kiosk, header x-vysion-kiosk.
  * Legacy query: ?kiosk1 / ?kiosk=1 → redirect naar /kiosk1.
  */
+import { isVysionMainPortalHost } from '@/lib/vysion-site'
+
 export const KIOSK_FLAG_PARAM = 'kiosk1' as const
 export const KIOSK_LEGACY_PARAM = 'kiosk' as const
 export const KIOSK_REQUEST_HEADER = 'x-vysion-kiosk' as const
@@ -33,18 +35,10 @@ export function withKioskQuery(path: string, _kiosk: boolean): string {
   return path
 }
 
-/** Hosts waar URLs altijd /shop/{tenant}/... blijven (geen korte /kiosk1). */
-const MAIN_SHOP_HOSTS = new Set([
-  'www.vysionhoreca.com',
-  'vysionhoreca.com',
-  'www.ordervysion.com',
-  'ordervysion.com',
-])
-
 export function isMainShopHost(host: string | null | undefined): boolean {
   if (!host) return true
   const h = host.toLowerCase().split(':')[0]
-  if (MAIN_SHOP_HOSTS.has(h)) return true
+  if (isVysionMainPortalHost(h)) return true
   if (h.endsWith('.vercel.app')) return true
   if (h === 'localhost' || h === '127.0.0.1') return true
   return false

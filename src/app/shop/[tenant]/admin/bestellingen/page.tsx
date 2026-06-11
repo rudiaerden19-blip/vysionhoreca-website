@@ -659,7 +659,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         : [],
     }))
     const printResult = await sendToVysionPrintAgent({
-      winkelnaam: tenantSettings?.business_name || 'Horecazaak',
+      winkelnaam: tenantSettings?.business_name || 'Zaak',
       bonInhoud: '',
       copies: 1,
       receiptMode: 'kassa',
@@ -726,7 +726,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
       </head>
       <body>
         <!-- ZAAKGEGEVENS - VERPLICHT -->
-        <div class="business-name">${tenantSettings?.business_name || 'Horecazaak'}</div>
+        <div class="business-name">${tenantSettings?.business_name || 'Zaak'}</div>
         <div class="business-info">
           ${tenantSettings?.address || ''}<br>
           ${tenantSettings?.postal_code || ''} ${tenantSettings?.city || ''}<br>

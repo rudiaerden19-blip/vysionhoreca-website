@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
                 </p>
               </div>
               <div style="background: #f9f9f9; padding: 20px; border-radius: 0 0 16px 16px; border: 1px solid #e5e5e5; border-top: none; text-align: center;">
-                <p style="color: #999; font-size: 12px; margin: 0;">Powered by <a href="https://www.vysionhoreca.com" style="color: #f97316; text-decoration: none;">Vysion kassa's</a></p>
+                <p style="color: #999; font-size: 12px; margin: 0;">Powered by <a href="https://www.vysion-kassa.com" style="color: #f97316; text-decoration: none;">Vysion kassa's</a></p>
               </div>
             </div>
           `,

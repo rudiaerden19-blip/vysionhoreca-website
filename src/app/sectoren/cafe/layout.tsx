@@ -4,12 +4,12 @@ const canonical = '/sectoren/cafe'
 
 export const metadata: Metadata = {
   title: {
-    absolute: 'Horeca Kassa voor Cafés | i7 Dual-Screen & 9 Talen | Vysion',
+    absolute: 'kassa voor Cafés | i7 Dual-Screen & 9 Talen | Vysion',
   },
   description:
-    'Café: razendsnelle i7-kassa (Het Beest), 9 talen, dubbel scherm, na 24 maanden eigendom. Stop met huren. Na 24 maanden is deze i7 kassa 100% jouw eigendom. Snelste horeca kassa — kassasysteem België & Nederland.',
+    'Café: razendsnelle i7-kassa (Het Beest), 9 talen, dubbel scherm, na 24 maanden eigendom. Stop met huren. Na 24 maanden is deze i7 kassa 100% jouw eigendom. Snelste kassa — kassasysteem België & Nederland.',
   keywords: [
-    'horeca kassa',
+    'kassa',
     'café kassa',
     'snelste kassa',
     'kassa kopen',
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical },
   openGraph: {
-    title: 'Horeca Kassa voor Cafés | i7 Dual-Screen & 9 Talen | Vysion',
+    title: 'kassa voor Cafés | i7 Dual-Screen & 9 Talen | Vysion',
     description:
       'Café: i7, 9 talen, snelle checkout. Kassasysteem België — start gratis.',
     url: canonical,
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Horeca Kassa voor Cafés | i7 Dual-Screen & 9 Talen | Vysion',
+    title: 'kassa voor Cafés | i7 Dual-Screen & 9 Talen | Vysion',
     description: 'Café POS met i7 en 9 talen. Gratis proberen — België & Nederland.',
   },
 }

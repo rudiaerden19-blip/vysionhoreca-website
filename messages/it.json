@@ -75,7 +75,7 @@
     "logoTagline": "",
     "title": "Una cassa per ogni settore",
     "subtitleLead": "Hardware e software cassa inclusi nel tuo abbonamento",
-    "subtitle": "Dal retail all'horeca, panetterie e negozi",
+    "subtitle": "Dal retail all' panetterie e negozi",
     "ctaStartFree": "Inizia gratis",
     "ctaViewDemo": "Guarda la demo",
     "ctaModulesHeadline": "Sistema premium completo",
@@ -358,7 +358,7 @@
     "compareDiscountStarter": "-40%",
     "compareDiscountPro": "-23%",
     "starter": {
-      "name": "Per l'horeca",
+      "name": "Per de la restauration",
       "features": {
         "1": "Piattaforma ordini online",
         "2": "Sito web proprio completamente personalizzabile",
@@ -377,7 +377,7 @@
     },
     "pro": {
       "name": "Per tutti i settori",
-      "allOfStarter": "Tutto il pacchetto horeca, più:",
+      "allOfStarter": "Tutto il pacchetto  più:",
       "hardwareIncluded": "Hardware incluso",
       "features": {
         "1": "Licenza POS inclusa",
@@ -585,7 +585,7 @@
     }
   },
   "footer": {
-    "description": "Vysion fa parte di Vysion Group International. Software cloud in tutto il mondo, in più lingue. Vysion Group realizza casse per ogni settore: dall'horeca a parrucchiere, macelleria, caffè, bistro, abbigliamento, retail e molto altro.",
+    "description": "Vysion fa parte di Vysion Group International. Software cloud in tutto il mondo, in più lingue. Vysion Group realizza casse per ogni settore: dall'a parrucchiere, macelleria, caffè, bistro, abbigliamento, retail e molto altro.",
     "address": "Indirizzo:",
     "product": "Prodotto",
     "features": "Funzioni e piattaforma",
@@ -604,7 +604,7 @@
     "navProductAria": "Prodotto — funzioni, prezzi e novità",
     "navCompanyAria": "Azienda — chi siamo, contatti e policy",
     "featuresLinkTitle": "POS, prenotazioni, ordini online e moduli",
-    "pricingLinkTitle": "Piani e prezzi per software horeca",
+    "pricingLinkTitle": "Piani e prezzi per software kassa",
     "updatesLinkTitle": "Novità prodotto Vysion kassa's",
     "supportLinkTitle": "Guida e assistenza tecnica",
     "aboutLinkTitle": "Informazioni su Vysion kassa's",
@@ -740,7 +740,7 @@
   "about": {
     "heroTitle": "Chi è",
     "heroTitleAccent": "Vysion",
-    "heroTitleEnd": "Horeca",
+    "heroTitleEnd": "Vysion kassa's",
     "heroSubtitle": "Costruito dalla pratica. Non da un ufficio.",
     "story": {
       "title": "La nostra storia",
@@ -4862,7 +4862,7 @@
   "printAgentDownloadPage": {
     "heroTitle": "Print Agent per Windows",
     "heroSubtitle": "Download ufficiale per la stampante scontrini sul PC cassa",
-    "intro": "Digita vysionhoreca.com nella barra degli indirizzi — senza cercare su Google. Windows o Chrome possono avvisare perché l’installer non è ancora firmato digitalmente presso Microsoft. Il file proviene dal progetto ufficiale Vysion; non è un virus.",
+    "intro": "Digita vysion-kassa.com nella barra degli indirizzi — senza cercare su Google. Windows o Chrome possono avvisare perché l’installer non è ancora firmato digitalmente presso Microsoft. Il file proviene dal progetto ufficiale Vysion; non è un virus.",
     "windowsNote": "Solo Windows. Sullo stesso PC della cassa Ordervysion nel browser e della tua Epson.",
     "downloadCta": "Scarica installer",
     "releaseNote": "Dettagli tecnici (GitHub)",
@@ -5288,7 +5288,7 @@
     "tenantSlugPlaceholder": "mio-locale",
     "tenantNamePlaceholder": "Esempio Bar",
     "tenantEmailPlaceholder": "info@esempio.it",
-    "superadminLoginPlaceholder": "admin@vysionkassa.com",
+    "superadminLoginPlaceholder": "admin@vysion-kassa.com",
     "invoiceEmailPlaceholder": "fatture@azienda.it",
     "companyLegalPlaceholder": "Srl Esempio",
     "companyVatPlaceholder": "BE0123456789",

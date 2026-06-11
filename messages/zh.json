@@ -740,7 +740,7 @@
   "about": {
     "heroTitle": "关于",
     "heroTitleAccent": "Vysion",
-    "heroTitleEnd": "Horeca",
+    "heroTitleEnd": "Vysion kassa's",
     "heroSubtitle": "从实践中构建。不是从办公室。",
     "story": {
       "title": "我们的故事",
@@ -4862,7 +4862,7 @@
   "printAgentDownloadPage": {
     "heroTitle": "Windows 版 Print Agent",
     "heroSubtitle": "收银小票打印机的官方下载",
-    "intro": "在地址栏输入 vysionhoreca.com 打开此页面 — 无需 Google 搜索。由于安装程序尚未经 Microsoft 代码签名，Windows 或 Chrome 可能发出警告。文件来自官方 Vysion 项目，这与恶意软件提示不同。",
+    "intro": "在地址栏输入 vysion-kassa.com 打开此页面 — 无需 Google 搜索。由于安装程序尚未经 Microsoft 代码签名，Windows 或 Chrome 可能发出警告。文件来自官方 Vysion 项目，这与恶意软件提示不同。",
     "windowsNote": "仅限 Windows。请安装在运行浏览器 Ordervysion 收银台与爱普生打印机的同一台电脑上。",
     "downloadCta": "下载安装程序",
     "releaseNote": "技术详情（GitHub）",
@@ -5288,7 +5288,7 @@
     "tenantSlugPlaceholder": "my-venue",
     "tenantNamePlaceholder": "示例咖啡厅",
     "tenantEmailPlaceholder": "info@example.cn",
-    "superadminLoginPlaceholder": "admin@vysionkassa.com",
+    "superadminLoginPlaceholder": "admin@vysion-kassa.com",
     "invoiceEmailPlaceholder": "invoice@company.cn",
     "companyLegalPlaceholder": "示例有限公司",
     "companyVatPlaceholder": "BE0123456789",

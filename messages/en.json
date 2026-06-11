@@ -127,7 +127,7 @@
     "tenantSlugPlaceholder": "my-venue",
     "tenantNamePlaceholder": "Café Example",
     "tenantEmailPlaceholder": "info@venue.com",
-    "superadminLoginPlaceholder": "admin@vysionkassa.com",
+    "superadminLoginPlaceholder": "admin@vysion-kassa.com",
     "invoiceEmailPlaceholder": "billing@company.com",
     "companyLegalPlaceholder": "Example Ltd",
     "companyVatPlaceholder": "BE0123456789",
@@ -5124,7 +5124,7 @@
   "printAgentDownloadPage": {
     "heroTitle": "Print Agent for Windows",
     "heroSubtitle": "Official download for your POS receipt printer",
-    "intro": "Type vysionhoreca.com in the address bar and open this page — no Google search needed. Windows or Chrome may warn because the installer is not yet digitally signed with Microsoft. The file still comes from the official Vysion project; that is not the same as malware.",
+    "intro": "Type vysion-kassa.com in the address bar and open this page — no Google search needed. Windows or Chrome may warn because the installer is not yet digitally signed with Microsoft. The file still comes from the official Vysion project; that is not the same as malware.",
     "windowsNote": "Windows only. Install on the same PC as your Ordervysion browser POS and your Epson.",
     "downloadCta": "Download installer",
     "releaseNote": "Technical details (GitHub)",

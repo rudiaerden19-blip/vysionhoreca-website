@@ -104,7 +104,7 @@ export async function GET(request: NextRequest) {
         }
 
         // Create payment link
-        const paymentLink = `https://www.vysionhoreca.com/shop/${subscription.tenant_slug}/admin/abonnement`
+        const paymentLink = `https://www.vysion-kassa.com/shop/${subscription.tenant_slug}/admin/abonnement`
         const expiryDate = new Date(subscription.next_payment_at).toLocaleDateString('nl-BE', {
           weekday: 'long',
           year: 'numeric',
@@ -173,8 +173,8 @@ export async function GET(request: NextRequest) {
     </div>
     
     <div class="footer">
-      <p>Vysion kassa's - Bestelplatform voor de horeca</p>
-      <p>www.vysionhoreca.com | ${VYSION_INFO_EMAIL}</p>
+      <p>Vysion kassa's - Bestelplatform voor zaken</p>
+      <p>www.vysion-kassa.com | ${VYSION_INFO_EMAIL}</p>
     </div>
   </div>
 </body>

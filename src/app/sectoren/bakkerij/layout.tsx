@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     'kassa kopen',
     'kassasysteem België',
     'i7 kassa',
-    'horeca kassa',
+    'kassa',
     'gratis kassa proberen',
   ],
   alternates: { canonical },

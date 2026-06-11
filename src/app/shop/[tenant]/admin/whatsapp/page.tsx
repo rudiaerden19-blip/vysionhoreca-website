@@ -147,7 +147,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
     )
   }
 
-  const webhookUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.vysionhoreca.com'}/api/whatsapp/webhook`
+  const webhookUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.vysion-kassa.com'}/api/whatsapp/webhook`
 
   return (
     <div className="max-w-4xl mx-auto">

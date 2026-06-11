@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
           </div>
           
           <p style="color: #888; font-size: 12px; margin-top: 30px; text-align: center;">
-            Dit bericht werd verstuurd via het contactformulier op vysionhoreca.com
+            Dit bericht werd verstuurd via het contactformulier op vysion-kassa.com
           </p>
         </div>
       `,
@@ -95,7 +95,7 @@ Bericht:
 ${message}
 
 ---
-Dit bericht werd verstuurd via het contactformulier op vysionhoreca.com
+Dit bericht werd verstuurd via het contactformulier op vysion-kassa.com
       `,
     }
 

@@ -89,7 +89,7 @@ function createLogEntry(
     level,
     message,
     context: context ? sanitizeData(context) : undefined,
-    service: 'vysion-horeca',
+    service: 'vysion-kassa',
   }
 }
 

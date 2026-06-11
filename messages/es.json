@@ -377,7 +377,7 @@
     },
     "pro": {
       "name": "Para todos los sectores",
-      "allOfStarter": "Todo el pack horeca, más:",
+      "allOfStarter": "Todo el pack  más:",
       "hardwareIncluded": "Hardware incluido",
       "features": {
         "1": "Licencia de TPV incluida",
@@ -740,7 +740,7 @@
   "about": {
     "heroTitle": "Sobre",
     "heroTitleAccent": "Vysion",
-    "heroTitleEnd": "Horeca",
+    "heroTitleEnd": "Vysion kassa's",
     "heroSubtitle": "Construido desde la práctica. No desde una oficina.",
     "story": {
       "title": "Nuestra historia",
@@ -4862,7 +4862,7 @@
   "printAgentDownloadPage": {
     "heroTitle": "Print Agent para Windows",
     "heroSubtitle": "Descarga oficial para la impresora de tickets en el PC de la caja",
-    "intro": "Escriba vysionhoreca.com en la barra de direcciones — sin buscar en Google. Windows o Chrome pueden avisar porque el instalador aún no está firmado digitalmente en Microsoft. El archivo es del proyecto oficial Vysion; no es lo mismo que malware.",
+    "intro": "Escriba vysion-kassa.com en la barra de direcciones — sin buscar en Google. Windows o Chrome pueden avisar porque el instalador aún no está firmado digitalmente en Microsoft. El archivo es del proyecto oficial Vysion; no es lo mismo que malware.",
     "windowsNote": "Solo Windows. Instálelo en el mismo PC que la caja Ordervysion en el navegador y su Epson.",
     "downloadCta": "Descargar instalador",
     "releaseNote": "Detalles técnicos (GitHub)",
@@ -5288,7 +5288,7 @@
     "tenantSlugPlaceholder": "mi-local",
     "tenantNamePlaceholder": "Café Ejemplo",
     "tenantEmailPlaceholder": "info@ejemplo.es",
-    "superadminLoginPlaceholder": "admin@vysionkassa.com",
+    "superadminLoginPlaceholder": "admin@vysion-kassa.com",
     "invoiceEmailPlaceholder": "facturas@empresa.es",
     "companyLegalPlaceholder": "Empresa SL",
     "companyVatPlaceholder": "BE0123456789",

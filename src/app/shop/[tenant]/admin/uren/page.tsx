@@ -1105,7 +1105,7 @@ Met vriendelijke groeten`,
         {/* Footer */}
         <div className="mt-8 pt-4 border-t text-center text-xs text-gray-500">
           <p>{t('urenPage.print.documentGenerated')} {new Date().toLocaleDateString()} {t('urenPage.print.at')} {new Date().toLocaleTimeString()}</p>
-          <p>www.vysionhoreca.com</p>
+          <p>www.vysion-kassa.com</p>
         </div>
       </div>
 
@@ -1580,7 +1580,7 @@ Met vriendelijke groeten`,
           {/* Footer */}
           <div className="mt-8 pt-4 border-t text-center text-xs text-gray-500">
             <p>{t('urenPage.print.documentGenerated')} {new Date().toLocaleDateString()} {t('urenPage.print.at')} {new Date().toLocaleTimeString()}</p>
-            <p className="text-blue-600 font-medium">www.vysionhoreca.com</p>
+            <p className="text-blue-600 font-medium">www.vysion-kassa.com</p>
           </div>
         </div>
       </div>

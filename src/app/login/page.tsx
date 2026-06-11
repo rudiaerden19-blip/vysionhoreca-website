@@ -22,15 +22,13 @@ import { mirrorSuperadminSessionFromCookieToLocalStorage } from '@/lib/superadmi
 import { LocaleFlagEmoji, LocaleFlagWithCode } from '@/components/LocaleFlagEmoji'
 import { LoginKassaCloseHintModal } from '@/components/LoginKassaCloseHintModal'
 import { LOGIN_QUERY_KASSA_CLOSE_TIP } from '@/lib/shop-login-kassa-tip'
+import { isVysionMainPortalHost } from '@/lib/vysion-site'
 
 /** Zelfde hosts als middleware `exactMainDomains` (+ dev): sessie blijft in localStorage van dit domein. */
 function stayOnMainDomainForShopSession(hostname: string): boolean {
   const h = hostname.toLowerCase().split(':')[0]
   return (
-    h === 'www.vysionhoreca.com' ||
-    h === 'vysionhoreca.com' ||
-    h === 'www.ordervysion.com' ||
-    h === 'ordervysion.com' ||
+    isVysionMainPortalHost(h) ||
     h.includes('localhost') ||
     h === '127.0.0.1' ||
     h.includes('vercel.app')

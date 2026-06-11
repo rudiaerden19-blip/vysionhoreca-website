@@ -313,7 +313,7 @@ export default function GroupJoinPage({ params }: { params: { tenant: string; co
 
         {/* Footer */}
         <div className="mt-8 text-center text-sm text-gray-400">
-          Powered by <Link href="https://www.vysionhoreca.com" className="text-blue-500 hover:underline">Vysion</Link>
+          Powered by <Link href="https://www.vysion-kassa.com" className="text-blue-500 hover:underline">Vysion</Link>
         </div>
       </div>
     </div>

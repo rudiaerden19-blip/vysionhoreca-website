@@ -147,33 +147,33 @@ const nextConfig = {
     return [
       {
         source: '/:path*',
-        has: [{ type: 'host', value: 'vysionhoreca.com' }],
-        destination: 'https://www.vysionhoreca.com/:path*',
-        permanent: true,
-      },
-      /** vysion-kassa.com (Vercel) + optioneel vysionkassa.com → www.vysionhoreca.com */
-      {
-        source: '/:path*',
         has: [{ type: 'host', value: 'vysion-kassa.com' }],
-        destination: 'https://www.vysionhoreca.com/:path*',
+        destination: 'https://www.vysion-kassa.com/:path*',
         permanent: true,
       },
       {
         source: '/:path*',
         has: [{ type: 'host', value: 'www.vysion-kassa.com' }],
-        destination: 'https://www.vysionhoreca.com/:path*',
+        destination: 'https://www.vysion-kassa.com/:path*',
         permanent: true,
       },
       {
         source: '/:path*',
+        has: [{ type: 'host', value: 'vysion-kassa.com' }],
+        destination: 'https://www.vysion-kassa.com/:path*',
+        permanent: true,
+      },
+      /** Legacy vysionkassa.com (zonder streepje) → canoniek */
+      {
+        source: '/:path*',
         has: [{ type: 'host', value: 'vysionkassa.com' }],
-        destination: 'https://www.vysionhoreca.com/:path*',
+        destination: 'https://www.vysion-kassa.com/:path*',
         permanent: true,
       },
       {
         source: '/:path*',
         has: [{ type: 'host', value: 'www.vysionkassa.com' }],
-        destination: 'https://www.vysionhoreca.com/:path*',
+        destination: 'https://www.vysion-kassa.com/:path*',
         permanent: true,
       },
       {

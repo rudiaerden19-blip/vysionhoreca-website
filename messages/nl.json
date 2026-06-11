@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Vysion kassa's | Alles-in-één Kassa & Betaalplatform",
-    "description": "Het complete kassasysteem voor horeca. Kassa, online bestellingen, facturatie, personeelsbeheer en meer - allemaal in één platform. Probeer 14 dagen gratis."
+    "description": "Het complete kassasysteem voor zaken. Kassa, online bestellingen, facturatie, personeelsbeheer en meer - allemaal in één platform. Probeer 14 dagen gratis."
   },
   "nav": {
     "home": "Home",
@@ -42,18 +42,18 @@
     "premiumStampTop": "software",
     "premiumStampBottom": "hardware",
     "premiumStampCenter": "inbegrepen",
-    "vysionProLifestyleAlt": "Horeca: gedeelde schotel met Aziatische gerechten, geglazuurd vlees en gamba’s op een gedekte tafel in een restaurant.",
+    "vysionProLifestyleAlt": "Restaurant: gedeelde schotel met Aziatische gerechten, geglazuurd vlees en gamba’s op een gedekte tafel in een restaurant.",
     "premiumShowcaseTitle": "Vysion premium onze software & hardware in jouw zaak",
     "premiumCardShowcaseAlt": "Overzicht van het Vysion Premium-abonnement met functies en prijs",
     "galleryHardwareAlt1": "Zwarte touchscreen-kassa met bonprinter op de toonbank",
-    "galleryHardwareAlt2": "Witte touchscreen-kassa in een horeca-interieur",
+    "galleryHardwareAlt2": "Witte touchscreen-kassa in een zaak-interieur",
     "galleryHardwareAlt3": "Digitaal menu-scherm op marmeren toonbank",
     "enlargeImageHint": "Vergroot foto",
     "premiumPitchLead": "Volledig kassasysteem met hardware, software & onbeperkte support voor maar €99/maand",
     "premiumPitchP1": "Je krijgt een zeer robuust en professioneel systeem dat razendsnel is met de nieuwste updates — geen iPad-kassa die na een jaar kapot is.",
     "premiumPitchP2": "Wij maken alles in orde voor jou: we leveren je kassa of bestelplatform en geven je gratis opleiding, zonder installatiegedoe. Als je daarna vragen hebt, krijg je de rechtstreekse nummers van onze programmeurs — geen robots aan de telefoon.",
     "onboardingTitle": "Overschakelen naar Vysion is verrassend simpel",
-    "onboardingP1": "Veel horecazaken zien op tegen de overstap naar een nieuw kassasysteem, maar dat hoeft helemaal geen gedoe te zijn. Bij Vysion doen wij gewoon alles voor jou. Jij levert je menukaart aan, wij bouwen het volledig in zoals jij werkt.",
+    "onboardingP1": "Veel zaken zien op tegen de overstap naar een nieuw kassasysteem, maar dat hoeft helemaal geen gedoe te zijn. Bij Vysion doen wij gewoon alles voor jou. Jij levert je menukaart aan, wij bouwen het volledig in zoals jij werkt.",
     "onboardingP2": "Je hoeft niets te installeren, niets zelf uit te zoeken en je zit niet vast aan vage stappenplannen of callcenters.",
     "onboardingP3Bold": "Binnen de week staat een volledig werkend systeem klaar",
     "onboardingP3After": ", plug & play, op maat van jouw zaak. En bij de oplevering krijg je rustig uitleg zodat je exact weet hoe alles werkt. Zo simpel kan het zijn.",
@@ -127,7 +127,7 @@
     "tenantSlugPlaceholder": "mijn-frituur",
     "tenantNamePlaceholder": "Frituur Nolim",
     "tenantEmailPlaceholder": "info@frituur.be",
-    "superadminLoginPlaceholder": "admin@vysionkassa.com",
+    "superadminLoginPlaceholder": "admin@vysion-kassa.com",
     "invoiceEmailPlaceholder": "factuur@bedrijf.be",
     "companyLegalPlaceholder": "Bedrijf BV",
     "companyVatPlaceholder": "BE0123456789",
@@ -156,7 +156,7 @@
     "logoTagline": "",
     "title": "Een kassa voor iedere sector",
     "subtitleLead": "Kassa hardware & software inbegrepen in je abonnement",
-    "subtitle": "Voor retail tot horeca, bakkers en winkels",
+    "subtitle": "Voor retail tot  bakkers en winkels",
     "ctaStartFree": "Start gratis",
     "ctaViewDemo": "Bekijk demo",
     "ctaModulesHeadline": "Compleet premium systeem",
@@ -172,8 +172,8 @@
   },
   "hero": {
     "badge1": "1 Platform",
-    "badge2": "Gemaakt door horecaondernemers",
-    "badge3": "Gemaakt voor horecaondernemers",
+    "badge2": "Gemaakt door ondernemers",
+    "badge3": "Gemaakt voor ondernemers",
     "title": "Het platform dat geld oplevert.",
     "description": "Laat klanten bestellen hoe zij willen: online, aan tafel of voor afhalen. Alles komt automatisch binnen op één plek en jij hoeft alleen nog te bereiden.",
     "extras": "En dan… dit zit er ook gewoon bij:",
@@ -307,7 +307,7 @@
     "imageAlt": "Vysion tafelkiosk met touchscreen",
     "fullPlatform": {
       "title": "Volledig platform voor iedere sector",
-      "body": "Vysion is geschikt voor elke onderneming: horeca, bakkerijen, slagers, kledingwinkels, kapsalons, speciaalzaken en retailzaken. Bespaar tot €1.500 per jaar ten opzichte van andere platformen dankzij één geïntegreerde oplossing die meegroeit met jouw bedrijf.",
+      "body": "Vysion is geschikt voor elke onderneming:  bakkerijen, slagers, kledingwinkels, kapsalons, speciaalzaken en retailzaken. Bespaar tot €1.500 per jaar ten opzichte van andere platformen dankzij één geïntegreerde oplossing die meegroeit met jouw bedrijf.",
       "bodyExtra": "Vysion kassa's is het eerste kassa-platform wereldwijd, waar alles in één scherm zit voor elke sector toepasbaar."
     },
     "liveSupport": {
@@ -375,9 +375,9 @@
       "title": "Kassasysteem",
       "teaser": "Een kassasysteem voor iedere sector, voor ieders budget, met barcodescanner enz.",
       "body": "Je kassa is het hart van de zaak: snelle verkoop, correcte bonnen en een realtime koppeling met je bestelplatform en keuken.\n\nMet Vysion kassa's beheer je producten, tafels, betalingen en personeel vanuit één omgeving: minder fouten tijdens piekuren en altijd zicht op de dagafsluiting.",
-      "heroAlt": "Hand bedient een touchscreen-kassa met betaalterminal aan de toonbank in een horecazaak",
-      "horecaSectorTitle": "Horeca kassasysteem",
-      "horecaImageAlt": "Moderne all-in-one horecakassa op een tafel in een restaurant",
+      "heroAlt": "Hand bedient een touchscreen-kassa met betaalterminal aan de toonbank in een zaak",
+      "horecaSectorTitle": "Kassasysteem",
+      "horecaImageAlt": "Moderne all-in-one kassa op een tafel in een restaurant",
       "horecaLeadBefore": "Onze kassasystemen bieden een ",
       "horecaLeadBold": "breed scala aan functies om jouw bedrijfsvoering te verbeteren.",
       "horecaLeadAfter": " Compatibel met vrijwel elke kassa-pc op een recente versie van Windows. Ook naadloos te gebruiken op iPad®, Android® en kiosken.",
@@ -416,7 +416,7 @@
       "title": "Bestel platform",
       "teaser": "Klanten bestellen online bij jou, zonder tussenpartij die commissie vraagt.",
       "body": "Afhalen, levering en bestellen aan tafel verlopen via jouw eigen site in jouw huisstijl. Orders komen gestructureerd binnen op kassa en keuken.\n\nZo verwerk je pieken beter en houd je de volledige marge op je online omzet.",
-      "heroAlt": "Smartphone met online bestellen in een horeca- of kantooromgeving",
+      "heroAlt": "Smartphone met online bestellen in een zaak- of kantooromgeving",
       "featuresTitle": "Jouw bestelplatform",
       "features": {
         "ownWebsite": {
@@ -480,7 +480,7 @@
     "whatsappBestellingen": {
       "title": "WhatsApp-bestellingen",
       "teaser": "Bestellen waar je klanten al zitten: gesprek, menu en afhandeling in één flow.",
-      "body": "WhatsApp is voor veel horeca de snelste manier om bestellingen binnen te halen. Wij koppelen menu en status aan je operationele flow.\n\nMinder misverstanden en snellere opvolging dan via losse chatberichten."
+      "body": "WhatsApp is voor veel zaken de snelste manier om bestellingen binnen te halen. Wij koppelen menu en status aan je operationele flow.\n\nMinder misverstanden en snellere opvolging dan via losse chatberichten."
     },
     "loonadministratie": {
       "title": "Loonadministratie",
@@ -505,7 +505,7 @@
   },
   "stats": {
     "processed": "Verwerkt per maand",
-    "businesses": "Actieve horecazaken",
+    "businesses": "Actieve zaken",
     "uptime": "Uptime garantie",
     "support": "Support beschikbaar",
     "award": "🏆 Ondertussen al uitgeroepen tot het snelst en meest betrouwbare platform van 2025/2026",
@@ -513,14 +513,14 @@
   },
   "orderApp": {
     "title": "Het meest uitgebreid bestelplatform op de markt",
-    "subtitle": "Eindelijk een compleet ecosysteem voor de horeca",
+    "subtitle": "Eindelijk een compleet compleet kassa-ecosysteem",
     "cta": "Ontdek het volledige platform"
   },
   "liveDemo": {
     "title": "Wil je het platform in actie zien?",
     "subtitle": "Bekijk een echte frituur die draait op Vysion kassa's",
     "clientsLead": "Deze klanten gingen u reeds voor",
-    "marquee": "Horeca · Frituur · Restaurant · Café · Slagerij · Bakkerij · Catering · Brasserie · Traiteur · Broodjeszaak · Wijnhandel · Hotel · Vysion kassa's · ",
+    "marquee": "· Frituur · Restaurant · Café · Slagerij · Bakkerij · Catering · Brasserie · Traiteur · Broodjeszaak · Wijnhandel · Hotel · Vysion kassa's · ",
     "successStories": {
       "vivaldi": {
         "name": "VIVALDI 2.0 Food & Drinks",
@@ -639,7 +639,7 @@
     "compareDiscountStarter": "-40%",
     "compareDiscountPro": "-23%",
     "starter": {
-      "name": "Voor de horeca",
+      "name": "Voor & retail",
       "features": {
         "1": "Online bestelplatform",
         "2": "Eigen website volledig aanpasbaar",
@@ -658,7 +658,7 @@
     },
     "pro": {
       "name": "Voor alle sectoren",
-      "allOfStarter": "Alles uit dit horeca-pakket, plus:",
+      "allOfStarter": "Alles uit dit pakket, plus:",
       "hardwareIncluded": "Hardware inbegrepen",
       "features": {
         "1": "Kassa licentie inbegrepen",
@@ -697,10 +697,10 @@
     "viewModules": "Bekijk de modules",
     "modulesModalTitle": "Alle modules",
     "modulesModalClose": "Sluiten",
-    "ctaHomeHorecaPricing": "Bekijk de prijzen voor horeca kassa",
+    "ctaHomeHorecaPricing": "Bekijk de prijzen voor kassa",
     "ctaHomeRetailPricing": "Bekijk prijzen van retail en alle sectoren",
     "choiceModalTitle": "Bekijk onze prijzen",
-    "choiceHorecaPricing": "Bekijk de prijzen voor de horeca kassa",
+    "choiceHorecaPricing": "Bekijk de prijzen voor de kassa",
     "choiceRetailPricing": "Bekijk de prijzen voor de retail en andere sectoren",
     "retailModalTitle": "Retail en andere sectoren",
     "retail": {
@@ -783,13 +783,13 @@
   },
   "costCalculator": {
     "title": "Eindelijk, hij is er",
-    "subtitle": "De kosten calculator voor de horeca",
+    "subtitle": "De kosten calculator voor jouw zaak",
     "description": "Wil je exact weten wat je aankoopprijzen zijn en wat je verkoopprijzen moeten zijn om een winstgevend bedrijf te creëren? Gebruik dan onze nieuwe kosten calculator. Vul de aankoopprijs in of scan je aankoopfactuur en sta versteld van de uitkomst. Je kunt ook kiezen uit onze database van 15.000+ producten.",
     "clickToEnlarge": "Klik om te vergroten",
     "tryFree": "Gratis uitproberen"
   },
   "testimonials": {
-    "title": "Horecaondernemers vertrouwen op Vysion",
+    "title": "Ondernemers vertrouwen op Vysion",
     "quotes": {
       "1": {
         "quote": "Eindelijk eens een platform waar alles in elkaar zit. Ik heb mijn andere abonnementen allemaal opgezegd en heb nu alles in één voor een fractie van de prijs.",
@@ -866,7 +866,7 @@
     }
   },
   "footer": {
-    "description": "Vysion is een onderdeel van de Vysion Group International. Cloudsoftware wereldwijd in meerdere talen. Vysion Group bouwt kassa's voor iedere sector: van horeca tot kapper, slager, café's, bistro, kledingwinkel, retail en nog veel meer.",
+    "description": "Vysion is een onderdeel van de Vysion Group International. Cloudsoftware wereldwijd in meerdere talen. Vysion Group bouwt kassa's voor iedere sector: van tot kapper, slager, café's, bistro, kledingwinkel, retail en nog veel meer.",
     "address": "Adres:",
     "product": "Product",
     "features": "Functies & platform",
@@ -1648,7 +1648,7 @@
         "title": "Toegestaan Gebruik",
         "intro": "U mag onze diensten gebruiken voor:",
         "items": {
-          "1": "Het beheren van uw horecazaak",
+          "1": "Het beheren van uw zaak",
           "2": "Het verwerken van transacties en bestellingen",
           "3": "Het bijhouden van uw boekhouding en administratie",
           "4": "Het communiceren met klanten"
@@ -1866,7 +1866,7 @@
       },
       "services": {
         "title": "2. Diensten",
-        "content": "Vysion kassa's biedt kassasoftware, online bestelplatform, boekhoudsoftware en aanverwante diensten voor de horecasector. Wij behouden ons het recht voor om onze diensten te wijzigen, uit te breiden of te beperken."
+        "content": "Vysion kassa's biedt kassasoftware, online bestelplatform, boekhoudsoftware en aanverwante diensten voor de sector. Wij behouden ons het recht voor om onze diensten te wijzigen, uit te breiden of te beperken."
       },
       "subscription": {
         "title": "3. Abonnement en Betaling",
@@ -2780,7 +2780,7 @@
       "productCountZero": "Geen producten",
       "productCountTitle": "Aantal producten in deze categorie",
       "categoryVatHint": "Kies per categorie een vast BTW-tarief (6%, 9%, 12% of 21%) voor producten in die categorie. „Zaak standaard\" gebruikt het tarief uit je zaak-instellingen — hetzelfde gedrag als voorheen als je niets wijzigt.",
-      "categoryVatTypicalRatesHint": "Tip — veelgebruikt in de horeca: eten en frisdranken 9%; alcoholische dranken 21%. Controleer bij twijfel bij je boekhouder of het fiscaal centrum.",
+      "categoryVatTypicalRatesHint": "Tip — veelgebruikt in de sector: eten en frisdranken 9%; alcoholische dranken 21%. Controleer bij twijfel bij je boekhouder of het fiscaal centrum.",
       "categoryVatShort": "BTW",
       "categoryVatUseTenant": "Zaak standaard",
       "categoryImageHelp": "Optioneel — zelfde mediabibliotheek en upload als bij Producten."
@@ -2818,7 +2818,7 @@
       "descriptionPlaceholder": "",
       "selectCategory": "",
       "catalogModeLabel": "Type product",
-      "catalogModeHoreca": "Horeca",
+      "catalogModeHoreca": "Eten & drinken",
       "catalogModeRetail": "Retail / winkel",
       "retailFieldsTitle": "Winkel & scan",
       "barcode": "Barcode / EAN",
@@ -4219,7 +4219,7 @@
       "title": "Bedrijfsdoelen Instellen",
       "subtitle": "Stel je targets in voor waarschuwingen en analyses",
       "targetMargin": "Gewenste Winstmarge (%)",
-      "targetMarginHelp": "Aanbevolen voor horeca: 25-30%",
+      "targetMarginHelp": "Aanbevolen voor zaken: 25-30%",
       "minMargin": "Minimum Winstmarge (%)",
       "minMarginHelp": "Onder deze waarde krijg je een waarschuwing",
       "maxPersonnel": "Max Personeelskosten (%)",
@@ -4229,7 +4229,7 @@
       "targetTicket": "Doel Gemiddelde Bon (€)",
       "saveTargets": "Doelen Opslaan",
       "targetsSaved": "Doelen opgeslagen!",
-      "benchmarks": "Sector Benchmarks (Horeca)",
+      "benchmarks": "Sector Benchmarks (sector)",
       "avgMargin": "Gemiddelde winstmarge",
       "goodPerformers": "Goede performers",
       "topPerformers": "Top performers",
@@ -5124,7 +5124,7 @@
   "printAgentDownloadPage": {
     "heroTitle": "Print Agent voor Windows",
     "heroSubtitle": "Officiële download voor de bonprinter op je kassa-pc",
-    "intro": "Typ vysionhoreca.com in de adresbalk en ga naar deze pagina — je hoeft niet te zoeken via Google. Windows of Chrome kan een waarschuwing tonen: het installatieprogramma is nog niet digitaal ondertekend bij Microsoft. Het bestand komt uit het officiële Vysion-project — dat is niet hetzelfde als een virusmelding.",
+    "intro": "Typ vysion-kassa.com in de adresbalk en ga naar deze pagina — je hoeft niet te zoeken via Google. Windows of Chrome kan een waarschuwing tonen: het installatieprogramma is nog niet digitaal ondertekend bij Microsoft. Het bestand komt uit het officiële Vysion-project — dat is niet hetzelfde als een virusmelding.",
     "windowsNote": "Alleen Windows. Installeer op dezelfde pc als je Ordervysion-kassa in de browser en je Epson.",
     "downloadCta": "Download installer",
     "releaseNote": "Technische details (GitHub)",
@@ -5193,13 +5193,13 @@
     "benefit2Title": "9 talen ingebouwd",
     "benefit2Desc": "De software werkt direct in NL, EN, FR, DE, ES, IT, JA, ZH en AR. Klaar voor jouw markt.",
     "benefit3Title": "WhatsApp Bestellen",
-    "benefit3Desc": "Unieke feature die geen concurrent heeft. Makkelijk te verkopen aan horeca.",
+    "benefit3Desc": "Unieke feature die geen concurrent heeft. Makkelijk te verkopen aan zaken.",
     "benefit4Title": "Eigen Partner Dashboard",
     "benefit4Desc": "Bekijk je klanten, commissies en statistieken in real-time.",
     "benefit5Title": "Wij doen de techniek",
     "benefit5Desc": "Jij verkoopt, wij zorgen voor hosting, updates en technische support.",
     "benefit6Title": "Groeiende markt",
-    "benefit6Desc": "Horeca digitaliseert snel. QR bestellen en online ordering zijn de toekomst.",
+    "benefit6Desc": "digitaliseert snel. QR bestellen en online ordering zijn de toekomst.",
     "commissionTitle": "Commissie Structuur",
     "monthlyCommission": "Maandelijkse commissie",
     "monthlyCommissionNote": "van het maandabonnement",
@@ -5222,7 +5222,7 @@
     "country": "Land",
     "city": "Stad",
     "website": "Website (optioneel)",
-    "experience": "Ervaring in sales/horeca",
+    "experience": "Ervaring in sales/retail",
     "motivation": "Waarom wil je reseller worden?",
     "expectedClients": "Hoeveel klanten verwacht je per jaar?",
     "companyPlaceholder": "Jouw bedrijf",
@@ -5904,8 +5904,8 @@
       "ownership24": "Stop met huren. Na 24 maanden is deze i7 kassa 100% jouw eigendom."
     },
     "cafe": {
-      "h1": "Horeca Kassa voor Cafés | i7 Dual-Screen & 9 Talen | Vysion",
-      "intro": "Café-ritme vraagt een razendsnelle kassa: i7-hardware (‘Het Beest’), 9 talen voor meertalig personeel en overzicht op je marge — de horeca kassa voor brasserie, koffiebar en lunchroom.",
+      "h1": "Kassa voor Cafés | i7 Dual-Screen & 9 Talen | Vysion",
+      "intro": "Café-ritme vraagt een razendsnelle kassa: i7-hardware (‘Het Beest’), 9 talen voor meertalig personeel en overzicht op je marge — de kassa voor brasserie, koffiebar en lunchroom.",
       "body1": "Ochtendrush of terrasweer: je wilt de snelste kassa aan de bar. Combineer zaal, takeaway en online bestellen in één flow — ideaal als kassasysteem België voor cafés met drukke pieken.",
       "body2": "Minder tikken, minder fouten, meer bedieningen per uur. Probeer Vysion gratis en ervaar i7-kracht met duidelijke voorwaarden en eigendom na 24 maanden.",
       "imageAlt": "Vysion kassa layout voor café en brasserie",
@@ -5924,7 +5924,7 @@
     "kebab": {
       "h1": "Kebab & Broodjesbar Kassa | i7 Kracht | Vysion",
       "intro": "Late-night druk en broodjes in het kwadraat: met i7-hardware (‘Het Beest’) en 9 talen blijft je team snel — de kassa voor kebab, döner en broodjesbar.",
-      "body1": "Combineer zaal, afhaal en bezorging zonder chaos. De snelste kassa-flow met duidelijke tickets en bonnen — kassasysteem België voor horeca met hoge doorzet.",
+      "body1": "Combineer zaal, afhaal en bezorging zonder chaos. De snelste kassa-flow met duidelijke tickets en bonnen — kassasysteem België voor met hoge doorzet.",
       "body2": "Minder stress aan de toonbank, meer controle op omzet. Probeer gratis en ontdek waarom ondernemers kiezen voor i7 in plaats van traag materiaal.",
       "imageAlt": "Vysion kassa layout voor kebab en broodjesbar",
       "cta": "Start gratis",

@@ -43,7 +43,7 @@ export default function Footer() {
                   www.vysionapps.io
                 </a>
                 <a
-                  href="https://www.vysionhoreca.com"
+                  href="https://www.vysion-kassa.com"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-accent hover:underline block"

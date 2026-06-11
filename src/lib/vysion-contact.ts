@@ -1,5 +1,5 @@
 /** Officieel support- en contactadres Vysion kassa's (Zoho / website). */
-export const VYSION_INFO_EMAIL = 'info@vysionkassa.com' as const
+export const VYSION_INFO_EMAIL = 'info@vysion-kassa.com' as const
 
 export function vysionInfoMailto(): string {
   return `mailto:${VYSION_INFO_EMAIL}`

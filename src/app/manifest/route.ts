@@ -2,21 +2,16 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getTenantSettings } from '@/lib/admin-api'
 import { TENANT_APP_SHELL_THEME_COLOR } from '@/lib/theme-color'
 import { tenantSlugFromOrdervysionHost } from '@/lib/tenant-slug-from-host'
+import { isVysionMainPortalHost as isVysionMarketingPortalHost } from '@/lib/vysion-site'
 
 const DEFAULT_NAME = "Vysion kassa's"
 const DEFAULT_SHORT = 'Vysion'
 
-/** Zaak heeft nog geen *.ordervysion subdomein → ze werken via www.vysionhoreca.com/shop/{slug}; PWA op hoofddomein moet nog steeds naar /login. */
+/** Zaak zonder *.ordervysion subdomein → /shop/{slug} op marketing-domein; PWA op hoofddomein → /login. */
 function isVysionMainPortalHost(host: string): boolean {
   const h = host.split(':')[0].toLowerCase()
-  return (
-    h === 'vysionhoreca.com' ||
-    h === 'www.vysionhoreca.com' ||
-    h === 'ordervysion.com' ||
-    h === 'www.ordervysion.com' ||
-    h === 'localhost' ||
-    h === '127.0.0.1'
-  )
+  if (isVysionMarketingPortalHost(h)) return true
+  return h === 'localhost' || h === '127.0.0.1'
 }
 
 export async function GET(request: NextRequest) {
@@ -50,7 +45,7 @@ export async function GET(request: NextRequest) {
   const manifest = {
     name,
     short_name,
-    description: 'Horeca kassa, reserveren, online bestellen — één platform',
+    description: 'Kassa, reserveren, online bestellen — één platform',
     start_url: startUrl,
     scope: '/',
     display: 'standalone',

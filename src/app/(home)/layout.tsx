@@ -1,12 +1,14 @@
 import type { Metadata } from 'next'
 
-const siteUrl = 'https://www.vysionhoreca.com'
+import { VYSION_CANONICAL_ORIGIN } from '@/lib/vysion-site'
+
+const siteUrl = VYSION_CANONICAL_ORIGIN
 
 /** SEO homepage (/): kernzoektermen kassa, bestelplatform, hardware, gratis proberen. */
 const HOME_TITLE =
-  'Horeca kassa, online bestelplatform & hardware | Gratis proberen | Vysion'
+  'Kassa, online bestelplatform & hardware | Gratis proberen | Vysion kassa\'s'
 const HOME_DESCRIPTION =
-  'Zoek je een horeca kassa, online bestelplatform of gratis uitproberen? Vysion: touchscreen POS, webshop, premium kassahardware (Intel i7). 14 dagen gratis — reserveringen, keukenscherm, WhatsApp, 9 talen. België & Nederland.'
+  'Zoek je een kassa, online bestelplatform of gratis uitproberen? Vysion: touchscreen POS, webshop, premium kassahardware (Intel i7). 14 dagen gratis — reserveringen, keukenscherm, WhatsApp, 9 talen. België & Nederland.'
 
 export const metadata: Metadata = {
   title: {
@@ -14,21 +16,21 @@ export const metadata: Metadata = {
   },
   description: HOME_DESCRIPTION,
   keywords: [
-    'horeca kassa',
+    'kassa software',
     'gratis kassa',
     'online bestelplatform',
-    'bestelplatform horeca',
+    'bestelplatform',
     'kassahardware',
     'touchscreen kassa',
-    'POS software horeca',
+    'POS software',
     'kassa software gratis proberen',
     'WhatsApp bestellen restaurant',
     'keukenscherm',
-    'horeca software België',
-    'horeca kassa gratis',
-    'gratis horeca kassa',
+    'kassa software België',
+    'kassa gratis proberen',
+    'gratis kassa',
     'kassa en bestelplatform',
-    'horeca bestelplatform gratis proberen',
+    'bestelplatform gratis proberen',
   ],
   alternates: {
     canonical: '/',

@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
           </div>
           <div class="footer">
             Verzonden via Vysion kassa's<br>
-            <a href="https://www.vysionhoreca.com" style="color: #f97316;">www.vysionhoreca.com</a>
+            <a href="https://www.vysion-kassa.com" style="color: #f97316;">www.vysion-kassa.com</a>
           </div>
         </div>
       </body>

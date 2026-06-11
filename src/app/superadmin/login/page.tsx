@@ -97,7 +97,7 @@ export default function SuperAdminLogin() {
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-              placeholder="admin@vysionkassa.com"
+              placeholder="admin@vysion-kassa.com"
             />
           </div>
 

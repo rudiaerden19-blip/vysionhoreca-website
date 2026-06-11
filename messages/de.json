@@ -2043,7 +2043,7 @@
       "kassaImageZoomHint": "Nur Kassenansicht. Unter 100% = herauszoomen (mehr Bild sichtbar). Über 100% = hineinzoomen für engeren Ausschnitt.",
       "kassaImageZoomPreview": "Vorschau für die Kasse",
       "catalogModeLabel": "Product type",
-      "catalogModeHoreca": "Horeca",
+      "catalogModeHoreca": "Eten & drinken",
       "catalogModeRetail": "Retail / Winkel",
       "retailFieldsTitle": "Winkel & Scan",
       "barcode": "Barcode / EAN",
@@ -4162,7 +4162,7 @@
         "email": "E-Mail:",
         "phone": "Telefon:",
         "inApp": "In-App-Support:",
-        "inAppDesc": "Verfügbar in der Vysion-Horeca-Anwendung"
+        "inAppDesc": "Verfügbar in der Vysion kassa's-Anwendung"
       },
       "hours": {
         "title": "5. Support-Zeiten",
@@ -4885,7 +4885,7 @@
   "printAgentDownloadPage": {
     "heroTitle": "Print Agent für Windows",
     "heroSubtitle": "Offizieller Download für den Bondrucker am Kassen-PC",
-    "intro": "Geben Sie vysionhoreca.com in die Adresszeile ein — kein Google nötig. Windows oder Chrome können warnen, weil das Installationsprogramm noch nicht bei Microsoft signiert ist. Die Datei stammt vom offiziellen Vysion-Projekt; das ist nicht dasselbe wie Malware.",
+    "intro": "Geben Sie vysion-kassa.com in die Adresszeile ein — kein Google nötig. Windows oder Chrome können warnen, weil das Installationsprogramm noch nicht bei Microsoft signiert ist. Die Datei stammt vom offiziellen Vysion-Projekt; das ist nicht dasselbe wie Malware.",
     "windowsNote": "Nur Windows. Auf demselben PC wie die Ordervysion-Kasse im Browser und Ihr Epson installieren.",
     "downloadCta": "Installer herunterladen",
     "releaseNote": "Technische Details (GitHub)",
@@ -5311,7 +5311,7 @@
     "tenantSlugPlaceholder": "mein-lokal",
     "tenantNamePlaceholder": "Beispiel Café",
     "tenantEmailPlaceholder": "info@lokal.de",
-    "superadminLoginPlaceholder": "admin@vysionkassa.com",
+    "superadminLoginPlaceholder": "admin@vysion-kassa.com",
     "invoiceEmailPlaceholder": "rechnung@firma.de",
     "companyLegalPlaceholder": "Firma GmbH",
     "companyVatPlaceholder": "BE0123456789",

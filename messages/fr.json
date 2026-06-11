@@ -46,7 +46,7 @@
     "premiumShowcaseTitle": "Vysion Premium — notre logiciel & matériel dans votre établissement",
     "premiumCardShowcaseAlt": "Aperçu de l’offre Vysion Premium avec fonctionnalités et tarif",
     "galleryHardwareAlt1": "Caisse tactile noire avec imprimante de tickets sur le comptoir",
-    "galleryHardwareAlt2": "Caisse tactile blanche dans un établissement horeca",
+    "galleryHardwareAlt2": "Caisse tactile blanche dans un établissement",
     "galleryHardwareAlt3": "Écran de menu numérique sur un comptoir en marbre",
     "enlargeImageHint": "Agrandir l’image",
     "premiumPitchLead": "Système d’encaissement complet avec matériel, logiciel & support illimité pour seulement €99/mois",
@@ -75,7 +75,7 @@
     "logoTagline": "",
     "title": "Une caisse pour chaque secteur",
     "subtitleLead": "Matériel et logiciel de caisse inclus dans votre abonnement",
-    "subtitle": "Du retail à l'horeca, boulangeries et commerces",
+    "subtitle": "Du retail à l' boulangeries et commerces",
     "ctaStartFree": "Commencer gratuitement",
     "ctaViewDemo": "Voir la démo",
     "ctaModulesHeadline": "Système premium complet",
@@ -230,14 +230,14 @@
   },
   "orderApp": {
     "title": "La plateforme de commande la plus complète du marché",
-    "subtitle": "Enfin un écosystème complet pour l'horeca",
+    "subtitle": "Enfin un écosystème complet pour de la restauration",
     "cta": "Découvrez la plateforme complète"
   },
   "liveDemo": {
     "title": "Vous voulez voir la plateforme en action ?",
     "subtitle": "Découvrez une vraie friterie fonctionnant avec Vysion kassa's",
     "clientsLead": "Ces clients vous ont précédé",
-    "marquee": "Horeca · Friterie · Restaurant · Café · Boucherie · Boulangerie · Traiteur · Brasserie · Sandwicherie · Bar à vins · Hôtel · Vysion kassa's · ",
+    "marquee": "· Friterie · Restaurant · Café · Boucherie · Boulangerie · Traiteur · Brasserie · Sandwicherie · Bar à vins · Hôtel · Vysion kassa's · ",
     "successStories": {
       "vivaldi": {
         "name": "VIVALDI 2.0 Food & Drinks",
@@ -358,7 +358,7 @@
     "compareDiscountStarter": "-40 %",
     "compareDiscountPro": "-23 %",
     "starter": {
-      "name": "Pour l'horeca",
+      "name": "Pour de la restauration",
       "features": {
         "1": "Plateforme de commande en ligne",
         "2": "Site web propre entièrement personnalisable",
@@ -377,7 +377,7 @@
     },
     "pro": {
       "name": "Pour tous les secteurs",
-      "allOfStarter": "Tout le pack horeca, plus :",
+      "allOfStarter": "Tout le pack  plus :",
       "hardwareIncluded": "Matériel inclus",
       "features": {
         "1": "Licence caisse incluse",
@@ -416,10 +416,10 @@
     "viewModules": "Voir les modules",
     "modulesModalTitle": "Tous les modules",
     "modulesModalClose": "Fermer",
-    "ctaHomeHorecaPricing": "Voir les tarifs caisse horeca",
+    "ctaHomeHorecaPricing": "Voir les tarifs caisse",
     "ctaHomeRetailPricing": "Voir les tarifs retail et tous les secteurs",
     "choiceModalTitle": "Voir nos tarifs",
-    "choiceHorecaPricing": "Voir les tarifs pour la caisse horeca",
+    "choiceHorecaPricing": "Voir les tarifs pour la caisse",
     "choiceRetailPricing": "Voir les tarifs retail et autres secteurs",
     "retailModalTitle": "Retail et autres secteurs",
     "retail": {
@@ -585,7 +585,7 @@
     }
   },
   "footer": {
-    "description": "Vysion fait partie de Vysion Group International. Logiciel cloud dans le monde entier, en plusieurs langues. Vysion Group conçoit des caisses pour chaque secteur : de l'horeca au coiffeur, boucher, cafés, bistro, prêt-à-porter, retail et bien plus encore.",
+    "description": "Vysion fait partie de Vysion Group International. Logiciel cloud dans le monde entier, en plusieurs langues. Vysion Group conçoit des caisses pour chaque secteur : de l'au coiffeur, boucher, cafés, bistro, prêt-à-porter, retail et bien plus encore.",
     "address": "Adresse:",
     "product": "Produit",
     "features": "Fonctionnalités & plateforme",
@@ -740,7 +740,7 @@
   "about": {
     "heroTitle": "À propos de",
     "heroTitleAccent": "Vysion",
-    "heroTitleEnd": "Horeca",
+    "heroTitleEnd": "Vysion kassa's",
     "heroSubtitle": "Construit depuis le terrain. Pas depuis un bureau.",
     "story": {
       "title": "Notre histoire",
@@ -2043,7 +2043,7 @@
       "kassaImageZoomHint": "Écran caisse uniquement. Sous 100% = dézoom (plus de photo visible). Au-dessus = zoom avant pour un cadrage plus serré.",
       "kassaImageZoomPreview": "Aperçu caisse approximatif",
       "catalogModeLabel": "Product type",
-      "catalogModeHoreca": "Horeca",
+      "catalogModeHoreca": "Eten & drinken",
       "catalogModeRetail": "Retail / magasin",
       "retailFieldsTitle": "Magasin & scan",
       "barcode": "Barcode / EAN",
@@ -4193,7 +4193,7 @@
         "title": "Toegestaan Gebruik",
         "intro": "U mag onze diensten gebruiken voor:",
         "items": {
-          "1": "Het beheren van uw horecazaak",
+          "1": "Het beheren van uw zaak",
           "2": "Het verwerken van transacties en bestellingen",
           "3": "Het bijhouden van uw boekhouding en administratie",
           "4": "Het communiceren met klanten"
@@ -4411,7 +4411,7 @@
       },
       "services": {
         "title": "2. Diensten",
-        "content": "Vysion kassa's biedt kassasoftware, online bestelplatform, boekhoudsoftware en aanverwante diensten voor de horecasector. Wij behouden ons het recht voor om onze diensten te wijzigen, uit te breiden of te beperken."
+        "content": "Vysion kassa's biedt kassasoftware, online bestelplatform, boekhoudsoftware en aanverwante diensten voor de sector. Wij behouden ons het recht voor om onze diensten te wijzigen, uit te breiden of te beperken."
       },
       "subscription": {
         "title": "3. Abonnement en Betaling",
@@ -4885,7 +4885,7 @@
   "printAgentDownloadPage": {
     "heroTitle": "Print Agent pour Windows",
     "heroSubtitle": "Téléchargement officiel pour l’imprimante de tickets sur le PC caisse",
-    "intro": "Tapez vysionhoreca.com dans la barre d’adresse — pas besoin de Google. Windows ou Chrome peuvent avertir car l’installeur n’est pas encore signé chez Microsoft. Le fichier provient du projet officiel Vysion ; ce n’est pas une alerte virus.",
+    "intro": "Tapez vysion-kassa.com dans la barre d’adresse — pas besoin de Google. Windows ou Chrome peuvent avertir car l’installeur n’est pas encore signé chez Microsoft. Le fichier provient du projet officiel Vysion ; ce n’est pas une alerte virus.",
     "windowsNote": "Windows uniquement. Sur le même PC que la caisse Ordervysion dans le navigateur et votre Epson.",
     "downloadCta": "Télécharger l’installeur",
     "releaseNote": "Détails techniques (GitHub)",
@@ -5058,7 +5058,7 @@
     "imageAlt": "Borne de table Vysion avec écran tactile",
     "fullPlatform": {
       "title": "Plateforme complète pour chaque secteur",
-      "body": "Vysion convient à chaque entreprise : horeca, boulangeries, boucheries, magasins de vêtements, salons de coiffure, commerces spécialisés et retail. Économisez jusqu’à 1 500 € par an par rapport à d’autres plateformes grâce à une solution intégrée qui évolue avec votre activité.",
+      "body": "Vysion convient à chaque entreprise :  boulangeries, boucheries, magasins de vêtements, salons de coiffure, commerces spécialisés et retail. Économisez jusqu’à 1 500 € par an par rapport à d’autres plateformes grâce à une solution intégrée qui évolue avec votre activité.",
       "bodyExtra": "Vysion kassa's est la première plateforme de caisse au monde, avec tout sur un seul écran, applicable à chaque secteur."
     },
     "liveSupport": {
@@ -5311,7 +5311,7 @@
     "tenantSlugPlaceholder": "mon-etablissement",
     "tenantNamePlaceholder": "Exemple Café",
     "tenantEmailPlaceholder": "info@exemple.be",
-    "superadminLoginPlaceholder": "admin@vysionkassa.com",
+    "superadminLoginPlaceholder": "admin@vysion-kassa.com",
     "invoiceEmailPlaceholder": "facture@societe.be",
     "companyLegalPlaceholder": "Société SARL",
     "companyVatPlaceholder": "BE0123456789",

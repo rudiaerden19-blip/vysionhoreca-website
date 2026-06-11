@@ -92,9 +92,9 @@ export const DEMO_KASSA_URL = `${DEMO_ORDER_SITE_URL}/admin/kassa?${DEMO_KASSA_P
 
 /** Publieke demomenu / online shop op het marketingdomein */
 export const DEMO_ONLINE_SHOP_MENU_URL =
-  `https://www.vysionhoreca.com/shop/${DEMO_TENANT_SLUG}/menu` as const
+  `https://www.vysion-kassa.com/shop/${DEMO_TENANT_SLUG}/menu` as const
 
-const MARKETING_SHOP_BASE = 'https://www.vysionhoreca.com/shop' as const
+const MARKETING_SHOP_BASE = 'https://www.vysion-kassa.com/shop' as const
 
 /** Showcase: restaurant/café — zelfde tenant als gratis-websitevoorbeeld. */
 export const DEMO_CAFE_MENU_URL = `${MARKETING_SHOP_BASE}/restaurantdekorf/menu` as const

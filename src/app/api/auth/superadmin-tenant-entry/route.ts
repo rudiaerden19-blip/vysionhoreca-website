@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifySuperAdminAccess } from '@/lib/verify-tenant-access'
 import { superadminCookieDomainForHost, VYSION_SUPERADMIN_COOKIE } from '@/lib/superadmin-cookies'
+import { isVysionMainPortalHost } from '@/lib/vysion-site'
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
@@ -27,13 +28,7 @@ function handoffLoginUrl(request: NextRequest, slug: string, path: string): URL 
 /** Zelfde hosts als middleware `exactMainDomain` + previews: handoff via /shop/{slug}/… op dit origin (betrouwbaarder dan tenant-subdomein). */
 function shouldHandoffViaMainSiteShopPath(request: NextRequest): boolean {
   const host = (request.headers.get('host') || '').split(':')[0].toLowerCase()
-  const mainHosts = new Set([
-    'www.vysionhoreca.com',
-    'vysionhoreca.com',
-    'www.ordervysion.com',
-    'ordervysion.com',
-  ])
-  if (mainHosts.has(host)) return true
+  if (isVysionMainPortalHost(host)) return true
   if (host.includes('localhost') || host === '127.0.0.1' || host.includes('vercel.app')) {
     return true
   }
@@ -44,7 +39,6 @@ function shouldHandoffViaMainSiteShopPath(request: NextRequest): boolean {
 function tenantOriginForSlug(request: NextRequest, slug: string): string {
   const host = (request.headers.get('host') || '').split(':')[0].toLowerCase()
   if (host.endsWith('ordervysion.com')) return `https://${slug}.ordervysion.com`
-  if (host.endsWith('vysionhoreca.com')) return `https://${slug}.vysionhoreca.com`
   return `https://${slug}.ordervysion.com`
 }
 

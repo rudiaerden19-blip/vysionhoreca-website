@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Unsubscribe URL voor GDPR compliance
-    const unsubscribeUrl = `https://www.vysionhoreca.com/shop/${tenantSlug}/account?unsubscribe=true`
+    const unsubscribeUrl = `https://www.vysion-kassa.com/shop/${tenantSlug}/account?unsubscribe=true`
     
     // Send emails met vertraging om spam filters te vermijden
     const results: PromiseSettledResult<string>[] = []
@@ -145,7 +145,7 @@ export async function POST(request: NextRequest) {
       
       <!-- CTA Button -->
       <div style="text-align: center; margin: 30px 0;">
-        <a href="https://www.vysionhoreca.com/shop/${tenantSlug}" 
+        <a href="https://www.vysion-kassa.com/shop/${tenantSlug}" 
            style="display: inline-block; background: #1e3a5f; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
           Bekijk onze website
         </a>

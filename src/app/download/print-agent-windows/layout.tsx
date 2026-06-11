@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: "Print Agent download (Windows) | Vysion kassa's",
   description:
-    'Officiële Windows-installer voor bonprinten met Ordervysion. Vaste pagina op vysionhoreca.com — niet via zoekmachines.',
+    'Officiële Windows-installer voor bonprinten met Ordervysion. Vaste pagina op vysion-kassa.com — niet via zoekmachines.',
   alternates: {
     canonical: '/download/print-agent-windows',
   },

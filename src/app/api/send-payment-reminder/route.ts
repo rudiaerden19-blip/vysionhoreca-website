@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    const paymentLink = `https://www.vysionhoreca.com/betalen/${tenantSlug}`
+    const paymentLink = `https://www.vysion-kassa.com/betalen/${tenantSlug}`
 
     const emailHtml = `
 <!DOCTYPE html>
@@ -110,8 +110,8 @@ export async function POST(request: NextRequest) {
     </div>
     
     <div class="footer">
-      <p>Vysion kassa's - Bestelplatform voor de horeca</p>
-      <p>www.vysionhoreca.com | ${VYSION_INFO_EMAIL}</p>
+      <p>Vysion kassa's - Bestelplatform voor zaken</p>
+      <p>www.vysion-kassa.com | ${VYSION_INFO_EMAIL}</p>
     </div>
   </div>
 </body>

@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
     }
 
     const businessName = tenantRow?.name || tenantSlug
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `https://${tenantSlug}.vysionhoreca.com`
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `https://${tenantSlug}.vysion-kassa.com`
 
     const stripe = new Stripe(stripeKey)
     const session = await stripe.checkout.sessions.create({

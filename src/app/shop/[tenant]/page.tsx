@@ -741,7 +741,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
     updateOGTag('og:title', seoTitle)
     updateOGTag('og:description', seoDescription)
     updateOGTag('og:type', 'website')
-    updateOGTag('og:url', `https://www.vysionhoreca.com/shop/${params.tenant}`)
+    updateOGTag('og:url', `https://www.vysion-kassa.com/shop/${params.tenant}`)
     
     if (business.seo_og_image) {
       updateOGTag('og:image', business.seo_og_image)
@@ -877,7 +877,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           <p className="text-gray-600 mb-6">
             {t('shopPage.notFoundDescription') || 'Deze shop bestaat niet of is verwijderd.'}
           </p>
-          <a href="https://www.vysionhoreca.com" className="text-orange-500 hover:text-orange-600 font-medium inline-block">
+          <a href="https://www.vysion-kassa.com" className="text-orange-500 hover:text-orange-600 font-medium inline-block">
             ← {t('shopPage.backToVysion') || 'Terug naar Vysion'}
           </a>
         </div>
@@ -1869,9 +1869,9 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 {business.website_url && (
                   <a 
                     href={
-                      // Als het een ordervysion.com URL is, gebruik de juiste vysionhoreca.com URL
+                      // Als het een ordervysion.com URL is, gebruik de juiste vysion-kassa.com URL
                       business.website_url.includes('ordervysion.com') 
-                        ? `https://www.vysionhoreca.com/shop/${params.tenant}`
+                        ? `https://www.vysion-kassa.com/shop/${params.tenant}`
                         : business.website_url.startsWith('http') 
                           ? business.website_url 
                           : `https://${business.website_url}`
@@ -1941,7 +1941,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             <Link href={`/shop/${params.tenant}/menukaart`} className="bg-white rounded-2xl p-8 shadow-lg text-center hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer block">
               <div className="w-48 h-48 mx-auto mb-6 bg-white p-3 rounded-xl shadow-inner">
                 <img 
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&format=png&margin=10&data=${encodeURIComponent(`https://www.vysionhoreca.com/shop/${params.tenant}/menukaart`)}`}
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&format=png&margin=10&data=${encodeURIComponent(`https://www.vysion-kassa.com/shop/${params.tenant}/menukaart`)}`}
                   alt="Menu QR Code"
                   className="w-full h-full"
                 />
@@ -1956,7 +1956,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             <Link href={`/shop/${params.tenant}/menukaart?promo=1`} className="bg-white rounded-2xl p-8 shadow-lg text-center hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer block">
               <div className="w-48 h-48 mx-auto mb-6 bg-white p-3 rounded-xl shadow-inner">
                 <img 
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&format=png&margin=10&data=${encodeURIComponent(`https://www.vysionhoreca.com/shop/${params.tenant}/menukaart?promo=1`)}`}
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&format=png&margin=10&data=${encodeURIComponent(`https://www.vysion-kassa.com/shop/${params.tenant}/menukaart?promo=1`)}`}
                   alt="Promoties QR Code"
                   className="w-full h-full"
                 />
@@ -1971,7 +1971,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             <Link href={`/shop/${params.tenant}/review`} className="bg-white rounded-2xl p-8 shadow-lg text-center hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer block">
               <div className="w-48 h-48 mx-auto mb-6 bg-white p-3 rounded-xl shadow-inner">
                 <img 
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&format=png&margin=10&data=${encodeURIComponent(`https://www.vysionhoreca.com/shop/${params.tenant}/review`)}`}
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&format=png&margin=10&data=${encodeURIComponent(`https://www.vysion-kassa.com/shop/${params.tenant}/review`)}`}
                   alt="Review QR Code"
                   className="w-full h-full"
                 />

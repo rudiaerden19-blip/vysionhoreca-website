@@ -365,7 +365,7 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
           <span className="text-6xl mb-6 block">🔍</span>
           <h1 className="text-2xl font-bold text-gray-900 mb-4">{t('adminLayout.shopNotFound')}</h1>
           <p className="text-gray-600 mb-6">{t('adminLayout.shopNotFoundDesc')}</p>
-          <a href="https://www.vysionhoreca.com" className="text-blue-600 hover:text-blue-700 font-medium inline-block">
+          <a href="https://www.vysion-kassa.com" className="text-blue-600 hover:text-blue-700 font-medium inline-block">
             {t('adminLayout.backToVysion')}
           </a>
         </div>

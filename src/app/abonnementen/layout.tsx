@@ -3,10 +3,10 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Abonnementen',
   description:
-    "Abonnementen Vysion kassa's: horeca kassa, online bestelplatform, kassahardware en software in één. Maandelijks opzegbaar, 14 dagen gratis kassa proberen.",
+    "Abonnementen Vysion kassa's: kassa, online bestelplatform, kassahardware en software in één. Maandelijks opzegbaar, 14 dagen gratis kassa proberen.",
   keywords: [
-    'vysion horeca abonnement',
-    'horeca software abonnement',
+    'vysion kassa abonnement',
+    'kassa software abonnement',
     'kassa abonnement',
     'bestelplatform abonnement',
     'kassahardware lease',

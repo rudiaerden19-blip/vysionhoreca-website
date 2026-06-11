@@ -20,7 +20,8 @@ const COOKIE_NAME = VYSION_SUPERADMIN_COOKIE.name
 export function superadminCookieDomainForHost(hostname: string): string | undefined {
   const h = hostname.toLowerCase().split(':')[0]
   if (h === 'ordervysion.com' || h.endsWith('.ordervysion.com')) return '.ordervysion.com'
-  if (h === 'vysionhoreca.com' || h.endsWith('.vysionhoreca.com')) return '.vysionhoreca.com'
+  if (h === 'vysion-kassa.com' || h.endsWith('.vysion-kassa.com')) return '.vysion-kassa.com'
+  if (h === 'vysion-kassa.com' || h.endsWith('.vysion-kassa.com')) return '.vysion-kassa.com'
   return undefined
 }
 

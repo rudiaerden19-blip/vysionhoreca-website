@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Over ons | Vysion kassa's",
     description:
-      'Van horeca kassa en bestelplatform tot hardware en analyse — één team.',
+      'Van kassa en bestelplatform tot hardware en analyse — één team.',
     url: '/over-ons',
     images: [{ url: '/images/reservation-platform-1.png' }],
   },

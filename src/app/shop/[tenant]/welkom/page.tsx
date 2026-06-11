@@ -59,7 +59,7 @@ export default function WelkomPage({ params }: { params: { tenant: string } }) {
           className="text-[clamp(2rem,8vw,4.5rem)] font-black leading-tight tracking-tight text-gray-900"
           style={{ letterSpacing: '-0.02em' }}
         >
-          Vysion-Horeca
+          Vysion kassa's
         </h1>
         <p className="mt-3 text-[clamp(1rem,3vw,1.5rem)] font-light uppercase tracking-[0.35em] text-gray-500">
           2026
@@ -72,7 +72,7 @@ export default function WelkomPage({ params }: { params: { tenant: string } }) {
         }`}
         style={{ transitionDelay: showTitle ? '200ms' : '0ms' }}
       >
-        Horeca Platform
+        Vysion kassa's platform
       </p>
 
       <div

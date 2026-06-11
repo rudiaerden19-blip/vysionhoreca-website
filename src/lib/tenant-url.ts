@@ -3,6 +3,8 @@
  * Supports both subdomain (www.naamzaak.ordervysion.com) and path-based (/shop/naamzaak) URLs
  */
 
+import { VYSION_CANONICAL_ORIGIN, isVysionMainPortalHost } from '@/lib/vysion-site'
+
 /**
  * Get the tenant URL base
  * Returns subdomain URL if on subdomain, otherwise returns path-based URL
@@ -16,11 +18,7 @@ export function getTenantUrl(tenantSlug: string, path: string = ''): string {
   const hostname = window.location.hostname
   
   // Check if we're on a subdomain (not localhost, not main domain)
-  const isMainDomain = 
-    hostname === 'ordervysion.com' ||
-    hostname === 'www.ordervysion.com' ||
-    hostname === 'vysionhoreca.com' ||
-    hostname === 'www.vysionhoreca.com'
+  const isMainDomain = isVysionMainPortalHost(hostname)
   
   const isSubdomain = 
     !hostname.includes('localhost') &&
@@ -64,7 +62,7 @@ export function assignTenantHref(
 /**
  * Get full tenant URL with protocol and domain
  * For subdomain: https://www.naamzaak.ordervysion.com
- * For path: https://www.vysionhoreca.com/shop/naamzaak
+ * For path: https://www.vysion-kassa.com/shop/naamzaak
  */
 export function getTenantFullUrl(tenantSlug: string, path: string = '', useSubdomain: boolean = true): string {
   if (typeof window === 'undefined') {
@@ -72,16 +70,12 @@ export function getTenantFullUrl(tenantSlug: string, path: string = '', useSubdo
     if (useSubdomain) {
       return `https://${tenantSlug}.ordervysion.com${path}`
     }
-    return `https://www.vysionhoreca.com/shop/${tenantSlug}${path}`
+    return `${VYSION_CANONICAL_ORIGIN}/shop/${tenantSlug}${path}`
   }
 
   const protocol = window.location.protocol
   const hostname = window.location.hostname
-  const isMainDomain2 = 
-    hostname === 'ordervysion.com' ||
-    hostname === 'www.ordervysion.com' ||
-    hostname === 'vysionhoreca.com' ||
-    hostname === 'www.vysionhoreca.com'
+  const isMainDomain2 = isVysionMainPortalHost(hostname)
   
   const isSubdomain = 
     !hostname.includes('localhost') &&
@@ -93,7 +87,7 @@ export function getTenantFullUrl(tenantSlug: string, path: string = '', useSubdo
     return `${protocol}//${tenantSlug}.ordervysion.com${path}`
   }
 
-  return `${protocol}//www.vysionhoreca.com/shop/${tenantSlug}${path}`
+  return `${protocol}//www.vysion-kassa.com/shop/${tenantSlug}${path}`
 }
 
 /**
@@ -106,11 +100,7 @@ export function getCurrentTenantSlug(): string | null {
   const pathname = window.location.pathname
 
   // Check if we're on a subdomain
-  const isMainDomain3 = 
-    hostname === 'ordervysion.com' ||
-    hostname === 'www.ordervysion.com' ||
-    hostname === 'vysionhoreca.com' ||
-    hostname === 'www.vysionhoreca.com'
+  const isMainDomain3 = isVysionMainPortalHost(hostname)
   
   const isSubdomain = 
     !hostname.includes('localhost') &&

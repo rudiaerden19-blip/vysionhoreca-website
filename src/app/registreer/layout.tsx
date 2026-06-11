@@ -5,10 +5,10 @@ export const metadata: Metadata = {
   description:
     'Gratis kassa en software 14 dagen uitproberen: touchscreen POS, online bestelplatform, kassahardware-opties, reserveringen, keukenscherm en analyse. Registreer in enkele minuten.',
   keywords: [
-    'vysion horeca registratie',
+    'vysion kassa registratie',
     'gratis kassa',
     'gratis kassa software',
-    'horeca software gratis proberen',
+    'kassa software gratis proberen',
     'online bestelplatform gratis',
     'kassa trial',
     'restaurant software trial',
