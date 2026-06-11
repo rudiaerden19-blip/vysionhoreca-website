@@ -2840,7 +2840,7 @@
       "cameraPermissionDenied": "Geen cameratoegang. Sta camera toe of typ de barcode.",
       "cameraStartFailed": "Camera kon niet starten. Tik opnieuw op Camera barcode of typ de EAN.",
       "cameraScanHint": "Richt de camera op de streepjescode tot het nummer in het veld staat.",
-      "cameraViewfinderHint": "Horizontaal of verticaal — barcode in beeld. Tik om scherp te stellen. 25–40 cm afstand. Of Foto van barcode.",
+      "cameraViewfinderHint": "Blikje? Houd de staande streepjescode midden in beeld — niet draaien. Tik om scherp te stellen. Of Foto van barcode.",
       "cameraTapToFocus": "Scherm tikken om scherp te stellen",
       "cameraTorchOn": "Zaklamp aan",
       "cameraTorchOff": "Zaklamp uit",

@@ -2840,7 +2840,7 @@
       "cameraPermissionDenied": "No camera access. Allow camera or type the barcode.",
       "cameraStartFailed": "Could not start the camera. Tap Camera barcode again or type the EAN.",
       "cameraScanHint": "Point the camera at the barcode until the number appears in the field.",
-      "cameraViewfinderHint": "Horizontal or vertical barcode in view. Tap to focus. 25–40 cm away. Or Photo of barcode.",
+      "cameraViewfinderHint": "Can? Keep the upright barcode centered — no need to tilt. Tap to focus. Or Photo of barcode.",
       "cameraTapToFocus": "Tap screen to focus",
       "cameraTorchOn": "Flashlight on",
       "cameraTorchOff": "Flashlight off",

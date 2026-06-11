@@ -240,6 +240,10 @@ function drawCanvasRotated(
   return dest
 }
 
+/** Volgorde: 90°/270° eerst — staande barcode op blik/flacon. */
+const ROTATIONS_VERTICAL_FIRST: CanvasRotationDeg[] = [90, 270, 0]
+const ROTATIONS_HORIZONTAL_FIRST: CanvasRotationDeg[] = [0, 90, 270]
+
 function decodeCanvasAllOrientations(
   canvas: HTMLCanvasElement,
   reader: MultiFormatOneDReader,
@@ -255,37 +259,53 @@ function decodeCanvasAllOrientations(
   return null
 }
 
-function drawVideoCropToCanvas(
+type VideoRegion = { sx: number; sy: number; sw: number; sh: number }
+
+/** Crop naar canvas met behouden aspect — geen uitrekken (kritiek voor verticale EAN). */
+function drawVideoRegionToCanvas(
   ctx: CanvasRenderingContext2D,
   video: HTMLVideoElement,
   canvas: HTMLCanvasElement,
-  mode: 'center' | 'full' | 'vertical',
+  region: VideoRegion,
+  maxDim = 1920,
 ): void {
   const vw = video.videoWidth
   const vh = video.videoHeight
-  const maxW = 1920
-  const scale = Math.min(1, maxW / vw)
-  const dw = Math.max(1, Math.floor(vw * scale))
-  const dh = Math.max(1, Math.floor(vh * scale))
-  if (canvas.width !== dw || canvas.height !== dh) {
-    canvas.width = dw
-    canvas.height = dh
-  }
+  const sx = Math.max(0, Math.min(vw - 1, region.sx))
+  const sy = Math.max(0, Math.min(vh - 1, region.sy))
+  const sw = Math.max(8, Math.min(vw - sx, region.sw))
+  const sh = Math.max(8, Math.min(vh - sy, region.sh))
+  const scale = Math.min(1, maxDim / Math.max(sw, sh))
+  const dw = Math.max(1, Math.floor(sw * scale))
+  const dh = Math.max(1, Math.floor(sh * scale))
+  canvas.width = dw
+  canvas.height = dh
   ctx.imageSmoothingEnabled = false
-  if (mode === 'center') {
-    const cropW = vw * 0.88
-    const cropH = vh * 0.38
-    const sx = (vw - cropW) / 2
-    const sy = (vh - cropH) / 2
-    ctx.drawImage(video, sx, sy, cropW, cropH, 0, 0, dw, dh)
-  } else if (mode === 'vertical') {
-    const cropW = vw * 0.36
-    const cropH = vh * 0.9
-    const sx = (vw - cropW) / 2
-    const sy = (vh - cropH) / 2
-    ctx.drawImage(video, sx, sy, cropW, cropH, 0, 0, dw, dh)
-  } else {
-    ctx.drawImage(video, 0, 0, dw, dh)
+  ctx.setTransform(1, 0, 0, 1, 0, 0)
+  ctx.drawImage(video, sx, sy, sw, sh, 0, 0, dw, dh)
+}
+
+function verticalStripRegions(vw: number, vh: number): VideoRegion[] {
+  const sw = vw * 0.52
+  const sh = vh * 0.94
+  const sy = vh * 0.03
+  const centers = [0.5, 0.34, 0.66]
+  return centers.map((cx) => ({
+    sx: cx * vw - sw / 2,
+    sy,
+    sw,
+    sh,
+  }))
+}
+
+function horizontalBandRegion(vw: number, vh: number): VideoRegion {
+  const sw = vw * 0.92
+  const sh = vh * 0.4
+  return {
+    sx: (vw - sw) / 2,
+    sy: (vh - sh) / 2,
+    sw,
+    sh,
   }
 }
 
@@ -303,7 +323,25 @@ export function startFastEanVideoScan(
   let rafId = 0
   let lastAttempt = 0
   let frameToggle = 0
-  const minIntervalMs = 48
+  const minIntervalMs = 55
+
+  const tryFrame = (reader: MultiFormatOneDReader, drawCtx: CanvasRenderingContext2D): string | null => {
+    const vw = video.videoWidth
+    const vh = video.videoHeight
+
+    for (const region of verticalStripRegions(vw, vh)) {
+      drawVideoRegionToCanvas(drawCtx, video, canvas, region)
+      const raw = decodeCanvasAllOrientations(canvas, reader, ROTATIONS_VERTICAL_FIRST)
+      if (raw) return raw
+    }
+
+    drawVideoRegionToCanvas(drawCtx, video, canvas, horizontalBandRegion(vw, vh))
+    const horizontal = decodeCanvasAllOrientations(canvas, reader, ROTATIONS_HORIZONTAL_FIRST)
+    if (horizontal) return horizontal
+
+    drawVideoRegionToCanvas(drawCtx, video, canvas, { sx: 0, sy: 0, sw: vw, sh: vh })
+    return decodeCanvasAllOrientations(canvas, reader, ROTATIONS_VERTICAL_FIRST)
+  }
 
   const loop = (now: number) => {
     if (!isActive()) return
@@ -323,24 +361,11 @@ export function startFastEanVideoScan(
     }
 
     frameToggle += 1
-    const cropModes: Array<'center' | 'full' | 'vertical'> =
-      frameToggle % 3 === 0
-        ? ['vertical', 'center']
-        : frameToggle % 2 === 0
-          ? ['center', 'full']
-          : ['full', 'center']
-    const rotations: CanvasRotationDeg[] =
-      frameToggle % 3 === 1 ? [0, 90] : frameToggle % 3 === 2 ? [0, 270] : [0, 90, 270]
-    const useHard = frameToggle % 5 === 0
-    const reader = useHard ? readerHard : readerFast
-
-    for (const mode of cropModes) {
-      drawVideoCropToCanvas(ctx, video, canvas, mode)
-      const raw = decodeCanvasAllOrientations(canvas, reader, rotations)
-      if (raw) {
-        onCode(raw)
-        return
-      }
+    const reader = frameToggle % 3 === 0 ? readerHard : readerFast
+    const raw = tryFrame(reader, ctx)
+    if (raw) {
+      onCode(raw)
+      return
     }
 
     rafId = requestAnimationFrame(loop)
@@ -394,34 +419,47 @@ export async function decodeEanFromImageFile(file: File): Promise<string | null>
   if (!file.type.startsWith('image/')) return null
   let bitmap: ImageBitmap | null = null
   try {
-    bitmap = await createImageBitmap(file)
+    bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' })
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d', { willReadFrequently: true })
     if (!ctx) return null
 
-    const tries: Array<{ sx: number; sy: number; sw: number; sh: number }> = [
+    const tries: VideoRegion[] = [
       { sx: 0, sy: 0, sw: bitmap.width, sh: bitmap.height },
       {
-        sx: bitmap.width * 0.06,
-        sy: bitmap.height * 0.28,
-        sw: bitmap.width * 0.88,
-        sh: bitmap.height * 0.38,
+        sx: bitmap.width * 0.04,
+        sy: bitmap.height * 0.26,
+        sw: bitmap.width * 0.92,
+        sh: bitmap.height * 0.42,
       },
       {
-        sx: bitmap.width * 0.32,
-        sy: bitmap.height * 0.05,
-        sw: bitmap.width * 0.36,
-        sh: bitmap.height * 0.9,
+        sx: bitmap.width * 0.24,
+        sy: bitmap.height * 0.02,
+        sw: bitmap.width * 0.52,
+        sh: bitmap.height * 0.96,
+      },
+      {
+        sx: bitmap.width * 0.12,
+        sy: bitmap.height * 0.02,
+        sw: bitmap.width * 0.52,
+        sh: bitmap.height * 0.96,
+      },
+      {
+        sx: bitmap.width * 0.36,
+        sy: bitmap.height * 0.02,
+        sw: bitmap.width * 0.52,
+        sh: bitmap.height * 0.96,
       },
     ]
 
     const reader = new MultiFormatOneDReader(buildEanHints(true))
-    const rotations: CanvasRotationDeg[] = [0, 90, 270]
     for (const crop of tries) {
-      const maxW = 2400
-      const scale = Math.min(1, maxW / crop.sw)
-      canvas.width = Math.max(1, Math.floor(crop.sw * scale))
-      canvas.height = Math.max(1, Math.floor(crop.sh * scale))
+      const maxDim = 2400
+      const sw = crop.sw
+      const sh = crop.sh
+      const scale = Math.min(1, maxDim / Math.max(sw, sh))
+      canvas.width = Math.max(1, Math.floor(sw * scale))
+      canvas.height = Math.max(1, Math.floor(sh * scale))
       ctx.imageSmoothingEnabled = false
       ctx.drawImage(
         bitmap,
@@ -434,7 +472,9 @@ export async function decodeEanFromImageFile(file: File): Promise<string | null>
         canvas.width,
         canvas.height,
       )
-      const raw = decodeCanvasAllOrientations(canvas, reader, rotations)
+      const isTall = canvas.height > canvas.width * 1.15
+      const rots = isTall ? ROTATIONS_VERTICAL_FIRST : ROTATIONS_HORIZONTAL_FIRST
+      const raw = decodeCanvasAllOrientations(canvas, reader, rots)
       if (raw) return raw
     }
     return null
