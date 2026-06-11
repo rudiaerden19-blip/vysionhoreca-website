@@ -8,7 +8,6 @@ import {
   Navigation,
   Footer,
   CookieBanner,
-  HomeCornerStamp,
   HomeLandingHero,
 } from '@/components'
 
@@ -567,17 +566,13 @@ function PricingModalPriceBar({
 function PricingSection() {
   const { t, locale } = useLanguage()
   const [withHardware, setWithHardware] = useState(false)
-  const [choiceOpen, setChoiceOpen] = useState(false)
   const [modulesOpen, setModulesOpen] = useState(false)
   const [retailOpen, setRetailOpen] = useState(false)
-  const modalFocusRef = useRef<HTMLButtonElement>(null)
 
   const horecaPrice = monthlyPriceForHardware(withHardware)
   const retailPrice = monthlyPriceForHardware(withHardware)
-  const proPrice = 99
-  const periodLabel = t('pricing.perMonth')
 
-  const anyModalOpen = choiceOpen || modulesOpen || retailOpen
+  const anyModalOpen = modulesOpen || retailOpen
 
   useEffect(() => {
     if (!anyModalOpen) return
@@ -587,70 +582,13 @@ function PricingSection() {
       if (e.key !== 'Escape') return
       if (modulesOpen) setModulesOpen(false)
       else if (retailOpen) setRetailOpen(false)
-      else setChoiceOpen(false)
     }
     window.addEventListener('keydown', onKey)
-    modalFocusRef.current?.focus()
     return () => {
       document.body.style.overflow = prev
       window.removeEventListener('keydown', onKey)
     }
   }, [anyModalOpen, modulesOpen, retailOpen])
-
-  const choiceModal =
-    choiceOpen && typeof document !== 'undefined'
-      ? createPortal(
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="pricing-choice-modal-title"
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-4 sm:p-6"
-            onClick={() => setChoiceOpen(false)}
-          >
-            <div
-              className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-home-image"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-start justify-between gap-4 border-b border-gray-100 bg-[#faf8f6] px-5 py-4 sm:px-6">
-                <h3 id="pricing-choice-modal-title" className="text-lg font-bold text-gray-900 sm:text-xl">
-                  {t('pricing.choiceModalTitle')}
-                </h3>
-                <button
-                  ref={modalFocusRef}
-                  type="button"
-                  onClick={() => setChoiceOpen(false)}
-                  className="rounded-lg px-3 py-1.5 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-200/80 hover:text-gray-900"
-                >
-                  {t('pricing.modulesModalClose')}
-                </button>
-              </div>
-              <div className="flex flex-col gap-3 px-5 py-6 sm:px-6 sm:py-8">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setChoiceOpen(false)
-                    setModulesOpen(true)
-                  }}
-                  className="w-full rounded-full border-2 border-gray-900 bg-white py-4 text-center text-sm font-semibold text-gray-900 shadow-home-float transition-colors hover:bg-gray-900 hover:text-white sm:text-base"
-                >
-                  {t('pricing.choiceHorecaPricing')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setChoiceOpen(false)
-                    setRetailOpen(true)
-                  }}
-                  className="w-full rounded-full bg-accent py-4 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:text-base"
-                >
-                  {t('pricing.choiceRetailPricing')}
-                </button>
-              </div>
-            </div>
-          </div>,
-          document.body,
-        )
-      : null
 
   const modulesModal =
     modulesOpen && typeof document !== 'undefined'
@@ -812,94 +750,22 @@ function PricingSection() {
           <p className="text-gray-600 text-sm sm:text-base mt-3 font-medium">{t('pricing.exclVat')}</p>
         </div>
 
-        <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-6 lg:gap-8 items-stretch">
-          <div className="flex flex-col items-center justify-center">
-            <button
-              type="button"
-              onClick={() => setChoiceOpen(true)}
-              className="w-full max-w-md rounded-full border-2 border-gray-900 bg-white px-6 py-4 text-center text-sm font-semibold text-gray-900 shadow-home-float transition-colors hover:bg-gray-900 hover:text-white sm:text-base"
-            >
-              {t('pricing.ctaHomeHorecaPricing')}
-            </button>
-            <p className="text-center text-accent text-sm mt-3 font-medium">{t('pricing.cancelAnytime')}</p>
-          </div>
-
-          {/* Pro (Premium) */}
-          <div id="pricing-premium-card" className="relative">
-            <div className="bg-white rounded-2xl border-2 border-gray-900 shadow-home-card overflow-hidden transition-shadow hover:shadow-home-image relative h-full">
-              <div className="absolute top-4 right-4 bg-accent text-white text-[11px] font-semibold px-3 py-1 rounded-full uppercase tracking-wide z-20">
-                {t('pricing.popular')}
-              </div>
-              <div className="p-6 lg:p-8">
-                <div className="mb-5 pr-16">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center">
-                      <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
-                        />
-                      </svg>
-                    </div>
-                    <h3 className="text-xl font-bold text-accent">{t('pricing.pro.name')}</h3>
-                  </div>
-                </div>
-                <div className="flex items-baseline mb-4">
-                  <span className="text-4xl sm:text-5xl font-bold text-gray-900 tabular-nums">€{proPrice}</span>
-                  <span className="text-accent font-medium ml-2">{periodLabel}</span>
-                </div>
-                <div className="mb-6 flex items-start gap-3">
-                  <svg
-                    className="mt-0.5 h-5 w-5 flex-shrink-0 text-accent"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-sm font-medium leading-snug text-gray-800 sm:text-base">
-                    {t('pricing.pro.hardwareIncluded')}
-                  </span>
-                </div>
-
-                <ul className="space-y-3 mb-8">
-                  {PREMIUM_CARD_FEATURES.map((i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <svg
-                        className="w-5 h-5 text-accent mt-0.5 flex-shrink-0"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span className="text-gray-600 text-sm sm:text-base leading-snug">
-                        {t(`pricing.pro.features.${i}`)}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-
-                <button
-                  type="button"
-                  onClick={() => setRetailOpen(true)}
-                  className="block w-full bg-accent text-white text-center py-3.5 rounded-full font-semibold hover:bg-accent/90 transition-colors shadow-home-btn"
-                >
-                  {t('pricing.choiceRetailPricing')}
-                </button>
-                <p className="text-center text-accent text-sm mt-3 font-medium">{t('pricing.cancelAnytime')}</p>
-              </div>
-            </div>
-            <div
-              id="pricing-premium-stamp-anchor"
-              className="pointer-events-none absolute bottom-[6.5rem] left-3 right-3 h-16 opacity-0"
-              aria-hidden
-            />
-            <HomeCornerStamp />
-          </div>
+        <div className="mx-auto flex max-w-md flex-col items-center gap-4">
+          <button
+            type="button"
+            onClick={() => setModulesOpen(true)}
+            className="w-full rounded-full border-2 border-gray-900 bg-white px-6 py-4 text-center text-sm font-semibold text-gray-900 shadow-home-float transition-colors hover:bg-gray-900 hover:text-white sm:text-base"
+          >
+            {t('pricing.ctaHomeHorecaPricing')}
+          </button>
+          <button
+            type="button"
+            onClick={() => setRetailOpen(true)}
+            className="w-full rounded-full bg-accent px-6 py-4 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:text-base"
+          >
+            {t('pricing.ctaHomeRetailPricing')}
+          </button>
+          <p className="text-center text-accent text-sm font-medium">{t('pricing.cancelAnytime')}</p>
         </div>
 
         <div className="mt-12 flex flex-col items-stretch justify-center gap-3 sm:mt-14 sm:flex-row sm:items-center sm:gap-4">
@@ -919,7 +785,6 @@ function PricingSection() {
           </a>
         </div>
       </div>
-      {choiceModal}
       {modulesModal}
       {retailModal}
     </section>
