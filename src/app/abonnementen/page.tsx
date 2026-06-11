@@ -3,7 +3,9 @@
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Navigation, Footer, CookieBanner, HomeCornerStamp, SubscriptionsTermsPopup } from '@/components'
+import { PricingHardwareToggle } from '@/components/PricingHardwareToggle'
 import { useLanguage } from '@/i18n'
+import { displayPrice, monthlyPriceForHardware } from '@/lib/pricing-hardware'
 
 const LIFESTYLE_IMAGE = '/images/abonnement-vysion-pro-lifestyle.png'
 const ONBOARDING_IMAGE = '/images/abonnement-onboarding-pos-restaurant.png'
@@ -20,6 +22,7 @@ const PREMIUM_CARD_FEATURES = [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12] as const
 
 export default function AbonnementenPage() {
   const { t, locale } = useLanguage()
+  const [withHardware, setWithHardware] = useState(false)
   const [isYearly, setIsYearly] = useState(false)
   const [lightbox, setLightbox] = useState<LightboxState>(null)
 
@@ -37,10 +40,10 @@ export default function AbonnementenPage() {
     }
   }, [lightbox])
 
-  const starterMonthly = 59
+  const starterMonthly = monthlyPriceForHardware(withHardware)
   const proMonthly = 99
-  const starterPrice = isYearly ? Math.round(starterMonthly * 12 * 0.9) : starterMonthly
-  const proPrice = isYearly ? Math.round(proMonthly * 12 * 0.9) : proMonthly
+  const starterPrice = displayPrice(starterMonthly, isYearly)
+  const proPrice = displayPrice(proMonthly, isYearly)
   const periodLabel = isYearly ? t('pricing.perYear') : t('pricing.perMonth')
 
   return (
@@ -88,6 +91,16 @@ export default function AbonnementenPage() {
             {t('subscriptionsPage.vysionProHeading')}
           </h2>
 
+          <div className="flex flex-col items-center mb-10 sm:mb-12 w-full max-w-full">
+            <PricingHardwareToggle
+              withHardware={withHardware}
+              onChange={setWithHardware}
+              labelWithout={t('pricing.hardwareWithout')}
+              labelWith={t('pricing.hardwareWith')}
+              className="shadow-sm"
+            />
+          </div>
+
           <div className="flex flex-col items-center mb-12 sm:mb-16 w-full max-w-full">
             <div className="bg-white border border-gray-200 p-1 rounded-full inline-flex flex-wrap justify-center items-center gap-y-1 shadow-sm max-w-full">
               <button
@@ -127,15 +140,6 @@ export default function AbonnementenPage() {
                     </svg>
                   </div>
                   <h3 className="text-xl font-bold text-accent">{t('pricing.starter.name')}</h3>
-                </div>
-                <div className="flex flex-wrap items-center gap-2 mb-2">
-                  <span className="text-lg text-gray-400 line-through">
-                    €{isYearly ? Math.round(99 * 12 * 0.9) : 99}
-                    {t('pricing.perMonth')}
-                  </span>
-                  <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-0.5 rounded-md">
-                    {t('pricing.compareDiscountStarter')}
-                  </span>
                 </div>
                 <div className="flex items-baseline mb-1">
                   <span className="text-4xl sm:text-5xl font-bold text-gray-900 tabular-nums">€{starterPrice}</span>
@@ -326,18 +330,24 @@ export default function AbonnementenPage() {
                   </p>
                 )}
                 <div className="mb-6 flex items-start gap-3">
-                  <svg
-                    className="mt-0.5 h-5 w-5 flex-shrink-0 text-accent"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-sm font-medium leading-snug text-gray-800 sm:text-base">
-                    {t('pricing.pro.hardwareIncluded')}
-                  </span>
+                  {withHardware ? (
+                    <>
+                      <svg
+                        className="mt-0.5 h-5 w-5 flex-shrink-0 text-accent"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-sm font-medium leading-snug text-gray-800 sm:text-base">
+                        {t('pricing.pro.hardwareIncluded')}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-sm text-gray-500 sm:text-base">{t('pricing.hardwareWithout')}</span>
+                  )}
                 </div>
 
                 <ul className="space-y-3.5 sm:space-y-4 mb-8 sm:mb-10">

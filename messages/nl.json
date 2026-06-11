@@ -631,6 +631,8 @@
     "yearlySave": "Je bespaart 10% met een jaarabonnement.",
     "billingMonthly": "Maandelijks",
     "billingYearly": "Jaarlijks",
+    "hardwareWithout": "Zonder hardware",
+    "hardwareWith": "Met hardware",
     "perYear": "/jaar",
     "badgeYearlyDiscount": "-10%",
     "compareDiscountStarter": "-40%",

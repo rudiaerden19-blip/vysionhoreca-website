@@ -351,6 +351,8 @@
     "yearlySave": "Risparmi il 10% con l'abbonamento annuale.",
     "billingMonthly": "Mensile",
     "billingYearly": "Annuale",
+    "hardwareWithout": "Senza hardware",
+    "hardwareWith": "Con hardware",
     "perYear": "/anno",
     "badgeYearlyDiscount": "-10%",
     "compareDiscountStarter": "-40%",

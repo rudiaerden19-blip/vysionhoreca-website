@@ -2,16 +2,19 @@
 
 import React, { useState } from 'react'
 import { Navigation, Footer, CookieBanner } from '@/components'
+import { PricingHardwareToggle } from '@/components/PricingHardwareToggle'
 import { useLanguage } from '@/i18n'
+import { displayPrice, monthlyPriceForHardware } from '@/lib/pricing-hardware'
 
 export default function PrijzenPage() {
   const { t, locale } = useLanguage()
+  const [withHardware, setWithHardware] = useState(false)
   const [isYearly, setIsYearly] = useState(false)
 
-  const starterMonthly = 59
+  const starterMonthly = monthlyPriceForHardware(withHardware)
   const proMonthly = 99
-  const starterPrice = isYearly ? Math.round(starterMonthly * 12 * 0.9) : starterMonthly
-  const proPrice = isYearly ? Math.round(proMonthly * 12 * 0.9) : proMonthly
+  const starterPrice = displayPrice(starterMonthly, isYearly)
+  const proPrice = displayPrice(proMonthly, isYearly)
   const periodLabel = isYearly ? t('pricing.perYear') : t('pricing.perMonth')
 
   return (
@@ -29,6 +32,16 @@ export default function PrijzenPage() {
 
       <section className="py-10 pb-20 bg-[#e3e3e3]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col items-center mb-8 gap-8">
+            <PricingHardwareToggle
+              withHardware={withHardware}
+              onChange={setWithHardware}
+              labelWithout={t('pricing.hardwareWithout')}
+              labelWith={t('pricing.hardwareWith')}
+              className="shadow-sm"
+            />
+          </div>
+
           <div className="flex flex-col items-center mb-12">
             <div className="bg-white border border-gray-200 p-1 rounded-full inline-flex items-center shadow-sm">
               <button
@@ -66,15 +79,6 @@ export default function PrijzenPage() {
                     </svg>
                   </div>
                   <h3 className="text-xl font-bold text-accent">{t('pricing.starter.name')}</h3>
-                </div>
-                <div className="flex flex-wrap items-center gap-2 mb-2">
-                  <span className="text-lg text-gray-400 line-through">
-                    €{isYearly ? Math.round(99 * 12 * 0.9) : 99}
-                    {t('pricing.perMonth')}
-                  </span>
-                  <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-0.5 rounded-md">
-                    {t('pricing.compareDiscountStarter')}
-                  </span>
                 </div>
                 <div className="flex items-baseline mb-2">
                   <span className="text-4xl sm:text-5xl font-bold text-gray-900 tabular-nums">€{starterPrice}</span>

@@ -18,6 +18,8 @@ const HardwareSection = dynamic(() => import('@/components/HardwareSection'), { 
 const ContactPageSection = dynamic(() => import('@/components/ContactPageSection'), { loading: () => null })
 import { useLanguage } from '@/i18n'
 import { DEMO_HERO_LIVE_URL, DEMO_ONLINE_SHOP_MENU_URL } from '@/lib/demo-links'
+import { PricingHardwareToggle } from '@/components/PricingHardwareToggle'
+import { displayPrice, monthlyPriceForHardware } from '@/lib/pricing-hardware'
 
 const GRATIS_WEBSITE_EXAMPLE_HREF =
   'https://restaurantdekorf.ordervysion.com/shop/restaurantdekorf'
@@ -532,15 +534,15 @@ function PricingFeatureCheck({ label }: { label: string }) {
 
 function PricingSection() {
   const { t, locale } = useLanguage()
+  const [withHardware, setWithHardware] = useState(false)
   const [isYearly, setIsYearly] = useState(false)
   const [modulesOpen, setModulesOpen] = useState(false)
   const modulesCloseRef = useRef<HTMLButtonElement>(null)
-  
-  // Jaarlijks = 10% korting
-  const starterMonthly = 59
+
+  const starterMonthly = monthlyPriceForHardware(withHardware)
   const proMonthly = 99
-  const starterPrice = isYearly ? Math.round(starterMonthly * 12 * 0.9) : starterMonthly
-  const proPrice = isYearly ? Math.round(proMonthly * 12 * 0.9) : proMonthly
+  const starterPrice = displayPrice(starterMonthly, isYearly)
+  const proPrice = displayPrice(proMonthly, isYearly)
   const periodLabel = isYearly ? t('pricing.perYear') : t('pricing.perMonth')
 
   useEffect(() => {
@@ -572,18 +574,38 @@ function PricingSection() {
               className="relative flex max-h-[min(90vh,880px)] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-home-image"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex shrink-0 items-start justify-between gap-4 border-b border-gray-100 bg-[#faf8f6] px-5 py-4 sm:px-6 sm:py-5">
-                <h3 id="pricing-modules-modal-title" className="text-lg font-bold text-gray-900 sm:text-xl">
-                  {t('pricing.modulesModalTitle')}
-                </h3>
-                <button
-                  ref={modulesCloseRef}
-                  type="button"
-                  onClick={() => setModulesOpen(false)}
-                  className="rounded-lg px-3 py-1.5 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-200/80 hover:text-gray-900"
-                >
-                  {t('pricing.modulesModalClose')}
-                </button>
+              <div className="flex shrink-0 flex-col border-b border-gray-100 bg-[#faf8f6]">
+                <div className="flex items-start justify-between gap-4 px-5 py-4 sm:px-6">
+                  <h3 id="pricing-modules-modal-title" className="text-lg font-bold text-gray-900 sm:text-xl">
+                    {t('pricing.modulesModalTitle')}
+                  </h3>
+                  <button
+                    ref={modulesCloseRef}
+                    type="button"
+                    onClick={() => setModulesOpen(false)}
+                    className="rounded-lg px-3 py-1.5 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-200/80 hover:text-gray-900"
+                  >
+                    {t('pricing.modulesModalClose')}
+                  </button>
+                </div>
+                <div className="mx-5 mb-5 rounded-2xl border-2 border-accent/25 bg-white px-4 py-5 shadow-sm sm:mx-6 sm:px-6 sm:py-6">
+                  <div className="flex flex-col items-center gap-4">
+                    <PricingHardwareToggle
+                      withHardware={withHardware}
+                      onChange={setWithHardware}
+                      labelWithout={t('pricing.hardwareWithout')}
+                      labelWith={t('pricing.hardwareWith')}
+                      className="shadow-sm w-full max-w-md justify-center"
+                    />
+                    <div className="text-center">
+                      <p className="text-3xl font-bold tabular-nums text-gray-900 sm:text-4xl">
+                        €{starterPrice}
+                        <span className="text-lg font-semibold text-accent sm:text-xl">{periodLabel}</span>
+                      </p>
+                      <p className="mt-1 text-sm font-medium text-gray-600">{t('pricing.exclVat')}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6 sm:py-6">
                 <div className="grid gap-8 md:grid-cols-2 md:gap-10">
@@ -641,6 +663,16 @@ function PricingSection() {
           <p className="text-gray-600 text-sm sm:text-base mt-3 font-medium">{t('pricing.exclVat')}</p>
         </div>
 
+        {/* Hardware / maand of jaar */}
+        <div className="flex flex-col items-center mb-10 sm:mb-12 gap-8">
+          <PricingHardwareToggle
+            withHardware={withHardware}
+            onChange={setWithHardware}
+            labelWithout={t('pricing.hardwareWithout')}
+            labelWith={t('pricing.hardwareWith')}
+          />
+        </div>
+
         {/* Toggle Maandelijks / Jaarlijks */}
         <div className="flex flex-col items-center mb-14">
           <div className="bg-white border border-gray-200 p-1 rounded-full inline-flex items-center shadow-home-float">
@@ -682,13 +714,6 @@ function PricingSection() {
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold text-accent">{t('pricing.starter.name')}</h3>
-              </div>
-              <div className="flex flex-wrap items-center gap-2 mb-2">
-                <span className="text-lg text-gray-400 line-through">
-                  €{isYearly ? Math.round(99 * 12 * 0.9) : 99}
-                  {t('pricing.perMonth')}
-                </span>
-                <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-0.5 rounded-md">-40%</span>
               </div>
               <div className="flex items-baseline mb-8">
                 <span className="text-4xl sm:text-5xl font-bold text-gray-900 tabular-nums">€{starterPrice}</span>
@@ -740,18 +765,24 @@ function PricingSection() {
                   <span className="text-accent font-medium ml-2">{periodLabel}</span>
                 </div>
                 <div className="mb-6 flex items-start gap-3">
-                  <svg
-                    className="mt-0.5 h-5 w-5 flex-shrink-0 text-accent"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-sm font-medium leading-snug text-gray-800 sm:text-base">
-                    {t('pricing.pro.hardwareIncluded')}
-                  </span>
+                  {withHardware ? (
+                    <>
+                      <svg
+                        className="mt-0.5 h-5 w-5 flex-shrink-0 text-accent"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-sm font-medium leading-snug text-gray-800 sm:text-base">
+                        {t('pricing.pro.hardwareIncluded')}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-sm text-gray-500 sm:text-base">{t('pricing.hardwareWithout')}</span>
+                  )}
                 </div>
 
                 <ul className="space-y-3 mb-8">

@@ -351,6 +351,8 @@
     "yearlySave": "年間プランで10%お得になります。",
     "billingMonthly": "月額",
     "billingYearly": "年額",
+    "hardwareWithout": "ハードウェアなし",
+    "hardwareWith": "ハードウェア込み",
     "perYear": "/年",
     "badgeYearlyDiscount": "-10%",
     "compareDiscountStarter": "-40%",

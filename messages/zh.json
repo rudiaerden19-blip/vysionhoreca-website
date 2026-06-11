@@ -351,6 +351,8 @@
     "yearlySave": "年付订阅可节省 10%。",
     "billingMonthly": "按月",
     "billingYearly": "按年",
+    "hardwareWithout": "不含硬件",
+    "hardwareWith": "含硬件",
     "perYear": "/年",
     "badgeYearlyDiscount": "-10%",
     "compareDiscountStarter": "-40%",
