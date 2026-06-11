@@ -340,8 +340,6 @@ export default function AbonnementenPage() {
                   </span>
                 </div>
 
-                <p className="text-gray-700 mb-4 text-sm sm:text-base font-medium">{t('pricing.pro.allOfStarter')}</p>
-
                 <ul className="space-y-3.5 sm:space-y-4 mb-8 sm:mb-10">
                   {PREMIUM_CARD_FEATURES.map((i) => (
                     <li key={i} className="flex items-start gap-3">

@@ -145,8 +145,6 @@ export default function PrijzenPage() {
                   <p className="text-accent text-sm font-medium mb-4">= €{Math.round(proMonthly * 0.9)}{t('pricing.perMonth')}</p>
                 )}
 
-                <p className="text-gray-700 mb-4 text-sm sm:text-base font-medium">{t('pricing.pro.allOfStarter')}</p>
-
                 <ul className="space-y-3 mb-8">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => (
                     <li key={i} className="flex items-start gap-3">

@@ -565,7 +565,6 @@ function PricingSection() {
                   </div>
                   <div>
                     <h4 className="mb-4 text-base font-bold text-accent sm:text-lg">{t('pricing.pro.name')}</h4>
-                    <p className="mb-3 text-sm font-medium text-gray-800 sm:text-base">{t('pricing.pro.allOfStarter')}</p>
                     <ul className="space-y-3">
                       <PricingFeatureCheck label={t('pricing.pro.hardwareIncluded')} />
                       {PREMIUM_CARD_FEATURES.map((i) => (
@@ -715,8 +714,6 @@ function PricingSection() {
                     {t('pricing.pro.hardwareIncluded')}
                   </span>
                 </div>
-
-                <p className="text-gray-700 mb-4 text-sm sm:text-base font-medium">{t('pricing.pro.allOfStarter')}</p>
 
                 <ul className="space-y-3 mb-8">
                   {PREMIUM_CARD_FEATURES.map((i) => (
