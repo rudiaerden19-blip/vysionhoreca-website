@@ -2061,7 +2061,9 @@
       "resetForm": "Nächster Artikel",
       "backToProducts": "Artikel",
       "retailModuleRequired": "Nur mit Winkelkassa-Modul verfügbar.",
-      "defaultPhotoName": "Produktfoto"
+      "defaultPhotoName": "Produktfoto",
+      "stockQuantityLabel": "Bestand (Stück)",
+      "stockQuantityHint": "Anzahl im Laden — wird im Bestand gespeichert."
     },
     "opties": {
       "title": "Optionen & Extras",

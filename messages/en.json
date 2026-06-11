@@ -2830,7 +2830,7 @@
     },
     "productIntake": {
       "title": "Scan with phone",
-      "newProductHint": "Scan barcode, take a photo, set price — item goes to the retail till catalog.",
+      "newProductHint": "Scan barcode, photo, price and stock — item goes to the retail till catalog.",
       "existingProductHint": "This barcode already exists — you are updating the item.",
       "photoLabel": "Product photo",
       "takePhoto": "Take photo",
@@ -2860,7 +2860,9 @@
       "resetForm": "Next item",
       "backToProducts": "Products",
       "retailModuleRequired": "Only available with the retail till module.",
-      "defaultPhotoName": "Product photo"
+      "defaultPhotoName": "Product photo",
+      "stockQuantityLabel": "Stock (units)",
+      "stockQuantityHint": "How many units on the shop floor — saved to inventory."
     },
     "opties": {
       "title": "Options & Extras",

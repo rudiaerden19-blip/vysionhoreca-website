@@ -2830,7 +2830,7 @@
     },
     "productIntake": {
       "title": "Scan met telefoon",
-      "newProductHint": "Scan barcode, maak foto, vul prijs in — artikel komt in de winkelkassa.",
+      "newProductHint": "Scan barcode, maak foto, vul prijs en voorraad in — artikel komt in de winkelkassa.",
       "existingProductHint": "Deze barcode bestaat al — je werkt het artikel bij.",
       "photoLabel": "Productfoto",
       "takePhoto": "Foto maken",
@@ -2860,7 +2860,9 @@
       "resetForm": "Volgend artikel",
       "backToProducts": "Artikelen",
       "retailModuleRequired": "Alleen beschikbaar met de winkelkassa-module.",
-      "defaultPhotoName": "Productfoto"
+      "defaultPhotoName": "Productfoto",
+      "stockQuantityLabel": "Voorraad (stuks)",
+      "stockQuantityHint": "Hoeveel stuks liggen op de winkelvloer — dit wordt in voorraad gezet."
     },
     "opties": {
       "title": "Opties & Extra's",

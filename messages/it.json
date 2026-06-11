@@ -2561,7 +2561,9 @@
       "resetForm": "Next item",
       "backToProducts": "Products",
       "retailModuleRequired": "Only available with the retail till module.",
-      "defaultPhotoName": "Product photo"
+      "defaultPhotoName": "Product photo",
+      "stockQuantityLabel": "Giacenza (pezzi)",
+      "stockQuantityHint": "Pezzi in negozio — salvati in magazzino."
     },
     "opties": {
       "title": "Opzioni ed Extra",

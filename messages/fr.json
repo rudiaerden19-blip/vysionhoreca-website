@@ -2061,7 +2061,9 @@
       "resetForm": "Next item",
       "backToProducts": "Products",
       "retailModuleRequired": "Only available with the retail till module.",
-      "defaultPhotoName": "Product photo"
+      "defaultPhotoName": "Product photo",
+      "stockQuantityLabel": "Stock (pièces)",
+      "stockQuantityHint": "Quantité en magasin — enregistrée dans le stock."
     },
     "opties": {
       "title": "Options & Extras",

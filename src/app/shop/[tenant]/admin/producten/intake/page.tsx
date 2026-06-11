@@ -75,6 +75,7 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
   const [categoryId, setCategoryId] = useState<string | null>(null)
   const [retailSaleUnit, setRetailSaleUnit] = useState<MenuProduct['retail_sale_unit']>('stuk')
   const [retailUnitQty, setRetailUnitQty] = useState('')
+  const [stockInput, setStockInput] = useState('')
 
   const [eanBusy, setEanBusy] = useState(false)
   const [photoBusy, setPhotoBusy] = useState(false)
@@ -146,6 +147,11 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
             ? String(hit.retail_unit_quantity)
             : '',
         )
+        setStockInput(
+          hit.track_stock !== false ? String(Math.max(0, Math.floor(Number(hit.stock_quantity) || 0))) : '',
+        )
+      } else {
+        setStockInput('')
       }
     },
     [catalog],
@@ -349,6 +355,7 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
     setExistingProduct(null)
     setRetailSaleUnit('stuk')
     setRetailUnitQty('')
+    setStockInput('')
     setSuccess('')
     setError('')
   }
@@ -375,6 +382,7 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
     setSaving(true)
     try {
       const unitQty = Math.floor(Number(retailUnitQty) || 0)
+      const stockQty = Math.max(0, Math.floor(Number(stockInput) || 0))
       const payload: MenuProduct = {
         id: existingProduct?.id,
         tenant_slug: tenant,
@@ -394,10 +402,8 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
         catalog_mode: 'retail',
         barcode: bc,
         article_number: existingProduct?.article_number?.trim() || bc,
-        track_stock: existingProduct?.track_stock ?? true,
-        stock_quantity: existingProduct?.track_stock
-          ? Math.max(0, Math.floor(Number(existingProduct.stock_quantity) || 0))
-          : 0,
+        track_stock: true,
+        stock_quantity: stockQty,
         low_stock_threshold: existingProduct?.low_stock_threshold ?? 5,
         retail_sale_unit: retailSaleUnit || 'stuk',
         retail_unit_quantity: unitQty > 0 ? unitQty : null,
@@ -621,6 +627,24 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
                   placeholder="0,00"
                 />
               </div>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-800 mb-1">
+                {t('adminPages.productIntake.stockQuantityLabel')}
+              </label>
+              <input
+                type="number"
+                min={0}
+                step={1}
+                inputMode="numeric"
+                value={stockInput}
+                onChange={(e) => setStockInput(e.target.value.replace(/[^\d]/g, ''))}
+                className="w-full rounded-xl border border-gray-200 px-4 py-3 text-lg font-semibold tabular-nums"
+                placeholder="0"
+              />
+              <p className="mt-1.5 text-xs text-gray-500">
+                {t('adminPages.productIntake.stockQuantityHint')}
+              </p>
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-800 mb-1">
