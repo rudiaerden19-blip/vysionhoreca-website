@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import nodemailer from 'nodemailer'
-
 import { logger } from '@/lib/logger'
+import { resolveZohoEmail } from '@/lib/vysion-contact'
+import { assertZohoSmtpConfigured, createZohoMailTransport } from '@/lib/zoho-smtp'
 import { trackError } from '@/lib/monitoring'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 import { apiRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
@@ -72,16 +72,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create transporter with Zoho SMTP
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.zoho.eu',
-      port: 465,
-      secure: true,
-      auth: {
-        user: process.env.ZOHO_EMAIL,
-        pass: process.env.ZOHO_PASSWORD,
-      },
-    })
+    const smtpConfigError = assertZohoSmtpConfigured()
+    if (smtpConfigError) {
+      return NextResponse.json({ error: smtpConfigError }, { status: 503 })
+    }
+    const transporter = createZohoMailTransport()
 
     const formatCurrency = (amount: number) => `€${amount.toFixed(2)}`
 
@@ -196,7 +191,7 @@ export async function POST(request: NextRequest) {
     `
 
     await transporter.sendMail({
-      from: `"${businessName || "Vysion kassa's"}" <${process.env.ZOHO_EMAIL}>`,
+      from: `"${businessName || "Vysion kassa's"}" <${resolveZohoEmail()}>`,
       to: to,
       subject: subject || `Z-Rapport - ${businessName}`,
       html: htmlContent,

@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import nodemailer from 'nodemailer'
-
 import { logger } from '@/lib/logger'
 import { trackError } from '@/lib/monitoring'
 import { buildOmzetReportEmailHtml } from '@/lib/report-omzet-email-html'
 import { apiRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
+import { resolveZohoEmail } from '@/lib/vysion-contact'
+import { assertZohoSmtpConfigured, createZohoMailTransport } from '@/lib/zoho-smtp'
 
 type ExportPeriodJson = 'day' | 'week' | 'month' | 'year'
 
@@ -134,11 +134,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (!process.env.ZOHO_EMAIL || !process.env.ZOHO_PASSWORD) {
-      return NextResponse.json(
-        { error: 'E-mail is niet geconfigureerd op de server.' },
-        { status: 503 },
-      )
+    const smtpConfigError = assertZohoSmtpConfigured()
+    if (smtpConfigError) {
+      return NextResponse.json({ error: smtpConfigError }, { status: 503 })
     }
 
     const html = buildOmzetReportEmailHtml({
@@ -158,22 +156,15 @@ export async function POST(request: NextRequest) {
       generatedAtNl: new Date().toLocaleString('nl-NL'),
     })
 
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.zoho.eu',
-      port: 465,
-      secure: true,
-      auth: {
-        user: process.env.ZOHO_EMAIL,
-        pass: process.env.ZOHO_PASSWORD,
-      },
-    })
+    const transporter = createZohoMailTransport()
 
     const fromName = businessName.slice(0, 120)
+    const zohoFrom = resolveZohoEmail()
 
     await transporter.sendMail({
-      from: `"${fromName.replace(/[\r\n"]/g, '')}" <${process.env.ZOHO_EMAIL}>`,
+      from: `"${fromName.replace(/[\r\n"]/g, '')}" <${zohoFrom}>`,
       to,
-      replyTo: process.env.ZOHO_EMAIL,
+      replyTo: zohoFrom,
       subject: `Omzetrapport ${periodLabel} — ${fromName}`.slice(0, 250),
       html,
     })

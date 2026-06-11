@@ -5,11 +5,20 @@ export function vysionInfoMailto(): string {
   return `mailto:${VYSION_INFO_EMAIL}`
 }
 
-/** SMTP-afzender wanneer ZOHO_EMAIL niet gezet is (lokaal / fallback). */
+/** SMTP-login (Vercel: ZOHO_EMAIL of legacy ZOHO_MAIL). */
 export function resolveZohoEmail(): string {
-  return process.env.ZOHO_EMAIL || VYSION_INFO_EMAIL
+  return (
+    process.env.ZOHO_EMAIL ||
+    process.env.ZOHO_MAIL ||
+    process.env.ZOHO_USER ||
+    VYSION_INFO_EMAIL
+  )
 }
 
 export function resolveZohoUser(): string {
-  return process.env.ZOHO_USER || process.env.ZOHO_EMAIL || VYSION_INFO_EMAIL
+  return process.env.ZOHO_USER || resolveZohoEmail()
+}
+
+export function resolveZohoPassword(): string {
+  return process.env.ZOHO_PASSWORD || process.env.ZOHO_PASS || ''
 }
