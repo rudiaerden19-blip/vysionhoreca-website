@@ -5858,6 +5858,7 @@
     "importFailed": "تعذّر قراءة الملف أو فشل الاستيراد",
     "trayTileLogout": "تسجيل خروج الحساب",
     "trayTileAddProduct": "إضافة منتج",
+    "trayTilePhoneIntake": "مسح بالهاتف",
     "trayTileSalesOverview": "نظرة عامة على المبيعات",
     "trayTileClockInOut": "تسجيل دخول/خروج",
     "trayTileStaff": "الموظفون",

@@ -129,6 +129,13 @@ const RETAIL_GRAY_TRAY_TILES: RetailGrayTrayTile[] = [
     submenuIds: ['sm_kassa_producten', 'sm_retail_kassa_producten'],
   },
   {
+    key: 'phoneIntake',
+    kind: 'link',
+    hrefSuffix: '/producten/intake',
+    labelKey: 'retailKassaPage.trayTilePhoneIntake',
+    submenuIds: ['sm_retail_product_intake', 'sm_retail_kassa_producten'],
+  },
+  {
     key: 'salesOverview',
     kind: 'link',
     hrefSuffix: '/verkoop',
@@ -2054,8 +2061,12 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             <button
               type="button"
               onClick={() => {
-                setHamburgerOpen(!hamburgerOpen)
-                setHamburgerSubOpen(null)
+                setHamburgerOpen((open) => {
+                  const next = !open
+                  if (next) setHamburgerSubOpen('retail-kassa')
+                  else setHamburgerSubOpen(null)
+                  return next
+                })
               }}
               className={`flex items-center gap-1.5 px-2 py-1.5 transition-colors sm:gap-2 sm:px-3 ${
                 appearanceDark

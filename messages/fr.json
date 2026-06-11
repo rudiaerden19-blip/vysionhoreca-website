@@ -5881,6 +5881,7 @@
     "importFailed": "Lecture du fichier ou import échoué",
     "trayTileLogout": "Déconnexion du compte",
     "trayTileAddProduct": "Ajouter un produit",
+    "trayTilePhoneIntake": "Scanner au téléphone",
     "trayTileSalesOverview": "Aperçu des ventes",
     "trayTileClockInOut": "Pointer entrée/sortie",
     "trayTileStaff": "Employés",

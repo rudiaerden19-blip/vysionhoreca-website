@@ -154,7 +154,6 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
       icon: '🏪',
       label: 'Winkelkassa',
       labelKey: rowLabelKey('retail-kassa'),
-      entryHref: `${baseUrl}/retail-kassa`,
       items: [
         {
           id: 'sm_retail_kassa_pos',

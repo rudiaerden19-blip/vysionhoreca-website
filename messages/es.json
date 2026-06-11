@@ -5858,6 +5858,7 @@
     "importFailed": "No se pudo leer el archivo o falló la importación",
     "trayTileLogout": "Cerrar sesión",
     "trayTileAddProduct": "Añadir producto",
+    "trayTilePhoneIntake": "Escanear con móvil",
     "trayTileSalesOverview": "Resumen de ventas",
     "trayTileClockInOut": "Fichar entrada/salida",
     "trayTileStaff": "Empleados",

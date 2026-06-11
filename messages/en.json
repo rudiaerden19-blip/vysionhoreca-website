@@ -5817,6 +5817,7 @@
     "importFailed": "Could not read file or import failed",
     "trayTileLogout": "Log out account",
     "trayTileAddProduct": "Add product",
+    "trayTilePhoneIntake": "Scan with phone",
     "trayTileSalesOverview": "Sales overview",
     "trayTileClockInOut": "Clock in/out",
     "trayTileStaff": "Staff",

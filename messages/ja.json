@@ -5858,6 +5858,7 @@
     "importFailed": "ファイルの読み込みまたはインポートに失敗しました",
     "trayTileLogout": "アカウントからログアウト",
     "trayTileAddProduct": "商品を追加",
+    "trayTilePhoneIntake": "スマホでスキャン",
     "trayTileSalesOverview": "売上概要",
     "trayTileClockInOut": "出退勤打刻",
     "trayTileStaff": "スタッフ",

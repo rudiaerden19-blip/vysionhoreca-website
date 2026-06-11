@@ -5858,6 +5858,7 @@
     "importFailed": "无法读取文件或导入失败",
     "trayTileLogout": "退出账户",
     "trayTileAddProduct": "添加商品",
+    "trayTilePhoneIntake": "手机扫描",
     "trayTileSalesOverview": "销售概览",
     "trayTileClockInOut": "上下班打卡",
     "trayTileStaff": "员工",
