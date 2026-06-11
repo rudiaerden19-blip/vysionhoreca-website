@@ -58,19 +58,8 @@ export default function HomeLandingHero() {
 
       {/* Top bar */}
       <header className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 sm:pt-4 pb-1">
-        <div className="flex items-start justify-between gap-4">
-          <a href="/" className="group inline-flex shrink-0 flex-col items-center leading-none">
-            <span className="block text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-accent lowercase">
-              {t('heroLanding.logoTitle')}
-            </span>
-            {t('heroLanding.logoTagline') ? (
-              <span className="mt-1 block text-center text-base font-medium text-white sm:text-lg md:text-xl">
-                {t('heroLanding.logoTagline')}
-              </span>
-            ) : null}
-          </a>
-
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-auto">
+        <div className="flex items-start justify-end gap-4">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <a
               href="/#contact"
               className="hidden sm:inline-flex items-center justify-center rounded-md bg-accent hover:bg-accent/90 text-white text-sm font-semibold px-4 py-2.5 shadow-home-btn transition-colors"
