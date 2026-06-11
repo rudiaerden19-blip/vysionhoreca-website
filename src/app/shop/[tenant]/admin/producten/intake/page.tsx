@@ -20,6 +20,14 @@ import {
   retailBarcodeMatchKey,
 } from '@/lib/retail-product-intake'
 import { uploadTenantMediaImage } from '@/lib/tenant-media-upload-client'
+import {
+  attachEnvironmentCameraToVideo,
+  getNativeBarcodeDetectorCtor,
+  isRetailBarcodeCameraScanAvailable,
+  startNativeBarcodeDetectorLoop,
+  startZxingBarcodeVideoScan,
+  type RetailBarcodeCameraScanStop,
+} from '@/lib/retail-barcode-camera-scan'
 
 function parseLocalizedMoneyInput(raw: string): number {
   const n = raw.trim().replace(/\s/g, '').replace(',', '.')
@@ -36,20 +44,6 @@ function findProductByBarcode(products: MenuProduct[], code: string): MenuProduc
     const an = p.article_number ? retailBarcodeMatchKey(p.article_number) : ''
     return bc === key || an === key
   })
-}
-
-function getBarcodeDetectorCtor():
-  | (new (options: { formats: string[] }) => {
-      detect: (source: HTMLVideoElement) => Promise<{ rawValue?: string }[]>
-    })
-  | null {
-  if (typeof window === 'undefined') return null
-  const w = window as Window & {
-    BarcodeDetector?: new (options: { formats: string[] }) => {
-      detect: (source: HTMLVideoElement) => Promise<{ rawValue?: string }[]>
-    }
-  }
-  return w.BarcodeDetector ?? null
 }
 
 export default function RetailProductIntakePage({ params }: { params: { tenant: string } }) {
@@ -82,7 +76,7 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
   const wedgeRef = useRef<HTMLInputElement>(null)
   const photoInputRef = useRef<HTMLInputElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
-  const scanLoopRef = useRef<number | null>(null)
+  const scanEngineStopRef = useRef<RetailBarcodeCameraScanStop | null>(null)
   const cameraScanActiveRef = useRef(false)
 
   useEffect(() => {
@@ -156,10 +150,8 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
   const stopCameraScan = useCallback(() => {
     setCameraScanActive(false)
     cameraScanActiveRef.current = false
-    if (scanLoopRef.current != null) {
-      cancelAnimationFrame(scanLoopRef.current)
-      scanLoopRef.current = null
-    }
+    scanEngineStopRef.current?.()
+    scanEngineStopRef.current = null
     const v = videoRef.current
     if (v?.srcObject) {
       const stream = v.srcObject as MediaStream
@@ -172,48 +164,28 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
     setError('')
     setCameraScanActive(true)
     cameraScanActiveRef.current = true
-    if (typeof window === 'undefined' || !getBarcodeDetectorCtor()) {
+    if (typeof window === 'undefined' || !isRetailBarcodeCameraScanAvailable()) {
       setError(t('adminPages.productIntake.cameraScanUnsupported'))
       stopCameraScan()
       return
     }
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: 'environment' } },
-        audio: false,
-      })
       const video = videoRef.current
-      if (!video) return
-      video.srcObject = stream
-      await video.play()
-      const BarcodeDetectorCtor = getBarcodeDetectorCtor()
-      if (!BarcodeDetectorCtor) {
+      if (!video) {
         stopCameraScan()
         return
       }
-      const detector = new BarcodeDetectorCtor({
-        formats: ['ean_13', 'ean_8', 'upc_a', 'code_128'],
-      })
-      const tick = async () => {
-        if (!videoRef.current || !cameraScanActiveRef.current) return
-        try {
-          const codes = await detector.detect(videoRef.current)
-          const raw = codes[0]?.rawValue
-          if (raw) {
-            applyBarcode(raw)
-            stopCameraScan()
-            return
-          }
-        } catch {
-          /* frame miss */
-        }
-        scanLoopRef.current = requestAnimationFrame(() => {
-          void tick()
-        })
+      await attachEnvironmentCameraToVideo(video)
+      const isActive = () => cameraScanActiveRef.current && videoRef.current != null
+      const onDetected = (raw: string) => {
+        applyBarcode(raw)
+        stopCameraScan()
       }
-      scanLoopRef.current = requestAnimationFrame(() => {
-        void tick()
-      })
+      if (getNativeBarcodeDetectorCtor()) {
+        scanEngineStopRef.current = startNativeBarcodeDetectorLoop(video, isActive, onDetected)
+        return
+      }
+      scanEngineStopRef.current = await startZxingBarcodeVideoScan(video, isActive, onDetected)
     } catch {
       setError(t('adminPages.productIntake.cameraPermissionDenied'))
       stopCameraScan()

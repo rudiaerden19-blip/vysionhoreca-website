@@ -28,6 +28,8 @@
     "@supabase/supabase-js": "^2.89.0",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.36.1",
+    "@zxing/browser": "^0.2.0",
+    "@zxing/library": "^0.22.0",
     "framer-motion": "^12.26.2",
     "html2pdf.js": "^0.14.0",
     "lucide-react": "^0.577.0",
