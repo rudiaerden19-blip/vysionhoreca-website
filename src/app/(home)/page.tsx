@@ -19,6 +19,7 @@ import { useLanguage } from '@/i18n'
 import { DEMO_HERO_LIVE_URL, DEMO_ONLINE_SHOP_MENU_URL } from '@/lib/demo-links'
 import { PricingHardwareToggle } from '@/components/PricingHardwareToggle'
 import { monthlyPriceForHardware } from '@/lib/pricing-hardware'
+import HomeScrollOnLoad from '@/components/HomeScrollOnLoad'
 
 const GRATIS_WEBSITE_EXAMPLE_HREF =
   'https://restaurantdekorf.ordervysion.com/shop/restaurantdekorf'
@@ -1537,6 +1538,7 @@ function TestimonialSection() {
 export default function HomePage() {
   return (
     <main>
+      <HomeScrollOnLoad />
       <Navigation />
       <HomeLandingHero />
       <WhyVysionSection />

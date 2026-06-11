@@ -62,6 +62,15 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     setIsHydrated(true)
   }, [])
 
+  useEffect(() => {
+    if (!isHydrated || typeof window === 'undefined') return
+    const path = window.location.pathname
+    if (path !== '/' && path !== '') return
+    const navEntry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined
+    if (navEntry?.type !== 'reload') return
+    window.scrollTo(0, 0)
+  }, [isHydrated])
+
   const setLocale = useCallback((newLocale: Locale) => {
     setLocaleState(newLocale)
     try {
