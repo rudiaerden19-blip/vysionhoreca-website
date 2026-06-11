@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "title": "Vysion kassa's | All-in-One POS & Payment Platform",
+    "title": "Vysion kassa | All-in-One POS & Payment Platform",
     "description": "The complete POS system for hospitality. Cash register, online orders, invoicing, staff management and more - all in one platform. Try 14 days free."
   },
   "nav": {
@@ -152,7 +152,7 @@
     "imageZoomPickerReset": "↺ Reset to centre"
   },
   "heroLanding": {
-    "logoTitle": "Vysion kassa's",
+    "logoTitle": "Vysion kassa",
     "logoTagline": "",
     "title": "One POS for every sector",
     "subtitleLead": "POS hardware & software included in your subscription",
@@ -893,8 +893,8 @@
     "privacyLinkTitle": "Privacy policy and data processing",
     "legalLinkTitle": "Terms of use and legal information",
     "linkAppsAria": "Vysion Apps — opens in a new tab",
-    "linkHorecaAria": "Official Vysion website — new tab",
-    "websiteLinkLabel": "Official website",
+    "linkHorecaAria": "Official Vysion kassa website — new tab",
+    "websiteLinkLabel": "Vysion kassa — official website",
     "linkWebvysionAria": "Web Vysion — opens in a new tab"
   },
   "stop": {

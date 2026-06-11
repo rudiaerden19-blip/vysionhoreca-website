@@ -4,7 +4,7 @@ const canonical = '/sectoren/frituur'
 
 export const metadata: Metadata = {
   title: {
-    absolute: 'Frituur Kassa | Snelste i7 Checkout | Vysion',
+    absolute: 'Frituur Kassa | Snelste i7 Checkout | Vysion kassa',
   },
   description:
     'Frituur en snackbar: Intel i7-kassa, dubbel scherm, 9 talen, ingebouwde printer. Stop met huren. Na 24 maanden is deze i7 kassa 100% jouw eigendom. Kassasysteem België & Nederland.',
@@ -18,14 +18,14 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical },
   openGraph: {
-    title: 'Frituur Kassa | Snelste i7 Checkout | Vysion',
+    title: 'Frituur Kassa | Snelste i7 Checkout | Vysion kassa',
     description: 'Frituur: i7, snelle kassa, online bestellen. België — start gratis.',
     url: canonical,
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Frituur Kassa | Snelste i7 Checkout | Vysion',
+    title: 'Frituur Kassa | Snelste i7 Checkout | Vysion kassa',
     description: 'Frituur POS met i7. Kassa kopen of gratis proberen.',
   },
 }

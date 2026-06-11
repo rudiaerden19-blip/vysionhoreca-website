@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useLanguage, Locale } from '@/i18n'
 import { LocaleFlagEmoji, LocaleFlagWithCode } from '@/components/LocaleFlagEmoji'
+import { VYSION_BRAND_SITE_NAME } from '@/lib/vysion-site'
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -43,7 +44,7 @@ export default function Navigation() {
               href="/"
               className="inline-flex min-h-11 items-center rounded-lg px-2 text-xl sm:text-2xl font-bold touch-manipulation [-webkit-tap-highlight-color:transparent]"
             >
-              <span className="text-accent">Vysion kassa&apos;s</span>
+              <span className="text-accent">{VYSION_BRAND_SITE_NAME}</span>
             </a>
           </div>
 

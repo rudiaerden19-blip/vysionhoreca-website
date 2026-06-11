@@ -1,6 +1,12 @@
 /** Canonieke marketing-site (www + apex). */
 export const VYSION_CANONICAL_ORIGIN = 'https://www.vysion-kassa.com' as const
 
+/** Google site name, `og:site_name`, WebSite/Organization schema (niet «Vysion Horeca»). */
+export const VYSION_BRAND_SITE_NAME = 'Vysion kassa' as const
+
+/** Langere productnaam in juridische copy en enkele UI-titels. */
+export const VYSION_BRAND_PRODUCT_NAME = "Vysion kassa's" as const
+
 export const VYSION_WWW_HOST = 'www.vysion-kassa.com' as const
 export const VYSION_APEX_HOST = 'vysion-kassa.com' as const
 

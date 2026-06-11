@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     'restaurant software trial',
   ],
   openGraph: {
-    title: "Gratis starten | Vysion kassa's",
+    title: "Gratis starten | Vysion kassa",
     description:
       'Gratis kassa, bestelplatform en modules 14 dagen — start vandaag.',
     url: '/registreer',

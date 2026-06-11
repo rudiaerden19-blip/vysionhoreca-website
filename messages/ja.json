@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "title": "Vysion kassa's | オールインワンPOS＆決済プラットフォーム",
+    "title": "Vysion kassa | オールインワンPOS＆決済プラットフォーム",
     "description": "飲食業向け完全POSシステム。レジ、オンライン注文、請求書、スタッフ管理など - すべて1つのプラットフォームで。14日間無料でお試し。"
   },
   "nav": {
@@ -71,7 +71,7 @@
     "readGeneralTermsCta": "利用規約を読む"
   },
   "heroLanding": {
-    "logoTitle": "Vysion kassa's",
+    "logoTitle": "Vysion kassa",
     "logoTagline": "",
     "title": "あらゆる業種のレジ",
     "subtitleLead": "レジのハードとソフトがサブスクに含まれます",
@@ -612,8 +612,8 @@
     "privacyLinkTitle": "プライバシーポリシー",
     "legalLinkTitle": "利用規約と法的情報",
     "linkAppsAria": "Vysion Apps（新しいタブ）",
-    "linkHorecaAria": "Vysion公式サイト（新しいタブ）",
-    "websiteLinkLabel": "公式サイト",
+    "linkHorecaAria": "Vysion kassa公式サイト（新しいタブ）",
+    "websiteLinkLabel": "Vysion kassa — 公式サイト",
     "linkWebvysionAria": "Web Vysion（新しいタブ）"
   },
   "stop": {

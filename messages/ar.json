@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "title": "Vysion kassa's | نظام نقاط البيع ومنصة الدفع الشاملة",
+    "title": "Vysion kassa | نظام نقاط البيع ومنصة الدفع الشاملة",
     "description": "نظام نقاط البيع الكامل للمطاعم. كاشير، طلبات أونلاين، فواتير، إدارة الموظفين والمزيد - كل شيء في منصة واحدة. جرب 14 أيام مجاناً."
   },
   "nav": {
@@ -71,7 +71,7 @@
     "readGeneralTermsCta": "اقرأ الشروط العامة"
   },
   "heroLanding": {
-    "logoTitle": "Vysion kassa's",
+    "logoTitle": "Vysion kassa",
     "logoTagline": "",
     "title": "كاشير لكل قطاع",
     "subtitleLead": "أجهزة وبرمجيات الكاشير مشمولة في اشتراكك",
@@ -612,8 +612,8 @@
     "privacyLinkTitle": "سياسة الخصوصية",
     "legalLinkTitle": "الشروط والمعلومات القانونية",
     "linkAppsAria": "Vysion Apps — يفتح في تبويب جديد",
-    "linkHorecaAria": "الموقع الرسمي لـ Vysion — تبويب جديد",
-    "websiteLinkLabel": "الموقع الرسمي",
+    "linkHorecaAria": "الموقع الرسمي لـ Vysion kassa — تبويب جديد",
+    "websiteLinkLabel": "Vysion kassa — الموقع الرسمي",
     "linkWebvysionAria": "Web Vysion — يفتح في تبويب جديد"
   },
   "stop": {

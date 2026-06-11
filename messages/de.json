@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "title": "Vysion kassa's | All-in-One Kassen- & Zahlungsplattform",
+    "title": "Vysion kassa | All-in-One Kassen- & Zahlungsplattform",
     "description": "Das komplette Kassensystem für die Gastronomie. Kasse, Online-Bestellungen, Rechnungsstellung, Personalverwaltung und mehr - alles in einer Plattform. 14 Tage kostenlos testen."
   },
   "nav": {
@@ -71,7 +71,7 @@
     "readGeneralTermsCta": "Allgemeine Geschäftsbedingungen lesen"
   },
   "heroLanding": {
-    "logoTitle": "Vysion kassa's",
+    "logoTitle": "Vysion kassa",
     "logoTagline": "",
     "title": "Eine Kasse für jede Branche",
     "subtitleLead": "Kassen-Hardware & Software in Ihrem Abo enthalten",
@@ -612,8 +612,8 @@
     "privacyLinkTitle": "Datenschutzerklärung",
     "legalLinkTitle": "AGB und rechtliche Hinweise",
     "linkAppsAria": "Vysion Apps — neues Fenster",
-    "linkHorecaAria": "Offizielle Vysion-Website — neues Fenster",
-    "websiteLinkLabel": "Offizielle Website",
+    "linkHorecaAria": "Offizielle Website Vysion kassa — neues Fenster",
+    "websiteLinkLabel": "Vysion kassa — offizielle Website",
     "linkWebvysionAria": "Web Vysion — neues Fenster"
   },
   "stop": {

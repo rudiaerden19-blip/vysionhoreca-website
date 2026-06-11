@@ -4,7 +4,7 @@ const canonical = '/sectoren/bakkerij'
 
 export const metadata: Metadata = {
   title: {
-    absolute: 'Snelste Kassasysteem voor Bakkers | i7 Kracht & 9 Talen | Vysion',
+    absolute: 'Snelste Kassasysteem voor Bakkers | i7 Kracht & 9 Talen | Vysion kassa',
   },
   description:
     'Specifieke kassa-layout voor bakkers: Intel i7 (Het Beest) voor ochtenddrukte, 9 talen, na 24 maanden eigendom van hardware. Stop met huren. Na 24 maanden is deze i7 kassa 100% jouw eigendom. Snelste kassa — kassasysteem België & Nederland.',
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical },
   openGraph: {
-    title: 'Snelste Kassasysteem voor Bakkers | i7 Kracht & 9 Talen | Vysion',
+    title: 'Snelste Kassasysteem voor Bakkers | i7 Kracht & 9 Talen | Vysion kassa',
     description:
       'Bakkers: i7-kracht, 9 talen, eigendom na 24 maanden. Kassasysteem België — start gratis.',
     url: canonical,
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Snelste Kassasysteem voor Bakkers | i7 Kracht & 9 Talen | Vysion',
+    title: 'Snelste Kassasysteem voor Bakkers | i7 Kracht & 9 Talen | Vysion kassa',
     description:
       'Kassa-layout voor bakkers: i7, 9 talen, eigendom na 24 maanden. Kassasysteem België.',
   },

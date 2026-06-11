@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getTenantSettings } from '@/lib/admin-api'
 import { TENANT_APP_SHELL_THEME_COLOR } from '@/lib/theme-color'
 import { tenantSlugFromOrdervysionHost } from '@/lib/tenant-slug-from-host'
-import { isVysionMainPortalHost as isVysionMarketingPortalHost } from '@/lib/vysion-site'
+import { isVysionMainPortalHost as isVysionMarketingPortalHost, VYSION_BRAND_SITE_NAME } from '@/lib/vysion-site'
 
-const DEFAULT_NAME = "Vysion kassa's"
-const DEFAULT_SHORT = 'Vysion'
+const DEFAULT_NAME: string = VYSION_BRAND_SITE_NAME
+const DEFAULT_SHORT = 'Vysion kassa'
 
 /** Zaak zonder *.ordervysion subdomein → /shop/{slug} op marketing-domein; PWA op hoofddomein → /login. */
 function isVysionMainPortalHost(host: string): boolean {

@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "title": "Vysion kassa's | 一体化收银与支付平台",
+    "title": "Vysion kassa | 一体化收银与支付平台",
     "description": "餐饮业完整收银系统。收银、在线订单、发票、员工管理等 - 全部在一个平台上。免费试用14天。"
   },
   "nav": {
@@ -71,7 +71,7 @@
     "readGeneralTermsCta": "阅读通用条款"
   },
   "heroLanding": {
-    "logoTitle": "Vysion kassa's",
+    "logoTitle": "Vysion kassa",
     "logoTagline": "",
     "title": "每个行业一套收银",
     "subtitleLead": "收银硬件与软件包含在您的订阅中",
@@ -612,8 +612,8 @@
     "privacyLinkTitle": "隐私政策",
     "legalLinkTitle": "条款与法律信息",
     "linkAppsAria": "Vysion Apps — 新标签页打开",
-    "linkHorecaAria": "Vysion官方网站 — 新标签页",
-    "websiteLinkLabel": "官方网站",
+    "linkHorecaAria": "Vysion kassa官方网站 — 新标签页",
+    "websiteLinkLabel": "Vysion kassa — 官方网站",
     "linkWebvysionAria": "Web Vysion — 新标签页打开"
   },
   "stop": {

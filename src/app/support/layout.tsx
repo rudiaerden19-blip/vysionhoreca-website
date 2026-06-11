@@ -3,9 +3,9 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Support & contact',
   description:
-    "Support voor Vysion kassa's: kassa, online bestelplatform, kassahardware, reserveringen en andere modules. Contact en veelgestelde vragen.",
+    "Support voor Vysion kassa: kassa, online bestelplatform, kassahardware, reserveringen en andere modules. Contact en veelgestelde vragen.",
   openGraph: {
-    title: "Support | Vysion kassa's",
+    title: "Support | Vysion kassa",
     description: 'Hulp bij kassa, bestelplatform, hardware en account.',
     url: '/support',
   },

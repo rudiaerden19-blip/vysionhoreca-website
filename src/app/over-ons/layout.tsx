@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: "Over Vysion kassa's",
+  title: "Over Vysion kassa",
   description:
-    "Vysion kassa's: alles-in-één voor ondernemers — touchscreen kassa (POS), online bestelplatform, kassahardware, reserveringen, keukenscherm en analyses. België & Nederland.",
+    "Vysion kassa: alles-in-één voor ondernemers — touchscreen kassa (POS), online bestelplatform, kassahardware, reserveringen, keukenscherm en analyses. België & Nederland.",
   openGraph: {
-    title: "Over ons | Vysion kassa's",
+    title: "Over ons | Vysion kassa",
     description:
       'Van kassa en bestelplatform tot hardware en analyse — één team.',
     url: '/over-ons',

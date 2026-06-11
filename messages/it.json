@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "title": "Vysion kassa's | Sistema POS e Piattaforma di Pagamento All-in-One",
+    "title": "Vysion kassa | Sistema POS e Piattaforma di Pagamento All-in-One",
     "description": "Il sistema POS completo per la ristorazione. Cassa, ordini online, fatturazione, gestione del personale e altro - tutto in una piattaforma. Prova 14 giorni gratis."
   },
   "nav": {
@@ -71,7 +71,7 @@
     "readGeneralTermsCta": "Leggi le condizioni generali"
   },
   "heroLanding": {
-    "logoTitle": "Vysion kassa's",
+    "logoTitle": "Vysion kassa",
     "logoTagline": "",
     "title": "Una cassa per ogni settore",
     "subtitleLead": "Hardware e software cassa inclusi nel tuo abbonamento",
@@ -612,8 +612,8 @@
     "privacyLinkTitle": "Informativa sulla privacy",
     "legalLinkTitle": "Termini e informazioni legali",
     "linkAppsAria": "Vysion Apps — si apre in una nuova scheda",
-    "linkHorecaAria": "Sito ufficiale Vysion — nuova scheda",
-    "websiteLinkLabel": "Sito ufficiale",
+    "linkHorecaAria": "Sito ufficiale Vysion kassa — nuova scheda",
+    "websiteLinkLabel": "Vysion kassa — sito ufficiale",
     "linkWebvysionAria": "Web Vysion — nuova scheda"
   },
   "stop": {

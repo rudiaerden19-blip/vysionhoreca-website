@@ -4,7 +4,7 @@ const canonical = '/sectoren/kapper'
 
 export const metadata: Metadata = {
   title: {
-    absolute: 'Kassasysteem voor Kappers & Salons | Stijlvol & Snel | Vysion',
+    absolute: 'Kassasysteem voor Kappers & Salons | Stijlvol & Snel | Vysion kassa',
   },
   description:
     'Salon-upgrade: professionele i7-kassa (Het Beest), eenvoudig afrekenen, 9 talen, na 24 maanden hardware van jou. Stop met huren. Na 24 maanden is deze i7 kassa 100% jouw eigendom. Snelste kassa voor salons — kassasysteem België & Nederland.',
@@ -18,14 +18,14 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical },
   openGraph: {
-    title: 'Kassasysteem voor Kappers & Salons | Stijlvol & Snel | Vysion',
+    title: 'Kassasysteem voor Kappers & Salons | Stijlvol & Snel | Vysion kassa',
     description: 'Kappers & salons: i7, stijlvolle checkout, eigendom na 24 maanden.',
     url: canonical,
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Kassasysteem voor Kappers & Salons | Stijlvol & Snel | Vysion',
+    title: 'Kassasysteem voor Kappers & Salons | Stijlvol & Snel | Vysion kassa',
     description: 'Salon POS met i7-kracht. Kassasysteem België — probeer gratis.',
   },
 }

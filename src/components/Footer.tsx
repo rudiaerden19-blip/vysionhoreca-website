@@ -1,5 +1,6 @@
 'use client'
 
+import { VYSION_BRAND_SITE_NAME } from '@/lib/vysion-site'
 import { useLanguage } from '@/i18n'
 import BackToTopBar from '@/components/BackToTopBar'
 
@@ -15,7 +16,7 @@ export default function Footer() {
             <div className="md:col-span-2">
               <div className="mb-4">
                 <span className="text-2xl font-bold">
-                  <span className="text-accent">Vysion</span>
+                  <span className="text-accent">{VYSION_BRAND_SITE_NAME}</span>
                 </span>
               </div>
               <p className="text-gray-400 max-w-lg leading-relaxed">

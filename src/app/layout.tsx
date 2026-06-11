@@ -10,7 +10,7 @@ import SectorChoiceGate from '@/components/SectorChoiceGate'
 import { OsTouchKeyboardAssist } from '@/components/OsTouchKeyboardAssist'
 import { WebAzertyKeyboard } from '@/components/WebAzertyKeyboard'
 import { TENANT_APP_SHELL_THEME_COLOR } from '@/lib/theme-color'
-import { VYSION_CANONICAL_ORIGIN } from '@/lib/vysion-site'
+import { VYSION_CANONICAL_ORIGIN, VYSION_BRAND_PRODUCT_NAME, VYSION_BRAND_SITE_NAME } from '@/lib/vysion-site'
 import { VYSION_INFO_EMAIL } from '@/lib/vysion-contact'
 const inter = Inter({ 
   subsets: ['latin'],
@@ -35,7 +35,8 @@ const organizationJsonLd = {
     {
       '@type': 'Organization',
       '@id': `${siteUrl}/#organization`,
-      name: "Vysion kassa's",
+      name: VYSION_BRAND_SITE_NAME,
+      alternateName: [VYSION_BRAND_PRODUCT_NAME],
       legalName: 'Vysion Group International',
       url: siteUrl,
       logo: `${siteUrl}/favicon.svg`,
@@ -67,9 +68,10 @@ const organizationJsonLd = {
       '@type': 'WebSite',
       '@id': `${siteUrl}/#website`,
       url: siteUrl,
-      name: "Vysion kassa's",
+      name: VYSION_BRAND_SITE_NAME,
+      alternateName: [VYSION_BRAND_PRODUCT_NAME],
       description:
-        'Zoek je een kassa, online bestelplatform of gratis uitproberen? Vysion combineert POS, bestellen, hardware en reserveringen voor België en Nederland.',
+        'Zoek je een kassa, online bestelplatform of gratis uitproberen? Vysion kassa combineert POS, bestellen, hardware en reserveringen voor België en Nederland.',
       publisher: { '@id': `${siteUrl}/#organization` },
       inLanguage: 'nl-BE',
     },
@@ -78,10 +80,10 @@ const organizationJsonLd = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  applicationName: VYSION_BRAND_SITE_NAME,
   title: {
-    default:
-      "Vysion kassa's | Kassa, online bestelplatform, hardware POS & gratis proberen",
-    template: "%s | Vysion kassa's",
+    default: `${VYSION_BRAND_SITE_NAME} | Kassa, online bestelplatform, hardware POS & gratis proberen`,
+    template: `%s | ${VYSION_BRAND_SITE_NAME}`,
   },
   description:
     'Touchscreen kassa (POS), online bestelplatform en webshop, premium kassahardware en software in één pakket. Gratis kassa 14 dagen uitproberen. Reserveringsplatform, keukenscherm, WhatsApp-bestellen, kosten en analyse. Bancontact, iDEAL. België & Nederland.',
@@ -125,7 +127,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: "Vysion kassa's",
+    title: VYSION_BRAND_SITE_NAME,
   },
   icons: {
     icon: [
@@ -135,20 +137,18 @@ export const metadata: Metadata = {
     apple: [{ url: '/icons/icon-192.png', sizes: '180x180', type: 'image/png' }],
   },
   openGraph: {
-    title:
-      "Vysion kassa's | Kassa, bestelplatform, hardware & gratis proberen",
+    title: `${VYSION_BRAND_SITE_NAME} | Kassa, bestelplatform, hardware & gratis proberen`,
     description:
       'Kassa (POS), online bestelplatform en kassahardware — reserveringen, keukenscherm en analyse. Start 14 dagen gratis.',
     type: 'website',
     locale: 'nl_BE',
     url: siteUrl,
-    siteName: "Vysion kassa's",
+    siteName: VYSION_BRAND_SITE_NAME,
     images: [{ url: '/images/online-order-platform-1.png' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title:
-      "Vysion kassa's | Kassa, bestelplatform, hardware & gratis proberen",
+    title: `${VYSION_BRAND_SITE_NAME} | Kassa, bestelplatform, hardware & gratis proberen`,
     description:
       'Touchscreen kassa, online bestelplatform en hardware POS — 14 dagen gratis. België & Nederland.',
     images: ['/images/online-order-platform-1.png'],

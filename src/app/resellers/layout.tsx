@@ -3,9 +3,9 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Resellers & partners',
   description:
-    "Partnerprogramma voor Vysion kassa's: kassa, online bestelplatform, hardware en kassa software voor resellers.",
+    "Partnerprogramma voor Vysion kassa: kassa, online bestelplatform, hardware en kassa software voor resellers.",
   openGraph: {
-    title: "Resellers | Vysion kassa's",
+    title: "Resellers | Vysion kassa",
     description: 'Partnerschap rond kassa, bestelplatform en hardware.',
     url: '/resellers',
   },

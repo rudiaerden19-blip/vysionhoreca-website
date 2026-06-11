@@ -1,14 +1,14 @@
 import type { Metadata } from 'next'
 
-import { VYSION_CANONICAL_ORIGIN } from '@/lib/vysion-site'
+import { VYSION_CANONICAL_ORIGIN, VYSION_BRAND_SITE_NAME } from '@/lib/vysion-site'
 
 const siteUrl = VYSION_CANONICAL_ORIGIN
 
 /** SEO homepage (/): kernzoektermen kassa, bestelplatform, hardware, gratis proberen. */
 const HOME_TITLE =
-  'Kassa, online bestelplatform & hardware | Gratis proberen | Vysion kassa\'s'
+  `Kassa, online bestelplatform & hardware | Gratis proberen | ${VYSION_BRAND_SITE_NAME}`
 const HOME_DESCRIPTION =
-  'Zoek je een kassa, online bestelplatform of gratis uitproberen? Vysion: touchscreen POS, webshop, premium kassahardware (Intel i7). 14 dagen gratis — reserveringen, keukenscherm, WhatsApp, 9 talen. België & Nederland.'
+  'Zoek je een kassa, online bestelplatform of gratis uitproberen? Vysion kassa: touchscreen POS, webshop, premium kassahardware (Intel i7). 14 dagen gratis — reserveringen, keukenscherm, WhatsApp, 9 talen. België & Nederland.'
 
 export const metadata: Metadata = {
   title: {
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'nl_BE',
     url: siteUrl,
-    siteName: "Vysion kassa's",
+    siteName: VYSION_BRAND_SITE_NAME,
     images: [{ url: '/images/online-order-platform-1.png' }],
   },
   twitter: {

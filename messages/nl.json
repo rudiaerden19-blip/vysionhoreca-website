@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "title": "Vysion kassa's | Alles-in-één Kassa & Betaalplatform",
+    "title": "Vysion kassa | Alles-in-één Kassa & Betaalplatform",
     "description": "Het complete kassasysteem voor zaken. Kassa, online bestellingen, facturatie, personeelsbeheer en meer - allemaal in één platform. Probeer 14 dagen gratis."
   },
   "nav": {
@@ -152,7 +152,7 @@
     "imageZoomPickerReset": "↺ Reset naar midden"
   },
   "heroLanding": {
-    "logoTitle": "Vysion kassa's",
+    "logoTitle": "Vysion kassa",
     "logoTagline": "",
     "title": "Een kassa voor iedere sector",
     "subtitleLead": "Kassa hardware & software inbegrepen in je abonnement",
@@ -893,8 +893,8 @@
     "privacyLinkTitle": "Privacybeleid en verwerking van gegevens",
     "legalLinkTitle": "Algemene voorwaarden en juridische documenten",
     "linkAppsAria": "Vysion Apps, opent in een nieuw venster",
-    "linkHorecaAria": "Officiële Vysion-website, nieuw venster",
-    "websiteLinkLabel": "Officiële website",
+    "linkHorecaAria": "Officiële website Vysion kassa, nieuw venster",
+    "websiteLinkLabel": "Vysion kassa — officiële website",
     "linkWebvysionAria": "Web Vysion, opent in een nieuw venster"
   },
   "stop": {

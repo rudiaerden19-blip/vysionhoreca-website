@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "title": "Vysion kassa's | Caisse & Plateforme de Paiement Tout-en-Un",
+    "title": "Vysion kassa | Caisse & Plateforme de Paiement Tout-en-Un",
     "description": "Le système de caisse complet pour l'hôtellerie. Caisse, commandes en ligne, facturation, gestion du personnel et plus - tout en une plateforme. Essayez 14 jours gratuits."
   },
   "nav": {
@@ -71,7 +71,7 @@
     "readGeneralTermsCta": "Lire les conditions générales"
   },
   "heroLanding": {
-    "logoTitle": "Vysion kassa's",
+    "logoTitle": "Vysion kassa",
     "logoTagline": "",
     "title": "Une caisse pour chaque secteur",
     "subtitleLead": "Matériel et logiciel de caisse inclus dans votre abonnement",
@@ -612,8 +612,8 @@
     "privacyLinkTitle": "Politique de confidentialité",
     "legalLinkTitle": "Conditions et informations légales",
     "linkAppsAria": "Vysion Apps — s’ouvre dans un nouvel onglet",
-    "linkHorecaAria": "Site officiel Vysion — nouvel onglet",
-    "websiteLinkLabel": "Site officiel",
+    "linkHorecaAria": "Site officiel Vysion kassa — nouvel onglet",
+    "websiteLinkLabel": "Vysion kassa — site officiel",
     "linkWebvysionAria": "Web Vysion — nouvel onglet"
   },
   "stop": {
