@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
@@ -72,6 +72,7 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [cameraScanActive, setCameraScanActive] = useState(false)
+  const [wedgeListening, setWedgeListening] = useState(false)
 
   const wedgeRef = useRef<HTMLInputElement>(null)
   const photoInputRef = useRef<HTMLInputElement>(null)
@@ -160,45 +161,88 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
     }
   }, [])
 
-  const startCameraScan = useCallback(async () => {
+  const toggleCameraScan = useCallback(() => {
     setError('')
-    setCameraScanActive(true)
-    cameraScanActiveRef.current = true
-    if (typeof window === 'undefined' || !isRetailBarcodeCameraScanAvailable()) {
-      setError(t('adminPages.productIntake.cameraScanUnsupported'))
-      stopCameraScan()
-      return
+    setWedgeListening(false)
+    if (typeof document !== 'undefined') {
+      const active = document.activeElement
+      if (active instanceof HTMLElement) active.blur()
     }
-    try {
+    if (cameraScanActive) stopCameraScan()
+    else setCameraScanActive(true)
+  }, [cameraScanActive, stopCameraScan])
+
+  useLayoutEffect(() => {
+    if (!cameraScanActive) return
+
+    cameraScanActiveRef.current = true
+    let cancelled = false
+
+    void (async () => {
+      if (typeof window === 'undefined' || !isRetailBarcodeCameraScanAvailable()) {
+        setError(t('adminPages.productIntake.cameraScanUnsupported'))
+        if (!cancelled) stopCameraScan()
+        return
+      }
+
       const video = videoRef.current
       if (!video) {
-        stopCameraScan()
+        setError(t('adminPages.productIntake.cameraStartFailed'))
+        if (!cancelled) stopCameraScan()
         return
       }
-      await attachEnvironmentCameraToVideo(video)
-      const isActive = () => cameraScanActiveRef.current && videoRef.current != null
-      const onDetected = (raw: string) => {
-        applyBarcode(raw)
-        stopCameraScan()
+
+      try {
+        const stream = await attachEnvironmentCameraToVideo(video)
+        if (cancelled) {
+          stream.getTracks().forEach((tr) => tr.stop())
+          video.srcObject = null
+          return
+        }
+
+        const isActive = () => cameraScanActiveRef.current && videoRef.current != null
+        const onDetected = (raw: string) => {
+          applyBarcode(raw)
+          stopCameraScan()
+        }
+
+        if (getNativeBarcodeDetectorCtor()) {
+          scanEngineStopRef.current = startNativeBarcodeDetectorLoop(video, isActive, onDetected)
+          return
+        }
+        scanEngineStopRef.current = await startZxingBarcodeVideoScan(video, isActive, onDetected)
+      } catch {
+        if (!cancelled) {
+          setError(t('adminPages.productIntake.cameraPermissionDenied'))
+          stopCameraScan()
+        }
       }
-      if (getNativeBarcodeDetectorCtor()) {
-        scanEngineStopRef.current = startNativeBarcodeDetectorLoop(video, isActive, onDetected)
-        return
-      }
-      scanEngineStopRef.current = await startZxingBarcodeVideoScan(video, isActive, onDetected)
-    } catch {
-      setError(t('adminPages.productIntake.cameraPermissionDenied'))
-      stopCameraScan()
+    })()
+
+    return () => {
+      cancelled = true
     }
-  }, [applyBarcode, stopCameraScan, t])
+  }, [cameraScanActive, applyBarcode, stopCameraScan, t])
 
   useEffect(() => () => stopCameraScan(), [stopCameraScan])
+
+  const startWedgeScan = useCallback(() => {
+    if (cameraScanActive) stopCameraScan()
+    setWedgeListening(true)
+    if (wedgeRef.current) wedgeRef.current.value = ''
+    if (typeof document !== 'undefined') {
+      const active = document.activeElement
+      if (active instanceof HTMLElement && active !== wedgeRef.current) active.blur()
+    }
+    requestAnimationFrame(() => wedgeRef.current?.focus({ preventScroll: true }))
+  }, [cameraScanActive, stopCameraScan])
 
   const onWedgeKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key !== 'Enter') return
     e.preventDefault()
     applyBarcode(e.currentTarget.value)
     e.currentTarget.value = ''
+    setWedgeListening(false)
   }
 
   const onPhotoSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -382,17 +426,20 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
             <div className="mt-3 flex flex-wrap gap-2">
               <button
                 type="button"
-                onClick={() => wedgeRef.current?.focus({ preventScroll: true })}
-                className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm font-semibold"
+                onClick={startWedgeScan}
+                className={`rounded-xl border px-4 py-2.5 text-sm font-semibold ${
+                  wedgeListening
+                    ? 'border-blue-600 bg-blue-50 text-blue-800'
+                    : 'border-gray-200 bg-gray-50'
+                }`}
               >
-                {t('adminPages.producten.scanProductButton')}
+                {wedgeListening
+                  ? t('adminPages.producten.scanProductListening')
+                  : t('adminPages.producten.scanProductButton')}
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  if (cameraScanActive) stopCameraScan()
-                  else void startCameraScan()
-                }}
+                onClick={toggleCameraScan}
                 className={`rounded-xl border px-4 py-2.5 text-sm font-semibold ${
                   cameraScanActive
                     ? 'border-blue-600 bg-blue-50 text-blue-800'
@@ -404,19 +451,44 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
                   : t('adminPages.productIntake.startCameraScan')}
               </button>
             </div>
-            <input
-              ref={wedgeRef}
-              type="text"
-              tabIndex={-1}
-              aria-hidden
-              className="fixed left-0 top-0 h-px w-px opacity-0 overflow-hidden"
-              onKeyDown={onWedgeKeyDown}
-            />
-            {cameraScanActive ? (
-              <div className="mt-3 overflow-hidden rounded-xl bg-black">
-                <video ref={videoRef} className="w-full max-h-48 object-cover" playsInline muted />
-              </div>
-            ) : null}
+            <p className="mt-2 text-xs text-gray-500">
+              {cameraScanActive
+                ? t('adminPages.productIntake.cameraScanHint')
+                : wedgeListening
+                  ? t('adminPages.producten.scanProductListeningHint')
+                  : t('adminPages.productIntake.barcodeScanChoiceHint')}
+            </p>
+            <div data-no-web-touch-keyboard>
+              <input
+                ref={wedgeRef}
+                type="text"
+                inputMode="none"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden
+                className="fixed left-0 top-0 h-px w-px opacity-0 overflow-hidden"
+                onKeyDown={onWedgeKeyDown}
+                onBlur={() => {
+                  window.setTimeout(() => setWedgeListening(false), 150)
+                }}
+              />
+            </div>
+            <div
+              className={
+                cameraScanActive
+                  ? 'mt-3 overflow-hidden rounded-xl bg-black'
+                  : 'fixed left-0 top-0 h-px w-px overflow-hidden opacity-0 pointer-events-none'
+              }
+              aria-hidden={!cameraScanActive}
+            >
+              <video
+                ref={videoRef}
+                className={cameraScanActive ? 'w-full max-h-52 object-cover' : 'h-px w-px'}
+                playsInline
+                muted
+                autoPlay
+              />
+            </div>
             {eanBusy ? (
               <p className="mt-2 text-xs text-gray-500">{t('adminPages.productIntake.eanLookupBusy')}</p>
             ) : null}
