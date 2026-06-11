@@ -2840,6 +2840,7 @@
       "cameraPermissionDenied": "No camera access. Allow camera or type the barcode.",
       "cameraStartFailed": "Could not start the camera. Tap Camera barcode again or type the EAN.",
       "cameraScanHint": "Point the camera at the barcode until the number appears in the field.",
+      "cameraViewfinderHint": "Align the barcode inside the green frame — the red line scans automatically.",
       "barcodeScanChoiceHint": "On phone: Camera barcode. With Bluetooth scanner: Scan product.",
       "eanLookupBusy": "Looking up name…",
       "barcodeRequired": "Barcode required.",

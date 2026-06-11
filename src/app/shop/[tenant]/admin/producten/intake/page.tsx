@@ -28,6 +28,7 @@ import {
   startZxingBarcodeVideoScan,
   type RetailBarcodeCameraScanStop,
 } from '@/lib/retail-barcode-camera-scan'
+import { RetailBarcodeScannerOverlay } from '@/components/retail/RetailBarcodeScannerOverlay'
 
 function parseLocalizedMoneyInput(raw: string): number {
   const n = raw.trim().replace(/\s/g, '').replace(',', '.')
@@ -451,13 +452,13 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
                   : t('adminPages.productIntake.startCameraScan')}
               </button>
             </div>
-            <p className="mt-2 text-xs text-gray-500">
-              {cameraScanActive
-                ? t('adminPages.productIntake.cameraScanHint')
-                : wedgeListening
+            {!cameraScanActive ? (
+              <p className="mt-2 text-xs text-gray-500">
+                {wedgeListening
                   ? t('adminPages.producten.scanProductListeningHint')
                   : t('adminPages.productIntake.barcodeScanChoiceHint')}
-            </p>
+              </p>
+            ) : null}
             <div data-no-web-touch-keyboard>
               <input
                 ref={wedgeRef}
@@ -476,18 +477,27 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
             <div
               className={
                 cameraScanActive
-                  ? 'mt-3 overflow-hidden rounded-xl bg-black'
+                  ? 'relative mt-3 aspect-[4/3] max-h-80 w-full overflow-hidden rounded-xl bg-black'
                   : 'fixed left-0 top-0 h-px w-px overflow-hidden opacity-0 pointer-events-none'
               }
               aria-hidden={!cameraScanActive}
             >
               <video
                 ref={videoRef}
-                className={cameraScanActive ? 'w-full max-h-52 object-cover' : 'h-px w-px'}
+                className={
+                  cameraScanActive
+                    ? 'absolute inset-0 h-full w-full object-cover'
+                    : 'h-px w-px'
+                }
                 playsInline
                 muted
                 autoPlay
               />
+              {cameraScanActive ? (
+                <RetailBarcodeScannerOverlay
+                  hint={t('adminPages.productIntake.cameraViewfinderHint')}
+                />
+              ) : null}
             </div>
             {eanBusy ? (
               <p className="mt-2 text-xs text-gray-500">{t('adminPages.productIntake.eanLookupBusy')}</p>

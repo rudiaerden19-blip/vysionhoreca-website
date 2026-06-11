@@ -2840,6 +2840,7 @@
       "cameraPermissionDenied": "Geen cameratoegang. Sta camera toe of typ de barcode.",
       "cameraStartFailed": "Camera kon niet starten. Tik opnieuw op Camera barcode of typ de EAN.",
       "cameraScanHint": "Richt de camera op de streepjescode tot het nummer in het veld staat.",
+      "cameraViewfinderHint": "Plaats de streepjescode in het groene kader — rode lijn scant automatisch.",
       "barcodeScanChoiceHint": "Op telefoon: Camera barcode. Met Bluetooth-scanner: Product scannen.",
       "eanLookupBusy": "Naam opzoeken…",
       "barcodeRequired": "Barcode verplicht.",

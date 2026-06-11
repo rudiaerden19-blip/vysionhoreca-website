@@ -535,6 +535,22 @@ input[type="number"] {
   animation: fadeIn 0.6s ease-out forwards;
 }
 
+@keyframes retail-barcode-scan-line {
+  0%,
+  100% {
+    top: 10%;
+    opacity: 0.45;
+  }
+  50% {
+    top: calc(100% - 12px);
+    opacity: 1;
+  }
+}
+
+.animate-retail-barcode-scan-line {
+  animation: retail-barcode-scan-line 2.1s ease-in-out infinite;
+}
+
 .delay-100 { animation-delay: 0.1s; }
 .delay-200 { animation-delay: 0.2s; }
 .delay-300 { animation-delay: 0.3s; }

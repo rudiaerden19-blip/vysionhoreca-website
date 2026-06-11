@@ -2041,6 +2041,7 @@
       "cameraPermissionDenied": "Kein Kamerazugriff. Kamera erlauben oder Barcode eingeben.",
       "cameraStartFailed": "Kamera konnte nicht starten. Erneut auf Kamera-Barcode tippen oder EAN eingeben.",
       "cameraScanHint": "Barcode in die Kamera halten, bis die Nummer im Feld steht.",
+      "cameraViewfinderHint": "Barcode ins grüne Feld halten — die rote Linie scannt automatisch.",
       "barcodeScanChoiceHint": "Am Handy: Kamera-Barcode. Mit Bluetooth-Scanner: Produkt scannen.",
       "eanLookupBusy": "Name wird gesucht…",
       "barcodeRequired": "Barcode erforderlich.",
