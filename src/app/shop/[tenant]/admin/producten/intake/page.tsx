@@ -38,6 +38,20 @@ function findProductByBarcode(products: MenuProduct[], code: string): MenuProduc
   })
 }
 
+function getBarcodeDetectorCtor():
+  | (new (options: { formats: string[] }) => {
+      detect: (source: HTMLVideoElement) => Promise<{ rawValue?: string }[]>
+    })
+  | null {
+  if (typeof window === 'undefined') return null
+  const w = window as Window & {
+    BarcodeDetector?: new (options: { formats: string[] }) => {
+      detect: (source: HTMLVideoElement) => Promise<{ rawValue?: string }[]>
+    }
+  }
+  return w.BarcodeDetector ?? null
+}
+
 export default function RetailProductIntakePage({ params }: { params: { tenant: string } }) {
   const tenant = params.tenant
   const router = useRouter()
@@ -158,7 +172,7 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
     setError('')
     setCameraScanActive(true)
     cameraScanActiveRef.current = true
-    if (typeof window === 'undefined' || !('BarcodeDetector' in window)) {
+    if (typeof window === 'undefined' || !getBarcodeDetectorCtor()) {
       setError(t('adminPages.productIntake.cameraScanUnsupported'))
       stopCameraScan()
       return
@@ -172,8 +186,12 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
       if (!video) return
       video.srcObject = stream
       await video.play()
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const detector = new (window as any).BarcodeDetector({
+      const BarcodeDetectorCtor = getBarcodeDetectorCtor()
+      if (!BarcodeDetectorCtor) {
+        stopCameraScan()
+        return
+      }
+      const detector = new BarcodeDetectorCtor({
         formats: ['ean_13', 'ean_8', 'upc_a', 'code_128'],
       })
       const tick = async () => {
