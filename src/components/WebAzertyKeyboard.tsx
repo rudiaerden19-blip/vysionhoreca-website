@@ -54,6 +54,12 @@ function persistLetterLayout(layout: KeyboardLetterLayout) {
 const ADMIN_SCROLL_SELECTOR = '[data-vysion-admin-scroll]'
 
 function findVerticalScrollParent(el: HTMLElement): HTMLElement {
+  const kbOpen = document.documentElement.classList.contains('vysion-web-kb-open')
+  if (kbOpen) {
+    const kbHost = el.closest('[data-vysion-kb-scroll-host]')
+    if (kbHost instanceof HTMLElement) return kbHost
+  }
+
   const adminMain = el.closest(ADMIN_SCROLL_SELECTOR)
   if (adminMain instanceof HTMLElement) return adminMain
 
@@ -345,7 +351,7 @@ function KeyBtn({ label, onClick, className = '', 'aria-label': ariaLabel, title
         if (touchConsumedRef.current) return
         run()
       }}
-      className={`min-h-[40px] min-w-0 shrink-0 select-none rounded-[6px] border border-black/35 bg-[#474a54] px-0.5 text-base font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] touch-manipulation active:bg-[#2f323b] active:brightness-105 max-sm:min-h-[44px] max-sm:text-[17px] sm:min-w-[44px] ${className}`.trim()}
+      className={`min-h-[48px] min-w-0 shrink-0 select-none rounded-[8px] border border-black/35 bg-[#474a54] px-0.5 text-lg font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] touch-manipulation active:bg-[#2f323b] active:brightness-105 max-sm:min-h-[52px] max-sm:text-[19px] sm:min-w-[48px] ${className}`.trim()}
     >
       {label}
     </button>
@@ -573,7 +579,7 @@ export function WebAzertyKeyboard() {
   const DIGITS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
 
   const numericGrid = (
-    <div className="mx-auto grid max-w-[min(48rem,100vw)] grid-cols-12 gap-x-1 gap-y-1 px-1 pb-1.5 pt-0.5 max-sm:gap-1 sm:gap-x-2 sm:gap-y-2 sm:px-2 sm:pb-2 sm:pt-1">
+    <div className="mx-auto grid w-full max-w-[min(720px,92vw)] grid-cols-12 gap-x-1.5 gap-y-1.5 px-2 pb-2 pt-1 max-sm:gap-1.5 sm:gap-x-2 sm:gap-y-2 sm:px-3 sm:pb-2.5">
       {(['7', '8', '9'] as const).map((d) => (
         <KeyBtn key={d} label={d} className="col-span-3" onClick={() => onChar(d)} />
       ))}
@@ -680,24 +686,24 @@ export function WebAzertyKeyboard() {
     </div>
   )
 
-  /** Telefoon: min-w-0 + flex-1 (één rij) met grotere toetsen (~44px). */
+  /** Telefoon: min-w-0 + flex-1 (één rij) met grotere toetsen. */
   const rowWrap =
-    'mx-auto flex w-full max-w-[min(92rem,100vw)] justify-stretch gap-1 px-1 max-sm:gap-0.5 max-sm:px-0.5 sm:gap-1.5 sm:px-1.5'
+    'mx-auto flex w-full max-w-[min(720px,92vw)] justify-stretch gap-1.5 px-2 max-sm:gap-1 max-sm:px-1.5 sm:gap-2 sm:px-2'
 
   const letterKeyCls =
-    '!min-w-0 min-h-0 flex-[1_1_0] basis-0 px-0 py-0 font-semibold leading-none tracking-tight h-10 min-h-[40px] text-[15px] max-sm:h-11 max-sm:min-h-[44px] max-sm:text-[17px]'
+    '!min-w-0 min-h-0 flex-[1_1_0] basis-0 px-0 py-0 font-semibold leading-none tracking-tight h-12 min-h-[48px] text-[17px] max-sm:h-[52px] max-sm:min-h-[52px] max-sm:text-[18px]'
 
   const digitKeyCls =
-    '!min-w-0 min-h-0 flex-[1_1_0] basis-0 px-0 font-semibold leading-none h-10 min-h-[40px] text-[15px] max-sm:h-11 max-sm:min-h-[44px] max-sm:text-[17px]'
+    '!min-w-0 min-h-0 flex-[1_1_0] basis-0 px-0 font-semibold leading-none h-12 min-h-[48px] text-[17px] max-sm:h-[52px] max-sm:min-h-[52px] max-sm:text-[18px]'
 
   const SYMBOL_KEY_COMPACT =
-    'h-10 min-h-[40px] w-9 shrink-0 px-0 text-[15px] max-sm:h-11 max-sm:min-h-[44px] max-sm:w-[2.35rem] max-sm:text-[16px] sm:w-10 sm:text-[15px]'
+    'h-12 min-h-[48px] w-10 shrink-0 px-0 text-[16px] max-sm:h-[52px] max-sm:min-h-[52px] max-sm:w-11 max-sm:text-[17px] sm:w-11 sm:text-[16px]'
 
   const actionKeyCls =
-    'h-10 min-h-[40px] max-sm:h-11 max-sm:min-h-[44px] max-sm:text-[15px] sm:min-h-[40px]'
+    'h-12 min-h-[48px] max-sm:h-[52px] max-sm:min-h-[52px] max-sm:text-[16px] sm:min-h-[48px]'
 
   const letterBlock = (
-    <div className="mx-auto w-full select-none pb-1.5">
+    <div className="mx-auto w-full max-w-[min(720px,92vw)] select-none pb-2">
       <div className={`${rowWrap} pt-0.5`}>
         {DIGITS.map((d) => (
           <KeyBtn key={d} label={d} className={digitKeyCls} onClick={() => onChar(d)} />
@@ -705,7 +711,7 @@ export function WebAzertyKeyboard() {
       </div>
 
       {/* Letterrijen (AZERTY of QWERTY) met trapjes */}
-      <div className="mt-0.5 space-y-1 max-sm:space-y-0.5">
+      <div className="mt-1 space-y-1.5 max-sm:space-y-1">
         <div className={`${rowWrap}`}>
           {ROW1.map((chr) => (
             <KeyBtn
@@ -745,7 +751,7 @@ export function WebAzertyKeyboard() {
         </div>
 
         {/* Eén onderrij: shift, tekens, spatiel met harde breedte-floor, enter — spaart hoogte t.o.v. twee rijen */}
-        <div className="mx-auto flex w-full max-w-[min(92rem,100vw)] flex-nowrap justify-start gap-1 overflow-x-auto px-0.5 pb-0.5 max-sm:gap-0.5 max-sm:px-0.5 sm:justify-center sm:gap-1.5 sm:overflow-x-visible sm:px-1.5 [scrollbar-width:thin] [-webkit-overflow-scrolling:touch]">
+        <div className="mx-auto flex w-full max-w-[min(720px,92vw)] flex-nowrap justify-start gap-1.5 overflow-x-auto px-1 pb-1 max-sm:gap-1 max-sm:px-1 sm:justify-center sm:gap-2 sm:overflow-x-visible sm:px-2 [scrollbar-width:thin] [-webkit-overflow-scrolling:touch]">
           <KeyBtn
             label="⇧"
             aria-label={t('kassaApp.webKbCaps')}
@@ -799,9 +805,7 @@ export function WebAzertyKeyboard() {
     <div
       ref={panelRef}
       data-web-touch-keyboard-panel
-      className={`fixed inset-x-0 bottom-0 z-[600] border-t border-zinc-700 bg-[#151a21] px-0.5 pb-[max(env(safe-area-inset-bottom),4px)] pt-1 shadow-[0_-6px_22px_rgba(0,0,0,.45)] ${
-        pinCompactMode ? 'rounded-t-2xl' : ''
-      }`}
+      className="fixed bottom-0 left-1/2 z-[600] w-[min(720px,92vw)] max-w-[92vw] -translate-x-1/2 rounded-t-2xl border border-zinc-700 border-b-0 bg-[#151a21] px-0.5 pb-[max(env(safe-area-inset-bottom),6px)] pt-1.5 shadow-[0_-8px_28px_rgba(0,0,0,.5)]"
       role="region"
       aria-label={
         pinCompactMode ? t('kassaApp.webKbPinTitle') : `${t('kassaApp.webKbTitle')} (${letterLayout.toUpperCase()})`

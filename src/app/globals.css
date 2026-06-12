@@ -57,6 +57,16 @@ html.vysion-web-kb-open [data-vysion-admin-scroll] {
   scroll-padding-bottom: var(--vysion-web-kb-height, 320px);
 }
 
+/* Volledige POS/viewport-shells: inhoud scrollbaar zodat focusveld boven het toetsenbord komt */
+html.vysion-web-kb-open [data-vysion-kb-scroll-host] {
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  max-height: calc(100dvh - var(--vysion-web-kb-height, 320px));
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  scroll-padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
 /*
  * Embedded touch / kiosk-WebView (o.a. Elo): hint naar manipulation om dubbeltik-zoom-vertraging te beperken.
  * Scrollports met eigen touch-action (bv. menu-scroll met touch-manipulation) blijven werken voor verticaal slepen.

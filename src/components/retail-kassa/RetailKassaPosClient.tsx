@@ -1738,6 +1738,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     <div
       className="flex min-h-0 flex-col overflow-hidden h-[100svh] max-h-[100svh] supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh]"
       data-testid="retail-kassa-app"
+      data-vysion-kb-scroll-host
     >
       <LogoutSoftwareConfirmModal
         open={logoutSoftwareConfirmOpen}
