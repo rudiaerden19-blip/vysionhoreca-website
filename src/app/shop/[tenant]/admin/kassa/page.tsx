@@ -928,6 +928,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [soundActivated, demoViewOnly])
 
   const [cart, setCart] = useState<CartItem[]>([])
+  /** Tafelregels in sidebar: uit na «Voeg toe aan tafel», aan bij opnieuw tafel kiezen. */
+  const [tableOrderLinesInSidebar, setTableOrderLinesInSidebar] = useState(true)
   const [orderType, setOrderType] = useState<OrderType>('DINE_IN')
   const [tableNumber, setTableNumber] = useState('')
   const [numpadValue, setNumpadValue] = useState('')
@@ -2173,6 +2175,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setTableNumber(newTableNr)
     setDineInFloorZone(zone)
     setOrderType('DINE_IN')
+    setTableOrderLinesInSidebar(true)
     setShowTablePicker(false)
     setKassaZoneTab(null)
     if (openPaymentAfterFloorPlanSwitchRef.current) {
@@ -2204,6 +2207,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     })
     setTableOrders(next)
     queueMicrotask(() => syncFloorPlanStatusesFromOpenOrders(next))
+    setTableOrderLinesInSidebar(false)
     void persistOpenOrderRowToSupabase(zone, tbl, merged)
     void flushBarDeltaSlipRef.current(zone, tbl, itemsToPark, opts)
   }
@@ -2672,10 +2676,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return tableOrders[activeTableSlotKey] ?? []
   }, [activeTableSlotKey, tableOrders])
 
-  /** Open tafelmand in sidebar (kar leeg): na tafelkeuze of na «Voeg toe aan tafel». */
+  /** Open tafelmand in sidebar (kar leeg): na tafelkeuze, niet direct na «Voeg toe aan tafel». */
+  const showParkedTableLinesInSidebar = useMemo(
+    () => tableOrderLinesInSidebar && parkedOnTableLines.length > 0,
+    [tableOrderLinesInSidebar, parkedOnTableLines.length],
+  )
+
   const parkedOnlySidebarView = useMemo(
-    () => !numpadPanelVisible && cart.length === 0 && parkedOnTableLines.length > 0,
-    [numpadPanelVisible, cart.length, parkedOnTableLines.length],
+    () => !numpadPanelVisible && cart.length === 0 && showParkedTableLinesInSidebar,
+    [numpadPanelVisible, cart.length, showParkedTableLinesInSidebar],
   )
 
   const updateParkedOnTableQty = (cartKey: string, qty: number) => {
@@ -5347,7 +5356,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           }`}
         >
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-              {parkedLinesByCategory.length > 0 &&
+              {showParkedTableLinesInSidebar &&
               (parkedOnlySidebarView || numpadPanelVisible) ? (
                 <div
                   className={
@@ -5381,7 +5390,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   kassaSidebarFooterTier === 'comfort' ? 'gap-2' : kassaSidebarFooterTier === 'compact' ? 'gap-1.5' : 'gap-1'
                 }`}
               >
-              {parkedLinesByCategory.length > 0 && cart.length > 0 ? (
+              {showParkedTableLinesInSidebar && cart.length > 0 ? (
                 <div
                   className="max-h-[min(20vh,6.5rem)] shrink-0 overflow-y-auto overscroll-y-contain"
                   data-testid="kassa-table-order-lines"
@@ -5602,7 +5611,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   </p>
                 </div>
               ) : null}
-              {parkedLinesByCategory.length > 0 ? (
+              {showParkedTableLinesInSidebar ? (
                 <div
                   className="max-h-[min(20vh,6.5rem)] shrink-0 overflow-y-auto overscroll-y-contain"
                   data-testid="kassa-table-order-lines"
