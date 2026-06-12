@@ -148,9 +148,10 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
   }, [params.tenant, adminPath, baseUrl])
 
   useLayoutEffect(() => {
-    if (loading || tenantExists === null) return
     if (tenantExists === false) return
     if (typeof window === 'undefined') return
+    /** POS: auth meteen (niet wachten op getTenantSettings) — voorkomt audio vóór login. */
+    if (!isAnyKassaPos && (loading || tenantExists === null)) return
 
     const stripHandoffParamFromSearch = (search: string) => {
       if (!search || search === '?') return ''
@@ -231,7 +232,7 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
     }
 
     goTenantLogin()
-  }, [loading, tenantExists, params.tenant, demoPublicUnauthenticated])
+  }, [loading, tenantExists, params.tenant, demoPublicUnauthenticated, isAnyKassaPos])
 
   /** Server moet dezelfde sessie zien als schrijf-API’s; ruimt verouderde `vysion_tenant` op bij mismatch. */
   useEffect(() => {
@@ -350,6 +351,16 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
     demoPublicUnauthenticated,
   ])
 
+  const ownerSessionFreshOnClient =
+    typeof window !== 'undefined' && isOwnerSessionFreshForTenant(params.tenant)
+
+  /** Kassa alleen na login-verify — nooit vóór /login (pending/login). */
+  const canShowKassaPos =
+    demoPublicUnauthenticated ||
+    (typeof window !== 'undefined' && isSuperAdminLoggedIn()) ||
+    adminAccess === 'ok' ||
+    (adminAccess === 'verifying' && ownerSessionFreshOnClient)
+
   const renderKassaPosChildren = () => {
     if (isHorecaKassaPos) {
       if (demoPublicUnauthenticated) {
@@ -390,8 +401,7 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
   }
 
   /**
-   * Kassa-POS: geen admin-laadschermen — na login alleen sound gate in de kassa-client.
-   * `tenantExists === null` tijdens fetch is géén "shop niet gevonden".
+   * Kassa-POS: geen admin-laadschermen na login; vóór login geen kassa/audio (leeg grijs).
    */
   if (isAnyKassaPos) {
     if (tenantExists === false) {
@@ -407,6 +417,9 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
           </div>
         </div>
       )
+    }
+    if (!canShowKassaPos) {
+      return <div className="min-h-[100svh] bg-[#e3e3e3]" aria-busy="true" />
     }
     return renderKassaPosChildren()
   }

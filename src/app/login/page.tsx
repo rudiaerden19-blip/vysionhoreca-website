@@ -212,15 +212,25 @@ export default function LoginPage() {
 
       const safeNext = normalizeLoginNextPath(nextParam, tenant.tenant_slug)
       const fallbackAfterLogin = `/shop/${tenant.tenant_slug}/admin`
+      const dest = safeNext || fallbackAfterLogin
+      const isKassaPosAfterLogin =
+        /\/admin\/(?:retail-kassa|kassa)(?:\/|$)/.test(dest.split('?')[0] ?? '')
 
       const host =
         typeof window !== 'undefined' ? window.location.hostname : ''
+      const origin = typeof window !== 'undefined' ? window.location.origin : ''
+
+      if (isKassaPosAfterLogin && origin) {
+        /** Volledige load: één mount → één audioscherm (geen router.push-flits). */
+        window.location.assign(`${origin}${dest.startsWith('/') ? dest : `/${dest}`}`)
+        return
+      }
+
       if (stayOnMainDomainForShopSession(host)) {
-        router.push(safeNext || fallbackAfterLogin)
+        router.push(dest)
       } else {
-        const target = safeNext || fallbackAfterLogin
-        const hostPath = internalShopPathToTenantHostPath(target, tenant.tenant_slug)
-        window.location.assign(`${window.location.origin}${hostPath}`)
+        const hostPath = internalShopPathToTenantHostPath(dest, tenant.tenant_slug)
+        window.location.assign(`${origin}${hostPath}`)
       }
       
     } catch (err) {
