@@ -428,17 +428,18 @@ function buildOpenTableOrdersMapFromRows(
 }
 
 /**
- * Supabase is bron voor elke tafel die een open order-rij heeft; lokale manden die
- * nog niet in die snapshot zitten (persist debounce / net gesleept) blijven zichtbaar
- * tot de server ze teruggeeft.
+ * Supabase is bron tussen kassa's. Alleen slots met lopende persist (timer of chain)
+ * mogen tijdelijk lokaal boven de server snapshot blijven — geen eeuwig localStorage-spook.
  */
 function mergeOpenTableOrdersServerWithPendingLocal(
   prev: Record<string, CartItem[]>,
-  fromServer: Record<string, CartItem[]>
+  fromServer: Record<string, CartItem[]>,
+  pendingLocalSlotKeys: ReadonlySet<string>,
 ): Record<string, CartItem[]> {
   const merged: Record<string, CartItem[]> = { ...fromServer }
-  for (const [k, v] of Object.entries(prev)) {
-    if (!(k in fromServer) && (v?.length ?? 0) > 0) {
+  for (const k of pendingLocalSlotKeys) {
+    const v = prev[k]
+    if ((v?.length ?? 0) > 0 && !(k in fromServer)) {
       merged[k] = v
     }
   }
@@ -1493,6 +1494,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const persistTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
   /** Één persist tegelijk per tafel-slot: voorkomt dat DELETE/INSERT door elkaar lopen (keuken ziet dan niets). */
   const openOrderPersistChainRef = useRef<Record<string, Promise<void>>>({})
+  /** Slots met lopende Supabase-persist — merge mag die kort lokaal houden. */
+  const openOrderPersistInflightRef = useRef<Set<string>>(new Set())
 
   const syncFloorPlanStatusesFromOpenOrders = useCallback(
     (ordersMap: Record<string, CartItem[]>) => {
@@ -1532,10 +1535,24 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   )
 
   const applyOpenOrdersFromServerRows = useCallback((rows: OpenTableOrderRow[] | null) => {
-    if (rows === null) return
+    if (rows === null) {
+      const ordersRaw = localStorage.getItem(tableOrdersKey)
+      if (ordersRaw) {
+        try {
+          setTableOrders(migrateLegacyTableOrdersKeys(JSON.parse(ordersRaw)))
+        } catch {
+          /* empty */
+        }
+      }
+      return
+    }
     const fromServer = buildOpenTableOrdersMapFromRows(rows)
+    const pendingLocal = new Set<string>([
+      ...Object.keys(persistTimersRef.current),
+      ...openOrderPersistInflightRef.current,
+    ])
     setTableOrders((prev) => {
-      const merged = mergeOpenTableOrdersServerWithPendingLocal(prev, fromServer)
+      const merged = mergeOpenTableOrdersServerWithPendingLocal(prev, fromServer, pendingLocal)
       localStorage.setItem(tableOrdersKey, JSON.stringify(merged))
       queueMicrotask(() => syncFloorPlanStatusesFromOpenOrders(merged))
       return merged
@@ -1682,16 +1699,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       })()
     }
 
-    const ordersRaw = localStorage.getItem(tableOrdersKey)
-    if (ordersRaw) {
-      try {
-        setTableOrders(migrateLegacyTableOrdersKeys(JSON.parse(ordersRaw)))
-      } catch {
-        /* empty */
-      }
-    }
-
     void fetchOpenTableOrdersForTenant(tenant).then(applyOpenOrdersFromServerRows)
+    // Geen localStorage vóór server: voorkomt spook-tafels die niet in Supabase staan.
     // Geen showTablePicker hier: die toggle triggert bij openen plattegrond en overschreef
     // tableOrders met een lege DB-snapshot vóór persist klaar was.
   }, [
@@ -2045,9 +2054,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const slotKey = tableOrderMapKey(zone, tblNr)
     const prev = openOrderPersistChainRef.current[slotKey] ?? Promise.resolve()
     openOrderPersistChainRef.current[slotKey] = prev
-      .then(() => persistOpenOrderRowToSupabaseImpl(zone, tblNr, items))
+      .then(() => {
+        openOrderPersistInflightRef.current.add(slotKey)
+        return persistOpenOrderRowToSupabaseImpl(zone, tblNr, items)
+      })
       .catch((err) => {
         console.warn('[kassa] open order persist:', err)
+      })
+      .finally(() => {
+        openOrderPersistInflightRef.current.delete(slotKey)
       })
   }
 
