@@ -22,7 +22,8 @@ export const RETAIL_RECEIPT_PRINT_STYLES = `
       .col-head { font-weight:bold;font-size:9px;text-transform:uppercase;letter-spacing:0.02em; }
       .item-name { flex:1;padding-right:4px; }
       .item-sub { font-size:9px;color:#333;margin:0 0 2px 0;padding-left:2px; }
-      .total-big { font-size:14px;font-weight:bold;margin:8px 0 4px; }
+      .total-big { font-size:18px;font-weight:900;margin:10px 0;padding:8px 0;border-top:2px solid #000;border-bottom:2px solid #000;letter-spacing:0.03em; }
+      .total-big span { font-weight:900; }
       .vat-block { margin-top:8px; }
       .footer-block { font-size:8px;line-height:1.45;margin-top:10px; }
       .barcode-wrap { margin-top:12px; }
@@ -63,6 +64,16 @@ function thermalMoneySigned(amount: number): string {
   const abs = Math.abs(amount)
   const core = thermalMoney(abs)
   return amount < -0.001 ? `-${core}` : core
+}
+
+/** TOTAAL-blok: dikke lijnen + regel die met TOTAAL begint (print-agent extra witruimte). */
+function appendThermalTotalEmphasis(lines: string[], total: number, totalLabel: string): void {
+  lines.push(thermalSep('='))
+  lines.push('')
+  lines.push(thermalPadRow(totalLabel.toUpperCase(), thermalMoney(total)))
+  lines.push(thermalPadRow('', thermalMoney(total)))
+  lines.push('')
+  lines.push(thermalSep('='))
 }
 
 function stripEmojiForThermal(text: string): string {
@@ -277,7 +288,7 @@ export function buildRetailThermalBonLines(opts: {
   }
 
   lines.push(thermalSepDashed())
-  lines.push(thermalPadRow(labels.total.toUpperCase(), thermalMoney(order.total)))
+  appendThermalTotalEmphasis(lines, order.total, labels.total)
   lines.push(thermalSep('-'))
   lines.push(thermalCenter(`${labels.paidWith} ${payLabel}`))
 
@@ -295,7 +306,7 @@ export function buildRetailThermalBonLines(opts: {
   for (const row of vatRows) {
     lines.push(thermalPadRow(`${row.rate}%`, thermalMoney(row.tax)))
   }
-  lines.push(thermalPadRow(labels.receiptVatSectionTotal, thermalMoney(tax)))
+  lines.push(thermalPadRow(`BTW ${labels.receiptVatSectionTotal}`, thermalMoney(tax)))
 
   appendRetailFooterThermal(tenantInfo, labels, isDraft, lines)
 
@@ -483,7 +494,7 @@ export function buildRetailKassaReceiptHtmlBody(opts: {
               `<div class="row"><span>${row.rate}%</span><span>€${row.tax.toFixed(2)}</span></div>`,
           )
           .join('')}
-        <div class="row bold"><span>${escapeReceiptHtml(labels.receiptVatSectionTotal)}</span><span>€${tax.toFixed(2)}</span></div>
+        <div class="row bold"><span>BTW ${escapeReceiptHtml(labels.receiptVatSectionTotal)}</span><span>€${tax.toFixed(2)}</span></div>
       </div>
       <div class="divider-solid"></div>
       <div class="center footer-block">
