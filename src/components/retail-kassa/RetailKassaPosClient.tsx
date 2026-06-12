@@ -2501,24 +2501,15 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               <button
                 type="button"
                 data-testid="retail-add-ok"
-                aria-live="polite"
-                className={
+                role="status"
+                tabIndex={-1}
+                aria-hidden={!addOkFlash}
+                aria-label={t('retailKassaPage.addOk')}
+                className={`pointer-events-none select-none ${
                   addOkFlash
                     ? `${retailTopNavShellClass} ${retailScanRowActionSizeClass} rounded-xl border-2 border-emerald-300/90 bg-emerald-500 font-bold text-white shadow-[0_0_22px_rgba(52,211,153,0.85)] transition-colors duration-150`
                     : `${retailScanRowActionBtnClass(false)} transition-colors duration-300`
-                }
-                onClick={() => {
-                  playClick()
-                  if (scanValue.trim()) {
-                    void processBarcode(scanValue)
-                    if (mode === 'sales') {
-                      setScanValue('')
-                      focusBarcodeCapture()
-                    }
-                  } else {
-                    releaseScanFocus()
-                  }
-                }}
+                }`}
               >
                 {t('retailKassaPage.addOk')}
               </button>
