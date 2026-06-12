@@ -71,15 +71,32 @@ function staffFirstName(full: string): string {
   return p[0] ?? full.trim()
 }
 
-/** Print Agent `encWithEuro` vouwt meerdere spaties niet meer samen; padding = 1 kolom. */
+/** Agent `encWithEuro` vouwt spaties samen — uitlijnen via tabstops (8 kol.), max 42 printkolommen. */
+const THERMAL_TAB_W = 8
+
+function thermalTabColumn(fromCol: number): number {
+  return (Math.floor(fromCol / THERMAL_TAB_W) + 1) * THERMAL_TAB_W
+}
+
 function thermalRightAlignLine(left: string, right: string): string {
   const l = left.trimEnd()
   const r = right.trim()
-  if (l.length + r.length >= RETAIL_THERMAL_W) {
-    return `${l.slice(0, RETAIL_THERMAL_W - r.length - 1)} ${r}`.slice(0, RETAIL_THERMAL_W)
+  const targetCol = RETAIL_THERMAL_W - r.length
+  if (targetCol <= 0) return r.slice(0, RETAIL_THERMAL_W)
+  if (l.length >= targetCol) {
+    return `${l.slice(0, Math.max(0, targetCol - 1))} ${r}`.slice(0, RETAIL_THERMAL_W)
   }
-  const gap = Math.max(1, RETAIL_THERMAL_W - l.length - r.length)
-  return l + ' '.repeat(gap) + r
+  let col = l.length
+  let tabs = ''
+  while (col < targetCol && tabs.length < 6) {
+    tabs += '\t'
+    col = thermalTabColumn(col)
+  }
+  if (col + r.length > RETAIL_THERMAL_W) {
+    const maxL = RETAIL_THERMAL_W - r.length - 1
+    return `${l.slice(0, Math.max(0, maxL))} ${r}`.slice(0, RETAIL_THERMAL_W)
+  }
+  return l + tabs + r
 }
 
 function thermalPadMoney(left: string, amount: number): string {
@@ -94,17 +111,25 @@ function thermalCenter(text: string): string {
   const t = text.replace(/\s+/g, ' ').trim()
   if (!t) return ''
   if (t.length >= RETAIL_THERMAL_W) return t.slice(0, RETAIL_THERMAL_W)
-  const leftPad = Math.floor((RETAIL_THERMAL_W - t.length) / 2)
-  return ' '.repeat(leftPad) + t
+  const startCol = Math.floor((RETAIL_THERMAL_W - t.length) / 2)
+  let col = 0
+  let tabs = ''
+  while (col < startCol && tabs.length < 6) {
+    tabs += '\t'
+    col = thermalTabColumn(col)
+  }
+  if (col + t.length > RETAIL_THERMAL_W) return t.slice(0, RETAIL_THERMAL_W)
+  return tabs + t
 }
 
 /** Print-agent herkent `Nx …` en zet extra witruimte tussen artikelregels. */
 function thermalItemRow(qty: number, name: string, lineTotal: number): string {
   const price = formatEuroThermal(lineTotal)
+  const targetCol = RETAIL_THERMAL_W - price.length
   const prefix = `${qty}x `
-  const maxNameLen = RETAIL_THERMAL_W - prefix.length - price.length - 1
   let productName = capitalizeProductName(name)
-  if (maxNameLen > 0 && productName.length > maxNameLen) {
+  const maxNameLen = Math.max(1, targetCol - prefix.length - 1)
+  if (productName.length > maxNameLen) {
     productName = `${productName.slice(0, Math.max(1, maxNameLen - 1))}.`
   }
   return thermalRightAlignLine(`${prefix}${productName}`, price)
@@ -176,16 +201,17 @@ function appendRetailLoyaltyThermal(
   const L = order.retailLoyalty
   if (!L || !labels.loyaltyBalanceLine) return
   lines.push('')
+  lines.push('')
   if (L.memberLabel && labels.loyaltyPassLabel) {
-    lines.push(thermalPlainLine(labels.loyaltyPassLabel(L.memberLabel)))
+    lines.push(thermalCenter(thermalPlainLine(labels.loyaltyPassLabel(L.memberLabel))))
   }
   if (L.pointsRedeemed > 0 && labels.loyaltyRedeemedLine) {
-    lines.push(thermalPlainLine(labels.loyaltyRedeemedLine(L.pointsRedeemed)))
+    lines.push(thermalCenter(thermalPlainLine(labels.loyaltyRedeemedLine(L.pointsRedeemed))))
   }
   if (L.pointsEarned > 0 && labels.loyaltyEarnedLine) {
-    lines.push(thermalPlainLine(labels.loyaltyEarnedLine(L.pointsEarned)))
+    lines.push(thermalCenter(thermalPlainLine(labels.loyaltyEarnedLine(L.pointsEarned))))
   }
-  lines.push(thermalPlainLine(labels.loyaltyBalanceLine(L.pointsBalance)))
+  lines.push(thermalCenter(thermalPlainLine(labels.loyaltyBalanceLine(L.pointsBalance))))
 }
 
 function appendHelpedByThermal(
@@ -196,8 +222,8 @@ function appendHelpedByThermal(
   const raw = order.helpedByStaffName?.trim()
   if (!raw || !labels.helpedByIntro) return
   lines.push('')
-  lines.push(thermalPlainLine(labels.helpedByIntro))
-  lines.push(thermalPlainLine(staffFirstName(raw)))
+  lines.push(thermalCenter(thermalPlainLine(labels.helpedByIntro)))
+  lines.push(thermalCenter(thermalPlainLine(staffFirstName(raw))))
 }
 
 function appendItemsThermal(order: KassaLastOrderReceipt, lines: string[]): void {
@@ -303,8 +329,8 @@ export function buildRetailThermalBonLines(opts: {
   appendHelpedByThermal(order, labels, lines)
 
   lines.push('')
-  lines.push(thermalPlainLine(isDraft ? labels.draftFooter : labels.thanks))
-  if (!isDraft) lines.push(thermalPlainLine(labels.thanksFarewell))
+  lines.push(thermalCenter(thermalPlainLine(isDraft ? labels.draftFooter : labels.thanks)))
+  if (!isDraft) lines.push(thermalCenter(thermalPlainLine(labels.thanksFarewell)))
   lines.push('')
   lines.push(labels.paymentMethodLine(payLabel).slice(0, RETAIL_THERMAL_W))
   lines.push('')
