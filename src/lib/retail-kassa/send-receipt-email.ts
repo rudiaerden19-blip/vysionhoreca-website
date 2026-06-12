@@ -4,26 +4,89 @@ import type { KassaLastOrderReceipt } from '@/lib/kassa-cart-types'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { buildRetailKassaReceiptHtmlDocument } from '@/lib/retail-kassa-receipt'
 import { retailReceiptI18nForLocale } from '@/lib/retail-kassa/receipt-email-labels'
-import { createMailTransporter, resolveTenantSmtp } from '@/lib/retail-loyalty/tenant-smtp'
-import {
-  formatFromAddress,
-  loadTenantShopContact,
-  transactionalMailHeaders,
-} from '@/lib/retail-loyalty/transactional-email'
+import { createMailTransporter, type TenantSmtpConfig } from '@/lib/retail-loyalty/tenant-smtp'
+import { formatFromAddress, transactionalMailHeaders } from '@/lib/retail-loyalty/transactional-email'
 import { logger } from '@/lib/logger'
 
-async function loadTenantSettingsForReceipt(
+async function loadTenantContextForReceiptEmail(
   supabase: SupabaseClient,
   tenantSlug: string,
-): Promise<TenantSettings | null> {
+): Promise<
+  | {
+      ok: true
+      tenantInfo: TenantSettings | null
+      contact: { businessName: string; replyToEmail: string | null; phone: string | null }
+      smtp: TenantSmtpConfig
+    }
+  | { ok: false; error: 'smtp_not_configured' }
+> {
   const { data } = await supabase
     .from('tenant_settings')
     .select(
-      'tenant_slug, business_name, address, postal_code, city, phone, email, website, btw_number, btw_percentage',
+      'tenant_slug, business_name, address, postal_code, city, phone, email, website, btw_number, btw_percentage, smtp_host, smtp_port, smtp_user, smtp_password, smtp_from_name',
     )
     .eq('tenant_slug', tenantSlug)
     .maybeSingle()
-  return (data as TenantSettings | null) ?? null
+
+  if (!data) {
+    const hasZoho = !!(process.env.ZOHO_EMAIL && process.env.ZOHO_PASSWORD)
+    if (!hasZoho) return { ok: false, error: 'smtp_not_configured' }
+    return {
+      ok: true,
+      tenantInfo: null,
+      contact: { businessName: tenantSlug, replyToEmail: null, phone: null },
+      smtp: {
+        host: 'smtp.zoho.eu',
+        port: 465,
+        user: process.env.ZOHO_EMAIL!.trim(),
+        pass: process.env.ZOHO_PASSWORD!.trim(),
+        fromName: "Vysion kassa's",
+      },
+    }
+  }
+
+  const row = data as TenantSettings & {
+    smtp_host?: string | null
+    smtp_port?: number | null
+    smtp_user?: string | null
+    smtp_password?: string | null
+    smtp_from_name?: string | null
+  }
+
+  let smtpHost = 'smtp.zoho.eu'
+  let smtpPort = 465
+  let smtpUser = process.env.ZOHO_EMAIL || ''
+  let smtpPass = process.env.ZOHO_PASSWORD || ''
+  let fromName = row.business_name?.trim() || "Vysion kassa's"
+
+  if (row.smtp_host && row.smtp_user && row.smtp_password?.trim()) {
+    smtpHost = row.smtp_host
+    smtpPort = row.smtp_port || 465
+    smtpUser = row.smtp_user
+    smtpPass = row.smtp_password
+    fromName = row.smtp_from_name || row.business_name || fromName
+  } else if (!process.env.ZOHO_EMAIL || !process.env.ZOHO_PASSWORD) {
+    return { ok: false, error: 'smtp_not_configured' }
+  }
+
+  const contact = {
+    businessName: row.business_name?.trim() || row.smtp_from_name?.trim() || tenantSlug,
+    replyToEmail: row.email?.trim().toLowerCase() || null,
+    phone: row.phone?.trim() || null,
+  }
+
+  return {
+    ok: true,
+    tenantInfo: row as TenantSettings,
+    contact,
+    smtp: {
+      host: smtpHost,
+      port: smtpPort,
+      user: smtpUser.trim(),
+      pass: smtpPass.trim(),
+      fromName,
+    },
+  }
 }
 
 function buildReceiptPlainText(
@@ -57,11 +120,10 @@ export async function sendRetailKassaReceiptEmail(opts: {
   const supabase = getServerSupabaseClient()
   if (!supabase) return { ok: false, error: 'db_unavailable' }
 
-  const smtpRes = await resolveTenantSmtp(supabase, opts.tenantSlug)
-  if (!smtpRes.ok) return { ok: false, error: smtpRes.error }
+  const ctx = await loadTenantContextForReceiptEmail(supabase, opts.tenantSlug)
+  if (!ctx.ok) return { ok: false, error: ctx.error }
 
-  const tenantInfo = await loadTenantSettingsForReceipt(supabase, opts.tenantSlug)
-  const contact = await loadTenantShopContact(supabase, opts.tenantSlug)
+  const { tenantInfo, contact, smtp } = ctx
   const labels = retailReceiptI18nForLocale(opts.locale)
   const html = buildRetailKassaReceiptHtmlDocument({
     tenantInfo,
@@ -70,8 +132,7 @@ export async function sendRetailKassaReceiptEmail(opts: {
     locale: opts.locale,
   })
 
-  const shopName =
-    tenantInfo?.business_name?.trim() || contact.businessName || smtpRes.smtp.fromName.trim()
+  const shopName = tenantInfo?.business_name?.trim() || contact.businessName || smtp.fromName.trim()
   const ref =
     opts.order.checkoutReference ??
     (opts.order.orderNumber > 0 ? String(opts.order.orderNumber) : '')
@@ -80,12 +141,12 @@ export async function sendRetailKassaReceiptEmail(opts: {
     : `${shopName} – ${labels.thanks}`
 
   const text = buildReceiptPlainText(opts.order, labels, shopName, ref)
-  const replyTo = contact.replyToEmail || smtpRes.smtp.user
+  const replyTo = contact.replyToEmail || smtp.user
 
-  const transporter = createMailTransporter(smtpRes.smtp)
+  const transporter = createMailTransporter(smtp)
   try {
     await transporter.sendMail({
-      from: formatFromAddress(shopName, smtpRes.smtp.user),
+      from: formatFromAddress(shopName, smtp.user),
       to: email,
       replyTo,
       subject,

@@ -2031,7 +2031,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               }
               return
             }
-            alert(t('retailKassaPage.receiptEmailSent'))
+            setShowSuccessModal(false)
+            focusBarcodeCapture()
           }}
         />
       ) : null}
