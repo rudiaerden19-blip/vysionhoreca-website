@@ -2637,6 +2637,35 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     [numpadPanelVisible, cart.length, parkedOnTableLines.length],
   )
 
+  /** Hoeveelheid aanpassen of regel verwijderen uit «Al op tafel» (niet uit de kar). */
+  const updateParkedOnTableQty = (cartKey: string, qty: number) => {
+    if (!activeTableSlotKey || !tableNumber || orderType !== 'DINE_IN') return
+    if (demoViewOnly) return
+    const zone = dineInFloorZone
+    const tbl = tableNumber
+    if (qty <= 0) scheduleKassaTapSound(playRemove)
+    else scheduleKassaTapSound(playClick)
+    setTableOrders((prev) => {
+      const lines = prev[activeTableSlotKey] ?? []
+      const updated =
+        qty <= 0
+          ? lines.filter((i) => i.cartKey !== cartKey)
+          : lines.map((i) => (i.cartKey === cartKey ? { ...i, quantity: qty } : i))
+      const next = { ...prev, [activeTableSlotKey]: updated }
+      localStorage.setItem(tableOrdersKey, JSON.stringify(next))
+      updateTableStatus(tbl, updated.length > 0, zone)
+      if (updated.length === 0) {
+        try {
+          removeBarBonWatermarkSlot(tenant, activeTableSlotKey)
+        } catch {
+          /* storage mag tafel-sync niet breken */
+        }
+      }
+      schedulePersistOpenOrder(zone, tbl, updated)
+      return next
+    })
+  }
+
   /** Volledige rekening (op tafel + deze ronde) voor totaal, betalen en voorlopige bon. */
   const billLines = useMemo((): CartItem[] => {
     if (activeTableSlotKey) return mergeCartLinesForTable(parkedOnTableLines, cart)
@@ -4419,6 +4448,66 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     )
   }
 
+  const renderParkedOnTableLine = (item: (typeof parkedLinesByCategory)[number]) => {
+    const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
+    const lineTotal = ((item.product.price + choicesTotal) * item.quantity).toFixed(2)
+    return (
+      <div
+        key={`parked-${item.cartKey}`}
+        className={`flex items-center gap-2 rounded-lg px-2 py-1.5 ${ui.cartRowBg}`}
+      >
+        <div className="min-w-0 flex-1">
+          <p className={`truncate text-sm font-semibold ${ui.cartTitle}`}>{item.product.name}</p>
+          {item.choices && item.choices.length > 0 ? (
+            <p className={`truncate text-xs ${ui.cartChoices}`}>{item.choices.map((c) => c.choiceName).join(', ')}</p>
+          ) : null}
+          <p className={`text-xs ${ui.cartChoices}`}>
+            {item.quantity}× · €{lineTotal}
+          </p>
+        </div>
+        {!demoViewOnly ? (
+          <div className="flex shrink-0 items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => updateParkedOnTableQty(item.cartKey, item.quantity - 1)}
+              className={
+                kassaAppearanceDark
+                  ? `touch-manipulation ${kassaPosCartQtyButtonClass(cartLineQtyBtnCompact)}`
+                  : `touch-manipulation rounded-lg bg-red-500 text-white font-bold flex items-center justify-center hover:bg-red-600 active:brightness-95 ${
+                      cartLineQtyBtnCompact ? 'h-8 w-8 text-base' : 'h-9 w-9 text-lg'
+                    }`
+              }
+              aria-label={item.quantity === 1 ? t('kassaApp.ariaRemoveLine') : t('kassaApp.ariaDecreaseQty')}
+            >
+              {item.quantity === 1 ? (
+                <span className={kassaAppearanceDark ? 'text-[1.05rem] leading-none' : undefined} aria-hidden>
+                  🗑
+                </span>
+              ) : (
+                '−'
+              )}
+            </button>
+            <span className={`w-6 text-center text-base font-bold ${ui.numpadInput}`}>{item.quantity}</span>
+            <button
+              type="button"
+              onClick={() => updateParkedOnTableQty(item.cartKey, item.quantity + 1)}
+              className={
+                kassaAppearanceDark
+                  ? `touch-manipulation ${kassaPosCartQtyButtonClass(cartLineQtyBtnCompact)}`
+                  : `touch-manipulation rounded-lg bg-[#3C4D6B] text-white font-bold flex items-center justify-center hover:bg-[#2D3A52] active:brightness-95 ${
+                      cartLineQtyBtnCompact ? 'h-8 w-8 text-base' : 'h-9 w-9 text-lg'
+                    }`
+              }
+              aria-label={t('kassaApp.ariaIncreaseQty')}
+            >
+              +
+            </button>
+          </div>
+        ) : null}
+      </div>
+    )
+  }
+
   const sidebarCartSectionLabelClass = kassaAppearanceDark
     ? 'shrink-0 text-[11px] font-bold uppercase tracking-[0.14em] text-white/90'
     : `shrink-0 text-[10px] font-bold uppercase tracking-wide ${ui.numpadMeta}`
@@ -5233,22 +5322,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                         : 'space-y-1'
                     }
                   >
-                    {parkedLinesByCategory.map((item) => {
-                      const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
-                      return (
-                        <div
-                          key={`parked-${item.cartKey}`}
-                          className={`flex items-center gap-2 rounded-lg px-2 py-1.5 opacity-80 ${ui.cartRowBg}`}
-                        >
-                          <div className="flex-1 min-w-0">
-                            <p className={`truncate text-sm font-semibold ${ui.cartTitle}`}>{item.product.name}</p>
-                            <p className={`text-xs ${ui.cartChoices}`}>
-                              {item.quantity}× · €{((item.product.price + choicesTotal) * item.quantity).toFixed(2)}
-                            </p>
-                          </div>
-                        </div>
-                      )
-                    })}
+                    {parkedLinesByCategory.map(renderParkedOnTableLine)}
                   </div>
                 </div>
               ) : null}
@@ -5271,22 +5345,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     {t('kassaApp.parkedOnTableSection')}
                   </p>
                   <div className="space-y-1">
-                    {parkedLinesByCategory.map((item) => {
-                      const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
-                      return (
-                        <div
-                          key={`parked-cart-${item.cartKey}`}
-                          className={`flex items-center gap-2 rounded-lg px-2 py-1.5 opacity-80 ${ui.cartRowBg}`}
-                        >
-                          <div className="flex-1 min-w-0">
-                            <p className={`truncate text-sm font-semibold ${ui.cartTitle}`}>{item.product.name}</p>
-                            <p className={`text-xs ${ui.cartChoices}`}>
-                              {item.quantity}× · €{((item.product.price + choicesTotal) * item.quantity).toFixed(2)}
-                            </p>
-                          </div>
-                        </div>
-                      )
-                    })}
+                    {parkedLinesByCategory.map(renderParkedOnTableLine)}
                   </div>
                 </div>
               ) : null}
@@ -5507,22 +5566,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     {t('kassaApp.parkedOnTableSection')}
                   </p>
                   <div className="space-y-1">
-                    {parkedLinesByCategory.map((item) => {
-                      const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
-                      return (
-                        <div
-                          key={`parked-${item.cartKey}`}
-                          className={`flex items-center gap-2 rounded-lg px-2 py-1.5 opacity-80 ${ui.cartRowBg}`}
-                        >
-                          <div className="flex-1 min-w-0">
-                            <p className={`truncate text-sm font-semibold ${ui.cartTitle}`}>{item.product.name}</p>
-                            <p className={`text-xs ${ui.cartChoices}`}>
-                              {item.quantity}× · €{((item.product.price + choicesTotal) * item.quantity).toFixed(2)}
-                            </p>
-                          </div>
-                        </div>
-                      )
-                    })}
+                    {parkedLinesByCategory.map(renderParkedOnTableLine)}
                   </div>
                 </div>
               ) : null}
