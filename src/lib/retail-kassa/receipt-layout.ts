@@ -71,15 +71,33 @@ function staffFirstName(full: string): string {
   return p[0] ?? full.trim()
 }
 
-/** Alleen 7-bit ASCII in bonInhoud — agent zet NBSP/UTF‑8 op `?`. Spaties = 1 kolom op 80mm. */
+/** Print Agent `encWithEuro` vouwt `  +` spaties samen → geen space-padding. Tabs (8 kol.) blijven staan. */
+const THERMAL_TAB_WIDTH = 8
+
+function thermalNextTabColumn(fromCol: number): number {
+  return (Math.floor(fromCol / THERMAL_TAB_WIDTH) + 1) * THERMAL_TAB_WIDTH
+}
+
+function thermalTabsToColumn(fromCol: number, targetCol: number): string {
+  let col = fromCol
+  let tabs = ''
+  let guard = 0
+  while (col < targetCol && guard++ < 14) {
+    tabs += '\t'
+    col = thermalNextTabColumn(col)
+  }
+  return tabs
+}
+
 function thermalRightAlignLine(left: string, right: string): string {
   const l = left.trimEnd()
   const r = right.trim()
-  if (l.length + r.length >= RETAIL_THERMAL_W) {
-    return `${l.slice(0, RETAIL_THERMAL_W - r.length - 1)} ${r}`.slice(0, RETAIL_THERMAL_W)
+  const targetCol = RETAIL_THERMAL_W - r.length
+  if (targetCol <= 0) return r.slice(0, RETAIL_THERMAL_W)
+  if (l.length >= targetCol) {
+    return `${l.slice(0, targetCol - 1)} ${r}`.slice(0, RETAIL_THERMAL_W)
   }
-  const gap = Math.max(1, RETAIL_THERMAL_W - l.length - r.length)
-  return l + ' '.repeat(gap) + r
+  return l + thermalTabsToColumn(l.length, targetCol) + r
 }
 
 function thermalPadMoney(left: string, amount: number): string {
@@ -94,8 +112,8 @@ function thermalCenter(text: string): string {
   const t = text.replace(/\s+/g, ' ').trim()
   if (!t) return ''
   if (t.length >= RETAIL_THERMAL_W) return t.slice(0, RETAIL_THERMAL_W)
-  const leftPad = Math.floor((RETAIL_THERMAL_W - t.length) / 2)
-  return ' '.repeat(leftPad) + t
+  const startCol = Math.floor((RETAIL_THERMAL_W - t.length) / 2)
+  return thermalTabsToColumn(0, startCol) + t
 }
 
 /** Print-agent herkent `Nx …` en zet extra witruimte tussen artikelregels. */
@@ -112,7 +130,7 @@ function thermalItemRow(qty: number, name: string, lineTotal: number): string {
 
 function thermalSectionTitle(title: string, lines: string[]): void {
   lines.push('')
-  lines.push(thermalCenter(title.toUpperCase()))
+  lines.push(title.toUpperCase())
   lines.push('')
 }
 
@@ -290,9 +308,7 @@ export function buildRetailThermalBonLines(opts: {
   lines.push(thermalPadMoney(labels.receivedLabel, order.total))
   lines.push(thermalPadMoney(labels.changeLabel, 0))
   lines.push('')
-  lines.push(
-    thermalCenter(stripEmojiForThermal(labels.paymentMethodLine(payLabel).slice(0, RETAIL_THERMAL_W))),
-  )
+  lines.push(labels.paymentMethodLine(payLabel).slice(0, RETAIL_THERMAL_W))
   lines.push('')
 
   appendRetailLoyaltyThermal(order, labels, lines)
