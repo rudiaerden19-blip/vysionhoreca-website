@@ -20,16 +20,15 @@ export const RETAIL_RECEIPT_PRINT_STYLES = `
       .retail-logo { max-width:120px;max-height:64px;margin:0 auto 8px;display:block;object-fit:contain; }
       .retail-name { font-size:14px;font-weight:700;margin:2px 0; }
       .retail-header .small { font-size:10px;line-height:1.45; }
-      .meta-row { display:flex;justify-content:space-between;align-items:baseline;font-size:10px;margin:6px 0; }
-      .rule-thin { border:none;border-top:1px solid #000;margin:8px 0; }
-      .section-bar { display:block;width:100%;box-sizing:border-box;background:#000;color:#fff;font-weight:700;font-size:11px;padding:6px 10px;margin:10px 0 8px;letter-spacing:0.06em;text-transform:uppercase; }
+      .meta-row { display:flex;justify-content:space-between;align-items:baseline;font-size:10px;margin:10px 0 6px; }
+      .section-bar { display:block;width:100%;box-sizing:border-box;background:#000;color:#fff;font-weight:700;font-size:11px;padding:6px 10px;margin:12px 0 8px;letter-spacing:0.06em;text-transform:uppercase; }
+      .section-bar:first-of-type { margin-top:4px; }
       .retail-item { display:grid;grid-template-columns:20px 1fr auto;gap:6px;align-items:baseline;margin:4px 0;font-size:11px; }
       .retail-item-extra { padding-left:26px;margin:2px 0;font-size:10px; }
       .amt { font-family:'Courier New',Courier,monospace;font-weight:700;text-align:right;white-space:nowrap; }
       .money-row { display:flex;justify-content:space-between;align-items:baseline;margin:3px 0;font-size:11px; }
       .money-row .amt { min-width:9ch; }
-      .rule-grand { border:none;border-top:3px double #000;margin:8px 0; }
-      .retail-grand { display:flex;justify-content:space-between;align-items:baseline;font-size:24px;font-weight:900;margin:6px 0;line-height:1.1; }
+      .retail-grand { display:flex;justify-content:space-between;align-items:baseline;font-size:24px;font-weight:900;margin:10px 0;padding:8px 0;border-top:2px solid #000;border-bottom:2px solid #000;line-height:1.1; }
       .retail-grand .amt { font-size:24px;font-weight:900; }
       .pay-line { margin:4px 0;font-size:11px; }
       .vat-head, .vat-row { display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;font-size:10px;margin:3px 0; }
@@ -63,19 +62,18 @@ function formatEuroThermal(amount: number): string {
   return `EUR ${formatAmountComma(amount)}`
 }
 
-function thermalSepThin(): string {
-  return '-'.repeat(RETAIL_THERMAL_W)
+const THERMAL_PRICE_W = 12
+
+function thermalPadMoney(left: string, amount: number): string {
+  const r = formatEuroThermal(amount).padStart(THERMAL_PRICE_W)
+  const maxLeft = RETAIL_THERMAL_W - THERMAL_PRICE_W
+  const l = left.trimEnd().slice(0, maxLeft)
+  return l.padEnd(maxLeft, ' ') + r
 }
 
-function thermalSepGrand(): string {
-  return '='.repeat(RETAIL_THERMAL_W)
-}
-
-/** Simuleert zwarte sectiebalk (agent = platte tekst). */
-function thermalSectionBar(title: string): string[] {
-  const fill = '#'.repeat(RETAIL_THERMAL_W)
-  const label = title.trim().toUpperCase().slice(0, RETAIL_THERMAL_W)
-  return [fill, label.padEnd(RETAIL_THERMAL_W, ' '), fill]
+/** Sectietitel — één regel, geen streepjes (zwarte balk alleen in HTML). */
+function thermalSectionTitleLines(title: string): string[] {
+  return [title.trim().toUpperCase()]
 }
 
 function thermalPadRow(left: string, right: string): string {
@@ -96,12 +94,11 @@ function thermalCenter(text: string): string {
 }
 
 function thermalItemRow(qty: number, name: string, lineTotal: number): string {
-  const price = formatEuroThermal(lineTotal)
   const q = String(qty)
-  const maxName = RETAIL_THERMAL_W - q.length - 1 - price.length - 1
+  const maxName = RETAIL_THERMAL_W - THERMAL_PRICE_W - q.length - 1
   let n = name.trim()
   if (maxName > 2 && n.length > maxName) n = `${n.slice(0, maxName - 1)}.`
-  return thermalPadRow(`${q} ${n}`, price)
+  return thermalPadMoney(`${q} ${n}`, lineTotal)
 }
 
 function thermalVatGridRow(row: RetailVatDisplayRow): string {
@@ -236,7 +233,6 @@ export function buildRetailThermalBonLines(opts: {
   const discountEuro = Math.round((itemsGrossIncl(order) - order.total) * 100) / 100
   const lines: string[] = []
 
-  lines.push('')
   lines.push(thermalCenter(bizName))
   if (tenantInfo?.address) lines.push(thermalCenter(tenantInfo.address.trim()))
   if (tenantInfo?.postal_code || tenantInfo?.city) {
@@ -245,11 +241,11 @@ export function buildRetailThermalBonLines(opts: {
   if (tenantInfo?.phone?.trim()) {
     lines.push(thermalCenter(`${labels.telPrefix} ${tenantInfo.phone.trim()}`))
   }
-  lines.push(thermalSepThin())
+  lines.push('')
 
   if (isDraft) {
     lines.push(thermalCenter(labels.draftBanner.toUpperCase()))
-    lines.push(thermalSepThin())
+    lines.push('')
   }
 
   const invoice = order.retailCustomerInvoice
@@ -259,43 +255,45 @@ export function buildRetailThermalBonLines(opts: {
     if (invoice.addressLine) lines.push(invoice.addressLine.trim())
     if (invoice.postalCity) lines.push(invoice.postalCity.trim())
     lines.push(labels.customerVatLabel(invoice.vatNumber))
-    lines.push(thermalSepThin())
+    lines.push('')
   }
 
   lines.push(thermalPadRow(`${labels.receiptBonNrPrefix}${receiptRefDisplay}`, dateStr))
   lines.push('')
 
-  lines.push(...thermalSectionBar(labels.sectionOrderBar))
+  lines.push(...thermalSectionTitleLines(labels.sectionOrderBar))
   appendItemsThermal(order, lines)
   if (discountEuro > 0.009) {
-    lines.push(thermalPadRow(labels.receiptDiscount, `-${formatEuroThermal(discountEuro)}`))
+    const r = `-${formatEuroThermal(discountEuro)}`.padStart(THERMAL_PRICE_W)
+    const maxLeft = RETAIL_THERMAL_W - THERMAL_PRICE_W
+    lines.push(labels.receiptDiscount.slice(0, maxLeft).padEnd(maxLeft, ' ') + r)
   }
-  lines.push(thermalSepThin())
+  lines.push('')
 
-  lines.push(...thermalSectionBar(labels.sectionTotalBar))
-  lines.push(thermalPadRow(labels.subtotal, formatEuroThermal(subtotalExcl)))
+  lines.push(...thermalSectionTitleLines(labels.sectionTotalBar))
+  lines.push(thermalPadMoney(labels.subtotal, subtotalExcl))
   if (vatRows.length > 1) {
     for (const row of vatRows) {
-      lines.push(thermalPadRow(labels.vatLabel(row.rate), formatEuroThermal(row.tax)))
+      lines.push(thermalPadMoney(labels.vatLabel(row.rate), row.tax))
     }
   } else {
-    lines.push(thermalPadRow(labels.vatSingleLabel, formatEuroThermal(taxTotal)))
+    lines.push(thermalPadMoney(labels.vatSingleLabel, taxTotal))
   }
-  lines.push(thermalSepGrand())
-  lines.push(thermalPadRow(labels.total.toUpperCase(), formatEuroThermal(order.total)))
-  lines.push(thermalSepGrand())
-  lines.push(thermalPadRow(labels.receivedLabel, formatEuroThermal(order.total)))
-  lines.push(thermalPadRow(labels.changeLabel, formatEuroThermal(0)))
+  lines.push('')
+  lines.push(thermalPadMoney(labels.total.toUpperCase(), order.total))
+  lines.push('')
+  lines.push(thermalPadMoney(labels.receivedLabel, order.total))
+  lines.push(thermalPadMoney(labels.changeLabel, 0))
   lines.push(labels.paymentMethodLine(payLabel).slice(0, RETAIL_THERMAL_W))
   lines.push('')
 
-  lines.push(...thermalSectionBar(labels.sectionVatBar))
+  lines.push(...thermalSectionTitleLines(labels.sectionVatBar))
   const vh = `${labels.vatColBtwPct.padEnd(6)}${labels.vatColBtw.padStart(6)}${labels.vatColExcl.padStart(8)}${labels.vatColIncl.padStart(8)}`
   lines.push(vh.slice(0, RETAIL_THERMAL_W))
   for (const row of vatRows) {
     lines.push(thermalVatGridRow(row))
   }
-  lines.push(thermalSepThin())
+  lines.push('')
 
   appendRetailLoyaltyThermal(order, labels, lines)
 
@@ -406,7 +404,6 @@ export function buildRetailKassaReceiptHtmlBody(opts: {
             : ''
         }
       </div>
-      <hr class="rule-thin" />
       ${isDraft ? `<div class="draft-banner">${escapeReceiptHtml(labels.draftBanner)}</div>` : ''}
       ${
         invoice
@@ -414,8 +411,7 @@ export function buildRetailKassaReceiptHtmlBody(opts: {
       <div class="small">${escapeReceiptHtml(invoice.name)}</div>
       ${invoice.addressLine ? `<div class="small">${escapeReceiptHtml(invoice.addressLine)}</div>` : ''}
       ${invoice.postalCity ? `<div class="small">${escapeReceiptHtml(invoice.postalCity)}</div>` : ''}
-      <div class="small bold">${escapeReceiptHtml(labels.customerVatLabel(invoice.vatNumber))}</div>
-      <hr class="rule-thin" />`
+      <div class="small bold">${escapeReceiptHtml(labels.customerVatLabel(invoice.vatNumber))}</div>`
           : ''
       }
       <div class="meta-row">
@@ -429,16 +425,13 @@ export function buildRetailKassaReceiptHtmlBody(opts: {
           ? `<div class="money-row"><span>${escapeReceiptHtml(labels.receiptDiscount)}</span><span class="amt">-${formatEuroHtml(discountEuro)}</span></div>`
           : ''
       }
-      <hr class="rule-thin" />
       <div class="section-bar">${escapeReceiptHtml(labels.sectionTotalBar)}</div>
       <div class="money-row"><span>${escapeReceiptHtml(labels.subtotal)}</span><span class="amt">${formatEuroHtml(subtotalExcl)}</span></div>
       ${vatSummaryRows}
-      <hr class="rule-grand" />
       <div class="retail-grand">
         <span>${escapeReceiptHtml(labels.total.toUpperCase())}</span>
         <span class="amt">${formatEuroHtml(order.total)}</span>
       </div>
-      <hr class="rule-grand" />
       <div class="money-row"><span>${escapeReceiptHtml(labels.receivedLabel)}</span><span class="amt">${formatEuroHtml(order.total)}</span></div>
       <div class="money-row"><span>${escapeReceiptHtml(labels.changeLabel)}</span><span class="amt">${formatEuroHtml(0)}</span></div>
       <div class="pay-line">${escapeReceiptHtml(labels.paymentMethodLine(payLabel))}</div>
@@ -455,7 +448,6 @@ export function buildRetailKassaReceiptHtmlBody(opts: {
             `<div class="vat-row"><span>${Math.round(row.rate)}%</span><span class="amt">${formatAmountComma(row.tax)}</span><span class="amt">${formatAmountComma(row.excl)}</span><span class="amt">${formatAmountComma(row.incl)}</span></div>`,
         )
         .join('')}
-      <hr class="rule-thin" />
       ${loyaltyHtml}
       ${
         order.helpedByStaffName?.trim() && labels.helpedByLine
