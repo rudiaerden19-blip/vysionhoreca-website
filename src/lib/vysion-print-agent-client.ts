@@ -48,34 +48,8 @@ export type VysionPrintAgentBody = {
   copies?: number
   /** Open kassa-lade (drawer-kick) na het printen. */
   openDrawer?: boolean
-  /** "kassa" (default), "keuken", of "retail" (winkelkassa POS). */
-  receiptMode?: 'kassa' | 'keuken' | 'retail'
-  /** Alleen bij receiptMode `retail` — labels + footer voor buildRetailKassaReceipt in de agent. */
-  retailBon?: VysionPrintAgentRetailBon
-}
-
-export type VysionPrintAgentRetailBon = {
-  dateStr: string
-  receiptRef: string | number
-  isDraft?: boolean
-  discountEuro?: number
-  changeAmount?: number
-  payLine?: string
-  businessVatLine?: string
-  telLine?: string
-  centerLines?: string[]
-  labels: {
-    receiptBonNrPrefix: string
-    sectionOrderBar: string
-    sectionTotalBar: string
-    subtotal: string
-    vatSingleLabel: string
-    total: string
-    receivedLabel: string
-    changeLabel: string
-    receiptDiscount?: string
-    draftBanner?: string
-  }
+  /** "kassa" (default, volledige bon) of "keuken" (compacte keukenbon). */
+  receiptMode?: 'kassa' | 'keuken'
 }
 
 /** Zelfde JSON als POST /print — Android-app (PrintBridgeActivity) verwacht identieke structuur. */
@@ -87,7 +61,6 @@ function buildAgentRequestPayload(body: VysionPrintAgentBody) {
     receiptText: body.receiptText ?? body.bonInhoud ?? '',
     orderData: body.orderData,
     businessInfo: body.businessInfo,
-    retailBon: body.retailBon,
     copies: body.copies,
     openDrawer: body.openDrawer === true,
     receiptMode: body.receiptMode || 'kassa',
