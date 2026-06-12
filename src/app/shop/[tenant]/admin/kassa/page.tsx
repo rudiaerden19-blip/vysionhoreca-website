@@ -2182,6 +2182,25 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
   }
 
+  /** Karronde naar tafelmand + keuken/kassa-delta; tafel blijft geselecteerd (sync Supabase). */
+  const parkOrder = (opts: { printKitchen: boolean; printKassaSlip: boolean }) => {
+    if (orderType !== 'DINE_IN' || !tableNumber || cart.length === 0) return
+    const snap = snapshotCartItemsForAsyncPrint(cart)
+    const zone = dineInFloorZone
+    const tbl = tableNumber
+    const slotKey = tableOrderMapKey(zone, tbl)
+    setTableOrders((prev) => {
+      const merged = mergeCartLinesForTable(prev[slotKey] || [], cart)
+      const next = { ...prev, [slotKey]: merged }
+      localStorage.setItem(tableOrdersKey, JSON.stringify(next))
+      updateTableStatus(tbl, merged.length > 0, zone)
+      schedulePersistOpenOrder(zone, tbl, merged)
+      return next
+    })
+    void flushBarDeltaSlipRef.current(zone, tbl, snap, opts)
+    setCart([])
+  }
+
   // Betaling
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
@@ -5681,6 +5700,28 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 <span className={kassaSidebarActionLabelClass}>{t('kassaApp.remove')}</span>
               </button>
             </div>
+            {orderType === 'DINE_IN' && tableNumber && cart.length > 0 && (
+              <div className="flex w-full gap-2.5 touch-manipulation select-none" data-testid="kassa-park-table-split">
+                <button
+                  type="button"
+                  onClick={() => parkOrder({ printKitchen: true, printKassaSlip: false })}
+                  className={`min-w-0 flex-1 font-semibold flex items-center justify-center text-center px-2 py-3 text-[11px] leading-tight sm:text-xs ${kassaPosButtonClass(false)} ${
+                    kassaSxgaDenseTiles ? 'min-h-[2.875rem]' : 'min-h-[2.5rem]'
+                  }`}
+                >
+                  {t('kassaApp.parkTableKitchenBon')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => parkOrder({ printKitchen: false, printKassaSlip: true })}
+                  className={`min-w-0 flex-1 font-semibold flex items-center justify-center text-center px-2 py-3 text-[11px] leading-tight sm:text-xs ${kassaPosButtonClass(false)} ${
+                    kassaSxgaDenseTiles ? 'min-h-[2.875rem]' : 'min-h-[2.5rem]'
+                  }`}
+                >
+                  {t('kassaApp.parkTableKassaBon')}
+                </button>
+              </div>
+            )}
             <div className={`flex touch-manipulation select-none ${kassaSxgaDenseTiles ? 'gap-2' : 'gap-2.5'}`}>
               <button
                 type="button"
@@ -5781,6 +5822,30 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 <span className="text-center text-xs font-bold">{t('kassaApp.remove')}</span>
               </button>
             </div>
+            {orderType === 'DINE_IN' && tableNumber && cart.length > 0 && (
+              <div className="flex w-full gap-2 touch-manipulation select-none" data-testid="kassa-park-table-split">
+                <button
+                  type="button"
+                  onClick={() => parkOrder({ printKitchen: true, printKassaSlip: false })}
+                  className={`min-w-0 flex-1 rounded-xl bg-[#3C4D6B] px-2 py-2.5 text-center text-xs font-bold text-white hover:bg-[#2D3A52] active:brightness-95 ${kassaFooterActionTouchMinHClass(
+                    kassaSxgaDenseTiles,
+                    kassaSidebarFooterTier === 'dense',
+                  )}`}
+                >
+                  {t('kassaApp.parkTableKitchenBon')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => parkOrder({ printKitchen: false, printKassaSlip: true })}
+                  className={`min-w-0 flex-1 rounded-xl bg-[#3C4D6B] px-2 py-2.5 text-center text-xs font-bold text-white hover:bg-[#2D3A52] active:brightness-95 ${kassaFooterActionTouchMinHClass(
+                    kassaSxgaDenseTiles,
+                    kassaSidebarFooterTier === 'dense',
+                  )}`}
+                >
+                  {t('kassaApp.parkTableKassaBon')}
+                </button>
+              </div>
+            )}
             <div className="flex gap-2.5 touch-manipulation select-none">
               <button
                 type="button"
