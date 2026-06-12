@@ -1672,6 +1672,40 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       return
     }
     const orderNumber = res.orderNumber ?? 0
+
+    let retailLoyaltyOnReceipt: KassaLastOrderReceipt['retailLoyalty'] | undefined
+    if (loyaltyMemberId && loyaltyMemberSnapshot) {
+      try {
+        const settleRes = await authFetch('/api/retail/loyalty/settle', {
+          method: 'POST',
+          body: JSON.stringify({
+            tenantSlug: tenant,
+            memberId: loyaltyMemberId,
+            orderTotal,
+            orderNumber: orderNumber > 0 ? orderNumber : undefined,
+            redeemPoints: redeemPointsForSale > 0 ? redeemPointsForSale : undefined,
+          }),
+        })
+        const settleJson = (await settleRes.json()) as {
+          ok?: boolean
+          balance?: number
+          earned?: number
+          redeemed?: number
+        }
+        if (settleJson.ok && settleJson.balance != null) {
+          retailLoyaltyOnReceipt = {
+            memberLabel:
+              loyaltyMemberSnapshot.display_name?.trim() || loyaltyMemberSnapshot.card_code,
+            pointsEarned: settleJson.earned ?? 0,
+            pointsRedeemed: settleJson.redeemed ?? 0,
+            pointsBalance: settleJson.balance,
+          }
+        }
+      } catch {
+        /* bon zonder loyaliteitblok als settle faalt */
+      }
+    }
+
     const receipt = buildRetailLastOrderReceipt(
       linesSnapshot,
       method,
@@ -1681,6 +1715,9 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       discountEuro > 0 ? discountEuro : undefined,
       activeKassaStaff?.name ?? null,
     )
+    if (retailLoyaltyOnReceipt) {
+      receipt.retailLoyalty = retailLoyaltyOnReceipt
+    }
     const customerInvoice = retailCustomerInvoiceFromLoyaltyMember(loyaltyMemberSnapshot)
     if (customerInvoice) {
       receipt.retailCustomerInvoice = customerInvoice
@@ -1696,46 +1733,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     setShowSuccessModal(true)
     focusBarcodeCapture()
     void reload({ fresh: true })
-
-    if (loyaltyMemberId && loyaltyMemberSnapshot) {
-      void authFetch('/api/retail/loyalty/settle', {
-        method: 'POST',
-        body: JSON.stringify({
-          tenantSlug: tenant,
-          memberId: loyaltyMemberId,
-          orderTotal,
-          orderNumber: orderNumber > 0 ? orderNumber : undefined,
-          redeemPoints: redeemPointsForSale > 0 ? redeemPointsForSale : undefined,
-        }),
-      })
-        .then((r) => r.json())
-        .then(
-          (settleJson: {
-            ok?: boolean
-            balance?: number
-            earned?: number
-            redeemed?: number
-          }) => {
-            if (!settleJson.ok || settleJson.balance == null) return
-            setLastOrderReceipt((prev) =>
-              prev
-                ? {
-                    ...prev,
-                    retailLoyalty: {
-                      memberLabel:
-                        loyaltyMemberSnapshot.display_name?.trim() ||
-                        loyaltyMemberSnapshot.card_code,
-                      pointsEarned: settleJson.earned ?? 0,
-                      pointsRedeemed: settleJson.redeemed ?? 0,
-                      pointsBalance: settleJson.balance!,
-                    },
-                  }
-                : prev,
-            )
-          },
-        )
-        .catch(() => {})
-    }
   }
 
   const performLogout = () => {

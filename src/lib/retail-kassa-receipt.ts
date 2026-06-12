@@ -222,11 +222,6 @@ export function buildRetailKassaReceiptHtmlDocument(opts: {
       <div class="divider"></div>
       <div class="center small">${escapeReceiptHtml(labels.paidWith)} ${escapeReceiptHtml(payLabel)}</div>
       ${
-        order.helpedByStaffName?.trim() && labels.helpedByLine
-          ? `<div class="center bold">${escapeReceiptHtml(labels.helpedByLine(order.helpedByStaffName.trim()))}</div>`
-          : ''
-      }
-      ${
         order.retailLoyalty && labels.loyaltyBalanceLine
           ? (() => {
               const L = order.retailLoyalty!
@@ -251,6 +246,11 @@ export function buildRetailKassaReceiptHtmlDocument(opts: {
               )
               return parts.join('')
             })()
+          : ''
+      }
+      ${
+        order.helpedByStaffName?.trim() && labels.helpedByLine
+          ? `<div class="center bold">${escapeReceiptHtml(labels.helpedByLine(order.helpedByStaffName.trim()))}</div>`
           : ''
       }
       <div class="divider"></div>
@@ -343,10 +343,10 @@ export async function printRetailKassaReceipt(opts: {
   }
   bonLines.push(`${labels.total}  EUR ${order.total.toFixed(2)}`)
   bonLines.push(`${labels.paidWith} ${payLabel}`)
+  appendRetailLoyaltyReceiptLines(order, labels, bonLines)
   if (order.helpedByStaffName?.trim() && labels.helpedByLine) {
     bonLines.push(labels.helpedByLine(order.helpedByStaffName.trim()))
   }
-  appendRetailLoyaltyReceiptLines(order, labels, bonLines)
   if (tenantInfo?.btw_number) {
     bonLines.push(labels.businessVatLabel(tenantInfo.btw_number))
   }
@@ -356,37 +356,16 @@ export async function printRetailKassaReceipt(opts: {
   const isCash =
     !isDraft && ['CASH', 'cash', 'CONTANT', 'contant'].includes(String(order.paymentMethod || ''))
 
+  /**
+   * Geen `orderData` meesturen: de lokale print-agent kiest dan buildRichReceipt (kort)
+   * en negeert loyaliteit/medewerker/bedankt uit bonInhoud. Alleen platte bonInhoud = volledige retailbon.
+   */
   const printResult = await sendToVysionPrintAgent({
     winkelnaam: tenantInfo?.business_name || labels.defaultBusinessName,
     bonInhoud: bonLines.join('\n'),
     copies: isDraft ? 1 : 2,
     openDrawer: isCash,
     receiptMode: 'kassa',
-    orderData: {
-      orderNumber: order.orderNumber,
-      orderType: order.orderType,
-      tableNumber: null,
-      items: order.items.map((i) => ({
-        quantity: i.quantity,
-        name: i.product.name,
-        price: (i.product.price + (i.choices || []).reduce((s, c) => s + c.price, 0)) * i.quantity,
-        choices: (i.choices || []).map((c) => ({ name: c.choiceName, price: c.price })),
-      })),
-      subtotal,
-      tax,
-      total: order.total,
-      paymentMethod: order.paymentMethod,
-    },
-    businessInfo: {
-      name: tenantInfo?.business_name,
-      address: tenantInfo?.address ?? undefined,
-      postalCode: tenantInfo?.postal_code ?? undefined,
-      city: tenantInfo?.city ?? undefined,
-      phone: tenantInfo?.phone ?? undefined,
-      vatNumber: tenantInfo?.btw_number ?? undefined,
-      website: tenantInfo?.website ?? undefined,
-      vatRate: splitOk ? order.vatSplit![0].rate : fbVatRate,
-    },
   })
 
   if (printResult.ok) return { ok: true }
