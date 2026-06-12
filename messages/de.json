@@ -5866,6 +5866,7 @@
     "receiptBonNrPrefix": "Beleg ",
     "sectionOrderBar": "BESTELLUNG",
     "sectionTotalBar": "TOTAL",
+    "receiptHelpedByIntro": "Sie wurden bedient von",
     "sectionVatBar": "MWST ÜBERSICHT",
     "receivedLabel": "Erhalten",
     "changeLabel": "Rückgeld",

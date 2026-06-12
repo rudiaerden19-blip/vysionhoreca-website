@@ -5866,6 +5866,7 @@
     "receiptBonNrPrefix": "Ticket ",
     "sectionOrderBar": "COMMANDE",
     "sectionTotalBar": "TOTAL",
+    "receiptHelpedByIntro": "Vous avez été servi par",
     "sectionVatBar": "APERÇU TVA",
     "receivedLabel": "Reçu",
     "changeLabel": "Rendu",

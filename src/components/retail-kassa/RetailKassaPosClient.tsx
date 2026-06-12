@@ -45,7 +45,6 @@ import {
   tryBrowserPrintFallback,
   type RetailReceiptI18n,
 } from '@/lib/retail-kassa-receipt'
-import { buildRetailSaleTicketEan13 } from '@/lib/retail-kassa/receipt-ticket-barcode'
 import {
   applyRetailGoodsReceipt,
   applyRetailStockScanIncrement,
@@ -578,7 +577,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         t('retailKassaPage.receiptLoyaltyRedeemed').replace('{points}', String(points)),
       loyaltyBalanceLine: (points) =>
         t('retailKassaPage.receiptLoyaltyBalance').replace('{points}', String(points)),
-      helpedByLine: (name) => t('kassaReceipt.helpedBy').replace('{name}', name),
+      helpedByIntro: t('retailKassaPage.receiptHelpedByIntro'),
       receiptBonNrPrefix: t('retailKassaPage.receiptBonNrPrefix'),
       sectionOrderBar: t('retailKassaPage.sectionOrderBar'),
       sectionTotalBar: t('retailKassaPage.sectionTotalBar'),
@@ -2010,7 +2009,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
           order={lastOrderReceipt}
           tenantInfo={tenantInfo}
           locale={locale}
-          ticketBarcodeEan13={buildRetailSaleTicketEan13(lastOrderReceipt.orderNumber)}
           receiptVariant="retail"
           retailReceiptLabels={receiptLabels}
           footerActions="print-email-close"

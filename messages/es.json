@@ -5843,6 +5843,7 @@
     "receiptBonNrPrefix": "Ticket ",
     "sectionOrderBar": "PEDIDO",
     "sectionTotalBar": "TOTAL",
+    "receiptHelpedByIntro": "Le ha atendido",
     "sectionVatBar": "RESUMEN IVA",
     "receivedLabel": "Recibido",
     "changeLabel": "Cambio",

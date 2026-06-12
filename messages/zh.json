@@ -5843,6 +5843,7 @@
     "receiptBonNrPrefix": "小票 ",
     "sectionOrderBar": "订单",
     "sectionTotalBar": "合计",
+    "receiptHelpedByIntro": "为您服务：",
     "sectionVatBar": "增值税明细",
     "receivedLabel": "实收",
     "changeLabel": "找零",

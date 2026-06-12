@@ -39,6 +39,8 @@ export type RetailReceiptI18n = {
   draftNotPaid: string
   draftFooter: string
   helpedByLine?: (name: string) => string
+  /** Regel vóór voornaam medewerker (winkelkassa bon). */
+  helpedByIntro?: string
   loyaltyPassLabel?: (name: string) => string
   loyaltyEarnedLine?: (points: number) => string
   loyaltyRedeemedLine?: (points: number) => string

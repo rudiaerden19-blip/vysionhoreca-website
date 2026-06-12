@@ -5843,6 +5843,7 @@
     "receiptBonNrPrefix": "Receipt ",
     "sectionOrderBar": "ORDER",
     "sectionTotalBar": "TOTAL",
+    "receiptHelpedByIntro": "担当：",
     "sectionVatBar": "VAT OVERVIEW",
     "receivedLabel": "Received",
     "changeLabel": "Change",

@@ -5802,6 +5802,7 @@
     "receiptBonNrPrefix": "Receipt ",
     "sectionOrderBar": "ORDER",
     "sectionTotalBar": "TOTAL",
+    "receiptHelpedByIntro": "You were helped by",
     "sectionVatBar": "VAT OVERVIEW",
     "receivedLabel": "Received",
     "changeLabel": "Change",

@@ -65,7 +65,7 @@ export function retailReceiptI18nForLocale(locale: string): RetailReceiptI18n {
       (retail.receiptLoyaltyRedeemed ?? '').replace('{points}', String(points)),
     loyaltyBalanceLine: (points) =>
       (retail.receiptLoyaltyBalance ?? '').replace('{points}', String(points)),
-    helpedByLine: (name) => (r.helpedBy ?? '').replace('{name}', name),
+    helpedByIntro: retail.receiptHelpedByIntro ?? 'U bent geholpen door',
     receiptBonNrPrefix: retail.receiptBonNrPrefix ?? 'Bonnr: ',
     sectionOrderBar: retail.sectionOrderBar ?? 'BESTELLING',
     sectionTotalBar: retail.sectionTotalBar ?? 'TOTAAL',

@@ -5735,6 +5735,7 @@
     "receiptBonNrPrefix": "Bonnr: ",
     "sectionOrderBar": "BESTELLING",
     "sectionTotalBar": "TOTAAL",
+    "receiptHelpedByIntro": "U bent geholpen door",
     "sectionVatBar": "BTW OVERZICHT",
     "receivedLabel": "Ontvangen",
     "changeLabel": "Retour",

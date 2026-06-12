@@ -5843,6 +5843,7 @@
     "receiptBonNrPrefix": "Scontr. ",
     "sectionOrderBar": "ORDINE",
     "sectionTotalBar": "TOTALE",
+    "receiptHelpedByIntro": "Sei stato servito da",
     "sectionVatBar": "RIEPILOGO IVA",
     "receivedLabel": "Ricevuto",
     "changeLabel": "Resto",
