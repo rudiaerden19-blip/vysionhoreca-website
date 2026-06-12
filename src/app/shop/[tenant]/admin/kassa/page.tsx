@@ -2672,6 +2672,42 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return tableOrders[activeTableSlotKey] ?? []
   }, [activeTableSlotKey, tableOrders])
 
+  /** Open tafelmand in sidebar (kar leeg): na tafelkeuze of na «Voeg toe aan tafel». */
+  const parkedOnlySidebarView = useMemo(
+    () => !numpadPanelVisible && cart.length === 0 && parkedOnTableLines.length > 0,
+    [numpadPanelVisible, cart.length, parkedOnTableLines.length],
+  )
+
+  const updateParkedOnTableQty = (cartKey: string, qty: number) => {
+    if (!activeTableSlotKey || !tableNumber || orderType !== 'DINE_IN') return
+    if (demoViewOnly) return
+    const zone = dineInFloorZone
+    const tbl = tableNumber
+    if (qty <= 0) scheduleKassaTapSound(playRemove)
+    else scheduleKassaTapSound(playClick)
+    setTableOrders((prev) => {
+      const lines = prev[activeTableSlotKey] ?? []
+      const updated =
+        qty <= 0
+          ? lines.filter((i) => i.cartKey !== cartKey)
+          : lines.map((i) => (i.cartKey === cartKey ? { ...i, quantity: qty } : i))
+      const next = { ...prev, [activeTableSlotKey]: updated }
+      tableOrdersRef.current = next
+      localStorage.setItem(tableOrdersKey, JSON.stringify(next))
+      updateTableStatus(tbl, updated.length > 0, zone)
+      if (updated.length === 0) {
+        try {
+          removeBarBonWatermarkSlot(tenant, activeTableSlotKey)
+        } catch {
+          /* storage mag tafel-sync niet breken */
+        }
+      }
+      cancelPersistTimer(activeTableSlotKey)
+      void persistOpenOrderRowToSupabase(zone, tbl, updated)
+      return next
+    })
+  }
+
   /** Volledige rekening (op tafel + deze ronde) voor totaal, betalen en voorlopige bon. */
   const billLines = useMemo((): CartItem[] => {
     if (activeTableSlotKey) return mergeCartLinesForTable(parkedOnTableLines, cart)
@@ -2819,6 +2855,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const cartLinesByCategory = useMemo(
     () => sortKassaCartLinesByMenuCategory(cart, categories),
     [cart, categories],
+  )
+
+  const parkedLinesByCategory = useMemo(
+    () => sortKassaCartLinesByMenuCategory(parkedOnTableLines, categories),
+    [parkedOnTableLines, categories],
   )
 
   const billLinesByCategory = useMemo(
@@ -4449,6 +4490,69 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     )
   }
 
+  const renderParkedOnTableLine = (item: (typeof parkedLinesByCategory)[number]) => {
+    const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
+    const lineTotal = ((item.product.price + choicesTotal) * item.quantity).toFixed(2)
+    return (
+      <div
+        key={`parked-${item.cartKey}`}
+        className={`flex items-center gap-2 rounded-lg px-2 py-1.5 ${ui.cartRowBg}`}
+      >
+        <div className="min-w-0 flex-1">
+          <p className={`truncate text-sm font-semibold ${ui.cartTitle}`}>{item.product.name}</p>
+          {item.choices && item.choices.length > 0 ? (
+            <p className={`truncate text-xs ${ui.cartChoices}`}>{item.choices.map((c) => c.choiceName).join(', ')}</p>
+          ) : null}
+          <p className={`text-xs ${ui.cartChoices}`}>
+            {item.quantity}× · €{lineTotal}
+          </p>
+        </div>
+        {!demoViewOnly ? (
+          <div className="flex shrink-0 items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => updateParkedOnTableQty(item.cartKey, item.quantity - 1)}
+              className={
+                kassaAppearanceDark
+                  ? `touch-manipulation ${kassaPosCartQtyButtonClass(cartLineQtyBtnCompact)}`
+                  : `touch-manipulation rounded-lg bg-red-500 text-white font-bold flex items-center justify-center hover:bg-red-600 active:brightness-95 ${
+                      cartLineQtyBtnCompact ? 'h-8 w-8 text-base' : 'h-9 w-9 text-lg'
+                    }`
+              }
+              aria-label={item.quantity === 1 ? t('kassaApp.ariaRemoveLine') : t('kassaApp.ariaDecreaseQty')}
+            >
+              {item.quantity === 1 ? (
+                <span className={kassaAppearanceDark ? 'text-[1.05rem] leading-none' : undefined} aria-hidden>
+                  🗑
+                </span>
+              ) : (
+                '−'
+              )}
+            </button>
+            <span className={`w-6 text-center text-base font-bold ${ui.numpadInput}`}>{item.quantity}</span>
+            <button
+              type="button"
+              onClick={() => updateParkedOnTableQty(item.cartKey, item.quantity + 1)}
+              className={
+                kassaAppearanceDark
+                  ? `touch-manipulation ${kassaPosCartQtyButtonClass(cartLineQtyBtnCompact)}`
+                  : `touch-manipulation rounded-lg bg-[#3C4D6B] text-white font-bold flex items-center justify-center hover:bg-[#2D3A52] active:brightness-95 ${
+                      cartLineQtyBtnCompact ? 'h-8 w-8 text-base' : 'h-9 w-9 text-lg'
+                    }`
+              }
+              aria-label={t('kassaApp.ariaIncreaseQty')}
+            >
+              +
+            </button>
+          </div>
+        ) : null}
+      </div>
+    )
+  }
+
+  const sidebarTableOrderSectionLabel =
+    cart.length > 0 ? t('kassaApp.parkedOnTableSection') : t('kassaApp.floorPlanOrderHeading')
+
   const sidebarCartSectionLabelClass = kassaAppearanceDark
     ? 'shrink-0 text-[11px] font-bold uppercase tracking-[0.14em] text-white/90'
     : `shrink-0 text-[10px] font-bold uppercase tracking-wide ${ui.numpadMeta}`
@@ -5243,6 +5347,30 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           }`}
         >
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+              {parkedLinesByCategory.length > 0 &&
+              (parkedOnlySidebarView || numpadPanelVisible) ? (
+                <div
+                  className={
+                    parkedOnlySidebarView
+                      ? 'mb-2 flex min-h-0 flex-1 flex-col overflow-hidden'
+                      : 'mb-2 max-h-[min(38vh,11rem)] shrink-0 overflow-y-auto overscroll-y-contain'
+                  }
+                  data-testid="kassa-table-order-lines"
+                >
+                  <p className={`mb-1 shrink-0 text-xs font-bold uppercase tracking-wide ${ui.numpadMeta}`}>
+                    {sidebarTableOrderSectionLabel}
+                  </p>
+                  <div
+                    className={
+                      parkedOnlySidebarView
+                        ? 'min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-y-contain'
+                        : 'space-y-1'
+                    }
+                  >
+                    {parkedLinesByCategory.map(renderParkedOnTableLine)}
+                  </div>
+                </div>
+              ) : null}
               {kassaAppearanceDark ? (
               <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
               {cart.length > 0 ? (
@@ -5253,6 +5381,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   kassaSidebarFooterTier === 'comfort' ? 'gap-2' : kassaSidebarFooterTier === 'compact' ? 'gap-1.5' : 'gap-1'
                 }`}
               >
+              {parkedLinesByCategory.length > 0 && cart.length > 0 ? (
+                <div
+                  className="max-h-[min(20vh,6.5rem)] shrink-0 overflow-y-auto overscroll-y-contain"
+                  data-testid="kassa-table-order-lines"
+                >
+                  <p className={`mb-1 text-xs font-bold uppercase tracking-wide ${ui.numpadMeta}`}>
+                    {sidebarTableOrderSectionLabel}
+                  </p>
+                  <div className="space-y-1">
+                    {parkedLinesByCategory.map(renderParkedOnTableLine)}
+                  </div>
+                </div>
+              ) : null}
               <p className={sidebarCartSectionLabelClass}>{t('kassaApp.cartNewLinesSection')}</p>
               <div
                 ref={cartLinesScrollRef}
@@ -5459,6 +5600,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   >
                     {numpadHeaderDateLabel}
                   </p>
+                </div>
+              ) : null}
+              {parkedLinesByCategory.length > 0 ? (
+                <div
+                  className="max-h-[min(20vh,6.5rem)] shrink-0 overflow-y-auto overscroll-y-contain"
+                  data-testid="kassa-table-order-lines"
+                >
+                  <p className={`mb-1 text-xs font-bold uppercase tracking-wide ${ui.numpadMeta}`}>
+                    {sidebarTableOrderSectionLabel}
+                  </p>
+                  <div className="space-y-1">
+                    {parkedLinesByCategory.map(renderParkedOnTableLine)}
+                  </div>
                 </div>
               ) : null}
               <p className={sidebarCartSectionLabelClass}>{t('kassaApp.cartNewLinesSection')}</p>
