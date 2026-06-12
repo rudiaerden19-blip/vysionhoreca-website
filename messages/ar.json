@@ -5741,6 +5741,7 @@
     "searchButton": "بحث",
     "searchMultipleTitle": "عدة منتجات",
     "searchMultipleHint": "اضغط على المنتج للإضافة",
+    "searchResultsEmpty": "ابحث عن منتج — اضغط على صف لإضافته",
     "add": "Add",
     "addOk": "OK",
     "search": "Search article…",

@@ -5741,6 +5741,7 @@
     "searchButton": "検索",
     "searchMultipleTitle": "複数の商品",
     "searchMultipleHint": "追加する商品をタップ",
+    "searchResultsEmpty": "商品を検索 — 行をタップして会計へ",
     "add": "Add",
     "addOk": "OK",
     "search": "Search article…",

@@ -5700,6 +5700,7 @@
     "searchButton": "Search",
     "searchMultipleTitle": "Multiple items",
     "searchMultipleHint": "Tap an item to add it",
+    "searchResultsEmpty": "Search for an item — tap a row to add it to the cart",
     "add": "Add",
     "addOk": "OK",
     "search": "Search article…",

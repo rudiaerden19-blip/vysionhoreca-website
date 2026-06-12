@@ -5741,6 +5741,7 @@
     "searchButton": "搜索",
     "searchMultipleTitle": "多个商品",
     "searchMultipleHint": "点击商品以添加",
+    "searchResultsEmpty": "搜索商品 — 点击行加入购物车",
     "add": "Add",
     "addOk": "OK",
     "search": "Search article…",

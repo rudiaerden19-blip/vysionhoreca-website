@@ -5764,6 +5764,7 @@
     "searchButton": "Rechercher",
     "searchMultipleTitle": "Plusieurs articles",
     "searchMultipleHint": "Appuyez sur l'article à ajouter",
+    "searchResultsEmpty": "Recherchez un article — touchez une ligne pour l'ajouter",
     "add": "Ajouter",
     "addOk": "OK",
     "search": "Rechercher…",

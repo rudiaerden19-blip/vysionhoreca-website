@@ -5741,6 +5741,7 @@
     "searchButton": "Buscar",
     "searchMultipleTitle": "Varios artículos",
     "searchMultipleHint": "Toque el artículo para añadirlo",
+    "searchResultsEmpty": "Busque un artículo — toque una fila para añadirlo",
     "add": "Añadir",
     "addOk": "OK",
     "search": "Buscar artículo…",

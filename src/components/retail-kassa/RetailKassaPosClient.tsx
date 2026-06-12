@@ -283,8 +283,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [stockBusy, setStockBusy] = useState(false)
   /** Schermtoetsenbord alleen na expliciete tik op «Artikel zoeken». */
   const [articleSearchActive, setArticleSearchActive] = useState(false)
-  /** Meerdere naam-treffers na «Zoeken». */
-  const [articleSearchPickList, setArticleSearchPickList] = useState<RetailPosSku[] | null>(null)
+  /** Treffers na «Zoeken» — middenlijst; pas in mandje na selectie. */
+  const [articleSearchResults, setArticleSearchResults] = useState<RetailPosSku[]>([])
   const [priceFixSku, setPriceFixSku] = useState<RetailPosSku | null>(null)
   const [priceFixName, setPriceFixName] = useState('')
   const [priceFixValue, setPriceFixValue] = useState('')
@@ -620,18 +620,24 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const retailSidebarFooterActionMinH = 'min-h-[3.35rem] sm:min-h-[3.65rem]'
   const retailSidebarFooterPrimaryMinH = 'min-h-[4.25rem] sm:min-h-[4.5rem]'
 
-  const barHasLines = mode === 'sales' ? cart.length > 0 : stockActivity.length > 0
+  const barHasLines =
+    mode === 'sales'
+      ? articleSearchResults.length > 0
+      : stockActivity.length > 0
 
   const selectedPreviewSku = useMemo(() => {
     const skuStillInList = (sku: RetailPosSku) =>
       mode === 'sales'
-        ? cart.some((l) => l.sku.lineKey === sku.lineKey)
+        ? cart.some((l) => l.sku.lineKey === sku.lineKey) ||
+          articleSearchResults.some((s) => s.lineKey === sku.lineKey)
         : stockActivity.some((r) => r.sku.lineKey === sku.lineKey)
 
     if (selectedListLineKey) {
       if (mode === 'sales') {
         const line = cart.find((l) => l.sku.lineKey === selectedListLineKey)
         if (line) return line.sku
+        const fromSearch = articleSearchResults.find((s) => s.lineKey === selectedListLineKey)
+        if (fromSearch) return fromSearch
       } else {
         const row = stockActivity.find((r) => r.key === selectedListLineKey)
         if (row) return row.sku
@@ -639,7 +645,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     }
     if (lastScannedSku && skuStillInList(lastScannedSku)) return lastScannedSku
     return null
-  }, [selectedListLineKey, cart, stockActivity, mode, lastScannedSku])
+  }, [selectedListLineKey, cart, stockActivity, mode, lastScannedSku, articleSearchResults])
 
   const scanBarRowGridClass =
     'grid w-full min-w-[42rem] grid-cols-[minmax(5.5rem,1fr)_minmax(6rem,1.6fr)_minmax(2.5rem,0.5fr)_minmax(2.5rem,0.5fr)_minmax(2.75rem,0.55fr)_minmax(3.25rem,0.65fr)_2.75rem] items-center gap-1.5 sm:gap-2'
@@ -686,7 +692,12 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   function renderScanBarRow(
     key: string,
     sku: RetailPosSku,
-    opts?: { quantity?: number; stockNote?: string; onRemove?: () => void },
+    opts?: {
+      quantity?: number
+      stockNote?: string
+      onRemove?: () => void
+      onSelect?: () => void
+    },
   ) {
     const barcode = sku.barcode || sku.article_number || '—'
     const stock =
@@ -703,11 +714,12 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         tabIndex={0}
         data-retail-scan-line={key}
         aria-pressed={selected}
-        onClick={() => selectRetailListLine(key, sku)}
+        onClick={() => (opts?.onSelect ? opts.onSelect() : selectRetailListLine(key, sku))}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault()
-            selectRetailListLine(key, sku)
+            if (opts?.onSelect) opts.onSelect()
+            else selectRetailListLine(key, sku)
           }
         }}
         className={`${scanBarRowGridClass} ${retailListBarShellClass} shrink-0 cursor-pointer touch-manipulation px-3 py-2.5 transition-[background-color,box-shadow,border-color] sm:px-4 sm:py-3 text-[11px] sm:text-sm ${
@@ -746,6 +758,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     setMode(next)
     setStockActivity([])
     setSelectedListLineKey(null)
+    setArticleSearchResults([])
     closeArticleSearchKeyboard()
     if (next !== 'exchangeCredit') {
       setExchangeOrderLines(null)
@@ -1437,10 +1450,19 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     focusBarcodeCapture()
   }
 
-  function addSkuFromArticleSearch(hit: RetailPosSku) {
-    addToCart(hit, 1)
-    setArticleSearchPickList(null)
+  function showArticleSearchResults(hits: RetailPosSku[]) {
+    setArticleSearchResults(hits)
+    if (hits[0]) {
+      focusRetailListLine(hits[0].lineKey, hits[0])
+      queueListScroll(hits[0].lineKey)
+    }
     finishArticleSearchUi()
+  }
+
+  function addFromArticleSearchSelection(sku: RetailPosSku) {
+    playClick()
+    addToCart(sku, 1)
+    setArticleSearchResults((prev) => prev.filter((s) => s.lineKey !== sku.lineKey))
   }
 
   async function runArticleSearch(query: string) {
@@ -1467,7 +1489,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       if (hits.length === 0 && looksLikeBarcodeOnlyQuery(trimmed)) {
         const imported = await resolveOrImportSku(trimmed)
         if (imported) {
-          addSkuFromArticleSearch(imported)
+          showArticleSearchResults([imported])
           return
         }
       }
@@ -1476,12 +1498,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         alert(t('retailKassaPage.barcodeNotFound'))
         return
       }
-      if (hits.length === 1) {
-        addSkuFromArticleSearch(hits[0])
-        return
-      }
       playClick()
-      setArticleSearchPickList(hits)
+      showArticleSearchResults(hits)
     } finally {
       stockBusyRef.current = false
       setStockBusy(false)
@@ -1809,58 +1827,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 className={`flex-1 py-3 font-bold ${kassaPosButtonClass(true)}`}
               >
                 {t('retailKassaPage.loyaltyRedeemModalConfirm')}
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
-
-      {articleSearchPickList && articleSearchPickList.length > 0 ? (
-        <div
-          className="fixed inset-0 z-[132] flex items-end justify-center bg-black/60 p-3 sm:items-center sm:p-4"
-          data-testid="retail-article-search-pick"
-        >
-          <div
-            className={`flex max-h-[min(70vh,28rem)] w-full max-w-lg flex-col overflow-hidden ${KASSA_POS_BTN_SHAPE} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} border ${KASSA_POS_RULE_BLACK}`}
-          >
-            <div className="shrink-0 border-b border-white/10 px-4 py-3">
-              <p className="text-lg font-bold text-white">{t('retailKassaPage.searchMultipleTitle')}</p>
-              <p className="text-xs text-white/65">{t('retailKassaPage.searchMultipleHint')}</p>
-            </div>
-            <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain p-2">
-              {articleSearchPickList.map((sku) => (
-                <button
-                  key={sku.lineKey}
-                  type="button"
-                  onClick={() => {
-                    playClick()
-                    addSkuFromArticleSearch(sku)
-                  }}
-                  className={`mb-2 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors ${KASSA_POS_MENU_RECESS_TRAY_CLASS} hover:bg-white/10`}
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-white">{sku.name}</p>
-                    <p className="truncate text-xs text-white/55">
-                      {[sku.barcode, sku.article_number].filter(Boolean).join(' · ') || '—'}
-                    </p>
-                  </div>
-                  <span className="shrink-0 text-sm font-bold tabular-nums text-emerald-300">
-                    €{sku.price.toFixed(2)}
-                  </span>
-                </button>
-              ))}
-            </div>
-            <div className="shrink-0 border-t border-white/10 p-3">
-              <button
-                type="button"
-                onClick={() => {
-                  playClick()
-                  setArticleSearchPickList(null)
-                  focusBarcodeCapture()
-                }}
-                className={`w-full py-2.5 ${kassaPosButtonClass(false)}`}
-              >
-                {t('common.cancel')}
               </button>
             </div>
           </div>
@@ -2698,7 +2664,11 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                   <p className={`flex flex-1 items-center justify-center px-4 text-center text-sm ${ui.menuEmptyMuted}`}>
                     {t('retailKassaPage.loading')}
                   </p>
-                ) : !barHasLines ? null : (
+                ) : !barHasLines ? (
+                  <p className={`flex flex-1 items-center justify-center px-4 text-center text-sm ${ui.menuEmptyMuted}`}>
+                    {mode === 'sales' ? t('retailKassaPage.searchResultsEmpty') : null}
+                  </p>
+                ) : (
                   <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden">
                     <div
                       className={`${scanBarRowGridClass} shrink-0 border-b border-white/15 px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-white/45 sm:px-4`}
@@ -2717,12 +2687,18 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                       className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overflow-x-auto overscroll-y-contain touch-manipulation p-1.5 sm:p-2 [scrollbar-gutter:stable]"
                     >
                       {mode === 'sales'
-                        ? cart.map((l) =>
-                            renderScanBarRow(l.sku.lineKey, l.sku, {
-                              quantity: l.quantity,
+                        ? articleSearchResults.map((sku) =>
+                            renderScanBarRow(sku.lineKey, sku, {
+                              onSelect: () => addFromArticleSearchSelection(sku),
                               onRemove: () => {
                                 playClick()
-                                updateQty(l.sku.lineKey, 0)
+                                setArticleSearchResults((prev) =>
+                                  prev.filter((s) => s.lineKey !== sku.lineKey),
+                                )
+                                if (selectedListLineKey === sku.lineKey) {
+                                  setSelectedListLineKey(null)
+                                  setLastScannedSku(null)
+                                }
                               },
                             }),
                           )

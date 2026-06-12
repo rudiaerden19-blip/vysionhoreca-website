@@ -5764,6 +5764,7 @@
     "searchButton": "Suchen",
     "searchMultipleTitle": "Mehrere Artikel",
     "searchMultipleHint": "Artikel antippen zum Hinzufügen",
+    "searchResultsEmpty": "Artikel suchen — Zeile antippen für die Kasse",
     "add": "Hinzufügen",
     "addOk": "OK",
     "search": "Artikel suchen…",
