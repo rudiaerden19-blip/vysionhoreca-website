@@ -5842,6 +5842,7 @@
     "receiptLoyaltyRedeemed": "−{points} puntos canjeados",
     "receiptLoyaltyBalance": "Saldo total: {points} puntos",
     "receiptBonNrPrefix": "Ticket ",
+    "receiptDocumentTitle": "TICKET DE VENTA",
     "sectionOrderBar": "PEDIDO",
     "sectionTotalBar": "TOTAL",
     "receiptHelpedByIntro": "Le ha atendido",

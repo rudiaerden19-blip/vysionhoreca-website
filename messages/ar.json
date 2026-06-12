@@ -5842,6 +5842,7 @@
     "receiptLoyaltyRedeemed": "−{points} points redeemed",
     "receiptLoyaltyBalance": "Total balance: {points} points",
     "receiptBonNrPrefix": "Receipt ",
+    "receiptDocumentTitle": "إيصال البيع",
     "sectionOrderBar": "ORDER",
     "sectionTotalBar": "TOTAL",
     "receiptHelpedByIntro": "خدمك",

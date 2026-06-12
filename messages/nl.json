@@ -5734,6 +5734,7 @@
     "receiptLoyaltyRedeemed": "−{points} punten ingewisseld",
     "receiptLoyaltyBalance": "Totaal saldo: {points} punten",
     "receiptBonNrPrefix": "Bonnr: ",
+    "receiptDocumentTitle": "VERKOOPSBON",
     "sectionOrderBar": "BESTELLING",
     "sectionTotalBar": "TOTAAL",
     "receiptHelpedByIntro": "U bent geholpen door",

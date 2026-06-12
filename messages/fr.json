@@ -5865,6 +5865,7 @@
     "receiptLoyaltyRedeemed": "−{points} points utilisés",
     "receiptLoyaltyBalance": "Solde total : {points} points",
     "receiptBonNrPrefix": "Ticket ",
+    "receiptDocumentTitle": "BON DE VENTE",
     "sectionOrderBar": "COMMANDE",
     "sectionTotalBar": "TOTAL",
     "receiptHelpedByIntro": "Vous avez été servi par",

@@ -8,12 +8,22 @@ import { formatStoreDisplayName } from '@/lib/retail-kassa/receipt-layout'
 
 const MM = 2.834645669
 const PAGE_W = 80 * MM
-const MARGIN = 4 * MM
+const MARGIN = 5 * MM
 const CONTENT_W = PAGE_W - 2 * MARGIN
-const LINE = 11
+const GAP_XS = 4
+const GAP_SM = 8
+const GAP_MD = 14
+const GAP_LG = 20
+const BAR_H = 20
 
 function formatEuro(amount: number): string {
   return `EUR ${amount.toFixed(2).replace('.', ',')}`
+}
+
+function capitalizeProductName(name: string): string {
+  const t = name.trim()
+  if (!t) return t
+  return t.charAt(0).toUpperCase() + t.slice(1)
 }
 
 function staffFirstName(full: string): string {
@@ -72,15 +82,43 @@ function itemsGrossIncl(order: KassaLastOrderReceipt): number {
 
 type PdfDoc = InstanceType<typeof PDFDocument>
 
-function rowLeftRight(doc: PdfDoc, y: number, left: string, right: string): number {
-  doc.fontSize(9).text(left, MARGIN, y, { width: CONTENT_W * 0.62, align: 'left', lineBreak: false })
-  doc.fontSize(9).text(right, MARGIN, y, { width: CONTENT_W, align: 'right', lineBreak: false })
-  return y + LINE
+type TextOpts = {
+  width?: number
+  align?: 'left' | 'center' | 'right'
+  fontSize?: number
+  bold?: boolean
 }
 
-function rowCenter(doc: PdfDoc, y: number, text: string, size = 9): number {
-  doc.fontSize(size).text(text, MARGIN, y, { width: CONTENT_W, align: 'center' })
-  return y + (size >= 12 ? LINE + 2 : LINE)
+function textBlock(doc: PdfDoc, y: number, text: string, opts: TextOpts = {}): number {
+  const fontSize = opts.fontSize ?? 10
+  const width = opts.width ?? CONTENT_W
+  doc.fontSize(fontSize)
+  doc.font(opts.bold ? 'Helvetica-Bold' : 'Helvetica')
+  doc.text(text, MARGIN, y, { width, align: opts.align ?? 'left', lineGap: 2 })
+  const h = doc.heightOfString(text, { width, lineGap: 2 })
+  doc.font('Helvetica')
+  return y + h + GAP_XS
+}
+
+function rowLeftRight(doc: PdfDoc, y: number, left: string, right: string, fontSize = 10): number {
+  doc.fontSize(fontSize).font('Helvetica')
+  doc.text(left, MARGIN, y, { width: CONTENT_W * 0.58, align: 'left', lineGap: 2 })
+  doc.text(right, MARGIN, y, { width: CONTENT_W, align: 'right', lineGap: 2 })
+  const h = Math.max(
+    doc.heightOfString(left, { width: CONTENT_W * 0.58, lineGap: 2 }),
+    doc.heightOfString(right, { width: CONTENT_W, align: 'right', lineGap: 2 }),
+  )
+  return y + h + GAP_SM
+}
+
+function sectionBlackBar(doc: PdfDoc, y: number, title: string): number {
+  doc.rect(MARGIN, y, CONTENT_W, BAR_H).fill('#000000')
+  doc.fillColor('#ffffff')
+  doc.fontSize(11).font('Helvetica-Bold')
+  doc.text(title.toUpperCase(), MARGIN, y + 5, { width: CONTENT_W, align: 'center' })
+  doc.fillColor('#000000')
+  doc.font('Helvetica')
+  return y + BAR_H + GAP_MD
 }
 
 export function retailReceiptPdfFilename(ref: string, orderNumber: number): string {
@@ -89,7 +127,7 @@ export function retailReceiptPdfFilename(ref: string, orderNumber: number): stri
   return `Bon-${safe}.pdf`
 }
 
-/** 80mm-bon als PDF-bijlage (e-mail); layout gelijk aan winkelkassa HTML-bon. */
+/** 80mm-bon als PDF-bijlage (e-mail); layout in lijn met winkelkassa HTML-bon. */
 export function buildRetailKassaReceiptPdfBuffer(opts: {
   tenantInfo: TenantSettings | null
   order: KassaLastOrderReceipt
@@ -108,99 +146,135 @@ export function buildRetailKassaReceiptPdfBuffer(opts: {
   const payLabel = isDraft ? labels.draftNotPaid : payMethodShort(order, labels)
   const discountEuro = Math.round((itemsGrossIncl(order) - order.total) * 100) / 100
   const shopName = formatStoreDisplayName(tenantInfo?.business_name || labels.defaultBusinessName)
+  const invoice = order.retailCustomerInvoice
 
   return new Promise((resolve, reject) => {
-    const doc = new PDFDocument({ size: [PAGE_W, 900], margin: 0, autoFirstPage: true })
+    const doc = new PDFDocument({ size: [PAGE_W, 2400], margin: 0, autoFirstPage: true })
     const chunks: Buffer[] = []
     doc.on('data', (c) => chunks.push(c as Buffer))
     doc.on('end', () => resolve(Buffer.concat(chunks)))
     doc.on('error', reject)
 
-    let y = MARGIN
-    y = rowCenter(doc, y, shopName, 14)
-    if (tenantInfo?.address?.trim()) y = rowCenter(doc, y, tenantInfo.address.trim())
+    let y = MARGIN + GAP_SM
+
+    y = textBlock(doc, y, labels.receiptDocumentTitle, {
+      align: 'center',
+      fontSize: 12,
+      bold: true,
+    })
+    y += GAP_XS
+
+    y = textBlock(doc, y, shopName, { align: 'center', fontSize: 18, bold: true })
+    y += GAP_XS
+
+    if (tenantInfo?.address?.trim()) {
+      y = textBlock(doc, y, tenantInfo.address.trim(), { align: 'center', fontSize: 9 })
+    }
     if (tenantInfo?.postal_code || tenantInfo?.city) {
-      y = rowCenter(doc, y, `${tenantInfo.postal_code ?? ''} ${tenantInfo.city ?? ''}`.trim())
+      y = textBlock(doc, y, `${tenantInfo.postal_code ?? ''} ${tenantInfo.city ?? ''}`.trim(), {
+        align: 'center',
+        fontSize: 9,
+      })
     }
     if (tenantInfo?.btw_number?.trim()) {
-      y = rowCenter(doc, y, labels.businessVatLabel(tenantInfo.btw_number.trim()))
+      y = textBlock(doc, y, labels.businessVatLabel(tenantInfo.btw_number.trim()), {
+        align: 'center',
+        fontSize: 9,
+      })
     }
     if (tenantInfo?.phone?.trim()) {
-      y = rowCenter(doc, y, `${labels.telPrefix} ${tenantInfo.phone.trim()}`)
+      y = textBlock(doc, y, `${labels.telPrefix} ${tenantInfo.phone.trim()}`, {
+        align: 'center',
+        fontSize: 9,
+      })
     }
-    y += 4
+
+    y += GAP_MD
 
     if (isDraft) {
-      y = rowCenter(doc, y, labels.draftBanner.toUpperCase(), 10)
-      y += 4
+      y = textBlock(doc, y, labels.draftBanner.toUpperCase(), { align: 'center', fontSize: 10, bold: true })
+      y += GAP_SM
     }
 
-    y = rowLeftRight(
-      doc,
-      y,
-      `${labels.receiptBonNrPrefix}${receiptRefDisplay}`,
-      dateStr,
-    )
-    y += 6
-    doc.fontSize(10).text(labels.sectionOrderBar.toUpperCase(), MARGIN, y, { width: CONTENT_W })
-    y += LINE + 2
+    if (invoice) {
+      y = textBlock(doc, y, labels.invoiceTitle.toUpperCase(), { align: 'center', fontSize: 11, bold: true })
+      y = textBlock(doc, y, invoice.name.trim(), { align: 'center', fontSize: 9 })
+      if (invoice.addressLine) y = textBlock(doc, y, invoice.addressLine.trim(), { align: 'center', fontSize: 9 })
+      if (invoice.postalCity) y = textBlock(doc, y, invoice.postalCity.trim(), { align: 'center', fontSize: 9 })
+      y = textBlock(doc, y, labels.customerVatLabel(invoice.vatNumber), { align: 'center', fontSize: 9, bold: true })
+      y += GAP_SM
+    }
+
+    y = rowLeftRight(doc, y, `${labels.receiptBonNrPrefix}${receiptRefDisplay}`, dateStr, 10)
+    y += GAP_SM
+
+    y = sectionBlackBar(doc, y, labels.sectionOrderBar)
 
     for (const item of order.items) {
       const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
       const lineTotal = (item.product.price + choicesTotal) * item.quantity
-      y = rowLeftRight(doc, y, `${item.quantity}x ${item.product.name}`, formatEuro(lineTotal))
+      y = rowLeftRight(
+        doc,
+        y,
+        `${item.quantity}x ${capitalizeProductName(item.product.name)}`,
+        formatEuro(lineTotal),
+        10,
+      )
     }
 
     if (discountEuro > 0.009) {
-      y += 2
-      y = rowLeftRight(doc, y, labels.receiptDiscount, formatEuro(-discountEuro))
+      y += GAP_XS
+      y = rowLeftRight(doc, y, labels.receiptDiscount, formatEuro(-discountEuro), 10)
     }
 
-    y += 6
-    doc.fontSize(10).text(labels.sectionTotalBar.toUpperCase(), MARGIN, y, { width: CONTENT_W })
-    y += LINE + 2
-    y = rowLeftRight(doc, y, labels.subtotal, formatEuro(subtotalExcl))
-    y = rowLeftRight(doc, y, labels.vatSingleLabel, formatEuro(taxTotal))
-    y += 4
-    doc.fontSize(12)
-    y = rowLeftRight(doc, y, labels.total.toUpperCase(), formatEuro(order.total))
-    doc.fontSize(9)
-    y += 4
-    y = rowLeftRight(doc, y, labels.receivedLabel, formatEuro(order.total))
-    y = rowLeftRight(doc, y, labels.changeLabel, formatEuro(0))
-    y += 6
+    y += GAP_MD
+    y = sectionBlackBar(doc, y, labels.sectionTotalBar)
+
+    y = rowLeftRight(doc, y, labels.subtotal, formatEuro(subtotalExcl), 10)
+    y = rowLeftRight(doc, y, labels.vatSingleLabel, formatEuro(taxTotal), 10)
+    y += GAP_SM
+    y = rowLeftRight(doc, y, labels.total.toUpperCase(), formatEuro(order.total), 14)
+    y += GAP_SM
+    y = rowLeftRight(doc, y, labels.receivedLabel, formatEuro(order.total), 10)
+    y = rowLeftRight(doc, y, labels.changeLabel, formatEuro(0), 10)
+    y += GAP_LG
 
     const L = order.retailLoyalty
     if (L && labels.loyaltyBalanceLine) {
-      y += 4
       if (L.memberLabel && labels.loyaltyPassLabel) {
-        y = rowCenter(doc, y, labels.loyaltyPassLabel(L.memberLabel))
+        y = textBlock(doc, y, labels.loyaltyPassLabel(L.memberLabel), { align: 'center', fontSize: 10, bold: true })
       }
       if (L.pointsRedeemed > 0 && labels.loyaltyRedeemedLine) {
-        y = rowCenter(doc, y, labels.loyaltyRedeemedLine(L.pointsRedeemed))
+        y = textBlock(doc, y, labels.loyaltyRedeemedLine(L.pointsRedeemed), { align: 'center', fontSize: 10 })
       }
       if (L.pointsEarned > 0 && labels.loyaltyEarnedLine) {
-        y = rowCenter(doc, y, labels.loyaltyEarnedLine(L.pointsEarned))
+        y = textBlock(doc, y, labels.loyaltyEarnedLine(L.pointsEarned), { align: 'center', fontSize: 10 })
       }
-      y = rowCenter(doc, y, labels.loyaltyBalanceLine(L.pointsBalance))
+      y = textBlock(doc, y, labels.loyaltyBalanceLine(L.pointsBalance), { align: 'center', fontSize: 10, bold: true })
+      y += GAP_SM
     }
 
     const helpedRaw = order.helpedByStaffName?.trim()
     if (helpedRaw && labels.helpedByIntro) {
-      y += 4
-      y = rowCenter(doc, y, labels.helpedByIntro)
-      y = rowCenter(doc, y, staffFirstName(helpedRaw))
+      y = textBlock(doc, y, labels.helpedByIntro, { align: 'center', fontSize: 10 })
+      y = textBlock(doc, y, staffFirstName(helpedRaw), { align: 'center', fontSize: 10, bold: true })
+      y += GAP_SM
     }
 
-    y += 4
-    y = rowCenter(doc, y, isDraft ? labels.draftFooter : labels.thanks)
-    if (!isDraft) y = rowCenter(doc, y, labels.thanksFarewell)
-    y += 4
-    doc.fontSize(9).text(labels.paymentMethodLine(payLabel), MARGIN, y, { width: CONTENT_W })
-    y += LINE
-    if (tenantInfo?.website?.trim()) {
-      y = rowCenter(doc, y, tenantInfo.website.trim())
+    y = textBlock(doc, y, isDraft ? labels.draftFooter : labels.thanks, { align: 'center', fontSize: 10 })
+    if (!isDraft) {
+      y = textBlock(doc, y, labels.thanksFarewell, { align: 'center', fontSize: 10 })
     }
+    y += GAP_MD
+
+    y = textBlock(doc, y, labels.paymentMethodLine(payLabel), { align: 'center', fontSize: 10, bold: true })
+
+    if (tenantInfo?.website?.trim()) {
+      y += GAP_SM
+      y = textBlock(doc, y, tenantInfo.website.trim(), { align: 'center', fontSize: 9 })
+    }
+
+    y += MARGIN
 
     doc.end()
   })

@@ -5865,6 +5865,7 @@
     "receiptLoyaltyRedeemed": "−{points} Punkte eingelöst",
     "receiptLoyaltyBalance": "Gesamtstand: {points} Punkte",
     "receiptBonNrPrefix": "Beleg ",
+    "receiptDocumentTitle": "VERKAUFSBELEG",
     "sectionOrderBar": "BESTELLUNG",
     "sectionTotalBar": "TOTAL",
     "receiptHelpedByIntro": "Sie wurden bedient von",

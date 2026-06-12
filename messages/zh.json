@@ -5842,6 +5842,7 @@
     "receiptLoyaltyRedeemed": "−{points} points redeemed",
     "receiptLoyaltyBalance": "Total balance: {points} points",
     "receiptBonNrPrefix": "小票 ",
+    "receiptDocumentTitle": "销售小票",
     "sectionOrderBar": "订单",
     "sectionTotalBar": "合计",
     "receiptHelpedByIntro": "为您服务：",

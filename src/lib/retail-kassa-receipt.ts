@@ -47,6 +47,8 @@ export type RetailReceiptI18n = {
   loyaltyRedeemedLine?: (points: number) => string
   loyaltyBalanceLine?: (points: number) => string
   receiptBonNrPrefix: string
+  /** Bovenaan e-mail-PDF (winkelkassa). */
+  receiptDocumentTitle: string
   sectionOrderBar: string
   sectionTotalBar: string
   sectionVatBar: string

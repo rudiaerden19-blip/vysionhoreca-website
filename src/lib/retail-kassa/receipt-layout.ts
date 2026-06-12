@@ -381,6 +381,7 @@ export function buildRetailKassaReceiptHtmlBody(opts: {
 
   return `
       <div class="retail-header">
+        <div class="bold center" style="font-size:12px;letter-spacing:0.06em;margin-bottom:10px">${escapeReceiptHtml(labels.receiptDocumentTitle)}</div>
         ${
           logoUrl
             ? `<img class="retail-logo" src="${String(logoUrl).replace(/&/g, '&amp;').replace(/"/g, '&quot;')}" alt="" />`

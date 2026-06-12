@@ -5801,6 +5801,7 @@
     "receiptLoyaltyRedeemed": "−{points} points redeemed",
     "receiptLoyaltyBalance": "Total balance: {points} points",
     "receiptBonNrPrefix": "Receipt ",
+    "receiptDocumentTitle": "SALES RECEIPT",
     "sectionOrderBar": "ORDER",
     "sectionTotalBar": "TOTAL",
     "receiptHelpedByIntro": "You were helped by",

@@ -5842,6 +5842,7 @@
     "receiptLoyaltyRedeemed": "−{points} punti usati",
     "receiptLoyaltyBalance": "Saldo totale: {points} punti",
     "receiptBonNrPrefix": "Scontr. ",
+    "receiptDocumentTitle": "SCONTRINO DI VENDITA",
     "sectionOrderBar": "ORDINE",
     "sectionTotalBar": "TOTALE",
     "receiptHelpedByIntro": "Sei stato servito da",

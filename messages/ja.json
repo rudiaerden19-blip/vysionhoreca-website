@@ -5842,6 +5842,7 @@
     "receiptLoyaltyRedeemed": "−{points} points redeemed",
     "receiptLoyaltyBalance": "Total balance: {points} points",
     "receiptBonNrPrefix": "Receipt ",
+    "receiptDocumentTitle": "売上レシート",
     "sectionOrderBar": "ORDER",
     "sectionTotalBar": "TOTAL",
     "receiptHelpedByIntro": "担当：",

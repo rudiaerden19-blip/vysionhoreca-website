@@ -579,6 +579,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         t('retailKassaPage.receiptLoyaltyBalance').replace('{points}', String(points)),
       helpedByIntro: t('retailKassaPage.receiptHelpedByIntro'),
       receiptBonNrPrefix: t('retailKassaPage.receiptBonNrPrefix'),
+      receiptDocumentTitle: t('retailKassaPage.receiptDocumentTitle'),
       sectionOrderBar: t('retailKassaPage.sectionOrderBar'),
       sectionTotalBar: t('retailKassaPage.sectionTotalBar'),
       sectionVatBar: t('retailKassaPage.sectionVatBar'),
