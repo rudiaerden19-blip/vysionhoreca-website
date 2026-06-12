@@ -15,6 +15,7 @@ import {
   retailTicketEanForOrder,
   RETAIL_RECEIPT_PRINT_STYLES,
 } from '@/lib/retail-kassa/receipt-layout'
+import type { VysionPrintAgentBody, VysionPrintAgentRetailBon } from '@/lib/vysion-print-agent-client'
 import { isAndroidTabletPrintClient, sendToVysionPrintAgent } from '@/lib/vysion-print-agent-client'
 
 export type RetailReceiptI18n = {
@@ -171,6 +172,157 @@ export function buildRetailKassaReceiptHtmlDocument(opts: {
   return `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${escapeReceiptHtml(docTitle)}</title><style>${KASSA_PRINT_RECEIPT_STYLES}\n${RETAIL_RECEIPT_PRINT_STYLES}</style></head><body>${body}</body></html>`
 }
 
+function payMethodShort(order: KassaLastOrderReceipt, labels: RetailReceiptI18n): string {
+  if (order.paymentMethod === 'SPLIT') {
+    return labels.paidSplit((order.splitCash ?? 0).toFixed(2), (order.splitCard ?? 0).toFixed(2))
+  }
+  if (order.paymentMethod === 'CASH') return labels.payCash
+  if (order.paymentMethod === 'CARD') return labels.payPin
+  if (order.paymentMethod === 'IDEAL') return labels.payIdeal
+  return labels.payBancontact
+}
+
+function itemsGrossIncl(order: KassaLastOrderReceipt): number {
+  return (
+    Math.round(
+      order.items.reduce((s, i) => {
+        const choicesTotal = (i.choices || []).reduce((c, ch) => c + ch.price, 0)
+        return s + (i.product.price + choicesTotal) * i.quantity
+      }, 0) * 100,
+    ) / 100
+  )
+}
+
+function stripEmojiForThermal(text: string): string {
+  return text.replace(/\p{Extended_Pictographic}/gu, '').replace(/\s+/g, ' ').trim()
+}
+
+function staffFirstName(full: string): string {
+  const p = full.trim().split(/\s+/).filter(Boolean)
+  return p[0] ?? full.trim()
+}
+
+function buildRetailPrintAgentBody(opts: {
+  tenantInfo: TenantSettings | null
+  order: KassaLastOrderReceipt
+  labels: RetailReceiptI18n
+  locale: string
+  draft?: boolean
+}): VysionPrintAgentBody {
+  const { tenantInfo, order, labels, locale } = opts
+  const isDraft = !!opts.draft
+  const dateStr = retailReceiptDateStr(order, locale)
+  const fbVatRate = normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 21, 21)
+  const subtotalExcl =
+    typeof order.subtotalExclVat === 'number'
+      ? Math.round(order.subtotalExclVat * 100) / 100
+      : Math.round((order.total / (1 + fbVatRate / 100)) * 100) / 100
+  const taxTotal =
+    typeof order.totalTax === 'number'
+      ? Math.round(order.totalTax * 100) / 100
+      : Math.round((order.total - subtotalExcl) * 100) / 100
+
+  const receiptRefDisplay = isDraft
+    ? '—'
+    : order.checkoutReference ?? (order.orderNumber > 0 ? String(order.orderNumber) : '—')
+  const payLabel = isDraft ? labels.draftNotPaid : payMethodShort(order, labels)
+  const discountEuro = Math.round((itemsGrossIncl(order) - order.total) * 100) / 100
+
+  const agentItems = order.items.map((i) => {
+    const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
+    const unitIncl = i.product.price + choicesTotal
+    return {
+      quantity: i.quantity,
+      name: i.product.name,
+      price: Math.round(unitIncl * i.quantity * 100) / 100,
+    }
+  })
+
+  const centerLines: string[] = []
+  const L = order.retailLoyalty
+  if (L && labels.loyaltyBalanceLine) {
+    if (L.memberLabel && labels.loyaltyPassLabel) {
+      centerLines.push(stripEmojiForThermal(labels.loyaltyPassLabel(L.memberLabel)))
+    }
+    if (L.pointsRedeemed > 0 && labels.loyaltyRedeemedLine) {
+      centerLines.push(stripEmojiForThermal(labels.loyaltyRedeemedLine(L.pointsRedeemed)))
+    }
+    if (L.pointsEarned > 0 && labels.loyaltyEarnedLine) {
+      centerLines.push(stripEmojiForThermal(labels.loyaltyEarnedLine(L.pointsEarned)))
+    }
+    centerLines.push(stripEmojiForThermal(labels.loyaltyBalanceLine(L.pointsBalance)))
+  }
+  const helpedRaw = order.helpedByStaffName?.trim()
+  if (helpedRaw && labels.helpedByIntro) {
+    centerLines.push(stripEmojiForThermal(labels.helpedByIntro))
+    centerLines.push(staffFirstName(helpedRaw))
+  }
+  centerLines.push(stripEmojiForThermal(isDraft ? labels.draftFooter : labels.thanks))
+  if (!isDraft) centerLines.push(stripEmojiForThermal(labels.thanksFarewell))
+
+  const retailBon: VysionPrintAgentRetailBon = {
+    dateStr,
+    receiptRef: receiptRefDisplay,
+    isDraft,
+    discountEuro: discountEuro > 0.009 ? discountEuro : undefined,
+    changeAmount: 0,
+    payLine: labels.paymentMethodLine(payLabel).slice(0, 42),
+    businessVatLine: tenantInfo?.btw_number?.trim()
+      ? labels.businessVatLabel(tenantInfo.btw_number.trim())
+      : undefined,
+    telLine: tenantInfo?.phone?.trim()
+      ? `${labels.telPrefix} ${tenantInfo.phone.trim()}`
+      : undefined,
+    centerLines,
+    labels: {
+      receiptBonNrPrefix: labels.receiptBonNrPrefix,
+      sectionOrderBar: labels.sectionOrderBar,
+      sectionTotalBar: labels.sectionTotalBar,
+      subtotal: labels.subtotal,
+      vatSingleLabel: labels.vatSingleLabel,
+      total: labels.total,
+      receivedLabel: labels.receivedLabel,
+      changeLabel: labels.changeLabel,
+      receiptDiscount: labels.receiptDiscount,
+      draftBanner: labels.draftBanner,
+    },
+  }
+
+  const bonLines = buildRetailThermalBonLines({
+    tenantInfo,
+    order,
+    labels,
+    locale,
+    draft: isDraft,
+  })
+
+  return {
+    winkelnaam: formatStoreDisplayName(tenantInfo?.business_name || labels.defaultBusinessName),
+    bonInhoud: bonLines.join('\n'),
+    receiptMode: 'retail',
+    orderData: {
+      orderNumber: order.orderNumber,
+      orderType: 'RETAIL',
+      items: agentItems,
+      subtotal: subtotalExcl,
+      tax: taxTotal,
+      total: order.total,
+      paymentMethod: order.paymentMethod,
+    },
+    businessInfo: {
+      name: formatStoreDisplayName(tenantInfo?.business_name || labels.defaultBusinessName),
+      address: tenantInfo?.address ?? undefined,
+      postalCode: tenantInfo?.postal_code ?? undefined,
+      city: tenantInfo?.city ?? undefined,
+      phone: tenantInfo?.phone ?? undefined,
+      vatNumber: tenantInfo?.btw_number ?? undefined,
+      website: tenantInfo?.website ?? undefined,
+      vatRate: fbVatRate,
+    },
+    retailBon,
+  }
+}
+
 export async function printRetailKassaReceipt(opts: {
   tenantInfo: TenantSettings | null
   order: KassaLastOrderReceipt
@@ -181,33 +333,13 @@ export async function printRetailKassaReceipt(opts: {
   const { tenantInfo, order, labels, locale } = opts
   const isDraft = !!opts.draft
 
-  const bonLines = buildRetailThermalBonLines({
-    tenantInfo,
-    order,
-    labels,
-    locale,
-    draft: isDraft,
-  })
-
   const isCash =
     !isDraft && ['CASH', 'cash', 'CONTANT', 'contant'].includes(String(order.paymentMethod || ''))
 
   const printResult = await sendToVysionPrintAgent({
-    winkelnaam: formatStoreDisplayName(tenantInfo?.business_name || labels.defaultBusinessName),
-    bonInhoud: bonLines.join('\n'),
-    businessInfo: {
-      name: formatStoreDisplayName(tenantInfo?.business_name || labels.defaultBusinessName),
-      address: tenantInfo?.address ?? undefined,
-      postalCode: tenantInfo?.postal_code ?? undefined,
-      city: tenantInfo?.city ?? undefined,
-      phone: tenantInfo?.phone ?? undefined,
-      vatNumber: tenantInfo?.btw_number ?? undefined,
-      website: tenantInfo?.website ?? undefined,
-      vatRate: normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 21, 21),
-    },
+    ...buildRetailPrintAgentBody({ tenantInfo, order, labels, locale, draft: isDraft }),
     copies: isDraft ? 1 : 2,
     openDrawer: isCash,
-    receiptMode: 'kassa',
   })
 
   if (printResult.ok) return { ok: true }
