@@ -95,26 +95,6 @@ export function buildRetailLastOrderReceipt(
   }
 }
 
-function appendRetailLoyaltyReceiptLines(
-  order: KassaLastOrderReceipt,
-  labels: RetailReceiptI18n,
-  lines: string[],
-): void {
-  const L = order.retailLoyalty
-  if (!L || !labels.loyaltyBalanceLine) return
-  lines.push('--------------------------------')
-  if (L.memberLabel && labels.loyaltyPassLabel) {
-    lines.push(labels.loyaltyPassLabel(L.memberLabel))
-  }
-  if (L.pointsRedeemed > 0 && labels.loyaltyRedeemedLine) {
-    lines.push(labels.loyaltyRedeemedLine(L.pointsRedeemed))
-  }
-  if (L.pointsEarned > 0 && labels.loyaltyEarnedLine) {
-    lines.push(labels.loyaltyEarnedLine(L.pointsEarned))
-  }
-  lines.push(labels.loyaltyBalanceLine(L.pointsBalance))
-}
-
 function payLabelForOrder(order: KassaLastOrderReceipt, labels: RetailReceiptI18n, isDraft: boolean): string {
   if (isDraft) return labels.draftNotPaid
   if (order.paymentMethod === 'SPLIT') {
@@ -124,6 +104,196 @@ function payLabelForOrder(order: KassaLastOrderReceipt, labels: RetailReceiptI18
   if (order.paymentMethod === 'CARD') return labels.payCard
   if (order.paymentMethod === 'IDEAL') return labels.payIdeal
   return labels.payBancontact
+}
+
+/** Zelfde effectieve breedte als Vysion Print Agent (80 mm). */
+const THERMAL_W = 42
+
+function thermalSep(char: '-' | '=' = '-'): string {
+  return char.repeat(THERMAL_W)
+}
+
+function thermalCenter(text: string): string {
+  const t = text.replace(/\s+/g, ' ').trim()
+  if (!t) return ''
+  if (t.length >= THERMAL_W) return t.slice(0, THERMAL_W)
+  const pad = Math.floor((THERMAL_W - t.length) / 2)
+  return `${' '.repeat(pad)}${t}`
+}
+
+function thermalPadRow(left: string, right: string): string {
+  const l = left.trim()
+  const r = right.trim()
+  if (l.length + r.length >= THERMAL_W) {
+    return `${l.slice(0, THERMAL_W - r.length - 1)} ${r}`.slice(0, THERMAL_W)
+  }
+  return l + ' '.repeat(THERMAL_W - l.length - r.length) + r
+}
+
+function thermalMoney(amount: number): string {
+  return `EUR ${amount.toFixed(2)}`
+}
+
+function thermalItemLine(qty: number, name: string, lineTotal: number): string {
+  const price = thermalMoney(lineTotal)
+  const prefix = `${qty}x `
+  const maxNameLen = THERMAL_W - prefix.length - price.length - 1
+  let n = name.trim()
+  if (maxNameLen > 3 && n.length > maxNameLen) {
+    n = `${n.slice(0, maxNameLen - 1)}.`
+  }
+  return thermalPadRow(`${prefix}${n}`, price)
+}
+
+function stripEmojiForThermal(text: string): string {
+  return text.replace(/\p{Extended_Pictographic}/gu, '').replace(/\s+/g, ' ').trim()
+}
+
+function appendRetailLoyaltyThermalLines(
+  order: KassaLastOrderReceipt,
+  labels: RetailReceiptI18n,
+  lines: string[],
+): void {
+  const L = order.retailLoyalty
+  if (!L || !labels.loyaltyBalanceLine) return
+  lines.push('')
+  lines.push(thermalSep('-'))
+  if (L.memberLabel && labels.loyaltyPassLabel) {
+    lines.push(thermalCenter(stripEmojiForThermal(labels.loyaltyPassLabel(L.memberLabel))))
+  }
+  if (L.pointsRedeemed > 0 && labels.loyaltyRedeemedLine) {
+    lines.push(thermalCenter(stripEmojiForThermal(labels.loyaltyRedeemedLine(L.pointsRedeemed))))
+  }
+  if (L.pointsEarned > 0 && labels.loyaltyEarnedLine) {
+    lines.push(thermalCenter(stripEmojiForThermal(labels.loyaltyEarnedLine(L.pointsEarned))))
+  }
+  lines.push(thermalCenter(stripEmojiForThermal(labels.loyaltyBalanceLine(L.pointsBalance))))
+}
+
+export function buildRetailThermalBonLines(opts: {
+  tenantInfo: TenantSettings | null
+  order: KassaLastOrderReceipt
+  labels: RetailReceiptI18n
+  locale: string
+  draft?: boolean
+}): string[] {
+  const { tenantInfo, order, labels, locale } = opts
+  const isDraft = !!opts.draft
+  const fbVatRate = normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 21, 21)
+  const splitOk =
+    Array.isArray(order.vatSplit) &&
+    order.vatSplit.length > 0 &&
+    typeof order.subtotalExclVat === 'number' &&
+    typeof order.totalTax === 'number'
+  let subtotal: number
+  let tax: number
+  if (splitOk) {
+    subtotal = Math.round((order.subtotalExclVat as number) * 100) / 100
+    tax = Math.round((order.totalTax as number) * 100) / 100
+  } else {
+    subtotal = Math.round((order.total / (1 + fbVatRate / 100)) * 100) / 100
+    tax = Math.round((order.total - subtotal) * 100) / 100
+  }
+
+  const invoice = order.retailCustomerInvoice
+  const receiptRefDisplay = isDraft
+    ? '—'
+    : order.checkoutReference ?? (order.orderNumber > 0 ? String(order.orderNumber) : '—')
+  const refLabel = invoice ? labels.invoiceNo : labels.receiptNo
+  const payLabel = payLabelForOrder(order, labels, isDraft)
+  const dateStr = order.createdAt.toLocaleString(appLocaleToBcp47(locale), {
+    day: '2-digit',
+    month: '2-digit',
+    year: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+
+  const bizName = (tenantInfo?.business_name || labels.defaultBusinessName).trim()
+  const lines: string[] = []
+
+  lines.push('')
+  lines.push(thermalCenter(bizName.toUpperCase()))
+  if (tenantInfo?.address) lines.push(thermalCenter(tenantInfo.address.trim()))
+  if (tenantInfo?.postal_code || tenantInfo?.city) {
+    lines.push(
+      thermalCenter(`${tenantInfo.postal_code ?? ''} ${tenantInfo.city ?? ''}`.trim()),
+    )
+  }
+  if (tenantInfo?.phone) {
+    lines.push(thermalCenter(`${labels.telPrefix} ${tenantInfo.phone}`.trim()))
+  }
+  lines.push('')
+  lines.push(thermalSep('='))
+
+  if (isDraft) {
+    lines.push(thermalCenter(labels.draftBanner.toUpperCase()))
+    lines.push(thermalSep('-'))
+  }
+
+  if (invoice) {
+    lines.push(thermalCenter(labels.invoiceTitle.toUpperCase()))
+    lines.push(thermalSep('-'))
+    lines.push(invoice.name.trim())
+    if (invoice.addressLine) lines.push(invoice.addressLine.trim())
+    if (invoice.postalCity) lines.push(invoice.postalCity.trim())
+    lines.push(labels.customerVatLabel(invoice.vatNumber))
+    lines.push(thermalSep('-'))
+  }
+
+  const typePlain = stripEmojiForThermal(labels.orderTypeTakeaway).toUpperCase()
+  lines.push(thermalCenter(`>> ${typePlain} <<`))
+  lines.push('')
+  lines.push(thermalPadRow(`${refLabel}${receiptRefDisplay}`.trim(), dateStr))
+  lines.push(thermalSep('-'))
+
+  for (const i of order.items) {
+    const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
+    const lineTotal = (i.product.price + choicesTotal) * i.quantity
+    lines.push(thermalItemLine(i.quantity, i.product.name, lineTotal))
+  }
+
+  lines.push(thermalSep('-'))
+  lines.push(thermalPadRow(labels.subtotal, thermalMoney(subtotal)))
+  if (splitOk && order.vatSplit!.length >= 1) {
+    for (const row of order.vatSplit!) {
+      lines.push(thermalPadRow(labels.vatLabel(row.rate), thermalMoney(row.tax)))
+    }
+  } else {
+    lines.push(thermalPadRow(labels.vatLabel(fbVatRate), thermalMoney(tax)))
+  }
+  lines.push('')
+  lines.push(thermalPadRow(labels.total.toUpperCase(), thermalMoney(order.total)))
+  lines.push(thermalSep('='))
+  lines.push('')
+  lines.push(thermalCenter(`${labels.paidWith} ${payLabel}`))
+
+  appendRetailLoyaltyThermalLines(order, labels, lines)
+
+  if (order.helpedByStaffName?.trim() && labels.helpedByLine) {
+    lines.push('')
+    lines.push(thermalSep('-'))
+    const staffLine = stripEmojiForThermal(labels.helpedByLine(order.helpedByStaffName.trim()))
+    if (staffLine.length <= THERMAL_W) {
+      lines.push(thermalCenter(staffLine))
+    } else {
+      lines.push(thermalCenter('Geholpen door:'))
+      lines.push(thermalCenter(order.helpedByStaffName.trim()))
+    }
+  }
+
+  lines.push('')
+  lines.push(thermalSep('-'))
+  if (tenantInfo?.btw_number) {
+    lines.push(thermalCenter(labels.businessVatLabel(tenantInfo.btw_number)))
+  }
+  lines.push(thermalCenter(isDraft ? labels.draftFooter : labels.thanks))
+  if (tenantInfo?.website?.trim()) {
+    lines.push(thermalCenter(tenantInfo.website.trim()))
+  }
+  lines.push('')
+
+  return lines
 }
 
 export type RetailPrintReceiptResult =
@@ -271,87 +441,14 @@ export async function printRetailKassaReceipt(opts: {
 }): Promise<RetailPrintReceiptResult> {
   const { tenantInfo, order, labels, locale } = opts
   const isDraft = !!opts.draft
-  const fbVatRate = normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 21, 21)
-  const splitOk =
-    Array.isArray(order.vatSplit) &&
-    order.vatSplit.length > 0 &&
-    typeof order.subtotalExclVat === 'number' &&
-    typeof order.totalTax === 'number'
-  let subtotal: number
-  let tax: number
-  if (splitOk) {
-    subtotal = Math.round((order.subtotalExclVat as number) * 100) / 100
-    tax = Math.round((order.totalTax as number) * 100) / 100
-  } else {
-    subtotal = Math.round((order.total / (1 + fbVatRate / 100)) * 100) / 100
-    tax = Math.round((order.total - subtotal) * 100) / 100
-  }
 
-  const orderTypePlain = labels.orderTypeTakeaway
-  const invoice = order.retailCustomerInvoice
-  const receiptRefDisplay = isDraft
-    ? '—'
-    : order.checkoutReference ?? (order.orderNumber > 0 ? String(order.orderNumber) : '—')
-  const refLabel = invoice ? labels.invoiceNo : labels.receiptNo
-  const payLabel = payLabelForOrder(order, labels, isDraft)
-  const docTitle = `${refLabel}${receiptRefDisplay}`
-  const dateStr = order.createdAt.toLocaleString(appLocaleToBcp47(locale), {
-    day: '2-digit',
-    month: '2-digit',
-    year: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
+  const bonLines = buildRetailThermalBonLines({
+    tenantInfo,
+    order,
+    labels,
+    locale,
+    draft: isDraft,
   })
-
-  const bonLines: string[] = []
-  bonLines.push(tenantInfo?.business_name || labels.defaultBusinessName)
-  if (tenantInfo?.address) bonLines.push(tenantInfo.address)
-  if (tenantInfo?.postal_code || tenantInfo?.city) {
-    bonLines.push(`${tenantInfo.postal_code ?? ''} ${tenantInfo.city ?? ''}`.trim())
-  }
-  if (tenantInfo?.phone) bonLines.push(`${labels.telPrefix} ${tenantInfo.phone}`)
-  bonLines.push('--------------------------------')
-  if (isDraft) {
-    bonLines.push(labels.draftBanner)
-    bonLines.push('--------------------------------')
-  }
-  if (invoice) {
-    bonLines.push(labels.invoiceTitle)
-    bonLines.push('--------------------------------')
-    bonLines.push(invoice.name)
-    if (invoice.addressLine) bonLines.push(invoice.addressLine)
-    if (invoice.postalCity) bonLines.push(invoice.postalCity)
-    bonLines.push(labels.customerVatLabel(invoice.vatNumber))
-    bonLines.push('--------------------------------')
-  }
-  bonLines.push(orderTypePlain)
-  bonLines.push(`${refLabel}${receiptRefDisplay}  ${dateStr}`)
-  bonLines.push('--------------------------------')
-  for (const i of order.items) {
-    const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
-    const lineTotal = (i.product.price + choicesTotal) * i.quantity
-    bonLines.push(`${i.quantity}x ${i.product.name}  EUR ${lineTotal.toFixed(2)}`)
-  }
-  bonLines.push('--------------------------------')
-  bonLines.push(`${labels.subtotal}  EUR ${subtotal.toFixed(2)}`)
-  if (splitOk && order.vatSplit!.length >= 1) {
-    for (const row of order.vatSplit!) {
-      bonLines.push(`${labels.vatLabel(row.rate)}  EUR ${row.tax.toFixed(2)}`)
-    }
-  } else {
-    bonLines.push(`${labels.vatLabel(fbVatRate)}  EUR ${tax.toFixed(2)}`)
-  }
-  bonLines.push(`${labels.total}  EUR ${order.total.toFixed(2)}`)
-  bonLines.push(`${labels.paidWith} ${payLabel}`)
-  appendRetailLoyaltyReceiptLines(order, labels, bonLines)
-  if (order.helpedByStaffName?.trim() && labels.helpedByLine) {
-    bonLines.push(labels.helpedByLine(order.helpedByStaffName.trim()))
-  }
-  if (tenantInfo?.btw_number) {
-    bonLines.push(labels.businessVatLabel(tenantInfo.btw_number))
-  }
-  bonLines.push(isDraft ? labels.draftFooter : labels.thanks)
-  if (tenantInfo?.website) bonLines.push(tenantInfo.website)
 
   const isCash =
     !isDraft && ['CASH', 'cash', 'CONTANT', 'contant'].includes(String(order.paymentMethod || ''))
