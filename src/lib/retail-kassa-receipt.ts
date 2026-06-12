@@ -11,6 +11,7 @@ import type { RetailCartLine } from '@/lib/retail-kassa-pos'
 import {
   buildRetailKassaReceiptHtmlBody,
   buildRetailThermalBonLines as buildRetailThermalBonLinesCore,
+  formatStoreDisplayName,
   retailTicketEanForOrder,
   RETAIL_RECEIPT_PRINT_STYLES,
 } from '@/lib/retail-kassa/receipt-layout'
@@ -192,7 +193,7 @@ export async function printRetailKassaReceipt(opts: {
     !isDraft && ['CASH', 'cash', 'CONTANT', 'contant'].includes(String(order.paymentMethod || ''))
 
   const printResult = await sendToVysionPrintAgent({
-    winkelnaam: tenantInfo?.business_name || labels.defaultBusinessName,
+    winkelnaam: formatStoreDisplayName(tenantInfo?.business_name || labels.defaultBusinessName),
     bonInhoud: bonLines.join('\n'),
     copies: isDraft ? 1 : 2,
     openDrawer: isCash,

@@ -15,10 +15,10 @@ export const RETAIL_RECEIPT_PRINT_STYLES = `
       .meta-row { display:flex;justify-content:space-between;align-items:baseline;font-size:10px;margin:10px 0 6px; }
       .black-bar { background:#000;color:#fff;font-weight:700;font-size:13px;padding:3px 6px;margin:8px 0 5px 0;width:100%;box-sizing:border-box;text-transform:uppercase; }
       .black-bar:first-of-type { margin-top:4px; }
-      .retail-item { display:grid;grid-template-columns:11ch 1fr;gap:8px;align-items:baseline;margin:4px 0;font-size:11px; }
-      .retail-item-extra { padding-left:11ch;margin:2px 0;font-size:10px; }
+      .retail-item { display:grid;grid-template-columns:1fr auto;gap:8px;align-items:baseline;margin:4px 0;font-size:11px; }
+      .retail-item-extra { padding-left:0;margin:2px 0 2px 8px;font-size:10px; }
       .amt { font-family:'Courier New',Courier,monospace;font-weight:700;white-space:nowrap; }
-      .item-price-left { text-align:left; }
+      .item-price-right { text-align:right; }
       .money-row { display:flex;justify-content:space-between;align-items:baseline;margin:3px 0;font-size:11px; }
       .money-row .label-strong { font-weight:900;color:#000; }
       .money-row .amt { min-width:11ch;text-align:right; }
@@ -58,18 +58,32 @@ function capitalizeProductName(name: string): string {
   return t.charAt(0).toUpperCase() + t.slice(1)
 }
 
+/** Eerste letter hoofdletter (Gamma i.p.v. gamma) — tenant-naam op bon. */
+export function formatStoreDisplayName(name: string): string {
+  const t = name.trim()
+  if (!t) return t
+  return t.charAt(0).toUpperCase() + t.slice(1)
+}
+
 function staffFirstName(full: string): string {
   const p = full.trim().split(/\s+/).filter(Boolean)
   return p[0] ?? full.trim()
 }
 
-const THERMAL_PRICE_W = 12
+/** Print-agent `encWithEuro` vouwt gewone spaties in — NBSP behoudt kolommen op papier. */
+const THERMAL_PAD = '\u00a0'
+
+function thermalPadGap(length: number): string {
+  if (length <= 0) return ''
+  return THERMAL_PAD.repeat(length)
+}
 
 function thermalPadMoney(left: string, amount: number): string {
-  const r = formatEuroThermal(amount).padStart(THERMAL_PRICE_W)
-  const maxLeft = RETAIL_THERMAL_W - THERMAL_PRICE_W
+  const r = formatEuroThermal(amount)
+  const maxLeft = RETAIL_THERMAL_W - r.length
   const l = left.trimEnd().slice(0, maxLeft)
-  return l.padEnd(maxLeft, ' ') + r
+  const gap = Math.max(1, maxLeft - l.length)
+  return l + thermalPadGap(gap) + r
 }
 
 function thermalPadRow(left: string, right: string): string {
@@ -78,7 +92,8 @@ function thermalPadRow(left: string, right: string): string {
   if (l.length + r.length >= RETAIL_THERMAL_W) {
     return `${l.slice(0, RETAIL_THERMAL_W - r.length - 1)} ${r}`.slice(0, RETAIL_THERMAL_W)
   }
-  return l + ' '.repeat(RETAIL_THERMAL_W - l.length - r.length) + r
+  const gap = RETAIL_THERMAL_W - l.length - r.length
+  return l + thermalPadGap(gap) + r
 }
 
 function thermalCenter(text: string): string {
@@ -86,14 +101,16 @@ function thermalCenter(text: string): string {
   if (!t) return ''
   if (t.length >= RETAIL_THERMAL_W) return t.slice(0, RETAIL_THERMAL_W)
   const pad = Math.floor((RETAIL_THERMAL_W - t.length) / 2)
-  return `${' '.repeat(pad)}${t}`
+  return thermalPadGap(pad) + t
 }
 
-function thermalItemRowPriceLeft(qty: number, name: string, lineTotal: number): string {
-  const price = formatEuroThermal(lineTotal).padEnd(THERMAL_PRICE_W)
-  const item = `${qty} ${capitalizeProductName(name)}`
-  const maxItem = RETAIL_THERMAL_W - THERMAL_PRICE_W
-  return price + item.slice(0, maxItem)
+function thermalItemRow(qty: number, name: string, lineTotal: number): string {
+  const left = `${qty} ${capitalizeProductName(name)}`
+  const r = formatEuroThermal(lineTotal)
+  const maxLeft = RETAIL_THERMAL_W - r.length
+  const l = left.slice(0, maxLeft)
+  const gap = Math.max(1, maxLeft - l.length)
+  return l + thermalPadGap(gap) + r
 }
 
 function itemsGrossIncl(order: KassaLastOrderReceipt): number {
@@ -177,7 +194,7 @@ function appendItemsThermal(order: KassaLastOrderReceipt, lines: string[]): void
     const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
     const unitIncl = item.product.price + choicesTotal
     const lineTotal = unitIncl * item.quantity
-    lines.push(thermalItemRowPriceLeft(item.quantity, item.product.name, lineTotal))
+    lines.push(thermalItemRow(item.quantity, item.product.name, lineTotal))
     for (const c of item.choices || []) {
       lines.push(`   + ${capitalizeProductName(c.choiceName)}`.slice(0, RETAIL_THERMAL_W))
     }
@@ -196,7 +213,7 @@ function appendItemsHtml(order: KassaLastOrderReceipt): string {
             `<div class="retail-item-extra">+ ${escapeReceiptHtml(capitalizeProductName(c.choiceName))}</div>`,
         )
         .join('')
-      return `<div class="retail-item"><span class="amt item-price-left">${formatEuroHtml(lineTotal)}</span><span>${i.quantity} ${escapeReceiptHtml(capitalizeProductName(i.product.name))}</span></div>${extras}`
+      return `<div class="retail-item"><span>${i.quantity} ${escapeReceiptHtml(capitalizeProductName(i.product.name))}</span><span class="amt item-price-right">${formatEuroHtml(lineTotal)}</span></div>${extras}`
     })
     .join('')
 }
@@ -218,14 +235,17 @@ export function buildRetailThermalBonLines(opts: {
     ? '—'
     : order.checkoutReference ?? (order.orderNumber > 0 ? String(order.orderNumber) : '—')
   const payLabel = isDraft ? labels.draftNotPaid : payMethodShort(order, labels)
-  const bizName = (tenantInfo?.business_name || labels.defaultBusinessName).trim()
+  const bizName = formatStoreDisplayName(tenantInfo?.business_name || labels.defaultBusinessName)
   const discountEuro = Math.round((itemsGrossIncl(order) - order.total) * 100) / 100
   const lines: string[] = []
 
-  lines.push(thermalCenter(bizName))
+  /** Naam print de agent gecentreerd via `winkelnaam` — hier alleen adres/BTW/tel gecentreerd. */
   if (tenantInfo?.address) lines.push(thermalCenter(tenantInfo.address.trim()))
   if (tenantInfo?.postal_code || tenantInfo?.city) {
     lines.push(thermalCenter(`${tenantInfo.postal_code ?? ''} ${tenantInfo.city ?? ''}`.trim()))
+  }
+  if (tenantInfo?.btw_number?.trim()) {
+    lines.push(thermalCenter(labels.businessVatLabel(tenantInfo.btw_number.trim())))
   }
   if (tenantInfo?.phone?.trim()) {
     lines.push(thermalCenter(`${labels.telPrefix} ${tenantInfo.phone.trim()}`))
@@ -253,9 +273,7 @@ export function buildRetailThermalBonLines(opts: {
 
   appendItemsThermal(order, lines)
   if (discountEuro > 0.009) {
-    const r = `-${formatEuroThermal(discountEuro)}`.padStart(THERMAL_PRICE_W)
-    const maxLeft = RETAIL_THERMAL_W - THERMAL_PRICE_W
-    lines.push(labels.receiptDiscount.slice(0, maxLeft).padEnd(maxLeft, ' ') + r)
+    lines.push(thermalPadMoney(labels.receiptDiscount, -discountEuro))
   }
   lines.push('')
   lines.push(labels.sectionTotalBar.toUpperCase())
@@ -299,7 +317,9 @@ export function buildRetailKassaReceiptHtmlBody(opts: {
     : order.checkoutReference ?? (order.orderNumber > 0 ? String(order.orderNumber) : '—')
   const payLabel = isDraft ? labels.draftNotPaid : payMethodShort(order, labels)
   const discountEuro = Math.round((itemsGrossIncl(order) - order.total) * 100) / 100
-  const bizName = escapeReceiptHtml(tenantInfo?.business_name || labels.defaultBusinessName)
+  const bizName = escapeReceiptHtml(
+    formatStoreDisplayName(tenantInfo?.business_name || labels.defaultBusinessName),
+  )
   const logoUrl = tenantInfo?.logo_url?.trim()
   const invoice = order.retailCustomerInvoice
 
@@ -339,6 +359,11 @@ export function buildRetailKassaReceiptHtmlBody(opts: {
         ${
           tenantInfo?.postal_code || tenantInfo?.city
             ? `<div class="small">${escapeReceiptHtml(`${tenantInfo.postal_code ?? ''} ${tenantInfo.city ?? ''}`.trim())}</div>`
+            : ''
+        }
+        ${
+          tenantInfo?.btw_number?.trim()
+            ? `<div class="small">${escapeReceiptHtml(labels.businessVatLabel(tenantInfo.btw_number.trim()))}</div>`
             : ''
         }
         ${
