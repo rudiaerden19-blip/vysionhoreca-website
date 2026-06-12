@@ -71,12 +71,8 @@ function staffFirstName(full: string): string {
   return p[0] ?? full.trim()
 }
 
-/** Agent `encWithEuro` vouwt spaties samen — uitlijnen via tabstops (8 kol.), max 42 printkolommen. */
-const THERMAL_TAB_W = 8
-
-function thermalTabColumn(fromCol: number): number {
-  return (Math.floor(fromCol / THERMAL_TAB_W) + 1) * THERMAL_TAB_W
-}
+/** Agent `encWithEuro` vouwt spaties samen — kolomuitlijning via `.` leaders (42 kol.). */
+const THERMAL_FILL = '.'
 
 function thermalRightAlignLine(left: string, right: string): string {
   const l = left.trimEnd()
@@ -84,19 +80,11 @@ function thermalRightAlignLine(left: string, right: string): string {
   const targetCol = RETAIL_THERMAL_W - r.length
   if (targetCol <= 0) return r.slice(0, RETAIL_THERMAL_W)
   if (l.length >= targetCol) {
-    return `${l.slice(0, Math.max(0, targetCol - 1))} ${r}`.slice(0, RETAIL_THERMAL_W)
+    return `${l.slice(0, Math.max(0, targetCol - 1))}${THERMAL_FILL}${r}`.slice(0, RETAIL_THERMAL_W)
   }
-  let col = l.length
-  let tabs = ''
-  while (col < targetCol && tabs.length < 6) {
-    tabs += '\t'
-    col = thermalTabColumn(col)
-  }
-  if (col + r.length > RETAIL_THERMAL_W) {
-    const maxL = RETAIL_THERMAL_W - r.length - 1
-    return `${l.slice(0, Math.max(0, maxL))} ${r}`.slice(0, RETAIL_THERMAL_W)
-  }
-  return l + tabs + r
+  const fillLen = Math.max(1, targetCol - l.length)
+  const line = l + THERMAL_FILL.repeat(fillLen) + r
+  return line.length > RETAIL_THERMAL_W ? line.slice(0, RETAIL_THERMAL_W) : line
 }
 
 function thermalPadMoney(left: string, amount: number): string {
@@ -112,14 +100,7 @@ function thermalCenter(text: string): string {
   if (!t) return ''
   if (t.length >= RETAIL_THERMAL_W) return t.slice(0, RETAIL_THERMAL_W)
   const startCol = Math.floor((RETAIL_THERMAL_W - t.length) / 2)
-  let col = 0
-  let tabs = ''
-  while (col < startCol && tabs.length < 6) {
-    tabs += '\t'
-    col = thermalTabColumn(col)
-  }
-  if (col + t.length > RETAIL_THERMAL_W) return t.slice(0, RETAIL_THERMAL_W)
-  return tabs + t
+  return THERMAL_FILL.repeat(startCol) + t
 }
 
 /** Print-agent herkent `Nx …` en zet extra witruimte tussen artikelregels. */
