@@ -44,16 +44,19 @@ export type RetailReceiptI18n = {
   loyaltyRedeemedLine?: (points: number) => string
   loyaltyBalanceLine?: (points: number) => string
   receiptBonNrPrefix: string
-  totalsBarLabel: string
+  sectionOrderBar: string
+  sectionTotalBar: string
+  sectionVatBar: string
   receivedLabel: string
   changeLabel: string
-  paymentMethodLabel: string
   payPin: string
+  paymentMethodLine: (method: string) => string
+  vatSingleLabel: string
   vatColBtwPct: string
   vatColBtw: string
   vatColExcl: string
   vatColIncl: string
-  vatTotalLine: (amount: string) => string
+  thanksFarewell: string
   receiptDiscount: string
 }
 

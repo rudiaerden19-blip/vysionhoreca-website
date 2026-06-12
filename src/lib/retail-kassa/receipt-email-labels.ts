@@ -66,18 +66,21 @@ export function retailReceiptI18nForLocale(locale: string): RetailReceiptI18n {
     loyaltyBalanceLine: (points) =>
       (retail.receiptLoyaltyBalance ?? '').replace('{points}', String(points)),
     helpedByLine: (name) => (r.helpedBy ?? '').replace('{name}', name),
-    receiptBonNrPrefix: retail.receiptBonNrPrefix ?? 'Bonnr. ',
-    totalsBarLabel: retail.totalsBarLabel ?? 'TOTALEN :',
+    receiptBonNrPrefix: retail.receiptBonNrPrefix ?? 'Bonnr: ',
+    sectionOrderBar: retail.sectionOrderBar ?? 'BESTELLING',
+    sectionTotalBar: retail.sectionTotalBar ?? 'TOTAAL',
+    sectionVatBar: retail.sectionVatBar ?? 'BTW OVERZICHT',
     receivedLabel: retail.receivedLabel ?? 'Ontvangen',
     changeLabel: retail.changeLabel ?? 'Retour',
-    paymentMethodLabel: retail.paymentMethodLabel ?? 'BetaalWijze',
     payPin: retail.payPin ?? 'PIN',
+    paymentMethodLine: (method) =>
+      (retail.paymentMethodLine ?? 'Betaalmethode: {method}').replace('{method}', method),
+    vatSingleLabel: retail.vatSingleLabel ?? 'BTW',
     vatColBtwPct: retail.vatColBtwPct ?? 'BTW%',
     vatColBtw: retail.vatColBtw ?? 'BTW',
     vatColExcl: retail.vatColExcl ?? 'Excl.:',
     vatColIncl: retail.vatColIncl ?? 'Incl.:',
-    vatTotalLine: (amount) =>
-      (retail.vatTotalLine ?? 'Totaal BTW {amount}').replace('{amount}', amount),
+    thanksFarewell: retail.thanksFarewell ?? 'Tot ziens!',
     receiptDiscount: retail.receiptDiscount ?? 'Korting',
   }
 }
