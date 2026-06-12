@@ -165,6 +165,15 @@ export function getBrusselsCalendarDateString(date: Date = new Date()): string {
 /** Zet tenant in localStorage na login/registratie (rollende sessie + legacy dagveld). */
 export function persistTenantSessionWithToday(tenant: Record<string, unknown>): void {
   if (typeof window === 'undefined') return
+  const slug = typeof tenant.tenant_slug === 'string' ? tenant.tenant_slug.trim() : ''
+  if (slug) {
+    try {
+      sessionStorage.removeItem(`vysion_kassa_audio_ok_${slug}`)
+      sessionStorage.removeItem(`vysion_audio_activated_${slug}`)
+    } catch {
+      /* ignore */
+    }
+  }
   const sessionExpiresAt = new Date(Date.now() + OWNER_SESSION_TTL_MS).toISOString()
   const enriched = {
     ...tenant,

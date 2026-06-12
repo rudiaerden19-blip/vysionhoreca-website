@@ -102,6 +102,10 @@ import {
 import { appendKassaCloseTipToAbsoluteLoginUrl } from '@/lib/shop-login-kassa-tip'
 import { isAndroidTabletPrintClient, openCashDrawer } from '@/lib/vysion-print-agent-client'
 import { playClick } from '@/lib/sounds'
+import {
+  KassaSoundActivationScreen,
+  useKassaSoundActivationGate,
+} from '@/components/kassa/KassaSoundActivationGate'
 import { retailCustomerInvoiceFromLoyaltyMember } from '@/lib/retail-kassa/customer-invoice-receipt'
 import { useKassaStaffClockPos } from '@/lib/use-kassa-staff-clock-pos'
 
@@ -187,6 +191,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         : createKassaRegisterUiTheme(false),
     [appearanceDark],
   )
+
+  const { gateResolved, soundActivated, activateSound } = useKassaSoundActivationGate(tenant)
 
   const {
     moduleAccess,
@@ -436,6 +442,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   }, [applyArticleSearchDomActive])
 
   useLayoutEffect(() => {
+    if (!soundActivated) return
     setArticleSearchActive(false)
     const active = document.activeElement
     if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) {
@@ -445,7 +452,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     if (el) applyArticleSearchDomInactive(el)
     el?.blur()
     focusBarcodeCapture()
-  }, [applyArticleSearchDomInactive, focusBarcodeCapture])
+  }, [applyArticleSearchDomInactive, focusBarcodeCapture, soundActivated])
 
   useEffect(() => {
     return () => {
@@ -1741,6 +1748,14 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     attemptCloseThenOrNavigate(() => {
       window.location.replace(appendKassaCloseTipToAbsoluteLoginUrl(loginUrl))
     })
+  }
+
+  if (!gateResolved) {
+    return <KassaSoundActivationScreen ui={ui} onActivate={activateSound} busy />
+  }
+
+  if (!soundActivated) {
+    return <KassaSoundActivationScreen ui={ui} onActivate={activateSound} />
   }
 
   return (
