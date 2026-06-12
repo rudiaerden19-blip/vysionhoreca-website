@@ -23,6 +23,7 @@ import { LocaleFlagEmoji, LocaleFlagWithCode } from '@/components/LocaleFlagEmoj
 import { LoginKassaCloseHintModal } from '@/components/LoginKassaCloseHintModal'
 import { LOGIN_QUERY_KASSA_CLOSE_TIP } from '@/lib/shop-login-kassa-tip'
 import { isVysionMainPortalHost } from '@/lib/vysion-site'
+import { kassaPosButtonClass } from '@/lib/kassa-pos-surface'
 
 /** Zelfde hosts als middleware `exactMainDomains` (+ dev): sessie blijft in localStorage van dit domein. */
 function stayOnMainDomainForShopSession(hostname: string): boolean {
@@ -346,7 +347,7 @@ export default function LoginPage() {
                 type="submit"
                 disabled={isLoading || !email || !password}
                 aria-busy={isLoading}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-accent py-4 font-semibold text-white transition-colors hover:bg-accent/90 disabled:bg-accent/50"
+                className={`flex w-full touch-manipulation select-none items-center justify-center gap-2 py-4 font-semibold disabled:opacity-50 ${kassaPosButtonClass(false)}`}
               >
                 {isLoading ? (
                   <>
