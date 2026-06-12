@@ -171,7 +171,6 @@ import {
   KASSA_FLOOR_ZONES,
   migrateLegacyTableOrdersKeys,
   normalizeFloorPlanZone,
-  parseTableOrderMapKey,
   reconcileFloorPlanTablesWithOpenOrders,
   tableOrderMapKey,
   type FloorPlanZone,
@@ -2117,11 +2116,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     void persistOpenOrderRowToSupabase(zone, tblNr, items)
   }
 
-  // Bevestiging popup voor tafel wisselen
-  const [switchConfirm, setSwitchConfirm] = useState<string | null>(null)
-  /** Na plattegrond «Afrekenen»: open betaalmodal zodra doSwitchToTable klaar is (ook ná switch-bevestiging). */
+  // Bevestiging popup voor tafel wisselen — verwijderd: geen manden verplaatsen tussen tafels.
+  /** Na plattegrond «Afrekenen»: open betaalmodal zodra tafel geselecteerd is. */
   const openPaymentAfterFloorPlanSwitchRef = useRef(false)
-  /** Automatische toog-delta bij «Naar tafel» / tafel wisselen: aparte inflight per slot. */
+  /** Automatische toog-delta (legacy hooks; geen «Naar tafel»-knoppen meer). */
   const barDeltaSlotInflightRef = useRef<Record<string, boolean>>({})
   const flushBarDeltaSlipRef = useRef<
     (
@@ -2133,60 +2131,28 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   >(() => {})
 
   const switchToTable = (newTableNr: string) => {
-    const zone = pickerBrowseZone
-    if (tableNumber) {
-      const oldSlot = tableOrderMapKey(dineInFloorZone, tableNumber)
-      const hasParked = (tableOrders[oldSlot]?.length ?? 0) > 0
-      const switchingAway =
-        tableNumber !== newTableNr || dineInFloorZone !== zone
-      if (switchingAway && (cart.length > 0 || hasParked)) {
-        setShowTablePicker(false)
-        setKassaZoneTab(null)
-        setSwitchConfirm(tableOrderMapKey(zone, newTableNr))
-        return
-      }
-    }
-    doSwitchToTable(newTableNr, zone)
+    doSwitchToTable(newTableNr, pickerBrowseZone)
   }
 
+  /**
+   * Alleen actieve tafel/zone wisselen — open manden blijven op hun oorspronkelijke tafel-slot.
+   * Kar met regels op de vorige tafel wordt daar geparkeerd vóór de wissel (geen merge naar nieuwe tafel).
+   */
   const doSwitchToTable = (newTableNr: string, zone: FloorPlanZone) => {
     const oldZone = dineInFloorZone
     const oldTbl = tableNumber.trim()
-    const moving = !!oldTbl && (oldTbl !== newTableNr || oldZone !== zone)
 
-    if (moving) {
+    if (oldTbl && cart.length > 0) {
       const oldSlot = tableOrderMapKey(oldZone, oldTbl)
-      const newSlot = tableOrderMapKey(zone, newTableNr)
-      const cartSnap = cart.length > 0 ? snapshotCartItemsForAsyncPrint(cart) : null
-
       setTableOrders((prev) => {
-        const fromParked = prev[oldSlot] || []
-        const atDest = oldSlot === newSlot ? [] : prev[newSlot] || []
-        let merged = mergeCartLinesForTable(fromParked, cart)
-        merged = mergeCartLinesForTable(atDest, merged)
-        const next = { ...prev, [newSlot]: merged }
-        if (oldSlot !== newSlot) {
-          next[oldSlot] = []
-        }
+        const merged = mergeCartLinesForTable(prev[oldSlot] || [], cart)
+        const next = { ...prev, [oldSlot]: merged }
         localStorage.setItem(tableOrdersKey, JSON.stringify(next))
-        updateTableStatus(oldTbl, false, oldZone)
-        updateTableStatus(newTableNr, merged.length > 0, zone)
-        if (oldSlot !== newSlot) {
-          schedulePersistOpenOrder(oldZone, oldTbl, [])
-        }
-        schedulePersistOpenOrder(zone, newTableNr, merged)
+        updateTableStatus(oldTbl, merged.length > 0, oldZone)
+        schedulePersistOpenOrder(oldZone, oldTbl, merged)
         return next
       })
-
-      if (cartSnap && cartSnap.length > 0) {
-        void flushBarDeltaSlipRef.current(oldZone, oldTbl, cartSnap, {
-          printKitchen: true,
-          printKassaSlip: false,
-        })
-      }
       setCart([])
-    } else if (!oldTbl && cart.length > 0) {
-      updateTableStatus(newTableNr, tableHasOpenOrder(zone, newTableNr, cart), zone)
     }
 
     setTableNumber(newTableNr)
@@ -2194,33 +2160,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setOrderType('DINE_IN')
     setShowTablePicker(false)
     setKassaZoneTab(null)
-    setSwitchConfirm(null)
     if (openPaymentAfterFloorPlanSwitchRef.current) {
       openPaymentAfterFloorPlanSwitchRef.current = false
       setShowFloorPlan(false)
       setShowPaymentModal(true)
     }
-  }
-
-  /** Voeg toe aan tafel: nieuwe karronde naar tafelmand; keuken/kassa-delta alleen over die ronde. */
-  const parkOrder = (opts: { printKitchen: boolean; printKassaSlip: boolean }) => {
-    if (!tableNumber || cart.length === 0) return
-    const snap = snapshotCartItemsForAsyncPrint(cart)
-    const zone = dineInFloorZone
-    const tbl = tableNumber
-    const slotKey = tableOrderMapKey(zone, tbl)
-    setTableOrders((prev) => {
-      const merged = mergeCartLinesForTable(prev[slotKey] || [], cart)
-      const next = { ...prev, [slotKey]: merged }
-      localStorage.setItem(tableOrdersKey, JSON.stringify(next))
-      updateTableStatus(tbl, merged.length > 0, zone)
-      schedulePersistOpenOrder(zone, tbl, merged)
-      return next
-    })
-    void flushBarDeltaSlipRef.current(zone, tbl, snap, opts)
-    setCart([])
-    setTableNumber('')
-    setDineInFloorZone(FLOOR_PLAN_ZONE_INSIDE)
   }
 
   // Betaling
@@ -2759,14 +2703,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       }
     }
   }, [])
-
-  const switchConfirmParsed = switchConfirm ? parseTableOrderMapKey(switchConfirm) : null
-  const switchConfirmDisplay =
-    switchConfirmParsed != null
-      ? switchConfirmParsed.zone === FLOOR_PLAN_ZONE_TERRACE
-        ? `${switchConfirmParsed.tableNumber} (${t('kassaApp.floorZoneTerrace')})`
-        : switchConfirmParsed.tableNumber
-      : ''
 
   /** Klantscherm: vooraf gelokaliseerde regel tafel + zone (BroadcastChannel). */
   const customerDisplayDineInSubtitle = useMemo((): string | undefined => {
@@ -5686,28 +5622,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 <span className={kassaSidebarActionLabelClass}>{t('kassaApp.remove')}</span>
               </button>
             </div>
-            {orderType === 'DINE_IN' && tableNumber && cart.length > 0 && (
-              <div className="flex w-full gap-2.5 touch-manipulation select-none" data-testid="kassa-park-table-split">
-                <button
-                  type="button"
-                  onClick={() => parkOrder({ printKitchen: true, printKassaSlip: false })}
-                  className={`min-w-0 flex-1 font-semibold flex items-center justify-center text-center px-2 py-3 text-[11px] leading-tight sm:text-xs ${kassaPosButtonClass(false)} ${
-                    kassaSxgaDenseTiles ? 'min-h-[2.875rem]' : 'min-h-[2.5rem]'
-                  }`}
-                >
-                  {t('kassaApp.parkTableKitchenBon')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => parkOrder({ printKitchen: false, printKassaSlip: true })}
-                  className={`min-w-0 flex-1 font-semibold flex items-center justify-center text-center px-2 py-3 text-[11px] leading-tight sm:text-xs ${kassaPosButtonClass(false)} ${
-                    kassaSxgaDenseTiles ? 'min-h-[2.875rem]' : 'min-h-[2.5rem]'
-                  }`}
-                >
-                  {t('kassaApp.parkTableKassaBon')}
-                </button>
-              </div>
-            )}
             <div className={`flex touch-manipulation select-none ${kassaSxgaDenseTiles ? 'gap-2' : 'gap-2.5'}`}>
               <button
                 type="button"
@@ -5843,43 +5757,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         )}
         </div>
       </div>
-
-      {/* ── Bevestiging: Tafel wisselen ── */}
-      {switchConfirm && (
-        <div className="fixed inset-0 bg-black/60 z-[220] flex items-center justify-center p-4">
-          <div className={ui.modalConfirmBg}>
-            <div className="text-center">
-              <div className="text-4xl mb-2">🪑</div>
-              <h2 className={ui.modalConfirmTitle}>{t('kassaApp.switchTableTitle')}</h2>
-              <p className={ui.modalConfirmBody}>
-                {t('kassaApp.switchTableBody')
-                  .replace(/\{current\}/g, String(tableNumber ?? ''))
-                  .replace(/\{next\}/g, switchConfirmDisplay)}
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  openPaymentAfterFloorPlanSwitchRef.current = false
-                  setSwitchConfirm(null)
-                }}
-                className={ui.modalGhostBtn}
-              >
-                {t('kassaApp.cancel')}
-              </button>
-              <button
-                onClick={() => {
-                  const p = switchConfirm ? parseTableOrderMapKey(switchConfirm) : null
-                  if (p) doSwitchToTable(p.tableNumber, p.zone)
-                }}
-                className="flex-1 py-3 rounded-xl bg-[#3C4D6B] text-white font-bold hover:bg-[#2D3A52] transition-colors"
-              >
-                {t('kassaApp.switchToTable').replace(/\{number\}/g, switchConfirmDisplay)}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       <KassaStaffSalesPickModal
         open={staffSalesPickOpen}
