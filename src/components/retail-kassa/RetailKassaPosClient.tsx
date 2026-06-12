@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, startTransition } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useLanguage } from '@/i18n'
 import { getTenantSettings, type TenantSettings } from '@/lib/admin-api'
@@ -1776,12 +1776,14 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     })
   }
 
-  if (!gateResolved) {
-    return <KassaSoundActivationScreen ui={ui} onActivate={activateSound} busy />
-  }
-
-  if (!soundActivated) {
-    return <KassaSoundActivationScreen ui={ui} onActivate={activateSound} />
+  if (!gateResolved || !soundActivated) {
+    return (
+      <KassaSoundActivationScreen
+        ui={ui}
+        onActivate={activateSound}
+        busy={!gateResolved}
+      />
+    )
   }
 
   return (
@@ -3141,8 +3143,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                     onClick={() => {
                       if (cart.length === 0) return
                       if (blockSaleWithoutStaffIfNeeded()) return
+                      setShowPaymentModal(true)
                       playClick()
-                      startTransition(() => setShowPaymentModal(true))
                     }}
                     disabled={cart.length === 0}
                     className={`flex min-w-0 flex-1 items-center justify-center py-3.5 text-xl font-bold sm:text-[1.35rem] ${retailSidebarFooterPrimaryMinH} ${KASSA_POS_CHECKOUT_BTN}`}

@@ -87,37 +87,36 @@ export function KassaSoundActivationScreen({
       aria-busy={busy}
       onPointerDown={(e) => e.stopPropagation()}
     >
-      {busy ? null : (
-        <div className={`max-w-md text-center ${ui.soundHeading}`}>
-          <div className="mb-8 text-8xl">🔔</div>
-          <h1 id="kassa-sound-activation-title" className={`mb-4 text-4xl font-bold ${ui.soundHeading}`}>
-            {t('kassaApp.soundTitle')}
-          </h1>
-          <p className={`mb-8 text-xl ${ui.soundBody}`}>
-            {t('kassaApp.soundBody')}
-            <br />
-            <br />
-            <strong className={ui.soundStrong}>{t('kassaApp.soundOncePerDay')}</strong>
-          </p>
-          <button
-            type="button"
-            onPointerDown={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-            }}
-            onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              onActivate()
-            }}
-            className="flex w-full transform touch-manipulation items-center justify-center gap-4 rounded-2xl bg-green-500 py-6 text-2xl font-bold text-white shadow-lg transition-all hover:scale-105 hover:bg-green-600 active:bg-green-700"
-          >
-            <span className="text-4xl">🔊</span>
-            {t('kassaApp.soundActivateButton').toUpperCase()}
-          </button>
-          <p className={`mt-6 text-sm ${ui.soundMuted}`}>💡 {t('kassaApp.soundHintFooter')}</p>
-        </div>
-      )}
+      <div className={`max-w-md text-center ${ui.soundHeading}`}>
+        <div className="mb-8 text-8xl">🔔</div>
+        <h1 id="kassa-sound-activation-title" className={`mb-4 text-4xl font-bold ${ui.soundHeading}`}>
+          {t('kassaApp.soundTitle')}
+        </h1>
+        <p className={`mb-8 text-xl ${ui.soundBody}`}>
+          {t('kassaApp.soundBody')}
+          <br />
+          <br />
+          <strong className={ui.soundStrong}>{t('kassaApp.soundOncePerDay')}</strong>
+        </p>
+        <button
+          type="button"
+          disabled={busy}
+          onPointerDown={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+          }}
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            if (!busy) onActivate()
+          }}
+          className="flex w-full transform touch-manipulation items-center justify-center gap-4 rounded-2xl bg-green-500 py-6 text-2xl font-bold text-white shadow-lg transition-all hover:scale-105 hover:bg-green-600 active:bg-green-700 disabled:pointer-events-none disabled:opacity-60"
+        >
+          <span className="text-4xl">🔊</span>
+          {t('kassaApp.soundActivateButton').toUpperCase()}
+        </button>
+        <p className={`mt-6 text-sm ${ui.soundMuted}`}>💡 {t('kassaApp.soundHintFooter')}</p>
+      </div>
     </div>
   )
 }

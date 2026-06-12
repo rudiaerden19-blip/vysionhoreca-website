@@ -68,6 +68,9 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
 function AdminLayoutBody({ children, params }: AdminLayoutProps) {
   const pathname = usePathname()
   const adminPath = normalizeShopAdminPathname(pathname, params.tenant)
+  const isHorecaKassaPos = isShopAdminKassaPosPath(adminPath, params.tenant)
+  const isRetailKassaPos = isShopAdminRetailKassaPosPath(adminPath, params.tenant)
+  const isAnyKassaPos = isHorecaKassaPos || isRetailKassaPos
   const router = useRouter()
   const { t } = useLanguage()
   const [tenantExists, setTenantExists] = useState<boolean | null>(null)
@@ -347,7 +350,17 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
     demoPublicUnauthenticated,
   ])
 
-  if (loading) {
+  const [posSessionReady, setPosSessionReady] = useState(false)
+
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') return
+    setPosSessionReady(
+      isAnyKassaPos &&
+        (isSuperAdminLoggedIn() || isOwnerSessionFreshForTenant(params.tenant)),
+    )
+  }, [isAnyKassaPos, params.tenant])
+
+  if (loading && !posSessionReady) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
@@ -373,7 +386,10 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
     )
   }
 
-  if (tenantExists && adminAccess !== 'ok') {
+  const posAuthInFlight =
+    isAnyKassaPos && posSessionReady && (adminAccess === 'verifying' || adminAccess === 'pending')
+
+  if (tenantExists && adminAccess !== 'ok' && !posAuthInFlight) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
@@ -385,9 +401,6 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
       </div>
     )
   }
-
-  const isHorecaKassaPos = isShopAdminKassaPosPath(adminPath, params.tenant)
-  const isRetailKassaPos = isShopAdminRetailKassaPosPath(adminPath, params.tenant)
 
   if (isHorecaKassaPos) {
     if (demoPublicUnauthenticated) {

@@ -45,7 +45,7 @@ export function KassaPaymentModal({
     : 'flex flex-col items-center justify-center h-32 gap-3 rounded-xl border-2 bg-gray-50 hover:scale-[1.02] transition-transform font-semibold text-lg'
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[180] p-4">
       <div className={card}>
         <div className={hdr}>
           <h3 className={titleCls}>{t('kassaApp.payTitle')}</h3>
