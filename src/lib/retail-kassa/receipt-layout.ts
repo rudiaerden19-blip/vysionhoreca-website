@@ -14,37 +14,57 @@ import {
 
 export const RETAIL_THERMAL_W = 42
 
+/** ZZP-centrum stijl — zwarte balken, kolommen, geen tafelregel. */
 export const RETAIL_RECEIPT_PRINT_STYLES = `
-      .retail-logo { max-width:128px;max-height:72px;margin:0 auto 6px;display:block;object-fit:contain; }
-      .retail-name { font-size:13px;font-weight:bold;margin:4px 0; }
-      .retail-tagline { font-size:9px;margin:8px auto 4px;max-width:72mm;line-height:1.35; }
-      .retail-header-rule { border-top:2px solid #000;width:36%;margin:8px auto; }
-      .col-head { font-weight:bold;font-size:9px;text-transform:uppercase;letter-spacing:0.02em; }
-      .item-name { flex:1;padding-right:4px; }
-      .item-sub { font-size:9px;color:#333;margin:0 0 2px 0;padding-left:2px; }
-      .total-big { font-size:18px;font-weight:900;margin:10px 0;padding:8px 0;border-top:2px solid #000;border-bottom:2px solid #000;letter-spacing:0.03em; }
-      .total-big span { font-weight:900; }
-      .vat-block { margin-top:8px; }
-      .footer-block { font-size:8px;line-height:1.45;margin-top:10px; }
-      .barcode-wrap { margin-top:12px; }
+      body { font-family: Helvetica, Arial, sans-serif; font-size:11px; line-height:1.35; color:#000; }
+      .retail-logo { max-width:120px;max-height:64px;margin:0 auto 8px;display:block;object-fit:contain; }
+      .retail-name { font-size:14px;font-weight:600;margin:2px 0;text-transform:lowercase; }
+      .retail-header { text-align:center;margin-bottom:10px; }
+      .retail-header .small { font-size:10px;line-height:1.4; }
+      .meta-row { display:flex;justify-content:space-between;align-items:baseline;font-size:10px;margin:8px 0 4px; }
+      .rule-thin { border:none;border-top:1px solid #000;margin:6px 0; }
+      .rule-double { border:none;border-top:3px double #000;margin:10px 0 8px; }
+      .retail-item { display:grid;grid-template-columns:22px 1fr auto;gap:4px;align-items:baseline;margin:3px 0;font-size:11px; }
+      .retail-item-qty { text-align:left; }
+      .retail-item-name { text-align:left;word-break:break-word; }
+      .retail-item-price { font-weight:800;text-align:right;white-space:nowrap; }
+      .retail-bar { background:#000;color:#fff;font-weight:700;font-size:11px;padding:5px 8px;margin:10px 0 6px;text-align:left;letter-spacing:0.02em; }
+      .retail-grand { display:flex;justify-content:space-between;align-items:baseline;font-size:22px;font-weight:900;margin:4px 0 8px;letter-spacing:-0.02em; }
+      .retail-grand .amount { font-weight:900; }
+      .pay-row { display:flex;justify-content:space-between;font-size:11px;margin:2px 0; }
+      .vat-head, .vat-row { display:grid;grid-template-columns:1.1fr 0.9fr 1fr 1fr;gap:4px;font-size:9px;margin:2px 0; }
+      .vat-head { font-weight:700;margin-bottom:4px; }
+      .vat-total-line { font-size:10px;margin-top:6px; }
+      .footer-thanks { text-align:center;font-size:10px;margin-top:12px;line-height:1.45; }
+      .footer-website { text-align:center;font-size:10px;margin-top:4px; }
+      .loyalty-block { font-size:10px;margin:8px 0;text-align:center; }
+      .barcode-wrap { margin-top:14px;text-align:center; }
+      .draft-banner { text-align:center;font-weight:700;font-size:10px;margin:6px 0;color:#b45309; }
 `.trim()
 
-function thermalSep(char: '-' | '=' = '-'): string {
-  return char.repeat(RETAIL_THERMAL_W)
+export type RetailVatDisplayRow = {
+  rate: number
+  tax: number
+  excl: number
+  incl: number
 }
 
-function thermalSepDashed(): string {
-  let s = ''
-  while (s.length < RETAIL_THERMAL_W) s += '- '
-  return s.slice(0, RETAIL_THERMAL_W)
+function formatAmountComma(amount: number): string {
+  return amount.toFixed(2).replace('.', ',')
 }
 
-function thermalCenter(text: string): string {
-  const t = text.replace(/\s+/g, ' ').trim()
-  if (!t) return ''
-  if (t.length >= RETAIL_THERMAL_W) return t.slice(0, RETAIL_THERMAL_W)
-  const pad = Math.floor((RETAIL_THERMAL_W - t.length) / 2)
-  return `${' '.repeat(pad)}${t}`
+function formatAmountEuroHtml(amount: number): string {
+  return `€&nbsp;${formatAmountComma(amount)}`
+}
+
+function thermalSepThin(): string {
+  return '-'.repeat(RETAIL_THERMAL_W)
+}
+
+function thermalBlackBar(label: string): string[] {
+  const fill = '#'.repeat(RETAIL_THERMAL_W)
+  const text = ` ${label.trim()}`.slice(0, RETAIL_THERMAL_W)
+  return [fill, text.padEnd(RETAIL_THERMAL_W, ' '), fill]
 }
 
 function thermalPadRow(left: string, right: string): string {
@@ -56,28 +76,31 @@ function thermalPadRow(left: string, right: string): string {
   return l + ' '.repeat(RETAIL_THERMAL_W - l.length - r.length) + r
 }
 
-function thermalMoney(amount: number): string {
-  return `EUR ${amount.toFixed(2)}`
+function thermalCenter(text: string): string {
+  const t = text.replace(/\s+/g, ' ').trim()
+  if (!t) return ''
+  if (t.length >= RETAIL_THERMAL_W) return t.slice(0, RETAIL_THERMAL_W)
+  const pad = Math.floor((RETAIL_THERMAL_W - t.length) / 2)
+  return `${' '.repeat(pad)}${t}`
 }
 
-function thermalMoneySigned(amount: number): string {
-  const abs = Math.abs(amount)
-  const core = thermalMoney(abs)
-  return amount < -0.001 ? `-${core}` : core
+function thermalItemRow(qty: number, name: string, lineTotal: number): string {
+  const price = formatAmountComma(lineTotal)
+  const q = String(qty)
+  const priceField = price.padStart(7)
+  const maxName = RETAIL_THERMAL_W - q.length - 1 - priceField.length - 1
+  let n = name.trim()
+  if (maxName > 2 && n.length > maxName) n = `${n.slice(0, maxName - 1)}.`
+  const gap = RETAIL_THERMAL_W - q.length - 1 - n.length - priceField.length
+  return `${q} ${n}${' '.repeat(Math.max(1, gap))}${priceField}`
 }
 
-/** TOTAAL-blok: dikke lijnen + regel die met TOTAAL begint (print-agent extra witruimte). */
-function appendThermalTotalEmphasis(lines: string[], total: number, totalLabel: string): void {
-  lines.push(thermalSep('='))
-  lines.push('')
-  lines.push(thermalPadRow(totalLabel.toUpperCase(), thermalMoney(total)))
-  lines.push(thermalPadRow('', thermalMoney(total)))
-  lines.push('')
-  lines.push(thermalSep('='))
-}
-
-function stripEmojiForThermal(text: string): string {
-  return text.replace(/\p{Extended_Pictographic}/gu, '').replace(/\s+/g, ' ').trim()
+function thermalVatRow(row: RetailVatDisplayRow): string {
+  const pct = `${formatAmountComma(row.rate)}%`.padStart(7)
+  const tax = formatAmountComma(row.tax).padStart(6)
+  const excl = formatAmountComma(row.excl).padStart(7)
+  const incl = formatAmountComma(row.incl).padStart(7)
+  return `${pct} ${tax} ${excl} ${incl}`.slice(0, RETAIL_THERMAL_W)
 }
 
 function itemsGrossIncl(order: KassaLastOrderReceipt): number {
@@ -89,33 +112,52 @@ function itemsGrossIncl(order: KassaLastOrderReceipt): number {
   ) / 100
 }
 
-function retailSocialChannels(tenantInfo: TenantSettings | null): string[] {
-  const ch: string[] = []
-  if (tenantInfo?.instagram_url?.trim()) ch.push('Instagram')
-  if (tenantInfo?.facebook_url?.trim()) ch.push('Facebook')
-  if (tenantInfo?.tiktok_url?.trim()) ch.push('TikTok')
-  return ch
+function buildVatDisplayRows(
+  order: KassaLastOrderReceipt,
+  fbVatRate: number,
+): { rows: RetailVatDisplayRow[]; taxTotal: number } {
+  const splitOk =
+    Array.isArray(order.vatSplit) &&
+    order.vatSplit.length > 0 &&
+    typeof order.totalTax === 'number'
+  if (splitOk) {
+    const rows = order.vatSplit!.map((r) => {
+      const excl = Math.round(r.baseExcl * 100) / 100
+      const tax = Math.round(r.tax * 100) / 100
+      return {
+        rate: r.rate,
+        tax,
+        excl,
+        incl: Math.round((excl + tax) * 100) / 100,
+      }
+    })
+    const taxTotal = Math.round((order.totalTax as number) * 100) / 100
+    return { rows, taxTotal }
+  }
+  const incl = order.total
+  const excl = Math.round((incl / (1 + fbVatRate / 100)) * 100) / 100
+  const tax = Math.round((incl - excl) * 100) / 100
+  return {
+    rows: [{ rate: fbVatRate, tax, excl, incl }],
+    taxTotal: tax,
+  }
 }
 
-function retailFooterReturnsText(
-  tenantInfo: TenantSettings | null,
-  labels: RetailReceiptI18n,
-): string | null {
-  const email = tenantInfo?.email?.trim()
-  if (!email || !labels.receiptFooterReturns) return null
-  return labels.receiptFooterReturns.replace('{email}', email)
+function payMethodShort(order: KassaLastOrderReceipt, labels: RetailReceiptI18n): string {
+  if (order.paymentMethod === 'SPLIT') {
+    return labels.paidSplit((order.splitCash ?? 0).toFixed(2), (order.splitCard ?? 0).toFixed(2))
+  }
+  if (order.paymentMethod === 'CASH') return labels.payCash
+  if (order.paymentMethod === 'CARD') return labels.payPin
+  if (order.paymentMethod === 'IDEAL') return labels.payIdeal
+  return labels.payBancontact
 }
 
-function retailFooterSocialText(
-  tenantInfo: TenantSettings | null,
-  labels: RetailReceiptI18n,
-): string | null {
-  const channels = retailSocialChannels(tenantInfo)
-  if (channels.length === 0 || !labels.receiptFooterSocial) return null
-  return labels.receiptFooterSocial.replace('{channels}', channels.join(', '))
+function stripEmojiForThermal(text: string): string {
+  return text.replace(/\p{Extended_Pictographic}/gu, '').replace(/\s+/g, ' ').trim()
 }
 
-function appendRetailLoyaltyThermalLines(
+function appendRetailLoyaltyThermal(
   order: KassaLastOrderReceipt,
   labels: RetailReceiptI18n,
   lines: string[],
@@ -123,7 +165,6 @@ function appendRetailLoyaltyThermalLines(
   const L = order.retailLoyalty
   if (!L || !labels.loyaltyBalanceLine) return
   lines.push('')
-  lines.push(thermalSep('-'))
   if (L.memberLabel && labels.loyaltyPassLabel) {
     lines.push(thermalCenter(stripEmojiForThermal(labels.loyaltyPassLabel(L.memberLabel))))
   }
@@ -134,79 +175,6 @@ function appendRetailLoyaltyThermalLines(
     lines.push(thermalCenter(stripEmojiForThermal(labels.loyaltyEarnedLine(L.pointsEarned))))
   }
   lines.push(thermalCenter(stripEmojiForThermal(labels.loyaltyBalanceLine(L.pointsBalance))))
-}
-
-function appendRetailFooterThermal(
-  tenantInfo: TenantSettings | null,
-  labels: RetailReceiptI18n,
-  isDraft: boolean,
-  lines: string[],
-): void {
-  const tagline = tenantInfo?.tagline?.trim()
-  lines.push('')
-  lines.push(thermalSep('-'))
-  if (tagline) {
-    lines.push(thermalCenter(stripEmojiForThermal(tagline)))
-    lines.push('')
-  }
-  if (tenantInfo?.btw_number) {
-    lines.push(thermalCenter(labels.businessVatLabel(tenantInfo.btw_number)))
-  }
-  const thanks = isDraft ? labels.draftFooter : labels.thanks
-  lines.push(thermalCenter(stripEmojiForThermal(thanks)))
-  const returns = retailFooterReturnsText(tenantInfo, labels)
-  if (returns) {
-    lines.push('')
-    for (const part of wrapThermalCenterParagraph(returns, RETAIL_THERMAL_W - 2)) {
-      lines.push(thermalCenter(part))
-    }
-  }
-  const social = retailFooterSocialText(tenantInfo, labels)
-  if (social) {
-    lines.push('')
-    for (const part of wrapThermalCenterParagraph(social, RETAIL_THERMAL_W - 2)) {
-      lines.push(thermalCenter(part))
-    }
-  }
-  if (tenantInfo?.website?.trim()) {
-    lines.push('')
-    lines.push(thermalCenter(tenantInfo.website.trim()))
-  }
-}
-
-function wrapThermalCenterParagraph(text: string, maxLen: number): string[] {
-  const words = text.split(/\s+/)
-  const out: string[] = []
-  let line = ''
-  for (const w of words) {
-    const next = line ? `${line} ${w}` : w
-    if (next.length <= maxLen) {
-      line = next
-    } else {
-      if (line) out.push(line)
-      line = w.length > maxLen ? w.slice(0, maxLen - 1) + '.' : w
-    }
-  }
-  if (line) out.push(line)
-  return out
-}
-
-function thermalItemLines(item: KassaCartItem): string[] {
-  const lines: string[] = []
-  const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
-  const unitIncl = item.product.price + choicesTotal
-  const lineTotal = unitIncl * item.quantity
-  const name = item.product.name.trim()
-  lines.push(thermalPadRow(name, thermalMoney(lineTotal)))
-  if (item.quantity > 1) {
-    lines.push(thermalPadRow(`  ${item.quantity}x ${unitIncl.toFixed(2)}`, ''))
-  }
-  for (const c of item.choices || []) {
-    const label = c.choiceName
-    const extra = c.price > 0 ? thermalMoney(c.price) : ''
-    lines.push(thermalPadRow(`  + ${label}`, extra))
-  }
-  return lines
 }
 
 export function buildRetailThermalBonLines(opts: {
@@ -220,95 +188,96 @@ export function buildRetailThermalBonLines(opts: {
   const { tenantInfo, order, labels, dateStr } = opts
   const isDraft = !!opts.draft
   const fbVatRate = normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 21, 21)
-  const splitOk =
-    Array.isArray(order.vatSplit) &&
-    order.vatSplit.length > 0 &&
-    typeof order.subtotalExclVat === 'number' &&
-    typeof order.totalTax === 'number'
-  let tax: number
-  const vatRows: { rate: number; tax: number }[] = []
-  if (splitOk) {
-    tax = Math.round((order.totalTax as number) * 100) / 100
-    for (const row of order.vatSplit!) {
-      vatRows.push({ rate: row.rate, tax: row.tax })
-    }
-  } else {
-    tax = Math.round((order.total - order.total / (1 + fbVatRate / 100)) * 100) / 100
-    vatRows.push({ rate: fbVatRate, tax })
-  }
+  const { rows: vatRows, taxTotal } = buildVatDisplayRows(order, fbVatRate)
 
-  const invoice = order.retailCustomerInvoice
   const receiptRefDisplay = isDraft
     ? '—'
     : order.checkoutReference ?? (order.orderNumber > 0 ? String(order.orderNumber) : '—')
-  const payLabel = isDraft ? labels.draftNotPaid : payLabelFromOrder(order, labels)
-
+  const payLabel = isDraft ? labels.draftNotPaid : payMethodShort(order, labels)
   const bizName = (tenantInfo?.business_name || labels.defaultBusinessName).trim()
-  const lines: string[] = []
   const discountEuro = Math.round((itemsGrossIncl(order) - order.total) * 100) / 100
+  const lines: string[] = []
 
   lines.push('')
   lines.push(thermalCenter(bizName))
   if (tenantInfo?.address) lines.push(thermalCenter(tenantInfo.address.trim()))
   if (tenantInfo?.postal_code || tenantInfo?.city) {
-    lines.push(thermalCenter(`${tenantInfo.postal_code ?? ''} ${tenantInfo.city ?? ''}`.trim()))
+    lines.push(
+      thermalCenter(`${tenantInfo.postal_code ?? ''} ${tenantInfo.city ?? ''}`.trim()),
+    )
+  }
+  if (tenantInfo?.phone?.trim()) {
+    lines.push(thermalCenter(`${labels.telPrefix} ${tenantInfo.phone.trim()}`))
   }
   lines.push('')
-  lines.push(thermalCenter('='.repeat(12)))
 
-  const tagline = tenantInfo?.tagline?.trim()
   if (isDraft) {
     lines.push(thermalCenter(labels.draftBanner.toUpperCase()))
-  } else if (tagline) {
-    lines.push(thermalCenter(stripEmojiForThermal(tagline)))
+    lines.push('')
   }
-  lines.push('')
 
+  const invoice = order.retailCustomerInvoice
   if (invoice) {
     lines.push(thermalCenter(labels.invoiceTitle.toUpperCase()))
-    lines.push(thermalSep('-'))
     lines.push(invoice.name.trim())
     if (invoice.addressLine) lines.push(invoice.addressLine.trim())
     if (invoice.postalCity) lines.push(invoice.postalCity.trim())
     lines.push(labels.customerVatLabel(invoice.vatNumber))
-    lines.push(thermalSep('-'))
+    lines.push(thermalSepThin())
   }
 
-  lines.push(thermalPadRow(labels.receiptColOrder, labels.receiptColDateTime))
-  lines.push(thermalPadRow(String(receiptRefDisplay), dateStr))
-  lines.push(thermalSep('-'))
-  lines.push(thermalPadRow(labels.receiptColProduct, labels.receiptColPrice))
+  lines.push(
+    thermalPadRow(`${labels.receiptBonNrPrefix}${receiptRefDisplay}`, dateStr),
+  )
+  lines.push(thermalSepThin())
 
   for (const item of order.items) {
-    lines.push(...thermalItemLines(item))
+    const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
+    const unitIncl = item.product.price + choicesTotal
+    const lineTotal = unitIncl * item.quantity
+    lines.push(thermalItemRow(item.quantity, item.product.name, lineTotal))
+    for (const c of item.choices || []) {
+      lines.push(thermalPadRow(`  + ${c.choiceName}`, c.price > 0 ? formatAmountComma(c.price) : ''))
+    }
   }
 
   if (discountEuro > 0.009) {
-    lines.push(thermalPadRow(labels.receiptDiscount, thermalMoneySigned(-discountEuro)))
+    lines.push(thermalPadRow(labels.receiptDiscount, `-${formatAmountComma(discountEuro)}`))
   }
 
-  lines.push(thermalSepDashed())
-  appendThermalTotalEmphasis(lines, order.total, labels.total)
-  lines.push(thermalSep('-'))
-  lines.push(thermalCenter(`${labels.paidWith} ${payLabel}`))
+  lines.push(...thermalBlackBar(labels.totalsBarLabel))
+  lines.push(
+    thermalPadRow(
+      labels.total.toUpperCase(),
+      `EUR ${formatAmountComma(order.total)}`,
+    ),
+  )
+  lines.push(thermalSepThin())
+  lines.push(thermalPadRow(labels.receivedLabel, formatAmountComma(order.total)))
+  lines.push(thermalPadRow(labels.changeLabel, formatAmountComma(0)))
+  lines.push(thermalPadRow(labels.paymentMethodLabel, payLabel))
+  lines.push(thermalSepThin())
+  lines.push(thermalSepThin())
 
-  appendRetailLoyaltyThermalLines(order, labels, lines)
+  const vh = `${labels.vatColBtwPct} ${labels.vatColBtw} ${labels.vatColExcl} ${labels.vatColIncl}`
+  lines.push(vh.slice(0, RETAIL_THERMAL_W))
+  for (const row of vatRows) {
+    lines.push(thermalVatRow(row))
+  }
+  lines.push(labels.vatTotalLine(formatAmountComma(taxTotal)))
+
+  appendRetailLoyaltyThermal(order, labels, lines)
 
   if (order.helpedByStaffName?.trim() && labels.helpedByLine) {
     lines.push('')
-    const staffLine = stripEmojiForThermal(labels.helpedByLine(order.helpedByStaffName.trim()))
-    lines.push(thermalCenter(staffLine.length <= RETAIL_THERMAL_W ? staffLine : order.helpedByStaffName.trim()))
+    lines.push(thermalCenter(stripEmojiForThermal(labels.helpedByLine(order.helpedByStaffName.trim()))))
   }
 
   lines.push('')
-  lines.push(thermalSep('-'))
-  lines.push(thermalPadRow(labels.receiptColVatRate, labels.receiptColPrice))
-  for (const row of vatRows) {
-    lines.push(thermalPadRow(`${row.rate}%`, thermalMoney(row.tax)))
+  lines.push(thermalCenter(isDraft ? labels.draftFooter : labels.thanks))
+  if (tenantInfo?.website?.trim()) {
+    lines.push(thermalCenter(tenantInfo.website.trim()))
   }
-  lines.push(thermalPadRow(`BTW ${labels.receiptVatSectionTotal}`, thermalMoney(tax)))
-
-  appendRetailFooterThermal(tenantInfo, labels, isDraft, lines)
 
   const ean = isDraft ? null : buildRetailSaleTicketEan13(order.orderNumber)
   if (ean) {
@@ -320,16 +289,6 @@ export function buildRetailThermalBonLines(opts: {
   return lines
 }
 
-function payLabelFromOrder(order: KassaLastOrderReceipt, labels: RetailReceiptI18n): string {
-  if (order.paymentMethod === 'SPLIT') {
-    return labels.paidSplit((order.splitCash ?? 0).toFixed(2), (order.splitCard ?? 0).toFixed(2))
-  }
-  if (order.paymentMethod === 'CASH') return labels.payCash
-  if (order.paymentMethod === 'CARD') return labels.payCard
-  if (order.paymentMethod === 'IDEAL') return labels.payIdeal
-  return labels.payBancontact
-}
-
 export function retailTicketEanForOrder(order: KassaLastOrderReceipt, isDraft: boolean): string | null {
   if (isDraft) return null
   return buildRetailSaleTicketEan13(order.orderNumber)
@@ -338,11 +297,11 @@ export function retailTicketEanForOrder(order: KassaLastOrderReceipt, isDraft: b
 export function retailTicketBarcodeHtmlBlock(ean: string): string {
   const svg = buildEan13BarcodeSvg(ean, { barHeight: 64, moduleWidth: 2, showCodeText: true })
   if (svg) {
-    return `<div class="center barcode-wrap">${svg}</div>`
+    return `<div class="barcode-wrap">${svg}</div>`
   }
   const table = buildEan13BarcodeEmailHtml(ean, { barHeightPx: 64, moduleWidthPx: 2 })
   if (table) {
-    return `<div class="center barcode-wrap">${table}</div>`
+    return `<div class="barcode-wrap">${table}</div>`
   }
   return `<div class="center small">${escapeReceiptHtml(formatEan13Display(ean))}</div>`
 }
@@ -356,48 +315,28 @@ export function buildRetailKassaReceiptHtmlBody(opts: {
 }): string {
   const { tenantInfo, order, labels, isDraft, dateStr } = opts
   const fbVatRate = normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 21, 21)
-  const splitOk =
-    Array.isArray(order.vatSplit) &&
-    order.vatSplit.length > 0 &&
-    typeof order.totalTax === 'number'
-  const vatRows: { rate: number; tax: number }[] = []
-  let tax: number
-  if (splitOk) {
-    tax = Math.round((order.totalTax as number) * 100) / 100
-    for (const row of order.vatSplit!) {
-      vatRows.push({ rate: row.rate, tax: row.tax })
-    }
-  } else {
-    tax = Math.round((order.total - order.total / (1 + fbVatRate / 100)) * 100) / 100
-    vatRows.push({ rate: fbVatRate, tax })
-  }
-
-  const invoice = order.retailCustomerInvoice
+  const { rows: vatRows, taxTotal } = buildVatDisplayRows(order, fbVatRate)
   const receiptRefDisplay = isDraft
     ? '—'
     : order.checkoutReference ?? (order.orderNumber > 0 ? String(order.orderNumber) : '—')
-  const payLabel = isDraft ? labels.draftNotPaid : payLabelFromOrder(order, labels)
+  const payLabel = isDraft ? labels.draftNotPaid : payMethodShort(order, labels)
   const discountEuro = Math.round((itemsGrossIncl(order) - order.total) * 100) / 100
   const bizName = escapeReceiptHtml(tenantInfo?.business_name || labels.defaultBusinessName)
   const logoUrl = tenantInfo?.logo_url?.trim()
-  const tagline = tenantInfo?.tagline?.trim()
+  const ticketEan = retailTicketEanForOrder(order, isDraft)
 
   const itemsHtml = order.items
     .map((i) => {
       const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
       const unitIncl = i.product.price + choicesTotal
       const lineTotal = unitIncl * i.quantity
-      const subs: string[] = []
-      if (i.quantity > 1) {
-        subs.push(`<div class="item-sub">${i.quantity}x ${unitIncl.toFixed(2)}</div>`)
-      }
-      for (const c of i.choices || []) {
-        const label = escapeReceiptHtml(c.choiceName)
-        const price =
-          c.price > 0 ? `<span>€${c.price.toFixed(2)}</span>` : ''
-        subs.push(`<div class="row item-sub"><span class="item-name">+ ${label}</span>${price}</div>`)
-      }
-      return `<div class="row"><span class="item-name">${escapeReceiptHtml(i.product.name)}</span><span>€${lineTotal.toFixed(2)}</span></div>${subs.join('')}`
+      const extras = (i.choices || [])
+        .map(
+          (c) =>
+            `<div class="retail-item" style="grid-template-columns:22px 1fr auto;"><span></span><span class="retail-item-name">+ ${escapeReceiptHtml(c.choiceName)}</span><span class="retail-item-price">${c.price > 0 ? formatAmountComma(c.price) : ''}</span></div>`,
+        )
+        .join('')
+      return `<div class="retail-item"><span class="retail-item-qty">${i.quantity}</span><span class="retail-item-name">${escapeReceiptHtml(i.product.name)}</span><span class="retail-item-price">${formatAmountComma(lineTotal)}</span></div>${extras}`
     })
     .join('')
 
@@ -405,35 +344,25 @@ export function buildRetailKassaReceiptHtmlBody(opts: {
     order.retailLoyalty && labels.loyaltyBalanceLine
       ? (() => {
           const L = order.retailLoyalty!
-          const parts: string[] = ['<div class="divider-solid"></div>']
+          const parts: string[] = ['<div class="loyalty-block">']
           if (L.memberLabel && labels.loyaltyPassLabel) {
-            parts.push(
-              `<div class="center small bold">${escapeReceiptHtml(labels.loyaltyPassLabel(L.memberLabel))}</div>`,
-            )
+            parts.push(`<div class="bold">${escapeReceiptHtml(labels.loyaltyPassLabel(L.memberLabel))}</div>`)
           }
           if (L.pointsRedeemed > 0 && labels.loyaltyRedeemedLine) {
-            parts.push(
-              `<div class="center small">${escapeReceiptHtml(labels.loyaltyRedeemedLine(L.pointsRedeemed))}</div>`,
-            )
+            parts.push(`<div>${escapeReceiptHtml(labels.loyaltyRedeemedLine(L.pointsRedeemed))}</div>`)
           }
           if (L.pointsEarned > 0 && labels.loyaltyEarnedLine) {
-            parts.push(
-              `<div class="center small">${escapeReceiptHtml(labels.loyaltyEarnedLine(L.pointsEarned))}</div>`,
-            )
+            parts.push(`<div>${escapeReceiptHtml(labels.loyaltyEarnedLine(L.pointsEarned))}</div>`)
           }
-          parts.push(
-            `<div class="center small bold">${escapeReceiptHtml(labels.loyaltyBalanceLine(L.pointsBalance))}</div>`,
-          )
+          parts.push(`<div class="bold">${escapeReceiptHtml(labels.loyaltyBalanceLine(L.pointsBalance))}</div></div>`)
           return parts.join('')
         })()
       : ''
 
-  const returns = retailFooterReturnsText(tenantInfo, labels)
-  const social = retailFooterSocialText(tenantInfo, labels)
-  const ticketEan = retailTicketEanForOrder(order, isDraft)
+  const invoice = order.retailCustomerInvoice
 
   return `
-      <div class="center">
+      <div class="retail-header">
         ${
           logoUrl
             ? `<img class="retail-logo" src="${String(logoUrl).replace(/&/g, '&amp;').replace(/"/g, '&quot;')}" alt="" />`
@@ -443,66 +372,67 @@ export function buildRetailKassaReceiptHtmlBody(opts: {
         ${tenantInfo?.address ? `<div class="small">${escapeReceiptHtml(tenantInfo.address)}</div>` : ''}
         ${
           tenantInfo?.postal_code || tenantInfo?.city
-            ? `<div class="small">${escapeReceiptHtml(tenantInfo.postal_code ?? '')} ${escapeReceiptHtml(tenantInfo.city ?? '')}</div>`
+            ? `<div class="small">${escapeReceiptHtml(`${tenantInfo.postal_code ?? ''} ${tenantInfo.city ?? ''}`.trim())}</div>`
+            : ''
+        }
+        ${
+          tenantInfo?.phone?.trim()
+            ? `<div class="small">${escapeReceiptHtml(labels.telPrefix)} ${escapeReceiptHtml(tenantInfo.phone.trim())}</div>`
             : ''
         }
       </div>
-      <div class="retail-header-rule"></div>
-      ${
-        isDraft
-          ? `<div class="center bold small">${escapeReceiptHtml(labels.draftBanner)}</div>`
-          : tagline
-            ? `<div class="center retail-tagline">${escapeReceiptHtml(tagline)}</div>`
-            : ''
-      }
+      ${isDraft ? `<div class="draft-banner">${escapeReceiptHtml(labels.draftBanner)}</div>` : ''}
       ${
         invoice
-          ? `<div class="divider-solid"></div>
-      <div class="center bold">${escapeReceiptHtml(labels.invoiceTitle)}</div>
+          ? `<hr class="rule-thin" />
+      <div class="bold center">${escapeReceiptHtml(labels.invoiceTitle)}</div>
       <div class="small">${escapeReceiptHtml(invoice.name)}</div>
       ${invoice.addressLine ? `<div class="small">${escapeReceiptHtml(invoice.addressLine)}</div>` : ''}
       ${invoice.postalCity ? `<div class="small">${escapeReceiptHtml(invoice.postalCity)}</div>` : ''}
-      <div class="small bold">${escapeReceiptHtml(labels.customerVatLabel(invoice.vatNumber))}</div>
-      <div class="divider-solid"></div>`
+      <div class="small bold">${escapeReceiptHtml(labels.customerVatLabel(invoice.vatNumber))}</div>`
           : ''
       }
-      <div class="row col-head"><span>${escapeReceiptHtml(labels.receiptColOrder)}</span><span>${escapeReceiptHtml(labels.receiptColDateTime)}</span></div>
-      <div class="row"><span>${escapeReceiptHtml(String(receiptRefDisplay))}</span><span>${escapeReceiptHtml(dateStr)}</span></div>
-      <div class="divider-solid"></div>
-      <div class="row col-head"><span>${escapeReceiptHtml(labels.receiptColProduct)}</span><span>${escapeReceiptHtml(labels.receiptColPrice)}</span></div>
+      <div class="meta-row">
+        <span>${escapeReceiptHtml(labels.receiptBonNrPrefix)}${escapeReceiptHtml(String(receiptRefDisplay))}</span>
+        <span>${escapeReceiptHtml(dateStr)}</span>
+      </div>
+      <hr class="rule-thin" />
       ${itemsHtml}
       ${
         discountEuro > 0.009
-          ? `<div class="row"><span>${escapeReceiptHtml(labels.receiptDiscount)}</span><span>-€${discountEuro.toFixed(2)}</span></div>`
+          ? `<div class="pay-row"><span>${escapeReceiptHtml(labels.receiptDiscount)}</span><span>-${formatAmountComma(discountEuro)}</span></div>`
           : ''
       }
-      <div class="divider"></div>
-      <div class="row total-big"><span>${escapeReceiptHtml(labels.total)}</span><span>€${order.total.toFixed(2)}</span></div>
-      <div class="divider-solid"></div>
-      <div class="center small">${escapeReceiptHtml(labels.paidWith)} ${escapeReceiptHtml(payLabel)}</div>
+      <div class="retail-bar">${escapeReceiptHtml(labels.totalsBarLabel)}</div>
+      <div class="retail-grand">
+        <span>${escapeReceiptHtml(labels.total.toUpperCase())}</span>
+        <span class="amount">${formatAmountEuroHtml(order.total)}</span>
+      </div>
+      <hr class="rule-thin" />
+      <div class="pay-row"><span>${escapeReceiptHtml(labels.receivedLabel)}</span><span>${formatAmountComma(order.total)}</span></div>
+      <div class="pay-row"><span>${escapeReceiptHtml(labels.changeLabel)}</span><span>${formatAmountComma(0)}</span></div>
+      <div class="pay-row"><span>${escapeReceiptHtml(labels.paymentMethodLabel)}</span><span>${escapeReceiptHtml(payLabel)}</span></div>
+      <hr class="rule-double" />
+      <div class="vat-head">
+        <span>${escapeReceiptHtml(labels.vatColBtwPct)}</span>
+        <span>${escapeReceiptHtml(labels.vatColBtw)}</span>
+        <span>${escapeReceiptHtml(labels.vatColExcl)}</span>
+        <span>${escapeReceiptHtml(labels.vatColIncl)}</span>
+      </div>
+      ${vatRows
+        .map(
+          (row) =>
+            `<div class="vat-row"><span>${formatAmountComma(row.rate)}%</span><span>${formatAmountComma(row.tax)}</span><span>${formatAmountComma(row.excl)}</span><span>${formatAmountComma(row.incl)}</span></div>`,
+        )
+        .join('')}
+      <div class="vat-total-line">${escapeReceiptHtml(labels.vatTotalLine(formatAmountComma(taxTotal)))}</div>
       ${loyaltyHtml}
       ${
         order.helpedByStaffName?.trim() && labels.helpedByLine
-          ? `<div class="center small bold">${escapeReceiptHtml(labels.helpedByLine(order.helpedByStaffName.trim()))}</div>`
+          ? `<div class="footer-thanks bold">${escapeReceiptHtml(labels.helpedByLine(order.helpedByStaffName.trim()))}</div>`
           : ''
       }
-      <div class="vat-block">
-        <div class="row col-head"><span>${escapeReceiptHtml(labels.receiptColVatRate)}</span><span>${escapeReceiptHtml(labels.receiptColPrice)}</span></div>
-        ${vatRows
-          .map(
-            (row) =>
-              `<div class="row"><span>${row.rate}%</span><span>€${row.tax.toFixed(2)}</span></div>`,
-          )
-          .join('')}
-        <div class="row bold"><span>BTW ${escapeReceiptHtml(labels.receiptVatSectionTotal)}</span><span>€${tax.toFixed(2)}</span></div>
-      </div>
-      <div class="divider-solid"></div>
-      <div class="center footer-block">
-        ${tenantInfo?.btw_number ? `<div>${escapeReceiptHtml(labels.businessVatLabel(tenantInfo.btw_number))}</div>` : ''}
-        <div>${escapeReceiptHtml(isDraft ? labels.draftFooter : labels.thanks)}</div>
-        ${returns ? `<div style="margin-top:6px;">${escapeReceiptHtml(returns)}</div>` : ''}
-        ${social ? `<div style="margin-top:6px;">${escapeReceiptHtml(social)}</div>` : ''}
-        ${tenantInfo?.website?.trim() ? `<div style="margin-top:4px;">${escapeReceiptHtml(tenantInfo.website.trim())}</div>` : ''}
-      </div>
+      <div class="footer-thanks">${escapeReceiptHtml(isDraft ? labels.draftFooter : labels.thanks)}</div>
+      ${tenantInfo?.website?.trim() ? `<div class="footer-website">${escapeReceiptHtml(tenantInfo.website.trim())}</div>` : ''}
       ${ticketEan ? retailTicketBarcodeHtmlBlock(ticketEan) : ''}`
 }

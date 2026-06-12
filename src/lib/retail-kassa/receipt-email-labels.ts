@@ -66,14 +66,18 @@ export function retailReceiptI18nForLocale(locale: string): RetailReceiptI18n {
     loyaltyBalanceLine: (points) =>
       (retail.receiptLoyaltyBalance ?? '').replace('{points}', String(points)),
     helpedByLine: (name) => (r.helpedBy ?? '').replace('{name}', name),
-    receiptColOrder: retail.receiptColOrder ?? 'ORDER',
-    receiptColDateTime: retail.receiptColDateTime ?? 'DATE/TIME',
-    receiptColProduct: retail.receiptColProduct ?? 'PRODUCT',
-    receiptColPrice: retail.receiptColPrice ?? 'PRICE',
-    receiptColVatRate: retail.receiptColVatRate ?? 'VAT',
-    receiptVatSectionTotal: retail.receiptVatSectionTotal ?? 'TOTAL',
-    receiptDiscount: retail.receiptDiscount ?? 'Discount',
-    receiptFooterReturns: retail.receiptFooterReturns ?? '',
-    receiptFooterSocial: retail.receiptFooterSocial ?? '',
+    receiptBonNrPrefix: retail.receiptBonNrPrefix ?? 'Bonnr. ',
+    totalsBarLabel: retail.totalsBarLabel ?? 'TOTALEN :',
+    receivedLabel: retail.receivedLabel ?? 'Ontvangen',
+    changeLabel: retail.changeLabel ?? 'Retour',
+    paymentMethodLabel: retail.paymentMethodLabel ?? 'BetaalWijze',
+    payPin: retail.payPin ?? 'PIN',
+    vatColBtwPct: retail.vatColBtwPct ?? 'BTW%',
+    vatColBtw: retail.vatColBtw ?? 'BTW',
+    vatColExcl: retail.vatColExcl ?? 'Excl.:',
+    vatColIncl: retail.vatColIncl ?? 'Incl.:',
+    vatTotalLine: (amount) =>
+      (retail.vatTotalLine ?? 'Totaal BTW {amount}').replace('{amount}', amount),
+    receiptDiscount: retail.receiptDiscount ?? 'Korting',
   }
 }

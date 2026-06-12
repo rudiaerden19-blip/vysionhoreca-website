@@ -43,15 +43,18 @@ export type RetailReceiptI18n = {
   loyaltyEarnedLine?: (points: number) => string
   loyaltyRedeemedLine?: (points: number) => string
   loyaltyBalanceLine?: (points: number) => string
-  receiptColOrder: string
-  receiptColDateTime: string
-  receiptColProduct: string
-  receiptColPrice: string
-  receiptColVatRate: string
-  receiptVatSectionTotal: string
+  receiptBonNrPrefix: string
+  totalsBarLabel: string
+  receivedLabel: string
+  changeLabel: string
+  paymentMethodLabel: string
+  payPin: string
+  vatColBtwPct: string
+  vatColBtw: string
+  vatColExcl: string
+  vatColIncl: string
+  vatTotalLine: (amount: string) => string
   receiptDiscount: string
-  receiptFooterReturns: string
-  receiptFooterSocial: string
 }
 
 function retailLineToCartItem(line: RetailCartLine): KassaCartItem {
@@ -112,8 +115,8 @@ export function buildRetailLastOrderReceipt(
 
 function retailReceiptDateStr(order: KassaLastOrderReceipt, locale: string): string {
   return order.createdAt.toLocaleString(appLocaleToBcp47(locale), {
-    day: '2-digit',
-    month: '2-digit',
+    day: 'numeric',
+    month: 'numeric',
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
