@@ -56,6 +56,7 @@ import {
   parseRetailScanPayload,
   resolveRetailSkuForGoodsReceipt,
   resolveRetailSkuLookup,
+  searchRetailSkus,
   retailSkuInStock,
   type RetailCartLine,
   type RetailPosSku,
@@ -282,6 +283,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [stockBusy, setStockBusy] = useState(false)
   /** Schermtoetsenbord alleen na expliciete tik op «Artikel zoeken». */
   const [articleSearchActive, setArticleSearchActive] = useState(false)
+  /** Meerdere naam-treffers na «Zoeken». */
+  const [articleSearchPickList, setArticleSearchPickList] = useState<RetailPosSku[] | null>(null)
   const [priceFixSku, setPriceFixSku] = useState<RetailPosSku | null>(null)
   const [priceFixName, setPriceFixName] = useState('')
   const [priceFixValue, setPriceFixValue] = useState('')
@@ -1421,13 +1424,73 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     releaseScanFocus()
   }
 
+  function looksLikeBarcodeOnlyQuery(raw: string): boolean {
+    const trimmed = raw.trim()
+    if (!trimmed) return false
+    const digits = trimmed.replace(/\D/g, '')
+    return digits.length >= 8 && digits.length === trimmed.replace(/\s/g, '').length
+  }
+
+  function finishArticleSearchUi() {
+    setScanValue('')
+    closeArticleSearchKeyboard()
+    focusBarcodeCapture()
+  }
+
+  function addSkuFromArticleSearch(hit: RetailPosSku) {
+    addToCart(hit, 1)
+    setArticleSearchPickList(null)
+    finishArticleSearchUi()
+  }
+
+  async function runArticleSearch(query: string) {
+    const trimmed = query.trim()
+    if (!trimmed) return
+    if (mode !== 'sales') {
+      void processBarcode(trimmed)
+      return
+    }
+    if (blockSaleWithoutStaffIfNeeded()) return
+    if (stockBusyRef.current) return
+
+    stockBusyRef.current = true
+    setStockBusy(true)
+    try {
+      let list = skusRef.current
+      if (list.length === 0) {
+        list = await fetchRetailPosSkus(tenant)
+        setSkus(list)
+        skusRef.current = list
+      }
+
+      let hits = searchRetailSkus(list, trimmed)
+      if (hits.length === 0 && looksLikeBarcodeOnlyQuery(trimmed)) {
+        const imported = await resolveOrImportSku(trimmed)
+        if (imported) {
+          addSkuFromArticleSearch(imported)
+          return
+        }
+      }
+
+      if (hits.length === 0) {
+        alert(t('retailKassaPage.barcodeNotFound'))
+        return
+      }
+      if (hits.length === 1) {
+        addSkuFromArticleSearch(hits[0])
+        return
+      }
+      playClick()
+      setArticleSearchPickList(hits)
+    } finally {
+      stockBusyRef.current = false
+      setStockBusy(false)
+    }
+  }
+
   function onScanSubmit(e: React.FormEvent) {
     e.preventDefault()
-    void processBarcode(scanValue)
-    if (mode === 'sales') {
-      setScanValue('')
-      focusBarcodeCapture()
-    }
+    void runArticleSearch(scanValue)
   }
 
   function onBarcodeWedgeKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -1746,6 +1809,58 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 className={`flex-1 py-3 font-bold ${kassaPosButtonClass(true)}`}
               >
                 {t('retailKassaPage.loyaltyRedeemModalConfirm')}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {articleSearchPickList && articleSearchPickList.length > 0 ? (
+        <div
+          className="fixed inset-0 z-[132] flex items-end justify-center bg-black/60 p-3 sm:items-center sm:p-4"
+          data-testid="retail-article-search-pick"
+        >
+          <div
+            className={`flex max-h-[min(70vh,28rem)] w-full max-w-lg flex-col overflow-hidden ${KASSA_POS_BTN_SHAPE} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} border ${KASSA_POS_RULE_BLACK}`}
+          >
+            <div className="shrink-0 border-b border-white/10 px-4 py-3">
+              <p className="text-lg font-bold text-white">{t('retailKassaPage.searchMultipleTitle')}</p>
+              <p className="text-xs text-white/65">{t('retailKassaPage.searchMultipleHint')}</p>
+            </div>
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain p-2">
+              {articleSearchPickList.map((sku) => (
+                <button
+                  key={sku.lineKey}
+                  type="button"
+                  onClick={() => {
+                    playClick()
+                    addSkuFromArticleSearch(sku)
+                  }}
+                  className={`mb-2 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors ${KASSA_POS_MENU_RECESS_TRAY_CLASS} hover:bg-white/10`}
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-white">{sku.name}</p>
+                    <p className="truncate text-xs text-white/55">
+                      {[sku.barcode, sku.article_number].filter(Boolean).join(' · ') || '—'}
+                    </p>
+                  </div>
+                  <span className="shrink-0 text-sm font-bold tabular-nums text-emerald-300">
+                    €{sku.price.toFixed(2)}
+                  </span>
+                </button>
+              ))}
+            </div>
+            <div className="shrink-0 border-t border-white/10 p-3">
+              <button
+                type="button"
+                onClick={() => {
+                  playClick()
+                  setArticleSearchPickList(null)
+                  focusBarcodeCapture()
+                }}
+                className={`w-full py-2.5 ${kassaPosButtonClass(false)}`}
+              >
+                {t('common.cancel')}
               </button>
             </div>
           </div>
@@ -2409,32 +2524,13 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 }}
                 className={`min-h-[2.35rem] min-w-0 flex-1 rounded-full px-5 py-2 text-base text-[#f0f0f0] placeholder:text-white/45 focus:outline-none sm:min-h-[2.6rem] sm:py-2.5 ${KASSA_POS_FIELD}`}
               />
-              <button type="submit" className={retailScanRowActionBtnClass(true)}>
-                {t('retailKassaPage.add')}
-              </button>
               <button
-                type="button"
-                data-testid="retail-add-ok"
-                aria-live="polite"
-                className={
-                  addOkFlash
-                    ? `${retailTopNavShellClass} ${retailScanRowActionSizeClass} rounded-xl border-2 border-emerald-300/90 bg-emerald-500 font-bold text-white shadow-[0_0_22px_rgba(52,211,153,0.85)] transition-colors duration-150`
-                    : `${retailScanRowActionBtnClass(false)} transition-colors duration-300`
-                }
-                onClick={() => {
-                  playClick()
-                  if (scanValue.trim()) {
-                    void processBarcode(scanValue)
-                    if (mode === 'sales') {
-                      setScanValue('')
-                      focusBarcodeCapture()
-                    }
-                  } else {
-                    releaseScanFocus()
-                  }
-                }}
+                type="submit"
+                data-testid="retail-article-search-btn"
+                disabled={stockBusy}
+                className={`shrink-0 ${retailScanRowActionBtnClass(true)}`}
               >
-                {t('retailKassaPage.addOk')}
+                {t('retailKassaPage.searchButton')}
               </button>
             </form>
 

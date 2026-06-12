@@ -213,17 +213,30 @@ export function findRetailSkuByCode(skus: RetailPosSku[], code: string): RetailP
 
 /** Zoek op barcode/artikelnr., anders unieke naam-treffer (artikel zoeken). */
 export function resolveRetailSkuLookup(skus: RetailPosSku[], raw: string): RetailPosSku | null {
-  const direct = findRetailSkuByCode(skus, raw)
-  if (direct) return direct
-  const q = raw.trim().toLowerCase()
-  if (q.length < 2) return null
+  const hits = searchRetailSkus(skus, raw, 2)
+  if (hits.length === 1) return hits[0]
+  return null
+}
+
+/** Barcode/EAN/artikelnr. exact, anders naam/omschrijving (min. 2 tekens). */
+export function searchRetailSkus(
+  skus: RetailPosSku[],
+  raw: string,
+  limit = 24,
+): RetailPosSku[] {
+  const trimmed = raw.trim()
+  if (!trimmed) return []
+  const direct = findRetailSkuByCode(skus, trimmed)
+  if (direct) return [direct]
+  const q = trimmed.toLowerCase()
+  if (q.length < 2) return []
   const hits = skus.filter(
     (s) =>
       s.name.toLowerCase().includes(q) ||
-      (s.description && s.description.toLowerCase().includes(q)),
+      (s.description && s.description.toLowerCase().includes(q)) ||
+      (s.article_number && s.article_number.toLowerCase().includes(q)),
   )
-  if (hits.length === 1) return hits[0]
-  return null
+  return hits.slice(0, Math.max(1, limit))
 }
 
 export type RetailScanPayload = {
