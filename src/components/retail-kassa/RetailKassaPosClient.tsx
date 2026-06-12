@@ -45,6 +45,7 @@ import {
   tryBrowserPrintFallback,
   type RetailReceiptI18n,
 } from '@/lib/retail-kassa-receipt'
+import { buildRetailSaleTicketEan13 } from '@/lib/retail-kassa/receipt-ticket-barcode'
 import {
   applyRetailGoodsReceipt,
   applyRetailStockScanIncrement,
@@ -578,6 +579,15 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       loyaltyBalanceLine: (points) =>
         t('retailKassaPage.receiptLoyaltyBalance').replace('{points}', String(points)),
       helpedByLine: (name) => t('kassaReceipt.helpedBy').replace('{name}', name),
+      receiptColOrder: t('retailKassaPage.receiptColOrder'),
+      receiptColDateTime: t('retailKassaPage.receiptColDateTime'),
+      receiptColProduct: t('retailKassaPage.receiptColProduct'),
+      receiptColPrice: t('retailKassaPage.receiptColPrice'),
+      receiptColVatRate: t('retailKassaPage.receiptColVatRate'),
+      receiptVatSectionTotal: t('retailKassaPage.receiptVatSectionTotal'),
+      receiptDiscount: t('retailKassaPage.receiptDiscount'),
+      receiptFooterReturns: t('retailKassaPage.receiptFooterReturns'),
+      receiptFooterSocial: t('retailKassaPage.receiptFooterSocial'),
     }),
     [t],
   )
@@ -1993,6 +2003,9 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
           order={lastOrderReceipt}
           tenantInfo={tenantInfo}
           locale={locale}
+          ticketBarcodeEan13={buildRetailSaleTicketEan13(lastOrderReceipt.orderNumber)}
+          receiptVariant="retail"
+          retailReceiptLabels={receiptLabels}
           footerActions="print-email-close"
           emailDisabled={!lastSaleCustomerEmail}
           emailDisabledHint={t('retailKassaPage.receiptEmailNoCustomer')}

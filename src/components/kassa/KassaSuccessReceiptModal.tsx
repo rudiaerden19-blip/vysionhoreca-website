@@ -5,7 +5,11 @@ import type { KassaLastOrderReceipt } from '@/lib/kassa-cart-types'
 import { kassaReceiptTableNumber } from '@/lib/kassa-cart-types'
 import { useLanguage } from '@/i18n'
 import { appLocaleToBcp47 } from '@/lib/print-receipt-html'
+import { formatEan13Display } from '@/lib/retail-kassa/receipt-ticket-barcode'
+import { buildEan13BarcodeSvg } from '@/lib/retail-loyalty/ean13-barcode-svg'
 import { useEffect, useState } from 'react'
+import { RetailReceiptPaper } from '@/components/retail-kassa/RetailReceiptPaper'
+import type { RetailReceiptI18n } from '@/lib/retail-kassa-receipt'
 
 export function KassaSuccessReceiptModal({
   open,
@@ -19,6 +23,9 @@ export function KassaSuccessReceiptModal({
   onEmail,
   emailDisabled = false,
   emailDisabledHint,
+  ticketBarcodeEan13 = null,
+  receiptVariant = 'default',
+  retailReceiptLabels,
 }: {
   open: boolean
   order: KassaLastOrderReceipt
@@ -33,6 +40,11 @@ export function KassaSuccessReceiptModal({
   onEmail?: () => Promise<void>
   emailDisabled?: boolean
   emailDisabledHint?: string
+  /** Retail winkelkassa: EAN-13 onderaan bon (991… + bonnummer). */
+  ticketBarcodeEan13?: string | null
+  /** Winkelkassa: bonlayout zoals retail ticket (ORDER/PRODUCT/BTW/blok). */
+  receiptVariant?: 'default' | 'retail'
+  retailReceiptLabels?: RetailReceiptI18n
 }) {
   const { t } = useLanguage()
   /** Meteen spinner na tik (parent `printDisabled` komt pas na re-render). */
@@ -94,6 +106,17 @@ export function KassaSuccessReceiptModal({
   })
   const successVatLabelLegacy = t('kassaReceipt.vat').replace('{rate}', String(legacyVatRate))
 
+  const ticketBarcodeSvg =
+    receiptVariant === 'default' &&
+    ticketBarcodeEan13 &&
+    buildEan13BarcodeSvg(ticketBarcodeEan13, {
+      barHeight: 56,
+      moduleWidth: 2,
+      showCodeText: true,
+    })
+
+  const showRetailPaper = receiptVariant === 'retail' && retailReceiptLabels
+
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 overflow-y-auto">
       <div className="bg-white rounded-2xl overflow-hidden max-w-md w-full my-4 shadow-2xl">
@@ -108,6 +131,14 @@ export function KassaSuccessReceiptModal({
         </div>
 
         <div className="p-4 max-h-[50vh] overflow-y-auto">
+          {showRetailPaper ? (
+            <RetailReceiptPaper
+              order={order}
+              tenantInfo={tenantInfo}
+              labels={retailReceiptLabels}
+              locale={locale}
+            />
+          ) : (
           <div className="bg-white text-black p-4 rounded-lg max-w-[300px] mx-auto font-mono text-sm">
             <div className="text-center mb-4">
               <h1 className="font-bold text-lg">{tenantInfo?.business_name || t('kassaApp.defaultBusinessName')}</h1>
@@ -242,7 +273,16 @@ export function KassaSuccessReceiptModal({
               <p className="mt-2">{t('kassaReceipt.thanks')}</p>
               {tenantInfo?.website && <p className="mt-1">{tenantInfo.website}</p>}
             </div>
+            {ticketBarcodeSvg ? (
+              <div
+                className="mt-3 flex justify-center [&_svg]:max-w-full [&_svg]:h-auto"
+                dangerouslySetInnerHTML={{ __html: ticketBarcodeSvg }}
+              />
+            ) : ticketBarcodeEan13 ? (
+              <p className="text-center text-xs mt-3 tracking-wide">{formatEan13Display(ticketBarcodeEan13)}</p>
+            ) : null}
           </div>
+          )}
         </div>
 
         <div className="p-4 border-t flex flex-col gap-2 sm:flex-row sm:gap-3">

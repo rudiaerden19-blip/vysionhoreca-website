@@ -66,5 +66,14 @@ export function retailReceiptI18nForLocale(locale: string): RetailReceiptI18n {
     loyaltyBalanceLine: (points) =>
       (retail.receiptLoyaltyBalance ?? '').replace('{points}', String(points)),
     helpedByLine: (name) => (r.helpedBy ?? '').replace('{name}', name),
+    receiptColOrder: retail.receiptColOrder ?? 'ORDER',
+    receiptColDateTime: retail.receiptColDateTime ?? 'DATE/TIME',
+    receiptColProduct: retail.receiptColProduct ?? 'PRODUCT',
+    receiptColPrice: retail.receiptColPrice ?? 'PRICE',
+    receiptColVatRate: retail.receiptColVatRate ?? 'VAT',
+    receiptVatSectionTotal: retail.receiptVatSectionTotal ?? 'TOTAL',
+    receiptDiscount: retail.receiptDiscount ?? 'Discount',
+    receiptFooterReturns: retail.receiptFooterReturns ?? '',
+    receiptFooterSocial: retail.receiptFooterSocial ?? '',
   }
 }
