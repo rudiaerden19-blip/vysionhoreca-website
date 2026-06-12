@@ -27,6 +27,18 @@ const PACKS: Record<string, MsgPack> = {
   ar: ar as MsgPack,
 }
 
+export function retailReceiptEmailCopyForLocale(locale: string): {
+  pdfAttachedIntro: string
+} {
+  const m = PACKS[locale] ?? PACKS.nl
+  const retail = m.retailKassaPage
+  return {
+    pdfAttachedIntro:
+      retail.receiptEmailPdfAttached ??
+      'In de bijlage vind je je bon als PDF om te downloaden of te bewaren.',
+  }
+}
+
 export function retailReceiptI18nForLocale(locale: string): RetailReceiptI18n {
   const m = PACKS[locale] ?? PACKS.nl
   const k = m.kassaApp

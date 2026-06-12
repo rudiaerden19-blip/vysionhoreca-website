@@ -5784,6 +5784,7 @@
     "receiptEmailButton": "Per E-Mail",
     "receiptEmailSending": "Senden…",
     "receiptEmailSent": "Der Beleg wurde an den Kunden gesendet.",
+    "receiptEmailPdfAttached": "Im Anhang finden Sie Ihren Beleg als PDF zum Herunterladen und Aufbewahren.",
     "receiptEmailFailed": "Beleg konnte nicht gesendet werden.",
     "receiptEmailNoCustomer": "Zuerst Shopkarte mit E-Mail scannen oder ohne Mail verkaufen.",
     "outOfStock": "Nicht genug auf Lager",

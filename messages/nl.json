@@ -5653,6 +5653,7 @@
     "receiptEmailButton": "Naar mail",
     "receiptEmailSending": "Mailen…",
     "receiptEmailSent": "De bon is naar de klant gemaild.",
+    "receiptEmailPdfAttached": "In de bijlage staat je bon als PDF — download en bewaar die gerust.",
     "receiptEmailFailed": "Bon mailen mislukt.",
     "receiptEmailNoCustomer": "Scan eerst een winkelpas met e-mailadres, of verkoop zonder mail.",
     "outOfStock": "Niet genoeg voorraad",

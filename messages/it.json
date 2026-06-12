@@ -5761,6 +5761,7 @@
     "receiptEmailButton": "Via email",
     "receiptEmailSending": "Invio…",
     "receiptEmailSent": "Lo scontrino è stato inviato al cliente.",
+    "receiptEmailPdfAttached": "Lo scontrino è in allegato in PDF — scaricalo e conservalo.",
     "receiptEmailFailed": "Invio scontrino non riuscito.",
     "receiptEmailNoCustomer": "Scansiona prima una tessera con email o vendi senza mail.",
     "outOfStock": "Giacenza insufficiente",

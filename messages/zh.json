@@ -5761,6 +5761,7 @@
     "receiptEmailButton": "发送邮件",
     "receiptEmailSending": "发送中…",
     "receiptEmailSent": "小票已发送至客户邮箱。",
+    "receiptEmailPdfAttached": "附件为 PDF 格式小票，请下载保存。",
     "receiptEmailFailed": "邮件发送小票失败。",
     "receiptEmailNoCustomer": "请先扫描带邮箱的会员卡，或不发邮件销售。",
     "outOfStock": "Insufficient stock",

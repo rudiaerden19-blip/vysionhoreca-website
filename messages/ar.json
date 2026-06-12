@@ -5761,6 +5761,7 @@
     "receiptEmailButton": "بالبريد",
     "receiptEmailSending": "جاري الإرسال…",
     "receiptEmailSent": "أُرسلت الفاتورة إلى بريد العميل.",
+    "receiptEmailPdfAttached": "الفاتورة مرفقة بصيغة PDF — يمكنك تنزيلها وحفظها.",
     "receiptEmailFailed": "تعذّر إرسال الفاتورة بالبريد.",
     "receiptEmailNoCustomer": "امسح بطاقة متجر فيها بريد أولاً، أو بِع بدون بريد.",
     "outOfStock": "Insufficient stock",

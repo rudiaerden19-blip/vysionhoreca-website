@@ -5720,6 +5720,7 @@
     "receiptEmailButton": "Email receipt",
     "receiptEmailSending": "Sending…",
     "receiptEmailSent": "The receipt was emailed to the customer.",
+    "receiptEmailPdfAttached": "Your receipt is attached as a PDF — feel free to download and keep it.",
     "receiptEmailFailed": "Could not email the receipt.",
     "receiptEmailNoCustomer": "Scan a store pass with an email first, or skip email.",
     "outOfStock": "Insufficient stock",

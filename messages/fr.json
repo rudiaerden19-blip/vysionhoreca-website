@@ -5784,6 +5784,7 @@
     "receiptEmailButton": "Par e-mail",
     "receiptEmailSending": "Envoi…",
     "receiptEmailSent": "Le ticket a été envoyé au client.",
+    "receiptEmailPdfAttached": "Votre ticket est en pièce jointe au format PDF — téléchargez-le et conservez-le.",
     "receiptEmailFailed": "Impossible d'envoyer le ticket par e-mail.",
     "receiptEmailNoCustomer": "Scannez d'abord une carte avec e-mail, ou vendez sans mail.",
     "outOfStock": "Stock insuffisant",

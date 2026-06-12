@@ -5761,6 +5761,7 @@
     "receiptEmailButton": "Por email",
     "receiptEmailSending": "Enviando…",
     "receiptEmailSent": "El ticket se envió al cliente.",
+    "receiptEmailPdfAttached": "Su ticket va adjunto en PDF — descárguelo y guárdelo.",
     "receiptEmailFailed": "No se pudo enviar el ticket por email.",
     "receiptEmailNoCustomer": "Escanee primero una tarjeta con email o venda sin mail.",
     "outOfStock": "Stock insuficiente",

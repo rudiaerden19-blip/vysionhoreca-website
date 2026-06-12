@@ -5761,6 +5761,7 @@
     "receiptEmailButton": "メール送信",
     "receiptEmailSending": "送信中…",
     "receiptEmailSent": "レシートをお客様にメールしました。",
+    "receiptEmailPdfAttached": "レシートのPDFを添付しています。ダウンロードして保管してください。",
     "receiptEmailFailed": "レシートのメール送信に失敗しました。",
     "receiptEmailNoCustomer": "メール付きの店舗パスを先にスキャンするか、メールなしで販売してください。",
     "outOfStock": "Insufficient stock",

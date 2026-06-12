@@ -3,7 +3,11 @@ import type { TenantSettings } from '@/lib/admin-api'
 import type { KassaLastOrderReceipt } from '@/lib/kassa-cart-types'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { buildRetailKassaReceiptHtmlDocument } from '@/lib/retail-kassa-receipt'
-import { retailReceiptI18nForLocale } from '@/lib/retail-kassa/receipt-email-labels'
+import { retailReceiptEmailCopyForLocale, retailReceiptI18nForLocale } from '@/lib/retail-kassa/receipt-email-labels'
+import {
+  buildRetailKassaReceiptPdfBuffer,
+  retailReceiptPdfFilename,
+} from '@/lib/retail-kassa/receipt-pdf'
 import { createMailTransporter, type TenantSmtpConfig } from '@/lib/retail-loyalty/tenant-smtp'
 import { formatFromAddress, transactionalMailHeaders } from '@/lib/retail-loyalty/transactional-email'
 import { logger } from '@/lib/logger'
@@ -89,6 +93,14 @@ async function loadTenantContextForReceiptEmail(
   }
 }
 
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
+
 function buildReceiptPlainText(
   order: KassaLastOrderReceipt,
   labels: ReturnType<typeof retailReceiptI18nForLocale>,
@@ -125,12 +137,29 @@ export async function sendRetailKassaReceiptEmail(opts: {
 
   const { tenantInfo, contact, smtp } = ctx
   const labels = retailReceiptI18nForLocale(opts.locale)
+  const emailCopy = retailReceiptEmailCopyForLocale(opts.locale)
   const html = buildRetailKassaReceiptHtmlDocument({
     tenantInfo,
     order: opts.order,
     labels,
     locale: opts.locale,
   })
+
+  let pdfBuffer: Buffer
+  try {
+    pdfBuffer = await buildRetailKassaReceiptPdfBuffer({
+      tenantInfo,
+      order: opts.order,
+      labels,
+      locale: opts.locale,
+    })
+  } catch (err) {
+    logger.warn('[retail-kassa] receipt PDF build failed', {
+      tenantSlug: opts.tenantSlug,
+      error: err instanceof Error ? err.message : String(err),
+    })
+    return { ok: false, error: 'pdf_failed' }
+  }
 
   const shopName = tenantInfo?.business_name?.trim() || contact.businessName || smtp.fromName.trim()
   const ref =
@@ -140,8 +169,14 @@ export async function sendRetailKassaReceiptEmail(opts: {
     ? `${shopName} – ${labels.receiptNo.replace(/\s*$/, '')} ${ref}`.trim()
     : `${shopName} – ${labels.thanks}`
 
-  const text = buildReceiptPlainText(opts.order, labels, shopName, ref)
+  const text = `${emailCopy.pdfAttachedIntro}\n\n${buildReceiptPlainText(opts.order, labels, shopName, ref)}`
   const replyTo = contact.replyToEmail || smtp.user
+  const pdfFilename = retailReceiptPdfFilename(ref, opts.order.orderNumber)
+
+  const introHtml = `<p style="font-family:Arial,sans-serif;font-size:14px;color:#333;margin:0 0 16px;">${escapeHtml(
+    emailCopy.pdfAttachedIntro,
+  )}</p>`
+  const htmlWithIntro = html.replace(/<body>/i, `<body>${introHtml}`)
 
   const transporter = createMailTransporter(smtp)
   try {
@@ -150,9 +185,16 @@ export async function sendRetailKassaReceiptEmail(opts: {
       to: email,
       replyTo,
       subject,
-      html,
+      html: htmlWithIntro,
       text,
       headers: transactionalMailHeaders(),
+      attachments: [
+        {
+          filename: pdfFilename,
+          content: pdfBuffer,
+          contentType: 'application/pdf',
+        },
+      ],
     })
     return { ok: true }
   } catch (err) {
