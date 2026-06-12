@@ -283,8 +283,9 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [stockBusy, setStockBusy] = useState(false)
   /** Schermtoetsenbord alleen na expliciete tik op «Artikel zoeken». */
   const [articleSearchActive, setArticleSearchActive] = useState(false)
-  /** Treffers na «Zoeken» — middenlijst; pas in mandje na selectie. */
+  /** Treffers na «Zoeken» — popup; na keuze in mand + grote lijst. */
   const [articleSearchResults, setArticleSearchResults] = useState<RetailPosSku[]>([])
+  const [articleSearchModalOpen, setArticleSearchModalOpen] = useState(false)
   const [priceFixSku, setPriceFixSku] = useState<RetailPosSku | null>(null)
   const [priceFixName, setPriceFixName] = useState('')
   const [priceFixValue, setPriceFixValue] = useState('')
@@ -622,22 +623,19 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
 
   const barHasLines =
     mode === 'sales'
-      ? articleSearchResults.length > 0
+      ? cart.length > 0
       : stockActivity.length > 0
 
   const selectedPreviewSku = useMemo(() => {
     const skuStillInList = (sku: RetailPosSku) =>
       mode === 'sales'
-        ? cart.some((l) => l.sku.lineKey === sku.lineKey) ||
-          articleSearchResults.some((s) => s.lineKey === sku.lineKey)
+        ? cart.some((l) => l.sku.lineKey === sku.lineKey)
         : stockActivity.some((r) => r.sku.lineKey === sku.lineKey)
 
     if (selectedListLineKey) {
       if (mode === 'sales') {
         const line = cart.find((l) => l.sku.lineKey === selectedListLineKey)
         if (line) return line.sku
-        const fromSearch = articleSearchResults.find((s) => s.lineKey === selectedListLineKey)
-        if (fromSearch) return fromSearch
       } else {
         const row = stockActivity.find((r) => r.key === selectedListLineKey)
         if (row) return row.sku
@@ -645,7 +643,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     }
     if (lastScannedSku && skuStillInList(lastScannedSku)) return lastScannedSku
     return null
-  }, [selectedListLineKey, cart, stockActivity, mode, lastScannedSku, articleSearchResults])
+  }, [selectedListLineKey, cart, stockActivity, mode, lastScannedSku])
 
   const scanBarRowGridClass =
     'grid w-full min-w-[42rem] grid-cols-[minmax(5.5rem,1fr)_minmax(6rem,1.6fr)_minmax(2.5rem,0.5fr)_minmax(2.5rem,0.5fr)_minmax(2.75rem,0.55fr)_minmax(3.25rem,0.65fr)_2.75rem] items-center gap-1.5 sm:gap-2'
@@ -759,6 +757,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     setStockActivity([])
     setSelectedListLineKey(null)
     setArticleSearchResults([])
+    setArticleSearchModalOpen(false)
     closeArticleSearchKeyboard()
     if (next !== 'exchangeCredit') {
       setExchangeOrderLines(null)
@@ -1450,19 +1449,29 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     focusBarcodeCapture()
   }
 
+  function closeArticleSearchModal() {
+    playClick()
+    setArticleSearchModalOpen(false)
+    setArticleSearchResults([])
+    focusBarcodeCapture()
+  }
+
   function showArticleSearchResults(hits: RetailPosSku[]) {
     setArticleSearchResults(hits)
-    if (hits[0]) {
-      focusRetailListLine(hits[0].lineKey, hits[0])
-      queueListScroll(hits[0].lineKey)
-    }
+    setArticleSearchModalOpen(true)
     finishArticleSearchUi()
   }
 
-  function addFromArticleSearchSelection(sku: RetailPosSku) {
+  function pickArticleFromSearchModal(sku: RetailPosSku) {
     playClick()
     addToCart(sku, 1)
-    setArticleSearchResults((prev) => prev.filter((s) => s.lineKey !== sku.lineKey))
+    setArticleSearchResults((prev) => {
+      const next = prev.filter((s) => s.lineKey !== sku.lineKey)
+      if (next.length === 0) {
+        queueMicrotask(() => setArticleSearchModalOpen(false))
+      }
+      return next
+    })
   }
 
   async function runArticleSearch(query: string) {
@@ -2048,6 +2057,44 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
           </div>
         </div>
       )}
+
+      {articleSearchModalOpen && articleSearchResults.length > 0 ? (
+        <div className="fixed inset-0 z-[130] flex items-center justify-center bg-black/70 p-4">
+          <div
+            className={`flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden ${KASSA_POS_BTN_SHAPE} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} border ${KASSA_POS_RULE_BLACK}`}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="retail-article-search-modal-title"
+          >
+            <div className="flex shrink-0 items-start justify-between gap-2 border-b border-white/10 px-4 py-3">
+              <div className="min-w-0">
+                <p id="retail-article-search-modal-title" className="text-lg font-bold text-white">
+                  {t('retailKassaPage.searchMultipleTitle')}
+                </p>
+                <p className="text-sm text-white/70">{t('retailKassaPage.searchMultipleHint')}</p>
+              </div>
+              <button
+                type="button"
+                className={`shrink-0 px-3 py-2 text-sm font-bold ${kassaPosButtonClass(false)}`}
+                onClick={closeArticleSearchModal}
+              >
+                {t('common.close')}
+              </button>
+            </div>
+            <div className="min-h-0 flex-1 overflow-x-auto overflow-y-auto overscroll-y-contain p-2 sm:p-3">
+              <div className="flex min-w-[42rem] flex-col gap-2">
+                {articleSearchResults.map((sku) => (
+                  <div key={sku.lineKey}>
+                    {renderScanBarRow(sku.lineKey, sku, {
+                      onSelect: () => pickArticleFromSearchModal(sku),
+                    })}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {importModalOpen ? (
         <div className="fixed inset-0 z-[125] flex items-center justify-center bg-black/70 p-4">
@@ -2682,7 +2729,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                   </p>
                 ) : !barHasLines ? (
                   <p className={`flex flex-1 items-center justify-center px-4 text-center text-sm ${ui.menuEmptyMuted}`}>
-                    {mode === 'sales' ? t('retailKassaPage.searchResultsEmpty') : null}
+                    {mode === 'sales' ? t('retailKassaPage.scanOnlyHint') : null}
                   </p>
                 ) : (
                   <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden">
@@ -2703,18 +2750,12 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                       className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overflow-x-auto overscroll-y-contain touch-manipulation p-1.5 sm:p-2 [scrollbar-gutter:stable]"
                     >
                       {mode === 'sales'
-                        ? articleSearchResults.map((sku) =>
-                            renderScanBarRow(sku.lineKey, sku, {
-                              onSelect: () => addFromArticleSearchSelection(sku),
+                        ? cart.map((l) =>
+                            renderScanBarRow(l.sku.lineKey, l.sku, {
+                              quantity: l.quantity,
                               onRemove: () => {
                                 playClick()
-                                setArticleSearchResults((prev) =>
-                                  prev.filter((s) => s.lineKey !== sku.lineKey),
-                                )
-                                if (selectedListLineKey === sku.lineKey) {
-                                  setSelectedListLineKey(null)
-                                  setLastScannedSku(null)
-                                }
+                                updateQty(l.sku.lineKey, 0)
                               },
                             }),
                           )
