@@ -70,47 +70,46 @@ function staffFirstName(full: string): string {
   return p[0] ?? full.trim()
 }
 
-/** Print-agent `encWithEuro` vouwt gewone spaties in — NBSP behoudt kolommen op papier. */
-const THERMAL_PAD = '\u00a0'
+/** Alleen 7-bit ASCII in bonInhoud — agent zet NBSP/UTF‑8 op `?`. Tabs (0x09) zijn wél veilig. */
+const THERMAL_TAB = '\t'
+const THERMAL_TAB_COLS = 8
 
-function thermalPadGap(length: number): string {
-  if (length <= 0) return ''
-  return THERMAL_PAD.repeat(length)
+function thermalTabsForGap(minColumns: number): string {
+  if (minColumns <= 0) return ' '
+  const n = Math.min(12, Math.max(1, Math.ceil(minColumns / THERMAL_TAB_COLS)))
+  return THERMAL_TAB.repeat(n)
 }
 
-function thermalPadMoney(left: string, amount: number): string {
-  const r = formatEuroThermal(amount)
-  const maxLeft = RETAIL_THERMAL_W - r.length
-  const l = left.trimEnd().slice(0, maxLeft)
-  const gap = Math.max(1, maxLeft - l.length)
-  return l + thermalPadGap(gap) + r
-}
-
-function thermalPadRow(left: string, right: string): string {
+function thermalRightAlignLine(left: string, right: string): string {
   const l = left.trimEnd()
   const r = right.trim()
   if (l.length + r.length >= RETAIL_THERMAL_W) {
     return `${l.slice(0, RETAIL_THERMAL_W - r.length - 1)} ${r}`.slice(0, RETAIL_THERMAL_W)
   }
-  const gap = RETAIL_THERMAL_W - l.length - r.length
-  return l + thermalPadGap(gap) + r
+  const priceCol = RETAIL_THERMAL_W - r.length
+  const gap = Math.max(1, priceCol - l.length)
+  return l + thermalTabsForGap(gap) + r
+}
+
+function thermalPadMoney(left: string, amount: number): string {
+  return thermalRightAlignLine(left, formatEuroThermal(amount))
+}
+
+function thermalPadRow(left: string, right: string): string {
+  return thermalRightAlignLine(left, right)
 }
 
 function thermalCenter(text: string): string {
   const t = text.replace(/\s+/g, ' ').trim()
   if (!t) return ''
   if (t.length >= RETAIL_THERMAL_W) return t.slice(0, RETAIL_THERMAL_W)
-  const pad = Math.floor((RETAIL_THERMAL_W - t.length) / 2)
-  return thermalPadGap(pad) + t
+  const padCols = Math.floor((RETAIL_THERMAL_W - t.length) / 2)
+  return thermalTabsForGap(padCols) + t
 }
 
 function thermalItemRow(qty: number, name: string, lineTotal: number): string {
   const left = `${qty} ${capitalizeProductName(name)}`
-  const r = formatEuroThermal(lineTotal)
-  const maxLeft = RETAIL_THERMAL_W - r.length
-  const l = left.slice(0, maxLeft)
-  const gap = Math.max(1, maxLeft - l.length)
-  return l + thermalPadGap(gap) + r
+  return thermalRightAlignLine(left, formatEuroThermal(lineTotal))
 }
 
 function itemsGrossIncl(order: KassaLastOrderReceipt): number {

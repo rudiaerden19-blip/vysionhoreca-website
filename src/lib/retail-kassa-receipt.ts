@@ -195,6 +195,16 @@ export async function printRetailKassaReceipt(opts: {
   const printResult = await sendToVysionPrintAgent({
     winkelnaam: formatStoreDisplayName(tenantInfo?.business_name || labels.defaultBusinessName),
     bonInhoud: bonLines.join('\n'),
+    businessInfo: {
+      name: formatStoreDisplayName(tenantInfo?.business_name || labels.defaultBusinessName),
+      address: tenantInfo?.address ?? undefined,
+      postalCode: tenantInfo?.postal_code ?? undefined,
+      city: tenantInfo?.city ?? undefined,
+      phone: tenantInfo?.phone ?? undefined,
+      vatNumber: tenantInfo?.btw_number ?? undefined,
+      website: tenantInfo?.website ?? undefined,
+      vatRate: normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 21, 21),
+    },
     copies: isDraft ? 1 : 2,
     openDrawer: isCash,
     receiptMode: 'kassa',
