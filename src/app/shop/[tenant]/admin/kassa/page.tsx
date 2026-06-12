@@ -439,7 +439,7 @@ function mergeOpenTableOrdersServerWithPendingLocal(
   const merged: Record<string, CartItem[]> = { ...fromServer }
   for (const k of pendingLocalSlotKeys) {
     const v = prev[k]
-    if ((v?.length ?? 0) > 0 && !(k in fromServer)) {
+    if ((v?.length ?? 0) > 0) {
       merged[k] = v
     }
   }
@@ -2189,17 +2189,22 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const zone = dineInFloorZone
     const tbl = tableNumber
     const slotKey = tableOrderMapKey(zone, tbl)
+    const merged = mergeCartLinesForTable(tableOrdersRef.current[slotKey] || [], itemsToPark)
+    const next: Record<string, CartItem[]> = { ...tableOrdersRef.current, [slotKey]: merged }
+    tableOrdersRef.current = next
+    try {
+      localStorage.setItem(tableOrdersKey, JSON.stringify(next))
+    } catch {
+      /* empty */
+    }
+    cancelPersistTimer(slotKey)
+    updateTableStatus(tbl, merged.length > 0, zone)
     flushSync(() => {
       setCart([])
     })
-    setTableOrders((prev) => {
-      const merged = mergeCartLinesForTable(prev[slotKey] || [], itemsToPark)
-      const next = { ...prev, [slotKey]: merged }
-      localStorage.setItem(tableOrdersKey, JSON.stringify(next))
-      updateTableStatus(tbl, merged.length > 0, zone)
-      schedulePersistOpenOrder(zone, tbl, merged)
-      return next
-    })
+    setTableOrders(next)
+    queueMicrotask(() => syncFloorPlanStatusesFromOpenOrders(next))
+    void persistOpenOrderRowToSupabase(zone, tbl, merged)
     void flushBarDeltaSlipRef.current(zone, tbl, itemsToPark, opts)
   }
 
