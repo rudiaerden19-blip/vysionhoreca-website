@@ -44,7 +44,7 @@ export function KassaSplitPaymentModal({
     : 'py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-sm font-semibold transition-colors'
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[180] p-4">
       <div className={card}>
         <div className={hdr}>
           <h3 className={hdrTitle}>
