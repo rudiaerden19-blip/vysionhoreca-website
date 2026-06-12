@@ -145,7 +145,7 @@ export async function sendRetailKassaReceiptEmail(opts: {
     locale: opts.locale,
   })
 
-  let pdfBuffer: Buffer
+  let pdfBuffer: Buffer | null = null
   try {
     pdfBuffer = await buildRetailKassaReceiptPdfBuffer({
       tenantInfo,
@@ -154,11 +154,10 @@ export async function sendRetailKassaReceiptEmail(opts: {
       locale: opts.locale,
     })
   } catch (err) {
-    logger.warn('[retail-kassa] receipt PDF build failed', {
+    logger.warn('[retail-kassa] receipt PDF build failed; sending HTML-only email', {
       tenantSlug: opts.tenantSlug,
       error: err instanceof Error ? err.message : String(err),
     })
-    return { ok: false, error: 'pdf_failed' }
   }
 
   const shopName = tenantInfo?.business_name?.trim() || contact.businessName || smtp.fromName.trim()
@@ -169,14 +168,21 @@ export async function sendRetailKassaReceiptEmail(opts: {
     ? `${shopName} – ${labels.receiptNo.replace(/\s*$/, '')} ${ref}`.trim()
     : `${shopName} – ${labels.thanks}`
 
-  const text = `${emailCopy.pdfAttachedIntro}\n\n${buildReceiptPlainText(opts.order, labels, shopName, ref)}`
+  const plainBody = buildReceiptPlainText(opts.order, labels, shopName, ref)
+  const text = pdfBuffer
+    ? `${emailCopy.pdfAttachedIntro}\n\n${plainBody}`
+    : plainBody
   const replyTo = contact.replyToEmail || smtp.user
   const pdfFilename = retailReceiptPdfFilename(ref, opts.order.orderNumber)
 
-  const introHtml = `<p style="font-family:Arial,sans-serif;font-size:14px;color:#333;margin:0 0 16px;">${escapeHtml(
-    emailCopy.pdfAttachedIntro,
-  )}</p>`
-  const htmlWithIntro = html.replace(/<body>/i, `<body>${introHtml}`)
+  const htmlWithIntro = pdfBuffer
+    ? html.replace(
+        /<body>/i,
+        `<body><p style="font-family:Arial,sans-serif;font-size:14px;color:#333;margin:0 0 16px;">${escapeHtml(
+          emailCopy.pdfAttachedIntro,
+        )}</p>`,
+      )
+    : html
 
   const transporter = createMailTransporter(smtp)
   try {
@@ -188,13 +194,15 @@ export async function sendRetailKassaReceiptEmail(opts: {
       html: htmlWithIntro,
       text,
       headers: transactionalMailHeaders(),
-      attachments: [
-        {
-          filename: pdfFilename,
-          content: pdfBuffer,
-          contentType: 'application/pdf',
-        },
-      ],
+      attachments: pdfBuffer
+        ? [
+            {
+              filename: pdfFilename,
+              content: pdfBuffer,
+              contentType: 'application/pdf',
+            },
+          ]
+        : undefined,
     })
     return { ok: true }
   } catch (err) {

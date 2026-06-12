@@ -60,6 +60,10 @@ const securityHeaders = [
 ]
 
 const nextConfig = {
+  experimental: {
+    // PDFKit leest .afm-fonts van schijf — niet webpack-bundelen (Vercel bon-mail).
+    serverComponentsExternalPackages: ['pdfkit'],
+  },
   env: {
     NEXT_PUBLIC_BUILD_SHA:
       process.env.VERCEL_GIT_COMMIT_SHA ||

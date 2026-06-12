@@ -162,9 +162,9 @@ export function buildRetailKassaReceiptPdfBuffer(opts: {
     y = rowLeftRight(doc, y, labels.subtotal, formatEuro(subtotalExcl))
     y = rowLeftRight(doc, y, labels.vatSingleLabel, formatEuro(taxTotal))
     y += 4
-    doc.fontSize(12).font('Helvetica-Bold')
+    doc.fontSize(12)
     y = rowLeftRight(doc, y, labels.total.toUpperCase(), formatEuro(order.total))
-    doc.font('Helvetica')
+    doc.fontSize(9)
     y += 4
     y = rowLeftRight(doc, y, labels.receivedLabel, formatEuro(order.total))
     y = rowLeftRight(doc, y, labels.changeLabel, formatEuro(0))

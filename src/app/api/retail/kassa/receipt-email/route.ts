@@ -3,6 +3,9 @@ import { z } from 'zod'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 import { sendRetailKassaReceiptEmail } from '@/lib/retail-kassa/send-receipt-email'
 
+export const runtime = 'nodejs'
+export const maxDuration = 60
+
 const OrderSchema = z.object({
   orderNumber: z.number(),
   checkoutReference: z.string().optional(),
@@ -26,7 +29,15 @@ const OrderSchema = z.object({
       pointsBalance: z.number(),
     })
     .optional(),
-})
+  retailCustomerInvoice: z
+    .object({
+      name: z.string(),
+      addressLine: z.string().optional(),
+      postalCity: z.string().optional(),
+      vatNumber: z.string(),
+    })
+    .optional(),
+}).passthrough()
 
 const BodySchema = z.object({
   tenantSlug: z.string().min(1),
