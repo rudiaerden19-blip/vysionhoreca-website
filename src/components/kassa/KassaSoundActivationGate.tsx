@@ -16,11 +16,9 @@ type SoundUi = Pick<
 
 /**
  * Eén groen toestemmingsscherm per browsersessie (sessionStorage).
- * `gateResolved` voorkomt flits: kassa pas tonen ná sessionStorage-check (layout effect).
  */
 export function useKassaSoundActivationGate(tenant: string) {
   const sessionKey = kassaSoundSessionKey(tenant)
-  const [gateResolved, setGateResolved] = useState(false)
   const [soundActivated, setSoundActivated] = useState(false)
   const audioUnlockOnceRef = useRef(false)
 
@@ -32,7 +30,6 @@ export function useKassaSoundActivationGate(tenant: string) {
       activated = false
     }
     setSoundActivated(activated)
-    setGateResolved(true)
   }, [sessionKey])
 
   const activateSound = useCallback(() => {
@@ -63,18 +60,15 @@ export function useKassaSoundActivationGate(tenant: string) {
     return () => window.removeEventListener('pointerdown', onPointer, true)
   }, [soundActivated])
 
-  return { gateResolved, soundActivated, activateSound }
+  return { soundActivated, activateSound }
 }
 
 export function KassaSoundActivationScreen({
   ui,
   onActivate,
-  busy = false,
 }: {
   ui: SoundUi
   onActivate: () => void
-  /** Alleen achtergrond — tijdens sessionStorage-check */
-  busy?: boolean
 }) {
   const { t } = useLanguage()
 
@@ -84,7 +78,6 @@ export function KassaSoundActivationScreen({
       role="dialog"
       aria-modal="true"
       aria-labelledby="kassa-sound-activation-title"
-      aria-busy={busy}
       onPointerDown={(e) => e.stopPropagation()}
     >
       <div className={`max-w-md text-center ${ui.soundHeading}`}>
@@ -100,7 +93,6 @@ export function KassaSoundActivationScreen({
         </p>
         <button
           type="button"
-          disabled={busy}
           onPointerDown={(e) => {
             e.preventDefault()
             e.stopPropagation()
@@ -108,9 +100,9 @@ export function KassaSoundActivationScreen({
           onClick={(e) => {
             e.preventDefault()
             e.stopPropagation()
-            if (!busy) onActivate()
+            onActivate()
           }}
-          className="flex w-full transform touch-manipulation items-center justify-center gap-4 rounded-2xl bg-green-500 py-6 text-2xl font-bold text-white shadow-lg transition-all hover:scale-105 hover:bg-green-600 active:bg-green-700 disabled:pointer-events-none disabled:opacity-60"
+          className="flex w-full transform touch-manipulation items-center justify-center gap-4 rounded-2xl bg-green-500 py-6 text-2xl font-bold text-white shadow-lg transition-all hover:scale-105 hover:bg-green-600 active:bg-green-700"
         >
           <span className="text-4xl">🔊</span>
           {t('kassaApp.soundActivateButton').toUpperCase()}

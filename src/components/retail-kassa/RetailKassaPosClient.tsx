@@ -192,7 +192,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     [appearanceDark],
   )
 
-  const { gateResolved, soundActivated, activateSound } = useKassaSoundActivationGate(tenant)
+  const { soundActivated, activateSound } = useKassaSoundActivationGate(tenant)
 
   const {
     moduleAccess,
@@ -1776,14 +1776,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     })
   }
 
-  if (!gateResolved || !soundActivated) {
-    return (
-      <KassaSoundActivationScreen
-        ui={ui}
-        onActivate={activateSound}
-        busy={!gateResolved}
-      />
-    )
+  if (!soundActivated) {
+    return <KassaSoundActivationScreen ui={ui} onActivate={activateSound} />
   }
 
   return (

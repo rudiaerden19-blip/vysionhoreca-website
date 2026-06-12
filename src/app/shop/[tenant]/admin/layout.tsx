@@ -350,17 +350,68 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
     demoPublicUnauthenticated,
   ])
 
-  const [posSessionReady, setPosSessionReady] = useState(false)
+  const renderKassaPosChildren = () => {
+    if (isHorecaKassaPos) {
+      if (demoPublicUnauthenticated) {
+        return <>{children}</>
+      }
+      if (typeof window !== 'undefined' && isSuperAdminLoggedIn()) {
+        return <>{children}</>
+      }
+      if (!modulesLoading && !isHorecaKassaPosScreenEnabled(moduleAccess)) {
+        return (
+          <RedirectToFirstAccessibleModule
+            tenant={params.tenant}
+            access={moduleAccess}
+            enabledModulesJson={enabledModulesJson}
+          />
+        )
+      }
+      return <>{children}</>
+    }
 
-  useLayoutEffect(() => {
-    if (typeof window === 'undefined') return
-    setPosSessionReady(
-      isAnyKassaPos &&
-        (isSuperAdminLoggedIn() || isOwnerSessionFreshForTenant(params.tenant)),
-    )
-  }, [isAnyKassaPos, params.tenant])
+    if (isRetailKassaPos) {
+      if (
+        !modulesLoading &&
+        !isRetailKassaPosScreenEnabled(moduleAccess, enabledModulesJson)
+      ) {
+        return (
+          <RedirectToFirstAccessibleModule
+            tenant={params.tenant}
+            access={moduleAccess}
+            enabledModulesJson={enabledModulesJson}
+          />
+        )
+      }
+      return <>{children}</>
+    }
 
-  if (loading && !posSessionReady) {
+    return null
+  }
+
+  /**
+   * Kassa-POS: geen admin-laadschermen — na login alleen sound gate in de kassa-client.
+   * `tenantExists === null` tijdens fetch is géén "shop niet gevonden".
+   */
+  if (isAnyKassaPos) {
+    if (tenantExists === false) {
+      return (
+        <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-12 shadow-xl max-w-md w-full text-center">
+            <span className="text-6xl mb-6 block">🔍</span>
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">{t('adminLayout.shopNotFound')}</h1>
+            <p className="text-gray-600 mb-6">{t('adminLayout.shopNotFoundDesc')}</p>
+            <a href="https://www.vysion-kassa.com" className="text-blue-600 hover:text-blue-700 font-medium inline-block">
+              {t('adminLayout.backToVysion')}
+            </a>
+          </div>
+        </div>
+      )
+    }
+    return renderKassaPosChildren()
+  }
+
+  if (loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
@@ -371,7 +422,7 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
     )
   }
 
-  if (!tenantExists) {
+  if (tenantExists === false) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
         <div className="bg-white rounded-3xl p-12 shadow-xl max-w-md w-full text-center">
@@ -386,10 +437,7 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
     )
   }
 
-  const posAuthInFlight =
-    isAnyKassaPos && posSessionReady && (adminAccess === 'verifying' || adminAccess === 'pending')
-
-  if (tenantExists && adminAccess !== 'ok' && !posAuthInFlight) {
+  if (tenantExists && adminAccess !== 'ok') {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
@@ -400,41 +448,6 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
         </div>
       </div>
     )
-  }
-
-  if (isHorecaKassaPos) {
-    if (demoPublicUnauthenticated) {
-      return <>{children}</>
-    }
-    if (typeof window !== 'undefined' && isSuperAdminLoggedIn()) {
-      return <>{children}</>
-    }
-    if (!modulesLoading && !isHorecaKassaPosScreenEnabled(moduleAccess)) {
-      return (
-        <RedirectToFirstAccessibleModule
-          tenant={params.tenant}
-          access={moduleAccess}
-          enabledModulesJson={enabledModulesJson}
-        />
-      )
-    }
-    return <>{children}</>
-  }
-
-  if (isRetailKassaPos) {
-    if (
-      !modulesLoading &&
-      !isRetailKassaPosScreenEnabled(moduleAccess, enabledModulesJson)
-    ) {
-      return (
-        <RedirectToFirstAccessibleModule
-          tenant={params.tenant}
-          access={moduleAccess}
-          enabledModulesJson={enabledModulesJson}
-        />
-      )
-    }
-    return <>{children}</>
   }
 
   return (
