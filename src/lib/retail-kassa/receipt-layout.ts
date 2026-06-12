@@ -21,14 +21,14 @@ export const RETAIL_RECEIPT_PRINT_STYLES = `
       .retail-name { font-size:14px;font-weight:700;margin:2px 0; }
       .retail-header .small { font-size:10px;line-height:1.45; }
       .meta-row { display:flex;justify-content:space-between;align-items:baseline;font-size:10px;margin:10px 0 6px; }
-      .section-bar { display:block;width:100%;box-sizing:border-box;background:#000;color:#fff;font-weight:700;font-size:11px;padding:6px 10px;margin:12px 0 8px;letter-spacing:0.06em;text-transform:uppercase; }
-      .section-bar:first-of-type { margin-top:4px; }
+      .black-bar { background:#000;color:#fff;font-weight:700;font-size:13px;padding:3px 6px;margin:8px 0 5px 0;width:100%;box-sizing:border-box;text-transform:uppercase; }
+      .black-bar:first-of-type { margin-top:4px; }
       .retail-item { display:grid;grid-template-columns:20px 1fr auto;gap:6px;align-items:baseline;margin:4px 0;font-size:11px; }
       .retail-item-extra { padding-left:26px;margin:2px 0;font-size:10px; }
       .amt { font-family:'Courier New',Courier,monospace;font-weight:700;text-align:right;white-space:nowrap; }
       .money-row { display:flex;justify-content:space-between;align-items:baseline;margin:3px 0;font-size:11px; }
       .money-row .amt { min-width:9ch; }
-      .retail-grand { display:flex;justify-content:space-between;align-items:baseline;font-size:24px;font-weight:900;margin:10px 0;padding:8px 0;border-top:2px solid #000;border-bottom:2px solid #000;line-height:1.1; }
+      .retail-grand { display:flex;justify-content:space-between;align-items:baseline;font-size:24px;font-weight:900;margin:10px 0;padding:4px 0;line-height:1.1; }
       .retail-grand .amt { font-size:24px;font-weight:900; }
       .pay-line { margin:4px 0;font-size:11px; }
       .vat-head, .vat-row { display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;font-size:10px;margin:3px 0; }
@@ -40,7 +40,12 @@ export const RETAIL_RECEIPT_PRINT_STYLES = `
       .loyalty-block { font-size:10px;margin:10px 0;text-align:center;font-family:Helvetica,Arial,sans-serif; }
       .barcode-wrap { margin-top:14px;text-align:center; }
       .draft-banner { text-align:center;font-weight:700;font-size:10px;margin:6px 0;color:#b45309;font-family:Helvetica,Arial,sans-serif; }
+      @media print { .black-bar { -webkit-print-color-adjust:exact; print-color-adjust:exact; } }
 `.trim()
+
+function blackBarHtml(title: string): string {
+  return `<div class="black-bar">${escapeReceiptHtml(title)}</div>`
+}
 
 export type RetailVatDisplayRow = {
   rate: number
@@ -69,11 +74,6 @@ function thermalPadMoney(left: string, amount: number): string {
   const maxLeft = RETAIL_THERMAL_W - THERMAL_PRICE_W
   const l = left.trimEnd().slice(0, maxLeft)
   return l.padEnd(maxLeft, ' ') + r
-}
-
-/** Sectietitel — één regel, geen streepjes (zwarte balk alleen in HTML). */
-function thermalSectionTitleLines(title: string): string[] {
-  return [title.trim().toUpperCase()]
 }
 
 function thermalPadRow(left: string, right: string): string {
@@ -261,7 +261,6 @@ export function buildRetailThermalBonLines(opts: {
   lines.push(thermalPadRow(`${labels.receiptBonNrPrefix}${receiptRefDisplay}`, dateStr))
   lines.push('')
 
-  lines.push(...thermalSectionTitleLines(labels.sectionOrderBar))
   appendItemsThermal(order, lines)
   if (discountEuro > 0.009) {
     const r = `-${formatEuroThermal(discountEuro)}`.padStart(THERMAL_PRICE_W)
@@ -270,7 +269,6 @@ export function buildRetailThermalBonLines(opts: {
   }
   lines.push('')
 
-  lines.push(...thermalSectionTitleLines(labels.sectionTotalBar))
   lines.push(thermalPadMoney(labels.subtotal, subtotalExcl))
   if (vatRows.length > 1) {
     for (const row of vatRows) {
@@ -287,7 +285,6 @@ export function buildRetailThermalBonLines(opts: {
   lines.push(labels.paymentMethodLine(payLabel).slice(0, RETAIL_THERMAL_W))
   lines.push('')
 
-  lines.push(...thermalSectionTitleLines(labels.sectionVatBar))
   const vh = `${labels.vatColBtwPct.padEnd(6)}${labels.vatColBtw.padStart(6)}${labels.vatColExcl.padStart(8)}${labels.vatColIncl.padStart(8)}`
   lines.push(vh.slice(0, RETAIL_THERMAL_W))
   for (const row of vatRows) {
@@ -418,14 +415,14 @@ export function buildRetailKassaReceiptHtmlBody(opts: {
         <span>${escapeReceiptHtml(labels.receiptBonNrPrefix)}${escapeReceiptHtml(String(receiptRefDisplay))}</span>
         <span>${escapeReceiptHtml(dateStr)}</span>
       </div>
-      <div class="section-bar">${escapeReceiptHtml(labels.sectionOrderBar)}</div>
+      ${blackBarHtml(labels.sectionOrderBar)}
       ${appendItemsHtml(order)}
       ${
         discountEuro > 0.009
           ? `<div class="money-row"><span>${escapeReceiptHtml(labels.receiptDiscount)}</span><span class="amt">-${formatEuroHtml(discountEuro)}</span></div>`
           : ''
       }
-      <div class="section-bar">${escapeReceiptHtml(labels.sectionTotalBar)}</div>
+      ${blackBarHtml(labels.sectionTotalBar)}
       <div class="money-row"><span>${escapeReceiptHtml(labels.subtotal)}</span><span class="amt">${formatEuroHtml(subtotalExcl)}</span></div>
       ${vatSummaryRows}
       <div class="retail-grand">
@@ -435,7 +432,7 @@ export function buildRetailKassaReceiptHtmlBody(opts: {
       <div class="money-row"><span>${escapeReceiptHtml(labels.receivedLabel)}</span><span class="amt">${formatEuroHtml(order.total)}</span></div>
       <div class="money-row"><span>${escapeReceiptHtml(labels.changeLabel)}</span><span class="amt">${formatEuroHtml(0)}</span></div>
       <div class="pay-line">${escapeReceiptHtml(labels.paymentMethodLine(payLabel))}</div>
-      <div class="section-bar">${escapeReceiptHtml(labels.sectionVatBar)}</div>
+      ${blackBarHtml(labels.sectionVatBar)}
       <div class="vat-head">
         <span>${escapeReceiptHtml(labels.vatColBtwPct)}</span>
         <span>${escapeReceiptHtml(labels.vatColBtw)}</span>
