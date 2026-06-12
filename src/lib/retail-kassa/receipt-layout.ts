@@ -73,11 +73,9 @@ function staffFirstName(full: string): string {
 
 /** Tussen omschrijving en EUR op de bon (midden sectie). */
 const THERMAL_FILL = '.'
-const THERMAL_TAB_W = 8
 
-function thermalTabColumn(fromCol: number): number {
-  return (Math.floor(fromCol / THERMAL_TAB_W) + 1) * THERMAL_TAB_W
-}
+/** Print-agent vouwt alleen gewone spaties in (`encWithEuro`); NBSP = één kolom zonder zichtbare puntjes. */
+const THERMAL_PAD = '\u00A0'
 
 /** Gecentreerd zonder punt-leaders vóór de tekst (adres + footer). */
 function thermalCenterPlain(text: string): string {
@@ -85,14 +83,7 @@ function thermalCenterPlain(text: string): string {
   if (!t) return ''
   if (t.length >= RETAIL_THERMAL_W) return t.slice(0, RETAIL_THERMAL_W)
   const startCol = Math.floor((RETAIL_THERMAL_W - t.length) / 2)
-  let col = 0
-  let tabs = ''
-  while (col < startCol && tabs.length < 6) {
-    tabs += '\t'
-    col = thermalTabColumn(col)
-  }
-  if (col + t.length > RETAIL_THERMAL_W) return t.slice(0, RETAIL_THERMAL_W)
-  return tabs + t
+  return THERMAL_PAD.repeat(startCol) + t
 }
 
 function thermalRightAlignLine(left: string, right: string): string {
