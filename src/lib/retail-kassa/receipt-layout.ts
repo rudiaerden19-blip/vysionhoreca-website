@@ -71,8 +71,29 @@ function staffFirstName(full: string): string {
   return p[0] ?? full.trim()
 }
 
-/** Agent `encWithEuro` vouwt spaties samen — kolomuitlijning via `.` leaders (42 kol.). */
+/** Tussen omschrijving en EUR op de bon (midden sectie). */
 const THERMAL_FILL = '.'
+const THERMAL_TAB_W = 8
+
+function thermalTabColumn(fromCol: number): number {
+  return (Math.floor(fromCol / THERMAL_TAB_W) + 1) * THERMAL_TAB_W
+}
+
+/** Gecentreerd zonder punt-leaders vóór de tekst (adres + footer). */
+function thermalCenterPlain(text: string): string {
+  const t = text.replace(/\s+/g, ' ').trim()
+  if (!t) return ''
+  if (t.length >= RETAIL_THERMAL_W) return t.slice(0, RETAIL_THERMAL_W)
+  const startCol = Math.floor((RETAIL_THERMAL_W - t.length) / 2)
+  let col = 0
+  let tabs = ''
+  while (col < startCol && tabs.length < 6) {
+    tabs += '\t'
+    col = thermalTabColumn(col)
+  }
+  if (col + t.length > RETAIL_THERMAL_W) return t.slice(0, RETAIL_THERMAL_W)
+  return tabs + t
+}
 
 function thermalRightAlignLine(left: string, right: string): string {
   const l = left.trimEnd()
@@ -184,15 +205,15 @@ function appendRetailLoyaltyThermal(
   lines.push('')
   lines.push('')
   if (L.memberLabel && labels.loyaltyPassLabel) {
-    lines.push(thermalCenter(thermalPlainLine(labels.loyaltyPassLabel(L.memberLabel))))
+    lines.push(thermalCenterPlain(thermalPlainLine(labels.loyaltyPassLabel(L.memberLabel))))
   }
   if (L.pointsRedeemed > 0 && labels.loyaltyRedeemedLine) {
-    lines.push(thermalCenter(thermalPlainLine(labels.loyaltyRedeemedLine(L.pointsRedeemed))))
+    lines.push(thermalCenterPlain(thermalPlainLine(labels.loyaltyRedeemedLine(L.pointsRedeemed))))
   }
   if (L.pointsEarned > 0 && labels.loyaltyEarnedLine) {
-    lines.push(thermalCenter(thermalPlainLine(labels.loyaltyEarnedLine(L.pointsEarned))))
+    lines.push(thermalCenterPlain(thermalPlainLine(labels.loyaltyEarnedLine(L.pointsEarned))))
   }
-  lines.push(thermalCenter(thermalPlainLine(labels.loyaltyBalanceLine(L.pointsBalance))))
+  lines.push(thermalCenterPlain(thermalPlainLine(labels.loyaltyBalanceLine(L.pointsBalance))))
 }
 
 function appendHelpedByThermal(
@@ -203,8 +224,8 @@ function appendHelpedByThermal(
   const raw = order.helpedByStaffName?.trim()
   if (!raw || !labels.helpedByIntro) return
   lines.push('')
-  lines.push(thermalCenter(thermalPlainLine(labels.helpedByIntro)))
-  lines.push(thermalCenter(thermalPlainLine(staffFirstName(raw))))
+  lines.push(thermalCenterPlain(thermalPlainLine(labels.helpedByIntro)))
+  lines.push(thermalCenterPlain(thermalPlainLine(staffFirstName(raw))))
 }
 
 function appendItemsThermal(order: KassaLastOrderReceipt, lines: string[]): void {
@@ -258,15 +279,15 @@ export function buildRetailThermalBonLines(opts: {
   const lines: string[] = []
 
   /** Naam print de agent gecentreerd via `winkelnaam` — hier alleen adres/BTW/tel gecentreerd. */
-  if (tenantInfo?.address) lines.push(thermalCenter(tenantInfo.address.trim()))
+  if (tenantInfo?.address) lines.push(thermalCenterPlain(tenantInfo.address.trim()))
   if (tenantInfo?.postal_code || tenantInfo?.city) {
-    lines.push(thermalCenter(`${tenantInfo.postal_code ?? ''} ${tenantInfo.city ?? ''}`.trim()))
+    lines.push(thermalCenterPlain(`${tenantInfo.postal_code ?? ''} ${tenantInfo.city ?? ''}`.trim()))
   }
   if (tenantInfo?.btw_number?.trim()) {
-    lines.push(thermalCenter(labels.businessVatLabel(tenantInfo.btw_number.trim())))
+    lines.push(thermalCenterPlain(labels.businessVatLabel(tenantInfo.btw_number.trim())))
   }
   if (tenantInfo?.phone?.trim()) {
-    lines.push(thermalCenter(`${labels.telPrefix} ${tenantInfo.phone.trim()}`))
+    lines.push(thermalCenterPlain(`${labels.telPrefix} ${tenantInfo.phone.trim()}`))
   }
   lines.push('')
   lines.push('')
@@ -310,8 +331,8 @@ export function buildRetailThermalBonLines(opts: {
   appendHelpedByThermal(order, labels, lines)
 
   lines.push('')
-  lines.push(thermalCenter(thermalPlainLine(isDraft ? labels.draftFooter : labels.thanks)))
-  if (!isDraft) lines.push(thermalCenter(thermalPlainLine(labels.thanksFarewell)))
+  lines.push(thermalCenterPlain(thermalPlainLine(isDraft ? labels.draftFooter : labels.thanks)))
+  if (!isDraft) lines.push(thermalCenterPlain(thermalPlainLine(labels.thanksFarewell)))
   lines.push('')
   lines.push(labels.paymentMethodLine(payLabel).slice(0, RETAIL_THERMAL_W))
   lines.push('')
