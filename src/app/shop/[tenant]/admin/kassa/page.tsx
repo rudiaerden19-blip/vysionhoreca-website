@@ -2185,20 +2185,22 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   /** Karronde naar tafelmand + keuken/kassa-delta; tafel blijft geselecteerd (sync Supabase). */
   const parkOrder = (opts: { printKitchen: boolean; printKassaSlip: boolean }) => {
     if (orderType !== 'DINE_IN' || !tableNumber || cart.length === 0) return
-    const snap = snapshotCartItemsForAsyncPrint(cart)
+    const itemsToPark = snapshotCartItemsForAsyncPrint(cart)
     const zone = dineInFloorZone
     const tbl = tableNumber
     const slotKey = tableOrderMapKey(zone, tbl)
+    flushSync(() => {
+      setCart([])
+    })
     setTableOrders((prev) => {
-      const merged = mergeCartLinesForTable(prev[slotKey] || [], cart)
+      const merged = mergeCartLinesForTable(prev[slotKey] || [], itemsToPark)
       const next = { ...prev, [slotKey]: merged }
       localStorage.setItem(tableOrdersKey, JSON.stringify(next))
       updateTableStatus(tbl, merged.length > 0, zone)
       schedulePersistOpenOrder(zone, tbl, merged)
       return next
     })
-    void flushBarDeltaSlipRef.current(zone, tbl, snap, opts)
-    setCart([])
+    void flushBarDeltaSlipRef.current(zone, tbl, itemsToPark, opts)
   }
 
   // Betaling
