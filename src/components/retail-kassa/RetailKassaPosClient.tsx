@@ -1734,6 +1734,17 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     )
     if (retailLoyaltyOnReceipt) {
       receipt.retailLoyalty = retailLoyaltyOnReceipt
+    } else if (loyaltyMemberSnapshot) {
+      const memberLabel =
+        loyaltyMemberSnapshot.display_name?.trim() ||
+        loyaltyMemberSnapshot.customer_name?.trim() ||
+        loyaltyMemberSnapshot.card_code
+      receipt.retailLoyalty = {
+        memberLabel,
+        pointsEarned: 0,
+        pointsRedeemed: redeemPointsForSale,
+        pointsBalance: loyaltyMemberSnapshot.points_balance,
+      }
     }
     const customerInvoice = retailCustomerInvoiceFromLoyaltyMember(loyaltyMemberSnapshot)
     if (customerInvoice) {

@@ -160,6 +160,14 @@ function stripEmojiForThermal(text: string): string {
   return text.replace(/\p{Extended_Pictographic}/gu, '').replace(/\s+/g, ' ').trim()
 }
 
+function thermalPlainLine(text: string): string {
+  return stripEmojiForThermal(text)
+    .replace(/\u2212/g, '-')
+    .replace(/[^\x09\x0A\x0D\x20-\x7E]/g, '')
+    .trim()
+    .slice(0, RETAIL_THERMAL_W)
+}
+
 function appendRetailLoyaltyThermal(
   order: KassaLastOrderReceipt,
   labels: RetailReceiptI18n,
@@ -169,15 +177,15 @@ function appendRetailLoyaltyThermal(
   if (!L || !labels.loyaltyBalanceLine) return
   lines.push('')
   if (L.memberLabel && labels.loyaltyPassLabel) {
-    lines.push(thermalCenter(stripEmojiForThermal(labels.loyaltyPassLabel(L.memberLabel))))
+    lines.push(thermalPlainLine(labels.loyaltyPassLabel(L.memberLabel)))
   }
   if (L.pointsRedeemed > 0 && labels.loyaltyRedeemedLine) {
-    lines.push(thermalCenter(stripEmojiForThermal(labels.loyaltyRedeemedLine(L.pointsRedeemed))))
+    lines.push(thermalPlainLine(labels.loyaltyRedeemedLine(L.pointsRedeemed)))
   }
   if (L.pointsEarned > 0 && labels.loyaltyEarnedLine) {
-    lines.push(thermalCenter(stripEmojiForThermal(labels.loyaltyEarnedLine(L.pointsEarned))))
+    lines.push(thermalPlainLine(labels.loyaltyEarnedLine(L.pointsEarned)))
   }
-  lines.push(thermalCenter(stripEmojiForThermal(labels.loyaltyBalanceLine(L.pointsBalance))))
+  lines.push(thermalPlainLine(labels.loyaltyBalanceLine(L.pointsBalance)))
 }
 
 function appendHelpedByThermal(
@@ -188,8 +196,8 @@ function appendHelpedByThermal(
   const raw = order.helpedByStaffName?.trim()
   if (!raw || !labels.helpedByIntro) return
   lines.push('')
-  lines.push(thermalCenter(stripEmojiForThermal(labels.helpedByIntro)))
-  lines.push(thermalCenter(staffFirstName(raw)))
+  lines.push(thermalPlainLine(labels.helpedByIntro))
+  lines.push(thermalPlainLine(staffFirstName(raw)))
 }
 
 function appendItemsThermal(order: KassaLastOrderReceipt, lines: string[]): void {
@@ -290,17 +298,19 @@ export function buildRetailThermalBonLines(opts: {
   lines.push(thermalPadMoney(labels.receivedLabel, order.total))
   lines.push(thermalPadMoney(labels.changeLabel, 0))
   lines.push('')
-  lines.push(labels.paymentMethodLine(payLabel).slice(0, RETAIL_THERMAL_W))
-  lines.push('')
 
   appendRetailLoyaltyThermal(order, labels, lines)
   appendHelpedByThermal(order, labels, lines)
 
   lines.push('')
-  lines.push(thermalCenter(isDraft ? labels.draftFooter : labels.thanks))
-  if (!isDraft) lines.push(thermalCenter(labels.thanksFarewell))
+  lines.push(thermalPlainLine(isDraft ? labels.draftFooter : labels.thanks))
+  if (!isDraft) lines.push(thermalPlainLine(labels.thanksFarewell))
+  lines.push('')
+  lines.push(labels.paymentMethodLine(payLabel).slice(0, RETAIL_THERMAL_W))
+  lines.push('')
+
   if (tenantInfo?.website?.trim()) {
-    lines.push(thermalCenter(tenantInfo.website.trim()))
+    lines.push(thermalPlainLine(tenantInfo.website.trim()))
   }
   lines.push('')
 
@@ -407,11 +417,11 @@ export function buildRetailKassaReceiptHtmlBody(opts: {
       </div>
       <div class="money-row"><span>${escapeReceiptHtml(labels.receivedLabel)}</span><span class="amt">${formatEuroHtml(order.total)}</span></div>
       <div class="money-row"><span>${escapeReceiptHtml(labels.changeLabel)}</span><span class="amt">${formatEuroHtml(0)}</span></div>
-      <div class="pay-line">${escapeReceiptHtml(labels.paymentMethodLine(payLabel))}</div>
       ${loyaltyHtml}
       ${helpedByHtml}
       <div class="footer-thanks">${escapeReceiptHtml(isDraft ? labels.draftFooter : labels.thanks)}</div>
       ${!isDraft ? `<div class="footer-thanks">${escapeReceiptHtml(labels.thanksFarewell)}</div>` : ''}
+      <div class="pay-line">${escapeReceiptHtml(labels.paymentMethodLine(payLabel))}</div>
       ${tenantInfo?.website?.trim() ? `<div class="footer-website">${escapeReceiptHtml(tenantInfo.website.trim())}</div>` : ''}`
 }
 
