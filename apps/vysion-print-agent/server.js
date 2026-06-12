@@ -140,143 +140,6 @@ function padPrice(label, amount, width) {
   ])
 }
 
-/** Winkelkassa (retail POS): zelfde uitlijning als padPrice, bedrag met komma (14,00). */
-function padPriceComma(label, amount, width) {
-  const num = Number(amount).toFixed(2).replace('.', ',')
-  const lab = String(label ?? '')
-  const rightLen = PREFIX_EUR_ASCII.length + num.length
-  const pad = Math.max(1, width - lab.length - rightLen)
-  return Buffer.concat([
-    encInline(lab),
-    Buffer.from(' '.repeat(pad), 'latin1'),
-    PREFIX_EUR_ASCII,
-    encInline(num),
-    Buffer.from([0x0a]),
-  ])
-}
-
-function capitalizeReceiptWord(s) {
-  const t = String(s ?? '').trim()
-  if (!t) return t
-  return t.charAt(0).toUpperCase() + t.slice(1)
-}
-
-/**
- * Retail-kassa bon — geen AFHALEN/keuken; adres gecentreerd, bedragen via padPriceComma (42 kol.).
- * Website: receiptMode `retail` + orderData + retailBon.
- */
-function buildRetailKassaReceipt(body) {
-  const W = 42
-  const { orderData, businessInfo, winkelnaam, retailBon } = body || {}
-  const meta = retailBon || {}
-  const labels = meta.labels || {}
-  const c = []
-
-  c.push(ESC_INIT)
-  c.push(CODEPAGE_PC437)
-  c.push(EMPHASIZE_ON)
-  c.push(BOLD_ON)
-  c.push(LINE_SPACING_W)
-
-  c.push(Buffer.from('\n', 'latin1'))
-  c.push(ALIGN_CENTER)
-
-  const bizName = (businessInfo?.name || winkelnaam || 'RECEIPT').toString().trim()
-  if (bizName.length > 18) c.push(DOUBLE_HEIGHT)
-  else c.push(DOUBLE_SIZE)
-  c.push(enc(bizName))
-  c.push(NORMAL_SIZE)
-
-  if (businessInfo?.address) c.push(enc(businessInfo.address))
-  if (businessInfo?.postalCode || businessInfo?.city) {
-    c.push(enc(`${businessInfo.postalCode || ''} ${businessInfo.city || ''}`.trim()))
-  }
-  if (meta.businessVatLine) c.push(enc(meta.businessVatLine))
-  else if (businessInfo?.vatNumber) c.push(enc(`BTW: ${businessInfo.vatNumber}`))
-  if (meta.telLine) c.push(enc(meta.telLine))
-  else if (businessInfo?.phone) c.push(enc(`Tel: ${businessInfo.phone}`))
-
-  c.push(Buffer.from('\n', 'latin1'))
-  c.push(ALIGN_LEFT)
-
-  if (meta.isDraft && labels.draftBanner) {
-    c.push(ALIGN_CENTER)
-    c.push(enc(String(labels.draftBanner).toUpperCase()))
-    c.push(ALIGN_LEFT)
-    c.push(Buffer.from('\n', 'latin1'))
-  }
-
-  const receiptRef = meta.receiptRef ?? orderData?.orderNumber ?? '?'
-  const dateStr = meta.dateStr || ''
-  c.push(padRow(`${labels.receiptBonNrPrefix || 'Bonnr: '}${receiptRef}`, dateStr, W))
-  c.push(Buffer.from('\n', 'latin1'))
-
-  if (labels.sectionOrderBar) {
-    c.push(enc(String(labels.sectionOrderBar).toUpperCase()))
-    c.push(Buffer.from('\n', 'latin1'))
-  }
-
-  for (const item of orderData?.items || []) {
-    const qty = parseNumber(item.quantity) || 1
-    const name = capitalizeReceiptWord(item.name || 'Item')
-    const lineTotal = parseNumber(item.price)
-    c.push(padPriceComma(`${qty}x ${name}`, lineTotal, W))
-  }
-
-  const discount = parseNumber(meta.discountEuro)
-  if (discount > 0.009 && labels.receiptDiscount) {
-    c.push(padPriceComma(labels.receiptDiscount, -discount, W))
-  }
-
-  c.push(Buffer.from('\n', 'latin1'))
-  if (labels.sectionTotalBar) {
-    c.push(enc(String(labels.sectionTotalBar).toUpperCase()))
-    c.push(Buffer.from('\n', 'latin1'))
-  }
-
-  c.push(padPriceComma(labels.subtotal || 'Subtotaal', parseNumber(orderData?.subtotal), W))
-  c.push(padPriceComma(labels.vatSingleLabel || 'BTW', parseNumber(orderData?.tax), W))
-  c.push(Buffer.from('\n', 'latin1'))
-  c.push(Buffer.from('\n', 'latin1'))
-
-  c.push(DOUBLE_HEIGHT)
-  c.push(padPriceComma(String(labels.total || 'Totaal').toUpperCase(), parseNumber(orderData?.total), W))
-  c.push(NORMAL_SIZE)
-  c.push(Buffer.from('\n', 'latin1'))
-
-  c.push(padPriceComma(labels.receivedLabel || 'Ontvangen', parseNumber(orderData?.total), W))
-  c.push(padPriceComma(labels.changeLabel || 'Retour', parseNumber(meta.changeAmount ?? 0), W))
-  c.push(Buffer.from('\n', 'latin1'))
-
-  if (meta.payLine) c.push(enc(meta.payLine))
-
-  const centerLines = Array.isArray(meta.centerLines) ? meta.centerLines : []
-  if (centerLines.length) {
-    c.push(Buffer.from('\n', 'latin1'))
-    c.push(ALIGN_CENTER)
-    for (const line of centerLines) {
-      const t = String(line ?? '').trim()
-      if (t) c.push(enc(t))
-    }
-    c.push(ALIGN_LEFT)
-  }
-
-  if (businessInfo?.website) {
-    c.push(ALIGN_CENTER)
-    c.push(enc(String(businessInfo.website)))
-    c.push(ALIGN_LEFT)
-  }
-
-  c.push(NORMAL_SIZE)
-  c.push(BOLD_OFF)
-  c.push(EMPHASIZE_OFF)
-  c.push(LINE_SPACING_N)
-  c.push(feedDots(160))
-  c.push(feedDots(80))
-  c.push(CUT_PARTIAL)
-  return Buffer.concat(c)
-}
-
 function parseNumber(value) {
   if (typeof value === 'number' && Number.isFinite(value)) return value
   if (typeof value === 'string') {
@@ -625,14 +488,6 @@ function buildKitchenReceipt(body) {
 function buildEscPosPayload(body) {
   // Keuken-bon mode (geen prijzen, alleen items + notities)
   if (body && body.receiptMode === 'keuken') return buildKitchenReceipt(body)
-  // Winkelkassa (retail POS) — eigen layout, geen horeca AFHALEN-bon
-  const retailPos =
-    body &&
-    body.orderData &&
-    body.retailBon &&
-    (body.receiptMode === 'retail' ||
-      String(body.orderData.orderType || '').toUpperCase() === 'RETAIL')
-  if (retailPos) return buildRetailKassaReceipt(body)
   // Gebruik rijke bon als orderData aanwezig is — geeft mooiste resultaat
   if (body && body.orderData) return buildRichReceipt(body)
 
@@ -749,7 +604,7 @@ function encWithEuro(line) {
     replaced = replaced.replace(/(^|[\s(])E(?=\s?-?\d)/g, '$1EUR ')
   }
   replaced = replaced.replace(/(EUR\s*){2,}/gi, 'EUR ')
-  // Geen space-collapse: retail/horeca bonInhoud gebruikt padding-spaties voor uitlijning.
+  replaced = replaced.replace(/  +/g, ' ')
   return Buffer.concat([encInline(replaced), Buffer.from([0x0a])])
 }
 
@@ -940,12 +795,7 @@ function executePrintRequest(body, cfg) {
 
   const b = body && typeof body === 'object' ? body : {}
 
-  const receiptMode =
-    b.receiptMode === 'keuken'
-      ? 'keuken'
-      : b.receiptMode === 'retail'
-        ? 'retail'
-        : 'kassa'
+  const receiptMode = b.receiptMode === 'keuken' ? 'keuken' : 'kassa'
 
   if (!primary) {
     return { ok: false, error: 'Geen hoofdprinter (zaak/bar) gekozen.', printedCopies: 0, buddyPrinted: false }
@@ -979,7 +829,7 @@ function executePrintRequest(body, cfg) {
   let lastError = null
 
   for (let i = 0; i < copies; i++) {
-    if (wantDrawer && i === 0 && (receiptMode === 'kassa' || receiptMode === 'retail')) {
+    if (wantDrawer && i === 0 && receiptMode === 'kassa') {
       kickCashDrawerWindowsParallel(primary)
     }
     const result = printRawWindows(targetPrinter, payloadMain)
