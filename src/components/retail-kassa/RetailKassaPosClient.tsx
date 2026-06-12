@@ -1596,7 +1596,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     focusBarcodeCapture()
   }
 
-  async function printRetailReceipt(order: KassaLastOrderReceipt, draft?: boolean) {
+  async function printRetailReceipt(order: KassaLastOrderReceipt, draft?: boolean): Promise<boolean> {
     const result = await printRetailKassaReceipt({
       tenantInfo,
       order,
@@ -1607,12 +1607,13 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     if (result.ok) {
       setThermalPrintBanner(null)
       setPrintAgentFallbackHtml(null)
-      return
+      return true
     }
     setThermalPrintBanner(
       `${t('kassaApp.printAgentFailedDebugTitle')}\n\n${result.error}\n\n${t('kassaApp.printAgentFailedDebugFooter')}`,
     )
     setPrintAgentFallbackHtml(result.fallbackHtml)
+    return false
   }
 
   async function printDraftBonFromCart() {
@@ -1998,9 +1999,14 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
           onClose={() => setShowSuccessModal(false)}
           printDisabled={successReceiptPrintBusy}
           onPrint={async () => {
+            if (!lastOrderReceipt) return
             try {
               setSuccessReceiptPrintBusy(true)
-              await printRetailReceipt(lastOrderReceipt)
+              const ok = await printRetailReceipt(lastOrderReceipt)
+              if (ok) {
+                setShowSuccessModal(false)
+                focusBarcodeCapture()
+              }
             } finally {
               setSuccessReceiptPrintBusy(false)
             }
