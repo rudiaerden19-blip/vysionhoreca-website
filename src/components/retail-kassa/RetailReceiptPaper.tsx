@@ -37,7 +37,7 @@ export function RetailReceiptPaper({
   })
 
   return (
-    <div className="mx-auto max-w-[300px] rounded-lg bg-white p-4 font-sans text-black text-[11px] leading-snug shadow-sm ring-1 ring-gray-200">
+    <div className="mx-auto max-w-[300px] rounded-lg bg-white p-4 font-sans text-black text-[11px] leading-relaxed shadow-sm ring-1 ring-gray-200">
       <style dangerouslySetInnerHTML={{ __html: RETAIL_RECEIPT_PRINT_STYLES }} />
       <div dangerouslySetInnerHTML={{ __html: innerHtml }} />
     </div>

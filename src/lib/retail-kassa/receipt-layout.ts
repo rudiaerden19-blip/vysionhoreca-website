@@ -7,33 +7,34 @@ import type { RetailReceiptI18n } from '@/lib/retail-kassa-receipt'
 export const RETAIL_THERMAL_W = 42
 
 export const RETAIL_RECEIPT_PRINT_STYLES = `
-      body { font-family: 'Courier New', Courier, monospace; font-size:11px; line-height:1.4; color:#000; }
-      .retail-header { font-family: Helvetica, Arial, sans-serif; text-align:center; margin-bottom:10px; }
-      .retail-logo { max-width:120px;max-height:64px;margin:0 auto 8px;display:block;object-fit:contain; }
-      .retail-name { font-size:22px;font-weight:900;color:#000;margin:4px 0;text-align:center;letter-spacing:0.02em; }
-      .retail-header .small { font-size:10px;line-height:1.45;text-align:center; }
-      .meta-row { display:flex;justify-content:space-between;align-items:baseline;font-size:10px;margin:10px 0 6px; }
-      .black-bar { background:#000;color:#fff;font-weight:700;font-size:13px;padding:3px 6px;margin:8px 0 5px 0;width:100%;box-sizing:border-box;text-transform:uppercase; }
-      .black-bar:first-of-type { margin-top:4px; }
-      .retail-item { display:grid;grid-template-columns:1fr auto;gap:8px;align-items:baseline;margin:4px 0;font-size:11px; }
-      .retail-item-extra { padding-left:0;margin:2px 0 2px 8px;font-size:10px; }
+      @page { size: 80mm auto; margin: 3mm; }
+      body { font-family: 'Courier New', Courier, monospace; font-size:11px; line-height:1.55; color:#000; width:72mm; max-width:72mm; margin:0 auto; padding:8px 4px; }
+      .retail-header { font-family: Helvetica, Arial, sans-serif; text-align:center; margin-bottom:14px; }
+      .retail-logo { max-width:120px;max-height:64px;margin:0 auto 10px;display:block;object-fit:contain; }
+      .retail-name { font-size:22px;font-weight:900;color:#000;margin:6px 0 8px;text-align:center;letter-spacing:0.02em;line-height:1.2; }
+      .retail-header .small { font-size:10px;line-height:1.55;text-align:center;margin:2px 0; }
+      .meta-row { display:flex;justify-content:space-between;align-items:baseline;font-size:10px;margin:12px 0 10px; }
+      .black-bar { background:#000;color:#fff;font-weight:700;font-size:13px;padding:5px 8px;margin:12px 0 8px;width:100%;box-sizing:border-box;text-transform:uppercase;text-align:center; }
+      .black-bar:first-of-type { margin-top:6px; }
+      .retail-item { display:grid;grid-template-columns:1fr auto;gap:10px;align-items:baseline;margin:7px 0;font-size:11px;line-height:1.45; }
+      .retail-item-extra { padding-left:0;margin:4px 0 4px 8px;font-size:10px;line-height:1.4; }
       .amt { font-family:'Courier New',Courier,monospace;font-weight:700;white-space:nowrap; }
       .item-price-right { text-align:right; }
-      .money-row { display:flex;justify-content:space-between;align-items:baseline;margin:3px 0;font-size:11px; }
+      .money-row { display:flex;justify-content:space-between;align-items:baseline;margin:5px 0;font-size:11px;line-height:1.45; }
       .money-row .label-strong { font-weight:900;color:#000; }
       .money-row .amt { min-width:11ch;text-align:right; }
-      .retail-grand { display:flex;justify-content:space-between;align-items:baseline;font-size:24px;font-weight:900;margin:10px 0;padding:4px 0;line-height:1.1;color:#000; }
+      .retail-grand { display:flex;justify-content:space-between;align-items:baseline;font-size:24px;font-weight:900;margin:14px 0 12px;padding:6px 0;line-height:1.15;color:#000; }
       .retail-grand .amt { font-size:24px;font-weight:900;text-align:right; }
-      .pay-line { margin:6px 0 4px;font-size:11px;font-weight:900;color:#000; }
-      .footer-thanks { text-align:center;font-family:Helvetica,Arial,sans-serif;font-size:10px;margin-top:14px;line-height:1.5; }
-      .footer-website { text-align:center;font-size:10px;margin-top:6px; }
-      .staff-help { text-align:center;font-family:Helvetica,Arial,sans-serif;font-size:10px;margin-top:12px;line-height:1.45; }
-      .staff-help-name { font-weight:700;margin-top:2px; }
-      .loyalty-block { font-size:10px;margin:10px 0;text-align:center;font-family:Helvetica,Arial,sans-serif; }
-      .draft-banner { text-align:center;font-weight:700;font-size:10px;margin:6px 0;color:#b45309;font-family:Helvetica,Arial,sans-serif; }
+      .pay-line { margin:10px 0 8px;font-size:11px;font-weight:900;color:#000;text-align:center;line-height:1.45; }
+      .footer-thanks { text-align:center;font-family:Helvetica,Arial,sans-serif;font-size:10px;margin-top:16px;line-height:1.55; }
+      .footer-website { text-align:center;font-size:10px;margin-top:8px;line-height:1.45; }
+      .staff-help { text-align:center;font-family:Helvetica,Arial,sans-serif;font-size:10px;margin-top:14px;line-height:1.5; }
+      .staff-help-name { font-weight:700;margin-top:4px; }
+      .loyalty-block { font-size:10px;margin:12px 0;line-height:1.5;text-align:center;font-family:Helvetica,Arial,sans-serif; }
+      .draft-banner { text-align:center;font-weight:700;font-size:10px;margin:10px 0;line-height:1.45;color:#b45309;font-family:Helvetica,Arial,sans-serif; }
       .bold { font-weight:700; }
       .center { text-align:center; }
-      @media print { .black-bar { -webkit-print-color-adjust:exact; print-color-adjust:exact; } }
+      @media print { body { width:auto; max-width:80mm; } .black-bar { -webkit-print-color-adjust:exact; print-color-adjust:exact; } }
 `.trim()
 
 function blackBarHtml(title: string): string {
@@ -70,25 +71,15 @@ function staffFirstName(full: string): string {
   return p[0] ?? full.trim()
 }
 
-/** Alleen 7-bit ASCII in bonInhoud — agent zet NBSP/UTF‑8 op `?`. Tabs (0x09) zijn wél veilig. */
-const THERMAL_TAB = '\t'
-const THERMAL_TAB_COLS = 8
-
-function thermalTabsForGap(minColumns: number): string {
-  if (minColumns <= 0) return ' '
-  const n = Math.min(12, Math.max(1, Math.ceil(minColumns / THERMAL_TAB_COLS)))
-  return THERMAL_TAB.repeat(n)
-}
-
+/** Alleen 7-bit ASCII in bonInhoud — agent zet NBSP/UTF‑8 op `?`. Spaties = 1 kolom op 80mm. */
 function thermalRightAlignLine(left: string, right: string): string {
   const l = left.trimEnd()
   const r = right.trim()
   if (l.length + r.length >= RETAIL_THERMAL_W) {
     return `${l.slice(0, RETAIL_THERMAL_W - r.length - 1)} ${r}`.slice(0, RETAIL_THERMAL_W)
   }
-  const priceCol = RETAIL_THERMAL_W - r.length
-  const gap = Math.max(1, priceCol - l.length)
-  return l + thermalTabsForGap(gap) + r
+  const gap = Math.max(1, RETAIL_THERMAL_W - l.length - r.length)
+  return l + ' '.repeat(gap) + r
 }
 
 function thermalPadMoney(left: string, amount: number): string {
@@ -103,13 +94,26 @@ function thermalCenter(text: string): string {
   const t = text.replace(/\s+/g, ' ').trim()
   if (!t) return ''
   if (t.length >= RETAIL_THERMAL_W) return t.slice(0, RETAIL_THERMAL_W)
-  const padCols = Math.floor((RETAIL_THERMAL_W - t.length) / 2)
-  return thermalTabsForGap(padCols) + t
+  const leftPad = Math.floor((RETAIL_THERMAL_W - t.length) / 2)
+  return ' '.repeat(leftPad) + t
 }
 
+/** Print-agent herkent `Nx …` en zet extra witruimte tussen artikelregels. */
 function thermalItemRow(qty: number, name: string, lineTotal: number): string {
-  const left = `${qty} ${capitalizeProductName(name)}`
-  return thermalRightAlignLine(left, formatEuroThermal(lineTotal))
+  const price = formatEuroThermal(lineTotal)
+  const prefix = `${qty}x `
+  const maxNameLen = RETAIL_THERMAL_W - prefix.length - price.length - 1
+  let productName = capitalizeProductName(name)
+  if (maxNameLen > 0 && productName.length > maxNameLen) {
+    productName = `${productName.slice(0, Math.max(1, maxNameLen - 1))}.`
+  }
+  return thermalRightAlignLine(`${prefix}${productName}`, price)
+}
+
+function thermalSectionTitle(title: string, lines: string[]): void {
+  lines.push('')
+  lines.push(thermalCenter(title.toUpperCase()))
+  lines.push('')
 }
 
 function itemsGrossIncl(order: KassaLastOrderReceipt): number {
@@ -212,7 +216,7 @@ function appendItemsHtml(order: KassaLastOrderReceipt): string {
             `<div class="retail-item-extra">+ ${escapeReceiptHtml(capitalizeProductName(c.choiceName))}</div>`,
         )
         .join('')
-      return `<div class="retail-item"><span>${i.quantity} ${escapeReceiptHtml(capitalizeProductName(i.product.name))}</span><span class="amt item-price-right">${formatEuroHtml(lineTotal)}</span></div>${extras}`
+      return `<div class="retail-item"><span>${i.quantity}x ${escapeReceiptHtml(capitalizeProductName(i.product.name))}</span><span class="amt item-price-right">${formatEuroHtml(lineTotal)}</span></div>${extras}`
     })
     .join('')
 }
@@ -250,6 +254,7 @@ export function buildRetailThermalBonLines(opts: {
     lines.push(thermalCenter(`${labels.telPrefix} ${tenantInfo.phone.trim()}`))
   }
   lines.push('')
+  lines.push('')
 
   if (isDraft) {
     lines.push(thermalCenter(labels.draftBanner.toUpperCase()))
@@ -267,24 +272,27 @@ export function buildRetailThermalBonLines(opts: {
   }
 
   lines.push(thermalPadRow(`${labels.receiptBonNrPrefix}${receiptRefDisplay}`, dateStr))
-  lines.push('')
-  lines.push(labels.sectionOrderBar.toUpperCase())
+  thermalSectionTitle(labels.sectionOrderBar, lines)
 
   appendItemsThermal(order, lines)
   if (discountEuro > 0.009) {
+    lines.push('')
     lines.push(thermalPadMoney(labels.receiptDiscount, -discountEuro))
   }
-  lines.push('')
-  lines.push(labels.sectionTotalBar.toUpperCase())
+  thermalSectionTitle(labels.sectionTotalBar, lines)
 
   lines.push(thermalPadMoney(labels.subtotal, subtotalExcl))
   lines.push(thermalPadMoney(labels.vatSingleLabel, taxTotal))
+  lines.push('')
   lines.push('')
   lines.push(thermalPadMoney(labels.total.toUpperCase(), order.total))
   lines.push('')
   lines.push(thermalPadMoney(labels.receivedLabel, order.total))
   lines.push(thermalPadMoney(labels.changeLabel, 0))
-  lines.push(labels.paymentMethodLine(payLabel).slice(0, RETAIL_THERMAL_W))
+  lines.push('')
+  lines.push(
+    thermalCenter(stripEmojiForThermal(labels.paymentMethodLine(payLabel).slice(0, RETAIL_THERMAL_W))),
+  )
   lines.push('')
 
   appendRetailLoyaltyThermal(order, labels, lines)
