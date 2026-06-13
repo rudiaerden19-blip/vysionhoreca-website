@@ -76,10 +76,10 @@ export function KassaSuccessReceiptModal({
   const tax = useVatSplit ? order.totalTax! : order.total - subtotalExcl
   const orderTypeLabel =
     order.orderType === 'DINE_IN'
-      ? `🍽️ ${t('kassaReceipt.orderTypeDineIn')}`
+      ? ` ${t('kassaReceipt.orderTypeDineIn')}`
       : order.orderType === 'TAKEAWAY'
-        ? `📦 ${t('kassaReceipt.orderTypeTakeaway')}`
-        : `🚗 ${t('kassaReceipt.orderTypeDelivery')}`
+        ? ` ${t('kassaReceipt.orderTypeTakeaway')}`
+        : ` ${t('kassaReceipt.orderTypeDelivery')}`
   const receiptTableNr = kassaReceiptTableNumber(order.orderType, order.tableNumber)
   const receiptRefSuccess =
     order.checkoutReference ?? (order.orderNumber > 0 ? String(order.orderNumber) : '—')
@@ -121,7 +121,7 @@ export function KassaSuccessReceiptModal({
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 overflow-y-auto">
       <div className="bg-white rounded-2xl overflow-hidden max-w-md w-full my-4 shadow-2xl">
         <div className="p-4 bg-emerald-500 text-white text-center">
-          <div className="w-16 h-16 rounded-full bg-white/20 mx-auto mb-2 flex items-center justify-center text-4xl">✓</div>
+          <div className="w-16 h-16 rounded-full bg-white/20 mx-auto mb-2 flex items-center justify-center text-4xl"></div>
           <h3 className="text-xl font-bold">{t('kassaApp.successTitle')}</h3>
           <p className="opacity-80">
             {order.checkoutReference
@@ -322,7 +322,7 @@ export function KassaSuccessReceiptModal({
             ) : (
               <>
                 <span aria-hidden className="select-none">
-                  🖨️
+                  
                 </span>
                 <span>{t('kassaReceipt.print')}</span>
               </>
@@ -349,7 +349,7 @@ export function KassaSuccessReceiptModal({
                 <span className="tabular-nums">{t('retailKassaPage.receiptEmailSending')}</span>
               ) : (
                 <>
-                  <span aria-hidden>✉️</span>
+                  <span aria-hidden></span>
                   <span>{t('retailKassaPage.receiptEmailButton')}</span>
                 </>
               )}

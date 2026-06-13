@@ -655,7 +655,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     .footer{color:#9ca3af;font-size:11px;margin-top:40px}
     @media print{.noprint{display:none}}</style></head><body>
     <div class="report-head">
-      <h1>📊 Omzet Rapport</h1>
+      <h1> Omzet Rapport</h1>
       <div class="report-head-meta">
         <span class="biz">${bizName}</span>
         Gegenereerd op <strong>${escapeHtml(genNl)}</strong>
@@ -667,8 +667,8 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     <div class="summary">
     <div class="sitem"><div class="slabel">Totale Omzet</div><div class="sval">€${totalRev.toFixed(2)}</div></div>
     <div class="sitem"><div class="slabel">Bestellingen</div><div class="sval">${exp.length}</div></div>
-    <div class="sitem"><div class="slabel">💵 Contant</div><div class="sval">€${cash.toFixed(2)}</div></div>
-    <div class="sitem"><div class="slabel">💳 PIN/Kaart</div><div class="sval">€${card.toFixed(2)}</div></div></div>
+    <div class="sitem"><div class="slabel"> Contant</div><div class="sval">€${cash.toFixed(2)}</div></div>
+    <div class="sitem"><div class="slabel"> PIN/Kaart</div><div class="sval">€${card.toFixed(2)}</div></div></div>
     <h2>BTW Overzicht</h2><table>
     <tr><th>Omschrijving</th><th class="amt">Bedrag</th></tr>
     <tr><td>Omzet excl. BTW</td><td class="amt">€${vatAggPdf.subtotalExcl.toFixed(2)}</td></tr>
@@ -676,7 +676,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     <tr><td><strong>Totaal BTW</strong></td><td class="amt"><strong>€${vatAggPdf.totalTax.toFixed(2)}</strong></td></tr>
     <tr><td><strong>Totaal incl. BTW</strong></td><td class="amt"><strong>€${totalRev.toFixed(2)}</strong></td></tr></table>
     <div class="footer">Gegenereerd op ${new Date().toLocaleString('nl-NL')} — Vysion kassa's POS</div>
-    <button class="noprint" onclick="window.print()" style="margin-top:20px;padding:10px 20px;background:#1e293b;color:white;border:none;border-radius:8px;cursor:pointer">🖨️ Afdrukken / PDF opslaan</button>
+    <button class="noprint" onclick="window.print()" style="margin-top:20px;padding:10px 20px;background:#1e293b;color:white;border:none;border-radius:8px;cursor:pointer"> Afdrukken / PDF opslaan</button>
     </body></html>`
     const w = window.open('','_blank','width=900,height=700')
     if (w) { w.document.write(html); w.document.close() }
@@ -712,12 +712,12 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     <style>body{font-family:Arial,sans-serif;padding:40px}table{width:100%;border-collapse:collapse}
     th,td{padding:8px;border:1px solid #ddd}th{background:#f5f5f5}.footer{color:#999;font-size:11px;margin-top:20px}
     @media print{button{display:none}}</style></head><body>
-    <h1>📊 Z-Rapporten Export</h1>
+    <h1> Z-Rapporten Export</h1>
     <p><strong>${tenantInfo?.business_name||tenant}</strong> — ${selected.length} rapporten — Totaal: €${totalRev.toFixed(2)}</p>
     <table><tr><th>Datum</th><th>Bonnen</th><th>Contant</th><th>PIN/Kaart</th><th>Totaal</th></tr>
     ${selected.map(r=>`<tr><td>${r.report_date}</td><td>${r.order_count}</td><td>€${r.cash_payments.toFixed(2)}</td><td>€${r.card_payments.toFixed(2)}</td><td><strong>€${r.total.toFixed(2)}</strong></td></tr>`).join('')}
     </table><div class="footer">Gegenereerd op ${new Date().toLocaleString('nl-NL')}</div>
-    <button onclick="window.print()" style="margin-top:20px;padding:10px 20px;background:#10b981;color:white;border:none;border-radius:8px;cursor:pointer">🖨️ Afdrukken</button>
+    <button onclick="window.print()" style="margin-top:20px;padding:10px 20px;background:#10b981;color:white;border:none;border-radius:8px;cursor:pointer"> Afdrukken</button>
     </body></html>`
     const w = window.open('','_blank','width=900,height=700')
     if (w) { w.document.write(html); w.document.close() }
@@ -744,14 +744,14 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     .divider{border-top:1px dashed #000;margin:8px 0}
     .total{font-size:16px;font-weight:bold}
     @media print{button{display:none}}</style></head><body>
-    <h1>📋 X-RAPPORT</h1>
+    <h1> X-RAPPORT</h1>
     <div class="row"><span>${tenantInfo?.business_name||tenant}</span></div>
     <div class="row"><span>Datum: ${new Date().toLocaleString('nl-NL')}</span></div>
     ${lastZGeneratedAt?`<div class="row"><span>Sinds Z: ${new Date(lastZGeneratedAt).toLocaleString('nl-NL')}</span></div>`:'<div class="row"><span>Nog geen Z-rapport</span></div>'}
     <div class="divider"></div>
     <div class="row"><span>Transacties</span><span>${xData.count}</span></div>
-    <div class="row"><span>💵 Contant</span><span>${fmt(xData.cash)}</span></div>
-    <div class="row"><span>💳 PIN/Kaart</span><span>${fmt(xData.card)}</span></div>
+    <div class="row"><span> Contant</span><span>${fmt(xData.cash)}</span></div>
+    <div class="row"><span> PIN/Kaart</span><span>${fmt(xData.card)}</span></div>
     <div class="divider"></div>
     <div class="row"><span>Excl. BTW</span><span>${fmt(xData.total-xData.tax)}</span></div>
     <div class="row"><span>BTW ${vatRate}%</span><span>${fmt(xData.tax)}</span></div>
@@ -760,7 +760,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     <div class="divider"></div>
     <div class="row"><span>Begin Kas</span><span>${fmt(openingCash)}</span></div>
     <div class="row total"><span>Verwachte Kas</span><span>${fmt(xData.expectedCash)}</span></div>
-    <br><button onclick="window.print()">🖨️ Afdrukken</button>
+    <br><button onclick="window.print()"> Afdrukken</button>
     </body></html>`
     const w = window.open('','_blank','width=500,height=600')
     if (w) { w.document.write(html); w.document.close() }
@@ -770,11 +770,11 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
   // RENDER
   // ─────────────────────────────────────────────────────────────────────────────
   const tabs: { id: Tab; label: string; icon: string; activeColor: string }[] = [
-    { id:'overzicht',   label:'Overzicht',   icon:'📊', activeColor:'bg-[#1e293b] text-white' },
-    { id:'xrapport',    label:'X-Rapport',   icon:'📋', activeColor:'bg-blue-500 text-white' },
-    { id:'zrapport',    label:'Z-Rapport',   icon:'📕', activeColor:'bg-red-500 text-white' },
-    { id:'boekhouding', label:'Boekhouding', icon:'📁', activeColor:'bg-emerald-500 text-white' },
-    { id:'facturen',    label:'Facturen',    icon:'📄', activeColor:'bg-purple-500 text-white' },
+    { id:'overzicht',   label:'Overzicht',   icon: '', activeColor:'bg-[#1e293b] text-white' },
+    { id:'xrapport',    label:'X-Rapport',   icon: '', activeColor:'bg-blue-500 text-white' },
+    { id:'zrapport',    label:'Z-Rapport',   icon: '', activeColor:'bg-red-500 text-white' },
+    { id:'boekhouding', label:'Boekhouding', icon: '', activeColor:'bg-emerald-500 text-white' },
+    { id:'facturen',    label:'Facturen',    icon: '', activeColor:'bg-purple-500 text-white' },
   ]
 
   return (
@@ -814,17 +814,17 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
                 <option value="year">Dit Jaar</option>
               </select>
               <button onClick={exportCSV} className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-sm font-medium transition-colors">
-                📊 CSV
+                 CSV
               </button>
               <button onClick={exportPDF} className="flex items-center gap-2 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-xl text-sm font-medium transition-colors">
-                📄 PDF
+                 PDF
               </button>
               <button
                 type="button"
                 onClick={openOverviewEmailModal}
                 className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-sm font-medium transition-colors"
               >
-                📧 E-mail
+                 E-mail
               </button>
             </div>
 
@@ -836,17 +836,17 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
                   title:'Omzet Week',
                   value:fmt(weekRevenue),
                   sub:`Kalenderweek ma–zo · van ${fmtDayShort(weekStart)}`,
-                  icon:'📈',
+                  icon: '',
                   color:'#3b82f6',
                 },
                 {
                   title:'Omzet Maand',
                   value:fmt(monthRevenue),
                   sub:`Vanaf ${fmtDayShort(monthStart)}`,
-                  icon:'📅',
+                  icon: '',
                   color:'#8b5cf6',
                 },
-                { title:'Gem. Bestelling', value:fmt(avgOrder), icon:'🛒', color:'#f59e0b' },
+                { title:'Gem. Bestelling', value:fmt(avgOrder), icon: '', color:'#f59e0b' },
               ].map(c => (
                 <div key={c.title} className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg mb-4" style={{backgroundColor:c.color+'20',color:c.color}}>{c.icon}</div>
@@ -870,7 +870,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
               {/* 7-dagen bar chart */}
               <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
                 <div className="flex items-center gap-2 mb-6">
-                  <span className="text-gray-500">📊</span>
+                  <span className="text-gray-500"></span>
                   <h2 className="text-base font-semibold text-gray-800">Omzet afgelopen 7 dagen</h2>
                 </div>
                 <div className="flex items-end gap-3 h-48">
@@ -889,16 +889,16 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
               {/* Betaalmethodes */}
               <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
                 <div className="flex items-center gap-2 mb-6">
-                  <span className="text-gray-500">💳</span>
+                  <span className="text-gray-500"></span>
                   <h2 className="text-base font-semibold text-gray-800">Betaalmethodes Vandaag</h2>
                 </div>
                 <div className="space-y-4">
                   {[
-                    { key:'CASH',       label:'Contant',    color:'#10b981', icon:'💵' },
-                    { key:'CARD',       label:'PIN/Kaart',  color:'#3b82f6', icon:'💳' },
-                    { key:'IDEAL',      label:'iDEAL',      color:'#ec4899', icon:'📱' },
-                    { key:'BANCONTACT', label:'Bancontact', color:'#f59e0b', icon:'🏦' },
-                    { key:'ONLINE',     label:'Online bet.', color:'#8b5cf6', icon:'🌐' },
+                    { key:'CASH',       label:'Contant',    color:'#10b981', icon: '' },
+                    { key:'CARD',       label:'PIN/Kaart',  color:'#3b82f6', icon: '' },
+                    { key:'IDEAL',      label:'iDEAL',      color:'#ec4899', icon: '' },
+                    { key:'BANCONTACT', label:'Bancontact', color:'#f59e0b', icon: '' },
+                    { key:'ONLINE',     label:'Online bet.', color:'#8b5cf6', icon: '' },
                   ].map(m => {
                     const amount = paymentToday[m.key as keyof typeof paymentToday]||0
                     const pct = todayRevenue > 0 ? (amount/todayRevenue)*100 : 0
@@ -940,7 +940,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
               {/* Aantal klanten */}
               <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
                 <div className="flex items-center gap-2 mb-5">
-                  <span className="text-gray-400">👥</span>
+                  <span className="text-gray-400"></span>
                   <h2 className="text-base font-semibold text-gray-800">Aantal Klanten</h2>
                 </div>
                 <div className="grid grid-cols-3 gap-3">
@@ -960,7 +960,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
               {/* Online bestellingen */}
               <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
                 <div className="flex items-center gap-2 mb-5">
-                  <span className="text-blue-400">🌐</span>
+                  <span className="text-blue-400"></span>
                   <h2 className="text-base font-semibold text-gray-800">Online Bestellingen</h2>
                 </div>
                 <div className="space-y-3">
@@ -986,7 +986,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
               {/* Ter plaatse */}
               <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
                 <div className="flex items-center gap-2 mb-5">
-                  <span>🍴</span>
+                  <span></span>
                   <h2 className="text-base font-semibold text-gray-800">Populair Ter Plaatse (Vandaag)</h2>
                 </div>
                 {popularDineIn.length === 0 ? (
@@ -999,7 +999,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
                           {i===0?'⭐':i+1}
                         </div>
                         <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
-                          {item.image ? <img src={item.image} alt={item.name} className="w-full h-full object-cover"/> : <div className="w-full h-full flex items-center justify-center text-gray-400 text-lg">🍽️</div>}
+                          {item.image ? <img src={item.image} alt={item.name} className="w-full h-full object-cover"/> : <div className="w-full h-full flex items-center justify-center text-gray-400 text-lg"></div>}
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-sm truncate text-gray-800">{item.name}</p>
@@ -1015,7 +1015,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
               {/* Online */}
               <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
                 <div className="flex items-center gap-2 mb-5">
-                  <span className="text-blue-400">🌐</span>
+                  <span className="text-blue-400"></span>
                   <h2 className="text-base font-semibold text-gray-800">Populair Online (Vandaag)</h2>
                 </div>
                 {popularOnline.length === 0 ? (
@@ -1028,7 +1028,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
                           {i===0?'⭐':i+1}
                         </div>
                         <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-                          <span className="text-blue-400 text-lg">🌐</span>
+                          <span className="text-blue-400 text-lg"></span>
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-sm truncate text-gray-800">{item.name}</p>
@@ -1048,7 +1048,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
               <div className="p-5 border-b border-gray-100">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-2">
-                    <span className="text-gray-400">🧾</span>
+                    <span className="text-gray-400"></span>
                     <h2 className="text-base font-semibold text-gray-800">Betalingen</h2>
                     <span className="text-sm text-gray-400">{periodTotals.receipts} bonnen</span>
                   </div>
@@ -1124,7 +1124,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
             {/* Header */}
             <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6">
               <div className="flex items-center gap-3 mb-3">
-                <span className="text-4xl">📋</span>
+                <span className="text-4xl"></span>
                 <div>
                   <h2 className="text-xl font-bold text-blue-700">X-Rapport</h2>
                   <p className="text-blue-500 text-sm">Tussentijds overzicht (geen afsluiting)</p>
@@ -1138,7 +1138,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
             {/* Begin Kas */}
             <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
               <div className="flex items-center gap-2 mb-4">
-                <span className="text-emerald-500">💵</span>
+                <span className="text-emerald-500"></span>
                 <h3 className="font-semibold text-gray-800">Begin Kas</h3>
               </div>
               <div className="flex items-center gap-4">
@@ -1187,7 +1187,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
 
             {/* Print knop */}
             <button onClick={printXReport} className="w-full py-4 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-2xl flex items-center justify-center gap-2 transition-colors text-lg">
-              🖨️ X-Rapport Printen
+               X-Rapport Printen
             </button>
           </div>
         )}
@@ -1200,13 +1200,13 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
             {/* Header */}
             <div className="bg-red-50 border border-red-200 rounded-2xl p-6">
               <div className="flex items-center gap-3 mb-3">
-                <span className="text-4xl">📕</span>
+                <span className="text-4xl"></span>
                 <div>
                   <h2 className="text-xl font-bold text-red-600">Z-Rapport</h2>
                   <p className="text-red-400 text-sm">Dagafsluiting - Tellers worden gereset</p>
                 </div>
               </div>
-              <p className="text-sm text-red-400">⚠️ Let op: Na het genereren van een Z-rapport worden de tellers gereset!</p>
+              <p className="text-sm text-red-400"> Let op: Na het genereren van een Z-rapport worden de tellers gereset!</p>
             </div>
 
             {/* Huidige periode samenvatting */}
@@ -1232,7 +1232,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
             {/* Getelde kas */}
             <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
               <div className="flex items-center gap-2 mb-4">
-                <span className="text-red-400">💵</span>
+                <span className="text-red-400"></span>
                 <h3 className="font-semibold text-gray-800">Getelde Kas (Eind)</h3>
               </div>
               <input type="number" value={closingCash||''} onChange={e=>setClosingCash(parseFloat(e.target.value)||0)}
@@ -1243,7 +1243,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
                 <div className={`mt-4 p-4 rounded-xl ${Math.abs(closingCash-xData.expectedCash)<1?'bg-emerald-50 border border-emerald-200':'bg-red-50 border border-red-200'}`}>
                   <p className="font-bold text-sm">Verschil: {fmt(closingCash-xData.expectedCash)}</p>
                   <p className="text-xs text-gray-500 mt-1">
-                    {Math.abs(closingCash-xData.expectedCash)<1?'✅ Kas klopt!':closingCash>xData.expectedCash?'⬆️ Kas is te hoog':'⬇️ Kas tekort'}
+                    {Math.abs(closingCash-xData.expectedCash)<1?' Kas klopt!':closingCash>xData.expectedCash?' Kas is te hoog':' Kas tekort'}
                   </p>
                 </div>
               )}
@@ -1253,16 +1253,16 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
             {!showZConfirm ? (
               <button onClick={()=>setShowZConfirm(true)}
                 className="w-full py-4 bg-red-400 hover:bg-red-500 text-white font-bold rounded-2xl flex items-center justify-center gap-2 transition-colors text-lg">
-                🧾 Z-Rapport Genereren & Dag Afsluiten
+                 Z-Rapport Genereren & Dag Afsluiten
               </button>
             ) : (
               <div className="bg-red-50 border-2 border-red-300 rounded-2xl p-6">
-                <p className="font-bold text-red-600 mb-2">⚠️ Weet je het zeker?</p>
+                <p className="font-bold text-red-600 mb-2"> Weet je het zeker?</p>
                 <p className="text-sm text-gray-500 mb-4">Na het genereren worden alle tellers gereset. Dit kan niet ongedaan worden gemaakt.</p>
                 <div className="flex gap-3">
                   <button onClick={()=>setShowZConfirm(false)} className="flex-1 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 font-semibold text-gray-600 transition-colors">Annuleer</button>
                   <button onClick={generateZReport} disabled={zGenerating} className="flex-1 py-3 rounded-xl bg-red-500 hover:bg-red-600 text-white font-bold transition-colors disabled:opacity-50">
-                    {zGenerating ? 'Bezig...' : '✓ Bevestigen'}
+                    {zGenerating ? 'Bezig...' : ' Bevestigen'}
                   </button>
                 </div>
               </div>
@@ -1271,7 +1271,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
             {/* Geschiedenis */}
             {zReports.length > 0 && (
               <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-                <h3 className="font-bold text-gray-800 mb-4">📚 Vorige Z-Rapporten</h3>
+                <h3 className="font-bold text-gray-800 mb-4"> Vorige Z-Rapporten</h3>
                 <div className="space-y-3 max-h-64 overflow-y-auto">
                   {zReports.map(r => (
                     <div key={r.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
@@ -1281,7 +1281,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
                       </div>
                       <div className="text-right">
                         <p className="font-bold text-emerald-500">{fmt(r.total)}</p>
-                        <p className="text-xs text-gray-400">💵 {fmt(r.cash_payments)} | 💳 {fmt(r.card_payments)}</p>
+                        <p className="text-xs text-gray-400"> {fmt(r.cash_payments)} |  {fmt(r.card_payments)}</p>
                       </div>
                     </div>
                   ))}
@@ -1299,7 +1299,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
             {/* Header */}
             <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6">
               <div className="flex items-center gap-3 mb-3">
-                <span className="text-4xl">📁</span>
+                <span className="text-4xl"></span>
                 <div>
                   <h2 className="text-xl font-bold text-emerald-700">Bockhoud Export</h2>
                   <p className="text-emerald-500 text-sm">SCARDa-compatibele export voor je boekhouder</p>
@@ -1312,7 +1312,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
               <div className="p-5 border-b border-gray-100 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-emerald-500">🧾</span>
+                  <span className="text-emerald-500"></span>
                   <h3 className="font-semibold text-gray-800">Selecteer Z-Rapporten</h3>
                 </div>
                 <button onClick={toggleAllZReports} className="text-sm text-blue-500 hover:underline">
@@ -1321,7 +1321,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
               </div>
               {zReports.length === 0 ? (
                 <div className="p-12 text-center">
-                  <span className="text-5xl block mb-4">📭</span>
+                  <span className="text-5xl block mb-4"></span>
                   <p className="text-gray-500 font-medium">Nog geen afgesloten Z-rapporten beschikbaar.</p>
                   <p className="text-gray-400 text-sm mt-1">Sluit eerst een dag af via het Z-Rapport tabblad.</p>
                 </div>
@@ -1332,7 +1332,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
                       className={`p-4 border-b border-gray-50 cursor-pointer transition-colors hover:bg-gray-50 ${selectedZReports.includes(r.id)?'bg-emerald-50':''}`}>
                       <div className="flex items-center gap-4">
                         <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center flex-shrink-0 ${selectedZReports.includes(r.id)?'bg-emerald-500 border-emerald-500':'border-gray-300'}`}>
-                          {selectedZReports.includes(r.id) && <span className="text-white text-xs">✓</span>}
+                          {selectedZReports.includes(r.id) && <span className="text-white text-xs"></span>}
                         </div>
                         <div className="flex-1">
                           <p className="font-bold text-sm text-gray-800">{r.report_date}</p>
@@ -1365,21 +1365,21 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
             <div className="grid grid-cols-3 gap-4">
               <button onClick={()=>selectedZReports.length>0&&exportBoekhoudCSV()} disabled={selectedZReports.length===0}
                 className="flex items-center justify-center gap-2 py-4 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-300 text-white font-bold rounded-2xl transition-colors text-sm">
-                📊 Export CSV
+                 Export CSV
               </button>
               <button onClick={()=>selectedZReports.length>0&&exportBoekhoudPDF()} disabled={selectedZReports.length===0}
                 className="flex items-center justify-center gap-2 py-4 bg-gray-500 hover:bg-gray-600 disabled:bg-gray-300 text-white font-bold rounded-2xl transition-colors text-sm">
-                📄 Export PDF
+                 Export PDF
               </button>
               <button onClick={()=>selectedZReports.length>0&&exportBoekhoudJSON()} disabled={selectedZReports.length===0}
                 className="flex items-center justify-center gap-2 py-4 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white font-bold rounded-2xl transition-colors text-sm">
-                ⬇️ Export JSON
+                 Export JSON
               </button>
             </div>
 
             {/* Info */}
             <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5">
-              <p className="font-semibold text-blue-700 mb-3">ℹ️ Over SCARDa Export</p>
+              <p className="font-semibold text-blue-700 mb-3">ℹ Over SCARDa Export</p>
               <ul className="space-y-1.5 text-sm text-blue-600">
                 <li>• CSV formaat is geschikt voor import in boekhoudpakketten</li>
                 <li>• Kolommen: datum, omzet, cash, kaart, online, BTW per tarief, tickets</li>
@@ -1397,7 +1397,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
           <div className="space-y-5">
             <div className="bg-purple-50 border border-purple-200 rounded-2xl p-6">
               <div className="flex items-center gap-3">
-                <span className="text-4xl">📄</span>
+                <span className="text-4xl"></span>
                 <div>
                   <h2 className="text-xl font-bold text-purple-700">Facturen Overzicht</h2>
                   <p className="text-purple-400 text-sm">Per maand archief</p>
@@ -1405,7 +1405,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
               </div>
             </div>
             <div className="bg-white rounded-2xl p-12 border border-gray-200 shadow-sm text-center">
-              <span className="text-5xl block mb-4">📄</span>
+              <span className="text-5xl block mb-4"></span>
               <p className="text-gray-500 font-medium">Facturen module</p>
               <p className="text-gray-400 text-sm mt-2">Facturen worden beheerd via het facturatie systeem</p>
             </div>

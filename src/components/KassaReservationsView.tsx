@@ -2130,14 +2130,14 @@ export default function KassaReservationsView({
                           </div>
                           <p className="font-semibold text-gray-900 text-sm truncate">
                             {r.guest_name}
-                            {guest?.isVip && <span className="ml-1 text-amber-400">★</span>}
+                            {guest?.isVip && <span className="ml-1 text-amber-400"></span>}
                           </p>
                           <div className="flex items-center gap-3 text-xs text-gray-400 mt-0.5">
                             <span className="flex items-center gap-0.5"><Users size={10} /> {r.party_size}p</span>
                             {r.table_number && <span className="flex items-center gap-0.5"><MapPin size={10} /> T{r.table_number}</span>}
                             {r.guest_phone && <span className="flex items-center gap-0.5"><Phone size={10} /></span>}
                             {r.notes && <span className="flex items-center gap-0.5"><MessageSquare size={10} /></span>}
-                            {r.occasion && <span className="text-purple-400">🎉</span>}
+                            {r.occasion && <span className="text-purple-400"></span>}
                           </div>
                           {/* Quick actions */}
                           {(r.status === 'CONFIRMED' || r.status === 'PENDING') && (
@@ -2798,7 +2798,7 @@ export default function KassaReservationsView({
                           className="min-h-[44px] min-w-[44px] shrink-0 text-2xl text-white/50 hover:text-white"
                           aria-label="Sluiten"
                         >
-                          ✕
+                          
                         </button>
                       </div>
 
@@ -2825,7 +2825,7 @@ export default function KassaReservationsView({
                                 {r.guest_phone && <a href={`tel:${r.guest_phone}`} className="flex items-center gap-1 text-base text-emerald-600 hover:text-emerald-700"><Phone size={14} />{r.guest_phone}</a>}
                                 {r.notes && <p className="text-sm text-gray-500 italic">{r.notes}</p>}
                                 {r.special_requests && (
-                                  <p className="text-sm font-semibold" style={{ color: '#f59e0b' }}>⚠️ {r.special_requests}</p>
+                                  <p className="text-sm font-semibold" style={{ color: '#f59e0b' }}> {r.special_requests}</p>
                                 )}
 
                                 {/* Status knoppen — min 44px hoogte voor touch */}
@@ -2860,10 +2860,10 @@ export default function KassaReservationsView({
                                 {/* Aanpassen + Verwijderen */}
                                 <div className="grid grid-cols-2 gap-1.5">
                                   <button onClick={() => setSelectedReservation(r)} className="min-h-[44px] rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(0,0,0,0.08)', color: '#374151' }}>
-                                    ✏️ Aanpassen
+                                     Aanpassen
                                   </button>
                                   <button onClick={() => handleDeleteReservation(r.id)} className="min-h-[44px] rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(239,68,68,0.15)', color: '#dc2626' }}>
-                                    🗑 Annulatie
+                                     Annulatie
                                   </button>
                                 </div>
                               </div>
@@ -2895,7 +2895,7 @@ export default function KassaReservationsView({
                         </button>
                         <button onClick={() => deleteFloorTable(selectedFloorTable.id)}
                           className="w-full min-h-[44px] rounded-xl text-sm font-semibold transition-colors active:opacity-70" style={{ backgroundColor: 'rgba(239,68,68,0.15)', color: '#f87171' }}>
-                          🗑 Tafel verwijderen
+                           Tafel verwijderen
                         </button>
                       </div>
                     </div>
@@ -3372,7 +3372,7 @@ export default function KassaReservationsView({
               <td className="px-5 py-4 text-right" onClick={e => e.stopPropagation()}>
                 <button onClick={() => setEditReservation(r)}
                   className="px-4 py-2 rounded-xl bg-[#58CCFF] hover:bg-[#43bef7] active:bg-[#34ade7] text-[#063042] text-sm font-semibold transition-colors">
-                  ✏️ Bewerken
+                   Bewerken
                 </button>
               </td>
             </tr>
@@ -3552,7 +3552,7 @@ export default function KassaReservationsView({
                   <div className="flex-shrink-0 bg-red-600 border-b-4 border-red-900 px-5 py-5 md:px-8 md:py-6 shadow-inner">
                     <div className="flex items-center gap-3 mb-4">
                       <span className="text-white font-black text-lg md:text-2xl tracking-wide uppercase drop-shadow-sm">
-                        🔴 {pending.length} nieuwe reservatie{pending.length > 1 ? 's' : ''} — wacht op goedkeuring
+                         {pending.length} nieuwe reservatie{pending.length > 1 ? 's' : ''} — wacht op goedkeuring
                       </span>
                     </div>
                     <div className="space-y-3">
@@ -3578,7 +3578,7 @@ export default function KassaReservationsView({
                               onClick={() => handleConfirm(r)}
                               className="px-5 py-3 rounded-xl bg-green-600 text-white text-base font-black hover:bg-green-500 transition-colors shadow-md"
                             >
-                              ✓ Goedkeuren
+                               Goedkeuren
                             </button>
                           </div>
                         </div>
@@ -3749,7 +3749,7 @@ export default function KassaReservationsView({
                 onClick={saveSettingsToSupabase}
                 className="flex items-center gap-2 px-5 py-2.5 bg-[#58CCFF] hover:bg-[#43bef7] text-[#063042] font-bold rounded-xl shadow transition-colors"
               >
-                💾 Opslaan
+                 Opslaan
               </button>
             </div>
             <h3 className="text-lg font-bold mb-4 hidden">Reservatie Instellingen</h3>
@@ -3792,7 +3792,7 @@ export default function KassaReservationsView({
                       onClick={() => updateSettings({ autoConfirm: false })}
                       className={`p-4 rounded-xl border-2 text-left transition-all ${!reservationSettings.autoConfirm ? 'border-[#075985] bg-[#f2f5fa]' : 'border-gray-200 hover:border-gray-300'}`}
                     >
-                      <div className="text-2xl mb-2">✋</div>
+                      <div className="text-2xl mb-2"></div>
                       <p className={`font-bold text-sm ${!reservationSettings.autoConfirm ? 'text-[#2D3A52]' : 'text-gray-700'}`}>Handmatig</p>
                       <p className="text-xs text-gray-500 mt-1">Klant krijgt mail "in afwachting". Jij keurt goed in de kassa → klant krijgt bevestigingsmail.</p>
                       {!reservationSettings.autoConfirm && <span className="mt-2 inline-block text-xs font-bold text-[#075985] bg-[#e8eef6] px-2 py-0.5 rounded-full">Actief</span>}
@@ -3801,7 +3801,7 @@ export default function KassaReservationsView({
                       onClick={() => updateSettings({ autoConfirm: true })}
                       className={`p-4 rounded-xl border-2 text-left transition-all ${reservationSettings.autoConfirm ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-gray-300'}`}
                     >
-                      <div className="text-2xl mb-2">⚡</div>
+                      <div className="text-2xl mb-2"></div>
                       <p className={`font-bold text-sm ${reservationSettings.autoConfirm ? 'text-green-700' : 'text-gray-700'}`}>Automatisch</p>
                       <p className="text-xs text-gray-500 mt-1">Klant reserveert → direct bevestigd → klant krijgt meteen bevestigingsmail.</p>
                       {reservationSettings.autoConfirm && <span className="mt-2 inline-block text-xs font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded-full">Actief</span>}
@@ -3902,7 +3902,7 @@ export default function KassaReservationsView({
 
               {/* z2 - Shifts beheer */}
               <div className="border-t border-gray-100 pt-6">
-                <h4 className="font-bold mb-4">🍽️ Shifts Beheer</h4>
+                <h4 className="font-bold mb-4"> Shifts Beheer</h4>
                 <p className="text-sm text-gray-400 mb-4">Definieer lunch en diner shifts om reservaties te filteren.</p>
                 <div className="space-y-3">
                   {(reservationSettings.shifts || []).map((shift, idx) => (
@@ -3951,7 +3951,7 @@ export default function KassaReservationsView({
 
               {/* z4 - Annuleringsbeleid */}
               <div className="border-t border-gray-100 pt-6">
-                <h4 className="font-bold mb-4">❌ Annuleringsbeleid</h4>
+                <h4 className="font-bold mb-4"> Annuleringsbeleid</h4>
                 <div className="space-y-4">
                   <div>
                     <label className="font-medium block mb-2">Annulering mogelijk tot (uren voor reservatie)</label>
@@ -4004,7 +4004,7 @@ export default function KassaReservationsView({
 
               {/* z8 - Borg/aanbetaling */}
               <div className="border-t border-gray-100 pt-6">
-                <h4 className="font-bold mb-4">💳 Voorschot bij online reservatie</h4>
+                <h4 className="font-bold mb-4"> Voorschot bij online reservatie</h4>
                 <div className="space-y-5">
 
                   {/* Aan/uit toggle */}
@@ -4052,7 +4052,7 @@ export default function KassaReservationsView({
                         </div>
                       </div>
                       <p className="text-xs text-[#2D3A52] mt-3 bg-[#e8eef6] rounded-lg px-3 py-2">
-                        ✅ Klant wordt na invullen doorgestuurd naar <strong>Stripe betaalpagina</strong> voor €{reservationSettings.depositAmount}. Na betaling wordt de reservatie bevestigd.
+                         Klant wordt na invullen doorgestuurd naar <strong>Stripe betaalpagina</strong> voor €{reservationSettings.depositAmount}. Na betaling wordt de reservatie bevestigd.
                       </p>
                     </div>
                   )}
@@ -4061,7 +4061,7 @@ export default function KassaReservationsView({
 
               {/* z9 - No-show bescherming */}
               <div className="border-t border-gray-100 pt-6">
-                <h4 className="font-bold mb-4">🛡️ No-show Bescherming</h4>
+                <h4 className="font-bold mb-4"> No-show Bescherming</h4>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -4090,7 +4090,7 @@ export default function KassaReservationsView({
 
               {/* z7 - Online booking widget */}
               <div className="border-t border-gray-100 pt-6">
-                <h4 className="font-bold mb-4">🌐 Online Booking Widget</h4>
+                <h4 className="font-bold mb-4"> Online Booking Widget</h4>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -4105,7 +4105,7 @@ export default function KassaReservationsView({
                     </button>
                   </div>
                   <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                    <p className="text-sm font-medium text-blue-700 mb-1">📎 Booking link voor klanten:</p>
+                    <p className="text-sm font-medium text-blue-700 mb-1"> Booking link voor klanten:</p>
                     <p className="text-xs text-blue-600 font-mono break-all">
                       {typeof window !== 'undefined' ? `${window.location.origin}/shop/${tenant}/reserveren` : `/shop/${tenant}/reserveren`}
                     </p>
@@ -4130,7 +4130,7 @@ export default function KassaReservationsView({
               onClick={saveSettingsToSupabase}
               className="w-full mt-4 py-4 bg-[#58CCFF] hover:bg-[#43bef7] text-[#063042] font-bold text-lg rounded-xl shadow-md transition-colors"
             >
-              💾 Instellingen Opslaan
+               Instellingen Opslaan
             </button>
           </div>
         )}
@@ -4223,7 +4223,7 @@ export default function KassaReservationsView({
       {cancelConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[70] p-4">
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
-            <h3 className="font-bold text-lg mb-2">⚠️ Annulering na deadline</h3>
+            <h3 className="font-bold text-lg mb-2"> Annulering na deadline</h3>
             <p className="text-gray-600 text-sm mb-4">{reservationSettings.cancellationMessage}</p>
             <p className="text-gray-500 text-sm mb-6">Wilt u toch annuleren?</p>
             <div className="flex gap-3">
@@ -4576,7 +4576,7 @@ function EditReservationModal({ reservation, tables, reservations, shifts, buffe
                 className={`${inputCls} ${isOutsideShifts ? 'border-red-400 bg-red-50' : ''}`}>
                 {timeSlots.map(t => <option key={t} value={t}>{t}</option>)}
               </select>
-              {isOutsideShifts && <p className="text-red-500 text-xs mt-1">⚠️ Buiten openingstijden</p>}
+              {isOutsideShifts && <p className="text-red-500 text-xs mt-1"> Buiten openingstijden</p>}
             </div>
           </div>
 
@@ -4618,7 +4618,7 @@ function EditReservationModal({ reservation, tables, reservations, shifts, buffe
                 <option key={t.id} value={String(t.number)}>Tafel {t.number} ({t.seats} plaatsen)</option>
               ))}
             </select>
-            {hasConflict && <p className="text-red-500 text-xs mt-1">⚠️ Tafel al bezet op dit tijdstip</p>}
+            {hasConflict && <p className="text-red-500 text-xs mt-1"> Tafel al bezet op dit tijdstip</p>}
           </div>
 
           {/* Status */}
@@ -4647,7 +4647,7 @@ function EditReservationModal({ reservation, tables, reservations, shifts, buffe
           {/* Validatiefout */}
           {validationError && (
             <div className="px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm font-semibold">
-              ⚠️ {validationError}
+               {validationError}
             </div>
           )}
         </div>
@@ -4663,7 +4663,7 @@ function EditReservationModal({ reservation, tables, reservations, shifts, buffe
             <div className="flex gap-2 flex-1">
               <button onClick={handleCancel} disabled={cancelling}
                 className="flex-1 py-3 rounded-xl bg-red-500 text-white font-bold text-sm hover:bg-red-600 disabled:opacity-50">
-                {cancelling ? 'Bezig...' : '✓ Ja, annuleer'}
+                {cancelling ? 'Bezig...' : ' Ja, annuleer'}
               </button>
               <button onClick={() => setConfirmCancel(false)}
                 className="flex-1 py-3 rounded-xl border-2 border-gray-200 text-gray-600 font-bold text-sm">
@@ -4898,8 +4898,8 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="font-bold text-gray-900 text-sm">{r.guest_name}</span>
-                              {r.occasion && <span className="text-sm">🎉</span>}
-                              {r.special_requests && <span className="text-amber-500 text-xs font-semibold">⚠️ Opmerking</span>}
+                              {r.occasion && <span className="text-sm"></span>}
+                              {r.special_requests && <span className="text-amber-500 text-xs font-semibold"> Opmerking</span>}
                             </div>
                             <div className="flex items-center gap-3 mt-0.5 flex-wrap">
                               {r.guest_phone && (
@@ -5465,7 +5465,7 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
               </select>
               {isOutsideHours && (
                 <div className="mt-2 flex items-start gap-2 px-3 py-2 bg-red-50 border border-red-300 rounded-lg">
-                  <span className="text-red-500 text-lg leading-none mt-0.5">⚠️</span>
+                  <span className="text-red-500 text-lg leading-none mt-0.5"></span>
                   <p className="text-red-600 text-sm font-semibold">
                     U boekt buiten de openingsuren. Maak een andere keuze.
                     {activeShifts.length > 0 && (
@@ -5528,7 +5528,7 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
                     : 'border-gray-200 bg-gray-50 text-gray-500 hover:border-gray-300'
                 }`}
               >
-                ✨ Automatisch toewijzen (vrije tafel)
+                 Automatisch toewijzen (vrije tafel)
               </button>
               {/* Tafels met bezet/vrij status */}
               {tables.filter(t => t.seats >= formData.party_size).map((table) => {
@@ -5790,7 +5790,7 @@ function ReservationDetailModal({
 
           {/* Special Requests — altijd zichtbaar */}
           <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl">
-            <p className="text-xs text-amber-500 font-semibold mb-1">⚠️ Speciale wensen gast</p>
+            <p className="text-xs text-amber-500 font-semibold mb-1"> Speciale wensen gast</p>
             <p className="text-sm text-amber-900">{reservation.special_requests || '—'}</p>
           </div>
 
@@ -5798,7 +5798,7 @@ function ReservationDetailModal({
           {reservation.occasion && (
             <div className="text-center">
               <span className="px-3 py-1 rounded-full text-sm bg-purple-100 text-purple-600">
-                🎉 {reservation.occasion}
+                 {reservation.occasion}
               </span>
             </div>
           )}

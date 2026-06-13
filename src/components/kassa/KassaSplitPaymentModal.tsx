@@ -48,10 +48,10 @@ export function KassaSplitPaymentModal({
       <div className={card}>
         <div className={hdr}>
           <h3 className={hdrTitle}>
-            <span className="text-purple-500">👛</span> {t('kassaApp.splitPayTitle')}
+            <span className="text-purple-500"></span> {t('kassaApp.splitPayTitle')}
           </h3>
           <button type="button" onClick={onCloseBack} className={closeBtn}>
-            ✕
+            
           </button>
         </div>
         <div className="p-6 space-y-5">
@@ -61,7 +61,7 @@ export function KassaSplitPaymentModal({
           </div>
           <div className="space-y-1">
             <label className={`flex items-center gap-2 ${labelMuted}`}>
-              💵 {t('kassaApp.splitCashLabel')}
+               {t('kassaApp.splitCashLabel')}
             </label>
             <input
               type="number"
@@ -79,7 +79,7 @@ export function KassaSplitPaymentModal({
           </div>
           <div className="space-y-1">
             <label className={`flex items-center gap-2 ${labelMuted}`}>
-              💳 {t('kassaApp.splitCardLabel')}
+               {t('kassaApp.splitCardLabel')}
             </label>
             <input
               type="number"

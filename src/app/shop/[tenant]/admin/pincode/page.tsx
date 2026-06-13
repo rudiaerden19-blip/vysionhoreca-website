@@ -103,7 +103,6 @@ export default function PincodePage({ params }: { params: { tenant: string } }) 
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
       <div className="bg-white rounded-2xl shadow-lg p-8 max-w-sm w-full">
         <div className="text-center mb-6">
-          <div className="text-5xl mb-3">🔐</div>
           <h1 className="text-2xl font-bold text-gray-800">
             {hasPin ? 'PIN wijzigen' : 'PIN instellen'}
           </h1>
@@ -117,7 +116,7 @@ export default function PincodePage({ params }: { params: { tenant: string } }) 
         {justSaved ? (
           <div className="text-center">
             <div className="bg-green-50 border border-green-200 rounded-xl p-5 mb-4 text-green-700 font-semibold">
-              ✓ {success}
+               {success}
             </div>
             <p className="text-sm text-gray-500 mb-4">
               Je wordt automatisch doorgestuurd naar het overzicht…

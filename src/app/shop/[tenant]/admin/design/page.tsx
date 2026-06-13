@@ -125,9 +125,9 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
             <span>{t('adminPages.common.saving')}</span>
           </>
         ) : saved ? (
-          <><span>✓</span><span>{t('adminPages.common.saved')}</span></>
+          <><span></span><span>{t('adminPages.common.saved')}</span></>
         ) : (
-          <><span>💾</span><span>{t('adminPages.common.save')}</span></>
+          <><span></span><span>{t('adminPages.common.save')}</span></>
         )}
       </motion.button>
 
@@ -156,7 +156,7 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
             className="bg-white rounded-2xl p-6 shadow-sm"
           >
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <span>🎨</span> {t('websiteDesign.colorScheme')}
+              <span></span> {t('websiteDesign.colorScheme')}
             </h2>
             <div className="grid grid-cols-4 gap-3 mb-6">
               {colorPresets.map((preset) => (
@@ -229,7 +229,7 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
             className="bg-white rounded-2xl p-6 shadow-sm"
           >
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <span>🌙</span> {t('websiteDesign.darkMode') || 'Donker thema'}
+              <span></span> {t('websiteDesign.darkMode') || 'Donker thema'}
             </h2>
             <div className="flex items-center justify-between">
               <div>
@@ -253,7 +253,7 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
               <div className="mt-4 p-4 bg-[#1a1a1a] rounded-xl">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-[#2a2a2a] flex items-center justify-center">
-                    <span style={{ color: primaryColor }}>🍟</span>
+                    <span style={{ color: primaryColor }}></span>
                   </div>
                   <div>
                     <p className="text-white text-sm font-medium">Preview donker thema</p>
@@ -271,7 +271,7 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
             transition={{ delay: 0.2 }}
             className="bg-blue-50 border border-blue-200 rounded-2xl p-6"
           >
-            <h3 className="font-semibold text-blue-900 mb-2">💡 {t('websiteDesign.tip')}</h3>
+            <h3 className="font-semibold text-blue-900 mb-2"> {t('websiteDesign.tip')}</h3>
             <p className="text-blue-700 text-sm">
               {t('websiteDesign.tipText')}
             </p>
@@ -287,7 +287,7 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
         >
           <div className="bg-white rounded-2xl p-6 shadow-sm">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <span>👁️</span> {t('websiteDesign.livePreview')}
+              <span></span> {t('websiteDesign.livePreview')}
             </h2>
             
             {/* Mini Preview */}

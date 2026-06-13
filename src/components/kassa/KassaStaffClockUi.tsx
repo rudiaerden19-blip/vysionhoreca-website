@@ -75,7 +75,7 @@ export function KassaStaffClockModal({
             className="p-2 hover:bg-gray-100 rounded-xl text-gray-500"
             aria-label={t('staffClock.close')}
           >
-            ✕
+            
           </button>
         </div>
         <div className="flex-1 overflow-y-auto p-5 space-y-4">

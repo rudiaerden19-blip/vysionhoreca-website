@@ -100,9 +100,9 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
   }
 
   const rewardTypeLabels = {
-    free_item: `🎁 ${t('rewardsPage.types.freeItem')}`,
-    discount_fixed: `💰 ${t('rewardsPage.types.fixedDiscount')}`,
-    discount_percentage: `📊 ${t('rewardsPage.types.percentDiscount')}`,
+    free_item: ` ${t('rewardsPage.types.freeItem')}`,
+    discount_fixed: ` ${t('rewardsPage.types.fixedDiscount')}`,
+    discount_percentage: ` ${t('rewardsPage.types.percentDiscount')}`,
   }
 
   if (loading) {
@@ -147,7 +147,7 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
         animate={{ opacity: 1, y: 0 }}
         className="bg-yellow-50 border border-yellow-200 rounded-2xl p-6 mb-8"
       >
-        <h3 className="font-semibold text-yellow-800 mb-2">💡 {t('rewardsPage.howItWorks.title')}</h3>
+        <h3 className="font-semibold text-yellow-800 mb-2"> {t('rewardsPage.howItWorks.title')}</h3>
         <ul className="text-yellow-700 space-y-1 text-sm">
           <li>• {t('rewardsPage.howItWorks.point1')}</li>
           <li>• {t('rewardsPage.howItWorks.point2')}</li>
@@ -162,7 +162,7 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
           animate={{ opacity: 1, y: 0 }}
           className="bg-white rounded-2xl p-12 shadow-sm text-center"
         >
-          <span className="text-6xl mb-4 block">🎁</span>
+          <span className="text-6xl mb-4 block"></span>
           <h3 className="text-xl font-bold text-gray-900 mb-2">{t('rewardsPage.noRewards')}</h3>
           <p className="text-gray-500 mb-6">{t('rewardsPage.noRewardsDesc')}</p>
           <button
@@ -185,7 +185,7 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="w-16 h-16 bg-yellow-100 rounded-2xl flex items-center justify-center text-3xl">
-                    🎁
+                    
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-gray-900">{reward.name}</h3>
@@ -213,19 +213,19 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
                         : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                     }`}
                   >
-                    {reward.is_active ? `✓ ${t('rewardsPage.active')}` : t('rewardsPage.inactive')}
+                    {reward.is_active ? ` ${t('rewardsPage.active')}` : t('rewardsPage.inactive')}
                   </button>
                   <button
                     onClick={() => openEditModal(reward)}
                     className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors"
                   >
-                    ✏️ {t('adminPages.common.edit')}
+                     {t('adminPages.common.edit')}
                   </button>
                   <button
                     onClick={() => handleDelete(reward.id!)}
                     className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg font-medium transition-colors"
                   >
-                    🗑️
+                    
                   </button>
                 </div>
               </div>
@@ -303,9 +303,9 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
                   </label>
                   <div className="grid grid-cols-3 gap-2">
                     {[
-                      { value: 'free_item', label: `🎁 ${t('rewardsPage.types.freeItem')}`, desc: t('rewardsPage.types.freeItemDesc') },
-                      { value: 'discount_fixed', label: `💰 ${t('rewardsPage.types.discountEuro')}`, desc: t('rewardsPage.types.fixedAmount') },
-                      { value: 'discount_percentage', label: `📊 ${t('rewardsPage.types.discountPercent')}`, desc: t('rewardsPage.types.percentage') },
+                      { value: 'free_item', label: ` ${t('rewardsPage.types.freeItem')}`, desc: t('rewardsPage.types.freeItemDesc') },
+                      { value: 'discount_fixed', label: ` ${t('rewardsPage.types.discountEuro')}`, desc: t('rewardsPage.types.fixedAmount') },
+                      { value: 'discount_percentage', label: ` ${t('rewardsPage.types.discountPercent')}`, desc: t('rewardsPage.types.percentage') },
                     ].map((type) => (
                       <button
                         key={type.value}

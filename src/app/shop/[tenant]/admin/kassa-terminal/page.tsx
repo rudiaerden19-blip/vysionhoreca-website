@@ -66,7 +66,7 @@ export default function KassaTerminalSettingsPage({ params }: { params: { tenant
             className="inline-flex items-center gap-2 rounded-xl bg-[#1e293b] px-4 py-2.5 text-sm font-bold text-white shadow-md transition-colors hover:bg-[#334155] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#58CCFF] focus-visible:ring-offset-2"
           >
             <span aria-hidden className="text-base leading-none">
-              🧾
+              
             </span>
             {t('adminPages.kassaTerminal.backToPos')}
           </Link>

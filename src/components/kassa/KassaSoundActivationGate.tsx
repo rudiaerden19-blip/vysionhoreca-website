@@ -81,7 +81,7 @@ export function KassaSoundActivationScreen({
       onPointerDown={(e) => e.stopPropagation()}
     >
       <div className={`max-w-md text-center ${ui.soundHeading}`}>
-        <div className="mb-8 text-8xl">🔔</div>
+        <div className="mb-8 text-8xl"></div>
         <h1 id="kassa-sound-activation-title" className={`mb-4 text-4xl font-bold ${ui.soundHeading}`}>
           {t('kassaApp.soundTitle')}
         </h1>
@@ -104,10 +104,10 @@ export function KassaSoundActivationScreen({
           }}
           className="flex w-full transform touch-manipulation items-center justify-center gap-4 rounded-2xl bg-green-500 py-6 text-2xl font-bold text-white shadow-lg transition-all hover:scale-105 hover:bg-green-600 active:bg-green-700"
         >
-          <span className="text-4xl">🔊</span>
+          <span className="text-4xl"></span>
           {t('kassaApp.soundActivateButton').toUpperCase()}
         </button>
-        <p className={`mt-6 text-sm ${ui.soundMuted}`}>💡 {t('kassaApp.soundHintFooter')}</p>
+        <p className={`mt-6 text-sm ${ui.soundMuted}`}> {t('kassaApp.soundHintFooter')}</p>
       </div>
     </div>
   )

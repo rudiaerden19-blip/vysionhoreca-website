@@ -49,19 +49,19 @@ const SECTOR_BENCHMARKS = {
 }
 
 const getHealthStatus = (t: (key: string) => string) => ({
-  EXCELLENT: { label: t('analysePage.health.excellent'), desc: t('analysePage.health.excellentDesc'), icon: '🌟', color: '#22c55e', bgColor: 'bg-green-50', borderColor: 'border-green-500' },
-  GOOD: { label: t('analysePage.health.good'), desc: t('analysePage.health.goodDesc'), icon: '✅', color: '#3b82f6', bgColor: 'bg-blue-50', borderColor: 'border-blue-500' },
-  WARNING: { label: t('analysePage.health.warning'), desc: t('analysePage.health.warningDesc'), icon: '⚠️', color: '#f59e0b', bgColor: 'bg-blue-50', borderColor: 'border-blue-500' },
-  CRITICAL: { label: t('analysePage.health.critical'), desc: t('analysePage.health.criticalDesc'), icon: '🚨', color: '#ef4444', bgColor: 'bg-red-50', borderColor: 'border-red-500' },
+  EXCELLENT: { label: t('analysePage.health.excellent'), desc: t('analysePage.health.excellentDesc'), icon: '', color: '#22c55e', bgColor: 'bg-green-50', borderColor: 'border-green-500' },
+  GOOD: { label: t('analysePage.health.good'), desc: t('analysePage.health.goodDesc'), icon: '', color: '#3b82f6', bgColor: 'bg-blue-50', borderColor: 'border-blue-500' },
+  WARNING: { label: t('analysePage.health.warning'), desc: t('analysePage.health.warningDesc'), icon: '', color: '#f59e0b', bgColor: 'bg-blue-50', borderColor: 'border-blue-500' },
+  CRITICAL: { label: t('analysePage.health.critical'), desc: t('analysePage.health.criticalDesc'), icon: '', color: '#ef4444', bgColor: 'bg-red-50', borderColor: 'border-red-500' },
 })
 
 // Icon mapping for categories
 const FIXED_ICONS: Record<string, string> = {
-  RENT: '🏠', PERSONNEL: '👥', ELECTRICITY: '⚡', GAS: '🔥', WATER: '💧',
-  INSURANCE: '🛡️', LEASING: '📋', LOAN: '🏦', SUBSCRIPTIONS: '📱', OTHER: '📦'
+  RENT: '', PERSONNEL: '', ELECTRICITY: '', GAS: '', WATER: '',
+  INSURANCE: '', LEASING: '', LOAN: '', SUBSCRIPTIONS: '', OTHER: ''
 }
 const VARIABLE_ICONS: Record<string, string> = {
-  INGREDIENTS: '🥔', PACKAGING: '📦', CLEANING: '🧹', MAINTENANCE: '🔧', MARKETING: '📢', OTHER: '📋'
+  INGREDIENTS: '', PACKAGING: '', CLEANING: '', MAINTENANCE: '', MARKETING: '', OTHER: ''
 }
 
 export default function AnalysePage({ params }: { params: { tenant: string } }) {
@@ -91,7 +91,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
     FIXED_COST_CATEGORIES.map(cat => ({
       ...cat,
       label: getFixedCatLabel(cat.id),
-      icon: FIXED_ICONS[cat.id] || '📦'
+      icon: FIXED_ICONS[cat.id] || ''
     // eslint-disable-next-line react-hooks/exhaustive-deps
     })), [t])
   
@@ -99,7 +99,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
     VARIABLE_COST_CATEGORIES.map(cat => ({
       ...cat,
       label: getVariableCatLabel(cat.id),
-      icon: VARIABLE_ICONS[cat.id] || '📋'
+      icon: VARIABLE_ICONS[cat.id] || ''
     // eslint-disable-next-line react-hooks/exhaustive-deps
     })), [t])
   
@@ -107,18 +107,18 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
   const translateRecommendations = (recs: string[]) => {
     return recs.map(rec => {
       // Parse and translate each recommendation
-      if (rec.includes('Geen omzet')) return `📊 ${t('analysePage.recommendations.noRevenue')}`
+      if (rec.includes('Geen omzet')) return ` ${t('analysePage.recommendations.noRevenue')}`
       if (rec.includes('UITSTEKEND')) {
         const match = rec.match(/([\d.]+)%/)
-        return `✅ ${t('analysePage.recommendations.excellent').replace('{margin}', match?.[1] || '0')}`
+        return ` ${t('analysePage.recommendations.excellent').replace('{margin}', match?.[1] || '0')}`
       }
       if (rec.includes('KRITIEK')) {
         const matches = rec.match(/([\d.]+)%/g)
-        return `🚨 ${t('analysePage.recommendations.critical').replace('{margin}', matches?.[0]?.replace('%','') || '0').replace('{min}', matches?.[1]?.replace('%','') || '0')}`
+        return ` ${t('analysePage.recommendations.critical').replace('{margin}', matches?.[0]?.replace('%','') || '0').replace('{min}', matches?.[1]?.replace('%','') || '0')}`
       }
       if (rec.includes('PERSONEEL TE DUUR')) {
         const matches = rec.match(/([\d.]+)%/g)
-        return `👥 ${t('analysePage.recommendations.personnelTooHigh').replace('{percent}', matches?.[0]?.replace('%','') || '0').replace('{max}', matches?.[1]?.replace('%','') || '0')}`
+        return ` ${t('analysePage.recommendations.personnelTooHigh').replace('{percent}', matches?.[0]?.replace('%','') || '0').replace('{max}', matches?.[1]?.replace('%','') || '0')}`
       }
       if (rec.includes('op personeel')) {
         const match = rec.match(/€([\d.]+)/)
@@ -126,7 +126,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
       }
       if (rec.includes('INGREDIËNTEN TE DUUR')) {
         const matches = rec.match(/([\d.]+)%/g)
-        return `🥔 ${t('analysePage.recommendations.ingredientsTooHigh').replace('{percent}', matches?.[0]?.replace('%','') || '0').replace('{max}', matches?.[1]?.replace('%','') || '0')}`
+        return ` ${t('analysePage.recommendations.ingredientsTooHigh').replace('{percent}', matches?.[0]?.replace('%','') || '0').replace('{max}', matches?.[1]?.replace('%','') || '0')}`
       }
       if (rec.includes('op ingrediënten')) {
         const match = rec.match(/€([\d.]+)/)
@@ -134,26 +134,26 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
       }
       if (rec.includes('HUUR TE DUUR')) {
         const match = rec.match(/([\d.]+)%/)
-        return `🏠 ${t('analysePage.recommendations.rentTooHigh').replace('{percent}', match?.[1] || '0')}`
+        return ` ${t('analysePage.recommendations.rentTooHigh').replace('{percent}', match?.[1] || '0')}`
       }
       if (rec.includes('ENERGIE TE DUUR')) {
         const match = rec.match(/([\d.]+)%/)
-        return `⚡ ${t('analysePage.recommendations.energyTooHigh').replace('{percent}', match?.[1] || '0')}`
+        return ` ${t('analysePage.recommendations.energyTooHigh').replace('{percent}', match?.[1] || '0')}`
       }
       if (rec.includes('GEMIDDELDE BON TE LAAG')) {
         const matches = rec.match(/€([\d.]+)/g)
-        return `🧾 ${t('analysePage.recommendations.ticketTooLow').replace('{current}', matches?.[0]?.replace('€','') || '0').replace('{target}', matches?.[1]?.replace('€','') || '0')}`
+        return ` ${t('analysePage.recommendations.ticketTooLow').replace('{current}', matches?.[0]?.replace('€','') || '0').replace('{target}', matches?.[1]?.replace('€','') || '0')}`
       }
       if (rec.includes('Tip:')) {
         return `→ ${t('analysePage.recommendations.ticketTip')}`
       }
       if (rec.includes('Break-even bereikt')) {
         const match = rec.match(/€([\d.]+)/)
-        return `📍 ${t('analysePage.recommendations.breakEvenReached').replace('{amount}', match?.[1] || '0')}`
+        return ` ${t('analysePage.recommendations.breakEvenReached').replace('{amount}', match?.[1] || '0')}`
       }
       if (rec.includes('Nog €')) {
         const match = rec.match(/€([\d.]+)/)
-        return `📍 ${t('analysePage.recommendations.breakEvenNeeded').replace('{amount}', match?.[1] || '0')}`
+        return ` ${t('analysePage.recommendations.breakEvenNeeded').replace('{amount}', match?.[1] || '0')}`
       }
       return rec
     })
@@ -559,7 +559,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            📊 {t('analysePage.title')}
+             {t('analysePage.title')}
           </h1>
           <p className="text-gray-500">{t('analysePage.subtitle')}</p>
         </div>
@@ -567,13 +567,13 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
         {/* Month Navigator */}
         <div className="flex items-center gap-2 bg-white rounded-xl p-2 shadow-sm">
           <button onClick={goToPrevMonth} className="p-2 hover:bg-gray-100 rounded-lg">
-            ◀️
+            ◀
           </button>
           <span className="font-bold text-gray-900 min-w-[140px] text-center">
             {MONTH_NAMES[selectedMonth - 1]} {selectedYear}
           </span>
           <button onClick={goToNextMonth} className="p-2 hover:bg-gray-100 rounded-lg">
-            ▶️
+            ▶
           </button>
         </div>
       </div>
@@ -581,11 +581,11 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
       {/* Tabs */}
       <div className="flex flex-wrap gap-2 mb-6 bg-white rounded-xl p-2 shadow-sm">
         {[
-          { id: 'overview', label: `📊 ${t('analysePage.tabs.overview')}` },
-          { id: 'fixed', label: `🏠 ${t('analysePage.tabs.fixed')}` },
-          { id: 'variable', label: `🛒 ${t('analysePage.tabs.variable')}` },
-          { id: 'year', label: `📅 ${t('analysePage.tabs.year')}` },
-          { id: 'settings', label: `⚙️ ${t('analysePage.tabs.settings')}` },
+          { id: 'overview', label: ` ${t('analysePage.tabs.overview')}` },
+          { id: 'fixed', label: ` ${t('analysePage.tabs.fixed')}` },
+          { id: 'variable', label: ` ${t('analysePage.tabs.variable')}` },
+          { id: 'year', label: ` ${t('analysePage.tabs.year')}` },
+          { id: 'settings', label: ` ${t('analysePage.tabs.settings')}` },
         ].map(tab => (
           <button
             key={tab.id}
@@ -626,7 +626,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               animate={{ opacity: 1, y: 0 }}
               className="bg-white rounded-2xl p-5 shadow-sm"
             >
-              <div className="text-sm text-gray-500 mb-1">💰 {t('analysePage.overview.totalRevenue')}</div>
+              <div className="text-sm text-gray-500 mb-1"> {t('analysePage.overview.totalRevenue')}</div>
               <div className="text-2xl font-bold text-green-600">{formatCurrency(monthlyReport.totalRevenue)}</div>
               <div className="text-xs text-gray-400 mt-1">
                 {t('analysePage.overview.online')}: {formatCurrency(monthlyReport.onlineRevenue)} | {t('analysePage.overview.kassa')}: {formatCurrency(monthlyReport.kassaRevenue)}
@@ -639,7 +639,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               transition={{ delay: 0.1 }}
               className="bg-white rounded-2xl p-5 shadow-sm"
             >
-              <div className="text-sm text-gray-500 mb-1">📉 {t('analysePage.overview.totalCosts')}</div>
+              <div className="text-sm text-gray-500 mb-1"> {t('analysePage.overview.totalCosts')}</div>
               <div className="text-2xl font-bold text-red-600">{formatCurrency(monthlyReport.totalCosts)}</div>
               <div className="text-xs text-gray-400 mt-1">
                 {t('analysePage.overview.fixed')}: {formatCurrency(monthlyReport.totalFixedCosts)} | {t('analysePage.overview.variable')}: {formatCurrency(monthlyReport.totalVariableCosts)}
@@ -652,7 +652,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               transition={{ delay: 0.2 }}
               className="bg-white rounded-2xl p-5 shadow-sm"
             >
-              <div className="text-sm text-gray-500 mb-1">✨ {t('analysePage.overview.netProfit')}</div>
+              <div className="text-sm text-gray-500 mb-1"> {t('analysePage.overview.netProfit')}</div>
               <div className={`text-2xl font-bold ${monthlyReport.netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                 {formatCurrency(monthlyReport.netProfit)}
               </div>
@@ -667,7 +667,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               transition={{ delay: 0.3 }}
               className="bg-white rounded-2xl p-5 shadow-sm"
             >
-              <div className="text-sm text-gray-500 mb-1">📊 {t('analysePage.overview.profitMargin')}</div>
+              <div className="text-sm text-gray-500 mb-1"> {t('analysePage.overview.profitMargin')}</div>
               <div className={`text-2xl font-bold ${monthlyReport.profitMargin >= 22 ? 'text-green-600' : 'text-blue-600'}`}>
                 {monthlyReport.profitMargin.toFixed(1)}%
               </div>
@@ -686,7 +686,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               className="bg-white rounded-2xl p-5 shadow-sm"
             >
               <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                📦 {t('analysePage.overview.orders')}
+                 {t('analysePage.overview.orders')}
               </h3>
               <div className="grid grid-cols-3 gap-4">
                 <div>
@@ -711,7 +711,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               className="bg-white rounded-2xl p-5 shadow-sm"
             >
               <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                🧾 {t('analysePage.overview.averageTicket')}
+                 {t('analysePage.overview.averageTicket')}
               </h3>
               <div className="flex items-end gap-4">
                 <div>
@@ -735,7 +735,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               transition={{ delay: 0.6 }}
               className="bg-white rounded-2xl p-5 shadow-sm"
             >
-              <h3 className="font-bold text-gray-900 mb-4">🏠 {t('analysePage.overview.fixedCosts')}</h3>
+              <h3 className="font-bold text-gray-900 mb-4"> {t('analysePage.overview.fixedCosts')}</h3>
               <div className="space-y-2">
                 {monthlyReport.fixedCostBreakdown.length > 0 ? (
                   monthlyReport.fixedCostBreakdown.map(item => {
@@ -764,7 +764,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               transition={{ delay: 0.7 }}
               className="bg-white rounded-2xl p-5 shadow-sm"
             >
-              <h3 className="font-bold text-gray-900 mb-4">🛒 {t('analysePage.overview.variableCosts')}</h3>
+              <h3 className="font-bold text-gray-900 mb-4"> {t('analysePage.overview.variableCosts')}</h3>
               <div className="space-y-2">
                 {monthlyReport.variableCostBreakdown.length > 0 ? (
                   monthlyReport.variableCostBreakdown.map(item => {
@@ -795,14 +795,14 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
             transition={{ delay: 0.8 }}
             className="bg-white rounded-2xl p-5 shadow-sm"
           >
-            <h3 className="font-bold text-gray-900 mb-4">🔍 {t('analysePage.overview.recommendations')}</h3>
+            <h3 className="font-bold text-gray-900 mb-4"> {t('analysePage.overview.recommendations')}</h3>
             <div className="space-y-2">
               {translateRecommendations(monthlyReport.recommendations).map((rec, idx) => {
                 let bgClass = 'bg-gray-50'
-                if (rec.includes('✅')) bgClass = 'bg-green-50 border-l-4 border-green-500'
-                else if (rec.includes('🚨')) bgClass = 'bg-red-50 border-l-4 border-red-500'
-                else if (rec.includes('👥') || rec.includes('🥔') || rec.includes('🏠') || rec.includes('⚡') || rec.includes('🧾')) bgClass = 'bg-yellow-50 border-l-4 border-yellow-500'
-                else if (rec.includes('📍')) bgClass = 'bg-blue-50 border-l-4 border-blue-500'
+                if (rec.includes('')) bgClass = 'bg-green-50 border-l-4 border-green-500'
+                else if (rec.includes('')) bgClass = 'bg-red-50 border-l-4 border-red-500'
+                else if (rec.includes('') || rec.includes('') || rec.includes('') || rec.includes('') || rec.includes('')) bgClass = 'bg-yellow-50 border-l-4 border-yellow-500'
+                else if (rec.includes('')) bgClass = 'bg-blue-50 border-l-4 border-blue-500'
                 else if (rec.includes('→')) bgClass = 'bg-gray-50 pl-6'
 
                 return (
@@ -821,14 +821,14 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-bold text-gray-900">🏠 {t('analysePage.fixed.title')}</h2>
+              <h2 className="text-xl font-bold text-gray-900"> {t('analysePage.fixed.title')}</h2>
               <p className="text-gray-500">{t('analysePage.fixed.subtitle')}</p>
             </div>
             <button
               onClick={() => openFixedModal()}
               className="px-4 py-2 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
             >
-              ➕ {t('analysePage.fixed.newCost')}
+               {t('analysePage.fixed.newCost')}
             </button>
           </div>
 
@@ -870,7 +870,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                       onClick={() => openFixedModal(cost)}
                       className="flex-1 min-h-[44px] touch-manipulation px-3 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200"
                     >
-                      ✏️ {t('analysePage.fixed.edit')}
+                       {t('analysePage.fixed.edit')}
                     </button>
                     {(cost as FixedCost & { pdf_url?: string }).pdf_url ? (
                       <button
@@ -879,7 +879,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                         className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center px-3 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium hover:bg-green-200"
                         title="Bekijk factuur"
                       >
-                        📄
+                        
                       </button>
                     ) : (
                       <button
@@ -891,7 +891,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                         className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center px-3 py-2 bg-gray-100 text-gray-400 rounded-lg text-sm font-medium hover:bg-blue-100 hover:text-blue-600"
                         title="PDF factuur koppelen"
                       >
-                        📎
+                        
                       </button>
                     )}
                     <button
@@ -899,7 +899,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                       onClick={() => handleDeleteFixed(cost.id!)}
                       className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center px-3 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-medium hover:bg-red-200"
                     >
-                      🗑️
+                      
                     </button>
                   </div>
                 </motion.div>
@@ -909,7 +909,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
 
           {fixedCosts.length === 0 && (
             <div className="bg-white rounded-2xl p-12 text-center">
-              <div className="text-6xl mb-4">🏠</div>
+              <div className="text-6xl mb-4"></div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">{t('analysePage.fixed.noData')}</h3>
               <p className="text-gray-500">{t('analysePage.fixed.noDataDesc')}</p>
             </div>
@@ -931,14 +931,14 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-bold text-gray-900">🛒 {t('analysePage.variable.title')}</h2>
+              <h2 className="text-xl font-bold text-gray-900"> {t('analysePage.variable.title')}</h2>
               <p className="text-gray-500">{MONTH_NAMES[selectedMonth - 1]} {selectedYear}</p>
             </div>
             <button
               onClick={() => openVariableModal()}
               className="px-4 py-2 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
             >
-              ➕ {t('analysePage.variable.newPurchase')}
+               {t('analysePage.variable.newPurchase')}
             </button>
           </div>
 
@@ -992,7 +992,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                               className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center rounded-lg bg-green-100 text-green-700 hover:bg-green-200 mr-1"
                               title="Bekijk factuur PDF"
                             >
-                              📄
+                              
                             </button>
                           ) : (
                             <button
@@ -1004,7 +1004,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                               className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center rounded-lg bg-gray-100 text-gray-400 hover:bg-blue-100 hover:text-blue-600 mr-1"
                               title="PDF factuur koppelen"
                             >
-                              📎
+                              
                             </button>
                           )}
                           <button
@@ -1012,14 +1012,14 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                             onClick={() => openVariableModal(cost)}
                             className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center text-blue-500 hover:text-blue-700 mr-1"
                           >
-                            ✏️
+                            
                           </button>
                           <button
                             type="button"
                             onClick={() => handleDeleteVariable(cost.id!)}
                             className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center text-red-500 hover:text-red-700"
                           >
-                            🗑️
+                            
                           </button>
                         </td>
                       </tr>
@@ -1028,7 +1028,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                 ) : (
                   <tr>
                     <td colSpan={6} className="px-4 py-12 text-center text-gray-400">
-                      <div className="text-4xl mb-2">🛒</div>
+                      <div className="text-4xl mb-2"></div>
                       <p>{t('analysePage.variable.noData')}</p>
                     </td>
                   </tr>
@@ -1053,38 +1053,38 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
         <div className="space-y-6">
           <div className="flex items-center justify-center gap-4 mb-6">
             <button onClick={() => setSelectedYear(y => y - 1)} className="p-2 hover:bg-gray-100 rounded-lg">
-              ◀️
+              ◀
             </button>
             <h2 className="text-2xl font-bold text-gray-900">{selectedYear}</h2>
             <button onClick={() => setSelectedYear(y => y + 1)} className="p-2 hover:bg-gray-100 rounded-lg">
-              ▶️
+              ▶
             </button>
           </div>
 
           <div className="grid md:grid-cols-4 gap-4">
             <div className="bg-white rounded-2xl p-5 shadow-sm">
-              <div className="text-sm text-gray-500">💰 {t('analysePage.year.yearRevenue')}</div>
+              <div className="text-sm text-gray-500"> {t('analysePage.year.yearRevenue')}</div>
               <div className="text-2xl font-bold text-green-600">{formatCurrency(yearReport?.totalRevenue || 0)}</div>
             </div>
             <div className="bg-white rounded-2xl p-5 shadow-sm">
-              <div className="text-sm text-gray-500">📉 {t('analysePage.year.yearCosts')}</div>
+              <div className="text-sm text-gray-500"> {t('analysePage.year.yearCosts')}</div>
               <div className="text-2xl font-bold text-red-600">{formatCurrency(yearReport?.totalCosts || 0)}</div>
             </div>
             <div className="bg-white rounded-2xl p-5 shadow-sm">
-              <div className="text-sm text-gray-500">✨ {t('analysePage.year.yearProfit')}</div>
+              <div className="text-sm text-gray-500"> {t('analysePage.year.yearProfit')}</div>
               <div className={`text-2xl font-bold ${(yearReport?.netProfit || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                 {formatCurrency(yearReport?.netProfit || 0)}
               </div>
             </div>
             <div className="bg-white rounded-2xl p-5 shadow-sm">
-              <div className="text-sm text-gray-500">📊 {t('analysePage.year.averageMargin')}</div>
+              <div className="text-sm text-gray-500"> {t('analysePage.year.averageMargin')}</div>
               <div className="text-2xl font-bold text-blue-600">{(yearReport?.profitMargin || 0).toFixed(1)}%</div>
             </div>
           </div>
 
           <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4">
             <p className="text-blue-800">
-              💡 <strong>Tip:</strong> {t('analysePage.year.tip')}
+               <strong>Tip:</strong> {t('analysePage.year.tip')}
             </p>
           </div>
         </div>
@@ -1094,13 +1094,13 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
       {activeTab === 'settings' && (
         <div className="max-w-2xl mx-auto space-y-6">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">⚙️ {t('analysePage.settings.title')}</h2>
+            <h2 className="text-xl font-bold text-gray-900"> {t('analysePage.settings.title')}</h2>
             <p className="text-gray-500">{t('analysePage.settings.subtitle')}</p>
           </div>
 
           <div className="bg-white rounded-2xl p-6 shadow-sm space-y-6">
             <div>
-              <label className="block font-medium text-gray-700 mb-2">🎯 {t('analysePage.settings.targetMargin')}</label>
+              <label className="block font-medium text-gray-700 mb-2"> {t('analysePage.settings.targetMargin')}</label>
               <input
                 type="number"
                 value={targetsForm.target_profit_margin || ''}
@@ -1113,7 +1113,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
             </div>
 
             <div>
-              <label className="block font-medium text-gray-700 mb-2">⚠️ {t('analysePage.settings.minMargin')}</label>
+              <label className="block font-medium text-gray-700 mb-2"> {t('analysePage.settings.minMargin')}</label>
               <input
                 type="number"
                 value={targetsForm.minimum_profit_margin || ''}
@@ -1126,7 +1126,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
             </div>
 
             <div>
-              <label className="block font-medium text-gray-700 mb-2">👥 {t('analysePage.settings.maxPersonnel')}</label>
+              <label className="block font-medium text-gray-700 mb-2"> {t('analysePage.settings.maxPersonnel')}</label>
               <input
                 type="number"
                 value={targetsForm.max_personnel_percent || ''}
@@ -1139,7 +1139,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
             </div>
 
             <div>
-              <label className="block font-medium text-gray-700 mb-2">🥔 {t('analysePage.settings.maxIngredients')}</label>
+              <label className="block font-medium text-gray-700 mb-2"> {t('analysePage.settings.maxIngredients')}</label>
               <input
                 type="number"
                 value={targetsForm.max_ingredient_percent || ''}
@@ -1152,7 +1152,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
             </div>
 
             <div>
-              <label className="block font-medium text-gray-700 mb-2">🧾 {t('analysePage.settings.targetTicket')}</label>
+              <label className="block font-medium text-gray-700 mb-2"> {t('analysePage.settings.targetTicket')}</label>
               <input
                 type="number"
                 value={targetsForm.target_average_ticket || ''}
@@ -1168,13 +1168,13 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               disabled={saving}
               className="w-full px-6 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 disabled:opacity-50 transition-colors"
             >
-              {saving ? t('analysePage.common.saving') : `💾 ${t('analysePage.settings.saveTargets')}`}
+              {saving ? t('analysePage.common.saving') : ` ${t('analysePage.settings.saveTargets')}`}
             </button>
           </div>
 
           {/* Sector Benchmarks */}
           <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6">
-            <h3 className="font-bold text-blue-900 mb-4">🏆 {t('analysePage.settings.benchmarks')}</h3>
+            <h3 className="font-bold text-blue-900 mb-4"> {t('analysePage.settings.benchmarks')}</h3>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <span className="text-blue-700">{t('analysePage.settings.avgMargin')}:</span>
@@ -1215,8 +1215,8 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               className="bg-white rounded-2xl w-full max-w-md shadow-xl"
             >
               <div className="p-4 border-b flex items-center justify-between">
-                <h2 className="text-xl font-bold">{editingFixed ? `✏️ ${t('analysePage.fixed.editCost')}` : `➕ ${t('analysePage.fixed.newCost')}`}</h2>
-                <button onClick={() => setShowFixedModal(false)} className="text-gray-400 hover:text-gray-600">✕</button>
+                <h2 className="text-xl font-bold">{editingFixed ? ` ${t('analysePage.fixed.editCost')}` : ` ${t('analysePage.fixed.newCost')}`}</h2>
+                <button onClick={() => setShowFixedModal(false)} className="text-gray-400 hover:text-gray-600"></button>
               </div>
               <div className="p-6 space-y-4">
 
@@ -1227,7 +1227,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                       onChange={e => { const f = e.target.files?.[0]; if (f) handlePdfUploadFixed(f); e.target.value = '' }} />
                     <button type="button" onClick={() => pdfInputFixedRef.current?.click()} disabled={isParsingPdfFixed}
                       className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed border-blue-400 text-blue-600 hover:bg-blue-50 transition-colors disabled:opacity-50 text-sm font-medium">
-                      {isParsingPdfFixed ? '⏳ PDF wordt ingelezen...' : '📄 PDF factuur uploaden (automatisch invullen)'}
+                      {isParsingPdfFixed ? '⏳ PDF wordt ingelezen...' : ' PDF factuur uploaden (automatisch invullen)'}
                     </button>
                     <p className="text-xs text-gray-400 mt-1 text-center">Peppol of gewone PDF — naam en bedrag worden automatisch ingevuld</p>
                   </div>
@@ -1298,7 +1298,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                     disabled={saving}
                     className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 disabled:opacity-50"
                   >
-                    {saving ? t('analysePage.common.saving') : `💾 ${t('analysePage.common.save')}`}
+                    {saving ? t('analysePage.common.saving') : ` ${t('analysePage.common.save')}`}
                   </button>
                 </div>
               </div>
@@ -1325,8 +1325,8 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               className="bg-white rounded-2xl w-full max-w-md shadow-xl"
             >
               <div className="p-4 border-b flex items-center justify-between">
-                <h2 className="text-xl font-bold">{editingVariable ? `✏️ ${t('analysePage.variable.editPurchase')}` : `➕ ${t('analysePage.variable.newPurchase')}`}</h2>
-                <button onClick={() => setShowVariableModal(false)} className="text-gray-400 hover:text-gray-600">✕</button>
+                <h2 className="text-xl font-bold">{editingVariable ? ` ${t('analysePage.variable.editPurchase')}` : ` ${t('analysePage.variable.newPurchase')}`}</h2>
+                <button onClick={() => setShowVariableModal(false)} className="text-gray-400 hover:text-gray-600"></button>
               </div>
               <div className="p-6 space-y-4">
 
@@ -1337,7 +1337,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                       onChange={e => { const f = e.target.files?.[0]; if (f) handlePdfUpload(f); e.target.value = '' }} />
                     <button type="button" onClick={() => pdfInputRef.current?.click()} disabled={isParsingPdf}
                       className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed border-blue-400 text-blue-600 hover:bg-blue-50 transition-colors disabled:opacity-50 text-sm font-medium">
-                      {isParsingPdf ? '⏳ PDF wordt ingelezen...' : '📄 PDF factuur uploaden (automatisch invullen)'}
+                      {isParsingPdf ? '⏳ PDF wordt ingelezen...' : ' PDF factuur uploaden (automatisch invullen)'}
                     </button>
                     <p className="text-xs text-gray-400 mt-1 text-center">Peppol of gewone PDF — leverancier, datum en bedrag worden automatisch ingevuld</p>
                   </div>
@@ -1431,7 +1431,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                     disabled={saving}
                     className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 disabled:opacity-50"
                   >
-                    {saving ? t('analysePage.common.saving') : `💾 ${t('analysePage.common.save')}`}
+                    {saving ? t('analysePage.common.saving') : ` ${t('analysePage.common.save')}`}
                   </button>
                 </div>
               </div>

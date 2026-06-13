@@ -62,16 +62,16 @@ function formatClosingDateNL(ymd: string): string {
 }
 
 const ALLERGEN_ICONS: Record<string, { icon: string; color: string; label: string }> = {
-  gluten: { icon: '🌾', color: 'bg-amber-100 text-amber-800', label: 'Gluten' },
-  ei: { icon: '🥚', color: 'bg-yellow-100 text-yellow-800', label: 'Ei' },
-  melk: { icon: '🥛', color: 'bg-blue-100 text-blue-800', label: 'Melk' },
-  noten: { icon: '🥜', color: 'bg-orange-100 text-orange-800', label: 'Noten' },
-  soja: { icon: '🫘', color: 'bg-green-100 text-green-800', label: 'Soja' },
-  vis: { icon: '🐟', color: 'bg-cyan-100 text-cyan-800', label: 'Vis' },
-  schaaldieren: { icon: '🦐', color: 'bg-red-100 text-red-800', label: 'Schaaldieren' },
-  selderij: { icon: '🥬', color: 'bg-lime-100 text-lime-800', label: 'Selderij' },
-  mosterd: { icon: '🟡', color: 'bg-yellow-100 text-yellow-800', label: 'Mosterd' },
-  sesam: { icon: '⚪', color: 'bg-stone-100 text-stone-800', label: 'Sesam' },
+  gluten: { icon: '', color: 'bg-amber-100 text-amber-800', label: 'Gluten' },
+  ei: { icon: '', color: 'bg-yellow-100 text-yellow-800', label: 'Ei' },
+  melk: { icon: '', color: 'bg-blue-100 text-blue-800', label: 'Melk' },
+  noten: { icon: '', color: 'bg-orange-100 text-orange-800', label: 'Noten' },
+  soja: { icon: '', color: 'bg-green-100 text-green-800', label: 'Soja' },
+  vis: { icon: '', color: 'bg-cyan-100 text-cyan-800', label: 'Vis' },
+  schaaldieren: { icon: '', color: 'bg-red-100 text-red-800', label: 'Schaaldieren' },
+  selderij: { icon: '', color: 'bg-lime-100 text-lime-800', label: 'Selderij' },
+  mosterd: { icon: '', color: 'bg-yellow-100 text-yellow-800', label: 'Mosterd' },
+  sesam: { icon: '', color: 'bg-stone-100 text-stone-800', label: 'Sesam' },
 }
 
 type MenuProductCardTheme = {
@@ -138,13 +138,13 @@ const MenuProductCard = memo(function MenuProductCard({
             className={useContain ? 'object-contain p-2' : 'object-cover'}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-6xl">🍟</div>
+          <div className="w-full h-full flex items-center justify-center text-6xl"></div>
         )}
 
         <div className="absolute top-3 left-3 z-[6] flex gap-2">
           {item.is_popular && (
             <span style={{ backgroundColor: primaryColor }} className="text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md">
-              🔥 POPULAIR
+               POPULAIR
             </span>
           )}
           {item.is_promo && item.promo_price != null && (
@@ -178,7 +178,7 @@ const MenuProductCard = memo(function MenuProductCard({
                 key={allergen}
                 className={`text-xs px-2 py-0.5 rounded-full ${ALLERGEN_ICONS[allergen.toLowerCase()]?.color || 'bg-gray-100 text-gray-600'}`}
               >
-                {ALLERGEN_ICONS[allergen.toLowerCase()]?.icon || '⚠️'}
+                {ALLERGEN_ICONS[allergen.toLowerCase()]?.icon || ''}
               </span>
             ))}
           </div>
@@ -193,12 +193,12 @@ const MenuProductCard = memo(function MenuProductCard({
             <span>{t('menuPage.soldOut')}</span>
           ) : hasLinkedOptions ? (
             <>
-              <span>⚙️</span>
+              <span></span>
               <span>{t('menuPage.chooseOptions')}</span>
             </>
           ) : (
             <>
-              <span>🛒</span>
+              <span></span>
               <span>{t('menuPage.clickToOrder')}</span>
             </>
           )}
@@ -636,9 +636,9 @@ export default function MenuPageClient({
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-6">
           <div className="bg-white rounded-3xl p-10 max-w-md w-full text-center shadow-2xl">
             <div className="text-7xl mb-6">
-              {manualOffline.offline_reason === 'volzet' ? '🔴' :
-               manualOffline.offline_reason === 'panne' ? '🔧' :
-               manualOffline.offline_reason === 'vakantie' ? '🌴' : '⚠️'}
+              {manualOffline.offline_reason === 'volzet' ? '' :
+               manualOffline.offline_reason === 'panne' ? '' :
+               manualOffline.offline_reason === 'vakantie' ? '' : ''}
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">
               {manualOffline.offline_reason === 'volzet' ? t('shopOffline.bannerVolzet') :
@@ -719,7 +719,7 @@ export default function MenuPageClient({
                     className="flex items-start gap-2 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium"
                     style={{ backgroundColor: primaryColor + '28', borderLeft: `4px solid ${primaryColor}` }}
                   >
-                    <span className="text-base shrink-0 leading-none">📢</span>
+                    <span className="text-base shrink-0 leading-none"></span>
                     <span className={`${theme.text} leading-snug`}>
                       <strong>{line}</strong>
                       {closing.reason ? ` — ${closing.reason}` : ''}
@@ -743,7 +743,7 @@ export default function MenuPageClient({
                     : 'bg-green-100 text-green-700 active:bg-green-200'
                 }`}
               >
-                🎁 {t('menuPage.promotions')}
+                 {t('menuPage.promotions')}
               </button>
             )}
             {menuItems.some(i => i.is_popular) && (
@@ -756,7 +756,7 @@ export default function MenuPageClient({
                     : `${theme.pill} ${theme.pillHover}`
                 }`}
               >
-                🔥 {t('menuPage.popular')}
+                 {t('menuPage.popular')}
               </button>
             )}
             {categories.map((cat) => (
@@ -791,7 +791,7 @@ export default function MenuPageClient({
               <span className="w-3 self-stretch flex-shrink-0" style={{ backgroundColor: primaryColor }}></span>
               <div className="relative flex-1 px-4 py-3 flex items-center gap-2 overflow-hidden" style={{ backgroundColor: primaryColor + '35' }}>
                 <h2 className={`text-xl font-bold ${theme.text} flex items-center gap-2`}>
-                  <span className="text-2xl">🎁</span> {t('menuPage.promotions')}
+                  <span className="text-2xl"></span> {t('menuPage.promotions')}
                 </h2>
               </div>
             </div>
@@ -825,7 +825,7 @@ export default function MenuPageClient({
                       ) : linkedProduct?.image_url ? (
                         <Image src={linkedProduct.image_url} alt={promo.name} fill sizes="(max-width: 640px) 100vw, 480px" quality={lite ? 40 : 60} loading="lazy" className="object-cover" />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-5xl bg-gradient-to-br from-green-400 to-green-600">🎁</div>
+                        <div className="w-full h-full flex items-center justify-center text-5xl bg-gradient-to-br from-green-400 to-green-600"></div>
                       )}
                       <div className="absolute top-2 left-2">
                         <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
@@ -864,7 +864,7 @@ export default function MenuPageClient({
               <span className="w-3 self-stretch flex-shrink-0" style={{ backgroundColor: primaryColor }}></span>
               <div className="relative flex-1 px-4 py-3 flex items-center gap-2 overflow-hidden" style={{ backgroundColor: primaryColor + '35' }}>
                 <h2 className={`text-xl font-bold ${theme.text} flex items-center gap-2`}>
-                  <span className="text-2xl">🔥</span> {t('menuPage.popular')}
+                  <span className="text-2xl"></span> {t('menuPage.popular')}
                 </h2>
               </div>
             </div>
@@ -929,7 +929,7 @@ export default function MenuPageClient({
         {/* Geen producten message */}
         {menuItems.length === 0 && promotions.length === 0 && (
           <div className="text-center py-20">
-            <span className="text-6xl mb-4 block">🍟</span>
+            <span className="text-6xl mb-4 block"></span>
             <h2 className={`text-2xl font-bold ${theme.text} mb-2`}>{t('menuPage.noProducts')}</h2>
             <p className={theme.textLight}>{t('menuPage.noProductsDesc')}</p>
           </div>
@@ -965,7 +965,7 @@ export default function MenuPageClient({
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-8xl">
-                    🍟
+                    
                   </div>
                 )}
                 <button
@@ -978,7 +978,7 @@ export default function MenuPageClient({
                 </button>
                 <div className="absolute bottom-4 left-4 flex gap-2">
                   {selectedItem.is_popular && (
-                    <span style={{ backgroundColor: primaryColor }} className="text-white text-sm font-bold px-3 py-1 rounded-full">🔥 POPULAIR</span>
+                    <span style={{ backgroundColor: primaryColor }} className="text-white text-sm font-bold px-3 py-1 rounded-full"> POPULAIR</span>
                   )}
                 </div>
               </div>
@@ -1001,7 +1001,7 @@ export default function MenuPageClient({
                           key={allergen}
                           className={`text-sm px-3 py-1.5 rounded-full ${ALLERGEN_ICONS[allergen.toLowerCase()]?.color || 'bg-gray-100 text-gray-600'}`}
                         >
-                          {ALLERGEN_ICONS[allergen.toLowerCase()]?.icon || '⚠️'} {ALLERGEN_ICONS[allergen.toLowerCase()]?.label || allergen}
+                          {ALLERGEN_ICONS[allergen.toLowerCase()]?.icon || ''} {ALLERGEN_ICONS[allergen.toLowerCase()]?.label || allergen}
                         </span>
                       ))}
                     </div>
@@ -1087,7 +1087,7 @@ export default function MenuPageClient({
                   style={{ backgroundColor: selectedItem.is_available && canAddToCart() ? primaryColor : undefined }}
                   className={`w-full disabled:bg-gray-300 text-white font-bold rounded-2xl transition-colors flex items-center justify-center gap-2 hover:opacity-90 touch-manipulation ${lite ? 'py-5 text-lg min-h-[58px]' : 'py-4'}`}
                 >
-                  <span>🛒</span>
+                  <span></span>
                   <span>{modalQuantity > 1 ? `${modalQuantity}x ` : ''}{t('menuPage.addToOrder')}</span>
                   <span className="bg-white/20 px-2 py-0.5 rounded-full text-sm">€{(calculateTotalPrice() * modalQuantity).toFixed(2)}</span>
                 </button>
@@ -1148,7 +1148,7 @@ export default function MenuPageClient({
               <div className="p-4 sm:p-6 flex-1 overflow-y-auto max-h-[55vh] sm:max-h-[60vh]">
                 {cart.length === 0 ? (
                   <div className="text-center py-12">
-                    <span className="text-6xl mb-4 block">🛒</span>
+                    <span className="text-6xl mb-4 block"></span>
                     <p className={theme.textLight}>{t('menuPage.emptyCart')}</p>
                   </div>
                 ) : (
@@ -1167,7 +1167,7 @@ export default function MenuPageClient({
                             />
                           </div>
                         ) : (
-                          <div className={`w-20 h-20 ${darkMode ? 'bg-[#444]' : 'bg-gray-200'} rounded-lg flex items-center justify-center text-3xl`}>🍟</div>
+                          <div className={`w-20 h-20 ${darkMode ? 'bg-[#444]' : 'bg-gray-200'} rounded-lg flex items-center justify-center text-3xl`}></div>
                         )}
                         <div className="flex-1">
                           <h3 className={`font-semibold ${theme.text}`}>{cartItem.item.name}</h3>
@@ -1178,7 +1178,7 @@ export default function MenuPageClient({
                           )}
                           {cartItem.notes && (
                             <div className="text-sm text-orange-500 font-medium mt-1">
-                              ⚠️ {cartItem.notes}
+                               {cartItem.notes}
                             </div>
                           )}
                           <p style={darkMode ? {} : { color: primaryColor }} className={`font-bold ${darkMode ? 'text-white' : ''}`}>€{(cartItem.totalPrice * cartItem.quantity).toFixed(2)}</p>

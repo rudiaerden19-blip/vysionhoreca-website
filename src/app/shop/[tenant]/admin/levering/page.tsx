@@ -92,9 +92,9 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
             <span>{t('adminPages.common.saving')}</span>
           </>
         ) : saved ? (
-          <><span>✓</span><span>{t('adminPages.common.saved')}</span></>
+          <><span></span><span>{t('adminPages.common.saved')}</span></>
         ) : (
-          <><span>💾</span><span>{t('adminPages.common.save')}</span></>
+          <><span></span><span>{t('adminPages.common.save')}</span></>
         )}
       </motion.button>
 
@@ -122,7 +122,7 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
         >
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
-              <span className="text-3xl">🛍️</span>
+              <span className="text-3xl"></span>
               <div>
                 <h2 className="text-lg font-semibold text-gray-900">{t('adminPages.levering.pickup.title')}</h2>
                 <p className="text-gray-500 text-sm">{t('adminPages.levering.pickup.enabled')}</p>
@@ -166,7 +166,7 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
         >
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
-              <span className="text-3xl">🚗</span>
+              <span className="text-3xl"></span>
               <div>
                 <h2 className="text-lg font-semibold text-gray-900">{t('adminPages.levering.delivery.title')}</h2>
                 <p className="text-gray-500 text-sm">{t('adminPages.levering.delivery.enabled')}</p>
@@ -256,14 +256,14 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-            <span>💳</span> {t('adminPages.betaling.methods')}
+            <span></span> {t('adminPages.betaling.methods')}
           </h2>
           
           <div className="space-y-2">
             {[
-              { key: 'payment_cash', icon: '💵', label: t('adminPages.betaling.cash'), desc: t('adminPages.betaling.cashDesc') },
-              { key: 'payment_card', icon: '💳', label: t('adminPages.betaling.bancontact'), desc: t('adminPages.betaling.bancontactDesc') },
-              { key: 'payment_online', icon: '🌐', label: 'Online betaling', desc: 'Betaling via link of QR-code' },
+              { key: 'payment_cash', icon: '', label: t('adminPages.betaling.cash'), desc: t('adminPages.betaling.cashDesc') },
+              { key: 'payment_card', icon: '', label: t('adminPages.betaling.bancontact'), desc: t('adminPages.betaling.bancontactDesc') },
+              { key: 'payment_online', icon: '', label: 'Online betaling', desc: 'Betaling via link of QR-code' },
             ].map(({ key, icon, label, desc }) => {
               const val = !!(settings as any)[key]
               return (
@@ -295,11 +295,11 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
           transition={{ delay: 0.3 }}
           className="bg-blue-50 border border-blue-200 rounded-2xl p-5"
         >
-          <p className="text-xs font-semibold text-blue-400 uppercase tracking-wider mb-3">📋 Overzicht instellingen</p>
+          <p className="text-xs font-semibold text-blue-400 uppercase tracking-wider mb-3"> Overzicht instellingen</p>
           <div className="grid md:grid-cols-3 gap-3">
             <div className="bg-white rounded-xl p-4 shadow-sm">
               <div className="flex items-center gap-2 mb-1">
-                <span>🛍️</span>
+                <span></span>
                 <span className="font-medium text-gray-900 text-sm">{t('adminPages.levering.pickup.title')}</span>
               </div>
               <p className="text-gray-500 text-sm">
@@ -308,7 +308,7 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
             </div>
             <div className="bg-white rounded-xl p-4 shadow-sm">
               <div className="flex items-center gap-2 mb-1">
-                <span>🚗</span>
+                <span></span>
                 <span className="font-medium text-gray-900 text-sm">{t('adminPages.levering.delivery.title')}</span>
               </div>
               <p className="text-gray-500 text-sm">
@@ -317,7 +317,7 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
             </div>
             <div className="bg-white rounded-xl p-4 shadow-sm">
               <div className="flex items-center gap-2 mb-1">
-                <span>💳</span>
+                <span></span>
                 <span className="font-medium text-gray-900 text-sm">{t('adminPages.betaling.methods')}</span>
               </div>
               <p className="text-gray-500 text-sm">

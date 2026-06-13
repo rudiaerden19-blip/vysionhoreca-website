@@ -95,13 +95,13 @@ export default function TekstenPage({ params }: { params: { tenant: string } }) 
   }
 
   const textFields: { section: string; icon: string; fields: { key: string; label: string; placeholder: string; multiline?: boolean }[] }[] = [
-    { section: t('websiteTexts.buttons'), icon: '🔘', fields: [
+    { section: t('websiteTexts.buttons'), icon: '', fields: [
       { key: 'order_button_text', label: t('websiteTexts.orderButton'), placeholder: t('websiteTexts.orderButtonPlaceholder') },
       { key: 'pickup_label', label: t('websiteTexts.pickupLabel'), placeholder: t('websiteTexts.pickupPlaceholder') },
       { key: 'delivery_label', label: t('websiteTexts.deliveryLabel'), placeholder: t('websiteTexts.deliveryPlaceholder') },
       { key: 'checkout_button_text', label: t('websiteTexts.checkoutButton'), placeholder: t('websiteTexts.checkoutPlaceholder') },
     ]},
-    { section: t('websiteTexts.messages'), icon: '💬', fields: [
+    { section: t('websiteTexts.messages'), icon: '', fields: [
       { key: 'closed_message', label: t('websiteTexts.closedMessage'), placeholder: t('websiteTexts.closedPlaceholder') },
       { key: 'min_order_message', label: t('websiteTexts.minOrderMessage'), placeholder: t('websiteTexts.minOrderPlaceholder') },
       { key: 'cart_empty_message', label: t('websiteTexts.cartEmptyMessage'), placeholder: t('websiteTexts.cartEmptyPlaceholder') },
@@ -132,7 +132,7 @@ export default function TekstenPage({ params }: { params: { tenant: string } }) 
           saved ? 'bg-green-500 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'
         }`}
       >
-        {saving ? `⏳ ${t('adminPages.common.saving')}` : saved ? `✓ ${t('adminPages.common.saved')}` : `💾 ${t('adminPages.common.save')}`}
+        {saving ? `⏳ ${t('adminPages.common.saving')}` : saved ? ` ${t('adminPages.common.saved')}` : ` ${t('adminPages.common.save')}`}
       </motion.button>
 
       {/* Header */}
@@ -192,7 +192,7 @@ export default function TekstenPage({ params }: { params: { tenant: string } }) 
         transition={{ delay: 0.4 }}
         className="mt-6 bg-blue-50 border border-blue-200 rounded-2xl p-6"
       >
-        <h3 className="font-semibold text-blue-900 mb-2">💡 {t('websiteTexts.tip')}</h3>
+        <h3 className="font-semibold text-blue-900 mb-2"> {t('websiteTexts.tip')}</h3>
         <p className="text-blue-700 text-sm">
           {t('websiteTexts.tipText')}
         </p>

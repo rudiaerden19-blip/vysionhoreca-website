@@ -154,7 +154,6 @@ export default function PinGate({ tenant, children }: Props) {
         <div className="bg-white rounded-2xl shadow-lg p-8 max-w-sm w-full">
           <button onClick={() => { setState('locked'); setForgotStep('email'); setError(''); setNewPin(''); setConfirmPin(''); setForgotEmail('') }}
             className="text-gray-400 hover:text-gray-600 text-sm mb-4">{t('pinGate.back')}</button>
-          <div className="text-4xl mb-3 text-center">🔑</div>
           <h2 className="text-xl font-bold text-center mb-6">{t('pinGate.forgotTitle')}</h2>
 
           {forgotStep === 'email' ? (
@@ -199,7 +198,6 @@ export default function PinGate({ tenant, children }: Props) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
       <div className="bg-white rounded-2xl shadow-lg p-8 max-w-xs w-full text-center">
-        <div className="text-4xl mb-2">🔐</div>
         <h2 className="text-xl font-bold mb-1">{t('pinGate.ownerPinTitle')}</h2>
         <p className="text-gray-500 text-sm mb-6">{t('pinGate.enterPinHelp')}</p>
 

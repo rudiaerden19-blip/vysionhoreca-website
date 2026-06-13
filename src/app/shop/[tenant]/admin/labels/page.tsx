@@ -139,7 +139,7 @@ export default function LabelsPage({ params }: { params: { tenant: string } }) {
         </div>
         ${label.group_member_name || label.customer_name ? `
           <div style="font-size: 10pt; margin-bottom: 1mm;">
-            👤 ${label.group_member_name || label.customer_name}
+             ${label.group_member_name || label.customer_name}
             ${label.department ? ` - ${label.department}` : ''}
           </div>
         ` : ''}
@@ -150,7 +150,7 @@ export default function LabelsPage({ params }: { params: { tenant: string } }) {
         ` : ''}
         ${label.notes ? `
           <div style="font-size: 8pt; font-style: italic; color: #888;">
-            📝 ${label.notes}
+             ${label.notes}
           </div>
         ` : ''}
       </div>
@@ -210,7 +210,7 @@ export default function LabelsPage({ params }: { params: { tenant: string } }) {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">🏷️ Label Printer</h1>
+          <h1 className="text-2xl font-bold text-gray-900"> Label Printer</h1>
           <p className="text-gray-600">{t('labelsPage.subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
@@ -219,7 +219,7 @@ export default function LabelsPage({ params }: { params: { tenant: string } }) {
               onClick={() => printLabels(labels.filter(l => selectedLabels.has(l.id)))}
               className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl font-medium"
             >
-              🖨️ {t('labelsPage.printSelected')} ({selectedLabels.size})
+               {t('labelsPage.printSelected')} ({selectedLabels.size})
             </button>
           )}
           {labels.length > 0 && (
@@ -227,7 +227,7 @@ export default function LabelsPage({ params }: { params: { tenant: string } }) {
               onClick={() => printLabels(labels)}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-medium"
             >
-              🖨️ {t('labelsPage.printAll')} ({labels.length})
+               {t('labelsPage.printAll')} ({labels.length})
             </button>
           )}
         </div>
@@ -260,7 +260,7 @@ export default function LabelsPage({ params }: { params: { tenant: string } }) {
           animate={{ opacity: 1 }}
           className="bg-gray-50 rounded-2xl p-12 text-center"
         >
-          <span className="text-6xl mb-4 block">✅</span>
+          <span className="text-6xl mb-4 block"></span>
           <h2 className="text-xl font-bold text-gray-900 mb-2">{t('labelsPage.noLabels')}</h2>
           <p className="text-gray-600">{t('labelsPage.noLabelsDesc')}</p>
         </motion.div>
@@ -299,13 +299,13 @@ export default function LabelsPage({ params }: { params: { tenant: string } }) {
                   <div className="font-bold text-gray-900">{label.product_name}</div>
                   <div className="text-sm text-gray-500 flex items-center gap-3">
                     {(label.group_member_name || label.customer_name) && (
-                      <span>👤 {label.group_member_name || label.customer_name}</span>
+                      <span> {label.group_member_name || label.customer_name}</span>
                     )}
-                    {label.department && <span>📁 {label.department}</span>}
-                    <span>🕐 {formatTime(label.created_at)}</span>
+                    {label.department && <span> {label.department}</span>}
+                    <span> {formatTime(label.created_at)}</span>
                   </div>
                   {label.notes && (
-                    <div className="text-sm text-gray-400 mt-1">📝 {label.notes}</div>
+                    <div className="text-sm text-gray-400 mt-1"> {label.notes}</div>
                   )}
                 </div>
                 
@@ -313,7 +313,7 @@ export default function LabelsPage({ params }: { params: { tenant: string } }) {
                   onClick={() => printLabels([label])}
                   className="px-3 py-1 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 text-sm font-medium"
                 >
-                  🖨️ {t('labelsPage.print')}
+                   {t('labelsPage.print')}
                 </button>
               </motion.div>
             ))}

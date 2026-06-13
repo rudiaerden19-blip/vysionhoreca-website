@@ -141,11 +141,11 @@ export default function GroupsPage({ params }: { params: { tenant: string } }) {
   }
 
   const groupTypeLabels: Record<string, string> = {
-    company: `🏢 ${t('groupsModule.groups.typeCompany')}`,
-    school: `🏫 ${t('groupsModule.groups.typeSchool')}`,
-    organization: `🏛️ ${t('groupsModule.groups.typeOrganization')}`,
-    event: `🎉 ${t('groupsModule.groups.typeEvent')}`,
-    other: `📋 ${t('groupsModule.groups.typeOther')}`
+    company: ` ${t('groupsModule.groups.typeCompany')}`,
+    school: ` ${t('groupsModule.groups.typeSchool')}`,
+    organization: ` ${t('groupsModule.groups.typeOrganization')}`,
+    event: ` ${t('groupsModule.groups.typeEvent')}`,
+    other: ` ${t('groupsModule.groups.typeOther')}`
   }
 
   if (!featureEnabled) {
@@ -157,23 +157,23 @@ export default function GroupsPage({ params }: { params: { tenant: string } }) {
           animate={{ opacity: 1, y: 0 }}
           className="bg-gradient-to-br from-purple-600 to-blue-600 rounded-3xl p-8 text-white text-center"
         >
-          <span className="text-6xl mb-4 block">👥</span>
+          <span className="text-6xl mb-4 block"></span>
           <h1 className="text-3xl font-bold mb-4">{t('groupsModule.groups.promoTitle')}</h1>
           <p className="text-xl opacity-90 mb-6">{t('groupsModule.groups.promoSubtitle')}</p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 text-left">
             <div className="bg-white/10 rounded-xl p-4">
-              <span className="text-2xl">🏢</span>
+              <span className="text-2xl"></span>
               <h3 className="font-bold mt-2">{t('groupsModule.groups.featureCompanies')}</h3>
               <p className="text-sm opacity-80">{t('groupsModule.groups.featureCompaniesDesc')}</p>
             </div>
             <div className="bg-white/10 rounded-xl p-4">
-              <span className="text-2xl">📋</span>
+              <span className="text-2xl"></span>
               <h3 className="font-bold mt-2">{t('groupsModule.groups.featureSessions')}</h3>
               <p className="text-sm opacity-80">{t('groupsModule.groups.featureSessionsDesc')}</p>
             </div>
             <div className="bg-white/10 rounded-xl p-4">
-              <span className="text-2xl">🏷️</span>
+              <span className="text-2xl"></span>
               <h3 className="font-bold mt-2">{t('groupsModule.groups.featureLabels')}</h3>
               <p className="text-sm opacity-80">{t('groupsModule.groups.featureLabelsDesc')}</p>
             </div>
@@ -200,7 +200,7 @@ export default function GroupsPage({ params }: { params: { tenant: string } }) {
       <ConfirmModal />
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">👥 {t('groupsModule.groups.pageTitle')}</h1>
+          <h1 className="text-2xl font-bold text-gray-900"> {t('groupsModule.groups.pageTitle')}</h1>
           <p className="text-gray-600">{t('groupsModule.groups.pageSubtitle')}</p>
         </div>
         <button
@@ -221,7 +221,7 @@ export default function GroupsPage({ params }: { params: { tenant: string } }) {
           animate={{ opacity: 1 }}
           className="bg-gray-50 rounded-2xl p-12 text-center"
         >
-          <span className="text-6xl mb-4 block">🏢</span>
+          <span className="text-6xl mb-4 block"></span>
           <h2 className="text-xl font-bold text-gray-900 mb-2">{t('groupsModule.groups.noGroups')}</h2>
           <p className="text-gray-600 mb-4">{t('groupsModule.groups.noGroupsDesc')}</p>
           <button
@@ -250,7 +250,7 @@ export default function GroupsPage({ params }: { params: { tenant: string } }) {
                     <span className={`text-xs px-2 py-1 rounded-full ${
                       group.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
                     }`}>
-                      {group.status === 'active' ? `✓ ${t('groupsModule.groups.active')}` : group.status}
+                      {group.status === 'active' ? ` ${t('groupsModule.groups.active')}` : group.status}
                     </span>
                   </div>
 
@@ -266,15 +266,15 @@ export default function GroupsPage({ params }: { params: { tenant: string } }) {
 
                   {(group.address_street || group.address_city) && (
                     <div className="mt-2 text-sm text-gray-500">
-                      📍 {[group.address_street, group.address_postal, group.address_city].filter(Boolean).join(', ')}
+                       {[group.address_street, group.address_postal, group.address_city].filter(Boolean).join(', ')}
                     </div>
                   )}
                 </div>
 
                 <div className="flex items-center gap-2 ml-4">
-                  <button onClick={() => openEditModal(group)} className="p-2 hover:bg-gray-100 rounded-lg text-gray-600" title={t('groupsModule.groups.editGroup')}>✏️</button>
-                  <a href={`/shop/${params.tenant}/admin/groepen/leden?group=${group.id}`} className="p-2 hover:bg-gray-100 rounded-lg text-gray-600" title={t('groupsModule.groups.members')}>👥</a>
-                  <button onClick={() => archiveGroup(group.id)} className="p-2 hover:bg-red-50 rounded-lg text-red-500" title="Archiveren">🗑️</button>
+                  <button onClick={() => openEditModal(group)} className="p-2 hover:bg-gray-100 rounded-lg text-gray-600" title={t('groupsModule.groups.editGroup')}></button>
+                  <a href={`/shop/${params.tenant}/admin/groepen/leden?group=${group.id}`} className="p-2 hover:bg-gray-100 rounded-lg text-gray-600" title={t('groupsModule.groups.members')}></a>
+                  <button onClick={() => archiveGroup(group.id)} className="p-2 hover:bg-red-50 rounded-lg text-red-500" title="Archiveren"></button>
                 </div>
               </div>
             </motion.div>
@@ -302,11 +302,11 @@ export default function GroupsPage({ params }: { params: { tenant: string } }) {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">{t('groupsModule.groups.type')}</label>
                   <select value={formData.group_type} onChange={(e) => setFormData({ ...formData, group_type: e.target.value })} className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <option value="company">🏢 {t('groupsModule.groups.typeCompany')}</option>
-                    <option value="school">🏫 {t('groupsModule.groups.typeSchool')}</option>
-                    <option value="organization">🏛️ {t('groupsModule.groups.typeOrganization')}</option>
-                    <option value="event">🎉 {t('groupsModule.groups.typeEvent')}</option>
-                    <option value="other">📋 {t('groupsModule.groups.typeOther')}</option>
+                    <option value="company"> {t('groupsModule.groups.typeCompany')}</option>
+                    <option value="school"> {t('groupsModule.groups.typeSchool')}</option>
+                    <option value="organization"> {t('groupsModule.groups.typeOrganization')}</option>
+                    <option value="event"> {t('groupsModule.groups.typeEvent')}</option>
+                    <option value="other"> {t('groupsModule.groups.typeOther')}</option>
                   </select>
                 </div>
                 <div>

@@ -50,7 +50,7 @@ export function KassaPaymentModal({
         <div className={hdr}>
           <h3 className={titleCls}>{t('kassaApp.payTitle')}</h3>
           <button type="button" onClick={onClose} className={btnCloseCls}>
-            ✕
+            
           </button>
         </div>
         <div className="p-6">
@@ -67,7 +67,6 @@ export function KassaPaymentModal({
                 className={btnTile}
                 style={{ borderColor: pm.color }}
               >
-                <span className="text-4xl">{pm.icon}</span>
                 <span style={{ color: pm.color }}>{pm.label}</span>
               </button>
             ))}
@@ -77,7 +76,6 @@ export function KassaPaymentModal({
               className={`col-span-2 ${btnTile}`}
               style={{ borderColor: '#8b5cf6' }}
             >
-              <span className="text-4xl">👛</span>
               <span style={{ color: '#8b5cf6' }}>{t('kassaApp.splitPay')}</span>
             </button>
           </div>

@@ -90,9 +90,6 @@ export function AdminHamburgerMenu({ tenantSlug }: { tenantSlug: string }) {
               onClick={closeAll}
               className="flex items-center gap-3 border-b border-gray-100 px-4 py-3 text-sm font-semibold text-gray-800 transition-colors hover:bg-blue-50"
             >
-              <span className="text-lg" aria-hidden>
-                🏠
-              </span>
               <span>{t('adminLayout.overview')}</span>
             </Link>
             {filteredModules.map((mod) => (
@@ -109,7 +106,6 @@ export function AdminHamburgerMenu({ tenantSlug }: { tenantSlug: string }) {
                       onClick={closeAll}
                       className="flex min-w-0 flex-1 items-center gap-3 px-4 py-3 no-underline"
                     >
-                      <span className="text-lg">{mod.icon}</span>
                       <span className="text-sm font-semibold text-gray-700">
                         {mod.labelKey ? t(mod.labelKey) : mod.label}
                       </span>
@@ -120,7 +116,6 @@ export function AdminHamburgerMenu({ tenantSlug }: { tenantSlug: string }) {
                       onClick={() => setSubOpen(subOpen === mod.rowKey ? null : mod.rowKey)}
                       className="flex min-w-0 flex-1 items-center gap-3 px-4 py-3 text-left"
                     >
-                      <span className="text-lg">{mod.icon}</span>
                       <span className="text-sm font-semibold text-gray-700">
                         {mod.labelKey ? t(mod.labelKey) : mod.label}
                       </span>
@@ -147,7 +142,6 @@ export function AdminHamburgerMenu({ tenantSlug }: { tenantSlug: string }) {
               style={{ width: 220, maxWidth: 'none' }}
             >
               <div className="sticky top-0 flex items-center gap-2 rounded-t-2xl bg-[#1e293b] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white">
-                <span>{activeMod.icon}</span>{' '}
                 {activeMod.labelKey ? t(activeMod.labelKey) : activeMod.label}
               </div>
               {activeMod.items.map((item) => (
@@ -158,7 +152,6 @@ export function AdminHamburgerMenu({ tenantSlug }: { tenantSlug: string }) {
                   onClick={closeAll}
                   className="flex items-center gap-3 border-b border-gray-100 px-4 py-3 text-sm text-gray-700 transition-colors hover:bg-blue-50"
                 >
-                  <span>{item.icon}</span>
                   <span>{item.labelKey ? t(item.labelKey) : item.label}</span>
                 </Link>
               ))}

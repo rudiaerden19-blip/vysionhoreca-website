@@ -45,7 +45,7 @@ export default function ResellersPage() {
     return COUNTRY_CODES.map((code) => ({
       code,
       name: names.of(code) ?? code,
-      flag: FLAGS[code] ?? '🏳️',
+      flag: FLAGS[code] ?? '',
     }))
   }, [locale])
   const [formData, setFormData] = useState({
@@ -89,12 +89,12 @@ export default function ResellersPage() {
   }
 
   const benefits = [
-    { icon: '💰', titleKey: 'benefit1Title', descKey: 'benefit1Desc' },
-    { icon: '🌍', titleKey: 'benefit2Title', descKey: 'benefit2Desc' },
-    { icon: '📱', titleKey: 'benefit3Title', descKey: 'benefit3Desc' },
-    { icon: '🎯', titleKey: 'benefit4Title', descKey: 'benefit4Desc' },
-    { icon: '🛠️', titleKey: 'benefit5Title', descKey: 'benefit5Desc' },
-    { icon: '📈', titleKey: 'benefit6Title', descKey: 'benefit6Desc' },
+    { icon: '', titleKey: 'benefit1Title', descKey: 'benefit1Desc' },
+    { icon: '', titleKey: 'benefit2Title', descKey: 'benefit2Desc' },
+    { icon: '', titleKey: 'benefit3Title', descKey: 'benefit3Desc' },
+    { icon: '', titleKey: 'benefit4Title', descKey: 'benefit4Desc' },
+    { icon: '', titleKey: 'benefit5Title', descKey: 'benefit5Desc' },
+    { icon: '', titleKey: 'benefit6Title', descKey: 'benefit6Desc' },
   ]
 
   const faqs = [
@@ -127,7 +127,7 @@ export default function ResellersPage() {
             transition={{ duration: 0.6 }}
           >
             <span className="inline-block px-4 py-2 bg-white/95 text-accent rounded-full text-sm font-semibold mb-6 shadow-sm border border-white/50">
-              🤝 {t('resellersPage.badge')}
+               {t('resellersPage.badge')}
             </span>
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 drop-shadow-md">
               {t('resellersPage.heroTitle')}
@@ -212,7 +212,7 @@ export default function ResellersPage() {
               animate={{ opacity: 1, scale: 1 }}
               className="bg-green-50 border border-green-200 rounded-2xl p-8 text-center"
             >
-              <span className="text-5xl mb-4 block">✅</span>
+              <span className="text-5xl mb-4 block"></span>
               <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('resellersPage.successTitle')}</h3>
               <p className="text-gray-700">{t('resellersPage.successDesc')}</p>
             </motion.div>
@@ -286,7 +286,7 @@ export default function ResellersPage() {
                         {country.flag} {country.name}
                       </option>
                     ))}
-                    <option value="OTHER">🌍 {t('resellersPage.otherCountry')}</option>
+                    <option value="OTHER"> {t('resellersPage.otherCountry')}</option>
                   </select>
                 </div>
                 <div>
@@ -367,7 +367,7 @@ export default function ResellersPage() {
                     {t('resellersPage.submitting')}
                   </span>
                 ) : (
-                  `🚀 ${t('resellersPage.submit')}`
+                  ` ${t('resellersPage.submit')}`
                 )}
               </motion.button>
             </form>
@@ -412,7 +412,7 @@ export default function ResellersPage() {
             href="#aanmelden"
             className="inline-block px-8 py-4 bg-accent hover:bg-accent/90 text-white rounded-full font-bold text-lg transition-all shadow-lg"
           >
-            🤝 {t('resellersPage.ctaButton')}
+             {t('resellersPage.ctaButton')}
           </a>
         </div>
       </section>

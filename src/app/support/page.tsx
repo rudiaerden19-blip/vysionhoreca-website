@@ -48,7 +48,7 @@ export default function SupportPage() {
                 className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-[#3C4D6B] text-2xl text-white"
                 aria-hidden
               >
-                🖨️
+                
               </div>
               <div>
                 <h2 className="text-xl font-bold text-gray-900">Bonprinter op de kassa (Windows)</h2>

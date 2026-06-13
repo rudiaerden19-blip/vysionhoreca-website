@@ -298,7 +298,7 @@ export default function PopulairPage({ params }: { params: { tenant: string } })
           animate={{ opacity: 1, y: 0 }}
           className="text-center py-16 bg-white rounded-2xl shadow-sm"
         >
-          <span className="text-6xl mb-4 block">📊</span>
+          <span className="text-6xl mb-4 block"></span>
           <h3 className="text-xl font-bold text-gray-900 mb-2">{t('popularPage.noSalesData')}</h3>
           <p className="text-gray-500">
             {t('popularPage.noOrdersPeriod').replace('{period}', t(`popularPage.periodLabels.${period}`))}
@@ -325,7 +325,7 @@ export default function PopulairPage({ params }: { params: { tenant: string } })
               >
                 <div className="flex items-start justify-between mb-4">
                   <span className="text-4xl font-black">#{product.rank}</span>
-                  <span className="text-3xl">{i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}</span>
+                  <span className="text-3xl">{i === 0 ? '' : i === 1 ? '' : ''}</span>
                 </div>
                 <h3 className="text-xl font-bold mb-1">{product.name}</h3>
                 <p className="text-white/70 text-sm mb-4">{product.category}</p>

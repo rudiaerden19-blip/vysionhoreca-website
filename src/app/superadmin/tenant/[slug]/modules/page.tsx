@@ -229,11 +229,11 @@ export default function SuperadminTenantModulesPage() {
               </p>
               <ul className="mt-3 space-y-2 text-sm text-slate-200">
                 <li className="flex items-center justify-between gap-4 rounded-xl border border-slate-600/60 bg-slate-800/50 px-4 py-3">
-                  <span>🏠 Overzicht (dashboard)</span>
+                  <span> Overzicht (dashboard)</span>
                   <span className="text-xs font-semibold text-emerald-400">Aan · vast</span>
                 </li>
                 <li className="flex items-center justify-between gap-4 rounded-xl border border-slate-600/60 bg-slate-800/50 px-4 py-3">
-                  <span>📋 Abonnement / facturatie (/abonnement)</span>
+                  <span> Abonnement / facturatie (/abonnement)</span>
                   <span className="text-xs font-semibold text-emerald-400">Aan · vast</span>
                 </li>
               </ul>
@@ -266,7 +266,6 @@ export default function SuperadminTenantModulesPage() {
                           className="flex items-center justify-between gap-4 rounded-lg bg-slate-900/40 px-3 py-2.5"
                         >
                           <span className="text-sm text-slate-200">
-                            <span className="mr-2">{it.icon}</span>
                             {it.labelKey ? t(it.labelKey) : it.label}
                           </span>
                           <ModuleSlider

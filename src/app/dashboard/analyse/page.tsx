@@ -127,7 +127,7 @@ export default function AnalysePage() {
           <div className="space-y-4">
             <div>
               <div className="flex justify-between mb-1">
-                <span className="text-gray-600">🏪 {trans('charts.pos')}</span>
+                <span className="text-gray-600"> {trans('charts.pos')}</span>
                 <span className="font-semibold">{formatCurrency(kassaRevenue)}</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-3">
@@ -139,7 +139,7 @@ export default function AnalysePage() {
             </div>
             <div>
               <div className="flex justify-between mb-1">
-                <span className="text-gray-600">🌐 {trans('charts.online')}</span>
+                <span className="text-gray-600"> {trans('charts.online')}</span>
                 <span className="font-semibold">{formatCurrency(onlineRevenue)}</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-3">
@@ -185,9 +185,9 @@ export default function AnalysePage() {
               topHours.map(([hour, count], index) => (
                 <div key={hour} className="flex items-center justify-between">
                   <span className="text-gray-600">
-                    {index === 0 && '🥇 '}
-                    {index === 1 && '🥈 '}
-                    {index === 2 && '🥉 '}
+                    {index === 0 && ' '}
+                    {index === 1 && ' '}
+                    {index === 2 && ' '}
                     {hour}:00 - {parseInt(hour) + 1}:00
                   </span>
                   <span className="font-semibold">{count} {trans('charts.orders')}</span>

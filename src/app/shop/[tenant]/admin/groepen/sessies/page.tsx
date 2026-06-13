@@ -74,18 +74,18 @@ export default function SessionsPage({ params }: { params: { tenant: string } })
   }
 
   const statusLabels: Record<string, string> = {
-    draft: `📝 ${t('groupsModule.sessions.statusDraft')}`,
-    open: `✅ ${t('groupsModule.sessions.statusOpen')}`,
-    closed: `🔒 ${t('groupsModule.sessions.statusClosed')}`,
-    delivered: `✓ ${t('groupsModule.sessions.statusDelivered')}`,
-    cancelled: `✗ ${t('groupsModule.sessions.statusCancelled')}`
+    draft: ` ${t('groupsModule.sessions.statusDraft')}`,
+    open: ` ${t('groupsModule.sessions.statusOpen')}`,
+    closed: ` ${t('groupsModule.sessions.statusClosed')}`,
+    delivered: ` ${t('groupsModule.sessions.statusDelivered')}`,
+    cancelled: ` ${t('groupsModule.sessions.statusCancelled')}`
   }
 
   return (
     <div className="max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">📋 {t('groupsModule.sessions.pageTitle')}</h1>
+          <h1 className="text-2xl font-bold text-gray-900"> {t('groupsModule.sessions.pageTitle')}</h1>
           <p className="text-gray-600">{t('groupsModule.sessions.pageSubtitle')}</p>
         </div>
         <button
@@ -100,7 +100,7 @@ export default function SessionsPage({ params }: { params: { tenant: string } })
       {groups.length === 0 && !loading && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
           <p className="text-yellow-800">
-            ⚠️ {t('groupsModule.sessions.noGroupWarning')}
+             {t('groupsModule.sessions.noGroupWarning')}
             <a href={`/shop/${params.tenant}/admin/groepen`} className="underline ml-1">{t('groupsModule.sessions.goToGroups')}</a>
           </p>
         </div>
@@ -110,7 +110,7 @@ export default function SessionsPage({ params }: { params: { tenant: string } })
         <div className="text-center py-12"><div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div></div>
       ) : sessions.length === 0 ? (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-gray-50 rounded-2xl p-12 text-center">
-          <span className="text-6xl mb-4 block">📋</span>
+          <span className="text-6xl mb-4 block"></span>
           <h2 className="text-xl font-bold text-gray-900 mb-2">{t('groupsModule.sessions.noSessions')}</h2>
           <p className="text-gray-600">{t('groupsModule.sessions.noSessionsDesc')}</p>
         </motion.div>
@@ -127,7 +127,7 @@ export default function SessionsPage({ params }: { params: { tenant: string } })
                       <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-700">⏰ {t('groupsModule.sessions.deadlinePassed')}</span>
                     )}
                   </div>
-                  <div className="text-sm text-gray-600 mb-3">🏢 {session.order_groups?.name}</div>
+                  <div className="text-sm text-gray-600 mb-3"> {session.order_groups?.name}</div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div><span className="text-gray-500">{t('groupsModule.sessions.deadline')}:</span><br /><span className="font-medium">{formatDate(session.order_deadline)}</span></div>
                     {session.delivery_time && <div><span className="text-gray-500">{t('groupsModule.sessions.delivery')}:</span><br /><span className="font-medium">{formatDate(session.delivery_time)}</span></div>}
@@ -139,16 +139,16 @@ export default function SessionsPage({ params }: { params: { tenant: string } })
                 <div className="flex flex-col gap-2 ml-4">
                   {session.status === 'open' && (
                     <button onClick={() => updateStatus(session.id, 'closed')} className="px-3 py-1 text-sm bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200">
-                      🔒 {t('groupsModule.sessions.close')}
+                       {t('groupsModule.sessions.close')}
                     </button>
                   )}
                   {session.status === 'closed' && (
                     <button onClick={() => updateStatus(session.id, 'delivered')} className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200">
-                      ✓ {t('groupsModule.sessions.markDelivered')}
+                       {t('groupsModule.sessions.markDelivered')}
                     </button>
                   )}
                   <a href={`/shop/${params.tenant}/admin/groepen/bestellingen?session=${session.id}`} className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-center">
-                    📦 {t('groupsModule.sessions.viewOrders')}
+                     {t('groupsModule.sessions.viewOrders')}
                   </a>
                 </div>
               </div>

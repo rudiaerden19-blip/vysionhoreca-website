@@ -1466,7 +1466,7 @@ export default function KassaFloorPlan({
 
           {tables.length === 0 && (
             <div className="absolute inset-0 flex flex-col items-center justify-center text-white/40">
-              <span className="text-6xl mb-4">🪑</span>
+              <span className="text-6xl mb-4"></span>
               <p className="text-lg font-semibold">{t('kassaApp.floorPlanNoTablesYet')}</p>
               <button onClick={() => setShowAddModal(true)}
                 className="mt-4 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold transition-colors">
@@ -1487,7 +1487,7 @@ export default function KassaFloorPlan({
                   ? t('kassaApp.floorPlanSidebarTitlePlant')
                   : t('kassaApp.floorPlanSidebarTitleBar')}
               </h3>
-              <button onClick={() => setSelectedDecor(null)} className="text-gray-400 hover:text-gray-700 text-xl">✕</button>
+              <button onClick={() => setSelectedDecor(null)} className="text-gray-400 hover:text-gray-700 text-xl"></button>
             </div>
 
             {/* Bar segment: kruk nummers + bestellingen + bestelling starten */}
@@ -1555,7 +1555,7 @@ export default function KassaFloorPlan({
                               ? { backgroundColor: STATUS_COLORS['UNPAID'] + '33', color: STATUS_COLORS['UNPAID'], border: `2px solid ${STATUS_COLORS['UNPAID']}` }
                               : { backgroundColor: '#d1d5db', color: '#374151' }
                             }>
-                            {statusLabels[s as TableStatus]}{warnUnpaid ? ' ⚠️' : ''}
+                            {statusLabels[s as TableStatus]}{warnUnpaid ? ' ' : ''}
                           </button>
                         )
                       })}
@@ -1568,13 +1568,13 @@ export default function KassaFloorPlan({
                           onClick={() => onCheckoutTable(stoolId)}
                           className="w-full py-3 rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold text-base transition-colors"
                         >
-                          💳 {t('kassaApp.floorPlanCheckoutStool').replace(/\{id\}/g, stoolId)}
+                           {t('kassaApp.floorPlanCheckoutStool').replace(/\{id\}/g, stoolId)}
                         </button>
                       )}
                       <button
                         onClick={() => { onSelectTable(stoolId); onClose() }}
                         className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-base transition-colors">
-                        🛒{' '}
+                        {' '}
                         {items.length > 0
                           ? t('kassaApp.floorPlanAddToStool').replace(/\{id\}/g, stoolId)
                           : t('kassaApp.floorPlanNewOrderStool').replace(/\{id\}/g, stoolId)}
@@ -1676,7 +1676,7 @@ export default function KassaFloorPlan({
                     {t('kassaApp.floorPlanSeatsLine').replace(/\{count\}/g, String(selected.seats))}
                   </p>
                 </div>
-                <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-700 text-xl">✕</button>
+                <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-700 text-xl"></button>
               </div>
 
               {/* Bestellingen */}
@@ -1759,7 +1759,7 @@ export default function KassaFloorPlan({
                           ? { backgroundColor: STATUS_COLORS['UNPAID'] + '33', color: STATUS_COLORS['UNPAID'], border: `2px solid ${STATUS_COLORS['UNPAID']}` }
                           : { backgroundColor: '#d1d5db', color: '#374151' }
                       }>
-                      {statusLabels[s as TableStatus]}{warnUnpaid ? ' ⚠️' : ''}
+                      {statusLabels[s as TableStatus]}{warnUnpaid ? ' ' : ''}
                     </button>
                   )
                 })}
@@ -1772,7 +1772,7 @@ export default function KassaFloorPlan({
                     onClick={() => onCheckoutTable(selected.number)}
                     className={`w-full py-3 font-bold ${kassaPosButtonClass(false)}`}
                   >
-                    💳 {t('kassaApp.floorPlanCheckoutTable')}
+                     {t('kassaApp.floorPlanCheckoutTable')}
                   </button>
                 )}
                 <button
@@ -1817,7 +1817,7 @@ export default function KassaFloorPlan({
           <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl" role="dialog" aria-modal="true">
             <div className="p-4 border-b flex justify-between items-center">
               <h3 className="font-bold text-lg">{t('kassaApp.floorPlanModalAddBarTitle')}</h3>
-              <button type="button" onClick={() => setShowAddBarModal(false)} className="min-h-[44px] min-w-[44px] touch-manipulation text-2xl text-gray-400 hover:text-gray-700">✕</button>
+              <button type="button" onClick={() => setShowAddBarModal(false)} className="min-h-[44px] min-w-[44px] touch-manipulation text-2xl text-gray-400 hover:text-gray-700"></button>
             </div>
             <div className="p-5 space-y-4">
               <p className="text-sm text-gray-500">{t('kassaApp.floorPlanModalAddBarIntro')}</p>
@@ -1874,7 +1874,7 @@ export default function KassaFloorPlan({
           <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl" role="dialog" aria-modal="true">
             <div className="p-4 border-b flex justify-between items-center">
               <h3 className="font-bold text-lg">{t('kassaApp.floorPlanModalAddTableTitle')}</h3>
-              <button type="button" onClick={() => setShowAddModal(false)} className="min-h-[44px] min-w-[44px] touch-manipulation text-2xl text-gray-400 hover:text-gray-700">✕</button>
+              <button type="button" onClick={() => setShowAddModal(false)} className="min-h-[44px] min-w-[44px] touch-manipulation text-2xl text-gray-400 hover:text-gray-700"></button>
             </div>
             <div className="p-5 space-y-4">
               <div>

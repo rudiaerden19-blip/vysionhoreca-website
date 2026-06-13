@@ -152,7 +152,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
       >
         <div className="text-center mb-8">
           <Link href={`/shop/${params.tenant}`} className="inline-block mb-4">
-            <span className="text-4xl">🎉</span>
+            <span className="text-4xl"></span>
           </Link>
           <h1 className="text-2xl font-bold text-gray-900">{t('accountPage.createAccount')}</h1>
           <p className="text-gray-500 mt-1">{t('accountPage.joinLoyalty')}</p>

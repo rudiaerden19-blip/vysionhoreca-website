@@ -30,7 +30,7 @@ export default function HomeCornerStamp({
   /** Path meta: sweep 0 = bovenboog in SVG; textPath zet glyphs visueel langs de andere boog. */
   const arcUpperPathId = `home-stamp-arc-u-${uid}`
   const arcLowerPathId = `home-stamp-arc-l-${uid}`
-  /** Langere onderboog voor software/hardware-stempel: "hardware" lager + ruimer om de ★ heen. */
+  /** Langere onderboog voor software/hardware-stempel: "hardware" lager + ruimer om de  heen. */
   const arcUpperOuterPathId = `home-stamp-arc-uout-${uid}`
   const [visible, setVisible] = useState(false)
   const triggeredRef = useRef(false)
@@ -137,10 +137,10 @@ export default function HomeCornerStamp({
           </textPath>
         </text>
         <text x="100" y="64" textAnchor="middle" fill="currentColor" fontSize="14" opacity="0.95">
-          ★
+          
         </text>
         <text x="100" y="148" textAnchor="middle" fill="currentColor" fontSize="14" opacity="0.95">
-          ★
+          
         </text>
         <line x1="14" y1="78" x2="186" y2="78" stroke="currentColor" strokeWidth="2.8" />
         <line x1="14" y1="122" x2="186" y2="122" stroke="currentColor" strokeWidth="2.8" />

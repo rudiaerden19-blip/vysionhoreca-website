@@ -48,42 +48,42 @@ interface OrderItemJson {
 const getStatusConfig = (t: (key: string) => string): Record<string, { bg: string; text: string; label: string; next?: string; prev?: string }> => ({
   new: { bg: 'bg-blue-100', text: 'text-blue-700', label: `🆕 ${t('ordersPage.status.new')}`, next: 'confirmed' },
   NEW: { bg: 'bg-blue-100', text: 'text-blue-700', label: `🆕 ${t('ordersPage.status.new')}`, next: 'confirmed' },
-  confirmed: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: `✓ ${t('ordersPage.status.confirmed')}`, next: 'preparing', prev: 'new' },
-  CONFIRMED: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: `✓ ${t('ordersPage.status.confirmed')}`, next: 'preparing', prev: 'new' },
-  preparing: { bg: 'bg-blue-100', text: 'text-blue-700', label: `👨‍🍳 ${t('ordersPage.status.preparing')}`, next: 'ready', prev: 'confirmed' },
-  PREPARING: { bg: 'bg-blue-100', text: 'text-blue-700', label: `👨‍🍳 ${t('ordersPage.status.preparing')}`, next: 'ready', prev: 'confirmed' },
-  ready: { bg: 'bg-green-100', text: 'text-green-700', label: `✅ ${t('ordersPage.status.ready')}`, next: 'completed', prev: 'preparing' },
-  READY: { bg: 'bg-green-100', text: 'text-green-700', label: `✅ ${t('ordersPage.status.ready')}`, next: 'completed', prev: 'preparing' },
-  delivered: { bg: 'bg-purple-100', text: 'text-purple-700', label: `🚗 ${t('ordersPage.status.delivered')}`, next: 'completed' },
-  DELIVERED: { bg: 'bg-purple-100', text: 'text-purple-700', label: `🚗 ${t('ordersPage.status.delivered')}`, next: 'completed' },
-  completed: { bg: 'bg-gray-100', text: 'text-gray-700', label: `✔️ ${t('ordersPage.status.completed')}` },
-  COMPLETED: { bg: 'bg-gray-100', text: 'text-gray-700', label: `✔️ ${t('ordersPage.status.completed')}` },
-  cancelled: { bg: 'bg-red-100', text: 'text-red-700', label: `❌ ${t('ordersPage.status.cancelled')}` },
-  CANCELLED: { bg: 'bg-red-100', text: 'text-red-700', label: `❌ ${t('ordersPage.status.cancelled')}` },
-  rejected: { bg: 'bg-red-100', text: 'text-red-700', label: `🚫 ${t('ordersPage.status.rejected')}` },
-  REJECTED: { bg: 'bg-red-100', text: 'text-red-700', label: `🚫 ${t('ordersPage.status.rejected')}` },
+  confirmed: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: ` ${t('ordersPage.status.confirmed')}`, next: 'preparing', prev: 'new' },
+  CONFIRMED: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: ` ${t('ordersPage.status.confirmed')}`, next: 'preparing', prev: 'new' },
+  preparing: { bg: 'bg-blue-100', text: 'text-blue-700', label: ` ${t('ordersPage.status.preparing')}`, next: 'ready', prev: 'confirmed' },
+  PREPARING: { bg: 'bg-blue-100', text: 'text-blue-700', label: ` ${t('ordersPage.status.preparing')}`, next: 'ready', prev: 'confirmed' },
+  ready: { bg: 'bg-green-100', text: 'text-green-700', label: ` ${t('ordersPage.status.ready')}`, next: 'completed', prev: 'preparing' },
+  READY: { bg: 'bg-green-100', text: 'text-green-700', label: ` ${t('ordersPage.status.ready')}`, next: 'completed', prev: 'preparing' },
+  delivered: { bg: 'bg-purple-100', text: 'text-purple-700', label: ` ${t('ordersPage.status.delivered')}`, next: 'completed' },
+  DELIVERED: { bg: 'bg-purple-100', text: 'text-purple-700', label: ` ${t('ordersPage.status.delivered')}`, next: 'completed' },
+  completed: { bg: 'bg-gray-100', text: 'text-gray-700', label: ` ${t('ordersPage.status.completed')}` },
+  COMPLETED: { bg: 'bg-gray-100', text: 'text-gray-700', label: ` ${t('ordersPage.status.completed')}` },
+  cancelled: { bg: 'bg-red-100', text: 'text-red-700', label: ` ${t('ordersPage.status.cancelled')}` },
+  CANCELLED: { bg: 'bg-red-100', text: 'text-red-700', label: ` ${t('ordersPage.status.cancelled')}` },
+  rejected: { bg: 'bg-red-100', text: 'text-red-700', label: ` ${t('ordersPage.status.rejected')}` },
+  REJECTED: { bg: 'bg-red-100', text: 'text-red-700', label: ` ${t('ordersPage.status.rejected')}` },
 })
 
 const getPaymentStatusConfig = (t: (key: string) => string): Record<string, { bg: string; text: string; label: string }> => ({
   pending: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: `⏳ ${t('ordersPage.paymentStatus.pending')}` },
   PENDING: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: `⏳ ${t('ordersPage.paymentStatus.pending')}` },
-  paid: { bg: 'bg-green-100', text: 'text-green-700', label: `✅ ${t('ordersPage.paymentStatus.paid')}` },
-  PAID: { bg: 'bg-green-100', text: 'text-green-700', label: `✅ ${t('ordersPage.paymentStatus.paid')}` },
-  failed: { bg: 'bg-red-100', text: 'text-red-700', label: `❌ ${t('ordersPage.paymentStatus.failed')}` },
-  FAILED: { bg: 'bg-red-100', text: 'text-red-700', label: `❌ ${t('ordersPage.paymentStatus.failed')}` },
+  paid: { bg: 'bg-green-100', text: 'text-green-700', label: ` ${t('ordersPage.paymentStatus.paid')}` },
+  PAID: { bg: 'bg-green-100', text: 'text-green-700', label: ` ${t('ordersPage.paymentStatus.paid')}` },
+  failed: { bg: 'bg-red-100', text: 'text-red-700', label: ` ${t('ordersPage.paymentStatus.failed')}` },
+  FAILED: { bg: 'bg-red-100', text: 'text-red-700', label: ` ${t('ordersPage.paymentStatus.failed')}` },
 })
 
 const getPaymentMethodLabels = (t: (key: string) => string): Record<string, string> => ({
-  cash: `💵 ${t('ordersPage.paymentMethod.cash')}`,
-  CASH: `💵 ${t('ordersPage.paymentMethod.cash')}`,
-  card: `💳 ${t('ordersPage.paymentMethod.card')}`,
-  CARD: `💳 ${t('ordersPage.paymentMethod.card')}`,
-  online: `🌐 ${t('ordersPage.paymentMethod.online')}`,
-  ONLINE: `🌐 ${t('ordersPage.paymentMethod.online')}`,
-  ideal: `🏦 ${t('ordersPage.paymentMethod.ideal')}`,
-  IDEAL: `🏦 ${t('ordersPage.paymentMethod.ideal')}`,
-  bancontact: `💳 ${t('ordersPage.paymentMethod.bancontact')}`,
-  BANCONTACT: `💳 ${t('ordersPage.paymentMethod.bancontact')}`,
+  cash: ` ${t('ordersPage.paymentMethod.cash')}`,
+  CASH: ` ${t('ordersPage.paymentMethod.cash')}`,
+  card: ` ${t('ordersPage.paymentMethod.card')}`,
+  CARD: ` ${t('ordersPage.paymentMethod.card')}`,
+  online: ` ${t('ordersPage.paymentMethod.online')}`,
+  ONLINE: ` ${t('ordersPage.paymentMethod.online')}`,
+  ideal: ` ${t('ordersPage.paymentMethod.ideal')}`,
+  IDEAL: ` ${t('ordersPage.paymentMethod.ideal')}`,
+  bancontact: ` ${t('ordersPage.paymentMethod.bancontact')}`,
+  BANCONTACT: ` ${t('ordersPage.paymentMethod.bancontact')}`,
 })
 
 export default function BestellingenPage({ params }: { params: { tenant: string } }) {
@@ -128,12 +128,12 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   const [rejectOrderError, setRejectOrderError] = useState<string | null>(null)
   
   const rejectionReasons = useMemo(() => [
-    { value: 'too_busy', label: `🔥 ${t('ordersPage.rejection.reasons.tooBusy')}` },
-    { value: 'closed', label: `🚪 ${t('ordersPage.rejection.reasons.closed')}` },
-    { value: 'sold_out', label: `❌ ${t('ordersPage.rejection.reasons.soldOut')}` },
-    { value: 'delivery_unavailable', label: `🚗 ${t('ordersPage.rejection.reasons.deliveryUnavailable')}` },
-    { value: 'technical', label: `⚙️ ${t('ordersPage.rejection.reasons.technical')}` },
-    { value: 'other', label: `📝 ${t('ordersPage.rejection.reasons.other')}` },
+    { value: 'too_busy', label: ` ${t('ordersPage.rejection.reasons.tooBusy')}` },
+    { value: 'closed', label: ` ${t('ordersPage.rejection.reasons.closed')}` },
+    { value: 'sold_out', label: ` ${t('ordersPage.rejection.reasons.soldOut')}` },
+    { value: 'delivery_unavailable', label: ` ${t('ordersPage.rejection.reasons.deliveryUnavailable')}` },
+    { value: 'technical', label: ` ${t('ordersPage.rejection.reasons.technical')}` },
+    { value: 'other', label: ` ${t('ordersPage.rejection.reasons.other')}` },
   ], [t])
   
   // Refs
@@ -168,7 +168,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
 
   const showNotification = useCallback((order: Order) => {
     if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification('🍟 Nieuwe bestelling!', {
+      new Notification(' Nieuwe bestelling!', {
         body: `${order.customer_name} - €${order.total?.toFixed(2)}`,
         icon: '/icon-192.png',
         tag: order.id,
@@ -769,7 +769,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             <span>€${((item.price || item.unit_price || 0) * item.quantity).toFixed(2)}</span>
           </div>
           ${item.options && item.options.length > 0 ? `<div style="font-size: 10px; margin-left: 10px; color: #666;">+ ${item.options.map((o: any) => o.name).join(', ')}</div>` : ''}
-          ${item.notes ? `<div style="font-size: 10px; margin-left: 10px; font-weight: bold;">⚠️ ${item.notes}</div>` : ''}
+          ${item.notes ? `<div style="font-size: 10px; margin-left: 10px; font-weight: bold;"> ${item.notes}</div>` : ''}
         `).join('')}
         
         <div class="divider"></div>
@@ -812,7 +812,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         <!-- BETALING -->
         <div class="center">
           ${order.payment_method ? `Betaalmethode: ${paymentMethodLabels[order.payment_method] || order.payment_method}<br>` : ''}
-          ${order.payment_status?.toLowerCase() === 'paid' ? '<strong>✓ BETAALD</strong>' : 'Betaling: In afwachting'}
+          ${order.payment_status?.toLowerCase() === 'paid' ? '<strong> BETAALD</strong>' : 'Betaling: In afwachting'}
         </div>
         
         ${order.customer_notes ? `
@@ -906,7 +906,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         {/* Header */}
         <div className="bg-gray-800 p-4 flex items-center justify-between sticky top-0 z-10">
           <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-bold text-white">🍳 {t('ordersPage.kitchen.title')}</h1>
+            <h1 className="text-2xl font-bold text-white"> {t('ordersPage.kitchen.title')}</h1>
             {newCount > 0 && (
               <motion.span
                 animate={{ scale: [1, 1.2, 1] }}
@@ -925,7 +925,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
               disabled={completableOrders.length === 0 || completingAll}
               className="px-4 py-3 rounded-xl text-lg font-bold bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:pointer-events-none text-white"
             >
-              ✔️{' '}
+              {' '}
               {completingAll
                 ? '…'
                 : completableOrders.length > 0
@@ -935,13 +935,13 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             <button
               className="p-4 rounded-xl text-2xl bg-green-500"
             >
-              🔔
+              
             </button>
             <button
               onClick={() => setKitchenMode(false)}
               className="p-4 bg-gray-600 hover:bg-gray-500 text-white rounded-xl text-xl"
             >
-              ✕ {t('ordersPage.kitchen.close')}
+               {t('ordersPage.kitchen.close')}
             </button>
           </div>
         </div>
@@ -1007,7 +1007,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                   <p className="text-xl font-bold">{order.customer_name}</p>
                   {order.customer_phone && <p className="opacity-80">{order.customer_phone}</p>}
                   {(order.delivery_address || order.customer_address) && (
-                    <p className="opacity-80 text-sm mt-1">📍 {order.delivery_address || order.customer_address}</p>
+                    <p className="opacity-80 text-sm mt-1"> {order.delivery_address || order.customer_address}</p>
                   )}
                 </div>
 
@@ -1032,7 +1032,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                             </div>
                           )}
                           {item.notes && (
-                            <div className="text-sm text-orange-200 font-bold ml-1 pl-2 mt-0.5">⚠️ {item.notes}</div>
+                            <div className="text-sm text-orange-200 font-bold ml-1 pl-2 mt-0.5"> {item.notes}</div>
                           )}
                         </div>
                       ))}
@@ -1050,7 +1050,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                         disabled={updatingId === order.id || completingAll}
                         className="p-4 bg-green-600 hover:bg-green-700 text-white rounded-xl text-xl font-bold"
                       >
-                        ✓ {t('ordersPage.actions.approve').toUpperCase()}
+                         {t('ordersPage.actions.approve').toUpperCase()}
                       </motion.button>
                       <motion.button
                         whileTap={{ scale: 0.95 }}
@@ -1061,7 +1061,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                         disabled={updatingId === order.id || completingAll}
                         className="p-4 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xl font-bold"
                       >
-                        ✕ {t('ordersPage.actions.reject').toUpperCase()}
+                         {t('ordersPage.actions.reject').toUpperCase()}
                       </motion.button>
                     </>
                   )}
@@ -1072,7 +1072,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                       disabled={updatingId === order.id || completingAll}
                       className="col-span-2 p-4 bg-gray-700 hover:bg-gray-800 text-white rounded-xl text-xl font-bold"
                     >
-                      ✔️ {t('ordersPage.actions.complete').toUpperCase()}
+                       {t('ordersPage.actions.complete').toUpperCase()}
                     </motion.button>
                   )}
                   {/* Print button */}
@@ -1080,7 +1080,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                     onClick={() => printReceipt(order)}
                     className="col-span-2 p-3 bg-white/20 hover:bg-white/30 rounded-xl font-bold flex items-center justify-center gap-2"
                   >
-                    🖨️ {t('ordersPage.actions.printReceipt').toUpperCase()}
+                     {t('ordersPage.actions.printReceipt').toUpperCase()}
                   </button>
                 </div>
               </motion.div>
@@ -1090,7 +1090,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
 
         {filteredOrders.length === 0 && (
           <div className="flex flex-col items-center justify-center h-[60vh] text-white">
-            <span className="text-8xl mb-4">✨</span>
+            <span className="text-8xl mb-4"></span>
             <h2 className="text-3xl font-bold">{t('ordersPage.noOrders')}</h2>
             <p className="text-xl text-gray-400 mt-2">{t('ordersPage.waitingForOrders')}</p>
           </div>
@@ -1122,7 +1122,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             onClick={() => setArchiveMode(!archiveMode)}
             className={`px-4 py-2 rounded-xl font-medium flex items-center gap-2 ${archiveMode ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
           >
-            📚 Archief
+             Archief
           </motion.button>
 
           <motion.button
@@ -1132,7 +1132,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             disabled={completableOrders.length === 0 || completingAll}
             className="px-4 py-2 rounded-xl font-medium flex items-center gap-2 bg-emerald-600 text-white hover:bg-emerald-500 disabled:opacity-40 disabled:pointer-events-none"
           >
-            ✔️{' '}
+            {' '}
             {completingAll
               ? '…'
               : completableOrders.length > 0
@@ -1147,7 +1147,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             onClick={() => setKitchenMode(true)}
             className="px-4 py-2 bg-gray-900 text-white rounded-xl font-medium flex items-center gap-2"
           >
-            🍳 {t('ordersPage.kitchenMode')}
+             {t('ordersPage.kitchenMode')}
           </motion.button>
 
           {/* Refresh */}
@@ -1158,7 +1158,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             className="p-2 bg-gray-100 hover:bg-gray-200 rounded-xl"
             title={t('ordersPage.refresh')}
           >
-            🔄
+            
           </motion.button>
 
           {/* Filter */}
@@ -1182,7 +1182,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
       {archiveMode && (
         <div className="mb-8 bg-white rounded-2xl shadow-sm p-6">
           <div className="flex flex-wrap items-center gap-3 mb-6">
-            <h2 className="text-lg font-bold text-gray-900">📚 Archief bestellingen</h2>
+            <h2 className="text-lg font-bold text-gray-900"> Archief bestellingen</h2>
             {/* Periode tabs */}
             <div className="flex bg-gray-100 rounded-xl p-1 gap-1">
               {(['dag', 'week', 'maand', 'jaar'] as const).map(p => (
@@ -1206,7 +1206,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
               className="px-3 py-2 border border-gray-200 rounded-xl text-sm"
             />
             <button onClick={loadArchive} className="px-3 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-xl text-sm font-medium">
-              🔄 Vernieuwen
+               Vernieuwen
             </button>
           </div>
 
@@ -1214,7 +1214,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             <div className="text-center py-8 text-gray-400">Laden...</div>
           ) : archiveOrders.length === 0 ? (
             <div className="text-center py-12">
-              <span className="text-5xl block mb-3">📭</span>
+              <span className="text-5xl block mb-3"></span>
               <p className="text-gray-500">Geen bestellingen gevonden voor deze periode</p>
             </div>
           ) : (
@@ -1263,7 +1263,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                           className="p-2 bg-white hover:bg-gray-100 rounded-lg text-sm border border-gray-200"
                           title="Kassabon afdrukken"
                         >
-                          🖨️
+                          
                         </button>
                       </div>
                     </div>
@@ -1288,7 +1288,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
               transition={{ repeat: Infinity, duration: 0.8 }}
               className="text-3xl"
             >
-              🔔
+              
             </motion.span>
             <div>
               <p className="font-bold text-lg">{newCount} {newCount > 1 ? t('ordersPage.newOrdersPlural') : t('ordersPage.newOrders')}!</p>
@@ -1377,7 +1377,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                     <p className="text-gray-500 mt-1">{formatTime(order.created_at)}</p>
                     {((order as any).scheduled_date || (order as any).scheduled_time) && (
                       <p className="mt-1 text-sm font-semibold text-orange-600 bg-orange-50 px-2 py-1 rounded-lg inline-block">
-                        📅 {(order as any).scheduled_date ? new Date((order as any).scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''}{(order as any).scheduled_time ? ` om ${(order as any).scheduled_time}` : ''}
+                         {(order as any).scheduled_date ? new Date((order as any).scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''}{(order as any).scheduled_time ? ` om ${(order as any).scheduled_time}` : ''}
                       </p>
                     )}
                   </div>
@@ -1389,18 +1389,18 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                     <p className="text-sm text-gray-500 mb-1">{t('ordersPage.customer')}</p>
                     <p className="font-semibold text-gray-900">{order.customer_name}</p>
                     {order.customer_phone && (
-                      <p className="text-gray-600">📞 {order.customer_phone}</p>
+                      <p className="text-gray-600"> {order.customer_phone}</p>
                     )}
                     {order.customer_email && (
                       <p className="text-gray-600">
-                        <a href={`mailto:${order.customer_email}`} className="hover:text-blue-600">✉️ {order.customer_email}</a>
+                        <a href={`mailto:${order.customer_email}`} className="hover:text-blue-600"> {order.customer_email}</a>
                       </p>
                     )}
                     {(order.delivery_address || order.customer_address) && (
-                      <p className="text-gray-600 text-sm mt-1">📍 {order.delivery_address || order.customer_address}</p>
+                      <p className="text-gray-600 text-sm mt-1"> {order.delivery_address || order.customer_address}</p>
                     )}
                     {order.customer_notes && (
-                      <p className="text-gray-500 text-sm mt-2 italic">💬 {order.customer_notes}</p>
+                      <p className="text-gray-500 text-sm mt-2 italic"> {order.customer_notes}</p>
                     )}
                   </div>
 
@@ -1432,7 +1432,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                             )}
                             {item.notes && (
                               <div className="text-sm text-orange-700 font-semibold mt-1 ml-1 pl-3 border-l-2 border-orange-200">
-                                ⚠️ {item.notes}
+                                 {item.notes}
                               </div>
                             )}
                           </div>
@@ -1463,7 +1463,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                         disabled={updatingId === order.id || completingAll}
                         className="flex-1 min-w-[140px] bg-green-500 hover:bg-green-600 disabled:bg-green-300 text-white font-medium py-3 rounded-xl transition-colors"
                       >
-                        ✓ {t('ordersPage.actions.approve')}
+                         {t('ordersPage.actions.approve')}
                       </motion.button>
                       <motion.button
                         whileHover={{ scale: 1.02 }}
@@ -1475,7 +1475,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                         disabled={updatingId === order.id || completingAll}
                         className="px-6 py-3 bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white font-medium rounded-xl transition-colors"
                       >
-                        ✕ {t('ordersPage.actions.reject')}
+                         {t('ordersPage.actions.reject')}
                       </motion.button>
                     </>
                   )}
@@ -1495,7 +1495,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                         />
                       ) : (
                         <>
-                          ✔️ {t('ordersPage.actions.complete')}
+                           {t('ordersPage.actions.complete')}
                         </>
                       )}
                     </motion.button>
@@ -1505,14 +1505,14 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                     className="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
                     title={t('ordersPage.actions.details')}
                   >
-                    📋
+                    
                   </button>
                   <button 
                     onClick={() => printReceipt(order)}
                     className="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
                     title={t('ordersPage.actions.printReceipt')}
                   >
-                    🖨️
+                    
                   </button>
                 </div>
               </motion.div>
@@ -1527,7 +1527,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
           animate={{ opacity: 1, y: 0 }}
           className="text-center py-12 bg-white rounded-2xl shadow-sm"
         >
-          <span className="text-6xl mb-4 block">📦</span>
+          <span className="text-6xl mb-4 block"></span>
           <h3 className="text-xl font-bold text-gray-900 mb-2">{t('ordersPage.noOrders')}</h3>
           <p className="text-gray-500">{t('ordersPage.waitingForOrders')}</p>
         </motion.div>
@@ -1601,7 +1601,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                   if (!seatLine) return null
                   return (
                     <p className="text-sm font-semibold text-gray-800 bg-gray-100 border border-gray-200 px-3 py-2 rounded-lg">
-                      📍 {seatLine}
+                       {seatLine}
                     </p>
                   )
                 })()}
@@ -1609,32 +1609,32 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                 {/* Geplande datum/tijd — PROMINENT tonen als aanwezig */}
                 {selectedScheduleLabel && (
                   <div className="bg-orange-50 border-2 border-orange-300 rounded-xl p-4">
-                    <p className="text-sm text-orange-600 font-semibold mb-1">📅 {t('shopDisplay.desiredTimeLabel')}</p>
+                    <p className="text-sm text-orange-600 font-semibold mb-1"> {t('shopDisplay.desiredTimeLabel')}</p>
                     <p className="text-2xl font-black text-orange-700">{selectedScheduleLabel}</p>
                   </div>
                 )}
 
                 {/* Customer Info */}
                 <div className="bg-blue-50 rounded-xl p-5">
-                  <p className="text-sm text-blue-600 font-medium mb-2">👤 {t('ordersPage.customerDetails')}</p>
+                  <p className="text-sm text-blue-600 font-medium mb-2"> {t('ordersPage.customerDetails')}</p>
                   <p className="text-xl font-bold text-gray-900">{selectedOrder.customer_name}</p>
                   {selectedOrder.customer_phone && (
-                    <p className="text-gray-600 text-lg">📞 {selectedOrder.customer_phone}</p>
+                    <p className="text-gray-600 text-lg"> {selectedOrder.customer_phone}</p>
                   )}
-                  {selectedOrder.customer_email && <p className="text-gray-600">✉️ {selectedOrder.customer_email}</p>}
+                  {selectedOrder.customer_email && <p className="text-gray-600"> {selectedOrder.customer_email}</p>}
                   {(selectedOrder.delivery_address || selectedOrder.customer_address) && (
-                    <p className="text-gray-600 mt-2">📍 {selectedOrder.delivery_address || selectedOrder.customer_address}</p>
+                    <p className="text-gray-600 mt-2"> {selectedOrder.delivery_address || selectedOrder.customer_address}</p>
                   )}
                   {(selectedOrder.delivery_notes || selectedOrder.customer_notes) && (
                     <p className="text-gray-500 text-sm mt-2 italic bg-white p-3 rounded-lg">
-                      💬 "{selectedOrder.delivery_notes || selectedOrder.customer_notes}"
+                       "{selectedOrder.delivery_notes || selectedOrder.customer_notes}"
                     </p>
                   )}
                 </div>
 
                 {/* Items */}
                 <div className="bg-blue-50 rounded-xl p-5 min-h-0">
-                  <p className="text-sm text-blue-800 font-semibold mb-3">🍟 {t('ordersPage.orderedProducts')}</p>
+                  <p className="text-sm text-blue-800 font-semibold mb-3"> {t('ordersPage.orderedProducts')}</p>
                   {(() => {
                     const items = parseItems(selectedOrder)
                     return items.length > 0 ? (
@@ -1657,7 +1657,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                             )}
                             {item.notes && (
                               <div className="text-sm text-orange-600 font-bold ml-1 mt-2 pl-3 border-l-2 border-orange-200">
-                                ⚠️ {item.notes}
+                                 {item.notes}
                               </div>
                             )}
                           </div>
@@ -1712,7 +1712,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                   onClick={() => printReceipt(selectedOrder)}
                   className="px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-medium flex items-center gap-2"
                 >
-                  🖨️ {t('ordersPage.actions.printReceipt')}
+                   {t('ordersPage.actions.printReceipt')}
                 </button>
               </div>
             </motion.div>
@@ -1742,7 +1742,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             >
               {/* Header */}
               <div className="p-6 border-b bg-red-50">
-                <h2 className="text-2xl font-bold text-red-700">🚫 {t('ordersPage.rejection.title')}</h2>
+                <h2 className="text-2xl font-bold text-red-700"> {t('ordersPage.rejection.title')}</h2>
                 <p className="text-red-600 mt-1">#{rejectingOrder.order_number} - {rejectingOrder.customer_name}</p>
               </div>
               
@@ -1792,7 +1792,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                 
                 <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
                   <p className="text-yellow-800 text-sm">
-                    ⚠️ {t('ordersPage.rejection.customerNotified')}
+                     {t('ordersPage.rejection.customerNotified')}
                   </p>
                 </div>
               </div>
@@ -1822,7 +1822,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                       className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
                     />
                   ) : (
-                    `🚫 ${t('ordersPage.rejection.confirmReject')}`
+                    ` ${t('ordersPage.rejection.confirmReject')}`
                   )}
                 </button>
               </div>

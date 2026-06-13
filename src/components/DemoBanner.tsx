@@ -15,7 +15,7 @@ export function DemoBanner({ tenantSlug }: DemoBannerProps) {
     <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-3 text-center sticky top-0 z-50 shadow-lg">
       <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
         <div className="flex items-center gap-2">
-          <span className="text-xl">👀</span>
+          <span className="text-xl"></span>
           <span className="font-bold">DEMO MODE</span>
           <span className="hidden sm:inline">-</span>
           <span>Je bekijkt een live demo. Aanpassingen zijn uitgeschakeld.</span>

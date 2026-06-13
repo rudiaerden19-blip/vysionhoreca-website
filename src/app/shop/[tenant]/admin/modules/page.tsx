@@ -132,9 +132,9 @@ export default function TenantModulesPage({ params }: { params: { tenant: string
               <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 pb-3">
                 <div>
                   <p className="text-base font-semibold text-gray-900">{label}</p>
-                  {mod?.icon ? (
+                  {mod?.labelKey ? (
                     <p className="mt-0.5 text-xs text-gray-500">
-                      {mod.icon} {mod.labelKey ? t(mod.labelKey) : mod.label}
+                      {t(mod.labelKey)}
                     </p>
                   ) : null}
                 </div>
@@ -156,7 +156,6 @@ export default function TenantModulesPage({ params }: { params: { tenant: string
                       className="flex items-center justify-between gap-4 rounded-lg bg-gray-50 px-3 py-2.5"
                     >
                       <span className="text-sm text-gray-800">
-                        <span className="mr-2">{it.icon}</span>
                         {it.labelKey ? t(it.labelKey) : it.label}
                       </span>
                       <ModuleToggleSlider

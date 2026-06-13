@@ -53,7 +53,7 @@ export function KassaStaffSalesPickModal({
             className="rounded-xl p-2 text-white/80 hover:bg-white/10"
             aria-label={t('staffClock.close')}
           >
-            ✕
+            
           </button>
         </div>
         <div className="flex-1 space-y-3 overflow-y-auto p-5">

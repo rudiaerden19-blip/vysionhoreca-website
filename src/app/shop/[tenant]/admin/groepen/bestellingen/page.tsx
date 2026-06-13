@@ -71,7 +71,7 @@ export default function GroupOrdersPage({ params }: { params: { tenant: string }
     return (
       <div className="max-w-4xl mx-auto">
         <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
-          <span className="text-4xl mb-4 block">📦</span>
+          <span className="text-4xl mb-4 block"></span>
           <h2 className="text-xl font-bold text-gray-900 mb-2">{t('groupsModule.orders.selectSession')}</h2>
           <p className="text-gray-600 mb-4">{t('groupsModule.orders.selectSessionDesc')}</p>
           <a href={`/shop/${params.tenant}/admin/groepen/sessies`} className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl">
@@ -86,20 +86,20 @@ export default function GroupOrdersPage({ params }: { params: { tenant: string }
     <div className="max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">📦 {t('groupsModule.orders.pageTitle')}</h1>
+          <h1 className="text-2xl font-bold text-gray-900"> {t('groupsModule.orders.pageTitle')}</h1>
           {session && <p className="text-gray-600">{session.title || session.order_groups?.name} - {formatDate(session.order_deadline)}</p>}
         </div>
         <div className="flex items-center gap-3">
           <div className="bg-gray-100 rounded-xl p-1 flex">
             <button onClick={() => setViewMode('grouped')} className={`px-3 py-1 rounded-lg text-sm ${viewMode === 'grouped' ? 'bg-white shadow' : ''}`}>
-              👥 {t('groupsModule.orders.perPerson')}
+               {t('groupsModule.orders.perPerson')}
             </button>
             <button onClick={() => setViewMode('list')} className={`px-3 py-1 rounded-lg text-sm ${viewMode === 'list' ? 'bg-white shadow' : ''}`}>
-              📋 {t('groupsModule.orders.list')}
+               {t('groupsModule.orders.list')}
             </button>
           </div>
           <button onClick={printLabels} className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl font-medium">
-            🏷️ {t('groupsModule.orders.printLabels')}
+             {t('groupsModule.orders.printLabels')}
           </button>
         </div>
       </div>
@@ -123,7 +123,7 @@ export default function GroupOrdersPage({ params }: { params: { tenant: string }
         <div className="text-center py-12"><div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div></div>
       ) : orders.length === 0 ? (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-gray-50 rounded-2xl p-12 text-center">
-          <span className="text-6xl mb-4 block">📭</span>
+          <span className="text-6xl mb-4 block"></span>
           <h2 className="text-xl font-bold text-gray-900 mb-2">{t('groupsModule.orders.noOrders')}</h2>
           <p className="text-gray-600">{t('groupsModule.orders.noOrdersDesc')}</p>
         </motion.div>
@@ -179,7 +179,7 @@ export default function GroupOrdersPage({ params }: { params: { tenant: string }
 
       {orders.length > 0 && (
         <div className="mt-8">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">🍳 {t('groupsModule.orders.kitchenOverview')}</h2>
+          <h2 className="text-lg font-bold text-gray-900 mb-4"> {t('groupsModule.orders.kitchenOverview')}</h2>
           <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
             {(() => {
               const productSummary: Record<string, number> = {}

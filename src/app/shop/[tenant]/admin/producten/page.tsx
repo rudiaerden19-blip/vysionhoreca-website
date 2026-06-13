@@ -51,20 +51,20 @@ import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 type ProductCatalogMode = 'horeca' | 'retail'
 
 const ALLERGEN_IDS = [
-  { id: 'gluten', icon: '🌾' },
-  { id: 'ei', icon: '🥚' },
-  { id: 'melk', icon: '🥛' },
-  { id: 'noten', icon: '🥜' },
-  { id: 'pinda', icon: '🥜' },
-  { id: 'soja', icon: '🫘' },
-  { id: 'vis', icon: '🐟' },
-  { id: 'schaaldieren', icon: '🦐' },
-  { id: 'selderij', icon: '🥬' },
-  { id: 'mosterd', icon: '🟡' },
-  { id: 'sesam', icon: '⚪' },
-  { id: 'sulfiet', icon: '🍷' },
-  { id: 'lupine', icon: '🌸' },
-  { id: 'weekdieren', icon: '🐚' },
+  { id: 'gluten', icon: '' },
+  { id: 'ei', icon: '' },
+  { id: 'melk', icon: '' },
+  { id: 'noten', icon: '' },
+  { id: 'pinda', icon: '' },
+  { id: 'soja', icon: '' },
+  { id: 'vis', icon: '' },
+  { id: 'schaaldieren', icon: '' },
+  { id: 'selderij', icon: '' },
+  { id: 'mosterd', icon: '' },
+  { id: 'sesam', icon: '' },
+  { id: 'sulfiet', icon: '' },
+  { id: 'lupine', icon: '' },
+  { id: 'weekdieren', icon: '' },
 ]
 
 function normalizeProductBarcodeScan(raw: string): string {
@@ -159,19 +159,19 @@ function SortableProductCard({
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-5xl bg-gray-50">
-            🍟
+            
           </div>
         )}
         {/* Badges */}
         <div className="absolute top-2 left-2 flex flex-col gap-1">
           {product.is_promo && (
             <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-              🎁 PROMO
+               PROMO
             </span>
           )}
           {product.is_popular && (
             <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full">
-              🔥 POPULAIR
+               POPULAIR
             </span>
           )}
         </div>
@@ -206,7 +206,7 @@ function SortableProductCard({
               }`}
               title={product.is_active ? 'Beschikbaar' : 'Niet beschikbaar'}
             >
-              {product.is_active ? '✓' : '✕'}
+              {product.is_active ? '' : ''}
             </button>
             <button
               onClick={onTogglePopular}
@@ -217,7 +217,7 @@ function SortableProductCard({
               }`}
               title={product.is_popular ? 'Populair' : 'Niet populair'}
             >
-              🔥
+              
             </button>
           </div>
           <div className="flex gap-1">
@@ -226,14 +226,14 @@ function SortableProductCard({
               className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
               title="Bewerken"
             >
-              ✏️
+              
             </button>
             <button
               onClick={onDelete}
               className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg transition-colors"
               title="Verwijderen"
             >
-              🗑️
+              
             </button>
           </div>
         </div>
@@ -708,7 +708,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
               href={`/shop/${params.tenant}/admin/producten/intake`}
               className="bg-emerald-700 hover:bg-emerald-800 text-white font-medium px-6 py-3 rounded-xl flex items-center justify-center gap-2"
             >
-              <span>📱</span>
+              <span></span>
               <span>{t('adminPages.productIntake.title')}</span>
             </Link>
           ) : null}
@@ -718,7 +718,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
           onClick={openAddModal}
           className="bg-blue-700 hover:bg-blue-800 text-white font-medium px-6 py-3 rounded-xl flex items-center gap-2"
         >
-          <span>➕</span>
+          <span></span>
           <span>{t('adminPages.producten.newProduct')}</span>
         </motion.button>
         </div>
@@ -735,7 +735,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         {/* Search */}
         <div className="relative flex-1">
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></span>
           <input
             type="text"
             value={searchQuery}
@@ -765,7 +765,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                 : 'bg-green-100 text-green-700 hover:bg-green-200'
             }`}
           >
-            🎁 {t('adminPages.producten.promotions')}
+             {t('adminPages.producten.promotions')}
           </button>
           {categories.map(cat => (
             <button
@@ -812,7 +812,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
       {/* Empty State */}
       {filteredProducts.length === 0 && (
         <div className="text-center py-12">
-          <span className="text-6xl mb-4 block">🍟</span>
+          <span className="text-6xl mb-4 block"></span>
           <h3 className="text-xl font-bold text-gray-900 mb-2">{t('adminPages.producten.noProductsFound')}</h3>
           <p className="text-gray-500 mb-6">{t('adminPages.producten.adjustFilters')}</p>
           <button
@@ -851,7 +851,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                     onClick={closeModal}
                     className="p-2 hover:bg-gray-100 rounded-lg"
                   >
-                    ✕
+                    
                   </button>
                 </div>
                 {error ? (
@@ -939,7 +939,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
 
                 {/* ── SECTIE 2: Foto ── */}
                 <div className="space-y-2 pt-2 border-t">
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider pt-2">📸 Foto</p>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider pt-2"> Foto</p>
                   <MediaPicker
                     tenantSlug={params.tenant}
                     value={formData.image_url || ''}
@@ -1045,16 +1045,16 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
 
                 {/* ── SECTIE 3: Status toggles ── */}
                 <div className="space-y-3 pt-2 border-t">
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider pt-2">⚙️ Instellingen</p>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider pt-2"> Instellingen</p>
 
                   {[
                     { key: 'is_active', label: 'Beschikbaar', sub: 'Zichtbaar in menu & kassa', color: 'bg-green-500' },
                     ...(isRetailForm
                       ? []
                       : [
-                          { key: 'is_popular', label: '🔥 Populair', sub: 'Wordt gemarkeerd als bestseller', color: 'bg-blue-500' },
-                          { key: 'is_promo', label: '🎁 Promotie', sub: 'Toon actieprijs', color: 'bg-orange-500' },
-                          { key: 'print_label', label: '🏷️ Print label', sub: 'Druk sticker af bij bestelling', color: 'bg-purple-500' },
+                          { key: 'is_popular', label: ' Populair', sub: 'Wordt gemarkeerd als bestseller', color: 'bg-blue-500' },
+                          { key: 'is_promo', label: ' Promotie', sub: 'Toon actieprijs', color: 'bg-orange-500' },
+                          { key: 'print_label', label: ' Print label', sub: 'Druk sticker af bij bestelling', color: 'bg-purple-500' },
                         ]),
                   ].map(({ key, label, sub, color }) => {
                     const val = !!(formData as any)[key]
@@ -1106,7 +1106,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                 {/* ── SECTIE 4: Opties ── */}
                 {availableOptions.length > 0 && !isRetailForm && (
                   <div className="space-y-3 pt-2 border-t">
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider pt-2">🔧 Opties koppelen</p>
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider pt-2"> Opties koppelen</p>
                     <div className="space-y-2">
                       {availableOptions.map(option => (
                         <button
@@ -1122,7 +1122,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                           <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
                             selectedOptionIds.includes(option.id!) ? 'border-blue-500 bg-blue-500' : 'border-gray-300'
                           }`}>
-                            {selectedOptionIds.includes(option.id!) && <span className="text-white text-xs">✓</span>}
+                            {selectedOptionIds.includes(option.id!) && <span className="text-white text-xs"></span>}
                           </div>
                           <div className="flex-1">
                             <span className="font-medium text-gray-900">{option.name}</span>
@@ -1393,7 +1393,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider pt-2">⚠️ Allergenen</p>
+                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider pt-2"> Allergenen</p>
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                         {ALLERGEN_IDS.map(allergen => {
                           const isSelected = formData.allergens?.includes(allergen.id) || false

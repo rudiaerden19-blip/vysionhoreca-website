@@ -204,12 +204,12 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           </>
         ) : saved ? (
           <>
-            <span>✓</span>
+            <span></span>
             <span>{t('adminPages.common.saved')}</span>
           </>
         ) : (
           <>
-            <span>💾</span>
+            <span></span>
             <span>{t('adminPages.common.save')}</span>
           </>
         )}
@@ -225,7 +225,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           href={`/shop/${params.tenant}/admin/team`}
           className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-sm shrink-0"
         >
-          <span>👥</span>
+          <span></span>
           {t('websiteTeam.mijnTeamButton')}
         </Link>
       </div>
@@ -246,7 +246,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-            <span>🏪</span> {t('adminPages.profiel.businessInfo')}
+            <span></span> {t('adminPages.profiel.businessInfo')}
           </h2>
           
           <div className="space-y-4">
@@ -347,7 +347,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-            <span>📍</span> {t('adminPages.profiel.contactInfo')}
+            <span></span> {t('adminPages.profiel.contactInfo')}
           </h2>
           
           <div className="grid md:grid-cols-2 gap-4">
@@ -426,7 +426,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
-            <span>📋</span> {t('adminPages.profiel.fiscalInfo') || 'Fiscale Gegevens'}
+            <span></span> {t('adminPages.profiel.fiscalInfo') || 'Fiscale Gegevens'}
           </h2>
           <p className="text-gray-500 text-sm mb-6">
             {t('adminPages.profiel.fiscalInfoDescription') || 'Deze gegevens worden getoond op kassabonnen en facturen (wettelijk verplicht in België)'}
@@ -485,13 +485,13 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-            <span>📱</span> {t('adminPages.profiel.socialMedia')}
+            <span></span> {t('adminPages.profiel.socialMedia')}
           </h2>
           
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                <span>📘</span> {t('adminPages.profiel.facebook')}
+                <span></span> {t('adminPages.profiel.facebook')}
               </label>
               <input
                 type="url"
@@ -505,7 +505,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                <span>📸</span> {t('adminPages.profiel.instagram')}
+                <span></span> {t('adminPages.profiel.instagram')}
               </label>
               <input
                 type="url"
@@ -519,7 +519,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                <span>🎵</span> {t('adminPages.profiel.tiktok')}
+                <span></span> {t('adminPages.profiel.tiktok')}
               </label>
               <input
                 type="url"
@@ -533,7 +533,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                <span>🌐</span> {t('adminPages.profiel.website')}
+                <span></span> {t('adminPages.profiel.website')}
               </label>
               <input
                 type="url"
@@ -555,7 +555,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-            <span>🖼️</span> {t('adminPages.profiel.logo')}
+            <span></span> {t('adminPages.profiel.logo')}
           </h2>
           
           <MediaPicker
@@ -576,7 +576,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
-            <span>🎠</span> {t('adminPages.profiel.heroSliderTitle')}
+            <span></span> {t('adminPages.profiel.heroSliderTitle')}
           </h2>
           <p className="text-gray-500 text-sm mb-6">
             {t('adminPages.profiel.heroSliderIntro')}{' '}
@@ -628,7 +628,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
-            <span>👥</span> {t('adminPages.profiel.aboutPhotoTitle')}
+            <span></span> {t('adminPages.profiel.aboutPhotoTitle')}
           </h2>
           <p className="text-gray-500 text-sm mb-6">{t('adminPages.profiel.aboutPhotoDesc')}</p>
           
@@ -650,7 +650,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
-            <span>🏠</span> {t('adminPages.profiel.dashboardBackgroundTitle')}
+            <span></span> {t('adminPages.profiel.dashboardBackgroundTitle')}
           </h2>
           <p className="text-gray-500 text-sm mb-6">{t('adminPages.profiel.dashboardBackgroundDesc')}</p>
           <ImageZoomPicker
@@ -675,7 +675,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
-            <span>🏆</span> {t('adminPages.profiel.topSellersTitle')}
+            <span></span> {t('adminPages.profiel.topSellersTitle')}
           </h2>
           <p className="text-gray-500 text-sm mb-6">{t('adminPages.profiel.topSellersDesc')}</p>
           
@@ -832,7 +832,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
-            <span>📧</span> {t('adminPages.profiel.emailMarketingTitle')}
+            <span></span> {t('adminPages.profiel.emailMarketingTitle')}
           </h2>
           <p className="text-gray-500 text-sm mb-6">
             {t('adminPages.profiel.emailMarketingDesc')}

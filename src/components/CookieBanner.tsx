@@ -31,7 +31,7 @@ export default function CookieBanner() {
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex-1">
           <p className="text-sm md:text-base">
-            🍪 {t('cookies.message')}{' '}
+             {t('cookies.message')}{' '}
             <a href="/juridisch/cookies" className="text-accent hover:underline">{t('cookies.policy')}</a>.
           </p>
         </div>

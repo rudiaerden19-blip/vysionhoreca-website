@@ -281,7 +281,7 @@ export default function PersoneelPage() {
       {/* Staff List */}
       {filteredStaff.length === 0 ? (
         <div className="bg-white rounded-2xl p-12 text-center shadow-sm">
-          <div className="text-6xl mb-4">👥</div>
+          <div className="text-6xl mb-4"></div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">{t('personeelPage.noEmployees')}</h2>
           <p className="text-gray-500 mb-6">{t('personeelPage.noEmployeesDesc')}</p>
           <button
@@ -330,24 +330,24 @@ export default function PersoneelPage() {
 
               <div className="space-y-2 text-sm text-gray-600 mb-4">
                 <div className="flex items-center gap-2">
-                  <span>🔢</span>
+                  <span></span>
                   <span>{t('personeelPage.pin')}: <span className="font-mono font-bold text-gray-800">{member.pin}</span></span>
                 </div>
                 {member.email && (
                   <div className="flex items-center gap-2">
-                    <span>📧</span>
+                    <span></span>
                     <span>{member.email}</span>
                   </div>
                 )}
                 {member.phone && (
                   <div className="flex items-center gap-2">
-                    <span>📱</span>
+                    <span></span>
                     <span>{member.phone}</span>
                   </div>
                 )}
                 {member.contract_type && (
                   <div className="flex items-center gap-2">
-                    <span>📋</span>
+                    <span></span>
                     <span>{LOCAL_CONTRACT_TYPES.find(c => c.id === member.contract_type)?.label}</span>
                   </div>
                 )}
@@ -364,19 +364,19 @@ export default function PersoneelPage() {
                   onClick={() => openEditModal(member)}
                   className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors text-sm font-medium"
                 >
-                  ✏️ {t('adminPages.common.edit')}
+                   {t('adminPages.common.edit')}
                 </button>
                 <button
                   onClick={() => openContractModal(member)}
                   className="flex-1 px-3 py-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors text-sm font-medium"
                 >
-                  📋 {t('personeelPage.contract')}
+                   {t('personeelPage.contract')}
                 </button>
                 <button
                   onClick={() => handleDelete(member)}
                   className="px-3 py-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors text-sm"
                 >
-                  🗑️
+                  
                 </button>
               </div>
             </div>
@@ -390,7 +390,7 @@ export default function PersoneelPage() {
           <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl">
             <div className="p-6 border-b">
               <h2 className="text-xl font-bold text-gray-900">
-                {editingStaff ? `✏️ ${t('personeelPage.editEmployee')}` : `➕ ${t('personeelPage.newEmployee')}`}
+                {editingStaff ? ` ${t('personeelPage.editEmployee')}` : ` ${t('personeelPage.newEmployee')}`}
               </h2>
             </div>
             
@@ -455,7 +455,7 @@ export default function PersoneelPage() {
                     className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors"
                     title="Of genereer willekeurig"
                   >
-                    🎲
+                    
                   </button>
                 </div>
               </div>
@@ -516,7 +516,7 @@ export default function PersoneelPage() {
           <div className="bg-white rounded-xl w-full max-w-md shadow-xl">
             <div className="p-6 border-b">
               <h2 className="text-xl font-bold text-gray-800">
-                📋 {t('personeelPage.contract')}: {editingStaff.name}
+                 {t('personeelPage.contract')}: {editingStaff.name}
               </h2>
             </div>
             
@@ -583,7 +583,7 @@ export default function PersoneelPage() {
 
               {/* Woon-werk kilometers */}
               <div className="border-t pt-4 mt-4">
-                <h4 className="font-medium text-gray-800 mb-3">🚗 {t('personeelPage.contractForm.commuteTitle')}</h4>
+                <h4 className="font-medium text-gray-800 mb-3"> {t('personeelPage.contractForm.commuteTitle')}</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">{t('personeelPage.contractForm.commuteDistance')}</label>
@@ -627,7 +627,7 @@ export default function PersoneelPage() {
                   className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <label htmlFor="meal-vouchers" className="flex-1 cursor-pointer">
-                  <span className="font-medium text-gray-800">🍽️ {t('personeelPage.contractForm.mealVouchers')}</span>
+                  <span className="font-medium text-gray-800"> {t('personeelPage.contractForm.mealVouchers')}</span>
                   <p className="text-sm text-gray-500">{t('personeelPage.contractForm.mealVouchersHint')}</p>
                 </label>
               </div>
@@ -645,7 +645,7 @@ export default function PersoneelPage() {
 
               {contractData.hours_per_week && contractData.hourly_rate && (
                 <div className="bg-blue-50 rounded-lg p-4">
-                  <h4 className="font-medium text-blue-800 mb-2">💰 {t('personeelPage.contractForm.calculation')}</h4>
+                  <h4 className="font-medium text-blue-800 mb-2"> {t('personeelPage.contractForm.calculation')}</h4>
                   <div className="text-sm text-blue-700 space-y-1">
                     <div>{t('personeelPage.contractForm.perWeek')}: €{(contractData.hours_per_week * contractData.hourly_rate).toFixed(2)}</div>
                     <div>{t('personeelPage.contractForm.perMonth')}: €{(contractData.hours_per_week * contractData.hourly_rate * 4.33).toFixed(2)}</div>

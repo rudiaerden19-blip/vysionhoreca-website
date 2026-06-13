@@ -94,7 +94,7 @@ export default function ReviewPage({ params }: { params: { tenant: string } }) {
           animate={{ opacity: 1, scale: 1 }}
           className="bg-white rounded-3xl p-8 shadow-xl text-center max-w-md w-full"
         >
-          <div className="text-6xl mb-4">🎉</div>
+          <div className="text-6xl mb-4"></div>
           <h1 className="text-2xl font-bold text-gray-900 mb-4">{t('reviewPage.thankYou')}</h1>
           <p className="text-gray-600 mb-6">
             {t('reviewPage.thankYouDesc')}
@@ -164,7 +164,7 @@ export default function ReviewPage({ params }: { params: { tenant: string } }) {
                   onMouseLeave={() => setHoverRating(0)}
                   className="text-5xl transition-colors"
                 >
-                  {(hoverRating || rating) >= star ? '⭐' : '☆'}
+                  {(hoverRating || rating) >= star ? '⭐' : ''}
                 </motion.button>
               ))}
             </div>

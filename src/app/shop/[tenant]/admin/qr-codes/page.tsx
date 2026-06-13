@@ -8,9 +8,9 @@ import { getQrCodes, saveQrCode, deleteQrCode, QrCode } from '@/lib/admin-api'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 
 const getQrTypes = (t: (key: string) => string) => [
-  { id: 'menu', name: t('marketingQr.types.menu'), icon: '📋', description: t('marketingQr.types.menuDesc') },
-  { id: 'table', name: t('marketingQr.types.table'), icon: '🍽️', description: t('marketingQr.types.tableDesc') },
-  { id: 'promo', name: t('marketingQr.types.promo'), icon: '🎁', description: t('marketingQr.types.promoDesc') },
+  { id: 'menu', name: t('marketingQr.types.menu'), icon: '', description: t('marketingQr.types.menuDesc') },
+  { id: 'table', name: t('marketingQr.types.table'), icon: '', description: t('marketingQr.types.tableDesc') },
+  { id: 'promo', name: t('marketingQr.types.promo'), icon: '', description: t('marketingQr.types.promoDesc') },
   { id: 'review', name: t('marketingQr.types.review'), icon: '⭐', description: t('marketingQr.types.reviewDesc') },
 ]
 
@@ -219,7 +219,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
         
         {qrCodes.length === 0 ? (
           <div className="p-12 text-center">
-            <span className="text-6xl mb-4 block">📱</span>
+            <span className="text-6xl mb-4 block"></span>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('marketingQr.noQrCodes')}</h3>
             <p className="text-gray-500">{t('marketingQr.noQrCodesDesc')}</p>
           </div>
@@ -266,7 +266,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
                     className="p-2 bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-lg"
                     title="Afdrukken"
                   >
-                    🖨️
+                    
                   </button>
                   <button
                     type="button"
@@ -274,7 +274,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
                     className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg"
                     title="Verwijderen"
                   >
-                    🗑️
+                    
                   </button>
                 </div>
               </div>
@@ -290,7 +290,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
         transition={{ delay: 0.2 }}
         className="mt-6 bg-blue-50 border border-blue-200 rounded-2xl p-6"
       >
-        <h3 className="font-semibold text-blue-900 mb-2">💡 {t('marketingQr.tips.title')}</h3>
+        <h3 className="font-semibold text-blue-900 mb-2"> {t('marketingQr.tips.title')}</h3>
         <ul className="text-blue-700 text-sm space-y-1">
           <li>• {t('marketingQr.tips.tip1')}</li>
           <li>• {t('marketingQr.tips.tip2')}</li>
@@ -401,7 +401,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
                     </>
                   ) : (
                     <>
-                      <span>✓</span>
+                      <span></span>
                       <span>{t('marketingQr.create')}</span>
                     </>
                   )}

@@ -410,7 +410,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         ${businessInfo?.btw_number ? `<p>BTW: ${businessInfo.btw_number}</p>` : ''}
         <p><strong>KASSA RAPPORT</strong></p>
         <p>${formatDate(report.report_date)}</p>
-        ${report.is_closed ? '<p>🔒 AFGESLOTEN</p>' : ''}
+        ${report.is_closed ? '<p> AFGESLOTEN</p>' : ''}
       </div>
       ${(report.manual_cash != null || report.manual_card != null || report.manual_online != null) ? `
       <div class="section-title">HANDMATIGE KASSA INVOER</div>
@@ -550,7 +550,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           ${businessInfo?.btw_number ? `<p>BTW: ${businessInfo.btw_number}</p>` : ''}
           <p style="margin-top: 10px; font-weight: bold;">Z-RAPPORT ONLINE VERKOPEN</p>
           <p>${formatDate(selectedDate)}</p>
-          ${currentSavedReport?.is_closed ? `<p><span class="closed-badge">✓ AFGESLOTEN</span></p>` : ''}
+          ${currentSavedReport?.is_closed ? `<p><span class="closed-badge"> AFGESLOTEN</span></p>` : ''}
         </div>
         <div class="section">
           <div class="section-title">OMZET</div>
@@ -675,7 +675,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-8 print:hidden">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">🧾 {t('zReport.title')}</h1>
+          <h1 className="text-2xl font-bold text-gray-900"> {t('zReport.title')}</h1>
           <p className="text-gray-500 text-sm">{t('zReport.subtitle')} · Fiscale dag: 00:00 t/m +1dag 12:00u</p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -685,31 +685,31 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
               showHistory ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
-            📚 {t('zReport.history')}
+             {t('zReport.history')}
           </button>
           <button onClick={printZRapport} className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl font-medium flex items-center gap-2">
-            🖨️ {t('zReport.print')}
+             {t('zReport.print')}
           </button>
           <button
             onClick={downloadPDF}
             disabled={!stats || stats.orderCount === 0}
             className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl font-medium flex items-center gap-2 disabled:opacity-50"
           >
-            📄 PDF
+             PDF
           </button>
           <button
             onClick={() => { setEmailAddress(businessInfo?.email || ''); setShowEmailModal(true) }}
             disabled={!stats || stats.orderCount === 0}
             className="px-4 py-2 bg-purple-100 hover:bg-purple-200 text-purple-600 rounded-xl font-medium flex items-center gap-2 disabled:opacity-50"
           >
-            📧 E-mail
+             E-mail
           </button>
           <button
             onClick={refreshData}
             disabled={loading}
             className="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-xl font-medium flex items-center gap-2"
           >
-            🔄 {t('zReport.refresh')}
+             {t('zReport.refresh')}
           </button>
           {/* KASSA INVOER */}
           <button
@@ -722,7 +722,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                 : 'bg-orange-500 hover:bg-orange-600 text-white'
             }`}
           >
-            🏧 {t('zReport.kassaEntryButton')}
+             {t('zReport.kassaEntryButton')}
           </button>
           {/* OPSLAAN — geblokkeerd als dag afgesloten */}
           <button
@@ -731,7 +731,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
             title={isDayClosed ? 'Dag is afgesloten — kan niet meer gewijzigd worden' : 'Rapport opslaan in archief'}
             className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium flex items-center gap-2 disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
-            {syncing ? '⏳' : '💾'} {t('zReport.sync')}
+            {syncing ? '⏳' : ''} {t('zReport.sync')}
           </button>
           {/* AFSLUITEN — altijd zichtbaar naast opslaan */}
           {isDayClosed ? (
@@ -739,14 +739,14 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
               disabled
               className="px-4 py-2 bg-gray-200 text-gray-500 rounded-xl font-medium flex items-center gap-2 cursor-not-allowed"
             >
-              🔒 Afgesloten
+               Afgesloten
             </button>
           ) : (
             <button
               onClick={() => setShowCloseConfirm(true)}
               className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium flex items-center gap-2"
             >
-              🔒 Afsluiten
+               Afsluiten
             </button>
           )}
         </div>
@@ -755,7 +755,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       {/* Gesloten dag banner */}
       {isDayClosed && (
         <div className="mb-6 p-4 bg-green-50 border-2 border-green-300 rounded-2xl flex items-center gap-3 print:hidden">
-          <span className="text-2xl">🔒</span>
+          <span className="text-2xl"></span>
           <div>
             <p className="font-bold text-green-800">Dag definitief afgesloten</p>
             <p className="text-green-700 text-sm">
@@ -806,11 +806,11 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
               <p className="text-xs text-gray-400 mt-1">Fiscale periode: 00:00u — +1dag 12:00u</p>
               <div className="flex items-center justify-center gap-2 mt-2 flex-wrap">
                 <span className="inline-block px-3 py-1 bg-blue-100 text-blue-600 text-sm rounded-full">
-                  🔄 {t('zReport.autoUpdated')}
+                   {t('zReport.autoUpdated')}
                 </span>
                 {isDayClosed && (
                   <span className="inline-block px-3 py-1 bg-green-100 text-green-700 text-sm rounded-full font-medium">
-                    🔒 AFGESLOTEN
+                     AFGESLOTEN
                   </span>
                 )}
               </div>
@@ -864,19 +864,19 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                   <h4 className="font-semibold text-gray-900 mb-3">{t('zReport.paymentMethods')}</h4>
                   {stats.onlinePayments > 0 && (
                     <div className="flex justify-between items-center py-2">
-                      <span className="text-gray-600">💳 {t('zReport.onlinePaid')}</span>
+                      <span className="text-gray-600"> {t('zReport.onlinePaid')}</span>
                       <span className="font-medium">{formatCurrency(stats.onlinePayments)}</span>
                     </div>
                   )}
                   {stats.cardPayments > 0 && (
                     <div className="flex justify-between items-center py-2">
-                      <span className="text-gray-600">💳 {t('zReport.cardPaid')}</span>
+                      <span className="text-gray-600"> {t('zReport.cardPaid')}</span>
                       <span className="font-medium">{formatCurrency(stats.cardPayments)}</span>
                     </div>
                   )}
                   {stats.cashPayments > 0 && (
                     <div className="flex justify-between items-center py-2">
-                      <span className="text-gray-600">💵 {t('zReport.cashPaid')}</span>
+                      <span className="text-gray-600"> {t('zReport.cashPaid')}</span>
                       <span className="font-medium">{formatCurrency(stats.cashPayments)}</span>
                     </div>
                   )}
@@ -916,7 +916,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
               </div>
             ) : (
               <div className="p-12 text-center">
-                <span className="text-6xl mb-4 block">📭</span>
+                <span className="text-6xl mb-4 block"></span>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{t('zReport.noOrders')}</h3>
                 <p className="text-gray-500">{t('zReport.noOrdersDesc')}</p>
               </div>
@@ -926,7 +926,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
 
           {/* Instructies */}
           <div className="mt-6 p-6 bg-blue-50 border border-blue-200 rounded-2xl print:hidden">
-            <h3 className="font-semibold text-blue-900 mb-3">💡 {t('zReport.howToUse')}</h3>
+            <h3 className="font-semibold text-blue-900 mb-3"> {t('zReport.howToUse')}</h3>
             <ol className="text-blue-800 space-y-2 text-sm">
               <li>1. {t('zReport.step1')}</li>
               <li>2. {t('zReport.step2')}</li>
@@ -935,7 +935,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
               <li>5. Klik op <strong>"Dag afsluiten"</strong> na je shift om de fiscale dag te vergrendelen</li>
             </ol>
             <p className="text-blue-600 text-xs mt-4">
-              ⚠️ Fiscale dag = 00:00u tot 12:00u de volgende dag · {t('zReport.retention')}
+               Fiscale dag = 00:00u tot 12:00u de volgende dag · {t('zReport.retention')}
             </p>
           </div>
         </div>
@@ -944,7 +944,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         <div className={`lg:block ${showHistory ? 'block' : 'hidden'} print:hidden`}>
           <div className="bg-white rounded-2xl shadow-sm p-4 sticky top-6">
             <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-              📚 {t('zReport.savedReports')}
+               {t('zReport.savedReports')}
             </h3>
 
             {/* Periodefilter */}
@@ -982,7 +982,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                       <div className="flex justify-between items-center">
                         <span className="font-medium text-sm flex items-center gap-1">
                           {item.label}
-                          {item.isClosed && <span className="text-green-600 text-xs">🔒</span>}
+                          {item.isClosed && <span className="text-green-600 text-xs"></span>}
                         </span>
                         <span className="text-green-600 font-bold text-sm">{formatCurrency(item.total)}</span>
                       </div>
@@ -1006,7 +1006,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                         onClick={() => printKassaReport(item.report!)}
                         className="mt-2 w-full py-1 text-xs bg-orange-100 hover:bg-orange-200 text-orange-700 rounded-lg font-medium"
                       >
-                        🖨️ Rapport afdrukken
+                         Rapport afdrukken
                       </button>
                     )}
                   </div>
@@ -1050,7 +1050,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
               className="bg-white rounded-2xl max-w-md w-full p-6"
             >
               <div className="text-center mb-6">
-                <span className="text-5xl">🔒</span>
+                <span className="text-5xl"></span>
                 <h2 className="text-xl font-bold text-gray-900 mt-3">Dag afsluiten na shift</h2>
                 <p className="text-gray-500 text-sm mt-2">
                   Je sluit de fiscale dag van <strong>{formatDate(selectedDate)}</strong> definitief af.
@@ -1069,7 +1069,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
               </div>
 
               <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-800 text-xs mb-6">
-                ⚠️ <strong>Onomkeerbaar!</strong> Na afsluiten kan dit rapport niet meer gewijzigd worden. Dit is vereist door de Belgische GKS-wetgeving (witte kassa).
+                 <strong>Onomkeerbaar!</strong> Na afsluiten kan dit rapport niet meer gewijzigd worden. Dit is vereist door de Belgische GKS-wetgeving (witte kassa).
               </div>
 
               <div className="flex gap-3">
@@ -1088,7 +1088,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                   {closing ? (
                     <><span className="animate-spin">⏳</span> Afsluiten...</>
                   ) : (
-                    <>🔒 Bevestigen &amp; Afsluiten</>
+                    <> Bevestigen &amp; Afsluiten</>
                   )}
                 </button>
               </div>
@@ -1115,7 +1115,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
               onClick={e => e.stopPropagation()}
             >
               <div className="flex items-center gap-3 mb-2">
-                <span className="text-3xl">🏧</span>
+                <span className="text-3xl"></span>
                 <div>
                   <h2 className="text-xl font-bold text-gray-900">{t('zReport.kassaModalTitle')}</h2>
                   <p className="text-gray-500 text-sm">{formatDate(selectedDate)}</p>
@@ -1127,7 +1127,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
               <div className="space-y-4 mb-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    💵 {t('zReport.kassaModalCash')}
+                     {t('zReport.kassaModalCash')}
                   </label>
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium">€</span>
@@ -1144,7 +1144,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    💳 {t('zReport.kassaModalCard')}
+                     {t('zReport.kassaModalCard')}
                   </label>
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium">€</span>
@@ -1161,7 +1161,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    🌐 {t('zReport.kassaModalOnlineExtra')}
+                     {t('zReport.kassaModalOnlineExtra')}
                   </label>
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium">€</span>
@@ -1212,7 +1212,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                       <span className="animate-spin">⏳</span> {t('zReport.kassaModalSaving')}
                     </>
                   ) : (
-                    <>📊 {t('zReport.kassaModalSave')}</>
+                    <> {t('zReport.kassaModalSave')}</>
                   )}
                 </button>
               </div>
@@ -1238,7 +1238,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
               className="bg-white rounded-2xl max-w-md w-full p-6"
               onClick={(e) => e.stopPropagation()}
             >
-              <h2 className="text-xl font-bold mb-2">📧 Z-Rapport versturen</h2>
+              <h2 className="text-xl font-bold mb-2"> Z-Rapport versturen</h2>
               <p className="text-gray-500 text-sm mb-6">
                 Verstuur het Z-Rapport van {formatShortDate(selectedDate)} per e-mail
               </p>
@@ -1268,7 +1268,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                   disabled={!emailAddress || sendingEmail}
                   className="flex-1 px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-medium disabled:bg-gray-300 flex items-center justify-center gap-2"
                 >
-                  {sendingEmail ? <><span className="animate-spin">⏳</span> Verzenden...</> : <>📧 Versturen</>}
+                  {sendingEmail ? <><span className="animate-spin">⏳</span> Verzenden...</> : <> Versturen</>}
                 </button>
               </div>
             </motion.div>

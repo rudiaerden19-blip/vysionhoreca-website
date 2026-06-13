@@ -687,7 +687,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
       )
       if (!r.ok) throw new Error(r.error || 'delete failed')
       setIngredients([])
-      alert('✅ Alle ingrediënten zijn verwijderd.')
+      alert(' Alle ingrediënten zijn verwijderd.')
     } catch (error) {
       console.error('Delete error:', error)
       alert('Er ging iets mis bij het verwijderen.')
@@ -709,7 +709,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">🥬 Ingrediënten</h1>
+          <h1 className="text-2xl font-bold text-gray-900"> Ingrediënten</h1>
           <p className="text-gray-500 mt-1">
             Beheer alle ingrediënten met hun inkoopprijzen
           </p>
@@ -719,19 +719,19 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
             onClick={() => setShowInvoiceScanner(true)}
             className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
           >
-            📸 Scan Factuur
+             Scan Factuur
           </button>
           <button
             onClick={() => setShowDatabaseSearch(true)}
             className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
           >
-            🔍 Zoek in Database
+             Zoek in Database
           </button>
           <button
             onClick={() => setShowImport(true)}
             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
           >
-            📋 Plak Tabel
+             Plak Tabel
           </button>
           <button
             onClick={() => { resetForm(); setShowAddForm(true) }}
@@ -744,7 +744,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
               onClick={deleteAllIngredients}
               className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
             >
-              🗑️ Wis Alles
+               Wis Alles
             </button>
           )}
         </div>
@@ -768,7 +768,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
               onClick={e => e.stopPropagation()}
             >
               <div className="p-6 border-b bg-green-50">
-                <h2 className="text-xl font-bold text-gray-900">🔍 Zoek in Leveranciers Database</h2>
+                <h2 className="text-xl font-bold text-gray-900"> Zoek in Leveranciers Database</h2>
                 <p className="text-gray-600 mt-1">
                   Zoek uit 15.000 producten met automatische prijsberekening per stuk
                 </p>
@@ -800,7 +800,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                     disabled={dbSearching}
                     className="px-6 py-3 bg-green-500 text-white rounded-xl hover:bg-green-600 disabled:opacity-50"
                   >
-                    {dbSearching ? '...' : '🔍 Zoek'}
+                    {dbSearching ? '...' : ' Zoek'}
                   </button>
                 </div>
 
@@ -834,7 +834,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                               </td>
                               <td className="px-3 py-2 text-center">
                                 {alreadyAdded ? (
-                                  <span className="text-green-600">✓ Toegevoegd</span>
+                                  <span className="text-green-600"> Toegevoegd</span>
                                 ) : (
                                   <button
                                     onClick={() => addFromDatabase(product)}
@@ -856,7 +856,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                         <>Geen producten gevonden. Probeer een andere zoekterm.</>
                       ) : (
                         <>
-                          <div className="text-4xl mb-2">🔍</div>
+                          <div className="text-4xl mb-2"></div>
                           <p>Typ een zoekterm en klik op zoeken</p>
                           <p className="text-sm mt-2">bijv. "hamburger", "frikandel", "bicky saus"</p>
                         </>
@@ -907,7 +907,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
               onClick={e => e.stopPropagation()}
             >
               <div className="p-6 border-b bg-purple-50">
-                <h2 className="text-xl font-bold text-gray-900">📸 Factuur Scanner</h2>
+                <h2 className="text-xl font-bold text-gray-900"> Factuur Scanner</h2>
                 <p className="text-gray-600 mt-1">
                   Upload een foto of PDF van je leveranciersfactuur - AI herkent automatisch alle producten
                 </p>
@@ -927,7 +927,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                       onChange={handleInvoiceUpload}
                       className="hidden"
                     />
-                    <div className="text-6xl mb-4">📄</div>
+                    <div className="text-6xl mb-4"></div>
                     <p className="text-lg font-semibold text-gray-700">
                       Klik om factuur te uploaden
                     </p>
@@ -956,7 +956,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                 {/* Error message */}
                 {scanError && !scanningInvoice && (
                   <div className="text-center py-8">
-                    <div className="text-5xl mb-4">⚠️</div>
+                    <div className="text-5xl mb-4"></div>
                     <p className="text-lg font-semibold text-red-600 mb-2">{scanError}</p>
                     <button
                       onClick={() => {
@@ -1006,7 +1006,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
 
                     {/* Info banner */}
                     <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm">
-                      <p className="font-medium text-yellow-800">⚠️ Controleer de waarden voordat je opslaat!</p>
+                      <p className="font-medium text-yellow-800"> Controleer de waarden voordat je opslaat!</p>
                       <p className="text-yellow-700">Pas "Stuks/doos" en "Doosprijs" aan. Vul optioneel "Porties" in om de prijs per portie te berekenen.</p>
                     </div>
 
@@ -1222,7 +1222,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
               onClick={e => e.stopPropagation()}
             >
               <div className="p-6 border-b bg-blue-50">
-                <h2 className="text-xl font-bold text-gray-900">📋 Factuur Tabel Import</h2>
+                <h2 className="text-xl font-bold text-gray-900"> Factuur Tabel Import</h2>
                 <p className="text-gray-600 mt-1">
                   Kopieer de tabel uit je PDF/Excel factuur en plak hieronder
                 </p>
@@ -1311,7 +1311,7 @@ BITTERBALLEN 96X20G PB       1    CU    13.5420    5.00    12.86"
       <div className="relative">
         <input
           type="text"
-          placeholder="🔍 Zoek ingrediënt..."
+          placeholder=" Zoek ingrediënt..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -1437,7 +1437,7 @@ BITTERBALLEN 96X20G PB       1    CU    13.5420    5.00    12.86"
                 </div>
                 {parseFloat(String(formData.package_price).replace(',', '.')) > 0 && parseInt(String(formData.units_per_package)) > 0 && (
                   <p className="text-sm text-green-600 mt-2">
-                    ✓ Berekende prijs per {formData.unit}: €{(parseFloat(String(formData.package_price).replace(',', '.')) / parseInt(String(formData.units_per_package))).toFixed(4)}
+                     Berekende prijs per {formData.unit}: €{(parseFloat(String(formData.package_price).replace(',', '.')) / parseInt(String(formData.units_per_package))).toFixed(4)}
                   </p>
                 )}
               </div>
@@ -1502,13 +1502,13 @@ BITTERBALLEN 96X20G PB       1    CU    13.5420    5.00    12.86"
                     onClick={() => startEdit(ing)}
                     className="text-blue-500 hover:text-blue-700 mr-3"
                   >
-                    ✏️
+                    
                   </button>
                   <button
                     onClick={() => deleteIngredient(ing.id)}
                     className="text-red-400 hover:text-red-600"
                   >
-                    🗑️
+                    
                   </button>
                 </td>
               </tr>

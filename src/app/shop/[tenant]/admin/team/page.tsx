@@ -130,7 +130,7 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
           animate={{ opacity: 1, y: 0 }}
           className="bg-white rounded-2xl p-12 text-center shadow-sm"
         >
-          <div className="text-6xl mb-4">👥</div>
+          <div className="text-6xl mb-4"></div>
           <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('websiteTeam.noMembers')}</h3>
           <p className="text-gray-500 mb-6">{t('websiteTeam.noMembersDesc')}</p>
           <button
@@ -160,7 +160,7 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-4xl text-gray-300">
-                    👤
+                    
                   </div>
                 )}
               </div>
@@ -177,13 +177,13 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
                   onClick={() => handleEdit(member)}
                   className="p-3 bg-white rounded-xl hover:bg-gray-100 transition-colors"
                 >
-                  ✏️
+                  
                 </button>
                 <button
                   onClick={() => member.id && handleDelete(member.id)}
                   className="p-3 bg-white rounded-xl hover:bg-red-100 transition-colors"
                 >
-                  🗑️
+                  
                 </button>
               </div>
             </motion.div>
@@ -198,7 +198,7 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
         transition={{ delay: 0.2 }}
         className="mt-8 bg-blue-50 border border-blue-200 rounded-2xl p-6"
       >
-        <h3 className="font-semibold text-blue-900 mb-2">💡 {t('websiteTeam.tip')}</h3>
+        <h3 className="font-semibold text-blue-900 mb-2"> {t('websiteTeam.tip')}</h3>
         <p className="text-blue-700 text-sm">
           {t('websiteTeam.tipText')}
         </p>

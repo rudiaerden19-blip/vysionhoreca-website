@@ -99,12 +99,12 @@ export default function VacaturesPage({ params }: { params: { tenant: string } }
         </>
       ) : saved ? (
         <>
-          <span>✓</span>
+          <span></span>
           <span>{t('adminPages.common.saved')}</span>
         </>
       ) : (
         <>
-          <span>💾</span>
+          <span></span>
           <span>{t('adminPages.common.save')}</span>
         </>
       )}
@@ -151,7 +151,7 @@ export default function VacaturesPage({ params }: { params: { tenant: string } }
         className="bg-white rounded-2xl p-6 shadow-sm"
       >
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-          <span>📢</span> {t('vacaturesPage.lookingForStaff')}
+          <span></span> {t('vacaturesPage.lookingForStaff')}
         </h2>
         
         <div className="space-y-6">
@@ -248,7 +248,7 @@ export default function VacaturesPage({ params }: { params: { tenant: string } }
           className="mt-6 bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-2xl p-6"
         >
           <h3 className="font-semibold text-blue-900 mb-4 flex items-center gap-2">
-            <span>👁️</span> {t('vacaturesPage.preview')}
+            <span></span> {t('vacaturesPage.preview')}
           </h3>
           <div className="bg-white rounded-xl p-6 shadow-sm">
             <p className="text-sm text-blue-600 font-medium uppercase tracking-wider">{t('vacaturesPage.joinOurTeam')}</p>
@@ -259,7 +259,7 @@ export default function VacaturesPage({ params }: { params: { tenant: string } }
             {formData.hiring_contact && (
               <div className="mt-4 pt-4 border-t border-gray-100">
                 <span className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium">
-                  <span>👋</span> {formData.hiring_contact}
+                  <span></span> {formData.hiring_contact}
                 </span>
               </div>
             )}
@@ -274,7 +274,7 @@ export default function VacaturesPage({ params }: { params: { tenant: string } }
         transition={{ delay: 0.2 }}
         className="mt-6 bg-blue-50 border border-blue-200 rounded-2xl p-6"
       >
-        <h3 className="font-semibold text-blue-900 mb-2">💡 {t('vacaturesPage.tips.title')}</h3>
+        <h3 className="font-semibold text-blue-900 mb-2"> {t('vacaturesPage.tips.title')}</h3>
         <ul className="text-blue-700 text-sm space-y-1">
           <li>• {t('vacaturesPage.tips.tip1')}</li>
           <li>• {t('vacaturesPage.tips.tip2')}</li>

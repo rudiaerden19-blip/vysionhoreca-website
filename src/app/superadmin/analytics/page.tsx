@@ -123,13 +123,13 @@ export default function AnalyticsPage() {
             <Link href="/superadmin" className="text-slate-400 hover:text-white transition-colors">
               ← Terug
             </Link>
-            <h1 className="text-xl font-bold text-white">📊 Website Analytics</h1>
+            <h1 className="text-xl font-bold text-white"> Website Analytics</h1>
           </div>
           <button
             onClick={loadData}
             className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
           >
-            🔄 Vernieuwen
+             Vernieuwen
           </button>
         </div>
       </header>
@@ -162,7 +162,7 @@ export default function AnalyticsPage() {
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Top Pages */}
           <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
-            <h2 className="text-xl font-bold text-white mb-4">🏆 Top Pagina's</h2>
+            <h2 className="text-xl font-bold text-white mb-4"> Top Pagina's</h2>
             <div className="space-y-3">
               {topPages.length === 0 ? (
                 <p className="text-slate-400">Nog geen data</p>
@@ -182,7 +182,7 @@ export default function AnalyticsPage() {
 
           {/* Recent Views */}
           <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
-            <h2 className="text-xl font-bold text-white mb-4">🕐 Recente Bezoekers</h2>
+            <h2 className="text-xl font-bold text-white mb-4"> Recente Bezoekers</h2>
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {recentViews.length === 0 ? (
                 <p className="text-slate-400">Nog geen bezoekers</p>
@@ -210,7 +210,7 @@ export default function AnalyticsPage() {
 
         {/* Daily Stats */}
         <div className="mt-8 bg-slate-800 rounded-2xl p-6 border border-slate-700">
-          <h2 className="text-xl font-bold text-white mb-4">📅 Dagelijkse Stats (afgelopen 7 dagen)</h2>
+          <h2 className="text-xl font-bold text-white mb-4"> Dagelijkse Stats (afgelopen 7 dagen)</h2>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>

@@ -121,7 +121,7 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">🧮 {t('kostenInstellingenPage.title')}</h1>
+          <h1 className="text-2xl font-bold text-gray-900"> {t('kostenInstellingenPage.title')}</h1>
           <p className="text-gray-500 mt-1">
             {t('kostenInstellingenPage.subtitle')}
           </p>
@@ -136,7 +136,7 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
 
       {/* Info Box */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-        <h3 className="font-semibold text-blue-800 mb-2">💡 {t('kostenInstellingenPage.howTitle')}</h3>
+        <h3 className="font-semibold text-blue-800 mb-2"> {t('kostenInstellingenPage.howTitle')}</h3>
         <p className="text-blue-700 text-sm">
           {t('kostenInstellingenPage.howDesc')}<br/>
           <strong>{t('kostenInstellingenPage.example')}:</strong> {t('kostenInstellingenPage.exampleDesc')}
@@ -201,7 +201,7 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
                 onClick={() => deleteCategory(category.id)}
                 className="text-red-400 hover:text-red-600 text-sm"
               >
-                🗑️
+                
               </button>
             </div>
             

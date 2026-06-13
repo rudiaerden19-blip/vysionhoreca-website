@@ -446,7 +446,7 @@ export default function CheckoutPageClient({
               scheduledTime: scheduledTime,
             })
           })
-          console.log('✅ WhatsApp confirmation sent')
+          console.log(' WhatsApp confirmation sent')
           
           // If user came from WhatsApp, redirect back after short delay
           if (whatsappPhone && businessWhatsApp) {
@@ -498,7 +498,7 @@ export default function CheckoutPageClient({
           </p>
           
           <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-6">
-            <p className="text-blue-800 font-medium mb-2">📱 {t('checkoutPage.waitForConfirmation')}</p>
+            <p className="text-blue-800 font-medium mb-2"> {t('checkoutPage.waitForConfirmation')}</p>
             <p className="text-blue-600 text-sm">{t('checkoutPage.waitForConfirmationDesc')}</p>
           </div>
           
@@ -509,7 +509,7 @@ export default function CheckoutPageClient({
           
           {earnedPoints > 0 && loggedInCustomerId && (
             <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 mb-6">
-              <p className="text-yellow-800 font-medium">🎁 {t('checkoutPage.canEarnPoints').replace('{points}', String(earnedPoints))}</p>
+              <p className="text-yellow-800 font-medium"> {t('checkoutPage.canEarnPoints').replace('{points}', String(earnedPoints))}</p>
               <p className="text-yellow-600 text-sm">{t('checkoutPage.pointsAfterApproval')}</p>
             </div>
           )}
@@ -541,7 +541,7 @@ export default function CheckoutPageClient({
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="text-center">
-          <span className="text-6xl mb-4 block">🛒</span>
+          <span className="text-6xl mb-4 block"></span>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('checkoutPage.emptyCart')}</h1>
           <p className="text-gray-500 mb-6">{t('checkoutPage.emptyCartDesc')}</p>
           <Link
@@ -603,7 +603,7 @@ export default function CheckoutPageClient({
                     isKiosk ? 'min-h-[56px] p-5' : 'p-4'
                   } ${orderType === 'pickup' ? '' : 'border-gray-200 hover:border-gray-300'}`}
                 >
-                  <span className="text-3xl block mb-2">🛍️</span>
+                  <span className="text-3xl block mb-2"></span>
                   <span className="font-bold text-gray-900">{t('checkoutPage.pickup')}</span>
                   <span className="block text-sm text-gray-500">
                     {deliverySettings?.pickup_time_minutes ? `~${deliverySettings.pickup_time_minutes} min` : t('checkoutPage.readyDirect')}
@@ -619,7 +619,7 @@ export default function CheckoutPageClient({
                       isKiosk ? 'min-h-[56px] p-5' : 'p-4'
                     } ${orderType === 'delivery' ? '' : 'border-gray-200 hover:border-gray-300'}`}
                   >
-                    <span className="text-3xl block mb-2">🚗</span>
+                    <span className="text-3xl block mb-2"></span>
                     <span className="font-bold text-gray-900">{t('checkoutPage.delivery')}</span>
                     <span className="block text-sm text-gray-500">
                       +€{deliverySettings?.delivery_fee?.toFixed(2) || '0.00'}
@@ -630,7 +630,7 @@ export default function CheckoutPageClient({
               
               {orderType === 'delivery' && deliverySettings?.min_order_amount && subtotal < deliverySettings.min_order_amount && (
                 <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-800 text-sm font-medium">
-                  ⛔ {t('checkoutPage.minDelivery')} €{deliverySettings.min_order_amount.toFixed(2)} — {t('checkoutPage.minDeliveryNotMet') || 'Jouw bestelling is te laag voor bezorging.'}
+                   {t('checkoutPage.minDelivery')} €{deliverySettings.min_order_amount.toFixed(2)} — {t('checkoutPage.minDeliveryNotMet') || 'Jouw bestelling is te laag voor bezorging.'}
                 </div>
               )}
 
@@ -638,7 +638,7 @@ export default function CheckoutPageClient({
 
             {/* Date & Time Picker */}
             <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">📅 {t('checkoutPage.whenPickup')}</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-4"> {t('checkoutPage.whenPickup')}</h2>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {/* Date picker — kalender */}
@@ -676,12 +676,12 @@ export default function CheckoutPageClient({
               {/* Info message when today is not available */}
               {shopStatus && !shopStatus.canOrder && (
                 <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-xl text-orange-800 text-sm">
-                  ⚠️ {t('checkoutPage.todayNotAvailable')}
+                   {t('checkoutPage.todayNotAvailable')}
                 </div>
               )}
               {scheduledDate && isDateInExceptionalClosing(scheduledDate, exceptionalClosings) && (
                 <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-800 text-sm font-medium">
-                  ⛔ {t('checkoutPage.dateInClosingPeriod')}
+                   {t('checkoutPage.dateInClosingPeriod')}
                 </div>
               )}
             </div>
@@ -693,7 +693,7 @@ export default function CheckoutPageClient({
               
               {!loggedInCustomerId && (
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
-                  <p className="text-blue-800 font-medium mb-3">💡 {t('checkoutPage.loginForPoints')}</p>
+                  <p className="text-blue-800 font-medium mb-3"> {t('checkoutPage.loginForPoints')}</p>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <Link
                       href={shop('accountLogin')}
@@ -715,7 +715,7 @@ export default function CheckoutPageClient({
               
               {loggedInCustomerId && (
                 <div className="bg-green-50 border border-green-200 rounded-xl p-3 mb-4">
-                  <p className="text-green-700 font-medium">✓ {t('checkoutPage.loggedInPoints')}</p>
+                  <p className="text-green-700 font-medium"> {t('checkoutPage.loggedInPoints')}</p>
                 </div>
               )}
             </div>
@@ -825,7 +825,7 @@ export default function CheckoutPageClient({
                       paymentMethod === 'cash' ? '' : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
-                    <span className="text-3xl block mb-2">💵</span>
+                    <span className="text-3xl block mb-2"></span>
                     <span className="font-bold text-gray-900">{t('checkoutPage.cash')}</span>
                     <span className="block text-sm text-gray-500">{orderType === 'pickup' ? t('checkoutPage.payAtPickup') : t('checkoutPage.payAtDelivery')}</span>
                   </button>
@@ -840,7 +840,7 @@ export default function CheckoutPageClient({
                       paymentMethod === 'online' ? '' : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
-                    <span className="text-3xl block mb-2">💳</span>
+                    <span className="text-3xl block mb-2"></span>
                     <span className="font-bold text-gray-900">Bancontact</span>
                     <span className="block text-sm text-gray-500">{t('checkoutPage.securePayment')}</span>
                   </button>
@@ -854,7 +854,7 @@ export default function CheckoutPageClient({
                       paymentMethod === 'online' ? '' : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
-                    <span className="text-3xl block mb-2">💳</span>
+                    <span className="text-3xl block mb-2"></span>
                     <span className="font-bold text-gray-900">Visa</span>
                     <span className="block text-sm text-gray-500">{t('checkoutPage.securePayment')}</span>
                   </button>
@@ -868,7 +868,7 @@ export default function CheckoutPageClient({
                       paymentMethod === 'online' ? '' : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
-                    <span className="text-3xl block mb-2">💳</span>
+                    <span className="text-3xl block mb-2"></span>
                     <span className="font-bold text-gray-900">Mastercard</span>
                     <span className="block text-sm text-gray-500">{t('checkoutPage.securePayment')}</span>
                   </button>
@@ -882,7 +882,7 @@ export default function CheckoutPageClient({
                       paymentMethod === 'online' ? '' : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
-                    <span className="text-3xl block mb-2">🅿️</span>
+                    <span className="text-3xl block mb-2">🅿</span>
                     <span className="font-bold text-gray-900">PayPal</span>
                     <span className="block text-sm text-gray-500">{t('checkoutPage.securePayment')}</span>
                   </button>
@@ -896,7 +896,7 @@ export default function CheckoutPageClient({
                       paymentMethod === 'online' ? '' : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
-                    <span className="text-3xl block mb-2">🏦</span>
+                    <span className="text-3xl block mb-2"></span>
                     <span className="font-bold text-gray-900">iDEAL</span>
                     <span className="block text-sm text-gray-500">{t('checkoutPage.securePayment')}</span>
                   </button>
@@ -905,7 +905,7 @@ export default function CheckoutPageClient({
               
               {paymentMethod === 'online' && (
                 <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-xl text-blue-800 text-sm">
-                  ℹ️ {t('checkoutPage.onlineComingSoon')}
+                  ℹ {t('checkoutPage.onlineComingSoon')}
                 </div>
               )}
             </div>
@@ -922,7 +922,7 @@ export default function CheckoutPageClient({
                     {item.image_url ? (
                       <img src={item.image_url} alt={item.name} className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-lg" />
                     ) : (
-                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-lg flex items-center justify-center text-xl sm:text-2xl">🍟</div>
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-lg flex items-center justify-center text-xl sm:text-2xl"></div>
                     )}
                     <div className="flex-1">
                       <div className="flex justify-between">
@@ -933,7 +933,7 @@ export default function CheckoutPageClient({
                         <p className="text-sm text-gray-500">{item.options.map(o => o.name).join(', ')}</p>
                       )}
                       {item.notes && (
-                        <p className="text-sm text-orange-500 font-medium">⚠️ {item.notes}</p>
+                        <p className="text-sm text-orange-500 font-medium"> {item.notes}</p>
                       )}
                     </div>
                   </div>
@@ -959,7 +959,7 @@ export default function CheckoutPageClient({
                   </button>
                 </div>
                 {promoError && <p className="text-red-500 text-sm mt-2">{promoError}</p>}
-                {promoDiscount > 0 && <p className="text-green-600 text-sm mt-2">✓ {t('checkoutPage.discountApplied')}</p>}
+                {promoDiscount > 0 && <p className="text-green-600 text-sm mt-2"> {t('checkoutPage.discountApplied')}</p>}
               </div>
 
               {/* Totals */}
@@ -989,7 +989,7 @@ export default function CheckoutPageClient({
               {/* Submit Error Message */}
               {getSubmitError() && (
                 <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm text-center">
-                  ⚠️ {getSubmitError()}
+                   {getSubmitError()}
                 </div>
               )}
 
@@ -1003,7 +1003,7 @@ export default function CheckoutPageClient({
               {/* Order Cutoff Warning - Shop is open but can't order anymore */}
               {shopStatus && shopStatus.isOpen && shopStatus.canOrder === false && (
                 <div className="mt-4 p-4 bg-orange-50 border border-orange-300 rounded-xl text-orange-800 text-center">
-                  <div className="text-lg font-semibold mb-1">🛒 Bestellen niet meer mogelijk</div>
+                  <div className="text-lg font-semibold mb-1"> Bestellen niet meer mogelijk</div>
                   <p>{shopStatus.orderCutoffMessage || 'U kunt vandaag niet meer bestellen.'}</p>
                 </div>
               )}

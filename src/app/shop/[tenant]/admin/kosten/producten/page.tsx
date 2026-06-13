@@ -643,7 +643,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
       <ConfirmModal />
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">📊 {t('dashboard.productCosts.title')}</h1>
+        <h1 className="text-2xl font-bold text-gray-900"> {t('dashboard.productCosts.title')}</h1>
         <p className="text-gray-500 mt-1">
           {t('dashboard.productCosts.subtitle')}
         </p>
@@ -687,11 +687,11 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
         </div>
         <div className="bg-white rounded-xl p-4 shadow text-center">
           <div className="text-2xl font-bold text-green-600">{stats.good}</div>
-          <div className="text-sm text-gray-500">{t('dashboard.productCosts.good')} ✓</div>
+          <div className="text-sm text-gray-500">{t('dashboard.productCosts.good')} </div>
         </div>
         <div className="bg-white rounded-xl p-4 shadow text-center">
           <div className="text-2xl font-bold text-red-600">{stats.low}</div>
-          <div className="text-sm text-gray-500">{t('dashboard.productCosts.tooLow')} ⚠️</div>
+          <div className="text-sm text-gray-500">{t('dashboard.productCosts.tooLow')} </div>
         </div>
         <div className="bg-white rounded-xl p-4 shadow text-center">
           <div className="text-2xl font-bold text-blue-600">{stats.high}</div>
@@ -706,24 +706,24 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
         <div className="flex items-center justify-between mb-3 max-w-7xl mx-auto">
           <div>
             <h3 className="font-semibold text-blue-900 flex items-center gap-2">
-              💰 {t('dashboard.productCosts.standardPricesTitle')}
+               {t('dashboard.productCosts.standardPricesTitle')}
               {selectedProduct && (
                 <span className="ml-2 px-3 py-1 bg-green-500 text-white text-sm rounded-full">
-                  ➜ {products.find(p => p.id === selectedProduct)?.name}
+                   {products.find(p => p.id === selectedProduct)?.name}
                 </span>
               )}
               {showSimulator && !selectedProduct && (
                 <span className="ml-2 px-3 py-1 bg-purple-500 text-white text-sm rounded-full">
-                  ➜ Simulator
+                   Simulator
                 </span>
               )}
             </h3>
             <p className="text-sm text-blue-600 mt-1">
               {selectedProduct 
-                ? `✅ Klik op + om toe te voegen aan "${products.find(p => p.id === selectedProduct)?.name}"`
+                ? ` Klik op + om toe te voegen aan "${products.find(p => p.id === selectedProduct)?.name}"`
                 : showSimulator
-                  ? `✅ Klik op + om toe te voegen aan de Simulator`
-                  : `⚠️ ${t('dashboard.productCosts.openProductFirst')}`}
+                  ? ` Klik op + om toe te voegen aan de Simulator`
+                  : ` ${t('dashboard.productCosts.openProductFirst')}`}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -739,9 +739,9 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
               {savingStandardPrices ? (
                 <><div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div> Opslaan...</>
               ) : standardPricesSaved ? (
-                <>✓ Opgeslagen!</>
+                <> Opgeslagen!</>
               ) : (
-                <>💾 Opslaan</>
+                <> Opslaan</>
               )}
             </button>
             {/* Sluit knop - alleen tonen als panel fixed is */}
@@ -754,7 +754,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                 className="w-10 h-10 rounded-lg bg-red-500 text-white hover:bg-red-600 flex items-center justify-center text-xl font-bold transition-all hover:scale-105"
                 title="Sluiten"
               >
-                ✕
+                
               </button>
             )}
           </div>
@@ -822,7 +822,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                   }`}
                   title={selectedProduct ? `${item.label} toevoegen aan product` : showSimulator ? `${item.label} toevoegen aan simulator` : 'Open eerst een product of simulator'}
                 >
-                  {addingStandardItem === item.label ? '✓' : '+'}
+                  {addingStandardItem === item.label ? '' : '+'}
                 </button>
               </div>
             </div>
@@ -830,7 +830,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
         </div>
         
         <p className="text-xs text-blue-700 mt-3 italic max-w-7xl mx-auto">
-          💡 {t('dashboard.productCosts.standardPricesHint')}
+           {t('dashboard.productCosts.standardPricesHint')}
         </p>
       </div>
       
@@ -844,7 +844,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
           className="w-full p-4 flex items-center justify-between hover:bg-purple-100/50 transition-colors"
         >
           <div className="flex items-center gap-3">
-            <span className="text-2xl">🧮</span>
+            <span className="text-2xl"></span>
             <div className="text-left">
               <h3 className="font-semibold text-purple-900">{t('simulator.title')}</h3>
               <p className="text-sm text-purple-600">{t('simulator.subtitle')}</p>
@@ -901,7 +901,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
 
                 {/* Search in database */}
                 <div className="mb-4">
-                  <label className="block text-sm text-purple-700 mb-1">🔍 {t('simulator.searchDatabase')}</label>
+                  <label className="block text-sm text-purple-700 mb-1"> {t('simulator.searchDatabase')}</label>
                   <input
                     type="text"
                     value={simulatorSearch}
@@ -973,7 +973,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                 {/* Drop zone hint */}
                 {simulatorItems.length === 0 && (
                   <div className="border-2 border-dashed border-purple-300 rounded-lg p-8 text-center bg-white/50">
-                    <p className="text-purple-600 font-medium">👆 {t('simulator.dragHere')}</p>
+                    <p className="text-purple-600 font-medium"> {t('simulator.dragHere')}</p>
                     <p className="text-sm text-purple-400 mt-1">{t('simulator.orClick')}</p>
                   </div>
                 )}
@@ -1077,7 +1077,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                       }}
                       className="px-4 py-2 text-purple-600 hover:text-purple-800 text-sm"
                     >
-                      🗑️ {t('simulator.clear')}
+                       {t('simulator.clear')}
                     </button>
                   </div>
                 )}
@@ -1113,9 +1113,9 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                   pc.status === 'high' ? 'bg-blue-100' :
                   pc.ingredients.length > 0 ? 'bg-green-100' : 'bg-gray-100'
                 }`}>
-                  {pc.status === 'low' ? '🔴' :
-                   pc.status === 'high' ? '🟠' :
-                   pc.ingredients.length > 0 ? '🟢' : '⚪'}
+                  {pc.status === 'low' ? '' :
+                   pc.status === 'high' ? '' :
+                   pc.ingredients.length > 0 ? '' : ''}
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">{pc.product.name}</h3>
@@ -1183,7 +1183,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                   }`}>
                     {pc.status === 'low' ? `↑ €${Math.abs(pc.difference).toFixed(2)}` :
                      pc.status === 'high' ? `${t('dashboard.productCosts.high')} +€${pc.difference.toFixed(2)}` :
-                     `✓ ${t('dashboard.productCosts.good')}`}
+                     ` ${t('dashboard.productCosts.good')}`}
                   </div>
                 )}
                 <div className="text-gray-400">
@@ -1220,7 +1220,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                           }}
                           className="text-sm text-red-500 hover:text-red-700 hover:underline"
                         >
-                          🗑️ {t('dashboard.productCosts.resetIngredients')}
+                           {t('dashboard.productCosts.resetIngredients')}
                         </button>
                       )}
                     </div>
@@ -1271,7 +1271,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                                   onClick={() => removeIngredientFromProduct(pi.id)}
                                   className="text-red-400 hover:text-red-600"
                                 >
-                                  ✕
+                                  
                                 </button>
                               </td>
                             </tr>
@@ -1293,7 +1293,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                         <div className="flex-1 relative">
                           <input
                             type="text"
-                            placeholder={`🔍 ${t('dashboard.productCosts.searchPlaceholder')}`}
+                            placeholder={` ${t('dashboard.productCosts.searchPlaceholder')}`}
                             value={ingredientSearch}
                             onChange={(e) => handleIngredientSearch(e.target.value, pc.ingredients.map(pi => pi.ingredient_id))}
                             onFocus={() => setShowSearchResults(true)}
@@ -1332,7 +1332,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                           {/* Hint when not enough characters */}
                           {ingredientSearch.length < 2 && (
                             <div className="p-4 text-center text-gray-500">
-                              <div className="text-2xl mb-2">🔍</div>
+                              <div className="text-2xl mb-2"></div>
                               <p>{t('dashboard.productCosts.typeToSearch')}</p>
                               <p className="text-sm mt-1">{t('dashboard.productCosts.searchExample')}</p>
                             </div>
@@ -1350,7 +1350,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                           {searchResults.own.length > 0 && (
                             <div>
                               <div className="px-3 py-2 bg-blue-50 text-sm font-semibold text-blue-700 sticky top-0">
-                                📦 Jouw ingrediënten ({searchResults.own.length})
+                                 Jouw ingrediënten ({searchResults.own.length})
                               </div>
                               {searchResults.own.map(ing => (
                                 <button
@@ -1369,7 +1369,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                           {searchResults.database.length > 0 && (
                             <div>
                               <div className="px-3 py-2 bg-green-50 text-sm font-semibold text-green-700 sticky top-0">
-                                🔍 Database ({searchResults.database.length} producten)
+                                 Database ({searchResults.database.length} producten)
                               </div>
                               {searchResults.database.map(product => (
                                 <button
@@ -1393,7 +1393,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                           {ingredientSearch.length >= 2 && !searching && 
                            searchResults.own.length === 0 && searchResults.database.length === 0 && (
                             <div className="p-4 text-center">
-                              <div className="text-2xl mb-2">😕</div>
+                              <div className="text-2xl mb-2"></div>
                               <p className="text-gray-700 font-medium">{t('dashboard.productCosts.noResults')} "{ingredientSearch}"</p>
                               <p className="text-sm text-gray-500 mt-1">
                                 {t('dashboard.productCosts.runSqlFirst')}
@@ -1430,9 +1430,9 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                           pc.status === 'high' ? 'text-blue-700' :
                           'text-green-700'
                         }`}>
-                          {pc.status === 'low' && `⚠️ ${t('dashboard.productCosts.priceTooLow').replace('{amount}', Math.abs(pc.difference).toFixed(2)).replace('{target}', pc.requiredPrice.toFixed(2))}`}
-                          {pc.status === 'high' && `💰 ${t('dashboard.productCosts.highMargin').replace('{amount}', pc.difference.toFixed(2))}`}
-                          {pc.status === 'good' && `✓ ${t('dashboard.productCosts.goodPricing').replace('{amount}', pc.difference.toFixed(2))}`}
+                          {pc.status === 'low' && ` ${t('dashboard.productCosts.priceTooLow').replace('{amount}', Math.abs(pc.difference).toFixed(2)).replace('{target}', pc.requiredPrice.toFixed(2))}`}
+                          {pc.status === 'high' && ` ${t('dashboard.productCosts.highMargin').replace('{amount}', pc.difference.toFixed(2))}`}
+                          {pc.status === 'good' && ` ${t('dashboard.productCosts.goodPricing').replace('{amount}', pc.difference.toFixed(2))}`}
                         </div>
                       </div>
                     )}
@@ -1446,7 +1446,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
 
       {products.length === 0 && (
         <div className="text-center py-12 bg-white rounded-xl shadow">
-          <div className="text-4xl mb-4">📦</div>
+          <div className="text-4xl mb-4"></div>
           <h3 className="text-lg font-semibold text-gray-700">{t('dashboard.productCosts.noProductsFound')}</h3>
           <p className="text-gray-500">{t('dashboard.productCosts.addProductsFirst')}</p>
         </div>
@@ -1455,7 +1455,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
       {ingredients.length === 0 && products.length > 0 && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-center">
           <p className="text-yellow-800">
-            ⚠️ {t('dashboard.productCosts.noIngredientsWarning')} 
+             {t('dashboard.productCosts.noIngredientsWarning')} 
             <a href={`/shop/${params.tenant}/admin/kosten/ingredienten`} className="underline ml-1">
               {t('dashboard.productCosts.addIngredientsFirst')}
             </a>

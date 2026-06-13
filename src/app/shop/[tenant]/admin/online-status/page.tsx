@@ -10,11 +10,11 @@ import {
 } from '@/lib/auth-headers'
 
 const REASONS = [
-  { key: 'volzet',   icon: '🔴', labelKey: 'reasonVolzet',   descKey: 'reasonVolzetDesc' },
-  { key: 'panne',    icon: '🔧', labelKey: 'reasonPanne',    descKey: 'reasonPanneDesc' },
-  { key: 'vakantie', icon: '🌴', labelKey: 'reasonVakantie', descKey: 'reasonVakantieDesc' },
-  { key: 'sluiting', icon: '⚠️', labelKey: 'reasonSluiting', descKey: 'reasonSluitingDesc' },
-  { key: 'eigen',    icon: '✏️', labelKey: 'reasonEigen',    descKey: 'reasonEigenDesc' },
+  { key: 'volzet',   icon: '', labelKey: 'reasonVolzet',   descKey: 'reasonVolzetDesc' },
+  { key: 'panne',    icon: '', labelKey: 'reasonPanne',    descKey: 'reasonPanneDesc' },
+  { key: 'vakantie', icon: '', labelKey: 'reasonVakantie', descKey: 'reasonVakantieDesc' },
+  { key: 'sluiting', icon: '', labelKey: 'reasonSluiting', descKey: 'reasonSluitingDesc' },
+  { key: 'eigen',    icon: '', labelKey: 'reasonEigen',    descKey: 'reasonEigenDesc' },
 ]
 
 export default function OnlineStatusPage({ params }: { params: { tenant: string } }) {
@@ -124,7 +124,7 @@ export default function OnlineStatusPage({ params }: { params: { tenant: string 
       {/* Migration warning */}
       {needsMigration && (
         <div className="mb-6 bg-red-50 border border-red-200 rounded-2xl p-5">
-          <p className="font-bold text-red-800 mb-2">⚠️ Database tabel ontbreekt</p>
+          <p className="font-bold text-red-800 mb-2"> Database tabel ontbreekt</p>
           <p className="text-red-700 text-sm mb-3">
             Voer dit SQL-script uit in de Supabase SQL Editor om de tabel aan te maken:
           </p>
@@ -145,7 +145,7 @@ ALTER TABLE shop_offline_status
       {/* Save error */}
       {saveError && !needsMigration && (
         <div className="mb-6 bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center gap-3">
-          <span className="text-2xl">❌</span>
+          <span className="text-2xl"></span>
           <p className="text-red-800 text-sm">{saveError}</p>
         </div>
       )}
@@ -159,7 +159,7 @@ ALTER TABLE shop_offline_status
             exit={{ opacity: 0 }}
             className="mb-6 bg-green-50 border border-green-200 rounded-2xl p-4 flex items-center gap-3"
           >
-            <span className="text-2xl">✅</span>
+            <span className="text-2xl"></span>
             <p className="text-green-800 text-sm font-semibold">Status opgeslagen en zichtbaar voor klanten.</p>
           </motion.div>
         )}
@@ -181,7 +181,7 @@ ALTER TABLE shop_offline_status
           <div className="flex items-center justify-between mb-8">
             <div>
               <p className={`text-2xl font-bold ${isOffline ? 'text-red-700' : 'text-green-700'}`}>
-                {isOffline ? `🔴 ${t('shopOffline.statusOffline')}` : `🟢 ${t('shopOffline.statusOnline')}`}
+                {isOffline ? ` ${t('shopOffline.statusOffline')}` : ` ${t('shopOffline.statusOnline')}`}
               </p>
               <p className={`text-sm mt-1 ${isOffline ? 'text-red-500' : 'text-green-500'}`}>
                 {isOffline ? t('shopOffline.offlineDesc') : t('shopOffline.onlineDesc')}
@@ -221,7 +221,7 @@ ALTER TABLE shop_offline_status
               disabled={saving}
               className="w-full py-4 bg-green-500 hover:bg-green-600 text-white rounded-2xl font-bold text-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {saving ? <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : '✅'}
+              {saving ? <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : ''}
               {t('shopOffline.goOnline')}
             </button>
           ) : (
@@ -230,7 +230,7 @@ ALTER TABLE shop_offline_status
               disabled={saving}
               className="w-full py-4 bg-red-500 hover:bg-red-600 text-white rounded-2xl font-bold text-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              🔴 {t('shopOffline.goOffline')}
+               {t('shopOffline.goOffline')}
             </button>
           )}
         </motion.div>
@@ -238,7 +238,7 @@ ALTER TABLE shop_offline_status
 
       <div className="mt-6 bg-blue-50 border border-blue-200 rounded-2xl p-5">
         <p className="text-blue-800 text-sm font-medium">
-          💡 De status wordt onmiddellijk zichtbaar voor alle klanten in de webshop. Klanten kunnen niet bestellen wanneer de shop offline is.
+           De status wordt onmiddellijk zichtbaar voor alle klanten in de webshop. Klanten kunnen niet bestellen wanneer de shop offline is.
         </p>
       </div>
 
@@ -279,7 +279,7 @@ ALTER TABLE shop_offline_status
                         <p className="text-gray-500 text-sm">{t(`shopOffline.${reason.descKey}`)}</p>
                       </div>
                       {selectedReason === reason.key && (
-                        <span className="text-red-500 text-xl font-bold">✓</span>
+                        <span className="text-red-500 text-xl font-bold"></span>
                       )}
                     </button>
 
@@ -308,7 +308,7 @@ ALTER TABLE shop_offline_status
               {/* Inline save error inside popup */}
               {saveError && !needsMigration && (
                 <div className="mb-4 bg-red-50 border border-red-200 rounded-xl p-3">
-                  <p className="text-red-700 text-sm">❌ {saveError}</p>
+                  <p className="text-red-700 text-sm"> {saveError}</p>
                 </div>
               )}
 
@@ -326,7 +326,7 @@ ALTER TABLE shop_offline_status
                 >
                   {saving
                     ? <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    : `🔴 ${t('shopOffline.confirm')}`}
+                    : ` ${t('shopOffline.confirm')}`}
                 </button>
               </div>
             </motion.div>

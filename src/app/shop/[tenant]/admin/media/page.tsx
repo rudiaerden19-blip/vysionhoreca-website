@@ -224,9 +224,9 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
     }
 
     if (successCount > 0) {
-      alert(`✅ ${successCount} foto('s) geüpload en geoptimaliseerd!`)
+      alert(` ${successCount} foto('s) geüpload en geoptimaliseerd!`)
     } else if (errorMessage) {
-      alert(`❌ Upload mislukt: ${errorMessage}`)
+      alert(` Upload mislukt: ${errorMessage}`)
     }
   }
 
@@ -345,7 +345,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
               onClick={deleteSelected}
               className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-xl font-medium"
             >
-              🗑️ {selectedItems.length} {t('websiteMedia.delete')}
+               {selectedItems.length} {t('websiteMedia.delete')}
             </button>
           )}
           <button
@@ -353,7 +353,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
             disabled={uploading}
             className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-xl font-medium flex items-center gap-2"
           >
-            {uploading ? `⏳ ${t('websiteMedia.optimizing')}` : `📤 ${t('websiteMedia.upload')}`}
+            {uploading ? `⏳ ${t('websiteMedia.optimizing')}` : ` ${t('websiteMedia.upload')}`}
           </button>
           <input
             ref={fileInputRef}
@@ -372,7 +372,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
         animate={{ opacity: 1, y: 0 }}
         className="bg-white rounded-2xl p-6 shadow-sm mb-6"
       >
-        <h3 className="font-semibold text-gray-900 mb-4">📁 {t('websiteMedia.uploadToFolder')}</h3>
+        <h3 className="font-semibold text-gray-900 mb-4"> {t('websiteMedia.uploadToFolder')}</h3>
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => setUploadCategory('')}
@@ -394,7 +394,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
                   : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
               }`}
             >
-              📁 {cat}
+               {cat}
             </button>
           ))}
           <button
@@ -426,7 +426,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
                 onClick={createCategory}
                 className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium"
               >
-                ✓
+                
               </button>
               <button
                 onClick={() => {
@@ -435,7 +435,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
                 }}
                 className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl font-medium"
               >
-                ✕
+                
               </button>
             </motion.div>
           )}
@@ -449,7 +449,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
         onClick={() => fileInputRef.current?.click()}
         className="border-2 border-dashed border-gray-300 rounded-2xl p-12 text-center mb-8 hover:border-blue-500 transition-colors cursor-pointer bg-gray-50"
       >
-        <span className="text-5xl mb-4 block">📷</span>
+        <span className="text-5xl mb-4 block"></span>
         <p className="text-gray-700 font-medium mb-2">{t('websiteMedia.dragFilesHere')}</p>
         <p className="text-gray-500 text-sm mb-4">{t('websiteMedia.orClickToUpload')}</p>
         <p className="text-gray-400 text-xs">{t('websiteMedia.supportedFormats')}</p>
@@ -468,12 +468,12 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-              <span>🖼️</span> {t('websiteMedia.imageDisplay')}
+              <span></span> {t('websiteMedia.imageDisplay')}
             </h3>
             <p className="text-gray-500 text-sm">{t('websiteMedia.imageDisplayDesc')}</p>
           </div>
           {savedDisplayMode && (
-            <span className="text-green-500 text-sm font-medium">✓ {t('adminPages.common.saved')}</span>
+            <span className="text-green-500 text-sm font-medium"> {t('adminPages.common.saved')}</span>
           )}
         </div>
         
@@ -570,7 +570,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
             onClick={() => setViewMode('list')}
             className={`px-3 py-1 rounded-md transition-colors ${viewMode === 'list' ? 'bg-white shadow' : ''}`}
           >
-            ☰
+            
           </button>
         </div>
       </div>
@@ -614,18 +614,18 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
                 className="absolute top-2 right-2 w-10 h-10 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white rounded-full flex items-center justify-center shadow-xl border-2 border-white z-20"
                 title="Verwijderen"
               >
-                <span className="text-lg">🗑️</span>
+                <span className="text-lg"></span>
               </button>
               <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity pointer-events-none ${
                 selectedItems.includes(item.id) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
               }`}>
                 <span className="text-3xl text-white">
-                  {selectedItems.includes(item.id) ? '✓' : '○'}
+                  {selectedItems.includes(item.id) ? '' : '○'}
                 </span>
               </div>
               {item.category && (
                 <div className="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded-lg">
-                  📁 {item.category}
+                   {item.category}
                 </div>
               )}
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
@@ -667,7 +667,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
               </div>
               {item.category && (
                 <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-lg">
-                  📁 {item.category}
+                   {item.category}
                 </span>
               )}
               <p className="text-sm text-gray-400">{formatDate(item.created_at)}</p>
@@ -678,7 +678,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
                 className="w-10 h-10 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white rounded-full flex items-center justify-center shadow-lg flex-shrink-0 relative z-10"
                 title="Verwijderen"
               >
-                <span className="text-lg">🗑️</span>
+                <span className="text-lg"></span>
               </button>
             </div>
           ))}
@@ -688,7 +688,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
       {/* Empty State */}
       {!loading && filteredMedia.length === 0 && (
         <div className="text-center py-12">
-          <span className="text-6xl mb-4 block">📷</span>
+          <span className="text-6xl mb-4 block"></span>
           <h3 className="text-xl font-bold text-gray-900 mb-2">
             {selectedCategory === 'alle' ? t('websiteMedia.noMedia') : `${t('websiteMedia.noPhotosIn')} "${selectedCategory}"`}
           </h3>

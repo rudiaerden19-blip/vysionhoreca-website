@@ -221,12 +221,12 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
             </>
           ) : saved ? (
             <>
-              <span>✓</span>
+              <span></span>
               <span>{t('adminPages.common.saved')}</span>
             </>
           ) : (
             <>
-              <span>💾</span>
+              <span></span>
               <span>{t('adminPages.common.save')}</span>
             </>
           )}
@@ -243,7 +243,7 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
       {/* Add New */}
       <div className="bg-white rounded-2xl p-4 shadow-sm mb-4 border border-dashed border-blue-200 flex flex-col gap-3">
         <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
-          <span className="text-2xl shrink-0 hidden sm:block">📂</span>
+          <span className="text-2xl shrink-0 hidden sm:block"></span>
           <input
             type="text"
             value={newCategory}
@@ -277,7 +277,7 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
       {/* Categories List */}
       <motion.div className="bg-white rounded-2xl shadow-sm overflow-hidden">
         <div className="px-4 py-3 border-b bg-gray-50 flex flex-col sm:flex-row sm:items-center gap-2">
-          <span className="text-gray-400 text-sm">☰</span>
+          <span className="text-gray-400 text-sm"></span>
           <p className="text-sm text-gray-500 flex-1">
             {t('adminPages.categorieen.dragHintShort')}
           </p>
@@ -287,7 +287,7 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
         </div>
         {categories.length === 0 ? (
           <div className="p-12 text-center">
-            <span className="text-5xl mb-4 block">📂</span>
+            <span className="text-5xl mb-4 block"></span>
             <p className="text-gray-500 font-medium mb-1">Nog geen categorieën</p>
             <p className="text-gray-400 text-sm">Voeg hierboven een eerste categorie toe</p>
           </div>
@@ -385,7 +385,7 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
                     className="p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                     title={t('adminPages.common.delete')}
                   >
-                    🗑️
+                    
                   </button>
                 </div>
               </Reorder.Item>

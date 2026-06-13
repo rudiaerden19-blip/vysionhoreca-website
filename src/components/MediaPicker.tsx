@@ -331,7 +331,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
               <Image src={value} alt={t('mediaPicker.selectedImageAlt')} fill className="object-cover" unoptimized />
             ) : (
               <div className="text-center p-2">
-                <span className="text-3xl block mb-1">📷</span>
+                <span className="text-3xl block mb-1"></span>
                 <span className="text-xs text-gray-500">{t('mediaPicker.choosePhoto')}</span>
               </div>
             )}
@@ -362,7 +362,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                   }}
                   className="w-full px-4 py-3 text-left hover:bg-gray-50 active:bg-gray-100 flex items-center gap-3 transition-colors"
                 >
-                  <span className="text-xl">📁</span>
+                  <span className="text-xl"></span>
                   <div>
                     <p className="font-medium text-gray-900">{t('mediaPicker.pickFromFilesTitle')}</p>
                     <p className="text-xs text-gray-500">{t('mediaPicker.pickFromFilesSubtitle')}</p>
@@ -386,7 +386,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                   }}
                   className="w-full px-4 py-3 text-left hover:bg-gray-50 active:bg-gray-100 flex items-center gap-3 transition-colors border-t"
                 >
-                  <span className="text-xl">📸</span>
+                  <span className="text-xl"></span>
                   <div>
                     <p className="font-medium text-gray-900">{t('mediaPicker.takePhotoTitle')}</p>
                     <p className="text-xs text-gray-500">{t('mediaPicker.takePhotoSubtitle')}</p>
@@ -401,7 +401,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                   }}
                   className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 transition-colors border-t"
                 >
-                  <span className="text-xl">🖼️</span>
+                  <span className="text-xl"></span>
                   <div>
                     <p className="font-medium text-gray-900">{t('mediaPicker.fromLibraryTitle')}</p>
                     <p className="text-xs text-gray-500">{t('mediaPicker.fromLibrarySubtitle')}</p>
@@ -418,14 +418,14 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
               onClick={clearImage}
               className="text-red-500 hover:text-red-600 text-sm"
             >
-              ✕ {t('adminPages.common.delete')}
+               {t('adminPages.common.delete')}
             </button>
           )}
           
           {/* Error message display */}
           {errorMessage && (
             <div className="bg-red-100 border border-red-300 text-red-700 px-3 py-2 rounded-lg text-sm max-w-[200px]">
-              <p className="font-medium">⚠️ {t('mediaPicker.errorHeading')}</p>
+              <p className="font-medium"> {t('mediaPicker.errorHeading')}</p>
               <p className="text-xs mt-1">{errorMessage}</p>
               <button 
                 onClick={() => setErrorMessage(null)}
@@ -474,13 +474,13 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                     }}
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center gap-2"
                   >
-                    <span>📤</span> {t('mediaPicker.uploadNewPhoto')}
+                    <span></span> {t('mediaPicker.uploadNewPhoto')}
                   </button>
                   <button
                     onClick={() => setIsOpen(false)}
                     className="p-2 hover:bg-gray-100 rounded-lg"
                   >
-                    ✕
+                    
                   </button>
                 </div>
               </div>
@@ -509,7 +509,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                             : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                         }`}
                       >
-                        📁 {cat}
+                         {cat}
                       </button>
                     ))}
                   </div>
@@ -529,7 +529,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                   </div>
                 ) : filteredMedia.length === 0 ? (
                   <div className="text-center py-12">
-                    <span className="text-6xl block mb-4">📷</span>
+                    <span className="text-6xl block mb-4"></span>
                     <h4 className="font-semibold text-gray-900 mb-2">{t('mediaPicker.noPhotosTitle')}</h4>
                     <p className="text-gray-500 text-sm mb-4">
                       {t('mediaPicker.noPhotosBody')}
@@ -541,7 +541,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                       }}
                       className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium"
                     >
-                      📤 {t('mediaPicker.uploadPhotoCta')}
+                       {t('mediaPicker.uploadPhotoCta')}
                     </button>
                   </div>
                 ) : (
@@ -582,13 +582,13 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                               className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
                             />
                           ) : (
-                            <span className="text-lg font-bold">🗑️</span>
+                            <span className="text-lg font-bold"></span>
                           )}
                         </button>
                         {/* Selected indicator */}
                         {value === item.url && (
                           <div className="absolute bottom-1 right-1 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center shadow-lg">
-                            <span className="text-xs">✓</span>
+                            <span className="text-xs"></span>
                           </div>
                         )}
                       </motion.div>

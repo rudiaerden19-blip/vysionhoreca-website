@@ -75,7 +75,7 @@ export function KassaProductOptionsModal({
             }
             aria-label={t('kassaApp.closeAria')}
           >
-            ✕
+            
           </button>
         </div>
 
@@ -135,7 +135,7 @@ export function KassaProductOptionsModal({
                               : 'absolute top-1.5 right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#3C4D6B] text-xs font-bold text-white'
                           }
                         >
-                          ✓
+                          
                         </div>
                       )}
                       <span

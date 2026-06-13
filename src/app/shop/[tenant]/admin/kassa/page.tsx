@@ -757,7 +757,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
       ) : (
         <>
           <div className={noImgTop}>
-            <span className={`text-5xl ${posLuxuryAppearance ? 'text-neutral-500' : 'text-neutral-300'}`}>🍽️</span>
+            <span className={`text-5xl ${posLuxuryAppearance ? 'text-neutral-500' : 'text-neutral-300'}`}></span>
           </div>
           <div className={labelWrap}>
             <p className={labelClass}>{product.name}</p>
@@ -783,7 +783,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
               : 'absolute top-1.5 left-1.5 z-20 rounded-md bg-amber-400 px-1.5 py-0.5 text-xs font-bold text-white shadow'
           }
         >
-          {posLuxuryAppearance ? t('kassaApp.optionBadgeShort') : '⚙️'}
+          {posLuxuryAppearance ? t('kassaApp.optionBadgeShort') : ''}
         </div>
       )}
     </button>
@@ -3597,10 +3597,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     const orderTypeLabel =
       order.orderType === 'DINE_IN'
-        ? `🍽️ ${t('kassaReceipt.orderTypeDineIn')}`
+        ? ` ${t('kassaReceipt.orderTypeDineIn')}`
         : order.orderType === 'TAKEAWAY'
-          ? `📦 ${t('kassaReceipt.orderTypeTakeaway')}`
-          : `🚗 ${t('kassaReceipt.orderTypeDelivery')}`
+          ? ` ${t('kassaReceipt.orderTypeTakeaway')}`
+          : ` ${t('kassaReceipt.orderTypeDelivery')}`
     const receiptRefDisplay = isDraft
       ? barKitchenDelta
         ? t('kassaReceipt.barToogReceiptRef')
@@ -4319,10 +4319,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const paymentMethodOptions = useMemo<KassaPayOption[]>(
     () => [
-      { method: 'CASH', label: t('kassaApp.payCash'), icon: '💵', color: '#10b981' },
-      { method: 'CARD', label: t('kassaApp.payCard'), icon: '💳', color: '#3b82f6' },
-      { method: 'IDEAL', label: t('kassaApp.payIdeal'), icon: '📱', color: '#ec4899' },
-      { method: 'BANCONTACT', label: t('kassaApp.payBancontact'), icon: '🏦', color: '#f59e0b' },
+      { method: 'CASH', label: t('kassaApp.payCash'), icon: '', color: '#10b981' },
+      { method: 'CARD', label: t('kassaApp.payCard'), icon: '', color: '#3b82f6' },
+      { method: 'IDEAL', label: t('kassaApp.payIdeal'), icon: '', color: '#ec4899' },
+      { method: 'BANCONTACT', label: t('kassaApp.payBancontact'), icon: '', color: '#f59e0b' },
     ],
     [t],
   )
@@ -4332,7 +4332,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return (
       <div className={`fixed inset-0 z-[200] flex flex-col items-center justify-center p-8 ${ui.soundBackdrop}`}>
         <div className={`max-w-md text-center ${ui.soundHeading}`}>
-          <div className="mb-8 text-8xl">🔔</div>
+          <div className="mb-8 text-8xl"></div>
           <h1 className={`mb-4 text-4xl font-bold ${ui.soundHeading}`}>{t('kassaApp.soundTitle')}</h1>
           <p className={`mb-8 text-xl ${ui.soundBody}`}>
             {t('kassaApp.soundBody')}
@@ -4343,11 +4343,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             onClick={activateSound}
             className="flex w-full transform items-center justify-center gap-4 rounded-2xl bg-green-500 py-6 text-2xl font-bold text-white shadow-lg transition-all hover:scale-105 hover:bg-green-600"
           >
-            <span className="text-4xl">🔊</span>
+            <span className="text-4xl"></span>
             {t('kassaApp.soundActivateButton').toUpperCase()}
           </button>
           <p className={`mt-6 text-sm ${ui.soundMuted}`}>
-            💡 {t('kassaApp.soundHintFooter')}
+             {t('kassaApp.soundHintFooter')}
           </p>
         </div>
       </div>
@@ -4418,7 +4418,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             }`}
           />
         ) : (
-          <div className={`${thumbClass} flex items-center justify-center text-xl`}>🍽️</div>
+          <div className={`${thumbClass} flex items-center justify-center text-xl`}></div>
         )}
         <div className="min-w-0 flex-1">
           <p
@@ -4453,7 +4453,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 className={kassaAppearanceDark ? 'text-[1.05rem] leading-none' : undefined}
                 aria-hidden
               >
-                🗑
+                
               </span>
             ) : (
               '−'
@@ -4476,7 +4476,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 title={t('kassaApp.ariaEditOptions')}
                 aria-label={t('kassaApp.ariaEditOptions')}
               >
-                ✏️
+                
               </button>
             )}
           <span className={`w-6 text-center text-base font-bold ${ui.numpadInput}`}>{item.quantity}</span>
@@ -4532,7 +4532,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             >
               {item.quantity === 1 ? (
                 <span className={kassaAppearanceDark ? 'text-[1.05rem] leading-none' : undefined} aria-hidden>
-                  🗑
+                  
                 </span>
               ) : (
                 '−'
@@ -4896,7 +4896,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       )}
       {installPrompt && !isInstalled && (
         <div className="flex-shrink-0 bg-[#3C4D6B] text-white text-xs font-semibold flex items-center justify-between gap-2 py-1.5 px-4">
-          <span>📲 {t('kassaApp.pwaInstallBanner')}</span>
+          <span> {t('kassaApp.pwaInstallBanner')}</span>
           <div className="flex gap-2">
             <button onClick={handleInstallPWA} className={ui.pwaInstallBtn}>{t('kassaApp.install')}</button>
             <button onClick={() => setInstallPrompt(null)} className="text-white/70 hover:text-white text-lg leading-none">×</button>
@@ -5006,7 +5006,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               /* Categorieën: responsief raster; rijhoogte vult viewport; gap-4 = KASSA_MENU_GRID_GAP_PX */
               categories.length === 0 ? (
                 <div className={`flex flex-col items-center justify-center h-full ${ui.menuEmptyMuted}`}>
-                  <span className="text-5xl mb-3">📂</span>
+                  <span className="text-5xl mb-3"></span>
                   <p className="font-semibold">{t('kassaApp.noCategoriesTitle')}</p>
                   <p className="text-sm mt-1">{t('kassaApp.noCategoriesHint')}</p>
                 </div>
@@ -5044,7 +5044,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               /* Producten: zelfde raster als categorieën */
               productsInSelectedCategory.length === 0 ? (
                   <div className={`flex flex-col items-center justify-center h-full ${ui.menuEmptyMuted}`}>
-                    <span className="text-5xl mb-3">🍽️</span>
+                    <span className="text-5xl mb-3"></span>
                     <p className="font-semibold">{t('kassaApp.noProductsInCategory')}</p>
                   </div>
                 ) : (
@@ -5232,8 +5232,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 {orderType === 'DINE_IN' && tableNumber && dineInFloorZone === FLOOR_PLAN_ZONE_INSIDE ? (
                   <span className="mt-0.5 text-xs font-semibold opacity-95">
                     {kassaStoolsByZone[FLOOR_PLAN_ZONE_INSIDE].some((s) => s.stoolNumber === tableNumber)
-                      ? `🍺 ${tableNumber}`
-                      : `🪑 ${tableNumber}`}
+                      ? ` ${tableNumber}`
+                      : ` ${tableNumber}`}
                   </span>
                 ) : null}
               </button>
@@ -5267,8 +5267,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 {orderType === 'DINE_IN' && tableNumber && dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE ? (
                   <span className="mt-0.5 text-xs font-semibold opacity-95">
                     {kassaStoolsByZone[FLOOR_PLAN_ZONE_TERRACE].some((s) => s.stoolNumber === tableNumber)
-                      ? `🍺 ${tableNumber}`
-                      : `🪑 ${tableNumber}`}
+                      ? ` ${tableNumber}`
+                      : ` ${tableNumber}`}
                   </span>
                 ) : null}
               </button>
@@ -5343,7 +5343,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               }}
               className="mt-1 flex w-full items-center justify-center gap-1 rounded-lg border border-red-500/40 bg-red-950/40 py-1 text-[11px] font-bold text-red-200 transition-colors hover:bg-red-600/30 active:bg-red-600/50"
             >
-              <span aria-hidden>✕</span>
+              <span aria-hidden></span>
               {t('kassaApp.clearTableBanner')}
             </button>
           ) : null}
@@ -6010,7 +6010,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             setShowReservations(true)
           }}
         >
-          <span className="text-4xl shrink-0" aria-hidden>📅</span>
+          <span className="text-4xl shrink-0" aria-hidden></span>
           <div className="min-w-0">
             <p className="font-black text-xl md:text-2xl leading-tight">
               {pendingReservCount === 1
@@ -6109,7 +6109,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                                   : 'border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100'
                           }`}
                         >
-                          <div className="text-2xl">🪑</div>
+                          <div className="text-2xl"></div>
                           <div className="text-lg">{tbl.number}</div>
                           <div className="text-[11px] opacity-70">
                             {tbl.status === 'FREE'
@@ -6131,7 +6131,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     <>
                       <div className="flex items-center gap-2 border-t border-amber-100 bg-amber-50 px-4 py-2">
                         <span className="text-xs font-bold uppercase tracking-wider text-amber-700">
-                          🍺 {t('kassaApp.stoolsSection')}
+                           {t('kassaApp.stoolsSection')}
                         </span>
                       </div>
                       <div className="grid grid-cols-3 gap-3 p-4 sm:grid-cols-4 md:grid-cols-5">
@@ -6148,7 +6148,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                                   : 'border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100'
                             }`}
                           >
-                            <div className="text-2xl">🍺</div>
+                            <div className="text-2xl"></div>
                             <div className="text-lg">{s.stoolNumber}</div>
                             <div className="text-[11px] opacity-70">
                               {(tableOrders[tableOrderMapKey(pickerBrowseZone, s.stoolNumber)]?.length ?? 0) > 0
@@ -6181,7 +6181,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   }}
                   className="flex-1 rounded-xl bg-red-50 py-3 text-sm font-semibold text-red-600 transition-colors hover:bg-red-100"
                 >
-                  ✕ {t('kassaApp.clearTable')}
+                   {t('kassaApp.clearTable')}
                 </button>
               )}
               {kassaFloorPlanEnabled && (
@@ -6352,7 +6352,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           }}
         >
           <div className="text-white text-center px-8">
-            <div className="text-6xl mb-4">🔔</div>
+            <div className="text-6xl mb-4"></div>
             <h1 className="text-4xl md:text-6xl font-bold mb-4">{t('kassaApp.newOrderSplashTitle')}</h1>
             <div className="text-3xl md:text-5xl font-bold mb-6">#{newOrderAlert.orderNumber}</div>
             <div className="text-2xl md:text-4xl mb-8">€{newOrderAlert.total.toFixed(2)}</div>

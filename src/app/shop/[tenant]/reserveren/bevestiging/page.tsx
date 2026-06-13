@@ -38,7 +38,7 @@ export default function ReservationBevestigingPage({ params }: { params: { tenan
           className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-5xl shadow-lg"
           style={{ backgroundColor: primaryColor }}
         >
-          ✓
+          
         </div>
 
         <h2 className="text-2xl font-bold mb-2">Betaling Geslaagd!</h2>
@@ -52,15 +52,15 @@ export default function ReservationBevestigingPage({ params }: { params: { tenan
         {/* Bevestigingskaart */}
         <div className="rounded-2xl p-4 mb-6 text-sm text-left" style={{ backgroundColor: `${primaryColor}15` }}>
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-lg">✅</span>
+            <span className="text-lg"></span>
             <span className="font-medium text-gray-700">Borg betaald</span>
           </div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-lg">📧</span>
+            <span className="text-lg"></span>
             <span className="text-gray-600">Bevestiging verstuurd per email</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-lg">📅</span>
+            <span className="text-lg"></span>
             <span className="text-gray-600">Reservatie staat genoteerd</span>
           </div>
         </div>

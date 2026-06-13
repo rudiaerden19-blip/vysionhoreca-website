@@ -120,7 +120,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
         ...customer,
         loyalty_points: (customer.loyalty_points || 0) - reward.points_required,
       })
-      alert('🎉 ' + t('accountPage.redeemSuccess').replace('{reward}', reward.name))
+      alert(' ' + t('accountPage.redeemSuccess').replace('{reward}', reward.name))
     } else {
       alert(t('accountPage.deleteError'))
     }
@@ -217,7 +217,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
               onClick={() => setEditing(!editing)}
               className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium transition-colors text-sm sm:text-base shrink-0"
             >
-              {editing ? t('accountPage.cancel') : '✏️ ' + t('accountPage.edit')}
+              {editing ? t('accountPage.cancel') : ' ' + t('accountPage.edit')}
             </button>
           </div>
 
@@ -308,7 +308,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
                 €{customer?.total_spent?.toFixed(2) || '0.00'} besteed • {customer?.total_orders || 0} bestellingen
               </p>
             </div>
-            <div className="text-4xl sm:text-6xl">🎁</div>
+            <div className="text-4xl sm:text-6xl"></div>
           </div>
         </motion.div>
 
@@ -320,7 +320,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
             transition={{ delay: 0.15 }}
             className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm mb-4 sm:mb-6"
           >
-            <h2 className="text-lg font-bold text-gray-900 mb-4">🎁 {t('accountPage.rewards')}</h2>
+            <h2 className="text-lg font-bold text-gray-900 mb-4"> {t('accountPage.rewards')}</h2>
             <div className="space-y-3">
               {rewards.map((reward) => {
                 const canRedeem = (customer?.loyalty_points || 0) >= reward.points_required
@@ -370,7 +370,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
           
           {orders.length === 0 ? (
             <div className="text-center py-12">
-              <span className="text-5xl mb-4 block">📦</span>
+              <span className="text-5xl mb-4 block"></span>
               <p className="text-gray-500">{t('accountPage.noOrders')}</p>
               <Link
                 href={`/shop/${params.tenant}/menu`}
@@ -407,7 +407,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
           transition={{ delay: 0.3 }}
           className="bg-white rounded-2xl p-6 shadow-sm border border-red-100"
         >
-          <h2 className="text-lg font-bold text-red-700 mb-2">⚠️ {t('accountPage.deleteAccount')}</h2>
+          <h2 className="text-lg font-bold text-red-700 mb-2"> {t('accountPage.deleteAccount')}</h2>
           <p className="text-gray-600 text-sm mb-4">
             {t('accountPage.deleteAccountWarning')}
           </p>
@@ -426,7 +426,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
         className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-40 shadow-xl rounded-full px-8 py-4 font-bold text-white flex items-center gap-3 hover:scale-105 transition-transform"
         style={{ backgroundColor: primaryColor }}
       >
-        <span className="text-xl">🍟</span>
+        <span className="text-xl"></span>
         <span>{t('accountPage.orderNow')}</span>
         <span className="text-xl">→</span>
       </Link>
@@ -440,7 +440,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
             className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden"
           >
             <div className="p-6 bg-red-50 border-b">
-              <h2 className="text-xl font-bold text-red-700">⚠️ Account permanent verwijderen?</h2>
+              <h2 className="text-xl font-bold text-red-700"> Account permanent verwijderen?</h2>
             </div>
             <div className="p-6 space-y-4">
               <p className="text-gray-700">
@@ -482,7 +482,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
                 disabled={deleteConfirmText !== t('accountPage.deleteConfirmWord') || deleting}
                 className="flex-1 px-4 py-3 bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white rounded-xl font-medium"
               >
-                {deleting ? t('accountPage.deleting') : '🗑️ ' + t('accountPage.deleteAccount')}
+                {deleting ? t('accountPage.deleting') : ' ' + t('accountPage.deleteAccount')}
               </button>
             </div>
           </motion.div>

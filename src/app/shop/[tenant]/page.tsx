@@ -855,7 +855,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
         <div className="bg-white rounded-3xl p-12 shadow-xl max-w-md w-full text-center">
-          <span className="text-6xl mb-6 block">🚫</span>
+          <span className="text-6xl mb-6 block"></span>
           <h1 className="text-2xl font-bold text-gray-900 mb-4">{t('shopPage.blockedTitle')}</h1>
           <p className="text-gray-600 mb-6">
             {t('shopPage.blockedDescription')}
@@ -872,7 +872,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
         <div className="bg-white rounded-3xl p-12 shadow-xl max-w-md w-full text-center">
-          <span className="text-6xl mb-6 block">🔍</span>
+          <span className="text-6xl mb-6 block"></span>
           <h1 className="text-2xl font-bold text-gray-900 mb-4">{t('shopPage.notFoundTitle') || 'Shop niet gevonden'}</h1>
           <p className="text-gray-600 mb-6">
             {t('shopPage.notFoundDescription') || 'Deze shop bestaat niet of is verwijderd.'}
@@ -918,7 +918,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 style={{ backgroundColor: business.primary_color }}
                 className="text-white font-medium px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm hover:opacity-90 transition-opacity flex items-center gap-1"
               >
-                <span>🎁</span>
+                <span></span>
                 <span className="hidden sm:inline">{t('shopPage.promotions')}</span>
               </button>
             )}
@@ -928,7 +928,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               href={`/shop/${params.tenant}/account`}
               className="bg-white/20 backdrop-blur-md text-white font-semibold px-3 sm:px-4 py-2 sm:py-2.5 rounded-full text-sm sm:text-base hover:bg-white/30 transition-colors flex items-center gap-1.5"
             >
-              <span>👤</span>
+              <span></span>
               <span className="hidden sm:inline">{t('shopPage.account')}</span>
             </Link>
 
@@ -962,7 +962,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                         <LocaleFlagEmoji locale={loc} className="text-lg" />
                         <span className="text-gray-700">{localeNames[loc]}</span>
                         {locale === loc && (
-                          <span className="ml-auto text-green-500">✓</span>
+                          <span className="ml-auto text-green-500"></span>
                         )}
                       </button>
                     ))}
@@ -979,9 +979,9 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             <div className="max-w-4xl mx-auto text-center">
               <div className="flex items-center justify-center gap-3 mb-1">
                 <span className="text-3xl">
-                  {manualOffline.offline_reason === 'volzet' ? '🔴' :
-                   manualOffline.offline_reason === 'panne' ? '🔧' :
-                   manualOffline.offline_reason === 'vakantie' ? '🌴' : '⚠️'}
+                  {manualOffline.offline_reason === 'volzet' ? '' :
+                   manualOffline.offline_reason === 'panne' ? '' :
+                   manualOffline.offline_reason === 'vakantie' ? '' : ''}
                 </span>
                 <h2 className="text-xl sm:text-2xl font-bold">
                   {manualOffline.offline_reason === 'volzet' ? t('shopOffline.bannerVolzet') :
@@ -991,9 +991,9 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                    t('shopOffline.bannerSluiting')}
                 </h2>
                 <span className="text-3xl">
-                  {manualOffline.offline_reason === 'volzet' ? '🔴' :
-                   manualOffline.offline_reason === 'panne' ? '🔧' :
-                   manualOffline.offline_reason === 'vakantie' ? '🌴' : '⚠️'}
+                  {manualOffline.offline_reason === 'volzet' ? '' :
+                   manualOffline.offline_reason === 'panne' ? '' :
+                   manualOffline.offline_reason === 'vakantie' ? '' : ''}
                 </span>
               </div>
               <p className="text-white/90 text-sm sm:text-base">
@@ -1008,11 +1008,11 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           <div className="fixed top-16 left-0 right-0 z-40 bg-red-600 text-white py-4 px-4 shadow-lg">
             <div className="max-w-4xl mx-auto text-center">
               <div className="flex items-center justify-center gap-3 mb-2">
-                <span className="text-3xl">🚫</span>
+                <span className="text-3xl"></span>
                 <h2 className="text-xl sm:text-2xl font-bold">
                   {t('shopPage.shopClosedTitle')}
                 </h2>
-                <span className="text-3xl">🚫</span>
+                <span className="text-3xl"></span>
               </div>
               <p className="text-white/90 text-sm sm:text-base">
                 {shopStatus.message || t('shopPage.shopClosedMessage')}
@@ -1109,17 +1109,17 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             <div className="flex flex-wrap gap-2 sm:gap-3 mt-4 sm:mt-6">
               {business.pickup_enabled && (
                 <span className="inline-flex items-center gap-1 sm:gap-2 bg-white/10 backdrop-blur-md text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm">
-                  <span>🛍️</span> <span className="hidden xs:inline">{t('shopPage.pickup')} ·</span> {business.pickup_time}
+                  <span></span> <span className="hidden xs:inline">{t('shopPage.pickup')} ·</span> {business.pickup_time}
                 </span>
               )}
               {business.delivery_enabled && (
                 <span className="inline-flex items-center gap-1 sm:gap-2 bg-white/10 backdrop-blur-md text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm">
-                  <span>🚗</span> <span className="hidden xs:inline">{t('shopPage.delivery')} ·</span> {business.delivery_time}
+                  <span></span> <span className="hidden xs:inline">{t('shopPage.delivery')} ·</span> {business.delivery_time}
                 </span>
               )}
               {business.address && (
                 <span className="inline-flex items-center gap-1 sm:gap-2 bg-white/10 backdrop-blur-md text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm max-w-full truncate">
-                  <span className="shrink-0">📍</span> <span className="truncate">{business.address}{business.postal_code || business.city ? `, ${business.postal_code || ''} ${business.city || ''}`.trim() : ''}</span>
+                  <span className="shrink-0"></span> <span className="truncate">{business.address}{business.postal_code || business.city ? `, ${business.postal_code || ''} ${business.city || ''}`.trim() : ''}</span>
                 </span>
               )}
             </div>
@@ -1132,7 +1132,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   style={{ backgroundColor: business.primary_color }}
                   className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-2xl text-white font-bold text-sm sm:text-base hover:opacity-90 transition-opacity shadow-lg"
                 >
-                  <span>🛒</span>
+                  <span></span>
                   <span>Bestel Nu</span>
                 </Link>
               )}
@@ -1141,7 +1141,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   href={`/shop/${params.tenant}/reserveren`}
                   className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-2xl bg-white/20 backdrop-blur-md text-white font-bold text-sm sm:text-base hover:bg-white/30 transition-colors border border-white/30"
                 >
-                  <span>📅</span>
+                  <span></span>
                   <span>{t('shopPage.reserveTable') || 'Reserveer'}</span>
                 </Link>
               )}
@@ -1317,14 +1317,14 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-8 md:p-12 shadow-sm">
             {reservationSuccess ? (
               <div className="text-center py-12">
-                <div className="text-6xl mb-4">✅</div>
+                <div className="text-6xl mb-4"></div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('shopPage.reservationReceived')}</h3>
                 <p className="text-gray-600 mb-4">
                   {t('shopPage.reservationReceivedDesc')}
                 </p>
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 max-w-md mx-auto">
                   <p className="text-blue-800 font-medium">
-                    📧 {t('shopPage.reservationEmailNotice')}
+                     {t('shopPage.reservationEmailNotice')}
                   </p>
                 </div>
                 <button
@@ -1404,7 +1404,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     />
                     {selectedDayClosed && reservationForm.date && (
-                      <p className="text-red-500 text-sm mt-2">⚠️ {t('shopPage.closedOnThisDay')}</p>
+                      <p className="text-red-500 text-sm mt-2"> {t('shopPage.closedOnThisDay')}</p>
                     )}
                   </div>
                   <div>
@@ -1459,7 +1459,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 {/* Voorschot banner */}
                 {depositSettings.required && depositSettings.amount > 0 && (
                   <div className="mt-6 bg-amber-50 border border-amber-300 rounded-xl p-4 flex items-start gap-3">
-                    <span className="text-2xl">💳</span>
+                    <span className="text-2xl"></span>
                     <div>
                       <p className="font-bold text-amber-800">Voorschot vereist: €{depositSettings.amount}</p>
                       <p className="text-amber-700 text-sm mt-0.5">Na het invullen wordt u doorgestuurd naar de beveiligde betaalpagina (Stripe). Uw reservatie wordt bevestigd na betaling.</p>
@@ -1481,12 +1481,12 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     <span>{t('shopPage.pleaseWait')}</span>
                   ) : depositSettings.required && depositSettings.amount > 0 ? (
                     <>
-                      <span>💳</span>
+                      <span></span>
                       <span>Reserveren &amp; Betalen €{depositSettings.amount}</span>
                     </>
                   ) : (
                     <>
-                      <span>🍽️</span>
+                      <span></span>
                       <span>{t('shopPage.reserveNow')}</span>
                     </>
                   )}
@@ -1538,7 +1538,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               {business.hiring_contact && (
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6 border-t border-gray-200">
                   <div className="flex items-center gap-3 text-gray-600">
-                    <span className="text-2xl">📧</span>
+                    <span className="text-2xl"></span>
                     <span className="font-medium">{t('shopPage.interested')}</span>
                   </div>
                   <a
@@ -1548,7 +1548,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     style={{ backgroundColor: business.primary_color }}
                     className="inline-flex items-center gap-2 px-6 py-3 text-white font-bold rounded-xl hover:opacity-90 transition-opacity"
                   >
-                    <span>👋</span>
+                    <span></span>
                     <span>{business.hiring_contact}</span>
                   </a>
                 </div>
@@ -1567,7 +1567,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             <div className="flex items-center justify-center gap-2 mt-4">
               <div className="flex">
                 {[1, 2, 3, 4, 5].map((star) => (
-                  <span key={star} className="text-yellow-400 text-2xl">★</span>
+                  <span key={star} className="text-yellow-400 text-2xl"></span>
                 ))}
               </div>
               <span className="font-bold text-2xl text-gray-900">{business.average_rating}</span>
@@ -1595,7 +1595,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                         key={star} 
                         className={`text-lg ${star <= review.rating ? 'text-yellow-400' : 'text-gray-200'}`}
                       >
-                        ★
+                        
                       </span>
                     ))}
                   </div>
@@ -1683,7 +1683,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-6xl text-gray-400">
-                        👤
+                        
                       </div>
                     )}
                   </div>
@@ -1730,7 +1730,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 style={{ backgroundColor: business.primary_color }}
                 className="inline-flex items-center gap-3 px-8 py-4 text-white font-bold text-lg rounded-2xl hover:opacity-90 transition-opacity shadow-lg"
               >
-                <span className="text-2xl">🎁</span>
+                <span className="text-2xl"></span>
                 <span>{t('shopPage.orderGiftCard')}</span>
               </button>
             </div>
@@ -1750,7 +1750,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       <p className="text-white/70 text-sm">{t('shopPage.giftCard')}</p>
                       <p className="text-2xl font-bold">{business.name}</p>
                     </div>
-                    <span className="text-4xl">🎁</span>
+                    <span className="text-4xl"></span>
                   </div>
                   <div className="text-right">
                     <p className="text-white/70 text-sm">{t('shopPage.value')}</p>
@@ -1770,7 +1770,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             {/* Opening Hours */}
             <div>
               <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-                <span className="text-4xl">🕐</span>
+                <span className="text-4xl"></span>
                 {t('shopPage.openingHours')}
               </h2>
               <div className="space-y-3">
@@ -1805,7 +1805,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             {/* Contact */}
             <div>
               <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-                <span className="text-4xl">📍</span>
+                <span className="text-4xl"></span>
                 {t('shopPage.contact')}
               </h2>
               <div className="space-y-6">
@@ -1816,7 +1816,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     className="flex items-start gap-4 group"
                   >
                     <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center group-hover:bg-orange-500 transition-colors">
-                      <span className="text-xl">📍</span>
+                      <span className="text-xl"></span>
                     </div>
                     <div>
                       <p className="font-semibold group-hover:text-orange-400 transition-colors">{business.address}</p>
@@ -1833,7 +1833,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 {business.btw_number && (
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
-                      <span className="text-xl">🏢</span>
+                      <span className="text-xl"></span>
                     </div>
                     <div>
                       <p className="font-semibold">BTW: {business.btw_number}</p>
@@ -1845,7 +1845,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 {business.phone && (
                   <a href={`tel:${business.phone}`} className="flex items-start gap-4 group">
                     <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center group-hover:bg-orange-500 transition-colors">
-                      <span className="text-xl">📞</span>
+                      <span className="text-xl"></span>
                     </div>
                     <div>
                       <p className="font-semibold group-hover:text-orange-400 transition-colors">{business.phone}</p>
@@ -1857,7 +1857,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 {business.email && (
                   <a href={`mailto:${business.email}`} className="flex items-start gap-4 group">
                     <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center group-hover:bg-orange-500 transition-colors">
-                      <span className="text-xl">✉️</span>
+                      <span className="text-xl"></span>
                     </div>
                     <div>
                       <p className="font-semibold group-hover:text-orange-400 transition-colors">{business.email}</p>
@@ -1880,7 +1880,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     className="flex items-start gap-4 group"
                   >
                     <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center group-hover:bg-green-500 transition-colors">
-                      <span className="text-xl">🌐</span>
+                      <span className="text-xl"></span>
                     </div>
                     <div>
                       <p className="font-semibold group-hover:text-green-400 transition-colors">
@@ -1899,7 +1899,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       target="_blank"
                       className="w-12 h-12 bg-white/10 hover:bg-blue-600 rounded-xl flex items-center justify-center transition-colors"
                     >
-                      <span className="text-xl">📘</span>
+                      <span className="text-xl"></span>
                     </a>
                   )}
                   {business.social_instagram && (
@@ -1908,7 +1908,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       target="_blank"
                       className="w-12 h-12 bg-white/10 hover:bg-pink-600 rounded-xl flex items-center justify-center transition-colors"
                     >
-                      <span className="text-xl">📸</span>
+                      <span className="text-xl"></span>
                     </a>
                   )}
                   {business.social_tiktok && (
@@ -1917,7 +1917,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       target="_blank"
                       className="w-12 h-12 bg-white/10 hover:bg-black rounded-xl flex items-center justify-center transition-colors"
                     >
-                      <span className="text-xl">🎵</span>
+                      <span className="text-xl"></span>
                     </a>
                   )}
                 </div>
@@ -1946,7 +1946,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   className="w-full h-full"
                 />
               </div>
-              <div className="text-5xl mb-3">🍟</div>
+              <div className="text-5xl mb-3"></div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">{t('shopPage.viewMenu')}</h3>
               <p className="text-gray-600">{t('shopPage.scanToSeeMenu')}</p>
               <p className="text-sm text-gray-400 mt-2">of klik om te openen</p>
@@ -1961,7 +1961,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   className="w-full h-full"
                 />
               </div>
-              <div className="text-5xl mb-3">🎁</div>
+              <div className="text-5xl mb-3"></div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">{t('shopPage.promotions')}</h3>
               <p className="text-gray-600">{t('shopPage.scanToSeeOffers')}</p>
               <p className="text-sm text-gray-400 mt-2">of klik om te openen</p>
@@ -1998,7 +1998,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             </p>
             {manualOffline?.is_offline ? (
               <div className="bg-white/20 backdrop-blur font-bold text-xl px-12 py-5 rounded-full inline-flex items-center gap-3 text-white/60 cursor-not-allowed select-none">
-                <span>🚫</span>
+                <span></span>
                 <span>{t('shopOffline.orderingBlocked')}</span>
               </div>
             ) : (
@@ -2007,7 +2007,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   style={{ color: business.primary_color }}
                   className="bg-white font-bold text-xl px-12 py-5 rounded-full shadow-2xl inline-flex items-center gap-3 hover:scale-105 active:scale-95 transition-transform"
                 >
-                  <span>🍟</span>
+                  <span></span>
                   <span>{t('shopPage.startYourOrder')}</span>
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -2057,7 +2057,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 className="p-6 text-white text-center"
                 style={{ backgroundColor: business.primary_color }}
               >
-                <span className="text-4xl">🎁</span>
+                <span className="text-4xl"></span>
                 <h2 className="text-2xl font-bold mt-2">{t('shopPage.promotions')}</h2>
                 <p className="opacity-80">{t('shopPage.currentOffers')}</p>
               </div>
@@ -2112,7 +2112,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               <div className="p-4 border-t">
                 {manualOffline?.is_offline ? (
                   <div className="w-full py-4 text-white/60 font-bold text-lg rounded-xl bg-gray-300 flex items-center justify-center gap-2 cursor-not-allowed">
-                    🚫 {t('shopOffline.orderingBlocked')}
+                     {t('shopOffline.orderingBlocked')}
                   </div>
                 ) : (
                   <Link href={`/shop/${params.tenant}/menu`}>
@@ -2120,7 +2120,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       style={{ backgroundColor: business.primary_color }}
                       className="w-full py-4 text-white font-bold text-lg rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
                     >
-                      🍟 {t('shopPage.orderNow')}
+                       {t('shopPage.orderNow')}
                     </button>
                   </Link>
                 )}
@@ -2153,7 +2153,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 className="p-6 text-white text-center rounded-t-3xl"
                 style={{ backgroundColor: business.primary_color }}
               >
-                <span className="text-4xl">🎁</span>
+                <span className="text-4xl"></span>
                 <h2 className="text-2xl font-bold mt-2">{t('shopPage.giftCardModal.title')}</h2>
                 <p className="opacity-80">{t('shopPage.giftCardModal.subtitle')}</p>
               </div>
@@ -2166,7 +2166,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     {t('shopPage.giftCardModal.occasion')}
                   </label>
                   <div className="grid grid-cols-2 gap-2">
-                    {[{key: 'birthday', label: t('shopPage.giftCardModal.birthday'), icon: '🎂'}, {key: 'wedding', label: t('shopPage.giftCardModal.wedding'), icon: '💍'}, {key: 'valentine', label: t('shopPage.giftCardModal.valentine'), icon: '❤️'}, {key: 'justBecause', label: t('shopPage.giftCardModal.justBecause'), icon: '🎉'}].map(({key, label, icon}) => (
+                    {[{key: 'birthday', label: t('shopPage.giftCardModal.birthday'), icon: ''}, {key: 'wedding', label: t('shopPage.giftCardModal.wedding'), icon: ''}, {key: 'valentine', label: t('shopPage.giftCardModal.valentine'), icon: ''}, {key: 'justBecause', label: t('shopPage.giftCardModal.justBecause'), icon: ''}].map(({key, label, icon}) => (
                       <button
                         key={key}
                         type="button"
@@ -2359,7 +2359,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       </>
                     ) : (
                       <>
-                        <span>💳</span>
+                        <span></span>
                         <span>{t('giftCardPayment.payWithBancontact')}</span>
                       </>
                     )}
@@ -2404,7 +2404,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                         const data = await response.json()
                         
                         if (data.success) {
-                          alert(`✅ Cadeaubon aangemaakt!\n\nCode: ${data.code}\n\nBetaal €${amount.toFixed(2)} in de zaak om de bon te activeren.\n\nDe ontvanger krijgt een email zodra de betaling is ontvangen.`)
+                          alert(` Cadeaubon aangemaakt!\n\nCode: ${data.code}\n\nBetaal €${amount.toFixed(2)} in de zaak om de bon te activeren.\n\nDe ontvanger krijgt een email zodra de betaling is ontvangen.`)
                           setShowGiftCardModal(false)
                           setGiftCardForm({
                             occasion: '',
@@ -2428,7 +2428,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     disabled={giftCardLoading}
                     className="w-full py-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-lg rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                   >
-                    <span>💵</span>
+                    <span></span>
                     <span>{t('giftCardPayment.payInStore')}</span>
                   </button>
                 </div>
@@ -2452,7 +2452,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             disabled
             className="w-full text-white/60 font-bold py-4 rounded-2xl shadow-2xl flex items-center justify-center gap-3 bg-gray-400 cursor-not-allowed"
           >
-            <span>🚫</span>
+            <span></span>
             <span>{t('shopOffline.orderingBlocked')}</span>
           </button>
         ) : (
@@ -2461,7 +2461,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               style={{ backgroundColor: business.primary_color, boxShadow: `0 25px 50px -12px ${business.primary_color}66` }}
               className="w-full text-white font-bold py-4 rounded-2xl shadow-2xl flex items-center justify-center gap-3 hover:opacity-90 active:scale-95 transition-transform"
             >
-              <span>🍟</span>
+              <span></span>
               <span>{t('shopPage.startYourOrder')}</span>
             </button>
           </Link>

@@ -120,7 +120,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
             saved ? 'bg-green-500 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'
           }`}
         >
-          {saving ? t('adminPages.common.saving') : saved ? `✓ ${t('adminPages.common.saved')}` : `💾 ${t('adminPages.common.save')}`}
+          {saving ? t('adminPages.common.saving') : saved ? ` ${t('adminPages.common.saved')}` : ` ${t('adminPages.common.save')}`}
         </motion.button>
       )}
 
@@ -142,7 +142,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
-          ⚙️ {t('websiteGiftCards.settings')}
+           {t('websiteGiftCards.settings')}
         </button>
         <button
           onClick={() => setActiveTab('bonnen')}
@@ -152,7 +152,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
-          🎫 {t('websiteGiftCards.soldCards')} ({giftCards.filter(g => g.status === 'paid').length})
+           {t('websiteGiftCards.soldCards')} ({giftCards.filter(g => g.status === 'paid').length})
         </button>
       </div>
 
@@ -192,7 +192,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
             transition={{ delay: 0.1 }}
             className="bg-white rounded-2xl p-6 shadow-sm"
           >
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">💳 {t('websiteGiftCards.stripePayments')}</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-2"> {t('websiteGiftCards.stripePayments')}</h2>
             <p className="text-gray-500 text-sm mb-6">
               {t('websiteGiftCards.stripeDesc')} 
               <a href="https://dashboard.stripe.com/apikeys" target="_blank" className="text-blue-600 hover:underline ml-1">
@@ -231,10 +231,10 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
                     onClick={() => setShowSecretKey(!showSecretKey)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
                   >
-                    {showSecretKey ? '🙈' : '👁️'}
+                    {showSecretKey ? '' : ''}
                   </button>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">🔒 {t('websiteGiftCards.keySecurelyStored')}</p>
+                <p className="text-xs text-gray-500 mt-1"> {t('websiteGiftCards.keySecurelyStored')}</p>
               </div>
             </div>
           </motion.div>
@@ -248,14 +248,14 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
               className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-2xl p-6"
             >
               <h3 className="font-semibold text-blue-900 mb-4 flex items-center gap-2">
-                <span>👁️</span> {t('websiteGiftCards.adminPreviewHeading')}
+                <span></span> {t('websiteGiftCards.adminPreviewHeading')}
               </h3>
               <div className="bg-white rounded-xl p-6 shadow-sm text-center">
                 <p className="text-sm text-blue-600 font-medium uppercase tracking-wider">{t('shopPage.perfectGift')}</p>
                 <h4 className="text-2xl font-bold text-gray-900 mt-1">{t('shopPage.giftCardTitle')}</h4>
                 <p className="text-gray-600 mt-2">{t('websiteGiftCards.adminPreviewBody')}</p>
                 <button type="button" className="mt-4 px-6 py-3 bg-blue-600 text-white font-medium rounded-xl">
-                  🎁 {t('shopPage.orderGiftCard')}
+                   {t('shopPage.orderGiftCard')}
                 </button>
               </div>
             </motion.div>
@@ -268,7 +268,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
             transition={{ delay: 0.3 }}
             className="bg-blue-50 border border-blue-200 rounded-2xl p-6"
           >
-            <h3 className="font-semibold text-blue-900 mb-4">📋 {t('websiteGiftCards.howItWorks')}</h3>
+            <h3 className="font-semibold text-blue-900 mb-4"> {t('websiteGiftCards.howItWorks')}</h3>
             <ol className="text-blue-700 text-sm space-y-2">
               <li>1. {t('websiteGiftCards.step1')}</li>
               <li>2. {t('websiteGiftCards.step2')}</li>
@@ -288,7 +288,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
               animate={{ opacity: 1, y: 0 }}
               className="bg-white rounded-2xl p-12 text-center shadow-sm"
             >
-              <div className="text-6xl mb-4">🎁</div>
+              <div className="text-6xl mb-4"></div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('websiteGiftCards.noGiftCards')}</h3>
               <p className="text-gray-500">{t('websiteGiftCards.noGiftCardsDesc')}</p>
             </motion.div>
@@ -327,7 +327,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
                 >
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-xl">
-                      🎁
+                      
                     </div>
                     <div>
                       <p className="font-mono font-bold text-gray-900">{card.code}</p>

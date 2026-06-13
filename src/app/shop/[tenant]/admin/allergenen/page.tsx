@@ -7,20 +7,20 @@ import { supabase } from '@/lib/supabase'
 import { saveTenantAllergensConfig } from '@/lib/admin-api'
 
 const DEFAULT_ALLERGENS = [
-  { id: 'gluten', icon: '🌾', enabled: true },
-  { id: 'ei', icon: '🥚', enabled: true },
-  { id: 'melk', icon: '🥛', enabled: true },
-  { id: 'noten', icon: '🥜', enabled: true },
-  { id: 'pinda', icon: '🥜', enabled: true },
-  { id: 'soja', icon: '🫘', enabled: true },
-  { id: 'vis', icon: '🐟', enabled: true },
-  { id: 'schaaldieren', icon: '🦐', enabled: true },
-  { id: 'weekdieren', icon: '🐚', enabled: false },
-  { id: 'selderij', icon: '🥬', enabled: true },
-  { id: 'mosterd', icon: '🟡', enabled: true },
-  { id: 'sesam', icon: '⚪', enabled: true },
-  { id: 'sulfiet', icon: '🍷', enabled: false },
-  { id: 'lupine', icon: '🌸', enabled: false },
+  { id: 'gluten', icon: '', enabled: true },
+  { id: 'ei', icon: '', enabled: true },
+  { id: 'melk', icon: '', enabled: true },
+  { id: 'noten', icon: '', enabled: true },
+  { id: 'pinda', icon: '', enabled: true },
+  { id: 'soja', icon: '', enabled: true },
+  { id: 'vis', icon: '', enabled: true },
+  { id: 'schaaldieren', icon: '', enabled: true },
+  { id: 'weekdieren', icon: '', enabled: false },
+  { id: 'selderij', icon: '', enabled: true },
+  { id: 'mosterd', icon: '', enabled: true },
+  { id: 'sesam', icon: '', enabled: true },
+  { id: 'sulfiet', icon: '', enabled: false },
+  { id: 'lupine', icon: '', enabled: false },
 ]
 
 export default function AllergenenPage({ params }: { params: { tenant: string } }) {
@@ -103,7 +103,7 @@ export default function AllergenenPage({ params }: { params: { tenant: string } 
           disabled={saving}
           className={`px-6 py-3 text-white rounded-xl font-medium flex items-center gap-2 transition-colors ${saved ? 'bg-green-500' : 'bg-blue-600 hover:bg-blue-700'}`}
         >
-          {saving ? '⏳' : saved ? '✓' : '💾'} {saved ? t('adminPages.common.saved') : t('adminPages.common.save')}
+          {saving ? '⏳' : saved ? '' : ''} {saved ? t('adminPages.common.saved') : t('adminPages.common.save')}
         </motion.button>
       </div>
 

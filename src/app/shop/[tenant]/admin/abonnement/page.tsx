@@ -729,7 +729,7 @@ export default function AbonnementPage() {
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
           <div className="flex-1">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">🏢 Zaakgegevens</h2>
+            <h2 className="text-lg font-bold text-gray-900 mb-4"> Zaakgegevens</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
               {tenantInfo?.business_name && (
                 <div><span className="text-gray-500">Naam</span><p className="font-semibold text-gray-900">{tenantInfo.business_name}</p></div>
@@ -759,7 +759,7 @@ export default function AbonnementPage() {
           {(currentPlan === 'starter' || currentPlan === 'STARTER') && (
             <div className="flex-shrink-0">
               <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-2xl p-5 text-center max-w-xs">
-                <span className="text-3xl">✨</span>
+                <span className="text-3xl"></span>
                 <h3 className="font-bold text-purple-900 mt-2 mb-1">Upgrade naar Premium</h3>
                 <p className="text-purple-700 text-sm mb-4">Alle features voor €99/maand</p>
                 <button
@@ -767,7 +767,7 @@ export default function AbonnementPage() {
                   disabled={processing !== null}
                   className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white py-3 px-6 rounded-xl font-bold text-sm transition-colors disabled:opacity-50"
                 >
-                  {processing === 'pro' ? '⏳ Laden...' : '🛒 Upgrade naar Premium'}
+                  {processing === 'pro' ? '⏳ Laden...' : ' Upgrade naar Premium'}
                 </button>
               </div>
             </div>
@@ -776,9 +776,9 @@ export default function AbonnementPage() {
           {(currentPlan === 'pro' || currentPlan === 'PRO') && (isActive || isTrial) && (
             <div className="flex-shrink-0">
               <div className="bg-gradient-to-br from-purple-100 to-pink-100 border border-purple-300 rounded-2xl p-5 text-center max-w-xs">
-                <span className="text-3xl">✨</span>
+                <span className="text-3xl"></span>
                 <h3 className="font-bold text-purple-900 mt-2 mb-1">Vysion Premium</h3>
-                <p className="text-green-700 font-semibold text-sm">✅ Uw huidig plan is Premium</p>
+                <p className="text-green-700 font-semibold text-sm"> Uw huidig plan is Premium</p>
               </div>
             </div>
           )}
@@ -796,7 +796,7 @@ export default function AbonnementPage() {
           >
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-2xl">✨</span>
+                <span className="text-2xl"></span>
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-bold text-purple-900">Dit is een Pro functie</h3>
@@ -812,7 +812,7 @@ export default function AbonnementPage() {
                     }}
                     className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-bold text-sm transition-colors"
                   >
-                    🛒 Upgrade naar Pro
+                     Upgrade naar Pro
                   </button>
                   <button
                     onClick={() => setShowUpgradeBanner(false)}
@@ -838,7 +838,7 @@ export default function AbonnementPage() {
           >
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-2xl">✓</span>
+                <span className="text-2xl"></span>
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-bold text-green-800">
@@ -872,7 +872,7 @@ export default function AbonnementPage() {
           >
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-2xl">⚠️</span>
+                <span className="text-2xl"></span>
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-bold text-amber-800">Betaling geannuleerd</h3>
@@ -934,7 +934,7 @@ export default function AbonnementPage() {
                 disabled={processing !== null}
                 className="mt-4 bg-amber-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-amber-700 transition-colors disabled:opacity-50"
               >
-                {processing ? t('loading') : '💳 Nu Verlengen'}
+                {processing ? t('loading') : ' Nu Verlengen'}
               </button>
             </div>
           </div>
@@ -949,7 +949,7 @@ export default function AbonnementPage() {
             <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
               currentPlan === 'pro' || currentPlan === 'PRO' ? 'bg-purple-100' : 'bg-yellow-100'
             }`}>
-              <span className="text-2xl">{currentPlan === 'pro' || currentPlan === 'PRO' ? '✨' : '⚡'}</span>
+              <span className="text-2xl">{currentPlan === 'pro' || currentPlan === 'PRO' ? '' : ''}</span>
             </div>
             <div>
               <p className="text-sm text-gray-500">{t('currentPlan')}</p>
@@ -977,10 +977,10 @@ export default function AbonnementPage() {
                 ? 'bg-blue-100 text-blue-700'
                 : 'bg-gray-100 text-gray-700'
             }`}>
-              {hasOverdue ? `⚠️ ${t('overdueStatus')}` : 
-               isActive ? `✓ ${t('activeStatus')}` : 
-               isTrial ? `🕐 ${t('trialStatus')}` : 
-               isExpired ? `✗ ${t('expiredStatus')}` : status}
+              {hasOverdue ? ` ${t('overdueStatus')}` : 
+               isActive ? ` ${t('activeStatus')}` : 
+               isTrial ? ` ${t('trialStatus')}` : 
+               isExpired ? ` ${t('expiredStatus')}` : status}
             </span>
           </div>
           {isTrial && (
@@ -1055,7 +1055,7 @@ export default function AbonnementPage() {
         </div>
         {billingYearly && (
           <p className="text-green-600 text-sm mt-2 font-medium">
-            ✓ Je bespaart 10% met een jaarabonnement!
+             Je bespaart 10% met een jaarabonnement!
           </p>
         )}
       </div>
@@ -1065,7 +1065,7 @@ export default function AbonnementPage() {
         <div className="bg-gradient-to-br from-[#1a2e1a] to-[#2d4a2d] rounded-2xl p-6 text-white">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 bg-yellow-400 rounded-xl flex items-center justify-center">
-              <span className="text-2xl">⚡</span>
+              <span className="text-2xl"></span>
             </div>
             <div>
               <h3 className="text-xl font-bold">{t('starter')}</h3>
@@ -1091,7 +1091,7 @@ export default function AbonnementPage() {
             disabled={processing !== null}
             className="w-full bg-yellow-400 hover:bg-yellow-300 text-gray-900 py-4 rounded-xl font-bold text-lg transition-colors disabled:opacity-50"
           >
-            {processing === 'starter' ? t('loading') : `🛒 ${t('buyStarter')}`}
+            {processing === 'starter' ? t('loading') : ` ${t('buyStarter')}`}
           </button>
         </div>
 
@@ -1104,7 +1104,7 @@ export default function AbonnementPage() {
           </div>
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 bg-purple-400 rounded-xl flex items-center justify-center">
-              <span className="text-2xl">✨</span>
+              <span className="text-2xl"></span>
             </div>
             <div>
               <h3 className="text-xl font-bold">{t('pro')}</h3>
@@ -1130,7 +1130,7 @@ export default function AbonnementPage() {
             disabled={processing !== null}
             className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white py-4 rounded-xl font-bold text-lg transition-colors disabled:opacity-50"
           >
-            {processing === 'pro' ? t('loading') : `🛒 ${t('buyPro')}`}
+            {processing === 'pro' ? t('loading') : ` ${t('buyPro')}`}
           </button>
         </div>
       </div>
@@ -1158,7 +1158,7 @@ export default function AbonnementPage() {
             disabled={processing !== null}
             className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-colors disabled:opacity-50 whitespace-nowrap"
           >
-            {processing && processing !== 'starter' && processing !== 'pro' ? t('loading') : `💳 ${t('payNow')}`}
+            {processing && processing !== 'starter' && processing !== 'pro' ? t('loading') : ` ${t('payNow')}`}
           </button>
         </div>
       </div>
@@ -1222,7 +1222,7 @@ export default function AbonnementPage() {
                           {processing === invoice.id ? t('loading') : t('pay')}
                         </button>
                       ) : invoice.status === 'paid' ? (
-                        <span className="text-gray-400 text-sm">✓ {t('done')}</span>
+                        <span className="text-gray-400 text-sm"> {t('done')}</span>
                       ) : null}
                     </td>
                   </tr>

@@ -93,12 +93,12 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   
   // Rejection reasons with translated labels
   const REJECTION_REASONS = [
-    { id: 'busy', label: tx('reasonBusy'), icon: '🔥' },
-    { id: 'closed', label: tx('reasonClosed'), icon: '🚫' },
-    { id: 'no_stock', label: tx('reasonNoStock'), icon: '📦' },
-    { id: 'technical', label: tx('reasonTechnical'), icon: '⚠️' },
-    { id: 'address', label: tx('reasonAddress'), icon: '📍' },
-    { id: 'other', label: tx('reasonOther'), icon: '💬' },
+    { id: 'busy', label: tx('reasonBusy'), icon: '' },
+    { id: 'closed', label: tx('reasonClosed'), icon: '' },
+    { id: 'no_stock', label: tx('reasonNoStock'), icon: '' },
+    { id: 'technical', label: tx('reasonTechnical'), icon: '' },
+    { id: 'address', label: tx('reasonAddress'), icon: '' },
+    { id: 'other', label: tx('reasonOther'), icon: '' },
   ]
   
   const [orders, setOrders] = useState<Order[]>([])
@@ -270,7 +270,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
           
           // Alert for truly new orders
           if (trulyNewOrders.length > 0) {
-            console.log(`🔔 ${trulyNewOrders.length} NIEUWE bestelling(en) gedetecteerd!`)
+            console.log(` ${trulyNewOrders.length} NIEUWE bestelling(en) gedetecteerd!`)
             trulyNewOrders.forEach(order => {
               setNewOrderIds(prev => new Set([...prev, order.id]))
             })
@@ -337,7 +337,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
         // CRITICAL: Initialize known IDs with ALL current orders
         // This prevents false "new order" alerts on page load
         parsed.forEach(o => knownOrderIdsRef.current.add(o.id))
-        console.log(`📋 Initial load: ${webshopOnly.length} webshop orders (${parsed.length} totaal), ${knownOrderIdsRef.current.size} known IDs`)
+        console.log(` Initial load: ${webshopOnly.length} webshop orders (${parsed.length} totaal), ${knownOrderIdsRef.current.size} known IDs`)
       }
     } catch (error) {
       console.error('Error loading data:', error)
@@ -357,14 +357,14 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   async function sendOrderStatusEmail(order: Order, status: string, rejectionReason?: string, rejectionNotes?: string) {
     // Skip if no email
     if (!order.customer_email) {
-      console.log('⚠️ No customer email - skipping notification')
+      console.log(' No customer email - skipping notification')
       return
     }
     
     // Prevent duplicate emails using sessionStorage
     const emailKey = `${order.id}-${status}`
     if (sentEmailsRef.current.has(emailKey)) {
-      console.log('📧 Email already sent:', emailKey)
+      console.log(' Email already sent:', emailKey)
       return
     }
     
@@ -381,7 +381,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
       // SessionStorage might be full or disabled
     }
     
-    console.log(`📧 Sending ${status} email to ${order.customer_email}...`)
+    console.log(` Sending ${status} email to ${order.customer_email}...`)
     
     try {
       const response = await fetch('/api/send-order-status', {
@@ -420,13 +420,13 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
       })
       
       if (response.ok) {
-        console.log(`✅ Email sent successfully to ${order.customer_email}`)
+        console.log(` Email sent successfully to ${order.customer_email}`)
       } else {
         const errorText = await response.text()
-        console.error(`❌ Email API error: ${response.status} - ${errorText}`)
+        console.error(` Email API error: ${response.status} - ${errorText}`)
       }
     } catch (error) {
-      console.error('❌ Failed to send email:', error)
+      console.error(' Failed to send email:', error)
       // Don't remove from sentEmailsRef - we don't want to spam on retry
     }
   }
@@ -507,7 +507,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
         <td style="padding: 5px 0; font-size: ${type === 'kitchen' ? '16px' : '14px'};">
           <strong>${qty}x</strong> ${label}
           ${optLines.map((line) => `<br><span style="color: #666; padding-left: 15px; font-size: 12px;">+ ${line}</span>`).join('')}
-          ${(item as { notes?: unknown }).notes ? `<br><span style="color: #666; font-style: italic; padding-left: 15px; font-size: 12px;">📝 ${String((item as { notes?: unknown }).notes)}</span>` : ''}
+          ${(item as { notes?: unknown }).notes ? `<br><span style="color: #666; font-style: italic; padding-left: 15px; font-size: 12px;"> ${String((item as { notes?: unknown }).notes)}</span>` : ''}
         </td>
         <td style="text-align: right; padding: 5px 0; font-size: ${type === 'kitchen' ? '16px' : '14px'}; vertical-align: top;">
           €${lineTotal.toFixed(2)}
@@ -558,7 +558,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
           ${nlDineInSeat ? `<div style="text-align:center;font-weight:bold;font-size:13px;margin:6px 0;">${nlDineInSeat}</div>` : ''}
           ${(order.scheduled_date || order.scheduled_time) ? `
           <div style="margin: 8px 0; padding: 6px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; text-align: center; font-weight: bold; font-size: 13px;">
-            📅 ${order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''}${order.scheduled_time ? ' om ' + order.scheduled_time : ''}
+             ${order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''}${order.scheduled_time ? ' om ' + order.scheduled_time : ''}
           </div>` : ''}
           
           <div class="order-info">
@@ -594,7 +594,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
           <div class="divider"></div>
 
           <div style="text-align: center; margin: 10px 0;">
-            ${order.payment_status === 'paid' ? '✅ BETAALD' : '⏳ NOG TE BETALEN'}
+            ${order.payment_status === 'paid' ? ' BETAALD' : '⏳ NOG TE BETALEN'}
             ${order.payment_method ? ` (${order.payment_method})` : ''}
           </div>
 
@@ -643,7 +643,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             ${nlDineInSeat ? `<div style="margin: 8px 0; padding: 6px; background: #ecfdf5; border: 1px solid #10b981; border-radius: 4px; text-align: center; font-weight: bold; font-size: 15px;">${nlDineInSeat}</div>` : ''}
             ${(order.scheduled_date || order.scheduled_time) ? `
             <div style="margin: 6px 0; padding: 5px; background: #000; color: #fff; font-size: 16px; font-weight: bold;">
-              📅 ${order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit' }) : ''}${order.scheduled_time ? ' om ' + order.scheduled_time : ''}
+               ${order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit' }) : ''}${order.scheduled_time ? ' om ' + order.scheduled_time : ''}
             </div>` : ''}
             <div class="time">
               ${new Date(order.created_at).toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' })}
@@ -662,7 +662,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                   <strong style="font-size: 20px;">${qty}x</strong> 
                   <span style="font-size: 18px;">${label}</span>
                   ${optLines.map((line) => `<br><span style="padding-left: 20px;">+ ${line}</span>`).join('')}
-                  ${(item as { notes?: unknown }).notes ? `<br><span style="font-style: italic; padding-left: 20px;">📝 ${String((item as { notes?: unknown }).notes)}</span>` : ''}
+                  ${(item as { notes?: unknown }).notes ? `<br><span style="font-style: italic; padding-left: 20px;"> ${String((item as { notes?: unknown }).notes)}</span>` : ''}
                 </td>
               </tr>
             `
@@ -671,7 +671,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
           ${order.customer_notes ? `
             <div class="notes">
-              <strong>⚠️ OPMERKINGEN:</strong><br>
+              <strong> OPMERKINGEN:</strong><br>
               ${order.customer_notes}
             </div>
           ` : ''}
@@ -766,7 +766,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
       case 'new': return tx('statusNew')
       case 'confirmed': return tx('statusKitchen')
       case 'preparing': return tx('statusPreparing')
-      case 'ready': return `✓ ${tx('statusReady')}`
+      case 'ready': return ` ${tx('statusReady')}`
       case 'completed': return tx('statusCompleted')
       case 'rejected': return tx('statusRejected')
       default: return status.toUpperCase()
@@ -873,7 +873,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                 }
               }}
             >
-              <p className="text-6xl font-black text-white text-center mb-2">🔔 {tx('newOrder')}</p>
+              <p className="text-6xl font-black text-white text-center mb-2"> {tx('newOrder')}</p>
               <p className="text-3xl font-bold text-white/90 text-center">
                 {newOrderIds.size === 1 ? tx('clickToView') : `${newOrderIds.size} ${tx('newOrders')}`}
               </p>
@@ -892,7 +892,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                 className="flex shrink-0 items-center gap-2 rounded-xl bg-[#58CCFF] px-3 py-2 text-sm font-bold text-[#063042] shadow-md transition-colors hover:bg-[#47c6fe]"
               >
                 <span className="text-base leading-none" aria-hidden>
-                  🧾
+                  
                 </span>
                 {t('adminLayout.pos')}
               </Link>
@@ -901,7 +901,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
               className="h-10 w-10 shrink-0 rounded-xl flex items-center justify-center text-xl"
               style={{ backgroundColor: business?.primary_color }}
             >
-              🖥️
+              
             </div>
             <div className="min-w-0">
               <h1 className="truncate text-lg font-bold sm:text-xl text-white">{tx('title')}</h1>
@@ -915,7 +915,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
               onClick={enableSound}
               className="px-3 py-2 bg-green-500/20 text-green-400 rounded-xl flex items-center gap-2 text-sm cursor-pointer"
             >
-              🔊 {tx('soundEnabled')}
+               {tx('soundEnabled')}
             </span>
 
             {/* New order indicator */}
@@ -925,7 +925,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                 transition={{ repeat: Infinity, duration: 0.5 }}
                 className="px-4 py-2 bg-red-500 rounded-xl font-bold"
               >
-                🚨 {newOrderIds.size} {tx('new').toUpperCase()}
+                 {newOrderIds.size} {tx('new').toUpperCase()}
               </motion.div>
             )}
 
@@ -954,7 +954,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
               onClick={() => setShowReservationsModal(true)}
               className="px-3 py-2 bg-orange-600 hover:bg-orange-500 rounded-xl text-sm font-bold text-white relative"
             >
-              📅 Reserveringen
+               Reserveringen
               {reservations.length > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center animate-pulse">
                   {reservations.length}
@@ -966,7 +966,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
               href={`/keuken/${params.tenant}`}
               className="px-3 py-2 bg-orange-600 hover:bg-orange-500 rounded-xl text-sm font-bold text-white"
             >
-              👨‍🍳 {tx('kitchen')}
+               {tx('kitchen')}
             </Link>
 
             <div className="relative z-[130]" ref={displayLangRef}>
@@ -1037,7 +1037,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
           onClick={handleCompleteAll}
           className="ml-auto px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold transition-colors"
         >
-          ✓ Alles afronden
+           Alles afronden
         </button>
       </div>
 
@@ -1046,7 +1046,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
         {activeTab === 'active' ? (
           sortedActiveOrders.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-gray-500">
-              <span className="text-8xl mb-6">📭</span>
+              <span className="text-8xl mb-6"></span>
               <p className="text-2xl font-bold">{tx('noActiveOrders')}</p>
               <p className="text-lg mt-2">{tx('ordersAppearHere')}</p>
             </div>
@@ -1103,7 +1103,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                   <div className="p-3 bg-white text-gray-900">
                     {!hideInnerScheduleBox && (order.scheduled_date || order.scheduled_time) && (
                       <div className="mb-2 px-2 py-1.5 bg-gray-100 border border-gray-200 rounded text-gray-800 font-medium text-sm text-center">
-                        📅 {order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit' }) : ''}{order.scheduled_time ? ` om ${order.scheduled_time}` : ''}
+                         {order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit' }) : ''}{order.scheduled_time ? ` om ${order.scheduled_time}` : ''}
                       </div>
                     )}
                     <div className="flex items-center justify-between mb-2">
@@ -1228,7 +1228,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                     className="w-11 h-11 shrink-0 rounded-full bg-white/15 flex items-center justify-center text-xl text-white hover:bg-white/25"
                     aria-label={tx('cancel')}
                   >
-                    ✕
+                    
                   </button>
                 </div>
               </div>
@@ -1532,21 +1532,21 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             >
               <div className="p-6 border-b border-gray-700 flex items-center justify-between">
                 <div>
-                  <h2 className="text-2xl font-bold">📅 Reserveringen</h2>
+                  <h2 className="text-2xl font-bold"> Reserveringen</h2>
                   <p className="text-gray-400">Wachtend op goedkeuring</p>
                 </div>
                 <button
                   onClick={() => setShowReservationsModal(false)}
                   className="p-2 hover:bg-gray-700 rounded-lg text-gray-400"
                 >
-                  ✕
+                  
                 </button>
               </div>
 
               <div className="p-6 overflow-y-auto max-h-[60vh]">
                 {reservations.length === 0 ? (
                   <div className="text-center py-12">
-                    <span className="text-6xl mb-4 block">✓</span>
+                    <span className="text-6xl mb-4 block"></span>
                     <p className="text-xl text-gray-400">Geen wachtende reserveringen</p>
                   </div>
                 ) : (
@@ -1559,7 +1559,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">
-                              <span className="text-2xl">👤</span>
+                              <span className="text-2xl"></span>
                               <div>
                                 <h3 className="font-bold text-lg">{reservation.customer_name}</h3>
                                 <p className="text-gray-400 text-sm">
@@ -1569,22 +1569,22 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                             </div>
                             <div className="grid grid-cols-2 gap-2 text-sm">
                               <div className="flex items-center gap-2">
-                                <span>📅</span>
+                                <span></span>
                                 <span>{new Date(reservation.reservation_date).toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short' })}</span>
                               </div>
                               <div className="flex items-center gap-2">
-                                <span>🕐</span>
+                                <span></span>
                                 <span>{reservation.reservation_time.slice(0, 5)}</span>
                               </div>
                               {reservation.customer_phone && (
                                 <div className="flex items-center gap-2">
-                                  <span>📞</span>
+                                  <span></span>
                                   <a href={`tel:${reservation.customer_phone}`} className="text-blue-400 hover:underline">{reservation.customer_phone}</a>
                                 </div>
                               )}
                               {reservation.customer_email && (
                                 <div className="flex items-center gap-2">
-                                  <span>📧</span>
+                                  <span></span>
                                   <span className="text-gray-400 truncate">{reservation.customer_email}</span>
                                 </div>
                               )}
@@ -1600,13 +1600,13 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                               onClick={() => updateReservationStatus(reservation.id, 'confirmed')}
                               className="px-4 py-2 bg-green-600 hover:bg-green-500 rounded-xl font-bold flex items-center gap-2"
                             >
-                              ✓ Goedkeuren
+                               Goedkeuren
                             </button>
                             <button
                               onClick={() => updateReservationStatus(reservation.id, 'cancelled')}
                               className="px-4 py-2 bg-red-600 hover:bg-red-500 rounded-xl font-bold flex items-center gap-2"
                             >
-                              ✕ Afwijzen
+                               Afwijzen
                             </button>
                           </div>
                         </div>

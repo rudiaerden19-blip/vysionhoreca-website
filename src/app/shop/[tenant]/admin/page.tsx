@@ -373,7 +373,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
         >
           <div className="flex items-center justify-between mb-4">
             <span className={statLabelClass}>{t('adminDashboard.stats.ordersToday')}</span>
-            <span className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">📦</span>
+            <span className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center"></span>
           </div>
           <p className={`text-3xl font-bold ${photoFg}`}>{stats.todayOrders}</p>
           <p
@@ -399,7 +399,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
         >
           <div className="flex items-center justify-between mb-4">
             <span className={statLabelClass}>{t('adminDashboard.stats.revenueToday')}</span>
-            <span className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">💰</span>
+            <span className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center"></span>
           </div>
           <p className={`text-3xl font-bold ${photoFg}`}>€{stats.todayRevenue.toFixed(2)}</p>
           <p
@@ -479,7 +479,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           </div>
           {recentOrders.length === 0 ? (
             <div className={`text-center py-8 ${hasDashboardBg ? 'text-white/80' : 'text-gray-400'}`}>
-              <p className="text-4xl mb-2">📦</p>
+              <p className="text-4xl mb-2"></p>
               <p>{t('adminDashboard.recentOrders.noOrders')}</p>
             </div>
           ) : (
@@ -548,7 +548,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           </div>
           {stats.popularItems.length === 0 ? (
             <div className={`text-center py-8 ${hasDashboardBg ? 'text-white/80' : 'text-gray-400'}`}>
-              <p className="text-4xl mb-2">🍟</p>
+              <p className="text-4xl mb-2"></p>
               <p>{t('adminDashboard.popularItems.noSales')}</p>
             </div>
           ) : (

@@ -105,7 +105,7 @@ export default function VerkoopPage({ params }: { params: { tenant: string } }) 
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-gray-500">{t('salesPage.totalRevenue')}</span>
-            <span className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">💰</span>
+            <span className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center"></span>
           </div>
           <p className="text-3xl font-bold text-gray-900">€{stats.total_revenue.toFixed(2)}</p>
           <p className="text-gray-400 text-sm mt-1">
@@ -121,7 +121,7 @@ export default function VerkoopPage({ params }: { params: { tenant: string } }) 
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-gray-500">{t('salesPage.orders')}</span>
-            <span className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">📦</span>
+            <span className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center"></span>
           </div>
           <p className="text-3xl font-bold text-gray-900">{stats.total_orders}</p>
           <p className="text-gray-400 text-sm mt-1">
@@ -137,7 +137,7 @@ export default function VerkoopPage({ params }: { params: { tenant: string } }) 
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-gray-500">{t('salesPage.avgOrder')}</span>
-            <span className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">📊</span>
+            <span className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center"></span>
           </div>
           <p className="text-3xl font-bold text-gray-900">€{stats.average_order.toFixed(2)}</p>
           <p className="text-gray-400 text-sm mt-1">{t('salesPage.perOrder')}</p>
@@ -155,7 +155,7 @@ export default function VerkoopPage({ params }: { params: { tenant: string } }) 
         
         {dailyData.length === 0 ? (
           <div className="text-center py-12">
-            <span className="text-4xl mb-4 block">📊</span>
+            <span className="text-4xl mb-4 block"></span>
             <p className="text-gray-500">{t('salesPage.noSalesData')}</p>
           </div>
         ) : (
@@ -188,7 +188,7 @@ export default function VerkoopPage({ params }: { params: { tenant: string } }) 
         
         {topProducts.length === 0 ? (
           <div className="text-center py-12">
-            <span className="text-4xl mb-4 block">🍟</span>
+            <span className="text-4xl mb-4 block"></span>
             <p className="text-gray-500">{t('salesPage.noProductsSold')}</p>
           </div>
         ) : (
@@ -224,7 +224,7 @@ export default function VerkoopPage({ params }: { params: { tenant: string } }) 
         transition={{ delay: 0.5 }}
         className="mt-6 bg-blue-50 border border-blue-200 rounded-2xl p-6"
       >
-        <h3 className="font-semibold text-blue-900 mb-2">💡 {t('salesPage.aboutStats')}</h3>
+        <h3 className="font-semibold text-blue-900 mb-2"> {t('salesPage.aboutStats')}</h3>
         <p className="text-blue-700 text-sm">
           {t('salesPage.statsDescription')}
         </p>

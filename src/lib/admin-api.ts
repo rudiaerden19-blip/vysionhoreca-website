@@ -1757,16 +1757,16 @@ export type FixedCostCategory =
   | 'OTHER'
 
 export const FIXED_COST_CATEGORIES: { id: FixedCostCategory; label: string; icon: string }[] = [
-  { id: 'RENT', label: 'Huur', icon: '🏠' },
-  { id: 'PERSONNEL', label: 'Personeel', icon: '👥' },
-  { id: 'ELECTRICITY', label: 'Elektriciteit', icon: '⚡' },
-  { id: 'GAS', label: 'Gas', icon: '🔥' },
-  { id: 'WATER', label: 'Water', icon: '💧' },
-  { id: 'INSURANCE', label: 'Verzekeringen', icon: '🛡️' },
-  { id: 'LEASING', label: 'Leasing', icon: '📋' },
-  { id: 'LOAN', label: 'Leningen', icon: '🏦' },
-  { id: 'SUBSCRIPTIONS', label: 'Abonnementen', icon: '📱' },
-  { id: 'OTHER', label: 'Overige', icon: '📦' },
+  { id: 'RENT', label: 'Huur', icon: '' },
+  { id: 'PERSONNEL', label: 'Personeel', icon: '' },
+  { id: 'ELECTRICITY', label: 'Elektriciteit', icon: '' },
+  { id: 'GAS', label: 'Gas', icon: '' },
+  { id: 'WATER', label: 'Water', icon: '' },
+  { id: 'INSURANCE', label: 'Verzekeringen', icon: '' },
+  { id: 'LEASING', label: 'Leasing', icon: '' },
+  { id: 'LOAN', label: 'Leningen', icon: '' },
+  { id: 'SUBSCRIPTIONS', label: 'Abonnementen', icon: '' },
+  { id: 'OTHER', label: 'Overige', icon: '' },
 ]
 
 export interface FixedCost {
@@ -1850,12 +1850,12 @@ export type VariableCostCategory =
   | 'OTHER'
 
 export const VARIABLE_COST_CATEGORIES: { id: VariableCostCategory; label: string; icon: string }[] = [
-  { id: 'INGREDIENTS', label: 'Ingrediënten', icon: '🥔' },
-  { id: 'PACKAGING', label: 'Verpakking', icon: '📦' },
-  { id: 'CLEANING', label: 'Schoonmaak', icon: '🧹' },
-  { id: 'MAINTENANCE', label: 'Onderhoud', icon: '🔧' },
-  { id: 'MARKETING', label: 'Marketing', icon: '📢' },
-  { id: 'OTHER', label: 'Overige', icon: '📋' },
+  { id: 'INGREDIENTS', label: 'Ingrediënten', icon: '' },
+  { id: 'PACKAGING', label: 'Verpakking', icon: '' },
+  { id: 'CLEANING', label: 'Schoonmaak', icon: '' },
+  { id: 'MAINTENANCE', label: 'Onderhoud', icon: '' },
+  { id: 'MARKETING', label: 'Marketing', icon: '' },
+  { id: 'OTHER', label: 'Overige', icon: '' },
 ]
 
 export interface VariableCost {
@@ -2389,17 +2389,17 @@ export type AbsenceType =
   | 'OTHER'       // Overig
 
 export const ABSENCE_TYPES: { id: AbsenceType; label: string; color: string; icon: string }[] = [
-  { id: 'WORKED', label: 'Gewerkt', color: '#22c55e', icon: '✅' },
-  { id: 'SICK', label: 'Ziekte', color: '#ef4444', icon: '🤒' },
-  { id: 'VACATION', label: 'Vakantie', color: '#3b82f6', icon: '🏖️' },
+  { id: 'WORKED', label: 'Gewerkt', color: '#22c55e', icon: '' },
+  { id: 'SICK', label: 'Ziekte', color: '#ef4444', icon: '' },
+  { id: 'VACATION', label: 'Vakantie', color: '#3b82f6', icon: '' },
   { id: 'SHORT_LEAVE', label: 'Kort verzuim', color: '#f97316', icon: '⏰' },
-  { id: 'AUTHORIZED', label: 'Geoorloofd afwezig', color: '#8b5cf6', icon: '📋' },
-  { id: 'HOLIDAY', label: 'Feestdag', color: '#06b6d4', icon: '🎉' },
-  { id: 'MATERNITY', label: 'Zwangerschapsverlof', color: '#ec4899', icon: '👶' },
-  { id: 'PATERNITY', label: 'Vaderschapsverlof', color: '#0ea5e9', icon: '👨‍👧' },
-  { id: 'UNPAID', label: 'Onbetaald verlof', color: '#6b7280', icon: '💤' },
-  { id: 'TRAINING', label: 'Opleiding', color: '#84cc16', icon: '📚' },
-  { id: 'OTHER', label: 'Overig', color: '#a3a3a3', icon: '📝' },
+  { id: 'AUTHORIZED', label: 'Geoorloofd afwezig', color: '#8b5cf6', icon: '' },
+  { id: 'HOLIDAY', label: 'Feestdag', color: '#06b6d4', icon: '' },
+  { id: 'MATERNITY', label: 'Zwangerschapsverlof', color: '#ec4899', icon: '' },
+  { id: 'PATERNITY', label: 'Vaderschapsverlof', color: '#0ea5e9', icon: '' },
+  { id: 'UNPAID', label: 'Onbetaald verlof', color: '#6b7280', icon: '' },
+  { id: 'TRAINING', label: 'Opleiding', color: '#84cc16', icon: '' },
+  { id: 'OTHER', label: 'Overig', color: '#a3a3a3', icon: '' },
 ]
 
 export interface TimesheetEntry {

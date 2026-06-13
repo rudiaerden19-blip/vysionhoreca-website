@@ -8,25 +8,21 @@ import {
 
 const LINE_META: Record<
   RegistrationProductLine,
-  { icon: string; titleKey: string; descKey: string }
+  { titleKey: string; descKey: string }
 > = {
   horeca_kassa: {
-    icon: '🖥️',
     titleKey: 'register.productLine.horeca_kassa.title',
     descKey: 'register.productLine.horeca_kassa.desc',
   },
   retail_winkel: {
-    icon: '🏪',
     titleKey: 'register.productLine.retail_winkel.title',
     descKey: 'register.productLine.retail_winkel.desc',
   },
   online_bestellen: {
-    icon: '📲',
     titleKey: 'register.productLine.online_bestellen.title',
     descKey: 'register.productLine.online_bestellen.desc',
   },
   restaurant_reservaties: {
-    icon: '📅',
     titleKey: 'register.productLine.restaurant_reservaties.title',
     descKey: 'register.productLine.restaurant_reservaties.desc',
   },
@@ -73,10 +69,7 @@ export function RegistrationProductLinePicker({
                   : 'border-gray-200 bg-white hover:border-accent/40 hover:shadow-sm'
               }`}
             >
-              <span className="text-3xl" aria-hidden>
-                {meta.icon}
-              </span>
-              <span className="mt-2 font-bold text-gray-900">{t(meta.titleKey)}</span>
+              <span className="font-bold text-gray-900">{t(meta.titleKey)}</span>
               <span className="mt-1 text-sm text-gray-600 leading-snug">{t(meta.descKey)}</span>
             </button>
           )

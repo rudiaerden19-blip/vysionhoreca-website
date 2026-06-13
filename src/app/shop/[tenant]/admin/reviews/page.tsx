@@ -126,7 +126,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
           <p className="text-4xl font-bold text-blue-600">{averageRating}</p>
           <div className="flex justify-center my-1">
             {[1,2,3,4,5].map(s => (
-              <span key={s} className={s <= Math.round(Number(averageRating)) ? 'text-yellow-400' : 'text-gray-200'}>★</span>
+              <span key={s} className={s <= Math.round(Number(averageRating)) ? 'text-yellow-400' : 'text-gray-200'}></span>
             ))}
           </div>
           <p className="text-sm text-gray-500">{t('reviewsPage.average')} ({reviews.length})</p>
@@ -141,7 +141,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
           >
             <p className="text-2xl font-bold text-gray-900">{item.count}</p>
             <div className="flex justify-center">
-              {[...Array(item.rating)].map((_, i) => <span key={i} className="text-yellow-400 text-sm">★</span>)}
+              {[...Array(item.rating)].map((_, i) => <span key={i} className="text-yellow-400 text-sm"></span>)}
             </div>
           </motion.div>
         ))}
@@ -205,7 +205,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
                       <div className="flex items-center gap-2">
                         <p className="font-semibold text-gray-900">{review.customer_name}</p>
                         {review.is_verified && (
-                          <span className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded-full">✓ {t('reviewsPage.verified')}</span>
+                          <span className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded-full"> {t('reviewsPage.verified')}</span>
                         )}
                       </div>
                       <p className="text-sm text-gray-500">{formatDate(review.created_at)}</p>
@@ -214,7 +214,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
                   <div className="flex items-center gap-2">
                     <div className="flex">
                       {[1,2,3,4,5].map(s => (
-                        <span key={s} className={`text-lg ${s <= review.rating ? 'text-yellow-400' : 'text-gray-200'}`}>★</span>
+                        <span key={s} className={`text-lg ${s <= review.rating ? 'text-yellow-400' : 'text-gray-200'}`}></span>
                       ))}
                     </div>
                     <button
@@ -222,14 +222,14 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
                       className={`p-2 rounded-xl transition-colors ${review.is_visible ? 'bg-green-100 text-green-600 hover:bg-green-200' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
                       title={review.is_visible ? t('reviewsPage.visibleTooltip') : t('reviewsPage.hiddenTooltip')}
                     >
-                      {review.is_visible ? '👁️' : '🙈'}
+                      {review.is_visible ? '' : ''}
                     </button>
                     <button
                       onClick={() => handleDelete(review.id!)}
                       className="p-2 rounded-xl text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors"
                       title={t('common.delete')}
                     >
-                      🗑️
+                      
                     </button>
                   </div>
                 </div>
@@ -273,7 +273,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
                             className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
                           />
                         ) : (
-                          '✓'
+                          ''
                         )}
                         {t('reviewsPage.send')}
                       </motion.button>
@@ -290,7 +290,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
                     onClick={() => setReplyingTo(review.id!)}
                     className="text-blue-600 text-sm font-medium hover:underline ml-8"
                   >
-                    💬 {t('reviewsPage.reply')}
+                     {t('reviewsPage.reply')}
                   </button>
                 )}
               </motion.div>
@@ -306,7 +306,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
         transition={{ delay: 0.3 }}
         className="mt-6 bg-blue-50 border border-blue-200 rounded-2xl p-6"
       >
-        <h3 className="font-semibold text-blue-900 mb-2">💡 {t('marketingReviews.tips.title')}</h3>
+        <h3 className="font-semibold text-blue-900 mb-2"> {t('marketingReviews.tips.title')}</h3>
         <ul className="text-blue-700 text-sm space-y-1">
           <li>• {t('marketingReviews.tips.tip1')}</li>
           <li>• {t('marketingReviews.tips.tip2')}</li>

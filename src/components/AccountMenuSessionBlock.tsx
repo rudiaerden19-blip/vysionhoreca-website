@@ -78,7 +78,7 @@ export function AccountMenuSessionBlock({
           onClick={() => setLogoutSoftwareConfirmOpen(true)}
           className="flex w-full items-center gap-3 border-b border-gray-100 px-4 py-3 text-left text-sm font-semibold text-red-700 transition-colors hover:bg-red-50"
         >
-          <span aria-hidden>🚪</span>
+          <span aria-hidden></span>
           <span>{t('adminLayout.logout')}</span>
         </button>
       ) : (
@@ -88,7 +88,7 @@ export function AccountMenuSessionBlock({
           onClick={onClose}
           className="flex items-center gap-3 border-b border-gray-100 px-4 py-3 text-sm font-semibold text-emerald-800 transition-colors hover:bg-emerald-50"
         >
-          <span aria-hidden>🔑</span>
+          <span aria-hidden></span>
           <span>{t('adminLayout.login')}</span>
         </Link>
       )}

@@ -108,7 +108,7 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
                     : 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
                 }`}
               >
-                🎁 {t('menuCard.promotions')}
+                 {t('menuCard.promotions')}
               </button>
             )}
             {categories.map((category) => (
@@ -143,7 +143,7 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
                   <h2 
                     className="text-xl font-bold text-white mb-4 pb-2 border-b border-white/10 flex items-center gap-2"
                   >
-                    <span style={{ color: primaryColor }}>{category.icon || '🍽️'}</span>
+                    <span style={{ color: primaryColor }}>{category.icon || ''}</span>
                     {category.name}
                   </h2>
                   <div className="space-y-3">
@@ -159,7 +159,7 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
             {products.filter(p => !p.category_id).length > 0 && (
               <section>
                 <h2 className="text-xl font-bold text-white mb-4 pb-2 border-b border-white/10">
-                  🍽️ {t('menuCard.other')}
+                   {t('menuCard.other')}
                 </h2>
                 <div className="space-y-3">
                   {products.filter(p => !p.category_id).map((product) => (
@@ -193,7 +193,7 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
             style={{ backgroundColor: primaryColor }}
             className="px-6 py-2 rounded-full text-white text-sm font-medium flex items-center gap-2"
           >
-            <span>🛒</span>
+            <span></span>
             <span>{t('menuCard.orderOnline')}</span>
           </a>
         </div>

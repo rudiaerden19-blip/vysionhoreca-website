@@ -64,16 +64,16 @@ function fmt(d: Date): string {
 function getBelgianHolidays(year: number): { key: string; label: string; date: string }[] {
   const easter = easterDate(year)
   return [
-    { key: 'nieuwjaar',       label: '🎆 Nieuwjaar',              date: `${year}-01-01` },
-    { key: 'paasmaandag',     label: '🐣 Paasmaandag',            date: fmt(addDays(easter, 1)) },
-    { key: 'dag_arbeid',      label: '🔨 Dag van de Arbeid',      date: `${year}-05-01` },
-    { key: 'hemelvaart',      label: '✝️ Hemelvaartsdag',          date: fmt(addDays(easter, 39)) },
-    { key: 'pinkstermaandag', label: '🕊️ Pinkstermaandag',         date: fmt(addDays(easter, 50)) },
+    { key: 'nieuwjaar',       label: ' Nieuwjaar',              date: `${year}-01-01` },
+    { key: 'paasmaandag',     label: ' Paasmaandag',            date: fmt(addDays(easter, 1)) },
+    { key: 'dag_arbeid',      label: ' Dag van de Arbeid',      date: `${year}-05-01` },
+    { key: 'hemelvaart',      label: ' Hemelvaartsdag',          date: fmt(addDays(easter, 39)) },
+    { key: 'pinkstermaandag', label: ' Pinkstermaandag',         date: fmt(addDays(easter, 50)) },
     { key: 'nationale_dag',   label: '🇧🇪 Nationale Feestdag',     date: `${year}-07-21` },
-    { key: 'olv_hemelvaart',  label: '🌸 OLV Hemelvaart',         date: `${year}-08-15` },
-    { key: 'allerheiligen',   label: '🕯️ Allerheiligen',           date: `${year}-11-01` },
-    { key: 'wapenstilstand',  label: '🎖️ Wapenstilstand',          date: `${year}-11-11` },
-    { key: 'kerstmis',        label: '🎄 Kerstmis',               date: `${year}-12-25` },
+    { key: 'olv_hemelvaart',  label: ' OLV Hemelvaart',         date: `${year}-08-15` },
+    { key: 'allerheiligen',   label: ' Allerheiligen',           date: `${year}-11-01` },
+    { key: 'wapenstilstand',  label: ' Wapenstilstand',          date: `${year}-11-11` },
+    { key: 'kerstmis',        label: ' Kerstmis',               date: `${year}-12-25` },
   ]
 }
 
@@ -320,12 +320,12 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
           </>
         ) : saved ? (
           <>
-            <span>✓</span>
+            <span></span>
             <span>{t('adminPages.common.saved')}</span>
           </>
         ) : (
           <>
-            <span>💾</span>
+            <span></span>
             <span>{t('adminPages.common.save')}</span>
           </>
         )}
@@ -354,7 +354,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
       >
         <div className="p-6 border-b">
           <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            <span>🕐</span> {t('adminPages.openingstijden.title')}
+            <span></span> {t('adminPages.openingstijden.title')}
           </h2>
         </div>
 
@@ -415,7 +415,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
                           : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                       }`}
                     >
-                      {daySchedule.has_shift2 ? `🕐 ${t('adminPages.openingstijden.shift2')}` : `+ ${t('adminPages.openingstijden.addShift')}`}
+                      {daySchedule.has_shift2 ? ` ${t('adminPages.openingstijden.shift2')}` : `+ ${t('adminPages.openingstijden.addShift')}`}
                     </button>
 
                     {/* Copy Button */}
@@ -423,7 +423,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
                       onClick={() => copyToAllDays(index)}
                       className="px-3 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors"
                     >
-                      📋
+                      
                     </button>
                   </div>
                 ) : (
@@ -460,7 +460,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
                   animate={{ opacity: 1, height: 'auto' }}
                   className="mt-4 ml-[156px] flex items-center gap-2"
                 >
-                  <span className="text-sm text-gray-500">🛒 {t('adminPages.openingstijden.customerCanOrderUntil')}:</span>
+                  <span className="text-sm text-gray-500"> {t('adminPages.openingstijden.customerCanOrderUntil')}:</span>
                   <select
                     value={daySchedule.last_order_time || ''}
                     onChange={(e) => updateDay(index, 'last_order_time', e.target.value || null)}
@@ -573,7 +573,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
       >
         <div className="p-6 border-b">
           <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            📅 Uitzonderlijke sluitingsdagen
+             Uitzonderlijke sluitingsdagen
           </h2>
           <p className="text-sm text-gray-500 mt-0.5">Voeg specifieke datums toe waarop u uitzonderlijk gesloten bent</p>
         </div>
@@ -683,7 +683,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
                     >
                       <div className="flex items-center gap-3 flex-wrap">
                         <span className="text-sm font-semibold text-orange-700">
-                          📅 {formatDateRange(closing)}
+                           {formatDateRange(closing)}
                         </span>
                         {closing.reason && closing.reason !== 'Gesloten' && (
                           <span className="text-xs text-orange-500 bg-orange-100 px-2 py-0.5 rounded-full">

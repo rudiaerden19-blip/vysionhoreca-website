@@ -101,7 +101,7 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-gray-500">{t('customersPage.stats.totalCustomers')}</span>
-            <span className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">👥</span>
+            <span className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center"></span>
           </div>
           <p className="text-3xl font-bold text-gray-900">{totalCustomers}</p>
         </motion.div>
@@ -114,7 +114,7 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-gray-500">{t('customersPage.stats.totalPoints')}</span>
-            <span className="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center">🎁</span>
+            <span className="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center"></span>
           </div>
           <p className="text-3xl font-bold text-gray-900">{totalPoints}</p>
         </motion.div>
@@ -127,7 +127,7 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-gray-500">{t('customersPage.stats.totalRevenue')}</span>
-            <span className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">💰</span>
+            <span className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center"></span>
           </div>
           <p className="text-3xl font-bold text-gray-900">€{totalSpent.toFixed(2)}</p>
         </motion.div>
@@ -139,7 +139,7 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder={`🔍 ${t('customersPage.search')}`}
+          placeholder={` ${t('customersPage.search')}`}
           className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
@@ -153,7 +153,7 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
       >
         {filteredCustomers.length === 0 ? (
           <div className="text-center py-12">
-            <span className="text-5xl mb-4 block">👥</span>
+            <span className="text-5xl mb-4 block"></span>
             <h3 className="text-lg font-bold text-gray-900 mb-2">{t('customersPage.noCustomers')}</h3>
             <p className="text-gray-500">{t('customersPage.noCustomersDesc')}</p>
           </div>
@@ -191,7 +191,7 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
                     </td>
                     <td className="py-4 px-6 text-right">
                       <span className="inline-flex items-center gap-1 px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full font-medium">
-                        🎁 {customer.loyalty_points || 0}
+                         {customer.loyalty_points || 0}
                       </span>
                     </td>
                     <td className="py-4 px-6 text-right font-medium text-gray-900">

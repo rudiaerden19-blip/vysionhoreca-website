@@ -585,7 +585,7 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
                 <Image src={imageUrl} alt="" fill className="object-cover" unoptimized />
               ) : (
                 <span className="text-center text-gray-500">
-                  <span className="text-3xl block mb-1">📷</span>
+                  <span className="text-3xl block mb-1"></span>
                   <span className="text-sm">{t('adminPages.productIntake.takePhoto')}</span>
                 </span>
               )}

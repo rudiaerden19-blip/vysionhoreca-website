@@ -150,7 +150,7 @@ export default function GroupJoinPage({ params }: { params: { tenant: string; co
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
-          <span className="text-5xl mb-4 block">👥</span>
+          <span className="text-5xl mb-4 block"></span>
           <h1 className="text-2xl font-bold text-gray-900">
             {group ? group.name : 'Groepsbestelling'}
           </h1>
@@ -228,7 +228,7 @@ export default function GroupJoinPage({ params }: { params: { tenant: string; co
           >
             {sessions.length === 0 ? (
               <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
-                <span className="text-4xl mb-4 block">📭</span>
+                <span className="text-4xl mb-4 block"></span>
                 <h2 className="text-lg font-bold text-gray-900 mb-2">Geen actieve bestelmomenten</h2>
                 <p className="text-gray-600">Er zijn momenteel geen open bestellingen voor je groep.</p>
               </div>
@@ -261,7 +261,7 @@ export default function GroupJoinPage({ params }: { params: { tenant: string; co
                     
                     {session.delivery_time && (
                       <div className="mt-2 pt-2 border-t text-sm text-gray-500">
-                        🚗 Levering: {new Date(session.delivery_time).toLocaleString('nl-NL', {
+                         Levering: {new Date(session.delivery_time).toLocaleString('nl-NL', {
                           weekday: 'short',
                           day: 'numeric',
                           month: 'short',
@@ -289,7 +289,7 @@ export default function GroupJoinPage({ params }: { params: { tenant: string; co
                   href={`/shop/${params.tenant}/menu?group_session=${selectedSession.id}&member_id=${member?.id}&member_name=${encodeURIComponent(member?.name || '')}`}
                   className="block w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold text-center"
                 >
-                  🍽️ Ga naar menu &amp; bestel
+                   Ga naar menu &amp; bestel
                 </Link>
               </motion.div>
             )}

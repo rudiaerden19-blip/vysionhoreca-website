@@ -334,7 +334,7 @@ export default function TenantDetailPage() {
               href={`/superadmin/tenant/${slug}/modules`}
               className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl transition-colors font-semibold shrink-0"
             >
-              📦 Modules
+               Modules
             </Link>
             <Link
               href={`/shop/${slug}`}
@@ -349,7 +349,7 @@ export default function TenantDetailPage() {
               title="Subdomein klantadmin — geen zaak-login"
               className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl transition-colors font-medium shrink-0"
             >
-              🔑 Beheer Klant
+               Beheer Klant
             </Link>
           </div>
         </div>
@@ -520,7 +520,7 @@ export default function TenantDetailPage() {
                     <p className="text-2xl font-bold text-white">Pro</p>
                   </div>
                   <span className="px-4 py-2 rounded-full text-sm font-medium border bg-purple-100 text-purple-700 border-purple-200">
-                    👑 platform (geen trial)
+                     platform (geen trial)
                   </span>
                 </div>
 
@@ -575,7 +575,7 @@ export default function TenantDetailPage() {
                       onClick={handleActivateSubscription}
                       className="flex-1 px-4 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium transition-colors"
                     >
-                      ✓ Activeren
+                       Activeren
                     </button>
                   )}
                   {subscription.status === 'active' && (
@@ -590,7 +590,7 @@ export default function TenantDetailPage() {
               </div>
             ) : (
               <div className="text-center py-8">
-                <span className="text-4xl mb-4 block">📋</span>
+                <span className="text-4xl mb-4 block"></span>
                 <p className="text-slate-400 mb-4">Geen abonnement</p>
                 <button
                   onClick={() => setShowSubscriptionModal(true)}

@@ -219,7 +219,7 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
   return (
     <div className="max-w-5xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">📦 {t('stockPage.title')}</h1>
+        <h1 className="text-2xl font-bold text-gray-900"> {t('stockPage.title')}</h1>
         <p className="text-sm text-gray-500 mt-0.5">{t('stockPage.subtitle')}</p>
       </div>
 
@@ -405,7 +405,7 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
                           {t('stockPage.saveMeta')}
                         </button>
                         <button type="button" onClick={() => setEditingKey(null)} className="text-sm text-gray-500">
-                          ✕
+                          
                         </button>
                       </div>
                     </div>

@@ -124,7 +124,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
       const data = await response.json()
 
       if (response.ok) {
-        alert(`✅ ${t('whatsappPage.connectionSuccess')}\n\nVerified Phone Number: ${data.verified_name || data.display_phone_number || 'OK'}`)
+        alert(` ${t('whatsappPage.connectionSuccess')}\n\nVerified Phone Number: ${data.verified_name || data.display_phone_number || 'OK'}`)
       } else {
         throw new Error(data.error?.message || t('whatsappPage.connectionFailed'))
       }
@@ -154,7 +154,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <span className="text-4xl">💬</span>
+          <span className="text-4xl"></span>
           <h1 className="text-2xl font-bold text-gray-900">{t('whatsappPage.title')}</h1>
           <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-bold rounded-full">
             PRO
@@ -170,7 +170,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl ${formData.is_active ? 'bg-green-500' : 'bg-gray-400'}`}>
-              {formData.is_active ? '✅' : '⏸️'}
+              {formData.is_active ? '' : '⏸'}
             </div>
             <div>
               <h2 className="text-xl font-bold text-gray-900">
@@ -198,14 +198,14 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
       {/* Error/Success Messages */}
       {error && (
         <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 flex items-center gap-3">
-          <span className="text-xl">❌</span>
+          <span className="text-xl"></span>
           {error}
         </div>
       )}
 
       {saved && (
         <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl text-green-600 flex items-center gap-3">
-          <span className="text-xl">✅</span>
+          <span className="text-xl"></span>
           {t('whatsappPage.savedSuccess')}
         </div>
       )}
@@ -213,7 +213,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
       {/* Setup Instructions */}
       <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 mb-8">
         <h3 className="font-bold text-blue-900 mb-4 flex items-center gap-2">
-          <span>📋</span> {t('whatsappPage.setupTitle')}
+          <span></span> {t('whatsappPage.setupTitle')}
         </h3>
         <ol className="space-y-3 text-blue-800">
           <li className="flex gap-3">
@@ -242,7 +242,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
       {/* Webhook URL */}
       <div className="bg-gray-900 text-white rounded-2xl p-6 mb-8">
         <h3 className="font-bold mb-2 flex items-center gap-2">
-          <span>🔗</span> {t('whatsappPage.webhookTitle')}
+          <span></span> {t('whatsappPage.webhookTitle')}
         </h3>
         <div className="flex gap-2">
           <input
@@ -258,7 +258,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
             }}
             className="px-4 py-3 bg-green-500 hover:bg-green-600 rounded-xl font-bold"
           >
-            📋 {t('whatsappPage.copyLink')}
+             {t('whatsappPage.copyLink')}
           </button>
         </div>
         <p className="text-gray-400 text-sm mt-3">
@@ -270,13 +270,13 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-            <span>🔑</span> {t('whatsappPage.apiSettings')}
+            <span></span> {t('whatsappPage.apiSettings')}
           </h3>
           <button
             onClick={() => setShowTokens(!showTokens)}
             className="text-sm text-gray-500 hover:text-gray-700"
           >
-            {showTokens ? `🙈 ${t('whatsappPage.hideTokens')}` : `👁️ ${t('whatsappPage.showTokens')}`}
+            {showTokens ? ` ${t('whatsappPage.hideTokens')}` : ` ${t('whatsappPage.showTokens')}`}
           </button>
         </div>
 
@@ -339,7 +339,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
               />
             ) : (
               <>
-                <span>🔌</span> {t('whatsappPage.testConnection')}
+                <span></span> {t('whatsappPage.testConnection')}
               </>
             )}
           </button>
@@ -349,7 +349,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
       {/* Custom Messages */}
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
         <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-          <span>💬</span> {t('whatsappPage.autoMessages')}
+          <span></span> {t('whatsappPage.autoMessages')}
         </h3>
 
         <div className="space-y-4">
@@ -394,7 +394,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
       {/* WhatsApp Number for QR */}
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
         <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-          <span>📞</span> {t('whatsappPage.numberTitle')}
+          <span></span> {t('whatsappPage.numberTitle')}
         </h3>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -416,7 +416,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
       {/* QR Code Preview */}
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
         <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-          <span>📱</span> {t('whatsappPage.qrTitle')}
+          <span></span> {t('whatsappPage.qrTitle')}
         </h3>
         <p className="text-gray-500 mb-4">
           {t('whatsappPage.qrDesc')}
@@ -427,7 +427,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
             {/* QR Code */}
             <div ref={qrRef} className="bg-white p-6 rounded-2xl shadow-lg border-2 border-gray-100">
               <div className="text-center mb-4">
-                <span className="text-4xl">💬</span>
+                <span className="text-4xl"></span>
                 <h4 className="font-bold text-gray-900 mt-2">{t('whatsappPage.scanToOrder')}</h4>
               </div>
               <QRCode 
@@ -443,7 +443,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
             {/* Actions */}
             <div className="flex-1 space-y-4">
               <div className="bg-green-50 p-4 rounded-xl">
-                <h4 className="font-bold text-green-800 mb-2">✅ {t('whatsappPage.qrReady')}</h4>
+                <h4 className="font-bold text-green-800 mb-2"> {t('whatsappPage.qrReady')}</h4>
                 <p className="text-sm text-green-700">
                   {t('whatsappPage.qrReadyDesc')}
                 </p>
@@ -470,7 +470,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
                   rel="noopener noreferrer"
                   className="flex-1 py-3 bg-green-100 hover:bg-green-200 text-green-800 rounded-xl font-medium flex items-center justify-center gap-2"
                 >
-                  🔗 {t('whatsappPage.openLink')}
+                   {t('whatsappPage.openLink')}
                 </a>
                 <button
                   onClick={() => {
@@ -480,7 +480,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
                   }}
                   className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium flex items-center justify-center gap-2"
                 >
-                  📋 {t('whatsappPage.copyLink')}
+                   {t('whatsappPage.copyLink')}
                 </button>
                 <button
                   onClick={() => {
@@ -511,7 +511,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
                             </head>
                             <body>
                               <div class="container">
-                                <h1>💬 {t('whatsappPage.scanToOrder')}</h1>
+                                <h1> {t('whatsappPage.scanToOrder')}</h1>
                                 ${qrRef.current.innerHTML}
                                 <p>Bestel via WhatsApp</p>
                               </div>
@@ -529,7 +529,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
                   }}
                   className="flex-1 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium flex items-center justify-center gap-2"
                 >
-                  🖨️ {t('whatsappPage.printQr')}
+                   {t('whatsappPage.printQr')}
                 </button>
               </div>
             </div>
@@ -538,7 +538,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
           <div className="flex items-center justify-center p-8 bg-gray-50 rounded-xl">
             <div className="text-center">
               <div className="w-48 h-48 bg-white border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <span className="text-gray-400 text-4xl">📱</span>
+                <span className="text-gray-400 text-4xl"></span>
               </div>
               <p className="text-sm text-gray-500">
                 {t('whatsappPage.fillNumberFirst')}
@@ -571,7 +571,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
             />
           ) : (
             <>
-              <span>💾</span> {t('common.save')}
+              <span></span> {t('common.save')}
             </>
           )}
         </motion.button>

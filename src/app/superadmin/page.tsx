@@ -270,12 +270,12 @@ export default function SuperAdminDashboard() {
       })
 
       if (response.ok) {
-        alert('✅ Betalingsherinnering verzonden naar ' + tenant.email)
+        alert(' Betalingsherinnering verzonden naar ' + tenant.email)
       } else {
-        alert('❌ Fout bij verzenden email')
+        alert(' Fout bij verzenden email')
       }
     } catch (error) {
-      alert('❌ Fout bij verzenden email')
+      alert(' Fout bij verzenden email')
     }
   }
 
@@ -428,7 +428,7 @@ export default function SuperAdminDashboard() {
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl flex items-center justify-center">
-              <span className="text-xl">🚀</span>
+              <span className="text-xl"></span>
             </div>
             <div>
               <h1 className="text-xl font-bold text-white">Vysion Super Admin</h1>
@@ -440,7 +440,7 @@ export default function SuperAdminDashboard() {
               onClick={() => setShowNewTenantModal(true)}
               className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl transition-colors"
             >
-              ➕ Nieuwe Tenant
+               Nieuwe Tenant
             </button>
             <button
               onClick={() => setShowExpiringOnly(!showExpiringOnly)}
@@ -450,7 +450,7 @@ export default function SuperAdminDashboard() {
                   : 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30'
               }`}
             >
-              ⚠️ Vervalt Binnenkort
+               Vervalt Binnenkort
               {expiringCount > 0 && (
                 <span className="bg-white/20 px-2 py-0.5 rounded-full text-sm font-bold">
                   {expiringCount}
@@ -461,19 +461,19 @@ export default function SuperAdminDashboard() {
               href="/superadmin/abonnementen"
               className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl transition-colors"
             >
-              💳 Abonnementen
+               Abonnementen
             </Link>
             <Link
               href="/superadmin/analytics"
               className="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-xl transition-colors"
             >
-              📊 Analytics
+               Analytics
             </Link>
             <button
               onClick={handleCleanupExpired}
               className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors border border-red-500/30"
             >
-              🧹 Opschonen
+               Opschonen
             </button>
             <button
               onClick={handleLogout}
@@ -549,7 +549,7 @@ export default function SuperAdminDashboard() {
         </div>
 
         <div className="mb-6 rounded-xl border border-slate-600 bg-slate-800/80 px-4 py-3 text-slate-300 text-sm">
-          Per tenant één <strong className="text-orange-400">📦 Modules</strong>-knop bij{' '}
+          Per tenant één <strong className="text-orange-400"> Modules</strong>-knop bij{' '}
           <strong>Acties</strong>. Oude scherm? <kbd className="px-1 bg-slate-900 rounded text-xs">Cmd+Shift+R</kbd> /{' '}
           <kbd className="px-1 bg-slate-900 rounded text-xs">Ctrl+Shift+R</kbd>.
         </div>
@@ -558,7 +558,7 @@ export default function SuperAdminDashboard() {
         <div className="mb-6">
           <input
             type="text"
-            placeholder="🔍 Zoek tenant..."
+            placeholder=" Zoek tenant..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full max-w-md px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
@@ -608,8 +608,8 @@ export default function SuperAdminDashboard() {
                     }`}>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
-                          {tenant.is_blocked && <span className="text-red-500">🚫</span>}
-                          {isDemoTenant(tenant.tenant_slug) && <span className="text-blue-400">🎭</span>}
+                          {tenant.is_blocked && <span className="text-red-500"></span>}
+                          {isDemoTenant(tenant.tenant_slug) && <span className="text-blue-400"></span>}
                           {isProtectedTenant(tenant.tenant_slug) && !isDemoTenant(tenant.tenant_slug) && <span className="text-yellow-500">⭐</span>}
                           <div>
                             <p className="font-medium text-white flex items-center gap-2">
@@ -644,7 +644,7 @@ export default function SuperAdminDashboard() {
                         <div className="flex items-center gap-2">
                           {isAdminTenant(tenant.tenant_slug) ? (
                             <span className={`px-3 py-1 rounded-lg text-xs font-medium ${isDemoTenant(tenant.tenant_slug) ? 'bg-blue-500 text-white' : 'bg-purple-500 text-white'}`}>
-                              {isDemoTenant(tenant.tenant_slug) ? '🎭 Demo' : '👑 Admin'}
+                              {isDemoTenant(tenant.tenant_slug) ? ' Demo' : ' Admin'}
                             </span>
                           ) : (
                             <>
@@ -658,7 +658,7 @@ export default function SuperAdminDashboard() {
                                     : 'bg-red-500 hover:bg-red-600 text-white'
                                 }`}
                               >
-                                {sub?.status === 'active' ? '✓ Betaald' : '✗ Niet betaald'}
+                                {sub?.status === 'active' ? ' Betaald' : ' Niet betaald'}
                               </button>
                               {sub?.status !== 'active' && tenant.email && (
                                 <button
@@ -666,7 +666,7 @@ export default function SuperAdminDashboard() {
                                   className="px-2 py-1 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-xs font-medium transition-all hover:scale-105"
                                   title="Stuur betalingsherinnering"
                                 >
-                                  📧
+                                  
                                 </button>
                               )}
                             </>
@@ -683,7 +683,7 @@ export default function SuperAdminDashboard() {
                               href={`/superadmin/tenant/${tenant.tenant_slug}/modules`}
                               className="px-2.5 py-1.5 bg-orange-500 hover:bg-orange-400 text-white rounded-lg text-xs font-semibold whitespace-nowrap"
                             >
-                              📦 Modules
+                               Modules
                             </Link>
                             <Link
                               href={`/api/auth/superadmin-tenant-entry?slug=${encodeURIComponent(tenant.tenant_slug)}&path=${encodeURIComponent('/admin')}`}
@@ -691,7 +691,7 @@ export default function SuperAdminDashboard() {
                               title="Opent de klant-site (subdomein); geen zaak-wachtwoord"
                               className="px-2.5 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg text-xs font-medium whitespace-nowrap shrink-0"
                             >
-                              🔑 Beheer
+                               Beheer
                             </Link>
                             <Link
                               href={`/superadmin/tenant/${tenant.tenant_slug}`}
@@ -711,19 +711,19 @@ export default function SuperAdminDashboard() {
                                       : 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
                                   }`}
                                 >
-                                  {tenant.is_blocked ? '✓ Deblokkeren' : '⚠️ Blokkeren'}
+                                  {tenant.is_blocked ? ' Deblokkeren' : ' Blokkeren'}
                                 </button>
                                 <button
                                   onClick={() => setShowDeleteModal(tenant)}
                                   className="px-3 py-1 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-lg text-sm transition-colors"
                                 >
-                                  🗑️ Verwijderen
+                                   Verwijderen
                                 </button>
                               </>
                             )}
                             {isProtectedTenant(tenant.tenant_slug) && (
                               <span className="px-3 py-1 bg-slate-700 text-slate-400 rounded-lg text-sm">
-                                🔒 Beschermd
+                                 Beschermd
                               </span>
                             )}
                           </div>
@@ -738,7 +738,7 @@ export default function SuperAdminDashboard() {
 
           {filteredTenants.length === 0 && (
             <div className="p-12 text-center">
-              <span className="text-4xl mb-4 block">🏪</span>
+              <span className="text-4xl mb-4 block"></span>
               <p className="text-slate-400">Geen tenants gevonden</p>
             </div>
           )}
@@ -762,7 +762,7 @@ export default function SuperAdminDashboard() {
               className="bg-slate-800 rounded-2xl p-6 max-w-md w-full"
               onClick={(e) => e.stopPropagation()}
             >
-              <h2 className="text-xl font-bold text-white mb-6">➕ Nieuwe Tenant Aanmaken</h2>
+              <h2 className="text-xl font-bold text-white mb-6"> Nieuwe Tenant Aanmaken</h2>
 
               <div className="space-y-4">
                 <div>
@@ -849,7 +849,7 @@ export default function SuperAdminDashboard() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="text-center">
-                <span className="text-5xl mb-4 block">⚠️</span>
+                <span className="text-5xl mb-4 block"></span>
                 <h2 className="text-xl font-bold text-white mb-2">Tenant Verwijderen?</h2>
                 <p className="text-slate-400 mb-2">
                   Weet je zeker dat je <span className="text-white font-semibold">{showDeleteModal.business_name}</span> wilt verwijderen?
@@ -871,7 +871,7 @@ export default function SuperAdminDashboard() {
                   disabled={saving}
                   className="flex-1 px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-medium transition-colors disabled:opacity-50"
                 >
-                  {saving ? 'Verwijderen...' : '🗑️ Definitief Verwijderen'}
+                  {saving ? 'Verwijderen...' : ' Definitief Verwijderen'}
                 </button>
               </div>
             </motion.div>
@@ -890,7 +890,7 @@ export default function SuperAdminDashboard() {
           </span>
         </p>
         <p className="text-slate-400 max-w-xl mx-auto">
-          Zie je <strong className="text-orange-300">geen oranje 📦 Modules</strong> bij Acties? Klik hieronder —
+          Zie je <strong className="text-orange-300">geen oranje  Modules</strong> bij Acties? Klik hieronder —
           daarna opnieuw laden.
         </p>
         <button

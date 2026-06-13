@@ -409,7 +409,7 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
       return (
         <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl p-12 shadow-xl max-w-md w-full text-center">
-            <span className="text-6xl mb-6 block">🔍</span>
+            <span className="text-6xl mb-6 block"></span>
             <h1 className="text-2xl font-bold text-gray-900 mb-4">{t('adminLayout.shopNotFound')}</h1>
             <p className="text-gray-600 mb-6">{t('adminLayout.shopNotFoundDesc')}</p>
             <a href="https://www.vysion-kassa.com" className="text-blue-600 hover:text-blue-700 font-medium inline-block">
@@ -440,7 +440,7 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
         <div className="bg-white rounded-3xl p-12 shadow-xl max-w-md w-full text-center">
-          <span className="text-6xl mb-6 block">🔍</span>
+          <span className="text-6xl mb-6 block"></span>
           <h1 className="text-2xl font-bold text-gray-900 mb-4">{t('adminLayout.shopNotFound')}</h1>
           <p className="text-gray-600 mb-6">{t('adminLayout.shopNotFoundDesc')}</p>
           <a href="https://www.vysion-kassa.com" className="text-blue-600 hover:text-blue-700 font-medium inline-block">
@@ -482,9 +482,6 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
                   href={`${baseUrl}/kassa`}
                   className="touch-manipulation [-webkit-tap-highlight-color:transparent] flex shrink-0 items-center gap-2 rounded-xl bg-[#58CCFF] px-3 py-2 text-sm font-bold text-[#063042] shadow-md transition-colors hover:bg-[#47c6fe] no-underline"
                 >
-                  <span className="text-base leading-none" aria-hidden>
-                    🧾
-                  </span>
                   <span>{t('adminLayout.pos')}</span>
                 </a>
               ) : null}
@@ -493,9 +490,6 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
                   href={`${baseUrl}/retail-kassa`}
                   className="touch-manipulation [-webkit-tap-highlight-color:transparent] flex shrink-0 items-center gap-2 rounded-xl bg-emerald-400 px-3 py-2 text-sm font-bold text-[#063042] shadow-md transition-colors hover:bg-emerald-300 no-underline"
                 >
-                  <span className="text-base leading-none" aria-hidden>
-                    🏪
-                  </span>
                   <span>{t('adminLayout.retailPos')}</span>
                 </a>
               ) : null}
@@ -522,7 +516,6 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
               href={`/shop/${params.tenant}/display`}
               className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors"
             >
-              <span className="text-base">🖥️</span>
               <span className="hidden sm:inline">{t('adminLayout.onlineDisplay')}</span>
             </Link>
           )}
@@ -594,7 +587,7 @@ function LockButton({ tenant, afterLockHref }: { tenant: string; afterLockHref: 
       onClick={handleLock}
       className="flex items-center gap-1.5 px-3 py-2 bg-red-500 hover:bg-red-600 rounded-xl text-white text-sm font-bold transition-colors"
     >
-      🔒 <span className="hidden sm:inline">{t('adminLayout.lock')}</span>
+      <span className="hidden sm:inline">{t('adminLayout.lock')}</span>
     </button>
   )
 }

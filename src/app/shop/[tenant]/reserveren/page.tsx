@@ -295,7 +295,7 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
           <p className="text-gray-400">Neem telefonisch contact op om te reserveren.</p>
           {tenantInfo?.phone && (
             <a href={`tel:${tenantInfo.phone}`} className="mt-4 inline-block px-6 py-3 rounded-xl bg-green-500 text-white font-medium">
-              📞 {tenantInfo.phone}
+               {tenantInfo.phone}
             </a>
           )}
         </div>
@@ -310,10 +310,10 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
           {/* Animated checkmark */}
           <div className="w-24 h-24 rounded-full mx-auto mb-6 flex items-center justify-center text-5xl shadow-lg"
             style={{ backgroundColor: primaryColor }}>
-            ✓
+            
           </div>
           <h2 className="text-2xl font-bold mb-2">
-            {settings.autoConfirm ? 'Reservatie Bevestigd! 🎉' : 'Reservatie Ontvangen!'}
+            {settings.autoConfirm ? 'Reservatie Bevestigd! ' : 'Reservatie Ontvangen!'}
           </h2>
           <p className="text-gray-500 mb-6">
             {settings.autoConfirm
@@ -355,7 +355,7 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
 
           {formData.guest_email && !emailWarning && (
             <p className="text-gray-400 text-sm mb-6">
-              📧 {settings.autoConfirm
+               {settings.autoConfirm
                 ? <>Een bevestiging is verstuurd naar <strong>{formData.guest_email}</strong></>
                 : <>U ontvangt een bevestigingsmail op <strong>{formData.guest_email}</strong> zodra uw reservatie goedgekeurd is.</>
               }
@@ -372,7 +372,7 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
             <a href={`tel:${tenantInfo.phone}`}
               className="block w-full py-3 rounded-2xl font-semibold text-white mb-3 transition-opacity hover:opacity-90"
               style={{ backgroundColor: primaryColor }}>
-              📞 {tenantInfo.phone}
+               {tenantInfo.phone}
             </a>
           )}
           <a href={`/shop/${tenant}`}
@@ -395,7 +395,7 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
           {tenantInfo?.logo_url ? (
             <img src={tenantInfo.logo_url} alt={tenantInfo.name} className="w-16 h-16 rounded-2xl object-cover mx-auto mb-3 shadow-lg border-2 border-white/30" />
           ) : (
-            <div className="w-16 h-16 rounded-2xl bg-white/20 mx-auto mb-3 flex items-center justify-center text-3xl">📅</div>
+            <div className="w-16 h-16 rounded-2xl bg-white/20 mx-auto mb-3 flex items-center justify-center text-3xl"></div>
           )}
           <h1 className="text-2xl font-bold">{tenantInfo?.name || 'Reserveren'}</h1>
           <p className="opacity-80 mt-1 text-sm">Online tafel reserveren</p>
@@ -555,7 +555,7 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
             {/* Borg melding */}
             {settings.depositRequired && settings.depositAmount > 0 && (
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                <p className="text-amber-700 text-sm font-medium">💳 Borg vereist: €{settings.depositAmount.toFixed(2)}</p>
+                <p className="text-amber-700 text-sm font-medium"> Borg vereist: €{settings.depositAmount.toFixed(2)}</p>
                 <p className="text-amber-600 text-xs mt-1">Na het invullen wordt u doorverwezen naar de betaalpagina.</p>
               </div>
             )}
@@ -563,7 +563,7 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
             {/* No-show melding */}
             {settings.noShowProtection && (
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                <p className="text-blue-700 text-sm font-medium">🛡️ No-show bescherming actief</p>
+                <p className="text-blue-700 text-sm font-medium"> No-show bescherming actief</p>
                 <p className="text-blue-600 text-xs mt-1">Bij niet verschijnen zonder annulering kan er een kost aangerekend worden.</p>
               </div>
             )}

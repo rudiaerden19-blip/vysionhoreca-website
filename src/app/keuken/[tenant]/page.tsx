@@ -164,7 +164,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
         parsed.forEach((o) => knownOrderIdsRef.current.add(o.id))
 
         if (trulyNewOrders.length > 0) {
-          console.log(`👨‍🍳 ${trulyNewOrders.length} nieuwe keuken bestelling(en)!`)
+          console.log(` ${trulyNewOrders.length} nieuwe keuken bestelling(en)!`)
           trulyNewOrders.forEach((order) => {
             setNewOrderIds((prev) => new Set([...prev, order.id]))
           })
@@ -208,7 +208,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
       setOrders(parsed)
 
       parsed.forEach((o) => knownOrderIdsRef.current.add(o.id))
-      console.log(`👨‍🍳 Initial load: ${parsed.length} keuken orders`)
+      console.log(` Initial load: ${parsed.length} keuken orders`)
     } catch (error) {
       console.error('Error loading data:', error)
     }
@@ -243,7 +243,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     } else {
       await updateOrderStatus(params.tenant, order.id, 'ready')
 
-      console.log('🔔 handleReady called, customer_phone:', order.customer_phone)
+      console.log(' handleReady called, customer_phone:', order.customer_phone)
       if (order.customer_phone) {
         try {
           const response = await authFetch('/api/whatsapp/send-status', {
@@ -257,15 +257,15 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
           })
           const data = await response.json()
           if (response.ok) {
-            console.log('✅ WhatsApp ready notification sent successfully:', data)
+            console.log(' WhatsApp ready notification sent successfully:', data)
           } else {
-            console.error('❌ WhatsApp ready notification failed:', response.status, data)
+            console.error(' WhatsApp ready notification failed:', response.status, data)
           }
         } catch (err) {
-          console.error('❌ Failed to send WhatsApp ready notification:', err)
+          console.error(' Failed to send WhatsApp ready notification:', err)
         }
       } else {
-        console.log('⚠️ No customer_phone on order, skipping WhatsApp notification')
+        console.log(' No customer_phone on order, skipping WhatsApp notification')
       }
     }
 
@@ -352,7 +352,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
       ${optLines.map((line) => `
         <tr><td></td><td style="font-size: 14px; color: #666; padding-left: 10px;">+ ${line}</td></tr>
       `).join('')}
-      ${(item as { notes?: unknown }).notes ? `<tr><td></td><td style="font-size: 14px; color: #666; font-style: italic; padding-left: 10px;">📝 ${String((item as { notes?: unknown }).notes)}</td></tr>` : ''}
+      ${(item as { notes?: unknown }).notes ? `<tr><td></td><td style="font-size: 14px; color: #666; font-style: italic; padding-left: 10px;"> ${String((item as { notes?: unknown }).notes)}</td></tr>` : ''}
     `
     }).join('') || ''
 
@@ -381,11 +381,11 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
           <div class="header">
             <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">*** KEUKEN BON ***</div>
             <div class="order-number">#${order.order_number}</div>
-            <div class="order-type">${order.order_type === 'delivery' || order.order_type === 'DELIVERY' ? '🚗 BEZORGEN' : order.order_type === 'DINE_IN' ? '🍽️ TER PLAATSE' : order.order_type === 'TAKEAWAY' ? '📦 AFHALEN' : '🛍️ AFHALEN'}</div>
+            <div class="order-type">${order.order_type === 'delivery' || order.order_type === 'DELIVERY' ? ' BEZORGEN' : order.order_type === 'DINE_IN' ? ' TER PLAATSE' : order.order_type === 'TAKEAWAY' ? ' AFHALEN' : ' AFHALEN'}</div>
             ${nlDineInSeat ? `<div style="font-size: 16px; font-weight: bold; margin-top: 6px;">${nlDineInSeat}</div>` : ''}
             ${(order.scheduled_date || order.scheduled_time) ? `
             <div style="margin: 6px 0; padding: 6px; background: #000; color: #fff; font-size: 16px; font-weight: bold; border-radius: 4px;">
-              📅 LEVEREN OP: ${order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''}${order.scheduled_time ? ' om ' + order.scheduled_time : ''}
+               LEVEREN OP: ${order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''}${order.scheduled_time ? ' om ' + order.scheduled_time : ''}
             </div>` : ''}
             <div style="font-size: 14px; margin-top: 5px;">
               ${new Date(order.created_at).toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' })}
@@ -403,7 +403,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
 
           ${order.customer_notes ? `
             <div class="notes">
-              <strong>⚠️ OPMERKING:</strong><br>
+              <strong> OPMERKING:</strong><br>
               ${order.customer_notes}
             </div>
           ` : ''}
@@ -444,10 +444,10 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
 
   const orderTypeLabelShort = (order: Order) => {
     const key = shopDisplayOrderTypeKey(order.order_type)
-    if (key === 'delivery') return `🚗 ${t('shopDisplay.delivery')}`
-    if (key === 'dineIn') return `🍽️ ${t('shopDisplay.dineIn')}`
-    if ((order.order_type || '').toString().toUpperCase() === 'TAKEAWAY') return `📦 ${t('shopDisplay.pickup')}`
-    return `🛍️ ${t('shopDisplay.pickup')}`
+    if (key === 'delivery') return ` ${t('shopDisplay.delivery')}`
+    if (key === 'dineIn') return ` ${t('shopDisplay.dineIn')}`
+    if ((order.order_type || '').toString().toUpperCase() === 'TAKEAWAY') return ` ${t('shopDisplay.pickup')}`
+    return ` ${t('shopDisplay.pickup')}`
   }
 
   if (loading) {
@@ -485,13 +485,13 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
             {kassaEntryHref && (
               <Link href={kassaEntryHref} className={`flex shrink-0 items-center gap-2 px-3 py-2 text-sm ${KITCHEN_POS_BTN_ACCENT}`}>
                 <span className="text-base leading-none" aria-hidden>
-                  🧾
+                  
                 </span>
                 {t('adminLayout.pos')}
               </Link>
             )}
             <div className={`flex h-10 w-10 shrink-0 items-center justify-center text-xl ${KITCHEN_POS_BTN}`}>
-              👨‍🍳
+              
             </div>
             <div className="min-w-0">
               <h1 className="truncate text-lg font-bold sm:text-xl">{tx('title')}</h1>
@@ -502,17 +502,17 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
           <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-4">
             {/* Sound - ALTIJD AAN */}
             <span onClick={enableSound} className={`flex cursor-pointer items-center gap-2 px-3 py-2 text-sm ${KITCHEN_POS_BTN}`}>
-              🔊 {tx('soundEnabled')}
+               {tx('soundEnabled')}
             </span>
 
             {/* Order count */}
             <div className={`px-4 py-2 font-bold ${KITCHEN_POS_BTN}`}>
-              📋 {orders.length} {tx('toMake')}
+               {orders.length} {tx('toMake')}
             </div>
 
             {/* Alles klaar */}
             <button type="button" onClick={handleAllReady} className={`px-4 py-2 ${KITCHEN_POS_BTN_ACCENT}`}>
-              ✓ Alles klaar
+               Alles klaar
             </button>
 
             {/* New order indicator */}
@@ -522,7 +522,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                 transition={{ repeat: Infinity, duration: 0.5 }}
                 className={`border border-red-500/60 bg-red-950/80 px-4 py-2 font-bold text-red-200 ${KASSA_POS_BTN_SHAPE}`}
               >
-                🚨 {newOrderIds.size} {tx('newOrder')}
+                 {newOrderIds.size} {tx('newOrder')}
               </motion.div>
             )}
 
@@ -580,7 +580,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
       <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-4">
         {orders.length === 0 ? (
           <div className={`flex h-full flex-col items-center justify-center ${KITCHEN_MUTED}`}>
-            <span className="mb-6 text-8xl">✅</span>
+            <span className="mb-6 text-8xl"></span>
             <p className="text-2xl font-bold text-white">{tx('allDone')}</p>
             <p className="mt-2 text-lg">{tx('ordersAppearHere')}</p>
           </div>
@@ -636,7 +636,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                     )}
                     {(order.scheduled_date || order.scheduled_time) && (
                       <div className={`px-3 py-2 text-sm font-medium ${KITCHEN_SUBSTRIP}`}>
-                        📅 {order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit' }) : ''}{order.scheduled_time ? ` om ${order.scheduled_time}` : ''}
+                         {order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit' }) : ''}{order.scheduled_time ? ` om ${order.scheduled_time}` : ''}
                       </div>
                     )}
                   </>
@@ -766,7 +766,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                     className={`flex h-11 w-11 shrink-0 items-center justify-center text-xl ${KITCHEN_POS_BTN}`}
                     aria-label={t('shopDisplay.cancel')}
                   >
-                    ✕
+                    
                   </button>
                 </div>
               </div>

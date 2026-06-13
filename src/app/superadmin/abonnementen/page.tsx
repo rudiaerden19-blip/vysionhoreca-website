@@ -228,7 +228,7 @@ export default function AbonnementenPage() {
             { key: 'all', label: 'Alle Abonnementen' },
             { key: 'active', label: 'Actieve Abonnementen' },
             { key: 'trial', label: 'Trial Abonnementen' },
-            { key: 'expiring', label: `⚠️ Verloopt Binnenkort (${stats.expiringSoon})` },
+            { key: 'expiring', label: ` Verloopt Binnenkort (${stats.expiringSoon})` },
             { key: 'cancelled', label: 'Verwijderde Abonnementen' },
             { key: 'expired', label: 'Vervallen Abonnementen' },
           ].map((f) => (
@@ -268,7 +268,7 @@ export default function AbonnementenPage() {
                 {/* Waarschuwingsbanner voor bijna verlopend */}
                 {isExpiringSoon && (
                   <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-xl p-3 mb-4 flex items-center gap-3">
-                    <span className="text-xl">⚠️</span>
+                    <span className="text-xl"></span>
                     <div>
                       <p className="text-yellow-300 font-bold text-sm">Abonnement verloopt over {daysLeft} {daysLeft === 1 ? 'dag' : 'dagen'}!</p>
                       <p className="text-yellow-400/80 text-xs">Klant ontvangt automatisch een herinnering</p>
@@ -279,7 +279,7 @@ export default function AbonnementenPage() {
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center">
-                      <span className="text-2xl">🏪</span>
+                      <span className="text-2xl"></span>
                     </div>
                     <div>
                       <Link
@@ -341,7 +341,7 @@ export default function AbonnementenPage() {
 
         {filteredSubs.length === 0 && (
           <div className="bg-slate-800 rounded-2xl p-12 text-center border border-slate-700">
-            <span className="text-4xl mb-4 block">📋</span>
+            <span className="text-4xl mb-4 block"></span>
             <p className="text-slate-400">Geen abonnementen gevonden</p>
           </div>
         )}

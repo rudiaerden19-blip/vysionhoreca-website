@@ -111,7 +111,7 @@ function SortableChoice({
           onClick={onRemove}
           className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
         >
-          🗑️
+          
         </button>
       )}
     </div>
@@ -316,7 +316,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
           onClick={openAddModal}
           className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium flex items-center gap-2"
         >
-          <span>➕</span>
+          <span></span>
           <span>{t('adminPages.opties.addOption')}</span>
         </motion.button>
       </div>
@@ -328,7 +328,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
           animate={{ opacity: 1, y: 0 }}
           className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl text-green-600 flex items-center gap-2"
         >
-          <span>✓</span> {t('adminPages.common.saved')}
+          <span></span> {t('adminPages.common.saved')}
         </motion.div>
       )}
 
@@ -372,13 +372,13 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                   onClick={() => openEditModal(option)}
                   className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                 >
-                  ✏️
+                  
                 </button>
                 <button 
                   onClick={() => handleDelete(option.id!)}
                   className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg transition-colors"
                 >
-                  🗑️
+                  
                 </button>
               </div>
             </div>
@@ -403,7 +403,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
       {/* Empty State */}
       {options.length === 0 && (
         <div className="text-center py-12 bg-white rounded-2xl">
-          <span className="text-6xl mb-4 block">⚙️</span>
+          <span className="text-6xl mb-4 block"></span>
           <h3 className="text-xl font-bold text-gray-900 mb-2">{t('adminPages.opties.noOptions')}</h3>
           <p className="text-gray-500 mb-6">{t('adminPages.opties.noOptionsDesc')}</p>
           <button
@@ -456,7 +456,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                     onClick={closeModal}
                     className="p-2 hover:bg-gray-100 rounded-xl text-gray-400 hover:text-gray-600"
                   >
-                    ✕
+                    
                   </button>
                 </div>
               </div>

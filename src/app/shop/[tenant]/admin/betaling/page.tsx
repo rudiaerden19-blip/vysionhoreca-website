@@ -117,12 +117,12 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
   }
 
   const paymentMethods = [
-    { id: 'cash', name: t('adminPages.betaling.cash'), icon: '💵', description: t('adminPages.betaling.cashDesc') },
-    { id: 'bancontact', name: t('adminPages.betaling.bancontact'), icon: '💳', description: t('adminPages.betaling.bancontactDesc') },
-    { id: 'visa', name: t('adminPages.betaling.visa'), icon: '💳', description: t('adminPages.betaling.visaDesc') },
-    { id: 'mastercard', name: t('adminPages.betaling.mastercard'), icon: '💳', description: t('adminPages.betaling.mastercardDesc') },
-    { id: 'paypal', name: t('adminPages.betaling.paypal'), icon: '🅿️', description: t('adminPages.betaling.paypalDesc') },
-    { id: 'ideal', name: t('adminPages.betaling.ideal'), icon: '🏦', description: t('adminPages.betaling.idealDesc') },
+    { id: 'cash', name: t('adminPages.betaling.cash'), icon: '', description: t('adminPages.betaling.cashDesc') },
+    { id: 'bancontact', name: t('adminPages.betaling.bancontact'), icon: '', description: t('adminPages.betaling.bancontactDesc') },
+    { id: 'visa', name: t('adminPages.betaling.visa'), icon: '', description: t('adminPages.betaling.visaDesc') },
+    { id: 'mastercard', name: t('adminPages.betaling.mastercard'), icon: '', description: t('adminPages.betaling.mastercardDesc') },
+    { id: 'paypal', name: t('adminPages.betaling.paypal'), icon: '', description: t('adminPages.betaling.paypalDesc') },
+    { id: 'ideal', name: t('adminPages.betaling.ideal'), icon: '', description: t('adminPages.betaling.idealDesc') },
   ]
 
   if (loading) {
@@ -146,7 +146,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
           saved ? 'bg-green-500 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'
         }`}
       >
-        {saving ? '⏳' : saved ? '✓' : '💾'} {saved ? t('adminPages.common.saved') : t('adminPages.common.save')}
+        {saving ? '⏳' : saved ? '' : ''} {saved ? t('adminPages.common.saved') : t('adminPages.common.save')}
       </motion.button>
 
       {/* Header */}
@@ -163,7 +163,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
         animate={{ opacity: 1, y: 0 }}
         className="bg-white rounded-2xl p-6 shadow-sm mb-6"
       >
-        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">💳 {t('adminPages.betaling.methods')}</p>
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4"> {t('adminPages.betaling.methods')}</p>
         <div className="space-y-2">
           {paymentMethods.map((method) => (
             <div
@@ -201,7 +201,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
         className="bg-white rounded-2xl p-6 shadow-sm"
       >
         <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-          <span>📊</span> {t('adminPages.betaling.vat')}
+          <span></span> {t('adminPages.betaling.vat')}
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[6, 9, 12, 21].map((rate) => (
@@ -219,7 +219,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
           ))}
         </div>
         <p className="text-sm text-gray-500 mt-4">
-          💡 {t('adminPages.betaling.vatRate')}
+           {t('adminPages.betaling.vatRate')}
         </p>
       </motion.div>
 
@@ -235,10 +235,10 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
           className="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors"
         >
           <div className="flex items-center gap-3">
-            <span className="text-2xl">⚡</span>
+            <span className="text-2xl"></span>
             <div className="text-left">
               <p className="font-semibold text-gray-900">Stripe — Online betalingen</p>
-              <p className="text-sm text-gray-500">{stripeSecretKey ? '✅ Geconfigureerd' : 'Voer je Stripe keys in om online betalingen te activeren'}</p>
+              <p className="text-sm text-gray-500">{stripeSecretKey ? ' Geconfigureerd' : 'Voer je Stripe keys in om online betalingen te activeren'}</p>
             </div>
           </div>
           <span className="text-gray-400">{showStripeKeys ? '▲' : '▼'}</span>
@@ -289,7 +289,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
               disabled={savingStripe}
               className={`w-full py-3 rounded-xl font-semibold transition-colors ${savedStripe ? 'bg-green-500 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
             >
-              {savingStripe ? '⏳ Opslaan...' : savedStripe ? '✓ Opgeslagen' : '💾 Stripe keys opslaan'}
+              {savingStripe ? '⏳ Opslaan...' : savedStripe ? ' Opgeslagen' : ' Stripe keys opslaan'}
             </button>
           </div>
         )}

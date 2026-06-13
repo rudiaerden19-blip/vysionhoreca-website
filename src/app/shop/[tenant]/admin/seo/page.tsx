@@ -107,9 +107,9 @@ export default function SeoPage({ params }: { params: { tenant: string } }) {
             <span>{t('adminPages.common.saving')}</span>
           </>
         ) : saved ? (
-          <><span>✓</span><span>{t('adminPages.common.saved')}</span></>
+          <><span></span><span>{t('adminPages.common.saved')}</span></>
         ) : (
-          <><span>💾</span><span>{t('adminPages.common.save')}</span></>
+          <><span></span><span>{t('adminPages.common.save')}</span></>
         )}
       </motion.button>
 
@@ -211,7 +211,7 @@ export default function SeoPage({ params }: { params: { tenant: string } }) {
         className="mt-6 bg-white rounded-2xl p-6 shadow-sm"
       >
         <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-          <span>🔍</span> {t('websiteSeo.googlePreview')}
+          <span></span> {t('websiteSeo.googlePreview')}
         </h3>
         <div className="border rounded-xl p-4 bg-gray-50">
           <p className="text-blue-600 text-lg hover:underline cursor-pointer truncate">
@@ -235,7 +235,7 @@ export default function SeoPage({ params }: { params: { tenant: string } }) {
           className="mt-6 bg-white rounded-2xl p-6 shadow-sm"
         >
           <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <span>📱</span> {t('websiteSeo.facebookPreview')}
+            <span></span> {t('websiteSeo.facebookPreview')}
           </h3>
           <div className="border rounded-xl overflow-hidden bg-gray-50 max-w-md">
             <img 
@@ -259,7 +259,7 @@ export default function SeoPage({ params }: { params: { tenant: string } }) {
         transition={{ delay: 0.2 }}
         className="mt-6 bg-green-50 border border-green-200 rounded-2xl p-6"
       >
-        <h3 className="font-semibold text-green-900 mb-2">💡 {t('websiteSeo.tips.title')}</h3>
+        <h3 className="font-semibold text-green-900 mb-2"> {t('websiteSeo.tips.title')}</h3>
         <ul className="text-green-700 text-sm space-y-1">
           <li>• {t('websiteSeo.tips.tip1')}</li>
           <li>• {t('websiteSeo.tips.tip2')}</li>

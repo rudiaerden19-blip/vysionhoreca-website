@@ -178,7 +178,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
       {/* Header - responsive */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">🎁 {t('promotiesPage.title')}</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900"> {t('promotiesPage.title')}</h1>
           <p className="text-gray-500 text-sm sm:text-base">{t('promotiesPage.subtitle')}</p>
         </div>
         <motion.button
@@ -187,14 +187,14 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
           onClick={openCreateModal}
           className="px-4 sm:px-6 py-2.5 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium flex items-center justify-center gap-2 text-sm sm:text-base w-full sm:w-auto"
         >
-          ➕ {t('promotiesPage.newPromo')}
+           {t('promotiesPage.newPromo')}
         </motion.button>
       </div>
 
       {/* Hoofdschakelaar - Promoties tonen in shop - responsive */}
       <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm mb-4 sm:mb-6 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          <span className="text-xl sm:text-2xl flex-shrink-0">🎁</span>
+          <span className="text-xl sm:text-2xl flex-shrink-0"></span>
           <div className="min-w-0">
             <p className="font-semibold text-gray-900 text-sm sm:text-base">{t('promotiesPage.showInShop')}</p>
             <p className="text-xs sm:text-sm text-gray-500 truncate">
@@ -217,7 +217,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
       {promotionsEnabled && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg sm:rounded-xl p-3 sm:p-4 mb-4 sm:mb-6">
           <p className="text-blue-800 text-xs sm:text-sm">
-            💡 {t('promotiesPage.tip')}
+             {t('promotiesPage.tip')}
           </p>
         </div>
       )}
@@ -250,7 +250,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
           animate={{ opacity: 1, y: 0 }}
           className="text-center py-12 bg-white rounded-2xl shadow-sm"
         >
-          <span className="text-6xl mb-4 block">🎁</span>
+          <span className="text-6xl mb-4 block"></span>
           <h3 className="text-xl font-bold text-gray-900 mb-2">{t('promotiesPage.noPromos')}</h3>
           <p className="text-gray-500 mb-6">{t('promotiesPage.noPromosDesc')}</p>
           <motion.button
@@ -289,7 +289,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-5xl sm:text-4xl bg-gradient-to-br from-green-400 to-green-600">
-                        🎁
+                        
                       </div>
                     )}
                     {/* Korting badge */}
@@ -326,7 +326,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                       <div className="flex flex-wrap gap-2 mt-3">
                         {promo.is_active ? (
                           <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
-                            ✓ {t('promotiesPage.visibleInShop')}
+                             {t('promotiesPage.visibleInShop')}
                           </span>
                         ) : (
                           <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">
@@ -352,13 +352,13 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                         onClick={() => openEditModal(promo)}
                         className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium flex items-center gap-1"
                       >
-                        ✏️ {t('common.edit')}
+                         {t('common.edit')}
                       </button>
                       <button
                         onClick={() => handleDelete(promo.id!)}
                         className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm font-medium flex items-center gap-1"
                       >
-                        🗑️ {t('common.delete')}
+                         {t('common.delete')}
                       </button>
                     </div>
                   </div>
@@ -448,7 +448,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >
-                      <span className="text-2xl block mb-1">🏷️</span>
+                      <span className="text-2xl block mb-1"></span>
                       <span className="text-sm font-medium">{t('promotiesPage.typeFixedPrice')}</span>
                       <span className="text-xs text-gray-500 block">{t('promotiesPage.typeFixedPriceExample')}</span>
                     </button>
@@ -496,7 +496,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                     </select>
                     {formData.product_id && (
                       <p className="text-xs text-green-600 mt-1">
-                        ✓ {t('promotiesPage.productSelected')}
+                         {t('promotiesPage.productSelected')}
                       </p>
                     )}
                   </div>
@@ -579,7 +579,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                     </>
                   ) : (
                     <>
-                      <span>✓</span>
+                      <span></span>
                       <span>{editingPromo ? t('common.save') : t('promotiesPage.create')}</span>
                     </>
                   )}

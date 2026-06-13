@@ -536,10 +536,10 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
 
   const paymentMethodOptions = useMemo<KassaPayOption[]>(
     () => [
-      { method: 'CASH', label: t('kassaApp.payCash'), icon: '💵', color: '#10b981' },
-      { method: 'CARD', label: t('kassaApp.payCard'), icon: '💳', color: '#3b82f6' },
-      { method: 'IDEAL', label: t('kassaApp.payIdeal'), icon: '📱', color: '#ec4899' },
-      { method: 'BANCONTACT', label: t('kassaApp.payBancontact'), icon: '🏦', color: '#f59e0b' },
+      { method: 'CASH', label: t('kassaApp.payCash'), icon: '', color: '#10b981' },
+      { method: 'CARD', label: t('kassaApp.payCard'), icon: '', color: '#3b82f6' },
+      { method: 'IDEAL', label: t('kassaApp.payIdeal'), icon: '', color: '#ec4899' },
+      { method: 'BANCONTACT', label: t('kassaApp.payBancontact'), icon: '', color: '#f59e0b' },
     ],
     [t],
   )
@@ -2843,7 +2843,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                     className="flex size-full items-center justify-center text-2xl text-white/25"
                     aria-hidden={!selectedPreviewSku}
                   >
-                    {selectedPreviewSku ? '📦' : null}
+                    {selectedPreviewSku ? '' : null}
                   </div>
                 )}
               </div>
@@ -2930,7 +2930,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                           className={retailListBarRemoveBtnClass}
                           aria-label={t('kassaApp.ariaDecreaseQty')}
                         >
-                          {l.quantity === 1 ? '🗑' : '−'}
+                          {l.quantity === 1 ? '' : '−'}
                         </button>
                         <span className="w-6 text-center text-sm font-bold text-black">{l.quantity}</span>
                         <button

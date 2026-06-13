@@ -152,11 +152,11 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
         loadData() // Reload campaign history
         setTimeout(() => setSendSuccess(false), 5000)
       } else {
-        alert('❌ Verzenden mislukt: ' + (result.error || 'Onbekende fout'))
+        alert(' Verzenden mislukt: ' + (result.error || 'Onbekende fout'))
       }
     } catch (error) {
       console.error('Send error:', error)
-      alert('❌ Verzenden mislukt. Controleer of ZOHO_EMAIL en ZOHO_PASSWORD ingesteld zijn in Vercel.')
+      alert(' Verzenden mislukt. Controleer of ZOHO_EMAIL en ZOHO_PASSWORD ingesteld zijn in Vercel.')
     }
 
     setSending(false)
@@ -189,7 +189,7 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">📧 {t('marketing.title')}</h1>
+          <h1 className="text-2xl font-bold text-gray-800"> {t('marketing.title')}</h1>
           <p className="text-gray-600">{t('marketing.subtitle')}</p>
         </div>
         <button
@@ -197,7 +197,7 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
           disabled={selectedCustomers.size === 0}
           className="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
         >
-          ✉️ {t('marketing.composeEmail')} {selectedCustomers.size > 0 && `(${selectedCustomers.size})`}
+           {t('marketing.composeEmail')} {selectedCustomers.size > 0 && `(${selectedCustomers.size})`}
         </button>
       </div>
 
@@ -208,14 +208,14 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
           animate={{ opacity: 1, y: 0 }}
           className="bg-green-100 border border-green-300 text-green-700 px-4 py-3 rounded-xl flex items-center gap-2"
         >
-          ✅ {t('marketing.emailsSent')}
+           {t('marketing.emailsSent')}
         </motion.div>
       )}
 
       {/* Tips om spam te voorkomen */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
         <h3 className="font-semibold text-blue-800 flex items-center gap-2 mb-2">
-          💡 Tips om spam te voorkomen
+           Tips om spam te voorkomen
         </h3>
         <ul className="text-blue-700 text-sm space-y-1">
           <li>• Verstuur niet te vaak (max 1-2x per maand)</li>
@@ -253,7 +253,7 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
         <div className="lg:col-span-2">
           <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
             <div className="p-4 border-b flex items-center justify-between">
-              <h2 className="font-bold text-gray-800">👥 {t('marketing.customerList')}</h2>
+              <h2 className="font-bold text-gray-800"> {t('marketing.customerList')}</h2>
               <button
                 onClick={toggleSelectAll}
                 className="text-sm text-blue-600 hover:text-blue-700"
@@ -264,7 +264,7 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
 
             {customers.length === 0 ? (
               <div className="p-12 text-center">
-                <div className="text-5xl mb-4">👥</div>
+                <div className="text-5xl mb-4"></div>
                 <h3 className="text-xl font-semibold text-gray-800 mb-2">{t('marketing.noCustomers')}</h3>
                 <p className="text-gray-500">{t('marketing.noCustomersDesc')}</p>
               </div>
@@ -307,12 +307,12 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
         <div>
           <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
             <div className="p-4 border-b">
-              <h2 className="font-bold text-gray-800">📊 {t('marketing.campaignHistory')}</h2>
+              <h2 className="font-bold text-gray-800"> {t('marketing.campaignHistory')}</h2>
             </div>
 
             {campaigns.length === 0 ? (
               <div className="p-8 text-center text-gray-500">
-                <div className="text-3xl mb-2">📭</div>
+                <div className="text-3xl mb-2"></div>
                 {t('marketing.noCampaigns')}
               </div>
             ) : (
@@ -329,7 +329,7 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
                           ? 'bg-green-100 text-green-700' 
                           : 'bg-red-100 text-red-700'
                       }`}>
-                        {campaign.status === 'sent' ? '✓ Verzonden' : '✗ Mislukt'}
+                        {campaign.status === 'sent' ? ' Verzonden' : ' Mislukt'}
                       </span>
                       <span className="text-xs text-gray-500">
                         {campaign.recipient_count} {t('marketing.recipients')}
@@ -353,7 +353,7 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
           >
             <div className="p-6 border-b">
               <h2 className="text-xl font-bold text-gray-800">
-                ✉️ {t('marketing.composeEmail')}
+                 {t('marketing.composeEmail')}
               </h2>
               <p className="text-gray-500 text-sm mt-1">
                 {t('marketing.sendingTo')} {selectedCustomers.size} {t('marketing.customers')}
@@ -397,7 +397,7 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
                     className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
                   <div>
-                    <span className="font-medium text-gray-800">🎁 {t('marketing.includePromoCode')}</span>
+                    <span className="font-medium text-gray-800"> {t('marketing.includePromoCode')}</span>
                     <p className="text-sm text-gray-500">{t('marketing.promoCodeDesc')}</p>
                   </div>
                 </label>
@@ -457,7 +457,7 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
                   </>
                 ) : (
                   <>
-                    📤 {t('marketing.send')} ({selectedCustomers.size})
+                     {t('marketing.send')} ({selectedCustomers.size})
                   </>
                 )}
               </button>
