@@ -36,7 +36,7 @@ export default function HomeLandingHero() {
     { href: '/', label: t('nav.home') },
     { href: '/#sectoren', label: t('nav.sectors') },
     { href: '/#platform', label: t('nav.services') },
-    { href: '/abonnementen', label: t('nav.subscriptions') },
+    { href: '/#prijzen', label: t('nav.pricing') },
   ]
 
   return (

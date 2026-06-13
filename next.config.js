@@ -195,6 +195,11 @@ const nextConfig = {
         destination: '/',
         permanent: true,
       },
+      {
+        source: '/abonnementen',
+        destination: '/prijzen',
+        permanent: true,
+      },
     ]
   },
 }
