@@ -750,8 +750,8 @@ export function WebAzertyKeyboard() {
           />
         </div>
 
-        {/* Eén onderrij: shift, tekens, spatiel met harde breedte-floor, enter — spaart hoogte t.o.v. twee rijen */}
-        <div className="mx-auto flex w-full max-w-[min(720px,92vw)] flex-nowrap justify-start gap-1.5 overflow-x-auto px-1 pb-1 max-sm:gap-1 max-sm:px-1 sm:justify-center sm:gap-2 sm:overflow-x-visible sm:px-2 [scrollbar-width:thin] [-webkit-overflow-scrolling:touch]">
+        {/* Tekens + shift (wrap); spatie + enter op aparte rij — past binnen paneel */}
+        <div className="mx-auto flex w-full max-w-[min(720px,92vw)] flex-wrap items-center justify-center gap-1 px-1.5 pb-1 max-sm:gap-1 sm:gap-1.5 sm:px-2">
           <KeyBtn
             label="⇧"
             aria-label={t('kassaApp.webKbCaps')}
@@ -764,15 +764,9 @@ export function WebAzertyKeyboard() {
               setCaps((c) => !c)
             }}
           />
-          {(['@', '-', '/', '€'] as const).map((s) => (
+          {(['@', '-', '/', '€', '_', '.', ',', ':', '&', "'"] as const).map((s) => (
             <KeyBtn key={s} label={s} className={SYMBOL_KEY_COMPACT} onClick={() => onChar(s)} />
           ))}
-          <KeyBtn label="_" className={SYMBOL_KEY_COMPACT} onClick={() => onChar('_')} />
-          <KeyBtn label="." className={SYMBOL_KEY_COMPACT} onClick={() => onChar('.')} />
-          <KeyBtn label="," className={SYMBOL_KEY_COMPACT} onClick={() => onChar(',')} />
-          <KeyBtn label=":" className={SYMBOL_KEY_COMPACT} onClick={() => onChar(':')} />
-          <KeyBtn label="&" className={SYMBOL_KEY_COMPACT} onClick={() => onChar('&')} />
-          <KeyBtn label="'" className={SYMBOL_KEY_COMPACT} onClick={() => onChar("'")} />
           <KeyBtn
             label=".com"
             title={t('kassaApp.webKbDotComHint')}
@@ -780,15 +774,16 @@ export function WebAzertyKeyboard() {
             className={`w-auto min-w-[2.75rem] shrink-0 px-1 text-xs font-bold tracking-tight max-sm:min-w-[2.5rem] max-sm:text-[13px] sm:min-w-[3rem] ${actionKeyCls}`}
             onClick={() => onChar('.com')}
           />
-          {/* Geen flex-1 + min-w-0: daar klapte dit op 0 bij smalle wrappers — blokkeerde tikken */}
+        </div>
+        <div className={`${rowWrap} pb-0.5`}>
           <KeyBtn
             label={t('kassaApp.webKbSpace')}
-            className={`max-sm:min-w-[4.5rem] min-w-[6.5rem] flex-1 basis-[clamp(5.5rem,26vw,18rem)] px-2 text-sm font-semibold tracking-wide max-sm:text-[13px] sm:min-w-[8rem] sm:px-3 ${actionKeyCls}`}
+            className={`!min-w-0 min-h-0 flex-1 shrink basis-0 px-2 text-sm font-semibold tracking-wide max-sm:text-[13px] sm:px-3 ${actionKeyCls}`}
             onClick={() => onChar(' ')}
           />
           <KeyBtn
             label={t('kassaApp.webKbEnter')}
-            className={`w-[min(5.5rem,calc((100vw-32px)*0.26))] shrink-0 border-[#324160] bg-[#3f5380] px-2 text-sm font-semibold max-sm:text-[13px] ${actionKeyCls}`}
+            className={`min-w-[4.75rem] max-w-[38%] shrink-0 border-[#324160] bg-[#3f5380] px-2 text-sm font-semibold max-sm:min-w-[4.25rem] max-sm:text-[13px] sm:min-w-[5.5rem] ${actionKeyCls}`}
             onClick={() => {
               if (!target?.isConnected) return
               focusInputForProgrammaticEdit(target)
@@ -805,7 +800,7 @@ export function WebAzertyKeyboard() {
     <div
       ref={panelRef}
       data-web-touch-keyboard-panel
-      className="fixed bottom-0 left-1/2 z-[600] w-[min(720px,92vw)] max-w-[92vw] -translate-x-1/2 rounded-t-2xl border border-zinc-700 border-b-0 bg-[#151a21] px-0.5 pb-[max(env(safe-area-inset-bottom),6px)] pt-1.5 shadow-[0_-8px_28px_rgba(0,0,0,.5)]"
+      className="fixed bottom-0 left-1/2 z-[600] w-[min(720px,92vw)] max-w-[92vw] -translate-x-1/2 overflow-hidden rounded-t-2xl border border-zinc-700 border-b-0 bg-[#151a21] px-0.5 pb-[max(env(safe-area-inset-bottom),6px)] pt-1.5 shadow-[0_-8px_28px_rgba(0,0,0,.5)]"
       role="region"
       aria-label={
         pinCompactMode ? t('kassaApp.webKbPinTitle') : `${t('kassaApp.webKbTitle')} (${letterLayout.toUpperCase()})`
