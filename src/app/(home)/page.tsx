@@ -540,6 +540,21 @@ function PricingFeatureCheck({ label }: { label: string }) {
   )
 }
 
+function PricingModalHardwareFooter({
+  withHardware,
+  t,
+}: {
+  withHardware: boolean
+  t: (key: string) => string
+}) {
+  if (!withHardware) return null
+  return (
+    <p className="mb-3 text-center text-xs leading-relaxed text-gray-600 sm:text-sm sm:leading-relaxed">
+      {t('pricing.hardwarePackageFooter')}
+    </p>
+  )
+}
+
 function PricingModalPriceBar({
   withHardware,
   onHardwareChange,
@@ -663,6 +678,7 @@ function PricingSection() {
                 </div>
               </div>
               <div className="shrink-0 border-t border-gray-100 bg-[#faf8f6] px-5 py-4 sm:px-6">
+                <PricingModalHardwareFooter withHardware={withHardware} t={t} />
                 <button
                   type="button"
                   onClick={() => setModulesOpen(false)}
@@ -740,6 +756,7 @@ function PricingSection() {
                 </div>
               </div>
               <div className="shrink-0 border-t border-gray-100 bg-[#faf8f6] px-5 py-4 sm:px-6">
+                <PricingModalHardwareFooter withHardware={withHardware} t={t} />
                 <a
                   href={`/registreer?lang=${locale}&plan=pro&billing=monthly`}
                   className="block w-full rounded-full bg-accent py-3.5 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:text-base"

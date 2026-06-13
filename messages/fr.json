@@ -353,6 +353,7 @@
  "billingYearly": "Annuel",
  "hardwareWithout": "Sans matériel",
  "hardwareWith": "Avec matériel",
+ "hardwarePackageFooter": "Le matériel comprend un écran tactile 15\"–17\" ou 21\", imprimante tickets, tiroir-caisse et PC : Intel i5-9500, 16 Go RAM, SSD 256 Go.",
  "perYear": "/an",
  "badgeYearlyDiscount": "-10 %",
  "compareDiscountStarter": "-40 %",
