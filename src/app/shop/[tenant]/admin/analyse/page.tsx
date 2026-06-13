@@ -26,18 +26,13 @@ import {
   FixedCostCategory,
   VariableCostCategory,
 } from '@/lib/admin-api'
-import type { PointerEvent as ReactPointerEvent } from 'react'
 import { KassaIconClose } from '@/lib/kassa-ui-icons'
+import { numberFieldDisplayValue, parseNumberFieldValue } from '@/lib/controlled-number-input'
 
 type TabType = 'overview' |  'fixed' |  'variable' |  'year' |  'settings'
 
 const ANALYSE_TOUCH_INPUT =
   'min-h-[44px] touch-manipulation [-webkit-tap-highlight-color:transparent]'
-
-function focusNumberFieldOnTouch(e: ReactPointerEvent<HTMLInputElement>) {
-  if (e.pointerType !== 'touch' && e.pointerType !== 'pen') return
-  e.currentTarget.focus({ preventScroll: true })
-}
 
 // Month names are now loaded from translations
 
@@ -1093,7 +1088,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
 
       {/* Settings Tab */}
       {activeTab === 'settings' && (
-        <div className="max-w-2xl mx-auto space-y-6">
+        <div className="mx-auto max-w-2xl space-y-6" data-vysion-kb-scroll-host>
           <div>
             <h2 className="text-xl font-bold text-gray-900"> {t('analysePage.settings.title')}</h2>
             <p className="text-gray-500">{t('analysePage.settings.subtitle')}</p>
@@ -1103,12 +1098,13 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
             <div>
               <label className="block font-medium text-gray-700 mb-2"> {t('analysePage.settings.targetMargin')}</label>
               <input
-                type="number"
-                value={targetsForm.target_profit_margin || ''}
-                onChange={e => setTargetsForm(f => ({ ...f, target_profit_margin: Number(e.target.value) }))}
+                type="text"
+                inputMode="decimal"
+                autoComplete="off"
+                value={numberFieldDisplayValue(targetsForm.target_profit_margin)}
+                onChange={e => setTargetsForm(f => ({ ...f, target_profit_margin: parseNumberFieldValue(e.target.value) }))}
                 placeholder="25"
                 className={`w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 ${ANALYSE_TOUCH_INPUT}`}
-                onPointerDown={focusNumberFieldOnTouch}
               />
               <p className="text-sm text-gray-500 mt-1">{t('analysePage.settings.targetMarginHelp')}</p>
             </div>
@@ -1116,12 +1112,13 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
             <div>
               <label className="block font-medium text-gray-700 mb-2"> {t('analysePage.settings.minMargin')}</label>
               <input
-                type="number"
-                value={targetsForm.minimum_profit_margin || ''}
-                onChange={e => setTargetsForm(f => ({ ...f, minimum_profit_margin: Number(e.target.value) }))}
+                type="text"
+                inputMode="decimal"
+                autoComplete="off"
+                value={numberFieldDisplayValue(targetsForm.minimum_profit_margin)}
+                onChange={e => setTargetsForm(f => ({ ...f, minimum_profit_margin: parseNumberFieldValue(e.target.value) }))}
                 placeholder="15"
                 className={`w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 ${ANALYSE_TOUCH_INPUT}`}
-                onPointerDown={focusNumberFieldOnTouch}
               />
               <p className="text-sm text-gray-500 mt-1">{t('analysePage.settings.minMarginHelp')}</p>
             </div>
@@ -1129,12 +1126,13 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
             <div>
               <label className="block font-medium text-gray-700 mb-2"> {t('analysePage.settings.maxPersonnel')}</label>
               <input
-                type="number"
-                value={targetsForm.max_personnel_percent || ''}
-                onChange={e => setTargetsForm(f => ({ ...f, max_personnel_percent: Number(e.target.value) }))}
+                type="text"
+                inputMode="decimal"
+                autoComplete="off"
+                value={numberFieldDisplayValue(targetsForm.max_personnel_percent)}
+                onChange={e => setTargetsForm(f => ({ ...f, max_personnel_percent: parseNumberFieldValue(e.target.value) }))}
                 placeholder="30"
                 className={`w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 ${ANALYSE_TOUCH_INPUT}`}
-                onPointerDown={focusNumberFieldOnTouch}
               />
               <p className="text-sm text-gray-500 mt-1">{t('analysePage.settings.maxPersonnelHelp')}</p>
             </div>
@@ -1142,12 +1140,13 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
             <div>
               <label className="block font-medium text-gray-700 mb-2"> {t('analysePage.settings.maxIngredients')}</label>
               <input
-                type="number"
-                value={targetsForm.max_ingredient_percent || ''}
-                onChange={e => setTargetsForm(f => ({ ...f, max_ingredient_percent: Number(e.target.value) }))}
+                type="text"
+                inputMode="decimal"
+                autoComplete="off"
+                value={numberFieldDisplayValue(targetsForm.max_ingredient_percent)}
+                onChange={e => setTargetsForm(f => ({ ...f, max_ingredient_percent: parseNumberFieldValue(e.target.value) }))}
                 placeholder="35"
                 className={`w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 ${ANALYSE_TOUCH_INPUT}`}
-                onPointerDown={focusNumberFieldOnTouch}
               />
               <p className="text-sm text-gray-500 mt-1">{t('analysePage.settings.maxIngredientsHelp')}</p>
             </div>
@@ -1155,12 +1154,13 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
             <div>
               <label className="block font-medium text-gray-700 mb-2"> {t('analysePage.settings.targetTicket')}</label>
               <input
-                type="number"
-                value={targetsForm.target_average_ticket || ''}
-                onChange={e => setTargetsForm(f => ({ ...f, target_average_ticket: Number(e.target.value) }))}
+                type="text"
+                inputMode="decimal"
+                autoComplete="off"
+                value={numberFieldDisplayValue(targetsForm.target_average_ticket)}
+                onChange={e => setTargetsForm(f => ({ ...f, target_average_ticket: parseNumberFieldValue(e.target.value) }))}
                 placeholder="15"
                 className={`w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 ${ANALYSE_TOUCH_INPUT}`}
-                onPointerDown={focusNumberFieldOnTouch}
               />
             </div>
 
@@ -1278,13 +1278,13 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">{t('analysePage.fixed.amountPerMonth')}</label>
                   <input
-                    type="number"
-                    step="0.01"
-                    value={fixedForm.amount || ''}
-                    onChange={e => setFixedForm(f => ({ ...f, amount: Number(e.target.value) }))}
+                    type="text"
+                    inputMode="decimal"
+                    autoComplete="off"
+                    value={numberFieldDisplayValue(fixedForm.amount)}
+                    onChange={e => setFixedForm(f => ({ ...f, amount: parseNumberFieldValue(e.target.value) }))}
                     placeholder="0.00"
                     className={`w-full px-4 py-3 border border-gray-200 rounded-xl ${ANALYSE_TOUCH_INPUT}`}
-                    onPointerDown={focusNumberFieldOnTouch}
                   />
                 </div>
                 <div>
@@ -1430,13 +1430,13 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">{t('analysePage.variable.amount')}</label>
                     <input
-                      type="number"
-                      step="0.01"
-                      value={variableForm.amount || ''}
-                      onChange={e => setVariableForm(f => ({ ...f, amount: Number(e.target.value) }))}
+                      type="text"
+                      inputMode="decimal"
+                      autoComplete="off"
+                      value={numberFieldDisplayValue(variableForm.amount)}
+                      onChange={e => setVariableForm(f => ({ ...f, amount: parseNumberFieldValue(e.target.value) }))}
                       placeholder="0.00"
                       className={`w-full px-4 py-3 border border-gray-200 rounded-xl ${ANALYSE_TOUCH_INPUT}`}
-                      onPointerDown={focusNumberFieldOnTouch}
                     />
                   </div>
                   <div>

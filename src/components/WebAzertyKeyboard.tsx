@@ -85,11 +85,16 @@ function isInAdminModal(el: HTMLElement): boolean {
   return !!el.closest('[data-vysion-modal-overlay]')
 }
 
+function isInKbScrollHostField(el: HTMLElement): boolean {
+  return !!el.closest('[data-vysion-kb-scroll-host]')
+}
+
 function scrollFieldClearOfKeyboard(target: HTMLElement, panelH: number, headerPx: number) {
   const margin = 16
   const visibleBottom = window.innerHeight - panelH - margin
   const rect = target.getBoundingClientRect()
-  const scrollBehavior: ScrollBehavior = isInAdminModal(target) ? 'auto' : 'smooth'
+  const scrollBehavior: ScrollBehavior =
+    isInAdminModal(target) || isInKbScrollHostField(target) ? 'auto' : 'smooth'
   if (rect.bottom <= visibleBottom && rect.top >= headerPx + 8) return
 
   const scrollParent = findVerticalScrollParent(target)
@@ -514,7 +519,7 @@ export function WebAzertyKeyboard() {
       if (
         from instanceof HTMLElement &&
         isEligibleField(from, pathname) &&
-        isInAdminModal(from)
+        (isInAdminModal(from) || isInKbScrollHostField(from))
       ) {
         clearBlurCloseTimer()
         const field = from as HTMLInputElement | HTMLTextAreaElement
