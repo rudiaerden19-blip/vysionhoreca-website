@@ -96,6 +96,77 @@ function loadedPriceToInputStr(v: number | undefined): string {
   return num.toFixed(2).replace('.', ',')
 }
 
+const productActionIconClass = 'h-5 w-5 shrink-0'
+
+function ProductIconCheck({ className = productActionIconClass }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+    </svg>
+  )
+}
+
+function ProductIconX({ className = productActionIconClass }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  )
+}
+
+function ProductIconFlame({ className = productActionIconClass }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"
+      />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
+    </svg>
+  )
+}
+
+function ProductIconPencil({ className = productActionIconClass }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+      />
+    </svg>
+  )
+}
+
+function ProductIconTrash({ className = productActionIconClass }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+      />
+    </svg>
+  )
+}
+
+function ProductIconPackage({ className = productActionIconClass }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+      />
+    </svg>
+  )
+}
+
 // Sortable Product Card Component
 function SortableProductCard({ 
   product, 
@@ -158,8 +229,8 @@ function SortableProductCard({
             className={`w-full h-full pointer-events-none ${product.image_display_mode === 'contain'? 'object-contain object-center': 'object-cover object-center'}`}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-5xl bg-gray-50">
-            
+          <div className="w-full h-full flex items-center justify-center bg-gray-50 text-gray-300">
+            <ProductIconPackage className="h-14 w-14" />
           </div>
         )}
         {/* Badges */}
@@ -206,7 +277,7 @@ function SortableProductCard({
               }`}
               title={product.is_active ? 'Beschikbaar': 'Niet beschikbaar'}
             >
-              {product.is_active ? '' : ''}
+              {product.is_active ? <ProductIconCheck /> : <ProductIconX />}
             </button>
             <button
               onClick={onTogglePopular}
@@ -217,7 +288,7 @@ function SortableProductCard({
               }`}
               title={product.is_popular ? 'Populair': 'Niet populair'}
             >
-              
+              <ProductIconFlame />
             </button>
           </div>
           <div className="flex gap-1">
@@ -226,14 +297,14 @@ function SortableProductCard({
               className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
               title="Bewerken"
             >
-              
+              <ProductIconPencil />
             </button>
             <button
               onClick={onDelete}
               className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg transition-colors"
               title="Verwijderen"
             >
-              
+              <ProductIconTrash />
             </button>
           </div>
         </div>
