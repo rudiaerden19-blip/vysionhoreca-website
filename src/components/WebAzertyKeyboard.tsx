@@ -450,6 +450,24 @@ export function WebAzertyKeyboard() {
     return () => document.removeEventListener('focusin', handleFocusCapture, true)
   }, [handleFocusCapture])
 
+  /** Eerste tik op touch: focus meteen (dnd/modals soms geen focusin op eerste tap). */
+  useEffect(() => {
+    if (!kbOn) return
+    const onPointerDown = (ev: PointerEvent) => {
+      if (ev.pointerType === 'mouse' && ev.button !== 0) return
+      const el = ev.target
+      if (!isEligibleField(el, pathname)) return
+      if (document.activeElement === el) return
+      try {
+        el.focus({ preventScroll: false })
+      } catch {
+        /* noop */
+      }
+    }
+    document.addEventListener('pointerdown', onPointerDown, true)
+    return () => document.removeEventListener('pointerdown', onPointerDown, true)
+  }, [kbOn, pathname])
+
   useEffect(() => {
     const onBlur = () => {
       queueMicrotask(() => {

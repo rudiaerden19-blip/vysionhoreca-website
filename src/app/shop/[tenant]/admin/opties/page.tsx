@@ -5,16 +5,11 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { 
   DndContext, 
   closestCenter, 
-  KeyboardSensor, 
-  PointerSensor, 
-  useSensor, 
-  useSensors,
   DragEndEvent 
 } from '@dnd-kit/core'
 import { 
   arrayMove, 
   SortableContext, 
-  sortableKeyboardCoordinates, 
   useSortable,
   verticalListSortingStrategy 
 } from '@dnd-kit/sortable'
@@ -28,6 +23,10 @@ import {
 } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
+import {
+  stopDragActivationOnField,
+  useAdminCatalogDragSensors,
+} from '@/lib/admin-dnd-sensors'
 
 // Sortable Choice Component
 function SortableChoice({ 
@@ -71,9 +70,10 @@ function SortableChoice({
     <div ref={setNodeRef} style={style} className={`flex gap-2 items-center ${isDragging ? 'z-50': ''}`}>
       {/* Drag Handle */}
       <button
+        type="button"
         {...attributes}
         {...listeners}
-        className="p-2 text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing"
+        className="touch-manipulation p-2 text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing"
         title="Sleep om te verplaatsen"
       >
         ⠿
@@ -81,6 +81,9 @@ function SortableChoice({
       <input
         type="text"
         value={choice.name}
+        onPointerDown={stopDragActivationOnField}
+        onMouseDown={stopDragActivationOnField}
+        onTouchStart={stopDragActivationOnField}
         onChange={(e) => {
           const val = e.target.value
           const capitalized = val.charAt(0).toUpperCase() + val.slice(1)
@@ -95,6 +98,9 @@ function SortableChoice({
           type="text"
           inputMode="decimal"
           value={priceInput}
+          onPointerDown={stopDragActivationOnField}
+          onMouseDown={stopDragActivationOnField}
+          onTouchStart={stopDragActivationOnField}
           onChange={(e) => {
             const val = e.target.value.replace(',', '.')
             if (val === '' || /^\d*\.?\d*$/.test(val)) {
@@ -140,15 +146,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
     choices: []
   })
 
-  // Drag & drop sensors for choices
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: { distance: 5 },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  )
+  const sensors = useAdminCatalogDragSensors()
 
   // Handle drag end for choices
   const handleChoiceDragEnd = (event: DragEndEvent) => {
@@ -484,6 +482,9 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                   <input
                     type="text"
                     value={formData.name}
+                    onPointerDown={stopDragActivationOnField}
+                    onMouseDown={stopDragActivationOnField}
+                    onTouchStart={stopDragActivationOnField}
                     onChange={(e) => {
                       const val = e.target.value
                       const capitalized = val.charAt(0).toUpperCase() + val.slice(1)
@@ -502,6 +503,9 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                     </label>
                     <select
                       value={formData.type}
+                      onPointerDown={stopDragActivationOnField}
+                      onMouseDown={stopDragActivationOnField}
+                      onTouchStart={stopDragActivationOnField}
                       onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as 'single' |  'multiple'}))}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >

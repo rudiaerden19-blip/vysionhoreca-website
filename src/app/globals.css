@@ -57,6 +57,24 @@ html.vysion-web-kb-open [data-vysion-admin-scroll] {
   scroll-padding-bottom: var(--vysion-web-kb-height, 320px);
 }
 
+/* Admin + modals: één tik, geen dubbel-tap-zoom-vertraging op touch-pc/kiosk */
+[data-vysion-admin-scroll] button,
+[data-vysion-admin-scroll] a,
+[data-vysion-admin-scroll] input,
+[data-vysion-admin-scroll] select,
+[data-vysion-admin-scroll] textarea,
+[data-vysion-admin-scroll] label,
+[data-vysion-admin-scroll] [role='button'],
+[data-vysion-modal-overlay] button,
+[data-vysion-modal-overlay] a,
+[data-vysion-modal-overlay] input,
+[data-vysion-modal-overlay] select,
+[data-vysion-modal-overlay] textarea,
+[data-vysion-modal-overlay] label,
+[data-vysion-modal-overlay] [role='button'] {
+  touch-action: manipulation;
+}
+
 /* Volledige POS/viewport-shells: inhoud scrollbaar zodat focusveld boven het toetsenbord komt */
 html.vysion-web-kb-open [data-vysion-kb-scroll-host] {
   overflow-y: auto !important;

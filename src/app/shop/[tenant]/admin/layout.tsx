@@ -540,7 +540,7 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
       {/* Hoofdinhoud — geen sidebar, volle breedte */}
       <main
         data-vysion-admin-scroll
-        className="fixed inset-x-0 bottom-0 top-14 z-0 overflow-x-hidden overflow-y-auto overscroll-y-contain [-webkit-overflow-scrolling:touch]"
+        className="fixed inset-x-0 bottom-0 top-14 z-0 overflow-x-hidden overflow-y-auto overscroll-y-contain touch-manipulation [-webkit-overflow-scrolling:touch]"
       >
         <div
           className={`max-w-full p-4 md:p-6 ${

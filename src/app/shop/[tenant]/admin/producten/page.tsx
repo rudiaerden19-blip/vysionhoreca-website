@@ -12,17 +12,11 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { 
   DndContext, 
   closestCenter, 
-  KeyboardSensor,
-  MouseSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
   DragEndEvent 
 } from '@dnd-kit/core'
 import { 
   arrayMove, 
   SortableContext, 
-  sortableKeyboardCoordinates, 
   useSortable,
   rectSortingStrategy 
 } from '@dnd-kit/sortable'
@@ -47,6 +41,7 @@ import {
   numberFieldDisplayValue,
   parseNumberFieldValue,
 } from '@/lib/controlled-number-input'
+import { useAdminCatalogDragSensors } from '@/lib/admin-dnd-sensors'
 import MediaPicker from '@/components/MediaPicker'
 import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
@@ -472,17 +467,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     }
   }
 
-  const sensors = useSensors(
-    useSensor(MouseSensor, {
-      activationConstraint: { distance: 5 },
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint: { delay: 200, tolerance: 6 },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  )
+  const sensors = useAdminCatalogDragSensors()
 
   // Herneem volgorde zoals in admin: sort_order is per categorie; bij "Alle" globaal genummerd.
   const handleDragEnd = async (event: DragEndEvent) => {
