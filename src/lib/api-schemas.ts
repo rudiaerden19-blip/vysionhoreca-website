@@ -51,6 +51,12 @@ export const registerBodySchema = z.object({
   email: emailField,
   phone: z.string().trim().min(6).max(40),
   password: z.string().min(8).max(128),
+  productLine: z.enum([
+    'horeca_kassa',
+    'retail_winkel',
+    'online_bestellen',
+    'restaurant_reservaties',
+  ]),
 })
 
 export const forgotPasswordBodySchema = z.object({

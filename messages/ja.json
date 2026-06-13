@@ -735,7 +735,30 @@
     "invalidEmail": "無効なメールアドレス",
     "passwordTooShort": "パスワードは8文字以上である必要があります",
     "passwordsDontMatch": "パスワードが一致しません",
-    "required": "必須フィールド"
+    "required": "必須フィールド",
+    "productLineTitle": "Vysionを何に使いますか？",
+    "productLineSubtitle": "スターターパッケージを選択してください。モジュールは後から変更できます。",
+    "productLineRequired": "先に製品ラインを選択してください",
+    "productLineContinue": "アカウント作成へ",
+    "productLineChange": "選択を変更",
+    "productLine": {
+      "horeca_kassa": {
+        "title": "ホスピタリティPOS",
+        "desc": "レジ画面、商品、決済端末"
+      },
+      "retail_winkel": {
+        "title": "小売店POS",
+        "desc": "店舗レジ、商品、在庫"
+      },
+      "online_bestellen": {
+        "title": "オンライン注文プラットフォーム",
+        "desc": "注文、ウェブショップ、サイト"
+      },
+      "restaurant_reservaties": {
+        "title": "レストラン予約",
+        "desc": "テーブルと予約の管理"
+      }
+    }
   },
   "about": {
     "heroTitle": "",

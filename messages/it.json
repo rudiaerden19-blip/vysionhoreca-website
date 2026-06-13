@@ -735,7 +735,30 @@
     "invalidEmail": "Indirizzo email non valido",
     "passwordTooShort": "La password deve contenere almeno 8 caratteri",
     "passwordsDontMatch": "Le password non corrispondono",
-    "required": "Campo obbligatorio"
+    "required": "Campo obbligatorio",
+    "productLineTitle": "Per cosa userai Vysion?",
+    "productLineSubtitle": "Scegli il pacchetto iniziale. Potrai modificare i moduli in seguito.",
+    "productLineRequired": "Scegli prima una linea prodotto",
+    "productLineContinue": "Continua con l'account",
+    "productLineChange": "Cambia scelta",
+    "productLine": {
+      "horeca_kassa": {
+        "title": "Cassa horeca",
+        "desc": "Schermo cassa, prodotti e terminale per l'horeca"
+      },
+      "retail_winkel": {
+        "title": "Cassa retail",
+        "desc": "Cassa negozio, prodotti e magazzino"
+      },
+      "online_bestellen": {
+        "title": "Piattaforma ordini online",
+        "desc": "Ordini, webshop e sito web"
+      },
+      "restaurant_reservaties": {
+        "title": "Prenotazioni ristorante",
+        "desc": "Gestisci tavoli e prenotazioni"
+      }
+    }
   },
   "about": {
     "heroTitle": "Chi è",

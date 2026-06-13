@@ -735,7 +735,30 @@
     "invalidEmail": "无效的电子邮件地址",
     "passwordTooShort": "密码必须至少8个字符",
     "passwordsDontMatch": "密码不匹配",
-    "required": "必填字段"
+    "required": "必填字段",
+    "productLineTitle": "您将用 Vysion 做什么？",
+    "productLineSubtitle": "选择入门套餐。模块可稍后调整。",
+    "productLineRequired": "请先选择产品线",
+    "productLineContinue": "继续创建账户",
+    "productLineChange": "更改选择",
+    "productLine": {
+      "horeca_kassa": {
+        "title": "餐饮收银",
+        "desc": "收银界面、产品与餐饮终端"
+      },
+      "retail_winkel": {
+        "title": "零售店收银",
+        "desc": "门店收银、产品与库存"
+      },
+      "online_bestellen": {
+        "title": "在线订餐平台",
+        "desc": "订单、网店与网站"
+      },
+      "restaurant_reservaties": {
+        "title": "餐厅预订",
+        "desc": "管理餐桌与预订"
+      }
+    }
   },
   "about": {
     "heroTitle": "关于",

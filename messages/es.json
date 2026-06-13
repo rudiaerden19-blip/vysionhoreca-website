@@ -735,7 +735,30 @@
     "invalidEmail": "Dirección de correo electrónico inválida",
     "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
     "passwordsDontMatch": "Las contraseñas no coinciden",
-    "required": "Campo obligatorio"
+    "required": "Campo obligatorio",
+    "productLineTitle": "¿Para qué usará Vysion?",
+    "productLineSubtitle": "Elija su paquete inicial. Podrá ajustar los módulos más tarde.",
+    "productLineRequired": "Elija primero una línea de producto",
+    "productLineContinue": "Continuar con la cuenta",
+    "productLineChange": "Cambiar elección",
+    "productLine": {
+      "horeca_kassa": {
+        "title": "TPV horeca",
+        "desc": "Pantalla de caja, productos y terminal para hostelería"
+      },
+      "retail_winkel": {
+        "title": "TPV retail",
+        "desc": "Caja de tienda, productos e inventario"
+      },
+      "online_bestellen": {
+        "title": "Plataforma de pedidos online",
+        "desc": "Pedidos, tienda online y sitio web"
+      },
+      "restaurant_reservaties": {
+        "title": "Reservas de restaurante",
+        "desc": "Gestionar mesas y reservas"
+      }
+    }
   },
   "about": {
     "heroTitle": "Sobre",

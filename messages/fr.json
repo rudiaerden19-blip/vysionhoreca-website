@@ -735,7 +735,30 @@
     "invalidEmail": "Adresse e-mail invalide",
     "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères",
     "passwordsDontMatch": "Les mots de passe ne correspondent pas",
-    "required": "Champ obligatoire"
+    "required": "Champ obligatoire",
+    "productLineTitle": "Pour quoi utiliserez-vous Vysion ?",
+    "productLineSubtitle": "Choisissez votre pack de départ. Vous pourrez ajuster les modules plus tard.",
+    "productLineRequired": "Choisissez d'abord une ligne produit",
+    "productLineContinue": "Continuer vers le compte",
+    "productLineChange": "Autre choix",
+    "productLine": {
+      "horeca_kassa": {
+        "title": "Caisse horeca",
+        "desc": "Écran caisse, produits et terminal pour l'horeca"
+      },
+      "retail_winkel": {
+        "title": "Caisse retail",
+        "desc": "Caisse magasin, produits et stock"
+      },
+      "online_bestellen": {
+        "title": "Plateforme de commande en ligne",
+        "desc": "Commandes, boutique en ligne et site web"
+      },
+      "restaurant_reservaties": {
+        "title": "Réservations restaurant",
+        "desc": "Gérer tables et réservations"
+      }
+    }
   },
   "about": {
     "heroTitle": "À propos de",

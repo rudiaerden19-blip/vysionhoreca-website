@@ -15,6 +15,12 @@ import {
   withoutPostTrialModulesConfirmed,
 } from '@/lib/supabase-post-trial-column'
 import { slugifyBusinessNameForTenant } from '@/lib/register-tenant-slug'
+import {
+  buildRegistrationEnabledModulesJson,
+  getRegistrationPostSignupAdminPath,
+  registrationLineWantsDeliveryBootstrap,
+  type RegistrationProductLine,
+} from '@/lib/registration-product-line'
 
 // Secure password hashing with bcrypt
 async function hashPassword(password: string): Promise<string> {
@@ -41,7 +47,7 @@ export async function POST(request: NextRequest) {
     const parsedBody = await parseJsonBody(request, registerBodySchema)
     if (!parsedBody.ok) return parsedBody.response
 
-    const { businessName, email, phone, password } = parsedBody.data
+    const { businessName, email, phone, password, productLine } = parsedBody.data
 
     const supabase = getServerSupabaseClient()
     if (!supabase) {
@@ -112,6 +118,10 @@ export async function POST(request: NextRequest) {
     // ========================================
     // Geen proefperiode meer — nieuwe zaak is direct 'active'. Betaling wordt
     // door superadmin handmatig beheerd via de blokkeer-knop op `tenants.is_blocked`.
+    const enabledModules = buildRegistrationEnabledModulesJson(
+      productLine as RegistrationProductLine,
+    )
+
     const tenantInsert = {
       name: businessName.trim(),
       slug: tenantSlug,
@@ -120,7 +130,7 @@ export async function POST(request: NextRequest) {
       plan: 'starter',
       subscription_status: 'active',
       trial_ends_at: null as string | null,
-      enabled_modules: null as null,
+      enabled_modules: enabledModules,
       post_trial_modules_confirmed: true,
       feature_group_orders: true,
     }
@@ -214,7 +224,9 @@ export async function POST(request: NextRequest) {
       // Don't fail - this is secondary
     }
 
-    await ensureDeliverySettingsForTenant(supabase, tenantSlug)
+    if (registrationLineWantsDeliveryBootstrap(productLine as RegistrationProductLine)) {
+      await ensureDeliverySettingsForTenant(supabase, tenantSlug)
+    }
 
     // ========================================
     // 4. CREATE SUBSCRIPTION
@@ -267,11 +279,17 @@ export async function POST(request: NextRequest) {
       requestId, 
       tenantSlug, 
       tenantId: tenant.id,
+      productLine,
       duration: Date.now() - startTime 
     })
     
     return NextResponse.json({ 
       success: true,
+      productLine,
+      postSignupAdminPath: getRegistrationPostSignupAdminPath(
+        tenantSlug,
+        productLine as RegistrationProductLine,
+      ),
       tenant: {
         id: tenant.id,
         name: businessName.trim(),

@@ -1016,7 +1016,30 @@
     "invalidEmail": "Ongeldig email adres",
     "passwordTooShort": "Wachtwoord moet minimaal 8 tekens zijn",
     "passwordsDontMatch": "Wachtwoorden komen niet overeen",
-    "required": "Verplicht veld"
+    "required": "Verplicht veld",
+    "productLineTitle": "Waarvoor gebruik je Vysion?",
+    "productLineSubtitle": "Kies je startpakket. Modules kun je later altijd aanpassen.",
+    "productLineRequired": "Kies eerst een productlijn",
+    "productLineContinue": "Verder met account",
+    "productLineChange": "Andere keuze",
+    "productLine": {
+      "horeca_kassa": {
+        "title": "Horeca kassa",
+        "desc": "Kassascherm, producten en PIN voor horeca"
+      },
+      "retail_winkel": {
+        "title": "Retail winkelkassa",
+        "desc": "Winkelkassa, producten en voorraad"
+      },
+      "online_bestellen": {
+        "title": "Online bestelplatform",
+        "desc": "Bestellingen, webshop en website"
+      },
+      "restaurant_reservaties": {
+        "title": "Restaurant reservaties",
+        "desc": "Tafels en reserveringen beheren"
+      }
+    }
   },
   "about": {
     "heroTitle": "Over",

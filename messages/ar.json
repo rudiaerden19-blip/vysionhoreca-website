@@ -735,7 +735,30 @@
     "invalidEmail": "عنوان بريد إلكتروني غير صالح",
     "passwordTooShort": "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
     "passwordsDontMatch": "كلمات المرور غير متطابقة",
-    "required": "حقل مطلوب"
+    "required": "حقل مطلوب",
+    "productLineTitle": "لماذا ستستخدم Vysion؟",
+    "productLineSubtitle": "اختر حزمة البداية. يمكنك تعديل الوحدات لاحقًا.",
+    "productLineRequired": "يرجى اختيار خط المنتج أولاً",
+    "productLineContinue": "متابعة إلى الحساب",
+    "productLineChange": "تغيير الاختيار",
+    "productLine": {
+      "horeca_kassa": {
+        "title": "نقطة بيع المطاعم",
+        "desc": "شاشة الكassa والمنتجات والطرفية للضيافة"
+      },
+      "retail_winkel": {
+        "title": "نقطة بيع التجزئة",
+        "desc": "كassa المتجر والمنتجات والمخزون"
+      },
+      "online_bestellen": {
+        "title": "منصة الطلب عبر الإنترنت",
+        "desc": "الطلبات والمتجر الإلكتروني والموقع"
+      },
+      "restaurant_reservaties": {
+        "title": "حجوزات المطعم",
+        "desc": "إدارة الطاولات والحجوزات"
+      }
+    }
   },
   "about": {
     "heroTitle": "حول",

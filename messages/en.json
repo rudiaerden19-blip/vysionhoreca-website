@@ -1016,7 +1016,30 @@
     "invalidEmail": "Invalid email address",
     "passwordTooShort": "Password must be at least 8 characters",
     "passwordsDontMatch": "Passwords do not match",
-    "required": "Required field"
+    "required": "Required field",
+    "productLineTitle": "What will you use Vysion for?",
+    "productLineSubtitle": "Choose your starter package. You can adjust modules later.",
+    "productLineRequired": "Please choose a product line first",
+    "productLineContinue": "Continue to account",
+    "productLineChange": "Change choice",
+    "productLine": {
+      "horeca_kassa": {
+        "title": "Horeca POS",
+        "desc": "POS screen, products and card terminal for hospitality"
+      },
+      "retail_winkel": {
+        "title": "Retail store POS",
+        "desc": "Store POS, products and inventory"
+      },
+      "online_bestellen": {
+        "title": "Online ordering platform",
+        "desc": "Orders, webshop and website"
+      },
+      "restaurant_reservaties": {
+        "title": "Restaurant reservations",
+        "desc": "Manage tables and reservations"
+      }
+    }
   },
   "about": {
     "heroTitle": "About",

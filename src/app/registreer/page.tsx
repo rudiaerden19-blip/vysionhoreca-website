@@ -5,8 +5,13 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useLanguage, Locale } from '@/i18n'
-import { persistTenantSessionWithToday } from '@/lib/auth-headers'
+import { persistTenantSessionWithToday, internalShopPathToTenantHostPath } from '@/lib/auth-headers'
 import { LocaleFlagEmoji, LocaleFlagWithCode } from '@/components/LocaleFlagEmoji'
+import { RegistrationProductLinePicker } from '@/components/register/RegistrationProductLinePicker'
+import {
+  isRegistrationProductLine,
+  type RegistrationProductLine,
+} from '@/lib/registration-product-line'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -24,6 +29,8 @@ export default function RegisterPage() {
   const [isLangOpen, setIsLangOpen] = useState(false)
   const [showInstallPopup, setShowInstallPopup] = useState(false)
   const [tenantSlug, setTenantSlug] = useState('')
+  const [productLine, setProductLine] = useState<RegistrationProductLine | null>(null)
+  const [step, setStep] = useState<'line' | 'form'>('line')
   const langRef = useRef<HTMLDivElement>(null)
 
   // Read language from URL parameter on mount
@@ -33,6 +40,11 @@ export default function RegisterPage() {
       const langParam = params.get('lang') as Locale | null
       if (langParam && locales.includes(langParam)) {
         setLocale(langParam)
+      }
+      const lineParam = params.get('line')
+      if (lineParam && isRegistrationProductLine(lineParam)) {
+        setProductLine(lineParam)
+        setStep('form')
       }
     }
   }, [setLocale, locales])
@@ -61,6 +73,42 @@ export default function RegisterPage() {
     }
   }
 
+  const handleProductLineSelect = (line: RegistrationProductLine) => {
+    setProductLine(line)
+    setError('')
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href)
+      url.searchParams.set('line', line)
+      window.history.replaceState({}, '', url.toString())
+    }
+  }
+
+  const goToFormStep = () => {
+    if (!productLine) {
+      setError(t('register.productLineRequired'))
+      return
+    }
+    setStep('form')
+    setError('')
+  }
+
+  const redirectAfterSignup = (slug: string, internalPath: string) => {
+    try {
+      sessionStorage.setItem(`vysion_welcomed_${slug}`, 'true')
+    } catch {
+      /* ignore */
+    }
+    const isLocalhost =
+      window.location.hostname.includes('localhost') ||
+      window.location.hostname.includes('127.0.0.1')
+    if (isLocalhost) {
+      router.push(internalPath)
+    } else {
+      const hostPath = internalShopPathToTenantHostPath(internalPath, slug)
+      window.location.href = `https://${slug}.ordervysion.com${hostPath}`
+    }
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
@@ -68,6 +116,11 @@ export default function RegisterPage() {
   }
 
   const validateForm = (): boolean => {
+    if (!productLine) {
+      setError(t('register.productLineRequired'))
+      return false
+    }
+
     if (!formData.businessName.trim()) {
       setError(t('register.required') + ': ' + t('register.businessName'))
       return false
@@ -124,6 +177,7 @@ export default function RegisterPage() {
           email: formData.email.trim().toLowerCase(),
           phone: formData.phone.trim(),
           password: formData.password,
+          productLine,
         })
       })
 
@@ -147,14 +201,12 @@ export default function RegisterPage() {
       // Direct redirect to dashboard (no install popup)
       setTenantSlug(data.tenant.tenant_slug)
       setSuccess(true)
-      
-      // Redirect naar welkomstpagina bij eerste registratie
-      if (window.location.hostname === 'localhost') {
-        router.push(`/shop/${data.tenant.tenant_slug}/welkom`)
-      } else {
-        window.location.href = `https://${data.tenant.tenant_slug}.ordervysion.com/welkom`
-      }
-      
+
+      const nextPath =
+        typeof data.postSignupAdminPath === 'string' && data.postSignupAdminPath
+          ? data.postSignupAdminPath
+          : `/shop/${data.tenant.tenant_slug}/welkom`
+      redirectAfterSignup(data.tenant.tenant_slug, nextPath)
     } catch (err) {
       setError(t('register.error'))
       setIsLoading(false)
@@ -320,9 +372,46 @@ export default function RegisterPage() {
         </div>
       </header>
 
-      {/* Registration Form */}
+      {/* Registration */}
       <div className="flex-1 flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md">
+        <div className={`w-full ${step === 'line' ? 'max-w-2xl' : 'max-w-md'}`}>
+          {step === 'line' ? (
+            <div className="space-y-8">
+              <div className="text-center">
+                <Link href="/">
+                  <span className="text-3xl font-bold">
+                    <span className="text-accent">Vysion</span>
+                  </span>
+                </Link>
+              </div>
+              <RegistrationProductLinePicker
+                value={productLine}
+                onSelect={handleProductLineSelect}
+              />
+              {error && (
+                <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                  {error}
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={goToFormStep}
+                disabled={!productLine}
+                className="w-full bg-accent hover:bg-accent/90 disabled:bg-accent/50 text-white py-4 rounded-lg font-semibold transition-colors"
+              >
+                {`${t('register.productLineContinue')} →`}
+              </button>
+              <div className="text-center">
+                <p className="text-sm text-gray-600">
+                  {t('register.alreadyHaveAccount')}{' '}
+                  <Link href={`/login?lang=${locale}`} className="font-medium text-accent hover:text-accent/80 transition-colors">
+                    {t('register.loginLink')}
+                  </Link>
+                </p>
+              </div>
+            </div>
+          ) : (
+            <>
           {/* Logo */}
           <div className="text-center mb-10">
             <Link href="/">
@@ -336,6 +425,26 @@ export default function RegisterPage() {
             <p className="mt-1 text-sm text-gray-600">
               {t('register.subtitle')}
             </p>
+            {productLine && (
+              <button
+                type="button"
+                onClick={() => {
+                  setStep('line')
+                  setError('')
+                }}
+                className="mt-3 text-sm font-medium text-accent hover:text-accent/80"
+              >
+                ← {t('register.productLineChange')}
+              </button>
+            )}
+          </div>
+
+          <div className="mb-6">
+            <RegistrationProductLinePicker
+              value={productLine}
+              onSelect={handleProductLineSelect}
+              compact
+            />
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -455,6 +564,8 @@ export default function RegisterPage() {
               </p>
             </div>
           </form>
+            </>
+          )}
         </div>
       </div>
 
