@@ -418,8 +418,16 @@ export function WebAzertyKeyboard() {
   const [caps, setCaps] = useState(false)
   const [letterLayout, setLetterLayout] = useState<KeyboardLetterLayout>('azerty')
   const panelRef = useRef<HTMLDivElement>(null)
+  const blurCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const kbOn = shouldActivateWebKeyboard(pathname)
+
+  const clearBlurCloseTimer = useCallback(() => {
+    if (blurCloseTimerRef.current != null) {
+      clearTimeout(blurCloseTimerRef.current)
+      blurCloseTimerRef.current = null
+    }
+  }, [])
 
   useEffect(() => {
     setLetterLayout(readStoredLetterLayout())
@@ -439,10 +447,11 @@ export function WebAzertyKeyboard() {
     (ev: FocusEvent) => {
       const tEl = ev.target
       if (!isEligibleField(tEl, pathname)) return
+      clearBlurCloseTimer()
       setTarget(tEl)
       setCaps(false)
     },
-    [pathname],
+    [pathname, clearBlurCloseTimer],
   )
 
   useEffect(() => {
@@ -469,20 +478,32 @@ export function WebAzertyKeyboard() {
   }, [kbOn, pathname])
 
   useEffect(() => {
-    const onBlur = () => {
-      queueMicrotask(() => {
+    const scheduleMaybeClose = () => {
+      clearBlurCloseTimer()
+      blurCloseTimerRef.current = setTimeout(() => {
+        blurCloseTimerRef.current = null
         const active = document.activeElement
         if (active instanceof HTMLElement && panelRef.current?.contains(active)) return
         if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) {
           if (isEligibleField(active, pathname)) return
         }
         setTarget(null)
-      })
+      }, 160)
+    }
+
+    const onBlur = (ev: FocusEvent) => {
+      const related = ev.relatedTarget
+      if (related instanceof HTMLElement && panelRef.current?.contains(related)) return
+
+      scheduleMaybeClose()
     }
 
     document.addEventListener('focusout', onBlur, true)
-    return () => document.removeEventListener('focusout', onBlur, true)
-  }, [pathname])
+    return () => {
+      document.removeEventListener('focusout', onBlur, true)
+      clearBlurCloseTimer()
+    }
+  }, [pathname, clearBlurCloseTimer])
 
   useLayoutEffect(() => {
     if (!target || !target.isConnected) return
@@ -560,10 +581,14 @@ export function WebAzertyKeyboard() {
 
   useLayoutEffect(() => {
     if (!target || !target.isConnected) return
+    const el = target
     const run = () => {
       try {
+        if (document.activeElement !== el) {
+          focusInputForProgrammaticEdit(el)
+        }
         const panelH = panelRef.current?.offsetHeight ?? 252
-        scrollFieldClearOfKeyboard(target, panelH, 56)
+        scrollFieldClearOfKeyboard(el, panelH, 56)
       } catch {
         /* noop */
       }
@@ -573,6 +598,7 @@ export function WebAzertyKeyboard() {
   }, [target, legacyNumericMode, pinCompactMode])
 
   const closePanel = () => {
+    clearBlurCloseTimer()
     try {
       target?.blur()
     } catch {

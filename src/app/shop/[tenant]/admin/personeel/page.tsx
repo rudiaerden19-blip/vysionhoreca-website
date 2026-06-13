@@ -389,7 +389,11 @@ export default function PersoneelPage() {
         <div
           className="fixed inset-0 z-[130] flex items-center justify-center bg-black/50 p-4"
           data-vysion-modal-overlay
-          onClick={() => setShowModal(false)}
+          onPointerDown={(e) => {
+            if (e.target !== e.currentTarget) return
+            if (e.pointerType === 'mouse' && e.button !== 0) return
+            setShowModal(false)
+          }}
         >
           <div
             className="flex min-h-0 w-full max-h-[90vh] max-w-md flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
@@ -528,7 +532,11 @@ export default function PersoneelPage() {
         <div
           className="fixed inset-0 z-[130] flex items-center justify-center bg-black/50 p-4"
           data-vysion-modal-overlay
-          onClick={() => setShowContractModal(false)}
+          onPointerDown={(e) => {
+            if (e.target !== e.currentTarget) return
+            if (e.pointerType === 'mouse' && e.button !== 0) return
+            setShowContractModal(false)
+          }}
         >
           <div
             className="flex min-h-0 w-full max-h-[90vh] max-w-md flex-col overflow-hidden rounded-xl bg-white shadow-xl"

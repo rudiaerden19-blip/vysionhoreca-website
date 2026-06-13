@@ -92,9 +92,10 @@ html.vysion-web-kb-open [data-vysion-kb-scroll-host] {
   -webkit-overflow-scrolling: touch;
 }
 html.vysion-web-kb-open [data-vysion-modal-overlay] {
-  align-items: flex-start !important;
+  /* Blijf gecentreerd — flex-start liet modal springen en veroorzaakte blur op touch */
   padding-top: max(0.75rem, env(safe-area-inset-top));
   padding-bottom: calc(var(--vysion-web-kb-height, 320px) + 1rem);
+  scroll-padding-bottom: calc(var(--vysion-web-kb-height, 320px) + 1rem);
 }
 html.vysion-web-kb-open [data-vysion-modal-panel] {
   max-height: min(90vh, calc(100dvh - var(--vysion-web-kb-height, 320px) - 2rem));
