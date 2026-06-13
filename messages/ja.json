@@ -5750,6 +5750,7 @@
  "variantBadge": "バリアント",
  "singleSkuBadge": "単一SKU",
  "enableTracking": "在庫を追跡",
+ "editStock": "在庫を編集",
  "allCategories": "すべてのカテゴリ",
  "statTotal": "SKU数",
  "statTracked": "追跡中",

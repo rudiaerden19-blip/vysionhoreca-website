@@ -5750,6 +5750,7 @@
  "variantBadge": "variante",
  "singleSkuBadge": "SKU singolo",
  "enableTracking": "Traccia giacenza",
+ "editStock": "Modifica giacenza",
  "allCategories": "Tutte le categorie",
  "statTotal": "SKU",
  "statTracked": "Tracciati",

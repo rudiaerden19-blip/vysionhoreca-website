@@ -5773,6 +5773,7 @@
  "variantBadge": "variante",
  "singleSkuBadge": "SKU unique",
  "enableTracking": "Suivre le stock",
+ "editStock": "Modifier le stock",
  "allCategories": "Toutes catégories",
  "statTotal": "SKU",
  "statTracked": "Suivis",

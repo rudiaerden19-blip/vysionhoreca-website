@@ -421,37 +421,51 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
                       </div>
                     </div>
                   ) : sku.track_stock ? (
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-col gap-2 shrink-0 items-stretch sm:items-end">
+                      <div className="flex items-center gap-2 justify-end">
+                        <button
+                          type="button"
+                          onClick={() => void quickAdjust(sku, -1)}
+                          className="w-9 h-9 rounded-xl bg-red-100 text-red-600 font-bold touch-manipulation"
+                        >
+                          −
+                        </button>
+                        <span className="min-w-[48px] px-3 py-2 rounded-xl bg-gray-100 font-bold text-center tabular-nums">
+                          {sku.stock_quantity}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => void quickAdjust(sku, 1)}
+                          className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-600 font-bold touch-manipulation"
+                        >
+                          +
+                        </button>
+                      </div>
                       <button
                         type="button"
-                        onClick={() => void quickAdjust(sku, -1)}
-                        className="w-9 h-9 rounded-xl bg-red-100 text-red-600 font-bold"
+                        onClick={() => startEdit(sku)}
+                        className="px-4 py-2 rounded-xl bg-black hover:bg-neutral-900 text-white text-sm font-semibold touch-manipulation"
                       >
-                        −
+                        {t('stockPage.editStock')}
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => void updateSku(sku, { track_stock: true, stock_quantity: 0, low_stock_threshold: 5 })}
+                        className="px-4 py-2 rounded-xl bg-[#1e293b] text-white text-sm font-semibold touch-manipulation"
+                      >
+                        {t('stockPage.enableTracking')}
                       </button>
                       <button
                         type="button"
                         onClick={() => startEdit(sku)}
-                        className="min-w-[48px] px-3 py-2 rounded-xl bg-gray-100 font-bold"
+                        className="px-4 py-2 rounded-xl bg-black hover:bg-neutral-900 text-white text-sm font-semibold touch-manipulation"
                       >
-                        {sku.stock_quantity}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => void quickAdjust(sku, 1)}
-                        className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-600 font-bold"
-                      >
-                        +
+                        {t('stockPage.editStock')}
                       </button>
                     </div>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => void updateSku(sku, { track_stock: true, stock_quantity: 0, low_stock_threshold: 5 })}
-                      className="px-4 py-2 rounded-xl bg-[#1e293b] text-white text-sm"
-                    >
-                      {t('stockPage.enableTracking')}
-                    </button>
                   )}
                 </div>
               </div>
