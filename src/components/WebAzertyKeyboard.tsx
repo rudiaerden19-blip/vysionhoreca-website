@@ -5,6 +5,10 @@ import type { ReactNode } from 'react'
 import { STAFF_PIN_MAX_LEN } from '@/components/staff-clock/StaffClockPinPortal'
 import { useLanguage } from '@/i18n'
 import { ATTR_VYSION_KB_MANAGED, focusInputForProgrammaticEdit, setNativeInputValue } from '@/lib/dom-input-value'
+import {
+  isShopStaffInternalPath,
+  preferNativeKeyboardOnThisPage,
+} from '@/lib/web-touch-keyboard-policy'
 import { usePathname } from 'next/navigation'
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
@@ -112,8 +116,8 @@ function scrollFieldClearOfKeyboard(target: HTMLElement, panelH: number, headerP
 }
 
 /**
- * Zaak-shell + keuken + interne dashboards: altijd groot webtoetsenbord (kassa-/touch-pc stack).
- * Publieke landingspagina’s: vooral bij touch-/tablet-pointer.
+ * Zaak-shell + keuken + interne dashboards: schermtoetsenbord (kassa-/touch-pc).
+ * Telefoon bij online bestellen/reserveren: native OS-toetsenbord.
  * Opslag: localStorage `vysion_web_kb_force`= 1 aan, `vysion_web_kb_off`= 1 uit.
  */
 function shouldActivateWebKeyboard(pathname: string): boolean {
@@ -128,7 +132,13 @@ function shouldActivateWebKeyboard(pathname: string): boolean {
 
   const p = pathname || window.location.pathname
 
-  if (/^\/shop\/[^/]+\//i.test(p)) return true
+  if (preferNativeKeyboardOnThisPage(p)) return false
+
+  if (/^\/shop\/[^/]+(\/|$)/i.test(p)) {
+    if (isShopStaffInternalPath(p)) return true
+    return true
+  }
+
   if (/^\/keuken\//i.test(p)) return true
   if (/^\/(?:superadmin|dashboard|registreer)\b/i.test(p)) return true
 
