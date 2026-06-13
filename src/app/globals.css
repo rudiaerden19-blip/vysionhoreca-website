@@ -67,6 +67,24 @@ html.vysion-web-kb-open [data-vysion-kb-scroll-host] {
   scroll-padding-bottom: max(1rem, env(safe-area-inset-bottom));
 }
 
+/* Admin modals: scroll overlay + form when schermtoetsenbord open */
+[data-vysion-modal-overlay] {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+html.vysion-web-kb-open [data-vysion-modal-overlay] {
+  align-items: flex-start !important;
+  padding-top: max(0.75rem, env(safe-area-inset-top));
+  padding-bottom: calc(var(--vysion-web-kb-height, 320px) + 1rem);
+}
+html.vysion-web-kb-open [data-vysion-modal-panel] {
+  max-height: min(90vh, calc(100dvh - var(--vysion-web-kb-height, 320px) - 2rem));
+}
+html.vysion-web-kb-open [data-vysion-modal-panel] [data-vysion-kb-scroll-host] {
+  max-height: none !important;
+}
+
 /*
  * Embedded touch / kiosk-WebView (o.a. Elo): hint naar manipulation om dubbeltik-zoom-vertraging te beperken.
  * Scrollports met eigen touch-action (bv. menu-scroll met touch-manipulation) blijven werken voor verticaal slepen.

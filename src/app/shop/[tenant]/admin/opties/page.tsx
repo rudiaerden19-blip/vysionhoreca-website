@@ -439,15 +439,19 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
             exit={{ opacity: 0 }}
             onClick={closeModal}
             className="fixed inset-0 z-[130] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+            data-vysion-modal-overlay
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+              className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col min-h-0 shadow-xl"
+              data-vysion-modal-panel
+              role="dialog"
+              aria-modal="true"
             >
-              <div className="p-6 border-b sticky top-0 bg-white z-10">
+              <div className="p-6 border-b shrink-0 bg-white z-10 rounded-t-2xl">
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-bold text-gray-900">
                     {editingOption ? t('adminPages.opties.editOption') : t('adminPages.opties.addOption')}
@@ -461,7 +465,10 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                 </div>
               </div>
 
-              <div className="p-6 space-y-6">
+              <div
+                className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-6 space-y-6"
+                data-vysion-kb-scroll-host
+              >
                 {/* Error in Modal */}
                 {error && (
                   <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-600">
@@ -560,7 +567,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
               </div>
 
               {/* Footer */}
-              <div className="p-6 border-t bg-gray-50 flex justify-end gap-4">
+              <div className="p-6 border-t bg-gray-50 flex justify-end gap-4 shrink-0 rounded-b-2xl">
                 <button
                   onClick={closeModal}
                   className="px-6 py-3 rounded-xl font-medium text-gray-600 hover:bg-gray-200 transition-colors"
