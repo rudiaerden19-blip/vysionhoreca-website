@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
 
   /** Tenant-subdomein óf Vysion-hoofddomein: icoon → staff-login (zelfde /login voor path-based tenants zonder eigen URL). */
   const openLoginFirst = !!(slug || isVysionMainPortalHost(host))
-  const startUrl = openLoginFirst ? '/login' : '/'
+  const startUrl = openLoginFirst ? '/login': '/'
 
   const manifest = {
     name,
@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
               short_name: 'Login',
               description: 'Aanmelden zaak',
               url: '/login',
-              icons: [{ src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' }],
+              icons: [{ src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png'}],
             },
           ]
         : []),
@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
         short_name: 'Home',
         description: 'Startpagina',
         url: '/',
-        icons: [{ src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' }],
+        icons: [{ src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png'}],
       },
     ],
   }

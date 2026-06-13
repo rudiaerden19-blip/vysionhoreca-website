@@ -248,9 +248,9 @@ export default function GroupsPage({ params }: { params: { tenant: string } }) {
                       {groupTypeLabels[group.group_type]}
                     </span>
                     <span className={`text-xs px-2 py-1 rounded-full ${
-                      group.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                      group.status === 'active'? 'bg-green-100 text-green-700': 'bg-gray-100 text-gray-600'
                     }`}>
-                      {group.status === 'active' ? ` ${t('groupsModule.groups.active')}` : group.status}
+                      {group.status === 'active'? ` ${t('groupsModule.groups.active')}`: group.status}
                     </span>
                   </div>
 

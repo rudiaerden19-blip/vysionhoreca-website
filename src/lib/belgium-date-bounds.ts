@@ -1,6 +1,6 @@
 /**
  * Belgium calendar bounds and Z-rapport fiscal-day ranges (Europe/Brussels).
- * Lightweight module — routes import this instead of `admin-api` where possible.
+ * Lightweight module — routes import this instead of `admin-api`where possible.
  */
 
 export function getDateBoundsForBelgium(dateStr: string): { startUTC: string; endUTC: string } {
@@ -29,14 +29,14 @@ function isBelgiumDST(year: number, month: number, day: number): boolean {
 }
 
 export function getBelgiumDateString(date: Date = new Date()): string {
-  return date.toLocaleDateString('sv-SE', { timeZone: 'Europe/Brussels' })
+  return date.toLocaleDateString('sv-SE', { timeZone: 'Europe/Brussels'})
 }
 
 /** Voeg dagen toe aan een YYYY-MM-DD (kalender in Europe/Brussels). */
 export function addDaysToBelgiumYMD(ymd: string, days: number): string {
   const [y, m, d] = ymd.split('-').map(Number)
   const dt = new Date(Date.UTC(y, m - 1, d + days))
-  return dt.toLocaleDateString('sv-SE', { timeZone: 'Europe/Brussels' })
+  return dt.toLocaleDateString('sv-SE', { timeZone: 'Europe/Brussels'})
 }
 
 /**

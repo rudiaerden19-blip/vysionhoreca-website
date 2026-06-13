@@ -37,7 +37,7 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
 
   const handleAdd = () => {
     setEditingMember(null)
-    setFormData({ name: '', role: '', photo_url: '' })
+    setFormData({ name: '', role: '', photo_url: ''})
     setShowModal(true)
   }
 

@@ -52,7 +52,7 @@ function cleanMessageCache() {
 function isMessageProcessed(messageId: string): boolean {
   cleanMessageCache()
   if (processedMessages.has(messageId)) {
-    console.log(`⚠️ Duplicate message ignored: ${messageId}`)
+    console.log(`Duplicate message ignored: ${messageId}`)
     return true
   }
   processedMessages.set(messageId, Date.now())
@@ -68,12 +68,12 @@ export async function GET(request: NextRequest) {
   const token = searchParams.get('hub.verify_token')
   const challenge = searchParams.get('hub.challenge')
 
-  console.log('🔔 Webhook verification request:', { mode, token, challenge })
+  console.log('Webhook verification request:', { mode, token, challenge })
 
   const verifyToken = process.env.WHATSAPP_VERIFY_TOKEN?.trim()
 
   if (mode === 'subscribe' && token && verifyToken && token === verifyToken) {
-    console.log('✅ Webhook verified successfully')
+    console.log('Webhook verified successfully')
     return new NextResponse(challenge, { status: 200 })
   }
 
@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
     logger.warn('WHATSAPP_VERIFY_TOKEN not set; rejecting Meta webhook verification')
   }
 
-  console.log('❌ Webhook verification failed')
+  console.log('Webhook verification failed')
   return new NextResponse('Forbidden', { status: 403 })
 }
 
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
       const sig = request.headers.get('x-hub-signature-256')
       if (!verifyMetaWebhookSignature(rawBody, sig, appSecret)) {
         logger.warn('WhatsApp webhook: invalid or missing X-Hub-Signature-256', { requestId })
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        return NextResponse.json({ error: 'Unauthorized'}, { status: 401 })
       }
     } else if (process.env.NODE_ENV === 'production') {
       logger.warn('WHATSAPP_APP_SECRET not set; webhook POST is not signature-verified', { requestId })
@@ -107,10 +107,10 @@ export async function POST(request: NextRequest) {
     try {
       body = JSON.parse(rawBody)
     } catch {
-      return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
+      return NextResponse.json({ error: 'Invalid JSON'}, { status: 400 })
     }
 
-    console.log('📩 Incoming webhook:', JSON.stringify(body, null, 2))
+    console.log('Incoming webhook:', JSON.stringify(body, null, 2))
 
     // Process message entries
     const entry = body.entry?.[0]
@@ -118,8 +118,8 @@ export async function POST(request: NextRequest) {
     const value = changes?.value
 
     if (!value?.messages?.[0]) {
-      console.log('ℹ️ No message in webhook (status update or other)')
-      return NextResponse.json({ status: 'ok' })
+      console.log('ℹ No message in webhook (status update or other)')
+      return NextResponse.json({ status: 'ok'})
     }
 
     const message = value.messages[0]
@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
     
     // DEDUPLICATION: Skip if already processed (Meta sometimes sends twice)
     if (isMessageProcessed(messageId)) {
-      return NextResponse.json({ status: 'ok' })
+      return NextResponse.json({ status: 'ok'})
     }
     
     // Get message text - can be from text message or interactive list selection
@@ -143,16 +143,16 @@ export async function POST(request: NextRequest) {
                     message.interactive?.button_reply?.id || ''
     }
 
-    console.log(`📱 Message from ${fromPhone}: "${messageText}" (type: ${message.type})`)
+    console.log(`Message from ${fromPhone}: "${messageText}" (type: ${message.type})`)
 
     // Find tenant by WhatsApp phone number ID
     const tenant = await findTenantByWhatsAppPhone(businessPhoneId)
     if (!tenant) {
-      console.log('❌ No tenant found for this phone number ID')
-      return NextResponse.json({ status: 'ok' })
+      console.log('No tenant found for this phone number ID')
+      return NextResponse.json({ status: 'ok'})
     }
 
-    console.log(`🏪 Tenant found: ${tenant.tenant_slug}`)
+    console.log(`Tenant found: ${tenant.tenant_slug}`)
 
     // Mark message as read (blue checkmarks for customer)
     await markMessageAsRead(businessPhoneId, message.id, tenant.access_token)
@@ -164,7 +164,7 @@ export async function POST(request: NextRequest) {
     if (messageText === 'reset' || messageText === 'taal' || messageText === 'language') {
       await clearCustomerLanguage(tenant.tenant_slug, fromPhone)
       await sendLanguageMenu(businessPhoneId, fromPhone, tenant.access_token, tenant.business_name)
-      return NextResponse.json({ status: 'ok' })
+      return NextResponse.json({ status: 'ok'})
     }
     
     // Check if customer is selecting a language (all 9 supported languages)
@@ -172,7 +172,7 @@ export async function POST(request: NextRequest) {
     if (validLanguages.includes(messageText)) {
       await saveCustomerLanguage(tenant.tenant_slug, fromPhone, messageText)
       await sendWelcomeWithShopLink(businessPhoneId, fromPhone, tenant, contactName, messageText)
-      return NextResponse.json({ status: 'ok' })
+      return NextResponse.json({ status: 'ok'})
     }
     
     // Quick order keywords - skip language menu, default to Dutch
@@ -180,27 +180,27 @@ export async function POST(request: NextRequest) {
     if (!savedLanguage && orderKeywords.includes(messageText)) {
       await saveCustomerLanguage(tenant.tenant_slug, fromPhone, 'nl')
       await sendWelcomeWithShopLink(businessPhoneId, fromPhone, tenant, contactName, 'nl')
-      return NextResponse.json({ status: 'ok' })
+      return NextResponse.json({ status: 'ok'})
     }
     
     // If no language saved, send language selection menu first
     if (!savedLanguage) {
       await sendLanguageMenu(businessPhoneId, fromPhone, tenant.access_token, tenant.business_name)
-      return NextResponse.json({ status: 'ok' })
+      return NextResponse.json({ status: 'ok'})
     }
     
     // Customer has language preference, send welcome in that language
     await sendWelcomeWithShopLink(businessPhoneId, fromPhone, tenant, contactName, savedLanguage)
 
-    return NextResponse.json({ status: 'ok' })
+    return NextResponse.json({ status: 'ok'})
 
   } catch (error) {
     logger.error('WhatsApp webhook error', {
       requestId,
       error: error instanceof Error ? error.message : String(error),
     })
-    trackError(error, { requestId, route: '/api/whatsapp/webhook' })
-    return NextResponse.json({ status: 'error' }, { status: 500 })
+    trackError(error, { requestId, route: '/api/whatsapp/webhook'})
+    return NextResponse.json({ status: 'error'}, { status: 500 })
   }
 }
 
@@ -228,7 +228,7 @@ async function clearCustomerLanguage(tenantSlug: string, customerPhone: string) 
     .delete()
     .eq('tenant_slug', tenantSlug)
     .eq('phone', customerPhone)
-  console.log(`🗑️ Cleared language preference for ${customerPhone}`)
+  console.log(`Cleared language preference for ${customerPhone}`)
 }
 
 // Save customer's language preference
@@ -261,7 +261,7 @@ async function saveCustomerLanguage(tenantSlug: string, customerPhone: string, l
         data: { language }
       })
   }
-  console.log(`💾 Saved language preference: ${language} for ${customerPhone}`)
+  console.log(`Saved language preference: ${language} for ${customerPhone}`)
 }
 
 // Send language selection menu as interactive list
@@ -285,22 +285,22 @@ async function sendLanguageMenu(
       interactive: {
         type: 'list',
         body: {
-          text: `🌍 Welcome to ${businessName}!\n\nChoose your language / Kies je taal:`
+          text: `Welcome to ${businessName}!\n\nChoose your language / Kies je taal:`
         },
         action: {
-          button: '🌍 Select Language',
+          button: 'Select Language',
           sections: [{
             title: 'Languages',
             rows: [
-              { id: 'nl', title: '🇧🇪 Nederlands' },
-              { id: 'en', title: '🇬🇧 English' },
-              { id: 'fr', title: '🇫🇷 Français' },
-              { id: 'de', title: '🇩🇪 Deutsch' },
-              { id: 'es', title: '🇪🇸 Español' },
-              { id: 'it', title: '🇮🇹 Italiano' },
-              { id: 'ja', title: '🇯🇵 日本語' },
-              { id: 'zh', title: '🇨🇳 中文' },
-              { id: 'ar', title: '🇸🇦 العربية' }
+              { id: 'nl', title: 'Nederlands'},
+              { id: 'en', title: 'English'},
+              { id: 'fr', title: 'Français'},
+              { id: 'de', title: 'Deutsch'},
+              { id: 'es', title: 'Español'},
+              { id: 'it', title: 'Italiano'},
+              { id: 'ja', title: '日本語'},
+              { id: 'zh', title: '中文'},
+              { id: 'ar', title: 'العربية'}
             ]
           }]
         }
@@ -310,10 +310,10 @@ async function sendLanguageMenu(
 
   if (!response.ok) {
     const error = await response.text()
-    console.error('❌ Language menu error:', error)
+    console.error('Language menu error:', error)
     // No fallback - only log the error
   } else {
-    console.log(`🌍 Language menu sent to ${toPhone}`)
+    console.log(`Language menu sent to ${toPhone}`)
   }
 }
 
@@ -326,7 +326,7 @@ async function findTenantByWhatsAppPhone(phoneNumberId: string) {
     .single()
 
   if (error || !data) {
-    console.log('❌ Tenant lookup error:', error?.message)
+    console.log('Tenant lookup error:', error?.message)
     return null
   }
 
@@ -367,48 +367,48 @@ async function findTenantByWhatsAppPhone(phoneNumberId: string) {
 const WELCOME_MESSAGES: Record<string, { body: string; button: string; tip: string }> = {
   nl: {
     body: 'Welkom bij {business}!\n\nKlik hieronder om te bestellen.\nJe krijgt bevestiging via WhatsApp.',
-    button: '🍔 BESTELLEN',
-    tip: '💡 Tip: Stuur ons altijd BESTEL, dan gaat de shop open!'
+    button: 'BESTELLEN',
+    tip: 'Tip: Stuur ons altijd BESTEL, dan gaat de shop open!'
   },
   en: {
     body: 'Welcome to {business}!\n\nClick below to order.\nYou will receive confirmation via WhatsApp.',
-    button: '🍔 ORDER NOW',
-    tip: '💡 Tip: Always send us ORDER to open the shop!'
+    button: 'ORDER NOW',
+    tip: 'Tip: Always send us ORDER to open the shop!'
   },
   fr: {
     body: 'Bienvenue chez {business}!\n\nCliquez ci-dessous pour commander.\nVous recevrez une confirmation via WhatsApp.',
-    button: '🍔 COMMANDER',
-    tip: '💡 Conseil: Envoyez-nous COMMANDER pour ouvrir la boutique!'
+    button: 'COMMANDER',
+    tip: 'Conseil: Envoyez-nous COMMANDER pour ouvrir la boutique!'
   },
   de: {
     body: 'Willkommen bei {business}!\n\nKlicken Sie unten, um zu bestellen.\nSie erhalten eine Bestätigung via WhatsApp.',
-    button: '🍔 BESTELLEN',
-    tip: '💡 Tipp: Senden Sie uns BESTELLEN um den Shop zu öffnen!'
+    button: 'BESTELLEN',
+    tip: 'Tipp: Senden Sie uns BESTELLEN um den Shop zu öffnen!'
   },
   es: {
     body: '¡Bienvenido a {business}!\n\nHaz clic abajo para pedir.\nRecibirás confirmación por WhatsApp.',
-    button: '🍔 PEDIR',
-    tip: '💡 Consejo: ¡Envíanos PEDIR para abrir la tienda!'
+    button: 'PEDIR',
+    tip: 'Consejo: ¡Envíanos PEDIR para abrir la tienda!'
   },
   it: {
     body: 'Benvenuto da {business}!\n\nClicca sotto per ordinare.\nRiceverai conferma via WhatsApp.',
-    button: '🍔 ORDINA',
-    tip: '💡 Consiglio: Inviaci ORDINA per aprire il negozio!'
+    button: 'ORDINA',
+    tip: 'Consiglio: Inviaci ORDINA per aprire il negozio!'
   },
   ja: {
     body: '{business}へようこそ!\n\n下のボタンをクリックしてご注文ください。\nWhatsAppで確認をお送りします。',
-    button: '🍔 注文する',
-    tip: '💡 ヒント: 注文と送信してショップを開きます!'
+    button: '注文する',
+    tip: 'ヒント: 注文と送信してショップを開きます!'
   },
   zh: {
     body: '欢迎来到 {business}!\n\n点击下方按钮下单。\n您将通过WhatsApp收到确认。',
-    button: '🍔 下单',
-    tip: '💡 提示: 发送 下单 打开商店!'
+    button: '下单',
+    tip: '提示: 发送 下单 打开商店!'
   },
   ar: {
     body: 'مرحباً بك في {business}!\n\nانقر أدناه للطلب.\nستتلقى تأكيداً عبر واتساب.',
-    button: '🍔 اطلب الآن',
-    tip: '💡 نصيحة: أرسل اطلب لفتح المتجر!'
+    button: 'اطلب الآن',
+    tip: 'نصيحة: أرسل اطلب لفتح المتجر!'
   }
 }
 
@@ -419,10 +419,10 @@ async function sendWelcomeWithShopLink(
   customerName: string,
   language: string = 'nl'
 ) {
-  console.log(`📤 Sending welcome message to ${toPhone} in ${language}`)
+  console.log(`Sending welcome message to ${toPhone} in ${language}`)
 
   const messages = WELCOME_MESSAGES[language] || WELCOME_MESSAGES.nl
-  const bodyText = `🍟 ${messages.body.replace('{business}', tenant.business_name)}\n\n${messages.tip}`
+  const bodyText = ` ${messages.body.replace('{business}', tenant.business_name)}\n\n${messages.tip}`
 
   // Send professional welcome with image + CTA button
   await sendImageWithCTA(phoneNumberId, toPhone, tenant.access_token, {
@@ -432,7 +432,7 @@ async function sendWelcomeWithShopLink(
     buttonUrl: `${tenant.shop_url}?wa=${toPhone}&lang=${language}`
   })
 
-  console.log(`✅ Welcome message sent to ${toPhone} in ${language}`)
+  console.log(`Welcome message sent to ${toPhone} in ${language}`)
 }
 
 // Mark message as read (blue checkmarks)
@@ -454,9 +454,9 @@ async function markMessageAsRead(
         message_id: messageId
       })
     })
-    console.log('✅ Message marked as read')
+    console.log('Message marked as read')
   } catch (error) {
-    console.error('❌ Failed to mark as read:', error)
+    console.error('Failed to mark as read:', error)
   }
 }
 
@@ -504,7 +504,7 @@ async function sendImageWithCTA(
 
   if (!response.ok) {
     const error = await response.text()
-    console.error('❌ WhatsApp Image+CTA API error:', error)
+    console.error('WhatsApp Image+CTA API error:', error)
     // Don't send fallback - prevents duplicate messages
   }
 }
@@ -533,7 +533,7 @@ async function sendTextMessage(
 
   if (!response.ok) {
     const error = await response.text()
-    console.error('❌ WhatsApp text API error:', error)
+    console.error('WhatsApp text API error:', error)
   }
 }
 
@@ -572,14 +572,14 @@ async function sendCTAButton(
 
   if (!response.ok) {
     const error = await response.text()
-    console.error('❌ WhatsApp CTA API error:', error)
+    console.error('WhatsApp CTA API error:', error)
     
     // Fallback: send as regular text with link
     await sendTextMessage(
       phoneNumberId, 
       to, 
       accessToken, 
-      `${content.body}\n\n👉 ${content.buttons[0].url}`
+      `${content.body}\n\n ${content.buttons[0].url}`
     )
   }
 }

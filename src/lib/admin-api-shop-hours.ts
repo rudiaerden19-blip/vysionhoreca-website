@@ -57,7 +57,7 @@ export async function saveOpeningHours(hours: OpeningHour[]): Promise<boolean> {
   const r = await adminDb.upsert(
     'opening_hours',
     hours as unknown as Record<string, unknown>[],
-    { tenantSlug: hours[0].tenant_slug, onConflict: 'tenant_slug,day_of_week' },
+    { tenantSlug: hours[0].tenant_slug, onConflict: 'tenant_slug,day_of_week'},
   )
   if (!r.ok) {
     console.error('Error saving opening hours:', r.error)
@@ -119,7 +119,7 @@ export async function getShopStatus(tenantSlug: string, signal?: AbortSignal): P
       if (!isExceptional) {
         const nextHours = hours?.find((h) => h.day_of_week === nextDay)
         if (nextHours?.is_open) {
-          const dayLabel = i === 1 ? 'morgen' : dayNames[nextDay]
+          const dayLabel = i === 1 ? 'morgen': dayNames[nextDay]
           return {
             isOpen: false,
             canOrder: false,
@@ -134,7 +134,7 @@ export async function getShopStatus(tenantSlug: string, signal?: AbortSignal): P
   }
 
   if (!hours || hours.length === 0) {
-    return { isOpen: true, canOrder: true, message: 'Open' }
+    return { isOpen: true, canOrder: true, message: 'Open'}
   }
 
   const now = new Date()
@@ -161,7 +161,7 @@ export async function getShopStatus(tenantSlug: string, signal?: AbortSignal): P
         }
       }
     }
-    return { isOpen: false, canOrder: false, message: 'Momenteel gesloten' }
+    return { isOpen: false, canOrder: false, message: 'Momenteel gesloten'}
   }
 
   const openTime = todayHours.open_time
@@ -221,7 +221,7 @@ export async function getShopStatus(tenantSlug: string, signal?: AbortSignal): P
       const nextDay = (dayOfWeek + i) % 7
       const nextDayHours = hours.find((h) => h.day_of_week === nextDay)
       if (nextDayHours && nextDayHours.is_open) {
-        const dayLabel = i === 1 ? 'morgen' : dayNames[nextDay]
+        const dayLabel = i === 1 ? 'morgen': dayNames[nextDay]
         return {
           isOpen: false,
           canOrder: false,
@@ -231,7 +231,7 @@ export async function getShopStatus(tenantSlug: string, signal?: AbortSignal): P
         }
       }
     }
-    return { isOpen: false, canOrder: false, message: 'Momenteel gesloten' }
+    return { isOpen: false, canOrder: false, message: 'Momenteel gesloten'}
   }
 
   if (todayHours.has_break && todayHours.break_start && todayHours.break_end) {
@@ -265,7 +265,7 @@ export async function getShopStatus(tenantSlug: string, signal?: AbortSignal): P
       const nextDay = (dayOfWeek + i) % 7
       const nextDayHours = hours.find((h) => h.day_of_week === nextDay)
       if (nextDayHours && nextDayHours.is_open) {
-        const dayLabel = i === 1 ? 'morgen' : dayNames[nextDay]
+        const dayLabel = i === 1 ? 'morgen': dayNames[nextDay]
         return {
           isOpen: true,
           canOrder: false,

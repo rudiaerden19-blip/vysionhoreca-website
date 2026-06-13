@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     locale: 'nl_BE',
     url: siteUrl,
     siteName: VYSION_BRAND_SITE_NAME,
-    images: [{ url: '/images/online-order-platform-1.png' }],
+    images: [{ url: '/images/online-order-platform-1.png'}],
   },
   twitter: {
     card: 'summary_large_image',

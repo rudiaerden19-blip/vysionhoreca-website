@@ -38,7 +38,7 @@ export function getTenantUrl(tenantSlug: string, path: string = ''): string {
 
 /**
  * Volledige pagina-navigatie naar een klant-route (logout, login redirect, enz.).
- * iPad Safari + tenant-subdomein: `/shop/:slug/account` staat niet in de adresbalk — `router.push` faalt daar vaak stil.
+ * iPad Safari + tenant-subdomein: `/shop/:slug/account`staat niet in de adresbalk — `router.push`faalt daar vaak stil.
  * `replace`: geen extra history-stack (minder «dubbel» schermen na PWA/icoon).
  */
 export function assignTenantHref(

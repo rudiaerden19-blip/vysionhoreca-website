@@ -68,10 +68,10 @@ export function activateAudio(): boolean {
     initAttempted = true
     sessionStorage.setItem(AUDIO_SESSION_KEY, 'true')
     
-    console.log('[AUDIO] ✅ Audio activated successfully')
+    console.log('[AUDIO]  Audio activated successfully')
     return true
   } catch (e) {
-    console.error('[AUDIO] ❌ Activation failed:', e)
+    console.error('[AUDIO]  Activation failed:', e)
     initAttempted = true
     return false
   }

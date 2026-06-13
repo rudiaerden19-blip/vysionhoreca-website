@@ -16,17 +16,17 @@ export async function POST(req: NextRequest) {
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ ok: false, error: 'invalid_json' }, { status: 400 })
+    return NextResponse.json({ ok: false, error: 'invalid_json'}, { status: 400 })
   }
 
   const parsed = RedeemSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ ok: false, error: 'invalid_body' }, { status: 400 })
+    return NextResponse.json({ ok: false, error: 'invalid_body'}, { status: 400 })
   }
 
   const access = await verifyTenantOrSuperAdmin(req, parsed.data.tenantSlug)
   if (!access.authorized) {
-    return NextResponse.json({ ok: false, error: access.error || 'forbidden' }, { status: 403 })
+    return NextResponse.json({ ok: false, error: access.error || 'forbidden'}, { status: 403 })
   }
 
   const res = await redeemRetailStoreCredit(

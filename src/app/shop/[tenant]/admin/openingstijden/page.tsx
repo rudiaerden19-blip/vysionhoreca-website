@@ -13,7 +13,7 @@ import PinGate from '@/components/PinGate'
 function formatTimeInput(raw: string): string {
   const digits = raw.replace(/\D/g, '').slice(0, 4)
   if (digits.length <= 2) return digits
-  return digits.slice(0, 2) + ':' + digits.slice(2)
+  return digits.slice(0, 2) + ':'+ digits.slice(2)
 }
 
 function TimeInput({ value, onChange, className }: { value: string; onChange: (v: string) => void; className?: string }) {
@@ -64,16 +64,16 @@ function fmt(d: Date): string {
 function getBelgianHolidays(year: number): { key: string; label: string; date: string }[] {
   const easter = easterDate(year)
   return [
-    { key: 'nieuwjaar',       label: ' Nieuwjaar',              date: `${year}-01-01` },
-    { key: 'paasmaandag',     label: ' Paasmaandag',            date: fmt(addDays(easter, 1)) },
-    { key: 'dag_arbeid',      label: ' Dag van de Arbeid',      date: `${year}-05-01` },
-    { key: 'hemelvaart',      label: ' Hemelvaartsdag',          date: fmt(addDays(easter, 39)) },
-    { key: 'pinkstermaandag', label: ' Pinkstermaandag',         date: fmt(addDays(easter, 50)) },
-    { key: 'nationale_dag',   label: '🇧🇪 Nationale Feestdag',     date: `${year}-07-21` },
-    { key: 'olv_hemelvaart',  label: ' OLV Hemelvaart',         date: `${year}-08-15` },
-    { key: 'allerheiligen',   label: ' Allerheiligen',           date: `${year}-11-01` },
-    { key: 'wapenstilstand',  label: ' Wapenstilstand',          date: `${year}-11-11` },
-    { key: 'kerstmis',        label: ' Kerstmis',               date: `${year}-12-25` },
+    { key: 'nieuwjaar',       label: 'Nieuwjaar',              date: `${year}-01-01`},
+    { key: 'paasmaandag',     label: 'Paasmaandag',            date: fmt(addDays(easter, 1)) },
+    { key: 'dag_arbeid',      label: 'Dag van de Arbeid',      date: `${year}-05-01`},
+    { key: 'hemelvaart',      label: 'Hemelvaartsdag',          date: fmt(addDays(easter, 39)) },
+    { key: 'pinkstermaandag', label: 'Pinkstermaandag',         date: fmt(addDays(easter, 50)) },
+    { key: 'nationale_dag',   label: 'Nationale Feestdag',     date: `${year}-07-21`},
+    { key: 'olv_hemelvaart',  label: 'OLV Hemelvaart',         date: `${year}-08-15`},
+    { key: 'allerheiligen',   label: 'Allerheiligen',           date: `${year}-11-01`},
+    { key: 'wapenstilstand',  label: 'Wapenstilstand',          date: `${year}-11-11`},
+    { key: 'kerstmis',        label: 'Kerstmis',               date: `${year}-12-25`},
   ]
 }
 
@@ -225,7 +225,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
   }
 
   const formatDateRange = (c: ExceptionalClosing) => {
-    const opts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' }
+    const opts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric'}
     const from = new Date(c.date).toLocaleDateString('nl-BE', opts)
     if (!c.date_end || c.date_end === c.date) return from
     const to = new Date(c.date_end).toLocaleDateString('nl-BE', opts)
@@ -365,7 +365,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.05 }}
-              className={`p-6 ${!daySchedule.is_open ? 'bg-gray-50' : ''}`}
+              className={`p-6 ${!daySchedule.is_open ? 'bg-gray-50': ''}`}
             >
               <div className="flex items-center justify-between gap-4 flex-wrap">
                 {/* Day Name & Toggle */}
@@ -379,7 +379,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
                     />
                     <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                   </label>
-                  <span className={`font-medium ${daySchedule.is_open ? 'text-gray-900' : 'text-gray-400'}`}>
+                  <span className={`font-medium ${daySchedule.is_open ? 'text-gray-900': 'text-gray-400'}`}>
                     {t(`adminPages.openingstijden.days.${dayKeys[index]}`)}
                   </span>
                 </div>
@@ -415,7 +415,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
                           : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                       }`}
                     >
-                      {daySchedule.has_shift2 ? ` ${t('adminPages.openingstijden.shift2')}` : `+ ${t('adminPages.openingstijden.addShift')}`}
+                      {daySchedule.has_shift2 ? ` ${t('adminPages.openingstijden.shift2')}`: `+ ${t('adminPages.openingstijden.addShift')}`}
                     </button>
 
                     {/* Copy Button */}
@@ -437,7 +437,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
               {daySchedule.is_open && daySchedule.has_shift2 && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
+                  animate={{ opacity: 1, height: 'auto'}}
                   className="mt-4 ml-[156px] flex items-center gap-2"
                 >
                   <span className="text-sm text-gray-500">{t('adminPages.openingstijden.shift2')}:</span>
@@ -457,7 +457,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
               {daySchedule.is_open && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
+                  animate={{ opacity: 1, height: 'auto'}}
                   className="mt-4 ml-[156px] flex items-center gap-2"
                 >
                   <span className="text-sm text-gray-500"> {t('adminPages.openingstijden.customerCanOrderUntil')}:</span>
@@ -516,7 +516,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
         <div className="p-6 border-b flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-              🇧🇪 Belgische feestdagen
+               Belgische feestdagen
             </h2>
             <p className="text-sm text-gray-500 mt-0.5">Selecteer feestdagen waarop u gesloten bent</p>
           </div>
@@ -549,12 +549,12 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
                   <span className="font-medium text-sm">{holiday.label}</span>
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-gray-400">
-                      {new Date(holiday.date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
+                      {new Date(holiday.date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short'})}
                     </span>
                     <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                      closed ? 'bg-red-200 text-red-700' : 'bg-gray-200 text-gray-500'
+                      closed ? 'bg-red-200 text-red-700': 'bg-gray-200 text-gray-500'
                     }`}>
-                      {closed ? 'Gesloten' : 'Open'}
+                      {closed ? 'Gesloten': 'Open'}
                     </span>
                   </div>
                 </button>
@@ -606,7 +606,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
               disabled={!singleDate || savingSingle}
               className="px-4 py-2 bg-orange-500 text-white rounded-lg text-sm font-medium hover:bg-orange-600 disabled:opacity-50 transition-colors whitespace-nowrap"
             >
-              {savingSingle ? '⏳ Opslaan...' : '+ Opslaan'}
+              {savingSingle ? 'Opslaan...': '+ Opslaan'}
             </button>
           </div>
         </div>
@@ -652,7 +652,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
               disabled={!newDateFrom || !newDateTo || savingClosing}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors whitespace-nowrap"
             >
-              {savingClosing ? '⏳ Opslaan...' : '+ Opslaan'}
+              {savingClosing ? 'Opslaan...': '+ Opslaan'}
             </button>
           </div>
         </div>
@@ -712,7 +712,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
                   .filter(c => c.is_holiday)
                   .map(c => (
                     <span key={c.date} className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full flex items-center gap-1">
-                      {new Date(c.date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })} — {c.reason}
+                      {new Date(c.date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short'})} — {c.reason}
                       <button onClick={() => removeClosing(c.date)} className="ml-1 hover:text-red-800">×</button>
                     </span>
                   ))}

@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     const rl = await checkRateLimit(apiRateLimiter, `marketing:${clientIP}`)
     if (!rl.success) {
       return NextResponse.json(
-        { error: 'Te veel verzoeken. Probeer het later opnieuw.' },
+        { error: 'Te veel verzoeken. Probeer het later opnieuw.'},
         { status: 429 }
       )
     }
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
     if (!access.authorized) {
       return NextResponse.json(
-        { error: access.error || 'Forbidden' },
+        { error: access.error || 'Forbidden'},
         { status: access.error?.includes('ingelogd') ? 401 : 403 }
       )
     }
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
         fromName = smtpSettings.smtp_from_name || businessName || "Vysion kassa's"
       } else if (!process.env.ZOHO_EMAIL || !process.env.ZOHO_PASSWORD) {
         return NextResponse.json(
-          { error: 'Geen email ingesteld. Ga naar Profiel → Email instellingen en vul je emailgegevens in.' },
+          { error: 'Geen email ingesteld. Ga naar Profiel → Email instellingen en vul je emailgegevens in.'},
           { status: 400 }
         )
       }
@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
     if (includePromo && promoCode) {
       promoHtml = `
         <div style="background: linear-gradient(135deg, #F97316, #FB923C); color: white; padding: 20px; border-radius: 12px; text-align: center; margin: 20px 0;">
-          <p style="margin: 0; font-size: 14px;">🎁 EXCLUSIEVE KORTING</p>
+          <p style="margin: 0; font-size: 14px;"> EXCLUSIEVE KORTING</p>
           <p style="margin: 10px 0; font-size: 32px; font-weight: bold;">${escapeHtml(String(promoDiscount ?? ''))}% KORTING</p>
           <p style="margin: 0; font-size: 12px;">Gebruik code:</p>
           <p style="margin: 10px 0; font-size: 24px; font-weight: bold; background: white; color: #F97316; padding: 10px 20px; border-radius: 8px; display: inline-block;">${escapeHtml(promoCode ?? '')}</p>
@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
     <!-- Content -->
     <div style="background: white; padding: 30px; border-radius: 0 0 12px 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
       ${personalizedMessage.split('\n').map((line: string) => 
-        line.trim() ? `<p style="margin: 0 0 15px 0; color: #333; line-height: 1.6; font-size: 15px;">${escapeHtml(line)}</p>` : '<br>'
+        line.trim() ? `<p style="margin: 0 0 15px 0; color: #333; line-height: 1.6; font-size: 15px;">${escapeHtml(line)}</p>`: '<br>'
       ).join('')}
       
       ${promoHtml}
@@ -208,7 +208,7 @@ export async function POST(request: NextRequest) {
         recipient_count: successCount,
         promo_code: includePromo ? promoCode : null,
         promo_discount: includePromo && promoDiscount != null ? promoDiscount : null,
-        status: failedCount === 0 ? 'sent' : 'partial',
+        status: failedCount === 0 ? 'sent': 'partial',
         sent_at: new Date().toISOString(),
       })
     }

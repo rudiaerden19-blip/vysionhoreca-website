@@ -1,9 +1,9 @@
 /**
- * Programmatisch een `<input>` / `<textarea>` vullen zodat React controlled state meeloopt.
+ * Programmatisch een `<input>`/ `<textarea>`vullen zodat React controlled state meeloopt.
  * — Zelfde idee als @testing-library/user-event: **HTMLInputElement.prototype.value**-setter,
- *   daarna `_valueTracker.setValue(vorige)` (react-dom `trackValueOnNode` / issue #10135).
- * — Rechtstreeks `el.value = …` laat op sommige browsers/kiosks de interne tracker achter;
- *   React zet dan bij de volgende commit de oude `value` prop terug → “typt niks”.
+ *   daarna `_valueTracker.setValue(vorige)`(react-dom `trackValueOnNode`/ issue #10135).
+ * — Rechtstreeks `el.value = …`laat op sommige browsers/kiosks de interne tracker achter;
+ *   React zet dan bij de volgende commit de oude `value`prop terug → “typt niks”.
  */
 
 /** Optioneel: zet op het element om GlobalAutoCapitalize over te slaan (legacy / scripts). */
@@ -28,7 +28,7 @@ type ValueTracking = { setValue: (v: string) => void }
 
 function getValueTracker(el: HTMLInputElement | HTMLTextAreaElement): ValueTracking | null {
   const t = (el as unknown as { _valueTracker?: ValueTracking })._valueTracker
-  return t && typeof t.setValue === 'function' ? t : null
+  return t && typeof t.setValue === 'function'? t : null
 }
 
 function setValueViaNativePrototype(el: HTMLInputElement | HTMLTextAreaElement, value: string): void {
@@ -45,7 +45,7 @@ function setValueViaNativePrototype(el: HTMLInputElement | HTMLTextAreaElement, 
 }
 
 /**
- * Zet de DOM-waarde en vuurt één bubbling `input` (klassiek Event — React verwacht deze keten).
+ * Zet de DOM-waarde en vuurt één bubbling `input`(klassiek Event — React verwacht deze keten).
  */
 export function setNativeInputValue(el: HTMLInputElement | HTMLTextAreaElement, value: string) {
   const previous = el.value

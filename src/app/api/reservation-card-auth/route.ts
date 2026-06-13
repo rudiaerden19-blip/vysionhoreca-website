@@ -8,7 +8,7 @@ import { apiRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
 
 /**
  * No-show fee charging — alleen bereikbaar voor de ingelogde zaak-eigenaar
- * (of superadmin). De caller stuurt enkel `tenantSlug` + `reservationId`;
+ * (of superadmin). De caller stuurt enkel `tenantSlug`+ `reservationId`;
  * de server haalt zelf het opgeslagen payment_method_id uit de reservering
  * en het bedrag uit `reservation_settings.no_show_fee`. Op die manier kan
  * een (eventueel kwaadwillende) admin van een andere tenant geen kaart
@@ -26,17 +26,17 @@ export async function PUT(request: NextRequest) {
   try {
     const stripeKey = process.env.STRIPE_SECRET_KEY
     if (!stripeKey) {
-      return NextResponse.json({ error: 'Stripe niet geconfigureerd' }, { status: 503 })
+      return NextResponse.json({ error: 'Stripe niet geconfigureerd'}, { status: 503 })
     }
 
     const body = await request.json()
     const { tenantSlug, reservationId } = body || {}
 
     if (!tenantSlug || typeof tenantSlug !== 'string') {
-      return NextResponse.json({ error: 'tenantSlug is verplicht' }, { status: 400 })
+      return NextResponse.json({ error: 'tenantSlug is verplicht'}, { status: 400 })
     }
     if (!reservationId || typeof reservationId !== 'string') {
-      return NextResponse.json({ error: 'reservationId is verplicht' }, { status: 400 })
+      return NextResponse.json({ error: 'reservationId is verplicht'}, { status: 400 })
     }
 
     // ── Auth ──────────────────────────────────────────────────────────────────
@@ -44,7 +44,7 @@ export async function PUT(request: NextRequest) {
     if (!access.authorized) {
       const st = access.error?.includes('ingelogd') ? 401 : 403
       logger.warn('reservation-card-auth PUT: unauthorized', { requestId, tenantSlug })
-      return NextResponse.json({ error: access.error || 'Geen toegang' }, { status: st })
+      return NextResponse.json({ error: access.error || 'Geen toegang'}, { status: st })
     }
 
     // ── Rate-limit per tenant ─────────────────────────────────────────────────
@@ -52,14 +52,14 @@ export async function PUT(request: NextRequest) {
     const rl = await checkRateLimit(apiRateLimiter, `noshow-charge:${tenantSlug}:${ip}`)
     if (!rl.success) {
       return NextResponse.json(
-        { error: 'Te veel verzoeken. Probeer over enkele seconden opnieuw.' },
-        { status: 429, headers: { 'Retry-After': '60' } }
+        { error: 'Te veel verzoeken. Probeer over enkele seconden opnieuw.'},
+        { status: 429, headers: { 'Retry-After': '60'} }
       )
     }
 
     const supabase = getServerSupabaseClient()
     if (!supabase) {
-      return NextResponse.json({ error: 'Server niet geconfigureerd' }, { status: 503 })
+      return NextResponse.json({ error: 'Server niet geconfigureerd'}, { status: 503 })
     }
 
     // ── Reservation moet bij deze tenant horen + payment-method gekoppeld ─────
@@ -71,12 +71,12 @@ export async function PUT(request: NextRequest) {
       .maybeSingle()
 
     if (!reservation) {
-      return NextResponse.json({ error: 'Reservering niet gevonden' }, { status: 404 })
+      return NextResponse.json({ error: 'Reservering niet gevonden'}, { status: 404 })
     }
     const paymentMethodId = (reservation as { stripe_payment_method_id?: string })
       .stripe_payment_method_id
     if (!paymentMethodId) {
-      return NextResponse.json({ error: 'Geen kaart geregistreerd voor deze reservering' }, { status: 400 })
+      return NextResponse.json({ error: 'Geen kaart geregistreerd voor deze reservering'}, { status: 400 })
     }
 
     // ── Bedrag uit reservation_settings (server-bepaald, niet client) ─────────
@@ -87,7 +87,7 @@ export async function PUT(request: NextRequest) {
       .maybeSingle()
     const fee = Number((settings as { no_show_fee?: number } | null)?.no_show_fee)
     if (!Number.isFinite(fee) || fee <= 0 || fee > 500) {
-      return NextResponse.json({ error: 'No-show bedrag onjuist of niet geconfigureerd' }, { status: 400 })
+      return NextResponse.json({ error: 'No-show bedrag onjuist of niet geconfigureerd'}, { status: 400 })
     }
 
     const { data: tenantRow } = await supabase
@@ -109,7 +109,7 @@ export async function PUT(request: NextRequest) {
         metadata: { reservationId, tenantSlug },
       },
       // Idempotency: dubbele klik op "no-show" knop kan kaart niet 2x belasten
-      { idempotencyKey: `noshow:${reservationId}` }
+      { idempotencyKey: `noshow:${reservationId}`}
     )
 
     return NextResponse.json({ success: true, paymentIntentId: paymentIntent.id })
@@ -118,6 +118,6 @@ export async function PUT(request: NextRequest) {
       requestId,
       error: error instanceof Error ? error.message : String(error),
     })
-    return NextResponse.json({ error: 'Betaling mislukt' }, { status: 500 })
+    return NextResponse.json({ error: 'Betaling mislukt'}, { status: 500 })
   }
 }

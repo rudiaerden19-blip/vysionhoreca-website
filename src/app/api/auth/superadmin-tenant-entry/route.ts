@@ -25,7 +25,7 @@ function handoffLoginUrl(request: NextRequest, slug: string, path: string): URL 
   return u
 }
 
-/** Zelfde hosts als middleware `exactMainDomain` + previews: handoff via /shop/{slug}/… op dit origin (betrouwbaarder dan tenant-subdomein). */
+/** Zelfde hosts als middleware `exactMainDomain`+ previews: handoff via /shop/{slug}/… op dit origin (betrouwbaarder dan tenant-subdomein). */
 function shouldHandoffViaMainSiteShopPath(request: NextRequest): boolean {
   const host = (request.headers.get('host') || '').split(':')[0].toLowerCase()
   if (isVysionMainPortalHost(host)) return true
@@ -56,7 +56,7 @@ function attachSuperadminCookies(
   const opts = {
     path: '/',
     maxAge,
-    sameSite: 'lax' as const,
+    sameSite: 'lax'as const,
     secure,
     httpOnly: false,
     ...(domain ? { domain } : {}),
@@ -73,7 +73,7 @@ function attachSuperadminCookies(
 export async function GET(request: NextRequest) {
   const slug = request.nextUrl.searchParams.get('slug')?.trim().toLowerCase() || ''
   if (!slug || !SLUG_RE.test(slug)) {
-    return NextResponse.json({ error: 'Ongeldige tenant' }, { status: 400 })
+    return NextResponse.json({ error: 'Ongeldige tenant'}, { status: 400 })
   }
 
   const path = safeTenantAdminPath(request.nextUrl.searchParams.get('path'))

@@ -1,6 +1,6 @@
 import { DEMO_TENANT_SLUG } from '@/lib/demo-links'
 
-/** Postgrest turns aborted fetches into `{ error: { message: 'AbortError: ...' } }`. Throw so in-memory cache and UI don't treat that as real empty data. */
+/** Postgrest turns aborted fetches into `{ error: { message: 'AbortError: ...'} }`. Throw so in-memory cache and UI don't treat that as real empty data. */
 export function throwIfSupabaseFetchAborted(error: { message?: string } | null | undefined): void {
   const m = error?.message ?? ''
   if (

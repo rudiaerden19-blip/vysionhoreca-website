@@ -30,19 +30,19 @@ export async function POST(req: NextRequest) {
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ ok: false, error: 'invalid_json' }, { status: 400 })
+    return NextResponse.json({ ok: false, error: 'invalid_json'}, { status: 400 })
   }
 
   const parsed = CreateSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ ok: false, error: 'invalid_body' }, { status: 400 })
+    return NextResponse.json({ ok: false, error: 'invalid_body'}, { status: 400 })
   }
 
   const { tenantSlug, display_name, phone, email, address, postal_code, city, btw_number, shop_customer_id, sendPassEmail, resendExistingPass } =
     parsed.data
   const access = await verifyTenantOrSuperAdmin(req, tenantSlug)
   if (!access.authorized) {
-    return NextResponse.json({ ok: false, error: access.error || 'forbidden' }, { status: 403 })
+    return NextResponse.json({ ok: false, error: access.error || 'forbidden'}, { status: 403 })
   }
 
   const origin =
@@ -64,8 +64,8 @@ export async function POST(req: NextRequest) {
     resendExistingPass: resendExistingPass === true,
   })
   if (!res.ok || !res.member) {
-    const status = res.error === 'email_has_active_pass' ? 409 : 500
-    return NextResponse.json({ ok: false, error: res.error || 'create_failed' }, { status })
+    const status = res.error === 'email_has_active_pass'? 409 : 500
+    return NextResponse.json({ ok: false, error: res.error || 'create_failed'}, { status })
   }
 
   return NextResponse.json({
@@ -81,18 +81,18 @@ export async function PATCH(req: NextRequest) {
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ ok: false, error: 'invalid_json' }, { status: 400 })
+    return NextResponse.json({ ok: false, error: 'invalid_json'}, { status: 400 })
   }
 
   const parsed = PatchSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ ok: false, error: 'invalid_body' }, { status: 400 })
+    return NextResponse.json({ ok: false, error: 'invalid_body'}, { status: 400 })
   }
 
   const { tenantSlug, memberId, display_name, phone, is_active } = parsed.data
   const access = await verifyTenantOrSuperAdmin(req, tenantSlug)
   if (!access.authorized) {
-    return NextResponse.json({ ok: false, error: access.error || 'forbidden' }, { status: 403 })
+    return NextResponse.json({ ok: false, error: access.error || 'forbidden'}, { status: 403 })
   }
 
   const res = await updateRetailLoyaltyMember(tenantSlug, memberId, {
@@ -101,7 +101,7 @@ export async function PATCH(req: NextRequest) {
     is_active,
   })
   if (!res.ok) {
-    return NextResponse.json({ ok: false, error: res.error || 'update_failed' }, { status: 500 })
+    return NextResponse.json({ ok: false, error: res.error || 'update_failed'}, { status: 500 })
   }
 
   return NextResponse.json({ ok: true })
@@ -117,23 +117,23 @@ export async function DELETE(req: NextRequest) {
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ ok: false, error: 'invalid_json' }, { status: 400 })
+    return NextResponse.json({ ok: false, error: 'invalid_json'}, { status: 400 })
   }
 
   const parsed = DeleteSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ ok: false, error: 'invalid_body' }, { status: 400 })
+    return NextResponse.json({ ok: false, error: 'invalid_body'}, { status: 400 })
   }
 
   const { tenantSlug, memberId } = parsed.data
   const access = await verifyTenantOrSuperAdmin(req, tenantSlug)
   if (!access.authorized) {
-    return NextResponse.json({ ok: false, error: access.error || 'forbidden' }, { status: 403 })
+    return NextResponse.json({ ok: false, error: access.error || 'forbidden'}, { status: 403 })
   }
 
   const res = await deleteRetailLoyaltyMember(tenantSlug, memberId)
   if (!res.ok) {
-    return NextResponse.json({ ok: false, error: res.error || 'delete_failed' }, { status: 500 })
+    return NextResponse.json({ ok: false, error: res.error || 'delete_failed'}, { status: 500 })
   }
 
   return NextResponse.json({ ok: true })

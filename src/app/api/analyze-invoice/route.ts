@@ -32,10 +32,10 @@ export async function POST(request: NextRequest): Promise<NextResponse<AnalyzeIn
     const { image, mimeType, tenantSlug } = await request.json()
 
     if (!tenantSlug || typeof tenantSlug !== 'string') {
-      return NextResponse.json({ success: false, error: 'tenantSlug ontbreekt' }, { status: 400 })
+      return NextResponse.json({ success: false, error: 'tenantSlug ontbreekt'}, { status: 400 })
     }
     if (!image) {
-      return NextResponse.json({ success: false, error: 'Geen afbeelding ontvangen' }, { status: 400 })
+      return NextResponse.json({ success: false, error: 'Geen afbeelding ontvangen'}, { status: 400 })
     }
 
     // ── Auth: alleen ingelogde zaak/superadmin ─────────────────────────────
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<AnalyzeIn
     if (!access.authorized) {
       logger.warn('analyze-invoice: unauthorized', { requestId, tenantSlug })
       return NextResponse.json(
-        { success: false, error: access.error || 'Niet geautoriseerd' },
+        { success: false, error: access.error || 'Niet geautoriseerd'},
         { status: 403 }
       )
     }
@@ -59,15 +59,15 @@ export async function POST(request: NextRequest): Promise<NextResponse<AnalyzeIn
     const rl = await checkRateLimit(apiRateLimiter, `analyze-invoice:${tenantSlug}:${actorId}`)
     if (!rl.success) {
       return NextResponse.json(
-        { success: false, error: 'Te veel factuurscans. Probeer over 1 minuut opnieuw.' },
-        { status: 429, headers: { 'Retry-After': '60' } }
+        { success: false, error: 'Te veel factuurscans. Probeer over 1 minuut opnieuw.'},
+        { status: 429, headers: { 'Retry-After': '60'} }
       )
     }
 
     const apiKey = process.env.GOOGLE_GEMINI_API_KEY
     if (!apiKey) {
       console.error('GOOGLE_GEMINI_API_KEY not set')
-      return NextResponse.json({ success: false, error: 'Google Gemini API key niet geconfigureerd.' }, { status: 500 })
+      return NextResponse.json({ success: false, error: 'Google Gemini API key niet geconfigureerd.'}, { status: 500 })
     }
 
     // Check image size — strakker dan voorheen (was 20 MB) om cost-bombing
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<AnalyzeIn
     const imageSizeMB = (image.length * 0.75) / (1024 * 1024)
     if (imageSizeMB > MAX_IMAGE_MB) {
       return NextResponse.json(
-        { success: false, error: `Afbeelding is te groot (max ${MAX_IMAGE_MB}MB).` },
+        { success: false, error: `Afbeelding is te groot (max ${MAX_IMAGE_MB}MB).`},
         { status: 400 }
       )
     }
@@ -193,7 +193,7 @@ REGELS:
     
     if (!content) {
       console.error('No content in response:', data)
-      return NextResponse.json({ success: false, error: 'Geen respons van AI' }, { status: 500 })
+      return NextResponse.json({ success: false, error: 'Geen respons van AI'}, { status: 500 })
     }
 
     // Parse JSON from response

@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     
     if (!rateLimitResult.success) {
       return NextResponse.json(
-        { error: 'Te veel berichten verstuurd. Probeer het later opnieuw.' },
+        { error: 'Te veel berichten verstuurd. Probeer het later opnieuw.'},
         { status: 429 }
       )
     }
@@ -103,7 +103,7 @@ Dit bericht werd verstuurd via het contactformulier op vysion-kassa.com
     await transporter.sendMail(mailOptions)
 
     return NextResponse.json(
-      { success: true, message: 'Bericht succesvol verzonden' },
+      { success: true, message: 'Bericht succesvol verzonden'},
       { status: 200 }
     )
   } catch (error) {

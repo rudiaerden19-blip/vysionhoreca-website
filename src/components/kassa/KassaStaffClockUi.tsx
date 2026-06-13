@@ -9,7 +9,7 @@ import {
 
 export type KassaStaffClockRow = { id: string; name: string; hasOpenSession: boolean }
 
-export type KassaStaffPinState = { staffId: string; staffName: string; action: 'in' | 'out' }
+export type KassaStaffPinState = { staffId: string; staffName: string; action: 'in' |  'out'}
 
 export type KassaStaffSummaryState = {
   staffName: string
@@ -56,7 +56,7 @@ export function KassaStaffClockModal({
 
   const pinTitle =
     pinModal &&
-    (pinModal.action === 'in' ? t('staffClock.pinTitleIn') : t('staffClock.pinTitleOut')).replace(
+    (pinModal.action === 'in'? t('staffClock.pinTitleIn') : t('staffClock.pinTitleOut')).replace(
       '{name}',
       pinModal.staffName,
     )

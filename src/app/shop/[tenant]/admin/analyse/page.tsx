@@ -28,7 +28,7 @@ import {
 } from '@/lib/admin-api'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 
-type TabType = 'overview' | 'fixed' | 'variable' | 'year' | 'settings'
+type TabType = 'overview' |  'fixed' |  'variable' |  'year' |  'settings'
 
 const ANALYSE_TOUCH_INPUT =
   'min-h-[44px] touch-manipulation [-webkit-tap-highlight-color:transparent]'
@@ -49,10 +49,10 @@ const SECTOR_BENCHMARKS = {
 }
 
 const getHealthStatus = (t: (key: string) => string) => ({
-  EXCELLENT: { label: t('analysePage.health.excellent'), desc: t('analysePage.health.excellentDesc'), icon: '', color: '#22c55e', bgColor: 'bg-green-50', borderColor: 'border-green-500' },
-  GOOD: { label: t('analysePage.health.good'), desc: t('analysePage.health.goodDesc'), icon: '', color: '#3b82f6', bgColor: 'bg-blue-50', borderColor: 'border-blue-500' },
-  WARNING: { label: t('analysePage.health.warning'), desc: t('analysePage.health.warningDesc'), icon: '', color: '#f59e0b', bgColor: 'bg-blue-50', borderColor: 'border-blue-500' },
-  CRITICAL: { label: t('analysePage.health.critical'), desc: t('analysePage.health.criticalDesc'), icon: '', color: '#ef4444', bgColor: 'bg-red-50', borderColor: 'border-red-500' },
+  EXCELLENT: { label: t('analysePage.health.excellent'), desc: t('analysePage.health.excellentDesc'), icon: '', color: '#22c55e', bgColor: 'bg-green-50', borderColor: 'border-green-500'},
+  GOOD: { label: t('analysePage.health.good'), desc: t('analysePage.health.goodDesc'), icon: '', color: '#3b82f6', bgColor: 'bg-blue-50', borderColor: 'border-blue-500'},
+  WARNING: { label: t('analysePage.health.warning'), desc: t('analysePage.health.warningDesc'), icon: '', color: '#f59e0b', bgColor: 'bg-blue-50', borderColor: 'border-blue-500'},
+  CRITICAL: { label: t('analysePage.health.critical'), desc: t('analysePage.health.criticalDesc'), icon: '', color: '#ef4444', bgColor: 'bg-red-50', borderColor: 'border-red-500'},
 })
 
 // Icon mapping for categories
@@ -179,23 +179,23 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
 
   // Form states
   const [fixedForm, setFixedForm] = useState({
-    category: 'OTHER' as FixedCostCategory,
+    category: 'OTHER'as FixedCostCategory,
     name: '',
     amount: 0,
     notes: '',
     is_active: true,
-    pdf_url: '' as string,
+    pdf_url: ''as string,
   })
 
   const [variableForm, setVariableForm] = useState({
-    category: 'INGREDIENTS' as VariableCostCategory,
+    category: 'INGREDIENTS'as VariableCostCategory,
     description: '',
     supplier: '',
     invoice_number: '',
     amount: 0,
     date: new Date().toISOString().split('T')[0],
     notes: '',
-    pdf_url: '' as string,
+    pdf_url: ''as string,
   })
 
   const [targetsForm, setTargetsForm] = useState({
@@ -208,7 +208,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
 
   /** iPad/Safari: native confirm() werkt hier vaak niet; eigen modal. */
   const [deleteConfirm, setDeleteConfirm] = useState<
-    { type: 'fixed' | 'variable'; id: string } | null
+    { type: 'fixed' |  'variable'; id: string } | null
   >(null)
   const [deleteWorking, setDeleteWorking] = useState(false)
 
@@ -419,7 +419,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
       const binary = atob(base64)
       const bytes = new Uint8Array(binary.length)
       for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i)
-      const blob = new Blob([bytes], { type: 'application/pdf' })
+      const blob = new Blob([bytes], { type: 'application/pdf'})
       const blobUrl = URL.createObjectURL(blob)
       window.open(blobUrl, '_blank')
     } catch {
@@ -581,11 +581,11 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
       {/* Tabs */}
       <div className="flex flex-wrap gap-2 mb-6 bg-white rounded-xl p-2 shadow-sm">
         {[
-          { id: 'overview', label: ` ${t('analysePage.tabs.overview')}` },
-          { id: 'fixed', label: ` ${t('analysePage.tabs.fixed')}` },
-          { id: 'variable', label: ` ${t('analysePage.tabs.variable')}` },
-          { id: 'year', label: ` ${t('analysePage.tabs.year')}` },
-          { id: 'settings', label: ` ${t('analysePage.tabs.settings')}` },
+          { id: 'overview', label: ` ${t('analysePage.tabs.overview')}`},
+          { id: 'fixed', label: ` ${t('analysePage.tabs.fixed')}`},
+          { id: 'variable', label: ` ${t('analysePage.tabs.variable')}`},
+          { id: 'year', label: ` ${t('analysePage.tabs.year')}`},
+          { id: 'settings', label: ` ${t('analysePage.tabs.settings')}`},
         ].map(tab => (
           <button
             key={tab.id}
@@ -653,7 +653,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               className="bg-white rounded-2xl p-5 shadow-sm"
             >
               <div className="text-sm text-gray-500 mb-1"> {t('analysePage.overview.netProfit')}</div>
-              <div className={`text-2xl font-bold ${monthlyReport.netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              <div className={`text-2xl font-bold ${monthlyReport.netProfit >= 0 ? 'text-green-600': 'text-red-600'}`}>
                 {formatCurrency(monthlyReport.netProfit)}
               </div>
               <div className="text-xs text-gray-400 mt-1">
@@ -668,7 +668,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               className="bg-white rounded-2xl p-5 shadow-sm"
             >
               <div className="text-sm text-gray-500 mb-1"> {t('analysePage.overview.profitMargin')}</div>
-              <div className={`text-2xl font-bold ${monthlyReport.profitMargin >= 22 ? 'text-green-600' : 'text-blue-600'}`}>
+              <div className={`text-2xl font-bold ${monthlyReport.profitMargin >= 22 ? 'text-green-600': 'text-blue-600'}`}>
                 {monthlyReport.profitMargin.toFixed(1)}%
               </div>
               <div className="text-xs text-gray-400 mt-1">
@@ -841,7 +841,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className={`bg-white rounded-2xl p-5 shadow-sm border-2 ${
-                    cost.is_active ? 'border-green-200' : 'border-gray-200 opacity-50'
+                    cost.is_active ? 'border-green-200': 'border-gray-200 opacity-50'
                   }`}
                 >
                   <div className="flex items-start justify-between mb-3">
@@ -1072,7 +1072,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
             </div>
             <div className="bg-white rounded-2xl p-5 shadow-sm">
               <div className="text-sm text-gray-500"> {t('analysePage.year.yearProfit')}</div>
-              <div className={`text-2xl font-bold ${(yearReport?.netProfit || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              <div className={`text-2xl font-bold ${(yearReport?.netProfit || 0) >= 0 ? 'text-green-600': 'text-red-600'}`}>
                 {formatCurrency(yearReport?.netProfit || 0)}
               </div>
             </div>
@@ -1215,7 +1215,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               className="bg-white rounded-2xl w-full max-w-md shadow-xl"
             >
               <div className="p-4 border-b flex items-center justify-between">
-                <h2 className="text-xl font-bold">{editingFixed ? ` ${t('analysePage.fixed.editCost')}` : ` ${t('analysePage.fixed.newCost')}`}</h2>
+                <h2 className="text-xl font-bold">{editingFixed ? ` ${t('analysePage.fixed.editCost')}`: ` ${t('analysePage.fixed.newCost')}`}</h2>
                 <button onClick={() => setShowFixedModal(false)} className="text-gray-400 hover:text-gray-600"></button>
               </div>
               <div className="p-6 space-y-4">
@@ -1224,10 +1224,10 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                 {!editingFixed && (
                   <div>
                     <input ref={pdfInputFixedRef} type="file" accept="application/pdf" className="hidden"
-                      onChange={e => { const f = e.target.files?.[0]; if (f) handlePdfUploadFixed(f); e.target.value = '' }} />
+                      onChange={e => { const f = e.target.files?.[0]; if (f) handlePdfUploadFixed(f); e.target.value = ''}} />
                     <button type="button" onClick={() => pdfInputFixedRef.current?.click()} disabled={isParsingPdfFixed}
                       className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed border-blue-400 text-blue-600 hover:bg-blue-50 transition-colors disabled:opacity-50 text-sm font-medium">
-                      {isParsingPdfFixed ? '⏳ PDF wordt ingelezen...' : ' PDF factuur uploaden (automatisch invullen)'}
+                      {isParsingPdfFixed ? 'PDF wordt ingelezen...': 'PDF factuur uploaden (automatisch invullen)'}
                     </button>
                     <p className="text-xs text-gray-400 mt-1 text-center">Peppol of gewone PDF — naam en bedrag worden automatisch ingevuld</p>
                   </div>
@@ -1325,7 +1325,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               className="bg-white rounded-2xl w-full max-w-md shadow-xl"
             >
               <div className="p-4 border-b flex items-center justify-between">
-                <h2 className="text-xl font-bold">{editingVariable ? ` ${t('analysePage.variable.editPurchase')}` : ` ${t('analysePage.variable.newPurchase')}`}</h2>
+                <h2 className="text-xl font-bold">{editingVariable ? ` ${t('analysePage.variable.editPurchase')}`: ` ${t('analysePage.variable.newPurchase')}`}</h2>
                 <button onClick={() => setShowVariableModal(false)} className="text-gray-400 hover:text-gray-600"></button>
               </div>
               <div className="p-6 space-y-4">
@@ -1334,10 +1334,10 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                 {!editingVariable && (
                   <div>
                     <input ref={pdfInputRef} type="file" accept="application/pdf" className="hidden"
-                      onChange={e => { const f = e.target.files?.[0]; if (f) handlePdfUpload(f); e.target.value = '' }} />
+                      onChange={e => { const f = e.target.files?.[0]; if (f) handlePdfUpload(f); e.target.value = ''}} />
                     <button type="button" onClick={() => pdfInputRef.current?.click()} disabled={isParsingPdf}
                       className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed border-blue-400 text-blue-600 hover:bg-blue-50 transition-colors disabled:opacity-50 text-sm font-medium">
-                      {isParsingPdf ? '⏳ PDF wordt ingelezen...' : ' PDF factuur uploaden (automatisch invullen)'}
+                      {isParsingPdf ? 'PDF wordt ingelezen...': 'PDF factuur uploaden (automatisch invullen)'}
                     </button>
                     <p className="text-xs text-gray-400 mt-1 text-center">Peppol of gewone PDF — leverancier, datum en bedrag worden automatisch ingevuld</p>
                   </div>

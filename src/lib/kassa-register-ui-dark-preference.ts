@@ -27,7 +27,7 @@ export function readKassaUiDarkPreference(tenantSlug: string): boolean {
 export function writeKassaUiDarkPreference(tenantSlug: string, dark: boolean): void {
   if (typeof window === 'undefined') return
   try {
-    window.localStorage.setItem(kassaUiDarkStorageKey(tenantSlug), dark ? '1' : '0')
+    window.localStorage.setItem(kassaUiDarkStorageKey(tenantSlug), dark ? '1': '0')
   } catch {
     /* private mode etc. */
   }
@@ -52,7 +52,7 @@ export function useKassaUiDarkSync(tenantSlug: string): {
   toggle: () => void
 } {
   const [dark, setDarkState] = useState(() =>
-    typeof window === 'undefined' ? true : readKassaUiDarkPreference(tenantSlug),
+    typeof window === 'undefined'? true : readKassaUiDarkPreference(tenantSlug),
   )
 
   useEffect(() => {

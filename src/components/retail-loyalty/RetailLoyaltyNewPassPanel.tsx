@@ -24,12 +24,12 @@ type SearchHit = {
   loyaltyMember: RetailLoyaltyMemberPublic | null
 }
 
-type SearchPhase = 'idle' | 'searching' | 'done'
+type SearchPhase = 'idle' |  'searching' |  'done'
 
 function splitCustomerName(full: string): { first: string; last: string } {
   const parts = full.trim().split(/\s+/).filter(Boolean)
-  if (parts.length === 0) return { first: '', last: '' }
-  if (parts.length === 1) return { first: parts[0], last: '' }
+  if (parts.length === 0) return { first: '', last: ''}
+  if (parts.length === 1) return { first: parts[0], last: ''}
   return { first: parts[0], last: parts.slice(1).join(' ') }
 }
 
@@ -250,7 +250,7 @@ export function RetailLoyaltyNewPassPanel({
                 type="button"
                 onClick={() => applyHitToForm(hit)}
                 className={`flex w-full flex-col items-start px-3 py-2.5 text-left text-sm hover:bg-gray-50 ${
-                  selectedCustomerId === hit.customer.id ? 'bg-emerald-50' : ''
+                  selectedCustomerId === hit.customer.id ? 'bg-emerald-50': ''
                 }`}
               >
                 <span className="font-semibold text-gray-900">{hit.customer.name}</span>

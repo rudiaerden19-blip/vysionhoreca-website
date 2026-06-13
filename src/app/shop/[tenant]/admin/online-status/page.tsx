@@ -10,11 +10,11 @@ import {
 } from '@/lib/auth-headers'
 
 const REASONS = [
-  { key: 'volzet',   icon: '', labelKey: 'reasonVolzet',   descKey: 'reasonVolzetDesc' },
-  { key: 'panne',    icon: '', labelKey: 'reasonPanne',    descKey: 'reasonPanneDesc' },
-  { key: 'vakantie', icon: '', labelKey: 'reasonVakantie', descKey: 'reasonVakantieDesc' },
-  { key: 'sluiting', icon: '', labelKey: 'reasonSluiting', descKey: 'reasonSluitingDesc' },
-  { key: 'eigen',    icon: '', labelKey: 'reasonEigen',    descKey: 'reasonEigenDesc' },
+  { key: 'volzet',   icon: '', labelKey: 'reasonVolzet',   descKey: 'reasonVolzetDesc'},
+  { key: 'panne',    icon: '', labelKey: 'reasonPanne',    descKey: 'reasonPanneDesc'},
+  { key: 'vakantie', icon: '', labelKey: 'reasonVakantie', descKey: 'reasonVakantieDesc'},
+  { key: 'sluiting', icon: '', labelKey: 'reasonSluiting', descKey: 'reasonSluitingDesc'},
+  { key: 'eigen',    icon: '', labelKey: 'reasonEigen',    descKey: 'reasonEigenDesc'},
 ]
 
 export default function OnlineStatusPage({ params }: { params: { tenant: string } }) {
@@ -102,12 +102,12 @@ export default function OnlineStatusPage({ params }: { params: { tenant: string 
     const ok = await saveStatus({
       is_offline: true,
       offline_reason: selectedReason,
-      offline_message: selectedReason === 'eigen' ? customMessage.trim() : null,
+      offline_message: selectedReason === 'eigen'? customMessage.trim() : null,
     })
     if (ok) {
       setIsOffline(true)
       setOfflineReason(selectedReason)
-      setOfflineMessage(selectedReason === 'eigen' ? customMessage.trim() : null)
+      setOfflineMessage(selectedReason === 'eigen'? customMessage.trim() : null)
       setShowPopup(false)
     }
     setSaving(false)
@@ -174,16 +174,16 @@ ALTER TABLE shop_offline_status
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className={`rounded-3xl p-8 border-2 transition-all ${
-            isOffline ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'
+            isOffline ? 'bg-red-50 border-red-200': 'bg-green-50 border-green-200'
           }`}
         >
           {/* Status header with toggle */}
           <div className="flex items-center justify-between mb-8">
             <div>
-              <p className={`text-2xl font-bold ${isOffline ? 'text-red-700' : 'text-green-700'}`}>
-                {isOffline ? ` ${t('shopOffline.statusOffline')}` : ` ${t('shopOffline.statusOnline')}`}
+              <p className={`text-2xl font-bold ${isOffline ? 'text-red-700': 'text-green-700'}`}>
+                {isOffline ? ` ${t('shopOffline.statusOffline')}`: ` ${t('shopOffline.statusOnline')}`}
               </p>
-              <p className={`text-sm mt-1 ${isOffline ? 'text-red-500' : 'text-green-500'}`}>
+              <p className={`text-sm mt-1 ${isOffline ? 'text-red-500': 'text-green-500'}`}>
                 {isOffline ? t('shopOffline.offlineDesc') : t('shopOffline.onlineDesc')}
               </p>
             </div>
@@ -191,11 +191,11 @@ ALTER TABLE shop_offline_status
               onClick={handleToggle}
               disabled={saving}
               className={`relative w-20 h-10 rounded-full transition-all duration-300 focus:outline-none shadow-inner ${
-                isOffline ? 'bg-red-500' : 'bg-green-500'
+                isOffline ? 'bg-red-500': 'bg-green-500'
               } disabled:opacity-50`}
             >
               <span className={`absolute top-1 w-8 h-8 bg-white rounded-full shadow-md transition-all duration-300 ${
-                isOffline ? 'left-11' : 'left-1'
+                isOffline ? 'left-11': 'left-1'
               }`} />
             </button>
           </div>
@@ -286,7 +286,7 @@ ALTER TABLE shop_offline_status
                     {reason.key === 'eigen' && selectedReason === 'eigen' && (
                       <motion.div
                         initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
+                        animate={{ opacity: 1, height: 'auto'}}
                         className="mt-2 px-1"
                       >
                         <textarea

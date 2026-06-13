@@ -26,7 +26,7 @@ export function loadBarBonWatermarks(tenantSlug: string): BarBonWatermarkStore {
     const raw = localStorage.getItem(barBonWatermarkStorageKey(tenantSlug))
     if (!raw) return {}
     const p = JSON.parse(raw) as BarBonWatermarkStore
-    return p && typeof p === 'object' ? p : {}
+    return p && typeof p === 'object'? p : {}
   } catch {
     return {}
   }
@@ -58,7 +58,7 @@ export function sanitizeBarBonWatermark(row: Record<string, unknown> | null | un
   if (!row || typeof row !== 'object') return out
   for (const [k, v] of Object.entries(row)) {
     if (!k || typeof k !== 'string') continue
-    const n = typeof v === 'number' ? v : Number(v)
+    const n = typeof v === 'number'? v : Number(v)
     if (!Number.isFinite(n) || n < 0) continue
     out[k] = Math.min(Math.floor(n), 99999)
   }
@@ -72,7 +72,7 @@ export function filterCartLinesForBarBonWatermark(items: KassaCartItem[]): Kassa
   for (const line of items) {
     try {
       if (!line?.product || String(line.product.id ?? '').trim() === '') continue
-      const q = typeof line.quantity === 'number' ? line.quantity : Number(line.quantity)
+      const q = typeof line.quantity === 'number'? line.quantity : Number(line.quantity)
       if (!Number.isFinite(q) || q <= 0) continue
       out.push(line)
     } catch {
@@ -88,7 +88,7 @@ function quantitiesByStableKey(items: KassaCartItem[]): Record<string, number> {
   for (const i of items) {
     try {
       if (!i?.product || String(i.product.id ?? '').trim() === '') continue
-      const q = typeof i.quantity === 'number' ? i.quantity : Number(i.quantity)
+      const q = typeof i.quantity === 'number'? i.quantity : Number(i.quantity)
       if (!Number.isFinite(q) || q <= 0) continue
       const k = kassaCartLineStableKey(i)
       const add = Math.min(Math.floor(q), 99999)
@@ -105,7 +105,7 @@ export function kassaDraftBonGuardSig(items: KassaCartItem[], total: number): st
   const qty = quantitiesByStableKey(items)
   const keys = Object.keys(qty).sort()
   const tt = typeof total === 'number' && Number.isFinite(total) ? total : 0
-  return keys.map((k) => `${k}:${qty[k]}`).join('|') + `@${tt.toFixed(4)}`
+  return keys.map((k) => `${k}:${qty[k]}`).join(' | ') + `@${tt.toFixed(4)}`
 }
 
 /** Eerste mandregel per stabiele sleutel (voor productnaam/opies op de bon). */
@@ -152,7 +152,7 @@ function barBonDeltaFallbackFullCart(safeCart: KassaCartItem[]): {
 }
 
 /**
- * Alleen extra stuks t.o.v. laatste toogbon; `nextWatermark` = volledige stand na deze bon.
+ * Alleen extra stuks t.o.v. laatste toogbon; `nextWatermark`= volledige stand na deze bon.
  * Robuust tegen corrupte storage/regels: geen throw naar de UI.
  */
 export function computeBarBonDelta(

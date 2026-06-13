@@ -8,7 +8,7 @@ import {
   type MenuProduct,
 } from './admin-api-menu-product-helpers'
 
-/** Admin-proxy/update kan één rij als object óf als `[rij]` teruggeven (Supabase/PostgREST). */
+/** Admin-proxy/update kan één rij als object óf als `[rij]`teruggeven (Supabase/PostgREST). */
 export function normalizeDbSingleRow<T>(data: unknown): T | null {
   if (data == null) return null
   if (Array.isArray(data)) {
@@ -82,8 +82,8 @@ export async function saveMenuCategory(
   opts?: { skipInvalidate?: boolean },
 ): Promise<MenuCategory | null> {
   /**
-   * `menu_categories` heeft forbiddenColumns `id`/`created_at` — blind upsert zonder id match triggert
-   * steeds INSERT en verdubbelt categorieën. Bij update: `update` met `{ id, tenant_slug }`; bij nieuw: `insert`.
+   * `menu_categories`heeft forbiddenColumns `id`/`created_at`— blind upsert zonder id match triggert
+   * steeds INSERT en verdubbelt categorieën. Bij update: `update`met `{ id, tenant_slug }`; bij nieuw: `insert`.
    */
   const tenantSlug = category.tenant_slug
   const row = {
@@ -103,12 +103,12 @@ export async function saveMenuCategory(
         'menu_categories',
         row,
         { id: category.id, tenant_slug: tenantSlug },
-        { tenantSlug, select: '*' },
+        { tenantSlug, select: '*'},
       )
     : await adminDb.insert<MenuCategory[]>(
         'menu_categories',
         { ...row, tenant_slug: tenantSlug },
-        { tenantSlug, select: '*' },
+        { tenantSlug, select: '*'},
       )
 
   if (
@@ -127,12 +127,12 @@ export async function saveMenuCategory(
           'menu_categories',
           rowLegacy,
           { id: category.id, tenant_slug: tenantSlug },
-          { tenantSlug, select: '*' },
+          { tenantSlug, select: '*'},
         )
       : await adminDb.insert<MenuCategory[]>(
           'menu_categories',
           { ...rowLegacy, tenant_slug: tenantSlug },
-          { tenantSlug, select: '*' },
+          { tenantSlug, select: '*'},
         )
     if (!r2.ok) {
       console.error('Error saving menu category:', r2.error)
@@ -162,7 +162,7 @@ export async function bulkSaveMenuCategories(
   categoriesInOrder: MenuCategory[],
 ): Promise<{ ok: boolean; error?: string }> {
   const slug = (tenantSlug || getCurrentTenantSlug() || '').trim()
-  if (!slug) return { ok: false, error: 'Niet ingelogd' }
+  if (!slug) return { ok: false, error: 'Niet ingelogd'}
 
   const deduped = dedupeCatalogById(categoriesInOrder.filter((c) => c.id != null && String(c.id).trim() !== ''))
   const categories = deduped.map((c, index) => ({
@@ -177,7 +177,7 @@ export async function bulkSaveMenuCategories(
 
   for (const row of categories) {
     if (!row.id || row.id === 'undefined') {
-      return { ok: false, error: 'Categorie mist id — ververs de pagina.' }
+      return { ok: false, error: 'Categorie mist id — ververs de pagina.'}
     }
   }
 
@@ -201,7 +201,7 @@ export async function bulkSaveMenuCategories(
       /* ignore */
     }
     if (!res.ok || json.ok !== true) {
-      return { ok: false, error: json?.error || `HTTP ${res.status}` }
+      return { ok: false, error: json?.error || `HTTP ${res.status}`}
     }
     invalidateMenuCategoriesCache(slug)
     return { ok: true }
@@ -273,7 +273,7 @@ export async function saveMenuProduct(product: MenuProduct): Promise<{ data: Men
 
   const wrapOk = (data: unknown): { data: MenuProduct | null; error?: string } => {
     const d = normalizeDbSingleRow<MenuProduct>(data)
-    if (!d) return { data: null, error: 'leeg resultaat' }
+    if (!d) return { data: null, error: 'leeg resultaat'}
     cache.invalidate(cacheKey('menu_products', product.tenant_slug))
     return {
       data: {
@@ -305,9 +305,9 @@ export async function saveMenuProduct(product: MenuProduct): Promise<{ data: Men
           'menu_products',
           payload,
           { id: product.id, tenant_slug: tenant },
-          { tenantSlug: tenant, select: '*' },
+          { tenantSlug: tenant, select: '*'},
         )
-      : adminDb.insert<MenuProduct[]>('menu_products', payload, { tenantSlug: tenant, select: '*' })
+      : adminDb.insert<MenuProduct[]>('menu_products', payload, { tenantSlug: tenant, select: '*'})
   }
 
   const isMissingRetailPackagingColumn = (msg: string) =>

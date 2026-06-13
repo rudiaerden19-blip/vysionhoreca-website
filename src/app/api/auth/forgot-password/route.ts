@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     
     if (!rateLimitResult.success) {
       return NextResponse.json(
-        { error: 'Te veel verzoeken. Probeer het later opnieuw.' },
+        { error: 'Te veel verzoeken. Probeer het later opnieuw.'},
         { status: 429 }
       )
     }
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     if (!supabase) {
       console.error('Forgot password failed: Supabase not configured')
       return NextResponse.json(
-        { error: 'Service tijdelijk niet beschikbaar' },
+        { error: 'Service tijdelijk niet beschikbaar'},
         { status: 503 }
       )
     }

@@ -4,10 +4,10 @@
  */
 import { isVysionMainPortalHost } from '@/lib/vysion-site'
 
-export const KIOSK_FLAG_PARAM = 'kiosk1' as const
-export const KIOSK_LEGACY_PARAM = 'kiosk' as const
-export const KIOSK_REQUEST_HEADER = 'x-vysion-kiosk' as const
-export const KIOSK_COOKIE = 'vysion_kiosk' as const
+export const KIOSK_FLAG_PARAM = 'kiosk1'as const
+export const KIOSK_LEGACY_PARAM = 'kiosk'as const
+export const KIOSK_REQUEST_HEADER = 'x-vysion-kiosk'as const
+export const KIOSK_COOKIE = 'vysion_kiosk'as const
 
 function parseKioskLegacyValue(value: string | null): boolean {
   if (value == null) return false
@@ -30,7 +30,7 @@ export function isKioskFromHeaderAndCookie(
   return v === '1' || v === 'true'
 }
 
-/** Voorheen query toevoegen; kiosk loopt nu via cookie — alleen `path` behouden. */
+/** Voorheen query toevoegen; kiosk loopt nu via cookie — alleen `path`behouden. */
 export function withKioskQuery(path: string, _kiosk: boolean): string {
   return path
 }

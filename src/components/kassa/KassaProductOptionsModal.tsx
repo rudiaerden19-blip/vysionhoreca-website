@@ -28,7 +28,7 @@ export function KassaProductOptionsModal({
   onClose: () => void
   onToggleChoice: (option: ProductOption, choice: ProductOptionChoice) => void
   onConfirm: () => void
-  appearance?: 'light' | 'dark'
+  appearance?: 'light' |  'dark'
 }) {
   const { t } = useLanguage()
   const dark = appearance === 'dark'
@@ -46,22 +46,22 @@ export function KassaProductOptionsModal({
         }
       >
         <div
-          className={`flex items-center gap-3 p-4 border-b ${dark ? `border-[#1a1a1a] ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}` : ''}`}
+          className={`flex items-center gap-3 p-4 border-b ${dark ? `border-[#1a1a1a] ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`: ''}`}
         >
           {model.product.image_url && (
             <img
               src={model.product.image_url}
               alt={model.product.name}
               onError={kassaProductImageRetryOnError}
-              className={`w-14 h-14 rounded-xl flex-shrink-0 ${model.product.image_display_mode === 'contain' ? (dark ? 'object-contain bg-zinc-800' : 'object-contain bg-gray-100') : 'object-cover'}`}
+              className={`w-14 h-14 rounded-xl flex-shrink-0 ${model.product.image_display_mode === 'contain'? (dark ? 'object-contain bg-zinc-800': 'object-contain bg-gray-100') : 'object-cover'}`}
             />
           )}
           <div className="flex-1 min-w-0">
-            <p className={dark ? 'font-bold text-lg truncate text-zinc-50' : 'font-bold text-lg truncate'}>
+            <p className={dark ? 'font-bold text-lg truncate text-zinc-50': 'font-bold text-lg truncate'}>
               {model.editingCartKey ? t('kassaApp.optionsEditPrefix') : ''}
               {model.product.name}
             </p>
-            <p className={dark ? 'text-[#6dd5ff] font-bold' : 'text-[#3C4D6B] font-bold'}>
+            <p className={dark ? 'text-[#6dd5ff] font-bold': 'text-[#3C4D6B] font-bold'}>
               €{(model.product.price + model.selected.reduce((s, c) => s + c.price, 0)).toFixed(2)}
             </p>
           </div>
@@ -85,7 +85,7 @@ export function KassaProductOptionsModal({
           {model.options.map((option) => (
             <div key={option.id}>
               <div className="flex items-center gap-2 mb-3">
-                <p className={dark ? 'font-bold text-base text-zinc-100' : 'font-bold text-base text-gray-900'}>
+                <p className={dark ? 'font-bold text-base text-zinc-100': 'font-bold text-base text-gray-900'}>
                   {option.name}
                 </p>
                 {option.required && (
@@ -121,7 +121,7 @@ export function KassaProductOptionsModal({
                       onClick={() => onToggleChoice(option, choice)}
                       className={`relative flex flex-col items-center justify-center px-2 py-3 text-sm font-medium transition-all ${
                         dark
-                          ? `${kassaPosButtonClass(isSelected)} min-h-[4.25rem] ${isSelected ? 'scale-[1.02]' : ''}`
+                          ? `${kassaPosButtonClass(isSelected)} min-h-[4.25rem] ${isSelected ? 'scale-[1.02]': ''}`
                           : isSelected
                             ? 'rounded-xl border-2 border-[#3C4D6B] bg-[#3C4D6B]/10 ring-2 ring-[#3C4D6B] scale-[1.03]'
                             : 'rounded-xl border-2 border-gray-200 hover:border-[#3C4D6B] bg-white text-gray-700'
@@ -140,7 +140,7 @@ export function KassaProductOptionsModal({
                       )}
                       <span
                         className={`text-center leading-tight font-semibold ${
-                          isSelected ? (dark ? 'text-[#6dd5ff]' : 'text-[#3C4D6B]') : dark ? 'text-zinc-100' : 'text-gray-800'
+                          isSelected ? (dark ? 'text-[#6dd5ff]': 'text-[#3C4D6B]') : dark ? 'text-zinc-100': 'text-gray-800'
                         }`}
                       >
                         {choice.name}
@@ -156,7 +156,7 @@ export function KassaProductOptionsModal({
                               : 'text-green-500'
                         }`}
                       >
-                        {choice.price > 0 ? `+€${choice.price.toFixed(2)}` : t('kassaApp.optionFree')}
+                        {choice.price > 0 ? `+€${choice.price.toFixed(2)}`: t('kassaApp.optionFree')}
                       </span>
                     </button>
                   )

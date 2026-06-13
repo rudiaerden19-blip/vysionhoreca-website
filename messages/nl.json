@@ -2707,7 +2707,7 @@
  "smtpGmailWarning": " Gmail vereist een app-wachtwoord. Maak dit aan via: Google-account → Beveiliging → App-wachtwoorden.",
  "smtpServerLabel": "SMTP-server (vraag het aan je provider)",
  "smtpPortLabel": "Poort",
- "smtpSaveSaving": "⏳ Opslaan...",
+ "smtpSaveSaving": " Opslaan...",
  "smtpSaveSaved": " Opgeslagen!",
  "smtpSaveButton": " E-mailinstellingen opslaan"
  },
@@ -3357,9 +3357,9 @@
  "noOrders": "Geen bestellingen",
  "noOrdersDesc": "Er zijn geen online bestellingen op deze dag.",
  "howToUse": "Hoe invoeren in witte kassa?",
- "step1": "Klik op 'Opslaan' om dit rapport te archiveren",
+ "step1": "Klik op 'Opslaan'om dit rapport te archiveren",
  "step2": "Open je witte kassa en maak een nieuwe verkoop aan",
- "step3": "Voer in: 'Online verkopen' met bedrag",
+ "step3": "Voer in: 'Online verkopen'met bedrag",
  "step4": "Selecteer de juiste BTW-categorie",
  "retention": "Z-Rapporten worden 7 jaar bewaard conform fiscale wetgeving.",
  "savedReports": "Opgeslagen rapporten",
@@ -3493,7 +3493,7 @@
  "selectEmployee": "Selecteer een medewerker",
  "reasonPlaceholder": "Optioneel: reden voor verlof",
  "initialStatus": "Status",
- "statusHint": "Kies 'Goedgekeurd' voor directe registratie (bijv. ziekmelding)",
+ "statusHint": "Kies 'Goedgekeurd'voor directe registratie (bijv. ziekmelding)",
  "add": "Toevoegen",
  "fillAllFields": "Vul alle verplichte velden in",
  "delete": "Verwijderen",
@@ -5985,7 +5985,7 @@
  "ownership24": "Stop met huren. Na 24 maanden is deze i7 kassa 100% jouw eigendom."
  },
  "retail": {
- "h1": "Retail Kassa & Voorraadbeheer | Het i7 'Beest' voor Winkels | Vysion",
+ "h1": "Retail Kassa & Voorraadbeheer | Het i7 'Beest'voor Winkels | Vysion",
  "intro": "Beheer je winkelvoorraad op krachtige i7-hardware (16 GB RAM), met touchscreen POS en gratis website-integratie — retail kassa die meegroeit met je zaak.",
  "body1": "Wie een snelle retail kassa wil, combineert voorraad en verkoop in één scherm. Kassa kopen met zicht op marges en snelheid aan de kassa — dé keuze als kassasysteem België voor winkels.",
  "body2": "Van barcode tot einddag: minder fouten, meer tempo. Eigendom na 24 maanden op premium hardware — stop met huren zonder voordeel.",

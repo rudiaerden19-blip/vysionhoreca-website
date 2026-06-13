@@ -8,7 +8,7 @@ import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 import { resolveZohoEmail } from '@/lib/vysion-contact'
 import { assertZohoSmtpConfigured, createZohoMailTransport } from '@/lib/zoho-smtp'
 
-type ExportPeriodJson = 'day' | 'week' | 'month' | 'year'
+type ExportPeriodJson = 'day' |  'week' |  'month' |  'year'
 
 const EXPORT_PERIODS = new Set<string>(['day', 'week', 'month', 'year'])
 
@@ -41,12 +41,12 @@ export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID()
   try {
     const body = (await request.json()) as Record<string, unknown>
-    const tenantSlug = typeof body.tenantSlug === 'string' ? body.tenantSlug.trim() : ''
-    const to = typeof body.to === 'string' ? body.to.trim() : ''
+    const tenantSlug = typeof body.tenantSlug === 'string'? body.tenantSlug.trim() : ''
+    const to = typeof body.to === 'string'? body.to.trim() : ''
     const exportPeriod =
-      typeof body.exportPeriod === 'string' ? (body.exportPeriod as ExportPeriodJson) : ''
+      typeof body.exportPeriod === 'string'? (body.exportPeriod as ExportPeriodJson) : ''
 
-    const businessName = typeof body.businessName === 'string' ? body.businessName.trim() : ''
+    const businessName = typeof body.businessName === 'string'? body.businessName.trim() : ''
     const btwNumber =
       typeof body.btwNumber === 'string' && body.btwNumber.trim() !== ''
         ? body.btwNumber.trim().slice(0, 120)
@@ -59,13 +59,13 @@ export async function POST(request: NextRequest) {
     const addressBlockLines = cleanAddressLines(body.addressBlockLines)
 
     if (!tenantSlug || !to || !looksLikeEmail(to)) {
-      return NextResponse.json({ error: 'Geldig e-mailadres is verplicht' }, { status: 400 })
+      return NextResponse.json({ error: 'Geldig e-mailadres is verplicht'}, { status: 400 })
     }
     if (!EXPORT_PERIODS.has(exportPeriod)) {
-      return NextResponse.json({ error: 'exportPeriod ongeldig' }, { status: 400 })
+      return NextResponse.json({ error: 'exportPeriod ongeldig'}, { status: 400 })
     }
     if (!businessName) {
-      return NextResponse.json({ error: 'businessName ontbreekt' }, { status: 400 })
+      return NextResponse.json({ error: 'businessName ontbreekt'}, { status: 400 })
     }
 
     const totalRev = body.totalRev
@@ -89,27 +89,27 @@ export async function POST(request: NextRequest) {
       !isFin(taxHigh) ||
       !isFin(totalTax)
     ) {
-      return NextResponse.json({ error: 'Ongeldige rapportcijfers' }, { status: 400 })
+      return NextResponse.json({ error: 'Ongeldige rapportcijfers'}, { status: 400 })
     }
     if (orderCount < 0 || orderCount > 1_000_000) {
-      return NextResponse.json({ error: 'Ongeldig aantal bestellingen' }, { status: 400 })
+      return NextResponse.json({ error: 'Ongeldig aantal bestellingen'}, { status: 400 })
     }
 
     const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
     if (!access.authorized) {
       const st = access.error?.includes('ingelogd') ? 401 : 403
       logger.warn('send-omzet-report-email: unauthorized', { requestId, tenantSlug })
-      return NextResponse.json({ error: access.error || 'Geen toegang' }, { status: st })
+      return NextResponse.json({ error: access.error || 'Geen toegang'}, { status: st })
     }
 
     if (!access.isSuperAdmin) {
       const supabase = getServerSupabaseClient()
       if (!supabase) {
-        return NextResponse.json({ error: 'Database niet beschikbaar' }, { status: 503 })
+        return NextResponse.json({ error: 'Database niet beschikbaar'}, { status: 503 })
       }
       const bid = access.businessId
       if (!bid) {
-        return NextResponse.json({ error: 'Geen toegang' }, { status: 403 })
+        return NextResponse.json({ error: 'Geen toegang'}, { status: 403 })
       }
       const { data: profile } = await supabase
         .from('business_profiles')
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
       const ownerEmail = normalizeEmail((profile?.email as string | undefined) || '')
       if (!ownerEmail || ownerEmail !== normalizeEmail(to)) {
         return NextResponse.json(
-          { error: 'Je kunt dit rapport alleen naar je eigen account-e-mailadres sturen.' },
+          { error: 'Je kunt dit rapport alleen naar je eigen account-e-mailadres sturen.'},
           { status: 403 },
         )
       }
@@ -129,8 +129,8 @@ export async function POST(request: NextRequest) {
     const rl = await checkRateLimit(apiRateLimiter, `omzet-report-email:${tenantSlug}:${ip}`)
     if (!rl.success) {
       return NextResponse.json(
-        { error: 'Te veel verzoeken. Probeer over enkele seconden opnieuw.' },
-        { status: 429, headers: { 'Retry-After': '60' } },
+        { error: 'Te veel verzoeken. Probeer over enkele seconden opnieuw.'},
+        { status: 429, headers: { 'Retry-After': '60'} },
       )
     }
 
@@ -175,7 +175,7 @@ export async function POST(request: NextRequest) {
       requestId,
       error: error instanceof Error ? error.message : String(error),
     })
-    trackError(error, { requestId, route: '/api/send-omzet-report-email' })
+    trackError(error, { requestId, route: '/api/send-omzet-report-email'})
     return NextResponse.json(
       {
         error: 'Fout bij versturen e-mail',

@@ -95,13 +95,13 @@ export function buildStaffSalesSummaryReceiptHtml(opts: {
 }): string {
   const esc = escapeReceiptHtml
   const b = opts.business
-  const nameLine = b?.name?.trim() ? `<div class="bold big">${esc(b.name.trim())}</div>` : ''
-  const addr = b?.address?.trim() ? `<div class="small">${esc(b.address.trim())}</div>` : ''
+  const nameLine = b?.name?.trim() ? `<div class="bold big">${esc(b.name.trim())}</div>`: ''
+  const addr = b?.address?.trim() ? `<div class="small">${esc(b.address.trim())}</div>`: ''
   const pcCity =
     b?.postalCode?.trim() || b?.city?.trim()
       ? `<div class="small">${esc(`${b?.postalCode?.trim() ?? ''} ${b?.city?.trim() ?? ''}`.trim())}</div>`
       : ''
-  const phone = b?.phone?.trim() ? `<div class="small">Tel: ${esc(b.phone.trim())}</div>` : ''
+  const phone = b?.phone?.trim() ? `<div class="small">Tel: ${esc(b.phone.trim())}</div>`: ''
 
   const rowsHtml =
     opts.orders.length === 0
@@ -157,7 +157,7 @@ export function printReceiptHtmlDocument(html: string): void {
 
   const fallbackBlobOrBlankWindow = () => {
     try {
-      const blob = new Blob([html], { type: 'text/html;charset=utf-8' })
+      const blob = new Blob([html], { type: 'text/html;charset=utf-8'})
       const url = URL.createObjectURL(blob)
       const w = window.open(url, '_blank', 'width=420,height=640')
       if (w) {

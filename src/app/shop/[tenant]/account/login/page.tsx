@@ -61,7 +61,7 @@ export default function LoginPage({ params }: { params: { tenant: string } }) {
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          style={{ borderColor: primaryColor, borderTopColor: 'transparent' }}
+          style={{ borderColor: primaryColor, borderTopColor: 'transparent'}}
           className="w-12 h-12 border-4 rounded-full"
         />
       </div>
@@ -69,7 +69,7 @@ export default function LoginPage({ params }: { params: { tenant: string } }) {
   }
 
   return (
-    <div style={{ maxWidth: '100%', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-50 flex items-center justify-center p-3 sm:p-4">
+    <div style={{ maxWidth: '100%', overflowX: 'hidden', width: '100%'}} className="min-h-screen bg-gray-50 flex items-center justify-center p-3 sm:p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

@@ -34,6 +34,6 @@ export function sortKassaCartLinesByMenuCategory<T extends LineWithProduct>(
     if (aRank !== bRank) return aRank - bRank
     const byProduct = compareMenuProductsBySortOrder(a.product, b.product)
     if (byProduct !== 0) return byProduct
-    return (a.product.name || '').localeCompare(b.product.name || '', 'nl', { sensitivity: 'base' })
+    return (a.product.name || '').localeCompare(b.product.name || '', 'nl', { sensitivity: 'base'})
   })
 }

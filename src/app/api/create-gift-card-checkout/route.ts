@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
     if (!supabase) {
       console.error('Gift card checkout failed: Supabase not configured')
       return NextResponse.json(
-        { error: 'Database niet geconfigureerd. Neem contact op met support.' },
+        { error: 'Database niet geconfigureerd. Neem contact op met support.'},
         { status: 503 }
       )
     }
@@ -24,13 +24,13 @@ export async function POST(request: NextRequest) {
       senderEmail, 
       recipientName, 
       recipientEmail,
-      paymentMethod, // 'card' or 'cash'
+      paymentMethod, // 'card'or 'cash'
     } = body
 
     // Validate required fields
     if (!tenantSlug || !amount || !recipientEmail) {
       return NextResponse.json(
-        { error: 'Ontbrekende velden' },
+        { error: 'Ontbrekende velden'},
         { status: 400 }
       )
     }
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
         sender_email: senderEmail,
         recipient_name: recipientName,
         recipient_email: recipientEmail,
-        status: paymentMethod === 'cash' ? 'pending_cash' : 'pending',
+        status: paymentMethod === 'cash'? 'pending_cash': 'pending',
         expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 year
       })
       .select()
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     if (giftCardError) {
       console.error('Gift card creation error:', giftCardError)
       return NextResponse.json(
-        { error: 'Kon cadeaubon niet aanmaken' },
+        { error: 'Kon cadeaubon niet aanmaken'},
         { status: 500 }
       )
     }
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
 
     if (tenantError || !tenant?.stripe_secret_key) {
       return NextResponse.json(
-        { error: 'Stripe niet geconfigureerd voor deze zaak' },
+        { error: 'Stripe niet geconfigureerd voor deze zaak'},
         { status: 400 }
       )
     }
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
             currency: 'eur',
             product_data: {
               name: `Cadeaubon ${tenant.business_name}`,
-              description: occasion ? `Gelegenheid: ${occasion}` : 'Cadeaubon',
+              description: occasion ? `Gelegenheid: ${occasion}`: 'Cadeaubon',
             },
             unit_amount: Math.round(amount * 100), // Convert to cents
           },
@@ -139,7 +139,7 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error('Stripe checkout error:', error)
     return NextResponse.json(
-      { error: error?.message || 'Er ging iets mis bij het aanmaken van de betaling' },
+      { error: error?.message || 'Er ging iets mis bij het aanmaken van de betaling'},
       { status: 500 }
     )
   }

@@ -140,7 +140,7 @@ export default function SupportPage() {
                 >
                   <span className="font-semibold text-gray-900 pr-4">{faq.question}</span>
                   <svg 
-                    className={`w-5 h-5 text-accent flex-shrink-0 transition-transform ${openFaq === index ? 'rotate-180' : ''}`} 
+                    className={`w-5 h-5 text-accent flex-shrink-0 transition-transform ${openFaq === index ? 'rotate-180': ''}`} 
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"

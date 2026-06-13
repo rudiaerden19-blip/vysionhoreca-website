@@ -32,8 +32,8 @@ export async function POST(request: NextRequest) {
   if (!ipResult.success) {
     logger.warn('pin/verify: rate-limit IP', { requestId, ip, tenant })
     return NextResponse.json(
-      { valid: false, error: 'Te veel pogingen. Wacht een minuut.' },
-      { status: 429, headers: { 'Retry-After': '60' } }
+      { valid: false, error: 'Te veel pogingen. Wacht een minuut.'},
+      { status: 429, headers: { 'Retry-After': '60'} }
     )
   }
 
@@ -41,8 +41,8 @@ export async function POST(request: NextRequest) {
   if (!tenantResult.success) {
     logger.warn('pin/verify: rate-limit tenant', { requestId, tenant })
     return NextResponse.json(
-      { valid: false, error: 'PIN tijdelijk geblokkeerd na te veel pogingen. Probeer over een uur opnieuw.' },
-      { status: 429, headers: { 'Retry-After': '3600' } }
+      { valid: false, error: 'PIN tijdelijk geblokkeerd na te veel pogingen. Probeer over een uur opnieuw.'},
+      { status: 429, headers: { 'Retry-After': '3600'} }
     )
   }
 

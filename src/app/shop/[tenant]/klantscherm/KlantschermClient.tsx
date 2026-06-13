@@ -16,8 +16,8 @@ import {
 import { appLocaleToBcp47 } from '@/lib/print-receipt-html'
 
 /** Grotere orders op niet‑touch klantscherm: kleinere tekst/marges naarmate er meer regels zijn (geen scroll/muis). */
-function klantschermOrderDensityStyle(lineCount: number, phase: 'cart' | 'checkout') {
-  const weight = lineCount + (phase === 'checkout' ? 6 : 2)
+function klantschermOrderDensityStyle(lineCount: number, phase: 'cart' |  'checkout') {
+  const weight = lineCount + (phase === 'checkout'? 6 : 2)
   if (weight <= 8) {
     return {
       shellPad: 'px-3 py-4 sm:px-5 sm:py-6 md:px-8 md:py-8',
@@ -109,7 +109,7 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
       const el = document.documentElement
       const req = el.requestFullscreen as ((options?: FullscreenOptions) => Promise<void>) | undefined
       if (!req) return
-      void req.call(el, { navigationUI: 'hide' }).catch(() => {})
+      void req.call(el, { navigationUI: 'hide'}).catch(() => {})
     }
     tryFullscreen()
   }, [token])
@@ -134,7 +134,7 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
       const el = document.documentElement
       const req = el.requestFullscreen as ((options?: FullscreenOptions) => Promise<void>) | undefined
       if (!req) return
-      void req.call(el, { navigationUI: 'hide' }).catch(() => {})
+      void req.call(el, { navigationUI: 'hide'}).catch(() => {})
     }, 520)
     return () => {
       cleared = true
@@ -149,7 +149,7 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
       const el = document.documentElement
       const req = el.requestFullscreen as ((options?: FullscreenOptions) => Promise<void>) | undefined
       if (!req) return
-      void req.call(el, { navigationUI: 'hide' }).catch(() => {})
+      void req.call(el, { navigationUI: 'hide'}).catch(() => {})
     }
     const fullscreenTimers = [2800, 5200].map((ms) => window.setTimeout(tryLateFullscreen, ms))
     return () => fullscreenTimers.forEach(clearTimeout)
@@ -175,7 +175,7 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
 
   const waitingClock = Boolean(token && (!msg || msg.phase === 'idle'))
 
-  /** Geen `new Date()` tijdens SSR — server-TZ (UTC) gaf verkeerde klok; pas na mount ticken. */
+  /** Geen `new Date()`tijdens SSR — server-TZ (UTC) gaf verkeerde klok; pas na mount ticken. */
   const [now, setNow] = useState<Date | null>(null)
 
   useEffect(() => {
@@ -187,7 +187,7 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
   }, [waitingClock])
 
   const formatMoney = (n: number) =>
-    new Intl.NumberFormat(appLocaleToBcp47(locale), { style: 'currency', currency: 'EUR' }).format(n)
+    new Intl.NumberFormat(appLocaleToBcp47(locale), { style: 'currency', currency: 'EUR'}).format(n)
 
   const shellCart =
     'box-border flex min-h-0 w-full flex-1 flex-col overflow-y-auto bg-black px-3 py-4 text-white sm:px-5 sm:py-6 md:px-8 md:py-8'

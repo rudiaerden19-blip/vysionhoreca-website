@@ -10,7 +10,7 @@ interface Props {
   children: ReactNode
 }
 
-type State = 'loading' | 'no-pin' | 'locked' | 'unlocked' | 'forgot'
+type State = 'loading' |  'no-pin' |  'locked' |  'unlocked' |  'forgot'
 
 export default function PinGate({ tenant, children }: Props) {
   const { t } = useLanguage()
@@ -23,7 +23,7 @@ export default function PinGate({ tenant, children }: Props) {
   const [newPin, setNewPin] = useState('')
   const [confirmPin, setConfirmPin] = useState('')
   const [saving, setSaving] = useState(false)
-  const [forgotStep, setForgotStep] = useState<'email' | 'newpin'>('email')
+  const [forgotStep, setForgotStep] = useState<'email' |  'newpin'>('email')
 
   useLayoutEffect(() => {
     if (isSuperAdminLoggedIn()) {
@@ -85,7 +85,7 @@ export default function PinGate({ tenant, children }: Props) {
   const verifyPin = async (code: string) => {
     const res = await fetch('/api/pin/verify', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json'},
       body: JSON.stringify({ tenant, pin: code }),
     })
     const data = await res.json()
@@ -101,7 +101,7 @@ export default function PinGate({ tenant, children }: Props) {
   const handleForgotEmail = async () => {
     if (!forgotEmail) return
     setSaving(true)
-    // Stap 1: check of email klopt door meteen naar 'newpin' te gaan
+    // Stap 1: check of email klopt door meteen naar 'newpin'te gaan
     // De API verifieert het email bij het opslaan van het nieuwe PIN
     setForgotStep('newpin')
     setSaving(false)
@@ -113,7 +113,7 @@ export default function PinGate({ tenant, children }: Props) {
     setSaving(true)
     const res = await fetch('/api/pin/set', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json'},
       body: JSON.stringify({ tenant, pin: newPin, email: forgotEmail }),
     })
     const data = await res.json()
@@ -156,7 +156,7 @@ export default function PinGate({ tenant, children }: Props) {
             className="text-gray-400 hover:text-gray-600 text-sm mb-4">{t('pinGate.back')}</button>
           <h2 className="text-xl font-bold text-center mb-6">{t('pinGate.forgotTitle')}</h2>
 
-          {forgotStep === 'email' ? (
+          {forgotStep === 'email'? (
             <>
               <p className="text-gray-500 text-sm mb-4 text-center">{t('pinGate.forgotEmailHelp')}</p>
               <input
@@ -205,7 +205,7 @@ export default function PinGate({ tenant, children }: Props) {
         <div className="flex justify-center gap-4 mb-6">
           {[0,1,2,3].map(i => (
             <div key={i} className={`w-4 h-4 rounded-full border-2 transition-colors ${
-              pin.length > i ? 'bg-orange-500 border-orange-500' : 'border-gray-300'
+              pin.length > i ? 'bg-orange-500 border-orange-500': 'border-gray-300'
             }`} />
           ))}
         </div>
@@ -214,16 +214,16 @@ export default function PinGate({ tenant, children }: Props) {
 
         {/* Numpad */}
         <div className="grid grid-cols-3 gap-3 mb-4">
-          {['1','2','3','4','5','6','7','8','9','','0','⌫'].map((d, i) => (
+          {['1','2','3','4','5','6','7','8','9','','0','Del'].map((d, i) => (
             <button key={i}
               onClick={() => {
-                if (d === '⌫') { setPin(p => p.slice(0, -1)); setError('') }
+                if (d === 'Del') { setPin(p => p.slice(0, -1)); setError('') }
                 else if (d) handleDigit(d)
               }}
               disabled={!d && d !== '0'}
               className={`py-4 rounded-xl text-xl font-bold transition-colors ${
                 d === '' ? 'invisible' :
-                d === '⌫' ? 'bg-gray-100 hover:bg-gray-200 text-gray-600' :
+                d === 'Del' ? 'bg-gray-100 hover:bg-gray-200 text-gray-600 text-base' :
                 'bg-gray-100 hover:bg-orange-100 hover:text-orange-600 active:scale-95'
               }`}
             >

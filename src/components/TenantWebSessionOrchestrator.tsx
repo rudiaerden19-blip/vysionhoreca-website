@@ -68,7 +68,7 @@ export function TenantWebSessionOrchestrator({ tenantSlug }: { tenantSlug: strin
         const d = ev.data as Partial<OwnerLogoutMessage>
         if (d?.type !== 'owner-logout' || typeof d.tenantSlug !== 'string') return
 
-        if (d.landing === 'superadmin-login') setTerminalLogout({ kind: 'superadmin' })
+        if (d.landing === 'superadmin-login') setTerminalLogout({ kind: 'superadmin'})
         else setTerminalLogout({ kind: 'staff', tenantSlug: d.tenantSlug })
 
         if (d.scope === 'full') applyFullStaffLogoutCleanup()

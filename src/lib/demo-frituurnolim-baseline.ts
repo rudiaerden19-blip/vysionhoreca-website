@@ -54,7 +54,7 @@ const TENANT_SETTINGS_BRANDING = {
   gift_cards_enabled: false,
   promotions_enabled: true,
   reservations_enabled: true,
-  image_display_mode: 'cover' as const,
+  image_display_mode: 'cover'as const,
   payment_methods: ['cash', 'bancontact'],
   is_blocked: false,
 }
@@ -62,12 +62,12 @@ const TENANT_SETTINGS_BRANDING = {
 /** Zelfde als hierboven maar zonder kolommen die op oudere DB’s kunnen ontbreken. */
 const TENANT_SETTINGS_BRANDING_CORE: Omit<
   typeof TENANT_SETTINGS_BRANDING,
-  'payment_methods' | 'image_display_mode'
+  'payment_methods' |  'image_display_mode'
 > = (() => {
   const r = { ...TENANT_SETTINGS_BRANDING }
   delete (r as Record<string, unknown>).payment_methods
   delete (r as Record<string, unknown>).image_display_mode
-  return r as Omit<typeof TENANT_SETTINGS_BRANDING, 'payment_methods' | 'image_display_mode'>
+  return r as Omit<typeof TENANT_SETTINGS_BRANDING, 'payment_methods' |  'image_display_mode'>
 })()
 
 function buildNolimOpeningHours(tenantSlug: string) {
@@ -133,12 +133,12 @@ const RESERVATION_SETTINGS_DEFAULTS = {
 }
 
 export type DemoBrandingResetStatus = {
-  tenant_settings: 'ok' | 'error'
-  tenants_name: 'ok' | 'error' | 'skipped'
-  opening_hours: 'ok' | 'error'
-  delivery_settings: 'ok' | 'error'
-  tenant_texts: 'ok' | 'error'
-  reservation_settings: 'ok' | 'error'
+  tenant_settings: 'ok' |  'error'
+  tenants_name: 'ok' |  'error' |  'skipped'
+  opening_hours: 'ok' |  'error'
+  delivery_settings: 'ok' |  'error'
+  tenant_texts: 'ok' |  'error'
+  reservation_settings: 'ok' |  'error'
 }
 
 export async function applyFrituurNolimDemoBranding(
@@ -191,21 +191,21 @@ export async function applyFrituurNolimDemoBranding(
   {
     const { error } = await supabase
       .from('delivery_settings')
-      .upsert(buildDefaultDeliverySettingsRow(slug), { onConflict: 'tenant_slug' })
+      .upsert(buildDefaultDeliverySettingsRow(slug), { onConflict: 'tenant_slug'})
     if (error) status.delivery_settings = 'error'
   }
 
   {
     const { error } = await supabase
       .from('tenant_texts')
-      .upsert({ tenant_slug: slug, ...TENANT_TEXTS_DEFAULTS }, { onConflict: 'tenant_slug' })
+      .upsert({ tenant_slug: slug, ...TENANT_TEXTS_DEFAULTS }, { onConflict: 'tenant_slug'})
     if (error) status.tenant_texts = 'error'
   }
 
   {
     const { error } = await supabase
       .from('reservation_settings')
-      .upsert({ tenant_slug: slug, ...RESERVATION_SETTINGS_DEFAULTS }, { onConflict: 'tenant_slug' })
+      .upsert({ tenant_slug: slug, ...RESERVATION_SETTINGS_DEFAULTS }, { onConflict: 'tenant_slug'})
     if (error) status.reservation_settings = 'error'
   }
 

@@ -59,7 +59,7 @@ export default function InklokkenPage({ params }: { params: { tenant: string } }
     <PinGate tenant={tenant}>
       <div className="mx-auto max-w-3xl space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">⏰ {t('inklokkenPage.title')}</h1>
+          <h1 className="text-2xl font-bold text-gray-900"> {t('inklokkenPage.title')}</h1>
           <p className="mt-1 text-gray-500">{t('inklokkenPage.subtitle')}</p>
         </div>
 
@@ -81,12 +81,12 @@ export default function InklokkenPage({ params }: { params: { tenant: string } }
                     disabled={kassaClockSaving}
                     onClick={() => void toggleKassaClock()}
                     className={`relative h-8 w-14 rounded-full transition-colors duration-200 disabled:opacity-50 ${
-                      kassaClockEnabled ? 'bg-emerald-500' : 'bg-gray-300'
+                      kassaClockEnabled ? 'bg-emerald-500': 'bg-gray-300'
                     }`}
                   >
                     <span
                       className={`absolute top-0.5 left-0.5 h-7 w-7 rounded-full bg-white shadow transition-transform duration-200 ${
-                        kassaClockEnabled ? 'translate-x-6' : 'translate-x-0'
+                        kassaClockEnabled ? 'translate-x-6': 'translate-x-0'
                       }`}
                     />
                   </button>

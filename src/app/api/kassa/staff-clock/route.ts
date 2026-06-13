@@ -19,12 +19,12 @@ function normalizeHmFromTs(iso: string): string {
 export async function GET(request: NextRequest) {
   const supabase = getServerSupabaseClient()
   if (!supabase) {
-    return NextResponse.json({ ok: false, error: 'server_config' }, { status: 500 })
+    return NextResponse.json({ ok: false, error: 'server_config'}, { status: 500 })
   }
 
   const tenant_slug = request.nextUrl.searchParams.get('tenant_slug')?.trim()
   if (!tenant_slug) {
-    return NextResponse.json({ ok: false, error: 'bad_request' }, { status: 400 })
+    return NextResponse.json({ ok: false, error: 'bad_request'}, { status: 400 })
   }
 
   // Personeelsdata = persoonsgegevens. Alleen ingelogde zaak/superadmin
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
   const access = await verifyTenantOrSuperAdmin(request, tenant_slug)
   if (!access.authorized) {
     return NextResponse.json(
-      { ok: false, error: access.error || 'unauthorized' },
+      { ok: false, error: access.error || 'unauthorized'},
       { status: 403 }
     )
   }
@@ -46,11 +46,11 @@ export async function GET(request: NextRequest) {
 
   if (settingsErr) {
     console.error('staff-clock GET settings', settingsErr)
-    return NextResponse.json({ ok: false, error: 'server' }, { status: 500 })
+    return NextResponse.json({ ok: false, error: 'server'}, { status: 500 })
   }
 
   if (!settings?.kassa_staff_clock_enabled) {
-    return NextResponse.json({ ok: false, error: 'disabled' }, { status: 403 })
+    return NextResponse.json({ ok: false, error: 'disabled'}, { status: 403 })
   }
 
   const [staffResult, sessionsResult] = await Promise.all([
@@ -72,12 +72,12 @@ export async function GET(request: NextRequest) {
 
   if (staffErr) {
     console.error('staff-clock GET staff', staffErr)
-    return NextResponse.json({ ok: false, error: 'server' }, { status: 500 })
+    return NextResponse.json({ ok: false, error: 'server'}, { status: 500 })
   }
 
   if (sessErr) {
     console.error('staff-clock GET sessions', sessErr)
-    return NextResponse.json({ ok: false, error: 'server' }, { status: 500 })
+    return NextResponse.json({ ok: false, error: 'server'}, { status: 500 })
   }
 
   const openSet = new Set((openSessions || []).map((r) => r.staff_id as string))
@@ -96,20 +96,20 @@ type PostBody = {
   tenant_slug?: string
   staff_id?: string
   pin?: string
-  action?: 'in' | 'out'
+  action?: 'in' |  'out'
 }
 
 export async function POST(request: NextRequest) {
   const supabase = getServerSupabaseClient()
   if (!supabase) {
-    return NextResponse.json({ ok: false, error: 'server_config' }, { status: 500 })
+    return NextResponse.json({ ok: false, error: 'server_config'}, { status: 500 })
   }
 
   let body: PostBody
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ ok: false, error: 'invalid_json' }, { status: 400 })
+    return NextResponse.json({ ok: false, error: 'invalid_json'}, { status: 400 })
   }
 
   const tenant_slug = String(body.tenant_slug || '').trim()
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
   const action = body.action
 
   if (!tenant_slug || !staff_id || !pin || (action !== 'in' && action !== 'out')) {
-    return NextResponse.json({ ok: false, error: 'bad_request' }, { status: 400 })
+    return NextResponse.json({ ok: false, error: 'bad_request'}, { status: 400 })
   }
 
   // Inklokken/uitklokken alleen door een ingelogde zaak (kassa-context).
@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
   const access = await verifyTenantOrSuperAdmin(request, tenant_slug)
   if (!access.authorized) {
     return NextResponse.json(
-      { ok: false, error: access.error || 'unauthorized' },
+      { ok: false, error: access.error || 'unauthorized'},
       { status: 403 }
     )
   }
@@ -139,11 +139,11 @@ export async function POST(request: NextRequest) {
 
   if (settingsErr) {
     console.error('staff-clock POST settings', settingsErr)
-    return NextResponse.json({ ok: false, error: 'server' }, { status: 500 })
+    return NextResponse.json({ ok: false, error: 'server'}, { status: 500 })
   }
 
   if (!settings?.kassa_staff_clock_enabled) {
-    return NextResponse.json({ ok: false, error: 'disabled' }, { status: 403 })
+    return NextResponse.json({ ok: false, error: 'disabled'}, { status: 403 })
   }
 
   const { data: staffRow, error: staffErr } = await supabase
@@ -154,15 +154,15 @@ export async function POST(request: NextRequest) {
     .maybeSingle()
 
   if (staffErr || !staffRow) {
-    return NextResponse.json({ ok: false, error: 'staff_not_found' }, { status: 404 })
+    return NextResponse.json({ ok: false, error: 'staff_not_found'}, { status: 404 })
   }
 
   if (!staffRow.is_active) {
-    return NextResponse.json({ ok: false, error: 'staff_inactive' }, { status: 403 })
+    return NextResponse.json({ ok: false, error: 'staff_inactive'}, { status: 403 })
   }
 
   if (String(staffRow.pin).trim() !== pin) {
-    return NextResponse.json({ ok: false, error: 'bad_pin' }, { status: 401 })
+    return NextResponse.json({ ok: false, error: 'bad_pin'}, { status: 401 })
   }
 
   const nowIso = new Date().toISOString()
@@ -179,7 +179,7 @@ export async function POST(request: NextRequest) {
 
     if (openErr) {
       console.error('staff-clock in open check', openErr)
-      return NextResponse.json({ ok: false, error: 'server' }, { status: 500 })
+      return NextResponse.json({ ok: false, error: 'server'}, { status: 500 })
     }
 
     if (open) {
@@ -204,7 +204,7 @@ export async function POST(request: NextRequest) {
 
     if (insErr) {
       console.error('staff-clock insert session', insErr)
-      return NextResponse.json({ ok: false, error: 'server' }, { status: 500 })
+      return NextResponse.json({ ok: false, error: 'server'}, { status: 500 })
     }
 
     return NextResponse.json({
@@ -227,7 +227,7 @@ export async function POST(request: NextRequest) {
 
   if (sessErr) {
     console.error('staff-clock out find', sessErr)
-    return NextResponse.json({ ok: false, error: 'server' }, { status: 500 })
+    return NextResponse.json({ ok: false, error: 'server'}, { status: 500 })
   }
 
   if (!session) {
@@ -242,7 +242,7 @@ export async function POST(request: NextRequest) {
 
   if (upErr) {
     console.error('staff-clock out update', upErr)
-    return NextResponse.json({ ok: false, error: 'server' }, { status: 500 })
+    return NextResponse.json({ ok: false, error: 'server'}, { status: 500 })
   }
 
   const dayYmd = getBelgiumDateString()

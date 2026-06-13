@@ -1,6 +1,6 @@
 /**
  * Reservatiedatum/tijd in de **lokale tijdzone van de browser** (klant).
- * Voorkomt UTC-bugs van `toISOString().split('T')[0]` bij min/max op date-inputs.
+ * Voorkomt UTC-bugs van `toISOString().split('T')[0]`bij min/max op date-inputs.
  */
 
 export function localCalendarDateString(d = new Date()): string {
@@ -27,7 +27,7 @@ export function compareYmd(a: string, b: string): number | null {
 }
 
 /**
- * Parseert `YYYY-MM-DD` + `H:mm` of `HH:mm` als lokale wall-clock.
+ * Parseert `YYYY-MM-DD`+ `H:mm`of `HH:mm`als lokale wall-clock.
  */
 export function parseReservationLocalDateTimeMs(dateYmd: string, timeHm: string): number | null {
   const dm = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(dateYmd ?? '').trim())

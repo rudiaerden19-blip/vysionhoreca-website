@@ -5,7 +5,7 @@ import { applyFrituurNolimDemoBranding, type DemoBrandingResetStatus } from '@/l
 /**
  * Periodieke reset voor de publieke demo (DEMO_TENANT_SLUG = frituurnolim), elk uur via Vercel cron (UTC).
  * Verwijdert operationele data én zet naam, kleuren, adres, uren en teksten
- * terug naar `demo-frituurnolim-baseline.ts` (Stripe/SMTP worden niet gewist — alleen niet mee in de update).
+ * terug naar `demo-frituurnolim-baseline.ts`(Stripe/SMTP worden niet gewist — alleen niet mee in de update).
  *
  * Nog niet automatisch teruggezet: menustructuur (categorieën/producten), personeelstabellen, abonnement.
  * Uitbreiding: verwijder + her-seed menu indien je canonieke demo-SQL hebt.
@@ -37,8 +37,8 @@ const TABLES_DELETE_IN_ORDER = [
 function normalizeTablesJson(data: unknown): unknown {
   if (!Array.isArray(data)) return data
   return data.map((t) => {
-    if (t && typeof t === 'object' && 'status' in t) {
-      return { ...(t as Record<string, unknown>), status: 'FREE' }
+    if (t && typeof t === 'object' && 'status'in t) {
+      return { ...(t as Record<string, unknown>), status: 'FREE'}
     }
     return t
   })
@@ -48,7 +48,7 @@ function normalizeDecorJson(data: unknown): unknown {
   if (Array.isArray(data)) return data
   if (data && typeof data === 'object') {
     const o = data as Record<string, unknown>
-    if ('items' in o || 'stool_statuses' in o) {
+    if ('items'in o || 'stool_statuses'in o) {
       return { ...o, stool_statuses: {} }
     }
   }
@@ -59,9 +59,9 @@ export type HourlyDemoResetResult = {
   tenant_slug: typeof DEMO_TENANT_SLUG
   deleted: { table: string; error: string | null }[]
   branding: DemoBrandingResetStatus
-  floor_plan_tables: 'updated' | 'skipped' | 'error'
-  floor_plan_decor: 'updated' | 'skipped' | 'error'
-  shop_online: 'updated' | 'skipped' | 'error'
+  floor_plan_tables: 'updated' |  'skipped' |  'error'
+  floor_plan_decor: 'updated' |  'skipped' |  'error'
+  shop_online: 'updated' |  'skipped' |  'error'
 }
 
 export async function runHourlyDemoTenantReset(
@@ -103,7 +103,7 @@ export async function runHourlyDemoTenantReset(
         else anyUpdated = true
       }
     }
-    floor_plan_tables = anyError ? 'error' : anyUpdated ? 'updated' : 'skipped'
+    floor_plan_tables = anyError ? 'error': anyUpdated ? 'updated': 'skipped'
   }
 
   let floor_plan_decor: HourlyDemoResetResult['floor_plan_decor'] = 'skipped'
@@ -130,7 +130,7 @@ export async function runHourlyDemoTenantReset(
         else anyUpdated = true
       }
     }
-    floor_plan_decor = anyError ? 'error' : anyUpdated ? 'updated' : 'skipped'
+    floor_plan_decor = anyError ? 'error': anyUpdated ? 'updated': 'skipped'
   }
 
   let shop_online: HourlyDemoResetResult['shop_online'] = 'skipped'

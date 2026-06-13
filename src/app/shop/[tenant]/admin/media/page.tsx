@@ -58,7 +58,7 @@ async function resizeImage(file: File): Promise<File> {
           if (blob) {
             // Maak nieuwe File met dezelfde naam maar .jpg extensie
             const newFileName = file.name.replace(/\.[^/.]+$/, '') + '.jpg'
-            const resizedFile = new File([blob], newFileName, { type: 'image/jpeg' })
+            const resizedFile = new File([blob], newFileName, { type: 'image/jpeg'})
             resolve(resizedFile)
           } else {
             resolve(file) // Fallback naar origineel
@@ -97,7 +97,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
   const [categories, setCategories] = useState<string[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string>('alle')
   const [selectedItems, setSelectedItems] = useState<string[]>([])
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [viewMode, setViewMode] = useState<'grid' |  'list'>('grid')
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
   const [showNewCategory, setShowNewCategory] = useState(false)
@@ -105,7 +105,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
   const [uploadCategory, setUploadCategory] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [settings, setSettings] = useState<TenantSettings | null>(null)
-  const [imageDisplayMode, setImageDisplayMode] = useState<'cover' | 'contain'>('cover')
+  const [imageDisplayMode, setImageDisplayMode] = useState<'cover' |  'contain'>('cover')
   const [savingDisplayMode, setSavingDisplayMode] = useState(false)
   const [savedDisplayMode, setSavedDisplayMode] = useState(false)
 
@@ -124,7 +124,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
     }
   }
 
-  const saveDisplayMode = async (mode: 'cover' | 'contain') => {
+  const saveDisplayMode = async (mode: 'cover' |  'contain') => {
     if (!settings) return
     setImageDisplayMode(mode)
     setSavingDisplayMode(true)
@@ -181,7 +181,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
         .from('media')
         .upload(fileName, file, {
           contentType: 'image/jpeg',
-          cacheControl: '31536000' // 1 jaar cache
+          cacheControl: '31536000'// 1 jaar cache
         })
 
       if (uploadError) {
@@ -226,7 +226,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
     if (successCount > 0) {
       alert(` ${successCount} foto('s) geüpload en geoptimaliseerd!`)
     } else if (errorMessage) {
-      alert(` Upload mislukt: ${errorMessage}`)
+      alert(`Upload mislukt: ${errorMessage}`)
     }
   }
 
@@ -308,9 +308,9 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
 
   const formatSize = (bytes: number | null | undefined) => {
     const b = bytes ?? 0
-    if (b < 1024) return b + ' B'
-    if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB'
-    return (b / (1024 * 1024)).toFixed(1) + ' MB'
+    if (b < 1024) return b + 'B'
+    if (b < 1024 * 1024) return (b / 1024).toFixed(1) + 'KB'
+    return (b / (1024 * 1024)).toFixed(1) + 'MB'
   }
 
   const formatDate = (date: string) => {
@@ -353,7 +353,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
             disabled={uploading}
             className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-xl font-medium flex items-center gap-2"
           >
-            {uploading ? `⏳ ${t('websiteMedia.optimizing')}` : ` ${t('websiteMedia.upload')}`}
+            {uploading ? ` ${t('websiteMedia.optimizing')}`: ` ${t('websiteMedia.upload')}`}
           </button>
           <input
             ref={fileInputRef}
@@ -410,7 +410,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
           {showNewCategory && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
+              animate={{ opacity: 1, height: 'auto'}}
               exit={{ opacity: 0, height: 0 }}
               className="mt-4 flex gap-2"
             >
@@ -562,13 +562,13 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
         <div className="flex bg-gray-100 rounded-lg p-1">
           <button
             onClick={() => setViewMode('grid')}
-            className={`px-3 py-1 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-white shadow' : ''}`}
+            className={`px-3 py-1 rounded-md transition-colors ${viewMode === 'grid'? 'bg-white shadow': ''}`}
           >
             ⊞
           </button>
           <button
             onClick={() => setViewMode('list')}
-            className={`px-3 py-1 rounded-md transition-colors ${viewMode === 'list' ? 'bg-white shadow' : ''}`}
+            className={`px-3 py-1 rounded-md transition-colors ${viewMode === 'list'? 'bg-white shadow': ''}`}
           >
             
           </button>
@@ -598,7 +598,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
               transition={{ delay: index * 0.03 }}
               onClick={() => toggleSelect(item.id)}
               className={`relative aspect-square rounded-xl overflow-hidden cursor-pointer group bg-gray-100 ${
-                selectedItems.includes(item.id) ? 'ring-4 ring-blue-500' : ''
+                selectedItems.includes(item.id) ? 'ring-4 ring-blue-500': ''
               }`}
             >
               <img
@@ -617,7 +617,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
                 <span className="text-lg"></span>
               </button>
               <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity pointer-events-none ${
-                selectedItems.includes(item.id) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                selectedItems.includes(item.id) ? 'opacity-100': 'opacity-0 group-hover:opacity-100'
               }`}>
                 <span className="text-3xl text-white">
                   {selectedItems.includes(item.id) ? '' : '○'}
@@ -644,7 +644,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
               key={item.id}
               onClick={(e) => handleListRowClick(e, item.id)}
               className={`flex items-center gap-4 p-4 border-b hover:bg-gray-50 cursor-pointer ${
-                selectedItems.includes(item.id) ? 'bg-blue-50' : ''
+                selectedItems.includes(item.id) ? 'bg-blue-50': ''
               }`}
             >
               <input
@@ -690,7 +690,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
         <div className="text-center py-12">
           <span className="text-6xl mb-4 block"></span>
           <h3 className="text-xl font-bold text-gray-900 mb-2">
-            {selectedCategory === 'alle' ? t('websiteMedia.noMedia') : `${t('websiteMedia.noPhotosIn')} "${selectedCategory}"`}
+            {selectedCategory === 'alle'? t('websiteMedia.noMedia') : `${t('websiteMedia.noPhotosIn')} "${selectedCategory}"`}
           </h3>
           <p className="text-gray-500">{t('websiteMedia.uploadFirstPhotos')}</p>
         </div>

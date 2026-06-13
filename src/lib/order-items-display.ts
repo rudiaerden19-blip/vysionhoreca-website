@@ -1,5 +1,5 @@
 /**
- * Orders bewaren `items` als JSONB met verschillende shapes:
+ * Orders bewaren `items`als JSONB met verschillende shapes:
  * - Webshop: product_name, unit_price, total_price, options[]
  * - Kassa mand / open tafel: { product: { name, price }, quantity, choices[] }
  */
@@ -17,7 +17,7 @@ export function orderItemDisplayName(item: unknown): string {
   return pn != null ? String(pn) : ''
 }
 
-/** Regels voor bon/UI: webshop `options` of kassa `choices`. */
+/** Regels voor bon/UI: webshop `options`of kassa `choices`. */
 export function orderItemDisplayOptionLines(item: unknown): string[] {
   if (!item || typeof item !== 'object') return []
   const o = item as Record<string, unknown>

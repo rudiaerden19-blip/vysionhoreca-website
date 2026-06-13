@@ -6,7 +6,7 @@ import { verifySuperAdminAccess } from '@/lib/verify-tenant-access'
  *
  * - **Development / test:** altijd toegestaan (lokale workflows breken niet).
  * - **Production:** alleen superadmin-sessie (headers) óf `x-internal-maintenance-secret`
- *   gelijk aan `INTERNAL_MAINTENANCE_SECRET` (optioneel, voor scripts zonder browser-sessie).
+ *   gelijk aan `INTERNAL_MAINTENANCE_SECRET`(optioneel, voor scripts zonder browser-sessie).
  */
 export async function assertInternalToolAccess(
   request: NextRequest

@@ -153,7 +153,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
       if (res.ok && result.success) {
         setSmtpSaved(true)
         setSmtpPasswordSet(true)
-        setSmtpData(prev => ({ ...prev, smtp_password: '' }))
+        setSmtpData(prev => ({ ...prev, smtp_password: ''}))
         setTimeout(() => setSmtpSaved(false), 3000)
       } else {
         setSmtpError(result.error || 'Opslaan mislukt')
@@ -724,7 +724,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
-            <span>⭐</span> {t('adminPages.profiel.specialtiesTitle')}
+            <span></span> {t('adminPages.profiel.specialtiesTitle')}
           </h2>
           <p className="text-gray-500 text-sm mb-6">{t('adminPages.profiel.specialtiesDesc')}</p>
           

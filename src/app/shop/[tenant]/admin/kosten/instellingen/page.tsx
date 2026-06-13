@@ -22,7 +22,7 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [businessId, setBusinessId] = useState<string | null>(null)
-  const [newCategory, setNewCategory] = useState({ name: '', multiplier: '' })
+  const [newCategory, setNewCategory] = useState({ name: '', multiplier: ''})
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingValues, setEditingValues] = useState<{[key: string]: string}>({})
 
@@ -76,12 +76,12 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
         name: newCategory.name,
         multiplier: multiplierValue,
       },
-      { tenantSlug: businessId, select: '*' }
+      { tenantSlug: businessId, select: '*'}
     )
     const inserted = Array.isArray(r.data) ? r.data[0] : r.data
     if (r.ok && inserted) {
       setCategories(prev => [...prev, inserted as any].sort((a: any, b: any) => a.name.localeCompare(b.name)))
-      setNewCategory({ name: '', multiplier: '' })
+      setNewCategory({ name: '', multiplier: ''})
       setShowAddForm(false)
     } else if (!r.ok) {
       console.error('[kosten/instellingen] insert:', r.error)
@@ -220,7 +220,7 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
                 onBlur={() => {
                   const val = editingValues[category.id]
                   if (val !== undefined) {
-                    updateMultiplier(category.id, val === '' ? 0 : parseFloat(val) || 0)
+                    updateMultiplier(category.id, val === ''? 0 : parseFloat(val) || 0)
                     setEditingValues(prev => {
                       const newVals = { ...prev }
                       delete newVals[category.id]

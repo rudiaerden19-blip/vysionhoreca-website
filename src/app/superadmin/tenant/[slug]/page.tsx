@@ -193,7 +193,7 @@ export default function TenantDetailPage() {
     })
     const json = await res.json().catch(() => ({}))
     if (!res.ok) {
-      alert('Opslaan mislukt: ' + (json?.error || `HTTP ${res.status}`))
+      alert('Opslaan mislukt: '+ (json?.error || `HTTP ${res.status}`))
       setSaving(false)
       return
     }
@@ -233,7 +233,7 @@ export default function TenantDetailPage() {
     const json = await res.json().catch(() => ({}))
     setSavingModules(false)
     if (!res.ok) {
-      alert('Modules opslaan mislukt: ' + (json?.error || `HTTP ${res.status}`))
+      alert('Modules opslaan mislukt: '+ (json?.error || `HTTP ${res.status}`))
       return
     }
     await loadData()
@@ -250,7 +250,7 @@ export default function TenantDetailPage() {
     })
     if (!res.ok) {
       const json = await res.json().catch(() => ({}))
-      alert('Activeren mislukt: ' + (json?.error || `HTTP ${res.status}`))
+      alert('Activeren mislukt: '+ (json?.error || `HTTP ${res.status}`))
       return
     }
     await loadData()
@@ -270,7 +270,7 @@ export default function TenantDetailPage() {
     })
     if (!res.ok) {
       const json = await res.json().catch(() => ({}))
-      alert('Opzeggen mislukt: ' + (json?.error || `HTTP ${res.status}`))
+      alert('Opzeggen mislukt: '+ (json?.error || `HTTP ${res.status}`))
       return
     }
     await loadData()
@@ -437,7 +437,7 @@ export default function TenantDetailPage() {
                 disabled={savingModules}
                 className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium disabled:opacity-50"
               >
-                {savingModules ? 'Opslaan…' : 'Modules opslaan'}
+                {savingModules ? 'Opslaan…': 'Modules opslaan'}
               </button>
               {!modulesFullAccess && (
                 <button
@@ -700,7 +700,7 @@ export default function TenantDetailPage() {
                 disabled={saving}
                 className="flex-1 px-4 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium transition-colors disabled:opacity-50"
               >
-                {saving ? 'Opslaan...' : 'Opslaan'}
+                {saving ? 'Opslaan...': 'Opslaan'}
               </button>
             </div>
           </motion.div>

@@ -83,7 +83,7 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
         onClick={handleSave}
         disabled={saving}
         className={`fixed bottom-6 right-6 z-50 px-6 py-4 rounded-2xl font-medium shadow-2xl flex items-center gap-2 ${
-          saved ? 'bg-green-500 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'
+          saved ? 'bg-green-500 text-white': 'bg-blue-600 hover:bg-blue-700 text-white'
         }`}
       >
         {saving ? (
@@ -263,14 +263,14 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
             {[
               { key: 'payment_cash', icon: '', label: t('adminPages.betaling.cash'), desc: t('adminPages.betaling.cashDesc') },
               { key: 'payment_card', icon: '', label: t('adminPages.betaling.bancontact'), desc: t('adminPages.betaling.bancontactDesc') },
-              { key: 'payment_online', icon: '', label: 'Online betaling', desc: 'Betaling via link of QR-code' },
+              { key: 'payment_online', icon: '', label: 'Online betaling', desc: 'Betaling via link of QR-code'},
             ].map(({ key, icon, label, desc }) => {
               const val = !!(settings as any)[key]
               return (
                 <div
                   key={key}
                   onClick={() => handleChange(key as any, !val)}
-                  className={`flex items-center justify-between p-4 rounded-xl cursor-pointer transition-all ${val ? 'bg-blue-50 border-2 border-blue-500' : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'}`}
+                  className={`flex items-center justify-between p-4 rounded-xl cursor-pointer transition-all ${val ? 'bg-blue-50 border-2 border-blue-500': 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'}`}
                 >
                   <div className="flex items-center gap-4">
                     <span className="text-2xl">{icon}</span>
@@ -279,8 +279,8 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
                       <p className="text-sm text-gray-400">{desc}</p>
                     </div>
                   </div>
-                  <button type="button" className={`relative w-12 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ${val ? 'bg-blue-600' : 'bg-gray-300'}`}>
-                    <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${val ? 'translate-x-6' : 'translate-x-0'}`} />
+                  <button type="button" className={`relative w-12 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ${val ? 'bg-blue-600': 'bg-gray-300'}`}>
+                    <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${val ? 'translate-x-6': 'translate-x-0'}`} />
                   </button>
                 </div>
               )
@@ -303,7 +303,7 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
                 <span className="font-medium text-gray-900 text-sm">{t('adminPages.levering.pickup.title')}</span>
               </div>
               <p className="text-gray-500 text-sm">
-                {settings.pickup_enabled ? `${settings.pickup_time_minutes} min` : t('adminPages.common.disabled')}
+                {settings.pickup_enabled ? `${settings.pickup_time_minutes} min`: t('adminPages.common.disabled')}
               </p>
             </div>
             <div className="bg-white rounded-xl p-4 shadow-sm">
@@ -312,7 +312,7 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
                 <span className="font-medium text-gray-900 text-sm">{t('adminPages.levering.delivery.title')}</span>
               </div>
               <p className="text-gray-500 text-sm">
-                {settings.delivery_enabled ? `€${settings.delivery_fee} · ${settings.delivery_radius_km}km` : t('adminPages.common.disabled')}
+                {settings.delivery_enabled ? `€${settings.delivery_fee} · ${settings.delivery_radius_km}km`: t('adminPages.common.disabled')}
               </p>
             </div>
             <div className="bg-white rounded-xl p-4 shadow-sm">

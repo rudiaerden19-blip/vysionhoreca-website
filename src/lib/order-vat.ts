@@ -12,7 +12,7 @@ export function normalizeCategoryVatPercent(
   raw: unknown,
   fallback: number,
 ): CategoryVatPercent {
-  const n = typeof raw === 'number' ? raw : typeof raw === 'string' ? parseInt(raw, 10) : NaN
+  const n = typeof raw === 'number'? raw : typeof raw === 'string'? parseInt(raw, 10) : NaN
   if (n === 6 || n === 9 || n === 12 || n === 21) return n
   const f =
     fallback === 6 || fallback === 9 || fallback === 12 || fallback === 21 ? fallback : 21
@@ -98,7 +98,7 @@ function round2(n: number): number {
   return Math.round(n * 100) / 100
 }
 
-/** Minimale order-schil voor Z-aggregatie uit `orders` JSON. */
+/** Minimale order-schil voor Z-aggregatie uit `orders`JSON. */
 export interface ZReportVatOrderSlice {
   total?: unknown
   items?: unknown
@@ -147,8 +147,8 @@ function parseItems(raw: unknown): unknown[] {
 
 /**
  * Brutobedrag en btw per officiële tarief voor één order.
- * Tarief op regel: `btw_percentage` indien aanwezig, anders zaak‑default.
- * Verschil `order.total` − som(regels): toegewezen aan defaulttarief (kostenbezorging enz.).
+ * Tarief op regel: `btw_percentage`indien aanwezig, anders zaak‑default.
+ * Verschil `order.total`− som(regels): toegewezen aan defaulttarief (kostenbezorging enz.).
  */
 export function allocateVatBucketsForSingleOrder(
   order: ZReportVatOrderSlice,
@@ -199,7 +199,7 @@ export function allocateVatBucketsForSingleOrder(
   return { subtotalExcl, buckets }
 }
 
-/** Z-rapport: `tax_mid` = 9% + 12% in één kolom. */
+/** Z-rapport: `tax_mid`= 9% + 12% in één kolom. */
 export function foldVatBucketsToZColumns(buckets: Record<CategoryVatPercent, number>): {
   tax_low: number
   tax_mid: number

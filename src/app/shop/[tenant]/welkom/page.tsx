@@ -52,12 +52,12 @@ export default function WelkomPage({ params }: { params: { tenant: string } }) {
     <div className="fixed inset-0 flex select-none flex-col items-center justify-center bg-[#e3e3e3] px-6">
       <div
         className={`mb-3 text-center transition-all duration-1000 ease-out ${
-          showTitle ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+          showTitle ? 'translate-y-0 opacity-100': 'translate-y-4 opacity-0'
         }`}
       >
         <h1
           className="text-[clamp(2rem,8vw,4.5rem)] font-black leading-tight tracking-tight text-gray-900"
-          style={{ letterSpacing: '-0.02em' }}
+          style={{ letterSpacing: '-0.02em'}}
         >
           Vysion kassa's
         </h1>
@@ -68,16 +68,16 @@ export default function WelkomPage({ params }: { params: { tenant: string } }) {
 
       <p
         className={`mb-14 text-center text-sm font-semibold uppercase tracking-[0.2em] text-gray-600 transition-opacity duration-1000 ease-out ${
-          showTitle ? 'opacity-100' : 'opacity-0'
+          showTitle ? 'opacity-100': 'opacity-0'
         }`}
-        style={{ transitionDelay: showTitle ? '200ms' : '0ms' }}
+        style={{ transitionDelay: showTitle ? '200ms': '0ms'}}
       >
         Vysion kassa's platform
       </p>
 
       <div
         className={`transition-opacity duration-500 ease-out ${
-          showButton ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
+          showButton ? 'pointer-events-auto opacity-100': 'pointer-events-none opacity-0'
         }`}
       >
         <button

@@ -20,7 +20,7 @@ export function requireCronSecret(
       requestId: context?.requestId,
       route: context?.route,
     })
-    return NextResponse.json({ error: 'Cron misconfigured' }, { status: 503 })
+    return NextResponse.json({ error: 'Cron misconfigured'}, { status: 503 })
   }
 
   const authHeader = request.headers.get('authorization')
@@ -29,7 +29,7 @@ export function requireCronSecret(
       requestId: context?.requestId,
       route: context?.route,
     })
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return NextResponse.json({ error: 'Unauthorized'}, { status: 401 })
   }
 
   return null

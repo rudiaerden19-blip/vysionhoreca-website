@@ -183,7 +183,7 @@ export interface FloorPlanTable {
   id: string
   number: string
   seats: number
-  shape: 'ROUND' | 'SQUARE' | 'RECTANGLE'
+  shape: 'ROUND' |  'SQUARE' |  'RECTANGLE'
   x: number
   y: number
   rotation: number

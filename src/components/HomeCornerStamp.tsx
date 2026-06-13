@@ -70,12 +70,12 @@ export default function HomeCornerStamp({
   const bottomArc = arcBottomKey ? t(arcBottomKey) : t('homeCornerStamp.bottomArc')
   const centerWord = centerWordKey ? t(centerWordKey) : 'VYSION'
   const centerFontSize = centerWordKey ? (centerWord.length > 9 ? 14 : centerWord.length > 6 ? 17 : 22) : 26
-  const centerLetterSpacing = centerWordKey ? '0.06em' : '0.14em'
+  const centerLetterSpacing = centerWordKey ? '0.06em': '0.14em'
 
   return (
     <div
       className={`home-stamp-wrap pointer-events-none absolute bottom-3 right-3 z-10 hidden md:block overflow-visible w-[176px] h-[176px] sm:w-[198px] sm:h-[198px] ${
-        visible ? 'home-stamp-visible' : 'home-stamp-hidden'
+        visible ? 'home-stamp-visible': 'home-stamp-hidden'
       }`}
       aria-hidden="true"
     >
@@ -115,7 +115,7 @@ export default function HomeCornerStamp({
           fontSize="19"
           fontWeight="800"
           letterSpacing="0.1em"
-          style={{ fontFamily: 'system-ui, sans-serif' }}
+          style={{ fontFamily: 'system-ui, sans-serif'}}
         >
           <textPath href={`#${arcLowerPathId}`} startOffset="50%" textAnchor="middle">
             {topArc}
@@ -125,8 +125,8 @@ export default function HomeCornerStamp({
           fill="currentColor"
           fontSize={centerWordKey ? 17 : 15}
           fontWeight="700"
-          letterSpacing={centerWordKey ? '0.07em' : '0.05em'}
-          style={{ fontFamily: 'system-ui, sans-serif' }}
+          letterSpacing={centerWordKey ? '0.07em': '0.05em'}
+          style={{ fontFamily: 'system-ui, sans-serif'}}
         >
           <textPath
             href={`#${centerWordKey ? arcUpperOuterPathId : arcUpperPathId}`}
@@ -152,7 +152,7 @@ export default function HomeCornerStamp({
           fontSize={centerFontSize}
           fontWeight="800"
           letterSpacing={centerLetterSpacing}
-          style={{ fontFamily: 'system-ui, sans-serif' }}
+          style={{ fontFamily: 'system-ui, sans-serif'}}
         >
           {centerWord}
         </text>

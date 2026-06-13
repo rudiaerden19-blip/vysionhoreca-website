@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     if (cronDenied) return cronDenied
 
     const supabase = getServerSupabaseClient()
-    if (!supabase) return NextResponse.json({ error: 'DB not configured' }, { status: 503 })
+    if (!supabase) return NextResponse.json({ error: 'DB not configured'}, { status: 503 })
 
     // Vroeger: `new Date(); tomorrow.setDate(+1); toISOString().split('T')[0]`.
     // Dat werkt op UTC-kalender, niet op Brussel. Bij DST-grenzen of als de
@@ -60,11 +60,11 @@ export async function GET(request: NextRequest) {
         await transporter.sendMail({
           from: `"${businessName}" <${process.env.ZOHO_EMAIL}>`,
           to: r.guest_email,
-          subject: `⏰ Herinnering: Uw reservatie morgen bij ${businessName}`,
+          subject: `Herinnering: Uw reservatie morgen bij ${businessName}`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
               <div style="text-align: center; padding: 30px; background: #f59e0b; border-radius: 16px 16px 0 0;">
-                <span style="font-size: 64px;">⏰</span>
+                <span style="font-size: 64px;"></span>
                 <h1 style="color: white; margin: 20px 0 10px; font-size: 28px;">Herinnering Reservatie</h1>
                 <p style="color: rgba(255,255,255,0.9); font-size: 16px; margin: 0;">${businessName}</p>
               </div>
@@ -72,16 +72,16 @@ export async function GET(request: NextRequest) {
                 <p style="font-size: 16px; color: #333; margin-bottom: 20px;">Beste ${r.guest_name},</p>
                 <p style="font-size: 15px; color: #555;">Dit is een herinnering voor uw reservatie <strong>morgen</strong>.</p>
                 <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 20px; margin: 20px 0;">
-                  <h3 style="margin: 0 0 15px; color: #166534; font-size: 16px;">📋 Uw reservatie</h3>
+                  <h3 style="margin: 0 0 15px; color: #166534; font-size: 16px;"> Uw reservatie</h3>
                   <table style="width: 100%;">
-                    <tr><td style="padding: 6px 0; color: #555; width: 40%;"><strong>📅 Datum</strong></td><td style="color: #333;">${formattedDate}</td></tr>
-                    <tr><td style="padding: 6px 0; color: #555;"><strong>🕐 Tijd</strong></td><td style="color: #333;">${r.reservation_time}</td></tr>
-                    <tr><td style="padding: 6px 0; color: #555;"><strong>👥 Personen</strong></td><td style="color: #333;">${r.party_size} ${r.party_size === 1 ? 'persoon' : 'personen'}</td></tr>
-                    ${r.table_number ? `<tr><td style="padding: 6px 0; color: #555;"><strong>🪑 Tafel</strong></td><td style="color: #333;">${r.table_number}</td></tr>` : ''}
+                    <tr><td style="padding: 6px 0; color: #555; width: 40%;"><strong> Datum</strong></td><td style="color: #333;">${formattedDate}</td></tr>
+                    <tr><td style="padding: 6px 0; color: #555;"><strong> Tijd</strong></td><td style="color: #333;">${r.reservation_time}</td></tr>
+                    <tr><td style="padding: 6px 0; color: #555;"><strong> Personen</strong></td><td style="color: #333;">${r.party_size} ${r.party_size === 1 ? 'persoon': 'personen'}</td></tr>
+                    ${r.table_number ? `<tr><td style="padding: 6px 0; color: #555;"><strong> Tafel</strong></td><td style="color: #333;">${r.table_number}</td></tr>`: ''}
                   </table>
                 </div>
                 <p style="color: #666; font-size: 14px;">
-                  Kunt u niet komen? Annuleer dan tijdig via ${businessPhone ? `<strong>${businessPhone}</strong>` : 'de zaak'}.
+                  Kunt u niet komen? Annuleer dan tijdig via ${businessPhone ? `<strong>${businessPhone}</strong>`: 'de zaak'}.
                 </p>
               </div>
               <div style="background: #f9f9f9; padding: 20px; border-radius: 0 0 16px 16px; border: 1px solid #e5e5e5; border-top: none; text-align: center;">
@@ -111,6 +111,6 @@ export async function GET(request: NextRequest) {
       requestId,
       error: error instanceof Error ? error.message : String(error),
     })
-    return NextResponse.json({ error: 'Cron failed' }, { status: 500 })
+    return NextResponse.json({ error: 'Cron failed'}, { status: 500 })
   }
 }

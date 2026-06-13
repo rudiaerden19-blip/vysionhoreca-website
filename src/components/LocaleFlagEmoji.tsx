@@ -1,8 +1,8 @@
 import type { Locale } from '@/i18n/config'
 
 /**
- * Taal-weergave: `badge` = duidelijke tegel met rand (admin/marketing).
- * `inline` = alleen ISO-codetekst — op donkere balk naast bv. logout minder „dubbel vak”.
+ * Taal-weergave: `badge`= duidelijke tegel met rand (admin/marketing).
+ * `inline`= alleen ISO-codetekst — op donkere balk naast bv. logout minder „dubbel vak”.
  */
 export function LocaleFlagEmoji({
   locale,
@@ -11,7 +11,7 @@ export function LocaleFlagEmoji({
 }: {
   locale: Locale
   className?: string
-  variant?: 'badge' | 'inline'
+  variant?: 'badge' |  'inline'
 }) {
   const code = locale.toUpperCase()
   if (variant === 'inline') {

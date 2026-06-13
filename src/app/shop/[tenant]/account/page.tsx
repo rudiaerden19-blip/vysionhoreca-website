@@ -21,7 +21,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
   const [redeeming, setRedeeming] = useState<string | null>(null)
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [editForm, setEditForm] = useState({ name: '', phone: '', address: '', postal_code: '', city: '' })
+  const [editForm, setEditForm] = useState({ name: '', phone: '', address: '', postal_code: '', city: ''})
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [deleteConfirmText, setDeleteConfirmText] = useState('')
@@ -120,7 +120,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
         ...customer,
         loyalty_points: (customer.loyalty_points || 0) - reward.points_required,
       })
-      alert(' ' + t('accountPage.redeemSuccess').replace('{reward}', reward.name))
+      alert(' '+ t('accountPage.redeemSuccess').replace('{reward}', reward.name))
     } else {
       alert(t('accountPage.deleteError'))
     }
@@ -159,7 +159,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          style={{ borderColor: primaryColor, borderTopColor: 'transparent' }}
+          style={{ borderColor: primaryColor, borderTopColor: 'transparent'}}
           className="w-12 h-12 border-4 rounded-full"
         />
       </div>
@@ -167,7 +167,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
   }
 
   return (
-    <div style={{ width: '100%', maxWidth: '100%', overflowX: 'clip' }} className="min-h-screen bg-gray-50">
+    <div style={{ width: '100%', maxWidth: '100%', overflowX: 'clip'}} className="min-h-screen bg-gray-50">
       <ConfirmModal />
       <LogoutSoftwareConfirmModal
         open={logoutSoftwareConfirmOpen}
@@ -217,7 +217,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
               onClick={() => setEditing(!editing)}
               className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium transition-colors text-sm sm:text-base shrink-0"
             >
-              {editing ? t('accountPage.cancel') : ' ' + t('accountPage.edit')}
+              {editing ? t('accountPage.cancel') : ' '+ t('accountPage.edit')}
             </button>
           </div>
 
@@ -298,7 +298,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl p-6 text-white mb-6"
-          style={{ background: `linear-gradient(135deg, ${primaryColor}, ${primaryColor}cc)` }}
+          style={{ background: `linear-gradient(135deg, ${primaryColor}, ${primaryColor}cc)`}}
         >
           <div className="flex items-center justify-between">
             <div>
@@ -328,7 +328,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
                   <div 
                     key={reward.id} 
                     className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all ${
-                      canRedeem ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'
+                      canRedeem ? 'border-green-200 bg-green-50': 'border-gray-200 bg-gray-50'
                     }`}
                   >
                     <div>
@@ -336,8 +336,8 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
                       {reward.description && (
                         <p className="text-sm text-gray-500">{reward.description}</p>
                       )}
-                      <p className="text-sm font-medium mt-1" style={{ color: canRedeem ? '#16a34a' : '#9ca3af' }}>
-                        ⭐ {reward.points_required} {t('accountPage.points')}
+                      <p className="text-sm font-medium mt-1" style={{ color: canRedeem ? '#16a34a': '#9ca3af'}}>
+                         {reward.points_required} {t('accountPage.points')}
                       </p>
                     </div>
                     <button
@@ -482,7 +482,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
                 disabled={deleteConfirmText !== t('accountPage.deleteConfirmWord') || deleting}
                 className="flex-1 px-4 py-3 bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white rounded-xl font-medium"
               >
-                {deleting ? t('accountPage.deleting') : ' ' + t('accountPage.deleteAccount')}
+                {deleting ? t('accountPage.deleting') : ' '+ t('accountPage.deleteAccount')}
               </button>
             </div>
           </motion.div>

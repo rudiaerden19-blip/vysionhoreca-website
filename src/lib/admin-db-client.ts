@@ -1,19 +1,19 @@
 /**
- * Client-side helper die admin-mutations naar `/api/admin/db` stuurt.
+ * Client-side helper die admin-mutations naar `/api/admin/db`stuurt.
  *
  *   import { adminDb } from '@/lib/admin-db-client'
  *
  *   await adminDb.insert('menu_products', { tenant_slug, name, price })
  *   await adminDb.update('menu_products', { name }, { id, tenant_slug })
- *   await adminDb.upsert('tenant_settings', settings, { onConflict: 'tenant_slug' })
+ *   await adminDb.upsert('tenant_settings', settings, { onConflict: 'tenant_slug'})
  *   await adminDb.delete('menu_products', { id, tenant_slug })
  *
  * De helper voegt automatisch:
- *   · auth-headers toe (`x-business-id` / `x-superadmin-id`)
- *   · `tenantSlug` uit `getCurrentTenantSlug()` als die niet expliciet meegegeven wordt
+ *   · auth-headers toe (`x-business-id`/ `x-superadmin-id`)
+ *   · `tenantSlug`uit `getCurrentTenantSlug()`als die niet expliciet meegegeven wordt
  *   · 8s timeout (Vercel default is 10s — we willen ruim binnen blijven)
  *
- * Geeft `{ ok: true, data }` of `{ ok: false, error }` terug. Geen exception tenzij
+ * Geeft `{ ok: true, data }`of `{ ok: false, error }`terug. Geen exception tenzij
  * netwerkfout.
  */
 
@@ -21,7 +21,7 @@
 
 import { authFetch, getCurrentTenantSlug } from './auth-headers'
 
-export type AdminDbOp = 'insert' | 'update' | 'upsert' | 'delete'
+export type AdminDbOp = 'insert' |  'update' |  'upsert' |  'delete'
 
 interface AdminDbResult<T = unknown> {
   ok: boolean
@@ -90,14 +90,14 @@ async function call<T>(
 
 // ── READ-pad ────────────────────────────────────────────────────────────────
 // Stuurt naar /api/admin/db/read. Gebruik dit als je een tabel leest die in
-// `admin-db-proxy-spec.ts` staat én die GDPR/commercieel gevoelig is. Zo
+// `admin-db-proxy-spec.ts`staat én die GDPR/commercieel gevoelig is. Zo
 // blijft de anon-key buiten de tabel.
 
 export interface AdminDbSelectOptions {
   tenantSlug?: string
-  /** PostgREST select-string, default '*' */
+  /** PostgREST select-string, default '*'*/
   select?: string
-  /** eq-filters: { col: value }; null wordt vertaald naar `.is(col, null)` */
+  /** eq-filters: { col: value }; null wordt vertaald naar `.is(col, null)`*/
   match?: Record<string, unknown>
   /** in-filters: { col: [v1, v2, …] } */
   in?: Record<string, unknown[]>
@@ -105,13 +105,13 @@ export interface AdminDbSelectOptions {
   gte?: Record<string, unknown>
   /** lte-filters */
   lte?: Record<string, unknown>
-  /** [col, op, val] tupels voor `.not(col, op, val)` */
+  /** [col, op, val] tupels voor `.not(col, op, val)`*/
   not?: Array<[string, string, unknown]>
   order?: { column: string; ascending?: boolean }
   limit?: number
   range?: [number, number]
-  /** 'one' = .single(), 'maybe' = .maybeSingle() */
-  single?: 'one' | 'maybe'
+  /** 'one'= .single(), 'maybe'= .maybeSingle() */
+  single?: 'one' |  'maybe'
   signal?: AbortSignal
   timeoutMs?: number
 }

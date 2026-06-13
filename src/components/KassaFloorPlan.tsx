@@ -68,7 +68,7 @@ interface Props {
   /** Na geslaagde upsert: parent-state (`pickerTables`) gelijk trekken — anders overschrijft seed een net toegevoegde terrastafel tot refresh. */
   onFloorPlanTablesPersisted?: (planZone: FloorPlanZone, tables: KassaTable[]) => void
   /** Start/einde van plattegrond-upsert: parent blokkeert poll/realtime die kortere snapshots pusht. */
-  onFloorPlanTablesPersistLifecycle?: (planZone: FloorPlanZone, phase: 'start' | 'end') => void
+  onFloorPlanTablesPersistLifecycle?: (planZone: FloorPlanZone, phase: 'start' |  'end') => void
 }
 
 function makeId() { return Math.random().toString(36).slice(2, 10) }
@@ -84,7 +84,7 @@ function sanitizeDecors(list: DecorItem[]): DecorItem[] {
   return list.map(d => ({ ...d, x: clampPct(d.x), y: clampPct(d.y) }))
 }
 
-export type DecorType = 'bar_segment' | 'plant'
+export type DecorType = 'bar_segment' |  'plant'
 export interface DecorItem {
   id: string
   type: DecorType
@@ -112,7 +112,7 @@ function DecorSVG({
 }) {
   if (item.type === 'plant') {
     return (
-      <svg width={80} height={100} style={{ overflow: 'visible' }}>
+      <svg width={80} height={100} style={{ overflow: 'visible'}}>
         <defs>
           <radialGradient id="pot-grad" cx="40%" cy="30%">
             <stop offset="0%" stopColor="#c1440e" />
@@ -152,13 +152,13 @@ function DecorSVG({
   const s1 = item.stool1 || '?'
   const s2 = item.stool2 || '?'
   const getColor = (stoolId: string) => {
-    const status = getStoolStatus ? getStoolStatus(stoolId) : (orderedStools.has(stoolId) ? 'OCCUPIED' : 'FREE')
+    const status = getStoolStatus ? getStoolStatus(stoolId) : (orderedStools.has(stoolId) ? 'OCCUPIED': 'FREE')
     return STATUS_COLORS[status]
   }
   const stool1Color = getColor(s1)
   const stool2Color = getColor(s2)
   return (
-    <svg width={bw} height={bh + stoolR * 2 + 10} style={{ overflow: 'visible' }}>
+    <svg width={bw} height={bh + stoolR * 2 + 10} style={{ overflow: 'visible'}}>
       <defs>
         <linearGradient id="bar-grad" x1="0%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stopColor="#6b6b6b" />
@@ -171,7 +171,7 @@ function DecorSVG({
       </defs>
       {/* Bar balk */}
       <rect x={0} y={stoolR * 2 + 6} width={bw} height={bh} rx={6}
-        fill="url(#bar-grad)" stroke={isSelected ? '#60a5fa' : '#222'} strokeWidth={isSelected ? 3 : 2} filter="url(#bshadow)" />
+        fill="url(#bar-grad)" stroke={isSelected ? '#60a5fa': '#222'} strokeWidth={isSelected ? 3 : 2} filter="url(#bshadow)" />
       {/* Rand bovenop */}
       <rect x={0} y={stoolR * 2 + 6} width={bw} height={8} rx={3} fill="#888" opacity={0.5} />
       {/* Label */}
@@ -188,7 +188,7 @@ function DecorSVG({
   )
 }
 
-type TableVisualZone = 'indoor' | 'terrace'
+type TableVisualZone = 'indoor' |  'terrace'
 
 function TerraceChairTop({ chairW, chairH }: { chairW: number; chairH: number }) {
   const hw = chairW / 2
@@ -284,10 +284,10 @@ function TableSVG({
     } else {
       const perSide = Math.ceil(seats / 4)
       const sides = [
-        { angle: 0, axis: 'x' as const, fixed: -dist },
-        { angle: -90, axis: 'y' as const, fixed: dist },
-        { angle: 180, axis: 'x' as const, fixed: dist },
-        { angle: 90, axis: 'y' as const, fixed: -dist },
+        { angle: 0, axis: 'x'as const, fixed: -dist },
+        { angle: -90, axis: 'y'as const, fixed: dist },
+        { angle: 180, axis: 'x'as const, fixed: dist },
+        { angle: 90, axis: 'y'as const, fixed: -dist },
       ]
       let placed = 0
       for (const side of sides) {
@@ -295,8 +295,8 @@ function TableSVG({
         for (let i = 0; i < count; i++) {
           const offset = (i - (count - 1) / 2) * (chairW + 6)
           chairs.push({
-            x: side.axis === 'x' ? offset : side.fixed,
-            y: side.axis === 'y' ? offset : side.fixed,
+            x: side.axis === 'x'? offset : side.fixed,
+            y: side.axis === 'y'? offset : side.fixed,
             angle: side.angle,
           })
           placed++
@@ -336,8 +336,8 @@ function TableSVG({
 
   // SVG canvas size
   const pad = 80
-  const tw = table.shape === 'RECTANGLE' ? tableSize * 1.7 : tableSize
-  const th = table.shape === 'RECTANGLE' ? tableSize * 0.65 : tableSize
+  const tw = table.shape === 'RECTANGLE'? tableSize * 1.7 : tableSize
+  const th = table.shape === 'RECTANGLE'? tableSize * 0.65 : tableSize
   const svgW = tw + pad * 2 + 40
   const svgH = th + pad * 2 + 40
   const cx = svgW / 2
@@ -348,7 +348,7 @@ function TableSVG({
       width={svgW}
       height={svgH}
       {...(onClick ? { onClick } : {})}
-      style={{ cursor: 'pointer', overflow: 'visible', display: 'block' }}
+      style={{ cursor: 'pointer', overflow: 'visible', display: 'block'}}
     >
       {/* Stoelen — binnen: gestoffeerd; terras: metalen bistro */}
       {chairs.map((c, i) => (
@@ -360,7 +360,7 @@ function TableSVG({
       {/* Tafelblad */}
       {isTerrace ? (
         <>
-          {table.shape === 'ROUND' ? (
+          {table.shape === 'ROUND'? (
             <>
               <ellipse
                 cx={cx}
@@ -396,11 +396,11 @@ function TableSVG({
             </>
           ) : (
             <rect
-              x={cx - (table.shape === 'RECTANGLE' ? tw : tableSize) / 2}
-              y={cy - (table.shape === 'RECTANGLE' ? th : tableSize) / 2}
-              width={table.shape === 'RECTANGLE' ? tw : tableSize}
-              height={table.shape === 'RECTANGLE' ? th : tableSize}
-              rx={table.shape === 'RECTANGLE' ? 8 : 10}
+              x={cx - (table.shape === 'RECTANGLE'? tw : tableSize) / 2}
+              y={cy - (table.shape === 'RECTANGLE'? th : tableSize) / 2}
+              width={table.shape === 'RECTANGLE'? tw : tableSize}
+              height={table.shape === 'RECTANGLE'? th : tableSize}
+              rx={table.shape === 'RECTANGLE'? 8 : 10}
               fill={`url(#terrace-rect-${gradKey})`}
               stroke={isSelected ? color : '#5c4a32'}
               strokeWidth={isSelected ? 4 : 2.5}
@@ -410,8 +410,8 @@ function TableSVG({
           {table.shape !== 'ROUND' && (
             <>
               {Array.from({ length: 6 }).map((_, i) => {
-                const top = cy - (table.shape === 'RECTANGLE' ? th : tableSize) / 2 + 8
-                const w = table.shape === 'RECTANGLE' ? tw : tableSize
+                const top = cy - (table.shape === 'RECTANGLE'? th : tableSize) / 2 + 8
+                const w = table.shape === 'RECTANGLE'? tw : tableSize
                 const step = w / 7
                 return (
                   <line
@@ -419,7 +419,7 @@ function TableSVG({
                     x1={cx - w / 2 + step * (i + 0.5)}
                     y1={top}
                     x2={cx - w / 2 + step * (i + 0.5)}
-                    y2={top + (table.shape === 'RECTANGLE' ? th : tableSize) - 16}
+                    y2={top + (table.shape === 'RECTANGLE'? th : tableSize) - 16}
                     stroke="rgba(30,22,14,0.2)"
                     strokeWidth={2}
                   />
@@ -434,8 +434,8 @@ function TableSVG({
               [-1, 1],
               [1, 1],
             ].map(([sx, sy], i) => {
-              const hw = (table.shape === 'RECTANGLE' ? tw : tableSize) / 2 - 10
-              const hh = (table.shape === 'RECTANGLE' ? th : tableSize) / 2 - 10
+              const hw = (table.shape === 'RECTANGLE'? tw : tableSize) / 2 - 10
+              const hh = (table.shape === 'RECTANGLE'? th : tableSize) / 2 - 10
               return (
                 <circle
                   key={i}
@@ -451,7 +451,7 @@ function TableSVG({
         </>
       ) : (
         <>
-          {table.shape === 'ROUND' ? (
+          {table.shape === 'ROUND'? (
             <ellipse
               cx={cx}
               cy={cy}
@@ -462,7 +462,7 @@ function TableSVG({
               strokeWidth={isSelected ? 4 : 2}
               filter={`url(#shadow-${gradKey})`}
             />
-          ) : table.shape === 'RECTANGLE' ? (
+          ) : table.shape === 'RECTANGLE'? (
             <rect
               x={cx - tw / 2}
               y={cy - th / 2}
@@ -487,7 +487,7 @@ function TableSVG({
               filter={`url(#shadow-${gradKey})`}
             />
           )}
-          {table.shape === 'ROUND' ? (
+          {table.shape === 'ROUND'? (
             <ellipse cx={cx - 12} cy={cy - 14} rx={16} ry={10} fill="rgba(255,255,255,0.08)" />
           ) : (
             <rect
@@ -503,7 +503,7 @@ function TableSVG({
       )}
 
       {/* Tafelnummer */}
-      <text x={cx} y={cy - 6} textAnchor="middle" fill="white" fontSize={20} fontWeight="bold" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))' }}>
+      <text x={cx} y={cy - 6} textAnchor="middle" fill="white" fontSize={20} fontWeight="bold" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))'}}>
         {table.number}
       </text>
       <text x={cx} y={cy + 14} textAnchor="middle" fill="white" fontSize={12} fontWeight="600">
@@ -511,7 +511,7 @@ function TableSVG({
       </text>
 
       {/* Status dot */}
-      <circle cx={cx + (table.shape === 'RECTANGLE' ? tw / 2 : tableSize / 2) - 4} cy={cy - (table.shape === 'RECTANGLE' ? th / 2 : tableSize / 2) + 4} r={8} fill={color} stroke="white" strokeWidth={2} />
+      <circle cx={cx + (table.shape === 'RECTANGLE'? tw / 2 : tableSize / 2) - 4} cy={cy - (table.shape === 'RECTANGLE'? th / 2 : tableSize / 2) + 4} r={8} fill={color} stroke="white" strokeWidth={2} />
 
       <defs>
         <linearGradient id={`table-grad-round-${gradKey}`} x1="0%" y1="0%" x2="100%" y2="100%">
@@ -567,7 +567,7 @@ export default function KassaFloorPlan({
       ? `vysion_tables_${tenant}`
       : `vysion_tables_terrace_${tenant}`
   const decorKey =
-    planZone === FLOOR_PLAN_ZONE_INSIDE ? `vysion_decor_${tenant}` : `vysion_decor_terrace_${tenant}`
+    planZone === FLOOR_PLAN_ZONE_INSIDE ? `vysion_decor_${tenant}`: `vysion_decor_terrace_${tenant}`
   const stoolStatusKey =
     planZone === FLOOR_PLAN_ZONE_INSIDE
       ? `vysion_stool_status_${tenant}`
@@ -588,7 +588,7 @@ export default function KassaFloorPlan({
   const [showAddBarModal, setShowAddBarModal] = useState(false)
   const [addStool1, setAddStool1] = useState('K1')
   const [addStool2, setAddStool2] = useState('K2')
-  const [editStoolVals, setEditStoolVals] = useState({ s1: '', s2: '' })
+  const [editStoolVals, setEditStoolVals] = useState({ s1: '', s2: ''})
   // Kruk statussen: { "K1": "FREE"|"OCCUPIED"|"UNPAID", ... }
   const [stoolStatuses, setStoolStatuses] = useState<Record<string, TableStatus>>({})
 
@@ -597,7 +597,7 @@ export default function KassaFloorPlan({
   const pointerCaptureRef = useRef<{ pointerId: number; element: HTMLElement } | null>(null)
 
   const draggingId = useRef<string | null>(null)
-  const draggingType = useRef<'table' | 'decor'>('table')
+  const draggingType = useRef<'table' |  'decor'>('table')
   const dragOffset = useRef({ x: 0, y: 0 })
   const dragMoved = useRef(false)
   const pointerStart = useRef({ x: 0, y: 0 })
@@ -612,7 +612,7 @@ export default function KassaFloorPlan({
   const pendingDragPctRef = useRef<{ x: number; y: number } | null>(null)
   const innerCanvasRef = useRef<HTMLDivElement | null>(null)
   /** Één gesture-laag: capture op canvas + hit-test (touch/desktop, alle tenants). */
-  const floorGestureRef = useRef<{ pointerId: number; kind: 'table' | 'decor'; id: string } | null>(null)
+  const floorGestureRef = useRef<{ pointerId: number; kind: 'table' |  'decor'; id: string } | null>(null)
   const tapStartedEmptyRef = useRef(false)
   /** Pauzeer localStorage-sync van tables tijdens eender welke vloer-interactie (zoals voorheen isDragging). */
   const floorPersistPausedRef = useRef(false)
@@ -650,7 +650,7 @@ export default function KassaFloorPlan({
         .upsert(
           'floor_plan_tables',
           { tenant_slug: tenant, plan_zone: planZone, data } as Record<string, unknown>,
-          { tenantSlug: tenant, onConflict: 'tenant_slug,plan_zone' },
+          { tenantSlug: tenant, onConflict: 'tenant_slug,plan_zone'},
         )
         .then((r) => {
           if (!r.ok) console.error('[KassaFloorPlan] floor_plan_tables:', r.error)
@@ -672,7 +672,7 @@ export default function KassaFloorPlan({
       .upsert(
         'floor_plan_decor',
         { tenant_slug: tenant, plan_zone: planZone, data } as Record<string, unknown>,
-        { tenantSlug: tenant, onConflict: 'tenant_slug,plan_zone' },
+        { tenantSlug: tenant, onConflict: 'tenant_slug,plan_zone'},
       )
       .then((r) => {
         if (!r.ok) console.error('[KassaFloorPlan] floor_plan_decor:', r.error)
@@ -844,7 +844,7 @@ export default function KassaFloorPlan({
       .channel(`fpt_${tenant}_${planZone}`)
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'floor_plan_tables', filter: `tenant_slug=eq.${tenant}` },
+        { event: '*', schema: 'public', table: 'floor_plan_tables', filter: `tenant_slug=eq.${tenant}`},
         (payload: {
           eventType?: string
           new?: { data?: unknown; plan_zone?: string }
@@ -873,7 +873,7 @@ export default function KassaFloorPlan({
       .channel(`fpd_${tenant}_${planZone}`)
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'floor_plan_decor', filter: `tenant_slug=eq.${tenant}` },
+        { event: '*', schema: 'public', table: 'floor_plan_decor', filter: `tenant_slug=eq.${tenant}`},
         (payload: {
           eventType?: string
           new?: { data?: unknown; plan_zone?: string }
@@ -910,7 +910,7 @@ export default function KassaFloorPlan({
 
   useEffect(() => {
     if (selectedDecor?.type === 'bar_segment') {
-      setEditStoolVals({ s1: selectedDecor.stool1 || '', s2: selectedDecor.stool2 || '' })
+      setEditStoolVals({ s1: selectedDecor.stool1 || '', s2: selectedDecor.stool2 || ''})
     }
   }, [selectedDecor])
 
@@ -969,7 +969,7 @@ export default function KassaFloorPlan({
   const floorSurfaceStyle = useMemo(
     () => ({
       cursor: 'default',
-      touchAction: 'none' as const,
+      touchAction: 'none'as const,
     }),
     [],
   )
@@ -1108,7 +1108,7 @@ export default function KassaFloorPlan({
   }
 
   /** Welke tafel/decor ligt visueel bovenaan op dit punt — DOM-stack i.p.v. per-element listeners (touch + muis, alle tenants). */
-  const resolveFloorHit = useCallback((clientX: number, clientY: number): { kind: 'table' | 'decor'; id: string } | null => {
+  const resolveFloorHit = useCallback((clientX: number, clientY: number): { kind: 'table' |  'decor'; id: string } | null => {
     const root = innerCanvasRef.current
     if (!root || typeof document === 'undefined') return null
     let stack: Element[]
@@ -1165,11 +1165,11 @@ export default function KassaFloorPlan({
     if (isLocked) return
 
     const item =
-      hit.kind === 'table' ? tables.find((t) => t.id === hit.id) : decors.find((d) => d.id === hit.id)
+      hit.kind === 'table'? tables.find((t) => t.id === hit.id) : decors.find((d) => d.id === hit.id)
     if (!item) return
 
     draggingId.current = hit.id
-    draggingType.current = hit.kind === 'table' ? 'table' : 'decor'
+    draggingType.current = hit.kind === 'table'? 'table': 'decor'
     pendingDragPctRef.current = null
     cancelDragPaintRaf()
     floorRectCachedRef.current = rect
@@ -1346,7 +1346,7 @@ export default function KassaFloorPlan({
   return (
     <div className={`fixed inset-0 z-50 flex flex-col ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`}>
       {/* Bij open modal: geen pointer-events naar vloer/header (iPad raakte vast na capture) */}
-      <div className={`flex min-h-0 flex-1 flex-col ${modalOpen ? 'pointer-events-none' : ''}`}>
+      <div className={`flex min-h-0 flex-1 flex-col ${modalOpen ? 'pointer-events-none': ''}`}>
       {/* Header */}
       <div
         className={`flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-[#1a1a1a] px-4 py-3 ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`}
@@ -1408,7 +1408,7 @@ export default function KassaFloorPlan({
         >
           <div
             ref={innerCanvasRef}
-            style={{ position: 'absolute', inset: 0, touchAction: 'manipulation' }}
+            style={{ position: 'absolute', inset: 0, touchAction: 'manipulation'}}
             onPointerDown={canvasPointerDown}
             onPointerMove={canvasPointerMove}
             onPointerUp={canvasPointerUp}
@@ -1458,7 +1458,7 @@ export default function KassaFloorPlan({
                 table={t}
                 isSelected={selected?.id === t.id}
                 effectiveStatus={getTableEffectiveStatus(t.number, t.status)}
-                visualZone={planZone === FLOOR_PLAN_ZONE_TERRACE ? 'terrace' : 'indoor'}
+                visualZone={planZone === FLOOR_PLAN_ZONE_TERRACE ? 'terrace': 'indoor'}
               />
             </div>
             )
@@ -1504,7 +1504,7 @@ export default function KassaFloorPlan({
                 return (
                   <div className="mb-4 rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
                     {/* Kruk header met status kleur */}
-                    <div className="flex items-center justify-between px-3 py-2" style={{ backgroundColor: STATUS_COLORS[status] + '33', borderLeft: `4px solid ${STATUS_COLORS[status]}` }}>
+                    <div className="flex items-center justify-between px-3 py-2" style={{ backgroundColor: STATUS_COLORS[status] + '33', borderLeft: `4px solid ${STATUS_COLORS[status]}`}}>
                       <div className="flex items-center gap-2">
                         <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold" style={{ backgroundColor: STATUS_COLORS[status] }}>{stoolId}</div>
                         <span className="text-gray-900 font-bold text-sm">
@@ -1550,12 +1550,12 @@ export default function KassaFloorPlan({
                             onClick={() => saveStoolStatus({ ...stoolStatuses, [stoolId]: s })}
                             className="py-2.5 rounded-xl text-sm font-bold transition-all"
                             style={isActive
-                              ? { backgroundColor: STATUS_COLORS[s], color: 'white' }
+                              ? { backgroundColor: STATUS_COLORS[s], color: 'white'}
                               : warnUnpaid
-                              ? { backgroundColor: STATUS_COLORS['UNPAID'] + '33', color: STATUS_COLORS['UNPAID'], border: `2px solid ${STATUS_COLORS['UNPAID']}` }
-                              : { backgroundColor: '#d1d5db', color: '#374151' }
+                              ? { backgroundColor: STATUS_COLORS['UNPAID'] + '33', color: STATUS_COLORS['UNPAID'], border: `2px solid ${STATUS_COLORS['UNPAID']}`}
+                              : { backgroundColor: '#d1d5db', color: '#374151'}
                             }>
-                            {statusLabels[s as TableStatus]}{warnUnpaid ? ' ' : ''}
+                            {statusLabels[s as TableStatus]}{warnUnpaid ? ' ': ''}
                           </button>
                         )
                       })}
@@ -1614,10 +1614,10 @@ export default function KassaFloorPlan({
                     <button
                       onClick={() => {
                         const updated = decors.map(d => d.id === selectedDecor.id
-                          ? { ...d, stool1: editStoolVals.s1 || 'K?', stool2: editStoolVals.s2 || 'K?' }
+                          ? { ...d, stool1: editStoolVals.s1 || 'K?', stool2: editStoolVals.s2 || 'K?'}
                           : d)
                         saveDecor(updated)
-                        setSelectedDecor({ ...selectedDecor, stool1: editStoolVals.s1 || 'K?', stool2: editStoolVals.s2 || 'K?' })
+                        setSelectedDecor({ ...selectedDecor, stool1: editStoolVals.s1 || 'K?', stool2: editStoolVals.s2 || 'K?'})
                       }}
                       className="w-full py-1.5 rounded-lg bg-blue-100 text-blue-800 hover:bg-blue-200 text-sm font-semibold transition-colors">
                       {t('kassaApp.floorPlanSaveBarStools')}
@@ -1664,7 +1664,7 @@ export default function KassaFloorPlan({
           return (
             <div className="w-80 bg-[#e3e3e3] border-l border-gray-300 flex flex-col">
               {/* Header met status kleur */}
-              <div className="p-4 border-b border-gray-300 flex justify-between items-center" style={{ borderLeft: `4px solid ${STATUS_COLORS[effectiveStatus]}` }}>
+              <div className="p-4 border-b border-gray-300 flex justify-between items-center" style={{ borderLeft: `4px solid ${STATUS_COLORS[effectiveStatus]}`}}>
                 <div>
                   <div className="flex items-center gap-2 mb-0.5">
                     <h3 className="text-gray-900 font-bold text-xl">
@@ -1698,7 +1698,7 @@ export default function KassaFloorPlan({
                                 <div className="mt-1 space-y-0.5">
                                   {item.choices!.map((c, ci) => (
                                     <p key={ci} className="text-gray-500 text-xs">
-                                      + {c.choiceName}{c.price > 0 ? ` (€${c.price.toFixed(2)})` : ''}
+                                      + {c.choiceName}{c.price > 0 ? `(€${c.price.toFixed(2)})`: ''}
                                     </p>
                                   ))}
                                 </div>
@@ -1754,12 +1754,12 @@ export default function KassaFloorPlan({
                       className="w-full py-2.5 rounded-lg text-sm font-semibold transition-all"
                       style={
                         isActive
-                          ? { backgroundColor: STATUS_COLORS[s], color: 'white' }
+                          ? { backgroundColor: STATUS_COLORS[s], color: 'white'}
                           : warnUnpaid
-                          ? { backgroundColor: STATUS_COLORS['UNPAID'] + '33', color: STATUS_COLORS['UNPAID'], border: `2px solid ${STATUS_COLORS['UNPAID']}` }
-                          : { backgroundColor: '#d1d5db', color: '#374151' }
+                          ? { backgroundColor: STATUS_COLORS['UNPAID'] + '33', color: STATUS_COLORS['UNPAID'], border: `2px solid ${STATUS_COLORS['UNPAID']}`}
+                          : { backgroundColor: '#d1d5db', color: '#374151'}
                       }>
-                      {statusLabels[s as TableStatus]}{warnUnpaid ? ' ' : ''}
+                      {statusLabels[s as TableStatus]}{warnUnpaid ? ' ': ''}
                     </button>
                   )
                 })}
@@ -1902,7 +1902,7 @@ export default function KassaFloorPlan({
                 <div className="grid grid-cols-5 gap-2">
                   {[2, 4, 6, 8, 10].map(n => (
                     <button key={n} type="button" onClick={() => setAddSeats(n)}
-                      className={`min-h-[44px] touch-manipulation rounded-xl py-2 font-bold transition-colors ${addSeats === n ? 'bg-[#58CCFF] text-[#063042]' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+                      className={`min-h-[44px] touch-manipulation rounded-xl py-2 font-bold transition-colors ${addSeats === n ? 'bg-[#58CCFF] text-[#063042]': 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
                       {n}
                     </button>
                   ))}
@@ -1919,7 +1919,7 @@ export default function KassaFloorPlan({
                     ] as const
                   ).map(([s, label]) => (
                     <button key={s} type="button" onClick={() => setAddShape(s)}
-                      className={`min-h-[44px] touch-manipulation rounded-xl py-2 text-xs font-bold transition-colors ${addShape === s ? 'bg-[#58CCFF] text-[#063042]' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+                      className={`min-h-[44px] touch-manipulation rounded-xl py-2 text-xs font-bold transition-colors ${addShape === s ? 'bg-[#58CCFF] text-[#063042]': 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
                       {label}
                     </button>
                   ))}

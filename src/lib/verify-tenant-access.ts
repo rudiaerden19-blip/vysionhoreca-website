@@ -172,12 +172,12 @@ export async function verifySuperAdminAccess(
     const superadminEmail = request.headers.get('x-superadmin-email')
 
     if (!superadminId || !superadminEmail) {
-      return { authorized: false, error: 'Niet ingelogd als superadmin' }
+      return { authorized: false, error: 'Niet ingelogd als superadmin'}
     }
 
     const supabase = getServerSupabaseClient()
     if (!supabase) {
-      return { authorized: false, error: 'Database niet beschikbaar' }
+      return { authorized: false, error: 'Database niet beschikbaar'}
     }
 
     // Verify superadmin exists and is active
@@ -195,7 +195,7 @@ export async function verifySuperAdminAccess(
         superadminId, 
         error: adminError?.message 
       })
-      return { authorized: false, error: 'Ongeldige superadmin sessie' }
+      return { authorized: false, error: 'Ongeldige superadmin sessie'}
     }
 
     return { authorized: true, adminId: admin.id }
@@ -205,7 +205,7 @@ export async function verifySuperAdminAccess(
       requestId, 
       error: error instanceof Error ? error.message : 'Unknown error' 
     })
-    return { authorized: false, error: 'Verificatie mislukt' }
+    return { authorized: false, error: 'Verificatie mislukt'}
   }
 }
 

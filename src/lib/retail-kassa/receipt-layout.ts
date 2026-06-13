@@ -113,7 +113,7 @@ function thermalCenter(text: string): string {
   return THERMAL_FILL.repeat(startCol) + t
 }
 
-/** Print-agent herkent `Nx …` en zet extra witruimte tussen artikelregels. */
+/** Print-agent herkent `Nx …`en zet extra witruimte tussen artikelregels. */
 function thermalItemRow(qty: number, name: string, lineTotal: number): string {
   const price = formatEuroThermal(lineTotal)
   const targetCol = RETAIL_THERMAL_W - price.length
@@ -224,7 +224,7 @@ function appendItemsThermal(order: KassaLastOrderReceipt, lines: string[]): void
     const lineTotal = unitIncl * item.quantity
     lines.push(thermalItemRow(item.quantity, item.product.name, lineTotal))
     for (const c of item.choices || []) {
-      lines.push(`   + ${capitalizeProductName(c.choiceName)}`.slice(0, RETAIL_THERMAL_W))
+      lines.push(`  + ${capitalizeProductName(c.choiceName)}`.slice(0, RETAIL_THERMAL_W))
     }
   }
 }
@@ -267,7 +267,7 @@ export function buildRetailThermalBonLines(opts: {
   const discountEuro = Math.round((itemsGrossIncl(order) - order.total) * 100) / 100
   const lines: string[] = []
 
-  /** Naam print de agent gecentreerd via `winkelnaam` — hier alleen adres/BTW/tel gecentreerd. */
+  /** Naam print de agent gecentreerd via `winkelnaam`— hier alleen adres/BTW/tel gecentreerd. */
   if (tenantInfo?.address) lines.push(thermalCenterPlain(tenantInfo.address.trim()))
   if (tenantInfo?.postal_code || tenantInfo?.city) {
     lines.push(thermalCenterPlain(`${tenantInfo.postal_code ?? ''} ${tenantInfo.city ?? ''}`.trim()))
@@ -388,7 +388,7 @@ export function buildRetailKassaReceiptHtmlBody(opts: {
             : ''
         }
         <div class="retail-name">${bizName}</div>
-        ${tenantInfo?.address ? `<div class="small">${escapeReceiptHtml(tenantInfo.address)}</div>` : ''}
+        ${tenantInfo?.address ? `<div class="small">${escapeReceiptHtml(tenantInfo.address)}</div>`: ''}
         ${
           tenantInfo?.postal_code || tenantInfo?.city
             ? `<div class="small">${escapeReceiptHtml(`${tenantInfo.postal_code ?? ''} ${tenantInfo.city ?? ''}`.trim())}</div>`
@@ -405,13 +405,13 @@ export function buildRetailKassaReceiptHtmlBody(opts: {
             : ''
         }
       </div>
-      ${isDraft ? `<div class="draft-banner">${escapeReceiptHtml(labels.draftBanner)}</div>` : ''}
+      ${isDraft ? `<div class="draft-banner">${escapeReceiptHtml(labels.draftBanner)}</div>`: ''}
       ${
         invoice
           ? `<div class="bold center">${escapeReceiptHtml(labels.invoiceTitle)}</div>
       <div class="small">${escapeReceiptHtml(invoice.name)}</div>
-      ${invoice.addressLine ? `<div class="small">${escapeReceiptHtml(invoice.addressLine)}</div>` : ''}
-      ${invoice.postalCity ? `<div class="small">${escapeReceiptHtml(invoice.postalCity)}</div>` : ''}
+      ${invoice.addressLine ? `<div class="small">${escapeReceiptHtml(invoice.addressLine)}</div>`: ''}
+      ${invoice.postalCity ? `<div class="small">${escapeReceiptHtml(invoice.postalCity)}</div>`: ''}
       <div class="small bold">${escapeReceiptHtml(labels.customerVatLabel(invoice.vatNumber))}</div>`
           : ''
       }
@@ -438,9 +438,9 @@ export function buildRetailKassaReceiptHtmlBody(opts: {
       ${loyaltyHtml}
       ${helpedByHtml}
       <div class="footer-thanks">${escapeReceiptHtml(isDraft ? labels.draftFooter : labels.thanks)}</div>
-      ${!isDraft ? `<div class="footer-thanks">${escapeReceiptHtml(labels.thanksFarewell)}</div>` : ''}
+      ${!isDraft ? `<div class="footer-thanks">${escapeReceiptHtml(labels.thanksFarewell)}</div>`: ''}
       <div class="pay-line">${escapeReceiptHtml(labels.paymentMethodLine(payLabel))}</div>
-      ${tenantInfo?.website?.trim() ? `<div class="footer-website">${escapeReceiptHtml(tenantInfo.website.trim())}</div>` : ''}`
+      ${tenantInfo?.website?.trim() ? `<div class="footer-website">${escapeReceiptHtml(tenantInfo.website.trim())}</div>`: ''}`
 }
 
 /** @deprecated Barcode niet meer op bon; behouden voor eventuele API-compat. */

@@ -2408,7 +2408,7 @@
  "smtpGmailWarning": " Gmailはアプリパスワードが必要です。Googleアカウント → セキュリティ → アプリパスワードで作成してください。",
  "smtpServerLabel": "SMTPサーバー（プロバイダーに確認）",
  "smtpPortLabel": "ポート",
- "smtpSaveSaving": "⏳ 保存中...",
+ "smtpSaveSaving": " 保存中...",
  "smtpSaveSaved": " 保存しました！",
  "smtpSaveButton": " メール設定を保存"
  },

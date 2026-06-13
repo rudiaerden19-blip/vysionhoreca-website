@@ -25,7 +25,7 @@ import { LOGIN_QUERY_KASSA_CLOSE_TIP } from '@/lib/shop-login-kassa-tip'
 import { isVysionMainPortalHost } from '@/lib/vysion-site'
 import { kassaPosButtonClass } from '@/lib/kassa-pos-surface'
 
-/** Zelfde hosts als middleware `exactMainDomains` (+ dev): sessie blijft in localStorage van dit domein. */
+/** Zelfde hosts als middleware `exactMainDomains`(+ dev): sessie blijft in localStorage van dit domein. */
 function stayOnMainDomainForShopSession(hostname: string): boolean {
   const h = hostname.toLowerCase().split(':')[0]
   return (
@@ -47,10 +47,10 @@ export default function LoginPage() {
   const langRef = useRef<HTMLDivElement>(null)
   const [showKassaCloseHint, setShowKassaCloseHint] = useState(false)
 
-  // Superadmin: gedeelde cookie → mirror in isSuperAdminLoggedIn; direct door naar `next` zonder zaak-wachtwoord.
+  // Superadmin: gedeelde cookie → mirror in isSuperAdminLoggedIn; direct door naar `next`zonder zaak-wachtwoord.
   // (Zonder dit bleef het tenant-loginformulier zichtbaar tot je handmatig logt.)
   // Marketing demo: op www/localhost of op het demo-subdomein zelf → zonder ?demo= al naar publieke demokassa.
-  // Niet doen op ander tenant-subdomein met `next` naar frituurnolim (anders blijft de gebruiker de login “kwijt”).
+  // Niet doen op ander tenant-subdomein met `next`naar frituurnolim (anders blijft de gebruiker de login “kwijt”).
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return
     const origin = window.location.origin
@@ -114,7 +114,7 @@ export default function LoginPage() {
     window.location.replace(fixed)
   }, [router])
 
-  /** Na uitloggen POS: `?kassa_sluit_tip=1` — popup over venster sluiten. */
+  /** Na uitloggen POS: `?kassa_sluit_tip=1`— popup over venster sluiten. */
   useEffect(() => {
     if (typeof window === 'undefined') return
     const p = new URLSearchParams(window.location.search)
@@ -126,7 +126,7 @@ export default function LoginPage() {
     const p = new URLSearchParams(window.location.search)
     p.delete(LOGIN_QUERY_KASSA_CLOSE_TIP)
     const q = p.toString()
-    router.replace(`/login${q ? `?${q}` : ''}`)
+    router.replace(`/login${q ? `?${q}`: ''}`)
   }
 
   // Read language from URL parameter on mount
@@ -183,7 +183,7 @@ export default function LoginPage() {
       // Server-side API call voor robuuste login
       const response = await fetch('/api/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json'},
         body: JSON.stringify({
           email,
           password,
@@ -217,8 +217,8 @@ export default function LoginPage() {
         /\/admin\/(?:retail-kassa|kassa)(?:\/|$)/.test(dest.split('?')[0] ?? '')
 
       const host =
-        typeof window !== 'undefined' ? window.location.hostname : ''
-      const origin = typeof window !== 'undefined' ? window.location.origin : ''
+        typeof window !== 'undefined'? window.location.hostname : ''
+      const origin = typeof window !== 'undefined'? window.location.origin : ''
 
       if (isKassaPosAfterLogin && origin) {
         /** Volledige load: één mount → één audioscherm (geen router.push-flits). */
@@ -261,7 +261,7 @@ export default function LoginPage() {
             <LocaleFlagWithCode locale={locale} />
             <span className="hidden sm:inline text-sm text-gray-600">{localeNames[locale]}</span>
             <svg 
-              className={`w-4 h-4 transition-transform ${isLangOpen ? 'rotate-180' : ''}`} 
+              className={`w-4 h-4 transition-transform ${isLangOpen ? 'rotate-180': ''}`} 
               fill="none" 
               stroke="currentColor" 
               viewBox="0 0 24 24"
@@ -278,7 +278,7 @@ export default function LoginPage() {
                   key={langCode}
                   onClick={() => handleLanguageSelect(langCode)}
                   className={`flex w-full items-center gap-3 px-4 py-3 transition-colors hover:bg-gray-100 ${
-                    locale === langCode ? 'text-accent' : 'text-gray-800'
+                    locale === langCode ? 'text-accent': 'text-gray-800'
                   }`}
                 >
                   <LocaleFlagEmoji locale={langCode} className="text-xl" />
@@ -363,7 +363,7 @@ export default function LoginPage() {
                   <>
                     <motion.span
                       animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                      transition={{ duration: 1, repeat: Infinity, ease: 'linear'}}
                       className="inline-block h-5 w-5 shrink-0 rounded-full border-2 border-white border-t-transparent"
                       aria-hidden
                     />

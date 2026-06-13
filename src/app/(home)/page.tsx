@@ -94,7 +94,7 @@ function WhyVysionSection() {
                   <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
                     {t(`whyVysion.${key}.body`)}
                   </p>
-                  {key === 'fullPlatform' ? (
+                  {key === 'fullPlatform'? (
                     <p className="mt-3 text-sm sm:text-base text-gray-600 leading-relaxed">
                       {t('whyVysion.fullPlatform.bodyExtra')}
                     </p>
@@ -143,7 +143,7 @@ function WhyVysionSection() {
 }
 
 // Stats Section
-function CountUp({ end, suffix = '', prefix = '' }: { end: number, suffix?: string, prefix?: string }) {
+function CountUp({ end, suffix = '', prefix = ''}: { end: number, suffix?: string, prefix?: string }) {
   const [count, setCount] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -191,23 +191,23 @@ function CountUp({ end, suffix = '', prefix = '' }: { end: number, suffix?: stri
 
 /** Trust-marquee: witte kaarten met logo + klantcase (i18n liveDemo.successStories.*). */
 const SUCCESS_STORY_CARDS = [
-  { src: '/images/partner-logos/02.png', key: 'vivaldi' },
-  { src: '/images/partner-logos/03.png', key: 'broodZo' },
-  { src: '/images/partner-logos/04.png', key: 'broodjesbar' },
-  { src: '/images/partner-logos/05.png', key: 'saintGermain' },
-  { src: '/images/partner-logos/06.png', key: 'frituurAnn' },
-  { src: '/images/partner-logos/07.png', key: 'butcher' },
-  { src: '/images/partner-logos/08.png', key: 'seelen' },
+  { src: '/images/partner-logos/02.png', key: 'vivaldi'},
+  { src: '/images/partner-logos/03.png', key: 'broodZo'},
+  { src: '/images/partner-logos/04.png', key: 'broodjesbar'},
+  { src: '/images/partner-logos/05.png', key: 'saintGermain'},
+  { src: '/images/partner-logos/06.png', key: 'frituurAnn'},
+  { src: '/images/partner-logos/07.png', key: 'butcher'},
+  { src: '/images/partner-logos/08.png', key: 'seelen'},
 ] as const
 
 function StatsAndLiveDemoSection() {
   const { t } = useLanguage()
 
   const stats = [
-    { value: 250_000, prefix: '', suffix: '+', labelKey: 'stats.processed' },
-    { value: 1321, prefix: '', suffix: '', labelKey: 'stats.businesses' },
-    { value: 99.9, prefix: '', suffix: '%', labelKey: 'stats.uptime' },
-    { value: 24, prefix: '', suffix: '/7', labelKey: 'stats.support' },
+    { value: 250_000, prefix: '', suffix: '+', labelKey: 'stats.processed'},
+    { value: 1321, prefix: '', suffix: '', labelKey: 'stats.businesses'},
+    { value: 99.9, prefix: '', suffix: '%', labelKey: 'stats.uptime'},
+    { value: 24, prefix: '', suffix: '/7', labelKey: 'stats.support'},
   ]
 
   return (
@@ -365,7 +365,7 @@ function OrderAppSection() {
               className="transition-all duration-700 ease-out cursor-pointer aspect-[9/16] relative overflow-hidden rounded-2xl bg-gray-300 shadow-home-image"
               style={{
                 opacity: visibleImages.includes(index) ? 1 : 0,
-                transform: visibleImages.includes(index) ? 'translateY(0) scale(1)' : 'translateY(30px) scale(0.95)',
+                transform: visibleImages.includes(index) ? 'translateY(0) scale(1)': 'translateY(30px) scale(0.95)',
               }}
               onClick={() => setLightboxIndex(index)}
             >
@@ -1058,7 +1058,7 @@ function TableKioskSection() {
               {TABLE_KIOSK_SLIDES.map((src, i) => (
                 <span
                   key={src}
-                  className={`h-1.5 w-1.5 rounded-full ${i === kioskSlide ? 'bg-accent' : 'bg-gray-400/60'}`}
+                  className={`h-1.5 w-1.5 rounded-full ${i === kioskSlide ? 'bg-accent': 'bg-gray-400/60'}`}
                 />
               ))}
             </div>
@@ -1500,7 +1500,7 @@ function TestimonialSection() {
           
           <div 
             className="flex transition-transform duration-500 ease-in-out mx-12"
-            style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+            style={{ transform: `translateX(-${currentSlide * 100}%)`}}
           >
             {testimonialKeys.map((key, index) => (
               <div key={index} className="w-full flex-shrink-0 px-4">

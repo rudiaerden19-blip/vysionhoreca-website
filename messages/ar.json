@@ -2408,7 +2408,7 @@
  "smtpGmailWarning": " Gmail يتطلب كلمة مرور للتطبيقات. أنشئها من: حساب Google ← الأمان ← كلمات مرور التطبيقات.",
  "smtpServerLabel": "خادم SMTP (اسأل مزود الخدمة)",
  "smtpPortLabel": "المنفذ",
- "smtpSaveSaving": "⏳ جارٍ الحفظ...",
+ "smtpSaveSaving": " جارٍ الحفظ...",
  "smtpSaveSaved": " تم الحفظ!",
  "smtpSaveButton": " حفظ إعدادات البريد"
  },
@@ -4615,7 +4615,7 @@
  "selectEmployee": "اختر موظف",
  "reasonPlaceholder": "اختياري: سبب الإجازة",
  "initialStatus": "الحالة",
- "statusHint": "اختر 'موافق عليه' للتسجيل المباشر (مثل الإجازة المرضية)",
+ "statusHint": "اختر 'موافق عليه'للتسجيل المباشر (مثل الإجازة المرضية)",
  "add": "إضافة",
  "fillAllFields": "املأ جميع الحقول المطلوبة",
  "delete": "حذف",

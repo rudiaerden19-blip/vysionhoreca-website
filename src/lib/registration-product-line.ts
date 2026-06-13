@@ -176,7 +176,7 @@ export const REGISTRATION_MODULE_PRESETS: Record<RegistrationProductLine, Preset
   },
 }
 
-/** JSON voor `tenants.enabled_modules` bij registratie. */
+/** JSON voor `tenants.enabled_modules`bij registratie. */
 export function buildRegistrationEnabledModulesJson(
   line: RegistrationProductLine,
 ): Record<string, boolean> {

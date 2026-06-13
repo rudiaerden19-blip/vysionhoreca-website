@@ -14,16 +14,16 @@ type Trans = (key: string) => string
 /** Kassa-POS kanaal (niet webshop). */
 export function adminPosChannelBadgeLabel(order: Pick<Order, 'order_type'>, t: Trans): string {
   const ot = (order.order_type || '').toString()
-  if (ot === 'DINE_IN') return `🍽️ ${t('ordersPage.kassaChannelDineIn')}`
-  if (ot === 'TAKEAWAY') return `📦 ${t('ordersPage.kassaChannelTakeaway')}`
-  if (ot === 'DELIVERY') return `🚗 ${t('ordersPage.kassaChannelDelivery')}`
-  return `🚗 ${t('ordersPage.orderType.delivery')}`
+  if (ot === 'DINE_IN') return ` ${t('ordersPage.kassaChannelDineIn')}`
+  if (ot === 'TAKEAWAY') return ` ${t('ordersPage.kassaChannelTakeaway')}`
+  if (ot === 'DELIVERY') return ` ${t('ordersPage.kassaChannelDelivery')}`
+  return ` ${t('ordersPage.orderType.delivery')}`
 }
 
 export function adminWebshopChannelBadgeLabel(order: Pick<Order, 'order_type'>, t: Trans): string {
   const ot = (order.order_type || '').toString()
-  if (ot === 'pickup' || ot === 'PICKUP') return `🛍️ ${t('ordersPage.orderType.pickup')}`
-  return `🚗 ${t('ordersPage.orderType.delivery')}`
+  if (ot === 'pickup' || ot === 'PICKUP') return ` ${t('ordersPage.orderType.pickup')}`
+  return ` ${t('ordersPage.orderType.delivery')}`
 }
 
 /** Tafel + binnen/terras voor geaudit POS dine-in (floor_plan_zone + table_number). */
@@ -56,7 +56,7 @@ export function dineInSeatLineNl(
   const zone = normalizeFloorPlanZone(
     floorPlanZone == null ? undefined : String(floorPlanZone),
   )
-  const zlab = zone === FLOOR_PLAN_ZONE_TERRACE ? 'Terras' : 'Binnen'
+  const zlab = zone === FLOOR_PLAN_ZONE_TERRACE ? 'Terras': 'Binnen'
   return `Tafel ${tableNumber} · ${zlab}`
 }
 

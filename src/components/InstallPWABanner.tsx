@@ -8,7 +8,7 @@ const DISMISS_MS = 1000 * 60 * 60 * 24 * 14 // 14 dagen
 /** Chrome install prompt (geen standaard lib-type in alle TS-versies) */
 type BeforeInstallPromptEventPoly = Event & {
   prompt: () => Promise<void>
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
+  userChoice: Promise<{ outcome: 'accepted' |  'dismissed'}>
 }
 
 function isTenantOrdervysionHost(hostname: string): boolean {
@@ -28,7 +28,7 @@ function isStandalone(): boolean {
   const standalone = window.matchMedia('(display-mode: standalone)').matches
   const fullscreen = window.matchMedia('(display-mode: fullscreen)').matches
   const minimal = window.matchMedia('(display-mode: minimal-ui)').matches
-  const ios = 'standalone' in navigator && (navigator as Navigator & { standalone?: boolean }).standalone === true
+  const ios = 'standalone'in navigator && (navigator as Navigator & { standalone?: boolean }).standalone === true
   const ref = typeof document !== 'undefined' && document.referrer.startsWith('android-app://')
   return standalone || fullscreen || minimal || ios || ref
 }

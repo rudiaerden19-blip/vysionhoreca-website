@@ -22,14 +22,14 @@ function eanVariants(raw: string): string[] {
 
 function parsePrice(value: unknown): number | null {
   if (value == null) return null
-  const n = typeof value === 'number' ? value : Number.parseFloat(String(value).replace(',', '.'))
+  const n = typeof value === 'number'? value : Number.parseFloat(String(value).replace(',', '.'))
   if (!Number.isFinite(n) || n < 0) return null
   return Math.round(n * 100) / 100
 }
 
 async function lookupOpenFoodFacts(code: string): Promise<{ name: string; price: number | null } | null> {
   const res = await fetch(`${OFF_API}/${code}.json`, {
-    headers: { 'User-Agent': `VysionKassa-Retail/1.0 (contact: ${VYSION_INFO_EMAIL})` },
+    headers: { 'User-Agent': `VysionKassa-Retail/1.0 (contact: ${VYSION_INFO_EMAIL})`},
     signal: AbortSignal.timeout(8000),
     next: { revalidate: 3600 },
   })
@@ -89,7 +89,7 @@ export async function GET(req: NextRequest) {
     try {
       const off = await lookupOpenFoodFacts(code)
       if (off) {
-        return NextResponse.json({ ok: true, name: off.name, price: off.price, ean: code, source: 'openfoodfacts' })
+        return NextResponse.json({ ok: true, name: off.name, price: off.price, ean: code, source: 'openfoodfacts'})
       }
     } catch {
       /* try next */
@@ -100,7 +100,7 @@ export async function GET(req: NextRequest) {
     try {
       const upc = await lookupUpcItemDb(code)
       if (upc) {
-        return NextResponse.json({ ok: true, name: upc.name, price: upc.price, ean: code, source: 'upcitemdb' })
+        return NextResponse.json({ ok: true, name: upc.name, price: upc.price, ean: code, source: 'upcitemdb'})
       }
     } catch {
       continue

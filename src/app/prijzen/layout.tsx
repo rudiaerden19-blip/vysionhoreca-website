@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       'Abonnementen voor kassa, bestelplatform en hardware — duidelijke prijzen, gratis proefperiode.',
     url: '/prijzen',
-    images: [{ url: '/images/kassa-platform-1.png' }],
+    images: [{ url: '/images/kassa-platform-1.png'}],
   },
   alternates: {
     canonical: '/prijzen',

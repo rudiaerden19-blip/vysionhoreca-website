@@ -21,7 +21,7 @@ export function KassaSplitPaymentModal({
   setSplitCard: (n: number) => void
   onCloseBack: () => void
   onConfirm: () => void
-  appearance?: 'light' | 'dark'
+  appearance?: 'light' |  'dark'
 }) {
   const { t } = useLanguage()
   const dark = appearance === 'dark'
@@ -31,11 +31,11 @@ export function KassaSplitPaymentModal({
   const card = dark
     ? 'rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl border border-zinc-600 bg-[#151a21]'
     : 'bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl'
-  const hdr = dark ? 'p-4 border-b border-zinc-600 flex justify-between items-center' : 'p-4 border-b border-gray-100 flex justify-between items-center'
-  const hdrTitle = dark ? 'text-xl font-semibold flex items-center gap-2 text-zinc-50' : 'text-xl font-semibold flex items-center gap-2'
-  const closeBtn = dark ? 'p-2 rounded-lg hover:bg-zinc-800 text-2xl text-zinc-200' : 'p-2 rounded-lg hover:bg-gray-100 text-2xl'
-  const totalBox = dark ? 'text-center p-4 bg-[#263043] rounded-xl border border-zinc-600' : 'text-center p-4 bg-gray-50 rounded-xl'
-  const labelMuted = dark ? 'text-zinc-400 text-sm' : 'text-gray-500 text-sm'
+  const hdr = dark ? 'p-4 border-b border-zinc-600 flex justify-between items-center': 'p-4 border-b border-gray-100 flex justify-between items-center'
+  const hdrTitle = dark ? 'text-xl font-semibold flex items-center gap-2 text-zinc-50': 'text-xl font-semibold flex items-center gap-2'
+  const closeBtn = dark ? 'p-2 rounded-lg hover:bg-zinc-800 text-2xl text-zinc-200': 'p-2 rounded-lg hover:bg-gray-100 text-2xl'
+  const totalBox = dark ? 'text-center p-4 bg-[#263043] rounded-xl border border-zinc-600': 'text-center p-4 bg-gray-50 rounded-xl'
+  const labelMuted = dark ? 'text-zinc-400 text-sm': 'text-gray-500 text-sm'
   const inputCls = dark
     ? 'w-full px-4 py-4 text-2xl font-bold rounded-xl bg-[#121821] border-2 text-zinc-50 border-zinc-600 focus:border-[#58CCFF] outline-none'
     : 'w-full px-4 py-4 text-2xl font-bold rounded-xl bg-white border-2 outline-none'
@@ -56,8 +56,8 @@ export function KassaSplitPaymentModal({
         </div>
         <div className="p-6 space-y-5">
           <div className={totalBox}>
-            <p className={dark ? 'text-zinc-400' : 'text-gray-500'}>{t('kassaApp.totalToPay')}</p>
-            <p className={dark ? 'text-4xl font-bold text-[#6dd5ff]' : 'text-4xl font-bold text-[#3C4D6B]'}>€{total.toFixed(2)}</p>
+            <p className={dark ? 'text-zinc-400': 'text-gray-500'}>{t('kassaApp.totalToPay')}</p>
+            <p className={dark ? 'text-4xl font-bold text-[#6dd5ff]': 'text-4xl font-bold text-[#3C4D6B]'}>€{total.toFixed(2)}</p>
           </div>
           <div className="space-y-1">
             <label className={`flex items-center gap-2 ${labelMuted}`}>
@@ -71,7 +71,7 @@ export function KassaSplitPaymentModal({
                 setSplitCash(v)
                 setSplitCard(Math.max(0, total - v))
               }}
-              className={dark ? `${inputCls} border-green-500 focus:border-green-400` : `${inputCls} border-green-400 focus:border-green-500`}
+              className={dark ? `${inputCls} border-green-500 focus:border-green-400`: `${inputCls} border-green-400 focus:border-green-500`}
               placeholder={t('kassaApp.numpadPlaceholder')}
               step="0.01"
               min="0"
@@ -89,7 +89,7 @@ export function KassaSplitPaymentModal({
                 setSplitCard(v)
                 setSplitCash(Math.max(0, total - v))
               }}
-              className={dark ? `${inputCls} border-blue-500 focus:border-blue-400` : `${inputCls} border-blue-400 focus:border-blue-500`}
+              className={dark ? `${inputCls} border-blue-500 focus:border-blue-400`: `${inputCls} border-blue-400 focus:border-blue-500`}
               placeholder={t('kassaApp.numpadPlaceholder')}
               step="0.01"
               min="0"
@@ -117,7 +117,7 @@ export function KassaSplitPaymentModal({
           {Math.abs(total - splitCash - splitCard) > 0.01 && (
             <div
               className={`p-3 rounded-xl text-center text-sm font-semibold ${
-                total - splitCash - splitCard > 0 ? 'bg-red-100 text-red-600' : 'bg-yellow-100 text-yellow-700'
+                total - splitCash - splitCard > 0 ? 'bg-red-100 text-red-600': 'bg-yellow-100 text-yellow-700'
               }`}
             >
               {total - splitCash - splitCard > 0

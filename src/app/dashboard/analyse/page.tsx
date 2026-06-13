@@ -44,7 +44,7 @@ export default function AnalysePage() {
   }
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('nl-BE', { style: 'currency', currency: 'EUR' }).format(amount)
+    return new Intl.NumberFormat('nl-BE', { style: 'currency', currency: 'EUR'}).format(amount)
   }
 
   // Calculate metrics
@@ -106,14 +106,14 @@ export default function AnalysePage() {
         </div>
         <div className="bg-white p-6 rounded-xl border border-gray-100">
           <p className="text-sm text-gray-500">{trans('stats.netProfit')}</p>
-          <p className={`text-3xl font-bold mt-1 ${netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+          <p className={`text-3xl font-bold mt-1 ${netProfit >= 0 ? 'text-green-600': 'text-red-600'}`}>
             {formatCurrency(netProfit)}
           </p>
           <p className="text-sm text-gray-500 mt-2">{trans('stats.afterCosts')}</p>
         </div>
         <div className="bg-white p-6 rounded-xl border border-gray-100">
           <p className="text-sm text-gray-500">{trans('stats.profitMargin')}</p>
-          <p className={`text-3xl font-bold mt-1 ${profitMargin >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+          <p className={`text-3xl font-bold mt-1 ${profitMargin >= 0 ? 'text-green-600': 'text-red-600'}`}>
             {profitMargin.toFixed(1)}%
           </p>
           <p className="text-sm text-gray-500 mt-2">{trans('stats.ofRevenue')}</p>
@@ -133,7 +133,7 @@ export default function AnalysePage() {
               <div className="w-full bg-gray-200 rounded-full h-3">
                 <div 
                   className="bg-gray-800 h-3 rounded-full" 
-                  style={{ width: `${totalRevenue > 0 ? (kassaRevenue / totalRevenue) * 100 : 0}%` }}
+                  style={{ width: `${totalRevenue > 0 ? (kassaRevenue / totalRevenue) * 100 : 0}%`}}
                 ></div>
               </div>
             </div>
@@ -145,7 +145,7 @@ export default function AnalysePage() {
               <div className="w-full bg-gray-200 rounded-full h-3">
                 <div 
                   className="bg-purple-600 h-3 rounded-full" 
-                  style={{ width: `${totalRevenue > 0 ? (onlineRevenue / totalRevenue) * 100 : 0}%` }}
+                  style={{ width: `${totalRevenue > 0 ? (onlineRevenue / totalRevenue) * 100 : 0}%`}}
                 ></div>
               </div>
             </div>
@@ -165,7 +165,7 @@ export default function AnalysePage() {
                     <div className="w-24 bg-gray-200 rounded-full h-2">
                       <div 
                         className="bg-accent h-2 rounded-full" 
-                        style={{ width: `${totalRevenue > 0 ? (amount / totalRevenue) * 100 : 0}%` }}
+                        style={{ width: `${totalRevenue > 0 ? (amount / totalRevenue) * 100 : 0}%`}}
                       ></div>
                     </div>
                     <span className="font-semibold w-24 text-right">{formatCurrency(amount)}</span>

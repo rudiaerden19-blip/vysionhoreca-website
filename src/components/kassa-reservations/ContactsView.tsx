@@ -23,8 +23,8 @@ export function ContactsView({
   promoSelectionReset?: number
   rk: (key: string, rep?: Record<string, string>) => string
 }) {
-  const [guestSort, setGuestSort] = useState<'lastVisit' | 'name' | 'visits'>('lastVisit')
-  const [guestSortDir, setGuestSortDir] = useState<'asc' | 'desc'>('desc')
+  const [guestSort, setGuestSort] = useState<'lastVisit' |  'name' |  'visits'>('lastVisit')
+  const [guestSortDir, setGuestSortDir] = useState<'asc' |  'desc'>('desc')
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(25)
   const [noShowRed, setNoShowRed] = useState<Set<string>>(new Set())
@@ -36,7 +36,7 @@ export function ContactsView({
   }, [promoSelectionReset])
 
   const changeSort = (col: typeof guestSort) => {
-    if (guestSort === col) setGuestSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
+    if (guestSort === col) setGuestSortDir((d) => (d === 'asc'? 'desc': 'asc'))
     else {
       setGuestSort(col)
       setGuestSortDir('desc')
@@ -57,7 +57,7 @@ export function ContactsView({
       if (guestSort === 'visits') cmp = a.totalVisits - b.totalVisits
       else if (guestSort === 'name') cmp = a.name.localeCompare(b.name)
       else cmp = (a.lastVisit || '').localeCompare(b.lastVisit || '')
-      return guestSortDir === 'desc' ? -cmp : cmp
+      return guestSortDir === 'desc'? -cmp : cmp
     })
 
   const totalPages = Math.ceil(filtered.length / pageSize)
@@ -129,7 +129,7 @@ export function ContactsView({
             className="flex min-h-[44px] items-center gap-2 rounded-xl bg-[#58CCFF] px-4 py-2 font-bold text-[#063042] shadow-sm transition-colors hover:bg-[#43bef7] disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Send size={16} />
-            Promotie e-mail{selectedWithEmail.length > 0 ? ` (${selectedWithEmail.length})` : ''}
+            Promotie e-mail{selectedWithEmail.length > 0 ? `(${selectedWithEmail.length})`: ''}
           </button>
           <button
             type="button"
@@ -172,7 +172,7 @@ export function ContactsView({
               onClick={() => changeSort('name')}
               className="flex cursor-pointer select-none items-center gap-1 hover:opacity-80"
             >
-              Naam {guestSort === 'name' && <span>{guestSortDir === 'desc' ? '↓' : '↑'}</span>}
+              Naam {guestSort === 'name' && <span>{guestSortDir === 'desc'? '↓': '↑'}</span>}
             </div>
             <div>Telefoon</div>
             <div>E-mail</div>
@@ -180,13 +180,13 @@ export function ContactsView({
               onClick={() => changeSort('lastVisit')}
               className="hidden cursor-pointer select-none items-center gap-1 hover:opacity-80 md:flex"
             >
-              Laatste bezoek {guestSort === 'lastVisit' && <span>{guestSortDir === 'desc' ? '↓' : '↑'}</span>}
+              Laatste bezoek {guestSort === 'lastVisit' && <span>{guestSortDir === 'desc'? '↓': '↑'}</span>}
             </div>
             <div
               onClick={() => changeSort('visits')}
               className="flex cursor-pointer select-none items-center gap-1 hover:opacity-80"
             >
-              Bezoeken {guestSort === 'visits' && <span>{guestSortDir === 'desc' ? '↓' : '↑'}</span>}
+              Bezoeken {guestSort === 'visits' && <span>{guestSortDir === 'desc'? '↓': '↑'}</span>}
             </div>
             <div>No-show</div>
           </div>
@@ -205,7 +205,7 @@ export function ContactsView({
                 <div
                   key={guest.id}
                   className="grid items-center px-4 py-3 transition-colors hover:bg-gray-50"
-                  style={{ gridTemplateColumns: GRID_COLS, columnGap: '12px' }}
+                  style={{ gridTemplateColumns: GRID_COLS, columnGap: '12px'}}
                 >
                   <div className="flex justify-center">
                     <input
@@ -266,7 +266,7 @@ export function ContactsView({
                         return s
                       })
                     }
-                    className={`w-fit rounded-full px-3 py-1 text-xs font-semibold transition-colors ${isRed ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
+                    className={`w-fit rounded-full px-3 py-1 text-xs font-semibold transition-colors ${isRed ? 'bg-red-500 text-white': 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
                   >
                     No-show
                   </button>

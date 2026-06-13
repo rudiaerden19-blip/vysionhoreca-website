@@ -81,9 +81,9 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
       .join(' ')
   )
   const [loading, setLoading] = useState(true)
-  /** Na mount: superadmin (platform) óf zaak-eigenaar met wachtwoord vandaag. Klanten zonder geldige `vysion_tenant` blijven naar /login — géén automatische tenant-sessie via cookies. */
-  /** `verifying` = client dacht ingelogd; wacht op `/api/auth/verify-tenant-session` (zelfde regels als schrijf-API’s). */
-  const [adminAccess, setAdminAccess] = useState<'pending' | 'verifying' | 'ok' | 'login'>('pending')
+  /** Na mount: superadmin (platform) óf zaak-eigenaar met wachtwoord vandaag. Klanten zonder geldige `vysion_tenant`blijven naar /login — géén automatische tenant-sessie via cookies. */
+  /** `verifying`= client dacht ingelogd; wacht op `/api/auth/verify-tenant-session`(zelfde regels als schrijf-API’s). */
+  const [adminAccess, setAdminAccess] = useState<'pending' |  'verifying' |  'ok' |  'login'>('pending')
   const baseUrl = `/shop/${params.tenant}/admin`
   const {
     moduleAccess,
@@ -119,7 +119,7 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
   }, [params.tenant])
 
   /**
-   * Marketing-demo (frituurnolim / frituur-nolim): `?demo=bekijk` of `alleen_lezen=1`, of actieve
+   * Marketing-demo (frituurnolim / frituur-nolim): `?demo=bekijk`of `alleen_lezen=1`, of actieve
    * sessie na eerdere demo-URL — hele /admin/* zonder login (niet alleen kassa).
    */
   const [demoPublicUnauthenticated, setDemoPublicUnauthenticated] = useState(false)
@@ -159,7 +159,7 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
       const p = new URLSearchParams(raw)
       p.delete('sa_handoff')
       const s = p.toString()
-      return s ? `?${s}` : ''
+      return s ? `?${s}`: ''
     }
 
     const removeHandoffFromAddressBar = () => {
@@ -234,7 +234,7 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
     goTenantLogin()
   }, [loading, tenantExists, params.tenant, demoPublicUnauthenticated, isAnyKassaPos])
 
-  /** Server moet dezelfde sessie zien als schrijf-API’s; ruimt verouderde `vysion_tenant` op bij mismatch. */
+  /** Server moet dezelfde sessie zien als schrijf-API’s; ruimt verouderde `vysion_tenant`op bij mismatch. */
   useEffect(() => {
     if (adminAccess !== 'verifying') return
     if (demoPublicUnauthenticated) return
@@ -286,7 +286,7 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
   }, [adminAccess, params.tenant, demoPublicUnauthenticated])
 
   /**
-   * Welkom-splash (/welkom) wordt getoond vanuit admin/page als `vysion_welcomed_*` ontbreekt.
+   * Welkom-splash (/welkom) wordt getoond vanuit admin/page als `vysion_welcomed_*`ontbreekt.
    * Wie eerst een subpagina opent (b.v. Rapporten) had die flag niet → bij later bezoek aan
    * /admin springt de app "ineens" naar het ENTER-scherm. Zet de flag hier als we al op een
    * admin-subroute zitten (niet alleen dashboard-root).
@@ -457,7 +457,7 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-gray-600">
-            {adminAccess === 'login' ? t('adminLayout.redirectLogin') : t('adminLayout.loading')}
+            {adminAccess === 'login'? t('adminLayout.redirectLogin') : t('adminLayout.loading')}
           </p>
         </div>
       </div>
@@ -465,7 +465,7 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
   }
 
   return (
-    <div style={{ maxWidth: '100%', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-100">
+    <div style={{ maxWidth: '100%', overflowX: 'hidden', width: '100%'}} className="min-h-screen bg-gray-100">
       {/* ── Zwarte topbalk (zelfde stijl als kassa). Z-index 100 — modals/dialoog: min. z-[130] zodat ze boven deze balk blijven (iPad). ── */}
       <div
         className="fixed top-0 left-0 right-0 z-[100] flex items-center gap-2 bg-black px-2 sm:px-3"
@@ -544,7 +544,7 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
       >
         <div
           className={`max-w-full p-4 md:p-6 ${
-            isAdminDashboardRoot ? 'pb-0' : 'pb-[max(6rem,calc(var(--vysion-web-kb-height,0px)+1.5rem))]'
+            isAdminDashboardRoot ? 'pb-0': 'pb-[max(6rem,calc(var(--vysion-web-kb-height,0px)+1.5rem))]'
           }`}
         >
           {children}
@@ -615,7 +615,7 @@ function LanguageSelector() {
         className="flex touch-manipulation items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors"
       >
         <LocaleFlagEmoji locale={locale} className="text-base text-white" />
-        <svg className={`w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className={`w-3 h-3 transition-transform ${isOpen ? 'rotate-180': ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
@@ -626,7 +626,7 @@ function LanguageSelector() {
             <button
               key={langCode}
               onClick={() => { setLocale(langCode as typeof locale); setIsOpen(false) }}
-              className={`w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors ${locale === langCode ? 'bg-blue-50 text-blue-600' : 'text-gray-700'}`}
+              className={`w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors ${locale === langCode ? 'bg-blue-50 text-blue-600': 'text-gray-700'}`}
             >
               <LocaleFlagEmoji locale={langCode} className="text-lg" />
               <span className="text-sm">{localeNames[langCode]}</span>

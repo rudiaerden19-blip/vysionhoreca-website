@@ -49,7 +49,7 @@ export default function PrijzenPage() {
                 type="button"
                 onClick={() => setIsYearly(false)}
                 className={`px-6 py-3 rounded-full font-semibold transition-all ${
-                  !isYearly ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                  !isYearly ? 'bg-gray-900 text-white shadow-sm': 'text-gray-600 hover:text-gray-900'
                 }`}
               >
                 {t('pricing.billingMonthly')}
@@ -58,7 +58,7 @@ export default function PrijzenPage() {
                 type="button"
                 onClick={() => setIsYearly(true)}
                 className={`px-6 py-3 rounded-full font-semibold transition-all relative pr-8 ${
-                  isYearly ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                  isYearly ? 'bg-gray-900 text-white shadow-sm': 'text-gray-600 hover:text-gray-900'
                 }`}
               >
                 {t('pricing.billingYearly')}
@@ -106,7 +106,7 @@ export default function PrijzenPage() {
                 </ul>
 
                 <a
-                  href={`/registreer?lang=${locale}&plan=starter&billing=${isYearly ? 'yearly' : 'monthly'}`}
+                  href={`/registreer?lang=${locale}&plan=starter&billing=${isYearly ? 'yearly': 'monthly'}`}
                   className="block w-full border-2 border-gray-900 text-gray-900 text-center py-3.5 rounded-full font-semibold hover:bg-gray-900 hover:text-white transition-colors"
                 >
                   {t('pricing.chooseStarter')}
@@ -167,7 +167,7 @@ export default function PrijzenPage() {
                 </ul>
 
                 <a
-                  href={`/registreer?lang=${locale}&plan=pro&billing=${isYearly ? 'yearly' : 'monthly'}`}
+                  href={`/registreer?lang=${locale}&plan=pro&billing=${isYearly ? 'yearly': 'monthly'}`}
                   className="block w-full bg-accent text-white text-center py-3.5 rounded-full font-semibold hover:bg-accent/90 transition-colors"
                 >
                   {t('pricing.choosePro')}

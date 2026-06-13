@@ -14,11 +14,11 @@
  *    order?:      { column: string; ascending?: boolean }
  *    limit?:      number
  *    range?:      [from: number, to: number]
- *    single?:     'one' | 'maybe'              // .single() of .maybeSingle()
+ *    single?:     'one' |  'maybe'             // .single() of .maybeSingle()
  *  }
  *
  *  Beveiliging:
- *   1. `verifyTenantOrSuperAdmin` — alleen eigenaar of superadmin
+ *   1. `verifyTenantOrSuperAdmin`— alleen eigenaar of superadmin
  *   2. Whitelist tabellen via `admin-db-proxy-spec.ts`
  *   3. Tenant-slug WORDT GEFORCEERD in de query (overschrijft elke andere
  *      `match[tenantSlugColumn]`).
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
     try {
       raw = await req.json()
     } catch {
-      return NextResponse.json({ error: 'Ongeldige JSON' }, { status: 400 })
+      return NextResponse.json({ error: 'Ongeldige JSON'}, { status: 400 })
     }
     const parsed = BodySchema.safeParse(raw)
     if (!parsed.success) {
@@ -75,13 +75,13 @@ export async function POST(req: NextRequest) {
     const spec = getTableSpec(body.table)
     if (!spec) {
       logger.warn('[admin-db-read] geblokkeerde tabel', { requestId, table: body.table })
-      return NextResponse.json({ error: 'Tabel niet toegestaan' }, { status: 403 })
+      return NextResponse.json({ error: 'Tabel niet toegestaan'}, { status: 403 })
     }
 
     // ── Auth ───────────────────────────────────────────────────────────────
     const access = await verifyTenantOrSuperAdmin(req, body.tenantSlug)
     if (!access.authorized) {
-      return NextResponse.json({ error: access.error || 'Niet geautoriseerd' }, { status: 403 })
+      return NextResponse.json({ error: access.error || 'Niet geautoriseerd'}, { status: 403 })
     }
 
     // ── Rate-limit ─────────────────────────────────────────────────────────
@@ -89,15 +89,15 @@ export async function POST(req: NextRequest) {
     const rl = await checkRateLimit(apiRateLimiter, `admin-db-read:${body.tenantSlug}:${actorId}`)
     if (!rl.success) {
       return NextResponse.json(
-        { error: 'Te veel verzoeken. Probeer het later opnieuw.' },
-        { status: 429, headers: { 'Retry-After': '60' } }
+        { error: 'Te veel verzoeken. Probeer het later opnieuw.'},
+        { status: 429, headers: { 'Retry-After': '60'} }
       )
     }
 
     // ── DB-client ──────────────────────────────────────────────────────────
     const supabase = getServerSupabaseClient()
     if (!supabase) {
-      return NextResponse.json({ error: 'Database niet beschikbaar' }, { status: 503 })
+      return NextResponse.json({ error: 'Database niet beschikbaar'}, { status: 503 })
     }
 
     // ── Query bouwen ───────────────────────────────────────────────────────
@@ -139,7 +139,7 @@ export async function POST(req: NextRequest) {
       const span = to - from + 1
       if (span > MAX_LIMIT) {
         return NextResponse.json(
-          { error: `Range te groot (max ${MAX_LIMIT})` },
+          { error: `Range te groot (max ${MAX_LIMIT})`},
           { status: 400 }
         )
       }
@@ -165,6 +165,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, data: data ?? null }, { status: 200 })
   } catch (err: any) {
     logger.error('[admin-db-read] uncaught', { requestId, err: err?.message || String(err) })
-    return NextResponse.json({ error: 'Interne fout' }, { status: 500 })
+    return NextResponse.json({ error: 'Interne fout'}, { status: 500 })
   }
 }

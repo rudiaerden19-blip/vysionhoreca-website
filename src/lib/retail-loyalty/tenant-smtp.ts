@@ -13,7 +13,7 @@ export async function resolveTenantSmtp(
   supabase: SupabaseClient,
   tenantSlug: string,
   businessNameFallback?: string,
-): Promise<{ ok: true; smtp: TenantSmtpConfig } | { ok: false; error: 'smtp_not_configured' }> {
+): Promise<{ ok: true; smtp: TenantSmtpConfig } | { ok: false; error: 'smtp_not_configured'}> {
   let smtpHost = 'smtp.zoho.eu'
   let smtpPort = 465
   let smtpUser = process.env.ZOHO_EMAIL || ''
@@ -37,7 +37,7 @@ export async function resolveTenantSmtp(
       businessNameFallback ||
       "Vysion kassa's"
   } else if (!process.env.ZOHO_EMAIL || !process.env.ZOHO_PASSWORD) {
-    return { ok: false, error: 'smtp_not_configured' }
+    return { ok: false, error: 'smtp_not_configured'}
   }
 
   return {

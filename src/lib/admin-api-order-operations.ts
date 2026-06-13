@@ -18,7 +18,7 @@ const ORDERS_ANALYTICS_PAGE_SIZE = 1000
 const ORDERS_ANALYTICS_MAX_PAGES = 500
 
 const ANALYTICS_ORDER_STATUS_EXCLUDE =
-  '("cancelled","rejected","CANCELLED","REJECTED")' as const
+  '("cancelled","rejected","CANCELLED","REJECTED")'as const
 
 /**
  * Haalt alle orders voor tenant binnen [startUTC, endUTC] op (stabiele sortering voor range-paginatie).
@@ -266,7 +266,7 @@ export async function regenerateZReportForDate(
 
     const orders = ordersRaw.filter((o) =>
       orderCountsTowardRevenueAndZReport(
-        o as Pick<Order, 'order_type' | 'status' | 'payment_status'>
+        o as Pick<Order, 'order_type' |  'status' |  'payment_status'>
       )
     ) as Array<
       Pick<
@@ -397,7 +397,7 @@ export async function regenerateZReportForDate(
     }
 
     console.log(
-      `✅ Z-rapport bijgewerkt voor ${tenantSlug} op ${date}: ${orders.length} bestellingen, €${total.toFixed(2)}`
+      `Z-rapport bijgewerkt voor ${tenantSlug} op ${date}: ${orders.length} bestellingen, €${total.toFixed(2)}`
     )
   } catch (error) {
     console.error('regenerateZReportForDate: Onverwachte fout:', error)
@@ -449,7 +449,7 @@ export async function confirmOrder(tenantSlug: string, id: string): Promise<bool
 
 /**
  * Webshop: goedkeuren → confirmed — payment_status niet aanpassen (cash).
- * Online: Stripe-webhook zet `paid` — telt dan al in rapporten vóór bevestiging.
+ * Online: Stripe-webhook zet `paid`— telt dan al in rapporten vóór bevestiging.
  * Rapportage gebruikt orderCountsTowardRevenueAndZReport (confirmed+ of paid).
  */
 export async function approveWebshopOrder(tenantSlug: string, id: string): Promise<boolean> {
@@ -504,7 +504,7 @@ export async function approveWebshopOrder(tenantSlug: string, id: string): Promi
 
 /**
  * Webshop: definitief afgerond (na keuken / Afronden-knop).
- * `paid` voor online betaalmethode alleen als webhook dat al zette; nooit pending→paid voor online.
+ * `paid`voor online betaalmethode alleen als webhook dat al zette; nooit pending→paid voor online.
  * Cash bij afhaal: bij afronden nog pending → markeer paid (ontvangen bij afhalen).
  */
 export async function completeWebshopOrder(

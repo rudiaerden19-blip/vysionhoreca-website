@@ -1,12 +1,12 @@
 /**
  * HMAC-getekend sessietoken voor zaak-eigenaar en superadmin.
  *
- * Doel: replace de naakte `x-business-id` + `x-auth-email` headers (uit
+ * Doel: replace de naakte `x-business-id`+ `x-auth-email`headers (uit
  * localStorage) door een token dat alleen door de server kan worden gemaakt.
  * Iemand die je business_id + email kent, kan zonder dit token niet meer
  * gewoon doen alsof hij ingelogd is.
  *
- * Vereiste env-var: `SESSION_HMAC_SECRET` (>= 32 bytes random; in Vercel
+ * Vereiste env-var: `SESSION_HMAC_SECRET`(>= 32 bytes random; in Vercel
  * Project Settings zetten). Zonder secret returnt sign() null en verify()
  * null → de auth-laag valt automatisch terug op de oude header-mode (zie
  * `verify-tenant-access.ts`). Zo breekt niets als de env-var ontbreekt;
@@ -20,7 +20,7 @@
  *
  *   {
  *     v: 1,
- *     k: 'owner' | 'superadmin',
+ *     k: 'owner' |  'superadmin',
  *     id: string,                    // business_profiles.id of super_admins.id
  *     email: string,                 // lowercase
  *     tenant_slug?: string,          // alleen bij k=owner; optioneel
@@ -37,7 +37,7 @@ import { createHmac, timingSafeEqual } from 'node:crypto'
 const TOKEN_VERSION = 1
 const DEFAULT_TTL_SECONDS = 14 * 24 * 60 * 60 // 14 dagen — gelijk aan oude OWNER_SESSION_TTL_MS
 
-export type SessionKind = 'owner' | 'superadmin'
+export type SessionKind = 'owner' |  'superadmin'
 
 export interface OwnerSessionPayload {
   v: number
@@ -71,10 +71,10 @@ function getSecret(): string | null {
 }
 
 /**
- * Health-check helper. Gebruikt door `/api/health` om te tonen of HMAC-auth
+ * Health-check helper. Gebruikt door `/api/health`om te tonen of HMAC-auth
  * actief is. Lekt niets over de inhoud van het secret.
  */
-export function getSessionHmacStatus(): 'configured' | 'weak' | 'not_configured' {
+export function getSessionHmacStatus(): 'configured' |  'weak' |  'not_configured'{
   const raw = process.env.SESSION_HMAC_SECRET?.trim()
   if (!raw) return 'not_configured'
   if (raw.length < 32) return 'weak'
@@ -98,8 +98,8 @@ export function logSessionHmacWarningOnce(): void {
   _hmacWarningLogged = true
   // eslint-disable-next-line no-console
   console.warn(
-    `[SECURITY] SESSION_HMAC_SECRET ${status} → auth valt terug op legacy ` +
-      `header-mode (x-business-id + x-auth-email). Zet een random secret ` +
+    `[SECURITY] SESSION_HMAC_SECRET ${status} → auth valt terug op legacy `+
+      `header-mode (x-business-id + x-auth-email). Zet een random secret `+
       `van >= 32 bytes in Vercel Project Settings → Environment Variables.`
   )
 }
@@ -129,7 +129,7 @@ export interface SignSessionInput {
 }
 
 /**
- * Geef een ondertekend token terug. Returned `null` als de secret ontbreekt
+ * Geef een ondertekend token terug. Returned `null`als de secret ontbreekt
  * of te kort is — caller logt dan en valt terug op header-mode.
  */
 export function signSessionToken(input: SignSessionInput): string | null {
@@ -172,7 +172,7 @@ export function signSessionToken(input: SignSessionInput): string | null {
 }
 
 /**
- * Verifieer een token. Geeft de payload terug bij succes, `null` bij elk falen
+ * Verifieer een token. Geeft de payload terug bij succes, `null`bij elk falen
  * (geen secret, ongeldige vorm, slechte signature, expired, verkeerde versie).
  * NOOIT exception throwen — caller mag rustig downgraden naar header-mode.
  */

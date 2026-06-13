@@ -43,7 +43,7 @@ interface ProductCostData {
   ingredients: ProductIngredient[]
   totalCost: number
   requiredPrice: number
-  status: 'good' | 'low' | 'high'
+  status: 'good' |  'low' |  'high'
   difference: number
   usedMultiplier: number
 }
@@ -119,7 +119,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
           simulator_name: simulatorName,
           simulator_multiplier: parseFloat(simulatorMultiplier.replace(',', '.')) || 3,
           updated_at: new Date().toISOString(),
-        }, { tenantSlug: params.tenant, onConflict: 'tenant_slug' })
+        }, { tenantSlug: params.tenant, onConflict: 'tenant_slug'})
       }, 1000)
       return () => clearTimeout(timeoutId)
     }
@@ -146,8 +146,8 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
     const [productsRes, ingredientsRes, categoriesRes, productIngsRes] = await Promise.all([
       supabase.from('menu_products').select('id, name, price, category_id, price_multiplier').eq('tenant_slug', params.tenant).order('name'),
       adminDb.select<any[]>('ingredients', { tenantSlug: params.tenant, select: '*', order: { column: 'name', ascending: true } }),
-      adminDb.select<any[]>('cost_categories', { tenantSlug: params.tenant, select: '*' }),
-      adminDb.select<any[]>('product_ingredients', { tenantSlug: params.tenant, select: '*' }),
+      adminDb.select<any[]>('cost_categories', { tenantSlug: params.tenant, select: '*'}),
+      adminDb.select<any[]>('product_ingredients', { tenantSlug: params.tenant, select: '*'}),
     ])
 
     if (productsRes.data) setProducts(productsRes.data)
@@ -251,7 +251,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
               simulator_multiplier: parseFloat(simMult.replace(',', '.')) || 3,
               updated_at: new Date().toISOString(),
             },
-            { tenantSlug: params.tenant, onConflict: 'tenant_slug' }
+            { tenantSlug: params.tenant, onConflict: 'tenant_slug'}
           )
           if (up.ok) {
             setStandardPrices(mergedPrices)
@@ -282,7 +282,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
       verpakking: parseFloat(standardPrices.verpakking.replace(',', '.')) || 0.30,
       kosten_per_stuk: parseFloat(standardPrices.kosten_per_stuk.replace(',', '.')) || 0.40,
       updated_at: new Date().toISOString(),
-    }, { tenantSlug: params.tenant, onConflict: 'tenant_slug' })
+    }, { tenantSlug: params.tenant, onConflict: 'tenant_slug'})
     if (r.ok) {
       setStandardPricesSaved(true)
       setTimeout(() => setStandardPricesSaved(false), 2000)
@@ -307,7 +307,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
         unit: 'stuk',
         purchase_price: price,
         notes: 'Standaardprijs',
-      }, { tenantSlug: businessId, select: '*' })
+      }, { tenantSlug: businessId, select: '*'})
       const newIng = insRes.ok && Array.isArray(insRes.data) ? insRes.data[0] : null
       if (newIng) {
         ingredient = newIng
@@ -326,7 +326,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
           product_id: productId,
           ingredient_id: ingredient.id,
           quantity: 1,
-        }, { tenantSlug: businessId, select: '*' })
+        }, { tenantSlug: businessId, select: '*'})
         const pi = piRes.ok && Array.isArray(piRes.data) ? piRes.data[0] : null
         if (pi) {
           setProductIngredients(prev => [...prev, pi])
@@ -461,8 +461,8 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
       purchase_price: product.unit_price || 0,
       units_per_package: product.units_per_package || 1,
       package_price: product.package_price || 0,
-      notes: product.article_number ? `Art. #${product.article_number}` : '',
-    }, { tenantSlug: businessId, select: '*' })
+      notes: product.article_number ? `Art. #${product.article_number}`: '',
+    }, { tenantSlug: businessId, select: '*'})
     const newIng = ingRes.ok && Array.isArray(ingRes.data) ? ingRes.data[0] : null
     if (!newIng) {
       console.error('Failed to create ingredient:', ingRes.error)
@@ -477,7 +477,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
       product_id: productId,
       ingredient_id: ingredientId,
       quantity: addingQuantity,
-    }, { tenantSlug: businessId, select: '*' })
+    }, { tenantSlug: businessId, select: '*'})
     const pi = piRes.ok && Array.isArray(piRes.data) ? piRes.data[0] : null
     if (pi) setProductIngredients(prev => [...prev, pi])
 
@@ -494,7 +494,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
       product_id: productId,
       ingredient_id: ingredient.id,
       quantity: addingQuantity,
-    }, { tenantSlug: businessId, select: '*' })
+    }, { tenantSlug: businessId, select: '*'})
     const pi = piRes.ok && Array.isArray(piRes.data) ? piRes.data[0] : null
     if (pi) setProductIngredients(prev => [...prev, pi])
 
@@ -534,11 +534,11 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
       : (ingredientCount > 0 ? totalMultiplier / ingredientCount : defaultMultiplier)
     const requiredPrice = totalCost * avgMultiplier
 
-    let status: 'good' | 'low' | 'high' = 'good'
+    let status: 'good' |  'low' |  'high'= 'good'
     const difference = product.price - requiredPrice
 
     if (totalCost === 0) {
-      status = 'good' // No ingredients yet
+      status = 'good'// No ingredients yet
     } else if (product.price < requiredPrice * 0.95) {
       status = 'low'
     } else if (product.price > requiredPrice * 1.3) {
@@ -570,7 +570,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
         ingredient_id: addingIngredient,
         quantity: addingQuantity,
       },
-      { tenantSlug: params.tenant, select: '*' }
+      { tenantSlug: params.tenant, select: '*'}
     )
     const inserted = Array.isArray(r.data) ? r.data[0] : r.data
     if (r.ok && inserted) {
@@ -701,7 +701,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
 
       {/* Vaste Standaardprijzen Kader - Fixed onderaan wanneer product OF simulator open is */}
       <div className={`bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-200 shadow-sm transition-all ${
-        (selectedProduct || showSimulator) ? 'fixed bottom-0 left-0 right-0 z-50 shadow-2xl rounded-none border-t-4 border-blue-400' : ''
+        (selectedProduct || showSimulator) ? 'fixed bottom-0 left-0 right-0 z-50 shadow-2xl rounded-none border-t-4 border-blue-400': ''
       }`}>
         <div className="flex items-center justify-between mb-3 max-w-7xl mx-auto">
           <div>
@@ -720,9 +720,9 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
             </h3>
             <p className="text-sm text-blue-600 mt-1">
               {selectedProduct 
-                ? ` Klik op + om toe te voegen aan "${products.find(p => p.id === selectedProduct)?.name}"`
+                ? `Klik op + om toe te voegen aan "${products.find(p => p.id === selectedProduct)?.name}"`
                 : showSimulator
-                  ? ` Klik op + om toe te voegen aan de Simulator`
+                  ? `Klik op + om toe te voegen aan de Simulator`
                   : ` ${t('dashboard.productCosts.openProductFirst')}`}
             </p>
           </div>
@@ -774,7 +774,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
             <div
               key={item.key}
               className={`bg-white rounded-lg p-2 sm:p-3 shadow-sm transition-all border-2 ${
-                addingStandardItem === item.label ? 'border-green-500 bg-green-100' : 'border-transparent'
+                addingStandardItem === item.label ? 'border-green-500 bg-green-100': 'border-transparent'
               }`}
             >
               <div className="flex items-center justify-between mb-1">
@@ -820,7 +820,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                           : 'bg-purple-500 text-white hover:bg-purple-600 hover:scale-110 active:scale-95'
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
-                  title={selectedProduct ? `${item.label} toevoegen aan product` : showSimulator ? `${item.label} toevoegen aan simulator` : 'Open eerst een product of simulator'}
+                  title={selectedProduct ? `${item.label} toevoegen aan product`: showSimulator ? `${item.label} toevoegen aan simulator`: 'Open eerst een product of simulator'}
                 >
                   {addingStandardItem === item.label ? '' : '+'}
                 </button>
@@ -850,7 +850,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
               <p className="text-sm text-purple-600">{t('simulator.subtitle')}</p>
             </div>
           </div>
-          <span className="text-purple-500 text-xl">{showSimulator ? '▲' : '▼'}</span>
+          <span className="text-purple-500 text-xl">{showSimulator ? '−' : '+'}</span>
         </button>
 
         <AnimatePresence>
@@ -867,7 +867,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                   e.dataTransfer.dropEffect = 'copy'
                 }}
                 onDrop={handleDropOnSimulator}
-                className={`p-4 ${draggedItem ? 'bg-purple-100 border-2 border-dashed border-purple-400' : ''}`}
+                className={`p-4 ${draggedItem ? 'bg-purple-100 border-2 border-dashed border-purple-400': ''}`}
               >
                 {/* Simulator Header */}
                 <div className="flex items-center gap-4 mb-4">
@@ -1001,7 +1001,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                                 inputMode="decimal"
                                 defaultValue={item.quantity}
                                 key={`sim-${idx}-${item.quantity}`}
-                                onFocus={(e) => { e.target.value = '' }}
+                                onFocus={(e) => { e.target.value = ''}}
                                 onBlur={(e) => {
                                   const val = parseFloat(e.target.value.replace(',', '.'))
                                   if (!isNaN(val) && val > 0) {
@@ -1096,11 +1096,11 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
             className={`bg-white rounded-xl shadow-lg border-2 transition-all ${
               selectedProduct === pc.product.id
                 ? 'border-green-500 ring-2 ring-green-200' 
-                : pc.status === 'low' ? 'border-red-300' :
-                  pc.status === 'high' ? 'border-blue-300' :
-                  pc.ingredients.length > 0 ? 'border-green-300' : 'border-gray-200'
+                : pc.status === 'low'? 'border-red-300':
+                  pc.status === 'high'? 'border-blue-300':
+                  pc.ingredients.length > 0 ? 'border-green-300': 'border-gray-200'
             }`}
-            style={{ overflow: 'visible' }}
+            style={{ overflow: 'visible'}}
           >
             {/* Product Header */}
             <div
@@ -1109,12 +1109,12 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
             >
               <div className="flex items-center gap-4">
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${
-                  pc.status === 'low' ? 'bg-red-100' :
-                  pc.status === 'high' ? 'bg-blue-100' :
-                  pc.ingredients.length > 0 ? 'bg-green-100' : 'bg-gray-100'
+                  pc.status === 'low'? 'bg-red-100':
+                  pc.status === 'high'? 'bg-blue-100':
+                  pc.ingredients.length > 0 ? 'bg-green-100': 'bg-gray-100'
                 }`}>
-                  {pc.status === 'low' ? '' :
-                   pc.status === 'high' ? '' :
+                  {pc.status === 'low'? '' :
+                   pc.status === 'high'? '' :
                    pc.ingredients.length > 0 ? '' : ''}
                 </div>
                 <div>
@@ -1146,7 +1146,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                       onBlur={() => {
                         const val = editingMultiplier[pc.product.id]
                         if (val !== undefined) {
-                          updateProductMultiplier(pc.product.id, val === '' ? null : parseFloat(val) || null)
+                          updateProductMultiplier(pc.product.id, val === ''? null : parseFloat(val) || null)
                           setEditingMultiplier(prev => {
                             const newVals = { ...prev }
                             delete newVals[pc.product.id]
@@ -1177,17 +1177,17 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                 </div>
                 {pc.ingredients.length > 0 && (
                   <div className={`px-3 py-1 rounded-full text-sm font-bold ${
-                    pc.status === 'low' ? 'bg-red-100 text-red-700' :
-                    pc.status === 'high' ? 'bg-blue-100 text-blue-700' :
+                    pc.status === 'low'? 'bg-red-100 text-red-700':
+                    pc.status === 'high'? 'bg-blue-100 text-blue-700':
                     'bg-green-100 text-green-700'
                   }`}>
-                    {pc.status === 'low' ? `↑ €${Math.abs(pc.difference).toFixed(2)}` :
-                     pc.status === 'high' ? `${t('dashboard.productCosts.high')} +€${pc.difference.toFixed(2)}` :
+                    {pc.status === 'low'? `↑ €${Math.abs(pc.difference).toFixed(2)}`:
+                     pc.status === 'high'? `${t('dashboard.productCosts.high')} +€${pc.difference.toFixed(2)}`:
                      ` ${t('dashboard.productCosts.good')}`}
                   </div>
                 )}
                 <div className="text-gray-400">
-                  {selectedProduct === pc.product.id ? '▲' : '▼'}
+                  {selectedProduct === pc.product.id ? '−' : '+'}
                 </div>
               </div>
             </div>
@@ -1247,7 +1247,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                                   inputMode="decimal"
                                   defaultValue={pi.quantity}
                                   key={`qty-${pi.id}-${pi.quantity}`}
-                                  onFocus={(e) => { e.target.value = '' }}
+                                  onFocus={(e) => { e.target.value = ''}}
                                   onBlur={(e) => {
                                     const val = e.target.value.replace(',', '.')
                                     const num = parseFloat(val)
@@ -1310,7 +1310,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                           inputMode="decimal"
                           defaultValue={addingQuantity}
                           key={`adding-${addingQuantity}`}
-                          onFocus={(e) => { e.target.value = '' }}
+                          onFocus={(e) => { e.target.value = ''}}
                           onBlur={(e) => {
                             const val = e.target.value.replace(',', '.')
                             const num = parseFloat(val)
@@ -1407,8 +1407,8 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                     {/* Summary */}
                     {pc.ingredients.length > 0 && (
                       <div className={`mt-4 p-4 rounded-lg ${
-                        pc.status === 'low' ? 'bg-red-50 border border-red-200' :
-                        pc.status === 'high' ? 'bg-blue-50 border border-blue-200' :
+                        pc.status === 'low'? 'bg-red-50 border border-red-200':
+                        pc.status === 'high'? 'bg-blue-50 border border-blue-200':
                         'bg-green-50 border border-green-200'
                       }`}>
                         <div className="grid grid-cols-3 gap-4 text-center">
@@ -1426,8 +1426,8 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                           </div>
                         </div>
                         <div className={`mt-3 text-center text-lg font-bold ${
-                          pc.status === 'low' ? 'text-red-700' :
-                          pc.status === 'high' ? 'text-blue-700' :
+                          pc.status === 'low'? 'text-red-700':
+                          pc.status === 'high'? 'text-blue-700':
                           'text-green-700'
                         }`}>
                           {pc.status === 'low' && ` ${t('dashboard.productCosts.priceTooLow').replace('{amount}', Math.abs(pc.difference).toFixed(2)).replace('{target}', pc.requiredPrice.toFixed(2))}`}

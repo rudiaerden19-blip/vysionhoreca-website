@@ -49,7 +49,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
     setFormData(prev => ({ ...prev, [name]: value }))
     // Clear error for this field
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }))
+      setErrors(prev => ({ ...prev, [name]: ''}))
     }
     setGeneralError('')
   }
@@ -136,7 +136,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          style={{ borderColor: primaryColor, borderTopColor: 'transparent' }}
+          style={{ borderColor: primaryColor, borderTopColor: 'transparent'}}
           className="w-12 h-12 border-4 rounded-full"
         />
       </div>
@@ -144,7 +144,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
   }
 
   return (
-    <div style={{ maxWidth: '100%', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-50 flex items-center justify-center p-3 sm:p-4">
+    <div style={{ maxWidth: '100%', overflowX: 'hidden', width: '100%'}} className="min-h-screen bg-gray-50 flex items-center justify-center p-3 sm:p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -176,7 +176,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
               value={formData.name}
               onChange={handleChange}
               className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all ${
-                errors.name ? 'border-red-500 bg-red-50' : 'border-gray-200'
+                errors.name ? 'border-red-500 bg-red-50': 'border-gray-200'
               }`}
               placeholder={t('accountPage.name')}
             />
@@ -194,7 +194,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
               value={formData.email}
               onChange={handleChange}
               className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all ${
-                errors.email ? 'border-red-500 bg-red-50' : 'border-gray-200'
+                errors.email ? 'border-red-500 bg-red-50': 'border-gray-200'
               }`}
               placeholder={t('accountPage.email')}
             />
@@ -212,7 +212,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
               value={formData.phone}
               onChange={handleChange}
               className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all ${
-                errors.phone ? 'border-red-500 bg-red-50' : 'border-gray-200'
+                errors.phone ? 'border-red-500 bg-red-50': 'border-gray-200'
               }`}
               placeholder={t('accountPage.phone')}
             />
@@ -230,7 +230,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
               value={formData.address}
               onChange={handleChange}
               className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all ${
-                errors.address ? 'border-red-500 bg-red-50' : 'border-gray-200'
+                errors.address ? 'border-red-500 bg-red-50': 'border-gray-200'
               }`}
               placeholder={t('accountPage.address')}
             />
@@ -249,7 +249,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
                 value={formData.postal_code}
                 onChange={handleChange}
                 className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all ${
-                  errors.postal_code ? 'border-red-500 bg-red-50' : 'border-gray-200'
+                  errors.postal_code ? 'border-red-500 bg-red-50': 'border-gray-200'
                 }`}
                 placeholder={t('accountPage.postalCode')}
               />
@@ -265,7 +265,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
                 value={formData.city}
                 onChange={handleChange}
                 className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all ${
-                  errors.city ? 'border-red-500 bg-red-50' : 'border-gray-200'
+                  errors.city ? 'border-red-500 bg-red-50': 'border-gray-200'
                 }`}
                 placeholder={t('accountPage.city')}
               />
@@ -284,7 +284,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
               value={formData.password}
               onChange={handleChange}
               className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all ${
-                errors.password ? 'border-red-500 bg-red-50' : 'border-gray-200'
+                errors.password ? 'border-red-500 bg-red-50': 'border-gray-200'
               }`}
               placeholder={t('accountPage.passwordMin')}
             />
@@ -302,7 +302,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
               value={formData.confirmPassword}
               onChange={handleChange}
               className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all ${
-                errors.confirmPassword ? 'border-red-500 bg-red-50' : 'border-gray-200'
+                errors.confirmPassword ? 'border-red-500 bg-red-50': 'border-gray-200'
               }`}
               placeholder={t('accountPage.confirmPassword')}
             />

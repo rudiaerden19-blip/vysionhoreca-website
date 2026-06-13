@@ -52,7 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }: { data: { session: any } }) => {
       if (!isMounted) return
-      console.log('Initial session:', session ? 'found' : 'none')
+      console.log('Initial session:', session ? 'found': 'none')
       setSession(session)
       setUser(session?.user ?? null)
       if (session?.user) {

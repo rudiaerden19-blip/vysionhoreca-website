@@ -23,7 +23,7 @@ export default function VerkoopPage({ params }: { params: { tenant: string } }) 
   }
   const dayLabels = dayLabelsMap[locale] || dayLabelsMap.nl
   
-  const [period, setPeriod] = useState<'today' | 'week' | 'month' | 'year'>('week')
+  const [period, setPeriod] = useState<'today' |  'week' |  'month' |  'year'>('week')
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState<SalesStats>({ total_orders: 0, total_revenue: 0, average_order: 0, orders_by_status: {} })
   const [dailyData, setDailyData] = useState<{ date: string; revenue: number; orders: number }[]>([])
@@ -39,8 +39,8 @@ export default function VerkoopPage({ params }: { params: { tenant: string } }) 
     
     const [statsData, dailyDataResult, topProductsResult] = await Promise.all([
       getSalesStats(params.tenant, period),
-      getDailyRevenue(params.tenant, period === 'today' ? 1 : period === 'week' ? 7 : period === 'month' ? 30 : 365),
-      getTopProducts(params.tenant, period === 'today' ? 'week' : period),
+      getDailyRevenue(params.tenant, period === 'today'? 1 : period === 'week'? 7 : period === 'month'? 30 : 365),
+      getTopProducts(params.tenant, period === 'today'? 'week': period),
     ])
     
     setStats(statsData)
@@ -87,7 +87,7 @@ export default function VerkoopPage({ params }: { params: { tenant: string } }) 
               key={p}
               onClick={() => setPeriod(p)}
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                period === p ? 'bg-white shadow text-gray-900' : 'text-gray-500'
+                period === p ? 'bg-white shadow text-gray-900': 'text-gray-500'
               }`}
             >
               {t(`salesPage.periods.${p}`)}
@@ -164,10 +164,10 @@ export default function VerkoopPage({ params }: { params: { tenant: string } }) 
               <div key={day.date} className="flex-1 flex flex-col items-center">
                 <motion.div
                   initial={{ height: 0 }}
-                  animate={{ height: `${(day.revenue / maxRevenue) * 100}%` }}
+                  animate={{ height: `${(day.revenue / maxRevenue) * 100}%`}}
                   transition={{ delay: i * 0.1, duration: 0.5 }}
-                  className={`w-full rounded-t-lg ${day.revenue === 0 ? 'bg-gray-200' : 'bg-blue-600'}`}
-                  style={{ minHeight: day.revenue > 0 ? '20px' : '4px' }}
+                  className={`w-full rounded-t-lg ${day.revenue === 0 ? 'bg-gray-200': 'bg-blue-600'}`}
+                  style={{ minHeight: day.revenue > 0 ? '20px': '4px'}}
                 />
                 <p className="mt-2 text-sm text-gray-500">{formatDayLabel(day.date)}</p>
                 <p className="text-xs text-gray-400">€{day.revenue.toFixed(2)}</p>
@@ -203,7 +203,7 @@ export default function VerkoopPage({ params }: { params: { tenant: string } }) 
                   <div className="w-full bg-gray-100 rounded-full h-2 mt-1">
                     <div 
                       className="bg-blue-600 h-2 rounded-full" 
-                      style={{ width: `${(product.revenue / (topProducts[0]?.revenue || 1)) * 100}%` }} 
+                      style={{ width: `${(product.revenue / (topProducts[0]?.revenue || 1)) * 100}%`}} 
                     />
                   </div>
                 </div>

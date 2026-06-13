@@ -4,7 +4,7 @@
  *  POST  /api/admin/db
  *  Body  {
  *    table:  string                       // moet in ADMIN_DB_TABLES staan
- *    op:     'insert' | 'update' | 'upsert' | 'delete'
+ *    op:     'insert' |  'update' |  'upsert' |  'delete'
  *    data?:  object | object[]            // bij insert/update/upsert
  *    where?: Record<string, any>          // bij update/delete (eq-only)
  *    onConflict?: string                  // bij upsert
@@ -13,12 +13,12 @@
  *  }
  *
  *  Beveiliging:
- *   1. `verifyTenantOrSuperAdmin` (header-based, met DB-check)
+ *   1. `verifyTenantOrSuperAdmin`(header-based, met DB-check)
  *   2. Whitelist van tabellen + ops (`admin-db-proxy-spec.ts`)
  *   3. Tenant-slug in iedere row/where MOET matchen met de geverifieerde sessie
- *   4. `forbiddenColumns` worden gestript voor de DB-call de buffer raakt
+ *   4. `forbiddenColumns`worden gestript voor de DB-call de buffer raakt
  *   5. Per-tenant rate-limit (Upstash) — voorkomt dat 1 boze admin alles flat-tikt
- *   6. Elke mutation wordt naar `audit_log` geschreven
+ *   6. Elke mutation wordt naar `audit_log`geschreven
  */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
     try {
       raw = await req.json()
     } catch {
-      return NextResponse.json({ error: 'Ongeldige JSON' }, { status: 400 })
+      return NextResponse.json({ error: 'Ongeldige JSON'}, { status: 400 })
     }
     const parsed = BodySchema.safeParse(raw)
     if (!parsed.success) {
@@ -68,11 +68,11 @@ export async function POST(req: NextRequest) {
     const spec = getTableSpec(body.table)
     if (!spec) {
       logger.warn('[admin-db] geblokkeerde tabel', { requestId, table: body.table })
-      return NextResponse.json({ error: 'Tabel niet toegestaan' }, { status: 403 })
+      return NextResponse.json({ error: 'Tabel niet toegestaan'}, { status: 403 })
     }
     if (!spec.allowedOps.includes(body.op as AdminDbOp)) {
       return NextResponse.json(
-        { error: `Operatie ${body.op} niet toegestaan voor ${body.table}` },
+        { error: `Operatie ${body.op} niet toegestaan voor ${body.table}`},
         { status: 403 }
       )
     }
@@ -80,9 +80,9 @@ export async function POST(req: NextRequest) {
     // ── 3. Auth & tenant-access ───────────────────────────────────────────
     const access = await verifyTenantOrSuperAdmin(req, body.tenantSlug)
     if (!access.authorized) {
-      return NextResponse.json({ error: access.error || 'Niet geautoriseerd' }, { status: 403 })
+      return NextResponse.json({ error: access.error || 'Niet geautoriseerd'}, { status: 403 })
     }
-    const actorType: AuditActorType = access.isSuperAdmin ? 'superadmin' : 'owner'
+    const actorType: AuditActorType = access.isSuperAdmin ? 'superadmin': 'owner'
     const actorEmail = req.headers.get('x-auth-email') || req.headers.get('x-superadmin-email')
     const actorId = req.headers.get('x-business-id') || req.headers.get('x-superadmin-id')
 
@@ -90,18 +90,18 @@ export async function POST(req: NextRequest) {
     const rl = await checkRateLimit(apiRateLimiter, `admin-db:${body.tenantSlug}:${actorId || 'anon'}`)
     if (!rl.success) {
       return NextResponse.json(
-        { error: 'Te veel verzoeken. Probeer het later opnieuw.' },
-        { status: 429, headers: { 'Retry-After': '60' } }
+        { error: 'Te veel verzoeken. Probeer het later opnieuw.'},
+        { status: 429, headers: { 'Retry-After': '60'} }
       )
     }
 
     // ── 5. Server-side Supabase ───────────────────────────────────────────
     const supabase = getServerSupabaseClient()
     if (!supabase) {
-      return NextResponse.json({ error: 'Database niet beschikbaar' }, { status: 503 })
+      return NextResponse.json({ error: 'Database niet beschikbaar'}, { status: 503 })
     }
 
-    // Helper: verwijder `forbiddenColumns` + zorg dat tenantSlugColumn klopt.
+    // Helper: verwijder `forbiddenColumns`+ zorg dat tenantSlugColumn klopt.
     const sanitizeRow = (row: Record<string, any>): Record<string, any> => {
       const out: Record<string, any> = {}
       for (const [k, v] of Object.entries(row)) {
@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
       if (body.op === 'insert') {
         const rows = Array.isArray(body.data) ? body.data : [body.data]
         if (spec.maxRows && rows.length > spec.maxRows) {
-          return NextResponse.json({ error: `Te veel rijen (max ${spec.maxRows})` }, { status: 400 })
+          return NextResponse.json({ error: `Te veel rijen (max ${spec.maxRows})`}, { status: 400 })
         }
         const sanitized = rows.map((r) => sanitizeRow(r || {}))
         let q = supabase.from(body.table).insert(sanitized)
@@ -144,7 +144,7 @@ export async function POST(req: NextRequest) {
       else if (body.op === 'upsert') {
         const rows = Array.isArray(body.data) ? body.data : [body.data]
         if (spec.maxRows && rows.length > spec.maxRows) {
-          return NextResponse.json({ error: `Te veel rijen (max ${spec.maxRows})` }, { status: 400 })
+          return NextResponse.json({ error: `Te veel rijen (max ${spec.maxRows})`}, { status: 400 })
         }
         const sanitized = rows.map((r) => sanitizeRow(r || {}))
         let q = supabase.from(body.table).upsert(sanitized, body.onConflict ? { onConflict: body.onConflict } : undefined as any)
@@ -198,7 +198,7 @@ export async function POST(req: NextRequest) {
         op: body.op,
         err: e?.message || String(e),
       })
-      return NextResponse.json({ error: e?.message || 'DB-fout' }, { status: 400 })
+      return NextResponse.json({ error: e?.message || 'DB-fout'}, { status: 400 })
     }
 
     // ── 7. Audit log (faalt nooit hard) ───────────────────────────────────
@@ -226,6 +226,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, data: result }, { status: 200 })
   } catch (err: any) {
     logger.error('[admin-db] uncaught', { requestId, err: err?.message || String(err) })
-    return NextResponse.json({ error: 'Interne fout' }, { status: 500 })
+    return NextResponse.json({ error: 'Interne fout'}, { status: 500 })
   }
 }

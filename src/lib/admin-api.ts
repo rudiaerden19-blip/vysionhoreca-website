@@ -183,8 +183,8 @@ export interface TenantSettings {
   reservations_enabled?: boolean
   // Betaalmethodes
   payment_methods?: string[]
-  // Product afbeelding weergave: 'cover' (vult hele vak) of 'contain' (hele product zichtbaar)
-  image_display_mode?: 'cover' | 'contain'
+  // Product afbeelding weergave: 'cover'(vult hele vak) of 'contain'(hele product zichtbaar)
+  image_display_mode?: 'cover' |  'contain'
   // Donker thema voor webshop
   dark_mode?: boolean
   /** Welke EU-allergenen-id's actief zijn voor deze zaak (admin producten / kassa); null = app-defaults */
@@ -317,8 +317,8 @@ export async function saveTenantKassaFloorPlanEnabled(
 
 export async function saveTenantSettings(settings: Partial<TenantSettings> & { tenant_slug: string }): Promise<boolean> {
   /** PHASE 1: server-side via /api/admin/db (service-role + audit-log + tenant-verify).
-   *  De whitelist in `admin-db-proxy-spec.ts` zorgt dat alleen tenant_settings
-   *  geüpsert kan worden, en `forbiddenColumns` strip id/created_at automatisch. */
+   *  De whitelist in `admin-db-proxy-spec.ts`zorgt dat alleen tenant_settings
+   *  geüpsert kan worden, en `forbiddenColumns`strip id/created_at automatisch. */
   const r = await adminDb.upsert('tenant_settings', settings as Record<string, unknown>, {
     onConflict: 'tenant_slug',
     tenantSlug: settings.tenant_slug,
@@ -492,7 +492,7 @@ export interface ProductOption {
   id?: string
   tenant_slug: string
   name: string
-  type: 'single' | 'multiple'
+  type: 'single' |  'multiple'
   required: boolean
   sort_order: number
   is_active: boolean
@@ -556,12 +556,12 @@ export async function saveProductOption(option: ProductOption): Promise<ProductO
           'product_options',
           row,
           { id: option.id, tenant_slug },
-          { tenantSlug: tenant_slug, select: '*' },
+          { tenantSlug: tenant_slug, select: '*'},
         )
       : await adminDb.insert<ProductOption[]>(
           'product_options',
           { ...row, tenant_slug },
-          { tenantSlug: tenant_slug, select: '*' },
+          { tenantSlug: tenant_slug, select: '*'},
         )
 
   if (!optRes.ok) {
@@ -602,7 +602,7 @@ export async function saveProductOption(option: ProductOption): Promise<ProductO
   const insRes = await adminDb.insert<ProductOptionChoice[]>(
     'product_option_choices',
     choicePayload,
-    { tenantSlug: tenant_slug, select: '*' },
+    { tenantSlug: tenant_slug, select: '*'},
   )
   if (!insRes.ok) {
     console.error('Error saving option choices:', insRes.error)
@@ -826,7 +826,7 @@ export interface QrCode {
   id?: string
   tenant_slug: string
   name: string
-  type: 'menu' | 'table' | 'promo' | 'review'
+  type: 'menu' |  'table' |  'promo' |  'review'
   target_url: string
   table_number?: number
   scans: number
@@ -917,7 +917,7 @@ export interface Promotion {
   code?: string // Optioneel - niet meer verplicht
   description?: string // Beschrijving van de aanbieding
   image_url?: string // Foto van de aanbieding
-  type: 'percentage' | 'fixed' | 'freeItem' | 'fixedPrice' // fixedPrice = vaste prijs voor product
+  type: 'percentage' |  'fixed' |  'freeItem' |  'fixedPrice'// fixedPrice = vaste prijs voor product
   value: number // Bij fixedPrice = de nieuwe prijs (bijv. 2 voor €2)
   product_id?: string // Gekoppeld product
   product_name?: string // Naam van gekoppeld product (voor weergave)
@@ -1212,7 +1212,7 @@ export interface SalesStats {
   orders_by_status: Record<string, number>
 }
 
-export async function getSalesStats(tenantSlug: string, period: 'today' | 'week' | 'month' | 'year'): Promise<SalesStats> {
+export async function getSalesStats(tenantSlug: string, period: 'today' |  'week' |  'month' |  'year'): Promise<SalesStats> {
   const now = new Date()
   let startDate: Date
   
@@ -1242,9 +1242,9 @@ export async function getSalesStats(tenantSlug: string, period: 'today' | 'week'
 
   const data = raw.filter((o) =>
     orderCountsTowardRevenueAndZReport(
-      o as Pick<Order, 'order_type' | 'status' | 'payment_status'>
+      o as Pick<Order, 'order_type' |  'status' |  'payment_status'>
     )
-  ) as Array<Pick<Order, 'total' | 'status' | 'order_type' | 'payment_status'>>
+  ) as Array<Pick<Order, 'total' |  'status' |  'order_type' |  'payment_status'>>
 
   const total_orders = data.length
   const total_revenue = data.reduce((sum, o) => sum + (Number(o.total) || 0), 0)
@@ -1274,9 +1274,9 @@ export async function getDailyRevenue(tenantSlug: string, days: number = 7): Pro
 
   const data = raw.filter((o) =>
     orderCountsTowardRevenueAndZReport(
-      o as Pick<Order, 'order_type' | 'status' | 'payment_status'>
+      o as Pick<Order, 'order_type' |  'status' |  'payment_status'>
     )
-  ) as Array<Pick<Order, 'total' | 'created_at' | 'status' | 'order_type' | 'payment_status'>>
+  ) as Array<Pick<Order, 'total' |  'created_at' |  'status' |  'order_type' |  'payment_status'>>
 
   // Group by date
   const dailyData: Record<string, { revenue: number; orders: number }> = {}
@@ -1303,7 +1303,7 @@ export async function getDailyRevenue(tenantSlug: string, days: number = 7): Pro
     .sort((a, b) => a.date.localeCompare(b.date))
 }
 
-export async function getTopProducts(tenantSlug: string, period: 'week' | 'month' | 'year' = 'month'): Promise<{ name: string; sales: number; revenue: number }[]> {
+export async function getTopProducts(tenantSlug: string, period: 'week' |  'month' |  'year'= 'month'): Promise<{ name: string; sales: number; revenue: number }[]> {
   const now = new Date()
   let startDate: Date
   
@@ -1425,7 +1425,7 @@ export async function registerCustomer(
     .single()
   
   if (existing) {
-    return { success: false, error: 'Email is al in gebruik' }
+    return { success: false, error: 'Email is al in gebruik'}
   }
   
   const password_hash = await hashPassword(password)
@@ -1447,7 +1447,7 @@ export async function registerCustomer(
   
   if (error) {
     console.error('Error registering customer:', error)
-    return { success: false, error: 'Registratie mislukt' }
+    return { success: false, error: 'Registratie mislukt'}
   }
   
   return { success: true, customer: data }
@@ -1467,14 +1467,14 @@ export async function loginCustomer(
     .single()
   
   if (error || !data) {
-    return { success: false, error: 'Onjuiste email of wachtwoord' }
+    return { success: false, error: 'Onjuiste email of wachtwoord'}
   }
   
   // Verify password using the new secure method (supports both bcrypt and legacy)
   const isValid = await verifyPassword(password, data.password_hash)
   
   if (!isValid) {
-    return { success: false, error: 'Onjuiste email of wachtwoord' }
+    return { success: false, error: 'Onjuiste email of wachtwoord'}
   }
   
   // Auto-upgrade legacy passwords to bcrypt
@@ -1558,7 +1558,7 @@ export interface LoyaltyReward {
   name: string
   description?: string
   points_required: number
-  reward_type: 'free_item' | 'discount_fixed' | 'discount_percentage'
+  reward_type: 'free_item' |  'discount_fixed' |  'discount_percentage'
   reward_value?: number
   is_active: boolean
   sort_order?: number
@@ -1716,7 +1716,7 @@ export async function saveDailySales(sales: DailySales): Promise<boolean> {
     notes: sales.notes || null,
     updated_at: new Date().toISOString(),
   }
-  // We laten 'id' weg zodat de proxy 'm strip via forbiddenColumns; upsert
+  // We laten 'id'weg zodat de proxy 'm strip via forbiddenColumns; upsert
   // gebruikt onConflict op (tenant_slug, date) om de juiste rij te raken.
 
   const r = await adminDb.upsert('daily_sales', record, {
@@ -1757,16 +1757,16 @@ export type FixedCostCategory =
   | 'OTHER'
 
 export const FIXED_COST_CATEGORIES: { id: FixedCostCategory; label: string; icon: string }[] = [
-  { id: 'RENT', label: 'Huur', icon: '' },
-  { id: 'PERSONNEL', label: 'Personeel', icon: '' },
-  { id: 'ELECTRICITY', label: 'Elektriciteit', icon: '' },
-  { id: 'GAS', label: 'Gas', icon: '' },
-  { id: 'WATER', label: 'Water', icon: '' },
-  { id: 'INSURANCE', label: 'Verzekeringen', icon: '' },
-  { id: 'LEASING', label: 'Leasing', icon: '' },
-  { id: 'LOAN', label: 'Leningen', icon: '' },
-  { id: 'SUBSCRIPTIONS', label: 'Abonnementen', icon: '' },
-  { id: 'OTHER', label: 'Overige', icon: '' },
+  { id: 'RENT', label: 'Huur', icon: ''},
+  { id: 'PERSONNEL', label: 'Personeel', icon: ''},
+  { id: 'ELECTRICITY', label: 'Elektriciteit', icon: ''},
+  { id: 'GAS', label: 'Gas', icon: ''},
+  { id: 'WATER', label: 'Water', icon: ''},
+  { id: 'INSURANCE', label: 'Verzekeringen', icon: ''},
+  { id: 'LEASING', label: 'Leasing', icon: ''},
+  { id: 'LOAN', label: 'Leningen', icon: ''},
+  { id: 'SUBSCRIPTIONS', label: 'Abonnementen', icon: ''},
+  { id: 'OTHER', label: 'Overige', icon: ''},
 ]
 
 export interface FixedCost {
@@ -1809,7 +1809,7 @@ export async function saveFixedCost(cost: FixedCost): Promise<FixedCost | null> 
       'fixed_costs',
       { ...payload, updated_at: new Date().toISOString() },
       { id: cost.id, tenant_slug: cost.tenant_slug },
-      { tenantSlug: cost.tenant_slug, select: '*' }
+      { tenantSlug: cost.tenant_slug, select: '*'}
     )
     if (!r.ok) {
       console.error('Error updating fixed cost:', r.error)
@@ -1820,7 +1820,7 @@ export async function saveFixedCost(cost: FixedCost): Promise<FixedCost | null> 
   const r = await adminDb.insert<FixedCost[]>(
     'fixed_costs',
     { ...payload, tenant_slug: cost.tenant_slug, is_active: cost.is_active ?? true },
-    { tenantSlug: cost.tenant_slug, select: '*' }
+    { tenantSlug: cost.tenant_slug, select: '*'}
   )
   if (!r.ok) {
     console.error('Error creating fixed cost:', r.error)
@@ -1850,12 +1850,12 @@ export type VariableCostCategory =
   | 'OTHER'
 
 export const VARIABLE_COST_CATEGORIES: { id: VariableCostCategory; label: string; icon: string }[] = [
-  { id: 'INGREDIENTS', label: 'Ingrediënten', icon: '' },
-  { id: 'PACKAGING', label: 'Verpakking', icon: '' },
-  { id: 'CLEANING', label: 'Schoonmaak', icon: '' },
-  { id: 'MAINTENANCE', label: 'Onderhoud', icon: '' },
-  { id: 'MARKETING', label: 'Marketing', icon: '' },
-  { id: 'OTHER', label: 'Overige', icon: '' },
+  { id: 'INGREDIENTS', label: 'Ingrediënten', icon: ''},
+  { id: 'PACKAGING', label: 'Verpakking', icon: ''},
+  { id: 'CLEANING', label: 'Schoonmaak', icon: ''},
+  { id: 'MAINTENANCE', label: 'Onderhoud', icon: ''},
+  { id: 'MARKETING', label: 'Marketing', icon: ''},
+  { id: 'OTHER', label: 'Overige', icon: ''},
 ]
 
 export interface VariableCost {
@@ -1921,7 +1921,7 @@ export async function saveVariableCost(cost: VariableCost): Promise<VariableCost
       'variable_costs',
       { ...payload, updated_at: new Date().toISOString() },
       { id: cost.id, tenant_slug: cost.tenant_slug },
-      { tenantSlug: cost.tenant_slug, select: '*' }
+      { tenantSlug: cost.tenant_slug, select: '*'}
     )
     if (!r.ok) {
       console.error('Error updating variable cost:', r.error)
@@ -1932,7 +1932,7 @@ export async function saveVariableCost(cost: VariableCost): Promise<VariableCost
   const r = await adminDb.insert<VariableCost[]>(
     'variable_costs',
     { ...payload, tenant_slug: cost.tenant_slug },
-    { tenantSlug: cost.tenant_slug, select: '*' }
+    { tenantSlug: cost.tenant_slug, select: '*'}
   )
   if (!r.ok) {
     console.error('Error creating variable cost:', r.error)
@@ -1988,7 +1988,7 @@ export async function saveBusinessTargets(targets: BusinessTargets): Promise<boo
   const r = await adminDb.upsert('business_targets', {
     ...targets,
     updated_at: new Date().toISOString(),
-  }, { tenantSlug: targets.tenant_slug, onConflict: 'tenant_slug' })
+  }, { tenantSlug: targets.tenant_slug, onConflict: 'tenant_slug'})
   if (!r.ok) {
     console.error('Error saving business targets:', r.error)
     return false
@@ -2026,7 +2026,7 @@ export interface MonthlyReport {
   profitMargin: number
   
   // Health
-  healthStatus: 'EXCELLENT' | 'GOOD' | 'WARNING' | 'CRITICAL'
+  healthStatus: 'EXCELLENT' |  'GOOD' |  'WARNING' |  'CRITICAL'
   recommendations: string[]
 }
 
@@ -2056,7 +2056,7 @@ export async function calculateMonthlyReport(
 
   const ordersData = ordersDataRaw.filter((o) =>
     orderCountsTowardRevenueAndZReport(
-      o as Pick<Order, 'order_type' | 'status' | 'payment_status'>
+      o as Pick<Order, 'order_type' |  'status' |  'payment_status'>
     )
   )
 
@@ -2145,7 +2145,7 @@ export async function calculateMonthlyReport(
   const targets = await getBusinessTargets(tenantSlug)
   
   // 7. Determine health status
-  let healthStatus: 'EXCELLENT' | 'GOOD' | 'WARNING' | 'CRITICAL'
+  let healthStatus: 'EXCELLENT' |  'GOOD' |  'WARNING' |  'CRITICAL'
   if (profitMargin >= 35) {
     healthStatus = 'EXCELLENT'
   } else if (profitMargin >= 22) {
@@ -2160,20 +2160,20 @@ export async function calculateMonthlyReport(
   const recommendations: string[] = []
   
   if (totalRevenue === 0) {
-    recommendations.push('📊 Geen omzet geregistreerd deze maand')
+    recommendations.push('Geen omzet geregistreerd deze maand')
   } else {
     // Profit check
     if (profitMargin >= targets.target_profit_margin) {
-      recommendations.push(`✅ UITSTEKEND! Financieel gezond met ${profitMargin.toFixed(1)}% marge`)
+      recommendations.push(`UITSTEKEND! Financieel gezond met ${profitMargin.toFixed(1)}% marge`)
     } else if (profitMargin < targets.minimum_profit_margin) {
-      recommendations.push(`🚨 KRITIEK: Winstmarge (${profitMargin.toFixed(1)}%) onder minimum (${targets.minimum_profit_margin}%)`)
+      recommendations.push(`KRITIEK: Winstmarge (${profitMargin.toFixed(1)}%) onder minimum (${targets.minimum_profit_margin}%)`)
     }
     
     // Personnel check
     const personnelCost = fixedCostBreakdown.find(c => c.category === 'PERSONNEL')?.amount || 0
     const personnelPercent = (personnelCost / totalRevenue) * 100
     if (personnelPercent > targets.max_personnel_percent) {
-      recommendations.push(`👥 PERSONEEL TE DUUR: ${personnelPercent.toFixed(1)}% van omzet (max ${targets.max_personnel_percent}%)`)
+      recommendations.push(`PERSONEEL TE DUUR: ${personnelPercent.toFixed(1)}% van omzet (max ${targets.max_personnel_percent}%)`)
       recommendations.push(`→ Bespaar €${(personnelCost - (totalRevenue * targets.max_personnel_percent / 100)).toFixed(2)} op personeel`)
     }
     
@@ -2181,7 +2181,7 @@ export async function calculateMonthlyReport(
     const ingredientsCost = variableCostBreakdown.find(c => c.category === 'INGREDIENTS')?.amount || 0
     const ingredientsPercent = (ingredientsCost / totalRevenue) * 100
     if (ingredientsPercent > targets.max_ingredient_percent) {
-      recommendations.push(`🥔 INGREDIËNTEN TE DUUR: ${ingredientsPercent.toFixed(1)}% van omzet (max ${targets.max_ingredient_percent}%)`)
+      recommendations.push(`INGREDIËNTEN TE DUUR: ${ingredientsPercent.toFixed(1)}% van omzet (max ${targets.max_ingredient_percent}%)`)
       recommendations.push(`→ Bespaar €${(ingredientsCost - (totalRevenue * targets.max_ingredient_percent / 100)).toFixed(2)} op ingrediënten`)
     }
     
@@ -2189,7 +2189,7 @@ export async function calculateMonthlyReport(
     const rentCost = fixedCostBreakdown.find(c => c.category === 'RENT')?.amount || 0
     const rentPercent = (rentCost / totalRevenue) * 100
     if (rentPercent > 10) {
-      recommendations.push(`🏠 HUUR TE DUUR: ${rentPercent.toFixed(1)}% van omzet (max 10%)`)
+      recommendations.push(`HUUR TE DUUR: ${rentPercent.toFixed(1)}% van omzet (max 10%)`)
     }
     
     // Energy check (max 8%)
@@ -2197,12 +2197,12 @@ export async function calculateMonthlyReport(
                        (fixedCostBreakdown.find(c => c.category === 'GAS')?.amount || 0)
     const energyPercent = (energyCost / totalRevenue) * 100
     if (energyPercent > 8) {
-      recommendations.push(`⚡ ENERGIE TE DUUR: ${energyPercent.toFixed(1)}% van omzet (max 8%)`)
+      recommendations.push(`ENERGIE TE DUUR: ${energyPercent.toFixed(1)}% van omzet (max 8%)`)
     }
     
     // Average ticket check
     if (averageTicket < targets.target_average_ticket) {
-      recommendations.push(`🧾 GEMIDDELDE BON TE LAAG: €${averageTicket.toFixed(2)} (doel: €${targets.target_average_ticket})`)
+      recommendations.push(`GEMIDDELDE BON TE LAAG: €${averageTicket.toFixed(2)} (doel: €${targets.target_average_ticket})`)
       recommendations.push(`→ Tip: Upselling, combo-deals, of prijzen verhogen`)
     }
     
@@ -2212,9 +2212,9 @@ export async function calculateMonthlyReport(
       : totalFixedCosts
     
     if (totalRevenue >= breakEvenRevenue) {
-      recommendations.push(`📍 Break-even bereikt! €${(totalRevenue - breakEvenRevenue).toFixed(2)} boven break-even`)
+      recommendations.push(`Break-even bereikt! €${(totalRevenue - breakEvenRevenue).toFixed(2)} boven break-even`)
     } else {
-      recommendations.push(`📍 Nog €${(breakEvenRevenue - totalRevenue).toFixed(2)} nodig om break-even te bereiken`)
+      recommendations.push(`Nog €${(breakEvenRevenue - totalRevenue).toFixed(2)} nodig om break-even te bereiken`)
     }
   }
   
@@ -2242,17 +2242,17 @@ export async function calculateMonthlyReport(
 // =====================================================
 // STAFF / PERSONEEL
 // =====================================================
-export type StaffRole = 'ADMIN' | 'MANAGER' | 'EMPLOYEE'
-export type ContractType = 'VAST' | 'INTERIM' | 'FLEXI' | 'STUDENT' | 'SEIZOEN' | 'FREELANCE' | 'STAGE'
+export type StaffRole = 'ADMIN' |  'MANAGER' |  'EMPLOYEE'
+export type ContractType = 'VAST' |  'INTERIM' |  'FLEXI' |  'STUDENT' |  'SEIZOEN' |  'FREELANCE' |  'STAGE'
 
 export const CONTRACT_TYPES: { id: ContractType; label: string }[] = [
-  { id: 'VAST', label: 'Vast contract' },
-  { id: 'INTERIM', label: 'Interim' },
-  { id: 'FLEXI', label: 'Flexi-job' },
-  { id: 'STUDENT', label: 'Student' },
-  { id: 'SEIZOEN', label: 'Seizoensarbeider' },
-  { id: 'FREELANCE', label: 'Freelance' },
-  { id: 'STAGE', label: 'Stagiair' },
+  { id: 'VAST', label: 'Vast contract'},
+  { id: 'INTERIM', label: 'Interim'},
+  { id: 'FLEXI', label: 'Flexi-job'},
+  { id: 'STUDENT', label: 'Student'},
+  { id: 'SEIZOEN', label: 'Seizoensarbeider'},
+  { id: 'FREELANCE', label: 'Freelance'},
+  { id: 'STAGE', label: 'Stagiair'},
 ]
 
 export interface Staff {
@@ -2330,7 +2330,7 @@ export async function saveStaff(staff: Staff): Promise<Staff | null> {
       'staff',
       { ...payload, updated_at: new Date().toISOString() },
       { id: staff.id, tenant_slug: staff.tenant_slug },
-      { tenantSlug: staff.tenant_slug, select: '*' }
+      { tenantSlug: staff.tenant_slug, select: '*'}
     )
     if (!r.ok) {
       console.error('Error updating staff:', r.error)
@@ -2341,7 +2341,7 @@ export async function saveStaff(staff: Staff): Promise<Staff | null> {
   const r = await adminDb.insert<Staff[]>(
     'staff',
     { ...payload, tenant_slug: staff.tenant_slug, is_active: staff.is_active ?? true },
-    { tenantSlug: staff.tenant_slug, select: '*' }
+    { tenantSlug: staff.tenant_slug, select: '*'}
   )
   if (!r.ok) {
     console.error('Error creating staff:', r.error)
@@ -2376,30 +2376,30 @@ export async function verifyStaffPin(tenantSlug: string, pin: string): Promise<S
 // TIMESHEET ENTRIES / UREN REGISTRATIE
 // =====================================================
 export type AbsenceType = 
-  | 'WORKED'      // Gewerkt
-  | 'SICK'        // Ziekte
-  | 'VACATION'    // Vakantie
-  | 'SHORT_LEAVE' // Kort verzuim
-  | 'AUTHORIZED'  // Geoorloofd afwezig
-  | 'HOLIDAY'     // Feestdag
-  | 'MATERNITY'   // Zwangerschapsverlof
-  | 'PATERNITY'   // Vaderschapsverlof
-  | 'UNPAID'      // Onbetaald verlof
-  | 'TRAINING'    // Opleiding
-  | 'OTHER'       // Overig
+  | 'WORKED'     // Gewerkt
+  | 'SICK'       // Ziekte
+  | 'VACATION'   // Vakantie
+  | 'SHORT_LEAVE'// Kort verzuim
+  | 'AUTHORIZED' // Geoorloofd afwezig
+  | 'HOLIDAY'    // Feestdag
+  | 'MATERNITY'  // Zwangerschapsverlof
+  | 'PATERNITY'  // Vaderschapsverlof
+  | 'UNPAID'     // Onbetaald verlof
+  | 'TRAINING'   // Opleiding
+  | 'OTHER'      // Overig
 
 export const ABSENCE_TYPES: { id: AbsenceType; label: string; color: string; icon: string }[] = [
-  { id: 'WORKED', label: 'Gewerkt', color: '#22c55e', icon: '' },
-  { id: 'SICK', label: 'Ziekte', color: '#ef4444', icon: '' },
-  { id: 'VACATION', label: 'Vakantie', color: '#3b82f6', icon: '' },
-  { id: 'SHORT_LEAVE', label: 'Kort verzuim', color: '#f97316', icon: '⏰' },
-  { id: 'AUTHORIZED', label: 'Geoorloofd afwezig', color: '#8b5cf6', icon: '' },
-  { id: 'HOLIDAY', label: 'Feestdag', color: '#06b6d4', icon: '' },
-  { id: 'MATERNITY', label: 'Zwangerschapsverlof', color: '#ec4899', icon: '' },
-  { id: 'PATERNITY', label: 'Vaderschapsverlof', color: '#0ea5e9', icon: '' },
-  { id: 'UNPAID', label: 'Onbetaald verlof', color: '#6b7280', icon: '' },
-  { id: 'TRAINING', label: 'Opleiding', color: '#84cc16', icon: '' },
-  { id: 'OTHER', label: 'Overig', color: '#a3a3a3', icon: '' },
+  { id: 'WORKED', label: 'Gewerkt', color: '#22c55e', icon: ''},
+  { id: 'SICK', label: 'Ziekte', color: '#ef4444', icon: ''},
+  { id: 'VACATION', label: 'Vakantie', color: '#3b82f6', icon: ''},
+  { id: 'SHORT_LEAVE', label: 'Kort verzuim', color: '#f97316', icon: ''},
+  { id: 'AUTHORIZED', label: 'Geoorloofd afwezig', color: '#8b5cf6', icon: ''},
+  { id: 'HOLIDAY', label: 'Feestdag', color: '#06b6d4', icon: ''},
+  { id: 'MATERNITY', label: 'Zwangerschapsverlof', color: '#ec4899', icon: ''},
+  { id: 'PATERNITY', label: 'Vaderschapsverlof', color: '#0ea5e9', icon: ''},
+  { id: 'UNPAID', label: 'Onbetaald verlof', color: '#6b7280', icon: ''},
+  { id: 'TRAINING', label: 'Opleiding', color: '#84cc16', icon: ''},
+  { id: 'OTHER', label: 'Overig', color: '#a3a3a3', icon: ''},
 ]
 
 export interface TimesheetEntry {
@@ -2487,7 +2487,7 @@ export async function saveTimesheetEntry(entry: TimesheetEntry): Promise<Timeshe
     break_minutes: entry.break_minutes || 0,
     worked_hours: workedHours,
     absence_type: entry.absence_type,
-    absence_hours: entry.absence_type !== 'WORKED' ? entry.absence_hours : null,
+    absence_hours: entry.absence_type !== 'WORKED'? entry.absence_hours : null,
     notes: entry.notes || null,
     is_approved: entry.is_approved || false,
     approved_by: entry.approved_by || null,
@@ -2500,7 +2500,7 @@ export async function saveTimesheetEntry(entry: TimesheetEntry): Promise<Timeshe
       'timesheet_entries',
       entryData,
       { id: entry.id, tenant_slug: entry.tenant_slug },
-      { tenantSlug: entry.tenant_slug, select: '*' }
+      { tenantSlug: entry.tenant_slug, select: '*'}
     )
     if (!r.ok) {
       console.error('Error updating timesheet entry:', r.error)
@@ -2699,7 +2699,7 @@ export async function generateMonthlyTimesheet(
   const r = await adminDb.upsert<MonthlyTimesheet[]>(
     'monthly_timesheets',
     timesheetData as unknown as Record<string, unknown>,
-    { tenantSlug, onConflict: 'tenant_slug,staff_id,year,month', select: '*' }
+    { tenantSlug, onConflict: 'tenant_slug,staff_id,year,month', select: '*'}
   )
   if (!r.ok) {
     console.error('Error generating monthly timesheet:', r.error)
@@ -2729,7 +2729,7 @@ export async function closeMonthlyTimesheet(
       closed_at: new Date().toISOString(),
     },
     { tenant_slug: tenantSlug, staff_id: staffId, year, month },
-    { tenantSlug, select: '*' }
+    { tenantSlug, select: '*'}
   )
   if (!r.ok) {
     console.error('Error closing monthly timesheet:', r.error)
@@ -2887,7 +2887,7 @@ export interface GiftCard {
   recipient_name?: string
   recipient_email: string
   stripe_payment_id?: string
-  status: 'pending' | 'pending_cash' | 'paid' | 'used' | 'expired'
+  status: 'pending' |  'pending_cash' |  'paid' |  'used' |  'expired'
   is_sent?: boolean
   expires_at?: string
   used_at?: string
@@ -2924,7 +2924,7 @@ export async function getGiftCardByCode(tenantSlug: string, code: string): Promi
   return data
 }
 
-export async function createGiftCard(giftCard: Omit<GiftCard, 'id' | 'code'>): Promise<GiftCard | null> {
+export async function createGiftCard(giftCard: Omit<GiftCard, 'id' |  'code'>): Promise<GiftCard | null> {
   // Generate unique code
   const code = generateGiftCardCode()
   
@@ -3008,7 +3008,7 @@ export async function useGiftCard(id: string, amountUsed: number): Promise<boole
   }
   
   const newRemaining = Math.max(0, card.remaining_amount - amountUsed)
-  const newStatus = newRemaining === 0 ? 'used' : 'paid'
+  const newStatus = newRemaining === 0 ? 'used': 'paid'
   
   const { error } = await supabase
     .from('gift_cards')
@@ -3029,7 +3029,7 @@ export async function useGiftCard(id: string, amountUsed: number): Promise<boole
 
 // Helper function to generate unique gift card code
 function generateGiftCardCode(): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789' // Exclude confusing chars like 0, O, 1, I
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'// Exclude confusing chars like 0, O, 1, I
   let code = ''
   for (let i = 0; i < 12; i++) {
     if (i > 0 && i % 4 === 0) code += '-'

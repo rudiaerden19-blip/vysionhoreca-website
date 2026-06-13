@@ -24,7 +24,7 @@ export function PageViewTracker() {
       try {
         const response = await fetch('/api/track-view', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json'},
           body: JSON.stringify({
             page_path: pathname,
             referrer: document.referrer || null

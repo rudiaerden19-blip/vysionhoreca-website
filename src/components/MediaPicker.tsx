@@ -315,7 +315,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
           <div 
             onClick={() => setShowOptions(!showOptions)}
             className={`relative w-32 h-32 border-2 border-dashed rounded-xl flex items-center justify-center cursor-pointer transition-colors overflow-hidden bg-gray-50 ${
-              uploading ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-500'
+              uploading ? 'border-blue-500 bg-blue-50': 'border-gray-300 hover:border-blue-500'
             }`}
           >
             {uploading ? (
@@ -553,7 +553,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                         whileTap={{ scale: 0.97 }}
                         onClick={() => selectImage(item.url)}
                         className={`relative aspect-square rounded-xl overflow-hidden cursor-pointer ring-2 transition-all bg-gray-100 ${
-                          value === item.url ? 'ring-blue-500 ring-4' : 'ring-transparent hover:ring-gray-300'
+                          value === item.url ? 'ring-blue-500 ring-4': 'ring-transparent hover:ring-gray-300'
                         }`}
                       >
                         <Image

@@ -10,8 +10,8 @@ import { verifySuperAdminAccess } from '@/lib/verify-tenant-access'
  *
  * Toegangsregels:
  *   - Superadmin (handmatig vanuit het superadmin-dashboard) — `verifySuperAdminAccess`.
- *   - Subscription-webhook (server-to-server) — header `x-cron-secret` moet matchen
- *     `process.env.CRON_SECRET` (zelfde secret als overige cron-routes).
+ *   - Subscription-webhook (server-to-server) — header `x-cron-secret`moet matchen
+ *     `process.env.CRON_SECRET`(zelfde secret als overige cron-routes).
  *
  * Anonymous calls worden geweigerd: anders kan iedereen op het internet uit jouw
  * Zoho-mailbox spam pushen onder de Vysion-naam.
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
 
   if (!authorized) {
     logger.warn('send-payment-reminder: unauthorized', { requestId })
-    return NextResponse.json({ error: 'Niet geautoriseerd' }, { status: 403 })
+    return NextResponse.json({ error: 'Niet geautoriseerd'}, { status: 403 })
   }
 
   try {
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     const { tenantEmail, tenantName, tenantSlug } = body
 
     if (!tenantEmail || !tenantName) {
-      return NextResponse.json({ error: 'Email en naam zijn verplicht' }, { status: 400 })
+      return NextResponse.json({ error: 'Email en naam zijn verplicht'}, { status: 400 })
     }
 
     const transporter = nodemailer.createTransport({
@@ -77,29 +77,29 @@ export async function POST(request: NextRequest) {
 <body>
   <div class="container">
     <div class="header">
-      <h1>⚠️ Betalingsherinnering</h1>
+      <h1> Betalingsherinnering</h1>
     </div>
     
     <div class="content">
       <p>Beste ${tenantName},</p>
       
       <div class="warning-box">
-        <h2>🚨 Uw abonnement is niet betaald</h2>
+        <h2> Uw abonnement is niet betaald</h2>
         <p style="margin: 0;">We hebben nog geen betaling ontvangen voor uw Vysion kassa's abonnement.</p>
       </div>
       
-      <p class="deadline">⏰ Nog 3 dagen om te betalen</p>
+      <p class="deadline"> Nog 3 dagen om te betalen</p>
       
       <p>Als we binnen <strong>3 dagen</strong> geen betaling ontvangen, wordt uw software automatisch gedeactiveerd. Dit betekent:</p>
       
       <ul>
-        <li>❌ Uw webshop wordt offline gehaald</li>
-        <li>❌ Klanten kunnen niet meer bestellen</li>
-        <li>❌ U verliest toegang tot het admin panel</li>
+        <li> Uw webshop wordt offline gehaald</li>
+        <li> Klanten kunnen niet meer bestellen</li>
+        <li> U verliest toegang tot het admin panel</li>
       </ul>
       
       <p style="text-align: center;">
-        <a href="${paymentLink}" class="cta-button">💳 Nu Betalen</a>
+        <a href="${paymentLink}" class="cta-button"> Nu Betalen</a>
       </p>
       
       <p>Heeft u al betaald? Neem dan contact met ons op zodat we uw account kunnen activeren.</p>
@@ -121,16 +121,16 @@ export async function POST(request: NextRequest) {
     await transporter.sendMail({
       from: `"Vysion kassa's" <${VYSION_INFO_EMAIL}>`,
       to: tenantEmail,
-      subject: `⚠️ Betalingsherinnering - Uw abonnement wordt binnen 3 dagen gedeactiveerd`,
+      subject: `Betalingsherinnering - Uw abonnement wordt binnen 3 dagen gedeactiveerd`,
       html: emailHtml,
     })
 
-    return NextResponse.json({ success: true, message: 'Betalingsherinnering verzonden' })
+    return NextResponse.json({ success: true, message: 'Betalingsherinnering verzonden'})
   } catch (error) {
     logger.error('send-payment-reminder error', {
       requestId,
       error: error instanceof Error ? error.message : String(error),
     })
-    return NextResponse.json({ error: 'Fout bij verzenden email' }, { status: 500 })
+    return NextResponse.json({ error: 'Fout bij verzenden email'}, { status: 500 })
   }
 }

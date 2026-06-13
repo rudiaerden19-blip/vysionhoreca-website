@@ -30,7 +30,7 @@ interface Member {
 }
 
 export default function GroupJoinPage({ params }: { params: { tenant: string; code: string } }) {
-  const [step, setStep] = useState<'join' | 'sessions' | 'order'>('join')
+  const [step, setStep] = useState<'join' |  'sessions' |  'order'>('join')
   const [loading, setLoading] = useState(true)
   const [group, setGroup] = useState<GroupInfo | null>(null)
   const [member, setMember] = useState<Member | null>(null)
@@ -89,7 +89,7 @@ export default function GroupJoinPage({ params }: { params: { tenant: string; co
     try {
       const res = await fetch('/api/groups/join', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json'},
         body: JSON.stringify({
           access_code: params.code,
           ...joinForm
@@ -125,7 +125,7 @@ export default function GroupJoinPage({ params }: { params: { tenant: string; co
 
     if (diff < 0) return 'Verlopen'
     if (hours < 24) return `Nog ${hours}u ${minutes}m`
-    return date.toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+    return date.toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})
   }
 
   function isDeadlineSoon(dateStr: string) {
@@ -214,7 +214,7 @@ export default function GroupJoinPage({ params }: { params: { tenant: string; co
                 disabled={joining}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold disabled:opacity-50"
               >
-                {joining ? 'Even geduld...' : 'Deelnemen'}
+                {joining ? 'Even geduld...': 'Deelnemen'}
               </button>
             </form>
           </motion.div>
@@ -253,7 +253,7 @@ export default function GroupJoinPage({ params }: { params: { tenant: string; co
                           <p className="text-sm text-gray-500">{session.description}</p>
                         )}
                       </div>
-                      <div className={`text-right ${isDeadlineSoon(session.order_deadline) ? 'text-red-600' : 'text-gray-600'}`}>
+                      <div className={`text-right ${isDeadlineSoon(session.order_deadline) ? 'text-red-600': 'text-gray-600'}`}>
                         <div className="text-sm">Deadline</div>
                         <div className="font-bold">{formatDeadline(session.order_deadline)}</div>
                       </div>

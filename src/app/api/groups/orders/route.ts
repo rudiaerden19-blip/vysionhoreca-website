@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
 
     if (!session_id && !group_id) {
       return NextResponse.json(
-        { error: 'session_id or group_id is required' },
+        { error: 'session_id or group_id is required'},
         { status: 400 }
       )
     }
@@ -32,11 +32,11 @@ export async function GET(request: NextRequest) {
         .eq('id', session_id)
         .single()
       if (sErr || !sess?.tenant_slug) {
-        return NextResponse.json({ error: 'Session not found' }, { status: 404 })
+        return NextResponse.json({ error: 'Session not found'}, { status: 404 })
       }
       const access = await verifyTenantOrSuperAdmin(request, sess.tenant_slug)
       if (!access.authorized) {
-        return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
+        return NextResponse.json({ error: access.error || 'Forbidden'}, { status: 403 })
       }
     } else if (group_id) {
       const { data: g, error: gErr } = await supabase
@@ -45,11 +45,11 @@ export async function GET(request: NextRequest) {
         .eq('id', group_id)
         .single()
       if (gErr || !g?.tenant_slug) {
-        return NextResponse.json({ error: 'Group not found' }, { status: 404 })
+        return NextResponse.json({ error: 'Group not found'}, { status: 404 })
       }
       const access = await verifyTenantOrSuperAdmin(request, g.tenant_slug)
       if (!access.authorized) {
-        return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
+        return NextResponse.json({ error: access.error || 'Forbidden'}, { status: 403 })
       }
     }
 
@@ -102,7 +102,7 @@ export async function GET(request: NextRequest) {
     })
   } catch (error) {
     console.error('Error fetching group orders:', error)
-    return NextResponse.json({ error: 'Failed to fetch orders' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to fetch orders'}, { status: 500 })
   }
 }
 
@@ -122,7 +122,7 @@ export async function POST(request: Request) {
 
     if (!tenant_slug || !session_id || !customer_name || !items?.length) {
       return NextResponse.json(
-        { error: 'tenant_slug, session_id, customer_name, and items are required' },
+        { error: 'tenant_slug, session_id, customer_name, and items are required'},
         { status: 400 }
       )
     }
@@ -134,23 +134,23 @@ export async function POST(request: Request) {
       .single()
 
     if (sessionError || !session) {
-      return NextResponse.json({ error: 'Session not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Session not found'}, { status: 404 })
     }
 
     if (normalizeTenantSlug(session.tenant_slug) !== normalizeTenantSlug(tenant_slug)) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      return NextResponse.json({ error: 'Forbidden'}, { status: 403 })
     }
 
     if (session.status !== 'open') {
       return NextResponse.json(
-        { error: 'Ordering session is closed' },
+        { error: 'Ordering session is closed'},
         { status: 400 }
       )
     }
 
     if (new Date(session.order_deadline) < new Date()) {
       return NextResponse.json(
-        { error: 'Order deadline has passed' },
+        { error: 'Order deadline has passed'},
         { status: 400 }
       )
     }
@@ -212,6 +212,6 @@ export async function POST(request: Request) {
     return NextResponse.json(order)
   } catch (error) {
     console.error('Error creating group order:', error)
-    return NextResponse.json({ error: 'Failed to create order' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to create order'}, { status: 500 })
   }
 }

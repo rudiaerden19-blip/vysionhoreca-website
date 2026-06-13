@@ -3,7 +3,7 @@
  * Werkt alleen als er netwerk is; faalt stil bij offline of CORS-problemen.
  */
 export async function prefetchProductImageUrls(urls: string[]): Promise<void> {
-  if (typeof window === 'undefined' || !('caches' in window)) return
+  if (typeof window === 'undefined' || !('caches'in window)) return
   const unique = [...new Set(urls.filter(Boolean))]
   if (unique.length === 0) return
 
@@ -13,10 +13,10 @@ export async function prefetchProductImageUrls(urls: string[]): Promise<void> {
     await Promise.all(
       chunk.map(async (url) => {
         try {
-          await fetch(url, { mode: 'cors', credentials: 'omit', cache: 'default' })
+          await fetch(url, { mode: 'cors', credentials: 'omit', cache: 'default'})
         } catch {
           try {
-            await fetch(url, { mode: 'no-cors', cache: 'default' })
+            await fetch(url, { mode: 'no-cors', cache: 'default'})
           } catch {
             /* negeren */
           }

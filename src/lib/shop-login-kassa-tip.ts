@@ -1,4 +1,4 @@
-/** Query op `/login` na POS-uitloggen: hint over browservenster / PWA sluiten */
+/** Query op `/login`na POS-uitloggen: hint over browservenster / PWA sluiten */
 export const LOGIN_QUERY_KASSA_CLOSE_TIP = 'kassa_sluit_tip'
 
 export function appendKassaCloseTipToAbsoluteLoginUrl(absoluteLoginUrl: string): string {
@@ -12,10 +12,10 @@ export function appendKassaCloseTipToAbsoluteLoginUrl(absoluteLoginUrl: string):
   }
 }
 
-/** `href` bv. `/login` of `/login?next=…` (relatief tot origin). */
+/** `href`bv. `/login`of `/login?next=…`(relatief tot origin). */
 export function appendKassaCloseTipToLoginPathHref(href: string): string {
   if (!href.startsWith('/login')) return href
   if (href.includes(`${LOGIN_QUERY_KASSA_CLOSE_TIP}=`)) return href
-  const join = href.includes('?') ? '&' : '?'
+  const join = href.includes('?') ? '&': '?'
   return `${href}${join}${LOGIN_QUERY_KASSA_CLOSE_TIP}=1`
 }

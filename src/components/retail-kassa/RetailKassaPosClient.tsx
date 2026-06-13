@@ -68,13 +68,13 @@ import {
   type RetailImportRow,
 } from '@/lib/retail-product-import'
 
-type RetailKassaMode = 'sales' | 'stockCount' | 'goodsReceipt' | 'exchangeCredit'
+type RetailKassaMode = 'sales' |  'stockCount' |  'goodsReceipt' |  'exchangeCredit'
 
 type StockActivityLine = {
   key: string
   sku: RetailPosSku
   delta: number
-  mode: 'stockCount' | 'goodsReceipt'
+  mode: 'stockCount' |  'goodsReceipt'
 }
 import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
 import { AccountMenuSessionBlock } from '@/components/AccountMenuSessionBlock'
@@ -307,7 +307,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [importPreview, setImportPreview] = useState<RetailImportRow[]>([])
   const [importModalOpen, setImportModalOpen] = useState(false)
   const [importBusy, setImportBusy] = useState(false)
-  const [importHighlight, setImportHighlight] = useState<'csv' | 'excel' | null>(null)
+  const [importHighlight, setImportHighlight] = useState<'csv' |  'excel'| null>(null)
   const [numpadPanelVisible, setNumpadPanelVisible] = useState(false)
   const [numpadValue, setNumpadValue] = useState('')
   const [addOkFlash, setAddOkFlash] = useState(false)
@@ -315,7 +315,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [loyaltyEnabled, setLoyaltyEnabled] = useState(true)
   const [loyaltySettings, setLoyaltySettings] = useState<Pick<
     RetailLoyaltySettings,
-    'redeem_enabled' | 'redeem_points_per_euro'
+    'redeem_enabled' |  'redeem_points_per_euro'
   >>({
     redeem_enabled: true,
     redeem_points_per_euro: 100,
@@ -536,10 +536,10 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
 
   const paymentMethodOptions = useMemo<KassaPayOption[]>(
     () => [
-      { method: 'CASH', label: t('kassaApp.payCash'), icon: '', color: '#10b981' },
-      { method: 'CARD', label: t('kassaApp.payCard'), icon: '', color: '#3b82f6' },
-      { method: 'IDEAL', label: t('kassaApp.payIdeal'), icon: '', color: '#ec4899' },
-      { method: 'BANCONTACT', label: t('kassaApp.payBancontact'), icon: '', color: '#f59e0b' },
+      { method: 'CASH', label: t('kassaApp.payCash'), icon: '', color: '#10b981'},
+      { method: 'CARD', label: t('kassaApp.payCard'), icon: '', color: '#3b82f6'},
+      { method: 'IDEAL', label: t('kassaApp.payIdeal'), icon: '', color: '#ec4899'},
+      { method: 'BANCONTACT', label: t('kassaApp.payBancontact'), icon: '', color: '#f59e0b'},
     ],
     [t],
   )
@@ -637,7 +637,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     appearanceDark
       ? `${kassaDarkHeaderBtnShell} gap-0.5 sm:gap-1 ${kassaPosButtonClass(selected)}`
       : `inline-flex shrink-0 touch-manipulation items-center gap-0.5 whitespace-nowrap rounded-lg px-1.5 py-1.5 font-medium text-white transition-colors hover:bg-white/20 sm:gap-1 sm:rounded-xl sm:px-2 sm:py-2 ${
-          selected ? 'bg-white/20' : 'bg-white/10'
+          selected ? 'bg-white/20': 'bg-white/10'
         }`
 
   const kassaSidebarActionLabelClass =
@@ -693,8 +693,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     const cart = cartScrollRef.current
     const scanRow = scan?.querySelector(`[data-retail-scan-line="${target}"]`)
     const cartRow = cart?.querySelector(`[data-retail-cart-line="${target}"]`)
-    scanRow?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
-    cartRow?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+    scanRow?.scrollIntoView({ block: 'nearest', inline: 'nearest'})
+    cartRow?.scrollIntoView({ block: 'nearest', inline: 'nearest'})
   }, [listScrollTick])
 
   function removeStockActivityLine(activityKey: string) {
@@ -726,7 +726,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       opts?.stockNote ??
       (sku.track_stock ? String(sku.stock_quantity) : t('retailKassaPage.stockNotTracked'))
     const qty = Math.max(1, opts?.quantity ?? 1)
-    const name = qty > 1 ? `${sku.name} × ${qty}` : sku.name
+    const name = qty > 1 ? `${sku.name} × ${qty}`: sku.name
     const lineTotal = sku.price * qty
     const selected = selectedListLineKey === key
     return (
@@ -747,7 +747,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         className={`${scanBarRowGridClass} ${retailListBarShellClass} shrink-0 cursor-pointer touch-manipulation px-3 py-2.5 transition-[background-color,box-shadow,border-color] sm:px-4 sm:py-3 text-[11px] sm:text-sm ${
           selected ? retailListBarSelectedClass : 'hover:bg-neutral-50'
         }`}
-        data-retail-line-selected={selected ? 'true' : undefined}
+        data-retail-line-selected={selected ? 'true': undefined}
       >
         <span className="truncate font-mono tabular-nums text-black/85">{barcode}</span>
         <span className="truncate font-semibold text-black">{name}</span>
@@ -994,7 +994,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               playClick()
               openExchangeCreditMode()
             }}
-            className={`${tileClass} ${mode === 'exchangeCredit' ? 'ring-2 ring-sky-400' : ''}`}
+            className={`${tileClass} ${mode === 'exchangeCredit'? 'ring-2 ring-sky-400': ''}`}
           >
             {label}
           </button>
@@ -1080,7 +1080,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   function pushStockActivity(
     sku: RetailPosSku,
     delta: number,
-    activityMode: 'stockCount' | 'goodsReceipt',
+    activityMode: 'stockCount' |  'goodsReceipt',
   ) {
     const key = `${sku.lineKey}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
     focusRetailListLine(key, sku)
@@ -1108,7 +1108,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
 
     const digits = trimmed.replace(/\D/g, '')
     const name =
-      lookup.name?.trim() || (digits.length >= 8 ? `EAN ${digits}` : trimmed)
+      lookup.name?.trim() || (digits.length >= 8 ? `EAN ${digits}`: trimmed)
     const price =
       lookup.price != null && Number.isFinite(Number(lookup.price))
         ? Math.round(Number(lookup.price) * 100) / 100
@@ -1336,7 +1336,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         try {
           const expr = prev.replace(/×/g, '*')
           // eslint-disable-next-line no-new-func
-          const result = Function('"use strict"; return (' + expr + ')')()
+          const result = Function('"use strict"; return ('+ expr + ')')()
           return String(result)
         } catch {
           return prev
@@ -1561,7 +1561,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     setImportModalOpen(true)
   }
 
-  async function onImportFileSelected(file: File | undefined, kind: 'csv' | 'excel') {
+  async function onImportFileSelected(file: File | undefined, kind: 'csv' |  'excel') {
     if (!file) {
       setImportHighlight(null)
       return
@@ -1767,7 +1767,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const performLogout = () => {
     applyOwnerOnlyLogoutCleanup(tenant)
     setTerminalLogout({ kind: 'staff', tenantSlug: tenant })
-    broadcastTenantOwnerLogout({ scope: 'owner', tenantSlug: tenant, landing: 'tenant-login' })
+    broadcastTenantOwnerLogout({ scope: 'owner', tenantSlug: tenant, landing: 'tenant-login'})
     const origin = window.location.origin
     const next = buildShopInternalReturnPath(tenant, window.location.pathname, window.location.search)
     const loginUrl = `${origin}/login?next=${encodeURIComponent(next)}`
@@ -1959,13 +1959,13 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         onPinInputChange={setStaffClockPinInput}
         onStartClockIn={(s) => {
           playClick()
-          setStaffClockPinModal({ staffId: s.id, staffName: s.name, action: 'in' })
+          setStaffClockPinModal({ staffId: s.id, staffName: s.name, action: 'in'})
           setStaffClockPinInput('')
           setStaffClockPinError(null)
         }}
         onStartClockOut={(s) => {
           playClick()
-          setStaffClockPinModal({ staffId: s.id, staffName: s.name, action: 'out' })
+          setStaffClockPinModal({ staffId: s.id, staffName: s.name, action: 'out'})
           setStaffClockPinInput('')
           setStaffClockPinError(null)
         }}
@@ -1993,7 +1993,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
           setShowSplitModal(true)
           setShowPaymentModal(false)
         }}
-        appearance={appearanceDark ? 'dark' : 'light'}
+        appearance={appearanceDark ? 'dark': 'light'}
       />
 
       <KassaSplitPaymentModal
@@ -2008,7 +2008,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
           setShowPaymentModal(true)
         }}
         onConfirm={() => void completePayment('SPLIT', { cash: splitCash, card: splitCard })}
-        appearance={appearanceDark ? 'dark' : 'light'}
+        appearance={appearanceDark ? 'dark': 'light'}
       />
 
       {lastOrderReceipt ? (
@@ -2218,7 +2218,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         <div
           data-testid="retail-kassa-title-header"
           className={`relative z-30 flex min-h-[56px] w-full min-w-0 shrink-0 flex-nowrap items-center gap-1.5 border-b px-2 py-2 sm:gap-2 sm:px-3 ${KASSA_POS_RULE_BLACK} ${
-            appearanceDark ? `pb-3 ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}` : 'bg-black'
+            appearanceDark ? `pb-3 ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`: 'bg-black'
           }`}
         >
           {hamburgerOpen && (
@@ -2296,7 +2296,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               const activeMod = modules.find((m) => m.rowKey === hamburgerSubOpen)
               return (
                 <div className="absolute top-full left-0 mt-1 flex z-30">
-                  <div className={`${ui.flyMenuPanel} overflow-y-auto`} style={{ width: 240, maxHeight: '85vh' }}>
+                  <div className={`${ui.flyMenuPanel} overflow-y-auto`} style={{ width: 240, maxHeight: '85vh'}}>
                     <div
                       className={`sticky top-0 rounded-t-2xl px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`}
                     >
@@ -2333,7 +2333,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                     ))}
                   </div>
                   {hamburgerOpen && hamburgerSubOpen && activeMod && (
-                    <div className={`ml-2 overflow-y-auto self-start ${ui.flyMenuPanel}`} style={{ width: 220, maxHeight: '85vh' }}>
+                    <div className={`ml-2 overflow-y-auto self-start ${ui.flyMenuPanel}`} style={{ width: 220, maxHeight: '85vh'}}>
                       <div
                         className={`sticky top-0 rounded-t-2xl px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`}
                       >
@@ -2399,7 +2399,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             >
               <LocaleFlagEmoji locale={locale} variant="inline" className="text-sm text-white sm:text-[15px]" />
               <svg
-                className={`size-4 shrink-0 transition-transform ${langOpen ? 'rotate-180' : ''}`}
+                className={`size-4 shrink-0 transition-transform ${langOpen ? 'rotate-180': ''}`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -2554,7 +2554,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               <input
                 ref={scanRef}
                 type="text"
-                inputMode={articleSearchActive ? 'search' : 'none'}
+                inputMode={articleSearchActive ? 'search': 'none'}
                 autoComplete="off"
                 readOnly={!articleSearchActive}
                 data-retail-article-search
@@ -2699,7 +2699,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 className={`flex min-h-0 flex-1 flex-col overflow-hidden ${KASSA_POS_MENU_RECESS_TRAY_CLASS} ${KASSA_POS_BTN_SHAPE} gks-menu-vignette`}
                 data-testid="retail-gray-tray"
               >
-                {mode === 'exchangeCredit' ? (
+                {mode === 'exchangeCredit'? (
                   <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-3 sm:p-4">
                     <p className="text-sm font-bold text-white">{t('retailKassaPage.exchangeTitle')}</p>
                     <p className="text-xs text-white/70">{t('retailKassaPage.exchangeHint')}</p>
@@ -2770,7 +2770,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                   </p>
                 ) : !barHasLines ? (
                   <p className={`flex flex-1 items-center justify-center px-4 text-center text-sm ${ui.menuEmptyMuted}`}>
-                    {mode === 'sales' ? t('retailKassaPage.scanOnlyHint') : null}
+                    {mode === 'sales'? t('retailKassaPage.scanOnlyHint') : null}
                   </p>
                 ) : (
                   <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden">
@@ -2857,11 +2857,11 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               <div
                 ref={cartScrollRef}
                 className={`flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-y-contain py-0.5 transition-opacity ${
-                  numpadPanelVisible ? 'pointer-events-none opacity-[0.28]' : 'opacity-100'
+                  numpadPanelVisible ? 'pointer-events-none opacity-[0.28]': 'opacity-100'
                 }`}
                 data-testid="retail-kassa-cart-scroll"
               >
-                {mode !== 'sales' ? (
+                {mode !== 'sales'? (
                   stockActivity.length === 0 ? null : (
                     stockActivity
                       .slice()
@@ -2883,7 +2883,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                           className={`${retailListBarShellClass} flex shrink-0 cursor-pointer touch-manipulation items-center gap-2 p-2 transition-[background-color,box-shadow,border-color] ${
                             selectedListLineKey === row.key ? retailListBarSelectedClass : 'hover:bg-neutral-50'
                           }`}
-                          data-retail-line-selected={selectedListLineKey === row.key ? 'true' : undefined}
+                          data-retail-line-selected={selectedListLineKey === row.key ? 'true': undefined}
                         >
                           <div className="min-w-0 flex-1">
                             <p className="truncate text-sm font-semibold text-black">{row.sku.name}</p>
@@ -2915,7 +2915,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                       className={`${retailListBarShellClass} flex shrink-0 cursor-pointer touch-manipulation items-center gap-2 p-2 transition-[background-color,box-shadow,border-color] ${
                         selectedListLineKey === l.sku.lineKey ? retailListBarSelectedClass : 'hover:bg-neutral-50'
                       }`}
-                      data-retail-line-selected={selectedListLineKey === l.sku.lineKey ? 'true' : undefined}
+                      data-retail-line-selected={selectedListLineKey === l.sku.lineKey ? 'true': undefined}
                     >
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold text-black">{l.sku.name}</p>
@@ -2954,7 +2954,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
 
               <div
                 className={`absolute inset-0 z-[3] flex min-h-0 flex-col justify-end overflow-hidden ${KASSA_NUMPAD_PANEL_SLIDE_MOTION} ${
-                  numpadPanelVisible ? 'translate-y-0 pointer-events-auto' : 'translate-y-full pointer-events-none'
+                  numpadPanelVisible ? 'translate-y-0 pointer-events-auto': 'translate-y-full pointer-events-none'
                 }`}
                 data-testid="retail-numpad-panel"
                 aria-hidden={!numpadPanelVisible}
@@ -3033,7 +3033,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                   </span>
                   <span
                     className={`min-w-0 truncate text-right font-bold tabular-nums tracking-tight text-[1.75rem] sm:text-[2rem] ${
-                      mode === 'sales' ? 'text-red-500' : mode === 'exchangeCredit' ? 'text-sky-300' : 'text-emerald-300'
+                      mode === 'sales'? 'text-red-500': mode === 'exchangeCredit'? 'text-sky-300': 'text-emerald-300'
                     }`}
                   >
                     {mode === 'sales'
@@ -3062,7 +3062,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 ) : null}
               </div>
               <div className="grid grid-cols-3 touch-manipulation select-none gap-3">
-                {mode === 'sales' ? (
+                {mode === 'sales'? (
                   <>
                     <button
                       type="button"
@@ -3093,7 +3093,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                       <span className={kassaSidebarActionLabelClass}>{t('kassaApp.remove')}</span>
                     </button>
                   </>
-                ) : mode === 'exchangeCredit' ? (
+                ) : mode === 'exchangeCredit'? (
                   <button
                     type="button"
                     onClick={() => switchMode('sales')}
@@ -3126,7 +3126,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 >
                   <span className={kassaSidebarActionLabelClass}>{t('kassaApp.numpadToggle')}</span>
                 </button>
-                {mode === 'sales' ? (
+                {mode === 'sales'? (
                   <button
                     type="button"
                     data-testid="retail-kassa-checkout"
@@ -3141,7 +3141,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                   >
                     {t('kassaApp.checkout')}
                   </button>
-                ) : mode === 'exchangeCredit' ? (
+                ) : mode === 'exchangeCredit'? (
                   <button
                     type="button"
                     data-testid="retail-issue-store-credit"

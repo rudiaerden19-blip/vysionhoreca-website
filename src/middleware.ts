@@ -155,8 +155,8 @@ export async function middleware(request: NextRequest) {
     const rl = await checkRateLimit(middlewareApiRateLimiter, `mw:${ip}`)
     if (!rl.success) {
       return NextResponse.json(
-        { error: 'Te veel verzoeken. Probeer het later opnieuw.' },
-        { status: 429, headers: { 'Retry-After': '60' } }
+        { error: 'Te veel verzoeken. Probeer het later opnieuw.'},
+        { status: 429, headers: { 'Retry-After': '60'} }
       )
     }
   }
@@ -294,7 +294,7 @@ export async function middleware(request: NextRequest) {
     pathParts[2] = subdomain
     url.pathname = pathParts.join('/')
   } else {
-    url.pathname = `/shop/${subdomain}${pathname === '/' ? '' : pathname}`
+    url.pathname = `/shop/${subdomain}${pathname === '/'? '' : pathname}`
   }
 
   const res = NextResponse.rewrite(url)

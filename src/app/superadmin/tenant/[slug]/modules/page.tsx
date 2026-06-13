@@ -54,7 +54,7 @@ export default function SuperadminTenantModulesPage() {
   )
   const [subToggles, setSubToggles] = useState<Record<string, boolean>>({})
   const [saving, setSaving] = useState(false)
-  const [saveMsg, setSaveMsg] = useState<'ok' | 'err' | null>(null)
+  const [saveMsg, setSaveMsg] = useState<'ok' |  'err'| null>(null)
 
   const loadData = useCallback(async () => {
     const { data: settings } = await supabase
@@ -145,7 +145,7 @@ export default function SuperadminTenantModulesPage() {
     if (!res.ok) {
       const json = await res.json().catch(() => ({}))
       setSaveMsg('err')
-      alert('Opslaan mislukt: ' + (json?.error || `HTTP ${res.status}`))
+      alert('Opslaan mislukt: '+ (json?.error || `HTTP ${res.status}`))
       return
     }
     setSaveMsg('ok')
@@ -241,14 +241,14 @@ export default function SuperadminTenantModulesPage() {
 
             {TENANT_MODULE_IDS.map((id) => {
               const mod = hamburgerByKey[id]
-              const parentOn = id === 'account' ? true : !!moduleToggles[id]
+              const parentOn = id === 'account'? true : !!moduleToggles[id]
               const nestedItems = dedupeHamburgerItems(mod?.items ?? [])
 
               return (
                 <div key={id} className="rounded-2xl border border-slate-600 bg-slate-800/50 p-4 sm:p-5">
                   <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-600/80 pb-3">
                     <p className="text-base font-semibold text-white">{TENANT_MODULE_LABELS[id]}</p>
-                    {id === 'account' ? (
+                    {id === 'account'? (
                       <span className="text-xs font-bold text-emerald-400">Altijd aan</span>
                     ) : (
                       <ModuleSlider
@@ -295,7 +295,7 @@ export default function SuperadminTenantModulesPage() {
             disabled={saving}
             className="rounded-xl bg-orange-500 px-6 py-3 font-semibold text-white hover:bg-orange-600 disabled:opacity-50"
           >
-            {saving ? 'Opslaan…' : 'Wijzigingen opslaan'}
+            {saving ? 'Opslaan…': 'Wijzigingen opslaan'}
           </button>
           {!modulesFullAccess && (
             <button
@@ -347,8 +347,8 @@ function ModuleSlider({
       className={`
         relative h-8 w-14 shrink-0 rounded-full transition-colors
         focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900
-        ${checked ? 'bg-emerald-500' : 'bg-slate-600'}
-        ${disabled ? 'cursor-default opacity-80' : 'cursor-pointer'}
+        ${checked ? 'bg-emerald-500': 'bg-slate-600'}
+        ${disabled ? 'cursor-default opacity-80': 'cursor-pointer'}
       `}
     >
       <span
@@ -356,7 +356,7 @@ function ModuleSlider({
         className={`
           pointer-events-none absolute left-1 top-1 block h-6 w-6 rounded-full bg-white shadow-md
           transition-transform duration-200 ease-out will-change-transform
-          ${checked ? 'translate-x-6' : 'translate-x-0'}
+          ${checked ? 'translate-x-6': 'translate-x-0'}
         `}
       />
     </button>

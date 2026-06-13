@@ -12,7 +12,7 @@ import { apiRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
  *   - tenantSlug + reservationId verplicht; reservation moet ook
  *     daadwerkelijk in die tenant bestaan en nog niet betaald zijn.
  *   - Bedrag wordt NIET meer uit de body genomen (was: vrij in te stellen
- *     door client) maar uit `reservation_settings.deposit_amount` per tenant
+ *     door client) maar uit `reservation_settings.deposit_amount`per tenant
  *     of uit de reservation zelf — body-amount wordt genegeerd.
  *   - IP-rate-limit voorkomt mass-checkout-spam (Stripe-rommel + dashboard).
  */
@@ -20,16 +20,16 @@ export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID()
   try {
     const stripeKey = process.env.STRIPE_SECRET_KEY
-    if (!stripeKey) return NextResponse.json({ error: 'Stripe niet geconfigureerd' }, { status: 503 })
+    if (!stripeKey) return NextResponse.json({ error: 'Stripe niet geconfigureerd'}, { status: 503 })
 
     const body = await request.json()
     const { reservationId, tenantSlug } = body || {}
 
     if (!tenantSlug || typeof tenantSlug !== 'string') {
-      return NextResponse.json({ error: 'tenantSlug is verplicht' }, { status: 400 })
+      return NextResponse.json({ error: 'tenantSlug is verplicht'}, { status: 400 })
     }
     if (!reservationId || typeof reservationId !== 'string') {
-      return NextResponse.json({ error: 'reservationId is verplicht' }, { status: 400 })
+      return NextResponse.json({ error: 'reservationId is verplicht'}, { status: 400 })
     }
 
     // ── Rate-limit per IP — voorkomt mass-checkout creatie ────────────────────
@@ -37,14 +37,14 @@ export async function POST(request: NextRequest) {
     const rl = await checkRateLimit(apiRateLimiter, `res-deposit:${ip}`)
     if (!rl.success) {
       return NextResponse.json(
-        { error: 'Te veel verzoeken. Probeer over enkele seconden opnieuw.' },
-        { status: 429, headers: { 'Retry-After': '60' } }
+        { error: 'Te veel verzoeken. Probeer over enkele seconden opnieuw.'},
+        { status: 429, headers: { 'Retry-After': '60'} }
       )
     }
 
     const supabase = getServerSupabaseClient()
     if (!supabase) {
-      return NextResponse.json({ error: 'Server niet geconfigureerd' }, { status: 503 })
+      return NextResponse.json({ error: 'Server niet geconfigureerd'}, { status: 503 })
     }
 
     // ── Reservation bestaat + behoort tot tenant + nog niet betaald ───────────
@@ -57,10 +57,10 @@ export async function POST(request: NextRequest) {
 
     if (resErr || !reservation) {
       logger.warn('reservation-deposit: reservation not found', { requestId, reservationId, tenantSlug })
-      return NextResponse.json({ error: 'Reservering niet gevonden' }, { status: 404 })
+      return NextResponse.json({ error: 'Reservering niet gevonden'}, { status: 404 })
     }
     if (reservation.payment_status === 'paid') {
-      return NextResponse.json({ error: 'Reservering is al betaald' }, { status: 409 })
+      return NextResponse.json({ error: 'Reservering is al betaald'}, { status: 409 })
     }
 
     // ── Bedrag uit DB (delivery_settings of reservation), nooit blind uit body ─
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
 
     if (!Number.isFinite(depositAmount) || depositAmount <= 0 || depositAmount > 1000) {
       logger.warn('reservation-deposit: invalid amount', { requestId, depositAmount, tenantSlug })
-      return NextResponse.json({ error: 'Borg-bedrag onjuist' }, { status: 400 })
+      return NextResponse.json({ error: 'Borg-bedrag onjuist'}, { status: 400 })
     }
 
     const businessName = tenantRow?.name || tenantSlug
@@ -126,6 +126,6 @@ export async function POST(request: NextRequest) {
       requestId,
       error: error instanceof Error ? error.message : String(error),
     })
-    return NextResponse.json({ error: 'Betaling aanmaken mislukt' }, { status: 500 })
+    return NextResponse.json({ error: 'Betaling aanmaken mislukt'}, { status: 500 })
   }
 }

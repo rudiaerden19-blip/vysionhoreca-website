@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     description:
       'Van kassa en bestelplatform tot hardware en analyse — één team.',
     url: '/over-ons',
-    images: [{ url: '/images/reservation-platform-1.png' }],
+    images: [{ url: '/images/reservation-platform-1.png'}],
   },
   alternates: {
     canonical: '/over-ons',

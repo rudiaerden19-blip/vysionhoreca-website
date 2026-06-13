@@ -69,7 +69,7 @@ export default function Navigation() {
               >
                 <LocaleFlagWithCode locale={locale} />
                 <svg 
-                  className={`w-4 h-4 transition-transform ${isLangOpen ? 'rotate-180' : ''}`} 
+                  className={`w-4 h-4 transition-transform ${isLangOpen ? 'rotate-180': ''}`} 
                   fill="none" 
                   stroke="currentColor" 
                   viewBox="0 0 24 24"
@@ -87,7 +87,7 @@ export default function Navigation() {
                       key={langCode}
                       onClick={() => handleLanguageSelect(langCode)}
                       className={`w-full flex items-center gap-3 px-4 py-3 touch-manipulation transition-colors active:bg-white/10 [@media(hover:hover)]:hover:bg-white/10 ${
-                        locale === langCode ? 'text-accent' : 'text-white'
+                        locale === langCode ? 'text-accent': 'text-white'
                       }`}
                     >
                       <LocaleFlagEmoji locale={langCode} className="text-xl" />

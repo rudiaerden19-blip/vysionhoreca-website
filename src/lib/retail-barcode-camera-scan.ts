@@ -23,7 +23,7 @@ export function isRetailPhoneCameraScanPreferred(): boolean {
   try {
     if (window.matchMedia('(pointer: coarse)').matches) return true
     const touch =
-      'maxTouchPoints' in navigator && typeof navigator.maxTouchPoints === 'number'
+      'maxTouchPoints'in navigator && typeof navigator.maxTouchPoints === 'number'
         ? navigator.maxTouchPoints
         : 0
     if (touch > 0 && window.innerWidth < 900) return true
@@ -92,7 +92,7 @@ export async function configureRetailIntakeCameraTrack(stream: MediaStream): Pro
   if (caps?.focusMode?.includes('continuous')) {
     try {
       await track.applyConstraints({
-        advanced: [{ focusMode: 'continuous' }] as unknown as MediaTrackConstraintSet[],
+        advanced: [{ focusMode: 'continuous'}] as unknown as MediaTrackConstraintSet[],
       })
     } catch {
       /* noop */
@@ -109,13 +109,13 @@ export async function refocusRetailCameraStream(stream: MediaStream | null): Pro
   try {
     if (modes.includes('single-shot')) {
       await track.applyConstraints({
-        advanced: [{ focusMode: 'single-shot' }] as unknown as MediaTrackConstraintSet[],
+        advanced: [{ focusMode: 'single-shot'}] as unknown as MediaTrackConstraintSet[],
       })
       await new Promise((r) => window.setTimeout(r, 450))
     }
     if (modes.includes('continuous')) {
       await track.applyConstraints({
-        advanced: [{ focusMode: 'continuous' }] as unknown as MediaTrackConstraintSet[],
+        advanced: [{ focusMode: 'continuous'}] as unknown as MediaTrackConstraintSet[],
       })
     }
   } catch {
@@ -129,7 +129,7 @@ export async function attachEnvironmentCameraToVideo(
   prepareIntakeScanVideoElement(video)
   const stream = await navigator.mediaDevices.getUserMedia({
     video: {
-      facingMode: { ideal: 'environment' },
+      facingMode: { ideal: 'environment'},
       width: { ideal: 1920, min: 1280 },
       height: { ideal: 1080, min: 720 },
     },
@@ -419,7 +419,7 @@ export async function decodeEanFromImageFile(file: File): Promise<string | null>
   if (!file.type.startsWith('image/')) return null
   let bitmap: ImageBitmap | null = null
   try {
-    bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' })
+    bitmap = await createImageBitmap(file, { imageOrientation: 'from-image'})
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d', { willReadFrequently: true })
     if (!ctx) return null

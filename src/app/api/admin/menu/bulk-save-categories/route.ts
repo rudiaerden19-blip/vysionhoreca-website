@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     try {
       raw = await req.json()
     } catch {
-      return NextResponse.json({ error: 'Ongeldige JSON' }, { status: 400 })
+      return NextResponse.json({ error: 'Ongeldige JSON'}, { status: 400 })
     }
 
     const parsed = BodySchema.safeParse(raw)
@@ -52,15 +52,15 @@ export async function POST(req: NextRequest) {
 
     const access = await verifyTenantOrSuperAdmin(req, tenantSlug)
     if (!access.authorized) {
-      return NextResponse.json({ error: access.error || 'Niet geautoriseerd' }, { status: 403 })
+      return NextResponse.json({ error: access.error || 'Niet geautoriseerd'}, { status: 403 })
     }
 
     const supabase = getServerSupabaseClient()
     if (!supabase) {
-      return NextResponse.json({ error: 'Database niet beschikbaar' }, { status: 503 })
+      return NextResponse.json({ error: 'Database niet beschikbaar'}, { status: 503 })
     }
 
-    const actorType: AuditActorType = access.isSuperAdmin ? 'superadmin' : 'owner'
+    const actorType: AuditActorType = access.isSuperAdmin ? 'superadmin': 'owner'
     const actorEmail = req.headers.get('x-auth-email') || req.headers.get('x-superadmin-email')
     const actorId = req.headers.get('x-business-id') || req.headers.get('x-superadmin-id')
     const meta = auditRequestMeta(req)
@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
         }
         if (!o.updated) {
           return NextResponse.json(
-            { error: `Categorie niet gevonden voor deze zaak (id: ${o.id.slice(0, 8)}…)` },
+            { error: `Categorie niet gevonden voor deze zaak (id: ${o.id.slice(0, 8)}…)`},
             { status: 404 },
           )
         }
@@ -128,6 +128,6 @@ export async function POST(req: NextRequest) {
       requestId,
       err: e instanceof Error ? e.message : String(e),
     })
-    return NextResponse.json({ error: 'Interne fout' }, { status: 500 })
+    return NextResponse.json({ error: 'Interne fout'}, { status: 500 })
   }
 }

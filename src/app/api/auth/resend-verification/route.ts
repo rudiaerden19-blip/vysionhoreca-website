@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     
     if (!rateLimitResult.success) {
       return NextResponse.json(
-        { error: 'Te veel verzoeken. Probeer het later opnieuw.' },
+        { error: 'Te veel verzoeken. Probeer het later opnieuw.'},
         { status: 429 }
       )
     }
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     const supabase = getServerSupabaseClient()
     if (!supabase) {
       return NextResponse.json(
-        { error: 'Service tijdelijk niet beschikbaar' },
+        { error: 'Service tijdelijk niet beschikbaar'},
         { status: 503 }
       )
     }

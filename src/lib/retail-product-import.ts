@@ -61,7 +61,7 @@ export function mapRecordToImportRow(row: Record<string, string>): RetailImportR
   }
 }
 
-function detectDelimiter(line: string): ',' | ';' | '\t' {
+function detectDelimiter(line: string): ',' |  ';' |  '\t'{
   const counts = { ',': 0, ';': 0, '\t': 0 }
   let inQuote = false
   for (const ch of line) {
@@ -113,10 +113,10 @@ export function parseRetailCsvText(text: string): RetailImportRow[] {
 }
 
 export function parseRetailExcelBuffer(buffer: ArrayBuffer): RetailImportRow[] {
-  const wb = XLSX.read(buffer, { type: 'array' })
+  const wb = XLSX.read(buffer, { type: 'array'})
   const sheet = wb.Sheets[wb.SheetNames[0]]
   if (!sheet) return []
-  const json = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: '' })
+  const json = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: ''})
   const rows: RetailImportRow[] = []
   for (const row of json) {
     const rec: Record<string, string> = {}

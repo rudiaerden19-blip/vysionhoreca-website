@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     const supabase = getServerSupabaseClient()
     if (!supabase) {
       logger.error('reset-demo-tenant: database not configured', { requestId })
-      return NextResponse.json({ error: 'Database not configured' }, { status: 503 })
+      return NextResponse.json({ error: 'Database not configured'}, { status: 503 })
     }
 
     logger.info('reset-demo-tenant: start', { requestId })

@@ -15,7 +15,7 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
   const [categories, setCategories] = useState<MenuCategory[]>([])
   const [products, setProducts] = useState<MenuProduct[]>([])
   const [loading, setLoading] = useState(true)
-  const [activeCategory, setActiveCategory] = useState<string>(showPromoOnly ? 'promo' : 'all')
+  const [activeCategory, setActiveCategory] = useState<string>(showPromoOnly ? 'promo': 'all')
 
   useEffect(() => {
     async function loadData() {
@@ -63,7 +63,7 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
   }
 
   return (
-    <div style={{ maxWidth: '100%', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-900">
+    <div style={{ maxWidth: '100%', overflowX: 'hidden', width: '100%'}} className="min-h-screen bg-gray-900">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-gray-900/95 backdrop-blur-md border-b border-white/10">
         <div className="px-4 py-4 text-center">
@@ -86,10 +86,10 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
         
         {/* Category Navigation */}
         <div className="px-4 pb-3 overflow-x-auto scrollbar-hide">
-          <div className="flex gap-2" style={{ WebkitOverflowScrolling: 'touch' }}>
+          <div className="flex gap-2" style={{ WebkitOverflowScrolling: 'touch'}}>
             <button
               onClick={() => setActiveCategory('all')}
-              style={activeCategory === 'all' ? { backgroundColor: primaryColor } : {}}
+              style={activeCategory === 'all'? { backgroundColor: primaryColor } : {}}
               className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
                 activeCategory === 'all'
                   ? 'text-white'
@@ -101,7 +101,7 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
             {products.some(p => p.is_promo) && (
               <button
                 onClick={() => setActiveCategory('promo')}
-                style={activeCategory === 'promo' ? { backgroundColor: '#22c55e' } : {}}
+                style={activeCategory === 'promo'? { backgroundColor: '#22c55e'} : {}}
                 className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
                   activeCategory === 'promo'
                     ? 'text-white'
@@ -131,7 +131,7 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
 
       {/* Menu Content */}
       <main className="px-4 py-6 pb-24">
-        {activeCategory === 'all' ? (
+        {activeCategory === 'all'? (
           // Toon per categorie
           <div className="space-y-8">
             {categories.map((category) => {
@@ -216,7 +216,7 @@ function MenuItemCard({ product, primaryColor, t }: { product: MenuProduct; prim
       <div className="flex">
         {/* Image */}
         {product.image_url && (
-          <div className={`${expanded ? 'w-24 h-24' : 'w-20 h-20'} flex-shrink-0 transition-all relative overflow-hidden rounded-lg bg-white`}>
+          <div className={`${expanded ? 'w-24 h-24': 'w-20 h-20'} flex-shrink-0 transition-all relative overflow-hidden rounded-lg bg-white`}>
             <Image 
               src={product.image_url} 
               alt={product.name}

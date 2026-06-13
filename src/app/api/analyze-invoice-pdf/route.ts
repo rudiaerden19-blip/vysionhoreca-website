@@ -31,14 +31,14 @@ export async function POST(request: NextRequest) {
     const tenantSlug = formData.get('tenant_slug') as string | null
 
     if (!tenantSlug)
-      return NextResponse.json({ success: false, error: 'tenant_slug ontbreekt' }, { status: 400 })
+      return NextResponse.json({ success: false, error: 'tenant_slug ontbreekt'}, { status: 400 })
     if (!file)
-      return NextResponse.json({ success: false, error: 'Geen bestand ontvangen' }, { status: 400 })
+      return NextResponse.json({ success: false, error: 'Geen bestand ontvangen'}, { status: 400 })
     if (file.type !== 'application/pdf')
-      return NextResponse.json({ success: false, error: 'Alleen PDF bestanden' }, { status: 400 })
+      return NextResponse.json({ success: false, error: 'Alleen PDF bestanden'}, { status: 400 })
     if (file.size > MAX_PDF_MB * 1024 * 1024)
       return NextResponse.json(
-        { success: false, error: `Bestand te groot (max ${MAX_PDF_MB} MB)` },
+        { success: false, error: `Bestand te groot (max ${MAX_PDF_MB} MB)`},
         { status: 400 }
       )
 
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     if (!access.authorized) {
       logger.warn('analyze-invoice-pdf: unauthorized', { requestId, tenantSlug })
       return NextResponse.json(
-        { success: false, error: access.error || 'Niet geautoriseerd' },
+        { success: false, error: access.error || 'Niet geautoriseerd'},
         { status: 403 }
       )
     }
@@ -62,8 +62,8 @@ export async function POST(request: NextRequest) {
     const rl = await checkRateLimit(apiRateLimiter, `analyze-invoice-pdf:${tenantSlug}:${actorId}`)
     if (!rl.success) {
       return NextResponse.json(
-        { success: false, error: 'Te veel PDF-scans. Probeer over 1 minuut opnieuw.' },
-        { status: 429, headers: { 'Retry-After': '60' } }
+        { success: false, error: 'Te veel PDF-scans. Probeer over 1 minuut opnieuw.'},
+        { status: 429, headers: { 'Retry-After': '60'} }
       )
     }
 
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
 
     if (!text || text.trim().length < 20)
       return NextResponse.json(
-        { success: false, error: 'Kon geen tekst uitlezen. Is het een gescande afbeelding?' },
+        { success: false, error: 'Kon geen tekst uitlezen. Is het een gescande afbeelding?'},
         { status: 422 }
       )
 
@@ -113,7 +113,7 @@ REGELS:
 
     const res = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json'},
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: { temperature: 0.1, maxOutputTokens: 512 },
@@ -142,15 +142,15 @@ REGELS:
       supplier:          parsed.supplier          || '',
       invoiceNumber:     parsed.invoiceNumber      || '',
       invoiceDate:       parsed.invoiceDate        || new Date().toISOString().split('T')[0],
-      amount:            typeof parsed.amount === 'number' ? parsed.amount : parseFloat(parsed.amount) || 0,
-      description:       parsed.description        || (parsed.supplier ? `Factuur ${parsed.supplier}` : 'Aankoop leverancier'),
+      amount:            typeof parsed.amount === 'number'? parsed.amount : parseFloat(parsed.amount) || 0,
+      description:       parsed.description        || (parsed.supplier ? `Factuur ${parsed.supplier}`: 'Aankoop leverancier'),
       fixedCategory:     parsed.fixedCategory      || 'OTHER',
       variableCategory:  parsed.variableCategory   || 'OTHER',
     })
 
   } catch (error) {
     console.error('[analyze-invoice-pdf] Error:', error)
-    return NextResponse.json({ success: false, error: 'Fout bij verwerken van PDF' }, { status: 500 })
+    return NextResponse.json({ success: false, error: 'Fout bij verwerken van PDF'}, { status: 500 })
   }
 }
 

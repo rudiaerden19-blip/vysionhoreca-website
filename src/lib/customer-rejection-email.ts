@@ -101,17 +101,17 @@ export async function sendCustomerRejectionEmail(
   const { order, tenantSlug, rejectionReason, rejectionNotes } = params
   const customerEmail = (order.customer_email || '').trim()
   if (!customerEmail) {
-    return { sent: false, error: 'Geen klant-e-mail op de bestelling' }
+    return { sent: false, error: 'Geen klant-e-mail op de bestelling'}
   }
   if (!process.env.ZOHO_EMAIL || !process.env.ZOHO_PASSWORD) {
-    return { sent: false, error: 'ZOHO_EMAIL / ZOHO_PASSWORD niet geconfigureerd' }
+    return { sent: false, error: 'ZOHO_EMAIL / ZOHO_PASSWORD niet geconfigureerd'}
   }
 
   const settings = await loadSettingsForTenant(supabase, tenantSlug)
   const tenantCore = await loadTenantCore(supabase, tenantSlug)
 
   if (!tenantCore?.slug) {
-    return { sent: false, error: 'Onbekende tenant (geen rij in tenants)' }
+    return { sent: false, error: 'Onbekende tenant (geen rij in tenants)'}
   }
 
   const businessName =
@@ -151,13 +151,13 @@ export async function sendCustomerRejectionEmail(
 
   const businessInfoHtml = `
       <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-top: 20px; border: 1px solid #e5e5e5;">
-        <h3 style="margin: 0 0 10px; color: #333; font-size: 14px;">🏪 Bedrijfsgegevens</h3>
+        <h3 style="margin: 0 0 10px; color: #333; font-size: 14px;"> Bedrijfsgegevens</h3>
         <p style="margin: 5px 0; color: #333;"><strong>${businessName}</strong></p>
-        ${settings?.address ? `<p style="margin: 5px 0; color: #666;">${settings.address}</p>` : ''}
-        ${settings?.postal_code || settings?.city ? `<p style="margin: 5px 0; color: #666;">${settings.postal_code || ''} ${settings.city || ''}</p>` : ''}
-        ${contactPhone ? `<p style="margin: 5px 0; color: #666;">📞 ${contactPhone}</p>` : ''}
-        ${contactEmail ? `<p style="margin: 5px 0; color: #666;">✉️ ${contactEmail}</p>` : ''}
-        ${settings?.btw_number ? `<p style="margin: 10px 0 0; color: #333; font-weight: bold;">BTW: ${settings.btw_number}</p>` : ''}
+        ${settings?.address ? `<p style="margin: 5px 0; color: #666;">${settings.address}</p>`: ''}
+        ${settings?.postal_code || settings?.city ? `<p style="margin: 5px 0; color: #666;">${settings.postal_code || ''} ${settings.city || ''}</p>`: ''}
+        ${contactPhone ? `<p style="margin: 5px 0; color: #666;"> ${contactPhone}</p>`: ''}
+        ${contactEmail ? `<p style="margin: 5px 0; color: #666;"> ${contactEmail}</p>`: ''}
+        ${settings?.btw_number ? `<p style="margin: 10px 0 0; color: #333; font-weight: bold;">BTW: ${settings.btw_number}</p>`: ''}
       </div>
     `
 
@@ -165,11 +165,11 @@ export async function sendCustomerRejectionEmail(
     from: `"${businessName}" <${process.env.ZOHO_EMAIL}>`,
     to: customerEmail,
     replyTo: contactEmail || process.env.ZOHO_EMAIL,
-    subject: `❌ Bestelling #${order.order_number} geannuleerd - ${businessName}`,
+    subject: `Bestelling #${order.order_number} geannuleerd - ${businessName}`,
     html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="text-align: center; padding: 30px; background: #ef4444; border-radius: 16px 16px 0 0;">
-            <span style="font-size: 64px;">❌</span>
+            <span style="font-size: 64px;"></span>
             <h1 style="color: white; margin: 20px 0 10px; font-size: 28px;">Bestelling #${order.order_number}</h1>
             <p style="color: rgba(255,255,255,0.9); font-size: 18px; margin: 0;">Helaas kunnen we je bestelling niet verwerken.</p>
           </div>
@@ -181,7 +181,7 @@ export async function sendCustomerRejectionEmail(
             <p style="color: #666; font-size: 14px; margin-top: 15px;">Order totaal (ter info): €${totalNum.toFixed(2)} incl. BTW (€${totalExclBtw.toFixed(2)} excl., BTW ${btwRate}%: €${btwAmount.toFixed(2)})</p>
             ${businessInfoHtml}
             <p style="color: #666; font-size: 14px; margin-top: 30px;">
-              Vragen? Neem contact op met ${businessName}${contactPhone ? ` via ${contactPhone}` : ''}.
+              Vragen? Neem contact op met ${businessName}${contactPhone ? `via ${contactPhone}`: ''}.
             </p>
           </div>
           <div style="background: #f9f9f9; padding: 20px; border-radius: 0 0 16px 16px; border: 1px solid #e5e5e5; border-top: none; text-align: center;">

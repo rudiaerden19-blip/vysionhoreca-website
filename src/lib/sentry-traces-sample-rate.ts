@@ -10,5 +10,5 @@ export function getSentryTracesSampleRate(): number {
       return n
     }
   }
-  return process.env.NODE_ENV === 'production' ? 0.1 : 1
+  return process.env.NODE_ENV === 'production'? 0.1 : 1
 }

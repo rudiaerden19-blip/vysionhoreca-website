@@ -1,7 +1,7 @@
 /**
  * Alleen **superadmin**-sessie, cross-subdomein (bv. www → tenant.ordervysion.com).
  *
- * **Zaak-eigenaren:** géén cookie — die blijven via `/api/auth/login` + `vysion_tenant` in localStorage
+ * **Zaak-eigenaren:** géén cookie — die blijven via `/api/auth/login`+ `vysion_tenant`in localStorage
  * (`sessionExpiresAt`, rollende geldigheid). Deze cookies worden nergens bij tenant-login gezet.
  */
 
@@ -48,8 +48,8 @@ export function writeSuperadminSessionCookies(id: string, email: string, name: s
   const domain = superadminSharedCookieDomain()
   const maxAge = 60 * 60 * 24 * 14 // 14 dagen
   const secure = typeof window !== 'undefined' && window.location.protocol === 'https:'
-  const tail = `Path=/; Max-Age=${maxAge}; SameSite=Lax${secure ? '; Secure' : ''}`
-  const dom = domain ? `; Domain=${domain}` : ''
+  const tail = `Path=/; Max-Age=${maxAge}; SameSite=Lax${secure ? '; Secure': ''}`
+  const dom = domain ? `; Domain=${domain}`: ''
 
   const set = (k: string, v: string) => {
     document.cookie = `${k}=${encodeURIComponent(v)}; ${tail}${dom}`
@@ -63,8 +63,8 @@ export function clearSuperadminSessionCookies(): void {
   if (typeof document === 'undefined') return
   const domain = superadminSharedCookieDomain()
   const secure = typeof window !== 'undefined' && window.location.protocol === 'https:'
-  const tailClear = `Path=/; Max-Age=0${secure ? '; Secure' : ''}`
-  const dom = domain ? `; Domain=${domain}` : ''
+  const tailClear = `Path=/; Max-Age=0${secure ? '; Secure': ''}`
+  const dom = domain ? `; Domain=${domain}`: ''
 
   for (const k of [COOKIE_ID, COOKIE_EMAIL, COOKIE_NAME]) {
     document.cookie = `${k}=; ${tailClear}${dom}`

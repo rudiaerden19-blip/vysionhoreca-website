@@ -9,12 +9,12 @@ import { isMissingPostTrialModulesColumnError } from '@/lib/supabase-post-trial-
 export async function GET(request: NextRequest) {
   const tenantSlug = new URL(request.url).searchParams.get('tenant')?.trim()
   if (!tenantSlug) {
-    return NextResponse.json({ error: 'tenant vereist' }, { status: 400 })
+    return NextResponse.json({ error: 'tenant vereist'}, { status: 400 })
   }
 
   const supabase = getServerSupabaseClient()
   if (!supabase) {
-    return NextResponse.json({ error: 'Server niet geconfigureerd' }, { status: 503 })
+    return NextResponse.json({ error: 'Server niet geconfigureerd'}, { status: 503 })
   }
 
   let { data: row, error: tErr } = await supabase

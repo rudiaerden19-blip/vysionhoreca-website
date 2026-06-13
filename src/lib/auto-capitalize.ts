@@ -15,7 +15,7 @@ export function autoCapitalize(event: React.FormEvent<HTMLInputElement | HTMLTex
   
   // Na een punt + spatie: volgende letter hoofdletter
   newValue = newValue.replace(/\. ([a-z])/g, (match, letter) => {
-    return '. ' + letter.toUpperCase()
+    return '. '+ letter.toUpperCase()
   })
   
   // Alleen updaten als er iets veranderd is
@@ -38,7 +38,7 @@ export function capitalizeText(text: string): string {
   
   // Na punt + spatie: hoofdletter
   result = result.replace(/\. ([a-z])/g, (match, letter) => {
-    return '. ' + letter.toUpperCase()
+    return '. '+ letter.toUpperCase()
   })
   
   return result

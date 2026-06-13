@@ -121,7 +121,7 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
 
   const updateCategoryDefaultBtw = (id: string, value: string) => {
     const next: number | null =
-      value === '' || value === 'tenant' ? null : parseInt(value, 10)
+      value === '' || value === 'tenant'? null : parseInt(value, 10)
     setCategories((prev) =>
       prev.map((c) =>
         c.id === id
@@ -370,13 +370,13 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
                   {/* Zichtbaar toggle */}
                   <button
                     onClick={() => toggleVisible(category.id!)}
-                    className={`relative w-10 h-5 rounded-full transition-colors flex-shrink-0 ${category.is_active ? 'bg-green-500' : 'bg-gray-200'}`}
+                    className={`relative w-10 h-5 rounded-full transition-colors flex-shrink-0 ${category.is_active ? 'bg-green-500': 'bg-gray-200'}`}
                     title={category.is_active ? t('adminPages.categorieen.visible') : t('adminPages.categorieen.hidden')}
                   >
-                    <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${category.is_active ? 'translate-x-5' : 'translate-x-0'}`} />
+                    <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${category.is_active ? 'translate-x-5': 'translate-x-0'}`} />
                   </button>
 
-                  <span className={`text-xs font-medium w-16 text-right ${category.is_active ? 'text-green-600' : 'text-gray-400'}`}>
+                  <span className={`text-xs font-medium w-16 text-right ${category.is_active ? 'text-green-600': 'text-gray-400'}`}>
                     {category.is_active ? t('adminPages.categorieen.visible') : t('adminPages.categorieen.hidden')}
                   </span>
 

@@ -6,7 +6,7 @@ export default function BackToTopBar() {
   const { t } = useLanguage()
 
   const scrollTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    window.scrollTo({ top: 0, behavior: 'smooth'})
   }
 
   return (

@@ -68,7 +68,7 @@ function SortableChoice({
   }
 
   return (
-    <div ref={setNodeRef} style={style} className={`flex gap-2 items-center ${isDragging ? 'z-50' : ''}`}>
+    <div ref={setNodeRef} style={style} className={`flex gap-2 items-center ${isDragging ? 'z-50': ''}`}>
       {/* Drag Handle */}
       <button
         {...attributes}
@@ -99,7 +99,7 @@ function SortableChoice({
             const val = e.target.value.replace(',', '.')
             if (val === '' || /^\d*\.?\d*$/.test(val)) {
               setPriceInput(val)
-              onUpdate('price', val === '' ? 0 : parseFloat(val) || 0)
+              onUpdate('price', val === ''? 0 : parseFloat(val) || 0)
             }
           }}
           className="w-full pl-8 pr-3 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -156,8 +156,8 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
     if (!over || active.id === over.id) return
 
     const choices = formData.choices || []
-    const oldIndex = choices.findIndex((_, i) => `choice-${i}` === active.id)
-    const newIndex = choices.findIndex((_, i) => `choice-${i}` === over.id)
+    const oldIndex = choices.findIndex((_, i) => `choice-${i}`=== active.id)
+    const newIndex = choices.findIndex((_, i) => `choice-${i}`=== over.id)
 
     if (oldIndex !== -1 && newIndex !== -1) {
       const newChoices = arrayMove(choices, oldIndex, newIndex).map((c, i) => ({
@@ -246,7 +246,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
 
     const validChoices = formData.choices?.filter(c => c.name.trim() !== '').map(c => ({
       ...c,
-      price: typeof c.price === 'number' ? c.price : 0
+      price: typeof c.price === 'number'? c.price : 0
     })) || []
     if (validChoices.length === 0) {
       setError(t('adminPages.opties.addAtLeastOne'))
@@ -358,7 +358,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                       ? 'bg-blue-100 text-blue-700' 
                       : 'bg-purple-100 text-purple-700'
                   }`}>
-                    {option.type === 'single' ? t('adminPages.opties.singleChoice') : t('adminPages.opties.multipleChoice')}
+                    {option.type === 'single'? t('adminPages.opties.singleChoice') : t('adminPages.opties.multipleChoice')}
                   </span>
                   {option.required && (
                     <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-700">
@@ -390,8 +390,8 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                   className="flex items-center justify-between p-3 bg-gray-50 rounded-xl"
                 >
                   <span className="text-gray-700">{choice.name}</span>
-                  <span className={`font-medium ${choice.price > 0 ? 'text-blue-600' : 'text-gray-400'}`}>
-                    {choice.price > 0 ? `+€${choice.price.toFixed(2)}` : t('adminPages.opties.free')}
+                  <span className={`font-medium ${choice.price > 0 ? 'text-blue-600': 'text-gray-400'}`}>
+                    {choice.price > 0 ? `+€${choice.price.toFixed(2)}`: t('adminPages.opties.free')}
                   </span>
                 </div>
               ))}
@@ -495,7 +495,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                     </label>
                     <select
                       value={formData.type}
-                      onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as 'single' | 'multiple' }))}
+                      onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as 'single' |  'multiple'}))}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="single">{t('adminPages.opties.singleChoice')}</option>
@@ -508,13 +508,13 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                     </label>
                     <div
                       onClick={() => setFormData(prev => ({ ...prev, required: !prev.required }))}
-                      className={`flex items-center justify-between h-12 px-4 rounded-xl cursor-pointer transition-colors ${formData.required ? 'bg-blue-50 border-2 border-blue-500' : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'}`}
+                      className={`flex items-center justify-between h-12 px-4 rounded-xl cursor-pointer transition-colors ${formData.required ? 'bg-blue-50 border-2 border-blue-500': 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'}`}
                     >
-                      <span className={`text-sm font-medium ${formData.required ? 'text-blue-700' : 'text-gray-600'}`}>
+                      <span className={`text-sm font-medium ${formData.required ? 'text-blue-700': 'text-gray-600'}`}>
                         {formData.required ? t('adminPages.opties.mustChoose') : t('adminPages.opties.optionalChoice')}
                       </span>
-                      <button type="button" className={`relative w-10 h-5 rounded-full transition-colors duration-200 ${formData.required ? 'bg-blue-600' : 'bg-gray-300'}`}>
-                        <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 ${formData.required ? 'translate-x-5' : 'translate-x-0'}`} />
+                      <button type="button" className={`relative w-10 h-5 rounded-full transition-colors duration-200 ${formData.required ? 'bg-blue-600': 'bg-gray-300'}`}>
+                        <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 ${formData.required ? 'translate-x-5': 'translate-x-0'}`} />
                       </button>
                     </div>
                   </div>

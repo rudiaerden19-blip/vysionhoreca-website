@@ -36,7 +36,7 @@ export default function TenantModulesPage({ params }: { params: { tenant: string
   )
   const [subToggles, setSubToggles] = useState<Record<string, boolean>>({})
   const [saving, setSaving] = useState(false)
-  const [saveMsg, setSaveMsg] = useState<'ok' | 'err' | null>(null)
+  const [saveMsg, setSaveMsg] = useState<'ok' |  'err'| null>(null)
 
   const loadData = useCallback(async () => {
     let row: {
@@ -138,7 +138,7 @@ export default function TenantModulesPage({ params }: { params: { tenant: string
                     </p>
                   ) : null}
                 </div>
-                {id === 'account' ? (
+                {id === 'account'? (
                   <span className="text-xs font-semibold text-emerald-600">{t('tenantModulesPage.alwaysOn')}</span>
                 ) : (
                   <ModuleToggleSlider

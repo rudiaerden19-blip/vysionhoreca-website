@@ -120,7 +120,7 @@ export default function ImageZoomPicker({ tenantSlug, value, onChange, label }: 
               onTouchMove={handleTouchMove}
               onTouchEnd={handleMouseUp}
               className="relative w-full h-32 rounded-lg overflow-hidden bg-gray-200 cursor-move"
-              style={{ touchAction: 'none' }}
+              style={{ touchAction: 'none'}}
             >
               {/* Deze preview toont exact hoe de foto op de website verschijnt */}
               <Image
@@ -130,7 +130,7 @@ export default function ImageZoomPicker({ tenantSlug, value, onChange, label }: 
                 className="object-cover"
                 style={{
                   objectPosition: `${settings.positionX}% ${settings.positionY}%`,
-                  transform: settings.zoom !== 1 ? `scale(${settings.zoom})` : undefined,
+                  transform: settings.zoom !== 1 ? `scale(${settings.zoom})`: undefined,
                   transformOrigin: `${settings.positionX}% ${settings.positionY}%`,
                 }}
                 unoptimized
@@ -275,7 +275,7 @@ export function getImageUrl(settings: ImageZoomSettings | string | null | undefi
 
 // Helper to get CSS styles for displaying the image
 export function getImageZoomStyles(settings: ImageZoomSettings | string | null | undefined): React.CSSProperties {
-  const parsed = typeof settings === 'string' ? parseImageZoomSettings(settings) : settings
+  const parsed = typeof settings === 'string'? parseImageZoomSettings(settings) : settings
   if (!parsed || parsed.zoom <= 1) return {}
   
   return {

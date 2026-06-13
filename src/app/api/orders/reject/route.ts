@@ -76,7 +76,7 @@ async function sendWhatsAppRejectionInBackground(params: {
     .replace(/^0/, '32')
     .replace(/^\+/, '')
 
-  const message = `❌ *Bestelling Afgewezen*
+  const message = `*Bestelling Afgewezen*
 
 Je bestelling #${order.order_number} is helaas afgewezen.
 
@@ -128,12 +128,12 @@ export async function POST(request: NextRequest) {
     tenantSlugLog = tenantSlug
 
     if (!orderId || !tenantSlug || !rejectionReason) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+      return NextResponse.json({ error: 'Missing required fields'}, { status: 400 })
     }
 
     const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
     if (!access.authorized) {
-      return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
+      return NextResponse.json({ error: access.error || 'Forbidden'}, { status: 403 })
     }
 
     const { data: order, error: orderError } = await supabaseAdmin
@@ -144,12 +144,12 @@ export async function POST(request: NextRequest) {
 
     if (orderError || !order) {
       logger.warn('Order reject: order not found', { requestId, orderId, error: orderError?.message })
-      return NextResponse.json({ error: 'Order not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Order not found'}, { status: 404 })
     }
 
     const norm = (s: string) => (s || '').replace(/-/g, '').toLowerCase()
     if (norm(order.tenant_slug) !== norm(tenantSlug)) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      return NextResponse.json({ error: 'Forbidden'}, { status: 403 })
     }
 
     const { error: updateError } = await supabaseAdmin
@@ -171,7 +171,7 @@ export async function POST(request: NextRequest) {
         phase: 'update',
         orderId,
       })
-      return NextResponse.json({ error: 'Failed to reject order' }, { status: 500 })
+      return NextResponse.json({ error: 'Failed to reject order'}, { status: 500 })
     }
 
     logger.info('Order rejected', { requestId, orderId })
@@ -194,7 +194,7 @@ export async function POST(request: NextRequest) {
         requestId,
         error: mailErr instanceof Error ? mailErr.message : String(mailErr),
       })
-      trackError(mailErr, { requestId, route: '/api/orders/reject', phase: 'rejection_email' })
+      trackError(mailErr, { requestId, route: '/api/orders/reject', phase: 'rejection_email'})
       emailError = 'E-mail versturen mislukt'
     }
 

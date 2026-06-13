@@ -83,7 +83,7 @@ export default function SuperAdminDashboard() {
 
   // Service worker: nieuwe sw.js ophalen (superadmin wordt niet meer gecached — oudere deploys toonden ontbrekende knoppen)
   useEffect(() => {
-    if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return
+    if (typeof navigator === 'undefined' || !('serviceWorker'in navigator)) return
     navigator.serviceWorker.getRegistration().then((reg) => reg?.update()).catch(() => {})
   }, [])
 
@@ -179,17 +179,17 @@ export default function SuperAdminDashboard() {
       })
       const json = await res.json().catch(() => ({}))
       if (!res.ok) {
-        alert('Fout bij aanmaken: ' + (json?.error || `HTTP ${res.status}`))
+        alert('Fout bij aanmaken: '+ (json?.error || `HTTP ${res.status}`))
         setSaving(false)
         return
       }
     } catch (e) {
-      alert('Netwerkfout bij aanmaken: ' + (e instanceof Error ? e.message : String(e)))
+      alert('Netwerkfout bij aanmaken: '+ (e instanceof Error ? e.message : String(e)))
       setSaving(false)
       return
     }
 
-    setNewTenant({ tenant_slug: '', business_name: '', email: '', phone: '' })
+    setNewTenant({ tenant_slug: '', business_name: '', email: '', phone: ''})
     setShowNewTenantModal(false)
     setSaving(false)
     await loadData()
@@ -214,7 +214,7 @@ export default function SuperAdminDashboard() {
     })
     const json = await res.json().catch(() => ({}))
     if (!res.ok) {
-      alert('Fout: ' + (json?.error || `HTTP ${res.status}`))
+      alert('Fout: '+ (json?.error || `HTTP ${res.status}`))
       return
     }
     await loadData()
@@ -233,7 +233,7 @@ export default function SuperAdminDashboard() {
       })
       const json = await res.json().catch(() => ({}))
       if (!res.ok) {
-        alert('Verwijderen mislukt: ' + (json?.error || `HTTP ${res.status}`))
+        alert('Verwijderen mislukt: '+ (json?.error || `HTTP ${res.status}`))
         setSaving(false)
         return
       }
@@ -241,7 +241,7 @@ export default function SuperAdminDashboard() {
         console.warn('[superadmin] cascade-delete partials:', json.errors)
       }
     } catch (e) {
-      alert('Netwerkfout bij verwijderen: ' + (e instanceof Error ? e.message : String(e)))
+      alert('Netwerkfout bij verwijderen: '+ (e instanceof Error ? e.message : String(e)))
       setSaving(false)
       return
     }
@@ -270,17 +270,17 @@ export default function SuperAdminDashboard() {
       })
 
       if (response.ok) {
-        alert(' Betalingsherinnering verzonden naar ' + tenant.email)
+        alert('Betalingsherinnering verzonden naar '+ tenant.email)
       } else {
-        alert(' Fout bij verzenden email')
+        alert('Fout bij verzenden email')
       }
     } catch (error) {
-      alert(' Fout bij verzenden email')
+      alert('Fout bij verzenden email')
     }
   }
 
   const handleTogglePaymentStatus = async (tenant: Tenant, sub: Subscription | undefined) => {
-    const newStatus = sub?.status === 'active' ? 'expired' : 'active'
+    const newStatus = sub?.status === 'active'? 'expired': 'active'
     const now = new Date()
     const nextMonth = new Date(now)
     nextMonth.setMonth(nextMonth.getMonth() + 1)
@@ -291,8 +291,8 @@ export default function SuperAdminDashboard() {
         .from('subscriptions')
         .update({ 
           status: newStatus,
-          subscription_started_at: newStatus === 'active' ? now.toISOString() : null,
-          next_payment_at: newStatus === 'active' ? nextMonth.toISOString() : null,
+          subscription_started_at: newStatus === 'active'? now.toISOString() : null,
+          next_payment_at: newStatus === 'active'? nextMonth.toISOString() : null,
         })
         .eq('id', sub.id)
     } else {
@@ -304,8 +304,8 @@ export default function SuperAdminDashboard() {
           plan: 'starter',
           status: newStatus,
           price_monthly: 59,
-          subscription_started_at: newStatus === 'active' ? now.toISOString() : null,
-          next_payment_at: newStatus === 'active' ? nextMonth.toISOString() : null,
+          subscription_started_at: newStatus === 'active'? now.toISOString() : null,
+          next_payment_at: newStatus === 'active'? nextMonth.toISOString() : null,
         })
     }
 
@@ -597,7 +597,7 @@ export default function SuperAdminDashboard() {
                     getSubscription(tenant.tenant_slug)
                   )
                   return (
-                    <tr key={tenant.id} className={`transition-colors ${tenant.is_blocked ? 'opacity-50' : ''} ${
+                    <tr key={tenant.id} className={`transition-colors ${tenant.is_blocked ? 'opacity-50': ''} ${
                       isDemoTenant(tenant.tenant_slug)
                         ? 'bg-blue-500/10 hover:bg-blue-500/20 border-l-4 border-blue-500'
                         : isAdminTenant(tenant.tenant_slug)
@@ -610,7 +610,7 @@ export default function SuperAdminDashboard() {
                         <div className="flex items-center gap-2">
                           {tenant.is_blocked && <span className="text-red-500"></span>}
                           {isDemoTenant(tenant.tenant_slug) && <span className="text-blue-400"></span>}
-                          {isProtectedTenant(tenant.tenant_slug) && !isDemoTenant(tenant.tenant_slug) && <span className="text-yellow-500">⭐</span>}
+                          {isProtectedTenant(tenant.tenant_slug) && !isDemoTenant(tenant.tenant_slug) && <span className="text-yellow-500"></span>}
                           <div>
                             <p className="font-medium text-white flex items-center gap-2">
                               {tenant.business_name || 'Geen naam'}
@@ -643,8 +643,8 @@ export default function SuperAdminDashboard() {
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           {isAdminTenant(tenant.tenant_slug) ? (
-                            <span className={`px-3 py-1 rounded-lg text-xs font-medium ${isDemoTenant(tenant.tenant_slug) ? 'bg-blue-500 text-white' : 'bg-purple-500 text-white'}`}>
-                              {isDemoTenant(tenant.tenant_slug) ? ' Demo' : ' Admin'}
+                            <span className={`px-3 py-1 rounded-lg text-xs font-medium ${isDemoTenant(tenant.tenant_slug) ? 'bg-blue-500 text-white': 'bg-purple-500 text-white'}`}>
+                              {isDemoTenant(tenant.tenant_slug) ? 'Demo': 'Admin'}
                             </span>
                           ) : (
                             <>
@@ -658,7 +658,7 @@ export default function SuperAdminDashboard() {
                                     : 'bg-red-500 hover:bg-red-600 text-white'
                                 }`}
                               >
-                                {sub?.status === 'active' ? ' Betaald' : ' Niet betaald'}
+                                {sub?.status === 'active'? 'Betaald': 'Niet betaald'}
                               </button>
                               {sub?.status !== 'active' && tenant.email && (
                                 <button
@@ -711,7 +711,7 @@ export default function SuperAdminDashboard() {
                                       : 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
                                   }`}
                                 >
-                                  {tenant.is_blocked ? ' Deblokkeren' : ' Blokkeren'}
+                                  {tenant.is_blocked ? 'Deblokkeren': 'Blokkeren'}
                                 </button>
                                 <button
                                   onClick={() => setShowDeleteModal(tenant)}
@@ -823,7 +823,7 @@ export default function SuperAdminDashboard() {
                   disabled={saving || !newTenant.tenant_slug || !newTenant.business_name}
                   className="flex-1 px-4 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium transition-colors disabled:opacity-50"
                 >
-                  {saving ? 'Aanmaken...' : 'Aanmaken'}
+                  {saving ? 'Aanmaken...': 'Aanmaken'}
                 </button>
               </div>
             </motion.div>
@@ -871,7 +871,7 @@ export default function SuperAdminDashboard() {
                   disabled={saving}
                   className="flex-1 px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-medium transition-colors disabled:opacity-50"
                 >
-                  {saving ? 'Verwijderen...' : ' Definitief Verwijderen'}
+                  {saving ? 'Verwijderen...': 'Definitief Verwijderen'}
                 </button>
               </div>
             </motion.div>
@@ -897,11 +897,11 @@ export default function SuperAdminDashboard() {
           type="button"
           onClick={async () => {
             try {
-              if ('serviceWorker' in navigator) {
+              if ('serviceWorker'in navigator) {
                 const regs = await navigator.serviceWorker.getRegistrations()
                 await Promise.all(regs.map((r) => r.unregister()))
               }
-              if ('caches' in window) {
+              if ('caches'in window) {
                 const keys = await caches.keys()
                 await Promise.all(keys.map((k) => caches.delete(k)))
               }

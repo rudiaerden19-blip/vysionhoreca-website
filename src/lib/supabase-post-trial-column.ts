@@ -1,7 +1,7 @@
 /**
- * When `post_trial_modules_confirmed` was never migrated on `tenants`, PostgREST returns
+ * When `post_trial_modules_confirmed`was never migrated on `tenants`, PostgREST returns
  * this error. Retry without that field, and run
- * `supabase/post_trial_modules_confirmed_migration.sql` in the Supabase SQL editor
+ * `supabase/post_trial_modules_confirmed_migration.sql`in the Supabase SQL editor
  * when you want the full post-trial module picker semantics.
  */
 export function isMissingPostTrialModulesColumnError(

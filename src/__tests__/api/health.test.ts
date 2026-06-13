@@ -14,7 +14,7 @@ import { getServerSupabaseClient } from '@/lib/supabase-server'
 
 // Skip these tests - they require Next.js runtime
 // Run integration tests separately with actual HTTP requests
-const describeOrSkip = typeof Request === 'undefined' ? describe.skip : describe
+const describeOrSkip = typeof Request === 'undefined'? describe.skip : describe
 
 // Mock GET function for testing
 let GET: () => Promise<Response>
@@ -74,7 +74,7 @@ describeOrSkip('Health Check API (Integration)', () => {
         select: jest.fn().mockReturnValue({
           limit: jest.fn().mockResolvedValue({ 
             data: null, 
-            error: { message: 'Connection failed' } 
+            error: { message: 'Connection failed'} 
           }),
         }),
       }),

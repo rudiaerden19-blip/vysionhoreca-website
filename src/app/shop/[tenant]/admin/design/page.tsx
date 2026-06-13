@@ -8,30 +8,30 @@ import { getTenantSettings, saveTenantSettings, TenantSettings } from '@/lib/adm
 
 const colorPresets = [
   // Rij 1 - Warm
-  { nameKey: 'orange', primary: '#FF6B35', secondary: '#FFA500' },
-  { nameKey: 'red', primary: '#E53935', secondary: '#FF5252' },
-  { nameKey: 'coral', primary: '#FF6F61', secondary: '#FF8A80' },
-  { nameKey: 'amber', primary: '#FF8F00', secondary: '#FFB300' },
+  { nameKey: 'orange', primary: '#FF6B35', secondary: '#FFA500'},
+  { nameKey: 'red', primary: '#E53935', secondary: '#FF5252'},
+  { nameKey: 'coral', primary: '#FF6F61', secondary: '#FF8A80'},
+  { nameKey: 'amber', primary: '#FF8F00', secondary: '#FFB300'},
   // Rij 2 - Koel
-  { nameKey: 'blue', primary: '#1E88E5', secondary: '#42A5F5' },
-  { nameKey: 'indigo', primary: '#3949AB', secondary: '#5C6BC0' },
-  { nameKey: 'teal', primary: '#00897B', secondary: '#26A69A' },
-  { nameKey: 'cyan', primary: '#00ACC1', secondary: '#26C6DA' },
+  { nameKey: 'blue', primary: '#1E88E5', secondary: '#42A5F5'},
+  { nameKey: 'indigo', primary: '#3949AB', secondary: '#5C6BC0'},
+  { nameKey: 'teal', primary: '#00897B', secondary: '#26A69A'},
+  { nameKey: 'cyan', primary: '#00ACC1', secondary: '#26C6DA'},
   // Rij 3 - Natuur
-  { nameKey: 'green', primary: '#43A047', secondary: '#66BB6A' },
-  { nameKey: 'lime', primary: '#7CB342', secondary: '#9CCC65' },
-  { nameKey: 'forest', primary: '#2E7D32', secondary: '#4CAF50' },
-  { nameKey: 'mint', primary: '#00BFA5', secondary: '#64FFDA' },
+  { nameKey: 'green', primary: '#43A047', secondary: '#66BB6A'},
+  { nameKey: 'lime', primary: '#7CB342', secondary: '#9CCC65'},
+  { nameKey: 'forest', primary: '#2E7D32', secondary: '#4CAF50'},
+  { nameKey: 'mint', primary: '#00BFA5', secondary: '#64FFDA'},
   // Rij 4 - Luxe
-  { nameKey: 'purple', primary: '#8E24AA', secondary: '#AB47BC' },
-  { nameKey: 'pink', primary: '#D81B60', secondary: '#EC407A' },
-  { nameKey: 'gold', primary: '#C9A227', secondary: '#D4AF37' },
-  { nameKey: 'bronze', primary: '#8D6E63', secondary: '#A1887F' },
+  { nameKey: 'purple', primary: '#8E24AA', secondary: '#AB47BC'},
+  { nameKey: 'pink', primary: '#D81B60', secondary: '#EC407A'},
+  { nameKey: 'gold', primary: '#C9A227', secondary: '#D4AF37'},
+  { nameKey: 'bronze', primary: '#8D6E63', secondary: '#A1887F'},
   // Rij 5 - Neutraal
-  { nameKey: 'dark', primary: '#37474F', secondary: '#546E7A' },
-  { nameKey: 'black', primary: '#212121', secondary: '#424242' },
-  { nameKey: 'slate', primary: '#455A64', secondary: '#607D8B' },
-  { nameKey: 'brown', primary: '#5D4037', secondary: '#795548' },
+  { nameKey: 'dark', primary: '#37474F', secondary: '#546E7A'},
+  { nameKey: 'black', primary: '#212121', secondary: '#424242'},
+  { nameKey: 'slate', primary: '#455A64', secondary: '#607D8B'},
+  { nameKey: 'brown', primary: '#5D4037', secondary: '#795548'},
 ]
 
 export default function DesignPage({ params }: { params: { tenant: string } }) {
@@ -116,7 +116,7 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
         onClick={handleSave}
         disabled={saving}
         className={`fixed bottom-6 right-6 z-50 px-6 py-4 rounded-2xl font-medium shadow-2xl flex items-center gap-2 ${
-          saved ? 'bg-green-500 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'
+          saved ? 'bg-green-500 text-white': 'bg-blue-600 hover:bg-blue-700 text-white'
         }`}
       >
         {saving ? (
@@ -171,7 +171,7 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
                 >
                   <div 
                     className="w-full aspect-square rounded-lg mb-2"
-                    style={{ background: `linear-gradient(135deg, ${preset.primary}, ${preset.secondary})` }}
+                    style={{ background: `linear-gradient(135deg, ${preset.primary}, ${preset.secondary})`}}
                   />
                   <p className="text-xs text-gray-600 text-center">{t(`websiteDesign.colors.${preset.nameKey}`)}</p>
                 </button>
@@ -239,12 +239,12 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
               <button
                 onClick={() => { setDarkMode(!darkMode); setSaved(false); }}
                 className={`relative w-14 h-8 rounded-full transition-colors ${
-                  darkMode ? 'bg-blue-600' : 'bg-gray-200'
+                  darkMode ? 'bg-blue-600': 'bg-gray-200'
                 }`}
               >
                 <div 
                   className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow-md transition-transform ${
-                    darkMode ? 'left-7' : 'left-1'
+                    darkMode ? 'left-7': 'left-1'
                   }`}
                 />
               </button>
@@ -292,19 +292,19 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
             
             {/* Mini Preview */}
             <div 
-              className={`rounded-xl overflow-hidden border ${darkMode ? 'bg-[#0d0d0d] border-[#333]' : 'bg-white'}`}
-              style={{ minHeight: '400px' }}
+              className={`rounded-xl overflow-hidden border ${darkMode ? 'bg-[#0d0d0d] border-[#333]': 'bg-white'}`}
+              style={{ minHeight: '400px'}}
             >
               {/* Mini Header */}
               <div 
-                className={`h-32 relative ${darkMode ? 'bg-[#1a1a1a]' : ''}`}
-                style={!darkMode ? { background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})` } : {}}
+                className={`h-32 relative ${darkMode ? 'bg-[#1a1a1a]': ''}`}
+                style={!darkMode ? { background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`} : {}}
               >
                 <div className="absolute bottom-4 left-4">
-                  <div className={`text-xs font-bold mb-1 ${darkMode ? 'text-white' : 'text-white'}`}>
+                  <div className={`text-xs font-bold mb-1 ${darkMode ? 'text-white': 'text-white'}`}>
                     {settings?.business_name || 'Je Zaak Naam'}
                   </div>
-                  <div className={`text-[10px] ${darkMode ? 'text-gray-400' : 'text-white/70'}`}>{settings?.tagline || t('websiteDesign.taglineHere')}</div>
+                  <div className={`text-[10px] ${darkMode ? 'text-gray-400': 'text-white/70'}`}>{settings?.tagline || t('websiteDesign.taglineHere')}</div>
                 </div>
               </div>
 
@@ -318,10 +318,10 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
                   >
                     {t('websiteDesign.previewAll')}
                   </div>
-                  <div className={`px-3 py-1 text-xs font-medium rounded-full ${darkMode ? 'bg-[#2a2a2a] text-gray-300' : 'bg-gray-100 text-gray-600'}`}>
+                  <div className={`px-3 py-1 text-xs font-medium rounded-full ${darkMode ? 'bg-[#2a2a2a] text-gray-300': 'bg-gray-100 text-gray-600'}`}>
                     {t('websiteDesign.previewFries')}
                   </div>
-                  <div className={`px-3 py-1 text-xs font-medium rounded-full ${darkMode ? 'bg-[#2a2a2a] text-gray-300' : 'bg-gray-100 text-gray-600'}`}>
+                  <div className={`px-3 py-1 text-xs font-medium rounded-full ${darkMode ? 'bg-[#2a2a2a] text-gray-300': 'bg-gray-100 text-gray-600'}`}>
                     {t('websiteDesign.previewSnacks')}
                   </div>
                 </div>
@@ -331,11 +331,11 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
                   {[1, 2].map((i) => (
                     <div 
                       key={i} 
-                      className={`rounded-xl overflow-hidden ${darkMode ? 'bg-[#1a1a1a]' : 'bg-gray-50'}`}
+                      className={`rounded-xl overflow-hidden ${darkMode ? 'bg-[#1a1a1a]': 'bg-gray-50'}`}
                     >
-                      <div className={`h-16 ${darkMode ? 'bg-[#2a2a2a]' : 'bg-gray-300'}`} />
+                      <div className={`h-16 ${darkMode ? 'bg-[#2a2a2a]': 'bg-gray-300'}`} />
                       <div className="p-2">
-                        <div className={`h-2 w-16 rounded mb-1 ${darkMode ? 'bg-gray-600' : 'bg-gray-200'}`} />
+                        <div className={`h-2 w-16 rounded mb-1 ${darkMode ? 'bg-gray-600': 'bg-gray-200'}`} />
                         <div 
                           className="h-2 w-10 rounded"
                           style={{ backgroundColor: primaryColor }}

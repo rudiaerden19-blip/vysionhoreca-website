@@ -15,7 +15,7 @@ export default function OverOnsPage() {
       <section className="relative pt-32 pb-20 overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: 'url(/images/over-ons-hero-bg.png)' }}
+          style={{ backgroundImage: 'url(/images/over-ons-hero-bg.png)'}}
           aria-hidden
         />
         <div className="absolute inset-0 bg-black/55" aria-hidden />
@@ -102,7 +102,7 @@ export default function OverOnsPage() {
       <section className="relative py-20 overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: 'url(/images/over-ons-mission-bg.png)' }}
+          style={{ backgroundImage: 'url(/images/over-ons-mission-bg.png)'}}
           aria-hidden
         />
         <div className="absolute inset-0 bg-black/60" aria-hidden />
@@ -239,7 +239,7 @@ export default function OverOnsPage() {
       <section className="relative py-20 overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: 'url(/images/over-ons-cta-bg.png)' }}
+          style={{ backgroundImage: 'url(/images/over-ons-cta-bg.png)'}}
           aria-hidden
         />
         <div className="absolute inset-0 bg-black/50" aria-hidden />

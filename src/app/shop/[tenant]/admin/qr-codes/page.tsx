@@ -11,7 +11,7 @@ const getQrTypes = (t: (key: string) => string) => [
   { id: 'menu', name: t('marketingQr.types.menu'), icon: '', description: t('marketingQr.types.menuDesc') },
   { id: 'table', name: t('marketingQr.types.table'), icon: '', description: t('marketingQr.types.tableDesc') },
   { id: 'promo', name: t('marketingQr.types.promo'), icon: '', description: t('marketingQr.types.promoDesc') },
-  { id: 'review', name: t('marketingQr.types.review'), icon: '⭐', description: t('marketingQr.types.reviewDesc') },
+  { id: 'review', name: t('marketingQr.types.review'), icon: '', description: t('marketingQr.types.reviewDesc') },
 ]
 
 export default function QrCodesPage({ params }: { params: { tenant: string } }) {
@@ -24,7 +24,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
   const [selectedType, setSelectedType] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     name: '',
-    type: 'menu' as 'menu' | 'table' | 'promo' | 'review',
+    type: 'menu'as 'menu' |  'table' |  'promo' |  'review',
     table_number: '',
   })
 
@@ -71,7 +71,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
       name: formData.name,
       type: formData.type,
       target_url: targetUrl,
-      table_number: formData.type === 'table' ? parseInt(formData.table_number) || undefined : undefined,
+      table_number: formData.type === 'table'? parseInt(formData.table_number) || undefined : undefined,
       scans: 0,
       is_active: true,
     }
@@ -81,7 +81,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
       setQrCodes(prev => [saved, ...prev])
       setShowModal(false)
       setSelectedType(null)
-      setFormData({ name: '', type: 'menu', table_number: '' })
+      setFormData({ name: '', type: 'menu', table_number: ''})
     }
     setSaving(false)
   }
@@ -112,11 +112,11 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
       return
     }
     const esc = (s: string) =>
-      s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!))
+      s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]!))
     w.document.write(
-      `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${esc(qr.name)}</title></head>` +
-        `<body style="margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#fff">` +
-        `<img src="${imageUrl}" alt="" style="max-width:100%;max-height:100vh;object-fit:contain"/>` +
+      `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${esc(qr.name)}</title></head>`+
+        `<body style="margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#fff">`+
+        `<img src="${imageUrl}" alt="" style="max-width:100%;max-height:100vh;object-fit:contain"/>`+
         `</body></html>`
     )
     w.document.close()
@@ -136,9 +136,9 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
   const openCreateModal = (type: string) => {
     setSelectedType(type)
     setFormData({
-      name: type === 'menu' ? 'Menu QR' : type === 'table' ? 'Tafel ' : type === 'promo' ? 'Promotie' : 'Review',
-      type: type as 'menu' | 'table' | 'promo' | 'review',
-      table_number: type === 'table' ? '1' : '',
+      name: type === 'menu'? 'Menu QR': type === 'table'? 'Tafel ': type === 'promo'? 'Promotie': 'Review',
+      type: type as 'menu' |  'table' |  'promo' |  'review',
+      table_number: type === 'table'? '1': '',
     })
     setShowModal(true)
   }

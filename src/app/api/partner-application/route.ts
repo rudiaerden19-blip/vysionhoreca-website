@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     const rateLimitResult = await checkRateLimit(partnerApplicationRateLimiter, clientIP)
     if (!rateLimitResult.success) {
       return NextResponse.json(
-        { error: 'Te veel aanvragen vanaf dit adres. Probeer later opnieuw.' },
+        { error: 'Te veel aanvragen vanaf dit adres. Probeer later opnieuw.'},
         { status: 429 }
       )
     }
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
 
     if (existing) {
       return NextResponse.json(
-        { error: 'Dit e-mailadres heeft al een aanvraag ingediend' },
+        { error: 'Dit e-mailadres heeft al een aanvraag ingediend'},
         { status: 400 }
       )
     }
@@ -74,12 +74,12 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error('Partner application error:', error)
       return NextResponse.json(
-        { error: 'Er ging iets mis bij het opslaan' },
+        { error: 'Er ging iets mis bij het opslaan'},
         { status: 500 }
       )
     }
 
-    console.log('✅ New partner application:', data)
+    console.log('New partner application:', data)
 
     return NextResponse.json({ success: true, data })
   } catch (error: unknown) {

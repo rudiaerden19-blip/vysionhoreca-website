@@ -43,7 +43,7 @@ export const loginBodySchema = z.object({
       z.null(),
       z.undefined(),
     ])
-    .transform((s) => (typeof s === 'string' ? s : '')),
+    .transform((s) => (typeof s === 'string'? s : '')),
 })
 
 export const registerBodySchema = z.object({

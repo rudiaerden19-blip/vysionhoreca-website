@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
 
     const supabase = getServerSupabaseClient()
     if (!supabase) {
-      return NextResponse.json({ error: 'Database not configured' }, { status: 503 })
+      return NextResponse.json({ error: 'Database not configured'}, { status: 503 })
     }
 
     logger.info('Subscription reminder cron started', { requestId })
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       logger.error('Subscription reminder: DB fetch failed', { requestId, error: error.message })
-      return NextResponse.json({ error: 'Database error' }, { status: 500 })
+      return NextResponse.json({ error: 'Database error'}, { status: 500 })
     }
 
     if (!expiringSubscriptions || expiringSubscriptions.length === 0) {
@@ -136,33 +136,33 @@ export async function GET(request: NextRequest) {
 <body>
   <div class="container">
     <div class="header">
-      <h1>📅 Abonnement Herinnering</h1>
+      <h1> Abonnement Herinnering</h1>
     </div>
     
     <div class="content">
       <p>Beste ${businessName},</p>
       
       <div class="info-box">
-        <h2>⏰ Uw abonnement loopt bijna af</h2>
+        <h2> Uw abonnement loopt bijna af</h2>
         <p style="margin: 0;">Uw Vysion kassa's abonnement verloopt binnenkort. Verleng op tijd om uw webshop online te houden!</p>
       </div>
       
-      <p class="deadline">📆 Vervaldatum: ${expiryDate}</p>
+      <p class="deadline"> Vervaldatum: ${expiryDate}</p>
       
       <p>Verleng nu uw abonnement om te blijven genieten van:</p>
       
       <div class="benefits">
         <ul>
-          <li>✅ Uw online bestelwebsite blijft actief</li>
-          <li>✅ Klanten kunnen blijven bestellen</li>
-          <li>✅ Toegang tot het admin panel</li>
-          <li>✅ Automatische bestellingen en betalingen</li>
-          <li>✅ Klantenservice en ondersteuning</li>
+          <li> Uw online bestelwebsite blijft actief</li>
+          <li> Klanten kunnen blijven bestellen</li>
+          <li> Toegang tot het admin panel</li>
+          <li> Automatische bestellingen en betalingen</li>
+          <li> Klantenservice en ondersteuning</li>
         </ul>
       </div>
       
       <p style="text-align: center;">
-        <a href="${paymentLink}" class="cta-button">💳 Nu Verlengen</a>
+        <a href="${paymentLink}" class="cta-button"> Nu Verlengen</a>
       </p>
       
       <p>Na verlenging blijft alles gewoon werken zonder onderbreking.</p>
@@ -184,7 +184,7 @@ export async function GET(request: NextRequest) {
         await transporter.sendMail({
           from: `"Vysion kassa's" <${VYSION_INFO_EMAIL}>`,
           to: email,
-          subject: `📅 Uw abonnement loopt bijna af - Verleng voor ${expiryDate}`,
+          subject: `Uw abonnement loopt bijna af - Verleng voor ${expiryDate}`,
           html: emailHtml,
         })
 

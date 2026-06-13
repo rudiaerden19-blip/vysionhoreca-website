@@ -27,15 +27,15 @@ interface CostCategory {
 }
 
 const unitOptions = [
-  { value: 'stuk', label: 'Stuk' },
-  { value: 'kg', label: 'Kilogram (kg)' },
-  { value: 'gram', label: 'Gram (g)' },
-  { value: 'liter', label: 'Liter (L)' },
-  { value: 'ml', label: 'Milliliter (ml)' },
-  { value: 'portie', label: 'Portie' },
-  { value: 'schijf', label: 'Schijf' },
-  { value: 'plak', label: 'Plak' },
-  { value: 'doos', label: 'Doos' },
+  { value: 'stuk', label: 'Stuk'},
+  { value: 'kg', label: 'Kilogram (kg)'},
+  { value: 'gram', label: 'Gram (g)'},
+  { value: 'liter', label: 'Liter (L)'},
+  { value: 'ml', label: 'Milliliter (ml)'},
+  { value: 'portie', label: 'Portie'},
+  { value: 'schijf', label: 'Schijf'},
+  { value: 'plak', label: 'Plak'},
+  { value: 'doos', label: 'Doos'},
 ]
 
 export default function IngredientsPage({ params }: { params: { tenant: string } }) {
@@ -230,7 +230,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
         total_amount: invoiceResults.totalAmount || null,
         status: 'completed',
       },
-      { tenantSlug: params.tenant, select: '*' }
+      { tenantSlug: params.tenant, select: '*'}
     )
     const invoiceScan = (Array.isArray(invScanRes.data) ? invScanRes.data[0] : invScanRes.data) as any
 
@@ -242,7 +242,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
       const usesPortions = item.portions && item.portions > 0
       const divider = usesPortions ? item.portions : item.quantity
       const calculatedPricePerUnit = (divider && divider > 0) ? item.totalPrice / divider : item.totalPrice
-      const effectiveUnit = usesPortions ? 'portie' : (item.unit || 'stuk')
+      const effectiveUnit = usesPortions ? 'portie': (item.unit || 'stuk')
       const effectiveQuantity = usesPortions ? item.portions! : item.quantity
 
       // Check if already exists (by name similarity)
@@ -264,10 +264,10 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
             units_per_package: effectiveQuantity,
             package_price: item.totalPrice,
             unit: effectiveUnit,
-            notes: invoiceResults.supplier ? `Leverancier: ${invoiceResults.supplier}` : existingIngredient.notes,
+            notes: invoiceResults.supplier ? `Leverancier: ${invoiceResults.supplier}`: existingIngredient.notes,
           },
           { id: existingIngredient.id, tenant_slug: params.tenant },
-          { tenantSlug: params.tenant, select: '*' }
+          { tenantSlug: params.tenant, select: '*'}
         )
         const updated_row = Array.isArray(updRes.data) ? updRes.data[0] : updRes.data
         if (updRes.ok && updated_row) {
@@ -309,9 +309,9 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
           purchase_price: calculatedPricePerUnit,
           units_per_package: effectiveQuantity,
           package_price: item.totalPrice,
-          notes: invoiceResults.supplier ? `Leverancier: ${invoiceResults.supplier}` : null,
+          notes: invoiceResults.supplier ? `Leverancier: ${invoiceResults.supplier}`: null,
         },
-        { tenantSlug: params.tenant, select: '*' }
+        { tenantSlug: params.tenant, select: '*'}
       )
       const inserted_ing = Array.isArray(insRes.data) ? insRes.data[0] : insRes.data
       if (insRes.ok && inserted_ing) {
@@ -378,7 +378,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
         package_price: product.package_price,
         notes: `Art. #${product.article_number}`,
       },
-      { tenantSlug: params.tenant, select: '*' }
+      { tenantSlug: params.tenant, select: '*'}
     )
     const inserted = Array.isArray(r.data) ? r.data[0] : r.data
     if (r.ok && inserted) {
@@ -471,7 +471,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
         'ingredients',
         ingredientData as any,
         { id: editingId, tenant_slug: params.tenant },
-        { tenantSlug: params.tenant, select: '*' }
+        { tenantSlug: params.tenant, select: '*'}
       )
       const upd = Array.isArray(r.data) ? r.data[0] : r.data
       if (r.ok && upd) {
@@ -484,7 +484,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
       const r = await adminDb.insert(
         'ingredients',
         ingredientData as any,
-        { tenantSlug: params.tenant, select: '*' }
+        { tenantSlug: params.tenant, select: '*'}
       )
       const ins = Array.isArray(r.data) ? r.data[0] : r.data
       if (r.ok && ins) {
@@ -643,7 +643,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
           package_price: product.price,
           notes: `Van Zon #${product.articleNr}`,
         },
-        { tenantSlug: params.tenant, select: '*' }
+        { tenantSlug: params.tenant, select: '*'}
       )
       const inserted_v = Array.isArray(r.data) ? r.data[0] : r.data
       if (r.ok && inserted_v) {
@@ -687,7 +687,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
       )
       if (!r.ok) throw new Error(r.error || 'delete failed')
       setIngredients([])
-      alert(' Alle ingrediënten zijn verwijderd.')
+      alert('Alle ingrediënten zijn verwijderd.')
     } catch (error) {
       console.error('Delete error:', error)
       alert('Er ging iets mis bij het verwijderen.')
@@ -800,7 +800,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                     disabled={dbSearching}
                     className="px-6 py-3 bg-green-500 text-white rounded-xl hover:bg-green-600 disabled:opacity-50"
                   >
-                    {dbSearching ? '...' : ' Zoek'}
+                    {dbSearching ? '...': 'Zoek'}
                   </button>
                 </div>
 
@@ -824,7 +824,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                             i.notes?.includes(`Art. #${product.article_number}`)
                           )
                           return (
-                            <tr key={product.id} className={`border-t hover:bg-gray-50 ${alreadyAdded ? 'bg-green-50' : ''}`}>
+                            <tr key={product.id} className={`border-t hover:bg-gray-50 ${alreadyAdded ? 'bg-green-50': ''}`}>
                               <td className="px-3 py-2 font-medium">{product.name}</td>
                               <td className="px-3 py-2 text-gray-500">{product.category || '-'}</td>
                               <td className="px-3 py-2 text-right font-mono">€{product.package_price.toFixed(2)}</td>
@@ -841,7 +841,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                                     disabled={addingProduct === product.id}
                                     className="px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 text-xs"
                                   >
-                                    {addingProduct === product.id ? '...' : '+ Toevoegen'}
+                                    {addingProduct === product.id ? '...': '+ Toevoegen'}
                                   </button>
                                 )}
                               </td>
@@ -1040,11 +1040,11 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                             // Bereken prijs: als porties is ingevuld, gebruik die, anders stuks/doos
                             const divider = item.portions && item.portions > 0 ? item.portions : item.quantity
                             const calculatedPrice = divider > 0 ? item.totalPrice / divider : item.totalPrice
-                            const priceUnit = item.portions && item.portions > 0 ? 'portie' : item.unit
+                            const priceUnit = item.portions && item.portions > 0 ? 'portie': item.unit
                             return (
                               <tr 
                                 key={index} 
-                                className={`border-t ${item.selected ? 'bg-white' : 'bg-gray-50 opacity-60'}`}
+                                className={`border-t ${item.selected ? 'bg-white': 'bg-gray-50 opacity-60'}`}
                               >
                                 <td className="px-2 py-2">
                                   <input
@@ -1299,7 +1299,7 @@ BITTERBALLEN 96X20G PB       1    CU    13.5420    5.00    12.86"
                   disabled={importing || importPreview.length === 0}
                   className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50"
                 >
-                  {importing ? 'Importeren...' : `${importPreview.length} producten importeren`}
+                  {importing ? 'Importeren...': `${importPreview.length} producten importeren`}
                 </button>
               </div>
             </motion.div>
@@ -1323,12 +1323,12 @@ BITTERBALLEN 96X20G PB       1    CU    13.5420    5.00    12.86"
         {showAddForm && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            animate={{ opacity: 1, height: 'auto'}}
             exit={{ opacity: 0, height: 0 }}
             className="bg-white rounded-xl shadow-lg p-6 border-2 border-blue-200"
           >
             <h3 className="font-semibold mb-4">
-              {editingId ? 'Ingrediënt bewerken' : 'Nieuw ingrediënt toevoegen'}
+              {editingId ? 'Ingrediënt bewerken': 'Nieuw ingrediënt toevoegen'}
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1461,7 +1461,7 @@ BITTERBALLEN 96X20G PB       1    CU    13.5420    5.00    12.86"
                 disabled={saving || !formData.name}
                 className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50"
               >
-                {saving ? 'Opslaan...' : (editingId ? 'Bijwerken' : 'Toevoegen')}
+                {saving ? 'Opslaan...': (editingId ? 'Bijwerken': 'Toevoegen')}
               </button>
               <button
                 onClick={resetForm}
@@ -1495,7 +1495,7 @@ BITTERBALLEN 96X20G PB       1    CU    13.5420    5.00    12.86"
                 <td className="px-4 py-3 text-gray-600">{getCategoryName(ing.cost_category_id)}</td>
                 <td className="px-4 py-3 text-right font-mono">€{ing.purchase_price.toFixed(4)}</td>
                 <td className="px-4 py-3 text-right font-mono text-gray-500">
-                  {ing.package_price > 0 ? `€${ing.package_price.toFixed(2)} (${ing.units_per_package}st)` : '-'}
+                  {ing.package_price > 0 ? `€${ing.package_price.toFixed(2)} (${ing.units_per_package}st)`: '-'}
                 </td>
                 <td className="px-4 py-3 text-center">
                   <button
@@ -1518,7 +1518,7 @@ BITTERBALLEN 96X20G PB       1    CU    13.5420    5.00    12.86"
 
         {filteredIngredients.length === 0 && (
           <div className="text-center py-12 text-gray-500">
-            {searchTerm ? 'Geen ingrediënten gevonden' : 'Nog geen ingrediënten toegevoegd'}
+            {searchTerm ? 'Geen ingrediënten gevonden': 'Nog geen ingrediënten toegevoegd'}
           </div>
         )}
       </div>

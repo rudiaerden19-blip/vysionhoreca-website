@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { LanguageProvider } from '@/i18n'
-import '@/lib/silence-console-prod' // Silence console.log in production
+import '@/lib/silence-console-prod'// Silence console.log in production
 import { GlobalAutoCapitalize } from '@/components/GlobalAutoCapitalize'
 import { PageViewTracker } from '@/components/PageViewTracker'
 import { PWARegister } from '@/components/PWARegister'
@@ -50,7 +50,7 @@ const organizationJsonLd = {
         addressCountry: 'BE',
       },
       vatID: 'BE1003226953',
-      areaServed: [{ '@type': 'Country', name: 'België' }, { '@type': 'Country', name: 'Nederland' }],
+      areaServed: [{ '@type': 'Country', name: 'België'}, { '@type': 'Country', name: 'Nederland'}],
       contactPoint: {
         '@type': 'ContactPoint',
         contactType: 'customer support',
@@ -72,7 +72,7 @@ const organizationJsonLd = {
       alternateName: [VYSION_BRAND_PRODUCT_NAME],
       description:
         'Zoek je een kassa, online bestelplatform of gratis uitproberen? Vysion kassa combineert POS, bestellen, hardware en reserveringen voor België en Nederland.',
-      publisher: { '@id': `${siteUrl}/#organization` },
+      publisher: { '@id': `${siteUrl}/#organization`},
       inLanguage: 'nl-BE',
     },
   ],
@@ -131,10 +131,10 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
-      { url: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+      { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png'},
+      { url: '/icons/icon-512.png', sizes: '512x512', type: 'image/png'},
     ],
-    apple: [{ url: '/icons/icon-192.png', sizes: '180x180', type: 'image/png' }],
+    apple: [{ url: '/icons/icon-192.png', sizes: '180x180', type: 'image/png'}],
   },
   openGraph: {
     title: `${VYSION_BRAND_SITE_NAME} | Kassa, bestelplatform, hardware & gratis proberen`,
@@ -144,7 +144,7 @@ export const metadata: Metadata = {
     locale: 'nl_BE',
     url: siteUrl,
     siteName: VYSION_BRAND_SITE_NAME,
-    images: [{ url: '/images/online-order-platform-1.png' }],
+    images: [{ url: '/images/online-order-platform-1.png'}],
   },
   twitter: {
     card: 'summary_large_image',

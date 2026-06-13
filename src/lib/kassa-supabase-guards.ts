@@ -20,7 +20,7 @@ export function isDuplicateKassaClientUuidError(error: { code?: string; message?
 
 /** Zelfde constraint gedetecteerd vanuit PostgREST-object óf `/api/admin/db`-foutstring. */
 export function isDuplicateKassaClientViolation(raw: unknown): boolean {
-  if (raw && typeof raw === 'object' && 'code' in (raw as object)) {
+  if (raw && typeof raw === 'object' && 'code'in (raw as object)) {
     return isDuplicateKassaClientUuidError(raw as { code?: string; message?: string })
   }
   const msg = String(raw ?? '').toLowerCase()
@@ -32,10 +32,10 @@ export function isDuplicateKassaClientViolation(raw: unknown): boolean {
   )
 }
 
-/** Offline / timeout / netwerk — bruikbaar voor admin-proxy `{ error: string }` en Supabase-foutobjecten. */
+/** Offline / timeout / netwerk — bruikbaar voor admin-proxy `{ error: string }`en Supabase-foutobjecten. */
 export function isLikelyOfflineOrNetworkPersistFailure(raw: unknown): boolean {
   if (typeof navigator !== 'undefined' && !navigator.onLine) return true
-  if (raw && typeof raw === 'object' && 'message' in (raw as object)) {
+  if (raw && typeof raw === 'object' && 'message'in (raw as object)) {
     return isLikelyOfflineOrNetworkSupabaseError(raw as { message?: string })
   }
   const m = String(raw ?? '').toLowerCase()

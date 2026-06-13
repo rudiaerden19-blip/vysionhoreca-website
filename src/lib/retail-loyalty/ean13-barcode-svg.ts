@@ -103,7 +103,7 @@ export function buildEan13BarcodeEmailHtml(
     )
   }
   for (let i = 0; i < bits.length; i++) {
-    const bg = bits[i] === '1' ? '#000000' : '#ffffff'
+    const bg = bits[i] === '1'? '#000000': '#ffffff'
     cells.push(
       `<td style="width:${moduleW}px;height:${barH}px;background:${bg};font-size:0;line-height:0;">&#8203;</td>`,
     )

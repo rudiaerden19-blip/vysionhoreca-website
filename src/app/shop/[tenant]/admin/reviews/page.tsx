@@ -15,7 +15,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
   const [replyingTo, setReplyingTo] = useState<string | null>(null)
   const [replyText, setReplyText] = useState('')
   const [savingReply, setSavingReply] = useState(false)
-  const [filter, setFilter] = useState<'all' | 'visible' | 'hidden'>('all')
+  const [filter, setFilter] = useState<'all' |  'visible' |  'hidden'>('all')
 
   useEffect(() => {
     loadReviews()
@@ -126,7 +126,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
           <p className="text-4xl font-bold text-blue-600">{averageRating}</p>
           <div className="flex justify-center my-1">
             {[1,2,3,4,5].map(s => (
-              <span key={s} className={s <= Math.round(Number(averageRating)) ? 'text-yellow-400' : 'text-gray-200'}></span>
+              <span key={s} className={s <= Math.round(Number(averageRating)) ? 'text-yellow-400': 'text-gray-200'}></span>
             ))}
           </div>
           <p className="text-sm text-gray-500">{t('reviewsPage.average')} ({reviews.length})</p>
@@ -156,7 +156,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
         ].map((f) => (
           <button
             key={f.id}
-            onClick={() => setFilter(f.id as 'all' | 'visible' | 'hidden')}
+            onClick={() => setFilter(f.id as 'all' |  'visible' |  'hidden')}
             className={`px-4 py-2 rounded-xl font-medium transition-all ${
               filter === f.id
                 ? 'bg-blue-600 text-white'
@@ -175,12 +175,12 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
           animate={{ opacity: 1, y: 0 }}
           className="text-center py-12 bg-white rounded-2xl shadow-sm"
         >
-          <span className="text-6xl mb-4 block">⭐</span>
+          <span className="text-6xl mb-4 block"></span>
           <h3 className="text-xl font-bold text-gray-900 mb-2">
-            {filter === 'all' ? t('marketingReviews.noReviews') : filter === 'visible' ? t('marketingReviews.noVisibleReviews') : t('marketingReviews.noHiddenReviews')}
+            {filter === 'all'? t('marketingReviews.noReviews') : filter === 'visible'? t('marketingReviews.noVisibleReviews') : t('marketingReviews.noHiddenReviews')}
           </h3>
           <p className="text-gray-500">
-            {filter === 'all' ? t('marketingReviews.noReviewsDesc') : t('marketingReviews.changeFilter')}
+            {filter === 'all'? t('marketingReviews.noReviewsDesc') : t('marketingReviews.changeFilter')}
           </p>
         </motion.div>
       ) : (
@@ -194,7 +194,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, x: -100 }}
                 transition={{ delay: index * 0.05 }}
-                className={`bg-white rounded-2xl p-6 shadow-sm ${!review.is_visible ? 'opacity-60' : ''}`}
+                className={`bg-white rounded-2xl p-6 shadow-sm ${!review.is_visible ? 'opacity-60': ''}`}
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-4">
@@ -214,12 +214,12 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
                   <div className="flex items-center gap-2">
                     <div className="flex">
                       {[1,2,3,4,5].map(s => (
-                        <span key={s} className={`text-lg ${s <= review.rating ? 'text-yellow-400' : 'text-gray-200'}`}></span>
+                        <span key={s} className={`text-lg ${s <= review.rating ? 'text-yellow-400': 'text-gray-200'}`}></span>
                       ))}
                     </div>
                     <button
                       onClick={() => handleToggleVisible(review.id!, review.is_visible)}
-                      className={`p-2 rounded-xl transition-colors ${review.is_visible ? 'bg-green-100 text-green-600 hover:bg-green-200' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
+                      className={`p-2 rounded-xl transition-colors ${review.is_visible ? 'bg-green-100 text-green-600 hover:bg-green-200': 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
                       title={review.is_visible ? t('reviewsPage.visibleTooltip') : t('reviewsPage.hiddenTooltip')}
                     >
                       {review.is_visible ? '' : ''}

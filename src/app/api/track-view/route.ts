@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     const clientIP = getClientIP(request)
     const rl = await checkRateLimit(trackViewRateLimiter, clientIP)
     if (!rl.success) {
-      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+      return NextResponse.json({ error: 'Too many requests'}, { status: 429 })
     }
 
     const parsed = await parseJsonBody(request, trackViewBodySchema)
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 
     const supabase = getServerSupabaseClient()
     if (!supabase) {
-      return NextResponse.json({ error: 'Database not configured' }, { status: 500 })
+      return NextResponse.json({ error: 'Database not configured'}, { status: 500 })
     }
 
     // Get user agent and IP from headers
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
 
     // Filter out bots
     if (isBot(user_agent)) {
-      return NextResponse.json({ success: true, filtered: 'bot' })
+      return NextResponse.json({ success: true, filtered: 'bot'})
     }
 
     // Create visitor hash for deduplication (IP + date)
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
 
     if (existingView) {
       // Already tracked this visitor today - skip
-      return NextResponse.json({ success: true, filtered: 'duplicate' })
+      return NextResponse.json({ success: true, filtered: 'duplicate'})
     }
 
     // Insert unique page view
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error('Failed to track page view:', error)
-      return NextResponse.json({ error: 'Failed to track' }, { status: 500 })
+      return NextResponse.json({ error: 'Failed to track'}, { status: 500 })
     }
 
     return NextResponse.json({ success: true })

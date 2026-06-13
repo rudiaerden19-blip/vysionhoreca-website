@@ -26,7 +26,7 @@ import {
  * Zet zowel zaak- als superadmin-headers als beide in localStorage staan.
  * API's gebruiken `verifyTenantOrSuperAdmin`: eerst eigenaar van de gevraagde tenant,
  * anders geldige superadmin — zonder beide headers faalt superadmin naast een oude
- * `vysion_tenant` van een andere zaak.
+ * `vysion_tenant`van een andere zaak.
  */
 export function getAuthHeaders(): Record<string, string> {
   if (typeof window === 'undefined') return {}
@@ -148,7 +148,7 @@ const normSlug = (s: string) => (s || '').replace(/-/g, '').toLowerCase()
 
 /**
  * Hoe lang de **browser** een zaak-login (localStorage) onthoudt na wachtwoord.
- * Dit is géén abonnement/proefperiode — die loopt via `subscriptions.trial_ends_at` / `isTrialSubscriptionActive` in de DB.
+ * Dit is géén abonnement/proefperiode — die loopt via `subscriptions.trial_ends_at`/ `isTrialSubscriptionActive`in de DB.
  */
 const OWNER_SESSION_TTL_MS = 14 * 24 * 60 * 60 * 1000
 
@@ -165,7 +165,7 @@ export function getBrusselsCalendarDateString(date: Date = new Date()): string {
 /** Zet tenant in localStorage na login/registratie (rollende sessie + legacy dagveld). */
 export function persistTenantSessionWithToday(tenant: Record<string, unknown>): void {
   if (typeof window === 'undefined') return
-  const slug = typeof tenant.tenant_slug === 'string' ? tenant.tenant_slug.trim() : ''
+  const slug = typeof tenant.tenant_slug === 'string'? tenant.tenant_slug.trim() : ''
   if (slug) {
     try {
       sessionStorage.removeItem(`vysion_kassa_audio_ok_${slug}`)
@@ -184,7 +184,7 @@ export function persistTenantSessionWithToday(tenant: Record<string, unknown>): 
 }
 
 /**
- * Valideer `next` na login: alleen intern pad onder /shop/{slug}/ (geen open redirect).
+ * Valideer `next`na login: alleen intern pad onder /shop/{slug}/ (geen open redirect).
  */
 export function safeInternalNextPath(next: string | null | undefined, tenantSlug: string): string | null {
   if (!next || !tenantSlug) return null
@@ -208,15 +208,15 @@ function stripMarketingDemoSearchForTenant(search: string, tenantSlug: string): 
   const sp = new URLSearchParams(raw)
   if (sp.get('demo') === 'bekijk') sp.delete('demo')
   const out = sp.toString()
-  return out ? `?${out}` : ''
+  return out ? `?${out}`: ''
 }
 
 /**
- * Na login: `next` komt van admin-layout als `window.location.pathname` — op tenant-subdomein
- * is dat vaak `/admin` of `/admin/...`, niet `/shop/{slug}/admin`. Zonder deze normalisatie
+ * Na login: `next`komt van admin-layout als `window.location.pathname`— op tenant-subdomein
+ * is dat vaak `/admin`of `/admin/...`, niet `/shop/{slug}/admin`. Zonder deze normalisatie
  * faalt safeInternalNextPath en belandt de gebruiker op /welkom terwijl de sessie net gezet is.
  *
- * Ook: bookmark/CTA met `/shop/frituurnolim/...` op `skippsbv.ordervysion.com` — zelfde pad
+ * Ook: bookmark/CTA met `/shop/frituurnolim/...`op `skippsbv.ordervysion.com`— zelfde pad
  * voor de **ingelogde** tenant, geen open redirect naar andere zaak.
  */
 export function normalizeLoginNextPath(
@@ -249,7 +249,7 @@ export function normalizeLoginNextPath(
   }
 
   if (pathOnly === '/admin' || pathOnly.startsWith('/admin/')) {
-    const rest = pathOnly === '/admin' ? '' : pathOnly.slice('/admin'.length)
+    const rest = pathOnly === '/admin'? '' : pathOnly.slice('/admin'.length)
     if (rest.includes('..')) return null
     search = stripMarketingDemoSearchForTenant(search, tenantSlug)
     return `/shop/${tenantSlug}/admin${rest}${search}`
@@ -268,8 +268,8 @@ export function clearTenantOwnerSession(): void {
 }
 
 /**
- * Zelfde vorm als admin-layout bij redirect naar login: browserpad (evt. `/admin/…` op subdomein)
- * → intern canoniek `/shop/{tenant}/…` voor `?next=`.
+ * Zelfde vorm als admin-layout bij redirect naar login: browserpad (evt. `/admin/…`op subdomein)
+ * → intern canoniek `/shop/{tenant}/…`voor `?next=`.
  */
 export function buildShopInternalReturnPath(
   tenantSlug: string,
@@ -279,7 +279,7 @@ export function buildShopInternalReturnPath(
   const path = browserPathname
   const search = browserSearch || ''
   if (path === '/admin' || path.startsWith('/admin/')) {
-    return `/shop/${tenantSlug}/admin${path === '/admin' ? '' : path.slice('/admin'.length)}${search}`
+    return `/shop/${tenantSlug}/admin${path === '/admin'? '' : path.slice('/admin'.length)}${search}`
   }
   return `${path}${search}`
 }
@@ -290,11 +290,11 @@ function stripSaHandoffQuery(search: string): string {
   const p = new URLSearchParams(raw)
   p.delete('sa_handoff')
   const s = p.toString()
-  return s ? `?${s}` : ''
+  return s ? `?${s}`: ''
 }
 
 /**
- * Volledige navigatie naar /login met canonieke `next` (zelfde als admin-layout).
+ * Volledige navigatie naar /login met canonieke `next`(zelfde als admin-layout).
  */
 export function redirectToShopOwnerLogin(tenantSlug: string): void {
   if (typeof window === 'undefined') return
@@ -309,11 +309,11 @@ export function redirectToShopOwnerLogin(tenantSlug: string): void {
   )
 }
 
-export type VerifyShopAdminSessionResult = 'ok' | 'auth_failed' | 'network_error'
+export type VerifyShopAdminSessionResult = 'ok' |  'auth_failed' |  'network_error'
 
 /**
  * Controleert headers tegen de database (owner of superadmin).
- * Bij `auth_failed`: geen netwerkfout — caller kan `clearTenantOwnerSession` + opnieuw proberen.
+ * Bij `auth_failed`: geen netwerkfout — caller kan `clearTenantOwnerSession`+ opnieuw proberen.
  */
 export async function verifyShopAdminApiSession(
   tenantSlug: string
@@ -344,7 +344,7 @@ export async function verifyShopAdminApiSession(
 
 /**
  * Pad zoals in de adresbalk op tenant-subdomein (middleware rewrite verwacht pad zonder /shop/slug).
- * Slug in URL en `tenantSlug` uit login mogen qua koppeltekens verschillen zolang normSlug gelijk is.
+ * Slug in URL en `tenantSlug`uit login mogen qua koppeltekens verschillen zolang normSlug gelijk is.
  */
 export function internalShopPathToTenantHostPath(internalPath: string, tenantSlug: string): string {
   const qIndex = internalPath.indexOf('?')
@@ -357,7 +357,7 @@ export function internalShopPathToTenantHostPath(internalPath: string, tenantSlu
   const rest = m[2] || ''
   if (normSlug(pathSlug) !== normSlug(tenantSlug)) return '/welkom'
 
-  if (!rest || rest === '') return search ? `/${search}` : '/'
+  if (!rest || rest === '') return search ? `/${search}`: '/'
   const pathPart = rest.startsWith('/') ? rest : `/${rest}`
   return `${pathPart}${search}`
 }

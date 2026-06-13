@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 
 /** Na deploy: nieuwe sw.js ophalen + bij terugkeren naar tab — gelijk UI op alle werkstations. */
 function bumpServiceWorker() {
-  if (!('serviceWorker' in navigator)) return
+  if (!('serviceWorker'in navigator)) return
   void navigator.serviceWorker
     .register('/sw.js')
     .then((reg) => reg.update())

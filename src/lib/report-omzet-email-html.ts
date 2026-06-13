@@ -66,7 +66,7 @@ export function buildOmzetReportEmailHtml(p: OmzetReportEmailBodyInput): string 
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="border-collapse:collapse;border-bottom:2px solid #1e293b;margin-bottom:12px;">
       <tr>
         <td valign="bottom" style="padding:0 12px 12px 0;">
-          <h1 style="margin:0;font-size:22px;color:#1e293b;font-weight:bold;line-height:1.2;">📊 Omzet Rapport</h1>
+          <h1 style="margin:0;font-size:22px;color:#1e293b;font-weight:bold;line-height:1.2;"> Omzet Rapport</h1>
         </td>
         <td valign="bottom" align="right" style="padding:0 0 12px 0;font-size:14px;color:#374151;line-height:1.45;max-width:280px;">
           <span style="font-weight:bold;color:#111827;font-size:15px;display:block;margin-bottom:4px;">${esc(p.businessName)}</span>
@@ -103,7 +103,7 @@ export function buildOmzetReportEmailHtml(p: OmzetReportEmailBodyInput): string 
             <td style="padding:32px 28px 24px 28px;">
               ${titleBand}
               ${addrHtml}
-              ${p.btwNumber ? `<p style="margin:8px 0 0 0;font-size:14px;color:#4b5563;">BTW: ${esc(p.btwNumber)}</p>` : ''}
+              ${p.btwNumber ? `<p style="margin:8px 0 0 0;font-size:14px;color:#4b5563;">BTW: ${esc(p.btwNumber)}</p>`: ''}
               <p style="margin:12px 0 0 0;font-size:14px;color:#4b5563;">Periode: <strong>${esc(p.periodLabel)}</strong></p>
 
               <!-- Donkerblauwe samenvatting 2×2 -->
@@ -116,8 +116,8 @@ export function buildOmzetReportEmailHtml(p: OmzetReportEmailBodyInput): string 
                         ${summaryCell('Bestellingen', String(p.orderCount))}
                       </tr>
                       <tr>
-                        ${summaryCell('💵 Contant', fmtEuro(p.cash))}
-                        ${summaryCell('💳 PIN/Kaart', fmtEuro(p.card))}
+                        ${summaryCell('Contant', fmtEuro(p.cash))}
+                        ${summaryCell('PIN/Kaart', fmtEuro(p.card))}
                       </tr>
                     </table>
                   </td>

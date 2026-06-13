@@ -17,7 +17,7 @@ describe('Logger', () => {
 
   describe('log levels', () => {
     it('should log info messages', () => {
-      logger.info('Test message', { key: 'value' })
+      logger.info('Test message', { key: 'value'})
       expect(console.info).toHaveBeenCalled()
     })
 
@@ -34,7 +34,7 @@ describe('Logger', () => {
 
   describe('sensitive data sanitization', () => {
     it('should redact passwords', () => {
-      logger.info('User login', { email: 'test@test.com', password: 'secret123' })
+      logger.info('User login', { email: 'test@test.com', password: 'secret123'})
       
       const logCall = (console.info as jest.Mock).mock.calls[0][0]
       expect(logCall).toContain('[REDACTED]')
@@ -42,7 +42,7 @@ describe('Logger', () => {
     })
 
     it('should redact tokens', () => {
-      logger.info('Auth', { accessToken: 'abc123', userId: '456' })
+      logger.info('Auth', { accessToken: 'abc123', userId: '456'})
       
       const logCall = (console.info as jest.Mock).mock.calls[0][0]
       expect(logCall).toContain('[REDACTED]')
@@ -71,7 +71,7 @@ describe('Logger', () => {
       // Simulate some work
       await new Promise(resolve => setTimeout(resolve, 10))
       
-      const duration = timer.end({ result: 'success' })
+      const duration = timer.end({ result: 'success'})
       
       expect(duration).toBeGreaterThanOrEqual(10)
       expect(console.info).toHaveBeenCalled()

@@ -12,7 +12,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { NextRequest } from 'next/server'
 import { logger } from './logger'
 
-export type AuditActorType = 'owner' | 'staff' | 'superadmin' | 'system' | 'anon'
+export type AuditActorType = 'owner' |  'staff' |  'superadmin' |  'system' |  'anon'
 
 export interface AuditEntry {
   tenantSlug: string
@@ -20,7 +20,7 @@ export interface AuditEntry {
   actorId?: string | null
   actorEmail?: string | null
 
-  action: string                 // 'insert' | 'update' | 'delete' | 'upsert' | custom
+  action: string                 // 'insert' |  'update' |  'delete' |  'upsert'| custom
   resourceType: string           // tabel-naam of logical resource
   resourceId?: string | number | null
 
@@ -68,7 +68,7 @@ export async function recordAudit(
 /**
  * Hulpje: extract IP / user-agent uit een NextRequest voor de audit-entry.
  */
-export function auditRequestMeta(req: NextRequest): Pick<AuditEntry, 'ip' | 'userAgent'> {
+export function auditRequestMeta(req: NextRequest): Pick<AuditEntry, 'ip' |  'userAgent'> {
   return {
     ip: req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-real-ip') || null,
     userAgent: req.headers.get('user-agent') || null,

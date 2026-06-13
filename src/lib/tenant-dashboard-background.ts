@@ -38,7 +38,7 @@ export function adminDashboardBackgroundImageStyle(
   const zoom = settings.zoom > 1 ? settings.zoom : 1
   return {
     objectPosition: `${settings.positionX}% ${settings.positionY}%`,
-    transform: zoom !== 1 ? `scale(${zoom})` : undefined,
+    transform: zoom !== 1 ? `scale(${zoom})`: undefined,
     transformOrigin: `${settings.positionX}% ${settings.positionY}%`,
   }
 }

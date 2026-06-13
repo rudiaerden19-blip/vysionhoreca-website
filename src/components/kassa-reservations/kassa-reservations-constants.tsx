@@ -84,7 +84,7 @@ export function mapReservationSettingsFromDb(data: Record<string, unknown>): Par
   }
   const closedRaw = safeParseJSON(data.closed_days, D.closedDays)
   const closedDays = Array.isArray(closedRaw)
-    ? closedRaw.map((x) => (typeof x === 'number' ? x : Number(x))).filter((x) => Number.isFinite(x))
+    ? closedRaw.map((x) => (typeof x === 'number'? x : Number(x))).filter((x) => Number.isFinite(x))
     : D.closedDays
   const shiftsRaw = safeParseJSON(data.shifts, D.shifts)
   const shifts = Array.isArray(shiftsRaw) ? (shiftsRaw as Shift[]) : D.shifts
@@ -106,8 +106,8 @@ export function mapReservationSettingsFromDb(data: Record<string, unknown>): Par
     shifts,
     cancellationDeadlineHours: numFromDb(data.cancellation_deadline_hours, D.cancellationDeadlineHours),
     cancellationMessage:
-      typeof data.cancellation_message === 'string' ? data.cancellation_message : D.cancellationMessage,
-    reviewLink: typeof data.review_link === 'string' ? data.review_link : D.reviewLink,
+      typeof data.cancellation_message === 'string'? data.cancellation_message : D.cancellationMessage,
+    reviewLink: typeof data.review_link === 'string'? data.review_link : D.reviewLink,
     autoSendReview: boolFromDb(data.auto_send_review, D.autoSendReview),
     depositRequired: boolFromDb(data.deposit_required, D.depositRequired),
     depositAmount: numFromDb(data.deposit_amount, D.depositAmount),

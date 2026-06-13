@@ -13,7 +13,7 @@ import {
 
 type StaffRow = { id: string; name: string; hasOpenSession: boolean }
 
-type PinModal = { staffId: string; staffName: string; action: 'in' | 'out' }
+type PinModal = { staffId: string; staffName: string; action: 'in' |  'out'}
 
 type SummaryState = {
   staffName: string
@@ -201,13 +201,13 @@ export function AdminStaffClockPanel({
                 )}
               </div>
               <div
-                className={`grid w-full gap-3 ${showSalesButton ? 'grid-cols-1 sm:grid-cols-3' : 'grid-cols-1 sm:grid-cols-2'}`}
+                className={`grid w-full gap-3 ${showSalesButton ? 'grid-cols-1 sm:grid-cols-3': 'grid-cols-1 sm:grid-cols-2'}`}
               >
                 <button
                   type="button"
                   disabled={busy}
                   onClick={() => {
-                    setPinModal({ staffId: s.id, staffName: s.name, action: 'in' })
+                    setPinModal({ staffId: s.id, staffName: s.name, action: 'in'})
                     setPinInput('')
                     setPinError(null)
                   }}
@@ -219,7 +219,7 @@ export function AdminStaffClockPanel({
                   type="button"
                   disabled={busy || !s.hasOpenSession}
                   onClick={() => {
-                    setPinModal({ staffId: s.id, staffName: s.name, action: 'out' })
+                    setPinModal({ staffId: s.id, staffName: s.name, action: 'out'})
                     setPinInput('')
                     setPinError(null)
                   }}
@@ -258,7 +258,7 @@ export function AdminStaffClockPanel({
         <StaffClockPinPortal
           open
           titleId="admin-staff-pin-title"
-          title={(pinModal.action === 'in' ? t('staffClock.pinTitleIn') : t('staffClock.pinTitleOut')).replace(
+          title={(pinModal.action === 'in'? t('staffClock.pinTitleIn') : t('staffClock.pinTitleOut')).replace(
             '{name}',
             pinModal.staffName,
           )}

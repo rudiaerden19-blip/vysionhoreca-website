@@ -10,7 +10,7 @@ export default function HomeScrollOnLoad() {
   useEffect(() => {
     if (typeof window === 'undefined') return
 
-    if ('scrollRestoration' in window.history) {
+    if ('scrollRestoration'in window.history) {
       window.history.scrollRestoration = 'manual'
     }
 
@@ -31,7 +31,7 @@ export default function HomeScrollOnLoad() {
       if (hash.length > 1) {
         const target = document.getElementById(hash.slice(1))
         if (target) {
-          target.scrollIntoView({ block: 'start', behavior: 'auto' })
+          target.scrollIntoView({ block: 'start', behavior: 'auto'})
           return
         }
       }

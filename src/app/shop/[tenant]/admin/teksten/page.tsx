@@ -82,13 +82,13 @@ export default function TekstenPage({ params }: { params: { tenant: string } }) 
       .upsert({
         tenant_slug: params.tenant,
         ...texts,
-      }, { onConflict: 'tenant_slug' })
+      }, { onConflict: 'tenant_slug'})
     
     if (!error) {
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     } else {
-      alert(t('adminPages.common.saveFailed') + ': ' + error.message)
+      alert(t('adminPages.common.saveFailed') + ': '+ error.message)
     }
     
     setSaving(false)
@@ -129,10 +129,10 @@ export default function TekstenPage({ params }: { params: { tenant: string } }) 
         onClick={handleSave}
         disabled={saving}
         className={`fixed bottom-6 right-6 z-50 px-6 py-4 rounded-2xl font-medium shadow-2xl flex items-center gap-2 ${
-          saved ? 'bg-green-500 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'
+          saved ? 'bg-green-500 text-white': 'bg-blue-600 hover:bg-blue-700 text-white'
         }`}
       >
-        {saving ? `⏳ ${t('adminPages.common.saving')}` : saved ? ` ${t('adminPages.common.saved')}` : ` ${t('adminPages.common.save')}`}
+        {saving ? ` ${t('adminPages.common.saving')}`: saved ? ` ${t('adminPages.common.saved')}`: ` ${t('adminPages.common.save')}`}
       </motion.button>
 
       {/* Header */}

@@ -58,7 +58,7 @@ export async function uploadTenantMediaImage(
   displayNameFallback: string,
 ): Promise<{ ok: true; publicUrl: string } | { ok: false; error: string }> {
   if (!supabase) {
-    return { ok: false, error: 'db_not_connected' }
+    return { ok: false, error: 'db_not_connected'}
   }
 
   const compressedFile = await compressImageFile(file, 1200, 0.8)

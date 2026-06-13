@@ -49,7 +49,7 @@ export type VysionPrintAgentBody = {
   /** Open kassa-lade (drawer-kick) na het printen. */
   openDrawer?: boolean
   /** "kassa" (default, volledige bon) of "keuken" (compacte keukenbon). */
-  receiptMode?: 'kassa' | 'keuken'
+  receiptMode?: 'kassa' |  'keuken'
 }
 
 /** Zelfde JSON als POST /print — Android-app (PrintBridgeActivity) verwacht identieke structuur. */
@@ -146,10 +146,10 @@ function utf8ToBase64Json(utf8Json: string): string {
 /**
  * Custom scheme naar Vysion Kiosk-app.
  *
- * **Niet** `location.assign` als eerste keus: dan navigeert het **huidige** tabblad weg van HTTPS-kassa → SPA breekt,
+ * **Niet** `location.assign`als eerste keus: dan navigeert het **huidige** tabblad weg van HTTPS-kassa → SPA breekt,
  * gebruiker valt vaak terug op Chrome-start of moet opnieuw inloggen.
  *
- * Eerst `_blank` (popup of `<a target="_blank">`): hoofdtab blijft op de webkassa; het systeem stuurt de intent nog steeds naar de app.
+ * Eerst `_blank`(popup of `<a target="_blank">`): hoofdtab blijft op de webkassa; het systeem stuurt de intent nog steeds naar de app.
  */
 function openKioskDeepLink(url: string): boolean {
   if (typeof window === 'undefined') return false
@@ -201,9 +201,9 @@ function openKioskDeepLink(url: string): boolean {
  * UI-feedback hoort in React (banner), niet via window.alert ná async — Chrome blokkeert dat vaak.
  */
 function tryVysionKioskPrintBridge(body: VysionPrintAgentBody): { ok: boolean; reason?: string } {
-  if (typeof document === 'undefined') return { ok: false, reason: 'Geen document (SSR).' }
+  if (typeof document === 'undefined') return { ok: false, reason: 'Geen document (SSR).'}
   if (!isAndroidTabletPrintClient()) {
-    return { ok: false, reason: 'Geen tablet/kiosk-sessie — overslaan van vysionkiosk://.' }
+    return { ok: false, reason: 'Geen tablet/kiosk-sessie — overslaan van vysionkiosk://.'}
   }
   const payload = buildAgentRequestPayload(body)
   let json: string
@@ -211,13 +211,13 @@ function tryVysionKioskPrintBridge(body: VysionPrintAgentBody): { ok: boolean; r
     json = JSON.stringify(payload)
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e)
-    return { ok: false, reason: `JSON.stringify mislukt: ${msg}` }
+    return { ok: false, reason: `JSON.stringify mislukt: ${msg}`}
   }
   const d = utf8ToBase64Json(json)
-  if (!d) return { ok: false, reason: 'Base64 mislukt (boninhoud te groot of speciale tekens).' }
+  if (!d) return { ok: false, reason: 'Base64 mislukt (boninhoud te groot of speciale tekens).'}
   const enc = encodeURIComponent(d)
   if (enc.length > 750_000) {
-    return { ok: false, reason: `URL te lang (${enc.length} tekens); bon moet korter of agent via USB PC.` }
+    return { ok: false, reason: `URL te lang (${enc.length} tekens); bon moet korter of agent via USB PC.`}
   }
   const url = `vysionkiosk://print?d=${enc}`
   /** Korte defer: React kan succes-banner nog pinten voordat secundair tabblad/scheme wordt geopend. */
@@ -227,7 +227,7 @@ function tryVysionKioskPrintBridge(body: VysionPrintAgentBody): { ok: boolean; r
     }, 48)
     return { ok: true }
   }
-  return { ok: false, reason: 'Geen window.' }
+  return { ok: false, reason: 'Geen window.'}
 }
 
 function tryVysionKioskDrawerBridge(): boolean {
@@ -299,14 +299,14 @@ export async function fetchPrintAgentHealth(
 
 /**
  * Aparte keukenprinter in agent (veld ingevuld én niet dezelfde als zaak/kassa).
- * Bij true stuurt de kassa receiptMode `keuken` → agent print op die printer.
+ * Bij true stuurt de kassa receiptMode `keuken`→ agent print op die printer.
  */
 export function printAgentHasDedicatedKitchenPrinter(health: PrintAgentHealth): boolean {
   const kitchen = health.kitchenPrinterName?.trim()
   if (!kitchen) return false
   const primary = health.printerName?.trim()
   if (!primary) return false
-  return kitchen.localeCompare(primary, undefined, { sensitivity: 'accent' }) !== 0
+  return kitchen.localeCompare(primary, undefined, { sensitivity: 'accent'}) !== 0
 }
 
 async function postPrintOnce(
@@ -320,7 +320,7 @@ async function postPrintOnce(
   try {
     const init: RequestInit = {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json'},
       body: JSON.stringify(buildAgentRequestPayload(body)),
       mode: 'cors',
       credentials: 'omit',
@@ -347,12 +347,12 @@ async function postPrintOnce(
     } catch {
       data = null
     }
-    if (r.ok && data?.success === true) return { ok: true, detail: '' }
+    if (r.ok && data?.success === true) return { ok: true, detail: ''}
     const agentErr = data?.error != null ? String(data.error) : ''
     const snippet = (text || '').slice(0, 280).trim() || '(lege response)'
     return {
       ok: false,
-      detail: `POST ${url} → HTTP ${r.status} ${r.statusText}${agentErr ? `. Agent: ${agentErr}` : ''}. Body: ${snippet}`,
+      detail: `POST ${url} → HTTP ${r.status} ${r.statusText}${agentErr ? `. Agent: ${agentErr}`: ''}. Body: ${snippet}`,
     }
   } catch (e) {
     const name = e instanceof Error ? e.name : 'Error'
@@ -441,7 +441,7 @@ export async function sendToVysionPrintAgent(
     (): VysionPrintAgentResult => ({
       ok: false,
       error:
-        `Print-service reageerde niet binnen ${Math.round(ms / 1000)} seconden.\n\n` +
+        `Print-service reageerde niet binnen ${Math.round(ms / 1000)} seconden.\n\n`+
         (isAndroidTabletPrintClient()
           ? 'Tablet: controleer „Vysion printdienst“, USB-printer, open de kassa via „Open kassa in Chrome” in de app, en zet Chrome Desktopweergave UIT. Herstart de Kiosk-app bij twijfel.'
           : 'PC: start de Print Agent (icoon bij de klok), testprint vanuit de agent. Controleer firewall en dat poort 9742 lokaal bereikbaar is.'),
@@ -461,7 +461,7 @@ export async function openCashDrawer(origin = DEFAULT_AGENT_ORIGIN): Promise<boo
   try {
     const init: RequestInit = {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json'},
       body: '{}',
       mode: 'cors',
       credentials: 'omit',

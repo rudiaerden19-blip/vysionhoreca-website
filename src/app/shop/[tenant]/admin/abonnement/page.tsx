@@ -513,7 +513,7 @@ export default function AbonnementPage() {
   const [showSuccess, setShowSuccess] = useState(false)
   const [showCancelled, setShowCancelled] = useState(false)
   const [showUpgradeBanner, setShowUpgradeBanner] = useState(false)
-  const [successType, setSuccessType] = useState<'subscription' | 'invoice'>('subscription')
+  const [successType, setSuccessType] = useState<'subscription' |  'invoice'>('subscription')
 
   // Check URL parameters for payment result
   useEffect(() => {
@@ -674,7 +674,7 @@ export default function AbonnementPage() {
     const now = new Date()
     const trialEnd = new Date(trialEndsAt)
     daysLeft = Math.max(0, Math.ceil((trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
-    trialEndDate = trialEnd.toLocaleDateString(locale === 'nl' ? 'nl-BE' : locale, { 
+    trialEndDate = trialEnd.toLocaleDateString(locale === 'nl'? 'nl-BE': locale, { 
       day: 'numeric', 
       month: 'long', 
       year: 'numeric' 
@@ -700,7 +700,7 @@ export default function AbonnementPage() {
     const diffDays = Math.ceil((nextPayment.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
     if (diffDays <= 7 && diffDays > 0) {
       expiringDays = diffDays
-      expiringDate = nextPayment.toLocaleDateString(locale === 'nl' ? 'nl-BE' : locale, {
+      expiringDate = nextPayment.toLocaleDateString(locale === 'nl'? 'nl-BE': locale, {
         weekday: 'long',
         day: 'numeric',
         month: 'long'
@@ -767,7 +767,7 @@ export default function AbonnementPage() {
                   disabled={processing !== null}
                   className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white py-3 px-6 rounded-xl font-bold text-sm transition-colors disabled:opacity-50"
                 >
-                  {processing === 'pro' ? '⏳ Laden...' : ' Upgrade naar Premium'}
+                  {processing === 'pro'? 'Laden...': 'Upgrade naar Premium'}
                 </button>
               </div>
             </div>
@@ -808,7 +808,7 @@ export default function AbonnementPage() {
                     onClick={() => {
                       setShowUpgradeBanner(false)
                       setBillingYearly(false)
-                      document.getElementById('pro-plan-card')?.scrollIntoView({ behavior: 'smooth' })
+                      document.getElementById('pro-plan-card')?.scrollIntoView({ behavior: 'smooth'})
                     }}
                     className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-bold text-sm transition-colors"
                   >
@@ -842,7 +842,7 @@ export default function AbonnementPage() {
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-bold text-green-800">
-                  {successType === 'subscription' ? 'Abonnement geactiveerd!' : 'Factuur betaald!'}
+                  {successType === 'subscription'? 'Abonnement geactiveerd!': 'Factuur betaald!'}
                 </h3>
                 <p className="text-green-700 mt-1">
                   {successType === 'subscription' 
@@ -921,12 +921,12 @@ export default function AbonnementPage() {
         <div className="bg-amber-50 border-2 border-amber-300 rounded-2xl p-6">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="text-2xl">⏰</span>
+              <span className="text-2xl"></span>
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-bold text-amber-800">Uw abonnement loopt bijna af!</h3>
               <p className="text-amber-700 mt-1">
-                Uw abonnement verloopt over <strong>{expiringDays} {expiringDays === 1 ? 'dag' : 'dagen'}</strong> ({expiringDate}).
+                Uw abonnement verloopt over <strong>{expiringDays} {expiringDays === 1 ? 'dag': 'dagen'}</strong> ({expiringDate}).
                 Verleng op tijd om uw webshop online te houden.
               </p>
               <button
@@ -934,7 +934,7 @@ export default function AbonnementPage() {
                 disabled={processing !== null}
                 className="mt-4 bg-amber-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-amber-700 transition-colors disabled:opacity-50"
               >
-                {processing ? t('loading') : ' Nu Verlengen'}
+                {processing ? t('loading') : 'Nu Verlengen'}
               </button>
             </div>
           </div>
@@ -947,9 +947,9 @@ export default function AbonnementPage() {
         <div className="bg-white rounded-2xl border-2 border-gray-200 p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-              currentPlan === 'pro' || currentPlan === 'PRO' ? 'bg-purple-100' : 'bg-yellow-100'
+              currentPlan === 'pro' || currentPlan === 'PRO'? 'bg-purple-100': 'bg-yellow-100'
             }`}>
-              <span className="text-2xl">{currentPlan === 'pro' || currentPlan === 'PRO' ? '' : ''}</span>
+              <span className="text-2xl">{currentPlan === 'pro' || currentPlan === 'PRO'? '' : ''}</span>
             </div>
             <div>
               <p className="text-sm text-gray-500">{t('currentPlan')}</p>
@@ -959,7 +959,7 @@ export default function AbonnementPage() {
             </div>
           </div>
           <div className="text-3xl font-bold text-gray-900">
-            €{currentPlan === 'pro' || currentPlan === 'PRO' ? '99' : '59'}
+            €{currentPlan === 'pro' || currentPlan === 'PRO'? '99': '59'}
             <span className="text-base font-normal text-gray-500">{t('perMonth')}</span>
           </div>
         </div>
@@ -977,10 +977,10 @@ export default function AbonnementPage() {
                 ? 'bg-blue-100 text-blue-700'
                 : 'bg-gray-100 text-gray-700'
             }`}>
-              {hasOverdue ? ` ${t('overdueStatus')}` : 
-               isActive ? ` ${t('activeStatus')}` : 
-               isTrial ? ` ${t('trialStatus')}` : 
-               isExpired ? ` ${t('expiredStatus')}` : status}
+              {hasOverdue ? ` ${t('overdueStatus')}`: 
+               isActive ? ` ${t('activeStatus')}`: 
+               isTrial ? ` ${t('trialStatus')}`: 
+               isExpired ? ` ${t('expiredStatus')}`: status}
             </span>
           </div>
           {isTrial && (
@@ -992,7 +992,7 @@ export default function AbonnementPage() {
           )}
           {isActive && subscription?.next_payment_at && (
             <p className="text-gray-600">
-              {t('nextPayment')}: {new Date(subscription.next_payment_at).toLocaleDateString(locale === 'nl' ? 'nl-BE' : locale)}
+              {t('nextPayment')}: {new Date(subscription.next_payment_at).toLocaleDateString(locale === 'nl'? 'nl-BE': locale)}
             </p>
           )}
         </div>
@@ -1011,7 +1011,7 @@ export default function AbonnementPage() {
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">{t('outstanding')}</span>
-              <span className={`font-bold ${pendingInvoices.length > 0 ? 'text-blue-600' : 'text-gray-400'}`}>
+              <span className={`font-bold ${pendingInvoices.length > 0 ? 'text-blue-600': 'text-gray-400'}`}>
                 {pendingInvoices.length}
               </span>
             </div>
@@ -1087,11 +1087,11 @@ export default function AbonnementPage() {
             )}
           </div>
           <button
-            onClick={() => handleSubscribe('starter', billingYearly ? 'yearly' : 'monthly')}
+            onClick={() => handleSubscribe('starter', billingYearly ? 'yearly': 'monthly')}
             disabled={processing !== null}
             className="w-full bg-yellow-400 hover:bg-yellow-300 text-gray-900 py-4 rounded-xl font-bold text-lg transition-colors disabled:opacity-50"
           >
-            {processing === 'starter' ? t('loading') : ` ${t('buyStarter')}`}
+            {processing === 'starter'? t('loading') : ` ${t('buyStarter')}`}
           </button>
         </div>
 
@@ -1126,11 +1126,11 @@ export default function AbonnementPage() {
             )}
           </div>
           <button
-            onClick={() => handleSubscribe('pro', billingYearly ? 'yearly' : 'monthly')}
+            onClick={() => handleSubscribe('pro', billingYearly ? 'yearly': 'monthly')}
             disabled={processing !== null}
             className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white py-4 rounded-xl font-bold text-lg transition-colors disabled:opacity-50"
           >
-            {processing === 'pro' ? t('loading') : ` ${t('buyPro')}`}
+            {processing === 'pro'? t('loading') : ` ${t('buyPro')}`}
           </button>
         </div>
       </div>
@@ -1158,7 +1158,7 @@ export default function AbonnementPage() {
             disabled={processing !== null}
             className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-colors disabled:opacity-50 whitespace-nowrap"
           >
-            {processing && processing !== 'starter' && processing !== 'pro' ? t('loading') : ` ${t('payNow')}`}
+            {processing && processing !== 'starter' && processing !== 'pro'? t('loading') : ` ${t('payNow')}`}
           </button>
         </div>
       </div>
@@ -1195,20 +1195,20 @@ export default function AbonnementPage() {
                   <tr key={invoice.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 font-mono text-sm">{invoice.invoice_number}</td>
                     <td className="px-6 py-4 text-gray-600">
-                      {new Date(invoice.created_at).toLocaleDateString(locale === 'nl' ? 'nl-BE' : locale)}
+                      {new Date(invoice.created_at).toLocaleDateString(locale === 'nl'? 'nl-BE': locale)}
                     </td>
                     <td className="px-6 py-4 text-gray-900">{invoice.description || '-'}</td>
                     <td className="px-6 py-4 font-semibold">€{Number(invoice.amount).toFixed(2)}</td>
                     <td className="px-6 py-4">
                       <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                        invoice.status === 'paid' ? 'bg-green-100 text-green-700' :
-                        invoice.status === 'overdue' ? 'bg-red-100 text-red-700' :
-                        invoice.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                        invoice.status === 'paid'? 'bg-green-100 text-green-700':
+                        invoice.status === 'overdue'? 'bg-red-100 text-red-700':
+                        invoice.status === 'pending'? 'bg-yellow-100 text-yellow-700':
                         'bg-gray-100 text-gray-700'
                       }`}>
-                        {invoice.status === 'paid' ? t('paid') :
-                         invoice.status === 'overdue' ? t('overdue') :
-                         invoice.status === 'pending' ? t('pending') :
+                        {invoice.status === 'paid'? t('paid') :
+                         invoice.status === 'overdue'? t('overdue') :
+                         invoice.status === 'pending'? t('pending') :
                          invoice.status}
                       </span>
                     </td>
@@ -1221,7 +1221,7 @@ export default function AbonnementPage() {
                         >
                           {processing === invoice.id ? t('loading') : t('pay')}
                         </button>
-                      ) : invoice.status === 'paid' ? (
+                      ) : invoice.status === 'paid'? (
                         <span className="text-gray-400 text-sm"> {t('done')}</span>
                       ) : null}
                     </td>

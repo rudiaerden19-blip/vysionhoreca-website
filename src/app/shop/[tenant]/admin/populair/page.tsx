@@ -130,7 +130,7 @@ async function fetchOrdersItemsWindow(params: {
 
 export default function PopulairPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
-  const [period, setPeriod] = useState<'week' | 'month' | 'year'>('week')
+  const [period, setPeriod] = useState<'week' |  'month' |  'year'>('week')
   const [products, setProducts] = useState<PopularProduct[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -209,12 +209,12 @@ export default function PopulairPage({ params }: { params: { tenant: string } })
 
       const currentOrders = currentRaw.filter((o) =>
         orderCountsTowardRevenueAndZReport(
-          o as Pick<Order, 'order_type' | 'status' | 'payment_status'>,
+          o as Pick<Order, 'order_type' |  'status' |  'payment_status'>,
         ),
       )
       const previousOrders = previousRaw.filter((o) =>
         orderCountsTowardRevenueAndZReport(
-          o as Pick<Order, 'order_type' | 'status' | 'payment_status'>,
+          o as Pick<Order, 'order_type' |  'status' |  'payment_status'>,
         ),
       )
 
@@ -262,7 +262,7 @@ export default function PopulairPage({ params }: { params: { tenant: string } })
         <div className="flex items-center justify-center min-h-[400px]">
           <motion.div
             animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+            transition={{ duration: 1, repeat: Infinity, ease: 'linear'}}
             className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full"
           />
         </div>
@@ -283,7 +283,7 @@ export default function PopulairPage({ params }: { params: { tenant: string } })
               key={p}
               onClick={() => setPeriod(p)}
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                period === p ? 'bg-white shadow text-gray-900' : 'text-gray-500'
+                period === p ? 'bg-white shadow text-gray-900': 'text-gray-500'
               }`}
             >
               {t(`popularPage.periods.${p}`)}
@@ -372,7 +372,7 @@ export default function PopulairPage({ params }: { params: { tenant: string } })
                     <td className="p-4">
                       <span
                         className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold ${
-                          product.rank <= 3 ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500'
+                          product.rank <= 3 ? 'bg-blue-100 text-blue-600': 'bg-gray-100 text-gray-500'
                         }`}
                       >
                         {product.rank}
@@ -392,7 +392,7 @@ export default function PopulairPage({ params }: { params: { tenant: string } })
                               : 'bg-gray-100 text-gray-700'
                         }`}
                       >
-                        {product.trend > 0 ? '↑' : product.trend < 0 ? '↓' : '→'}
+                        {product.trend > 0 ? '↑': product.trend < 0 ? '↓': '→'}
                         {Math.abs(product.trend)}%
                       </span>
                     </td>

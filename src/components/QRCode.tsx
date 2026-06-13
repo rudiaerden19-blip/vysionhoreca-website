@@ -10,7 +10,7 @@ interface QRCodeProps {
 }
 
 // Memoized QR Code component - prevents re-renders
-const QRCode = memo(function QRCode({ url, size = 200, className = '' }: QRCodeProps) {
+const QRCode = memo(function QRCode({ url, size = 200, className = ''}: QRCodeProps) {
   const [loaded, setLoaded] = useState(false)
   const [error, setError] = useState(false)
   
@@ -45,7 +45,7 @@ const QRCode = memo(function QRCode({ url, size = 200, className = '' }: QRCodeP
         alt="QR Code"
         width={size}
         height={size}
-        className={`transition-opacity duration-300 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+        className={`transition-opacity duration-300 ${loaded ? 'opacity-100': 'opacity-0'}`}
         onLoad={() => setLoaded(true)}
         onError={() => setError(true)}
         loading="lazy"

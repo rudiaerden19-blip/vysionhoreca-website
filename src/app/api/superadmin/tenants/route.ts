@@ -137,14 +137,14 @@ export async function POST(req: NextRequest) {
 
   const access = await verifySuperAdminAccess(req)
   if (!access.authorized) {
-    return NextResponse.json({ error: access.error || 'Niet ingelogd als superadmin' }, { status: 403 })
+    return NextResponse.json({ error: access.error || 'Niet ingelogd als superadmin'}, { status: 403 })
   }
 
   let raw: unknown
   try {
     raw = await req.json()
   } catch {
-    return NextResponse.json({ error: 'Ongeldige JSON' }, { status: 400 })
+    return NextResponse.json({ error: 'Ongeldige JSON'}, { status: 400 })
   }
   const parsed = BodySchema.safeParse(raw)
   if (!parsed.success) {
@@ -154,7 +154,7 @@ export async function POST(req: NextRequest) {
 
   const supabase = getServerSupabaseClient()
   if (!supabase) {
-    return NextResponse.json({ error: 'Database niet beschikbaar' }, { status: 503 })
+    return NextResponse.json({ error: 'Database niet beschikbaar'}, { status: 503 })
   }
 
   const meta = auditRequestMeta(req)
@@ -165,10 +165,10 @@ export async function POST(req: NextRequest) {
     // ── CREATE ─────────────────────────────────────────────────────────
     if (body.action === 'create') {
       const slug = body.tenant.tenant_slug.toLowerCase().replace(/[^a-z0-9]/g, '')
-      if (!slug) return NextResponse.json({ error: 'Ongeldige slug' }, { status: 400 })
+      if (!slug) return NextResponse.json({ error: 'Ongeldige slug'}, { status: 400 })
 
       // 1. tenants
-      // Geen proefperiode meer — superadmin maakt zaak direct 'active' aan;
+      // Geen proefperiode meer — superadmin maakt zaak direct 'active'aan;
       // betalingscontrole loopt via de blokkeer-knop op `tenants.is_blocked`.
       const tenantInsert = {
         name: body.tenant.business_name,
@@ -238,7 +238,7 @@ export async function POST(req: NextRequest) {
         ).error
       }
       if (settingsError) {
-        return NextResponse.json({ error: 'tenant_settings: ' + settingsError.message }, { status: 400 })
+        return NextResponse.json({ error: 'tenant_settings: '+ settingsError.message }, { status: 400 })
       }
 
       // 4. subscriptions
@@ -283,8 +283,8 @@ export async function POST(req: NextRequest) {
 
       const errors: string[] = []
       for (const table of CASCADE_DELETE_TABLES) {
-        // Voor de meeste tabellen is de kolom `tenant_slug`. Voor `tenants` is het `slug`.
-        const column = table === 'tenants' ? 'slug' : 'tenant_slug'
+        // Voor de meeste tabellen is de kolom `tenant_slug`. Voor `tenants`is het `slug`.
+        const column = table === 'tenants'? 'slug': 'tenant_slug'
         const { error } = await supabase.from(table).delete().eq(column, slug)
         if (error) {
           // Niet hard falen — sommige tabellen bestaan misschien niet in elke installatie
@@ -308,7 +308,7 @@ export async function POST(req: NextRequest) {
         ip: meta.ip,
         userAgent: meta.userAgent,
         requestId,
-        notes: errors.length > 0 ? `Tenant verwijderd met ${errors.length} fouten` : `Tenant volledig verwijderd`,
+        notes: errors.length > 0 ? `Tenant verwijderd met ${errors.length} fouten`: `Tenant volledig verwijderd`,
       })
 
       return NextResponse.json({ ok: true, errors }, { status: 200 })
@@ -329,7 +329,7 @@ export async function POST(req: NextRequest) {
         actorType: 'superadmin',
         actorId,
         actorEmail,
-        action: body.isBlocked ? 'block_tenant' : 'unblock_tenant',
+        action: body.isBlocked ? 'block_tenant': 'unblock_tenant',
         resourceType: 'tenant_settings',
         resourceId: body.tenantSettingsId,
         before: { is_blocked: !body.isBlocked },
@@ -447,9 +447,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true })
     }
 
-    return NextResponse.json({ error: 'Onbekende actie' }, { status: 400 })
+    return NextResponse.json({ error: 'Onbekende actie'}, { status: 400 })
   } catch (err: any) {
     logger.error('[superadmin/tenants] uncaught', { requestId, err: err?.message || String(err) })
-    return NextResponse.json({ error: 'Interne fout' }, { status: 500 })
+    return NextResponse.json({ error: 'Interne fout'}, { status: 500 })
   }
 }

@@ -1,6 +1,6 @@
 /**
  * Order shape and pure helpers (POS vs webshop, Z-rapport payment buckets).
- * Consumed by admin-api; re-exported from `@/lib/admin-api` for callers.
+ * Consumed by admin-api; re-exported from `@/lib/admin-api`for callers.
  */
 
 export interface OrderItem {
@@ -27,8 +27,8 @@ export interface Order {
   customer_email?: string
   customer_address?: string
   customer_notes?: string
-  order_type?: 'pickup' | 'delivery' | string
-  status: 'new' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'completed' | 'cancelled' | 'rejected' | string
+  order_type?: 'pickup' |  'delivery'| string
+  status: 'new' |  'confirmed' |  'preparing' |  'ready' |  'delivered' |  'completed' |  'cancelled' |  'rejected'| string
   delivery_address?: string
   delivery_notes?: string
   subtotal: number
@@ -81,12 +81,12 @@ export function isActiveTenantOrderStatus(status: string | null | undefined): bo
 }
 
 /**
- * Orders met status `new` die van het publieke web / groepsmodule komen.
- * Kassa-POS schrijft bij verkoop direct `confirmed` — die horen dit alarm niet te triggeren.
- * Let op: `.toLowerCase()` alleen is onvoldoende (`DELIVERY` zou `delivery` worden); daarom eerst POS uitsluiten.
+ * Orders met status `new`die van het publieke web / groepsmodule komen.
+ * Kassa-POS schrijft bij verkoop direct `confirmed`— die horen dit alarm niet te triggeren.
+ * Let op: `.toLowerCase()`alleen is onvoldoende (`DELIVERY`zou `delivery`worden); daarom eerst POS uitsluiten.
  */
 export function isWebshopChannelNewOrder(order: { order_type?: string | null | undefined }): boolean {
-  if (isKassaPosOrder({ order_type: order.order_type ?? '' } as Pick<Order, 'order_type'>)) return false
+  if (isKassaPosOrder({ order_type: order.order_type ?? ''} as Pick<Order, 'order_type'>)) return false
   const ot = String(order.order_type ?? '').toLowerCase().trim()
   return ot === 'pickup' || ot === 'delivery' || ot === 'group'
 }
@@ -99,7 +99,7 @@ export function isWebshopChannelNewOrder(order: { order_type?: string | null | u
  * - Geannuleerd / geweigerd: nooit.
  */
 export function orderCountsTowardRevenueAndZReport(
-  order: Pick<Order, 'order_type' | 'status' | 'payment_status'>
+  order: Pick<Order, 'order_type' |  'status' |  'payment_status'>
 ): boolean {
   const st = (order.status || '').toString().toLowerCase()
   if (['cancelled', 'rejected'].includes(st)) return false
@@ -115,7 +115,7 @@ export function orderCountsTowardRevenueAndZReport(
 }
 
 /** Zelfde indeling als Z-rapport / omzet: contant, kaart, overig (online), gesplitst. */
-export type OrderPaymentBucket = 'cash' | 'card' | 'online' | 'split'
+export type OrderPaymentBucket = 'cash' |  'card' |  'online' |  'split'
 
 export function orderPaymentMethodBucket(order: Pick<Order, 'payment_method'>): OrderPaymentBucket {
   const pm = (order.payment_method || '').toLowerCase()

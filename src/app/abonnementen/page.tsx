@@ -11,9 +11,9 @@ const LIFESTYLE_IMAGE = '/images/abonnement-vysion-pro-lifestyle.png'
 const ONBOARDING_IMAGE = '/images/abonnement-onboarding-pos-restaurant.png'
 
 const GALLERY_IMAGES = [
-  { src: '/images/abonnement-gallery-pos-1.png', width: 782, height: 788, altKey: 'galleryHardwareAlt1' as const },
-  { src: '/images/abonnement-gallery-pos-2.png', width: 720, height: 780, altKey: 'galleryHardwareAlt2' as const },
-  { src: '/images/abonnement-gallery-pos-3.png', width: 787, height: 784, altKey: 'galleryHardwareAlt3' as const },
+  { src: '/images/abonnement-gallery-pos-1.png', width: 782, height: 788, altKey: 'galleryHardwareAlt1'as const },
+  { src: '/images/abonnement-gallery-pos-2.png', width: 720, height: 780, altKey: 'galleryHardwareAlt2'as const },
+  { src: '/images/abonnement-gallery-pos-3.png', width: 787, height: 784, altKey: 'galleryHardwareAlt3'as const },
 ]
 
 type LightboxState = { src: string; alt: string } | null
@@ -107,7 +107,7 @@ export default function AbonnementenPage() {
                 type="button"
                 onClick={() => setIsYearly(false)}
                 className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-full text-sm sm:text-base font-semibold transition-all ${
-                  !isYearly ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                  !isYearly ? 'bg-gray-900 text-white shadow-sm': 'text-gray-600 hover:text-gray-900'
                 }`}
               >
                 {t('pricing.billingMonthly')}
@@ -116,7 +116,7 @@ export default function AbonnementenPage() {
                 type="button"
                 onClick={() => setIsYearly(true)}
                 className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-full text-sm sm:text-base font-semibold transition-all relative pr-7 sm:pr-8 ${
-                  isYearly ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                  isYearly ? 'bg-gray-900 text-white shadow-sm': 'text-gray-600 hover:text-gray-900'
                 }`}
               >
                 {t('pricing.billingYearly')}
@@ -172,7 +172,7 @@ export default function AbonnementenPage() {
                 </ul>
 
                 <a
-                  href={`/registreer?lang=${locale}&plan=starter&billing=${isYearly ? 'yearly' : 'monthly'}`}
+                  href={`/registreer?lang=${locale}&plan=starter&billing=${isYearly ? 'yearly': 'monthly'}`}
                   className="block w-full border-2 border-gray-900 text-gray-900 text-center py-3.5 rounded-full font-semibold hover:bg-gray-900 hover:text-white transition-colors"
                 >
                   {t('pricing.chooseStarter')}
@@ -232,7 +232,7 @@ export default function AbonnementenPage() {
                 type="button"
                 onClick={() => setIsYearly(false)}
                 className={`px-5 py-2.5 sm:px-6 sm:py-3 rounded-full text-sm sm:text-base font-semibold transition-all ${
-                  !isYearly ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                  !isYearly ? 'bg-gray-900 text-white shadow-sm': 'text-gray-600 hover:text-gray-900'
                 }`}
               >
                 {t('pricing.billingMonthly')}
@@ -241,7 +241,7 @@ export default function AbonnementenPage() {
                 type="button"
                 onClick={() => setIsYearly(true)}
                 className={`px-5 py-2.5 sm:px-6 sm:py-3 rounded-full text-sm sm:text-base font-semibold transition-all relative pr-7 sm:pr-8 ${
-                  isYearly ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                  isYearly ? 'bg-gray-900 text-white shadow-sm': 'text-gray-600 hover:text-gray-900'
                 }`}
               >
                 {t('pricing.billingYearly')}
@@ -369,7 +369,7 @@ export default function AbonnementenPage() {
                 </ul>
 
                 <a
-                  href={`/registreer?lang=${locale}&plan=pro&billing=${isYearly ? 'yearly' : 'monthly'}`}
+                  href={`/registreer?lang=${locale}&plan=pro&billing=${isYearly ? 'yearly': 'monthly'}`}
                   className="block w-full bg-accent text-white text-center py-3.5 rounded-full font-semibold hover:bg-accent/90 transition-colors"
                 >
                   {t('pricing.choosePro')}
@@ -456,7 +456,7 @@ export default function AbonnementenPage() {
 
             <div
               className="rounded-3xl p-8 sm:p-10 text-white shadow-lg lg:sticky lg:top-28"
-              style={{ backgroundColor: '#c05617' }}
+              style={{ backgroundColor: '#c05617'}}
             >
               <ol className="relative ml-1 border-l-2 border-white/35 pl-8 sm:pl-10 space-y-8 sm:space-y-10">
                 {[1, 2, 3, 4, 5].map((step) => (

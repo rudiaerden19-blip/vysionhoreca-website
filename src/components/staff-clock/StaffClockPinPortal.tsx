@@ -119,7 +119,7 @@ export function StaffClockPinPortal({
             placeholder={placeholder}
             className="w-full px-4 py-3 rounded-xl border border-gray-200 text-lg font-mono tracking-widest text-gray-900"
             aria-invalid={pinError ? true : undefined}
-            aria-describedby={pinError ? `${titleId}-error` : undefined}
+            aria-describedby={pinError ? `${titleId}-error`: undefined}
           />
           {pinError ? (
             <p id={`${titleId}-error`} className="text-sm font-medium text-red-600" role="alert">

@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     if (!supabase) {
       logger.error('Subscription checkout failed: Supabase not configured', { requestId })
       return NextResponse.json(
-        { error: 'Database niet geconfigureerd. Neem contact op met support.' },
+        { error: 'Database niet geconfigureerd. Neem contact op met support.'},
         { status: 503 }
       )
     }
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 
     if (!tenantSlug || !planId) {
       return NextResponse.json(
-        { error: 'Ontbrekende gegevens' },
+        { error: 'Ontbrekende gegevens'},
         { status: 400 }
       )
     }
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     const stripeSecretKey = process.env.STRIPE_SECRET_KEY
     if (!stripeSecretKey) {
       return NextResponse.json(
-        { error: 'Betalingen zijn nog niet geconfigureerd. Neem contact op met support.' },
+        { error: 'Betalingen zijn nog niet geconfigureerd. Neem contact op met support.'},
         { status: 500 }
       )
     }
@@ -68,21 +68,21 @@ export async function POST(request: NextRequest) {
     if (tenantError) {
       logger.error('Tenant lookup error', { requestId, tenantSlug, error: tenantError.message })
       return NextResponse.json(
-        { error: `Tenant niet gevonden: ${tenantSlug}` },
+        { error: `Tenant niet gevonden: ${tenantSlug}`},
         { status: 404 }
       )
     }
     
     if (!tenant) {
       return NextResponse.json(
-        { error: `Geen tenant gevonden met slug: ${tenantSlug}` },
+        { error: `Geen tenant gevonden met slug: ${tenantSlug}`},
         { status: 404 }
       )
     }
     
     if (!tenant.email) {
       return NextResponse.json(
-        { error: 'Tenant heeft geen email adres ingesteld' },
+        { error: 'Tenant heeft geen email adres ingesteld'},
         { status: 400 }
       )
     }
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
             },
             unit_amount: price,
             recurring: {
-              interval: isYearly ? 'year' : 'month',
+              interval: isYearly ? 'year': 'month',
             },
           },
           quantity: 1,
@@ -149,9 +149,9 @@ export async function POST(request: NextRequest) {
       requestId, 
       error: error instanceof Error ? error.message : 'Unknown error' 
     })
-    trackError(error, { requestId, route: '/api/create-subscription-checkout' })
+    trackError(error, { requestId, route: '/api/create-subscription-checkout'})
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Er ging iets mis bij het aanmaken van de betaling' },
+      { error: error instanceof Error ? error.message : 'Er ging iets mis bij het aanmaken van de betaling'},
       { status: 500 }
     )
   }

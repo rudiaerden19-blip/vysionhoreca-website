@@ -238,13 +238,13 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
   }
 
   const statusColors: Record<string, { bg: string; text: string; labelKey: string }> = {
-    pending: { bg: 'bg-blue-100', text: 'text-blue-700', labelKey: 'pending' },
-    confirmed: { bg: 'bg-purple-100', text: 'text-purple-700', labelKey: 'confirmed' },
-    preparing: { bg: 'bg-yellow-100', text: 'text-yellow-700', labelKey: 'preparing' },
-    ready: { bg: 'bg-green-100', text: 'text-green-700', labelKey: 'ready' },
-    delivered: { bg: 'bg-emerald-100', text: 'text-emerald-700', labelKey: 'delivered' },
-    completed: { bg: 'bg-gray-100', text: 'text-gray-700', labelKey: 'completed' },
-    cancelled: { bg: 'bg-red-100', text: 'text-red-700', labelKey: 'cancelled' },
+    pending: { bg: 'bg-blue-100', text: 'text-blue-700', labelKey: 'pending'},
+    confirmed: { bg: 'bg-purple-100', text: 'text-purple-700', labelKey: 'confirmed'},
+    preparing: { bg: 'bg-yellow-100', text: 'text-yellow-700', labelKey: 'preparing'},
+    ready: { bg: 'bg-green-100', text: 'text-green-700', labelKey: 'ready'},
+    delivered: { bg: 'bg-emerald-100', text: 'text-emerald-700', labelKey: 'delivered'},
+    completed: { bg: 'bg-gray-100', text: 'text-gray-700', labelKey: 'completed'},
+    cancelled: { bg: 'bg-red-100', text: 'text-red-700', labelKey: 'cancelled'},
   }
 
 
@@ -268,7 +268,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
     }
     const change = ((current - previous) / previous) * 100
     return {
-      value: `${change >= 0 ? '+' : ''}${change.toFixed(0)}%`,
+      value: `${change >= 0 ? '+': ''}${change.toFixed(0)}%`,
       positive: change >= 0
     }
   }
@@ -303,14 +303,14 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
   const photoTextShadow = hasDashboardBg
     ? '[text-shadow:0_1px_3px_rgba(0,0,0,0.9),0_0_12px_rgba(0,0,0,0.55)]'
     : ''
-  const photoFg = hasDashboardBg ? `text-white ${photoTextShadow}` : 'text-gray-900'
+  const photoFg = hasDashboardBg ? `text-white ${photoTextShadow}`: 'text-gray-900'
   const photoFgMuted = hasDashboardBg
     ? `text-white/90 ${photoTextShadow}`
     : 'text-gray-500'
   const photoLinkClass = hasDashboardBg
     ? 'text-white/95 hover:text-white text-sm font-medium underline-offset-2 hover:underline'
     : 'text-blue-600 hover:text-blue-600 text-sm font-medium'
-  const mutedOnPhoto = hasDashboardBg ? `text-sm font-medium ${photoFgMuted}` : 'text-sm text-gray-500'
+  const mutedOnPhoto = hasDashboardBg ? `text-sm font-medium ${photoFgMuted}`: 'text-sm text-gray-500'
   const popularRankClass = hasDashboardBg
     ? `flex h-8 w-8 items-center justify-center rounded-lg bg-black/30 text-sm font-bold text-white ring-1 ring-white/35 ${photoTextShadow}`
     : 'flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 text-sm font-bold text-gray-500'
@@ -350,7 +350,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
       {/* Header */}
       <div
         className={
-          hasDashboardBg ? `mb-8 ${panelSurface}` : 'mb-8 pt-1'
+          hasDashboardBg ? `mb-8 ${panelSurface}`: 'mb-8 pt-1'
         }
       >
         <motion.h1
@@ -425,7 +425,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
         >
           <div className="flex items-center justify-between mb-4">
             <span className={statLabelClass}>{t('adminDashboard.stats.pendingOrders')}</span>
-            <span className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">⏳</span>
+            <span className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center"></span>
           </div>
           <p className={`text-3xl font-bold ${photoFg}`}>{stats.pendingOrders}</p>
           <p
@@ -451,7 +451,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
         >
           <div className="flex items-center justify-between mb-4">
             <span className={statLabelClass}>{t('adminDashboard.stats.rating')}</span>
-            <span className="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center">⭐</span>
+            <span className="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center"></span>
           </div>
           <p className={`text-3xl font-bold ${photoFg}`}>{stats.averageRating || '-'}</p>
           <p className={`${statLabelClass} mt-1`}>{stats.totalReviews} {t('adminDashboard.stats.reviews')}</p>
@@ -478,7 +478,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
             )}
           </div>
           {recentOrders.length === 0 ? (
-            <div className={`text-center py-8 ${hasDashboardBg ? 'text-white/80' : 'text-gray-400'}`}>
+            <div className={`text-center py-8 ${hasDashboardBg ? 'text-white/80': 'text-gray-400'}`}>
               <p className="text-4xl mb-2"></p>
               <p>{t('adminDashboard.recentOrders.noOrders')}</p>
             </div>
@@ -498,7 +498,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
                       }
                     >
                       <span
-                        className={`text-sm font-bold ${hasDashboardBg ? 'text-white' : 'text-blue-600'}`}
+                        className={`text-sm font-bold ${hasDashboardBg ? 'text-white': 'text-blue-600'}`}
                       >
                         {order.customer_name[0]?.toUpperCase()}
                       </span>
@@ -547,7 +547,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
             )}
           </div>
           {stats.popularItems.length === 0 ? (
-            <div className={`text-center py-8 ${hasDashboardBg ? 'text-white/80' : 'text-gray-400'}`}>
+            <div className={`text-center py-8 ${hasDashboardBg ? 'text-white/80': 'text-gray-400'}`}>
               <p className="text-4xl mb-2"></p>
               <p>{t('adminDashboard.popularItems.noSales')}</p>
             </div>
@@ -561,7 +561,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
                     <div className={popularBarTrackClass}>
                       <div 
                         className="bg-blue-600 h-2 rounded-full" 
-                        style={{ width: `${(item.count / stats.popularItems[0].count) * 100}%` }}
+                        style={{ width: `${(item.count / stats.popularItems[0].count) * 100}%`}}
                       />
                     </div>
                   </div>

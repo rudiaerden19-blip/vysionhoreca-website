@@ -1,6 +1,6 @@
 /**
  * Aggregeer verkochte artikelen voor Z-rapport UI / print / mail.
- * Bron: `orders.items` JSON (kassa + webshop). Geen DB-migratie nodig.
+ * Bron: `orders.items`JSON (kassa + webshop). Geen DB-migratie nodig.
  */
 
 export type ZReportArticleLine = { label: string; qty: number; total: number }
@@ -26,7 +26,7 @@ function parseLinesFromOrderItems(items: unknown): ParsedOrderLine[] {
       continue
     }
     out.push({
-      name: typeof r.name === 'string' ? r.name : '',
+      name: typeof r.name === 'string'? r.name : '',
       quantity: Number(r.quantity) || 0,
       price: Number(r.price) || 0,
       options: Array.isArray(r.options) ? (r.options as ParsedOrderLine['options']) : undefined,
@@ -40,7 +40,7 @@ function optionSignature(opts?: ParsedOrderLine['options']): string {
   return opts
     .map((o) => `${String(o?.name ?? '').trim()}@${Number(o?.price) || 0}`)
     .sort()
-    .join('|')
+    .join(' | ')
 }
 
 function orderLineAmount(line: ParsedOrderLine): number {
@@ -61,7 +61,7 @@ export function aggregateZReportArticleLines(
     for (const raw of parseLinesFromOrderItems(o.items)) {
       const name = String(raw.name || '').trim() || 'Artikel'
       const sig = optionSignature(raw.options)
-      const key = sig ? `${name}|||${sig}` : name
+      const key = sig ? `${name}|||${sig}`: name
       const qty = Math.max(0, Number(raw.quantity) || 0)
       const amt = orderLineAmount(raw)
       let label = name

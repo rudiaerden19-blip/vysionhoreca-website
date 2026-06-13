@@ -53,7 +53,7 @@ export default function KlantenPage() {
   }
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('nl-BE', { style: 'currency', currency: 'EUR' }).format(amount || 0)
+    return new Intl.NumberFormat('nl-BE', { style: 'currency', currency: 'EUR'}).format(amount || 0)
   }
 
   const formatDate = (dateString: string) => {
@@ -187,7 +187,7 @@ export default function KlantenPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                        ⭐ {customer.loyalty_points || 0}
+                         {customer.loyalty_points || 0}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-gray-500 text-sm">

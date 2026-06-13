@@ -11,7 +11,7 @@ export function kassaSoundSessionKey(tenant: string): string {
 
 type SoundUi = Pick<
   KassaRegisterUiTheme,
-  'soundBackdrop' | 'soundHeading' | 'soundBody' | 'soundStrong' | 'soundMuted'
+  'soundBackdrop' |  'soundHeading' |  'soundBody' |  'soundStrong' |  'soundMuted'
 >
 
 /**

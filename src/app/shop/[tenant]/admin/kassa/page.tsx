@@ -211,7 +211,7 @@ function scheduleAddToCartSound() {
   scheduleKassaTapSound(playAddToCart)
 }
 
-/** Kiosk/SXGA‑raster: smalle sidebar + vijf kolommen op `lg` — matcht Tailwind‑raster voor row‑cap. */
+/** Kiosk/SXGA‑raster: smalle sidebar + vijf kolommen op `lg`— matcht Tailwind‑raster voor row‑cap. */
 function kassaMenuGridColumnCountSxgaViewport(vpWcss: number): number {
   if (!Number.isFinite(vpWcss) || vpWcss <= 0) return 2
   if (vpWcss >= 1024) return 5
@@ -224,12 +224,12 @@ function kassaMenuGridColumnCountSxgaViewport(vpWcss: number): number {
 const KASSA_SXGA_LABEL_STRIP_RESERVED_PX = 80
 /** Vierkante fotobak ⇒ hoogte = celbreedte */
 const KASSA_SXGA_TILE_IMAGE_HEIGHT_FRAC = 1
-/** Zelfde als `mt-1.5` tussen foto-strook en naam */
+/** Zelfde als `mt-1.5`tussen foto-strook en naam */
 const KASSA_SXGA_IMAGE_TO_TITLE_GAP_PX = 6
 
 /**
  * Fysisch paneel klassiek **1280×1024** óf daar dicht tegenaan (sommige Elo/OS rapporteren ±2px).
- * Vangt kassa’s waar `inner*` door zoom/oriëntatie **niet altijd landschaps-w>h** heeft zoals verwacht,
+ * Vangt kassa’s waar `inner*`door zoom/oriëntatie **niet altijd landschaps-w>h** heeft zoals verwacht,
  * maar het scherm wel echt deze 17″ 4∶3 klasse is.
  */
 function isLikelySxga1280by1024PhysicalPanel(): boolean {
@@ -309,12 +309,12 @@ function shouldApplyKassaCompactSquareMonitorTileCap(): boolean {
   return ratioHit
 }
 
-/** Standaard numpadbalk (`w-80` / `sm:w-96` / `lg:w-[380px]`). */
+/** Standaard numpadbalk (`w-80`/ `sm:w-96`/ `lg:w-[380px]`). */
 const KASSA_SIDEBAR_WIDTH_BASE_PX = 320
 const KASSA_SIDEBAR_WIDTH_SM_PX = 384
 const KASSA_SIDEBAR_WIDTH_LG_PX = 380
 /**
- * 17″ kiosk (SXGA): zijbalkbreedte — sync met `w-[332px]` en `.cursor/rules/kassa-17inch-sxga.mdc`.
+ * 17″ kiosk (SXGA): zijbalkbreedte — sync met `w-[332px]`en `.cursor/rules/kassa-17inch-sxga.mdc`.
  * Niet verkleinen zonder footer/header opnieuw te meten op 1280×1024.
  */
 const KASSA_SIDEBAR_WIDTH_SXGA_COMPACT_PX = 332
@@ -364,11 +364,11 @@ const KASSA_HEADER_QUICK_LINK_LABEL = 'text-[11px] leading-snug sm:text-xs'
 
 /** Alleen Binnen/Terras — groter dan besteltype-knoppen eronder. */
 function kassaFloorZoneButtonTouchClass(sxga: boolean): string {
-  return sxga ? 'min-h-[3.25rem] py-2.5' : 'min-h-[2.75rem] py-2'
+  return sxga ? 'min-h-[3.25rem] py-2.5': 'min-h-[2.75rem] py-2'
 }
 
 function kassaOrderTypeButtonTouchClass(sxga: boolean): string {
-  return sxga ? 'min-h-[3.25rem] py-2.5' : 'min-h-[3rem] py-2.5'
+  return sxga ? 'min-h-[3.25rem] py-2.5': 'min-h-[3rem] py-2.5'
 }
 
 /** Sidebar-footer: touch-vriendelijke hoogte (Lade / Bon / Verwijder). */
@@ -468,7 +468,7 @@ function isDineInOpenTableDraftRow(row: OpenTableOrderRow): boolean {
 /**
  * Open tafelmanden: lees via admin-proxy (service role), net als schrijven — alle kassa-pc's zien identieke data.
  * Anon-Supabase alleen als fallback (bv. demo zonder sessie).
- * `preparing` = keuken heeft "klaar" gezet op open mand; mand blijft zichtbaar tot afrekenen.
+ * `preparing`= keuken heeft "klaar" gezet op open mand; mand blijft zichtbaar tot afrekenen.
  */
 async function fetchOpenTableOrdersForTenant(tenantSlug: string): Promise<OpenTableOrderRow[] | null> {
   const adminRes = await adminDb.select<OpenTableOrderRow[]>('orders', {
@@ -501,7 +501,7 @@ function buildKassaCustomerDisplayLines(cart: CartItem[]): KassaCustomerDisplayL
     const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
     const unit = i.product.price + choicesTotal
     const choiceNames = (i.choices || []).map((c) => c.choiceName).filter(Boolean)
-    const choicePart = choiceNames.length > 0 ? ` (${choiceNames.join(', ')})` : ''
+    const choicePart = choiceNames.length > 0 ? `(${choiceNames.join(', ')})`: ''
     return {
       label: `${i.product.name}${choicePart}`,
       qty: i.quantity,
@@ -535,7 +535,7 @@ const KASSA_MENU_TILE_BUTTON_CLASS_BASE =
 const KASSA_MENU_TILE_BUTTON_CLASS = `${KASSA_MENU_TILE_BUTTON_CLASS_BASE} h-full`
 
 /**
- * SXGA: **`h-auto`** — geen groot wit blok onder titel als `gridAutoRows` te ruim rekende;
+ * SXGA: **`h-auto`** — geen groot wit blok onder titel als `gridAutoRows`te ruim rekende;
  * combinatie met **`items-start`** op het grid voor beide grids (cat + product).
  */
 const KASSA_MENU_TILE_BUTTON_CLASS_SXGA = `${KASSA_MENU_TILE_BUTTON_CLASS_BASE} h-auto justify-start`
@@ -571,7 +571,7 @@ const KASSA_MENU_TILE_LABEL_WRAP_SXGA =
 const KASSA_MENU_TILE_LABEL_CLASS =
   'm-0 line-clamp-1 text-center text-sm font-black leading-tight tracking-tight text-black sm:text-[15px] md:text-base'
 
-/** SXGA 17″: categorie + product gelijk (`md:text-xl` wordt te groot in smalle rastercel). */
+/** SXGA 17″: categorie + product gelijk (`md:text-xl`wordt te groot in smalle rastercel). */
 const KASSA_MENU_TILE_LABEL_CLASS_SXGA =
   'm-0 line-clamp-1 text-center text-xs font-black leading-tight tracking-tight text-black sm:text-[13px]'
 
@@ -589,7 +589,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
   posLuxuryAppearance = false,
 }: KassaCategoryTileButtonProps) {
   const btnClass = posLuxuryAppearance
-    ? `${KASSA_POS_MENU_TILE_BUTTON_BASE} ${sxgaDenseTileLayout ? 'h-auto justify-start' : 'h-full'}`
+    ? `${KASSA_POS_MENU_TILE_BUTTON_BASE} ${sxgaDenseTileLayout ? 'h-auto justify-start': 'h-full'}`
     : sxgaDenseTileLayout
       ? KASSA_MENU_TILE_BUTTON_CLASS_SXGA
       : KASSA_MENU_TILE_BUTTON_CLASS
@@ -658,7 +658,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
         <>
           <div className={noImgTop}>
             {category.icon ? (
-              <span className={`text-5xl ${posLuxuryAppearance ? 'text-neutral-500' : 'text-neutral-400'}`}>
+              <span className={`text-5xl ${posLuxuryAppearance ? 'text-neutral-500': 'text-neutral-400'}`}>
                 {category.icon}
               </span>
             ) : null}
@@ -689,7 +689,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
 }: KassaProductTileButtonProps) {
   const { t } = useLanguage()
   const btnClass = posLuxuryAppearance
-    ? `${KASSA_POS_MENU_TILE_BUTTON_BASE} ${sxgaDenseTileLayout ? 'h-auto justify-start' : 'h-full'}`
+    ? `${KASSA_POS_MENU_TILE_BUTTON_BASE} ${sxgaDenseTileLayout ? 'h-auto justify-start': 'h-full'}`
     : sxgaDenseTileLayout
       ? KASSA_MENU_TILE_BUTTON_CLASS_SXGA
       : KASSA_MENU_TILE_BUTTON_CLASS
@@ -757,7 +757,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
       ) : (
         <>
           <div className={noImgTop}>
-            <span className={`text-5xl ${posLuxuryAppearance ? 'text-neutral-500' : 'text-neutral-300'}`}></span>
+            <span className={`text-5xl ${posLuxuryAppearance ? 'text-neutral-500': 'text-neutral-300'}`}></span>
           </div>
           <div className={labelWrap}>
             <p className={labelClass}>{product.name}</p>
@@ -884,7 +884,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   })
   const [showSoundActivation, setShowSoundActivation] = useState(() => {
     if (demoViewOnly) return false
-    return typeof window === 'undefined' ? false : sessionStorage.getItem(SESSION_KEY) !== 'true'
+    return typeof window === 'undefined'? false : sessionStorage.getItem(SESSION_KEY) !== 'true'
   })
 
   const activateSound = () => {
@@ -892,7 +892,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     activateAudioForIOS()
     initAudio()
     prewarmAudio()
-    if ('Notification' in window && Notification.permission === 'default') {
+    if ('Notification'in window && Notification.permission === 'default') {
       Notification.requestPermission()
     }
     sessionStorage.setItem(SESSION_KEY, 'true')
@@ -1128,7 +1128,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           pendingResPromise,
         ])
         const list = orders || []
-        /** Alleen webshop/kiosk `new` — kassa-POS schrijft direct `confirmed`; die mogen geen oranje alarm geven. */
+        /** Alleen webshop/kiosk `new`— kassa-POS schrijft direct `confirmed`; die mogen geen oranje alarm geven. */
         const webshopNewList = list.filter((o: { order_type?: string | null }) =>
           isWebshopChannelNewOrder(o),
         )
@@ -1158,7 +1158,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           if (newOrderOnes.length > 0) {
             startAlarm()
             try {
-              if ('Notification' in window && Notification.permission === 'granted') {
+              if ('Notification'in window && Notification.permission === 'granted') {
                 new Notification(t('kassaApp.pushNewOrderTitle'), {
                   body: t('kassaApp.pushNewOrderBody').replace(
                     '{orderNumber}',
@@ -1198,7 +1198,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             reservationAlarmLatchedRef.current = true
             startAlarm()
             try {
-              if ('Notification' in window && Notification.permission === 'granted') {
+              if ('Notification'in window && Notification.permission === 'granted') {
                 new Notification(t('kassaApp.pushNewReservationTitle'), {
                   body: t('kassaApp.pushNewReservationBody'),
                   icon: '/favicon.ico',
@@ -1218,7 +1218,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         }
         if (pollReserv) previousReservIdsRef.current = currentReservIds
 
-        // ── Alarm aan/uit: alleen webshop `new` OF reservering-alarm ──
+        // ── Alarm aan/uit: alleen webshop `new`OF reservering-alarm ──
         const needOrderAlarm = pollOrders && webshopNewList.length > 0
         const needReservAlarm =
           pollReserv && reservationAlarmLatchedRef.current && pendingAndWl > 0
@@ -1350,7 +1350,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const kassaPrevSelectedCategoryIdRef = useRef<string | null>(null)
 
   const [kassaMenuRowPx, setKassaMenuRowPx] = useState(computeInitialKassaMenuRowPx)
-  /** SXGA ~17″: dichtere titel+vierkante fotobak — alleen daar `sxgaDenseTileLayout` naar tegels */
+  /** SXGA ~17″: dichtere titel+vierkante fotobak — alleen daar `sxgaDenseTileLayout`naar tegels */
   const [kassaSxgaDenseTiles, setKassaSxgaDenseTiles] = useState(false)
 
   /** Na swap categorie⇄product: kort géén pointers op de verse grid (zelfde coörd = ghost tik). */
@@ -1393,8 +1393,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const chip = kassaCategoryStripRef.current.querySelector(
       `[data-kassa-strip-category-id="${String(selectedCategory.id)}"]`,
     )
-    if (chip && 'scrollIntoView' in chip) {
-      chip.scrollIntoView({ inline: 'nearest', block: 'nearest', behavior: 'smooth' })
+    if (chip && 'scrollIntoView'in chip) {
+      chip.scrollIntoView({ inline: 'nearest', block: 'nearest', behavior: 'smooth'})
     }
   }, [selectedCategory?.id])
 
@@ -1403,7 +1403,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [showFloorPlan, setShowFloorPlan] = useState(false)
   const [showTablePicker, setShowTablePicker] = useState(false)
   /** Verkoop / Binnen / Terras — los van besteltype (Ter plaatse); accent alleen na tik. */
-  const [kassaZoneTab, setKassaZoneTab] = useState<'sales' | 'inside' | 'terrace' | null>(null)
+  const [kassaZoneTab, setKassaZoneTab] = useState<'sales' |  'inside' |  'terrace'| null>(null)
   const [pickerBrowseZone, setPickerBrowseZone] = useState<FloorPlanZone>(FLOOR_PLAN_ZONE_INSIDE)
   const [dineInFloorZone, setDineInFloorZone] = useState<FloorPlanZone>(FLOOR_PLAN_ZONE_INSIDE)
   const [kassaTablesByZone, setKassaTablesByZone] = useState<Record<FloorPlanZone, FloorPlanTable[]>>({
@@ -1467,7 +1467,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       })
   }, [tenant])
 
-  /** Zie Admin › Kassa-terminal (`kassa_floor_plan_enabled`). `undefined` = aan (backward compatible). */
+  /** Zie Admin › Kassa-terminal (`kassa_floor_plan_enabled`). `undefined`= aan (backward compatible). */
   const kassaFloorPlanEnabled = tenantInfo?.kassa_floor_plan_enabled ?? true
 
   const categoryVatLookup = useMemo(() => buildCategoryVatLookup(categories), [categories])
@@ -1527,7 +1527,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           void adminDb.upsert(
             'floor_plan_tables',
             { tenant_slug: tenant, plan_zone: zone, data: reconciled } as any,
-            { tenantSlug: tenant, onConflict: 'tenant_slug,plan_zone' },
+            { tenantSlug: tenant, onConflict: 'tenant_slug,plan_zone'},
           )
         }
         return next ?? prev
@@ -1574,7 +1574,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   useLayoutEffect(() => {
     let rafId = 0
 
-    /** Moet synchroon: geen `rAF` — anders eerste categorie-frame nog “niet‑SXGA” (te groot). */
+    /** Moet synchroon: geen `rAF`— anders eerste categorie-frame nog “niet‑SXGA” (te groot). */
     function syncSxgaDenseFromViewport() {
       const sxgaDense = shouldApplyKassaCompactSquareMonitorTileCap()
       setKassaSxgaDenseTiles((prev) => (prev === sxgaDense ? prev : sxgaDense))
@@ -1752,7 +1752,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       .channel(`kassa_fpt_${tenant}`)
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'floor_plan_tables', filter: `tenant_slug=eq.${tenant}` },
+        { event: '*', schema: 'public', table: 'floor_plan_tables', filter: `tenant_slug=eq.${tenant}`},
         (payload: {
           eventType?: string
           new?: { data?: unknown; plan_zone?: string }
@@ -1854,7 +1854,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const ordersChannel = supabase
       .channel(`kassa_open_orders_${tenant}`)
       .on('postgres_changes',
-        { event: '*', schema: 'public', table: 'orders', filter: `tenant_slug=eq.${tenant}` },
+        { event: '*', schema: 'public', table: 'orders', filter: `tenant_slug=eq.${tenant}`},
         () => {
           void fetchOpenTableOrdersForTenant(tenant).then(applyOpenOrdersFromServerRows)
         }
@@ -1969,13 +1969,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const openWhere = {
       tenant_slug: tenant,
       table_number: tblNr,
-      status: 'open' as const,
+      status: 'open'as const,
       floor_plan_zone: zone,
     }
     const prepWhere = {
       tenant_slug: tenant,
       table_number: tblNr,
-      status: 'preparing' as const,
+      status: 'preparing'as const,
       floor_plan_zone: zone,
     }
 
@@ -2079,7 +2079,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const updateTableStatus = (tblNr: string, occupied: boolean, zone: FloorPlanZone) => {
     const nr = String(tblNr)
-    const newStatus = occupied ? 'OCCUPIED' : 'FREE'
+    const newStatus = occupied ? 'OCCUPIED': 'FREE'
     const lsKey = floorPlanTablesLocalStorageKey(tenant, zone)
     setKassaTablesByZone((prev) => {
       const zoneTables = prev[zone]
@@ -2108,7 +2108,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       void adminDb.upsert(
         'floor_plan_tables',
         { tenant_slug: tenant, plan_zone: zone, data: updatedTbls } as any,
-        { tenantSlug: tenant, onConflict: 'tenant_slug,plan_zone' },
+        { tenantSlug: tenant, onConflict: 'tenant_slug,plan_zone'},
       )
       return { ...prev, [zone]: updatedTbls }
     })
@@ -2233,7 +2233,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
    * Thermische print-status op het scherm — géén window.alert ná async (Chrome Android blokkeert dat).
    */
   const [thermalPrintBanner, setThermalPrintBanner] = useState<{
-    variant: 'success' | 'error'
+    variant: 'success' |  'error'
     message: string
   } | null>(null)
   /** Bon afdrukken in succesmodal: UI-lock tijdens await. */
@@ -2269,7 +2269,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [staffClockPinModal, setStaffClockPinModal] = useState<{
     staffId: string
     staffName: string
-    action: 'in' | 'out'
+    action: 'in' |  'out'
   } | null>(null)
   const [staffClockPinInput, setStaffClockPinInput] = useState('')
   const [staffClockPinError, setStaffClockPinError] = useState<string | null>(null)
@@ -2479,7 +2479,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const check = async () => {
       if (!navigator.onLine) { setIsOnline(false); return }
       try {
-        const res = await fetch('/api/ping', { method: 'HEAD', cache: 'no-store' })
+        const res = await fetch('/api/ping', { method: 'HEAD', cache: 'no-store'})
         setIsOnline(res.ok)
       } catch {
         setIsOnline(false)
@@ -2744,7 +2744,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   )
 
   /** Compacte chrome (boven/onder) zodat productveld maximaal ruimte houdt. */
-  const kassaSidebarFooterTier = useMemo<'comfort' | 'compact' | 'dense'>(() => {
+  const kassaSidebarFooterTier = useMemo<'comfort' |  'compact' |  'dense'>(() => {
     const n = billLines.length
     if (n === 0) return 'compact'
     return 'dense'
@@ -2768,7 +2768,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     localStorage.setItem(floorPlanTablesLocalStorageKey(tenant, zone), JSON.stringify(fixed))
   }, [tenant])
 
-  const onFloorPlanTablesPersistLifecycle = useCallback((zone: FloorPlanZone, phase: 'start' | 'end') => {
+  const onFloorPlanTablesPersistLifecycle = useCallback((zone: FloorPlanZone, phase: 'start' |  'end') => {
     if (phase === 'start') {
       floorPlanTablesPersistInflightRef.current[zone] =
         (floorPlanTablesPersistInflightRef.current[zone] ?? 0) + 1
@@ -2812,7 +2812,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     if (!tok) {
       tok =
-        typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        typeof crypto !== 'undefined' && 'randomUUID'in crypto
           ? crypto.randomUUID()
           : `${Date.now()}-${Math.random().toString(36).slice(2)}`
       try {
@@ -2975,7 +2975,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return m
   }, [cart])
 
-  /** Categorietegel-foto: eigen `image_url` als gezet, anders eerste productfoto in categorie. */
+  /** Categorietegel-foto: eigen `image_url`als gezet, anders eerste productfoto in categorie. */
   const categoryTileImageByCategoryId = useMemo(() => {
     const m = new Map<string, { url: string }>()
     for (const c of categories) {
@@ -3186,7 +3186,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         try {
           const expr = prev.replace(/×/g, '*')
           // eslint-disable-next-line no-new-func
-          const result = Function('"use strict"; return (' + expr + ')')()
+          const result = Function('"use strict"; return ('+ expr + ')')()
           return String(result)
         } catch {
           return prev
@@ -3351,7 +3351,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       customer_name: customerTableLabel ?? t('kassaApp.walkInCustomerName'),
       status: 'confirmed',
       payment_status: 'paid',
-      payment_method: method === 'SPLIT' ? 'SPLIT' : method,
+      payment_method: method === 'SPLIT'? 'SPLIT': method,
       order_type: orderType,
       customer_notes: customerTableLabel,
       subtotal: Math.round(subtotal * 100) / 100,
@@ -3384,7 +3384,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const insRes = await adminDb.insert(
       'orders',
       orderPayload as Record<string, unknown>,
-      { tenantSlug: tenant, select: 'order_number' },
+      { tenantSlug: tenant, select: 'order_number'},
     )
 
     const insertedRow = (() => {
@@ -3435,7 +3435,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         }
         try {
           const reg = await navigator.serviceWorker?.ready
-          if (reg && 'sync' in reg) {
+          if (reg && 'sync'in reg) {
             await (
               reg as ServiceWorkerRegistration & {
                 sync: { register: (tag: string) => Promise<void> }
@@ -3446,7 +3446,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           /* Background Sync niet ondersteund */
         }
       }
-      if ('locks' in navigator) {
+      if ('locks'in navigator) {
         await (navigator as Navigator & { locks: LockManager }).locks.request(
           `vysion_queue_${tenant}`,
           async () => {
@@ -3463,7 +3463,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     } else {
       console.error('Kassa: admin order insert error:', insRes.error)
       alert(
-        `${t('kassaApp.orderPersistFailedTitle')}\n\n${t('kassaApp.orderPersistFailedBody')}${insRes.error ? `\n\n(${insRes.error})` : ''}`,
+        `${t('kassaApp.orderPersistFailedTitle')}\n\n${t('kassaApp.orderPersistFailedBody')}${insRes.error ? `\n\n(${insRes.error})`: ''}`,
       )
       return
     }
@@ -3497,8 +3497,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       subtotalExclVat: Math.round(subtotal * 100) / 100,
       totalTax: Math.round(tax * 100) / 100,
       paymentMethod: method,
-      splitCash: method === 'SPLIT' ? splitAmounts?.cash : undefined,
-      splitCard: method === 'SPLIT' ? splitAmounts?.card : undefined,
+      splitCash: method === 'SPLIT'? splitAmounts?.cash : undefined,
+      splitCard: method === 'SPLIT'? splitAmounts?.card : undefined,
       orderType,
       tableNumber: receiptTable,
       floorPlanZone: receiptTable ? dineInFloorZone : undefined,
@@ -3535,7 +3535,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
        */
       draftCopies?: 1 | 2
       /** Standaard kassa; keuken bij «naar tafel»-delta. */
-      receiptMode?: 'kassa' | 'keuken'
+      receiptMode?: 'kassa' |  'keuken'
     },
   ) => {
     if (!order) {
@@ -3641,7 +3641,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     const terraceSuffix =
       order.orderType === 'DINE_IN' && order.floorPlanZone === FLOOR_PLAN_ZONE_TERRACE
-        ? ` (${t('kassaApp.floorZoneTerrace')})`
+        ? `(${t('kassaApp.floorZoneTerrace')})`
         : ''
 
     const bonLines: string[] = []
@@ -3674,7 +3674,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       const lineTotal = (i.product.price + choicesTotal) * i.quantity
       bonLines.push(`${i.quantity}x ${i.product.name}  EUR ${lineTotal.toFixed(2)}`)
       for (const c of i.choices || []) {
-        bonLines.push(`  + ${c.choiceName}${c.price > 0 ? `  EUR ${c.price.toFixed(2)}` : ''}`)
+        bonLines.push(` + ${c.choiceName}${c.price > 0 ? ` EUR ${c.price.toFixed(2)}`: ''}`)
       }
     }
     bonLines.push('--------------------------------')
@@ -3748,13 +3748,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       ? `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${escapeReceiptHtml(docTitle)}</title><style>${KASSA_PRINT_RECEIPT_STYLES}</style></head><body>
       <div class="center">
         <div class="bold big">${bizName}</div>
-        ${tenantInfo?.address ? `<div class="small">${escapeReceiptHtml(tenantInfo.address)}</div>` : ''}
-        ${tenantInfo?.postal_code || tenantInfo?.city ? `<div class="small">${escapeReceiptHtml(tenantInfo.postal_code ?? '')} ${escapeReceiptHtml(tenantInfo.city ?? '')}</div>` : ''}
-        ${tenantInfo?.phone ? `<div class="small">${escapeReceiptHtml(t('kassaReceipt.telPrefix'))} ${escapeReceiptHtml(tenantInfo.phone)}</div>` : ''}
+        ${tenantInfo?.address ? `<div class="small">${escapeReceiptHtml(tenantInfo.address)}</div>`: ''}
+        ${tenantInfo?.postal_code || tenantInfo?.city ? `<div class="small">${escapeReceiptHtml(tenantInfo.postal_code ?? '')} ${escapeReceiptHtml(tenantInfo.city ?? '')}</div>`: ''}
+        ${tenantInfo?.phone ? `<div class="small">${escapeReceiptHtml(t('kassaReceipt.telPrefix'))} ${escapeReceiptHtml(tenantInfo.phone)}</div>`: ''}
       </div>
       <div class="divider"></div>
-      ${isDraft ? `<div class="center bold">${escapeReceiptHtml(barKitchenDelta ? t('kassaReceipt.barToogBanner') : t('kassaReceipt.draftBanner'))}</div>${barKitchenDelta ? `<div class="center small">${escapeReceiptHtml(t('kassaReceipt.barToogHint'))}</div>` : ''}<div class="divider-solid"></div>` : ''}
-      <div class="center order-type">${escapeReceiptHtml(orderTypeLabel)}${receiptTableNr ? `<br/>${escapeReceiptHtml(t('kassaReceipt.tablePrefix'))} ${escapeReceiptHtml(receiptTableNr)}${escapeReceiptHtml(terraceSuffix)}` : ''}</div>
+      ${isDraft ? `<div class="center bold">${escapeReceiptHtml(barKitchenDelta ? t('kassaReceipt.barToogBanner') : t('kassaReceipt.draftBanner'))}</div>${barKitchenDelta ? `<div class="center small">${escapeReceiptHtml(t('kassaReceipt.barToogHint'))}</div>`: ''}<div class="divider-solid"></div>`: ''}
+      <div class="center order-type">${escapeReceiptHtml(orderTypeLabel)}${receiptTableNr ? `<br/>${escapeReceiptHtml(t('kassaReceipt.tablePrefix'))} ${escapeReceiptHtml(receiptTableNr)}${escapeReceiptHtml(terraceSuffix)}`: ''}</div>
       <div class="row small">
         <span>${escapeReceiptHtml(t('kassaReceipt.receiptNo'))}${escapeReceiptHtml(receiptRefDisplay)}</span>
         <span>${escapeReceiptHtml(dateStr)}</span>
@@ -3764,7 +3764,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
         const lineTotal = (i.product.price + choicesTotal) * i.quantity
         return `<div class="row"><span>${i.quantity}x ${escapeReceiptHtml(i.product.name)}</span><span>€${lineTotal.toFixed(2)}</span></div>
-        ${(i.choices || []).map(c => `<div class="row small" style="margin-left:15px;color:#666;"><span>+ ${escapeReceiptHtml(c.choiceName)}</span><span>${c.price > 0 ? '€' + c.price.toFixed(2) : ''}</span></div>`).join('')}`
+        ${(i.choices || []).map(c => `<div class="row small" style="margin-left:15px;color:#666;"><span>+ ${escapeReceiptHtml(c.choiceName)}</span><span>${c.price > 0 ? '€'+ c.price.toFixed(2) : ''}</span></div>`).join('')}`
       }).join('')}
       <div class="divider-solid"></div>
       <div class="row"><span>${escapeReceiptHtml(t('kassaReceipt.subtotal'))}</span><span>€${subtotal.toFixed(2)}</span></div>
@@ -3781,12 +3781,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       <div class="row total"><span>${escapeReceiptHtml(t('kassaReceipt.total'))}</span><span>€${order.total.toFixed(2)}</span></div>
       <div class="divider"></div>
       <div class="center small">${escapeReceiptHtml(t('kassaReceipt.paidWith'))} ${escapeReceiptHtml(payLabel)}</div>
-      ${order.helpedByStaffName ? `<div class="divider"></div><div class="center bold">${t('kassaReceipt.helpedBy').replace('{name}', escapeReceiptHtml(order.helpedByStaffName))}</div>` : ''}
+      ${order.helpedByStaffName ? `<div class="divider"></div><div class="center bold">${t('kassaReceipt.helpedBy').replace('{name}', escapeReceiptHtml(order.helpedByStaffName))}</div>`: ''}
       <div class="divider"></div>
       <div class="center small">
-        ${tenantInfo?.btw_number ? `${escapeReceiptHtml(t('kassaReceipt.businessVatLabel').replace('{vatNumber}', tenantInfo.btw_number))}<br/>` : ''}
+        ${tenantInfo?.btw_number ? `${escapeReceiptHtml(t('kassaReceipt.businessVatLabel').replace('{vatNumber}', tenantInfo.btw_number))}<br/>`: ''}
         ${escapeReceiptHtml(isDraft ? (barKitchenDelta ? t('kassaReceipt.barToogFooter') : t('kassaReceipt.draftFooter')) : t('kassaReceipt.thanks'))}
-        ${tenantInfo?.website ? `<br/>${escapeReceiptHtml(tenantInfo.website)}` : ''}
+        ${tenantInfo?.website ? `<br/>${escapeReceiptHtml(tenantInfo.website)}`: ''}
       </div>
     </body></html>`
         : ''
@@ -4038,7 +4038,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     applyOwnerOnlyLogoutCleanup(tenant)
     setTerminalLogout({ kind: 'staff', tenantSlug: tenant })
-    broadcastTenantOwnerLogout({ scope: 'owner', tenantSlug: tenant, landing: 'tenant-login' })
+    broadcastTenantOwnerLogout({ scope: 'owner', tenantSlug: tenant, landing: 'tenant-login'})
     const origin = window.location.origin
     const next = buildShopInternalReturnPath(tenant, window.location.pathname, window.location.search)
     const loginUrl = `${origin}/login?next=${encodeURIComponent(next)}`
@@ -4216,56 +4216,56 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {
           key: 'addCategory',
           labelKey: 'kassaApp.quickMenuAddCategory',
-          kind: 'nav' as const,
+          kind: 'nav'as const,
           href: `${baseUrl}/categorieen`,
           submenuId: 'sm_kassa_categorieen',
         },
         {
           key: 'addProduct',
           labelKey: 'kassaApp.quickMenuAddProduct',
-          kind: 'nav' as const,
+          kind: 'nav'as const,
           href: `${baseUrl}/producten`,
           submenuId: 'sm_kassa_producten',
         },
         {
           key: 'clockOut',
           labelKey: 'kassaApp.quickMenuClockOut',
-          kind: 'clock' as const,
+          kind: 'clock'as const,
           submenuId: 'sm_personeel_inuitklokken',
           requireStaffClock: true,
         },
         {
           key: 'sales',
           labelKey: 'kassaApp.quickMenuSales',
-          kind: 'nav' as const,
+          kind: 'nav'as const,
           href: `${baseUrl}/verkoop`,
           submenuId: 'sm_rpt_verkoop',
         },
         {
           key: 'online',
           labelKey: 'kassaApp.quickMenuOnlineToggle',
-          kind: 'nav' as const,
+          kind: 'nav'as const,
           href: `${baseUrl}/online-status`,
           submenuId: 'sm_online_status',
         },
         {
           key: 'openingHours',
           labelKey: 'kassaApp.quickMenuOpeningHours',
-          kind: 'nav' as const,
+          kind: 'nav'as const,
           href: `${baseUrl}/openingstijden`,
           submenuId: 'sm_inst_opening',
         },
         {
           key: 'shopProfile',
           labelKey: 'kassaApp.quickMenuShopProfile',
-          kind: 'nav' as const,
+          kind: 'nav'as const,
           href: `${baseUrl}/profiel`,
           submenuId: 'sm_web_profiel',
         },
         {
           key: 'orders',
           labelKey: 'kassaApp.quickMenuOrders',
-          kind: 'nav' as const,
+          kind: 'nav'as const,
           href: `${baseUrl}/bestellingen`,
           submenuId: 'sm_orders_bestellingen',
         },
@@ -4275,7 +4275,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const isKassaQuickMenuActionEnabled = useCallback(
     (action: (typeof kassaQuickMenuActions)[number]) => {
-      if ('requireStaffClock' in action && action.requireStaffClock && !showKassaStaffClockButton) {
+      if ('requireStaffClock'in action && action.requireStaffClock && !showKassaStaffClockButton) {
         return false
       }
       return quickMenuAllowedSubmenuIds.has(action.submenuId)
@@ -4290,7 +4290,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         kassaAppearanceDark
           ? kassaPosQuickMenuPanelButtonClass()
           : `rounded-xl bg-[#161616] text-[#f0f0f0] ${KASSA_POS_QUICK_MENU_LIFT_SHADOW} hover:brightness-110 active:brightness-90`,
-        !enabled ? 'pointer-events-none opacity-40' : '',
+        !enabled ? 'pointer-events-none opacity-40': '',
       ].join(' '),
     [kassaAppearanceDark],
   )
@@ -4319,10 +4319,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const paymentMethodOptions = useMemo<KassaPayOption[]>(
     () => [
-      { method: 'CASH', label: t('kassaApp.payCash'), icon: '', color: '#10b981' },
-      { method: 'CARD', label: t('kassaApp.payCard'), icon: '', color: '#3b82f6' },
-      { method: 'IDEAL', label: t('kassaApp.payIdeal'), icon: '', color: '#ec4899' },
-      { method: 'BANCONTACT', label: t('kassaApp.payBancontact'), icon: '', color: '#f59e0b' },
+      { method: 'CASH', label: t('kassaApp.payCash'), icon: '', color: '#10b981'},
+      { method: 'CARD', label: t('kassaApp.payCard'), icon: '', color: '#3b82f6'},
+      { method: 'IDEAL', label: t('kassaApp.payIdeal'), icon: '', color: '#ec4899'},
+      { method: 'BANCONTACT', label: t('kassaApp.payBancontact'), icon: '', color: '#f59e0b'},
     ],
     [t],
   )
@@ -4362,7 +4362,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     : KASSA_HEADER_QUICK_LINK_BTN
 
   const headerUtilityBtnClass = (selected: boolean) =>
-    kassaAppearanceDark ? `${kassaDarkHeaderBtnShell} gap-0.5 sm:gap-1 ${kassaPosButtonClass(selected)}` : ''
+    kassaAppearanceDark ? `${kassaDarkHeaderBtnShell} gap-0.5 sm:gap-1 ${kassaPosButtonClass(selected)}`: ''
 
   const cartLineQtyBtnCompact = kassaSxgaDenseTiles && kassaSidebarFooterTier === 'dense'
 
@@ -4414,7 +4414,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             loading="eager"
             onError={kassaProductImageRetryOnError}
             className={`${thumbClass} ${
-              item.product.image_display_mode === 'contain' ? 'object-contain p-0.5' : 'object-cover'
+              item.product.image_display_mode === 'contain'? 'object-contain p-0.5': 'object-cover'
             }`}
           />
         ) : (
@@ -4422,7 +4422,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         )}
         <div className="min-w-0 flex-1">
           <p
-            className={`truncate font-bold ${ui.cartTitle} ${kassaAppearanceDark ? 'text-[13px] leading-tight' : 'text-sm'}`}
+            className={`truncate font-bold ${ui.cartTitle} ${kassaAppearanceDark ? 'text-[13px] leading-tight': 'text-sm'}`}
           >
             {item.product.name}
           </p>
@@ -4430,7 +4430,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <p className={`truncate text-xs ${ui.cartChoices}`}>{item.choices.map((c) => c.choiceName).join(', ')}</p>
           ) : null}
           <p
-            className={`font-bold ${kassaAppearanceDark ? `text-xs ${ui.priceAccentClass}` : 'text-sm text-emerald-600'}`}
+            className={`font-bold ${kassaAppearanceDark ? `text-xs ${ui.priceAccentClass}`: 'text-sm text-emerald-600'}`}
           >
             €{lineTotal}
           </p>
@@ -4443,14 +4443,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               kassaAppearanceDark
                 ? `touch-manipulation ${kassaPosCartQtyButtonClass(cartLineQtyBtnCompact)}`
                 : `touch-manipulation rounded-lg bg-red-500 text-white font-bold flex items-center justify-center hover:bg-red-600 active:brightness-95 ${
-                    cartLineQtyBtnCompact ? 'h-8 w-8 text-base' : 'h-9 w-9 text-lg'
+                    cartLineQtyBtnCompact ? 'h-8 w-8 text-base': 'h-9 w-9 text-lg'
                   }`
             }
             aria-label={item.quantity === 1 ? t('kassaApp.ariaRemoveLine') : t('kassaApp.ariaDecreaseQty')}
           >
             {item.quantity === 1 ? (
               <span
-                className={kassaAppearanceDark ? 'text-[1.05rem] leading-none' : undefined}
+                className={kassaAppearanceDark ? 'text-[1.05rem] leading-none': undefined}
                 aria-hidden
               >
                 
@@ -4470,7 +4470,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   kassaAppearanceDark
                     ? `touch-manipulation ${kassaPosCartQtyButtonClass(cartLineQtyBtnCompact)} text-sm`
                     : `touch-manipulation rounded-lg bg-amber-500 text-white flex items-center justify-center hover:bg-amber-600 active:brightness-95 ${
-                        cartLineQtyBtnCompact ? 'h-8 w-8 text-sm' : 'h-9 w-9 text-sm'
+                        cartLineQtyBtnCompact ? 'h-8 w-8 text-sm': 'h-9 w-9 text-sm'
                       }`
                 }
                 title={t('kassaApp.ariaEditOptions')}
@@ -4487,7 +4487,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               kassaAppearanceDark
                 ? `touch-manipulation ${kassaPosCartQtyButtonClass(cartLineQtyBtnCompact)}`
                 : `touch-manipulation rounded-lg bg-[#3C4D6B] text-white font-bold flex items-center justify-center hover:bg-[#2D3A52] active:brightness-95 ${
-                    cartLineQtyBtnCompact ? 'h-8 w-8 text-base' : 'h-9 w-9 text-lg'
+                    cartLineQtyBtnCompact ? 'h-8 w-8 text-base': 'h-9 w-9 text-lg'
                   }`
             }
             aria-label={t('kassaApp.ariaIncreaseQty')}
@@ -4525,13 +4525,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 kassaAppearanceDark
                   ? `touch-manipulation ${kassaPosCartQtyButtonClass(cartLineQtyBtnCompact)}`
                   : `touch-manipulation rounded-lg bg-red-500 text-white font-bold flex items-center justify-center hover:bg-red-600 active:brightness-95 ${
-                      cartLineQtyBtnCompact ? 'h-8 w-8 text-base' : 'h-9 w-9 text-lg'
+                      cartLineQtyBtnCompact ? 'h-8 w-8 text-base': 'h-9 w-9 text-lg'
                     }`
               }
               aria-label={item.quantity === 1 ? t('kassaApp.ariaRemoveLine') : t('kassaApp.ariaDecreaseQty')}
             >
               {item.quantity === 1 ? (
-                <span className={kassaAppearanceDark ? 'text-[1.05rem] leading-none' : undefined} aria-hidden>
+                <span className={kassaAppearanceDark ? 'text-[1.05rem] leading-none': undefined} aria-hidden>
                   
                 </span>
               ) : (
@@ -4546,7 +4546,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 kassaAppearanceDark
                   ? `touch-manipulation ${kassaPosCartQtyButtonClass(cartLineQtyBtnCompact)}`
                   : `touch-manipulation rounded-lg bg-[#3C4D6B] text-white font-bold flex items-center justify-center hover:bg-[#2D3A52] active:brightness-95 ${
-                      cartLineQtyBtnCompact ? 'h-8 w-8 text-base' : 'h-9 w-9 text-lg'
+                      cartLineQtyBtnCompact ? 'h-8 w-8 text-base': 'h-9 w-9 text-lg'
                     }`
               }
               aria-label={t('kassaApp.ariaIncreaseQty')}
@@ -4629,7 +4629,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             return (
               <div className="absolute top-full left-0 mt-1 flex z-30">
                 {/* Eerste kolom: modules */}
-                <div className={`${ui.flyMenuPanel} overflow-y-auto`} style={{ width: 240, maxHeight: '85vh' }}>
+                <div className={`${ui.flyMenuPanel} overflow-y-auto`} style={{ width: 240, maxHeight: '85vh'}}>
                   <div
                     className={`sticky top-0 rounded-t-2xl px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white ${
                       kassaAppearanceDark ? KASSA_POS_MENU_PLATE_SHELL_BG_CLASS : 'bg-[#1e293b]'
@@ -4664,7 +4664,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 </div>
                 {/* Tweede popup rechts: sub-items */}
                 {hamburgerOpen && hamburgerSubOpen && activeMod && (
-                  <div className={`ml-2 overflow-y-auto self-start ${ui.flyMenuPanel}`} style={{ width: 220, maxHeight: '85vh' }}>
+                  <div className={`ml-2 overflow-y-auto self-start ${ui.flyMenuPanel}`} style={{ width: 220, maxHeight: '85vh'}}>
                     <div
                       className={`sticky top-0 rounded-t-2xl px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white ${
                         kassaAppearanceDark ? KASSA_POS_MENU_PLATE_SHELL_BG_CLASS : 'bg-[#1e293b]'
@@ -4720,7 +4720,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* Snelkoppelingen: 4cm naar rechts op groot scherm; op 17″ 2cm extra naast zaaknaam */}
         <div
           className={`relative z-20 flex min-h-0 min-w-0 flex-1 items-center ${
-            kassaSxgaDenseTiles ? 'ml-[2cm]' : 'ml-[4cm]'
+            kassaSxgaDenseTiles ? 'ml-[2cm]': 'ml-[4cm]'
           }`}
         >
           <nav
@@ -4756,7 +4756,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               aria-hidden={KASSA_HEADER_HIDE_CUSTOMER_DISPLAY_AND_SOUND}
               tabIndex={KASSA_HEADER_HIDE_CUSTOMER_DISPLAY_AND_SOUND ? -1 : 0}
               className={`relative ${headerQuickLinkBtnClass} ${
-                KASSA_HEADER_HIDE_CUSTOMER_DISPLAY_AND_SOUND ? 'hidden' : ''
+                KASSA_HEADER_HIDE_CUSTOMER_DISPLAY_AND_SOUND ? 'hidden': ''
               }`}
             >
               <span className={KASSA_HEADER_QUICK_LINK_LABEL}>{t('kassaApp.openCustomerDisplay')}</span>
@@ -4803,7 +4803,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             tabIndex={KASSA_HEADER_HIDE_CUSTOMER_DISPLAY_AND_SOUND ? -1 : 0}
             className={`${headerQuickLinkBtnClass} ${
               soundsOn || kassaAppearanceDark ? '' : 'bg-white/10 text-white hover:bg-white/20'
-            } ${KASSA_HEADER_HIDE_CUSTOMER_DISPLAY_AND_SOUND ? 'hidden' : ''}`}
+            } ${KASSA_HEADER_HIDE_CUSTOMER_DISPLAY_AND_SOUND ? 'hidden': ''}`}
             title={soundsOn ? t('kassaApp.soundOnTitle') : t('kassaApp.soundOffTitle')}
           >
             <span className={KASSA_HEADER_QUICK_LINK_LABEL}>
@@ -4854,7 +4854,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               }
             >
               <LocaleFlagEmoji locale={locale} variant="inline" className="text-sm text-white sm:text-[15px]" />
-              <svg className={`size-4 shrink-0 transition-transform ${langOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+              <svg className={`size-4 shrink-0 transition-transform ${langOpen ? 'rotate-180': ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
             </button>
             {langOpen && (
               <div className={ui.langPanel}>
@@ -4918,7 +4918,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           {selectedCategory && categories.length > 0 && (
             <div
               className={`flex shrink-0 items-stretch border-b ${ui.categoryStripBorder} ${ui.categoryStripBg} ${
-                kassaAppearanceDark ? 'pl-2' : ''
+                kassaAppearanceDark ? 'pl-2': ''
               }`}
             >
               <button
@@ -4929,7 +4929,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 className={`touch-manipulation select-none flex shrink-0 items-center justify-center min-h-[3rem] min-w-[3.75rem] px-3 pl-4 transition-colors active:brightness-95 sm:min-h-[3.25rem] sm:min-w-[4.25rem] sm:pl-5 ${ui.categoryStripHover} border-r ${ui.categoryStripBorder}`}
               >
                 <svg
-                  className={`h-7 w-7 shrink-0 sm:h-8 sm:w-8 ${kassaAppearanceDark ? 'text-[#f0f0f0]' : ui.categoryStripIcon}`}
+                  className={`h-7 w-7 shrink-0 sm:h-8 sm:w-8 ${kassaAppearanceDark ? 'text-[#f0f0f0]': ui.categoryStripIcon}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -4948,7 +4948,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 onPointerCancel={handleCategoryStripPointerCancel}
                 onClick={handleCategoryStripClick}
                 className={`flex min-w-0 flex-1 touch-pan-x overflow-x-auto overflow-y-hidden overscroll-x-contain select-none [scrollbar-gutter:stable] [-webkit-overflow-scrolling:touch] ${
-                  kassaSxgaDenseTiles ? 'gap-2 px-2 py-2' : 'gap-1.5 px-1.5 py-1.5'
+                  kassaSxgaDenseTiles ? 'gap-2 px-2 py-2': 'gap-1.5 px-1.5 py-1.5'
                 }`}
               >
                 {categories.map((cat) => {
@@ -4986,10 +4986,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </div>
           )}
 
-          <div className={`flex min-h-0 flex-1 flex-col ${kassaAppearanceDark ? 'px-3 pb-3 pt-1.5' : ''}`}>
+          <div className={`flex min-h-0 flex-1 flex-col ${kassaAppearanceDark ? 'px-3 pb-3 pt-1.5': ''}`}>
             <div
               className={`flex min-h-0 flex-1 flex-col overflow-hidden ${
-                kassaAppearanceDark ? `${KASSA_POS_MENU_RECESS_TRAY_CLASS} ${KASSA_POS_BTN_SHAPE}` : ''
+                kassaAppearanceDark ? `${KASSA_POS_MENU_RECESS_TRAY_CLASS} ${KASSA_POS_BTN_SHAPE}`: ''
               }`}
             >
           {/* Grid — min-h-0 nodig: anders groeit de flex-child mee met alle tegels en wordt onderaan afgekapt zonder scroll */}
@@ -4997,7 +4997,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             ref={kassaMenuScrollRef}
             data-testid="kassa-menu-scroll"
             className={`relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4 touch-manipulation [overflow-anchor:none] [scrollbar-gutter:stable] ${
-              kassaAppearanceDark ? 'gks-menu-vignette' : ''
+              kassaAppearanceDark ? 'gks-menu-vignette': ''
             }`}
           >
             {menuLoading ? (
@@ -5014,16 +5014,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 <div
                   ref={kassaCategoryGridRef}
                   data-testid="kassa-category-grid"
-                  data-kassa-sxga-tiles={kassaSxgaDenseTiles ? '1' : '0'}
+                  data-kassa-sxga-tiles={kassaSxgaDenseTiles ? '1': '0'}
                   onPointerDown={handleCategoryGridPointerDown}
                   onPointerUp={handleCategoryGridPointerUp}
                   onPointerCancel={handleCategoryGridPointerCancel}
                   onClick={handleCategoryGridClick}
-                  className={`grid min-h-0 w-full grid-cols-2 pb-8 touch-manipulation select-none ${kassaSxgaDenseTiles ? 'gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5' : 'gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'} [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start' : 'items-stretch'}`}
+                  className={`grid min-h-0 w-full grid-cols-2 pb-8 touch-manipulation select-none ${kassaSxgaDenseTiles ? 'gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5': 'gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'} [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start': 'items-stretch'}`}
                   style={
                     kassaSxgaDenseTiles ?
-                      { gridAutoRows: 'max-content' }
-                    : { gridAutoRows: `${kassaMenuRowPx}px` }
+                      { gridAutoRows: 'max-content'}
+                    : { gridAutoRows: `${kassaMenuRowPx}px`}
                   }
                 >
                   {categories.map((cat) => {
@@ -5051,16 +5051,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   <div
                     ref={kassaProductGridRef}
                     data-testid="kassa-product-grid"
-                    data-kassa-sxga-tiles={kassaSxgaDenseTiles ? '1' : '0'}
+                    data-kassa-sxga-tiles={kassaSxgaDenseTiles ? '1': '0'}
                     onPointerDown={handleProductGridPointerDown}
                     onPointerUp={handleProductGridPointerUp}
                     onPointerCancel={handleProductGridPointerCancel}
                     onClick={handleProductGridClick}
-                    className={`grid min-h-0 w-full grid-cols-2 pb-8 touch-manipulation select-none ${kassaSxgaDenseTiles ? 'gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5' : 'gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'} [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start' : 'items-stretch'}`}
+                    className={`grid min-h-0 w-full grid-cols-2 pb-8 touch-manipulation select-none ${kassaSxgaDenseTiles ? 'gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5': 'gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'} [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start': 'items-stretch'}`}
                     style={
                       kassaSxgaDenseTiles ?
-                        { gridAutoRows: 'max-content' }
-                      : { gridAutoRows: `${kassaMenuRowPx}px` }
+                        { gridAutoRows: 'max-content'}
+                      : { gridAutoRows: `${kassaMenuRowPx}px`}
                     }
                   >
                     {productsInSelectedCategory.map((product) => {
@@ -5154,9 +5154,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* ── Rechts: numpad / cart ── */}
         <div
           className={`${
-            kassaSxgaDenseTiles ? 'w-[332px] max-w-[38vw]' : 'w-80 sm:w-96 lg:w-[380px]'
+            kassaSxgaDenseTiles ? 'w-[332px] max-w-[38vw]': 'w-80 sm:w-96 lg:w-[380px]'
           } flex min-h-0 min-w-0 flex-shrink-0 flex-col overflow-y-hidden ${
-            kassaSxgaDenseTiles ? 'overflow-x-visible' : 'overflow-hidden'
+            kassaSxgaDenseTiles ? 'overflow-x-visible': 'overflow-hidden'
           } ${
             kassaAppearanceDark
               ? `border-l ${KASSA_POS_RULE_BLACK} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`
@@ -5167,7 +5167,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* Zone: Verkoop / Binnen / Terras — drie gelijke knoppen; geen aparte klok-/datumbalk. */}
         <div
           className={`shrink-0 ${
-            kassaAppearanceDark ? 'px-2.5 pt-3 pb-1 sm:px-3' : 'px-2 pt-1.5 pb-1'
+            kassaAppearanceDark ? 'px-2.5 pt-3 pb-1 sm:px-3': 'px-2 pt-1.5 pb-1'
           }`}
         >
             <div className={`flex min-w-0 ${kassaSidebarRowGapClass}`}>
@@ -5302,7 +5302,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 <span className="mt-0.5 max-w-full truncate text-[10px] font-semibold normal-case opacity-95 sm:text-xs">
                   {t('kassaApp.tableWord')} {tableNumber}
                   {dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE
-                    ? ` (${t('kassaApp.floorZoneTerraceShort')})`
+                    ? `(${t('kassaApp.floorZoneTerraceShort')})`
                     : ''}
                 </span>
               ) : null}
@@ -5352,7 +5352,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* Cart / numpad (toggle via footer) */}
         <div
           className={`flex min-h-0 flex-1 flex-col overflow-hidden touch-pan-y ${
-            kassaAppearanceDark ? 'px-3 pt-1' : 'px-2.5 pt-1.5'
+            kassaAppearanceDark ? 'px-3 pt-1': 'px-2.5 pt-1.5'
           }`}
         >
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
@@ -5385,9 +5385,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               {cart.length > 0 ? (
               <div
                 className={`flex min-h-0 flex-1 flex-col overflow-hidden ${KASSA_NUMPAD_CART_RECESS_MOTION} ${
-                  numpadPanelVisible ? 'pointer-events-none opacity-[0.28]' : 'opacity-100'
+                  numpadPanelVisible ? 'pointer-events-none opacity-[0.28]': 'opacity-100'
                 } ${
-                  kassaSidebarFooterTier === 'comfort' ? 'gap-2' : kassaSidebarFooterTier === 'compact' ? 'gap-1.5' : 'gap-1'
+                  kassaSidebarFooterTier === 'comfort'? 'gap-2': kassaSidebarFooterTier === 'compact'? 'gap-1.5': 'gap-1'
                 }`}
               >
               {showParkedTableLinesInSidebar && cart.length > 0 ? (
@@ -5415,7 +5415,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               ) : null}
               <div
                 className={`absolute inset-0 z-[3] flex min-h-0 flex-col justify-end overflow-hidden ${KASSA_NUMPAD_PANEL_SLIDE_MOTION} ${
-                  numpadPanelVisible ? 'translate-y-0 pointer-events-auto' : 'translate-y-full pointer-events-none'
+                  numpadPanelVisible ? 'translate-y-0 pointer-events-auto': 'translate-y-full pointer-events-none'
                 }`}
                 data-testid="kassa-numpad-panel"
                 aria-hidden={!numpadPanelVisible}
@@ -5435,7 +5435,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 ) : null}
                 <div
                   className={`min-w-0 flex flex-col justify-center gap-0.5 ${
-                    !kassaAppearanceDark && tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1' : 'w-full'
+                    !kassaAppearanceDark && tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1': 'w-full'
                   }`}
                 >
                   {!kassaAppearanceDark ? (
@@ -5458,7 +5458,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               </div>
               <div
                 className={`grid shrink-0 grid-cols-4 touch-manipulation select-none [grid-template-rows:repeat(4,minmax(2.75rem,1fr))] ${
-                  kassaAppearanceDark ? 'gap-2.5' : 'gap-2'
+                  kassaAppearanceDark ? 'gap-2.5': 'gap-2'
                 }`}
                 onClick={(e) => {
                   const el = (e.target as HTMLElement).closest('[data-kassa-numpad-key]')
@@ -5522,7 +5522,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 ) : null}
                 <div
                   className={`min-w-0 flex flex-col justify-center gap-0.5 ${
-                    !kassaAppearanceDark && tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1' : 'w-full'
+                    !kassaAppearanceDark && tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1': 'w-full'
                   }`}
                 >
                   {!kassaAppearanceDark ? (
@@ -5584,7 +5584,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               ) : cart.length > 0 ? (
               <div
                 className={`flex min-h-0 flex-1 flex-col overflow-hidden ${
-                  kassaSidebarFooterTier === 'comfort' ? 'gap-2' : kassaSidebarFooterTier === 'compact' ? 'gap-1.5' : 'gap-1'
+                  kassaSidebarFooterTier === 'comfort'? 'gap-2': kassaSidebarFooterTier === 'compact'? 'gap-1.5': 'gap-1'
                 }`}
               >
               {!kassaAppearanceDark ? (
@@ -5603,7 +5603,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     </button>
                   ) : null}
                   <p
-                    className={`min-w-0 truncate whitespace-nowrap text-right text-[11px] font-semibold leading-tight tracking-tight ${ui.numpadMeta} ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1' : 'w-full'}`}
+                    className={`min-w-0 truncate whitespace-nowrap text-right text-[11px] font-semibold leading-tight tracking-tight ${ui.numpadMeta} ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1': 'w-full'}`}
                     title={numpadHeaderDateLabel}
                     aria-live="polite"
                   >
@@ -5641,11 +5641,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {kassaAppearanceDark ? (
           <div
             className={`sticky bottom-0 z-10 shrink-0 border-t ${KASSA_POS_RULE_BLACK} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} ${
-              kassaSxgaDenseTiles ? 'px-2.5 py-2 space-y-2' : 'px-3 py-2.5 space-y-2.5'
+              kassaSxgaDenseTiles ? 'px-2.5 py-2 space-y-2': 'px-3 py-2.5 space-y-2.5'
             }`}
           >
             <div
-              className={`flex w-full touch-manipulation select-none ${kassaSxgaDenseTiles ? 'gap-2' : 'gap-3'} ${kassaFooterActionTouchMinHClass(
+              className={`flex w-full touch-manipulation select-none ${kassaSxgaDenseTiles ? 'gap-2': 'gap-3'} ${kassaFooterActionTouchMinHClass(
                 kassaSxgaDenseTiles,
                 kassaSidebarFooterTier === 'dense',
               )}`}
@@ -5670,7 +5670,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 </span>
                 <span
                   className={`min-w-0 truncate text-right font-bold tabular-nums tracking-tight text-red-500 ${
-                    kassaSxgaDenseTiles || kassaSidebarFooterTier !== 'dense' ? 'text-2xl sm:text-[1.65rem]' : 'text-xl'
+                    kassaSxgaDenseTiles || kassaSidebarFooterTier !== 'dense'? 'text-2xl sm:text-[1.65rem]': 'text-xl'
                   }`}
                 >
                   €{total.toFixed(2)}
@@ -5678,7 +5678,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               </div>
             </div>
             <div
-              className={`grid grid-cols-3 touch-manipulation select-none ${kassaSxgaDenseTiles ? 'gap-2' : 'gap-3'}`}
+              className={`grid grid-cols-3 touch-manipulation select-none ${kassaSxgaDenseTiles ? 'gap-2': 'gap-3'}`}
             >
               <button
                 type="button"
@@ -5726,7 +5726,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   type="button"
                   onClick={() => parkOrder({ printKitchen: true, printKassaSlip: false })}
                   className={`min-w-0 flex-1 font-semibold flex items-center justify-center text-center px-2 py-3 text-[11px] leading-tight sm:text-xs ${kassaPosButtonClass(false)} ${
-                    kassaSxgaDenseTiles ? 'min-h-[2.875rem]' : 'min-h-[2.5rem]'
+                    kassaSxgaDenseTiles ? 'min-h-[2.875rem]': 'min-h-[2.5rem]'
                   }`}
                 >
                   {t('kassaApp.parkTableKitchenBon')}
@@ -5735,14 +5735,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   type="button"
                   onClick={() => parkOrder({ printKitchen: false, printKassaSlip: true })}
                   className={`min-w-0 flex-1 font-semibold flex items-center justify-center text-center px-2 py-3 text-[11px] leading-tight sm:text-xs ${kassaPosButtonClass(false)} ${
-                    kassaSxgaDenseTiles ? 'min-h-[2.875rem]' : 'min-h-[2.5rem]'
+                    kassaSxgaDenseTiles ? 'min-h-[2.875rem]': 'min-h-[2.5rem]'
                   }`}
                 >
                   {t('kassaApp.parkTableKassaBon')}
                 </button>
               </div>
             )}
-            <div className={`flex touch-manipulation select-none ${kassaSxgaDenseTiles ? 'gap-2' : 'gap-2.5'}`}>
+            <div className={`flex touch-manipulation select-none ${kassaSxgaDenseTiles ? 'gap-2': 'gap-2.5'}`}>
               <button
                 type="button"
                 aria-pressed={numpadPanelVisible}
@@ -5754,7 +5754,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   setNumpadPanelVisible((v) => !v)
                 }}
                 className={`flex items-center justify-center px-3 ${KASSA_SIDEBAR_FOOTER_LEFT_COL} ${kassaPosButtonClass(numpadPanelVisible)} ${
-                  kassaSxgaDenseTiles ? 'min-h-[4rem] py-3.5' : 'min-h-[3.5rem] py-3'
+                  kassaSxgaDenseTiles ? 'min-h-[4rem] py-3.5': 'min-h-[3.5rem] py-3'
                 }`}
               >
                 <span className={kassaSidebarActionLabelClass}>{t('kassaApp.numpadToggle')}</span>
@@ -5769,7 +5769,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 }}
                 disabled={billLines.length === 0}
                 className={`flex min-w-0 flex-1 items-center justify-center ${KASSA_POS_CHECKOUT_BTN} ${
-                  kassaSxgaDenseTiles ? 'min-h-[4rem] py-3.5 text-lg' : 'min-h-[3.5rem] py-3 text-lg'
+                  kassaSxgaDenseTiles ? 'min-h-[4rem] py-3.5 text-lg': 'min-h-[3.5rem] py-3 text-lg'
                 }`}
               >
                 {t('kassaApp.checkout')}
@@ -5790,7 +5790,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 aria-pressed={quickMenuPanelOpen}
                 onClick={toggleKassaQuickMenu}
                 className={`flex items-center justify-center rounded-xl px-3 py-2 text-xs font-bold leading-tight text-white ${KASSA_SIDEBAR_FOOTER_LEFT_COL} ${
-                  quickMenuPanelOpen ? 'bg-[#2D3A52] ring-2 ring-[#58CCFF]/60' : 'bg-[#3C4D6B] hover:bg-[#2D3A52]'
+                  quickMenuPanelOpen ? 'bg-[#2D3A52] ring-2 ring-[#58CCFF]/60': 'bg-[#3C4D6B] hover:bg-[#2D3A52]'
                 }`}
                 title={t('kassaApp.quickMenu')}
               >
@@ -5878,7 +5878,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   setNumpadPanelVisible((v) => !v)
                 }}
                 className={`flex items-center justify-center rounded-xl bg-black px-3 font-bold text-white hover:bg-zinc-800 min-h-[3.5rem] py-3 text-sm sm:text-base ${KASSA_SIDEBAR_FOOTER_LEFT_COL} ${
-                  numpadPanelVisible ? 'ring-2 ring-white/40' : ''
+                  numpadPanelVisible ? 'ring-2 ring-white/40': ''
                 }`}
               >
                 {t('kassaApp.numpadToggle')}
@@ -5935,13 +5935,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         onPinInputChange={setStaffClockPinInput}
         onStartClockIn={(s) => {
           playClick()
-          setStaffClockPinModal({ staffId: s.id, staffName: s.name, action: 'in' })
+          setStaffClockPinModal({ staffId: s.id, staffName: s.name, action: 'in'})
           setStaffClockPinInput('')
           setStaffClockPinError(null)
         }}
         onStartClockOut={(s) => {
           playClick()
-          setStaffClockPinModal({ staffId: s.id, staffName: s.name, action: 'out' })
+          setStaffClockPinModal({ staffId: s.id, staffName: s.name, action: 'out'})
           setStaffClockPinInput('')
           setStaffClockPinError(null)
         }}
@@ -5974,7 +5974,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           onClose={() => setOptionsModal(null)}
           onToggleChoice={toggleChoice}
           onConfirm={confirmOptions}
-          appearance={kassaAppearanceDark ? 'dark' : 'light'}
+          appearance={kassaAppearanceDark ? 'dark': 'light'}
         />
       ) : null}
 
@@ -6192,7 +6192,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     setShowTablePicker(false)
                     setShowFloorPlan(true)
                   }}
-                  className={`flex items-center justify-center py-3 text-sm font-semibold ${tableNumber ? 'flex-1' : 'w-full'} ${
+                  className={`flex items-center justify-center py-3 text-sm font-semibold ${tableNumber ? 'flex-1': 'w-full'} ${
                     kassaAppearanceDark
                       ? kassaPosButtonClass(false)
                       : 'rounded-xl bg-[#3C4D6B] text-white transition-colors hover:bg-[#2D3A52]'
@@ -6219,7 +6219,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           setShowSplitModal(true)
           setShowPaymentModal(false)
         }}
-        appearance={kassaAppearanceDark ? 'dark' : 'light'}
+        appearance={kassaAppearanceDark ? 'dark': 'light'}
       />
 
       <KassaSplitPaymentModal
@@ -6234,7 +6234,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           setShowPaymentModal(true)
         }}
         onConfirm={() => void completePayment('SPLIT', { cash: splitCash, card: splitCard })}
-        appearance={kassaAppearanceDark ? 'dark' : 'light'}
+        appearance={kassaAppearanceDark ? 'dark': 'light'}
       />
 
       {printAgentFallbackHtml !== null && (
@@ -6299,7 +6299,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <p
               className={`whitespace-pre-wrap text-sm leading-relaxed ${
-                thermalPrintBanner.variant === 'error' ? 'text-red-200' : 'text-emerald-200'
+                thermalPrintBanner.variant === 'error'? 'text-red-200': 'text-emerald-200'
               }`}
             >
               {thermalPrintBanner.message}

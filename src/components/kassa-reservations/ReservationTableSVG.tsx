@@ -53,10 +53,10 @@ export function ReservationTableSVG({
     } else {
       const perSide = Math.ceil(seats / 4)
       const sides = [
-        { angle: 0, axis: 'x' as const, fixed: -dist },
-        { angle: -90, axis: 'y' as const, fixed: dist },
-        { angle: 180, axis: 'x' as const, fixed: dist },
-        { angle: 90, axis: 'y' as const, fixed: -dist },
+        { angle: 0, axis: 'x'as const, fixed: -dist },
+        { angle: -90, axis: 'y'as const, fixed: dist },
+        { angle: 180, axis: 'x'as const, fixed: dist },
+        { angle: 90, axis: 'y'as const, fixed: -dist },
       ]
       let placed = 0
       for (const side of sides) {
@@ -64,8 +64,8 @@ export function ReservationTableSVG({
         for (let i = 0; i < count; i++) {
           const offset = (i - (count - 1) / 2) * (chairW + 6)
           chairs.push({
-            x: side.axis === 'x' ? offset : side.fixed,
-            y: side.axis === 'y' ? offset : side.fixed,
+            x: side.axis === 'x'? offset : side.fixed,
+            y: side.axis === 'y'? offset : side.fixed,
             angle: side.angle,
           })
           placed++
@@ -98,8 +98,8 @@ export function ReservationTableSVG({
   }
 
   const pad = 80
-  const tw = table.shape === 'RECTANGLE' ? tableSize * 1.7 : tableSize
-  const th = table.shape === 'RECTANGLE' ? tableSize * 0.65 : tableSize
+  const tw = table.shape === 'RECTANGLE'? tableSize * 1.7 : tableSize
+  const th = table.shape === 'RECTANGLE'? tableSize * 0.65 : tableSize
   const svgW = tw + pad * 2 + 40
   const svgH = th + pad * 2 + 40
   const cx = svgW / 2
@@ -108,7 +108,7 @@ export function ReservationTableSVG({
   const uid = table.id.replace(/[^a-z0-9]/gi, '')
 
   return (
-    <svg width={svgW} height={svgH} style={{ overflow: 'visible', display: 'block' }}>
+    <svg width={svgW} height={svgH} style={{ overflow: 'visible', display: 'block'}}>
       <defs>
         <linearGradient id={`tg-round-${uid}`} x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#6b6b6b" />
@@ -142,7 +142,7 @@ export function ReservationTableSVG({
         const haloStroke = 11
         const haloOpacity = 0.42 * ringOp
         const expand = 5
-        const haloStyle = { filter: `blur(${haloBlur}px)` as const }
+        const haloStyle = { filter: `blur(${haloBlur}px)`as const }
         if (table.shape === 'ROUND') {
           return (
             <ellipse
@@ -190,7 +190,7 @@ export function ReservationTableSVG({
         )
       })()}
 
-      {table.shape === 'ROUND' ? (
+      {table.shape === 'ROUND'? (
         <ellipse
           cx={cx}
           cy={cy}
@@ -202,7 +202,7 @@ export function ReservationTableSVG({
           strokeWidth={isSelected ? 5 : 4}
           filter={`url(#rshadow-${uid})`}
         />
-      ) : table.shape === 'RECTANGLE' ? (
+      ) : table.shape === 'RECTANGLE'? (
         <rect
           x={cx - tw / 2}
           y={cy - th / 2}
@@ -230,7 +230,7 @@ export function ReservationTableSVG({
         />
       )}
 
-      {table.shape === 'ROUND' ? (
+      {table.shape === 'ROUND'? (
         <ellipse cx={cx - 12} cy={cy - 14} rx={16} ry={10} fill="rgba(255,255,255,0.08)" />
       ) : (
         <rect x={cx - tw / 2 + 8} y={cy - th / 2 + 6} width={tw * 0.35} height={th * 0.25} rx={4} fill="rgba(255,255,255,0.07)" />
@@ -240,8 +240,8 @@ export function ReservationTableSVG({
         <ellipse
           cx={cx}
           cy={cy}
-          rx={(table.shape === 'ROUND' ? tableSize / 2 : tw / 2) + 8}
-          ry={(table.shape === 'RECTANGLE' ? th / 2 : tableSize / 2) + 8}
+          rx={(table.shape === 'ROUND'? tableSize / 2 : tw / 2) + 8}
+          ry={(table.shape === 'RECTANGLE'? th / 2 : tableSize / 2) + 8}
           fill="none"
           stroke={statusColor}
           strokeWidth={2}
@@ -250,7 +250,7 @@ export function ReservationTableSVG({
         />
       )}
 
-      <text x={cx} y={cy - 6} textAnchor="middle" fill="white" fontSize={20} fontWeight="bold" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))' }}>
+      <text x={cx} y={cy - 6} textAnchor="middle" fill="white" fontSize={20} fontWeight="bold" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))'}}>
         {table.number}
       </text>
       <text x={cx} y={cy + 14} textAnchor="middle" fill="rgba(255,255,255,0.6)" fontSize={12}>
@@ -270,7 +270,7 @@ export function ReservationTableSVG({
         const labelW = Math.min(286, Math.max(Math.round(tw * 1.32) + 64, 244))
         const nameW = Math.max(96, labelW - padL - padR - gapNameTime - timeW)
         const totalH = guests.length * lineH + padTop + padBottom
-        const startY = cy + (table.shape === 'RECTANGLE' ? th / 2 : tableSize / 2) + gap + chairH + 10
+        const startY = cy + (table.shape === 'RECTANGLE'? th / 2 : tableSize / 2) + gap + chairH + 10
         const baselineY = (i: number) => startY + padTop + i * lineH + 24
         const oneLineName = (n: string) => n.replace(/\r?\n|\r/g, ' ').replace(/\s+/g, ' ').trim()
         return (
@@ -280,7 +280,7 @@ export function ReservationTableSVG({
                 <rect x={cx - labelW / 2 + padL} y={startY} width={nameW} height={totalH} />
               </clipPath>
             </defs>
-            <rect x={cx - labelW / 2} y={startY} width={labelW} height={totalH} rx={14} fill="white" style={{ filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.22))' }} />
+            <rect x={cx - labelW / 2} y={startY} width={labelW} height={totalH} rx={14} fill="white" style={{ filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.22))'}} />
             {guests.map((g, i) => (
               <g key={i}>
                 <text x={cx - labelW / 2 + padL} y={baselineY(i)} fill="#111827" fontSize={nameFont} fontWeight="700" clipPath={`url(#nameClip-${table.id})`}>

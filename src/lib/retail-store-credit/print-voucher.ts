@@ -49,7 +49,7 @@ function buildStoreCreditVoucherHtml(opts: {
     .divider{border-top:1px dashed #000;margin:6px 0}
   </style></head><body>
     <div class="center bold">${escapeReceiptHtml(tenantInfo?.business_name || '')}</div>
-    ${tenantInfo?.address ? `<div class="center small">${escapeReceiptHtml(tenantInfo.address)}</div>` : ''}
+    ${tenantInfo?.address ? `<div class="center small">${escapeReceiptHtml(tenantInfo.address)}</div>`: ''}
     <div class="divider"></div>
     <div class="center bold">${escapeReceiptHtml(labels.creditNoteTitle)}</div>
     <div class="center bold">${escapeReceiptHtml(labels.storeCreditTitle)}</div>

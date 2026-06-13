@@ -23,7 +23,7 @@ export async function parseJsonBody<T>(
   } catch {
     return {
       ok: false,
-      response: NextResponse.json({ error: 'Ongeldige of lege JSON' }, { status: 400 }),
+      response: NextResponse.json({ error: 'Ongeldige of lege JSON'}, { status: 400 }),
     }
   }
   const parsed = schema.safeParse(raw)

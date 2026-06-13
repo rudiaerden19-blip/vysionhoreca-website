@@ -63,9 +63,9 @@ interface TenantInfo {
   website?: string
 }
 
-type Tab = 'overzicht' | 'xrapport' | 'zrapport' | 'boekhouding' | 'facturen'
-type PaymentPeriod = 'month' | 'year'
-type ExportPeriod = 'day' | 'week' | 'month' | 'year'
+type Tab = 'overzicht' |  'xrapport' |  'zrapport' |  'boekhouding' |  'facturen'
+type PaymentPeriod = 'month' |  'year'
+type ExportPeriod = 'day' |  'week' |  'month' |  'year'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 const KASSA_TYPES = ['DINE_IN', 'TAKEAWAY', 'DELIVERY']
@@ -80,11 +80,11 @@ function subDays(d: Date, n: number) { const r = new Date(d); r.setDate(r.getDat
 function subMonths(d: Date, n: number) { return new Date(d.getFullYear(), d.getMonth()-n, 1) }
 function addMonths(d: Date, n: number) { return new Date(d.getFullYear(), d.getMonth()+n, 1) }
 function daysInMonth(y: number, m: number) { return new Date(y, m+1, 0).getDate() }
-function fmt(n: number) { return `€${n.toFixed(2)}` }
-function fmtDate(s: string) { const d = new Date(s); return `${d.getDate()} ${NL_MONTHS[d.getMonth()]}` }
+function fmt(n: number) { return `€${n.toFixed(2)}`}
+function fmtDate(s: string) { const d = new Date(s); return `${d.getDate()} ${NL_MONTHS[d.getMonth()]}`}
 /** Korte datum voor periode-onderregels (nl-BE → “2 apr.”) */
 function fmtDayShort(d: Date) {
-  return d.toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' }).replace(/\s+$/, '')
+  return d.toLocaleDateString('nl-BE', { day: 'numeric', month: 'short'}).replace(/\s+$/, '')
 }
 
 /** JSONB kan als object of als string binnenkomen — anders crasht .forEach op populaire producten. */
@@ -290,7 +290,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
           const row = payload.new as { report_register_opening_cash?: number | string | null }
           const v = row?.report_register_opening_cash
           if (v === undefined || v === null || v === '') return
-          const n = typeof v === 'number' ? v : parseFloat(String(v))
+          const n = typeof v === 'number'? v : parseFloat(String(v))
           if (Number.isFinite(n)) setOpeningCash(n)
         }
       )
@@ -516,7 +516,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
       btw_percentage: defaultBtw,
       generated_at: now.toISOString(),
       business_name: tenantInfo?.business_name || tenant,
-    }, { tenantSlug: tenant, onConflict: 'tenant_slug,report_date' })
+    }, { tenantSlug: tenant, onConflict: 'tenant_slug,report_date'})
     if (!zRes.ok) {
       console.error('[rapporten] Z-rapport opslaan mislukt:', zRes.error)
       alert(`Z-rapport opslaan mislukt: ${zRes.error}`)
@@ -534,7 +534,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
 
   const openOverviewEmailModal = () => {
     try {
-      const raw = typeof window !== 'undefined' ? localStorage.getItem('vysion_tenant') : null
+      const raw = typeof window !== 'undefined'? localStorage.getItem('vysion_tenant') : null
       if (raw) {
         const parsed = JSON.parse(raw) as { email?: string }
         if (typeof parsed.email === 'string' && parsed.email.trim())
@@ -662,8 +662,8 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
       </div>
     </div>
     <div class="info">
-    ${tenantInfo?.address ? `${escapeHtml(tenantInfo.address)}<br>` : ''}${postalCity ? `${escapeHtml(postalCity)}<br>` : ''}
-    ${tenantInfo?.btw_number ? `BTW: ${escapeHtml(tenantInfo.btw_number)}<br>` : ''}Periode: <strong>${escapeHtml(EXPORT_PERIOD_LABEL_NL[exportPeriod])}</strong></div>
+    ${tenantInfo?.address ? `${escapeHtml(tenantInfo.address)}<br>`: ''}${postalCity ? `${escapeHtml(postalCity)}<br>`: ''}
+    ${tenantInfo?.btw_number ? `BTW: ${escapeHtml(tenantInfo.btw_number)}<br>`: ''}Periode: <strong>${escapeHtml(EXPORT_PERIOD_LABEL_NL[exportPeriod])}</strong></div>
     <div class="summary">
     <div class="sitem"><div class="slabel">Totale Omzet</div><div class="sval">€${totalRev.toFixed(2)}</div></div>
     <div class="sitem"><div class="slabel">Bestellingen</div><div class="sval">${exp.length}</div></div>
@@ -770,11 +770,11 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
   // RENDER
   // ─────────────────────────────────────────────────────────────────────────────
   const tabs: { id: Tab; label: string; icon: string; activeColor: string }[] = [
-    { id:'overzicht',   label:'Overzicht',   icon: '', activeColor:'bg-[#1e293b] text-white' },
-    { id:'xrapport',    label:'X-Rapport',   icon: '', activeColor:'bg-blue-500 text-white' },
-    { id:'zrapport',    label:'Z-Rapport',   icon: '', activeColor:'bg-red-500 text-white' },
-    { id:'boekhouding', label:'Boekhouding', icon: '', activeColor:'bg-emerald-500 text-white' },
-    { id:'facturen',    label:'Facturen',    icon: '', activeColor:'bg-purple-500 text-white' },
+    { id:'overzicht',   label:'Overzicht',   icon: '', activeColor:'bg-[#1e293b] text-white'},
+    { id:'xrapport',    label:'X-Rapport',   icon: '', activeColor:'bg-blue-500 text-white'},
+    { id:'zrapport',    label:'Z-Rapport',   icon: '', activeColor:'bg-red-500 text-white'},
+    { id:'boekhouding', label:'Boekhouding', icon: '', activeColor:'bg-emerald-500 text-white'},
+    { id:'facturen',    label:'Facturen',    icon: '', activeColor:'bg-purple-500 text-white'},
   ]
 
   return (
@@ -831,7 +831,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
             {/* 4 Stat cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { title:'Omzet Vandaag', value:fmt(todayRevenue), sub:`${todayOrders.length} bestellingen`, icon:'€', color:'#10b981' },
+                { title:'Omzet Vandaag', value:fmt(todayRevenue), sub:`${todayOrders.length} bestellingen`, icon:'€', color:'#10b981'},
                 {
                   title:'Omzet Week',
                   value:fmt(weekRevenue),
@@ -846,7 +846,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
                   icon: '',
                   color:'#8b5cf6',
                 },
-                { title:'Gem. Bestelling', value:fmt(avgOrder), icon: '', color:'#f59e0b' },
+                { title:'Gem. Bestelling', value:fmt(avgOrder), icon: '', color:'#f59e0b'},
               ].map(c => (
                 <div key={c.title} className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg mb-4" style={{backgroundColor:c.color+'20',color:c.color}}>{c.icon}</div>
@@ -894,11 +894,11 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
                 </div>
                 <div className="space-y-4">
                   {[
-                    { key:'CASH',       label:'Contant',    color:'#10b981', icon: '' },
-                    { key:'CARD',       label:'PIN/Kaart',  color:'#3b82f6', icon: '' },
-                    { key:'IDEAL',      label:'iDEAL',      color:'#ec4899', icon: '' },
-                    { key:'BANCONTACT', label:'Bancontact', color:'#f59e0b', icon: '' },
-                    { key:'ONLINE',     label:'Online bet.', color:'#8b5cf6', icon: '' },
+                    { key:'CASH',       label:'Contant',    color:'#10b981', icon: ''},
+                    { key:'CARD',       label:'PIN/Kaart',  color:'#3b82f6', icon: ''},
+                    { key:'IDEAL',      label:'iDEAL',      color:'#ec4899', icon: ''},
+                    { key:'BANCONTACT', label:'Bancontact', color:'#f59e0b', icon: ''},
+                    { key:'ONLINE',     label:'Online bet.', color:'#8b5cf6', icon: ''},
                   ].map(m => {
                     const amount = paymentToday[m.key as keyof typeof paymentToday]||0
                     const pct = todayRevenue > 0 ? (amount/todayRevenue)*100 : 0
@@ -923,9 +923,9 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
               <h2 className="text-base font-semibold text-gray-800 mb-5">Besteltypen Vandaag</h2>
               <div className="grid grid-cols-3 gap-4">
                 {[
-                  { key:'DINE_IN',  label:'Ter plaatse', color:'#6366f1' },
-                  { key:'TAKEAWAY', label:'Afhalen',      color:'#10b981' },
-                  { key:'DELIVERY', label:'Bezorgen',     color:'#f59e0b' },
+                  { key:'DINE_IN',  label:'Ter plaatse', color:'#6366f1'},
+                  { key:'TAKEAWAY', label:'Afhalen',      color:'#10b981'},
+                  { key:'DELIVERY', label:'Bezorgen',     color:'#f59e0b'},
                 ].map(t => (
                   <div key={t.key} className="p-5 rounded-2xl text-center" style={{backgroundColor:t.color+'18'}}>
                     <p className="text-3xl font-bold mb-1" style={{color:t.color}}>{fmt(orderTypesToday[t.key as keyof typeof orderTypesToday]||0)}</p>
@@ -945,9 +945,9 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
                 </div>
                 <div className="grid grid-cols-3 gap-3">
                   {[
-                    { val:klanten.today,  label:'Vandaag',      color:'text-[#6366f1]' },
-                    { val:klanten.week,   label:'Deze Week',    color:'text-[#3b82f6]' },
-                    { val:klanten.month,  label:'Deze Maand',   color:'text-purple-500' },
+                    { val:klanten.today,  label:'Vandaag',      color:'text-[#6366f1]'},
+                    { val:klanten.week,   label:'Deze Week',    color:'text-[#3b82f6]'},
+                    { val:klanten.month,  label:'Deze Maand',   color:'text-purple-500'},
                   ].map(k => (
                     <div key={k.label} className="text-center p-4 rounded-xl bg-gray-50">
                       <p className={`text-3xl font-bold ${k.color}`}>{k.val}</p>
@@ -965,9 +965,9 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
                 </div>
                 <div className="space-y-3">
                   {[
-                    { label:'Vandaag',    count:online.todayCount,  rev:online.todayRev,  color:'text-blue-400' },
-                    { label:'Deze Week',  count:online.weekCount,   rev:online.weekRev,   color:'text-[#3b82f6]' },
-                    { label:'Deze Maand', count:online.monthCount,  rev:online.monthRev,  color:'text-purple-500' },
+                    { label:'Vandaag',    count:online.todayCount,  rev:online.todayRev,  color:'text-blue-400'},
+                    { label:'Deze Week',  count:online.weekCount,   rev:online.weekRev,   color:'text-[#3b82f6]'},
+                    { label:'Deze Maand', count:online.monthCount,  rev:online.monthRev,  color:'text-purple-500'},
                   ].map(o => (
                     <div key={o.label} className="flex items-center justify-between p-4 rounded-xl bg-gray-50">
                       <div>
@@ -996,7 +996,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
                     {popularDineIn.map((item, i) => (
                       <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${i===0?'bg-yellow-100 text-yellow-600':i===1?'bg-gray-200 text-gray-500':i===2?'bg-amber-100 text-amber-600':'bg-gray-100 text-gray-400'}`}>
-                          {i===0?'⭐':i+1}
+                          {i + 1}
                         </div>
                         <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
                           {item.image ? <img src={item.image} alt={item.name} className="w-full h-full object-cover"/> : <div className="w-full h-full flex items-center justify-center text-gray-400 text-lg"></div>}
@@ -1025,7 +1025,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
                     {popularOnline.map((item, i) => (
                       <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${i===0?'bg-yellow-100 text-yellow-600':i===1?'bg-gray-200 text-gray-500':i===2?'bg-amber-100 text-amber-600':'bg-gray-100 text-gray-400'}`}>
-                          {i===0?'⭐':i+1}
+                          {i + 1}
                         </div>
                         <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
                           <span className="text-blue-400 text-lg"></span>
@@ -1152,10 +1152,10 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
             {/* 4 stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { label:'Transacties',   value:String(xData.count),    color:'text-gray-900' },
-                { label:'Totaal Omzet',  value:fmt(xData.total),       color:'text-emerald-500' },
-                { label:'Contant',       value:fmt(xData.cash),        color:'text-gray-900' },
-                { label:'PIN/Kaart',     value:fmt(xData.card),        color:'text-gray-900' },
+                { label:'Transacties',   value:String(xData.count),    color:'text-gray-900'},
+                { label:'Totaal Omzet',  value:fmt(xData.total),       color:'text-emerald-500'},
+                { label:'Contant',       value:fmt(xData.cash),        color:'text-gray-900'},
+                { label:'PIN/Kaart',     value:fmt(xData.card),        color:'text-gray-900'},
               ].map(s => (
                 <div key={s.label} className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
                   <p className="text-sm text-gray-400 mb-2">{s.label}</p>
@@ -1214,12 +1214,12 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
               <h3 className="font-bold text-gray-800 mb-4">Huidige Periode Samenvatting</h3>
               <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
                 {[
-                  { label:'Transacties:', value:String(xData.count), color:'text-gray-900' },
-                  { label:'Totaal Omzet:', value:fmt(xData.total), color:'text-emerald-500' },
-                  { label:'Contant:', value:fmt(xData.cash), color:'text-gray-900' },
-                  { label:'PIN/Kaart:', value:fmt(xData.card), color:'text-gray-900' },
-                  { label:'Begin Kas:', value:fmt(openingCash), color:'text-gray-900' },
-                  { label:'Verwachte Kas:', value:fmt(xData.expectedCash), color:'text-emerald-500' },
+                  { label:'Transacties:', value:String(xData.count), color:'text-gray-900'},
+                  { label:'Totaal Omzet:', value:fmt(xData.total), color:'text-emerald-500'},
+                  { label:'Contant:', value:fmt(xData.cash), color:'text-gray-900'},
+                  { label:'PIN/Kaart:', value:fmt(xData.card), color:'text-gray-900'},
+                  { label:'Begin Kas:', value:fmt(openingCash), color:'text-gray-900'},
+                  { label:'Verwachte Kas:', value:fmt(xData.expectedCash), color:'text-emerald-500'},
                 ].map(r => (
                   <div key={r.label} className="flex justify-between py-2 border-b border-gray-100">
                     <span className="text-gray-500">{r.label}</span>
@@ -1243,7 +1243,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
                 <div className={`mt-4 p-4 rounded-xl ${Math.abs(closingCash-xData.expectedCash)<1?'bg-emerald-50 border border-emerald-200':'bg-red-50 border border-red-200'}`}>
                   <p className="font-bold text-sm">Verschil: {fmt(closingCash-xData.expectedCash)}</p>
                   <p className="text-xs text-gray-500 mt-1">
-                    {Math.abs(closingCash-xData.expectedCash)<1?' Kas klopt!':closingCash>xData.expectedCash?' Kas is te hoog':' Kas tekort'}
+                    {Math.abs(closingCash-xData.expectedCash)<1?'Kas klopt!':closingCash>xData.expectedCash?'Kas is te hoog':'Kas tekort'}
                   </p>
                 </div>
               )}
@@ -1262,7 +1262,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
                 <div className="flex gap-3">
                   <button onClick={()=>setShowZConfirm(false)} className="flex-1 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 font-semibold text-gray-600 transition-colors">Annuleer</button>
                   <button onClick={generateZReport} disabled={zGenerating} className="flex-1 py-3 rounded-xl bg-red-500 hover:bg-red-600 text-white font-bold transition-colors disabled:opacity-50">
-                    {zGenerating ? 'Bezig...' : ' Bevestigen'}
+                    {zGenerating ? 'Bezig...': 'Bevestigen'}
                   </button>
                 </div>
               </div>
@@ -1316,7 +1316,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
                   <h3 className="font-semibold text-gray-800">Selecteer Z-Rapporten</h3>
                 </div>
                 <button onClick={toggleAllZReports} className="text-sm text-blue-500 hover:underline">
-                  {selectedZReports.length === zReports.length ? 'Deselecteer alles' : 'Selecteer alles'}
+                  {selectedZReports.length === zReports.length ? 'Deselecteer alles': 'Selecteer alles'}
                 </button>
               </div>
               {zReports.length === 0 ? (
@@ -1470,7 +1470,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
                 onClick={() => void sendOverviewEmailReport()}
                 className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-medium text-sm disabled:opacity-50"
               >
-                {overviewEmailSending ? 'Versturen…' : 'Versturen'}
+                {overviewEmailSending ? 'Versturen…': 'Versturen'}
               </button>
             </div>
           </div>

@@ -738,7 +738,7 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
         <video
           ref={videoRef}
           className={
-            cameraScanActive ? 'absolute inset-0 h-full w-full object-cover' : 'h-px w-px'
+            cameraScanActive ? 'absolute inset-0 h-full w-full object-cover': 'h-px w-px'
           }
           playsInline
           muted

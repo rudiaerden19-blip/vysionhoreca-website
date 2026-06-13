@@ -8,7 +8,7 @@ export function kassaProductImageRetryOnError(ev: { currentTarget: HTMLImageElem
   img.setAttribute('data-vysion-img-retry', '1')
   try {
     const baseSrc = img.src
-    const u = new URL(baseSrc, typeof window !== 'undefined' ? window.location.href : undefined)
+    const u = new URL(baseSrc, typeof window !== 'undefined'? window.location.href : undefined)
     u.searchParams.set('vysion_retry', String(Date.now()))
     img.src = u.toString()
   } catch {

@@ -159,7 +159,7 @@ export default function TroubleshootingPage() {
                 >
                   <span className="font-semibold text-white pr-4">{faq.question}</span>
                   <svg 
-                    className={`w-5 h-5 text-gray-400 transition-transform flex-shrink-0 ${openFaq === index ? 'rotate-180' : ''}`} 
+                    className={`w-5 h-5 text-gray-400 transition-transform flex-shrink-0 ${openFaq === index ? 'rotate-180': ''}`} 
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"

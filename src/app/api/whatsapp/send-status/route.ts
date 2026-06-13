@@ -15,59 +15,59 @@ const WHATSAPP_API_URL = `https://graph.facebook.com/${WHATSAPP_API_VERSION}`
 // Status types and their messages
 const STATUS_MESSAGES: Record<string, { nl: string; emoji: string }> = {
   confirmed: {
-    emoji: '✅',
-    nl: `✅ *Bestelling Bevestigd!*
+    emoji: '',
+    nl: `*Bestelling Bevestigd!*
 
 Je bestelling #{orderNumber} is bevestigd door {businessName}!
 
-We zijn ermee bezig en laten je weten wanneer het klaar is. 🍟`
+We zijn ermee bezig en laten je weten wanneer het klaar is. `
   },
   preparing: {
-    emoji: '👨‍🍳',
-    nl: `👨‍🍳 *Bestelling wordt bereid!*
+    emoji: '',
+    nl: `*Bestelling wordt bereid!*
 
 Je bestelling #{orderNumber} wordt nu klaargemaakt.
 
-Nog even geduld... ⏳`
+Nog even geduld... `
   },
   ready: {
-    emoji: '🔔',
-    nl: `🔔 *Je bestelling is KLAAR!*
+    emoji: '',
+    nl: `*Je bestelling is KLAAR!*
 
 Bestelnummer: #{orderNumber}
 
-Je kunt je bestelling nu ophalen bij {businessName}! 🍟
+Je kunt je bestelling nu ophalen bij {businessName}! 
 
-Tot zo! 👋`
+Tot zo! `
   },
   delivering: {
-    emoji: '🚗',
-    nl: `🚗 *Onderweg!*
+    emoji: '',
+    nl: `*Onderweg!*
 
 Je bestelling #{orderNumber} is onderweg naar jou!
 
-Bezorger is vertrokken. 📍`
+Bezorger is vertrokken. `
   },
   delivered: {
-    emoji: '✅',
-    nl: `✅ *Bezorgd!*
+    emoji: '',
+    nl: `*Bezorgd!*
 
 Je bestelling #{orderNumber} is bezorgd.
 
 Bedankt voor je bestelling bij {businessName}! 
-Smakelijk! 😋`
+Smakelijk! `
   },
   cancelled: {
-    emoji: '❌',
-    nl: `❌ *Bestelling Geannuleerd*
+    emoji: '',
+    nl: `*Bestelling Geannuleerd*
 
 Je bestelling #{orderNumber} is helaas geannuleerd.
 
 Neem contact op met {businessName} voor meer informatie.`
   },
   rejected: {
-    emoji: '❌',
-    nl: `❌ *Bestelling Afgewezen*
+    emoji: '',
+    nl: `*Bestelling Afgewezen*
 
 Je bestelling #{orderNumber} is helaas afgewezen.
 
@@ -81,13 +81,13 @@ export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID()
   try {
     const body = await request.json()
-    console.log('📨 WhatsApp send-status called with:', JSON.stringify(body))
+    console.log('WhatsApp send-status called with:', JSON.stringify(body))
 
     const { tenantSlug, customerPhone, orderNumber, status, rejectionReason } = body
 
     if (!tenantSlug || !customerPhone || !orderNumber || !status) {
-      console.log('❌ Missing required fields:', { tenantSlug, customerPhone, orderNumber, status })
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+      console.log('Missing required fields:', { tenantSlug, customerPhone, orderNumber, status })
+      return NextResponse.json({ error: 'Missing required fields'}, { status: 400 })
     }
 
     // ── Auth: alleen ingelogde zaak-eigenaar of superadmin ─────────────────
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
     if (!access.authorized) {
       logger.warn('whatsapp/send-status: unauthorized', { requestId, tenantSlug })
       return NextResponse.json(
-        { error: access.error || 'Niet geautoriseerd' },
+        { error: access.error || 'Niet geautoriseerd'},
         { status: 403 }
       )
     }
@@ -111,8 +111,8 @@ export async function POST(request: NextRequest) {
     const rl = await checkRateLimit(apiRateLimiter, `wa-status:${tenantSlug}:${actorId}`)
     if (!rl.success) {
       return NextResponse.json(
-        { error: 'Te veel statusberichten. Probeer over 1 minuut opnieuw.' },
-        { status: 429, headers: { 'Retry-After': '60' } }
+        { error: 'Te veel statusberichten. Probeer over 1 minuut opnieuw.'},
+        { status: 429, headers: { 'Retry-After': '60'} }
       )
     }
 
@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
 
     // Check if status is valid
     if (!STATUS_MESSAGES[status]) {
-      return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
+      return NextResponse.json({ error: 'Invalid status'}, { status: 400 })
     }
 
     // Get tenant WhatsApp settings (try normalized slug first, then original)
@@ -144,8 +144,8 @@ export async function POST(request: NextRequest) {
     }
 
     if (!tenant) {
-      console.log('❌ No WhatsApp settings found for tenant:', tenantSlug, 'or', normalizedSlug)
-      return NextResponse.json({ error: 'WhatsApp not configured' }, { status: 404 })
+      console.log('No WhatsApp settings found for tenant:', tenantSlug, 'or', normalizedSlug)
+      return NextResponse.json({ error: 'WhatsApp not configured'}, { status: 404 })
     }
 
     // Get tenant name
@@ -228,19 +228,19 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const error = await response.text()
-      console.error('❌ WhatsApp API error:', error)
+      console.error('WhatsApp API error:', error)
       // Rollback dedup-row zodat een retry mogelijk is.
       if (dedupRowId) {
         await supabaseAdmin.from('whatsapp_send_log').delete().eq('id', dedupRowId)
       }
-      return NextResponse.json({ error: 'Failed to send WhatsApp message' }, { status: 500 })
+      return NextResponse.json({ error: 'Failed to send WhatsApp message'}, { status: 500 })
     }
 
-    console.log(`✅ Status update "${status}" sent to ${formattedPhone}`)
+    console.log(`Status update "${status}" sent to ${formattedPhone}`)
     return NextResponse.json({ success: true })
 
   } catch (error: any) {
-    console.error('❌ Error sending status update:', error)
+    console.error('Error sending status update:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

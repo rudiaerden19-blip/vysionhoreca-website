@@ -82,7 +82,7 @@ export async function flushOfflineOrdersToSupabase(tenantSlug: string): Promise<
   }
 
   try {
-    if ('locks' in navigator) {
+    if ('locks'in navigator) {
       await (navigator as Navigator & { locks: LockManager }).locks.request(
         `vysion_queue_${tenantSlug}`,
         processQueue,

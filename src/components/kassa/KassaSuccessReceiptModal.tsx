@@ -36,18 +36,18 @@ export function KassaSuccessReceiptModal({
   /** Voorkom dubbeltik tijdens print / guard-ref sync. */
   printDisabled?: boolean
   /** Winkelkassa: afdrukken + naar mail + sluiten. */
-  footerActions?: 'print-close' | 'print-email-close'
+  footerActions?: 'print-close' |  'print-email-close'
   onEmail?: () => Promise<void>
   emailDisabled?: boolean
   emailDisabledHint?: string
   /** Retail winkelkassa: EAN-13 onderaan bon (991… + bonnummer). */
   ticketBarcodeEan13?: string | null
   /** Winkelkassa: bonlayout zoals retail ticket (ORDER/PRODUCT/BTW/blok). */
-  receiptVariant?: 'default' | 'retail'
+  receiptVariant?: 'default' |  'retail'
   retailReceiptLabels?: RetailReceiptI18n
 }) {
   const { t } = useLanguage()
-  /** Meteen spinner na tik (parent `printDisabled` komt pas na re-render). */
+  /** Meteen spinner na tik (parent `printDisabled`komt pas na re-render). */
   const [optimisticPrintBusy, setOptimisticPrintBusy] = useState(false)
   const [optimisticEmailBusy, setOptimisticEmailBusy] = useState(false)
   const printBusy = printDisabled || optimisticPrintBusy
@@ -64,7 +64,7 @@ export function KassaSuccessReceiptModal({
   if (!open) return null
 
   const legacyVatRate =
-    typeof tenantInfo?.btw_percentage === 'number' ? tenantInfo.btw_percentage : 6
+    typeof tenantInfo?.btw_percentage === 'number'? tenantInfo.btw_percentage : 6
   const useVatSplit =
     Array.isArray(order.vatSplit) &&
     order.vatSplit.length > 0 &&

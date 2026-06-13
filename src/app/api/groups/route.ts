@@ -14,12 +14,12 @@ export async function GET(request: NextRequest) {
     const tenant_slug = searchParams.get('tenant_slug')
 
     if (!tenant_slug) {
-      return NextResponse.json({ error: 'tenant_slug is required' }, { status: 400 })
+      return NextResponse.json({ error: 'tenant_slug is required'}, { status: 400 })
     }
 
     const access = await verifyTenantOrSuperAdmin(request, tenant_slug)
     if (!access.authorized) {
-      return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
+      return NextResponse.json({ error: access.error || 'Forbidden'}, { status: 403 })
     }
 
     const { data, error } = await supabase
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(data)
   } catch (error) {
     console.error('Error fetching groups:', error)
-    return NextResponse.json({ error: 'Failed to fetch groups' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to fetch groups'}, { status: 500 })
   }
 }
 
@@ -70,14 +70,14 @@ export async function POST(request: NextRequest) {
 
     if (!tenant_slug || !name || !contact_name || !contact_email) {
       return NextResponse.json(
-        { error: 'tenant_slug, name, contact_name, and contact_email are required' },
+        { error: 'tenant_slug, name, contact_name, and contact_email are required'},
         { status: 400 }
       )
     }
 
     const access = await verifyTenantOrSuperAdmin(request, tenant_slug)
     if (!access.authorized) {
-      return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
+      return NextResponse.json({ error: access.error || 'Forbidden'}, { status: 403 })
     }
 
     const { data: codeData } = await supabase.rpc('generate_group_access_code')
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(data)
   } catch (error) {
     console.error('Error creating group:', error)
-    return NextResponse.json({ error: 'Failed to create group' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to create group'}, { status: 500 })
   }
 }
 
@@ -120,7 +120,7 @@ export async function PUT(request: NextRequest) {
     const { id, ...updates } = body
 
     if (!id) {
-      return NextResponse.json({ error: 'id is required' }, { status: 400 })
+      return NextResponse.json({ error: 'id is required'}, { status: 400 })
     }
 
     const { data: existing, error: loadError } = await supabase
@@ -130,12 +130,12 @@ export async function PUT(request: NextRequest) {
       .single()
 
     if (loadError || !existing?.tenant_slug) {
-      return NextResponse.json({ error: 'Group not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Group not found'}, { status: 404 })
     }
 
     const access = await verifyTenantOrSuperAdmin(request, existing.tenant_slug)
     if (!access.authorized) {
-      return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
+      return NextResponse.json({ error: access.error || 'Forbidden'}, { status: 403 })
     }
 
     const { tenant_slug: _t, id: _i, ...safeUpdates } = updates as Record<string, unknown>
@@ -152,7 +152,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json(data)
   } catch (error) {
     console.error('Error updating group:', error)
-    return NextResponse.json({ error: 'Failed to update group' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to update group'}, { status: 500 })
   }
 }
 
@@ -163,7 +163,7 @@ export async function DELETE(request: NextRequest) {
     const id = searchParams.get('id')
 
     if (!id) {
-      return NextResponse.json({ error: 'id is required' }, { status: 400 })
+      return NextResponse.json({ error: 'id is required'}, { status: 400 })
     }
 
     const { data: existing, error: loadError } = await supabase
@@ -173,17 +173,17 @@ export async function DELETE(request: NextRequest) {
       .single()
 
     if (loadError || !existing?.tenant_slug) {
-      return NextResponse.json({ error: 'Group not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Group not found'}, { status: 404 })
     }
 
     const access = await verifyTenantOrSuperAdmin(request, existing.tenant_slug)
     if (!access.authorized) {
-      return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
+      return NextResponse.json({ error: access.error || 'Forbidden'}, { status: 403 })
     }
 
     const { error } = await supabase
       .from('order_groups')
-      .update({ status: 'archived' })
+      .update({ status: 'archived'})
       .eq('id', id)
 
     if (error) throw error
@@ -191,6 +191,6 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error archiving group:', error)
-    return NextResponse.json({ error: 'Failed to archive group' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to archive group'}, { status: 500 })
   }
 }

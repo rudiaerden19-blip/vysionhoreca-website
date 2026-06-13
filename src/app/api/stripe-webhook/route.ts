@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     if (!supabase) {
       logger.error('Stripe webhook failed: Supabase not configured', { requestId })
       return NextResponse.json(
-        { error: 'Database not configured' },
+        { error: 'Database not configured'},
         { status: 503 }
       )
     }
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     if (!stripeSecretKey) {
       logger.error('STRIPE_SECRET_KEY not configured', { requestId })
       return NextResponse.json(
-        { error: 'Stripe not configured' },
+        { error: 'Stripe not configured'},
         { status: 500 }
       )
     }
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     if (!webhookSecret) {
       logger.error('STRIPE_WEBHOOK_SECRET not configured', { requestId })
       return NextResponse.json(
-        { error: 'Webhook secret not configured' },
+        { error: 'Webhook secret not configured'},
         { status: 500 }
       )
     }
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     if (!signature) {
       logger.warn('Missing stripe-signature header', { requestId })
       return NextResponse.json(
-        { error: 'Missing signature' },
+        { error: 'Missing signature'},
         { status: 400 }
       )
     }
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       const message = err instanceof Error ? err.message : 'Unknown error'
       logger.error('Webhook signature verification failed', { requestId, error: message })
       return NextResponse.json(
-        { error: `Webhook signature verification failed: ${message}` },
+        { error: `Webhook signature verification failed: ${message}`},
         { status: 400 }
       )
     }
@@ -175,9 +175,9 @@ export async function POST(request: NextRequest) {
       error: error instanceof Error ? error.message : 'Unknown error',
       duration: Date.now() - startTime 
     })
-    trackError(error, { requestId, route: '/api/stripe-webhook' })
+    trackError(error, { requestId, route: '/api/stripe-webhook'})
     return NextResponse.json(
-      { error: 'Webhook processing failed' },
+      { error: 'Webhook processing failed'},
       { status: 500 }
     )
   }
@@ -211,8 +211,8 @@ async function sendGiftCardEmail(
     },
   })
 
-  const occasionText = giftCard.occasion ? `ter gelegenheid van ${giftCard.occasion}` : ''
-  const senderText = giftCard.sender_name ? `van ${giftCard.sender_name}` : ''
+  const occasionText = giftCard.occasion ? `ter gelegenheid van ${giftCard.occasion}`: ''
+  const senderText = giftCard.sender_name ? `van ${giftCard.sender_name}`: ''
 
   const htmlContent = `
     <!DOCTYPE html>
@@ -225,14 +225,14 @@ async function sendGiftCardEmail(
       <div style="background-color: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
         <!-- Header -->
         <div style="background-color: ${tenant.primary_color}; padding: 30px; text-align: center;">
-          ${tenant.logo_url ? `<img src="${tenant.logo_url}" alt="${tenant.business_name}" style="max-height: 60px; margin-bottom: 15px;">` : ''}
-          <h1 style="color: white; margin: 0; font-size: 24px;">🎁 Je hebt een cadeaubon ontvangen!</h1>
+          ${tenant.logo_url ? `<img src="${tenant.logo_url}" alt="${tenant.business_name}" style="max-height: 60px; margin-bottom: 15px;">`: ''}
+          <h1 style="color: white; margin: 0; font-size: 24px;"> Je hebt een cadeaubon ontvangen!</h1>
         </div>
         
         <!-- Content -->
         <div style="padding: 30px;">
           <p style="font-size: 18px; color: #333;">
-            ${giftCard.recipient_name ? `Beste ${giftCard.recipient_name},` : 'Hallo!'}
+            ${giftCard.recipient_name ? `Beste ${giftCard.recipient_name},`: 'Hallo!'}
           </p>
           
           <p style="color: #666; line-height: 1.6;">
@@ -243,7 +243,7 @@ async function sendGiftCardEmail(
             <div style="background-color: #f9f9f9; border-left: 4px solid ${tenant.primary_color}; padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0;">
               <p style="color: #666; margin: 0; font-style: italic;">"${giftCard.personal_message}"</p>
             </div>
-          ` : ''}
+          `: ''}
           
           <!-- Gift Card -->
           <div style="background: linear-gradient(135deg, ${tenant.primary_color}, ${tenant.primary_color}dd); border-radius: 16px; padding: 30px; margin: 30px 0; color: white; text-align: center;">
@@ -279,7 +279,7 @@ async function sendGiftCardEmail(
   await transporter.sendMail({
     from: `"${tenant.business_name}" <${process.env.ZOHO_EMAIL}>`,
     to: recipientEmail,
-    subject: `🎁 Je hebt een cadeaubon ontvangen van ${tenant.business_name}!`,
+    subject: `Je hebt een cadeaubon ontvangen van ${tenant.business_name}!`,
     html: htmlContent,
   })
 }

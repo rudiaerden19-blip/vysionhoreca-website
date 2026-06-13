@@ -208,7 +208,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
       setOrders(parsed)
 
       parsed.forEach((o) => knownOrderIdsRef.current.add(o.id))
-      console.log(` Initial load: ${parsed.length} keuken orders`)
+      console.log(`Initial load: ${parsed.length} keuken orders`)
     } catch (error) {
       console.error('Error loading data:', error)
     }
@@ -228,7 +228,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
       orders.map((o) => {
         const st = (o.status || '').toLowerCase()
         const isOpenTab = st === 'open' && (o.order_type || '').toString().toUpperCase() === 'DINE_IN'
-        return updateOrderStatus(params.tenant, o.id, isOpenTab ? 'preparing' : 'ready')
+        return updateOrderStatus(params.tenant, o.id, isOpenTab ? 'preparing': 'ready')
       }),
     )
     setOrders([])
@@ -243,7 +243,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     } else {
       await updateOrderStatus(params.tenant, order.id, 'ready')
 
-      console.log(' handleReady called, customer_phone:', order.customer_phone)
+      console.log('handleReady called, customer_phone:', order.customer_phone)
       if (order.customer_phone) {
         try {
           const response = await authFetch('/api/whatsapp/send-status', {
@@ -257,15 +257,15 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
           })
           const data = await response.json()
           if (response.ok) {
-            console.log(' WhatsApp ready notification sent successfully:', data)
+            console.log('WhatsApp ready notification sent successfully:', data)
           } else {
-            console.error(' WhatsApp ready notification failed:', response.status, data)
+            console.error('WhatsApp ready notification failed:', response.status, data)
           }
         } catch (err) {
-          console.error(' Failed to send WhatsApp ready notification:', err)
+          console.error('Failed to send WhatsApp ready notification:', err)
         }
       } else {
-        console.log(' No customer_phone on order, skipping WhatsApp notification')
+        console.log('No customer_phone on order, skipping WhatsApp notification')
       }
     }
 
@@ -293,7 +293,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
       }
     })
     const requestedDateTime = order.scheduled_date
-      ? `${new Date(order.scheduled_date).toLocaleDateString('nl-BE')}${order.scheduled_time ? ' ' + order.scheduled_time : ''}`
+      ? `${new Date(order.scheduled_date).toLocaleDateString('nl-BE')}${order.scheduled_time ? ' '+ order.scheduled_time : ''}`
       : ''
     const printResult = await sendToVysionPrintAgent({
       winkelnaam: business?.business_name || '',
@@ -352,7 +352,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
       ${optLines.map((line) => `
         <tr><td></td><td style="font-size: 14px; color: #666; padding-left: 10px;">+ ${line}</td></tr>
       `).join('')}
-      ${(item as { notes?: unknown }).notes ? `<tr><td></td><td style="font-size: 14px; color: #666; font-style: italic; padding-left: 10px;"> ${String((item as { notes?: unknown }).notes)}</td></tr>` : ''}
+      ${(item as { notes?: unknown }).notes ? `<tr><td></td><td style="font-size: 14px; color: #666; font-style: italic; padding-left: 10px;"> ${String((item as { notes?: unknown }).notes)}</td></tr>`: ''}
     `
     }).join('') || ''
 
@@ -381,20 +381,20 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
           <div class="header">
             <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">*** KEUKEN BON ***</div>
             <div class="order-number">#${order.order_number}</div>
-            <div class="order-type">${order.order_type === 'delivery' || order.order_type === 'DELIVERY' ? ' BEZORGEN' : order.order_type === 'DINE_IN' ? ' TER PLAATSE' : order.order_type === 'TAKEAWAY' ? ' AFHALEN' : ' AFHALEN'}</div>
-            ${nlDineInSeat ? `<div style="font-size: 16px; font-weight: bold; margin-top: 6px;">${nlDineInSeat}</div>` : ''}
+            <div class="order-type">${order.order_type === 'delivery' || order.order_type === 'DELIVERY'? 'BEZORGEN': order.order_type === 'DINE_IN'? 'TER PLAATSE': order.order_type === 'TAKEAWAY'? 'AFHALEN': 'AFHALEN'}</div>
+            ${nlDineInSeat ? `<div style="font-size: 16px; font-weight: bold; margin-top: 6px;">${nlDineInSeat}</div>`: ''}
             ${(order.scheduled_date || order.scheduled_time) ? `
             <div style="margin: 6px 0; padding: 6px; background: #000; color: #fff; font-size: 16px; font-weight: bold; border-radius: 4px;">
-               LEVEREN OP: ${order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''}${order.scheduled_time ? ' om ' + order.scheduled_time : ''}
-            </div>` : ''}
+               LEVEREN OP: ${order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit', year: 'numeric'}) : ''}${order.scheduled_time ? 'om '+ order.scheduled_time : ''}
+            </div>`: ''}
             <div style="font-size: 14px; margin-top: 5px;">
-              ${new Date(order.created_at).toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' })}
+              ${new Date(order.created_at).toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit'})}
             </div>
           </div>
           
           <div style="margin-bottom: 10px;">
             <strong>Klant: ${order.customer_name}</strong>
-            ${order.customer_phone ? `<br>Tel: ${order.customer_phone}` : ''}
+            ${order.customer_phone ? `<br>Tel: ${order.customer_phone}`: ''}
           </div>
 
           <table>
@@ -406,13 +406,13 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
               <strong> OPMERKING:</strong><br>
               ${order.customer_notes}
             </div>
-          ` : ''}
+          `: ''}
 
           <div class="footer">
             ${business?.business_name || ''}<br>
             ${business?.address || ''}<br>
-            ${business?.phone ? `Tel: ${business.phone}` : ''}<br>
-            ${business?.btw_number ? `BTW: ${business.btw_number}` : ''}<br>
+            ${business?.phone ? `Tel: ${business.phone}`: ''}<br>
+            ${business?.btw_number ? `BTW: ${business.btw_number}`: ''}<br>
             ${new Date().toLocaleDateString('nl-BE')}
           </div>
         </body>
@@ -528,7 +528,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
 
             {/* Clock */}
             <div className={`font-mono text-2xl font-bold tabular-nums ${KASSA_POS_SELECTED_ACCENT_TEXT}`}>
-              {currentTime.toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' })}
+              {currentTime.toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit'})}
             </div>
 
             <div className="relative z-[130]" ref={keukenLangRef}>
@@ -540,7 +540,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
               >
                 <LocaleFlagEmoji locale={locale} className="text-base text-white" />
                 <svg
-                  className={`size-3.5 shrink-0 transition-transform ${keukenLangOpen ? 'rotate-180' : ''}`}
+                  className={`size-3.5 shrink-0 transition-transform ${keukenLangOpen ? 'rotate-180': ''}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -561,7 +561,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                         setKeukenLangOpen(false)
                       }}
                       className={`flex w-full items-center gap-2 border-b border-white/10 px-4 py-2.5 text-left text-sm transition-colors last:border-0 hover:bg-white/10 ${
-                        locale === lang ? 'bg-white/10 font-semibold text-white' : 'text-white/90'
+                        locale === lang ? 'bg-white/10 font-semibold text-white': 'text-white/90'
                       }`}
                     >
                       <LocaleFlagEmoji locale={lang} />
@@ -623,7 +623,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                     <div className="text-sm font-bold text-white">{t('shopDisplay.onlineOrder')}</div>
                     <div className={`mt-1 text-xs leading-snug sm:text-sm ${KITCHEN_MUTED}`}>
                       {t(`shopDisplay.${shopDisplayOrderTypeKey(order.order_type)}`)}
-                      {schedLine ? ` · ${schedLine}` : ''}
+                      {schedLine ? `· ${schedLine}`: ''}
                     </div>
                   </div>
                 ) : (
@@ -636,7 +636,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                     )}
                     {(order.scheduled_date || order.scheduled_time) && (
                       <div className={`px-3 py-2 text-sm font-medium ${KITCHEN_SUBSTRIP}`}>
-                         {order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit' }) : ''}{order.scheduled_time ? ` om ${order.scheduled_time}` : ''}
+                         {order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit'}) : ''}{order.scheduled_time ? `om ${order.scheduled_time}`: ''}
                       </div>
                     )}
                   </>
@@ -657,7 +657,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                       const qty = Number((item as { quantity?: unknown }).quantity) || 1
                       const noteRaw = (item as { notes?: unknown }).notes
                       const noteStr =
-                        noteRaw != null && String(noteRaw).trim() !== '' ? String(noteRaw) : ''
+                        noteRaw != null && String(noteRaw).trim() !== ''? String(noteRaw) : ''
                       return (
                       <div key={i} className="flex items-start gap-3 border-b border-white/10 pb-2 last:border-0">
                         <span className={`flex h-9 w-9 shrink-0 items-center justify-center text-sm font-bold ${KITCHEN_POS_BTN}`}>
@@ -747,7 +747,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                           return `${orderTypeLabelShort(selectedOrder)} · ${getTimeSince(selectedOrder.created_at)}`
                         }
                         const ch = t(`shopDisplay.${shopDisplayOrderTypeKey(selectedOrder.order_type)}`)
-                        return `${t('shopDisplay.onlineOrder')} · ${ch}${sched ? ` · ${sched}` : ''}`
+                        return `${t('shopDisplay.onlineOrder')} · ${ch}${sched ? `· ${sched}`: ''}`
                       })()}
                     </p>
                     {(() => {
@@ -809,7 +809,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                       const qty = Number((item as { quantity?: unknown }).quantity) || 1
                       const noteRaw = (item as { notes?: unknown }).notes
                       const noteStr =
-                        noteRaw != null && String(noteRaw).trim() !== '' ? String(noteRaw) : ''
+                        noteRaw != null && String(noteRaw).trim() !== ''? String(noteRaw) : ''
                       return (
                       <div key={i} className="flex items-start gap-4 border-b border-white/10 pb-4 last:border-0 last:pb-0">
                         <span className={`flex h-12 w-12 shrink-0 items-center justify-center text-xl font-bold sm:h-14 sm:w-14 sm:text-2xl ${KITCHEN_POS_BTN}`}>

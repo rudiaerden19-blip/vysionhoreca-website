@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     
     if (!rateLimitResult.success) {
       return NextResponse.json(
-        { error: 'Te veel verzoeken. Probeer het later opnieuw.' },
+        { error: 'Te veel verzoeken. Probeer het later opnieuw.'},
         { status: 429 }
       )
     }
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     if (!supabase) {
       console.error('Reset password failed: Supabase not configured')
       return NextResponse.json(
-        { error: 'Service tijdelijk niet beschikbaar' },
+        { error: 'Service tijdelijk niet beschikbaar'},
         { status: 503 }
       )
     }
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
 
     if (tokenError || !resetToken) {
       return NextResponse.json(
-        { error: 'Ongeldige of verlopen reset link' },
+        { error: 'Ongeldige of verlopen reset link'},
         { status: 400 }
       )
     }
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
         .eq('id', resetToken.id)
 
       return NextResponse.json(
-        { error: 'Reset link is verlopen. Vraag een nieuwe aan.' },
+        { error: 'Reset link is verlopen. Vraag een nieuwe aan.'},
         { status: 400 }
       )
     }
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
     if (updateError) {
       console.error('Failed to update password:', updateError)
       return NextResponse.json(
-        { error: 'Kon wachtwoord niet updaten. Probeer opnieuw.' },
+        { error: 'Kon wachtwoord niet updaten. Probeer opnieuw.'},
         { status: 500 }
       )
     }
@@ -117,10 +117,10 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const tokenRaw = searchParams.get('token')
-    const q = resetTokenQuerySchema.safeParse({ token: tokenRaw ?? '' })
+    const q = resetTokenQuerySchema.safeParse({ token: tokenRaw ?? ''})
     if (!q.success) {
       return NextResponse.json(
-        { valid: false, error: 'Token ontbreekt of ongeldig' },
+        { valid: false, error: 'Token ontbreekt of ongeldig'},
         { status: 400 }
       )
     }
@@ -129,7 +129,7 @@ export async function GET(request: NextRequest) {
     const supabase = getServerSupabaseClient()
     if (!supabase) {
       return NextResponse.json(
-        { valid: false, error: 'Service niet beschikbaar' },
+        { valid: false, error: 'Service niet beschikbaar'},
         { status: 503 }
       )
     }
@@ -141,15 +141,15 @@ export async function GET(request: NextRequest) {
       .maybeSingle()
 
     if (!resetToken) {
-      return NextResponse.json({ valid: false, error: 'Ongeldige link' })
+      return NextResponse.json({ valid: false, error: 'Ongeldige link'})
     }
 
     if (resetToken.used_at) {
-      return NextResponse.json({ valid: false, error: 'Link is al gebruikt' })
+      return NextResponse.json({ valid: false, error: 'Link is al gebruikt'})
     }
 
     if (new Date(resetToken.expires_at) < new Date()) {
-      return NextResponse.json({ valid: false, error: 'Link is verlopen' })
+      return NextResponse.json({ valid: false, error: 'Link is verlopen'})
     }
 
     return NextResponse.json({ valid: true })
@@ -157,7 +157,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Token validation error:', error)
     return NextResponse.json(
-      { valid: false, error: 'Fout bij validatie' },
+      { valid: false, error: 'Fout bij validatie'},
       { status: 500 }
     )
   }

@@ -41,7 +41,7 @@ export function RegistrationProductLinePicker({
   const { t } = useLanguage()
 
   return (
-    <div className={compact ? 'space-y-3' : 'space-y-6'}>
+    <div className={compact ? 'space-y-3': 'space-y-6'}>
       {!compact ? (
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900">{t('register.productLineTitle')}</h1>

@@ -14,23 +14,23 @@ export async function POST(req: NextRequest) {
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ ok: false, error: 'invalid_json' }, { status: 400 })
+    return NextResponse.json({ ok: false, error: 'invalid_json'}, { status: 400 })
   }
 
   const parsed = BodySchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ ok: false, error: 'invalid_body' }, { status: 400 })
+    return NextResponse.json({ ok: false, error: 'invalid_body'}, { status: 400 })
   }
 
   const { tenantSlug, memberId } = parsed.data
   const access = await verifyTenantOrSuperAdmin(req, tenantSlug)
   if (!access.authorized) {
-    return NextResponse.json({ ok: false, error: access.error || 'forbidden' }, { status: 403 })
+    return NextResponse.json({ ok: false, error: access.error || 'forbidden'}, { status: 403 })
   }
 
   const supabase = getServerSupabaseClient()
   if (!supabase) {
-    return NextResponse.json({ ok: false, error: 'db_unavailable' }, { status: 503 })
+    return NextResponse.json({ ok: false, error: 'db_unavailable'}, { status: 503 })
   }
 
   const { data: member, error } = await supabase
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     .maybeSingle()
 
   if (error || !member || !member.is_active) {
-    return NextResponse.json({ ok: false, error: 'member_not_found' }, { status: 404 })
+    return NextResponse.json({ ok: false, error: 'member_not_found'}, { status: 404 })
   }
 
   let toEmail = member.email?.trim().toLowerCase() || ''
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (!toEmail || !toEmail.includes('@')) {
-    return NextResponse.json({ ok: false, error: 'member_no_email' }, { status: 400 })
+    return NextResponse.json({ ok: false, error: 'member_no_email'}, { status: 400 })
   }
 
   const mail = await sendRetailLoyaltyPassEmail({
@@ -69,8 +69,8 @@ export async function POST(req: NextRequest) {
   })
 
   if (!mail.ok) {
-    const status = mail.error === 'smtp_not_configured' ? 400 : 502
-    return NextResponse.json({ ok: false, error: mail.error || 'send_failed' }, { status })
+    const status = mail.error === 'smtp_not_configured'? 400 : 502
+    return NextResponse.json({ ok: false, error: mail.error || 'send_failed'}, { status })
   }
 
   return NextResponse.json({ ok: true })

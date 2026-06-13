@@ -37,17 +37,17 @@ const getDays = (t: (key: string) => string) => [
 ]
 
 const getAbsenceTypes = (t: (key: string) => string): { id: AbsenceType; label: string; color: string; icon: string }[] => [
-  { id: 'WORKED', label: t('urenPage.absenceTypes.worked'), color: '#22c55e', icon: '' },
-  { id: 'SICK', label: t('urenPage.absenceTypes.sick'), color: '#ef4444', icon: '' },
-  { id: 'VACATION', label: t('urenPage.absenceTypes.vacation'), color: '#3b82f6', icon: '' },
-  { id: 'SHORT_LEAVE', label: t('urenPage.absenceTypes.shortLeave'), color: '#f97316', icon: '⏰' },
-  { id: 'AUTHORIZED', label: t('urenPage.absenceTypes.authorized'), color: '#8b5cf6', icon: '' },
-  { id: 'HOLIDAY', label: t('urenPage.absenceTypes.holiday'), color: '#06b6d4', icon: '' },
-  { id: 'MATERNITY', label: t('urenPage.absenceTypes.maternity'), color: '#ec4899', icon: '' },
-  { id: 'PATERNITY', label: t('urenPage.absenceTypes.paternity'), color: '#0ea5e9', icon: '' },
-  { id: 'UNPAID', label: t('urenPage.absenceTypes.unpaid'), color: '#6b7280', icon: '' },
-  { id: 'TRAINING', label: t('urenPage.absenceTypes.training'), color: '#84cc16', icon: '' },
-  { id: 'OTHER', label: t('urenPage.absenceTypes.other'), color: '#a3a3a3', icon: '' },
+  { id: 'WORKED', label: t('urenPage.absenceTypes.worked'), color: '#22c55e', icon: ''},
+  { id: 'SICK', label: t('urenPage.absenceTypes.sick'), color: '#ef4444', icon: ''},
+  { id: 'VACATION', label: t('urenPage.absenceTypes.vacation'), color: '#3b82f6', icon: ''},
+  { id: 'SHORT_LEAVE', label: t('urenPage.absenceTypes.shortLeave'), color: '#f97316', icon: ''},
+  { id: 'AUTHORIZED', label: t('urenPage.absenceTypes.authorized'), color: '#8b5cf6', icon: ''},
+  { id: 'HOLIDAY', label: t('urenPage.absenceTypes.holiday'), color: '#06b6d4', icon: ''},
+  { id: 'MATERNITY', label: t('urenPage.absenceTypes.maternity'), color: '#ec4899', icon: ''},
+  { id: 'PATERNITY', label: t('urenPage.absenceTypes.paternity'), color: '#0ea5e9', icon: ''},
+  { id: 'UNPAID', label: t('urenPage.absenceTypes.unpaid'), color: '#6b7280', icon: ''},
+  { id: 'TRAINING', label: t('urenPage.absenceTypes.training'), color: '#84cc16', icon: ''},
+  { id: 'OTHER', label: t('urenPage.absenceTypes.other'), color: '#a3a3a3', icon: ''},
 ]
 
 // Format time to HH:MM (remove seconds)
@@ -91,7 +91,7 @@ export default function UrenPage() {
   const [showEmailModal, setShowEmailModal] = useState(false)
   const [showReopenModal, setShowReopenModal] = useState(false)
   /** iOS Safari: vermijd window.confirm — eigen dialoog voor goedkeuren / maand afsluiten. */
-  const [bulkConfirm, setBulkConfirm] = useState<null | 'approve' | 'close'>(null)
+  const [bulkConfirm, setBulkConfirm] = useState<null | 'approve' |  'close'>(null)
   const [reopenReason, setReopenReason] = useState('')
   const [selectedDate, setSelectedDate] = useState<string>('')
   const [entryForm, setEntryForm] = useState<Partial<TimesheetEntry>>({
@@ -259,11 +259,11 @@ export default function UrenPage() {
       staff_id: selectedStaff.id,
       date: selectedDate,
       absence_type: entryForm.absence_type as AbsenceType,
-      clock_in: entryForm.absence_type === 'WORKED' ? entryForm.clock_in : undefined,
-      clock_out: entryForm.absence_type === 'WORKED' ? entryForm.clock_out : undefined,
-      break_minutes: entryForm.absence_type === 'WORKED' ? entryForm.break_minutes || 0 : 0,
+      clock_in: entryForm.absence_type === 'WORKED'? entryForm.clock_in : undefined,
+      clock_out: entryForm.absence_type === 'WORKED'? entryForm.clock_out : undefined,
+      break_minutes: entryForm.absence_type === 'WORKED'? entryForm.break_minutes || 0 : 0,
       worked_hours: entryForm.worked_hours || 0,
-      absence_hours: entryForm.absence_type !== 'WORKED' ? entryForm.absence_hours : undefined,
+      absence_hours: entryForm.absence_type !== 'WORKED'? entryForm.absence_hours : undefined,
       notes: entryForm.notes,
       is_approved: editingEntry?.is_approved || false,
     }
@@ -426,8 +426,8 @@ export default function UrenPage() {
     const headers = ['Datum', 'Inkloktijd', 'Uitkloktijd', 'Pauze (min)', 'Gewerkte uren', 'Type', 'Notities']
     const rows = entries.map(e => [
       e.date,
-      formatTime(e.clock_in) === '-' ? '' : formatTime(e.clock_in),
-      formatTime(e.clock_out) === '-' ? '' : formatTime(e.clock_out),
+      formatTime(e.clock_in) === '-'? '' : formatTime(e.clock_in),
+      formatTime(e.clock_out) === '-'? '' : formatTime(e.clock_out),
       e.break_minutes || 0,
       e.worked_hours || e.absence_hours || 0,
       LOCAL_ABSENCE_TYPES.find(at => at.id === e.absence_type)?.label || e.absence_type,
@@ -455,7 +455,7 @@ export default function UrenPage() {
     }
     
     const csvContent = [headers, ...rows, ...summaryRows].map(row => row.join(';')).join('\n')
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;'})
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
@@ -487,9 +487,9 @@ export default function UrenPage() {
     const opt = {
       margin: [10, 15, 10, 15] as [number, number, number, number],
       filename: fileName,
-      image: { type: 'jpeg' as const, quality: 0.95 },
+      image: { type: 'jpeg'as const, quality: 0.95 },
       html2canvas: { scale: 1.5, useCORS: true, letterRendering: true },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const }
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait'as const }
     }
     
     html2pdf().set(opt).from(element).save()
@@ -550,8 +550,8 @@ Met vriendelijke groeten`,
       const headers = ['Datum', 'Inkloktijd', 'Uitkloktijd', 'Pauze (min)', 'Gewerkte uren', 'Type', 'Notities']
       const rows = entries.map(e => [
         e.date,
-        formatTime(e.clock_in) === '-' ? '' : formatTime(e.clock_in),
-        formatTime(e.clock_out) === '-' ? '' : formatTime(e.clock_out),
+        formatTime(e.clock_in) === '-'? '' : formatTime(e.clock_in),
+        formatTime(e.clock_out) === '-'? '' : formatTime(e.clock_out),
         e.break_minutes || 0,
         e.worked_hours || e.absence_hours || 0,
         LOCAL_ABSENCE_TYPES.find(at => at.id === e.absence_type)?.label || e.absence_type,
@@ -778,7 +778,7 @@ Met vriendelijke groeten`,
                 }}
                 className="min-h-[44px] touch-manipulation rounded-lg bg-blue-600 px-6 py-2 text-white [-webkit-tap-highlight-color:transparent] transition hover:bg-blue-700 disabled:opacity-50"
               >
-                {saving ? `${t('adminPages.common.saving')}...` : t('adminPages.common.confirm')}
+                {saving ? `${t('adminPages.common.saving')}...`: t('adminPages.common.confirm')}
               </button>
             </div>
           </div>
@@ -823,7 +823,7 @@ Met vriendelijke groeten`,
                 <td className="py-1 font-medium">{t('urenPage.print.phone')}:</td>
                 <td>{selectedStaff?.phone || '-'}</td>
                 <td className="font-medium">{t('urenPage.print.hourlyRate')}:</td>
-                <td>{selectedStaff?.hourly_rate ? `€${selectedStaff.hourly_rate}` : '-'}</td>
+                <td>{selectedStaff?.hourly_rate ? `€${selectedStaff.hourly_rate}`: '-'}</td>
               </tr>
             </tbody>
           </table>
@@ -957,13 +957,13 @@ Met vriendelijke groeten`,
                 key={idx}
                 onClick={() => inMonth && !isMonthClosed && openEntryModal(date)}
                 className={`min-h-[80px] md:min-h-[100px] p-2 border-b border-r relative ${
-                  !inMonth ? 'bg-gray-50 text-gray-300' :
-                  isWeekend ? 'bg-gray-50' :
+                  !inMonth ? 'bg-gray-50 text-gray-300':
+                  isWeekend ? 'bg-gray-50':
                   ''
-                } ${inMonth && !isMonthClosed ? 'cursor-pointer hover:bg-blue-50' : ''} print:min-h-[60px]`}
+                } ${inMonth && !isMonthClosed ? 'cursor-pointer hover:bg-blue-50': ''} print:min-h-[60px]`}
               >
                 <div className={`text-sm font-medium mb-1 ${
-                  isToday ? 'bg-blue-600 text-white w-7 h-7 rounded-full flex items-center justify-center' : ''
+                  isToday ? 'bg-blue-600 text-white w-7 h-7 rounded-full flex items-center justify-center': ''
                 }`}>
                   {date.getDate()}
                 </div>
@@ -980,7 +980,7 @@ Met vriendelijke groeten`,
                         color: absenceType?.color
                       }}
                     >
-                      {absenceType?.icon} {entry.absence_type === 'WORKED' ? `${formatHours(entry.worked_hours)}u` : `${entry.absence_hours || 8}u ${absenceType?.label}`}
+                      {absenceType?.icon} {entry.absence_type === 'WORKED'? `${formatHours(entry.worked_hours)}u`: `${entry.absence_hours || 8}u ${absenceType?.label}`}
                       {entry.is_approved && <span className="ml-1"></span>}
                     </div>
                   )
@@ -1011,10 +1011,10 @@ Met vriendelijke groeten`,
           <tbody>
             {entries.map((e, i) => {
               const date = new Date(e.date)
-              const dayName = date.toLocaleDateString(undefined, { weekday: 'short' })
+              const dayName = date.toLocaleDateString(undefined, { weekday: 'short'})
               const absenceType = LOCAL_ABSENCE_TYPES.find(at => at.id === e.absence_type)
               return (
-                <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                <tr key={i} className={i % 2 === 0 ? 'bg-white': 'bg-gray-50'}>
                   <td className="border border-gray-300 p-2">{date.toLocaleDateString()}</td>
                   <td className="border border-gray-300 p-2">{dayName}</td>
                   <td className="border border-gray-300 p-2">
@@ -1076,7 +1076,7 @@ Met vriendelijke groeten`,
                   </tr>
                   <tr className="font-bold">
                     <td className="border p-1">{t('urenPage.print.difference')}</td>
-                    <td className={`border p-1 text-right font-mono ${totalWorked - (selectedStaff.hours_per_week * 4.33) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    <td className={`border p-1 text-right font-mono ${totalWorked - (selectedStaff.hours_per_week * 4.33) >= 0 ? 'text-green-600': 'text-red-600'}`}>
                       {(totalWorked - (selectedStaff.hours_per_week * 4.33)).toFixed(1)} uur
                     </td>
                   </tr>
@@ -1131,7 +1131,7 @@ Met vriendelijke groeten`,
           <div className="bg-white rounded-xl w-full max-w-md shadow-xl">
             <div className="p-6 border-b">
               <h2 className="text-xl font-bold text-gray-800">
-                 {new Date(selectedDate).toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long' })}
+                 {new Date(selectedDate).toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long'})}
               </h2>
               <p className="text-gray-600">{selectedStaff?.name}</p>
             </div>
@@ -1148,7 +1148,7 @@ Met vriendelijke groeten`,
                         <div
                           key={entry.id}
                           className="flex items-center justify-between p-3 rounded-lg border"
-                          style={{ backgroundColor: absenceType?.color + '10', borderColor: absenceType?.color + '40' }}
+                          style={{ backgroundColor: absenceType?.color + '10', borderColor: absenceType?.color + '40'}}
                         >
                           <div className="flex items-center gap-2">
                             <span>{absenceType?.icon}</span>
@@ -1203,7 +1203,7 @@ Met vriendelijke groeten`,
                           : 'hover:bg-gray-100'
                       }`}
                       style={{
-                        backgroundColor: entryForm.absence_type === type.id ? type.color + '30' : undefined,
+                        backgroundColor: entryForm.absence_type === type.id ? type.color + '30': undefined,
                         borderColor: type.color,
                         color: entryForm.absence_type === type.id ? type.color : undefined,
                       }}
@@ -1266,7 +1266,7 @@ Met vriendelijke groeten`,
                         value={entryForm.break_minutes ?? ''}
                         placeholder="0"
                         onChange={(e) => {
-                          const val = e.target.value === '' ? undefined : parseInt(e.target.value) || 0
+                          const val = e.target.value === ''? undefined : parseInt(e.target.value) || 0
                           setEntryForm({ ...entryForm, break_minutes: val })
                           setTimeout(() => calculateWorkedHours(undefined, undefined, val || 0), 0)
                         }}
@@ -1297,7 +1297,7 @@ Met vriendelijke groeten`,
                     type="number"
                     value={entryForm.absence_hours ?? ''}
                     placeholder="bv. 8"
-                    onChange={(e) => setEntryForm({ ...entryForm, absence_hours: e.target.value === '' ? undefined : parseFloat(e.target.value) })}
+                    onChange={(e) => setEntryForm({ ...entryForm, absence_hours: e.target.value === ''? undefined : parseFloat(e.target.value) })}
                     className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     step="0.5"
                     min="0"
@@ -1352,7 +1352,7 @@ Met vriendelijke groeten`,
                   disabled={saving}
                   className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
                 >
-                  {saving ? `${t('adminPages.common.saving')}...` : editingEntry ? t('urenPage.update') : t('urenPage.add')}
+                  {saving ? `${t('adminPages.common.saving')}...`: editingEntry ? t('urenPage.update') : t('urenPage.add')}
                 </button>
               </div>
             </div>
@@ -1365,7 +1365,7 @@ Met vriendelijke groeten`,
         className="pointer-events-none absolute left-[-9999px] top-0 select-none"
         aria-hidden
       >
-        <div ref={pdfRef} className="bg-white p-6" style={{ fontFamily: 'Arial, sans-serif', width: '180mm', maxWidth: '180mm' }}>
+        <div ref={pdfRef} className="bg-white p-6" style={{ fontFamily: 'Arial, sans-serif', width: '180mm', maxWidth: '180mm'}}>
           {/* PDF Header */}
           <div className="border-b-2 border-gray-800 pb-3 mb-4">
             <div className="flex justify-between items-start">
@@ -1404,7 +1404,7 @@ Met vriendelijke groeten`,
                   <td className="py-0.5 font-medium">{t('urenPage.print.phone')}:</td>
                   <td className="py-0.5">{selectedStaff?.phone || '-'}</td>
                   <td className="py-0.5 font-medium">{t('urenPage.print.hourlyRate')}:</td>
-                  <td className="py-0.5">{selectedStaff?.hourly_rate ? `€${selectedStaff.hourly_rate}` : '-'}</td>
+                  <td className="py-0.5">{selectedStaff?.hourly_rate ? `€${selectedStaff.hourly_rate}`: '-'}</td>
                 </tr>
               </tbody>
             </table>
@@ -1452,10 +1452,10 @@ Met vriendelijke groeten`,
             <tbody>
               {entries.map((e, i) => {
                 const date = new Date(e.date)
-                const dayName = date.toLocaleDateString(undefined, { weekday: 'short' })
+                const dayName = date.toLocaleDateString(undefined, { weekday: 'short'})
                 const absenceType = LOCAL_ABSENCE_TYPES.find(at => at.id === e.absence_type)
                 return (
-                  <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                  <tr key={i} className={i % 2 === 0 ? 'bg-white': 'bg-gray-50'}>
                     <td className="border border-gray-300 p-1">{date.toLocaleDateString()}</td>
                     <td className="border border-gray-300 p-1">{dayName}</td>
                     <td className="border border-gray-300 p-1">{absenceType?.label}</td>
@@ -1514,7 +1514,7 @@ Met vriendelijke groeten`,
                     </tr>
                     <tr className="font-bold">
                       <td className="border p-1">{t('urenPage.print.difference')}</td>
-                      <td className={`border p-1 text-right font-mono ${totalWorked - (selectedStaff.hours_per_week * 4.33) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      <td className={`border p-1 text-right font-mono ${totalWorked - (selectedStaff.hours_per_week * 4.33) >= 0 ? 'text-green-600': 'text-red-600'}`}>
                         {(totalWorked - (selectedStaff.hours_per_week * 4.33)).toFixed(1)} {t('urenPage.print.hour')}
                       </td>
                     </tr>
@@ -1625,7 +1625,7 @@ Met vriendelijke groeten`,
                 </select>
                 {reopenReason === 'Anders' && (
                   <textarea
-                    value={reopenReason === 'Anders' ? '' : reopenReason}
+                    value={reopenReason === 'Anders'? '' : reopenReason}
                     onChange={(e) => setReopenReason(e.target.value)}
                     rows={2}
                     className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -1650,7 +1650,7 @@ Met vriendelijke groeten`,
                 disabled={saving || !reopenReason.trim()}
                 className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
               >
-                {saving ? `${t('adminPages.common.saving')}...` : ` ${t('urenPage.print.reopen')}`}
+                {saving ? `${t('adminPages.common.saving')}...`: ` ${t('urenPage.print.reopen')}`}
               </button>
             </div>
           </div>
@@ -1724,7 +1724,7 @@ Met vriendelijke groeten`,
               >
                 {sendingEmail ? (
                   <>
-                    <span className="animate-spin">⏳</span>
+                    <span className="animate-spin"></span>
                     {t('urenPage.print.sending')}
                   </>
                 ) : (

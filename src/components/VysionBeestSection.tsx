@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { Fragment, useLayoutEffect, useRef, useState } from 'react'
 import { useLanguage } from '@/i18n'
 
-/** Zet `**vet**` in vertaalstrings om naar <strong>. */
+/** Zet `**vet**`in vertaalstrings om naar <strong>. */
 function InlineBold({ text }: { text: string }) {
   const parts = text.split(/\*\*/)
   return (
@@ -81,13 +81,13 @@ export default function VysionBeestSection() {
             }
           >
             <div
-              className={`flex h-full flex-col gap-3 sm:gap-4 ${lockStackToText ? 'min-h-0' : ''}`}
+              className={`flex h-full flex-col gap-3 sm:gap-4 ${lockStackToText ? 'min-h-0': ''}`}
             >
               {BEEST_IMAGES.map((src, i) => (
                 <div
                   key={src}
                   className={`relative w-full overflow-hidden rounded-xl bg-gray-50 ring-1 ring-gray-100 shadow-sm ${
-                    lockStackToText ? 'min-h-0 flex-1 basis-0' : 'aspect-[5/4]'
+                    lockStackToText ? 'min-h-0 flex-1 basis-0': 'aspect-[5/4]'
                   }`}
                 >
                   <Image
@@ -95,7 +95,7 @@ export default function VysionBeestSection() {
                     alt={t(BEEST_ALT_KEYS[i])}
                     fill
                     sizes="(min-width: 1024px) 42vw, (min-width: 640px) 90vw, 100vw"
-                    className={`object-contain object-center ${lockStackToText ? 'p-1.5 sm:p-2' : 'p-3 sm:p-4'}`}
+                    className={`object-contain object-center ${lockStackToText ? 'p-1.5 sm:p-2': 'p-3 sm:p-4'}`}
                     priority={i === 0}
                   />
                 </div>

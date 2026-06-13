@@ -69,7 +69,7 @@ export function offlineQueueDbKey(tenant: string) {
 
 export async function offlineDbSaveMenuSnapshot(
   tenant: string,
-  payload: Omit<MenuSnapshot, 'v' | 'updatedAt'> & { updatedAt?: number }
+  payload: Omit<MenuSnapshot, 'v' |  'updatedAt'> & { updatedAt?: number }
 ): Promise<void> {
   const snap: MenuSnapshot = {
     v: 1,

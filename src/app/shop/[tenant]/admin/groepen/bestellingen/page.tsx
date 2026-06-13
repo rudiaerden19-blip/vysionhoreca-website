@@ -20,7 +20,7 @@ export default function GroupOrdersPage({ params }: { params: { tenant: string }
   const [summary, setSummary] = useState({ totalOrders: 0, totalAmount: 0 })
   const [session, setSession] = useState<SessionInfo | null>(null)
   const [loading, setLoading] = useState(true)
-  const [viewMode, setViewMode] = useState<'list' | 'grouped'>('grouped')
+  const [viewMode, setViewMode] = useState<'list' |  'grouped'>('grouped')
 
   useEffect(() => {
     if (sessionId) { loadOrders(); loadSession() } else { setLoading(false) }
@@ -48,7 +48,7 @@ export default function GroupOrdersPage({ params }: { params: { tenant: string }
   }
 
   function formatDate(dateStr: string) {
-    return new Date(dateStr).toLocaleString('nl-NL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+    return new Date(dateStr).toLocaleString('nl-NL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})
   }
 
   function printLabels() {
@@ -57,9 +57,9 @@ export default function GroupOrdersPage({ params }: { params: { tenant: string }
     const labelsHtml = orders.map(order => `
       <div style="border:2px dashed #ccc;padding:20px;margin:10px;width:300px;display:inline-block;page-break-inside:avoid;font-family:Arial,sans-serif;">
         <div style="font-size:24px;font-weight:bold;margin-bottom:10px;">${order.group_members?.name || order.customer_name}</div>
-        ${order.group_members?.department ? `<div style="color:#666;margin-bottom:10px;">${order.group_members.department}</div>` : ''}
+        ${order.group_members?.department ? `<div style="color:#666;margin-bottom:10px;">${order.group_members.department}</div>`: ''}
         <div style="border-top:1px solid #eee;padding-top:10px;">
-          ${order.order_items.map(item => `<div style="margin-bottom:5px;"><strong>${item.quantity}x</strong> ${item.product_name}${item.notes ? `<br><small style="color:#666;">${item.notes}</small>` : ''}</div>`).join('')}
+          ${order.order_items.map(item => `<div style="margin-bottom:5px;"><strong>${item.quantity}x</strong> ${item.product_name}${item.notes ? `<br><small style="color:#666;">${item.notes}</small>`: ''}</div>`).join('')}
         </div>
         <div style="border-top:1px solid #eee;margin-top:10px;padding-top:10px;font-weight:bold;">Totaal: €${order.total.toFixed(2)}</div>
       </div>`).join('')
@@ -91,10 +91,10 @@ export default function GroupOrdersPage({ params }: { params: { tenant: string }
         </div>
         <div className="flex items-center gap-3">
           <div className="bg-gray-100 rounded-xl p-1 flex">
-            <button onClick={() => setViewMode('grouped')} className={`px-3 py-1 rounded-lg text-sm ${viewMode === 'grouped' ? 'bg-white shadow' : ''}`}>
+            <button onClick={() => setViewMode('grouped')} className={`px-3 py-1 rounded-lg text-sm ${viewMode === 'grouped'? 'bg-white shadow': ''}`}>
                {t('groupsModule.orders.perPerson')}
             </button>
-            <button onClick={() => setViewMode('list')} className={`px-3 py-1 rounded-lg text-sm ${viewMode === 'list' ? 'bg-white shadow' : ''}`}>
+            <button onClick={() => setViewMode('list')} className={`px-3 py-1 rounded-lg text-sm ${viewMode === 'list'? 'bg-white shadow': ''}`}>
                {t('groupsModule.orders.list')}
             </button>
           </div>
@@ -127,7 +127,7 @@ export default function GroupOrdersPage({ params }: { params: { tenant: string }
           <h2 className="text-xl font-bold text-gray-900 mb-2">{t('groupsModule.orders.noOrders')}</h2>
           <p className="text-gray-600">{t('groupsModule.orders.noOrdersDesc')}</p>
         </motion.div>
-      ) : viewMode === 'grouped' ? (
+      ) : viewMode === 'grouped'? (
         <div className="space-y-4">
           {Object.entries(ordersByMember).map(([memberName, memberOrders]) => (
             <motion.div key={memberName} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-2xl p-4 shadow-sm border">

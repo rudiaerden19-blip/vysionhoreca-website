@@ -22,7 +22,7 @@ export default function SuperAdminLogin() {
       const response = await fetch('/api/auth/superadmin-login', {
         method: 'POST',
         credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json'},
         body: JSON.stringify({ email, password })
       })
 
@@ -120,7 +120,7 @@ export default function SuperAdminLogin() {
             disabled={loading}
             className="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold py-4 rounded-xl hover:opacity-90 transition-colors disabled:opacity-50"
           >
-            {loading ? 'Inloggen...' : 'Inloggen'}
+            {loading ? 'Inloggen...': 'Inloggen'}
           </motion.button>
         </form>
 

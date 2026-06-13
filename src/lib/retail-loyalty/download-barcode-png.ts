@@ -14,7 +14,7 @@ export async function saveRetailLoyaltyBarcodeToPhone(cardCode: string): Promise
   const svg = buildEan13BarcodeSvg(cardCode, { moduleWidth: 3, barHeight: 100, showCodeText: false })
   if (!svg) throw new Error('invalid_code')
 
-  const svgBlob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' })
+  const svgBlob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8'})
   const svgUrl = URL.createObjectURL(svgBlob)
 
   try {
@@ -34,7 +34,7 @@ export async function saveRetailLoyaltyBarcodeToPhone(cardCode: string): Promise
     })
 
     const fileName = `winkelpas-${cardCode.replace(/\D/g, '').slice(-6)}.png`
-    const file = new File([blob], fileName, { type: 'image/png' })
+    const file = new File([blob], fileName, { type: 'image/png'})
 
     if (
       typeof navigator !== 'undefined' &&

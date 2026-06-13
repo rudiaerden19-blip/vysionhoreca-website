@@ -75,7 +75,7 @@
  "logoTagline": "",
  "title": "Una cassa per ogni settore",
  "subtitleLead": "Hardware e software cassa inclusi nel tuo abbonamento",
- "subtitle": "Dal retail all' panetterie e negozi",
+ "subtitle": "Dal retail all'panetterie e negozi",
  "ctaStartFree": "Inizia gratis",
  "ctaViewDemo": "Guarda la demo",
  "ctaModulesHeadline": "Sistema premium completo",
@@ -2408,7 +2408,7 @@
  "smtpGmailWarning": " Gmail richiede una password per le app. Creala in: Account Google → Sicurezza → Password per le app.",
  "smtpServerLabel": "Server SMTP (chiedi al provider)",
  "smtpPortLabel": "Porta",
- "smtpSaveSaving": "⏳ Salvataggio...",
+ "smtpSaveSaving": " Salvataggio...",
  "smtpSaveSaved": " Salvato!",
  "smtpSaveButton": " Salva impostazioni email"
  },
@@ -4615,7 +4615,7 @@
  "selectEmployee": "Seleziona dipendente",
  "reasonPlaceholder": "Opzionale: motivo del permesso",
  "initialStatus": "Stato",
- "statusHint": "Scegli 'Approvato' per registrazione diretta (es: malattia)",
+ "statusHint": "Scegli 'Approvato'per registrazione diretta (es: malattia)",
  "add": "Aggiungi",
  "fillAllFields": "Compila tutti i campi obbligatori",
  "delete": "Elimina",
@@ -5718,7 +5718,7 @@
  "ownership24": "Smetti di noleggiare. Dopo 24 mesi questa cassa i7 è 100% tua."
  },
  "retail": {
- "h1": "Cassa retail & magazzino | L'i7 'Bestia' per negozi | Vysion",
+ "h1": "Cassa retail & magazzino | L'i7 'Bestia'per negozi | Vysion",
  "intro": "Magazzino su i7 (16 GB RAM), POS touch e integrazione web gratuita — retail che scala con te.",
  "body1": "Cassa retail veloce: magazzino e vendita su uno schermo. Acquisto POS con margini e velocità — sistema belga per negozi.",
  "body2": "Dal barcode alla chiusura: meno errori, più ritmo. Hardware premium tuo dopo 24 mesi — niente affitto senza vantaggio.",

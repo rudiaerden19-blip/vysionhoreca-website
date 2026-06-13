@@ -29,7 +29,7 @@ export default function PincodePage({ params }: { params: { tenant: string } }) 
 
   const [hasPin, setHasPin] = useState<boolean | null>(null)
   const [justSaved, setJustSaved] = useState(false)
-  const [step, setStep] = useState<'check' | 'set' | 'change-current' | 'change-new'>('check')
+  const [step, setStep] = useState<'check' |  'set' |  'change-current' |  'change-new'>('check')
   const [pin1, setPin1] = useState('')
   const [pin2, setPin2] = useState('')
   const [currentPin, setCurrentPin] = useState('')
@@ -40,7 +40,7 @@ export default function PincodePage({ params }: { params: { tenant: string } }) 
   useEffect(() => {
     fetch(`/api/pin/check?tenant=${tenant}`)
       .then(r => r.json())
-      .then(d => { setHasPin(d.hasPin); setStep(d.hasPin ? 'change-current' : 'set') })
+      .then(d => { setHasPin(d.hasPin); setStep(d.hasPin ? 'change-current': 'set') })
   }, [tenant])
 
   /** Na succes: kort bevestigen, dan overal hetzelfde naar admin-overzicht (alle tenants). */
@@ -73,7 +73,7 @@ export default function PincodePage({ params }: { params: { tenant: string } }) 
       } catch {
         /* noop */
       }
-      setSuccess(hasPin ? 'PIN succesvol gewijzigd!' : 'PIN succesvol ingesteld!')
+      setSuccess(hasPin ? 'PIN succesvol gewijzigd!': 'PIN succesvol ingesteld!')
       setHasPin(true)
       setJustSaved(true)
       setPin1(''); setPin2(''); setCurrentPin('')
@@ -104,7 +104,7 @@ export default function PincodePage({ params }: { params: { tenant: string } }) 
       <div className="bg-white rounded-2xl shadow-lg p-8 max-w-sm w-full">
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold text-gray-800">
-            {hasPin ? 'PIN wijzigen' : 'PIN instellen'}
+            {hasPin ? 'PIN wijzigen': 'PIN instellen'}
           </h1>
           <p className="text-gray-500 text-sm mt-1">
             {hasPin
@@ -153,7 +153,7 @@ export default function PincodePage({ params }: { params: { tenant: string } }) 
 
           <div>
             <label className="block text-sm font-semibold text-gray-600 mb-1">
-              {hasPin ? 'Nieuw PIN' : 'PIN (4 cijfers)'}
+              {hasPin ? 'Nieuw PIN': 'PIN (4 cijfers)'}
             </label>
             <input
               type="password" inputMode="numeric" maxLength={4}
@@ -166,7 +166,7 @@ export default function PincodePage({ params }: { params: { tenant: string } }) 
 
           <div>
             <label className="block text-sm font-semibold text-gray-600 mb-1">
-              {hasPin ? 'Bevestig nieuw PIN' : 'Bevestig PIN'}
+              {hasPin ? 'Bevestig nieuw PIN': 'Bevestig PIN'}
             </label>
             <input
               type="password" inputMode="numeric" maxLength={4}
@@ -182,7 +182,7 @@ export default function PincodePage({ params }: { params: { tenant: string } }) 
             disabled={saving}
             className="w-full py-4 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-lg transition-colors disabled:opacity-50"
           >
-            {saving ? 'Opslaan...' : hasPin ? 'PIN wijzigen' : 'PIN instellen'}
+            {saving ? 'Opslaan...': hasPin ? 'PIN wijzigen': 'PIN instellen'}
           </button>
         </div>
 

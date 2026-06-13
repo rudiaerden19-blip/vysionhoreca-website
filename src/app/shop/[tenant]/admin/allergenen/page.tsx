@@ -101,9 +101,9 @@ export default function AllergenenPage({ params }: { params: { tenant: string } 
           whileTap={{ scale: 0.98 }}
           onClick={handleSave}
           disabled={saving}
-          className={`px-6 py-3 text-white rounded-xl font-medium flex items-center gap-2 transition-colors ${saved ? 'bg-green-500' : 'bg-blue-600 hover:bg-blue-700'}`}
+          className={`px-6 py-3 text-white rounded-xl font-medium flex items-center gap-2 transition-colors ${saved ? 'bg-green-500': 'bg-blue-600 hover:bg-blue-700'}`}
         >
-          {saving ? '⏳' : saved ? '' : ''} {saved ? t('adminPages.common.saved') : t('adminPages.common.save')}
+          {saving ? '' : saved ? '' : ''} {saved ? t('adminPages.common.saved') : t('adminPages.common.save')}
         </motion.button>
       </div>
 
@@ -134,7 +134,7 @@ export default function AllergenenPage({ params }: { params: { tenant: string } 
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">{allergen.icon}</span>
                   <div>
-                    <p className={`font-medium ${allergen.enabled ? 'text-blue-700' : 'text-gray-600'}`}>
+                    <p className={`font-medium ${allergen.enabled ? 'text-blue-700': 'text-gray-600'}`}>
                       {allergenName}
                     </p>
                     <p className="text-xs text-gray-400">

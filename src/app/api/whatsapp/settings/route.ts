@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   const tenantSlug = request.nextUrl.searchParams.get('tenant')
 
   if (!tenantSlug) {
-    return NextResponse.json({ error: 'Missing tenant' }, { status: 400 })
+    return NextResponse.json({ error: 'Missing tenant'}, { status: 400 })
   }
 
   const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
@@ -41,13 +41,13 @@ export async function POST(request: NextRequest) {
     const { tenant_slug, ...settings } = body
 
     if (!tenant_slug) {
-      return NextResponse.json({ error: 'Missing tenant_slug' }, { status: 400 })
+      return NextResponse.json({ error: 'Missing tenant_slug'}, { status: 400 })
     }
 
     const access = await verifyTenantOrSuperAdmin(request, tenant_slug)
     if (!access.authorized) {
       const st = access.error?.includes('ingelogd') ? 401 : 403
-      return NextResponse.json({ error: access.error || 'Forbidden' }, { status: st })
+      return NextResponse.json({ error: access.error || 'Forbidden'}, { status: st })
     }
 
     const { data: existing } = await supabaseAdmin

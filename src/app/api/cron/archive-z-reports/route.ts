@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     const supabase = getServerSupabaseClient()
     if (!supabase) {
       logger.error('Database not configured', { requestId })
-      return NextResponse.json({ error: 'Database not configured' }, { status: 503 })
+      return NextResponse.json({ error: 'Database not configured'}, { status: 503 })
     }
 
     logger.info('Starting Z-report archival cron job', { requestId })
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
     logger.info('Query bounds', { requestId, startUTC, endUTC })
 
     const ANALYTICS_ORDER_STATUS_EXCLUDE =
-      '("cancelled","rejected","CANCELLED","REJECTED")' as const
+      '("cancelled","rejected","CANCELLED","REJECTED")'as const
 
     const { data: allOrdersRaw, error: ordersError } = await supabase
       .from('orders')
@@ -62,12 +62,12 @@ export async function GET(request: NextRequest) {
 
     if (ordersError) {
       logger.error('Failed to fetch orders', { requestId, error: ordersError.message })
-      return NextResponse.json({ error: 'Failed to fetch orders' }, { status: 500 })
+      return NextResponse.json({ error: 'Failed to fetch orders'}, { status: 500 })
     }
 
     const allOrders = (allOrdersRaw || []).filter((row) =>
       orderCountsTowardRevenueAndZReport(
-        row as Pick<Order, 'order_type' | 'status' | 'payment_status'>,
+        row as Pick<Order, 'order_type' |  'status' |  'payment_status'>,
       ),
     )
 

@@ -92,7 +92,7 @@ export default function VacaturesPage({ params }: { params: { tenant: string } }
         <>
           <motion.div
             animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+            transition={{ duration: 1, repeat: Infinity, ease: 'linear'}}
             className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
           />
           <span>{t('adminPages.common.saving')}</span>
@@ -170,12 +170,12 @@ export default function VacaturesPage({ params }: { params: { tenant: string } }
                 setSaved(false)
               }}
               className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                formData.hiring_enabled ? 'bg-blue-600' : 'bg-gray-200'
+                formData.hiring_enabled ? 'bg-blue-600': 'bg-gray-200'
               }`}
             >
               <span
                 className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                  formData.hiring_enabled ? 'translate-x-5' : 'translate-x-0'
+                  formData.hiring_enabled ? 'translate-x-5': 'translate-x-0'
                 }`}
               />
             </button>
@@ -184,7 +184,7 @@ export default function VacaturesPage({ params }: { params: { tenant: string } }
           {formData.hiring_enabled && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
+              animate={{ opacity: 1, height: 'auto'}}
               className="space-y-4"
             >
               <div>

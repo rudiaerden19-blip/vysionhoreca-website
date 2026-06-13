@@ -15,13 +15,13 @@ export const localeNames: Record<Locale, string> = {
 };
 
 export const localeFlags: Record<Locale, string> = {
-  nl: '🇧🇪',
-  en: '🇬🇧',
-  fr: '🇫🇷',
-  de: '🇩🇪',
-  es: '🇪🇸',
-  it: '🇮🇹',
-  ja: '🇯🇵',
-  zh: '🇨🇳',
-  ar: '🇸🇦',
+  nl: '',
+  en: '',
+  fr: '',
+  de: '',
+  es: '',
+  it: '',
+  ja: '',
+  zh: '',
+  ar: '',
 };

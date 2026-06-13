@@ -27,7 +27,7 @@ export function PricingHardwareToggle({
         type="button"
         onClick={() => onChange(false)}
         className={`px-5 sm:px-6 py-2.5 sm:py-3 rounded-full text-sm sm:text-base font-semibold transition-all ${
-          !withHardware ? 'bg-accent text-white shadow-home-float' : 'text-gray-600 hover:text-gray-900'
+          !withHardware ? 'bg-accent text-white shadow-home-float': 'text-gray-600 hover:text-gray-900'
         }`}
       >
         {labelWithout}
@@ -36,7 +36,7 @@ export function PricingHardwareToggle({
         type="button"
         onClick={() => onChange(true)}
         className={`px-5 sm:px-6 py-2.5 sm:py-3 rounded-full text-sm sm:text-base font-semibold transition-all ${
-          withHardware ? 'bg-accent text-white shadow-home-float' : 'text-gray-600 hover:text-gray-900'
+          withHardware ? 'bg-accent text-white shadow-home-float': 'text-gray-600 hover:text-gray-900'
         }`}
       >
         {labelWith}

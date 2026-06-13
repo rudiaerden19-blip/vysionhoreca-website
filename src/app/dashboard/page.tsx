@@ -105,7 +105,7 @@ export default function DashboardPage() {
   }
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('nl-BE', { style: 'currency', currency: 'EUR' }).format(amount)
+    return new Intl.NumberFormat('nl-BE', { style: 'currency', currency: 'EUR'}).format(amount)
   }
 
   const formatDate = (dateString: string) => {
@@ -266,8 +266,8 @@ export default function DashboardPage() {
                       {order.customer_name || common('anonymous')}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${order.is_online ? 'bg-purple-500/20 text-purple-400' : 'bg-gray-700 text-gray-300'}`}>
-                        {order.is_online ? ` ${trans('orderType.online')}` : ` ${trans('orderType.pos')}`}
+                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${order.is_online ? 'bg-purple-500/20 text-purple-400': 'bg-gray-700 text-gray-300'}`}>
+                        {order.is_online ? ` ${trans('orderType.online')}`: ` ${trans('orderType.pos')}`}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap font-medium text-white">

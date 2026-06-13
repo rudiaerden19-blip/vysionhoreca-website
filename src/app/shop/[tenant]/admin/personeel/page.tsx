@@ -271,9 +271,9 @@ export default function PersoneelPage() {
       <div className="flex items-center gap-3">
         <button
           onClick={() => setShowInactive(!showInactive)}
-          className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${showInactive ? 'bg-blue-600' : 'bg-gray-200'}`}
+          className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${showInactive ? 'bg-blue-600': 'bg-gray-200'}`}
         >
-          <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${showInactive ? 'translate-x-5' : 'translate-x-0'}`} />
+          <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${showInactive ? 'translate-x-5': 'translate-x-0'}`} />
         </button>
         <span className="text-gray-700 text-sm font-medium">{t('personeelPage.showInactive')}</span>
       </div>
@@ -297,7 +297,7 @@ export default function PersoneelPage() {
             <div
               key={member.id}
               className={`bg-white rounded-2xl p-5 shadow-sm transition ${
-                !member.is_active ? 'opacity-50' : ''
+                !member.is_active ? 'opacity-50': ''
               }`}
             >
               <div className="flex items-start justify-between mb-4">
@@ -311,8 +311,8 @@ export default function PersoneelPage() {
                   <div>
                     <h3 className="font-semibold text-gray-800">{member.name}</h3>
                     <span className={`text-xs px-2 py-0.5 rounded-full ${
-                      member.role === 'ADMIN' ? 'bg-blue-100 text-blue-700' :
-                      member.role === 'MANAGER' ? 'bg-purple-100 text-purple-700' :
+                      member.role === 'ADMIN'? 'bg-blue-100 text-blue-700':
+                      member.role === 'MANAGER'? 'bg-purple-100 text-purple-700':
                       'bg-green-100 text-green-700'
                     }`}>
                       {ROLES.find(r => r.id === member.role)?.label}
@@ -321,10 +321,10 @@ export default function PersoneelPage() {
                 </div>
                 <button
                   onClick={() => toggleActive(member)}
-                  className={`relative w-10 h-5 rounded-full transition-colors duration-200 flex-shrink-0 ${member.is_active ? 'bg-green-500' : 'bg-gray-300'}`}
-                  title={member.is_active ? 'Actief' : 'Inactief'}
+                  className={`relative w-10 h-5 rounded-full transition-colors duration-200 flex-shrink-0 ${member.is_active ? 'bg-green-500': 'bg-gray-300'}`}
+                  title={member.is_active ? 'Actief': 'Inactief'}
                 >
-                  <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 ${member.is_active ? 'translate-x-5' : 'translate-x-0'}`} />
+                  <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 ${member.is_active ? 'translate-x-5': 'translate-x-0'}`} />
                 </button>
               </div>
 
@@ -353,7 +353,7 @@ export default function PersoneelPage() {
                 )}
                 {member.hours_per_week && (
                   <div className="flex items-center gap-2">
-                    <span>⏰</span>
+                    <span></span>
                     <span>{member.hours_per_week} {t('personeelPage.hoursPerWeek')}</span>
                   </div>
                 )}
@@ -390,7 +390,7 @@ export default function PersoneelPage() {
           <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl">
             <div className="p-6 border-b">
               <h2 className="text-xl font-bold text-gray-900">
-                {editingStaff ? ` ${t('personeelPage.editEmployee')}` : ` ${t('personeelPage.newEmployee')}`}
+                {editingStaff ? ` ${t('personeelPage.editEmployee')}`: ` ${t('personeelPage.newEmployee')}`}
               </h2>
             </div>
             
@@ -482,7 +482,7 @@ export default function PersoneelPage() {
                       type="button"
                       onClick={() => setFormData({ ...formData, color })}
                       className={`w-8 h-8 rounded-full transition ${
-                        formData.color === color ? 'ring-2 ring-offset-2 ring-gray-800' : ''
+                        formData.color === color ? 'ring-2 ring-offset-2 ring-gray-800': ''
                       }`}
                       style={{ backgroundColor: color }}
                     />
@@ -503,7 +503,7 @@ export default function PersoneelPage() {
                 disabled={saving}
                 className="px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50"
               >
-                {saving ? `${t('adminPages.common.saving')}...` : editingStaff ? t('urenPage.update') : t('urenPage.add')}
+                {saving ? `${t('adminPages.common.saving')}...`: editingStaff ? t('urenPage.update') : t('urenPage.add')}
               </button>
             </div>
           </div>
@@ -666,7 +666,7 @@ export default function PersoneelPage() {
                 disabled={saving}
                 className="px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50"
               >
-                {saving ? `${t('adminPages.common.saving')}...` : t('personeelPage.contractForm.saveContract')}
+                {saving ? `${t('adminPages.common.saving')}...`: t('personeelPage.contractForm.saveContract')}
               </button>
             </div>
           </div>

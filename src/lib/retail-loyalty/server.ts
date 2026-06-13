@@ -61,7 +61,7 @@ export async function upsertRetailLoyaltySettings(
   >,
 ): Promise<{ ok: boolean; error?: string }> {
   const supabase = getServerSupabaseClient()
-  if (!supabase) return { ok: false, error: 'db_unavailable' }
+  if (!supabase) return { ok: false, error: 'db_unavailable'}
 
   const row: Record<string, unknown> = {
     tenant_slug: tenantSlug,
@@ -204,7 +204,7 @@ export async function searchRetailLoyaltyCustomers(
   if (q.length < 2) return { ok: true, results: [] }
 
   const supabase = getServerSupabaseClient()
-  if (!supabase) return { ok: false, results: [], error: 'db_unavailable' }
+  if (!supabase) return { ok: false, results: [], error: 'db_unavailable'}
 
   const safe = q.replace(/[%_\\]/g, '')
   const emailExact = q.includes('@') ? q.toLowerCase().trim() : null
@@ -297,12 +297,12 @@ async function upsertShopCustomerForLoyalty(
   },
 ): Promise<{ ok: boolean; customerId?: string; error?: string }> {
   const supabase = getServerSupabaseClient()
-  if (!supabase) return { ok: false, error: 'db_unavailable' }
+  if (!supabase) return { ok: false, error: 'db_unavailable'}
 
   const email = input.email.trim().toLowerCase()
   const name = capitalizeCustomerWords(input.name.trim())
-  if (!email || !email.includes('@')) return { ok: false, error: 'email_required' }
-  if (!name) return { ok: false, error: 'name_required' }
+  if (!email || !email.includes('@')) return { ok: false, error: 'email_required'}
+  if (!name) return { ok: false, error: 'name_required'}
 
   const btwRaw = input.btw_number?.trim()
   const btw_number = btwRaw ? normalizeCustomerBtwNumber(btwRaw) || null : null
@@ -363,7 +363,7 @@ async function upsertShopCustomerForLoyalty(
     .select('id')
     .single()
 
-  if (insErr || !inserted) return { ok: false, error: insErr?.message || 'customer_insert_failed' }
+  if (insErr || !inserted) return { ok: false, error: insErr?.message || 'customer_insert_failed'}
   return { ok: true, customerId: inserted.id }
 }
 
@@ -385,7 +385,7 @@ export async function createRetailLoyaltyMember(
   },
 ): Promise<{ ok: boolean; member?: RetailLoyaltyMemberPublic; error?: string; emailSent?: boolean }> {
   const supabase = getServerSupabaseClient()
-  if (!supabase) return { ok: false, error: 'db_unavailable' }
+  if (!supabase) return { ok: false, error: 'db_unavailable'}
 
   let shopCustomerId = input.shop_customer_id
   const emailNorm = input.email?.trim().toLowerCase()
@@ -427,7 +427,7 @@ export async function createRetailLoyaltyMember(
           })
           emailSent = mail.ok
           if (!mail.ok && mail.error === 'smtp_not_configured') {
-            return { ok: false, error: 'smtp_not_configured' }
+            return { ok: false, error: 'smtp_not_configured'}
           }
           if (mail.ok) {
             const member: RetailLoyaltyMemberPublic = {
@@ -437,7 +437,7 @@ export async function createRetailLoyaltyMember(
               phone: existingPass.phone,
               points_balance: Number(existingPass.points_balance) || 0,
             }
-            return { ok: true, member, emailSent: true, error: 'existing_pass_mailed' }
+            return { ok: true, member, emailSent: true, error: 'existing_pass_mailed'}
           }
           const member: RetailLoyaltyMemberPublic = {
             id: existingPass.id,
@@ -446,9 +446,9 @@ export async function createRetailLoyaltyMember(
             phone: existingPass.phone,
             points_balance: Number(existingPass.points_balance) || 0,
           }
-          return { ok: true, member, emailSent: false, error: 'email_send_failed' }
+          return { ok: true, member, emailSent: false, error: 'email_send_failed'}
         }
-        return { ok: false, error: 'email_has_active_pass' }
+        return { ok: false, error: 'email_has_active_pass'}
       }
       await updateRetailLoyaltyMember(tenantSlug, existingPass.id, {
         display_name: input.display_name?.trim() || existingPass.display_name,
@@ -474,10 +474,10 @@ export async function createRetailLoyaltyMember(
         })
         emailSent = mail.ok
         if (!mail.ok && mail.error === 'smtp_not_configured') {
-          return { ok: true, member, emailSent: false, error: 'smtp_not_configured' }
+          return { ok: true, member, emailSent: false, error: 'smtp_not_configured'}
         }
         if (!mail.ok) {
-          return { ok: true, member, emailSent: false, error: 'email_send_failed' }
+          return { ok: true, member, emailSent: false, error: 'email_send_failed'}
         }
       }
       return { ok: true, member, emailSent }
@@ -500,7 +500,7 @@ export async function createRetailLoyaltyMember(
       }
     }
   }
-  if (!cardCode) return { ok: false, error: 'card_generate_failed' }
+  if (!cardCode) return { ok: false, error: 'card_generate_failed'}
 
   const { data, error } = await supabase
     .from('retail_loyalty_members')
@@ -515,7 +515,7 @@ export async function createRetailLoyaltyMember(
     .select(MEMBER_SELECT)
     .single()
 
-  if (error || !data) return { ok: false, error: error?.message || 'insert_failed' }
+  if (error || !data) return { ok: false, error: error?.message || 'insert_failed'}
 
   const member: RetailLoyaltyMemberPublic = {
     id: data.id,
@@ -537,9 +537,9 @@ export async function createRetailLoyaltyMember(
     })
     emailSent = mail.ok
     if (!mail.ok && mail.error === 'smtp_not_configured') {
-      return { ok: true, member, emailSent: false, error: 'smtp_not_configured' }
+      return { ok: true, member, emailSent: false, error: 'smtp_not_configured'}
     }
-    if (!mail.ok) return { ok: true, member, emailSent: false, error: 'email_send_failed' }
+    if (!mail.ok) return { ok: true, member, emailSent: false, error: 'email_send_failed'}
   }
 
   return { ok: true, member, emailSent }
@@ -568,7 +568,7 @@ export async function earnRetailLoyaltyPointsForSale(
   if (points <= 0) return { ok: true, points: 0 }
 
   const supabase = getServerSupabaseClient()
-  if (!supabase) return { ok: false, error: 'db_unavailable' }
+  if (!supabase) return { ok: false, error: 'db_unavailable'}
 
   const { data: member, error: loadErr } = await supabase
     .from('retail_loyalty_members')
@@ -578,7 +578,7 @@ export async function earnRetailLoyaltyPointsForSale(
     .maybeSingle()
 
   if (loadErr || !member || !member.is_active) {
-    return { ok: false, error: 'member_not_found' }
+    return { ok: false, error: 'member_not_found'}
   }
 
   const prev = Number(member.points_balance) || 0
@@ -626,7 +626,7 @@ async function applyRetailLoyaltyPointsDelta(
 ): Promise<{ ok: boolean; balance?: number; error?: string }> {
   if (pointsDelta === 0) {
     const supabase = getServerSupabaseClient()
-    if (!supabase) return { ok: false, error: 'db_unavailable' }
+    if (!supabase) return { ok: false, error: 'db_unavailable'}
     const { data: member } = await supabase
       .from('retail_loyalty_members')
       .select('points_balance')
@@ -637,7 +637,7 @@ async function applyRetailLoyaltyPointsDelta(
   }
 
   const supabase = getServerSupabaseClient()
-  if (!supabase) return { ok: false, error: 'db_unavailable' }
+  if (!supabase) return { ok: false, error: 'db_unavailable'}
 
   const { data: member, error: loadErr } = await supabase
     .from('retail_loyalty_members')
@@ -647,12 +647,12 @@ async function applyRetailLoyaltyPointsDelta(
     .maybeSingle()
 
   if (loadErr || !member || !member.is_active) {
-    return { ok: false, error: 'member_not_found' }
+    return { ok: false, error: 'member_not_found'}
   }
 
   const prev = Number(member.points_balance) || 0
   const next = prev + pointsDelta
-  if (next < 0) return { ok: false, error: 'insufficient_points' }
+  if (next < 0) return { ok: false, error: 'insufficient_points'}
 
   const { error: updErr } = await supabase
     .from('retail_loyalty_members')
@@ -690,7 +690,7 @@ export async function updateRetailLoyaltyMember(
   patch: { display_name?: string | null; phone?: string | null; email?: string | null; is_active?: boolean },
 ): Promise<{ ok: boolean; error?: string }> {
   const supabase = getServerSupabaseClient()
-  if (!supabase) return { ok: false, error: 'db_unavailable' }
+  if (!supabase) return { ok: false, error: 'db_unavailable'}
 
   const row: Record<string, unknown> = { updated_at: new Date().toISOString() }
   if (patch.display_name !== undefined) {
@@ -719,7 +719,7 @@ export async function deleteRetailLoyaltyMember(
   memberId: string,
 ): Promise<{ ok: boolean; error?: string }> {
   const supabase = getServerSupabaseClient()
-  if (!supabase) return { ok: false, error: 'db_unavailable' }
+  if (!supabase) return { ok: false, error: 'db_unavailable'}
 
   const { error } = await supabase
     .from('retail_loyalty_members')
@@ -738,7 +738,7 @@ export async function adjustRetailLoyaltyMemberPoints(
   note?: string,
 ): Promise<{ ok: boolean; balance?: number; error?: string }> {
   if (!Number.isInteger(pointsDelta) || pointsDelta === 0) {
-    return { ok: false, error: 'invalid_delta' }
+    return { ok: false, error: 'invalid_delta'}
   }
   return applyRetailLoyaltyPointsDelta(tenantSlug, memberId, pointsDelta, {
     reason: 'adjust',
@@ -763,7 +763,7 @@ export async function settleRetailLoyaltyForSale(
   const paidTotal = Math.round(orderTotal * 100) / 100
 
   const supabase = getServerSupabaseClient()
-  if (!supabase) return { ok: false, error: 'db_unavailable' }
+  if (!supabase) return { ok: false, error: 'db_unavailable'}
 
   const { data: memberRow } = await supabase
     .from('retail_loyalty_members')
@@ -772,19 +772,19 @@ export async function settleRetailLoyaltyForSale(
     .eq('id', memberId)
     .maybeSingle()
 
-  if (!memberRow || !memberRow.is_active) return { ok: false, error: 'member_not_found' }
+  if (!memberRow || !memberRow.is_active) return { ok: false, error: 'member_not_found'}
 
   const memberBalance = Number(memberRow.points_balance) || 0
 
   if (redeemPoints > 0) {
-    if (!settings.redeem_enabled) return { ok: false, error: 'redeem_disabled' }
+    if (!settings.redeem_enabled) return { ok: false, error: 'redeem_disabled'}
     const rate = Number(settings.redeem_points_per_euro)
-    if (!(rate > 0)) return { ok: false, error: 'redeem_not_configured' }
+    if (!(rate > 0)) return { ok: false, error: 'redeem_not_configured'}
     const discount = computeRetailLoyaltyRedeemEuroDiscount(redeemPoints, rate)
-    if (discount <= 0) return { ok: false, error: 'invalid_redeem' }
+    if (discount <= 0) return { ok: false, error: 'invalid_redeem'}
     const grossBeforeDiscount = paidTotal + discount
     const maxPts = maxRetailLoyaltyRedeemPoints(memberBalance, grossBeforeDiscount, rate)
-    if (redeemPoints > maxPts) return { ok: false, error: 'redeem_exceeds_order' }
+    if (redeemPoints > maxPts) return { ok: false, error: 'redeem_exceeds_order'}
   }
 
   let balance: number | undefined

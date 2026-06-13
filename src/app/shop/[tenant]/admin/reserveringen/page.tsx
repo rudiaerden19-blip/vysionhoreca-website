@@ -46,7 +46,7 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
     }
 
     void (async () => {
-      const loadZone = async (plan_zone: 'inside' | 'terrace'): Promise<KassaTable[]> => {
+      const loadZone = async (plan_zone: 'inside' |  'terrace'): Promise<KassaTable[]> => {
         const adminRes = await adminDb.select<{ data?: unknown } | null>('floor_plan_tables', {
           tenantSlug: params.tenant,
           select: 'data',

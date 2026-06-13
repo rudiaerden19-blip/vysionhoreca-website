@@ -28,16 +28,16 @@ const IGNORE_TYPES = new Set([
 
 const STORAGE_KEYBOARD_LAYOUT = 'vysion_web_kb_layout'
 
-/** Blijft op het veld staan terwijl `inputmode` tijdelijk `none` is (decimale toetsen tonen). */
+/** Blijft op het veld staan terwijl `inputmode`tijdelijk `none`is (decimale toetsen tonen). */
 const ATTR_VYSION_KB_DECIMAL = 'data-vysion-kb-decimal'
 
-type KeyboardLetterLayout = 'azerty' | 'qwerty'
+type KeyboardLetterLayout = 'azerty' |  'qwerty'
 
 function readStoredLetterLayout(): KeyboardLetterLayout {
   if (typeof window === 'undefined') return 'azerty'
   try {
     const raw = window.localStorage.getItem(STORAGE_KEYBOARD_LAYOUT)
-    return raw === 'qwerty' ? 'qwerty' : 'azerty'
+    return raw === 'qwerty'? 'qwerty': 'azerty'
   } catch {
     return 'azerty'
   }
@@ -88,7 +88,7 @@ function scrollFieldClearOfKeyboard(target: HTMLElement, panelH: number, headerP
   if (scrollParent === document.documentElement) {
     const y = window.scrollY + rect.top - headerPx - 20
     const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight)
-    window.scrollTo({ top: Math.min(maxScroll, Math.max(0, y)), behavior: 'smooth' })
+    window.scrollTo({ top: Math.min(maxScroll, Math.max(0, y)), behavior: 'smooth'})
     return
   }
 
@@ -109,7 +109,7 @@ function scrollFieldClearOfKeyboard(target: HTMLElement, panelH: number, headerP
 /**
  * Zaak-shell + keuken + interne dashboards: altijd groot webtoetsenbord (kassa-/touch-pc stack).
  * Publieke landingspagina’s: vooral bij touch-/tablet-pointer.
- * Opslag: localStorage `vysion_web_kb_force` = 1 aan, `vysion_web_kb_off` = 1 uit.
+ * Opslag: localStorage `vysion_web_kb_force`= 1 aan, `vysion_web_kb_off`= 1 uit.
  */
 function shouldActivateWebKeyboard(pathname: string): boolean {
   if (typeof window === 'undefined') return false
@@ -129,7 +129,7 @@ function shouldActivateWebKeyboard(pathname: string): boolean {
 
   try {
     if (window.matchMedia?.('(pointer: coarse)')?.matches) return true
-    if ('maxTouchPoints' in navigator && navigator.maxTouchPoints > 0) return true
+    if ('maxTouchPoints'in navigator && navigator.maxTouchPoints > 0) return true
   } catch {
     /* noop */
   }
@@ -194,7 +194,7 @@ function isDigitOriented(el: HTMLInputElement): boolean {
 /**
  * Compact PINATM-numpad: korte wachtwoordvelden, expliciete data-attribuut,
  * OTP, of velden met pin/pincode in id|name + cijferachtig type/modus.
- * `data-web-kb-pin="1"` op <input> of ancestor forceert compact numpad.
+ * `data-web-kb-pin="1"`op <input> of ancestor forceert compact numpad.
  */
 function isCompactPinField(el: HTMLInputElement | HTMLTextAreaElement): boolean {
   if (!(el instanceof HTMLInputElement)) return false
@@ -208,7 +208,7 @@ function isCompactPinField(el: HTMLInputElement | HTMLTextAreaElement): boolean 
   const ac = el.autocomplete ?? el.getAttribute('autocomplete') ?? ''
   if (/\bone-time-code\b/i.test(ac)) return true
 
-  const ml = typeof el.maxLength === 'number' ? el.maxLength : 0
+  const ml = typeof el.maxLength === 'number'? el.maxLength : 0
 
   if (el.type === 'password') {
     if (ml > 0 && ml <= STAFF_PIN_MAX_LEN) return true
@@ -558,9 +558,9 @@ export function WebAzertyKeyboard() {
   const QWERTY_ROW2 = ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l']
   const QWERTY_ROW3 = ['z', 'x', 'c', 'v', 'b', 'n', 'm']
 
-  const ROW1 = letterLayout === 'azerty' ? AZERTY_ROW1 : QWERTY_ROW1
-  const ROW2 = letterLayout === 'azerty' ? AZERTY_ROW2 : QWERTY_ROW2
-  const ROW3 = letterLayout === 'azerty' ? AZERTY_ROW3 : QWERTY_ROW3
+  const ROW1 = letterLayout === 'azerty'? AZERTY_ROW1 : QWERTY_ROW1
+  const ROW2 = letterLayout === 'azerty'? AZERTY_ROW2 : QWERTY_ROW2
+  const ROW3 = letterLayout === 'azerty'? AZERTY_ROW3 : QWERTY_ROW3
 
   const rowPad2 =
     letterLayout === 'azerty'
@@ -584,7 +584,7 @@ export function WebAzertyKeyboard() {
         <KeyBtn key={d} label={d} className="col-span-3" onClick={() => onChar(d)} />
       ))}
       <KeyBtn
-        label="⌫"
+        label="Del"
         className="col-span-3 bg-amber-900/95"
         onClick={() => {
           if (target?.isConnected) backspace(target)
@@ -667,7 +667,7 @@ export function WebAzertyKeyboard() {
         />
         <KeyBtn label="0" className={pinKeyCls} onClick={() => onChar('0')} />
         <KeyBtn
-          label="⌫"
+          label="Del"
           className={`${pinKeyCls} border-amber-950/65 bg-[#5f3b28] text-xl`}
           onClick={() => {
             if (target?.isConnected) backspace(target)
@@ -742,7 +742,7 @@ export function WebAzertyKeyboard() {
             />
           ))}
           <KeyBtn
-            label="⌫"
+            label="Del"
             className={`!min-w-0 min-h-0 flex-[1.35_1_0] basis-0 shrink px-1 text-lg max-sm:px-0.5 sm:min-w-[3.5rem] sm:flex-none ${actionKeyCls}`}
             onClick={() => {
               if (target?.isConnected) backspace(target)
@@ -753,11 +753,11 @@ export function WebAzertyKeyboard() {
         {/* Tekens + shift (wrap); spatie + enter op aparte rij — past binnen paneel */}
         <div className="mx-auto flex w-full max-w-[min(720px,92vw)] flex-wrap items-center justify-center gap-1 px-1.5 pb-1 max-sm:gap-1 sm:gap-1.5 sm:px-2">
           <KeyBtn
-            label="⇧"
+            label="Shift"
             aria-label={t('kassaApp.webKbCaps')}
             title={t('kassaApp.webKbCaps')}
             className={`shrink-0 border-zinc-900 bg-[#585c66] px-2 text-xl font-bold leading-none max-sm:px-1.5 sm:min-w-[3.25rem] ${actionKeyCls} ${
-              caps ? 'ring-[3px] ring-amber-400 ring-offset-0 ring-offset-transparent' : ''
+              caps ? 'ring-[3px] ring-amber-400 ring-offset-0 ring-offset-transparent': ''
             }`}
             onClick={() => {
               if (target?.isConnected) focusInputForProgrammaticEdit(target)
@@ -828,7 +828,7 @@ export function WebAzertyKeyboard() {
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => chooseLayout('azerty')}
                 className={`h-8 min-w-[3.75rem] shrink-0 px-1.5 text-[10px] font-extrabold uppercase tracking-wide touch-manipulation active:brightness-110 sm:h-9 sm:min-w-[4.25rem] sm:text-[11px] ${
-                  letterLayout === 'azerty' ? 'bg-[#3C4D6B] text-white' : 'bg-zinc-800 text-zinc-400'
+                  letterLayout === 'azerty'? 'bg-[#3C4D6B] text-white': 'bg-zinc-800 text-zinc-400'
                 }`}
               >
                 AZERTY
@@ -843,7 +843,7 @@ export function WebAzertyKeyboard() {
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => chooseLayout('qwerty')}
                 className={`h-8 min-w-[3.75rem] shrink-0 px-1.5 text-[10px] font-extrabold uppercase tracking-wide touch-manipulation active:brightness-110 sm:h-9 sm:min-w-[4.25rem] sm:text-[11px] ${
-                  letterLayout === 'qwerty' ? 'bg-[#3C4D6B] text-white' : 'bg-zinc-800 text-zinc-400'
+                  letterLayout === 'qwerty'? 'bg-[#3C4D6B] text-white': 'bg-zinc-800 text-zinc-400'
                 }`}
               >
                 QWERTY

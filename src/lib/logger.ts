@@ -10,11 +10,11 @@
  * 
  * Usage:
  *   import { logger } from '@/lib/logger'
- *   logger.info('User logged in', { userId: '123', tenant: 'demo' })
- *   logger.error('Payment failed', { error: err.message, orderId: '456' })
+ *   logger.info('User logged in', { userId: '123', tenant: 'demo'})
+ *   logger.error('Payment failed', { error: err.message, orderId: '456'})
  */
 
-type LogLevel = 'debug' | 'info' | 'warn' | 'error'
+type LogLevel = 'debug' |  'info' |  'warn' |  'error'
 
 interface LogEntry {
   timestamp: string
@@ -153,7 +153,7 @@ export const logger = {
     return {
       end: (context?: Record<string, unknown>) => {
         const duration = Date.now() - start
-        this.info(`${label} completed`, { ...context, duration: `${duration}ms` })
+        this.info(`${label} completed`, { ...context, duration: `${duration}ms`})
         return duration
       },
     }
@@ -166,8 +166,8 @@ export const logger = {
 
   // Helper for API response logging
   response(method: string, path: string, status: number, duration: number) {
-    const level = status >= 500 ? 'error' : status >= 400 ? 'warn' : 'info'
-    this[level](`${method} ${path} -> ${status}`, { status, duration: `${duration}ms` })
+    const level = status >= 500 ? 'error': status >= 400 ? 'warn': 'info'
+    this[level](`${method} ${path} -> ${status}`, { status, duration: `${duration}ms`})
   },
 }
 

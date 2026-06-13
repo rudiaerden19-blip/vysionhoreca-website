@@ -8,7 +8,7 @@ describe('kassaReceiptTableNumber', () => {
   })
 
   it('trims and treats empty as no table', () => {
-    expect(kassaReceiptTableNumber('DINE_IN', '  ')).toBe('')
+    expect(kassaReceiptTableNumber('DINE_IN', ' ')).toBe('')
     expect(kassaReceiptTableNumber('DINE_IN', null)).toBe('')
   })
 })

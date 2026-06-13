@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
     try {
       raw = await req.json()
     } catch {
-      return NextResponse.json({ error: 'Ongeldige JSON' }, { status: 400 })
+      return NextResponse.json({ error: 'Ongeldige JSON'}, { status: 400 })
     }
     const parsed = BodySchema.safeParse(raw)
     if (!parsed.success) {
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
 
     const supabase = getServerSupabaseClient()
     if (!supabase) {
-      return NextResponse.json({ error: 'Database niet beschikbaar' }, { status: 503 })
+      return NextResponse.json({ error: 'Database niet beschikbaar'}, { status: 503 })
     }
 
     // Tenant moet bestaan (voorkomt vervuiling met onbekende tenants).
@@ -97,10 +97,10 @@ export async function POST(req: NextRequest) {
       .eq('slug', tenantSlug)
       .maybeSingle()
     if (tenantErr || !tenant) {
-      return NextResponse.json({ error: 'Tenant onbekend' }, { status: 404 })
+      return NextResponse.json({ error: 'Tenant onbekend'}, { status: 404 })
     }
 
-    const onConflict = phone ? 'tenant_slug,phone' : 'tenant_slug,email'
+    const onConflict = phone ? 'tenant_slug,phone': 'tenant_slug,email'
     const { error } = await supabase
       .from('guest_profiles')
       .upsert(
@@ -130,6 +130,6 @@ export async function POST(req: NextRequest) {
       err: err?.message || String(err),
     })
     // Soft-fail: 200 zodat de reservering-flow niet kapot gaat.
-    return NextResponse.json({ ok: false, error: 'Interne fout' }, { status: 200 })
+    return NextResponse.json({ ok: false, error: 'Interne fout'}, { status: 200 })
   }
 }

@@ -62,7 +62,7 @@ export default function BestellingenPage() {
   }
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('nl-BE', { style: 'currency', currency: 'EUR' }).format(amount || 0)
+    return new Intl.NumberFormat('nl-BE', { style: 'currency', currency: 'EUR'}).format(amount || 0)
   }
 
   const formatDate = (dateString: string) => {
@@ -140,31 +140,31 @@ export default function BestellingenPage() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <button 
           onClick={() => setFilter('all')}
-          className={`p-4 rounded-xl border transition-colors ${filter === 'all' ? 'bg-accent text-white border-accent' : 'bg-white border-gray-200 hover:border-accent'}`}
+          className={`p-4 rounded-xl border transition-colors ${filter === 'all'? 'bg-accent text-white border-accent': 'bg-white border-gray-200 hover:border-accent'}`}
         >
-          <p className={`text-2xl font-bold ${filter === 'all' ? 'text-white' : 'text-gray-900'}`}>{stats.total}</p>
-          <p className={`text-sm ${filter === 'all' ? 'text-white/80' : 'text-gray-500'}`}>{trans('filters.total')}</p>
+          <p className={`text-2xl font-bold ${filter === 'all'? 'text-white': 'text-gray-900'}`}>{stats.total}</p>
+          <p className={`text-sm ${filter === 'all'? 'text-white/80': 'text-gray-500'}`}>{trans('filters.total')}</p>
         </button>
         <button 
           onClick={() => setFilter('online')}
-          className={`p-4 rounded-xl border transition-colors ${filter === 'online' ? 'bg-purple-600 text-white border-purple-600' : 'bg-white border-gray-200 hover:border-purple-600'}`}
+          className={`p-4 rounded-xl border transition-colors ${filter === 'online'? 'bg-purple-600 text-white border-purple-600': 'bg-white border-gray-200 hover:border-purple-600'}`}
         >
-          <p className={`text-2xl font-bold ${filter === 'online' ? 'text-white' : 'text-gray-900'}`}>{stats.online}</p>
-          <p className={`text-sm ${filter === 'online' ? 'text-white/80' : 'text-gray-500'}`}>{trans('filters.online')}</p>
+          <p className={`text-2xl font-bold ${filter === 'online'? 'text-white': 'text-gray-900'}`}>{stats.online}</p>
+          <p className={`text-sm ${filter === 'online'? 'text-white/80': 'text-gray-500'}`}>{trans('filters.online')}</p>
         </button>
         <button 
           onClick={() => setFilter('kassa')}
-          className={`p-4 rounded-xl border transition-colors ${filter === 'kassa' ? 'bg-gray-800 text-white border-gray-800' : 'bg-white border-gray-200 hover:border-gray-800'}`}
+          className={`p-4 rounded-xl border transition-colors ${filter === 'kassa'? 'bg-gray-800 text-white border-gray-800': 'bg-white border-gray-200 hover:border-gray-800'}`}
         >
-          <p className={`text-2xl font-bold ${filter === 'kassa' ? 'text-white' : 'text-gray-900'}`}>{stats.kassa}</p>
-          <p className={`text-sm ${filter === 'kassa' ? 'text-white/80' : 'text-gray-500'}`}>{trans('filters.pos')}</p>
+          <p className={`text-2xl font-bold ${filter === 'kassa'? 'text-white': 'text-gray-900'}`}>{stats.kassa}</p>
+          <p className={`text-sm ${filter === 'kassa'? 'text-white/80': 'text-gray-500'}`}>{trans('filters.pos')}</p>
         </button>
         <button 
           onClick={() => setFilter('pending')}
-          className={`p-4 rounded-xl border transition-colors ${filter === 'pending' ? 'bg-yellow-500 text-white border-yellow-500' : 'bg-white border-gray-200 hover:border-yellow-500'}`}
+          className={`p-4 rounded-xl border transition-colors ${filter === 'pending'? 'bg-yellow-500 text-white border-yellow-500': 'bg-white border-gray-200 hover:border-yellow-500'}`}
         >
-          <p className={`text-2xl font-bold ${filter === 'pending' ? 'text-white' : 'text-gray-900'}`}>{stats.pending}</p>
-          <p className={`text-sm ${filter === 'pending' ? 'text-white/80' : 'text-gray-500'}`}>{trans('filters.pending')}</p>
+          <p className={`text-2xl font-bold ${filter === 'pending'? 'text-white': 'text-gray-900'}`}>{stats.pending}</p>
+          <p className={`text-sm ${filter === 'pending'? 'text-white/80': 'text-gray-500'}`}>{trans('filters.pending')}</p>
         </button>
       </div>
 
@@ -206,8 +206,8 @@ export default function BestellingenPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${order.is_online ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'}`}>
-                        {order.is_online ? ' Online' : ' POS'}
+                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${order.is_online ? 'bg-purple-100 text-purple-800': 'bg-gray-100 text-gray-800'}`}>
+                        {order.is_online ? 'Online': 'POS'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-gray-600">
@@ -269,7 +269,7 @@ export default function BestellingenPage() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">{trans('modal.type')}</p>
-                  <p className="font-medium">{selectedOrder.is_online ? 'Online' : 'POS'}</p>
+                  <p className="font-medium">{selectedOrder.is_online ? 'Online': 'POS'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">{trans('modal.status')}</p>

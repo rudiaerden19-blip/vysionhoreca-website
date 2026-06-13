@@ -166,11 +166,11 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
       </div>
 
       {/* Status Card */}
-      <div className={`mb-8 p-6 rounded-2xl ${formData.is_active ? 'bg-green-50 border-2 border-green-200' : 'bg-gray-50 border-2 border-gray-200'}`}>
+      <div className={`mb-8 p-6 rounded-2xl ${formData.is_active ? 'bg-green-50 border-2 border-green-200': 'bg-gray-50 border-2 border-gray-200'}`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl ${formData.is_active ? 'bg-green-500' : 'bg-gray-400'}`}>
-              {formData.is_active ? '' : '⏸'}
+            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl ${formData.is_active ? 'bg-green-500': 'bg-gray-400'}`}>
+              {formData.is_active ? '' : ''}
             </div>
             <div>
               <h2 className="text-xl font-bold text-gray-900">
@@ -276,7 +276,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
             onClick={() => setShowTokens(!showTokens)}
             className="text-sm text-gray-500 hover:text-gray-700"
           >
-            {showTokens ? ` ${t('whatsappPage.hideTokens')}` : ` ${t('whatsappPage.showTokens')}`}
+            {showTokens ? ` ${t('whatsappPage.hideTokens')}`: ` ${t('whatsappPage.showTokens')}`}
           </button>
         </div>
 
@@ -286,7 +286,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
               Phone Number ID *
             </label>
             <input
-              type={showTokens ? 'text' : 'password'}
+              type={showTokens ? 'text': 'password'}
               value={formData.phone_number_id}
               onChange={(e) => setFormData(prev => ({ ...prev, phone_number_id: e.target.value }))}
               placeholder="123456789012345"
@@ -302,7 +302,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
               Permanent Access Token *
             </label>
             <input
-              type={showTokens ? 'text' : 'password'}
+              type={showTokens ? 'text': 'password'}
               value={formData.access_token}
               onChange={(e) => setFormData(prev => ({ ...prev, access_token: e.target.value }))}
               placeholder="EAAxxxxxxx..."

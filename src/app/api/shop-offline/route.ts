@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
   const tenant = searchParams.get('tenant')
 
   if (!tenant) {
-    return NextResponse.json({ error: 'Missing tenant' }, { status: 400 })
+    return NextResponse.json({ error: 'Missing tenant'}, { status: 400 })
   }
 
   await ensureTable()
@@ -86,18 +86,18 @@ export async function POST(request: NextRequest) {
   const { tenant, is_offline, offline_reason, offline_message } = body
 
   if (!tenant) {
-    return NextResponse.json({ error: 'Missing tenant' }, { status: 400 })
+    return NextResponse.json({ error: 'Missing tenant'}, { status: 400 })
   }
 
   const access = await verifyTenantOrSuperAdmin(request, tenant)
   if (!access.authorized) {
-    return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
+    return NextResponse.json({ error: access.error || 'Forbidden'}, { status: 403 })
   }
 
   const ready = await ensureTable()
   if (!ready) {
     return NextResponse.json(
-      { error: 'shop_offline_status table does not exist. Run supabase/shop_offline_status_migration.sql in the Supabase SQL editor.' },
+      { error: 'shop_offline_status table does not exist. Run supabase/shop_offline_status_migration.sql in the Supabase SQL editor.'},
       { status: 503 }
     )
   }
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
         offline_message: is_offline ? (offline_message ?? null) : null,
         updated_at: new Date().toISOString(),
       },
-      { onConflict: 'tenant_slug' }
+      { onConflict: 'tenant_slug'}
     )
 
   if (error) {

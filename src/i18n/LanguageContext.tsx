@@ -22,7 +22,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 function applyDocumentLocale(locale: Locale) {
   if (typeof document === 'undefined') return
-  document.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr'
+  document.documentElement.dir = locale === 'ar'? 'rtl': 'ltr'
   document.documentElement.lang = locale
 }
 
@@ -40,7 +40,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       if (savedLocale && locales.includes(savedLocale)) {
         initial = savedLocale
       } else {
-        const raw = typeof navigator !== 'undefined' ? navigator.language : ''
+        const raw = typeof navigator !== 'undefined'? navigator.language : ''
         const browserLang = (raw.split('-')[0] || '') as Locale
         if (browserLang && locales.includes(browserLang)) {
           initial = browserLang
@@ -100,7 +100,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         localeFlags,
       }}
     >
-      <div style={{ visibility: isHydrated ? 'visible' : 'hidden', minHeight: '100vh' }}>{children}</div>
+      <div style={{ visibility: isHydrated ? 'visible': 'hidden', minHeight: '100vh'}}>{children}</div>
     </LanguageContext.Provider>
   )
 }

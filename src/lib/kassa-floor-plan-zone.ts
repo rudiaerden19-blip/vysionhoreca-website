@@ -1,16 +1,16 @@
 /** Zaalebied voor plattegrond + open kassa-mand — alle tenants. */
 
-export const FLOOR_PLAN_ZONE_INSIDE = 'inside' as const
-export const FLOOR_PLAN_ZONE_TERRACE = 'terrace' as const
+export const FLOOR_PLAN_ZONE_INSIDE = 'inside'as const
+export const FLOOR_PLAN_ZONE_TERRACE = 'terrace'as const
 
 export type FloorPlanZone = typeof FLOOR_PLAN_ZONE_INSIDE | typeof FLOOR_PLAN_ZONE_TERRACE
 
 /** Zelfde volgorde als kassa-plattegrond + reserveringen-editor. */
 export const KASSA_FLOOR_ZONES: FloorPlanZone[] = [FLOOR_PLAN_ZONE_INSIDE, FLOOR_PLAN_ZONE_TERRACE]
 
-/** localStorage — synchroon met kassa-plattegrond (`vysion_tables_*` legacy keys). */
+/** localStorage — synchroon met kassa-plattegrond (`vysion_tables_*`legacy keys). */
 export function floorPlanTablesLocalStorageKey(tenantSlug: string, zone: FloorPlanZone): string {
-  return zone === FLOOR_PLAN_ZONE_INSIDE ? `vysion_tables_${tenantSlug}` : `vysion_tables_terrace_${tenantSlug}`
+  return zone === FLOOR_PLAN_ZONE_INSIDE ? `vysion_tables_${tenantSlug}`: `vysion_tables_terrace_${tenantSlug}`
 }
 
 export function isFloorPlanZone(s: string): s is FloorPlanZone {
@@ -24,8 +24,8 @@ export function normalizeFloorPlanZone(raw: string | null | undefined): FloorPla
 
 /**
  * Supabase Realtime stuurt bij UPDATE vaak alleen gewijzigde kolommen in `new`.
- * `plan_zone` hoort bij de PK — gebruik `old.plan_zone` als die in `new` ontbreekt.
- * Anders zou terras-data per ongeluk onder `inside` gemerged worden.
+ * `plan_zone`hoort bij de PK — gebruik `old.plan_zone`als die in `new`ontbreekt.
+ * Anders zou terras-data per ongeluk onder `inside`gemerged worden.
  */
 export function floorPlanZoneFromRealtimePayload(payload: {
   eventType?: string
@@ -39,7 +39,7 @@ export function floorPlanZoneFromRealtimePayload(payload: {
   }
   const raw =
     payload.new?.plan_zone ??
-    (payload.eventType === 'UPDATE' ? payload.old?.plan_zone : undefined)
+    (payload.eventType === 'UPDATE'? payload.old?.plan_zone : undefined)
   if (raw == null || String(raw).trim() === '') return null
   return normalizeFloorPlanZone(raw)
 }
@@ -91,7 +91,7 @@ export function displayNumbersWithOpenOrdersInZone(
   return out
 }
 
-type FloorPlanTableStatusLike = 'FREE' | 'OCCUPIED' | 'UNPAID'
+type FloorPlanTableStatusLike = 'FREE' |  'OCCUPIED' |  'UNPAID'
 
 /** Zet FREE/OCCUPIED op basis van open manden; UNPAID blijft zolang er geen mand is. */
 export function reconcileFloorPlanTablesWithOpenOrders<
@@ -102,8 +102,8 @@ export function reconcileFloorPlanTablesWithOpenOrders<
     const hasOpen = openNumbersInZone.has(num)
     if (hasOpen) {
       if (t.status === 'UNPAID') return t
-      return t.status === 'OCCUPIED' ? t : { ...t, status: 'OCCUPIED' as const }
+      return t.status === 'OCCUPIED'? t : { ...t, status: 'OCCUPIED'as const }
     }
-    return t.status === 'FREE' ? t : { ...t, status: 'FREE' as const }
+    return t.status === 'FREE'? t : { ...t, status: 'FREE'as const }
   })
 }

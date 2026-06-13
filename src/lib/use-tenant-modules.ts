@@ -29,7 +29,7 @@ type RawModuleFlagSub = {
 } | null
 
 /**
- * Haalt de twee Supabase-queries op die `useTenantModuleFlags` nodig heeft, met een
+ * Haalt de twee Supabase-queries op die `useTenantModuleFlags`nodig heeft, met een
  * 60-seconden cache per tenant-slug. Voor admin-modulewissels binnen 60s = 0 round-trips.
  * Bij plan/blokkade-wijziging in superadmin: invalidateModuleFlags(slug).
  */
@@ -96,7 +96,7 @@ export function invalidateTenantModuleFlags(slug: string) {
 
 export interface TenantModuleFlagsResult {
   moduleAccess: Record<TenantModuleId, boolean>
-  /** Ruwe `tenants.enabled_modules` (inclusief submenu-keys `sm_*`). */
+  /** Ruwe `tenants.enabled_modules`(inclusief submenu-keys `sm_*`). */
   enabledModulesJson: Record<string, boolean> | null
   featureGroupOrders: boolean
   featureLabelPrinting: boolean

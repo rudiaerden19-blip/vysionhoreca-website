@@ -21,7 +21,7 @@ interface MenuItem {
   is_promo: boolean
   promo_price?: number
   allergens: string[]
-  image_display_mode?: 'cover' | 'contain' | null
+  image_display_mode?: 'cover' |  'contain'| null
   /** Volgorde binnen categorie (= admin sleepvolgorde) */
   sort_order: number
 }
@@ -36,7 +36,7 @@ interface CartItem {
 
 /** Vandaag YYYY-MM-DD in Europe/Brussels (zelfde kalenderdag als zaak) */
 function todayYMDBrussels(): string {
-  return new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Brussels' })
+  return new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Brussels'})
 }
 
 function closingPeriodEnd(c: ExceptionalClosing): string {
@@ -62,16 +62,16 @@ function formatClosingDateNL(ymd: string): string {
 }
 
 const ALLERGEN_ICONS: Record<string, { icon: string; color: string; label: string }> = {
-  gluten: { icon: '', color: 'bg-amber-100 text-amber-800', label: 'Gluten' },
-  ei: { icon: '', color: 'bg-yellow-100 text-yellow-800', label: 'Ei' },
-  melk: { icon: '', color: 'bg-blue-100 text-blue-800', label: 'Melk' },
-  noten: { icon: '', color: 'bg-orange-100 text-orange-800', label: 'Noten' },
-  soja: { icon: '', color: 'bg-green-100 text-green-800', label: 'Soja' },
-  vis: { icon: '', color: 'bg-cyan-100 text-cyan-800', label: 'Vis' },
-  schaaldieren: { icon: '', color: 'bg-red-100 text-red-800', label: 'Schaaldieren' },
-  selderij: { icon: '', color: 'bg-lime-100 text-lime-800', label: 'Selderij' },
-  mosterd: { icon: '', color: 'bg-yellow-100 text-yellow-800', label: 'Mosterd' },
-  sesam: { icon: '', color: 'bg-stone-100 text-stone-800', label: 'Sesam' },
+  gluten: { icon: '', color: 'bg-amber-100 text-amber-800', label: 'Gluten'},
+  ei: { icon: '', color: 'bg-yellow-100 text-yellow-800', label: 'Ei'},
+  melk: { icon: '', color: 'bg-blue-100 text-blue-800', label: 'Melk'},
+  noten: { icon: '', color: 'bg-orange-100 text-orange-800', label: 'Noten'},
+  soja: { icon: '', color: 'bg-green-100 text-green-800', label: 'Soja'},
+  vis: { icon: '', color: 'bg-cyan-100 text-cyan-800', label: 'Vis'},
+  schaaldieren: { icon: '', color: 'bg-red-100 text-red-800', label: 'Schaaldieren'},
+  selderij: { icon: '', color: 'bg-lime-100 text-lime-800', label: 'Selderij'},
+  mosterd: { icon: '', color: 'bg-yellow-100 text-yellow-800', label: 'Mosterd'},
+  sesam: { icon: '', color: 'bg-stone-100 text-stone-800', label: 'Sesam'},
 }
 
 type MenuProductCardTheme = {
@@ -93,7 +93,7 @@ const MenuProductCard = memo(function MenuProductCard({
   lite,
 }: {
   item: MenuItem
-  imageDisplayModeDefault: 'cover' | 'contain'
+  imageDisplayModeDefault: 'cover' |  'contain'
   primaryColor: string
   theme: MenuProductCardTheme
   hasLinkedOptions: boolean
@@ -124,7 +124,7 @@ const MenuProductCard = memo(function MenuProductCard({
     >
       <div
         className={`relative overflow-hidden ${useContain ? theme.card : theme.imageBg} ${
-          lite ? 'h-52 sm:h-60 lg:h-52' : 'h-48 sm:h-56 lg:h-48'
+          lite ? 'h-52 sm:h-60 lg:h-52': 'h-48 sm:h-56 lg:h-48'
         }`}
       >
         {item.image_url ? (
@@ -132,10 +132,10 @@ const MenuProductCard = memo(function MenuProductCard({
             src={item.image_url}
             alt={item.name}
             fill
-            sizes={lite ? '(max-width: 640px) 80vw, 360px' : '(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 420px'}
+            sizes={lite ? '(max-width: 640px) 80vw, 360px': '(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 420px'}
             quality={lite ? 38 : 50}
             loading="lazy"
-            className={useContain ? 'object-contain p-2' : 'object-cover'}
+            className={useContain ? 'object-contain p-2': 'object-cover'}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-6xl"></div>
@@ -152,9 +152,9 @@ const MenuProductCard = memo(function MenuProductCard({
           )}
         </div>
 
-        <div className={`absolute inset-x-0 bottom-0 z-[5] px-3 ${lite ? 'pb-2' : 'pb-2.5'}`}>
+        <div className={`absolute inset-x-0 bottom-0 z-[5] px-3 ${lite ? 'pb-2': 'pb-2.5'}`}>
           <h3
-            className={`font-bold text-black leading-snug line-clamp-2 ${lite ? 'text-lg' : 'text-base sm:text-lg'}`}
+            className={`font-bold text-black leading-snug line-clamp-2 ${lite ? 'text-lg': 'text-base sm:text-lg'}`}
           >
             {item.name}
           </h3>
@@ -167,7 +167,7 @@ const MenuProductCard = memo(function MenuProductCard({
         )}
       </div>
 
-      <div className={lite ? 'p-4 pb-3' : 'p-3 sm:p-4'}>
+      <div className={lite ? 'p-4 pb-3': 'p-3 sm:p-4'}>
         {item.description && (
           <p className={`${theme.textLight} text-xs sm:text-sm mb-3 line-clamp-2 leading-relaxed`}>{item.description}</p>
         )}
@@ -185,9 +185,9 @@ const MenuProductCard = memo(function MenuProductCard({
         )}
         <div
           className={`mt-2 w-full rounded-xl text-white font-semibold flex items-center justify-center gap-2 transition-opacity group-hover:opacity-90 ${
-            lite ? 'min-h-[52px] py-3.5 text-base' : 'py-2 text-sm'
+            lite ? 'min-h-[52px] py-3.5 text-base': 'py-2 text-sm'
           }`}
-          style={{ backgroundColor: item.is_available ? primaryColor : '#9ca3af' }}
+          style={{ backgroundColor: item.is_available ? primaryColor : '#9ca3af'}}
         >
           {!item.is_available ? (
             <span>{t('menuPage.soldOut')}</span>
@@ -239,7 +239,7 @@ export default function MenuPageClient({
   const [optionsByProductId, setOptionsByProductId] = useState<Record<string, ProductOption[]>>({})
   const [primaryColor, setPrimaryColor] = useState('#FF6B35')
   const [businessName, setBusinessName] = useState('')
-  const [imageDisplayMode, setImageDisplayMode] = useState<'cover' | 'contain'>('cover') // altijd cover als standaard
+  const [imageDisplayMode, setImageDisplayMode] = useState<'cover' |  'contain'>('cover') // altijd cover als standaard
   const [upcomingClosings, setUpcomingClosings] = useState<ExceptionalClosing[]>([])
   const [darkMode, setDarkMode] = useState(false)
   const [productsWithOptions, setProductsWithOptions] = useState<string[]>([])
@@ -312,7 +312,7 @@ export default function MenuPageClient({
       // Set language from URL parameter (from WhatsApp)
       const validLocales = ['nl', 'en', 'fr', 'de', 'es', 'it', 'ja', 'zh', 'ar']
       if (lang && validLocales.includes(lang)) {
-        setLocale(lang as 'nl' | 'en' | 'fr' | 'de' | 'es' | 'it' | 'ja' | 'zh' | 'ar')
+        setLocale(lang as 'nl' |  'en' |  'fr' |  'de' |  'es' |  'it' |  'ja' |  'zh' |  'ar')
       }
     }
   }, [params.tenant, setLocale])
@@ -363,7 +363,7 @@ export default function MenuPageClient({
     if (sectionEl) {
       const headerHeight = 120 // Sticky header hoogte
       const elementTop = sectionEl.getBoundingClientRect().top + window.scrollY - headerHeight
-      window.scrollTo({ top: elementTop, behavior: 'smooth' })
+      window.scrollTo({ top: elementTop, behavior: 'smooth'})
       
       // Reset flag na scroll animatie
       setTimeout(() => {
@@ -461,7 +461,7 @@ export default function MenuPageClient({
             allergens: p.allergens || [],
             image_display_mode: p.image_display_mode || null,
             sort_order:
-              typeof p.sort_order === 'number' ? p.sort_order : Number(p.sort_order) || 0,
+              typeof p.sort_order === 'number'? p.sort_order : Number(p.sort_order) || 0,
           }
         })
 
@@ -499,7 +499,7 @@ export default function MenuPageClient({
     setSelectedChoices(initialChoices)
   }, [optionsByProductId])
 
-  const handleChoiceSelect = (optionId: string, choiceId: string, optionType: 'single' | 'multiple') => {
+  const handleChoiceSelect = (optionId: string, choiceId: string, optionType: 'single' |  'multiple') => {
     setSelectedChoices(prev => {
       if (optionType === 'single') {
         return { ...prev, [optionId]: choiceId }
@@ -597,17 +597,17 @@ export default function MenuPageClient({
 
   // Theme classes voor dark mode
   const theme = useMemo(() => ({
-    bg: darkMode ? 'bg-[#0d0d0d]' : 'bg-[#e3e3e3]',
-    header: darkMode ? 'bg-[#1a1a1a]' : 'bg-white',
-    card: darkMode ? 'bg-[#2a2a2a]' : 'bg-white',
-    cardHover: darkMode ? 'hover:bg-[#333]' : 'hover:shadow-lg',
-    border: darkMode ? 'border-[#444]' : 'border-gray-100',
-    text: darkMode ? 'text-white' : 'text-gray-900',
-    textMuted: darkMode ? 'text-gray-300' : 'text-gray-600',
-    textLight: darkMode ? 'text-gray-400' : 'text-gray-500',
-    pill: darkMode ? 'bg-[#3a3a3a] text-gray-200' : 'bg-gray-100 text-gray-700',
-    pillHover: darkMode ? 'active:bg-[#444]' : 'active:bg-gray-200',
-    imageBg: darkMode ? 'bg-[#222]' : 'bg-gray-100',
+    bg: darkMode ? 'bg-[#0d0d0d]': 'bg-[#e3e3e3]',
+    header: darkMode ? 'bg-[#1a1a1a]': 'bg-white',
+    card: darkMode ? 'bg-[#2a2a2a]': 'bg-white',
+    cardHover: darkMode ? 'hover:bg-[#333]': 'hover:shadow-lg',
+    border: darkMode ? 'border-[#444]': 'border-gray-100',
+    text: darkMode ? 'text-white': 'text-gray-900',
+    textMuted: darkMode ? 'text-gray-300': 'text-gray-600',
+    textLight: darkMode ? 'text-gray-400': 'text-gray-500',
+    pill: darkMode ? 'bg-[#3a3a3a] text-gray-200': 'bg-gray-100 text-gray-700',
+    pillHover: darkMode ? 'active:bg-[#444]': 'active:bg-gray-200',
+    imageBg: darkMode ? 'bg-[#222]': 'bg-gray-100',
   }), [darkMode])
 
   const cardTheme = useMemo((): MenuProductCardTheme => ({
@@ -630,21 +630,21 @@ export default function MenuPageClient({
   }
 
   return (
-    <div className={`min-h-screen ${theme.bg}${lite ? ' kiosk-touch-ui' : ''}`}>
+    <div className={`min-h-screen ${theme.bg}${lite ? 'kiosk-touch-ui': ''}`}>
       {/* Manual Offline Overlay */}
       {manualOffline?.is_offline && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-6">
           <div className="bg-white rounded-3xl p-10 max-w-md w-full text-center shadow-2xl">
             <div className="text-7xl mb-6">
-              {manualOffline.offline_reason === 'volzet' ? '' :
-               manualOffline.offline_reason === 'panne' ? '' :
-               manualOffline.offline_reason === 'vakantie' ? '' : ''}
+              {manualOffline.offline_reason === 'volzet'? '' :
+               manualOffline.offline_reason === 'panne'? '' :
+               manualOffline.offline_reason === 'vakantie'? '' : ''}
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">
-              {manualOffline.offline_reason === 'volzet' ? t('shopOffline.bannerVolzet') :
-               manualOffline.offline_reason === 'panne' ? t('shopOffline.bannerPanne') :
-               manualOffline.offline_reason === 'vakantie' ? t('shopOffline.bannerVakantie') :
-               manualOffline.offline_reason === 'eigen' ? (manualOffline.offline_message || t('shopOffline.bannerEigen')) :
+              {manualOffline.offline_reason === 'volzet'? t('shopOffline.bannerVolzet') :
+               manualOffline.offline_reason === 'panne'? t('shopOffline.bannerPanne') :
+               manualOffline.offline_reason === 'vakantie'? t('shopOffline.bannerVakantie') :
+               manualOffline.offline_reason === 'eigen'? (manualOffline.offline_message || t('shopOffline.bannerEigen')) :
                t('shopOffline.bannerSluiting')}
             </h2>
             <p className="text-gray-500 mb-8">{t('shopOffline.bannerSubtitle')}</p>
@@ -660,7 +660,7 @@ export default function MenuPageClient({
 
       {/* Sticky Header + Categories - SAMEN in 1 container voor iOS Safari */}
       <header 
-        className={`sticky top-0 z-50 ${theme.header} ${lite ? 'shadow-sm' : 'shadow-[0_4px_20px_rgba(0,0,0,0.18)]'}`}
+        className={`sticky top-0 z-50 ${theme.header} ${lite ? 'shadow-sm': 'shadow-[0_4px_20px_rgba(0,0,0,0.18)]'}`}
         style={{
           position: '-webkit-sticky',
           WebkitTransform: 'translateZ(0)',
@@ -717,12 +717,12 @@ export default function MenuPageClient({
                   <div
                     key={`${closing.date}-${closing.date_end || 'single'}`}
                     className="flex items-start gap-2 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium"
-                    style={{ backgroundColor: primaryColor + '28', borderLeft: `4px solid ${primaryColor}` }}
+                    style={{ backgroundColor: primaryColor + '28', borderLeft: `4px solid ${primaryColor}`}}
                   >
                     <span className="text-base shrink-0 leading-none"></span>
                     <span className={`${theme.text} leading-snug`}>
                       <strong>{line}</strong>
-                      {closing.reason ? ` — ${closing.reason}` : ''}
+                      {closing.reason ? `— ${closing.reason}`: ''}
                     </span>
                   </div>
                 )
@@ -733,11 +733,11 @@ export default function MenuPageClient({
 
         {/* Categories Bar */}
         <div className="max-w-4xl mx-auto px-4">
-          <div className={`flex ${lite ? 'gap-3' : 'gap-2'} py-3 overflow-x-auto scrollbar-hide`} style={{ WebkitOverflowScrolling: 'touch' }}>
+          <div className={`flex ${lite ? 'gap-3': 'gap-2'} py-3 overflow-x-auto scrollbar-hide`} style={{ WebkitOverflowScrolling: 'touch'}}>
             {promotionsEnabled && promotions.length > 0 && (
               <button
                 onClick={() => handleCategoryChange('promo')}
-                className={`rounded-full font-medium whitespace-nowrap touch-manipulation ${lite ? 'min-h-[52px] px-6 py-3 text-base active:opacity-90' : 'px-5 py-2.5 transition-colors active:scale-95 shadow-[0_4px_14px_rgba(0,0,0,0.35)]'} ${
+                className={`rounded-full font-medium whitespace-nowrap touch-manipulation ${lite ? 'min-h-[52px] px-6 py-3 text-base active:opacity-90': 'px-5 py-2.5 transition-colors active:scale-95 shadow-[0_4px_14px_rgba(0,0,0,0.35)]'} ${
                   activeCategory === 'promo'
                     ? 'bg-green-500 text-white'
                     : 'bg-green-100 text-green-700 active:bg-green-200'
@@ -749,8 +749,8 @@ export default function MenuPageClient({
             {menuItems.some(i => i.is_popular) && (
               <button
                 onClick={() => handleCategoryChange('popular')}
-                style={activeCategory === 'popular' ? { backgroundColor: primaryColor } : {}}
-                className={`rounded-full font-medium whitespace-nowrap touch-manipulation ${lite ? 'min-h-[52px] px-6 py-3 text-base active:opacity-90' : 'px-5 py-2.5 transition-colors active:scale-95 shadow-[0_4px_14px_rgba(0,0,0,0.35)]'} ${
+                style={activeCategory === 'popular'? { backgroundColor: primaryColor } : {}}
+                className={`rounded-full font-medium whitespace-nowrap touch-manipulation ${lite ? 'min-h-[52px] px-6 py-3 text-base active:opacity-90': 'px-5 py-2.5 transition-colors active:scale-95 shadow-[0_4px_14px_rgba(0,0,0,0.35)]'} ${
                   activeCategory === 'popular'
                     ? 'text-white'
                     : `${theme.pill} ${theme.pillHover}`
@@ -764,7 +764,7 @@ export default function MenuPageClient({
                 key={cat.id}
                 onClick={() => handleCategoryChange(cat.id!)}
                 style={activeCategory === cat.id ? { backgroundColor: primaryColor } : {}}
-                className={`rounded-full font-medium whitespace-nowrap touch-manipulation ${lite ? 'min-h-[52px] px-6 py-3 text-base active:opacity-90' : 'px-5 py-2.5 transition-colors active:scale-95 shadow-[0_4px_14px_rgba(0,0,0,0.35)]'} ${
+                className={`rounded-full font-medium whitespace-nowrap touch-manipulation ${lite ? 'min-h-[52px] px-6 py-3 text-base active:opacity-90': 'px-5 py-2.5 transition-colors active:scale-95 shadow-[0_4px_14px_rgba(0,0,0,0.35)]'} ${
                   activeCategory === cat.id
                     ? 'text-white'
                     : `${theme.pill} ${theme.pillHover}`
@@ -789,7 +789,7 @@ export default function MenuPageClient({
           >
             <div className="flex items-center gap-0 mb-5 rounded-xl overflow-hidden shadow-sm">
               <span className="w-3 self-stretch flex-shrink-0" style={{ backgroundColor: primaryColor }}></span>
-              <div className="relative flex-1 px-4 py-3 flex items-center gap-2 overflow-hidden" style={{ backgroundColor: primaryColor + '35' }}>
+              <div className="relative flex-1 px-4 py-3 flex items-center gap-2 overflow-hidden" style={{ backgroundColor: primaryColor + '35'}}>
                 <h2 className={`text-xl font-bold ${theme.text} flex items-center gap-2`}>
                   <span className="text-2xl"></span> {t('menuPage.promotions')}
                 </h2>
@@ -800,7 +800,7 @@ export default function MenuPageClient({
                 const linkedProduct = promo.product_id 
                   ? menuItems.find(item => item.id === promo.product_id)
                   : null
-                const promoPrice = promo.type === 'fixedPrice' ? promo.value : 
+                const promoPrice = promo.type === 'fixedPrice'? promo.value : 
                                    promo.type === 'percentage' && linkedProduct ? linkedProduct.price * (1 - promo.value / 100) :
                                    promo.type === 'fixed' && linkedProduct ? Math.max(0, linkedProduct.price - promo.value) : 0
                 return (
@@ -817,7 +817,7 @@ export default function MenuPageClient({
                         setCartOpen(true)
                       }
                     }}
-                    className={`${theme.card} rounded-xl sm:rounded-2xl overflow-hidden shadow-sm ${lite ? '' : `${theme.cardHover} transition-all`} ${linkedProduct ? 'cursor-pointer touch-manipulation' : ''} ${!lite && linkedProduct ? 'active:scale-[0.98]' : ''}`}
+                    className={`${theme.card} rounded-xl sm:rounded-2xl overflow-hidden shadow-sm ${lite ? '' : `${theme.cardHover} transition-all`} ${linkedProduct ? 'cursor-pointer touch-manipulation': ''} ${!lite && linkedProduct ? 'active:scale-[0.98]': ''}`}
                   >
                     <div className={`relative h-48 sm:h-52 lg:h-44 xl:h-40 overflow-hidden ${theme.imageBg}`}>
                       {promo.image_url ? (
@@ -829,7 +829,7 @@ export default function MenuPageClient({
                       )}
                       <div className="absolute top-2 left-2">
                         <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
-                          {promo.type === 'fixedPrice' ? `€${promo.value.toFixed(2)}` : promo.type === 'percentage' ? `-${promo.value}%` : promo.type === 'fixed' ? `-€${promo.value}` : t('menuPage.free')}
+                          {promo.type === 'fixedPrice'? `€${promo.value.toFixed(2)}`: promo.type === 'percentage'? `-${promo.value}%`: promo.type === 'fixed'? `-€${promo.value}`: t('menuPage.free')}
                         </span>
                       </div>
                     </div>
@@ -840,7 +840,7 @@ export default function MenuPageClient({
                         <button
                           type="button"
                           style={{ backgroundColor: primaryColor }}
-                          className={`w-full mt-3 text-white font-medium rounded-lg touch-manipulation ${lite ? 'min-h-[52px] py-3.5 text-base' : 'py-2 text-sm'}`}
+                          className={`w-full mt-3 text-white font-medium rounded-lg touch-manipulation ${lite ? 'min-h-[52px] py-3.5 text-base': 'py-2 text-sm'}`}
                         >
                           + Toevoegen €{promo.value.toFixed(2)}
                         </button>
@@ -862,7 +862,7 @@ export default function MenuPageClient({
           >
             <div className="flex items-center gap-0 mb-5 rounded-xl overflow-hidden shadow-sm">
               <span className="w-3 self-stretch flex-shrink-0" style={{ backgroundColor: primaryColor }}></span>
-              <div className="relative flex-1 px-4 py-3 flex items-center gap-2 overflow-hidden" style={{ backgroundColor: primaryColor + '35' }}>
+              <div className="relative flex-1 px-4 py-3 flex items-center gap-2 overflow-hidden" style={{ backgroundColor: primaryColor + '35'}}>
                 <h2 className={`text-xl font-bold ${theme.text} flex items-center gap-2`}>
                   <span className="text-2xl"></span> {t('menuPage.popular')}
                 </h2>
@@ -903,7 +903,7 @@ export default function MenuPageClient({
             >
               <div className="flex items-center gap-0 mb-5 rounded-xl overflow-hidden shadow-sm">
                 <span className="w-3 self-stretch flex-shrink-0" style={{ backgroundColor: primaryColor }}></span>
-                <div className="relative flex-1 px-4 py-3 overflow-hidden" style={{ backgroundColor: primaryColor + '35' }}>
+                <div className="relative flex-1 px-4 py-3 overflow-hidden" style={{ backgroundColor: primaryColor + '35'}}>
                   <h2 className={`text-xl font-bold ${theme.text}`}>{category.name}</h2>
                 </div>
               </div>
@@ -959,9 +959,9 @@ export default function MenuPageClient({
                     src={selectedItem.image_url}
                     alt={selectedItem.name}
                     fill
-                    sizes={lite ? '(max-width: 768px) 100vw, 400px' : '(max-width: 768px) 100vw, min(90vw, 480px)'}
+                    sizes={lite ? '(max-width: 768px) 100vw, 400px': '(max-width: 768px) 100vw, min(90vw, 480px)'}
                     quality={lite ? 38 : 55}
-                    className={useContain ? 'object-contain p-4' : 'object-cover'}
+                    className={useContain ? 'object-contain p-4': 'object-cover'}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-8xl">
@@ -971,10 +971,10 @@ export default function MenuPageClient({
                 <button
                   type="button"
                   onClick={() => { setSelectedItem(null); setModalQuantity(1) }}
-                  className={`absolute top-4 right-4 bg-white/90 backdrop-blur rounded-full flex items-center justify-center shadow-lg touch-manipulation ${lite ? 'w-14 h-14 min-w-[56px] min-h-[56px]' : 'w-10 h-10'}`}
+                  className={`absolute top-4 right-4 bg-white/90 backdrop-blur rounded-full flex items-center justify-center shadow-lg touch-manipulation ${lite ? 'w-14 h-14 min-w-[56px] min-h-[56px]': 'w-10 h-10'}`}
                   aria-label={t('menuPage.close')}
                 >
-                  <span className={lite ? 'text-3xl' : 'text-2xl'}>×</span>
+                  <span className={lite ? 'text-3xl': 'text-2xl'}>×</span>
                 </button>
                 <div className="absolute bottom-4 left-4 flex gap-2">
                   {selectedItem.is_popular && (
@@ -985,10 +985,10 @@ export default function MenuPageClient({
                 )
               })()}
 
-              <div className={lite ? 'p-6 pt-5' : 'p-6'}>
+              <div className={lite ? 'p-6 pt-5': 'p-6'}>
                 <div className="flex justify-between items-start mb-4">
-                  <h2 className={`${lite ? 'text-xl sm:text-2xl' : 'text-2xl'} font-bold ${theme.text}`}>{selectedItem.name}</h2>
-                  <span style={darkMode ? {} : { color: primaryColor }} className={`text-2xl font-bold ${darkMode ? 'text-white' : ''}`}>€{selectedItem.price.toFixed(2)}</span>
+                  <h2 className={`${lite ? 'text-xl sm:text-2xl': 'text-2xl'} font-bold ${theme.text}`}>{selectedItem.name}</h2>
+                  <span style={darkMode ? {} : { color: primaryColor }} className={`text-2xl font-bold ${darkMode ? 'text-white': ''}`}>€{selectedItem.price.toFixed(2)}</span>
                 </div>
                 <p className={`${theme.textMuted} mb-6`}>{selectedItem.description}</p>
 
@@ -1030,26 +1030,26 @@ export default function MenuPageClient({
                                 key={choice.id}
                                 style={isSelected ? { backgroundColor: `${primaryColor}10`, borderColor: primaryColor } : {}}
                                 className={`flex items-center justify-between rounded-lg cursor-pointer touch-manipulation transition-colors ${
-                                  lite ? 'min-h-[52px] px-3 py-3.5' : 'p-3'
+                                  lite ? 'min-h-[52px] px-3 py-3.5': 'p-3'
                                 } ${
                                   isSelected
                                     ? 'border-2'
-                                    : `${darkMode ? 'bg-[#3a3a3a] hover:bg-[#444]' : 'bg-gray-50 hover:bg-gray-100'} border-2 border-transparent`
+                                    : `${darkMode ? 'bg-[#3a3a3a] hover:bg-[#444]': 'bg-gray-50 hover:bg-gray-100'} border-2 border-transparent`
                                 }`}
                               >
                                 <div className="flex items-center gap-3">
                                   <input
-                                    type={option.type === 'single' ? 'radio' : 'checkbox'}
+                                    type={option.type === 'single'? 'radio': 'checkbox'}
                                     name={option.id}
                                     checked={isSelected}
                                     onChange={() => handleChoiceSelect(option.id!, choice.id!, option.type)}
                                     style={{ accentColor: primaryColor }}
-                                    className={lite ? 'w-6 h-6 shrink-0' : 'w-5 h-5'}
+                                    className={lite ? 'w-6 h-6 shrink-0': 'w-5 h-5'}
                                   />
                                   <span className={`font-medium ${theme.text}`}>{choice.name}</span>
                                 </div>
-                                <span style={choice.price > 0 && !darkMode ? { color: primaryColor } : {}} className={`font-medium ${choice.price <= 0 ? 'text-gray-400' : darkMode ? 'text-white' : ''}`}>
-                                  {choice.price > 0 ? `+€${choice.price.toFixed(2)}` : t('menuPage.free')}
+                                <span style={choice.price > 0 && !darkMode ? { color: primaryColor } : {}} className={`font-medium ${choice.price <= 0 ? 'text-gray-400': darkMode ? 'text-white': ''}`}>
+                                  {choice.price > 0 ? `+€${choice.price.toFixed(2)}`: t('menuPage.free')}
                                 </span>
                               </label>
                             )
@@ -1061,20 +1061,20 @@ export default function MenuPageClient({
                 )}
 
                 {/* Hoeveelheid kiezer */}
-                <div className={`flex items-center justify-between mb-4 rounded-2xl ${darkMode ? 'bg-[#2a2a2a]' : 'bg-gray-50'} ${lite ? 'p-5 min-h-[60px]' : 'p-4'}`}>
+                <div className={`flex items-center justify-between mb-4 rounded-2xl ${darkMode ? 'bg-[#2a2a2a]': 'bg-gray-50'} ${lite ? 'p-5 min-h-[60px]': 'p-4'}`}>
                   <span className={`font-semibold ${theme.text}`}>Aantal</span>
                   <div className="flex items-center gap-4">
                     <button
                       type="button"
                       onClick={() => setModalQuantity(q => Math.max(1, q - 1))}
-                      className={`rounded-full border-2 flex items-center justify-center font-bold transition-colors touch-manipulation ${lite ? 'w-14 h-14 min-w-[56px] min-h-[56px] text-2xl' : 'w-10 h-10 text-xl'}`}
+                      className={`rounded-full border-2 flex items-center justify-center font-bold transition-colors touch-manipulation ${lite ? 'w-14 h-14 min-w-[56px] min-h-[56px] text-2xl': 'w-10 h-10 text-xl'}`}
                       style={{ borderColor: primaryColor, color: primaryColor }}
                     >−</button>
-                    <span className={`font-bold text-center ${theme.text} ${lite ? 'text-3xl w-12' : 'text-2xl w-8'}`}>{modalQuantity}</span>
+                    <span className={`font-bold text-center ${theme.text} ${lite ? 'text-3xl w-12': 'text-2xl w-8'}`}>{modalQuantity}</span>
                     <button
                       type="button"
                       onClick={() => setModalQuantity(q => q + 1)}
-                      className={`rounded-full flex items-center justify-center font-bold text-white transition-colors touch-manipulation ${lite ? 'w-14 h-14 min-w-[56px] min-h-[56px] text-2xl' : 'w-10 h-10 text-xl'}`}
+                      className={`rounded-full flex items-center justify-center font-bold text-white transition-colors touch-manipulation ${lite ? 'w-14 h-14 min-w-[56px] min-h-[56px] text-2xl': 'w-10 h-10 text-xl'}`}
                       style={{ backgroundColor: primaryColor }}
                     >+</button>
                   </div>
@@ -1085,10 +1085,10 @@ export default function MenuPageClient({
                   onClick={addToCart}
                   disabled={!selectedItem.is_available || !canAddToCart()}
                   style={{ backgroundColor: selectedItem.is_available && canAddToCart() ? primaryColor : undefined }}
-                  className={`w-full disabled:bg-gray-300 text-white font-bold rounded-2xl transition-colors flex items-center justify-center gap-2 hover:opacity-90 touch-manipulation ${lite ? 'py-5 text-lg min-h-[58px]' : 'py-4'}`}
+                  className={`w-full disabled:bg-gray-300 text-white font-bold rounded-2xl transition-colors flex items-center justify-center gap-2 hover:opacity-90 touch-manipulation ${lite ? 'py-5 text-lg min-h-[58px]': 'py-4'}`}
                 >
                   <span></span>
-                  <span>{modalQuantity > 1 ? `${modalQuantity}x ` : ''}{t('menuPage.addToOrder')}</span>
+                  <span>{modalQuantity > 1 ? `${modalQuantity}x `: ''}{t('menuPage.addToOrder')}</span>
                   <span className="bg-white/20 px-2 py-0.5 rounded-full text-sm">€{(calculateTotalPrice() * modalQuantity).toFixed(2)}</span>
                 </button>
               </div>
@@ -1104,18 +1104,18 @@ export default function MenuPageClient({
             style={
               lite
                 ? { backgroundColor: primaryColor }
-                : { backgroundColor: primaryColor, boxShadow: `0 25px 50px -12px ${primaryColor}66` }
+                : { backgroundColor: primaryColor, boxShadow: `0 25px 50px -12px ${primaryColor}66`}
             }
-            className={`fixed left-1/2 -translate-x-1/2 text-white font-bold rounded-2xl flex items-center z-40 hover:opacity-90 max-w-[calc(100%-2rem)] touch-manipulation ${lite ? 'bottom-5 py-5 px-8 gap-4 text-base min-h-[60px] w-[calc(100%-1.5rem)] max-w-lg justify-center shadow-md' : 'bottom-4 sm:bottom-6 py-3 sm:py-4 px-4 sm:px-8 gap-2 sm:gap-4 text-sm sm:text-base shadow-2xl'}`}
+            className={`fixed left-1/2 -translate-x-1/2 text-white font-bold rounded-2xl flex items-center z-40 hover:opacity-90 max-w-[calc(100%-2rem)] touch-manipulation ${lite ? 'bottom-5 py-5 px-8 gap-4 text-base min-h-[60px] w-[calc(100%-1.5rem)] max-w-lg justify-center shadow-md': 'bottom-4 sm:bottom-6 py-3 sm:py-4 px-4 sm:px-8 gap-2 sm:gap-4 text-sm sm:text-base shadow-2xl'}`}
           >
             <span
               style={{ color: primaryColor }}
-              className={`bg-white rounded-full flex items-center justify-center font-bold shrink-0 ${lite ? 'w-10 h-10 text-lg' : 'w-7 h-7 sm:w-8 sm:h-8 text-sm sm:text-base'}`}
+              className={`bg-white rounded-full flex items-center justify-center font-bold shrink-0 ${lite ? 'w-10 h-10 text-lg': 'w-7 h-7 sm:w-8 sm:h-8 text-sm sm:text-base'}`}
             >
               {cartCount}
             </span>
-            <span className={lite ? 'inline' : 'hidden sm:inline'}>{t('menuPage.viewOrder')}</span>
-            <span className={lite ? 'hidden' : 'sm:hidden'}>{t('menuPage.order')}</span>
+            <span className={lite ? 'inline': 'hidden sm:inline'}>{t('menuPage.viewOrder')}</span>
+            <span className={lite ? 'hidden': 'sm:hidden'}>{t('menuPage.order')}</span>
             <span className="border-l border-white/30 pl-2 sm:pl-4 shrink-0">€{cartTotal.toFixed(2)}</span>
           </button>
       )}
@@ -1129,7 +1129,7 @@ export default function MenuPageClient({
           >
             <aside
               onClick={(e) => e.stopPropagation()}
-              className={`absolute right-0 top-0 h-full w-full max-w-md ${theme.card} ${lite ? 'shadow-lg' : 'shadow-2xl'} translate-x-0 transition-transform duration-200 ease-out motion-reduce:transition-none`}
+              className={`absolute right-0 top-0 h-full w-full max-w-md ${theme.card} ${lite ? 'shadow-lg': 'shadow-2xl'} translate-x-0 transition-transform duration-200 ease-out motion-reduce:transition-none`}
             >
               <div className={`p-4 sm:p-6 border-b ${theme.border}`}>
                 <div className="flex items-center justify-between">
@@ -1138,9 +1138,9 @@ export default function MenuPageClient({
                     type="button"
                     onClick={() => setCartOpen(false)}
                     aria-label={t('menuPage.close')}
-                    className={`${darkMode ? 'bg-[#3a3a3a] hover:bg-[#444]' : 'bg-gray-100 hover:bg-gray-200'} rounded-full flex items-center justify-center touch-manipulation ${theme.text} ${lite ? 'w-14 h-14 min-w-[56px] min-h-[56px]' : 'w-10 h-10'}`}
+                    className={`${darkMode ? 'bg-[#3a3a3a] hover:bg-[#444]': 'bg-gray-100 hover:bg-gray-200'} rounded-full flex items-center justify-center touch-manipulation ${theme.text} ${lite ? 'w-14 h-14 min-w-[56px] min-h-[56px]': 'w-10 h-10'}`}
                   >
-                    <span className={lite ? 'text-3xl' : 'text-2xl'}>×</span>
+                    <span className={lite ? 'text-3xl': 'text-2xl'}>×</span>
                   </button>
                 </div>
               </div>
@@ -1154,7 +1154,7 @@ export default function MenuPageClient({
                 ) : (
                   <div className="space-y-4">
                     {cart.map((cartItem, index) => (
-                      <div key={index} className={`flex gap-4 ${darkMode ? 'bg-[#3a3a3a]' : 'bg-gray-50'} rounded-xl p-4`}>
+                      <div key={index} className={`flex gap-4 ${darkMode ? 'bg-[#3a3a3a]': 'bg-gray-50'} rounded-xl p-4`}>
                         {cartItem.item.image_url ? (
                           <div className={`relative w-20 h-20 flex-shrink-0 overflow-hidden rounded-lg ${theme.card}`}>
                             <Image 
@@ -1167,7 +1167,7 @@ export default function MenuPageClient({
                             />
                           </div>
                         ) : (
-                          <div className={`w-20 h-20 ${darkMode ? 'bg-[#444]' : 'bg-gray-200'} rounded-lg flex items-center justify-center text-3xl`}></div>
+                          <div className={`w-20 h-20 ${darkMode ? 'bg-[#444]': 'bg-gray-200'} rounded-lg flex items-center justify-center text-3xl`}></div>
                         )}
                         <div className="flex-1">
                           <h3 className={`font-semibold ${theme.text}`}>{cartItem.item.name}</h3>
@@ -1181,13 +1181,13 @@ export default function MenuPageClient({
                                {cartItem.notes}
                             </div>
                           )}
-                          <p style={darkMode ? {} : { color: primaryColor }} className={`font-bold ${darkMode ? 'text-white' : ''}`}>€{(cartItem.totalPrice * cartItem.quantity).toFixed(2)}</p>
+                          <p style={darkMode ? {} : { color: primaryColor }} className={`font-bold ${darkMode ? 'text-white': ''}`}>€{(cartItem.totalPrice * cartItem.quantity).toFixed(2)}</p>
                           <div className="flex items-center gap-2 mt-2">
                             <span className={theme.textLight}>{t('menuPage.quantity')}: {cartItem.quantity}</span>
                             <button
                               type="button"
                               onClick={() => removeFromCart(index)}
-                              className={`text-red-500 hover:underline touch-manipulation ${lite ? 'text-base min-h-[48px] px-2 py-2 -ml-2' : 'text-sm'}`}
+                              className={`text-red-500 hover:underline touch-manipulation ${lite ? 'text-base min-h-[48px] px-2 py-2 -ml-2': 'text-sm'}`}
                             >
                               {t('menuPage.remove')}
                             </button>
@@ -1212,7 +1212,7 @@ export default function MenuPageClient({
                       router.push(shop('checkout'))
                     }}
                     style={{ backgroundColor: primaryColor }}
-                    className={`w-full text-white font-bold rounded-2xl transition-colors hover:opacity-90 touch-manipulation ${lite ? 'py-5 text-lg min-h-[58px]' : 'py-4'}`}
+                    className={`w-full text-white font-bold rounded-2xl transition-colors hover:opacity-90 touch-manipulation ${lite ? 'py-5 text-lg min-h-[58px]': 'py-4'}`}
                   >
                     {t('menuPage.checkout')} →
                   </button>

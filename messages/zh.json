@@ -2408,7 +2408,7 @@
  "smtpGmailWarning": " Gmail 需要应用专用密码。请在 Google 账号 → 安全性 → 应用专用密码 中创建。",
  "smtpServerLabel": "SMTP 服务器（请咨询服务商）",
  "smtpPortLabel": "端口",
- "smtpSaveSaving": "⏳ 正在保存...",
+ "smtpSaveSaving": " 正在保存...",
  "smtpSaveSaved": " 已保存！",
  "smtpSaveButton": " 保存邮件设置"
  },

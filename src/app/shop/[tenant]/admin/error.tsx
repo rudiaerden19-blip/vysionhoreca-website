@@ -8,7 +8,7 @@ import { useLanguage } from '@/i18n'
 import { trackError } from '@/lib/monitoring'
 
 /**
- * Next.js-route error boundary voor alle `/shop/[tenant]/admin/*` routes
+ * Next.js-route error boundary voor alle `/shop/[tenant]/admin/*`routes
  * (kassa, reserveringen, rapporten, …). Vangt renderfouten in page/layout‑kinderen
  * zodat gebruikers niet op een witte pagina terechtkomen.
  */
@@ -20,7 +20,7 @@ export default function ShopAdminError({
   reset: () => void
 }) {
   const params = useParams()
-  const tenant = typeof params?.tenant === 'string' ? params.tenant : ''
+  const tenant = typeof params?.tenant === 'string'? params.tenant : ''
   const { t } = useLanguage()
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export default function ShopAdminError({
     trackError(error, { segment: 'shop/[tenant]/admin', tenant: tenant || undefined })
   }, [error, tenant])
 
-  const overviewHref = tenant ? `/shop/${encodeURIComponent(tenant)}/admin` : '/'
+  const overviewHref = tenant ? `/shop/${encodeURIComponent(tenant)}/admin`: '/'
 
   return (
     <div className="flex min-h-[40vh] flex-col items-center justify-center px-4 py-12 text-center">

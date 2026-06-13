@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     if (!rateLimitResult.success) {
       logger.warn('Login rate limited', { requestId, clientIP })
       return NextResponse.json(
-        { error: 'Te veel login pogingen. Probeer het over een minuut opnieuw.' },
+        { error: 'Te veel login pogingen. Probeer het over een minuut opnieuw.'},
         { status: 429 }
       )
     }
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
     if (!supabase) {
       logger.error('Login failed: Supabase not configured', { requestId })
       return NextResponse.json(
-        { error: 'Database niet geconfigureerd. Neem contact op met support.' },
+        { error: 'Database niet geconfigureerd. Neem contact op met support.'},
         { status: 503 }
       )
     }
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
 
       if (saErr) {
         logger.error('Superadmin tenant-login lookup error', { requestId, error: saErr.message })
-        return NextResponse.json({ error: 'Database fout' }, { status: 500 })
+        return NextResponse.json({ error: 'Database fout'}, { status: 500 })
       }
 
       const saValid = await verifySuperadminPassword(
@@ -129,7 +129,7 @@ export async function POST(request: NextRequest) {
 
           if (ownerErr) {
             logger.error('Superadmin tenant-login owner fallback', { requestId, error: ownerErr.message })
-            return NextResponse.json({ error: 'Database fout' }, { status: 500 })
+            return NextResponse.json({ error: 'Database fout'}, { status: 500 })
           }
 
           owner =
@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
             targetTenantSlugRaw,
           })
           return NextResponse.json(
-            { error: 'Geen zaak-account gevonden voor deze tenant. Neem contact op met support.' },
+            { error: 'Geen zaak-account gevonden voor deze tenant. Neem contact op met support.'},
             { status: 404 }
           )
         }
@@ -196,14 +196,14 @@ export async function POST(request: NextRequest) {
     if (profileError) {
       logger.error('Error finding profile', { requestId, error: profileError.message })
       return NextResponse.json(
-        { error: 'Database fout' },
+        { error: 'Database fout'},
         { status: 500 }
       )
     }
 
     if (!profile) {
       return NextResponse.json(
-        { error: 'Geen account gevonden met dit email adres' },
+        { error: 'Geen account gevonden met dit email adres'},
         { status: 404 }
       )
     }
@@ -213,7 +213,7 @@ export async function POST(request: NextRequest) {
 
     if (!isValid) {
       return NextResponse.json(
-        { error: 'Onjuist wachtwoord' },
+        { error: 'Onjuist wachtwoord'},
         { status: 401 }
       )
     }
@@ -273,7 +273,7 @@ export async function POST(request: NextRequest) {
     if (!tenantSlug) {
       logger.warn('No tenant found for account', { requestId, email: emailLower })
       return NextResponse.json(
-        { error: 'Geen tenant gevonden voor dit account. Neem contact op met support.' },
+        { error: 'Geen tenant gevonden voor dit account. Neem contact op met support.'},
         { status: 404 }
       )
     }
@@ -369,7 +369,7 @@ export async function POST(request: NextRequest) {
       duration: Date.now() - startTime 
     })
     return NextResponse.json(
-      { error: 'Er is een fout opgetreden' },
+      { error: 'Er is een fout opgetreden'},
       { status: 500 }
     )
   }

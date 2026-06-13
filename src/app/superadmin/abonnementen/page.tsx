@@ -225,20 +225,20 @@ export default function AbonnementenPage() {
         {/* Filters */}
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
           {[
-            { key: 'all', label: 'Alle Abonnementen' },
-            { key: 'active', label: 'Actieve Abonnementen' },
-            { key: 'trial', label: 'Trial Abonnementen' },
-            { key: 'expiring', label: ` Verloopt Binnenkort (${stats.expiringSoon})` },
-            { key: 'cancelled', label: 'Verwijderde Abonnementen' },
-            { key: 'expired', label: 'Vervallen Abonnementen' },
+            { key: 'all', label: 'Alle Abonnementen'},
+            { key: 'active', label: 'Actieve Abonnementen'},
+            { key: 'trial', label: 'Trial Abonnementen'},
+            { key: 'expiring', label: `Verloopt Binnenkort (${stats.expiringSoon})`},
+            { key: 'cancelled', label: 'Verwijderde Abonnementen'},
+            { key: 'expired', label: 'Vervallen Abonnementen'},
           ].map((f) => (
             <button
               key={f.key}
               onClick={() => setFilter(f.key)}
               className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors ${
                 filter === f.key
-                  ? f.key === 'expiring' ? 'bg-yellow-500 text-black' : 'bg-orange-500 text-white'
-                  : f.key === 'expiring' && stats.expiringSoon > 0 ? 'bg-yellow-900 text-yellow-300 hover:bg-yellow-800' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                  ? f.key === 'expiring'? 'bg-yellow-500 text-black': 'bg-orange-500 text-white'
+                  : f.key === 'expiring' && stats.expiringSoon > 0 ? 'bg-yellow-900 text-yellow-300 hover:bg-yellow-800': 'bg-slate-800 text-slate-300 hover:bg-slate-700'
               }`}
             >
               {f.label}
@@ -263,14 +263,14 @@ export default function AbonnementenPage() {
                 key={sub.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className={`bg-slate-800 rounded-2xl p-6 border ${isExpiringSoon ? 'border-yellow-500 border-2' : 'border-slate-700'}`}
+                className={`bg-slate-800 rounded-2xl p-6 border ${isExpiringSoon ? 'border-yellow-500 border-2': 'border-slate-700'}`}
               >
                 {/* Waarschuwingsbanner voor bijna verlopend */}
                 {isExpiringSoon && (
                   <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-xl p-3 mb-4 flex items-center gap-3">
                     <span className="text-xl"></span>
                     <div>
-                      <p className="text-yellow-300 font-bold text-sm">Abonnement verloopt over {daysLeft} {daysLeft === 1 ? 'dag' : 'dagen'}!</p>
+                      <p className="text-yellow-300 font-bold text-sm">Abonnement verloopt over {daysLeft} {daysLeft === 1 ? 'dag': 'dagen'}!</p>
                       <p className="text-yellow-400/80 text-xs">Klant ontvangt automatisch een herinnering</p>
                     </div>
                   </div>
@@ -302,7 +302,7 @@ export default function AbonnementenPage() {
                         )}
                         {isExpiringSoon && (
                           <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-500 text-black">
-                            ⏰ {daysLeft} {daysLeft === 1 ? 'dag' : 'dagen'}
+                             {daysLeft} {daysLeft === 1 ? 'dag': 'dagen'}
                           </span>
                         )}
                       </div>
@@ -327,7 +327,7 @@ export default function AbonnementenPage() {
                 {sub.next_payment_at && (
                   <div className="mt-4 pt-4 border-t border-slate-700 flex items-center justify-between">
                     <p className="text-slate-400 text-sm">
-                      Volgende betaling: <span className={`${isExpiringSoon ? 'text-yellow-400 font-bold' : 'text-white'}`}>{new Date(sub.next_payment_at).toLocaleDateString('nl-BE')}</span>
+                      Volgende betaling: <span className={`${isExpiringSoon ? 'text-yellow-400 font-bold': 'text-white'}`}>{new Date(sub.next_payment_at).toLocaleDateString('nl-BE')}</span>
                     </p>
                     {isExpiringSoon && (
                       <span className="text-yellow-400 text-xs">Email herinnering wordt automatisch verstuurd</span>

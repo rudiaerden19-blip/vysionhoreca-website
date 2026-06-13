@@ -67,7 +67,7 @@ function formatSkuName(base: string, size: string | null, color: string | null):
   if (size?.trim()) parts.push(size.trim())
   if (color?.trim()) parts.push(color.trim())
   if (parts.length === 0) return base
-  return `${base} — ${parts.join(' / ')}`
+  return `${base} — ${parts.join('/ ')}`
 }
 
 export function buildRetailSkusFromRows(products: ProductRow[], variants: VariantRow[]): RetailPosSku[] {
@@ -153,7 +153,7 @@ export function invalidateRetailPosSkuCache(tenantSlug: string): void {
   cache.invalidate(cacheKey('retail_pos_skus', tenantSlug))
 }
 
-/** Gecachte catalogus — `fresh` na writes of expliciete reload. */
+/** Gecachte catalogus — `fresh`na writes of expliciete reload. */
 export async function fetchRetailPosSkus(
   tenantSlug: string,
   options?: { fresh?: boolean },
@@ -270,8 +270,8 @@ export function parseRetailScanPayload(raw: string): RetailScanPayload {
     }
   }
 
-  if (trimmed.includes('|')) {
-    const [code, qtyRaw, size, color] = trimmed.split('|').map((s) => s.trim())
+  if (trimmed.includes(' | ')) {
+    const [code, qtyRaw, size, color] = trimmed.split(' | ').map((s) => s.trim())
     const qty = Math.max(1, Math.floor(Number(qtyRaw) || 1))
     return {
       lookupCode: code || trimmed,

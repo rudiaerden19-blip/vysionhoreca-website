@@ -1,6 +1,6 @@
 /**
  * Productie-kassa POS-knoppenstijl (gunmetal gradient).
- * Geen import uit `gks-kassa/` — GKS-pilot blijft op preview-branch.
+ * Geen import uit `gks-kassa/`— GKS-pilot blijft op preview-branch.
  */
 
 /** Korrelgrijs — header, zijbalk, kader (zie `globals.css`). */
@@ -162,7 +162,7 @@ export const KASSA_POS_CART_THUMB_SHELL =
   'rounded-lg border border-[#3a3a3a] bg-[#252528] overflow-hidden shrink-0'
 
 export function kassaPosCartQtyButtonClass(compact?: boolean): string {
-  const size = compact ? 'h-7 w-7 min-h-7 min-w-7 text-sm' : 'h-8 w-8 min-h-8 min-w-8 text-base'
+  const size = compact ? 'h-7 w-7 min-h-7 min-w-7 text-sm': 'h-8 w-8 min-h-8 min-w-8 text-base'
   return `${kassaPosButtonClass(false)} ${size} shrink-0 flex items-center justify-center leading-none`
 }
 
@@ -198,7 +198,7 @@ export const KASSA_POS_MENU_TILE_BUTTON_BASE = [
   'active:translate-y-[1px] active:brightness-[0.93]',
 ].join(' ')
 
-/** Fotovlak rand-tot-rand; wit zodat `object-contain` geen grijze letterbox toont. */
+/** Fotovlak rand-tot-rand; wit zodat `object-contain`geen grijze letterbox toont. */
 export const KASSA_POS_MENU_TILE_IMAGE_WELL =
   'pointer-events-none relative min-h-0 w-full min-w-0 flex-1 overflow-hidden bg-white'
 

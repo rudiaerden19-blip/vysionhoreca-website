@@ -9,7 +9,7 @@ export function slugifyBusinessNameForTenant(businessName: string): string {
     .replace(/[^a-z0-9]/g, '')
 
   if (!tenantSlug || tenantSlug.length < 2) {
-    tenantSlug = 'shop' + Date.now().toString(36)
+    tenantSlug = 'shop'+ Date.now().toString(36)
   }
 
   return tenantSlug

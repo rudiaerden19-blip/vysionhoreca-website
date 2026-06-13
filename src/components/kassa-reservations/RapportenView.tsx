@@ -74,8 +74,8 @@ export function RapportenView({
       const y = H - PAD - (v / max) * (H - PAD * 2)
       return `${x},${y}`
     })
-    const linePath = `M ${pts.join(' L ')}`
-    const areaPath = `M ${PAD},${H - PAD} L ${pts.join(' L ')} L ${W - PAD},${H - PAD} Z`
+    const linePath = `M ${pts.join('L ')}`
+    const areaPath = `M ${PAD},${H - PAD} L ${pts.join('L ')} L ${W - PAD},${H - PAD} Z`
     return (
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: 150 }}>
         <defs>
@@ -118,11 +118,11 @@ export function RapportenView({
   )
 
   const statusData = [
-    { label: 'Bevestigd', status: 'CONFIRMED' as const, color: '#3b82f6' },
-    { label: 'Ingecheckt', status: 'CHECKED_IN' as const, color: '#22c55e' },
-    { label: 'Afgerond', status: 'COMPLETED' as const, color: '#6b7280' },
-    { label: 'No-show', status: 'NO_SHOW' as const, color: '#ef4444' },
-    { label: 'Geannuleerd', status: 'CANCELLED' as const, color: '#d1d5db' },
+    { label: 'Bevestigd', status: 'CONFIRMED'as const, color: '#3b82f6'},
+    { label: 'Ingecheckt', status: 'CHECKED_IN'as const, color: '#22c55e'},
+    { label: 'Afgerond', status: 'COMPLETED'as const, color: '#6b7280'},
+    { label: 'No-show', status: 'NO_SHOW'as const, color: '#ef4444'},
+    { label: 'Geannuleerd', status: 'CANCELLED'as const, color: '#d1d5db'},
   ]
 
   return (
@@ -164,18 +164,18 @@ export function RapportenView({
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {[
-          { label: 'Terugkerende gasten', value: `${returningPct}%`, sub: 'van alle gasten', color: 'text-gray-800' },
+          { label: 'Terugkerende gasten', value: `${returningPct}%`, sub: 'van alle gasten', color: 'text-gray-800'},
           {
             label: 'Annuleringen',
             value: `${cancelPct}%`,
             sub: `${cancelled} geannuleerd`,
-            color: cancelPct > 20 ? 'text-red-500' : 'text-gray-800',
+            color: cancelPct > 20 ? 'text-red-500': 'text-gray-800',
           },
           {
             label: 'No-shows',
             value: `${noShowPct}%`,
             sub: `${noShows} no-show`,
-            color: noShowPct > 10 ? 'text-red-500' : 'text-gray-800',
+            color: noShowPct > 10 ? 'text-red-500': 'text-gray-800',
           },
           {
             label: 'Gem. groepsgrootte',

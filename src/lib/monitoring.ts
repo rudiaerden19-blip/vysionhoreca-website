@@ -2,7 +2,7 @@
  * Application Monitoring & Metrics
  * 
  * Lightweight monitoring that works with any APM provider.
- * `trackError` logs via `logger` en stuurt naar Sentry als `NEXT_PUBLIC_SENTRY_DSN` gezet is.
+ * `trackError`logs via `logger`en stuurt naar Sentry als `NEXT_PUBLIC_SENTRY_DSN`gezet is.
  * Metrics (`increment`, …) loggen voorlopig als debug; DataDog e.d. kan later.
  * - New Relic
  * - Vercel Analytics
@@ -11,11 +11,11 @@
  *   import { metrics, trackError } from '@/lib/monitoring'
  *   
  *   // Track an error
- *   trackError(error, { userId: '123', action: 'checkout' })
+ *   trackError(error, { userId: '123', action: 'checkout'})
  *   
  *   // Track a metric
- *   metrics.increment('orders.created', { tenant: 'demo' })
- *   metrics.timing('api.response', 150, { endpoint: '/api/orders' })
+ *   metrics.increment('orders.created', { tenant: 'demo'})
+ *   metrics.timing('api.response', 150, { endpoint: '/api/orders'})
  */
 
 import * as Sentry from '@sentry/nextjs'
@@ -38,7 +38,7 @@ export function trackError(
 
   if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
     const capture =
-      error instanceof Error ? error : new Error(typeof error === 'string' ? error : errorMessage)
+      error instanceof Error ? error : new Error(typeof error === 'string'? error : errorMessage)
     Sentry.captureException(capture, { extra: context })
   }
 }

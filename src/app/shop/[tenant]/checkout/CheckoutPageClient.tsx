@@ -63,8 +63,8 @@ export default function CheckoutPageClient({
   const [tenantSettings, setTenantSettings] = useState<TenantSettings | null>(null)
   const [deliverySettings, setDeliverySettings] = useState<DeliverySettings | null>(null)
   const [cart, setCart] = useState<CartItem[]>([])
-  const [orderType, setOrderType] = useState<'pickup' | 'delivery'>('pickup')
-  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'online'>('cash')
+  const [orderType, setOrderType] = useState<'pickup' |  'delivery'>('pickup')
+  const [paymentMethod, setPaymentMethod] = useState<'cash' |  'online'>('cash')
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
     name: '',
     email: '',
@@ -109,7 +109,7 @@ export default function CheckoutPageClient({
         // Pre-fill phone number
         setCustomerInfo(prev => ({
           ...prev,
-          phone: waPhone!.startsWith('32') ? `+${waPhone}` : waPhone!
+          phone: waPhone!.startsWith('32') ? `+${waPhone}`: waPhone!
         }))
       }
       
@@ -239,7 +239,7 @@ export default function CheckoutPageClient({
   }
 
   const subtotal = cart.reduce((sum, item) => sum + item.totalPrice * item.quantity, 0)
-  const deliveryFee = orderType === 'delivery' ? (deliverySettings?.delivery_fee || 0) : 0
+  const deliveryFee = orderType === 'delivery'? (deliverySettings?.delivery_fee || 0) : 0
   const discount = promoDiscount
   const total = subtotal + deliveryFee - discount
 
@@ -331,8 +331,8 @@ export default function CheckoutPageClient({
     
     try {
       // Ordernummer wordt server-side atomair toegekend door
-      // `orders_assign_webshop_order_number` (BEFORE INSERT trigger). De trigger
-      // overschrijft `order_number = 0` met een per-tenant volgnummer
+      // `orders_assign_webshop_order_number`(BEFORE INSERT trigger). De trigger
+      // overschrijft `order_number = 0`met een per-tenant volgnummer
       // (`tenant_order_sequences`). Race-safe; geen client-side MAX+1 meer.
       const { data: order, error: orderError } = await supabase
         .from('orders')
@@ -342,7 +342,7 @@ export default function CheckoutPageClient({
           customer_name: customerInfo.name,
           customer_email: customerInfo.email || null,
           customer_phone: customerInfo.phone,
-          customer_address: orderType === 'delivery' ? `${customerInfo.address}, ${customerInfo.postal_code} ${customerInfo.city}` : null,
+          customer_address: orderType === 'delivery'? `${customerInfo.address}, ${customerInfo.postal_code} ${customerInfo.city}`: null,
           customer_notes: customerInfo.notes || null,
           order_type: orderType,
           scheduled_date: scheduledDate || null,  // Date for pickup/delivery
@@ -357,10 +357,10 @@ export default function CheckoutPageClient({
             total_price: item.totalPrice * item.quantity,
           })),
           subtotal: subtotal,
-          delivery_fee: orderType === 'delivery' ? (deliverySettings?.delivery_fee || 0) : 0,
+          delivery_fee: orderType === 'delivery'? (deliverySettings?.delivery_fee || 0) : 0,
           tax: 0,
           total: total,
-          payment_method: paymentMethod === 'cash' ? 'cash' : 'online',
+          payment_method: paymentMethod === 'cash'? 'cash': 'online',
           payment_status: 'pending',
         })
         .select()
@@ -394,7 +394,7 @@ export default function CheckoutPageClient({
         try {
           const stripeRes = await fetch('/api/stripe/create-checkout', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json'},
             body: JSON.stringify({
               orderId: order.id,
               tenantSlug: params.tenant,
@@ -429,7 +429,7 @@ export default function CheckoutPageClient({
           // weigert oude orders (>15 min) — voorkomt spam via dit endpoint.
           await fetch('/api/whatsapp/send-confirmation', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json'},
             body: JSON.stringify({
               orderId: order.id,
               tenantSlug: params.tenant,
@@ -446,7 +446,7 @@ export default function CheckoutPageClient({
               scheduledTime: scheduledTime,
             })
           })
-          console.log(' WhatsApp confirmation sent')
+          console.log('WhatsApp confirmation sent')
           
           // If user came from WhatsApp, redirect back after short delay
           if (whatsappPhone && businessWhatsApp) {
@@ -487,10 +487,10 @@ export default function CheckoutPageClient({
   // Success screen - Wacht op bevestiging (MOET VOOR empty cart check!)
   if (orderSuccess) {
     return (
-      <div style={{ minHeight: '100dvh' }} className="bg-gray-50 flex items-center justify-center p-4">
+      <div style={{ minHeight: '100dvh'}} className="bg-gray-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full text-center shadow-xl">
           <div className="w-24 h-24 rounded-full mx-auto mb-6 flex items-center justify-center text-5xl bg-blue-100">
-            ⏳
+            
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('checkoutPage.orderReceived')}</h1>
           <p className="text-gray-600 mb-6">
@@ -562,8 +562,8 @@ export default function CheckoutPageClient({
 
   return (
     <div
-      style={{ width: '100%', maxWidth: '100%', overflowX: 'clip' }}
-      className={`min-h-screen bg-gray-50${isKiosk ? ' kiosk-touch-ui' : ''}`}
+      style={{ width: '100%', maxWidth: '100%', overflowX: 'clip'}}
+      className={`min-h-screen bg-gray-50${isKiosk ? 'kiosk-touch-ui': ''}`}
     >
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white shadow-sm">
@@ -598,15 +598,15 @@ export default function CheckoutPageClient({
                 <button
                   type="button"
                   onClick={() => setOrderType('pickup')}
-                  style={orderType === 'pickup' ? { borderColor: primaryColor, backgroundColor: `${primaryColor}10` } : {}}
+                  style={orderType === 'pickup'? { borderColor: primaryColor, backgroundColor: `${primaryColor}10`} : {}}
                   className={`rounded-xl border-2 transition-all touch-manipulation ${
-                    isKiosk ? 'min-h-[56px] p-5' : 'p-4'
-                  } ${orderType === 'pickup' ? '' : 'border-gray-200 hover:border-gray-300'}`}
+                    isKiosk ? 'min-h-[56px] p-5': 'p-4'
+                  } ${orderType === 'pickup'? '' : 'border-gray-200 hover:border-gray-300'}`}
                 >
                   <span className="text-3xl block mb-2"></span>
                   <span className="font-bold text-gray-900">{t('checkoutPage.pickup')}</span>
                   <span className="block text-sm text-gray-500">
-                    {deliverySettings?.pickup_time_minutes ? `~${deliverySettings.pickup_time_minutes} min` : t('checkoutPage.readyDirect')}
+                    {deliverySettings?.pickup_time_minutes ? `~${deliverySettings.pickup_time_minutes} min`: t('checkoutPage.readyDirect')}
                   </span>
                 </button>
                 
@@ -614,10 +614,10 @@ export default function CheckoutPageClient({
                   <button
                     type="button"
                     onClick={() => setOrderType('delivery')}
-                    style={orderType === 'delivery' ? { borderColor: primaryColor, backgroundColor: `${primaryColor}10` } : {}}
+                    style={orderType === 'delivery'? { borderColor: primaryColor, backgroundColor: `${primaryColor}10`} : {}}
                     className={`rounded-xl border-2 transition-all touch-manipulation ${
-                      isKiosk ? 'min-h-[56px] p-5' : 'p-4'
-                    } ${orderType === 'delivery' ? '' : 'border-gray-200 hover:border-gray-300'}`}
+                      isKiosk ? 'min-h-[56px] p-5': 'p-4'
+                    } ${orderType === 'delivery'? '' : 'border-gray-200 hover:border-gray-300'}`}
                   >
                     <span className="text-3xl block mb-2"></span>
                     <span className="font-bold text-gray-900">{t('checkoutPage.delivery')}</span>
@@ -665,7 +665,7 @@ export default function CheckoutPageClient({
                     value={scheduledTime}
                     onChange={(e) => {
                       const digits = e.target.value.replace(/\D/g, '').slice(0, 4)
-                      const formatted = digits.length > 2 ? digits.slice(0,2) + ':' + digits.slice(2) : digits
+                      const formatted = digits.length > 2 ? digits.slice(0,2) + ':'+ digits.slice(2) : digits
                       setScheduledTime(formatted)
                     }}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all text-center text-lg tracking-widest"
@@ -820,14 +820,14 @@ export default function CheckoutPageClient({
                 {enabledPaymentMethods.includes('cash') && (
                   <button
                     onClick={() => setPaymentMethod('cash')}
-                    style={paymentMethod === 'cash' ? { borderColor: primaryColor, backgroundColor: `${primaryColor}10` } : {}}
+                    style={paymentMethod === 'cash'? { borderColor: primaryColor, backgroundColor: `${primaryColor}10`} : {}}
                     className={`p-4 rounded-xl border-2 transition-all ${
-                      paymentMethod === 'cash' ? '' : 'border-gray-200 hover:border-gray-300'
+                      paymentMethod === 'cash'? '' : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
                     <span className="text-3xl block mb-2"></span>
                     <span className="font-bold text-gray-900">{t('checkoutPage.cash')}</span>
-                    <span className="block text-sm text-gray-500">{orderType === 'pickup' ? t('checkoutPage.payAtPickup') : t('checkoutPage.payAtDelivery')}</span>
+                    <span className="block text-sm text-gray-500">{orderType === 'pickup'? t('checkoutPage.payAtPickup') : t('checkoutPage.payAtDelivery')}</span>
                   </button>
                 )}
                 
@@ -835,9 +835,9 @@ export default function CheckoutPageClient({
                 {enabledPaymentMethods.includes('bancontact') && (
                   <button
                     onClick={() => setPaymentMethod('online')}
-                    style={paymentMethod === 'online' ? { borderColor: primaryColor, backgroundColor: `${primaryColor}10` } : {}}
+                    style={paymentMethod === 'online'? { borderColor: primaryColor, backgroundColor: `${primaryColor}10`} : {}}
                     className={`p-4 rounded-xl border-2 transition-all ${
-                      paymentMethod === 'online' ? '' : 'border-gray-200 hover:border-gray-300'
+                      paymentMethod === 'online'? '' : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
                     <span className="text-3xl block mb-2"></span>
@@ -849,9 +849,9 @@ export default function CheckoutPageClient({
                 {enabledPaymentMethods.includes('visa') && (
                   <button
                     onClick={() => setPaymentMethod('online')}
-                    style={paymentMethod === 'online' ? { borderColor: primaryColor, backgroundColor: `${primaryColor}10` } : {}}
+                    style={paymentMethod === 'online'? { borderColor: primaryColor, backgroundColor: `${primaryColor}10`} : {}}
                     className={`p-4 rounded-xl border-2 transition-all ${
-                      paymentMethod === 'online' ? '' : 'border-gray-200 hover:border-gray-300'
+                      paymentMethod === 'online'? '' : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
                     <span className="text-3xl block mb-2"></span>
@@ -863,9 +863,9 @@ export default function CheckoutPageClient({
                 {enabledPaymentMethods.includes('mastercard') && (
                   <button
                     onClick={() => setPaymentMethod('online')}
-                    style={paymentMethod === 'online' ? { borderColor: primaryColor, backgroundColor: `${primaryColor}10` } : {}}
+                    style={paymentMethod === 'online'? { borderColor: primaryColor, backgroundColor: `${primaryColor}10`} : {}}
                     className={`p-4 rounded-xl border-2 transition-all ${
-                      paymentMethod === 'online' ? '' : 'border-gray-200 hover:border-gray-300'
+                      paymentMethod === 'online'? '' : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
                     <span className="text-3xl block mb-2"></span>
@@ -877,9 +877,9 @@ export default function CheckoutPageClient({
                 {enabledPaymentMethods.includes('paypal') && (
                   <button
                     onClick={() => setPaymentMethod('online')}
-                    style={paymentMethod === 'online' ? { borderColor: primaryColor, backgroundColor: `${primaryColor}10` } : {}}
+                    style={paymentMethod === 'online'? { borderColor: primaryColor, backgroundColor: `${primaryColor}10`} : {}}
                     className={`p-4 rounded-xl border-2 transition-all ${
-                      paymentMethod === 'online' ? '' : 'border-gray-200 hover:border-gray-300'
+                      paymentMethod === 'online'? '' : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
                     <span className="text-3xl block mb-2">🅿</span>
@@ -891,9 +891,9 @@ export default function CheckoutPageClient({
                 {enabledPaymentMethods.includes('ideal') && (
                   <button
                     onClick={() => setPaymentMethod('online')}
-                    style={paymentMethod === 'online' ? { borderColor: primaryColor, backgroundColor: `${primaryColor}10` } : {}}
+                    style={paymentMethod === 'online'? { borderColor: primaryColor, backgroundColor: `${primaryColor}10`} : {}}
                     className={`p-4 rounded-xl border-2 transition-all ${
-                      paymentMethod === 'online' ? '' : 'border-gray-200 hover:border-gray-300'
+                      paymentMethod === 'online'? '' : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
                     <span className="text-3xl block mb-2"></span>
@@ -996,7 +996,7 @@ export default function CheckoutPageClient({
               {/* Shop Closed Warning */}
               {shopStatus && !shopStatus.isOpen && (
                 <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-xl text-yellow-800 text-sm text-center">
-                  ⏰ {shopStatus.message || t('checkoutPage.currentlyClosed')} - {t('checkoutPage.canStillOrder')}
+                   {shopStatus.message || t('checkoutPage.currentlyClosed')} - {t('checkoutPage.canStillOrder')}
                 </div>
               )}
 
@@ -1015,7 +1015,7 @@ export default function CheckoutPageClient({
                 disabled={!canSubmit() || submitting}
                 style={{ backgroundColor: canSubmit() ? primaryColor : undefined }}
                 className={`w-full mt-4 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold rounded-2xl transition-colors flex items-center justify-center gap-2 touch-manipulation ${
-                  isKiosk ? 'py-5 text-lg min-h-[58px]' : 'py-4'
+                  isKiosk ? 'py-5 text-lg min-h-[58px]': 'py-4'
                 }`}
               >
                 {submitting ? (

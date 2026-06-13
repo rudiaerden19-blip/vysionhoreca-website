@@ -19,9 +19,9 @@ export const SUBMENU_IDS_ALWAYS_ON = new Set<string>()
 export type AdminHamburgerItem = {
   id: string
   icon: string
-  /** Fallback als `labelKey` ontbreekt of vertaling niet geladen is */
+  /** Fallback als `labelKey`ontbreekt of vertaling niet geladen is */
   label: string
-  /** Vertaalde label via `t(labelKey)` (kassa / superadmin / …) */
+  /** Vertaalde label via `t(labelKey)`(kassa / superadmin / …) */
   labelKey?: string
   href: string
 }
@@ -310,7 +310,7 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
         },
         {
           id: 'sm_web_reviews',
-          icon: '⭐',
+          icon: '',
           label: 'Reviews',
           labelKey: itemLabelKey('sm_web_reviews'),
           href: `${baseUrl}/reviews`,
@@ -384,7 +384,7 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
         },
         {
           id: 'sm_personeel_inuitklokken',
-          icon: '⏰',
+          icon: '',
           label: 'In/uitklokken',
           labelKey: 'personeelPage.submenuInOutClocking',
           href: `${baseUrl}/inklokken`,
@@ -597,7 +597,7 @@ export function buildEnabledModulesSavePayload(
 ): Record<string, boolean> {
   const payload: Record<string, boolean> = {}
   for (const id of TENANT_MODULE_IDS) {
-    payload[id] = id === 'account' ? true : !!moduleToggles[id]
+    payload[id] = id === 'account'? true : !!moduleToggles[id]
   }
   const seen = new Set<string>()
   const hmods = buildHamburgerModules(`/shop/${tenantSlug}/admin`, tenantSlug)
@@ -634,7 +634,7 @@ export function getSubmenuIdForPathname(
 ): string | null {
   const baseUrl = `/shop/${tenantSlug}/admin`
   const pathNoQuery = pathname.split('?')[0].replace(/\/+$/, '')
-  if (pathNoQuery === `${baseUrl}/kassa` || pathNoQuery === `${baseUrl}/retail-kassa`) return null
+  if (pathNoQuery === `${baseUrl}/kassa`|| pathNoQuery === `${baseUrl}/retail-kassa`) return null
 
   const modules = buildHamburgerModules(baseUrl, tenantSlug)
   let best: { id: string; len: number } | null = null
@@ -657,7 +657,7 @@ export function getSubmenuIdForPathname(
     }
   }
   if (
-    pathNoQuery === `${baseUrl}/producten/intake` ||
+    pathNoQuery === `${baseUrl}/producten/intake`||
     pathNoQuery.startsWith(`${baseUrl}/producten/intake/`)
   ) {
     if (moduleAccess?.['retail-kassa'] && !moduleAccess?.kassa) {
@@ -665,7 +665,7 @@ export function getSubmenuIdForPathname(
     }
   }
   if (
-    pathNoQuery === `${baseUrl}/producten` &&
+    pathNoQuery === `${baseUrl}/producten`&&
     moduleAccess?.['retail-kassa'] &&
     !moduleAccess?.kassa
   ) {
@@ -679,7 +679,7 @@ export function isSubmenuForcedOn(subId: string): boolean {
 }
 
 /**
- * `enabledJson` = ruwe tenants.enabled_modules. Ontbrekende submenu-key = aan zolang parent-module aan is en JSON expliciet is.
+ * `enabledJson`= ruwe tenants.enabled_modules. Ontbrekende submenu-key = aan zolang parent-module aan is en JSON expliciet is.
  */
 export function isSubmenuEnabledInTenantConfig(
   subId: string,

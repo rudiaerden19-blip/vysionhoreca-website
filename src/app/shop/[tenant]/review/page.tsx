@@ -115,7 +115,7 @@ export default function ReviewPage({ params }: { params: { tenant: string } }) {
   }
 
   return (
-    <div style={{ maxWidth: '100%', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-50">
+    <div style={{ maxWidth: '100%', overflowX: 'hidden', width: '100%'}} className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white shadow-sm">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -164,7 +164,11 @@ export default function ReviewPage({ params }: { params: { tenant: string } }) {
                   onMouseLeave={() => setHoverRating(0)}
                   className="text-5xl transition-colors"
                 >
-                  {(hoverRating || rating) >= star ? '⭐' : ''}
+                  {(hoverRating || rating) >= star ? (
+                    <span className="text-orange-500">{star}</span>
+                  ) : (
+                    <span className="text-gray-300">{star}</span>
+                  )}
                 </motion.button>
               ))}
             </div>
@@ -240,7 +244,7 @@ export default function ReviewPage({ params }: { params: { tenant: string } }) {
               disabled={submitting || rating === 0}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              style={{ backgroundColor: rating === 0 ? '#ccc' : primaryColor }}
+              style={{ backgroundColor: rating === 0 ? '#ccc': primaryColor }}
               className="w-full text-white font-bold py-4 rounded-xl transition-all disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {submitting ? (
@@ -250,7 +254,7 @@ export default function ReviewPage({ params }: { params: { tenant: string } }) {
                 </>
               ) : (
                 <>
-                  <span>⭐</span>
+                  <span></span>
                   <span>{t('reviewPage.submit')}</span>
                 </>
               )}

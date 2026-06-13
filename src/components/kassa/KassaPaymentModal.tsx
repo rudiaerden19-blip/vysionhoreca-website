@@ -2,7 +2,7 @@
 
 import { useLanguage } from '@/i18n'
 
-export type KassaQuickPayMethod = 'CASH' | 'CARD' | 'IDEAL' | 'BANCONTACT'
+export type KassaQuickPayMethod = 'CASH' |  'CARD' |  'IDEAL' |  'BANCONTACT'
 
 export type KassaPayOption = {
   readonly method: KassaQuickPayMethod
@@ -26,7 +26,7 @@ export function KassaPaymentModal({
   onClose: () => void
   onPay: (method: KassaQuickPayMethod) => void
   onOpenSplit: () => void
-  appearance?: 'light' | 'dark'
+  appearance?: 'light' |  'dark'
 }) {
   const { t } = useLanguage()
   const dark = appearance === 'dark'
@@ -35,11 +35,11 @@ export function KassaPaymentModal({
   const card = dark
     ? 'rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl border border-zinc-600 bg-[#151a21]'
     : 'bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl'
-  const hdr = dark ? 'p-4 border-b border-zinc-600 flex justify-between items-center' : 'p-4 border-b border-gray-100 flex justify-between items-center'
-  const titleCls = dark ? 'text-xl font-semibold text-zinc-50' : 'text-xl font-semibold'
-  const btnCloseCls = dark ? 'p-2 rounded-lg hover:bg-zinc-800 text-2xl text-zinc-200' : 'p-2 rounded-lg hover:bg-gray-100 text-2xl'
-  const toPayMuted = dark ? 'text-zinc-400' : 'text-gray-500'
-  const totalAccent = dark ? 'text-[#6dd5ff]' : 'text-[#3C4D6B]'
+  const hdr = dark ? 'p-4 border-b border-zinc-600 flex justify-between items-center': 'p-4 border-b border-gray-100 flex justify-between items-center'
+  const titleCls = dark ? 'text-xl font-semibold text-zinc-50': 'text-xl font-semibold'
+  const btnCloseCls = dark ? 'p-2 rounded-lg hover:bg-zinc-800 text-2xl text-zinc-200': 'p-2 rounded-lg hover:bg-gray-100 text-2xl'
+  const toPayMuted = dark ? 'text-zinc-400': 'text-gray-500'
+  const totalAccent = dark ? 'text-[#6dd5ff]': 'text-[#3C4D6B]'
   const btnTile = dark
     ? 'flex flex-col items-center justify-center h-32 gap-3 rounded-xl border-2 bg-[#263043] hover:scale-[1.02] transition-transform font-semibold text-lg text-zinc-100'
     : 'flex flex-col items-center justify-center h-32 gap-3 rounded-xl border-2 bg-gray-50 hover:scale-[1.02] transition-transform font-semibold text-lg'
@@ -74,9 +74,9 @@ export function KassaPaymentModal({
               type="button"
               onClick={onOpenSplit}
               className={`col-span-2 ${btnTile}`}
-              style={{ borderColor: '#8b5cf6' }}
+              style={{ borderColor: '#8b5cf6'}}
             >
-              <span style={{ color: '#8b5cf6' }}>{t('kassaApp.splitPay')}</span>
+              <span style={{ color: '#8b5cf6'}}>{t('kassaApp.splitPay')}</span>
             </button>
           </div>
         </div>

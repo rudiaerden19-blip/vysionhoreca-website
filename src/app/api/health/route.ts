@@ -19,15 +19,15 @@ export async function GET() {
   const authSigningStatus = getSessionHmacStatus()
 
   const health = {
-    status: 'healthy' as 'healthy' | 'degraded' | 'unhealthy',
+    status: 'healthy'as 'healthy' |  'degraded' |  'unhealthy',
     timestamp: new Date().toISOString(),
     version: process.env.npm_package_version || '1.0.0',
     uptime: process.uptime(),
     services: {
-      database: { status: 'unknown' as string, latency: 0 },
-      stripe: { status: 'configured' as string },
-      email: { status: 'configured' as string },
-      redis: { status: 'unknown' as string },
+      database: { status: 'unknown'as string, latency: 0 },
+      stripe: { status: 'configured'as string },
+      email: { status: 'configured'as string },
+      redis: { status: 'unknown'as string },
       auth_signing: { status: authSigningStatus as string },
     },
     environment: process.env.NODE_ENV || 'development',
@@ -45,7 +45,7 @@ export async function GET() {
         .limit(1)
       
       health.services.database = {
-        status: error ? 'error' : 'healthy',
+        status: error ? 'error': 'healthy',
         latency: Date.now() - dbStart,
       }
     } else {
@@ -58,7 +58,7 @@ export async function GET() {
 
   // Check Stripe
   health.services.stripe = {
-    status: process.env.STRIPE_SECRET_KEY ? 'configured' : 'not_configured',
+    status: process.env.STRIPE_SECRET_KEY ? 'configured': 'not_configured',
   }
 
   // Check Email (Nodemailer/Zoho SMTP). EMAIL_HOST werd nergens gelezen — alle
@@ -72,7 +72,7 @@ export async function GET() {
 
   // Check Redis (Upstash)
   health.services.redis = {
-    status: process.env.UPSTASH_REDIS_REST_URL ? 'configured' : 'not_configured',
+    status: process.env.UPSTASH_REDIS_REST_URL ? 'configured': 'not_configured',
   }
 
   // Determine overall health
@@ -97,7 +97,7 @@ export async function GET() {
       responseTime: `${responseTime}ms` 
     },
     { 
-      status: health.status === 'unhealthy' ? 503 : 200,
+      status: health.status === 'unhealthy'? 503 : 200,
       headers: {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
       }

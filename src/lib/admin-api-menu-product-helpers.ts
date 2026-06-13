@@ -17,7 +17,7 @@ export interface MenuProduct {
   promo_price?: number
   sort_order: number
   allergens: string[]
-  image_display_mode?: 'cover' | 'contain' | null
+  image_display_mode?: 'cover' |  'contain'| null
   print_label?: boolean
   /** Zoom on kassa tile: 1 = default, <1 zoom out, >1 zoom in (clamped in app). */
   kassa_image_zoom?: number | null
@@ -29,9 +29,9 @@ export interface MenuProduct {
   size_label?: string | null
   color_label?: string | null
   /** Admin productform: horeca vs winkelkassa-velden. */
-  catalog_mode?: 'horeca' | 'retail' | null
+  catalog_mode?: 'horeca' |  'retail'| null
   /** Retail: stuk / doos / bak / pallet — prijs geldt per 1 scan (= 1 eenheid). */
-  retail_sale_unit?: 'stuk' | 'doos' | 'bak' | 'pallet' | null
+  retail_sale_unit?: 'stuk' |  'doos' |  'bak' |  'pallet'| null
   /** Retail: bv. 24 flesjes in deze doos (informatief + bon). */
   retail_unit_quantity?: number | null
 }
@@ -39,7 +39,7 @@ export interface MenuProduct {
 export const KASSA_PRODUCT_IMAGE_ZOOM_MIN = 0.65
 export const KASSA_PRODUCT_IMAGE_ZOOM_MAX = 1.85
 
-/** `<1` shows more of the photo; `>1` crops tighter (object-cover). Parse strings from PostgREST. */
+/** `<1`shows more of the photo; `>1`crops tighter (object-cover). Parse strings from PostgREST. */
 export function clampKassaProductImageZoom(raw: unknown): number {
   if (raw === undefined || raw === null || raw === '') return 1
   const n =
@@ -55,7 +55,7 @@ export function clampKassaProductImageZoom(raw: unknown): number {
 /** Read sort_order from DB (may be string from PostgREST). */
 export function menuProductSortOrderValue(raw: unknown): number {
   if (raw === null || raw === undefined || raw === '') return 0
-  const n = typeof raw === 'number' ? raw : parseFloat(String(raw).replace(',', '.'))
+  const n = typeof raw === 'number'? raw : parseFloat(String(raw).replace(',', '.'))
   return Number.isFinite(n) ? n : 0
 }
 

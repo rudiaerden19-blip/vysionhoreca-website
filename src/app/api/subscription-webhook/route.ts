@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     if (!supabase) {
       logger.error('Subscription webhook failed: Supabase not configured', { requestId })
       return NextResponse.json(
-        { error: 'Database not configured' },
+        { error: 'Database not configured'},
         { status: 503 }
       )
     }
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     const signature = request.headers.get('stripe-signature')
 
     if (!signature) {
-      return NextResponse.json({ error: 'No signature' }, { status: 400 })
+      return NextResponse.json({ error: 'No signature'}, { status: 400 })
     }
 
     const stripeSecretKey = process.env.STRIPE_SECRET_KEY
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
 
     if (!stripeSecretKey || !webhookSecret) {
       logger.error('Subscription webhook: missing Stripe configuration', { requestId })
-      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
+      return NextResponse.json({ error: 'Server configuration error'}, { status: 500 })
     }
 
     const stripe = new Stripe(stripeSecretKey)
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err)
       logger.warn('Subscription webhook: signature verification failed', { requestId, error: msg })
-      return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
+      return NextResponse.json({ error: 'Invalid signature'}, { status: 400 })
     }
 
     // SECURITY: Idempotency check - prevent duplicate event processing
@@ -214,7 +214,7 @@ export async function POST(request: NextRequest) {
 
       case 'invoice.paid': {
         const invoice = event.data.object as StripeInvoiceExtended
-        const stripeSubscriptionId = (typeof invoice.subscription === 'string' ? invoice.subscription : (invoice.subscription as Stripe.Subscription)?.id) as string
+        const stripeSubscriptionId = (typeof invoice.subscription === 'string'? invoice.subscription : (invoice.subscription as Stripe.Subscription)?.id) as string
 
         if (stripeSubscriptionId) {
           // Find subscription by Stripe ID
@@ -248,7 +248,7 @@ export async function POST(request: NextRequest) {
 
       case 'invoice.payment_failed': {
         const invoice = event.data.object as StripeInvoiceExtended
-        const stripeSubscriptionId = (typeof invoice.subscription === 'string' ? invoice.subscription : (invoice.subscription as Stripe.Subscription)?.id) as string
+        const stripeSubscriptionId = (typeof invoice.subscription === 'string'? invoice.subscription : (invoice.subscription as Stripe.Subscription)?.id) as string
 
         if (stripeSubscriptionId) {
           const { data: sub } = await supabase
@@ -344,10 +344,10 @@ export async function POST(request: NextRequest) {
           .single()
 
         if (sub) {
-          const status = subscription.status === 'active' ? 'active' 
-            : subscription.status === 'past_due' ? 'payment_failed'
-            : subscription.status === 'canceled' ? 'cancelled'
-            : subscription.status === 'unpaid' ? 'expired'
+          const status = subscription.status === 'active'? 'active' 
+            : subscription.status === 'past_due'? 'payment_failed'
+            : subscription.status === 'canceled'? 'cancelled'
+            : subscription.status === 'unpaid'? 'expired'
             : sub.status
 
           await supabase
@@ -379,9 +379,9 @@ export async function POST(request: NextRequest) {
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error)
     logger.error('Subscription webhook error', { requestId, error: message })
-    trackError(error, { requestId, route: '/api/subscription-webhook' })
+    trackError(error, { requestId, route: '/api/subscription-webhook'})
     return NextResponse.json(
-      { error: message || 'Webhook handler failed' },
+      { error: message || 'Webhook handler failed'},
       { status: 500 }
     )
   }

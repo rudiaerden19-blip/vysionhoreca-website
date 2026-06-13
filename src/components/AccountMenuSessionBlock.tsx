@@ -36,7 +36,7 @@ export function AccountMenuSessionBlock({
   const searchParams = useSearchParams()
   const searchKey = searchParams.toString()
   const loginReturnHref = useMemo(() => {
-    const search = searchKey ? `?${searchKey}` : ''
+    const search = searchKey ? `?${searchKey}`: ''
     const next = buildShopInternalReturnPath(tenantSlug, pathname, search)
     return `/login?next=${encodeURIComponent(next)}`
   }, [tenantSlug, pathname, searchKey])
@@ -46,10 +46,10 @@ export function AccountMenuSessionBlock({
 
   const performLogout = () => {
     const landing: OwnerLogoutLanding =
-      superHere && !ownerHere ? 'superadmin-login' : 'tenant-login'
+      superHere && !ownerHere ? 'superadmin-login': 'tenant-login'
     applyFullStaffLogoutCleanup()
     if (landing === 'superadmin-login') {
-      setTerminalLogout({ kind: 'superadmin' })
+      setTerminalLogout({ kind: 'superadmin'})
     } else {
       setTerminalLogout({ kind: 'staff', tenantSlug })
     }

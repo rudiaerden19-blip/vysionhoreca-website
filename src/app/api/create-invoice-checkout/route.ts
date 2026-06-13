@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
 
     if (!tenantSlug || !invoiceId) {
       return NextResponse.json(
-        { error: 'Tenant slug en invoice ID zijn verplicht' },
+        { error: 'Tenant slug en invoice ID zijn verplicht'},
         { status: 400 }
       )
     }
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     const stripeSecretKey = process.env.STRIPE_SECRET_KEY
     if (!stripeSecretKey) {
       return NextResponse.json(
-        { error: 'Stripe is niet geconfigureerd' },
+        { error: 'Stripe is niet geconfigureerd'},
         { status: 500 }
       )
     }
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     if (!supabase) {
       logger.error('Invoice checkout failed: Supabase not configured', { requestId })
       return NextResponse.json(
-        { error: 'Database niet geconfigureerd. Neem contact op met support.' },
+        { error: 'Database niet geconfigureerd. Neem contact op met support.'},
         { status: 503 }
       )
     }
@@ -52,21 +52,21 @@ export async function POST(request: NextRequest) {
 
     if (invoiceError || !invoice) {
       return NextResponse.json(
-        { error: 'Factuur niet gevonden' },
+        { error: 'Factuur niet gevonden'},
         { status: 404 }
       )
     }
 
     if (invoice.status === 'paid') {
       return NextResponse.json(
-        { error: 'Deze factuur is al betaald' },
+        { error: 'Deze factuur is al betaald'},
         { status: 400 }
       )
     }
 
     // Determine base URL
     const host = request.headers.get('host') || 'ordervysion.com'
-    const protocol = host.includes('localhost') ? 'http' : 'https'
+    const protocol = host.includes('localhost') ? 'http': 'https'
     const baseUrl = `${protocol}://${host}`
 
     // Create Stripe checkout session
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
       tenantSlug: tenantSlugLog,
     })
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Er ging iets mis' },
+      { error: error instanceof Error ? error.message : 'Er ging iets mis'},
       { status: 500 }
     )
   }

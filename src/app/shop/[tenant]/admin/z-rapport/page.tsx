@@ -86,9 +86,9 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const [closing, setClosing] = useState(false)
   const [showCloseConfirm, setShowCloseConfirm] = useState(false)
   const [showKassaModal, setShowKassaModal] = useState(false)
-  const [kassaForm, setKassaForm] = useState({ cash: '', card: '', online: '' })
+  const [kassaForm, setKassaForm] = useState({ cash: '', card: '', online: ''})
   const [savingKassa, setSavingKassa] = useState(false)
-  const [archivePeriod, setArchivePeriod] = useState<'dag' | 'week' | 'maand' | 'jaar'>('dag')
+  const [archivePeriod, setArchivePeriod] = useState<'dag' |  'week' |  'maand' |  'jaar'>('dag')
 
   const getLocalDateString = (date: Date = new Date()) => {
     const year = date.getFullYear()
@@ -143,7 +143,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
 
     const orders = ordersRaw.filter((o) =>
       orderCountsTowardRevenueAndZReport(
-        o as Pick<Order, 'order_type' | 'status' | 'payment_status'>
+        o as Pick<Order, 'order_type' |  'status' |  'payment_status'>
       )
     ) as unknown as Order[]
 
@@ -261,13 +261,13 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         report_hash: reportHash,
         generated_at: new Date().toISOString(),
       },
-      { tenantSlug: params.tenant, onConflict: 'tenant_slug,report_date' }
+      { tenantSlug: params.tenant, onConflict: 'tenant_slug,report_date'}
     )
 
     if (r.ok) {
       await loadSavedReports()
     } else {
-      alert('Fout bij opslaan: ' + (r.error || ''))
+      alert('Fout bij opslaan: '+ (r.error || ''))
     }
 
     setSyncing(false)
@@ -313,14 +313,14 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         is_closed: true,   // KRITIEK: Dag definitief afgesloten
         closed_at: closedAt,
       },
-      { tenantSlug: params.tenant, onConflict: 'tenant_slug,report_date' }
+      { tenantSlug: params.tenant, onConflict: 'tenant_slug,report_date'}
     )
 
     if (r.ok) {
       await loadSavedReports()
       setShowCloseConfirm(false)
     } else {
-      alert('Fout bij afsluiten: ' + (r.error || ''))
+      alert('Fout bij afsluiten: '+ (r.error || ''))
     }
 
     setClosing(false)
@@ -378,15 +378,15 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         manual_total: total || null,
         kassa_saved_at: new Date().toISOString(),
       },
-      { tenantSlug: params.tenant, onConflict: 'tenant_slug,report_date' }
+      { tenantSlug: params.tenant, onConflict: 'tenant_slug,report_date'}
     )
 
     if (r.ok) {
       await loadSavedReports()
       setShowKassaModal(false)
-      setKassaForm({ cash: '', card: '', online: '' })
+      setKassaForm({ cash: '', card: '', online: ''})
     } else {
-      alert('Fout bij opslaan: ' + (r.error || ''))
+      alert('Fout bij opslaan: '+ (r.error || ''))
     }
     setSavingKassa(false)
   }
@@ -407,23 +407,23 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       <div class="header">
         <h1>${businessInfo?.business_name || ''}</h1>
         <p>${businessInfo?.address || ''}</p>
-        ${businessInfo?.btw_number ? `<p>BTW: ${businessInfo.btw_number}</p>` : ''}
+        ${businessInfo?.btw_number ? `<p>BTW: ${businessInfo.btw_number}</p>`: ''}
         <p><strong>KASSA RAPPORT</strong></p>
         <p>${formatDate(report.report_date)}</p>
-        ${report.is_closed ? '<p> AFGESLOTEN</p>' : ''}
+        ${report.is_closed ? '<p> AFGESLOTEN</p>': ''}
       </div>
       ${(report.manual_cash != null || report.manual_card != null || report.manual_online != null) ? `
       <div class="section-title">HANDMATIGE KASSA INVOER</div>
-      ${report.manual_cash != null ? `<div class="row"><span>Contant:</span><span>€${(report.manual_cash || 0).toFixed(2)}</span></div>` : ''}
-      ${report.manual_card != null ? `<div class="row"><span>Kaart:</span><span>€${(report.manual_card || 0).toFixed(2)}</span></div>` : ''}
-      ${report.manual_online != null ? `<div class="row"><span>Online:</span><span>€${(report.manual_online || 0).toFixed(2)}</span></div>` : ''}
+      ${report.manual_cash != null ? `<div class="row"><span>Contant:</span><span>€${(report.manual_cash || 0).toFixed(2)}</span></div>`: ''}
+      ${report.manual_card != null ? `<div class="row"><span>Kaart:</span><span>€${(report.manual_card || 0).toFixed(2)}</span></div>`: ''}
+      ${report.manual_online != null ? `<div class="row"><span>Online:</span><span>€${(report.manual_online || 0).toFixed(2)}</span></div>`: ''}
       <div class="row total-row"><span>TOTAAL KASSA:</span><span>€${(report.manual_total || 0).toFixed(2)}</span></div>
-      ` : ''}
+      `: ''}
       ${report.order_count > 0 ? `
       <div class="section-title">ONLINE BESTELLINGEN</div>
       <div class="row"><span>Aantal:</span><span>${report.order_count}</span></div>
       <div class="row total-row"><span>TOTAAL ONLINE:</span><span>€${(report.total || 0).toFixed(2)}</span></div>
-      ` : ''}
+      `: ''}
       <div class="row total-row" style="font-size:18px;margin-top:16px;"><span>GRAND TOTAL:</span><span>€${((report.manual_total || 0) + (report.total || 0)).toFixed(2)}</span></div>
       <div class="footer">
         <p>Gegenereerd: ${new Date().toLocaleString('nl-BE')}</p>
@@ -459,7 +459,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         label = `Week ${week} ${d.getFullYear()}`
       } else if (archivePeriod === 'maand') {
         key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
-        label = d.toLocaleDateString('nl-BE', { month: 'long', year: 'numeric' })
+        label = d.toLocaleDateString('nl-BE', { month: 'long', year: 'numeric'})
       } else if (archivePeriod === 'jaar') {
         key = `${d.getFullYear()}`
         label = `${d.getFullYear()}`
@@ -547,10 +547,10 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         <div class="header">
           <h1>${businessInfo?.business_name || 'Z-Rapport'}</h1>
           <p>${businessInfo?.address || ''}</p>
-          ${businessInfo?.btw_number ? `<p>BTW: ${businessInfo.btw_number}</p>` : ''}
+          ${businessInfo?.btw_number ? `<p>BTW: ${businessInfo.btw_number}</p>`: ''}
           <p style="margin-top: 10px; font-weight: bold;">Z-RAPPORT ONLINE VERKOPEN</p>
           <p>${formatDate(selectedDate)}</p>
-          ${currentSavedReport?.is_closed ? `<p><span class="closed-badge"> AFGESLOTEN</span></p>` : ''}
+          ${currentSavedReport?.is_closed ? `<p><span class="closed-badge"> AFGESLOTEN</span></p>`: ''}
         </div>
         <div class="section">
           <div class="section-title">OMZET</div>
@@ -568,7 +568,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         <div class="footer">
           <p>Dagperiode: ${formatShortDate(selectedDate)} 00:00 t/m ${formatShortDate(selectedDate)} +1dag 12:00</p>
           <p>Gegenereerd: ${new Date().toLocaleString('nl-BE')}</p>
-          ${currentSavedReport?.closed_at ? `<p>Afgesloten: ${new Date(currentSavedReport.closed_at).toLocaleString('nl-BE')}</p>` : ''}
+          ${currentSavedReport?.closed_at ? `<p>Afgesloten: ${new Date(currentSavedReport.closed_at).toLocaleString('nl-BE')}</p>`: ''}
           <p>Hash: ${currentSavedReport?.report_hash?.substring(0, 16) || 'n.v.t.'}...</p>
           <p>Vysion kassa's - ordervysion.com</p>
         </div>
@@ -617,12 +617,12 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         })
       })
       if (response.ok) {
-        alert('Z-Rapport verzonden naar ' + emailAddress)
+        alert('Z-Rapport verzonden naar '+ emailAddress)
         setShowEmailModal(false)
         setEmailAddress('')
       } else {
         const error = await response.json()
-        alert('Fout bij verzenden: ' + (error.message || 'Onbekende fout'))
+        alert('Fout bij verzenden: '+ (error.message || 'Onbekende fout'))
       }
     } catch {
       alert('Fout bij verzenden. Probeer opnieuw.')
@@ -682,7 +682,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           <button
             onClick={() => setShowHistory(!showHistory)}
             className={`px-4 py-2 rounded-xl font-medium flex items-center gap-2 ${
-              showHistory ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              showHistory ? 'bg-blue-100 text-blue-600': 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
              {t('zReport.history')}
@@ -713,7 +713,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           </button>
           {/* KASSA INVOER */}
           <button
-            onClick={() => { setKassaForm({ cash: '', card: '', online: '' }); setShowKassaModal(true) }}
+            onClick={() => { setKassaForm({ cash: '', card: '', online: ''}); setShowKassaModal(true) }}
             disabled={isDayClosed}
             title={isDayClosed ? t('zReport.kassaButtonTitleClosed') : undefined}
             className={`px-4 py-2 rounded-xl font-medium flex items-center gap-2 ${
@@ -728,10 +728,10 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           <button
             onClick={syncReport}
             disabled={syncing || !stats || stats.orderCount === 0 || isDayClosed}
-            title={isDayClosed ? 'Dag is afgesloten — kan niet meer gewijzigd worden' : 'Rapport opslaan in archief'}
+            title={isDayClosed ? 'Dag is afgesloten — kan niet meer gewijzigd worden': 'Rapport opslaan in archief'}
             className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium flex items-center gap-2 disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
-            {syncing ? '⏳' : ''} {t('zReport.sync')}
+            {syncing ? '' : ''} {t('zReport.sync')}
           </button>
           {/* AFSLUITEN — altijd zichtbaar naast opslaan */}
           {isDayClosed ? (
@@ -941,7 +941,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         </div>
 
         {/* Sidebar — Archief */}
-        <div className={`lg:block ${showHistory ? 'block' : 'hidden'} print:hidden`}>
+        <div className={`lg:block ${showHistory ? 'block': 'hidden'} print:hidden`}>
           <div className="bg-white rounded-2xl shadow-sm p-4 sticky top-6">
             <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
                {t('zReport.savedReports')}
@@ -954,7 +954,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                   key={p}
                   onClick={() => setArchivePeriod(p)}
                   className={`py-1.5 rounded-lg text-xs font-medium capitalize transition-colors ${
-                    archivePeriod === p ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    archivePeriod === p ? 'bg-blue-600 text-white': 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
                   {p.charAt(0).toUpperCase() + p.slice(1)}
@@ -1086,7 +1086,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                   className="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold flex items-center justify-center gap-2"
                 >
                   {closing ? (
-                    <><span className="animate-spin">⏳</span> Afsluiten...</>
+                    <><span className="animate-spin"></span> Afsluiten...</>
                   ) : (
                     <> Bevestigen &amp; Afsluiten</>
                   )}
@@ -1209,7 +1209,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                 >
                   {savingKassa ? (
                     <>
-                      <span className="animate-spin">⏳</span> {t('zReport.kassaModalSaving')}
+                      <span className="animate-spin"></span> {t('zReport.kassaModalSaving')}
                     </>
                   ) : (
                     <> {t('zReport.kassaModalSave')}</>
@@ -1268,7 +1268,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                   disabled={!emailAddress || sendingEmail}
                   className="flex-1 px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-medium disabled:bg-gray-300 flex items-center justify-center gap-2"
                 >
-                  {sendingEmail ? <><span className="animate-spin">⏳</span> Verzenden...</> : <> Versturen</>}
+                  {sendingEmail ? <><span className="animate-spin"></span> Verzenden...</> : <> Versturen</>}
                 </button>
               </div>
             </motion.div>

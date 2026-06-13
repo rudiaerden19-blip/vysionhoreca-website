@@ -4,7 +4,7 @@
  * Iedere INSERT/UPDATE/UPSERT/DELETE die admin-pagina's willen doen MOET
  * hier expliciet vermeld zijn. Zonder vermelding → 403.
  *
- *  · `tenantSlugColumn` zegt welk veld de proxy MOET checken (bv. 'tenant_slug').
+ *  · `tenantSlugColumn`zegt welk veld de proxy MOET checken (bv. 'tenant_slug').
  *    Komt het niet voor in de payload of klopt het niet met `verifyTenantAccess`,
  *    dan wijst de proxy af.
  *  · `allowedOps`: welke operaties (insert/update/upsert/delete) zijn toegestaan.
@@ -14,13 +14,13 @@
  *  Houd deze lijst klein, expliciet en review-baar.
  */
 
-export type AdminDbOp = 'insert' | 'update' | 'upsert' | 'delete'
+export type AdminDbOp = 'insert' |  'update' |  'upsert' |  'delete'
 
 export interface AdminDbTableSpec {
   /** Naam van de kolom die de tenant identificeert. Dit veld moet in alle
    *  WHERE-clauses én alle nieuwe rijen aanwezig zijn én moet matchen
    *  met de geverifieerde sessie. Sommige tabellen gebruiken een ander
-   *  veld dan `tenant_slug` (bv. `qr_codes` heeft slug + business_id). */
+   *  veld dan `tenant_slug`(bv. `qr_codes`heeft slug + business_id). */
   tenantSlugColumn: string
   /** Welke ops mogen via de proxy. */
   allowedOps: AdminDbOp[]

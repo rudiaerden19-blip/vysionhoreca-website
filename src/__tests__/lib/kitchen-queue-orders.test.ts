@@ -1,6 +1,6 @@
 import { isKitchenQueueOrder, parseOrdersItemsJson } from '@/lib/kitchen-queue-orders'
 
-const itemsOne = [{ quantity: 1, name: 'Bier' }]
+const itemsOne = [{ quantity: 1, name: 'Bier'}]
 
 describe('kitchen-queue-orders', () => {
   describe('parseOrdersItemsJson', () => {

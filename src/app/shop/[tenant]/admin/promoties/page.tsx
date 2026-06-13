@@ -22,7 +22,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
     name: '',
     description: '',
     image_url: '',
-    type: 'fixedPrice' as 'percentage' | 'fixed' | 'freeItem' | 'fixedPrice',
+    type: 'fixedPrice'as 'percentage' |  'fixed' |  'freeItem' |  'fixedPrice',
     value: 2,
     product_id: '',
     min_order_amount: 0,
@@ -273,7 +273,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                 layout
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className={`bg-white rounded-2xl shadow-sm overflow-hidden ${!promo.is_active || isExpired ? 'opacity-60' : ''}`}
+                className={`bg-white rounded-2xl shadow-sm overflow-hidden ${!promo.is_active || isExpired ? 'opacity-60': ''}`}
               >
                 {/* Mobile: stacked layout, Desktop: side-by-side */}
                 <div className="flex flex-col sm:flex-row">
@@ -294,8 +294,8 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                     )}
                     {/* Korting badge */}
                     <div className="absolute top-2 left-2 sm:top-2 sm:left-2 bg-red-500 text-white text-xs sm:text-xs font-bold px-2 py-1 rounded-full shadow-md">
-                      {promo.type === 'percentage' ? `-${promo.value}%` :
-                       promo.type === 'fixed' ? `-€${promo.value}` : t('promotiesPage.free')}
+                      {promo.type === 'percentage'? `-${promo.value}%`:
+                       promo.type === 'fixed'? `-€${promo.value}`: t('promotiesPage.free')}
                     </div>
                   </div>
 
@@ -441,7 +441,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       type="button"
-                      onClick={() => setFormData(prev => ({ ...prev, type: 'fixedPrice' }))}
+                      onClick={() => setFormData(prev => ({ ...prev, type: 'fixedPrice'}))}
                       className={`p-3 rounded-xl border-2 text-center transition-all ${
                         formData.type === 'fixedPrice'
                           ? 'border-blue-500 bg-blue-50'
@@ -454,7 +454,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                     </button>
                     <button
                       type="button"
-                      onClick={() => setFormData(prev => ({ ...prev, type: 'percentage' }))}
+                      onClick={() => setFormData(prev => ({ ...prev, type: 'percentage'}))}
                       className={`p-3 rounded-xl border-2 text-center transition-all ${
                         formData.type === 'percentage'
                           ? 'border-blue-500 bg-blue-50'
@@ -481,7 +481,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                         setFormData(prev => ({ 
                           ...prev, 
                           product_id: e.target.value,
-                          name: prev.name || (product ? `${product.name} actie` : ''),
+                          name: prev.name || (product ? `${product.name} actie`: ''),
                           image_url: prev.image_url || product?.image_url || ''
                         }))
                       }}
@@ -506,8 +506,8 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                 {formData.type !== 'freeItem' && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {formData.type === 'fixedPrice' ? t('promotiesPage.salePrice') : 
-                       formData.type === 'percentage' ? t('promotiesPage.percentageValue') : t('promotiesPage.discountValue')}
+                      {formData.type === 'fixedPrice'? t('promotiesPage.salePrice') : 
+                       formData.type === 'percentage'? t('promotiesPage.percentageValue') : t('promotiesPage.discountValue')}
                     </label>
                     <input
                       type="text"
@@ -516,11 +516,11 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                       onChange={(e) => {
                         const val = e.target.value.replace(',', '.')
                         if (val === '' || /^\d*\.?\d*$/.test(val)) {
-                          setFormData(prev => ({ ...prev, value: val === '' ? 0 : parseFloat(val) || 0 }))
+                          setFormData(prev => ({ ...prev, value: val === ''? 0 : parseFloat(val) || 0 }))
                         }
                       }}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder={formData.type === 'percentage' ? '10' : '5.00'}
+                      placeholder={formData.type === 'percentage'? '10': '5.00'}
                     />
                   </div>
                 )}

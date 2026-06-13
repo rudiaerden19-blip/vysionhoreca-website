@@ -140,19 +140,19 @@ export default function LabelsPage({ params }: { params: { tenant: string } }) {
         ${label.group_member_name || label.customer_name ? `
           <div style="font-size: 10pt; margin-bottom: 1mm;">
              ${label.group_member_name || label.customer_name}
-            ${label.department ? ` - ${label.department}` : ''}
+            ${label.department ? `- ${label.department}`: ''}
           </div>
-        ` : ''}
-        ${label.options_text && label.options_text !== '{}' && label.options_text !== 'null' ? `
+        `: ''}
+        ${label.options_text && label.options_text !== '{}' && label.options_text !== 'null'? `
           <div style="font-size: 8pt; color: #666; margin-bottom: 1mm;">
             ${formatOptions(label.options_text)}
           </div>
-        ` : ''}
+        `: ''}
         ${label.notes ? `
           <div style="font-size: 8pt; font-style: italic; color: #888;">
              ${label.notes}
           </div>
-        ` : ''}
+        `: ''}
       </div>
     `).join('')
 
@@ -285,7 +285,7 @@ export default function LabelsPage({ params }: { params: { tenant: string } }) {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 className={`p-4 flex items-center gap-4 hover:bg-gray-50 ${
-                  selectedLabels.has(label.id) ? 'bg-purple-50' : ''
+                  selectedLabels.has(label.id) ? 'bg-purple-50': ''
                 }`}
               >
                 <input

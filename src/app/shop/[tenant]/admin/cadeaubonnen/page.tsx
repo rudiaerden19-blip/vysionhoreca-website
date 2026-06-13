@@ -16,7 +16,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
-  const [activeTab, setActiveTab] = useState<'instellingen' | 'bonnen'>('instellingen')
+  const [activeTab, setActiveTab] = useState<'instellingen' |  'bonnen'>('instellingen')
   const [showSecretKey, setShowSecretKey] = useState(false)
   
   const [formData, setFormData] = useState({
@@ -117,10 +117,10 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
           onClick={handleSave}
           disabled={saving}
           className={`fixed bottom-6 right-6 z-50 px-6 py-4 rounded-2xl font-medium shadow-2xl flex items-center gap-2 ${
-            saved ? 'bg-green-500 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'
+            saved ? 'bg-green-500 text-white': 'bg-blue-600 hover:bg-blue-700 text-white'
           }`}
         >
-          {saving ? t('adminPages.common.saving') : saved ? ` ${t('adminPages.common.saved')}` : ` ${t('adminPages.common.save')}`}
+          {saving ? t('adminPages.common.saving') : saved ? ` ${t('adminPages.common.saved')}`: ` ${t('adminPages.common.save')}`}
         </motion.button>
       )}
 
@@ -173,12 +173,12 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, gift_cards_enabled: !prev.gift_cards_enabled }))}
                 className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                  formData.gift_cards_enabled ? 'bg-blue-600' : 'bg-gray-200'
+                  formData.gift_cards_enabled ? 'bg-blue-600': 'bg-gray-200'
                 }`}
               >
                 <span
                   className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                    formData.gift_cards_enabled ? 'translate-x-5' : 'translate-x-0'
+                    formData.gift_cards_enabled ? 'translate-x-5': 'translate-x-0'
                   }`}
                 />
               </button>
@@ -220,7 +220,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
                 </label>
                 <div className="relative">
                   <input
-                    type={showSecretKey ? 'text' : 'password'}
+                    type={showSecretKey ? 'text': 'password'}
                     value={formData.stripe_secret_key}
                     onChange={(e) => setFormData(prev => ({ ...prev, stripe_secret_key: e.target.value }))}
                     className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
@@ -344,7 +344,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
 
                           const { error } = await supabase
                             .from('gift_cards')
-                            .update({ status: 'paid' })
+                            .update({ status: 'paid'})
                             .eq('id', card.id)
                           
                           if (!error) {

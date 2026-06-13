@@ -9,23 +9,23 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = getServerSupabaseClient()
     if (!supabase) {
-      return NextResponse.json({ error: 'Database not configured' }, { status: 503 })
+      return NextResponse.json({ error: 'Database not configured'}, { status: 503 })
     }
 
     const body = await request.json()
     const { tenant_slug, ingredients } = body
 
     if (!tenant_slug) {
-      return NextResponse.json({ error: 'tenant_slug is required' }, { status: 400 })
+      return NextResponse.json({ error: 'tenant_slug is required'}, { status: 400 })
     }
 
     const access = await verifyTenantOrSuperAdmin(request, tenant_slug)
     if (!access.authorized) {
-      return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
+      return NextResponse.json({ error: access.error || 'Forbidden'}, { status: 403 })
     }
 
     if (!ingredients || !Array.isArray(ingredients) || ingredients.length === 0) {
-      return NextResponse.json({ error: 'ingredients array is required' }, { status: 400 })
+      return NextResponse.json({ error: 'ingredients array is required'}, { status: 400 })
     }
 
     // Get existing ingredients for this tenant
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
         unit: ing.unit || 'stuk',
         purchase_price: parseFloat(ing.price) || 0,
         supplier: ing.supplier || null,
-        notes: ing.article_nr ? `Art.nr: ${ing.article_nr}` : null
+        notes: ing.article_nr ? `Art.nr: ${ing.article_nr}`: null
       })
     }
 

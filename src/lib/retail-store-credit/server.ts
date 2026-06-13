@@ -54,8 +54,8 @@ export async function lookupRetailOrderForReturn(
   orderNumber: number,
 ): Promise<{ ok: boolean; error?: string; orderId?: string; lines?: RetailOrderLineForReturn[] }> {
   const supabase = getServerSupabaseClient()
-  if (!supabase) return { ok: false, error: 'db_unavailable' }
-  if (!(orderNumber > 0)) return { ok: false, error: 'invalid_order_number' }
+  if (!supabase) return { ok: false, error: 'db_unavailable'}
+  if (!(orderNumber > 0)) return { ok: false, error: 'invalid_order_number'}
 
   const { data: order, error } = await supabase
     .from('orders')
@@ -65,12 +65,12 @@ export async function lookupRetailOrderForReturn(
     .maybeSingle()
 
   if (error) return { ok: false, error: error.message }
-  if (!order) return { ok: false, error: 'order_not_found' }
+  if (!order) return { ok: false, error: 'order_not_found'}
   if (String(order.payment_status || '').toLowerCase() !== 'paid') {
-    return { ok: false, error: 'order_not_paid' }
+    return { ok: false, error: 'order_not_paid'}
   }
   const total = Number(order.total) || 0
-  if (total < 0) return { ok: false, error: 'order_is_credit_note' }
+  if (total < 0) return { ok: false, error: 'order_is_credit_note'}
 
   const returnedMap = await sumReturnedQtyByLine(supabase, tenantSlug, orderNumber)
   const lines: RetailOrderLineForReturn[] = []
@@ -95,9 +95,9 @@ export async function lookupRetailOrderForReturn(
     })
   }
 
-  if (lines.length === 0) return { ok: false, error: 'no_items' }
+  if (lines.length === 0) return { ok: false, error: 'no_items'}
   if (lines.every((l) => l.quantityReturnable <= 0)) {
-    return { ok: false, error: 'already_fully_returned' }
+    return { ok: false, error: 'already_fully_returned'}
   }
 
   return { ok: true, orderId: order.id, lines }
@@ -150,11 +150,11 @@ export async function issueRetailStoreCredit(
   opts?: { kassaStaffId?: string | null },
 ): Promise<RetailStoreCreditIssueResult> {
   const supabase = getServerSupabaseClient()
-  if (!supabase) return { ok: false, error: 'db_unavailable' }
+  if (!supabase) return { ok: false, error: 'db_unavailable'}
 
   const lookup = await lookupRetailOrderForReturn(tenantSlug, sourceOrderNumber)
   if (!lookup.ok || !lookup.lines || !lookup.orderId) {
-    return { ok: false, error: lookup.error || 'lookup_failed' }
+    return { ok: false, error: lookup.error || 'lookup_failed'}
   }
 
   const byKey = new Map(lookup.lines.map((l) => [l.lineKey, l]))
@@ -165,8 +165,8 @@ export async function issueRetailStoreCredit(
     const qty = Math.floor(Number(req.quantity) || 0)
     if (qty <= 0) continue
     const line = byKey.get(req.lineKey)
-    if (!line) return { ok: false, error: 'invalid_line' }
-    if (qty > line.quantityReturnable) return { ok: false, error: 'qty_exceeds_returnable' }
+    if (!line) return { ok: false, error: 'invalid_line'}
+    if (qty > line.quantityReturnable) return { ok: false, error: 'qty_exceeds_returnable'}
     returnedItems.push({
       product_id: line.product_id,
       variant_id: line.variant_id,
@@ -177,9 +177,9 @@ export async function issueRetailStoreCredit(
     amount += line.price * qty
   }
 
-  if (returnedItems.length === 0) return { ok: false, error: 'empty_return' }
+  if (returnedItems.length === 0) return { ok: false, error: 'empty_return'}
   amount = Math.round(amount * 100) / 100
-  if (!(amount > 0)) return { ok: false, error: 'zero_amount' }
+  if (!(amount > 0)) return { ok: false, error: 'zero_amount'}
 
   let creditCode = generateRetailStoreCreditCode()
   for (let attempt = 0; attempt < 8; attempt++) {
@@ -227,7 +227,7 @@ export async function issueRetailStoreCredit(
     .single()
 
   if (noteErr || !noteRow) {
-    return { ok: false, error: noteErr?.message || 'credit_note_failed' }
+    return { ok: false, error: noteErr?.message || 'credit_note_failed'}
   }
 
   const creditNoteOrderNumber = Number(noteRow.order_number) || undefined
@@ -250,7 +250,7 @@ export async function issueRetailStoreCredit(
     .single()
 
   if (creditErr || !creditRow) {
-    return { ok: false, error: creditErr?.message || 'credit_insert_failed' }
+    return { ok: false, error: creditErr?.message || 'credit_insert_failed'}
   }
 
   for (const it of returnedItems) {
@@ -274,9 +274,9 @@ export async function lookupRetailStoreCreditByCode(
   rawCode: string,
 ): Promise<{ ok: boolean; error?: string; credit?: RetailStoreCreditPos }> {
   const supabase = getServerSupabaseClient()
-  if (!supabase) return { ok: false, error: 'db_unavailable' }
+  if (!supabase) return { ok: false, error: 'db_unavailable'}
   const code = normalizeRetailStoreCreditCode(rawCode)
-  if (!code) return { ok: false, error: 'invalid_code' }
+  if (!code) return { ok: false, error: 'invalid_code'}
 
   const { data, error } = await supabase
     .from('retail_store_credits')
@@ -286,11 +286,11 @@ export async function lookupRetailStoreCreditByCode(
     .maybeSingle()
 
   if (error) return { ok: false, error: error.message }
-  if (!data) return { ok: false, error: 'not_found' }
-  if (data.status === 'void') return { ok: false, error: 'void' }
+  if (!data) return { ok: false, error: 'not_found'}
+  if (data.status === 'void') return { ok: false, error: 'void'}
   const remaining = Number(data.amount_remaining) || 0
   if (remaining <= 0 || data.status === 'depleted') {
-    return { ok: false, error: 'depleted' }
+    return { ok: false, error: 'depleted'}
   }
 
   return {
@@ -314,9 +314,9 @@ export async function redeemRetailStoreCredit(
   orderNumber: number,
 ): Promise<{ ok: boolean; error?: string; remaining?: number }> {
   const supabase = getServerSupabaseClient()
-  if (!supabase) return { ok: false, error: 'db_unavailable' }
+  if (!supabase) return { ok: false, error: 'db_unavailable'}
   const euro = Math.round(amount * 100) / 100
-  if (!(euro > 0)) return { ok: false, error: 'invalid_amount' }
+  if (!(euro > 0)) return { ok: false, error: 'invalid_amount'}
 
   const { data: credit, error: fetchErr } = await supabase
     .from('retail_store_credits')
@@ -326,14 +326,14 @@ export async function redeemRetailStoreCredit(
     .maybeSingle()
 
   if (fetchErr) return { ok: false, error: fetchErr.message }
-  if (!credit) return { ok: false, error: 'not_found' }
-  if (credit.status === 'void') return { ok: false, error: 'void' }
+  if (!credit) return { ok: false, error: 'not_found'}
+  if (credit.status === 'void') return { ok: false, error: 'void'}
 
   const remainingBefore = Number(credit.amount_remaining) || 0
-  if (euro > remainingBefore + 0.001) return { ok: false, error: 'insufficient_balance' }
+  if (euro > remainingBefore + 0.001) return { ok: false, error: 'insufficient_balance'}
 
   const remainingAfter = Math.round((remainingBefore - euro) * 100) / 100
-  const nextStatus = remainingAfter <= 0 ? 'depleted' : 'active'
+  const nextStatus = remainingAfter <= 0 ? 'depleted': 'active'
 
   const { error: upErr } = await supabase
     .from('retail_store_credits')

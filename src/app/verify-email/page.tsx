@@ -31,7 +31,7 @@ function VerifyEmailContent() {
     try {
       const response = await fetch('/api/auth/resend-verification', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json'},
         body: JSON.stringify({ email }),
       })
 
@@ -116,7 +116,7 @@ function VerifyEmailContent() {
                 disabled={isResending || !email}
                 className="w-full bg-accent hover:bg-accent/90 disabled:bg-accent/50 text-white py-3 rounded-lg font-semibold transition-colors"
               >
-                {isResending ? 'Verzenden...' : 'Nieuwe link versturen'}
+                {isResending ? 'Verzenden...': 'Nieuwe link versturen'}
               </button>
               {resendMessage && (
                 <p className="text-sm text-gray-400">{resendMessage}</p>
@@ -170,7 +170,7 @@ function VerifyEmailContent() {
               disabled={isResending || !email}
               className="w-full bg-white/10 hover:bg-white/20 disabled:bg-white/5 text-white py-3 rounded-lg font-semibold transition-colors"
             >
-              {isResending ? 'Verzenden...' : 'Opnieuw versturen'}
+              {isResending ? 'Verzenden...': 'Opnieuw versturen'}
             </button>
             {resendMessage && (
               <p className="text-sm text-gray-400">{resendMessage}</p>

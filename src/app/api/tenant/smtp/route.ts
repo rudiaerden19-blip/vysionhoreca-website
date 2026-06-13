@@ -8,17 +8,17 @@ export async function GET(request: NextRequest) {
   const tenantSlug = searchParams.get('tenant')
 
   if (!tenantSlug) {
-    return NextResponse.json({ error: 'tenant vereist' }, { status: 400 })
+    return NextResponse.json({ error: 'tenant vereist'}, { status: 400 })
   }
 
   const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
   if (!access.authorized) {
-    return NextResponse.json({ error: access.error || 'Forbidden' }, { status: access.error?.includes('ingelogd') ? 401 : 403 })
+    return NextResponse.json({ error: access.error || 'Forbidden'}, { status: access.error?.includes('ingelogd') ? 401 : 403 })
   }
 
   const supabase = getServerSupabaseClient()
   if (!supabase) {
-    return NextResponse.json({ error: 'Server fout' }, { status: 500 })
+    return NextResponse.json({ error: 'Server fout'}, { status: 500 })
   }
 
   const { data, error } = await supabase
@@ -45,17 +45,17 @@ export async function POST(request: NextRequest) {
   const { tenantSlug, smtp_host, smtp_port, smtp_user, smtp_password, smtp_from_name } = await request.json()
 
   if (!tenantSlug) {
-    return NextResponse.json({ error: 'tenant vereist' }, { status: 400 })
+    return NextResponse.json({ error: 'tenant vereist'}, { status: 400 })
   }
 
   const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
   if (!access.authorized) {
-    return NextResponse.json({ error: access.error || 'Forbidden' }, { status: access.error?.includes('ingelogd') ? 401 : 403 })
+    return NextResponse.json({ error: access.error || 'Forbidden'}, { status: access.error?.includes('ingelogd') ? 401 : 403 })
   }
 
   const supabase = getServerSupabaseClient()
   if (!supabase) {
-    return NextResponse.json({ error: 'Server fout' }, { status: 500 })
+    return NextResponse.json({ error: 'Server fout'}, { status: 500 })
   }
 
   // Upsert: bij nieuwe tenants bestaat er nog geen tenant_settings-rij; pure .update()
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
 
   const { error, data } = await supabase
     .from('tenant_settings')
-    .upsert(row, { onConflict: 'tenant_slug' })
+    .upsert(row, { onConflict: 'tenant_slug'})
     .select('tenant_slug')
 
   if (error) {
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
   }
   if (!data?.length) {
     return NextResponse.json(
-      { error: 'Kon SMTP-instellingen niet opslaan (geen rij terug)' },
+      { error: 'Kon SMTP-instellingen niet opslaan (geen rij terug)'},
       { status: 500 }
     )
   }

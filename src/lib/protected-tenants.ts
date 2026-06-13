@@ -29,15 +29,15 @@ export function isAdminTenant(slug: string | null | undefined): boolean {
 
 /**
  * Donor-/platformtenants (ADMIN_TENANTS): in superadmin- en abonnement-lijsten altijd **pro + active**,
- * nooit trial/starter — los van wat er in `subscriptions` staat.
+ * nooit trial/starter — los van wat er in `subscriptions`staat.
  */
 export function donorAdminDisplaySubscription<T extends { plan: string; status: string }>(
   tenantSlug: string,
   sub: T | null | undefined
 ): T | undefined {
   if (!isAdminTenant(tenantSlug)) return sub ?? undefined
-  const base = (sub ?? { plan: 'pro', status: 'active' }) as T
-  return { ...base, plan: 'pro', status: 'active' }
+  const base = (sub ?? { plan: 'pro', status: 'active'}) as T
+  return { ...base, plan: 'pro', status: 'active'}
 }
 
 export function isProtectedTenant(slug: string | null | undefined): boolean {

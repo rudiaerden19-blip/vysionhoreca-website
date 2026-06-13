@@ -74,14 +74,14 @@ describe('admin-api-order-helpers (Z-rapport / revenue gate)', () => {
 
 describe('isWebshopChannelNewOrder (kassa alarm alleen web)', () => {
   it('includes webshop pickup / delivery / group', () => {
-    expect(isWebshopChannelNewOrder({ order_type: 'pickup' })).toBe(true)
-    expect(isWebshopChannelNewOrder({ order_type: 'delivery' })).toBe(true)
-    expect(isWebshopChannelNewOrder({ order_type: 'group' })).toBe(true)
+    expect(isWebshopChannelNewOrder({ order_type: 'pickup'})).toBe(true)
+    expect(isWebshopChannelNewOrder({ order_type: 'delivery'})).toBe(true)
+    expect(isWebshopChannelNewOrder({ order_type: 'group'})).toBe(true)
   })
 
   it('excludes all POS order types even if lowercased elsewhere', () => {
-    expect(isWebshopChannelNewOrder({ order_type: 'DINE_IN' })).toBe(false)
-    expect(isWebshopChannelNewOrder({ order_type: 'TAKEAWAY' })).toBe(false)
-    expect(isWebshopChannelNewOrder({ order_type: 'DELIVERY' })).toBe(false)
+    expect(isWebshopChannelNewOrder({ order_type: 'DINE_IN'})).toBe(false)
+    expect(isWebshopChannelNewOrder({ order_type: 'TAKEAWAY'})).toBe(false)
+    expect(isWebshopChannelNewOrder({ order_type: 'DELIVERY'})).toBe(false)
   })
 })

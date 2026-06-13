@@ -50,7 +50,7 @@ export function RetailLoyaltyPassShare({
 
   return (
     <div
-      className={`rounded-xl border border-emerald-200 bg-white ${compact ? 'p-3' : 'p-4'}`}
+      className={`rounded-xl border border-emerald-200 bg-white ${compact ? 'p-3': 'p-4'}`}
     >
       {!compact ? (
         <p className="mb-3 text-xs leading-snug text-gray-500">{t('retailLoyalty.passShareHint')}</p>

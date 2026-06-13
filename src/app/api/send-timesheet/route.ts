@@ -13,10 +13,10 @@ export async function POST(request: NextRequest) {
     const { to, subject, message, csvData, fileName, staffName, month, year, tenantSlug } = body
 
     if (!to || !subject || !csvData) {
-      return NextResponse.json({ error: 'Missende velden' }, { status: 400 })
+      return NextResponse.json({ error: 'Missende velden'}, { status: 400 })
     }
     if (!tenantSlug || typeof tenantSlug !== 'string') {
-      return NextResponse.json({ error: 'tenantSlug is verplicht' }, { status: 400 })
+      return NextResponse.json({ error: 'tenantSlug is verplicht'}, { status: 400 })
     }
 
     // ── Auth: alleen ingelogde zaak-eigenaar of superadmin ───────────────────
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     if (!access.authorized) {
       const st = access.error?.includes('ingelogd') ? 401 : 403
       logger.warn('send-timesheet: unauthorized', { requestId, tenantSlug })
-      return NextResponse.json({ error: access.error || 'Geen toegang' }, { status: st })
+      return NextResponse.json({ error: access.error || 'Geen toegang'}, { status: st })
     }
 
     // ── Rate-limit per tenant — voorkomt spam via dezelfde zaak ──────────────
@@ -32,8 +32,8 @@ export async function POST(request: NextRequest) {
     const rl = await checkRateLimit(apiRateLimiter, `timesheet:${tenantSlug}:${ip}`)
     if (!rl.success) {
       return NextResponse.json(
-        { error: 'Te veel verzoeken. Probeer over enkele seconden opnieuw.' },
-        { status: 429, headers: { 'Retry-After': '60' } }
+        { error: 'Te veel verzoeken. Probeer over enkele seconden opnieuw.'},
+        { status: 429, headers: { 'Retry-After': '60'} }
       )
     }
 
@@ -65,13 +65,13 @@ export async function POST(request: NextRequest) {
       <body>
         <div class="container">
           <div class="header">
-            <h1 style="margin: 0;">📅 Urenregistratie</h1>
+            <h1 style="margin: 0;"> Urenregistratie</h1>
             <p style="margin: 10px 0 0 0;">${staffName} - ${month} ${year}</p>
           </div>
           <div class="content">
             <p>${message.replace(/\n/g, '<br>')}</p>
             <div class="summary">
-              <p style="margin: 0 0 10px 0; font-weight: bold;">📎 Bijgevoegd bestand:</p>
+              <p style="margin: 0 0 10px 0; font-weight: bold;"> Bijgevoegd bestand:</p>
               <p style="margin: 0; color: #6b7280;">${fileName}</p>
             </div>
           </div>
@@ -99,14 +99,14 @@ export async function POST(request: NextRequest) {
       ],
     })
 
-    return NextResponse.json({ success: true, message: 'Email verzonden' })
+    return NextResponse.json({ success: true, message: 'Email verzonden'})
   } catch (error) {
     logger.error('send-timesheet error', {
       requestId,
       error: error instanceof Error ? error.message : String(error),
     })
     return NextResponse.json(
-      { error: 'Er is een fout opgetreden bij het verzenden' },
+      { error: 'Er is een fout opgetreden bij het verzenden'},
       { status: 500 }
     )
   }

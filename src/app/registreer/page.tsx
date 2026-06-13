@@ -30,7 +30,7 @@ export default function RegisterPage() {
   const [showInstallPopup, setShowInstallPopup] = useState(false)
   const [tenantSlug, setTenantSlug] = useState('')
   const [productLine, setProductLine] = useState<RegistrationProductLine | null>(null)
-  const [step, setStep] = useState<'line' | 'form'>('line')
+  const [step, setStep] = useState<'line' |  'form'>('line')
   const langRef = useRef<HTMLDivElement>(null)
 
   // Read language from URL parameter on mount
@@ -122,12 +122,12 @@ export default function RegisterPage() {
     }
 
     if (!formData.businessName.trim()) {
-      setError(t('register.required') + ': ' + t('register.businessName'))
+      setError(t('register.required') + ': '+ t('register.businessName'))
       return false
     }
 
     if (!formData.email.trim()) {
-      setError(t('register.required') + ': ' + t('register.email'))
+      setError(t('register.required') + ': '+ t('register.email'))
       return false
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       setError(t('register.invalidEmail'))
@@ -135,12 +135,12 @@ export default function RegisterPage() {
     }
 
     if (!formData.phone.trim()) {
-      setError(t('register.required') + ': ' + t('register.phone'))
+      setError(t('register.required') + ': '+ t('register.phone'))
       return false
     }
 
     if (!formData.password) {
-      setError(t('register.required') + ': ' + t('register.password'))
+      setError(t('register.required') + ': '+ t('register.password'))
       return false
     } else if (formData.password.length < 8) {
       setError(t('register.passwordTooShort'))
@@ -148,7 +148,7 @@ export default function RegisterPage() {
     }
 
     if (!formData.confirmPassword) {
-      setError(t('register.required') + ': ' + t('register.confirmPassword'))
+      setError(t('register.required') + ': '+ t('register.confirmPassword'))
       return false
     } else if (formData.password !== formData.confirmPassword) {
       setError(t('register.passwordsDontMatch'))
@@ -171,7 +171,7 @@ export default function RegisterPage() {
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json'},
         body: JSON.stringify({
           businessName: formData.businessName.trim(),
           email: formData.email.trim().toLowerCase(),
@@ -338,7 +338,7 @@ export default function RegisterPage() {
             <LocaleFlagWithCode locale={locale} />
             <span className="hidden sm:inline text-sm text-gray-600">{localeNames[locale]}</span>
             <svg 
-              className={`w-4 h-4 transition-transform ${isLangOpen ? 'rotate-180' : ''}`} 
+              className={`w-4 h-4 transition-transform ${isLangOpen ? 'rotate-180': ''}`} 
               fill="none" 
               stroke="currentColor" 
               viewBox="0 0 24 24"
@@ -355,7 +355,7 @@ export default function RegisterPage() {
                   key={langCode}
                   onClick={() => handleLanguageSelect(langCode)}
                   className={`flex w-full items-center gap-3 px-4 py-3 transition-colors hover:bg-gray-100 ${
-                    locale === langCode ? 'text-accent' : 'text-gray-800'
+                    locale === langCode ? 'text-accent': 'text-gray-800'
                   }`}
                 >
                   <LocaleFlagEmoji locale={langCode} className="text-xl" />
@@ -374,8 +374,8 @@ export default function RegisterPage() {
 
       {/* Registration */}
       <div className="flex-1 flex items-center justify-center px-4 py-12">
-        <div className={`w-full ${step === 'line' ? 'max-w-2xl' : 'max-w-md'}`}>
-          {step === 'line' ? (
+        <div className={`w-full ${step === 'line'? 'max-w-2xl': 'max-w-md'}`}>
+          {step === 'line'? (
             <div className="space-y-8">
               <div className="text-center">
                 <Link href="/">
@@ -544,7 +544,7 @@ export default function RegisterPage() {
                 <>
                   <motion.span
                     animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'linear'}}
                     className="inline-block h-5 w-5 shrink-0 rounded-full border-2 border-white border-t-transparent"
                     aria-hidden
                   />

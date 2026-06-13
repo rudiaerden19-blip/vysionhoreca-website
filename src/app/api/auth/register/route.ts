@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     if (!rateLimitResult.success) {
       logger.warn('Registration rate limited', { requestId, clientIP })
       return NextResponse.json(
-        { error: 'Te veel registraties. Probeer het later opnieuw.' },
+        { error: 'Te veel registraties. Probeer het later opnieuw.'},
         { status: 429 }
       )
     }
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     if (!supabase) {
       logger.error('Registration failed: Supabase not configured', { requestId })
       return NextResponse.json(
-        { error: 'Database niet geconfigureerd. Neem contact op met support.' },
+        { error: 'Database niet geconfigureerd. Neem contact op met support.'},
         { status: 503 }
       )
     }
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
 
     if (existingTenant) {
       return NextResponse.json(
-        { error: 'Dit email adres is al in gebruik' },
+        { error: 'Dit email adres is al in gebruik'},
         { status: 409 }
       )
     }
@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
         
         if (counter > 100) {
           return NextResponse.json(
-            { error: 'Kon geen unieke slug genereren. Probeer een andere bedrijfsnaam.' },
+            { error: 'Kon geen unieke slug genereren. Probeer een andere bedrijfsnaam.'},
             { status: 400 }
           )
         }
@@ -152,7 +152,7 @@ export async function POST(request: NextRequest) {
     if (tenantError) {
       logger.error('Error creating tenant', { requestId, error: tenantError.message })
       return NextResponse.json(
-        { error: `Fout bij aanmaken tenant: ${tenantError.message}` },
+        { error: `Fout bij aanmaken tenant: ${tenantError.message}`},
         { status: 500 }
       )
     }
@@ -181,7 +181,7 @@ export async function POST(request: NextRequest) {
         await supabase.from('tenants').delete().eq('id', tenant.id)
       }
       return NextResponse.json(
-        { error: `Fout bij aanmaken account: ${profileError.message}` },
+        { error: `Fout bij aanmaken account: ${profileError.message}`},
         { status: 500 }
       )
     }
@@ -306,7 +306,7 @@ export async function POST(request: NextRequest) {
       duration: Date.now() - startTime 
     })
     return NextResponse.json(
-      { error: 'Er is een fout opgetreden' },
+      { error: 'Er is een fout opgetreden'},
       { status: 500 }
     )
   }

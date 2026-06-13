@@ -21,7 +21,7 @@ export function tenantShouldLoadPopularItemsStats(access: TenantModuleAccess): b
   return !!access.rapporten && tenantShouldLoadOrderDashboardData(access)
 }
 
-/** Kassa: 3s-poll voor webshop `new` orders. */
+/** Kassa: 3s-poll voor webshop `new`orders. */
 export function tenantShouldPollWebshopNewOrders(access: TenantModuleAccess): boolean {
   return !!access['online-bestellingen']
 }

@@ -79,7 +79,7 @@ export function AdminHamburgerMenu({ tenantSlug }: { tenantSlug: string }) {
         <div className="absolute left-0 top-full z-[120] mt-1 flex max-w-none">
           <div
             className="max-h-[85vh] max-w-none shrink-0 overflow-y-auto rounded-2xl border border-gray-100 bg-white shadow-2xl"
-            style={{ width: 240, maxWidth: 'none' }}
+            style={{ width: 240, maxWidth: 'none'}}
           >
             <div className="sticky top-0 rounded-t-2xl bg-[#1e293b] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white">
               {t('adminLayout.menu')}
@@ -96,7 +96,7 @@ export function AdminHamburgerMenu({ tenantSlug }: { tenantSlug: string }) {
               <div key={mod.rowKey} className="border-b border-gray-100 last:border-0">
                 <div
                   className={`flex w-full items-stretch transition-colors ${
-                    subOpen === mod.rowKey ? 'bg-blue-50' : 'hover:bg-gray-50'
+                    subOpen === mod.rowKey ? 'bg-blue-50': 'hover:bg-gray-50'
                   }`}
                 >
                   {mod.entryHref ? (
@@ -139,7 +139,7 @@ export function AdminHamburgerMenu({ tenantSlug }: { tenantSlug: string }) {
           {open && subOpen && activeMod && (
             <div
               className="ml-2 max-h-[85vh] max-w-none shrink-0 self-start overflow-y-auto rounded-2xl border border-gray-100 bg-white shadow-2xl"
-              style={{ width: 220, maxWidth: 'none' }}
+              style={{ width: 220, maxWidth: 'none'}}
             >
               <div className="sticky top-0 flex items-center gap-2 rounded-t-2xl bg-[#1e293b] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white">
                 {activeMod.labelKey ? t(activeMod.labelKey) : activeMod.label}

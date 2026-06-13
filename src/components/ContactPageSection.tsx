@@ -18,7 +18,7 @@ export default function ContactPageSection({ className = '', sectionId }: Contac
     email: '',
     message: '',
   })
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [status, setStatus] = useState<'idle' |  'loading' |  'success' |  'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,7 +29,7 @@ export default function ContactPageSection({ className = '', sectionId }: Contac
     try {
       const response = await fetch('/api/contact', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json'},
         body: JSON.stringify(formData),
       })
 
@@ -40,7 +40,7 @@ export default function ContactPageSection({ className = '', sectionId }: Contac
       }
 
       setStatus('success')
-      setFormData({ firstName: '', lastName: '', email: '', message: '' })
+      setFormData({ firstName: '', lastName: '', email: '', message: ''})
 
       setTimeout(() => setStatus('idle'), 5000)
     } catch (error) {
@@ -142,7 +142,7 @@ export default function ContactPageSection({ className = '', sectionId }: Contac
           </div>
 
           <div className="bg-[#E3E3E3] rounded-2xl p-8 shadow-home-card">
-            {status === 'success' ? (
+            {status === 'success'? (
               <div className="flex flex-col items-center justify-center h-full py-12">
                 <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mb-4">
                   <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -230,7 +230,7 @@ export default function ContactPageSection({ className = '', sectionId }: Contac
                   disabled={status === 'loading'}
                   className="w-full bg-accent hover:bg-accent/90 text-white py-4 rounded-lg font-semibold transition-colors disabled:bg-accent/50 disabled:cursor-not-allowed flex items-center justify-center shadow-home-btn"
                 >
-                  {status === 'loading' ? (
+                  {status === 'loading'? (
                     <>
                       <svg
                         className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"

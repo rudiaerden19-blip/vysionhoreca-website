@@ -2408,7 +2408,7 @@
  "smtpGmailWarning": " Gmail requiere una contraseña de aplicación. Créala en: Cuenta de Google → Seguridad → Contraseñas de aplicaciones.",
  "smtpServerLabel": "Servidor SMTP (pregunta a tu proveedor)",
  "smtpPortLabel": "Puerto",
- "smtpSaveSaving": "⏳ Guardando...",
+ "smtpSaveSaving": " Guardando...",
  "smtpSaveSaved": " ¡Guardado!",
  "smtpSaveButton": " Guardar ajustes de email"
  },
@@ -4615,7 +4615,7 @@
  "selectEmployee": "Seleccionar empleado",
  "reasonPlaceholder": "Opcional: motivo del permiso",
  "initialStatus": "Estado",
- "statusHint": "Elige 'Aprobado' para registro directo (ej: baja médica)",
+ "statusHint": "Elige 'Aprobado'para registro directo (ej: baja médica)",
  "add": "Añadir",
  "fillAllFields": "Completa todos los campos obligatorios",
  "delete": "Eliminar",
@@ -5718,7 +5718,7 @@
  "ownership24": "Deja de alquilar. A los 24 meses, este TPV i7 es 100 % tuyo."
  },
  "retail": {
- "h1": "TPV retail y stock | El i7 'Bestia' para tiendas | Vysion",
+ "h1": "TPV retail y stock | El i7 'Bestia'para tiendas | Vysion",
  "intro": "Stock en i7 (16 GB RAM), TPV táctil e integración web gratis — retail que crece contigo.",
  "body1": "TPV retail rápido: stock y venta en una pantalla. Comprar TPV con margen y velocidad — sistema belga para tiendas.",
  "body2": "Del código de barras al cierre: menos errores, más ritmo. Hardware premium tuyo a los 24 meses — sin alquilar sin beneficio.",

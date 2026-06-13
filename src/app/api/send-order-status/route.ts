@@ -19,13 +19,13 @@ export async function POST(request: NextRequest) {
 
     const tenantSlug = body.tenantSlug as string | undefined
     if (!tenantSlug || typeof tenantSlug !== 'string') {
-      return NextResponse.json({ error: 'tenantSlug is required' }, { status: 400 })
+      return NextResponse.json({ error: 'tenantSlug is required'}, { status: 400 })
     }
 
     const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
     if (!access.authorized) {
       const st = access.error?.includes('ingelogd') ? 401 : 403
-      return NextResponse.json({ error: access.error || 'Forbidden' }, { status: st })
+      return NextResponse.json({ error: access.error || 'Forbidden'}, { status: st })
     }
 
     const { 
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     } = body
 
     if (!customerEmail || !orderNumber || !status || !businessName) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+      return NextResponse.json({ error: 'Missing required fields'}, { status: 400 })
     }
 
     const transporter = nodemailer.createTransport({
@@ -79,24 +79,24 @@ export async function POST(request: NextRequest) {
 
     switch (status) {
       case 'confirmed':
-        subject = `✅ Bestelling #${orderNumber} bevestigd - ${businessName}`
+        subject = `Bestelling #${orderNumber} bevestigd - ${businessName}`
         statusText = 'Je bestelling is bevestigd en wordt nu bereid!'
         statusColor = '#22c55e'
-        statusEmoji = '✅'
+        statusEmoji = ''
         break
       case 'ready':
-        subject = `🎉 Bestelling #${orderNumber} is klaar! - ${businessName}`
+        subject = `Bestelling #${orderNumber} is klaar! - ${businessName}`
         statusText = orderType === 'delivery' 
           ? 'Je bestelling is klaar en wordt bezorgd!'
           : 'Je bestelling is klaar om opgehaald te worden!'
         statusColor = '#22c55e'
-        statusEmoji = '🎉'
+        statusEmoji = ''
         break
       case 'rejected':
-        subject = `❌ Bestelling #${orderNumber} geannuleerd - ${businessName}`
+        subject = `Bestelling #${orderNumber} geannuleerd - ${businessName}`
         statusText = 'Helaas kunnen we je bestelling niet verwerken.'
         statusColor = '#ef4444'
-        statusEmoji = '❌'
+        statusEmoji = ''
         if (rejectionReason) {
           const reasonLabels: Record<string, string> = {
             'too_busy': 'We zijn op dit moment te druk',
@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
         subject = `Bestelling #${orderNumber} update - ${businessName}`
         statusText = `Status: ${status}`
         statusColor = '#f97316'
-        statusEmoji = '📦'
+        statusEmoji = ''
     }
 
     // Parse items if they're a string
@@ -159,9 +159,9 @@ export async function POST(request: NextRequest) {
             const itemPrice = item.price || item.unit_price || 0
             const itemTotal = item.total_price || (itemPrice * item.quantity)
             const optionsHtml = item.options?.map(opt => 
-              `<br><span style="color: #666; font-size: 12px;">+ ${opt.name}${opt.price ? ` (€${opt.price.toFixed(2)})` : ''}</span>`
+              `<br><span style="color: #666; font-size: 12px;">+ ${opt.name}${opt.price ? `(€${opt.price.toFixed(2)})`: ''}</span>`
             ).join('') || ''
-            const notesHtml = item.notes ? `<br><span style="color: #888; font-size: 12px; font-style: italic;">📝 ${item.notes}</span>` : ''
+            const notesHtml = item.notes ? `<br><span style="color: #888; font-size: 12px; font-style: italic;"> ${item.notes}</span>`: ''
             
             return `
               <tr>
@@ -175,7 +175,7 @@ export async function POST(request: NextRequest) {
           }).join('')}
         </tbody>
       </table>
-    ` : ''
+    `: ''
 
     // Build totals HTML
     const totalsHtml = `
@@ -185,19 +185,19 @@ export async function POST(request: NextRequest) {
             <td style="padding: 5px 0; color: #666;">Subtotaal</td>
             <td style="padding: 5px 0; text-align: right;">€${parseFloat(subtotal).toFixed(2)}</td>
           </tr>
-        ` : ''}
+        `: ''}
         ${deliveryFee && parseFloat(deliveryFee) > 0 ? `
           <tr>
             <td style="padding: 5px 0; color: #666;">Bezorgkosten</td>
             <td style="padding: 5px 0; text-align: right;">€${parseFloat(deliveryFee).toFixed(2)}</td>
           </tr>
-        ` : ''}
+        `: ''}
         ${discount && parseFloat(discount) > 0 ? `
           <tr>
             <td style="padding: 5px 0; color: #22c55e;">Korting</td>
             <td style="padding: 5px 0; text-align: right; color: #22c55e;">-€${parseFloat(discount).toFixed(2)}</td>
           </tr>
-        ` : ''}
+        `: ''}
         <tr style="border-top: 1px solid #ddd;">
           <td style="padding: 8px 0; color: #666;">Totaal excl. BTW</td>
           <td style="padding: 8px 0; text-align: right;">€${totalExclBtw.toFixed(2)}</td>
@@ -216,13 +216,13 @@ export async function POST(request: NextRequest) {
     // Customer info HTML
     const customerInfoHtml = `
       <div style="background: #f0f9ff; padding: 15px; border-radius: 8px; margin: 15px 0;">
-        <h3 style="margin: 0 0 10px; color: #0369a1; font-size: 14px;">👤 Klantgegevens</h3>
+        <h3 style="margin: 0 0 10px; color: #0369a1; font-size: 14px;"> Klantgegevens</h3>
         <p style="margin: 5px 0; color: #333;"><strong>${customerName || 'Klant'}</strong></p>
-        ${customerPhone ? `<p style="margin: 5px 0; color: #666;">📞 ${customerPhone}</p>` : ''}
-        ${customerEmail ? `<p style="margin: 5px 0; color: #666;">✉️ ${customerEmail}</p>` : ''}
-        ${customerAddress ? `<p style="margin: 5px 0; color: #666;">📍 ${customerAddress}</p>` : ''}
+        ${customerPhone ? `<p style="margin: 5px 0; color: #666;"> ${customerPhone}</p>`: ''}
+        ${customerEmail ? `<p style="margin: 5px 0; color: #666;"> ${customerEmail}</p>`: ''}
+        ${customerAddress ? `<p style="margin: 5px 0; color: #666;"> ${customerAddress}</p>`: ''}
         <p style="margin: 10px 0 0; padding-top: 10px; border-top: 1px solid #bae6fd; color: #0369a1; font-weight: bold;">
-          ${orderType === 'delivery' ? '🚗 Levering' : '🛍️ Afhalen'}
+          ${orderType === 'delivery'? 'Levering': 'Afhalen'}
         </p>
       </div>
     `
@@ -230,13 +230,13 @@ export async function POST(request: NextRequest) {
     // Business info HTML (VERPLICHT voor Belgische wetgeving)
     const businessInfoHtml = `
       <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-top: 20px; border: 1px solid #e5e5e5;">
-        <h3 style="margin: 0 0 10px; color: #333; font-size: 14px;">🏪 Bedrijfsgegevens</h3>
+        <h3 style="margin: 0 0 10px; color: #333; font-size: 14px;"> Bedrijfsgegevens</h3>
         <p style="margin: 5px 0; color: #333;"><strong>${businessName}</strong></p>
-        ${businessAddress ? `<p style="margin: 5px 0; color: #666;">${businessAddress}</p>` : ''}
-        ${businessPostalCode || businessCity ? `<p style="margin: 5px 0; color: #666;">${businessPostalCode || ''} ${businessCity || ''}</p>` : ''}
-        ${businessPhone ? `<p style="margin: 5px 0; color: #666;">📞 ${businessPhone}</p>` : ''}
-        ${businessEmail ? `<p style="margin: 5px 0; color: #666;">✉️ ${businessEmail}</p>` : ''}
-        ${businessBtwNumber ? `<p style="margin: 10px 0 0; color: #333; font-weight: bold;">BTW: ${businessBtwNumber}</p>` : ''}
+        ${businessAddress ? `<p style="margin: 5px 0; color: #666;">${businessAddress}</p>`: ''}
+        ${businessPostalCode || businessCity ? `<p style="margin: 5px 0; color: #666;">${businessPostalCode || ''} ${businessCity || ''}</p>`: ''}
+        ${businessPhone ? `<p style="margin: 5px 0; color: #666;"> ${businessPhone}</p>`: ''}
+        ${businessEmail ? `<p style="margin: 5px 0; color: #666;"> ${businessEmail}</p>`: ''}
+        ${businessBtwNumber ? `<p style="margin: 10px 0 0; color: #333; font-weight: bold;">BTW: ${businessBtwNumber}</p>`: ''}
       </div>
     `
 
@@ -260,29 +260,29 @@ export async function POST(request: NextRequest) {
             
             ${additionalInfo}
             
-            ${status !== 'rejected' ? `
+            ${status !== 'rejected'? `
               <!-- Customer Info -->
               ${customerInfoHtml}
               
               <!-- Order Items -->
               ${orderItems.length > 0 ? `
                 <div style="margin: 20px 0;">
-                  <h3 style="margin: 0 0 10px; color: #333; font-size: 14px;">🧾 Bestelde producten</h3>
+                  <h3 style="margin: 0 0 10px; color: #333; font-size: 14px;"> Bestelde producten</h3>
                   ${itemsHtml}
                 </div>
-              ` : ''}
+              `: ''}
               
               <!-- Totals -->
               <div style="background: #fafafa; padding: 15px; border-radius: 8px; border: 1px solid #e5e5e5;">
                 ${totalsHtml}
               </div>
-            ` : ''}
+            `: ''}
             
             <!-- Business Info (VERPLICHT) -->
             ${businessInfoHtml}
             
             <p style="color: #666; font-size: 14px; margin-top: 30px;">
-              Vragen over je bestelling? Neem contact op met ${businessName}${businessPhone ? ` via ${businessPhone}` : ''}.
+              Vragen over je bestelling? Neem contact op met ${businessName}${businessPhone ? `via ${businessPhone}`: ''}.
             </p>
           </div>
           
@@ -305,6 +305,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Order status email error:', error)
-    return NextResponse.json({ error: 'Failed to send email' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to send email'}, { status: 500 })
   }
 }

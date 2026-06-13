@@ -21,4 +21,4 @@ export function normalizeThemeColorHex(input: string | null | undefined, fallbac
  * Browser/PWA-systeembalk: donker slate-blauw (kassa-titelbalk #1e293b).
  * Mobiele browsers verhelderen `theme-color`; eerder #3C4D6B / #2D3A52 bleek nog te licht.
  */
-export const TENANT_APP_SHELL_THEME_COLOR = '#1e293b' as const
+export const TENANT_APP_SHELL_THEME_COLOR = '#1e293b'as const

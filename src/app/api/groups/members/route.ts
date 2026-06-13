@@ -14,13 +14,13 @@ async function requireGroupTenantAccess(request: NextRequest, groupId: string) {
     .eq('id', groupId)
     .single()
   if (error || !group?.tenant_slug) {
-    return { ok: false as const, response: NextResponse.json({ error: 'Group not found' }, { status: 404 }) }
+    return { ok: false as const, response: NextResponse.json({ error: 'Group not found'}, { status: 404 }) }
   }
   const access = await verifyTenantOrSuperAdmin(request, group.tenant_slug)
   if (!access.authorized) {
     return {
       ok: false as const,
-      response: NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
+      response: NextResponse.json({ error: access.error || 'Forbidden'}, { status: 403 })
     }
   }
   return { ok: true as const, tenant_slug: group.tenant_slug }
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     const group_id = searchParams.get('group_id')
 
     if (!group_id) {
-      return NextResponse.json({ error: 'group_id is required' }, { status: 400 })
+      return NextResponse.json({ error: 'group_id is required'}, { status: 400 })
     }
 
     const gate = await requireGroupTenantAccess(request, group_id)
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(data)
   } catch (error) {
     console.error('Error fetching members:', error)
-    return NextResponse.json({ error: 'Failed to fetch members' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to fetch members'}, { status: 500 })
   }
 }
 
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     const { group_id, members } = body
 
     if (!group_id) {
-      return NextResponse.json({ error: 'group_id is required' }, { status: 400 })
+      return NextResponse.json({ error: 'group_id is required'}, { status: 400 })
     }
 
     const gate = await requireGroupTenantAccess(request, group_id)
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
 
     if (group && count !== null && count + membersToAdd.length > group.max_members) {
       return NextResponse.json(
-        { error: `Maximum ${group.max_members} members allowed` },
+        { error: `Maximum ${group.max_members} members allowed`},
         { status: 400 }
       )
     }
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
 
     const { data, error } = await supabase
       .from('group_members')
-      .upsert(insertData, { onConflict: 'group_id,email' })
+      .upsert(insertData, { onConflict: 'group_id,email'})
       .select()
 
     if (error) throw error
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(data)
   } catch (error) {
     console.error('Error adding members:', error)
-    return NextResponse.json({ error: 'Failed to add members' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to add members'}, { status: 500 })
   }
 }
 
@@ -119,7 +119,7 @@ export async function PUT(request: NextRequest) {
     const { id, ...updates } = body
 
     if (!id) {
-      return NextResponse.json({ error: 'id is required' }, { status: 400 })
+      return NextResponse.json({ error: 'id is required'}, { status: 400 })
     }
 
     const { data: memberRow, error: mErr } = await supabase
@@ -128,7 +128,7 @@ export async function PUT(request: NextRequest) {
       .eq('id', id)
       .single()
     if (mErr || !memberRow?.group_id) {
-      return NextResponse.json({ error: 'Member not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Member not found'}, { status: 404 })
     }
 
     const gate = await requireGroupTenantAccess(request, memberRow.group_id)
@@ -146,7 +146,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json(data)
   } catch (error) {
     console.error('Error updating member:', error)
-    return NextResponse.json({ error: 'Failed to update member' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to update member'}, { status: 500 })
   }
 }
 
@@ -157,7 +157,7 @@ export async function DELETE(request: NextRequest) {
     const id = searchParams.get('id')
 
     if (!id) {
-      return NextResponse.json({ error: 'id is required' }, { status: 400 })
+      return NextResponse.json({ error: 'id is required'}, { status: 400 })
     }
 
     const { data: memberRow, error: mErr } = await supabase
@@ -166,7 +166,7 @@ export async function DELETE(request: NextRequest) {
       .eq('id', id)
       .single()
     if (mErr || !memberRow?.group_id) {
-      return NextResponse.json({ error: 'Member not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Member not found'}, { status: 404 })
     }
 
     const gate = await requireGroupTenantAccess(request, memberRow.group_id)
@@ -174,7 +174,7 @@ export async function DELETE(request: NextRequest) {
 
     const { error } = await supabase
       .from('group_members')
-      .update({ status: 'removed' })
+      .update({ status: 'removed'})
       .eq('id', id)
 
     if (error) throw error
@@ -182,6 +182,6 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error removing member:', error)
-    return NextResponse.json({ error: 'Failed to remove member' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to remove member'}, { status: 500 })
   }
 }

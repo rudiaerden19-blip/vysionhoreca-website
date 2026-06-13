@@ -8,7 +8,7 @@ import SubscriptionsTermsPopup from './SubscriptionsTermsPopup'
 
 const HERO_BG = '/images/hero-header.png'
 
-/** Hoogte vaste marketing-nav (~ `Navigation` h-20); inhoud niet onder de balk laten verdwijnen. */
+/** Hoogte vaste marketing-nav (~ `Navigation`h-20); inhoud niet onder de balk laten verdwijnen. */
 const NAV_TOP_OFFSET_CLASS = 'pt-20'
 
 export default function HomeLandingHero() {
@@ -75,7 +75,7 @@ export default function HomeLandingHero() {
               >
                 <LocaleFlagWithCode locale={locale} codeClassName="text-white" />
                 <svg
-                  className={`w-4 h-4 transition-transform ${isLangOpen ? 'rotate-180' : ''}`}
+                  className={`w-4 h-4 transition-transform ${isLangOpen ? 'rotate-180': ''}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -91,7 +91,7 @@ export default function HomeLandingHero() {
                       type="button"
                       onClick={() => handleLanguageSelect(langCode)}
                       className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors ${
-                        locale === langCode ? 'text-accent' : 'text-white'
+                        locale === langCode ? 'text-accent': 'text-white'
                       }`}
                     >
                       <LocaleFlagEmoji locale={langCode} className="text-xl" />
@@ -150,7 +150,7 @@ export default function HomeLandingHero() {
                       setIsMenuOpen(false)
                     }}
         className={`py-2 rounded-lg text-sm ${
-          locale === langCode ? 'bg-accent text-white' : 'bg-white/10 text-white'
+          locale === langCode ? 'bg-accent text-white': 'bg-white/10 text-white'
         }`}
                   >
                     <LocaleFlagEmoji locale={langCode} className="text-sm" /> {langCode.toUpperCase()}

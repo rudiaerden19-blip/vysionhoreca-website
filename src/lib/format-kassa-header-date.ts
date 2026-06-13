@@ -13,7 +13,7 @@ const localeTag: Record<Locale, string> = {
   ar: 'ar-u-ca-gregory-nu-latn',
 }
 
-/** BCP-47-tag voor `Intl.DateTimeFormat` conform app-taal. */
+/** BCP-47-tag voor `Intl.DateTimeFormat`conform app-taal. */
 export function appIntlLocaleTag(locale: Locale): string {
   return localeTag[locale] ?? 'en-GB'
 }
@@ -21,7 +21,7 @@ export function appIntlLocaleTag(locale: Locale): string {
 /**
  * Tekst in de kassa-datumbalk (compact): „wo 06 mei 2026” — weekdag afgekort,
  * dag/maand/jaar nog steeds uit dezelfde `Date`.
- * Geen vaste string — `date` bepaalt weekdag en dag tegelijk.
+ * Geen vaste string — `date`bepaalt weekdag en dag tegelijk.
  */
 export function formatKassaNumpadHeaderDate(date: Date, locale: Locale): string {
   const tag = localeTag[locale] ?? 'en-GB'

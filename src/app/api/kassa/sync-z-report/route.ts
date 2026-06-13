@@ -34,35 +34,35 @@ export async function POST(req: NextRequest) {
     try {
       raw = await req.json()
     } catch {
-      return NextResponse.json({ error: 'Ongeldige JSON' }, { status: 400 })
+      return NextResponse.json({ error: 'Ongeldige JSON'}, { status: 400 })
     }
     const parsed = BodySchema.safeParse(raw)
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Ongeldige aanvraag' }, { status: 400 })
+      return NextResponse.json({ error: 'Ongeldige aanvraag'}, { status: 400 })
     }
     const { tenantSlug, date } = parsed.data
 
     const access = await verifyTenantOrSuperAdmin(req, tenantSlug)
     if (!access.authorized) {
-      return NextResponse.json({ error: access.error || 'Niet geautoriseerd' }, { status: 403 })
+      return NextResponse.json({ error: access.error || 'Niet geautoriseerd'}, { status: 403 })
     }
 
     // Rate-limit per tenant — voorkomt dat 1 kassa de DB platslaat
     const actorId = req.headers.get('x-business-id') || req.headers.get('x-superadmin-id') || 'anon'
     const rl = await checkRateLimit(apiRateLimiter, `z-sync:${tenantSlug}:${actorId}`)
     if (!rl.success) {
-      return NextResponse.json({ error: 'Te veel verzoeken' }, { status: 429 })
+      return NextResponse.json({ error: 'Te veel verzoeken'}, { status: 429 })
     }
 
     const supabase = getServerSupabaseClient()
     if (!supabase) {
-      return NextResponse.json({ error: 'Database niet beschikbaar' }, { status: 503 })
+      return NextResponse.json({ error: 'Database niet beschikbaar'}, { status: 503 })
     }
 
     await regenerateZReportForDate(supabase, tenantSlug, date)
     return NextResponse.json({ ok: true }, { status: 200 })
   } catch (err: any) {
     logger.error('[kassa/sync-z-report] uncaught', { requestId, err: err?.message || String(err) })
-    return NextResponse.json({ error: 'Interne fout' }, { status: 500 })
+    return NextResponse.json({ error: 'Interne fout'}, { status: 500 })
   }
 }

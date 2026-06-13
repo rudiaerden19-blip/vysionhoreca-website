@@ -28,7 +28,7 @@ export async function ensureDeliverySettingsForTenant(
   const row = buildDefaultDeliverySettingsRow(tenantSlug)
   const { error } = await client
     .from('delivery_settings')
-    .upsert(row, { onConflict: 'tenant_slug' })
+    .upsert(row, { onConflict: 'tenant_slug'})
   if (error) {
     console.warn('[ensureDeliverySettingsForTenant]', tenantSlug, error.message)
   }

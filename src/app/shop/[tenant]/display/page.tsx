@@ -74,7 +74,7 @@ interface Reservation {
   reservation_time: string
   party_size: number
   notes?: string
-  status: 'pending' | 'confirmed' | 'cancelled' | 'completed'
+  status: 'pending' |  'confirmed' |  'cancelled' |  'completed'
   created_at: string
 }
 
@@ -93,12 +93,12 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   
   // Rejection reasons with translated labels
   const REJECTION_REASONS = [
-    { id: 'busy', label: tx('reasonBusy'), icon: '' },
-    { id: 'closed', label: tx('reasonClosed'), icon: '' },
-    { id: 'no_stock', label: tx('reasonNoStock'), icon: '' },
-    { id: 'technical', label: tx('reasonTechnical'), icon: '' },
-    { id: 'address', label: tx('reasonAddress'), icon: '' },
-    { id: 'other', label: tx('reasonOther'), icon: '' },
+    { id: 'busy', label: tx('reasonBusy'), icon: ''},
+    { id: 'closed', label: tx('reasonClosed'), icon: ''},
+    { id: 'no_stock', label: tx('reasonNoStock'), icon: ''},
+    { id: 'technical', label: tx('reasonTechnical'), icon: ''},
+    { id: 'address', label: tx('reasonAddress'), icon: ''},
+    { id: 'other', label: tx('reasonOther'), icon: ''},
   ]
   
   const [orders, setOrders] = useState<Order[]>([])
@@ -115,7 +115,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   // Check if already activated this session - skip activation screen if so
   const [audioActivated, setAudioActivated] = useState(() => isAudioActivatedThisSession(params.tenant))
   const [newOrderIds, setNewOrderIds] = useState<Set<string>>(new Set())
-  const [activeTab, setActiveTab] = useState<'active' | 'completed'>('active')
+  const [activeTab, setActiveTab] = useState<'active' |  'completed'>('active')
   const [reservations, setReservations] = useState<Reservation[]>([])
   const [showReservationsModal, setShowReservationsModal] = useState(false)
   const [displayLangOpen, setDisplayLangOpen] = useState(false)
@@ -183,7 +183,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   }, [params.tenant])
 
   // Update reservation status
-  async function updateReservationStatus(id: string, status: 'confirmed' | 'cancelled') {
+  async function updateReservationStatus(id: string, status: 'confirmed' |  'cancelled') {
     const { error } = await supabase
       .from('reservations')
       .update({ status })
@@ -255,7 +255,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
         if (data) {
           const parsed = data.map(order => ({
             ...order,
-            items: typeof order.items === 'string' ? JSON.parse(order.items) : order.items || []
+            items: typeof order.items === 'string'? JSON.parse(order.items) : order.items || []
           }))
           const webshopOnly = parsed.filter((o) => isWebshopOrder(o))
           
@@ -329,7 +329,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
       if (data) {
         const parsed = data.map(order => ({
           ...order,
-          items: typeof order.items === 'string' ? JSON.parse(order.items) : order.items || []
+          items: typeof order.items === 'string'? JSON.parse(order.items) : order.items || []
         }))
         const webshopOnly = parsed.filter((o) => isWebshopOrder(o))
         setOrders(webshopOnly)
@@ -337,7 +337,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
         // CRITICAL: Initialize known IDs with ALL current orders
         // This prevents false "new order" alerts on page load
         parsed.forEach(o => knownOrderIdsRef.current.add(o.id))
-        console.log(` Initial load: ${webshopOnly.length} webshop orders (${parsed.length} totaal), ${knownOrderIdsRef.current.size} known IDs`)
+        console.log(`Initial load: ${webshopOnly.length} webshop orders (${parsed.length} totaal), ${knownOrderIdsRef.current.size} known IDs`)
       }
     } catch (error) {
       console.error('Error loading data:', error)
@@ -357,14 +357,14 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   async function sendOrderStatusEmail(order: Order, status: string, rejectionReason?: string, rejectionNotes?: string) {
     // Skip if no email
     if (!order.customer_email) {
-      console.log(' No customer email - skipping notification')
+      console.log('No customer email - skipping notification')
       return
     }
     
     // Prevent duplicate emails using sessionStorage
     const emailKey = `${order.id}-${status}`
     if (sentEmailsRef.current.has(emailKey)) {
-      console.log(' Email already sent:', emailKey)
+      console.log('Email already sent:', emailKey)
       return
     }
     
@@ -381,7 +381,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
       // SessionStorage might be full or disabled
     }
     
-    console.log(` Sending ${status} email to ${order.customer_email}...`)
+    console.log(`Sending ${status} email to ${order.customer_email}...`)
     
     try {
       const response = await fetch('/api/send-order-status', {
@@ -420,13 +420,13 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
       })
       
       if (response.ok) {
-        console.log(` Email sent successfully to ${order.customer_email}`)
+        console.log(`Email sent successfully to ${order.customer_email}`)
       } else {
         const errorText = await response.text()
-        console.error(` Email API error: ${response.status} - ${errorText}`)
+        console.error(`Email API error: ${response.status} - ${errorText}`)
       }
     } catch (error) {
-      console.error(' Failed to send email:', error)
+      console.error('Failed to send email:', error)
       // Don't remove from sentEmailsRef - we don't want to spam on retry
     }
   }
@@ -493,7 +493,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   }
 
   // Browser print (thermal/USB bridge verwijderd)
-  function browserPrint(order: Order, type: 'customer' | 'kitchen') {
+  function browserPrint(order: Order, type: 'customer' |  'kitchen') {
     const printWindow = window.open('', '_blank', 'width=320,height=700')
     if (!printWindow) return
 
@@ -504,12 +504,12 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
       const optLines = orderItemDisplayOptionLines(item)
       return `
       <tr>
-        <td style="padding: 5px 0; font-size: ${type === 'kitchen' ? '16px' : '14px'};">
+        <td style="padding: 5px 0; font-size: ${type === 'kitchen'? '16px': '14px'};">
           <strong>${qty}x</strong> ${label}
           ${optLines.map((line) => `<br><span style="color: #666; padding-left: 15px; font-size: 12px;">+ ${line}</span>`).join('')}
-          ${(item as { notes?: unknown }).notes ? `<br><span style="color: #666; font-style: italic; padding-left: 15px; font-size: 12px;"> ${String((item as { notes?: unknown }).notes)}</span>` : ''}
+          ${(item as { notes?: unknown }).notes ? `<br><span style="color: #666; font-style: italic; padding-left: 15px; font-size: 12px;"> ${String((item as { notes?: unknown }).notes)}</span>`: ''}
         </td>
-        <td style="text-align: right; padding: 5px 0; font-size: ${type === 'kitchen' ? '16px' : '14px'}; vertical-align: top;">
+        <td style="text-align: right; padding: 5px 0; font-size: ${type === 'kitchen'? '16px': '14px'}; vertical-align: top;">
           €${lineTotal.toFixed(2)}
         </td>
       </tr>
@@ -547,24 +547,24 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
         <body>
           <div class="header">
             <div class="business-name">${business?.business_name || ''}</div>
-            ${business?.address ? `<div style="font-size: 11px;">${business.address}</div>` : ''}
-            ${business?.phone ? `<div style="font-size: 11px;">Tel: ${business.phone}</div>` : ''}
+            ${business?.address ? `<div style="font-size: 11px;">${business.address}</div>`: ''}
+            ${business?.phone ? `<div style="font-size: 11px;">Tel: ${business.phone}</div>`: ''}
           </div>
           
           <div class="divider"></div>
           
           <div class="order-number">#${order.order_number}</div>
           <div class="order-type">${nlBrowserPrintOrderTypeBanner(order.order_type)}</div>
-          ${nlDineInSeat ? `<div style="text-align:center;font-weight:bold;font-size:13px;margin:6px 0;">${nlDineInSeat}</div>` : ''}
+          ${nlDineInSeat ? `<div style="text-align:center;font-weight:bold;font-size:13px;margin:6px 0;">${nlDineInSeat}</div>`: ''}
           ${(order.scheduled_date || order.scheduled_time) ? `
           <div style="margin: 8px 0; padding: 6px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; text-align: center; font-weight: bold; font-size: 13px;">
-             ${order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''}${order.scheduled_time ? ' om ' + order.scheduled_time : ''}
-          </div>` : ''}
+             ${order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit', year: 'numeric'}) : ''}${order.scheduled_time ? 'om '+ order.scheduled_time : ''}
+          </div>`: ''}
           
           <div class="order-info">
             <strong>${order.customer_name}</strong><br>
-            ${order.customer_phone ? `Tel: ${order.customer_phone}<br>` : ''}
-            ${order.delivery_address ? `Adres: ${order.delivery_address}<br>` : ''}
+            ${order.customer_phone ? `Tel: ${order.customer_phone}<br>`: ''}
+            ${order.delivery_address ? `Adres: ${order.delivery_address}<br>`: ''}
             <span style="color: #666;">
               ${new Date(order.created_at).toLocaleString('nl-BE', { 
                 day: '2-digit', month: '2-digit', year: 'numeric',
@@ -582,9 +582,9 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
           <div class="divider"></div>
 
           <table>
-            ${order.subtotal ? `<tr><td>Subtotaal</td><td style="text-align: right;">€${order.subtotal.toFixed(2)}</td></tr>` : ''}
-            ${order.delivery_fee ? `<tr><td>Bezorgkosten</td><td style="text-align: right;">€${order.delivery_fee.toFixed(2)}</td></tr>` : ''}
-            ${order.discount_amount ? `<tr><td>Korting</td><td style="text-align: right;">-€${order.discount_amount.toFixed(2)}</td></tr>` : ''}
+            ${order.subtotal ? `<tr><td>Subtotaal</td><td style="text-align: right;">€${order.subtotal.toFixed(2)}</td></tr>`: ''}
+            ${order.delivery_fee ? `<tr><td>Bezorgkosten</td><td style="text-align: right;">€${order.delivery_fee.toFixed(2)}</td></tr>`: ''}
+            ${order.discount_amount ? `<tr><td>Korting</td><td style="text-align: right;">-€${order.discount_amount.toFixed(2)}</td></tr>`: ''}
             <tr class="total-row">
               <td style="padding-top: 5px;">TOTAAL</td>
               <td style="text-align: right; padding-top: 5px;">€${order.total?.toFixed(2)}</td>
@@ -594,8 +594,8 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
           <div class="divider"></div>
 
           <div style="text-align: center; margin: 10px 0;">
-            ${order.payment_status === 'paid' ? ' BETAALD' : '⏳ NOG TE BETALEN'}
-            ${order.payment_method ? ` (${order.payment_method})` : ''}
+            ${order.payment_status === 'paid'? 'BETAALD': 'NOG TE BETALEN'}
+            ${order.payment_method ? `(${order.payment_method})`: ''}
           </div>
 
           ${order.customer_notes ? `
@@ -603,7 +603,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
               <strong>Opmerkingen:</strong><br>
               ${order.customer_notes}
             </div>
-          ` : ''}
+          `: ''}
 
           <div class="footer">
             Bedankt voor uw bestelling!<br>
@@ -640,13 +640,13 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             <div style="font-size: 14px; font-weight: bold;">KEUKEN BON</div>
             <div class="order-number">#${order.order_number}</div>
             <div class="order-type">${nlBrowserPrintOrderTypeBanner(order.order_type)}</div>
-            ${nlDineInSeat ? `<div style="margin: 8px 0; padding: 6px; background: #ecfdf5; border: 1px solid #10b981; border-radius: 4px; text-align: center; font-weight: bold; font-size: 15px;">${nlDineInSeat}</div>` : ''}
+            ${nlDineInSeat ? `<div style="margin: 8px 0; padding: 6px; background: #ecfdf5; border: 1px solid #10b981; border-radius: 4px; text-align: center; font-weight: bold; font-size: 15px;">${nlDineInSeat}</div>`: ''}
             ${(order.scheduled_date || order.scheduled_time) ? `
             <div style="margin: 6px 0; padding: 5px; background: #000; color: #fff; font-size: 16px; font-weight: bold;">
-               ${order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit' }) : ''}${order.scheduled_time ? ' om ' + order.scheduled_time : ''}
-            </div>` : ''}
+               ${order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit'}) : ''}${order.scheduled_time ? 'om '+ order.scheduled_time : ''}
+            </div>`: ''}
             <div class="time">
-              ${new Date(order.created_at).toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' })}
+              ${new Date(order.created_at).toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit'})}
             </div>
             <div style="margin-top: 5px;"><strong>${order.customer_name}</strong></div>
           </div>
@@ -662,7 +662,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                   <strong style="font-size: 20px;">${qty}x</strong> 
                   <span style="font-size: 18px;">${label}</span>
                   ${optLines.map((line) => `<br><span style="padding-left: 20px;">+ ${line}</span>`).join('')}
-                  ${(item as { notes?: unknown }).notes ? `<br><span style="font-style: italic; padding-left: 20px;"> ${String((item as { notes?: unknown }).notes)}</span>` : ''}
+                  ${(item as { notes?: unknown }).notes ? `<br><span style="font-style: italic; padding-left: 20px;"> ${String((item as { notes?: unknown }).notes)}</span>`: ''}
                 </td>
               </tr>
             `
@@ -674,7 +674,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
               <strong> OPMERKINGEN:</strong><br>
               ${order.customer_notes}
             </div>
-          ` : ''}
+          `: ''}
 
           <div style="text-align: center; margin-top: 15px; font-size: 12px;">
             ${business?.business_name || ''} - ${new Date().toLocaleDateString('nl-BE')}
@@ -683,7 +683,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
       </html>
     `
 
-    printWindow.document.write(type === 'kitchen' ? kitchenBon : customerBon)
+    printWindow.document.write(type === 'kitchen'? kitchenBon : customerBon)
     printWindow.document.close()
     printWindow.focus()
     setTimeout(() => {
@@ -694,7 +694,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
   /** Probeer eerst de lokale Vysion Print Agent (ESC/POS bonprinter).
    *  Lukt niet (agent niet bereikbaar) → val terug op het browser-print venster. */
-  async function printOrder(order: Order, type: 'customer' | 'kitchen' = 'customer') {
+  async function printOrder(order: Order, type: 'customer' |  'kitchen'= 'customer') {
     const items = (order.items || []).map((it: unknown) => ({
       quantity: Number((it as { quantity?: unknown }).quantity) || 1,
       name: orderItemDisplayName(it) || 'Item',
@@ -704,7 +704,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     }))
 
     const requestedDateTime = (order as any).scheduled_date
-      ? `${new Date((order as any).scheduled_date).toLocaleDateString('nl-BE')}${(order as any).scheduled_time ? ' ' + (order as any).scheduled_time : ''}`
+      ? `${new Date((order as any).scheduled_date).toLocaleDateString('nl-BE')}${(order as any).scheduled_time ? ' '+ (order as any).scheduled_time : ''}`
       : ''
 
     const subtotal = items.reduce((s, it: any) => s + (Number(it.price) || 0), 0)
@@ -716,7 +716,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
       winkelnaam: business?.business_name || '',
       bonInhoud: '',
       copies: 1,
-      receiptMode: type === 'kitchen' ? 'keuken' : 'kassa',
+      receiptMode: type === 'kitchen'? 'keuken': 'kassa',
       orderData: {
         orderNumber: order.order_number,
         orderType: order.order_type,
@@ -945,7 +945,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             {/* Clock */}
             <div className="text-right">
               <p className="text-2xl font-mono font-bold">
-                {currentTime.toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' })}
+                {currentTime.toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit'})}
               </p>
             </div>
 
@@ -978,7 +978,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
               >
                 <LocaleFlagEmoji locale={locale} className="text-base text-white" />
                 <svg
-                  className={`size-3.5 shrink-0 transition-transform ${displayLangOpen ? 'rotate-180' : ''}`}
+                  className={`size-3.5 shrink-0 transition-transform ${displayLangOpen ? 'rotate-180': ''}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -997,7 +997,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                         setDisplayLangOpen(false)
                       }}
                       className={`flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm transition-colors hover:bg-white/10 ${
-                        locale === lang ? 'bg-white/15 font-semibold text-white' : 'text-gray-100'
+                        locale === lang ? 'bg-white/15 font-semibold text-white': 'text-gray-100'
                       }`}
                     >
                       <LocaleFlagEmoji locale={lang} />
@@ -1043,7 +1043,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
       {/* Orders Grid — flex-1 + min-h-0: correcte scroll op iPad Safari / PWA (was 100vh) */}
       <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-4">
-        {activeTab === 'active' ? (
+        {activeTab === 'active'? (
           sortedActiveOrders.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-gray-500">
               <span className="text-8xl mb-6"></span>
@@ -1094,7 +1094,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                       <div className="text-sm font-bold text-gray-900">{tx('onlineOrder')}</div>
                       <div className="text-xs text-gray-700 mt-0.5 leading-snug">
                         {orderTypeLabel(order.order_type)}
-                        {schedLine ? ` · ${schedLine}` : ''}
+                        {schedLine ? `· ${schedLine}`: ''}
                       </div>
                     </div>
                   )}
@@ -1103,7 +1103,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                   <div className="p-3 bg-white text-gray-900">
                     {!hideInnerScheduleBox && (order.scheduled_date || order.scheduled_time) && (
                       <div className="mb-2 px-2 py-1.5 bg-gray-100 border border-gray-200 rounded text-gray-800 font-medium text-sm text-center">
-                         {order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit' }) : ''}{order.scheduled_time ? ` om ${order.scheduled_time}` : ''}
+                         {order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit'}) : ''}{order.scheduled_time ? `om ${order.scheduled_time}`: ''}
                       </div>
                     )}
                     <div className="flex items-center justify-between mb-2">
@@ -1123,7 +1123,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                         </span>
                       )}
                       <span className="px-2 py-0.5 rounded-md text-xs font-medium text-gray-700 bg-gray-100 border border-gray-200">
-                        {order.payment_status === 'paid' ? tx('paid') : tx('notPaid')}
+                        {order.payment_status === 'paid'? tx('paid') : tx('notPaid')}
                       </span>
                     </div>
 
@@ -1164,7 +1164,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                 <div className="bg-[#0f2744] text-white px-3 py-2.5 flex items-center justify-between border-b border-black/20">
                   <span className="font-bold tabular-nums">#{order.order_number}</span>
                   <span className="text-xs font-semibold uppercase tracking-wide text-white bg-white/15 px-2 py-1 rounded-md border border-white/25">
-                    {order.status === 'completed' ? tx('statusCompleted') : tx('statusRejected')}
+                    {order.status === 'completed'? tx('statusCompleted') : tx('statusRejected')}
                   </span>
                 </div>
                 <div className="p-3">
@@ -1203,13 +1203,13 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                     {isWebshopOrder(selectedOrder) ? (
                       <p className="text-sm text-white/90 mt-2 font-semibold leading-snug normal-case">
                         {tx('onlineOrder')} · {orderTypeLabel(selectedOrder.order_type)}
-                        {selectedScheduleDetail ? ` · ${selectedScheduleDetail}` : ''}
+                        {selectedScheduleDetail ? `· ${selectedScheduleDetail}`: ''}
                       </p>
                     ) : (
                       <>
                         <p className="text-sm text-white/90 mt-2 font-semibold leading-snug normal-case">
                           {orderTypeLabel(selectedOrder.order_type)}
-                          {selectedScheduleDetail ? ` · ${selectedScheduleDetail}` : ''}
+                          {selectedScheduleDetail ? `· ${selectedScheduleDetail}`: ''}
                         </p>
                         {(() => {
                           const seat = adminDineInSeatAuditLine(selectedOrder, t)
@@ -1274,7 +1274,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                   </div>
                   <div className="flex-1 rounded-lg p-3 text-center border border-gray-200 bg-white">
                     <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{tx('paymentHeading')}</p>
-                    <p className="font-semibold text-gray-900 mt-1">{selectedOrder.payment_status === 'paid' ? tx('paid') : tx('notPaid')}</p>
+                    <p className="font-semibold text-gray-900 mt-1">{selectedOrder.payment_status === 'paid'? tx('paid') : tx('notPaid')}</p>
                   </div>
                 </div>
 
@@ -1290,7 +1290,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                       const optLines = orderItemDisplayOptionLines(item)
                       const noteRaw = (item as { notes?: unknown }).notes
                       const noteStr =
-                        noteRaw != null && String(noteRaw).trim() !== '' ? String(noteRaw) : ''
+                        noteRaw != null && String(noteRaw).trim() !== ''? String(noteRaw) : ''
                       return (
                       <div key={i} className="flex items-start justify-between py-2 border-b border-gray-100 last:border-0 gap-3">
                         <div className="flex items-start gap-3 min-w-0">
@@ -1563,14 +1563,14 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                               <div>
                                 <h3 className="font-bold text-lg">{reservation.customer_name}</h3>
                                 <p className="text-gray-400 text-sm">
-                                  {reservation.party_size} {reservation.party_size === 1 ? 'persoon' : 'personen'}
+                                  {reservation.party_size} {reservation.party_size === 1 ? 'persoon': 'personen'}
                                 </p>
                               </div>
                             </div>
                             <div className="grid grid-cols-2 gap-2 text-sm">
                               <div className="flex items-center gap-2">
                                 <span></span>
-                                <span>{new Date(reservation.reservation_date).toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short' })}</span>
+                                <span>{new Date(reservation.reservation_date).toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short'})}</span>
                               </div>
                               <div className="flex items-center gap-2">
                                 <span></span>

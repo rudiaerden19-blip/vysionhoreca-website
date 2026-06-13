@@ -136,7 +136,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed top-0 left-0 z-50 h-full w-64 bg-dark transform transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <aside className={`fixed top-0 left-0 z-50 h-full w-64 bg-dark transform transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0': '-translate-x-full'}`}>
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="p-6 border-b border-gray-700">
@@ -235,7 +235,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   className="flex items-center gap-2 px-3 py-2 bg-[#0f0f0f] rounded-lg text-gray-300 hover:text-white transition-colors"
                 >
                   <LocaleFlagWithCode locale={locale} codeClassName="text-gray-200" />
-                  <svg className={`w-4 h-4 transition-transform ${langDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className={`w-4 h-4 transition-transform ${langDropdownOpen ? 'rotate-180': ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>

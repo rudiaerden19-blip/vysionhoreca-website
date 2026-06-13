@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
 
     if (!giftCardId || !tenantSlug) {
       return NextResponse.json(
-        { error: 'Gift card ID en tenant zijn verplicht' },
+        { error: 'Gift card ID en tenant zijn verplicht'},
         { status: 400 }
       )
     }
@@ -23,12 +23,12 @@ export async function GET(request: NextRequest) {
     const supabase = getServerSupabaseClient()
     if (!supabase) {
       return NextResponse.json(
-        { error: 'Database niet geconfigureerd' },
+        { error: 'Database niet geconfigureerd'},
         { status: 503 }
       )
     }
 
-    // Fetch gift card - ONLY return code if status is 'paid' or 'active'
+    // Fetch gift card - ONLY return code if status is 'paid'or 'active'
     const { data: giftCard, error } = await supabase
       .from('gift_cards')
       .select('id, code, amount, status, recipient_name, recipient_email, sender_name, occasion, personal_message')
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
 
     if (error || !giftCard) {
       return NextResponse.json(
-        { error: 'Cadeaubon niet gevonden' },
+        { error: 'Cadeaubon niet gevonden'},
         { status: 404 }
       )
     }
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
     // SECURITY: Only return the code if payment is confirmed
     if (giftCard.status !== 'paid' && giftCard.status !== 'active') {
       return NextResponse.json(
-        { error: 'Betaling nog niet bevestigd' },
+        { error: 'Betaling nog niet bevestigd'},
         { status: 402 } // Payment Required
       )
     }
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Get gift card code error:', error)
     return NextResponse.json(
-      { error: 'Er ging iets mis' },
+      { error: 'Er ging iets mis'},
       { status: 500 }
     )
   }

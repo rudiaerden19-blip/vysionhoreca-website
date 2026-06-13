@@ -34,11 +34,11 @@ export async function POST(request: NextRequest) {
     tenantSlugLog = tenantSlug
 
     if (!orderId || !tenantSlug) {
-      return NextResponse.json({ error: 'orderId en tenantSlug zijn verplicht' }, { status: 400 })
+      return NextResponse.json({ error: 'orderId en tenantSlug zijn verplicht'}, { status: 400 })
     }
 
     const supabase = getServerSupabaseClient()
-    if (!supabase) return NextResponse.json({ error: 'DB niet beschikbaar' }, { status: 500 })
+    if (!supabase) return NextResponse.json({ error: 'DB niet beschikbaar'}, { status: 500 })
 
     // Haal Stripe keys op van de tenant (server-side only)
     const { data: settings } = await supabase
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (!settings?.stripe_secret_key) {
-      return NextResponse.json({ error: 'Stripe niet geconfigureerd voor deze tenant' }, { status: 400 })
+      return NextResponse.json({ error: 'Stripe niet geconfigureerd voor deze tenant'}, { status: 400 })
     }
 
     // Haal order op (incl. cache-velden voor dedupe)
@@ -63,13 +63,13 @@ export async function POST(request: NextRequest) {
     const order = orderRaw as OrderRow | null
 
     if (!order) {
-      return NextResponse.json({ error: 'Bestelling niet gevonden' }, { status: 404 })
+      return NextResponse.json({ error: 'Bestelling niet gevonden'}, { status: 404 })
     }
 
     // ── Al betaald? Stuur de klant niet nog eens naar Stripe. ─────────────
     if (String(order.payment_status || '').toLowerCase() === 'paid') {
       logger.info('Stripe checkout geweigerd: order al betaald', { requestId, orderId, tenantSlug })
-      return NextResponse.json({ error: 'Bestelling is al betaald.' }, { status: 409 })
+      return NextResponse.json({ error: 'Bestelling is al betaald.'}, { status: 409 })
     }
 
     const stripe = new Stripe(settings.stripe_secret_key)
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
     // Dit dekt: dubbele klikken, browser-back, F5 op de checkout, of de
     // klant die via de cancel-URL terugkomt op de webshop. We doen één
     // Stripe-API-call (sessions.retrieve) om zeker te weten dat de sessie
-    // nog 'open' is — anders maken we een nieuwe.
+    // nog 'open'is — anders maken we een nieuwe.
     if (order.stripe_session_id && order.stripe_session_url && order.stripe_session_created_at) {
       const ageMs = Date.now() - new Date(order.stripe_session_created_at).getTime()
       if (ageMs >= 0 && ageMs < SESSION_REUSE_MAX_AGE_MS) {
@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
       : [{
           price_data: {
             currency: 'eur',
-            product_data: { name: 'Bestelling' },
+            product_data: { name: 'Bestelling'},
             unit_amount: Math.round(orderTotal * 100),
           },
           quantity: 1,
@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
       lineItems.push({
         price_data: {
           currency: 'eur',
-          product_data: { name: 'Bezorgkosten' },
+          product_data: { name: 'Bezorgkosten'},
           unit_amount: Math.round(order.delivery_fee * 100),
         },
         quantity: 1,

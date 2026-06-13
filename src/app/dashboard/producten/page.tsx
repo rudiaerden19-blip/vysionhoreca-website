@@ -63,7 +63,7 @@ export default function ProductenPage() {
   }
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('nl-BE', { style: 'currency', currency: 'EUR' }).format(amount || 0)
+    return new Intl.NumberFormat('nl-BE', { style: 'currency', currency: 'EUR'}).format(amount || 0)
   }
 
   const getCategoryName = (categoryId: string) => {

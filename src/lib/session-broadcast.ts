@@ -9,18 +9,18 @@ export const TENANT_OWNER_LOGOUT_CHANNEL = 'vysion-tenant-owner-logout-v1'
 
 const TERMINAL_LOGOUT_KEY = 'vysion_terminal_logout_v3'
 
-export type OwnerLogoutLanding = 'tenant-login' | 'superadmin-login'
+export type OwnerLogoutLanding = 'tenant-login' |  'superadmin-login'
 
 export type OwnerLogoutMessage = {
   type: 'owner-logout'
-  scope: 'owner' | 'full'
+  scope: 'owner' |  'full'
   tenantSlug: string
   landing: OwnerLogoutLanding
   ts: number
 }
 
 /** Na uitloggen (alleen zaak/superadmin): volgende URL’s dwingen naar inlog tot opnieuw sessie. Klant-uitlog: geen stempel — elk tabblad probeert zich te sluiten (browser beperkt dit). */
-export type TerminalLogoutStamp = { kind: 'staff'; tenantSlug: string } | { kind: 'superadmin' }
+export type TerminalLogoutStamp = { kind: 'staff'; tenantSlug: string } | { kind: 'superadmin'}
 
 export function setTerminalLogout(stamp: TerminalLogoutStamp): void {
   if (typeof window === 'undefined') return
@@ -47,7 +47,7 @@ export function readTerminalLogout(): TerminalLogoutStamp | null {
     if (!raw) return null
     const o = JSON.parse(raw) as { kind?: string; tenantSlug?: string }
     const kind = o?.kind
-    if (kind === 'superadmin') return { kind: 'superadmin' }
+    if (kind === 'superadmin') return { kind: 'superadmin'}
     if (kind === 'staff' && typeof o.tenantSlug === 'string' && o.tenantSlug.trim()) {
       return { kind: 'staff', tenantSlug: o.tenantSlug }
     }
@@ -82,7 +82,7 @@ export function clearShopCustomerSessionLocal(): void {
 }
 
 /**
- * `window.close()` mag alleen bij door script geopende vensters; veel tabbladen/PWA’s weigeren dit.
+ * `window.close()`mag alleen bij door script geopende vensters; veel tabbladen/PWA’s weigeren dit.
  * Wordt op elke klant-uitlog-broadcast aangeroepen zodat elk open tabblad zichzelf sluit **als** de browser het toelaat.
  */
 export function attemptCloseCurrentWebview(): void {
@@ -95,7 +95,7 @@ export function attemptCloseCurrentWebview(): void {
 }
 
 /**
- * Eerst venster sluiten (kiosk, popup, sommige PWA’s); blijft de tab open, dan pas `fallback` na korte delay.
+ * Eerst venster sluiten (kiosk, popup, sommige PWA’s); blijft de tab open, dan pas `fallback`na korte delay.
  * Zo zie je minder vaak het login-scherm bij “software afsluiten” dan bij directe `location.replace`.
  */
 export function attemptCloseThenOrNavigate(fallback: () => void, delayMs = 420): void {
@@ -118,7 +118,7 @@ export function broadcastShopCustomerLogout(tenantSlug: string): void {
 
 /**
  * Klant uitloggen: sessie wissen; alle open tabbladen (zelfde origin) proberen zich te sluiten.
- * Browsers/PWA’s mogen `close()` weigeren voor handmatig geopende tabbladen — dat is een platformlimiet.
+ * Browsers/PWA’s mogen `close()`weigeren voor handmatig geopende tabbladen — dat is een platformlimiet.
  */
 export function redirectCustomerLogoutUI(tenantSlug: string): void {
   if (typeof window === 'undefined') return
@@ -163,7 +163,7 @@ export function applyOwnerOnlyLogoutCleanup(tenantSlug: string): void {
 }
 
 export function broadcastTenantOwnerLogout(args: {
-  scope: 'owner' | 'full'
+  scope: 'owner' |  'full'
   tenantSlug: string
   landing: OwnerLogoutLanding
 }): void {

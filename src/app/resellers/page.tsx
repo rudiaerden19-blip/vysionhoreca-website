@@ -10,16 +10,16 @@ import type { Locale } from '@/i18n/config'
 const COUNTRY_CODES = ['BE', 'NL', 'FR', 'DE', 'ES', 'IT', 'AT', 'CH', 'LU', 'PT'] as const
 
 const FLAGS: Record<string, string> = {
-  BE: '🇧🇪',
-  NL: '🇳🇱',
-  FR: '🇫🇷',
-  DE: '🇩🇪',
-  ES: '🇪🇸',
-  IT: '🇮🇹',
-  AT: '🇦🇹',
-  CH: '🇨🇭',
-  LU: '🇱🇺',
-  PT: '🇵🇹',
+  BE: '',
+  NL: '',
+  FR: '',
+  DE: '',
+  ES: '',
+  IT: '',
+  AT: '',
+  CH: '',
+  LU: '',
+  PT: '',
 }
 
 function regionDisplayLocale(locale: Locale): string {
@@ -38,9 +38,9 @@ export default function ResellersPage() {
     const intlLocale = regionDisplayLocale(locale)
     let names: Intl.DisplayNames
     try {
-      names = new Intl.DisplayNames([intlLocale], { type: 'region' })
+      names = new Intl.DisplayNames([intlLocale], { type: 'region'})
     } catch {
-      names = new Intl.DisplayNames(['en'], { type: 'region' })
+      names = new Intl.DisplayNames(['en'], { type: 'region'})
     }
     return COUNTRY_CODES.map((code) => ({
       code,
@@ -72,7 +72,7 @@ export default function ResellersPage() {
     try {
       const response = await fetch('/api/partner-application', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json'},
         body: JSON.stringify(formData),
       })
 
@@ -89,12 +89,12 @@ export default function ResellersPage() {
   }
 
   const benefits = [
-    { icon: '', titleKey: 'benefit1Title', descKey: 'benefit1Desc' },
-    { icon: '', titleKey: 'benefit2Title', descKey: 'benefit2Desc' },
-    { icon: '', titleKey: 'benefit3Title', descKey: 'benefit3Desc' },
-    { icon: '', titleKey: 'benefit4Title', descKey: 'benefit4Desc' },
-    { icon: '', titleKey: 'benefit5Title', descKey: 'benefit5Desc' },
-    { icon: '', titleKey: 'benefit6Title', descKey: 'benefit6Desc' },
+    { icon: '', titleKey: 'benefit1Title', descKey: 'benefit1Desc'},
+    { icon: '', titleKey: 'benefit2Title', descKey: 'benefit2Desc'},
+    { icon: '', titleKey: 'benefit3Title', descKey: 'benefit3Desc'},
+    { icon: '', titleKey: 'benefit4Title', descKey: 'benefit4Desc'},
+    { icon: '', titleKey: 'benefit5Title', descKey: 'benefit5Desc'},
+    { icon: '', titleKey: 'benefit6Title', descKey: 'benefit6Desc'},
   ]
 
   const faqs = [
@@ -116,7 +116,7 @@ export default function ResellersPage() {
       <section className="relative pt-32 pb-24 px-4 overflow-hidden min-h-[420px] md:min-h-[480px] flex items-center">
         <div
           className="absolute inset-0 bg-cover bg-[center_30%] md:bg-center"
-          style={{ backgroundImage: 'url(/images/resellers-hero-bg.png)' }}
+          style={{ backgroundImage: 'url(/images/resellers-hero-bg.png)'}}
           aria-hidden
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/45 to-black/55" aria-hidden />
@@ -361,7 +361,7 @@ export default function ResellersPage() {
                   <span className="flex items-center justify-center gap-2">
                     <motion.span
                       animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                      transition={{ duration: 1, repeat: Infinity, ease: 'linear'}}
                       className="w-5 h-5 border-2 border-white border-t-transparent rounded-full inline-block"
                     />
                     {t('resellersPage.submitting')}
@@ -388,7 +388,7 @@ export default function ResellersPage() {
               >
                 <summary className="px-6 py-4 cursor-pointer text-gray-900 font-medium flex items-center justify-between">
                   {faq.q}
-                  <span className="text-accent group-open:rotate-180 transition-transform">▼</span>
+                  <span className="text-accent group-open:rotate-180 transition-transform text-sm font-bold">+</span>
                 </summary>
                 <div className="px-6 pb-4 text-gray-600">{faq.a}</div>
               </details>
@@ -401,7 +401,7 @@ export default function ResellersPage() {
       <section className="relative py-20 px-4 overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: 'url(/images/resellers-cta-bg.png)' }}
+          style={{ backgroundImage: 'url(/images/resellers-cta-bg.png)'}}
           aria-hidden
         />
         <div className="absolute inset-0 bg-black/50" aria-hidden />

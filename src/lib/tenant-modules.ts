@@ -93,7 +93,7 @@ export function parseEnabledModulesJson(raw: unknown): Record<string, boolean> |
   return Object.keys(out).length ? out : null
 }
 
-/** Niet-leeg opgeslagen JSON in `tenants.enabled_modules` (superadmin of klant na trial). */
+/** Niet-leeg opgeslagen JSON in `tenants.enabled_modules`(superadmin of klant na trial). */
 export function hasExplicitEnabledModules(json: Record<string, boolean> | null): boolean {
   return json != null && Object.keys(json).length > 0
 }
@@ -119,7 +119,7 @@ export function getResolvedStarterOnlyAccess(): Record<TenantModuleId, boolean> 
 }
 
 /**
- * Voor superadmin: DB-json. Zonder JSON en `postTrialModulesConfirmed === false` → starter (niet alles aan).
+ * Voor superadmin: DB-json. Zonder JSON en `postTrialModulesConfirmed === false`→ starter (niet alles aan).
  */
 export function mergeEnabledModulesFromDb(
   raw: unknown,
@@ -145,7 +145,7 @@ export function mergeEnabledModulesFromDb(
 /**
  * Effective module access for UI and guards.
  * - Platform admin tenants: always all on.
- * - Active trial: standaard alles aan; mét expliciete `enabled_modules` (superadmin) worden alle keys
+ * - Active trial: standaard alles aan; mét expliciete `enabled_modules`(superadmin) worden alle keys
  *   (inclusief kassa / instellingen / account) exact gevolgd.
  * - Pro plan: idem.
  * - Anders: expliciete JSON indien gezet (geen geforceerde “altijd aan”-modules); anders bij
@@ -222,7 +222,7 @@ export function customerNeedsPostTrialModulePicker(
 }
 
 export type AdminModuleGateResult =
-  | { kind: 'always' }
+  | { kind: 'always'}
   | { kind: 'module'; module: TenantModuleId }
 
 /** Submenu-id's voor het echte kassascherm (niet pincode-instellingen). */
@@ -252,14 +252,14 @@ export function isTenantSubmenuEffectiveOn(
   return false
 }
 
-/** Schuif `kassa` in Modules (zelfde vlak als pincode/producten …). */
+/** Schuif `kassa`in Modules (zelfde vlak als pincode/producten …). */
 export function isHorecaKassaPosScreenEnabled(
   moduleAccess: Record<TenantModuleId, boolean>
 ): boolean {
   return !!moduleAccess.kassa
 }
 
-/** Schuif `retail-kassa` of submenu «Verkoop (barcode)» — elk apart. */
+/** Schuif `retail-kassa`of submenu «Verkoop (barcode)» — elk apart. */
 export function isRetailKassaPosScreenEnabled(
   moduleAccess: Record<TenantModuleId, boolean>,
   enabledJson: Record<string, boolean> | null
@@ -289,20 +289,20 @@ export function normalizeShopAdminPathname(pathname: string, tenantSlug: string)
   const base = `/shop/${tenantSlug}/admin`
   if (pathname.startsWith(base)) return pathname
   if (pathname === '/admin' || pathname.startsWith('/admin/')) {
-    const suffix = pathname === '/admin' ? '' : pathname.slice('/admin'.length)
+    const suffix = pathname === '/admin'? '' : pathname.slice('/admin'.length)
     return `${base}${suffix}`
   }
   return pathname
 }
 
-/** Verkoopscherm `/shop/:slug/admin/kassa` — geen onderdeel van hamburger-submenu-toggles (die gelden voor beheerlijst onder /pincode/producten …). */
+/** Verkoopscherm `/shop/:slug/admin/kassa`— geen onderdeel van hamburger-submenu-toggles (die gelden voor beheerlijst onder /pincode/producten …). */
 export function isShopAdminKassaPosPath(pathnameNormalized: string, tenantSlug: string): boolean {
   const base = `/shop/${tenantSlug}/admin/kassa`
   const p = pathnameNormalized.split('?')[0].replace(/\/+$/, '')
   return p === base
 }
 
-/** Winkelkassa `/shop/:slug/admin/retail-kassa` — zelfde vrije toegang als horeca-POS (geen submenu-redirect). */
+/** Winkelkassa `/shop/:slug/admin/retail-kassa`— zelfde vrije toegang als horeca-POS (geen submenu-redirect). */
 export function isShopAdminRetailKassaPosPath(pathnameNormalized: string, tenantSlug: string): boolean {
   const base = `/shop/${tenantSlug}/admin/retail-kassa`
   const p = pathnameNormalized.split('?')[0].replace(/\/+$/, '')
@@ -346,16 +346,16 @@ export function getFirstAccessibleAdminPath(
   if (posHref) return posHref
 
   const candidates: { m: TenantModuleId; path: string }[] = [
-    { m: 'voorraad', path: '/voorraad' },
-    { m: 'online-bestellingen', path: '/bestellingen' },
-    { m: 'reservaties', path: '/reserveringen' },
-    { m: 'instellingen', path: '/betaling' },
-    { m: 'online', path: '/online-status' },
-    { m: 'personeel', path: '/personeel' },
-    { m: 'kosten', path: '/kosten' },
-    { m: 'rapporten', path: '/rapporten' },
-    { m: 'website', path: '/design' },
-    { m: 'account', path: '/abonnement' },
+    { m: 'voorraad', path: '/voorraad'},
+    { m: 'online-bestellingen', path: '/bestellingen'},
+    { m: 'reservaties', path: '/reserveringen'},
+    { m: 'instellingen', path: '/betaling'},
+    { m: 'online', path: '/online-status'},
+    { m: 'personeel', path: '/personeel'},
+    { m: 'kosten', path: '/kosten'},
+    { m: 'rapporten', path: '/rapporten'},
+    { m: 'website', path: '/design'},
+    { m: 'account', path: '/abonnement'},
   ]
   for (const { m, path } of candidates) {
     if (access[m]) return `${base}${path}`
@@ -426,21 +426,21 @@ export function submenuParentAllowedForSubmenuId(
 export function adminPathToModule(pathname: string, tenantSlug: string): AdminModuleGateResult {
   const base = `/shop/${tenantSlug}/admin`
   if (!pathname.startsWith(base)) {
-    return { kind: 'always' }
+    return { kind: 'always'}
   }
   const rest = pathname.slice(base.length).replace(/\/$/, '') || '/'
 
-  if (rest === '/' || rest === '') return { kind: 'always' }
-  if (rest.startsWith('/welkom')) return { kind: 'always' }
+  if (rest === '/' || rest === '') return { kind: 'always'}
+  if (rest.startsWith('/welkom')) return { kind: 'always'}
   if (rest.startsWith('/retail-kassa') || rest.startsWith('/retail-loyalty')) {
-    return { kind: 'module', module: 'retail-kassa' }
+    return { kind: 'module', module: 'retail-kassa'}
   }
-  if (rest.startsWith('/kassa-terminal')) return { kind: 'module', module: 'kassa' }
-  if (rest.startsWith('/kassa')) return { kind: 'module', module: 'kassa' }
-  if (rest.startsWith('/voorraad')) return { kind: 'module', module: 'voorraad' }
-  if (rest.startsWith('/pincode')) return { kind: 'always' }
-  if (rest.startsWith('/abonnement')) return { kind: 'always' }
-  if (rest.startsWith('/modules')) return { kind: 'always' }
+  if (rest.startsWith('/kassa-terminal')) return { kind: 'module', module: 'kassa'}
+  if (rest.startsWith('/kassa')) return { kind: 'module', module: 'kassa'}
+  if (rest.startsWith('/voorraad')) return { kind: 'module', module: 'voorraad'}
+  if (rest.startsWith('/pincode')) return { kind: 'always'}
+  if (rest.startsWith('/abonnement')) return { kind: 'always'}
+  if (rest.startsWith('/modules')) return { kind: 'always'}
 
   if (
     rest.startsWith('/categorieen') ||
@@ -449,13 +449,13 @@ export function adminPathToModule(pathname: string, tenantSlug: string): AdminMo
     rest.startsWith('/allergenen') ||
     rest.startsWith('/labels')
   ) {
-    return { kind: 'module', module: 'kassa' }
+    return { kind: 'module', module: 'kassa'}
   }
   if (rest.startsWith('/bestellingen') || rest.startsWith('/groepen')) {
-    return { kind: 'module', module: 'online-bestellingen' }
+    return { kind: 'module', module: 'online-bestellingen'}
   }
   if (rest.startsWith('/betaling')) {
-    return { kind: 'module', module: 'instellingen' }
+    return { kind: 'module', module: 'instellingen'}
   }
   if (
     rest.startsWith('/online-status') ||
@@ -463,10 +463,10 @@ export function adminPathToModule(pathname: string, tenantSlug: string): AdminMo
     rest.startsWith('/promoties') ||
     rest.startsWith('/whatsapp')
   ) {
-    return { kind: 'module', module: 'online' }
+    return { kind: 'module', module: 'online'}
   }
   if (rest.startsWith('/reserveringen')) {
-    return { kind: 'module', module: 'reservaties' }
+    return { kind: 'module', module: 'reservaties'}
   }
   if (
     rest.startsWith('/personeel') ||
@@ -474,10 +474,10 @@ export function adminPathToModule(pathname: string, tenantSlug: string): AdminMo
     rest.startsWith('/vacatures') ||
     rest.startsWith('/inklokken')
   ) {
-    return { kind: 'module', module: 'personeel' }
+    return { kind: 'module', module: 'personeel'}
   }
   if (rest.startsWith('/kosten')) {
-    return { kind: 'module', module: 'kosten' }
+    return { kind: 'module', module: 'kosten'}
   }
   if (
     rest.startsWith('/rapporten') ||
@@ -486,7 +486,7 @@ export function adminPathToModule(pathname: string, tenantSlug: string): AdminMo
     rest.startsWith('/populair') ||
     rest.startsWith('/verkoop')
   ) {
-    return { kind: 'module', module: 'rapporten' }
+    return { kind: 'module', module: 'rapporten'}
   }
   if (
     rest.startsWith('/profiel') ||
@@ -502,8 +502,8 @@ export function adminPathToModule(pathname: string, tenantSlug: string): AdminMo
     rest.startsWith('/media') ||
     rest.startsWith('/team')
   ) {
-    return { kind: 'module', module: 'website' }
+    return { kind: 'module', module: 'website'}
   }
 
-  return { kind: 'always' }
+  return { kind: 'always'}
 }

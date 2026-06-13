@@ -22,7 +22,7 @@ async function loadTenantContextForReceiptEmail(
       contact: { businessName: string; replyToEmail: string | null; phone: string | null }
       smtp: TenantSmtpConfig
     }
-  | { ok: false; error: 'smtp_not_configured' }
+  | { ok: false; error: 'smtp_not_configured'}
 > {
   const { data } = await supabase
     .from('tenant_settings')
@@ -34,7 +34,7 @@ async function loadTenantContextForReceiptEmail(
 
   if (!data) {
     const hasZoho = !!(process.env.ZOHO_EMAIL && process.env.ZOHO_PASSWORD)
-    if (!hasZoho) return { ok: false, error: 'smtp_not_configured' }
+    if (!hasZoho) return { ok: false, error: 'smtp_not_configured'}
     return {
       ok: true,
       tenantInfo: null,
@@ -70,7 +70,7 @@ async function loadTenantContextForReceiptEmail(
     smtpPass = row.smtp_password
     fromName = row.smtp_from_name || row.business_name || fromName
   } else if (!process.env.ZOHO_EMAIL || !process.env.ZOHO_PASSWORD) {
-    return { ok: false, error: 'smtp_not_configured' }
+    return { ok: false, error: 'smtp_not_configured'}
   }
 
   const contact = {
@@ -127,10 +127,10 @@ export async function sendRetailKassaReceiptEmail(opts: {
   order: KassaLastOrderReceipt
 }): Promise<{ ok: boolean; error?: string }> {
   const email = opts.toEmail.trim().toLowerCase()
-  if (!email.includes('@')) return { ok: false, error: 'invalid_email' }
+  if (!email.includes('@')) return { ok: false, error: 'invalid_email'}
 
   const supabase = getServerSupabaseClient()
-  if (!supabase) return { ok: false, error: 'db_unavailable' }
+  if (!supabase) return { ok: false, error: 'db_unavailable'}
 
   const ctx = await loadTenantContextForReceiptEmail(supabase, opts.tenantSlug)
   if (!ctx.ok) return { ok: false, error: ctx.error }
@@ -211,6 +211,6 @@ export async function sendRetailKassaReceiptEmail(opts: {
       toEmail: email,
       error: err instanceof Error ? err.message : String(err),
     })
-    return { ok: false, error: 'send_failed' }
+    return { ok: false, error: 'send_failed'}
   }
 }

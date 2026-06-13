@@ -8,12 +8,12 @@ import {
   withoutPostTrialModulesConfirmed,
 } from '@/lib/supabase-post-trial-column'
 
-/** Superadmin of ingelogde zaak mag `enabled_modules` (+ submenu-keys) opslaan. */
+/** Superadmin of ingelogde zaak mag `enabled_modules`(+ submenu-keys) opslaan. */
 export async function POST(request: NextRequest) {
   try {
     const supabase = getServerSupabaseClient()
     if (!supabase) {
-      return NextResponse.json({ error: 'Server niet geconfigureerd' }, { status: 503 })
+      return NextResponse.json({ error: 'Server niet geconfigureerd'}, { status: 503 })
     }
 
     const body = await request.json()
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     const enabled_modules = body?.enabled_modules as Record<string, boolean> | undefined
 
     if (!tenantSlug || !enabled_modules || typeof enabled_modules !== 'object') {
-      return NextResponse.json({ error: 'tenantSlug en enabled_modules verplicht' }, { status: 400 })
+      return NextResponse.json({ error: 'tenantSlug en enabled_modules verplicht'}, { status: 400 })
     }
 
     const superAccess = await verifySuperAdminAccess(request)
@@ -31,14 +31,14 @@ export async function POST(request: NextRequest) {
       authorized = tenantAccess.authorized
     }
     if (!authorized) {
-      return NextResponse.json({ error: 'Geen toegang' }, { status: 403 })
+      return NextResponse.json({ error: 'Geen toegang'}, { status: 403 })
     }
 
     const validSubs = new Set(collectAllSubmenuIds())
     const merged: Record<string, boolean> = {}
 
     for (const id of TENANT_MODULE_IDS) {
-      merged[id] = id === 'account' ? true : !!enabled_modules[id]
+      merged[id] = id === 'account'? true : !!enabled_modules[id]
     }
     for (const subId of validSubs) {
       merged[subId] = !!enabled_modules[subId]
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true })
   } catch (e) {
     return NextResponse.json(
-      { error: e instanceof Error ? e.message : 'Onbekende fout' },
+      { error: e instanceof Error ? e.message : 'Onbekende fout'},
       { status: 500 }
     )
   }

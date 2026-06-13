@@ -143,10 +143,10 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
         onClick={handleSave}
         disabled={saving}
         className={`fixed bottom-6 right-6 z-50 px-6 py-4 rounded-2xl font-medium shadow-2xl flex items-center gap-2 ${
-          saved ? 'bg-green-500 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'
+          saved ? 'bg-green-500 text-white': 'bg-blue-600 hover:bg-blue-700 text-white'
         }`}
       >
-        {saving ? '⏳' : saved ? '' : ''} {saved ? t('adminPages.common.saved') : t('adminPages.common.save')}
+        {saving ? '' : saved ? '' : ''} {saved ? t('adminPages.common.saved') : t('adminPages.common.save')}
       </motion.button>
 
       {/* Header */}
@@ -184,9 +184,9 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
               </div>
               <button
                 type="button"
-                className={`relative w-12 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ${methods[method.id] ? 'bg-blue-600' : 'bg-gray-300'}`}
+                className={`relative w-12 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ${methods[method.id] ? 'bg-blue-600': 'bg-gray-300'}`}
               >
-                <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${methods[method.id] ? 'translate-x-6' : 'translate-x-0'}`} />
+                <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${methods[method.id] ? 'translate-x-6': 'translate-x-0'}`} />
               </button>
             </div>
           ))}
@@ -238,10 +238,10 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
             <span className="text-2xl"></span>
             <div className="text-left">
               <p className="font-semibold text-gray-900">Stripe — Online betalingen</p>
-              <p className="text-sm text-gray-500">{stripeSecretKey ? ' Geconfigureerd' : 'Voer je Stripe keys in om online betalingen te activeren'}</p>
+              <p className="text-sm text-gray-500">{stripeSecretKey ? 'Geconfigureerd': 'Voer je Stripe keys in om online betalingen te activeren'}</p>
             </div>
           </div>
-          <span className="text-gray-400">{showStripeKeys ? '▲' : '▼'}</span>
+          <span className="text-gray-400">{showStripeKeys ? '−' : '+'}</span>
         </button>
 
         {showStripeKeys && (
@@ -287,9 +287,9 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
             <button
               onClick={handleSaveStripe}
               disabled={savingStripe}
-              className={`w-full py-3 rounded-xl font-semibold transition-colors ${savedStripe ? 'bg-green-500 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+              className={`w-full py-3 rounded-xl font-semibold transition-colors ${savedStripe ? 'bg-green-500 text-white': 'bg-blue-600 hover:bg-blue-700 text-white'}`}
             >
-              {savingStripe ? '⏳ Opslaan...' : savedStripe ? ' Opgeslagen' : ' Stripe keys opslaan'}
+              {savingStripe ? 'Opslaan...': savedStripe ? 'Opgeslagen': 'Stripe keys opslaan'}
             </button>
           </div>
         )}

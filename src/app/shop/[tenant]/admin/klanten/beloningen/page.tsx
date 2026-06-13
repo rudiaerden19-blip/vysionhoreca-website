@@ -180,7 +180,7 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className={`bg-white rounded-2xl p-6 shadow-sm ${!reward.is_active ? 'opacity-60' : ''}`}
+              className={`bg-white rounded-2xl p-6 shadow-sm ${!reward.is_active ? 'opacity-60': ''}`}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
@@ -194,12 +194,12 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
                     )}
                     <div className="flex items-center gap-3 mt-2">
                       <span className="inline-flex items-center gap-1 px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-medium">
-                        ⭐ {reward.points_required} {t('rewardsPage.points')}
+                         {reward.points_required} {t('rewardsPage.points')}
                       </span>
                       <span className="text-sm text-gray-500">
                         {rewardTypeLabels[reward.reward_type]}
-                        {reward.reward_type === 'discount_fixed' && reward.reward_value && ` (€${reward.reward_value})`}
-                        {reward.reward_type === 'discount_percentage' && reward.reward_value && ` (${reward.reward_value}%)`}
+                        {reward.reward_type === 'discount_fixed' && reward.reward_value && `(€${reward.reward_value})`}
+                        {reward.reward_type === 'discount_percentage' && reward.reward_value && `(${reward.reward_value}%)`}
                       </span>
                     </div>
                   </div>
@@ -213,7 +213,7 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
                         : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                     }`}
                   >
-                    {reward.is_active ? ` ${t('rewardsPage.active')}` : t('rewardsPage.inactive')}
+                    {reward.is_active ? ` ${t('rewardsPage.active')}`: t('rewardsPage.inactive')}
                   </button>
                   <button
                     onClick={() => openEditModal(reward)}
@@ -327,15 +327,15 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
                 {(formData.reward_type === 'discount_fixed' || formData.reward_type === 'discount_percentage') && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {formData.reward_type === 'discount_fixed' ? t('rewardsPage.form.discountAmount') : t('rewardsPage.form.discountPercentage')}
+                      {formData.reward_type === 'discount_fixed'? t('rewardsPage.form.discountAmount') : t('rewardsPage.form.discountPercentage')}
                     </label>
                     <input
                       type="number"
                       min="0"
-                      step={formData.reward_type === 'discount_fixed' ? '0.01' : '1'}
+                      step={formData.reward_type === 'discount_fixed'? '0.01': '1'}
                       value={formData.reward_value || ''}
                       onChange={(e) => setFormData({ ...formData, reward_value: parseFloat(e.target.value) || 0 })}
-                      placeholder={formData.reward_type === 'discount_fixed' ? '5.00' : '10'}
+                      placeholder={formData.reward_type === 'discount_fixed'? '5.00': '10'}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
@@ -354,7 +354,7 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
                   disabled={saving || !formData.name || !formData.points_required}
                   className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white rounded-xl font-medium transition-colors"
                 >
-                  {saving ? `${t('adminPages.common.save')}...` : t('adminPages.common.save')}
+                  {saving ? `${t('adminPages.common.save')}...`: t('adminPages.common.save')}
                 </button>
               </div>
             </motion.div>

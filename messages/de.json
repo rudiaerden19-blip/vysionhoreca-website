@@ -1908,7 +1908,7 @@
  "smtpGmailWarning": " Gmail erfordert ein App-Passwort. Erstellen Sie es unter: Google-Konto → Sicherheit → App-Passwörter.",
  "smtpServerLabel": "SMTP-Server (fragen Sie Ihren Anbieter)",
  "smtpPortLabel": "Port",
- "smtpSaveSaving": "⏳ Speichern...",
+ "smtpSaveSaving": " Speichern...",
  "smtpSaveSaved": " Gespeichert!",
  "smtpSaveButton": " E-Mail-Einstellungen speichern"
  },
@@ -4638,7 +4638,7 @@
  "selectEmployee": "Mitarbeiter auswählen",
  "reasonPlaceholder": "Optional: Grund für Urlaub",
  "initialStatus": "Status",
- "statusHint": "Wählen Sie 'Genehmigt' für direkte Registrierung (z.B. Krankmeldung)",
+ "statusHint": "Wählen Sie 'Genehmigt'für direkte Registrierung (z.B. Krankmeldung)",
  "add": "Hinzufügen",
  "fillAllFields": "Füllen Sie alle Pflichtfelder aus",
  "delete": "Löschen",
@@ -5741,7 +5741,7 @@
  "ownership24": "Schluss mit Mieten. Nach 24 Monaten ist diese i7-Kasse zu 100 % Ihr Eigentum."
  },
  "retail": {
- "h1": "Retail-Kasse & Lager | Das i7 'Biest' für Shops | Vysion",
+ "h1": "Retail-Kasse & Lager | Das i7 'Biest'für Shops | Vysion",
  "intro": "Lagerverwaltung auf starker i7-Hardware (16 GB RAM), Touchscreen-POS und kostenlose Website-Integration — Retail-Kasse, die mitwächst.",
  "body1": "Schnelle Retail-Kasse: Lager und Verkauf auf einem Bildschirm. Kasse kaufen mit Margen- und Tempo-Fokus — belgisches System für Shops.",
  "body2": "Vom Barcode bis Tagesabschluss: weniger Fehler, mehr Tempo. Premium-Hardware nach 24 Monaten besitzen — ohne nutzloses Mieten.",

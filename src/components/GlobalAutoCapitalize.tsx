@@ -45,7 +45,7 @@ export function GlobalAutoCapitalize() {
       
       // Na een punt + spatie: volgende letter hoofdletter
       newValue = newValue.replace(/\. ([a-z])/g, (match, letter) => {
-        return '. ' + letter.toUpperCase()
+        return '. '+ letter.toUpperCase()
       })
       
       // Alleen updaten als er iets veranderd is

@@ -84,7 +84,7 @@ type PdfDoc = InstanceType<typeof PDFDocument>
 
 type TextOpts = {
   width?: number
-  align?: 'left' | 'center' | 'right'
+  align?: 'left' |  'center' |  'right'
   fontSize?: number
   bold?: boolean
 }
@@ -93,7 +93,7 @@ function textBlock(doc: PdfDoc, y: number, text: string, opts: TextOpts = {}): n
   const fontSize = opts.fontSize ?? 10
   const width = opts.width ?? CONTENT_W
   doc.fontSize(fontSize)
-  doc.font(opts.bold ? 'Helvetica-Bold' : 'Helvetica')
+  doc.font(opts.bold ? 'Helvetica-Bold': 'Helvetica')
   doc.text(text, MARGIN, y, { width, align: opts.align ?? 'left', lineGap: 2 })
   const h = doc.heightOfString(text, { width, lineGap: 2 })
   doc.font('Helvetica')
@@ -115,7 +115,7 @@ function sectionBlackBar(doc: PdfDoc, y: number, title: string): number {
   doc.rect(MARGIN, y, CONTENT_W, BAR_H).fill('#000000')
   doc.fillColor('#ffffff')
   doc.fontSize(11).font('Helvetica-Bold')
-  doc.text(title.toUpperCase(), MARGIN, y + 5, { width: CONTENT_W, align: 'center' })
+  doc.text(title.toUpperCase(), MARGIN, y + 5, { width: CONTENT_W, align: 'center'})
   doc.fillColor('#000000')
   doc.font('Helvetica')
   return y + BAR_H + GAP_MD

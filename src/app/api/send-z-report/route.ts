@@ -12,7 +12,7 @@ function sanitizeArticleLinesForEmail(raw: unknown): Array<{ label: string; qty:
   for (const item of raw) {
     if (!item || typeof item !== 'object') continue
     const o = item as Record<string, unknown>
-    const label = typeof o.label === 'string' ? o.label.trim().slice(0, 400) : ''
+    const label = typeof o.label === 'string'? o.label.trim().slice(0, 400) : ''
     if (!label) continue
     const qty = typeof o.qty === 'number' && Number.isFinite(o.qty) ? Math.max(0, o.qty) : 0
     const total = typeof o.total === 'number' && Number.isFinite(o.total) ? o.total : 0
@@ -48,10 +48,10 @@ export async function POST(request: NextRequest) {
     } = body
 
     if (!to) {
-      return NextResponse.json({ error: 'E-mailadres is verplicht' }, { status: 400 })
+      return NextResponse.json({ error: 'E-mailadres is verplicht'}, { status: 400 })
     }
     if (!tenantSlug || typeof tenantSlug !== 'string') {
-      return NextResponse.json({ error: 'tenantSlug is verplicht' }, { status: 400 })
+      return NextResponse.json({ error: 'tenantSlug is verplicht'}, { status: 400 })
     }
 
     // ── Auth: alleen ingelogde zaak-eigenaar of superadmin ───────────────────
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     if (!access.authorized) {
       const st = access.error?.includes('ingelogd') ? 401 : 403
       logger.warn('send-z-report: unauthorized', { requestId, tenantSlug })
-      return NextResponse.json({ error: access.error || 'Geen toegang' }, { status: st })
+      return NextResponse.json({ error: access.error || 'Geen toegang'}, { status: st })
     }
 
     // ── Rate-limit per tenant — voorkomt SMTP-quota verspillen door één zaak ─
@@ -67,8 +67,8 @@ export async function POST(request: NextRequest) {
     const rl = await checkRateLimit(apiRateLimiter, `z-report:${tenantSlug}:${ip}`)
     if (!rl.success) {
       return NextResponse.json(
-        { error: 'Te veel verzoeken. Probeer over enkele seconden opnieuw.' },
-        { status: 429, headers: { 'Retry-After': '60' } }
+        { error: 'Te veel verzoeken. Probeer over enkele seconden opnieuw.'},
+        { status: 429, headers: { 'Retry-After': '60'} }
       )
     }
 
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
         ? ''
         : `
             <div class="section">
-              <div class="section-title">📦 ${articlesSectionTitle}</div>
+              <div class="section-title"> ${articlesSectionTitle}</div>
               ${articlesRows
                 .map(
                   (r) => `
@@ -134,8 +134,8 @@ export async function POST(request: NextRequest) {
         <div class="container">
           <div class="header">
             <h1>${businessName}</h1>
-            ${businessAddress ? `<p>${businessAddress}</p>` : ''}
-            ${btwNumber ? `<p>BTW: ${btwNumber}</p>` : ''}
+            ${businessAddress ? `<p>${businessAddress}</p>`: ''}
+            ${btwNumber ? `<p>BTW: ${btwNumber}</p>`: ''}
             <div style="margin-top: 15px;">
               <span class="badge">Z-RAPPORT</span>
             </div>
@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
           
           <div class="content">
             <div class="section">
-              <div class="section-title">📊 OMZET</div>
+              <div class="section-title"> OMZET</div>
               <div class="row">
                 <span>Aantal transacties:</span>
                 <span>${orderCount}</span>
@@ -164,17 +164,17 @@ export async function POST(request: NextRequest) {
             </div>
             
             <div class="section">
-              <div class="section-title">💳 BETALINGEN</div>
+              <div class="section-title"> BETALINGEN</div>
               <div class="row">
-                <span>💵 Contant:</span>
+                <span> Contant:</span>
                 <span>${formatCurrency(cashPayments)}</span>
               </div>
               <div class="row">
-                <span>💳 PIN/Kaart:</span>
+                <span> PIN/Kaart:</span>
                 <span>${formatCurrency(cardPayments)}</span>
               </div>
               <div class="row">
-                <span>🌐 Online:</span>
+                <span> Online:</span>
                 <span>${formatCurrency(onlinePayments)}</span>
               </div>
             </div>${articlesHtml}
@@ -204,9 +204,9 @@ export async function POST(request: NextRequest) {
       requestId,
       error: error instanceof Error ? error.message : String(error),
     })
-    trackError(error, { requestId, route: '/api/send-z-report' })
+    trackError(error, { requestId, route: '/api/send-z-report'})
     return NextResponse.json(
-      { error: 'Fout bij versturen e-mail', message: error instanceof Error ? error.message : 'Onbekende fout' },
+      { error: 'Fout bij versturen e-mail', message: error instanceof Error ? error.message : 'Onbekende fout'},
       { status: 500 }
     )
   }

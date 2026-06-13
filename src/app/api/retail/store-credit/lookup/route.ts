@@ -7,12 +7,12 @@ export async function GET(req: NextRequest) {
   const code = req.nextUrl.searchParams.get('code')?.trim()
 
   if (!tenant || !code) {
-    return NextResponse.json({ ok: false, error: 'missing_params' }, { status: 400 })
+    return NextResponse.json({ ok: false, error: 'missing_params'}, { status: 400 })
   }
 
   const access = await verifyTenantOrSuperAdmin(req, tenant)
   if (!access.authorized) {
-    return NextResponse.json({ ok: false, error: access.error || 'forbidden' }, { status: 403 })
+    return NextResponse.json({ ok: false, error: access.error || 'forbidden'}, { status: 403 })
   }
 
   const res = await lookupRetailStoreCreditByCode(tenant, code)

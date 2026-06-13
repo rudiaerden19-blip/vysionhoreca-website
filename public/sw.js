@@ -26,7 +26,7 @@ self.addEventListener('install', event => {
         const cache = await caches.open(STATIC_CACHE)
         await Promise.all(
           PRECACHE_SAME_ORIGIN.map(url =>
-            fetch(url, { credentials: 'same-origin' })
+            fetch(url, { credentials: 'same-origin'})
               .then(r => {
                 if (r.ok) return cache.put(url, r.clone())
               })
@@ -88,7 +88,7 @@ function networkFirstExternalImage(request, url) {
       .catch(() =>
         cache.match(request).then(hit => {
           if (hit) return hit
-          return new Response('', { status: 503, statusText: 'No cached image' })
+          return new Response('', { status: 503, statusText: 'No cached image'})
         })
       )
   )
@@ -101,7 +101,7 @@ self.addEventListener('sync', event => {
       self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clients => {
         clients.forEach(c => {
           try {
-            c.postMessage({ type: 'VYSION_FLUSH_OFFLINE_ORDERS' })
+            c.postMessage({ type: 'VYSION_FLUSH_OFFLINE_ORDERS'})
           } catch {
             /* ignore */
           }
@@ -115,11 +115,11 @@ self.addEventListener('fetch', event => {
   const { request } = event
   const url = new URL(request.url)
 
-  if (request.method !== 'GET' || !url.protocol.startsWith('http')) return
+  if (request.method !== 'GET'|| !url.protocol.startsWith('http')) return
 
   if (isSupabaseNonStorageRequest(url)) return
 
-  if (url.hostname === 'api.qrserver.com' || url.hostname.endsWith('.qrserver.com')) return
+  if (url.hostname === 'api.qrserver.com'|| url.hostname.endsWith('.qrserver.com')) return
 
   if (url.hostname !== self.location.hostname) {
     event.respondWith(networkFirstExternalImage(request, url))
@@ -147,9 +147,9 @@ self.addEventListener('fetch', event => {
   }
 
   if (
-    url.pathname === '/manifest.json' ||
-    url.pathname === '/manifest' ||
-    url.pathname === '/favicon.svg' ||
+    url.pathname === '/manifest.json'||
+    url.pathname === '/manifest'||
+    url.pathname === '/favicon.svg'||
     url.pathname.startsWith('/icons/') ||
     url.pathname.endsWith('.mp3') ||
     url.pathname.startsWith('/images/')
@@ -168,17 +168,17 @@ self.addEventListener('fetch', event => {
     return
   }
 
-  if (url.pathname === '/superadmin' || url.pathname.startsWith('/superadmin/')) {
-    event.respondWith(fetch(request, { cache: 'no-store' }))
+  if (url.pathname === '/superadmin'|| url.pathname.startsWith('/superadmin/')) {
+    event.respondWith(fetch(request, { cache: 'no-store'}))
     return
   }
 
   /** Zaak-admin HTML: niet uit Cache Storage — oude bundles → fout gedrag bij Opslaan (INSERT-loop).
-   *  `/shop/:tenant/admin` heeft géén `/admin/` substring (geen slash ná admin); wel expliciet matchen. */
+   *  `/shop/:tenant/admin`heeft géén `/admin/`substring (geen slash ná admin); wel expliciet matchen. */
   const p = url.pathname
   const isTenantShopAdmin = /\/shop\/[^/]+\/admin(?:\/|$)/.test(p)
   if (isTenantShopAdmin || p.includes('/admin/')) {
-    event.respondWith(fetch(request, { cache: 'no-store' }))
+    event.respondWith(fetch(request, { cache: 'no-store'}))
     return
   }
 
@@ -209,7 +209,7 @@ self.addEventListener('fetch', event => {
   </style>
 </head>
 <body>
-  <h1>📴</h1>
+  <h1></h1>
   <h2>Offline</h2>
   <p>Geen internetverbinding. Zodra u terug online bent, wordt de kassa automatisch herladen.</p>
   <p>Offline bestellingen worden bewaard en automatisch verstuurd bij reconnect (of via achtergrond-sync).</p>
@@ -217,7 +217,7 @@ self.addEventListener('fetch', event => {
   <button onclick="location.reload()">↺ Opnieuw proberen</button>
 </body>
 </html>`,
-            { headers: { 'Content-Type': 'text/html; charset=utf-8' } }
+            { headers: { 'Content-Type': 'text/html; charset=utf-8'} }
           )
         })
       )

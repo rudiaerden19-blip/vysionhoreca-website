@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     } = body
 
     if (!tenantSlug || !customerPhone || !orderNumber) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+      return NextResponse.json({ error: 'Missing required fields'}, { status: 400 })
     }
 
     // ── Rate-limit per IP+phone (defense-in-depth) ──────────────────────────
@@ -64,8 +64,8 @@ export async function POST(request: NextRequest) {
     if (!rl.success) {
       logger.warn('whatsapp/send-confirmation: rate-limited', { requestId, ip, tenantSlug })
       return NextResponse.json(
-        { error: 'Te veel verzoeken. Probeer over 1 minuut opnieuw.' },
-        { status: 429, headers: { 'Retry-After': '60' } }
+        { error: 'Te veel verzoeken. Probeer over 1 minuut opnieuw.'},
+        { status: 429, headers: { 'Retry-After': '60'} }
       )
     }
 
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
     // iemand zonder login willekeurige WhatsApps via tenant-token stuurt.
     if (!orderId || typeof orderId !== 'string') {
       logger.warn('whatsapp/send-confirmation: orderId ontbreekt', { requestId, tenantSlug })
-      return NextResponse.json({ error: 'Missing orderId' }, { status: 400 })
+      return NextResponse.json({ error: 'Missing orderId'}, { status: 400 })
     }
 
     const normalizedSlug = String(tenantSlug).replace(/-/g, '').toLowerCase()
@@ -87,24 +87,24 @@ export async function POST(request: NextRequest) {
 
     if (orderError || !order) {
       logger.warn('whatsapp/send-confirmation: order not found', { requestId, orderId, tenantSlug })
-      return NextResponse.json({ error: 'Order niet gevonden' }, { status: 403 })
+      return NextResponse.json({ error: 'Order niet gevonden'}, { status: 403 })
     }
 
     const orderSlugNorm = String(order.tenant_slug || '').replace(/-/g, '').toLowerCase()
     if (orderSlugNorm !== normalizedSlug) {
       logger.warn('whatsapp/send-confirmation: tenant mismatch', { requestId, orderId, tenantSlug, orderSlug: order.tenant_slug })
-      return NextResponse.json({ error: 'Order tenant mismatch' }, { status: 403 })
+      return NextResponse.json({ error: 'Order tenant mismatch'}, { status: 403 })
     }
 
     if (!phonesMatch(order.customer_phone, customerPhone)) {
       logger.warn('whatsapp/send-confirmation: phone mismatch', { requestId, orderId })
-      return NextResponse.json({ error: 'Phone mismatch' }, { status: 403 })
+      return NextResponse.json({ error: 'Phone mismatch'}, { status: 403 })
     }
 
     const createdMs = order.created_at ? new Date(order.created_at).getTime() : 0
     if (!createdMs || Date.now() - createdMs > CONFIRMATION_MAX_AGE_MS) {
       logger.warn('whatsapp/send-confirmation: order too old', { requestId, orderId, createdMs })
-      return NextResponse.json({ error: 'Order is te oud voor confirmatie' }, { status: 403 })
+      return NextResponse.json({ error: 'Order is te oud voor confirmatie'}, { status: 403 })
     }
 
     // Get tenant WhatsApp settings
@@ -116,8 +116,8 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (!tenant) {
-      console.log('❌ No WhatsApp settings found for tenant:', tenantSlug)
-      return NextResponse.json({ error: 'WhatsApp not configured' }, { status: 404 })
+      console.log('No WhatsApp settings found for tenant:', tenantSlug)
+      return NextResponse.json({ error: 'WhatsApp not configured'}, { status: 404 })
     }
 
     // Get tenant name
@@ -141,29 +141,29 @@ export async function POST(request: NextRequest) {
     let scheduledText = ''
     if (scheduledDate) {
       const dateObj = new Date(scheduledDate)
-      const formattedDate = dateObj.toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long' })
-      scheduledText = `\n📅 ${formattedDate}`
+      const formattedDate = dateObj.toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long'})
+      scheduledText = `\n ${formattedDate}`
       if (scheduledTime) {
-        scheduledText += ` om ${scheduledTime}`
+        scheduledText += `om ${scheduledTime}`
       }
     }
 
     // Build confirmation message
-    const orderTypeText = orderType === 'pickup' ? '🏪 Ophalen' : '🚗 Bezorgen'
+    const orderTypeText = orderType === 'pickup'? 'Ophalen': 'Bezorgen'
 
-    const confirmationMessage = `📨 *Bestelling Verzonden!*
+    const confirmationMessage = `*Bestelling Verzonden!*
 
 Je bestelling bij ${businessName} is ontvangen.
 
-📋 *Bestelnummer:* #${orderNumber}
+ *Bestelnummer:* #${orderNumber}
 ${orderTypeText}${scheduledText}
 
 *Je bestelling:*
 ${itemsList}
 
-💰 *Totaal:* €${total.toFixed(2)}
+ *Totaal:* €${total.toFixed(2)}
 
-⏳ *Wacht op bevestiging van de zaak...*
+ *Wacht op bevestiging van de zaak...*
 Je krijgt een bericht zodra de zaak je bestelling bevestigt!`
 
     // ── Idempotency-lock ───────────────────────────────────────────────────
@@ -223,19 +223,19 @@ Je krijgt een bericht zodra de zaak je bestelling bevestigt!`
 
     if (!response.ok) {
       const error = await response.text()
-      console.error('❌ WhatsApp API error:', error)
+      console.error('WhatsApp API error:', error)
       // Rollback dedup-row zodat retry mogelijk blijft.
       if (dedupRowId) {
         await supabaseAdmin.from('whatsapp_send_log').delete().eq('id', dedupRowId)
       }
-      return NextResponse.json({ error: 'Failed to send WhatsApp message' }, { status: 500 })
+      return NextResponse.json({ error: 'Failed to send WhatsApp message'}, { status: 500 })
     }
 
-    console.log(`✅ Order confirmation sent to ${formattedPhone}`)
+    console.log(`Order confirmation sent to ${formattedPhone}`)
     return NextResponse.json({ success: true })
 
   } catch (error: any) {
-    console.error('❌ Error sending confirmation:', error)
+    console.error('Error sending confirmation:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

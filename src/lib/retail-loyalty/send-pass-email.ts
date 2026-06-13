@@ -28,7 +28,7 @@ export async function sendRetailLoyaltyPassEmail(opts: {
 }): Promise<{ ok: boolean; error?: string }> {
   const { supabase, tenantSlug, toEmail, cardCode, origin } = opts
   const email = toEmail.trim().toLowerCase()
-  if (!email || !email.includes('@')) return { ok: false, error: 'invalid_email' }
+  if (!email || !email.includes('@')) return { ok: false, error: 'invalid_email'}
 
   const smtpRes = await resolveTenantSmtp(supabase, tenantSlug)
   if (!smtpRes.ok) return { ok: false, error: smtpRes.error }
@@ -76,6 +76,6 @@ export async function sendRetailLoyaltyPassEmail(opts: {
       toEmail: email,
       error: err instanceof Error ? err.message : String(err),
     })
-    return { ok: false, error: 'send_failed' }
+    return { ok: false, error: 'send_failed'}
   }
 }

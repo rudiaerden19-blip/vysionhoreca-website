@@ -1,6 +1,6 @@
 /** Publieke demo-omgevingen (marketing). */
 
-export const DEMO_TENANT_SLUG = 'frituurnolim' as const
+export const DEMO_TENANT_SLUG = 'frituurnolim'as const
 
 /** Publieke demo-site — platformtegels bestelplatform & eigen website (https://frituurnolim.ordervysion.com) */
 export const DEMO_ORDER_SITE_URL = `https://${DEMO_TENANT_SLUG}.ordervysion.com`
@@ -60,7 +60,7 @@ export function publicDemoSessionMatchesTenant(tenant: string): boolean {
 
 /**
  * Pad naar publieke kassa zonder demo-query → `/shop/:tenant/admin/kassa?demo=bekijk`.
- * Ondersteunt zowel `/shop/frituurnolim/admin/kassa` als tenant-subdomein-URL `/admin/kassa`.
+ * Ondersteunt zowel `/shop/frituurnolim/admin/kassa`als tenant-subdomein-URL `/admin/kassa`.
  */
 export function withPublicDemoSearchOnKassaPath(nextPath: string): string | null {
   if (!nextPath.includes('/admin/kassa')) return null
@@ -76,37 +76,37 @@ export function withPublicDemoSearchOnKassaPath(nextPath: string): string | null
   }
   if (!tenant || !isMarketingDemoTenantSlug(tenant)) return null
 
-  const sp = new URLSearchParams(nextPath.includes('?') ? nextPath.split('?')[1] || '' : '')
+  const sp = new URLSearchParams(nextPath.includes('?') ? nextPath.split('?')[1] || '': '')
   sp.set('demo', 'bekijk')
   return `/shop/${tenant}/admin/kassa?${sp.toString()}`
 }
 
 /**
  * Publieke alleen-bekijken-kassa — zie admin layout (frituurnolim + deze query = geen login).
- * Zelfde als `alleen_lezen=1` (gebruikt in e2e).
+ * Zelfde als `alleen_lezen=1`(gebruikt in e2e).
  */
-export const DEMO_KASSA_PUBLIC_QUERY = 'demo=bekijk' as const
+export const DEMO_KASSA_PUBLIC_QUERY = 'demo=bekijk'as const
 
 /** Demo-kassa (admin) op hetzelfde subdomein, met publieke view-only gate */
 export const DEMO_KASSA_URL = `${DEMO_ORDER_SITE_URL}/admin/kassa?${DEMO_KASSA_PUBLIC_QUERY}`
 
 /** Publieke demomenu / online shop op het marketingdomein */
 export const DEMO_ONLINE_SHOP_MENU_URL =
-  `https://www.vysion-kassa.com/shop/${DEMO_TENANT_SLUG}/menu` as const
+  `https://www.vysion-kassa.com/shop/${DEMO_TENANT_SLUG}/menu`as const
 
-const MARKETING_SHOP_BASE = 'https://www.vysion-kassa.com/shop' as const
+const MARKETING_SHOP_BASE = 'https://www.vysion-kassa.com/shop'as const
 
 /** Showcase: restaurant/café — zelfde tenant als gratis-websitevoorbeeld. */
-export const DEMO_CAFE_MENU_URL = `${MARKETING_SHOP_BASE}/restaurantdekorf/menu` as const
+export const DEMO_CAFE_MENU_URL = `${MARKETING_SHOP_BASE}/restaurantdekorf/menu`as const
 
 /**
  * Tweede voorbeeldzaak (publiek menu). Label op de site: “bakker”; slug kan hier
  * worden vervangen door een echte bakkerij-showcase zodra die vast staat.
  */
-export const DEMO_BAKERY_MENU_URL = `${MARKETING_SHOP_BASE}/skippsbv/menu` as const
+export const DEMO_BAKERY_MENU_URL = `${MARKETING_SHOP_BASE}/skippsbv/menu`as const
 
 /** Voorbeelddemo (nu: digitale menukaart restaurant-showcase); URL aanpasbaar naar echte crèmerie-showcase. */
-export const DEMO_SHOWCASE_CREMERIE_URL = `${MARKETING_SHOP_BASE}/restaurantdekorf/menukaart` as const
+export const DEMO_SHOWCASE_CREMERIE_URL = `${MARKETING_SHOP_BASE}/restaurantdekorf/menukaart`as const
 
 export function isPublicDemoKassaSearch(search: string): boolean {
   const q = search.startsWith('?') ? search.slice(1) : search
@@ -122,7 +122,7 @@ export const DEMO_HERO_LIVE_URL = DEMO_KASSA_URL
 
 /**
  * Per platformtegel: CTA “Start gratis demo” — de meeste tegels naar dezelfde demokassa.
- * `msgKey` komt overeen met `PLATFORM_PAGES[].msgKey` in `platform-pages.ts`.
+ * `msgKey`komt overeen met `PLATFORM_PAGES[].msgKey`in `platform-pages.ts`.
  */
 export function demoUrlForPlatformCard(msgKey: string): string {
   switch (msgKey) {

@@ -57,7 +57,7 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
   const { tenant } = params
   const [tenantInfo, setTenantInfo] = useState<TenantInfo | null>(null)
   const [settings, setSettings] = useState<BookingSettings>(DEFAULT_SETTINGS)
-  const [step, setStep] = useState<'form' | 'success'>('form')
+  const [step, setStep] = useState<'form' |  'success'>('form')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [emailWarning, setEmailWarning] = useState('')
@@ -109,11 +109,11 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
           minAdvanceHours: data.min_advance_hours ?? DEFAULT_SETTINGS.minAdvanceHours,
           maxAdvanceDays: data.max_advance_days ?? DEFAULT_SETTINGS.maxAdvanceDays,
           slotDurationMinutes: data.slot_duration_minutes ?? DEFAULT_SETTINGS.slotDurationMinutes,
-          closedDays: Array.isArray(data.closed_days) ? data.closed_days : (typeof data.closed_days === 'string' ? (() => { try { return JSON.parse(data.closed_days) } catch { return [] } })() : []),
+          closedDays: Array.isArray(data.closed_days) ? data.closed_days : (typeof data.closed_days === 'string'? (() => { try { return JSON.parse(data.closed_days) } catch { return [] } })() : []),
           depositRequired: data.deposit_required ?? DEFAULT_SETTINGS.depositRequired,
           depositAmount: Number(data.deposit_amount) || DEFAULT_SETTINGS.depositAmount,
           noShowProtection: data.no_show_protection ?? DEFAULT_SETTINGS.noShowProtection,
-          shifts: Array.isArray(data.shifts) ? data.shifts : (typeof data.shifts === 'string' ? (() => { try { return JSON.parse(data.shifts) } catch { return [] } })() : []),
+          shifts: Array.isArray(data.shifts) ? data.shifts : (typeof data.shifts === 'string'? (() => { try { return JSON.parse(data.shifts) } catch { return [] } })() : []),
           autoConfirm: data.auto_confirm ?? false,
         })
       })
@@ -170,7 +170,7 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
     setLoading(true)
 
     try {
-      const reservationStatus = settings.autoConfirm ? 'CONFIRMED' : 'PENDING'
+      const reservationStatus = settings.autoConfirm ? 'CONFIRMED': 'PENDING'
       const { data, error: insertError } = await supabase.from('reservations').insert([{
         tenant_slug: tenant,
         guest_name: formData.guest_name,
@@ -198,7 +198,7 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
         try {
           await fetch('/api/public/guest-profile', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json'},
             body: JSON.stringify({
               tenantSlug: tenant,
               name: formData.guest_name,
@@ -221,11 +221,11 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
           let bEmail = tenantInfo?.email || ''
           if (!bName) {
             const { data: td } = await supabase.from('tenants').select('name,phone,email').eq('slug', tenant).single()
-            if (td) { bName = td.name || tenant; bPhone = td.phone || ''; bEmail = td.email || '' }
+            if (td) { bName = td.name || tenant; bPhone = td.phone || ''; bEmail = td.email || ''}
           }
           const mailRes = await fetch('/api/send-reservation-email', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json'},
             body: JSON.stringify({
               tenantSlug: tenant,
               customerEmail: formData.guest_email,
@@ -236,7 +236,7 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
               partySize: formData.party_size,
               notes: formData.notes,
               specialRequests: formData.special_requests,
-              status: settings.autoConfirm ? 'confirmed' : 'pending',
+              status: settings.autoConfirm ? 'confirmed': 'pending',
               businessName: bName || tenant,
               businessPhone: bPhone,
               businessEmail: bEmail,
@@ -257,7 +257,7 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
       if (settings.depositRequired && settings.depositAmount > 0 && data) {
         const res = await fetch('/api/reservation-deposit', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json'},
           body: JSON.stringify({
             reservationId: data.id,
             tenantSlug: tenant,
@@ -305,7 +305,7 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
 
   if (step === 'success') {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: `${primaryColor}10` }}>
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: `${primaryColor}10`}}>
         <div className="text-center max-w-md w-full bg-white rounded-3xl p-8 shadow-xl">
           {/* Animated checkmark */}
           <div className="w-24 h-24 rounded-full mx-auto mb-6 flex items-center justify-center text-5xl shadow-lg"
@@ -313,7 +313,7 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
             
           </div>
           <h2 className="text-2xl font-bold mb-2">
-            {settings.autoConfirm ? 'Reservatie Bevestigd! ' : 'Reservatie Ontvangen!'}
+            {settings.autoConfirm ? 'Reservatie Bevestigd! ': 'Reservatie Ontvangen!'}
           </h2>
           <p className="text-gray-500 mb-6">
             {settings.autoConfirm
@@ -323,14 +323,14 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
           </p>
 
           {/* Overzicht kaart */}
-          <div className="rounded-2xl p-5 text-left space-y-3 mb-6" style={{ backgroundColor: `${primaryColor}15` }}>
+          <div className="rounded-2xl p-5 text-left space-y-3 mb-6" style={{ backgroundColor: `${primaryColor}15`}}>
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm" style={{ backgroundColor: primaryColor }}>
                 <CalendarDays size={16} />
               </div>
               <div>
                 <p className="text-xs text-gray-500">Datum</p>
-                <p className="font-semibold text-gray-800">{new Date(formData.reservation_date).toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+                <p className="font-semibold text-gray-800">{new Date(formData.reservation_date).toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long'})}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -348,7 +348,7 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
               </div>
               <div>
                 <p className="text-xs text-gray-500">Personen</p>
-                <p className="font-semibold text-gray-800">{formData.party_size} {formData.party_size === 1 ? 'persoon' : 'personen'}</p>
+                <p className="font-semibold text-gray-800">{formData.party_size} {formData.party_size === 1 ? 'persoon': 'personen'}</p>
               </div>
             </div>
           </div>
@@ -526,7 +526,7 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
                     type="button"
                     onClick={() => setFormData({ ...formData, occasion: occ })}
                     className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
-                      formData.occasion === occ ? 'text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                      formData.occasion === occ ? 'text-white': 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                     }`}
                     style={formData.occasion === occ ? { backgroundColor: primaryColor } : {}}
                   >
@@ -582,12 +582,12 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
               className="w-full py-4 rounded-xl text-white font-bold text-lg transition-opacity disabled:opacity-50"
               style={{ backgroundColor: primaryColor }}
             >
-              {loading ? 'Bezig...' : settings.depositRequired && settings.depositAmount > 0 ? `Reserveren & Betalen €${settings.depositAmount.toFixed(2)}` : 'Reservatie Aanvragen'}
+              {loading ? 'Bezig...': settings.depositRequired && settings.depositAmount > 0 ? `Reserveren & Betalen €${settings.depositAmount.toFixed(2)}`: 'Reservatie Aanvragen'}
             </button>
 
             <p className="text-center text-gray-400 text-xs">
               Door te reserveren gaat u akkoord met onze voorwaarden.
-              {tenantInfo?.phone && ` Vragen? ${tenantInfo.phone}`}
+              {tenantInfo?.phone && `Vragen? ${tenantInfo.phone}`}
             </p>
           </div>
         </div>

@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     description:
       'Gratis kassa, bestelplatform en modules 14 dagen — start vandaag.',
     url: '/registreer',
-    images: [{ url: '/images/online-order-platform-1.png' }],
+    images: [{ url: '/images/online-order-platform-1.png'}],
   },
   alternates: {
     canonical: '/registreer',

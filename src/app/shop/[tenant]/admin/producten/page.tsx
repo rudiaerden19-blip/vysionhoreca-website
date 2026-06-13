@@ -48,23 +48,23 @@ import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 
-type ProductCatalogMode = 'horeca' | 'retail'
+type ProductCatalogMode = 'horeca' |  'retail'
 
 const ALLERGEN_IDS = [
-  { id: 'gluten', icon: '' },
-  { id: 'ei', icon: '' },
-  { id: 'melk', icon: '' },
-  { id: 'noten', icon: '' },
-  { id: 'pinda', icon: '' },
-  { id: 'soja', icon: '' },
-  { id: 'vis', icon: '' },
-  { id: 'schaaldieren', icon: '' },
-  { id: 'selderij', icon: '' },
-  { id: 'mosterd', icon: '' },
-  { id: 'sesam', icon: '' },
-  { id: 'sulfiet', icon: '' },
-  { id: 'lupine', icon: '' },
-  { id: 'weekdieren', icon: '' },
+  { id: 'gluten', icon: ''},
+  { id: 'ei', icon: ''},
+  { id: 'melk', icon: ''},
+  { id: 'noten', icon: ''},
+  { id: 'pinda', icon: ''},
+  { id: 'soja', icon: ''},
+  { id: 'vis', icon: ''},
+  { id: 'schaaldieren', icon: ''},
+  { id: 'selderij', icon: ''},
+  { id: 'mosterd', icon: ''},
+  { id: 'sesam', icon: ''},
+  { id: 'sulfiet', icon: ''},
+  { id: 'lupine', icon: ''},
+  { id: 'weekdieren', icon: ''},
 ]
 
 function normalizeProductBarcodeScan(raw: string): string {
@@ -134,7 +134,7 @@ function SortableProductCard({
     <div
       ref={setNodeRef}
       style={style}
-      className={`bg-white rounded-2xl shadow-sm overflow-hidden ${isDragging ? 'shadow-xl ring-2 ring-blue-500' : ''}`}
+      className={`bg-white rounded-2xl shadow-sm overflow-hidden ${isDragging ? 'shadow-xl ring-2 ring-blue-500': ''}`}
     >
       {/* Drag Handle */}
       <div 
@@ -148,14 +148,14 @@ function SortableProductCard({
 
       {/* Image — object-fit volgt image_display_mode (zelfde als webshop/kassa) */}
       <div
-        className={`relative h-40 overflow-hidden ${product.image_display_mode === 'contain' ? 'bg-gray-50' : 'bg-white'}`}
+        className={`relative h-40 overflow-hidden ${product.image_display_mode === 'contain'? 'bg-gray-50': 'bg-white'}`}
       >
         {product.image_url ? (
           <img
             src={product.image_url}
             alt={product.name}
             draggable={false}
-            className={`w-full h-full pointer-events-none ${product.image_display_mode === 'contain' ? 'object-contain object-center' : 'object-cover object-center'}`}
+            className={`w-full h-full pointer-events-none ${product.image_display_mode === 'contain'? 'object-contain object-center': 'object-cover object-center'}`}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-5xl bg-gray-50">
@@ -204,7 +204,7 @@ function SortableProductCard({
                   ? 'bg-green-100 text-green-600' 
                   : 'bg-gray-100 text-gray-400'
               }`}
-              title={product.is_active ? 'Beschikbaar' : 'Niet beschikbaar'}
+              title={product.is_active ? 'Beschikbaar': 'Niet beschikbaar'}
             >
               {product.is_active ? '' : ''}
             </button>
@@ -215,7 +215,7 @@ function SortableProductCard({
                   ? 'bg-blue-100 text-blue-600' 
                   : 'bg-gray-100 text-gray-400'
               }`}
-              title={product.is_popular ? 'Populair' : 'Niet populair'}
+              title={product.is_popular ? 'Populair': 'Niet populair'}
             >
               
             </button>
@@ -318,7 +318,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     }
     const q = searchParams.get('mode')
     if (q === 'retail') return 'retail'
-    return horecaKassaOn ? 'horeca' : 'retail'
+    return horecaKassaOn ? 'horeca': 'retail'
   }
 
   // Load data on mount
@@ -489,7 +489,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
       is_promo: false,
       promo_price: undefined,
       allergens: [],
-      image_display_mode: mode === 'retail' ? null : 'contain',
+      image_display_mode: mode === 'retail'? null : 'contain',
       kassa_image_zoom: 1,
       print_label: false,
       track_stock: mode === 'retail',
@@ -605,25 +605,25 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
         price: priceNum,
         image_url: formData.image_url || '',
         is_active: formData.is_active ?? true,
-        is_popular: saveMode === 'retail' ? false : (formData.is_popular ?? false),
-        is_promo: saveMode === 'retail' ? false : (formData.is_promo ?? false),
-        promo_price: saveMode === 'retail' ? undefined : promoNum,
+        is_popular: saveMode === 'retail'? false : (formData.is_popular ?? false),
+        is_promo: saveMode === 'retail'? false : (formData.is_promo ?? false),
+        promo_price: saveMode === 'retail'? undefined : promoNum,
         sort_order: editingProduct?.sort_order || products.length,
-        allergens: saveMode === 'retail' ? [] : formData.allergens || [],
-        image_display_mode: saveMode === 'retail' ? null : formData.image_display_mode || null,
+        allergens: saveMode === 'retail'? [] : formData.allergens || [],
+        image_display_mode: saveMode === 'retail'? null : formData.image_display_mode || null,
         kassa_image_zoom:
-          saveMode === 'retail' ? 1 : clampKassaProductImageZoom(formData.kassa_image_zoom as number),
-        print_label: saveMode === 'retail' ? false : (formData.print_label ?? false),
+          saveMode === 'retail'? 1 : clampKassaProductImageZoom(formData.kassa_image_zoom as number),
+        print_label: saveMode === 'retail'? false : (formData.print_label ?? false),
         catalog_mode: saveMode,
         barcode:
           saveMode === 'retail'
             ? normalizeProductBarcodeScan(formData.barcode || '') || null
             : formData.barcode ?? null,
         article_number:
-          saveMode === 'retail' ? formData.article_number?.trim() || null : formData.article_number ?? null,
-        size_label: saveMode === 'retail' ? formData.size_label?.trim() || null : formData.size_label ?? null,
-        color_label: saveMode === 'retail' ? formData.color_label?.trim() || null : formData.color_label ?? null,
-        track_stock: saveMode === 'retail' ? !!formData.track_stock : formData.track_stock,
+          saveMode === 'retail'? formData.article_number?.trim() || null : formData.article_number ?? null,
+        size_label: saveMode === 'retail'? formData.size_label?.trim() || null : formData.size_label ?? null,
+        color_label: saveMode === 'retail'? formData.color_label?.trim() || null : formData.color_label ?? null,
+        track_stock: saveMode === 'retail'? !!formData.track_stock : formData.track_stock,
         stock_quantity:
           saveMode === 'retail' && formData.track_stock
             ? Math.max(0, Math.floor(Number(formData.stock_quantity) || 0))
@@ -982,7 +982,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                   </div>
                   {!!formData.image_url?.trim() && (
                     <div className="space-y-3 rounded-xl border border-gray-100 bg-gray-50/80 p-4">
-                      {formData.image_display_mode === 'contain' ? (
+                      {formData.image_display_mode === 'contain'? (
                         <>
                           <p className="text-sm font-medium text-gray-800">{t('adminPages.producten.kassaImageZoomPreview')}</p>
                           <p className="text-xs text-gray-600">{t('adminPages.producten.productImageContainNoZoomNote')}</p>
@@ -1048,13 +1048,13 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                   <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider pt-2"> Instellingen</p>
 
                   {[
-                    { key: 'is_active', label: 'Beschikbaar', sub: 'Zichtbaar in menu & kassa', color: 'bg-green-500' },
+                    { key: 'is_active', label: 'Beschikbaar', sub: 'Zichtbaar in menu & kassa', color: 'bg-green-500'},
                     ...(isRetailForm
                       ? []
                       : [
-                          { key: 'is_popular', label: ' Populair', sub: 'Wordt gemarkeerd als bestseller', color: 'bg-blue-500' },
-                          { key: 'is_promo', label: ' Promotie', sub: 'Toon actieprijs', color: 'bg-orange-500' },
-                          { key: 'print_label', label: ' Print label', sub: 'Druk sticker af bij bestelling', color: 'bg-purple-500' },
+                          { key: 'is_popular', label: 'Populair', sub: 'Wordt gemarkeerd als bestseller', color: 'bg-blue-500'},
+                          { key: 'is_promo', label: 'Promotie', sub: 'Toon actieprijs', color: 'bg-orange-500'},
+                          { key: 'print_label', label: 'Print label', sub: 'Druk sticker af bij bestelling', color: 'bg-purple-500'},
                         ]),
                   ].map(({ key, label, sub, color }) => {
                     const val = !!(formData as any)[key]
@@ -1069,7 +1069,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                           onClick={() => setFormData(prev => ({ ...prev, [key]: !val }))}
                           className={`relative w-12 h-6 rounded-full transition-colors duration-200 ${val ? color : 'bg-gray-300'}`}
                         >
-                          <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${val ? 'translate-x-6' : 'translate-x-0'}`} />
+                          <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${val ? 'translate-x-6': 'translate-x-0'}`} />
                         </button>
                       </div>
                     )
@@ -1120,15 +1120,15 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                           }`}
                         >
                           <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
-                            selectedOptionIds.includes(option.id!) ? 'border-blue-500 bg-blue-500' : 'border-gray-300'
+                            selectedOptionIds.includes(option.id!) ? 'border-blue-500 bg-blue-500': 'border-gray-300'
                           }`}>
                             {selectedOptionIds.includes(option.id!) && <span className="text-white text-xs"></span>}
                           </div>
                           <div className="flex-1">
                             <span className="font-medium text-gray-900">{option.name}</span>
                             <div className="flex gap-1 mt-0.5">
-                              <span className={`text-xs px-2 py-0.5 rounded-full ${option.type === 'single' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
-                                {option.type === 'single' ? 'Enkelvoudig' : 'Meervoudig'}
+                              <span className={`text-xs px-2 py-0.5 rounded-full ${option.type === 'single'? 'bg-blue-100 text-blue-700': 'bg-purple-100 text-purple-700'}`}>
+                                {option.type === 'single'? 'Enkelvoudig': 'Meervoudig'}
                               </span>
                               {option.required && <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700">Verplicht</span>}
                             </div>
@@ -1342,12 +1342,12 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                             setFormData((prev) => ({ ...prev, track_stock: !prev.track_stock }))
                           }
                           className={`relative w-12 h-6 rounded-full transition-colors duration-200 ${
-                            formData.track_stock ? 'bg-green-500' : 'bg-gray-300'
+                            formData.track_stock ? 'bg-green-500': 'bg-gray-300'
                           }`}
                         >
                           <span
                             className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${
-                              formData.track_stock ? 'translate-x-6' : 'translate-x-0'
+                              formData.track_stock ? 'translate-x-6': 'translate-x-0'
                             }`}
                           />
                         </button>
@@ -1404,11 +1404,11 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                               type="button"
                               onClick={() => toggleAllergen(allergen.id)}
                               className={`flex items-center gap-2 p-2.5 rounded-xl text-left transition-all border-2 ${
-                                isSelected ? 'border-blue-500 bg-blue-50' : 'border-transparent bg-gray-50 hover:bg-gray-100'
+                                isSelected ? 'border-blue-500 bg-blue-50': 'border-transparent bg-gray-50 hover:bg-gray-100'
                               }`}
                             >
                               <span className="text-xl">{allergen.icon}</span>
-                              <span className={`text-sm font-medium ${isSelected ? 'text-blue-700' : 'text-gray-600'}`}>
+                              <span className={`text-sm font-medium ${isSelected ? 'text-blue-700': 'text-gray-600'}`}>
                                 {allergenName}
                               </span>
                             </button>

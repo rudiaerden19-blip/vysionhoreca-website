@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     lastWebhook = body
     lastWebhookTime = new Date().toISOString()
-    console.log('🔍 DEBUG webhook received:', JSON.stringify(body, null, 2))
+    console.log('DEBUG webhook received:', JSON.stringify(body, null, 2))
     return NextResponse.json({ stored: true })
   } catch (e) {
     return NextResponse.json({ error: String(e) })

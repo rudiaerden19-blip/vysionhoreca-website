@@ -6,7 +6,7 @@ export async function POST(request: Request) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!url || !key) {
-    return NextResponse.json({ error: 'Server configuration error' }, { status: 503 })
+    return NextResponse.json({ error: 'Server configuration error'}, { status: 503 })
   }
   const supabase = createClient(url, key)
 
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
     if (!access_code || !name) {
       return NextResponse.json(
-        { error: 'access_code and name are required' },
+        { error: 'access_code and name are required'},
         { status: 400 }
       )
     }
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
 
     if (groupError || !group) {
       return NextResponse.json(
-        { error: 'Invalid access code or group not active' },
+        { error: 'Invalid access code or group not active'},
         { status: 404 }
       )
     }
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
 
     if (count !== null && count >= group.max_members) {
       return NextResponse.json(
-        { error: 'Group has reached maximum members' },
+        { error: 'Group has reached maximum members'},
         { status: 400 }
       )
     }
@@ -120,6 +120,6 @@ export async function POST(request: Request) {
     })
   } catch (error) {
     console.error('Error joining group:', error)
-    return NextResponse.json({ error: 'Failed to join group' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to join group'}, { status: 500 })
   }
 }

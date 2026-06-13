@@ -8,7 +8,7 @@ let supabaseInstance: SupabaseClient | null = null
 if (supabaseUrl && supabaseAnonKey) {
   supabaseInstance = createClient(supabaseUrl, supabaseAnonKey)
 } else {
-  console.warn('⚠️ Supabase credentials missing - check .env.local')
+  console.warn('Supabase credentials missing - check .env.local')
 }
 
 export const supabase = supabaseInstance as SupabaseClient

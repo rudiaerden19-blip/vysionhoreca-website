@@ -110,12 +110,12 @@ export default function KassaTerminalSettingsPage({ params }: { params: { tenant
               disabled={loading || saving}
               onClick={() => void toggleFloorPlan(!floorPlanOn)}
               className={`relative shrink-0 inline-flex h-9 w-[52px] items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#3C4D6B] disabled:opacity-50 ${
-                floorPlanOn ? 'bg-green-500' : 'bg-gray-300'
+                floorPlanOn ? 'bg-green-500': 'bg-gray-300'
               }`}
             >
               <span
                 className={`inline-block h-7 w-7 transform rounded-full bg-white shadow transition-transform ${
-                  floorPlanOn ? 'translate-x-[22px]' : 'translate-x-1'
+                  floorPlanOn ? 'translate-x-[22px]': 'translate-x-1'
                 }`}
               />
             </button>

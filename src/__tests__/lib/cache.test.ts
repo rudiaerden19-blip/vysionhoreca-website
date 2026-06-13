@@ -10,21 +10,21 @@ describe('Cache', () => {
 
   describe('getOrFetch', () => {
     it('should fetch data on first call', async () => {
-      const fetcher = jest.fn().mockResolvedValue({ id: 1, name: 'Test' })
+      const fetcher = jest.fn().mockResolvedValue({ id: 1, name: 'Test'})
       
       const result = await cache.getOrFetch('test-key', fetcher)
       
-      expect(result).toEqual({ id: 1, name: 'Test' })
+      expect(result).toEqual({ id: 1, name: 'Test'})
       expect(fetcher).toHaveBeenCalledTimes(1)
     })
 
     it('should return cached data on second call', async () => {
-      const fetcher = jest.fn().mockResolvedValue({ id: 1, name: 'Test' })
+      const fetcher = jest.fn().mockResolvedValue({ id: 1, name: 'Test'})
       
       await cache.getOrFetch('test-key', fetcher)
       const result = await cache.getOrFetch('test-key', fetcher)
       
-      expect(result).toEqual({ id: 1, name: 'Test' })
+      expect(result).toEqual({ id: 1, name: 'Test'})
       expect(fetcher).toHaveBeenCalledTimes(1) // Still only called once
     })
 
@@ -53,7 +53,7 @@ describe('Cache', () => {
 
   describe('invalidate', () => {
     it('should remove specific cache entry', async () => {
-      const fetcher = jest.fn().mockResolvedValue({ data: 'test' })
+      const fetcher = jest.fn().mockResolvedValue({ data: 'test'})
       
       await cache.getOrFetch('key-1', fetcher)
       cache.invalidate('key-1')
@@ -66,7 +66,7 @@ describe('Cache', () => {
 
   describe('invalidatePattern', () => {
     it('should remove all matching cache entries', async () => {
-      const fetcher = jest.fn().mockResolvedValue({ data: 'test' })
+      const fetcher = jest.fn().mockResolvedValue({ data: 'test'})
       
       await cache.getOrFetch('tenant:demo:settings', fetcher)
       await cache.getOrFetch('tenant:demo:products', fetcher)

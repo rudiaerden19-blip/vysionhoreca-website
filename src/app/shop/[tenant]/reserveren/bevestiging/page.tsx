@@ -31,7 +31,7 @@ export default function ReservationBevestigingPage({ params }: { params: { tenan
   }, [reservationId, sessionId, params.tenant])
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: `${primaryColor}15` }}>
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: `${primaryColor}15`}}>
       <div className="text-center max-w-md w-full bg-white rounded-3xl p-8 shadow-xl">
         {/* Checkmark cirkel */}
         <div
@@ -50,7 +50,7 @@ export default function ReservationBevestigingPage({ params }: { params: { tenan
         </p>
 
         {/* Bevestigingskaart */}
-        <div className="rounded-2xl p-4 mb-6 text-sm text-left" style={{ backgroundColor: `${primaryColor}15` }}>
+        <div className="rounded-2xl p-4 mb-6 text-sm text-left" style={{ backgroundColor: `${primaryColor}15`}}>
           <div className="flex items-center gap-2 mb-2">
             <span className="text-lg"></span>
             <span className="font-medium text-gray-700">Borg betaald</span>

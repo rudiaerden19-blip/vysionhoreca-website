@@ -13,7 +13,7 @@ export function parseOrdersItemsJson<T extends Record<string, unknown>>(rows: T[
 
 /**
  * Keukenrij: webshop bevestigd/voorbereiding + open kassa-tafelmanden (DINE_IN) met inhoud.
- * DINE_IN die al op `preparing` staat maar nog niet betaald is, verdwijnt uit de rij (eten klaar gemeld).
+ * DINE_IN die al op `preparing`staat maar nog niet betaald is, verdwijnt uit de rij (eten klaar gemeld).
  */
 export function isKitchenQueueOrder(o: {
   status?: string

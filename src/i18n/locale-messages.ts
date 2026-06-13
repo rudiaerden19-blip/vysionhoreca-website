@@ -54,9 +54,9 @@ export function translateKey(key: string, locale: Locale, catalog: Partial<Recor
           return key
         }
       }
-      return typeof fallback === 'string' ? fallback : key
+      return typeof fallback === 'string'? fallback : key
     }
   }
 
-  return typeof value === 'string' ? value : key
+  return typeof value === 'string'? value : key
 }

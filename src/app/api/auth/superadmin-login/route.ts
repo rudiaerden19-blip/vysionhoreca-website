@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     if (!rateLimitResult.success) {
       logger.warn('Superadmin login rate limited', { requestId, clientIP })
       return NextResponse.json(
-        { error: 'Te veel login pogingen. Probeer het over een minuut opnieuw.' },
+        { error: 'Te veel login pogingen. Probeer het over een minuut opnieuw.'},
         { status: 429 }
       )
     }
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
 
     if (!email || !password) {
       return NextResponse.json(
-        { error: 'Email en wachtwoord zijn verplicht' },
+        { error: 'Email en wachtwoord zijn verplicht'},
         { status: 400 }
       )
     }
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     if (!supabase) {
       logger.error('Superadmin login failed: Supabase not configured', { requestId })
       return NextResponse.json(
-        { error: 'Database niet geconfigureerd. Neem contact op met support.' },
+        { error: 'Database niet geconfigureerd. Neem contact op met support.'},
         { status: 503 }
       )
     }
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     if (adminError) {
       logger.error('Error finding superadmin', { requestId, error: adminError.message })
       return NextResponse.json(
-        { error: 'Database fout' },
+        { error: 'Database fout'},
         { status: 500 }
       )
     }
@@ -78,11 +78,11 @@ export async function POST(request: NextRequest) {
       logger.warn('Superadmin login failed', { 
         requestId, 
         email: emailLower, 
-        reason: !admin ? 'not_found' : !isValid ? 'wrong_password' : 'inactive',
+        reason: !admin ? 'not_found': !isValid ? 'wrong_password': 'inactive',
         clientIP 
       })
       return NextResponse.json(
-        { error: 'Onjuiste email of wachtwoord' },
+        { error: 'Onjuiste email of wachtwoord'},
         { status: 401 }
       )
     }
@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
     const cookieOpts = {
       path: '/',
       maxAge,
-      sameSite: 'lax' as const,
+      sameSite: 'lax'as const,
       secure,
       /** Zichtbaar in document.cookie zodat client + admin-layout API-headers werken op subdomeinen. */
       httpOnly: false,
@@ -154,7 +154,7 @@ export async function POST(request: NextRequest) {
       duration: Date.now() - startTime 
     })
     return NextResponse.json(
-      { error: 'Er is een fout opgetreden' },
+      { error: 'Er is een fout opgetreden'},
       { status: 500 }
     )
   }

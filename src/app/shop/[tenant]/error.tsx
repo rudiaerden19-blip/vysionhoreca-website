@@ -14,7 +14,7 @@ export default function ShopTenantError({
   reset: () => void
 }) {
   const params = useParams()
-  const tenant = typeof params?.tenant === 'string' ? params.tenant : ''
+  const tenant = typeof params?.tenant === 'string'? params.tenant : ''
 
   useEffect(() => {
     const name = error?.name ?? ''
@@ -24,7 +24,7 @@ export default function ShopTenantError({
     trackError(error, { segment: 'shop/[tenant]', tenant: tenant || undefined })
   }, [error, tenant])
 
-  const homeHref = tenant ? `/shop/${encodeURIComponent(tenant)}` : '/'
+  const homeHref = tenant ? `/shop/${encodeURIComponent(tenant)}`: '/'
 
   return (
     <div className="min-h-[50vh] flex flex-col items-center justify-center px-4 py-16 text-center">

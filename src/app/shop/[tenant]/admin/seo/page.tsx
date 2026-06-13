@@ -98,7 +98,7 @@ export default function SeoPage({ params }: { params: { tenant: string } }) {
         onClick={handleSave}
         disabled={saving}
         className={`fixed bottom-6 right-6 z-50 px-6 py-4 rounded-2xl font-medium shadow-2xl flex items-center gap-2 ${
-          saved ? 'bg-green-500 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'
+          saved ? 'bg-green-500 text-white': 'bg-blue-600 hover:bg-blue-700 text-white'
         }`}
       >
         {saving ? (
@@ -148,7 +148,7 @@ export default function SeoPage({ params }: { params: { tenant: string } }) {
           />
           <div className="flex justify-between mt-2">
             <p className="text-sm text-gray-500">{t('websiteSeo.pageTitleDesc')}</p>
-            <p className={`text-sm ${titleLength > 60 ? 'text-red-500' : 'text-gray-400'}`}>
+            <p className={`text-sm ${titleLength > 60 ? 'text-red-500': 'text-gray-400'}`}>
               {titleLength}/60
             </p>
           </div>
@@ -168,7 +168,7 @@ export default function SeoPage({ params }: { params: { tenant: string } }) {
           />
           <div className="flex justify-between mt-2">
             <p className="text-sm text-gray-500">{t('websiteSeo.metaDescriptionDesc')}</p>
-            <p className={`text-sm ${descLength > 160 ? 'text-red-500' : 'text-gray-400'}`}>
+            <p className={`text-sm ${descLength > 160 ? 'text-red-500': 'text-gray-400'}`}>
               {descLength}/160
             </p>
           </div>

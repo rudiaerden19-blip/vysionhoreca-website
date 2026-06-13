@@ -70,9 +70,9 @@ async function updateSkuStock(
       { id: sku.variantId, tenant_slug: tenantSlug },
       { tenantSlug, select: VARIANT_SELECT },
     )
-    if (!r.ok) return { ok: false, error: r.error || 'update_failed' }
+    if (!r.ok) return { ok: false, error: r.error || 'update_failed'}
     const row = (Array.isArray(r.data) ? r.data[0] : r.data) as Record<string, unknown> | undefined
-    if (!row) return { ok: false, error: 'empty_row' }
+    if (!row) return { ok: false, error: 'empty_row'}
 
     if (opts?.skipCatalogRefresh) {
       return { ok: true, sku: { ...sku, stock_quantity: nextQty, track_stock: true } }
@@ -95,7 +95,7 @@ async function updateSkuStock(
     { id: sku.productId, tenant_slug: tenantSlug },
     { tenantSlug, select: PRODUCT_STOCK_SELECT },
   )
-  if (!r.ok) return { ok: false, error: r.error || 'update_failed' }
+  if (!r.ok) return { ok: false, error: r.error || 'update_failed'}
   if (opts?.skipCatalogRefresh) {
     return { ok: true, sku: { ...sku, stock_quantity: nextQty, track_stock: true } }
   }
@@ -118,7 +118,7 @@ export async function completeRetailSale(
     storeCreditEuro?: number
   },
 ): Promise<{ ok: boolean; orderNumber?: number; orderId?: string; error?: string }> {
-  if (lines.length === 0) return { ok: false, error: 'empty_cart' }
+  if (lines.length === 0) return { ok: false, error: 'empty_cart'}
 
   const grossTotal = lines.reduce((s, l) => s + l.sku.price * l.quantity, 0)
   const loyaltyDiscountRaw = Math.max(0, options?.loyaltyDiscountEuro ?? 0)
@@ -133,7 +133,7 @@ export async function completeRetailSale(
     const sc = splitAmounts?.cash ?? 0
     const sd = splitAmounts?.card ?? 0
     if (Math.abs(roundedTotal - sc - sd) > 0.02) {
-      return { ok: false, error: 'split_mismatch' }
+      return { ok: false, error: 'split_mismatch'}
     }
   }
 
@@ -151,7 +151,7 @@ export async function completeRetailSale(
     customer_name: 'Winkel',
     status: 'confirmed',
     payment_status: 'paid',
-    payment_method: method === 'SPLIT' ? 'SPLIT' : method,
+    payment_method: method === 'SPLIT'? 'SPLIT': method,
     order_type: 'TAKEAWAY',
     subtotal,
     tax,
@@ -193,7 +193,7 @@ export async function completeRetailSale(
   })
 
   if (!insRes.ok) {
-    return { ok: false, error: insRes.error || 'insert_failed' }
+    return { ok: false, error: insRes.error || 'insert_failed'}
   }
 
   const raw = insRes.data as unknown
@@ -216,7 +216,7 @@ export async function completeRetailSale(
     })
     const redeemJson = (await redeemRes.json().catch(() => ({}))) as { ok?: boolean; error?: string }
     if (!redeemRes.ok || !redeemJson.ok) {
-      return { ok: false, error: redeemJson.error || 'store_credit_redeem_failed' }
+      return { ok: false, error: redeemJson.error || 'store_credit_redeem_failed'}
     }
   }
 
@@ -257,7 +257,7 @@ export async function createRetailSkuFromScan(
   const barcodeRaw = input.barcode.trim()
   const price = Math.round(Number(input.price) * 100) / 100
   if (!name || !barcodeRaw || !(price >= 0)) {
-    return { ok: false, error: 'invalid_input' }
+    return { ok: false, error: 'invalid_input'}
   }
 
   const catalog = await fetchRetailPosSkus(tenantSlug)
@@ -288,12 +288,12 @@ export async function createRetailSkuFromScan(
     { tenantSlug, select: PRODUCT_STOCK_SELECT },
   )
   if (!ins.ok) {
-    return { ok: false, error: ins.error || 'insert_failed' }
+    return { ok: false, error: ins.error || 'insert_failed'}
   }
 
   const refreshed = await fetchRetailPosSkus(tenantSlug, { fresh: true })
   const sku = findRetailSkuByCode(refreshed, barcodeRaw) ?? refreshed[refreshed.length - 1]
-  return sku ? { ok: true, sku } : { ok: false, error: 'sku_missing' }
+  return sku ? { ok: true, sku } : { ok: false, error: 'sku_missing'}
 }
 
 /** CSV/Excel → menu_products (bestaande barcode wordt overgeslagen). */
@@ -328,7 +328,7 @@ export async function importRetailProductsBatch(
         image_url: '',
         sort_order: 0,
       },
-      { tenantSlug, select: 'id' },
+      { tenantSlug, select: 'id'},
     )
     if (!ins.ok) failed++
     else {
@@ -346,10 +346,10 @@ export async function updateRetailSkuPrice(
   name?: string,
 ): Promise<{ ok: boolean; sku?: RetailPosSku; error?: string }> {
   const nextPrice = Math.round(price * 100) / 100
-  if (!(nextPrice >= 0)) return { ok: false, error: 'invalid_price' }
+  if (!(nextPrice >= 0)) return { ok: false, error: 'invalid_price'}
 
   const trimmedName = name?.trim()
-  if (name !== undefined && !trimmedName) return { ok: false, error: 'invalid_name' }
+  if (name !== undefined && !trimmedName) return { ok: false, error: 'invalid_name'}
 
   const id = sku.variantId ?? sku.productId
   const r = sku.variantId
@@ -370,7 +370,7 @@ export async function updateRetailSkuPrice(
         { id, tenant_slug: tenantSlug },
         { tenantSlug },
       )
-  if (!r.ok) return { ok: false, error: r.error || 'update_failed' }
+  if (!r.ok) return { ok: false, error: r.error || 'update_failed'}
 
   if (trimmedName && sku.variantId) {
     const nameRes = await adminDb.update(
@@ -379,19 +379,19 @@ export async function updateRetailSkuPrice(
       { id: sku.productId, tenant_slug: tenantSlug },
       { tenantSlug },
     )
-    if (!nameRes.ok) return { ok: false, error: nameRes.error || 'update_failed' }
+    if (!nameRes.ok) return { ok: false, error: nameRes.error || 'update_failed'}
   }
 
   const refreshed = await fetchRetailPosSkus(tenantSlug, { fresh: true })
   const updated = refreshed.find((s) => s.lineKey === sku.lineKey)
-  if (!updated) return { ok: false, error: 'sku_missing' }
+  if (!updated) return { ok: false, error: 'sku_missing'}
   return { ok: true, sku: updated }
 }
 
 export async function applyRetailGoodsReceipt(
   tenantSlug: string,
   sku: RetailPosSku,
-  payload: Pick<RetailScanPayload, 'quantity' | 'size_label' | 'color_label'>,
+  payload: Pick<RetailScanPayload, 'quantity' |  'size_label' |  'color_label'>,
 ): Promise<{ ok: boolean; product?: RetailPosSku; sku?: RetailPosSku; error?: string }> {
   const add = Math.max(1, Math.floor(payload.quantity || 1))
   const nextQty = (sku.track_stock ? sku.stock_quantity : 0) + add

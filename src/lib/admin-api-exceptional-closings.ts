@@ -52,7 +52,7 @@ export async function saveExceptionalClosing(closing: ExceptionalClosing): Promi
 
   const { data, error } = await supabase
     .from('exceptional_closings')
-    .upsert(payload, { onConflict: 'tenant_slug,date' })
+    .upsert(payload, { onConflict: 'tenant_slug,date'})
     .select()
     .single()
 

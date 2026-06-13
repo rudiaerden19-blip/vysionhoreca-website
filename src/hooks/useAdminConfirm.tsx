@@ -7,13 +7,13 @@ type Pending = { message: string; resolve: (ok: boolean) => void }
 
 /**
  * Vervangt window.confirm voor admin / touch (iPad Safari).
- * Render `<ConfirmModal />` één keer hoog in je component-return.
+ * Render `<ConfirmModal />`één keer hoog in je component-return.
  *
  * Belangrijk: de modal rendert via een React Portal naar `document.body`.
  * Zonder portal wordt-ie "vastgepind" achter andere kaarten zodra een
- * voorouder-element een `transform` of `filter` heeft (bv. produkt-kaarten
- * met @dnd-kit/sortable die `transform: translate3d(...)` zetten — die
- * maken een nieuwe stacking context waardoor `position: fixed` niet meer
+ * voorouder-element een `transform`of `filter`heeft (bv. produkt-kaarten
+ * met @dnd-kit/sortable die `transform: translate3d(...)`zetten — die
+ * maken een nieuwe stacking context waardoor `position: fixed`niet meer
  * t.o.v. de viewport werkt). Een portal naar <body> haalt de modal uit
  * elke transform-keten.
  */
@@ -119,7 +119,7 @@ export function useAdminConfirm(t: (key: string) => string) {
       <div style={overlayStyle} data-admin-confirm-portal="v2">
         <div style={cardStyle} onClick={(e) => e.stopPropagation()}>
           <div style={headerStyle}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'rgb(31,41,55)' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'rgb(31,41,55)'}}>
               {t('adminPages.common.confirm')}
             </h2>
             <p

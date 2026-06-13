@@ -46,31 +46,31 @@ interface OrderItemJson {
 
 // Status config builder function (uses translations)
 const getStatusConfig = (t: (key: string) => string): Record<string, { bg: string; text: string; label: string; next?: string; prev?: string }> => ({
-  new: { bg: 'bg-blue-100', text: 'text-blue-700', label: `🆕 ${t('ordersPage.status.new')}`, next: 'confirmed' },
-  NEW: { bg: 'bg-blue-100', text: 'text-blue-700', label: `🆕 ${t('ordersPage.status.new')}`, next: 'confirmed' },
-  confirmed: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: ` ${t('ordersPage.status.confirmed')}`, next: 'preparing', prev: 'new' },
-  CONFIRMED: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: ` ${t('ordersPage.status.confirmed')}`, next: 'preparing', prev: 'new' },
-  preparing: { bg: 'bg-blue-100', text: 'text-blue-700', label: ` ${t('ordersPage.status.preparing')}`, next: 'ready', prev: 'confirmed' },
-  PREPARING: { bg: 'bg-blue-100', text: 'text-blue-700', label: ` ${t('ordersPage.status.preparing')}`, next: 'ready', prev: 'confirmed' },
-  ready: { bg: 'bg-green-100', text: 'text-green-700', label: ` ${t('ordersPage.status.ready')}`, next: 'completed', prev: 'preparing' },
-  READY: { bg: 'bg-green-100', text: 'text-green-700', label: ` ${t('ordersPage.status.ready')}`, next: 'completed', prev: 'preparing' },
-  delivered: { bg: 'bg-purple-100', text: 'text-purple-700', label: ` ${t('ordersPage.status.delivered')}`, next: 'completed' },
-  DELIVERED: { bg: 'bg-purple-100', text: 'text-purple-700', label: ` ${t('ordersPage.status.delivered')}`, next: 'completed' },
-  completed: { bg: 'bg-gray-100', text: 'text-gray-700', label: ` ${t('ordersPage.status.completed')}` },
-  COMPLETED: { bg: 'bg-gray-100', text: 'text-gray-700', label: ` ${t('ordersPage.status.completed')}` },
-  cancelled: { bg: 'bg-red-100', text: 'text-red-700', label: ` ${t('ordersPage.status.cancelled')}` },
-  CANCELLED: { bg: 'bg-red-100', text: 'text-red-700', label: ` ${t('ordersPage.status.cancelled')}` },
-  rejected: { bg: 'bg-red-100', text: 'text-red-700', label: ` ${t('ordersPage.status.rejected')}` },
-  REJECTED: { bg: 'bg-red-100', text: 'text-red-700', label: ` ${t('ordersPage.status.rejected')}` },
+  new: { bg: 'bg-blue-100', text: 'text-blue-700', label: `🆕 ${t('ordersPage.status.new')}`, next: 'confirmed'},
+  NEW: { bg: 'bg-blue-100', text: 'text-blue-700', label: `🆕 ${t('ordersPage.status.new')}`, next: 'confirmed'},
+  confirmed: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: ` ${t('ordersPage.status.confirmed')}`, next: 'preparing', prev: 'new'},
+  CONFIRMED: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: ` ${t('ordersPage.status.confirmed')}`, next: 'preparing', prev: 'new'},
+  preparing: { bg: 'bg-blue-100', text: 'text-blue-700', label: ` ${t('ordersPage.status.preparing')}`, next: 'ready', prev: 'confirmed'},
+  PREPARING: { bg: 'bg-blue-100', text: 'text-blue-700', label: ` ${t('ordersPage.status.preparing')}`, next: 'ready', prev: 'confirmed'},
+  ready: { bg: 'bg-green-100', text: 'text-green-700', label: ` ${t('ordersPage.status.ready')}`, next: 'completed', prev: 'preparing'},
+  READY: { bg: 'bg-green-100', text: 'text-green-700', label: ` ${t('ordersPage.status.ready')}`, next: 'completed', prev: 'preparing'},
+  delivered: { bg: 'bg-purple-100', text: 'text-purple-700', label: ` ${t('ordersPage.status.delivered')}`, next: 'completed'},
+  DELIVERED: { bg: 'bg-purple-100', text: 'text-purple-700', label: ` ${t('ordersPage.status.delivered')}`, next: 'completed'},
+  completed: { bg: 'bg-gray-100', text: 'text-gray-700', label: ` ${t('ordersPage.status.completed')}`},
+  COMPLETED: { bg: 'bg-gray-100', text: 'text-gray-700', label: ` ${t('ordersPage.status.completed')}`},
+  cancelled: { bg: 'bg-red-100', text: 'text-red-700', label: ` ${t('ordersPage.status.cancelled')}`},
+  CANCELLED: { bg: 'bg-red-100', text: 'text-red-700', label: ` ${t('ordersPage.status.cancelled')}`},
+  rejected: { bg: 'bg-red-100', text: 'text-red-700', label: ` ${t('ordersPage.status.rejected')}`},
+  REJECTED: { bg: 'bg-red-100', text: 'text-red-700', label: ` ${t('ordersPage.status.rejected')}`},
 })
 
 const getPaymentStatusConfig = (t: (key: string) => string): Record<string, { bg: string; text: string; label: string }> => ({
-  pending: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: `⏳ ${t('ordersPage.paymentStatus.pending')}` },
-  PENDING: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: `⏳ ${t('ordersPage.paymentStatus.pending')}` },
-  paid: { bg: 'bg-green-100', text: 'text-green-700', label: ` ${t('ordersPage.paymentStatus.paid')}` },
-  PAID: { bg: 'bg-green-100', text: 'text-green-700', label: ` ${t('ordersPage.paymentStatus.paid')}` },
-  failed: { bg: 'bg-red-100', text: 'text-red-700', label: ` ${t('ordersPage.paymentStatus.failed')}` },
-  FAILED: { bg: 'bg-red-100', text: 'text-red-700', label: ` ${t('ordersPage.paymentStatus.failed')}` },
+  pending: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: ` ${t('ordersPage.paymentStatus.pending')}`},
+  PENDING: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: ` ${t('ordersPage.paymentStatus.pending')}`},
+  paid: { bg: 'bg-green-100', text: 'text-green-700', label: ` ${t('ordersPage.paymentStatus.paid')}`},
+  PAID: { bg: 'bg-green-100', text: 'text-green-700', label: ` ${t('ordersPage.paymentStatus.paid')}`},
+  failed: { bg: 'bg-red-100', text: 'text-red-700', label: ` ${t('ordersPage.paymentStatus.failed')}`},
+  FAILED: { bg: 'bg-red-100', text: 'text-red-700', label: ` ${t('ordersPage.paymentStatus.failed')}`},
 })
 
 const getPaymentMethodLabels = (t: (key: string) => string): Record<string, string> => ({
@@ -94,11 +94,11 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   const paymentStatusConfig = useMemo(() => getPaymentStatusConfig(t), [t])
   const paymentMethodLabels = useMemo(() => getPaymentMethodLabels(t), [t])
 
-  const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('active')
+  const [filter, setFilter] = useState<'all' |  'active' |  'completed'>('active')
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [archiveMode, setArchiveMode] = useState(false)
-  const [archivePeriod, setArchivePeriod] = useState<'dag' | 'week' | 'maand' | 'jaar'>('dag')
+  const [archivePeriod, setArchivePeriod] = useState<'dag' |  'week' |  'maand' |  'jaar'>('dag')
   const [archiveDate, setArchiveDate] = useState(() => new Date().toISOString().split('T')[0])
   const [archiveOrders, setArchiveOrders] = useState<Order[]>([])
   const [archiveLoading, setArchiveLoading] = useState(false)
@@ -128,12 +128,12 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   const [rejectOrderError, setRejectOrderError] = useState<string | null>(null)
   
   const rejectionReasons = useMemo(() => [
-    { value: 'too_busy', label: ` ${t('ordersPage.rejection.reasons.tooBusy')}` },
-    { value: 'closed', label: ` ${t('ordersPage.rejection.reasons.closed')}` },
-    { value: 'sold_out', label: ` ${t('ordersPage.rejection.reasons.soldOut')}` },
-    { value: 'delivery_unavailable', label: ` ${t('ordersPage.rejection.reasons.deliveryUnavailable')}` },
-    { value: 'technical', label: ` ${t('ordersPage.rejection.reasons.technical')}` },
-    { value: 'other', label: ` ${t('ordersPage.rejection.reasons.other')}` },
+    { value: 'too_busy', label: ` ${t('ordersPage.rejection.reasons.tooBusy')}`},
+    { value: 'closed', label: ` ${t('ordersPage.rejection.reasons.closed')}`},
+    { value: 'sold_out', label: ` ${t('ordersPage.rejection.reasons.soldOut')}`},
+    { value: 'delivery_unavailable', label: ` ${t('ordersPage.rejection.reasons.deliveryUnavailable')}`},
+    { value: 'technical', label: ` ${t('ordersPage.rejection.reasons.technical')}`},
+    { value: 'other', label: ` ${t('ordersPage.rejection.reasons.other')}`},
   ], [t])
   
   // Refs
@@ -161,14 +161,14 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
 
   // Request notification permission
   useEffect(() => {
-    if ('Notification' in window && Notification.permission === 'default') {
+    if ('Notification'in window && Notification.permission === 'default') {
       // We'll ask for permission when user enables notifications
     }
   }, [])
 
   const showNotification = useCallback((order: Order) => {
-    if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification(' Nieuwe bestelling!', {
+    if ('Notification'in window && Notification.permission === 'granted') {
+      new Notification('Nieuwe bestelling!', {
         body: `${order.customer_name} - €${order.total?.toFixed(2)}`,
         icon: '/icon-192.png',
         tag: order.id,
@@ -730,9 +730,9 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         <div class="business-info">
           ${tenantSettings?.address || ''}<br>
           ${tenantSettings?.postal_code || ''} ${tenantSettings?.city || ''}<br>
-          ${tenantSettings?.phone ? `Tel: ${tenantSettings.phone}` : ''}<br>
-          ${tenantSettings?.email ? `${tenantSettings.email}` : ''}<br>
-          ${tenantSettings?.btw_number ? `<strong>BTW: ${tenantSettings.btw_number}</strong>` : ''}
+          ${tenantSettings?.phone ? `Tel: ${tenantSettings.phone}`: ''}<br>
+          ${tenantSettings?.email ? `${tenantSettings.email}`: ''}<br>
+          ${tenantSettings?.btw_number ? `<strong>BTW: ${tenantSettings.btw_number}</strong>`: ''}
         </div>
         
         <div class="divider-double"></div>
@@ -744,7 +744,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         </div>
         <div class="center small">
           ${new Date(order.created_at || '').toLocaleString('nl-BE')}<br>
-          ${order.order_type === 'pickup' || order.order_type === 'PICKUP' ? 'AFHALEN' : 'LEVERING'}
+          ${order.order_type === 'pickup' || order.order_type === 'PICKUP'? 'AFHALEN': 'LEVERING'}
         </div>
         
         <div class="divider"></div>
@@ -752,9 +752,9 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         <!-- KLANTGEGEVENS -->
         <div style="margin: 6px 0;">
           <strong>Klant:</strong> ${order.customer_name}<br>
-          ${order.customer_phone ? `Tel: ${order.customer_phone}<br>` : ''}
-          ${order.customer_email ? `${order.customer_email}<br>` : ''}
-          ${order.customer_address || order.delivery_address ? `Adres: ${order.customer_address || order.delivery_address}<br>` : ''}
+          ${order.customer_phone ? `Tel: ${order.customer_phone}<br>`: ''}
+          ${order.customer_email ? `${order.customer_email}<br>`: ''}
+          ${order.customer_address || order.delivery_address ? `Adres: ${order.customer_address || order.delivery_address}<br>`: ''}
         </div>
         
         <div class="divider"></div>
@@ -768,8 +768,8 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             <span>${item.quantity}x ${item.name || item.product_name}</span>
             <span>€${((item.price || item.unit_price || 0) * item.quantity).toFixed(2)}</span>
           </div>
-          ${item.options && item.options.length > 0 ? `<div style="font-size: 10px; margin-left: 10px; color: #666;">+ ${item.options.map((o: any) => o.name).join(', ')}</div>` : ''}
-          ${item.notes ? `<div style="font-size: 10px; margin-left: 10px; font-weight: bold;"> ${item.notes}</div>` : ''}
+          ${item.options && item.options.length > 0 ? `<div style="font-size: 10px; margin-left: 10px; color: #666;">+ ${item.options.map((o: any) => o.name).join(', ')}</div>`: ''}
+          ${item.notes ? `<div style="font-size: 10px; margin-left: 10px; font-weight: bold;"> ${item.notes}</div>`: ''}
         `).join('')}
         
         <div class="divider"></div>
@@ -780,13 +780,13 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             <span>Bezorgkosten</span>
             <span>€${order.delivery_fee?.toFixed(2)}</span>
           </div>
-        ` : ''}
+        `: ''}
         ${(order.discount_amount || 0) > 0 ? `
           <div class="item" style="color: green;">
-            <span>Korting ${order.discount_code ? `(${order.discount_code})` : ''}</span>
+            <span>Korting ${order.discount_code ? `(${order.discount_code})`: ''}</span>
             <span>-€${order.discount_amount?.toFixed(2)}</span>
           </div>
-        ` : ''}
+        `: ''}
         
         <div class="divider-double"></div>
         
@@ -811,14 +811,14 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         
         <!-- BETALING -->
         <div class="center">
-          ${order.payment_method ? `Betaalmethode: ${paymentMethodLabels[order.payment_method] || order.payment_method}<br>` : ''}
-          ${order.payment_status?.toLowerCase() === 'paid' ? '<strong> BETAALD</strong>' : 'Betaling: In afwachting'}
+          ${order.payment_method ? `Betaalmethode: ${paymentMethodLabels[order.payment_method] || order.payment_method}<br>`: ''}
+          ${order.payment_status?.toLowerCase() === 'paid'? '<strong> BETAALD</strong>': 'Betaling: In afwachting'}
         </div>
         
         ${order.customer_notes ? `
           <div class="divider"></div>
           <div class="small"><strong>Opmerking:</strong> ${order.customer_notes}</div>
-        ` : ''}
+        `: ''}
         
         <div class="divider-double"></div>
         
@@ -996,7 +996,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                 {/* Payment Status */}
                 {order.payment_status && (
                   <div className={`inline-block px-3 py-1 rounded-full text-sm font-bold mb-3 ${
-                    order.payment_status.toLowerCase() === 'paid' ? 'bg-green-600 text-white' : 'bg-yellow-600 text-white'
+                    order.payment_status.toLowerCase() === 'paid'? 'bg-green-600 text-white': 'bg-yellow-600 text-white'
                   }`}>
                     {paymentStatusConfig[order.payment_status]?.label || order.payment_status}
                   </div>
@@ -1120,7 +1120,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setArchiveMode(!archiveMode)}
-            className={`px-4 py-2 rounded-xl font-medium flex items-center gap-2 ${archiveMode ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+            className={`px-4 py-2 rounded-xl font-medium flex items-center gap-2 ${archiveMode ? 'bg-blue-600 text-white': 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
           >
              Archief
           </motion.button>
@@ -1168,7 +1168,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                 key={f}
                 onClick={() => setFilter(f)}
                 className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                  filter === f ? 'bg-white shadow text-gray-900' : 'text-gray-500'
+                  filter === f ? 'bg-white shadow text-gray-900': 'text-gray-500'
                 }`}
               >
                 {t(`ordersPage.filter.${f}`)}
@@ -1190,7 +1190,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                   key={p}
                   onClick={() => setArchivePeriod(p)}
                   className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors capitalize ${
-                    archivePeriod === p ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700'
+                    archivePeriod === p ? 'bg-white shadow text-blue-600': 'text-gray-500 hover:text-gray-700'
                   }`}
                 >
                   {p.charAt(0).toUpperCase() + p.slice(1)}
@@ -1311,7 +1311,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                 key={order.id}
                 layout
                 className={`bg-white rounded-2xl p-6 shadow-sm ${
-                  status === 'new' ? 'ring-2 ring-red-500 animate-pulse' : ''
+                  status === 'new'? 'ring-2 ring-red-500 animate-pulse': ''
                 }`}
               >
                 {/* Webshop: online bestelling + moment; kassa: kanaal */}
@@ -1333,7 +1333,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                             },
                             locale
                           )
-                          return sl ? ` · ${sl}` : ''
+                          return sl ? `· ${sl}`: ''
                         })()}
                       </div>
                     </>
@@ -1377,7 +1377,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                     <p className="text-gray-500 mt-1">{formatTime(order.created_at)}</p>
                     {((order as any).scheduled_date || (order as any).scheduled_time) && (
                       <p className="mt-1 text-sm font-semibold text-orange-600 bg-orange-50 px-2 py-1 rounded-lg inline-block">
-                         {(order as any).scheduled_date ? new Date((order as any).scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''}{(order as any).scheduled_time ? ` om ${(order as any).scheduled_time}` : ''}
+                         {(order as any).scheduled_date ? new Date((order as any).scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit', year: 'numeric'}) : ''}{(order as any).scheduled_time ? `om ${(order as any).scheduled_time}`: ''}
                       </p>
                     )}
                   </div>
@@ -1580,7 +1580,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                           selectedOrder.order_type === 'pickup' || selectedOrder.order_type === 'PICKUP'
                             ? t('ordersPage.orderType.pickup')
                             : t('ordersPage.orderType.delivery')
-                        }${selectedScheduleLabel ? ` · ${selectedScheduleLabel}` : ''}`
+                        }${selectedScheduleLabel ? `· ${selectedScheduleLabel}`: ''}`
                       : adminPosChannelBadgeLabel(selectedOrder, t)}
                   </span>
                   {selectedOrder.payment_status && (

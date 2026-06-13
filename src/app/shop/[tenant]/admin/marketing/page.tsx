@@ -24,7 +24,7 @@ interface CampaignHistory {
   subject: string
   sent_at: string
   recipient_count: number
-  status: 'sent' | 'failed'
+  status: 'sent' |  'failed'
 }
 
 export default function MarketingPage({ params }: { params: { tenant: string } }) {
@@ -152,11 +152,11 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
         loadData() // Reload campaign history
         setTimeout(() => setSendSuccess(false), 5000)
       } else {
-        alert(' Verzenden mislukt: ' + (result.error || 'Onbekende fout'))
+        alert('Verzenden mislukt: '+ (result.error || 'Onbekende fout'))
       }
     } catch (error) {
       console.error('Send error:', error)
-      alert(' Verzenden mislukt. Controleer of ZOHO_EMAIL en ZOHO_PASSWORD ingesteld zijn in Vercel.')
+      alert('Verzenden mislukt. Controleer of ZOHO_EMAIL en ZOHO_PASSWORD ingesteld zijn in Vercel.')
     }
 
     setSending(false)
@@ -329,7 +329,7 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
                           ? 'bg-green-100 text-green-700' 
                           : 'bg-red-100 text-red-700'
                       }`}>
-                        {campaign.status === 'sent' ? ' Verzonden' : ' Mislukt'}
+                        {campaign.status === 'sent'? 'Verzonden': 'Mislukt'}
                       </span>
                       <span className="text-xs text-gray-500">
                         {campaign.recipient_count} {t('marketing.recipients')}

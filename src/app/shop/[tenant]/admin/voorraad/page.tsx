@@ -7,7 +7,7 @@ import { getMenuCategories, MenuCategory } from '@/lib/admin-api'
 import { buildRetailSkusFromRows, type RetailPosSku } from '@/lib/retail-pos-catalog'
 import { useLanguage } from '@/i18n'
 
-type FilterType = 'all' | 'tracked' | 'low' | 'out'
+type FilterType = 'all' |  'tracked' |  'low' |  'out'
 
 export default function VoorraadPage({ params }: { params: { tenant: string } }) {
   const tenant = params.tenant
@@ -104,7 +104,7 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
 
   const updateSku = async (sku: RetailPosSku, patch: Record<string, unknown>) => {
     setSaving(sku.lineKey)
-    const table = sku.variantId ? 'menu_product_variants' : 'menu_products'
+    const table = sku.variantId ? 'menu_product_variants': 'menu_products'
     const id = sku.variantId ?? sku.productId
     const r = await adminDb.update(table, patch, { id, tenant_slug: tenant }, { tenantSlug: tenant })
     if (!r.ok) {
@@ -177,12 +177,12 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
   const getCatName = (catId: string | null) => categories.find((c) => c.id === catId)?.name ?? '—'
 
   const getStatus = (sku: RetailPosSku) => {
-    if (!sku.track_stock) return { label: t('stockPage.statusNotTracked'), color: 'text-gray-400', bg: 'bg-gray-100' }
+    if (!sku.track_stock) return { label: t('stockPage.statusNotTracked'), color: 'text-gray-400', bg: 'bg-gray-100'}
     if (sku.stock_quantity === 0)
-      return { label: t('stockPage.statusOut'), color: 'text-red-600', bg: 'bg-red-100' }
+      return { label: t('stockPage.statusOut'), color: 'text-red-600', bg: 'bg-red-100'}
     if (sku.stock_quantity <= sku.low_stock_threshold)
-      return { label: t('stockPage.statusLow'), color: 'text-amber-600', bg: 'bg-amber-100' }
-    return { label: t('stockPage.statusOk'), color: 'text-emerald-600', bg: 'bg-emerald-100' }
+      return { label: t('stockPage.statusLow'), color: 'text-amber-600', bg: 'bg-amber-100'}
+    return { label: t('stockPage.statusOk'), color: 'text-emerald-600', bg: 'bg-emerald-100'}
   }
 
   const filtered = useMemo(() => {
@@ -328,7 +328,7 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
                     <p className="font-semibold text-gray-900">{sku.name}</p>
                     <p className="text-xs text-gray-400">
                       {getCatName(sku.category_id)} · €{sku.price.toFixed(2)}
-                      {sku.variantId ? ` · ${t('stockPage.variantBadge')}` : ` · ${t('stockPage.singleSkuBadge')}`}
+                      {sku.variantId ? `· ${t('stockPage.variantBadge')}`: `· ${t('stockPage.singleSkuBadge')}`}
                     </p>
                     <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-xs ${status.bg} ${status.color}`}>
                       {status.label}

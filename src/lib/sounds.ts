@@ -19,7 +19,7 @@ let heartbeatRefCount = 0; // Track hoeveel tenants heartbeat nodig hebben
 // Check if sounds are enabled (tenant-specifiek)
 export const getSoundsEnabled = (tenant?: string): boolean => {
   if (typeof window === 'undefined') return true;
-  const key = tenant ? `vysion_sounds_enabled_${tenant}` : 'vysion_sounds_enabled';
+  const key = tenant ? `vysion_sounds_enabled_${tenant}`: 'vysion_sounds_enabled';
   const saved = localStorage.getItem(key);
   return saved !== 'false';
 };
@@ -27,14 +27,14 @@ export const getSoundsEnabled = (tenant?: string): boolean => {
 // Check of audio al geactiveerd is deze sessie (tenant-specifiek)
 export const isAudioActivatedThisSession = (tenant?: string): boolean => {
   if (typeof window === 'undefined') return false;
-  const key = tenant ? `vysion_audio_activated_${tenant}` : 'vysion_audio_session_activated';
+  const key = tenant ? `vysion_audio_activated_${tenant}`: 'vysion_audio_session_activated';
   return sessionStorage.getItem(key) === 'true';
 };
 
 // Markeer audio als geactiveerd deze sessie (tenant-specifiek)
 export const markAudioActivated = (tenant?: string): void => {
   if (typeof window !== 'undefined') {
-    const key = tenant ? `vysion_audio_activated_${tenant}` : 'vysion_audio_session_activated';
+    const key = tenant ? `vysion_audio_activated_${tenant}`: 'vysion_audio_session_activated';
     sessionStorage.setItem(key, 'true');
   }
 };
@@ -43,7 +43,7 @@ export const markAudioActivated = (tenant?: string): void => {
 export const setSoundsEnabled = (enabled: boolean, tenant?: string) => {
   soundsEnabled = enabled;
   if (typeof window !== 'undefined') {
-    const key = tenant ? `vysion_sounds_enabled_${tenant}` : 'vysion_sounds_enabled';
+    const key = tenant ? `vysion_sounds_enabled_${tenant}`: 'vysion_sounds_enabled';
     localStorage.setItem(key, String(enabled));
   }
   if (enabled) {
@@ -343,7 +343,7 @@ export const activateAudioForIOS = (): void => {
     // 5. Start heartbeat
     startHeartbeat();
     
-    console.log('[AUDIO] ✅ iOS audio geactiveerd');
+    console.log('[AUDIO]  iOS audio geactiveerd');
   } catch (e) {
     console.error('[AUDIO] iOS activatie mislukt:', e);
   }
@@ -528,7 +528,7 @@ export const playOrderNotification = async (): Promise<void> => {
 
 // Browser notification (voor bestellingen) - werkt zelfs als tab niet actief is
 export const showBrowserNotification = (title: string, body: string): void => {
-  if (typeof window === 'undefined' || !('Notification' in window)) return;
+  if (typeof window === 'undefined' || !('Notification'in window)) return;
   
   if (Notification.permission === 'granted') {
     try {

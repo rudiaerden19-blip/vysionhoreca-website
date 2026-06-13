@@ -1,5 +1,5 @@
 /** i18n-sleutel onder sectorPages.* in messages/*.json */
-export type SectorPageContentKey = 'bakkerij' | 'cafe' | 'frituur' | 'kebab' | 'kapper' | 'retail'
+export type SectorPageContentKey = 'bakkerij' |  'cafe' |  'frituur' |  'kebab' |  'kapper' |  'retail'
 
 /** Marketing SEO-routes onder /sectoren/… — image per sector voor hero. */
 export const SECTOR_SEO_ROUTES = {

@@ -20,7 +20,7 @@ export default function SessionsPage({ params }: { params: { tenant: string } })
   const [groups, setGroups] = useState<OrderGroup[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
-  const [formData, setFormData] = useState({ group_id: '', title: '', description: '', order_deadline: '', delivery_time: '', status: 'open' })
+  const [formData, setFormData] = useState({ group_id: '', title: '', description: '', order_deadline: '', delivery_time: '', status: 'open'})
   const [saving, setSaving] = useState(false)
 
   useEffect(() => { loadData() }, [params.tenant])
@@ -63,7 +63,7 @@ export default function SessionsPage({ params }: { params: { tenant: string } })
   }
 
   function formatDate(dateStr: string) {
-    return new Date(dateStr).toLocaleString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+    return new Date(dateStr).toLocaleString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})
   }
 
   function isDeadlinePassed(deadline: string) { return new Date(deadline) < new Date() }
@@ -89,7 +89,7 @@ export default function SessionsPage({ params }: { params: { tenant: string } })
           <p className="text-gray-600">{t('groupsModule.sessions.pageSubtitle')}</p>
         </div>
         <button
-          onClick={() => { setFormData({ group_id: groups[0]?.id || '', title: '', description: '', order_deadline: '', delivery_time: '', status: 'open' }); setShowModal(true) }}
+          onClick={() => { setFormData({ group_id: groups[0]?.id || '', title: '', description: '', order_deadline: '', delivery_time: '', status: 'open'}); setShowModal(true) }}
           disabled={groups.length === 0}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -124,7 +124,7 @@ export default function SessionsPage({ params }: { params: { tenant: string } })
                     <h3 className="text-lg font-bold text-gray-900">{session.title || `${t('groupsModule.sessions.pageTitle')} ${session.order_groups?.name}`}</h3>
                     <span className={`text-xs px-2 py-1 rounded-full ${statusColors[session.status]}`}>{statusLabels[session.status]}</span>
                     {session.status === 'open' && isDeadlinePassed(session.order_deadline) && (
-                      <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-700">⏰ {t('groupsModule.sessions.deadlinePassed')}</span>
+                      <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-700"> {t('groupsModule.sessions.deadlinePassed')}</span>
                     )}
                   </div>
                   <div className="text-sm text-gray-600 mb-3"> {session.order_groups?.name}</div>

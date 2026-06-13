@@ -145,7 +145,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         nl: 'nl-BE', en: 'en-GB', fr: 'fr-FR', de: 'de-DE', 
         es: 'es-ES', it: 'it-IT', ja: 'ja-JP', zh: 'zh-CN', ar: 'ar-SA'
       }
-      return date.toLocaleDateString(localeMap[locale] || 'nl-BE', { day: 'numeric', month: 'short', year: 'numeric' })
+      return date.toLocaleDateString(localeMap[locale] || 'nl-BE', { day: 'numeric', month: 'short', year: 'numeric'})
     } catch {
       return ''
     }
@@ -219,7 +219,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       // Set language from URL parameter (from WhatsApp)
       const validLocales = ['nl', 'en', 'fr', 'de', 'es', 'it', 'ja', 'zh', 'ar']
       if (lang && validLocales.includes(lang)) {
-        setLocale(lang as 'nl' | 'en' | 'fr' | 'de' | 'es' | 'it' | 'ja' | 'zh' | 'ar')
+        setLocale(lang as 'nl' |  'en' |  'fr' |  'de' |  'es' |  'it' |  'ja' |  'zh' |  'ar')
       }
     }
   }, [params.tenant, setLocale])
@@ -374,7 +374,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       notes: capitalizeWords(reservationForm.notes),
       status: 'PENDING',
       total_spent: 0,
-      payment_status: depositSettings.required && depositSettings.amount > 0 ? 'pending' : 'unpaid',
+      payment_status: depositSettings.required && depositSettings.amount > 0 ? 'pending': 'unpaid',
     }]).select().single()
 
     if (resError || !resData) {
@@ -387,7 +387,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
     try {
       await fetch('/api/send-reservation-email', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json'},
         body: JSON.stringify({
           status: 'pending',
           customerEmail: reservationForm.email.toLowerCase(),
@@ -409,7 +409,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       try {
         const res = await fetch('/api/reservation-deposit', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json'},
           body: JSON.stringify({
             reservationId: resData.id,
             tenantSlug: params.tenant,
@@ -429,7 +429,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
     }
 
     setReservationSuccess(true)
-    setReservationForm({ firstName: '', lastName: '', phone: '', email: '', date: '', time: '', partySize: '', notes: '' })
+    setReservationForm({ firstName: '', lastName: '', phone: '', email: '', date: '', time: '', partySize: '', notes: ''})
     setReservationSubmitting(false)
   }
 
@@ -888,7 +888,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   const todayHours = business.opening_hours[getDayName()]
 
   return (
-    <div style={{ width: '100%', maxWidth: '100%', overflowX: 'clip' }} className="min-h-screen bg-white">
+    <div style={{ width: '100%', maxWidth: '100%', overflowX: 'clip'}} className="min-h-screen bg-white">
       <MarketingDemoSessionPrime tenant={params.tenant} />
       {/* Fixed Header - Clean & Compact */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-black/30 backdrop-blur-md">
@@ -956,7 +956,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                           setShowLanguageMenu(false)
                         }}
                         className={`w-full px-4 py-2.5 text-left hover:bg-gray-100 transition-colors flex items-center gap-3 ${
-                          locale === loc ? 'bg-gray-50 font-medium' : ''
+                          locale === loc ? 'bg-gray-50 font-medium': ''
                         }`}
                       >
                         <LocaleFlagEmoji locale={loc} className="text-lg" />
@@ -979,21 +979,21 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             <div className="max-w-4xl mx-auto text-center">
               <div className="flex items-center justify-center gap-3 mb-1">
                 <span className="text-3xl">
-                  {manualOffline.offline_reason === 'volzet' ? '' :
-                   manualOffline.offline_reason === 'panne' ? '' :
-                   manualOffline.offline_reason === 'vakantie' ? '' : ''}
+                  {manualOffline.offline_reason === 'volzet'? '' :
+                   manualOffline.offline_reason === 'panne'? '' :
+                   manualOffline.offline_reason === 'vakantie'? '' : ''}
                 </span>
                 <h2 className="text-xl sm:text-2xl font-bold">
-                  {manualOffline.offline_reason === 'volzet' ? t('shopOffline.bannerVolzet') :
-                   manualOffline.offline_reason === 'panne' ? t('shopOffline.bannerPanne') :
-                   manualOffline.offline_reason === 'vakantie' ? t('shopOffline.bannerVakantie') :
-                   manualOffline.offline_reason === 'eigen' ? (manualOffline.offline_message || t('shopOffline.bannerEigen')) :
+                  {manualOffline.offline_reason === 'volzet'? t('shopOffline.bannerVolzet') :
+                   manualOffline.offline_reason === 'panne'? t('shopOffline.bannerPanne') :
+                   manualOffline.offline_reason === 'vakantie'? t('shopOffline.bannerVakantie') :
+                   manualOffline.offline_reason === 'eigen'? (manualOffline.offline_message || t('shopOffline.bannerEigen')) :
                    t('shopOffline.bannerSluiting')}
                 </h2>
                 <span className="text-3xl">
-                  {manualOffline.offline_reason === 'volzet' ? '' :
-                   manualOffline.offline_reason === 'panne' ? '' :
-                   manualOffline.offline_reason === 'vakantie' ? '' : ''}
+                  {manualOffline.offline_reason === 'volzet'? '' :
+                   manualOffline.offline_reason === 'panne'? '' :
+                   manualOffline.offline_reason === 'vakantie'? '' : ''}
                 </span>
               </div>
               <p className="text-white/90 text-sm sm:text-base">
@@ -1049,7 +1049,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       // Object-position bepaalt welk deel van de foto zichtbaar is
                       objectPosition: `${posX}% ${posY}%`,
                       // Zoom alleen toepassen als het niet 100% is
-                      transform: zoom !== 1 ? `scale(${zoom})` : undefined,
+                      transform: zoom !== 1 ? `scale(${zoom})`: undefined,
                       transformOrigin: `${posX}% ${posY}%`,
                     }}
                   />
@@ -1070,10 +1070,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               {manualOffline?.is_offline ? (
                 <span className="inline-flex items-center gap-2 bg-black/40 backdrop-blur-md text-white/90 px-4 py-2 rounded-full text-sm border border-white/20">
                   <span className="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></span>
-                  {manualOffline.offline_reason === 'volzet' ? t('shopOffline.bannerVolzet') :
-                   manualOffline.offline_reason === 'panne' ? t('shopOffline.bannerPanne') :
-                   manualOffline.offline_reason === 'vakantie' ? t('shopOffline.bannerVakantie') :
-                   manualOffline.offline_reason === 'eigen' ? ((manualOffline as any).offline_message || t('shopOffline.bannerEigen')) :
+                  {manualOffline.offline_reason === 'volzet'? t('shopOffline.bannerVolzet') :
+                   manualOffline.offline_reason === 'panne'? t('shopOffline.bannerPanne') :
+                   manualOffline.offline_reason === 'vakantie'? t('shopOffline.bannerVakantie') :
+                   manualOffline.offline_reason === 'eigen'? ((manualOffline as any).offline_message || t('shopOffline.bannerEigen')) :
                    t('shopOffline.bannerSluiting')}
                 </span>
               ) : todayHours?.closed ? (
@@ -1225,7 +1225,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                         className="object-cover group-hover:scale-110 transition-transform duration-500"
                         style={{
                           objectPosition: `${img.positionX}% ${img.positionY}%`,
-                          transform: img.zoom !== 1 ? `scale(${img.zoom})` : undefined,
+                          transform: img.zoom !== 1 ? `scale(${img.zoom})`: undefined,
                           transformOrigin: `${img.positionX}% ${img.positionY}%`,
                         }}
                       />
@@ -1255,7 +1255,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                         className="object-cover group-hover:scale-110 transition-transform duration-500"
                         style={{
                           objectPosition: `${img.positionX}% ${img.positionY}%`,
-                          transform: img.zoom !== 1 ? `scale(${img.zoom})` : undefined,
+                          transform: img.zoom !== 1 ? `scale(${img.zoom})`: undefined,
                           transformOrigin: `${img.positionX}% ${img.positionY}%`,
                         }}
                       />
@@ -1285,7 +1285,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                         className="object-cover group-hover:scale-110 transition-transform duration-500"
                         style={{
                           objectPosition: `${img.positionX}% ${img.positionY}%`,
-                          transform: img.zoom !== 1 ? `scale(${img.zoom})` : undefined,
+                          transform: img.zoom !== 1 ? `scale(${img.zoom})`: undefined,
                           transformOrigin: `${img.positionX}% ${img.positionY}%`,
                         }}
                       />
@@ -1394,7 +1394,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       value={reservationForm.date}
                       onChange={(e) => {
                         const newDate = e.target.value
-                        setReservationForm({ ...reservationForm, date: newDate, time: '' })
+                        setReservationForm({ ...reservationForm, date: newDate, time: ''})
                         if (business) {
                           generateTimeSlots(newDate, business.opening_hours)
                         }
@@ -1582,7 +1582,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-lg transition-shadow"
               >
                 <div className="flex items-center gap-4 mb-4">
-                  <div style={{ backgroundColor: `${business.primary_color}20` }} className="w-12 h-12 rounded-full flex items-center justify-center">
+                  <div style={{ backgroundColor: `${business.primary_color}20`}} className="w-12 h-12 rounded-full flex items-center justify-center">
                     <span style={{ color: business.primary_color }} className="font-bold text-lg">{review.author[0]}</span>
                   </div>
                   <div>
@@ -1593,7 +1593,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     {[1, 2, 3, 4, 5].map((star) => (
                       <span 
                         key={star} 
-                        className={`text-lg ${star <= review.rating ? 'text-yellow-400' : 'text-gray-200'}`}
+                        className={`text-lg ${star <= review.rating ? 'text-yellow-400': 'text-gray-200'}`}
                       >
                         
                       </span>
@@ -1645,7 +1645,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       className="object-cover"
                       style={{
                         objectPosition: `${img.positionX}% ${img.positionY}%`,
-                        transform: img.zoom !== 1 ? `scale(${img.zoom})` : undefined,
+                        transform: img.zoom !== 1 ? `scale(${img.zoom})`: undefined,
                         transformOrigin: `${img.positionX}% ${img.positionY}%`,
                       }}
                     />
@@ -1783,7 +1783,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     <div 
                       key={day}
                       className={`flex justify-between items-center py-3 border-b border-white/10 ${
-                        day === getDayName() ? 'font-bold' : ''
+                        day === getDayName() ? 'font-bold': ''
                       }`}
                     style={day === getDayName() ? { color: business.primary_color } : {}}
                     >
@@ -1976,7 +1976,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   className="w-full h-full"
                 />
               </div>
-              <div className="text-5xl mb-3">⭐</div>
+              <div className="text-5xl mb-3"></div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">{t('shopPage.giveReview')}</h3>
               <p className="text-gray-600">{t('shopPage.scanToReview')}</p>
               <p className="text-sm text-gray-400 mt-2">of klik om te openen</p>
@@ -1987,7 +1987,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       )}
 
       {/* CTA Section */}
-      <section style={{ background: `linear-gradient(to right, ${business.primary_color}, ${business.primary_color}cc)` }} className="py-12 sm:py-20">
+      <section style={{ background: `linear-gradient(to right, ${business.primary_color}, ${business.primary_color}cc)`}} className="py-12 sm:py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div>
             <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-white mb-6">
@@ -2080,8 +2080,8 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                         />
                         {/* Korting badge */}
                         <div className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-red-500 text-white text-xs sm:text-sm font-bold px-2 sm:px-3 py-1 sm:py-1.5 rounded-full shadow-lg">
-                          {promo.type === 'percentage' ? `-${promo.value}%` :
-                           promo.type === 'fixed' ? `-€${promo.value}` : t('shopPage.free')}
+                          {promo.type === 'percentage'? `-${promo.value}%`:
+                           promo.type === 'fixed'? `-€${promo.value}`: t('shopPage.free')}
                         </div>
                       </div>
                     )}
@@ -2098,8 +2098,8 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       {!promo.image_url && (
                         <div className="flex items-center gap-2 mt-2">
                           <span className="bg-red-500 text-white text-xs sm:text-sm font-bold px-2 sm:px-3 py-1 rounded-full">
-                            {promo.type === 'percentage' ? `-${promo.value}%` :
-                             promo.type === 'fixed' ? `-€${promo.value}` : t('shopPage.free')}
+                            {promo.type === 'percentage'? `-${promo.value}%`:
+                             promo.type === 'fixed'? `-€${promo.value}`: t('shopPage.free')}
                           </span>
                         </div>
                       )}
@@ -2194,7 +2194,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       <button
                         key={amt}
                         type="button"
-                        onClick={() => setGiftCardForm(prev => ({ ...prev, amount: amt, customAmount: '' }))}
+                        onClick={() => setGiftCardForm(prev => ({ ...prev, amount: amt, customAmount: ''}))}
                         className={`p-3 rounded-xl border-2 transition-all font-bold ${
                           giftCardForm.amount === amt && !giftCardForm.customAmount
                             ? 'text-white'
@@ -2322,7 +2322,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       try {
                         const response = await fetch('/api/create-gift-card-checkout', {
                           method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
+                          headers: { 'Content-Type': 'application/json'},
                           body: JSON.stringify({
                             tenantSlug: params.tenant,
                             amount,
@@ -2387,7 +2387,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       try {
                         const response = await fetch('/api/create-gift-card-checkout', {
                           method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
+                          headers: { 'Content-Type': 'application/json'},
                           body: JSON.stringify({
                             tenantSlug: params.tenant,
                             amount,
@@ -2404,7 +2404,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                         const data = await response.json()
                         
                         if (data.success) {
-                          alert(` Cadeaubon aangemaakt!\n\nCode: ${data.code}\n\nBetaal €${amount.toFixed(2)} in de zaak om de bon te activeren.\n\nDe ontvanger krijgt een email zodra de betaling is ontvangen.`)
+                          alert(`Cadeaubon aangemaakt!\n\nCode: ${data.code}\n\nBetaal €${amount.toFixed(2)} in de zaak om de bon te activeren.\n\nDe ontvanger krijgt een email zodra de betaling is ontvangen.`)
                           setShowGiftCardModal(false)
                           setGiftCardForm({
                             occasion: '',
@@ -2458,7 +2458,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         ) : (
           <Link href={`/shop/${params.tenant}/menu`}>
             <button
-              style={{ backgroundColor: business.primary_color, boxShadow: `0 25px 50px -12px ${business.primary_color}66` }}
+              style={{ backgroundColor: business.primary_color, boxShadow: `0 25px 50px -12px ${business.primary_color}66`}}
               className="w-full text-white font-bold py-4 rounded-2xl shadow-2xl flex items-center justify-center gap-3 hover:opacity-90 active:scale-95 transition-transform"
             >
               <span></span>
