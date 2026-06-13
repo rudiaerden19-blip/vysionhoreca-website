@@ -38,6 +38,7 @@ import { useLanguage } from '@/i18n'
 import { getSoundsEnabled, setSoundsEnabled, playClick, playAddToCart, playRemove, playSuccess, playCashRegister, playCheckout, initAudio, prewarmAudio, playOrderNotification, activateAudioForIOS } from '@/lib/sounds'
 import { prefetchProductImageUrls } from '@/lib/offline-product-images'
 import { kassaProductImageRetryOnError } from '@/lib/kassa-img-retry'
+import { KassaCartIconPencil, KassaCartIconTrash } from '@/lib/kassa-ui-icons'
 import { allTenantModulesTrue, type TenantModuleId } from '@/lib/tenant-modules'
 import {
   buildHamburgerModules,
@@ -4449,12 +4450,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             aria-label={item.quantity === 1 ? t('kassaApp.ariaRemoveLine') : t('kassaApp.ariaDecreaseQty')}
           >
             {item.quantity === 1 ? (
-              <span
-                className={kassaAppearanceDark ? 'text-[1.05rem] leading-none': undefined}
-                aria-hidden
-              >
-                
-              </span>
+              <KassaCartIconTrash
+                className={kassaAppearanceDark ? 'h-[1.05rem] w-[1.05rem]': 'h-4 w-4'}
+              />
             ) : (
               '−'
             )}
@@ -4476,7 +4474,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 title={t('kassaApp.ariaEditOptions')}
                 aria-label={t('kassaApp.ariaEditOptions')}
               >
-                
+                <KassaCartIconPencil className="h-4 w-4" />
               </button>
             )}
           <span className={`w-6 text-center text-base font-bold ${ui.numpadInput}`}>{item.quantity}</span>
@@ -4531,9 +4529,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               aria-label={item.quantity === 1 ? t('kassaApp.ariaRemoveLine') : t('kassaApp.ariaDecreaseQty')}
             >
               {item.quantity === 1 ? (
-                <span className={kassaAppearanceDark ? 'text-[1.05rem] leading-none': undefined} aria-hidden>
-                  
-                </span>
+                <KassaCartIconTrash
+                  className={kassaAppearanceDark ? 'h-[1.05rem] w-[1.05rem]': 'h-4 w-4'}
+                />
               ) : (
                 '−'
               )}

@@ -16,6 +16,7 @@ import {
   useKassaUiDarkSync,
 } from '@/lib/kassa-register-ui-dark-preference'
 import { kassaProductImageRetryOnError } from '@/lib/kassa-img-retry'
+import { KassaCartIconTrash } from '@/lib/kassa-ui-icons'
 import {
   KASSA_POS_CHECKOUT_BTN,
   KASSA_POS_FIELD,
@@ -2919,9 +2920,11 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                           type="button"
                           onClick={() => updateQty(l.sku.lineKey, l.quantity - 1)}
                           className={retailListBarRemoveBtnClass}
-                          aria-label={t('kassaApp.ariaDecreaseQty')}
+                          aria-label={
+                            l.quantity === 1 ? t('kassaApp.ariaRemoveLine') : t('kassaApp.ariaDecreaseQty')
+                          }
                         >
-                          {l.quantity === 1 ? '' : '−'}
+                          {l.quantity === 1 ? <KassaCartIconTrash className="h-4 w-4" /> : '−'}
                         </button>
                         <span className="w-6 text-center text-sm font-bold text-black">{l.quantity}</span>
                         <button
