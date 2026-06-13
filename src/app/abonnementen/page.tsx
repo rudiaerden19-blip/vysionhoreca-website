@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { Navigation, Footer, CookieBanner, HomeCornerStamp, SubscriptionsTermsPopup } from '@/components'
 import { PricingHardwareToggle } from '@/components/PricingHardwareToggle'
 import { useLanguage } from '@/i18n'
-import { displayPrice, monthlyPriceForHardware } from '@/lib/pricing-hardware'
+import { monthlyPriceForHardware } from '@/lib/pricing-hardware'
 
 const LIFESTYLE_IMAGE = '/images/abonnement-vysion-pro-lifestyle.png'
 const ONBOARDING_IMAGE = '/images/abonnement-onboarding-pos-restaurant.png'
@@ -23,7 +23,6 @@ const PREMIUM_CARD_FEATURES = [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12] as const
 export default function AbonnementenPage() {
   const { t, locale } = useLanguage()
   const [withHardware, setWithHardware] = useState(false)
-  const [isYearly, setIsYearly] = useState(false)
   const [lightbox, setLightbox] = useState<LightboxState>(null)
 
   useEffect(() => {
@@ -42,9 +41,9 @@ export default function AbonnementenPage() {
 
   const starterMonthly = monthlyPriceForHardware(withHardware)
   const proMonthly = 99
-  const starterPrice = displayPrice(starterMonthly, isYearly)
-  const proPrice = displayPrice(proMonthly, isYearly)
-  const periodLabel = isYearly ? t('pricing.perYear') : t('pricing.perMonth')
+  const starterPrice = starterMonthly
+  const proPrice = proMonthly
+  const periodLabel = t('pricing.perMonth')
 
   return (
     <div className="min-h-screen bg-[#e3e3e3] overflow-x-hidden">
@@ -101,35 +100,6 @@ export default function AbonnementenPage() {
             />
           </div>
 
-          <div className="flex flex-col items-center mb-12 sm:mb-16 w-full max-w-full">
-            <div className="bg-white border border-gray-200 p-1 rounded-full inline-flex flex-wrap justify-center items-center gap-y-1 shadow-sm max-w-full">
-              <button
-                type="button"
-                onClick={() => setIsYearly(false)}
-                className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-full text-sm sm:text-base font-semibold transition-all ${
-                  !isYearly ? 'bg-gray-900 text-white shadow-sm': 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                {t('pricing.billingMonthly')}
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsYearly(true)}
-                className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-full text-sm sm:text-base font-semibold transition-all relative pr-7 sm:pr-8 ${
-                  isYearly ? 'bg-gray-900 text-white shadow-sm': 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                {t('pricing.billingYearly')}
-                <span className="absolute -top-1.5 -right-1 bg-gray-700 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-full leading-none">
-                  {t('pricing.badgeYearlyDiscount')}
-                </span>
-              </button>
-            </div>
-            {isYearly && (
-              <p className="text-gray-600 text-sm mt-4 sm:mt-5">{t('pricing.yearlySave')}</p>
-            )}
-          </div>
-
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 xl:gap-20 items-start">
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden lg:mt-[3cm]">
               <div className="p-6 sm:p-8 lg:p-10">
@@ -146,12 +116,6 @@ export default function AbonnementenPage() {
                   <span className="text-accent font-medium ml-2">{periodLabel}</span>
                 </div>
                 <p className="text-gray-500 text-xs mb-3">{t('pricing.exclVat')}</p>
-                {isYearly && (
-                  <p className="text-accent text-sm font-medium mb-4">
-                    = €{Math.round(starterMonthly * 0.9)}
-                    {t('pricing.perMonth')}
-                  </p>
-                )}
 
                 <ul className="space-y-3.5 sm:space-y-4 mb-8 sm:mb-10">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map((i) => (
@@ -172,7 +136,7 @@ export default function AbonnementenPage() {
                 </ul>
 
                 <a
-                  href={`/registreer?lang=${locale}&plan=starter&billing=${isYearly ? 'yearly': 'monthly'}`}
+                  href={`/registreer?lang=${locale}&plan=starter&billing=monthly`}
                   className="block w-full border-2 border-gray-900 text-gray-900 text-center py-3.5 rounded-full font-semibold hover:bg-gray-900 hover:text-white transition-colors"
                 >
                   {t('pricing.chooseStarter')}
@@ -225,35 +189,6 @@ export default function AbonnementenPage() {
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-10 sm:mb-14 text-balance break-words px-1">
             {t('subscriptionsPage.premiumShowcaseTitle')}
           </h2>
-
-          <div className="flex flex-col items-center mb-12 sm:mb-16 w-full max-w-full">
-            <div className="bg-white border border-gray-200 p-1 rounded-full inline-flex flex-wrap justify-center items-center gap-y-1 shadow-sm max-w-full">
-              <button
-                type="button"
-                onClick={() => setIsYearly(false)}
-                className={`px-5 py-2.5 sm:px-6 sm:py-3 rounded-full text-sm sm:text-base font-semibold transition-all ${
-                  !isYearly ? 'bg-gray-900 text-white shadow-sm': 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                {t('pricing.billingMonthly')}
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsYearly(true)}
-                className={`px-5 py-2.5 sm:px-6 sm:py-3 rounded-full text-sm sm:text-base font-semibold transition-all relative pr-7 sm:pr-8 ${
-                  isYearly ? 'bg-gray-900 text-white shadow-sm': 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                {t('pricing.billingYearly')}
-                <span className="absolute -top-1.5 -right-1 bg-gray-700 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-full leading-none">
-                  {t('pricing.badgeYearlyDiscount')}
-                </span>
-              </button>
-            </div>
-            {isYearly && (
-              <p className="text-gray-600 text-sm mt-4 sm:mt-5">{t('pricing.yearlySave')}</p>
-            )}
-          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-10 max-w-6xl mx-auto">
             {GALLERY_IMAGES.map((item) => {
@@ -311,7 +246,7 @@ export default function AbonnementenPage() {
                   </div>
                 <div className="flex flex-wrap items-center gap-2 mb-2">
                   <span className="text-lg text-gray-400 line-through">
-                    €{isYearly ? Math.round(129 * 12 * 0.9) : 129}
+                    €129
                     {t('pricing.perMonth')}
                   </span>
                   <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-0.5 rounded-md">
@@ -323,12 +258,6 @@ export default function AbonnementenPage() {
                   <span className="text-accent font-medium ml-2">{periodLabel}</span>
                 </div>
                 <p className="text-gray-500 text-xs mb-3">{t('pricing.exclVat')}</p>
-                {isYearly && (
-                  <p className="text-accent text-sm font-medium mb-4">
-                    = €{Math.round(proMonthly * 0.9)}
-                    {t('pricing.perMonth')}
-                  </p>
-                )}
                 <div className="mb-6 flex items-start gap-3">
                   {withHardware ? (
                     <>
@@ -369,7 +298,7 @@ export default function AbonnementenPage() {
                 </ul>
 
                 <a
-                  href={`/registreer?lang=${locale}&plan=pro&billing=${isYearly ? 'yearly': 'monthly'}`}
+                  href={`/registreer?lang=${locale}&plan=pro&billing=monthly`}
                   className="block w-full bg-accent text-white text-center py-3.5 rounded-full font-semibold hover:bg-accent/90 transition-colors"
                 >
                   {t('pricing.choosePro')}
