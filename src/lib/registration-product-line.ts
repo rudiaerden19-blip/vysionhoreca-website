@@ -30,35 +30,50 @@ type PresetDef = {
   submenusOn: string[]
 }
 
+/** Winkelkassa + gekoppelde voorraad-submenu’s (niet voor horeca-preset). */
+function isWinkelkassaSubmenuId(subId: string): boolean {
+  return subId.startsWith('sm_retail_') || subId.startsWith('sm_voorraad_')
+}
+
+function allSubmenusExceptWinkelkassa(): string[] {
+  return collectAllSubmenuIds().filter((id) => !isWinkelkassaSubmenuId(id))
+}
+
+function horecaKassaModules(): Partial<Record<TenantModuleId, boolean>> {
+  const modules: Partial<Record<TenantModuleId, boolean>> = {}
+  for (const id of TENANT_MODULE_IDS) {
+    if (id === 'retail-kassa' || id === 'voorraad') modules[id] = false
+    else modules[id] = true
+  }
+  return modules
+}
+
+const RETAIL_WEBSITE_SUBMENUS = [
+  'sm_web_profiel',
+  'sm_online_cadeaubonnen',
+  'sm_inst_opening',
+] as const
+
+const RETAIL_ADMIN_SUBMENUS = [
+  'sm_inst_betaling',
+  'sm_inst_modules',
+  'sm_abonnement',
+  'sm_rpt_rapporten',
+  'sm_rpt_z',
+  'sm_rpt_analyse',
+  'sm_rpt_verkoop',
+  'sm_rpt_populair',
+] as const
+
 /**
  * Automatische modules per registratie-keuze.
  * Pas deze objecten aan wanneer producteigenaar de pakketten definitief zet.
  */
 export const REGISTRATION_MODULE_PRESETS: Record<RegistrationProductLine, PresetDef> = {
+  /** Alle modules behalve winkelkassa (retail-kassa + voorraad + sm_retail_* / sm_voorraad_*). */
   horeca_kassa: {
-    modules: {
-      kassa: true,
-      instellingen: true,
-      account: true,
-      rapporten: true,
-      personeel: false,
-      kosten: false,
-      website: false,
-      online: false,
-      'online-bestellingen': false,
-      reservaties: false,
-      'retail-kassa': false,
-      voorraad: false,
-    },
-    submenusOn: [
-      'sm_kassa_pincode',
-      'sm_kassa_categorieen',
-      'sm_kassa_producten',
-      'sm_kassa_opties',
-      'sm_kassa_allergenen',
-      'sm_kassa_labels',
-      'sm_kassa_terminal',
-    ],
+    modules: horecaKassaModules(),
+    submenusOn: allSubmenusExceptWinkelkassa(),
   },
   retail_winkel: {
     modules: {
@@ -67,10 +82,10 @@ export const REGISTRATION_MODULE_PRESETS: Record<RegistrationProductLine, Preset
       instellingen: true,
       account: true,
       rapporten: true,
+      website: true,
       kassa: false,
       'online-bestellingen': false,
       online: false,
-      website: false,
       reservaties: false,
       personeel: false,
       kosten: false,
@@ -79,7 +94,11 @@ export const REGISTRATION_MODULE_PRESETS: Record<RegistrationProductLine, Preset
       'sm_retail_kassa_pos',
       'sm_retail_kassa_producten',
       'sm_retail_product_intake',
+      'sm_retail_loyalty',
+      'sm_voorraad_beheer',
       'sm_voorraad_producten',
+      ...RETAIL_WEBSITE_SUBMENUS,
+      ...RETAIL_ADMIN_SUBMENUS,
     ],
   },
   online_bestellen: {
@@ -87,23 +106,51 @@ export const REGISTRATION_MODULE_PRESETS: Record<RegistrationProductLine, Preset
       'online-bestellingen': true,
       online: true,
       website: true,
-      kassa: true,
       instellingen: true,
       account: true,
-      reservaties: false,
+      rapporten: true,
+      kosten: true,
+      kassa: false,
       'retail-kassa': false,
       voorraad: false,
-      rapporten: false,
+      reservaties: false,
       personeel: false,
-      kosten: false,
     },
     submenusOn: [
       'sm_orders_bestellingen',
       'sm_orders_groepen',
-      'sm_kassa_categorieen',
-      'sm_kassa_producten',
-      'sm_kassa_opties',
-      'sm_kassa_allergenen',
+      'sm_orders_display',
+      'sm_orders_keuken',
+      'sm_online_shop_preview',
+      'sm_online_status',
+      'sm_online_klanten',
+      'sm_online_beloningen',
+      'sm_online_promoties',
+      'sm_online_whatsapp',
+      'sm_web_profiel',
+      'sm_online_cadeaubonnen',
+      'sm_inst_opening',
+      'sm_inst_levering',
+      'sm_web_design',
+      'sm_web_seo',
+      'sm_web_teksten',
+      'sm_web_reviews',
+      'sm_web_marketing',
+      'sm_web_qr',
+      'sm_web_media',
+      'sm_web_team',
+      'sm_web_site_preview',
+      'sm_kosten_marge',
+      'sm_kosten_ingredienten',
+      'sm_kosten_product',
+      'sm_rpt_rapporten',
+      'sm_rpt_z',
+      'sm_rpt_analyse',
+      'sm_rpt_verkoop',
+      'sm_rpt_populair',
+      'sm_inst_betaling',
+      'sm_inst_modules',
+      'sm_abonnement',
     ],
   },
   restaurant_reservaties: {
@@ -113,15 +160,22 @@ export const REGISTRATION_MODULE_PRESETS: Record<RegistrationProductLine, Preset
       account: true,
       website: true,
       kassa: false,
-      'online-bestellingen': false,
-      online: false,
       'retail-kassa': false,
       voorraad: false,
-      rapporten: false,
+      'online-bestellingen': false,
+      online: false,
       personeel: false,
       kosten: false,
+      rapporten: false,
     },
-    submenusOn: ['sm_reserveringen'],
+    submenusOn: [
+      'sm_reserveringen',
+      'sm_web_profiel',
+      'sm_inst_opening',
+      'sm_inst_betaling',
+      'sm_inst_modules',
+      'sm_abonnement',
+    ],
   },
 }
 
