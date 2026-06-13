@@ -5642,6 +5642,7 @@
  "variantBadge": "variant",
  "singleSkuBadge": "enkel artikel",
  "enableTracking": "Voorraad bijhouden",
+ "disableTracking": "Voorraad niet bijhouden",
  "editStock": "Voorraad bewerken",
  "stockOnHandLabel": "Aantal op voorraad",
  "lowStockThresholdLabel": "Melden vanaf dit aantal",

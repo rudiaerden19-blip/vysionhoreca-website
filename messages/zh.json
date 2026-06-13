@@ -5750,6 +5750,7 @@
  "variantBadge": "变体",
  "singleSkuBadge": "单一 SKU",
  "enableTracking": "跟踪库存",
+ "disableTracking": "停止跟踪库存",
  "editStock": "编辑库存",
  "stockOnHandLabel": "当前库存数量",
  "lowStockThresholdLabel": "低于此数量时提醒",

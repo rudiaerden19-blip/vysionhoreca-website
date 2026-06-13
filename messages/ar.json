@@ -5750,6 +5750,7 @@
  "variantBadge": "متغير",
  "singleSkuBadge": "SKU واحد",
  "enableTracking": "تتبع المخزون",
+ "disableTracking": "إيقاف تتبع المخزون",
  "editStock": "تعديل المخزون",
  "stockOnHandLabel": "الكمية في المخزون",
  "lowStockThresholdLabel": "تنبيه عند الوصول إلى",

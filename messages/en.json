@@ -5709,6 +5709,7 @@
  "variantBadge": "variant",
  "singleSkuBadge": "single SKU",
  "enableTracking": "Track stock",
+ "disableTracking": "Stop tracking stock",
  "editStock": "Edit stock",
  "stockOnHandLabel": "Quantity in stock",
  "lowStockThresholdLabel": "Alert when stock reaches",

@@ -5773,6 +5773,7 @@
  "variantBadge": "Variante",
  "singleSkuBadge": "Einzel-SKU",
  "enableTracking": "Bestand führen",
+ "disableTracking": "Bestand nicht führen",
  "editStock": "Bestand bearbeiten",
  "stockOnHandLabel": "Menge auf Lager",
  "lowStockThresholdLabel": "Warnung ab dieser Menge",

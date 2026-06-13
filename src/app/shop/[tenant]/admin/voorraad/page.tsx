@@ -453,6 +453,13 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
                       </div>
                       <button
                         type="button"
+                        onClick={() => void updateSku(sku, { track_stock: false })}
+                        className="px-4 py-2 rounded-xl bg-[#1e293b] text-white text-sm font-semibold touch-manipulation"
+                      >
+                        {t('stockPage.disableTracking')}
+                      </button>
+                      <button
+                        type="button"
                         onClick={() => startEdit(sku)}
                         className="px-4 py-2 rounded-xl bg-black hover:bg-neutral-900 text-white text-sm font-semibold touch-manipulation"
                       >
