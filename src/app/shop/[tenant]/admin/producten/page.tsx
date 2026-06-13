@@ -43,6 +43,10 @@ import {
   KASSA_PRODUCT_IMAGE_ZOOM_MAX,
   compareMenuProductsBySortOrder,
 } from '@/lib/admin-api'
+import {
+  numberFieldDisplayValue,
+  parseNumberFieldValue,
+} from '@/lib/controlled-number-input'
 import MediaPicker from '@/components/MediaPicker'
 import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
@@ -1432,11 +1436,13 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                             <input
                               type="number"
                               min={0}
-                              value={formData.stock_quantity ?? 0}
+                              value={numberFieldDisplayValue(formData.stock_quantity ?? 0)}
                               onChange={(e) =>
                                 setFormData((prev) => ({
                                   ...prev,
-                                  stock_quantity: parseInt(e.target.value || '0', 10) || 0,
+                                  stock_quantity: parseNumberFieldValue(e.target.value, {
+                                    integer: true,
+                                  }),
                                 }))
                               }
                               className="w-full px-3 py-2.5 border border-gray-200 rounded-xl"
@@ -1449,11 +1455,13 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                             <input
                               type="number"
                               min={0}
-                              value={formData.low_stock_threshold ?? 5}
+                              value={numberFieldDisplayValue(formData.low_stock_threshold ?? 0)}
                               onChange={(e) =>
                                 setFormData((prev) => ({
                                   ...prev,
-                                  low_stock_threshold: parseInt(e.target.value || '0', 10) || 0,
+                                  low_stock_threshold: parseNumberFieldValue(e.target.value, {
+                                    integer: true,
+                                  }),
                                 }))
                               }
                               className="w-full px-3 py-2.5 border border-gray-200 rounded-xl"

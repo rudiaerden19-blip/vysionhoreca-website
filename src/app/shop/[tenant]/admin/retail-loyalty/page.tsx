@@ -8,6 +8,10 @@ import { adminDb } from '@/lib/admin-db-client'
 import { RetailLoyaltyPassShare } from '@/components/retail-loyalty/RetailLoyaltyPassShare'
 import { RetailLoyaltyNewPassPanel } from '@/components/retail-loyalty/RetailLoyaltyNewPassPanel'
 import type { RetailLoyaltyMember } from '@/lib/retail-loyalty/types'
+import {
+  numberFieldDisplayValue,
+  parseNumberFieldValue,
+} from '@/lib/controlled-number-input'
 
 type Settings = {
   enabled: boolean
@@ -279,7 +283,7 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
           points_per_euro: settings.points_per_euro,
           min_order_total_for_points: settings.min_order_total_for_points,
           redeem_enabled: settings.redeem_enabled,
-          redeem_points_per_euro: settings.redeem_points_per_euro,
+          redeem_points_per_euro: Math.max(1, settings.redeem_points_per_euro || 100),
         }),
       })
       const json = (await res.json()) as { ok?: boolean }
@@ -371,9 +375,12 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
               type="number"
               min={0}
               step={0.1}
-              value={settings.points_per_euro}
+              value={numberFieldDisplayValue(settings.points_per_euro)}
               onChange={(e) =>
-                setSettings((s) => ({ ...s, points_per_euro: parseFloat(e.target.value) || 0 }))
+                setSettings((s) => ({
+                  ...s,
+                  points_per_euro: parseNumberFieldValue(e.target.value),
+                }))
               }
               className="mt-1 w-full rounded-lg border px-3 py-2"
             />
@@ -384,11 +391,11 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
               type="number"
               min={0}
               step={0.01}
-              value={settings.min_order_total_for_points}
+              value={numberFieldDisplayValue(settings.min_order_total_for_points)}
               onChange={(e) =>
                 setSettings((s) => ({
                   ...s,
-                  min_order_total_for_points: parseFloat(e.target.value) || 0,
+                  min_order_total_for_points: parseNumberFieldValue(e.target.value),
                 }))
               }
               className="mt-1 w-full rounded-lg border px-3 py-2"
@@ -409,11 +416,11 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
             type="number"
             min={1}
             step={1}
-            value={settings.redeem_points_per_euro}
+            value={numberFieldDisplayValue(settings.redeem_points_per_euro, { emptyWhenZero: true })}
             onChange={(e) =>
               setSettings((s) => ({
                 ...s,
-                redeem_points_per_euro: Math.max(1, parseFloat(e.target.value) || 100),
+                redeem_points_per_euro: parseNumberFieldValue(e.target.value, { integer: true }),
               }))
             }
             className="mt-1 w-full rounded-lg border px-3 py-2 sm:max-w-xs"

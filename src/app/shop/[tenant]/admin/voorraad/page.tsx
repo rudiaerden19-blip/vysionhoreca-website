@@ -6,6 +6,10 @@ import { adminDb } from '@/lib/admin-db-client'
 import { getMenuCategories, MenuCategory } from '@/lib/admin-api'
 import { buildRetailSkusFromRows, type RetailPosSku } from '@/lib/retail-pos-catalog'
 import { useLanguage } from '@/i18n'
+import {
+  numberFieldDisplayValue,
+  parseNumberFieldValue,
+} from '@/lib/controlled-number-input'
 
 type FilterType = 'all' |  'tracked' |  'low' |  'out'
 
@@ -261,9 +265,12 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
             min={0}
             className="w-20 px-2 py-2 border rounded-xl text-sm text-center"
             placeholder={t('stockPage.stock')}
-            value={newVariantDraft.stock_quantity}
+            value={numberFieldDisplayValue(newVariantDraft.stock_quantity, { emptyWhenZero: true })}
             onChange={(e) =>
-              setNewVariantDraft((d) => ({ ...d, stock_quantity: Math.max(0, parseInt(e.target.value, 10) || 0) }))
+              setNewVariantDraft((d) => ({
+                ...d,
+                stock_quantity: parseNumberFieldValue(e.target.value, { integer: true }),
+              }))
             }
           />
           <button
@@ -385,15 +392,19 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
                       <div className="flex gap-2 items-center">
                         <input
                           type="number"
-                          value={editStock}
-                          onChange={(e) => setEditStock(Math.max(0, parseInt(e.target.value, 10) || 0))}
+                          value={numberFieldDisplayValue(editStock, { emptyWhenZero: true })}
+                          onChange={(e) =>
+                            setEditStock(parseNumberFieldValue(e.target.value, { integer: true }))
+                          }
                           className="w-16 px-2 py-1 border rounded-lg text-center font-bold"
                           min={0}
                         />
                         <input
                           type="number"
-                          value={editThreshold}
-                          onChange={(e) => setEditThreshold(Math.max(0, parseInt(e.target.value, 10) || 0))}
+                          value={numberFieldDisplayValue(editThreshold, { emptyWhenZero: true })}
+                          onChange={(e) =>
+                            setEditThreshold(parseNumberFieldValue(e.target.value, { integer: true }))
+                          }
                           className="w-16 px-2 py-1 border rounded-lg text-center"
                           min={0}
                         />

@@ -7,6 +7,10 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { getLoyaltyRewards, saveLoyaltyReward, deleteLoyaltyReward, LoyaltyReward } from '@/lib/admin-api'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
+import {
+  numberFieldDisplayValue,
+  parseNumberFieldValue,
+} from '@/lib/controlled-number-input'
 
 export default function BeloningenPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
@@ -291,8 +295,13 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
                   <input
                     type="number"
                     min="1"
-                    value={formData.points_required}
-                    onChange={(e) => setFormData({ ...formData, points_required: parseInt(e.target.value) || 0 })}
+                    value={numberFieldDisplayValue(formData.points_required ?? 0, { emptyWhenZero: true })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        points_required: parseNumberFieldValue(e.target.value, { integer: true }),
+                      })
+                    }
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
@@ -333,8 +342,13 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
                       type="number"
                       min="0"
                       step={formData.reward_type === 'discount_fixed'? '0.01': '1'}
-                      value={formData.reward_value || ''}
-                      onChange={(e) => setFormData({ ...formData, reward_value: parseFloat(e.target.value) || 0 })}
+                      value={numberFieldDisplayValue(formData.reward_value ?? 0)}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          reward_value: parseNumberFieldValue(e.target.value),
+                        })
+                      }
                       placeholder={formData.reward_type === 'discount_fixed'? '5.00': '10'}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />

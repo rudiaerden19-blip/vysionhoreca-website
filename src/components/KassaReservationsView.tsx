@@ -52,6 +52,10 @@ import {
 } from '@/lib/kassa-floor-plan-zone'
 import { getAuthHeaders, authFetch } from '@/lib/auth-headers'
 import { useLanguage } from '@/i18n'
+import {
+  numberFieldDisplayValue,
+  parseNumberFieldValue,
+} from '@/lib/controlled-number-input'
 
 import type {
   FloorPlanTable,
@@ -3815,8 +3819,12 @@ export default function KassaReservationsView({
                 <label className="font-medium block mb-2">Max. groepsgrootte</label>
                 <input
                   type="number"
-                  value={reservationSettings.maxPartySize}
-                  onChange={(e) => updateSettings({ maxPartySize: parseInt(e.target.value) || 12 })}
+                  value={numberFieldDisplayValue(reservationSettings.maxPartySize, { emptyWhenZero: true })}
+                  onChange={(e) =>
+                    updateSettings({
+                      maxPartySize: parseNumberFieldValue(e.target.value, { integer: true }),
+                    })
+                  }
                   className="w-full px-4 py-2 rounded-lg bg-gray-100 border border-gray-200"
                 />
               </div>
@@ -3826,8 +3834,14 @@ export default function KassaReservationsView({
                 <label className="font-medium block mb-2">Standaard reservatieduur (minuten)</label>
                 <input
                   type="number"
-                  value={reservationSettings.defaultDurationMinutes}
-                  onChange={(e) => updateSettings({ defaultDurationMinutes: parseInt(e.target.value) || 90 })}
+                  value={numberFieldDisplayValue(reservationSettings.defaultDurationMinutes, {
+                    emptyWhenZero: true,
+                  })}
+                  onChange={(e) =>
+                    updateSettings({
+                      defaultDurationMinutes: parseNumberFieldValue(e.target.value, { integer: true }),
+                    })
+                  }
                   className="w-full px-4 py-2 rounded-lg bg-gray-100 border border-gray-200"
                 />
               </div>
@@ -3836,8 +3850,14 @@ export default function KassaReservationsView({
               <div>
                 <label className="font-medium block mb-2">Tijdslot interval (minuten)</label>
                 <select
-                  value={reservationSettings.slotDurationMinutes}
-                  onChange={(e) => updateSettings({ slotDurationMinutes: parseInt(e.target.value) })}
+                  value={numberFieldDisplayValue(reservationSettings.slotDurationMinutes, {
+                    emptyWhenZero: true,
+                  })}
+                  onChange={(e) =>
+                    updateSettings({
+                      slotDurationMinutes: parseNumberFieldValue(e.target.value, { integer: true }),
+                    })
+                  }
                   className="w-full px-4 py-2 rounded-lg bg-gray-100 border border-gray-200"
                 >
                   <option value={15}>Elke 15 minuten</option>
@@ -3853,8 +3873,14 @@ export default function KassaReservationsView({
                   <input
                     type="number"
                     min="0"
-                    value={reservationSettings.minAdvanceHours}
-                    onChange={(e) => updateSettings({ minAdvanceHours: parseInt(e.target.value) || 2 })}
+                    value={numberFieldDisplayValue(reservationSettings.minAdvanceHours, {
+                      emptyWhenZero: true,
+                    })}
+                    onChange={(e) =>
+                      updateSettings({
+                        minAdvanceHours: parseNumberFieldValue(e.target.value, { integer: true }),
+                      })
+                    }
                     className="w-full px-4 py-2 rounded-lg bg-gray-100 border border-gray-200"
                   />
                 </div>
@@ -3863,8 +3889,14 @@ export default function KassaReservationsView({
                   <input
                     type="number"
                     min="1"
-                    value={reservationSettings.maxAdvanceDays}
-                    onChange={(e) => updateSettings({ maxAdvanceDays: parseInt(e.target.value) || 60 })}
+                    value={numberFieldDisplayValue(reservationSettings.maxAdvanceDays, {
+                      emptyWhenZero: true,
+                    })}
+                    onChange={(e) =>
+                      updateSettings({
+                        maxAdvanceDays: parseNumberFieldValue(e.target.value, { integer: true }),
+                      })
+                    }
                     className="w-full px-4 py-2 rounded-lg bg-gray-100 border border-gray-200"
                   />
                 </div>
@@ -3957,8 +3989,16 @@ export default function KassaReservationsView({
                     <label className="font-medium block mb-2">Annulering mogelijk tot (uren voor reservatie)</label>
                     <p className="text-sm text-gray-400 mb-2">0 = altijd mogelijk, 24 = tot 24u van tevoren</p>
                     <input type="number" min="0"
-                      value={reservationSettings.cancellationDeadlineHours}
-                      onChange={(e) => updateSettings({ cancellationDeadlineHours: parseInt(e.target.value) || 0 })}
+                      value={numberFieldDisplayValue(reservationSettings.cancellationDeadlineHours, {
+                        emptyWhenZero: true,
+                      })}
+                      onChange={(e) =>
+                        updateSettings({
+                          cancellationDeadlineHours: parseNumberFieldValue(e.target.value, {
+                            integer: true,
+                          }),
+                        })
+                      }
                       className="w-full px-4 py-2 rounded-lg bg-gray-100 border border-gray-200"
                     />
                   </div>
@@ -4045,8 +4085,14 @@ export default function KassaReservationsView({
                         <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-lg px-3 py-1.5">
                           <span className="text-gray-500 font-medium">€</span>
                           <input type="number" min="1" step="5"
-                            value={reservationSettings.depositAmount}
-                            onChange={(e) => updateSettings({ depositAmount: parseFloat(e.target.value) || 0 })}
+                            value={numberFieldDisplayValue(reservationSettings.depositAmount, {
+                              emptyWhenZero: true,
+                            })}
+                            onChange={(e) =>
+                              updateSettings({
+                                depositAmount: parseNumberFieldValue(e.target.value),
+                              })
+                            }
                             className="w-16 outline-none text-sm font-bold text-gray-800"
                           />
                         </div>
@@ -4079,8 +4125,14 @@ export default function KassaReservationsView({
                     <div>
                       <label className="font-medium block mb-2">No-show kost (€)</label>
                       <input type="number" min="0" step="5"
-                        value={reservationSettings.noShowFee}
-                        onChange={(e) => updateSettings({ noShowFee: parseFloat(e.target.value) || 25 })}
+                        value={numberFieldDisplayValue(reservationSettings.noShowFee, {
+                          emptyWhenZero: true,
+                        })}
+                        onChange={(e) =>
+                          updateSettings({
+                            noShowFee: parseNumberFieldValue(e.target.value),
+                          })
+                        }
                         className="w-full px-4 py-2 rounded-lg bg-gray-100 border border-gray-200"
                       />
                     </div>
