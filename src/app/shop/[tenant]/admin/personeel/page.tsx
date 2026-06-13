@@ -386,15 +386,28 @@ export default function PersoneelPage() {
 
       {/* Add/Edit Staff Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-[130] flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl">
-            <div className="p-6 border-b">
+        <div
+          className="fixed inset-0 z-[130] flex items-center justify-center bg-black/50 p-4"
+          data-vysion-modal-overlay
+          onClick={() => setShowModal(false)}
+        >
+          <div
+            className="flex min-h-0 w-full max-h-[90vh] max-w-md flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
+            data-vysion-modal-panel
+            role="dialog"
+            aria-modal="true"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="shrink-0 border-b p-6">
               <h2 className="text-xl font-bold text-gray-900">
                 {editingStaff ? ` ${t('personeelPage.editEmployee')}`: ` ${t('personeelPage.newEmployee')}`}
               </h2>
             </div>
-            
-            <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
+
+            <div
+              className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-6"
+              data-vysion-kb-scroll-host
+            >
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   {t('personeelPage.form.name')} <span className="text-red-500">*</span>
@@ -490,8 +503,8 @@ export default function PersoneelPage() {
                 </div>
               </div>
             </div>
-            
-            <div className="p-6 border-t flex gap-3 justify-end">
+
+            <div className="flex shrink-0 justify-end gap-3 border-t p-6">
               <button
                 onClick={() => setShowModal(false)}
                 className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors"
@@ -512,15 +525,28 @@ export default function PersoneelPage() {
 
       {/* Contract Modal */}
       {showContractModal && editingStaff && (
-        <div className="fixed inset-0 z-[130] flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-xl w-full max-w-md shadow-xl">
-            <div className="p-6 border-b">
+        <div
+          className="fixed inset-0 z-[130] flex items-center justify-center bg-black/50 p-4"
+          data-vysion-modal-overlay
+          onClick={() => setShowContractModal(false)}
+        >
+          <div
+            className="flex min-h-0 w-full max-h-[90vh] max-w-md flex-col overflow-hidden rounded-xl bg-white shadow-xl"
+            data-vysion-modal-panel
+            role="dialog"
+            aria-modal="true"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="shrink-0 border-b p-6">
               <h2 className="text-xl font-bold text-gray-800">
                  {t('personeelPage.contract')}: {editingStaff.name}
               </h2>
             </div>
-            
-            <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
+
+            <div
+              className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-6"
+              data-vysion-kb-scroll-host
+            >
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">{t('personeelPage.contractForm.type')}</label>
                 <select
@@ -653,8 +679,8 @@ export default function PersoneelPage() {
                 </div>
               )}
             </div>
-            
-            <div className="p-6 border-t flex gap-3 justify-end">
+
+            <div className="flex shrink-0 justify-end gap-3 border-t p-6">
               <button
                 onClick={() => setShowContractModal(false)}
                 className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors"
