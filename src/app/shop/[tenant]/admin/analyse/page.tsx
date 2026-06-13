@@ -50,8 +50,8 @@ const SECTOR_BENCHMARKS = {
 
 const getHealthStatus = (t: (key: string) => string) => ({
   EXCELLENT: { label: t('analysePage.health.excellent'), desc: t('analysePage.health.excellentDesc'), icon: '', color: '#22c55e', bgColor: 'bg-green-50', borderColor: 'border-green-500'},
-  GOOD: { label: t('analysePage.health.good'), desc: t('analysePage.health.goodDesc'), icon: '', color: '#3b82f6', bgColor: 'bg-blue-50', borderColor: 'border-blue-500'},
-  WARNING: { label: t('analysePage.health.warning'), desc: t('analysePage.health.warningDesc'), icon: '', color: '#f59e0b', bgColor: 'bg-blue-50', borderColor: 'border-blue-500'},
+  GOOD: { label: t('analysePage.health.good'), desc: t('analysePage.health.goodDesc'), icon: '', color: '#111827', bgColor: 'bg-gray-50', borderColor: 'border-gray-400'},
+  WARNING: { label: t('analysePage.health.warning'), desc: t('analysePage.health.warningDesc'), icon: '', color: '#f59e0b', bgColor: 'bg-amber-50', borderColor: 'border-amber-500'},
   CRITICAL: { label: t('analysePage.health.critical'), desc: t('analysePage.health.criticalDesc'), icon: '', color: '#ef4444', bgColor: 'bg-red-50', borderColor: 'border-red-500'},
 })
 
@@ -592,7 +592,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
             onClick={() => setActiveTab(tab.id as TabType)}
             className={`px-4 py-2 rounded-lg font-medium transition-all ${
               activeTab === tab.id
-                ? 'bg-gray-900 text-white shadow-md'
+                ? 'bg-black text-white shadow-md'
                 : 'text-gray-600 hover:bg-gray-100'
             }`}
           >
@@ -668,7 +668,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               className="bg-white rounded-2xl p-5 shadow-sm"
             >
               <div className="text-sm text-gray-500 mb-1"> {t('analysePage.overview.profitMargin')}</div>
-              <div className={`text-2xl font-bold ${monthlyReport.profitMargin >= 22 ? 'text-green-600': 'text-blue-600'}`}>
+              <div className={`text-2xl font-bold ${monthlyReport.profitMargin >= 22 ? 'text-green-600': 'text-gray-900'}`}>
                 {monthlyReport.profitMargin.toFixed(1)}%
               </div>
               <div className="text-xs text-gray-400 mt-1">
@@ -694,11 +694,11 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                   <div className="text-sm text-gray-500">{t('analysePage.overview.total')}</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-blue-600">{monthlyReport.onlineOrders}</div>
+                  <div className="text-2xl font-bold text-gray-900">{monthlyReport.onlineOrders}</div>
                   <div className="text-sm text-gray-500">{t('analysePage.overview.online')}</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-blue-600">{monthlyReport.kassaOrders}</div>
+                  <div className="text-2xl font-bold text-gray-900">{monthlyReport.kassaOrders}</div>
                   <div className="text-sm text-gray-500">{t('analysePage.overview.kassa')}</div>
                 </div>
               </div>
@@ -719,7 +719,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                   <div className="text-sm text-gray-500">{t('analysePage.overview.perOrder')}</div>
                 </div>
                 {businessTargets && monthlyReport.averageTicket < businessTargets.target_average_ticket && (
-                  <div className="text-sm text-blue-600">
+                  <div className="text-sm text-gray-700">
                     {t('analysePage.overview.target')}: {formatCurrency(businessTargets.target_average_ticket)}
                   </div>
                 )}
@@ -802,7 +802,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                 if (rec.includes('')) bgClass = 'bg-green-50 border-l-4 border-green-500'
                 else if (rec.includes('')) bgClass = 'bg-red-50 border-l-4 border-red-500'
                 else if (rec.includes('') || rec.includes('') || rec.includes('') || rec.includes('') || rec.includes('')) bgClass = 'bg-yellow-50 border-l-4 border-yellow-500'
-                else if (rec.includes('')) bgClass = 'bg-blue-50 border-l-4 border-blue-500'
+                else if (rec.includes('')) bgClass = 'bg-gray-50 border-l-4 border-gray-400'
                 else if (rec.includes('→')) bgClass = 'bg-gray-50 pl-6'
 
                 return (
@@ -826,7 +826,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
             </div>
             <button
               onClick={() => openFixedModal()}
-              className="px-4 py-2 bg-gray-900 text-white rounded-xl font-medium hover:bg-black transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-black text-white rounded-xl font-medium hover:bg-neutral-900 transition-colors flex items-center gap-2"
             >
                {t('analysePage.fixed.newCost')}
             </button>
@@ -868,7 +868,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                     <button
                       type="button"
                       onClick={() => openFixedModal(cost)}
-                      className="flex-1 min-h-[44px] touch-manipulation px-3 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200"
+                      className="flex-1 min-h-[44px] touch-manipulation px-3 py-2 bg-gray-100 text-gray-900 rounded-lg text-sm font-medium hover:bg-gray-200"
                     >
                        {t('analysePage.fixed.edit')}
                     </button>
@@ -888,7 +888,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                           setAttachingFixedId(cost.id!)
                           setTimeout(() => attachPdfFixedRef.current?.click(), 50)
                         }}
-                        className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center px-3 py-2 bg-gray-100 text-gray-400 rounded-lg text-sm font-medium hover:bg-blue-100 hover:text-blue-600"
+                        className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center px-3 py-2 bg-gray-100 text-gray-400 rounded-lg text-sm font-medium hover:bg-gray-200 hover:text-gray-900"
                         title="PDF factuur koppelen"
                       >
                         
@@ -936,7 +936,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
             </div>
             <button
               onClick={() => openVariableModal()}
-              className="px-4 py-2 bg-gray-900 text-white rounded-xl font-medium hover:bg-black transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-black text-white rounded-xl font-medium hover:bg-neutral-900 transition-colors flex items-center gap-2"
             >
                {t('analysePage.variable.newPurchase')}
             </button>
@@ -1001,7 +1001,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                                 setAttachingId(cost.id!)
                                 setTimeout(() => attachPdfRef.current?.click(), 50)
                               }}
-                              className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center rounded-lg bg-gray-100 text-gray-400 hover:bg-blue-100 hover:text-blue-600 mr-1"
+                              className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center rounded-lg bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-900 mr-1"
                               title="PDF factuur koppelen"
                             >
                               
@@ -1010,7 +1010,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                           <button
                             type="button"
                             onClick={() => openVariableModal(cost)}
-                            className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center text-blue-500 hover:text-blue-700 mr-1"
+                            className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center text-gray-700 hover:text-gray-900 mr-1"
                           >
                             
                           </button>
@@ -1078,12 +1078,12 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
             </div>
             <div className="bg-white rounded-2xl p-5 shadow-sm">
               <div className="text-sm text-gray-500"> {t('analysePage.year.averageMargin')}</div>
-              <div className="text-2xl font-bold text-blue-600">{(yearReport?.profitMargin || 0).toFixed(1)}%</div>
+              <div className="text-2xl font-bold text-gray-900">{(yearReport?.profitMargin || 0).toFixed(1)}%</div>
             </div>
           </div>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4">
-            <p className="text-blue-800">
+          <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4">
+            <p className="text-gray-800">
                <strong>Tip:</strong> {t('analysePage.year.tip')}
             </p>
           </div>
@@ -1166,31 +1166,31 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
             <button
               onClick={saveTargets}
               disabled={saving}
-              className="w-full px-6 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-black disabled:opacity-50 transition-colors"
+              className="w-full px-6 py-3 bg-black text-white rounded-xl font-bold hover:bg-neutral-900 disabled:opacity-50 transition-colors"
             >
               {saving ? t('analysePage.common.saving') : ` ${t('analysePage.settings.saveTargets')}`}
             </button>
           </div>
 
           {/* Sector Benchmarks */}
-          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6">
-            <h3 className="font-bold text-blue-900 mb-4"> {t('analysePage.settings.benchmarks')}</h3>
+          <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6">
+            <h3 className="font-bold text-gray-900 mb-4"> {t('analysePage.settings.benchmarks')}</h3>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="text-blue-700">{t('analysePage.settings.avgMargin')}:</span>
-                <span className="font-bold text-blue-900 ml-2">{SECTOR_BENCHMARKS.profitMargin.average}%</span>
+                <span className="text-gray-600">{t('analysePage.settings.avgMargin')}:</span>
+                <span className="font-bold text-gray-900 ml-2">{SECTOR_BENCHMARKS.profitMargin.average}%</span>
               </div>
               <div>
-                <span className="text-blue-700">{t('analysePage.settings.goodPerformers')}:</span>
-                <span className="font-bold text-blue-900 ml-2">{SECTOR_BENCHMARKS.profitMargin.good}%+</span>
+                <span className="text-gray-600">{t('analysePage.settings.goodPerformers')}:</span>
+                <span className="font-bold text-gray-900 ml-2">{SECTOR_BENCHMARKS.profitMargin.good}%+</span>
               </div>
               <div>
-                <span className="text-blue-700">{t('analysePage.settings.topPerformers')}:</span>
-                <span className="font-bold text-blue-900 ml-2">{SECTOR_BENCHMARKS.profitMargin.excellent}%+</span>
+                <span className="text-gray-600">{t('analysePage.settings.topPerformers')}:</span>
+                <span className="font-bold text-gray-900 ml-2">{SECTOR_BENCHMARKS.profitMargin.excellent}%+</span>
               </div>
               <div>
-                <span className="text-blue-700">{t('analysePage.settings.maxPersonnelBenchmark')}:</span>
-                <span className="font-bold text-blue-900 ml-2">{SECTOR_BENCHMARKS.personnelPercent.max}%</span>
+                <span className="text-gray-600">{t('analysePage.settings.maxPersonnelBenchmark')}:</span>
+                <span className="font-bold text-gray-900 ml-2">{SECTOR_BENCHMARKS.personnelPercent.max}%</span>
               </div>
             </div>
           </div>
@@ -1226,7 +1226,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                     <input ref={pdfInputFixedRef} type="file" accept="application/pdf" className="hidden"
                       onChange={e => { const f = e.target.files?.[0]; if (f) handlePdfUploadFixed(f); e.target.value = ''}} />
                     <button type="button" onClick={() => pdfInputFixedRef.current?.click()} disabled={isParsingPdfFixed}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed border-blue-400 text-blue-600 hover:bg-blue-50 transition-colors disabled:opacity-50 text-sm font-medium">
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed border-gray-400 text-gray-900 hover:bg-gray-50 transition-colors disabled:opacity-50 text-sm font-medium">
                       {isParsingPdfFixed ? 'PDF wordt ingelezen...': 'PDF factuur uploaden (automatisch invullen)'}
                     </button>
                     <p className="text-xs text-gray-400 mt-1 text-center">Peppol of gewone PDF — naam en bedrag worden automatisch ingevuld</p>
@@ -1296,7 +1296,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                   <button
                     onClick={saveFixed}
                     disabled={saving}
-                    className="flex-1 px-4 py-3 bg-gray-900 text-white rounded-xl font-medium hover:bg-black disabled:opacity-50"
+                    className="flex-1 px-4 py-3 bg-black text-white rounded-xl font-medium hover:bg-neutral-900 disabled:opacity-50"
                   >
                     {saving ? t('analysePage.common.saving') : ` ${t('analysePage.common.save')}`}
                   </button>
@@ -1336,7 +1336,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                     <input ref={pdfInputRef} type="file" accept="application/pdf" className="hidden"
                       onChange={e => { const f = e.target.files?.[0]; if (f) handlePdfUpload(f); e.target.value = ''}} />
                     <button type="button" onClick={() => pdfInputRef.current?.click()} disabled={isParsingPdf}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed border-blue-400 text-blue-600 hover:bg-blue-50 transition-colors disabled:opacity-50 text-sm font-medium">
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed border-gray-400 text-gray-900 hover:bg-gray-50 transition-colors disabled:opacity-50 text-sm font-medium">
                       {isParsingPdf ? 'PDF wordt ingelezen...': 'PDF factuur uploaden (automatisch invullen)'}
                     </button>
                     <p className="text-xs text-gray-400 mt-1 text-center">Peppol of gewone PDF — leverancier, datum en bedrag worden automatisch ingevuld</p>
@@ -1429,7 +1429,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                   <button
                     onClick={saveVariable}
                     disabled={saving}
-                    className="flex-1 px-4 py-3 bg-gray-900 text-white rounded-xl font-medium hover:bg-black disabled:opacity-50"
+                    className="flex-1 px-4 py-3 bg-black text-white rounded-xl font-medium hover:bg-neutral-900 disabled:opacity-50"
                   >
                     {saving ? t('analysePage.common.saving') : ` ${t('analysePage.common.save')}`}
                   </button>
