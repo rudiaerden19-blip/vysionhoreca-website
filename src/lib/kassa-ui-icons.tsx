@@ -1,5 +1,21 @@
 /** Inline SVG’s voor kassa-winkelwagen (geen emoji / geen Lucide-stub). */
 
+export function KassaIconClose({ className = 'h-5 w-5 shrink-0' }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  )
+}
+
+export function KassaIconCheck({ className = 'h-3 w-3 shrink-0' }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+    </svg>
+  )
+}
+
 export function KassaCartIconTrash({ className = 'h-4 w-4 shrink-0' }: { className?: string }) {
   return (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>

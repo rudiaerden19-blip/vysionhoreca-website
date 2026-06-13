@@ -9,6 +9,7 @@ import {
   KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
   kassaPosButtonClass,
 } from '@/lib/kassa-pos-surface'
+import { KassaIconCheck, KassaIconClose } from '@/lib/kassa-ui-icons'
 
 export interface KassaProductOptionsModalModel {
   product: MenuProduct
@@ -75,7 +76,7 @@ export function KassaProductOptionsModal({
             }
             aria-label={t('kassaApp.closeAria')}
           >
-            
+            <KassaIconClose className="h-6 w-6" />
           </button>
         </div>
 
@@ -135,7 +136,7 @@ export function KassaProductOptionsModal({
                               : 'absolute top-1.5 right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#3C4D6B] text-xs font-bold text-white'
                           }
                         >
-                          
+                          <KassaIconCheck className={dark ? 'h-3 w-3 text-[#5a9fd4]' : 'h-3.5 w-3.5'} />
                         </div>
                       )}
                       <span
