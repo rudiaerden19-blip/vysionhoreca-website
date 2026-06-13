@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Search, Send, Star } from 'lucide-react'
+import { Search, Star } from 'lucide-react'
 import type { GuestProfile } from './kassa-reservations-model'
 
 export const PAGE_SIZE_OPTIONS = [10, 25, 50, 100]
@@ -94,7 +94,7 @@ export function ContactsView({
     })
   }
 
-  const GRID_COLS = '44px minmax(100px,1.6fr) minmax(100px,1.2fr) minmax(140px,2fr) minmax(88px,1fr) 72px 88px'
+  const GRID_COLS = '44px minmax(100px,1.6fr) minmax(100px,1.2fr) minmax(140px,2fr) minmax(88px,1fr) 72px 96px'
 
   return (
     <div className="space-y-3">
@@ -126,10 +126,10 @@ export function ContactsView({
             type="button"
             disabled={selectedWithEmail.length === 0}
             onClick={() => onBulkPromoMailClick(selectedWithEmail)}
-            className="flex min-h-[44px] items-center gap-2 rounded-xl bg-[#58CCFF] px-4 py-2 font-bold text-[#063042] shadow-sm transition-colors hover:bg-[#43bef7] disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex min-h-[44px] items-center gap-2 rounded-xl bg-[#58CCFF] px-4 py-2 font-bold text-[#063042] shadow-sm transition-colors hover:bg-[#43bef7] disabled:cursor-not-allowed disabled:opacity-50 touch-manipulation"
           >
-            <Send size={16} />
-            Promotie e-mail{selectedWithEmail.length > 0 ? `(${selectedWithEmail.length})`: ''}
+            {rk('promoEmailBulk')}
+            {selectedWithEmail.length > 0 ? ` (${selectedWithEmail.length})` : ''}
           </button>
           <button
             type="button"
@@ -244,11 +244,11 @@ export function ContactsView({
                         <button
                           type="button"
                           onClick={() => onPromoMailClick(guest)}
-                          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#58CCFF] text-[#063042] shadow-sm transition-colors hover:bg-[#43bef7] active:bg-[#34ade7]"
-                          title="Promotie-e-mail versturen"
-                          aria-label={`Promotie-e-mail naar ${guest.name}`}
+                          className="shrink-0 rounded-lg bg-[#58CCFF] px-2.5 py-1.5 text-xs font-bold text-[#063042] shadow-sm transition-colors hover:bg-[#43bef7] active:bg-[#34ade7] touch-manipulation"
+                          title={rk('promoEmailBulk')}
+                          aria-label={`${rk('promoButton')} — ${guest.name}`}
                         >
-                          <Send size={16} className="shrink-0" strokeWidth={2.25} />
+                          {rk('promoButton')}
                         </button>
                       </>
                     ) : (

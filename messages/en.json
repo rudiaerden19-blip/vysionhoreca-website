@@ -5377,6 +5377,8 @@
  "linkCopied": "Link copied!",
  "promoEmailSentOne": "Promo email sent to {name}",
  "promoEmailSentMany": "Promo email sent to {count} recipients",
+ "promoButton": "Promo",
+ "promoEmailBulk": "Promo email",
  "reservationSaved": "Reservation saved",
  "saveFailedShort": "Save failed: ",
  "cancelFailedPrefix": "Cancel failed: ",

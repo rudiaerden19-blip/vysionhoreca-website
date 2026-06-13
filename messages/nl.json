@@ -5377,6 +5377,8 @@
  "linkCopied": "Link gekopieerd!",
  "promoEmailSentOne": "Promotie e-mail verstuurd naar {name}",
  "promoEmailSentMany": "Promotie e-mail verstuurd naar {count} ontvangers",
+ "promoButton": "Promotie",
+ "promoEmailBulk": "Promotie e-mail",
  "reservationSaved": "Reservatie opgeslagen",
  "saveFailedShort": "Opslaan mislukt: ",
  "cancelFailedPrefix": "Annuleren mislukt: ",

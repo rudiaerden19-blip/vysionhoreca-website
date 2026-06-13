@@ -5418,6 +5418,8 @@
  "linkCopied": "تم نسخ الرابط",
  "promoEmailSentOne": "تم إرسال بريد العرض إلى {name}",
  "promoEmailSentMany": "تم إرسال بريد العرض إلى {count} مستلمين",
+ "promoButton": "عرض",
+ "promoEmailBulk": "بريد العرض",
  "reservationSaved": "تم حفظ الحجز",
  "saveFailedShort": "فشل الحفظ: ",
  "cancelFailedPrefix": "فشل الإلغاء: ",

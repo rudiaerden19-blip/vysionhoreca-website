@@ -5441,6 +5441,8 @@
  "linkCopied": "Link kopiert!",
  "promoEmailSentOne": "Promo-E-Mail gesendet an {name}",
  "promoEmailSentMany": "Promo-E-Mail an {count} Empfänger gesendet",
+ "promoButton": "Promo",
+ "promoEmailBulk": "Promo-E-Mail",
  "reservationSaved": "Reservierung gespeichert",
  "saveFailedShort": "Speichern fehlgeschlagen: ",
  "cancelFailedPrefix": "Stornieren fehlgeschlagen: ",

@@ -5418,6 +5418,8 @@
  "linkCopied": "¡Enlace copiado!",
  "promoEmailSentOne": "Correo promo enviado a {name}",
  "promoEmailSentMany": "Correo promo enviado a {count} destinatarios",
+ "promoButton": "Promo",
+ "promoEmailBulk": "Correo promo",
  "reservationSaved": "Reserva guardada",
  "saveFailedShort": "Error al guardar: ",
  "cancelFailedPrefix": "Error al cancelar: ",

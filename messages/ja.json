@@ -5418,6 +5418,8 @@
  "linkCopied": "リンクをコピーしました",
  "promoEmailSentOne": "プロモメールを {name} に送信しました",
  "promoEmailSentMany": "プロモメールを {count} 名に送信しました",
+ "promoButton": "プロモ",
+ "promoEmailBulk": "プロモメール",
  "reservationSaved": "予約を保存しました",
  "saveFailedShort": "保存に失敗: ",
  "cancelFailedPrefix": "キャンセルに失敗: ",

@@ -5418,6 +5418,8 @@
  "linkCopied": "链接已复制",
  "promoEmailSentOne": "促销邮件已发送给 {name}",
  "promoEmailSentMany": "促销邮件已发送给 {count} 位收件人",
+ "promoButton": "促销",
+ "promoEmailBulk": "促销邮件",
  "reservationSaved": "预订已保存",
  "saveFailedShort": "保存失败：",
  "cancelFailedPrefix": "取消失败：",
