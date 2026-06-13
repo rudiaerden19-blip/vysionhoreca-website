@@ -27,6 +27,7 @@ import {
   VariableCostCategory,
 } from '@/lib/admin-api'
 import type { PointerEvent as ReactPointerEvent } from 'react'
+import { KassaIconClose } from '@/lib/kassa-ui-icons'
 
 type TabType = 'overview' |  'fixed' |  'variable' |  'year' |  'settings'
 
@@ -1205,20 +1206,39 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[130] flex items-center justify-center bg-black/50 p-4"
-            onClick={() => setShowFixedModal(false)}
+            data-vysion-modal-overlay
+            onPointerDown={(e) => {
+              if (e.target !== e.currentTarget) return
+              if (e.pointerType === 'mouse' && e.button !== 0) return
+              setShowFixedModal(false)
+            }}
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              onClick={e => e.stopPropagation()}
-              className="bg-white rounded-2xl w-full max-w-md shadow-xl"
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
+              className="flex min-h-0 w-full max-h-[90vh] max-w-md flex-col overflow-hidden rounded-2xl bg-white shadow-xl"
+              data-vysion-modal-panel
+              role="dialog"
+              aria-modal="true"
             >
-              <div className="p-4 border-b flex items-center justify-between">
+              <div className="flex shrink-0 items-center justify-between border-b p-4">
                 <h2 className="text-xl font-bold">{editingFixed ? ` ${t('analysePage.fixed.editCost')}`: ` ${t('analysePage.fixed.newCost')}`}</h2>
-                <button onClick={() => setShowFixedModal(false)} className="text-gray-400 hover:text-gray-600"></button>
+                <button
+                  type="button"
+                  onClick={() => setShowFixedModal(false)}
+                  className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                  aria-label={t('analysePage.common.cancel')}
+                >
+                  <KassaIconClose className="h-5 w-5" />
+                </button>
               </div>
-              <div className="p-6 space-y-4">
+              <div
+                className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-6"
+                data-vysion-kb-scroll-host
+              >
 
                 {/* PDF Upload — alleen bij nieuwe kost */}
                 {!editingFixed && (
@@ -1315,20 +1335,39 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[130] flex items-center justify-center bg-black/50 p-4"
-            onClick={() => setShowVariableModal(false)}
+            data-vysion-modal-overlay
+            onPointerDown={(e) => {
+              if (e.target !== e.currentTarget) return
+              if (e.pointerType === 'mouse' && e.button !== 0) return
+              setShowVariableModal(false)
+            }}
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              onClick={e => e.stopPropagation()}
-              className="bg-white rounded-2xl w-full max-w-md shadow-xl"
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
+              className="flex min-h-0 w-full max-h-[90vh] max-w-md flex-col overflow-hidden rounded-2xl bg-white shadow-xl"
+              data-vysion-modal-panel
+              role="dialog"
+              aria-modal="true"
             >
-              <div className="p-4 border-b flex items-center justify-between">
+              <div className="flex shrink-0 items-center justify-between border-b p-4">
                 <h2 className="text-xl font-bold">{editingVariable ? ` ${t('analysePage.variable.editPurchase')}`: ` ${t('analysePage.variable.newPurchase')}`}</h2>
-                <button onClick={() => setShowVariableModal(false)} className="text-gray-400 hover:text-gray-600"></button>
+                <button
+                  type="button"
+                  onClick={() => setShowVariableModal(false)}
+                  className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                  aria-label={t('analysePage.common.cancel')}
+                >
+                  <KassaIconClose className="h-5 w-5" />
+                </button>
               </div>
-              <div className="p-6 space-y-4">
+              <div
+                className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-6"
+                data-vysion-kb-scroll-host
+              >
 
                 {/* PDF Upload — alleen bij nieuwe inkoop */}
                 {!editingVariable && (
