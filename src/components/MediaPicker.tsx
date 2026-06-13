@@ -309,9 +309,9 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
         style={{ position: 'absolute', left: '-9999px', opacity: 0 }}
       />
       
-      {/* Current Image Preview */}
-      <div className="flex items-start gap-4">
-        <div className="relative">
+      {/* Current Image Preview — stack actions under thumbnail (avoids overlap in narrow rows) */}
+      <div className="inline-flex max-w-full flex-col items-start gap-2">
+        <div className="relative shrink-0">
           <div 
             onClick={() => setShowOptions(!showOptions)}
             className={`relative w-32 h-32 border-2 border-dashed rounded-xl flex items-center justify-center cursor-pointer transition-colors overflow-hidden bg-gray-50 ${
@@ -411,32 +411,30 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
             )}
           </AnimatePresence>
         </div>
-        
-        <div className="flex flex-col gap-2">
-          {value && (
-            <button
+
+        {value ? (
+          <button
+            type="button"
+            onClick={clearImage}
+            className="max-w-[8rem] text-left text-xs font-medium leading-snug text-red-600 hover:text-red-700 hover:underline"
+          >
+            {t('mediaPicker.removePhoto')}
+          </button>
+        ) : null}
+
+        {errorMessage ? (
+          <div className="bg-red-100 border border-red-300 text-red-700 px-3 py-2 rounded-lg text-sm max-w-[200px]">
+            <p className="font-medium"> {t('mediaPicker.errorHeading')}</p>
+            <p className="text-xs mt-1">{errorMessage}</p>
+            <button 
               type="button"
-              onClick={clearImage}
-              className="text-red-500 hover:text-red-600 text-sm text-left"
+              onClick={() => setErrorMessage(null)}
+              className="text-xs underline mt-2"
             >
-              {t('mediaPicker.removePhoto')}
+              {t('ui.ariaClose')}
             </button>
-          )}
-          
-          {/* Error message display */}
-          {errorMessage && (
-            <div className="bg-red-100 border border-red-300 text-red-700 px-3 py-2 rounded-lg text-sm max-w-[200px]">
-              <p className="font-medium"> {t('mediaPicker.errorHeading')}</p>
-              <p className="text-xs mt-1">{errorMessage}</p>
-              <button 
-                onClick={() => setErrorMessage(null)}
-                className="text-xs underline mt-2"
-              >
-                {t('ui.ariaClose')}
-              </button>
-            </div>
-          )}
-        </div>
+          </div>
+        ) : null}
       </div>
       
       {/* Click outside to close options */}

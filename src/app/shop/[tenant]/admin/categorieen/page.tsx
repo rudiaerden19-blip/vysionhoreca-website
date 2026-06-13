@@ -313,10 +313,10 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
                 value={category}
                 className="bg-white hover:bg-gray-50 cursor-grab active:cursor-grabbing transition-colors"
               >
-                <div className="flex items-center gap-2 sm:gap-3 px-4 py-3.5 flex-wrap">
+                <div className="flex flex-wrap items-start gap-x-3 gap-y-3 px-4 py-3.5 sm:items-center sm:flex-nowrap">
                   <span className="text-gray-300 text-lg select-none shrink-0">⠿</span>
 
-                  <div className="shrink-0 w-full min-[480px]:w-[200px] sm:max-w-[220px]">
+                  <div className="shrink-0 w-full min-[480px]:w-[9.5rem] sm:max-w-[9.5rem]">
                     <MediaPicker
                       tenantSlug={params.tenant}
                       value={(category.image_url || '').trim()}
