@@ -831,25 +831,20 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
             {/* 4 Stat cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { title:'Omzet Vandaag', value:fmt(todayRevenue), sub:`${todayOrders.length} bestellingen`, icon:'€', color:'#10b981'},
+                { title:'Omzet Vandaag', value:fmt(todayRevenue), sub:`${todayOrders.length} bestellingen`},
                 {
                   title:'Omzet Week',
                   value:fmt(weekRevenue),
                   sub:`Kalenderweek ma–zo · van ${fmtDayShort(weekStart)}`,
-                  icon: '',
-                  color:'#3b82f6',
                 },
                 {
                   title:'Omzet Maand',
                   value:fmt(monthRevenue),
                   sub:`Vanaf ${fmtDayShort(monthStart)}`,
-                  icon: '',
-                  color:'#8b5cf6',
                 },
-                { title:'Gem. Bestelling', value:fmt(avgOrder), icon: '', color:'#f59e0b'},
+                { title:'Gem. Bestelling', value:fmt(avgOrder)},
               ].map(c => (
                 <div key={c.title} className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg mb-4" style={{backgroundColor:c.color+'20',color:c.color}}>{c.icon}</div>
                   <p className="text-3xl font-bold text-gray-900 mb-1">{c.value}</p>
                   <p className="text-gray-500 text-sm">{c.title}</p>
                   {c.sub && <p className="text-gray-400 text-xs mt-1 leading-snug">{c.sub}</p>}
