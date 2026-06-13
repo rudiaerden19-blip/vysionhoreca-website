@@ -1,6 +1,7 @@
 'use client'
 
 import { useLanguage } from '@/i18n'
+import { KassaIconClose } from '@/lib/kassa-ui-icons'
 
 export function KassaSplitPaymentModal({
   open,
@@ -50,8 +51,8 @@ export function KassaSplitPaymentModal({
           <h3 className={hdrTitle}>
             <span className="text-purple-500"></span> {t('kassaApp.splitPayTitle')}
           </h3>
-          <button type="button" onClick={onCloseBack} className={closeBtn}>
-            
+          <button type="button" onClick={onCloseBack} className={closeBtn} aria-label={t('kassaApp.closeAria')}>
+            <KassaIconClose className="h-7 w-7" />
           </button>
         </div>
         <div className="p-6 space-y-5">

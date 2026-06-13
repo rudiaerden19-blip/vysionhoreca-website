@@ -1,6 +1,7 @@
 'use client'
 
 import { useLanguage } from '@/i18n'
+import { KassaIconClose } from '@/lib/kassa-ui-icons'
 
 export type KassaQuickPayMethod = 'CASH' |  'CARD' |  'IDEAL' |  'BANCONTACT'
 
@@ -49,8 +50,8 @@ export function KassaPaymentModal({
       <div className={card}>
         <div className={hdr}>
           <h3 className={titleCls}>{t('kassaApp.payTitle')}</h3>
-          <button type="button" onClick={onClose} className={btnCloseCls}>
-            
+          <button type="button" onClick={onClose} className={btnCloseCls} aria-label={t('kassaApp.closeAria')}>
+            <KassaIconClose className="h-7 w-7" />
           </button>
         </div>
         <div className="p-6">
