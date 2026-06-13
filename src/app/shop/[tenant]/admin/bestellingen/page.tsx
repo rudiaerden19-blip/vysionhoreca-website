@@ -22,7 +22,6 @@ import { appIntlLocaleTag, formatKlantschermWaitingClock } from '@/lib/format-ka
 import { formatOrderScheduleDetail } from '@/lib/format-order-schedule'
 import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
-import { getSoundsEnabled } from '@/lib/sounds'
 import { authFetch, getAuthHeaders } from '@/lib/auth-headers'
 import { sendToVysionPrintAgent } from '@/lib/vysion-print-agent-client'
 import {
@@ -31,6 +30,14 @@ import {
   adminPosChannelBadgeLabel,
   adminWebshopChannelBadgeLabel,
 } from '@/lib/admin-order-display'
+import {
+  KassaIconBell,
+  KassaIconCheck,
+  KassaIconEye,
+  KassaIconPrint,
+  KassaIconRefresh,
+  KassaIconVolume,
+} from '@/lib/kassa-ui-icons'
 
 // Parse items from JSONB
 interface OrderItemJson {
@@ -46,44 +53,44 @@ interface OrderItemJson {
 
 // Status config builder function (uses translations)
 const getStatusConfig = (t: (key: string) => string): Record<string, { bg: string; text: string; label: string; next?: string; prev?: string }> => ({
-  new: { bg: 'bg-blue-100', text: 'text-blue-700', label: `🆕 ${t('ordersPage.status.new')}`, next: 'confirmed'},
-  NEW: { bg: 'bg-blue-100', text: 'text-blue-700', label: `🆕 ${t('ordersPage.status.new')}`, next: 'confirmed'},
-  confirmed: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: ` ${t('ordersPage.status.confirmed')}`, next: 'preparing', prev: 'new'},
-  CONFIRMED: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: ` ${t('ordersPage.status.confirmed')}`, next: 'preparing', prev: 'new'},
-  preparing: { bg: 'bg-blue-100', text: 'text-blue-700', label: ` ${t('ordersPage.status.preparing')}`, next: 'ready', prev: 'confirmed'},
-  PREPARING: { bg: 'bg-blue-100', text: 'text-blue-700', label: ` ${t('ordersPage.status.preparing')}`, next: 'ready', prev: 'confirmed'},
-  ready: { bg: 'bg-green-100', text: 'text-green-700', label: ` ${t('ordersPage.status.ready')}`, next: 'completed', prev: 'preparing'},
-  READY: { bg: 'bg-green-100', text: 'text-green-700', label: ` ${t('ordersPage.status.ready')}`, next: 'completed', prev: 'preparing'},
-  delivered: { bg: 'bg-purple-100', text: 'text-purple-700', label: ` ${t('ordersPage.status.delivered')}`, next: 'completed'},
-  DELIVERED: { bg: 'bg-purple-100', text: 'text-purple-700', label: ` ${t('ordersPage.status.delivered')}`, next: 'completed'},
-  completed: { bg: 'bg-gray-100', text: 'text-gray-700', label: ` ${t('ordersPage.status.completed')}`},
-  COMPLETED: { bg: 'bg-gray-100', text: 'text-gray-700', label: ` ${t('ordersPage.status.completed')}`},
-  cancelled: { bg: 'bg-red-100', text: 'text-red-700', label: ` ${t('ordersPage.status.cancelled')}`},
-  CANCELLED: { bg: 'bg-red-100', text: 'text-red-700', label: ` ${t('ordersPage.status.cancelled')}`},
-  rejected: { bg: 'bg-red-100', text: 'text-red-700', label: ` ${t('ordersPage.status.rejected')}`},
-  REJECTED: { bg: 'bg-red-100', text: 'text-red-700', label: ` ${t('ordersPage.status.rejected')}`},
+  new: { bg: 'bg-blue-100', text: 'text-blue-700', label: t('ordersPage.status.new'), next: 'confirmed'},
+  NEW: { bg: 'bg-blue-100', text: 'text-blue-700', label: t('ordersPage.status.new'), next: 'confirmed'},
+  confirmed: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: t('ordersPage.status.confirmed'), next: 'preparing', prev: 'new'},
+  CONFIRMED: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: t('ordersPage.status.confirmed'), next: 'preparing', prev: 'new'},
+  preparing: { bg: 'bg-blue-100', text: 'text-blue-700', label: t('ordersPage.status.preparing'), next: 'ready', prev: 'confirmed'},
+  PREPARING: { bg: 'bg-blue-100', text: 'text-blue-700', label: t('ordersPage.status.preparing'), next: 'ready', prev: 'confirmed'},
+  ready: { bg: 'bg-green-100', text: 'text-green-700', label: t('ordersPage.status.ready'), next: 'completed', prev: 'preparing'},
+  READY: { bg: 'bg-green-100', text: 'text-green-700', label: t('ordersPage.status.ready'), next: 'completed', prev: 'preparing'},
+  delivered: { bg: 'bg-purple-100', text: 'text-purple-700', label: t('ordersPage.status.delivered'), next: 'completed'},
+  DELIVERED: { bg: 'bg-purple-100', text: 'text-purple-700', label: t('ordersPage.status.delivered'), next: 'completed'},
+  completed: { bg: 'bg-gray-100', text: 'text-gray-700', label: t('ordersPage.status.completed')},
+  COMPLETED: { bg: 'bg-gray-100', text: 'text-gray-700', label: t('ordersPage.status.completed')},
+  cancelled: { bg: 'bg-red-100', text: 'text-red-700', label: t('ordersPage.status.cancelled')},
+  CANCELLED: { bg: 'bg-red-100', text: 'text-red-700', label: t('ordersPage.status.cancelled')},
+  rejected: { bg: 'bg-red-100', text: 'text-red-700', label: t('ordersPage.status.rejected')},
+  REJECTED: { bg: 'bg-red-100', text: 'text-red-700', label: t('ordersPage.status.rejected')},
 })
 
 const getPaymentStatusConfig = (t: (key: string) => string): Record<string, { bg: string; text: string; label: string }> => ({
-  pending: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: ` ${t('ordersPage.paymentStatus.pending')}`},
-  PENDING: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: ` ${t('ordersPage.paymentStatus.pending')}`},
-  paid: { bg: 'bg-green-100', text: 'text-green-700', label: ` ${t('ordersPage.paymentStatus.paid')}`},
-  PAID: { bg: 'bg-green-100', text: 'text-green-700', label: ` ${t('ordersPage.paymentStatus.paid')}`},
-  failed: { bg: 'bg-red-100', text: 'text-red-700', label: ` ${t('ordersPage.paymentStatus.failed')}`},
-  FAILED: { bg: 'bg-red-100', text: 'text-red-700', label: ` ${t('ordersPage.paymentStatus.failed')}`},
+  pending: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: t('ordersPage.paymentStatus.pending')},
+  PENDING: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: t('ordersPage.paymentStatus.pending')},
+  paid: { bg: 'bg-green-100', text: 'text-green-700', label: t('ordersPage.paymentStatus.paid')},
+  PAID: { bg: 'bg-green-100', text: 'text-green-700', label: t('ordersPage.paymentStatus.paid')},
+  failed: { bg: 'bg-red-100', text: 'text-red-700', label: t('ordersPage.paymentStatus.failed')},
+  FAILED: { bg: 'bg-red-100', text: 'text-red-700', label: t('ordersPage.paymentStatus.failed')},
 })
 
 const getPaymentMethodLabels = (t: (key: string) => string): Record<string, string> => ({
-  cash: ` ${t('ordersPage.paymentMethod.cash')}`,
-  CASH: ` ${t('ordersPage.paymentMethod.cash')}`,
-  card: ` ${t('ordersPage.paymentMethod.card')}`,
-  CARD: ` ${t('ordersPage.paymentMethod.card')}`,
-  online: ` ${t('ordersPage.paymentMethod.online')}`,
-  ONLINE: ` ${t('ordersPage.paymentMethod.online')}`,
-  ideal: ` ${t('ordersPage.paymentMethod.ideal')}`,
-  IDEAL: ` ${t('ordersPage.paymentMethod.ideal')}`,
-  bancontact: ` ${t('ordersPage.paymentMethod.bancontact')}`,
-  BANCONTACT: ` ${t('ordersPage.paymentMethod.bancontact')}`,
+  cash: t('ordersPage.paymentMethod.cash'),
+  CASH: t('ordersPage.paymentMethod.cash'),
+  card: t('ordersPage.paymentMethod.card'),
+  CARD: t('ordersPage.paymentMethod.card'),
+  online: t('ordersPage.paymentMethod.online'),
+  ONLINE: t('ordersPage.paymentMethod.online'),
+  ideal: t('ordersPage.paymentMethod.ideal'),
+  IDEAL: t('ordersPage.paymentMethod.ideal'),
+  bancontact: t('ordersPage.paymentMethod.bancontact'),
+  BANCONTACT: t('ordersPage.paymentMethod.bancontact'),
 })
 
 export default function BestellingenPage({ params }: { params: { tenant: string } }) {
@@ -933,9 +940,12 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                   : t('ordersPage.actions.completeAll')}
             </motion.button>
             <button
-              className="p-4 rounded-xl text-2xl bg-green-500"
+              type="button"
+              className="p-4 rounded-xl bg-green-500 text-white"
+              title={t('ordersPage.soundEnabled')}
+              aria-label={t('ordersPage.soundEnabled')}
             >
-              
+              <KassaIconVolume className="h-7 w-7" />
             </button>
             <button
               onClick={() => setKitchenMode(false)}
@@ -1080,7 +1090,8 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                     onClick={() => printReceipt(order)}
                     className="col-span-2 p-3 bg-white/20 hover:bg-white/30 rounded-xl font-bold flex items-center justify-center gap-2"
                   >
-                     {t('ordersPage.actions.printReceipt').toUpperCase()}
+                    <KassaIconPrint className="h-5 w-5" />
+                    {t('ordersPage.actions.printReceipt').toUpperCase()}
                   </button>
                 </div>
               </motion.div>
@@ -1157,8 +1168,9 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             onClick={loadOrders}
             className="p-2 bg-gray-100 hover:bg-gray-200 rounded-xl"
             title={t('ordersPage.refresh')}
+            aria-label={t('ordersPage.refresh')}
           >
-            
+            <KassaIconRefresh className="h-5 w-5 text-gray-700" />
           </motion.button>
 
           {/* Filter */}
@@ -1260,10 +1272,11 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                         <span className="font-bold text-gray-900">€{order.total?.toFixed(2)}</span>
                         <button
                           onClick={() => printReceipt(order)}
-                          className="p-2 bg-white hover:bg-gray-100 rounded-lg text-sm border border-gray-200"
+                          className="p-2 bg-white hover:bg-gray-100 rounded-lg text-sm border border-gray-200 text-gray-700"
                           title="Kassabon afdrukken"
+                          aria-label={t('ordersPage.actions.printReceipt')}
                         >
-                          
+                          <KassaIconPrint className="h-5 w-5" />
                         </button>
                       </div>
                     </div>
@@ -1286,9 +1299,9 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             <motion.span
               animate={{ scale: [1, 1.3, 1] }}
               transition={{ repeat: Infinity, duration: 0.8 }}
-              className="text-3xl"
+              className="text-3xl text-white"
             >
-              
+              <KassaIconBell />
             </motion.span>
             <div>
               <p className="font-bold text-lg">{newCount} {newCount > 1 ? t('ordersPage.newOrdersPlural') : t('ordersPage.newOrders')}!</p>
@@ -1495,24 +1508,27 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                         />
                       ) : (
                         <>
-                           {t('ordersPage.actions.complete')}
+                          <KassaIconCheck className="h-5 w-5" />
+                          {t('ordersPage.actions.complete')}
                         </>
                       )}
                     </motion.button>
                   )}
                   <button 
                     onClick={() => setSelectedOrder(order)}
-                    className="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+                    className="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors text-gray-700"
                     title={t('ordersPage.actions.details')}
+                    aria-label={t('ordersPage.actions.details')}
                   >
-                    
+                    <KassaIconEye className="h-5 w-5" />
                   </button>
                   <button 
                     onClick={() => printReceipt(order)}
-                    className="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+                    className="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors text-gray-700"
                     title={t('ordersPage.actions.printReceipt')}
+                    aria-label={t('ordersPage.actions.printReceipt')}
                   >
-                    
+                    <KassaIconPrint className="h-5 w-5" />
                   </button>
                 </div>
               </motion.div>
@@ -1712,7 +1728,8 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                   onClick={() => printReceipt(selectedOrder)}
                   className="px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-medium flex items-center gap-2"
                 >
-                   {t('ordersPage.actions.printReceipt')}
+                  <KassaIconPrint className="h-5 w-5" />
+                  {t('ordersPage.actions.printReceipt')}
                 </button>
               </div>
             </motion.div>
