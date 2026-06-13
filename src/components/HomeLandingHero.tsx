@@ -60,7 +60,7 @@ export default function HomeLandingHero() {
         <div className="flex items-start justify-end gap-4">
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <a
-              href="/#contact"
+              href={`/registreer?lang=${locale}`}
               className="hidden sm:inline-flex items-center justify-center rounded-md bg-accent hover:bg-accent/90 text-white text-sm font-semibold px-4 py-2.5 shadow-home-btn transition-colors"
             >
               {t('heroLanding.demoRequest')}
@@ -132,7 +132,7 @@ export default function HomeLandingHero() {
               </a>
             ))}
             <a
-              href="/#contact"
+              href={`/registreer?lang=${locale}`}
               className="block mt-2 text-center rounded-full bg-accent text-white font-semibold py-3 shadow-home-btn"
               onClick={() => setIsMenuOpen(false)}
             >
