@@ -733,7 +733,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
               className={`px-4 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-all ${
                 standardPricesSaved 
                   ? 'bg-green-500 text-white' 
-                  : 'bg-blue-500 text-white hover:bg-blue-600'
+                  : 'bg-gray-900 text-white hover:bg-black'
               } disabled:opacity-50`}
             >
               {savingStandardPrices ? (

@@ -306,7 +306,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
         className={`fixed bottom-6 right-6 z-50 px-6 py-4 rounded-2xl font-medium shadow-2xl flex items-center gap-2 ${
           saved 
             ? 'bg-green-500 text-white' 
-            : 'bg-blue-600 hover:bg-blue-700 text-white'
+            : 'bg-gray-900 hover:bg-black text-white'
         }`}
       >
         {saving ? (
@@ -650,7 +650,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
             <button
               onClick={addCustomClosing}
               disabled={!newDateFrom || !newDateTo || savingClosing}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors whitespace-nowrap"
+              className="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-black disabled:opacity-50 transition-colors whitespace-nowrap"
             >
               {savingClosing ? 'Opslaan...': '+ Opslaan'}
             </button>

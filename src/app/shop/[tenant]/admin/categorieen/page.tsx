@@ -207,7 +207,7 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
           className={`px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2 ${
             saved 
               ? 'bg-green-500 text-white' 
-              : 'bg-blue-600 hover:bg-blue-700 text-white'
+              : 'bg-gray-900 hover:bg-black text-white'
           }`}
         >
           {saving ? (
@@ -256,7 +256,7 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
             type="button"
             onClick={addCategory}
             disabled={!newCategory.trim()}
-            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 text-white rounded-xl font-medium transition-colors whitespace-nowrap shrink-0"
+            className="px-5 py-2.5 bg-gray-900 hover:bg-black disabled:bg-gray-200 disabled:text-gray-400 text-white rounded-xl font-medium transition-colors whitespace-nowrap shrink-0"
           >
             {t('adminPages.categorieen.add')}
           </button>

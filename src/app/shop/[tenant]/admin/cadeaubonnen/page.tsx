@@ -117,7 +117,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
           onClick={handleSave}
           disabled={saving}
           className={`fixed bottom-6 right-6 z-50 px-6 py-4 rounded-2xl font-medium shadow-2xl flex items-center gap-2 ${
-            saved ? 'bg-green-500 text-white': 'bg-blue-600 hover:bg-blue-700 text-white'
+            saved ? 'bg-green-500 text-white': 'bg-gray-900 hover:bg-black text-white'
           }`}
         >
           {saving ? t('adminPages.common.saving') : saved ? ` ${t('adminPages.common.saved')}`: ` ${t('adminPages.common.save')}`}
@@ -138,7 +138,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
           onClick={() => setActiveTab('instellingen')}
           className={`px-4 py-2 rounded-xl font-medium transition-colors ${
             activeTab === 'instellingen' 
-              ? 'bg-blue-600 text-white' 
+              ? 'bg-gray-900 text-white' 
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
@@ -148,7 +148,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
           onClick={() => setActiveTab('bonnen')}
           className={`px-4 py-2 rounded-xl font-medium transition-colors ${
             activeTab === 'bonnen' 
-              ? 'bg-blue-600 text-white' 
+              ? 'bg-gray-900 text-white' 
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
@@ -254,7 +254,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
                 <p className="text-sm text-blue-600 font-medium uppercase tracking-wider">{t('shopPage.perfectGift')}</p>
                 <h4 className="text-2xl font-bold text-gray-900 mt-1">{t('shopPage.giftCardTitle')}</h4>
                 <p className="text-gray-600 mt-2">{t('websiteGiftCards.adminPreviewBody')}</p>
-                <button type="button" className="mt-4 px-6 py-3 bg-blue-600 text-white font-medium rounded-xl">
+                <button type="button" className="mt-4 px-6 py-3 bg-gray-900 text-white font-medium rounded-xl">
                    {t('shopPage.orderGiftCard')}
                 </button>
               </div>

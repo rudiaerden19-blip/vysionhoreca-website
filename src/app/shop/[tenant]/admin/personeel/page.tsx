@@ -240,7 +240,7 @@ export default function PersoneelPage() {
         </div>
         <button
           onClick={openAddModal}
-          className="px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium flex items-center gap-2"
+          className="px-5 py-2.5 bg-gray-900 text-white rounded-xl hover:bg-black transition-colors font-medium flex items-center gap-2"
         >
           <span>+</span>
           <span>{t('personeelPage.addEmployee')}</span>
@@ -286,7 +286,7 @@ export default function PersoneelPage() {
           <p className="text-gray-500 mb-6">{t('personeelPage.noEmployeesDesc')}</p>
           <button
             onClick={openAddModal}
-            className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium"
+            className="px-6 py-3 bg-gray-900 text-white rounded-xl hover:bg-black transition-colors font-medium"
           >
             + {t('personeelPage.addFirstEmployee')}
           </button>
@@ -501,7 +501,7 @@ export default function PersoneelPage() {
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50"
+                className="px-6 py-2 bg-gray-900 text-white rounded-xl hover:bg-black transition-colors disabled:opacity-50"
               >
                 {saving ? `${t('adminPages.common.saving')}...`: editingStaff ? t('urenPage.update') : t('urenPage.add')}
               </button>
@@ -664,7 +664,7 @@ export default function PersoneelPage() {
               <button
                 onClick={handleSaveContract}
                 disabled={saving}
-                className="px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50"
+                className="px-6 py-2 bg-gray-900 text-white rounded-xl hover:bg-black transition-colors disabled:opacity-50"
               >
                 {saving ? `${t('adminPages.common.saving')}...`: t('personeelPage.contractForm.saveContract')}
               </button>

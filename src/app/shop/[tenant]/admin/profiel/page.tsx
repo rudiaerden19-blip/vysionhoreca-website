@@ -190,7 +190,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
         className={`fixed bottom-6 right-6 z-50 px-6 py-4 rounded-2xl font-medium shadow-2xl flex items-center gap-2 ${
           saved 
             ? 'bg-green-500 text-white' 
-            : 'bg-blue-600 hover:bg-blue-700 text-white'
+            : 'bg-gray-900 hover:bg-black text-white'
         }`}
       >
         {saving ? (
@@ -223,7 +223,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
         </div>
         <Link
           href={`/shop/${params.tenant}/admin/team`}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-sm shrink-0"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium text-white bg-gray-900 hover:bg-black shadow-sm shrink-0"
         >
           <span></span>
           {t('websiteTeam.mijnTeamButton')}
@@ -933,7 +933,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
             <button
               onClick={handleSmtpSave}
               disabled={smtpSaving}
-              className="w-full bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
+              className="w-full bg-gray-900 text-white py-3 rounded-xl font-medium hover:bg-black transition-colors disabled:opacity-50"
             >
               {smtpSaving ? t('adminPages.profiel.smtpSaveSaving') : smtpSaved ? t('adminPages.profiel.smtpSaveSaved') : t('adminPages.profiel.smtpSaveButton')}
             </button>

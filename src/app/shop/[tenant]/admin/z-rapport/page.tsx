@@ -954,7 +954,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                   key={p}
                   onClick={() => setArchivePeriod(p)}
                   className={`py-1.5 rounded-lg text-xs font-medium capitalize transition-colors ${
-                    archivePeriod === p ? 'bg-blue-600 text-white': 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    archivePeriod === p ? 'bg-gray-900 text-white': 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
                   {p.charAt(0).toUpperCase() + p.slice(1)}

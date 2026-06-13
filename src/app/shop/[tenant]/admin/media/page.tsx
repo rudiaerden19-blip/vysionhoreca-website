@@ -351,7 +351,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-xl font-medium flex items-center gap-2"
+            className="px-6 py-3 bg-gray-900 hover:bg-black disabled:bg-gray-400 text-white rounded-xl font-medium flex items-center gap-2"
           >
             {uploading ? ` ${t('websiteMedia.optimizing')}`: ` ${t('websiteMedia.upload')}`}
           </button>
@@ -378,7 +378,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
             onClick={() => setUploadCategory('')}
             className={`px-4 py-2 rounded-xl font-medium transition-all ${
               uploadCategory === '' 
-                ? 'bg-blue-600 text-white' 
+                ? 'bg-gray-900 text-white' 
                 : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
             }`}
           >
@@ -390,7 +390,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
               onClick={() => setUploadCategory(cat)}
               className={`px-4 py-2 rounded-xl font-medium transition-all ${
                 uploadCategory === cat 
-                  ? 'bg-blue-600 text-white' 
+                  ? 'bg-gray-900 text-white' 
                   : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
               }`}
             >

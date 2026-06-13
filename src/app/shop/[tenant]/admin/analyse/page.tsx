@@ -592,7 +592,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
             onClick={() => setActiveTab(tab.id as TabType)}
             className={`px-4 py-2 rounded-lg font-medium transition-all ${
               activeTab === tab.id
-                ? 'bg-blue-600 text-white shadow-md'
+                ? 'bg-gray-900 text-white shadow-md'
                 : 'text-gray-600 hover:bg-gray-100'
             }`}
           >
@@ -826,7 +826,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
             </div>
             <button
               onClick={() => openFixedModal()}
-              className="px-4 py-2 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-gray-900 text-white rounded-xl font-medium hover:bg-black transition-colors flex items-center gap-2"
             >
                {t('analysePage.fixed.newCost')}
             </button>
@@ -936,7 +936,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
             </div>
             <button
               onClick={() => openVariableModal()}
-              className="px-4 py-2 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-gray-900 text-white rounded-xl font-medium hover:bg-black transition-colors flex items-center gap-2"
             >
                {t('analysePage.variable.newPurchase')}
             </button>
@@ -1166,7 +1166,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
             <button
               onClick={saveTargets}
               disabled={saving}
-              className="w-full px-6 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              className="w-full px-6 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-black disabled:opacity-50 transition-colors"
             >
               {saving ? t('analysePage.common.saving') : ` ${t('analysePage.settings.saveTargets')}`}
             </button>
@@ -1296,7 +1296,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                   <button
                     onClick={saveFixed}
                     disabled={saving}
-                    className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 disabled:opacity-50"
+                    className="flex-1 px-4 py-3 bg-gray-900 text-white rounded-xl font-medium hover:bg-black disabled:opacity-50"
                   >
                     {saving ? t('analysePage.common.saving') : ` ${t('analysePage.common.save')}`}
                   </button>
@@ -1429,7 +1429,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                   <button
                     onClick={saveVariable}
                     disabled={saving}
-                    className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 disabled:opacity-50"
+                    className="flex-1 px-4 py-3 bg-gray-900 text-white rounded-xl font-medium hover:bg-black disabled:opacity-50"
                   >
                     {saving ? t('analysePage.common.saving') : ` ${t('analysePage.common.save')}`}
                   </button>

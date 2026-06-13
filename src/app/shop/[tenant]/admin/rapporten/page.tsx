@@ -771,7 +771,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
   // ─────────────────────────────────────────────────────────────────────────────
   const tabs: { id: Tab; label: string; icon: string; activeColor: string }[] = [
     { id:'overzicht',   label:'Overzicht',   icon: '', activeColor:'bg-[#1e293b] text-white'},
-    { id:'xrapport',    label:'X-Rapport',   icon: '', activeColor:'bg-blue-500 text-white'},
+    { id:'xrapport',    label:'X-Rapport',   icon: '', activeColor:'bg-gray-900 text-white'},
     { id:'zrapport',    label:'Z-Rapport',   icon: '', activeColor:'bg-red-500 text-white'},
     { id:'boekhouding', label:'Boekhouding', icon: '', activeColor:'bg-emerald-500 text-white'},
     { id:'facturen',    label:'Facturen',    icon: '', activeColor:'bg-purple-500 text-white'},
@@ -1181,7 +1181,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
             </div>
 
             {/* Print knop */}
-            <button onClick={printXReport} className="w-full py-4 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-2xl flex items-center justify-center gap-2 transition-colors text-lg">
+            <button onClick={printXReport} className="w-full py-4 bg-gray-900 hover:bg-black text-white font-bold rounded-2xl flex items-center justify-center gap-2 transition-colors text-lg">
                X-Rapport Printen
             </button>
           </div>
@@ -1367,7 +1367,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
                  Export PDF
               </button>
               <button onClick={()=>selectedZReports.length>0&&exportBoekhoudJSON()} disabled={selectedZReports.length===0}
-                className="flex items-center justify-center gap-2 py-4 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white font-bold rounded-2xl transition-colors text-sm">
+                className="flex items-center justify-center gap-2 py-4 bg-gray-900 hover:bg-black disabled:bg-gray-300 text-white font-bold rounded-2xl transition-colors text-sm">
                  Export JSON
               </button>
             </div>

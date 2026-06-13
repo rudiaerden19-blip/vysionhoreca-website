@@ -91,7 +91,7 @@ export default function SessionsPage({ params }: { params: { tenant: string } })
         <button
           onClick={() => { setFormData({ group_id: groups[0]?.id || '', title: '', description: '', order_deadline: '', delivery_time: '', status: 'open'}); setShowModal(true) }}
           disabled={groups.length === 0}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="bg-gray-900 hover:bg-black text-white px-4 py-2 rounded-xl font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {t('groupsModule.sessions.newSession')}
         </button>
@@ -187,7 +187,7 @@ export default function SessionsPage({ params }: { params: { tenant: string } })
               </div>
               <div className="flex justify-end gap-3 pt-4 border-t">
                 <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-xl">{t('groupsModule.sessions.cancel')}</button>
-                <button type="submit" disabled={saving} className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium disabled:opacity-50">
+                <button type="submit" disabled={saving} className="px-6 py-2 bg-gray-900 hover:bg-black text-white rounded-xl font-medium disabled:opacity-50">
                   {saving ? t('groupsModule.sessions.starting') : t('groupsModule.sessions.startSession')}
                 </button>
               </div>

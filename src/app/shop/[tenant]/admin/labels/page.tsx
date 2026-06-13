@@ -225,7 +225,7 @@ export default function LabelsPage({ params }: { params: { tenant: string } }) {
           {labels.length > 0 && (
             <button
               onClick={() => printLabels(labels)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-medium"
+              className="bg-gray-900 hover:bg-black text-white px-4 py-2 rounded-xl font-medium"
             >
                {t('labelsPage.printAll')} ({labels.length})
             </button>

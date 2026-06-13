@@ -388,7 +388,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
                   whileTap={{ scale: 0.98 }}
                   onClick={handleCreate}
                   disabled={saving || !formData.name.trim()}
-                  className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-xl font-medium flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-3 bg-gray-900 hover:bg-black disabled:bg-gray-400 text-white rounded-xl font-medium flex items-center justify-center gap-2"
                 >
                   {saving ? (
                     <>

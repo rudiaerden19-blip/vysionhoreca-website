@@ -143,7 +143,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
         onClick={handleSave}
         disabled={saving}
         className={`fixed bottom-6 right-6 z-50 px-6 py-4 rounded-2xl font-medium shadow-2xl flex items-center gap-2 ${
-          saved ? 'bg-green-500 text-white': 'bg-blue-600 hover:bg-blue-700 text-white'
+          saved ? 'bg-green-500 text-white': 'bg-gray-900 hover:bg-black text-white'
         }`}
       >
         {saving ? '' : saved ? '' : ''} {saved ? t('adminPages.common.saved') : t('adminPages.common.save')}
@@ -210,7 +210,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
               onClick={() => setVatRate(rate)}
               className={`p-4 rounded-xl font-bold text-xl transition-all ${
                 vatRate === rate 
-                  ? 'bg-blue-600 text-white' 
+                  ? 'bg-gray-900 text-white' 
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -287,7 +287,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
             <button
               onClick={handleSaveStripe}
               disabled={savingStripe}
-              className={`w-full py-3 rounded-xl font-semibold transition-colors ${savedStripe ? 'bg-green-500 text-white': 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+              className={`w-full py-3 rounded-xl font-semibold transition-colors ${savedStripe ? 'bg-green-500 text-white': 'bg-gray-900 hover:bg-black text-white'}`}
             >
               {savingStripe ? 'Opslaan...': savedStripe ? 'Opgeslagen': 'Stripe keys opslaan'}
             </button>

@@ -185,7 +185,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={openCreateModal}
-          className="px-4 sm:px-6 py-2.5 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium flex items-center justify-center gap-2 text-sm sm:text-base w-full sm:w-auto"
+          className="px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-900 hover:bg-black text-white rounded-xl font-medium flex items-center justify-center gap-2 text-sm sm:text-base w-full sm:w-auto"
         >
            {t('promotiesPage.newPromo')}
         </motion.button>
@@ -257,7 +257,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={openCreateModal}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-xl"
+            className="bg-gray-900 hover:bg-black text-white font-medium px-6 py-3 rounded-xl"
           >
             + {t('promotiesPage.createFirst')}
           </motion.button>
@@ -566,7 +566,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                   whileTap={{ scale: 0.98 }}
                   onClick={handleSave}
                   disabled={saving || !formData.name.trim()}
-                  className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-xl font-medium flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-3 bg-gray-900 hover:bg-black disabled:bg-gray-400 text-white rounded-xl font-medium flex items-center justify-center gap-2"
                 >
                   {saving ? (
                     <>

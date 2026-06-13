@@ -85,7 +85,7 @@ export default function VacaturesPage({ params }: { params: { tenant: string } }
       className={`px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2 ${
         saved
           ? 'bg-green-500 text-white'
-          : 'bg-blue-600 hover:bg-blue-700 text-white'
+          : 'bg-gray-900 hover:bg-black text-white'
       }`}
     >
       {saving ? (
@@ -258,7 +258,7 @@ export default function VacaturesPage({ params }: { params: { tenant: string } }
             )}
             {formData.hiring_contact && (
               <div className="mt-4 pt-4 border-t border-gray-100">
-                <span className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                <span className="inline-flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium">
                   <span></span> {formData.hiring_contact}
                 </span>
               </div>

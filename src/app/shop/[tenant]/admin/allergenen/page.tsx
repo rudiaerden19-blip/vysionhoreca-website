@@ -101,7 +101,7 @@ export default function AllergenenPage({ params }: { params: { tenant: string } 
           whileTap={{ scale: 0.98 }}
           onClick={handleSave}
           disabled={saving}
-          className={`px-6 py-3 text-white rounded-xl font-medium flex items-center gap-2 transition-colors ${saved ? 'bg-green-500': 'bg-blue-600 hover:bg-blue-700'}`}
+          className={`px-6 py-3 text-white rounded-xl font-medium flex items-center gap-2 transition-colors ${saved ? 'bg-green-500': 'bg-gray-900 hover:bg-black'}`}
         >
           {saving ? '' : saved ? '' : ''} {saved ? t('adminPages.common.saved') : t('adminPages.common.save')}
         </motion.button>

@@ -134,7 +134,7 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={openAddModal}
-          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-colors flex items-center gap-2"
+          className="px-6 py-3 bg-gray-900 hover:bg-black text-white font-medium rounded-xl transition-colors flex items-center gap-2"
         >
           <span>+</span>
           <span>{t('rewardsPage.addReward')}</span>
@@ -167,7 +167,7 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
           <p className="text-gray-500 mb-6">{t('rewardsPage.noRewardsDesc')}</p>
           <button
             onClick={openAddModal}
-            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-colors"
+            className="px-6 py-3 bg-gray-900 hover:bg-black text-white font-medium rounded-xl transition-colors"
           >
             {t('rewardsPage.addFirstReward')}
           </button>
@@ -352,7 +352,7 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
                 <button
                   onClick={handleSave}
                   disabled={saving || !formData.name || !formData.points_required}
-                  className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white rounded-xl font-medium transition-colors"
+                  className="flex-1 px-4 py-3 bg-gray-900 hover:bg-black disabled:bg-gray-300 text-white rounded-xl font-medium transition-colors"
                 >
                   {saving ? `${t('adminPages.common.save')}...`: t('adminPages.common.save')}
                 </button>

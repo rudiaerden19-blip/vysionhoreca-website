@@ -195,7 +195,7 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
         <button
           onClick={openComposer}
           disabled={selectedCustomers.size === 0}
-          className="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
+          className="px-6 py-3 bg-gray-900 text-white rounded-xl font-medium hover:bg-black transition disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
         >
            {t('marketing.composeEmail')} {selectedCustomers.size > 0 && `(${selectedCustomers.size})`}
         </button>
@@ -444,7 +444,7 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
               <button
                 onClick={sendEmails}
                 disabled={sending || !emailForm.subject || !emailForm.message}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:bg-gray-300 flex items-center gap-2"
+                className="px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-black transition disabled:bg-gray-300 flex items-center gap-2"
               >
                 {sending ? (
                   <>

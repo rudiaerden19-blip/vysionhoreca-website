@@ -159,7 +159,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
             onClick={() => setFilter(f.id as 'all' |  'visible' |  'hidden')}
             className={`px-4 py-2 rounded-xl font-medium transition-all ${
               filter === f.id
-                ? 'bg-blue-600 text-white'
+                ? 'bg-gray-900 text-white'
                 : 'bg-white text-gray-600 hover:bg-gray-50'
             }`}
           >
@@ -264,7 +264,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
                         whileTap={{ scale: 0.98 }}
                         onClick={() => submitReply(review.id!)}
                         disabled={savingReply || !replyText.trim()}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-xl font-medium flex items-center gap-2"
+                        className="px-4 py-2 bg-gray-900 hover:bg-black disabled:bg-gray-400 text-white rounded-xl font-medium flex items-center gap-2"
                       >
                         {savingReply ? (
                           <motion.div

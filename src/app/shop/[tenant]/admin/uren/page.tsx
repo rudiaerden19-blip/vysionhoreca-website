@@ -627,7 +627,7 @@ Met vriendelijke groeten`,
         <p className="text-gray-600 mb-6">{t('urenPage.noStaffDesc')}</p>
         <a
           href={`/shop/${tenant}/admin/personeel`}
-          className="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          className="inline-block px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-black transition"
         >
           {t('urenPage.goToStaff')}
         </a>
@@ -728,7 +728,7 @@ Met vriendelijke groeten`,
             type="button"
             onClick={() => setShowReopenModal(true)}
             disabled={saving}
-            className="relative z-[6] min-h-[44px] shrink-0 touch-manipulation px-4 py-2 [-webkit-tap-highlight-color:transparent] bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+            className="relative z-[6] min-h-[44px] shrink-0 touch-manipulation px-4 py-2 [-webkit-tap-highlight-color:transparent] bg-gray-900 text-white rounded-lg hover:bg-black transition disabled:opacity-50"
           >
              {t('urenPage.reopenMonth')}
           </button>
@@ -776,7 +776,7 @@ Met vriendelijke groeten`,
                   if (kind === 'approve') await executeBulkApprove()
                   else if (kind === 'close') await executeBulkClose()
                 }}
-                className="min-h-[44px] touch-manipulation rounded-lg bg-blue-600 px-6 py-2 text-white [-webkit-tap-highlight-color:transparent] transition hover:bg-blue-700 disabled:opacity-50"
+                className="min-h-[44px] touch-manipulation rounded-lg bg-gray-900 px-6 py-2 text-white [-webkit-tap-highlight-color:transparent] transition hover:bg-black disabled:opacity-50"
               >
                 {saving ? `${t('adminPages.common.saving')}...`: t('adminPages.common.confirm')}
               </button>
@@ -927,7 +927,7 @@ Met vriendelijke groeten`,
           </span>
           <button
             onClick={() => setShowReopenModal(true)}
-            className="px-3 py-1 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition"
+            className="px-3 py-1 bg-gray-900 text-white text-sm rounded-lg hover:bg-black transition"
           >
              {t('urenPage.print.reopen')}
           </button>
@@ -963,7 +963,7 @@ Met vriendelijke groeten`,
                 } ${inMonth && !isMonthClosed ? 'cursor-pointer hover:bg-blue-50': ''} print:min-h-[60px]`}
               >
                 <div className={`text-sm font-medium mb-1 ${
-                  isToday ? 'bg-blue-600 text-white w-7 h-7 rounded-full flex items-center justify-center': ''
+                  isToday ? 'bg-gray-900 text-white w-7 h-7 rounded-full flex items-center justify-center': ''
                 }`}>
                   {date.getDate()}
                 </div>
@@ -1350,7 +1350,7 @@ Met vriendelijke groeten`,
                 <button
                   onClick={handleSaveEntry}
                   disabled={saving}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+                  className="px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-black transition disabled:opacity-50"
                 >
                   {saving ? `${t('adminPages.common.saving')}...`: editingEntry ? t('urenPage.update') : t('urenPage.add')}
                 </button>
@@ -1648,7 +1648,7 @@ Met vriendelijke groeten`,
               <button
                 onClick={handleReopenMonth}
                 disabled={saving || !reopenReason.trim()}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+                className="px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-black transition disabled:opacity-50"
               >
                 {saving ? `${t('adminPages.common.saving')}...`: ` ${t('urenPage.print.reopen')}`}
               </button>

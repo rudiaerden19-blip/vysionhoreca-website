@@ -702,7 +702,7 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
               type="button"
               disabled={saving}
               onClick={() => void handleSave()}
-              className="w-full rounded-2xl bg-blue-700 py-4 text-lg font-bold text-white disabled:opacity-60"
+              className="w-full rounded-2xl bg-gray-900 hover:bg-black py-4 text-lg font-bold text-white disabled:opacity-60"
             >
               {saving ? t('adminPages.common.saving') : t('adminPages.productIntake.saveButton')}
             </button>

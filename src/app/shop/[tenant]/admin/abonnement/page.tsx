@@ -1156,7 +1156,7 @@ export default function AbonnementPage() {
               }
             }}
             disabled={processing !== null}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-colors disabled:opacity-50 whitespace-nowrap"
+            className="bg-gray-900 hover:bg-black text-white px-8 py-4 rounded-xl font-bold text-lg transition-colors disabled:opacity-50 whitespace-nowrap"
           >
             {processing && processing !== 'starter' && processing !== 'pro'? t('loading') : ` ${t('payNow')}`}
           </button>

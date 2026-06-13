@@ -83,7 +83,7 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
         onClick={handleSave}
         disabled={saving}
         className={`fixed bottom-6 right-6 z-50 px-6 py-4 rounded-2xl font-medium shadow-2xl flex items-center gap-2 ${
-          saved ? 'bg-green-500 text-white': 'bg-blue-600 hover:bg-blue-700 text-white'
+          saved ? 'bg-green-500 text-white': 'bg-gray-900 hover:bg-black text-white'
         }`}
       >
         {saving ? (

@@ -205,7 +205,7 @@ export default function GroupsPage({ params }: { params: { tenant: string } }) {
         </div>
         <button
           onClick={openCreateModal}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-medium flex items-center gap-2"
+          className="bg-gray-900 hover:bg-black text-white px-4 py-2 rounded-xl font-medium flex items-center gap-2"
         >
           {t('groupsModule.groups.newGroup')}
         </button>
@@ -226,7 +226,7 @@ export default function GroupsPage({ params }: { params: { tenant: string } }) {
           <p className="text-gray-600 mb-4">{t('groupsModule.groups.noGroupsDesc')}</p>
           <button
             onClick={openCreateModal}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl font-medium"
+            className="bg-gray-900 hover:bg-black text-white px-6 py-2 rounded-xl font-medium"
           >
             {t('groupsModule.groups.firstGroup')}
           </button>
@@ -365,7 +365,7 @@ export default function GroupsPage({ params }: { params: { tenant: string } }) {
                 <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-xl">
                   {t('groupsModule.groups.cancel')}
                 </button>
-                <button type="submit" disabled={saving} className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium disabled:opacity-50">
+                <button type="submit" disabled={saving} className="px-6 py-2 bg-gray-900 hover:bg-black text-white rounded-xl font-medium disabled:opacity-50">
                   {saving ? t('groupsModule.groups.saving') : editGroup ? t('groupsModule.groups.save') : t('groupsModule.groups.create')}
                 </button>
               </div>

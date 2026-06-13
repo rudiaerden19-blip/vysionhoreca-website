@@ -74,7 +74,7 @@ export default function GroupOrdersPage({ params }: { params: { tenant: string }
           <span className="text-4xl mb-4 block"></span>
           <h2 className="text-xl font-bold text-gray-900 mb-2">{t('groupsModule.orders.selectSession')}</h2>
           <p className="text-gray-600 mb-4">{t('groupsModule.orders.selectSessionDesc')}</p>
-          <a href={`/shop/${params.tenant}/admin/groepen/sessies`} className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl">
+          <a href={`/shop/${params.tenant}/admin/groepen/sessies`} className="inline-block bg-gray-900 hover:bg-black text-white px-6 py-2 rounded-xl">
             {t('groupsModule.orders.toSessions')}
           </a>
         </div>

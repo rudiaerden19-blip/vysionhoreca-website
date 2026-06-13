@@ -128,7 +128,7 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
         </div>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-black transition-colors"
         >
           + {t('kostenInstellingenPage.addCategory')}
         </button>

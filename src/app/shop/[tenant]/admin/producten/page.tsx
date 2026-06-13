@@ -170,7 +170,7 @@ function SortableProductCard({
             </span>
           )}
           {product.is_popular && (
-            <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full">
+            <span className="bg-gray-900 text-white text-xs font-bold px-2 py-1 rounded-full">
                POPULAIR
             </span>
           )}
@@ -716,7 +716,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={openAddModal}
-          className="bg-blue-700 hover:bg-blue-800 text-white font-medium px-6 py-3 rounded-xl flex items-center gap-2"
+          className="bg-gray-900 hover:bg-black text-white font-medium px-6 py-3 rounded-xl flex items-center gap-2"
         >
           <span></span>
           <span>{t('adminPages.producten.newProduct')}</span>
@@ -751,7 +751,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
             onClick={() => setSelectedCategory('Alle')}
             className={`px-4 py-2 rounded-xl font-medium whitespace-nowrap transition-all ${
               selectedCategory === 'Alle'
-                ? 'bg-blue-600 text-white'
+                ? 'bg-gray-900 text-white'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
@@ -773,7 +773,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
               onClick={() => setSelectedCategory(cat.name)}
               className={`px-4 py-2 rounded-xl font-medium whitespace-nowrap transition-all ${
                 selectedCategory === cat.name
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-gray-900 text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -817,7 +817,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
           <p className="text-gray-500 mb-6">{t('adminPages.producten.adjustFilters')}</p>
           <button
             onClick={openAddModal}
-            className="bg-blue-700 hover:bg-blue-800 text-white font-medium px-6 py-3 rounded-xl"
+            className="bg-gray-900 hover:bg-black text-white font-medium px-6 py-3 rounded-xl"
           >
             + {t('adminPages.producten.newProduct')}
           </button>
@@ -1434,7 +1434,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                   type="button"
                   onClick={handleSave}
                   disabled={saving}
-                  className="px-6 py-3 bg-blue-700 hover:bg-blue-800 text-white rounded-xl font-medium transition-colors flex items-center gap-2"
+                  className="px-6 py-3 bg-gray-900 hover:bg-black text-white rounded-xl font-medium transition-colors flex items-center gap-2"
                 >
                   {saving ? (
                     <>

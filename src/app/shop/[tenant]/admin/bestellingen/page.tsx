@@ -965,7 +965,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                     : status === 'confirmed'
                     ? 'bg-yellow-500 text-gray-900'
                     : status === 'preparing'
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-gray-900 text-white'
                     : status === 'ready'
                     ? 'bg-green-500 text-white'
                     : 'bg-gray-700 text-white'
@@ -1120,7 +1120,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setArchiveMode(!archiveMode)}
-            className={`px-4 py-2 rounded-xl font-medium flex items-center gap-2 ${archiveMode ? 'bg-blue-600 text-white': 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+            className={`px-4 py-2 rounded-xl font-medium flex items-center gap-2 ${archiveMode ? 'bg-gray-900 text-white': 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
           >
              Archief
           </motion.button>

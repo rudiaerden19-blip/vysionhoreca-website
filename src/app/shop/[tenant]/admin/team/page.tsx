@@ -116,7 +116,7 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={handleAdd}
-          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium flex items-center gap-2"
+          className="px-6 py-3 bg-gray-900 hover:bg-black text-white rounded-xl font-medium flex items-center gap-2"
         >
           <span>+</span>
           <span>{t('websiteTeam.addMember')}</span>
@@ -135,7 +135,7 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
           <p className="text-gray-500 mb-6">{t('websiteTeam.noMembersDesc')}</p>
           <button
             onClick={handleAdd}
-            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium"
+            className="px-6 py-3 bg-gray-900 hover:bg-black text-white rounded-xl font-medium"
           >
             {t('websiteTeam.addFirstMember')}
           </button>
@@ -278,7 +278,7 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium disabled:opacity-50"
+                  className="flex-1 px-4 py-3 bg-gray-900 hover:bg-black text-white rounded-xl font-medium disabled:opacity-50"
                 >
                   {saving ? t('adminPages.common.saving') : t('adminPages.common.save')}
                 </button>
