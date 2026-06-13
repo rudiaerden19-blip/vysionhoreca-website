@@ -26,6 +26,12 @@ import {
   orderItemDisplayOptionLines,
   orderItemLineTotalEur,
 } from '@/lib/order-items-display'
+import {
+  KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
+  kassaPosButtonClass,
+} from '@/lib/kassa-pos-surface'
+import { KitchenStyleOrderCard } from '@/components/shop-display/KitchenStyleOrderCard'
+import { KassaIconClose } from '@/lib/kassa-ui-icons'
 
 interface Order {
   id: string
@@ -758,9 +764,6 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   const getStatusColor = (_status: string) =>
     'bg-[#0f2744] text-white border-b border-black/20'
 
-  /** Card shell — witte kaart, subtiele rand; geen status-regenboog */
-  const getStatusBgColor = (_status: string) => 'bg-white border-gray-200'
-
   const getStatusLabel = (status: string) => {
     switch (status.toLowerCase()) {
       case 'new': return tx('statusNew')
@@ -780,6 +783,24 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     if (mins < 60) return `${mins} ${tx('min')}`
     return `${Math.floor(mins / 60)}u ${mins % 60}m`
   }
+
+  const displayHeaderStatus = (status: string) => {
+    const s = status.toLowerCase()
+    if (s === 'new') return tx('statusNew')
+    if (s === 'ready') return tx('statusReady')
+    if (s === 'preparing') return tx('statusPreparing')
+    if (s === 'open') return tx('statusNew')
+    return tx('statusKitchen')
+  }
+
+  const orderTypeLabelShort = (order: Pick<Order, 'order_type'>) => {
+    const key = shopDisplayOrderTypeKey(order.order_type)
+    if (key === 'delivery') return ` ${tx('delivery')}`
+    if (key === 'dineIn') return ` ${tx('dineIn')}`
+    return ` ${tx('pickup')}`
+  }
+
+  const DISPLAY_POS_BTN = `${kassaPosButtonClass(false)} touch-manipulation font-semibold text-[#f0f0f0]`
 
   const activeOrders = orders.filter(o => !['completed', 'rejected'].includes(o.status.toLowerCase()))
   const completedOrders = orders.filter(o => ['completed', 'rejected'].includes(o.status.toLowerCase()))
@@ -807,7 +828,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   if (loading) {
     return (
       <div
-        className="min-h-[100dvh] w-full min-w-0 max-w-full bg-[#e3e3e3] flex items-center justify-center"
+        className={`min-h-[100dvh] w-full min-w-0 max-w-full ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} flex items-center justify-center text-white`}
         style={{
           paddingTop: 'env(safe-area-inset-top, 0px)',
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
@@ -825,7 +846,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
   return (
     <div
-      className="flex min-h-0 h-[100dvh] max-h-[100dvh] w-full min-w-0 max-w-full flex-col overflow-hidden bg-[#e3e3e3] text-gray-900"
+      className={`flex min-h-0 h-[100dvh] max-h-[100dvh] w-full min-w-0 max-w-full flex-col overflow-hidden ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} text-[#f0f0f0]`}
       style={{
         width: '100%',
         paddingTop: 'env(safe-area-inset-top, 0px)',
@@ -1012,30 +1033,30 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
       </header>
 
       {/* Tabs */}
-      <div className="shrink-0 border-b border-gray-300 bg-[#d8d8d8] px-4 py-2 flex gap-2 items-center">
+      <div className="shrink-0 border-b border-black px-4 py-2 flex gap-2 items-center">
         <button
           onClick={() => setActiveTab('active')}
-          className={`px-4 py-2 rounded-lg font-bold transition-colors ${
-            activeTab === 'active' 
-              ? 'bg-orange-500 text-white' 
-              : 'bg-white/90 text-gray-700 shadow-sm hover:bg-white'
+          className={`px-4 py-2 rounded-lg font-bold transition-colors touch-manipulation ${
+            activeTab === 'active'
+              ? `${kassaPosButtonClass(true)}`
+              : DISPLAY_POS_BTN
           }`}
         >
           {tx('active')} ({activeOrders.length})
         </button>
         <button
           onClick={() => setActiveTab('completed')}
-          className={`px-4 py-2 rounded-lg font-bold transition-colors ${
-            activeTab === 'completed' 
-              ? 'bg-gray-500 text-white' 
-              : 'bg-white/90 text-gray-700 shadow-sm hover:bg-white'
+          className={`px-4 py-2 rounded-lg font-bold transition-colors touch-manipulation ${
+            activeTab === 'completed'
+              ? `${kassaPosButtonClass(true)}`
+              : DISPLAY_POS_BTN
           }`}
         >
           {tx('completed')} ({completedOrders.length})
         </button>
         <button
           onClick={handleCompleteAll}
-          className="ml-auto px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold transition-colors"
+          className={`ml-auto px-4 py-2 font-bold transition-colors touch-manipulation ${DISPLAY_POS_BTN}`}
         >
            Alles afronden
         </button>
@@ -1045,112 +1066,44 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
       <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-4">
         {activeTab === 'active'? (
           sortedActiveOrders.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-gray-500">
-              <span className="text-8xl mb-6"></span>
-              <p className="text-2xl font-bold">{tx('noActiveOrders')}</p>
+            <div className="flex flex-col items-center justify-center h-full text-white/70">
+              <p className="text-2xl font-bold text-white">{tx('noActiveOrders')}</p>
               <p className="text-lg mt-2">{tx('ordersAppearHere')}</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
-              {sortedActiveOrders.map((order) => {
-                const schedLine = isWebshopOrder(order)
-                  ? formatOrderScheduleDetail(
-                      { scheduled_date: order.scheduled_date, scheduled_time: order.scheduled_time },
-                      locale
-                    )
-                  : null
-                const hideInnerScheduleBox = isWebshopOrder(order) && !!schedLine
-                const dineInSeat = adminDineInSeatAuditLine(order, t)
-                return (
-                <motion.div
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+              {sortedActiveOrders.map((order) => (
+                <KitchenStyleOrderCard
                   key={order.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className={`rounded-xl overflow-hidden cursor-pointer transition-all border border-gray-200 shadow-sm ${getStatusBgColor(order.status)} ${
-                    newOrderIds.has(order.id)
-                      ? 'ring-2 ring-slate-500 shadow-md'
-                      : 'hover:border-gray-300'
-                  }`}
-                  onClick={() => {
+                  order={order}
+                  locale={locale}
+                  isNew={newOrderIds.has(order.id)}
+                  headerStatus={displayHeaderStatus(order.status)}
+                  onlineOrderLabel={tx('onlineOrder')}
+                  orderTypeLabel={orderTypeLabel}
+                  orderTypeLabelShort={orderTypeLabelShort}
+                  timeSince={getTimeSince(order.created_at)}
+                  printLabel={t('kitchenDisplay.print')}
+                  readyLabel={tx('ready')}
+                  t={t}
+                  onOpen={() => {
                     setSelectedOrder(order)
-                    setNewOrderIds(prev => {
+                    setNewOrderIds((prev) => {
                       const next = new Set(prev)
                       next.delete(order.id)
                       return next
                     })
                   }}
-                >
-                  {/* Order Header */}
-                  <div className={`${getStatusColor(order.status)} px-4 py-2.5 flex items-center justify-between`}>
-                    <span className="font-bold text-lg tabular-nums">#{order.order_number}</span>
-                    <span className="text-xs font-semibold uppercase tracking-wide text-white bg-white/15 px-2 py-1 rounded-md border border-white/25">
-                      {getStatusLabel(order.status)}
-                    </span>
-                  </div>
-
-                  {isWebshopOrder(order) && (
-                    <div className="px-3 py-2 bg-gray-50 border-b border-gray-100 text-center">
-                      <div className="text-sm font-bold text-gray-900">{tx('onlineOrder')}</div>
-                      <div className="text-xs text-gray-700 mt-0.5 leading-snug">
-                        {orderTypeLabel(order.order_type)}
-                        {schedLine ? `· ${schedLine}`: ''}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Order Content */}
-                  <div className="p-3 bg-white text-gray-900">
-                    {!hideInnerScheduleBox && (order.scheduled_date || order.scheduled_time) && (
-                      <div className="mb-2 px-2 py-1.5 bg-gray-100 border border-gray-200 rounded text-gray-800 font-medium text-sm text-center">
-                         {order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit'}) : ''}{order.scheduled_time ? `om ${order.scheduled_time}`: ''}
-                      </div>
-                    )}
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-semibold truncate">{order.customer_name}</span>
-                      <span className="text-gray-500 text-xs shrink-0 ml-2 tabular-nums">{getTimeSince(order.created_at)}</span>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-1 mb-2">
-                      {!isWebshopOrder(order) && (
-                        <span className="px-2 py-0.5 rounded-md text-xs font-medium text-gray-700 bg-gray-100 border border-gray-200">
-                          {orderTypeLabel(order.order_type)}
-                        </span>
-                      )}
-                      {dineInSeat && (
-                        <span className="px-2 py-0.5 rounded-md text-xs font-bold text-emerald-900 bg-emerald-50 border border-emerald-200">
-                          {dineInSeat}
-                        </span>
-                      )}
-                      <span className="px-2 py-0.5 rounded-md text-xs font-medium text-gray-700 bg-gray-100 border border-gray-200">
-                        {order.payment_status === 'paid'? tx('paid') : tx('notPaid')}
-                      </span>
-                    </div>
-
-                    {/* Items — scrollbaar bij lange lijsten */}
-                    <div className="mb-2 max-h-40 overflow-y-auto overscroll-y-contain rounded-lg border border-gray-200 bg-white px-2 py-1.5 [scrollbar-gutter:stable]">
-                      <div className="text-sm space-y-1">
-                        {order.items?.map((item: unknown, i: number) => {
-                          const qty = Number((item as { quantity?: unknown }).quantity) || 1
-                          const label = orderItemDisplayName(item)
-                          return (
-                          <p key={i} className="text-gray-900 font-semibold leading-snug break-words">
-                            <span className="tabular-nums text-[#0f2744]">{qty}×</span>{' '}
-                            {label}
-                          </p>
-                          )
-                        })}
-                      </div>
-                    </div>
-
-                    {/* Total */}
-                    <div className="text-xl font-semibold text-gray-900 tabular-nums">
-                      €{order.total?.toFixed(2)}
-                    </div>
-                  </div>
-                </motion.div>
-                )
-              })}
+                  onPrint={(e) => {
+                    e.stopPropagation()
+                    void printOrder(order, 'customer')
+                  }}
+                  onReady={(e) => {
+                    e.stopPropagation()
+                    void handleReady(order)
+                  }}
+                />
+              ))}
             </div>
           )
         ) : (
@@ -1228,7 +1181,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                     className="w-11 h-11 shrink-0 rounded-full bg-white/15 flex items-center justify-center text-xl text-white hover:bg-white/25"
                     aria-label={tx('cancel')}
                   >
-                    
+                    <KassaIconClose className="h-6 w-6 text-white" />
                   </button>
                 </div>
               </div>
