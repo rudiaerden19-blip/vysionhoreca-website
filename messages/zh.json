@@ -2227,6 +2227,7 @@
  "dbNotConnected": "数据库未连接",
  "unknownError": "未知错误",
  "confirmDeletePhoto": "确定要删除这张照片吗？",
+ "removePhoto": "移除照片",
  "confirmDeleteManyPhotos": "删除 {count} 张照片？",
  "deleteDbError": "从数据库删除失败",
  "deleteErrorPrefix": "删除时出错：",
@@ -2508,7 +2509,8 @@
  "categoryVatTypicalRatesHint": "提示 — 餐饮行业常见做法：餐食与软饮料选 9%；酒精饮料选 21%。如有疑问请咨询会计师或税务部门。",
  "categoryVatShort": "增值税",
  "categoryVatUseTenant": "店铺默认",
- "categoryImageHelp": "可选 — 与商品相同的媒体库与上传方式。"
+ "categoryImageHelp": "可选 — 与商品相同的媒体库与上传方式。",
+ "deleteCategory": "删除分类"
  },
  "producten": {
  "title": "产品",

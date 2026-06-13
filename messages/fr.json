@@ -1727,6 +1727,7 @@
  "dbNotConnected": "Base de données non connectée",
  "unknownError": "Erreur inconnue",
  "confirmDeletePhoto": "Supprimer cette photo ?",
+ "removePhoto": "Retirer la photo",
  "confirmDeleteManyPhotos": "Supprimer {count} photo(s) ?",
  "deleteDbError": "Erreur lors de la suppression en base",
  "deleteErrorPrefix": "Erreur lors de la suppression :",
@@ -2008,7 +2009,8 @@
  "categoryVatTypicalRatesHint": "Conseil — courant en restauration : aliments et boissons non alcoolisées 9 % ; boissons alcoolisées 21 %. En cas de doute, vérifiez avec votre comptable ou l’administration fiscale.",
  "categoryVatShort": "TVA",
  "categoryVatUseTenant": "Standard établissement",
- "categoryImageHelp": "Facultatif — même médiathèque et envoi que pour les produits."
+ "categoryImageHelp": "Facultatif — même médiathèque et envoi que pour les produits.",
+ "deleteCategory": "Supprimer la catégorie"
  },
  "producten": {
  "title": "Produits",

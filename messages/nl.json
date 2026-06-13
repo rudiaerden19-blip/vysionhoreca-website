@@ -2507,6 +2507,7 @@
  "dbNotConnected": "Database niet verbonden",
  "unknownError": "Onbekende fout",
  "confirmDeletePhoto": "Weet je zeker dat je deze foto wilt verwijderen?",
+ "removePhoto": "Foto verwijderen",
  "confirmDeleteManyPhotos": "{count} foto('s) verwijderen?",
  "deleteDbError": "Fout bij verwijderen uit database",
  "deleteErrorPrefix": "Fout bij verwijderen:",
@@ -2807,7 +2808,8 @@
  "categoryVatTypicalRatesHint": "Tip — veelgebruikt in de sector: eten en frisdranken 9%; alcoholische dranken 21%. Controleer bij twijfel bij je boekhouder of het fiscaal centrum.",
  "categoryVatShort": "BTW",
  "categoryVatUseTenant": "Zaak standaard",
- "categoryImageHelp": "Optioneel — zelfde mediabibliotheek en upload als bij Producten."
+ "categoryImageHelp": "Optioneel — zelfde mediabibliotheek en upload als bij Producten.",
+ "deleteCategory": "Categorie verwijderen"
  },
  "producten": {
  "title": "Producten",

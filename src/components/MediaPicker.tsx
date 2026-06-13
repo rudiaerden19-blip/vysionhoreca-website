@@ -415,10 +415,11 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
         <div className="flex flex-col gap-2">
           {value && (
             <button
+              type="button"
               onClick={clearImage}
-              className="text-red-500 hover:text-red-600 text-sm"
+              className="text-red-500 hover:text-red-600 text-sm text-left"
             >
-               {t('adminPages.common.delete')}
+              {t('mediaPicker.removePhoto')}
             </button>
           )}
           

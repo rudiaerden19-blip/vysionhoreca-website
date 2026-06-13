@@ -2227,6 +2227,7 @@
  "dbNotConnected": "قاعدة البيانات غير متصلة",
  "unknownError": "خطأ غير معروف",
  "confirmDeletePhoto": "هل تريد حذف هذه الصورة؟",
+ "removePhoto": "إزالة الصورة",
  "confirmDeleteManyPhotos": "حذف {count} صورة/صور؟",
  "deleteDbError": "خطأ أثناء الحذف من قاعدة البيانات",
  "deleteErrorPrefix": "خطأ أثناء الحذف:",
@@ -2508,7 +2509,8 @@
  "categoryVatTypicalRatesHint": "تلميح — شائع في قطاع المطاعم: الطعام والمشروبات غير الكحولية غالبًا 9٪؛ المشروبات الكحولية غالبًا 21٪. عند الشك استشر محاسبك أو الجهة الضريبية.",
  "categoryVatShort": "الضريبة",
  "categoryVatUseTenant": "الافتراضي للمنشأة",
- "categoryImageHelp": "اختياري — نفس مكتبة الوسائط والرفع كما في المنتجات."
+ "categoryImageHelp": "اختياري — نفس مكتبة الوسائط والرفع كما في المنتجات.",
+ "deleteCategory": "حذف الفئة"
  },
  "producten": {
  "title": "المنتجات",

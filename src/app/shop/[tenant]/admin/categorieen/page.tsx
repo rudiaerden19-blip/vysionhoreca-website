@@ -70,14 +70,21 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
   }
 
   const handleDelete = async (id: string) => {
-    const n = productCounts[id] ?? 0
+    const idStr = String(id || '').trim()
+    if (!idStr) {
+      setError(t('adminPages.categorieen.deleteFailed'))
+      return
+    }
+    const n = productCounts[idStr] ?? 0
     const confirmMsg =
       n > 0
         ? t('adminPages.categorieen.confirmDeleteHasProducts').replace('{count}', String(n))
         : t('adminPages.categorieen.confirmDelete')
     if (!(await ask(confirmMsg))) return
-    const success = await deleteMenuCategory(id, params.tenant)
+    const success = await deleteMenuCategory(idStr, params.tenant)
     if (success) {
+      setCategories((prev) => prev.filter((c) => String(c.id) !== idStr))
+      setSaved(false)
       await refreshCategoriesAndProductCounts()
     } else {
       setError(t('adminPages.categorieen.deleteFailed'))
@@ -301,7 +308,11 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
                   ? t('adminPages.categorieen.productCountZero')
                   : t('adminPages.categorieen.productCount').replace('{count}', String(cnt))
               return (
-              <Reorder.Item key={category.id} value={category} className="bg-white hover:bg-gray-50 cursor-grab active:cursor-grabbing transition-colors">
+              <Reorder.Item
+                key={cid || `cat-${category.name}-${category.sort_order}`}
+                value={category}
+                className="bg-white hover:bg-gray-50 cursor-grab active:cursor-grabbing transition-colors"
+              >
                 <div className="flex items-center gap-2 sm:gap-3 px-4 py-3.5 flex-wrap">
                   <span className="text-gray-300 text-lg select-none shrink-0">⠿</span>
 
@@ -314,6 +325,7 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
                     />
                   </div>
 
+                  <div className="flex flex-1 min-w-[120px] flex-col gap-1">
                   {editingId === category.id ? (
                     <input
                       type="text"
@@ -322,17 +334,27 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
                       onBlur={() => setEditingId(null)}
                       onKeyDown={(e) => e.key === 'Enter' && setEditingId(null)}
                       autoFocus
-                      className="flex-1 min-w-[140px] px-3 py-1.5 border-2 border-blue-500 rounded-lg focus:outline-none text-base font-medium"
+                      className="w-full px-3 py-1.5 border-2 border-blue-500 rounded-lg focus:outline-none text-base font-medium"
                     />
                   ) : (
                     <span
-                      className="flex-1 min-w-[120px] font-medium text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
-                      onClick={() => setEditingId(category.id!)}
+                      className="font-medium text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
+                      onClick={() => category.id && setEditingId(category.id)}
                       title="Klik om naam te bewerken"
                     >
                       {category.name}
                     </span>
                   )}
+                  {cid ? (
+                    <button
+                      type="button"
+                      onClick={() => void handleDelete(cid)}
+                      className="w-fit text-left text-xs font-medium text-red-600 hover:text-red-700 hover:underline"
+                    >
+                      {t('adminPages.categorieen.deleteCategory')}
+                    </button>
+                  ) : null}
+                  </div>
 
                   <div className="flex items-center gap-1.5 shrink-0">
                     <label className="sr-only" htmlFor={`cat-btw-${category.id}`}>
@@ -379,14 +401,6 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
                   <span className={`text-xs font-medium w-16 text-right ${category.is_active ? 'text-green-600': 'text-gray-400'}`}>
                     {category.is_active ? t('adminPages.categorieen.visible') : t('adminPages.categorieen.hidden')}
                   </span>
-
-                  <button
-                    onClick={() => handleDelete(category.id!)}
-                    className="p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                    title={t('adminPages.common.delete')}
-                  >
-                    
-                  </button>
                 </div>
               </Reorder.Item>
               )

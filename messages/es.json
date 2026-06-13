@@ -2227,6 +2227,7 @@
  "dbNotConnected": "Base de datos no conectada",
  "unknownError": "Error desconocido",
  "confirmDeletePhoto": "¿Seguro que quieres eliminar esta foto?",
+ "removePhoto": "Quitar foto",
  "confirmDeleteManyPhotos": "¿Eliminar {count} foto(s)?",
  "deleteDbError": "Error al eliminar de la base de datos",
  "deleteErrorPrefix": "Error al eliminar:",
@@ -2508,7 +2509,8 @@
  "categoryVatTypicalRatesHint": "Consejo — habitual en hostelería: comida y refrescos 9 %; bebidas alcohólicas 21 %. Si tienes dudas, consulta a tu asesor o a la administración tributaria.",
  "categoryVatShort": "IVA",
  "categoryVatUseTenant": "Estándar del local",
- "categoryImageHelp": "Opcional — misma biblioteca de medios y subida que en Productos."
+ "categoryImageHelp": "Opcional — misma biblioteca de medios y subida que en Productos.",
+ "deleteCategory": "Eliminar categoría"
  },
  "producten": {
  "title": "Productos",

@@ -2507,6 +2507,7 @@
  "dbNotConnected": "Database not connected",
  "unknownError": "Unknown error",
  "confirmDeletePhoto": "Are you sure you want to delete this photo?",
+ "removePhoto": "Remove photo",
  "confirmDeleteManyPhotos": "Delete {count} photo(s)?",
  "deleteDbError": "Error removing from database",
  "deleteErrorPrefix": "Error while deleting:",
@@ -2807,7 +2808,8 @@
  "categoryVatTypicalRatesHint": "Tip — common in hospitality: food and soft drinks 9%; alcoholic beverages 21%. If unsure, check with your accountant or tax office.",
  "categoryVatShort": "VAT",
  "categoryVatUseTenant": "Business default",
- "categoryImageHelp": "Optional — same media library and upload as for products."
+ "categoryImageHelp": "Optional — same media library and upload as for products.",
+ "deleteCategory": "Delete category"
  },
  "producten": {
  "title": "Products",

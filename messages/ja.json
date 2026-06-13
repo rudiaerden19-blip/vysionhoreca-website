@@ -2227,6 +2227,7 @@
  "dbNotConnected": "データベースに接続されていません",
  "unknownError": "不明なエラー",
  "confirmDeletePhoto": "この写真を削除しますか？",
+ "removePhoto": "写真を削除",
  "confirmDeleteManyPhotos": "写真を{count}枚削除しますか？",
  "deleteDbError": "データベースからの削除に失敗しました",
  "deleteErrorPrefix": "削除エラー:",
@@ -2508,7 +2509,8 @@
  "categoryVatTypicalRatesHint": "ヒント — 飲食店では例として、飲食・清涼飲料は9%、アルコール飲料は21%と設定することが多いです。不明な場合は税理士または税務署にご確認ください。",
  "categoryVatShort": "消費税",
  "categoryVatUseTenant": "店舗デフォルト",
- "categoryImageHelp": "任意 — 商品と同じメディアライブラリとアップロードです。"
+ "categoryImageHelp": "任意 — 商品と同じメディアライブラリとアップロードです。",
+ "deleteCategory": "カテゴリを削除"
  },
  "producten": {
  "title": "商品",

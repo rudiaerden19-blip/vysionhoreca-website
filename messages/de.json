@@ -1727,6 +1727,7 @@
  "dbNotConnected": "Datenbank nicht verbunden",
  "unknownError": "Unbekannter Fehler",
  "confirmDeletePhoto": "Dieses Foto wirklich löschen?",
+ "removePhoto": "Foto entfernen",
  "confirmDeleteManyPhotos": "{count} Foto(s) löschen?",
  "deleteDbError": "Fehler beim Löschen in der Datenbank",
  "deleteErrorPrefix": "Fehler beim Löschen:",
@@ -2008,7 +2009,8 @@
  "categoryVatTypicalRatesHint": "Hinweis — in der Gastronomie oft üblich: Speisen und Erfrischungsgetränke 9 %; alkoholische Getränke 21 %. Bei Unsicherheit Steuerberater oder Finanzamt konsultieren.",
  "categoryVatShort": "MwSt.",
  "categoryVatUseTenant": "Betriebsstandard",
- "categoryImageHelp": "Optional — dieselbe Medienbibliothek und Uploads wie bei Produkten."
+ "categoryImageHelp": "Optional — dieselbe Medienbibliothek und Uploads wie bei Produkten.",
+ "deleteCategory": "Kategorie löschen"
  },
  "producten": {
  "title": "Produkte",
