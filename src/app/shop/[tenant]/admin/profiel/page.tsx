@@ -931,9 +931,10 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
             )}
 
             <button
+              type="button"
               onClick={handleSmtpSave}
               disabled={smtpSaving}
-              className="w-full bg-black text-white py-3 rounded-xl font-medium hover:bg-neutral-900 transition-colors disabled:opacity-50"
+              className="w-full rounded-xl bg-black py-3 font-medium text-white hover:bg-neutral-900 transition-colors disabled:opacity-50"
             >
               {smtpSaving ? t('adminPages.profiel.smtpSaveSaving') : smtpSaved ? t('adminPages.profiel.smtpSaveSaved') : t('adminPages.profiel.smtpSaveButton')}
             </button>
@@ -945,7 +946,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-gradient-to-r from-gray-900 to-black rounded-2xl p-6 text-white"
+          className="rounded-2xl bg-black p-6 text-white"
         >
           <div className="flex items-center justify-between">
             <div>
