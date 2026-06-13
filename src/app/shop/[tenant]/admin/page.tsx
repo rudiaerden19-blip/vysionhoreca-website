@@ -371,9 +371,8 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           transition={{ delay: 0.1 }}
           className={cardSurface}
         >
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4">
             <span className={statLabelClass}>{t('adminDashboard.stats.ordersToday')}</span>
-            <span className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center"></span>
           </div>
           <p className={`text-3xl font-bold ${photoFg}`}>{stats.todayOrders}</p>
           <p
@@ -397,9 +396,8 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           transition={{ delay: 0.2 }}
           className={cardSurface}
         >
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4">
             <span className={statLabelClass}>{t('adminDashboard.stats.revenueToday')}</span>
-            <span className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center"></span>
           </div>
           <p className={`text-3xl font-bold ${photoFg}`}>€{stats.todayRevenue.toFixed(2)}</p>
           <p
@@ -423,9 +421,8 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           transition={{ delay: 0.3 }}
           className={cardSurface}
         >
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4">
             <span className={statLabelClass}>{t('adminDashboard.stats.pendingOrders')}</span>
-            <span className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center"></span>
           </div>
           <p className={`text-3xl font-bold ${photoFg}`}>{stats.pendingOrders}</p>
           <p
@@ -449,9 +446,8 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           transition={{ delay: 0.4 }}
           className={cardSurface}
         >
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4">
             <span className={statLabelClass}>{t('adminDashboard.stats.rating')}</span>
-            <span className="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center"></span>
           </div>
           <p className={`text-3xl font-bold ${photoFg}`}>{stats.averageRating || '-'}</p>
           <p className={`${statLabelClass} mt-1`}>{stats.totalReviews} {t('adminDashboard.stats.reviews')}</p>
