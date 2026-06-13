@@ -472,7 +472,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                       setIsOpen(false)
                       setTimeout(() => fileInputRef.current?.click(), 100)
                     }}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center gap-2"
+                    className="px-4 py-2 bg-black text-white rounded-lg hover:bg-neutral-900 transition-colors text-sm font-medium flex items-center gap-2"
                   >
                     <span></span> {t('mediaPicker.uploadNewPhoto')}
                   </button>
@@ -493,7 +493,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                       onClick={() => setSelectedCategory('alle')}
                       className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
                         selectedCategory === 'alle' 
-                          ? 'bg-blue-600 text-white' 
+                          ? 'bg-black text-white' 
                           : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                       }`}
                     >
@@ -505,7 +505,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                         onClick={() => setSelectedCategory(cat)}
                         className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
                           selectedCategory === cat 
-                            ? 'bg-blue-600 text-white' 
+                            ? 'bg-black text-white' 
                             : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                         }`}
                       >
@@ -539,7 +539,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                         setIsOpen(false)
                         setTimeout(() => fileInputRef.current?.click(), 100)
                       }}
-                      className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium"
+                      className="px-6 py-3 bg-black text-white rounded-xl hover:bg-neutral-900 transition-colors font-medium"
                     >
                        {t('mediaPicker.uploadPhotoCta')}
                     </button>

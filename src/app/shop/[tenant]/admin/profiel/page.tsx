@@ -190,7 +190,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
         className={`fixed bottom-6 right-6 z-50 px-6 py-4 rounded-2xl font-medium shadow-2xl flex items-center gap-2 ${
           saved 
             ? 'bg-green-500 text-white' 
-            : 'bg-gray-900 hover:bg-black text-white'
+            : 'bg-black hover:bg-neutral-900 text-white'
         }`}
       >
         {saving ? (
@@ -223,7 +223,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
         </div>
         <Link
           href={`/shop/${params.tenant}/admin/team`}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium text-white bg-gray-900 hover:bg-black shadow-sm shrink-0"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium text-white bg-black hover:bg-neutral-900 shadow-sm shrink-0"
         >
           <span></span>
           {t('websiteTeam.mijnTeamButton')}
@@ -933,7 +933,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
             <button
               onClick={handleSmtpSave}
               disabled={smtpSaving}
-              className="w-full bg-gray-900 text-white py-3 rounded-xl font-medium hover:bg-black transition-colors disabled:opacity-50"
+              className="w-full bg-black text-white py-3 rounded-xl font-medium hover:bg-neutral-900 transition-colors disabled:opacity-50"
             >
               {smtpSaving ? t('adminPages.profiel.smtpSaveSaving') : smtpSaved ? t('adminPages.profiel.smtpSaveSaved') : t('adminPages.profiel.smtpSaveButton')}
             </button>
@@ -945,7 +945,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl p-6 text-white"
+          className="bg-gradient-to-r from-gray-900 to-black rounded-2xl p-6 text-white"
         >
           <div className="flex items-center justify-between">
             <div>
@@ -955,7 +955,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
             <a
               href={`/shop/${params.tenant}`}
               target="_blank"
-              className="bg-white text-blue-600 font-medium px-6 py-3 rounded-xl hover:bg-blue-50 transition-colors flex items-center gap-2"
+              className="bg-white text-gray-900 font-medium px-6 py-3 rounded-xl hover:bg-gray-100 transition-colors flex items-center gap-2"
             >
               <span>{t('admin.viewWebsite')}</span>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
