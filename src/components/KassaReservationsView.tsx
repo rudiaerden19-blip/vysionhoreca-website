@@ -73,6 +73,7 @@ import { ContactsView } from '@/components/kassa-reservations/ContactsView'
 import {
   KassaResChevronLeft as ChevronLeft,
   KassaResChevronRight as ChevronRight,
+  KassaResCloseIcon as CloseIconX,
   KassaResGripVertical as GripVertical,
 } from '@/components/kassa-reservations/kassa-reservations-icons'
 import { RapportenView } from '@/components/kassa-reservations/RapportenView'
@@ -5734,15 +5735,18 @@ function ReservationDetailModal({
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto bg-black/50 px-3 py-3 sm:p-4 sm:py-6 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+      className="fixed inset-0 z-[100] overflow-y-auto bg-black/50 overscroll-contain"
+      data-vysion-modal-overlay
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      {/* Iets smaller + max-h: op iPad valt een gecentreerde hoge modal uit beeld; kruis blijft nu bovenaan zichtbaar */}
+      <div className="flex min-h-full items-center justify-center p-4 sm:p-6 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))]">
       <div
-        className="relative mb-4 flex min-h-0 w-full max-h-[min(78dvh,620px)] max-w-[min(100%,22rem)] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl sm:max-w-md"
+        className="relative flex min-h-0 w-full max-h-[min(85dvh,640px)] max-w-[min(100%,22rem)] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl sm:max-w-md"
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
       >
         {/* Header — sticky bovenin kaart; witte achtergrond zodat X niet verdwijnt */}
         <div className="relative shrink-0 border-b border-gray-200 bg-white p-4 pb-3 sm:p-5 sm:pb-4">
@@ -5752,7 +5756,7 @@ function ReservationDetailModal({
             className="absolute right-2 top-2 z-[60] flex h-9 w-9 items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-900 shadow-md hover:bg-gray-50 active:bg-gray-100 touch-manipulation sm:h-10 sm:w-10"
             aria-label="Sluiten"
           >
-            <X size={22} className="pointer-events-none shrink-0" strokeWidth={2.5} />
+            <CloseIconX size={22} className="pointer-events-none shrink-0" />
           </button>
           <div className="min-w-0 pr-12">
             <span
@@ -5974,6 +5978,7 @@ function ReservationDetailModal({
             </div>
           </div>
         )}
+      </div>
       </div>
     </div>
   )
