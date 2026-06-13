@@ -270,7 +270,7 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
             type="button"
             disabled={!newVariantProductId || addingVariant}
             onClick={() => void addVariant()}
-            className="px-4 py-2 rounded-xl bg-[#1e293b] text-white text-sm font-semibold disabled:opacity-40"
+            className="px-4 py-2 rounded-xl bg-black hover:bg-neutral-900 text-white text-sm font-semibold disabled:opacity-40"
           >
             {t('stockPage.addVariant')}
           </button>
