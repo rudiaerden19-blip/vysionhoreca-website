@@ -34,7 +34,6 @@ import {
   Eye,
   EyeOff,
   Calendar,
-  GripVertical,
   Maximize2,
   Minimize2,
 } from 'lucide-react'
@@ -74,6 +73,7 @@ import { ContactsView } from '@/components/kassa-reservations/ContactsView'
 import {
   KassaResChevronLeft as ChevronLeft,
   KassaResChevronRight as ChevronRight,
+  KassaResGripVertical as GripVertical,
 } from '@/components/kassa-reservations/kassa-reservations-icons'
 import { RapportenView } from '@/components/kassa-reservations/RapportenView'
 import { ReservationTableSVG } from '@/components/kassa-reservations/ReservationTableSVG'

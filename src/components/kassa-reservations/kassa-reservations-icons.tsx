@@ -40,3 +40,22 @@ export function KassaResChevronRight({ className, size = 22 }: ChevronProps) {
     </svg>
   )
 }
+
+/** Sleep-handvat op reservatiebalk (tijdlijn). */
+export function KassaResGripVertical({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 10 16"
+      fill="currentColor"
+      className={className}
+      aria-hidden
+    >
+      <circle cx="3" cy="3" r="1.35" />
+      <circle cx="7" cy="3" r="1.35" />
+      <circle cx="3" cy="8" r="1.35" />
+      <circle cx="7" cy="8" r="1.35" />
+      <circle cx="3" cy="13" r="1.35" />
+      <circle cx="7" cy="13" r="1.35" />
+    </svg>
+  )
+}
