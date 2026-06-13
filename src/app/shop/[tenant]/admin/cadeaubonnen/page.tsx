@@ -112,12 +112,13 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
       {/* Floating Save Button */}
       {activeTab === 'instellingen' && (
         <motion.button
+          type="button"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={handleSave}
           disabled={saving}
           className={`fixed bottom-6 right-6 z-50 px-6 py-4 rounded-2xl font-medium shadow-2xl flex items-center gap-2 ${
-            saved ? 'bg-green-500 text-white': 'bg-gray-900 hover:bg-black text-white'
+            saved ? 'bg-green-500 text-white': 'bg-black hover:bg-neutral-900 text-white'
           }`}
         >
           {saving ? t('adminPages.common.saving') : saved ? ` ${t('adminPages.common.saved')}`: ` ${t('adminPages.common.save')}`}
@@ -138,7 +139,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
           onClick={() => setActiveTab('instellingen')}
           className={`px-4 py-2 rounded-xl font-medium transition-colors ${
             activeTab === 'instellingen' 
-              ? 'bg-gray-900 text-white' 
+              ? 'bg-black text-white' 
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
@@ -148,7 +149,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
           onClick={() => setActiveTab('bonnen')}
           className={`px-4 py-2 rounded-xl font-medium transition-colors ${
             activeTab === 'bonnen' 
-              ? 'bg-gray-900 text-white' 
+              ? 'bg-black text-white' 
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
@@ -173,7 +174,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, gift_cards_enabled: !prev.gift_cards_enabled }))}
                 className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                  formData.gift_cards_enabled ? 'bg-blue-600': 'bg-gray-200'
+                  formData.gift_cards_enabled ? 'bg-black': 'bg-gray-200'
                 }`}
               >
                 <span
@@ -245,16 +246,16 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-2xl p-6"
+              className="bg-gray-50 border border-gray-200 rounded-2xl p-6"
             >
-              <h3 className="font-semibold text-blue-900 mb-4 flex items-center gap-2">
+              <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <span></span> {t('websiteGiftCards.adminPreviewHeading')}
               </h3>
               <div className="bg-white rounded-xl p-6 shadow-sm text-center">
-                <p className="text-sm text-blue-600 font-medium uppercase tracking-wider">{t('shopPage.perfectGift')}</p>
+                <p className="text-sm text-gray-600 font-medium uppercase tracking-wider">{t('shopPage.perfectGift')}</p>
                 <h4 className="text-2xl font-bold text-gray-900 mt-1">{t('shopPage.giftCardTitle')}</h4>
                 <p className="text-gray-600 mt-2">{t('websiteGiftCards.adminPreviewBody')}</p>
-                <button type="button" className="mt-4 px-6 py-3 bg-gray-900 text-white font-medium rounded-xl">
+                <button type="button" className="mt-4 px-6 py-3 bg-black hover:bg-neutral-900 text-white font-medium rounded-xl">
                    {t('shopPage.orderGiftCard')}
                 </button>
               </div>
@@ -266,10 +267,10 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-blue-50 border border-blue-200 rounded-2xl p-6"
+            className="bg-gray-50 border border-gray-200 rounded-2xl p-6"
           >
-            <h3 className="font-semibold text-blue-900 mb-4"> {t('websiteGiftCards.howItWorks')}</h3>
-            <ol className="text-blue-700 text-sm space-y-2">
+            <h3 className="font-semibold text-gray-900 mb-4"> {t('websiteGiftCards.howItWorks')}</h3>
+            <ol className="text-gray-700 text-sm space-y-2">
               <li>1. {t('websiteGiftCards.step1')}</li>
               <li>2. {t('websiteGiftCards.step2')}</li>
               <li>3. {t('websiteGiftCards.step3')}</li>
