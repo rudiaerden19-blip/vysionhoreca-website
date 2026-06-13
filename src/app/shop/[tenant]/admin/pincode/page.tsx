@@ -1,13 +1,31 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, useMemo } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { authFetch } from '@/lib/auth-headers'
+
+function safeAdminReturnPath(tenant: string, raw: string | null): string | null {
+  if (!raw) return null
+  try {
+    const path = decodeURIComponent(raw).split('?')[0]
+    const base = `/shop/${tenant}/admin`
+    if (!path.startsWith(base)) return null
+    if (path.includes('/pincode')) return null
+    return decodeURIComponent(raw)
+  } catch {
+    return null
+  }
+}
 
 export default function PincodePage({ params }: { params: { tenant: string } }) {
   const tenant = params.tenant
   const router = useRouter()
+  const searchParams = useSearchParams()
   const adminOverviewHref = `/shop/${tenant}/admin`
+  const returnAfterSave = useMemo(
+    () => safeAdminReturnPath(tenant, searchParams.get('return')),
+    [tenant, searchParams],
+  )
 
   const [hasPin, setHasPin] = useState<boolean | null>(null)
   const [justSaved, setJustSaved] = useState(false)
@@ -28,12 +46,13 @@ export default function PincodePage({ params }: { params: { tenant: string } }) 
   /** Na succes: kort bevestigen, dan overal hetzelfde naar admin-overzicht (alle tenants). */
   useEffect(() => {
     if (!justSaved) return
+    const dest = returnAfterSave ?? adminOverviewHref
     const redirectMs = 1400
     const id = window.setTimeout(() => {
-      router.replace(adminOverviewHref)
+      router.replace(dest)
     }, redirectMs)
     return () => window.clearTimeout(id)
-  }, [justSaved, router, adminOverviewHref])
+  }, [justSaved, router, adminOverviewHref, returnAfterSave])
 
   const savePin = async (pin: string, opts: { currentPin?: string } = {}) => {
     setSaving(true)
@@ -49,6 +68,11 @@ export default function PincodePage({ params }: { params: { tenant: string } }) 
     const data = await res.json()
     setSaving(false)
     if (data.success) {
+      try {
+        sessionStorage.setItem(`vysion_pin_unlocked_${tenant}`, 'true')
+      } catch {
+        /* noop */
+      }
       setSuccess(hasPin ? 'PIN succesvol gewijzigd!' : 'PIN succesvol ingesteld!')
       setHasPin(true)
       setJustSaved(true)
@@ -100,7 +124,7 @@ export default function PincodePage({ params }: { params: { tenant: string } }) 
             </p>
             <button
               type="button"
-              onClick={() => router.replace(adminOverviewHref)}
+              onClick={() => router.replace(returnAfterSave ?? adminOverviewHref)}
               className="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-semibold transition-colors"
             >
               Nu naar overzicht

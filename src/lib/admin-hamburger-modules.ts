@@ -736,6 +736,10 @@ export function hasShopAdminPathAccess(
   enabledModulesJson: Record<string, boolean> | null
 ): boolean {
   const pathNoQuery = pathname.split('?')[0].replace(/\/+$/, '')
+  const pinBase = `/shop/${tenantSlug}/admin/pincode`
+  if (pathNoQuery === pinBase || pathNoQuery.startsWith(`${pinBase}/`)) {
+    return true
+  }
   if (isShopAdminKassaPosPath(pathNoQuery, tenantSlug)) {
     return isHorecaKassaPosScreenEnabled(moduleAccess)
   }

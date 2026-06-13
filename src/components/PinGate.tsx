@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useLayoutEffect, ReactNode } from 'react'
+import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/i18n'
 import { isSuperAdminLoggedIn } from '@/lib/auth-headers'
 
@@ -13,6 +14,7 @@ type State = 'loading' | 'no-pin' | 'locked' | 'unlocked' | 'forgot'
 
 export default function PinGate({ tenant, children }: Props) {
   const { t } = useLanguage()
+  const router = useRouter()
   const SESSION_KEY = `vysion_pin_unlocked_${tenant}`
   const [state, setState] = useState<State>('loading')
   const [pin, setPin] = useState('')
@@ -28,15 +30,49 @@ export default function PinGate({ tenant, children }: Props) {
       setState('unlocked')
       return
     }
-    if (sessionStorage.getItem(SESSION_KEY) === 'true') {
-      setState('unlocked')
+    fetch(`/api/pin/check?tenant=${tenant}`)
+      .then((r) => r.json())
+      .then((d) => {
+        const hasPin = !!d?.hasPin
+        if (!hasPin) {
+          try {
+            sessionStorage.removeItem(SESSION_KEY)
+          } catch {
+            /* noop */
+          }
+          setState('no-pin')
+          return
+        }
+        try {
+          if (sessionStorage.getItem(SESSION_KEY) === 'true') {
+            setState('unlocked')
+            return
+          }
+        } catch {
+          /* noop */
+        }
+        setState('locked')
+      })
+      .catch(() => {
+        try {
+          sessionStorage.removeItem(SESSION_KEY)
+        } catch {
+          /* noop */
+        }
+        setState('no-pin')
+      })
+  }, [tenant, SESSION_KEY])
+
+  useLayoutEffect(() => {
+    if (state !== 'no-pin') return
+    const pinPath = `/shop/${tenant}/admin/pincode`
+    if (typeof window !== 'undefined' && window.location.pathname.includes('/admin/pincode')) {
       return
     }
-    fetch(`/api/pin/check?tenant=${tenant}`)
-      .then(r => r.json())
-      .then(d => setState(d.hasPin ? 'locked' : 'no-pin'))
-      .catch(() => setState('no-pin'))
-  }, [tenant, SESSION_KEY])
+    const returnPath = `${window.location.pathname}${window.location.search}`
+    const q = new URLSearchParams({ setup: '1', return: returnPath })
+    router.replace(`${pinPath}?${q.toString()}`)
+  }, [state, tenant, router])
 
   const handleDigit = (d: string) => {
     if (pin.length >= 4) return
@@ -106,19 +142,8 @@ export default function PinGate({ tenant, children }: Props) {
 
   if (state === 'no-pin') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
-        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full text-center">
-          <div className="text-5xl mb-4">🔒</div>
-          <h2 className="text-xl font-bold text-gray-800 mb-3">{t('pinGate.noAccessTitle')}</h2>
-          <p className="text-gray-600 leading-relaxed">
-            {t('pinGate.noAccessBody1')}
-            <br /><br />
-            {t('pinGate.noAccessBody2')}{' '}
-            <a href={`/shop/${tenant}/admin/pincode`} className="text-orange-500 font-semibold underline">
-              {t('pinGate.kassaPinLink')}
-            </a>
-          </p>
-        </div>
+      <div className="min-h-[40vh] flex items-center justify-center bg-gray-50 p-6">
+        <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }

@@ -438,7 +438,7 @@ export function adminPathToModule(pathname: string, tenantSlug: string): AdminMo
   if (rest.startsWith('/kassa-terminal')) return { kind: 'module', module: 'kassa' }
   if (rest.startsWith('/kassa')) return { kind: 'module', module: 'kassa' }
   if (rest.startsWith('/voorraad')) return { kind: 'module', module: 'voorraad' }
-  if (rest.startsWith('/pincode')) return { kind: 'module', module: 'kassa' }
+  if (rest.startsWith('/pincode')) return { kind: 'always' }
   if (rest.startsWith('/abonnement')) return { kind: 'always' }
   if (rest.startsWith('/modules')) return { kind: 'always' }
 

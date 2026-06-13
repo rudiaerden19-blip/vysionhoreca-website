@@ -316,6 +316,7 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
   useEffect(() => {
     if (loading || modulesLoading || tenantExists === false) return
     if (demoPublicUnauthenticated) return
+    if (adminPath.includes('/admin/pincode')) return
     const gate = adminPathToModule(adminPath, params.tenant)
     if (
       gate.kind === 'module' &&
