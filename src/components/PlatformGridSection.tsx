@@ -1,21 +1,11 @@
 'use client'
 
 import Image from 'next/image'
-import type { LucideIcon } from 'lucide-react'
 import {
-  BarChart3,
-  Calculator,
-  CalendarDays,
-  ChefHat,
   ExternalLink,
   Flame,
-  Globe,
-  MessageCircle,
-  Monitor,
   Rocket,
   ShoppingBag,
-  Store,
-  Wallet,
 } from 'lucide-react'
 import { useLanguage } from '@/i18n'
 import { PLATFORM_PAGES } from '@/lib/platform-pages'
@@ -24,26 +14,13 @@ import {
   DEMO_ONLINE_SHOP_MENU_URL,
 } from '@/lib/demo-links'
 
-const ICONS: Record<string, LucideIcon> = {
-  kassasysteem: Store,
-  bestelplatform: ShoppingBag,
-  keukenschermen: ChefHat,
-  onlineScherm: Monitor,
-  reservaties: CalendarDays,
-  eigenWebsite: Globe,
-  whatsappBestellingen: MessageCircle,
-  loonadministratie: Wallet,
-  bedrijfsanalyse: BarChart3,
-  kostencalculator: Calculator,
-}
-
 const ctaIconClass =
   'h-[1.05rem] w-[1.05rem] shrink-0 sm:h-[1.15rem] sm:w-[1.15rem] stroke-[2.25]'
 
 const ctaExternalIconClass = 'h-4 w-4 shrink-0 opacity-70 sm:h-[1.05rem] sm:w-[1.05rem]'
 
 const cardShellClasses =
-  'group flex min-h-[300px] sm:min-h-[320px] flex-col overflow-hidden rounded-2xl border border-gray-200/60 bg-[#f4f4f4] text-center shadow-home-card transition-all duration-300 hover:z-10 hover:-translate-y-0.5 hover:border-accent/55 hover:shadow-[0_12px_40px_-6px_rgba(232,90,60,0.55),0_28px_70px_-12px_rgba(232,90,60,0.42),0_0_0_1px_rgba(232,90,60,0.2),0_0_60px_8px_rgba(232,90,60,0.28)] active:z-10 active:-translate-y-0.5 active:border-accent/60 active:shadow-[0_12px_40px_-6px_rgba(232,90,60,0.6),0_28px_70px_-12px_rgba(232,90,60,0.48),0_0_0_1px_rgba(232,90,60,0.22),0_0_72px_10px_rgba(232,90,60,0.32)]'
+  'group flex min-h-[240px] sm:min-h-[260px] flex-col overflow-hidden rounded-2xl border border-gray-200/60 bg-[#f4f4f4] text-center shadow-home-card transition-all duration-300 hover:z-10 hover:-translate-y-0.5 hover:border-accent/55 hover:shadow-[0_12px_40px_-6px_rgba(232,90,60,0.55),0_28px_70px_-12px_rgba(232,90,60,0.42),0_0_0_1px_rgba(232,90,60,0.2),0_0_60px_8px_rgba(232,90,60,0.28)] active:z-10 active:-translate-y-0.5 active:border-accent/60 active:shadow-[0_12px_40px_-6px_rgba(232,90,60,0.6),0_28px_70px_-12px_rgba(232,90,60,0.48),0_0_0_1px_rgba(232,90,60,0.22),0_0_72px_10px_rgba(232,90,60,0.32)]'
 
 export default function PlatformGridSection() {
   const { t, locale } = useLanguage()
@@ -62,7 +39,6 @@ export default function PlatformGridSection() {
 
         <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-5 sm:gap-6 lg:gap-7">
           {PLATFORM_PAGES.map(({ slug, msgKey, cardHeaderImage }) => {
-            const Icon = ICONS[msgKey] ?? Store
             const headerAlt =
               cardHeaderImage && t(`platform.${msgKey}.cardHeaderAlt`) !==
                 `platform.${msgKey}.cardHeaderAlt`
@@ -84,13 +60,7 @@ export default function PlatformGridSection() {
                   ) : null}
                 </div>
 
-                <div className="flex flex-1 flex-col items-center px-4 pb-5 pt-5 sm:px-6 sm:pb-6 sm:pt-6">
-                  <div
-                    className="mb-4 flex h-[4.75rem] w-[4.75rem] sm:h-[5.25rem] sm:w-[5.25rem] shrink-0 items-center justify-center rounded-full border-2 border-accent bg-white text-accent group-hover:bg-orange-50/80 transition-colors"
-                    aria-hidden
-                  >
-                    <Icon className="h-9 w-9 sm:h-10 sm:w-10" strokeWidth={1.5} />
-                  </div>
+                <div className="flex flex-1 flex-col items-center px-4 pb-5 pt-4 sm:px-6 sm:pb-6 sm:pt-5">
                   <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-2.5 leading-snug px-1">
                     {t(`platform.${msgKey}.title`)}
                   </h3>
