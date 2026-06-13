@@ -2482,15 +2482,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             >
               {t('adminHamburger.rows.rapporten')}
             </Link>
-            <Link
-              href={`${baseUrl}/modules`}
-              prefetch={false}
-              data-testid="retail-nav-instellingen"
-              onClick={() => playClick()}
-              className={retailTopNavLinkClass}
-            >
-              {t('adminHamburger.rows.instellingen')}
-            </Link>
             {showKassaStaffClockButton && clockedInStaff.length > 0 ? (
               <>
                 <span
