@@ -24,8 +24,6 @@ import {
   Settings,
   LayoutGrid,
   List,
-  ChevronLeft,
-  ChevronRight,
   Star,
   Ban,
   X,
@@ -73,6 +71,10 @@ import {
   parseDurationMinutesFromRaw,
 } from '@/components/kassa-reservations/kassa-reservations-model'
 import { ContactsView } from '@/components/kassa-reservations/ContactsView'
+import {
+  KassaResChevronLeft as ChevronLeft,
+  KassaResChevronRight as ChevronRight,
+} from '@/components/kassa-reservations/kassa-reservations-icons'
 import { RapportenView } from '@/components/kassa-reservations/RapportenView'
 import { ReservationTableSVG } from '@/components/kassa-reservations/ReservationTableSVG'
 import {
