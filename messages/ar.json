@@ -5751,6 +5751,8 @@
  "singleSkuBadge": "SKU واحد",
  "enableTracking": "تتبع المخزون",
  "editStock": "تعديل المخزون",
+ "stockOnHandLabel": "الكمية في المخزون",
+ "lowStockThresholdLabel": "تنبيه عند الوصول إلى",
  "allCategories": "كل الفئات",
  "statTotal": "SKU",
  "statTracked": "مُتتبَّع",

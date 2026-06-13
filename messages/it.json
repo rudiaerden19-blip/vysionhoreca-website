@@ -5751,6 +5751,8 @@
  "singleSkuBadge": "SKU singolo",
  "enableTracking": "Traccia giacenza",
  "editStock": "Modifica giacenza",
+ "stockOnHandLabel": "Quantità in magazzino",
+ "lowStockThresholdLabel": "Avviso da questa quantità",
  "allCategories": "Tutte le categorie",
  "statTotal": "SKU",
  "statTracked": "Tracciati",

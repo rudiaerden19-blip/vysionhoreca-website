@@ -5710,6 +5710,8 @@
  "singleSkuBadge": "single SKU",
  "enableTracking": "Track stock",
  "editStock": "Edit stock",
+ "stockOnHandLabel": "Quantity in stock",
+ "lowStockThresholdLabel": "Alert when stock reaches",
  "allCategories": "All categories",
  "statTotal": "SKUs",
  "statTracked": "Tracked",

@@ -5643,6 +5643,8 @@
  "singleSkuBadge": "enkel artikel",
  "enableTracking": "Voorraad bijhouden",
  "editStock": "Voorraad bewerken",
+ "stockOnHandLabel": "Aantal op voorraad",
+ "lowStockThresholdLabel": "Melden vanaf dit aantal",
  "allCategories": "Alle categorieën",
  "statTotal": "SKU’s",
  "statTracked": "Bijgehouden",

@@ -389,34 +389,44 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
                           onChange={(e) => setMetaDraft((m) => ({ ...m, color_label: e.target.value }))}
                         />
                       </div>
-                      <div className="flex gap-2 items-center">
-                        <input
-                          type="number"
-                          value={numberFieldDisplayValue(editStock, { emptyWhenZero: true })}
-                          onChange={(e) =>
-                            setEditStock(parseNumberFieldValue(e.target.value, { integer: true }))
-                          }
-                          className="w-16 px-2 py-1 border rounded-lg text-center font-bold"
-                          min={0}
-                        />
-                        <input
-                          type="number"
-                          value={numberFieldDisplayValue(editThreshold, { emptyWhenZero: true })}
-                          onChange={(e) =>
-                            setEditThreshold(parseNumberFieldValue(e.target.value, { integer: true }))
-                          }
-                          className="w-16 px-2 py-1 border rounded-lg text-center"
-                          min={0}
-                        />
+                      <div className="flex flex-wrap gap-3 items-end">
+                        <label className="flex flex-col gap-0.5 text-xs">
+                          <span className="font-medium text-gray-600">{t('stockPage.stockOnHandLabel')}</span>
+                          <input
+                            type="number"
+                            value={numberFieldDisplayValue(editStock, { emptyWhenZero: true })}
+                            onChange={(e) =>
+                              setEditStock(parseNumberFieldValue(e.target.value, { integer: true }))
+                            }
+                            className="w-20 px-2 py-1.5 border rounded-lg text-center font-bold text-sm"
+                            min={0}
+                          />
+                        </label>
+                        <label className="flex flex-col gap-0.5 text-xs">
+                          <span className="font-medium text-gray-600">{t('stockPage.lowStockThresholdLabel')}</span>
+                          <input
+                            type="number"
+                            value={numberFieldDisplayValue(editThreshold, { emptyWhenZero: true })}
+                            onChange={(e) =>
+                              setEditThreshold(parseNumberFieldValue(e.target.value, { integer: true }))
+                            }
+                            className="w-20 px-2 py-1.5 border rounded-lg text-center text-sm"
+                            min={0}
+                          />
+                        </label>
                         <button
                           type="button"
                           onClick={() => void saveEdit(sku)}
-                          className="px-3 py-1.5 rounded-lg bg-emerald-500 text-white text-sm font-semibold"
+                          className="px-3 py-1.5 rounded-lg bg-emerald-500 text-white text-sm font-semibold touch-manipulation"
                         >
                           {t('stockPage.saveMeta')}
                         </button>
-                        <button type="button" onClick={() => setEditingKey(null)} className="text-sm text-gray-500">
-                          
+                        <button
+                          type="button"
+                          onClick={() => setEditingKey(null)}
+                          className="px-2 py-1.5 text-sm text-gray-500 touch-manipulation"
+                        >
+                          {t('adminPages.common.cancel')}
                         </button>
                       </div>
                     </div>
