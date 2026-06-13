@@ -138,12 +138,13 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
       <div className="max-w-3xl mx-auto pb-24">
       {/* Floating Save Button */}
       <motion.button
+        type="button"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={handleSave}
         disabled={saving}
         className={`fixed bottom-6 right-6 z-50 px-6 py-4 rounded-2xl font-medium shadow-2xl flex items-center gap-2 ${
-          saved ? 'bg-green-500 text-white': 'bg-gray-900 hover:bg-black text-white'
+          saved ? 'bg-green-500 text-white': 'bg-black hover:bg-neutral-900 text-white'
         }`}
       >
         {saving ? '' : saved ? '' : ''} {saved ? t('adminPages.common.saved') : t('adminPages.common.save')}
@@ -171,7 +172,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
               onClick={() => setMethods(prev => ({ ...prev, [method.id]: !prev[method.id] }))}
               className={`flex items-center justify-between p-4 rounded-xl cursor-pointer transition-all ${
                 methods[method.id]
-                  ? 'bg-blue-50 border-2 border-blue-500'
+                  ? 'bg-gray-100 border-2 border-black'
                   : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'
               }`}
             >
@@ -184,7 +185,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
               </div>
               <button
                 type="button"
-                className={`relative w-12 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ${methods[method.id] ? 'bg-blue-600': 'bg-gray-300'}`}
+                className={`relative w-12 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ${methods[method.id] ? 'bg-black': 'bg-gray-300'}`}
               >
                 <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${methods[method.id] ? 'translate-x-6': 'translate-x-0'}`} />
               </button>
@@ -210,7 +211,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
               onClick={() => setVatRate(rate)}
               className={`p-4 rounded-xl font-bold text-xl transition-all ${
                 vatRate === rate 
-                  ? 'bg-gray-900 text-white' 
+                  ? 'bg-black text-white' 
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -247,7 +248,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
         {showStripeKeys && (
           <div className="px-6 pb-6 space-y-4 border-t border-gray-100">
             <p className="text-sm text-gray-500 pt-4">
-              Maak een account op <a href="https://stripe.com" target="_blank" className="text-blue-600 underline">stripe.com</a> en kopieer je keys hieronder. Bancontact en kaartebetalingen worden automatisch verwerkt.
+              Maak een account op <a href="https://stripe.com" target="_blank" className="text-gray-900 underline">stripe.com</a> en kopieer je keys hieronder. Bancontact en kaartebetalingen worden automatisch verwerkt.
             </p>
 
             <div>
@@ -287,7 +288,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
             <button
               onClick={handleSaveStripe}
               disabled={savingStripe}
-              className={`w-full py-3 rounded-xl font-semibold transition-colors ${savedStripe ? 'bg-green-500 text-white': 'bg-gray-900 hover:bg-black text-white'}`}
+              className={`w-full py-3 rounded-xl font-semibold transition-colors ${savedStripe ? 'bg-green-500 text-white': 'bg-black hover:bg-neutral-900 text-white'}`}
             >
               {savingStripe ? 'Opslaan...': savedStripe ? 'Opgeslagen': 'Stripe keys opslaan'}
             </button>
