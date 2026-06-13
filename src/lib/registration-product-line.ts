@@ -56,7 +56,6 @@ const RETAIL_WEBSITE_SUBMENUS = [
 
 const RETAIL_ADMIN_SUBMENUS = [
   'sm_inst_betaling',
-  'sm_inst_modules',
   'sm_abonnement',
   'sm_rpt_rapporten',
   'sm_rpt_z',
@@ -73,7 +72,7 @@ export const REGISTRATION_MODULE_PRESETS: Record<RegistrationProductLine, Preset
   /** Alle modules behalve winkelkassa (retail-kassa + voorraad + sm_retail_* / sm_voorraad_*). */
   horeca_kassa: {
     modules: horecaKassaModules(),
-    submenusOn: allSubmenusExceptWinkelkassa(),
+    submenusOn: allSubmenusExceptWinkelkassa().filter((id) => id !== 'sm_inst_modules'),
   },
   retail_winkel: {
     modules: {
@@ -146,7 +145,6 @@ export const REGISTRATION_MODULE_PRESETS: Record<RegistrationProductLine, Preset
       'sm_rpt_verkoop',
       'sm_rpt_populair',
       'sm_inst_betaling',
-      'sm_inst_modules',
       'sm_abonnement',
     ],
   },
@@ -170,7 +168,6 @@ export const REGISTRATION_MODULE_PRESETS: Record<RegistrationProductLine, Preset
       'sm_web_profiel',
       'sm_inst_opening',
       'sm_inst_betaling',
-      'sm_inst_modules',
       'sm_abonnement',
     ],
   },
@@ -195,6 +192,10 @@ export function buildRegistrationEnabledModulesJson(
   }
 
   for (const subId of allSubIds) {
+    if (subId === 'sm_inst_modules') {
+      raw[subId] = false
+      continue
+    }
     raw[subId] = preset.submenusOn.includes(subId)
   }
 

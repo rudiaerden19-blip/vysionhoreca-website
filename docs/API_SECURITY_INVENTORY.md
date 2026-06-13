@@ -72,7 +72,7 @@ Gebruikt in o.a.: `import-ingredients`, `marketing/send`, `tenant/smtp`, `whatsa
 | stripe-webhook | POST | ja | — | `stripe_sig` |
 | stripe/create-checkout | POST | ja | ja | varies |
 | subscription-webhook | POST | ja | — | varies (provider) |
-| tenant/confirm-modules | POST | ja | ja | `verifyTenantAccess` of `verifySuperAdminAccess` |
+| tenant/confirm-modules | POST | ja | nee | alleen `verifySuperAdminAccess` |
 | tenant/smtp | GET,POST | ja | ja | **`verify_tenant_or_super`** |
 | track-view | POST | ja | — | `public` analytics |
 | voice-order/match-products | POST | — | — | rate limit; Gemini server-only |

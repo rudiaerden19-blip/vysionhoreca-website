@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
-import { verifySuperAdminAccess, verifyTenantAccess } from '@/lib/verify-tenant-access'
+import { verifySuperAdminAccess } from '@/lib/verify-tenant-access'
 import { TENANT_MODULE_IDS } from '@/lib/tenant-modules'
 import { collectAllSubmenuIds } from '@/lib/admin-hamburger-modules'
 import {
@@ -8,7 +8,7 @@ import {
   withoutPostTrialModulesConfirmed,
 } from '@/lib/supabase-post-trial-column'
 
-/** Superadmin of ingelogde zaak mag `enabled_modules`(+ submenu-keys) opslaan. */
+/** Superadmin mag `enabled_modules` (+ submenu-keys) opslaan; klantportaal niet. */
 export async function POST(request: NextRequest) {
   try {
     const supabase = getServerSupabaseClient()
@@ -25,12 +25,7 @@ export async function POST(request: NextRequest) {
     }
 
     const superAccess = await verifySuperAdminAccess(request)
-    let authorized = superAccess.authorized
-    if (!authorized) {
-      const tenantAccess = await verifyTenantAccess(request, tenantSlug)
-      authorized = tenantAccess.authorized
-    }
-    if (!authorized) {
+    if (!superAccess.authorized) {
       return NextResponse.json({ error: 'Geen toegang'}, { status: 403 })
     }
 
