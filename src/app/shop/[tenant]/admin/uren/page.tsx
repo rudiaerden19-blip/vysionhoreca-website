@@ -23,6 +23,15 @@ import {
   MonthlyTimesheet,
   AbsenceType,
 } from '@/lib/admin-api'
+import { KassaIconCheck } from '@/lib/kassa-ui-icons'
+
+function UrenApprovedCheck({ className = 'h-3.5 w-3.5' }: { className?: string }) {
+  return (
+    <span className="ml-1 inline-flex shrink-0 align-middle text-green-600" aria-hidden>
+      <KassaIconCheck className={className} />
+    </span>
+  )
+}
 
 const getMonths = (t: (key: string) => string) => [
   t('urenPage.months.january'), t('urenPage.months.february'), t('urenPage.months.march'),
@@ -981,7 +990,7 @@ Met vriendelijke groeten`,
                       }}
                     >
                       {absenceType?.icon} {entry.absence_type === 'WORKED'? `${formatHours(entry.worked_hours)}u`: `${entry.absence_hours || 8}u ${absenceType?.label}`}
-                      {entry.is_approved && <span className="ml-1"></span>}
+                      {entry.is_approved && <UrenApprovedCheck />}
                     </div>
                   )
                 })}
@@ -1025,7 +1034,7 @@ Met vriendelijke groeten`,
                   <td className="border border-gray-300 p-2 text-center">{e.break_minutes || 0}m</td>
                   <td className="border border-gray-300 p-2 text-center font-bold">{formatHours(e.worked_hours || e.absence_hours || 0)}</td>
                   <td className="border border-gray-300 p-2 text-gray-600 text-xs">{e.notes || '-'}</td>
-                  <td className="border border-gray-300 p-2 text-center">{e.is_approved ? '' : ''}</td>
+                  <td className="border border-gray-300 p-2 text-center">{e.is_approved ? <UrenApprovedCheck className="h-4 w-4" /> : null}</td>
                 </tr>
               )
             })}
@@ -1463,7 +1472,7 @@ Met vriendelijke groeten`,
                     <td className="border border-gray-300 p-1 text-center font-mono">{formatTime(e.clock_out)}</td>
                     <td className="border border-gray-300 p-1 text-center">{e.break_minutes || 0}m</td>
                     <td className="border border-gray-300 p-1 text-center font-bold">{formatHours(e.worked_hours || e.absence_hours || 0)}</td>
-                    <td className="border border-gray-300 p-1 text-center">{e.is_approved ? '' : ''}</td>
+                    <td className="border border-gray-300 p-1 text-center">{e.is_approved ? <UrenApprovedCheck className="h-4 w-4" /> : null}</td>
                   </tr>
                 )
               })}
