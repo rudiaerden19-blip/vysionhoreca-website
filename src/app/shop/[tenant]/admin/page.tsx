@@ -238,7 +238,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
   }
 
   const statusColors: Record<string, { bg: string; text: string; labelKey: string }> = {
-    pending: { bg: 'bg-blue-100', text: 'text-blue-700', labelKey: 'pending'},
+    pending: { bg: 'bg-gray-100', text: 'text-gray-800', labelKey: 'pending'},
     confirmed: { bg: 'bg-purple-100', text: 'text-purple-700', labelKey: 'confirmed'},
     preparing: { bg: 'bg-yellow-100', text: 'text-yellow-700', labelKey: 'preparing'},
     ready: { bg: 'bg-green-100', text: 'text-green-700', labelKey: 'ready'},
@@ -309,7 +309,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
     : 'text-gray-500'
   const photoLinkClass = hasDashboardBg
     ? 'text-white/95 hover:text-white text-sm font-medium underline-offset-2 hover:underline'
-    : 'text-blue-600 hover:text-blue-600 text-sm font-medium'
+    : 'text-gray-900 hover:text-black text-sm font-medium'
   const mutedOnPhoto = hasDashboardBg ? `text-sm font-medium ${photoFgMuted}`: 'text-sm text-gray-500'
   const popularRankClass = hasDashboardBg
     ? `flex h-8 w-8 items-center justify-center rounded-lg bg-black/30 text-sm font-bold text-white ring-1 ring-white/35 ${photoTextShadow}`
@@ -373,7 +373,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
         >
           <div className="flex items-center justify-between mb-4">
             <span className={statLabelClass}>{t('adminDashboard.stats.ordersToday')}</span>
-            <span className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center"></span>
+            <span className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center"></span>
           </div>
           <p className={`text-3xl font-bold ${photoFg}`}>{stats.todayOrders}</p>
           <p
@@ -425,7 +425,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
         >
           <div className="flex items-center justify-between mb-4">
             <span className={statLabelClass}>{t('adminDashboard.stats.pendingOrders')}</span>
-            <span className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center"></span>
+            <span className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center"></span>
           </div>
           <p className={`text-3xl font-bold ${photoFg}`}>{stats.pendingOrders}</p>
           <p
@@ -435,7 +435,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
                   ? 'text-sky-200'
                   : 'text-emerald-200'
                 : stats.pendingOrders > 0
-                  ? 'text-blue-600'
+                  ? 'text-gray-900'
                   : 'text-green-500'
             }`}
           >
@@ -494,11 +494,11 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
                       className={
                         hasDashboardBg
                           ? 'flex h-10 w-10 items-center justify-center rounded-full bg-black/35 ring-1 ring-white/35'
-                          : 'flex h-10 w-10 items-center justify-center rounded-full bg-blue-100'
+                          : 'flex h-10 w-10 items-center justify-center rounded-full bg-gray-100'
                       }
                     >
                       <span
-                        className={`text-sm font-bold ${hasDashboardBg ? 'text-white': 'text-blue-600'}`}
+                        className={`text-sm font-bold ${hasDashboardBg ? 'text-white': 'text-gray-900'}`}
                       >
                         {order.customer_name[0]?.toUpperCase()}
                       </span>
@@ -560,7 +560,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
                     <p className={`font-medium ${photoFg}`}>{item.name}</p>
                     <div className={popularBarTrackClass}>
                       <div 
-                        className="bg-blue-600 h-2 rounded-full" 
+                        className="bg-black h-2 rounded-full" 
                         style={{ width: `${(item.count / stats.popularItems[0].count) * 100}%`}}
                       />
                     </div>
@@ -578,7 +578,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
-        className="mt-6 bg-gradient-to-r from-blue-700 to-blue-900 rounded-2xl p-6 text-white"
+        className="mt-6 rounded-2xl bg-black p-6 text-white"
       >
         <h2 className="text-lg font-semibold mb-4">{t('adminDashboard.thisWeek.title')}</h2>
         <div className="grid md:grid-cols-3 gap-6">
