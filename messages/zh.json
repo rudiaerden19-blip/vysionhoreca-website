@@ -3794,6 +3794,8 @@
  "delete": "删除",
  "deleting": "正在删除…",
  "actions": "操作",
+ "viewInvoicePdf": "查看发票 PDF",
+ "attachInvoicePdf": "附加发票 PDF",
  "total": "合计",
  "fillNameAndAmount": "请输入名称和金额",
  "fillDescAndAmount": "请输入说明和金额"

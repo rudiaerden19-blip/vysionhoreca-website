@@ -3794,6 +3794,8 @@
  "delete": "حذف",
  "deleting": "جاري الحذف…",
  "actions": "الإجراءات",
+ "viewInvoicePdf": "عرض فاتورة PDF",
+ "attachInvoicePdf": "ربط فاتورة PDF",
  "total": "المجموع",
  "fillNameAndAmount": "أدخل الاسم والمبلغ",
  "fillDescAndAmount": "أدخل الوصف والمبلغ"

@@ -3294,6 +3294,8 @@
  "delete": "Löschen",
  "deleting": "Wird gelöscht…",
  "actions": "Aktionen",
+ "viewInvoicePdf": "Rechnungs-PDF anzeigen",
+ "attachInvoicePdf": "Rechnungs-PDF verknüpfen",
  "total": "Gesamt",
  "fillNameAndAmount": "Name und Betrag eingeben",
  "fillDescAndAmount": "Beschreibung und Betrag eingeben"

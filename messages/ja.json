@@ -3794,6 +3794,8 @@
  "delete": "削除",
  "deleting": "削除中…",
  "actions": "アクション",
+ "viewInvoicePdf": "請求書PDFを表示",
+ "attachInvoicePdf": "請求書PDFを添付",
  "total": "合計",
  "fillNameAndAmount": "名前と金額を入力してください",
  "fillDescAndAmount": "説明と金額を入力してください"

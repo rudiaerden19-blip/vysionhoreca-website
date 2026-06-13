@@ -4270,6 +4270,8 @@
  "delete": "Delete",
  "deleting": "Deleting…",
  "actions": "Actions",
+ "viewInvoicePdf": "View invoice PDF",
+ "attachInvoicePdf": "Attach invoice PDF",
  "total": "Total",
  "fillNameAndAmount": "Enter a name and amount",
  "fillDescAndAmount": "Enter a description and amount"

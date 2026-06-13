@@ -26,7 +26,13 @@ import {
   FixedCostCategory,
   VariableCostCategory,
 } from '@/lib/admin-api'
-import { KassaIconClose } from '@/lib/kassa-ui-icons'
+import {
+  KassaIconClose,
+  KassaIconEye,
+  KassaIconPaperclip,
+  KassaCartIconPencil,
+  KassaCartIconTrash,
+} from '@/lib/kassa-ui-icons'
 import { numberFieldDisplayValue, parseNumberFieldValue } from '@/lib/controlled-number-input'
 
 type TabType = 'overview' |  'fixed' |  'variable' |  'year' |  'settings'
@@ -873,9 +879,10 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                         type="button"
                         onClick={() => openPdfBlob((cost as FixedCost & { pdf_url?: string }).pdf_url!)}
                         className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center px-3 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium hover:bg-green-200"
-                        title="Bekijk factuur"
+                        title={t('analysePage.common.viewInvoicePdf')}
+                        aria-label={t('analysePage.common.viewInvoicePdf')}
                       >
-                        
+                        <KassaIconEye className="h-5 w-5" />
                       </button>
                     ) : (
                       <button
@@ -885,17 +892,20 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                           setTimeout(() => attachPdfFixedRef.current?.click(), 50)
                         }}
                         className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center px-3 py-2 bg-gray-100 text-gray-400 rounded-lg text-sm font-medium hover:bg-gray-200 hover:text-gray-900"
-                        title="PDF factuur koppelen"
+                        title={t('analysePage.common.attachInvoicePdf')}
+                        aria-label={t('analysePage.common.attachInvoicePdf')}
                       >
-                        
+                        <KassaIconPaperclip className="h-5 w-5" />
                       </button>
                     )}
                     <button
                       type="button"
                       onClick={() => handleDeleteFixed(cost.id!)}
                       className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center px-3 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-medium hover:bg-red-200"
+                      title={t('analysePage.common.delete')}
+                      aria-label={t('analysePage.common.delete')}
                     >
-                      
+                      <KassaCartIconTrash className="h-5 w-5" />
                     </button>
                   </div>
                 </motion.div>
@@ -986,9 +996,10 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                               type="button"
                               onClick={() => openPdfBlob((cost as VariableCost & { pdf_url?: string }).pdf_url!)}
                               className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center rounded-lg bg-green-100 text-green-700 hover:bg-green-200 mr-1"
-                              title="Bekijk factuur PDF"
+                              title={t('analysePage.common.viewInvoicePdf')}
+                              aria-label={t('analysePage.common.viewInvoicePdf')}
                             >
-                              
+                              <KassaIconEye className="h-5 w-5" />
                             </button>
                           ) : (
                             <button
@@ -998,24 +1009,29 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                                 setTimeout(() => attachPdfRef.current?.click(), 50)
                               }}
                               className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center rounded-lg bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-900 mr-1"
-                              title="PDF factuur koppelen"
+                              title={t('analysePage.common.attachInvoicePdf')}
+                              aria-label={t('analysePage.common.attachInvoicePdf')}
                             >
-                              
+                              <KassaIconPaperclip className="h-5 w-5" />
                             </button>
                           )}
                           <button
                             type="button"
                             onClick={() => openVariableModal(cost)}
                             className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center text-gray-700 hover:text-gray-900 mr-1"
+                            title={t('analysePage.fixed.edit')}
+                            aria-label={t('analysePage.fixed.edit')}
                           >
-                            
+                            <KassaCartIconPencil className="h-5 w-5" />
                           </button>
                           <button
                             type="button"
                             onClick={() => handleDeleteVariable(cost.id!)}
                             className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center text-red-500 hover:text-red-700"
+                            title={t('analysePage.common.delete')}
+                            aria-label={t('analysePage.common.delete')}
                           >
-                            
+                            <KassaCartIconTrash className="h-5 w-5" />
                           </button>
                         </td>
                       </tr>

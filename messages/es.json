@@ -3794,6 +3794,8 @@
  "delete": "Eliminar",
  "deleting": "Eliminando…",
  "actions": "Acciones",
+ "viewInvoicePdf": "Ver factura PDF",
+ "attachInvoicePdf": "Adjuntar factura PDF",
  "total": "Total",
  "fillNameAndAmount": "Introduzca nombre e importe",
  "fillDescAndAmount": "Introduzca descripción e importe"

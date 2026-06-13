@@ -4270,6 +4270,8 @@
  "delete": "Verwijderen",
  "deleting": "Verwijderen…",
  "actions": "Acties",
+ "viewInvoicePdf": "Bekijk factuur-PDF",
+ "attachInvoicePdf": "PDF-factuur koppelen",
  "total": "Totaal",
  "fillNameAndAmount": "Vul een naam en bedrag in",
  "fillDescAndAmount": "Vul een beschrijving en bedrag in"

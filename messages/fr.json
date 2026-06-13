@@ -3294,6 +3294,8 @@
  "delete": "Supprimer",
  "deleting": "Suppression…",
  "actions": "Actions",
+ "viewInvoicePdf": "Voir la facture PDF",
+ "attachInvoicePdf": "Joindre une facture PDF",
  "total": "Total",
  "fillNameAndAmount": "Entrez un nom et un montant",
  "fillDescAndAmount": "Entrez une description et un montant"
