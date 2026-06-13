@@ -141,7 +141,7 @@ export function AdminHamburgerMenu({ tenantSlug }: { tenantSlug: string }) {
             ))}
           </div>
 
-          {activeMod && (
+          {open && subOpen && activeMod && (
             <div
               className="ml-2 max-h-[85vh] max-w-none shrink-0 self-start overflow-y-auto rounded-2xl border border-gray-100 bg-white shadow-2xl"
               style={{ width: 220, maxWidth: 'none' }}

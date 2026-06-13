@@ -2235,12 +2235,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             <button
               type="button"
               onClick={() => {
-                setHamburgerOpen((open) => {
-                  const next = !open
-                  if (next) setHamburgerSubOpen('retail-kassa')
-                  else setHamburgerSubOpen(null)
-                  return next
-                })
+                setHamburgerSubOpen(null)
+                setHamburgerOpen((open) => !open)
               }}
               className={`flex items-center gap-1.5 px-2 py-1.5 transition-colors sm:gap-2 sm:px-3 ${
                 appearanceDark
@@ -2336,7 +2332,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                       </div>
                     ))}
                   </div>
-                  {activeMod && (
+                  {hamburgerOpen && hamburgerSubOpen && activeMod && (
                     <div className={`ml-2 overflow-y-auto self-start ${ui.flyMenuPanel}`} style={{ width: 220, maxHeight: '85vh' }}>
                       <div
                         className={`sticky top-0 rounded-t-2xl px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`}
