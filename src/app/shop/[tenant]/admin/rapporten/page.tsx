@@ -993,9 +993,11 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${i===0?'bg-yellow-100 text-yellow-600':i===1?'bg-gray-200 text-gray-500':i===2?'bg-amber-100 text-amber-600':'bg-gray-100 text-gray-400'}`}>
                           {i + 1}
                         </div>
-                        <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
-                          {item.image ? <img src={item.image} alt={item.name} className="w-full h-full object-cover"/> : <div className="w-full h-full flex items-center justify-center text-gray-400 text-lg"></div>}
-                        </div>
+                        {item.image ? (
+                          <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+                            <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                          </div>
+                        ) : null}
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-sm truncate text-gray-800">{item.name}</p>
                           <p className="text-xs text-gray-400">{item.count}x verkocht</p>
@@ -1021,9 +1023,6 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
                       <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${i===0?'bg-yellow-100 text-yellow-600':i===1?'bg-gray-200 text-gray-500':i===2?'bg-amber-100 text-amber-600':'bg-gray-100 text-gray-400'}`}>
                           {i + 1}
-                        </div>
-                        <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-                          <span className="text-blue-400 text-lg"></span>
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-sm truncate text-gray-800">{item.name}</p>
