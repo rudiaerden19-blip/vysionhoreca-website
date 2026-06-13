@@ -3506,6 +3506,8 @@
  "numpadToggle": "数字键盘",
  "webKbTitle": "屏幕键盘",
  "webKbClose": "关闭",
+ "webKbDragHandle": "拖动键盘",
+ "webKbResetPosition": "回到底部",
  "webKbCaps": "切换大写",
  "webKbSpace": "空格",
  "webKbEnter": "回车",

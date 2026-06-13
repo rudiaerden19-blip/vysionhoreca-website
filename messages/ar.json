@@ -3506,6 +3506,8 @@
  "numpadToggle": "لوحة أرقام",
  "webKbTitle": "لوحة المفاتيح على الشاشة",
  "webKbClose": "إغلاق",
+ "webKbDragHandle": "سحب لوحة المفاتيح",
+ "webKbResetPosition": "تثبيت في الأسفل",
  "webKbCaps": "Shift",
  "webKbSpace": "مسافة",
  "webKbEnter": "إدخال",

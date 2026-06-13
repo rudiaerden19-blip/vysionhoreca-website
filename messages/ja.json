@@ -3506,6 +3506,8 @@
  "numpadToggle": "テンキー",
  "webKbTitle": "画面上のキーボード",
  "webKbClose": "閉じる",
+ "webKbDragHandle": "キーボードを移動",
+ "webKbResetPosition": "下に固定",
  "webKbCaps": "Shift",
  "webKbSpace": "スペース",
  "webKbEnter": "Enter",

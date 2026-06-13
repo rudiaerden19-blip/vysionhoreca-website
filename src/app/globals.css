@@ -107,6 +107,27 @@ html.vysion-web-kb-open [data-vysion-modal-panel] [data-vysion-kb-scroll-host] {
   max-height: none !important;
 }
 
+/* Versleepbaar toetsenbord: geen vaste bodem-reservering */
+html.vysion-web-kb-open[data-vysion-kb-floating] {
+  scroll-padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+html.vysion-web-kb-open[data-vysion-kb-floating]:not([data-vysion-kb-modal-field]) body {
+  padding-bottom: 0;
+}
+html.vysion-web-kb-open[data-vysion-kb-floating] [data-vysion-admin-scroll] {
+  scroll-padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+html.vysion-web-kb-open[data-vysion-kb-floating] [data-vysion-kb-scroll-host] {
+  max-height: min(90dvh, calc(100dvh - 2rem));
+}
+html.vysion-web-kb-open[data-vysion-kb-floating] [data-vysion-modal-overlay] {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  scroll-padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+html.vysion-web-kb-open[data-vysion-kb-floating] [data-vysion-modal-panel] {
+  max-height: min(90vh, calc(100dvh - 2rem));
+}
+
 /*
  * Embedded touch / kiosk-WebView (o.a. Elo): hint naar manipulation om dubbeltik-zoom-vertraging te beperken.
  * Scrollports met eigen touch-action (bv. menu-scroll met touch-manipulation) blijven werken voor verticaal slepen.

@@ -3506,6 +3506,8 @@
  "numpadToggle": "Teclado",
  "webKbTitle": "Teclado en pantalla",
  "webKbClose": "Cerrar",
+ "webKbDragHandle": "Arrastrar teclado",
+ "webKbResetPosition": "Anclar abajo",
  "webKbCaps": "Mayúsculas",
  "webKbSpace": "Espacio",
  "webKbEnter": "Intro",

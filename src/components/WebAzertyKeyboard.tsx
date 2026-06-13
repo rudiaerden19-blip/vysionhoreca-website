@@ -10,7 +10,7 @@ import {
   preferNativeKeyboardOnThisPage,
 } from '@/lib/web-touch-keyboard-policy'
 import { usePathname } from 'next/navigation'
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 
 const IGNORE_TYPES = new Set([
   'hidden',
@@ -31,6 +31,42 @@ const IGNORE_TYPES = new Set([
 ])
 
 const STORAGE_KEYBOARD_LAYOUT = 'vysion_web_kb_layout'
+const STORAGE_KB_POSITION = 'vysion_web_kb_panel_pos'
+
+type PanelPos = { x: number; y: number }
+
+function readStoredPanelPos(): PanelPos | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KB_POSITION)
+    if (!raw) return null
+    const p = JSON.parse(raw) as PanelPos
+    if (typeof p.x !== 'number' || typeof p.y !== 'number') return null
+    if (!Number.isFinite(p.x) || !Number.isFinite(p.y)) return null
+    return p
+  } catch {
+    return null
+  }
+}
+
+function persistPanelPos(pos: PanelPos | null) {
+  try {
+    if (pos === null) window.localStorage.removeItem(STORAGE_KB_POSITION)
+    else window.localStorage.setItem(STORAGE_KB_POSITION, JSON.stringify(pos))
+  } catch {
+    /* noop */
+  }
+}
+
+function clampPanelPos(x: number, y: number, w: number, h: number): PanelPos {
+  const pad = 6
+  const maxX = Math.max(pad, window.innerWidth - w - pad)
+  const maxY = Math.max(pad, window.innerHeight - h - pad)
+  return {
+    x: Math.min(maxX, Math.max(pad, x)),
+    y: Math.min(maxY, Math.max(pad, y)),
+  }
+}
 
 /** Blijft op het veld staan terwijl `inputmode`tijdelijk `none`is (decimale toetsen tonen). */
 const ATTR_VYSION_KB_DECIMAL = 'data-vysion-kb-decimal'
@@ -89,29 +125,46 @@ function isInKbScrollHostField(el: HTMLElement): boolean {
   return !!el.closest('[data-vysion-kb-scroll-host]')
 }
 
-function scrollFieldClearOfKeyboard(target: HTMLElement, panelH: number, headerPx: number) {
+function scrollFieldClearOfKeyboard(target: HTMLElement, panelEl: HTMLElement | null, headerPx: number) {
   const margin = 16
-  const visibleBottom = window.innerHeight - panelH - margin
+  const panelRect = panelEl?.getBoundingClientRect()
+  const panelTop = panelRect && panelRect.height > 0 ? panelRect.top : window.innerHeight - 252
+  const panelBottom = panelRect && panelRect.height > 0 ? panelRect.bottom : window.innerHeight
+
   const rect = target.getBoundingClientRect()
   const scrollBehavior: ScrollBehavior =
     isInAdminModal(target) || isInKbScrollHostField(target) ? 'auto' : 'smooth'
-  if (rect.bottom <= visibleBottom && rect.top >= headerPx + 8) return
+
+  const clearAboveKb = rect.bottom <= panelTop - margin
+  const clearBelowKb = rect.top >= panelBottom + margin
+  const clearTop = rect.top >= headerPx + 8
+  if ((clearAboveKb || clearBelowKb) && clearTop) return
 
   const scrollParent = findVerticalScrollParent(target)
+
+  let delta = 0
+  if (!clearAboveKb && rect.bottom > panelTop - margin) {
+    delta = rect.bottom - (panelTop - margin) + 12
+  } else if (!clearBelowKb && rect.top < panelBottom + margin) {
+    delta = rect.top - (panelBottom + margin) - 12
+  } else if (rect.top < headerPx + 8) {
+    delta = rect.top - headerPx - 20
+  }
 
   if (scrollParent === document.documentElement) {
     const y = window.scrollY + rect.top - headerPx - 20
     const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight)
-    window.scrollTo({ top: Math.min(maxScroll, Math.max(0, y)), behavior: scrollBehavior })
+    if (delta !== 0) {
+      window.scrollTo({
+        top: Math.max(0, Math.min(maxScroll, window.scrollY + delta)),
+        behavior: scrollBehavior,
+      })
+    } else {
+      window.scrollTo({ top: Math.min(maxScroll, Math.max(0, y)), behavior: scrollBehavior })
+    }
     return
   }
 
-  let delta = 0
-  if (rect.bottom > visibleBottom) {
-    delta = rect.bottom - visibleBottom + 12
-  } else if (rect.top < headerPx + 8) {
-    delta = rect.top - headerPx - 20
-  }
   if (delta !== 0) {
     scrollParent.scrollTo({
       top: Math.max(0, scrollParent.scrollTop + delta),
@@ -439,6 +492,14 @@ export function WebAzertyKeyboard() {
   const [letterLayout, setLetterLayout] = useState<KeyboardLetterLayout>('azerty')
   const panelRef = useRef<HTMLDivElement>(null)
   const blurCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const dragSessionRef = useRef<{
+    pointerId: number
+    startClientX: number
+    startClientY: number
+    origX: number
+    origY: number
+  } | null>(null)
+  const [panelPos, setPanelPos] = useState<PanelPos | null>(null)
 
   const kbOn = shouldActivateWebKeyboard(pathname)
 
@@ -451,6 +512,7 @@ export function WebAzertyKeyboard() {
 
   useEffect(() => {
     setLetterLayout(readStoredLetterLayout())
+    setPanelPos(readStoredPanelPos())
   }, [])
 
   useEffect(() => {
@@ -462,6 +524,81 @@ export function WebAzertyKeyboard() {
   const effectiveNumericKeyboard = legacyNumericMode || pinCompactMode
   const decimalsOk = !!(target && numericAllowDecimal(target) && !pinCompactMode)
   const pinOnly = !!(target && target instanceof HTMLInputElement && target.type === 'password')
+
+  const resetPanelPos = useCallback(() => {
+    setPanelPos(null)
+    persistPanelPos(null)
+  }, [])
+
+  const onDragHandlePointerDown = useCallback(
+    (e: ReactPointerEvent<HTMLButtonElement>) => {
+      if (e.button !== 0 && e.pointerType === 'mouse') return
+      const panel = panelRef.current
+      if (!panel) return
+      e.preventDefault()
+      e.stopPropagation()
+      const rect = panel.getBoundingClientRect()
+      const origX = panelPos?.x ?? rect.left
+      const origY = panelPos?.y ?? rect.top
+      if (!panelPos) setPanelPos({ x: origX, y: origY })
+      dragSessionRef.current = {
+        pointerId: e.pointerId,
+        startClientX: e.clientX,
+        startClientY: e.clientY,
+        origX,
+        origY,
+      }
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId)
+      } catch {
+        /* noop */
+      }
+    },
+    [panelPos],
+  )
+
+  const onDragHandlePointerMove = useCallback((e: ReactPointerEvent<HTMLButtonElement>) => {
+    const session = dragSessionRef.current
+    if (!session || session.pointerId !== e.pointerId) return
+    e.preventDefault()
+    const panel = panelRef.current
+    if (!panel) return
+    const w = panel.offsetWidth
+    const h = panel.offsetHeight
+    const dx = e.clientX - session.startClientX
+    const dy = e.clientY - session.startClientY
+    const next = clampPanelPos(session.origX + dx, session.origY + dy, w, h)
+    setPanelPos(next)
+  }, [])
+
+  const finishDrag = useCallback((e: ReactPointerEvent<HTMLButtonElement>) => {
+    const session = dragSessionRef.current
+    if (!session || session.pointerId !== e.pointerId) return
+    dragSessionRef.current = null
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId)
+    } catch {
+      /* noop */
+    }
+    setPanelPos((pos) => {
+      if (pos) persistPanelPos(pos)
+      return pos
+    })
+  }, [])
+
+  useEffect(() => {
+    if (!panelPos) return
+    const onResize = () => {
+      const panel = panelRef.current
+      if (!panel) return
+      setPanelPos((pos) => {
+        if (!pos) return pos
+        return clampPanelPos(pos.x, pos.y, panel.offsetWidth, panel.offsetHeight)
+      })
+    }
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [panelPos])
 
   const handleFocusCapture = useCallback(
     (ev: FocusEvent) => {
@@ -601,6 +738,7 @@ export function WebAzertyKeyboard() {
     if (!target) {
       root.classList.remove('vysion-web-kb-open')
       root.removeAttribute('data-vysion-kb-modal-field')
+      root.removeAttribute('data-vysion-kb-floating')
       root.style.removeProperty('--vysion-web-kb-height')
       return
     }
@@ -609,6 +747,8 @@ export function WebAzertyKeyboard() {
       const h = panelRef.current?.offsetHeight ?? 252
       root.classList.add('vysion-web-kb-open')
       root.style.setProperty('--vysion-web-kb-height', `${h}px`)
+      if (panelPos) root.setAttribute('data-vysion-kb-floating', '1')
+      else root.removeAttribute('data-vysion-kb-floating')
       if (isInAdminModal(target)) root.setAttribute('data-vysion-kb-modal-field', '1')
       else root.removeAttribute('data-vysion-kb-modal-field')
     }
@@ -626,9 +766,10 @@ export function WebAzertyKeyboard() {
       ro?.disconnect()
       root.classList.remove('vysion-web-kb-open')
       root.removeAttribute('data-vysion-kb-modal-field')
+      root.removeAttribute('data-vysion-kb-floating')
       root.style.removeProperty('--vysion-web-kb-height')
     }
-  }, [target, legacyNumericMode, pinCompactMode])
+  }, [target, legacyNumericMode, pinCompactMode, panelPos])
 
   useLayoutEffect(() => {
     if (!target || !target.isConnected) return
@@ -638,15 +779,14 @@ export function WebAzertyKeyboard() {
         if (document.activeElement !== el) {
           focusInputForProgrammaticEdit(el)
         }
-        const panelH = panelRef.current?.offsetHeight ?? 252
-        scrollFieldClearOfKeyboard(el, panelH, 56)
+        scrollFieldClearOfKeyboard(el, panelRef.current, 56)
       } catch {
         /* noop */
       }
     }
     requestAnimationFrame(run)
     requestAnimationFrame(() => requestAnimationFrame(run))
-  }, [target, legacyNumericMode, pinCompactMode])
+  }, [target, legacyNumericMode, pinCompactMode, panelPos])
 
   const closePanel = () => {
     clearBlurCloseTimer()
@@ -951,13 +1091,43 @@ export function WebAzertyKeyboard() {
     <div
       ref={panelRef}
       data-web-touch-keyboard-panel
-      className="fixed bottom-0 left-1/2 z-[600] w-[min(960px,94vw)] max-w-[94vw] -translate-x-1/2 overflow-hidden rounded-t-2xl border border-zinc-700 border-b-0 bg-[#151a21] px-0.5 pb-[max(env(safe-area-inset-bottom),6px)] pt-1.5 shadow-[0_-8px_28px_rgba(0,0,0,.5)] md:pt-2"
+      style={
+        panelPos
+          ? { left: panelPos.x, top: panelPos.y, right: 'auto', bottom: 'auto', transform: 'none' }
+          : undefined
+      }
+      className={
+        panelPos
+          ? 'fixed z-[600] w-[min(960px,94vw)] max-w-[94vw] overflow-hidden rounded-2xl border border-zinc-700 bg-[#151a21] px-0.5 pb-[max(env(safe-area-inset-bottom),6px)] pt-1.5 shadow-[0_12px_40px_rgba(0,0,0,.55)] md:pt-2'
+          : 'fixed bottom-0 left-1/2 z-[600] w-[min(960px,94vw)] max-w-[94vw] -translate-x-1/2 overflow-hidden rounded-t-2xl border border-zinc-700 border-b-0 bg-[#151a21] px-0.5 pb-[max(env(safe-area-inset-bottom),6px)] pt-1.5 shadow-[0_-8px_28px_rgba(0,0,0,.5)] md:pt-2'
+      }
       role="region"
       aria-label={
         pinCompactMode ? t('kassaApp.webKbPinTitle') : `${t('kassaApp.webKbTitle')} (${letterLayout.toUpperCase()})`
       }
     >
-      <div className="flex w-full items-center gap-1.5 border-b border-zinc-800/80 px-1.5 py-0.5">
+      <div className="flex w-full items-center gap-1 border-b border-zinc-800/80 px-1 py-0.5">
+        <button
+          type="button"
+          tabIndex={-1}
+          data-vysion-kb-drag-handle
+          aria-label={t('kassaApp.webKbDragHandle')}
+          title={t('kassaApp.webKbDragHandle')}
+          onPointerDown={onDragHandlePointerDown}
+          onPointerMove={onDragHandlePointerMove}
+          onPointerUp={finishDrag}
+          onPointerCancel={finishDrag}
+          className="flex h-8 w-8 shrink-0 cursor-grab touch-none items-center justify-center rounded-md bg-zinc-800/80 text-zinc-400 active:cursor-grabbing active:bg-zinc-950 sm:h-9 sm:w-9"
+        >
+          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden className="pointer-events-none">
+            <circle cx="6" cy="5" r="1.35" fill="currentColor" />
+            <circle cx="12" cy="5" r="1.35" fill="currentColor" />
+            <circle cx="6" cy="9" r="1.35" fill="currentColor" />
+            <circle cx="12" cy="9" r="1.35" fill="currentColor" />
+            <circle cx="6" cy="13" r="1.35" fill="currentColor" />
+            <circle cx="12" cy="13" r="1.35" fill="currentColor" />
+          </svg>
+        </button>
         {pinCompactMode ? (
           <p className="min-w-0 flex-1 truncate text-left text-[12px] font-semibold leading-tight text-zinc-200 sm:text-sm">
             {t('kassaApp.webKbPinTitle')}
@@ -1005,6 +1175,20 @@ export function WebAzertyKeyboard() {
             </p>
           </>
         )}
+        {panelPos ? (
+          <button
+            type="button"
+            tabIndex={-1}
+            aria-label={t('kassaApp.webKbResetPosition')}
+            title={t('kassaApp.webKbResetPosition')}
+            onPointerDown={(e) => e.preventDefault()}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={resetPanelPos}
+            className="h-8 shrink-0 rounded-md bg-zinc-800/80 px-2 text-[10px] font-bold text-zinc-300 touch-manipulation active:bg-zinc-950 sm:h-9 sm:text-[11px]"
+          >
+            ↩
+          </button>
+        ) : null}
         <button
           type="button"
           tabIndex={-1}
