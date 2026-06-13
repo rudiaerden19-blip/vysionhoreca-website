@@ -314,15 +314,47 @@ type KeyBtnProps = {
   className?: string
   'aria-label'?: string
   title?: string
+  /** Houd ingedrukt: herhaalt actie (bv. backspace). */
+  repeatHold?: boolean
 }
 
-function KeyBtn({ label, onClick, className = '', 'aria-label': ariaLabel, title }: KeyBtnProps) {
+function KeyBtn({
+  label,
+  onClick,
+  className = '',
+  'aria-label': ariaLabel,
+  title,
+  repeatHold = false,
+}: KeyBtnProps) {
   /** Touch via pointerevents; muisklik apart — géén dubbele touchEnd+pointerUp vuur */
   const touchConsumedRef = useRef(false)
+  const repeatDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const repeatIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  const run = () => {
+  const clearRepeat = useCallback(() => {
+    if (repeatDelayRef.current) {
+      clearTimeout(repeatDelayRef.current)
+      repeatDelayRef.current = null
+    }
+    if (repeatIntervalRef.current) {
+      clearInterval(repeatIntervalRef.current)
+      repeatIntervalRef.current = null
+    }
+  }, [])
+
+  useEffect(() => clearRepeat, [clearRepeat])
+
+  const run = useCallback(() => {
     onClick()
-  }
+  }, [onClick])
+
+  const startRepeatHold = useCallback(() => {
+    clearRepeat()
+    run()
+    repeatDelayRef.current = setTimeout(() => {
+      repeatIntervalRef.current = setInterval(run, 55)
+    }, 380)
+  }, [clearRepeat, run])
 
   return (
     <button
@@ -333,25 +365,46 @@ function KeyBtn({ label, onClick, className = '', 'aria-label': ariaLabel, title
       onPointerDown={(e) => {
         if (e.pointerType !== 'touch' && e.pointerType !== 'pen') return
         e.preventDefault()
+        if (repeatHold) startRepeatHold()
       }}
       onPointerUp={(e) => {
         if (e.pointerType !== 'touch' && e.pointerType !== 'pen') return
         e.preventDefault()
+        if (repeatHold) {
+          clearRepeat()
+          return
+        }
         touchConsumedRef.current = true
         run()
         window.setTimeout(() => {
           touchConsumedRef.current = false
         }, 500)
       }}
+      onPointerCancel={(e) => {
+        if (repeatHold) clearRepeat()
+        else e.preventDefault()
+      }}
+      onPointerLeave={(e) => {
+        if (!repeatHold) return
+        if (e.pointerType === 'touch' || e.pointerType === 'pen') clearRepeat()
+      }}
       onMouseDown={(e) => {
         e.preventDefault()
+        if (repeatHold) startRepeatHold()
+      }}
+      onMouseUp={() => {
+        if (repeatHold) clearRepeat()
+      }}
+      onMouseLeave={() => {
+        if (repeatHold) clearRepeat()
       }}
       onClick={(e) => {
         e.preventDefault()
+        if (repeatHold) return
         if (touchConsumedRef.current) return
         run()
       }}
-      className={`min-h-[48px] min-w-0 shrink-0 select-none rounded-[8px] border border-black/35 bg-[#474a54] px-0.5 text-lg font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] touch-manipulation active:bg-[#2f323b] active:brightness-105 max-sm:min-h-[52px] max-sm:text-[19px] sm:min-w-[48px] ${className}`.trim()}
+      className={`min-h-[52px] min-w-0 shrink-0 select-none rounded-[8px] border border-black/35 bg-[#474a54] px-0.5 text-lg font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] touch-manipulation active:bg-[#2f323b] active:brightness-105 max-sm:min-h-[56px] max-sm:text-[19px] sm:min-h-[54px] sm:min-w-[52px] md:min-h-[58px] md:text-xl lg:min-h-[62px] lg:text-[21px] ${className}`.trim()}
     >
       {label}
     </button>
@@ -579,12 +632,13 @@ export function WebAzertyKeyboard() {
   const DIGITS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
 
   const numericGrid = (
-    <div className="mx-auto grid w-full max-w-[min(720px,92vw)] grid-cols-12 gap-x-1.5 gap-y-1.5 px-2 pb-2 pt-1 max-sm:gap-1.5 sm:gap-x-2 sm:gap-y-2 sm:px-3 sm:pb-2.5">
+    <div className="mx-auto grid w-full max-w-[min(960px,94vw)] grid-cols-12 gap-x-1.5 gap-y-1.5 px-2 pb-2 pt-1 max-sm:gap-2 sm:gap-x-2.5 sm:gap-y-2.5 sm:px-3 sm:pb-3 md:gap-3">
       {(['7', '8', '9'] as const).map((d) => (
         <KeyBtn key={d} label={d} className="col-span-3" onClick={() => onChar(d)} />
       ))}
       <KeyBtn
         label="Del"
+        repeatHold
         className="col-span-3 bg-amber-900/95"
         onClick={() => {
           if (target?.isConnected) backspace(target)
@@ -633,7 +687,7 @@ export function WebAzertyKeyboard() {
 
   /** Compact ATM-stijl (PIN / OTP): minder breed en lager dan het grote numeriek rooster */
   const pinKeyCls =
-    '!min-h-0 min-h-[40px] h-10 shrink-0 rounded-lg border border-black/35 bg-[#474a54] px-0 text-[17px] font-bold leading-none text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] touch-manipulation active:bg-[#2f323b] max-sm:min-h-[48px] max-sm:h-12 max-sm:text-[19px]'
+    '!min-h-0 min-h-[44px] h-11 shrink-0 rounded-lg border border-black/35 bg-[#474a54] px-0 text-[18px] font-bold leading-none text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] touch-manipulation active:bg-[#2f323b] max-sm:min-h-[52px] max-sm:h-[52px] max-sm:text-[20px] md:min-h-[56px] md:h-14 md:text-[21px]'
 
   const pinCompactGrid = (
     <div className="mx-auto w-full max-w-[280px] px-3 pb-2.5 pt-1 sm:max-w-[300px]">
@@ -668,6 +722,7 @@ export function WebAzertyKeyboard() {
         <KeyBtn label="0" className={pinKeyCls} onClick={() => onChar('0')} />
         <KeyBtn
           label="Del"
+          repeatHold
           className={`${pinKeyCls} border-amber-950/65 bg-[#5f3b28] text-xl`}
           onClick={() => {
             if (target?.isConnected) backspace(target)
@@ -688,22 +743,22 @@ export function WebAzertyKeyboard() {
 
   /** Telefoon: min-w-0 + flex-1 (één rij) met grotere toetsen. */
   const rowWrap =
-    'mx-auto flex w-full max-w-[min(720px,92vw)] justify-stretch gap-1.5 px-2 max-sm:gap-1 max-sm:px-1.5 sm:gap-2 sm:px-2'
+    'mx-auto flex w-full max-w-[min(960px,94vw)] justify-stretch gap-1.5 px-2 max-sm:gap-1.5 max-sm:px-2 sm:gap-2 sm:px-2.5 md:gap-2.5 lg:gap-3'
 
   const letterKeyCls =
-    '!min-w-0 min-h-0 flex-[1_1_0] basis-0 px-0 py-0 font-semibold leading-none tracking-tight h-12 min-h-[48px] text-[17px] max-sm:h-[52px] max-sm:min-h-[52px] max-sm:text-[18px]'
+    '!min-w-0 min-h-0 flex-[1_1_0] basis-0 px-0 py-0 font-semibold leading-none tracking-tight h-[52px] min-h-[52px] text-[18px] max-sm:h-[56px] max-sm:min-h-[56px] max-sm:text-[19px] md:h-[58px] md:min-h-[58px] md:text-[20px] lg:h-[62px] lg:min-h-[62px] lg:text-[21px]'
 
   const digitKeyCls =
-    '!min-w-0 min-h-0 flex-[1_1_0] basis-0 px-0 font-semibold leading-none h-12 min-h-[48px] text-[17px] max-sm:h-[52px] max-sm:min-h-[52px] max-sm:text-[18px]'
+    '!min-w-0 min-h-0 flex-[1_1_0] basis-0 px-0 font-semibold leading-none h-[52px] min-h-[52px] text-[18px] max-sm:h-[56px] max-sm:min-h-[56px] max-sm:text-[19px] md:h-[58px] md:min-h-[58px] md:text-[20px] lg:h-[62px] lg:min-h-[62px] lg:text-[21px]'
 
   const SYMBOL_KEY_COMPACT =
-    'h-12 min-h-[48px] w-10 shrink-0 px-0 text-[16px] max-sm:h-[52px] max-sm:min-h-[52px] max-sm:w-11 max-sm:text-[17px] sm:w-11 sm:text-[16px]'
+    'h-[52px] min-h-[52px] w-11 shrink-0 px-0 text-[17px] max-sm:h-[56px] max-sm:min-h-[56px] max-sm:w-12 max-sm:text-[18px] md:h-[58px] md:min-h-[58px] md:w-12 md:text-[18px] lg:h-[62px] lg:min-h-[62px] lg:w-[3.25rem] lg:text-[19px]'
 
   const actionKeyCls =
-    'h-12 min-h-[48px] max-sm:h-[52px] max-sm:min-h-[52px] max-sm:text-[16px] sm:min-h-[48px]'
+    'h-[52px] min-h-[52px] max-sm:h-[56px] max-sm:min-h-[56px] max-sm:text-[17px] md:h-[58px] md:min-h-[58px] lg:h-[62px] lg:min-h-[62px] lg:text-[18px]'
 
   const letterBlock = (
-    <div className="mx-auto w-full max-w-[min(720px,92vw)] select-none pb-2">
+    <div className="mx-auto w-full max-w-[min(960px,94vw)] select-none pb-2 md:pb-2.5">
       <div className={`${rowWrap} pt-0.5`}>
         {DIGITS.map((d) => (
           <KeyBtn key={d} label={d} className={digitKeyCls} onClick={() => onChar(d)} />
@@ -743,7 +798,8 @@ export function WebAzertyKeyboard() {
           ))}
           <KeyBtn
             label="Del"
-            className={`!min-w-0 min-h-0 flex-[1.35_1_0] basis-0 shrink px-1 text-lg max-sm:px-0.5 sm:min-w-[3.5rem] sm:flex-none ${actionKeyCls}`}
+            repeatHold
+            className={`!min-w-0 min-h-0 flex-[1.35_1_0] basis-0 shrink px-1 text-lg max-sm:px-0.5 sm:min-w-[4rem] sm:flex-none md:min-w-[4.25rem] lg:min-w-[4.5rem] ${actionKeyCls}`}
             onClick={() => {
               if (target?.isConnected) backspace(target)
             }}
@@ -751,7 +807,7 @@ export function WebAzertyKeyboard() {
         </div>
 
         {/* Tekens + shift (wrap); spatie + enter op aparte rij — past binnen paneel */}
-        <div className="mx-auto flex w-full max-w-[min(720px,92vw)] flex-wrap items-center justify-center gap-1 px-1.5 pb-1 max-sm:gap-1 sm:gap-1.5 sm:px-2">
+        <div className="mx-auto flex w-full max-w-[min(960px,94vw)] flex-wrap items-center justify-center gap-1 px-2 pb-1 max-sm:gap-1.5 sm:gap-2 sm:px-2.5 md:gap-2.5">
           <KeyBtn
             label="Shift"
             aria-label={t('kassaApp.webKbCaps')}
@@ -800,7 +856,7 @@ export function WebAzertyKeyboard() {
     <div
       ref={panelRef}
       data-web-touch-keyboard-panel
-      className="fixed bottom-0 left-1/2 z-[600] w-[min(720px,92vw)] max-w-[92vw] -translate-x-1/2 overflow-hidden rounded-t-2xl border border-zinc-700 border-b-0 bg-[#151a21] px-0.5 pb-[max(env(safe-area-inset-bottom),6px)] pt-1.5 shadow-[0_-8px_28px_rgba(0,0,0,.5)]"
+      className="fixed bottom-0 left-1/2 z-[600] w-[min(960px,94vw)] max-w-[94vw] -translate-x-1/2 overflow-hidden rounded-t-2xl border border-zinc-700 border-b-0 bg-[#151a21] px-0.5 pb-[max(env(safe-area-inset-bottom),6px)] pt-1.5 shadow-[0_-8px_28px_rgba(0,0,0,.5)] md:pt-2"
       role="region"
       aria-label={
         pinCompactMode ? t('kassaApp.webKbPinTitle') : `${t('kassaApp.webKbTitle')} (${letterLayout.toUpperCase()})`
