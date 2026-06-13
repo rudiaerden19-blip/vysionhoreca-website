@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
-import { usePathname } from 'next/navigation'
 import { useLanguage } from '@/i18n'
 import { AccountMenuSessionBlock } from '@/components/AccountMenuSessionBlock'
 import {
@@ -17,7 +16,6 @@ import { useTenantModuleFlagsContext } from '@/lib/tenant-module-flags-context'
  */
 export function AdminHamburgerMenu({ tenantSlug }: { tenantSlug: string }) {
   const { t } = useLanguage()
-  const pathname = usePathname() || ''
   const baseUrl = `/shop/${tenantSlug}/admin`
   const {
     moduleAccess,
@@ -40,15 +38,6 @@ export function AdminHamburgerMenu({ tenantSlug }: { tenantSlug: string }) {
   const [open, setOpen] = useState(false)
   const [subOpen, setSubOpen] = useState<string | null>(null)
 
-  const retailSubmenuAutoOpen = useMemo(() => {
-    if (!moduleAccess['retail-kassa']) return null
-    const p = pathname.split('?')[0]
-    if (p.includes(`${baseUrl}/retail-kassa`)) return 'retail-kassa'
-    if (p.includes(`${baseUrl}/producten`)) return 'retail-kassa'
-    if (p.includes(`${baseUrl}/retail-loyalty`)) return 'retail-kassa'
-    return null
-  }, [pathname, baseUrl, moduleAccess])
-
   const closeAll = () => {
     setOpen(false)
     setSubOpen(null)
@@ -66,12 +55,8 @@ export function AdminHamburgerMenu({ tenantSlug }: { tenantSlug: string }) {
         disabled={loading}
         onClick={() => {
           if (loading) return
-          setOpen((o) => {
-            const next = !o
-            if (next) setSubOpen(retailSubmenuAutoOpen)
-            else setSubOpen(null)
-            return next
-          })
+          setSubOpen(null)
+          setOpen((o) => !o)
         }}
         className={`flex min-h-[44px] min-w-[44px] items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold shadow-md transition-colors ${
           loading
