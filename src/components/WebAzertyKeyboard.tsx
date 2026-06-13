@@ -77,10 +77,15 @@ function findVerticalScrollParent(el: HTMLElement): HTMLElement {
   return document.documentElement
 }
 
+function isInAdminModal(el: HTMLElement): boolean {
+  return !!el.closest('[data-vysion-modal-overlay]')
+}
+
 function scrollFieldClearOfKeyboard(target: HTMLElement, panelH: number, headerPx: number) {
   const margin = 16
   const visibleBottom = window.innerHeight - panelH - margin
   const rect = target.getBoundingClientRect()
+  const scrollBehavior: ScrollBehavior = isInAdminModal(target) ? 'auto' : 'smooth'
   if (rect.bottom <= visibleBottom && rect.top >= headerPx + 8) return
 
   const scrollParent = findVerticalScrollParent(target)
@@ -88,7 +93,7 @@ function scrollFieldClearOfKeyboard(target: HTMLElement, panelH: number, headerP
   if (scrollParent === document.documentElement) {
     const y = window.scrollY + rect.top - headerPx - 20
     const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight)
-    window.scrollTo({ top: Math.min(maxScroll, Math.max(0, y)), behavior: 'smooth'})
+    window.scrollTo({ top: Math.min(maxScroll, Math.max(0, y)), behavior: scrollBehavior })
     return
   }
 
@@ -101,7 +106,7 @@ function scrollFieldClearOfKeyboard(target: HTMLElement, panelH: number, headerP
   if (delta !== 0) {
     scrollParent.scrollTo({
       top: Math.max(0, scrollParent.scrollTop + delta),
-      behavior: 'smooth',
+      behavior: scrollBehavior,
     })
   }
 }
@@ -488,12 +493,39 @@ export function WebAzertyKeyboard() {
           if (isEligibleField(active, pathname)) return
         }
         setTarget(null)
-      }, 160)
+      }, 280)
     }
 
     const onBlur = (ev: FocusEvent) => {
       const related = ev.relatedTarget
       if (related instanceof HTMLElement && panelRef.current?.contains(related)) return
+
+      const from = ev.target
+      if (
+        from instanceof HTMLElement &&
+        isEligibleField(from, pathname) &&
+        isInAdminModal(from)
+      ) {
+        clearBlurCloseTimer()
+        const field = from as HTMLInputElement | HTMLTextAreaElement
+        blurCloseTimerRef.current = setTimeout(() => {
+          blurCloseTimerRef.current = null
+          const active = document.activeElement
+          if (active instanceof HTMLElement && panelRef.current?.contains(active)) return
+          if (isEligibleField(active, pathname)) return
+          if (!field.isConnected) {
+            setTarget(null)
+            return
+          }
+          try {
+            focusInputForProgrammaticEdit(field)
+            setTarget(field)
+          } catch {
+            setTarget(null)
+          }
+        }, 40)
+        return
+      }
 
       scheduleMaybeClose()
     }
@@ -553,6 +585,7 @@ export function WebAzertyKeyboard() {
     const root = document.documentElement
     if (!target) {
       root.classList.remove('vysion-web-kb-open')
+      root.removeAttribute('data-vysion-kb-modal-field')
       root.style.removeProperty('--vysion-web-kb-height')
       return
     }
@@ -561,6 +594,8 @@ export function WebAzertyKeyboard() {
       const h = panelRef.current?.offsetHeight ?? 252
       root.classList.add('vysion-web-kb-open')
       root.style.setProperty('--vysion-web-kb-height', `${h}px`)
+      if (isInAdminModal(target)) root.setAttribute('data-vysion-kb-modal-field', '1')
+      else root.removeAttribute('data-vysion-kb-modal-field')
     }
 
     syncKbInset()
@@ -575,6 +610,7 @@ export function WebAzertyKeyboard() {
     return () => {
       ro?.disconnect()
       root.classList.remove('vysion-web-kb-open')
+      root.removeAttribute('data-vysion-kb-modal-field')
       root.style.removeProperty('--vysion-web-kb-height')
     }
   }, [target, legacyNumericMode, pinCompactMode])

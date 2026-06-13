@@ -50,8 +50,11 @@ html.vysion-kassa-root body {
 html.vysion-web-kb-open {
   scroll-padding-bottom: var(--vysion-web-kb-height, 320px);
 }
-html.vysion-web-kb-open body {
+html.vysion-web-kb-open:not([data-vysion-kb-modal-field]) body {
   padding-bottom: var(--vysion-web-kb-height, 320px);
+}
+html.vysion-web-kb-open[data-vysion-kb-modal-field] body {
+  padding-bottom: 0;
 }
 html.vysion-web-kb-open [data-vysion-admin-scroll] {
   scroll-padding-bottom: var(--vysion-web-kb-height, 320px);
