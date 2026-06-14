@@ -75,10 +75,7 @@ import {
   isMarketingDemoTenantSlug,
   publicDemoSessionMatchesTenant,
 } from '@/lib/demo-links'
-import {
-  KASSA_UI_APPEARANCE_TOGGLE_ENABLED,
-  useKassaUiDarkSync,
-} from '@/lib/kassa-register-ui-dark-preference'
+import { cache, cacheKey } from '@/lib/cache'
 import { createKassaRegisterUiTheme, type KassaRegisterUiTheme } from '@/lib/kassa-register-ui-theme'
 import { createKassaPosRegisterUiTheme } from '@/lib/kassa-pos-register-ui-theme'
 import {
@@ -853,6 +850,8 @@ const KASSA_DRAFT_RECEIPT_COOLDOWN_MS = 450
 
 function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const tenant = params.tenant
+  /** Horeca-POS: altijd donker (geen licht-thema op productie-kassa). */
+  const kassaAppearanceDark = true
   const router = useRouter()
   const searchParams = useSearchParams()
   const demoFromUrl =
@@ -863,7 +862,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setDemoFromMarketingSession(publicDemoSessionMatchesTenant(tenant))
   }, [tenant, searchParams])
   const demoViewOnly = demoFromUrl || demoFromMarketingSession
-  const { dark: kassaAppearanceDark, toggle: toggleKassaAppearance } = useKassaUiDarkSync(tenant)
   const ui = useMemo(
     () =>
       kassaAppearanceDark
@@ -1478,11 +1476,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   })
 
   const [tenantInfo, setTenantInfo] = useState<TenantSettings | null>(null)
+  /** Waarheid uit `/api/kassa/staff-clock` (niet alleen client-cache tenant_settings). */
+  const [kassaStaffClockEnabled, setKassaStaffClockEnabled] = useState(false)
 
   useEffect(() => {
+    cache.invalidate(cacheKey('tenant_settings', tenant))
     getTenantSettings(tenant)
       .then((s) => {
         setTenantInfo(s)
+        if (s?.kassa_staff_clock_enabled) setKassaStaffClockEnabled(true)
       })
       .catch(() => {
         /* offline: geen cache — volgende online load */
@@ -2271,7 +2273,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [tenant])
 
   useEffect(() => {
-    if (demoViewOnly || !tenantInfo?.kassa_staff_clock_enabled || !staffClockListHydrated) return
+    if (demoViewOnly || !kassaStaffClockEnabled || !staffClockListHydrated) return
     if (activeKassaStaff) return
     const clockedIn = staffClockList.filter((s) => s.hasOpenSession)
     void (async () => {
@@ -2287,7 +2289,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [
     tenant,
     demoViewOnly,
-    tenantInfo?.kassa_staff_clock_enabled,
+    kassaStaffClockEnabled,
     staffClockListHydrated,
     staffClockList,
     activeKassaStaff,
@@ -3481,7 +3483,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setDineInFloorZone(FLOOR_PLAN_ZONE_INSIDE)
     setShowPaymentModal(false)
     setShowSplitModal(false)
-    if (tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly) {
+    if (kassaStaffClockEnabled && !demoViewOnly) {
       setActiveKassaStaff(null)
     }
     setShowSuccessModal(true)
@@ -4028,10 +4030,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       })
       const data = (await res.json()) as {
         ok?: boolean
+        error?: string
         staff?: { id: string; name: string; hasOpenSession: boolean }[]
       }
-      if (data.ok && data.staff) setStaffClockList(data.staff)
-      else if (!background) setStaffClockList([])
+      if (res.ok && data.ok && data.staff) {
+        setKassaStaffClockEnabled(true)
+        setStaffClockList(data.staff)
+      } else if (res.status === 403 && data.error === 'disabled') {
+        setKassaStaffClockEnabled(false)
+        if (!background) setStaffClockList([])
+      } else if (!background) {
+        setStaffClockList([])
+      }
     } catch {
       if (!background) setStaffClockList([])
     } finally {
@@ -4045,13 +4055,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       setStaffClockListHydrated(true)
       return
     }
-    if (!tenantInfo?.kassa_staff_clock_enabled) {
-      setStaffClockListHydrated(true)
-      return
-    }
     setStaffClockListHydrated(false)
     void loadStaffClockList({ background: true })
-  }, [tenant, demoViewOnly, tenantInfo?.kassa_staff_clock_enabled, loadStaffClockList])
+  }, [tenant, demoViewOnly, loadStaffClockList])
 
   const openStaffSalesPickModal = useCallback(() => {
     playClick()
@@ -4167,8 +4173,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     [staffClockList]
   )
   const showKassaStaffClockButton = useMemo(
-    () => Boolean(tenantInfo?.kassa_staff_clock_enabled) && !demoViewOnly,
-    [tenantInfo?.kassa_staff_clock_enabled, demoViewOnly],
+    () => kassaStaffClockEnabled && !demoViewOnly,
+    [kassaStaffClockEnabled, demoViewOnly],
   )
 
   const quickMenuAllowedSubmenuIds = useMemo(
@@ -4262,18 +4268,23 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   )
   const requiresStaffSelectionForSale = useMemo(
     () =>
-      Boolean(tenantInfo?.kassa_staff_clock_enabled) &&
+      kassaStaffClockEnabled &&
       !demoViewOnly &&
       (!staffClockListHydrated || hasAnyStaffClockedIn) &&
       !activeKassaStaff,
     [
-      tenantInfo?.kassa_staff_clock_enabled,
+      kassaStaffClockEnabled,
       demoViewOnly,
       staffClockListHydrated,
       hasAnyStaffClockedIn,
       activeKassaStaff,
-    ]
+    ],
   )
+
+  useEffect(() => {
+    if (!requiresStaffSelectionForSale || staffSalesPickOpen) return
+    openStaffSalesPickModal()
+  }, [requiresStaffSelectionForSale, staffSalesPickOpen, openStaffSalesPickModal])
 
   const blockSaleWithoutStaffIfNeeded = useCallback((): boolean => {
     if (!requiresStaffSelectionForSale) return false
@@ -4746,16 +4757,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </Link>
           )}
 
-          {KASSA_UI_APPEARANCE_TOGGLE_ENABLED && !demoViewOnly ? (
+          {false && !demoViewOnly ? (
             <button
               type="button"
-              onClick={toggleKassaAppearance}
+              onClick={() => {}}
               className={headerQuickLinkBtnClass}
-              title={kassaAppearanceDark ? t('kassaApp.lightMode') : t('kassaApp.darkMode')}
+              title={t('kassaApp.darkMode')}
             >
-              <span className={KASSA_HEADER_QUICK_LINK_LABEL}>
-                {kassaAppearanceDark ? t('kassaApp.lightMode') : t('kassaApp.darkMode')}
-              </span>
+              <span className={KASSA_HEADER_QUICK_LINK_LABEL}>{t('kassaApp.darkMode')}</span>
             </button>
           ) : null}
 
@@ -5392,7 +5401,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               >
               <div className="flex min-h-[15rem] flex-1 flex-col justify-end">
               <div className={`mb-3 flex shrink-0 items-center gap-2.5 rounded-xl px-2.5 py-2 ${ui.numpadBarBg}`}>
-                {!kassaAppearanceDark && tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? (
+                {kassaStaffClockEnabled && !demoViewOnly ? (
                   <button
                     type="button"
                     onClick={() => openStaffClockModal()}
@@ -5405,7 +5414,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 ) : null}
                 <div
                   className={`min-w-0 flex flex-col justify-center gap-0.5 ${
-                    !kassaAppearanceDark && tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1': 'w-full'
+                    kassaStaffClockEnabled && !demoViewOnly ? 'flex-1': 'w-full'
                   }`}
                 >
                   {!kassaAppearanceDark ? (
@@ -5485,9 +5494,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 }`}
               >
               <div
-                  className={`flex shrink-0 items-center gap-2 rounded-lg px-2 py-1 ${ui.numpadBarBg} ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? '' : 'justify-end'}`}
+                  className={`flex shrink-0 items-center gap-2 rounded-lg px-2 py-1 ${ui.numpadBarBg} ${kassaStaffClockEnabled && !demoViewOnly ? '' : 'justify-end'}`}
                 >
-                  {tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? (
+                  {kassaStaffClockEnabled && !demoViewOnly ? (
                     <button
                       type="button"
                       onClick={() => openStaffClockModal()}
@@ -5499,7 +5508,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     </button>
                   ) : null}
                   <p
-                    className={`min-w-0 truncate whitespace-nowrap text-right text-[11px] font-semibold leading-tight tracking-tight ${ui.numpadMeta} ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1': 'w-full'}`}
+                    className={`min-w-0 truncate whitespace-nowrap text-right text-[11px] font-semibold leading-tight tracking-tight ${ui.numpadMeta} ${kassaStaffClockEnabled && !demoViewOnly ? 'flex-1': 'w-full'}`}
                     title={numpadHeaderDateLabel}
                     aria-live="polite"
                   >
@@ -5545,7 +5554,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 data-testid="kassa-numpad-panel"
               >
               <div className={`mb-3 flex shrink-0 items-center gap-2.5 rounded-xl px-2.5 py-2 ${ui.numpadBarBg}`}>
-                {!kassaAppearanceDark && tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? (
+                {kassaStaffClockEnabled && !demoViewOnly ? (
                   <button
                     type="button"
                     onClick={() => openStaffClockModal()}
@@ -5558,7 +5567,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 ) : null}
                 <div
                   className={`min-w-0 flex flex-col justify-center gap-0.5 ${
-                    !kassaAppearanceDark && tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1': 'w-full'
+                    kassaStaffClockEnabled && !demoViewOnly ? 'flex-1': 'w-full'
                   }`}
                 >
                   {!kassaAppearanceDark ? (

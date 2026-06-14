@@ -63,7 +63,7 @@ export function KassaStaffClockModal({
     )
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-3 sm:p-4">
+    <div className="fixed inset-0 bg-black/60 z-[700] flex items-center justify-center p-3 sm:p-4">
       <div
         className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] shadow-2xl flex flex-col overflow-hidden z-[61]"
         data-testid="kassa-staff-clock"
@@ -173,7 +173,7 @@ export function KassaStaffSalesSummaryModal({
   const { t } = useLanguage()
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-[65] flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black/60 z-[710] flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl p-6 flex flex-col gap-4 max-h-[85vh] overflow-hidden">
         <h2 className="font-bold text-xl text-gray-900">{t('staffClock.summaryTitle')}</h2>
         <p className="text-gray-600 text-sm">{t('staffClock.summaryIntro').replace('{name}', summary.staffName)}</p>
@@ -234,7 +234,7 @@ export function KassaProductStaffGatePopup({ open, onDismiss }: { open: boolean;
 
   return (
     <div
-      className="fixed inset-0 z-[85] flex items-center justify-center bg-black/50 p-4"
+      className="fixed inset-0 z-[720] flex items-center justify-center bg-black/50 p-4"
       onClick={onDismiss}
       role="presentation"
     >
