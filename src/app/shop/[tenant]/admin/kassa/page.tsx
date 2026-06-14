@@ -929,8 +929,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [soundActivated, demoViewOnly])
 
   const [cart, setCart] = useState<CartItem[]>([])
-  /** Tafelregels in sidebar: uit na «Voeg toe aan tafel», aan bij opnieuw tafel kiezen. */
-  const [tableOrderLinesInSidebar, setTableOrderLinesInSidebar] = useState(true)
   const [orderType, setOrderType] = useState<OrderType>('DINE_IN')
   const [tableNumber, setTableNumber] = useState('')
   const [numpadValue, setNumpadValue] = useState('')
@@ -2176,7 +2174,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setTableNumber(newTableNr)
     setDineInFloorZone(zone)
     setOrderType('DINE_IN')
-    setTableOrderLinesInSidebar(true)
     setShowTablePicker(false)
     setKassaZoneTab(null)
     if (openPaymentAfterFloorPlanSwitchRef.current) {
@@ -2208,7 +2205,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     })
     setTableOrders(next)
     queueMicrotask(() => syncFloorPlanStatusesFromOpenOrders(next))
-    setTableOrderLinesInSidebar(false)
     void persistOpenOrderRowToSupabase(zone, tbl, merged)
     void flushBarDeltaSlipRef.current(zone, tbl, itemsToPark, opts)
   }
@@ -2677,11 +2673,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return tableOrders[activeTableSlotKey] ?? []
   }, [activeTableSlotKey, tableOrders])
 
-  /** Open tafelmand in sidebar (kar leeg): na tafelkeuze, niet direct na «Voeg toe aan tafel». */
-  const showParkedTableLinesInSidebar = useMemo(
-    () => tableOrderLinesInSidebar && parkedOnTableLines.length > 0,
-    [tableOrderLinesInSidebar, parkedOnTableLines.length],
-  )
+  /** Open tafelmand in sidebar zolang er regels op de actieve tafel staan (alle tenants). */
+  const showParkedTableLinesInSidebar = parkedOnTableLines.length > 0
 
   const parkedOnlySidebarView = useMemo(
     () => !numpadPanelVisible && cart.length === 0 && showParkedTableLinesInSidebar,
@@ -5504,8 +5497,66 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               </div>
               </div>
               </div>
-              ) : numpadPanelVisible ? (
-              <div className="flex min-h-[15rem] flex-1 flex-col justify-end" data-testid="kassa-numpad-panel">
+              ) : (
+              <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+              {cart.length > 0 ? (
+              <div
+                className={`flex min-h-0 flex-1 flex-col overflow-hidden ${
+                  kassaSidebarFooterTier === 'comfort'? 'gap-2': kassaSidebarFooterTier === 'compact'? 'gap-1.5': 'gap-1'
+                }`}
+              >
+              <div
+                  className={`flex shrink-0 items-center gap-2 rounded-lg px-2 py-1 ${ui.numpadBarBg} ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? '' : 'justify-end'}`}
+                >
+                  {tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? (
+                    <button
+                      type="button"
+                      onClick={() => openStaffClockModal()}
+                      className={`shrink-0 active:scale-[0.98] transition-all ${ui.clockTileBg} ${ui.clockTileHover}`}
+                      title={t('staffClock.buttonTitle')}
+                      aria-label={t('staffClock.buttonTitle')}
+                    >
+                      <KassaAnalogClock size={48} />
+                    </button>
+                  ) : null}
+                  <p
+                    className={`min-w-0 truncate whitespace-nowrap text-right text-[11px] font-semibold leading-tight tracking-tight ${ui.numpadMeta} ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1': 'w-full'}`}
+                    title={numpadHeaderDateLabel}
+                    aria-live="polite"
+                  >
+                    {numpadHeaderDateLabel}
+                  </p>
+                </div>
+              {showParkedTableLinesInSidebar ? (
+                <div
+                  className="max-h-[min(20vh,6.5rem)] shrink-0 overflow-y-auto overscroll-y-contain"
+                  data-testid="kassa-table-order-lines"
+                >
+                  <p className={`mb-1 text-xs font-bold uppercase tracking-wide ${ui.numpadMeta}`}>
+                    {sidebarTableOrderSectionLabel}
+                  </p>
+                  <div className="space-y-1">
+                    {parkedLinesByCategory.map(renderParkedOnTableLine)}
+                  </div>
+                </div>
+              ) : null}
+              <p className={sidebarCartSectionLabelClass}>{t('kassaApp.cartNewLinesSection')}</p>
+              <div
+                ref={cartLinesScrollRef}
+                className={sidebarCartLinesScrollClass}
+                data-testid="kassa-cart-lines"
+              >
+                {cartLinesByCategory.map(renderSidebarCartLine)}
+              </div>
+            </div>
+              ) : null}
+              {numpadPanelVisible ? (
+              <div
+                className={`flex flex-col justify-end touch-manipulation ${
+                  cart.length > 0 ? 'max-h-[min(42vh,13rem)] shrink-0': 'min-h-[15rem] flex-1'
+                }`}
+                data-testid="kassa-numpad-panel"
+              >
               <div className={`mb-3 flex shrink-0 items-center gap-2.5 rounded-xl px-2.5 py-2 ${ui.numpadBarBg}`}>
                 {!kassaAppearanceDark && tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? (
                   <button
@@ -5579,59 +5630,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 </button>
               )}
               </div>
-              ) : cart.length > 0 ? (
-              <div
-                className={`flex min-h-0 flex-1 flex-col overflow-hidden ${
-                  kassaSidebarFooterTier === 'comfort'? 'gap-2': kassaSidebarFooterTier === 'compact'? 'gap-1.5': 'gap-1'
-                }`}
-              >
-              {!kassaAppearanceDark ? (
-                <div
-                  className={`flex shrink-0 items-center gap-2 rounded-lg px-2 py-1 ${ui.numpadBarBg} ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? '' : 'justify-end'}`}
-                >
-                  {tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? (
-                    <button
-                      type="button"
-                      onClick={() => openStaffClockModal()}
-                      className={`shrink-0 active:scale-[0.98] transition-all ${ui.clockTileBg} ${ui.clockTileHover}`}
-                      title={t('staffClock.buttonTitle')}
-                      aria-label={t('staffClock.buttonTitle')}
-                    >
-                      <KassaAnalogClock size={48} />
-                    </button>
-                  ) : null}
-                  <p
-                    className={`min-w-0 truncate whitespace-nowrap text-right text-[11px] font-semibold leading-tight tracking-tight ${ui.numpadMeta} ${tenantInfo?.kassa_staff_clock_enabled && !demoViewOnly ? 'flex-1': 'w-full'}`}
-                    title={numpadHeaderDateLabel}
-                    aria-live="polite"
-                  >
-                    {numpadHeaderDateLabel}
-                  </p>
-                </div>
               ) : null}
-              {showParkedTableLinesInSidebar ? (
-                <div
-                  className="max-h-[min(20vh,6.5rem)] shrink-0 overflow-y-auto overscroll-y-contain"
-                  data-testid="kassa-table-order-lines"
-                >
-                  <p className={`mb-1 text-xs font-bold uppercase tracking-wide ${ui.numpadMeta}`}>
-                    {sidebarTableOrderSectionLabel}
-                  </p>
-                  <div className="space-y-1">
-                    {parkedLinesByCategory.map(renderParkedOnTableLine)}
-                  </div>
-                </div>
-              ) : null}
-              <p className={sidebarCartSectionLabelClass}>{t('kassaApp.cartNewLinesSection')}</p>
-              <div
-                ref={cartLinesScrollRef}
-                className={sidebarCartLinesScrollClass}
-                data-testid="kassa-cart-lines"
-              >
-                {cartLinesByCategory.map(renderSidebarCartLine)}
               </div>
-            </div>
-              ) : null}
+              )}
             </div>
         </div>
 
