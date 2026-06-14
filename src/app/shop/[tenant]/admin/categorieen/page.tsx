@@ -32,6 +32,7 @@ type CategoryRowProps = {
   toggleVisible: (id: string) => void
   handleDelete: (id: string) => void
   t: (key: string) => string
+  optionsPlacement: 'below' | 'above'
 }
 
 function CategoryReorderRow({
@@ -46,6 +47,7 @@ function CategoryReorderRow({
   toggleVisible,
   handleDelete,
   t,
+  optionsPlacement,
 }: CategoryRowProps) {
   const dragControls = useDragControls()
   const cid = category.id ? String(category.id) : ''
@@ -77,6 +79,7 @@ function CategoryReorderRow({
             value={(category.image_url || '').trim()}
             onChange={(url) => updateCategoryImage(category.id!, url)}
             label={t('adminPages.categorieen.image')}
+            optionsPlacement={optionsPlacement}
           />
         </div>
 
@@ -433,7 +436,7 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
       </div>
 
       {/* Categories List */}
-      <motion.div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+      <motion.div className="bg-white rounded-2xl shadow-sm overflow-visible">
         <div className="px-4 py-3 border-b bg-gray-50 flex flex-col sm:flex-row sm:items-center gap-2">
           <span className="text-gray-400 text-sm"></span>
           <p className="text-sm text-gray-500 flex-1">
@@ -450,8 +453,12 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
             <p className="text-gray-400 text-sm">Voeg hierboven een eerste categorie toe</p>
           </div>
         ) : (
-          <Reorder.Group values={categories} onReorder={setCategories} className="divide-y divide-gray-100 touch-pan-y">
-            {categories.map((category) => (
+          <Reorder.Group
+            values={categories}
+            onReorder={setCategories}
+            className="divide-y divide-gray-100 touch-pan-y overflow-hidden rounded-b-2xl"
+          >
+            {categories.map((category, index) => (
               <CategoryReorderRow
                 key={
                   category.id
@@ -469,6 +476,7 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
                 toggleVisible={toggleVisible}
                 handleDelete={handleDelete}
                 t={t}
+                optionsPlacement={index === categories.length - 1 ? 'above' : 'below'}
               />
             ))}
           </Reorder.Group>

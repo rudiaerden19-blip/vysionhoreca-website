@@ -21,9 +21,17 @@ interface MediaPickerProps {
   value?: string
   onChange: (url: string) => void
   label?: string
+  /** Bij laatste rij in een afgeknipte lijst: menu boven het vakje i.p.v. eronder. */
+  optionsPlacement?: 'below' | 'above'
 }
 
-export default function MediaPicker({ tenantSlug, value, onChange, label }: MediaPickerProps) {
+export default function MediaPicker({
+  tenantSlug,
+  value,
+  onChange,
+  label,
+  optionsPlacement = 'below',
+}: MediaPickerProps) {
   const { t } = useLanguage()
   const { ask, ConfirmModal } = useAdminConfirm(t)
   const [isOpen, setIsOpen] = useState(false)
@@ -341,10 +349,12 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
           <AnimatePresence>
             {showOptions && !uploading && (
               <motion.div
-                initial={{ opacity: 0, y: -10 }}
+                initial={{ opacity: 0, y: optionsPlacement === 'above' ? 10 : -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-xl border z-50 overflow-hidden min-w-[220px]"
+                exit={{ opacity: 0, y: optionsPlacement === 'above' ? 10 : -10 }}
+                className={`absolute left-0 bg-white rounded-xl shadow-xl border z-[120] overflow-hidden min-w-[220px] ${
+                  optionsPlacement === 'above' ? 'bottom-full mb-2' : 'top-full mt-2'
+                }`}
               >
                 {/* Upload from computer/device */}
                 <button
