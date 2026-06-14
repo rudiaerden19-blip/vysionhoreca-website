@@ -7,11 +7,9 @@ import { useLanguage } from '@/i18n'
 import { ATTR_VYSION_KB_MANAGED, focusInputForProgrammaticEdit, setNativeInputValue } from '@/lib/dom-input-value'
 import {
   isMarketingWebKeyboardPath,
-  isShopStaffInternalPath,
-  preferNativeKeyboardOnThisPage,
+  resolveWebKeyboardActive,
 } from '@/lib/web-touch-keyboard-policy'
 import {
-  getCachedTouchUiPrefs,
   loadTouchUiPrefs,
   persistTouchUiPrefs,
   touchPrefsTenantFromPathname,
@@ -138,42 +136,10 @@ function scrollFieldClearOfKeyboard(target: HTMLElement, panelEl: HTMLElement | 
 }
 
 /**
- * Zaak-shell + keuken + interne dashboards: schermtoetsenbord (kassa-/touch-pc).
- * Telefoon bij online bestellen/reserveren: native OS-toetsenbord.
- * Voorkeuren (layout, positie, force/off): Supabase `kassa_pos_state.touch_ui_prefs`.
+ * Zie resolveWebKeyboardActive in web-touch-keyboard-policy.ts (één bron).
  */
 function shouldActivateWebKeyboard(pathname: string): boolean {
-  if (typeof window === 'undefined') return false
-
-  const p = pathname || window.location.pathname
-
-  if (isMarketingWebKeyboardPath(p)) return true
-
-  const tenantSlug = touchPrefsTenantFromPathname(p)
-  if (tenantSlug) {
-    const prefs = getCachedTouchUiPrefs(tenantSlug)
-    if (prefs.kb_off) return false
-    if (prefs.kb_force) return true
-  }
-
-  if (preferNativeKeyboardOnThisPage(p)) return false
-
-  if (/^\/shop\/[^/]+(\/|$)/i.test(p)) {
-    if (isShopStaffInternalPath(p)) return true
-    return true
-  }
-
-  if (/^\/keuken\//i.test(p)) return true
-  if (/^\/(?:superadmin|dashboard|registreer)\b/i.test(p)) return true
-
-  try {
-    if (window.matchMedia?.('(pointer: coarse)')?.matches) return true
-    if ('maxTouchPoints'in navigator && navigator.maxTouchPoints > 0) return true
-  } catch {
-    /* noop */
-  }
-
-  return false
+  return resolveWebKeyboardActive(pathname)
 }
 
 function isEligibleField(
@@ -195,7 +161,7 @@ function isEligibleField(
 
 function isNumericMode(el: HTMLInputElement | HTMLTextAreaElement): boolean {
   if (el instanceof HTMLTextAreaElement) return false
-  if (el.type === 'number') return true
+  if (el.type === 'number' || el.type === 'tel') return true
 
   const im = (el.getAttribute('inputmode') || '').toLowerCase()
   if (im === 'numeric' || im === 'decimal') return true
@@ -239,6 +205,7 @@ function isCompactPinField(el: HTMLInputElement | HTMLTextAreaElement): boolean 
   if (!(el instanceof HTMLInputElement)) return false
 
   try {
+    if (el.closest('[data-web-kb-full="1"]')) return false
     if (el.closest('[data-web-kb-pin="1"]')) return true
   } catch {
     /* noop */
@@ -253,6 +220,8 @@ function isCompactPinField(el: HTMLInputElement | HTMLTextAreaElement): boolean 
     if (ml > 0 && ml <= STAFF_PIN_MAX_LEN) return true
     return hintsPinNaming(el)
   }
+
+  if (el.type === 'tel') return false
 
   if (!hintsPinNaming(el)) return false
   return isDigitOriented(el)
@@ -592,7 +561,7 @@ export function WebAzertyKeyboard() {
     (ev: FocusEvent) => {
       const tEl = ev.target
       if (!isEligibleField(tEl, pathname)) return
-      if (userDismissedKbRef.current) return
+      userDismissedKbRef.current = false
       clearBlurCloseTimer()
       setTarget(tEl)
       setCaps(false)
@@ -637,6 +606,8 @@ export function WebAzertyKeyboard() {
   }, [kbOn, pathname, openKeyboardForField])
 
   useEffect(() => {
+    const blurCloseMs = isMarketingWebKeyboardPath(pathname) ? 520 : 320
+
     const scheduleMaybeClose = () => {
       clearBlurCloseTimer()
       blurCloseTimerRef.current = setTimeout(() => {
@@ -647,17 +618,35 @@ export function WebAzertyKeyboard() {
         }
         const active = document.activeElement
         if (active instanceof HTMLElement && panelRef.current?.contains(active)) return
+
+        const bound = target
+        if (bound?.isConnected) {
+          if (active === bound) return
+          // Schermtoetsenbord: veld verliest focus (activeElement body) — panel open houden
+          if (
+            active === document.body ||
+            active === document.documentElement ||
+            active === null
+          ) {
+            return
+          }
+        }
+
         if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) {
-          if (isEligibleField(active, pathname)) return
+          if (isEligibleField(active, pathname)) {
+            setTarget(active)
+            return
+          }
         }
         setTarget(null)
-      }, isMarketingWebKeyboardPath(pathname) ? 480 : 280)
+      }, blurCloseMs)
     }
 
     const onBlur = (ev: FocusEvent) => {
       const related = ev.relatedTarget
-      if (related instanceof HTMLElement && isEligibleField(related, pathname)) {
-        return
+      if (related instanceof HTMLElement) {
+        if (panelRef.current?.contains(related)) return
+        if (isEligibleField(related, pathname)) return
       }
       scheduleMaybeClose()
     }
@@ -667,7 +656,7 @@ export function WebAzertyKeyboard() {
       document.removeEventListener('focusout', onBlur, true)
       clearBlurCloseTimer()
     }
-  }, [pathname, clearBlurCloseTimer])
+  }, [pathname, clearBlurCloseTimer, target])
 
   useLayoutEffect(() => {
     if (!target || !target.isConnected) return

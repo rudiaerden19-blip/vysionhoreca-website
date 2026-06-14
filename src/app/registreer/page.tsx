@@ -485,7 +485,7 @@ export default function RegisterPage() {
             className="space-y-6"
             autoComplete="off"
             data-vysion-kb-scroll-host
-            data-web-touch-keyboard="1"
+            data-web-kb-full="1"
           >
             <div>
               <label htmlFor="businessName" className="mb-2 block text-sm font-medium text-gray-800">

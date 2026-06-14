@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { resolveWebKeyboardActive } from '@/lib/web-touch-keyboard-policy'
 
 /** Velden waar we géén focus-/touch-fix toepassen. */
 const DATA_OPT_OUT = 'data-no-os-touch-keyboard'
@@ -26,6 +27,7 @@ const IGNORE_INPUT_TYPES = new Set([
 function isEligible(el: EventTarget | null): el is HTMLInputElement | HTMLTextAreaElement {
   if (!el || !(el instanceof HTMLElement)) return false
   if (el.closest(`[${DATA_OPT_OUT}]`)) return false
+  if (el.closest('[data-no-web-touch-keyboard],[data-kassa-no-web-keyboard]')) return false
   if (el instanceof HTMLTextAreaElement) {
     return !el.readOnly && !el.disabled
   }
@@ -38,15 +40,17 @@ function isEligible(el: EventTarget | null): el is HTMLInputElement | HTMLTextAr
 }
 
 /**
- * Edge/Chromium **VirtualKeyboard.show()** laat op sommige Windows-touch/Elo setups het **kleine
- * zwevende** systeemtoetsenbord verschijnen. We roepen die API daarom niet meer aan.
- *
- * Dit onderdeel zorgt er alleen nog voor dat touch/pen-tikken betrouwbaar **`focus`** op het
- * invoerveld krijgt — het OS mag daarna zijn normale (grotere/docke) keyboard kiezen.
+ * Alleen waar **geen** Vysion-schermtoetsenbord actief is: focus-kick voor native OS-toetsenbord.
+ * Op kassa/admin/registreer (Vysion actief) niet gebruiken — voorkomt focus-gevecht met WebAzertyKeyboard.
  */
 export function OsTouchKeyboardAssist() {
   useEffect(() => {
     const kickEligibleFocus = (el: HTMLInputElement | HTMLTextAreaElement) => {
+      if (typeof window !== 'undefined') {
+        const p = window.location.pathname || ''
+        if (resolveWebKeyboardActive(p)) return
+        if (document.documentElement.classList.contains('vysion-web-kb-open')) return
+      }
       queueMicrotask(() => {
         try {
           if (document.activeElement !== el) {
@@ -58,16 +62,12 @@ export function OsTouchKeyboardAssist() {
       })
     }
 
-    /** Touch-eventpad (legacy). */
     const onTouchEnd = (ev: TouchEvent) => {
       const t = ev.target
       if (!isEligible(t)) return
       kickEligibleFocus(t)
     }
 
-    /**
-     * Edge/Windows gebruikt vaak Pointer Events; zonder focus-kick bereikt invoer soms geen caret.
-     */
     const onPointerUp = (ev: PointerEvent) => {
       if (ev.pointerType !== 'touch' && ev.pointerType !== 'pen') return
       const t = ev.target
