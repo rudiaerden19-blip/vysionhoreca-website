@@ -2178,24 +2178,24 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }
 
   /**
-   * Actieve tafel/zone wisselen. Karronde gaat naar:
-   * - geselecteerde tafel als er nog geen tafel was, of dezelfde tafel opnieuw bevestigd wordt;
-   * - anders naar de vorige tafel vóór de wissel (niet mee naar andere tafel slepen).
+   * Actieve tafel/zone wisselen.
+   * - Eerst producten, dan tafel: mand blijft staan tot «Voeg toe aan tafel».
+   * - Eerst tafel, dan producten: normaal tikken + parkeren.
+   * - Wissel naar andere tafel met open kar: karronde naar vorige tafel (niet mee naar nieuwe tafel).
    */
   const doSwitchToTable = (newTableNr: string, zone: FloorPlanZone) => {
     const oldZone = dineInFloorZone
-    const oldTbl = tableNumber.trim()
-    const newTbl = newTableNr.trim()
+    const oldTbl = kassaTableDisplayNumber(tableNumber)
+    const newTbl = kassaTableDisplayNumber(newTableNr)
+    const switchingAway = !!oldTbl && (oldTbl !== newTbl || oldZone !== zone)
 
-    if (cart.length > 0) {
-      const snap = snapshotCartItemsForAsyncPrint(cartRef.current.length > 0 ? cartRef.current : cart)
-      if (!oldTbl && newTbl) {
-        commitCartRoundToTable(zone, newTbl, snap)
-      } else if (oldTbl && oldTbl === newTbl && oldZone === zone) {
-        commitCartRoundToTable(zone, newTbl, snap)
-      } else if (oldTbl) {
-        commitCartRoundToTable(oldZone, oldTbl, snap)
-      }
+    if (switchingAway && cart.length > 0) {
+      const snap = snapshotCartItemsForAsyncPrint(
+        cartRef.current.length > 0 ? cartRef.current : cart,
+      )
+      commitCartRoundToTable(oldZone, oldTbl, snap)
+    } else if (!oldTbl && newTbl && cart.length > 0) {
+      updateTableStatus(newTbl, tableHasOpenOrder(zone, newTbl, cart), zone)
     } else if (newTbl) {
       setTableOrderLinesInSidebar(true)
     }
