@@ -5744,7 +5744,7 @@
  "loyaltyPointsBalance": "{points} punten",
  "loyaltyUnlink": "Loskoppelen",
  "loyaltyEarnedToast": "+{points} punten — saldo {balance}",
- "trayTileLoyaltyAdmin": "Winkelpas beheer",
+ "trayTileLoyaltyAdmin": "Klantenkaart aanmaken",
  "loyaltyRedeemOpen": "Punten inwisselen",
  "loyaltyRedeemActive": "{points} pt ingewisseld",
  "loyaltyRedeemClear": "Geen korting",

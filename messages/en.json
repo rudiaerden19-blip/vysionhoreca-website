@@ -5811,7 +5811,7 @@
  "loyaltyPointsBalance": "{points} points",
  "loyaltyUnlink": "Unlink",
  "loyaltyEarnedToast": "+{points} points — balance {balance}",
- "trayTileLoyaltyAdmin": "Store pass admin",
+ "trayTileLoyaltyAdmin": "Create customer card",
  "loyaltyRedeemOpen": "Redeem points",
  "loyaltyRedeemActive": "{points} pt redeemed",
  "loyaltyRedeemClear": "No discount",

@@ -5852,7 +5852,7 @@
  "loyaltyPointsBalance": "{points} points",
  "loyaltyUnlink": "Unlink",
  "loyaltyEarnedToast": "+{points} points — balance {balance}",
- "trayTileLoyaltyAdmin": "Store pass admin",
+ "trayTileLoyaltyAdmin": "创建客户卡",
  "loyaltyRedeemOpen": "Redeem points",
  "loyaltyRedeemActive": "{points} pt redeemed",
  "loyaltyRedeemClear": "No discount",

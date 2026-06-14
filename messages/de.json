@@ -5875,7 +5875,7 @@
  "loyaltyPointsBalance": "{points} Punkte",
  "loyaltyUnlink": "Trennen",
  "loyaltyEarnedToast": "+{points} Punkte — Stand {balance}",
- "trayTileLoyaltyAdmin": "Shopkarte verwalten",
+ "trayTileLoyaltyAdmin": "Kundenkarte anlegen",
  "loyaltyRedeemOpen": "Punkte einlösen",
  "loyaltyRedeemActive": "{points} Pt eingelöst",
  "loyaltyRedeemClear": "Kein Rabatt",

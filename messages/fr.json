@@ -5875,7 +5875,7 @@
  "loyaltyPointsBalance": "{points} points",
  "loyaltyUnlink": "Détacher",
  "loyaltyEarnedToast": "+{points} points — solde {balance}",
- "trayTileLoyaltyAdmin": "Gestion carte",
+ "trayTileLoyaltyAdmin": "Créer carte client",
  "loyaltyRedeemOpen": "Utiliser les points",
  "loyaltyRedeemActive": "{points} pt utilisés",
  "loyaltyRedeemClear": "Pas de réduction",

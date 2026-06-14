@@ -5852,7 +5852,7 @@
  "loyaltyPointsBalance": "{points} puntos",
  "loyaltyUnlink": "Desvincular",
  "loyaltyEarnedToast": "+{points} puntos — saldo {balance}",
- "trayTileLoyaltyAdmin": "Gestionar tarjeta",
+ "trayTileLoyaltyAdmin": "Crear tarjeta cliente",
  "loyaltyRedeemOpen": "Canjear puntos",
  "loyaltyRedeemActive": "{points} pt canjeados",
  "loyaltyRedeemClear": "Sin descuento",
