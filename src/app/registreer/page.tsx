@@ -447,7 +447,12 @@ export default function RegisterPage() {
             />
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-6"
+            autoComplete="off"
+            data-no-web-touch-keyboard
+          >
             <div>
               <label htmlFor="businessName" className="mb-2 block text-sm font-medium text-gray-800">
                 {t('register.businessName')} <span className="text-red-500">*</span>
@@ -475,6 +480,7 @@ export default function RegisterPage() {
                 value={formData.email}
                 onChange={handleChange}
                 required
+                autoComplete="off"
                 placeholder={t('register.emailPlaceholder')}
                 className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition-all placeholder:text-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/25"
               />
@@ -491,6 +497,8 @@ export default function RegisterPage() {
                 value={formData.phone}
                 onChange={handleChange}
                 required
+                inputMode="tel"
+                autoComplete="tel"
                 placeholder={t('register.phonePlaceholder')}
                 className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition-all placeholder:text-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/25"
               />
@@ -507,6 +515,7 @@ export default function RegisterPage() {
                 value={formData.password}
                 onChange={handleChange}
                 required
+                autoComplete="new-password"
                 placeholder={t('register.passwordPlaceholder')}
                 className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition-all placeholder:text-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/25"
               />
@@ -523,6 +532,7 @@ export default function RegisterPage() {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 required
+                autoComplete="new-password"
                 placeholder={t('register.confirmPasswordPlaceholder')}
                 className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition-all placeholder:text-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/25"
               />

@@ -87,11 +87,22 @@ export function isShortCustomerSelfServicePath(pathname: string): boolean {
   return /^\/(checkout|menu|account|kiosk1)(\/|$)/i.test(p)
 }
 
+/** Marketing / zaak-aanmaken / platform-login — altijd native OS-toetsenbord (ook op touch-kassa). */
+export function isPublicPlatformAuthPath(pathname: string): boolean {
+  const p = (pathname || '').replace(/\/+$/, '') || '/'
+  if (p === '/registreer' || p === '/login') return true
+  return /^\/login\/(forgot-password|reset-password|troubleshooting)(\/|$)/i.test(p)
+}
+
 export function preferNativeKeyboardOnThisPage(pathname: string): boolean {
   if (typeof window === 'undefined') return false
   if (isKioskSession()) return false
-  if (!isPhoneLikeDevice()) return false
+  if (isPublicPlatformAuthPath(pathname)) return true
 
   const p = pathname || window.location.pathname
-  return isShopCustomerSelfServicePath(p) || isShortCustomerSelfServicePath(p)
+  if (isShopCustomerSelfServicePath(p) || isShortCustomerSelfServicePath(p)) {
+    return isPhoneLikeDevice()
+  }
+
+  return false
 }
