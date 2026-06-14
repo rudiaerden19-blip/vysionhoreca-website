@@ -453,6 +453,9 @@ export function WebAzertyKeyboard() {
   /** Sync met React state — blur-timer leest altijd actueel veld (geen stale closure). */
   const activeInputRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null)
   const panelInteractionUntilRef = useRef(0)
+  /** Touch: veld dat de gebruiker net tikte — voorkom autofill/focusin die terug naar e-mail springt. */
+  const userPinnedFieldRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null)
+  const userPinnedUntilRef = useRef(0)
 
   const bindActiveInput = useCallback((el: HTMLInputElement | HTMLTextAreaElement | null) => {
     activeInputRef.current = el
@@ -577,22 +580,49 @@ export function WebAzertyKeyboard() {
     return () => window.removeEventListener('resize', onResize)
   }, [panelPos])
 
+  const pinUserField = useCallback((el: HTMLInputElement | HTMLTextAreaElement) => {
+    userPinnedFieldRef.current = el
+    userPinnedUntilRef.current = Date.now() + 1500
+  }, [])
+
   const handleFocusCapture = useCallback(
     (ev: FocusEvent) => {
       const tEl = ev.target
       if (!isEligibleField(tEl, pathname)) return
+
+      const pinned = userPinnedFieldRef.current
+      if (
+        pinned?.isConnected &&
+        Date.now() < userPinnedUntilRef.current &&
+        tEl !== pinned
+      ) {
+        clearBlurCloseTimer()
+        bindActiveInput(pinned)
+        setCaps(false)
+        queueMicrotask(() => {
+          try {
+            focusInputForProgrammaticEdit(pinned)
+          } catch {
+            /* noop */
+          }
+        })
+        return
+      }
+
       userDismissedKbRef.current = false
+      pinUserField(tEl)
       clearBlurCloseTimer()
       bindActiveInput(tEl)
       setCaps(false)
     },
-    [pathname, clearBlurCloseTimer, bindActiveInput],
+    [pathname, clearBlurCloseTimer, bindActiveInput, pinUserField],
   )
 
   const openKeyboardForField = useCallback(
     (el: HTMLInputElement | HTMLTextAreaElement) => {
       if (!isEligibleField(el, pathname)) return
       userDismissedKbRef.current = false
+      pinUserField(el)
       clearBlurCloseTimer()
       bindActiveInput(el)
       setCaps(false)
@@ -604,7 +634,7 @@ export function WebAzertyKeyboard() {
         /* noop */
       }
     },
-    [pathname, clearBlurCloseTimer, bindActiveInput],
+    [pathname, clearBlurCloseTimer, bindActiveInput, pinUserField],
   )
 
   useEffect(() => {
@@ -789,6 +819,8 @@ export function WebAzertyKeyboard() {
 
   const closePanel = () => {
     userDismissedKbRef.current = true
+    userPinnedFieldRef.current = null
+    userPinnedUntilRef.current = 0
     clearBlurCloseTimer()
     const el = target
     bindActiveInput(null)

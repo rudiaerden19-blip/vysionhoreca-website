@@ -92,7 +92,7 @@ export default function RegisterPage() {
     setError('')
   }
 
-  /** Autofill op touch vult DOM vóór React — eenmalig syncen zodat velden niet leeg blijven / focus springt. */
+  /** Eénmalige autofill-sync bij openen formulier — geen herhaalde timers (die stelen focus bij wachtwoord). */
   useEffect(() => {
     if (step !== 'form' || typeof window === 'undefined') return
     const fieldIds = ['businessName', 'email', 'phone', 'password', 'confirmPassword'] as const
@@ -109,11 +109,9 @@ export default function RegisterPage() {
         return next === prev ? prev : next
       })
     }
-    const t1 = window.setTimeout(sync, 300)
-    const t2 = window.setTimeout(sync, 1200)
+    const t1 = window.setTimeout(sync, 400)
     return () => {
       window.clearTimeout(t1)
-      window.clearTimeout(t2)
     }
   }, [step])
 
@@ -517,6 +515,8 @@ export default function RegisterPage() {
                 onInput={handleInput}
                 required
                 autoComplete="off"
+                autoCorrect="off"
+                spellCheck={false}
                 placeholder={t('register.emailPlaceholder')}
                 className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition-all placeholder:text-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/25"
               />
@@ -553,6 +553,8 @@ export default function RegisterPage() {
                 onInput={handleInput}
                 required
                 autoComplete="new-password"
+                autoCorrect="off"
+                spellCheck={false}
                 placeholder={t('register.passwordPlaceholder')}
                 className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition-all placeholder:text-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/25"
               />
@@ -571,6 +573,8 @@ export default function RegisterPage() {
                 onInput={handleInput}
                 required
                 autoComplete="new-password"
+                autoCorrect="off"
+                spellCheck={false}
                 placeholder={t('register.confirmPasswordPlaceholder')}
                 className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition-all placeholder:text-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/25"
               />
