@@ -988,8 +988,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [langOpen, setLangOpen] = useState(false)
   const [logoutSoftwareConfirmOpen, setLogoutSoftwareConfirmOpen] = useState(false)
   const langRef = useRef<HTMLDivElement>(null)
-  /** Alleen bij product/opties: toon korte popup als verkoopmedewerker verplicht is. */
-  const blockSaleWithoutStaffIfNeededRef = useRef<() => boolean>(() => false)
   const handleProductClickRef = useRef<(product: MenuProduct) => Promise<void>>(async () => {})
   /** Touch/WebView: voorkom dubbele afhandeling (pointerup + synthetische click). */
   const suppressProductGridClickRef = useRef(false)
@@ -2272,22 +2270,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     })
   }, [tenant])
 
+  /** Verwijder actieve verkoper uit UI/DB als die niet meer ingeklokt is (geen zwart vak). */
   useEffect(() => {
-    if (demoViewOnly || !kassaStaffClockEnabled || !staffClockListHydrated) return
-    if (activeKassaStaff) return
-    const clockedIn = staffClockList.filter((s) => s.hasOpenSession)
-    void (async () => {
-      const stored = await loadKassaActiveStaffFromServer(tenant)
-      if (stored && clockedIn.some((s) => s.id === stored.id)) {
-        setActiveKassaStaff(stored)
-        return
-      }
-      if (clockedIn.length === 1) {
-        setActiveKassaStaff({ id: clockedIn[0].id, name: clockedIn[0].name })
-      }
-    })()
+    if (demoViewOnly || !kassaStaffClockEnabled || !staffClockListHydrated || !activeKassaStaff) return
+    const row = staffClockList.find((s) => s.id === activeKassaStaff.id)
+    if (row && row.hasOpenSession) return
+    setActiveKassaStaff(null)
   }, [
-    tenant,
     demoViewOnly,
     kassaStaffClockEnabled,
     staffClockListHydrated,
@@ -2532,7 +2521,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }
 
   handleProductClickRef.current = async (product: MenuProduct) => {
-    if (blockSaleWithoutStaffIfNeededRef.current()) return
     if (product.id && productIdsWithOptionsSet.has(product.id)) {
       const opts = await getOptionsForProduct(product.id!)
       setOptionsModal({ product, options: opts, selected: [] })
@@ -2607,7 +2595,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
 
     const { product, selected, editingCartKey } = optionsModal
-    if (!editingCartKey && blockSaleWithoutStaffIfNeededRef.current()) return
 
     if (editingCartKey) {
       scheduleAddToCartSound()
@@ -3483,9 +3470,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setDineInFloorZone(FLOOR_PLAN_ZONE_INSIDE)
     setShowPaymentModal(false)
     setShowSplitModal(false)
-    if (kassaStaffClockEnabled && !demoViewOnly) {
-      setActiveKassaStaff(null)
-    }
     setShowSuccessModal(true)
   }
 
@@ -4266,34 +4250,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       ].join(' '),
     [kassaAppearanceDark],
   )
-  const requiresStaffSelectionForSale = useMemo(
-    () =>
-      kassaStaffClockEnabled &&
-      !demoViewOnly &&
-      (!staffClockListHydrated || hasAnyStaffClockedIn) &&
-      !activeKassaStaff,
-    [
-      kassaStaffClockEnabled,
-      demoViewOnly,
-      staffClockListHydrated,
-      hasAnyStaffClockedIn,
-      activeKassaStaff,
-    ],
-  )
-
-  useEffect(() => {
-    if (!requiresStaffSelectionForSale || staffSalesPickOpen) return
-    openStaffSalesPickModal()
-  }, [requiresStaffSelectionForSale, staffSalesPickOpen, openStaffSalesPickModal])
-
-  const blockSaleWithoutStaffIfNeeded = useCallback((): boolean => {
-    if (!requiresStaffSelectionForSale) return false
-    openStaffSalesPickModal()
-    return true
-  }, [requiresStaffSelectionForSale, openStaffSalesPickModal])
-
-  blockSaleWithoutStaffIfNeededRef.current = blockSaleWithoutStaffIfNeeded
-
   const paymentMethodOptions = useMemo<KassaPayOption[]>(
     () => [
       { method: 'CASH', label: t('kassaApp.payCash'), icon: '', color: '#10b981'},
