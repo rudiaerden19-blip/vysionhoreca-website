@@ -87,6 +87,13 @@ export function isShortCustomerSelfServicePath(pathname: string): boolean {
   return /^\/(checkout|menu|account|kiosk1)(\/|$)/i.test(p)
 }
 
+/** Platform registratie/login — altijd Vysion-schermtoetsenbord op touch-pc. */
+export function isMarketingWebKeyboardPath(pathname: string): boolean {
+  const p = (pathname || '').replace(/\/+$/, '') || '/'
+  if (p === '/registreer' || p === '/login') return true
+  return /^\/login\//i.test(p)
+}
+
 export function preferNativeKeyboardOnThisPage(pathname: string): boolean {
   if (typeof window === 'undefined') return false
   if (isKioskSession()) return false

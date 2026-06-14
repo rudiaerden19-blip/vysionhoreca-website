@@ -6,6 +6,7 @@ import { STAFF_PIN_MAX_LEN } from '@/components/staff-clock/StaffClockPinPortal'
 import { useLanguage } from '@/i18n'
 import { ATTR_VYSION_KB_MANAGED, focusInputForProgrammaticEdit, setNativeInputValue } from '@/lib/dom-input-value'
 import {
+  isMarketingWebKeyboardPath,
   isShopStaffInternalPath,
   preferNativeKeyboardOnThisPage,
 } from '@/lib/web-touch-keyboard-policy'
@@ -144,14 +145,16 @@ function scrollFieldClearOfKeyboard(target: HTMLElement, panelEl: HTMLElement | 
 function shouldActivateWebKeyboard(pathname: string): boolean {
   if (typeof window === 'undefined') return false
 
-  const tenantSlug = touchPrefsTenantFromPathname(pathname || window.location.pathname)
+  const p = pathname || window.location.pathname
+
+  if (isMarketingWebKeyboardPath(p)) return true
+
+  const tenantSlug = touchPrefsTenantFromPathname(p)
   if (tenantSlug) {
     const prefs = getCachedTouchUiPrefs(tenantSlug)
     if (prefs.kb_off) return false
     if (prefs.kb_force) return true
   }
-
-  const p = pathname || window.location.pathname
 
   if (preferNativeKeyboardOnThisPage(p)) return false
 
@@ -597,29 +600,41 @@ export function WebAzertyKeyboard() {
     [pathname, clearBlurCloseTimer],
   )
 
+  const openKeyboardForField = useCallback(
+    (el: HTMLInputElement | HTMLTextAreaElement) => {
+      if (!isEligibleField(el, pathname)) return
+      userDismissedKbRef.current = false
+      clearBlurCloseTimer()
+      setTarget(el)
+      setCaps(false)
+      try {
+        if (document.activeElement !== el) {
+          el.focus({ preventScroll: false })
+        }
+      } catch {
+        /* noop */
+      }
+    },
+    [pathname, clearBlurCloseTimer],
+  )
+
   useEffect(() => {
     document.addEventListener('focusin', handleFocusCapture, true)
     return () => document.removeEventListener('focusin', handleFocusCapture, true)
   }, [handleFocusCapture])
 
-  /** Eerste tik op touch: focus meteen (dnd/modals soms geen focusin op eerste tap). */
+  /** Eerste tik op touch: focus + panel (sommige browsers geven geen focusin op eerste tap). */
   useEffect(() => {
     if (!kbOn) return
     const onPointerDown = (ev: PointerEvent) => {
       if (ev.pointerType === 'mouse' && ev.button !== 0) return
       const el = ev.target
       if (!isEligibleField(el, pathname)) return
-      userDismissedKbRef.current = false
-      if (document.activeElement === el) return
-      try {
-        el.focus({ preventScroll: false })
-      } catch {
-        /* noop */
-      }
+      openKeyboardForField(el)
     }
     document.addEventListener('pointerdown', onPointerDown, true)
     return () => document.removeEventListener('pointerdown', onPointerDown, true)
-  }, [kbOn, pathname])
+  }, [kbOn, pathname, openKeyboardForField])
 
   useEffect(() => {
     const scheduleMaybeClose = () => {
@@ -636,7 +651,7 @@ export function WebAzertyKeyboard() {
           if (isEligibleField(active, pathname)) return
         }
         setTarget(null)
-      }, 280)
+      }, isMarketingWebKeyboardPath(pathname) ? 480 : 280)
     }
 
     const onBlur = (ev: FocusEvent) => {
