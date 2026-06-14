@@ -200,6 +200,11 @@ import {
   normalizeCategoryVatPercent,
 } from '@/lib/order-vat'
 import { sortKassaCartLinesByMenuCategory } from '@/lib/kassa-cart-grouping'
+import {
+  isLomiChillplayKassaTenant,
+  kassaSidebarShowsLegacyParkedHeaderBlock,
+  kassaSidebarShowsOrderPanel,
+} from '@/lib/tenant-kassa-owner-overrides'
 
 /** Tik-feedback ná paint — zwakkere touch-terminals blijven UI-updates beter bijbenen */
 function scheduleKassaTapSound(play: () => void) {
@@ -2716,6 +2721,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     if (activeTableSlotKey) return mergeCartLinesForTable(parkedOnTableLines, cart)
     return cart
   }, [activeTableSlotKey, parkedOnTableLines, cart])
+
+  const sidebarShowsOrderPanel = kassaSidebarShowsOrderPanel(tenant, cart.length, billLines.length)
+  const sidebarShowsLegacyParkedHeader = kassaSidebarShowsLegacyParkedHeaderBlock(
+    tenant,
+    showParkedTableLinesInSidebar,
+    parkedOnlySidebarView,
+    numpadPanelVisible,
+  )
+  const lomiKassaSidebar = isLomiChillplayKassaTenant(tenant)
 
   const total = useMemo(
     () =>
@@ -5347,8 +5361,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           }`}
         >
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-              {showParkedTableLinesInSidebar &&
-              (parkedOnlySidebarView || numpadPanelVisible) ? (
+              {sidebarShowsLegacyParkedHeader ? (
                 <div
                   className={
                     parkedOnlySidebarView
@@ -5373,7 +5386,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               ) : null}
               {kassaAppearanceDark ? (
               <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
-              {cart.length > 0 ? (
+              {sidebarShowsOrderPanel ? (
               <div
                 className={`flex min-h-0 flex-1 flex-col overflow-hidden ${KASSA_NUMPAD_CART_RECESS_MOTION} ${
                   numpadPanelVisible ? 'pointer-events-none opacity-[0.28]': 'opacity-100'
@@ -5381,9 +5394,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   kassaSidebarFooterTier === 'comfort'? 'gap-2': kassaSidebarFooterTier === 'compact'? 'gap-1.5': 'gap-1'
                 }`}
               >
-              {showParkedTableLinesInSidebar && cart.length > 0 ? (
+              {showParkedTableLinesInSidebar && (cart.length > 0 || lomiKassaSidebar) ? (
                 <div
-                  className="max-h-[min(20vh,6.5rem)] shrink-0 overflow-y-auto overscroll-y-contain"
+                  className={
+                    lomiKassaSidebar && cart.length === 0
+                      ? 'min-h-0 flex-1 overflow-y-auto overscroll-y-contain'
+                      : 'max-h-[min(20vh,6.5rem)] shrink-0 overflow-y-auto overscroll-y-contain'
+                  }
                   data-testid="kassa-table-order-lines"
                 >
                   <p className={`mb-1 text-xs font-bold uppercase tracking-wide ${ui.numpadMeta}`}>
@@ -5394,6 +5411,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   </div>
                 </div>
               ) : null}
+              {cart.length > 0 ? (
+                <>
               <p className={sidebarCartSectionLabelClass}>{t('kassaApp.cartNewLinesSection')}</p>
               <div
                 ref={cartLinesScrollRef}
@@ -5402,6 +5421,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               >
                 {cartLinesByCategory.map(renderSidebarCartLine)}
               </div>
+                </>
+              ) : null}
               </div>
               ) : null}
               <div
@@ -5499,7 +5520,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               </div>
               ) : (
               <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-              {cart.length > 0 ? (
+              {sidebarShowsOrderPanel ? (
               <div
                 className={`flex min-h-0 flex-1 flex-col overflow-hidden ${
                   kassaSidebarFooterTier === 'comfort'? 'gap-2': kassaSidebarFooterTier === 'compact'? 'gap-1.5': 'gap-1'
@@ -5527,9 +5548,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     {numpadHeaderDateLabel}
                   </p>
                 </div>
-              {showParkedTableLinesInSidebar ? (
+              {showParkedTableLinesInSidebar && (cart.length > 0 || lomiKassaSidebar) ? (
                 <div
-                  className="max-h-[min(20vh,6.5rem)] shrink-0 overflow-y-auto overscroll-y-contain"
+                  className={
+                    lomiKassaSidebar && cart.length === 0
+                      ? 'min-h-0 flex-1 overflow-y-auto overscroll-y-contain'
+                      : 'max-h-[min(20vh,6.5rem)] shrink-0 overflow-y-auto overscroll-y-contain'
+                  }
                   data-testid="kassa-table-order-lines"
                 >
                   <p className={`mb-1 text-xs font-bold uppercase tracking-wide ${ui.numpadMeta}`}>
@@ -5540,6 +5565,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   </div>
                 </div>
               ) : null}
+              {cart.length > 0 ? (
+                <>
               <p className={sidebarCartSectionLabelClass}>{t('kassaApp.cartNewLinesSection')}</p>
               <div
                 ref={cartLinesScrollRef}
@@ -5548,6 +5575,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               >
                 {cartLinesByCategory.map(renderSidebarCartLine)}
               </div>
+                </>
+              ) : null}
             </div>
               ) : null}
               {numpadPanelVisible ? (
