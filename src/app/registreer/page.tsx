@@ -534,7 +534,6 @@ export default function RegisterPage() {
                 onChange={handleChange}
                 onInput={handleInput}
                 required
-                inputMode="tel"
                 autoComplete="tel"
                 placeholder={t('register.phonePlaceholder')}
                 className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition-all placeholder:text-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/25"

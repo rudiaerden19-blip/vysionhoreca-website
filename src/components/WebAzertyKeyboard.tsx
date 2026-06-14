@@ -161,7 +161,19 @@ function isEligibleField(
 
 function isNumericMode(el: HTMLInputElement | HTMLTextAreaElement): boolean {
   if (el instanceof HTMLTextAreaElement) return false
-  if (el.type === 'number' || el.type === 'tel') return true
+
+  try {
+    if (el.closest('[data-web-kb-full="1"]')) {
+      if (el.type === 'number') return true
+      const imFull = (el.getAttribute('inputmode') || '').toLowerCase()
+      return imFull === 'numeric' || imFull === 'decimal'
+    }
+  } catch {
+    /* noop */
+  }
+
+  if (el.type === 'number') return true
+  // type=tel → volledig AZERTY (niet het cijfer-only paneel)
 
   const im = (el.getAttribute('inputmode') || '').toLowerCase()
   if (im === 'numeric' || im === 'decimal') return true
@@ -438,6 +450,14 @@ export function WebAzertyKeyboard() {
     origY: number
   } | null>(null)
   const [panelPos, setPanelPos] = useState<PanelPos | null>(null)
+  /** Sync met React state — blur-timer leest altijd actueel veld (geen stale closure). */
+  const activeInputRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null)
+  const panelInteractionUntilRef = useRef(0)
+
+  const bindActiveInput = useCallback((el: HTMLInputElement | HTMLTextAreaElement | null) => {
+    activeInputRef.current = el
+    setTarget(el)
+  }, [])
 
   const kbOn = shouldActivateWebKeyboard(pathname)
   const touchTenantSlug = touchPrefsTenantFromPathname(pathname)
@@ -462,8 +482,8 @@ export function WebAzertyKeyboard() {
   }, [touchTenantSlug])
 
   useEffect(() => {
-    if (!kbOn) setTarget(null)
-  }, [kbOn])
+    if (!kbOn) bindActiveInput(null)
+  }, [kbOn, bindActiveInput])
 
   const clearBlurCloseTimer = useCallback(() => {
     if (blurCloseTimerRef.current != null) {
@@ -563,10 +583,10 @@ export function WebAzertyKeyboard() {
       if (!isEligibleField(tEl, pathname)) return
       userDismissedKbRef.current = false
       clearBlurCloseTimer()
-      setTarget(tEl)
+      bindActiveInput(tEl)
       setCaps(false)
     },
-    [pathname, clearBlurCloseTimer],
+    [pathname, clearBlurCloseTimer, bindActiveInput],
   )
 
   const openKeyboardForField = useCallback(
@@ -574,7 +594,7 @@ export function WebAzertyKeyboard() {
       if (!isEligibleField(el, pathname)) return
       userDismissedKbRef.current = false
       clearBlurCloseTimer()
-      setTarget(el)
+      bindActiveInput(el)
       setCaps(false)
       try {
         if (document.activeElement !== el) {
@@ -584,7 +604,7 @@ export function WebAzertyKeyboard() {
         /* noop */
       }
     },
-    [pathname, clearBlurCloseTimer],
+    [pathname, clearBlurCloseTimer, bindActiveInput],
   )
 
   useEffect(() => {
@@ -612,17 +632,17 @@ export function WebAzertyKeyboard() {
       clearBlurCloseTimer()
       blurCloseTimerRef.current = setTimeout(() => {
         blurCloseTimerRef.current = null
+        if (Date.now() < panelInteractionUntilRef.current) return
         if (userDismissedKbRef.current) {
-          setTarget(null)
+          bindActiveInput(null)
           return
         }
         const active = document.activeElement
         if (active instanceof HTMLElement && panelRef.current?.contains(active)) return
 
-        const bound = target
+        const bound = activeInputRef.current
         if (bound?.isConnected) {
           if (active === bound) return
-          // Schermtoetsenbord: veld verliest focus (activeElement body) — panel open houden
           if (
             active === document.body ||
             active === document.documentElement ||
@@ -634,11 +654,11 @@ export function WebAzertyKeyboard() {
 
         if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) {
           if (isEligibleField(active, pathname)) {
-            setTarget(active)
+            bindActiveInput(active)
             return
           }
         }
-        setTarget(null)
+        bindActiveInput(null)
       }, blurCloseMs)
     }
 
@@ -656,7 +676,7 @@ export function WebAzertyKeyboard() {
       document.removeEventListener('focusout', onBlur, true)
       clearBlurCloseTimer()
     }
-  }, [pathname, clearBlurCloseTimer, target])
+  }, [pathname, clearBlurCloseTimer, bindActiveInput])
 
   useLayoutEffect(() => {
     if (!target || !target.isConnected) return
@@ -771,7 +791,7 @@ export function WebAzertyKeyboard() {
     userDismissedKbRef.current = true
     clearBlurCloseTimer()
     const el = target
-    setTarget(null)
+    bindActiveInput(null)
     setCaps(false)
     try {
       el?.blur()
@@ -1086,6 +1106,9 @@ export function WebAzertyKeyboard() {
     <div
       ref={panelRef}
       data-web-touch-keyboard-panel
+      onPointerDownCapture={() => {
+        panelInteractionUntilRef.current = Date.now() + 900
+      }}
       style={
         panelPos
           ? { left: panelPos.x, top: panelPos.y, right: 'auto', bottom: 'auto', transform: 'none' }
