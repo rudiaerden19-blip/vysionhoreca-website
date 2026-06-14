@@ -978,6 +978,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   useEffect(() => {
     cartRef.current = cart
   }, [cart])
+  /** Tafelregels in sidebar: uit na «Voeg toe aan tafel»; leeg veld voor volgende ronde. */
+  const [tableOrderLinesInSidebar, setTableOrderLinesInSidebar] = useState(true)
   const [orderType, setOrderType] = useState<OrderType>('DINE_IN')
   const [tableNumber, setTableNumber] = useState('')
   const [numpadValue, setNumpadValue] = useState('')
@@ -2169,6 +2171,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     flushSync(() => {
       setCart([])
       setTableOrders(next)
+      setTableOrderLinesInSidebar(false)
     })
     queueMicrotask(() => syncFloorPlanStatusesFromOpenOrders(next))
     void persistOpenOrderRowToSupabase(zone, tbl, merged)
@@ -2193,6 +2196,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       } else if (oldTbl) {
         commitCartRoundToTable(oldZone, oldTbl, snap)
       }
+    } else if (newTbl) {
+      setTableOrderLinesInSidebar(true)
     }
 
     setTableNumber(newTbl)
@@ -2690,8 +2695,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return tableOrders[activeTableSlotKey] ?? []
   }, [activeTableSlotKey, tableOrders])
 
-  /** Open tafelmand in sidebar zolang er regels op de actieve tafel staan (alle tenants). */
-  const showParkedTableLinesInSidebar = parkedOnTableLines.length > 0
+  /** Open tafelmand in sidebar — niet direct na parkeren (mand moet leeg ogen). */
+  const showParkedTableLinesInSidebar =
+    tableOrderLinesInSidebar && parkedOnTableLines.length > 0
 
   const parkedOnlySidebarView = useMemo(
     () => !numpadPanelVisible && cart.length === 0 && showParkedTableLinesInSidebar,
@@ -2733,7 +2739,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return cart
   }, [activeTableSlotKey, parkedOnTableLines, cart])
 
-  const sidebarShowsOrderPanel = billLines.length > 0 || cart.length > 0
+  const sidebarShowsOrderPanel = cart.length > 0 || showParkedTableLinesInSidebar
   const sidebarShowsLegacyParkedHeader = false
 
   const total = useMemo(
@@ -3256,6 +3262,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const slotKey = tableOrderMapKey(zone, tblNr)
     cancelPersistTimer(slotKey)
     removeBarBonWatermarkSlot(tenant, slotKey)
+    setTableOrderLinesInSidebar(true)
     setTableOrders((prev) => {
       const next = { ...prev }
       delete next[slotKey]
