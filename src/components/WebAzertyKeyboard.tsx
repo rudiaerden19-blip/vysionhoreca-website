@@ -492,6 +492,8 @@ export function WebAzertyKeyboard() {
   const [letterLayout, setLetterLayout] = useState<KeyboardLetterLayout>('azerty')
   const panelRef = useRef<HTMLDivElement>(null)
   const blurCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  /** Sluiten-knop: modal-blur mag veld niet opnieuw focussen (andere open het toetsenbord terug). */
+  const userDismissedKbRef = useRef(false)
   const dragSessionRef = useRef<{
     pointerId: number
     startClientX: number
@@ -604,6 +606,7 @@ export function WebAzertyKeyboard() {
     (ev: FocusEvent) => {
       const tEl = ev.target
       if (!isEligibleField(tEl, pathname)) return
+      userDismissedKbRef.current = false
       clearBlurCloseTimer()
       setTarget(tEl)
       setCaps(false)
@@ -659,9 +662,17 @@ export function WebAzertyKeyboard() {
         (isInAdminModal(from) || isInKbScrollHostField(from))
       ) {
         clearBlurCloseTimer()
+        if (userDismissedKbRef.current) {
+          setTarget(null)
+          return
+        }
         const field = from as HTMLInputElement | HTMLTextAreaElement
         blurCloseTimerRef.current = setTimeout(() => {
           blurCloseTimerRef.current = null
+          if (userDismissedKbRef.current) {
+            setTarget(null)
+            return
+          }
           const active = document.activeElement
           if (active instanceof HTMLElement && panelRef.current?.contains(active)) return
           if (isEligibleField(active, pathname)) return
@@ -789,6 +800,7 @@ export function WebAzertyKeyboard() {
   }, [target, legacyNumericMode, pinCompactMode, panelPos])
 
   const closePanel = () => {
+    userDismissedKbRef.current = true
     clearBlurCloseTimer()
     try {
       target?.blur()
@@ -797,6 +809,9 @@ export function WebAzertyKeyboard() {
     }
     setTarget(null)
     setCaps(false)
+    window.setTimeout(() => {
+      userDismissedKbRef.current = false
+    }, 400)
   }
 
   const onChar = useCallback(
