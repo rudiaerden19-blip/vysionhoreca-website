@@ -6,8 +6,8 @@ import { authFetch } from '@/lib/auth-headers'
 import { playClick, playSuccess } from '@/lib/sounds'
 import type { KassaStaffClockRow, KassaStaffPinState } from '@/components/kassa/KassaStaffClockUi'
 import {
-  readKassaActiveStaffPreference,
-  writeKassaActiveStaffPreference,
+  loadKassaActiveStaffFromServer,
+  persistKassaActiveStaffToServer,
 } from '@/lib/kassa-active-staff-preference'
 
 export type KassaActiveStaff = { id: string; name: string }
@@ -35,14 +35,19 @@ export function useKassaStaffClockPos(opts: {
   const setActiveKassaStaff = useCallback(
     (next: KassaActiveStaff | null) => {
       setActiveKassaStaffState(next)
-      writeKassaActiveStaffPreference(tenant, next)
+      void persistKassaActiveStaffToServer(tenant, next)
     },
     [tenant],
   )
 
-  /** localStorage pas op client — vóór paint, vóór staff-sync effect. */
   useLayoutEffect(() => {
-    setActiveKassaStaffState(readKassaActiveStaffPreference(tenant))
+    let cancelled = false
+    void loadKassaActiveStaffFromServer(tenant).then((stored) => {
+      if (!cancelled && stored) setActiveKassaStaffState(stored)
+    })
+    return () => {
+      cancelled = true
+    }
   }, [tenant])
 
   const loadStaffClockList = useCallback(async (loadOpts?: { background?: boolean }) => {
@@ -90,14 +95,16 @@ export function useKassaStaffClockPos(opts: {
       return
     }
 
-    const stored = readKassaActiveStaffPreference(tenant)
-    if (stored && clockedIn.some((s) => s.id === stored.id)) {
-      setActiveKassaStaff(stored)
-      return
-    }
-    if (clockedIn.length === 1) {
-      setActiveKassaStaff({ id: clockedIn[0].id, name: clockedIn[0].name })
-    }
+    void (async () => {
+      const stored = await loadKassaActiveStaffFromServer(tenant)
+      if (stored && clockedIn.some((s) => s.id === stored.id)) {
+        setActiveKassaStaff(stored)
+        return
+      }
+      if (clockedIn.length === 1) {
+        setActiveKassaStaff({ id: clockedIn[0].id, name: clockedIn[0].name })
+      }
+    })()
   }, [
     staffClockEnabled,
     staffClockListHydrated,

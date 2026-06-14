@@ -562,17 +562,6 @@ export default function KassaFloorPlan({
     }),
     [t],
   )
-  const storageKey =
-    planZone === FLOOR_PLAN_ZONE_INSIDE
-      ? `vysion_tables_${tenant}`
-      : `vysion_tables_terrace_${tenant}`
-  const decorKey =
-    planZone === FLOOR_PLAN_ZONE_INSIDE ? `vysion_decor_${tenant}`: `vysion_decor_terrace_${tenant}`
-  const stoolStatusKey =
-    planZone === FLOOR_PLAN_ZONE_INSIDE
-      ? `vysion_stool_status_${tenant}`
-      : `vysion_stool_status_terrace_${tenant}`
-
   const [tables, setTables] = useState<KassaTable[]>([])
   const [selected, setSelected] = useState<KassaTable | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
@@ -614,7 +603,7 @@ export default function KassaFloorPlan({
   /** Één gesture-laag: capture op canvas + hit-test (touch/desktop, alle tenants). */
   const floorGestureRef = useRef<{ pointerId: number; kind: 'table' |  'decor'; id: string } | null>(null)
   const tapStartedEmptyRef = useRef(false)
-  /** Pauzeer localStorage-sync van tables tijdens eender welke vloer-interactie (zoals voorheen isDragging). */
+  /** Pauzeer Supabase-sync van tables tijdens vloer-interactie (zoals voorheen isDragging). */
   const floorPersistPausedRef = useRef(false)
 
   const setBodyGrabbing = (on: boolean) => {
@@ -747,7 +736,6 @@ export default function KassaFloorPlan({
       if (parsed === null) return false
       const fixed = sanitizeTables(parsed)
       setTables(fixed)
-      localStorage.setItem(storageKey, JSON.stringify(fixed))
       if (JSON.stringify(fixed) !== JSON.stringify(parsed)) {
         persistFloorPlanTablesToBackend(fixed)
       }
@@ -755,18 +743,6 @@ export default function KassaFloorPlan({
     }
 
     const load = async () => {
-      const localTables = (() => {
-        try {
-          const r = localStorage.getItem(storageKey)
-          return r ? JSON.parse(r) : null
-        } catch {
-          return null
-        }
-      })()
-      if (Array.isArray(localTables)) {
-        setTables(sanitizeTables(localTables as KassaTable[]))
-      }
-
       const adminRes = await adminDb.select<{ data?: unknown } | null>('floor_plan_tables', {
         tenantSlug: tenant,
         select: 'data',
@@ -794,31 +770,6 @@ export default function KassaFloorPlan({
         }
       }
 
-      const localDecor = (() => {
-        try {
-          const r = localStorage.getItem(decorKey)
-          return r ? JSON.parse(r) : null
-        } catch {
-          return null
-        }
-      })()
-      const localStoolStatus = (() => {
-        try {
-          const r = localStorage.getItem(stoolStatusKey)
-          return r ? JSON.parse(r) : null
-        } catch {
-          return null
-        }
-      })()
-      if (localDecor) {
-        const fixedD = sanitizeDecors(localDecor as DecorItem[])
-        setDecors(fixedD)
-        if (JSON.stringify(fixedD) !== JSON.stringify(localDecor)) {
-          localStorage.setItem(decorKey, JSON.stringify(fixedD))
-        }
-        if (localStoolStatus && typeof localStoolStatus === 'object') setStoolStatuses(localStoolStatus)
-      }
-
       const { data: dData, error: dErr } = await supabase
         .from('floor_plan_decor')
         .select('data')
@@ -831,12 +782,10 @@ export default function KassaFloorPlan({
         const fixedItems = sanitizeDecors(items)
         setDecors(fixedItems)
         setStoolStatuses(statuses)
-        localStorage.setItem(decorKey, JSON.stringify(fixedItems))
-        localStorage.setItem(stoolStatusKey, JSON.stringify(statuses))
       }
     }
     void load()
-  }, [tenant, planZone, storageKey, decorKey, stoolStatusKey, persistFloorPlanTablesToBackend])
+  }, [tenant, planZone, persistFloorPlanTablesToBackend])
 
   // ── Realtime subscriptions: sync tussen apparaten ────────────────────────
   useEffect(() => {
@@ -855,7 +804,6 @@ export default function KassaFloorPlan({
           if (!z || z !== planZone) return
           if (payload.eventType === 'DELETE') {
             setTables([])
-            localStorage.setItem(storageKey, JSON.stringify([]))
             return
           }
           const newRow = payload.new
@@ -864,7 +812,6 @@ export default function KassaFloorPlan({
           if (parsed === null) return
           const fixed = sanitizeTables(parsed)
           setTables(fixed)
-          localStorage.setItem(storageKey, JSON.stringify(fixed))
         }
       )
       .subscribe()
@@ -885,8 +832,6 @@ export default function KassaFloorPlan({
           if (payload.eventType === 'DELETE') {
             setDecors([])
             setStoolStatuses({})
-            localStorage.setItem(decorKey, JSON.stringify([]))
-            localStorage.setItem(stoolStatusKey, JSON.stringify({}))
             return
           }
           const ins = payload.new
@@ -895,8 +840,6 @@ export default function KassaFloorPlan({
             const fixedItems = sanitizeDecors(items)
             setDecors(fixedItems)
             setStoolStatuses(statuses)
-            localStorage.setItem(decorKey, JSON.stringify(fixedItems))
-            localStorage.setItem(stoolStatusKey, JSON.stringify(statuses))
           }
         }
       )
@@ -906,7 +849,7 @@ export default function KassaFloorPlan({
       void supabase.removeChannel(tableChannel).catch(() => {})
       void supabase.removeChannel(decorChannel).catch(() => {})
     }
-  }, [tenant, planZone, storageKey, decorKey, stoolStatusKey])
+  }, [tenant, planZone])
 
   useEffect(() => {
     if (selectedDecor?.type === 'bar_segment') {
@@ -914,31 +857,26 @@ export default function KassaFloorPlan({
     }
   }, [selectedDecor])
 
-  // Veiligheidsnet voor iPad: sla posities altijd op na elke drag
+  // Veiligheidsnet voor iPad: sla posities op naar Supabase na drag (geen localStorage)
   useEffect(() => {
     if (tables.length > 0 && !floorPersistPausedRef.current) {
-      localStorage.setItem(storageKey, JSON.stringify(tables))
+      persistFloorPlanTablesToBackend(tables)
     }
-  }, [tables, storageKey])
+  }, [tables, persistFloorPlanTablesToBackend])
 
   const save = (updated: KassaTable[]) => {
     setTables(updated)
-    localStorage.setItem(storageKey, JSON.stringify(updated))
     persistFloorPlanTablesToBackend(updated)
   }
 
-  // Sla decor + huidige krukstatussen samen op (één Supabase-rij, backward-compatible)
   const saveDecor = (updated: DecorItem[], currentStoolStatuses?: Record<string, TableStatus>) => {
     setDecors(updated)
-    localStorage.setItem(decorKey, JSON.stringify(updated))
     const payload = { items: updated, stool_statuses: currentStoolStatuses ?? stoolStatuses }
     persistFloorPlanDecorToBackend(payload)
   }
 
-  // Sla krukstatus op + sync naar Supabase zodat andere apparaten het zien
   const saveStoolStatus = (updated: Record<string, TableStatus>) => {
     setStoolStatuses(updated)
-    localStorage.setItem(stoolStatusKey, JSON.stringify(updated))
     const payload = { items: decors, stool_statuses: updated }
     persistFloorPlanDecorToBackend(payload)
   }
@@ -1285,7 +1223,6 @@ export default function KassaFloorPlan({
       if (draggingType.current === 'table' && id) {
         setTables((latest) => {
           const next = latest.map((t) => (t.id === id ? { ...t, x: pct.x, y: pct.y } : t))
-          localStorage.setItem(storageKey, JSON.stringify(next))
           persistFloorPlanTablesToBackend(next)
           return next
         })
@@ -1294,7 +1231,6 @@ export default function KassaFloorPlan({
         setDecors((latestDecors) => {
           const next = latestDecors.map((d) => (d.id === id ? { ...d, x: pct.x, y: pct.y } : d))
           const payload = { items: next, stool_statuses: stoolStatuses }
-          localStorage.setItem(decorKey, JSON.stringify(next))
           persistFloorPlanDecorToBackend(payload)
           return next
         })

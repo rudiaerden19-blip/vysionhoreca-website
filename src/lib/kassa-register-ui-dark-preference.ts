@@ -1,36 +1,24 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { fetchKassaPosState, patchKassaPosState } from '@/lib/kassa-pos-state-client'
 
 export const KASSA_UI_DARK_EVENT = 'vysion:kassa-ui-dark-change'
 
-/** Donker/licht-toggle in kassa-titelbalk (per tenant, localStorage). */
+/** Donker/licht-toggle in kassa-titelbalk — opgeslagen in Supabase `kassa_pos_state`. */
 export const KASSA_UI_APPEARANCE_TOGGLE_ENABLED = true
 
-export function kassaUiDarkStorageKey(tenantSlug: string): string {
-  return `vysion:kassa-pro-dark:v1:${tenantSlug}`
+export function kassaUiDarkStorageKey(_tenantSlug: string): string {
+  return ''
 }
 
-export function readKassaUiDarkPreference(tenantSlug: string): boolean {
-  if (!KASSA_UI_APPEARANCE_TOGGLE_ENABLED) return true
-  if (typeof window === 'undefined') return true
-  try {
-    const stored = window.localStorage.getItem(kassaUiDarkStorageKey(tenantSlug))
-    if (stored === null) return true
-    return stored === '1'
-  } catch {
-    return true
-  }
+export function readKassaUiDarkPreference(_tenantSlug: string): boolean {
+  return true
 }
 
-/** Zelfde-tab + andere tabs/apparaten luisteren op event / storage */
 export function writeKassaUiDarkPreference(tenantSlug: string, dark: boolean): void {
   if (typeof window === 'undefined') return
-  try {
-    window.localStorage.setItem(kassaUiDarkStorageKey(tenantSlug), dark ? '1': '0')
-  } catch {
-    /* private mode etc. */
-  }
+  void patchKassaPosState(tenantSlug, { kassa_ui_dark: dark })
   try {
     window.dispatchEvent(
       new CustomEvent(KASSA_UI_DARK_EVENT, { detail: { tenantSlug, dark } }),
@@ -42,21 +30,32 @@ export function writeKassaUiDarkPreference(tenantSlug: string, dark: boolean): v
 
 type DarkChangeDetail = { tenantSlug?: string; dark?: boolean }
 
-/**
- * Gedeelde donkere modus voor kassa (per tenant, per browser).
- * Werkt over admin-layout en volledig scherm /kassa heen via localStorage + CustomEvent.
- */
 export function useKassaUiDarkSync(tenantSlug: string): {
   dark: boolean
   setDark: (next: boolean) => void
   toggle: () => void
 } {
-  const [dark, setDarkState] = useState(() =>
-    typeof window === 'undefined'? true : readKassaUiDarkPreference(tenantSlug),
-  )
+  const [dark, setDarkState] = useState(true)
+  const [hydrated, setHydrated] = useState(false)
 
   useEffect(() => {
-    setDarkState(readKassaUiDarkPreference(tenantSlug))
+    let cancelled = false
+    void fetchKassaPosState(tenantSlug).then((state) => {
+      if (cancelled) return
+      if (typeof state.kassa_ui_dark === 'boolean') {
+        setDarkState(state.kassa_ui_dark)
+      } else {
+        setDarkState(true)
+      }
+      setHydrated(true)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [tenantSlug])
+
+  useEffect(() => {
+    if (!hydrated) return
 
     const onCustom = (e: Event) => {
       const ce = e as CustomEvent<DarkChangeDetail>
@@ -64,18 +63,9 @@ export function useKassaUiDarkSync(tenantSlug: string): {
       if (typeof ce.detail.dark === 'boolean') setDarkState(ce.detail.dark)
     }
 
-    const onStorage = (ev: StorageEvent) => {
-      if (ev.key !== kassaUiDarkStorageKey(tenantSlug)) return
-      setDarkState(readKassaUiDarkPreference(tenantSlug))
-    }
-
     window.addEventListener(KASSA_UI_DARK_EVENT, onCustom as EventListener)
-    window.addEventListener('storage', onStorage)
-    return () => {
-      window.removeEventListener(KASSA_UI_DARK_EVENT, onCustom as EventListener)
-      window.removeEventListener('storage', onStorage)
-    }
-  }, [tenantSlug])
+    return () => window.removeEventListener(KASSA_UI_DARK_EVENT, onCustom as EventListener)
+  }, [tenantSlug, hydrated])
 
   const setDark = useCallback(
     (next: boolean) => {
@@ -86,10 +76,8 @@ export function useKassaUiDarkSync(tenantSlug: string): {
   )
 
   const toggle = useCallback(() => {
-    const next = !readKassaUiDarkPreference(tenantSlug)
-    writeKassaUiDarkPreference(tenantSlug, next)
-    setDarkState(next)
-  }, [tenantSlug])
+    setDark(!dark)
+  }, [dark, setDark])
 
   return { dark, setDark, toggle }
 }

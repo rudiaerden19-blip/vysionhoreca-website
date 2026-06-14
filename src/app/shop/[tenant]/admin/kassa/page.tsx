@@ -143,14 +143,19 @@ import { kassaReceiptTableNumber } from '@/lib/kassa-cart-types'
 import { mergeCartLinesForTable } from '@/lib/kassa-table-cart-merge'
 import {
   computeBarBonDelta,
+  hydrateBarBonWatermarksFromStore,
   loadBarBonWatermarks,
   removeBarBonWatermarkSlot,
   saveBarBonWatermarks,
 } from '@/lib/kassa-bar-bon-watermark'
 import {
+  loadKassaActiveStaffFromServer,
+  persistKassaActiveStaffToServer,
+} from '@/lib/kassa-active-staff-preference'
+import { fetchKassaPosState, purgeLegacyKassaLocalStorage } from '@/lib/kassa-pos-state-client'
+import {
   flushOfflineOrdersToSupabase,
   mergeOfflineOrderQueues,
-  offlineOrdersQueueStorageKey,
 } from '@/lib/kassa-offline-order-queue'
 import { isWebshopChannelNewOrder } from '@/lib/admin-api-order-helpers'
 import { useKassaOfflineFlushBridge } from '@/lib/use-kassa-offline-flush-bridge'
@@ -167,10 +172,8 @@ import {
   displayNumbersWithOpenOrdersInZone,
   FLOOR_PLAN_ZONE_INSIDE,
   FLOOR_PLAN_ZONE_TERRACE,
-  floorPlanTablesLocalStorageKey,
   floorPlanZoneFromRealtimePayload,
   KASSA_FLOOR_ZONES,
-  migrateLegacyTableOrdersKeys,
   normalizeFloorPlanZone,
   reconcileFloorPlanTablesWithOpenOrders,
   tableOrderMapKey,
@@ -200,11 +203,6 @@ import {
   normalizeCategoryVatPercent,
 } from '@/lib/order-vat'
 import { sortKassaCartLinesByMenuCategory } from '@/lib/kassa-cart-grouping'
-import {
-  isLomiChillplayKassaTenant,
-  kassaSidebarShowsLegacyParkedHeaderBlock,
-  kassaSidebarShowsOrderPanel,
-} from '@/lib/tenant-kassa-owner-overrides'
 
 /** Tik-feedback ná paint — zwakkere touch-terminals blijven UI-updates beter bijbenen */
 function scheduleKassaTapSound(play: () => void) {
@@ -399,6 +397,41 @@ function stoolsFromFloorDecorPayload(data: unknown): { stoolNumber: string; segm
     if (d.stool2) out.push({ stoolNumber: d.stool2, segmentId: sid })
   }
   return out
+}
+
+async function clearStoolStatusOnFloorDecor(
+  tenantSlug: string,
+  zone: FloorPlanZone,
+  slotNr: string,
+): Promise<void> {
+  const { data, error } = await supabase
+    .from('floor_plan_decor')
+    .select('data')
+    .eq('tenant_slug', tenantSlug)
+    .eq('plan_zone', zone)
+    .maybeSingle()
+  if (error || data?.data == null) return
+  const raw = data.data
+  let items: unknown[] = []
+  let statuses: Record<string, string> = {}
+  if (Array.isArray(raw)) {
+    items = raw
+  } else if (raw && typeof raw === 'object') {
+    const o = raw as { items?: unknown[]; stool_statuses?: Record<string, string> }
+    items = o.items ?? []
+    statuses = { ...(o.stool_statuses ?? {}) }
+  }
+  if (!statuses[slotNr]) return
+  delete statuses[slotNr]
+  void adminDb.upsert(
+    'floor_plan_decor',
+    {
+      tenant_slug: tenantSlug,
+      plan_zone: zone,
+      data: { items, stool_statuses: statuses },
+    } as Record<string, unknown>,
+    { tenantSlug: tenantSlug, onConflict: 'tenant_slug,plan_zone' },
+  )
 }
 
 /** Open kassa-tafelorders: alleen rijen uit Supabase — geen merge met oude localStorage. */
@@ -820,7 +853,6 @@ const KASSA_DRAFT_RECEIPT_COOLDOWN_MS = 450
 
 function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const tenant = params.tenant
-  const offlineQueueKey = offlineOrdersQueueStorageKey(tenant)
   const router = useRouter()
   const searchParams = useSearchParams()
   const demoFromUrl =
@@ -1433,11 +1465,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           return prev
         }
       }
-      localStorage.setItem(floorPlanTablesLocalStorageKey(tenant, zone), JSON.stringify(fixed))
       return { ...prev, [zone]: fixed }
     })
     return true
   }, [tenant])
+
   const [kassaStoolsByZone, setKassaStoolsByZone] = useState<
     Record<FloorPlanZone, { stoolNumber: string; segmentId: string }[]>
   >({
@@ -1448,26 +1480,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [tenantInfo, setTenantInfo] = useState<TenantSettings | null>(null)
 
   useEffect(() => {
-    const cacheKeySettings = `vysion_settings_${tenant}`
-    const cachedSettings = localStorage.getItem(cacheKeySettings)
-    if (cachedSettings) {
-      try {
-        setTenantInfo(JSON.parse(cachedSettings))
-      } catch {
-        /* ignore */
-      }
-    }
     getTenantSettings(tenant)
       .then((s) => {
         setTenantInfo(s)
-        try {
-          localStorage.setItem(cacheKeySettings, JSON.stringify(s))
-        } catch {
-          /* ignore */
-        }
       })
       .catch(() => {
-        /* offline: cache suffices */
+        /* offline: geen cache — volgende online load */
       })
   }, [tenant])
 
@@ -1496,7 +1514,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     tableOrdersRef.current = tableOrders
   }, [tableOrders])
 
-  const tableOrdersKey = `vysion_table_orders_${tenant}`
   const persistTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
   /** Één persist tegelijk per tafel-slot: voorkomt dat DELETE/INSERT door elkaar lopen (keuken ziet dan niets). */
   const openOrderPersistChainRef = useRef<Record<string, Promise<void>>>({})
@@ -1520,14 +1537,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           if (!changed) continue
           if (!next) next = { ...prev }
           next[zone] = reconciled
-          try {
-            localStorage.setItem(
-              floorPlanTablesLocalStorageKey(tenant, zone),
-              JSON.stringify(reconciled),
-            )
-          } catch {
-            /* empty */
-          }
           void adminDb.upsert(
             'floor_plan_tables',
             { tenant_slug: tenant, plan_zone: zone, data: reconciled } as any,
@@ -1542,14 +1551,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const applyOpenOrdersFromServerRows = useCallback((rows: OpenTableOrderRow[] | null) => {
     if (rows === null) {
-      const ordersRaw = localStorage.getItem(tableOrdersKey)
-      if (ordersRaw) {
-        try {
-          setTableOrders(migrateLegacyTableOrdersKeys(JSON.parse(ordersRaw)))
-        } catch {
-          /* empty */
-        }
-      }
       return
     }
     const fromServer = buildOpenTableOrdersMapFromRows(rows)
@@ -1559,11 +1560,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     ])
     setTableOrders((prev) => {
       const merged = mergeOpenTableOrdersServerWithPendingLocal(prev, fromServer, pendingLocal)
-      localStorage.setItem(tableOrdersKey, JSON.stringify(merged))
       queueMicrotask(() => syncFloorPlanStatusesFromOpenOrders(merged))
       return merged
     })
-  }, [tableOrdersKey, syncFloorPlanStatusesFromOpenOrders])
+  }, [syncFloorPlanStatusesFromOpenOrders])
 
   useEffect(() => {
     return () => {
@@ -1640,22 +1640,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
   }, [selectedCategory, menuLoading, kassaSxgaDenseTiles])
 
-  // Laad tafels + barkrukken + openstaande bestellingen (localStorage + Supabase sync)
+  // Laad tafels + barkrukken + openstaande bestellingen (Supabase)
 
   useEffect(() => {
     if (kassaFloorPlanEnabled) {
-      for (const zone of KASSA_FLOOR_ZONES) {
-        const lsRaw = localStorage.getItem(floorPlanTablesLocalStorageKey(tenant, zone))
-        if (lsRaw) {
-          try {
-            const parsed = JSON.parse(lsRaw)
-            if (Array.isArray(parsed)) setKassaTablesByZone((p) => ({ ...p, [zone]: parsed }))
-          } catch {
-            /* empty */
-          }
-        }
-      }
-
       void (async () => {
         for (const zone of KASSA_FLOOR_ZONES) {
           const adminRes = await adminDb.select<{ data?: unknown } | null>('floor_plan_tables', {
@@ -1711,7 +1699,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     // tableOrders met een lege DB-snapshot vóór persist klaar was.
   }, [
     tenant,
-    tableOrdersKey,
     kassaFloorPlanEnabled,
     applyOpenOrdersFromServerRows,
     applyKassaFloorPlanTablesPayload,
@@ -2084,30 +2071,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const updateTableStatus = (tblNr: string, occupied: boolean, zone: FloorPlanZone) => {
     const nr = String(tblNr)
     const newStatus = occupied ? 'OCCUPIED': 'FREE'
-    const lsKey = floorPlanTablesLocalStorageKey(tenant, zone)
     setKassaTablesByZone((prev) => {
       const zoneTables = prev[zone]
       if (!zoneTables.length) return prev
-      let tbls: FloorPlanTable[] = zoneTables
-      const tablesRaw = localStorage.getItem(lsKey)
-      if (tablesRaw) {
-        try {
-          tbls = JSON.parse(tablesRaw) as FloorPlanTable[]
-        } catch {
-          tbls = zoneTables
-        }
-      }
-      const updatedTbls = tbls.map((t) =>
+      const updatedTbls = zoneTables.map((t) =>
         String(t.number) === nr ? { ...t, status: newStatus } : t,
       )
       const prior = zoneTables.find((t) => String(t.number) === nr)
       if (prior?.status === newStatus && updatedTbls.every((t, i) => t.status === zoneTables[i]?.status)) {
         return prev
-      }
-      try {
-        localStorage.setItem(lsKey, JSON.stringify(updatedTbls))
-      } catch {
-        /* empty */
       }
       void adminDb.upsert(
         'floor_plan_tables',
@@ -2130,7 +2102,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     setTableOrders((prev) => {
       const updated = { ...prev, [slotKey]: items }
-      localStorage.setItem(tableOrdersKey, JSON.stringify(updated))
       return updated
     })
     updateTableStatus(tblNr, items.length > 0, zone)
@@ -2168,7 +2139,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       setTableOrders((prev) => {
         const merged = mergeCartLinesForTable(prev[oldSlot] || [], cart)
         const next = { ...prev, [oldSlot]: merged }
-        localStorage.setItem(tableOrdersKey, JSON.stringify(next))
         updateTableStatus(oldTbl, merged.length > 0, oldZone)
         schedulePersistOpenOrder(oldZone, oldTbl, merged)
         return next
@@ -2198,11 +2168,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const merged = mergeCartLinesForTable(tableOrdersRef.current[slotKey] || [], itemsToPark)
     const next: Record<string, CartItem[]> = { ...tableOrdersRef.current, [slotKey]: merged }
     tableOrdersRef.current = next
-    try {
-      localStorage.setItem(tableOrdersKey, JSON.stringify(next))
-    } catch {
-      /* empty */
-    }
     cancelPersistTimer(slotKey)
     updateTableStatus(tbl, merged.length > 0, zone)
     flushSync(() => {
@@ -2283,7 +2248,51 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   } | null>(null)
   /** Verhoog bij annuleren/sluiten zodat late API-antwoorden geen state meer zetten (busy blijft niet hangen). */
   const staffClockPinReqGen = useRef(0)
-  const [activeKassaStaff, setActiveKassaStaff] = useState<{ id: string; name: string } | null>(null)
+  const [activeKassaStaff, setActiveKassaStaffInner] = useState<{ id: string; name: string } | null>(
+    null,
+  )
+
+  const setActiveKassaStaff = useCallback(
+    (next: { id: string; name: string } | null) => {
+      setActiveKassaStaffInner(next)
+      void persistKassaActiveStaffToServer(tenant, next)
+    },
+    [tenant],
+  )
+
+  useLayoutEffect(() => {
+    purgeLegacyKassaLocalStorage(tenant)
+    void fetchKassaPosState(tenant).then((state) => {
+      hydrateBarBonWatermarksFromStore(tenant, state.bar_bon_watermarks)
+    })
+    void loadKassaActiveStaffFromServer(tenant).then((stored) => {
+      if (stored) setActiveKassaStaffInner(stored)
+    })
+  }, [tenant])
+
+  useEffect(() => {
+    if (demoViewOnly || !tenantInfo?.kassa_staff_clock_enabled || !staffClockListHydrated) return
+    if (activeKassaStaff) return
+    const clockedIn = staffClockList.filter((s) => s.hasOpenSession)
+    void (async () => {
+      const stored = await loadKassaActiveStaffFromServer(tenant)
+      if (stored && clockedIn.some((s) => s.id === stored.id)) {
+        setActiveKassaStaff(stored)
+        return
+      }
+      if (clockedIn.length === 1) {
+        setActiveKassaStaff({ id: clockedIn[0].id, name: clockedIn[0].name })
+      }
+    })()
+  }, [
+    tenant,
+    demoViewOnly,
+    tenantInfo?.kassa_staff_clock_enabled,
+    staffClockListHydrated,
+    staffClockList,
+    activeKassaStaff,
+    setActiveKassaStaff,
+  ])
 
   // Opties modal (editingCartKey = bestaande winkelmandregel aanpassen)
   const [optionsModal, setOptionsModal] = useState<{
@@ -2325,18 +2334,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     if (outcome === 'accepted') { setInstallPrompt(null); setIsInstalled(true) }
   }
 
-  // ── Menu cache keys ────────────────────────────────────────────────────────
-  const CACHE_CATS = `vysion_menu_cats_${tenant}`
-  const CACHE_PRODS = `vysion_menu_prods_${tenant}`
-  const CACHE_OPTS = `vysion_menu_opts_${tenant}`
-
-  // Laad categorieën, producten en welke producten opties hebben
-  // Offline: laad uit localStorage-cache; online: laad van Supabase en update cache
+  // ── Menu laden: IndexedDB offline snapshot + Supabase online ─────────────
   const loadMenu = useCallback(async (opts?: { silent?: boolean }) => {
     const silent = !!opts?.silent
     if (!silent) setMenuLoading(true)
 
-    // 1) IndexedDB (meest recente snapshot na eerdere sessie)
     try {
       const snap = await offlineDbLoadMenuSnapshot(tenant)
       if (snap) {
@@ -2349,22 +2351,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       /* ignore */
     }
 
-    // 2) localStorage-cache (legacy / migratie)
-    try {
-      const cachedCats = localStorage.getItem(CACHE_CATS)
-      const cachedProds = localStorage.getItem(CACHE_PRODS)
-      const cachedOpts = localStorage.getItem(CACHE_OPTS)
-      if (cachedCats && cachedProds && cachedOpts) {
-        setCategories(dedupeCatalogById(JSON.parse(cachedCats)))
-        setProducts(dedupeCatalogById(JSON.parse(cachedProds)))
-        setProductsWithOptions([...new Set(JSON.parse(cachedOpts) as string[])])
-        setMenuLoading(false)
-      }
-    } catch {
-      /* geen geldige cache */
-    }
-
-    // 3) Supabase (online refresh)
     try {
       const [cats, prods, withOpts] = await Promise.all([
         getMenuCategories(tenant),
@@ -2379,19 +2365,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       const catsJson = JSON.stringify(activeCats)
       const prodsJson = JSON.stringify(activeProds)
       const optsJson = JSON.stringify(withOpts)
-      localStorage.setItem(CACHE_CATS, catsJson)
-      localStorage.setItem(CACHE_PRODS, prodsJson)
-      localStorage.setItem(CACHE_OPTS, optsJson)
       void offlineDbSaveMenuSnapshot(tenant, {
         categoriesJson: catsJson,
         productsJson: prodsJson,
         productsWithOptionsJson: optsJson,
       })
     } catch {
-      // Netwerkfout – cache hierboven is voldoende
+      // Netwerkfout – IndexedDB snapshot hierboven is voldoende
     }
     setMenuLoading(false)
-  }, [tenant, CACHE_CATS, CACHE_PRODS, CACHE_OPTS])
+  }, [tenant])
 
   useEffect(() => {
     loadMenu()
@@ -2701,7 +2684,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           : lines.map((i) => (i.cartKey === cartKey ? { ...i, quantity: qty } : i))
       const next = { ...prev, [activeTableSlotKey]: updated }
       tableOrdersRef.current = next
-      localStorage.setItem(tableOrdersKey, JSON.stringify(next))
       updateTableStatus(tbl, updated.length > 0, zone)
       if (updated.length === 0) {
         try {
@@ -2722,14 +2704,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return cart
   }, [activeTableSlotKey, parkedOnTableLines, cart])
 
-  const sidebarShowsOrderPanel = kassaSidebarShowsOrderPanel(tenant, cart.length, billLines.length)
-  const sidebarShowsLegacyParkedHeader = kassaSidebarShowsLegacyParkedHeaderBlock(
-    tenant,
-    showParkedTableLinesInSidebar,
-    parkedOnlySidebarView,
-    numpadPanelVisible,
-  )
-  const lomiKassaSidebar = isLomiChillplayKassaTenant(tenant)
+  const sidebarShowsOrderPanel = billLines.length > 0 || cart.length > 0
+  const sidebarShowsLegacyParkedHeader = false
 
   const total = useMemo(
     () =>
@@ -2773,8 +2749,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const onFloorPlanTablesPersisted = useCallback((zone: FloorPlanZone, tables: FloorPlanTable[]) => {
     const fixed = sanitizeFloorPlanTables(tables)
     setKassaTablesByZone((prev) => ({ ...prev, [zone]: fixed }))
-    localStorage.setItem(floorPlanTablesLocalStorageKey(tenant, zone), JSON.stringify(fixed))
-  }, [tenant])
+  }, [])
 
   const onFloorPlanTablesPersistLifecycle = useCallback((zone: FloorPlanZone, phase: 'start' |  'end') => {
     if (phase === 'start') {
@@ -3254,27 +3229,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setTableOrders((prev) => {
       const next = { ...prev }
       delete next[slotKey]
-      localStorage.setItem(tableOrdersKey, JSON.stringify(next))
       queueMicrotask(() => syncFloorPlanStatusesFromOpenOrders(next))
       return next
     })
     updateTableStatus(tblNr, false, zone)
-    const stoolStatusKey =
-      zone === FLOOR_PLAN_ZONE_INSIDE
-        ? `vysion_stool_status_${tenant}`
-        : `vysion_stool_status_terrace_${tenant}`
-    try {
-      const raw = localStorage.getItem(stoolStatusKey)
-      if (raw) {
-        const statuses = JSON.parse(raw)
-        if (statuses[tblNr]) {
-          delete statuses[tblNr]
-          localStorage.setItem(stoolStatusKey, JSON.stringify(statuses))
-        }
-      }
-    } catch {
-      /* empty */
-    }
+    void clearStoolStatusOnFloorDecor(tenant, zone, tblNr)
     const prevChain = openOrderPersistChainRef.current[slotKey] ?? Promise.resolve()
     openOrderPersistChainRef.current[slotKey] = prevChain
       .then(() => persistOpenOrderRowToSupabaseImpl(zone, tblNr, []))
@@ -3439,7 +3398,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         ) {
           queue.push(orderPayload)
           await offlineDbSetOrderQueue(tenant, queue)
-          localStorage.setItem(offlineQueueKey, JSON.stringify(queue))
         }
         try {
           const reg = await navigator.serviceWorker?.ready
@@ -3535,7 +3493,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       draft?: boolean
       /** Alleen nieuwe regels t.o.v. vorige toogbon (tafelmand). */
       barTableDelta?: boolean
-      /** Na geslaagde print: watermerk bijwerken (localStorage per tenant). */
+      /** Na geslaagde print: watermerk bijwerken (Supabase pos_state). */
       barWatermarkCommit?: { slotKey: string; row: Record<string, number> }
       /**
        * Alleen bij draft: 1 = gele Bon-knop / toog-delta; 2 = tap op zaaknaam in header (zelfde volume als betaalde bon).
@@ -4836,7 +4794,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           )}
 
           {activeKassaStaff && !demoViewOnly && (
-            <div className="hidden max-w-[7rem] shrink-0 items-center rounded-md bg-emerald-600/90 px-1.5 py-1 text-[10px] font-bold text-white sm:flex md:max-w-[10rem] md:text-xs">
+            <div className="flex max-w-[7rem] shrink-0 items-center rounded-md bg-emerald-600/90 px-1.5 py-1 text-[10px] font-bold text-white md:max-w-[10rem] md:text-xs">
               <span className="truncate" title={activeKassaStaff.name}>
                 {activeKassaStaff.name}
               </span>
@@ -5394,10 +5352,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   kassaSidebarFooterTier === 'comfort'? 'gap-2': kassaSidebarFooterTier === 'compact'? 'gap-1.5': 'gap-1'
                 }`}
               >
-              {showParkedTableLinesInSidebar && (cart.length > 0 || lomiKassaSidebar) ? (
+              {showParkedTableLinesInSidebar && sidebarShowsOrderPanel ? (
                 <div
                   className={
-                    lomiKassaSidebar && cart.length === 0
+                    cart.length === 0
                       ? 'min-h-0 flex-1 overflow-y-auto overscroll-y-contain'
                       : 'max-h-[min(20vh,6.5rem)] shrink-0 overflow-y-auto overscroll-y-contain'
                   }
@@ -5548,10 +5506,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     {numpadHeaderDateLabel}
                   </p>
                 </div>
-              {showParkedTableLinesInSidebar && (cart.length > 0 || lomiKassaSidebar) ? (
+              {showParkedTableLinesInSidebar && sidebarShowsOrderPanel ? (
                 <div
                   className={
-                    lomiKassaSidebar && cart.length === 0
+                    cart.length === 0
                       ? 'min-h-0 flex-1 overflow-y-auto overscroll-y-contain'
                       : 'max-h-[min(20vh,6.5rem)] shrink-0 overflow-y-auto overscroll-y-contain'
                   }

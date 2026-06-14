@@ -1,4 +1,5 @@
 import type { KassaCartItem } from '@/lib/kassa-cart-types'
+import { patchKassaPosState } from '@/lib/kassa-pos-state-client'
 
 /** Zelfde logica als mandregel-id in de kassa (zonder fragiele cartKey uit JSON/sync). */
 export function kassaCartLineStableKey(line: KassaCartItem): string {
@@ -15,30 +16,19 @@ export function kassaCartLineStableKey(line: KassaCartItem): string {
 /** Per tafelsleutel (zone|tafel): laatst naar de toog gestuurde hoeveelheden per stabiele regel. */
 export type BarBonWatermarkStore = Record<string, Record<string, number>>
 
-/** v2: sleutels op product+keuzes — v1 gebruikte cartKey die na server-sync kon afwijken. */
-export function barBonWatermarkStorageKey(tenantSlug: string): string {
-  return `vysion_kassa_bar_bon_watermark_v2_${tenantSlug}`
+const watermarkByTenant: Record<string, BarBonWatermarkStore> = {}
+
+export function hydrateBarBonWatermarksFromStore(tenantSlug: string, store: BarBonWatermarkStore): void {
+  watermarkByTenant[tenantSlug] = store && typeof store === 'object' ? store : {}
 }
 
 export function loadBarBonWatermarks(tenantSlug: string): BarBonWatermarkStore {
-  if (typeof window === 'undefined') return {}
-  try {
-    const raw = localStorage.getItem(barBonWatermarkStorageKey(tenantSlug))
-    if (!raw) return {}
-    const p = JSON.parse(raw) as BarBonWatermarkStore
-    return p && typeof p === 'object'? p : {}
-  } catch {
-    return {}
-  }
+  return watermarkByTenant[tenantSlug] ?? {}
 }
 
 export function saveBarBonWatermarks(tenantSlug: string, store: BarBonWatermarkStore): void {
-  if (typeof window === 'undefined') return
-  try {
-    localStorage.setItem(barBonWatermarkStorageKey(tenantSlug), JSON.stringify(store))
-  } catch {
-    /* quota */
-  }
+  watermarkByTenant[tenantSlug] = store
+  void patchKassaPosState(tenantSlug, { bar_bon_watermarks: store })
 }
 
 export function removeBarBonWatermarkSlot(tenantSlug: string, slotKey: string): void {
@@ -48,8 +38,13 @@ export function removeBarBonWatermarkSlot(tenantSlug: string, slotKey: string): 
     delete store[slotKey]
     saveBarBonWatermarks(tenantSlug, store)
   } catch {
-    /* storage / parse — mand mag niet blokkeren */
+    /* mand mag niet blokkeren */
   }
+}
+
+/** @deprecated Alleen legacy purge — geen reads meer. */
+export function barBonWatermarkStorageKey(_tenantSlug: string): string {
+  return ''
 }
 
 /** Ruwe watermark uit storage — alleen niet-negatieve gehele hoeveelheden. */
@@ -58,7 +53,7 @@ export function sanitizeBarBonWatermark(row: Record<string, unknown> | null | un
   if (!row || typeof row !== 'object') return out
   for (const [k, v] of Object.entries(row)) {
     if (!k || typeof k !== 'string') continue
-    const n = typeof v === 'number'? v : Number(v)
+    const n = typeof v === 'number' ? v : Number(v)
     if (!Number.isFinite(n) || n < 0) continue
     out[k] = Math.min(Math.floor(n), 99999)
   }
@@ -72,7 +67,7 @@ export function filterCartLinesForBarBonWatermark(items: KassaCartItem[]): Kassa
   for (const line of items) {
     try {
       if (!line?.product || String(line.product.id ?? '').trim() === '') continue
-      const q = typeof line.quantity === 'number'? line.quantity : Number(line.quantity)
+      const q = typeof line.quantity === 'number' ? line.quantity : Number(line.quantity)
       if (!Number.isFinite(q) || q <= 0) continue
       out.push(line)
     } catch {
@@ -88,7 +83,7 @@ function quantitiesByStableKey(items: KassaCartItem[]): Record<string, number> {
   for (const i of items) {
     try {
       if (!i?.product || String(i.product.id ?? '').trim() === '') continue
-      const q = typeof i.quantity === 'number'? i.quantity : Number(i.quantity)
+      const q = typeof i.quantity === 'number' ? i.quantity : Number(i.quantity)
       if (!Number.isFinite(q) || q <= 0) continue
       const k = kassaCartLineStableKey(i)
       const add = Math.min(Math.floor(q), 99999)

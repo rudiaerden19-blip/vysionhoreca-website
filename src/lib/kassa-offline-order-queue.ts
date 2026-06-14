@@ -1,5 +1,5 @@
 /**
- * Merge IndexedDB + localStorage offline order queues and flush to Supabase (Web Locks).
+ * Offline order queue — alleen IndexedDB; flush naar Supabase (geen localStorage).
  */
 
 import {
@@ -18,37 +18,16 @@ export function offlineOrdersQueueStorageKey(tenantSlug: string): string {
 }
 
 export async function mergeOfflineOrderQueues(tenantSlug: string): Promise<object[]> {
-  const offlineQueueKey = offlineOrdersQueueStorageKey(tenantSlug)
   let fromIdb: object[] = []
   try {
     fromIdb = await offlineDbGetOrderQueue(tenantSlug)
   } catch {
     fromIdb = []
   }
-  let fromLs: object[] = []
-  const raw = localStorage.getItem(offlineQueueKey)
-  if (raw) {
-    try {
-      fromLs = JSON.parse(raw)
-    } catch {
-      fromLs = []
-    }
-  }
-  const merged = mergeOfflineOrderQueueRows(fromLs, fromIdb)
-  if (merged.length > 0) {
-    try {
-      await offlineDbSetOrderQueue(tenantSlug, merged)
-      localStorage.setItem(offlineQueueKey, JSON.stringify(merged))
-    } catch {
-      /* ignore */
-    }
-  }
-  return merged
+  return fromIdb
 }
 
 export async function flushOfflineOrdersToSupabase(tenantSlug: string): Promise<void> {
-  const offlineQueueKey = offlineOrdersQueueStorageKey(tenantSlug)
-
   const processQueue = async () => {
     const freshQueue = await mergeOfflineOrderQueues(tenantSlug)
     if (freshQueue.length === 0) return
@@ -75,14 +54,13 @@ export async function flushOfflineOrdersToSupabase(tenantSlug: string): Promise<
     }
     try {
       await offlineDbSetOrderQueue(tenantSlug, remaining)
-      localStorage.setItem(offlineQueueKey, JSON.stringify(remaining))
     } catch {
       /* ignore */
     }
   }
 
   try {
-    if ('locks'in navigator) {
+    if ('locks' in navigator) {
       await (navigator as Navigator & { locks: LockManager }).locks.request(
         `vysion_queue_${tenantSlug}`,
         processQueue,

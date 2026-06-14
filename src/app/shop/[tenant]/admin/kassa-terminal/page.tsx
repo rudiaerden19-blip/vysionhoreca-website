@@ -31,17 +31,6 @@ export default function KassaTerminalSettingsPage({ params }: { params: { tenant
     }
   }, [tenant])
 
-  const persistLocalSettingsCache = (enabled: boolean) => {
-    try {
-      const key = `vysion_settings_${tenant}`
-      const raw = localStorage.getItem(key)
-      const prev = raw ? (JSON.parse(raw) as Record<string, unknown>) : {}
-      localStorage.setItem(key, JSON.stringify({ ...prev, kassa_floor_plan_enabled: enabled }))
-    } catch {
-      /* ignore */
-    }
-  }
-
   const toggleFloorPlan = async (next: boolean) => {
     setSaving(true)
     setSaveError(null)
@@ -52,7 +41,6 @@ export default function KassaTerminalSettingsPage({ params }: { params: { tenant
       return
     }
     setFloorPlanOn(next)
-    persistLocalSettingsCache(next)
     setSavedFlash(true)
     window.setTimeout(() => setSavedFlash(false), 2000)
   }
