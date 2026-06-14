@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
@@ -46,6 +47,50 @@ export default function MediaPicker({
   
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
+  const anchorRef = useRef<HTMLDivElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
+  const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null)
+  const [resolvedPlacement, setResolvedPlacement] = useState<'below' | 'above'>(optionsPlacement)
+
+  const updateOptionsMenuPosition = useCallback(() => {
+    const anchor = anchorRef.current
+    if (!anchor) return
+    const rect = anchor.getBoundingClientRect()
+    const gap = 8
+    const menuHeight = menuRef.current?.offsetHeight ?? 240
+    const spaceBelow = window.innerHeight - rect.bottom - gap
+    const spaceAbove = rect.top - gap
+    let placement: 'below' | 'above' = optionsPlacement
+    if (placement === 'below' && spaceBelow < menuHeight && spaceAbove >= menuHeight) {
+      placement = 'above'
+    } else if (placement === 'above' && spaceAbove < menuHeight && spaceBelow >= menuHeight) {
+      placement = 'below'
+    } else if (placement === 'below' && spaceBelow < menuHeight && spaceAbove < menuHeight) {
+      placement = spaceBelow >= spaceAbove ? 'below' : 'above'
+    }
+    setResolvedPlacement(placement)
+    const top =
+      placement === 'above'
+        ? Math.max(gap, rect.top - menuHeight - gap)
+        : Math.min(window.innerHeight - gap - menuHeight, rect.bottom + gap)
+    setMenuPos({ top, left: Math.max(gap, Math.min(rect.left, window.innerWidth - 240 - gap)) })
+  }, [optionsPlacement])
+
+  useLayoutEffect(() => {
+    if (!showOptions || uploading) {
+      setMenuPos(null)
+      return
+    }
+    updateOptionsMenuPosition()
+    const raf = requestAnimationFrame(() => updateOptionsMenuPosition())
+    window.addEventListener('resize', updateOptionsMenuPosition)
+    window.addEventListener('scroll', updateOptionsMenuPosition, true)
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener('resize', updateOptionsMenuPosition)
+      window.removeEventListener('scroll', updateOptionsMenuPosition, true)
+    }
+  }, [showOptions, uploading, updateOptionsMenuPosition])
 
   const loadMedia = useCallback(async () => {
     setLoading(true)
@@ -319,7 +364,7 @@ export default function MediaPicker({
       
       {/* Current Image Preview — stack actions under thumbnail (avoids overlap in narrow rows) */}
       <div className="inline-flex max-w-full flex-col items-start gap-2">
-        <div className="relative shrink-0">
+        <div className="relative shrink-0" ref={anchorRef}>
           <div 
             onClick={() => setShowOptions(!showOptions)}
             className={`relative w-32 h-32 border-2 border-dashed rounded-xl flex items-center justify-center cursor-pointer transition-colors overflow-hidden bg-gray-50 ${
@@ -344,82 +389,6 @@ export default function MediaPicker({
               </div>
             )}
           </div>
-          
-          {/* Options Dropdown - opent ONDER het foto venster */}
-          <AnimatePresence>
-            {showOptions && !uploading && (
-              <motion.div
-                initial={{ opacity: 0, y: optionsPlacement === 'above' ? 10 : -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: optionsPlacement === 'above' ? 10 : -10 }}
-                className={`absolute left-0 bg-white rounded-xl shadow-xl border z-[120] overflow-hidden min-w-[220px] ${
-                  optionsPlacement === 'above' ? 'bottom-full mb-2' : 'top-full mt-2'
-                }`}
-              >
-                {/* Upload from computer/device */}
-                <button
-                  onClick={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    setShowOptions(false)
-                    setErrorMessage(null)
-                    setTimeout(() => {
-                      if (fileInputRef.current) {
-                        fileInputRef.current.value = ''
-                        fileInputRef.current.click()
-                      }
-                    }, 200)
-                  }}
-                  className="w-full px-4 py-3 text-left hover:bg-gray-50 active:bg-gray-100 flex items-center gap-3 transition-colors"
-                >
-                  <span className="text-xl"></span>
-                  <div>
-                    <p className="font-medium text-gray-900">{t('mediaPicker.pickFromFilesTitle')}</p>
-                    <p className="text-xs text-gray-500">{t('mediaPicker.pickFromFilesSubtitle')}</p>
-                  </div>
-                </button>
-                
-                {/* Take photo with camera */}
-                <button
-                  onClick={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    setShowOptions(false)
-                    setErrorMessage(null)
-                    // Langere delay voor iOS
-                    setTimeout(() => {
-                      if (cameraInputRef.current) {
-                        cameraInputRef.current.value = ''
-                        cameraInputRef.current.click()
-                      }
-                    }, 200)
-                  }}
-                  className="w-full px-4 py-3 text-left hover:bg-gray-50 active:bg-gray-100 flex items-center gap-3 transition-colors border-t"
-                >
-                  <span className="text-xl"></span>
-                  <div>
-                    <p className="font-medium text-gray-900">{t('mediaPicker.takePhotoTitle')}</p>
-                    <p className="text-xs text-gray-500">{t('mediaPicker.takePhotoSubtitle')}</p>
-                  </div>
-                </button>
-                
-                {/* Choose from library */}
-                <button
-                  onClick={() => {
-                    setShowOptions(false)
-                    setIsOpen(true)
-                  }}
-                  className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 transition-colors border-t"
-                >
-                  <span className="text-xl"></span>
-                  <div>
-                    <p className="font-medium text-gray-900">{t('mediaPicker.fromLibraryTitle')}</p>
-                    <p className="text-xs text-gray-500">{t('mediaPicker.fromLibrarySubtitle')}</p>
-                  </div>
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
 
         {value ? (
@@ -446,15 +415,94 @@ export default function MediaPicker({
           </div>
         ) : null}
       </div>
-      
-      {/* Click outside to close options */}
-      {showOptions && (
-        <div 
-          className="fixed inset-0 z-40" 
-          onClick={() => setShowOptions(false)}
-        />
-      )}
 
+      {typeof document !== 'undefined' &&
+        showOptions &&
+        !uploading &&
+        createPortal(
+          <>
+            <div className="fixed inset-0 z-[115]" aria-hidden onClick={() => setShowOptions(false)} />
+            <AnimatePresence>
+              <motion.div
+                ref={menuRef}
+                role="menu"
+                initial={{ opacity: 0, y: resolvedPlacement === 'above' ? 8 : -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: resolvedPlacement === 'above' ? 8 : -8 }}
+                className="fixed z-[120] bg-white rounded-xl shadow-xl border overflow-hidden min-w-[220px] max-w-[min(100vw-1rem,280px)]"
+                style={{
+                  top: menuPos?.top ?? 0,
+                  left: menuPos?.left ?? 0,
+                  visibility: menuPos ? 'visible' : 'hidden',
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setShowOptions(false)
+                    setErrorMessage(null)
+                    setTimeout(() => {
+                      if (fileInputRef.current) {
+                        fileInputRef.current.value = ''
+                        fileInputRef.current.click()
+                      }
+                    }, 200)
+                  }}
+                  className="w-full px-4 py-3 text-left hover:bg-gray-50 active:bg-gray-100 flex items-center gap-3 transition-colors"
+                >
+                  <span className="text-xl"></span>
+                  <div>
+                    <p className="font-medium text-gray-900">{t('mediaPicker.pickFromFilesTitle')}</p>
+                    <p className="text-xs text-gray-500">{t('mediaPicker.pickFromFilesSubtitle')}</p>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setShowOptions(false)
+                    setErrorMessage(null)
+                    setTimeout(() => {
+                      if (cameraInputRef.current) {
+                        cameraInputRef.current.value = ''
+                        cameraInputRef.current.click()
+                      }
+                    }, 200)
+                  }}
+                  className="w-full px-4 py-3 text-left hover:bg-gray-50 active:bg-gray-100 flex items-center gap-3 transition-colors border-t"
+                >
+                  <span className="text-xl"></span>
+                  <div>
+                    <p className="font-medium text-gray-900">{t('mediaPicker.takePhotoTitle')}</p>
+                    <p className="text-xs text-gray-500">{t('mediaPicker.takePhotoSubtitle')}</p>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    setShowOptions(false)
+                    setIsOpen(true)
+                  }}
+                  className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 transition-colors border-t"
+                >
+                  <span className="text-xl"></span>
+                  <div>
+                    <p className="font-medium text-gray-900">{t('mediaPicker.fromLibraryTitle')}</p>
+                    <p className="text-xs text-gray-500">{t('mediaPicker.fromLibrarySubtitle')}</p>
+                  </div>
+                </button>
+              </motion.div>
+            </AnimatePresence>
+          </>,
+          document.body,
+        )}
       {/* Media Library Modal */}
       <AnimatePresence>
         {isOpen && (

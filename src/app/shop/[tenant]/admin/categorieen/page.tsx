@@ -456,7 +456,7 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
           <Reorder.Group
             values={categories}
             onReorder={setCategories}
-            className="divide-y divide-gray-100 touch-pan-y overflow-hidden rounded-b-2xl"
+            className="divide-y divide-gray-100 touch-pan-y overflow-visible rounded-b-2xl"
           >
             {categories.map((category, index) => (
               <CategoryReorderRow
