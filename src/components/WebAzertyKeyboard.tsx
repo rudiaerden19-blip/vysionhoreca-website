@@ -492,8 +492,9 @@ export function WebAzertyKeyboard() {
   const [letterLayout, setLetterLayout] = useState<KeyboardLetterLayout>('azerty')
   const panelRef = useRef<HTMLDivElement>(null)
   const blurCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  /** Sluiten-knop: modal-blur mag veld niet opnieuw focussen (andere open het toetsenbord terug). */
+  /** Gebruiker tikte Sluiten — geen programmatic refocus tot volgende tik op een veld. */
   const userDismissedKbRef = useRef(false)
+  const targetRefocusRafRef = useRef<number | null>(null)
   const dragSessionRef = useRef<{
     pointerId: number
     startClientX: number
@@ -606,7 +607,7 @@ export function WebAzertyKeyboard() {
     (ev: FocusEvent) => {
       const tEl = ev.target
       if (!isEligibleField(tEl, pathname)) return
-      userDismissedKbRef.current = false
+      if (userDismissedKbRef.current) return
       clearBlurCloseTimer()
       setTarget(tEl)
       setCaps(false)
@@ -626,6 +627,7 @@ export function WebAzertyKeyboard() {
       if (ev.pointerType === 'mouse' && ev.button !== 0) return
       const el = ev.target
       if (!isEligibleField(el, pathname)) return
+      userDismissedKbRef.current = false
       if (document.activeElement === el) return
       try {
         el.focus({ preventScroll: false })
@@ -642,6 +644,10 @@ export function WebAzertyKeyboard() {
       clearBlurCloseTimer()
       blurCloseTimerRef.current = setTimeout(() => {
         blurCloseTimerRef.current = null
+        if (userDismissedKbRef.current) {
+          setTarget(null)
+          return
+        }
         const active = document.activeElement
         if (active instanceof HTMLElement && panelRef.current?.contains(active)) return
         if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) {
@@ -651,45 +657,7 @@ export function WebAzertyKeyboard() {
       }, 280)
     }
 
-    const onBlur = (ev: FocusEvent) => {
-      const related = ev.relatedTarget
-      if (related instanceof HTMLElement && panelRef.current?.contains(related)) return
-
-      const from = ev.target
-      if (
-        from instanceof HTMLElement &&
-        isEligibleField(from, pathname) &&
-        (isInAdminModal(from) || isInKbScrollHostField(from))
-      ) {
-        clearBlurCloseTimer()
-        if (userDismissedKbRef.current) {
-          setTarget(null)
-          return
-        }
-        const field = from as HTMLInputElement | HTMLTextAreaElement
-        blurCloseTimerRef.current = setTimeout(() => {
-          blurCloseTimerRef.current = null
-          if (userDismissedKbRef.current) {
-            setTarget(null)
-            return
-          }
-          const active = document.activeElement
-          if (active instanceof HTMLElement && panelRef.current?.contains(active)) return
-          if (isEligibleField(active, pathname)) return
-          if (!field.isConnected) {
-            setTarget(null)
-            return
-          }
-          try {
-            focusInputForProgrammaticEdit(field)
-            setTarget(field)
-          } catch {
-            setTarget(null)
-          }
-        }, 40)
-        return
-      }
-
+    const onBlur = () => {
       scheduleMaybeClose()
     }
 
@@ -784,8 +752,11 @@ export function WebAzertyKeyboard() {
 
   useLayoutEffect(() => {
     if (!target || !target.isConnected) return
+    if (userDismissedKbRef.current) return
     const el = target
+    let cancelled = false
     const run = () => {
+      if (cancelled || userDismissedKbRef.current) return
       try {
         if (document.activeElement !== el) {
           focusInputForProgrammaticEdit(el)
@@ -795,23 +766,40 @@ export function WebAzertyKeyboard() {
         /* noop */
       }
     }
-    requestAnimationFrame(run)
-    requestAnimationFrame(() => requestAnimationFrame(run))
+    const raf1 = requestAnimationFrame(run)
+    const raf2 = requestAnimationFrame(() => requestAnimationFrame(run))
+    targetRefocusRafRef.current = raf2
+    return () => {
+      cancelled = true
+      cancelAnimationFrame(raf1)
+      cancelAnimationFrame(raf2)
+      targetRefocusRafRef.current = null
+    }
   }, [target, legacyNumericMode, pinCompactMode, panelPos])
 
   const closePanel = () => {
     userDismissedKbRef.current = true
     clearBlurCloseTimer()
+    const el = target
+    setTarget(null)
+    setCaps(false)
     try {
-      target?.blur()
+      el?.blur()
     } catch {
       /* noop */
     }
-    setTarget(null)
-    setCaps(false)
-    window.setTimeout(() => {
-      userDismissedKbRef.current = false
-    }, 400)
+    try {
+      const active = document.activeElement
+      if (
+        active instanceof HTMLInputElement ||
+        active instanceof HTMLTextAreaElement ||
+        active instanceof HTMLElement
+      ) {
+        active.blur()
+      }
+    } catch {
+      /* noop */
+    }
   }
 
   const onChar = useCallback(
