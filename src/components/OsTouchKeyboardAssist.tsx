@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect } from 'react'
-import { resolveWebKeyboardActive } from '@/lib/web-touch-keyboard-policy'
 
 /** Velden waar we géén focus-/touch-fix toepassen. */
 const DATA_OPT_OUT = 'data-no-os-touch-keyboard'
@@ -40,17 +39,12 @@ function isEligible(el: EventTarget | null): el is HTMLInputElement | HTMLTextAr
 }
 
 /**
- * Alleen waar **geen** Vysion-schermtoetsenbord actief is: focus-kick voor native OS-toetsenbord.
- * Op kassa/admin/registreer (Vysion actief) niet gebruiken — voorkomt focus-gevecht met WebAzertyKeyboard.
+ * Focus-kick voor native OS-toetsenbord op touch (Vysion-schermtoetsenbord staat globaal uit).
  */
 export function OsTouchKeyboardAssist() {
   useEffect(() => {
     const kickEligibleFocus = (el: HTMLInputElement | HTMLTextAreaElement) => {
-      if (typeof window !== 'undefined') {
-        const p = window.location.pathname || ''
-        if (resolveWebKeyboardActive(p)) return
-        if (document.documentElement.classList.contains('vysion-web-kb-open')) return
-      }
+      if (document.documentElement.classList.contains('vysion-web-kb-open')) return
       queueMicrotask(() => {
         try {
           if (document.activeElement !== el) {

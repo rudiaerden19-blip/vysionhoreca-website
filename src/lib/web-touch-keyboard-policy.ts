@@ -1,17 +1,14 @@
 /**
  * Eén bron van waarheid: wanneer het Vysion-schermtoetsenbord actief is.
  *
- * | Context | Toetsenbord |
- * |---------|-------------|
- * | Touch-pc: kassa, admin, keuken, /registreer, /login | Vysion (inputmode=none) |
- * | Telefoon: webshop klant (menu, checkout, account) | Native OS |
- * | Desktop zonder touch | Geen schermtoetsenbord (fysiek toetsenbord) |
- *
- * Tenant override via kassa_pos_state.touch_ui_prefs: kb_off, kb_force.
+ * VYSION_WEB_TOUCH_KEYBOARD_ENABLED = false → nergens het AZERTY-paneel; touch gebruikt OS-toetsenbord.
  */
 
 import { KIOSK_COOKIE } from '@/lib/kiosk-mode'
 import { getCachedTouchUiPrefs, touchPrefsTenantFromPathname } from '@/lib/touch-keyboard-prefs'
+
+/** Globaal uit: geen WebAzertyKeyboard op geen enkele pagina/tenant. */
+export const VYSION_WEB_TOUCH_KEYBOARD_ENABLED = false
 
 export function normalizeAppPathname(pathname: string): string {
   return (pathname || '').replace(/\/+$/, '') || '/'
@@ -129,6 +126,7 @@ export function preferNativeKeyboardOnThisPage(pathname: string): boolean {
  * (Component toont panel pas na focus op een invoerveld.)
  */
 export function resolveWebKeyboardActive(pathname: string): boolean {
+  if (!VYSION_WEB_TOUCH_KEYBOARD_ENABLED) return false
   if (typeof window === 'undefined') return false
 
   const p = pathname || window.location.pathname

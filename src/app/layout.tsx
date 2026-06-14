@@ -8,7 +8,6 @@ import { PageViewTracker } from '@/components/PageViewTracker'
 import { PWARegister } from '@/components/PWARegister'
 import SectorChoiceGate from '@/components/SectorChoiceGate'
 import { OsTouchKeyboardAssist } from '@/components/OsTouchKeyboardAssist'
-import { WebAzertyKeyboard } from '@/components/WebAzertyKeyboard'
 import { TENANT_APP_SHELL_THEME_COLOR } from '@/lib/theme-color'
 import { VYSION_CANONICAL_ORIGIN, VYSION_BRAND_PRODUCT_NAME, VYSION_BRAND_SITE_NAME } from '@/lib/vysion-site'
 import { VYSION_INFO_EMAIL } from '@/lib/vysion-contact'
@@ -180,7 +179,6 @@ export default function RootLayout({
           <PWARegister />
           <GlobalAutoCapitalize />
           <OsTouchKeyboardAssist />
-          <WebAzertyKeyboard />
           <PageViewTracker />
           <SectorChoiceGate />
           {children}
