@@ -2129,27 +2129,52 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     doSwitchToTable(newTableNr, pickerBrowseZone)
   }
 
+  /** Karronde naar tafelmand (Supabase + ref sync); leegt altijd de rechter mand. */
+  const commitCartRoundToTable = (
+    zone: FloorPlanZone,
+    tblNr: string,
+    itemsToPark: CartItem[],
+  ) => {
+    if (itemsToPark.length === 0) return
+    const tbl = tblNr.trim()
+    if (!tbl) return
+    const slotKey = tableOrderMapKey(zone, tbl)
+    const merged = mergeCartLinesForTable(tableOrdersRef.current[slotKey] || [], itemsToPark)
+    const next: Record<string, CartItem[]> = { ...tableOrdersRef.current, [slotKey]: merged }
+    tableOrdersRef.current = next
+    cancelPersistTimer(slotKey)
+    openOrderPersistInflightRef.current.add(slotKey)
+    updateTableStatus(tbl, merged.length > 0, zone)
+    flushSync(() => {
+      setCart([])
+    })
+    setTableOrders(next)
+    queueMicrotask(() => syncFloorPlanStatusesFromOpenOrders(next))
+    void persistOpenOrderRowToSupabase(zone, tbl, merged)
+  }
+
   /**
-   * Alleen actieve tafel/zone wisselen — open manden blijven op hun oorspronkelijke tafel-slot.
-   * Kar met regels op de vorige tafel wordt daar geparkeerd vóór de wissel (geen merge naar nieuwe tafel).
+   * Actieve tafel/zone wisselen. Karronde gaat naar:
+   * - geselecteerde tafel als er nog geen tafel was, of dezelfde tafel opnieuw bevestigd wordt;
+   * - anders naar de vorige tafel vóór de wissel (niet mee naar andere tafel slepen).
    */
   const doSwitchToTable = (newTableNr: string, zone: FloorPlanZone) => {
     const oldZone = dineInFloorZone
     const oldTbl = tableNumber.trim()
+    const newTbl = newTableNr.trim()
 
-    if (oldTbl && cart.length > 0) {
-      const oldSlot = tableOrderMapKey(oldZone, oldTbl)
-      setTableOrders((prev) => {
-        const merged = mergeCartLinesForTable(prev[oldSlot] || [], cart)
-        const next = { ...prev, [oldSlot]: merged }
-        updateTableStatus(oldTbl, merged.length > 0, oldZone)
-        schedulePersistOpenOrder(oldZone, oldTbl, merged)
-        return next
-      })
-      setCart([])
+    if (cart.length > 0) {
+      const snap = snapshotCartItemsForAsyncPrint(cart)
+      if (!oldTbl && newTbl) {
+        commitCartRoundToTable(zone, newTbl, snap)
+      } else if (oldTbl && oldTbl === newTbl && oldZone === zone) {
+        commitCartRoundToTable(zone, newTbl, snap)
+      } else if (oldTbl) {
+        commitCartRoundToTable(oldZone, oldTbl, snap)
+      }
     }
 
-    setTableNumber(newTableNr)
+    setTableNumber(newTbl)
     setDineInFloorZone(zone)
     setOrderType('DINE_IN')
     setShowTablePicker(false)
@@ -2163,22 +2188,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   /** Karronde naar tafelmand + keuken/kassa-delta; tafel blijft geselecteerd (sync Supabase). */
   const parkOrder = (opts: { printKitchen: boolean; printKassaSlip: boolean }) => {
-    if (orderType !== 'DINE_IN' || !tableNumber || cart.length === 0) return
-    const itemsToPark = snapshotCartItemsForAsyncPrint(cart)
+    if (orderType !== 'DINE_IN' || !tableNumber.trim() || cart.length === 0) return
     const zone = dineInFloorZone
-    const tbl = tableNumber
-    const slotKey = tableOrderMapKey(zone, tbl)
-    const merged = mergeCartLinesForTable(tableOrdersRef.current[slotKey] || [], itemsToPark)
-    const next: Record<string, CartItem[]> = { ...tableOrdersRef.current, [slotKey]: merged }
-    tableOrdersRef.current = next
-    cancelPersistTimer(slotKey)
-    updateTableStatus(tbl, merged.length > 0, zone)
-    flushSync(() => {
-      setCart([])
-    })
-    setTableOrders(next)
-    queueMicrotask(() => syncFloorPlanStatusesFromOpenOrders(next))
-    void persistOpenOrderRowToSupabase(zone, tbl, merged)
+    const tbl = tableNumber.trim()
+    const itemsToPark = snapshotCartItemsForAsyncPrint(cart)
+    commitCartRoundToTable(zone, tbl, itemsToPark)
     void flushBarDeltaSlipRef.current(zone, tbl, itemsToPark, opts)
   }
 
