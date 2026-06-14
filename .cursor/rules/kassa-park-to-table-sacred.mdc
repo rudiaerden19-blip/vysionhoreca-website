@@ -1,0 +1,71 @@
+---
+description: HEILIG — kassa tafel/mand parkeren; nooit breken zonder expliciete opdracht eigenaar
+alwaysApply: true
+---
+
+# Kassa — tafel mand & «Voeg toe aan tafel» (HEILIG)
+
+**Eigenaar:** deze flow is meerdere keren kapot gemaakt door AI-wijzigingen. **Elke agent:** lees dit vóór je `kassa/page.tsx`, `kassa-table-park-flow.ts` of sidebar-mand logic aanraakt.
+
+## Verplicht vóór commit
+
+```bash
+npm test -- --testPathPatterns=kassa-table-park-flow
+npm test -- --testPathPatterns=controlled-number-input
+npx tsc --noEmit
+```
+
+Faalt een test → flow niet wijzigen tot groen.
+
+## Datamodel
+
+- **`cart`** = nieuwe ronde in de mand (rechter veld).
+- **`tableOrders[slot]`** = geparkeerd op tafel (Supabase sync).
+- **`billLines`** = parked + cart (totaal, afrekenen, bon) — **niet** de sidebar-lijst dupliceren.
+
+## «Voeg toe aan tafel» (keukenbon / kassabon op tafel)
+
+Alleen via **`parkOrder` → `commitCartRoundToTable`**.
+
+Na parkeren **verplicht**:
+
+1. **`setCart([])`** (liefst `flushSync` samen met `setTableOrders`).
+2. **`setTableOrderLinesInSidebar(false)`** — sidebar-lijst **leeg** (geen «Bestelling»-regels tonen).
+3. **Totaal footer** blijft op volledige tafel (`billLines`).
+
+## Tafel kiezen (`doSwitchToTable`) — gebruik `resolveTableSwitchCartAction`
+
+| Situatie | Actie |
+|----------|--------|
+| Mand gevuld, **nog geen** tafel → tafel kiezen | **`keep_cart_mark_table_occupied`** — **GEEN** `commitCartRoundToTable` |
+| Tafel gekozen, producten tikken | Mand blijft zichtbaar tot park-knop |
+| Zelfde tafel opnieuw tikken met mand | **GEEN** auto-park |
+| **Andere** tafel/zone met open mand | **`park_cart_on_previous_table`** op **oude** tafel |
+
+### Verboden
+
+```typescript
+// NOOIT — mand leegt vóór park-knop
+if (!oldTbl && newTbl && cart.length) commitCartRoundToTable(zone, newTbl, cart)
+// NOOIT — zelfde tafel auto-park
+if (oldTbl === newTbl && cart.length) commitCartRoundToTable(...)
+```
+
+Logica staat in **`src/lib/kassa-table-park-flow.ts`** — wijzig page **via** die helpers + tests.
+
+## Sidebar zichtbaarheid
+
+- **`showParkedTableLinesInKassaSidebar`**: `tableOrderLinesInSidebar && parked lines`.
+- **`kassaSidebarShowsOrderLinePanel`**: cart **of** zichtbare tafelregels — niet `billLines.length` alleen.
+
+## Multi-tenant
+
+Slot key = `tableOrderMapKey(zone, normalizeKassaTableNumber(nr))` — trim overal hetzelfde.
+
+## Scope
+
+- Productie: **`src/app/shop/[tenant]/admin/kassa/page.tsx`** op **`main`**.
+- **Geen** GKS-kassa flows kopiëren (zie `production-kassa-no-gks.mdc`).
+- **Geen** tenant-specifieke uitzonderingen.
+
+Wijziging alleen als de gebruiker in **dezelfde opdracht** expliciet vraagt om andere horeca-flow.

@@ -139,6 +139,12 @@ import type {
 import { kassaReceiptTableNumber } from '@/lib/kassa-cart-types'
 import { mergeCartLinesForTable } from '@/lib/kassa-table-cart-merge'
 import {
+  kassaSidebarShowsOrderLinePanel,
+  normalizeKassaTableNumber as kassaTableDisplayNumber,
+  resolveTableSwitchCartAction,
+  showParkedTableLinesInKassaSidebar,
+} from '@/lib/kassa-table-park-flow'
+import {
   computeBarBonDelta,
   hydrateBarBonWatermarksFromStore,
   loadBarBonWatermarks,
@@ -486,11 +492,6 @@ function mergeOpenTableOrdersServerWithPendingLocal(
     }
   }
   return merged
-}
-
-/** Tafelnummer uit picker/DB — altijd trimmen zodat slot-keys gelijk blijven. */
-function kassaTableDisplayNumber(raw: string): string {
-  return String(raw).trim()
 }
 
 /** Rijen uit DB voor buildOpenTableOrdersMapFromRows — zelfde bron als adminDb-insert (service role). */
@@ -2152,7 +2153,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     doSwitchToTable(newTableNr, pickerBrowseZone)
   }
 
-  /** Karronde naar tafelmand (Supabase + ref sync); leegt altijd de rechter mand. */
+  /** Karronde naar tafelmand (Supabase + ref sync); leegt altijd de rechter mand. Alleen parkOrder + table-switch-away. Zie kassa-table-park-flow.ts + .cursor/rules/kassa-park-to-table-sacred.mdc */
   const commitCartRoundToTable = (
     zone: FloorPlanZone,
     tblNr: string,
@@ -2187,16 +2188,23 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const oldZone = dineInFloorZone
     const oldTbl = kassaTableDisplayNumber(tableNumber)
     const newTbl = kassaTableDisplayNumber(newTableNr)
-    const switchingAway = !!oldTbl && (oldTbl !== newTbl || oldZone !== zone)
 
-    if (switchingAway && cart.length > 0) {
+    const switchAction = resolveTableSwitchCartAction({
+      oldTable: tableNumber,
+      newTable: newTableNr,
+      oldZone,
+      newZone: zone,
+      cartLineCount: cart.length,
+    })
+
+    if (switchAction === 'park_cart_on_previous_table') {
       const snap = snapshotCartItemsForAsyncPrint(
         cartRef.current.length > 0 ? cartRef.current : cart,
       )
       commitCartRoundToTable(oldZone, oldTbl, snap)
-    } else if (!oldTbl && newTbl && cart.length > 0) {
+    } else if (switchAction === 'keep_cart_mark_table_occupied') {
       updateTableStatus(newTbl, tableHasOpenOrder(zone, newTbl, cart), zone)
-    } else if (newTbl) {
+    } else if (switchAction === 'reveal_table_lines_in_sidebar') {
       setTableOrderLinesInSidebar(true)
     }
 
@@ -2696,8 +2704,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [activeTableSlotKey, tableOrders])
 
   /** Open tafelmand in sidebar — niet direct na parkeren (mand moet leeg ogen). */
-  const showParkedTableLinesInSidebar =
-    tableOrderLinesInSidebar && parkedOnTableLines.length > 0
+  const showParkedTableLinesInSidebar = showParkedTableLinesInKassaSidebar({
+    tableOrderLinesInSidebar,
+    parkedLineCount: parkedOnTableLines.length,
+  })
 
   const parkedOnlySidebarView = useMemo(
     () => !numpadPanelVisible && cart.length === 0 && showParkedTableLinesInSidebar,
@@ -2739,7 +2749,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return cart
   }, [activeTableSlotKey, parkedOnTableLines, cart])
 
-  const sidebarShowsOrderPanel = cart.length > 0 || showParkedTableLinesInSidebar
+  const sidebarShowsOrderPanel = kassaSidebarShowsOrderLinePanel({
+    cartLineCount: cart.length,
+    showParkedTableLinesInSidebar,
+  })
   const sidebarShowsLegacyParkedHeader = false
 
   const total = useMemo(
