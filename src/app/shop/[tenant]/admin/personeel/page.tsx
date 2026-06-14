@@ -14,20 +14,7 @@ import {
   StaffRole,
   ContractType
 } from '@/lib/admin-api'
-import { parseNumberFieldValue } from '@/lib/controlled-number-input'
-
-function parseOptionalDecimal(raw: string): number | undefined {
-  const trimmed = raw.trim()
-  if (trimmed === '') return undefined
-  const n = parseNumberFieldValue(trimmed)
-  return Number.isNaN(n) ? undefined : n
-}
-
-function decimalFieldDisplay(value: number | undefined): string {
-  if (value === undefined || value === null) return ''
-  return String(value)
-}
-
+import { ControlledOptionalNumberInput } from '@/components/ControlledNumberInput'
 const STAFF_COLORS = [
   '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16', 
   '#22c55e', '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9',
@@ -586,13 +573,10 @@ export default function PersoneelPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">{t('personeelPage.contractForm.hoursPerWeek')}</label>
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    autoComplete="off"
-                    value={decimalFieldDisplay(contractData.hours_per_week)}
-                    onChange={(e) =>
-                      setContractData({ ...contractData, hours_per_week: parseOptionalDecimal(e.target.value) })
+                  <ControlledOptionalNumberInput
+                    value={contractData.hours_per_week}
+                    onChange={(hours_per_week) =>
+                      setContractData({ ...contractData, hours_per_week })
                     }
                     className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="38"
@@ -600,13 +584,10 @@ export default function PersoneelPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">{t('personeelPage.contractForm.hourlyRate')}</label>
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    autoComplete="off"
-                    value={decimalFieldDisplay(contractData.hourly_rate)}
-                    onChange={(e) =>
-                      setContractData({ ...contractData, hourly_rate: parseOptionalDecimal(e.target.value) })
+                  <ControlledOptionalNumberInput
+                    value={contractData.hourly_rate}
+                    onChange={(hourly_rate) =>
+                      setContractData({ ...contractData, hourly_rate })
                     }
                     className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="15.00"
@@ -642,15 +623,12 @@ export default function PersoneelPage() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">{t('personeelPage.contractForm.commuteDistance')}</label>
                     <div className="flex">
-                      <input
-                        type="text"
-                        inputMode="decimal"
-                        autoComplete="off"
-                        value={decimalFieldDisplay(contractData.commute_distance_km)}
-                        onChange={(e) =>
+                      <ControlledOptionalNumberInput
+                        value={contractData.commute_distance_km}
+                        onChange={(commute_distance_km) =>
                           setContractData({
                             ...contractData,
-                            commute_distance_km: parseOptionalDecimal(e.target.value),
+                            commute_distance_km,
                           })
                         }
                         className="flex-1 px-4 py-2 border rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -664,15 +642,12 @@ export default function PersoneelPage() {
                     <label className="block text-sm font-medium text-gray-700 mb-1">{t('personeelPage.contractForm.kmRate')}</label>
                     <div className="flex">
                       <span className="px-3 py-2 bg-gray-100 border border-r-0 rounded-l-lg text-gray-600">€</span>
-                      <input
-                        type="text"
-                        inputMode="decimal"
-                        autoComplete="off"
-                        value={decimalFieldDisplay(contractData.km_rate)}
-                        onChange={(e) =>
+                      <ControlledOptionalNumberInput
+                        value={contractData.km_rate}
+                        onChange={(km_rate) =>
                           setContractData({
                             ...contractData,
-                            km_rate: parseOptionalDecimal(e.target.value) ?? 0.4297,
+                            km_rate: km_rate ?? 0.4297,
                           })
                         }
                         className="flex-1 px-4 py-2 border rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"

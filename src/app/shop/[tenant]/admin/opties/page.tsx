@@ -109,6 +109,7 @@ function SortableChoice({
             }
           }}
           className="w-full pl-8 pr-3 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          data-no-capitalize="true"
           placeholder="0.00"
         />
       </div>

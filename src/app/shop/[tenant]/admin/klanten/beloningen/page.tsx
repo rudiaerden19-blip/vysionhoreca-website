@@ -7,10 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { getLoyaltyRewards, saveLoyaltyReward, deleteLoyaltyReward, LoyaltyReward } from '@/lib/admin-api'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
-import {
-  numberFieldDisplayValue,
-  parseNumberFieldValue,
-} from '@/lib/controlled-number-input'
+import { ControlledNumberInput } from '@/components/ControlledNumberInput'
 
 export default function BeloningenPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
@@ -292,16 +289,17 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     {t('rewardsPage.form.pointsRequired')} *
                   </label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={numberFieldDisplayValue(formData.points_required ?? 0, { emptyWhenZero: true })}
-                    onChange={(e) =>
+                  <ControlledNumberInput
+                    min={1}
+                    value={formData.points_required ?? 0}
+                    onChange={(points_required) =>
                       setFormData({
                         ...formData,
-                        points_required: parseNumberFieldValue(e.target.value, { integer: true }),
+                        points_required,
                       })
                     }
+                    integer
+                    emptyWhenZero
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
@@ -338,15 +336,14 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       {formData.reward_type === 'discount_fixed'? t('rewardsPage.form.discountAmount') : t('rewardsPage.form.discountPercentage')}
                     </label>
-                    <input
-                      type="number"
-                      min="0"
+                    <ControlledNumberInput
+                      min={0}
                       step={formData.reward_type === 'discount_fixed'? '0.01': '1'}
-                      value={numberFieldDisplayValue(formData.reward_value ?? 0)}
-                      onChange={(e) =>
+                      value={formData.reward_value ?? 0}
+                      onChange={(reward_value) =>
                         setFormData({
                           ...formData,
-                          reward_value: parseNumberFieldValue(e.target.value),
+                          reward_value,
                         })
                       }
                       placeholder={formData.reward_type === 'discount_fixed'? '5.00': '10'}

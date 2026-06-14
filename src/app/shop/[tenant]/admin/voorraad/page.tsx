@@ -6,10 +6,7 @@ import { adminDb } from '@/lib/admin-db-client'
 import { getMenuCategories, MenuCategory } from '@/lib/admin-api'
 import { buildRetailSkusFromRows, type RetailPosSku } from '@/lib/retail-pos-catalog'
 import { useLanguage } from '@/i18n'
-import {
-  numberFieldDisplayValue,
-  parseNumberFieldValue,
-} from '@/lib/controlled-number-input'
+import { ControlledNumberInput } from '@/components/ControlledNumberInput'
 
 type FilterType = 'all' |  'tracked' |  'low' |  'out'
 
@@ -260,18 +257,19 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
             value={newVariantDraft.barcode}
             onChange={(e) => setNewVariantDraft((d) => ({ ...d, barcode: e.target.value }))}
           />
-          <input
-            type="number"
+          <ControlledNumberInput
             min={0}
             className="w-20 px-2 py-2 border rounded-xl text-sm text-center"
             placeholder={t('stockPage.stock')}
-            value={numberFieldDisplayValue(newVariantDraft.stock_quantity, { emptyWhenZero: true })}
-            onChange={(e) =>
+            value={newVariantDraft.stock_quantity}
+            onChange={(stock_quantity) =>
               setNewVariantDraft((d) => ({
                 ...d,
-                stock_quantity: parseNumberFieldValue(e.target.value, { integer: true }),
+                stock_quantity,
               }))
             }
+            integer
+            emptyWhenZero
           />
           <button
             type="button"
@@ -392,24 +390,22 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
                       <div className="flex flex-wrap gap-3 items-end">
                         <label className="flex flex-col gap-0.5 text-xs">
                           <span className="font-medium text-gray-600">{t('stockPage.stockOnHandLabel')}</span>
-                          <input
-                            type="number"
-                            value={numberFieldDisplayValue(editStock, { emptyWhenZero: true })}
-                            onChange={(e) =>
-                              setEditStock(parseNumberFieldValue(e.target.value, { integer: true }))
-                            }
+                          <ControlledNumberInput
+                            value={editStock}
+                            onChange={setEditStock}
+                            integer
+                            emptyWhenZero
                             className="w-20 px-2 py-1.5 border rounded-lg text-center font-bold text-sm"
                             min={0}
                           />
                         </label>
                         <label className="flex flex-col gap-0.5 text-xs">
                           <span className="font-medium text-gray-600">{t('stockPage.lowStockThresholdLabel')}</span>
-                          <input
-                            type="number"
-                            value={numberFieldDisplayValue(editThreshold, { emptyWhenZero: true })}
-                            onChange={(e) =>
-                              setEditThreshold(parseNumberFieldValue(e.target.value, { integer: true }))
-                            }
+                          <ControlledNumberInput
+                            value={editThreshold}
+                            onChange={setEditThreshold}
+                            integer
+                            emptyWhenZero
                             className="w-20 px-2 py-1.5 border rounded-lg text-center text-sm"
                             min={0}
                           />

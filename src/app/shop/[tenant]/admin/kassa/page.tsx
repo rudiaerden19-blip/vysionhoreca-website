@@ -3185,9 +3185,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         if (prev && !['+', '-', '×'].some((op) => prev.endsWith(op))) return prev + key
         return prev
       }
-      if (key === '.') {
+      if (key === '.' || key === ',') {
         const parts = prev.split(/[+\-×]/)
-        if (!parts[parts.length - 1]?.includes('.')) return prev + '.'
+        const last = parts[parts.length - 1] ?? ''
+        if (!last.includes('.') && !last.includes(',')) return prev + key
         return prev
       }
       return prev + key

@@ -27,6 +27,11 @@ export function GlobalAutoCapitalize() {
       if (inputType === 'email' || inputType === 'password' || inputType === 'url' || inputType === 'number' || inputType === 'checkbox' || inputType === 'radio' || inputType === 'range' || inputType === 'color' || inputType === 'file' || inputType === 'hidden') {
         return
       }
+
+      const inputMode = target.getAttribute('inputmode')?.toLowerCase()
+      if (inputMode === 'decimal' || inputMode === 'numeric') {
+        return
+      }
       
       // Skip als autocapitalize="off" is gezet
       if (target.getAttribute('autocapitalize') === 'off' || target.getAttribute('data-no-capitalize') === 'true') {

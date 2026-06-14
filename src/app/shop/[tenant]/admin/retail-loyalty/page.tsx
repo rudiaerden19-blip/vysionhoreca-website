@@ -8,10 +8,7 @@ import { adminDb } from '@/lib/admin-db-client'
 import { RetailLoyaltyPassShare } from '@/components/retail-loyalty/RetailLoyaltyPassShare'
 import { RetailLoyaltyNewPassPanel } from '@/components/retail-loyalty/RetailLoyaltyNewPassPanel'
 import type { RetailLoyaltyMember } from '@/lib/retail-loyalty/types'
-import {
-  numberFieldDisplayValue,
-  parseNumberFieldValue,
-} from '@/lib/controlled-number-input'
+import { ControlledNumberInput } from '@/components/ControlledNumberInput'
 
 type Settings = {
   enabled: boolean
@@ -371,31 +368,20 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
         <div className="mb-3 grid gap-3 sm:grid-cols-2">
           <label className="block text-sm">
             <span className="font-medium">{t('retailLoyalty.pointsPerEuro')}</span>
-            <input
-              type="number"
-              min={0}
-              step={0.1}
-              value={numberFieldDisplayValue(settings.points_per_euro)}
-              onChange={(e) =>
-                setSettings((s) => ({
-                  ...s,
-                  points_per_euro: parseNumberFieldValue(e.target.value),
-                }))
-              }
+            <ControlledNumberInput
+              value={settings.points_per_euro}
+              onChange={(n) => setSettings((s) => ({ ...s, points_per_euro: n }))}
               className="mt-1 w-full rounded-lg border px-3 py-2"
             />
           </label>
           <label className="block text-sm">
             <span className="font-medium">{t('retailLoyalty.minOrderTotal')}</span>
-            <input
-              type="number"
-              min={0}
-              step={0.01}
-              value={numberFieldDisplayValue(settings.min_order_total_for_points)}
-              onChange={(e) =>
+            <ControlledNumberInput
+              value={settings.min_order_total_for_points}
+              onChange={(n) =>
                 setSettings((s) => ({
                   ...s,
-                  min_order_total_for_points: parseNumberFieldValue(e.target.value),
+                  min_order_total_for_points: n,
                 }))
               }
               className="mt-1 w-full rounded-lg border px-3 py-2"
@@ -412,15 +398,14 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
         </label>
         <label className="mb-3 block text-sm">
           <span className="font-medium">{t('retailLoyalty.redeemPointsPerEuro')}</span>
-          <input
-            type="number"
-            min={1}
-            step={1}
-            value={numberFieldDisplayValue(settings.redeem_points_per_euro, { emptyWhenZero: true })}
-            onChange={(e) =>
+          <ControlledNumberInput
+            integer
+            emptyWhenZero
+            value={settings.redeem_points_per_euro}
+            onChange={(n) =>
               setSettings((s) => ({
                 ...s,
-                redeem_points_per_euro: parseNumberFieldValue(e.target.value, { integer: true }),
+                redeem_points_per_euro: n,
               }))
             }
             className="mt-1 w-full rounded-lg border px-3 py-2 sm:max-w-xs"

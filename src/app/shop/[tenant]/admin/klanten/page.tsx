@@ -6,10 +6,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { adminDb } from '@/lib/admin-db-client'
 import { Customer } from '@/lib/admin-api'
-import {
-  numberFieldDisplayValue,
-  parseNumberFieldValue,
-} from '@/lib/controlled-number-input'
+import { ControlledNumberInput } from '@/components/ControlledNumberInput'
 
 export default function KlantenPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
@@ -274,12 +271,11 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
                 </div>
                 {editingPoints ? (
                   <div className="flex gap-2">
-                    <input
-                      type="number"
-                      value={numberFieldDisplayValue(newPoints, { emptyWhenZero: true })}
-                      onChange={(e) =>
-                        setNewPoints(parseNumberFieldValue(e.target.value, { integer: true }))
-                      }
+                    <ControlledNumberInput
+                      value={newPoints}
+                      onChange={setNewPoints}
+                      integer
+                      emptyWhenZero
                       className="flex-1 px-3 py-2 border border-yellow-200 rounded-lg"
                     />
                     <button

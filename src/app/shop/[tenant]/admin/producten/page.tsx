@@ -37,10 +37,7 @@ import {
   KASSA_PRODUCT_IMAGE_ZOOM_MAX,
   compareMenuProductsBySortOrder,
 } from '@/lib/admin-api'
-import {
-  numberFieldDisplayValue,
-  parseNumberFieldValue,
-} from '@/lib/controlled-number-input'
+import { ControlledNumberInput } from '@/components/ControlledNumberInput'
 import { useAdminCatalogDragSensors } from '@/lib/admin-dnd-sensors'
 import MediaPicker from '@/components/MediaPicker'
 import { useLanguage } from '@/i18n'
@@ -1418,18 +1415,16 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                               {t('adminPages.producten.stockQuantity')}
                             </label>
-                            <input
-                              type="number"
+                            <ControlledNumberInput
                               min={0}
-                              value={numberFieldDisplayValue(formData.stock_quantity ?? 0)}
-                              onChange={(e) =>
+                              value={formData.stock_quantity ?? 0}
+                              onChange={(stock_quantity) =>
                                 setFormData((prev) => ({
                                   ...prev,
-                                  stock_quantity: parseNumberFieldValue(e.target.value, {
-                                    integer: true,
-                                  }),
+                                  stock_quantity,
                                 }))
                               }
+                              integer
                               className="w-full px-3 py-2.5 border border-gray-200 rounded-xl"
                             />
                           </div>
@@ -1437,18 +1432,16 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                               {t('adminPages.producten.lowStockThreshold')}
                             </label>
-                            <input
-                              type="number"
+                            <ControlledNumberInput
                               min={0}
-                              value={numberFieldDisplayValue(formData.low_stock_threshold ?? 0)}
-                              onChange={(e) =>
+                              value={formData.low_stock_threshold ?? 0}
+                              onChange={(low_stock_threshold) =>
                                 setFormData((prev) => ({
                                   ...prev,
-                                  low_stock_threshold: parseNumberFieldValue(e.target.value, {
-                                    integer: true,
-                                  }),
+                                  low_stock_threshold,
                                 }))
                               }
+                              integer
                               className="w-full px-3 py-2.5 border border-gray-200 rounded-xl"
                             />
                           </div>
