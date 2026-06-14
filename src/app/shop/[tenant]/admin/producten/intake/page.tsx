@@ -549,7 +549,7 @@ export default function RetailProductIntakePage({ params }: { params: { tenant: 
                     : t('adminPages.productIntake.barcodeScanChoiceHint')}
               </p>
             ) : null}
-            <div data-no-web-touch-keyboard>
+            <div>
               <input
                 ref={wedgeRef}
                 type="text"

@@ -472,7 +472,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   return (
     <div
       className={`flex min-h-0 h-[100dvh] max-h-[100dvh] w-full min-w-0 max-w-full flex-col overflow-hidden ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} text-[#f0f0f0]`}
-      data-vysion-kb-scroll-host
+     
       style={{
         paddingTop: 'env(safe-area-inset-top, 0px)',
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',

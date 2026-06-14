@@ -544,7 +544,7 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
       >
         <div
           className={`max-w-full p-4 md:p-6 ${
-            isAdminDashboardRoot ? 'pb-0': 'pb-[max(6rem,calc(var(--vysion-web-kb-height,0px)+1.5rem))]'
+            isAdminDashboardRoot ? 'pb-0': 'pb-[max(6rem,env(safe-area-inset-bottom))]'
           }`}
         >
           {children}

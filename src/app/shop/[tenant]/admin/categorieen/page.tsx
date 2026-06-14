@@ -18,7 +18,7 @@ import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 import MediaPicker from '@/components/MediaPicker'
 
 const CATEGORIEEN_SCROLL_CLASS =
-  '-mx-4 -mt-4 md:-mx-6 md:-mt-6 min-h-[calc(100dvh-3.5rem)] overflow-y-auto overscroll-y-contain touch-pan-y [-webkit-overflow-scrolling:touch] px-4 pt-4 md:px-6 md:pt-6 pb-[max(8rem,calc(var(--vysion-web-kb-height,0px)+2rem))]'
+  '-mx-4 -mt-4 md:-mx-6 md:-mt-6 min-h-[calc(100dvh-3.5rem)] overflow-y-auto overscroll-y-contain touch-pan-y [-webkit-overflow-scrolling:touch] px-4 pt-4 md:px-6 md:pt-6 pb-[max(8rem,env(safe-area-inset-bottom))]'
 
 type CategoryRowProps = {
   category: MenuCategory
@@ -345,7 +345,7 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
     <PinGate tenant={params.tenant}>
     <div
       className={CATEGORIEEN_SCROLL_CLASS}
-      data-vysion-kb-scroll-host
+     
     >
     <div className="max-w-3xl mx-auto">
       <ConfirmModal />

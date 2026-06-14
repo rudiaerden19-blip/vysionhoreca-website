@@ -1104,7 +1104,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
 
       {/* Settings Tab */}
       {activeTab === 'settings' && (
-        <div className="mx-auto max-w-2xl space-y-6" data-vysion-kb-scroll-host>
+        <div className="mx-auto max-w-2xl space-y-6">
           <div>
             <h2 className="text-xl font-bold text-gray-900"> {t('analysePage.settings.title')}</h2>
             <p className="text-gray-500">{t('analysePage.settings.subtitle')}</p>
@@ -1253,7 +1253,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               </div>
               <div
                 className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-6"
-                data-vysion-kb-scroll-host
+               
               >
 
                 {/* PDF Upload — alleen bij nieuwe kost */}
@@ -1382,7 +1382,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               </div>
               <div
                 className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-6"
-                data-vysion-kb-scroll-host
+               
               >
 
                 {/* PDF Upload — alleen bij nieuwe inkoop */}

@@ -46,20 +46,6 @@ html.vysion-kassa-root body {
   text-rendering: geometricPrecision;
 }
 
-/* Schermtoetsenbord: pagina kan scrollen; focusveld niet achter het paneel */
-html.vysion-web-kb-open {
-  scroll-padding-bottom: var(--vysion-web-kb-height, 320px);
-}
-html.vysion-web-kb-open:not([data-vysion-kb-modal-field]) body {
-  padding-bottom: var(--vysion-web-kb-height, 320px);
-}
-html.vysion-web-kb-open[data-vysion-kb-modal-field] body {
-  padding-bottom: 0;
-}
-html.vysion-web-kb-open [data-vysion-admin-scroll] {
-  scroll-padding-bottom: var(--vysion-web-kb-height, 320px);
-}
-
 /* Admin + modals: één tik, geen dubbel-tap-zoom-vertraging op touch-pc/kiosk */
 [data-vysion-admin-scroll] button,
 [data-vysion-admin-scroll] a,
@@ -78,54 +64,11 @@ html.vysion-web-kb-open [data-vysion-admin-scroll] {
   touch-action: manipulation;
 }
 
-/* Volledige POS/viewport-shells: inhoud scrollbaar zodat focusveld boven het toetsenbord komt */
-html.vysion-web-kb-open [data-vysion-kb-scroll-host] {
-  overflow-y: auto !important;
-  overflow-x: hidden;
-  max-height: calc(100dvh - var(--vysion-web-kb-height, 320px));
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: contain;
-  scroll-padding-bottom: max(1rem, env(safe-area-inset-bottom));
-}
-
-/* Admin modals: scroll overlay + form when schermtoetsenbord open */
+/* Admin modals: scrollbare overlay op touch */
 [data-vysion-modal-overlay] {
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
-}
-html.vysion-web-kb-open [data-vysion-modal-overlay] {
-  /* Blijf gecentreerd — flex-start liet modal springen en veroorzaakte blur op touch */
-  padding-top: max(0.75rem, env(safe-area-inset-top));
-  padding-bottom: calc(var(--vysion-web-kb-height, 320px) + 1rem);
-  scroll-padding-bottom: calc(var(--vysion-web-kb-height, 320px) + 1rem);
-}
-html.vysion-web-kb-open [data-vysion-modal-panel] {
-  max-height: min(90vh, calc(100dvh - var(--vysion-web-kb-height, 320px) - 2rem));
-}
-html.vysion-web-kb-open [data-vysion-modal-panel] [data-vysion-kb-scroll-host] {
-  max-height: none !important;
-}
-
-/* Versleepbaar toetsenbord: geen vaste bodem-reservering */
-html.vysion-web-kb-open[data-vysion-kb-floating] {
-  scroll-padding-bottom: max(1rem, env(safe-area-inset-bottom));
-}
-html.vysion-web-kb-open[data-vysion-kb-floating]:not([data-vysion-kb-modal-field]) body {
-  padding-bottom: 0;
-}
-html.vysion-web-kb-open[data-vysion-kb-floating] [data-vysion-admin-scroll] {
-  scroll-padding-bottom: max(1rem, env(safe-area-inset-bottom));
-}
-html.vysion-web-kb-open[data-vysion-kb-floating] [data-vysion-kb-scroll-host] {
-  max-height: min(90dvh, calc(100dvh - 2rem));
-}
-html.vysion-web-kb-open[data-vysion-kb-floating] [data-vysion-modal-overlay] {
-  padding-bottom: max(1rem, env(safe-area-inset-bottom));
-  scroll-padding-bottom: max(1rem, env(safe-area-inset-bottom));
-}
-html.vysion-web-kb-open[data-vysion-kb-floating] [data-vysion-modal-panel] {
-  max-height: min(90vh, calc(100dvh - 2rem));
 }
 
 /*

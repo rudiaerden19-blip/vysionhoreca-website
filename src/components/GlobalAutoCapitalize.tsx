@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 
-import { setNativeInputValue, ATTR_VYSION_KB_MANAGED } from '@/lib/dom-input-value'
+import { setNativeInputValue } from '@/lib/dom-input-value'
 
 /**
  * Global Auto-Capitalize Component
@@ -21,10 +21,6 @@ export function GlobalAutoCapitalize() {
       if (raw == null || !(raw instanceof Element)) return
       if (!(raw instanceof HTMLInputElement) && !(raw instanceof HTMLTextAreaElement)) return
       const target = raw
-
-      if (target.getAttribute(ATTR_VYSION_KB_MANAGED) === '1') {
-        return
-      }
 
       // Skip bepaalde input types
       const inputType = target.getAttribute('type')?.toLowerCase()

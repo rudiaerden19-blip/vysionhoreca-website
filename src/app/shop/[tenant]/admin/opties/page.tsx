@@ -465,7 +465,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
 
               <div
                 className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-6 space-y-6"
-                data-vysion-kb-scroll-host
+               
               >
                 {/* Error in Modal */}
                 {error && (

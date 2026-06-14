@@ -310,7 +310,7 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off" method="post" data-vysion-kb-scroll-host data-web-kb-full="1">
+          <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off" method="post">
               <div>
                 <label htmlFor="email" className="mb-2 block text-sm font-medium text-gray-800">
                   {t('login.emailAddress')} <span className="text-red-500">*</span>

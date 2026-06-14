@@ -404,14 +404,12 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     articleSearchActiveRef.current = false
     el.readOnly = true
     el.setAttribute('inputmode', 'none')
-    el.setAttribute('data-kassa-no-web-keyboard', 'true')
   }, [])
 
   const applyArticleSearchDomActive = useCallback((el: HTMLInputElement) => {
     articleSearchActiveRef.current = true
     el.readOnly = false
     el.setAttribute('inputmode', 'search')
-    el.removeAttribute('data-kassa-no-web-keyboard')
   }, [])
 
   const closeArticleSearchKeyboard = useCallback(() => {
@@ -1785,7 +1783,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     <div
       className="flex min-h-0 flex-col overflow-hidden h-[100svh] max-h-[100svh] supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh]"
       data-testid="retail-kassa-app"
-      data-vysion-kb-scroll-host
     >
       <LogoutSoftwareConfirmModal
         open={logoutSoftwareConfirmOpen}
@@ -1911,7 +1908,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 ref={priceFixInputRef}
                 type="text"
                 inputMode="decimal"
-                data-vysion-kb-decimal="1"
                 value={priceFixValue}
                 onChange={(e) => setPriceFixValue(e.target.value)}
                 className={`w-full px-4 py-3 text-base tabular-nums text-[#f0f0f0] placeholder:text-white/45 focus:outline-none ${KASSA_POS_FIELD}`}
@@ -2526,7 +2522,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               type="text"
               tabIndex={-1}
               autoComplete="off"
-              data-kassa-no-web-keyboard
               aria-hidden
               onKeyDown={onBarcodeWedgeKeyDown}
               onBlur={() => {
@@ -2550,7 +2545,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 autoComplete="off"
                 readOnly={!articleSearchActive}
                 data-retail-article-search
-                {...(articleSearchActive ? {} : { 'data-kassa-no-web-keyboard': true })}
                 placeholder={t('retailKassaPage.scanPlaceholder')}
                 value={scanValue}
                 onChange={(e) => setScanValue(e.target.value)}
@@ -2564,7 +2558,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                   window.setTimeout(() => {
                     const active = document.activeElement
                     if (active === scanRef.current) return
-                    if (active instanceof HTMLElement && active.closest('[data-web-touch-keyboard-panel]')) return
                     if (!articleSearchActiveRef.current) return
                     closeArticleSearchKeyboard()
                   }, 120)

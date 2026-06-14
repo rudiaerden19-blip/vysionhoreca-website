@@ -10,7 +10,6 @@ type PosStateRow = {
   active_staff_name: string | null
   kassa_ui_dark: boolean | null
   bar_bon_watermarks: Record<string, unknown> | null
-  touch_ui_prefs: Record<string, unknown> | null
   updated_at: string
 }
 
@@ -21,7 +20,6 @@ function rowToJson(row: PosStateRow | null) {
       active_staff_name: null as string | null,
       kassa_ui_dark: null as boolean | null,
       bar_bon_watermarks: {} as Record<string, unknown>,
-      touch_ui_prefs: {} as Record<string, unknown>,
     }
   }
   return {
@@ -32,8 +30,6 @@ function rowToJson(row: PosStateRow | null) {
       row.bar_bon_watermarks && typeof row.bar_bon_watermarks === 'object'
         ? row.bar_bon_watermarks
         : {},
-    touch_ui_prefs:
-      row.touch_ui_prefs && typeof row.touch_ui_prefs === 'object' ? row.touch_ui_prefs : {},
   }
 }
 
@@ -56,7 +52,7 @@ export async function GET(request: NextRequest) {
   const { data, error } = await supabase
     .from('kassa_pos_state')
     .select(
-      'tenant_slug, active_staff_id, active_staff_name, kassa_ui_dark, bar_bon_watermarks, touch_ui_prefs, updated_at',
+      'tenant_slug, active_staff_id, active_staff_name, kassa_ui_dark, bar_bon_watermarks, updated_at',
     )
     .eq('tenant_slug', tenant_slug)
     .maybeSingle()
@@ -81,7 +77,6 @@ export async function PATCH(request: NextRequest) {
     active_staff_name?: string | null
     kassa_ui_dark?: boolean | null
     bar_bon_watermarks?: Record<string, unknown>
-    touch_ui_prefs?: Record<string, unknown>
   }
   try {
     body = (await request.json()) as typeof body
@@ -106,15 +101,12 @@ export async function PATCH(request: NextRequest) {
   if ('bar_bon_watermarks' in body && body.bar_bon_watermarks && typeof body.bar_bon_watermarks === 'object') {
     patch.bar_bon_watermarks = body.bar_bon_watermarks
   }
-  if ('touch_ui_prefs' in body && body.touch_ui_prefs && typeof body.touch_ui_prefs === 'object') {
-    patch.touch_ui_prefs = body.touch_ui_prefs
-  }
 
   const { data, error } = await supabase
     .from('kassa_pos_state')
     .upsert(patch, { onConflict: 'tenant_slug' })
     .select(
-      'tenant_slug, active_staff_id, active_staff_name, kassa_ui_dark, bar_bon_watermarks, touch_ui_prefs, updated_at',
+      'tenant_slug, active_staff_id, active_staff_name, kassa_ui_dark, bar_bon_watermarks, updated_at',
     )
     .single()
 
@@ -123,5 +115,5 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ ok: false, error: 'server' }, { status: 500 })
   }
 
-  return NextResponse.json({ ok: true, state: rowToJson(data as PosStateRow) })
+  return NextResponse.json({ ok: true, state: rowToJson(data as PosStateRow | null) })
 }
