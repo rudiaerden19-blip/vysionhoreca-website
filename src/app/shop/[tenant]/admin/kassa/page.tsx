@@ -151,6 +151,10 @@ import {
 } from '@/lib/kassa-active-staff-preference'
 import { fetchKassaPosState, purgeLegacyKassaLocalStorage } from '@/lib/kassa-pos-state-client'
 import {
+  KASSA_UI_APPEARANCE_TOGGLE_ENABLED,
+  useKassaUiDarkSync,
+} from '@/lib/kassa-register-ui-dark-preference'
+import {
   flushOfflineOrdersToSupabase,
   mergeOfflineOrderQueues,
 } from '@/lib/kassa-offline-order-queue'
@@ -850,8 +854,7 @@ const KASSA_DRAFT_RECEIPT_COOLDOWN_MS = 450
 
 function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const tenant = params.tenant
-  /** Horeca-POS: altijd donker (geen licht-thema op productie-kassa). */
-  const kassaAppearanceDark = true
+  const { dark: kassaAppearanceDark, toggle: toggleKassaAppearance } = useKassaUiDarkSync(tenant)
   const router = useRouter()
   const searchParams = useSearchParams()
   const demoFromUrl =
@@ -4713,14 +4716,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </Link>
           )}
 
-          {false && !demoViewOnly ? (
+          {KASSA_UI_APPEARANCE_TOGGLE_ENABLED ? (
             <button
               type="button"
-              onClick={() => {}}
+              onClick={toggleKassaAppearance}
               className={headerQuickLinkBtnClass}
-              title={t('kassaApp.darkMode')}
+              title={kassaAppearanceDark ? t('kassaApp.lightMode') : t('kassaApp.darkMode')}
             >
-              <span className={KASSA_HEADER_QUICK_LINK_LABEL}>{t('kassaApp.darkMode')}</span>
+              <span className={KASSA_HEADER_QUICK_LINK_LABEL}>
+                {kassaAppearanceDark ? t('kassaApp.lightMode') : t('kassaApp.darkMode')}
+              </span>
             </button>
           ) : null}
 
