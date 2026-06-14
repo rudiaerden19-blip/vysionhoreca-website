@@ -6,8 +6,6 @@ import { STAFF_PIN_MAX_LEN } from '@/components/staff-clock/StaffClockPinPortal'
 import { useLanguage } from '@/i18n'
 import { ATTR_VYSION_KB_MANAGED, focusInputForProgrammaticEdit, setNativeInputValue } from '@/lib/dom-input-value'
 import {
-  isPublicPlatformAuthPath,
-  isShopCustomerSelfServicePath,
   isShopStaffInternalPath,
   preferNativeKeyboardOnThisPage,
 } from '@/lib/web-touch-keyboard-policy'
@@ -156,16 +154,14 @@ function shouldActivateWebKeyboard(pathname: string): boolean {
   const p = pathname || window.location.pathname
 
   if (preferNativeKeyboardOnThisPage(p)) return false
-  if (isPublicPlatformAuthPath(p)) return false
 
   if (/^\/shop\/[^/]+(\/|$)/i.test(p)) {
     if (isShopStaffInternalPath(p)) return true
-    if (isShopCustomerSelfServicePath(p)) return false
     return true
   }
 
   if (/^\/keuken\//i.test(p)) return true
-  if (/^\/(?:superadmin|dashboard)\b/i.test(p)) return true
+  if (/^\/(?:superadmin|dashboard|registreer)\b/i.test(p)) return true
 
   try {
     if (window.matchMedia?.('(pointer: coarse)')?.matches) return true
@@ -643,7 +639,11 @@ export function WebAzertyKeyboard() {
       }, 280)
     }
 
-    const onBlur = () => {
+    const onBlur = (ev: FocusEvent) => {
+      const related = ev.relatedTarget
+      if (related instanceof HTMLElement && isEligibleField(related, pathname)) {
+        return
+      }
       scheduleMaybeClose()
     }
 

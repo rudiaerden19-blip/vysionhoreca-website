@@ -92,6 +92,31 @@ export default function RegisterPage() {
     setError('')
   }
 
+  /** Autofill op touch vult DOM vóór React — eenmalig syncen zodat velden niet leeg blijven / focus springt. */
+  useEffect(() => {
+    if (step !== 'form' || typeof window === 'undefined') return
+    const fieldIds = ['businessName', 'email', 'phone', 'password', 'confirmPassword'] as const
+    const sync = () => {
+      setFormData((prev) => {
+        let next = prev
+        for (const id of fieldIds) {
+          const el = document.getElementById(id)
+          if (!(el instanceof HTMLInputElement) || !el.value) continue
+          if (prev[id] !== el.value) {
+            next = { ...next, [id]: el.value }
+          }
+        }
+        return next === prev ? prev : next
+      })
+    }
+    const t1 = window.setTimeout(sync, 300)
+    const t2 = window.setTimeout(sync, 1200)
+    return () => {
+      window.clearTimeout(t1)
+      window.clearTimeout(t2)
+    }
+  }, [step])
+
   const redirectAfterSignup = (slug: string, internalPath: string) => {
     try {
       sessionStorage.setItem(`vysion_welcomed_${slug}`, 'true')
@@ -112,6 +137,14 @@ export default function RegisterPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
+    setError('')
+  }
+
+  /** Browser-autofill op touch vult soms DOM zonder `change` — sync naar React-state. */
+  const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
+    const { name, value } = e.currentTarget
+    if (!name) return
+    setFormData(prev => (prev[name as keyof typeof prev] === value ? prev : { ...prev, [name]: value }))
     setError('')
   }
 
@@ -451,7 +484,7 @@ export default function RegisterPage() {
             onSubmit={handleSubmit}
             className="space-y-6"
             autoComplete="off"
-            data-no-web-touch-keyboard
+            data-vysion-kb-scroll-host
           >
             <div>
               <label htmlFor="businessName" className="mb-2 block text-sm font-medium text-gray-800">
@@ -463,6 +496,7 @@ export default function RegisterPage() {
                 type="text"
                 value={formData.businessName}
                 onChange={handleChange}
+                onInput={handleInput}
                 required
                 placeholder={t('register.businessNamePlaceholder')}
                 className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition-all placeholder:text-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/25"
@@ -479,6 +513,7 @@ export default function RegisterPage() {
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
+                onInput={handleInput}
                 required
                 autoComplete="off"
                 placeholder={t('register.emailPlaceholder')}
@@ -496,6 +531,7 @@ export default function RegisterPage() {
                 type="tel"
                 value={formData.phone}
                 onChange={handleChange}
+                onInput={handleInput}
                 required
                 inputMode="tel"
                 autoComplete="tel"
@@ -514,6 +550,7 @@ export default function RegisterPage() {
                 type="password"
                 value={formData.password}
                 onChange={handleChange}
+                onInput={handleInput}
                 required
                 autoComplete="new-password"
                 placeholder={t('register.passwordPlaceholder')}
@@ -531,6 +568,7 @@ export default function RegisterPage() {
                 type="password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
+                onInput={handleInput}
                 required
                 autoComplete="new-password"
                 placeholder={t('register.confirmPasswordPlaceholder')}
