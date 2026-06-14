@@ -1,13 +1,37 @@
 /**
- * Controlled numeric fields: store number in state, keep partial input (12. / 3,5) while typing.
+ * Controlled numeric fields: store number in state, keep partial input (12. / 3,5 / 1.234,) while typing.
+ * BE/EU: thousand dots + decimal comma (1.234,56).
  */
+
+/** Normalise partial or complete user input naar een enkel decimaalteken (punt). */
+export function normalizeEuropeanNumberInput(raw: string): string {
+  const t = raw.trim().replace(/\s/g, '')
+  if (t === '' || t === '-') return t
+  if (t === '.' || t === ',') return '.'
+
+  const hasComma = t.includes(',')
+
+  if (hasComma) {
+    const lastComma = t.lastIndexOf(',')
+    const intPart = t.slice(0, lastComma).replace(/\./g, '')
+    const fracPart = t.slice(lastComma + 1)
+    return `${intPart}.${fracPart}`
+  }
+
+  const dotCount = (t.match(/\./g) || []).length
+  if (dotCount > 1) {
+    return t.replace(/\./g, '')
+  }
+
+  return t
+}
+
 export function isPartialNumberInput(raw: string, options?: { integer?: boolean }): boolean {
   const t = raw.trim().replace(/\s/g, '')
   if (t === '') return true
   if (options?.integer) return /^\d*$/.test(t)
   if (t === '-' || t === '.' || t === ',') return true
-  if (t.includes(',') && t.includes('.')) return false
-  const normalized = t.replace(',', '.')
+  const normalized = normalizeEuropeanNumberInput(t)
   return /^-?\d*\.?\d*$/.test(normalized)
 }
 
@@ -21,9 +45,16 @@ export function numberFieldDisplayValue(
 }
 
 export function parseNumberFieldValue(raw: string, options?: { integer?: boolean }): number {
-  const trimmed = raw.trim().replace(/\s/g, '').replace(',', '.')
-  if (trimmed === '' || trimmed === '-' || trimmed === '.') return 0
-  const n = options?.integer ? parseInt(trimmed, 10) : parseFloat(trimmed)
+  const trimmed = raw.trim().replace(/\s/g, '')
+  if (trimmed === '' || trimmed === '-' || trimmed === '.' || trimmed === ',') return 0
+  if (options?.integer) {
+    const digits = trimmed.replace(/\./g, '').replace(/,/g, '')
+    const n = parseInt(digits, 10)
+    return Number.isNaN(n) ? 0 : n
+  }
+  const normalized = normalizeEuropeanNumberInput(trimmed)
+  if (normalized === '' || normalized === '-' || normalized === '.') return 0
+  const n = parseFloat(normalized)
   return Number.isNaN(n) ? 0 : n
 }
 

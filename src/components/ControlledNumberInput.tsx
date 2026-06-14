@@ -32,13 +32,19 @@ export function ControlledNumberInput({
 
   const display = draft !== null ? draft : numberFieldDisplayValue(value, { emptyWhenZero })
 
+  const resolvedInputMode = inputMode ?? (integer ? 'numeric' : 'decimal')
+
   return (
     <input
       {...rest}
       type="text"
-      inputMode={inputMode ?? (integer ? 'numeric' : 'decimal')}
+      inputMode={resolvedInputMode}
       autoComplete="off"
+      autoCorrect="off"
+      autoCapitalize="off"
+      spellCheck={false}
       data-no-capitalize="true"
+      data-vysion-number-input="true"
       value={display}
       onChange={(e) => {
         const raw = e.target.value
@@ -72,13 +78,19 @@ export function ControlledOptionalNumberInput({
 
   const display = draft !== null ? draft : optionalNumberFieldDisplay(value)
 
+  const resolvedInputMode = inputMode ?? (integer ? 'numeric' : 'decimal')
+
   return (
     <input
       {...rest}
       type="text"
-      inputMode={inputMode ?? (integer ? 'numeric' : 'decimal')}
+      inputMode={resolvedInputMode}
       autoComplete="off"
+      autoCorrect="off"
+      autoCapitalize="off"
+      spellCheck={false}
       data-no-capitalize="true"
+      data-vysion-number-input="true"
       value={display}
       onChange={(e) => {
         const raw = e.target.value

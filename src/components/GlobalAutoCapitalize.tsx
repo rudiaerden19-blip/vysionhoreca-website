@@ -22,6 +22,14 @@ export function GlobalAutoCapitalize() {
       if (!(raw instanceof HTMLInputElement) && !(raw instanceof HTMLTextAreaElement)) return
       const target = raw
 
+      if (
+        target.getAttribute('autocapitalize') === 'off' ||
+        target.getAttribute('data-no-capitalize') === 'true' ||
+        target.getAttribute('data-vysion-number-input') === 'true'
+      ) {
+        return
+      }
+
       // Skip bepaalde input types
       const inputType = target.getAttribute('type')?.toLowerCase()
       if (inputType === 'email' || inputType === 'password' || inputType === 'url' || inputType === 'number' || inputType === 'checkbox' || inputType === 'radio' || inputType === 'range' || inputType === 'color' || inputType === 'file' || inputType === 'hidden') {
@@ -32,14 +40,14 @@ export function GlobalAutoCapitalize() {
       if (inputMode === 'decimal' || inputMode === 'numeric') {
         return
       }
-      
-      // Skip als autocapitalize="off" is gezet
-      if (target.getAttribute('autocapitalize') === 'off' || target.getAttribute('data-no-capitalize') === 'true') {
-        return
-      }
-      
+
       const value = target.value
       if (!value) return
+
+      // Bedrag / percentage — nooit autocapitalize (ook zonder inputmode in DOM)
+      if (/^-?[\d\s.,]*$/.test(value)) {
+        return
+      }
       
       // Eerste letter altijd hoofdletter
       let newValue = value.charAt(0).toUpperCase() + value.slice(1)
