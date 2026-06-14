@@ -13,6 +13,7 @@ import {
   minReservationDateYmd,
 } from '@/lib/reservation-datetime'
 import { useLanguage } from '@/i18n'
+import { patchWebshopBrowserSession, migrateLegacyWebshopLocalStorage } from '@/lib/webshop-browser-session'
 import { LocaleFlagEmoji, LocaleFlagWithCode } from '@/components/LocaleFlagEmoji'
 
 const MarketingDemoSessionPrime = dynamic(
@@ -201,12 +202,13 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   // Save WhatsApp phone and set language if user came from WhatsApp link
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      void migrateLegacyWebshopLocalStorage(params.tenant)
       const urlParams = new URLSearchParams(window.location.search)
       const waPhone = urlParams.get('wa')
       const lang = urlParams.get('lang')
       
       if (waPhone) {
-        localStorage.setItem(`whatsapp_phone_${params.tenant}`, waPhone)
+        void patchWebshopBrowserSession(params.tenant, { whatsapp_phone: waPhone })
         
         // ALWAYS start fresh at top when coming from WhatsApp
         window.scrollTo(0, 0)

@@ -6,6 +6,7 @@
  */
 
 import { KIOSK_COOKIE } from '@/lib/kiosk-mode'
+import { getCachedTouchUiPrefs, touchPrefsTenantFromWindow } from '@/lib/touch-keyboard-prefs'
 
 export function isKioskSession(): boolean {
   if (typeof document === 'undefined') return false
@@ -31,7 +32,8 @@ export function isPhoneLikeDevice(): boolean {
   if (isKioskSession()) return false
 
   try {
-    if (localStorage.getItem('vysion_web_kb_force') === '1') return false
+    const slug = touchPrefsTenantFromWindow()
+    if (slug && getCachedTouchUiPrefs(slug).kb_force) return false
   } catch {
     /* noop */
   }

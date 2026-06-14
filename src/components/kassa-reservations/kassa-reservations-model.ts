@@ -163,6 +163,7 @@ export interface ReservationSettings {
   bookingPageEnabled: boolean
   autoConfirm: boolean
   floorplanFloorOnly: boolean
+  floorPlanTablesLocked: boolean
 }
 
 export interface GuestProfile {

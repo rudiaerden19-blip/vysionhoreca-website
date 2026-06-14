@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { getTenantSettings, registerCustomer, TenantSettings } from '@/lib/admin-api'
 import { assignTenantHref } from '@/lib/tenant-url'
+import { fetchWebshopBrowserSession, patchWebshopBrowserSession, migrateLegacyWebshopLocalStorage } from '@/lib/webshop-browser-session'
 import { useLanguage } from '@/i18n'
 
 export default function RegisterPage({ params }: { params: { tenant: string } }) {
@@ -33,8 +34,9 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
   }, [params.tenant])
 
   async function loadData() {
-    const customerId = localStorage.getItem(`customer_${params.tenant}`)
-    if (customerId) {
+    await migrateLegacyWebshopLocalStorage(params.tenant)
+    const session = await fetchWebshopBrowserSession(params.tenant)
+    if (session.shop_customer_id) {
       assignTenantHref(params.tenant, '/account')
       return
     }
@@ -121,7 +123,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
     )
     
     if (result.success && result.customer) {
-      localStorage.setItem(`customer_${params.tenant}`, result.customer.id!)
+      await patchWebshopBrowserSession(params.tenant, { shop_customer_id: result.customer.id! })
       assignTenantHref(params.tenant, '/account')
     } else {
       setGeneralError(result.error || t('accountPage.registrationFailed'))

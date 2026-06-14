@@ -8,6 +8,7 @@ export type KassaPosState = {
   active_staff_name: string | null
   kassa_ui_dark: boolean | null
   bar_bon_watermarks: BarBonWatermarkStore
+  touch_ui_prefs: Record<string, unknown>
 }
 
 const emptyState = (): KassaPosState => ({
@@ -15,6 +16,7 @@ const emptyState = (): KassaPosState => ({
   active_staff_name: null,
   kassa_ui_dark: null,
   bar_bon_watermarks: {},
+  touch_ui_prefs: {},
 })
 
 export async function fetchKassaPosState(tenantSlug: string): Promise<KassaPosState> {
@@ -33,6 +35,10 @@ export async function fetchKassaPosState(tenantSlug: string): Promise<KassaPosSt
         data.state.bar_bon_watermarks && typeof data.state.bar_bon_watermarks === 'object'
           ? (data.state.bar_bon_watermarks as BarBonWatermarkStore)
           : {},
+      touch_ui_prefs:
+        data.state.touch_ui_prefs && typeof data.state.touch_ui_prefs === 'object'
+          ? (data.state.touch_ui_prefs as Record<string, unknown>)
+          : {},
     }
   } catch {
     return emptyState()
@@ -46,6 +52,7 @@ export async function patchKassaPosState(
     active_staff_name: string | null
     kassa_ui_dark: boolean | null
     bar_bon_watermarks: BarBonWatermarkStore
+    touch_ui_prefs: Record<string, unknown>
   }>,
 ): Promise<KassaPosState | null> {
   try {
@@ -62,6 +69,10 @@ export async function patchKassaPosState(
       bar_bon_watermarks:
         data.state.bar_bon_watermarks && typeof data.state.bar_bon_watermarks === 'object'
           ? (data.state.bar_bon_watermarks as BarBonWatermarkStore)
+          : {},
+      touch_ui_prefs:
+        data.state.touch_ui_prefs && typeof data.state.touch_ui_prefs === 'object'
+          ? (data.state.touch_ui_prefs as Record<string, unknown>)
           : {},
     }
   } catch {
@@ -84,6 +95,15 @@ export function purgeLegacyKassaLocalStorage(tenantSlug: string): void {
     `vysion_kassa_bar_bon_watermark_v2_${tenantSlug}`,
     `vysion_stool_status_${tenantSlug}`,
     `vysion_stool_status_terrace_${tenantSlug}`,
+    `reservationSettings_${tenantSlug}`,
+    `floor_tables_locked_${tenantSlug}`,
+    `cart_${tenantSlug}`,
+    `whatsapp_phone_${tenantSlug}`,
+    `customer_${tenantSlug}`,
+    'vysion_web_kb_layout',
+    'vysion_web_kb_panel_pos',
+    'vysion_web_kb_force',
+    'vysion_web_kb_off',
   ]
   for (const k of keys) {
     try {

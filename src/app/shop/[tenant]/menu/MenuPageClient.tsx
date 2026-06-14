@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { isKioskSearchParams, kioskShopHref } from '@/lib/kiosk-mode'
 import { getMenuCategories, getMenuProducts, getAllMenuProductOptionsForTenant, getTenantSettings, getActivePromotions, getExceptionalClosings, ExceptionalClosing, MenuCategory, MenuProduct, ProductOption, ProductOptionChoice, Promotion, compareMenuProductsBySortOrder } from '@/lib/admin-api'
+import { patchWebshopBrowserSession, migrateLegacyWebshopLocalStorage } from '@/lib/webshop-browser-session'
 import { useLanguage } from '@/i18n'
 
 interface MenuItem {
@@ -291,12 +292,13 @@ export default function MenuPageClient({
   // Save WhatsApp phone and set language if user came from WhatsApp link
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      void migrateLegacyWebshopLocalStorage(params.tenant)
       const urlParams = new URLSearchParams(window.location.search)
       const waPhone = urlParams.get('wa')
       const lang = urlParams.get('lang')
       
       if (waPhone) {
-        localStorage.setItem(`whatsapp_phone_${params.tenant}`, waPhone)
+        void patchWebshopBrowserSession(params.tenant, { whatsapp_phone: waPhone })
         
         // ALWAYS start fresh at top when coming from WhatsApp
         window.scrollTo(0, 0)
@@ -379,21 +381,19 @@ export default function MenuPageClient({
     }
   }
 
-  // Save cart to localStorage whenever it changes
+  // Mand sync naar browser-sessie (Supabase + httpOnly cookie), niet localStorage
   useEffect(() => {
-    if (cart.length > 0) {
-      const cartForStorage = cart.map(c => ({
-        id: c.item.id,
-        name: c.item.name,
-        price: c.item.price,
-        quantity: c.quantity,
-        options: c.selectedOptions.map(o => ({ name: o.choice.name, price: o.choice.price })),
-        totalPrice: c.totalPrice,
-        image_url: c.item.image_url,
-        notes: c.notes,  // Include voice order modifications
-      }))
-      localStorage.setItem(`cart_${params.tenant}`, JSON.stringify(cartForStorage))
-    }
+    const cartForStorage = cart.map((c) => ({
+      id: c.item.id,
+      name: c.item.name,
+      price: c.item.price,
+      quantity: c.quantity,
+      options: c.selectedOptions.map((o) => ({ name: o.choice.name, price: o.choice.price })),
+      totalPrice: c.totalPrice,
+      image_url: c.item.image_url,
+      notes: c.notes,
+    }))
+    void patchWebshopBrowserSession(params.tenant, { cart: cartForStorage })
   }, [cart, params.tenant])
 
   useEffect(() => {

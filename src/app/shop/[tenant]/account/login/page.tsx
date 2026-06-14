@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { getTenantSettings, loginCustomer, TenantSettings } from '@/lib/admin-api'
 import { assignTenantHref } from '@/lib/tenant-url'
 import { clearTerminalLogout } from '@/lib/session-broadcast'
+import { fetchWebshopBrowserSession, patchWebshopBrowserSession, migrateLegacyWebshopLocalStorage } from '@/lib/webshop-browser-session'
 import { useLanguage } from '@/i18n'
 
 export default function LoginPage({ params }: { params: { tenant: string } }) {
@@ -25,9 +26,9 @@ export default function LoginPage({ params }: { params: { tenant: string } }) {
   }, [params.tenant])
 
   async function loadData() {
-    // Check if already logged in
-    const customerId = localStorage.getItem(`customer_${params.tenant}`)
-    if (customerId) {
+    await migrateLegacyWebshopLocalStorage(params.tenant)
+    const session = await fetchWebshopBrowserSession(params.tenant)
+    if (session.shop_customer_id) {
       assignTenantHref(params.tenant, '/account')
       return
     }
@@ -46,7 +47,7 @@ export default function LoginPage({ params }: { params: { tenant: string } }) {
     
     if (result.success && result.customer) {
       clearTerminalLogout()
-      localStorage.setItem(`customer_${params.tenant}`, result.customer.id!)
+      await patchWebshopBrowserSession(params.tenant, { shop_customer_id: result.customer.id! })
       assignTenantHref(params.tenant, '/account')
     } else {
       setError(result.error || t('accountPage.loginFailed'))

@@ -9,6 +9,13 @@ import {
   isShopStaffInternalPath,
   preferNativeKeyboardOnThisPage,
 } from '@/lib/web-touch-keyboard-policy'
+import {
+  getCachedTouchUiPrefs,
+  loadTouchUiPrefs,
+  persistTouchUiPrefs,
+  touchPrefsTenantFromPathname,
+  type TouchKeyboardLetterLayout,
+} from '@/lib/touch-keyboard-prefs'
 import { usePathname } from 'next/navigation'
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 
@@ -30,33 +37,9 @@ const IGNORE_TYPES = new Set([
   'week',
 ])
 
-const STORAGE_KEYBOARD_LAYOUT = 'vysion_web_kb_layout'
-const STORAGE_KB_POSITION = 'vysion_web_kb_panel_pos'
-
 type PanelPos = { x: number; y: number }
 
-function readStoredPanelPos(): PanelPos | null {
-  if (typeof window === 'undefined') return null
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KB_POSITION)
-    if (!raw) return null
-    const p = JSON.parse(raw) as PanelPos
-    if (typeof p.x !== 'number' || typeof p.y !== 'number') return null
-    if (!Number.isFinite(p.x) || !Number.isFinite(p.y)) return null
-    return p
-  } catch {
-    return null
-  }
-}
-
-function persistPanelPos(pos: PanelPos | null) {
-  try {
-    if (pos === null) window.localStorage.removeItem(STORAGE_KB_POSITION)
-    else window.localStorage.setItem(STORAGE_KB_POSITION, JSON.stringify(pos))
-  } catch {
-    /* noop */
-  }
-}
+type KeyboardLetterLayout = TouchKeyboardLetterLayout
 
 function clampPanelPos(x: number, y: number, w: number, h: number): PanelPos {
   const pad = 6
@@ -70,26 +53,6 @@ function clampPanelPos(x: number, y: number, w: number, h: number): PanelPos {
 
 /** Blijft op het veld staan terwijl `inputmode`tijdelijk `none`is (decimale toetsen tonen). */
 const ATTR_VYSION_KB_DECIMAL = 'data-vysion-kb-decimal'
-
-type KeyboardLetterLayout = 'azerty' |  'qwerty'
-
-function readStoredLetterLayout(): KeyboardLetterLayout {
-  if (typeof window === 'undefined') return 'azerty'
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEYBOARD_LAYOUT)
-    return raw === 'qwerty'? 'qwerty': 'azerty'
-  } catch {
-    return 'azerty'
-  }
-}
-
-function persistLetterLayout(layout: KeyboardLetterLayout) {
-  try {
-    window.localStorage.setItem(STORAGE_KEYBOARD_LAYOUT, layout)
-  } catch {
-    /* noop */
-  }
-}
 
 const ADMIN_SCROLL_SELECTOR = '[data-vysion-admin-scroll]'
 
@@ -176,16 +139,16 @@ function scrollFieldClearOfKeyboard(target: HTMLElement, panelEl: HTMLElement | 
 /**
  * Zaak-shell + keuken + interne dashboards: schermtoetsenbord (kassa-/touch-pc).
  * Telefoon bij online bestellen/reserveren: native OS-toetsenbord.
- * Opslag: localStorage `vysion_web_kb_force`= 1 aan, `vysion_web_kb_off`= 1 uit.
+ * Voorkeuren (layout, positie, force/off): Supabase `kassa_pos_state.touch_ui_prefs`.
  */
 function shouldActivateWebKeyboard(pathname: string): boolean {
   if (typeof window === 'undefined') return false
 
-  try {
-    if (localStorage.getItem('vysion_web_kb_off') === '1') return false
-    if (localStorage.getItem('vysion_web_kb_force') === '1') return true
-  } catch {
-    /* noop */
+  const tenantSlug = touchPrefsTenantFromPathname(pathname || window.location.pathname)
+  if (tenantSlug) {
+    const prefs = getCachedTouchUiPrefs(tenantSlug)
+    if (prefs.kb_off) return false
+    if (prefs.kb_force) return true
   }
 
   const p = pathname || window.location.pathname
@@ -505,6 +468,30 @@ export function WebAzertyKeyboard() {
   const [panelPos, setPanelPos] = useState<PanelPos | null>(null)
 
   const kbOn = shouldActivateWebKeyboard(pathname)
+  const touchTenantSlug = touchPrefsTenantFromPathname(pathname)
+
+  useEffect(() => {
+    if (!touchTenantSlug) return
+    let cancelled = false
+    void loadTouchUiPrefs(touchTenantSlug).then((prefs) => {
+      if (cancelled) return
+      if (prefs.kb_layout === 'qwerty' || prefs.kb_layout === 'azerty') {
+        setLetterLayout(prefs.kb_layout)
+      }
+      if (prefs.kb_panel_pos && typeof prefs.kb_panel_pos.x === 'number') {
+        setPanelPos(prefs.kb_panel_pos)
+      } else if (prefs.kb_panel_pos === null) {
+        setPanelPos(null)
+      }
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [touchTenantSlug])
+
+  useEffect(() => {
+    if (!kbOn) setTarget(null)
+  }, [kbOn])
 
   const clearBlurCloseTimer = useCallback(() => {
     if (blurCloseTimerRef.current != null) {
@@ -512,15 +499,6 @@ export function WebAzertyKeyboard() {
       blurCloseTimerRef.current = null
     }
   }, [])
-
-  useEffect(() => {
-    setLetterLayout(readStoredLetterLayout())
-    setPanelPos(readStoredPanelPos())
-  }, [])
-
-  useEffect(() => {
-    if (!kbOn) setTarget(null)
-  }, [kbOn])
 
   const legacyNumericMode = !!(target && isNumericMode(target))
   const pinCompactMode = !!(target && isCompactPinField(target))
@@ -530,8 +508,10 @@ export function WebAzertyKeyboard() {
 
   const resetPanelPos = useCallback(() => {
     setPanelPos(null)
-    persistPanelPos(null)
-  }, [])
+    if (touchTenantSlug) {
+      void persistTouchUiPrefs(touchTenantSlug, { kb_panel_pos: null })
+    }
+  }, [touchTenantSlug])
 
   const onDragHandlePointerDown = useCallback(
     (e: ReactPointerEvent<HTMLButtonElement>) => {
@@ -584,10 +564,12 @@ export function WebAzertyKeyboard() {
       /* noop */
     }
     setPanelPos((pos) => {
-      if (pos) persistPanelPos(pos)
+      if (pos && touchTenantSlug) {
+        void persistTouchUiPrefs(touchTenantSlug, { kb_panel_pos: pos })
+      }
       return pos
     })
-  }, [])
+  }, [touchTenantSlug])
 
   useEffect(() => {
     if (!panelPos) return
@@ -864,7 +846,9 @@ export function WebAzertyKeyboard() {
 
   const chooseLayout = (L: KeyboardLetterLayout) => {
     setLetterLayout(L)
-    persistLetterLayout(L)
+    if (touchTenantSlug) {
+      void persistTouchUiPrefs(touchTenantSlug, { kb_layout: L })
+    }
   }
 
   const DIGITS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']

@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { getTenantSettings, getCustomer, getCustomerOrders, updateCustomer, getLoyaltyRewards, redeemReward, deleteCustomerAccount, Customer, Order, TenantSettings, LoyaltyReward } from '@/lib/admin-api'
 import { assignTenantHref } from '@/lib/tenant-url'
 import { redirectCustomerLogoutUI } from '@/lib/session-broadcast'
+import { fetchWebshopBrowserSession, patchWebshopBrowserSession, migrateLegacyWebshopLocalStorage } from '@/lib/webshop-browser-session'
 import { useLanguage } from '@/i18n'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
@@ -35,8 +36,9 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
   }, [params.tenant])
 
   async function checkAuth() {
-    // Check if logged in via localStorage
-    const customerId = localStorage.getItem(`customer_${params.tenant}`)
+    await migrateLegacyWebshopLocalStorage(params.tenant)
+    const session = await fetchWebshopBrowserSession(params.tenant)
+    const customerId = session.shop_customer_id
     if (!customerId) {
       assignTenantHref(params.tenant, '/account/login')
       return
@@ -49,7 +51,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
     ])
 
     if (!customerData) {
-      localStorage.removeItem(`customer_${params.tenant}`)
+      await patchWebshopBrowserSession(params.tenant, { shop_customer_id: null })
       assignTenantHref(params.tenant, '/account/login')
       return
     }

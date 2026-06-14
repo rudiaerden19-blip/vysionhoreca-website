@@ -53,6 +53,7 @@ export const KASSA_DEFAULT_RESERVATION_SETTINGS: ReservationSettings = {
   bookingPageEnabled: true,
   autoConfirm: false,
   floorplanFloorOnly: false,
+  floorPlanTablesLocked: true,
 }
 
 function numFromDb(v: unknown, fallback: number): number {
@@ -116,5 +117,6 @@ export function mapReservationSettingsFromDb(data: Record<string, unknown>): Par
     bookingPageEnabled: boolFromDb(data.booking_page_enabled, D.bookingPageEnabled),
     autoConfirm: boolFromDb(data.auto_confirm, D.autoConfirm),
     floorplanFloorOnly: boolFromDb(data.floorplan_floor_only, D.floorplanFloorOnly),
+    floorPlanTablesLocked: boolFromDb(data.floor_plan_tables_locked, D.floorPlanTablesLocked),
   }
 }

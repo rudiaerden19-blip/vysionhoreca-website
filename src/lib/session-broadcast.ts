@@ -1,5 +1,6 @@
 import { clearTenantOwnerSession } from '@/lib/auth-headers'
 import { clearSuperadminSessionCookies } from '@/lib/superadmin-cookies'
+import { patchWebshopBrowserSession } from '@/lib/webshop-browser-session'
 
 /** Andere tabbladen / webviews op zelfde origin — zelf gedrag bij uitloggen klant */
 export const SHOP_CUSTOMER_LOGOUT_CHANNEL = 'vysion-shop-customer-logout-v1'
@@ -65,7 +66,7 @@ export function readTerminalLogout(): TerminalLogoutStamp | null {
   }
 }
 
-/** Verwijdert lokale klant-sessie + winkelmand(ken) voor de webshop. */
+/** Verwijdert legacy localStorage-keys voor webshop-klant/mand. */
 export function clearShopCustomerSessionLocal(): void {
   if (typeof window === 'undefined') return
   try {
@@ -73,7 +74,9 @@ export function clearShopCustomerSessionLocal(): void {
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i)
       if (!k) continue
-      if (k.startsWith('customer_') || k.startsWith('cart_')) toRemove.push(k)
+      if (k.startsWith('customer_') || k.startsWith('cart_') || k.startsWith('whatsapp_phone_')) {
+        toRemove.push(k)
+      }
     }
     toRemove.forEach((key) => localStorage.removeItem(key))
   } catch {
@@ -123,6 +126,7 @@ export function broadcastShopCustomerLogout(tenantSlug: string): void {
 export function redirectCustomerLogoutUI(tenantSlug: string): void {
   if (typeof window === 'undefined') return
   broadcastShopCustomerLogout(tenantSlug)
+  void patchWebshopBrowserSession(tenantSlug, { shop_customer_id: null, cart: [] })
   clearShopCustomerSessionLocal()
   attemptCloseCurrentWebview()
 }

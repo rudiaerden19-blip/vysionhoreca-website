@@ -22,31 +22,8 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
       return fixed as KassaTable[]
     }
 
-    try {
-      const rawInside = localStorage.getItem(`vysion_tables_${params.tenant}`)
-      const rawTerrace = localStorage.getItem(`vysion_tables_terrace_${params.tenant}`)
-      const mergedLs: KassaTable[] = []
-      if (rawInside) {
-        try {
-          mergedLs.push(...(JSON.parse(rawInside) as KassaTable[]))
-        } catch {
-          /* empty */
-        }
-      }
-      if (rawTerrace) {
-        try {
-          mergedLs.push(...(JSON.parse(rawTerrace) as KassaTable[]))
-        } catch {
-          /* empty */
-        }
-      }
-      if (mergedLs.length) setKassaTables(mergedLs)
-    } catch {
-      /* empty */
-    }
-
     void (async () => {
-      const loadZone = async (plan_zone: 'inside' |  'terrace'): Promise<KassaTable[]> => {
+      const loadZone = async (plan_zone: 'inside' | 'terrace'): Promise<KassaTable[]> => {
         const adminRes = await adminDb.select<{ data?: unknown } | null>('floor_plan_tables', {
           tenantSlug: params.tenant,
           select: 'data',
@@ -70,12 +47,6 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
       }
       const [inside, terrace] = await Promise.all([loadZone('inside'), loadZone('terrace')])
       setKassaTables([...inside, ...terrace])
-      try {
-        localStorage.setItem(`vysion_tables_${params.tenant}`, JSON.stringify(inside))
-        localStorage.setItem(`vysion_tables_terrace_${params.tenant}`, JSON.stringify(terrace))
-      } catch {
-        /* empty */
-      }
     })()
   }, [params.tenant])
 

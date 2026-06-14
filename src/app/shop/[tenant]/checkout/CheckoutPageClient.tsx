@@ -21,6 +21,11 @@ import {
 } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
+import {
+  fetchWebshopBrowserSession,
+  migrateLegacyWebshopLocalStorage,
+  patchWebshopBrowserSession,
+} from '@/lib/webshop-browser-session'
 
 interface CartItem {
   id: string
@@ -93,41 +98,46 @@ export default function CheckoutPageClient({
 
   const primaryColor = tenantSettings?.primary_color || '#FF6B35'
   
-  // Check if user came from WhatsApp (has ?wa= parameter or saved in localStorage)
+  // WhatsApp deep-link: ?wa= in URL of opgeslagen in browser-sessie (Supabase + cookie)
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search)
-      let waPhone = urlParams.get('wa')
-      
-      // If not in URL, check localStorage (saved when user opened shop from WhatsApp)
+    if (typeof window === 'undefined') return
+
+    const urlParams = new URLSearchParams(window.location.search)
+    let waPhone = urlParams.get('wa')
+
+    void (async () => {
       if (!waPhone) {
-        waPhone = localStorage.getItem(`whatsapp_phone_${params.tenant}`)
+        const session = await fetchWebshopBrowserSession(params.tenant)
+        waPhone = session.whatsapp_phone
+      } else {
+        await patchWebshopBrowserSession(params.tenant, { whatsapp_phone: waPhone })
       }
-      
+
       if (waPhone) {
         setWhatsappPhone(waPhone)
-        // Pre-fill phone number
-        setCustomerInfo(prev => ({
+        setCustomerInfo((prev) => ({
           ...prev,
-          phone: waPhone!.startsWith('32') ? `+${waPhone}`: waPhone!
+          phone: waPhone!.startsWith('32') ? `+${waPhone}` : waPhone!,
         }))
       }
-      
-      // Fetch business WhatsApp number
+
       fetch(`/api/whatsapp/settings?tenant=${params.tenant}`)
-        .then(res => res.json())
-        .then(data => {
+        .then((res) => res.json())
+        .then((data) => {
           if (data.data?.whatsapp_number) {
             setBusinessWhatsApp(data.data.whatsapp_number.replace(/[^0-9]/g, ''))
           }
         })
-        .catch(err => console.error('Failed to fetch WhatsApp settings:', err))
-    }
+        .catch((err) => console.error('Failed to fetch WhatsApp settings:', err))
+    })()
   }, [params.tenant])
 
   useEffect(() => {
-    loadData()
-    loadCart()
+    void (async () => {
+      await migrateLegacyWebshopLocalStorage(params.tenant)
+      await loadData()
+      await loadCart()
+    })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
 
@@ -182,8 +192,9 @@ export default function CheckoutPageClient({
       setOrderType('pickup')
     }
     
-    // Check if customer is logged in
-    const customerId = localStorage.getItem(`customer_${params.tenant}`)
+    // Ingelogde klant via browser-sessie (httpOnly cookie + Supabase)
+    const session = await fetchWebshopBrowserSession(params.tenant)
+    const customerId = session.shop_customer_id
     if (customerId) {
       const customer = await getCustomer(customerId)
       if (customer) {
@@ -204,15 +215,10 @@ export default function CheckoutPageClient({
     setLoading(false)
   }
 
-  function loadCart() {
-    // Load cart from localStorage
-    const savedCart = localStorage.getItem(`cart_${params.tenant}`)
-    if (savedCart) {
-      try {
-        setCart(JSON.parse(savedCart))
-      } catch (e) {
-        console.error('Error loading cart:', e)
-      }
+  async function loadCart() {
+    const session = await fetchWebshopBrowserSession(params.tenant)
+    if (session.cart.length > 0) {
+      setCart(session.cart as CartItem[])
     }
   }
 
@@ -404,7 +410,7 @@ export default function CheckoutPageClient({
           })
           const stripeData = await stripeRes.json()
           if (stripeData.url) {
-            localStorage.removeItem(`cart_${params.tenant}`)
+            void patchWebshopBrowserSession(params.tenant, { cart: [] })
             window.location.href = stripeData.url
             return
           }
@@ -418,8 +424,7 @@ export default function CheckoutPageClient({
       setOrderNumber(order.order_number)
       setOrderSuccess(true)
       
-      // Then clear cart from localStorage (state blijft zodat we geen "empty cart" zien)
-      localStorage.removeItem(`cart_${params.tenant}`)
+      void patchWebshopBrowserSession(params.tenant, { cart: [] })
       
       // Send WhatsApp confirmation and redirect back to WhatsApp
       if (customerInfo.phone) {

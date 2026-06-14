@@ -43,7 +43,6 @@ import { parseFloorPlanTablesJson, sanitizeFloorPlanTables } from '@/lib/kassa-f
 import {
   FLOOR_PLAN_ZONE_INSIDE,
   FLOOR_PLAN_ZONE_TERRACE,
-  floorPlanTablesLocalStorageKey,
   floorPlanZoneFromRealtimePayload,
   type FloorPlanZone,
 } from '@/lib/kassa-floor-plan-zone'
@@ -216,15 +215,7 @@ export default function KassaReservationsView({
   const addFloorTableRef = useRef<() => Promise<void>>(async () => {})
   const [isDraggingFloor, setIsDraggingFloor] = useState(false)
   // Zelfde gedrag als kassa-plattegrond (KassaFloorPlan): standaard vast; ontgrendelen = bewust bewerken.
-  const [tablesLocked, setTablesLocked] = useState(() => {
-    try {
-      const v = localStorage.getItem(`floor_tables_locked_${tenant}`)
-      if (v == null || v === '') return true
-      return v === 'true'
-    } catch {
-      return true
-    }
-  })
+  const [tablesLocked, setTablesLocked] = useState(true)
   /** Altijd actueel in pointer capture handlers (voorkomt slepen na vergrendelen mid-gesture door stale closure). */
   const tablesLockedRef = useRef(tablesLocked)
   useEffect(() => {
@@ -314,13 +305,9 @@ export default function KassaReservationsView({
     const d = new Date()
     return { year: d.getFullYear(), month: d.getMonth() }
   })
-  const [reservationSettings, setReservationSettings] = useState<ReservationSettings>(() => {
-    if (typeof window === 'undefined') return KASSA_DEFAULT_RESERVATION_SETTINGS
-    try {
-      const saved = localStorage.getItem(`reservationSettings_${tenant}`)
-      return saved ? { ...KASSA_DEFAULT_RESERVATION_SETTINGS, ...JSON.parse(saved) } : KASSA_DEFAULT_RESERVATION_SETTINGS
-    } catch { return KASSA_DEFAULT_RESERVATION_SETTINGS }
-  })
+  const [reservationSettings, setReservationSettings] = useState<ReservationSettings>(
+    KASSA_DEFAULT_RESERVATION_SETTINGS,
+  )
   // Tenant info for emails
   const [businessInfo, setBusinessInfo] = useState({ name: '', phone: '', email: ''})
   const [noShowMarked, setNoShowMarked] = useState<Set<string>>(new Set())
@@ -375,7 +362,7 @@ export default function KassaReservationsView({
         }
       } catch (err) { console.error('[tenants] load error:', err) }
 
-      // Laad instellingen: Supabase is bron van waarheid; localStorage alleen voor offline/cache overlay
+      // Laad instellingen vanuit Supabase
       try {
         const { data, error: rsErr } = await supabase
           .from('reservation_settings')
@@ -385,20 +372,12 @@ export default function KassaReservationsView({
         if (rsErr) {
           console.error('[reservation_settings] load error:', rsErr.message)
         }
-        let localData: Record<string, unknown> = {}
-        try {
-          const localRaw = localStorage.getItem(`reservationSettings_${tenant}`)
-          localData = localRaw ? JSON.parse(localRaw) : {}
-        } catch { localData = {} }
 
         if (data && typeof data === 'object') {
           const fromDB = mapReservationSettingsFromDb(data as Record<string, unknown>)
           const merged = { ...KASSA_DEFAULT_RESERVATION_SETTINGS, ...fromDB }
           setReservationSettings(merged)
-          try { localStorage.setItem(`reservationSettings_${tenant}`, JSON.stringify(merged)) } catch {}
-        } else {
-          const merged = { ...KASSA_DEFAULT_RESERVATION_SETTINGS, ...localData }
-          setReservationSettings(merged)
+          setTablesLocked(merged.floorPlanTablesLocked)
         }
       } catch (err) {
         console.error('[reservation_settings] load error:', err)
@@ -782,22 +761,12 @@ export default function KassaReservationsView({
           if (!z) return
           if (payload.eventType === 'DELETE') {
             setFloorPlanTablesByZone((prev) => ({ ...prev, [z]: [] }))
-            try {
-              localStorage.setItem(floorPlanTablesLocalStorageKey(tenant, z), JSON.stringify([]))
-            } catch {
-              /* empty */
-            }
             return
           }
           const parsed = parseFloorPlanTablesJson(payload.new?.data)
           if (parsed === null) return
           const fixed = sanitizeFloorPlanTables(parsed) as FloorPlanTable[]
           setFloorPlanTablesByZone((prev) => ({ ...prev, [z]: fixed }))
-          try {
-            localStorage.setItem(floorPlanTablesLocalStorageKey(tenant, z), JSON.stringify(fixed))
-          } catch {
-            /* empty */
-          }
         },
       )
       .subscribe()
@@ -834,15 +803,16 @@ export default function KassaReservationsView({
     review_link: s.reviewLink,
     booking_page_enabled: s.bookingPageEnabled,
     auto_confirm: s.autoConfirm,
-    floorplan_floor_only: s.floorplanFloorOnly,
-  })
+  floorplan_floor_only: s.floorplanFloorOnly,
+  floor_plan_tables_locked: s.floorPlanTablesLocked,
+})
 
-  // Auto-save bij elke toggle/wijziging (localStorage direct, Supabase async)
   const updateSettings = (updates: Partial<ReservationSettings>) => {
     const newSettings = { ...reservationSettings, ...updates }
     setReservationSettings(newSettings)
-    localStorage.setItem(`reservationSettings_${tenant}`, JSON.stringify(newSettings))
-    // Stil opslaan via admin-proxy
+    if ('floorPlanTablesLocked' in updates) {
+      setTablesLocked(newSettings.floorPlanTablesLocked)
+    }
     void adminDb.upsert(
       'reservation_settings',
       buildSettingsPayload(newSettings) as any,
@@ -854,7 +824,6 @@ export default function KassaReservationsView({
 
   // Expliciet opslaan met toast feedback
   const saveSettingsToSupabase = async () => {
-    localStorage.setItem(`reservationSettings_${tenant}`, JSON.stringify(reservationSettings))
     const r = await adminDb.upsert(
       'reservation_settings',
       buildSettingsPayload(reservationSettings) as any,
@@ -876,11 +845,6 @@ export default function KassaReservationsView({
   const saveFloorPlan = async (updated: FloorPlanTable[]) => {
     const zone = resFloorPlanZoneRef.current
     setFloorPlanTablesByZone((prev) => ({ ...prev, [zone]: updated }))
-    try {
-      localStorage.setItem(floorPlanTablesLocalStorageKey(tenant, zone), JSON.stringify(updated))
-    } catch {
-      /* empty */
-    }
     const r = await adminDb.upsert(
       'floor_plan_tables',
       { tenant_slug: tenant, plan_zone: zone, data: updated } as Record<string, unknown>,
@@ -2459,7 +2423,7 @@ export default function KassaReservationsView({
                   onClick={() => {
                     const next = !tablesLocked
                     setTablesLocked(next)
-                    try { localStorage.setItem(`floor_tables_locked_${tenant}`, String(next)) } catch {}
+                    updateSettings({ floorPlanTablesLocked: next })
                   }}
                   className={`flex items-center gap-2 h-11 px-4 rounded-xl text-sm font-bold transition-colors whitespace-nowrap shadow-sm ${
                     tablesLocked
@@ -2608,7 +2572,7 @@ export default function KassaReservationsView({
                           e.stopPropagation()
                           const next = !tablesLocked
                           setTablesLocked(next)
-                          try { localStorage.setItem(`floor_tables_locked_${tenant}`, String(next)) } catch {}
+                          updateSettings({ floorPlanTablesLocked: next })
                         }}
                         className={`flex min-h-[44px] shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold shadow-lg transition-colors sm:px-4 ${
                           tablesLocked
