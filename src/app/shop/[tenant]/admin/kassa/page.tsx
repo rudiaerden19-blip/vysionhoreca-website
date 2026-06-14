@@ -459,9 +459,9 @@ function buildOpenTableOrdersMapFromRows(
     if (ot !== 'DINE_IN') continue
     if (!['open', 'preparing'].includes(st)) continue
     if (ps === 'paid') continue
-    if (tn != null && String(tn) !== '' && row.items != null) {
+    if (tn != null && String(tn).trim() !== '' && row.items != null) {
       const zone = normalizeFloorPlanZone(row.floor_plan_zone)
-      out[tableOrderMapKey(zone, String(tn))] = row.items as CartItem[]
+      out[tableOrderMapKey(zone, String(tn).trim())] = row.items as CartItem[]
     }
   }
   return out
@@ -475,15 +475,22 @@ function mergeOpenTableOrdersServerWithPendingLocal(
   prev: Record<string, CartItem[]>,
   fromServer: Record<string, CartItem[]>,
   pendingLocalSlotKeys: ReadonlySet<string>,
+  pendingCommittedBySlot?: Readonly<Record<string, CartItem[]>>,
 ): Record<string, CartItem[]> {
   const merged: Record<string, CartItem[]> = { ...fromServer }
   for (const k of pendingLocalSlotKeys) {
-    const v = prev[k]
+    const committed = pendingCommittedBySlot?.[k]
+    const v = committed ?? prev[k]
     if ((v?.length ?? 0) > 0) {
       merged[k] = v
     }
   }
   return merged
+}
+
+/** Tafelnummer uit picker/DB — altijd trimmen zodat slot-keys gelijk blijven. */
+function kassaTableDisplayNumber(raw: string): string {
+  return String(raw).trim()
 }
 
 /** Rijen uit DB voor buildOpenTableOrdersMapFromRows — zelfde bron als adminDb-insert (service role). */
@@ -967,6 +974,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [soundActivated, demoViewOnly])
 
   const [cart, setCart] = useState<CartItem[]>([])
+  const cartRef = useRef<CartItem[]>([])
+  useEffect(() => {
+    cartRef.current = cart
+  }, [cart])
   const [orderType, setOrderType] = useState<OrderType>('DINE_IN')
   const [tableNumber, setTableNumber] = useState('')
   const [numpadValue, setNumpadValue] = useState('')
@@ -1449,6 +1460,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const floorPlanTablesPersistInflightRef = useRef<Partial<Record<FloorPlanZone, number>>>({})
   /** Laatste open-manden snapshot — plattegrond-sync mag geen verouderde «bezet» uit DB terugzetten. */
   const tableOrdersRef = useRef<Record<string, CartItem[]>>({})
+  /** Tafelmand net gecommit — blijft leidend tot Supabase-persist klaar is (server poll mag mand niet leegtrekken). */
+  const pendingTableOrderLinesRef = useRef<Record<string, CartItem[]>>({})
 
   const applyKassaFloorPlanTablesPayload = useCallback((zone: FloorPlanZone, raw: unknown): boolean => {
     const parsed = parseFloorPlanTablesJson(raw)
@@ -1557,12 +1570,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       return
     }
     const fromServer = buildOpenTableOrdersMapFromRows(rows)
+    const pendingCommitted = pendingTableOrderLinesRef.current
     const pendingLocal = new Set<string>([
       ...Object.keys(persistTimersRef.current),
       ...openOrderPersistInflightRef.current,
+      ...Object.keys(pendingCommitted),
     ])
     setTableOrders((prev) => {
-      const merged = mergeOpenTableOrdersServerWithPendingLocal(prev, fromServer, pendingLocal)
+      const merged = mergeOpenTableOrdersServerWithPendingLocal(
+        prev,
+        fromServer,
+        pendingLocal,
+        pendingCommitted,
+      )
       queueMicrotask(() => syncFloorPlanStatusesFromOpenOrders(merged))
       return merged
     })
@@ -2059,6 +2079,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       })
       .finally(() => {
         openOrderPersistInflightRef.current.delete(slotKey)
+        delete pendingTableOrderLinesRef.current[slotKey]
       })
   }
 
@@ -2136,19 +2157,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     itemsToPark: CartItem[],
   ) => {
     if (itemsToPark.length === 0) return
-    const tbl = tblNr.trim()
+    const tbl = kassaTableDisplayNumber(tblNr)
     if (!tbl) return
     const slotKey = tableOrderMapKey(zone, tbl)
     const merged = mergeCartLinesForTable(tableOrdersRef.current[slotKey] || [], itemsToPark)
     const next: Record<string, CartItem[]> = { ...tableOrdersRef.current, [slotKey]: merged }
     tableOrdersRef.current = next
+    pendingTableOrderLinesRef.current[slotKey] = merged
     cancelPersistTimer(slotKey)
-    openOrderPersistInflightRef.current.add(slotKey)
     updateTableStatus(tbl, merged.length > 0, zone)
     flushSync(() => {
       setCart([])
+      setTableOrders(next)
     })
-    setTableOrders(next)
     queueMicrotask(() => syncFloorPlanStatusesFromOpenOrders(next))
     void persistOpenOrderRowToSupabase(zone, tbl, merged)
   }
@@ -2164,7 +2185,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const newTbl = newTableNr.trim()
 
     if (cart.length > 0) {
-      const snap = snapshotCartItemsForAsyncPrint(cart)
+      const snap = snapshotCartItemsForAsyncPrint(cartRef.current.length > 0 ? cartRef.current : cart)
       if (!oldTbl && newTbl) {
         commitCartRoundToTable(zone, newTbl, snap)
       } else if (oldTbl && oldTbl === newTbl && oldZone === zone) {
@@ -2188,10 +2209,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   /** Karronde naar tafelmand + keuken/kassa-delta; tafel blijft geselecteerd (sync Supabase). */
   const parkOrder = (opts: { printKitchen: boolean; printKassaSlip: boolean }) => {
-    if (orderType !== 'DINE_IN' || !tableNumber.trim() || cart.length === 0) return
+    const round = cartRef.current
+    if (orderType !== 'DINE_IN' || !kassaTableDisplayNumber(tableNumber) || round.length === 0) return
     const zone = dineInFloorZone
-    const tbl = tableNumber.trim()
-    const itemsToPark = snapshotCartItemsForAsyncPrint(cart)
+    const tbl = kassaTableDisplayNumber(tableNumber)
+    const itemsToPark = snapshotCartItemsForAsyncPrint(round)
     commitCartRoundToTable(zone, tbl, itemsToPark)
     void flushBarDeltaSlipRef.current(zone, tbl, itemsToPark, opts)
   }
@@ -2515,7 +2537,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   // ── Cart ─────────────────────────────────────────────────────────────────
   const tableHasOpenOrder = (zone: FloorPlanZone, tblNr: string, cartRound: CartItem[]) => {
-    const slotKey = tableOrderMapKey(zone, tblNr)
+    const slotKey = tableOrderMapKey(zone, kassaTableDisplayNumber(tblNr))
     const parked = tableOrders[slotKey]?.length ?? 0
     return parked > 0 || cartRound.length > 0
   }
@@ -2658,8 +2680,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }
 
   const activeTableSlotKey = useMemo(() => {
-    if (orderType !== 'DINE_IN' || !tableNumber) return null
-    return tableOrderMapKey(dineInFloorZone, tableNumber)
+    const tbl = kassaTableDisplayNumber(tableNumber)
+    if (orderType !== 'DINE_IN' || !tbl) return null
+    return tableOrderMapKey(dineInFloorZone, tbl)
   }, [orderType, tableNumber, dineInFloorZone])
 
   const parkedOnTableLines = useMemo((): CartItem[] => {
@@ -2679,7 +2702,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     if (!activeTableSlotKey || !tableNumber || orderType !== 'DINE_IN') return
     if (demoViewOnly) return
     const zone = dineInFloorZone
-    const tbl = tableNumber
+    const tbl = kassaTableDisplayNumber(tableNumber)
     if (qty <= 0) scheduleKassaTapSound(playRemove)
     else scheduleKassaTapSound(playClick)
     setTableOrders((prev) => {
