@@ -81,7 +81,7 @@ import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
 import { AccountMenuSessionBlock } from '@/components/AccountMenuSessionBlock'
 import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
 import { authFetch, buildShopInternalReturnPath } from '@/lib/auth-headers'
-import { isRetailLoyaltyCardScan } from '@/lib/retail-loyalty/card-code'
+import { extractRetailLoyaltyScanCode } from '@/lib/retail-loyalty/card-code'
 import { isRetailStoreCreditScan } from '@/lib/retail-store-credit/code'
 import type { RetailOrderLineForReturn, RetailStoreCreditPos } from '@/lib/retail-store-credit/types'
 import {
@@ -324,6 +324,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [linkedLoyaltyMember, setLinkedLoyaltyMember] = useState<RetailLoyaltyMemberPos | null>(
     null,
   )
+  const [loyaltyScanFeedback, setLoyaltyScanFeedback] = useState<string | null>(null)
+  const loyaltyScanFeedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [loyaltyRedeemPoints, setLoyaltyRedeemPoints] = useState(0)
   const [loyaltyRedeemModalOpen, setLoyaltyRedeemModalOpen] = useState(false)
   const [loyaltyRedeemDraft, setLoyaltyRedeemDraft] = useState('')
@@ -352,6 +354,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     return () => {
       for (const id of addOkFlashTimersRef.current) clearTimeout(id)
       addOkFlashTimersRef.current = []
+      if (loyaltyScanFeedbackTimerRef.current) clearTimeout(loyaltyScanFeedbackTimerRef.current)
     }
   }, [])
 
@@ -429,6 +432,15 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       requestAnimationFrame(() => focusBarcodeCapture())
     }
   }, [closeArticleSearchKeyboard, focusBarcodeCapture])
+
+  const showLoyaltyScanError = useCallback((message: string) => {
+    setLoyaltyScanFeedback(message)
+    if (loyaltyScanFeedbackTimerRef.current) clearTimeout(loyaltyScanFeedbackTimerRef.current)
+    loyaltyScanFeedbackTimerRef.current = setTimeout(() => {
+      setLoyaltyScanFeedback(null)
+      loyaltyScanFeedbackTimerRef.current = null
+    }, 4500)
+  }, [])
 
   const openArticleSearchKeyboard = useCallback(() => {
     const el = scanRef.current
@@ -1139,16 +1151,25 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   }
 
   async function linkLoyaltyCardFromScan(raw: string) {
+    const cardCode = extractRetailLoyaltyScanCode(raw)
+    if (!cardCode) return false
+    setLoyaltyScanFeedback(null)
     const res = await authFetch(
-      `/api/retail/loyalty/lookup?tenant=${encodeURIComponent(tenant)}&code=${encodeURIComponent(raw)}`,
+      `/api/retail/loyalty/lookup?tenant=${encodeURIComponent(tenant)}&code=${encodeURIComponent(cardCode)}`,
     )
-    const data = (await res.json()) as { ok?: boolean; member?: RetailLoyaltyMemberPos }
-    if (data.ok && data.member) {
+    let data: { ok?: boolean; member?: RetailLoyaltyMemberPos } = {}
+    try {
+      data = (await res.json()) as typeof data
+    } catch {
+      data = {}
+    }
+    if (res.ok && data.ok && data.member) {
       setLinkedLoyaltyMember(data.member)
+      setLoyaltyRedeemPoints(0)
       flashAddOkButton()
       return true
     }
-    alert(t('retailLoyalty.cardNotFound'))
+    showLoyaltyScanError(t('retailLoyalty.cardNotFound'))
     return false
   }
 
@@ -1191,7 +1212,10 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     if (!trimmed) return
     if (stockBusyRef.current) return
 
-    if (mode === 'sales' && loyaltyEnabled && isRetailLoyaltyCardScan(trimmed)) {
+    const loyaltyCode =
+      mode === 'sales' && loyaltyEnabled ? extractRetailLoyaltyScanCode(trimmed) : null
+
+    if (loyaltyCode) {
       stockBusyRef.current = true
       setStockBusy(true)
       try {
@@ -1500,6 +1524,15 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   async function runArticleSearch(query: string) {
     const trimmed = query.trim()
     if (!trimmed) return
+    if (
+      mode === 'sales' &&
+      loyaltyEnabled &&
+      extractRetailLoyaltyScanCode(trimmed)
+    ) {
+      setScanValue('')
+      void processBarcode(trimmed)
+      return
+    }
     if (mode !== 'sales') {
       void processBarcode(trimmed)
       return
@@ -2526,6 +2559,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               onKeyDown={onBarcodeWedgeKeyDown}
               onBlur={() => {
                 if (priceFixSku || articleSearchActiveRef.current) return
+                if (stockBusyRef.current) return
                 const ae = document.activeElement
                 if (ae === scanRef.current) return
                 if (ae && ae !== document.body && ae !== barcodeCaptureRef.current) return
@@ -2611,6 +2645,16 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 >
                   {t('retailKassaPage.storeCreditUnlink')}
                 </button>
+              </div>
+            ) : null}
+
+            {loyaltyEnabled && loyaltyScanFeedback ? (
+              <div
+                role="alert"
+                className={`shrink-0 border-b border-amber-400/40 bg-amber-950/90 px-3 py-2 text-sm font-semibold text-amber-100 sm:px-4`}
+                data-testid="retail-loyalty-scan-error"
+              >
+                {loyaltyScanFeedback}
               </div>
             ) : null}
 

@@ -9,8 +9,25 @@ export function normalizeRetailLoyaltyCardCode(raw: string): string | null {
   return null
 }
 
+/**
+ * Eén geldige 899…-code uit scanner-input (bij dubbel plakken: laatste code wint).
+ */
+export function extractRetailLoyaltyScanCode(raw: string): string | null {
+  const direct = normalizeRetailLoyaltyCardCode(raw)
+  if (direct) return direct
+  const digits = raw.replace(/\D/g, '')
+  if (digits.length < 13) return null
+  const re = /899\d{10}/g
+  let match: RegExpExecArray | null
+  let last: string | null = null
+  while ((match = re.exec(digits)) !== null) {
+    if (match[0].length === 13) last = match[0]
+  }
+  return last
+}
+
 export function isRetailLoyaltyCardScan(raw: string): boolean {
-  return normalizeRetailLoyaltyCardCode(raw) !== null
+  return extractRetailLoyaltyScanCode(raw) !== null
 }
 
 export function generateRetailLoyaltyCardCode(): string {
