@@ -1864,6 +1864,8 @@
  "description": "Texte à propos de nous",
  "contactInfo": "Coordonnées",
  "email": "E-mail",
+ "accountantEmail": "E-mail comptable",
+ "accountantEmailHint": "Prérempli lors de l'envoi du Z-rapport par e-mail. Laissez vide si vous ne souhaitez pas de copie pour le comptable.",
  "phone": "Téléphone",
  "address": "Adresse",
  "postalCode": "Code postal",
@@ -4523,7 +4525,18 @@
  "kassaModalSaving": "Enregistrement...",
  "kassaDuplicateConfirm": "Le total manuel semble égal au CA des commandes. Cela doublerait le total journalier dans l'archive. Enregistrer quand même ?",
  "kassaEntryClosedBlocked": "Ce jour fiscal est clôturé. La saisie caisse manuelle ne peut plus être modifiée.",
- "kassaButtonTitleClosed": "Indisponible : jour définitivement clôturé."
+ "kassaButtonTitleClosed": "Indisponible : jour définitivement clôturé.",
+ "emailSendTitle": "Envoyer le Z-Rapport",
+ "emailSendIntro": "Envoyer le Z-Rapport du {{date}} par e-mail",
+ "emailTenantLabel": "E-mail de l'établissement",
+ "emailAccountantLabel": "E-mail du comptable",
+ "emailAccountantHint": "Une copie est automatiquement envoyée à cette adresse lors de l'envoi (si renseignée).",
+ "emailCancel": "Annuler",
+ "emailSend": "Envoyer",
+ "emailSending": "Envoi...",
+ "emailSentSuccess": "Z-Rapport envoyé à",
+ "emailSendError": "Erreur lors de l'envoi :",
+ "emailSendRetry": "Erreur lors de l'envoi. Veuillez réessayer."
  },
  "simulator": {
  "title": "Simulateur de coûts",

@@ -2364,6 +2364,8 @@
  "description": "Texto sobre nosotros",
  "contactInfo": "Información de contacto",
  "email": "Email",
+ "accountantEmail": "Email del contable",
+ "accountantEmailHint": "Se rellena automáticamente al enviar el Z-informe por email. Déjelo vacío si no desea copia para el contable.",
  "phone": "Teléfono",
  "address": "Dirección",
  "postalCode": "Código postal",
@@ -4500,7 +4502,18 @@
  "kassaModalSaving": "Guardando...",
  "kassaDuplicateConfirm": "El total manual parece igual al ingreso por pedidos. Eso duplicaría el total del día en el archivo. ¿Guardar de todos modos?",
  "kassaEntryClosedBlocked": "Este día fiscal está cerrado. La entrada manual de caja ya no se puede cambiar.",
- "kassaButtonTitleClosed": "No disponible: el día está cerrado definitivamente."
+ "kassaButtonTitleClosed": "No disponible: el día está cerrado definitivamente.",
+ "emailSendTitle": "Enviar Z-Informe",
+ "emailSendIntro": "Enviar el Z-Informe del {{date}} por email",
+ "emailTenantLabel": "Email del negocio",
+ "emailAccountantLabel": "Email del contable",
+ "emailAccountantHint": "Al enviar, también se envía automáticamente una copia a esta dirección (si está rellenada).",
+ "emailCancel": "Cancelar",
+ "emailSend": "Enviar",
+ "emailSending": "Enviando...",
+ "emailSentSuccess": "Z-Informe enviado a",
+ "emailSendError": "Error al enviar:",
+ "emailSendRetry": "Error al enviar. Inténtelo de nuevo."
  },
  "simulator": {
  "title": "Simulador de costes",

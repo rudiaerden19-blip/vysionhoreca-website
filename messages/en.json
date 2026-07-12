@@ -2663,6 +2663,8 @@
  "description": "About us text",
  "contactInfo": "Contact Information",
  "email": "Email",
+ "accountantEmail": "Accountant email",
+ "accountantEmailHint": "Pre-filled when sending Z-reports by email. Leave empty if you do not want a copy sent to your accountant.",
  "phone": "Phone",
  "address": "Address",
  "postalCode": "Postal Code",
@@ -3385,7 +3387,18 @@
  "kassaModalSaving": "Saving...",
  "kassaDuplicateConfirm": "The manual total looks the same as revenue from orders. That would double the day total in the archive. Save anyway?",
  "kassaEntryClosedBlocked": "This fiscal day is closed. Manual register entry can no longer be changed.",
- "kassaButtonTitleClosed": "Unavailable: day is permanently closed."
+ "kassaButtonTitleClosed": "Unavailable: day is permanently closed.",
+ "emailSendTitle": "Send Z-Report",
+ "emailSendIntro": "Send the Z-Report for {{date}} by email",
+ "emailTenantLabel": "Business email",
+ "emailAccountantLabel": "Accountant email",
+ "emailAccountantHint": "A copy is automatically sent to this address when sending (if filled in).",
+ "emailCancel": "Cancel",
+ "emailSend": "Send",
+ "emailSending": "Sending...",
+ "emailSentSuccess": "Z-Report sent to",
+ "emailSendError": "Error sending:",
+ "emailSendRetry": "Error sending. Please try again."
  },
  "simulator": {
  "title": "Cost Simulator",

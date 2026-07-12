@@ -2364,6 +2364,8 @@
  "description": "الوصف",
  "contactInfo": "معلومات الاتصال",
  "email": "البريد الإلكتروني",
+ "accountantEmail": "بريد المحاسب",
+ "accountantEmailHint": "يُملأ تلقائياً عند إرسال تقرير Z بالبريد. اتركه فارغاً إذا لم ترد نسخة للمحاسب.",
  "phone": "الهاتف",
  "address": "العنوان",
  "postalCode": "الرمز البريدي",
@@ -4500,7 +4502,18 @@
  "kassaModalSaving": "جارٍ الحفظ...",
  "kassaDuplicateConfirm": "يبدو أن الإجمالي اليدوي يطابق إيراد الطلبات. سيزيد ذلك إجمالي اليوم في الأرشيف مرتين. هل تريد الحفظ على أي حال؟",
  "kassaEntryClosedBlocked": "يومك المحاسبي مغلق. لا يمكن تغيير إدخال الصندوق اليدوي بعد الآن.",
- "kassaButtonTitleClosed": "غير متاح: اليوم مغلق نهائياً."
+ "kassaButtonTitleClosed": "غير متاح: اليوم مغلق نهائياً.",
+ "emailSendTitle": "إرسال تقرير Z",
+ "emailSendIntro": "إرسال تقرير Z لتاريخ {{date}} بالبريد",
+ "emailTenantLabel": "بريد المنشأة",
+ "emailAccountantLabel": "بريد المحاسب",
+ "emailAccountantHint": "عند الإرسال تُرسل نسخة تلقائياً إلى هذا العنوان أيضاً (إن وُجد).",
+ "emailCancel": "إلغاء",
+ "emailSend": "إرسال",
+ "emailSending": "جارٍ الإرسال...",
+ "emailSentSuccess": "تم إرسال تقرير Z إلى",
+ "emailSendError": "خطأ في الإرسال:",
+ "emailSendRetry": "فشل الإرسال. حاول مرة أخرى."
  },
  "simulator": {
  "title": "محاكي التكلفة",

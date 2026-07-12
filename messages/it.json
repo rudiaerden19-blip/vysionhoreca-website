@@ -2364,6 +2364,8 @@
  "description": "Testo chi siamo",
  "contactInfo": "Informazioni di contatto",
  "email": "Email",
+ "accountantEmail": "Email commercialista",
+ "accountantEmailHint": "Compilato automaticamente all'invio del Z-report via email. Lascia vuoto se non vuoi una copia per il commercialista.",
  "phone": "Telefono",
  "address": "Indirizzo",
  "postalCode": "CAP",
@@ -4500,7 +4502,18 @@
  "kassaModalSaving": "Salvataggio...",
  "kassaDuplicateConfirm": "Il totale manuale sembra uguale al fatturato ordini. Raddoppierebbe il totale del giorno nell'archivio. Salvare comunque?",
  "kassaEntryClosedBlocked": "Questo giorno fiscale è chiuso. L'inserimento manuale cassa non può più essere modificato.",
- "kassaButtonTitleClosed": "Non disponibile: giorno chiuso definitivamente."
+ "kassaButtonTitleClosed": "Non disponibile: giorno chiuso definitivamente.",
+ "emailSendTitle": "Invia Z-Report",
+ "emailSendIntro": "Invia il Z-Report del {{date}} via email",
+ "emailTenantLabel": "Email attività",
+ "emailAccountantLabel": "Email commercialista",
+ "emailAccountantHint": "All'invio viene inviata automaticamente anche una copia a questo indirizzo (se compilato).",
+ "emailCancel": "Annulla",
+ "emailSend": "Invia",
+ "emailSending": "Invio...",
+ "emailSentSuccess": "Z-Report inviato a",
+ "emailSendError": "Errore durante l'invio:",
+ "emailSendRetry": "Errore durante l'invio. Riprova."
  },
  "simulator": {
  "title": "Simulatore di costi",

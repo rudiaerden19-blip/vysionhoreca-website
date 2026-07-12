@@ -2663,6 +2663,8 @@
  "description": "Over ons tekst",
  "contactInfo": "Contactgegevens",
  "email": "E-mail",
+ "accountantEmail": "E-mail boekhouder",
+ "accountantEmailHint": "Wordt automatisch ingevuld bij Z-rapport per e-mail. Laat leeg als je geen kopie naar de boekhouder wilt.",
  "phone": "Telefoon",
  "address": "Adres",
  "postalCode": "Postcode",
@@ -3385,7 +3387,18 @@
  "kassaModalSaving": "Opslaan...",
  "kassaDuplicateConfirm": "Het handmatige totaal lijkt gelijk aan de omzet uit bestellingen. Dan wordt het dagtotaal in het archief verdubbeld. Toch opslaan?",
  "kassaEntryClosedBlocked": "Deze fiscale dag is afgesloten. Handmatige kassa-invoer kan niet meer worden gewijzigd.",
- "kassaButtonTitleClosed": "Niet beschikbaar: dag is definitief afgesloten."
+ "kassaButtonTitleClosed": "Niet beschikbaar: dag is definitief afgesloten.",
+ "emailSendTitle": "Z-Rapport versturen",
+ "emailSendIntro": "Verstuur het Z-Rapport van {{date}} per e-mail",
+ "emailTenantLabel": "E-mail zaak",
+ "emailAccountantLabel": "E-mail boekhouder",
+ "emailAccountantHint": "Bij versturen gaat automatisch ook een kopie naar dit adres (indien ingevuld).",
+ "emailCancel": "Annuleren",
+ "emailSend": "Versturen",
+ "emailSending": "Verzenden...",
+ "emailSentSuccess": "Z-Rapport verzonden naar",
+ "emailSendError": "Fout bij verzenden:",
+ "emailSendRetry": "Fout bij verzenden. Probeer opnieuw."
  },
  "simulator": {
  "title": "Kostprijs Simulator",

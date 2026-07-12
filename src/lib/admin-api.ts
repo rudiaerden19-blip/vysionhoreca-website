@@ -131,6 +131,8 @@ export interface TenantSettings {
   primary_color: string
   secondary_color: string
   email: string
+  /** Boekhouder — vooraf ingevuld bij Z-rapport per e-mail */
+  accountant_email?: string
   phone: string
   address: string
   postal_code?: string
