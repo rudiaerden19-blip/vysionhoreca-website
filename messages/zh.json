@@ -3462,6 +3462,7 @@
  "parkTableKitchenBon": "添加到餐桌",
  "parkTableKassaBon": "添加到餐桌",
  "parkTableAdd": "添加到餐桌",
+ "parkTableAddPrint": "print",
  "parkTableKitchenBonAria": "添加到餐桌并打印厨房小票",
  "parkTableKassaBonAria": "添加到餐桌不打印厨房小票（收银小票）",
  "checkout": "结账",

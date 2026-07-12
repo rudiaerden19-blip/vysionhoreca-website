@@ -3949,6 +3949,7 @@
  "parkTableKitchenBon": "Voeg toe aan tafel",
  "parkTableKassaBon": "Voeg toe aan tafel",
  "parkTableAdd": "Voeg toe aan tafel",
+ "parkTableAddPrint": "print",
  "parkTableKitchenBonAria": "Voeg toe aan tafel en print keukenbon",
  "parkTableKassaBonAria": "Voeg toe aan tafel zonder keukenbon (kassabon)",
  "checkout": "Afrekenen",

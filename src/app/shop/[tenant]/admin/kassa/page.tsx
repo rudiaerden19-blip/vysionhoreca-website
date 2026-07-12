@@ -169,7 +169,6 @@ import { isWebshopChannelNewOrder } from '@/lib/admin-api-order-helpers'
 import { useKassaOfflineFlushBridge } from '@/lib/use-kassa-offline-flush-bridge'
 import type { KassaPayOption } from '@/components/kassa/KassaPaymentModal'
 import { KassaPaymentModal } from '@/components/kassa/KassaPaymentModal'
-import { KassaPrinterNoKitchenIcon, KassaPrinterPrintIcon } from '@/components/kassa/KassaParkTableButtonIcons'
 import { KassaSplitPaymentModal } from '@/components/kassa/KassaSplitPaymentModal'
 import { KassaSuccessReceiptModal } from '@/components/kassa/KassaSuccessReceiptModal'
 import { KassaProductOptionsModal } from '@/components/kassa/KassaProductOptionsModal'
@@ -5758,24 +5757,25 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   onClick={() => parkOrder({ printKitchen: true, printKassaSlip: false })}
                   title={t('kassaApp.parkTableKitchenBonAria')}
                   aria-label={t('kassaApp.parkTableKitchenBonAria')}
-                  className={`min-w-0 flex-1 font-semibold flex flex-col items-center justify-center gap-1 text-center px-2 py-2 text-[11px] leading-tight sm:text-xs ${kassaPosButtonClass(false)} ${
+                  className={`min-w-0 flex-1 font-semibold flex items-center justify-center text-center px-2 py-3 text-[11px] leading-tight sm:text-xs ${kassaPosButtonClass(false)} ${
                     kassaSxgaDenseTiles ? 'min-h-[2.875rem]': 'min-h-[2.5rem]'
                   }`}
                 >
-                  <KassaPrinterPrintIcon className="h-5 w-5" />
-                  <span>{t('kassaApp.parkTableAdd')}</span>
+                  {t('kassaApp.parkTableAdd')}
                 </button>
                 <button
                   type="button"
                   onClick={() => parkOrder({ printKitchen: false, printKassaSlip: true })}
                   title={t('kassaApp.parkTableKassaBonAria')}
                   aria-label={t('kassaApp.parkTableKassaBonAria')}
-                  className={`min-w-0 flex-1 font-semibold flex flex-col items-center justify-center gap-1 text-center px-2 py-2 text-[11px] leading-tight sm:text-xs ${kassaPosButtonClass(false)} ${
+                  className={`min-w-0 flex-1 font-semibold flex flex-col items-center justify-center gap-0.5 text-center px-2 py-2 text-[11px] leading-tight sm:text-xs ${kassaPosButtonClass(false)} ${
                     kassaSxgaDenseTiles ? 'min-h-[2.875rem]': 'min-h-[2.5rem]'
                   }`}
                 >
-                  <KassaPrinterNoKitchenIcon className="h-5 w-5" />
                   <span>{t('kassaApp.parkTableAdd')}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wide opacity-90">
+                    {t('kassaApp.parkTableAddPrint')}
+                  </span>
                 </button>
               </div>
             )}
@@ -5886,26 +5886,27 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   onClick={() => parkOrder({ printKitchen: true, printKassaSlip: false })}
                   title={t('kassaApp.parkTableKitchenBonAria')}
                   aria-label={t('kassaApp.parkTableKitchenBonAria')}
-                  className={`min-w-0 flex-1 flex flex-col items-center justify-center gap-1 rounded-xl bg-[#3C4D6B] px-2 py-2 text-center text-xs font-bold text-white hover:bg-[#2D3A52] active:brightness-95 ${kassaFooterActionTouchMinHClass(
+                  className={`min-w-0 flex-1 rounded-xl bg-[#3C4D6B] px-2 py-2.5 text-center text-xs font-bold text-white hover:bg-[#2D3A52] active:brightness-95 ${kassaFooterActionTouchMinHClass(
                     kassaSxgaDenseTiles,
                     kassaSidebarFooterTier === 'dense',
                   )}`}
                 >
-                  <KassaPrinterPrintIcon className="h-5 w-5" />
-                  <span>{t('kassaApp.parkTableAdd')}</span>
+                  {t('kassaApp.parkTableAdd')}
                 </button>
                 <button
                   type="button"
                   onClick={() => parkOrder({ printKitchen: false, printKassaSlip: true })}
                   title={t('kassaApp.parkTableKassaBonAria')}
                   aria-label={t('kassaApp.parkTableKassaBonAria')}
-                  className={`min-w-0 flex-1 flex flex-col items-center justify-center gap-1 rounded-xl bg-[#3C4D6B] px-2 py-2 text-center text-xs font-bold text-white hover:bg-[#2D3A52] active:brightness-95 ${kassaFooterActionTouchMinHClass(
+                  className={`min-w-0 flex-1 flex flex-col items-center justify-center gap-0.5 rounded-xl bg-[#3C4D6B] px-2 py-2 text-center text-xs font-bold text-white hover:bg-[#2D3A52] active:brightness-95 ${kassaFooterActionTouchMinHClass(
                     kassaSxgaDenseTiles,
                     kassaSidebarFooterTier === 'dense',
                   )}`}
                 >
-                  <KassaPrinterNoKitchenIcon className="h-5 w-5" />
                   <span>{t('kassaApp.parkTableAdd')}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wide opacity-90">
+                    {t('kassaApp.parkTableAddPrint')}
+                  </span>
                 </button>
               </div>
             )}

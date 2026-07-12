@@ -2962,6 +2962,7 @@
  "parkTableKitchenBon": "Ajouter à la table",
  "parkTableKassaBon": "Ajouter à la table",
  "parkTableAdd": "Ajouter à la table",
+ "parkTableAddPrint": "print",
  "parkTableKitchenBonAria": "Ajouter à la table et imprimer le ticket cuisine",
  "parkTableKassaBonAria": "Ajouter à la table sans ticket cuisine (ticket caisse)",
  "checkout": "Payer",
