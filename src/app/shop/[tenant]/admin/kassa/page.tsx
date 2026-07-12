@@ -150,6 +150,7 @@ import {
   loadBarBonWatermarks,
   removeBarBonWatermarkSlot,
   saveBarBonWatermarks,
+  seedBarBonWatermarkFromTableLines,
 } from '@/lib/kassa-bar-bon-watermark'
 import {
   loadKassaActiveStaffFromServer,
@@ -1586,10 +1587,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         pendingLocal,
         pendingCommitted,
       )
-      queueMicrotask(() => syncFloorPlanStatusesFromOpenOrders(merged))
+      queueMicrotask(() => {
+        syncFloorPlanStatusesFromOpenOrders(merged)
+        for (const [slotKey, lines] of Object.entries(merged)) {
+          if (lines.length > 0) {
+            seedBarBonWatermarkFromTableLines(tenant, slotKey, lines)
+          }
+        }
+      })
       return merged
     })
-  }, [syncFloorPlanStatusesFromOpenOrders])
+  }, [tenant, syncFloorPlanStatusesFromOpenOrders])
 
   useEffect(() => {
     return () => {
@@ -2144,7 +2152,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     (
       zone: FloorPlanZone,
       tblNr: string,
-      snap: CartItem[],
+      fullTableLines: CartItem[],
       opts?: { printKitchen?: boolean; printKassaSlip?: boolean },
     ) => void
   >(() => {})
@@ -2208,6 +2216,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       setTableOrderLinesInSidebar(true)
     }
 
+    const newSlotKey = tableOrderMapKey(zone, newTbl)
+    const parkedOnNewTable = tableOrdersRef.current[newSlotKey] ?? []
+    if (parkedOnNewTable.length > 0) {
+      seedBarBonWatermarkFromTableLines(tenant, newSlotKey, parkedOnNewTable)
+    }
+
     setTableNumber(newTbl)
     setDineInFloorZone(zone)
     setOrderType('DINE_IN')
@@ -2228,7 +2242,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const tbl = kassaTableDisplayNumber(tableNumber)
     const itemsToPark = snapshotCartItemsForAsyncPrint(round)
     commitCartRoundToTable(zone, tbl, itemsToPark)
-    void flushBarDeltaSlipRef.current(zone, tbl, itemsToPark, opts)
+    const slotKey = tableOrderMapKey(zone, tbl)
+    const fullTableAfterPark = tableOrdersRef.current[slotKey] ?? []
+    void flushBarDeltaSlipRef.current(zone, tbl, fullTableAfterPark, opts)
   }
 
   // Betaling
@@ -3856,9 +3872,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
   }
 
-  flushBarDeltaSlipRef.current = (zone, tblNr, snap, slipOpts) => {
+  flushBarDeltaSlipRef.current = (zone, tblNr, fullTableLines, slipOpts) => {
     void (async () => {
-      if (demoViewOnly || snap.length === 0) return
+      if (demoViewOnly || fullTableLines.length === 0) return
       const wantKitchen = slipOpts?.printKitchen === true
       const printKassaSlip = slipOpts?.printKassaSlip === true
       if (!wantKitchen && !printKassaSlip) return
@@ -3872,7 +3888,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           rawPrev != null && typeof rawPrev === 'object' && !Array.isArray(rawPrev)
             ? (rawPrev as Record<string, number>)
             : {}
-        const { deltaLines, nextWatermark } = computeBarBonDelta(snap, prev)
+        const { deltaLines, nextWatermark } = computeBarBonDelta(fullTableLines, prev)
         if (deltaLines.length === 0) return
 
         const draftSplit = computeInclusiveVatSplitFromCart(deltaLines, resolveCartLineVat)

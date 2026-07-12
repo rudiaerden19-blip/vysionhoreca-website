@@ -42,6 +42,32 @@ export function removeBarBonWatermarkSlot(tenantSlug: string, slotKey: string): 
   }
 }
 
+/**
+ * Markeer bestaande tafelregels als al naar de keuken gestuurd (bij laden uit Supabase of tafel kiezen).
+ * Verhoogt per regel alleen — nooit verlagen — zodat open tafelmanden niet opnieuw printen.
+ */
+export function seedBarBonWatermarkFromTableLines(
+  tenantSlug: string,
+  slotKey: string,
+  tableLines: KassaCartItem[],
+): void {
+  if (!slotKey) return
+  try {
+    const tableQty = quantitiesByStableKey(filterCartLinesForBarBonWatermark(tableLines))
+    if (Object.keys(tableQty).length === 0) return
+    const store = loadBarBonWatermarks(tenantSlug)
+    const prev = sanitizeBarBonWatermark(store[slotKey])
+    const merged: Record<string, number> = { ...prev }
+    for (const [k, q] of Object.entries(tableQty)) {
+      merged[k] = Math.max(merged[k] ?? 0, q)
+    }
+    store[slotKey] = merged
+    saveBarBonWatermarks(tenantSlug, store)
+  } catch {
+    /* storage mag tafel-sync niet breken */
+  }
+}
+
 /** @deprecated Alleen legacy purge — geen reads meer. */
 export function barBonWatermarkStorageKey(_tenantSlug: string): string {
   return ''
@@ -147,7 +173,8 @@ function barBonDeltaFallbackFullCart(safeCart: KassaCartItem[]): {
 }
 
 /**
- * Alleen extra stuks t.o.v. laatste toogbon; `nextWatermark`= volledige stand na deze bon.
+ * Alleen extra stuks t.o.v. laatste keukenbon; `nextWatermark` = volledige tafelstand na deze bon.
+ * Geef de **volledige tafelmand** door (niet alleen de nieuwe karronde).
  * Robuust tegen corrupte storage/regels: geen throw naar de UI.
  */
 export function computeBarBonDelta(
