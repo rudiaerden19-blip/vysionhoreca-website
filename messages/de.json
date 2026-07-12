@@ -1864,6 +1864,8 @@
  "description": "Über uns Text",
  "contactInfo": "Kontaktinformationen",
  "email": "E-Mail",
+ "accountantEmail": "E-Mail Buchhalter",
+ "accountantEmailHint": "Wird beim Z-Bericht per E-Mail automatisch ausgefüllt. Leer lassen, wenn keine Kopie an den Buchhalter gewünscht ist.",
  "phone": "Telefon",
  "address": "Adresse",
  "postalCode": "Postleitzahl",
@@ -4523,7 +4525,18 @@
  "kassaModalSaving": "Speichern...",
  "kassaDuplicateConfirm": "Die manuelle Summe entspricht fast dem Bestellumsatz. Das würde den Tages-Gesamtbetrag im Archiv verdoppeln. Trotzdem speichern?",
  "kassaEntryClosedBlocked": "Dieser Fiskaltag ist abgeschlossen. Die manuelle Kasseneingabe kann nicht mehr geändert werden.",
- "kassaButtonTitleClosed": "Nicht verfügbar: Tag ist endgültig abgeschlossen."
+ "kassaButtonTitleClosed": "Nicht verfügbar: Tag ist endgültig abgeschlossen.",
+ "emailSendTitle": "Z-Bericht senden",
+ "emailSendIntro": "Z-Bericht vom {{date}} per E-Mail senden",
+ "emailTenantLabel": "E-Mail Betrieb",
+ "emailAccountantLabel": "E-Mail Buchhalter",
+ "emailAccountantHint": "Beim Senden geht automatisch auch eine Kopie an diese Adresse (falls ausgefüllt).",
+ "emailCancel": "Abbrechen",
+ "emailSend": "Senden",
+ "emailSending": "Senden...",
+ "emailSentSuccess": "Z-Bericht gesendet an",
+ "emailSendError": "Fehler beim Senden:",
+ "emailSendRetry": "Fehler beim Senden. Bitte erneut versuchen."
  },
  "simulator": {
  "title": "Kostenrechner",

@@ -105,6 +105,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const [showHistory, setShowHistory] = useState(false)
   const [showEmailModal, setShowEmailModal] = useState(false)
   const [emailAddress, setEmailAddress] = useState('')
+  const [accountantEmailAddress, setAccountantEmailAddress] = useState('')
   const [sendingEmail, setSendingEmail] = useState(false)
   const [currentSavedReport, setCurrentSavedReport] = useState<SavedReport | null>(null)
   const [articleLines, setArticleLines] = useState<ZReportArticleLine[]>([])
@@ -590,42 +591,57 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
 
   const sendEmailReport = async () => {
     if (!emailAddress || !stats) return
+    const recipients = Array.from(
+      new Set(
+        [emailAddress.trim(), accountantEmailAddress.trim()].filter((addr) => addr.length > 0)
+      )
+    )
+    if (recipients.length === 0) return
+
     setSendingEmail(true)
     try {
-      const response = await authFetch('/api/send-z-report', {
-        method: 'POST',
-        body: JSON.stringify({
-          tenantSlug: params.tenant,
-          to: emailAddress,
-          subject: `Z-Rapport ${formatShortDate(selectedDate)} - ${businessInfo?.business_name || params.tenant}`,
-          businessName: businessInfo?.business_name || params.tenant,
-          businessAddress: businessInfo?.address || '',
-          btwNumber: businessInfo?.btw_number || '',
-          date: selectedDate,
-          formattedDate: formatDate(selectedDate),
-          orderCount: stats.orderCount,
-          subtotal: stats.subtotal,
-          tax: stats.total - stats.subtotal,
-          btwPercentage,
-          total: stats.total,
-          cashPayments: stats.cashPayments,
-          cardPayments: stats.cardPayments,
-          onlinePayments: stats.onlinePayments,
-          articleLines,
-          soldArticlesSectionTitle: t('zReport.soldArticlesTitle'),
-          soldArticlesPiecesShort: t('zReport.soldArticlesPiecesShort'),
-        })
-      })
-      if (response.ok) {
-        alert('Z-Rapport verzonden naar '+ emailAddress)
+      const payload = {
+        tenantSlug: params.tenant,
+        subject: `Z-Rapport ${formatShortDate(selectedDate)} - ${businessInfo?.business_name || params.tenant}`,
+        businessName: businessInfo?.business_name || params.tenant,
+        businessAddress: businessInfo?.address || '',
+        btwNumber: businessInfo?.btw_number || '',
+        date: selectedDate,
+        formattedDate: formatDate(selectedDate),
+        orderCount: stats.orderCount,
+        subtotal: stats.subtotal,
+        tax: stats.total - stats.subtotal,
+        btwPercentage,
+        total: stats.total,
+        cashPayments: stats.cashPayments,
+        cardPayments: stats.cardPayments,
+        onlinePayments: stats.onlinePayments,
+        articleLines,
+        soldArticlesSectionTitle: t('zReport.soldArticlesTitle'),
+        soldArticlesPiecesShort: t('zReport.soldArticlesPiecesShort'),
+      }
+
+      const results = await Promise.all(
+        recipients.map((to) =>
+          authFetch('/api/send-z-report', {
+            method: 'POST',
+            body: JSON.stringify({ ...payload, to }),
+          })
+        )
+      )
+
+      const failed = results.find((r) => !r.ok)
+      if (!failed) {
+        alert(`${t('zReport.emailSentSuccess')} ${recipients.join(' en ')}`)
         setShowEmailModal(false)
         setEmailAddress('')
+        setAccountantEmailAddress('')
       } else {
-        const error = await response.json()
-        alert('Fout bij verzenden: '+ (error.message || 'Onbekende fout'))
+        const error = await failed.json()
+        alert(`${t('zReport.emailSendError')} ${error.message || error.error || ''}`)
       }
     } catch {
-      alert('Fout bij verzenden. Probeer opnieuw.')
+      alert(t('zReport.emailSendRetry'))
     }
     setSendingEmail(false)
   }
@@ -698,7 +714,11 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
              PDF
           </button>
           <button
-            onClick={() => { setEmailAddress(businessInfo?.email || ''); setShowEmailModal(true) }}
+            onClick={() => {
+              setEmailAddress(businessInfo?.email || '')
+              setAccountantEmailAddress(businessInfo?.accountant_email || '')
+              setShowEmailModal(true)
+            }}
             disabled={!stats || stats.orderCount === 0}
             className="px-4 py-2 bg-purple-100 hover:bg-purple-200 text-purple-600 rounded-xl font-medium flex items-center gap-2 disabled:opacity-50"
           >
@@ -1238,19 +1258,36 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
               className="bg-white rounded-2xl max-w-md w-full p-6"
               onClick={(e) => e.stopPropagation()}
             >
-              <h2 className="text-xl font-bold mb-2"> Z-Rapport versturen</h2>
+              <h2 className="text-xl font-bold mb-2">{t('zReport.emailSendTitle')}</h2>
               <p className="text-gray-500 text-sm mb-6">
-                Verstuur het Z-Rapport van {formatShortDate(selectedDate)} per e-mail
+                {t('zReport.emailSendIntro').replace('{{date}}', formatShortDate(selectedDate))}
               </p>
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">E-mailadres</label>
-                <input
-                  type="email"
-                  value={emailAddress}
-                  onChange={(e) => setEmailAddress(e.target.value)}
-                  placeholder="email@voorbeeld.be"
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
+              <div className="space-y-4 mb-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('zReport.emailTenantLabel')}
+                  </label>
+                  <input
+                    type="email"
+                    value={emailAddress}
+                    onChange={(e) => setEmailAddress(e.target.value)}
+                    placeholder="email@voorbeeld.be"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('zReport.emailAccountantLabel')}
+                  </label>
+                  <input
+                    type="email"
+                    value={accountantEmailAddress}
+                    onChange={(e) => setAccountantEmailAddress(e.target.value)}
+                    placeholder="boekhouder@voorbeeld.be"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">{t('zReport.emailAccountantHint')}</p>
+                </div>
               </div>
               {stats && (
                 <div className="bg-gray-50 rounded-xl p-4 mb-6">
@@ -1261,14 +1298,14 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
               )}
               <div className="flex gap-3">
                 <button onClick={() => setShowEmailModal(false)} className="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium">
-                  Annuleren
+                  {t('zReport.emailCancel')}
                 </button>
                 <button
                   onClick={sendEmailReport}
-                  disabled={!emailAddress || sendingEmail}
+                  disabled={!emailAddress.trim() || sendingEmail}
                   className="flex-1 px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-medium disabled:bg-gray-300 flex items-center justify-center gap-2"
                 >
-                  {sendingEmail ? <><span className="animate-spin"></span> Verzenden...</> : <> Versturen</>}
+                  {sendingEmail ? <><span className="animate-spin"></span> {t('zReport.emailSending')}</> : <> {t('zReport.emailSend')}</>}
                 </button>
               </div>
             </motion.div>

@@ -53,6 +53,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
     primary_color: '#ef4444',
     secondary_color: '#dc2626',
     email: '',
+    accountant_email: '',
     phone: '',
     address: '',
     postal_code: '',
@@ -414,6 +415,21 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('adminPages.profiel.accountantEmail')}
+              </label>
+              <input
+                type="email"
+                name="accountant_email"
+                value={formData.accountant_email || ''}
+                onChange={handleChange}
+                placeholder="boekhouder@voorbeeld.be"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              />
+              <p className="text-xs text-gray-400 mt-1">{t('adminPages.profiel.accountantEmailHint')}</p>
             </div>
           </div>
         </motion.div>

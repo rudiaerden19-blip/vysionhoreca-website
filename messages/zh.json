@@ -2364,6 +2364,8 @@
  "description": "描述",
  "contactInfo": "联系信息",
  "email": "电子邮件",
+ "accountantEmail": "会计师邮箱",
+ "accountantEmailHint": "通过邮件发送 Z 报表时自动填写。如不需要抄送会计师请留空。",
  "phone": "电话",
  "address": "地址",
  "postalCode": "邮政编码",
@@ -4500,7 +4502,18 @@
  "kassaModalSaving": "正在保存...",
  "kassaDuplicateConfirm": "手动合计与订单营业额几乎相同，这会使存档中的当日合计翻倍。仍要保存吗？",
  "kassaEntryClosedBlocked": "该会计日已结账，无法再更改手动收银录入。",
- "kassaButtonTitleClosed": "不可用：该日已永久结账。"
+ "kassaButtonTitleClosed": "不可用：该日已永久结账。",
+ "emailSendTitle": "发送 Z 报表",
+ "emailSendIntro": "通过邮件发送 {{date}} 的 Z 报表",
+ "emailTenantLabel": "店铺邮箱",
+ "emailAccountantLabel": "会计师邮箱",
+ "emailAccountantHint": "发送时会自动向此地址发送副本（如已填写）。",
+ "emailCancel": "取消",
+ "emailSend": "发送",
+ "emailSending": "发送中...",
+ "emailSentSuccess": "Z 报表已发送至",
+ "emailSendError": "发送错误：",
+ "emailSendRetry": "发送失败，请重试。"
  },
  "simulator": {
  "title": "成本模拟器",

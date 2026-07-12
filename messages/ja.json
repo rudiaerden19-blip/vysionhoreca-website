@@ -2364,6 +2364,8 @@
  "description": "説明",
  "contactInfo": "連絡先情報",
  "email": "メール",
+ "accountantEmail": "会計士のメール",
+ "accountantEmailHint": "Zレポートをメール送信する際に自動入力されます。会計士にコピーを送らない場合は空欄にしてください。",
  "phone": "電話",
  "address": "住所",
  "postalCode": "郵便番号",
@@ -4500,7 +4502,18 @@
  "kassaModalSaving": "保存中...",
  "kassaDuplicateConfirm": "手動合計が注文売上とほぼ同じです。アーカイブの日次合計が二重になります。保存しますか？",
  "kassaEntryClosedBlocked": "この会計日は締め済みです。手動レジ入力は変更できません。",
- "kassaButtonTitleClosed": "利用不可：日付は確定して閉じています。"
+ "kassaButtonTitleClosed": "利用不可：日付は確定して閉じています。",
+ "emailSendTitle": "Zレポートを送信",
+ "emailSendIntro": "{{date}}のZレポートをメールで送信",
+ "emailTenantLabel": "店舗メール",
+ "emailAccountantLabel": "会計士メール",
+ "emailAccountantHint": "送信時、このアドレスにも自動的にコピーが送られます（入力されている場合）。",
+ "emailCancel": "キャンセル",
+ "emailSend": "送信",
+ "emailSending": "送信中...",
+ "emailSentSuccess": "Zレポートを送信しました：",
+ "emailSendError": "送信エラー：",
+ "emailSendRetry": "送信に失敗しました。もう一度お試しください。"
  },
  "simulator": {
  "title": "コストシミュレーター",
