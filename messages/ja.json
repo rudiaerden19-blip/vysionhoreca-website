@@ -3462,6 +3462,7 @@
  "parkTableKitchenBon": "テーブルに追加",
  "parkTableKassaBon": "テーブルに追加",
  "parkTableAdd": "テーブルに追加",
+ "parkTableAddPrint": "print",
  "parkTableKitchenBonAria": "テーブルに追加してキッチン伝票を印刷",
  "parkTableKassaBonAria": "テーブルに追加（キッチン伝票なし・レジ伝票）",
  "checkout": "会計",

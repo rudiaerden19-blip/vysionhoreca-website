@@ -3462,6 +3462,7 @@
  "parkTableKitchenBon": "Aggiungi al tavolo",
  "parkTableKassaBon": "Aggiungi al tavolo",
  "parkTableAdd": "Aggiungi al tavolo",
+ "parkTableAddPrint": "print",
  "parkTableKitchenBonAria": "Aggiungi al tavolo e stampa scontrino cucina",
  "parkTableKassaBonAria": "Aggiungi al tavolo senza scontrino cucina (scontrino cassa)",
  "checkout": "Paga",
