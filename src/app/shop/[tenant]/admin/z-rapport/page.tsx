@@ -525,6 +525,30 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
             )
             .join('')}
         </div>`
+
+    const vatRows = [
+      stats.taxLow > 0
+        ? `<div class="row"><span>${esc(t('zReport.vat'))} 6%:</span><span>${formatCurrency(stats.taxLow)}</span></div>`
+        : '',
+      stats.taxMid > 0
+        ? `<div class="row"><span>${esc(t('zReport.vat'))} ${esc(t('zReport.vatMidRates'))}:</span><span>${formatCurrency(stats.taxMid)}</span></div>`
+        : '',
+      stats.taxHigh > 0
+        ? `<div class="row"><span>${esc(t('zReport.vat'))} 21%:</span><span>${formatCurrency(stats.taxHigh)}</span></div>`
+        : '',
+    ].join('')
+
+    const paymentRows = [
+      stats.onlinePayments > 0
+        ? `<div class="row"><span>${esc(t('zReport.onlinePaid'))}:</span><span>${formatCurrency(stats.onlinePayments)}</span></div>`
+        : '',
+      stats.cardPayments > 0
+        ? `<div class="row"><span>${esc(t('zReport.cardPaid'))}:</span><span>${formatCurrency(stats.cardPayments)}</span></div>`
+        : '',
+      stats.cashPayments > 0
+        ? `<div class="row"><span>${esc(t('zReport.cashPaid'))}:</span><span>${formatCurrency(stats.cashPayments)}</span></div>`
+        : '',
+    ].join('')
     return `
       <!DOCTYPE html>
       <html>
@@ -557,14 +581,12 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           <div class="section-title">OMZET</div>
           <div class="row"><span>Aantal transacties:</span><span>${stats.orderCount}</span></div>
           <div class="row"><span>Subtotaal (excl. BTW):</span><span>${formatCurrency(stats.subtotal)}</span></div>
-          <div class="row"><span>BTW ${btwPercentage}%:</span><span>${formatCurrency(stats.total - stats.subtotal)}</span></div>
+          ${vatRows}
           <div class="row total-row"><span>TOTAAL:</span><span>${formatCurrency(stats.total)}</span></div>
         </div>
         <div class="section">
           <div class="section-title">BETALINGEN</div>
-          <div class="row"><span>Contant:</span><span>${formatCurrency(stats.cashPayments)}</span></div>
-          <div class="row"><span>PIN/Kaart:</span><span>${formatCurrency(stats.cardPayments)}</span></div>
-          <div class="row"><span>Online:</span><span>${formatCurrency(stats.onlinePayments)}</span></div>
+          ${paymentRows}
         </div>${articlesBlock}
         <div class="footer">
           <p>Dagperiode: ${formatShortDate(selectedDate)} 00:00 t/m ${formatShortDate(selectedDate)} +1dag 12:00</p>
@@ -610,8 +632,9 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         formattedDate: formatDate(selectedDate),
         orderCount: stats.orderCount,
         subtotal: stats.subtotal,
-        tax: stats.total - stats.subtotal,
-        btwPercentage,
+        taxLow: stats.taxLow,
+        taxMid: stats.taxMid,
+        taxHigh: stats.taxHigh,
         total: stats.total,
         cashPayments: stats.cashPayments,
         cardPayments: stats.cardPayments,
@@ -619,6 +642,21 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         articleLines,
         soldArticlesSectionTitle: t('zReport.soldArticlesTitle'),
         soldArticlesPiecesShort: t('zReport.soldArticlesPiecesShort'),
+        labels: {
+          revenue: 'OMZET',
+          orderCount: t('zReport.orderCount'),
+          subtotal: t('zReport.subtotal'),
+          vat: t('zReport.vat'),
+          vatMidRates: t('zReport.vatMidRates'),
+          total: t('zReport.total'),
+          payments: t('zReport.paymentMethods'),
+          cash: t('zReport.cashPaid'),
+          card: t('zReport.cardPaid'),
+          online: t('zReport.onlinePaid'),
+          footerAuto: 'Dit is een automatisch gegenereerd Z-Rapport',
+          footerGenerated: `${t('zReport.generatedOn')}:`,
+          footerPowered: "Vysion kassa's - ordervysion.com",
+        },
       }
 
       const results = await Promise.all(
