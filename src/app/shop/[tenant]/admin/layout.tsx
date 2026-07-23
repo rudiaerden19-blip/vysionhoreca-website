@@ -30,6 +30,7 @@ import {
 } from '@/lib/tenant-module-flags-context'
 import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
 import { AdminHamburgerMenu } from '@/components/AdminHamburgerMenu'
+import { KassaRegisterSuspenseFallback } from '@/components/KassaRegisterSuspenseFallback'
 import {
   buildShopInternalReturnPath,
   clearTenantOwnerSession,
@@ -420,7 +421,7 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
       )
     }
     if (!canShowKassaPos) {
-      return <div className="min-h-[100svh] bg-[#e3e3e3]" aria-busy="true" />
+      return <KassaRegisterSuspenseFallback />
     }
     return renderKassaPosChildren()
   }

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
+import React, { createContext, useContext, useState, useEffect, useLayoutEffect, useCallback, ReactNode } from 'react'
 import { Locale, defaultLocale, locales, localeNames, localeFlags } from './config'
 import {
   type Messages,
@@ -33,7 +33,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }))
   const [isHydrated, setIsHydrated] = useState(false)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     let initial: Locale = defaultLocale
     try {
       const savedLocale = localStorage.getItem('vysion_locale') as Locale | null
@@ -60,6 +60,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     }
 
     setIsHydrated(true)
+  }, [])
+
+  /** Voorkom permanent wit scherm als hydratatie/JS faalt (visibility:hidden blijft anders hangen). */
+  useEffect(() => {
+    const failSafe = window.setTimeout(() => setIsHydrated(true), 4000)
+    return () => window.clearTimeout(failSafe)
   }, [])
 
   useEffect(() => {

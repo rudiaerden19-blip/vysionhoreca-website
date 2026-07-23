@@ -1,9 +1,20 @@
 // Vysion Kassa – Service Worker
 // Offline: kassa-app + statische assets + sector-marketingpagina’s; productafbeeldingen (externe URL's)
 
-const CACHE = 'vysion-kassa-v16'
-const STATIC_CACHE = 'vysion-static-v16'
+const CACHE = 'vysion-kassa-v17'
+const STATIC_CACHE = 'vysion-static-v17'
 const IMAGE_CACHE = 'vysion-images-v4'
+
+/** Clone synchronously vóór de response naar de pagina gaat — anders "body already used". */
+function cachePutClone(cacheName, request, response) {
+  if (!response || !response.ok) return
+  try {
+    const copy = response.clone()
+    void caches.open(cacheName).then(cache => cache.put(request, copy)).catch(() => {})
+  } catch {
+    /* ignore — body al gelezen */
+  }
+}
 
 /** Eerste install: marketing-sectoren + start zodat PWA na één online bezoek ook zonder net start. */
 const PRECACHE_SAME_ORIGIN = [
@@ -81,7 +92,12 @@ function networkFirstExternalImage(request, url) {
     fetch(request)
       .then(response => {
         if (response.ok && shouldStoreImageResponse(url, request, response)) {
-          void cache.put(request, response.clone()).catch(() => {})
+          try {
+            const copy = response.clone()
+            void cache.put(request, copy).catch(() => {})
+          } catch {
+            /* ignore */
+          }
         }
         return response
       })
@@ -132,9 +148,7 @@ self.addEventListener('fetch', event => {
     event.respondWith(
       fetch(request)
         .then(response => {
-          if (response.ok) {
-            caches.open(STATIC_CACHE).then(cache => cache.put(request, response.clone()))
-          }
+          cachePutClone(STATIC_CACHE, request, response)
           return response
         })
         .catch(() =>
@@ -185,9 +199,7 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     fetch(request)
       .then(response => {
-        if (response.ok) {
-          caches.open(CACHE).then(cache => cache.put(request, response.clone()))
-        }
+        cachePutClone(CACHE, request, response)
         return response
       })
       .catch(() =>
