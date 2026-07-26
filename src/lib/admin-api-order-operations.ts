@@ -321,7 +321,7 @@ export async function regenerateZReportForDate(
     const vatContext = await fetchZReportVatContextFromSupabase(client, tenantSlug)
 
     const vatAgg = aggregateZReportVatFromOrderRows(
-      orders.map((o) => ({ total: o.total, items: o.items })),
+      orders.map((o) => ({ total: o.total, items: o.items, order_type: o.order_type })),
       btwPercentage,
       vatContext,
     )

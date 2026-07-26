@@ -199,6 +199,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     const vatSlice: ZReportVatOrderSlice[] = orders.map((o) => ({
       total: o.total,
       items: (o as { items?: unknown }).items,
+      order_type: (o as { order_type?: unknown }).order_type,
     }))
     const vatContext = await fetchZReportVatContextForTenant(params.tenant)
     const vatAgg = aggregateZReportVatFromOrderRows(vatSlice, settingsBtw, vatContext)

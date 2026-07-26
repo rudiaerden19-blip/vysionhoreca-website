@@ -1,12 +1,34 @@
 import type { MenuCategory } from '@/lib/admin-api-menu-catalog'
 import type { MenuProduct } from '@/lib/admin-api-menu-product-helpers'
-import type { KassaCartItem } from '@/lib/kassa-cart-types'
+import type { KassaCartItem, KassaRegisterOrderType } from '@/lib/kassa-cart-types'
 import { orderItemLineTotalEur } from '@/lib/order-items-display'
 import type { ZReportVatContext } from '@/lib/z-report-vat-context'
 
 /** Officiële keuzes in de UI (BE/NL gangbaar). */
 export const CATEGORY_VAT_PERCENT_OPTIONS = [6, 9, 12, 21] as const
 export type CategoryVatPercent = (typeof CATEGORY_VAT_PERCENT_OPTIONS)[number]
+
+export type OrderTypeForVat = KassaRegisterOrderType
+
+/** Normaliseer order_type uit DB (kassa, webshop pickup/delivery, …). */
+export function normalizeOrderTypeForVat(raw: unknown): OrderTypeForVat {
+  const u = String(raw ?? '').trim().toUpperCase()
+  if (u === 'DINE_IN') return 'DINE_IN'
+  if (u === 'DELIVERY') return 'DELIVERY'
+  return 'TAKEAWAY'
+}
+
+/** België: 6% afhaal/levering, 12% ter plaatse. NL (zaak 9%): beide 9%. */
+export function dineInAndOffPremiseVatRates(tenantDefaultPct: number): {
+  dineIn: CategoryVatPercent
+  offPremise: CategoryVatPercent
+} {
+  const base = normalizeCategoryVatPercent(tenantDefaultPct, 21)
+  if (base === 9) {
+    return { dineIn: 9, offPremise: 9 }
+  }
+  return { dineIn: 12, offPremise: 6 }
+}
 
 /** Valideert DB/API-waarde; onbekend → fallback. */
 export function normalizeCategoryVatPercent(
@@ -31,18 +53,49 @@ export function buildCategoryVatLookup(
   return m
 }
 
-/** Per productregel: categorie‑override óf tenant‑default (bruto = incl. btw). */
+/** Per productregel: categorie‑override óf tenant‑default (bruto = incl. btw). Zonder orderType: afhaal-tarief. */
 export function resolveVatPercentForProduct(
   product: Pick<MenuProduct, 'category_id'>,
   categoryById: Map<string, number | null | undefined>,
   tenantDefaultPct: number,
 ): CategoryVatPercent {
+  return resolveVatPercentForProductAndOrderType(
+    product,
+    categoryById,
+    tenantDefaultPct,
+    'TAKEAWAY',
+  )
+}
+
+/**
+ * BTW per product + besteltype (ter plaatse / afhalen / leveren).
+ * Categorie met vast 21% (drank) wijzigt niet; eten volgt 6% afhaal vs 12% ter plaatse (BE).
+ */
+export function resolveVatPercentForProductAndOrderType(
+  product: Pick<MenuProduct, 'category_id'>,
+  categoryById: Map<string, number | null | undefined>,
+  tenantDefaultPct: number,
+  orderType: OrderTypeForVat,
+): CategoryVatPercent {
+  const override =
+    product.category_id != null ? categoryById.get(String(product.category_id)) : undefined
+  return resolveVatPercentForCategoryAndOrderType(override, tenantDefaultPct, orderType)
+}
+
+export function resolveVatPercentForCategoryAndOrderType(
+  categoryOverride: number | null | undefined,
+  tenantDefaultPct: number,
+  orderType: OrderTypeForVat,
+): CategoryVatPercent {
   const base = normalizeCategoryVatPercent(tenantDefaultPct, 21)
-  const cid = product.category_id
-  if (!cid) return base
-  const override = categoryById.get(String(cid))
-  if (override === null || override === undefined) return base
-  return normalizeCategoryVatPercent(override, base)
+
+  if (categoryOverride !== null && categoryOverride !== undefined) {
+    const explicit = normalizeCategoryVatPercent(categoryOverride, base)
+    if (explicit === 21) return explicit
+  }
+
+  const { dineIn, offPremise } = dineInAndOffPremiseVatRates(tenantDefaultPct)
+  return orderType === 'DINE_IN' ? dineIn : offPremise
 }
 
 export interface VatSplitLine {
@@ -103,6 +156,7 @@ function round2(n: number): number {
 export interface ZReportVatOrderSlice {
   total?: unknown
   items?: unknown
+  order_type?: unknown
 }
 
 function emptyVatBuckets(): Record<CategoryVatPercent, number> {
@@ -136,33 +190,34 @@ function lineDisplayNameForVat(line: Record<string, unknown>): string {
 }
 
 /**
- * BTW-tarief per orderregel — categorie/product vóór opgeslagen btw op de regel.
- * Oude bonnen hadden vaak btw = zaak-default (6%) op elke regel; lookup herstelt drank vs. eten.
+ * BTW-tarief per orderregel — categorie/product + besteltype vóór opgeslagen btw op de regel.
  */
 function resolveLineVatRate(
   line: Record<string, unknown>,
-  fallbackRate: CategoryVatPercent,
+  tenantDefaultPct: number,
+  orderType: OrderTypeForVat,
   ctx?: ZReportVatContext | null,
 ): CategoryVatPercent {
-  const tryCategory = (categoryId: unknown): CategoryVatPercent | null => {
+  const fb = normalizeCategoryVatPercent(tenantDefaultPct, 21)
+
+  const resolveFromCategoryId = (categoryId: unknown): CategoryVatPercent | null => {
     if (!categoryId || !ctx?.categoryById) return null
     const override = ctx.categoryById.get(String(categoryId))
-    if (override === null || override === undefined) return fallbackRate
-    return normalizeCategoryVatPercent(override, fallbackRate)
+    return resolveVatPercentForCategoryAndOrderType(override, tenantDefaultPct, orderType)
   }
 
   const productId = line.product_id ?? line.productId
   if (productId && ctx?.productCategoryById) {
     const cid = ctx.productCategoryById.get(String(productId))
     if (cid) {
-      const fromProduct = tryCategory(cid)
+      const fromProduct = resolveFromCategoryId(cid)
       if (fromProduct != null) return fromProduct
     }
   }
 
   const lineCategoryId = line.category_id ?? line.categoryId
   if (lineCategoryId) {
-    const fromLineCategory = tryCategory(lineCategoryId)
+    const fromLineCategory = resolveFromCategoryId(lineCategoryId)
     if (fromLineCategory != null) return fromLineCategory
   }
 
@@ -171,15 +226,15 @@ function resolveLineVatRate(
     if (displayName) {
       const cid = ctx.productCategoryByNormalizedName.get(normalizeProductNameForVat(displayName))
       if (cid) {
-        const fromName = tryCategory(cid)
+        const fromName = resolveFromCategoryId(cid)
         if (fromName != null) return fromName
       }
     }
   }
 
-  if (itemHasExplicitBtw(line)) return lineVatRate(line, fallbackRate)
+  if (itemHasExplicitBtw(line)) return lineVatRate(line, fb)
 
-  return fallbackRate
+  return resolveVatPercentForCategoryAndOrderType(undefined, tenantDefaultPct, orderType)
 }
 
 function lineVatRate(line: Record<string, unknown>, fallbackRate: CategoryVatPercent): CategoryVatPercent {
@@ -218,7 +273,12 @@ export function allocateVatBucketsForSingleOrder(
   tenantDefaultPct: number,
   ctx?: ZReportVatContext | null,
 ): { subtotalExcl: number; buckets: Record<CategoryVatPercent, number>; baseBuckets: Record<CategoryVatPercent, number> } {
-  const fb = normalizeCategoryVatPercent(tenantDefaultPct, 21)
+  const orderType = normalizeOrderTypeForVat(order.order_type)
+  const defaultOrderRate = resolveVatPercentForCategoryAndOrderType(
+    undefined,
+    tenantDefaultPct,
+    orderType,
+  )
   const orderTotal = round2(Number(order.total) || 0)
   const buckets = emptyVatBuckets()
   const baseBuckets = emptyVatBuckets()
@@ -230,14 +290,14 @@ export function allocateVatBucketsForSingleOrder(
     const line = raw as Record<string, unknown>
     const gross = round2(orderItemLineTotalEur(raw))
     if (gross <= 0) continue
-    const rate = resolveLineVatRate(line, fb, ctx)
+    const rate = resolveLineVatRate(line, tenantDefaultPct, orderType, ctx)
     lines.push({ gross, rate })
   }
 
   const sumLineGross = round2(lines.reduce((s, x) => s + x.gross, 0))
   const delta = round2(orderTotal - sumLineGross)
   if (delta > 0.001) {
-    lines.push({ gross: delta, rate: fb })
+    lines.push({ gross: delta, rate: defaultOrderRate })
   }
 
   let subtotalExcl = 0
@@ -246,11 +306,11 @@ export function allocateVatBucketsForSingleOrder(
     if (orderTotal <= 0) {
       return { subtotalExcl: 0, buckets, baseBuckets }
     }
-    const r = fb / 100
+    const r = defaultOrderRate / 100
     const baseExcl = round2(orderTotal / (1 + r))
     const tax = round2(orderTotal - baseExcl)
-    buckets[fb] = tax
-    baseBuckets[fb] = baseExcl
+    buckets[defaultOrderRate] = tax
+    baseBuckets[defaultOrderRate] = baseExcl
     return { subtotalExcl: baseExcl, buckets, baseBuckets }
   }
 
