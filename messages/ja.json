@@ -4574,6 +4574,15 @@
  "emailSending": "送信中...",
  "emailSentSuccess": "Zレポートを送信しました：",
  "emailSendError": "送信エラー：",
+ "moveSalesDayButton": "売上日を移動",
+ "moveSalesDayTitle": "レシートを別の日に移動",
+ "moveSalesDayIntro": "{{from}}のすべてのレシートを{{to}}に移動します。アーカイブが再計算されます。",
+ "moveSalesDayTargetLabel": "移動先の日付",
+ "moveSalesDayConfirm": "{{from}}のすべてのレシートを{{to}}に移動しますか？自動では元に戻せません。",
+ "moveSalesDaySubmit": "レシートを移動",
+ "moveSalesDayWorking": "処理中…",
+ "moveSalesDaySuccess": "{{count}}件のレシートを{{to}}に移動しました。",
+ "moveSalesDayError": "移動に失敗しました。もう一度お試しください。",
  "emailSendRetry": "送信に失敗しました。もう一度お試しください。"
  },
  "simulator": {

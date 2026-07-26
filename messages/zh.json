@@ -4574,6 +4574,15 @@
  "emailSending": "发送中...",
  "emailSentSuccess": "Z 报表已发送至",
  "emailSendError": "发送错误：",
+ "moveSalesDayButton": "移动销售日",
+ "moveSalesDayTitle": "将小票移至其他日期",
+ "moveSalesDayIntro": "{{from}} 的所有小票将移至 {{to}}。存档将重新计算。",
+ "moveSalesDayTargetLabel": "移至日期",
+ "moveSalesDayConfirm": "将 {{from}} 的所有小票移至 {{to}}？此操作无法自动撤销。",
+ "moveSalesDaySubmit": "移动小票",
+ "moveSalesDayWorking": "处理中…",
+ "moveSalesDaySuccess": "已将 {{count}} 张小票移至 {{to}}。",
+ "moveSalesDayError": "移动失败，请重试。",
  "emailSendRetry": "发送失败，请重试。"
  },
  "simulator": {

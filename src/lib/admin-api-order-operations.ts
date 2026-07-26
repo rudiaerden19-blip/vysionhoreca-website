@@ -286,11 +286,6 @@ export async function regenerateZReportForDate(
 
     console.log(`regenerateZReportForDate: ${orders?.length || 0} orders voor rapport`)
 
-    if (!orders || orders.length === 0) {
-      console.log('regenerateZReportForDate: Geen tellende orders, skip upsert (bestaand Z-rapport ongewijzigd)')
-      return
-    }
-
     const { data: settings } = await client
       .from('tenant_settings')
       .select('btw_percentage, business_name, address, btw_number')
@@ -298,6 +293,49 @@ export async function regenerateZReportForDate(
       .single()
 
     const btwPercentage = settings?.btw_percentage || 6
+
+    if (!orders || orders.length === 0) {
+      const hashInput = JSON.stringify({
+        tenant: tenantSlug,
+        date: date,
+        orderCount: 0,
+        total: 0,
+        orderIds: [] as string[],
+        version: 'v1',
+      })
+      const reportHash = await generateSimpleHash(hashInput)
+
+      const { error: clearError } = await client.from('z_reports').upsert(
+        {
+          tenant_slug: tenantSlug,
+          report_date: date,
+          order_count: 0,
+          subtotal: 0,
+          tax_low: 0,
+          tax_mid: 0,
+          tax_high: 0,
+          total: 0,
+          cash_payments: 0,
+          card_payments: 0,
+          online_payments: 0,
+          btw_percentage: btwPercentage,
+          business_name: settings?.business_name,
+          business_address: settings?.address,
+          btw_number: settings?.btw_number,
+          order_ids: [],
+          report_hash: reportHash,
+          generated_at: new Date().toISOString(),
+        },
+        { onConflict: 'tenant_slug,report_date', ignoreDuplicates: false },
+      )
+
+      if (clearError) {
+        console.error('regenerateZReportForDate: Fout bij leegmaken:', clearError)
+      } else {
+        console.log(`regenerateZReportForDate: Z-rapport ${date} op 0 gezet voor ${tenantSlug}`)
+      }
+      return
+    }
 
     let total = 0
     let cashPayments = 0
@@ -406,6 +444,66 @@ export async function regenerateZReportForDate(
   } catch (error) {
     console.error('regenerateZReportForDate: Onverwachte fout:', error)
   }
+}
+
+function ymdToUtcMs(ymd: string): number {
+  const [y, m, d] = ymd.split('-').map(Number)
+  return Date.UTC(y, m - 1, d)
+}
+
+/**
+ * Verplaats alle bonnen van één fiscale dag naar een andere (created_at ± offset).
+ * Herberekent z_reports voor bron- en doeldatum.
+ */
+export async function moveFiscalDaySales(
+  client: SupabaseClient,
+  tenantSlug: string,
+  fromDate: string,
+  toDate: string,
+): Promise<{ movedCount: number; fromDate: string; toDate: string }> {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fromDate) || !/^\d{4}-\d{2}-\d{2}$/.test(toDate)) {
+    throw new Error('fromDate en toDate moeten YYYY-MM-DD zijn')
+  }
+  if (fromDate === toDate) {
+    throw new Error('Bron- en doeldatum moeten verschillen')
+  }
+
+  const fromBounds = getZRapportDateBounds(fromDate)
+  const offsetMs = ymdToUtcMs(toDate) - ymdToUtcMs(fromDate)
+  const fromStartMs = new Date(fromBounds.startUTC).getTime()
+  const fromEndMs = new Date(fromBounds.endUTC).getTime()
+
+  const ordersRaw = await fetchAllOrdersInCreatedAtRange(
+    client,
+    tenantSlug,
+    fromBounds.startUTC,
+    fromBounds.endUTC,
+    'id, created_at, completed_at',
+  )
+
+  for (const row of ordersRaw) {
+    const id = String(row.id)
+    const createdMs = new Date(String(row.created_at)).getTime()
+    const patch: { created_at: string; updated_at: string; completed_at?: string } = {
+      created_at: new Date(createdMs + offsetMs).toISOString(),
+      updated_at: new Date().toISOString(),
+    }
+    if (row.completed_at) {
+      const completedMs = new Date(String(row.completed_at)).getTime()
+      if (completedMs >= fromStartMs && completedMs <= fromEndMs) {
+        patch.completed_at = new Date(completedMs + offsetMs).toISOString()
+      }
+    }
+    const { error } = await client.from('orders').update(patch).eq('id', id).eq('tenant_slug', tenantSlug)
+    if (error) {
+      throw new Error(`Order ${id} verplaatsen mislukt: ${error.message}`)
+    }
+  }
+
+  await regenerateZReportForDate(client, tenantSlug, fromDate)
+  await regenerateZReportForDate(client, tenantSlug, toDate)
+
+  return { movedCount: ordersRaw.length, fromDate, toDate }
 }
 
 // AUTOMATISCH: Update Z-rapport voor een specifieke dag (browser Supabase)

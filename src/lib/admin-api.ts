@@ -111,6 +111,7 @@ export {
   getOrderWithItems,
   updateOrderStatus,
   regenerateZReportForDate,
+  moveFiscalDaySales,
   syncZReportAfterOrder,
   confirmOrder,
   approveWebshopOrder,

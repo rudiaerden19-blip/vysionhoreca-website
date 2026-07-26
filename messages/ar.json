@@ -4574,6 +4574,15 @@
  "emailSending": "جارٍ الإرسال...",
  "emailSentSuccess": "تم إرسال تقرير Z إلى",
  "emailSendError": "خطأ في الإرسال:",
+ "moveSalesDayButton": "نقل يوم المبيعات",
+ "moveSalesDayTitle": "نقل الإيصالات إلى يوم آخر",
+ "moveSalesDayIntro": "سيتم نقل جميع إيصالات {{from}} إلى {{to}}. سيتم إعادة حساب الأرشيف.",
+ "moveSalesDayTargetLabel": "النقل إلى التاريخ",
+ "moveSalesDayConfirm": "نقل جميع إيصالات {{from}} إلى {{to}}؟ لا يمكن التراجع تلقائياً.",
+ "moveSalesDaySubmit": "نقل الإيصالات",
+ "moveSalesDayWorking": "جارٍ التنفيذ…",
+ "moveSalesDaySuccess": "تم نقل {{count}} إيصالاً إلى {{to}}.",
+ "moveSalesDayError": "فشل النقل. حاول مرة أخرى.",
  "emailSendRetry": "فشل الإرسال. حاول مرة أخرى."
  },
  "simulator": {

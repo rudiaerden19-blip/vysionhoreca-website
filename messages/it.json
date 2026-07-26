@@ -4574,6 +4574,15 @@
  "emailSending": "Invio...",
  "emailSentSuccess": "Z-Report inviato a",
  "emailSendError": "Errore durante l'invio:",
+ "moveSalesDayButton": "Sposta giorno vendite",
+ "moveSalesDayTitle": "Sposta scontrini su altro giorno",
+ "moveSalesDayIntro": "Tutti gli scontrini del {{from}} verranno spostati al {{to}}. L'archivio verrà ricalcolato.",
+ "moveSalesDayTargetLabel": "Sposta alla data",
+ "moveSalesDayConfirm": "Spostare tutti gli scontrini dal {{from}} al {{to}}? Non può essere annullato automaticamente.",
+ "moveSalesDaySubmit": "Sposta scontrini",
+ "moveSalesDayWorking": "In corso…",
+ "moveSalesDaySuccess": "{{count}} scontrini spostati al {{to}}.",
+ "moveSalesDayError": "Spostamento non riuscito. Riprova.",
  "emailSendRetry": "Errore durante l'invio. Riprova."
  },
  "simulator": {

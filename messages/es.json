@@ -4574,6 +4574,15 @@
  "emailSending": "Enviando...",
  "emailSentSuccess": "Z-Informe enviado a",
  "emailSendError": "Error al enviar:",
+ "moveSalesDayButton": "Mover día de venta",
+ "moveSalesDayTitle": "Mover tickets a otro día",
+ "moveSalesDayIntro": "Todos los tickets del {{from}} se moverán al {{to}}. El archivo se recalculará.",
+ "moveSalesDayTargetLabel": "Mover a la fecha",
+ "moveSalesDayConfirm": "¿Mover todos los tickets del {{from}} al {{to}}? Esto no se puede deshacer automáticamente.",
+ "moveSalesDaySubmit": "Mover tickets",
+ "moveSalesDayWorking": "Procesando…",
+ "moveSalesDaySuccess": "{{count}} tickets movidos al {{to}}.",
+ "moveSalesDayError": "Error al mover. Inténtelo de nuevo.",
  "emailSendRetry": "Error al enviar. Inténtelo de nuevo."
  },
  "simulator": {

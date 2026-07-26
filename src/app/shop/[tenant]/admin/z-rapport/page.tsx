@@ -125,6 +125,9 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const [showKassaModal, setShowKassaModal] = useState(false)
   const [kassaForm, setKassaForm] = useState({ cash: '', card: '', online: ''})
   const [savingKassa, setSavingKassa] = useState(false)
+  const [showMoveDayModal, setShowMoveDayModal] = useState(false)
+  const [moveTargetDate, setMoveTargetDate] = useState('')
+  const [movingSalesDay, setMovingSalesDay] = useState(false)
   const [archivePeriod, setArchivePeriod] = useState<'dag' |  'week' |  'maand' |  'jaar'>('dag')
 
   const getLocalDateString = (date: Date = new Date()) => {
@@ -332,6 +335,54 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const refreshData = () => {
     loadData()
     loadSavedReports()
+  }
+
+  const moveSalesDay = async () => {
+    if (!moveTargetDate || isDayClosed || reportViewMode !== 'day') return
+    if (
+      !window.confirm(
+        t('zReport.moveSalesDayConfirm')
+          .replace('{{from}}', formatShortDate(selectedDate))
+          .replace('{{to}}', formatShortDate(moveTargetDate)),
+      )
+    ) {
+      return
+    }
+
+    setMovingSalesDay(true)
+    try {
+      const r = await authFetch('/api/admin/z-report/move-sales-day', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tenantSlug: params.tenant,
+          fromDate: selectedDate,
+          toDate: moveTargetDate,
+        }),
+      })
+      const data = (await r.json()) as { error?: string; movedCount?: number }
+      if (!r.ok) {
+        throw new Error(data.error || t('zReport.moveSalesDayError'))
+      }
+      const target = moveTargetDate
+      setShowMoveDayModal(false)
+      setMoveTargetDate('')
+      setSelectedDate(target)
+      setArchivePeriod('dag')
+      setReportViewMode('day')
+      await loadData()
+      await loadSavedReports()
+      alert(
+        t('zReport.moveSalesDaySuccess')
+          .replace('{{count}}', String(data.movedCount ?? 0))
+          .replace('{{to}}', formatShortDate(target)),
+      )
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : t('zReport.moveSalesDayError')
+      alert(message)
+    } finally {
+      setMovingSalesDay(false)
+    }
   }
 
   // Opslaan (kan meerdere keren, tot dag is afgesloten)
@@ -1119,6 +1170,18 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           >
              {t('zReport.refresh')}
           </button>
+          {reportViewMode === 'day' && !isDayClosed && stats && stats.orderCount > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                setMoveTargetDate('')
+                setShowMoveDayModal(true)
+              }}
+              className="px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-xl font-medium flex items-center gap-2"
+            >
+              {t('zReport.moveSalesDayButton')}
+            </button>
+          )}
           {/* KASSA INVOER */}
           <button
             onClick={() => { setKassaForm({ cash: '', card: '', online: ''}); setShowKassaModal(true) }}
@@ -1711,6 +1774,73 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                   className="flex-1 px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-medium disabled:bg-gray-300 flex items-center justify-center gap-2"
                 >
                   {sendingEmail ? <><span className="animate-spin"></span> {t('zReport.emailSending')}</> : <> {t('zReport.emailSend')}</>}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showMoveDayModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4"
+            onClick={() => !movingSalesDay && setShowMoveDayModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-xl font-bold text-gray-900 mb-2">{t('zReport.moveSalesDayTitle')}</h3>
+              <p className="text-gray-600 text-sm mb-4">
+                {t('zReport.moveSalesDayIntro')
+                  .replace('{{from}}', formatShortDate(selectedDate))
+                  .replace('{{to}}', moveTargetDate ? formatShortDate(moveTargetDate) : '…')}
+              </p>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('zReport.moveSalesDayTargetLabel')}
+              </label>
+              <input
+                type="date"
+                value={moveTargetDate}
+                onChange={(e) => setMoveTargetDate(e.target.value)}
+                max={getLocalDateString()}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl mb-4"
+              />
+              {stats && (
+                <div className="bg-gray-50 rounded-xl p-4 mb-4 text-sm text-gray-600">
+                  <div className="flex justify-between">
+                    <span>{t('zReport.orders')}</span>
+                    <span className="font-medium">{stats.orderCount}</span>
+                  </div>
+                  <div className="flex justify-between mt-1">
+                    <span>{t('zReport.total')}</span>
+                    <span className="font-bold text-green-600">{formatCurrency(stats.total)}</span>
+                  </div>
+                </div>
+              )}
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowMoveDayModal(false)}
+                  disabled={movingSalesDay}
+                  className="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium disabled:opacity-50"
+                >
+                  {t('zReport.kassaModalCancel')}
+                </button>
+                <button
+                  type="button"
+                  onClick={moveSalesDay}
+                  disabled={!moveTargetDate || movingSalesDay || moveTargetDate === selectedDate}
+                  className="flex-1 px-4 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-medium disabled:bg-gray-300"
+                >
+                  {movingSalesDay ? t('zReport.moveSalesDayWorking') : t('zReport.moveSalesDaySubmit')}
                 </button>
               </div>
             </motion.div>

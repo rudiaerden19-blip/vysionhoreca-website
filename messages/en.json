@@ -3455,6 +3455,15 @@
  "emailSending": "Sending...",
  "emailSentSuccess": "Z-Report sent to",
  "emailSendError": "Error sending:",
+ "moveSalesDayButton": "Move sales day",
+ "moveSalesDayTitle": "Move receipts to another day",
+ "moveSalesDayIntro": "All receipts from {{from}} will be moved to {{to}}. The archive will be recalculated.",
+ "moveSalesDayTargetLabel": "Move to date",
+ "moveSalesDayConfirm": "Move all receipts from {{from}} to {{to}}? This cannot be undone automatically.",
+ "moveSalesDaySubmit": "Move receipts",
+ "moveSalesDayWorking": "Working…",
+ "moveSalesDaySuccess": "{{count}} receipts moved to {{to}}.",
+ "moveSalesDayError": "Move failed. Please try again.",
  "emailSendRetry": "Error sending. Please try again."
  },
  "simulator": {

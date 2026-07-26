@@ -3455,6 +3455,15 @@
  "emailSending": "Verzenden...",
  "emailSentSuccess": "Z-Rapport verzonden naar",
  "emailSendError": "Fout bij verzenden:",
+ "moveSalesDayButton": "Verkoopdag verplaatsen",
+ "moveSalesDayTitle": "Bonnen naar andere dag verplaatsen",
+ "moveSalesDayIntro": "Alle bonnen van {{from}} worden naar {{to}} verplaatst. Het archief wordt opnieuw berekend.",
+ "moveSalesDayTargetLabel": "Verplaatsen naar datum",
+ "moveSalesDayConfirm": "Alle bonnen van {{from}} verplaatsen naar {{to}}? Dit kan niet automatisch ongedaan worden gemaakt.",
+ "moveSalesDaySubmit": "Verplaats bonnen",
+ "moveSalesDayWorking": "Bezig…",
+ "moveSalesDaySuccess": "{{count}} bonnen verplaatst naar {{to}}.",
+ "moveSalesDayError": "Verplaatsen mislukt. Probeer opnieuw.",
  "emailSendRetry": "Fout bij verzenden. Probeer opnieuw."
  },
  "simulator": {

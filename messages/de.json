@@ -4597,6 +4597,15 @@
  "emailSending": "Senden...",
  "emailSentSuccess": "Z-Bericht gesendet an",
  "emailSendError": "Fehler beim Senden:",
+ "moveSalesDayButton": "Verkaufstag verschieben",
+ "moveSalesDayTitle": "Belege auf anderen Tag verschieben",
+ "moveSalesDayIntro": "Alle Belege von {{from}} werden nach {{to}} verschoben. Das Archiv wird neu berechnet.",
+ "moveSalesDayTargetLabel": "Verschieben nach Datum",
+ "moveSalesDayConfirm": "Alle Belege von {{from}} nach {{to}} verschieben? Dies kann nicht automatisch rückgängig gemacht werden.",
+ "moveSalesDaySubmit": "Belege verschieben",
+ "moveSalesDayWorking": "Wird ausgeführt…",
+ "moveSalesDaySuccess": "{{count}} Belege nach {{to}} verschoben.",
+ "moveSalesDayError": "Verschieben fehlgeschlagen. Bitte erneut versuchen.",
  "emailSendRetry": "Fehler beim Senden. Bitte erneut versuchen."
  },
  "simulator": {
