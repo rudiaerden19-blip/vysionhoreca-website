@@ -52,9 +52,9 @@ export default function Navigation() {
           <div className="hidden md:flex items-center gap-1 ml-12">
             <a href="/" className={navLinkClass}>{t('nav.home')}</a>
             <a href="/#prijzen" className={navLinkClass}>{t('nav.pricing')}</a>
+            <a href="/licentie" className={navLinkClass}>{t('nav.license')}</a>
             <a href="/over-ons" className={navLinkClass}>{t('nav.about')}</a>
             <a href="/support" className={navLinkClass}>{t('nav.support')}</a>
-            <a href="/licentie" className={navLinkClass}>{t('nav.license')}</a>
             <a href="/resellers" className={navLinkClass}>{t('nav.resellers')}</a>
           </div>
 
