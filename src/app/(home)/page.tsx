@@ -790,6 +790,12 @@ function PricingSection() {
             {t('pricing.ctaHomeRetailPricing')}
           </button>
           <p className="text-center text-accent text-sm font-medium">{t('pricing.cancelAnytime')}</p>
+          <a
+            href="/licentie"
+            className="w-full rounded-full border-2 border-gray-900 bg-white px-6 py-4 text-center text-sm font-semibold text-gray-900 shadow-home-float transition-colors hover:bg-gray-900 hover:text-white sm:text-base"
+          >
+            {t('pricing.ctaBuyOneTimeLicense')}
+          </a>
         </div>
 
         <div className="mt-12 flex flex-col items-stretch justify-center gap-3 sm:mt-14 sm:flex-row sm:items-center sm:justify-center sm:gap-4">
