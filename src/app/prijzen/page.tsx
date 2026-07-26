@@ -39,6 +39,7 @@ export default function PrijzenPage() {
               onChange={setWithHardware}
               labelWithout={t('pricing.hardwareWithout')}
               labelWith={t('pricing.hardwareWith')}
+              labelLicense={t('pricing.buyLicense')}
               className="shadow-sm"
             />
           </div>

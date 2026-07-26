@@ -565,6 +565,7 @@ function PricingModalPriceBar({
           onChange={onHardwareChange}
           labelWithout={t('pricing.hardwareWithout')}
           labelWith={t('pricing.hardwareWith')}
+          labelLicense={t('pricing.buyLicense')}
           className="shadow-sm w-full max-w-md justify-center"
         />
         <div className="text-center">
