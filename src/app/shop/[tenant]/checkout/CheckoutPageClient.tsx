@@ -355,6 +355,7 @@ export default function CheckoutPageClient({
           scheduled_time: scheduledTime || null,  // Time for pickup/delivery
           status: 'new',
           items: cart.map(item => ({
+            product_id: item.id,
             name: item.name,
             quantity: item.quantity,
             price: item.price,

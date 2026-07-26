@@ -4476,6 +4476,7 @@
  "subtitle": "Resumen diario para caja registradora (GKS)",
  "reportTitle": "INFORME Z",
  "onlineSales": "VENTAS ONLINE",
+ "fiscalPeriodNote": "Período fiscal: 00:00 — día siguiente 12:00",
  "history": "Archivo",
  "print": "Imprimir",
  "refresh": "Actualizar",

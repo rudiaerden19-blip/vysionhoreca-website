@@ -2,6 +2,7 @@ import type { MenuCategory } from '@/lib/admin-api-menu-catalog'
 import type { MenuProduct } from '@/lib/admin-api-menu-product-helpers'
 import type { KassaCartItem } from '@/lib/kassa-cart-types'
 import { orderItemLineTotalEur } from '@/lib/order-items-display'
+import type { ZReportVatContext } from '@/lib/z-report-vat-context'
 
 /** Officiële keuzes in de UI (BE/NL gangbaar). */
 export const CATEGORY_VAT_PERCENT_OPTIONS = [6, 9, 12, 21] as const
@@ -119,6 +120,68 @@ function itemHasExplicitBtw(raw: Record<string, unknown>): boolean {
   return false
 }
 
+function normalizeProductNameForVat(name: string): string {
+  return name.trim().toLowerCase().replace(/\s+/g, ' ')
+}
+
+function lineDisplayNameForVat(line: Record<string, unknown>): string {
+  const direct = line.name ?? line.product_name
+  if (direct != null && String(direct).trim() !== '') return String(direct)
+  const nested = line.product
+  if (nested && typeof nested === 'object') {
+    const pn = (nested as Record<string, unknown>).name
+    if (pn != null && String(pn).trim() !== '') return String(pn)
+  }
+  return ''
+}
+
+/**
+ * BTW-tarief per orderregel — categorie/product vóór opgeslagen btw op de regel.
+ * Oude bonnen hadden vaak btw = zaak-default (6%) op elke regel; lookup herstelt drank vs. eten.
+ */
+function resolveLineVatRate(
+  line: Record<string, unknown>,
+  fallbackRate: CategoryVatPercent,
+  ctx?: ZReportVatContext | null,
+): CategoryVatPercent {
+  const tryCategory = (categoryId: unknown): CategoryVatPercent | null => {
+    if (!categoryId || !ctx?.categoryById) return null
+    const override = ctx.categoryById.get(String(categoryId))
+    if (override === null || override === undefined) return fallbackRate
+    return normalizeCategoryVatPercent(override, fallbackRate)
+  }
+
+  const productId = line.product_id ?? line.productId
+  if (productId && ctx?.productCategoryById) {
+    const cid = ctx.productCategoryById.get(String(productId))
+    if (cid) {
+      const fromProduct = tryCategory(cid)
+      if (fromProduct != null) return fromProduct
+    }
+  }
+
+  const lineCategoryId = line.category_id ?? line.categoryId
+  if (lineCategoryId) {
+    const fromLineCategory = tryCategory(lineCategoryId)
+    if (fromLineCategory != null) return fromLineCategory
+  }
+
+  if (ctx?.productCategoryByNormalizedName) {
+    const displayName = lineDisplayNameForVat(line)
+    if (displayName) {
+      const cid = ctx.productCategoryByNormalizedName.get(normalizeProductNameForVat(displayName))
+      if (cid) {
+        const fromName = tryCategory(cid)
+        if (fromName != null) return fromName
+      }
+    }
+  }
+
+  if (itemHasExplicitBtw(line)) return lineVatRate(line, fallbackRate)
+
+  return fallbackRate
+}
+
 function lineVatRate(line: Record<string, unknown>, fallbackRate: CategoryVatPercent): CategoryVatPercent {
   const v = line.btw_percentage
   if (typeof v === 'number' && Number.isFinite(v)) {
@@ -153,10 +216,12 @@ function parseItems(raw: unknown): unknown[] {
 export function allocateVatBucketsForSingleOrder(
   order: ZReportVatOrderSlice,
   tenantDefaultPct: number,
-): { subtotalExcl: number; buckets: Record<CategoryVatPercent, number> } {
+  ctx?: ZReportVatContext | null,
+): { subtotalExcl: number; buckets: Record<CategoryVatPercent, number>; baseBuckets: Record<CategoryVatPercent, number> } {
   const fb = normalizeCategoryVatPercent(tenantDefaultPct, 21)
   const orderTotal = round2(Number(order.total) || 0)
   const buckets = emptyVatBuckets()
+  const baseBuckets = emptyVatBuckets()
   const items = parseItems(order.items)
   const lines: { gross: number; rate: CategoryVatPercent }[] = []
 
@@ -165,7 +230,7 @@ export function allocateVatBucketsForSingleOrder(
     const line = raw as Record<string, unknown>
     const gross = round2(orderItemLineTotalEur(raw))
     if (gross <= 0) continue
-    const rate = itemHasExplicitBtw(line) ? lineVatRate(line, fb) : fb
+    const rate = resolveLineVatRate(line, fb, ctx)
     lines.push({ gross, rate })
   }
 
@@ -179,13 +244,14 @@ export function allocateVatBucketsForSingleOrder(
 
   if (lines.length === 0) {
     if (orderTotal <= 0) {
-      return { subtotalExcl: 0, buckets }
+      return { subtotalExcl: 0, buckets, baseBuckets }
     }
     const r = fb / 100
     const baseExcl = round2(orderTotal / (1 + r))
     const tax = round2(orderTotal - baseExcl)
     buckets[fb] = tax
-    return { subtotalExcl: baseExcl, buckets }
+    baseBuckets[fb] = baseExcl
+    return { subtotalExcl: baseExcl, buckets, baseBuckets }
   }
 
   for (const { gross, rate } of lines) {
@@ -194,9 +260,10 @@ export function allocateVatBucketsForSingleOrder(
     const tax = round2(gross - baseExcl)
     subtotalExcl = round2(subtotalExcl + baseExcl)
     buckets[rate] = round2(buckets[rate] + tax)
+    baseBuckets[rate] = round2((baseBuckets[rate] || 0) + baseExcl)
   }
 
-  return { subtotalExcl, buckets }
+  return { subtotalExcl, buckets, baseBuckets }
 }
 
 /** Z-rapport: `tax_mid`= 9% + 12% in één kolom. */
@@ -215,8 +282,13 @@ export function foldVatBucketsToZColumns(buckets: Record<CategoryVatPercent, num
 
 export interface ZReportVatAggregate {
   subtotalExcl: number
+  taxByRate: Record<CategoryVatPercent, number>
+  baseByRate: Record<CategoryVatPercent, number>
+  /** DB-compat: 6% */
   tax_low: number
+  /** DB-compat: 9% + 12% */
   tax_mid: number
+  /** DB-compat: 21% */
   tax_high: number
   totalTax: number
 }
@@ -224,18 +296,33 @@ export interface ZReportVatAggregate {
 export function aggregateZReportVatFromOrderRows(
   orders: ZReportVatOrderSlice[],
   tenantDefaultPct: number,
+  ctx?: ZReportVatContext | null,
 ): ZReportVatAggregate {
   let subtotalExcl = 0
   const sumBuckets = emptyVatBuckets()
+  const sumBaseBuckets = emptyVatBuckets()
 
   for (const order of orders) {
-    const { subtotalExcl: se, buckets } = allocateVatBucketsForSingleOrder(order, tenantDefaultPct)
+    const { subtotalExcl: se, buckets, baseBuckets } = allocateVatBucketsForSingleOrder(
+      order,
+      tenantDefaultPct,
+      ctx,
+    )
     subtotalExcl = round2(subtotalExcl + se)
     for (const rate of CATEGORY_VAT_PERCENT_OPTIONS) {
       sumBuckets[rate] = round2(sumBuckets[rate] + (buckets[rate] || 0))
+      sumBaseBuckets[rate] = round2(sumBaseBuckets[rate] + (baseBuckets[rate] || 0))
     }
   }
 
   const { tax_low, tax_mid, tax_high, totalTax } = foldVatBucketsToZColumns(sumBuckets)
-  return { subtotalExcl, tax_low, tax_mid, tax_high, totalTax }
+  return {
+    subtotalExcl,
+    taxByRate: sumBuckets,
+    baseByRate: sumBaseBuckets,
+    tax_low,
+    tax_mid,
+    tax_high,
+    totalTax,
+  }
 }

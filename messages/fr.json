@@ -4499,6 +4499,7 @@
  "subtitle": "Vue quotidienne pour caisse enregistreuse (GKS)",
  "reportTitle": "RAPPORT Z",
  "onlineSales": "VENTES EN LIGNE",
+ "fiscalPeriodNote": "Période fiscale : 00h00 — lendemain 12h00",
  "history": "Archive",
  "print": "Imprimer",
  "refresh": "Actualiser",

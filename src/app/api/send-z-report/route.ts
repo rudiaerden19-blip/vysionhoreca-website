@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     }
     const transporter = createZohoMailTransport()
 
-    const amounts = parseZReportEmailAmounts(body as Record<string, unknown>)
+    const parsed = parseZReportEmailAmounts(body as Record<string, unknown>)
     const labelsIn = rawLabels && typeof rawLabels === 'object' ? (rawLabels as Record<string, unknown>) : {}
     const label = (key: string, fallback: string) =>
       typeof labelsIn[key] === 'string' ? String(labelsIn[key]).trim().slice(0, 120) : fallback
@@ -65,15 +65,7 @@ export async function POST(request: NextRequest) {
       businessAddress: businessAddress || '',
       btwNumber: btwNumber || '',
       formattedDate: formattedDate || '',
-      orderCount: typeof orderCount === 'number' ? orderCount : 0,
-      subtotal: amounts.subtotal,
-      taxLow: amounts.taxLow,
-      taxMid: amounts.taxMid,
-      taxHigh: amounts.taxHigh,
-      total: amounts.total,
-      cashPayments: amounts.cashPayments,
-      cardPayments: amounts.cardPayments,
-      onlinePayments: amounts.onlinePayments,
+      amounts: parsed.amounts,
       articleLines: rawArticleLines,
       soldArticlesSectionTitle,
       soldArticlesPiecesShort,
@@ -81,9 +73,12 @@ export async function POST(request: NextRequest) {
         revenue: label('revenue', 'OMZET'),
         orderCount: label('orderCount', 'Aantal transacties'),
         subtotal: label('subtotal', 'Subtotaal (excl. BTW)'),
-        vat: label('vat', 'BTW'),
-        vatMidRates: label('vatMidRates', '9% / 12%'),
-        total: label('total', 'TOTAAL'),
+        vatTableTitle: label('vatTableTitle', 'BTW-overzicht'),
+        vatRateCol: label('vatRateCol', 'Tarief'),
+        vatBaseCol: label('vatBaseCol', 'Excl. BTW'),
+        vatTaxCol: label('vatTaxCol', 'BTW'),
+        vatTotalRow: label('vatTotalRow', 'Totaal'),
+        total: label('total', 'TOTAAL INCL. BTW'),
         payments: label('payments', 'BETALINGEN'),
         cash: label('cash', 'Contant'),
         card: label('card', 'PIN/Kaart'),

@@ -20,8 +20,16 @@ import {
 } from '@/lib/z-report-aggregate-articles'
 import {
   aggregateZReportVatFromOrderRows,
+  type CategoryVatPercent,
   type ZReportVatOrderSlice,
 } from '@/lib/order-vat'
+import { fetchZReportVatContextForTenant } from '@/lib/z-report-vat-context'
+import {
+  buildZReportVatRows,
+  formatZReportEuro,
+  type ZReportAmounts,
+} from '@/lib/z-report-document'
+import { ZReportDocumentBody } from '@/components/ZReportDocumentBody'
 import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
 
@@ -52,6 +60,8 @@ interface DailyStats {
   date: string
   orderCount: number
   subtotal: number
+  taxByRate: Record<CategoryVatPercent, number>
+  baseByRate: Record<CategoryVatPercent, number>
   taxLow: number
   taxMid: number
   taxHigh: number
@@ -60,6 +70,23 @@ interface DailyStats {
   onlinePayments: number
   cardPayments: number
   orderIds: string[]
+}
+
+function emptyVatRecord(): Record<CategoryVatPercent, number> {
+  return { 6: 0, 9: 0, 12: 0, 21: 0 }
+}
+
+function statsToAmounts(stats: DailyStats): ZReportAmounts {
+  return {
+    orderCount: stats.orderCount,
+    subtotalExcl: stats.subtotal,
+    totalIncl: stats.total,
+    taxByRate: stats.taxByRate,
+    baseByRate: stats.baseByRate,
+    cashPayments: stats.cashPayments,
+    cardPayments: stats.cardPayments,
+    onlinePayments: stats.onlinePayments,
+  }
 }
 
 interface SavedReport {
@@ -169,16 +196,19 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
 
       total = Math.round(total * 100) / 100
 
-      const vatSlice: ZReportVatOrderSlice[] = orders.map((o) => ({
-        total: o.total,
-        items: (o as { items?: unknown }).items,
-      }))
-      const vatAgg = aggregateZReportVatFromOrderRows(vatSlice, settingsBtw)
+    const vatSlice: ZReportVatOrderSlice[] = orders.map((o) => ({
+      total: o.total,
+      items: (o as { items?: unknown }).items,
+    }))
+    const vatContext = await fetchZReportVatContextForTenant(params.tenant)
+    const vatAgg = aggregateZReportVatFromOrderRows(vatSlice, settingsBtw, vatContext)
 
       setStats({
         date: selectedDate,
         orderCount: orders.length,
         subtotal: vatAgg.subtotalExcl,
+        taxByRate: vatAgg.taxByRate,
+        baseByRate: vatAgg.baseByRate,
         taxLow: vatAgg.tax_low,
         taxMid: vatAgg.tax_mid,
         taxHigh: vatAgg.tax_high,
@@ -193,6 +223,8 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         date: selectedDate,
         orderCount: 0,
         subtotal: 0,
+        taxByRate: emptyVatRecord(),
+        baseByRate: emptyVatRecord(),
         taxLow: 0,
         taxMid: 0,
         taxHigh: 0,
@@ -512,6 +544,17 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     if (!stats) return ''
     const esc = (s: string) =>
       s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+    const amounts = statsToAmounts(stats)
+    const vatRows = buildZReportVatRows(amounts)
+    const totalTax = vatRows.reduce((s, r) => s + r.tax, 0)
+
+    const vatTableRows = vatRows
+      .map(
+        (r) =>
+          `<tr><td style="padding:6px 0;border-top:1px solid #ddd;">${r.rate}%</td><td style="padding:6px 0;border-top:1px solid #ddd;text-align:right;">${formatZReportEuro(r.baseExcl)}</td><td style="padding:6px 0;border-top:1px solid #ddd;text-align:right;">${formatZReportEuro(r.tax)}</td></tr>`,
+      )
+      .join('')
+
     const articlesBlock =
       articleLines.length === 0
         ? ''
@@ -521,22 +564,10 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           ${articleLines
             .map(
               (l) => `
-          <div class="row"><span>${esc(l.label)}</span><span>${l.qty} ${esc(t('zReport.soldArticlesPiecesShort'))} · ${formatCurrency(l.total)}</span></div>`
+          <div class="row"><span>${esc(l.label)}</span><span>${l.qty} ${esc(t('zReport.soldArticlesPiecesShort'))} · ${formatCurrency(l.total)}</span></div>`,
             )
             .join('')}
         </div>`
-
-    const vatRows = [
-      stats.taxLow > 0
-        ? `<div class="row"><span>${esc(t('zReport.vat'))} 6%:</span><span>${formatCurrency(stats.taxLow)}</span></div>`
-        : '',
-      stats.taxMid > 0
-        ? `<div class="row"><span>${esc(t('zReport.vat'))} ${esc(t('zReport.vatMidRates'))}:</span><span>${formatCurrency(stats.taxMid)}</span></div>`
-        : '',
-      stats.taxHigh > 0
-        ? `<div class="row"><span>${esc(t('zReport.vat'))} 21%:</span><span>${formatCurrency(stats.taxHigh)}</span></div>`
-        : '',
-    ].join('')
 
     const paymentRows = [
       stats.onlinePayments > 0
@@ -549,6 +580,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         ? `<div class="row"><span>${esc(t('zReport.cashPaid'))}:</span><span>${formatCurrency(stats.cashPayments)}</span></div>`
         : '',
     ].join('')
+
     return `
       <!DOCTYPE html>
       <html>
@@ -556,14 +588,17 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         <meta charset="utf-8">
         <title>Z-Rapport ${formatShortDate(selectedDate)}</title>
         <style>
-          body { font-family: 'Courier New', monospace; max-width: 400px; margin: 0 auto; padding: 20px; }
+          body { font-family: 'Courier New', monospace; max-width: 420px; margin: 0 auto; padding: 20px; }
           .header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 15px; margin-bottom: 15px; }
           .header h1 { margin: 0; font-size: 18px; }
           .header p { margin: 5px 0; font-size: 12px; color: #666; }
           .section { margin: 15px 0; }
-          .section-title { font-weight: bold; border-bottom: 1px solid #ccc; margin-bottom: 10px; }
+          .section-title { font-weight: bold; border-bottom: 1px solid #ccc; margin-bottom: 10px; text-transform: uppercase; font-size: 12px; }
           .row { display: flex; justify-content: space-between; font-size: 14px; margin: 5px 0; }
           .total-row { font-weight: bold; font-size: 16px; border-top: 2px solid #000; padding-top: 10px; margin-top: 10px; }
+          table { width: 100%; font-size: 13px; border-collapse: collapse; }
+          th { text-align: left; font-size: 11px; color: #555; padding-bottom: 4px; }
+          th:not(:first-child) { text-align: right; }
           .footer { text-align: center; font-size: 10px; color: #666; border-top: 2px dashed #000; margin-top: 20px; padding-top: 15px; }
           .closed-badge { background: #16a34a; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; }
         </style>
@@ -573,23 +608,34 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           <h1>${businessInfo?.business_name || 'Z-Rapport'}</h1>
           <p>${businessInfo?.address || ''}</p>
           ${businessInfo?.btw_number ? `<p>BTW: ${businessInfo.btw_number}</p>`: ''}
-          <p style="margin-top: 10px; font-weight: bold;">Z-RAPPORT ONLINE VERKOPEN</p>
+          <p style="margin-top: 10px; font-weight: bold;">Z-RAPPORT</p>
+          <p style="font-size:11px;">${esc(t('zReport.onlineSales'))}</p>
           <p>${formatDate(selectedDate)}</p>
           ${currentSavedReport?.is_closed ? `<p><span class="closed-badge"> AFGESLOTEN</span></p>`: ''}
         </div>
         <div class="section">
           <div class="section-title">OMZET</div>
-          <div class="row"><span>Aantal transacties:</span><span>${stats.orderCount}</span></div>
-          <div class="row"><span>Subtotaal (excl. BTW):</span><span>${formatCurrency(stats.subtotal)}</span></div>
-          ${vatRows}
-          <div class="row total-row"><span>TOTAAL:</span><span>${formatCurrency(stats.total)}</span></div>
+          <div class="row"><span>${esc(t('zReport.orderCount'))}:</span><span>${stats.orderCount}</span></div>
+          <div class="section-title" style="margin-top:12px;">${esc(t('zReport.vatTableTitle'))}</div>
+          <table>
+            <thead><tr><th>${esc(t('zReport.vatRateCol'))}</th><th style="text-align:right">${esc(t('zReport.vatBaseCol'))}</th><th style="text-align:right">${esc(t('zReport.vatTaxCol'))}</th></tr></thead>
+            <tbody>
+              ${vatTableRows}
+              <tr style="font-weight:bold;border-top:2px solid #000;">
+                <td style="padding-top:8px;">${esc(t('zReport.vatTotalRow'))}</td>
+                <td style="padding-top:8px;text-align:right;">${formatCurrency(stats.subtotal)}</td>
+                <td style="padding-top:8px;text-align:right;">${formatCurrency(Math.round(totalTax * 100) / 100)}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="row total-row"><span>${esc(t('zReport.total'))}:</span><span>${formatCurrency(stats.total)}</span></div>
         </div>
         <div class="section">
-          <div class="section-title">BETALINGEN</div>
+          <div class="section-title">${esc(t('zReport.paymentMethods'))}</div>
           ${paymentRows}
         </div>${articlesBlock}
         <div class="footer">
-          <p>Dagperiode: ${formatShortDate(selectedDate)} 00:00 t/m ${formatShortDate(selectedDate)} +1dag 12:00</p>
+          <p>Dagperiode: ${formatShortDate(selectedDate)} 00:00 t/m +1dag 12:00</p>
           <p>Gegenereerd: ${new Date().toLocaleString('nl-BE')}</p>
           ${currentSavedReport?.closed_at ? `<p>Afgesloten: ${new Date(currentSavedReport.closed_at).toLocaleString('nl-BE')}</p>`: ''}
           <p>Hash: ${currentSavedReport?.report_hash?.substring(0, 16) || 'n.v.t.'}...</p>
@@ -635,6 +681,14 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         taxLow: stats.taxLow,
         taxMid: stats.taxMid,
         taxHigh: stats.taxHigh,
+        tax6: stats.taxByRate[6],
+        tax9: stats.taxByRate[9],
+        tax12: stats.taxByRate[12],
+        tax21: stats.taxByRate[21],
+        base6: stats.baseByRate[6],
+        base9: stats.baseByRate[9],
+        base12: stats.baseByRate[12],
+        base21: stats.baseByRate[21],
         total: stats.total,
         cashPayments: stats.cashPayments,
         cardPayments: stats.cardPayments,
@@ -646,8 +700,11 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           revenue: 'OMZET',
           orderCount: t('zReport.orderCount'),
           subtotal: t('zReport.subtotal'),
-          vat: t('zReport.vat'),
-          vatMidRates: t('zReport.vatMidRates'),
+          vatTableTitle: t('zReport.vatTableTitle'),
+          vatRateCol: t('zReport.vatRateCol'),
+          vatBaseCol: t('zReport.vatBaseCol'),
+          vatTaxCol: t('zReport.vatTaxCol'),
+          vatTotalRow: t('zReport.vatTotalRow'),
           total: t('zReport.total'),
           payments: t('zReport.paymentMethods'),
           cash: t('zReport.cashPaid'),
@@ -859,9 +916,9 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
 
             <div className="border-b-2 border-dashed border-gray-300 p-6 text-center">
               <h3 className="text-2xl font-bold text-gray-900">{t('zReport.reportTitle')}</h3>
-              <p className="text-lg text-gray-600">{t('zReport.onlineSales')}</p>
+              <p className="text-sm font-medium text-gray-600 mt-1">{t('zReport.onlineSales')}</p>
               <p className="text-gray-500 mt-2">{formatDate(selectedDate)}</p>
-              <p className="text-xs text-gray-400 mt-1">Fiscale periode: 00:00u — +1dag 12:00u</p>
+              <p className="text-xs text-gray-400 mt-1">{t('zReport.fiscalPeriodNote')}</p>
               <div className="flex items-center justify-center gap-2 mt-2 flex-wrap">
                 <span className="inline-block px-3 py-1 bg-blue-100 text-blue-600 text-sm rounded-full">
                    {t('zReport.autoUpdated')}
@@ -875,103 +932,29 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
             </div>
 
             {stats && stats.orderCount > 0 ? (
-              <div className="p-6 space-y-4">
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-gray-600">{t('zReport.orderCount')}</span>
-                  <span className="font-bold text-lg">{stats.orderCount}</span>
-                </div>
-
-                <div className="border-t-2 border-dashed border-gray-300 my-4"></div>
-
-                <div className="flex justify-between items-center py-2">
-                  <span className="text-gray-600">{t('zReport.subtotal')}</span>
-                  <span className="font-medium">{formatCurrency(stats.subtotal)}</span>
-                </div>
-
-                {stats.taxLow > 0 && (
-                  <div className="flex justify-between items-center py-2">
-                    <span className="text-gray-600">{t('zReport.vat')} 6%</span>
-                    <span className="font-medium">{formatCurrency(stats.taxLow)}</span>
-                  </div>
-                )}
-                {stats.taxMid > 0 && (
-                  <div className="flex justify-between items-center py-2">
-                    <span className="text-gray-600">
-                      {t('zReport.vat')} {t('zReport.vatMidRates')}
-                    </span>
-                    <span className="font-medium">{formatCurrency(stats.taxMid)}</span>
-                  </div>
-                )}
-                {stats.taxHigh > 0 && (
-                  <div className="flex justify-between items-center py-2">
-                    <span className="text-gray-600">{t('zReport.vat')} 21%</span>
-                    <span className="font-medium">{formatCurrency(stats.taxHigh)}</span>
-                  </div>
-                )}
-
-                <div className="border-t-2 border-dashed border-gray-300 my-4"></div>
-
-                <div className="flex justify-between items-center py-4 bg-gray-100 -mx-6 px-6">
-                  <span className="text-xl font-bold text-gray-900">{t('zReport.total')}</span>
-                  <span className="text-2xl font-bold text-green-600">{formatCurrency(stats.total)}</span>
-                </div>
-
-                <div className="border-t-2 border-dashed border-gray-300 my-4"></div>
-
-                <div className="space-y-2">
-                  <h4 className="font-semibold text-gray-900 mb-3">{t('zReport.paymentMethods')}</h4>
-                  {stats.onlinePayments > 0 && (
-                    <div className="flex justify-between items-center py-2">
-                      <span className="text-gray-600"> {t('zReport.onlinePaid')}</span>
-                      <span className="font-medium">{formatCurrency(stats.onlinePayments)}</span>
-                    </div>
-                  )}
-                  {stats.cardPayments > 0 && (
-                    <div className="flex justify-between items-center py-2">
-                      <span className="text-gray-600"> {t('zReport.cardPaid')}</span>
-                      <span className="font-medium">{formatCurrency(stats.cardPayments)}</span>
-                    </div>
-                  )}
-                  {stats.cashPayments > 0 && (
-                    <div className="flex justify-between items-center py-2">
-                      <span className="text-gray-600"> {t('zReport.cashPaid')}</span>
-                      <span className="font-medium">{formatCurrency(stats.cashPayments)}</span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="space-y-2 pt-2">
-                  <h4 className="font-semibold text-gray-900">{t('zReport.soldArticlesTitle')}</h4>
-                  {articleLines.length === 0 ? (
-                    <p className="text-sm text-gray-500">{t('zReport.soldArticlesEmpty')}</p>
-                  ) : (
-                    <div className="space-y-1 max-h-72 overflow-y-auto pr-1">
-                      {articleLines.map((line, idx) => (
-                        <div
-                          key={`${line.label}-${idx}`}
-                          className="flex justify-between gap-3 text-sm py-1.5 border-b border-gray-100 last:border-0"
-                        >
-                          <span className="text-gray-700 min-w-0 flex-1 break-words">{line.label}</span>
-                          <span className="flex items-center gap-4 shrink-0 tabular-nums">
-                            <span className="text-gray-600">
-                              {line.qty} {t('zReport.soldArticlesPiecesShort')}
-                            </span>
-                            <span className="font-medium w-[5.5rem] text-right">{formatCurrency(line.total)}</span>
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div className="border-t-2 border-dashed border-gray-300 my-4"></div>
-
-                <div className="text-center text-gray-500 text-sm pt-4">
-                  <p>{t('zReport.generatedOn')} {new Date().toLocaleString('nl-BE')}</p>
-                  <p className="mt-1">Vysion kassa's - ordervysion.com</p>
-                </div>
-
-              </div>
+              <ZReportDocumentBody
+                amounts={statsToAmounts(stats)}
+                articleLines={articleLines}
+                generatedAt={new Date().toLocaleString('nl-BE')}
+                labels={{
+                  orderCount: t('zReport.orderCount'),
+                  subtotal: t('zReport.subtotal'),
+                  vatTableTitle: t('zReport.vatTableTitle'),
+                  vatRateCol: t('zReport.vatRateCol'),
+                  vatBaseCol: t('zReport.vatBaseCol'),
+                  vatTaxCol: t('zReport.vatTaxCol'),
+                  vatTotalRow: t('zReport.vatTotalRow'),
+                  total: t('zReport.total'),
+                  paymentMethods: t('zReport.paymentMethods'),
+                  onlinePaid: t('zReport.onlinePaid'),
+                  cardPaid: t('zReport.cardPaid'),
+                  cashPaid: t('zReport.cashPaid'),
+                  soldArticlesTitle: t('zReport.soldArticlesTitle'),
+                  soldArticlesEmpty: t('zReport.soldArticlesEmpty'),
+                  soldArticlesPiecesShort: t('zReport.soldArticlesPiecesShort'),
+                  generatedOn: t('zReport.generatedOn'),
+                }}
+              />
             ) : (
               <div className="p-12 text-center">
                 <span className="text-6xl mb-4 block"></span>

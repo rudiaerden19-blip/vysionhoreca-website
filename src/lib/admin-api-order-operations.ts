@@ -8,6 +8,7 @@ import {
   type Order,
 } from './admin-api-order-helpers'
 import { aggregateZReportVatFromOrderRows } from './order-vat'
+import { fetchZReportVatContextFromSupabase } from './z-report-vat-context'
 
 // =====================================================
 // ORDERS / BESTELLINGEN — types & pure helpers: `./admin-api-order-helpers`
@@ -317,9 +318,12 @@ export async function regenerateZReportForDate(
 
     total = Math.round(total * 100) / 100
 
+    const vatContext = await fetchZReportVatContextFromSupabase(client, tenantSlug)
+
     const vatAgg = aggregateZReportVatFromOrderRows(
       orders.map((o) => ({ total: o.total, items: o.items })),
       btwPercentage,
+      vatContext,
     )
     const subtotal = vatAgg.subtotalExcl
 

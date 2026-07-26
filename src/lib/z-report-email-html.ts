@@ -1,6 +1,13 @@
 /**
- * HTML voor Z-rapport e-mail — zelfde BTW-opdeling als admin/z-rapport UI.
+ * HTML voor Z-rapport e-mail — zelfde BTW-tabel als admin/z-rapport UI.
  */
+
+import {
+  buildZReportVatRows,
+  formatZReportEuro,
+  zReportAmountsFromLegacyFields,
+  type ZReportAmounts,
+} from '@/lib/z-report-document'
 
 export function escapeHtml(s: string): string {
   return String(s)
@@ -8,10 +15,6 @@ export function escapeHtml(s: string): string {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
-}
-
-function fmtEuro(n: number): string {
-  return `€${n.toFixed(2)}`
 }
 
 function sanitizeArticleLines(raw: unknown): Array<{ label: string; qty: number; total: number }> {
@@ -40,15 +43,7 @@ export type ZReportEmailInput = {
   businessAddress?: string
   btwNumber?: string
   formattedDate: string
-  orderCount: number
-  subtotal: number
-  taxLow: number
-  taxMid: number
-  taxHigh: number
-  total: number
-  cashPayments: number
-  cardPayments: number
-  onlinePayments: number
+  amounts: ZReportAmounts
   articleLines?: unknown
   soldArticlesSectionTitle?: string
   soldArticlesPiecesShort?: string
@@ -56,8 +51,11 @@ export type ZReportEmailInput = {
     revenue: string
     orderCount: string
     subtotal: string
-    vat: string
-    vatMidRates: string
+    vatTableTitle: string
+    vatRateCol: string
+    vatBaseCol: string
+    vatTaxCol: string
+    vatTotalRow: string
     total: string
     payments: string
     cash: string
@@ -70,29 +68,41 @@ export type ZReportEmailInput = {
   generatedAtNl: string
 }
 
-function buildVatRows(
-  taxLow: number,
-  taxMid: number,
-  taxHigh: number,
-  labels: ZReportEmailInput['labels'],
-): string {
-  const rows: string[] = []
-  if (taxLow > 0) {
-    rows.push(
-      `<div class="row"><span>${escapeHtml(labels.vat)} 6%:</span><span>${fmtEuro(taxLow)}</span></div>`,
+function buildVatTableHtml(amounts: ZReportAmounts, labels: ZReportEmailInput['labels']): string {
+  const esc = escapeHtml
+  const rows = buildZReportVatRows(amounts)
+  const totalTax = rows.reduce((s, r) => s + r.tax, 0)
+  const bodyRows = rows
+    .map(
+      (r) => `
+        <tr>
+          <td style="padding:8px;border-top:1px solid #eee;">${r.rate}%</td>
+          <td style="padding:8px;border-top:1px solid #eee;text-align:right;">${formatZReportEuro(r.baseExcl)}</td>
+          <td style="padding:8px;border-top:1px solid #eee;text-align:right;font-weight:600;">${formatZReportEuro(r.tax)}</td>
+        </tr>`,
     )
-  }
-  if (taxMid > 0) {
-    rows.push(
-      `<div class="row"><span>${escapeHtml(labels.vat)} ${escapeHtml(labels.vatMidRates)}:</span><span>${fmtEuro(taxMid)}</span></div>`,
-    )
-  }
-  if (taxHigh > 0) {
-    rows.push(
-      `<div class="row"><span>${escapeHtml(labels.vat)} 21%:</span><span>${fmtEuro(taxHigh)}</span></div>`,
-    )
-  }
-  return rows.join('')
+    .join('')
+
+  return `
+    <div class="section-title">${esc(labels.vatTableTitle)}</div>
+    <table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:12px;">
+      <thead>
+        <tr style="background:#f8fafc;color:#475569;">
+          <th style="padding:8px;text-align:left;">${esc(labels.vatRateCol)}</th>
+          <th style="padding:8px;text-align:right;">${esc(labels.vatBaseCol)}</th>
+          <th style="padding:8px;text-align:right;">${esc(labels.vatTaxCol)}</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${bodyRows}
+        <tr style="background:#f1f5f9;font-weight:bold;">
+          <td style="padding:8px;border-top:2px solid #cbd5e1;">${esc(labels.vatTotalRow)}</td>
+          <td style="padding:8px;border-top:2px solid #cbd5e1;text-align:right;">${formatZReportEuro(amounts.subtotalExcl)}</td>
+          <td style="padding:8px;border-top:2px solid #cbd5e1;text-align:right;">${formatZReportEuro(Math.round(totalTax * 100) / 100)}</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:12px;color:#64748b;margin:0 0 12px;">${esc(labels.subtotal)}</p>`
 }
 
 function buildPaymentRows(
@@ -104,17 +114,17 @@ function buildPaymentRows(
   const rows: string[] = []
   if (cash > 0) {
     rows.push(
-      `<div class="row"><span>${escapeHtml(labels.cash)}:</span><span>${fmtEuro(cash)}</span></div>`,
+      `<div class="row"><span>${escapeHtml(labels.cash)}:</span><span>${formatZReportEuro(cash)}</span></div>`,
     )
   }
   if (card > 0) {
     rows.push(
-      `<div class="row"><span>${escapeHtml(labels.card)}:</span><span>${fmtEuro(card)}</span></div>`,
+      `<div class="row"><span>${escapeHtml(labels.card)}:</span><span>${formatZReportEuro(card)}</span></div>`,
     )
   }
   if (online > 0) {
     rows.push(
-      `<div class="row"><span>${escapeHtml(labels.online)}:</span><span>${fmtEuro(online)}</span></div>`,
+      `<div class="row"><span>${escapeHtml(labels.online)}:</span><span>${formatZReportEuro(online)}</span></div>`,
     )
   }
   return rows.join('')
@@ -141,17 +151,17 @@ export function buildZReportEmailHtml(p: ZReportEmailInput): string {
                   (r) => `
               <div class="row">
                 <span>${esc(r.label)}</span>
-                <span>${r.qty} ${piecesShort} · ${fmtEuro(r.total)}</span>
+                <span>${r.qty} ${piecesShort} · ${formatZReportEuro(r.total)}</span>
               </div>`,
                 )
                 .join('')}
             </div>`
 
-  const vatRows = buildVatRows(p.taxLow, p.taxMid, p.taxHigh, p.labels)
+  const vatTable = buildVatTableHtml(p.amounts, p.labels)
   const paymentRows = buildPaymentRows(
-    p.cashPayments,
-    p.cardPayments,
-    p.onlinePayments,
+    p.amounts.cashPayments,
+    p.amounts.cardPayments,
+    p.amounts.onlinePayments,
     p.labels,
   )
 
@@ -161,7 +171,7 @@ export function buildZReportEmailHtml(p: ZReportEmailInput): string {
         <meta charset="utf-8">
         <style>
           body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
-          .container { max-width: 500px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+          .container { max-width: 560px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
           .header { background: #1a1a2e; color: white; padding: 30px; text-align: center; }
           .header h1 { margin: 0 0 5px 0; font-size: 24px; }
           .header p { margin: 0; opacity: 0.8; font-size: 14px; }
@@ -192,16 +202,12 @@ export function buildZReportEmailHtml(p: ZReportEmailInput): string {
               <div class="section-title">${esc(p.labels.revenue)}</div>
               <div class="row">
                 <span>${esc(p.labels.orderCount)}:</span>
-                <span>${p.orderCount}</span>
+                <span>${p.amounts.orderCount}</span>
               </div>
-              <div class="row">
-                <span>${esc(p.labels.subtotal)}:</span>
-                <span>${fmtEuro(p.subtotal)}</span>
-              </div>
-              ${vatRows}
+              ${vatTable}
               <div class="row total">
                 <span>${esc(p.labels.total)}:</span>
-                <span class="amount">${fmtEuro(p.total)}</span>
+                <span class="amount">${formatZReportEuro(p.amounts.totalIncl)}</span>
               </div>
             </div>
             
@@ -221,84 +227,110 @@ export function buildZReportEmailHtml(p: ZReportEmailInput): string {
       </html>`
 }
 
-/** Parse body fields from /api/send-z-report — ondersteunt legacy `tax` + `btwPercentage`. */
-export function parseZReportEmailAmounts(body: Record<string, unknown>): {
-  subtotal: number
+export type ParsedZReportEmailAmounts = {
+  amounts: ZReportAmounts
   taxLow: number
   taxMid: number
   taxHigh: number
-  total: number
-  cashPayments: number
-  cardPayments: number
-  onlinePayments: number
-} {
+}
+
+/** Parse body fields from /api/send-z-report — ondersteunt per-tarief velden en legacy taxLow/Mid/High. */
+export function parseZReportEmailAmounts(body: Record<string, unknown>): ParsedZReportEmailAmounts {
   const subtotal = coerceMoney(body.subtotal)
   const total = coerceMoney(body.total)
+  const cashPayments = coerceMoney(body.cashPayments)
+  const cardPayments = coerceMoney(body.cardPayments)
+  const onlinePayments = coerceMoney(body.onlinePayments)
+  const orderCount = typeof body.orderCount === 'number' ? body.orderCount : coerceMoney(body.orderCount)
+
+  const hasPerRate =
+    body.tax6 != null ||
+    body.tax9 != null ||
+    body.tax12 != null ||
+    body.tax21 != null ||
+    body.base6 != null
+
+  if (hasPerRate) {
+    const amounts = zReportAmountsFromLegacyFields({
+      orderCount,
+      subtotal,
+      total,
+      taxLow: 0,
+      taxMid: 0,
+      taxHigh: 0,
+      tax6: coerceMoney(body.tax6),
+      tax9: coerceMoney(body.tax9),
+      tax12: coerceMoney(body.tax12),
+      tax21: coerceMoney(body.tax21),
+      base6: coerceMoney(body.base6),
+      base9: coerceMoney(body.base9),
+      base12: coerceMoney(body.base12),
+      base21: coerceMoney(body.base21),
+      cashPayments,
+      cardPayments,
+      onlinePayments,
+    })
+    return {
+      amounts,
+      taxLow: amounts.taxByRate[6],
+      taxMid: amounts.taxByRate[9] + amounts.taxByRate[12],
+      taxHigh: amounts.taxByRate[21],
+    }
+  }
+
   const taxLow = coerceMoney(body.taxLow)
   const taxMid = coerceMoney(body.taxMid)
   const taxHigh = coerceMoney(body.taxHigh)
 
   if (taxLow > 0 || taxMid > 0 || taxHigh > 0) {
-    return {
+    const amounts = zReportAmountsFromLegacyFields({
+      orderCount,
       subtotal,
+      total,
       taxLow,
       taxMid,
       taxHigh,
-      total,
-      cashPayments: coerceMoney(body.cashPayments),
-      cardPayments: coerceMoney(body.cardPayments),
-      onlinePayments: coerceMoney(body.onlinePayments),
-    }
+      cashPayments,
+      cardPayments,
+      onlinePayments,
+    })
+    return { amounts, taxLow, taxMid, taxHigh }
   }
 
   const legacyTax = coerceMoney(body.tax)
   if (legacyTax > 0) {
     const pct = coerceMoney(body.btwPercentage)
-    if (pct === 21) {
-      return {
-        subtotal,
-        taxLow: 0,
-        taxMid: 0,
-        taxHigh: legacyTax,
-        total,
-        cashPayments: coerceMoney(body.cashPayments),
-        cardPayments: coerceMoney(body.cardPayments),
-        onlinePayments: coerceMoney(body.onlinePayments),
-      }
-    }
-    if (pct === 9 || pct === 12) {
-      return {
-        subtotal,
-        taxLow: 0,
-        taxMid: legacyTax,
-        taxHigh: 0,
-        total,
-        cashPayments: coerceMoney(body.cashPayments),
-        cardPayments: coerceMoney(body.cardPayments),
-        onlinePayments: coerceMoney(body.onlinePayments),
-      }
-    }
-    return {
+    let tl = 0
+    let tm = 0
+    let th = 0
+    if (pct === 21) th = legacyTax
+    else if (pct === 9 || pct === 12) tm = legacyTax
+    else tl = legacyTax
+    const amounts = zReportAmountsFromLegacyFields({
+      orderCount,
       subtotal,
-      taxLow: legacyTax,
-      taxMid: 0,
-      taxHigh: 0,
       total,
-      cashPayments: coerceMoney(body.cashPayments),
-      cardPayments: coerceMoney(body.cardPayments),
-      onlinePayments: coerceMoney(body.onlinePayments),
-    }
+      taxLow: tl,
+      taxMid: tm,
+      taxHigh: th,
+      cashPayments,
+      cardPayments,
+      onlinePayments,
+    })
+    return { amounts, taxLow: tl, taxMid: tm, taxHigh: th }
   }
 
   const derivedTax = Math.max(0, Math.round((total - subtotal) * 100) / 100)
-  return {
+  const amounts = zReportAmountsFromLegacyFields({
+    orderCount,
     subtotal,
+    total,
     taxLow: derivedTax,
     taxMid: 0,
     taxHigh: 0,
-    total,
-    cashPayments: coerceMoney(body.cashPayments),
-    cardPayments: coerceMoney(body.cardPayments),
-    onlinePayments: coerceMoney(body.onlinePayments),
-  }
+    cashPayments,
+    cardPayments,
+    onlinePayments,
+  })
+  return { amounts, taxLow: derivedTax, taxMid: 0, taxHigh: 0 }
 }
