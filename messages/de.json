@@ -4524,6 +4524,8 @@
  "soldArticlesTitle": "Verkaufte Artikel",
  "soldArticlesEmpty": "Keine Positionszeilen auf den Belegen für diesen Abrechnungszeitraum.",
  "soldArticlesPiecesShort": "Stk.",
+ "soldArticlesVatShort": "MwSt.",
+ "soldArticlesAmountShort": "Betrag",
  "onlinePaid": "Online bezahlt",
  "cardPaid": "Karte/PIN",
  "cashPaid": "Bar",

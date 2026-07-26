@@ -4501,6 +4501,8 @@
  "soldArticlesTitle": "الأصناف المباعة",
  "soldArticlesEmpty": "لا توجد بنود أصناف على الإيصالات لهذه الفترة المحاسبية.",
  "soldArticlesPiecesShort": "وحدة",
+ "soldArticlesVatShort": "ضريبة",
+ "soldArticlesAmountShort": "المبلغ",
  "onlinePaid": "مدفوع أونلاين",
  "cardPaid": "بطاقة/PIN",
  "cashPaid": "نقداً",

@@ -4501,6 +4501,8 @@
  "soldArticlesTitle": "售出商品",
  "soldArticlesEmpty": "此会计期间的收据上没有商品明细。",
  "soldArticlesPiecesShort": "件",
+ "soldArticlesVatShort": "增值税",
+ "soldArticlesAmountShort": "金额",
  "onlinePaid": "线上已付",
  "cardPaid": "卡/PIN",
  "cashPaid": "现金",

@@ -175,7 +175,8 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       )
     ) as unknown as Order[]
 
-    setArticleLines(aggregateZReportArticleLines(orders))
+    const vatContext = await fetchZReportVatContextForTenant(params.tenant)
+    setArticleLines(aggregateZReportArticleLines(orders, settingsBtw, vatContext))
 
     if (orders.length) {
       let total = 0
@@ -201,7 +202,6 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       items: (o as { items?: unknown }).items,
       order_type: (o as { order_type?: unknown }).order_type,
     }))
-    const vatContext = await fetchZReportVatContextForTenant(params.tenant)
     const vatAgg = aggregateZReportVatFromOrderRows(vatSlice, settingsBtw, vatContext)
 
       setStats({
@@ -565,7 +565,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           ${articleLines
             .map(
               (l) => `
-          <div class="row"><span>${esc(l.label)}</span><span>${l.qty} ${esc(t('zReport.soldArticlesPiecesShort'))} · ${formatCurrency(l.total)}</span></div>`,
+          <div class="row"><span>${esc(l.label)}</span><span>${l.qty} ${esc(t('zReport.soldArticlesPiecesShort'))} · ${l.vatRate}% · ${formatCurrency(l.total)}</span></div>`,
             )
             .join('')}
         </div>`
@@ -953,6 +953,8 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                   soldArticlesTitle: t('zReport.soldArticlesTitle'),
                   soldArticlesEmpty: t('zReport.soldArticlesEmpty'),
                   soldArticlesPiecesShort: t('zReport.soldArticlesPiecesShort'),
+                  soldArticlesVatShort: t('zReport.soldArticlesVatShort'),
+                  soldArticlesAmountShort: t('zReport.soldArticlesAmountShort'),
                   generatedOn: t('zReport.generatedOn'),
                 }}
               />

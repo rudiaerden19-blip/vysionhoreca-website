@@ -4524,6 +4524,8 @@
  "soldArticlesTitle": "Articles vendus",
  "soldArticlesEmpty": "Aucune ligne d’article sur les tickets pour cette période fiscale.",
  "soldArticlesPiecesShort": "u.",
+ "soldArticlesVatShort": "TVA",
+ "soldArticlesAmountShort": "Montant",
  "onlinePaid": "Payé en ligne",
  "cardPaid": "Carte/PIN",
  "cashPaid": "Espèces",

@@ -3382,6 +3382,8 @@
  "soldArticlesTitle": "Sold articles",
  "soldArticlesEmpty": "No item lines on receipts for this fiscal period.",
  "soldArticlesPiecesShort": "pcs",
+ "soldArticlesVatShort": "VAT",
+ "soldArticlesAmountShort": "Amount",
  "onlinePaid": "Online paid",
  "cardPaid": "Card/PIN",
  "cashPaid": "Cash",

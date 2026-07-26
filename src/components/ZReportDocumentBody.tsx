@@ -23,6 +23,8 @@ export type ZReportDocumentLabels = {
   soldArticlesTitle: string
   soldArticlesEmpty: string
   soldArticlesPiecesShort: string
+  soldArticlesVatShort: string
+  soldArticlesAmountShort: string
   generatedOn: string
 }
 
@@ -126,16 +128,22 @@ export function ZReportDocumentBody({
           <p className="text-sm text-gray-500">{labels.soldArticlesEmpty}</p>
         ) : (
           <div className="space-y-1 max-h-72 overflow-y-auto pr-1">
+            <div className="flex justify-end gap-3 text-xs text-gray-500 pb-1 pr-1 tabular-nums">
+              <span className="w-[4.5rem] text-right">{labels.soldArticlesPiecesShort}</span>
+              <span className="w-9 text-right">{labels.soldArticlesVatShort}</span>
+              <span className="w-[5.5rem] text-right">{labels.soldArticlesAmountShort}</span>
+            </div>
             {articleLines.map((line, idx) => (
               <div
                 key={`${line.label}-${idx}`}
                 className="flex justify-between gap-3 text-sm py-1.5 border-b border-gray-100 last:border-0"
               >
                 <span className="text-gray-700 min-w-0 flex-1 break-words">{line.label}</span>
-                <span className="flex items-center gap-4 shrink-0 tabular-nums">
+                <span className="flex items-center gap-3 shrink-0 tabular-nums">
                   <span className="text-gray-600">
                     {line.qty} {labels.soldArticlesPiecesShort}
                   </span>
+                  <span className="text-gray-500 w-9 text-right font-medium">{line.vatRate}%</span>
                   <span className="font-medium w-[5.5rem] text-right">
                     {formatZReportEuro(line.total)}
                   </span>

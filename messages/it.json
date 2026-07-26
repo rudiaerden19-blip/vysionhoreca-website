@@ -4501,6 +4501,8 @@
  "soldArticlesTitle": "Articoli venduti",
  "soldArticlesEmpty": "Nessuna riga articolo negli scontrini per questo periodo fiscale.",
  "soldArticlesPiecesShort": "pz.",
+ "soldArticlesVatShort": "IVA",
+ "soldArticlesAmountShort": "Importo",
  "onlinePaid": "Pagato online",
  "cardPaid": "Carta/PIN",
  "cashPaid": "Contanti",

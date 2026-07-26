@@ -3382,6 +3382,8 @@
  "soldArticlesTitle": "Verkochte artikelen",
  "soldArticlesEmpty": "Geen artikelregels op bonnen voor deze fiscale periode.",
  "soldArticlesPiecesShort": "st.",
+ "soldArticlesVatShort": "BTW",
+ "soldArticlesAmountShort": "Bedrag",
  "onlinePaid": "Online betaald",
  "cardPaid": "Kaart/PIN",
  "cashPaid": "Contant",

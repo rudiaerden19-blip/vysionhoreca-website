@@ -17,9 +17,11 @@ export function escapeHtml(s: string): string {
     .replace(/"/g, '&quot;')
 }
 
-function sanitizeArticleLines(raw: unknown): Array<{ label: string; qty: number; total: number }> {
+function sanitizeArticleLines(
+  raw: unknown,
+): Array<{ label: string; qty: number; total: number; vatRate: number }> {
   if (!Array.isArray(raw)) return []
-  const out: Array<{ label: string; qty: number; total: number }> = []
+  const out: Array<{ label: string; qty: number; total: number; vatRate: number }> = []
   for (const item of raw) {
     if (!item || typeof item !== 'object') continue
     const o = item as Record<string, unknown>
@@ -27,7 +29,9 @@ function sanitizeArticleLines(raw: unknown): Array<{ label: string; qty: number;
     if (!label) continue
     const qty = typeof o.qty === 'number' && Number.isFinite(o.qty) ? Math.max(0, o.qty) : 0
     const total = typeof o.total === 'number' && Number.isFinite(o.total) ? o.total : 0
-    out.push({ label, qty, total })
+    const vatRate =
+      typeof o.vatRate === 'number' && Number.isFinite(o.vatRate) ? Math.round(o.vatRate) : 0
+    out.push({ label, qty, total, vatRate })
     if (out.length >= 500) break
   }
   return out
@@ -151,7 +155,7 @@ export function buildZReportEmailHtml(p: ZReportEmailInput): string {
                   (r) => `
               <div class="row">
                 <span>${esc(r.label)}</span>
-                <span>${r.qty} ${piecesShort} · ${formatZReportEuro(r.total)}</span>
+                <span>${r.qty} ${piecesShort} · ${r.vatRate > 0 ? `${r.vatRate}% · ` : ''}${formatZReportEuro(r.total)}</span>
               </div>`,
                 )
                 .join('')}

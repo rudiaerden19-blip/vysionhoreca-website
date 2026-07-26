@@ -4501,6 +4501,8 @@
  "soldArticlesTitle": "Artículos vendidos",
  "soldArticlesEmpty": "Sin líneas de artículos en los tickets de este período fiscal.",
  "soldArticlesPiecesShort": "uds.",
+ "soldArticlesVatShort": "IVA",
+ "soldArticlesAmountShort": "Importe",
  "onlinePaid": "Pagado online",
  "cardPaid": "Tarjeta/PIN",
  "cashPaid": "Efectivo",

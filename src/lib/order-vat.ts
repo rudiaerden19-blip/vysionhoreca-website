@@ -237,6 +237,19 @@ function resolveLineVatRate(
   return resolveVatPercentForCategoryAndOrderType(undefined, tenantDefaultPct, orderType)
 }
 
+/** BTW-tarief voor één orderregel (Z-rapport artikelenlijst, scherm/mail/print). */
+export function resolveVatRateForOrderItem(
+  item: unknown,
+  tenantDefaultPct: number,
+  orderType: OrderTypeForVat,
+  ctx?: ZReportVatContext | null,
+): CategoryVatPercent {
+  if (!item || typeof item !== 'object') {
+    return resolveVatPercentForCategoryAndOrderType(undefined, tenantDefaultPct, orderType)
+  }
+  return resolveLineVatRate(item as Record<string, unknown>, tenantDefaultPct, orderType, ctx)
+}
+
 function lineVatRate(line: Record<string, unknown>, fallbackRate: CategoryVatPercent): CategoryVatPercent {
   const v = line.btw_percentage
   if (typeof v === 'number' && Number.isFinite(v)) {

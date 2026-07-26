@@ -3,15 +3,24 @@
  * Bron: `orders.items` JSON (kassa + webshop). Geen DB-migratie nodig.
  *
  * Bedragen via `orderItemLineTotalEur` — zelfde bron als BTW/Z-totaal (total_price wint).
+ * BTW-tarief via dezelfde logica als Z-rapport BTW-tabel (categorie + besteltype).
  */
 
+import type { CategoryVatPercent } from '@/lib/order-vat'
+import { normalizeOrderTypeForVat, resolveVatRateForOrderItem } from '@/lib/order-vat'
 import {
   orderItemDisplayName,
   orderItemDisplayOptionLines,
   orderItemLineTotalEur,
 } from '@/lib/order-items-display'
+import type { ZReportVatContext } from '@/lib/z-report-vat-context'
 
-export type ZReportArticleLine = { label: string; qty: number; total: number }
+export type ZReportArticleLine = {
+  label: string
+  qty: number
+  total: number
+  vatRate: CategoryVatPercent
+}
 
 function parseItems(raw: unknown): unknown[] {
   if (!raw) return []
@@ -60,19 +69,24 @@ function lineQuantity(item: unknown): number {
 
 /** Alle orders moeten dezelfde set zijn als voor het Z-totaal (al gefilterd op tenant + fiscaliteit). */
 export function aggregateZReportArticleLines(
-  orders: ReadonlyArray<{ items?: unknown }>,
+  orders: ReadonlyArray<{ items?: unknown; order_type?: unknown }>,
+  tenantDefaultPct: number = 6,
+  ctx?: ZReportVatContext | null,
 ): ZReportArticleLine[] {
   const map = new Map<string, ZReportArticleLine>()
 
   for (const o of orders) {
+    const orderType = normalizeOrderTypeForVat(o.order_type)
     for (const raw of parseItems(o.items)) {
       const amt = Math.round(orderItemLineTotalEur(raw) * 100) / 100
       const qty = lineQuantity(raw)
       if (amt <= 0 && qty <= 0) continue
 
+      const vatRate = resolveVatRateForOrderItem(raw, tenantDefaultPct, orderType, ctx)
+
       const name = orderItemDisplayName(raw).trim() || 'Artikel'
       const sig = optionSignature(raw)
-      const key = sig ? `${name}|||${sig}` : name
+      const key = sig ? `${name}|||${sig}|||${vatRate}` : `${name}|||${vatRate}`
 
       const optBits = orderItemDisplayOptionLines(raw)
       const label = optBits.length ? `${name} (${optBits.join(', ')})` : name
@@ -82,7 +96,7 @@ export function aggregateZReportArticleLines(
         prev.qty += qty
         prev.total = Math.round((prev.total + amt) * 100) / 100
       } else {
-        map.set(key, { label, qty, total: amt })
+        map.set(key, { label, qty, total: amt, vatRate })
       }
     }
   }
