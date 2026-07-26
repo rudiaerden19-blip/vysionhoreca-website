@@ -4505,6 +4505,8 @@
  "soldArticlesAmountShort": "金額",
  "monthSendTitle": "月次を会計士に送信",
  "monthSendIntro": "選択月のZレポートを1通のメールで — 日別概要、税率別消費税と合計。",
+ "monthSelectLabel": "月を選択",
+ "monthSelectHint": "ここで月を選ぶか、右のアーカイブ（月タブ）の月をクリックしてください。",
  "monthAccountantEmail": "会計士のメール",
  "monthAccountantEmailPlaceholder": "accountant@example.com",
  "monthNotSentReminder": "今月はまだ会計士に送信されていません。",

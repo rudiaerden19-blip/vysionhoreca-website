@@ -4528,6 +4528,8 @@
  "soldArticlesAmountShort": "Betrag",
  "monthSendTitle": "Monat an Buchhalter senden",
  "monthSendIntro": "Alle Z-Berichte des Monats in einer E-Mail — Tagesübersicht, MwSt. pro Satz und Summen.",
+ "monthSelectLabel": "Monat wählen",
+ "monthSelectHint": "Wählen Sie hier einen Monat oder klicken Sie im Archiv rechts (Tab Monat).",
  "monthAccountantEmail": "E-Mail Buchhalter",
  "monthAccountantEmailPlaceholder": "buchhalter@beispiel.de",
  "monthNotSentReminder": "Dieser Monat wurde noch nicht an den Buchhalter gesendet.",

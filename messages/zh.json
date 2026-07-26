@@ -4505,6 +4505,8 @@
  "soldArticlesAmountShort": "金额",
  "monthSendTitle": "发送整月报表给会计",
  "monthSendIntro": "将所选月份的所有 Z 报表合并为一封邮件 — 每日概览、各税率增值税与合计。",
+ "monthSelectLabel": "选择月份",
+ "monthSelectHint": "在此选择月份，或点击右侧归档（月）中的月份。",
  "monthAccountantEmail": "会计邮箱",
  "monthAccountantEmailPlaceholder": "accountant@example.com",
  "monthNotSentReminder": "本月尚未发送给会计。",

@@ -3386,6 +3386,8 @@
  "soldArticlesAmountShort": "Amount",
  "monthSendTitle": "Send month to accountant",
  "monthSendIntro": "Send all Z-reports for the selected month in one email — daily overview, VAT per rate and totals.",
+ "monthSelectLabel": "Select month",
+ "monthSelectHint": "Pick a month here, or click a month in the archive on the right (Month tab).",
  "monthAccountantEmail": "Accountant email",
  "monthAccountantEmailPlaceholder": "accountant@example.com",
  "monthNotSentReminder": "This month has not been sent to the accountant yet.",

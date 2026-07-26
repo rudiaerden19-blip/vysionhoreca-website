@@ -143,6 +143,9 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const [sendingEmail, setSendingEmail] = useState(false)
   const [monthAccountantEmail, setMonthAccountantEmail] = useState('')
   const [sendingMonthEmail, setSendingMonthEmail] = useState(false)
+  const [selectedMonthForEmail, setSelectedMonthForEmail] = useState(() =>
+    getLocalDateString().slice(0, 7),
+  )
   const [currentSavedReport, setCurrentSavedReport] = useState<SavedReport | null>(null)
   const [articleLines, setArticleLines] = useState<ZReportArticleLine[]>([])
 
@@ -761,7 +764,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
 
     setSendingMonthEmail(true)
     try {
-      const yearMonth = selectedDate.slice(0, 7)
+      const yearMonth = selectedMonthForEmail
       const today = getLocalDateString()
       const monthEnd = getLastDayOfMonthYmd(yearMonth)
       const capYmd = today < monthEnd ? today : monthEnd
@@ -891,7 +894,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const kassaFormHasValues =
     !!kassaForm.cash.trim() || !!kassaForm.card.trim() || !!kassaForm.online.trim()
 
-  const selectedYearMonth = selectedDate.slice(0, 7)
+  const selectedYearMonth = selectedMonthForEmail
   const monthSentLog = parseZReportMonthSentLog(businessInfo?.z_report_month_sent)
   const monthSentEntry = monthSentLog[selectedYearMonth]
   const selectedMonthLabel = formatYearMonthLabel(selectedYearMonth)
@@ -917,8 +920,24 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       {/* Maandmail boekhouder */}
       <div className="mb-6 p-5 bg-indigo-50 border border-indigo-200 rounded-2xl print:hidden">
         <h2 className="text-lg font-bold text-indigo-900 mb-1">{t('zReport.monthSendTitle')}</h2>
-        <p className="text-sm text-indigo-800 mb-4">
-          {t('zReport.monthSendIntro')} — <strong>{selectedMonthLabel}</strong>
+        <p className="text-sm text-indigo-800 mb-4">{t('zReport.monthSendIntro')}</p>
+        <div className="mb-3">
+          <label className="block text-sm font-medium text-indigo-900 mb-2">
+            {t('zReport.monthSelectLabel')}
+          </label>
+          <input
+            type="month"
+            value={selectedMonthForEmail}
+            max={getLocalDateString().slice(0, 7)}
+            onChange={(e) => {
+              if (e.target.value) setSelectedMonthForEmail(e.target.value)
+            }}
+            className="w-full sm:w-auto px-4 py-3 border border-indigo-200 rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-medium"
+          />
+          <p className="text-xs text-indigo-700 mt-2">{t('zReport.monthSelectHint')}</p>
+        </div>
+        <p className="text-sm text-indigo-900 mb-4">
+          <strong>{selectedMonthLabel}</strong>
         </p>
         <div className="mb-3">
           <label className="block text-sm font-medium text-indigo-900 mb-2">
@@ -1185,18 +1204,30 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
               <p className="text-gray-500 text-sm">{t('zReport.noSavedReports')}</p>
             ) : (
               <div className="space-y-2 max-h-[460px] overflow-y-auto">
-                {getAggregatedReports().map((item, idx) => (
+                {getAggregatedReports().map((item, idx) => {
+                  const isSelectedArchiveItem =
+                    (archivePeriod === 'dag' && item.reportDate === selectedDate) ||
+                    (archivePeriod === 'maand' && item.reportDate === selectedMonthForEmail)
+
+                  return (
                   <div
                     key={item.reportDate + idx}
                     className={`p-3 rounded-xl transition-colors ${
-                      archivePeriod === 'dag' && item.reportDate === selectedDate
+                      isSelectedArchiveItem
                         ? 'bg-blue-100 border-2 border-blue-500'
                         : 'bg-gray-50'
                     }`}
                   >
                     <div
                       className="cursor-pointer"
-                      onClick={() => { if (archivePeriod === 'dag' && item.reportDate) setSelectedDate(item.reportDate) }}
+                      onClick={() => {
+                        if (archivePeriod === 'dag' && item.reportDate) {
+                          setSelectedDate(item.reportDate)
+                        }
+                        if (archivePeriod === 'maand' && item.reportDate) {
+                          setSelectedMonthForEmail(item.reportDate)
+                        }
+                      }}
                     >
                       <div className="flex justify-between items-center">
                         <span className="font-medium text-sm flex items-center gap-1">
@@ -1229,7 +1260,8 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                       </button>
                     )}
                   </div>
-                ))}
+                  )
+                })}
               </div>
             )}
 

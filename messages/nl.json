@@ -3386,6 +3386,8 @@
  "soldArticlesAmountShort": "Bedrag",
  "monthSendTitle": "Maand doorsturen naar boekhouder",
  "monthSendIntro": "Stuur alle Z-rapporten van de geselecteerde maand in één e-mail — met dagoverzicht, BTW per tarief en totalen.",
+ "monthSelectLabel": "Maand kiezen",
+ "monthSelectHint": "Kies hier een maand, of klik een maand in het archief rechts (tab Maand).",
  "monthAccountantEmail": "E-mail boekhouder",
  "monthAccountantEmailPlaceholder": "boekhouder@voorbeeld.be",
  "monthNotSentReminder": "Deze maand is nog niet naar de boekhouder gestuurd.",

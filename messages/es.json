@@ -4505,6 +4505,8 @@
  "soldArticlesAmountShort": "Importe",
  "monthSendTitle": "Enviar mes al contable",
  "monthSendIntro": "Todos los Z-informes del mes en un e-mail — resumen diario, IVA por tarifa y totales.",
+ "monthSelectLabel": "Elegir mes",
+ "monthSelectHint": "Elija un mes aquí o haga clic en un mes del archivo a la derecha (pestaña Mes).",
  "monthAccountantEmail": "E-mail del contable",
  "monthAccountantEmailPlaceholder": "contable@ejemplo.com",
  "monthNotSentReminder": "Este mes aún no se ha enviado al contable.",
