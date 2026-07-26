@@ -36,6 +36,17 @@ export default function LicentiePage() {
             <div className="p-6 sm:p-10 space-y-6">
               <p className="text-gray-700 text-lg leading-relaxed">{t('licensePurchasePage.lead')}</p>
 
+              <div className="rounded-xl border-2 border-accent/30 bg-accent/5 p-5 space-y-4">
+                <div>
+                  <p className="font-semibold text-gray-900 mb-1">{t('licensePurchasePage.hardwareTitle')}</p>
+                  <p className="text-gray-700 text-sm leading-relaxed">{t('licensePurchasePage.hardwareDetail')}</p>
+                </div>
+                <div className="border-t border-accent/20 pt-4">
+                  <p className="font-semibold text-gray-900 mb-1">{t('licensePurchasePage.plugAndPlayTitle')}</p>
+                  <p className="text-gray-700 text-sm leading-relaxed">{t('licensePurchasePage.plugAndPlayBody')}</p>
+                </div>
+              </div>
+
               <ul className="space-y-3">
                 {[1, 2, 3, 4, 5].map((i) => (
                   <li key={i} className="flex items-start gap-3">
