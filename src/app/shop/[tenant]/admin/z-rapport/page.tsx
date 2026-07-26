@@ -142,7 +142,6 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const [showHistory, setShowHistory] = useState(false)
   const [showEmailModal, setShowEmailModal] = useState(false)
   const [emailAddress, setEmailAddress] = useState('')
-  const [accountantEmailAddress, setAccountantEmailAddress] = useState('')
   const [sendingEmail, setSendingEmail] = useState(false)
   const [monthAccountantEmail, setMonthAccountantEmail] = useState('')
   const [sendingMonthEmail, setSendingMonthEmail] = useState(false)
@@ -736,18 +735,14 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   }
 
   const sendEmailReport = async () => {
-    if (!emailAddress || !stats) return
-    const recipients = Array.from(
-      new Set(
-        [emailAddress.trim(), accountantEmailAddress.trim()].filter((addr) => addr.length > 0)
-      )
-    )
-    if (recipients.length === 0) return
+    const email = emailAddress.trim()
+    if (!email || !stats) return
 
     setSendingEmail(true)
     try {
       const payload = {
         tenantSlug: params.tenant,
+        to: email,
         subject: `Z-Rapport ${formatShortDate(selectedDate)} - ${businessInfo?.business_name || params.tenant}`,
         businessName: businessInfo?.business_name || params.tenant,
         businessAddress: businessInfo?.address || '',
@@ -794,23 +789,17 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         },
       }
 
-      const results = await Promise.all(
-        recipients.map((to) =>
-          authFetch('/api/send-z-report', {
-            method: 'POST',
-            body: JSON.stringify({ ...payload, to }),
-          })
-        )
-      )
+      const res = await authFetch('/api/send-z-report', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      })
 
-      const failed = results.find((r) => !r.ok)
-      if (!failed) {
-        alert(`${t('zReport.emailSentSuccess')} ${recipients.join(' en ')}`)
+      if (res.ok) {
+        alert(`${t('zReport.emailSentSuccess')} ${email}`)
         setShowEmailModal(false)
         setEmailAddress('')
-        setAccountantEmailAddress('')
       } else {
-        const error = await failed.json()
+        const error = await res.json()
         alert(`${t('zReport.emailSendError')} ${error.message || error.error || ''}`)
       }
     } catch {
@@ -1107,7 +1096,6 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           <button
             onClick={() => {
               setEmailAddress(businessInfo?.email || '')
-              setAccountantEmailAddress(businessInfo?.accountant_email || '')
               setShowEmailModal(true)
             }}
             disabled={!stats || stats.orderCount === 0}
@@ -1694,19 +1682,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                     placeholder="email@voorbeeld.be"
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('zReport.emailAccountantLabel')}
-                  </label>
-                  <input
-                    type="email"
-                    value={accountantEmailAddress}
-                    onChange={(e) => setAccountantEmailAddress(e.target.value)}
-                    placeholder="boekhouder@voorbeeld.be"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  <p className="text-xs text-gray-400 mt-1">{t('zReport.emailAccountantHint')}</p>
+                  <p className="text-xs text-gray-400 mt-1">{t('zReport.emailDailyOnlyHint')}</p>
                 </div>
               </div>
               {stats && (
