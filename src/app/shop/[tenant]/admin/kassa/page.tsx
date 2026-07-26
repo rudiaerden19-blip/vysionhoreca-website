@@ -208,6 +208,7 @@ import {
   buildCategoryVatLookup,
   computeInclusiveVatSplitFromCart,
   resolveVatPercentForProductAndOrderType,
+  resolveTenantCountryForVat,
   normalizeCategoryVatPercent,
 } from '@/lib/order-vat'
 import { sortKassaCartLinesByMenuCategory } from '@/lib/kassa-cart-grouping'
@@ -1517,6 +1518,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     () => normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 6, 21),
     [tenantInfo?.btw_percentage],
   )
+  const tenantCountry = resolveTenantCountryForVat(tenantInfo?.country, tenantInfo?.btw_number)
   const resolveCartLineVat = useCallback(
     (line: CartItem) =>
       resolveVatPercentForProductAndOrderType(
@@ -1524,8 +1526,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         categoryVatLookup,
         tenantDefaultBtw,
         orderType,
+        tenantCountry,
       ),
-    [categoryVatLookup, tenantDefaultBtw, orderType],
+    [categoryVatLookup, tenantDefaultBtw, orderType, tenantCountry],
   )
 
   useEffect(() => {
@@ -3357,7 +3360,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       /* offline: bestaande lookup */
     }
     const resolveLineVatAtCheckout = (line: (typeof billLines)[number]) =>
-      resolveVatPercentForProductAndOrderType(line.product, freshVatLookup, tenantDefaultBtw, orderType)
+      resolveVatPercentForProductAndOrderType(
+        line.product,
+        freshVatLookup,
+        tenantDefaultBtw,
+        orderType,
+        tenantCountry,
+      )
     const vatSplit = computeInclusiveVatSplitFromCart(billLines, resolveLineVatAtCheckout)
     if (Math.abs(vatSplit.grossTotal - total) > 0.03) {
       console.warn('[kassa] btw-split vs mandtotaal mismatched', { split: vatSplit.grossTotal, total })

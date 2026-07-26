@@ -18,14 +18,52 @@ export function normalizeOrderTypeForVat(raw: unknown): OrderTypeForVat {
   return 'TAKEAWAY'
 }
 
-/** België: 6% afhaal/levering, 12% ter plaatse. NL (zaak 9%): beide 9%. */
-export function dineInAndOffPremiseVatRates(tenantDefaultPct: number): {
+/** België: 6% afhaal/levering, 12% ter plaatse. NL: geen verschil binnen/afhaal vs meenemen. */
+export function isNetherlandsVatJurisdiction(country?: string | null): boolean {
+  const c = String(country ?? '')
+    .trim()
+    .toUpperCase()
+    .replace(/\./g, '')
+  return c === 'NL' || c === 'NEDERLAND' || c === 'NETHERLANDS' || c.startsWith('NL')
+}
+
+/** Land voor BTW-logica: expliciet `country`, anders afleiden uit BTW-nummer (NL… / BE…). */
+export function resolveTenantCountryForVat(
+  country?: string | null,
+  btwNumber?: string | null,
+): string | null {
+  if (String(country ?? '').trim()) return String(country).trim()
+  const vat = String(btwNumber ?? '')
+    .trim()
+    .toUpperCase()
+    .replace(/[\s.]/g, '')
+  if (vat.startsWith('NL')) return 'NL'
+  if (vat.startsWith('BE')) return 'BE'
+  return null
+}
+
+/** NL of zaak met 9% default: zelfde tarief voor ter plaatse en afhalen/meenemen. */
+export function shouldUnifyDineInAndOffPremiseVat(
+  tenantDefaultPct: number,
+  country?: string | null,
+): boolean {
+  if (isNetherlandsVatJurisdiction(country)) return true
+  return normalizeCategoryVatPercent(tenantDefaultPct, 21) === 9
+}
+
+export function dineInAndOffPremiseVatRates(
+  tenantDefaultPct: number,
+  country?: string | null,
+): {
   dineIn: CategoryVatPercent
   offPremise: CategoryVatPercent
 } {
   const base = normalizeCategoryVatPercent(tenantDefaultPct, 21)
-  if (base === 9) {
-    return { dineIn: 9, offPremise: 9 }
+  if (shouldUnifyDineInAndOffPremiseVat(tenantDefaultPct, country)) {
+    const unified = isNetherlandsVatJurisdiction(country)
+      ? normalizeCategoryVatPercent(tenantDefaultPct, 9)
+      : base
+    return { dineIn: unified, offPremise: unified }
   }
   return { dineIn: 12, offPremise: 6 }
 }
@@ -76,16 +114,18 @@ export function resolveVatPercentForProductAndOrderType(
   categoryById: Map<string, number | null | undefined>,
   tenantDefaultPct: number,
   orderType: OrderTypeForVat,
+  country?: string | null,
 ): CategoryVatPercent {
   const override =
     product.category_id != null ? categoryById.get(String(product.category_id)) : undefined
-  return resolveVatPercentForCategoryAndOrderType(override, tenantDefaultPct, orderType)
+  return resolveVatPercentForCategoryAndOrderType(override, tenantDefaultPct, orderType, country)
 }
 
 export function resolveVatPercentForCategoryAndOrderType(
   categoryOverride: number | null | undefined,
   tenantDefaultPct: number,
   orderType: OrderTypeForVat,
+  country?: string | null,
 ): CategoryVatPercent {
   const base = normalizeCategoryVatPercent(tenantDefaultPct, 21)
 
@@ -94,7 +134,7 @@ export function resolveVatPercentForCategoryAndOrderType(
     if (explicit === 21) return explicit
   }
 
-  const { dineIn, offPremise } = dineInAndOffPremiseVatRates(tenantDefaultPct)
+  const { dineIn, offPremise } = dineInAndOffPremiseVatRates(tenantDefaultPct, country)
   return orderType === 'DINE_IN' ? dineIn : offPremise
 }
 
@@ -200,10 +240,11 @@ function resolveLineVatRate(
 ): CategoryVatPercent {
   const fb = normalizeCategoryVatPercent(tenantDefaultPct, 21)
 
+  const country = ctx?.tenantCountry
   const resolveFromCategoryId = (categoryId: unknown): CategoryVatPercent | null => {
     if (!categoryId || !ctx?.categoryById) return null
     const override = ctx.categoryById.get(String(categoryId))
-    return resolveVatPercentForCategoryAndOrderType(override, tenantDefaultPct, orderType)
+    return resolveVatPercentForCategoryAndOrderType(override, tenantDefaultPct, orderType, country)
   }
 
   const productId = line.product_id ?? line.productId
@@ -234,7 +275,7 @@ function resolveLineVatRate(
 
   if (itemHasExplicitBtw(line)) return lineVatRate(line, fb)
 
-  return resolveVatPercentForCategoryAndOrderType(undefined, tenantDefaultPct, orderType)
+  return resolveVatPercentForCategoryAndOrderType(undefined, tenantDefaultPct, orderType, country)
 }
 
 /** BTW-tarief voor één orderregel (Z-rapport artikelenlijst, scherm/mail/print). */
@@ -244,8 +285,9 @@ export function resolveVatRateForOrderItem(
   orderType: OrderTypeForVat,
   ctx?: ZReportVatContext | null,
 ): CategoryVatPercent {
+  const country = ctx?.tenantCountry
   if (!item || typeof item !== 'object') {
-    return resolveVatPercentForCategoryAndOrderType(undefined, tenantDefaultPct, orderType)
+    return resolveVatPercentForCategoryAndOrderType(undefined, tenantDefaultPct, orderType, country)
   }
   return resolveLineVatRate(item as Record<string, unknown>, tenantDefaultPct, orderType, ctx)
 }
@@ -287,10 +329,12 @@ export function allocateVatBucketsForSingleOrder(
   ctx?: ZReportVatContext | null,
 ): { subtotalExcl: number; buckets: Record<CategoryVatPercent, number>; baseBuckets: Record<CategoryVatPercent, number> } {
   const orderType = normalizeOrderTypeForVat(order.order_type)
+  const country = ctx?.tenantCountry
   const defaultOrderRate = resolveVatPercentForCategoryAndOrderType(
     undefined,
     tenantDefaultPct,
     orderType,
+    country,
   )
   const orderTotal = round2(Number(order.total) || 0)
   const buckets = emptyVatBuckets()
