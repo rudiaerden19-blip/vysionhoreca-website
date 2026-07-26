@@ -545,16 +545,25 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
 
   // Archief aggregatie per periode
   const getAggregatedReports = () => {
-    if (archivePeriod === 'dag') return savedReports.map(r => ({
-      label: formatShortDate(r.report_date),
-      total: (r.total || 0) + (r.manual_total || 0),
-      onlineTotal: r.total || 0,
-      kassaTotal: r.manual_total || 0,
-      count: r.order_count || 0,
-      isClosed: r.is_closed,
-      reportDate: r.report_date,
-      report: r,
-    }))
+    const useLiveStatsForRow = (reportDate: string) =>
+      reportViewMode === 'day' && reportDate === selectedDate && stats != null && !loading
+
+    if (archivePeriod === 'dag') return savedReports.map(r => {
+      const live = useLiveStatsForRow(r.report_date)
+      const onlineTotal = live ? stats!.total : (r.total || 0)
+      const count = live ? stats!.orderCount : (r.order_count || 0)
+      const kassaTotal = r.manual_total || 0
+      return {
+        label: formatShortDate(r.report_date),
+        total: onlineTotal + kassaTotal,
+        onlineTotal,
+        kassaTotal,
+        count,
+        isClosed: r.is_closed,
+        reportDate: r.report_date,
+        report: r,
+      }
+    })
 
     const groups: Record<string, { label: string; total: number; onlineTotal: number; kassaTotal: number; count: number; reports: SavedReport[] }> = {}
 
