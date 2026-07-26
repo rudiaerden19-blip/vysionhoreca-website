@@ -1,4 +1,6 @@
--- Eénmalig: verkoopbonnen fiscale dag 22/07/2026 → 10/07/2026 (Blonky's / Blonkys)
+-- Eénmalig: verkoopbonnen fiscale dag 22/07/2026 → 10/07/2026
+-- Tenant: Blonkys Restaurant (slug: blonkys-restaurant)
+-- NIET Blonkys Snackbar — alleen deze tenant.
 --
 -- Z-rapport en kassa gebruiken orders.created_at (fiscale dag België: 00:00 t/m 12:00 volgende dag).
 -- Dit script verschuift alle relevante orders 12 dagen terug zodat ze op 10 juli tellen.
@@ -7,15 +9,11 @@
 -- Daarna BEGIN … COMMIT of stap voor stap.
 
 -- ---------------------------------------------------------------------------
--- 1. Tenant-slug vinden (pas aan indien nodig)
+-- 1. Controle: juiste tenant (moet Blonkys Restaurant zijn)
 -- ---------------------------------------------------------------------------
 SELECT tenant_slug, business_name, btw_number
 FROM tenant_settings
-WHERE business_name ILIKE '%blonk%'
-   OR business_name ILIKE '%blonky%';
-
--- Vul hier de juiste slug in na controle (URL: /shop/[slug]/admin/…):
--- Voorbeeld: 'blonkys-snackbar' of 'blonkys-restaurant'
+WHERE tenant_slug = 'blonkys-restaurant';
 
 -- ---------------------------------------------------------------------------
 -- 2. Preview: bonnen op fiscale dag 22/07/2026 (CEST)
@@ -31,7 +29,7 @@ SELECT
   created_at AT TIME ZONE 'Europe/Brussels' AS created_brussels,
   completed_at AT TIME ZONE 'Europe/Brussels' AS completed_brussels
 FROM orders
-WHERE tenant_slug = 'VERVANG_MET_TENANT_SLUG'
+WHERE tenant_slug = 'blonkys-restaurant'
   AND created_at >= timestamptz '2026-07-21 22:00:00+00'  -- 22/07 00:00 CEST
   AND created_at <  timestamptz '2026-07-23 10:00:00+00'  -- 23/07 12:00 CEST
   AND lower(coalesce(status, '')) NOT IN ('cancelled', 'rejected')
@@ -53,7 +51,7 @@ SET
     ELSE completed_at
   END,
   updated_at = now()
-WHERE tenant_slug = 'VERVANG_MET_TENANT_SLUG'
+WHERE tenant_slug = 'blonkys-restaurant'
   AND created_at >= timestamptz '2026-07-21 22:00:00+00'
   AND created_at <  timestamptz '2026-07-23 10:00:00+00'
   AND lower(coalesce(status, '')) NOT IN ('cancelled', 'rejected');
@@ -61,7 +59,7 @@ WHERE tenant_slug = 'VERVANG_MET_TENANT_SLUG'
 -- Kasboek-regels (tenant_kasboek_manual_lines) worden via trigger bijgewerkt op created_at UPDATE.
 
 -- ---------------------------------------------------------------------------
--- 4. Oude Z-rapportdag 22/07 leegmaken (anders blijft €99,15 in archief staan)
+-- 4. Oude Z-rapportdag 22/07 leegmaken (anders blijft oude omzet in archief staan)
 -- ---------------------------------------------------------------------------
 UPDATE z_reports
 SET
@@ -76,7 +74,7 @@ SET
   online_payments = 0,
   order_ids = '{}',
   generated_at = now()
-WHERE tenant_slug = 'VERVANG_MET_TENANT_SLUG'
+WHERE tenant_slug = 'blonkys-restaurant'
   AND report_date = '2026-07-22'
   AND coalesce(is_closed, false) = false;
 
@@ -85,10 +83,11 @@ WHERE tenant_slug = 'VERVANG_MET_TENANT_SLUG'
 -- ---------------------------------------------------------------------------
 -- 5. Z-rapport 10/07 herberekenen
 -- ---------------------------------------------------------------------------
--- In de admin: Z-rapport → datum 10/07/2026 → Opslaan (of Vernieuwen).
+-- Admin: https://blonkys-restaurant.ordervysion.com/shop/blonkys-restaurant/admin/z-rapport
+-- → datum 10/07/2026 → Opslaan (of Vernieuwen).
 -- Of API (ingelogd als tenant):
 --   POST /api/kassa/sync-z-report
---   Body: { "tenantSlug": "…", "date": "2026-07-10" }
+--   Body: { "tenantSlug": "blonkys-restaurant", "date": "2026-07-10" }
 -- Herhaal eventueel voor 2026-07-22 na controle.
 
 -- COMMIT;
@@ -101,7 +100,7 @@ SELECT
   count(*) AS aantal,
   round(sum(total)::numeric, 2) AS omzet
 FROM orders
-WHERE tenant_slug = 'VERVANG_MET_TENANT_SLUG'
+WHERE tenant_slug = 'blonkys-restaurant'
   AND (timezone('Europe/Brussels', created_at))::date IN ('2026-07-10', '2026-07-22')
   AND lower(coalesce(status, '')) NOT IN ('cancelled', 'rejected')
 GROUP BY 1
