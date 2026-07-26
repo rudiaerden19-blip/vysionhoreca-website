@@ -2,22 +2,13 @@
 
 import Image from 'next/image'
 import {
-  ExternalLink,
-  Flame,
   Rocket,
-  ShoppingBag,
 } from 'lucide-react'
 import { useLanguage } from '@/i18n'
 import { PLATFORM_PAGES } from '@/lib/platform-pages'
-import {
-  DEMO_HERO_LIVE_URL,
-  DEMO_ONLINE_SHOP_MENU_URL,
-} from '@/lib/demo-links'
 
 const ctaIconClass =
   'h-[1.05rem] w-[1.05rem] shrink-0 sm:h-[1.15rem] sm:w-[1.15rem] stroke-[2.25]'
-
-const ctaExternalIconClass = 'h-4 w-4 shrink-0 opacity-70 sm:h-[1.05rem] sm:w-[1.05rem]'
 
 const cardShellClasses =
   'group flex min-h-[240px] sm:min-h-[260px] flex-col overflow-hidden rounded-2xl border border-gray-200/60 bg-[#f4f4f4] text-center shadow-home-card transition-all duration-300 hover:z-10 hover:-translate-y-0.5 hover:border-accent/55 hover:shadow-[0_12px_40px_-6px_rgba(232,90,60,0.55),0_28px_70px_-12px_rgba(232,90,60,0.42),0_0_0_1px_rgba(232,90,60,0.2),0_0_60px_8px_rgba(232,90,60,0.28)] active:z-10 active:-translate-y-0.5 active:border-accent/60 active:shadow-[0_12px_40px_-6px_rgba(232,90,60,0.6),0_28px_70px_-12px_rgba(232,90,60,0.48),0_0_0_1px_rgba(232,90,60,0.22),0_0_72px_10px_rgba(232,90,60,0.32)]'
@@ -77,8 +68,7 @@ export default function PlatformGridSection() {
           <p className="text-sm sm:text-base text-gray-600 leading-snug">
             {t('platform.gridTrustLine')}
           </p>
-          <div className="mt-[2cm] flex flex-col gap-3 sm:gap-4">
-          <div className="flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-4">
+          <div className="mt-[2cm] flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center sm:justify-center sm:gap-4">
             <a
               href={`/registreer?lang=${locale}`}
               className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:min-w-[200px] sm:text-base"
@@ -86,27 +76,6 @@ export default function PlatformGridSection() {
               <Rocket className={ctaIconClass} aria-hidden />
               {t('heroLanding.ctaStartFree')}
             </a>
-            <a
-              href={DEMO_HERO_LIVE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full border-2 border-gray-900 bg-white px-6 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:min-w-[200px] sm:text-base"
-            >
-              <Flame className={ctaIconClass} aria-hidden />
-              <span className="min-w-0">{t('platform.gridDemoCta')}</span>
-              <ExternalLink className={ctaExternalIconClass} aria-hidden />
-            </a>
-            <a
-              href={DEMO_ONLINE_SHOP_MENU_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full border-2 border-gray-900 bg-white px-6 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:min-w-[200px] sm:text-base"
-            >
-              <ShoppingBag className={ctaIconClass} aria-hidden />
-              <span className="min-w-0">{t('platform.gridDemoShopCta')}</span>
-              <ExternalLink className={ctaExternalIconClass} aria-hidden />
-            </a>
-          </div>
           </div>
         </div>
       </div>

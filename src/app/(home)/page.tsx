@@ -16,7 +16,6 @@ const VysionBeestSection = dynamic(() => import('@/components/VysionBeestSection
 const HardwareSection = dynamic(() => import('@/components/HardwareSection'), { loading: () => null })
 const ContactPageSection = dynamic(() => import('@/components/ContactPageSection'), { loading: () => null })
 import { useLanguage } from '@/i18n'
-import { DEMO_HERO_LIVE_URL, DEMO_ONLINE_SHOP_MENU_URL } from '@/lib/demo-links'
 import { PricingHardwareToggle } from '@/components/PricingHardwareToggle'
 import { monthlyPriceForHardware } from '@/lib/pricing-hardware'
 import HomeScrollOnLoad from '@/components/HomeScrollOnLoad'
@@ -125,14 +124,6 @@ function WhyVysionSection() {
                 className="inline-flex min-h-[48px] w-full items-center justify-center rounded-full bg-accent px-8 py-3.5 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:min-w-[200px] sm:flex-1 lg:max-w-[220px] lg:flex-initial"
               >
                 {t('heroLanding.ctaStartFree')}
-              </a>
-              <a
-                href={DEMO_HERO_LIVE_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex min-h-[48px] w-full items-center justify-center rounded-full border-2 border-gray-900/85 bg-white px-8 py-3.5 text-center text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:min-w-[200px] sm:flex-1 lg:max-w-[220px] lg:flex-initial"
-              >
-                {t('heroLanding.ctaViewDemo')}
               </a>
             </div>
           </div>
@@ -801,20 +792,12 @@ function PricingSection() {
           <p className="text-center text-accent text-sm font-medium">{t('pricing.cancelAnytime')}</p>
         </div>
 
-        <div className="mt-12 flex flex-col items-stretch justify-center gap-3 sm:mt-14 sm:flex-row sm:items-center sm:gap-4">
+        <div className="mt-12 flex flex-col items-stretch justify-center gap-3 sm:mt-14 sm:flex-row sm:items-center sm:justify-center sm:gap-4">
           <a
             href={`/registreer?lang=${locale}`}
             className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-accent px-8 py-3.5 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:text-base"
           >
             {t('heroLanding.ctaStartFree')}
-          </a>
-          <a
-            href={DEMO_HERO_LIVE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex min-h-[48px] items-center justify-center rounded-full border-2 border-gray-900 bg-white px-8 py-3.5 text-center text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:text-base"
-          >
-            {t('heroLanding.ctaViewDemo')}
           </a>
         </div>
       </div>
@@ -1106,20 +1089,12 @@ function TableKioskSection() {
                 </li>
               ))}
             </ul>
-            <div className="mt-[calc(2.5rem+2cm)] flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+            <div className="mt-[calc(2.5rem+2cm)] flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-center sm:gap-4">
               <a
                 href={`/registreer?lang=${locale}`}
                 className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-accent px-8 py-3.5 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:text-base"
               >
                 {t('heroLanding.ctaStartFree')}
-              </a>
-              <a
-                href={DEMO_HERO_LIVE_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex min-h-[48px] items-center justify-center rounded-full border-2 border-gray-900 bg-white px-8 py-3.5 text-center text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:text-base"
-              >
-                {t('heroLanding.ctaViewDemo')}
               </a>
             </div>
           </div>
