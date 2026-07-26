@@ -54,6 +54,7 @@ export default function Navigation() {
             <a href="/#prijzen" className={navLinkClass}>{t('nav.pricing')}</a>
             <a href="/over-ons" className={navLinkClass}>{t('nav.about')}</a>
             <a href="/support" className={navLinkClass}>{t('nav.support')}</a>
+            <a href="/licentie" className={navLinkClass}>{t('nav.license')}</a>
             <a href="/resellers" className={navLinkClass}>{t('nav.resellers')}</a>
           </div>
 
@@ -135,6 +136,7 @@ export default function Navigation() {
               <a href="/#prijzen" className={navLinkClassMobile}>{t('nav.pricing')}</a>
               <a href="/over-ons" className={navLinkClassMobile}>{t('nav.about')}</a>
               <a href="/support" className={navLinkClassMobile}>{t('nav.support')}</a>
+              <a href="/licentie" className={navLinkClassMobile}>{t('nav.license')}</a>
               <a href="/resellers" className={navLinkClassMobile}>{t('nav.resellers')}</a>
 
               {/* Mobile Language Selector */}

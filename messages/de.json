@@ -11,6 +11,7 @@
  "contact": "Kontakt",
  "support": "Support",
  "resellers": "Reseller",
+ "license": "Lizenz",
  "login": "Anmelden",
  "tryFree": "Kostenlos testen",
  "language": "Sprache",
@@ -18,6 +19,25 @@
  "services": "Unsere Leistungen",
  "integrations": "Integrationen",
  "subscriptions": "Abonnements"
+ },
+ "licensePurchasePage": {
+ "title": "Lizenzkauf",
+ "subtitle": "Einmalige lebenslange Lizenz — Alternative zum Monatsabo",
+ "cardBadge": "Lebenslange Lizenz",
+ "priceAmount": "€1.499",
+ "priceNote": "zzgl. MwSt. · einmalig",
+ "lead": "Kaufen Sie Hardware und Software einmalig statt monatlich zu abonnieren. Nach der Zahlung gehört die Softwarelizenz dauerhaft zu Ihrem Betrieb.",
+ "bullet1": "Touchscreen-Kasse, Software und Hardware inklusive",
+ "bullet2": "Lebenslange Softwarelizenz — keine monatlichen Kassasoftware-Kosten",
+ "bullet3": "Updates und Support gemäß unseren AGB",
+ "bullet4": "Ideal, wenn Sie lieber einmal investieren als monatlich zahlen",
+ "bullet5": "Alternative zum Premium-Abo für €99 pro Monat",
+ "compareTitle": "Abo oder Lizenz?",
+ "compareBody": "Mit dem Monatsabo gibt es keine große Anfangsinvestition. Mit der lebenslangen Lizenz zahlen Sie einmal €1.499 zzgl. MwSt. Beide Optionen enthalten Hardware und Software.",
+ "ctaContact": "Lizenzkauf anfragen",
+ "ctaSubscription": "Abo ansehen",
+ "emailSubject": "Kauf lebenslange Vysion-Lizenz",
+ "footerNote": "Alle Preise zzgl. MwSt. Kontaktieren Sie uns für ein individuelles Angebot."
  },
  "subscriptionsPage": {
  "title": "Abonnements",

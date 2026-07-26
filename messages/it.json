@@ -11,6 +11,7 @@
  "contact": "Contatti",
  "support": "Supporto",
  "resellers": "Rivenditori",
+ "license": "Licenza",
  "login": "Accedi",
  "tryFree": "Prova gratis",
  "language": "Lingua",
@@ -18,6 +19,25 @@
  "services": "I nostri servizi",
  "integrations": "Integrazioni",
  "subscriptions": "Abbonamenti"
+ },
+ "licensePurchasePage": {
+ "title": "Acquisto licenza",
+ "subtitle": "Licenza a vita una tantum — alternativa all’abbonamento mensile",
+ "cardBadge": "Licenza a vita",
+ "priceAmount": "€1.499",
+ "priceNote": "IVA escl. · una tantum",
+ "lead": "Acquista hardware e software in un pagamento unico invece di un abbonamento mensile. Dopo il pagamento, la licenza software resta a vita per la tua attività.",
+ "bullet1": "POS touchscreen, software e hardware inclusi",
+ "bullet2": "Licenza software a vita — nessun costo mensile del software di cassa",
+ "bullet3": "Aggiornamenti e assistenza secondo i nostri termini",
+ "bullet4": "Ideale se preferisci un investimento unico invece del pagamento mensile",
+ "bullet5": "Alternativa all’abbonamento Premium a €99 al mese",
+ "compareTitle": "Abbonamento o licenza?",
+ "compareBody": "Con l’abbonamento mensile non c’è un grande investimento iniziale. Con la licenza a vita paghi una volta €1.499 IVA escl. Entrambe le opzioni includono hardware e software.",
+ "ctaContact": "Richiedi acquisto licenza",
+ "ctaSubscription": "Vedi abbonamento",
+ "emailSubject": "Acquisto licenza a vita Vysion",
+ "footerNote": "Tutti i prezzi IVA esclusa. Contattaci per un’offerta su misura."
  },
  "subscriptionsPage": {
  "title": "Abbonamenti",

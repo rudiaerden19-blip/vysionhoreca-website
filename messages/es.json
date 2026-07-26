@@ -11,6 +11,7 @@
  "contact": "Contacto",
  "support": "Soporte",
  "resellers": "Distribuidores",
+ "license": "Licencia",
  "login": "Iniciar sesión",
  "tryFree": "Prueba gratis",
  "language": "Idioma",
@@ -18,6 +19,25 @@
  "services": "Nuestros servicios",
  "integrations": "Integraciones",
  "subscriptions": "Suscripciones"
+ },
+ "licensePurchasePage": {
+ "title": "Compra de licencia",
+ "subtitle": "Licencia de por vida única — alternativa a la suscripción mensual",
+ "cardBadge": "Licencia de por vida",
+ "priceAmount": "1.499 €",
+ "priceNote": "sin IVA · pago único",
+ "lead": "Compra hardware y software de una sola vez en lugar de una suscripción mensual. Tras el pago, la licencia de software pertenece a tu negocio de por vida.",
+ "bullet1": "TPV táctil, software y hardware incluidos",
+ "bullet2": "Licencia de software de por vida — sin costes mensuales de software de caja",
+ "bullet3": "Actualizaciones y soporte según nuestras condiciones",
+ "bullet4": "Ideal si prefieres una inversión única en lugar de pagar cada mes",
+ "bullet5": "Alternativa a la suscripción Premium de 99 € al mes",
+ "compareTitle": "¿Suscripción o licencia?",
+ "compareBody": "Con la suscripción mensual no hay gran inversión inicial. Con la licencia de por vida pagas una vez 1.499 € sin IVA. Ambas opciones incluyen hardware y software.",
+ "ctaContact": "Solicitar compra de licencia",
+ "ctaSubscription": "Ver suscripción",
+ "emailSubject": "Compra licencia de por vida Vysion",
+ "footerNote": "Todos los precios sin IVA. Contáctanos para una oferta personalizada."
  },
  "subscriptionsPage": {
  "title": "Suscripciones",

@@ -11,6 +11,7 @@
  "contact": "Contact",
  "support": "Support",
  "resellers": "Revendeurs",
+ "license": "Licence",
  "login": "Connexion",
  "tryFree": "Essai gratuit",
  "language": "Langue",
@@ -18,6 +19,25 @@
  "services": "Nos services",
  "integrations": "Intégrations",
  "subscriptions": "Abonnements"
+ },
+ "licensePurchasePage": {
+ "title": "Achat de licence",
+ "subtitle": "Licence à vie unique — alternative à l’abonnement mensuel",
+ "cardBadge": "Licence à vie",
+ "priceAmount": "1 499 €",
+ "priceNote": "HT · en une fois",
+ "lead": "Optez pour un achat unique de matériel et logiciel plutôt qu’un abonnement mensuel. Après paiement, la licence logicielle reste à vie pour votre établissement.",
+ "bullet1": "Caisse tactile, logiciel et matériel inclus",
+ "bullet2": "Licence logicielle à vie — pas de frais mensuels de logiciel de caisse",
+ "bullet3": "Mises à jour et support selon nos conditions générales",
+ "bullet4": "Idéal si vous préférez un investissement unique plutôt qu’un paiement mensuel",
+ "bullet5": "Alternative à l’abonnement Premium à 99 € par mois",
+ "compareTitle": "Abonnement ou licence ?",
+ "compareBody": "Avec l’abonnement mensuel, pas de gros investissement initial. Avec la licence à vie, vous payez une fois 1 499 € HT. Les deux options incluent matériel et logiciel.",
+ "ctaContact": "Demander l’achat de licence",
+ "ctaSubscription": "Voir l’abonnement",
+ "emailSubject": "Achat licence à vie Vysion",
+ "footerNote": "Tous les prix hors TVA. Contactez-nous pour une offre personnalisée."
  },
  "subscriptionsPage": {
  "title": "Abonnements",

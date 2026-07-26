@@ -11,6 +11,7 @@
  "contact": "Contact",
  "support": "Support",
  "resellers": "Resellers",
+ "license": "License",
  "login": "Login",
  "tryFree": "Try Free",
  "language": "Language",
@@ -18,6 +19,25 @@
  "services": "Our services",
  "integrations": "Integrations",
  "subscriptions": "Subscriptions"
+ },
+ "licensePurchasePage": {
+ "title": "Purchase license",
+ "subtitle": "One-time lifetime license — alternative to monthly subscription",
+ "cardBadge": "Lifetime license",
+ "priceAmount": "€1,499",
+ "priceNote": "excl. VAT · one-time",
+ "lead": "Choose a one-time purchase of hardware and software instead of a monthly subscription. After payment, the software license belongs to your business for life.",
+ "bullet1": "Touchscreen POS, software and required hardware included",
+ "bullet2": "Lifetime software license — no monthly POS software fees",
+ "bullet3": "Updates and support according to our terms and conditions",
+ "bullet4": "Ideal if you prefer one investment over paying monthly",
+ "bullet5": "Alternative to our Premium subscription at €99 per month",
+ "compareTitle": "Subscription or license?",
+ "compareBody": "With the monthly subscription you avoid a large upfront payment. With the lifetime license you pay once €1,499 excl. VAT. Both options include hardware and software.",
+ "ctaContact": "Request license purchase",
+ "ctaSubscription": "View subscription",
+ "emailSubject": "Vysion lifetime license purchase",
+ "footerNote": "All prices exclude VAT. Contact us for a tailored quote."
  },
  "subscriptionsPage": {
  "title": "Subscriptions",

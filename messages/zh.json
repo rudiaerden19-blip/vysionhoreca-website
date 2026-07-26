@@ -11,6 +11,7 @@
  "contact": "联系我们",
  "support": "支持",
  "resellers": "经销商",
+ "license": "许可证",
  "login": "登录",
  "tryFree": "免费试用",
  "language": "语言",
@@ -18,6 +19,25 @@
  "services": "我们的服务",
  "integrations": "集成",
  "subscriptions": "订阅"
+ },
+ "licensePurchasePage": {
+ "title": "购买许可证",
+ "subtitle": "一次性终身许可证 — 月付订阅的替代方案",
+ "cardBadge": "终身许可证",
+ "priceAmount": "€1,499",
+ "priceNote": "不含税 · 一次性",
+ "lead": "选择一次性购买硬件和软件，而非月付订阅。付款后，软件许可证将终身归属于您的店铺。",
+ "bullet1": "含触摸屏收银机、软件及所需硬件",
+ "bullet2": "终身软件许可证 — 无月度收银软件费用",
+ "bullet3": "按我们的条款提供更新与支持",
+ "bullet4": "若您偏好一次性投资而非按月付款，这是理想选择",
+ "bullet5": "每月 €99 Premium 订阅的替代方案",
+ "compareTitle": "订阅还是许可证？",
+ "compareBody": "月付订阅无需大额前期投入。终身许可证一次性支付 €1,499（不含税）。两种方案均含硬件与软件。",
+ "ctaContact": "咨询购买许可证",
+ "ctaSubscription": "查看订阅",
+ "emailSubject": "Vysion 终身许可证购买",
+ "footerNote": "所有价格不含税。请联系我们获取定制报价。"
  },
  "subscriptionsPage": {
  "title": "订阅方案",
