@@ -19,6 +19,7 @@ import {
 } from '@/lib/z-report-aggregate-articles'
 import {
   aggregateZReportVatFromOrderRows,
+  CATEGORY_VAT_PERCENT_OPTIONS,
   type CategoryVatPercent,
   type ZReportVatOrderSlice,
 } from '@/lib/order-vat'
@@ -30,12 +31,14 @@ import {
 } from '@/lib/z-report-document'
 import { ZReportDocumentBody } from '@/components/ZReportDocumentBody'
 import {
+  addMonthsToYearMonth,
   buildZReportMonthDayRows,
   formatYearMonthLabel,
   getLastDayOfMonthYmd,
   monthBoundsUtc,
   parseZReportMonthSentLog,
   sumZReportMonthAmounts,
+  type ZReportMonthDayRow,
 } from '@/lib/z-report-month'
 import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
@@ -146,14 +149,27 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const [selectedMonthForEmail, setSelectedMonthForEmail] = useState(() =>
     getLocalDateString().slice(0, 7),
   )
+  const [reportViewMode, setReportViewMode] = useState<'day' | 'month'>('day')
+  const [monthLoading, setMonthLoading] = useState(false)
+  const [monthDayRows, setMonthDayRows] = useState<ZReportMonthDayRow[]>([])
+  const [monthAmounts, setMonthAmounts] = useState<ZReportAmounts | null>(null)
   const [currentSavedReport, setCurrentSavedReport] = useState<SavedReport | null>(null)
   const [articleLines, setArticleLines] = useState<ZReportArticleLine[]>([])
 
   useEffect(() => {
-    loadData()
+    if (reportViewMode === 'day') {
+      loadData()
+    }
     loadSavedReports()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.tenant, selectedDate])
+  }, [params.tenant, selectedDate, reportViewMode])
+
+  useEffect(() => {
+    if (reportViewMode === 'month') {
+      loadMonthReportData(selectedMonthForEmail)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.tenant, selectedMonthForEmail, reportViewMode, savedReports])
 
   // Houd huidige opgeslagen rapport bij voor is_closed check
   useEffect(() => {
@@ -251,6 +267,54 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     }
 
     setLoading(false)
+  }
+
+  const buildManualByDateForMonth = (yearMonth: string) => {
+    const manualByDate: Record<
+      string,
+      { cash?: number; card?: number; online?: number; total?: number }
+    > = {}
+    savedReports
+      .filter((r) => r.report_date.startsWith(yearMonth) && (r.manual_total || 0) > 0)
+      .forEach((r) => {
+        manualByDate[r.report_date] = {
+          cash: r.manual_cash ?? undefined,
+          card: r.manual_card ?? undefined,
+          online: r.manual_online ?? undefined,
+          total: r.manual_total ?? undefined,
+        }
+      })
+    return manualByDate
+  }
+
+  const loadMonthReportData = async (yearMonth: string) => {
+    setMonthLoading(true)
+    try {
+      const today = getLocalDateString()
+      const monthEnd = getLastDayOfMonthYmd(yearMonth)
+      const capYmd = today < monthEnd ? today : monthEnd
+      const { startUTC, endUTC } = monthBoundsUtc(yearMonth, capYmd)
+
+      const ordersRaw = await fetchAllTenantOrdersInCreatedAtRange(
+        params.tenant,
+        startUTC,
+        endUTC,
+        '*',
+      )
+      const vatContext = await fetchZReportVatContextForTenant(params.tenant)
+      const days = buildZReportMonthDayRows(
+        ordersRaw as unknown as Order[],
+        yearMonth,
+        capYmd,
+        btwPercentage,
+        vatContext,
+        buildManualByDateForMonth(yearMonth),
+      )
+      setMonthDayRows(days)
+      setMonthAmounts(days.length ? sumZReportMonthAmounts(days) : null)
+    } finally {
+      setMonthLoading(false)
+    }
   }
 
   const loadSavedReports = async () => {
@@ -779,28 +843,13 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
 
       const vatContext = await fetchZReportVatContextForTenant(params.tenant)
 
-      const manualByDate: Record<
-        string,
-        { cash?: number; card?: number; online?: number; total?: number }
-      > = {}
-      savedReports
-        .filter((r) => r.report_date.startsWith(yearMonth) && (r.manual_total || 0) > 0)
-        .forEach((r) => {
-          manualByDate[r.report_date] = {
-            cash: r.manual_cash ?? undefined,
-            card: r.manual_card ?? undefined,
-            online: r.manual_online ?? undefined,
-            total: r.manual_total ?? undefined,
-          }
-        })
-
       const days = buildZReportMonthDayRows(
         ordersRaw as unknown as Order[],
         yearMonth,
         capYmd,
         btwPercentage,
         vatContext,
-        manualByDate,
+        buildManualByDateForMonth(yearMonth),
       )
 
       if (days.length === 0) {
@@ -873,6 +922,8 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const goToPreviousDay = () => {
     const [y, m, d] = selectedDate.split('-').map(Number)
     const date = new Date(y, m - 1, d - 1)
+    setReportViewMode('day')
+    setArchivePeriod('dag')
     setSelectedDate(getLocalDateString(date))
   }
 
@@ -881,8 +932,58 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     const date = new Date(y, m - 1, d + 1)
     const today = getLocalDateString()
     const newDate = getLocalDateString(date)
-    if (newDate <= today) setSelectedDate(newDate)
+    if (newDate <= today) {
+      setReportViewMode('day')
+      setSelectedDate(newDate)
+    }
   }
+
+  const goToPreviousMonth = () => {
+    setReportViewMode('month')
+    setArchivePeriod('maand')
+    setSelectedMonthForEmail((prev) => addMonthsToYearMonth(prev, -1))
+  }
+
+  const goToNextMonth = () => {
+    const todayYm = getLocalDateString().slice(0, 7)
+    const next = addMonthsToYearMonth(selectedMonthForEmail, 1)
+    if (next <= todayYm) {
+      setReportViewMode('month')
+      setArchivePeriod('maand')
+      setSelectedMonthForEmail(next)
+    }
+  }
+
+  const selectMonthForView = (yearMonth: string) => {
+    setSelectedMonthForEmail(yearMonth)
+    setReportViewMode('month')
+    setArchivePeriod('maand')
+  }
+
+  const zReportDocumentLabels = {
+    orderCount: t('zReport.orderCount'),
+    subtotal: t('zReport.subtotal'),
+    vatTableTitle: t('zReport.vatTableTitle'),
+    vatRateCol: t('zReport.vatRateCol'),
+    vatBaseCol: t('zReport.vatBaseCol'),
+    vatTaxCol: t('zReport.vatTaxCol'),
+    vatTotalRow: t('zReport.vatTotalRow'),
+    total: t('zReport.total'),
+    paymentMethods: t('zReport.paymentMethods'),
+    onlinePaid: t('zReport.onlinePaid'),
+    cardPaid: t('zReport.cardPaid'),
+    cashPaid: t('zReport.cashPaid'),
+    soldArticlesTitle: t('zReport.soldArticlesTitle'),
+    soldArticlesEmpty: t('zReport.soldArticlesEmpty'),
+    soldArticlesPiecesShort: t('zReport.soldArticlesPiecesShort'),
+    soldArticlesVatShort: t('zReport.soldArticlesVatShort'),
+    soldArticlesAmountShort: t('zReport.soldArticlesAmountShort'),
+    generatedOn: t('zReport.generatedOn'),
+  }
+
+  const monthVatRates = CATEGORY_VAT_PERCENT_OPTIONS.filter((rate) =>
+    monthDayRows.some((d) => (d.taxByRate[rate] || 0) > 0 || (d.baseByRate[rate] || 0) > 0),
+  )
 
   const isDayClosed = currentSavedReport?.is_closed === true
   const hasExistingManualEntry =
@@ -899,7 +1000,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const monthSentEntry = monthSentLog[selectedYearMonth]
   const selectedMonthLabel = formatYearMonthLabel(selectedYearMonth)
 
-  if (loading) {
+  if (loading && reportViewMode === 'day') {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
@@ -930,7 +1031,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
             value={selectedMonthForEmail}
             max={getLocalDateString().slice(0, 7)}
             onChange={(e) => {
-              if (e.target.value) setSelectedMonthForEmail(e.target.value)
+              if (e.target.value) selectMonthForView(e.target.value)
             }}
             className="w-full sm:w-auto px-4 py-3 border border-indigo-200 rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-medium"
           />
@@ -1063,7 +1164,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       </div>
 
       {/* Gesloten dag banner */}
-      {isDayClosed && (
+      {isDayClosed && reportViewMode === 'day' && (
         <div className="mb-6 p-4 bg-green-50 border-2 border-green-300 rounded-2xl flex items-center gap-3 print:hidden">
           <span className="text-2xl"></span>
           <div>
@@ -1078,21 +1179,41 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Main Report */}
         <div className="lg:col-span-2">
-          {/* Date Selector */}
+          {/* Datum- of maandkiezer */}
           <div className="flex items-center justify-center gap-4 mb-6 print:hidden">
-            <button onClick={goToPreviousDay} className="p-3 bg-gray-100 hover:bg-gray-200 rounded-xl">←</button>
-            <input
-              type="date"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              max={getLocalDateString()}
-              className="px-4 py-3 border border-gray-200 rounded-xl text-center font-medium"
-            />
-            <button
-              onClick={goToNextDay}
-              disabled={selectedDate === getLocalDateString()}
-              className="p-3 bg-gray-100 hover:bg-gray-200 rounded-xl disabled:opacity-50"
-            >→</button>
+            {reportViewMode === 'month' ? (
+              <>
+                <button onClick={goToPreviousMonth} className="p-3 bg-gray-100 hover:bg-gray-200 rounded-xl">←</button>
+                <div className="px-4 py-3 border border-gray-200 rounded-xl text-center font-medium min-w-[200px] capitalize">
+                  {selectedMonthLabel}
+                </div>
+                <button
+                  onClick={goToNextMonth}
+                  disabled={selectedMonthForEmail >= getLocalDateString().slice(0, 7)}
+                  className="p-3 bg-gray-100 hover:bg-gray-200 rounded-xl disabled:opacity-50"
+                >→</button>
+              </>
+            ) : (
+              <>
+                <button onClick={goToPreviousDay} className="p-3 bg-gray-100 hover:bg-gray-200 rounded-xl">←</button>
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => {
+                    setReportViewMode('day')
+                    setArchivePeriod('dag')
+                    setSelectedDate(e.target.value)
+                  }}
+                  max={getLocalDateString()}
+                  className="px-4 py-3 border border-gray-200 rounded-xl text-center font-medium"
+                />
+                <button
+                  onClick={goToNextDay}
+                  disabled={selectedDate === getLocalDateString()}
+                  className="p-3 bg-gray-100 hover:bg-gray-200 rounded-xl disabled:opacity-50"
+                >→</button>
+              </>
+            )}
           </div>
 
           {/* Z-Rapport */}
@@ -1110,15 +1231,24 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
             </div>
 
             <div className="border-b-2 border-dashed border-gray-300 p-6 text-center">
-              <h3 className="text-2xl font-bold text-gray-900">{t('zReport.reportTitle')}</h3>
+              <h3 className="text-2xl font-bold text-gray-900">
+                {reportViewMode === 'month' ? t('zReport.monthReportTitle') : t('zReport.reportTitle')}
+              </h3>
               <p className="text-sm font-medium text-gray-600 mt-1">{t('zReport.onlineSales')}</p>
-              <p className="text-gray-500 mt-2">{formatDate(selectedDate)}</p>
+              <p className="text-gray-500 mt-2 capitalize">
+                {reportViewMode === 'month' ? selectedMonthLabel : formatDate(selectedDate)}
+              </p>
               <p className="text-xs text-gray-400 mt-1">{t('zReport.fiscalPeriodNote')}</p>
               <div className="flex items-center justify-center gap-2 mt-2 flex-wrap">
                 <span className="inline-block px-3 py-1 bg-blue-100 text-blue-600 text-sm rounded-full">
                    {t('zReport.autoUpdated')}
                 </span>
-                {isDayClosed && (
+                {reportViewMode === 'month' && (
+                  <span className="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 text-sm rounded-full font-medium">
+                    {t('zReport.monthSummary')}
+                  </span>
+                )}
+                {reportViewMode === 'day' && isDayClosed && (
                   <span className="inline-block px-3 py-1 bg-green-100 text-green-700 text-sm rounded-full font-medium">
                      AFGESLOTEN
                   </span>
@@ -1126,31 +1256,80 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
               </div>
             </div>
 
-            {stats && stats.orderCount > 0 ? (
+            {reportViewMode === 'month' ? (
+              monthLoading ? (
+                <div className="p-12 text-center">
+                  <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                  <p className="text-gray-500">{t('adminPages.common.loading')}</p>
+                </div>
+              ) : monthAmounts && monthDayRows.length > 0 ? (
+                <>
+                  <ZReportDocumentBody
+                    amounts={monthAmounts}
+                    articleLines={[]}
+                    showSoldArticles={false}
+                    generatedAt={new Date().toLocaleString('nl-BE')}
+                    labels={zReportDocumentLabels}
+                  />
+                  <div className="px-6 pb-6">
+                    <h4 className="font-semibold text-gray-900 mb-3 uppercase tracking-wide text-sm">
+                      {t('zReport.dailyOverview')}
+                    </h4>
+                    <div className="overflow-x-auto rounded-xl border border-gray-200">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="bg-gray-50 text-left text-gray-600">
+                            <th className="px-3 py-2 font-medium">{t('zReport.dateCol')}</th>
+                            <th className="px-3 py-2 font-medium text-center">{t('zReport.orderCount')}</th>
+                            {monthVatRates.map((rate) => (
+                              <th key={rate} className="px-3 py-2 font-medium text-right">
+                                {rate}% {t('zReport.vatTaxCol')}
+                              </th>
+                            ))}
+                            <th className="px-3 py-2 font-medium text-right">{t('zReport.dayTotalCol')}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {monthDayRows.map((day) => (
+                            <tr
+                              key={day.date}
+                              className="border-t border-gray-100 cursor-pointer hover:bg-blue-50"
+                              onClick={() => {
+                                setReportViewMode('day')
+                                setArchivePeriod('dag')
+                                setSelectedDate(day.date)
+                              }}
+                            >
+                              <td className="px-3 py-2">{formatShortDate(day.date)}</td>
+                              <td className="px-3 py-2 text-center tabular-nums">{day.orderCount}</td>
+                              {monthVatRates.map((rate) => (
+                                <td key={rate} className="px-3 py-2 text-right tabular-nums">
+                                  {formatZReportEuro(day.taxByRate[rate] || 0)}
+                                </td>
+                              ))}
+                              <td className="px-3 py-2 text-right tabular-nums font-medium">
+                                {formatZReportEuro(day.totalIncl)}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2">{t('zReport.monthDayDrillHint')}</p>
+                  </div>
+                </>
+              ) : (
+                <div className="p-12 text-center">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">{t('zReport.monthNoOrders')}</h3>
+                  <p className="text-gray-500">{t('zReport.monthSendEmpty')}</p>
+                </div>
+              )
+            ) : stats && stats.orderCount > 0 ? (
               <ZReportDocumentBody
                 amounts={statsToAmounts(stats)}
                 articleLines={articleLines}
                 generatedAt={new Date().toLocaleString('nl-BE')}
-                labels={{
-                  orderCount: t('zReport.orderCount'),
-                  subtotal: t('zReport.subtotal'),
-                  vatTableTitle: t('zReport.vatTableTitle'),
-                  vatRateCol: t('zReport.vatRateCol'),
-                  vatBaseCol: t('zReport.vatBaseCol'),
-                  vatTaxCol: t('zReport.vatTaxCol'),
-                  vatTotalRow: t('zReport.vatTotalRow'),
-                  total: t('zReport.total'),
-                  paymentMethods: t('zReport.paymentMethods'),
-                  onlinePaid: t('zReport.onlinePaid'),
-                  cardPaid: t('zReport.cardPaid'),
-                  cashPaid: t('zReport.cashPaid'),
-                  soldArticlesTitle: t('zReport.soldArticlesTitle'),
-                  soldArticlesEmpty: t('zReport.soldArticlesEmpty'),
-                  soldArticlesPiecesShort: t('zReport.soldArticlesPiecesShort'),
-                  soldArticlesVatShort: t('zReport.soldArticlesVatShort'),
-                  soldArticlesAmountShort: t('zReport.soldArticlesAmountShort'),
-                  generatedOn: t('zReport.generatedOn'),
-                }}
+                labels={zReportDocumentLabels}
               />
             ) : (
               <div className="p-12 text-center">
@@ -1163,6 +1342,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           </motion.div>
 
           {/* Instructies */}
+          {reportViewMode === 'day' && (
           <div className="mt-6 p-6 bg-blue-50 border border-blue-200 rounded-2xl print:hidden">
             <h3 className="font-semibold text-blue-900 mb-3"> {t('zReport.howToUse')}</h3>
             <ol className="text-blue-800 space-y-2 text-sm">
@@ -1176,6 +1356,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                Fiscale dag = 00:00u tot 12:00u de volgende dag · {t('zReport.retention')}
             </p>
           </div>
+          )}
         </div>
 
         {/* Sidebar — Archief */}
@@ -1190,7 +1371,14 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
               {(['dag', 'week', 'maand', 'jaar'] as const).map(p => (
                 <button
                   key={p}
-                  onClick={() => setArchivePeriod(p)}
+                  onClick={() => {
+                    setArchivePeriod(p)
+                    if (p === 'maand') {
+                      setReportViewMode('month')
+                    } else if (p === 'dag') {
+                      setReportViewMode('day')
+                    }
+                  }}
                   className={`py-1.5 rounded-lg text-xs font-medium capitalize transition-colors ${
                     archivePeriod === p ? 'bg-gray-900 text-white': 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
@@ -1222,10 +1410,11 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                       className="cursor-pointer"
                       onClick={() => {
                         if (archivePeriod === 'dag' && item.reportDate) {
+                          setReportViewMode('day')
                           setSelectedDate(item.reportDate)
                         }
                         if (archivePeriod === 'maand' && item.reportDate) {
-                          setSelectedMonthForEmail(item.reportDate)
+                          selectMonthForView(item.reportDate)
                         }
                       }}
                     >

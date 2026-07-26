@@ -1,4 +1,5 @@
 import {
+  addMonthsToYearMonth,
   buildZReportMonthDayRows,
   fiscalReportDateForOrderCreatedAt,
   getLastDayOfMonthYmd,
@@ -82,6 +83,13 @@ describe('parseZReportMonthSentLog', () => {
   it('retourneert leeg object voor ongeldige input', () => {
     expect(parseZReportMonthSentLog(null)).toEqual({})
     expect(parseZReportMonthSentLog('x')).toEqual({})
+  })
+})
+
+describe('addMonthsToYearMonth', () => {
+  it('schuift maanden door', () => {
+    expect(addMonthsToYearMonth('2026-06', 1)).toBe('2026-07')
+    expect(addMonthsToYearMonth('2026-01', -1)).toBe('2025-12')
   })
 })
 

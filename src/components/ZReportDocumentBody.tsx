@@ -34,6 +34,7 @@ type Props = {
   labels: ZReportDocumentLabels
   generatedAt?: string
   showFooter?: boolean
+  showSoldArticles?: boolean
 }
 
 export function ZReportDocumentBody({
@@ -42,6 +43,7 @@ export function ZReportDocumentBody({
   labels,
   generatedAt,
   showFooter = true,
+  showSoldArticles = true,
 }: Props) {
   const vatRows = buildZReportVatRows(amounts)
   const totalTax = vatRows.reduce((s, r) => s + r.tax, 0)
@@ -122,6 +124,7 @@ export function ZReportDocumentBody({
         )}
       </div>
 
+      {showSoldArticles ? (
       <div className="space-y-2 pt-1">
         <h4 className="font-semibold text-gray-900">{labels.soldArticlesTitle}</h4>
         {articleLines.length === 0 ? (
@@ -153,6 +156,7 @@ export function ZReportDocumentBody({
           </div>
         )}
       </div>
+      ) : null}
 
       {showFooter && generatedAt ? (
         <div className="border-t-2 border-dashed border-gray-300 pt-4 text-center text-gray-500 text-sm">

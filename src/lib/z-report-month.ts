@@ -232,6 +232,12 @@ export function formatYearMonthLabel(yearMonth: string, locale = 'nl-BE'): strin
   return d.toLocaleDateString(locale, { month: 'long', year: 'numeric' })
 }
 
+export function addMonthsToYearMonth(yearMonth: string, delta: number): string {
+  const [y, m] = yearMonth.split('-').map(Number)
+  const d = new Date(y, m - 1 + delta, 1)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+}
+
 export function parseZReportMonthSentLog(raw: unknown): ZReportMonthSentLog {
   if (!raw || typeof raw !== 'object') return {}
   const out: ZReportMonthSentLog = {}
