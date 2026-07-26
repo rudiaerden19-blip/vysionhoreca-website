@@ -545,11 +545,11 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
 
   // Archief aggregatie per periode
   const getAggregatedReports = () => {
-    const useLiveStatsForRow = (reportDate: string) =>
+    const liveStatsForRow = (reportDate: string) =>
       reportViewMode === 'day' && reportDate === selectedDate && stats != null && !loading
 
     if (archivePeriod === 'dag') return savedReports.map(r => {
-      const live = useLiveStatsForRow(r.report_date)
+      const live = liveStatsForRow(r.report_date)
       const onlineTotal = live ? stats!.total : (r.total || 0)
       const count = live ? stats!.orderCount : (r.order_count || 0)
       const kassaTotal = r.manual_total || 0
