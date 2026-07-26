@@ -10,7 +10,6 @@ import {
   fetchAllTenantOrdersInCreatedAtRange,
   getTenantSettings,
   getZRapportDateBounds,
-  getBelgiumDateString,
   orderCountsTowardRevenueAndZReport,
   type Order,
 } from '@/lib/admin-api'
@@ -30,6 +29,14 @@ import {
   type ZReportAmounts,
 } from '@/lib/z-report-document'
 import { ZReportDocumentBody } from '@/components/ZReportDocumentBody'
+import {
+  buildZReportMonthDayRows,
+  formatYearMonthLabel,
+  getLastDayOfMonthYmd,
+  monthBoundsUtc,
+  parseZReportMonthSentLog,
+  sumZReportMonthAmounts,
+} from '@/lib/z-report-month'
 import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
 
@@ -134,6 +141,8 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const [emailAddress, setEmailAddress] = useState('')
   const [accountantEmailAddress, setAccountantEmailAddress] = useState('')
   const [sendingEmail, setSendingEmail] = useState(false)
+  const [monthAccountantEmail, setMonthAccountantEmail] = useState('')
+  const [sendingMonthEmail, setSendingMonthEmail] = useState(false)
   const [currentSavedReport, setCurrentSavedReport] = useState<SavedReport | null>(null)
   const [articleLines, setArticleLines] = useState<ZReportArticleLine[]>([])
 
@@ -157,6 +166,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     if (settings) {
       setBusinessInfo(settings)
       setBtwPercentage(settingsBtw)
+      setMonthAccountantEmail(settings.accountant_email || '')
     }
 
     // KRITIEK: Fiscale daggrens = 00:00 tot 12:00 de VOLGENDE dag (GKS compliant)
@@ -742,6 +752,121 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     setSendingEmail(false)
   }
 
+  const sendMonthToAccountant = async () => {
+    const email = monthAccountantEmail.trim()
+    if (!email) {
+      alert(t('zReport.monthAccountantEmailPlaceholder'))
+      return
+    }
+
+    setSendingMonthEmail(true)
+    try {
+      const yearMonth = selectedDate.slice(0, 7)
+      const today = getLocalDateString()
+      const monthEnd = getLastDayOfMonthYmd(yearMonth)
+      const capYmd = today < monthEnd ? today : monthEnd
+
+      const { startUTC, endUTC } = monthBoundsUtc(yearMonth, capYmd)
+      const ordersRaw = await fetchAllTenantOrdersInCreatedAtRange(
+        params.tenant,
+        startUTC,
+        endUTC,
+        '*',
+      )
+
+      const vatContext = await fetchZReportVatContextForTenant(params.tenant)
+
+      const manualByDate: Record<
+        string,
+        { cash?: number; card?: number; online?: number; total?: number }
+      > = {}
+      savedReports
+        .filter((r) => r.report_date.startsWith(yearMonth) && (r.manual_total || 0) > 0)
+        .forEach((r) => {
+          manualByDate[r.report_date] = {
+            cash: r.manual_cash ?? undefined,
+            card: r.manual_card ?? undefined,
+            online: r.manual_online ?? undefined,
+            total: r.manual_total ?? undefined,
+          }
+        })
+
+      const days = buildZReportMonthDayRows(
+        ordersRaw as unknown as Order[],
+        yearMonth,
+        capYmd,
+        btwPercentage,
+        vatContext,
+        manualByDate,
+      )
+
+      if (days.length === 0) {
+        alert(t('zReport.monthSendEmpty'))
+        setSendingMonthEmail(false)
+        return
+      }
+
+      const amounts = sumZReportMonthAmounts(days)
+      const monthLabel = formatYearMonthLabel(yearMonth)
+
+      const payload = {
+        to: email,
+        tenantSlug: params.tenant,
+        yearMonth,
+        subject: `Z-Rapport ${monthLabel} - ${businessInfo?.business_name || params.tenant}`,
+        businessName: businessInfo?.business_name || params.tenant,
+        businessAddress: businessInfo?.address || '',
+        btwNumber: businessInfo?.btw_number || '',
+        monthLabel,
+        days,
+        amounts,
+        saveAccountantEmail: true,
+        labels: {
+          monthTitle: t('zReport.monthSendTitle'),
+          monthSummary: t('zReport.monthSummary'),
+          dailyOverview: t('zReport.dailyOverview'),
+          dateCol: t('zReport.dateCol'),
+          orderCount: t('zReport.orderCount'),
+          vatTableTitle: t('zReport.vatTableTitle'),
+          vatRateCol: t('zReport.vatRateCol'),
+          vatBaseCol: t('zReport.vatBaseCol'),
+          vatTaxCol: t('zReport.vatTaxCol'),
+          vatTotalRow: t('zReport.vatTotalRow'),
+          total: t('zReport.total'),
+          payments: t('zReport.paymentMethods'),
+          cash: t('zReport.cashPaid'),
+          card: t('zReport.cardPaid'),
+          online: t('zReport.onlinePaid'),
+          dayTotalCol: t('zReport.dayTotalCol'),
+          fiscalNote: t('zReport.fiscalPeriodNote'),
+          footerAuto: t('zReport.monthFooterAuto'),
+          footerGenerated: t('zReport.generatedOn'),
+          footerPowered: "Vysion kassa's - ordervysion.com",
+        },
+      }
+
+      const res = await authFetch('/api/send-z-report-month', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      })
+
+      if (res.ok) {
+        alert(t('zReport.monthSendSuccess'))
+        const settings = await getTenantSettings(params.tenant)
+        if (settings) {
+          setBusinessInfo(settings)
+          setMonthAccountantEmail(settings.accountant_email || email)
+        }
+      } else {
+        const err = await res.json().catch(() => ({}))
+        alert(`${t('zReport.monthSendError')} ${err.message || err.error || ''}`)
+      }
+    } catch {
+      alert(t('zReport.monthSendError'))
+    }
+    setSendingMonthEmail(false)
+  }
+
   const goToPreviousDay = () => {
     const [y, m, d] = selectedDate.split('-').map(Number)
     const date = new Date(y, m - 1, d - 1)
@@ -766,6 +891,11 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const kassaFormHasValues =
     !!kassaForm.cash.trim() || !!kassaForm.card.trim() || !!kassaForm.online.trim()
 
+  const selectedYearMonth = selectedDate.slice(0, 7)
+  const monthSentLog = parseZReportMonthSentLog(businessInfo?.z_report_month_sent)
+  const monthSentEntry = monthSentLog[selectedYearMonth]
+  const selectedMonthLabel = formatYearMonthLabel(selectedYearMonth)
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -784,6 +914,51 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   return (
       <PinGate tenant={params.tenant}>
       <div className="max-w-4xl mx-auto">
+      {/* Maandmail boekhouder */}
+      <div className="mb-6 p-5 bg-indigo-50 border border-indigo-200 rounded-2xl print:hidden">
+        <h2 className="text-lg font-bold text-indigo-900 mb-1">{t('zReport.monthSendTitle')}</h2>
+        <p className="text-sm text-indigo-800 mb-4">
+          {t('zReport.monthSendIntro')} — <strong>{selectedMonthLabel}</strong>
+        </p>
+        <div className="mb-3">
+          <label className="block text-sm font-medium text-indigo-900 mb-2">
+            {t('zReport.monthAccountantEmail')}
+          </label>
+          <input
+            type="email"
+            value={monthAccountantEmail}
+            onChange={(e) => setMonthAccountantEmail(e.target.value)}
+            placeholder={t('zReport.monthAccountantEmailPlaceholder')}
+            className="w-full px-4 py-3 border border-indigo-200 rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          />
+        </div>
+        {monthSentEntry ? (
+          <p className="text-sm text-green-700 mb-3">
+            {t('zReport.monthSentAt')
+              .replace('{date}', new Date(monthSentEntry.sentAt).toLocaleString('nl-BE'))
+              .replace('{email}', monthSentEntry.to)}
+          </p>
+        ) : (
+          <p className="text-sm text-amber-700 mb-3 font-medium">
+            {t('zReport.monthNotSentReminder')}
+          </p>
+        )}
+        <button
+          onClick={sendMonthToAccountant}
+          disabled={sendingMonthEmail || !monthAccountantEmail.trim()}
+          className="w-full sm:w-auto px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          {sendingMonthEmail ? (
+            <>
+              <span className="animate-spin" />
+              {t('zReport.monthSending')}
+            </>
+          ) : (
+            t('zReport.monthSendButton')
+          )}
+        </button>
+      </div>
+
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-8 print:hidden">
         <div>

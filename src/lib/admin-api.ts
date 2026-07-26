@@ -133,6 +133,8 @@ export interface TenantSettings {
   email: string
   /** Boekhouder — vooraf ingevuld bij Z-rapport per e-mail */
   accountant_email?: string
+  /** Per maand YYYY-MM: { sentAt, to } — maandmail naar boekhouder */
+  z_report_month_sent?: Record<string, { sentAt?: string; to?: string }> | null
   phone: string
   address: string
   postal_code?: string
