@@ -206,10 +206,12 @@ import {
 } from '@/lib/kassa-customer-display-window'
 import {
   buildCategoryVatLookup,
+  buildProductCategoryLookup,
   computeInclusiveVatSplitFromCart,
-  resolveVatPercentForProductAndOrderType,
-  resolveTenantCountryForVat,
   normalizeCategoryVatPercent,
+  normalizeOrderTypeForVat,
+  resolveTenantCountryForVat,
+  resolveVatPercentForProductAndOrderType,
 } from '@/lib/order-vat'
 import { sortKassaCartLinesByMenuCategory } from '@/lib/kassa-cart-grouping'
 
@@ -1514,6 +1516,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const kassaFloorPlanEnabled = tenantInfo?.kassa_floor_plan_enabled ?? true
 
   const categoryVatLookup = useMemo(() => buildCategoryVatLookup(categories), [categories])
+  const productCategoryById = useMemo(() => buildProductCategoryLookup(products), [products])
   const tenantDefaultBtw = useMemo(
     () => normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 6, 21),
     [tenantInfo?.btw_percentage],
@@ -1526,9 +1529,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         categoryVatLookup,
         tenantDefaultBtw,
         orderType,
+        productCategoryById,
         tenantCountry,
       ),
-    [categoryVatLookup, tenantDefaultBtw, orderType, tenantCountry],
+    [categoryVatLookup, tenantDefaultBtw, orderType, productCategoryById, tenantCountry],
   )
 
   useEffect(() => {
@@ -3365,6 +3369,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         freshVatLookup,
         tenantDefaultBtw,
         orderType,
+        productCategoryById,
         tenantCountry,
       )
     const vatSplit = computeInclusiveVatSplitFromCart(billLines, resolveLineVatAtCheckout)
@@ -3624,20 +3629,27 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     try {
     const fbVatRate = normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 6, 21)
-    const splitOk =
-      Array.isArray(order.vatSplit) &&
-      order.vatSplit.length > 0 &&
-      typeof order.subtotalExclVat === 'number' &&
-      typeof order.totalTax === 'number'
-    let subtotal: number
-    let tax: number
-    if (splitOk) {
-      subtotal = Math.round((order.subtotalExclVat as number) * 100) / 100
-      tax = Math.round((order.totalTax as number) * 100) / 100
-    } else {
-      subtotal = Math.round((order.total / (1 + fbVatRate / 100)) * 100) / 100
-      tax = Math.round((order.total - subtotal) * 100) / 100
-    }
+    const orderTypeForVat = normalizeOrderTypeForVat(order.orderType)
+    const receiptVatSplit =
+      order.items.length > 0
+        ? computeInclusiveVatSplitFromCart(order.items, (line) =>
+            resolveVatPercentForProductAndOrderType(
+              line.product,
+              categoryVatLookup,
+              tenantDefaultBtw,
+              orderTypeForVat,
+              productCategoryById,
+              tenantCountry,
+            ),
+          )
+        : null
+    const subtotal = receiptVatSplit
+      ? Math.round(receiptVatSplit.subtotalExcl * 100) / 100
+      : Math.round((order.total / (1 + fbVatRate / 100)) * 100) / 100
+    const tax = receiptVatSplit
+      ? Math.round(receiptVatSplit.totalTax * 100) / 100
+      : Math.round((order.total - subtotal) * 100) / 100
+    const receiptVatRows = receiptVatSplit?.byRate ?? []
     const orderTypeLabel =
       order.orderType === 'DINE_IN'
         ? ` ${t('kassaReceipt.orderTypeDineIn')}`
@@ -3722,8 +3734,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     bonLines.push('--------------------------------')
     bonLines.push(`${t('kassaReceipt.subtotal')}  EUR ${subtotal.toFixed(2)}`)
-    if (splitOk && order.vatSplit!.length >= 1) {
-      for (const row of order.vatSplit!) {
+    if (receiptVatRows.length >= 1) {
+      for (const row of receiptVatRows) {
         bonLines.push(
           `${t('kassaReceipt.vat').replace('{rate}', String(row.rate))}  EUR ${row.tax.toFixed(2)}`,
         )
@@ -3782,7 +3794,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         phone: tenantInfo?.phone ?? undefined,
         vatNumber: tenantInfo?.btw_number ?? undefined,
         website: tenantInfo?.website ?? undefined,
-        vatRate: splitOk ? order.vatSplit![0].rate : fbVatRate,
+        vatRate: receiptVatRows[0]?.rate ?? fbVatRate,
       },
     })
 
@@ -3812,9 +3824,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       <div class="divider-solid"></div>
       <div class="row"><span>${escapeReceiptHtml(t('kassaReceipt.subtotal'))}</span><span>€${subtotal.toFixed(2)}</span></div>
       ${
-        splitOk && order.vatSplit!.length >= 1
-          ? order
-              .vatSplit!.map(
+        receiptVatRows.length >= 1
+          ? receiptVatRows
+              .map(
                 (l) =>
                   `<div class="row"><span>${escapeReceiptHtml(t('kassaReceipt.vat').replace('{rate}', String(l.rate)))}</span><span>€${l.tax.toFixed(2)}</span></div>`,
               )

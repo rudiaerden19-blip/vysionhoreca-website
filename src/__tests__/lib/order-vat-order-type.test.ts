@@ -1,4 +1,5 @@
 import {
+  buildProductCategoryLookup,
   dineInAndOffPremiseVatRates,
   resolveTenantCountryForVat,
   resolveVatPercentForCategoryAndOrderType,
@@ -27,6 +28,7 @@ describe('order type VAT (ter plaatse / afhalen / leveren)', () => {
         categoryById,
         6,
         'DINE_IN',
+        undefined,
         'BE',
       ),
     ).toBe(21)
@@ -36,6 +38,7 @@ describe('order type VAT (ter plaatse / afhalen / leveren)', () => {
         categoryById,
         6,
         'TAKEAWAY',
+        undefined,
         'BE',
       ),
     ).toBe(21)
@@ -48,6 +51,7 @@ describe('order type VAT (ter plaatse / afhalen / leveren)', () => {
         categoryById,
         6,
         'DINE_IN',
+        undefined,
         'BE',
       ),
     ).toBe(12)
@@ -57,6 +61,7 @@ describe('order type VAT (ter plaatse / afhalen / leveren)', () => {
         categoryById,
         6,
         'TAKEAWAY',
+        undefined,
         'BE',
       ),
     ).toBe(6)
@@ -72,6 +77,7 @@ describe('order type VAT (ter plaatse / afhalen / leveren)', () => {
         categoryById,
         9,
         'DINE_IN',
+        undefined,
         'NL',
       ),
     ).toBe(9)
@@ -81,6 +87,7 @@ describe('order type VAT (ter plaatse / afhalen / leveren)', () => {
         categoryById,
         9,
         'TAKEAWAY',
+        undefined,
         'NL',
       ),
     ).toBe(9)
@@ -96,6 +103,7 @@ describe('order type VAT (ter plaatse / afhalen / leveren)', () => {
         categoryById,
         6,
         'DINE_IN',
+        undefined,
         'NL',
       ),
     ).toBe(6)
@@ -109,8 +117,40 @@ describe('order type VAT (ter plaatse / afhalen / leveren)', () => {
         categoryById,
         6,
         'DINE_IN',
+        undefined,
         resolveTenantCountryForVat(null, 'NL123456789B01'),
       ),
     ).toBe(6)
+  })
+
+  it('categorie met vast 9% blijft 9% (niet order-type split)', () => {
+    const cat9 = 'cat-nine'
+    const map = new Map<string, number | null | undefined>([[cat9, 9]])
+    expect(resolveVatPercentForCategoryAndOrderType(9, 6, 'DINE_IN')).toBe(9)
+    expect(
+      resolveVatPercentForProductAndOrderType(
+        { id: 'p1', category_id: cat9 },
+        map,
+        6,
+        'DINE_IN',
+      ),
+    ).toBe(9)
+  })
+
+  it('product_id lookup als category_id op mandregel leeg is', () => {
+    const alcoholCat = 'cat-alcohol'
+    const categoryById = new Map<string, number | null | undefined>([[alcoholCat, 21]])
+    const productCategoryById = buildProductCategoryLookup([
+      { id: 'p-beer', category_id: alcoholCat },
+    ])
+    expect(
+      resolveVatPercentForProductAndOrderType(
+        { id: 'p-beer', category_id: null },
+        categoryById,
+        9,
+        'DINE_IN',
+        productCategoryById,
+      ),
+    ).toBe(21)
   })
 })

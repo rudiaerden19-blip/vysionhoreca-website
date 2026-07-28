@@ -91,6 +91,29 @@ export function buildCategoryVatLookup(
   return m
 }
 
+export function buildProductCategoryLookup(
+  products: ReadonlyArray<{ id?: string | null; category_id?: string | null }>,
+): Map<string, string | null> {
+  return new Map(
+    products
+      .filter((p) => p.id)
+      .map((p) => [String(p.id), p.category_id ? String(p.category_id) : null]),
+  )
+}
+
+export function resolveCategoryIdForVatProduct(
+  product: Pick<MenuProduct, 'id' | 'category_id'>,
+  productCategoryById?: Map<string, string | null>,
+): string | null {
+  const pid = product.id
+  if (pid && productCategoryById) {
+    const fromCatalog = productCategoryById.get(String(pid))
+    if (fromCatalog) return fromCatalog
+  }
+  if (product.category_id) return String(product.category_id)
+  return null
+}
+
 /** Per productregel: categorie‑override óf tenant‑default (bruto = incl. btw). Zonder orderType: afhaal-tarief. */
 export function resolveVatPercentForProduct(
   product: Pick<MenuProduct, 'category_id'>,
@@ -110,14 +133,15 @@ export function resolveVatPercentForProduct(
  * Categorie met vast 21% (drank) wijzigt niet; eten volgt 6% afhaal vs 12% ter plaatse (BE).
  */
 export function resolveVatPercentForProductAndOrderType(
-  product: Pick<MenuProduct, 'category_id'>,
+  product: Pick<MenuProduct, 'id' | 'category_id'>,
   categoryById: Map<string, number | null | undefined>,
   tenantDefaultPct: number,
   orderType: OrderTypeForVat,
+  productCategoryById?: Map<string, string | null>,
   country?: string | null,
 ): CategoryVatPercent {
-  const override =
-    product.category_id != null ? categoryById.get(String(product.category_id)) : undefined
+  const categoryId = resolveCategoryIdForVatProduct(product, productCategoryById)
+  const override = categoryId != null ? categoryById.get(categoryId) : undefined
   return resolveVatPercentForCategoryAndOrderType(override, tenantDefaultPct, orderType, country)
 }
 
@@ -130,8 +154,7 @@ export function resolveVatPercentForCategoryAndOrderType(
   const base = normalizeCategoryVatPercent(tenantDefaultPct, 21)
 
   if (categoryOverride !== null && categoryOverride !== undefined) {
-    const explicit = normalizeCategoryVatPercent(categoryOverride, base)
-    if (explicit === 21) return explicit
+    return normalizeCategoryVatPercent(categoryOverride, base)
   }
 
   const { dineIn, offPremise } = dineInAndOffPremiseVatRates(tenantDefaultPct, country)

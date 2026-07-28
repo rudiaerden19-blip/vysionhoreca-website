@@ -32,14 +32,22 @@ describe('aggregateZReportVatFromOrderRows', () => {
 
     const agg = aggregateZReportVatFromOrderRows(orders, 6, ctx)
 
-    expect(agg.taxByRate[12]).toBeGreaterThan(0)
+    expect(agg.taxByRate[6]).toBeGreaterThan(0)
     expect(agg.taxByRate[21]).toBeGreaterThan(0)
-    expect(agg.tax_mid).toBe(agg.taxByRate[12])
     expect(agg.tax_high).toBe(agg.taxByRate[21])
     expect(Math.round((agg.subtotalExcl + agg.totalTax) * 100) / 100).toBe(10.9)
   })
 
-  it('eten ter plaatse 12% vs afhalen 6% in Z-rapport', () => {
+  it('eten ter plaatse 12% vs afhalen 6% als categorie zaak-tarief gebruikt', () => {
+    const ctxTenantFood = buildCtx(
+      [
+        { id: foodCatId, default_btw_percentage: null },
+        { id: drinkCatId, default_btw_percentage: 21 },
+      ],
+      [
+        { id: 'p-friet', name: 'Middelfriet', category_id: foodCatId },
+      ],
+    )
     const dineIn = aggregateZReportVatFromOrderRows(
       [
         {
@@ -49,7 +57,7 @@ describe('aggregateZReportVatFromOrderRows', () => {
         },
       ],
       6,
-      ctx,
+      ctxTenantFood,
     )
     const takeaway = aggregateZReportVatFromOrderRows(
       [
@@ -60,7 +68,7 @@ describe('aggregateZReportVatFromOrderRows', () => {
         },
       ],
       6,
-      ctx,
+      ctxTenantFood,
     )
     expect(dineIn.taxByRate[12]).toBeGreaterThan(0)
     expect(takeaway.taxByRate[6]).toBeGreaterThan(0)
