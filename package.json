@@ -11,6 +11,7 @@
     "test:kassa-kitchen-queue": "jest src/__tests__/lib/kitchen-queue-orders.test.ts",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
+    "audit:z-reports": "jest --testPathPatterns=z-report-audit.live --runInBand",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:no-server": "PLAYWRIGHT_SKIP_WEBSERVER=1 playwright test",
