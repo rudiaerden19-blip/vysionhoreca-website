@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
@@ -153,6 +153,27 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const [monthAmounts, setMonthAmounts] = useState<ZReportAmounts | null>(null)
   const [currentSavedReport, setCurrentSavedReport] = useState<SavedReport | null>(null)
   const [articleLines, setArticleLines] = useState<ZReportArticleLine[]>([])
+  const reconciledTenantRef = useRef(false)
+
+  useEffect(() => {
+    if (reconciledTenantRef.current) return
+    reconciledTenantRef.current = true
+    void authFetch('/api/kassa/reconcile-z-report', {
+      method: 'POST',
+      body: JSON.stringify({ tenantSlug: params.tenant }),
+    })
+      .then(async (res) => {
+        if (!res.ok) return
+        await loadSavedReports()
+        if (reportViewMode === 'month') {
+          await loadMonthReportData(selectedMonthForEmail)
+        } else {
+          await loadData()
+        }
+      })
+      .catch(() => undefined)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.tenant])
 
   useEffect(() => {
     if (reportViewMode === 'day') {
@@ -547,22 +568,50 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     const liveStatsForRow = (reportDate: string) =>
       reportViewMode === 'day' && reportDate === selectedDate && stats != null && !loading
 
-    if (archivePeriod === 'dag') return savedReports.map(r => {
-      const live = liveStatsForRow(r.report_date)
-      const onlineTotal = live ? stats!.total : (r.total || 0)
-      const count = live ? stats!.orderCount : (r.order_count || 0)
-      const kassaTotal = r.manual_total || 0
-      return {
-        label: formatShortDate(r.report_date),
-        total: onlineTotal + kassaTotal,
-        onlineTotal,
-        kassaTotal,
-        count,
-        isClosed: r.is_closed,
-        reportDate: r.report_date,
-        report: r,
-      }
+    const liveFromMonth = new Map<string, { orderCount: number; total: number }>()
+    monthDayRows.forEach((d) => {
+      liveFromMonth.set(d.date, { orderCount: d.orderCount, total: d.totalIncl })
     })
+
+    if (archivePeriod === 'dag') {
+      const savedByDate = new Map(savedReports.map((r) => [r.report_date, r]))
+      const allDates = new Set<string>([
+        ...savedByDate.keys(),
+        ...liveFromMonth.keys(),
+      ])
+      if (stats && selectedDate) allDates.add(selectedDate)
+
+      return Array.from(allDates)
+        .sort((a, b) => b.localeCompare(a))
+        .map((reportDate) => {
+          const r = savedByDate.get(reportDate)
+          const monthLive = liveFromMonth.get(reportDate)
+          const dayLive = liveStatsForRow(reportDate) ? stats! : null
+
+          const onlineTotal = dayLive
+            ? dayLive.total
+            : monthLive
+              ? monthLive.total
+              : (r?.total || 0)
+          const count = dayLive
+            ? dayLive.orderCount
+            : monthLive
+              ? monthLive.orderCount
+              : (r?.order_count || 0)
+          const kassaTotal = r?.manual_total || 0
+
+          return {
+            label: formatShortDate(reportDate),
+            total: onlineTotal + kassaTotal,
+            onlineTotal,
+            kassaTotal,
+            count,
+            isClosed: r?.is_closed,
+            reportDate,
+            report: r ?? null,
+          }
+        })
+    }
 
     const groups: Record<string, { label: string; total: number; onlineTotal: number; kassaTotal: number; count: number; reports: SavedReport[] }> = {}
 
