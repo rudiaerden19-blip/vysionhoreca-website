@@ -8,6 +8,7 @@ import {
   sumZReportMonthAmounts,
   type ZReportMonthDayRow,
 } from '@/lib/z-report-month'
+import { getZRapportDateBounds } from '@/lib/belgium-date-bounds'
 import type { ZReportVatContext } from '@/lib/z-report-vat-context'
 
 const emptyVatContext: ZReportVatContext = {
@@ -24,6 +25,32 @@ describe('fiscalReportDateForOrderCreatedAt', () => {
 
   it('retourneert null voor ongeldige datum', () => {
     expect(fiscalReportDateForOrderCreatedAt('invalid')).toBeNull()
+  })
+
+  it('werkdag 23/05: bon na middernacht 24/05 vóór 12:00 hoort bij 23/05', () => {
+    expect(fiscalReportDateForOrderCreatedAt('2026-05-23T22:00:00.000Z')).toBe('2026-05-23')
+    expect(fiscalReportDateForOrderCreatedAt('2026-05-24T08:00:00.000Z')).toBe('2026-05-23')
+    expect(fiscalReportDateForOrderCreatedAt('2026-05-24T09:00:00.000Z')).toBe('2026-05-23')
+  })
+
+  it('vanaf 12:00 op kalenderdag hoort bij die werkdag', () => {
+    expect(fiscalReportDateForOrderCreatedAt('2026-05-24T10:00:00.000Z')).toBe('2026-05-24')
+    expect(fiscalReportDateForOrderCreatedAt('2026-05-24T12:00:00.000Z')).toBe('2026-05-24')
+  })
+
+  it('komt overeen met getZRapportDateBounds voor werkdag 23/05/2026', () => {
+    const bounds = getZRapportDateBounds('2026-05-23')
+    const samples = [
+      '2026-05-23T21:00:00.000Z',
+      '2026-05-23T22:00:00.000Z',
+      '2026-05-24T06:00:00.000Z',
+      '2026-05-24T09:00:00.000Z',
+    ]
+    for (const iso of samples) {
+      const t = new Date(iso)
+      expect(t >= new Date(bounds.startUTC) && t <= new Date(bounds.endUTC)).toBe(true)
+      expect(fiscalReportDateForOrderCreatedAt(iso)).toBe('2026-05-23')
+    }
   })
 })
 

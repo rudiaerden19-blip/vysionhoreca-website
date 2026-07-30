@@ -39,17 +39,38 @@ function round2(n: number): number {
   return Math.round(n * 100) / 100
 }
 
-/** Fiscale rapportdatum voor een order (00:00 – +1dag 12:00). */
+function brusselsHour(utc: Date): number {
+  return Number(
+    utc.toLocaleString('en-GB', {
+      timeZone: 'Europe/Brussels',
+      hour: 'numeric',
+      hour12: false,
+    }),
+  )
+}
+
+/**
+ * Fiscale werkdag voor een order — zelfde als dag-Z-rapport (`getZRapportDateBounds`).
+ * Werkdag X = X 00:00 t/m X+1 12:00 (Europe/Brussels). Bonnen na middernacht vóór 12:00
+ * horen bij de vorige werkdag, niet bij de nieuwe kalenderdag.
+ */
 export function fiscalReportDateForOrderCreatedAt(createdAt: string): string | null {
   const t = new Date(createdAt)
   if (Number.isNaN(t.getTime())) return null
+
   const center = getBelgiumDateString(t)
-  const candidates = [center, addDaysToBelgiumYMD(center, -1), addDaysToBelgiumYMD(center, 1)]
-  for (const ymd of candidates) {
-    const { startUTC, endUTC } = getZRapportDateBounds(ymd)
-    if (t >= new Date(startUTC) && t <= new Date(endUTC)) return ymd
+  const hour = brusselsHour(t)
+  const fiscalYmd = hour < 12 ? addDaysToBelgiumYMD(center, -1) : center
+
+  const { startUTC, endUTC } = getZRapportDateBounds(fiscalYmd)
+  if (t >= new Date(startUTC) && t <= new Date(endUTC)) return fiscalYmd
+
+  for (const ymd of [addDaysToBelgiumYMD(center, -1), center, addDaysToBelgiumYMD(center, 1)]) {
+    const b = getZRapportDateBounds(ymd)
+    if (t >= new Date(b.startUTC) && t <= new Date(b.endUTC)) return ymd
   }
-  return center
+
+  return fiscalYmd
 }
 
 export function getLastDayOfMonthYmd(yearMonth: string): string {
