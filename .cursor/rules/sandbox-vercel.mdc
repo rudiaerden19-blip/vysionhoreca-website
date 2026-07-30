@@ -18,17 +18,29 @@ Einde van de taak (tenzij de gebruiker expliciet zegt *niet* te committen/pushen
 1. **`git status`** — alle relevante bestanden meenemen.
 2. **`npx tsc --noEmit`** als er TypeScript-wijzigingen zijn — voorkom kapotte `main`.
 3. **`git commit`** — duidelijke boodschap (wat + waarom).
-4. **`git push origin`** (huidige branch, meestal `main`).
+4. **`git push origin main`** — **altijd `main`**, nooit alleen een feature-branch laten hangen.
 
-**Deploy:** push naar GitHub triggert **Vercel** (production en/of preview). **Niet vergeten:** altijd pushen na commit zodat alle tenants dezelfde nieuwe build krijgen.
+**Deploy:** alleen een push/merge op **`main`** is **Production** voor alle tenants. Een push op `cursor/…` of een open PR-branch geeft **Preview** — dat is **niet** productie.
 
-**Uitzonderingen:** geen commit bij puur uitleg/lezen zonder bestandswijzigingen; geen lege commits.
+## 🚨 EIGENAAR: ALTIJD PRODUCTION — GEEN PREVIEW-DEPLOYS VOOR FIXES
 
-## Sandbox = preview
+**Vaste opdracht (eigenaar):** wijzigingen die live moeten (kassa, Z-rapport, BTW, alle tenants) **nooit** alleen op een preview-branch laten. Workflow:
 
-- Controleer in Vercel dat een deployment **loopt of klaar** is na de push.
-- Gebruik de **preview-URL** (PR-branch of push) om te testen waar dat past.
-- **`npx vercel`** alleen als extra nodig (geen gekoppelde repo, of gebruiker vraagt expliciet om CLI-deploy).
+1. Werk op `main` **of** merge onmiddellijk naar `main` vóór de taak als «klaar» wordt gemeld.
+2. **`git push origin main`** — controleer in Vercel dat de deployment **Production** is (niet Preview).
+3. Geen «klaar» melden zolang alleen een Preview-deployment draait.
+4. Feature-branches/PR's zijn oké als tussenstap, maar **merge naar `main` is verplicht** — preview is geen deliverable.
+
+**Uitzondering:** expliciete GKS-preview-branch (`gks/…`) alleen als de eigenaar dat in dezelfde opdracht vraagt.
+
+**Deploy:** push naar GitHub triggert Vercel. **Production = `main` alleen.**
+
+**Uitzonderingen commit:** geen commit bij puur uitleg/lezen zonder bestandswijzigingen; geen lege commits.
+
+## Sandbox / preview (alleen intern testen)
+
+- Preview-URL's zijn **niet** productie — niet als «live» aan de eigenaar presenteren.
+- Na merge op `main`: controleer **Production** deployment in Vercel.
 
 ## Niet doen
 
