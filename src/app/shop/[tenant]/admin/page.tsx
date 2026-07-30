@@ -13,6 +13,8 @@ import {
   orderCountsTowardRevenueAndZReport,
   type Order,
 } from '@/lib/admin-api'
+import { getDateBoundsForBelgium, getBelgiumDateString } from '@/lib/belgium-date-bounds'
+import { getDashboardFiscalPeriodStats } from '@/lib/revenue-fiscal-stats'
 import PinGate from '@/components/PinGate'
 import { useTenantModuleFlagsContext } from '@/lib/tenant-module-flags-context'
 import {
@@ -122,13 +124,8 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
     }
 
     const today = new Date()
-    today.setHours(0, 0, 0, 0)
-
-    const yesterday = new Date(today)
-    yesterday.setDate(yesterday.getDate() - 1)
-
-    const weekAgo = new Date(today)
-    weekAgo.setDate(weekAgo.getDate() - 7)
+    const brusselsToday = getBelgiumDateString(today)
+    const { startUTC: pendingSinceUtc } = getDateBoundsForBelgium(brusselsToday)
 
     const loadOrders = tenantShouldLoadOrderDashboardData(access)
     const loadPopular = tenantShouldLoadPopularItemsStats(access)
@@ -149,32 +146,18 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
         params.tenant,
       )) as unknown as Order[]
 
-      const paidOrders = allOrdersList.filter((o) => orderCountsTowardRevenueAndZReport(o))
-
-      const todayOrders = paidOrders.filter(
-        (o) => o.created_at && new Date(o.created_at) >= today,
-      )
-      todayOrdersCount = todayOrders.length
-      todayRevenue = todayOrders.reduce((sum, o) => sum + (o.total || 0), 0)
-
-      const yesterdayOrders = paidOrders.filter((o) => {
-        if (!o.created_at) return false
-        const date = new Date(o.created_at)
-        return date >= yesterday && date < today
-      })
-      yesterdayOrdersCount = yesterdayOrders.length
-      yesterdayRevenue = yesterdayOrders.reduce((sum, o) => sum + (o.total || 0), 0)
-
-      const weekOrders = paidOrders.filter(
-        (o) => o.created_at && new Date(o.created_at) >= weekAgo,
-      )
-      weekOrdersCount = weekOrders.length
-      weekRevenue = weekOrders.reduce((sum, o) => sum + (o.total || 0), 0)
+      const fiscalStats = getDashboardFiscalPeriodStats(allOrdersList, today)
+      todayOrdersCount = fiscalStats.todayOrders
+      todayRevenue = fiscalStats.todayRevenue
+      yesterdayOrdersCount = fiscalStats.yesterdayOrders
+      yesterdayRevenue = fiscalStats.yesterdayRevenue
+      weekOrdersCount = fiscalStats.weekOrders
+      weekRevenue = fiscalStats.weekRevenue
 
       pendingOrders = allOrdersList.filter((o) => {
         if (!isActiveTenantOrderStatus(o.status)) return false
         if (!o.created_at) return false
-        return new Date(o.created_at) >= today
+        return new Date(o.created_at) >= new Date(pendingSinceUtc)
       }).length
 
       recentOrdersData = allOrdersList.slice(0, 5).map((o) => ({
@@ -190,6 +173,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
 
       if (loadPopular) {
         const itemCounts: Record<string, number> = {}
+        const paidOrders = allOrdersList.filter((o) => orderCountsTowardRevenueAndZReport(o))
         paidOrders.forEach((order) => {
           const items = order.items || []
           items.forEach((item: { product_name?: string; name?: string; quantity?: number }) => {

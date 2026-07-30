@@ -10,6 +10,7 @@ import { adminDb } from './admin-db-client'
 // (light routes import that module directly to avoid pulling in admin-api).
 import {
   addDaysToBelgiumYMD,
+  fiscalReportDateForOrderCreatedAt,
   getBelgiumDateString,
   getDateBoundsForBelgium,
   getZRapportDateBounds,
@@ -101,6 +102,15 @@ export {
 }
 
 import { fetchAllOrdersInCreatedAtRange } from './admin-api-order-operations'
+import {
+  aggregateRevenueByFiscalDay,
+  fetchRangeUtcForFiscalDays,
+  filterOrdersInFiscalMonth,
+  getCurrentFiscalReportDate,
+  getDashboardFiscalPeriodStats,
+  listFiscalDaysEndingAt,
+  monthBoundsUtcForYearMonth,
+} from './revenue-fiscal-stats'
 
 export {
   fetchAllOrdersInCreatedAtRange,
@@ -1219,37 +1229,79 @@ export interface SalesStats {
 
 export async function getSalesStats(tenantSlug: string, period: 'today' |  'week' |  'month' |  'year'): Promise<SalesStats> {
   const now = new Date()
-  let startDate: Date
-  
+  let startUTC: string
+  let endUTC: string
+
   switch (period) {
-    case 'today':
-      startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    case 'today': {
+      const fiscal = getCurrentFiscalReportDate(now)
+      const bounds = getZRapportDateBounds(fiscal)
+      startUTC = bounds.startUTC
+      endUTC = bounds.endUTC
       break
-    case 'week':
-      startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+    }
+    case 'week': {
+      const fiscalDays = listFiscalDaysEndingAt(getCurrentFiscalReportDate(now), 7)
+      const range = fetchRangeUtcForFiscalDays(fiscalDays)
+      startUTC = range.startUTC
+      endUTC = range.endUTC
       break
-    case 'month':
-      startDate = new Date(now.getFullYear(), now.getMonth(), 1)
+    }
+    case 'month': {
+      const bounds = monthBoundsUtcForYearMonth(now.getFullYear(), now.getMonth() + 1)
+      startUTC = bounds.startUTC
+      endUTC = bounds.endUTC
       break
-    case 'year':
-      startDate = new Date(now.getFullYear(), 0, 1)
+    }
+    case 'year': {
+      const y = now.getFullYear()
+      const bounds = monthBoundsUtcForYearMonth(y, 12)
+      const jan = getZRapportDateBounds(`${y}-01-01`)
+      startUTC = jan.startUTC
+      endUTC = bounds.endUTC
       break
+    }
   }
-  
-  const endISO = now.toISOString()
+
   const raw = await fetchAllOrdersInCreatedAtRange(
     supabase,
     tenantSlug,
-    startDate.toISOString(),
-    endISO,
-    'total, status, order_type, payment_status'
+    startUTC,
+    endUTC,
+    'total, status, order_type, payment_status, created_at'
   )
 
-  const data = raw.filter((o) =>
+  const counted = raw.filter((o) =>
     orderCountsTowardRevenueAndZReport(
       o as Pick<Order, 'order_type' |  'status' |  'payment_status'>
     )
-  ) as Array<Pick<Order, 'total' |  'status' |  'order_type' |  'payment_status'>>
+  )
+
+  let data = counted
+  if (period === 'today') {
+    const fiscal = getCurrentFiscalReportDate(now)
+    data = counted.filter(
+      (o) => fiscalReportDateForOrderCreatedAt(String((o as { created_at?: string }).created_at || '')) === fiscal,
+    )
+  } else if (period === 'week') {
+    const fiscalSet = new Set(listFiscalDaysEndingAt(getCurrentFiscalReportDate(now), 7))
+    data = counted.filter((o) => {
+      const fd = fiscalReportDateForOrderCreatedAt(String((o as { created_at?: string }).created_at || ''))
+      return fd && fiscalSet.has(fd)
+    })
+  } else if (period === 'month') {
+    const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+    data = counted.filter((o) => {
+      const fd = fiscalReportDateForOrderCreatedAt(String((o as { created_at?: string }).created_at || ''))
+      return fd?.startsWith(ym)
+    })
+  } else {
+    const y = String(now.getFullYear())
+    data = counted.filter((o) => {
+      const fd = fiscalReportDateForOrderCreatedAt(String((o as { created_at?: string }).created_at || ''))
+      return fd?.startsWith(y)
+    })
+  }
 
   const total_orders = data.length
   const total_revenue = data.reduce((sum, o) => sum + (Number(o.total) || 0), 0)
@@ -1265,47 +1317,24 @@ export async function getSalesStats(tenantSlug: string, period: 'today' |  'week
 }
 
 export async function getDailyRevenue(tenantSlug: string, days: number = 7): Promise<{ date: string; revenue: number; orders: number }[]> {
-  const startDate = new Date()
-  startDate.setDate(startDate.getDate() - days)
-  
-  const endNow = new Date()
+  const now = new Date()
+  const fiscalDays = listFiscalDaysEndingAt(getCurrentFiscalReportDate(now), days)
+  const { startUTC, endUTC } = fetchRangeUtcForFiscalDays(fiscalDays)
+
   const raw = await fetchAllOrdersInCreatedAtRange(
     supabase,
     tenantSlug,
-    startDate.toISOString(),
-    endNow.toISOString(),
+    startUTC,
+    endUTC,
     'total, created_at, status, order_type, payment_status'
   )
 
-  const data = raw.filter((o) =>
-    orderCountsTowardRevenueAndZReport(
-      o as Pick<Order, 'order_type' |  'status' |  'payment_status'>
-    )
-  ) as Array<Pick<Order, 'total' |  'created_at' |  'status' |  'order_type' |  'payment_status'>>
+  const byDay = aggregateRevenueByFiscalDay(raw)
 
-  // Group by date
-  const dailyData: Record<string, { revenue: number; orders: number }> = {}
-
-  for (let i = 0; i < days; i++) {
-    const date = new Date()
-    date.setDate(date.getDate() - i)
-    const dateKey = date.toISOString().split('T')[0]
-    dailyData[dateKey] = { revenue: 0, orders: 0 }
-  }
-
-  data.forEach(order => {
-    const ca = order.created_at
-    if (!ca) return
-    const dateKey = String(ca).split('T')[0]
-    if (dailyData[dateKey]) {
-      dailyData[dateKey].revenue += order.total || 0
-      dailyData[dateKey].orders += 1
-    }
+  return fiscalDays.map((date) => {
+    const stats = byDay.get(date) ?? { revenue: 0, orders: 0 }
+    return { date, revenue: stats.revenue, orders: stats.orders }
   })
-  
-  return Object.entries(dailyData)
-    .map(([date, stats]) => ({ date, ...stats }))
-    .sort((a, b) => a.date.localeCompare(b.date))
 }
 
 export async function getTopProducts(tenantSlug: string, period: 'week' |  'month' |  'year'= 'month'): Promise<{ name: string; sales: number; revenue: number }[]> {
@@ -2040,17 +2069,8 @@ export async function calculateMonthlyReport(
   year: number, 
   month: number
 ): Promise<MonthlyReport> {
-  const startDateStr = `${year}-${String(month).padStart(2, '0')}-01`
-  const lastDay = new Date(year, month, 0).getDate() // Last day of month
-  const endDateStr = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
-  
-  // KRITIEK: Gebruik Belgium timezone voor correcte maand grenzen
-  const { startUTC } = getDateBoundsForBelgium(startDateStr)
-  const { endUTC } = getDateBoundsForBelgium(endDateStr)
-  
-  // 1. Omzet uit orders-tabel (zelfde regels als dashboard / Z-rapport / rapporten).
-  //    payment_status MOET in .select: voor POS (DINE_IN/TAKEAWAY/DELIVERY) is orderCountsTowardRevenueAndZReport
-  //    afhankelijk van payment_status === 'paid'. Zonder veld vielen alle kassa-orders weg → lege bedrijfsanalyse.
+  const { startUTC, endUTC, yearMonth } = monthBoundsUtcForYearMonth(year, month)
+
   const ordersDataRaw = await fetchAllOrdersInCreatedAtRange(
     supabase,
     tenantSlug,
@@ -2059,11 +2079,7 @@ export async function calculateMonthlyReport(
     'total, status, payment_method, payment_split_cash, payment_split_card, order_type, payment_status, created_at'
   )
 
-  const ordersData = ordersDataRaw.filter((o) =>
-    orderCountsTowardRevenueAndZReport(
-      o as Pick<Order, 'order_type' |  'status' |  'payment_status'>
-    )
-  )
+  const ordersData = filterOrdersInFiscalMonth(ordersDataRaw, yearMonth)
 
   const onlineOrderRows = ordersData.filter((o) => isWebshopOrder(o))
   const kassaOrderRows = ordersData.filter((o) => isKassaPosOrder(o))
@@ -2074,30 +2090,24 @@ export async function calculateMonthlyReport(
   const kassaRevenueFromOrders = kassaOrderRows.reduce((sum, o) => sum + (Number(o.total) || 0), 0)
   const kassaOrdersFromOrders = kassaOrderRows.length
 
-  /** Brussels kalenderdag → POS die meetelt voor analyse (geen dubbeltelling met daily_sales). */
-  const kassaOrderRevenueByBelgiumDay = new Map<string, number>()
-  const kassaOrderCountByBelgiumDay = new Map<string, number>()
+  /** Fiscale werkdag → POS (zelfde als Z-rapport; geen dubbeltelling met daily_sales). */
+  const kassaOrderRevenueByFiscalDay = new Map<string, number>()
+  const kassaOrderCountByFiscalDay = new Map<string, number>()
   for (const o of kassaOrderRows) {
-    const raw = o as Record<string, unknown>
-    const created = raw.created_at
-    const ts =
-      typeof created === 'string' && created.length > 0 ? Date.parse(created) : Number.NaN
-    if (!Number.isFinite(ts)) continue
-    const day = getBelgiumDateString(new Date(ts))
-    const total = Number(raw.total) || 0
-    kassaOrderRevenueByBelgiumDay.set(day, (kassaOrderRevenueByBelgiumDay.get(day) ?? 0) + total)
-    kassaOrderCountByBelgiumDay.set(day, (kassaOrderCountByBelgiumDay.get(day) ?? 0) + 1)
+    const fiscal = fiscalReportDateForOrderCreatedAt(String(o.created_at || ''))
+    if (!fiscal) continue
+    const total = Number(o.total) || 0
+    kassaOrderRevenueByFiscalDay.set(fiscal, (kassaOrderRevenueByFiscalDay.get(fiscal) ?? 0) + total)
+    kassaOrderCountByFiscalDay.set(fiscal, (kassaOrderCountByFiscalDay.get(fiscal) ?? 0) + 1)
   }
 
-  // 2. Handmatige kassa-dagtotalen (daily_sales): alleen voor dagen zonder meetellende POS-order(s).
-  //    Anders dubbelt het met stap 1 — typisch zelfde omzet uit kassa én uit «Kassa omzet invoeren».
   const dailySales = await getDailySales(tenantSlug, year, month)
   let kassaRevenueFromManual = 0
   let kassaOrdersFromManual = 0
   for (const d of dailySales) {
     const day = d.date
-    const revDay = kassaOrderRevenueByBelgiumDay.get(day) ?? 0
-    const cntDay = kassaOrderCountByBelgiumDay.get(day) ?? 0
+    const revDay = kassaOrderRevenueByFiscalDay.get(day) ?? 0
+    const cntDay = kassaOrderCountByFiscalDay.get(day) ?? 0
     if (revDay > 0 || cntDay > 0) continue
     kassaRevenueFromManual += Number(d.total_revenue) || 0
     kassaOrdersFromManual += Number(d.order_count) || 0

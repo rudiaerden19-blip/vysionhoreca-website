@@ -101,3 +101,8 @@ export function lastCompletedFiscalReportDate(now: Date = new Date()): string {
   const hour = brusselsHour(now)
   return hour >= 12 ? addDaysToBelgiumYMD(center, -1) : addDaysToBelgiumYMD(center, -2)
 }
+
+/** Fiscale werkdag die `now` bevat — zelfde label als Z-rapport / bonnen. */
+export function getCurrentFiscalReportDate(now: Date = new Date()): string {
+  return fiscalReportDateForOrderCreatedAt(now.toISOString()) ?? getBelgiumDateString(now)
+}
