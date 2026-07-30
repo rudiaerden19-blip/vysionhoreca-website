@@ -3,7 +3,6 @@
  */
 
 import {
-  distributeOrderPaymentForZRaport,
   orderCountsTowardRevenueAndZReport,
   type Order,
 } from '@/lib/admin-api'
@@ -15,19 +14,19 @@ import {
 } from '@/lib/belgium-date-bounds'
 
 export { fiscalReportDateForOrderCreatedAt }
-import {
-  aggregateZReportVatFromOrderRows,
-  type CategoryVatPercent,
-  type ZReportVatOrderSlice,
-} from '@/lib/order-vat'
+import type { CategoryVatPercent } from '@/lib/order-vat'
 import type { ZReportAmounts } from '@/lib/z-report-document'
 import type { ZReportVatContext } from '@/lib/z-report-vat-context'
+import { buildZReportDayAmountsFromOrders, type ZReportManualExtras } from '@/lib/z-report-day-builder'
 
 export type ZReportMonthDayRow = {
   date: string
   orderCount: number
   subtotalExcl: number
+  /** Som bonnen/orders — gelijk aan dag-Z scherm. */
   totalIncl: number
+  /** Handmatige invoer (witte kassa buiten Vysion), apart van bonnen. */
+  manualIncl?: number
   taxByRate: Record<CategoryVatPercent, number>
   baseByRate: Record<CategoryVatPercent, number>
   cashPayments: number
@@ -101,12 +100,7 @@ export function sumZReportMonthAmounts(days: ZReportMonthDayRow[]): ZReportAmoun
   }
 }
 
-type ManualDayExtras = {
-  cash?: number
-  card?: number
-  online?: number
-  total?: number
-}
+type ManualDayExtras = ZReportManualExtras
 
 function buildDayRowFromOrders(
   date: string,
@@ -115,61 +109,21 @@ function buildDayRowFromOrders(
   vatContext: ZReportVatContext,
   manual?: ManualDayExtras | null,
 ): ZReportMonthDayRow | null {
-  let cashPayments = 0
-  let cardPayments = 0
-  let onlinePayments = 0
-  let orderTotal = 0
+  const amounts = buildZReportDayAmountsFromOrders(dayOrders, tenantDefaultBtw, vatContext, manual)
 
-  for (const order of dayOrders) {
-    orderTotal = round2(orderTotal + (Number(order.total) || 0))
-    const d = distributeOrderPaymentForZRaport(order)
-    cashPayments = round2(cashPayments + d.cash)
-    cardPayments = round2(cardPayments + d.card)
-    onlinePayments = round2(onlinePayments + d.online)
-  }
-
-  const manualTotal = round2(Number(manual?.total) || 0)
-  if (manualTotal > 0) {
-    cashPayments = round2(cashPayments + (Number(manual?.cash) || 0))
-    cardPayments = round2(cardPayments + (Number(manual?.card) || 0))
-    onlinePayments = round2(onlinePayments + (Number(manual?.online) || 0))
-    orderTotal = round2(orderTotal + manualTotal)
-  }
-
-  if (dayOrders.length === 0 && manualTotal <= 0) return null
-
-  const vatSlice: ZReportVatOrderSlice[] = dayOrders.map((o) => ({
-    total: o.total,
-    items: (o as { items?: unknown }).items,
-    order_type: o.order_type,
-  }))
-
-  const vatAgg = aggregateZReportVatFromOrderRows(vatSlice, tenantDefaultBtw, vatContext)
-  const taxByRate = { ...vatAgg.taxByRate }
-  const baseByRate = { ...vatAgg.baseByRate }
-
-  let subtotalExcl = vatAgg.subtotalExcl
-  const totalIncl = orderTotal
-
-  if (manualTotal > 0 && dayOrders.length === 0) {
-    const fb = tenantDefaultBtw === 9 ? 9 : tenantDefaultBtw === 21 ? 21 : 6
-    const base = round2(manualTotal / (1 + fb / 100))
-    const tax = round2(manualTotal - base)
-    taxByRate[fb as CategoryVatPercent] = round2((taxByRate[fb as CategoryVatPercent] || 0) + tax)
-    baseByRate[fb as CategoryVatPercent] = round2((baseByRate[fb as CategoryVatPercent] || 0) + base)
-    subtotalExcl = round2(subtotalExcl + base)
-  }
+  if (amounts.orderCount === 0 && amounts.manualTotalIncl <= 0) return null
 
   return {
     date,
-    orderCount: dayOrders.length,
-    subtotalExcl,
-    totalIncl,
-    taxByRate,
-    baseByRate,
-    cashPayments,
-    cardPayments,
-    onlinePayments,
+    orderCount: amounts.orderCount,
+    subtotalExcl: amounts.subtotalExcl,
+    totalIncl: amounts.orderTotalIncl,
+    manualIncl: amounts.manualTotalIncl > 0 ? amounts.manualTotalIncl : undefined,
+    taxByRate: amounts.taxByRate,
+    baseByRate: amounts.baseByRate,
+    cashPayments: amounts.cashPayments,
+    cardPayments: amounts.cardPayments,
+    onlinePayments: amounts.onlinePayments,
   }
 }
 

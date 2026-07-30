@@ -14,6 +14,7 @@ import {
 import type { ZReportAmounts } from '@/lib/z-report-document'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { CATEGORY_VAT_PERCENT_OPTIONS, type CategoryVatPercent } from '@/lib/order-vat'
+import { buildZReportMonthFromSupabase } from '@/lib/z-report-month-server'
 
 function coerceMoney(raw: unknown): number {
   const n = typeof raw === 'number' ? raw : typeof raw === 'string' ? parseFloat(raw) : NaN
@@ -135,7 +136,28 @@ export async function POST(request: NextRequest) {
 
     const days = sanitizeDayRows(rawDays)
     const amounts = sanitizeAmounts(rawAmounts)
-    if (!amounts || days.length === 0) {
+
+    const supabase = getServerSupabaseClient()
+    let serverDays = days
+    let serverAmounts = amounts
+
+    if (supabase) {
+      try {
+        const rebuilt = await buildZReportMonthFromSupabase(supabase, tenantSlug, ym)
+        if (rebuilt.days.length > 0 && rebuilt.amounts) {
+          serverDays = rebuilt.days
+          serverAmounts = rebuilt.amounts
+        }
+      } catch (rebuildErr) {
+        logger.warn('send-z-report-month: server rebuild failed, using client payload', {
+          requestId,
+          tenantSlug,
+          error: rebuildErr instanceof Error ? rebuildErr.message : String(rebuildErr),
+        })
+      }
+    }
+
+    if (!serverAmounts || serverDays.length === 0) {
       return NextResponse.json({ error: 'Geen omzet in deze maand om te versturen' }, { status: 400 })
     }
 
@@ -178,8 +200,8 @@ export async function POST(request: NextRequest) {
       businessAddress: businessAddress || '',
       btwNumber: btwNumber || '',
       monthLabel: monthLabel || ym,
-      amounts,
-      days,
+      amounts: serverAmounts,
+      days: serverDays,
       labels,
       generatedAtNl: new Date().toLocaleString('nl-NL'),
     })
@@ -191,7 +213,6 @@ export async function POST(request: NextRequest) {
       html: htmlContent,
     })
 
-    const supabase = getServerSupabaseClient()
     if (supabase) {
       const { data: settings } = await supabase
         .from('tenant_settings')

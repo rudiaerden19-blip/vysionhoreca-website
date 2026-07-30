@@ -93,3 +93,13 @@ export function fiscalReportDateForOrderCreatedAt(createdAt: string): string | n
 
   return fiscalYmd
 }
+
+/**
+ * Laatste **afgesloten** fiscale werkdag (Europe/Brussels).
+ * Fiscale dag D sluit om D+1 12:00 — cron/archive moet niet de kalenderdag gebruiken.
+ */
+export function lastCompletedFiscalReportDate(now: Date = new Date()): string {
+  const center = getBelgiumDateString(now)
+  const hour = brusselsHour(now)
+  return hour >= 12 ? addDaysToBelgiumYMD(center, -1) : addDaysToBelgiumYMD(center, -2)
+}

@@ -7,7 +7,7 @@ import {
   sumZReportMonthAmounts,
   type ZReportMonthDayRow,
 } from '@/lib/z-report-month'
-import { fiscalReportDateForOrderCreatedAt, getZRapportDateBounds } from '@/lib/belgium-date-bounds'
+import { fiscalReportDateForOrderCreatedAt, getZRapportDateBounds, lastCompletedFiscalReportDate } from '@/lib/belgium-date-bounds'
 import type { ZReportVatContext } from '@/lib/z-report-vat-context'
 
 const emptyVatContext: ZReportVatContext = {
@@ -50,6 +50,14 @@ describe('fiscalReportDateForOrderCreatedAt', () => {
       expect(t >= new Date(bounds.startUTC) && t <= new Date(bounds.endUTC)).toBe(true)
       expect(fiscalReportDateForOrderCreatedAt(iso)).toBe('2026-05-23')
     }
+  })
+
+  it('lastCompletedFiscalReportDate: vóór 12:00 hoort laatste afgesloten dag 2 dagen terug op kalender', () => {
+    expect(lastCompletedFiscalReportDate(new Date('2026-05-24T06:00:00.000Z'))).toBe('2026-05-22')
+  })
+
+  it('lastCompletedFiscalReportDate: na 12:00 is gisteren fiscaal afgesloten', () => {
+    expect(lastCompletedFiscalReportDate(new Date('2026-05-24T14:00:00.000Z'))).toBe('2026-05-23')
   })
 })
 

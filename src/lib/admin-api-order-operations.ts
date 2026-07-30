@@ -7,8 +7,11 @@ import {
   orderCountsTowardRevenueAndZReport,
   type Order,
 } from './admin-api-order-helpers'
-import { aggregateZReportVatFromOrderRows } from './order-vat'
 import { fetchZReportVatContextFromSupabase } from './z-report-vat-context'
+import {
+  buildZReportDayAmountsFromOrders,
+  zReportDayHashPayload,
+} from './z-report-day-builder'
 
 // =====================================================
 // ORDERS / BESTELLINGEN — types & pure helpers: `./admin-api-order-helpers`
@@ -265,26 +268,9 @@ export async function regenerateZReportForDate(
       'id, total, payment_method, payment_split_cash, payment_split_card, order_type, status, payment_status, items'
     )
 
-    const orders = ordersRaw.filter((o) =>
-      orderCountsTowardRevenueAndZReport(
-        o as Pick<Order, 'order_type' |  'status' |  'payment_status'>
-      )
-    ) as Array<
-      Pick<
-        Order,
-        | 'id'
-        | 'total'
-        | 'items'
-        | 'payment_method'
-        | 'payment_split_cash'
-        | 'payment_split_card'
-        | 'order_type'
-        | 'status'
-        | 'payment_status'
-      > & { id: string }
-    >
+    const orders = ordersRaw as unknown as Order[]
 
-    console.log(`regenerateZReportForDate: ${orders?.length || 0} orders voor rapport`)
+    console.log(`regenerateZReportForDate: ${ordersRaw?.length || 0} orders in venster`)
 
     const { data: settings } = await client
       .from('tenant_settings')
@@ -293,144 +279,52 @@ export async function regenerateZReportForDate(
       .single()
 
     const btwPercentage = settings?.btw_percentage || 6
-
-    if (!orders || orders.length === 0) {
-      const hashInput = JSON.stringify({
-        tenant: tenantSlug,
-        date: date,
-        orderCount: 0,
-        total: 0,
-        orderIds: [] as string[],
-        version: 'v1',
-      })
-      const reportHash = await generateSimpleHash(hashInput)
-
-      const { error: clearError } = await client.from('z_reports').upsert(
-        {
-          tenant_slug: tenantSlug,
-          report_date: date,
-          order_count: 0,
-          subtotal: 0,
-          tax_low: 0,
-          tax_mid: 0,
-          tax_high: 0,
-          total: 0,
-          cash_payments: 0,
-          card_payments: 0,
-          online_payments: 0,
-          btw_percentage: btwPercentage,
-          business_name: settings?.business_name,
-          business_address: settings?.address,
-          btw_number: settings?.btw_number,
-          order_ids: [],
-          report_hash: reportHash,
-          generated_at: new Date().toISOString(),
-        },
-        { onConflict: 'tenant_slug,report_date', ignoreDuplicates: false },
-      )
-
-      if (clearError) {
-        console.error('regenerateZReportForDate: Fout bij leegmaken:', clearError)
-      } else {
-        console.log(`regenerateZReportForDate: Z-rapport ${date} op 0 gezet voor ${tenantSlug}`)
-      }
-      return
-    }
-
-    let total = 0
-    let cashPayments = 0
-    let onlinePayments = 0
-    let cardPayments = 0
-    const orderIds: string[] = []
-
-    orders.forEach((order) => {
-      orderIds.push(order.id)
-      const orderTotal = Number(order.total) || 0
-      total += orderTotal
-
-      const d = distributeOrderPaymentForZRaport(order)
-      cashPayments += d.cash
-      cardPayments += d.card
-      onlinePayments += d.online
-    })
-
-    total = Math.round(total * 100) / 100
-
     const vatContext = await fetchZReportVatContextFromSupabase(client, tenantSlug)
 
-    const vatAgg = aggregateZReportVatFromOrderRows(
-      orders.map((o) => ({ total: o.total, items: o.items, order_type: o.order_type })),
-      btwPercentage,
-      vatContext,
+    const amounts = buildZReportDayAmountsFromOrders(orders, btwPercentage, vatContext)
+
+    const reportHash = await generateSimpleHash(
+      zReportDayHashPayload(tenantSlug, date, amounts),
     )
-    const subtotal = vatAgg.subtotalExcl
 
-    const hashInput = JSON.stringify({
-      tenant: tenantSlug,
-      date: date,
-      orderCount: orders.length,
-      total: Math.round(total * 100),
-      orderIds: orderIds.sort(),
-      version: 'v1',
-    })
-    const reportHash = await generateSimpleHash(hashInput)
+    const upsertPayload = {
+      tenant_slug: tenantSlug,
+      report_date: date,
+      order_count: amounts.orderCount,
+      subtotal: amounts.subtotalExcl,
+      tax_low: amounts.tax_low,
+      tax_mid: amounts.tax_mid,
+      tax_high: amounts.tax_high,
+      total: amounts.orderTotalIncl,
+      cash_payments: amounts.cashPayments,
+      card_payments: amounts.cardPayments,
+      online_payments: amounts.onlinePayments,
+      btw_percentage: btwPercentage,
+      business_name: settings?.business_name,
+      business_address: settings?.address,
+      btw_number: settings?.btw_number,
+      order_ids: amounts.orderIds,
+      report_hash: reportHash,
+      generated_at: new Date().toISOString(),
+    }
 
-    console.log(`regenerateZReportForDate: Upsert z_report voor ${tenantSlug}, ${date}, total: €${total.toFixed(2)}`)
+    console.log(
+      `regenerateZReportForDate: Upsert ${tenantSlug} ${date}: ${amounts.orderCount} bonnen, €${amounts.orderTotalIncl.toFixed(2)}`,
+    )
 
     const { error: upsertError } = await client
       .from('z_reports')
-      .upsert(
-        {
-          tenant_slug: tenantSlug,
-          report_date: date,
-          order_count: orders.length,
-          subtotal: subtotal,
-          tax_low: vatAgg.tax_low,
-          tax_mid: vatAgg.tax_mid,
-          tax_high: vatAgg.tax_high,
-          total: total,
-          cash_payments: cashPayments,
-          card_payments: cardPayments,
-          online_payments: onlinePayments,
-          btw_percentage: btwPercentage,
-          business_name: settings?.business_name,
-          business_address: settings?.address,
-          btw_number: settings?.btw_number,
-          order_ids: orderIds,
-          report_hash: reportHash,
-          generated_at: new Date().toISOString(),
-        },
-        {
-          onConflict: 'tenant_slug,report_date',
-          ignoreDuplicates: false,
-        }
-      )
+      .upsert(upsertPayload, {
+        onConflict: 'tenant_slug,report_date',
+        ignoreDuplicates: false,
+      })
 
     if (upsertError) {
       console.error('regenerateZReportForDate: Fout bij upsert:', upsertError)
 
       await client.from('z_reports').delete().eq('tenant_slug', tenantSlug).eq('report_date', date)
 
-      const { error: insertError } = await client.from('z_reports').insert({
-        tenant_slug: tenantSlug,
-        report_date: date,
-        order_count: orders.length,
-        subtotal: subtotal,
-        tax_low: vatAgg.tax_low,
-        tax_mid: vatAgg.tax_mid,
-        tax_high: vatAgg.tax_high,
-        total: total,
-        cash_payments: cashPayments,
-        card_payments: cardPayments,
-        online_payments: onlinePayments,
-        btw_percentage: btwPercentage,
-        business_name: settings?.business_name,
-        business_address: settings?.address,
-        btw_number: settings?.btw_number,
-        order_ids: orderIds,
-        report_hash: reportHash,
-        generated_at: new Date().toISOString(),
-      })
+      const { error: insertError } = await client.from('z_reports').insert(upsertPayload)
 
       if (insertError) {
         console.error('regenerateZReportForDate: Fallback insert ook gefaald:', insertError)
@@ -439,7 +333,7 @@ export async function regenerateZReportForDate(
     }
 
     console.log(
-      `Z-rapport bijgewerkt voor ${tenantSlug} op ${date}: ${orders.length} bestellingen, €${total.toFixed(2)}`
+      `Z-rapport bijgewerkt voor ${tenantSlug} op ${date}: ${amounts.orderCount} bestellingen, €${amounts.orderTotalIncl.toFixed(2)}`,
     )
   } catch (error) {
     console.error('regenerateZReportForDate: Onverwachte fout:', error)

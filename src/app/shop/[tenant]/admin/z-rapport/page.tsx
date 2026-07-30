@@ -6,7 +6,6 @@ import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
 import { authFetch } from '@/lib/auth-headers'
 import {
-  distributeOrderPaymentForZRaport,
   fetchAllTenantOrdersInCreatedAtRange,
   getTenantSettings,
   getZRapportDateBounds,
@@ -18,12 +17,11 @@ import {
   type ZReportArticleLine,
 } from '@/lib/z-report-aggregate-articles'
 import {
-  aggregateZReportVatFromOrderRows,
   CATEGORY_VAT_PERCENT_OPTIONS,
   type CategoryVatPercent,
-  type ZReportVatOrderSlice,
 } from '@/lib/order-vat'
 import { fetchZReportVatContextForTenant } from '@/lib/z-report-vat-context'
+import { buildZReportDayAmountsFromOrders } from '@/lib/z-report-day-builder'
 import {
   buildZReportVatRows,
   formatZReportEuro,
@@ -198,55 +196,35 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       '*'
     )
 
-    const orders = ordersRaw.filter((o) =>
-      orderCountsTowardRevenueAndZReport(
-        o as Pick<Order, 'order_type' |  'status' |  'payment_status'>
-      )
-    ) as unknown as Order[]
-
     const vatContext = await fetchZReportVatContextForTenant(params.tenant)
-    setArticleLines(aggregateZReportArticleLines(orders, settingsBtw, vatContext))
+    const counted = ordersRaw.filter((o) =>
+      orderCountsTowardRevenueAndZReport(
+        o as Pick<Order, 'order_type' | 'status' | 'payment_status'>,
+      ),
+    ) as unknown as Order[]
+    setArticleLines(aggregateZReportArticleLines(counted, settingsBtw, vatContext))
 
-    if (orders.length) {
-      let total = 0
-      let cashPayments = 0
-      let onlinePayments = 0
-      let cardPayments = 0
-      const orderIds: string[] = []
+    const amounts = buildZReportDayAmountsFromOrders(
+      ordersRaw as unknown as Order[],
+      settingsBtw,
+      vatContext,
+    )
 
-      orders.forEach((order) => {
-        if (order.id) orderIds.push(order.id)
-        const orderTotal = Number(order.total) || 0
-        total += orderTotal
-        const d = distributeOrderPaymentForZRaport(order)
-        cashPayments += d.cash
-        cardPayments += d.card
-        onlinePayments += d.online
-      })
-
-      total = Math.round(total * 100) / 100
-
-    const vatSlice: ZReportVatOrderSlice[] = orders.map((o) => ({
-      total: o.total,
-      items: (o as { items?: unknown }).items,
-      order_type: (o as { order_type?: unknown }).order_type,
-    }))
-    const vatAgg = aggregateZReportVatFromOrderRows(vatSlice, settingsBtw, vatContext)
-
+    if (amounts.orderCount > 0) {
       setStats({
         date: selectedDate,
-        orderCount: orders.length,
-        subtotal: vatAgg.subtotalExcl,
-        taxByRate: vatAgg.taxByRate,
-        baseByRate: vatAgg.baseByRate,
-        taxLow: vatAgg.tax_low,
-        taxMid: vatAgg.tax_mid,
-        taxHigh: vatAgg.tax_high,
-        total,
-        cashPayments,
-        onlinePayments,
-        cardPayments,
-        orderIds,
+        orderCount: amounts.orderCount,
+        subtotal: amounts.subtotalExcl,
+        taxByRate: amounts.taxByRate,
+        baseByRate: amounts.baseByRate,
+        taxLow: amounts.tax_low,
+        taxMid: amounts.tax_mid,
+        taxHigh: amounts.tax_high,
+        total: amounts.orderTotalIncl,
+        cashPayments: amounts.cashPayments,
+        onlinePayments: amounts.onlinePayments,
+        cardPayments: amounts.cardPayments,
+        orderIds: amounts.orderIds,
       })
     } else {
       setStats({
@@ -397,6 +375,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         return
       }
       await loadSavedReports()
+      await loadData()
       alert(t('zReport.rebuildArchiveSuccess'))
     } finally {
       setRebuildingArchive(false)
