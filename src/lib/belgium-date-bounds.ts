@@ -40,9 +40,9 @@ export function addDaysToBelgiumYMD(ymd: string, days: number): string {
 }
 
 /**
- * Fiscale dag grenzen voor Z-Rapport (GKS compliant)
- * Een fiscale dag loopt van 00:00 tot 12:00 de VOLGENDE dag.
- * Nachtbestellingen (bv. 01:00u) horen bij de juiste dag; afsluiten uiterlijk 12u de volgende dag.
+ * Fiscale dag grenzen voor Z-Rapport (GKS compliant).
+ * Werkdag met label D = D 12:00 t/m D+1 12:00 (Europe/Brussels).
+ * Bonnen na middernacht vóór 12:00 horen bij werkdag D−1 (niet bij D).
  */
 export function getZRapportDateBounds(dateStr: string): { startUTC: string; endUTC: string } {
   const [year, month, day] = dateStr.split('-').map(Number)
@@ -50,8 +50,7 @@ export function getZRapportDateBounds(dateStr: string): { startUTC: string; endU
   const isDST = isBelgiumDST(year, month, day)
   const belgiumOffsetHours = isDST ? 2 : 1
 
-  const startDate = new Date(Date.UTC(year, month - 1, day - 1, 24 - belgiumOffsetHours, 0, 0))
-
+  const startDate = new Date(Date.UTC(year, month - 1, day, 12 - belgiumOffsetHours, 0, 0))
   const endDate = new Date(Date.UTC(year, month - 1, day + 1, 12 - belgiumOffsetHours, 0, 0))
 
   return {
@@ -71,9 +70,8 @@ function brusselsHour(utc: Date): number {
 }
 
 /**
- * Fiscale werkdag voor een order — zelfde als dag-Z-rapport (`getZRapportDateBounds`).
- * Werkdag X = X 00:00 t/m X+1 12:00 (Europe/Brussels). Bonnen na middernacht vóór 12:00
- * horen bij de vorige werkdag, niet bij de nieuwe kalenderdag.
+ * Fiscale werkdag voor een order — zelfde venster als `getZRapportDateBounds`.
+ * Werkdag D = D 12:00 t/m D+1 12:00 (Europe/Brussels).
  */
 export function fiscalReportDateForOrderCreatedAt(createdAt: string): string | null {
   const t = new Date(createdAt)

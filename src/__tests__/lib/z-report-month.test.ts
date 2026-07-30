@@ -40,7 +40,7 @@ describe('fiscalReportDateForOrderCreatedAt', () => {
   it('komt overeen met getZRapportDateBounds voor werkdag 23/05/2026', () => {
     const bounds = getZRapportDateBounds('2026-05-23')
     const samples = [
-      '2026-05-23T21:00:00.000Z',
+      '2026-05-23T12:00:00.000Z',
       '2026-05-23T22:00:00.000Z',
       '2026-05-24T06:00:00.000Z',
       '2026-05-24T09:00:00.000Z',
@@ -50,6 +50,21 @@ describe('fiscalReportDateForOrderCreatedAt', () => {
       expect(t >= new Date(bounds.startUTC) && t <= new Date(bounds.endUTC)).toBe(true)
       expect(fiscalReportDateForOrderCreatedAt(iso)).toBe('2026-05-23')
     }
+  })
+
+  it('werkdag 24/05: bonnen vóór 12:00 op 24/05 horen bij 23/05 — niet in bounds van 24/05', () => {
+    const bounds24 = getZRapportDateBounds('2026-05-24')
+    const earlyMorning = '2026-05-24T08:00:00.000Z'
+    expect(fiscalReportDateForOrderCreatedAt(earlyMorning)).toBe('2026-05-23')
+    const t = new Date(earlyMorning)
+    expect(t >= new Date(bounds24.startUTC) && t <= new Date(bounds24.endUTC)).toBe(false)
+  })
+
+  it('werkdag 24/05 bounds: vanaf 12:00 Brussels op 24/05', () => {
+    const bounds = getZRapportDateBounds('2026-05-24')
+    expect(fiscalReportDateForOrderCreatedAt('2026-05-24T10:00:00.000Z')).toBe('2026-05-24')
+    const t = new Date('2026-05-24T10:00:00.000Z')
+    expect(t >= new Date(bounds.startUTC) && t <= new Date(bounds.endUTC)).toBe(true)
   })
 
   it('lastCompletedFiscalReportDate: vóór 12:00 hoort laatste afgesloten dag 2 dagen terug op kalender', () => {
