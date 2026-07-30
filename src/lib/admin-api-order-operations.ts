@@ -1,6 +1,6 @@
 import { supabase } from './supabase'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { getBelgiumDateString, getZRapportDateBounds } from './belgium-date-bounds'
+import { getBelgiumDateString, getZRapportDateBounds, fiscalReportDateForOrderCreatedAt } from './belgium-date-bounds'
 import {
   distributeOrderPaymentForZRaport,
   isWebshopOrder,
@@ -515,9 +515,10 @@ async function autoUpdateZReport(tenantSlug: string, date: string): Promise<void
   await regenerateZReportForDate(supabase, tenantSlug, date)
 }
 
-/** Herbereken opgeslagen Z-rapportdag (België) na order — kassa-betaling, bevestiging, weigeren, … */
+/** Herbereken opgeslagen Z-rapportdag (fiscale werkdag) na order — kassa, bevestiging, weigeren, … */
 export async function syncZReportAfterOrder(tenantSlug: string, orderCreatedAt: string): Promise<void> {
-  const dayYmd = getBelgiumDateString(new Date(orderCreatedAt))
+  const dayYmd =
+    fiscalReportDateForOrderCreatedAt(orderCreatedAt) ?? getBelgiumDateString(new Date(orderCreatedAt))
   await autoUpdateZReport(tenantSlug, dayYmd)
 }
 

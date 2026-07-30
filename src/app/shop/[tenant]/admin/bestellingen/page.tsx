@@ -16,8 +16,8 @@ import {
   isWebshopOrder,
   isActiveTenantOrderStatus,
   regenerateZReportForDate,
-  getBelgiumDateString,
 } from '@/lib/admin-api'
+import { fiscalReportDateForOrderCreatedAt, getBelgiumDateString } from '@/lib/belgium-date-bounds'
 import { appIntlLocaleTag, formatKlantschermWaitingClock } from '@/lib/format-kassa-header-date'
 import { formatOrderScheduleDetail } from '@/lib/format-order-schedule'
 import { supabase } from '@/lib/supabase'
@@ -398,7 +398,10 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             if (ok) {
               succeededWebshopIds.add(order.id)
               if (order.created_at) {
-                affectedBelgiumDays.add(getBelgiumDateString(new Date(order.created_at)))
+                const fiscalDay =
+                  fiscalReportDateForOrderCreatedAt(order.created_at) ??
+                  getBelgiumDateString(new Date(order.created_at))
+                affectedBelgiumDays.add(fiscalDay)
               }
             }
           } else {
@@ -408,7 +411,10 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             if (ok) {
               succeededPosIds.add(order.id)
               if (order.created_at) {
-                affectedBelgiumDays.add(getBelgiumDateString(new Date(order.created_at)))
+                const fiscalDay =
+                  fiscalReportDateForOrderCreatedAt(order.created_at) ??
+                  getBelgiumDateString(new Date(order.created_at))
+                affectedBelgiumDays.add(fiscalDay)
               }
             }
           }

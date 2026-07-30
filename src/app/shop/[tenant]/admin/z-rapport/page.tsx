@@ -120,6 +120,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const { t } = useLanguage()
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
+  const [rebuildingArchive, setRebuildingArchive] = useState(false)
   const [closing, setClosing] = useState(false)
   const [showCloseConfirm, setShowCloseConfirm] = useState(false)
   const [showKassaModal, setShowKassaModal] = useState(false)
@@ -381,6 +382,25 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     }
 
     setSyncing(false)
+  }
+
+  const rebuildSavedReportFromOrders = async () => {
+    setRebuildingArchive(true)
+    try {
+      const res = await authFetch('/api/kassa/sync-z-report', {
+        method: 'POST',
+        body: JSON.stringify({ tenantSlug: params.tenant, date: selectedDate }),
+      })
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}))
+        alert(json?.error || t('zReport.rebuildArchiveError'))
+        return
+      }
+      await loadSavedReports()
+      alert(t('zReport.rebuildArchiveSuccess'))
+    } finally {
+      setRebuildingArchive(false)
+    }
   }
 
   // DAG AFSLUITEN — onomkeerbaar, GKS compliant
@@ -984,6 +1004,12 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   )
 
   const isDayClosed = currentSavedReport?.is_closed === true
+  const archiveMismatch =
+    currentSavedReport &&
+    stats &&
+    stats.orderCount > 0 &&
+    (Math.abs(Number(currentSavedReport.total ?? 0) - stats.total) > 0.01 ||
+      Number(currentSavedReport.order_count ?? 0) !== stats.orderCount)
   const hasExistingManualEntry =
     !!currentSavedReport &&
     (currentSavedReport.manual_total != null ||
@@ -1164,12 +1190,52 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       {isDayClosed && reportViewMode === 'day' && (
         <div className="mb-6 p-4 bg-green-50 border-2 border-green-300 rounded-2xl flex items-center gap-3 print:hidden">
           <span className="text-2xl"></span>
-          <div>
+          <div className="flex-1">
             <p className="font-bold text-green-800">Dag definitief afgesloten</p>
             <p className="text-green-700 text-sm">
               Afgesloten op {currentSavedReport?.closed_at ? new Date(currentSavedReport.closed_at).toLocaleString('nl-BE') : '—'} · Fiscale registratie immutabel (GKS compliant)
             </p>
+            {archiveMismatch && (
+              <p className="text-amber-800 text-sm mt-2 font-medium">
+                {t('zReport.archiveMismatchWarning')
+                  .replace('{savedTotal}', formatZReportEuro(Number(currentSavedReport?.total ?? 0)))
+                  .replace('{savedCount}', String(currentSavedReport?.order_count ?? 0))
+                  .replace('{liveTotal}', formatZReportEuro(stats?.total ?? 0))
+                  .replace('{liveCount}', String(stats?.orderCount ?? 0))}
+              </p>
+            )}
           </div>
+          {archiveMismatch && (
+            <button
+              type="button"
+              onClick={rebuildSavedReportFromOrders}
+              disabled={rebuildingArchive}
+              title={t('zReport.rebuildArchiveTitle')}
+              className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-medium shrink-0 disabled:opacity-60"
+            >
+              {rebuildingArchive ? t('zReport.rebuildArchiveWorking') : t('zReport.rebuildArchiveButton')}
+            </button>
+          )}
+        </div>
+      )}
+      {!isDayClosed && archiveMismatch && reportViewMode === 'day' && (
+        <div className="mb-6 p-4 bg-amber-50 border-2 border-amber-300 rounded-2xl flex items-center gap-3 print:hidden">
+          <div className="flex-1 text-amber-900 text-sm font-medium">
+            {t('zReport.archiveMismatchWarning')
+              .replace('{savedTotal}', formatZReportEuro(Number(currentSavedReport?.total ?? 0)))
+              .replace('{savedCount}', String(currentSavedReport?.order_count ?? 0))
+              .replace('{liveTotal}', formatZReportEuro(stats?.total ?? 0))
+              .replace('{liveCount}', String(stats?.orderCount ?? 0))}
+          </div>
+          <button
+            type="button"
+            onClick={rebuildSavedReportFromOrders}
+            disabled={rebuildingArchive}
+            title={t('zReport.rebuildArchiveTitle')}
+            className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-medium shrink-0 disabled:opacity-60"
+          >
+            {rebuildingArchive ? t('zReport.rebuildArchiveWorking') : t('zReport.rebuildArchiveButton')}
+          </button>
         </div>
       )}
 
