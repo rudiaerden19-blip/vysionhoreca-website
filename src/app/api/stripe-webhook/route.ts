@@ -5,7 +5,7 @@ import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
 import { trackError } from '@/lib/monitoring'
 import { regenerateZReportForDate } from '@/lib/admin-api'
-import { getBelgiumDateString } from '@/lib/belgium-date-bounds'
+import { getBelgiumDateString, fiscalReportDateForOrderCreatedAt } from '@/lib/belgium-date-bounds'
 
 export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID()
@@ -120,7 +120,9 @@ export async function POST(request: NextRequest) {
           .maybeSingle()
 
         if (paidOrder?.created_at) {
-          const dayYmd = getBelgiumDateString(new Date(paidOrder.created_at as string))
+          const createdAt = paidOrder.created_at as string
+          const dayYmd =
+            fiscalReportDateForOrderCreatedAt(createdAt) ?? getBelgiumDateString(new Date(createdAt))
           await regenerateZReportForDate(supabase, tenantSlug, dayYmd)
         }
       }

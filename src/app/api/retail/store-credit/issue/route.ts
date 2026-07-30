@@ -4,7 +4,7 @@ import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 import { issueRetailStoreCredit } from '@/lib/retail-store-credit/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { regenerateZReportForDate } from '@/lib/admin-api-order-operations'
-import { getBelgiumDateString } from '@/lib/belgium-date-bounds'
+import { fiscalReportDateForOrderCreatedAt, getBelgiumDateString } from '@/lib/belgium-date-bounds'
 
 const IssueSchema = z.object({
   tenantSlug: z.string().min(1),
@@ -47,7 +47,8 @@ export async function POST(req: NextRequest) {
 
   const supabase = getServerSupabaseClient()
   if (supabase) {
-    const date = getBelgiumDateString()
+    const nowIso = new Date().toISOString()
+    const date = fiscalReportDateForOrderCreatedAt(nowIso) ?? getBelgiumDateString()
     await regenerateZReportForDate(supabase, tenantSlug, date).catch(() => undefined)
   }
 

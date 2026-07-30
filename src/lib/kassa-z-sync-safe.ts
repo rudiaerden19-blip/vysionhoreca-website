@@ -1,5 +1,5 @@
 import { authFetch } from '@/lib/auth-headers'
-import { getBelgiumDateString } from '@/lib/belgium-date-bounds'
+import { fiscalReportDateForOrderCreatedAt, getBelgiumDateString } from '@/lib/belgium-date-bounds'
 
 /**
  * Z-rapport refresh na order — fire-and-forget naar de server.
@@ -10,7 +10,8 @@ import { getBelgiumDateString } from '@/lib/belgium-date-bounds'
  */
 export function syncZReportAfterOrderSafe(tenantSlug: string, orderCreatedAt: string): void {
   try {
-    const date = getBelgiumDateString(new Date(orderCreatedAt))
+    const date =
+      fiscalReportDateForOrderCreatedAt(orderCreatedAt) ?? getBelgiumDateString(new Date(orderCreatedAt))
     void authFetch('/api/kassa/sync-z-report', {
       method: 'POST',
       body: JSON.stringify({ tenantSlug, date }),
