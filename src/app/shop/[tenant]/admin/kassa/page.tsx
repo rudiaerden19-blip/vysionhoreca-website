@@ -214,6 +214,11 @@ import {
   resolveVatPercentForProductAndOrderType,
 } from '@/lib/order-vat'
 import { sortKassaCartLinesByMenuCategory } from '@/lib/kassa-cart-grouping'
+import {
+  computeKassaReceiptVatFromCartLines,
+  hydrateKassaCartItemsFromCatalog,
+  kassaReceiptVatFromPersistedOrder,
+} from '@/lib/kassa-receipt-vat'
 
 /** Tik-feedback ná paint — zwakkere touch-terminals blijven UI-updates beter bijbenen */
 function scheduleKassaTapSound(play: () => void) {
@@ -1586,6 +1591,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       return
     }
     const fromServer = buildOpenTableOrdersMapFromRows(rows)
+    const hydratedFromServer: Record<string, CartItem[]> = {}
+    for (const [slot, lines] of Object.entries(fromServer)) {
+      hydratedFromServer[slot] = hydrateKassaCartItemsFromCatalog(lines, products)
+    }
     const pendingCommitted = pendingTableOrderLinesRef.current
     const pendingLocal = new Set<string>([
       ...Object.keys(persistTimersRef.current),
@@ -1595,7 +1604,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setTableOrders((prev) => {
       const merged = mergeOpenTableOrdersServerWithPendingLocal(
         prev,
-        fromServer,
+        hydratedFromServer,
         pendingLocal,
         pendingCommitted,
       )
@@ -1609,7 +1618,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       })
       return merged
     })
-  }, [tenant, syncFloorPlanStatusesFromOpenOrders])
+  }, [tenant, syncFloorPlanStatusesFromOpenOrders, products])
 
   useEffect(() => {
     return () => {
@@ -2773,9 +2782,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   /** Volledige rekening (op tafel + deze ronde) voor totaal, betalen en voorlopige bon. */
   const billLines = useMemo((): CartItem[] => {
-    if (activeTableSlotKey) return mergeCartLinesForTable(parkedOnTableLines, cart)
-    return cart
-  }, [activeTableSlotKey, parkedOnTableLines, cart])
+    const raw = activeTableSlotKey ? mergeCartLinesForTable(parkedOnTableLines, cart) : cart
+    return hydrateKassaCartItemsFromCatalog(raw, products)
+  }, [activeTableSlotKey, parkedOnTableLines, cart, products])
 
   const sidebarShowsOrderPanel = kassaSidebarShowsOrderLinePanel({
     cartLineCount: cart.length,
@@ -3355,24 +3364,35 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
 
     invalidateMenuCategoriesCache(tenant)
+    cache.invalidate(cacheKey('menu_products', tenant))
     let freshVatLookup = categoryVatLookup
+    let freshProductCategoryById = productCategoryById
+    let freshProds = products
     try {
-      const freshCats = dedupeCatalogById((await getMenuCategories(tenant)).filter((c) => c.is_active))
+      const [freshCatsRaw, freshProdsRaw] = await Promise.all([
+        getMenuCategories(tenant),
+        getMenuProducts(tenant),
+      ])
+      const freshCats = dedupeCatalogById(freshCatsRaw.filter((c) => c.is_active))
+      freshProds = dedupeCatalogById(freshProdsRaw.filter((p) => p.is_active))
       freshVatLookup = buildCategoryVatLookup(freshCats)
+      freshProductCategoryById = buildProductCategoryLookup(freshProds)
       setCategories(freshCats)
+      setProducts(freshProds)
     } catch {
       /* offline: bestaande lookup */
     }
+    const linesForVat = hydrateKassaCartItemsFromCatalog(billLines, freshProds)
     const resolveLineVatAtCheckout = (line: (typeof billLines)[number]) =>
       resolveVatPercentForProductAndOrderType(
         line.product,
         freshVatLookup,
         tenantDefaultBtw,
         orderType,
-        productCategoryById,
+        freshProductCategoryById,
         tenantCountry,
       )
-    const vatSplit = computeInclusiveVatSplitFromCart(billLines, resolveLineVatAtCheckout)
+    const vatSplit = computeInclusiveVatSplitFromCart(linesForVat, resolveLineVatAtCheckout)
     if (Math.abs(vatSplit.grossTotal - total) > 0.03) {
       console.warn('[kassa] btw-split vs mandtotaal mismatched', { split: vatSplit.grossTotal, total })
     }
@@ -3629,27 +3649,40 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     try {
     const fbVatRate = normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 6, 21)
-    const orderTypeForVat = normalizeOrderTypeForVat(order.orderType)
-    const receiptVatSplit =
-      order.items.length > 0
-        ? computeInclusiveVatSplitFromCart(order.items, (line) =>
-            resolveVatPercentForProductAndOrderType(
-              line.product,
-              categoryVatLookup,
-              tenantDefaultBtw,
-              orderTypeForVat,
-              productCategoryById,
-              tenantCountry,
-            ),
-          )
-        : null
-    const subtotal = receiptVatSplit
-      ? Math.round(receiptVatSplit.subtotalExcl * 100) / 100
+    let receiptVatComputed = kassaReceiptVatFromPersistedOrder(order)
+    if (!receiptVatComputed && order.items.length > 0) {
+      let catsForVat = categories
+      let prodsForVat = products
+      try {
+        invalidateMenuCategoriesCache(tenant)
+        cache.invalidate(cacheKey('menu_products', tenant))
+        const [freshCatsRaw, freshProdsRaw] = await Promise.all([
+          getMenuCategories(tenant),
+          getMenuProducts(tenant),
+        ])
+        catsForVat = dedupeCatalogById(freshCatsRaw.filter((c) => c.is_active))
+        prodsForVat = dedupeCatalogById(freshProdsRaw.filter((p) => p.is_active))
+        setCategories(catsForVat)
+        setProducts(prodsForVat)
+      } catch {
+        /* offline: state snapshot */
+      }
+      receiptVatComputed = computeKassaReceiptVatFromCartLines(
+        hydrateKassaCartItemsFromCatalog(order.items, prodsForVat),
+        catsForVat,
+        prodsForVat,
+        tenantDefaultBtw,
+        order.orderType,
+        tenantCountry,
+      )
+    }
+    const subtotal = receiptVatComputed
+      ? receiptVatComputed.subtotalExcl
       : Math.round((order.total / (1 + fbVatRate / 100)) * 100) / 100
-    const tax = receiptVatSplit
-      ? Math.round(receiptVatSplit.totalTax * 100) / 100
+    const tax = receiptVatComputed
+      ? receiptVatComputed.totalTax
       : Math.round((order.total - subtotal) * 100) / 100
-    const receiptVatRows = receiptVatSplit?.byRate ?? []
+    const receiptVatRows = receiptVatComputed?.byRate ?? []
     const orderTypeLabel =
       order.orderType === 'DINE_IN'
         ? ` ${t('kassaReceipt.orderTypeDineIn')}`
@@ -3785,6 +3818,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         tax,
         total: order.total,
         paymentMethod: order.paymentMethod,
+        ...(receiptVatRows.length > 0
+          ? {
+              vatLines: receiptVatRows.map((row) => ({
+                rate: row.rate,
+                tax: row.tax,
+              })),
+            }
+          : {}),
       },
       businessInfo: {
         name: tenantInfo?.business_name,
