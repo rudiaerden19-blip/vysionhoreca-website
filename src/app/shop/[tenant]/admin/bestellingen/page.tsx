@@ -30,10 +30,22 @@ import {
   orderJsonItemsToKassaCartLines,
 } from '@/lib/kassa-receipt-vat'
 import {
+  kassaThermalItemLine,
+  kassaThermalPadMoney,
+  kassaThermalTotalLine,
+  kassaThermalVatLine,
+} from '@/lib/kassa-thermal-bon-format'
+import {
   normalizeCategoryVatPercent,
   normalizeOrderTypeForVat,
   resolveTenantCountryForVat,
 } from '@/lib/order-vat'
+import {
+  kassaThermalItemLine,
+  kassaThermalPadMoney,
+  kassaThermalTotalLine,
+  kassaThermalVatLine,
+} from '@/lib/kassa-thermal-bon-format'
 import {
   adminDineInSeatAuditLine,
   adminOrderChannelBadgeClass,
@@ -706,30 +718,37 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         ? it.options.map((o: any) => ({ name: String(o.name || ''), price: Number(o.price || 0) }))
         : [],
     }))
+    // Thermische bon: platte bonInhoud (BTW per tarief) — géén orderData (standaard Print Agent).
+    const bonLines: string[] = []
+    bonLines.push(tenantSettings?.business_name || 'Zaak')
+    if (tenantSettings?.address) bonLines.push(tenantSettings.address)
+    if (tenantSettings?.postal_code || tenantSettings?.city) {
+      bonLines.push(`${tenantSettings.postal_code ?? ''} ${tenantSettings.city ?? ''}`.trim())
+    }
+    if (tenantSettings?.phone) bonLines.push(`Tel: ${tenantSettings.phone}`)
+    bonLines.push('--------------------------------')
+    bonLines.push(`Bon #${order.order_number || order.id?.slice(0, 8) ?? '?'}`)
+    bonLines.push('--------------------------------')
+    for (const it of agentItems) {
+      bonLines.push(kassaThermalItemLine(it.quantity, it.name, it.price))
+    }
+    bonLines.push('--------------------------------')
+    bonLines.push(kassaThermalPadMoney('Subtotaal', subtotalExcl))
+    if (vatLines && vatLines.length > 0) {
+      for (const row of vatLines) {
+        bonLines.push(kassaThermalVatLine(row.rate, row.tax))
+      }
+    } else {
+      bonLines.push(kassaThermalVatLine(tenantDefaultBtw, totalTax))
+    }
+    bonLines.push('')
+    bonLines.push(kassaThermalTotalLine('TOTAAL', order.total || 0))
+
     const printResult = await sendToVysionPrintAgent({
       winkelnaam: tenantSettings?.business_name || 'Zaak',
-      bonInhoud: '',
+      bonInhoud: bonLines.join('\n'),
       copies: 1,
       receiptMode: 'kassa',
-      orderData: {
-        orderNumber: order.order_number || (order.id?.slice(0, 8) ?? '?'),
-        orderType: order.order_type,
-        tableNumber: null,
-        items: agentItems,
-        subtotal: subtotalExcl,
-        tax: totalTax,
-        total: order.total || 0,
-        paymentMethod: order.payment_method,
-        ...(vatLines && vatLines.length > 0 ? { vatLines } : {}),
-        // Extra (rich) velden:
-        ...(order.customer_name ? { customerName: order.customer_name } : {}),
-        ...(order.customer_phone ? { customerPhone: order.customer_phone } : {}),
-        ...(order.customer_address || order.delivery_address
-          ? { customerAddress: order.customer_address || order.delivery_address }
-          : {}),
-        ...(order.customer_notes ? { customerNotes: order.customer_notes } : {}),
-        isOnlineOrder: true,
-      } as any,
       businessInfo: {
         name: tenantSettings?.business_name,
         address: tenantSettings?.address ?? undefined,
@@ -738,7 +757,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         phone: tenantSettings?.phone ?? undefined,
         vatNumber: tenantSettings?.btw_number ?? undefined,
         website: tenantSettings?.website ?? undefined,
-        vatRate: vatLines?.[0]?.rate ?? tenantDefaultBtw,
+        ...(vatLines?.length === 1 ? { vatRate: vatLines[0].rate } : {}),
       },
     })
     if (printResult.ok) return

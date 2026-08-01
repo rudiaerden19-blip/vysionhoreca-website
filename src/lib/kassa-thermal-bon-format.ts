@@ -25,6 +25,11 @@ export function kassaThermalPadMoney(left: string, amount: number): string {
   return kassaThermalRightAlignLine(left, formatEuroThermal(amount))
 }
 
+/** Vaste `BTW (xx%)`-tekst — zelfde als Print Agent en bonInhoud-fallback. */
+export function kassaThermalVatLine(rate: number, tax: number): string {
+  return kassaThermalPadMoney(`BTW (${rate}%)`, tax)
+}
+
 /** Agent herkent `Nx …` voor extra regelafstand tussen artikelen. */
 export function kassaThermalItemLine(qty: number, name: string, lineTotal: number): string {
   const price = formatEuroThermal(lineTotal)

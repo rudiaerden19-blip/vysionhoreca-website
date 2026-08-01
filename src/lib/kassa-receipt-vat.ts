@@ -239,6 +239,28 @@ export function kassaReceiptVatFromPersistedOrder(order: KassaLastOrderReceipt):
   }
 }
 
+/** Bon + scherm: altijd zelfde regels; vatSplit van afrekenen wint (ook zonder subtotalExclVat snapshot). */
+export function resolveKassaReceiptVatRowsForPrint(
+  order: KassaLastOrderReceipt,
+  fallbackFbRate: number,
+  computed: KassaReceiptVatComputed | null,
+): VatSplitLine[] {
+  if (Array.isArray(order.vatSplit) && order.vatSplit.length > 0) {
+    return [...order.vatSplit]
+      .map((l) => ({
+        rate: normalizeCategoryVatPercent(l.rate, fallbackFbRate) as CategoryVatPercent,
+        baseExcl: l.baseExcl,
+        tax: l.tax,
+      }))
+      .sort((a, b) => a.rate - b.rate)
+  }
+  const fromComputed = computed?.byRate ?? []
+  if (fromComputed.length > 0) {
+    return [...fromComputed].sort((a, b) => a.rate - b.rate)
+  }
+  return []
+}
+
 /** Order JSON (kassa/bestellingen) → cartregels voor BTW-berekening. */
 export function orderJsonItemsToKassaCartLines(
   items: ReadonlyArray<{

@@ -44,7 +44,7 @@ export type VysionPrintAgentBody = {
   bonInhoud: string
   receiptText?: string
   orderData?: VysionPrintAgentOrderData
-  /** BTW-regels voor bonInhoud (zonder orderData — voorkomt rijke bon met 1 tarief). */
+  /** Optioneel; kassabon met bonInhoud stuurt géén vatLines (tekst is leidend). */
   vatLines?: VysionPrintAgentVatLine[]
   businessInfo?: VysionPrintAgentBusinessInfo
   copies?: number
@@ -56,17 +56,21 @@ export type VysionPrintAgentBody = {
 
 /** Zelfde JSON als POST /print — Android-app (PrintBridgeActivity) verwacht identieke structuur. */
 function buildAgentRequestPayload(body: VysionPrintAgentBody) {
+  const receiptMode = body.receiptMode || 'kassa'
+  const bonText = (body.bonInhoud ?? body.receiptText ?? '').trim()
+  /** Standaard Print Agent: platte bonInhoud regel-voor-regel; orderData/vatLines veroorzaken één BTW of inject-bugs. */
+  const kassaPlainBon = receiptMode === 'kassa' && bonText.length > 0
   return {
     winkelnaam: body.winkelnaam ?? body.storeName,
     storeName: body.storeName ?? body.winkelnaam,
     bonInhoud: body.bonInhoud ?? body.receiptText ?? '',
     receiptText: body.receiptText ?? body.bonInhoud ?? '',
-    orderData: body.orderData,
-    vatLines: body.vatLines,
+    orderData: kassaPlainBon ? undefined : body.orderData,
+    vatLines: kassaPlainBon ? undefined : body.vatLines,
     businessInfo: body.businessInfo,
     copies: body.copies,
     openDrawer: body.openDrawer === true,
-    receiptMode: body.receiptMode || 'kassa',
+    receiptMode,
   }
 }
 

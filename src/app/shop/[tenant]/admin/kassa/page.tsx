@@ -63,8 +63,6 @@ import {
   isAndroidTabletPrintClient,
   fetchPrintAgentHealth,
   printAgentHasDedicatedKitchenPrinter,
-  isPrintAgentMultiVatReady,
-  MIN_PRINT_AGENT_VERSION_FOR_MULTI_VAT,
 } from '@/lib/vysion-print-agent-client'
 import {
   offlineDbLoadMenuSnapshot,
@@ -217,13 +215,16 @@ import {
   computeKassaReceiptVatFromCartLines,
   fetchKassaMenuVatCatalog,
   hydrateKassaCartItemsFromCatalog,
+  kassaOrderHasPersistedVatSplit,
   kassaReceiptVatFromPersistedOrder,
   resolveKassaCartLineVatRate,
+  resolveKassaReceiptVatRowsForPrint,
 } from '@/lib/kassa-receipt-vat'
 import {
   kassaThermalItemLine,
   kassaThermalPadMoney,
   kassaThermalTotalLine,
+  kassaThermalVatLine,
 } from '@/lib/kassa-thermal-bon-format'
 
 /** Tik-feedback ná paint — zwakkere touch-terminals blijven UI-updates beter bijbenen */
@@ -3695,22 +3696,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     if (!receiptVatComputed) {
       receiptVatComputed = kassaReceiptVatFromPersistedOrder(order)
     }
-    const screenVatRows =
-      order.vatSplit?.map((l) => ({
-        rate: normalizeCategoryVatPercent(l.rate, fbVatRate),
-        baseExcl: l.baseExcl,
-        tax: l.tax,
-      })) ?? []
-    const receiptVatRows =
-      screenVatRows.length > 0 ? screenVatRows : (receiptVatComputed?.byRate ?? [])
+    const receiptVatRows = resolveKassaReceiptVatRowsForPrint(order, fbVatRate, receiptVatComputed)
     const subtotal =
-      screenVatRows.length > 0 && typeof order.subtotalExclVat === 'number'
+      kassaOrderHasPersistedVatSplit(order) && typeof order.subtotalExclVat === 'number'
         ? order.subtotalExclVat
         : receiptVatComputed
           ? receiptVatComputed.subtotalExcl
           : Math.round((order.total / (1 + fbVatRate / 100)) * 100) / 100
     const tax =
-      screenVatRows.length > 0 && typeof order.totalTax === 'number'
+      kassaOrderHasPersistedVatSplit(order) && typeof order.totalTax === 'number'
         ? order.totalTax
         : receiptVatComputed
           ? receiptVatComputed.totalTax
@@ -3805,12 +3799,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     bonLines.push(kassaThermalPadMoney(t('kassaReceipt.subtotal'), subtotal))
     if (receiptVatRows.length >= 1) {
       for (const row of receiptVatRows) {
-        bonLines.push(
-          kassaThermalPadMoney(t('kassaReceipt.vat').replace('{rate}', String(row.rate)), row.tax),
-        )
+        bonLines.push(kassaThermalVatLine(row.rate, row.tax))
       }
     } else {
-      bonLines.push(kassaThermalPadMoney(t('kassaReceipt.vat').replace('{rate}', String(fbVatRate)), tax))
+      bonLines.push(kassaThermalVatLine(fbVatRate, tax))
     }
     bonLines.push('')
     bonLines.push(kassaThermalTotalLine(t('kassaReceipt.total'), order.total))
@@ -3857,14 +3849,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           }
         : {}),
     }
-    const thermalVatLines =
-      receiptVatRows.length > 0
-        ? receiptVatRows.map((row) => ({ rate: row.rate, tax: row.tax }))
-        : undefined
-    /**
-     * Thermische kassabon: géén orderData naar de agent — oude agents bouwen dan één BTW (9%).
-     * bonInhoud + vatLines; keukenbon gebruikt apart agentOrderData.
-     */
+    /** Thermische kassabon: alleen bonInhoud (BTW 9/12/21 als aparte regels). Geen orderData/vatLines — standaard Print Agent. */
     const printResult = await sendToVysionPrintAgent({
       winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
       bonInhoud: bonLines.join('\n'),
@@ -3872,7 +3857,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       copies: isDraft ? draftCopies : paidCopies,
       openDrawer: isCash,
       receiptMode,
-      vatLines: thermalVatLines,
       businessInfo: {
         name: tenantInfo?.business_name,
         address: tenantInfo?.address ?? undefined,
@@ -3881,7 +3865,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         phone: tenantInfo?.phone ?? undefined,
         vatNumber: tenantInfo?.btw_number ?? undefined,
         website: tenantInfo?.website ?? undefined,
-        vatRate: receiptVatRows[0]?.rate ?? fbVatRate,
+        ...(receiptVatRows.length === 1 ? { vatRate: receiptVatRows[0].rate } : {}),
       },
     })
     if (printResult.ok && receiptMode === 'kassa' && order.items.length > 0 && !opts?.skipKitchenCompanion) {
@@ -3972,16 +3956,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           }
         } catch {
           /* quota / private mode */
-        }
-        if (receiptVatRows.length > 1) {
-          const health = await fetchPrintAgentHealth()
-          if (!isPrintAgentMultiVatReady(health)) {
-            setThermalPrintBanner({
-              variant: 'error',
-              message:
-                `Bon is geprint, maar de Print Agent op deze PC is verouderd (${health.agentVersion ?? 'onbekend'}). Daardoor komt alleen 9% op papier.\n\nInstalleer Vysion Print Agent ${MIN_PRINT_AGENT_VERSION_FOR_MULTI_VAT}+ van www.vysion-kassa.com/download/print-agent-windows, start opnieuw, en print nog eens.`,
-            })
-          }
         }
       } else {
         if (!barKitchenDelta) {
