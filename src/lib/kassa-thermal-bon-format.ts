@@ -25,9 +25,9 @@ export function kassaThermalPadMoney(left: string, amount: number): string {
   return kassaThermalRightAlignLine(left, formatEuroThermal(amount))
 }
 
-/** Geen `BTW (xx%)` — standaard Print Agent slikt die regels en vervangt door één tarief. */
+/** Geen `BTW (xx%)` — agent slikt die regels. `Tarief 9%` print letterlijk op standaard agent. */
 export function kassaThermalVatLine(rate: number, tax: number): string {
-  return kassaThermalPadMoney(`BTW ${rate}%`, tax)
+  return kassaThermalPadMoney(`Tarief ${rate}%`, tax)
 }
 
 /** Agent herkent `Nx …` voor extra regelafstand tussen artikelen. */

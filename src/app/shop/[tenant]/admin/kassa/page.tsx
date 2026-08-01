@@ -3852,23 +3852,22 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           }
         : {}),
     }
-    /** Thermische kassabon: alleen bonInhoud (BTW 9/12/21 als aparte regels). Geen orderData/vatLines — standaard Print Agent. */
+    const printBusinessInfo = {
+      name: tenantInfo?.business_name,
+      address: tenantInfo?.address ?? undefined,
+      postalCode: tenantInfo?.postal_code ?? undefined,
+      city: tenantInfo?.city ?? undefined,
+      phone: tenantInfo?.phone ?? undefined,
+      vatNumber: tenantInfo?.btw_number ?? undefined,
+      website: tenantInfo?.website ?? undefined,
+    }
     const printResult = await sendToVysionPrintAgent({
       winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
       bonInhoud: bonLines.join('\n'),
-      /** Draft: 1 = gele Bon / toog-delta; 2 = zaaknaam in header. Betaald (afrekenen): altijd 2. */
       copies: isDraft ? draftCopies : paidCopies,
       openDrawer: isCash,
       receiptMode,
-      businessInfo: {
-        name: tenantInfo?.business_name,
-        address: tenantInfo?.address ?? undefined,
-        postalCode: tenantInfo?.postal_code ?? undefined,
-        city: tenantInfo?.city ?? undefined,
-        phone: tenantInfo?.phone ?? undefined,
-        vatNumber: tenantInfo?.btw_number ?? undefined,
-        website: tenantInfo?.website ?? undefined,
-      },
+      businessInfo: printBusinessInfo,
     })
     if (printResult.ok && receiptMode === 'kassa' && order.items.length > 0 && !opts?.skipKitchenCompanion) {
       const health = await fetchPrintAgentHealth()

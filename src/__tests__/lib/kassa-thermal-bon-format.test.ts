@@ -15,7 +15,7 @@ describe('kassaThermalBonFormat', () => {
 
   it('BTW-regel zonder haakjes (Print Agent-safe)', () => {
     const line = kassaThermalVatLine(21, 3.55)
-    expect(line.includes('BTW 21%')).toBe(true)
+    expect(line.includes('Tarief 21%')).toBe(true)
     expect(line.includes('BTW (21%)')).toBe(false)
   })
 })
