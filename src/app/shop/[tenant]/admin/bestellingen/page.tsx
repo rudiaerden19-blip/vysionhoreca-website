@@ -751,7 +751,6 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         phone: tenantSettings?.phone ?? undefined,
         vatNumber: tenantSettings?.btw_number ?? undefined,
         website: tenantSettings?.website ?? undefined,
-        ...(vatLines?.length === 1 ? { vatRate: vatLines[0].rate } : {}),
       },
     })
     if (printResult.ok) return

@@ -217,6 +217,7 @@ import {
   hydrateKassaCartItemsFromCatalog,
   kassaOrderHasPersistedVatSplit,
   kassaReceiptVatFromPersistedOrder,
+  mergeKassaReceiptVatRows,
   resolveKassaCartLineVatRate,
   resolveKassaReceiptVatRowsForPrint,
 } from '@/lib/kassa-receipt-vat'
@@ -3684,7 +3685,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         /* offline: state snapshot */
       }
       receiptVatComputed = computeKassaReceiptVatFromCartLines(
-        order.items,
+        hydrateKassaCartItemsFromCatalog(order.items, prodsForVat),
         catsForVat,
         prodsForVat,
         tenantDefaultBtw,
@@ -3696,7 +3697,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     if (!receiptVatComputed) {
       receiptVatComputed = kassaReceiptVatFromPersistedOrder(order)
     }
-    const receiptVatRows = resolveKassaReceiptVatRowsForPrint(order, fbVatRate, receiptVatComputed)
+    const orderVatRows = resolveKassaReceiptVatRowsForPrint(order, fbVatRate, receiptVatComputed)
+    const computedVatRows = receiptVatComputed?.byRate ?? []
+    const receiptVatRows = mergeKassaReceiptVatRows(orderVatRows, computedVatRows)
     const subtotal =
       kassaOrderHasPersistedVatSplit(order) && typeof order.subtotalExclVat === 'number'
         ? order.subtotalExclVat
@@ -3865,7 +3868,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         phone: tenantInfo?.phone ?? undefined,
         vatNumber: tenantInfo?.btw_number ?? undefined,
         website: tenantInfo?.website ?? undefined,
-        ...(receiptVatRows.length === 1 ? { vatRate: receiptVatRows[0].rate } : {}),
       },
     })
     if (printResult.ok && receiptMode === 'kassa' && order.items.length > 0 && !opts?.skipKitchenCompanion) {

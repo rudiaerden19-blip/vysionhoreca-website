@@ -261,6 +261,22 @@ export function resolveKassaReceiptVatRowsForPrint(
   return []
 }
 
+/** Scherm + print: meest complete BTW-split (meer tarieven wint per rate). */
+export function mergeKassaReceiptVatRows(
+  fromOrder: ReadonlyArray<VatSplitLine>,
+  fromComputed: ReadonlyArray<VatSplitLine>,
+): VatSplitLine[] {
+  const m = new Map<number, VatSplitLine>()
+  for (const row of [...fromOrder, ...fromComputed]) {
+    const rate = row.rate
+    const prev = m.get(rate)
+    if (!prev || Math.abs(row.tax) >= Math.abs(prev.tax)) {
+      m.set(rate, row)
+    }
+  }
+  return [...m.values()].sort((a, b) => a.rate - b.rate)
+}
+
 /** Order JSON (kassa/bestellingen) → cartregels voor BTW-berekening. */
 export function orderJsonItemsToKassaCartLines(
   items: ReadonlyArray<{

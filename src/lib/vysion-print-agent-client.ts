@@ -60,6 +60,10 @@ function buildAgentRequestPayload(body: VysionPrintAgentBody) {
   const bonText = (body.bonInhoud ?? body.receiptText ?? '').trim()
   /** Standaard Print Agent: platte bonInhoud regel-voor-regel; orderData/vatLines veroorzaken één BTW of inject-bugs. */
   const kassaPlainBon = receiptMode === 'kassa' && bonText.length > 0
+  const businessInfo =
+    kassaPlainBon && body.businessInfo
+      ? { ...body.businessInfo, vatRate: undefined }
+      : body.businessInfo
   return {
     winkelnaam: body.winkelnaam ?? body.storeName,
     storeName: body.storeName ?? body.winkelnaam,
@@ -67,7 +71,7 @@ function buildAgentRequestPayload(body: VysionPrintAgentBody) {
     receiptText: body.receiptText ?? body.bonInhoud ?? '',
     orderData: kassaPlainBon ? undefined : body.orderData,
     vatLines: kassaPlainBon ? undefined : body.vatLines,
-    businessInfo: body.businessInfo,
+    businessInfo,
     copies: body.copies,
     openDrawer: body.openDrawer === true,
     receiptMode,

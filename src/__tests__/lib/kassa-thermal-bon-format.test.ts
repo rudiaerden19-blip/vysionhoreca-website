@@ -2,6 +2,7 @@ import {
   KASSA_THERMAL_RECEIPT_W,
   kassaThermalItemLine,
   kassaThermalPadMoney,
+  kassaThermalVatLine,
 } from '@/lib/kassa-thermal-bon-format'
 
 describe('kassaThermalBonFormat', () => {
@@ -12,9 +13,9 @@ describe('kassaThermalBonFormat', () => {
     expect(line.startsWith('1x ')).toBe(true)
   })
 
-  it('subtotaal/BTW-regel: label links, bedrag rechts', () => {
-    const line = kassaThermalPadMoney('BTW (21%)', 3.55)
-    expect(line.endsWith('EUR 3.55')).toBe(true)
-    expect(line.includes('BTW (21%)')).toBe(true)
+  it('BTW-regel zonder haakjes (Print Agent-safe)', () => {
+    const line = kassaThermalVatLine(21, 3.55)
+    expect(line.includes('BTW 21%')).toBe(true)
+    expect(line.includes('BTW (21%)')).toBe(false)
   })
 })
