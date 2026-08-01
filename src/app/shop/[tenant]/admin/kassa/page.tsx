@@ -2604,12 +2604,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const addToCart = (product: MenuProduct, choices: SelectedChoice[] = []) => {
     scheduleAddToCartSound()
-    const vatCatId =
-      selectedCategory?.id != null && String(selectedCategory.id).trim() !== ''
-        ? String(selectedCategory.id)
-        : product.category_id != null
-          ? String(product.category_id)
-          : null
     const cartKey = choices.length > 0
       ? `${product.id}-${choices.map(c => c.choiceId).sort().join('-')}`
       : product.id!
@@ -2617,7 +2611,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       const existing = prev.find(i => i.cartKey === cartKey)
       const updated = existing
         ? prev.map(i => i.cartKey === cartKey ? { ...i, quantity: i.quantity + 1 } : i)
-        : [...prev, { product, quantity: 1, choices, cartKey, kassaVatCategoryId: vatCatId }]
+        : [...prev, { product, quantity: 1, choices, cartKey }]
       if (tableNumber) {
         updateTableStatus(tableNumber, tableHasOpenOrder(dineInFloorZone, tableNumber, updated), dineInFloorZone)
       }
@@ -3670,8 +3664,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     try {
     const fbVatRate = normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 6, 21)
-    let receiptVatComputed = null as ReturnType<typeof kassaReceiptVatFromPersistedOrder>
-    if (order.items.length > 0) {
+    /** Zelfde BTW als op het scherm (vatSplit bij afrekenen); anders herberekenen. */
+    let receiptVatComputed = kassaReceiptVatFromPersistedOrder(order)
+    if (!receiptVatComputed && order.items.length > 0) {
       let catsForVat = categories
       let prodsForVat = products
       try {
@@ -3694,9 +3689,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         tenantCountry,
         tenantInfo?.btw_number,
       )
-    }
-    if (!receiptVatComputed) {
-      receiptVatComputed = kassaReceiptVatFromPersistedOrder(order)
     }
     const subtotal = receiptVatComputed
       ? receiptVatComputed.subtotalExcl
@@ -3847,8 +3839,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           }
         : {}),
     }
+    const thermalVatLines =
+      receiptVatRows.length > 0
+        ? receiptVatRows.map((row) => ({ rate: row.rate, tax: row.tax }))
+        : undefined
     /**
-     * Altijd orderData met vatLines mee — Print Agent vervangt BTW-regels in bonInhoud.
+     * Thermische kassabon: géén orderData naar de agent — oude agents bouwen dan één BTW (9%).
+     * bonInhoud + vatLines; keukenbon gebruikt apart agentOrderData.
      */
     const printResult = await sendToVysionPrintAgent({
       winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
@@ -3857,7 +3854,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       copies: isDraft ? draftCopies : paidCopies,
       openDrawer: isCash,
       receiptMode,
-      orderData: agentOrderData,
+      vatLines: thermalVatLines,
       businessInfo: {
         name: tenantInfo?.business_name,
         address: tenantInfo?.address ?? undefined,

@@ -44,6 +44,8 @@ export type VysionPrintAgentBody = {
   bonInhoud: string
   receiptText?: string
   orderData?: VysionPrintAgentOrderData
+  /** BTW-regels voor bonInhoud (zonder orderData — voorkomt rijke bon met 1 tarief). */
+  vatLines?: VysionPrintAgentVatLine[]
   businessInfo?: VysionPrintAgentBusinessInfo
   copies?: number
   /** Open kassa-lade (drawer-kick) na het printen. */
@@ -60,6 +62,7 @@ function buildAgentRequestPayload(body: VysionPrintAgentBody) {
     bonInhoud: body.bonInhoud ?? body.receiptText ?? '',
     receiptText: body.receiptText ?? body.bonInhoud ?? '',
     orderData: body.orderData,
+    vatLines: body.vatLines,
     businessInfo: body.businessInfo,
     copies: body.copies,
     openDrawer: body.openDrawer === true,

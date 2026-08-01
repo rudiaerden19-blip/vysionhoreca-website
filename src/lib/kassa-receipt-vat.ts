@@ -5,7 +5,7 @@ import {
   type MenuCategory,
   type MenuProduct,
 } from '@/lib/admin-api'
-import { authFetch } from '@/lib/auth-headers'
+import { adminDb } from '@/lib/admin-db-client'
 import type { KassaCartItem, KassaLastOrderReceipt, KassaRegisterOrderType } from '@/lib/kassa-cart-types'
 import {
   computeInclusiveVatSplitFromCart,
@@ -23,77 +23,86 @@ export type KassaReceiptVatComputed = {
   byRate: VatSplitLine[]
 }
 
-/** Server-side catalog (service role) — expliciet default_btw_percentage. */
+/** Server-side catalog (service role) — betrouwbaarder dan anon-cache voor BTW op bon. */
 export async function fetchKassaMenuVatCatalog(tenantSlug: string): Promise<{
   categories: MenuCategory[]
   products: MenuProduct[]
 }> {
   const slug = tenantSlug.trim()
-  try {
-    const res = await authFetch('/api/admin/menu/vat-catalog', {
-      method: 'POST',
-      body: JSON.stringify({ tenantSlug: slug }),
-    })
-    const json = (await res.json()) as {
-      ok?: boolean
-      categories?: MenuCategory[]
-      products?: MenuProduct[]
-      error?: string
+  const [catRes, prodRes] = await Promise.all([
+    adminDb.select<MenuCategory[]>('menu_categories', {
+      tenantSlug: slug,
+      select: 'id, tenant_slug, name, default_btw_percentage, is_active, sort_order, description, image_url',
+      match: { tenant_slug: slug },
+      limit: 500,
+    }),
+    adminDb.select<MenuProduct[]>('menu_products', {
+      tenantSlug: slug,
+      select:
+        'id, tenant_slug, category_id, name, price, is_active, sort_order, description, image_url, is_popular, allergens',
+      match: { tenant_slug: slug },
+      limit: 2000,
+    }),
+  ])
+  if (catRes.ok && prodRes.ok && Array.isArray(catRes.data) && Array.isArray(prodRes.data)) {
+    return {
+      categories: dedupeCatalogById(catRes.data),
+      products: dedupeCatalogById(prodRes.data),
     }
-    if (res.ok && json.ok && Array.isArray(json.categories) && Array.isArray(json.products)) {
-      return {
-        categories: dedupeCatalogById(json.categories),
-        products: dedupeCatalogById(json.products),
-      }
-    }
-  } catch {
-    /* fallback */
   }
   const [categories, products] = await Promise.all([getMenuCategories(slug), getMenuProducts(slug)])
   return { categories: dedupeCatalogById(categories), products: dedupeCatalogById(products) }
 }
 
-function normCatalogId(id: unknown): string | null {
-  if (id === null || id === undefined) return null
-  const s = String(id).trim()
-  return s ? s.toLowerCase() : null
-}
-
-function findCategoryById(
+function buildCategoryVatOverrideMap(
   categories: ReadonlyArray<MenuCategory>,
-  categoryId: string | null,
-): MenuCategory | undefined {
-  const key = normCatalogId(categoryId)
-  if (!key) return undefined
-  return categories.find((c) => normCatalogId(c.id) === key)
+  tenantDefaultBtw: number,
+): Map<string, number | null> {
+  const m = new Map<string, number | null>()
+  for (const c of categories) {
+    const key = normalizeCatalogId(c.id)
+    if (!key) continue
+    const raw = c.default_btw_percentage
+    m.set(
+      key,
+      raw === null || raw === undefined
+        ? null
+        : (normalizeCategoryVatPercent(raw, tenantDefaultBtw) as number),
+    )
+  }
+  return m
 }
 
 function normalizeNameKey(name: string): string {
   return name.trim().toLowerCase().replace(/\s+/g, ' ')
 }
 
+function normalizeCatalogId(id: unknown): string | null {
+  if (id === null || id === undefined) return null
+  const s = String(id).trim()
+  return s ? s.toLowerCase() : null
+}
+
 function resolveProductCategoryId(
   line: KassaCartItem,
   products: ReadonlyArray<MenuProduct>,
 ): string | null {
-  if (line.kassaVatCategoryId) {
-    const fromTile = normCatalogId(line.kassaVatCategoryId)
-    if (fromTile) return fromTile
-  }
   const hydrated = hydrateKassaCartItemsFromCatalog([line], products)[0] ?? line
-  const pid = hydrated.product.id ? String(hydrated.product.id) : ''
+  const pid = hydrated.product.id ? normalizeCatalogId(hydrated.product.id) : null
   if (pid && !pid.startsWith('custom-')) {
-    const fromCatalog = products.find((p) => p.id && normCatalogId(p.id) === normCatalogId(pid))
-    if (fromCatalog?.category_id) return normCatalogId(fromCatalog.category_id)
+    const fromCatalog = products.find((p) => p.id && normalizeCatalogId(p.id) === pid)
+    const cid = fromCatalog?.category_id ? normalizeCatalogId(fromCatalog.category_id) : null
+    if (cid) return cid
   }
-  if (hydrated.product.category_id) return normCatalogId(hydrated.product.category_id)
+  const snapCat = hydrated.product.category_id ? normalizeCatalogId(hydrated.product.category_id) : null
+  if (snapCat) return snapCat
   const displayName = hydrated.product.name?.trim()
   if (displayName) {
     const key = normalizeNameKey(displayName)
     const byName = products.find(
       (p) => p.name && normalizeNameKey(String(p.name)) === key && p.category_id,
     )
-    if (byName?.category_id) return normCatalogId(byName.category_id)
+    if (byName?.category_id) return normalizeCatalogId(byName.category_id)
   }
   return null
 }
@@ -113,15 +122,26 @@ export function resolveKassaCartLineVatRate(
 ): CategoryVatPercent {
   const country = resolveTenantCountryForVat(tenantCountry, tenantBtwNumber ?? null)
   const orderTypeForVat = normalizeOrderTypeForVat(orderType)
+  const catVat = buildCategoryVatOverrideMap(categories, tenantDefaultBtw)
   const categoryId = resolveProductCategoryId(line, products)
-  const cat = findCategoryById(categories, categoryId)
-  if (cat) {
-    return resolveVatPercentForCategoryAndOrderType(
-      cat.default_btw_percentage,
-      tenantDefaultBtw,
-      orderTypeForVat,
-      country,
-    )
+  if (categoryId) {
+    if (catVat.has(categoryId)) {
+      return resolveVatPercentForCategoryAndOrderType(
+        catVat.get(categoryId),
+        tenantDefaultBtw,
+        orderTypeForVat,
+        country,
+      )
+    }
+    const catRow = categories.find((c) => normalizeCatalogId(c.id) === categoryId)
+    if (catRow) {
+      return resolveVatPercentForCategoryAndOrderType(
+        catRow.default_btw_percentage,
+        tenantDefaultBtw,
+        orderTypeForVat,
+        country,
+      )
+    }
   }
   return resolveVatPercentForCategoryAndOrderType(undefined, tenantDefaultBtw, orderTypeForVat, country)
 }
@@ -163,12 +183,13 @@ export function hydrateKassaCartItemsFromCatalog(
 ): KassaCartItem[] {
   const byId = new Map<string, MenuProduct>()
   for (const p of products) {
-    if (p.id) byId.set(String(p.id), p)
+    const key = p.id ? normalizeCatalogId(p.id) : null
+    if (key) byId.set(key, p)
   }
   return lines.map((line) => {
-    const pid = line.product?.id
-    if (!pid || String(pid).startsWith('custom-')) return line
-    const fromCatalog = byId.get(String(pid))
+    const pid = line.product?.id ? normalizeCatalogId(line.product.id) : null
+    if (!pid || pid.startsWith('custom-')) return line
+    const fromCatalog = byId.get(pid)
     if (!fromCatalog) return line
     const catalogCat =
       fromCatalog.category_id != null && String(fromCatalog.category_id).trim() !== ''

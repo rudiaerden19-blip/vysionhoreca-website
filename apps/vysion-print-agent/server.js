@@ -573,7 +573,10 @@ function buildEscPosPayload(body) {
   const RE_BETAALD = /^(BETAALD)/i
 
   const raw = kassaBon
-    ? injectVatLinesIntoBonText(rawBonIn, body?.orderData?.vatLines)
+    ? injectVatLinesIntoBonText(
+        rawBonIn,
+        body?.vatLines || body?.orderData?.vatLines,
+      )
     : rawBonIn
   let lines = raw.split(/\r?\n/)
 
