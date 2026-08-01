@@ -25,6 +25,16 @@ import { adminDb } from '@/lib/admin-db-client'
 import { authFetch, getAuthHeaders } from '@/lib/auth-headers'
 import { sendToVysionPrintAgent } from '@/lib/vysion-print-agent-client'
 import {
+  computeKassaReceiptVatFromCartLines,
+  fetchKassaMenuVatCatalog,
+  orderJsonItemsToKassaCartLines,
+} from '@/lib/kassa-receipt-vat'
+import {
+  normalizeCategoryVatPercent,
+  normalizeOrderTypeForVat,
+  resolveTenantCountryForVat,
+} from '@/lib/order-vat'
+import {
   adminDineInSeatAuditLine,
   adminOrderChannelBadgeClass,
   adminPosChannelBadgeLabel,
@@ -43,6 +53,7 @@ import {
 interface OrderItemJson {
   name?: string
   product_name?: string
+  product_id?: string
   quantity: number
   price?: number
   unit_price?: number
@@ -657,10 +668,34 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   const printReceipt = async (order: Order) => {
     const items = parseItems(order)
 
-    // BTW berekening - gebruik percentage uit instellingen of standaard 6%
-    const btwPercentage = tenantSettings?.btw_percentage || 6
-    const totalExclBtw = order.total ? order.total / (1 + btwPercentage / 100) : 0
-    const btwBedrag = order.total ? order.total - totalExclBtw : 0
+    const tenantDefaultBtw = normalizeCategoryVatPercent(tenantSettings?.btw_percentage ?? 6, 21)
+    const tenantCountry = resolveTenantCountryForVat(
+      tenantSettings?.country,
+      tenantSettings?.btw_number,
+    )
+    let subtotalExcl = 0
+    let totalTax = 0
+    let vatLines: { rate: number; tax: number }[] | undefined
+    try {
+      const catalog = await fetchKassaMenuVatCatalog(params.tenant)
+      const cartLines = orderJsonItemsToKassaCartLines(items, params.tenant)
+      const vat = computeKassaReceiptVatFromCartLines(
+        cartLines,
+        catalog.categories,
+        catalog.products,
+        tenantDefaultBtw,
+        normalizeOrderTypeForVat(order.order_type),
+        tenantCountry,
+        tenantSettings?.btw_number,
+      )
+      subtotalExcl = vat.subtotalExcl
+      totalTax = vat.totalTax
+      vatLines = vat.byRate.map((l) => ({ rate: l.rate, tax: l.tax }))
+    } catch {
+      const fb = tenantSettings?.btw_percentage || 6
+      subtotalExcl = order.total ? order.total / (1 + fb / 100) : 0
+      totalTax = order.total ? order.total - subtotalExcl : 0
+    }
 
     // 1) Probeer Vysion Print Agent (Windows ESC/POS bonprinter)
     const agentItems = items.map((it: any) => ({
@@ -681,10 +716,11 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         orderType: order.order_type,
         tableNumber: null,
         items: agentItems,
-        subtotal: totalExclBtw,
-        tax: btwBedrag,
+        subtotal: subtotalExcl,
+        tax: totalTax,
         total: order.total || 0,
         paymentMethod: order.payment_method,
+        ...(vatLines && vatLines.length > 0 ? { vatLines } : {}),
         // Extra (rich) velden:
         ...(order.customer_name ? { customerName: order.customer_name } : {}),
         ...(order.customer_phone ? { customerPhone: order.customer_phone } : {}),
@@ -702,7 +738,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         phone: tenantSettings?.phone ?? undefined,
         vatNumber: tenantSettings?.btw_number ?? undefined,
         website: tenantSettings?.website ?? undefined,
-        vatRate: btwPercentage,
+        vatRate: vatLines?.[0]?.rate ?? tenantDefaultBtw,
       },
     })
     if (printResult.ok) return
@@ -807,12 +843,18 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         <div class="btw-section">
           <div class="item">
             <span>Totaal excl. BTW</span>
-            <span>€${totalExclBtw.toFixed(2)}</span>
+            <span>€${subtotalExcl.toFixed(2)}</span>
           </div>
-          <div class="item">
-            <span>BTW ${btwPercentage}%</span>
-            <span>€${btwBedrag.toFixed(2)}</span>
-          </div>
+          ${
+            vatLines && vatLines.length > 0
+              ? vatLines
+                  .map(
+                    (l) =>
+                      `<div class="item"><span>BTW ${l.rate}%</span><span>€${l.tax.toFixed(2)}</span></div>`,
+                  )
+                  .join('')
+              : `<div class="item"><span>BTW ${tenantDefaultBtw}%</span><span>€${totalTax.toFixed(2)}</span></div>`
+          }
         </div>
         
         <div class="item total" style="font-size: 16px; margin: 10px 0;">

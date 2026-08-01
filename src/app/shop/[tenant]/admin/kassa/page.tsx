@@ -213,6 +213,7 @@ import {
 import { sortKassaCartLinesByMenuCategory } from '@/lib/kassa-cart-grouping'
 import {
   computeKassaReceiptVatFromCartLines,
+  fetchKassaMenuVatCatalog,
   hydrateKassaCartItemsFromCatalog,
   kassaReceiptVatFromPersistedOrder,
   resolveKassaCartLineVatRate,
@@ -3377,14 +3378,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     let freshCats = categories
     let freshProds = products
     try {
-      const [freshCatsRaw, freshProdsRaw] = await Promise.all([
-        getMenuCategories(tenant),
-        getMenuProducts(tenant),
-      ])
-      freshCats = dedupeCatalogById(freshCatsRaw)
-      freshProds = dedupeCatalogById(freshProdsRaw)
-      setCategories(dedupeCatalogById(freshCatsRaw.filter((c) => c.is_active)))
-      setProducts(dedupeCatalogById(freshProdsRaw.filter((p) => p.is_active)))
+      const catalog = await fetchKassaMenuVatCatalog(tenant)
+      freshCats = catalog.categories
+      freshProds = catalog.products
+      setCategories(dedupeCatalogById(catalog.categories.filter((c) => c.is_active)))
+      setProducts(dedupeCatalogById(catalog.products.filter((p) => p.is_active)))
     } catch {
       /* offline: bestaande lookup */
     }
@@ -3673,14 +3671,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       try {
         invalidateMenuCategoriesCache(tenant)
         cache.invalidate(cacheKey('menu_products', tenant))
-        const [freshCatsRaw, freshProdsRaw] = await Promise.all([
-          getMenuCategories(tenant),
-          getMenuProducts(tenant),
-        ])
-        catsForVat = dedupeCatalogById(freshCatsRaw)
-        prodsForVat = dedupeCatalogById(freshProdsRaw)
-        setCategories(dedupeCatalogById(freshCatsRaw.filter((c) => c.is_active)))
-        setProducts(dedupeCatalogById(freshProdsRaw.filter((p) => p.is_active)))
+        const catalog = await fetchKassaMenuVatCatalog(tenant)
+        catsForVat = catalog.categories
+        prodsForVat = catalog.products
+        setCategories(dedupeCatalogById(catalog.categories.filter((c) => c.is_active)))
+        setProducts(dedupeCatalogById(catalog.products.filter((p) => p.is_active)))
       } catch {
         /* offline: state snapshot */
       }
@@ -3847,10 +3842,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         : {}),
     }
     /**
-     * Kassabon: altijd voorgebouwde bonInhoud (juiste BTW-regels per tarief).
-     * orderData alleen voor keukenbon / online-rijke bon elders.
+     * Altijd orderData met vatLines mee — Print Agent vervangt BTW-regels in bonInhoud.
      */
-    const kassaBonInhoudOnly = receiptMode === 'kassa'
     const printResult = await sendToVysionPrintAgent({
       winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
       bonInhoud: bonLines.join('\n'),
@@ -3858,7 +3851,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       copies: isDraft ? draftCopies : paidCopies,
       openDrawer: isCash,
       receiptMode,
-      orderData: kassaBonInhoudOnly ? undefined : agentOrderData,
+      orderData: agentOrderData,
       businessInfo: {
         name: tenantInfo?.business_name,
         address: tenantInfo?.address ?? undefined,
@@ -3870,7 +3863,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         vatRate: receiptVatRows[0]?.rate ?? fbVatRate,
       },
     })
-    if (printResult.ok && kassaBonInhoudOnly && order.items.length > 0 && !opts?.skipKitchenCompanion) {
+    if (printResult.ok && receiptMode === 'kassa' && order.items.length > 0 && !opts?.skipKitchenCompanion) {
       const health = await fetchPrintAgentHealth()
       if (printAgentHasDedicatedKitchenPrinter(health)) {
         await sendToVysionPrintAgent({

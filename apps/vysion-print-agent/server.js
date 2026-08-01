@@ -494,17 +494,51 @@ function buildKitchenReceipt(body) {
   return Buffer.concat(c)
 }
 
+/** Zelfde layout als kassaThermalPadMoney (42 kolommen). */
+function padThermalMoneyLine(left, amount, W = 42) {
+  const r = `EUR ${Number(amount).toFixed(2)}`
+  const l = String(left).trimEnd()
+  const targetCol = W - r.length
+  if (targetCol <= 0) return r.slice(0, W)
+  if (l.length >= targetCol) {
+    return `${l.slice(0, Math.max(0, targetCol - 1))}.${r}`.slice(0, W)
+  }
+  const fillLen = Math.max(1, targetCol - l.length)
+  return (l + '.'.repeat(fillLen) + r).slice(0, W)
+}
+
+/** Vervang BTW-regels in platte bonInhoud door orderData.vatLines (categorie-BTW). */
+function injectVatLinesIntoBonText(rawText, vatLines) {
+  if (!Array.isArray(vatLines) || vatLines.length === 0) return rawText
+  const lines = rawText.split(/\r?\n/)
+  const out = []
+  for (let i = 0; i < lines.length; i++) {
+    const trimmed = (lines[i] || '').trim()
+    if (/^BTW\s*\(/i.test(trimmed)) {
+      while (i < lines.length && /^BTW\s*\(/i.test((lines[i] || '').trim())) i++
+      for (const row of vatLines) {
+        const rate = parseNumber(row.rate) || 21
+        const tax = parseNumber(row.tax)
+        out.push(padThermalMoneyLine(`BTW (${rate}%)`, tax))
+      }
+      continue
+    }
+    out.push(lines[i])
+  }
+  return out.join('\n')
+}
+
 function buildEscPosPayload(body) {
   // Keuken-bon mode (geen prijzen, alleen items + notities)
   if (body && body.receiptMode === 'keuken') return buildKitchenReceipt(body)
-  // Gebruik rijke bon als orderData aanwezig is — geeft mooiste resultaat
-  if (body && body.orderData) return buildRichReceipt(body)
+
+  const rawBonIn = (body?.bonInhoud || body?.receiptText || '').toString().trim()
+  const kassaBon = rawBonIn && body?.receiptMode === 'kassa'
+  if (!kassaBon && body && body.orderData) return buildRichReceipt(body)
 
   /**
-   * Fallback wanneer de website (oude versie) alleen platte `bonInhoud` stuurt.
-   * Bewust simpel: hele bon staat in DOUBLE_HEIGHT (alles dubbel zo hoog),
-   * met extra ruimte voor item-regels en totaalregels. Geen slimme rewrites
-   * die de structuur kapot maken.
+   * Kassabon: bonInhoud (layout) + optioneel vatLines uit orderData (juiste tarieven).
+   * Fallback: alleen platte bonInhoud of rijke bon via orderData hierboven.
    */
   const W = 42
   const c = []
@@ -538,7 +572,9 @@ function buildEscPosPayload(body) {
   const RE_BEDANKT = /^(BEDANKT|DANK\s*U|THANK\s*YOU)/i
   const RE_BETAALD = /^(BETAALD)/i
 
-  const raw = (body?.bonInhoud || body?.receiptText || '').toString()
+  const raw = kassaBon
+    ? injectVatLinesIntoBonText(rawBonIn, body?.orderData?.vatLines)
+    : rawBonIn
   let lines = raw.split(/\r?\n/)
 
   /**
