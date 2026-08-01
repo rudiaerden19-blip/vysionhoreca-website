@@ -3381,10 +3381,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         getMenuCategories(tenant),
         getMenuProducts(tenant),
       ])
-      freshCats = dedupeCatalogById(freshCatsRaw.filter((c) => c.is_active))
-      freshProds = dedupeCatalogById(freshProdsRaw.filter((p) => p.is_active))
-      setCategories(freshCats)
-      setProducts(freshProds)
+      freshCats = dedupeCatalogById(freshCatsRaw)
+      freshProds = dedupeCatalogById(freshProdsRaw)
+      setCategories(dedupeCatalogById(freshCatsRaw.filter((c) => c.is_active)))
+      setProducts(dedupeCatalogById(freshProdsRaw.filter((p) => p.is_active)))
     } catch {
       /* offline: bestaande lookup */
     }
@@ -3677,10 +3677,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           getMenuCategories(tenant),
           getMenuProducts(tenant),
         ])
-        catsForVat = dedupeCatalogById(freshCatsRaw.filter((c) => c.is_active))
-        prodsForVat = dedupeCatalogById(freshProdsRaw.filter((p) => p.is_active))
-        setCategories(catsForVat)
-        setProducts(prodsForVat)
+        catsForVat = dedupeCatalogById(freshCatsRaw)
+        prodsForVat = dedupeCatalogById(freshProdsRaw)
+        setCategories(dedupeCatalogById(freshCatsRaw.filter((c) => c.is_active)))
+        setProducts(dedupeCatalogById(freshProdsRaw.filter((p) => p.is_active)))
       } catch {
         /* offline: state snapshot */
       }

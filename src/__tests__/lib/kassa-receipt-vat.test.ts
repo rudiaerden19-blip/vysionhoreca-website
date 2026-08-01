@@ -112,4 +112,27 @@ describe('computeKassaReceiptVatFromCartLines', () => {
     )
     expect(vat.byRate.map((l) => l.rate).sort((a, b) => a - b)).toEqual([9, 21])
   })
+
+  it('negeert verouderde category_id op tafel-snapshot als catalog drank is', () => {
+    const lines: KassaCartItem[] = [
+      {
+        cartKey: '1',
+        quantity: 1,
+        product: {
+          ...cola,
+          category_id: 'cat-food',
+        },
+      },
+    ]
+    const vat = computeKassaReceiptVatFromCartLines(
+      lines,
+      [foodCat, drinkCat],
+      [burger, cola],
+      9,
+      'DINE_IN',
+      'NL',
+      null,
+    )
+    expect(vat.byRate.map((l) => l.rate)).toEqual([21])
+  })
 })

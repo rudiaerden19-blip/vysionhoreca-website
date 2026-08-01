@@ -273,18 +273,20 @@ function resolveLineVatRate(
   }
 
   const productId = line.product_id ?? line.productId
-  if (productId && ctx?.productCategoryById) {
+  const catalogHasProduct =
+    Boolean(productId) && Boolean(ctx?.productCategoryById?.has(String(productId)))
+  if (catalogHasProduct && ctx?.productCategoryById) {
     const cid = ctx.productCategoryById.get(String(productId))
     if (cid) {
       const fromProduct = resolveFromCategoryId(cid)
       if (fromProduct != null) return fromProduct
     }
-  }
-
-  const lineCategoryId = line.category_id ?? line.categoryId
-  if (lineCategoryId) {
-    const fromLineCategory = resolveFromCategoryId(lineCategoryId)
-    if (fromLineCategory != null) return fromLineCategory
+  } else {
+    const lineCategoryId = line.category_id ?? line.categoryId
+    if (lineCategoryId) {
+      const fromLineCategory = resolveFromCategoryId(lineCategoryId)
+      if (fromLineCategory != null) return fromLineCategory
+    }
   }
 
   if (ctx?.productCategoryByNormalizedName) {

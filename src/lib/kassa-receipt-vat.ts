@@ -33,10 +33,11 @@ export function hydrateKassaCartItemsFromCatalog(
     if (!pid || String(pid).startsWith('custom-')) return line
     const fromCatalog = byId.get(String(pid))
     if (!fromCatalog) return line
-    const category_id =
-      line.product.category_id != null && String(line.product.category_id).trim() !== ''
-        ? line.product.category_id
-        : fromCatalog.category_id
+    const catalogCat =
+      fromCatalog.category_id != null && String(fromCatalog.category_id).trim() !== ''
+        ? fromCatalog.category_id
+        : null
+    const category_id = catalogCat ?? line.product.category_id
     if (
       category_id === line.product.category_id &&
       fromCatalog.name === line.product.name &&
@@ -115,18 +116,21 @@ export function computeKassaReceiptVatFromCartLines(
   const ctx = buildZReportVatContext(categories, products, tenantCountry, tenantBtwNumber ?? null)
   const hydrated = hydrateKassaCartItemsFromCatalog(lines, products)
   const orderTypeForVat = normalizeOrderTypeForVat(orderType)
-  const split = computeInclusiveVatSplitFromCart(hydrated, (line) =>
-    resolveVatRateForOrderItem(
+  const split = computeInclusiveVatSplitFromCart(hydrated, (line) => {
+    const pid = line.product.id ? String(line.product.id) : ''
+    const catalogCategoryId =
+      pid && ctx.productCategoryById.has(pid) ? ctx.productCategoryById.get(pid) : undefined
+    return resolveVatRateForOrderItem(
       {
         product_id: line.product.id,
-        category_id: line.product.category_id,
+        category_id: catalogCategoryId ?? line.product.category_id,
         name: line.product.name,
       },
       tenantDefaultBtw,
       orderTypeForVat,
       ctx,
-    ),
-  )
+    )
+  })
   return {
     subtotalExcl: Math.round(split.subtotalExcl * 100) / 100,
     totalTax: Math.round(split.totalTax * 100) / 100,
