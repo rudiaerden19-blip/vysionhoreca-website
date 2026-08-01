@@ -57,6 +57,8 @@ const organizationJsonLd = {
         availableLanguage: ['Dutch', 'English', 'French', 'German'],
       },
       sameAs: [
+        'https://www.tablevysion.com',
+        'https://www.vysionorder.com',
         'https://www.vysionapps.io',
         'https://www.vysion-kassa.com',
         'https://www.webvysion.tech',

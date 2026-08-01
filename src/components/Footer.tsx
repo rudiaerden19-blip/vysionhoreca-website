@@ -35,6 +35,24 @@ export default function Footer() {
               </address>
               <p className="mt-6 space-y-1">
                 <a
+                  href="https://www.tablevysion.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent hover:underline block"
+                  aria-label="TableVysion reserveringen, opent in een nieuw venster"
+                >
+                  www.tablevysion.com
+                </a>
+                <a
+                  href="https://www.vysionorder.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent hover:underline block"
+                  aria-label="Vysion Order, opent in een nieuw venster"
+                >
+                  www.vysionorder.com
+                </a>
+                <a
                   href="https://www.vysionapps.io"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -67,6 +85,17 @@ export default function Footer() {
             <nav aria-label={t('footer.navProductAria')}>
               <h2 className="text-base font-semibold mb-4 text-white">{t('footer.product')}</h2>
               <ul className="space-y-2">
+                <li>
+                  <a
+                    href="https://www.tablevysion.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="TableVysion: reserveringssoftware voor horeca"
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
+                    TableVysion reserveringen
+                  </a>
+                </li>
                 <li>
                   <a
                     href="/#platform"
