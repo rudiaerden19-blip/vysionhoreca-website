@@ -63,6 +63,8 @@ import {
   isAndroidTabletPrintClient,
   fetchPrintAgentHealth,
   printAgentHasDedicatedKitchenPrinter,
+  isPrintAgentMultiVatReady,
+  MIN_PRINT_AGENT_VERSION_FOR_MULTI_VAT,
 } from '@/lib/vysion-print-agent-client'
 import {
   offlineDbLoadMenuSnapshot,
@@ -3690,13 +3692,29 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         tenantInfo?.btw_number,
       )
     }
-    const subtotal = receiptVatComputed
-      ? receiptVatComputed.subtotalExcl
-      : Math.round((order.total / (1 + fbVatRate / 100)) * 100) / 100
-    const tax = receiptVatComputed
-      ? receiptVatComputed.totalTax
-      : Math.round((order.total - subtotal) * 100) / 100
-    const receiptVatRows = receiptVatComputed?.byRate ?? []
+    if (!receiptVatComputed) {
+      receiptVatComputed = kassaReceiptVatFromPersistedOrder(order)
+    }
+    const screenVatRows =
+      order.vatSplit?.map((l) => ({
+        rate: normalizeCategoryVatPercent(l.rate, fbVatRate),
+        baseExcl: l.baseExcl,
+        tax: l.tax,
+      })) ?? []
+    const receiptVatRows =
+      screenVatRows.length > 0 ? screenVatRows : (receiptVatComputed?.byRate ?? [])
+    const subtotal =
+      screenVatRows.length > 0 && typeof order.subtotalExclVat === 'number'
+        ? order.subtotalExclVat
+        : receiptVatComputed
+          ? receiptVatComputed.subtotalExcl
+          : Math.round((order.total / (1 + fbVatRate / 100)) * 100) / 100
+    const tax =
+      screenVatRows.length > 0 && typeof order.totalTax === 'number'
+        ? order.totalTax
+        : receiptVatComputed
+          ? receiptVatComputed.totalTax
+          : Math.round((order.total - subtotal) * 100) / 100
     const orderTypeLabel =
       order.orderType === 'DINE_IN'
         ? ` ${t('kassaReceipt.orderTypeDineIn')}`
@@ -3954,6 +3972,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           }
         } catch {
           /* quota / private mode */
+        }
+        if (receiptVatRows.length > 1) {
+          const health = await fetchPrintAgentHealth()
+          if (!isPrintAgentMultiVatReady(health)) {
+            setThermalPrintBanner({
+              variant: 'error',
+              message:
+                `Bon is geprint, maar de Print Agent op deze PC is verouderd (${health.agentVersion ?? 'onbekend'}). Daardoor komt alleen 9% op papier.\n\nInstalleer Vysion Print Agent ${MIN_PRINT_AGENT_VERSION_FOR_MULTI_VAT}+ van www.vysion-kassa.com/download/print-agent-windows, start opnieuw, en print nog eens.`,
+            })
+          }
         }
       } else {
         if (!barKitchenDelta) {

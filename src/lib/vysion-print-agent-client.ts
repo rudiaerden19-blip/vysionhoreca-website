@@ -247,6 +247,18 @@ export type PrintAgentHealth = {
   printerConfigured: boolean
   printerName: string | null
   kitchenPrinterName: string | null
+  agentVersion?: string | null
+  multiVatOnReceipt?: boolean
+}
+
+export const MIN_PRINT_AGENT_VERSION_FOR_MULTI_VAT = '2.0.10'
+
+export function isPrintAgentMultiVatReady(health: PrintAgentHealth): boolean {
+  if (!health.ok) return false
+  if (health.multiVatOnReceipt === true) return true
+  const v = health.agentVersion?.trim()
+  if (!v) return false
+  return v >= MIN_PRINT_AGENT_VERSION_FOR_MULTI_VAT
 }
 
 /** GET /health — o.a. of keukenprinter in de agent is ingesteld. */
@@ -278,6 +290,8 @@ export async function fetchPrintAgentHealth(
       printerConfigured?: boolean
       printerName?: string | null
       kitchenPrinterName?: string | null
+      agentVersion?: string | null
+      multiVatOnReceipt?: boolean
     }
     const p =
       j.printerName != null && String(j.printerName).trim() !== ''
@@ -292,6 +306,8 @@ export async function fetchPrintAgentHealth(
       printerConfigured: j.printerConfigured === true,
       printerName: p,
       kitchenPrinterName: k,
+      agentVersion: j.agentVersion ?? null,
+      multiVatOnReceipt: j.multiVatOnReceipt === true,
     }
   } catch {
     return { ok: false, printerConfigured: false, printerName: null, kitchenPrinterName: null }

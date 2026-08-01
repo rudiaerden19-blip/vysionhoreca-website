@@ -11,6 +11,9 @@ const fs = require('fs')
 const os = require('os')
 const crypto = require('crypto')
 
+/** Verhoog bij bon/BTW-wijzigingen — kassa toont waarschuwing als agent ouder is. */
+const AGENT_VERSION = '2.0.10'
+
 // ESC/POS commando's
 const ESC = 0x1b
 const GS = 0x1d
@@ -507,25 +510,53 @@ function padThermalMoneyLine(left, amount, W = 42) {
   return (l + '.'.repeat(fillLen) + r).slice(0, W)
 }
 
-/** Vervang BTW-regels in platte bonInhoud door orderData.vatLines (categorie-BTW). */
-function injectVatLinesIntoBonText(rawText, vatLines) {
+/** Vervang/insert BTW-regels in bon-tekst (fallback vóór ESC/POS-loop). */
+function applyVatLinesToBonText(rawText, vatLines) {
   if (!Array.isArray(vatLines) || vatLines.length === 0) return rawText
   const lines = rawText.split(/\r?\n/)
   const out = []
+  let vatDone = false
   for (let i = 0; i < lines.length; i++) {
     const trimmed = (lines[i] || '').trim()
     if (/^BTW\s*\(/i.test(trimmed)) {
-      while (i < lines.length && /^BTW\s*\(/i.test((lines[i] || '').trim())) i++
+      if (!vatDone) {
+        for (const row of vatLines) {
+          const rate = parseNumber(row.rate) || 21
+          const tax = parseNumber(row.tax)
+          out.push(padThermalMoneyLine(`BTW (${rate}%)`, tax))
+        }
+        vatDone = true
+      }
+      while (i + 1 < lines.length && /^BTW\s*\(/i.test((lines[i + 1] || '').trim())) i++
+      continue
+    }
+    out.push(lines[i])
+    if (!vatDone && /^subtotaal/i.test(trimmed)) {
       for (const row of vatLines) {
         const rate = parseNumber(row.rate) || 21
         const tax = parseNumber(row.tax)
         out.push(padThermalMoneyLine(`BTW (${rate}%)`, tax))
       }
-      continue
+      vatDone = true
     }
-    out.push(lines[i])
+  }
+  if (!vatDone) {
+    const insert = []
+    for (const row of vatLines) {
+      const rate = parseNumber(row.rate) || 21
+      const tax = parseNumber(row.tax)
+      insert.push(padThermalMoneyLine(`BTW (${rate}%)`, tax))
+    }
+    const idx = out.findIndex((l) => /^TOTA(A?)L\b/i.test(String(l || '').trim()))
+    if (idx >= 0) out.splice(idx, 0, ...insert)
+    else out.push(...insert)
   }
   return out.join('\n')
+}
+
+/** Vervang BTW-regels in platte bonInhoud door orderData.vatLines (categorie-BTW). */
+function injectVatLinesIntoBonText(rawText, vatLines) {
+  return applyVatLinesToBonText(rawText, vatLines)
 }
 
 function buildEscPosPayload(body) {
@@ -593,6 +624,14 @@ function buildEscPosPayload(body) {
     break
   }
 
+  const vatLinesEsc =
+    Array.isArray(body?.vatLines) && body.vatLines.length > 0
+      ? body.vatLines
+      : Array.isArray(body?.orderData?.vatLines)
+        ? body.orderData.vatLines
+        : []
+  let vatEscPosDone = false
+
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i] || ''
     const trimmed = line.trim()
@@ -603,8 +642,42 @@ function buildEscPosPayload(body) {
       continue
     }
 
+    if (/^BTW\s*\(/i.test(trimmed)) {
+      if (!vatEscPosDone && vatLinesEsc.length > 0) {
+        for (const row of vatLinesEsc) {
+          const rate = parseNumber(row.rate) || 21
+          const tax = parseNumber(row.tax)
+          c.push(encWithEuro(padThermalMoneyLine(`BTW (${rate}%)`, tax)))
+        }
+        vatEscPosDone = true
+      }
+      while (i + 1 < lines.length && /^BTW\s*\(/i.test((lines[i + 1] || '').trim())) i++
+      continue
+    }
+
+    if (/^subtotaal/i.test(trimmed)) {
+      c.push(encWithEuro(line))
+      if (!vatEscPosDone && vatLinesEsc.length > 0) {
+        for (const row of vatLinesEsc) {
+          const rate = parseNumber(row.rate) || 21
+          const tax = parseNumber(row.tax)
+          c.push(encWithEuro(padThermalMoneyLine(`BTW (${rate}%)`, tax)))
+        }
+        vatEscPosDone = true
+      }
+      continue
+    }
+
     // Voor TOTAAL: extra witruimte ervoor + scheidingsstreep
     if (RE_TOTAL.test(trimmed)) {
+      if (!vatEscPosDone && vatLinesEsc.length > 0) {
+        for (const row of vatLinesEsc) {
+          const rate = parseNumber(row.rate) || 21
+          const tax = parseNumber(row.tax)
+          c.push(encWithEuro(padThermalMoneyLine(`BTW (${rate}%)`, tax)))
+        }
+        vatEscPosDone = true
+      }
       c.push(Buffer.from('\n', 'latin1'))
     }
 
@@ -989,6 +1062,8 @@ function createApp(
     res.json({
       ok: true,
       service: 'vysion-print-agent',
+      agentVersion: AGENT_VERSION,
+      multiVatOnReceipt: true,
       printerConfigured: !!name,
       printerName: name || null,
       kitchenPrinterName: k || null,
