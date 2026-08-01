@@ -3833,10 +3833,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         : {}),
     }
     /**
-     * Agent: met orderData bouwt hij de kassabon zelf (één BTW-regel). Mix 9%/21% staat in bonInhoud.
-     * Keukenbon gebruikt alleen orderData.items — die moet bij receiptMode `keuken` altijd mee.
+     * Kassabon: altijd voorgebouwde bonInhoud (juiste BTW-regels per tarief).
+     * orderData alleen voor keukenbon / online-rijke bon elders.
      */
-    const kassaBonInhoudOnly = receiptMode === 'kassa' && receiptVatRows.length > 1
+    const kassaBonInhoudOnly = receiptMode === 'kassa'
     const printResult = await sendToVysionPrintAgent({
       winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
       bonInhoud: bonLines.join('\n'),

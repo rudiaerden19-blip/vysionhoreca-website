@@ -286,11 +286,20 @@ function buildRichReceipt(body) {
   const subtotal = parseNumber(orderData?.subtotal)
   const tax = parseNumber(orderData?.tax)
   const total = parseNumber(orderData?.total)
-  const vatRate = parseNumber(businessInfo?.vatRate) || 21
 
   c.push(DOUBLE_HEIGHT)
   c.push(padPrice('Subtotaal', subtotal, W))
-  c.push(padPrice(`BTW (${vatRate}%)`, tax, W))
+  const vatLines = orderData?.vatLines
+  if (Array.isArray(vatLines) && vatLines.length > 0) {
+    for (const row of vatLines) {
+      const rate = parseNumber(row.rate) || parseNumber(businessInfo?.vatRate) || 21
+      const rowTax = parseNumber(row.tax)
+      c.push(padPrice(`BTW (${rate}%)`, rowTax, W))
+    }
+  } else {
+    const vatRate = parseNumber(businessInfo?.vatRate) || 21
+    c.push(padPrice(`BTW (${vatRate}%)`, tax, W))
+  }
   c.push(NORMAL_SIZE)
 
   c.push(Buffer.from('\n', 'latin1'))
