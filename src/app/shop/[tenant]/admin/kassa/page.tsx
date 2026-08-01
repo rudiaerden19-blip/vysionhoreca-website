@@ -2604,6 +2604,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const addToCart = (product: MenuProduct, choices: SelectedChoice[] = []) => {
     scheduleAddToCartSound()
+    const vatCatId =
+      selectedCategory?.id != null && String(selectedCategory.id).trim() !== ''
+        ? String(selectedCategory.id)
+        : product.category_id != null
+          ? String(product.category_id)
+          : null
     const cartKey = choices.length > 0
       ? `${product.id}-${choices.map(c => c.choiceId).sort().join('-')}`
       : product.id!
@@ -2611,7 +2617,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       const existing = prev.find(i => i.cartKey === cartKey)
       const updated = existing
         ? prev.map(i => i.cartKey === cartKey ? { ...i, quantity: i.quantity + 1 } : i)
-        : [...prev, { product, quantity: 1, choices, cartKey }]
+        : [...prev, { product, quantity: 1, choices, cartKey, kassaVatCategoryId: vatCatId }]
       if (tableNumber) {
         updateTableStatus(tableNumber, tableHasOpenOrder(dineInFloorZone, tableNumber, updated), dineInFloorZone)
       }

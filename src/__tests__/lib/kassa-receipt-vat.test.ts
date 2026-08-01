@@ -1,7 +1,10 @@
 import { hydrateKassaCartItemsFromCatalog } from '@/lib/kassa-receipt-vat'
 import type { KassaCartItem } from '@/lib/kassa-cart-types'
 import type { MenuCategory, MenuProduct } from '@/lib/admin-api'
-import { computeKassaReceiptVatFromCartLines } from '@/lib/kassa-receipt-vat'
+import {
+  computeKassaReceiptVatFromCartLines,
+  resolveKassaCartLineVatRate,
+} from '@/lib/kassa-receipt-vat'
 
 describe('hydrateKassaCartItemsFromCatalog', () => {
   it('zet category_id vanuit menu als tafel-snapshot die mist', () => {
@@ -134,5 +137,29 @@ describe('computeKassaReceiptVatFromCartLines', () => {
       null,
     )
     expect(vat.byRate.map((l) => l.rate)).toEqual([21])
+  })
+
+  it('kassaVatCategoryId van categorietegel wint van verkeerde product.category_id', () => {
+    const lines: KassaCartItem[] = [
+      {
+        cartKey: '1',
+        quantity: 1,
+        kassaVatCategoryId: 'cat-drink',
+        product: {
+          ...cola,
+          category_id: 'cat-food',
+        },
+      },
+    ]
+    const rate = resolveKassaCartLineVatRate(
+      lines[0],
+      [foodCat, drinkCat],
+      [burger, cola],
+      9,
+      'DINE_IN',
+      'NL',
+      null,
+    )
+    expect(rate).toBe(21)
   })
 })

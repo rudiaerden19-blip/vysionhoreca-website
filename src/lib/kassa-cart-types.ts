@@ -14,6 +14,8 @@ export interface KassaCartItem {
   quantity: number
   choices?: KassaSelectedChoice[]
   cartKey: string
+  /** Categorietegel bij toevoegen — bepaalt BTW als snapshot afwijkt. */
+  kassaVatCategoryId?: string | null
 }
 
 export type KassaRegisterOrderType = 'DINE_IN' |  'TAKEAWAY' |  'DELIVERY'
