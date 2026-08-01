@@ -41,12 +41,6 @@ import {
   resolveTenantCountryForVat,
 } from '@/lib/order-vat'
 import {
-  kassaThermalItemLine,
-  kassaThermalPadMoney,
-  kassaThermalTotalLine,
-  kassaThermalVatLine,
-} from '@/lib/kassa-thermal-bon-format'
-import {
   adminDineInSeatAuditLine,
   adminOrderChannelBadgeClass,
   adminPosChannelBadgeLabel,
@@ -727,7 +721,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     }
     if (tenantSettings?.phone) bonLines.push(`Tel: ${tenantSettings.phone}`)
     bonLines.push('--------------------------------')
-    bonLines.push(`Bon #${order.order_number || order.id?.slice(0, 8) ?? '?'}`)
+    bonLines.push(`Bon #${order.order_number || (order.id?.slice(0, 8) ?? '?')}`)
     bonLines.push('--------------------------------')
     for (const it of agentItems) {
       bonLines.push(kassaThermalItemLine(it.quantity, it.name, it.price))
