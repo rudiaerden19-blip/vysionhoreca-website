@@ -64,7 +64,9 @@ export default function LoginPage() {
     const nextRaw = params.get('next')
 
     mirrorSuperadminSessionFromCookieToLocalStorage()
-    if (isSuperAdminLoggedIn()) {
+    const productLineParam = params.get('productLine')
+    const tableVysionLogin = productLineParam === 'restaurant_reservaties'
+    if (isSuperAdminLoggedIn() && !tableVysionLogin) {
       let nextDecoded = (nextRaw || '').trim()
       try {
         if (nextRaw) nextDecoded = decodeURIComponent(nextRaw.trim())

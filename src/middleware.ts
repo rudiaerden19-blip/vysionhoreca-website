@@ -105,6 +105,8 @@ function redirectSuperadminPastLoginOnMainHost(
   pathname: string
 ): NextResponse | null {
   if (!pathname.startsWith('/login')) return null
+  /** TableVysion-marketing: superadmin mag zaak-login zien i.p.v. /superadmin. */
+  if (url.searchParams.get('productLine') === 'restaurant_reservaties') return null
   if (!hasSuperadminSessionCookie(request)) return null
   const nextRaw = url.searchParams.get('next')?.trim()
   if (nextRaw) {
