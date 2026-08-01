@@ -219,6 +219,11 @@ import {
   hydrateKassaCartItemsFromCatalog,
   kassaReceiptVatFromPersistedOrder,
 } from '@/lib/kassa-receipt-vat'
+import {
+  kassaThermalItemLine,
+  kassaThermalPadMoney,
+  kassaThermalTotalLine,
+} from '@/lib/kassa-thermal-bon-format'
 
 /** Tik-feedback ná paint — zwakkere touch-terminals blijven UI-updates beter bijbenen */
 function scheduleKassaTapSound(play: () => void) {
@@ -3604,6 +3609,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       draftCopies?: 1 | 2
       /** Standaard kassa; keuken bij «naar tafel»-delta. */
       receiptMode?: 'kassa' |  'keuken'
+      /** Voorkom dubbele keukenbon na expliciete keukenprint in dezelfde flow. */
+      skipKitchenCompanion?: boolean
     },
   ) => {
     if (!order) {
@@ -3760,23 +3767,28 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     for (const i of receiptLines) {
       const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
       const lineTotal = (i.product.price + choicesTotal) * i.quantity
-      bonLines.push(`${i.quantity}x ${i.product.name}  EUR ${lineTotal.toFixed(2)}`)
+      bonLines.push(kassaThermalItemLine(i.quantity, i.product.name, lineTotal))
       for (const c of i.choices || []) {
-        bonLines.push(` + ${c.choiceName}${c.price > 0 ? ` EUR ${c.price.toFixed(2)}`: ''}`)
+        if (c.price > 0) {
+          bonLines.push(kassaThermalPadMoney(` + ${c.choiceName}`, c.price))
+        } else {
+          bonLines.push(` + ${c.choiceName}`.slice(0, 42))
+        }
       }
     }
     bonLines.push('--------------------------------')
-    bonLines.push(`${t('kassaReceipt.subtotal')}  EUR ${subtotal.toFixed(2)}`)
+    bonLines.push(kassaThermalPadMoney(t('kassaReceipt.subtotal'), subtotal))
     if (receiptVatRows.length >= 1) {
       for (const row of receiptVatRows) {
         bonLines.push(
-          `${t('kassaReceipt.vat').replace('{rate}', String(row.rate))}  EUR ${row.tax.toFixed(2)}`,
+          kassaThermalPadMoney(t('kassaReceipt.vat').replace('{rate}', String(row.rate)), row.tax),
         )
       }
     } else {
-      bonLines.push(`${t('kassaReceipt.vat').replace('{rate}', String(fbVatRate))}  EUR ${tax.toFixed(2)}`)
+      bonLines.push(kassaThermalPadMoney(t('kassaReceipt.vat').replace('{rate}', String(fbVatRate)), tax))
     }
-    bonLines.push(`${t('kassaReceipt.total')}  EUR ${order.total.toFixed(2)}`)
+    bonLines.push('')
+    bonLines.push(kassaThermalTotalLine(t('kassaReceipt.total'), order.total))
     bonLines.push(`${t('kassaReceipt.paidWith')} ${payLabel}`)
     if (order.helpedByStaffName) {
       bonLines.push(t('kassaReceipt.helpedBy').replace('{name}', order.helpedByStaffName))
@@ -3797,6 +3809,34 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     const paidCopies = 2
     const draftCopies = opts?.draftCopies === 2 ? 2 : 1
+    const agentOrderData = {
+      orderNumber: order.orderNumber,
+      orderType: order.orderType,
+      tableNumber: receiptTableNr || null,
+      items: order.items.map((i) => ({
+        quantity: i.quantity,
+        name: i.product.name,
+        price: (i.product.price + (i.choices || []).reduce((s, c) => s + c.price, 0)) * i.quantity,
+        choices: (i.choices || []).map((c) => ({ name: c.choiceName, price: c.price })),
+      })),
+      subtotal,
+      tax,
+      total: order.total,
+      paymentMethod: order.paymentMethod,
+      ...(receiptVatRows.length > 0
+        ? {
+            vatLines: receiptVatRows.map((row) => ({
+              rate: row.rate,
+              tax: row.tax,
+            })),
+          }
+        : {}),
+    }
+    /**
+     * Agent: met orderData bouwt hij de kassabon zelf (één BTW-regel). Mix 9%/21% staat in bonInhoud.
+     * Keukenbon gebruikt alleen orderData.items — die moet bij receiptMode `keuken` altijd mee.
+     */
+    const kassaBonInhoudOnly = receiptMode === 'kassa' && receiptVatRows.length > 1
     const printResult = await sendToVysionPrintAgent({
       winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
       bonInhoud: bonLines.join('\n'),
@@ -3804,29 +3844,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       copies: isDraft ? draftCopies : paidCopies,
       openDrawer: isCash,
       receiptMode,
-      orderData: {
-        orderNumber: order.orderNumber,
-        orderType: order.orderType,
-        tableNumber: receiptTableNr || null,
-        items: order.items.map(i => ({
-          quantity: i.quantity,
-          name: i.product.name,
-          price: (i.product.price + (i.choices || []).reduce((s, c) => s + c.price, 0)) * i.quantity,
-          choices: (i.choices || []).map(c => ({ name: c.choiceName, price: c.price })),
-        })),
-        subtotal,
-        tax,
-        total: order.total,
-        paymentMethod: order.paymentMethod,
-        ...(receiptVatRows.length > 0
-          ? {
-              vatLines: receiptVatRows.map((row) => ({
-                rate: row.rate,
-                tax: row.tax,
-              })),
-            }
-          : {}),
-      },
+      orderData: kassaBonInhoudOnly ? undefined : agentOrderData,
       businessInfo: {
         name: tenantInfo?.business_name,
         address: tenantInfo?.address ?? undefined,
@@ -3838,6 +3856,23 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         vatRate: receiptVatRows[0]?.rate ?? fbVatRate,
       },
     })
+    if (printResult.ok && kassaBonInhoudOnly && order.items.length > 0 && !opts?.skipKitchenCompanion) {
+      const health = await fetchPrintAgentHealth()
+      if (printAgentHasDedicatedKitchenPrinter(health)) {
+        await sendToVysionPrintAgent({
+          winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
+          bonInhoud: '',
+          copies: 1,
+          openDrawer: false,
+          receiptMode: 'keuken',
+          orderData: agentOrderData,
+          businessInfo: {
+            name: tenantInfo?.business_name,
+            phone: tenantInfo?.phone ?? undefined,
+          },
+        })
+      }
+    }
 
     /** Alleen bij Print-Agent-fout op PC: HTML voor noodafdruk. Tablet/kiosk: géén browser-print (Chrome → alleen PDF, kiosk valt om). */
     const receiptHtml = !printResult.ok
@@ -4015,6 +4050,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             barTableDelta: true,
             receiptMode: 'kassa',
             barWatermarkCommit: watermarkCommit,
+            skipKitchenCompanion: wantKitchen && kitchenAvailable,
           })
         }
       } catch {
