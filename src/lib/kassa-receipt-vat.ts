@@ -1,15 +1,14 @@
 import type { MenuCategory, MenuProduct } from '@/lib/admin-api'
 import type { KassaCartItem, KassaLastOrderReceipt, KassaRegisterOrderType } from '@/lib/kassa-cart-types'
 import {
-  buildCategoryVatLookup,
-  buildProductCategoryLookup,
   computeInclusiveVatSplitFromCart,
   normalizeCategoryVatPercent,
   normalizeOrderTypeForVat,
-  resolveVatPercentForProductAndOrderType,
+  resolveVatRateForOrderItem,
   type CategoryVatPercent,
   type VatSplitLine,
 } from '@/lib/order-vat'
+import { buildZReportVatContext } from '@/lib/z-report-vat-context'
 
 export type KassaReceiptVatComputed = {
   subtotalExcl: number
@@ -66,7 +65,7 @@ export function kassaOrderHasPersistedVatSplit(order: KassaLastOrderReceipt): bo
   )
 }
 
-/** BTW zoals berekend bij afrekenen — bon mag niet opnieuw rekenen met verouderde categorie-cache. */
+/** BTW zoals berekend bij afrekenen — fallback als live menu niet beschikbaar is. */
 export function kassaReceiptVatFromPersistedOrder(order: KassaLastOrderReceipt): KassaReceiptVatComputed | null {
   if (!kassaOrderHasPersistedVatSplit(order)) return null
   const byRate: VatSplitLine[] = order.vatSplit!.map((l) => ({
@@ -81,6 +80,29 @@ export function kassaReceiptVatFromPersistedOrder(order: KassaLastOrderReceipt):
   }
 }
 
+export function resolveKassaCartLineVatRate(
+  line: KassaCartItem,
+  categories: MenuCategory[],
+  products: ReadonlyArray<MenuProduct>,
+  tenantDefaultBtw: number,
+  orderType: KassaRegisterOrderType,
+  tenantCountry: string | null,
+  tenantBtwNumber?: string | null,
+): CategoryVatPercent {
+  const ctx = buildZReportVatContext(categories, products, tenantCountry, tenantBtwNumber ?? null)
+  const hydrated = hydrateKassaCartItemsFromCatalog([line], products)[0] ?? line
+  return resolveVatRateForOrderItem(
+    {
+      product_id: hydrated.product.id,
+      category_id: hydrated.product.category_id,
+      name: hydrated.product.name,
+    },
+    tenantDefaultBtw,
+    normalizeOrderTypeForVat(orderType),
+    ctx,
+  )
+}
+
 export function computeKassaReceiptVatFromCartLines(
   lines: KassaCartItem[],
   categories: MenuCategory[],
@@ -88,18 +110,21 @@ export function computeKassaReceiptVatFromCartLines(
   tenantDefaultBtw: number,
   orderType: KassaRegisterOrderType,
   tenantCountry: string | null,
+  tenantBtwNumber?: string | null,
 ): KassaReceiptVatComputed {
-  const categoryVatLookup = buildCategoryVatLookup(categories)
-  const productCategoryById = buildProductCategoryLookup(products)
+  const ctx = buildZReportVatContext(categories, products, tenantCountry, tenantBtwNumber ?? null)
+  const hydrated = hydrateKassaCartItemsFromCatalog(lines, products)
   const orderTypeForVat = normalizeOrderTypeForVat(orderType)
-  const split = computeInclusiveVatSplitFromCart(lines, (line) =>
-    resolveVatPercentForProductAndOrderType(
-      line.product,
-      categoryVatLookup,
+  const split = computeInclusiveVatSplitFromCart(hydrated, (line) =>
+    resolveVatRateForOrderItem(
+      {
+        product_id: line.product.id,
+        category_id: line.product.category_id,
+        name: line.product.name,
+      },
       tenantDefaultBtw,
       orderTypeForVat,
-      productCategoryById,
-      tenantCountry,
+      ctx,
     ),
   )
   return {

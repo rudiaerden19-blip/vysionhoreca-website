@@ -266,7 +266,9 @@ function resolveLineVatRate(
   const country = ctx?.tenantCountry
   const resolveFromCategoryId = (categoryId: unknown): CategoryVatPercent | null => {
     if (!categoryId || !ctx?.categoryById) return null
-    const override = ctx.categoryById.get(String(categoryId))
+    const key = String(categoryId)
+    if (!ctx.categoryById.has(key)) return null
+    const override = ctx.categoryById.get(key)
     return resolveVatPercentForCategoryAndOrderType(override, tenantDefaultPct, orderType, country)
   }
 

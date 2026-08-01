@@ -205,19 +205,17 @@ import {
   applyCustomerDisplayWindowBounds,
 } from '@/lib/kassa-customer-display-window'
 import {
-  buildCategoryVatLookup,
-  buildProductCategoryLookup,
   computeInclusiveVatSplitFromCart,
   normalizeCategoryVatPercent,
   normalizeOrderTypeForVat,
   resolveTenantCountryForVat,
-  resolveVatPercentForProductAndOrderType,
 } from '@/lib/order-vat'
 import { sortKassaCartLinesByMenuCategory } from '@/lib/kassa-cart-grouping'
 import {
   computeKassaReceiptVatFromCartLines,
   hydrateKassaCartItemsFromCatalog,
   kassaReceiptVatFromPersistedOrder,
+  resolveKassaCartLineVatRate,
 } from '@/lib/kassa-receipt-vat'
 import {
   kassaThermalItemLine,
@@ -1525,8 +1523,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   /** Zie Admin › Kassa-terminal (`kassa_floor_plan_enabled`). `undefined`= aan (backward compatible). */
   const kassaFloorPlanEnabled = tenantInfo?.kassa_floor_plan_enabled ?? true
 
-  const categoryVatLookup = useMemo(() => buildCategoryVatLookup(categories), [categories])
-  const productCategoryById = useMemo(() => buildProductCategoryLookup(products), [products])
   const tenantDefaultBtw = useMemo(
     () => normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 6, 21),
     [tenantInfo?.btw_percentage],
@@ -1534,15 +1530,23 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const tenantCountry = resolveTenantCountryForVat(tenantInfo?.country, tenantInfo?.btw_number)
   const resolveCartLineVat = useCallback(
     (line: CartItem) =>
-      resolveVatPercentForProductAndOrderType(
-        line.product,
-        categoryVatLookup,
+      resolveKassaCartLineVatRate(
+        line,
+        categories,
+        products,
         tenantDefaultBtw,
         orderType,
-        productCategoryById,
         tenantCountry,
+        tenantInfo?.btw_number,
       ),
-    [categoryVatLookup, tenantDefaultBtw, orderType, productCategoryById, tenantCountry],
+    [
+      categories,
+      products,
+      tenantDefaultBtw,
+      orderType,
+      tenantCountry,
+      tenantInfo?.btw_number,
+    ],
   )
 
   useEffect(() => {
@@ -3370,39 +3374,37 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     invalidateMenuCategoriesCache(tenant)
     cache.invalidate(cacheKey('menu_products', tenant))
-    let freshVatLookup = categoryVatLookup
-    let freshProductCategoryById = productCategoryById
+    let freshCats = categories
     let freshProds = products
     try {
       const [freshCatsRaw, freshProdsRaw] = await Promise.all([
         getMenuCategories(tenant),
         getMenuProducts(tenant),
       ])
-      const freshCats = dedupeCatalogById(freshCatsRaw.filter((c) => c.is_active))
+      freshCats = dedupeCatalogById(freshCatsRaw.filter((c) => c.is_active))
       freshProds = dedupeCatalogById(freshProdsRaw.filter((p) => p.is_active))
-      freshVatLookup = buildCategoryVatLookup(freshCats)
-      freshProductCategoryById = buildProductCategoryLookup(freshProds)
       setCategories(freshCats)
       setProducts(freshProds)
     } catch {
       /* offline: bestaande lookup */
     }
-    const linesForVat = hydrateKassaCartItemsFromCatalog(billLines, freshProds)
-    const resolveLineVatAtCheckout = (line: (typeof billLines)[number]) =>
-      resolveVatPercentForProductAndOrderType(
-        line.product,
-        freshVatLookup,
-        tenantDefaultBtw,
-        orderType,
-        freshProductCategoryById,
-        tenantCountry,
-      )
-    const vatSplit = computeInclusiveVatSplitFromCart(linesForVat, resolveLineVatAtCheckout)
-    if (Math.abs(vatSplit.grossTotal - total) > 0.03) {
-      console.warn('[kassa] btw-split vs mandtotaal mismatched', { split: vatSplit.grossTotal, total })
+    const vatComputed = computeKassaReceiptVatFromCartLines(
+      billLines,
+      freshCats,
+      freshProds,
+      tenantDefaultBtw,
+      orderType,
+      tenantCountry,
+      tenantInfo?.btw_number,
+    )
+    if (Math.abs(vatComputed.subtotalExcl + vatComputed.totalTax - total) > 0.03) {
+      console.warn('[kassa] btw-split vs mandtotaal mismatched', {
+        split: vatComputed.subtotalExcl + vatComputed.totalTax,
+        total,
+      })
     }
-    const subtotal = vatSplit.subtotalExcl
-    const tax = vatSplit.totalTax
+    const subtotal = vatComputed.subtotalExcl
+    const tax = vatComputed.totalTax
     const createdAt = new Date()
     const kassa_client_uuid =
       typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
@@ -3440,7 +3442,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         name: i.product.name,
         price: i.product.price,
         quantity: i.quantity,
-        btw_percentage: resolveLineVatAtCheckout(i),
+        btw_percentage: resolveKassaCartLineVatRate(
+          i,
+          freshCats,
+          freshProds,
+          tenantDefaultBtw,
+          orderType,
+          tenantCountry,
+          tenantInfo?.btw_number,
+        ),
         options: (i.choices || []).map((c: any) => ({ name: c.choiceName || c.name || '', price: c.price || 0 })),
       })),
       created_at: createdAt.toISOString(),
@@ -3565,7 +3575,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       checkoutReference: queuedOffline ? shortRef : undefined,
       items: sortKassaCartLinesByMenuCategory([...billLines], categories),
       total,
-      vatSplit: vatSplit.byRate.map((l) => ({
+      vatSplit: vatComputed.byRate.map((l) => ({
         rate: l.rate,
         baseExcl: l.baseExcl,
         tax: l.tax,
@@ -3656,8 +3666,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     try {
     const fbVatRate = normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 6, 21)
-    let receiptVatComputed = kassaReceiptVatFromPersistedOrder(order)
-    if (!receiptVatComputed && order.items.length > 0) {
+    let receiptVatComputed = null as ReturnType<typeof kassaReceiptVatFromPersistedOrder>
+    if (order.items.length > 0) {
       let catsForVat = categories
       let prodsForVat = products
       try {
@@ -3675,13 +3685,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         /* offline: state snapshot */
       }
       receiptVatComputed = computeKassaReceiptVatFromCartLines(
-        hydrateKassaCartItemsFromCatalog(order.items, prodsForVat),
+        order.items,
         catsForVat,
         prodsForVat,
         tenantDefaultBtw,
         order.orderType,
         tenantCountry,
+        tenantInfo?.btw_number,
       )
+    }
+    if (!receiptVatComputed) {
+      receiptVatComputed = kassaReceiptVatFromPersistedOrder(order)
     }
     const subtotal = receiptVatComputed
       ? receiptVatComputed.subtotalExcl
