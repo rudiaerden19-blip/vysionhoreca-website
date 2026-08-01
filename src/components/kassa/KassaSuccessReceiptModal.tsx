@@ -65,15 +65,22 @@ export function KassaSuccessReceiptModal({
 
   const legacyVatRate =
     typeof tenantInfo?.btw_percentage === 'number'? tenantInfo.btw_percentage : 6
+  const hasVatSplitLines = Array.isArray(order.vatSplit) && order.vatSplit.length > 0
   const useVatSplit =
-    Array.isArray(order.vatSplit) &&
-    order.vatSplit.length > 0 &&
-    typeof order.subtotalExclVat === 'number' &&
-    typeof order.totalTax === 'number'
-  const subtotalExcl = useVatSplit
-    ? order.subtotalExclVat!
-    : order.total / (1 + legacyVatRate / 100)
-  const tax = useVatSplit ? order.totalTax! : order.total - subtotalExcl
+    hasVatSplitLines &&
+    (typeof order.subtotalExclVat === 'number' && typeof order.totalTax === 'number'
+      ? true
+      : order.vatSplit!.length > 1)
+  const subtotalExcl = useVatSplit && typeof order.subtotalExclVat === 'number'
+    ? order.subtotalExclVat
+    : hasVatSplitLines
+      ? order.vatSplit!.reduce((s, r) => s + (r.baseExcl ?? 0), 0)
+      : order.total / (1 + legacyVatRate / 100)
+  const tax = useVatSplit && typeof order.totalTax === 'number'
+    ? order.totalTax!
+    : hasVatSplitLines
+      ? order.vatSplit!.reduce((s, r) => s + (r.tax ?? 0), 0)
+      : order.total - subtotalExcl
   const orderTypeLabel =
     order.orderType === 'DINE_IN'
       ? ` ${t('kassaReceipt.orderTypeDineIn')}`
@@ -203,7 +210,7 @@ export function KassaSuccessReceiptModal({
                 <span>{t('kassaReceipt.subtotal')}</span>
                 <span>€{subtotalExcl.toFixed(2)}</span>
               </div>
-              {useVatSplit && order.vatSplit
+              {hasVatSplitLines && order.vatSplit
                 ? order.vatSplit.map((row, ri) => (
                     <div key={`${row.rate}-${ri}`} className="flex justify-between">
                       <span>{t('kassaReceipt.vat').replace('{rate}', String(row.rate))}</span>

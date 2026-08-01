@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { getTenantSettings, saveTenantSettings, TenantSettings } from '@/lib/admin-api'
@@ -8,6 +8,7 @@ import MediaPicker from '@/components/MediaPicker'
 import ImageZoomPicker, { parseImageZoomSettings, stringifyImageZoomSettings } from '@/components/ImageZoomPicker'
 import { useLanguage } from '@/i18n'
 import { getAuthHeaders } from '@/lib/auth-headers'
+import { resolveTenantCountryForVat } from '@/lib/order-vat'
 
 function detectSmtp(email: string): { host: string; port: number } | null {
   const domain = email.split('@')[1]?.toLowerCase()
@@ -81,6 +82,11 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
     specialty_3_image: '',
     specialty_3_title: '',
   })
+
+  const vatJurisdiction = useMemo(
+    () => resolveTenantCountryForVat(formData.country, formData.btw_number),
+    [formData.country, formData.btw_number],
+  )
 
   useEffect(() => {
     async function loadData() {
@@ -445,7 +451,8 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
             <span></span> {t('adminPages.profiel.fiscalInfo') || 'Fiscale Gegevens'}
           </h2>
           <p className="text-gray-500 text-sm mb-6">
-            {t('adminPages.profiel.fiscalInfoDescription') || 'Deze gegevens worden getoond op kassabonnen en facturen (wettelijk verplicht in België)'}
+            {t('adminPages.profiel.fiscalInfoDescription') ||
+              'BTW-nummer en adres op kassabonnen en facturen.'}
           </p>
           
           <div className="grid md:grid-cols-2 gap-4">
@@ -458,15 +465,21 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 name="btw_number"
                 value={formData.btw_number || ''}
                 onChange={handleChange}
-                placeholder="BE0123.456.789"
+                placeholder={vatJurisdiction === 'NL' ? 'NL123456789B01' : 'BE0123.456.789'}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
-              <p className="text-xs text-gray-400 mt-1">Verplicht op kassabonnen in België</p>
+              <p className="text-xs text-gray-400 mt-1">
+                {vatJurisdiction === 'NL'
+                  ? 'Nederlands BTW-nummer (NL…) — kassa gebruikt NL-tarieven.'
+                  : vatJurisdiction === 'BE'
+                    ? 'Belgisch BTW-nummer (BE…) — kassa gebruikt BE-tarieven.'
+                    : 'NL… of BE… — het land bepaalt welke tarieven gelden.'}
+              </p>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('adminPages.profiel.btwPercentage') || 'BTW Percentage'} *
+                {t('adminPages.profiel.btwPercentage') || 'Standaard BTW (fallback)'} *
               </label>
               <select
                 name="btw_percentage"
@@ -480,13 +493,30 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 }}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               >
-                <option value={6}>6% — België: laag tarief (o.a. voeding, afhaal)</option>
-                <option value={9}>9% — Nederland: laag tarief</option>
-                <option value={12}>12% — België: restaurant (ter plaatse)</option>
-                <option value={21}>21% — Hoog tarief</option>
+                {(vatJurisdiction === 'NL' || !vatJurisdiction) && (
+                  <>
+                    <option value={9}>9% — NL laag (alleen zonder categorie-tarief)</option>
+                    <option value={21}>21% — NL hoog (alleen zonder categorie-tarief)</option>
+                  </>
+                )}
+                {(vatJurisdiction === 'BE' || !vatJurisdiction) && (
+                  <>
+                    <option value={6}>6% — BE laag (alleen zonder categorie-tarief)</option>
+                    <option value={12}>12% — BE restaurant (alleen zonder categorie-tarief)</option>
+                    <option value={21}>21% — Hoog tarief (alleen zonder categorie-tarief)</option>
+                  </>
+                )}
               </select>
-              <p className="text-xs text-gray-400 mt-1">
-                België: o.a. 6% / 12% / 21%. Nederland: o.a. 9% (laag) en 21% (hoog). Kies het tarief van jouw zaak.
+              <p className="text-xs text-gray-500 mt-1">
+                {t('adminPages.profiel.btwPercentageHint')}
+              </p>
+              <p className="text-xs mt-2">
+                <Link
+                  href={`/shop/${params.tenant}/admin/categorieen`}
+                  className="text-blue-600 hover:underline font-medium"
+                >
+                  → Categorieën / BTW per categorie instellen
+                </Link>
               </p>
             </div>
 

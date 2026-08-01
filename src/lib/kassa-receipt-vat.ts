@@ -277,6 +277,28 @@ export function mergeKassaReceiptVatRows(
   return [...m.values()].sort((a, b) => a.rate - b.rate)
 }
 
+/** Thermische bon: volledige split (scherm + categorieën), nooit alleen zaak-default als er meer tarieven zijn. */
+export function buildThermalAgentVatLines(
+  order: KassaLastOrderReceipt,
+  computed: KassaReceiptVatComputed | null,
+  fallbackRate: CategoryVatPercent,
+  fallbackTotalTax: number,
+): { rate: number; tax: number }[] {
+  const orderRows: VatSplitLine[] =
+    Array.isArray(order.vatSplit) && order.vatSplit.length > 0
+      ? order.vatSplit.map((l) => ({
+          rate: normalizeCategoryVatPercent(l.rate, fallbackRate) as CategoryVatPercent,
+          baseExcl: l.baseExcl,
+          tax: l.tax,
+        }))
+      : []
+  const merged = mergeKassaReceiptVatRows(orderRows, computed?.byRate ?? [])
+  if (merged.length > 0) {
+    return merged.map((r) => ({ rate: r.rate, tax: r.tax }))
+  }
+  return [{ rate: fallbackRate, tax: fallbackTotalTax }]
+}
+
 /** Order JSON (kassa/bestellingen) → cartregels voor BTW-berekening. */
 export function orderJsonItemsToKassaCartLines(
   items: ReadonlyArray<{

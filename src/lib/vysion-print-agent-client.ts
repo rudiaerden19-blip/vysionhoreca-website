@@ -70,7 +70,8 @@ function buildAgentRequestPayload(body: VysionPrintAgentBody) {
     body.orderData &&
     Array.isArray(body.orderData.vatLines) &&
     body.orderData.vatLines.length > 1
-  const stripTenantDefaultVatRate = kassaPlainBon || richKassaMultiVat
+  const stripTenantDefaultVatRate =
+    receiptMode === 'kassa' || kassaPlainBon || richKassaMultiVat
   const businessInfo =
     body.businessInfo && stripTenantDefaultVatRate
       ? { ...body.businessInfo, vatRate: undefined }

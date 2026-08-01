@@ -220,6 +220,7 @@ import {
   mergeKassaReceiptVatRows,
   resolveKassaCartLineVatRate,
   resolveKassaReceiptVatRowsForPrint,
+  buildThermalAgentVatLines,
 } from '@/lib/kassa-receipt-vat'
 import {
   kassaThermalItemLine,
@@ -3855,10 +3856,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       vatNumber: tenantInfo?.btw_number ?? undefined,
       website: tenantInfo?.website ?? undefined,
     }
-    const agentVatLines =
-      receiptVatRows.length >= 1
-        ? receiptVatRows.map((row) => ({ rate: row.rate, tax: row.tax }))
-        : [{ rate: fbVatRate, tax }]
+    const agentVatLines = buildThermalAgentVatLines(order, receiptVatComputed, fbVatRate, tax)
 
     const printResult = await sendToVysionPrintAgent({
       winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),

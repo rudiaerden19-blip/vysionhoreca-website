@@ -25,10 +25,13 @@ import { adminDb } from '@/lib/admin-db-client'
 import { authFetch, getAuthHeaders } from '@/lib/auth-headers'
 import { sendToVysionPrintAgent } from '@/lib/vysion-print-agent-client'
 import {
+  buildThermalAgentVatLines,
   computeKassaReceiptVatFromCartLines,
   fetchKassaMenuVatCatalog,
   orderJsonItemsToKassaCartLines,
+  type KassaReceiptVatComputed,
 } from '@/lib/kassa-receipt-vat'
+import type { KassaLastOrderReceipt } from '@/lib/kassa-cart-types'
 import {
   kassaThermalItemLine,
   kassaThermalPadMoney,
@@ -680,7 +683,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     )
     let subtotalExcl = 0
     let totalTax = 0
-    let vatLines: { rate: number; tax: number }[] | undefined
+    let receiptVatComputed: KassaReceiptVatComputed | null = null
     try {
       const catalog = await fetchKassaMenuVatCatalog(params.tenant)
       const cartLines = orderJsonItemsToKassaCartLines(items, params.tenant)
@@ -693,9 +696,9 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         tenantCountry,
         tenantSettings?.btw_number,
       )
+      receiptVatComputed = vat
       subtotalExcl = vat.subtotalExcl
       totalTax = vat.totalTax
-      vatLines = vat.byRate.map((l) => ({ rate: l.rate, tax: l.tax }))
     } catch {
       const fb = tenantSettings?.btw_percentage || 6
       subtotalExcl = order.total ? order.total / (1 + fb / 100) : 0
@@ -727,10 +730,21 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     }
     bonLines.push('--------------------------------')
     bonLines.push(kassaThermalPadMoney('Subtotaal', subtotalExcl))
-    const agentVatLines =
-      vatLines && vatLines.length > 0
-        ? vatLines
-        : [{ rate: tenantDefaultBtw, tax: totalTax }]
+    const printOrderStub: KassaLastOrderReceipt = {
+      orderNumber: Number(order.order_number) || 0,
+      items: [],
+      total: Number(order.total) || 0,
+      paymentMethod: 'CARD',
+      orderType: 'TAKEAWAY',
+      tableNumber: '',
+      createdAt: new Date(),
+    }
+    const agentVatLines = buildThermalAgentVatLines(
+      printOrderStub,
+      receiptVatComputed,
+      tenantDefaultBtw,
+      totalTax,
+    )
     bonLines.push('')
     bonLines.push(kassaThermalTotalLine('TOTAAL', order.total || 0))
 
