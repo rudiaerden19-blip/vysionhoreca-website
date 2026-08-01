@@ -25,7 +25,7 @@ export function kassaThermalPadMoney(left: string, amount: number): string {
   return kassaThermalRightAlignLine(left, formatEuroThermal(amount))
 }
 
-/** Geen `BTW (xx%)` — agent slikt die regels. `Tarief 9%` print letterlijk op standaard agent. */
+/** Voor HTML/noodbon; thermische agent-BTW via `vatLines` in POST (niet in bonInhoud). */
 export function kassaThermalVatLine(rate: number, tax: number): string {
   return kassaThermalPadMoney(`Tarief ${rate}%`, tax)
 }

@@ -3668,9 +3668,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     try {
     const fbVatRate = normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 6, 21)
-    /** Zelfde BTW als op het scherm (vatSplit bij afrekenen); anders herberekenen. */
+    /** Altijd verse catalogus bij print — zelfde BTW als scherm na afrekenen. */
     let receiptVatComputed = kassaReceiptVatFromPersistedOrder(order)
-    if (!receiptVatComputed && order.items.length > 0) {
+    if (order.items.length > 0) {
       let catsForVat = categories
       let prodsForVat = products
       try {
@@ -3800,13 +3800,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     bonLines.push('--------------------------------')
     bonLines.push(kassaThermalPadMoney(t('kassaReceipt.subtotal'), subtotal))
-    if (receiptVatRows.length >= 1) {
-      for (const row of receiptVatRows) {
-        bonLines.push(kassaThermalVatLine(row.rate, row.tax))
-      }
-    } else {
-      bonLines.push(kassaThermalVatLine(fbVatRate, tax))
-    }
+    /** BTW niet in bonInhoud — standaard Print Agent injecteert `vatLines` onder Subtotaal. */
     bonLines.push('')
     bonLines.push(kassaThermalTotalLine(t('kassaReceipt.total'), order.total))
     bonLines.push(`${t('kassaReceipt.paidWith')} ${payLabel}`)
@@ -3861,9 +3855,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       vatNumber: tenantInfo?.btw_number ?? undefined,
       website: tenantInfo?.website ?? undefined,
     }
+    const agentVatLines =
+      receiptVatRows.length >= 1
+        ? receiptVatRows.map((row) => ({ rate: row.rate, tax: row.tax }))
+        : [{ rate: fbVatRate, tax }]
+
     const printResult = await sendToVysionPrintAgent({
       winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
       bonInhoud: bonLines.join('\n'),
+      vatLines: agentVatLines,
       copies: isDraft ? draftCopies : paidCopies,
       openDrawer: isCash,
       receiptMode,

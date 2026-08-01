@@ -44,7 +44,7 @@ export type VysionPrintAgentBody = {
   bonInhoud: string
   receiptText?: string
   orderData?: VysionPrintAgentOrderData
-  /** Optioneel; kassabon met bonInhoud stuurt géén vatLines (tekst is leidend). */
+  /** Meerdere BTW-tarieven: Print Agent plakt regels onder Subtotaal (bonInhoud zonder BTW-regels). */
   vatLines?: VysionPrintAgentVatLine[]
   businessInfo?: VysionPrintAgentBusinessInfo
   copies?: number
@@ -59,14 +59,20 @@ function buildAgentRequestPayload(body: VysionPrintAgentBody) {
   const receiptMode = body.receiptMode || 'kassa'
   const bonText = (body.bonInhoud ?? body.receiptText ?? '').trim()
   const kassaPlainBon = receiptMode === 'kassa' && bonText.length > 0
+  const payloadVatLines =
+    body.vatLines ??
+    (Array.isArray(body.orderData?.vatLines) && body.orderData.vatLines.length > 0
+      ? body.orderData.vatLines
+      : undefined)
   const richKassaMultiVat =
     receiptMode === 'kassa' &&
     !bonText.length &&
     body.orderData &&
     Array.isArray(body.orderData.vatLines) &&
     body.orderData.vatLines.length > 1
+  const stripTenantDefaultVatRate = kassaPlainBon || richKassaMultiVat
   const businessInfo =
-    body.businessInfo && (kassaPlainBon || richKassaMultiVat)
+    body.businessInfo && stripTenantDefaultVatRate
       ? { ...body.businessInfo, vatRate: undefined }
       : body.businessInfo
   return {
@@ -75,7 +81,9 @@ function buildAgentRequestPayload(body: VysionPrintAgentBody) {
     bonInhoud: body.bonInhoud ?? body.receiptText ?? '',
     receiptText: body.receiptText ?? body.bonInhoud ?? '',
     orderData: kassaPlainBon ? undefined : body.orderData,
-    vatLines: kassaPlainBon ? undefined : body.vatLines,
+    vatLines: kassaPlainBon
+      ? payloadVatLines
+      : body.vatLines ?? payloadVatLines,
     businessInfo,
     copies: body.copies,
     openDrawer: body.openDrawer === true,

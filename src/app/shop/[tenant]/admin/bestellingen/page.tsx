@@ -33,7 +33,6 @@ import {
   kassaThermalItemLine,
   kassaThermalPadMoney,
   kassaThermalTotalLine,
-  kassaThermalVatLine,
 } from '@/lib/kassa-thermal-bon-format'
 import {
   normalizeCategoryVatPercent,
@@ -728,19 +727,17 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     }
     bonLines.push('--------------------------------')
     bonLines.push(kassaThermalPadMoney('Subtotaal', subtotalExcl))
-    if (vatLines && vatLines.length > 0) {
-      for (const row of vatLines) {
-        bonLines.push(kassaThermalVatLine(row.rate, row.tax))
-      }
-    } else {
-      bonLines.push(kassaThermalVatLine(tenantDefaultBtw, totalTax))
-    }
+    const agentVatLines =
+      vatLines && vatLines.length > 0
+        ? vatLines
+        : [{ rate: tenantDefaultBtw, tax: totalTax }]
     bonLines.push('')
     bonLines.push(kassaThermalTotalLine('TOTAAL', order.total || 0))
 
     const printResult = await sendToVysionPrintAgent({
       winkelnaam: tenantSettings?.business_name || 'Zaak',
       bonInhoud: bonLines.join('\n'),
+      vatLines: agentVatLines,
       copies: 1,
       receiptMode: 'kassa',
       businessInfo: {
