@@ -1,6 +1,9 @@
 /** Canonieke marketing-site (www + apex). */
 export const VYSION_CANONICAL_ORIGIN = 'https://www.vysion-kassa.com'as const
 
+/** TableVysion marketing (reserveringsproductlijn login terug-link). */
+export const TABLEVYSION_MARKETING_ORIGIN = 'https://www.tablevysion.com' as const
+
 /** Google site name, `og:site_name`, WebSite/Organization schema (niet «Vysion Horeca»). */
 export const VYSION_BRAND_SITE_NAME = 'Vysion kassa'as const
 

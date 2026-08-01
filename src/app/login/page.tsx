@@ -22,7 +22,7 @@ import { mirrorSuperadminSessionFromCookieToLocalStorage } from '@/lib/superadmi
 import { LocaleFlagEmoji, LocaleFlagWithCode } from '@/components/LocaleFlagEmoji'
 import { LoginKassaCloseHintModal } from '@/components/LoginKassaCloseHintModal'
 import { LOGIN_QUERY_KASSA_CLOSE_TIP } from '@/lib/shop-login-kassa-tip'
-import { isVysionMainPortalHost } from '@/lib/vysion-site'
+import { isVysionMainPortalHost, TABLEVYSION_MARKETING_ORIGIN } from '@/lib/vysion-site'
 import { kassaPosButtonClass } from '@/lib/kassa-pos-surface'
 
 /** Zelfde hosts als middleware `exactMainDomains`(+ dev): sessie blijft in localStorage van dit domein. */
@@ -46,6 +46,14 @@ export default function LoginPage() {
   const [isLangOpen, setIsLangOpen] = useState(false)
   const langRef = useRef<HTMLDivElement>(null)
   const [showKassaCloseHint, setShowKassaCloseHint] = useState(false)
+  const [homeHref, setHomeHref] = useState('/')
+
+  useEffect(() => {
+    const productLine = new URLSearchParams(window.location.search).get('productLine')
+    if (productLine === 'restaurant_reservaties') {
+      setHomeHref(TABLEVYSION_MARKETING_ORIGIN)
+    }
+  }, [])
 
   // Superadmin: gedeelde cookie → mirror in isSuperAdminLoggedIn; direct door naar `next`zonder zaak-wachtwoord.
   // (Zonder dit bleef het tenant-loginformulier zichtbaar tot je handmatig logt.)
@@ -247,7 +255,7 @@ export default function LoginPage() {
       <LoginKassaCloseHintModal open={showKassaCloseHint} onDismiss={dismissKassaCloseHint} />
       {/* Header */}
       <header className="p-6 flex items-center justify-between">
-        <Link href="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
+        <Link href={homeHref} className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
