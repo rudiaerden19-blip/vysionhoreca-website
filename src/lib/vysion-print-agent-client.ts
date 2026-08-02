@@ -50,6 +50,8 @@ export type VysionPrintAgentBody = {
   openDrawer?: boolean
   /** "kassa" (default, volledige bon) of "keuken" (compacte keukenbon). */
   receiptMode?: 'kassa' |  'keuken'
+  /** Agent buddy-keuken na kassa — website stuurt keuken zelf; default uit. */
+  companionKitchen?: boolean
 }
 
 /** Zelfde JSON als POST /print — Android-app (PrintBridgeActivity) verwacht identieke structuur. */
@@ -63,6 +65,8 @@ function buildAgentRequestPayload(body: VysionPrintAgentBody) {
     businessInfo: body.businessInfo,
     copies: body.copies,
     openDrawer: body.openDrawer === true,
+    /** Agent buddy-keuken zonder orderData levert lege «TE BEREIDEN»; keuken komt van website. */
+    companionKitchen: body.companionKitchen === true,
     receiptMode: body.receiptMode || 'kassa',
   }
 }
@@ -307,6 +311,13 @@ export function printAgentHasDedicatedKitchenPrinter(health: PrintAgentHealth): 
   const primary = health.printerName?.trim()
   if (!primary) return false
   return kitchen.localeCompare(primary, undefined, { sensitivity: 'accent'}) !== 0
+}
+
+/** Keukenbon mag naar agent zolang er een printer is (keuken of kassa — agent kiest). */
+export function printAgentCanPrintKitchen(health: PrintAgentHealth): boolean {
+  if (!health.ok) return false
+  if (health.kitchenPrinterName?.trim()) return true
+  return health.printerConfigured === true && !!health.printerName?.trim()
 }
 
 async function postPrintOnce(

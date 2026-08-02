@@ -62,7 +62,7 @@ import {
   openCashDrawer,
   isAndroidTabletPrintClient,
   fetchPrintAgentHealth,
-  printAgentHasDedicatedKitchenPrinter,
+  printAgentCanPrintKitchen,
 } from '@/lib/vysion-print-agent-client'
 import {
   offlineDbLoadMenuSnapshot,
@@ -3797,36 +3797,42 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     const paidCopies = 2
     const draftCopies = opts?.draftCopies === 2 ? 2 : 1
+    const agentOrderData = {
+      orderNumber: order.orderNumber,
+      orderType: order.orderType,
+      tableNumber: receiptTableNr || null,
+      items: order.items.map((i) => ({
+        quantity: i.quantity,
+        name: i.product.name,
+        price: (i.product.price + (i.choices || []).reduce((s, c) => s + c.price, 0)) * i.quantity,
+        choices: (i.choices || []).map((c) => ({ name: c.choiceName, price: c.price })),
+      })),
+      subtotal,
+      tax,
+      total: order.total,
+      paymentMethod: order.paymentMethod,
+      ...(receiptVatRows.length > 0
+        ? {
+            vatLines: receiptVatRows.map((row) => ({
+              rate: row.rate,
+              tax: row.tax,
+            })),
+          }
+        : {}),
+    }
+    if (receiptMode === 'keuken' && agentOrderData.items.length === 0) {
+      console.warn('[kassa] keukenprint overgeslagen: geen items in orderData')
+      return
+    }
+
     const printResult = await sendToVysionPrintAgent({
       winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
-      bonInhoud: bonLines.join('\n'),
+      bonInhoud: receiptMode === 'keuken' ? '' : bonLines.join('\n'),
       /** Draft: 1 = gele Bon / toog-delta; 2 = zaaknaam in header. Betaald (afrekenen): altijd 2. */
       copies: isDraft ? draftCopies : paidCopies,
       openDrawer: isCash,
       receiptMode,
-      orderData: {
-        orderNumber: order.orderNumber,
-        orderType: order.orderType,
-        tableNumber: receiptTableNr || null,
-        items: order.items.map(i => ({
-          quantity: i.quantity,
-          name: i.product.name,
-          price: (i.product.price + (i.choices || []).reduce((s, c) => s + c.price, 0)) * i.quantity,
-          choices: (i.choices || []).map(c => ({ name: c.choiceName, price: c.price })),
-        })),
-        subtotal,
-        tax,
-        total: order.total,
-        paymentMethod: order.paymentMethod,
-        ...(receiptVatRows.length > 0
-          ? {
-              vatLines: receiptVatRows.map((row) => ({
-                rate: row.rate,
-                tax: row.tax,
-              })),
-            }
-          : {}),
-      },
+      orderData: agentOrderData,
       businessInfo: {
         name: tenantInfo?.business_name,
         address: tenantInfo?.address ?? undefined,
@@ -3982,20 +3988,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         const watermarkCommit = { slotKey, row: nextWatermark }
 
-        const commitWatermarkOnly = () => {
-          try {
-            const st = loadBarBonWatermarks(tenant)
-            st[watermarkCommit.slotKey] = watermarkCommit.row
-            saveBarBonWatermarks(tenant, st)
-          } catch {
-            /* ignore */
-          }
-        }
-
         let kitchenAvailable = false
         if (wantKitchen) {
           const health = await fetchPrintAgentHealth()
-          kitchenAvailable = printAgentHasDedicatedKitchenPrinter(health)
+          kitchenAvailable = printAgentCanPrintKitchen(health)
         }
 
         if (wantKitchen && kitchenAvailable) {
@@ -4005,8 +4001,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             receiptMode: 'keuken',
             barWatermarkCommit: printKassaSlip ? undefined : watermarkCommit,
           })
-        } else if (wantKitchen && !kitchenAvailable) {
-          commitWatermarkOnly()
         }
 
         if (printKassaSlip) {
