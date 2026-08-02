@@ -868,16 +868,10 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             <span>Totaal excl. BTW</span>
             <span>€${subtotalExcl.toFixed(2)}</span>
           </div>
-          ${
-            vatLines && vatLines.length > 0
-              ? vatLines
-                  .map(
-                    (l) =>
-                      `<div class="item"><span>BTW ${l.rate}%</span><span>€${l.tax.toFixed(2)}</span></div>`,
-                  )
-                  .join('')
-              : `<div class="item"><span>BTW ${tenantDefaultBtw}%</span><span>€${totalTax.toFixed(2)}</span></div>`
-          }
+          <div class="item">
+            <span>BTW ${tenantDefaultBtw}%</span>
+            <span>€${totalTax.toFixed(2)}</span>
+          </div>
         </div>
         
         <div class="item total" style="font-size: 16px; margin: 10px 0;">
