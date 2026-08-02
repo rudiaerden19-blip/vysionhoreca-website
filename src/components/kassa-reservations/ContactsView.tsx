@@ -150,11 +150,10 @@ export function ContactsView({
       {paginated.length > 0 && (
         <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
           <div
-            className="grid items-center px-4 py-3 text-xs font-bold uppercase tracking-wider text-white"
+            className="grid items-center bg-black px-4 py-3 text-xs font-bold uppercase tracking-wider text-white"
             style={{
               gridTemplateColumns: GRID_COLS,
               columnGap: '12px',
-              backgroundColor: '#075985',
             }}
           >
             <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
