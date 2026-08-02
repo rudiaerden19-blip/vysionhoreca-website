@@ -2054,8 +2054,8 @@ export default function KassaReservationsView({
                   onClick={() => { setViewMode(view.id as ViewMode); setShowResCalendar(false) }}
                   className={`relative flex min-w-[44px] flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-2 text-sm font-medium transition-colors ${
                     viewMode === view.id
-                      ? 'bg-gray-700 text-white shadow-sm ring-1 ring-black/10'
-                      : 'bg-[#5f728f] text-white hover:bg-[#4d5f78]'
+                      ? 'bg-gray-800 text-white shadow-sm ring-1 ring-black/10'
+                      : 'bg-gray-500 text-white hover:bg-gray-600'
                   }`}
                 >
                   {view.icon}
