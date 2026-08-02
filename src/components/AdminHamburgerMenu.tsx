@@ -142,6 +142,7 @@ export function AdminHamburgerMenu({ tenantSlug }: { tenantSlug: string }) {
                 </div>
               </div>
             ))}
+            <AccountMenuSessionBlock tenantSlug={tenantSlug} onClose={closeAll} />
           </div>
 
           {open && subOpen && activeMod && (
