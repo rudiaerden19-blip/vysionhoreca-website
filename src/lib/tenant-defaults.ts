@@ -67,4 +67,31 @@ export async function ensureReservationsSoftwareBootstrapForTenant(
   if (rsErr) {
     console.warn('[ensureReservationsSoftwareBootstrapForTenant] settings', tenantSlug, rsErr.message)
   }
+
+  const { error: deliveryErr } = await client.from('delivery_settings').upsert(
+    {
+      tenant_slug: tenantSlug,
+      pickup_enabled: false,
+      delivery_enabled: false,
+      payment_online: false,
+      payment_cash: false,
+      payment_card: false,
+    },
+    { onConflict: 'tenant_slug' },
+  )
+  if (deliveryErr) {
+    console.warn('[ensureReservationsSoftwareBootstrapForTenant] delivery', tenantSlug, deliveryErr.message)
+  }
+
+  const { error: tsErr } = await client
+    .from('tenant_settings')
+    .update({
+      reservations_enabled: true,
+      promotions_enabled: false,
+      gift_cards_enabled: false,
+    })
+    .eq('tenant_slug', tenantSlug)
+  if (tsErr) {
+    console.warn('[ensureReservationsSoftwareBootstrapForTenant] tenant_settings', tenantSlug, tsErr.message)
+  }
 }

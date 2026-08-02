@@ -8,6 +8,8 @@ import { isKioskSearchParams, kioskShopHref } from '@/lib/kiosk-mode'
 import { getMenuCategories, getMenuProducts, getAllMenuProductOptionsForTenant, getTenantSettings, getActivePromotions, getExceptionalClosings, ExceptionalClosing, MenuCategory, MenuProduct, ProductOption, ProductOptionChoice, Promotion, compareMenuProductsBySortOrder } from '@/lib/admin-api'
 import { patchWebshopBrowserSession, migrateLegacyWebshopLocalStorage } from '@/lib/webshop-browser-session'
 import { useLanguage } from '@/i18n'
+import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
+import { isPublicOnlineOrderingEnabled } from '@/lib/public-website-cta'
 
 interface MenuItem {
   id: string
@@ -226,6 +228,7 @@ export default function MenuPageClient({
   const shop = (key: Parameters<typeof kioskShopHref>[1]) =>
     kioskShopHref(params.tenant, key, { kiosk: isKiosk, shortUrls: shortKioskUrls })
   const { t, locale, setLocale, locales, localeNames, localeFlags } = useLanguage()
+  const { moduleAccess, loading: modulesLoading } = useTenantModuleFlags(params.tenant)
   const [showLanguageMenu, setShowLanguageMenu] = useState(false)
   const [categories, setCategories] = useState<MenuCategory[]>([])
   const [menuItems, setMenuItems] = useState<MenuItem[]>([])
@@ -288,6 +291,13 @@ export default function MenuPageClient({
       cancelled = true
     }
   }, [params.tenant, lite])
+
+  useEffect(() => {
+    if (modulesLoading || isKiosk) return
+    if (!isPublicOnlineOrderingEnabled(moduleAccess)) {
+      router.replace(`/shop/${params.tenant}`)
+    }
+  }, [modulesLoading, moduleAccess, isKiosk, params.tenant, router])
 
   // Save WhatsApp phone and set language if user came from WhatsApp link
   useEffect(() => {

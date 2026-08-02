@@ -188,7 +188,8 @@ export default function PincodePage({ params }: { params: { tenant: string } }) 
 
         <div className="mt-6 p-4 bg-gray-50 rounded-xl text-xs text-gray-500">
           <p className="font-semibold mb-1">Beschermde modules:</p>
-          <p>Categorieën · Producten · Openingstijden · Abonnement · Betaalmethodes · Personeel · Rapporten · Z-rapport</p>
+          <p>Categorieën · Producten · Abonnement · Betaalmethodes · Personeel · Rapporten · Z-rapport</p>
+          <p className="mt-2 text-gray-400">Geen PIN: zaakprofiel, openingstijden en overige website-instellingen.</p>
         </div>
         </>
         )}

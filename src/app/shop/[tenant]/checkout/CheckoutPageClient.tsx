@@ -26,6 +26,8 @@ import {
   migrateLegacyWebshopLocalStorage,
   patchWebshopBrowserSession,
 } from '@/lib/webshop-browser-session'
+import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
+import { isPublicOnlineOrderingEnabled } from '@/lib/public-website-cta'
 
 interface CartItem {
   id: string
@@ -63,6 +65,7 @@ export default function CheckoutPageClient({
   const shop = (key: Parameters<typeof kioskShopHref>[1]) =>
     kioskShopHref(params.tenant, key, { kiosk: isKiosk, shortUrls: shortKioskUrls })
   const { t } = useLanguage()
+  const { moduleAccess, loading: modulesLoading } = useTenantModuleFlags(params.tenant)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [tenantSettings, setTenantSettings] = useState<TenantSettings | null>(null)
@@ -97,6 +100,13 @@ export default function CheckoutPageClient({
   const [radiusConfirmed] = useState(true)
 
   const primaryColor = tenantSettings?.primary_color || '#FF6B35'
+
+  useEffect(() => {
+    if (modulesLoading || isKiosk) return
+    if (!isPublicOnlineOrderingEnabled(moduleAccess)) {
+      router.replace(`/shop/${params.tenant}`)
+    }
+  }, [modulesLoading, moduleAccess, isKiosk, params.tenant, router])
   
   // WhatsApp deep-link: ?wa= in URL of opgeslagen in browser-sessie (Supabase + cookie)
   useEffect(() => {

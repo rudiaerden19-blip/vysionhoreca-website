@@ -1,14 +1,20 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { getTenantSettings, getMenuCategories, getMenuProducts, TenantSettings, MenuCategory, MenuProduct, compareMenuProductsBySortOrder } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
+import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
+import { isPublicOnlineOrderingEnabled } from '@/lib/public-website-cta'
 
 export default function MenukaartPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
+  const router = useRouter()
   const searchParams = useSearchParams()
+  const { moduleAccess, loading: modulesLoading } = useTenantModuleFlags(params.tenant)
+  const publicOrderingEnabled =
+    !modulesLoading && isPublicOnlineOrderingEnabled(moduleAccess)
   const showPromoOnly = searchParams.get('promo') === '1'
   
   const [settings, setSettings] = useState<TenantSettings | null>(null)
@@ -16,6 +22,13 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
   const [products, setProducts] = useState<MenuProduct[]>([])
   const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState<string>(showPromoOnly ? 'promo': 'all')
+
+  useEffect(() => {
+    if (modulesLoading) return
+    if (!publicOrderingEnabled) {
+      router.replace(`/shop/${params.tenant}`)
+    }
+  }, [modulesLoading, publicOrderingEnabled, params.tenant, router])
 
   useEffect(() => {
     async function loadData() {

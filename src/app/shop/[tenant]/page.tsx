@@ -15,6 +15,11 @@ import {
 import { useLanguage } from '@/i18n'
 import { patchWebshopBrowserSession, migrateLegacyWebshopLocalStorage } from '@/lib/webshop-browser-session'
 import { LocaleFlagEmoji, LocaleFlagWithCode } from '@/components/LocaleFlagEmoji'
+import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
+import {
+  isPublicOnlineOrderingEnabled,
+  isPublicReservationsEnabled,
+} from '@/lib/public-website-cta'
 
 const MarketingDemoSessionPrime = dynamic(
   () => import('@/components/MarketingDemoSessionPrime').then((mod) => ({ default: mod.MarketingDemoSessionPrime })),
@@ -116,6 +121,7 @@ const dayKeyMap: Record<string, string> = {
 
 export default function TenantLandingPage({ params }: { params: { tenant: string } }) {
   const { t, locale, setLocale, locales, localeNames } = useLanguage()
+  const { moduleAccess, loading: modulesLoading } = useTenantModuleFlags(params.tenant)
   const [showLanguageMenu, setShowLanguageMenu] = useState(false)
   const shopLangRef = useRef<HTMLDivElement>(null)
   const [business, setBusiness] = useState<Business | null>(null)
@@ -888,6 +894,12 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   }
 
   const todayHours = business.opening_hours[getDayName()]
+  const publicOrderingEnabled =
+    !modulesLoading && isPublicOnlineOrderingEnabled(moduleAccess)
+  const publicReservationsEnabled =
+    !modulesLoading &&
+    isPublicReservationsEnabled(moduleAccess) &&
+    business.reservations_enabled !== false
 
   return (
     <div style={{ width: '100%', maxWidth: '100%', overflowX: 'clip'}} className="min-h-screen bg-white">
@@ -914,7 +926,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           {/* Navigation buttons - all same style */}
           <div className="flex items-center gap-1.5 sm:gap-2">
             {/* Promoties - alleen icoon op mobiel */}
-            {business.promotions_enabled && promotions.length > 0 && (
+            {publicOrderingEnabled && business.promotions_enabled && promotions.length > 0 && (
               <button
                 onClick={() => setShowPromotionsModal(true)}
                 style={{ backgroundColor: business.primary_color }}
@@ -1109,12 +1121,12 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
             {/* Quick Info Pills */}
             <div className="flex flex-wrap gap-2 sm:gap-3 mt-4 sm:mt-6">
-              {business.pickup_enabled && (
+              {publicOrderingEnabled && business.pickup_enabled && (
                 <span className="inline-flex items-center gap-1 sm:gap-2 bg-white/10 backdrop-blur-md text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm">
                   <span></span> <span className="hidden xs:inline">{t('shopPage.pickup')} ·</span> {business.pickup_time}
                 </span>
               )}
-              {business.delivery_enabled && (
+              {publicOrderingEnabled && business.delivery_enabled && (
                 <span className="inline-flex items-center gap-1 sm:gap-2 bg-white/10 backdrop-blur-md text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm">
                   <span></span> <span className="hidden xs:inline">{t('shopPage.delivery')} ·</span> {business.delivery_time}
                 </span>
@@ -1128,7 +1140,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
             {/* CTA Buttons */}
             <div className="flex flex-wrap gap-3 mt-6 sm:mt-8">
-              {!manualOffline?.is_offline && (
+              {publicOrderingEnabled && !manualOffline?.is_offline && (
                 <Link
                   href={`/shop/${params.tenant}/menu`}
                   style={{ backgroundColor: business.primary_color }}
@@ -1138,7 +1150,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   <span>Bestel Nu</span>
                 </Link>
               )}
-              {business.reservations_enabled && (
+              {publicReservationsEnabled && (
                 <Link
                   href={`/shop/${params.tenant}/reserveren`}
                   className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-2xl bg-white/20 backdrop-blur-md text-white font-bold text-sm sm:text-base hover:bg-white/30 transition-colors border border-white/30"
@@ -1305,7 +1317,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       )}
 
       {/* Table Reservation Section */}
-      {business.reservations_enabled && (
+      {publicReservationsEnabled && (
       <section className="py-12 sm:py-20 bg-gray-50">
         <div className="max-w-4xl mx-auto px-4">
           <div className="text-center mb-8 sm:mb-12">
@@ -1610,7 +1622,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       </section>
 
       {/* Top Sellers Section */}
-      {business && (() => {
+      {publicOrderingEnabled && business && (() => {
         const topSellers = [business.top_seller_1, business.top_seller_2, business.top_seller_3]
           .map(s => parseImageZoomSettings(s))
           .filter(img => img.url)
@@ -1701,7 +1713,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       )}
 
       {/* Cadeaubonnen Section */}
-      {business.gift_cards_enabled && (
+      {publicOrderingEnabled && business.gift_cards_enabled && (
         <section 
           className="py-12 sm:py-20 relative overflow-hidden"
           style={{ 
@@ -1930,7 +1942,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       </section>
 
       {/* QR Codes Section */}
-      {business.show_qr_codes && (
+      {publicOrderingEnabled && business.show_qr_codes && (
       <section className="py-10 sm:py-16 bg-gray-100">
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-8 sm:mb-12">
@@ -1988,7 +2000,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       </section>
       )}
 
-      {/* CTA Section */}
+      {publicOrderingEnabled && (
       <section style={{ background: `linear-gradient(to right, ${business.primary_color}, ${business.primary_color}cc)`}} className="py-12 sm:py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div>
@@ -2020,6 +2032,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           </div>
         </div>
       </section>
+      )}
 
       {/* Footer */}
       <footer className="bg-gray-950 text-white py-12">
@@ -2042,7 +2055,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       </footer>
 
       {/* Promoties Modal */}
-        {showPromotionsModal && business && (
+      {showPromotionsModal && business && publicOrderingEnabled && (
           <div
             role="presentation"
             className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
@@ -2447,7 +2460,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           </div>
         )}
 
-      {/* Floating Order Button (Mobile) */}
+      {publicOrderingEnabled && (
       <div className="fixed bottom-4 left-3 right-3 sm:bottom-6 sm:left-4 sm:right-4 md:hidden z-50 pb-safe">
         {manualOffline?.is_offline ? (
           <button
@@ -2469,6 +2482,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           </Link>
         )}
       </div>
+      )}
     </div>
   )
 }

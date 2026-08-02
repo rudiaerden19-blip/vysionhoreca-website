@@ -4,6 +4,7 @@ import { useState, useLayoutEffect, ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/i18n'
 import { isSuperAdminLoggedIn } from '@/lib/auth-headers'
+import { adminPathRequiresOwnerPin } from '@/lib/owner-pin-routes'
 
 interface Props {
   tenant: string
@@ -29,6 +30,13 @@ export default function PinGate({ tenant, children }: Props) {
     if (isSuperAdminLoggedIn()) {
       setState('unlocked')
       return
+    }
+    if (typeof window !== 'undefined') {
+      const path = `${window.location.pathname}${window.location.search}`
+      if (!adminPathRequiresOwnerPin(path, tenant)) {
+        setState('unlocked')
+        return
+      }
     }
     fetch(`/api/pin/check?tenant=${tenant}`)
       .then((r) => r.json())
@@ -65,6 +73,10 @@ export default function PinGate({ tenant, children }: Props) {
 
   useLayoutEffect(() => {
     if (state !== 'no-pin') return
+    if (typeof window !== 'undefined') {
+      const path = `${window.location.pathname}${window.location.search}`
+      if (!adminPathRequiresOwnerPin(path, tenant)) return
+    }
     const pinPath = `/shop/${tenant}/admin/pincode`
     if (typeof window !== 'undefined' && window.location.pathname.includes('/admin/pincode')) {
       return

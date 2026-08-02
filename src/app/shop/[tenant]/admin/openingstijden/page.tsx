@@ -7,7 +7,6 @@ import {
   getExceptionalClosings, saveExceptionalClosing, deleteExceptionalClosing, ExceptionalClosing,
 } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
-import PinGate from '@/components/PinGate'
 
 // ── Tijdinvoer helper ─────────────────────────────────────────────
 function formatTimeInput(raw: string): string {
@@ -295,7 +294,6 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
   }
 
   return (
-      <PinGate tenant={params.tenant}>
       <div className="max-w-4xl mx-auto pb-24">
       {/* Floating Save Button - Fixed Bottom Right */}
       <motion.button
@@ -723,6 +721,5 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
         </div>
       </motion.div>
     </div>
-      </PinGate>
   )
 }
