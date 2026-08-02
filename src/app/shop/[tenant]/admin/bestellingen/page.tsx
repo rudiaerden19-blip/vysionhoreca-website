@@ -745,6 +745,9 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
       tenantDefaultBtw,
       totalTax,
     )
+    for (const row of agentVatLines) {
+      bonLines.push(kassaThermalPadMoney('BTW', row.tax))
+    }
     bonLines.push('')
     bonLines.push(kassaThermalTotalLine('TOTAAL', order.total || 0))
 
@@ -869,8 +872,8 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             <span>€${subtotalExcl.toFixed(2)}</span>
           </div>
           ${
-            vatLines && vatLines.length > 0
-              ? vatLines
+            agentVatLines && agentVatLines.length > 0
+              ? agentVatLines
                   .map(
                     (l) =>
                       `<div class="item"><span>BTW ${l.rate}%</span><span>€${l.tax.toFixed(2)}</span></div>`,
