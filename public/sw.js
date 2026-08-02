@@ -1,8 +1,8 @@
 // Vysion Kassa – Service Worker
 // Offline: kassa-app + statische assets + sector-marketingpagina’s; productafbeeldingen (externe URL's)
 
-const CACHE = 'vysion-kassa-v25'
-const STATIC_CACHE = 'vysion-static-v25'
+const CACHE = 'vysion-kassa-v26'
+const STATIC_CACHE = 'vysion-static-v26'
 const IMAGE_CACHE = 'vysion-images-v4'
 
 /** Clone synchronously vóór de response naar de pagina gaat — anders "body already used". */
