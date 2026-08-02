@@ -745,9 +745,6 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
       tenantDefaultBtw,
       totalTax,
     )
-    for (const row of agentVatLines) {
-      bonLines.push(kassaThermalPadMoney('BTW', row.tax))
-    }
     bonLines.push('')
     bonLines.push(kassaThermalTotalLine('TOTAAL', order.total || 0))
 
