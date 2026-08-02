@@ -3856,10 +3856,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     /** Afgeronde kassabon: lege bonInhoud + orderData → bestaande agent rijke layout. Voorlopig: platte bonInhoud. Keuken: orderData. */
     const agentRichKassaBon = receiptMode === 'kassa' && !isDraft
+    const kitchenItems = agentOrderData.items ?? []
+    if (receiptMode === 'keuken' && kitchenItems.length === 0) {
+      console.warn('[kassa] keukenprint overgeslagen: geen items in orderData')
+      return
+    }
 
     const printResult = await sendToVysionPrintAgent({
       winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
-      bonInhoud: agentRichKassaBon ? '' : bonLines.join('\n'),
+      bonInhoud:
+        receiptMode === 'keuken' ? '' : agentRichKassaBon ? '' : bonLines.join('\n'),
       copies: isDraft ? draftCopies : paidCopies,
       openDrawer: isCash,
       receiptMode,
@@ -3867,7 +3873,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         receiptMode === 'keuken' || agentRichKassaBon ? agentOrderData : undefined,
       businessInfo: printBusinessInfo,
     })
-    if (printResult.ok && receiptMode === 'kassa' && order.items.length > 0 && !opts?.skipKitchenCompanion) {
+    if (printResult.ok && receiptMode === 'kassa' && kitchenItems.length > 0 && !opts?.skipKitchenCompanion) {
       const health = await fetchPrintAgentHealth()
       if (printAgentHasDedicatedKitchenPrinter(health)) {
         await sendToVysionPrintAgent({

@@ -50,6 +50,8 @@ export type VysionPrintAgentBody = {
   copies?: number
   /** Open kassa-lade (drawer-kick) na het printen. */
   openDrawer?: boolean
+  /** Keukenbon door agent na kassa (buddy). Website stuurt keuken zelf — default uit. */
+  companionKitchen?: boolean
   /** "kassa" (default, volledige bon) of "keuken" (compacte keukenbon). */
   receiptMode?: 'kassa' |  'keuken'
 }
@@ -88,6 +90,8 @@ function buildAgentRequestPayload(body: VysionPrintAgentBody) {
     businessInfo,
     copies: body.copies,
     openDrawer: body.openDrawer === true,
+    /** Agent buddy-keuken zonder orderData levert lege «TE BEREIDEN»; keuken komt van website. */
+    companionKitchen: body.companionKitchen === true,
     receiptMode,
   }
 }
