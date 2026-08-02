@@ -2430,7 +2430,7 @@ export default function KassaReservationsView({
                   title={tablesLocked ? 'Tafels vergrendeld — klik om te ontgrendelen': 'Tafels ontgrendeld — klik om te vergrendelen'}
                 >
                   {tablesLocked ? <Lock size={18} /> : <LockOpen size={18} />}
-                  <span className="hidden sm:inline">{tablesLocked ? 'Vergrendeld': 'Vergrendelen'}</span>
+                  <span className="hidden sm:inline">{tablesLocked ? 'Ontgrendel tafels': 'Vergrendelen'}</span>
                 </button>
 
                 <button onClick={() => { setSelectedFloorTable(null); setShowAddFloorTable(true) }}
@@ -2579,7 +2579,7 @@ export default function KassaReservationsView({
                         title={tablesLocked ? 'Tafels vergrendeld — tik om te ontgrendelen': 'Tafels ontgrendeld — tik om te vergrendelen'}
                       >
                         {tablesLocked ? <Lock size={18} className="shrink-0" /> : <LockOpen size={18} className="shrink-0" />}
-                        <span className="hidden sm:inline">{tablesLocked ? 'Vergrendeld': 'Vergrendelen'}</span>
+                        <span className="hidden sm:inline">{tablesLocked ? 'Ontgrendel tafels': 'Vergrendelen'}</span>
                       </button>
                       <button
                         type="button"
