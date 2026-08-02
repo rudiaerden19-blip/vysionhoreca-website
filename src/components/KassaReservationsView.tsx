@@ -1226,6 +1226,46 @@ export default function KassaReservationsView({
     return { rows, grouped, from, to, today: todayStr }
   }, [reservations, resViewFilter, resListDate, resFilterYear, resFilterMonth, resSearch])
 
+  const headerReservationSubtitle = useMemo(() => {
+    const fmt = (iso: string) =>
+      new Date(`${iso}T12:00:00`).toLocaleDateString('nl-BE', {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+      })
+
+    const coversForDate = (iso: string) =>
+      reservations
+        .filter((r) => r.reservation_date === iso && r.status !== 'CANCELLED' && r.status !== 'WAITLIST')
+        .reduce((s, r) => s + r.party_size, 0)
+
+    if (viewMode === 'reservations') {
+      const covers = resViewFiltered.rows
+        .filter((r) => r.status !== 'WAITLIST')
+        .reduce((s, r) => s + r.party_size, 0)
+      if (resViewFilter === 'dag') {
+        return `${fmt(resListDate)} • ${covers} personen verwacht`
+      }
+      return `${covers} personen verwacht`
+    }
+
+    if (viewMode === 'today') {
+      return `${fmt(today)} • ${todayStats.covers} personen verwacht`
+    }
+
+    const covers = coversForDate(selectedDate)
+    return `${fmt(selectedDate)} • ${covers} personen verwacht`
+  }, [
+    viewMode,
+    resViewFilter,
+    resListDate,
+    resViewFiltered.rows,
+    reservations,
+    selectedDate,
+    today,
+    todayStats.covers,
+  ])
+
   // 12 kalendermaanden voor sidebar (alleen herbouwen als jaar wijzigt)
   const resCalMonths = useMemo(() => {
     const months: { y: number; m: number; cells: (number|null)[] }[] = []
@@ -1931,7 +1971,7 @@ export default function KassaReservationsView({
             <div className="min-w-0">
               <h1 className="truncate text-xl font-bold sm:text-2xl">Reservaties</h1>
               <p className="text-sm text-gray-400 sm:text-base">
-                {formatDate(selectedDate)} • {todayStats.covers} personen verwacht
+                {headerReservationSubtitle}
               </p>
             </div>
           </div>
