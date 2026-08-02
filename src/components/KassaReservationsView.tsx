@@ -1751,7 +1751,7 @@ export default function KassaReservationsView({
     return (
       <div
         key={reservation.id}
-        className="bg-white rounded-xl border border-gray-200 p-4 hover:border-[#075985] transition-all cursor-pointer shadow-sm"
+        className="bg-white rounded-xl border border-gray-200 p-4 hover:border-gray-900 transition-all cursor-pointer shadow-sm"
         onClick={() => setSelectedReservation(reservation)}
       >
         {/* Header */}
@@ -1844,7 +1844,7 @@ export default function KassaReservationsView({
               {allowKassaHandoff && (
                 <button
                   onClick={(e) => { e.stopPropagation(); handleStartOrder(reservation) }}
-                  className="flex-1 py-2 px-3 rounded-lg bg-[#58CCFF] text-[#063042] text-sm font-medium hover:bg-[#47c6fe] transition-colors flex items-center justify-center gap-1"
+                  className="flex-1 py-2 px-3 rounded-lg bg-black text-white text-sm font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-1"
                 >
                   <UtensilsCrossed size={16} />
                   {t('adminLayout.pos')}
@@ -1861,7 +1861,7 @@ export default function KassaReservationsView({
           {reservation.status === 'PENDING' && (
             <button
               onClick={(e) => { e.stopPropagation(); handleConfirm(reservation) }}
-              className="flex-1 py-2 px-3 rounded-lg bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 transition-colors flex items-center justify-center gap-1"
+              className="flex-1 py-2 px-3 rounded-lg bg-black text-white font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-1"
             >
               <CheckCircle2 size={16} />
               Bevestigen
@@ -1938,7 +1938,7 @@ export default function KassaReservationsView({
           <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
             <button
               onClick={onClose}
-              className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-[#58CCFF] px-3 py-2 text-sm font-bold text-[#063042] transition-colors hover:bg-[#43bef7] sm:gap-2"
+              className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-black px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-gray-800 sm:gap-2"
             >
               <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -1980,7 +1980,7 @@ export default function KassaReservationsView({
           <div className="flex items-center gap-2 mb-3">
             <button
               onClick={() => setSelectedShift(null)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${selectedShift === null ? 'bg-[#58CCFF] text-[#063042]': 'bg-gray-100 text-gray-500 hover:text-gray-900'}`}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${selectedShift === null ? 'bg-black text-white': 'bg-gray-100 text-gray-500 hover:text-gray-900'}`}
             >
               Alle shifts
             </button>
@@ -1988,7 +1988,7 @@ export default function KassaReservationsView({
               <button
                 key={shift.id}
                 onClick={() => setSelectedShift(shift.id)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${selectedShift === shift.id ? 'bg-[#58CCFF] text-[#063042]': 'bg-gray-100 text-gray-500 hover:text-gray-900'}`}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${selectedShift === shift.id ? 'bg-black text-white': 'bg-gray-100 text-gray-500 hover:text-gray-900'}`}
               >
                 {shift.name} {shift.startTime}–{shift.endTime}
               </button>
@@ -1998,7 +1998,7 @@ export default function KassaReservationsView({
 
         {/* View Toggle & Search */}
         <div className="flex flex-col gap-2 w-full lg:flex-row lg:items-center lg:gap-3">
-          <div className="flex w-full overflow-x-auto rounded-xl bg-[#cdd8ea] p-1">
+          <div className="flex w-full overflow-x-auto rounded-xl bg-gray-200 p-1">
             {(() => {
               const pendingCount = reservations.filter(r => r.status === 'PENDING').length
               return [
@@ -2014,7 +2014,7 @@ export default function KassaReservationsView({
                   onClick={() => { setViewMode(view.id as ViewMode); setShowResCalendar(false) }}
                   className={`relative flex min-w-[44px] flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-2 text-sm font-medium transition-colors ${
                     viewMode === view.id
-                      ? 'bg-[#58CCFF] text-[#063042] shadow-sm ring-1 ring-black/10'
+                      ? 'bg-black text-white shadow-sm ring-1 ring-black/10'
                       : 'bg-[#5f728f] text-white hover:bg-[#4d5f78]'
                   }`}
                 >
@@ -2038,7 +2038,7 @@ export default function KassaReservationsView({
                 placeholder="Zoek op naam, telefoon of email..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-xl bg-gray-100 border border-gray-200 focus:border-[#075985] outline-none"
+                className="w-full pl-10 pr-4 py-2 rounded-xl bg-gray-100 border border-gray-200 focus:border-black outline-none"
               />
             </div>
           )}
@@ -2084,7 +2084,7 @@ export default function KassaReservationsView({
                     <div
                       key={r.id}
                       onClick={() => setSelectedReservation(r)}
-                      className={`px-3 py-2.5 cursor-pointer transition-colors hover:bg-gray-50 ${isSelected ? 'bg-blue-50 border-l-4 border-blue-500': 'border-l-4 border-transparent'}`}
+                      className={`px-3 py-2.5 cursor-pointer transition-colors hover:bg-gray-50 ${isSelected ? 'bg-gray-100 border-l-4 border-black': 'border-l-4 border-transparent'}`}
                     >
                       <div className="flex items-start gap-2.5">
                         <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: status.color }} />
@@ -2112,7 +2112,7 @@ export default function KassaReservationsView({
                             <div className="flex gap-1 mt-1.5">
                               {r.status === 'PENDING' && (
                                 <button onClick={e => { e.stopPropagation(); handleConfirm(r) }}
-                                  className="text-[10px] px-2 py-1 rounded-md bg-blue-500 text-white font-medium hover:bg-blue-600 transition-colors">
+                                  className="text-[10px] px-2 py-1 rounded-md bg-black text-white font-medium hover:bg-gray-800 transition-colors">
                                   Bevestigen
                                 </button>
                               )}
@@ -2132,7 +2132,7 @@ export default function KassaReservationsView({
                             <div className="flex gap-1 mt-1.5">
                               {allowKassaHandoff && (
                                 <button onClick={e => { e.stopPropagation(); handleStartOrder(r) }}
-                                  className="text-[10px] px-2 py-1 rounded-md bg-[#58CCFF] text-[#063042] font-medium hover:bg-[#47c6fe] transition-colors">
+                                  className="text-[10px] px-2 py-1 rounded-md bg-black text-white font-medium hover:bg-gray-800 transition-colors">
                                   {t('adminLayout.pos')}
                                 </button>
                               )}
@@ -2191,7 +2191,7 @@ export default function KassaReservationsView({
                   onClick={() => setResFloorPlanZone(FLOOR_PLAN_ZONE_INSIDE)}
                   className={`rounded-lg px-2.5 py-1.5 text-xs font-bold transition-colors sm:px-3 sm:text-sm ${
                     resFloorPlanZone === FLOOR_PLAN_ZONE_INSIDE
-                      ? 'bg-[#58CCFF] text-[#063042]'
+                      ? 'bg-black text-white'
                       : 'text-gray-600 hover:bg-gray-100'
                   }`}
                 >
@@ -2202,7 +2202,7 @@ export default function KassaReservationsView({
                   onClick={() => setResFloorPlanZone(FLOOR_PLAN_ZONE_TERRACE)}
                   className={`rounded-lg px-2.5 py-1.5 text-xs font-bold transition-colors sm:px-3 sm:text-sm ${
                     resFloorPlanZone === FLOOR_PLAN_ZONE_TERRACE
-                      ? 'bg-[#58CCFF] text-[#063042]'
+                      ? 'bg-black text-white'
                       : 'text-gray-600 hover:bg-gray-100'
                   }`}
                 >
@@ -2284,7 +2284,7 @@ export default function KassaReservationsView({
                   <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur rounded-xl px-4 py-2.5 flex items-center gap-4 shadow-md text-xs font-medium">
                     <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-green-400" /><span>Vrij</span></div>
                     <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-violet-400" /><span>Gereserveerd</span></div>
-                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-blue-400" /><span>Bezet</span></div>
+                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-gray-800" /><span>Bezet</span></div>
                     <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-amber-400" /><span>Afwachting</span></div>
                   </div>
 
@@ -2345,23 +2345,23 @@ export default function KassaReservationsView({
               <div className="flex flex-shrink-0 flex-wrap items-center gap-2 bg-white px-2 py-2 sm:gap-3 sm:px-4 sm:py-3 border-b border-gray-200">
 
                 {/* Datum kiezer — groot en opvallend */}
-                <div className="flex items-center gap-2 bg-[#58CCFF] rounded-2xl px-3 py-2 shadow-md">
+                <div className="flex items-center gap-2 bg-black rounded-2xl px-3 py-2 shadow-md">
                   <button
                     onClick={() => { const d = new Date(selectedDate + 'T12:00:00'); d.setDate(d.getDate() - 1); setSelectedDate(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`) }}
                     className="w-10 h-10 rounded-xl bg-white/60 hover:bg-white/85 active:bg-white flex items-center justify-center transition-colors">
-                    <ChevronLeft size={22} className="text-[#063042]" />
+                    <ChevronLeft size={22} className="text-white" />
                   </button>
                   <div className="flex flex-col items-center">
-                    <span className="font-bold text-xl text-[#063042] min-w-[8rem] text-center leading-tight">
+                    <span className="font-bold text-xl text-white min-w-[8rem] text-center leading-tight">
                       {formatDate(selectedDate)}
                     </span>
                     <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)}
-                      className="mt-0.5 text-xs font-semibold text-[#063042] bg-white/65 border border-[#0891b2]/35 rounded-lg px-2 py-0.5 text-center cursor-pointer outline-none" />
+                      className="mt-0.5 text-xs font-semibold text-gray-900 bg-white/65 border border-gray-300/35 rounded-lg px-2 py-0.5 text-center cursor-pointer outline-none" />
                   </div>
                   <button
                     onClick={() => { const d = new Date(selectedDate + 'T12:00:00'); d.setDate(d.getDate() + 1); setSelectedDate(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`) }}
                     className="w-10 h-10 rounded-xl bg-white/60 hover:bg-white/85 active:bg-white flex items-center justify-center transition-colors">
-                    <ChevronRight size={22} className="text-[#063042]" />
+                    <ChevronRight size={22} className="text-white" />
                   </button>
                 </div>
 
@@ -2372,7 +2372,7 @@ export default function KassaReservationsView({
                     onClick={() => setResFloorPlanZone(FLOOR_PLAN_ZONE_INSIDE)}
                     className={`min-h-[40px] rounded-xl px-3 text-sm font-bold transition-colors ${
                       resFloorPlanZone === FLOOR_PLAN_ZONE_INSIDE
-                        ? 'bg-[#58CCFF] text-[#063042] shadow-sm'
+                        ? 'bg-black text-white shadow-sm'
                         : 'text-gray-600 hover:bg-gray-100'
                     }`}
                   >
@@ -2383,7 +2383,7 @@ export default function KassaReservationsView({
                     onClick={() => setResFloorPlanZone(FLOOR_PLAN_ZONE_TERRACE)}
                     className={`min-h-[40px] rounded-xl px-3 text-sm font-bold transition-colors ${
                       resFloorPlanZone === FLOOR_PLAN_ZONE_TERRACE
-                        ? 'bg-[#58CCFF] text-[#063042] shadow-sm'
+                        ? 'bg-black text-white shadow-sm'
                         : 'text-gray-600 hover:bg-gray-100'
                     }`}
                   >
@@ -2397,7 +2397,7 @@ export default function KassaReservationsView({
                 <div className="hidden lg:flex items-center gap-4 text-sm font-medium text-gray-600">
                   <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-green-400" /><span>Vrij</span></div>
                   <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-violet-400" /><span>Gereserveerd</span></div>
-                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-blue-400" /><span>Bezet</span></div>
+                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-gray-800" /><span>Bezet</span></div>
                   <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-amber-400" /><span>Afwachting</span></div>
                 </div>
 
@@ -2406,7 +2406,7 @@ export default function KassaReservationsView({
                 <button
                   type="button"
                   onClick={toggleFloorOnlyMode}
-                  className="flex min-h-[44px] items-center gap-2 rounded-xl border-2 border-[#075985] bg-white px-3 py-2 text-sm font-bold text-[#075985] shadow-sm transition-colors hover:bg-gray-50"
+                  className="flex min-h-[44px] items-center gap-2 rounded-xl border-2 border-black bg-white px-3 py-2 text-sm font-bold text-gray-900 shadow-sm transition-colors hover:bg-gray-50"
                   title="Verberg menu en toon alleen de vloer"
                   aria-label="Alleen vloer — verberg balken"
                 >
@@ -2497,7 +2497,7 @@ export default function KassaReservationsView({
                       floorRes.map(r => {
                         const statusDot: Record<string, string> = {
                           CONFIRMED: 'bg-violet-400',
-                          CHECKED_IN: 'bg-blue-400',
+                          CHECKED_IN: 'bg-gray-800',
                           PENDING: 'bg-amber-400',
                           CANCELLED: 'bg-gray-300',
                         }
@@ -2506,7 +2506,7 @@ export default function KassaReservationsView({
                           <div
                             key={r.id}
                             onClick={() => setSelectedReservation(r)}
-                            className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${isActive ? 'bg-blue-50': 'hover:bg-gray-50'}`}
+                            className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${isActive ? 'bg-gray-100': 'hover:bg-gray-50'}`}
                           >
                             <div className={`w-3 h-3 rounded-full flex-shrink-0 ${statusDot[r.status] ?? 'bg-gray-300'}`} />
                             <div className="flex-1 min-w-0">
@@ -2533,7 +2533,7 @@ export default function KassaReservationsView({
                 {!floorOnlyMode && (
                 <button
                   onClick={() => setResListCollapsed(c => !c)}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center rounded-r-2xl bg-[#58CCFF] hover:bg-[#43bef7] active:bg-[#34ade7] text-[#063042] shadow-xl transition-all"
+                  className="absolute left-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center rounded-r-2xl bg-black hover:bg-gray-800 active:bg-gray-900 text-white shadow-xl transition-all"
                   style={{ width: 44, height: 80, fontSize: 22, left: resListCollapsed ? 0 : undefined }}
                   title={resListCollapsed ? 'Lijst tonen': 'Lijst verbergen'}
                 >
@@ -2598,7 +2598,7 @@ export default function KassaReservationsView({
                       <button
                         type="button"
                         onClick={e => { e.stopPropagation(); toggleFloorOnlyMode() }}
-                        className="flex min-h-[44px] shrink-0 items-center gap-2 rounded-xl bg-[#58CCFF] px-3 py-2 text-sm font-bold text-[#063042] shadow-lg transition-colors hover:bg-[#43bef7] active:bg-[#34ade7] sm:px-4"
+                        className="flex min-h-[44px] shrink-0 items-center gap-2 rounded-xl bg-black px-3 py-2 text-sm font-bold text-white shadow-lg transition-colors hover:bg-gray-800 active:bg-gray-900 sm:px-4"
                         title="Toon menu, tabs en werkbalk"
                       >
                         <Minimize2 size={20} className="shrink-0" />
@@ -2687,7 +2687,7 @@ export default function KassaReservationsView({
                       onPointerDown={e => e.stopPropagation()}
                       onClick={e => e.stopPropagation()}
                     >
-                      <div className="flex items-center gap-2 rounded-2xl bg-[#58CCFF] px-2 py-2 shadow-xl sm:px-3 sm:py-2.5">
+                      <div className="flex items-center gap-2 rounded-2xl bg-black px-2 py-2 shadow-xl sm:px-3 sm:py-2.5">
                         <button
                           type="button"
                           onClick={() => {
@@ -2699,17 +2699,17 @@ export default function KassaReservationsView({
                           title="Vorige dag"
                           aria-label="Vorige dag"
                         >
-                          <ChevronLeft size={22} className="text-[#063042]" />
+                          <ChevronLeft size={22} className="text-white" />
                         </button>
                         <div className="flex min-w-0 flex-col items-center px-1">
-                          <span className="max-w-[10rem] truncate text-center text-base font-bold leading-tight text-[#063042] sm:max-w-none sm:text-lg">
+                          <span className="max-w-[10rem] truncate text-center text-base font-bold leading-tight text-white sm:max-w-none sm:text-lg">
                             {formatDate(selectedDate)}
                           </span>
                           <input
                             type="date"
                             value={selectedDate}
                             onChange={e => setSelectedDate(e.target.value)}
-                            className="mt-0.5 max-w-full cursor-pointer rounded-lg border border-[#0891b2]/35 bg-white/65 px-2 py-0.5 text-center text-xs font-semibold text-[#063042] outline-none"
+                            className="mt-0.5 max-w-full cursor-pointer rounded-lg border border-gray-300/35 bg-white/65 px-2 py-0.5 text-center text-xs font-semibold text-gray-900 outline-none"
                             aria-label="Kies datum"
                           />
                         </div>
@@ -2724,7 +2724,7 @@ export default function KassaReservationsView({
                           title="Volgende dag"
                           aria-label="Volgende dag"
                         >
-                          <ChevronRight size={22} className="text-[#063042]" />
+                          <ChevronRight size={22} className="text-white" />
                         </button>
                       </div>
                     </div>
@@ -2799,7 +2799,7 @@ export default function KassaReservationsView({
                                 {/* Status knoppen — min 44px hoogte voor touch */}
                                 <div className="grid grid-cols-2 gap-1.5 pt-1">
                                   {r.status === 'PENDING' && (
-                                    <button onClick={() => handleConfirm(r)} className="col-span-2 min-h-[44px] rounded-xl bg-blue-500 active:bg-blue-700 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-1.5">
+                                    <button onClick={() => handleConfirm(r)} className="col-span-2 min-h-[44px] rounded-xl bg-black active:bg-gray-900 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-1.5">
                                       <CheckCircle2 size={14} /> Bevestigen
                                     </button>
                                   )}
@@ -3024,11 +3024,11 @@ export default function KassaReservationsView({
                   {/* Dag / Avond toggle */}
                   <div className="flex rounded-lg overflow-hidden border border-gray-200 ml-2">
                     <button onClick={() => setTimeShift('dag')}
-                      className={`px-4 py-1.5 text-sm font-bold transition-colors ${timeShift==='dag'?'bg-[#58CCFF] text-[#063042]':'bg-white text-gray-500 hover:bg-gray-50'}`}>
+                      className={`px-4 py-1.5 text-sm font-bold transition-colors ${timeShift==='dag'?'bg-black text-white':'bg-white text-gray-500 hover:bg-gray-50'}`}>
                       Dag
                     </button>
                     <button onClick={() => setTimeShift('avond')}
-                      className={`px-4 py-1.5 text-sm font-bold transition-colors border-l border-gray-200 ${timeShift==='avond'?'bg-[#58CCFF] text-[#063042]':'bg-white text-gray-500 hover:bg-gray-50'}`}>
+                      className={`px-4 py-1.5 text-sm font-bold transition-colors border-l border-gray-200 ${timeShift==='avond'?'bg-black text-white':'bg-white text-gray-500 hover:bg-gray-50'}`}>
                       Avond
                     </button>
                   </div>
@@ -3037,7 +3037,7 @@ export default function KassaReservationsView({
                     onClick={() => setCalOpen(o => !o)}
                     className={`ml-2 flex items-center gap-2 px-5 py-1.5 rounded-lg border-2 font-bold text-sm transition-colors
                       ${calOpen
-                        ? 'bg-[#58CCFF] border-[#0891b2] text-[#063042] hover:bg-[#43bef7]'
+                        ? 'bg-black border-black text-white hover:bg-gray-800'
                         : 'bg-gray-200 border-gray-300 text-gray-500 hover:bg-gray-300'
                       }`}>
                     <Calendar size={20}/>
@@ -3076,14 +3076,14 @@ export default function KassaReservationsView({
                     <div style={{ minWidth: (timeSlots.length + extraSlots.length) * 80 + LABEL_W }}>
 
                       {/* Oranje header — sticky bovenaan de scroll container */}
-                      <div className="flex sticky top-0 z-10" style={{ height:48, backgroundColor:'#58CCFF'}}>
-                        <div style={{ width:LABEL_W, flexShrink:0 }} className="border-r border-[#6b7d9e] flex items-center justify-center sticky left-0 z-20 bg-[#58CCFF]">
-                          <span className="text-sm font-bold text-[#063042]">Tafel</span>
+                      <div className="flex sticky top-0 z-10" style={{ height:48, backgroundColor:'#000000'}}>
+                        <div style={{ width:LABEL_W, flexShrink:0 }} className="border-r border-[#6b7d9e] flex items-center justify-center sticky left-0 z-20 bg-black">
+                          <span className="text-sm font-bold text-white">Tafel</span>
                         </div>
                         <div className="flex relative" style={{ width:(timeSlots.length+extraSlots.length)*80 }}>
                           {timeSlots.map((t,i) => (
                             <div key={`${t}-${i}`} style={{ width:80, flexShrink:0 }} className="border-r border-[#6b7d9e] flex items-center justify-center px-0.5">
-                              <span className="text-[11px] font-bold leading-tight text-[#063042] sm:text-xs md:text-sm">{t}</span>
+                              <span className="text-[11px] font-bold leading-tight text-white sm:text-xs md:text-sm">{t}</span>
                             </div>
                           ))}
                           {extraSlots.map((t,i) => (
@@ -3238,19 +3238,19 @@ export default function KassaReservationsView({
               {/* === KALENDER RECHTS — inklapbaar, groot === */}
               <div className={`flex-shrink-0 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col transition-[width] duration-300 ease-in-out ${calOpen ? 'w-72': 'w-12'}`}>
                 {/* Header: inklapknop + jaar + vandaag */}
-                <div className="flex items-center gap-2 px-3 py-3 border-b border-gray-100 flex-shrink-0 bg-[#58CCFF]">
+                <div className="flex items-center gap-2 px-3 py-3 border-b border-gray-100 flex-shrink-0 bg-black">
                   <button onClick={() => setCalOpen(o=>!o)}
-                    className="p-1.5 rounded-lg bg-white/55 hover:bg-white/80 text-[#063042] flex-shrink-0">
+                    className="p-1.5 rounded-lg bg-white/55 hover:bg-white/80 text-white flex-shrink-0">
                     {calOpen ? <ChevronRight size={18}/> : <ChevronLeft size={18}/>}
                   </button>
                   {calOpen && (<>
                     <button onClick={() => setCalMonth(m=>({year:m.year-1,month:m.month}))}
-                      className="p-1.5 hover:bg-white/45 rounded-lg text-[#063042]"><ChevronLeft size={18}/></button>
-                    <span className="flex-1 text-center text-lg font-black text-[#063042]">{calMonth.year}</span>
+                      className="p-1.5 hover:bg-white/45 rounded-lg text-white"><ChevronLeft size={18}/></button>
+                    <span className="flex-1 text-center text-lg font-black text-white">{calMonth.year}</span>
                     <button onClick={() => setCalMonth(m=>({year:m.year+1,month:m.month}))}
-                      className="p-1.5 hover:bg-white/45 rounded-lg text-[#063042]"><ChevronRight size={18}/></button>
+                      className="p-1.5 hover:bg-white/45 rounded-lg text-white"><ChevronRight size={18}/></button>
                     <button onClick={() => { setTimelineDate(todayStr); setCalMonth({year:timelineNow.getFullYear(),month:timelineNow.getMonth()}) }}
-                      className="px-3 py-1 rounded-lg bg-white text-[#075985] text-sm font-black hover:bg-[#f2f5fa]">
+                      className="px-3 py-1 rounded-lg bg-white text-gray-900 text-sm font-black hover:bg-[#f2f5fa]">
                       Vandaag
                     </button>
                   </>)}
@@ -3283,9 +3283,9 @@ export default function KassaReservationsView({
                               return (
                                 <button key={day} onClick={()=>{ setTimelineDate(dStr); setCalMonth({year:mYear,month:mMonth}) }}
                                   className={`relative aspect-square flex items-center justify-center text-sm font-bold rounded-full transition-colors
-                                    ${isSel?'bg-[#58CCFF] text-[#063042]':isTod?'bg-[#e8eef6] text-[#075985]':'hover:bg-gray-100 text-gray-700'}`}>
+                                    ${isSel?'bg-black text-white':isTod?'bg-[#e8eef6] text-gray-900':'hover:bg-gray-100 text-gray-700'}`}>
                                   {day}
-                                  {hasRes&&!isSel&&<span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-blue-500"/>}
+                                  {hasRes&&!isSel&&<span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-gray-1000"/>}
                                 </button>
                               )
                             })}
@@ -3339,7 +3339,7 @@ export default function KassaReservationsView({
               </td>
               <td className="px-5 py-4 text-right" onClick={e => e.stopPropagation()}>
                 <button onClick={() => setEditReservation(r)}
-                  className="px-4 py-2 rounded-xl bg-[#58CCFF] hover:bg-[#43bef7] active:bg-[#34ade7] text-[#063042] text-sm font-semibold transition-colors">
+                  className="px-4 py-2 rounded-xl bg-black hover:bg-gray-800 active:bg-gray-900 text-white text-sm font-semibold transition-colors">
                    Bewerken
                 </button>
               </td>
@@ -3355,7 +3355,7 @@ export default function KassaReservationsView({
                 {resViewFilter === 'dag' && (
                   <>
                     <button onClick={() => { const d = new Date(resDate + 'T12:00:00'); d.setDate(d.getDate()-1); setResListDate(d.toISOString().split('T')[0]) }}
-                      className="w-9 h-9 rounded-xl bg-[#58CCFF] hover:bg-[#43bef7] flex items-center justify-center text-[#063042] flex-shrink-0">
+                      className="w-9 h-9 rounded-xl bg-black hover:bg-gray-800 flex items-center justify-center text-white flex-shrink-0">
                       <ChevronLeft size={18}/>
                     </button>
                     <span className="font-bold text-gray-800 text-sm min-w-[100px] text-center">{formatDate(resDate)}</span>
@@ -3370,7 +3370,7 @@ export default function KassaReservationsView({
                 {resViewFilter === 'week' && (
                   <>
                     <button onClick={() => { const d = new Date(resDate + 'T12:00:00'); d.setDate(d.getDate()-7); setResListDate(d.toISOString().split('T')[0]) }}
-                      className="w-9 h-9 rounded-xl bg-[#58CCFF] hover:bg-[#43bef7] flex items-center justify-center text-[#063042] flex-shrink-0">
+                      className="w-9 h-9 rounded-xl bg-black hover:bg-gray-800 flex items-center justify-center text-white flex-shrink-0">
                       <ChevronLeft size={18}/>
                     </button>
                     <span className="font-bold text-gray-800 text-sm min-w-[140px] text-center">{from} – {to}</span>
@@ -3385,7 +3385,7 @@ export default function KassaReservationsView({
                 {resViewFilter === 'maand' && (
                   <div className="relative">
                     <button onClick={() => setShowMonthPicker(v => !v)}
-                      className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#58CCFF] hover:bg-[#43bef7] text-[#063042] font-semibold text-sm">
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl bg-black hover:bg-gray-800 text-white font-semibold text-sm">
                       <Calendar size={15}/>
                       {MONTHS_SHORT[resFilterMonth]} {resFilterYear}
                       <ChevronRight size={13} className={`transition-transform ${showMonthPicker ? 'rotate-90': ''}`}/>
@@ -3410,7 +3410,7 @@ export default function KassaReservationsView({
                             <button key={mi}
                               onClick={() => { setResFilterMonth(mi); setShowMonthPicker(false) }}
                               className={`py-2 rounded-xl text-sm font-semibold transition-colors
-                                ${resFilterMonth === mi ? 'bg-[#58CCFF] text-[#063042]': 'bg-gray-100 hover:bg-[#e8eef6] text-gray-700'}`}>
+                                ${resFilterMonth === mi ? 'bg-black text-white': 'bg-gray-100 hover:bg-[#e8eef6] text-gray-700'}`}>
                               {mn}
                             </button>
                           ))}
@@ -3424,7 +3424,7 @@ export default function KassaReservationsView({
                 {resViewFilter === 'jaar' && (
                   <div className="flex items-center gap-2">
                     <button onClick={() => setResFilterYear(y => y - 1)}
-                      className="w-9 h-9 rounded-xl bg-[#58CCFF] hover:bg-[#43bef7] flex items-center justify-center text-[#063042]">
+                      className="w-9 h-9 rounded-xl bg-black hover:bg-gray-800 flex items-center justify-center text-white">
                       <ChevronLeft size={18}/>
                     </button>
                     <span className="font-bold text-gray-800 text-base px-2">{resFilterYear}</span>
@@ -3441,7 +3441,7 @@ export default function KassaReservationsView({
                     <button key={f}
                       onClick={() => { setResViewFilter(f); setShowMonthPicker(false); if (f === 'maand') { setResFilterMonth(new Date().getMonth()); setResFilterYear(new Date().getFullYear()) } if (f === 'jaar') setResFilterYear(new Date().getFullYear()) }}
                       className={`px-3 py-1.5 rounded-lg text-sm font-semibold capitalize transition-colors
-                        ${resViewFilter === f ? 'bg-[#58CCFF] text-[#063042] shadow-sm': 'text-gray-500 hover:text-gray-800'}`}>
+                        ${resViewFilter === f ? 'bg-black text-white shadow-sm': 'text-gray-500 hover:text-gray-800'}`}>
                       {f.charAt(0).toUpperCase() + f.slice(1)}
                     </button>
                   ))}
@@ -3450,7 +3450,7 @@ export default function KassaReservationsView({
                 <div className="ml-auto flex gap-2">
                   <button onClick={() => { setShowResCalendar(v => !v); setShowResSearch(false) }}
                     className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-colors
-                      ${showResCalendar ? 'bg-[#43bef7] text-[#063042] ring-2 ring-black/12': 'bg-[#58CCFF] hover:bg-[#43bef7] text-[#063042]'}`}>
+                      ${showResCalendar ? 'bg-gray-900 text-white ring-2 ring-black/12': 'bg-black hover:bg-gray-800 text-white'}`}>
                     <Calendar size={15}/> Kalender {showResCalendar ? <Eye size={13}/> : <EyeOff size={13}/>}
                   </button>
                   <button onClick={() => { setShowResSearch(v => !v); if (showResSearch) setResSearch('') }}
@@ -3473,13 +3473,13 @@ export default function KassaReservationsView({
               {/* Samenvatting vak */}
               <div className="flex items-stretch gap-0 border-b border-gray-200 flex-shrink-0 bg-gray-50 divide-x divide-gray-200">
                 <div className="flex flex-col items-center justify-center px-8 py-3">
-                  <span className="text-2xl font-black text-gray-800">{filteredRes.length}</span>
+                  <span className="text-2xl font-black text-gray-900">{filteredRes.length}</span>
                   <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-0.5">
                     Reservering{filteredRes.length !== 1 ? 'en': ''}
                   </span>
                 </div>
                 <div className="flex flex-col items-center justify-center px-8 py-3">
-                  <span className="text-2xl font-black text-[#075985]">{totalPersons}</span>
+                  <span className="text-2xl font-black text-gray-900">{totalPersons}</span>
                   <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-0.5">Personen</span>
                 </div>
                 {resViewFilter !== 'dag' && (
@@ -3502,7 +3502,7 @@ export default function KassaReservationsView({
                 )}
                 <div className="flex-1"/>
                 <div className="flex flex-col items-center justify-center px-6 py-3">
-                  <span className="text-xs font-bold text-[#075985] uppercase tracking-wider">
+                  <span className="text-xs font-bold text-gray-900 uppercase tracking-wider">
                     {resViewFilter === 'dag' && formatDate(resDate)}
                     {resViewFilter === 'week' && `${from} – ${to}`}
                     {resViewFilter === 'maand' && `${MONTHS_NL[resFilterMonth].charAt(0).toUpperCase() + MONTHS_NL[resFilterMonth].slice(1)} ${resFilterYear}`}
@@ -3585,7 +3585,7 @@ export default function KassaReservationsView({
                             {dateHeader(date) && (
                               <tr key={`hdr-${date}`}>
                                 <td colSpan={7} className="border-b border-[#dde5f0] bg-[#f2f5fa] px-5 py-2">
-                                  <span className="text-xs font-bold text-[#075985] uppercase tracking-wider">{dateHeader(date)}</span>
+                                  <span className="text-xs font-bold text-gray-900 uppercase tracking-wider">{dateHeader(date)}</span>
                                   <span className="ml-2 text-xs text-[#5c708a]">{rows.length} reserv. · {rows.reduce((s,r) => s+r.party_size,0)} pers.</span>
                                 </td>
                               </tr>
@@ -3648,7 +3648,7 @@ export default function KassaReservationsView({
                         <ChevronRight size={14}/>
                       </button>
                       <button onClick={() => { setResListDate(today); setShowResCalendar(false) }}
-                        className="ml-2 px-3 py-1 rounded-lg bg-[#58CCFF] hover:bg-[#43bef7] text-[#063042] text-xs font-semibold">
+                        className="ml-2 px-3 py-1 rounded-lg bg-black hover:bg-gray-800 text-white text-xs font-semibold">
                         Vandaag
                       </button>
                       <button onClick={() => setShowResCalendar(false)}
@@ -3674,7 +3674,7 @@ export default function KassaReservationsView({
                                 <button key={i}
                                   onClick={() => { setResListDate(ds); setResViewFilter('dag'); setShowResCalendar(false) }}
                                   className={`w-7 h-7 mx-auto rounded-full text-xs font-medium flex items-center justify-center transition-colors relative
-                                    ${isSel ? 'bg-[#58CCFF] text-[#063042]': isTod ? 'border border-[#6b7d9e] text-[#075985] font-bold': 'text-gray-700 hover:bg-[#f2f5fa]'}`}>
+                                    ${isSel ? 'bg-black text-white': isTod ? 'border border-[#6b7d9e] text-gray-900 font-bold': 'text-gray-700 hover:bg-[#f2f5fa]'}`}>
                                   {day}
                                   {hasDot && !isSel && (
                                     <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#6b7d9e]"/>
@@ -3715,7 +3715,7 @@ export default function KassaReservationsView({
               <h3 className="text-lg font-bold">Reservatie Instellingen</h3>
               <button
                 onClick={saveSettingsToSupabase}
-                className="flex items-center gap-2 px-5 py-2.5 bg-[#58CCFF] hover:bg-[#43bef7] text-[#063042] font-bold rounded-xl shadow transition-colors"
+                className="flex items-center gap-2 px-5 py-2.5 bg-black hover:bg-gray-800 text-white font-bold rounded-xl shadow transition-colors"
               >
                  Opslaan
               </button>
@@ -3758,12 +3758,12 @@ export default function KassaReservationsView({
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       onClick={() => updateSettings({ autoConfirm: false })}
-                      className={`p-4 rounded-xl border-2 text-left transition-all ${!reservationSettings.autoConfirm ? 'border-[#075985] bg-[#f2f5fa]': 'border-gray-200 hover:border-gray-300'}`}
+                      className={`p-4 rounded-xl border-2 text-left transition-all ${!reservationSettings.autoConfirm ? 'border-black bg-[#f2f5fa]': 'border-gray-200 hover:border-gray-300'}`}
                     >
                       <div className="text-2xl mb-2"></div>
                       <p className={`font-bold text-sm ${!reservationSettings.autoConfirm ? 'text-[#2D3A52]': 'text-gray-700'}`}>Handmatig</p>
                       <p className="text-xs text-gray-500 mt-1">Klant krijgt mail "in afwachting". Jij keurt goed in de kassa → klant krijgt bevestigingsmail.</p>
-                      {!reservationSettings.autoConfirm && <span className="mt-2 inline-block text-xs font-bold text-[#075985] bg-[#e8eef6] px-2 py-0.5 rounded-full">Actief</span>}
+                      {!reservationSettings.autoConfirm && <span className="mt-2 inline-block text-xs font-bold text-gray-900 bg-[#e8eef6] px-2 py-0.5 rounded-full">Actief</span>}
                     </button>
                     <button
                       onClick={() => updateSettings({ autoConfirm: true })}
@@ -4015,8 +4015,8 @@ export default function KassaReservationsView({
                             onClick={() => updateSettings({ depositAmount: amount })}
                             className={`py-3 rounded-xl font-bold text-sm transition-colors ${
                               reservationSettings.depositAmount === amount
-                                ? 'bg-[#58CCFF] text-[#063042] shadow-md'
-                                : 'bg-white text-gray-700 border border-gray-200 hover:border-[#8a9bc0] hover:text-[#075985]'
+                                ? 'bg-black text-white shadow-md'
+                                : 'bg-white text-gray-700 border border-gray-200 hover:border-[#8a9bc0] hover:text-gray-900'
                             }`}
                           >
                             €{amount}
@@ -4093,9 +4093,9 @@ export default function KassaReservationsView({
                       <div className={`w-5 h-5 rounded-full bg-white transition-transform ${reservationSettings.bookingPageEnabled ? 'translate-x-8': 'translate-x-1'}`} />
                     </button>
                   </div>
-                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                    <p className="text-sm font-medium text-blue-700 mb-1"> Booking link voor klanten:</p>
-                    <p className="text-xs text-blue-600 font-mono break-all">
+                  <div className="bg-gray-100 border border-gray-300 rounded-xl p-4">
+                    <p className="text-sm font-medium text-gray-900 mb-1"> Booking link voor klanten:</p>
+                    <p className="text-xs text-gray-700 font-mono break-all">
                       {typeof window !== 'undefined'? `${window.location.origin}/shop/${tenant}/reserveren`: `/shop/${tenant}/reserveren`}
                     </p>
                     <button
@@ -4104,7 +4104,7 @@ export default function KassaReservationsView({
                         navigator.clipboard?.writeText(url)
                         toast.success(rk('linkCopied'))
                       }}
-                      className="mt-2 px-3 py-1.5 bg-blue-500 text-white text-xs rounded-lg hover:bg-blue-600 transition-colors"
+                      className="mt-2 px-3 py-1.5 bg-black text-white text-xs rounded-lg hover:bg-gray-800 transition-colors"
                     >
                       Kopieer link
                     </button>
@@ -4117,7 +4117,7 @@ export default function KassaReservationsView({
             {/* Opslaan knop onderaan */}
             <button
               onClick={saveSettingsToSupabase}
-              className="w-full mt-4 py-4 bg-[#58CCFF] hover:bg-[#43bef7] text-[#063042] font-bold text-lg rounded-xl shadow-md transition-colors"
+              className="w-full mt-4 py-4 bg-black hover:bg-gray-800 text-white font-bold text-lg rounded-xl shadow-md transition-colors"
             >
                Instellingen Opslaan
             </button>
@@ -4171,7 +4171,7 @@ export default function KassaReservationsView({
               type="text"
               value={contactPromoSubject}
               onChange={e => setContactPromoSubject(e.target.value)}
-              className="mb-4 w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-[#075985]"
+              className="mb-4 w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-black"
               disabled={contactPromoSending}
             />
             <label className="block text-sm font-medium text-gray-700 mb-1">Bericht</label>
@@ -4179,7 +4179,7 @@ export default function KassaReservationsView({
               value={contactPromoMessage}
               onChange={e => setContactPromoMessage(e.target.value)}
               rows={6}
-              className="mb-4 w-full resize-y rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-[#075985]"
+              className="mb-4 w-full resize-y rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-black"
               disabled={contactPromoSending}
             />
             <p className="mb-4 text-xs text-gray-400">
@@ -4198,7 +4198,7 @@ export default function KassaReservationsView({
                 type="button"
                 disabled={contactPromoSending}
                 onClick={() => void handleSendContactPromo()}
-                className="flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-xl bg-[#58CCFF] px-4 font-bold text-[#063042] hover:bg-[#43bef7] disabled:opacity-50"
+                className="flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-xl bg-black px-4 font-bold text-white hover:bg-gray-800 disabled:opacity-50"
               >
                 <Send size={18} />
                 {contactPromoSending ? 'Versturen…': contactPromoRecipients.length > 1 ? `Versturen (${contactPromoRecipients.length})`: 'Versturen'}
@@ -4330,11 +4330,11 @@ export default function KassaReservationsView({
               {/* Tabs */}
               <div className="flex border-b border-gray-100">
                 <button onClick={() => setSearchPopupTab('dag')}
-                  className={`flex-1 py-3 text-sm font-bold tracking-wide transition-colors ${searchPopupTab==='dag'?'text-blue-600 border-b-2 border-blue-600':'text-gray-400 hover:text-gray-600'}`}>
+                  className={`flex-1 py-3 text-sm font-bold tracking-wide transition-colors ${searchPopupTab==='dag'?'text-gray-700 border-b-2 border-black':'text-gray-400 hover:text-gray-600'}`}>
                   DEZE DAG
                 </button>
                 <button onClick={() => setSearchPopupTab('alle')}
-                  className={`flex-1 py-3 text-sm font-bold tracking-wide transition-colors ${searchPopupTab==='alle'?'text-blue-600 border-b-2 border-blue-600':'text-gray-400 hover:text-gray-600'}`}>
+                  className={`flex-1 py-3 text-sm font-bold tracking-wide transition-colors ${searchPopupTab==='alle'?'text-gray-700 border-b-2 border-black':'text-gray-400 hover:text-gray-600'}`}>
                   ALLE DAGEN
                 </button>
               </div>
@@ -4350,7 +4350,7 @@ export default function KassaReservationsView({
                     </p>
                     {grouped[date].sort((a,b)=>a.reservation_time.localeCompare(b.reservation_time)).map(r => (
                       <button key={r.id} onClick={() => { setEditReservation(r); setShowSearchPopup(false) }}
-                        className="w-full px-4 py-3 border-b border-gray-50 hover:bg-blue-50 transition-colors text-left flex items-center gap-4">
+                        className="w-full px-4 py-3 border-b border-gray-50 hover:bg-gray-100 transition-colors text-left flex items-center gap-4">
                         <div className="flex-shrink-0 text-center">
                           <p className="text-base font-black text-gray-800">{r.reservation_time}</p>
                           <p className="text-xs text-gray-400">{r.party_size}p.</p>
@@ -4364,7 +4364,7 @@ export default function KassaReservationsView({
                           <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
                             r.status==='CONFIRMED'?'bg-green-100 text-green-700':
                             r.status==='PENDING'?'bg-yellow-100 text-yellow-700':
-                            r.status==='CHECKED_IN'?'bg-blue-100 text-blue-700':
+                            r.status==='CHECKED_IN'?'bg-gray-200 text-gray-900':
                             'bg-gray-100 text-gray-500'}`}>
                             {r.status==='CONFIRMED'?'Bevestigd':r.status==='PENDING'?'Verwacht':r.status==='CHECKED_IN'?'Aanwezig':'Onbekend'}
                           </span>
@@ -4505,7 +4505,7 @@ function EditReservationModal({ reservation, tables, reservations, shifts, buffe
     setCancelling(false)
   }
 
-  const inputCls = 'w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 focus:border-blue-500 outline-none text-base'
+  const inputCls = 'w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 focus:border-black outline-none text-base'
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4" style={{ background:'rgba(0,0,0,0.5)'}}
@@ -4630,7 +4630,7 @@ function EditReservationModal({ reservation, tables, reservations, shifts, buffe
             <textarea value={form.special_requests}
               onChange={e => setForm({...form, special_requests: e.target.value})}
               rows={3} placeholder="Bijv. allergieën, verjaardagstaart, rolstoel..."
-              className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 focus:border-blue-500 outline-none text-base resize-none"/>
+              className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 focus:border-black outline-none text-base resize-none"/>
           </div>
 
           {/* Validatiefout */}
@@ -4662,7 +4662,7 @@ function EditReservationModal({ reservation, tables, reservations, shifts, buffe
           )}
           {!confirmCancel && (
             <button onClick={handleSave} disabled={saving || isOutsideShifts || hasConflict}
-              className="flex-1 py-3 rounded-xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-700 disabled:opacity-40 transition-colors">
+              className="flex-1 py-3 rounded-xl bg-black hover:bg-gray-800 disabled:opacity-40 transition-colors">
               {saving ? 'Opslaan...': 'Wijzigingen opslaan'}
             </button>
           )}
@@ -4752,10 +4752,10 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
                   return (
                     <th key={iso}
                       onClick={() => { onSelectDate(iso); setCalMode('day') }}
-                      className={`border-b border-r border-gray-200 last:border-r-0 py-2 px-1 text-center cursor-pointer transition-colors ${isSelected ? 'bg-green-50': isToday ? 'bg-blue-50': 'hover:bg-gray-50'}`}
+                      className={`border-b border-r border-gray-200 last:border-r-0 py-2 px-1 text-center cursor-pointer transition-colors ${isSelected ? 'bg-green-50': isToday ? 'bg-gray-100': 'hover:bg-gray-50'}`}
                     >
-                      <div className={`text-[11px] font-bold uppercase tracking-wide mb-0.5 ${isToday ? 'text-blue-500': 'text-gray-400'}`}>{NL_DAYS_SHORT[i]}</div>
-                      <div className={`text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center mx-auto ${isToday ? 'bg-blue-500 text-white': isSelected ? 'bg-green-500 text-white': 'text-gray-800'}`}>{d.getDate()}</div>
+                      <div className={`text-[11px] font-bold uppercase tracking-wide mb-0.5 ${isToday ? 'text-gray-900': 'text-gray-400'}`}>{NL_DAYS_SHORT[i]}</div>
+                      <div className={`text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center mx-auto ${isToday ? 'bg-gray-1000 text-white': isSelected ? 'bg-green-500 text-white': 'text-gray-800'}`}>{d.getDate()}</div>
                       {cnt > 0
                         ? <div className="text-[10px] text-green-700 font-semibold mt-0.5">{cnt}×&nbsp;·&nbsp;{covers}p</div>
                         : <div className="text-[10px] text-gray-300 mt-0.5">–</div>
@@ -4780,7 +4780,7 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
                     return (
                       <td key={iso}
                         onClick={() => { onSelectDate(iso); setCalMode('day') }}
-                        className={`border-r border-gray-100 last:border-r-0 text-center align-middle cursor-pointer transition-colors ${isToday ? 'bg-blue-50/40': ''}`}
+                        className={`border-r border-gray-100 last:border-r-0 text-center align-middle cursor-pointer transition-colors ${isToday ? 'bg-gray-100/40': ''}`}
                         style={{ height: 40 }}
                       >
                         {cnt > 0 && (
@@ -4859,12 +4859,12 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
                 <div key={time} className="rounded-xl border border-gray-200 bg-white overflow-hidden">
                   {/* Tijdstip-header */}
                   <div className="flex items-center gap-3 px-4 py-2.5 bg-gray-50 border-b border-gray-200">
-                    <div className="text-lg font-black text-[#075985]">{time}</div>
+                    <div className="text-lg font-black text-gray-900">{time}</div>
                     <div className="flex items-center gap-2">
                       <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full">
                         {group.length} {group.length === 1 ? 'reservatie': 'reservaties'}
                       </span>
-                      <span className="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                      <span className="bg-gray-200 text-gray-900 text-xs font-bold px-2 py-0.5 rounded-full">
                         {groupCovers} personen
                       </span>
                     </div>
@@ -4912,7 +4912,7 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
                               <div className="text-[10px] text-gray-400 leading-none">pers.</div>
                             </div>
                             {r.table_number && (
-                              <div className="bg-[#58CCFF] text-[#063042] text-xs font-bold px-2 py-1 rounded-lg">
+                              <div className="bg-black text-white text-xs font-bold px-2 py-1 rounded-lg">
                                 T{r.table_number}
                               </div>
                             )}
@@ -4975,9 +4975,9 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
                 <div
                   key={dateISO}
                   onClick={() => { onSelectDate(dateISO); setCalMode('day') }}
-                  className={`min-h-[90px] p-1.5 border-r border-b border-gray-100 last:border-r-0 cursor-pointer transition-colors ${isToday ? 'bg-blue-50': isSelected ? 'bg-green-50': 'hover:bg-gray-50'}`}
+                  className={`min-h-[90px] p-1.5 border-r border-b border-gray-100 last:border-r-0 cursor-pointer transition-colors ${isToday ? 'bg-gray-100': isSelected ? 'bg-green-50': 'hover:bg-gray-50'}`}
                 >
-                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold mb-1 ${isToday ? 'bg-blue-500 text-white': isSelected ? 'bg-green-500 text-white': 'text-gray-700'}`}>
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold mb-1 ${isToday ? 'bg-gray-1000 text-white': isSelected ? 'bg-green-500 text-white': 'text-gray-700'}`}>
                     {day}
                   </div>
                   <div className="space-y-0.5">
@@ -5010,7 +5010,7 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
         <div className="flex bg-gray-100 rounded-xl p-1">
           {(['week', 'day', 'month'] as const).map(m => (
             <button key={m} onClick={() => setCalMode(m)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${calMode === m ? 'bg-[#58CCFF] text-[#063042]': 'text-gray-500 hover:text-gray-900'}`}>
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${calMode === m ? 'bg-black text-white': 'text-gray-500 hover:text-gray-900'}`}>
               {m === 'week'? 'Week': m === 'day'? 'Dag': 'Maand'}
             </button>
           ))}
@@ -5802,7 +5802,7 @@ function ReservationDetailModal({
           {reservation.status === 'PENDING' && (
             <button
               onClick={onConfirm}
-              className="w-full py-3 rounded-xl bg-blue-500 text-white font-medium hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-xl bg-black text-white font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
             >
               <CheckCircle2 size={18} />
               Bevestigen
@@ -5813,7 +5813,7 @@ function ReservationDetailModal({
           {allowKassaHandoffModal && (
             <button
               onClick={onStartOrder}
-              className="w-full py-3 rounded-xl bg-[#58CCFF] text-[#063042] font-bold hover:bg-[#47c6fe] transition-colors flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-xl bg-black text-white font-bold hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
             >
               <UtensilsCrossed size={18} />
               {t('adminLayout.pos')}
