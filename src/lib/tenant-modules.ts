@@ -99,6 +99,30 @@ export function hasExplicitEnabledModules(json: Record<string, boolean> | null):
 }
 
 /**
+ * TableVysion / reserverings-registratie: geen kassa-POS, geen online-bestellingen.
+ * Gebruikt voor menu (geen dashboard-overzicht) en route-guards.
+ */
+export function isReservationsSoftwareTenant(
+  moduleAccess: Record<TenantModuleId, boolean>,
+  enabledModulesJson: Record<string, boolean> | null,
+): boolean {
+  if (enabledModulesJson && hasExplicitEnabledModules(enabledModulesJson)) {
+    return (
+      enabledModulesJson.reservaties === true &&
+      enabledModulesJson.kassa === false &&
+      enabledModulesJson['retail-kassa'] === false &&
+      enabledModulesJson['online-bestellingen'] === false
+    )
+  }
+  return (
+    !!moduleAccess.reservaties &&
+    !moduleAccess.kassa &&
+    !moduleAccess['retail-kassa'] &&
+    !moduleAccess['online-bestellingen']
+  )
+}
+
+/**
  * Trial/Pro-basis = alles aan; superadmin (of bewaarde keuze) kan modules uitzetten via expliciete false.
  */
 export function mergeFullAccessWithExplicitJson(
@@ -439,7 +463,7 @@ export function adminPathToModule(pathname: string, tenantSlug: string): AdminMo
   if (rest.startsWith('/kassa')) return { kind: 'module', module: 'kassa'}
   if (rest.startsWith('/voorraad')) return { kind: 'module', module: 'voorraad'}
   if (rest.startsWith('/pincode')) return { kind: 'always'}
-  if (rest.startsWith('/abonnement')) return { kind: 'always'}
+  if (rest.startsWith('/abonnement')) return { kind: 'module', module: 'account'}
   if (rest.startsWith('/modules')) return { kind: 'always'}
 
   if (

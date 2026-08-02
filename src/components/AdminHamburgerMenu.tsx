@@ -84,14 +84,6 @@ export function AdminHamburgerMenu({ tenantSlug }: { tenantSlug: string }) {
             <div className="sticky top-0 rounded-t-2xl bg-[#1e293b] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white">
               {t('adminLayout.menu')}
             </div>
-            <Link
-              href={baseUrl}
-              prefetch={false}
-              onClick={closeAll}
-              className="flex items-center gap-3 border-b border-gray-100 px-4 py-3 text-sm font-semibold text-gray-800 transition-colors hover:bg-blue-50"
-            >
-              <span>{t('adminLayout.overview')}</span>
-            </Link>
             {filteredModules.map((mod) => (
               <div key={mod.rowKey} className="border-b border-gray-100 last:border-0">
                 <div
