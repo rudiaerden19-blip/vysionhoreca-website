@@ -2385,10 +2385,10 @@ export default function KassaReservationsView({
               <div className="flex flex-shrink-0 flex-wrap items-center gap-2 bg-white px-2 py-2 sm:gap-3 sm:px-4 sm:py-3 border-b border-gray-200">
 
                 {/* Datum kiezer — groot en opvallend */}
-                <div className="flex items-center gap-2 bg-gray-700 rounded-2xl px-3 py-2 shadow-md">
+                <div className="flex items-center gap-2 bg-green-500 rounded-2xl px-3 py-2 shadow-md">
                   <button
                     onClick={() => { const d = new Date(selectedDate + 'T12:00:00'); d.setDate(d.getDate() - 1); setSelectedDate(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`) }}
-                    className="w-10 h-10 rounded-xl bg-white/60 hover:bg-white/85 active:bg-white flex items-center justify-center transition-colors">
+                    className="w-10 h-10 rounded-xl bg-green-600/80 hover:bg-green-700 active:bg-green-800 flex items-center justify-center transition-colors">
                     <ChevronLeft size={22} className="text-white" />
                   </button>
                   <div className="flex flex-col items-center">
@@ -2396,11 +2396,11 @@ export default function KassaReservationsView({
                       {formatDate(selectedDate)}
                     </span>
                     <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)}
-                      className="mt-0.5 text-xs font-semibold text-[#063042] bg-white/65 border border-[#0891b2]/35 rounded-lg px-2 py-0.5 text-center cursor-pointer outline-none" />
+                      className="mt-0.5 text-xs font-semibold text-green-900 bg-white/90 border border-green-800/25 rounded-lg px-2 py-0.5 text-center cursor-pointer outline-none focus:border-green-900/40" />
                   </div>
                   <button
                     onClick={() => { const d = new Date(selectedDate + 'T12:00:00'); d.setDate(d.getDate() + 1); setSelectedDate(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`) }}
-                    className="w-10 h-10 rounded-xl bg-white/60 hover:bg-white/85 active:bg-white flex items-center justify-center transition-colors">
+                    className="w-10 h-10 rounded-xl bg-green-600/80 hover:bg-green-700 active:bg-green-800 flex items-center justify-center transition-colors">
                     <ChevronRight size={22} className="text-white" />
                   </button>
                 </div>
@@ -2727,7 +2727,7 @@ export default function KassaReservationsView({
                       onPointerDown={e => e.stopPropagation()}
                       onClick={e => e.stopPropagation()}
                     >
-                      <div className="flex items-center gap-2 rounded-2xl bg-gray-700 px-2 py-2 shadow-xl sm:px-3 sm:py-2.5">
+                      <div className="flex items-center gap-2 rounded-2xl bg-green-500 px-2 py-2 shadow-xl sm:px-3 sm:py-2.5">
                         <button
                           type="button"
                           onClick={() => {
@@ -2735,7 +2735,7 @@ export default function KassaReservationsView({
                             d.setDate(d.getDate() - 1)
                             setSelectedDate(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`)
                           }}
-                          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/60 transition-colors hover:bg-white/85 active:bg-white"
+                          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-green-600/80 transition-colors hover:bg-green-700 active:bg-green-800"
                           title="Vorige dag"
                           aria-label="Vorige dag"
                         >
@@ -2749,7 +2749,7 @@ export default function KassaReservationsView({
                             type="date"
                             value={selectedDate}
                             onChange={e => setSelectedDate(e.target.value)}
-                            className="mt-0.5 max-w-full cursor-pointer rounded-lg border border-[#0891b2]/35 bg-white/65 px-2 py-0.5 text-center text-xs font-semibold text-[#063042] outline-none"
+                            className="mt-0.5 max-w-full cursor-pointer rounded-lg border border-green-800/25 bg-white/90 px-2 py-0.5 text-center text-xs font-semibold text-green-900 outline-none focus:border-green-900/40"
                             aria-label="Kies datum"
                           />
                         </div>
@@ -2760,7 +2760,7 @@ export default function KassaReservationsView({
                             d.setDate(d.getDate() + 1)
                             setSelectedDate(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`)
                           }}
-                          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/60 transition-colors hover:bg-white/85 active:bg-white"
+                          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-green-600/80 transition-colors hover:bg-green-700 active:bg-green-800"
                           title="Volgende dag"
                           aria-label="Volgende dag"
                         >
@@ -3055,14 +3055,16 @@ export default function KassaReservationsView({
               {/* === TIJDLIJN LINKS — groeit/krimpt mee met kalender === */}
               <div className="flex flex-col flex-1 overflow-hidden min-w-0">
                 {/* Date nav */}
-                <div className="flex items-center gap-2 mb-3">
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                <div className="flex items-center gap-2 rounded-2xl bg-green-500 px-2 py-1.5 w-fit shadow-sm">
                   <button onClick={() => { const d = new Date(timelineDate + 'T12:00:00'); d.setDate(d.getDate()-1); setTimelineDate(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`) }}
-                    className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronLeft size={16}/></button>
-                  <span className="font-bold text-xl">{formatDate(timelineDate)}</span>
+                    className="p-2 rounded-lg bg-green-600/80 hover:bg-green-700 text-white"><ChevronLeft size={16}/></button>
+                  <span className="font-bold text-xl text-white px-1">{formatDate(timelineDate)}</span>
                   <button onClick={() => { const d = new Date(timelineDate + 'T12:00:00'); d.setDate(d.getDate()+1); setTimelineDate(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`) }}
-                    className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronRight size={16}/></button>
+                    className="p-2 rounded-lg bg-green-600/80 hover:bg-green-700 text-white"><ChevronRight size={16}/></button>
+                </div>
                   {/* Dag / Avond toggle */}
-                  <div className="flex rounded-lg overflow-hidden border border-gray-200 ml-2">
+                  <div className="flex rounded-lg overflow-hidden border border-gray-200">
                     <button onClick={() => setTimeShift('dag')}
                       className={`px-4 py-1.5 text-sm font-bold transition-colors ${timeShift==='dag'?'bg-gray-700 text-white':'bg-white text-gray-500 hover:bg-gray-50'}`}>
                       Dag
@@ -3278,19 +3280,19 @@ export default function KassaReservationsView({
               {/* === KALENDER RECHTS — inklapbaar, groot === */}
               <div className={`flex-shrink-0 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col transition-[width] duration-300 ease-in-out ${calOpen ? 'w-72': 'w-12'}`}>
                 {/* Header: inklapknop + jaar + vandaag */}
-                <div className="flex items-center gap-2 px-3 py-3 border-b border-gray-100 flex-shrink-0 bg-gray-700">
+                <div className="flex items-center gap-2 px-3 py-3 border-b border-green-600/30 flex-shrink-0 bg-green-500">
                   <button onClick={() => setCalOpen(o=>!o)}
-                    className="p-1.5 rounded-lg bg-white/55 hover:bg-white/80 text-gray-800 flex-shrink-0">
+                    className="p-1.5 rounded-lg bg-green-600/80 hover:bg-green-700 text-white flex-shrink-0">
                     {calOpen ? <ChevronRight size={18}/> : <ChevronLeft size={18}/>}
                   </button>
                   {calOpen && (<>
                     <button onClick={() => setCalMonth(m=>({year:m.year-1,month:m.month}))}
-                      className="p-1.5 hover:bg-white/45 rounded-lg text-white"><ChevronLeft size={18}/></button>
+                      className="p-1.5 hover:bg-green-600/80 rounded-lg text-white"><ChevronLeft size={18}/></button>
                     <span className="flex-1 text-center text-lg font-black text-white">{calMonth.year}</span>
                     <button onClick={() => setCalMonth(m=>({year:m.year+1,month:m.month}))}
-                      className="p-1.5 hover:bg-white/45 rounded-lg text-white"><ChevronRight size={18}/></button>
+                      className="p-1.5 hover:bg-green-600/80 rounded-lg text-white"><ChevronRight size={18}/></button>
                     <button onClick={() => { setTimelineDate(todayStr); setCalMonth({year:timelineNow.getFullYear(),month:timelineNow.getMonth()}) }}
-                      className="px-3 py-1 rounded-lg bg-white text-[#075985] text-sm font-black hover:bg-[#f2f5fa]">
+                      className="px-3 py-1 rounded-lg bg-white text-green-700 text-sm font-black hover:bg-green-50">
                       Vandaag
                     </button>
                   </>)}
@@ -3395,12 +3397,12 @@ export default function KassaReservationsView({
                 {resViewFilter === 'dag' && (
                   <>
                     <button onClick={() => { const d = new Date(resDate + 'T12:00:00'); d.setDate(d.getDate()-1); setResListDate(d.toISOString().split('T')[0]) }}
-                      className="w-9 h-9 rounded-xl bg-gray-700 hover:bg-gray-800 flex items-center justify-center text-white flex-shrink-0">
+                      className="w-9 h-9 rounded-xl bg-green-500 hover:bg-green-600 flex items-center justify-center text-white flex-shrink-0">
                       <ChevronLeft size={18}/>
                     </button>
                     <span className="font-bold text-gray-800 text-sm min-w-[100px] text-center">{formatDate(resDate)}</span>
                     <button onClick={() => { const d = new Date(resDate + 'T12:00:00'); d.setDate(d.getDate()+1); setResListDate(d.toISOString().split('T')[0]) }}
-                      className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 flex-shrink-0">
+                      className="w-9 h-9 rounded-xl bg-green-500 hover:bg-green-600 flex items-center justify-center text-white flex-shrink-0">
                       <ChevronRight size={18}/>
                     </button>
                   </>
@@ -3410,12 +3412,12 @@ export default function KassaReservationsView({
                 {resViewFilter === 'week' && (
                   <>
                     <button onClick={() => { const d = new Date(resDate + 'T12:00:00'); d.setDate(d.getDate()-7); setResListDate(d.toISOString().split('T')[0]) }}
-                      className="w-9 h-9 rounded-xl bg-gray-700 hover:bg-gray-800 flex items-center justify-center text-white flex-shrink-0">
+                      className="w-9 h-9 rounded-xl bg-green-500 hover:bg-green-600 flex items-center justify-center text-white flex-shrink-0">
                       <ChevronLeft size={18}/>
                     </button>
                     <span className="font-bold text-gray-800 text-sm min-w-[140px] text-center">{from} – {to}</span>
                     <button onClick={() => { const d = new Date(resDate + 'T12:00:00'); d.setDate(d.getDate()+7); setResListDate(d.toISOString().split('T')[0]) }}
-                      className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 flex-shrink-0">
+                      className="w-9 h-9 rounded-xl bg-green-500 hover:bg-green-600 flex items-center justify-center text-white flex-shrink-0">
                       <ChevronRight size={18}/>
                     </button>
                   </>
@@ -3464,12 +3466,12 @@ export default function KassaReservationsView({
                 {resViewFilter === 'jaar' && (
                   <div className="flex items-center gap-2">
                     <button onClick={() => setResFilterYear(y => y - 1)}
-                      className="w-9 h-9 rounded-xl bg-gray-700 hover:bg-gray-800 flex items-center justify-center text-white">
+                      className="w-9 h-9 rounded-xl bg-green-500 hover:bg-green-600 flex items-center justify-center text-white">
                       <ChevronLeft size={18}/>
                     </button>
                     <span className="font-bold text-gray-800 text-base px-2">{resFilterYear}</span>
                     <button onClick={() => setResFilterYear(y => y + 1)}
-                      className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600">
+                      className="w-9 h-9 rounded-xl bg-green-500 hover:bg-green-600 flex items-center justify-center text-white">
                       <ChevronRight size={18}/>
                     </button>
                   </div>
@@ -3688,7 +3690,7 @@ export default function KassaReservationsView({
                         <ChevronRight size={14}/>
                       </button>
                       <button onClick={() => { setResListDate(today); setShowResCalendar(false) }}
-                        className="ml-2 px-3 py-1 rounded-lg bg-gray-700 hover:bg-gray-800 text-white text-xs font-semibold">
+                        className="ml-2 px-3 py-1 rounded-lg bg-green-500 hover:bg-green-600 text-white text-xs font-semibold">
                         Vandaag
                       </button>
                       <button onClick={() => setShowResCalendar(false)}
@@ -4773,9 +4775,9 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
     return (
       <div>
         <div className="flex items-center justify-between mb-3">
-          <button onClick={prevWeek} className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronLeft size={18} /></button>
+          <button onClick={prevWeek} className="p-2 rounded-lg bg-green-500 hover:bg-green-600 text-white"><ChevronLeft size={18} /></button>
           <span className="font-bold text-gray-800">{weekLabel}</span>
-          <button onClick={nextWeek} className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronRight size={18} /></button>
+          <button onClick={nextWeek} className="p-2 rounded-lg bg-green-500 hover:bg-green-600 text-white"><ChevronRight size={18} /></button>
         </div>
 
         <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
@@ -4871,7 +4873,7 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
       <div>
         {/* Navigatie */}
         <div className="flex items-center justify-between mb-3">
-          <button onClick={prevDay} className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronLeft size={18} /></button>
+          <button onClick={prevDay} className="p-2 rounded-lg bg-green-500 hover:bg-green-600 text-white"><ChevronLeft size={18} /></button>
           <div className="text-center">
             <div className="font-bold text-gray-800 capitalize">{dayLabel}</div>
             {dayRes.length > 0
@@ -4879,7 +4881,7 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
               : <div className="text-sm text-gray-400">Geen reservaties</div>
             }
           </div>
-          <button onClick={nextDay} className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronRight size={18} /></button>
+          <button onClick={nextDay} className="p-2 rounded-lg bg-green-500 hover:bg-green-600 text-white"><ChevronRight size={18} /></button>
         </div>
 
         {dayRes.length === 0 ? (
@@ -4994,9 +4996,9 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
     return (
       <div>
         <div className="flex items-center justify-between mb-3">
-          <button onClick={prevMonth} className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronLeft size={18} /></button>
+          <button onClick={prevMonth} className="p-2 rounded-lg bg-green-500 hover:bg-green-600 text-white"><ChevronLeft size={18} /></button>
           <span className="font-bold text-gray-800 text-lg">{NL_MONTHS_LONG[refMonth]} {refYear}</span>
-          <button onClick={nextMonth} className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronRight size={18} /></button>
+          <button onClick={nextMonth} className="p-2 rounded-lg bg-green-500 hover:bg-green-600 text-white"><ChevronRight size={18} /></button>
         </div>
         <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
           <div className="grid grid-cols-7 border-b border-gray-200">
