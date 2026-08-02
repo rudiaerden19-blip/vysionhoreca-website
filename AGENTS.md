@@ -1,5 +1,13 @@
 # AGENTS.md
 
+## 🚫 Print Agent — ZERO TOLERANCE (lees vóór elke taak)
+
+**Eigenaar:** wijzig **NOOIT** `apps/vysion-print-agent/**` zonder dat de gebruiker in **dezelfde opdracht** expliciet schrijft dat die map/bestanden **mag**. Geen commits, geen refactors, geen “bon fix in server.js”. Overtreding → eigenaar schakelt advocaat in en vordert **schadevergoeding**.
+
+- Bon/print-problemen: **alleen website** (`src/`, o.a. kassa + `vysion-print-agent-client.ts`).
+- Vóór commit: controleer dat **geen** bestand onder `apps/vysion-print-agent/` in de diff zit.
+- Volledige regel: `.cursor/rules/no-print-agent.mdc` (`alwaysApply: true`).
+
 ## Cursor Cloud specific instructions
 
 Deze sectie is voor toekomstige cloud agents. Het update-script (`npm install`) draait al
@@ -8,7 +16,7 @@ automatisch bij het opstarten, dus hier staan alleen niet-voor-de-hand-liggende 
 ### Wat is dit
 Eén multi-tenant horeca SaaS (Next.js 14, App Router). **De repo-root ís de website** — er is
 geen aparte `website/`-map. De enige losse app is de Print Agent onder `apps/vysion-print-agent/`
-(NIET aanraken, zie `.cursor/rules/no-print-agent.mdc`).
+(**ZERO TOLERANCE — zie boven en `.cursor/rules/no-print-agent.mdc`**).
 
 ### Standaardcommando's (zie `package.json` scripts)
 - Dev server: `npm run dev` → http://localhost:3000
