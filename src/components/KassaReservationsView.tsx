@@ -39,6 +39,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
+import { upsertGuestProfileForTenant } from '@/lib/guest-profile-admin-upsert'
 import { parseFloorPlanTablesJson, sanitizeFloorPlanTables } from '@/lib/kassa-floor-plan-tables'
 import {
   FLOOR_PLAN_ZONE_INSIDE,
@@ -1166,7 +1167,23 @@ export default function KassaReservationsView({
         })
       }
     })
-    return Array.from(map.values())
+    return Array.from(map.values()).map((p) => {
+      const dbProfile = guestProfilesDB.find(
+        (g) =>
+          (g.phone && p.phone && g.phone === p.phone) ||
+          (g.email && p.email && g.email === p.email) ||
+          g.name === p.name,
+      )
+      if (!dbProfile) return p
+      return {
+        ...p,
+        id: dbProfile.id,
+        isVip: dbProfile.isVip,
+        isBlocked: dbProfile.isBlocked,
+        notes: dbProfile.notes ?? p.notes,
+        totalNoShows: Math.max(p.totalNoShows, dbProfile.totalNoShows ?? 0),
+      }
+    })
   }, [reservations, guestProfilesDB])
 
   // Stats helpers
@@ -1586,8 +1603,8 @@ export default function KassaReservationsView({
   // z6 - VIP/geblokkeerd opslaan via admin-proxy
   const handleToggleVip = async (guest: GuestProfile) => {
     const newVip = !guest.isVip
-    await adminDb.upsert(
-      'guest_profiles',
+    const upsertRes = await upsertGuestProfileForTenant(
+      tenant,
       {
         tenant_slug: tenant,
         name: guest.name,
@@ -1596,17 +1613,21 @@ export default function KassaReservationsView({
         is_vip: newVip,
         is_blocked: guest.isBlocked,
         notes: guest.notes || '',
-      } as any,
-      { tenantSlug: tenant, onConflict: 'tenant_slug,phone'}
+      },
+      guest.id,
     )
+    if (!upsertRes.ok) {
+      toast.error(rk('sendFailed'))
+      return
+    }
     await loadGuestProfiles()
     toast.success(newVip ? rk('vipAdded') : rk('vipRemoved'))
   }
 
   const handleToggleBlocked = async (guest: GuestProfile) => {
     const newBlocked = !guest.isBlocked
-    await adminDb.upsert(
-      'guest_profiles',
+    const upsertRes = await upsertGuestProfileForTenant(
+      tenant,
       {
         tenant_slug: tenant,
         name: guest.name,
@@ -1615,11 +1636,68 @@ export default function KassaReservationsView({
         is_vip: guest.isVip,
         is_blocked: newBlocked,
         notes: guest.notes || '',
-      } as any,
-      { tenantSlug: tenant, onConflict: 'tenant_slug,phone'}
+      },
+      guest.id,
     )
+    if (!upsertRes.ok) {
+      toast.error(rk('sendFailed'))
+      return
+    }
     await loadGuestProfiles()
     toast.success(newBlocked ? rk('guestBlocked') : rk('guestUnblocked'))
+  }
+
+  const reservationMatchesGuest = (r: Reservation, guest: GuestProfile) =>
+    (guest.phone && r.guest_phone && guest.phone === r.guest_phone) ||
+    (guest.email && r.guest_email && guest.email === r.guest_email) ||
+    r.guest_name === guest.name
+
+  /** Contacten-tab: no-show persistent (guest_profiles + reservatiestatus voor rapporten). */
+  const handleToggleContactNoShow = async (guest: GuestProfile) => {
+    const mark = guest.totalNoShows <= 0
+    const newTotal = mark ? 1 : 0
+    const upsertRes = await upsertGuestProfileForTenant(
+      tenant,
+      {
+        tenant_slug: tenant,
+        name: guest.name,
+        phone: guest.phone || null,
+        email: guest.email || null,
+        is_vip: guest.isVip,
+        is_blocked: guest.isBlocked,
+        total_no_shows: newTotal,
+        notes: guest.notes || '',
+      },
+      guest.id,
+    )
+    if (!upsertRes.ok) {
+      toast.error(rk('sendFailed'))
+      return
+    }
+
+    const guestRes = reservations
+      .filter((r) => reservationMatchesGuest(r, guest) && r.status !== 'CANCELLED')
+      .sort((a, b) =>
+        `${b.reservation_date}T${b.reservation_time}`.localeCompare(
+          `${a.reservation_date}T${a.reservation_time}`,
+        ),
+      )
+    if (mark) {
+      const latest = guestRes[0]
+      if (latest && latest.status !== 'NO_SHOW') {
+        await updateStatus(latest.id, 'NO_SHOW')
+      }
+    } else {
+      for (const r of guestRes.filter((x) => x.status === 'NO_SHOW')) {
+        await updateStatus(r.id, 'CONFIRMED')
+      }
+    }
+
+    await loadGuestProfiles()
+    await loadReservations(true)
+    toast.success(
+      mark ? `${guest.name} ${rk('markedNoShow')}` : `${guest.name} ${rk('guestBackConfirmed')}`,
+    )
   }
 
   const handleAssignTable = async (reservationId: string, tableNumber: string) => {
@@ -3796,6 +3874,7 @@ export default function KassaReservationsView({
             setSearchQuery={setSearchQuery}
             onPromoMailClick={openContactPromoModal}
             onBulkPromoMailClick={openContactPromoModalMany}
+            onToggleNoShow={handleToggleContactNoShow}
             promoSelectionReset={contactPromoSelectionReset}
             rk={rk}
           />

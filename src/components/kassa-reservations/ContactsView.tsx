@@ -12,6 +12,7 @@ export function ContactsView({
   setSearchQuery,
   onPromoMailClick,
   onBulkPromoMailClick,
+  onToggleNoShow,
   promoSelectionReset = 0,
   rk,
 }: {
@@ -20,6 +21,7 @@ export function ContactsView({
   setSearchQuery: (q: string) => void
   onPromoMailClick: (guest: GuestProfile) => void
   onBulkPromoMailClick: (guests: GuestProfile[]) => void
+  onToggleNoShow: (guest: GuestProfile) => void | Promise<void>
   promoSelectionReset?: number
   rk: (key: string, rep?: Record<string, string>) => string
 }) {
@@ -27,7 +29,7 @@ export function ContactsView({
   const [guestSortDir, setGuestSortDir] = useState<'asc' |  'desc'>('desc')
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(25)
-  const [noShowRed, setNoShowRed] = useState<Set<string>>(new Set())
+  const [noShowBusyId, setNoShowBusyId] = useState<string | null>(null)
   const [selectedGuestIds, setSelectedGuestIds] = useState<Set<string>>(new Set())
   const headerSelectRef = useRef<HTMLInputElement>(null)
 
@@ -192,7 +194,7 @@ export function ContactsView({
 
           <div className="divide-y divide-gray-100">
             {paginated.map((guest: GuestProfile) => {
-              const isRed = noShowRed.has(guest.id)
+              const isRed = guest.totalNoShows > 0
               const lastVisitFmt = guest.lastVisit
                 ? new Date(guest.lastVisit + 'T12:00').toLocaleDateString('nl-BE', {
                     day: 'numeric',
@@ -258,14 +260,16 @@ export function ContactsView({
                   <div className="pr-2 text-right font-bold text-gray-800">{guest.totalVisits}</div>
                   <button
                     type="button"
-                    onClick={() =>
-                      setNoShowRed((prev) => {
-                        const s = new Set(prev)
-                        s.has(guest.id) ? s.delete(guest.id) : s.add(guest.id)
-                        return s
-                      })
-                    }
-                    className={`w-fit rounded-full px-3 py-1 text-xs font-semibold transition-colors ${isRed ? 'bg-red-500 text-white': 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
+                    disabled={noShowBusyId === guest.id}
+                    onClick={async () => {
+                      setNoShowBusyId(guest.id)
+                      try {
+                        await onToggleNoShow(guest)
+                      } finally {
+                        setNoShowBusyId(null)
+                      }
+                    }}
+                    className={`w-fit rounded-full px-3 py-1 text-xs font-semibold transition-colors disabled:opacity-60 ${isRed ? 'bg-red-500 text-white hover:bg-red-600': 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
                   >
                     No-show
                   </button>

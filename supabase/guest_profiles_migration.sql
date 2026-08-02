@@ -24,6 +24,14 @@ CREATE INDEX IF NOT EXISTS idx_guest_profiles_tenant ON guest_profiles(tenant_sl
 CREATE INDEX IF NOT EXISTS idx_guest_profiles_phone ON guest_profiles(tenant_slug, phone);
 CREATE INDEX IF NOT EXISTS idx_guest_profiles_email ON guest_profiles(tenant_slug, email);
 
+-- Upsert (admin + publieke flow): zie ook migrations/20260802120000_guest_profiles_upsert_unique.sql
+CREATE UNIQUE INDEX IF NOT EXISTS guest_profiles_tenant_phone_key
+  ON guest_profiles (tenant_slug, phone)
+  WHERE phone IS NOT NULL AND btrim(phone) <> '';
+CREATE UNIQUE INDEX IF NOT EXISTS guest_profiles_tenant_email_key
+  ON guest_profiles (tenant_slug, email)
+  WHERE email IS NOT NULL AND btrim(email) <> '';
+
 -- Voeg betaalvelden toe aan reservations tabel
 ALTER TABLE reservations
   ADD COLUMN IF NOT EXISTS payment_status VARCHAR(20) DEFAULT 'unpaid',
