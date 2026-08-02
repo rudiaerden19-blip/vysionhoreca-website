@@ -19,7 +19,7 @@ import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { verifySuperAdminAccess } from '@/lib/verify-tenant-access'
 import { recordAudit, auditRequestMeta } from '@/lib/audit-log'
 import { logger } from '@/lib/logger'
-import { ensureDeliverySettingsForTenant } from '@/lib/tenant-defaults'
+import { ensureDeliverySettingsForTenant, ensureEmptyFloorPlanTablesForTenant, ensureReservationSettingsForTenant } from '@/lib/tenant-defaults'
 import { DEFAULT_ENABLED_ALLERGEN_IDS } from '@/lib/allergens-defaults'
 import {
   isProtectedTenant,
@@ -253,6 +253,8 @@ export async function POST(req: NextRequest) {
 
       // 5. delivery_settings defaults
       await ensureDeliverySettingsForTenant(supabase, slug)
+      await ensureEmptyFloorPlanTablesForTenant(supabase, slug)
+      await ensureReservationSettingsForTenant(supabase, slug)
 
       // 6. Audit
       await recordAudit(supabase, {

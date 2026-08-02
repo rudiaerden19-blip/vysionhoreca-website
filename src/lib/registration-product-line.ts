@@ -168,7 +168,6 @@ export const REGISTRATION_MODULE_PRESETS: Record<RegistrationProductLine, Preset
       'sm_web_profiel',
       'sm_inst_opening',
       'sm_inst_betaling',
-      'sm_abonnement',
     ],
   },
 }
@@ -220,4 +219,9 @@ export function getRegistrationPostSignupAdminPath(
 
 export function registrationLineWantsDeliveryBootstrap(line: RegistrationProductLine): boolean {
   return line === 'horeca_kassa' || line === 'online_bestellen'
+}
+
+/** Reservatie-instellingen + lege plattegrond bij registratie (geen demo-tafels). */
+export function registrationLineWantsReservationBootstrap(line: RegistrationProductLine): boolean {
+  return line === 'restaurant_reservaties'
 }

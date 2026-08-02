@@ -39,6 +39,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
+import { purgeLegacyKassaLocalStorage } from '@/lib/kassa-pos-state-client'
 import { parseFloorPlanTablesJson, sanitizeFloorPlanTables } from '@/lib/kassa-floor-plan-tables'
 import {
   FLOOR_PLAN_ZONE_INSIDE,
@@ -347,6 +348,7 @@ export default function KassaReservationsView({
 
   // Load tenant info + reservatie instellingen vanuit Supabase
   useEffect(() => {
+    purgeLegacyKassaLocalStorage(tenant)
     const loadTenantData = async () => {
       try {
         const { data } = await supabase.from('tenants').select('name,phone,email,subscription_status,trial_ends_at,plan').eq('slug', tenant).single()

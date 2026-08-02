@@ -8,7 +8,7 @@ import { parseJsonBody } from '@/lib/api-request'
 import { registerBodySchema } from '@/lib/api-schemas'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
-import { ensureDeliverySettingsForTenant } from '@/lib/tenant-defaults'
+import { ensureDeliverySettingsForTenant, ensureEmptyFloorPlanTablesForTenant, ensureReservationSettingsForTenant } from '@/lib/tenant-defaults'
 import { DEFAULT_ENABLED_ALLERGEN_IDS } from '@/lib/allergens-defaults'
 import {
   isMissingPostTrialModulesColumnError,
@@ -19,6 +19,7 @@ import {
   buildRegistrationEnabledModulesJson,
   getRegistrationPostSignupAdminPath,
   registrationLineWantsDeliveryBootstrap,
+  registrationLineWantsReservationBootstrap,
   type RegistrationProductLine,
 } from '@/lib/registration-product-line'
 
@@ -226,6 +227,11 @@ export async function POST(request: NextRequest) {
 
     if (registrationLineWantsDeliveryBootstrap(productLine as RegistrationProductLine)) {
       await ensureDeliverySettingsForTenant(supabase, tenantSlug)
+    }
+
+    await ensureEmptyFloorPlanTablesForTenant(supabase, tenantSlug)
+    if (registrationLineWantsReservationBootstrap(productLine as RegistrationProductLine)) {
+      await ensureReservationSettingsForTenant(supabase, tenantSlug)
     }
 
     // ========================================

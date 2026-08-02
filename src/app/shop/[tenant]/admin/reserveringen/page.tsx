@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
 import type { KassaTable } from '@/components/kassa-reservations/kassa-reservations-model'
 import { parseFloorPlanTablesJson, sanitizeFloorPlanTables } from '@/lib/kassa-floor-plan-tables'
+import { purgeLegacyKassaLocalStorage } from '@/lib/kassa-pos-state-client'
 
 export default function ReserveringenPage({ params }: { params: { tenant: string } }) {
   const router = useRouter()
@@ -15,6 +16,7 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
   const [kassaTables, setKassaTables] = useState<KassaTable[]>([])
 
   useEffect(() => {
+    purgeLegacyKassaLocalStorage(params.tenant)
     const applyPayload = (raw: unknown): KassaTable[] => {
       const parsed = parseFloorPlanTablesJson(raw)
       if (parsed === null) return []
