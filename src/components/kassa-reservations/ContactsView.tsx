@@ -126,7 +126,7 @@ export function ContactsView({
             type="button"
             disabled={selectedWithEmail.length === 0}
             onClick={() => onBulkPromoMailClick(selectedWithEmail)}
-            className="flex min-h-[44px] items-center gap-2 rounded-xl bg-[#58CCFF] px-4 py-2 font-bold text-[#063042] shadow-sm transition-colors hover:bg-[#43bef7] disabled:cursor-not-allowed disabled:opacity-50 touch-manipulation"
+            className="flex min-h-[44px] items-center gap-2 rounded-xl bg-gray-700 px-4 py-2 font-bold text-white shadow-sm transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50 touch-manipulation"
           >
             {rk('promoEmailBulk')}
             {selectedWithEmail.length > 0 ? ` (${selectedWithEmail.length})` : ''}
@@ -244,7 +244,7 @@ export function ContactsView({
                         <button
                           type="button"
                           onClick={() => onPromoMailClick(guest)}
-                          className="shrink-0 rounded-lg bg-[#58CCFF] px-2.5 py-1.5 text-xs font-bold text-[#063042] shadow-sm transition-colors hover:bg-[#43bef7] active:bg-[#34ade7] touch-manipulation"
+                          className="shrink-0 rounded-lg bg-gray-700 px-2.5 py-1.5 text-xs font-bold text-white shadow-sm transition-colors hover:bg-gray-800 active:bg-gray-900 touch-manipulation"
                           title={rk('promoEmailBulk')}
                           aria-label={`${rk('promoButton')} — ${guest.name}`}
                         >

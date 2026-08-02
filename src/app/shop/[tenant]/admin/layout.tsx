@@ -495,7 +495,7 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
               {isHorecaKassaPosScreenEnabled(moduleAccess) ? (
                 <a
                   href={`${baseUrl}/kassa`}
-                  className="touch-manipulation [-webkit-tap-highlight-color:transparent] flex shrink-0 items-center gap-2 rounded-xl bg-[#58CCFF] px-3 py-2 text-sm font-bold text-[#063042] shadow-md transition-colors hover:bg-[#47c6fe] no-underline"
+                  className="touch-manipulation [-webkit-tap-highlight-color:transparent] flex shrink-0 items-center gap-2 rounded-xl bg-gray-700 px-3 py-2 text-sm font-bold text-white shadow-md transition-colors hover:bg-gray-800 no-underline"
                 >
                   <span>{t('adminLayout.pos')}</span>
                 </a>

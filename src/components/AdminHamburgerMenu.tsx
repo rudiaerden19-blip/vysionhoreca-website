@@ -66,10 +66,10 @@ export function AdminHamburgerMenu({ tenantSlug }: { tenantSlug: string }) {
         }}
         className={`flex min-h-[44px] min-w-[44px] items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold shadow-md transition-colors ${
           loading
-            ? 'cursor-wait bg-[#58CCFF]/70 text-[#063042]/80'
+            ? 'cursor-wait bg-gray-700/70 text-white/80'
             : open
-              ? 'bg-[#47c6fe] text-[#063042]'
-              : 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
+              ? 'bg-gray-800 text-white'
+              : 'bg-gray-700 text-white hover:bg-gray-800'
         }`}
         aria-expanded={open}
         aria-haspopup="true"
