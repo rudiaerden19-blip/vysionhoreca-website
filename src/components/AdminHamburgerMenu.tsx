@@ -9,6 +9,7 @@ import {
   filterHamburgerModulesForAccess,
 } from '@/lib/admin-hamburger-modules'
 import { useTenantModuleFlagsContext } from '@/lib/tenant-module-flags-context'
+import { isReservationsSoftwareTenant } from '@/lib/tenant-modules'
 
 /**
  * Zelfde module-structuur als kassa; alleen modules die de tenant aan heeft staan.
@@ -23,6 +24,11 @@ export function AdminHamburgerMenu({ tenantSlug }: { tenantSlug: string }) {
     featureLabelPrinting,
     loading,
   } = useTenantModuleFlagsContext()
+
+  const hideKassaOverviewLink = useMemo(() => {
+    if (loading) return false
+    return isReservationsSoftwareTenant(moduleAccess, enabledModulesJson)
+  }, [loading, moduleAccess, enabledModulesJson])
 
   const filteredModules = useMemo(() => {
     const all = buildHamburgerModules(baseUrl, tenantSlug)
@@ -84,14 +90,16 @@ export function AdminHamburgerMenu({ tenantSlug }: { tenantSlug: string }) {
             <div className="sticky top-0 rounded-t-2xl bg-[#1e293b] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white">
               {t('adminLayout.menu')}
             </div>
-            <Link
-              href={baseUrl}
-              prefetch={false}
-              onClick={closeAll}
-              className="flex items-center gap-3 border-b border-gray-100 px-4 py-3 text-sm font-semibold text-gray-800 transition-colors hover:bg-blue-50"
-            >
-              <span>{t('adminLayout.overview')}</span>
-            </Link>
+            {!hideKassaOverviewLink && (
+              <Link
+                href={baseUrl}
+                prefetch={false}
+                onClick={closeAll}
+                className="flex items-center gap-3 border-b border-gray-100 px-4 py-3 text-sm font-semibold text-gray-800 transition-colors hover:bg-blue-50"
+              >
+                <span>{t('adminLayout.overview')}</span>
+              </Link>
+            )}
             {filteredModules.map((mod) => (
               <div key={mod.rowKey} className="border-b border-gray-100 last:border-0">
                 <div

@@ -168,7 +168,6 @@ export const REGISTRATION_MODULE_PRESETS: Record<RegistrationProductLine, Preset
       'sm_web_profiel',
       'sm_inst_opening',
       'sm_inst_betaling',
-      'sm_abonnement',
     ],
   },
 }

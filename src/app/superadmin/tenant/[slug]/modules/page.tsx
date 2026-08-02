@@ -12,7 +12,7 @@ import {
   type TenantModuleId,
   mergeEnabledModulesFromDb,
   getStarterEnabledModulesRecord,
-  parseEnabledModulesJson,
+  isReservationsSoftwareTenant,
 } from '@/lib/tenant-modules'
 import {
   isMissingPostTrialModulesColumnError,
@@ -161,6 +161,13 @@ export default function SuperadminTenantModulesPage() {
     )
   }
 
+  const reservationsSoftwareTenant =
+    !modulesFullAccess &&
+    isReservationsSoftwareTenant(
+      moduleToggles,
+      buildEnabledModulesSavePayload({ ...moduleToggles, account: true }, subToggles, slug),
+    )
+
   return (
     <div className="min-h-screen bg-slate-900 text-white">
       <header className="sticky top-0 z-10 border-b border-slate-700 bg-slate-800 px-4 py-4">
@@ -183,8 +190,18 @@ export default function SuperadminTenantModulesPage() {
         <p className="mb-6 text-sm text-slate-400">
           {businessName || slug} — schakel <strong className="text-slate-200">hoofdmodules</strong> en{' '}
           <strong className="text-slate-200">submenu&apos;s</strong> (onderdelen per module).{' '}
-          <strong className="text-slate-200">Overzicht</strong> en <strong className="text-slate-200">abonnement</strong>{' '}
-          blijven altijd beschikbaar voor de tenant. Account-hoofdmodule staat vast aan (zelfde reden).
+          {reservationsSoftwareTenant ? (
+            <>
+              <strong className="text-slate-200">Reserveringspakket:</strong> geen vast Overzicht of
+              abonnement in het menu — dat geldt alleen voor kassa-tenants.
+            </>
+          ) : (
+            <>
+              <strong className="text-slate-200">Overzicht</strong> en{' '}
+              <strong className="text-slate-200">abonnement</strong> blijven altijd beschikbaar voor de
+              tenant. Account-hoofdmodule staat vast aan (zelfde reden).
+            </>
+          )}
         </p>
 
         {isAdminTenant(slug) && (
@@ -223,6 +240,7 @@ export default function SuperadminTenantModulesPage() {
 
         {!modulesFullAccess && (
           <div className="mb-8 space-y-6">
+            {!reservationsSoftwareTenant && (
             <div className="rounded-2xl border border-emerald-700/40 bg-emerald-950/30 p-4">
               <p className="text-xs font-bold uppercase tracking-wider text-emerald-400/90">
                 Altijd zichtbaar in het menu
@@ -238,6 +256,7 @@ export default function SuperadminTenantModulesPage() {
                 </li>
               </ul>
             </div>
+            )}
 
             {TENANT_MODULE_IDS.map((id) => {
               const mod = hamburgerByKey[id]

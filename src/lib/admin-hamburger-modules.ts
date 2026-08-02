@@ -3,6 +3,7 @@ import {
   hasExplicitEnabledModules,
   hasModuleAccessForPathname,
   isHorecaKassaPosScreenEnabled,
+  isReservationsSoftwareTenant,
   isRetailKassaPosScreenEnabled,
   isShopAdminKassaPosPath,
   isShopAdminRetailKassaPosPath,
@@ -729,7 +730,27 @@ export function hasShopAdminPathAccess(
   enabledModulesJson: Record<string, boolean> | null
 ): boolean {
   const pathNoQuery = pathname.split('?')[0].replace(/\/+$/, '')
-  const pinBase = `/shop/${tenantSlug}/admin/pincode`
+  const adminBase = `/shop/${tenantSlug}/admin`
+  const pinBase = `${adminBase}/pincode`
+
+  if (isReservationsSoftwareTenant(moduleAccess, enabledModulesJson)) {
+    if (pathNoQuery === adminBase || pathNoQuery === `${adminBase}/`) {
+      return false
+    }
+  }
+
+  const abonnementBase = `${adminBase}/abonnement`
+  if (pathNoQuery === abonnementBase || pathNoQuery.startsWith(`${abonnementBase}/`)) {
+    if (isReservationsSoftwareTenant(moduleAccess, enabledModulesJson)) {
+      return enabledModulesJson?.sm_abonnement === true
+    }
+    if (enabledModulesJson && hasExplicitEnabledModules(enabledModulesJson)) {
+      if (enabledModulesJson.sm_abonnement === true) return true
+      if (enabledModulesJson.sm_abonnement === false) return false
+    }
+    return true
+  }
+
   if (pathNoQuery === pinBase || pathNoQuery.startsWith(`${pinBase}/`)) {
     return true
   }
@@ -782,8 +803,11 @@ export function filterHamburgerModulesForAccess(
   effectiveLabelPrinting: boolean,
   enabledModulesJson: Record<string, boolean> | null
 ): AdminHamburgerModule[] {
-  /** Account-blok altijd in het menu; overige modules volgens toggle. */
-  const menuAccess: Record<TenantModuleId, boolean> = { ...effectiveAccess, account: true }
+  /** Account-blok altijd in het menu voor kassa; reserveringspakket volgt toggles. */
+  const reservationsOnly = isReservationsSoftwareTenant(effectiveAccess, enabledModulesJson)
+  const menuAccess: Record<TenantModuleId, boolean> = reservationsOnly
+    ? { ...effectiveAccess }
+    : { ...effectiveAccess, account: true }
 
   return modules
     .filter((m) => moduleRowVisibleInMenu(m, menuAccess, enabledModulesJson))
