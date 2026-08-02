@@ -2038,7 +2038,7 @@ export default function KassaReservationsView({
 
         {/* View Toggle & Search */}
         <div className="flex flex-col gap-2 w-full lg:flex-row lg:items-center lg:gap-3">
-          <div className="flex w-full overflow-x-auto rounded-xl bg-[#cdd8ea] p-1">
+          <div className="flex w-full overflow-x-auto rounded-xl bg-gray-200 p-1">
             {(() => {
               const pendingCount = reservations.filter(r => r.status === 'PENDING').length
               return [
@@ -5170,7 +5170,7 @@ function WalkInModal({ onClose, onSave, tables, reservations, rk }: {
             Annuleren
           </button>
           <button onClick={handleSubmit} disabled={saving}
-            className="flex-1 py-2.5 rounded-xl bg-gray-800 text-white font-bold hover:bg-gray-900 transition-colors flex items-center justify-center gap-2 disabled:opacity-60">
+            className="flex-1 py-2.5 rounded-xl bg-black text-white font-bold hover:bg-gray-900 transition-colors flex items-center justify-center gap-2 disabled:opacity-60">
             {saving ? <span className="animate-spin">⟳</span> : <UserCheck size={18}/>}
             Inchecken
           </button>
