@@ -65,7 +65,7 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
       tenant={params.tenant}
       kassaTables={kassaTables}
       presentation="adminPage"
-      closeButtonLabel={kassaOn ? undefined : 'Overzicht'}
+      closeButtonLabel={kassaOn ? undefined : 'Reservaties'}
       allowKassaHandoff={kassaOn}
       onClose={() => {
         if (kassaOn) {

@@ -2332,17 +2332,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                     >
                       {t('adminLayout.menu')}
                     </div>
-                    <Link
-                      href={baseUrl}
-                      prefetch={false}
-                      onClick={() => {
-                        setHamburgerOpen(false)
-                        setHamburgerSubOpen(null)
-                      }}
-                      className={`flex items-center border-b ${ui.flyMenuDivider} px-4 py-3 text-sm font-semibold ${ui.flyMenuText} transition-colors ${ui.flyMenuRowHover}`}
-                    >
-                      <span>{t('adminLayout.overview')}</span>
-                    </Link>
                     {modules.map((mod) => (
                       <div key={mod.rowKey} className={`border-b ${ui.flyMenuDivider} last:border-0`}>
                         <button

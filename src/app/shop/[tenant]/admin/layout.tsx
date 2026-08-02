@@ -8,6 +8,7 @@ import { getTenantSettings } from '@/lib/admin-api'
 import {
   adminPathToModule,
   getFirstAccessibleAdminPath,
+  isReservationsSoftwareTenant,
   isShopAdminAnyPosPath,
   isHorecaKassaPosScreenEnabled,
   isRetailKassaPosScreenEnabled,
@@ -318,6 +319,16 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
     if (loading || modulesLoading || tenantExists === false) return
     if (demoPublicUnauthenticated) return
     if (adminPath.includes('/admin/pincode')) return
+
+    const adminRoot = `/shop/${params.tenant}/admin`
+    if (
+      isReservationsSoftwareTenant(moduleAccess, enabledModulesJson) &&
+      (adminPath === adminRoot || adminPath === `${adminRoot}/`)
+    ) {
+      router.replace(getFirstAccessibleAdminPath(params.tenant, moduleAccess, enabledModulesJson))
+      return
+    }
+
     const gate = adminPathToModule(adminPath, params.tenant)
     if (
       gate.kind === 'module' &&
@@ -339,7 +350,10 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
         submenuParentAllowedForSubmenuId(subId, gate, moduleAccess)
       )
     ) {
-      router.replace(`/shop/${params.tenant}/admin`)
+      router.replace(
+        getFirstAccessibleAdminPath(params.tenant, moduleAccess, enabledModulesJson)
+      )
+      return
     }
   }, [
     loading,
