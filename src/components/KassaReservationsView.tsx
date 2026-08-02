@@ -1989,7 +1989,7 @@ export default function KassaReservationsView({
               <>
                 <button
                   onClick={() => setShowWalkInModal(true)}
-                  className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-gray-700 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800 sm:gap-2 sm:px-4"
+                  className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-black px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-900 sm:gap-2 sm:px-4"
                 >
                   <UserCheck size={18} className="shrink-0" />
                   <span className="hidden sm:inline">Walk-in</span>
@@ -5120,7 +5120,7 @@ function WalkInModal({ onClose, onSave, tables, reservations, rk }: {
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
         <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gray-800 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-black flex items-center justify-center">
               <UserCheck size={18} className="text-white"/>
             </div>
             <div>
