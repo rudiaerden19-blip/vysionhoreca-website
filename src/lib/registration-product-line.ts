@@ -220,3 +220,7 @@ export function getRegistrationPostSignupAdminPath(
 export function registrationLineWantsDeliveryBootstrap(line: RegistrationProductLine): boolean {
   return line === 'horeca_kassa' || line === 'online_bestellen'
 }
+
+export function registrationLineWantsReservationsBootstrap(line: RegistrationProductLine): boolean {
+  return line === 'restaurant_reservaties'
+}

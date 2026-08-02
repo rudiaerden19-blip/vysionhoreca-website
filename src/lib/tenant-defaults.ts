@@ -33,3 +33,38 @@ export async function ensureDeliverySettingsForTenant(
     console.warn('[ensureDeliverySettingsForTenant]', tenantSlug, error.message)
   }
 }
+
+const RESERVATION_FLOOR_PLAN_ZONES = ['inside', 'terrace'] as const
+
+/**
+ * TableVysion / restaurant_reservaties: lege plattegrond (geen demo-tafel).
+ * Overschrijft ook orphaned `floor_plan_tables` bij hergebruikte tenant_slug.
+ */
+export async function ensureReservationsSoftwareBootstrapForTenant(
+  client: SupabaseClient,
+  tenantSlug: string,
+): Promise<void> {
+  for (const plan_zone of RESERVATION_FLOOR_PLAN_ZONES) {
+    const { error } = await client.from('floor_plan_tables').upsert(
+      { tenant_slug: tenantSlug, plan_zone, data: [] },
+      { onConflict: 'tenant_slug,plan_zone' },
+    )
+    if (error) {
+      console.warn('[ensureReservationsSoftwareBootstrapForTenant] floor', tenantSlug, plan_zone, error.message)
+    }
+  }
+
+  const { error: rsErr } = await client.from('reservation_settings').upsert(
+    {
+      tenant_slug: tenantSlug,
+      is_enabled: true,
+      accept_online: true,
+      booking_page_enabled: true,
+      auto_confirm: false,
+    },
+    { onConflict: 'tenant_slug' },
+  )
+  if (rsErr) {
+    console.warn('[ensureReservationsSoftwareBootstrapForTenant] settings', tenantSlug, rsErr.message)
+  }
+}
