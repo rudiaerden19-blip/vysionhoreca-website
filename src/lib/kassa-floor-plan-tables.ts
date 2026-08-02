@@ -24,7 +24,9 @@ export function clampFloorPlanPct(v: unknown, fallback = 50): number {
 }
 
 export function sanitizeFloorPlanTables(list: FloorPlanTable[]): FloorPlanTable[] {
-  return list.map((t) => ({ ...t, x: clampFloorPlanPct(t.x), y: clampFloorPlanPct(t.y) }))
+  return list
+    .filter((t) => t != null && String(t.number ?? '').trim() !== '')
+    .map((t) => ({ ...t, x: clampFloorPlanPct(t.x), y: clampFloorPlanPct(t.y) }))
 }
 
 /**
