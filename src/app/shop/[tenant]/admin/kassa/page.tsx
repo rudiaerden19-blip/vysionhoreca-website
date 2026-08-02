@@ -4735,6 +4735,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       )}
                     </div>
                   ))}
+                  <AccountMenuSessionBlock
+                    tenantSlug={tenant}
+                    onClose={() => {
+                      setHamburgerOpen(false)
+                      setHamburgerSubOpen(null)
+                    }}
+                  />
                 </div>
                 {/* Tweede popup rechts: sub-items */}
                 {hamburgerOpen && hamburgerSubOpen && activeMod && (
