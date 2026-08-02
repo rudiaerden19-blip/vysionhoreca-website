@@ -1956,7 +1956,7 @@ export default function KassaReservationsView({
                 </button>
                 <button
                   onClick={() => setShowWaitlistModal(true)}
-                  className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-purple-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-600 sm:gap-2 sm:px-4"
+                  className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-black px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800 sm:gap-2 sm:px-4"
                 >
                   <Clock size={18} className="shrink-0" />
                   <span className="hidden sm:inline">Wachtlijst</span>
@@ -2015,7 +2015,7 @@ export default function KassaReservationsView({
                   className={`relative flex min-w-[44px] flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-2 text-sm font-medium transition-colors ${
                     viewMode === view.id
                       ? 'bg-black text-white shadow-sm ring-1 ring-black/10'
-                      : 'bg-[#5f728f] text-white hover:bg-[#4d5f78]'
+                      : 'bg-gray-700 text-white hover:bg-gray-600'
                   }`}
                 >
                   {view.icon}
@@ -4330,11 +4330,11 @@ export default function KassaReservationsView({
               {/* Tabs */}
               <div className="flex border-b border-gray-100">
                 <button onClick={() => setSearchPopupTab('dag')}
-                  className={`flex-1 py-3 text-sm font-bold tracking-wide transition-colors ${searchPopupTab==='dag'?'text-gray-700 border-b-2 border-black':'text-gray-400 hover:text-gray-600'}`}>
+                  className={`flex-1 py-3 text-sm font-bold tracking-wide transition-colors ${searchPopupTab==='dag'?'text-black border-b-2 border-black':'text-gray-400 hover:text-gray-600'}`}>
                   DEZE DAG
                 </button>
                 <button onClick={() => setSearchPopupTab('alle')}
-                  className={`flex-1 py-3 text-sm font-bold tracking-wide transition-colors ${searchPopupTab==='alle'?'text-gray-700 border-b-2 border-black':'text-gray-400 hover:text-gray-600'}`}>
+                  className={`flex-1 py-3 text-sm font-bold tracking-wide transition-colors ${searchPopupTab==='alle'?'text-black border-b-2 border-black':'text-gray-400 hover:text-gray-600'}`}>
                   ALLE DAGEN
                 </button>
               </div>
