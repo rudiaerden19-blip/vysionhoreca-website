@@ -25,18 +25,11 @@ import { adminDb } from '@/lib/admin-db-client'
 import { authFetch, getAuthHeaders } from '@/lib/auth-headers'
 import { sendToVysionPrintAgent } from '@/lib/vysion-print-agent-client'
 import {
-  buildThermalAgentVatLines,
   computeKassaReceiptVatFromCartLines,
   fetchKassaMenuVatCatalog,
   orderJsonItemsToKassaCartLines,
   type KassaReceiptVatComputed,
 } from '@/lib/kassa-receipt-vat'
-import type { KassaLastOrderReceipt } from '@/lib/kassa-cart-types'
-import {
-  kassaThermalItemLine,
-  kassaThermalPadMoney,
-  kassaThermalTotalLine,
-} from '@/lib/kassa-thermal-bon-format'
 import {
   normalizeCategoryVatPercent,
   normalizeOrderTypeForVat,
@@ -714,46 +707,32 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         ? it.options.map((o: any) => ({ name: String(o.name || ''), price: Number(o.price || 0) }))
         : [],
     }))
-    // Thermische bon: platte bonInhoud (BTW per tarief) — géén orderData (standaard Print Agent).
-    const bonLines: string[] = []
-    bonLines.push(tenantSettings?.business_name || 'Zaak')
-    if (tenantSettings?.address) bonLines.push(tenantSettings.address)
-    if (tenantSettings?.postal_code || tenantSettings?.city) {
-      bonLines.push(`${tenantSettings.postal_code ?? ''} ${tenantSettings.city ?? ''}`.trim())
-    }
-    if (tenantSettings?.phone) bonLines.push(`Tel: ${tenantSettings.phone}`)
-    bonLines.push('--------------------------------')
-    bonLines.push(`Bon #${order.order_number || (order.id?.slice(0, 8) ?? '?')}`)
-    bonLines.push('--------------------------------')
-    for (const it of agentItems) {
-      bonLines.push(kassaThermalItemLine(it.quantity, it.name, it.price))
-    }
-    bonLines.push('--------------------------------')
-    bonLines.push(kassaThermalPadMoney('Subtotaal', subtotalExcl))
-    const printOrderStub: KassaLastOrderReceipt = {
-      orderNumber: Number(order.order_number) || 0,
-      items: [],
+    const vatRows = receiptVatComputed?.byRate ?? []
+    const agentOrderData = {
+      orderNumber: order.order_number || (order.id?.slice(0, 8) ?? '?'),
+      orderType: normalizeOrderTypeForVat(order.order_type),
+      tableNumber: order.table_number ?? null,
+      items: agentItems,
+      subtotal: subtotalExcl,
+      tax: totalTax,
       total: Number(order.total) || 0,
-      paymentMethod: 'CARD',
-      orderType: 'TAKEAWAY',
-      tableNumber: '',
-      createdAt: new Date(),
+      paymentMethod: order.payment_method || 'CARD',
+      ...(vatRows.length > 0
+        ? {
+            vatLines: vatRows.map((row) => ({
+              rate: row.rate,
+              tax: row.tax,
+            })),
+          }
+        : {}),
     }
-    const agentVatLines = buildThermalAgentVatLines(
-      printOrderStub,
-      receiptVatComputed,
-      tenantDefaultBtw,
-      totalTax,
-    )
-    bonLines.push('')
-    bonLines.push(kassaThermalTotalLine('TOTAAL', order.total || 0))
 
     const printResult = await sendToVysionPrintAgent({
       winkelnaam: tenantSettings?.business_name || 'Zaak',
-      bonInhoud: bonLines.join('\n'),
-      vatLines: agentVatLines,
+      bonInhoud: '',
       copies: 1,
       receiptMode: 'kassa',
+      orderData: agentOrderData,
       businessInfo: {
         name: tenantSettings?.business_name,
         address: tenantSettings?.address ?? undefined,
@@ -762,6 +741,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         phone: tenantSettings?.phone ?? undefined,
         vatNumber: tenantSettings?.btw_number ?? undefined,
         website: tenantSettings?.website ?? undefined,
+        vatRate: vatRows[0]?.rate ?? tenantDefaultBtw,
       },
     })
     if (printResult.ok) return

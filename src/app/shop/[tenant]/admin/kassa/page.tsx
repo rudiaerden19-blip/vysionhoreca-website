@@ -220,14 +220,7 @@ import {
   mergeKassaReceiptVatRows,
   resolveKassaCartLineVatRate,
   resolveKassaReceiptVatRowsForPrint,
-  buildThermalAgentVatLines,
 } from '@/lib/kassa-receipt-vat'
-import {
-  kassaThermalItemLine,
-  kassaThermalPadMoney,
-  kassaThermalTotalLine,
-  kassaThermalVatLine,
-} from '@/lib/kassa-thermal-bon-format'
 
 /** Tik-feedback ná paint — zwakkere touch-terminals blijven UI-updates beter bijbenen */
 function scheduleKassaTapSound(play: () => void) {
@@ -3790,20 +3783,23 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     for (const i of receiptLines) {
       const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
       const lineTotal = (i.product.price + choicesTotal) * i.quantity
-      bonLines.push(kassaThermalItemLine(i.quantity, i.product.name, lineTotal))
+      bonLines.push(`${i.quantity}x ${i.product.name}  EUR ${lineTotal.toFixed(2)}`)
       for (const c of i.choices || []) {
-        if (c.price > 0) {
-          bonLines.push(kassaThermalPadMoney(` + ${c.choiceName}`, c.price))
-        } else {
-          bonLines.push(` + ${c.choiceName}`.slice(0, 42))
-        }
+        bonLines.push(` + ${c.choiceName}${c.price > 0 ? ` EUR ${c.price.toFixed(2)}`: ''}`)
       }
     }
     bonLines.push('--------------------------------')
-    bonLines.push(kassaThermalPadMoney(t('kassaReceipt.subtotal'), subtotal))
-    /** BTW niet in bonInhoud — standaard Print Agent injecteert `vatLines` onder Subtotaal. */
-    bonLines.push('')
-    bonLines.push(kassaThermalTotalLine(t('kassaReceipt.total'), order.total))
+    bonLines.push(`${t('kassaReceipt.subtotal')}  EUR ${subtotal.toFixed(2)}`)
+    if (receiptVatRows.length >= 1) {
+      for (const row of receiptVatRows) {
+        bonLines.push(
+          `${t('kassaReceipt.vat').replace('{rate}', String(row.rate))}  EUR ${row.tax.toFixed(2)}`,
+        )
+      }
+    } else {
+      bonLines.push(`${t('kassaReceipt.vat').replace('{rate}', String(fbVatRate))}  EUR ${tax.toFixed(2)}`)
+    }
+    bonLines.push(`${t('kassaReceipt.total')}  EUR ${order.total.toFixed(2)}`)
     bonLines.push(`${t('kassaReceipt.paidWith')} ${payLabel}`)
     if (order.helpedByStaffName) {
       bonLines.push(t('kassaReceipt.helpedBy').replace('{name}', order.helpedByStaffName))
@@ -3855,16 +3851,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       phone: tenantInfo?.phone ?? undefined,
       vatNumber: tenantInfo?.btw_number ?? undefined,
       website: tenantInfo?.website ?? undefined,
+      vatRate: receiptVatRows[0]?.rate ?? fbVatRate,
     }
-    const agentVatLines = buildThermalAgentVatLines(order, receiptVatComputed, fbVatRate, tax)
+
+    /** Afgeronde kassabon: lege bonInhoud + orderData → bestaande agent rijke layout. Voorlopig: platte bonInhoud. Keuken: orderData. */
+    const agentRichKassaBon = receiptMode === 'kassa' && !isDraft
 
     const printResult = await sendToVysionPrintAgent({
       winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
-      bonInhoud: bonLines.join('\n'),
-      vatLines: agentVatLines,
+      bonInhoud: agentRichKassaBon ? '' : bonLines.join('\n'),
       copies: isDraft ? draftCopies : paidCopies,
       openDrawer: isCash,
       receiptMode,
+      orderData:
+        receiptMode === 'keuken' || agentRichKassaBon ? agentOrderData : undefined,
       businessInfo: printBusinessInfo,
     })
     if (printResult.ok && receiptMode === 'kassa' && order.items.length > 0 && !opts?.skipKitchenCompanion) {
