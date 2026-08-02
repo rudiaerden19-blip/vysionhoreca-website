@@ -1996,7 +1996,7 @@ export default function KassaReservationsView({
                 </button>
                 <button
                   onClick={() => setShowWaitlistModal(true)}
-                  className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-purple-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-600 sm:gap-2 sm:px-4"
+                  className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-black px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-900 sm:gap-2 sm:px-4"
                 >
                   <Clock size={18} className="shrink-0" />
                   <span className="hidden sm:inline">Wachtlijst</span>
@@ -5207,7 +5207,7 @@ function WaitlistModal({ onClose, onSave, rk }: {
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
         <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-purple-500 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-black flex items-center justify-center">
               <Clock size={18} className="text-white"/>
             </div>
             <div>
@@ -5223,12 +5223,12 @@ function WaitlistModal({ onClose, onSave, rk }: {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Naam <span className="text-red-500">*</span></label>
             <input value={name} onChange={e => setName(e.target.value)} placeholder="Naam gast"
-              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-purple-400 outline-none text-sm"/>
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-gray-700 outline-none text-sm"/>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Telefoon</label>
             <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="0471 234 567"
-              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-purple-400 outline-none text-sm"/>
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-gray-700 outline-none text-sm"/>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Aantal personen</label>
@@ -5244,12 +5244,12 @@ function WaitlistModal({ onClose, onSave, rk }: {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Datum</label>
               <input type="date" value={date} onChange={e => setDate(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-purple-400 outline-none text-sm"/>
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-gray-700 outline-none text-sm"/>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Tijdstip</label>
               <input type="time" value={time} onChange={e => setTime(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-purple-400 outline-none text-sm"/>
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-gray-700 outline-none text-sm"/>
             </div>
           </div>
         </div>
@@ -5258,7 +5258,7 @@ function WaitlistModal({ onClose, onSave, rk }: {
             Annuleren
           </button>
           <button onClick={handleSubmit} disabled={saving}
-            className="flex-1 py-2.5 rounded-xl bg-purple-500 text-white font-bold hover:bg-purple-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-60">
+            className="flex-1 py-2.5 rounded-xl bg-black text-white font-bold hover:bg-gray-900 transition-colors flex items-center justify-center gap-2 disabled:opacity-60">
             {saving ? <span className="animate-spin">⟳</span> : <Clock size={18}/>}
             Op wachtlijst
           </button>
