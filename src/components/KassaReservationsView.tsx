@@ -64,6 +64,7 @@ import type {
 import {
   computeConfirmedStatusRingOpacity,
   formatFloorPlanTimeRange,
+  formatReservationTimeRange,
   parseDurationMinutesFromRaw,
 } from '@/components/kassa-reservations/kassa-reservations-model'
 import { ContactsView } from '@/components/kassa-reservations/ContactsView'
@@ -3493,7 +3494,9 @@ export default function KassaReservationsView({
             <tr key={r.id} style={{ borderBottom: '1px solid #e5e7eb'}}
               onClick={() => setEditReservation(r)}
               className={`cursor-pointer transition-colors hover:bg-[#f2f5fa]/80 ${idx % 2 === 0 ? 'bg-white': 'bg-gray-50/40'}`}>
-              <td className="px-5 py-4 font-bold text-gray-800 text-base" style={{ borderRight: '1px solid #e5e7eb'}}>{r.reservation_time}</td>
+              <td className="px-5 py-4 font-bold text-gray-800 text-base whitespace-nowrap" style={{ borderRight: '1px solid #e5e7eb'}}>
+                {formatReservationTimeRange(r.reservation_time, r.duration_minutes, reservationSettings.defaultDurationMinutes)}
+              </td>
               <td className="px-5 py-4 text-gray-600" style={{ borderRight: '1px solid #e5e7eb'}}>
                 {r.table_number ? <span className="font-semibold">Tafel {r.table_number}</span> : <span className="text-gray-300">—</span>}
               </td>
@@ -3808,7 +3811,9 @@ export default function KassaReservationsView({
                           {wl.map((r, idx) => (
                             <tr key={r.id} className={idx % 2 === 0 ? 'bg-white': 'bg-purple-50/50'} style={{borderBottom:'1px solid #e9d5ff'}}>
                               <td className="px-5 py-3 font-medium text-purple-700">#{r.waitlist_position || idx+1}</td>
-                              <td className="px-5 py-3">{r.reservation_time}</td>
+                              <td className="px-5 py-3 whitespace-nowrap">
+                                {formatReservationTimeRange(r.reservation_time, r.duration_minutes, reservationSettings.defaultDurationMinutes)}
+                              </td>
                               <td className="px-5 py-3 text-center font-bold">{r.party_size}</td>
                               <td className="px-5 py-3 font-semibold">{r.guest_name}</td>
                               <td className="px-5 py-3 text-gray-500">{r.guest_phone}</td>

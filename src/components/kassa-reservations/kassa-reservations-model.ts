@@ -66,21 +66,47 @@ export function parseDurationMinutesFromRaw(raw: unknown, fallback: number): num
   return Math.round(n)
 }
 
-/** Plattegrond-label: start- en eindtijd obv reservatieduur (per reservatie of default zaak). */
-export function formatFloorPlanTimeRange(reservationTime: string, durationMinutes: number): string {
+function parseReservationStartHm(reservationTime: string): { h: number; min: number } | null {
   const raw = (reservationTime || '12:00').trim().slice(0, 8)
   const m = raw.match(/^(\d{1,2}):(\d{2})/)
-  if (!m) return raw.slice(0, 5)
+  if (!m) return null
   const h = parseInt(m[1], 10)
   const min = parseInt(m[2], 10)
-  if (!Number.isFinite(h) || !Number.isFinite(min)) return raw.slice(0, 5)
+  if (!Number.isFinite(h) || !Number.isFinite(min)) return null
+  return { h, min }
+}
+
+function formatHmFromTotalMinutes(totalMinutes: number): string {
+  const dayMin = ((totalMinutes % (24 * 60)) + (24 * 60)) % (24 * 60)
+  const hh = Math.floor(dayMin / 60)
+  const mm = dayMin % 60
+  return `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`
+}
+
+/** Lijst/contacten: 15:00 tot 17:00 (duur uit reservatie of zaak-default). */
+export function formatReservationTimeRange(
+  reservationTime: string,
+  durationMinutes: number,
+  fallbackDuration = 90,
+): string {
+  const start = parseReservationStartHm(reservationTime)
+  if (!start) return (reservationTime || '').trim().slice(0, 5)
+  const dur = Math.max(15, Math.round(durationMinutes || fallbackDuration))
+  const startStr = `${String(start.h).padStart(2, '0')}:${String(start.min).padStart(2, '0')}`
+  const endStr = formatHmFromTotalMinutes(start.h * 60 + start.min + dur)
+  return `${startStr} tot ${endStr}`
+}
+
+/** Plattegrond-label: start- en eindtijd obv reservatieduur (per reservatie of default zaak). */
+export function formatFloorPlanTimeRange(reservationTime: string, durationMinutes: number): string {
+  const start = parseReservationStartHm(reservationTime)
+  if (!start) return (reservationTime || '12:00').trim().slice(0, 5)
   const dur = Math.max(15, Math.round(durationMinutes || 90))
-  const startTotal = h * 60 + min
-  const endTotal = startTotal + dur
+  const startStr = `${String(start.h).padStart(2, '0')}:${String(start.min).padStart(2, '0')}`
+  const endTotal = start.h * 60 + start.min + dur
   const dayMin = ((endTotal % (24 * 60)) + (24 * 60)) % (24 * 60)
   const endH = Math.floor(dayMin / 60)
   const endM = dayMin % 60
-  const startStr = `${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}`
   const endStr = `${endH}u${String(endM).padStart(2, '0')}`
   return `${startStr} tot ${endStr}`
 }
