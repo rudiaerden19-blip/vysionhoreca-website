@@ -1940,7 +1940,7 @@ export default function KassaReservationsView({
           <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
             <button
               onClick={onClose}
-              className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-black px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-gray-800 sm:gap-2"
+              className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-[#1877F2] px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-[#166FE5] active:bg-[#1464D6] sm:gap-2"
             >
               <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -1951,14 +1951,14 @@ export default function KassaReservationsView({
               <>
                 <button
                   onClick={() => setShowWalkInModal(true)}
-                  className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-gray-700 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800 sm:gap-2 sm:px-4"
+                  className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-[#1877F2] px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[#166FE5] active:bg-[#1464D6] sm:gap-2 sm:px-4"
                 >
                   <UserCheck size={18} className="shrink-0" />
                   <span className="hidden sm:inline">Walk-in</span>
                 </button>
                 <button
                   onClick={() => setShowWaitlistModal(true)}
-                  className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-black px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800 sm:gap-2 sm:px-4"
+                  className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-[#1877F2] px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[#166FE5] active:bg-[#1464D6] sm:gap-2 sm:px-4"
                 >
                   <Clock size={18} className="shrink-0" />
                   <span className="hidden sm:inline">Wachtlijst</span>
