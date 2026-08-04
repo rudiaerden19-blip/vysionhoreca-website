@@ -225,3 +225,16 @@ export function registrationLineWantsDeliveryBootstrap(line: RegistrationProduct
 export function registrationLineWantsReservationBootstrap(line: RegistrationProductLine): boolean {
   return line === 'restaurant_reservaties'
 }
+
+/** Externe marketinghome per productlijn (login/registratie op platformdomein). */
+export const PRODUCT_LINE_MARKETING_HOME: Partial<Record<RegistrationProductLine, string>> = {
+  restaurant_reservaties: 'https://www.tablevysion.com',
+}
+
+export function marketingHomeHrefForProductLineParam(productLineParam: string | null): string {
+  if (productLineParam && isRegistrationProductLine(productLineParam)) {
+    const external = PRODUCT_LINE_MARKETING_HOME[productLineParam]
+    if (external) return external
+  }
+  return '/'
+}

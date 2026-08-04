@@ -24,6 +24,7 @@ import { LoginKassaCloseHintModal } from '@/components/LoginKassaCloseHintModal'
 import { LOGIN_QUERY_KASSA_CLOSE_TIP } from '@/lib/shop-login-kassa-tip'
 import { isVysionMainPortalHost } from '@/lib/vysion-site'
 import { kassaPosButtonClass } from '@/lib/kassa-pos-surface'
+import { marketingHomeHrefForProductLineParam } from '@/lib/registration-product-line'
 
 /** Zelfde hosts als middleware `exactMainDomains`(+ dev): sessie blijft in localStorage van dit domein. */
 function stayOnMainDomainForShopSession(hostname: string): boolean {
@@ -46,6 +47,7 @@ export default function LoginPage() {
   const [isLangOpen, setIsLangOpen] = useState(false)
   const langRef = useRef<HTMLDivElement>(null)
   const [showKassaCloseHint, setShowKassaCloseHint] = useState(false)
+  const [marketingHomeHref, setMarketingHomeHref] = useState('/')
 
   // Superadmin: gedeelde cookie → mirror in isSuperAdminLoggedIn; direct door naar `next`zonder zaak-wachtwoord.
   // (Zonder dit bleef het tenant-loginformulier zichtbaar tot je handmatig logt.)
@@ -119,6 +121,9 @@ export default function LoginPage() {
     if (typeof window === 'undefined') return
     const p = new URLSearchParams(window.location.search)
     setShowKassaCloseHint(p.get(LOGIN_QUERY_KASSA_CLOSE_TIP) === '1')
+    setMarketingHomeHref(
+      marketingHomeHrefForProductLineParam(p.get('productLine')),
+    )
   }, [])
 
   const dismissKassaCloseHint = () => {
@@ -245,7 +250,7 @@ export default function LoginPage() {
       <LoginKassaCloseHintModal open={showKassaCloseHint} onDismiss={dismissKassaCloseHint} />
       {/* Header */}
       <header className="p-6 flex items-center justify-between">
-        <Link href="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
+        <Link href={marketingHomeHref} className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
@@ -300,7 +305,7 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           {/* Logo */}
           <div className="text-center mb-10">
-            <Link href="/">
+            <Link href={marketingHomeHref}>
               <span className="text-3xl font-bold">
                 <span className="text-accent">Vysion</span>
               </span>
