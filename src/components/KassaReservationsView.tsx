@@ -2017,7 +2017,7 @@ export default function KassaReservationsView({
                   className={`relative flex min-w-[44px] flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-2 text-sm font-medium transition-colors ${
                     viewMode === view.id
                       ? 'bg-black text-white shadow-sm ring-1 ring-black/10'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900'
+                      : 'bg-gray-300 text-gray-800 hover:bg-gray-400 hover:text-gray-900'
                   }`}
                 >
                   {view.icon}
