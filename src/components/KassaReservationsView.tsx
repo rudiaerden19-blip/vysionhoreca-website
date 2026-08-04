@@ -2347,7 +2347,7 @@ export default function KassaReservationsView({
               <div className="flex flex-shrink-0 flex-wrap items-center gap-2 bg-white px-2 py-2 sm:gap-3 sm:px-4 sm:py-3 border-b border-gray-200">
 
                 {/* Datum kiezer — groot en opvallend */}
-                <div className="flex items-center gap-2 bg-black rounded-2xl px-3 py-2 shadow-md">
+                <div className="flex items-center gap-2 rounded-2xl bg-green-500 px-3 py-2 shadow-md">
                   <button
                     onClick={() => { const d = new Date(selectedDate + 'T12:00:00'); d.setDate(d.getDate() - 1); setSelectedDate(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`) }}
                     className="w-10 h-10 rounded-xl bg-white/60 hover:bg-white/85 active:bg-white flex items-center justify-center transition-colors">
@@ -2689,7 +2689,7 @@ export default function KassaReservationsView({
                       onPointerDown={e => e.stopPropagation()}
                       onClick={e => e.stopPropagation()}
                     >
-                      <div className="flex items-center gap-2 rounded-2xl bg-black px-2 py-2 shadow-xl sm:px-3 sm:py-2.5">
+                      <div className="flex items-center gap-2 rounded-2xl bg-green-500 px-2 py-2 shadow-xl sm:px-3 sm:py-2.5">
                         <button
                           type="button"
                           onClick={() => {
@@ -3355,17 +3355,42 @@ export default function KassaReservationsView({
 
                 {/* Dag navigatie — alleen zichtbaar in dag-modus */}
                 {resViewFilter === 'dag' && (
-                  <>
-                    <button onClick={() => { const d = new Date(resDate + 'T12:00:00'); d.setDate(d.getDate()-1); setResListDate(d.toISOString().split('T')[0]) }}
-                      className="w-9 h-9 rounded-xl bg-black hover:bg-gray-800 flex items-center justify-center text-white flex-shrink-0">
-                      <ChevronLeft size={18}/>
+                  <div className="flex items-center gap-2 rounded-2xl bg-green-500 px-3 py-2 shadow-md">
+                    <button
+                      onClick={() => {
+                        const d = new Date(resDate + 'T12:00:00')
+                        d.setDate(d.getDate() - 1)
+                        setResListDate(d.toISOString().split('T')[0])
+                      }}
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/60 transition-colors hover:bg-white/85 active:bg-white"
+                      aria-label="Vorige dag"
+                    >
+                      <ChevronLeft size={22} className="text-white" />
                     </button>
-                    <span className="font-bold text-gray-800 text-sm min-w-[100px] text-center">{formatDate(resDate)}</span>
-                    <button onClick={() => { const d = new Date(resDate + 'T12:00:00'); d.setDate(d.getDate()+1); setResListDate(d.toISOString().split('T')[0]) }}
-                      className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 flex-shrink-0">
-                      <ChevronRight size={18}/>
+                    <div className="flex flex-col items-center">
+                      <span className="min-w-[8rem] text-center text-xl font-bold leading-tight text-white">
+                        {formatDate(resDate)}
+                      </span>
+                      <input
+                        type="date"
+                        value={resDate}
+                        onChange={e => setResListDate(e.target.value)}
+                        className="mt-0.5 cursor-pointer rounded-lg border border-gray-300/35 bg-white/65 px-2 py-0.5 text-center text-xs font-semibold text-gray-900 outline-none"
+                        aria-label="Kies datum"
+                      />
+                    </div>
+                    <button
+                      onClick={() => {
+                        const d = new Date(resDate + 'T12:00:00')
+                        d.setDate(d.getDate() + 1)
+                        setResListDate(d.toISOString().split('T')[0])
+                      }}
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/60 transition-colors hover:bg-white/85 active:bg-white"
+                      aria-label="Volgende dag"
+                    >
+                      <ChevronRight size={22} className="text-white" />
                     </button>
-                  </>
+                  </div>
                 )}
 
                 {/* Week navigatie */}
