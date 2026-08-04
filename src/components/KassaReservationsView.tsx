@@ -2016,7 +2016,7 @@ export default function KassaReservationsView({
                   onClick={() => { setViewMode(view.id as ViewMode); setShowResCalendar(false) }}
                   className={`relative flex min-w-[44px] flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-2 text-sm font-medium transition-colors ${
                     viewMode === view.id
-                      ? 'bg-black text-white shadow-sm ring-1 ring-black/10'
+                      ? 'bg-[#1877F2] text-white shadow-sm ring-1 ring-[#1877F2]/30'
                       : 'bg-gray-300 text-gray-800 hover:bg-gray-400 hover:text-gray-900'
                   }`}
                 >
@@ -2374,8 +2374,8 @@ export default function KassaReservationsView({
                     onClick={() => setResFloorPlanZone(FLOOR_PLAN_ZONE_INSIDE)}
                     className={`min-h-[40px] rounded-xl px-3 text-sm font-bold transition-colors ${
                       resFloorPlanZone === FLOOR_PLAN_ZONE_INSIDE
-                        ? 'bg-black text-white shadow-sm'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        ? 'bg-[#1877F2] text-white shadow-sm'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                     }`}
                   >
                     Binnen
@@ -2385,8 +2385,8 @@ export default function KassaReservationsView({
                     onClick={() => setResFloorPlanZone(FLOOR_PLAN_ZONE_TERRACE)}
                     className={`min-h-[40px] rounded-xl px-3 text-sm font-bold transition-colors ${
                       resFloorPlanZone === FLOOR_PLAN_ZONE_TERRACE
-                        ? 'bg-black text-white shadow-sm'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        ? 'bg-[#1877F2] text-white shadow-sm'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                     }`}
                   >
                     Terras
@@ -3468,7 +3468,7 @@ export default function KassaReservationsView({
                     <button key={f}
                       onClick={() => { setResViewFilter(f); setShowMonthPicker(false); if (f === 'maand') { setResFilterMonth(new Date().getMonth()); setResFilterYear(new Date().getFullYear()) } if (f === 'jaar') setResFilterYear(new Date().getFullYear()) }}
                       className={`px-3 py-1.5 rounded-lg text-sm font-semibold capitalize transition-colors
-                        ${resViewFilter === f ? 'bg-black text-white shadow-sm': 'text-gray-500 hover:text-gray-800'}`}>
+                        ${resViewFilter === f ? 'bg-[#1877F2] text-white shadow-sm': 'text-gray-500 hover:text-gray-800'}`}>
                       {f.charAt(0).toUpperCase() + f.slice(1)}
                     </button>
                   ))}
@@ -3476,13 +3476,13 @@ export default function KassaReservationsView({
 
                 <div className="ml-auto flex gap-2">
                   <button onClick={() => { setShowResCalendar(v => !v); setShowResSearch(false) }}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-colors
-                      ${showResCalendar ? 'bg-gray-900 text-white ring-2 ring-black/12': 'bg-black hover:bg-gray-800 text-white'}`}>
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-colors
+                      ${showResCalendar ? 'bg-[#166FE5] ring-2 ring-[#1877F2]/45': 'bg-[#1877F2] hover:bg-[#166FE5]'}`}>
                     <Calendar size={15}/> Kalender {showResCalendar ? <Eye size={13}/> : <EyeOff size={13}/>}
                   </button>
                   <button onClick={() => { setShowResSearch(v => !v); if (showResSearch) setResSearch('') }}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-colors
-                      ${showResSearch ? 'bg-gray-700 text-white ring-2 ring-gray-400': 'bg-gray-800 hover:bg-gray-700 text-white'}`}>
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-colors
+                      ${showResSearch ? 'bg-[#166FE5] ring-2 ring-[#1877F2]/45': 'bg-[#1877F2] hover:bg-[#166FE5]'}`}>
                     <Search size={15}/> Zoek reserv.
                   </button>
                 </div>
