@@ -3240,7 +3240,7 @@ export default function KassaReservationsView({
               {/* === KALENDER RECHTS — inklapbaar, groot === */}
               <div className={`flex-shrink-0 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col transition-[width] duration-300 ease-in-out ${calOpen ? 'w-72': 'w-12'}`}>
                 {/* Header: inklapknop + jaar + vandaag */}
-                <div className="flex items-center gap-2 px-3 py-3 border-b border-gray-100 flex-shrink-0 bg-black">
+                <div className="flex items-center gap-2 px-3 py-3 border-b border-gray-100 flex-shrink-0 bg-[#1877F2]">
                   <button onClick={() => setCalOpen(o=>!o)}
                     className="p-1.5 rounded-lg bg-white/55 hover:bg-white/80 text-white flex-shrink-0">
                     {calOpen ? <ChevronRight size={18}/> : <ChevronLeft size={18}/>}
@@ -3285,7 +3285,7 @@ export default function KassaReservationsView({
                               return (
                                 <button key={day} onClick={()=>{ setTimelineDate(dStr); setCalMonth({year:mYear,month:mMonth}) }}
                                   className={`relative aspect-square flex items-center justify-center text-sm font-bold rounded-full transition-colors
-                                    ${isSel?'bg-black text-white':isTod?'bg-[#e8eef6] text-gray-900':'hover:bg-gray-100 text-gray-700'}`}>
+                                    ${isSel?'bg-[#1877F2] text-white':isTod?'bg-[#e8eef6] text-gray-900':'hover:bg-gray-100 text-gray-700'}`}>
                                   {day}
                                   {hasRes&&!isSel&&<span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-gray-1000"/>}
                                 </button>
