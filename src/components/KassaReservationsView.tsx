@@ -3026,21 +3026,21 @@ export default function KassaReservationsView({
                   {/* Dag / Avond toggle */}
                   <div className="flex rounded-lg overflow-hidden border border-gray-200 ml-2">
                     <button onClick={() => setTimeShift('dag')}
-                      className={`px-4 py-1.5 text-sm font-bold transition-colors ${timeShift==='dag'?'bg-black text-white':'bg-white text-gray-500 hover:bg-gray-50'}`}>
+                      className={`px-4 py-1.5 text-sm font-bold transition-colors ${timeShift==='dag'?'bg-[#1877F2] text-white':'bg-white text-gray-500 hover:bg-gray-50'}`}>
                       Dag
                     </button>
                     <button onClick={() => setTimeShift('avond')}
-                      className={`px-4 py-1.5 text-sm font-bold transition-colors border-l border-gray-200 ${timeShift==='avond'?'bg-black text-white':'bg-white text-gray-500 hover:bg-gray-50'}`}>
+                      className={`px-4 py-1.5 text-sm font-bold transition-colors border-l border-gray-200 ${timeShift==='avond'?'bg-[#1877F2] text-white':'bg-white text-gray-500 hover:bg-gray-50'}`}>
                       Avond
                     </button>
                   </div>
                   {/* Kalender toon/verberg knop */}
                   <button
                     onClick={() => setCalOpen(o => !o)}
-                    className={`ml-2 flex items-center gap-2 px-5 py-1.5 rounded-lg border-2 font-bold text-sm transition-colors
+                    className={`ml-2 flex items-center gap-2 rounded-lg px-5 py-1.5 text-sm font-bold text-white transition-colors
                       ${calOpen
-                        ? 'bg-black border-black text-white hover:bg-gray-800'
-                        : 'bg-gray-200 border-gray-300 text-gray-500 hover:bg-gray-300'
+                        ? 'bg-[#166FE5] ring-2 ring-[#1877F2]/45'
+                        : 'bg-[#1877F2] hover:bg-[#166FE5]'
                       }`}>
                     <Calendar size={20}/>
                     <span>Kalender</span>
@@ -3049,7 +3049,7 @@ export default function KassaReservationsView({
                   {/* Zoek knop */}
                   <button
                     onClick={() => setShowSearchPopup(true)}
-                    className="ml-2 flex items-center gap-2 px-5 py-1.5 rounded-lg border-2 font-bold text-sm bg-gray-700 border-gray-700 text-white hover:bg-gray-800 transition-colors">
+                    className="ml-2 flex items-center gap-2 rounded-lg bg-[#1877F2] px-5 py-1.5 text-sm font-bold text-white transition-colors hover:bg-[#166FE5]">
                     <Search size={20}/>
                     <span>Zoek reserv.</span>
                   </button>
