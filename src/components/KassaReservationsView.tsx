@@ -388,32 +388,39 @@ export default function KassaReservationsView({
   // silent=true: geen loading spinner (voor achtergrond auto-refresh)
   const loadReservations = async (silent = false) => {
     if (!silent) setLoading(true)
-    const { data, error } = await supabase
-      .from('reservations')
-      .select('*')
-      .eq('tenant_slug', tenant)
-      .order('reservation_date', { ascending: true })
-      .order('reservation_time', { ascending: true })
-    if (error) {
-      console.error('[loadReservations] Supabase error:', error)
-      if (!silent) toast.error(rk('loadFailedPrefix') + error.message)
+    const r = await adminDb.select<Record<string, unknown>[]>('reservations', {
+      tenantSlug: tenant,
+      select: '*',
+      order: { column: 'reservation_date', ascending: true },
+    })
+    if (!r.ok) {
+      console.error('[loadReservations] admin read error:', r.error)
+      if (!silent) toast.error(rk('loadFailedPrefix') + (r.error || ''))
+      if (!silent) setLoading(false)
+      return
     }
-    if (data) {
-      const mapped = data.map((r: Record<string, unknown>) => {
-        const rawDur = r.duration_minutes ?? (r as { durationMinutes?: unknown }).durationMinutes
+    const data = Array.isArray(r.data) ? r.data : []
+    if (data.length >= 0) {
+      const mapped = data.map((row: Record<string, unknown>) => {
+        const rawDur = row.duration_minutes ?? (row as { durationMinutes?: unknown }).durationMinutes
         const duration_minutes = parseDurationMinutesFromRaw(rawDur, 90)
         return {
-          ...r,
+          ...row,
           duration_minutes,
-          guest_name: (r.guest_name || r.customer_name || '') as string,
-          guest_phone: (r.guest_phone || r.customer_phone || '') as string,
-          guest_email: (r.guest_email || r.customer_email || '') as string,
-          reservation_date: r.reservation_date ? String(r.reservation_date).slice(0, 10) : '',
-          reservation_time: ((r.reservation_time as string) || '').substring(0, 5),
-          status: ((r.status as string) || '').toUpperCase() as ReservationStatus,
-          table_number: r.table_number != null ? String(r.table_number) : undefined,
+          guest_name: (row.guest_name || row.customer_name || '') as string,
+          guest_phone: (row.guest_phone || row.customer_phone || '') as string,
+          guest_email: (row.guest_email || row.customer_email || '') as string,
+          reservation_date: row.reservation_date ? String(row.reservation_date).slice(0, 10) : '',
+          reservation_time: ((row.reservation_time as string) || '').substring(0, 5),
+          status: ((row.status as string) || '').toUpperCase() as ReservationStatus,
+          table_number: row.table_number != null ? String(row.table_number) : undefined,
         }
       }) as Reservation[]
+      mapped.sort((a, b) => {
+        const d = a.reservation_date.localeCompare(b.reservation_date)
+        if (d !== 0) return d
+        return (a.reservation_time || '').localeCompare(b.reservation_time || '')
+      })
       setReservations(mapped)
     }
     if (!silent) setLoading(false)
@@ -1167,7 +1174,21 @@ export default function KassaReservationsView({
         })
       }
     })
-    return Array.from(map.values())
+    return Array.from(map.values()).map((g) => {
+      const dbProfile = guestProfilesDB.find(
+        (db) =>
+          (g.phone && db.phone === g.phone) ||
+          (g.email && db.email && g.email.toLowerCase() === db.email.toLowerCase()) ||
+          db.name === g.name,
+      )
+      const fromDb = dbProfile?.totalNoShows ?? 0
+      return {
+        ...g,
+        totalNoShows: Math.max(g.totalNoShows, fromDb),
+        isVip: g.isVip || dbProfile?.isVip || false,
+        isBlocked: g.isBlocked || dbProfile?.isBlocked || false,
+      }
+    })
   }, [reservations, guestProfilesDB])
 
   // Stats helpers
@@ -1243,13 +1264,17 @@ export default function KassaReservationsView({
   }, [resCalYear])
 
   // ---- CRUD actions ----
-  const updateStatus = async (id: string, status: ReservationStatus, extra?: Partial<Reservation>) => {
+  const updateStatus = async (id: string, status: ReservationStatus, extra?: Partial<Reservation>): Promise<boolean> => {
     const updates: Record<string, unknown> = { status: status.toLowerCase(), ...extra }
     if (status === 'CHECKED_IN') updates.checked_in_at = new Date().toISOString()
     if (status === 'COMPLETED') updates.completed_at = new Date().toISOString()
     const r = await adminDb.update('reservations', updates, { id, tenant_slug: tenant }, { tenantSlug: tenant })
-    if (!r.ok) { toast.error(rk('statusUpdateFailedPrefix') + (r.error || '')); return }
+    if (!r.ok) {
+      toast.error(rk('statusUpdateFailedPrefix') + (r.error || ''))
+      return false
+    }
     await loadReservations()
+    return true
   }
 
   const handleCheckIn = async (r: Reservation) => {
@@ -1366,7 +1391,8 @@ export default function KassaReservationsView({
   }
 
   const handleNoShow = async (r: Reservation) => {
-    await updateStatus(r.id, 'NO_SHOW')
+    const ok = await updateStatus(r.id, 'NO_SHOW')
+    if (!ok) return
     toast.error(`${r.guest_name} ${rk('markedNoShow')}`)
     // z9 - No-show fee aanrekenen als bescherming actief
     if (reservationSettings.noShowProtection && r.stripe_payment_method_id && r.guest_name) {
@@ -1403,22 +1429,90 @@ export default function KassaReservationsView({
         ),
       )
 
+  const findDbGuestProfile = (guest: GuestProfile) =>
+    guestProfilesDB.find(
+      (g) =>
+        g.id === guest.id ||
+        (guest.phone && g.phone === guest.phone) ||
+        (guest.email && g.email && guest.email.toLowerCase() === g.email.toLowerCase()),
+    )
+
+  const persistGuestProfileNoShowCount = async (guest: GuestProfile, totalNoShows: number) => {
+    const count = Math.max(0, totalNoShows)
+    const db = findDbGuestProfile(guest)
+    const row = {
+      tenant_slug: tenant,
+      name: guest.name,
+      phone: guest.phone || null,
+      email: guest.email || null,
+      is_vip: guest.isVip,
+      is_blocked: guest.isBlocked,
+      notes: guest.notes || '',
+      total_no_shows: count,
+      total_visits: guest.totalVisits,
+      last_visit: guest.lastVisit || null,
+    }
+    if (db?.id && /^[0-9a-f-]{36}$/i.test(db.id)) {
+      const r = await adminDb.update(
+        'guest_profiles',
+        { total_no_shows: count },
+        { id: db.id, tenant_slug: tenant },
+        { tenantSlug: tenant },
+      )
+      if (!r.ok) {
+        toast.error(rk('statusUpdateFailedPrefix') + (r.error || ''))
+        return false
+      }
+    } else if (guest.phone?.trim()) {
+      const r = await adminDb.upsert('guest_profiles', row as Record<string, unknown>, {
+        tenantSlug: tenant,
+        onConflict: 'tenant_slug,phone',
+      })
+      if (!r.ok) {
+        toast.error(rk('statusUpdateFailedPrefix') + (r.error || ''))
+        return false
+      }
+    } else {
+      const r = await adminDb.insert('guest_profiles', row as Record<string, unknown>, {
+        tenantSlug: tenant,
+      })
+      if (!r.ok) {
+        toast.error(rk('statusUpdateFailedPrefix') + (r.error || ''))
+        return false
+      }
+    }
+    await loadGuestProfiles()
+    return true
+  }
+
   const handleGuestContactNoShow = async (guest: GuestProfile) => {
     const guestRes = reservationsForGuestProfile(guest)
-    const noShowRes = guestRes.find(r => r.status === 'NO_SHOW')
-    if (noShowRes) {
-      await handleUndoNoShow(noShowRes)
+    const db = findDbGuestProfile(guest)
+    const currentCount = Math.max(guest.totalNoShows, db?.totalNoShows ?? 0)
+    const hasNoShow = currentCount > 0 || guestRes.some(r => r.status === 'NO_SHOW')
+
+    if (hasNoShow) {
+      const noShowRes = guestRes.find(r => r.status === 'NO_SHOW')
+      if (noShowRes) await handleUndoNoShow(noShowRes)
+      await persistGuestProfileNoShowCount(guest, currentCount - 1)
+      toast.success(`${guest.name} — no-show verwijderd`)
       return
     }
+
     const target =
       guestRes.find(
         r => r.status === 'PENDING' || r.status === 'CONFIRMED' || r.status === 'CHECKED_IN',
       ) || guestRes.find(r => r.status !== 'CANCELLED' && r.status !== 'COMPLETED')
-    if (!target) {
-      toast.error('Geen reservatie gevonden om als no-show te markeren.')
-      return
+
+    if (target) {
+      const ok = await updateStatus(target.id, 'NO_SHOW')
+      if (!ok) return
     }
-    await handleNoShow(target)
+
+    const profileOk = await persistGuestProfileNoShowCount(guest, currentCount + 1)
+    if (profileOk) {
+      toast.error(`${guest.name} ${rk('markedNoShow')}`)
+    }
   }
 
   const handleCancel = async (r: Reservation) => {
