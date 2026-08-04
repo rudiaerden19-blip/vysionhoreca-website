@@ -308,7 +308,6 @@ export default function KassaReservationsView({
   )
   // Tenant info for emails
   const [businessInfo, setBusinessInfo] = useState({ name: '', phone: '', email: ''})
-  const [noShowMarked, setNoShowMarked] = useState<Set<string>>(new Set())
   const [pushTarget, setPushTarget] = useState<Reservation | null>(null)
   const [pushSubject, setPushSubject] = useState('')
   const [pushMessage, setPushMessage] = useState('')
@@ -1384,6 +1383,42 @@ export default function KassaReservationsView({
         )
       } catch { /* stille fout */ }
     }
+  }
+
+  const reservationsForGuestProfile = (guest: GuestProfile): Reservation[] =>
+    reservations
+      .filter(r => {
+        if (guest.phone && r.guest_phone && guest.phone === r.guest_phone) return true
+        if (
+          guest.email &&
+          r.guest_email &&
+          guest.email.toLowerCase() === r.guest_email.toLowerCase()
+        )
+          return true
+        return guest.name === r.guest_name
+      })
+      .sort((a, b) =>
+        `${b.reservation_date}T${b.reservation_time}`.localeCompare(
+          `${a.reservation_date}T${a.reservation_time}`,
+        ),
+      )
+
+  const handleGuestContactNoShow = async (guest: GuestProfile) => {
+    const guestRes = reservationsForGuestProfile(guest)
+    const noShowRes = guestRes.find(r => r.status === 'NO_SHOW')
+    if (noShowRes) {
+      await handleUndoNoShow(noShowRes)
+      return
+    }
+    const target =
+      guestRes.find(
+        r => r.status === 'PENDING' || r.status === 'CONFIRMED' || r.status === 'CHECKED_IN',
+      ) || guestRes.find(r => r.status !== 'CANCELLED' && r.status !== 'COMPLETED')
+    if (!target) {
+      toast.error('Geen reservatie gevonden om als no-show te markeren.')
+      return
+    }
+    await handleNoShow(target)
   }
 
   const handleCancel = async (r: Reservation) => {
@@ -3017,12 +3052,49 @@ export default function KassaReservationsView({
               {/* === TIJDLIJN LINKS — groeit/krimpt mee met kalender === */}
               <div className="flex flex-col flex-1 overflow-hidden min-w-0">
                 {/* Date nav */}
-                <div className="flex items-center gap-2 mb-3">
-                  <button onClick={() => { const d = new Date(timelineDate + 'T12:00:00'); d.setDate(d.getDate()-1); setTimelineDate(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`) }}
-                    className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronLeft size={16}/></button>
-                  <span className="font-bold text-xl">{formatDate(timelineDate)}</span>
-                  <button onClick={() => { const d = new Date(timelineDate + 'T12:00:00'); d.setDate(d.getDate()+1); setTimelineDate(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`) }}
-                    className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronRight size={16}/></button>
+                <div className="mb-3 flex flex-wrap items-center gap-2">
+                  <div className="flex items-center gap-2 rounded-2xl bg-green-500 px-3 py-2 shadow-md">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const d = new Date(timelineDate + 'T12:00:00')
+                        d.setDate(d.getDate() - 1)
+                        setTimelineDate(
+                          `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
+                        )
+                      }}
+                      className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/60 transition-colors hover:bg-white/85 active:bg-white"
+                      aria-label="Vorige dag"
+                    >
+                      <ChevronLeft size={22} className="text-white" />
+                    </button>
+                    <div className="flex flex-col items-center">
+                      <span className="min-w-[8rem] text-center text-xl font-bold leading-tight text-white">
+                        {formatDate(timelineDate)}
+                      </span>
+                      <input
+                        type="date"
+                        value={timelineDate}
+                        onChange={e => setTimelineDate(e.target.value)}
+                        className="mt-0.5 cursor-pointer rounded-lg border border-gray-300/35 bg-white/65 px-2 py-0.5 text-center text-xs font-semibold text-gray-900 outline-none"
+                        aria-label="Kies datum"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const d = new Date(timelineDate + 'T12:00:00')
+                        d.setDate(d.getDate() + 1)
+                        setTimelineDate(
+                          `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
+                        )
+                      }}
+                      className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/60 transition-colors hover:bg-white/85 active:bg-white"
+                      aria-label="Volgende dag"
+                    >
+                      <ChevronRight size={22} className="text-white" />
+                    </button>
+                  </div>
                   {/* Dag / Avond toggle */}
                   <div className="flex rounded-lg overflow-hidden border border-gray-200 ml-2">
                     <button onClick={() => setTimeShift('dag')}
@@ -3727,6 +3799,7 @@ export default function KassaReservationsView({
             setSearchQuery={setSearchQuery}
             onPromoMailClick={openContactPromoModal}
             onBulkPromoMailClick={openContactPromoModalMany}
+            onToggleNoShow={handleGuestContactNoShow}
             promoSelectionReset={contactPromoSelectionReset}
             rk={rk}
           />
