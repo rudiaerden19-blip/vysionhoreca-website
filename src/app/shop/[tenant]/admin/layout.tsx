@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useEffect, useLayoutEffect, useRef } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { useLanguage } from '@/i18n'
+import { useLanguage, type Locale } from '@/i18n'
 import { getTenantSettings } from '@/lib/admin-api'
 import {
   adminPathToModule,
@@ -609,24 +610,60 @@ function LockButton({ tenant, afterLockHref }: { tenant: string; afterLockHref: 
 
 function LanguageSelector() {
   const [isOpen, setIsOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
+  const [menuPos, setMenuPos] = useState<{ top: number; right: number } | null>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
   const { locale, setLocale, locales, localeNames } = useLanguage()
 
-  useEffect(() => {
-    function handlePointerOutside(event: PointerEvent) {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
-        setIsOpen(false)
-      }
-    }
-    document.addEventListener('pointerdown', handlePointerOutside, true)
-    return () => document.removeEventListener('pointerdown', handlePointerOutside, true)
+  const updateMenuPos = useCallback(() => {
+    const el = triggerRef.current
+    if (!el) return
+    const r = el.getBoundingClientRect()
+    setMenuPos({ top: r.bottom + 8, right: Math.max(8, window.innerWidth - r.right) })
   }, [])
 
+  useLayoutEffect(() => {
+    if (!isOpen) return
+    updateMenuPos()
+    window.addEventListener('resize', updateMenuPos)
+    window.addEventListener('scroll', updateMenuPos, true)
+    return () => {
+      window.removeEventListener('resize', updateMenuPos)
+      window.removeEventListener('scroll', updateMenuPos, true)
+    }
+  }, [isOpen, updateMenuPos])
+
+  useEffect(() => {
+    if (!isOpen) return
+    function handlePointerOutside(event: PointerEvent) {
+      const t = event.target as Node
+      if (triggerRef.current?.contains(t)) return
+      if (menuRef.current?.contains(t)) return
+      setIsOpen(false)
+    }
+    document.addEventListener('pointerdown', handlePointerOutside)
+    return () => document.removeEventListener('pointerdown', handlePointerOutside)
+  }, [isOpen])
+
+  const pickLocale = (langCode: Locale) => {
+    setLocale(langCode)
+    setIsOpen(false)
+  }
+
   return (
-    <div ref={ref} className="relative">
+    <>
       <button
+        ref={triggerRef}
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
+        aria-expanded={isOpen}
+        aria-haspopup="listbox"
+        onClick={() => {
+          setIsOpen((open) => {
+            const next = !open
+            if (next) updateMenuPos()
+            return next
+          })
+        }}
         className="flex touch-manipulation items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors"
       >
         <LocaleFlagEmoji locale={locale} className="text-base text-white" />
@@ -635,25 +672,43 @@ function LanguageSelector() {
         </svg>
       </button>
 
-      {isOpen && (
-        <div className="absolute right-0 mt-2 bg-white rounded-xl shadow-xl border z-[130] min-w-[180px] max-h-80 overflow-y-auto">
-          {locales.map((langCode) => (
-            <button
-              key={langCode}
-              onClick={() => { setLocale(langCode as typeof locale); setIsOpen(false) }}
-              className={`w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors ${locale === langCode ? 'bg-blue-50 text-blue-600': 'text-gray-700'}`}
-            >
-              <LocaleFlagEmoji locale={langCode} className="text-lg" />
-              <span className="text-sm">{localeNames[langCode]}</span>
-              {locale === langCode && (
-                <svg className="w-4 h-4 ml-auto text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              )}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
+      {isOpen &&
+        menuPos &&
+        typeof document !== 'undefined' &&
+        createPortal(
+          <div
+            ref={menuRef}
+            role="listbox"
+            aria-label="Taal"
+            className="fixed z-[250] min-w-[180px] max-h-80 overflow-y-auto rounded-xl border bg-white shadow-xl"
+            style={{ top: menuPos.top, right: menuPos.right }}
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            {locales.map((langCode) => (
+              <button
+                key={langCode}
+                type="button"
+                role="option"
+                aria-selected={locale === langCode}
+                onPointerDown={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  pickLocale(langCode)
+                }}
+                className={`flex w-full touch-manipulation items-center gap-3 px-4 py-2.5 transition-colors hover:bg-gray-50 ${locale === langCode ? 'bg-blue-50 text-blue-600': 'text-gray-700'}`}
+              >
+                <LocaleFlagEmoji locale={langCode} className="text-lg" />
+                <span className="text-sm">{localeNames[langCode]}</span>
+                {locale === langCode && (
+                  <svg className="ml-auto h-4 w-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+              </button>
+            ))}
+          </div>,
+          document.body,
+        )}
+    </>
   )
 }
