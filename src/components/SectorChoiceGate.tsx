@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { usePathname } from 'next/navigation'
 import { useLanguage } from '@/i18n'
+import { shouldShowSectorChoiceGate } from '@/lib/sector-choice-gate-path'
 
 const STORAGE_KEY = 'vysion_landing_sector_v1'
 
@@ -24,18 +25,6 @@ const SECTOR_IDS = [
 ] as const
 
 export type LandingSectorId = (typeof SECTOR_IDS)[number]
-
-function isMarketingSitePath(pathname: string | null): boolean {
-  if (!pathname) return false
-  if (pathname.startsWith('/shop')) return false
-  if (pathname.startsWith('/superadmin')) return false
-  if (pathname.startsWith('/dashboard')) return false
-  if (pathname.startsWith('/keuken')) return false
-  // Staff/auth flows: géén sector-overlay (z-[200]) boven formulier — blokkeerde o.a. taalkiezer op /login
-  if (pathname.startsWith('/login')) return false
-  if (pathname.startsWith('/verify-email')) return false
-  return true
-}
 
 function hasStoredSector(): boolean {
   try {
@@ -69,7 +58,8 @@ export default function SectorChoiceGate() {
 
   useEffect(() => {
     if (!mounted) return
-    if (!isMarketingSitePath(pathname)) {
+    const host = typeof window !== 'undefined' ? window.location.hostname : ''
+    if (!shouldShowSectorChoiceGate(pathname, host)) {
       setOpen(false)
       return
     }

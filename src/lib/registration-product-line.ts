@@ -238,3 +238,12 @@ export function marketingHomeHrefForProductLineParam(productLineParam: string | 
   }
   return '/'
 }
+
+/** URL `?line=` of `?productLine=` (TableVysion login-link). */
+export function registrationProductLineFromUrlSearchParams(
+  params: URLSearchParams,
+): RegistrationProductLine | null {
+  const raw = params.get('line') ?? params.get('productLine')
+  if (raw && isRegistrationProductLine(raw)) return raw
+  return null
+}

@@ -9,7 +9,7 @@ import { persistTenantSessionWithToday, internalShopPathToTenantHostPath } from 
 import { LocaleFlagEmoji, LocaleFlagWithCode } from '@/components/LocaleFlagEmoji'
 import { RegistrationProductLinePicker } from '@/components/register/RegistrationProductLinePicker'
 import {
-  isRegistrationProductLine,
+  registrationProductLineFromUrlSearchParams,
   type RegistrationProductLine,
 } from '@/lib/registration-product-line'
 
@@ -30,6 +30,8 @@ export default function RegisterPage() {
   const [showInstallPopup, setShowInstallPopup] = useState(false)
   const [tenantSlug, setTenantSlug] = useState('')
   const [productLine, setProductLine] = useState<RegistrationProductLine | null>(null)
+  /** Vast uit URL (TableVysion / ?productLine=restaurant_reservaties) — geen pakket-popup. */
+  const [productLineLockedFromUrl, setProductLineLockedFromUrl] = useState(false)
   const [step, setStep] = useState<'line' |  'form'>('line')
   const langRef = useRef<HTMLDivElement>(null)
 
@@ -41,9 +43,10 @@ export default function RegisterPage() {
       if (langParam && locales.includes(langParam)) {
         setLocale(langParam)
       }
-      const lineParam = params.get('line')
-      if (lineParam && isRegistrationProductLine(lineParam)) {
-        setProductLine(lineParam)
+      const lineFromUrl = registrationProductLineFromUrlSearchParams(params)
+      if (lineFromUrl) {
+        setProductLine(lineFromUrl)
+        setProductLineLockedFromUrl(true)
         setStep('form')
       }
     }
@@ -456,7 +459,7 @@ export default function RegisterPage() {
             <p className="mt-1 text-sm text-gray-600">
               {t('register.subtitle')}
             </p>
-            {productLine && (
+            {productLine && !productLineLockedFromUrl && (
               <button
                 type="button"
                 onClick={() => {
@@ -470,6 +473,7 @@ export default function RegisterPage() {
             )}
           </div>
 
+          {!productLineLockedFromUrl && (
           <div className="mb-6">
             <RegistrationProductLinePicker
               value={productLine}
@@ -477,6 +481,20 @@ export default function RegisterPage() {
               compact
             />
           </div>
+          )}
+
+          {productLineLockedFromUrl && productLine === 'restaurant_reservaties' && (
+            <div className="mb-6 rounded-xl border-2 border-accent bg-white p-4">
+              <p className="font-bold text-gray-900">{t('register.productLine.restaurant_reservaties.title')}</p>
+              <p className="mt-1 text-sm text-gray-600">{t('register.productLine.restaurant_reservaties.desc')}</p>
+            </div>
+          )}
+
+          {productLineLockedFromUrl && productLine && productLine !== 'restaurant_reservaties' && (
+            <div className="mb-6 rounded-xl border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700">
+              {t(`register.productLine.${productLine}.title`)}
+            </div>
+          )}
 
           <form
             onSubmit={handleSubmit}
