@@ -3083,7 +3083,7 @@ export default function KassaReservationsView({
 
                   <div
                     data-floor-ui
-                    className="absolute bottom-[max(1rem,env(safe-area-inset-bottom))] left-[max(1rem,env(safe-area-inset-left))] z-[35] flex flex-col gap-2 touch-manipulation"
+                    className="absolute bottom-[max(3.75rem,calc(env(safe-area-inset-bottom,0px)+1.75rem))] left-[max(1rem,env(safe-area-inset-left))] z-[35] flex flex-col gap-2 touch-manipulation"
                     onPointerDown={e => e.stopPropagation()}
                   >
                     <button
