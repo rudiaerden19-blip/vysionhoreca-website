@@ -619,7 +619,8 @@ function LanguageSelector() {
     const el = triggerRef.current
     if (!el) return
     const r = el.getBoundingClientRect()
-    setMenuPos({ top: r.bottom + 8, right: Math.max(8, window.innerWidth - r.right) })
+    // Menu boven de knop (in de header) — voorkomt overlap met reserveringsknoppen/inputs eronder
+    setMenuPos({ top: r.top - 8, right: Math.max(8, window.innerWidth - r.right) })
   }, [])
 
   useLayoutEffect(() => {
@@ -635,14 +636,11 @@ function LanguageSelector() {
 
   useEffect(() => {
     if (!isOpen) return
-    function handlePointerOutside(event: PointerEvent) {
-      const t = event.target as Node
-      if (triggerRef.current?.contains(t)) return
-      if (menuRef.current?.contains(t)) return
-      setIsOpen(false)
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = prev
     }
-    document.addEventListener('pointerdown', handlePointerOutside)
-    return () => document.removeEventListener('pointerdown', handlePointerOutside)
   }, [isOpen])
 
   const pickLocale = (langCode: Locale) => {
@@ -676,37 +674,42 @@ function LanguageSelector() {
         menuPos &&
         typeof document !== 'undefined' &&
         createPortal(
-          <div
-            ref={menuRef}
-            role="listbox"
-            aria-label="Taal"
-            className="fixed z-[250] min-w-[180px] max-h-80 overflow-y-auto rounded-xl border bg-white shadow-xl"
-            style={{ top: menuPos.top, right: menuPos.right }}
-            onPointerDown={(e) => e.stopPropagation()}
-          >
-            {locales.map((langCode) => (
-              <button
-                key={langCode}
-                type="button"
-                role="option"
-                aria-selected={locale === langCode}
-                onPointerDown={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  pickLocale(langCode)
-                }}
-                className={`flex w-full touch-manipulation items-center gap-3 px-4 py-2.5 transition-colors hover:bg-gray-50 ${locale === langCode ? 'bg-blue-50 text-blue-600': 'text-gray-700'}`}
-              >
-                <LocaleFlagEmoji locale={langCode} className="text-lg" />
-                <span className="text-sm">{localeNames[langCode]}</span>
-                {locale === langCode && (
-                  <svg className="ml-auto h-4 w-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                )}
-              </button>
-            ))}
-          </div>,
+          <>
+            <div
+              className="fixed inset-0 z-[249] touch-none bg-black/20"
+              aria-hidden
+              onClick={() => setIsOpen(false)}
+            />
+            <div
+              ref={menuRef}
+              role="listbox"
+              aria-label="Taal"
+              className="fixed z-[250] min-w-[180px] max-h-80 -translate-y-full overflow-y-auto rounded-xl border bg-white shadow-xl"
+              style={{ top: menuPos.top, right: menuPos.right }}
+            >
+              {locales.map((langCode) => (
+                <button
+                  key={langCode}
+                  type="button"
+                  role="option"
+                  aria-selected={locale === langCode}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    pickLocale(langCode)
+                  }}
+                  className={`flex w-full touch-manipulation items-center gap-3 px-4 py-2.5 transition-colors hover:bg-gray-50 ${locale === langCode ? 'bg-blue-50 text-blue-600': 'text-gray-700'}`}
+                >
+                  <LocaleFlagEmoji locale={langCode} className="text-lg" />
+                  <span className="text-sm">{localeNames[langCode]}</span>
+                  {locale === langCode && (
+                    <svg className="ml-auto h-4 w-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </button>
+              ))}
+            </div>
+          </>,
           document.body,
         )}
     </>
