@@ -6,12 +6,26 @@ export type ReservationFloorViewport = {
   zoom: number
 }
 
-/** Ruimte rond tafel-midden in % van het vlak (SVG + stoelen). */
-const TABLE_HALO_PCT = 14
+/** Ruimte rond tafel-midden in % van het vlak (SVG + stoelen + gastlabels). */
+const TABLE_HALO_PCT = 20
 
-const MIN_ZOOM = 0.2
-const MAX_ZOOM = 2
+const MIN_ZOOM = 0.15
+/** Fit-toont-alle: nooit inzoomen boven 100% — anders worden tafels op iPad gigantisch. */
+const MAX_FIT_ZOOM = 1
 const VIEWPORT_PAD_PX = 28
+
+/** Schaal tafel-SVG op kleine viewports (iPad plattegrond, smalle hoogte). */
+export function computeReservationFloorTableVisualScale(
+  viewportW: number,
+  viewportH: number,
+): number {
+  if (viewportW <= 0 || viewportH <= 0) return 1
+  const refW = 1024
+  const refH = 720
+  const byW = viewportW / refW
+  const byH = viewportH / refH
+  return Math.min(1, Math.max(0.28, Math.min(byW, byH)))
+}
 
 export function computeFitReservationFloorViewport(
   tables: { x: number; y: number }[],
@@ -38,12 +52,12 @@ export function computeFitReservationFloorViewport(
     return { panX: 0, panY: 0, zoom: 1 }
   }
 
-  const zoom = Math.min(
+  const zoomRaw = Math.min(
     (viewportW - VIEWPORT_PAD_PX * 2) / boxW,
     (viewportH - VIEWPORT_PAD_PX * 2) / boxH,
-    MAX_ZOOM,
+    MAX_FIT_ZOOM,
   )
-  const clampedZoom = Math.max(MIN_ZOOM, zoom)
+  const clampedZoom = Math.max(MIN_ZOOM, zoomRaw)
 
   const centerX = ((minX + maxX) / 2 / 100) * viewportW
   const centerY = ((minY + maxY) / 2 / 100) * viewportH

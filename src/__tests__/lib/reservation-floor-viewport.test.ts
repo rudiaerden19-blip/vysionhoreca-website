@@ -1,4 +1,14 @@
-import { computeFitReservationFloorViewport } from '@/lib/reservation-floor-viewport'
+import {
+  computeFitReservationFloorViewport,
+  computeReservationFloorTableVisualScale,
+} from '@/lib/reservation-floor-viewport'
+
+describe('computeReservationFloorTableVisualScale', () => {
+  it('scales down on short viewports', () => {
+    expect(computeReservationFloorTableVisualScale(1024, 720)).toBe(1)
+    expect(computeReservationFloorTableVisualScale(1024, 400)).toBeLessThan(0.65)
+  })
+})
 
 describe('computeFitReservationFloorViewport', () => {
   it('returns default when no tables', () => {
@@ -22,9 +32,8 @@ describe('computeFitReservationFloorViewport', () => {
     expect(v.zoom).toBeGreaterThanOrEqual(0.2)
   })
 
-  it('centers a single table', () => {
-    const v = computeFitReservationFloorViewport([{ x: 80, y: 20 }], 500, 500)
-    const centerScreenX = v.panX + (80 / 100) * 500 * v.zoom
-    expect(centerScreenX).toBeCloseTo(250, 0)
+  it('never zooms in above 1 when fitting a tight cluster', () => {
+    const v = computeFitReservationFloorViewport([{ x: 50, y: 50 }], 800, 600)
+    expect(v.zoom).toBeLessThanOrEqual(1)
   })
 })

@@ -83,6 +83,7 @@ import {
 } from '@/components/kassa-reservations/kassa-reservations-constants'
 import {
   computeFitReservationFloorViewport,
+  computeReservationFloorTableVisualScale,
   type ReservationFloorViewport,
 } from '@/lib/reservation-floor-viewport'
 
@@ -280,8 +281,11 @@ export default function KassaReservationsView({
   } | null>(null)
   const floorPanMovedRef = useRef(false)
   const [isPanningFloor, setIsPanningFloor] = useState(false)
+  const [floorTableVisualScale, setFloorTableVisualScale] = useState(1)
+  const floorAutoFitKeyRef = useRef('')
   useEffect(() => {
     setFloorViewport({ panX: 0, panY: 0, zoom: 1 })
+    floorAutoFitKeyRef.current = ''
   }, [resFloorPlanZone])
   /** Horizontaal scrollende tijdlijn — nodig voor correcte resize (pixels ↔ minuten) */
   const timelineGridScrollRef = useRef<HTMLDivElement>(null)
@@ -970,8 +974,44 @@ export default function KassaReservationsView({
     const el = canvasRef.current
     if (!el) return
     const r = el.getBoundingClientRect()
+    const visual = computeReservationFloorTableVisualScale(r.width, r.height)
+    setFloorTableVisualScale(visual)
     setFloorViewport(computeFitReservationFloorViewport(floorPlanTablesDB, r.width, r.height))
   }, [floorPlanTablesDB])
+
+  useEffect(() => {
+    if (viewMode !== 'floorplan' && viewMode !== 'today') return
+    const syncScale = () => {
+      const el = canvasRef.current
+      const r = el?.getBoundingClientRect()
+      const w = r && r.width > 0 ? r.width : window.innerWidth
+      const h = r && r.height > 0 ? r.height : window.innerHeight
+      setFloorTableVisualScale(computeReservationFloorTableVisualScale(w, h))
+    }
+    syncScale()
+    window.addEventListener('resize', syncScale)
+    const el = canvasRef.current
+    const ro =
+      el && viewMode === 'floorplan'
+        ? new ResizeObserver(() => syncScale())
+        : null
+    if (el && ro) ro.observe(el)
+    return () => {
+      window.removeEventListener('resize', syncScale)
+      ro?.disconnect()
+    }
+  }, [viewMode, resFloorPlanZone])
+
+  useEffect(() => {
+    if (viewMode !== 'floorplan' || floorPlanTablesDB.length === 0) return
+    const key = `${resFloorPlanZone}:${floorPlanTablesDB.map((t) => t.id).join(',')}`
+    if (floorAutoFitKeyRef.current === key) return
+    const t = window.requestAnimationFrame(() => {
+      fitReservationFloorView()
+      floorAutoFitKeyRef.current = key
+    })
+    return () => window.cancelAnimationFrame(t)
+  }, [viewMode, resFloorPlanZone, floorPlanTablesDB, fitReservationFloorView])
 
   /** Plattegrond pan (v1): alleen als tafels vergrendeld — lege vloer slepen, tafels niet. */
   const handleResFloorCanvasPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -2481,7 +2521,7 @@ export default function KassaReservationsView({
                         style={{
                           left: `${table.x}%`,
                           top: `${table.y}%`,
-                          transform: `translate(-50%, -50%) rotate(${table.rotation}deg)`,
+                          transform: `translate(-50%, -50%) rotate(${table.rotation}deg) scale(${floorTableVisualScale})`,
                           cursor: tableRes ? 'pointer': 'default',
                           zIndex: isSelected ? 10 : 1,
                         }}
@@ -2896,7 +2936,7 @@ export default function KassaReservationsView({
                         style={{
                           left: `${table.x}%`,
                           top: `${table.y}%`,
-                          transform: `translate(-50%, -50%) rotate(${table.rotation}deg)`,
+                          transform: `translate(-50%, -50%) rotate(${table.rotation}deg) scale(${floorTableVisualScale})`,
                           zIndex: isSelected ? 10 : 1,
                           cursor: tablesLocked ? 'default': isDraggingFloor ? 'grabbing': 'grab',
                           touchAction: 'none',
