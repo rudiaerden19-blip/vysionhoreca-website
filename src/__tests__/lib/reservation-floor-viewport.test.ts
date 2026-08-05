@@ -1,39 +1,30 @@
 import {
-  computeFitReservationFloorViewport,
-  computeReservationFloorTableVisualScale,
+  clampFloorViewportZoom,
+  pinchZoomReservationFloor,
+  zoomReservationFloorAtPoint,
 } from '@/lib/reservation-floor-viewport'
 
-describe('computeReservationFloorTableVisualScale', () => {
-  it('scales down on short viewports', () => {
-    expect(computeReservationFloorTableVisualScale(1024, 720)).toBe(1)
-    expect(computeReservationFloorTableVisualScale(1024, 400)).toBeLessThan(0.65)
+describe('reservation-floor-viewport', () => {
+  it('clamps zoom', () => {
+    expect(clampFloorViewportZoom(0.01)).toBeGreaterThanOrEqual(0.08)
+    expect(clampFloorViewportZoom(99)).toBeLessThanOrEqual(2.5)
   })
-})
 
-describe('computeFitReservationFloorViewport', () => {
-  it('returns default when no tables', () => {
-    expect(computeFitReservationFloorViewport([], 800, 600)).toEqual({
-      panX: 0,
-      panY: 0,
+  it('zooms out at viewport center', () => {
+    const vp = { panX: 0, panY: 0, zoom: 1 }
+    const out = zoomReservationFloorAtPoint(vp, 0.5, 200, 150)
+    expect(out.zoom).toBe(0.5)
+  })
+
+  it('pinch ratio scales zoom from start', () => {
+    const start = {
+      panX: 10,
+      panY: 20,
       zoom: 1,
-    })
-  })
-
-  it('zooms out when tables span wide area', () => {
-    const v = computeFitReservationFloorViewport(
-      [
-        { x: 10, y: 50 },
-        { x: 90, y: 50 },
-      ],
-      400,
-      400,
-    )
-    expect(v.zoom).toBeLessThan(1)
-    expect(v.zoom).toBeGreaterThanOrEqual(0.2)
-  })
-
-  it('never zooms in above 1 when fitting a tight cluster', () => {
-    const v = computeFitReservationFloorViewport([{ x: 50, y: 50 }], 800, 600)
-    expect(v.zoom).toBeLessThanOrEqual(1)
+      anchorLocalX: 100,
+      anchorLocalY: 100,
+    }
+    const z2 = pinchZoomReservationFloor(start, 100, 50)
+    expect(z2.zoom).toBe(0.5)
   })
 })

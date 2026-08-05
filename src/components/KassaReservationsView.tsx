@@ -82,8 +82,10 @@ import {
   mapReservationSettingsFromDb,
 } from '@/components/kassa-reservations/kassa-reservations-constants'
 import {
-  computeFitReservationFloorViewport,
-  computeReservationFloorTableVisualScale,
+  defaultFloorViewportForDevice,
+  pinchDistance,
+  pinchZoomReservationFloor,
+  zoomReservationFloorAtPoint,
   type ReservationFloorViewport,
 } from '@/lib/reservation-floor-viewport'
 
@@ -281,11 +283,19 @@ export default function KassaReservationsView({
   } | null>(null)
   const floorPanMovedRef = useRef(false)
   const [isPanningFloor, setIsPanningFloor] = useState(false)
-  const [floorTableVisualScale, setFloorTableVisualScale] = useState(1)
-  const floorAutoFitKeyRef = useRef('')
+  const floorPointersRef = useRef(new Map<number, { clientX: number; clientY: number }>())
+  const floorPinchSessionRef = useRef<{
+    pointerIds: [number, number]
+    startDist: number
+    startViewport: ReservationFloorViewport
+    anchorLocalX: number
+    anchorLocalY: number
+  } | null>(null)
   useEffect(() => {
-    setFloorViewport({ panX: 0, panY: 0, zoom: 1 })
-    floorAutoFitKeyRef.current = ''
+    const touch = typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0
+    setFloorViewport(defaultFloorViewportForDevice(touch))
+    floorPointersRef.current.clear()
+    floorPinchSessionRef.current = null
   }, [resFloorPlanZone])
   /** Horizontaal scrollende tijdlijn — nodig voor correcte resize (pixels ↔ minuten) */
   const timelineGridScrollRef = useRef<HTMLDivElement>(null)
@@ -970,58 +980,52 @@ export default function KassaReservationsView({
     toast.success(rk('tableRemoved'))
   }
 
-  const fitReservationFloorView = useCallback(() => {
+  const stepFloorZoom = useCallback((factor: number) => {
     const el = canvasRef.current
     if (!el) return
     const r = el.getBoundingClientRect()
-    const visual = computeReservationFloorTableVisualScale(r.width, r.height)
-    setFloorTableVisualScale(visual)
-    setFloorViewport(computeFitReservationFloorViewport(floorPlanTablesDB, r.width, r.height))
-  }, [floorPlanTablesDB])
+    setFloorViewport((vp) =>
+      zoomReservationFloorAtPoint(vp, factor, r.width / 2, r.height / 2),
+    )
+  }, [])
 
-  useEffect(() => {
-    if (viewMode !== 'floorplan' && viewMode !== 'today') return
-    const syncScale = () => {
-      const el = canvasRef.current
-      const r = el?.getBoundingClientRect()
-      const w = r && r.width > 0 ? r.width : window.innerWidth
-      const h = r && r.height > 0 ? r.height : window.innerHeight
-      setFloorTableVisualScale(computeReservationFloorTableVisualScale(w, h))
+  const beginFloorPinchIfNeeded = () => {
+    const ids = [...floorPointersRef.current.keys()]
+    if (ids.length < 2) return
+    const floor = canvasRef.current
+    if (!floor) return
+    const rect = floor.getBoundingClientRect()
+    const p1 = floorPointersRef.current.get(ids[0])!
+    const p2 = floorPointersRef.current.get(ids[1])!
+    const midX = (p1.clientX + p2.clientX) / 2 - rect.left
+    const midY = (p1.clientY + p2.clientY) / 2 - rect.top
+    floorPanDragRef.current = null
+    setIsPanningFloor(false)
+    floorPinchSessionRef.current = {
+      pointerIds: [ids[0], ids[1]],
+      startDist: pinchDistance(p1.clientX, p1.clientY, p2.clientX, p2.clientY),
+      startViewport: { ...floorViewportRef.current },
+      anchorLocalX: midX,
+      anchorLocalY: midY,
     }
-    syncScale()
-    window.addEventListener('resize', syncScale)
-    const el = canvasRef.current
-    const ro =
-      el && viewMode === 'floorplan'
-        ? new ResizeObserver(() => syncScale())
-        : null
-    if (el && ro) ro.observe(el)
-    return () => {
-      window.removeEventListener('resize', syncScale)
-      ro?.disconnect()
-    }
-  }, [viewMode, resFloorPlanZone])
+  }
 
-  useEffect(() => {
-    if (viewMode !== 'floorplan' || floorPlanTablesDB.length === 0) return
-    const key = `${resFloorPlanZone}:${floorPlanTablesDB.map((t) => t.id).join(',')}`
-    if (floorAutoFitKeyRef.current === key) return
-    const t = window.requestAnimationFrame(() => {
-      fitReservationFloorView()
-      floorAutoFitKeyRef.current = key
-    })
-    return () => window.cancelAnimationFrame(t)
-  }, [viewMode, resFloorPlanZone, floorPlanTablesDB, fitReservationFloorView])
-
-  /** Plattegrond pan (v1): alleen als tafels vergrendeld — lege vloer slepen, tafels niet. */
+  /** Plattegrond pan/pinch: lege vloer — schuiven + knijpen (iPad); tafels niet verplaatsen. */
   const handleResFloorCanvasPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!tablesLockedRef.current) return
-    if (e.button !== 0) return
+    if (e.button !== 0 && e.pointerType !== 'touch') return
     const target = e.target as HTMLElement
     if (target.closest('[data-table-id]')) return
     if (target.closest('[data-floor-ui]')) return
     const floor = canvasRef.current
     if (!floor) return
+
+    floorPointersRef.current.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY })
+
+    if (floorPointersRef.current.size >= 2) {
+      beginFloorPinchIfNeeded()
+      return
+    }
+
     floorPanMovedRef.current = false
     const vp = floorViewportRef.current
     floorPanDragRef.current = {
@@ -1033,6 +1037,16 @@ export default function KassaReservationsView({
     }
     floor.setPointerCapture(e.pointerId)
     setIsPanningFloor(true)
+  }
+
+  const handleResFloorCanvasPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    floorPointersRef.current.delete(e.pointerId)
+    if (floorPointersRef.current.size < 2) {
+      floorPinchSessionRef.current = null
+    }
+    if (floorPanDragRef.current?.pointerId === e.pointerId) {
+      finalizeResFloorPan(e)
+    }
   }
 
   const finalizeResFloorPan = (e: React.PointerEvent) => {
@@ -1081,8 +1095,36 @@ export default function KassaReservationsView({
   }
 
   const handleResFloorPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (floorPointersRef.current.has(e.pointerId)) {
+      floorPointersRef.current.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY })
+    }
+
+    const pinch = floorPinchSessionRef.current
+    if (pinch && floorPointersRef.current.size >= 2) {
+      const p1 = floorPointersRef.current.get(pinch.pointerIds[0])
+      const p2 = floorPointersRef.current.get(pinch.pointerIds[1])
+      if (p1 && p2) {
+        const dist = pinchDistance(p1.clientX, p1.clientY, p2.clientX, p2.clientY)
+        if (dist > 0 && pinch.startDist > 0) {
+          floorPanMovedRef.current = true
+          setFloorViewport(
+            pinchZoomReservationFloor(
+              {
+                ...pinch.startViewport,
+                anchorLocalX: pinch.anchorLocalX,
+                anchorLocalY: pinch.anchorLocalY,
+              },
+              pinch.startDist,
+              dist,
+            ),
+          )
+        }
+      }
+      return
+    }
+
     const panDrag = floorPanDragRef.current
-    if (panDrag && tablesLockedRef.current) {
+    if (panDrag) {
       const dx = e.clientX - panDrag.startX
       const dy = e.clientY - panDrag.startY
       if (Math.abs(dx) > 4 || Math.abs(dy) > 4) floorPanMovedRef.current = true
@@ -1124,11 +1166,6 @@ export default function KassaReservationsView({
   }
 
   const finalizeResFloorDrag = async (e: React.PointerEvent) => {
-    if (floorPanDragRef.current) {
-      finalizeResFloorPan(e)
-      return
-    }
-
     const capEl = floorDragTableElRef.current
     if (capEl) {
       try {
@@ -2521,7 +2558,7 @@ export default function KassaReservationsView({
                         style={{
                           left: `${table.x}%`,
                           top: `${table.y}%`,
-                          transform: `translate(-50%, -50%) rotate(${table.rotation}deg) scale(${floorTableVisualScale})`,
+                          transform: `translate(-50%, -50%) rotate(${table.rotation}deg)`,
                           cursor: tableRes ? 'pointer': 'default',
                           zIndex: isSelected ? 10 : 1,
                         }}
@@ -2682,17 +2719,6 @@ export default function KassaReservationsView({
                   <span className="hidden sm:inline">Alleen vloer</span>
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => fitReservationFloorView()}
-                  className="flex min-h-[44px] items-center gap-2 rounded-xl border-2 border-[#075985] bg-white px-3 py-2 text-sm font-bold text-[#075985] shadow-sm transition-colors hover:bg-[#e8eef6]"
-                  title="Zoom zodat alle tafels zichtbaar zijn"
-                >
-                  <LayoutGrid size={18} className="shrink-0" />
-                  <span className="hidden sm:inline">Toon alle tafels</span>
-                  <span className="sm:hidden">Alles</span>
-                </button>
-
                 {/* Vergrendel-knop */}
                 <button
                   onClick={() => {
@@ -2832,8 +2858,29 @@ export default function KassaReservationsView({
                   }}
                   onPointerDown={handleResFloorCanvasPointerDown}
                   onPointerMove={handleResFloorPointerMove}
-                  onPointerUp={e => void finalizeResFloorDrag(e)}
-                  onPointerCancel={e => void finalizeResFloorDrag(e)}
+                  onPointerUp={e => {
+                    handleResFloorCanvasPointerUp(e)
+                    void finalizeResFloorDrag(e)
+                  }}
+                  onPointerCancel={e => {
+                    handleResFloorCanvasPointerUp(e)
+                    void finalizeResFloorDrag(e)
+                  }}
+                  onWheel={e => {
+                    if (viewMode !== 'floorplan') return
+                    e.preventDefault()
+                    const rect = canvasRef.current?.getBoundingClientRect()
+                    if (!rect) return
+                    const factor = e.deltaY < 0 ? 1.12 : 1 / 1.12
+                    setFloorViewport((vp) =>
+                      zoomReservationFloorAtPoint(
+                        vp,
+                        factor,
+                        e.clientX - rect.left,
+                        e.clientY - rect.top,
+                      ),
+                    )
+                  }}
                   onClick={() => {
                     if (floorPanMovedRef.current || floorDragMoved.current) return
                     setSelectedFloorTable(null)
@@ -2845,18 +2892,6 @@ export default function KassaReservationsView({
                       className="absolute right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-[35] flex max-w-[calc(100%-1.5rem)] flex-row flex-wrap items-center justify-end gap-2"
                       onPointerDown={e => e.stopPropagation()}
                     >
-                      <button
-                        type="button"
-                        onClick={e => {
-                          e.stopPropagation()
-                          fitReservationFloorView()
-                        }}
-                        className="flex min-h-[44px] shrink-0 items-center gap-2 rounded-xl border-2 border-white/90 bg-white px-3 py-2 text-sm font-bold text-[#075985] shadow-lg transition-colors hover:bg-[#e8eef6] sm:px-4"
-                        title="Toon alle tafels"
-                      >
-                        <LayoutGrid size={18} className="shrink-0" />
-                        <span className="hidden sm:inline">Toon alle tafels</span>
-                      </button>
                       <button
                         type="button"
                         onClick={e => {
@@ -2936,7 +2971,7 @@ export default function KassaReservationsView({
                         style={{
                           left: `${table.x}%`,
                           top: `${table.y}%`,
-                          transform: `translate(-50%, -50%) rotate(${table.rotation}deg) scale(${floorTableVisualScale})`,
+                          transform: `translate(-50%, -50%) rotate(${table.rotation}deg)`,
                           zIndex: isSelected ? 10 : 1,
                           cursor: tablesLocked ? 'default': isDraggingFloor ? 'grabbing': 'grab',
                           touchAction: 'none',
@@ -2977,6 +3012,35 @@ export default function KassaReservationsView({
                       </div>
                     )
                   })}
+                  </div>
+
+                  <div
+                    data-floor-ui
+                    className="absolute bottom-[max(1rem,env(safe-area-inset-bottom))] left-[max(1rem,env(safe-area-inset-left))] z-[35] flex flex-col gap-2 touch-manipulation"
+                    onPointerDown={e => e.stopPropagation()}
+                  >
+                    <button
+                      type="button"
+                      aria-label="Inzoomen"
+                      onClick={e => {
+                        e.stopPropagation()
+                        stepFloorZoom(1.22)
+                      }}
+                      className="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-gray-900 shadow-lg ring-1 ring-black/10 active:bg-gray-100"
+                    >
+                      <span className="text-2xl font-bold leading-none" aria-hidden>+</span>
+                    </button>
+                    <button
+                      type="button"
+                      aria-label="Uitzoomen"
+                      onClick={e => {
+                        e.stopPropagation()
+                        stepFloorZoom(1 / 1.22)
+                      }}
+                      className="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-gray-900 shadow-lg ring-1 ring-black/10 active:bg-gray-100"
+                    >
+                      <span className="text-2xl font-bold leading-none" aria-hidden>−</span>
+                    </button>
                   </div>
 
                   {/* Datum kiezer rechtsonder — alleen bij “alleen vloer” (toolbar verborgen) */}
