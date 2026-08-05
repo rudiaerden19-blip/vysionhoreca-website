@@ -3764,7 +3764,9 @@ export default function KassaReservationsView({
             const isTerminal = r.status === 'CANCELLED' || r.status === 'WAITLIST'
             const statusRowBg = reservationListRowBackgroundClass(r.status)
             const rowBg =
-              statusRowBg || (idx % 2 === 0 ? 'bg-white hover:bg-[#f2f5fa]/80' : 'bg-gray-50/40 hover:bg-[#f2f5fa]/80')
+              statusRowBg.includes('bg-')
+                ? statusRowBg
+                : `${statusRowBg} ${idx % 2 === 0 ? 'bg-white hover:bg-[#f2f5fa]/80' : 'bg-gray-50/40 hover:bg-[#f2f5fa]/80'}`
 
             return (
             <tr key={r.id} style={{ borderBottom: '1px solid #e5e7eb'}}

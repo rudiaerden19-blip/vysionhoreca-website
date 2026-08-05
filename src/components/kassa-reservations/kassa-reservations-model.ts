@@ -118,17 +118,17 @@ export function isReservationDepositPaid(
   return ps === 'deposit_paid' || ps === 'paid'
 }
 
-/** Lijstweergave: subtiele rij-achtergrond na statusknop (Binnen blauw, Tafel vrij groen, No-show rood). */
+/** Lijstweergave: rij-achtergrond na statusknop (Binnen blauw, Tafel vrij groen, No-show rood). */
 export function reservationListRowBackgroundClass(status: ReservationStatus): string {
   switch (status) {
     case 'CHECKED_IN':
-      return 'bg-sky-50 hover:bg-sky-100/80'
+      return 'bg-sky-100 hover:bg-sky-200/80 border-l-[5px] border-sky-500'
     case 'COMPLETED':
-      return 'bg-emerald-50 hover:bg-emerald-100/80'
+      return 'bg-emerald-100 hover:bg-emerald-200/80 border-l-[5px] border-emerald-500'
     case 'NO_SHOW':
-      return 'bg-red-50 hover:bg-red-100/80'
+      return 'bg-red-100 hover:bg-red-200/80 border-l-[5px] border-red-500'
     default:
-      return ''
+      return 'border-l-[5px] border-transparent'
   }
 }
 
