@@ -34,10 +34,6 @@ export function zoomReservationFloorAtPoint(
 export const FLOOR_DEFAULT_OPEN_ZOOM_TOUCH = 0.8
 export const FLOOR_DEFAULT_OPEN_ZOOM_DESKTOP = 1
 
-/** Gastlabels / stoelen — marge in % zodat tekst niet links/rechts wordt afgesneden. */
-const OPEN_HALO_X_PCT = 24
-const OPEN_HALO_Y_PCT = 20
-
 export function defaultFloorViewportForDevice(isTouch: boolean): ReservationFloorViewport {
   return {
     panX: 0,
@@ -46,36 +42,14 @@ export function defaultFloorViewportForDevice(isTouch: boolean): ReservationFloo
   }
 }
 
-/** Openingsstand: vaste zoom + pan zodat tafelcluster (incl. labels) gecentreerd is. */
+/** Openingsstand: vaste zoom, geen auto-center — tafel-x/y % blijven visueel op dezelfde plek op elk scherm. */
 export function openingFloorViewportForTables(
-  tables: { x: number; y: number }[],
-  viewportW: number,
-  viewportH: number,
+  _tables: { x: number; y: number }[],
+  _viewportW: number,
+  _viewportH: number,
   isTouch: boolean,
 ): ReservationFloorViewport {
-  const zoom = isTouch ? FLOOR_DEFAULT_OPEN_ZOOM_TOUCH : FLOOR_DEFAULT_OPEN_ZOOM_DESKTOP
-  if (tables.length === 0 || viewportW <= 0 || viewportH <= 0) {
-    return { panX: 0, panY: 0, zoom }
-  }
-
-  let minX = Math.min(...tables.map((t) => t.x)) - OPEN_HALO_X_PCT
-  let maxX = Math.max(...tables.map((t) => t.x)) + OPEN_HALO_X_PCT
-  let minY = Math.min(...tables.map((t) => t.y)) - OPEN_HALO_Y_PCT
-  let maxY = Math.max(...tables.map((t) => t.y)) + OPEN_HALO_Y_PCT
-
-  minX = Math.max(0, minX)
-  maxX = Math.min(100, maxX)
-  minY = Math.max(0, minY)
-  maxY = Math.min(100, maxY)
-
-  const centerX = ((minX + maxX) / 2 / 100) * viewportW
-  const centerY = ((minY + maxY) / 2 / 100) * viewportH
-
-  return {
-    zoom,
-    panX: viewportW / 2 - centerX * zoom,
-    panY: viewportH / 2 - centerY * zoom,
-  }
+  return defaultFloorViewportForDevice(isTouch)
 }
 
 export function pinchDistance(x1: number, y1: number, x2: number, y2: number): number {

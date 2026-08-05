@@ -22,18 +22,19 @@ describe('reservation-floor-viewport', () => {
     expect(defaultFloorViewportForDevice(true).zoom).toBe(0.8)
   })
 
-  it('shifts pan right when tables sit on the left', () => {
+  it('opening viewport does not auto-pan (tables stay at saved % positions)', () => {
     const vp = openingFloorViewportForTables(
       [
-        { x: 12, y: 50 },
-        { x: 28, y: 50 },
+        { x: 12, y: 8 },
+        { x: 28, y: 8 },
       ],
       1000,
       800,
-      true,
+      false,
     )
-    expect(vp.zoom).toBe(0.8)
-    expect(vp.panX).toBeGreaterThan(0)
+    expect(vp.zoom).toBe(1)
+    expect(vp.panX).toBe(0)
+    expect(vp.panY).toBe(0)
   })
 
   it('pinch ratio scales zoom from start', () => {

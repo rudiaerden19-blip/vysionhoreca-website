@@ -90,7 +90,6 @@ import {
 } from '@/components/kassa-reservations/kassa-reservations-constants'
 import {
   defaultFloorViewportForDevice,
-  openingFloorViewportForTables,
   pinchDistance,
   pinchZoomReservationFloor,
   zoomReservationFloorAtPoint,
@@ -320,37 +319,15 @@ export default function KassaReservationsView({
 
   const applyOpeningFloorViewport = useCallback(() => {
     const touch = typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0
-    const tryApply = (attempt = 0) => {
-      const el = canvasRef.current
-      if (!el) {
-        setFloorViewport(defaultFloorViewportForDevice(touch))
-        return
-      }
-      const r = el.getBoundingClientRect()
-      if ((r.width < 20 || r.height < 20) && attempt < 8) {
-        window.requestAnimationFrame(() => tryApply(attempt + 1))
-        return
-      }
-      setFloorViewport(
-        openingFloorViewportForTables(floorPlanTablesDB, r.width, r.height, touch),
-      )
-    }
-    tryApply()
-  }, [floorPlanTablesDB])
+    setFloorViewport(defaultFloorViewportForDevice(touch))
+  }, [])
 
+  /** Alleen bij zone-wissel: vaste camera — niet opnieuw centreren bij tafel-save of DB-refresh. */
   useEffect(() => {
     floorPointersRef.current.clear()
     floorPinchSessionRef.current = null
     applyOpeningFloorViewport()
   }, [resFloorPlanZone, applyOpeningFloorViewport])
-
-  /** Elke keer plattegrond-tab: zelfde openingszoom + gecentreerd op tafels. */
-  useEffect(() => {
-    if (viewMode !== 'floorplan') return
-    floorPointersRef.current.clear()
-    floorPinchSessionRef.current = null
-    applyOpeningFloorViewport()
-  }, [viewMode, applyOpeningFloorViewport])
   /** Horizontaal scrollende tijdlijn — nodig voor correcte resize (pixels ↔ minuten) */
   const timelineGridScrollRef = useRef<HTMLDivElement>(null)
   /** Zelfde als LABEL_W in de tijdlijn-UI (kolom “Tafel”) */
