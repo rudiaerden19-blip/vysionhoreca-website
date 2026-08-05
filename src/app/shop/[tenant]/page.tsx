@@ -248,6 +248,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   const [availableTimes, setAvailableTimes] = useState<string[]>([])
   const [selectedDayClosed, setSelectedDayClosed] = useState(false)
   const [depositSettings, setDepositSettings] = useState<{ required: boolean; amount: number }>({ required: false, amount: 0 })
+  const [reservationAutoConfirm, setReservationAutoConfirm] = useState(false)
   const [publicReservationRules, setPublicReservationRules] = useState({
     minAdvanceHours: 2,
     maxAdvanceDays: 60,
@@ -364,6 +365,8 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
     
     const fullName = `${capitalizeWords(reservationForm.firstName)} ${capitalizeWords(reservationForm.lastName)}`
     
+    const reservationStatus = reservationAutoConfirm ? 'CONFIRMED' : 'PENDING'
+
     // Direct insert zodat we het ID krijgen voor Stripe
     const { data: resData, error: resError } = await supabase.from('reservations').insert([{
       tenant_slug: params.tenant,
@@ -374,7 +377,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       reservation_date: reservationForm.date,
       reservation_time: reservationForm.time,
       notes: capitalizeWords(reservationForm.notes),
-      status: 'PENDING',
+      status: reservationStatus,
       total_spent: 0,
       payment_status: depositSettings.required && depositSettings.amount > 0 ? 'pending': 'unpaid',
     }]).select().single()
@@ -391,7 +394,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         method: 'POST',
         headers: { 'Content-Type': 'application/json'},
         body: JSON.stringify({
-          status: 'pending',
+          status: reservationAutoConfirm ? 'confirmed' : 'pending',
           customerEmail: reservationForm.email.toLowerCase(),
           customerName: fullName,
           customerPhone: reservationForm.phone,
@@ -443,6 +446,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           const required = !!(data.deposit_required ?? data.depositRequired ?? false)
           const amount = Number(data.deposit_amount ?? data.depositAmount ?? 0)
           setDepositSettings({ required, amount })
+          setReservationAutoConfirm(!!(data.auto_confirm ?? data.autoConfirm ?? false))
           setPublicReservationRules({
             minAdvanceHours: Number(data.min_advance_hours ?? data.minAdvanceHours ?? 2) || 2,
             maxAdvanceDays: Number(data.max_advance_days ?? data.maxAdvanceDays ?? 60) || 60,

@@ -899,8 +899,22 @@ export default function KassaReservationsView({
       'reservation_settings',
       buildSettingsPayload(newSettings) as any,
       { tenantSlug: tenant, onConflict: 'tenant_slug'}
-    ).then(r => {
-      if (!r.ok) console.error('[reservation_settings] upsert:', r.error)
+    ).then(async r => {
+      if (!r.ok) {
+        console.error('[reservation_settings] upsert:', r.error)
+        toast.error(rk('settingsSaveFailedPrefix') + (r.error || ''))
+        const { data } = await supabase
+          .from('reservation_settings')
+          .select('*')
+          .eq('tenant_slug', tenant)
+          .maybeSingle()
+        if (data && typeof data === 'object') {
+          const fromDB = mapReservationSettingsFromDb(data as Record<string, unknown>)
+          const merged = { ...KASSA_DEFAULT_RESERVATION_SETTINGS, ...fromDB }
+          setReservationSettings(merged)
+          setTablesLocked(merged.floorPlanTablesLocked)
+        }
+      }
     })
   }
 
