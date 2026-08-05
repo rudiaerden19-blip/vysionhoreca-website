@@ -5236,8 +5236,8 @@ function EditReservationModal({ reservation, tables, reservations, shifts, buffe
           )}
           {!confirmCancel && (
             <button onClick={handleSave} disabled={saving || isOutsideShifts || hasConflict}
-              className="flex-1 py-3 rounded-xl bg-black hover:bg-gray-800 disabled:opacity-40 transition-colors">
-              {saving ? 'Opslaan...': 'Wijzigingen opslaan'}
+              className="flex-1 py-3 rounded-xl bg-black text-white font-bold text-sm hover:bg-gray-800 disabled:opacity-40 transition-colors">
+              {saving ? 'Opslaan...': 'Opslaan'}
             </button>
           )}
         </div>
