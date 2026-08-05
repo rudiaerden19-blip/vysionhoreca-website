@@ -67,6 +67,7 @@ import {
   formatReservationTimeRange,
   isReservationDepositPaid,
   parseDurationMinutesFromRaw,
+  reservationListRowBackgroundClass,
   reservationNotesDisplay,
 } from '@/components/kassa-reservations/kassa-reservations-model'
 import { ContactsView } from '@/components/kassa-reservations/ContactsView'
@@ -3761,11 +3762,14 @@ export default function KassaReservationsView({
             const depositPaid = isReservationDepositPaid(r)
             const depositAmt = Number(r.deposit_amount)
             const isTerminal = r.status === 'CANCELLED' || r.status === 'WAITLIST'
+            const statusRowBg = reservationListRowBackgroundClass(r.status)
+            const rowBg =
+              statusRowBg || (idx % 2 === 0 ? 'bg-white hover:bg-[#f2f5fa]/80' : 'bg-gray-50/40 hover:bg-[#f2f5fa]/80')
 
             return (
             <tr key={r.id} style={{ borderBottom: '1px solid #e5e7eb'}}
               onClick={() => setEditReservation(r)}
-              className={`cursor-pointer transition-colors hover:bg-[#f2f5fa]/80 ${idx % 2 === 0 ? 'bg-white': 'bg-gray-50/40'}`}>
+              className={`cursor-pointer transition-colors duration-200 ${rowBg}`}>
               <td className="px-5 py-4 font-bold text-gray-800 text-base whitespace-nowrap" style={{ borderRight: '1px solid #e5e7eb'}}>
                 {formatReservationTimeRange(r.reservation_time, r.duration_minutes, reservationSettings.defaultDurationMinutes)}
               </td>
@@ -3776,10 +3780,10 @@ export default function KassaReservationsView({
               <td className="px-5 py-4 font-semibold text-gray-800" style={{ borderRight: '1px solid #e5e7eb'}}>
                 <span>{r.guest_name}</span>
                 {r.status === 'CHECKED_IN' && (
-                  <span className="ml-2 inline-block rounded-md bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-800">Binnen</span>
+                  <span className="ml-2 inline-block rounded-md bg-sky-100 px-2 py-0.5 text-xs font-bold text-sky-800">Binnen</span>
                 )}
                 {r.status === 'COMPLETED' && (
-                  <span className="ml-2 inline-block rounded-md bg-gray-200 px-2 py-0.5 text-xs font-bold text-gray-700">Tafel vrij</span>
+                  <span className="ml-2 inline-block rounded-md bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-800">Tafel vrij</span>
                 )}
                 {r.status === 'NO_SHOW' && (
                   <span className="ml-2 inline-block rounded-md bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700">No-show</span>
@@ -3808,8 +3812,8 @@ export default function KassaReservationsView({
                     onClick={() => void handleCheckIn(r)}
                     className={`px-2.5 py-2 rounded-lg text-xs font-bold transition-colors touch-manipulation ${
                       r.status === 'CHECKED_IN'
-                        ? 'bg-emerald-600 text-white ring-2 ring-emerald-300'
-                        : 'bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white'
+                        ? 'bg-sky-600 text-white ring-2 ring-sky-300'
+                        : 'bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white'
                     } ${isTerminal ? 'opacity-40 cursor-not-allowed': ''}`}
                   >
                     Binnen
@@ -3820,8 +3824,8 @@ export default function KassaReservationsView({
                     onClick={() => void handleComplete(r)}
                     className={`px-2.5 py-2 rounded-lg text-xs font-bold transition-colors touch-manipulation ${
                       r.status === 'COMPLETED'
-                        ? 'bg-indigo-600 text-white ring-2 ring-indigo-300'
-                        : 'bg-indigo-500 hover:bg-indigo-600 active:bg-indigo-700 text-white'
+                        ? 'bg-emerald-600 text-white ring-2 ring-emerald-300'
+                        : 'bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white'
                     } ${isTerminal ? 'opacity-40 cursor-not-allowed': ''}`}
                   >
                     Tafel vrij

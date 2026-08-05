@@ -118,6 +118,20 @@ export function isReservationDepositPaid(
   return ps === 'deposit_paid' || ps === 'paid'
 }
 
+/** Lijstweergave: subtiele rij-achtergrond na statusknop (Binnen blauw, Tafel vrij groen, No-show rood). */
+export function reservationListRowBackgroundClass(status: ReservationStatus): string {
+  switch (status) {
+    case 'CHECKED_IN':
+      return 'bg-sky-50 hover:bg-sky-100/80'
+    case 'COMPLETED':
+      return 'bg-emerald-50 hover:bg-emerald-100/80'
+    case 'NO_SHOW':
+      return 'bg-red-50 hover:bg-red-100/80'
+    default:
+      return ''
+  }
+}
+
 /** Plattegrond-label: start- en eindtijd obv reservatieduur (per reservatie of default zaak). */
 export function formatFloorPlanTimeRange(reservationTime: string, durationMinutes: number): string {
   const start = parseReservationStartHm(reservationTime)
