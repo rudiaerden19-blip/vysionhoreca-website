@@ -42,6 +42,10 @@ import { adminDb } from '@/lib/admin-db-client'
 import { purgeLegacyKassaLocalStorage } from '@/lib/kassa-pos-state-client'
 import { parseFloorPlanTablesJson, sanitizeFloorPlanTables } from '@/lib/kassa-floor-plan-tables'
 import {
+  findReservationBlockingTableSlot,
+  getTableAvailabilityAtSlot,
+} from '@/lib/reservation-table-availability'
+import {
   FLOOR_PLAN_ZONE_INSIDE,
   FLOOR_PLAN_ZONE_TERRACE,
   floorPlanZoneFromRealtimePayload,
@@ -1774,26 +1778,21 @@ export default function KassaReservationsView({
       ).map(t => String(t.number))
 
       const buffer = reservationSettings.bufferMinutes || 0
-      const rStart = parseInt(r.reservation_time.split(':')[0]) * 60 + parseInt(r.reservation_time.split(':')[1])
-      const rEnd = rStart + (r.duration_minutes || 90) + buffer
+      const slotDur = r.duration_minutes || reservationSettings.defaultDurationMinutes || 90
 
-      const occupied = reservations
-        .filter(res =>
-          res.id !== r.id &&
-          res.status !== 'CANCELLED' &&
-          res.status !== 'WAITLIST' &&
-          res.reservation_date === r.reservation_date &&
-          res.table_number
-        )
-        .filter(res => {
-          const sMin = parseInt(res.reservation_time.split(':')[0]) * 60 + parseInt(res.reservation_time.split(':')[1])
-          // Buffer ook op bestaande reserveringen — symmetrische check
-          const eMin = sMin + (res.duration_minutes || 90) + buffer
-          return rStart < eMin && rEnd > sMin
+      const isTableFreeAtSlot = (tableNum: string) =>
+        !findReservationBlockingTableSlot(reservations, {
+          tableNumber: tableNum,
+          date: r.reservation_date,
+          slotStartHm: r.reservation_time,
+          slotDurationMinutes: slotDur,
+          bufferMinutes: buffer,
+          defaultDurationMinutes: reservationSettings.defaultDurationMinutes,
+          symmetricBuffer: true,
+          excludeReservationId: r.id,
         })
-        .map(res => String(res.table_number))
 
-      assignedTable = allTables.find(t => !occupied.includes(t)) || undefined
+      assignedTable = allTables.find(t => isTableFreeAtSlot(t)) || undefined
     }
 
     // Sla status + eventueel tafelnummer op
@@ -5035,20 +5034,20 @@ function EditReservationModal({ reservation, tables, reservations, shifts, buffe
     : false
 
   // Overlap-check (excl. eigen reservatie, incl. buffer)
-  const hasConflict = (() => {
-    if (!form.table_number || !form.reservation_date || !form.reservation_time) return false
-    const startMin = parseInt(form.reservation_time.split(':')[0]) * 60 + parseInt(form.reservation_time.split(':')[1])
-    const endMin = startMin + (form.duration_minutes || 90) + (bufferMinutes || 0)
-    return reservations.some(r => {
-      if (r.id === reservation.id) return false
-      if (r.status === 'CANCELLED') return false
-      if (String(r.table_number) !== form.table_number) return false
-      if (r.reservation_date !== form.reservation_date) return false
-      const rStart = parseInt(r.reservation_time.split(':')[0]) * 60 + parseInt(r.reservation_time.split(':')[1])
-      const rEnd = rStart + (r.duration_minutes || 90)
-      return startMin < rEnd && endMin > rStart
-    })
-  })()
+  const hasConflict = Boolean(
+    form.table_number &&
+      form.reservation_date &&
+      form.reservation_time &&
+      findReservationBlockingTableSlot(reservations, {
+        tableNumber: form.table_number,
+        date: form.reservation_date,
+        slotStartHm: form.reservation_time,
+        slotDurationMinutes: form.duration_minutes || 90,
+        bufferMinutes: bufferMinutes || 0,
+        defaultDurationMinutes: form.duration_minutes || 90,
+        excludeReservationId: reservation.id,
+      }),
+  )
 
   const handleSave = async () => {
     setValidationError('')
@@ -5847,26 +5846,20 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
 
   // Zoek automatisch een vrije tafel voor de gegeven datum/tijd/groep
   const autoAssignTable = (): string => {
-    const startMin = parseInt(formData.reservation_time.split(':')[0]) * 60 + parseInt(formData.reservation_time.split(':')[1])
-    const endMin = startMin + (formData.duration_minutes || 90) + (bufferMinutes || 0)
-    const busyTables = new Set(
-      reservations
-        .filter(r =>
-          r.reservation_date === formData.reservation_date &&
-          r.status !== 'CANCELLED' &&
-          r.table_number
-        )
-        .filter(r => {
-          const rStart = parseInt(r.reservation_time.split(':')[0]) * 60 + parseInt(r.reservation_time.split(':')[1])
-          // Buffer ook toepassen op bestaande reserveringen voor symmetrische overlap-check
-          const rEnd = rStart + (r.duration_minutes || 90) + (bufferMinutes || 0)
-          return startMin < rEnd && endMin > rStart
-        })
-        .map(r => String(r.table_number))
-    )
-    // Kies kleinste tafel die groot genoeg is (seats >= party_size)
     const candidate = tables
-      .filter(t => t.seats >= formData.party_size && !busyTables.has(String(t.number)))
+      .filter(t => t.seats >= formData.party_size)
+      .filter(
+        t =>
+          !findReservationBlockingTableSlot(reservations, {
+            tableNumber: t.number,
+            date: formData.reservation_date,
+            slotStartHm: formData.reservation_time,
+            slotDurationMinutes: formData.duration_minutes || defaultDurationMinutes || 90,
+            bufferMinutes: bufferMinutes || 0,
+            defaultDurationMinutes: defaultDurationMinutes || 90,
+            symmetricBuffer: true,
+          }),
+      )
       .sort((a, b) => a.seats - b.seats)[0]
     return candidate ? String(candidate.number) : ''
   }
@@ -5916,25 +5909,15 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
   const availableTables = tables.filter(t => t.seats >= formData.party_size)
 
   // Bereken welke tafels bezet zijn op het gekozen tijdstip
-  const getTableStatus = (tableNum: string | number): { bezet: boolean; door?: string; tot?: string } => {
-    const startMin = parseInt(formData.reservation_time.split(':')[0]) * 60 + parseInt(formData.reservation_time.split(':')[1])
-    const endMin = startMin + (formData.duration_minutes || 90) + (bufferMinutes || 0)
-    const conflict = reservations.find(r =>
-      r.reservation_date === formData.reservation_date &&
-      r.status !== 'CANCELLED' &&
-      String(r.table_number) === String(tableNum) &&
-      (() => {
-        const rStart = parseInt(r.reservation_time.split(':')[0]) * 60 + parseInt(r.reservation_time.split(':')[1])
-        const rEnd = rStart + (r.duration_minutes || 90)
-        return startMin < rEnd && endMin > rStart
-      })()
-    )
-    if (!conflict) return { bezet: false }
-    const rStart = parseInt(conflict.reservation_time.split(':')[0]) * 60 + parseInt(conflict.reservation_time.split(':')[1])
-    const rEnd = rStart + (conflict.duration_minutes || 90)
-    const fmt = (m: number) => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`
-    return { bezet: true, door: conflict.guest_name, tot: fmt(rEnd) }
-  }
+  const getTableStatus = (tableNum: string | number): { bezet: boolean; door?: string; tot?: string } =>
+    getTableAvailabilityAtSlot(reservations, {
+      tableNumber: tableNum,
+      date: formData.reservation_date,
+      slotStartHm: formData.reservation_time,
+      slotDurationMinutes: formData.duration_minutes || defaultDurationMinutes || 90,
+      bufferMinutes: bufferMinutes || 0,
+      defaultDurationMinutes: defaultDurationMinutes || 90,
+    })
 
   const inputCls = (field: string) =>
     `w-full px-4 py-3 rounded-xl bg-gray-100 border ${errors[field] ? 'border-red-500': 'border-gray-200'} focus:border-green-500 outline-none`

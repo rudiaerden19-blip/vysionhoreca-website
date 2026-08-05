@@ -13,7 +13,13 @@ import {
   maxReservationDateYmd,
   minReservationDateYmd,
 } from '@/lib/reservation-datetime'
-import { CalendarDays, Clock, Users, Phone, Mail, MessageSquare, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { parseFloorPlanTablesJson, sanitizeFloorPlanTables } from '@/lib/kassa-floor-plan-tables'
+import {
+  findReservationBlockingTableSlot,
+  getTableAvailabilityAtSlot,
+  type ReservationTableBlocker,
+} from '@/lib/reservation-table-availability'
+import { CalendarDays, Clock, Users, Phone, Mail, MessageSquare, CheckCircle2, ChevronLeft, ChevronRight, MapPin } from 'lucide-react'
 
 interface TenantInfo {
   name: string
@@ -30,6 +36,7 @@ interface BookingSettings {
   minAdvanceHours: number
   maxAdvanceDays: number
   slotDurationMinutes: number
+  bufferMinutes: number
   closedDays: number[]
   depositRequired: boolean
   depositAmount: number
@@ -38,6 +45,8 @@ interface BookingSettings {
   autoConfirm: boolean
 }
 
+type PublicFloorTable = { number: string; seats: number }
+
 const DEFAULT_SETTINGS: BookingSettings = {
   isEnabled: true,
   maxPartySize: 12,
@@ -45,6 +54,7 @@ const DEFAULT_SETTINGS: BookingSettings = {
   minAdvanceHours: 2,
   maxAdvanceDays: 60,
   slotDurationMinutes: 30,
+  bufferMinutes: 15,
   closedDays: [],
   depositRequired: false,
   depositAmount: 0,
@@ -72,8 +82,12 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
     notes: '',
     special_requests: '',
     occasion: '',
+    table_number: '',
   })
   const [reservationId, setReservationId] = useState('')
+  const [floorTables, setFloorTables] = useState<PublicFloorTable[]>([])
+  const [dayReservations, setDayReservations] = useState<ReservationTableBlocker[]>([])
+  const [loadingDayReservations, setLoadingDayReservations] = useState(false)
 
   useEffect(() => {
     // Laad tenant info (basis: naam, telefoon, logo)
@@ -109,6 +123,7 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
           minAdvanceHours: data.min_advance_hours ?? DEFAULT_SETTINGS.minAdvanceHours,
           maxAdvanceDays: data.max_advance_days ?? DEFAULT_SETTINGS.maxAdvanceDays,
           slotDurationMinutes: data.slot_duration_minutes ?? DEFAULT_SETTINGS.slotDurationMinutes,
+          bufferMinutes: data.buffer_minutes ?? DEFAULT_SETTINGS.bufferMinutes,
           closedDays: Array.isArray(data.closed_days) ? data.closed_days : (typeof data.closed_days === 'string'? (() => { try { return JSON.parse(data.closed_days) } catch { return [] } })() : []),
           depositRequired: data.deposit_required ?? DEFAULT_SETTINGS.depositRequired,
           depositAmount: Number(data.deposit_amount) || DEFAULT_SETTINGS.depositAmount,
@@ -117,7 +132,91 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
           autoConfirm: data.auto_confirm ?? false,
         })
       })
+
+    Promise.all([
+      supabase.from('floor_plan_tables').select('data').eq('tenant_slug', tenant).eq('plan_zone', 'inside').maybeSingle(),
+      supabase.from('floor_plan_tables').select('data').eq('tenant_slug', tenant).eq('plan_zone', 'terrace').maybeSingle(),
+    ]).then(([insideRes, terraceRes]) => {
+      const merged = [
+        ...(parseFloorPlanTablesJson(insideRes.data?.data) || []),
+        ...(parseFloorPlanTablesJson(terraceRes.data?.data) || []),
+      ]
+      const sanitized = sanitizeFloorPlanTables(merged)
+      setFloorTables(
+        sanitized.map(t => ({ number: String(t.number), seats: t.seats || 2 })).sort((a, b) => {
+          const na = parseInt(a.number, 10)
+          const nb = parseInt(b.number, 10)
+          if (Number.isFinite(na) && Number.isFinite(nb)) return na - nb
+          return a.number.localeCompare(b.number)
+        }),
+      )
+    })
   }, [tenant])
+
+  useEffect(() => {
+    if (!formData.reservation_date) {
+      setDayReservations([])
+      return
+    }
+    let cancelled = false
+    setLoadingDayReservations(true)
+    void supabase
+      .from('reservations')
+      .select('id, reservation_date, reservation_time, duration_minutes, table_number, status, guest_name')
+      .eq('tenant_slug', tenant)
+      .eq('reservation_date', formData.reservation_date)
+      .then(({ data, error }) => {
+        if (cancelled) return
+        if (error) {
+          console.error('[reserveren] reservations load:', error.message)
+          setDayReservations([])
+          return
+        }
+        setDayReservations(
+          (data || []).map(row => ({
+            id: row.id as string,
+            reservation_date: row.reservation_date as string,
+            reservation_time: (row.reservation_time as string) || '19:00',
+            duration_minutes: Number(row.duration_minutes) || settings.defaultDurationMinutes,
+            table_number: row.table_number as string | number | null | undefined,
+            status: ((row.status as string) || '').toUpperCase(),
+            guest_name: row.guest_name as string | undefined,
+          })),
+        )
+      })
+      .then(() => {
+        if (!cancelled) setLoadingDayReservations(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [tenant, formData.reservation_date, settings.defaultDurationMinutes])
+
+  const tablePickerTables = floorTables.filter(t => t.seats >= formData.party_size)
+
+  const slotAvailabilityParams = (tableNum: string | number) => ({
+    tableNumber: tableNum,
+    date: formData.reservation_date,
+    slotStartHm: formData.reservation_time,
+    slotDurationMinutes: settings.defaultDurationMinutes,
+    bufferMinutes: settings.bufferMinutes,
+    defaultDurationMinutes: settings.defaultDurationMinutes,
+  })
+
+  useEffect(() => {
+    if (!formData.table_number) return
+    const status = getTableAvailabilityAtSlot(dayReservations, slotAvailabilityParams(formData.table_number))
+    if (status.bezet) {
+      setFormData(f => ({ ...f, table_number: '' }))
+    }
+  }, [
+    formData.reservation_date,
+    formData.reservation_time,
+    formData.party_size,
+    dayReservations,
+    settings.defaultDurationMinutes,
+    settings.bufferMinutes,
+  ])
 
   // Genereer tijdsloten
   const generateTimeSlots = () => {
@@ -166,6 +265,20 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
       )
       return
     }
+    if (floorTables.length > 0) {
+      if (!formData.table_number) {
+        setError('Kies een vrije tafel voor uw tijdstip.')
+        return
+      }
+      if (
+        findReservationBlockingTableSlot(dayReservations, {
+          ...slotAvailabilityParams(formData.table_number),
+        })
+      ) {
+        setError('Deze tafel is bezet op het gekozen uur. Kies een andere tafel of een later tijdstip.')
+        return
+      }
+    }
     setError('')
     setLoading(true)
 
@@ -183,6 +296,7 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
         reservation_date: formData.reservation_date,
         reservation_time: formData.reservation_time,
         duration_minutes: settings.defaultDurationMinutes,
+        table_number: formData.table_number || null,
         notes: formData.notes || null,
         special_requests: formData.special_requests || null,
         status: reservationStatus,
@@ -460,7 +574,7 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
               <input
                 type="date"
                 value={formData.reservation_date}
-                onChange={(e) => setFormData({ ...formData, reservation_date: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, reservation_date: e.target.value, table_number: '' })}
                 min={getMinDate()}
                 max={getMaxDate()}
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none bg-gray-50"
@@ -479,7 +593,7 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
                   <button
                     key={time}
                     type="button"
-                    onClick={() => setFormData({ ...formData, reservation_time: time })}
+                    onClick={() => setFormData({ ...formData, reservation_time: time, table_number: '' })}
                     className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
                       formData.reservation_time === time
                         ? 'text-white'
@@ -493,6 +607,65 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
               </div>
             </div>
 
+            {/* Tafel — alleen vrije tafels op gekozen datum/tijd */}
+            {floorTables.length > 0 && formData.reservation_date && formData.reservation_time && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <MapPin size={14} className="inline mr-1" />
+                  Tafel * <span className="font-normal text-gray-400">(vrij op {formData.reservation_time})</span>
+                </label>
+                {loadingDayReservations ? (
+                  <p className="text-sm text-gray-400">Beschikbaarheid laden…</p>
+                ) : tablePickerTables.length === 0 ? (
+                  <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
+                    Geen tafel groot genoeg voor {formData.party_size} personen. Pas het aantal personen aan.
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
+                    {tablePickerTables.map(table => {
+                      const status = getTableAvailabilityAtSlot(dayReservations, slotAvailabilityParams(table.number))
+                      const selected = formData.table_number === table.number
+                      return (
+                        <button
+                          key={table.number}
+                          type="button"
+                          disabled={status.bezet}
+                          title={
+                            status.bezet
+                              ? `Bezet${status.tot ? ` tot ${status.tot}` : ''}`
+                              : `${table.seats} plaatsen`
+                          }
+                          onClick={() => {
+                            if (!status.bezet) {
+                              setFormData(f => ({ ...f, table_number: table.number }))
+                            }
+                          }}
+                          className={`py-2.5 px-2 rounded-xl border-2 text-sm font-bold transition-colors ${
+                            status.bezet
+                              ? 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed line-through'
+                              : selected
+                                ? 'border-transparent text-white'
+                                : 'border-gray-200 bg-white text-gray-800 hover:border-gray-400'
+                          }`}
+                          style={!status.bezet && selected ? { backgroundColor: primaryColor, borderColor: primaryColor } : undefined}
+                        >
+                          {table.number}
+                          <span className="block text-[10px] font-normal opacity-80">{table.seats}p</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
+                {!loadingDayReservations &&
+                  tablePickerTables.length > 0 &&
+                  tablePickerTables.every(t => getTableAvailabilityAtSlot(dayReservations, slotAvailabilityParams(t.number)).bezet) && (
+                    <p className="text-sm text-red-600 mt-2">
+                      Alle geschikte tafels zijn bezet rond dit uur. Kies een ander tijdstip.
+                    </p>
+                  )}
+              </div>
+            )}
+
             {/* Personen */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -501,7 +674,7 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
               <div className="flex items-center gap-4">
                 <button
                   type="button"
-                  onClick={() => setFormData({ ...formData, party_size: Math.max(1, formData.party_size - 1) })}
+                  onClick={() => setFormData({ ...formData, party_size: Math.max(1, formData.party_size - 1), table_number: '' })}
                   className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center text-xl font-bold hover:bg-gray-200"
                 >-</button>
                 <div className="flex-1 text-center">
@@ -510,7 +683,7 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
                 </div>
                 <button
                   type="button"
-                  onClick={() => setFormData({ ...formData, party_size: Math.min(settings.maxPartySize, formData.party_size + 1) })}
+                  onClick={() => setFormData({ ...formData, party_size: Math.min(settings.maxPartySize, formData.party_size + 1), table_number: '' })}
                   className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center text-xl font-bold hover:bg-gray-200"
                 >+</button>
               </div>
