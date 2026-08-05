@@ -65,7 +65,9 @@ import {
   computeConfirmedStatusRingOpacity,
   formatFloorPlanTimeRange,
   formatReservationTimeRange,
+  isReservationDepositPaid,
   parseDurationMinutesFromRaw,
+  reservationNotesDisplay,
 } from '@/components/kassa-reservations/kassa-reservations-model'
 import { ContactsView } from '@/components/kassa-reservations/ContactsView'
 import {
@@ -3751,10 +3753,20 @@ export default function KassaReservationsView({
           // Gebruik gecachte kalendermaanden en dagset uit useMemo
           const calMonths = resCalMonths
 
-          const reservationRow = (r: typeof filteredRes[0], idx: number) => (
+          const reservationRow = (r: typeof filteredRes[0], idx: number) => {
+            const notesText = reservationNotesDisplay(r)
+            const depositPaid = isReservationDepositPaid(r)
+            const depositAmt = Number(r.deposit_amount)
+            const canCheckIn = r.status === 'PENDING' || r.status === 'CONFIRMED'
+            const canFreeTable = r.status === 'CHECKED_IN'
+            const canNoShow =
+              r.status === 'PENDING' || r.status === 'CONFIRMED' || r.status === 'CHECKED_IN'
+            const rowMuted = r.status === 'COMPLETED' || r.status === 'NO_SHOW' || r.status === 'CANCELLED'
+
+            return (
             <tr key={r.id} style={{ borderBottom: '1px solid #e5e7eb'}}
               onClick={() => setEditReservation(r)}
-              className={`cursor-pointer transition-colors hover:bg-[#f2f5fa]/80 ${idx % 2 === 0 ? 'bg-white': 'bg-gray-50/40'}`}>
+              className={`cursor-pointer transition-colors hover:bg-[#f2f5fa]/80 ${idx % 2 === 0 ? 'bg-white': 'bg-gray-50/40'} ${rowMuted ? 'opacity-70': ''}`}>
               <td className="px-5 py-4 font-bold text-gray-800 text-base whitespace-nowrap" style={{ borderRight: '1px solid #e5e7eb'}}>
                 {formatReservationTimeRange(r.reservation_time, r.duration_minutes, reservationSettings.defaultDurationMinutes)}
               </td>
@@ -3762,21 +3774,89 @@ export default function KassaReservationsView({
                 {r.table_number ? <span className="font-semibold">Tafel {r.table_number}</span> : <span className="text-gray-300">—</span>}
               </td>
               <td className="px-5 py-4 text-center font-bold text-gray-800 text-lg" style={{ borderRight: '1px solid #e5e7eb'}}>{r.party_size}</td>
-              <td className="px-5 py-4 font-semibold text-gray-800" style={{ borderRight: '1px solid #e5e7eb'}}>{r.guest_name}</td>
-              <td className="px-5 py-4 text-gray-600" style={{ borderRight: '1px solid #e5e7eb'}}>
-                {r.guest_phone ? <a href={`tel:${r.guest_phone}`} className="hover:underline">{r.guest_phone}</a> : <span className="text-gray-300">—</span>}
+              <td className="px-5 py-4 font-semibold text-gray-800" style={{ borderRight: '1px solid #e5e7eb'}}>
+                <span>{r.guest_name}</span>
+                {r.status === 'CHECKED_IN' && (
+                  <span className="ml-2 inline-block rounded-md bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-800">Binnen</span>
+                )}
+                {r.status === 'COMPLETED' && (
+                  <span className="ml-2 inline-block rounded-md bg-gray-200 px-2 py-0.5 text-xs font-bold text-gray-700">Tafel vrij</span>
+                )}
+                {r.status === 'NO_SHOW' && (
+                  <span className="ml-2 inline-block rounded-md bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700">No-show</span>
+                )}
               </td>
-              <td className="px-5 py-4 text-gray-600" style={{ borderRight: '1px solid #e5e7eb'}}>
-                {r.guest_email ? <a href={`mailto:${r.guest_email}`} className="hover:underline">{r.guest_email}</a> : <span className="text-gray-300">—</span>}
+              <td className="px-5 py-4 text-gray-600 max-w-[14rem]" style={{ borderRight: '1px solid #e5e7eb'}} title={notesText || undefined}>
+                {notesText ? <span className="text-sm line-clamp-2">{notesText}</span> : <span className="text-gray-300">—</span>}
               </td>
-              <td className="px-5 py-4 text-right" onClick={e => e.stopPropagation()}>
-                <button onClick={() => setEditReservation(r)}
-                  className="px-4 py-2 rounded-xl bg-black hover:bg-gray-800 active:bg-gray-900 text-white text-sm font-semibold transition-colors">
-                   Bewerken
-                </button>
+              <td className="px-5 py-4 whitespace-nowrap" style={{ borderRight: '1px solid #e5e7eb'}}>
+                {depositPaid ? (
+                  <span className="font-semibold text-green-600">
+                    Ja
+                    {Number.isFinite(depositAmt) && depositAmt > 0
+                      ? ` · €${depositAmt.toFixed(2)}`
+                      : ''}
+                  </span>
+                ) : (
+                  <span className="text-gray-400">Nee</span>
+                )}
+              </td>
+              <td className="px-3 py-3 text-right align-middle min-w-[17rem]" onClick={e => e.stopPropagation()}>
+                <div className="flex flex-wrap items-center justify-end gap-1.5">
+                  <button
+                    type="button"
+                    disabled={!canCheckIn}
+                    onClick={() => { if (canCheckIn) void handleCheckIn(r) }}
+                    className={`px-2.5 py-2 rounded-lg text-xs font-bold transition-colors ${
+                      r.status === 'CHECKED_IN'
+                        ? 'bg-emerald-600 text-white ring-2 ring-emerald-300 cursor-default'
+                        : canCheckIn
+                          ? 'bg-emerald-500 hover:bg-emerald-600 text-white'
+                          : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    }`}
+                  >
+                    Binnen
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!canFreeTable}
+                    onClick={() => { if (canFreeTable) void handleComplete(r) }}
+                    className={`px-2.5 py-2 rounded-lg text-xs font-bold transition-colors ${
+                      r.status === 'COMPLETED'
+                        ? 'bg-indigo-600 text-white ring-2 ring-indigo-300 cursor-default'
+                        : canFreeTable
+                          ? 'bg-indigo-500 hover:bg-indigo-600 text-white'
+                          : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    }`}
+                  >
+                    Tafel vrij
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!canNoShow}
+                    onClick={() => { if (canNoShow) void handleNoShow(r) }}
+                    className={`px-2.5 py-2 rounded-lg text-xs font-bold transition-colors ${
+                      r.status === 'NO_SHOW'
+                        ? 'bg-red-600 text-white ring-2 ring-red-300 cursor-default'
+                        : canNoShow
+                          ? 'bg-red-50 hover:bg-red-100 text-red-700 border border-red-200'
+                          : 'bg-gray-100 text-gray-400 cursor-not-allowed border border-transparent'
+                    }`}
+                  >
+                    No-show
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditReservation(r)}
+                    className="px-2.5 py-2 rounded-lg bg-black hover:bg-gray-800 text-white text-xs font-semibold transition-colors"
+                  >
+                    Bewerken
+                  </button>
+                </div>
               </td>
             </tr>
-          )
+            )
+          }
 
           return (
             <div className="flex flex-col h-full -m-4 bg-white">
@@ -4031,9 +4111,9 @@ export default function KassaReservationsView({
                           <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Tafel</th>
                           <th className="px-5 py-3 text-center text-xs font-bold uppercase tracking-wider text-gray-500">Personen</th>
                           <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Naam</th>
-                          <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Telefoon</th>
-                          <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">E-mail</th>
-                          <th className="px-5 py-3 text-right text-xs font-bold uppercase tracking-wider text-gray-500"></th>
+                          <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Opmerkingen</th>
+                          <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Voorschot betaald</th>
+                          <th className="px-5 py-3 text-right text-xs font-bold uppercase tracking-wider text-gray-500">Acties</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -4077,8 +4157,16 @@ export default function KassaReservationsView({
                               </td>
                               <td className="px-5 py-3 text-center font-bold">{r.party_size}</td>
                               <td className="px-5 py-3 font-semibold">{r.guest_name}</td>
-                              <td className="px-5 py-3 text-gray-500">{r.guest_phone}</td>
-                              <td className="px-5 py-3 text-gray-500">{r.guest_email}</td>
+                              <td className="px-5 py-3 text-gray-500 max-w-[10rem]" title={reservationNotesDisplay(r) || undefined}>
+                                {reservationNotesDisplay(r) || '—'}
+                              </td>
+                              <td className="px-5 py-3">
+                                {isReservationDepositPaid(r) ? (
+                                  <span className="font-semibold text-green-600">Ja</span>
+                                ) : (
+                                  <span className="text-gray-400">Nee</span>
+                                )}
+                              </td>
                               <td className="px-5 py-3 text-right">
                                 <button onClick={() => updateStatus(r.id, 'CONFIRMED')}
                                   className="px-3 py-1.5 rounded-lg bg-purple-500 hover:bg-purple-600 text-white text-xs font-bold transition-colors">

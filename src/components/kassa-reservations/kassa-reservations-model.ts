@@ -97,6 +97,27 @@ export function formatReservationTimeRange(
   return `${startStr} tot ${endStr}`
 }
 
+/** Opmerkingen + special requests voor lijstweergave (contactgegevens staan in Contacten). */
+export function reservationNotesDisplay(
+  r: Pick<Reservation, 'notes' | 'special_requests'>,
+  maxLen = 120,
+): string {
+  const parts = [r.notes, r.special_requests]
+    .filter((s): s is string => Boolean(s?.trim()))
+    .map(s => s.trim())
+  const combined = parts.join(' · ')
+  if (!combined) return ''
+  if (combined.length <= maxLen) return combined
+  return `${combined.slice(0, maxLen - 1)}…`
+}
+
+export function isReservationDepositPaid(
+  r: Pick<Reservation, 'payment_status' | 'deposit_amount'>,
+): boolean {
+  const ps = (r.payment_status || '').toLowerCase()
+  return ps === 'deposit_paid' || ps === 'paid'
+}
+
 /** Plattegrond-label: start- en eindtijd obv reservatieduur (per reservatie of default zaak). */
 export function formatFloorPlanTimeRange(reservationTime: string, durationMinutes: number): string {
   const start = parseReservationStartHm(reservationTime)
