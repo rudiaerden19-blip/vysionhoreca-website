@@ -619,8 +619,7 @@ function LanguageSelector() {
     const el = triggerRef.current
     if (!el) return
     const r = el.getBoundingClientRect()
-    // Menu boven de knop (in de header) — voorkomt overlap met reserveringsknoppen/inputs eronder
-    setMenuPos({ top: r.top - 8, right: Math.max(8, window.innerWidth - r.right) })
+    setMenuPos({ top: r.bottom + 8, right: Math.max(8, window.innerWidth - r.right) })
   }, [])
 
   useLayoutEffect(() => {
@@ -678,13 +677,16 @@ function LanguageSelector() {
             <div
               className="fixed inset-0 z-[249] touch-none bg-black/20"
               aria-hidden
-              onClick={() => setIsOpen(false)}
+              onPointerDown={(e) => {
+                e.preventDefault()
+                setIsOpen(false)
+              }}
             />
             <div
               ref={menuRef}
               role="listbox"
               aria-label="Taal"
-              className="fixed z-[250] min-w-[180px] max-h-80 -translate-y-full overflow-y-auto rounded-xl border bg-white shadow-xl"
+              className="fixed z-[250] min-w-[180px] max-h-[min(20rem,calc(100dvh-4.5rem))] overflow-y-auto overscroll-contain rounded-xl border bg-white shadow-xl"
               style={{ top: menuPos.top, right: menuPos.right }}
             >
               {locales.map((langCode) => (
