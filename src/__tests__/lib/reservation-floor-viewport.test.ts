@@ -1,5 +1,6 @@
 import {
   clampFloorViewportZoom,
+  cssCmToPx,
   defaultFloorViewportForDevice,
   openingFloorViewportForTables,
   pinchZoomReservationFloor,
@@ -33,8 +34,8 @@ describe('reservation-floor-viewport', () => {
       false,
     )
     expect(vp.zoom).toBe(1)
-    expect(vp.panX).toBe(0)
-    expect(vp.panY).toBe(0)
+    expect(vp.panX).toBeCloseTo(cssCmToPx(2), 0)
+    expect(vp.panY).toBeCloseTo(cssCmToPx(2), 0)
   })
 
   it('pinch ratio scales zoom from start', () => {

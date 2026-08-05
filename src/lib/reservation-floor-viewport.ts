@@ -34,10 +34,27 @@ export function zoomReservationFloorAtPoint(
 export const FLOOR_DEFAULT_OPEN_ZOOM_TOUCH = 0.8
 export const FLOOR_DEFAULT_OPEN_ZOOM_DESKTOP = 1
 
-export function defaultFloorViewportForDevice(isTouch: boolean): ReservationFloorViewport {
+/** CSS cm → px (zelfde referentie als browser: 1in = 96px, 1in = 2.54cm). */
+export function cssCmToPx(cm: number): number {
+  return (cm * 96) / 2.54
+}
+
+/** Fine-tune plattegrond: cameraverschuiving (niet opgeslagen in DB). */
+export const FLOOR_DEFAULT_PAN_OFFSET_X_CM = 2
+export const FLOOR_DEFAULT_PAN_OFFSET_Y_CM = 2
+
+export function floorDefaultPanOffsetPx(): { panX: number; panY: number } {
   return {
-    panX: 0,
-    panY: 0,
+    panX: cssCmToPx(FLOOR_DEFAULT_PAN_OFFSET_X_CM),
+    panY: cssCmToPx(FLOOR_DEFAULT_PAN_OFFSET_Y_CM),
+  }
+}
+
+export function defaultFloorViewportForDevice(isTouch: boolean): ReservationFloorViewport {
+  const { panX, panY } = floorDefaultPanOffsetPx()
+  return {
+    panX,
+    panY,
     zoom: isTouch ? FLOOR_DEFAULT_OPEN_ZOOM_TOUCH : FLOOR_DEFAULT_OPEN_ZOOM_DESKTOP,
   }
 }
