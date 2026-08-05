@@ -1482,6 +1482,7 @@ export default function KassaReservationsView({
   }
 
   const handleCheckIn = async (r: Reservation) => {
+    if (r.status === 'CHECKED_IN') return
     await updateStatus(r.id, 'CHECKED_IN')
     toast.success(`${r.guest_name}${rk('guestAtTableSuffix')}`)
     // Geen mail sturen bij aan tafel zetten — enkel interne statuswijziging
@@ -1595,6 +1596,7 @@ export default function KassaReservationsView({
   }
 
   const handleNoShow = async (r: Reservation) => {
+    if (r.status === 'NO_SHOW') return
     const ok = await updateStatus(r.id, 'NO_SHOW')
     if (!ok) return
     toast.error(`${r.guest_name} ${rk('markedNoShow')}`)
@@ -1740,6 +1742,7 @@ export default function KassaReservationsView({
   }
 
   const handleComplete = async (r: Reservation) => {
+    if (r.status === 'COMPLETED') return
     await updateStatus(r.id, 'COMPLETED')
     toast.success(`${r.guest_name}${rk('guestDepartedSuffix')}`)
     // Geen automatische mail bij vertrekken — enkel interne statuswijziging
@@ -3757,16 +3760,12 @@ export default function KassaReservationsView({
             const notesText = reservationNotesDisplay(r)
             const depositPaid = isReservationDepositPaid(r)
             const depositAmt = Number(r.deposit_amount)
-            const canCheckIn = r.status === 'PENDING' || r.status === 'CONFIRMED'
-            const canFreeTable = r.status === 'CHECKED_IN'
-            const canNoShow =
-              r.status === 'PENDING' || r.status === 'CONFIRMED' || r.status === 'CHECKED_IN'
-            const rowMuted = r.status === 'COMPLETED' || r.status === 'NO_SHOW' || r.status === 'CANCELLED'
+            const isTerminal = r.status === 'CANCELLED' || r.status === 'WAITLIST'
 
             return (
             <tr key={r.id} style={{ borderBottom: '1px solid #e5e7eb'}}
               onClick={() => setEditReservation(r)}
-              className={`cursor-pointer transition-colors hover:bg-[#f2f5fa]/80 ${idx % 2 === 0 ? 'bg-white': 'bg-gray-50/40'} ${rowMuted ? 'opacity-70': ''}`}>
+              className={`cursor-pointer transition-colors hover:bg-[#f2f5fa]/80 ${idx % 2 === 0 ? 'bg-white': 'bg-gray-50/40'}`}>
               <td className="px-5 py-4 font-bold text-gray-800 text-base whitespace-nowrap" style={{ borderRight: '1px solid #e5e7eb'}}>
                 {formatReservationTimeRange(r.reservation_time, r.duration_minutes, reservationSettings.defaultDurationMinutes)}
               </td>
@@ -3805,50 +3804,44 @@ export default function KassaReservationsView({
                 <div className="flex flex-wrap items-center justify-end gap-1.5">
                   <button
                     type="button"
-                    disabled={!canCheckIn}
-                    onClick={() => { if (canCheckIn) void handleCheckIn(r) }}
-                    className={`px-2.5 py-2 rounded-lg text-xs font-bold transition-colors ${
+                    disabled={isTerminal}
+                    onClick={() => void handleCheckIn(r)}
+                    className={`px-2.5 py-2 rounded-lg text-xs font-bold transition-colors touch-manipulation ${
                       r.status === 'CHECKED_IN'
-                        ? 'bg-emerald-600 text-white ring-2 ring-emerald-300 cursor-default'
-                        : canCheckIn
-                          ? 'bg-emerald-500 hover:bg-emerald-600 text-white'
-                          : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    }`}
+                        ? 'bg-emerald-600 text-white ring-2 ring-emerald-300'
+                        : 'bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white'
+                    } ${isTerminal ? 'opacity-40 cursor-not-allowed': ''}`}
                   >
                     Binnen
                   </button>
                   <button
                     type="button"
-                    disabled={!canFreeTable}
-                    onClick={() => { if (canFreeTable) void handleComplete(r) }}
-                    className={`px-2.5 py-2 rounded-lg text-xs font-bold transition-colors ${
+                    disabled={isTerminal}
+                    onClick={() => void handleComplete(r)}
+                    className={`px-2.5 py-2 rounded-lg text-xs font-bold transition-colors touch-manipulation ${
                       r.status === 'COMPLETED'
-                        ? 'bg-indigo-600 text-white ring-2 ring-indigo-300 cursor-default'
-                        : canFreeTable
-                          ? 'bg-indigo-500 hover:bg-indigo-600 text-white'
-                          : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    }`}
+                        ? 'bg-indigo-600 text-white ring-2 ring-indigo-300'
+                        : 'bg-indigo-500 hover:bg-indigo-600 active:bg-indigo-700 text-white'
+                    } ${isTerminal ? 'opacity-40 cursor-not-allowed': ''}`}
                   >
                     Tafel vrij
                   </button>
                   <button
                     type="button"
-                    disabled={!canNoShow}
-                    onClick={() => { if (canNoShow) void handleNoShow(r) }}
-                    className={`px-2.5 py-2 rounded-lg text-xs font-bold transition-colors ${
+                    disabled={isTerminal}
+                    onClick={() => void handleNoShow(r)}
+                    className={`px-2.5 py-2 rounded-lg text-xs font-bold transition-colors touch-manipulation ${
                       r.status === 'NO_SHOW'
-                        ? 'bg-red-600 text-white ring-2 ring-red-300 cursor-default'
-                        : canNoShow
-                          ? 'bg-red-50 hover:bg-red-100 text-red-700 border border-red-200'
-                          : 'bg-gray-100 text-gray-400 cursor-not-allowed border border-transparent'
-                    }`}
+                        ? 'bg-red-600 text-white ring-2 ring-red-300'
+                        : 'bg-red-500 hover:bg-red-600 active:bg-red-700 text-white'
+                    } ${isTerminal ? 'opacity-40 cursor-not-allowed': ''}`}
                   >
                     No-show
                   </button>
                   <button
                     type="button"
                     onClick={() => setEditReservation(r)}
-                    className="px-2.5 py-2 rounded-lg bg-black hover:bg-gray-800 text-white text-xs font-semibold transition-colors"
+                    className="px-2.5 py-2 rounded-lg bg-black hover:bg-gray-800 active:bg-gray-900 text-white text-xs font-semibold transition-colors touch-manipulation"
                   >
                     Bewerken
                   </button>
