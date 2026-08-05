@@ -1,6 +1,7 @@
 import {
   clampFloorViewportZoom,
   defaultFloorViewportForDevice,
+  openingFloorViewportForTables,
   pinchZoomReservationFloor,
   zoomReservationFloorAtPoint,
 } from '@/lib/reservation-floor-viewport'
@@ -19,6 +20,20 @@ describe('reservation-floor-viewport', () => {
 
   it('opens touch at full zoom for readable tables', () => {
     expect(defaultFloorViewportForDevice(true).zoom).toBe(0.8)
+  })
+
+  it('shifts pan right when tables sit on the left', () => {
+    const vp = openingFloorViewportForTables(
+      [
+        { x: 12, y: 50 },
+        { x: 28, y: 50 },
+      ],
+      1000,
+      800,
+      true,
+    )
+    expect(vp.zoom).toBe(0.8)
+    expect(vp.panX).toBeGreaterThan(0)
   })
 
   it('pinch ratio scales zoom from start', () => {
