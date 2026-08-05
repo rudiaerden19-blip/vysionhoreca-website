@@ -78,7 +78,7 @@ import { ContactsView } from '@/components/kassa-reservations/ContactsView'
 import {
   KassaResChevronLeft as ChevronLeft,
   KassaResChevronRight as ChevronRight,
-  KassaResCloseIcon as CloseIconX,
+  KassaResCloseButtonLabel,
   KassaResGripVertical as GripVertical,
 } from '@/components/kassa-reservations/kassa-reservations-icons'
 import { RapportenView } from '@/components/kassa-reservations/RapportenView'
@@ -5126,9 +5126,9 @@ function EditReservationModal({ reservation, tables, reservations, shifts, buffe
             type="button"
             onClick={onClose}
             aria-label="Sluiten"
-            className="shrink-0 flex h-11 w-11 items-center justify-center rounded-xl border border-gray-300 bg-white text-gray-800 shadow-sm hover:bg-gray-100 active:bg-gray-200 transition-colors touch-manipulation"
+            className="shrink-0 flex h-11 w-11 items-center justify-center rounded-xl border border-gray-300 bg-white text-gray-900 shadow-sm hover:bg-gray-100 active:bg-gray-200 transition-colors touch-manipulation"
           >
-            <X size={22} strokeWidth={2.5} aria-hidden />
+            <KassaResCloseButtonLabel />
           </button>
         </div>
 
@@ -5981,8 +5981,8 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
               <CalendarDays size={24} className="text-green-500" />
               Nieuwe Reservatie
             </h2>
-            <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100">
-              <X size={20} />
+            <button type="button" onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 text-gray-900" aria-label="Sluiten">
+              <KassaResCloseButtonLabel className="text-xl" />
             </button>
           </div>
         </div>
@@ -6283,7 +6283,7 @@ function ReservationDetailModal({
             className="absolute right-2 top-2 z-[60] flex h-9 w-9 items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-900 shadow-md hover:bg-gray-50 active:bg-gray-100 touch-manipulation sm:h-10 sm:w-10"
             aria-label="Sluiten"
           >
-            <CloseIconX size={22} className="pointer-events-none shrink-0" />
+            <KassaResCloseButtonLabel />
           </button>
           <div className="min-w-0 pr-12">
             <span
