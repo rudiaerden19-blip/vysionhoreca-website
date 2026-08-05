@@ -96,6 +96,15 @@ import {
   zoomReservationFloorAtPoint,
   type ReservationFloorViewport,
 } from '@/lib/reservation-floor-viewport'
+import {
+  isPendingOrWaitlistReservationStatus,
+  triggerReservationRequestAlarmSound,
+} from '@/lib/reservation-request-alarm-loop'
+import { useReservationRequestAlarm } from '@/hooks/useReservationRequestAlarm'
+import {
+  KassaSoundActivationScreen,
+  useKassaSoundActivationGate,
+} from '@/components/kassa/KassaSoundActivationGate'
 
 
 // ---- Props ----
@@ -169,6 +178,15 @@ export default function KassaReservationsView({
   allowKassaHandoff = true,
 }: KassaReservationsViewProps) {
   const isAdminPagePresentation = presentation === 'adminPage'
+  const { soundActivated, activateSound } = useKassaSoundActivationGate(tenant)
+  useReservationRequestAlarm(tenant, isAdminPagePresentation && soundActivated)
+  const adminSoundUi = {
+    soundBackdrop: 'bg-slate-900/95',
+    soundHeading: 'text-white',
+    soundBody: 'text-slate-200',
+    soundStrong: 'text-white',
+    soundMuted: 'text-slate-400',
+  } as const
   const shellFixed = isAdminPagePresentation
     ? 'flex h-[calc(100dvh-3.5rem)] min-h-0 w-full max-w-full flex-col overflow-hidden bg-white'
     : 'fixed inset-0 z-50 flex min-h-0 flex-col overflow-hidden bg-white h-[100dvh] max-h-[100dvh]'
@@ -755,7 +773,14 @@ export default function KassaReservationsView({
         event: 'INSERT',
         schema: 'public',
         table: 'reservations',
-      }, () => { loadReservations(true); loadGuestProfiles() })
+      }, (payload) => {
+        const row = payload.new as { tenant_slug?: string; status?: string }
+        if (row.tenant_slug === tenant && isPendingOrWaitlistReservationStatus(row.status)) {
+          triggerReservationRequestAlarmSound()
+        }
+        loadReservations(true)
+        loadGuestProfiles()
+      })
       .on('postgres_changes', {
         event: 'UPDATE',
         schema: 'public',
@@ -2267,6 +2292,9 @@ export default function KassaReservationsView({
   // ---- Main render ----
   return (
     <div className={shellFixed}>
+      {isAdminPagePresentation && !soundActivated && (
+        <KassaSoundActivationScreen ui={adminSoundUi} onActivate={activateSound} />
+      )}
       {/* Toast */}
       {toast.msg && (
         <div
