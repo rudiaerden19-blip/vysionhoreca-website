@@ -36,7 +36,6 @@ import {
   Calendar,
   Maximize2,
   Minimize2,
-  Expand,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
@@ -2649,7 +2648,7 @@ export default function KassaReservationsView({
                   className="flex min-h-[44px] items-center gap-2 rounded-xl border-2 border-[#075985] bg-white px-3 py-2 text-sm font-bold text-[#075985] shadow-sm transition-colors hover:bg-[#e8eef6]"
                   title="Zoom zodat alle tafels zichtbaar zijn"
                 >
-                  <Expand size={18} className="shrink-0" />
+                  <LayoutGrid size={18} className="shrink-0" />
                   <span className="hidden sm:inline">Toon alle tafels</span>
                   <span className="sm:hidden">Alles</span>
                 </button>
@@ -2815,7 +2814,7 @@ export default function KassaReservationsView({
                         className="flex min-h-[44px] shrink-0 items-center gap-2 rounded-xl border-2 border-white/90 bg-white px-3 py-2 text-sm font-bold text-[#075985] shadow-lg transition-colors hover:bg-[#e8eef6] sm:px-4"
                         title="Toon alle tafels"
                       >
-                        <Expand size={18} className="shrink-0" />
+                        <LayoutGrid size={18} className="shrink-0" />
                         <span className="hidden sm:inline">Toon alle tafels</span>
                       </button>
                       <button
