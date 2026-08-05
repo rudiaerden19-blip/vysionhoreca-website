@@ -5089,12 +5089,19 @@ function EditReservationModal({ reservation, tables, reservations, shifts, buffe
         onClick={e => e.stopPropagation()}>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50 flex-shrink-0">
-          <div>
+        <div className="flex items-start justify-between gap-3 px-6 py-4 border-b border-gray-100 bg-gray-50 flex-shrink-0">
+          <div className="min-w-0 flex-1">
             <h2 className="text-lg font-black text-gray-800">Reservatie bewerken</h2>
-            <p className="text-sm text-gray-500">{reservation.guest_name} · {reservation.reservation_date} {reservation.reservation_time}</p>
+            <p className="text-sm text-gray-500 truncate">{reservation.guest_name} · {reservation.reservation_date} {reservation.reservation_time}</p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-lg"><X size={20}/></button>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Sluiten"
+            className="shrink-0 flex h-11 w-11 items-center justify-center rounded-xl border border-gray-300 bg-white text-gray-800 shadow-sm hover:bg-gray-100 active:bg-gray-200 transition-colors touch-manipulation"
+          >
+            <X size={22} strokeWidth={2.5} aria-hidden />
+          </button>
         </div>
 
         {/* Body */}
