@@ -297,6 +297,15 @@ export default function KassaReservationsView({
     floorPointersRef.current.clear()
     floorPinchSessionRef.current = null
   }, [resFloorPlanZone])
+
+  /** Elke keer plattegrond-tab: zelfde openingszoom (iPad niet meer miniaturisch). */
+  useEffect(() => {
+    if (viewMode !== 'floorplan') return
+    const touch = typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0
+    setFloorViewport(defaultFloorViewportForDevice(touch))
+    floorPointersRef.current.clear()
+    floorPinchSessionRef.current = null
+  }, [viewMode])
   /** Horizontaal scrollende tijdlijn — nodig voor correcte resize (pixels ↔ minuten) */
   const timelineGridScrollRef = useRef<HTMLDivElement>(null)
   /** Zelfde als LABEL_W in de tijdlijn-UI (kolom “Tafel”) */

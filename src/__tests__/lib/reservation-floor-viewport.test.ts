@@ -1,5 +1,6 @@
 import {
   clampFloorViewportZoom,
+  defaultFloorViewportForDevice,
   pinchZoomReservationFloor,
   zoomReservationFloorAtPoint,
 } from '@/lib/reservation-floor-viewport'
@@ -14,6 +15,10 @@ describe('reservation-floor-viewport', () => {
     const vp = { panX: 0, panY: 0, zoom: 1 }
     const out = zoomReservationFloorAtPoint(vp, 0.5, 200, 150)
     expect(out.zoom).toBe(0.5)
+  })
+
+  it('opens touch at full zoom for readable tables', () => {
+    expect(defaultFloorViewportForDevice(true).zoom).toBe(1)
   })
 
   it('pinch ratio scales zoom from start', () => {
