@@ -30,8 +30,8 @@ export function zoomReservationFloorAtPoint(
   }
 }
 
-/** Standaard openingszoom: iPad ≈ afb. 2 (leesbare tafels); uitzoomen kan via − / pinch. */
-export const FLOOR_DEFAULT_OPEN_ZOOM_TOUCH = 1
+/** Standaard openingszoom: iPad ~80%; uitzoomen kan via − / pinch. */
+export const FLOOR_DEFAULT_OPEN_ZOOM_TOUCH = 0.8
 export const FLOOR_DEFAULT_OPEN_ZOOM_DESKTOP = 1
 
 export function defaultFloorViewportForDevice(isTouch: boolean): ReservationFloorViewport {

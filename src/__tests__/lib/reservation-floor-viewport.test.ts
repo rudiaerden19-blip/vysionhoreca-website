@@ -18,7 +18,7 @@ describe('reservation-floor-viewport', () => {
   })
 
   it('opens touch at full zoom for readable tables', () => {
-    expect(defaultFloorViewportForDevice(true).zoom).toBe(1)
+    expect(defaultFloorViewportForDevice(true).zoom).toBe(0.8)
   })
 
   it('pinch ratio scales zoom from start', () => {
