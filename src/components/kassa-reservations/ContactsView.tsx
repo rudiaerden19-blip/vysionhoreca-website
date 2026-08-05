@@ -15,6 +15,7 @@ export function ContactsView({
   onToggleNoShow,
   promoSelectionReset = 0,
   rk,
+  formatGuestDate,
 }: {
   guestProfiles: GuestProfile[]
   searchQuery: string
@@ -24,6 +25,7 @@ export function ContactsView({
   onToggleNoShow: (guest: GuestProfile) => void | Promise<void>
   promoSelectionReset?: number
   rk: (key: string, rep?: Record<string, string>) => string
+  formatGuestDate: (isoDate: string) => string
 }) {
   const [guestSort, setGuestSort] = useState<'lastVisit' |  'name' |  'visits'>('lastVisit')
   const [guestSortDir, setGuestSortDir] = useState<'asc' |  'desc'>('desc')
@@ -109,19 +111,22 @@ export function ContactsView({
             setSearchQuery(e.target.value)
             setPage(0)
           }}
-          placeholder="Zoek op naam, email of telefoon..."
+          placeholder={rk('contactsSearchPlaceholder')}
           className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-4 text-sm outline-none focus:border-[#075985]"
         />
       </div>
 
-      <p className="text-sm text-gray-400">{filtered.length} contacten</p>
+      <p className="text-sm text-gray-400">{rk('contactsCount', { count: String(filtered.length) })}</p>
 
       {selectedTotal > 0 && (
         <div className="flex flex-wrap items-center gap-3 rounded-xl border border-[#bcc8dc] bg-[#f2f5fa] px-4 py-3 text-sm">
           <span className="font-semibold text-gray-800">
-            {selectedTotal} geselecteerd
+            {rk('contactsSelected', { count: String(selectedTotal) })}
             {selectedWithEmail.length !== selectedTotal && (
-              <span className="font-normal text-gray-500"> ({selectedWithEmail.length} met e-mail)</span>
+              <span className="font-normal text-gray-500">
+                {' '}
+                {rk('contactsSelectedWithEmail', { count: String(selectedWithEmail.length) })}
+              </span>
             )}
           </span>
           <button
@@ -138,7 +143,7 @@ export function ContactsView({
             onClick={() => setSelectedGuestIds(new Set())}
             className="min-h-[44px] rounded-lg px-3 text-sm font-medium text-gray-600 underline decoration-gray-300 hover:text-gray-900"
           >
-            Selectie wissen
+            {rk('clearSelection')}
           </button>
         </div>
       )}
@@ -166,44 +171,38 @@ export function ContactsView({
                 checked={allPageSelected}
                 onChange={toggleSelectPage}
                 className="h-5 w-5 cursor-pointer rounded border-white/50 text-[#075985] focus:ring-2 focus:ring-white/80"
-                title="Selecteer alle contacten op deze pagina"
-                aria-label="Selecteer alle contacten op deze pagina"
+                title={rk('selectAllContactsOnPage')}
+                aria-label={rk('selectAllContactsOnPage')}
               />
             </div>
             <div
               onClick={() => changeSort('name')}
               className="flex cursor-pointer select-none items-center gap-1 hover:opacity-80"
             >
-              Naam {guestSort === 'name' && <span>{guestSortDir === 'desc'? '↓': '↑'}</span>}
+              {rk('colName')} {guestSort === 'name' && <span>{guestSortDir === 'desc'? '↓': '↑'}</span>}
             </div>
-            <div>Telefoon</div>
-            <div>E-mail</div>
+            <div>{rk('colPhone')}</div>
+            <div>{rk('colEmail')}</div>
             <div
               onClick={() => changeSort('lastVisit')}
               className="hidden cursor-pointer select-none items-center gap-1 hover:opacity-80 md:flex"
             >
-              Laatste bezoek {guestSort === 'lastVisit' && <span>{guestSortDir === 'desc'? '↓': '↑'}</span>}
+              {rk('colLastVisit')} {guestSort === 'lastVisit' && <span>{guestSortDir === 'desc'? '↓': '↑'}</span>}
             </div>
             <div
               onClick={() => changeSort('visits')}
               className="flex cursor-pointer select-none items-center gap-1 hover:opacity-80"
             >
-              Bezoeken {guestSort === 'visits' && <span>{guestSortDir === 'desc'? '↓': '↑'}</span>}
+              {rk('colVisits')} {guestSort === 'visits' && <span>{guestSortDir === 'desc'? '↓': '↑'}</span>}
             </div>
-            <div>No-show</div>
+            <div>{rk('colNoShow')}</div>
           </div>
 
           <div className="divide-y divide-gray-100">
             {paginated.map((guest: GuestProfile) => {
               const isRed = guest.totalNoShows > 0
               const saving = noShowSaving === guest.id
-              const lastVisitFmt = guest.lastVisit
-                ? new Date(guest.lastVisit + 'T12:00').toLocaleDateString('nl-BE', {
-                    day: 'numeric',
-                    month: 'short',
-                    year: 'numeric',
-                  })
-                : '—'
+              const lastVisitFmt = guest.lastVisit ? formatGuestDate(guest.lastVisit) : '—'
               return (
                 <div
                   key={guest.id}
@@ -216,7 +215,7 @@ export function ContactsView({
                       checked={selectedGuestIds.has(guest.id)}
                       onChange={() => toggleSelectRow(guest.id)}
                       className="h-5 w-5 cursor-pointer rounded border-gray-300 text-[#075985] focus:ring-[#075985]"
-                      aria-label={`Selecteer ${guest.name}`}
+                      aria-label={rk('selectGuestAria', { name: guest.name })}
                     />
                   </div>
                   <div className="flex min-w-0 items-center gap-1.5 pr-2 font-semibold text-gray-900">
@@ -273,7 +272,7 @@ export function ContactsView({
                     }}
                     className={`w-fit rounded-full px-3 py-1 text-xs font-semibold transition-colors disabled:opacity-60 ${isRed ? 'bg-red-500 text-white': 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
                   >
-                    {saving ? '…' : 'No-show'}
+                    {saving ? '…' : rk('colNoShow')}
                   </button>
                 </div>
               )
@@ -284,7 +283,11 @@ export function ContactsView({
 
       <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-500">
         <span>
-          {from}–{to} van {filtered.length}
+          {rk('paginationFromTo', {
+            from: String(from),
+            to: String(to),
+            total: String(filtered.length),
+          })}
         </span>
         <div className="flex items-center gap-2">
           <select
@@ -297,7 +300,7 @@ export function ContactsView({
           >
             {PAGE_SIZE_OPTIONS.map((s) => (
               <option key={s} value={s}>
-                {s} per pagina
+                {rk('perPageOption', { size: String(s) })}
               </option>
             ))}
           </select>

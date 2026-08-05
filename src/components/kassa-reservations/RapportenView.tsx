@@ -1,33 +1,25 @@
 'use client'
 
 import { useState } from 'react'
-import type { GuestProfile, Reservation } from './kassa-reservations-model'
+import type { GuestProfile, Reservation, ReservationStatus } from './kassa-reservations-model'
+import type { ReservationKassaRk } from '@/hooks/useReservationKassa'
 
 export function RapportenView({
   reservations,
   guestProfiles,
+  rk,
+  monthName,
+  weekdayShort,
 }: {
   reservations: Reservation[]
   guestProfiles: GuestProfile[]
+  rk: ReservationKassaRk
+  monthName: (i: number) => string
+  weekdayShort: (i: number) => string
 }) {
   const now = new Date()
   const [rMonth, setRMonth] = useState(now.getMonth())
   const [rYear, setRYear] = useState(now.getFullYear())
-
-  const MONTHS = [
-    'Januari',
-    'Februari',
-    'Maart',
-    'April',
-    'Mei',
-    'Juni',
-    'Juli',
-    'Augustus',
-    'September',
-    'Oktober',
-    'November',
-    'December',
-  ]
 
   const from = `${rYear}-${String(rMonth + 1).padStart(2, '0')}-01`
   const to = `${rYear}-${String(rMonth + 1).padStart(2, '0')}-${String(new Date(rYear, rMonth + 1, 0).getDate()).padStart(2, '0')}`
@@ -48,7 +40,7 @@ export function RapportenView({
   const daysInMonth = new Date(rYear, rMonth + 1, 0).getDate()
   const dayLabels = Array.from({ length: daysInMonth }, (_, i) => {
     const d = new Date(rYear, rMonth, i + 1)
-    return `${['Zo', 'Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za'][d.getDay()]} ${i + 1}`
+    return `${weekdayShort(d.getDay())} ${i + 1}`
   })
   const guestsByDay = Array.from({ length: daysInMonth }, (_, i) => {
     const d = `${rYear}-${String(rMonth + 1).padStart(2, '0')}-${String(i + 1).padStart(2, '0')}`
@@ -117,28 +109,30 @@ export function RapportenView({
     (i) => i % Math.ceil(daysInMonth / 10) === 0 || i === daysInMonth - 1,
   )
 
-  const statusData = [
-    { label: 'Bevestigd', status: 'CONFIRMED'as const, color: '#3b82f6'},
-    { label: 'Ingecheckt', status: 'CHECKED_IN'as const, color: '#22c55e'},
-    { label: 'Afgerond', status: 'COMPLETED'as const, color: '#6b7280'},
-    { label: 'No-show', status: 'NO_SHOW'as const, color: '#ef4444'},
-    { label: 'Geannuleerd', status: 'CANCELLED'as const, color: '#d1d5db'},
+  const statusKeys: { status: ReservationStatus; color: string }[] = [
+    { status: 'CONFIRMED', color: '#3b82f6' },
+    { status: 'CHECKED_IN', color: '#22c55e' },
+    { status: 'COMPLETED', color: '#6b7280' },
+    { status: 'NO_SHOW', color: '#ef4444' },
+    { status: 'CANCELLED', color: '#d1d5db' },
   ]
+
+  const monthLabel = monthName(rMonth)
 
   return (
     <div className="space-y-5 pb-8">
       <div className="flex flex-wrap items-center gap-4 rounded-xl border border-gray-200 bg-white p-4">
         <div>
-          <label className="mb-1 block text-xs text-gray-500">Datumbereik</label>
+          <label className="mb-1 block text-xs text-gray-500">{rk('reportDateRange')}</label>
           <div className="flex items-center gap-2">
             <select
               value={rMonth}
               onChange={(e) => setRMonth(Number(e.target.value))}
               className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-[#075985]"
             >
-              {MONTHS.map((m, i) => (
+              {Array.from({ length: 12 }, (_, i) => (
                 <option key={i} value={i}>
-                  {m}
+                  {monthName(i)}
                 </option>
               ))}
             </select>
@@ -157,30 +151,39 @@ export function RapportenView({
         </div>
         <div className="hidden h-8 w-px bg-gray-200 sm:block" />
         <div className="text-sm text-gray-500">
-          <span className="font-semibold text-gray-800">{total}</span> reservaties &nbsp;·&nbsp;
-          <span className="font-semibold text-gray-800">{totalGuests}</span> gasten in {MONTHS[rMonth]} {rYear}
+          {rk('reportMonthSummary', {
+            total: String(total),
+            totalGuests: String(totalGuests),
+            month: monthLabel,
+            year: String(rYear),
+          })}
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {[
-          { label: 'Terugkerende gasten', value: `${returningPct}%`, sub: 'van alle gasten', color: 'text-gray-800'},
           {
-            label: 'Annuleringen',
+            label: rk('reportReturningGuests'),
+            value: `${returningPct}%`,
+            sub: rk('reportOfAllGuests'),
+            color: 'text-gray-800',
+          },
+          {
+            label: rk('reportCancellations'),
             value: `${cancelPct}%`,
-            sub: `${cancelled} geannuleerd`,
-            color: cancelPct > 20 ? 'text-red-500': 'text-gray-800',
+            sub: rk('reportCancelledCount', { count: String(cancelled) }),
+            color: cancelPct > 20 ? 'text-red-500' : 'text-gray-800',
           },
           {
-            label: 'No-shows',
+            label: rk('reportNoShows'),
             value: `${noShowPct}%`,
-            sub: `${noShows} no-show`,
-            color: noShowPct > 10 ? 'text-red-500': 'text-gray-800',
+            sub: rk('reportNoShowCount', { count: String(noShows) }),
+            color: noShowPct > 10 ? 'text-red-500' : 'text-gray-800',
           },
           {
-            label: 'Gem. groepsgrootte',
+            label: rk('reportAvgGroupSize'),
             value: avgGroup > 0 ? avgGroup.toFixed(1) : '—',
-            sub: 'personen per reservatie',
+            sub: rk('reportPersonsPerReservation'),
             color: 'text-gray-800',
           },
         ].map(({ label, value, sub, color }) => (
@@ -195,12 +198,14 @@ export function RapportenView({
       <div className="rounded-xl border border-gray-200 bg-white p-5">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h4 className="font-bold text-gray-800">Gasten per dag</h4>
+            <h4 className="font-bold text-gray-800">{rk('reportGuestsPerDay')}</h4>
             <p className="mt-0.5 text-xs text-gray-400">
-              {MONTHS[rMonth]} {rYear}
+              {monthLabel} {rYear}
             </p>
           </div>
-          <span className="text-sm font-semibold text-gray-500">Totaal: {totalGuests}</span>
+          <span className="text-sm font-semibold text-gray-500">
+            {rk('reportTotal')} {totalGuests}
+          </span>
         </div>
         <AreaChart data={guestsByDay} max={maxGuests} color="#58CCFF" />
         <div className="mt-1 flex justify-between px-2">
@@ -212,19 +217,21 @@ export function RapportenView({
         </div>
         <div className="mt-3 flex items-center gap-2">
           <div className="h-3 w-3 rounded-full bg-[#6b7d9e]" />
-          <span className="text-xs text-gray-500">Handmatig / kassa</span>
+          <span className="text-xs text-gray-500">{rk('reportSourceManualKassa')}</span>
         </div>
       </div>
 
       <div className="rounded-xl border border-gray-200 bg-white p-5">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h4 className="font-bold text-gray-800">Reserveringen per dag</h4>
+            <h4 className="font-bold text-gray-800">{rk('reportReservationsPerDay')}</h4>
             <p className="mt-0.5 text-xs text-gray-400">
-              {MONTHS[rMonth]} {rYear}
+              {monthLabel} {rYear}
             </p>
           </div>
-          <span className="text-sm font-semibold text-gray-500">Totaal: {totalRes}</span>
+          <span className="text-sm font-semibold text-gray-500">
+            {rk('reportTotal')} {totalRes}
+          </span>
         </div>
         <AreaChart data={resByDay} max={maxRes} color="#3b82f6" />
         <div className="mt-1 flex justify-between px-2">
@@ -236,20 +243,20 @@ export function RapportenView({
         </div>
         <div className="mt-3 flex items-center gap-2">
           <div className="h-3 w-3 rounded-full bg-blue-400" />
-          <span className="text-xs text-gray-500">Handmatig / kassa</span>
+          <span className="text-xs text-gray-500">{rk('reportSourceManualKassa')}</span>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="rounded-xl border border-gray-200 bg-white p-5">
-          <h4 className="mb-4 font-bold text-gray-800">Status verdeling</h4>
+          <h4 className="mb-4 font-bold text-gray-800">{rk('reportStatusDistribution')}</h4>
           <div className="space-y-3">
-            {statusData.map(({ label, status, color }) => {
+            {statusKeys.map(({ status, color }) => {
               const count = filtered.filter((r) => r.status === status).length
               const pct = filtered.length > 0 ? (count / filtered.length) * 100 : 0
               return (
                 <div key={status} className="flex items-center gap-3">
-                  <span className="w-24 shrink-0 text-sm text-gray-600">{label}</span>
+                  <span className="w-24 shrink-0 text-sm text-gray-600">{rk(`status_${status}`)}</span>
                   <div className="h-3 flex-1 overflow-hidden rounded-full bg-gray-100">
                     <div
                       className="h-full rounded-full transition-all"
@@ -264,7 +271,7 @@ export function RapportenView({
         </div>
 
         <div className="rounded-xl border border-gray-200 bg-white p-5">
-          <h4 className="mb-4 font-bold text-gray-800">Top 5 meest terugkerende gasten</h4>
+          <h4 className="mb-4 font-bold text-gray-800">{rk('reportTopReturningGuests')}</h4>
           <div className="space-y-3">
             {[...guestProfiles]
               .sort((a, b) => b.totalVisits - a.totalVisits)
@@ -295,7 +302,7 @@ export function RapportenView({
                 </div>
               ))}
             {guestProfiles.length === 0 && (
-              <p className="py-4 text-center text-sm text-gray-400">Nog geen gastdata</p>
+              <p className="py-4 text-center text-sm text-gray-400">{rk('reportNoGuestData')}</p>
             )}
           </div>
         </div>

@@ -54,6 +54,7 @@ import {
 import { getAuthHeaders, authFetch } from '@/lib/auth-headers'
 import { useLanguage } from '@/i18n'
 import { ControlledNumberInput } from '@/components/ControlledNumberInput'
+import { useReservationKassa, makeReservationKassaRk } from '@/hooks/useReservationKassa'
 
 import type {
   FloorPlanTable,
@@ -191,16 +192,24 @@ export default function KassaReservationsView({
     : 'fixed inset-0 z-50 flex min-h-0 flex-col overflow-hidden bg-white h-[100dvh] max-h-[100dvh]'
   const toast = useToast()
   const { t, locale } = useLanguage()
+  const {
+    rk,
+    dateTag,
+    formatDate,
+    formatDateLong,
+    formatDateMedium,
+    statusLabel,
+    monthName,
+    weekdayShort,
+  } = useReservationKassa()
   const backLabel = closeButtonLabel ?? t('adminLayout.pos')
-  const rk = useCallback((key: string, rep?: Record<string, string>) => {
-    let out = t(`reservationKassa.${key}`)
-    if (rep) {
-      for (const [k, v] of Object.entries(rep)) {
-        out = out.split(`{${k}}`).join(v)
-      }
-    }
-    return out
-  }, [t])
+  const formatGuestDate = useCallback(
+    (iso: string) => {
+      const d = new Date(`${iso}T12:00:00`)
+      return d.toLocaleDateString(dateTag, { day: 'numeric', month: 'short', year: 'numeric' })
+    },
+    [dateTag],
+  )
 
   const [reservations, setReservations] = useState<Reservation[]>([])
   const [loading, setLoading] = useState(true)
@@ -1557,8 +1566,10 @@ export default function KassaReservationsView({
       return
     }
     setContactPromoRecipients([g])
-    setContactPromoSubject(businessInfo.name ? `Nieuws van ${businessInfo.name}`: 'Een woordje van ons')
-    setContactPromoMessage(`Beste ${g.name},\n\n`)
+    setContactPromoSubject(
+      businessInfo.name ? rk('promoSubjectFromBusiness', { businessName: businessInfo.name }) : rk('promoSubjectDefault'),
+    )
+    setContactPromoMessage(`${rk('promoGreetingSingle', { name: g.name })}\n\n`)
   }
 
   const openContactPromoModalMany = (guests: GuestProfile[]) => {
@@ -1573,8 +1584,10 @@ export default function KassaReservationsView({
       return
     }
     setContactPromoRecipients(withEmail)
-    setContactPromoSubject(businessInfo.name ? `Nieuws van ${businessInfo.name}`: 'Een woordje van ons')
-    setContactPromoMessage('Beste klant,\n\n')
+    setContactPromoSubject(
+      businessInfo.name ? rk('promoSubjectFromBusiness', { businessName: businessInfo.name }) : rk('promoSubjectDefault'),
+    )
+    setContactPromoMessage(`${rk('promoGreetingBulk')}\n\n`)
   }
 
   const handleSendContactPromo = async () => {
@@ -2098,12 +2111,6 @@ export default function KassaReservationsView({
     }
   }
 
-  // ---- Formatting ----
-  const formatDate = (date: string) => {
-    const d = new Date(date)
-    return d.toLocaleDateString('nl-BE', { weekday: 'short', day: 'numeric', month: 'short'})
-  }
-
   // ---- Render card (exact kopie) ----
   const renderReservationCard = (reservation: Reservation) => {
     const status = KASSA_STATUS_CONFIG[reservation.status]
@@ -2125,7 +2132,7 @@ export default function KassaReservationsView({
                 style={{ backgroundColor: status.bgColor, color: status.color }}
               >
                 {status.icon}
-                {status.label}
+                {statusLabel(reservation.status)}
               </span>
             </div>
             <h3 className="font-semibold text-lg mt-1">{reservation.guest_name}</h3>
@@ -2147,7 +2154,7 @@ export default function KassaReservationsView({
           {reservation.table_number && (
             <div className="flex items-center gap-2">
               <MapPin size={14} />
-              <span>Tafel {reservation.table_number}</span>
+              <span>{rk('tableWithNumber', { number: String(reservation.table_number) })}</span>
             </div>
           )}
           {reservation.notes && (
@@ -2163,17 +2170,17 @@ export default function KassaReservationsView({
           <div className="flex items-center gap-2 mb-3">
             {guest.isVip && (
               <span className="px-2 py-0.5 rounded-full text-xs bg-amber-500/20 text-amber-600 flex items-center gap-1">
-                <Star size={12} /> VIP
+                <Star size={12} /> {rk('vipBadge')}
               </span>
             )}
             {guest.totalNoShows > 0 && (
               <span className="px-2 py-0.5 rounded-full text-xs bg-red-500/20 text-red-500">
-                {guest.totalNoShows} no-shows
+                {rk('noShowsBadge', { count: String(guest.totalNoShows) })}
               </span>
             )}
             {guest.totalVisits > 5 && (
               <span className="px-2 py-0.5 rounded-full text-xs bg-green-500/20 text-green-600">
-                {guest.totalVisits} bezoeken
+                {rk('visitsBadge', { count: String(guest.totalVisits) })}
               </span>
             )}
           </div>
@@ -2189,7 +2196,7 @@ export default function KassaReservationsView({
                   className="flex-1 py-2 px-3 rounded-lg bg-emerald-500 text-white text-sm font-medium hover:bg-emerald-600 transition-colors flex items-center justify-center gap-1"
                 >
                   <UtensilsCrossed size={16} />
-                  Start Order
+                  {rk('startOrder')}
                 </button>
               )}
               <button
@@ -2225,7 +2232,7 @@ export default function KassaReservationsView({
               className="flex-1 py-2 px-3 rounded-lg bg-black text-white font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-1"
             >
               <CheckCircle2 size={16} />
-              Bevestigen
+              {rk('confirm')}
             </button>
           )}
         </div>
@@ -2440,12 +2447,12 @@ export default function KassaReservationsView({
             <div className="w-80 flex-shrink-0 border-r border-gray-200 bg-white flex flex-col overflow-hidden">
               <div className="px-4 py-3 border-b border-gray-100 bg-gray-50 flex-shrink-0">
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-                  {formatDate(today)} • {todayStats.covers} personen • {todayStats.total} reservaties
+                  {formatDate(today)} • {rk('todayHeaderStats', { covers: String(todayStats.covers), total: String(todayStats.total) })}
                 </p>
               </div>
               <div className="flex-1 overflow-y-auto divide-y divide-gray-100">
                 {todayReservations.filter(r => r.status !== 'WAITLIST').length === 0 && (
-                  <div className="p-6 text-center text-gray-400 text-sm">Geen reservaties vandaag</div>
+                  <div className="p-6 text-center text-gray-400 text-sm">{rk('noReservationsToday')}</div>
                 )}
                 {todayReservations.filter(r => r.status !== 'WAITLIST').map(r => {
                   const status = KASSA_STATUS_CONFIG[r.status]
@@ -2464,7 +2471,7 @@ export default function KassaReservationsView({
                             <span className="text-sm font-bold text-gray-900">{r.reservation_time}</span>
                             <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium flex-shrink-0"
                               style={{ backgroundColor: status.bgColor, color: status.color }}>
-                              {status.label}
+                              {statusLabel(r.status)}
                             </span>
                           </div>
                           <p className="font-semibold text-gray-900 text-sm truncate">
@@ -2484,7 +2491,7 @@ export default function KassaReservationsView({
                               {r.status === 'PENDING' && (
                                 <button onClick={e => { e.stopPropagation(); handleConfirm(r) }}
                                   className="text-[10px] px-2 py-1 rounded-md bg-black text-white font-medium hover:bg-gray-800 transition-colors">
-                                  Bevestigen
+                                  {rk('confirm')}
                                 </button>
                               )}
                               {r.status === 'CONFIRMED' && (
@@ -2523,7 +2530,7 @@ export default function KassaReservationsView({
                 {waitlistReservations.length > 0 && (
                   <div>
                     <div className="px-3 py-2 bg-purple-50 border-y border-purple-100">
-                      <p className="text-xs font-bold text-purple-600">WACHTLIJST ({waitlistReservations.length})</p>
+                      <p className="text-xs font-bold text-purple-600">{rk('waitlistHeader', { count: String(waitlistReservations.length) })}</p>
                     </div>
                     {waitlistReservations.map(r => (
                       <div key={r.id} onClick={() => setSelectedReservation(r)}
@@ -2538,7 +2545,7 @@ export default function KassaReservationsView({
                         </div>
                         <button onClick={e => { e.stopPropagation(); handleConfirmFromWaitlist(r) }}
                           className="mt-1.5 text-[10px] px-2 py-1 rounded-md bg-purple-500 text-white font-medium hover:bg-purple-600 transition-colors">
-                          Bevestigen
+                          {rk('confirm')}
                         </button>
                       </div>
                     ))}
@@ -2566,7 +2573,7 @@ export default function KassaReservationsView({
                       : 'text-gray-600 hover:bg-gray-100'
                   }`}
                 >
-                  Binnen
+                  {rk('zoneInside')}
                 </button>
                 <button
                   type="button"
@@ -2577,7 +2584,7 @@ export default function KassaReservationsView({
                       : 'text-gray-600 hover:bg-gray-100'
                   }`}
                 >
-                  Terras
+                  {rk('zoneTerrace')}
                 </button>
               </div>
 
@@ -2585,14 +2592,14 @@ export default function KassaReservationsView({
                 <div className="flex items-center justify-center h-full">
                   <div className="text-center bg-white/80 rounded-2xl p-8 shadow-sm">
                     <LayoutGrid size={48} className="mx-auto text-gray-400 mb-3" />
-                    <p className="text-gray-600 font-semibold mb-1">Nog geen tafels aangemaakt</p>
-                    <p className="text-sm text-gray-400 mb-4">Maak je plattegrond aan om tafels te zien</p>
+                    <p className="text-gray-600 font-semibold mb-1">{rk('noTablesYet')}</p>
+                    <p className="text-sm text-gray-400 mb-4">{rk('noTablesYetHint')}</p>
                     <button
                       onClick={() => openFloorPlanView()}
                       className="px-5 py-2.5 rounded-xl bg-green-500 hover:bg-green-600 text-white text-sm font-semibold transition-colors flex items-center gap-2 mx-auto"
                     >
                       <Plus size={16} />
-                      Tafels aanmaken
+                      {rk('createTablesCta')}
                     </button>
                   </div>
                 </div>
@@ -2653,10 +2660,10 @@ export default function KassaReservationsView({
 
                   {/* Legenda */}
                   <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur rounded-xl px-4 py-2.5 flex items-center gap-4 shadow-md text-xs font-medium">
-                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-green-400" /><span>Vrij</span></div>
-                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-violet-400" /><span>Gereserveerd</span></div>
-                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-gray-800" /><span>Bezet</span></div>
-                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-amber-400" /><span>Afwachting</span></div>
+                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-green-400" /><span>{rk('floorFree')}</span></div>
+                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-violet-400" /><span>{rk('floorReserved')}</span></div>
+                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-gray-800" /><span>{rk('floorOccupied')}</span></div>
+                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-amber-400" /><span>{rk('floorPending')}</span></div>
                   </div>
 
                   {/* Datum badge */}
@@ -2692,7 +2699,7 @@ export default function KassaReservationsView({
             const all = floorRes.filter(r => String(r.table_number) === String(tableNum))
             // Geen reservaties of enkel afgeronde → vrij (groen)
             const active = all.filter(r => r.status !== 'COMPLETED')
-            if (active.length === 0) return { color: '#4ade80', borderColor: '#22c55e', label: 'Vrij', res: null, count: 0, guestLabel: ''}
+            if (active.length === 0) return { color: '#4ade80', borderColor: '#22c55e', label: rk('floorFree'), res: null, count: 0, guestLabel: ''}
             // Toon de eerstvolgende actieve reservatie
             const res = active.sort((a, b) => a.reservation_time.localeCompare(b.reservation_time))[0]
             const count = active.length
@@ -2701,10 +2708,10 @@ export default function KassaReservationsView({
               : count > 2
                 ? `${res.guest_name} +${count - 1}`
                 : res.guest_name
-            if (res.status === 'CHECKED_IN') return { color: '#60a5fa', borderColor: '#3b82f6', label: 'Bezet', res, count, guestLabel }
-            if (res.status === 'CONFIRMED') return { color: '#a78bfa', borderColor: '#8b5cf6', label: 'Gereserveerd', res, count, guestLabel }
-            if (res.status === 'PENDING') return { color: '#fbbf24', borderColor: '#f59e0b', label: 'Afwachting', res, count, guestLabel }
-            return { color: '#4ade80', borderColor: '#22c55e', label: 'Vrij', res, count, guestLabel }
+            if (res.status === 'CHECKED_IN') return { color: '#60a5fa', borderColor: '#3b82f6', label: rk('floorOccupied'), res, count, guestLabel }
+            if (res.status === 'CONFIRMED') return { color: '#a78bfa', borderColor: '#8b5cf6', label: rk('floorReserved'), res, count, guestLabel }
+            if (res.status === 'PENDING') return { color: '#fbbf24', borderColor: '#f59e0b', label: rk('floorPending'), res, count, guestLabel }
+            return { color: '#4ade80', borderColor: '#22c55e', label: rk('floorFree'), res, count, guestLabel }
           }
 
           const effectiveResListCollapsed = floorOnlyMode || resListCollapsed
@@ -2747,7 +2754,7 @@ export default function KassaReservationsView({
                         : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                     }`}
                   >
-                    Binnen
+                    {rk('zoneInside')}
                   </button>
                   <button
                     type="button"
@@ -2758,7 +2765,7 @@ export default function KassaReservationsView({
                         : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                     }`}
                   >
-                    Terras
+                    {rk('zoneTerrace')}
                   </button>
                 </div>
 
@@ -2766,10 +2773,10 @@ export default function KassaReservationsView({
 
                 {/* Legend */}
                 <div className="hidden lg:flex items-center gap-4 text-sm font-medium text-gray-600">
-                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-green-400" /><span>Vrij</span></div>
-                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-violet-400" /><span>Gereserveerd</span></div>
-                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-gray-800" /><span>Bezet</span></div>
-                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-amber-400" /><span>Afwachting</span></div>
+                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-green-400" /><span>{rk('floorFree')}</span></div>
+                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-violet-400" /><span>{rk('floorReserved')}</span></div>
+                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-gray-800" /><span>{rk('floorOccupied')}</span></div>
+                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-amber-400" /><span>{rk('floorPending')}</span></div>
                 </div>
 
                 <div className="flex-1" />
@@ -2778,12 +2785,12 @@ export default function KassaReservationsView({
                   type="button"
                   onClick={toggleFloorOnlyMode}
                   className="flex min-h-[44px] items-center gap-2 rounded-xl border-2 border-black bg-white px-3 py-2 text-sm font-bold text-gray-900 shadow-sm transition-colors hover:bg-gray-50"
-                  title="Verberg menu en toon alleen de vloer"
-                  aria-label="Alleen vloer — verberg balken"
+                  title={rk('floorOnlyTitle')}
+                  aria-label={rk('floorOnlyAria')}
                 >
                   <Maximize2 size={18} className="shrink-0" />
-                  <span className="sm:hidden">Vloer</span>
-                  <span className="hidden sm:inline">Alleen vloer</span>
+                  <span className="sm:hidden">{rk('floorOnlyShort')}</span>
+                  <span className="hidden sm:inline">{rk('floorOnlyLong')}</span>
                 </button>
 
                 {/* Vergrendel-knop */}
@@ -2798,17 +2805,17 @@ export default function KassaReservationsView({
                       ? 'bg-red-500 hover:bg-red-600 text-white'
                       : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
                   }`}
-                  title={tablesLocked ? 'Tafels vergrendeld — klik om te ontgrendelen': 'Tafels ontgrendeld — klik om te vergrendelen'}
+                  title={tablesLocked ? rk('tablesLockedTitle') : rk('tablesUnlockedTitle')}
                 >
                   {tablesLocked ? <Lock size={18} /> : <LockOpen size={18} />}
-                  <span className="hidden sm:inline">{tablesLocked ? 'Ontgrendel tafels': 'Vergrendelen'}</span>
+                  <span className="hidden sm:inline">{tablesLocked ? rk('unlockTablesLong') : rk('lockTables')}</span>
                 </button>
 
                 <button onClick={() => { setSelectedFloorTable(null); setShowAddFloorTable(true) }}
                   className="flex items-center gap-2 h-11 px-5 rounded-xl bg-green-500 hover:bg-green-600 active:bg-green-700 text-white text-sm font-bold transition-colors whitespace-nowrap shadow-sm">
                   <Plus size={18} />
                   <span className="hidden sm:inline">{rk('addTable')}</span>
-                  <span className="sm:hidden">+ Tafel</span>
+                  <span className="sm:hidden">{rk('addTableMobile')}</span>
                 </button>
               </div>
               )}
@@ -2833,11 +2840,11 @@ export default function KassaReservationsView({
                       return (
                         <div className="flex flex-col items-center justify-center py-10 text-center px-6">
                           <CalendarDays size={32} className="text-gray-300 mb-3" />
-                          <p className="text-base text-gray-400 font-medium">Geen reservaties</p>
-                          <p className="text-sm text-gray-300 mt-1">voor {formatDate(selectedDate)}</p>
+                          <p className="text-base text-gray-400 font-medium">{rk('noReservations')}</p>
+                          <p className="text-sm text-gray-300 mt-1">{rk('forDate', { date: formatDate(selectedDate) })}</p>
                           {allDates.length > 0 && (
                             <div className="mt-4 w-full">
-                              <p className="text-xs text-gray-400 mb-2">Reservaties gevonden op:</p>
+                              <p className="text-xs text-gray-400 mb-2">{rk('reservationsFoundOn')}</p>
                               <div className="flex flex-col gap-1">
                                 {allDates.map(d => (
                                   <button
@@ -2853,7 +2860,7 @@ export default function KassaReservationsView({
                           )}
                           {reservations.length === 0 && !loading && (
                             <div className="mt-4">
-                              <p className="text-xs text-red-400 font-medium">Geen data geladen</p>
+                              <p className="text-xs text-red-400 font-medium">{rk('noDataLoaded')}</p>
                               <button
                                 onClick={() => loadReservations()}
                                 className="mt-2 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg px-3 py-1.5 font-semibold transition-colors"
@@ -2895,7 +2902,7 @@ export default function KassaReservationsView({
                       className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-green-500 hover:bg-green-600 text-white text-sm font-semibold transition-colors"
                     >
                       <Plus size={15} />
-                      Nieuwe reservatie
+                      {rk('newReservation')}
                     </button>
                   </div>
                 </div>
@@ -2975,7 +2982,7 @@ export default function KassaReservationsView({
                         title={tablesLocked ? 'Tafels vergrendeld — tik om te ontgrendelen': 'Tafels ontgrendeld — tik om te vergrendelen'}
                       >
                         {tablesLocked ? <Lock size={18} className="shrink-0" /> : <LockOpen size={18} className="shrink-0" />}
-                        <span className="hidden sm:inline">{tablesLocked ? 'Ontgrendel tafels': 'Vergrendelen'}</span>
+                        <span className="hidden sm:inline">{tablesLocked ? rk('unlockTablesLong') : rk('lockTables')}</span>
                       </button>
                       <button
                         type="button"
@@ -2985,20 +2992,20 @@ export default function KassaReservationsView({
                           setShowAddFloorTable(true)
                         }}
                         className="flex min-h-[44px] shrink-0 items-center gap-2 rounded-xl bg-green-500 px-3 py-2 text-sm font-bold text-white shadow-lg transition-colors hover:bg-green-600 active:bg-green-700 sm:px-5"
-                        title="Nieuwe tafel op de plattegrond"
+                      title={rk('addTableMobile')}
                       >
                         <Plus size={18} className="shrink-0" />
                         <span className="hidden sm:inline">{rk('addTable')}</span>
-                        <span className="sm:hidden">+ Tafel</span>
+                        <span className="sm:hidden">{rk('addTableMobile')}</span>
                       </button>
                       <button
                         type="button"
                         onClick={e => { e.stopPropagation(); toggleFloorOnlyMode() }}
                         className="flex min-h-[44px] shrink-0 items-center gap-2 rounded-xl bg-black px-3 py-2 text-sm font-bold text-white shadow-lg transition-colors hover:bg-gray-800 active:bg-gray-900 sm:px-4"
-                        title="Toon menu, tabs en werkbalk"
+                        title={rk('showPanelsTitle')}
                       >
                         <Minimize2 size={20} className="shrink-0" />
-                        <span className="hidden sm:inline">Panelen tonen</span>
+                        <span className="hidden sm:inline">{rk('showPanels')}</span>
                       </button>
                     </div>
                   )}
@@ -3012,8 +3019,8 @@ export default function KassaReservationsView({
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       <div className="text-center bg-white/80 rounded-2xl px-10 py-8 shadow-sm">
                         <LayoutGrid size={48} className="mx-auto text-gray-400 mb-3" />
-                        <p className="text-gray-600 font-semibold mb-1">Nog geen tafels</p>
-                        <p className="text-sm text-gray-400">Klik op &ldquo;Tafel toevoegen&rdquo; om te starten</p>
+                        <p className="text-gray-600 font-semibold mb-1">{rk('noTablesEmpty')}</p>
+                        <p className="text-sm text-gray-400">{rk('clickAddTableHint')}</p>
                       </div>
                     </div>
                   )}
@@ -3088,7 +3095,7 @@ export default function KassaReservationsView({
                   >
                     <button
                       type="button"
-                      aria-label="Inzoomen"
+                      aria-label={rk('zoomInAria')}
                       onClick={e => {
                         e.stopPropagation()
                         stepFloorZoom(1.22)
@@ -3099,7 +3106,7 @@ export default function KassaReservationsView({
                     </button>
                     <button
                       type="button"
-                      aria-label="Uitzoomen"
+                      aria-label={rk('zoomOutAria')}
                       onClick={e => {
                         e.stopPropagation()
                         stepFloorZoom(1 / 1.22)
@@ -3128,7 +3135,7 @@ export default function KassaReservationsView({
                           }}
                           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/60 transition-colors hover:bg-white/85 active:bg-white"
                           title="Vorige dag"
-                          aria-label="Vorige dag"
+                          aria-label={rk('prevDay')}
                         >
                           <ChevronLeft size={22} className="text-white" />
                         </button>
@@ -3141,7 +3148,7 @@ export default function KassaReservationsView({
                             value={selectedDate}
                             onChange={e => setSelectedDate(e.target.value)}
                             className="mt-0.5 max-w-full cursor-pointer rounded-lg border border-gray-300/35 bg-white/65 px-2 py-0.5 text-center text-xs font-semibold text-gray-900 outline-none"
-                            aria-label="Kies datum"
+                            aria-label={rk('pickDateAria')}
                           />
                         </div>
                         <button
@@ -3153,7 +3160,7 @@ export default function KassaReservationsView({
                           }}
                           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/60 transition-colors hover:bg-white/85 active:bg-white"
                           title="Volgende dag"
-                          aria-label="Volgende dag"
+                          aria-label={rk('nextDay')}
                         >
                           <ChevronRight size={22} className="text-white" />
                         </button>
@@ -3186,7 +3193,7 @@ export default function KassaReservationsView({
                       >
                         <div className="min-w-0 flex-1">
                           <div className="mb-0.5 flex flex-wrap items-center gap-2">
-                            <h3 className="text-2xl font-bold text-white sm:text-3xl">Tafel {selectedFloorTable.number}</h3>
+                            <h3 className="text-2xl font-bold text-white sm:text-3xl">{rk('tableWithNumber', { number: String(selectedFloorTable.number) })}</h3>
                             <span className="shrink-0 rounded-full px-2.5 py-1 text-sm font-bold text-white sm:px-3 sm:text-base" style={{ backgroundColor: color }}>{label}</span>
                           </div>
                           <p className="text-sm font-medium text-white/60 sm:text-base">{selectedFloorTable.seats} plaatsen</p>
@@ -3195,7 +3202,7 @@ export default function KassaReservationsView({
                           type="button"
                           onClick={() => setSelectedFloorTable(null)}
                           className="min-h-[44px] min-w-[44px] shrink-0 text-2xl text-white/50 hover:text-white"
-                          aria-label="Sluiten"
+                          aria-label={rk('closeAria')}
                         >
                           
                         </button>
@@ -3231,7 +3238,7 @@ export default function KassaReservationsView({
                                 <div className="grid grid-cols-2 gap-1.5 pt-1">
                                   {r.status === 'PENDING' && (
                                     <button onClick={() => handleConfirm(r)} className="col-span-2 min-h-[44px] rounded-xl bg-black active:bg-gray-900 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-1.5">
-                                      <CheckCircle2 size={14} /> Bevestigen
+                                      <CheckCircle2 size={14} /> {rk('confirm')}
                                     </button>
                                   )}
                                   {(r.status === 'CONFIRMED' || r.status === 'PENDING') && (
@@ -3269,20 +3276,20 @@ export default function KassaReservationsView({
                             ))}
                           </div>
                         ) : (
-                          <p className="text-white/30 text-sm text-center py-6">Geen reservatie voor {formatDate(selectedDate)}</p>
+                          <p className="text-white/30 text-sm text-center py-6">{rk('noReservationForDate', { date: formatDate(selectedDate) })}</p>
                         )}
                       </div>
 
                       {/* Draaien */}
                       <div className="flex-shrink-0 p-3 sm:p-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)'}}>
-                        <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Draaien</p>
+                        <p className="text-white/50 text-xs uppercase tracking-wider mb-2">{rk('rotate')}</p>
                         <div className="flex gap-2">
                           <button onClick={async () => { const u = floorPlanTablesDB.map(t => t.id === selectedFloorTable.id ? { ...t, rotation: (t.rotation - 45 + 360) % 360 } : t); await saveFloorPlan(u); setSelectedFloorTable(p => p ? { ...p, rotation: (p.rotation - 45 + 360) % 360 } : null) }}
                             className="flex-1 min-h-[48px] rounded-xl font-bold text-xl text-white transition-colors active:opacity-70" style={{ backgroundColor: 'rgba(255,255,255,0.1)'}}>↺</button>
                           <button onClick={async () => { const u = floorPlanTablesDB.map(t => t.id === selectedFloorTable.id ? { ...t, rotation: (t.rotation + 45) % 360 } : t); await saveFloorPlan(u); setSelectedFloorTable(p => p ? { ...p, rotation: (p.rotation + 45) % 360 } : null) }}
                             className="flex-1 min-h-[48px] rounded-xl font-bold text-xl text-white transition-colors active:opacity-70" style={{ backgroundColor: 'rgba(255,255,255,0.1)'}}>↻</button>
                           <button onClick={async () => { const u = floorPlanTablesDB.map(t => t.id === selectedFloorTable.id ? { ...t, rotation: 0 } : t); await saveFloorPlan(u); setSelectedFloorTable(p => p ? { ...p, rotation: 0 } : null) }}
-                            className="flex-1 min-h-[48px] rounded-xl text-xs font-semibold text-white transition-colors active:opacity-70" style={{ backgroundColor: 'rgba(255,255,255,0.1)'}}>Reset</button>
+                            className="flex-1 min-h-[48px] rounded-xl text-xs font-semibold text-white transition-colors active:opacity-70" style={{ backgroundColor: 'rgba(255,255,255,0.1)'}}>{rk('reset')}</button>
                         </div>
                       </div>
 
@@ -3290,11 +3297,11 @@ export default function KassaReservationsView({
                       <div className="mt-auto flex-shrink-0 space-y-2 p-3 sm:p-4">
                         <button onClick={() => { setShowNewReservationModal(true); setSelectedFloorTable(null) }}
                           className="w-full min-h-[52px] rounded-xl bg-emerald-500 active:bg-emerald-700 text-white font-bold transition-colors text-sm">
-                          + Reservatie aanmaken
+                          {rk('createReservationOnTable')}
                         </button>
                         <button onClick={() => deleteFloorTable(selectedFloorTable.id)}
                           className="w-full min-h-[44px] rounded-xl text-sm font-semibold transition-colors active:opacity-70" style={{ backgroundColor: 'rgba(239,68,68,0.15)', color: '#f87171'}}>
-                           Tafel verwijderen
+                           {rk('deleteTable')}
                         </button>
                       </div>
                     </div>
@@ -3312,7 +3319,7 @@ export default function KassaReservationsView({
                     </div>
                     <div className="p-5 space-y-4">
                       <div>
-                        <label className="block text-sm font-semibold text-gray-600 mb-1">Tafelnummer *</label>
+                        <label className="block text-sm font-semibold text-gray-600 mb-1">{rk('tableNumberRequired')}</label>
                         <input
                           ref={addFloorNumberInputRef}
                           type="text"
@@ -3355,7 +3362,7 @@ export default function KassaReservationsView({
                     </div>
                     <div className="p-4 border-t flex gap-3">
                       <button onClick={() => setShowAddFloorTable(false)} className="flex-1 py-3 rounded-xl bg-gray-100 font-semibold">{rk('cancel')}</button>
-                      <button onClick={addFloorTable} className="flex-[2] py-3 rounded-xl bg-green-500 hover:bg-green-600 text-white font-bold transition-colors">Toevoegen</button>
+                      <button onClick={addFloorTable} className="flex-[2] py-3 rounded-xl bg-green-500 hover:bg-green-600 text-white font-bold transition-colors">{rk('addButton')}</button>
                     </div>
                   </div>
                 </div>
@@ -3458,7 +3465,7 @@ export default function KassaReservationsView({
                         )
                       }}
                       className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/60 transition-colors hover:bg-white/85 active:bg-white"
-                      aria-label="Vorige dag"
+                      aria-label={rk('prevDay')}
                     >
                       <ChevronLeft size={22} className="text-white" />
                     </button>
@@ -3471,7 +3478,7 @@ export default function KassaReservationsView({
                         value={timelineDate}
                         onChange={e => setTimelineDate(e.target.value)}
                         className="mt-0.5 cursor-pointer rounded-lg border border-gray-300/35 bg-white/65 px-2 py-0.5 text-center text-xs font-semibold text-gray-900 outline-none"
-                        aria-label="Kies datum"
+                        aria-label={rk('pickDateAria')}
                       />
                     </div>
                     <button
@@ -3484,7 +3491,7 @@ export default function KassaReservationsView({
                         )
                       }}
                       className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/60 transition-colors hover:bg-white/85 active:bg-white"
-                      aria-label="Volgende dag"
+                      aria-label={rk('nextDay')}
                     >
                       <ChevronRight size={22} className="text-white" />
                     </button>
@@ -3509,7 +3516,7 @@ export default function KassaReservationsView({
                         : 'bg-[#1877F2] hover:bg-[#166FE5]'
                       }`}>
                     <Calendar size={20}/>
-                    <span>Kalender</span>
+                    <span>{rk('calendar')}</span>
                     {calOpen ? <Eye size={22}/> : <EyeOff size={22}/>}
                   </button>
                   {/* Zoek knop */}
@@ -3517,7 +3524,7 @@ export default function KassaReservationsView({
                     onClick={() => setShowSearchPopup(true)}
                     className="ml-2 flex items-center gap-2 rounded-lg bg-[#1877F2] px-5 py-1.5 text-sm font-bold text-white transition-colors hover:bg-[#166FE5]">
                     <Search size={20}/>
-                    <span>Zoek reserv.</span>
+                    <span>{rk('searchResShort')}</span>
                   </button>
                   <span className="text-sm text-gray-400 ml-auto">{dayRes.length} res. · {dayRes.reduce((s,r)=>s+r.party_size,0)}p</span>
                 </div>
@@ -3525,10 +3532,10 @@ export default function KassaReservationsView({
                 {/* Legenda statuskleuren */}
                 <div className="flex items-center gap-4 mb-2 px-1">
                   {[
-                    { color:'#3B5BDB', label:'Verwacht/Bevestigd'},
-                    { color:'#16a34a', label:'Aan tafel'},
-                    { color:'#dc2626', label:'No-show'},
-                    { color:'#6B7280', label:'Vertrokken'},
+                    { color:'#3B5BDB', label: rk('timelineLegendExpected')},
+                    { color:'#16a34a', label: rk('timelineLegendAtTable')},
+                    { color:'#dc2626', label: rk('status_NO_SHOW')},
+                    { color:'#6B7280', label: rk('timelineLegendDeparted')},
                   ].map(s => (
                     <div key={s.label} className="flex items-center gap-1.5">
                       <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: s.color }}/>
@@ -3546,7 +3553,7 @@ export default function KassaReservationsView({
                       {/* Oranje header — sticky bovenaan de scroll container */}
                       <div className="flex sticky top-0 z-10" style={{ height:48, backgroundColor:'#000000'}}>
                         <div style={{ width:LABEL_W, flexShrink:0 }} className="border-r border-[#6b7d9e] flex items-center justify-center sticky left-0 z-20 bg-black">
-                          <span className="text-sm font-bold text-white">Tafel</span>
+                          <span className="text-sm font-bold text-white">{rk('tableLabel')}</span>
                         </div>
                         <div className="flex relative" style={{ width:(timeSlots.length+extraSlots.length)*80 }}>
                           {timeSlots.map((t,i) => (
@@ -3668,7 +3675,7 @@ export default function KassaReservationsView({
                                       />
                                     </div>
                                     <div
-                                      title="Sleep links: starttijd (duur blijft gelijk)"
+                                      title={rk('timelineResizeStartTitle')}
                                       className="absolute left-0 top-0 bottom-0 w-7 sm:w-8 z-20 cursor-ew-resize flex items-center justify-center hover:bg-black/25 active:bg-black/35 rounded-l-md border-r border-white/40 touch-none select-none bg-black/10"
                                       style={{ touchAction: 'none'}}
                                       onPointerDown={(e) => beginTimelineStartResize(e, r, slotW, totalRange, minStartBound, maxStartBound)}
@@ -3677,7 +3684,7 @@ export default function KassaReservationsView({
                                       <GripVertical className="w-4 h-5 text-white pointer-events-none drop-shadow-sm" aria-hidden />
                                     </div>
                                     <div
-                                      title="Sleep rechts: duur aanpassen (stopt vóór volgende reservatie)"
+                                      title={rk('timelineResizeDurationTitle')}
                                       className="absolute right-0 top-0 bottom-0 w-7 sm:w-8 z-20 cursor-ew-resize flex items-center justify-center hover:bg-black/25 active:bg-black/35 border-l border-white/40 touch-none select-none bg-black/10"
                                       style={{ touchAction: 'none'}}
                                       onPointerDown={(e) => beginTimelineDurationResize(e, r, slotW, totalRange, maxDurCap)}
@@ -3695,7 +3702,7 @@ export default function KassaReservationsView({
                       {dayRes.length===0 && (
                         <div className="flex flex-col items-center justify-center py-16 text-gray-300">
                           <CalendarDays size={40} className="mb-3"/>
-                          <p className="text-base">Geen reservaties op {formatDate(timelineDate)}</p>
+                          <p className="text-base">{rk('noReservationsOnDate', { date: formatDate(timelineDate) })}</p>
                         </div>
                       )}
                     </div>
@@ -3719,7 +3726,7 @@ export default function KassaReservationsView({
                       className="p-1.5 hover:bg-white/45 rounded-lg text-white"><ChevronRight size={18}/></button>
                     <button onClick={() => { setTimelineDate(todayStr); setCalMonth({year:timelineNow.getFullYear(),month:timelineNow.getMonth()}) }}
                       className="px-3 py-1 rounded-lg bg-white text-gray-900 text-sm font-black hover:bg-[#f2f5fa]">
-                      Vandaag
+                      {rk('today')}
                     </button>
                   </>)}
                 </div>
@@ -3733,13 +3740,13 @@ export default function KassaReservationsView({
                       let mDow = mFirst.getDay(); if(mDow===0) mDow=7
                       const mDays = new Date(mYear, mMonth+1, 0).getDate()
                       const mPad = mDow - 1
-                      const mName = mFirst.toLocaleDateString('nl-BE',{month:'long'})
+                      const mName = monthName(mMonth)
                       return (
                         <div key={mMonth} className="px-3 pt-4 pb-3 border-b border-gray-50 last:border-0">
                           <p className="text-sm font-black text-gray-600 uppercase tracking-wide mb-2 capitalize">{mName}</p>
                           <div className="grid grid-cols-7 gap-0.5">
-                            {['Ma','Di','Wo','Do','Vr','Za','Zo'].map((d,i)=>(
-                              <div key={i} className="text-center text-xs text-gray-400 font-bold pb-1">{d}</div>
+                            {['Ma','Di','Wo','Do','Vr','Za','Zo'].map((_, i) => (
+                              <div key={i} className="text-center text-xs text-gray-400 font-bold pb-1">{weekdayShort(mondayFirstToWeekdayIndex(i))}</div>
                             ))}
                             {Array.from({length:mPad}).map((_,i)=><div key={`p${i}`}/>)}
                             {Array.from({length:mDays}).map((_,di)=>{
@@ -3773,15 +3780,9 @@ export default function KassaReservationsView({
           const { rows: filteredRes, grouped, from, to, today } = resViewFiltered
           const totalPersons = filteredRes.reduce((s, r) => s + r.party_size, 0)
 
-          const MONTHS_NL = ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December']
-          const MONTHS_SHORT = ['Jan','Feb','Mrt','Apr','Mei','Jun','Jul','Aug','Sep','Okt','Nov','Dec']
-          const DAYS_FULL_NL = ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag']
-          const DAYS_NL = ['Ma','Di','Wo','Do','Vr','Za','Zo']
-
           const dateHeader = (ds: string) => {
             if (resViewFilter === 'dag') return null
-            const d = new Date(ds + 'T12:00:00')
-            return `${DAYS_FULL_NL[d.getDay()]} ${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}`
+            return formatDateMedium(ds)
           }
 
           const resDate = resListDate
@@ -3808,19 +3809,19 @@ export default function KassaReservationsView({
                 {formatReservationTimeRange(r.reservation_time, r.duration_minutes, reservationSettings.defaultDurationMinutes)}
               </td>
               <td className="px-5 py-4 text-gray-600" style={{ borderRight: '1px solid #e5e7eb'}}>
-                {r.table_number ? <span className="font-semibold">Tafel {r.table_number}</span> : <span className="text-gray-300">—</span>}
+                {r.table_number ? <span className="font-semibold">{rk('tableWithNumber', { number: String(r.table_number) })}</span> : <span className="text-gray-300">—</span>}
               </td>
               <td className="px-5 py-4 text-center font-bold text-gray-800 text-lg" style={{ borderRight: '1px solid #e5e7eb'}}>{r.party_size}</td>
               <td className="px-5 py-4 font-semibold text-gray-800" style={{ borderRight: '1px solid #e5e7eb'}}>
                 <span>{r.guest_name}</span>
                 {r.status === 'CHECKED_IN' && (
-                  <span className="ml-2 inline-block rounded-md bg-sky-100 px-2 py-0.5 text-xs font-bold text-sky-800">Binnen</span>
+                  <span className="ml-2 inline-block rounded-md bg-sky-100 px-2 py-0.5 text-xs font-bold text-sky-800">{rk('zoneInside')}</span>
                 )}
                 {r.status === 'COMPLETED' && (
-                  <span className="ml-2 inline-block rounded-md bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-800">Tafel vrij</span>
+                  <span className="ml-2 inline-block rounded-md bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-800">{rk('tableFreeBadge')}</span>
                 )}
                 {r.status === 'NO_SHOW' && (
-                  <span className="ml-2 inline-block rounded-md bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700">No-show</span>
+                  <span className="ml-2 inline-block rounded-md bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700">{rk('status_NO_SHOW')}</span>
                 )}
               </td>
               <td className="px-5 py-4 text-gray-600 max-w-[14rem]" style={{ borderRight: '1px solid #e5e7eb'}} title={notesText || undefined}>
@@ -3835,7 +3836,7 @@ export default function KassaReservationsView({
                       : ''}
                   </span>
                 ) : (
-                  <span className="text-gray-400">Nee</span>
+                  <span className="text-gray-400">{rk('no')}</span>
                 )}
               </td>
               <td className="px-3 py-3 text-right align-middle min-w-[17rem]" onClick={e => e.stopPropagation()}>
@@ -3850,7 +3851,7 @@ export default function KassaReservationsView({
                         : 'bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white'
                     } ${isTerminal ? 'opacity-40 cursor-not-allowed': ''}`}
                   >
-                    Binnen
+                    {rk('zoneInside')}
                   </button>
                   <button
                     type="button"
@@ -3862,7 +3863,7 @@ export default function KassaReservationsView({
                         : 'bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white'
                     } ${isTerminal ? 'opacity-40 cursor-not-allowed': ''}`}
                   >
-                    Tafel vrij
+                    {rk('tableFreeBadge')}
                   </button>
                   <button
                     type="button"
@@ -3881,7 +3882,7 @@ export default function KassaReservationsView({
                     onClick={() => setEditReservation(r)}
                     className="px-2.5 py-2 rounded-lg bg-black hover:bg-gray-800 active:bg-gray-900 text-white text-xs font-semibold transition-colors touch-manipulation"
                   >
-                    Bewerken
+                    {rk('editLabel')}
                   </button>
                 </div>
               </td>
@@ -3904,7 +3905,7 @@ export default function KassaReservationsView({
                         setResListDate(d.toISOString().split('T')[0])
                       }}
                       className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/60 transition-colors hover:bg-white/85 active:bg-white"
-                      aria-label="Vorige dag"
+                      aria-label={rk('prevDay')}
                     >
                       <ChevronLeft size={22} className="text-white" />
                     </button>
@@ -3917,7 +3918,7 @@ export default function KassaReservationsView({
                         value={resDate}
                         onChange={e => setResListDate(e.target.value)}
                         className="mt-0.5 cursor-pointer rounded-lg border border-gray-300/35 bg-white/65 px-2 py-0.5 text-center text-xs font-semibold text-gray-900 outline-none"
-                        aria-label="Kies datum"
+                        aria-label={rk('pickDateAria')}
                       />
                     </div>
                     <button
@@ -3927,7 +3928,7 @@ export default function KassaReservationsView({
                         setResListDate(d.toISOString().split('T')[0])
                       }}
                       className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/60 transition-colors hover:bg-white/85 active:bg-white"
-                      aria-label="Volgende dag"
+                      aria-label={rk('nextDay')}
                     >
                       <ChevronRight size={22} className="text-white" />
                     </button>
@@ -3955,7 +3956,7 @@ export default function KassaReservationsView({
                     <button onClick={() => setShowMonthPicker(v => !v)}
                       className="flex items-center gap-2 px-4 py-2 rounded-xl bg-black hover:bg-gray-800 text-white font-semibold text-sm">
                       <Calendar size={15}/>
-                      {MONTHS_SHORT[resFilterMonth]} {resFilterYear}
+                      {monthName(resFilterMonth)} {resFilterYear}
                       <ChevronRight size={13} className={`transition-transform ${showMonthPicker ? 'rotate-90': ''}`}/>
                     </button>
                     {showMonthPicker && (
@@ -3974,12 +3975,12 @@ export default function KassaReservationsView({
                         </div>
                         {/* 12 maanden grid */}
                         <div className="grid grid-cols-3 gap-2">
-                          {MONTHS_SHORT.map((mn, mi) => (
+                          {Array.from({ length: 12 }, (_, mi) => (
                             <button key={mi}
                               onClick={() => { setResFilterMonth(mi); setShowMonthPicker(false) }}
                               className={`py-2 rounded-xl text-sm font-semibold transition-colors
                                 ${resFilterMonth === mi ? 'bg-black text-white': 'bg-gray-100 hover:bg-[#e8eef6] text-gray-700'}`}>
-                              {mn}
+                              {monthName(mi)}
                             </button>
                           ))}
                         </div>
@@ -4032,7 +4033,7 @@ export default function KassaReservationsView({
               {/* Zoekbalk */}
               {showResSearch && (
                 <div className="px-4 py-2 border-b border-gray-200 flex-shrink-0 bg-gray-50">
-                  <input autoFocus type="text" placeholder="Zoek op naam, telefoon of e-mail…"
+                  <input autoFocus type="text" placeholder={rk('searchPopupPlaceholder')}
                     value={resSearch} onChange={e => setResSearch(e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-xl text-sm outline-none focus:border-[#6b7d9e] focus:ring-2 focus:ring-[#e8eef6]"/>
                 </div>
@@ -4048,7 +4049,7 @@ export default function KassaReservationsView({
                 </div>
                 <div className="flex flex-col items-center justify-center px-8 py-3">
                   <span className="text-2xl font-black text-gray-900">{totalPersons}</span>
-                  <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-0.5">Personen</span>
+                  <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-0.5">{rk('guestsLabel')}</span>
                 </div>
                 {resViewFilter !== 'dag' && (
                   <div className="flex flex-col items-center justify-center px-8 py-3">
@@ -4073,7 +4074,7 @@ export default function KassaReservationsView({
                   <span className="text-xs font-bold text-gray-900 uppercase tracking-wider">
                     {resViewFilter === 'dag' && formatDate(resDate)}
                     {resViewFilter === 'week' && `${from} – ${to}`}
-                    {resViewFilter === 'maand' && `${MONTHS_NL[resFilterMonth].charAt(0).toUpperCase() + MONTHS_NL[resFilterMonth].slice(1)} ${resFilterYear}`}
+                    {resViewFilter === 'maand' && `${monthName(resFilterMonth).charAt(0).toUpperCase() + monthName(resFilterMonth).slice(1)} ${resFilterYear}`}
                     {resViewFilter === 'jaar' && `Jaar ${resFilterYear}`}
                   </span>
                   <span className="text-[10px] text-gray-400 uppercase tracking-wider mt-0.5">Periode</span>
@@ -4088,7 +4089,7 @@ export default function KassaReservationsView({
                   <div className="flex-shrink-0 bg-red-600 border-b-4 border-red-900 px-5 py-5 md:px-8 md:py-6 shadow-inner">
                     <div className="flex items-center gap-3 mb-4">
                       <span className="text-white font-black text-lg md:text-2xl tracking-wide uppercase drop-shadow-sm">
-                         {pending.length} nieuwe reservatie{pending.length > 1 ? 's': ''} — wacht op goedkeuring
+                         {rk('pendingBanner', { count: String(pending.length) })}
                       </span>
                     </div>
                     <div className="space-y-3">
@@ -4132,19 +4133,19 @@ export default function KassaReservationsView({
                   {filteredRes.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-2 py-16">
                       <List size={40} className="text-gray-300"/>
-                      <p className="font-medium">{q ? `Geen resultaten voor "${resSearch}"`: `Geen reserveringen gevonden`}</p>
+                      <p className="font-medium">{resSearch ? rk('searchNoResultsNamed', { q: resSearch }) : rk('searchNoBookings')}</p>
                     </div>
                   ) : (
                     <table className="w-full text-sm" style={{ borderCollapse: 'collapse'}}>
                       <thead>
                         <tr style={{ background: '#f9fafb', borderBottom: '2px solid #e5e7eb'}}>
-                          <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Tijd</th>
-                          <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Tafel</th>
-                          <th className="px-5 py-3 text-center text-xs font-bold uppercase tracking-wider text-gray-500">Personen</th>
-                          <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Naam</th>
-                          <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Opmerkingen</th>
-                          <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Voorschot betaald</th>
-                          <th className="px-5 py-3 text-right text-xs font-bold uppercase tracking-wider text-gray-500">Acties</th>
+                          <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">{rk('colTime')}</th>
+                          <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">{rk('tableLabel')}</th>
+                          <th className="px-5 py-3 text-center text-xs font-bold uppercase tracking-wider text-gray-500">{rk('colGuests')}</th>
+                          <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">{rk('colName')}</th>
+                          <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">{rk('colNotes')}</th>
+                          <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">{rk('colDeposit')}</th>
+                          <th className="px-5 py-3 text-right text-xs font-bold uppercase tracking-wider text-gray-500">{rk('colActions')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -4176,7 +4177,7 @@ export default function KassaReservationsView({
                       <div className="px-5 py-2 flex items-center gap-2">
                         <Clock size={14} className="text-purple-600"/>
                         <span className="text-xs font-bold text-purple-700 uppercase tracking-wider">{rk('waitlist')}</span>
-                        <span className="text-xs text-purple-500">{wl.length} wachtend · {wl.reduce((s,r)=>s+r.party_size,0)} pers.</span>
+                        <span className="text-xs text-purple-500">{rk('waitlistSummary', { count: String(wl.length), guests: String(wl.reduce((s,r)=>s+r.party_size,0)) })}</span>
                       </div>
                       <table className="w-full text-sm" style={{borderCollapse:'collapse'}}>
                         <tbody>
@@ -4193,15 +4194,15 @@ export default function KassaReservationsView({
                               </td>
                               <td className="px-5 py-3">
                                 {isReservationDepositPaid(r) ? (
-                                  <span className="font-semibold text-green-600">Ja</span>
+                                  <span className="font-semibold text-green-600">{rk('yes')}</span>
                                 ) : (
-                                  <span className="text-gray-400">Nee</span>
+                                  <span className="text-gray-400">{rk('no')}</span>
                                 )}
                               </td>
                               <td className="px-5 py-3 text-right">
                                 <button onClick={() => updateStatus(r.id, 'CONFIRMED')}
                                   className="px-3 py-1.5 rounded-lg bg-purple-500 hover:bg-purple-600 text-white text-xs font-bold transition-colors">
-                                  Bevestigen
+                                  {rk('confirm')}
                                 </button>
                               </td>
                             </tr>
@@ -4227,7 +4228,7 @@ export default function KassaReservationsView({
                       </button>
                       <button onClick={() => { setResListDate(today); setShowResCalendar(false) }}
                         className="ml-2 px-3 py-1 rounded-lg bg-black hover:bg-gray-800 text-white text-xs font-semibold">
-                        Vandaag
+                        {rk('today')}
                       </button>
                       <button onClick={() => setShowResCalendar(false)}
                         className="ml-1 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 md:hidden">
@@ -4237,9 +4238,11 @@ export default function KassaReservationsView({
                     <div className="px-3 py-2 space-y-4">
                       {calMonths.map(({ y, m, cells }) => (
                         <div key={`${y}-${m}`}>
-                          <div className="text-xs font-bold text-gray-700 mb-1 px-1">{MONTHS_NL[m].charAt(0).toUpperCase() + MONTHS_NL[m].slice(1)}</div>
+                          <div className="text-xs font-bold text-gray-700 mb-1 px-1">{monthName(m).charAt(0).toUpperCase() + monthName(m).slice(1)}</div>
                           <div className="grid grid-cols-7 text-center mb-1">
-                            {DAYS_NL.map(d => <div key={d} className="text-[10px] text-gray-400 font-semibold py-0.5">{d}</div>)}
+                            {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+                              <div key={i} className="text-[10px] text-gray-400 font-semibold py-0.5">{weekdayShort(mondayFirstToWeekdayIndex(i))}</div>
+                            ))}
                           </div>
                           <div className="grid grid-cols-7 text-center gap-y-0.5">
                             {cells.map((day, i) => {
@@ -4281,11 +4284,18 @@ export default function KassaReservationsView({
             onToggleNoShow={handleGuestContactNoShow}
             promoSelectionReset={contactPromoSelectionReset}
             rk={rk}
+            formatGuestDate={formatGuestDate}
           />
         )}
 
         {!loading && viewMode === 'stats' && (
-          <RapportenView reservations={reservations} guestProfiles={guestProfiles} />
+          <RapportenView
+            reservations={reservations}
+            guestProfiles={guestProfiles}
+            rk={rk}
+            monthName={monthName}
+            weekdayShort={weekdayShort}
+          />
         )}
 
         {!loading && viewMode === 'settings' && (
@@ -4296,7 +4306,7 @@ export default function KassaReservationsView({
                 onClick={saveSettingsToSupabase}
                 className="flex items-center gap-2 px-5 py-2.5 bg-black hover:bg-gray-800 text-white font-bold rounded-xl shadow transition-colors"
               >
-                 Opslaan
+                 {rk('saveSettingsTop')}
               </button>
             </div>
             <h3 className="text-lg font-bold mb-4 hidden">{rk('reservationSettingsTitle')}</h3>
@@ -4304,8 +4314,8 @@ export default function KassaReservationsView({
               {/* Enable toggle */}
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">Reservaties ingeschakeld</p>
-                  <p className="text-sm text-gray-400">Toon reservaties in de kassa</p>
+                  <p className="font-medium">{rk('reservationsEnabled')}</p>
+                  <p className="text-sm text-gray-400">{rk('reservationsEnabledDesc')}</p>
                 </div>
                 <button
                   onClick={() => updateSettings({ isEnabled: !isEnabled })}
@@ -4318,8 +4328,8 @@ export default function KassaReservationsView({
               {/* Online reservations */}
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">Online reservaties</p>
-                  <p className="text-sm text-gray-400">Laat klanten online reserveren</p>
+                  <p className="font-medium">{rk('acceptOnline')}</p>
+                  <p className="text-sm text-gray-400">{rk('acceptOnlineDesc')}</p>
                 </div>
                 <button
                   onClick={() => updateSettings({ acceptOnline: !reservationSettings.acceptOnline })}
@@ -4332,26 +4342,26 @@ export default function KassaReservationsView({
               {/* Bevestigingsmodus */}
               {reservationSettings.acceptOnline && (
                 <div>
-                  <p className="font-medium mb-1">Bevestigingsmodus online reservaties</p>
-                  <p className="text-sm text-gray-400 mb-3">Hoe worden online reservaties verwerkt?</p>
+                  <p className="font-medium mb-1">{rk('confirmationModeOnlineLabel')}</p>
+                  <p className="text-sm text-gray-400 mb-3">{rk('confirmationModeQuestion')}</p>
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       onClick={() => updateSettings({ autoConfirm: false })}
                       className={`p-4 rounded-xl border-2 text-left transition-all ${!reservationSettings.autoConfirm ? 'border-black bg-[#f2f5fa]': 'border-gray-200 hover:border-gray-300'}`}
                     >
                       <div className="text-2xl mb-2"></div>
-                      <p className={`font-bold text-sm ${!reservationSettings.autoConfirm ? 'text-[#2D3A52]': 'text-gray-700'}`}>Handmatig</p>
-                      <p className="text-xs text-gray-500 mt-1">Klant krijgt mail "in afwachting". Jij keurt goed in de kassa → klant krijgt bevestigingsmail.</p>
-                      {!reservationSettings.autoConfirm && <span className="mt-2 inline-block text-xs font-bold text-gray-900 bg-[#e8eef6] px-2 py-0.5 rounded-full">Actief</span>}
+                      <p className={`font-bold text-sm ${!reservationSettings.autoConfirm ? 'text-[#2D3A52]': 'text-gray-700'}`}>{rk('manualConfirm')}</p>
+                      <p className="text-xs text-gray-500 mt-1">{rk('manualConfirmDesc')}</p>
+                      {!reservationSettings.autoConfirm && <span className="mt-2 inline-block text-xs font-bold text-gray-900 bg-[#e8eef6] px-2 py-0.5 rounded-full">{rk('activeBadge')}</span>}
                     </button>
                     <button
                       onClick={() => updateSettings({ autoConfirm: true })}
                       className={`p-4 rounded-xl border-2 text-left transition-all ${reservationSettings.autoConfirm ? 'border-green-500 bg-green-50': 'border-gray-200 hover:border-gray-300'}`}
                     >
                       <div className="text-2xl mb-2"></div>
-                      <p className={`font-bold text-sm ${reservationSettings.autoConfirm ? 'text-green-700': 'text-gray-700'}`}>Automatisch</p>
-                      <p className="text-xs text-gray-500 mt-1">Klant reserveert → direct bevestigd → klant krijgt meteen bevestigingsmail.</p>
-                      {reservationSettings.autoConfirm && <span className="mt-2 inline-block text-xs font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded-full">Actief</span>}
+                      <p className={`font-bold text-sm ${reservationSettings.autoConfirm ? 'text-green-700': 'text-gray-700'}`}>{rk('autoConfirm')}</p>
+                      <p className="text-xs text-gray-500 mt-1">{rk('autoConfirmDesc')}</p>
+                      {reservationSettings.autoConfirm && <span className="mt-2 inline-block text-xs font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded-full">{rk('activeBadge')}</span>}
                     </button>
                   </div>
                 </div>
@@ -4359,7 +4369,7 @@ export default function KassaReservationsView({
 
               {/* Max party size */}
               <div>
-                <label className="font-medium block mb-2">Max. groepsgrootte</label>
+                <label className="font-medium block mb-2">{rk('maxPartySize')}</label>
                 <ControlledNumberInput
                   value={reservationSettings.maxPartySize}
                   onChange={(maxPartySize) => updateSettings({ maxPartySize })}
@@ -4371,7 +4381,7 @@ export default function KassaReservationsView({
 
               {/* Default duration */}
               <div>
-                <label className="font-medium block mb-2">Standaard reservatieduur (minuten)</label>
+                <label className="font-medium block mb-2">{rk('defaultDurationMinutes')}</label>
                 <ControlledNumberInput
                   value={reservationSettings.defaultDurationMinutes}
                   onChange={(defaultDurationMinutes) =>
@@ -4385,7 +4395,7 @@ export default function KassaReservationsView({
 
               {/* Slot duration */}
               <div>
-                <label className="font-medium block mb-2">Tijdslot interval (minuten)</label>
+                <label className="font-medium block mb-2">{rk('slotInterval')}</label>
                 <select
                   value={reservationSettings.slotDurationMinutes}
                   onChange={(e) =>
@@ -4395,16 +4405,16 @@ export default function KassaReservationsView({
                   }
                   className="w-full px-4 py-2 rounded-lg bg-gray-100 border border-gray-200"
                 >
-                  <option value={15}>Elke 15 minuten</option>
-                  <option value={30}>Elke 30 minuten</option>
-                  <option value={60}>Elk uur</option>
+                  <option value={15}>{rk('slotEvery15')}</option>
+                  <option value={30}>{rk('slotEvery30')}</option>
+                  <option value={60}>{rk('slotEvery60')}</option>
                 </select>
               </div>
 
               {/* Booking window */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="font-medium block mb-2">Min. vooraf (uren)</label>
+                  <label className="font-medium block mb-2">{rk('minAdvanceHours')}</label>
                   <ControlledNumberInput
                     min={0}
                     value={reservationSettings.minAdvanceHours}
@@ -4415,7 +4425,7 @@ export default function KassaReservationsView({
                   />
                 </div>
                 <div>
-                  <label className="font-medium block mb-2">Max. vooraf (dagen)</label>
+                  <label className="font-medium block mb-2">{rk('maxAdvanceDays')}</label>
                   <ControlledNumberInput
                     min={1}
                     value={reservationSettings.maxAdvanceDays}
@@ -4429,14 +4439,14 @@ export default function KassaReservationsView({
 
               {/* Closed days */}
               <div className="border-t border-gray-100 pt-6">
-                <label className="font-medium block mb-2">Gesloten dagen</label>
-                <p className="text-sm text-gray-400 mb-4">Dagen waarop geen reservaties mogelijk zijn</p>
+                <label className="font-medium block mb-2">{rk('closedDays')}</label>
+                <p className="text-sm text-gray-400 mb-4">{rk('closedDaysHint')}</p>
                 <div className="flex flex-wrap gap-2">
-                  {['Zo', 'Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za'].map((day, index) => {
+                  {[0,1,2,3,4,5,6].map((index) => {
                     const isClosed = reservationSettings.closedDays?.includes(index)
                     return (
                       <button
-                        key={day}
+                        key={index}
                         onClick={() => {
                           const currentDays = reservationSettings.closedDays || []
                           const newDays = isClosed
@@ -4450,7 +4460,7 @@ export default function KassaReservationsView({
                             : 'bg-gray-100 border border-gray-200 hover:bg-gray-50'
                         }`}
                       >
-                        {day}
+                        {weekdayShort(index)}
                       </button>
                     )
                   })}
@@ -4459,8 +4469,8 @@ export default function KassaReservationsView({
 
               {/* z2 - Shifts beheer */}
               <div className="border-t border-gray-100 pt-6">
-                <h4 className="font-bold mb-4"> Shifts Beheer</h4>
-                <p className="text-sm text-gray-400 mb-4">Definieer lunch en diner shifts om reservaties te filteren.</p>
+                <h4 className="font-bold mb-4">{rk('shiftsManageTitle')}</h4>
+                <p className="text-sm text-gray-400 mb-4">{rk('shiftsManageHint')}</p>
                 <div className="space-y-3">
                   {(reservationSettings.shifts || []).map((shift, idx) => (
                     <div key={shift.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
@@ -4511,8 +4521,8 @@ export default function KassaReservationsView({
                 <h4 className="font-bold mb-4"> Annuleringsbeleid</h4>
                 <div className="space-y-4">
                   <div>
-                    <label className="font-medium block mb-2">Annulering mogelijk tot (uren voor reservatie)</label>
-                    <p className="text-sm text-gray-400 mb-2">0 = altijd mogelijk, 24 = tot 24u van tevoren</p>
+                    <label className="font-medium block mb-2">{rk('cancellationDeadlineLabel')}</label>
+                    <p className="text-sm text-gray-400 mb-2">{rk('cancellationDeadlineHint')}</p>
                     <ControlledNumberInput
                       min={0}
                       value={reservationSettings.cancellationDeadlineHours}
@@ -4525,7 +4535,7 @@ export default function KassaReservationsView({
                     />
                   </div>
                   <div>
-                    <label className="font-medium block mb-2">Boodschap bij te late annulering</label>
+                    <label className="font-medium block mb-2">{rk('cancellationMessageLabel')}</label>
                     <textarea
                       value={reservationSettings.cancellationMessage}
                       onChange={(e) => updateSettings({ cancellationMessage: e.target.value })}
@@ -4538,12 +4548,12 @@ export default function KassaReservationsView({
 
               {/* z5 - Review uitnodiging */}
               <div className="border-t border-gray-100 pt-6">
-                <h4 className="font-bold mb-4"> Review Uitnodiging</h4>
+                <h4 className="font-bold mb-4">{rk('reviewInviteTitle')}</h4>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium">Automatisch review email sturen</p>
-                      <p className="text-sm text-gray-400">Bij afronden van reservatie</p>
+                      <p className="font-medium">{rk('autoReviewEmail')}</p>
+                      <p className="text-sm text-gray-400">{rk('autoReviewEmailDesc')}</p>
                     </div>
                     <button
                       onClick={() => updateSettings({ autoSendReview: !reservationSettings.autoSendReview })}
@@ -4553,11 +4563,11 @@ export default function KassaReservationsView({
                     </button>
                   </div>
                   <div>
-                    <label className="font-medium block mb-2">Review link (Google Maps / TripAdvisor)</label>
+                    <label className="font-medium block mb-2">{rk('reviewLinkLabel')}</label>
                     <input type="url"
                       value={reservationSettings.reviewLink}
                       onChange={(e) => updateSettings({ reviewLink: e.target.value })}
-                      placeholder="https://g.page/jouwzaak/review"
+                      placeholder={rk('reviewLinkPlaceholder')}
                       className="w-full px-4 py-2 rounded-lg bg-gray-100 border border-gray-200"
                     />
                   </div>
@@ -4566,14 +4576,14 @@ export default function KassaReservationsView({
 
               {/* z8 - Borg/aanbetaling */}
               <div className="border-t border-gray-100 pt-6">
-                <h4 className="font-bold mb-4"> Voorschot bij online reservatie</h4>
+                <h4 className="font-bold mb-4">{rk('depositSectionTitle')}</h4>
                 <div className="space-y-5">
 
                   {/* Aan/uit toggle */}
                   <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-200">
                     <div>
-                      <p className="font-semibold text-gray-800">Voorschot verplichten</p>
-                      <p className="text-sm text-gray-400">Klant betaalt voorschot via Stripe vóór de reservatie bevestigd wordt</p>
+                      <p className="font-semibold text-gray-800">{rk('depositRequired')}</p>
+                      <p className="text-sm text-gray-400">{rk('depositRequiredDesc')}</p>
                     </div>
                     <button
                       onClick={() => updateSettings({ depositRequired: !reservationSettings.depositRequired })}
@@ -4586,7 +4596,7 @@ export default function KassaReservationsView({
                   {/* Bedrag kiezen — alleen zichtbaar als aan */}
                   {reservationSettings.depositRequired && (
                     <div className="p-4 rounded-xl bg-[#f2f5fa] border border-[#bcc8dc]">
-                      <p className="font-semibold text-gray-800 mb-3">Kies het voorschotbedrag</p>
+                      <p className="font-semibold text-gray-800 mb-3">{rk('chooseDepositAmount')}</p>
                       <div className="grid grid-cols-5 gap-2">
                         {[25, 50, 75, 100, 150].map(amount => (
                           <button
@@ -4603,7 +4613,7 @@ export default function KassaReservationsView({
                         ))}
                       </div>
                       <div className="mt-3 flex items-center gap-2">
-                        <span className="text-sm text-gray-500">Of vrij bedrag:</span>
+                        <span className="text-sm text-gray-500">{rk('orCustomAmount')}</span>
                         <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-lg px-3 py-1.5">
                           <span className="text-gray-500 font-medium">€</span>
                           <ControlledNumberInput
@@ -4617,7 +4627,7 @@ export default function KassaReservationsView({
                         </div>
                       </div>
                       <p className="text-xs text-[#2D3A52] mt-3 bg-[#e8eef6] rounded-lg px-3 py-2">
-                         Klant wordt na invullen doorgestuurd naar <strong>Stripe betaalpagina</strong> voor €{reservationSettings.depositAmount}. Na betaling wordt de reservatie bevestigd.
+                         {rk('depositStripeHint')} €{reservationSettings.depositAmount}.
                       </p>
                     </div>
                   )}
@@ -4626,12 +4636,12 @@ export default function KassaReservationsView({
 
               {/* z9 - No-show bescherming */}
               <div className="border-t border-gray-100 pt-6">
-                <h4 className="font-bold mb-4"> No-show Bescherming</h4>
+                <h4 className="font-bold mb-4">{rk('noShowProtectionTitle')}</h4>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium">Creditcard registreren bij reservatie</p>
-                      <p className="text-sm text-gray-400">Kaart wordt bewaard, pas belast bij no-show</p>
+                      <p className="font-medium">{rk('cardOnFile')}</p>
+                      <p className="text-sm text-gray-400">{rk('cardOnFileDesc')}</p>
                     </div>
                     <button
                       onClick={() => updateSettings({ noShowProtection: !reservationSettings.noShowProtection })}
@@ -4642,7 +4652,7 @@ export default function KassaReservationsView({
                   </div>
                   {reservationSettings.noShowProtection && (
                     <div>
-                      <label className="font-medium block mb-2">No-show kost (€)</label>
+                      <label className="font-medium block mb-2">{rk('noShowFeeLabel')}</label>
                       <ControlledNumberInput
                         min={0}
                         step={5}
@@ -4658,12 +4668,12 @@ export default function KassaReservationsView({
 
               {/* z7 - Online booking widget */}
               <div className="border-t border-gray-100 pt-6">
-                <h4 className="font-bold mb-4"> Online Booking Widget</h4>
+                <h4 className="font-bold mb-4">{rk('bookingWidgetTitle')}</h4>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium">Online reserveren inschakelen</p>
-                      <p className="text-sm text-gray-400">Klanten kunnen online reserveren</p>
+                      <p className="font-medium">{rk('bookingPageEnable')}</p>
+                      <p className="text-sm text-gray-400">{rk('bookingPageEnableDesc')}</p>
                     </div>
                     <button
                       onClick={() => updateSettings({ bookingPageEnabled: !reservationSettings.bookingPageEnabled })}
@@ -4673,7 +4683,7 @@ export default function KassaReservationsView({
                     </button>
                   </div>
                   <div className="bg-gray-100 border border-gray-300 rounded-xl p-4">
-                    <p className="text-sm font-medium text-gray-900 mb-1"> Booking link voor klanten:</p>
+                    <p className="text-sm font-medium text-gray-900 mb-1">{rk('bookingLinkForCustomers')}</p>
                     <p className="text-xs text-gray-700 font-mono break-all">
                       {typeof window !== 'undefined'? `${window.location.origin}/shop/${tenant}/reserveren`: `/shop/${tenant}/reserveren`}
                     </p>
@@ -4685,7 +4695,7 @@ export default function KassaReservationsView({
                       }}
                       className="mt-2 px-3 py-1.5 bg-black text-white text-xs rounded-lg hover:bg-gray-800 transition-colors"
                     >
-                      Kopieer link
+                      {rk('copyLink')}
                     </button>
                   </div>
                 </div>
@@ -4698,7 +4708,7 @@ export default function KassaReservationsView({
               onClick={saveSettingsToSupabase}
               className="w-full mt-4 py-4 bg-black hover:bg-gray-800 text-white font-bold text-lg rounded-xl shadow-md transition-colors"
             >
-               Instellingen Opslaan
+               {rk('settingsSaveFooter')}
             </button>
           </div>
         )}
@@ -4713,7 +4723,7 @@ export default function KassaReservationsView({
           >
             <div className="mb-4 flex items-start justify-between gap-2">
               <div className="min-w-0 flex-1">
-                <h3 className="text-lg font-bold text-gray-900">Promotie-e-mail</h3>
+                <h3 className="text-lg font-bold text-gray-900">{rk('promoEmailModalTitle')}</h3>
                 {contactPromoRecipients.length === 1 ? (
                   <p className="text-sm text-gray-500 mt-1">
                     Naar <span className="font-medium text-gray-800">{contactPromoRecipients[0].name}</span>
@@ -4740,12 +4750,12 @@ export default function KassaReservationsView({
                 disabled={contactPromoSending}
                 onClick={() => setContactPromoRecipients([])}
                 className="min-h-[44px] min-w-[44px] rounded-xl text-2xl text-gray-400 hover:bg-gray-100 hover:text-gray-700"
-                aria-label="Sluiten"
+                aria-label={rk('closeAria')}
               >
                 ×
               </button>
             </div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Onderwerp</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{rk('subjectLabel')}</label>
             <input
               type="text"
               value={contactPromoSubject}
@@ -4753,7 +4763,7 @@ export default function KassaReservationsView({
               className="mb-4 w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-black"
               disabled={contactPromoSending}
             />
-            <label className="block text-sm font-medium text-gray-700 mb-1">Bericht</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{rk('messageLabel')}</label>
             <textarea
               value={contactPromoMessage}
               onChange={e => setContactPromoMessage(e.target.value)}
@@ -4771,7 +4781,7 @@ export default function KassaReservationsView({
                 onClick={() => setContactPromoRecipients([])}
                 className="min-h-[44px] flex-1 rounded-xl bg-gray-100 px-4 font-semibold text-gray-700 hover:bg-gray-200"
               >
-                Annuleren
+                {rk('cancel')}
               </button>
               <button
                 type="button"
@@ -4780,7 +4790,7 @@ export default function KassaReservationsView({
                 className="flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-xl bg-black px-4 font-bold text-white hover:bg-gray-800 disabled:opacity-50"
               >
                 <Send size={18} />
-                {contactPromoSending ? 'Versturen…': contactPromoRecipients.length > 1 ? `Versturen (${contactPromoRecipients.length})`: 'Versturen'}
+                {contactPromoSending ? rk('sending') : contactPromoRecipients.length > 1 ? rk('sendCount', { count: String(contactPromoRecipients.length) }) : rk('send')}
               </button>
             </div>
           </div>
@@ -4791,12 +4801,12 @@ export default function KassaReservationsView({
       {cancelConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[70] p-4">
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
-            <h3 className="font-bold text-lg mb-2"> Annulering na deadline</h3>
+            <h3 className="font-bold text-lg mb-2">{rk('cancelAfterDeadlineTitle')}</h3>
             <p className="text-gray-600 text-sm mb-4">{reservationSettings.cancellationMessage}</p>
-            <p className="text-gray-500 text-sm mb-6">Wilt u toch annuleren?</p>
+            <p className="text-gray-500 text-sm mb-6">{rk('cancelAnywayQuestion')}</p>
             <div className="flex gap-3">
-              <button onClick={() => setCancelConfirm(null)} className="flex-1 py-3 rounded-xl bg-gray-100 font-medium">Nee, terug</button>
-              <button onClick={() => doCancelReservation(cancelConfirm)} className="flex-1 py-3 rounded-xl bg-red-500 text-white font-medium">Ja, annuleren</button>
+              <button onClick={() => setCancelConfirm(null)} className="flex-1 py-3 rounded-xl bg-gray-100 font-medium">{rk('noGoBack')}</button>
+              <button onClick={() => doCancelReservation(cancelConfirm)} className="flex-1 py-3 rounded-xl bg-red-500 text-white font-medium">{rk('yesCancel')}</button>
             </div>
           </div>
         </div>
@@ -4910,22 +4920,22 @@ export default function KassaReservationsView({
               <div className="flex border-b border-gray-100">
                 <button onClick={() => setSearchPopupTab('dag')}
                   className={`flex-1 py-3 text-sm font-bold tracking-wide transition-colors ${searchPopupTab==='dag'?'text-black border-b-2 border-black':'text-gray-400 hover:text-gray-600'}`}>
-                  DEZE DAG
+                  {rk('tabThisDay')}
                 </button>
                 <button onClick={() => setSearchPopupTab('alle')}
                   className={`flex-1 py-3 text-sm font-bold tracking-wide transition-colors ${searchPopupTab==='alle'?'text-black border-b-2 border-black':'text-gray-400 hover:text-gray-600'}`}>
-                  ALLE DAGEN
+                  {rk('tabAllDays')}
                 </button>
               </div>
               {/* Resultaten */}
               <div className="overflow-y-auto flex-1">
                 {sortedDates.length === 0 && (
-                  <div className="py-12 text-center text-gray-400 text-sm">Geen reservaties gevonden</div>
+                  <div className="py-12 text-center text-gray-400 text-sm">{rk('searchNoBookings')}</div>
                 )}
                 {sortedDates.map(date => (
                   <div key={date}>
                     <p className="px-4 py-2 text-sm font-black text-gray-700 bg-gray-50 border-b border-gray-100">
-                      {new Date(date+'T12:00').toLocaleDateString('nl-BE',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
+                      {formatDateLong(date)}
                     </p>
                     {grouped[date].sort((a,b)=>a.reservation_time.localeCompare(b.reservation_time)).map(r => (
                       <button key={r.id} onClick={() => { setEditReservation(r); setShowSearchPopup(false) }}
@@ -4939,13 +4949,13 @@ export default function KassaReservationsView({
                           <p className="text-xs text-gray-400">{r.guest_phone || r.guest_email || ''}</p>
                         </div>
                         <div className="flex-shrink-0 text-right">
-                          <p className="text-xs text-gray-500">Tafel {r.table_number || '?'}</p>
+                          <p className="text-xs text-gray-500">{r.table_number ? rk('tableWithNumber', { number: String(r.table_number) }) : rk('noTablePlaceholder')}</p>
                           <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
                             r.status==='CONFIRMED'?'bg-green-100 text-green-700':
                             r.status==='PENDING'?'bg-yellow-100 text-yellow-700':
                             r.status==='CHECKED_IN'?'bg-gray-200 text-gray-900':
                             'bg-gray-100 text-gray-500'}`}>
-                            {r.status==='CONFIRMED'?'Bevestigd':r.status==='PENDING'?'Verwacht':r.status==='CHECKED_IN'?'Aanwezig':'Onbekend'}
+                            {statusLabel(r.status)}
                           </span>
                         </div>
                       </button>
@@ -5024,15 +5034,7 @@ interface EditReservationModalProps {
 
 function EditReservationModal({ reservation, tables, reservations, shifts, bufferMinutes, onClose, onSave, onCancel }: EditReservationModalProps) {
   const { t } = useLanguage()
-  const rk = useCallback((key: string, rep?: Record<string, string>) => {
-    let out = t(`reservationKassa.${key}`)
-    if (rep) {
-      for (const [k, v] of Object.entries(rep)) {
-        out = out.split(`{${k}}`).join(v)
-      }
-    }
-    return out
-  }, [t])
+  const rk = useMemo(() => makeReservationKassaRk(t), [t])
   const [form, setForm] = useState({
     guest_name: reservation.guest_name || '',
     guest_phone: reservation.guest_phone || '',
@@ -5080,9 +5082,16 @@ function EditReservationModal({ reservation, tables, reservations, shifts, buffe
 
   const handleSave = async () => {
     setValidationError('')
-    if (!form.guest_name.trim()) { setValidationError('Naam is verplicht'); return }
-    if (isOutsideShifts) { setValidationError(`Gekozen tijd valt buiten de openingstijden (${activeShifts.map(s=>`${s.name} ${s.startTime}–${s.endTime}`).join(', ')})`); return }
-    if (hasConflict) { setValidationError('Tafel is al bezet op dit tijdstip — kies een andere tafel of tijd'); return }
+    if (!form.guest_name.trim()) { setValidationError(rk('validationNameRequired')); return }
+    if (isOutsideShifts) {
+      setValidationError(
+        rk('validationOutsideShifts', {
+          shifts: activeShifts.map((s) => `${s.name} ${s.startTime}–${s.endTime}`).join(', '),
+        }),
+      )
+      return
+    }
+    if (hasConflict) { setValidationError(rk('validationTableConflict')); return }
     setSaving(true)
     await onSave({ ...reservation, ...form, table_number: form.table_number || reservation.table_number })
     setSaving(false)
@@ -5112,7 +5121,7 @@ function EditReservationModal({ reservation, tables, reservations, shifts, buffe
           <button
             type="button"
             onClick={onClose}
-            aria-label="Sluiten"
+            aria-label={rk('closeAria')}
             className="shrink-0 flex h-11 w-11 items-center justify-center rounded-xl border border-gray-300 bg-white text-gray-900 shadow-sm hover:bg-gray-100 active:bg-gray-200 transition-colors touch-manipulation"
           >
             <KassaResCloseButtonLabel />
@@ -5124,22 +5133,22 @@ function EditReservationModal({ reservation, tables, reservations, shifts, buffe
 
           {/* Naam */}
           <div>
-            <label className="block text-sm font-bold text-gray-600 mb-1">Naam gast <span className="text-red-500">*</span></label>
+            <label className="block text-sm font-bold text-gray-600 mb-1">{rk('guestNameRequired')}</label>
             <input type="text" value={form.guest_name}
               onChange={e => setForm({...form, guest_name: e.target.value})}
-              className={inputCls} placeholder="Voor- en achternaam"/>
+              className={inputCls} placeholder={rk('guestNamePlaceholder')}/>
           </div>
 
           {/* Telefoon & Email */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-bold text-gray-600 mb-1">Telefoon</label>
+              <label className="block text-sm font-bold text-gray-600 mb-1">{rk('labelPhone')}</label>
               <input type="tel" value={form.guest_phone}
                 onChange={e => setForm({...form, guest_phone: e.target.value})}
                 className={inputCls} placeholder="0472..."/>
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-600 mb-1">Email</label>
+              <label className="block text-sm font-bold text-gray-600 mb-1">{rk('labelEmail')}</label>
               <input type="email" value={form.guest_email}
                 onChange={e => setForm({...form, guest_email: e.target.value})}
                 className={inputCls} placeholder="naam@mail.com"/>
@@ -5149,26 +5158,26 @@ function EditReservationModal({ reservation, tables, reservations, shifts, buffe
           {/* Datum & Tijd */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-bold text-gray-600 mb-1">Datum</label>
+              <label className="block text-sm font-bold text-gray-600 mb-1">{rk('labelDate')}</label>
               <input type="date" value={form.reservation_date}
                 onChange={e => setForm({...form, reservation_date: e.target.value})}
                 className={inputCls}/>
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-600 mb-1">Tijd</label>
+              <label className="block text-sm font-bold text-gray-600 mb-1">{rk('labelTime')}</label>
               <select value={form.reservation_time}
                 onChange={e => setForm({...form, reservation_time: e.target.value})}
                 className={`${inputCls} ${isOutsideShifts ? 'border-red-400 bg-red-50': ''}`}>
                 {timeSlots.map(t => <option key={t} value={t}>{t}</option>)}
               </select>
-              {isOutsideShifts && <p className="text-red-500 text-xs mt-1"> Buiten openingstijden</p>}
+              {isOutsideShifts && <p className="text-red-500 text-xs mt-1">{rk('outsideOpeningHours')}</p>}
             </div>
           </div>
 
           {/* Personen & Duur */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-bold text-gray-600 mb-1">Personen</label>
+              <label className="block text-sm font-bold text-gray-600 mb-1">{rk('labelPersons')}</label>
               <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-100 border border-gray-200">
                 <button type="button" onClick={() => setForm({...form, party_size: Math.max(1, form.party_size-1)})}
                   className="w-10 h-10 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-xl font-bold">-</button>
@@ -5178,54 +5187,54 @@ function EditReservationModal({ reservation, tables, reservations, shifts, buffe
               </div>
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-600 mb-1">Duur</label>
+              <label className="block text-sm font-bold text-gray-600 mb-1">{rk('labelDuration')}</label>
               <select value={form.duration_minutes}
                 onChange={e => setForm({...form, duration_minutes: parseInt(e.target.value)})}
                 className={inputCls}>
-                <option value={60}>1 uur</option>
-                <option value={90}>1,5 uur</option>
-                <option value={120}>2 uur</option>
-                <option value={150}>2,5 uur</option>
-                <option value={180}>3 uur</option>
-                <option value={240}>4 uur</option>
+                <option value={60}>{rk('duration1h')}</option>
+                <option value={90}>{rk('duration1h30')}</option>
+                <option value={120}>{rk('duration2h')}</option>
+                <option value={150}>{rk('duration2h30')}</option>
+                <option value={180}>{rk('duration3h')}</option>
+                <option value={240}>{rk('duration4h')}</option>
               </select>
             </div>
           </div>
 
           {/* Tafel */}
           <div>
-            <label className="block text-sm font-bold text-gray-600 mb-1">Tafel</label>
+            <label className="block text-sm font-bold text-gray-600 mb-1">{rk('tableLabel')}</label>
             <select value={form.table_number}
               onChange={e => setForm({...form, table_number: e.target.value})}
               className={`${inputCls} ${hasConflict ? 'border-red-400 bg-red-50': ''}`}>
-              <option value="">— Geen voorkeur —</option>
+              <option value="">{rk('noPreference')}</option>
               {tables.map(t => (
-                <option key={t.id} value={String(t.number)}>Tafel {t.number} ({t.seats} plaatsen)</option>
+                <option key={t.id} value={String(t.number)}>{rk('tableOption', { number: String(t.number), seats: String(t.seats) })}</option>
               ))}
             </select>
-            {hasConflict && <p className="text-red-500 text-xs mt-1"> Tafel al bezet op dit tijdstip</p>}
+            {hasConflict && <p className="text-red-500 text-xs mt-1">{rk('tableConflictShort')}</p>}
           </div>
 
           {/* Status */}
           <div>
-            <label className="block text-sm font-bold text-gray-600 mb-1">Status</label>
+            <label className="block text-sm font-bold text-gray-600 mb-1">{rk('labelStatus')}</label>
             <select value={form.status}
               onChange={e => setForm({...form, status: e.target.value as Reservation['status']})}
               className={inputCls}>
-              <option value="PENDING">Verwacht</option>
+              <option value="PENDING">{rk('statusExpected')}</option>
               <option value="CONFIRMED">{rk('statusConfirmed')}</option>
-              <option value="CHECKED_IN">Aan tafel</option>
-              <option value="COMPLETED">Vertrokken</option>
-              <option value="NO_SHOW">No-show</option>
+              <option value="CHECKED_IN">{rk('statusAtTableOption')}</option>
+              <option value="COMPLETED">{rk('statusDepartedOption')}</option>
+              <option value="NO_SHOW">{rk('status_NO_SHOW')}</option>
             </select>
           </div>
 
           {/* Opmerkingen */}
           <div>
-            <label className="block text-sm font-bold text-gray-600 mb-1">Opmerkingen / Speciale wensen</label>
+            <label className="block text-sm font-bold text-gray-600 mb-1">{rk('notesSpecialLabel')}</label>
             <textarea value={form.special_requests}
               onChange={e => setForm({...form, special_requests: e.target.value})}
-              rows={3} placeholder="Bijv. allergieën, verjaardagstaart, rolstoel..."
+              rows={3} placeholder={rk('notesPlaceholder')}
               className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 focus:border-black outline-none text-base resize-none"/>
           </div>
 
@@ -5242,24 +5251,24 @@ function EditReservationModal({ reservation, tables, reservations, shifts, buffe
           {!confirmCancel ? (
             <button onClick={() => setConfirmCancel(true)}
               className="px-4 py-3 rounded-xl border-2 border-red-300 text-red-600 font-bold text-sm hover:bg-red-50 transition-colors">
-              Annuleer
+              {rk('cancelReservation')}
             </button>
           ) : (
             <div className="flex gap-2 flex-1">
               <button onClick={handleCancel} disabled={cancelling}
                 className="flex-1 py-3 rounded-xl bg-red-500 text-white font-bold text-sm hover:bg-red-600 disabled:opacity-50">
-                {cancelling ? 'Bezig...': 'Ja, annuleer'}
+                {cancelling ? rk('busy') : rk('yesCancelReservation')}
               </button>
               <button onClick={() => setConfirmCancel(false)}
                 className="flex-1 py-3 rounded-xl border-2 border-gray-200 text-gray-600 font-bold text-sm">
-                Terug
+                {rk('back')}
               </button>
             </div>
           )}
           {!confirmCancel && (
             <button onClick={handleSave} disabled={saving || isOutsideShifts || hasConflict}
               className="flex-1 py-3 rounded-xl bg-black text-white font-bold text-sm hover:bg-gray-800 disabled:opacity-40 transition-colors">
-              {saving ? 'Opslaan...': 'Opslaan'}
+              {saving ? rk('saving') : rk('save')}
             </button>
           )}
         </div>
@@ -5272,10 +5281,13 @@ function EditReservationModal({ reservation, tables, reservations, shifts, buffe
 // CALENDAR VIEW — maand / week / dag (uur-per-uur)
 // ============================================================
 
-const NL_DAYS_SHORT = ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo']
-const NL_MONTHS_LONG = ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December']
 const HOURS = Array.from({ length: 13 }, (_, i) => i + 10) // 10:00–22:00
 const HOUR_HEIGHT = 64 // px per uur
+
+/** Ma–Zo header index → JS getDay() (0=Sun … 6=Sat) */
+function mondayFirstToWeekdayIndex(i: number) {
+  return (i + 1) % 7
+}
 
 interface CalendarViewProps {
   reservations: Reservation[]
@@ -5288,6 +5300,7 @@ interface CalendarViewProps {
 
 function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReservation, onNewReservation }: CalendarViewProps) {
   const [calMode, setCalMode] = useState<'week' |  'day' |  'month'>('week')
+  const { rk, dateTag, formatDateLong, monthName, weekdayShort } = useReservationKassa()
 
   // Huidige referentiedatum (geselecteerde dag)
   const refDate = new Date(selectedDate + 'T12:00:00')
@@ -5311,7 +5324,7 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
     })
     const prevWeek = () => { const d = new Date(monday); d.setDate(monday.getDate() - 7); onSelectDate(toISO(d)) }
     const nextWeek = () => { const d = new Date(monday); d.setDate(monday.getDate() + 7); onSelectDate(toISO(d)) }
-    const weekLabel = `${weekDays[0].toLocaleDateString('nl-BE', { day: 'numeric', month: 'short'})} – ${weekDays[6].toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric'})}`
+    const weekLabel = `${weekDays[0].toLocaleDateString(dateTag, { day: 'numeric', month: 'short'})} – ${weekDays[6].toLocaleDateString(dateTag, { day: 'numeric', month: 'short', year: 'numeric'})}`
 
     // Reservaties per (dag, uur) groeperen
     const resByDayHour = (iso: string, hour: number) =>
@@ -5350,7 +5363,7 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
                       onClick={() => { onSelectDate(iso); setCalMode('day') }}
                       className={`border-b border-r border-gray-200 last:border-r-0 py-2 px-1 text-center cursor-pointer transition-colors ${isSelected ? 'bg-green-50': isToday ? 'bg-gray-100': 'hover:bg-gray-50'}`}
                     >
-                      <div className={`text-[11px] font-bold uppercase tracking-wide mb-0.5 ${isToday ? 'text-gray-900': 'text-gray-400'}`}>{NL_DAYS_SHORT[i]}</div>
+                      <div className={`text-[11px] font-bold uppercase tracking-wide mb-0.5 ${isToday ? 'text-gray-900': 'text-gray-400'}`}>{weekdayShort(mondayFirstToWeekdayIndex(i))}</div>
                       <div className={`text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center mx-auto ${isToday ? 'bg-gray-1000 text-white': isSelected ? 'bg-green-500 text-white': 'text-gray-800'}`}>{d.getDate()}</div>
                       {cnt > 0
                         ? <div className="text-[10px] text-green-700 font-semibold mt-0.5">{cnt}×&nbsp;·&nbsp;{covers}p</div>
@@ -5389,8 +5402,8 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
                               color: intensity > 0.5 ? 'white': '#166534',
                             }}
                           >
-                            <span className="text-[11px] leading-none font-bold">{cnt} res.</span>
-                            <span className="text-[9px] leading-none opacity-80">{covers} pers.</span>
+                            <span className="text-[11px] leading-none font-bold">{rk('calResShort', { count: String(cnt) })}</span>
+                            <span className="text-[9px] leading-none opacity-80">{rk('calPersons', { count: String(covers) })}</span>
                           </div>
                         )}
                       </td>
@@ -5401,7 +5414,7 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
             </tbody>
           </table>
         </div>
-        <p className="text-xs text-gray-400 mt-2 text-center">Klik op een dag of cel om alle reservaties te zien</p>
+        <p className="text-xs text-gray-400 mt-2 text-center">{rk('calClickHint')}</p>
       </div>
     )
   }
@@ -5411,7 +5424,7 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
     const prevDay = () => { const d = new Date(refDate); d.setDate(refDate.getDate() - 1); onSelectDate(toISO(d)) }
     const nextDay = () => { const d = new Date(refDate); d.setDate(refDate.getDate() + 1); onSelectDate(toISO(d)) }
     const dayRes = resByDate(selectedDate).sort((a, b) => (a.reservation_time || '').localeCompare(b.reservation_time || ''))
-    const dayLabel = refDate.toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'})
+    const dayLabel = formatDateLong(selectedDate)
     const covers = dayRes.reduce((s, r) => s + r.party_size, 0)
 
     // Groepeer op tijdstip
@@ -5431,8 +5444,8 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
           <div className="text-center">
             <div className="font-bold text-gray-800 capitalize">{dayLabel}</div>
             {dayRes.length > 0
-              ? <div className="text-sm text-gray-500">{dayRes.length} reservaties &nbsp;·&nbsp; {covers} personen</div>
-              : <div className="text-sm text-gray-400">Geen reservaties</div>
+              ? <div className="text-sm text-gray-500">{rk('groupResSummary', { count: String(dayRes.length), covers: String(covers) })}</div>
+              : <div className="text-sm text-gray-400">{rk('noReservations')}</div>
             }
           </div>
           <button onClick={nextDay} className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronRight size={18} /></button>
@@ -5441,9 +5454,9 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
         {dayRes.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 rounded-xl border border-gray-200 bg-white">
             <CalendarDays size={44} className="text-gray-300 mb-3" />
-            <p className="text-gray-400 font-medium">Geen reservaties op deze dag</p>
+            <p className="text-gray-400 font-medium">{rk('calNoReservationsDay')}</p>
             <button onClick={onNewReservation} className="mt-4 px-5 py-2 rounded-xl bg-green-500 text-white text-sm font-semibold hover:bg-green-600 transition-colors">
-              + Reservatie aanmaken
+              {rk('newReservationCreate')}
             </button>
           </div>
         ) : (
@@ -5458,10 +5471,10 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
                     <div className="text-lg font-black text-gray-900">{time}</div>
                     <div className="flex items-center gap-2">
                       <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full">
-                        {group.length} {group.length === 1 ? 'reservatie': 'reservaties'}
+                        {rk('calResCount', { count: String(group.length) })}
                       </span>
                       <span className="bg-gray-200 text-gray-900 text-xs font-bold px-2 py-0.5 rounded-full">
-                        {groupCovers} personen
+                        {rk('calPersons', { count: String(groupCovers) })}
                       </span>
                     </div>
                   </div>
@@ -5525,7 +5538,7 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
             })}
 
             <button onClick={onNewReservation} className="w-full py-3 rounded-xl border-2 border-dashed border-green-300 text-green-600 text-sm font-semibold hover:bg-green-50 transition-colors">
-              + Nieuwe reservatie aanmaken
+              {rk('newReservationCreate')}
             </button>
           </div>
         )}
@@ -5551,13 +5564,13 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
       <div>
         <div className="flex items-center justify-between mb-3">
           <button onClick={prevMonth} className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronLeft size={18} /></button>
-          <span className="font-bold text-gray-800 text-lg">{NL_MONTHS_LONG[refMonth]} {refYear}</span>
+          <span className="font-bold text-gray-800 text-lg">{monthName(refMonth)} {refYear}</span>
           <button onClick={nextMonth} className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronRight size={18} /></button>
         </div>
         <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
           <div className="grid grid-cols-7 border-b border-gray-200">
-            {NL_DAYS_SHORT.map(d => (
-              <div key={d} className="text-center text-xs font-bold text-gray-400 py-2">{d}</div>
+            {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="text-center text-xs font-bold text-gray-400 py-2">{weekdayShort(mondayFirstToWeekdayIndex(i))}</div>
             ))}
           </div>
           <div className="grid grid-cols-7">
@@ -5607,7 +5620,7 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
           {(['week', 'day', 'month'] as const).map(m => (
             <button key={m} onClick={() => setCalMode(m)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${calMode === m ? 'bg-black text-white': 'text-gray-500 hover:text-gray-900'}`}>
-              {m === 'week'? 'Week': m === 'day'? 'Dag': 'Maand'}
+              {m === 'week'? rk('calWeek'): m === 'day'? rk('calDay'): rk('calMonth')}
             </button>
           ))}
         </div>
@@ -5615,7 +5628,7 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
           onClick={() => { onSelectDate(new Date().toISOString().split('T')[0]); setCalMode('day') }}
           className="px-3 py-2 rounded-xl bg-green-100 text-green-700 text-sm font-medium hover:bg-green-200 transition-colors"
         >
-          Vandaag
+          {rk('today')}
         </button>
       </div>
 
@@ -5680,8 +5693,8 @@ function WalkInModal({ onClose, onSave, tables, reservations, rk }: {
               <UserCheck size={18} className="text-white"/>
             </div>
             <div>
-              <h2 className="font-bold text-lg">Walk-in</h2>
-              <p className="text-xs text-gray-400">Direct inchecken — geen reservatie nodig</p>
+              <h2 className="font-bold text-lg">{rk('walkIn')}</h2>
+              <p className="text-xs text-gray-400">{rk('walkInSubtitle')}</p>
             </div>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-700 transition-colors">
@@ -5690,12 +5703,12 @@ function WalkInModal({ onClose, onSave, tables, reservations, rk }: {
         </div>
         <div className="p-5 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Naam gast <span className="text-red-500">*</span></label>
-            <input value={name} onChange={e => setName(e.target.value)} placeholder="Voornaam achternaam"
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">{rk('guestNameRequired')}</label>
+            <input value={name} onChange={e => setName(e.target.value)} placeholder={rk('guestNamePlaceholder')}
               className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-gray-700 outline-none text-sm"/>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Aantal personen</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">{rk('partySizeLabel')}</label>
             <div className="flex items-center gap-3">
               <button onClick={() => setPartySize(p => Math.max(1, p-1))}
                 className="w-9 h-9 rounded-xl border border-gray-200 flex items-center justify-center font-bold text-lg hover:bg-gray-50">−</button>
@@ -5705,9 +5718,9 @@ function WalkInModal({ onClose, onSave, tables, reservations, rk }: {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Tafel <span className="text-red-500">*</span></label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">{rk('tableNumberRequired')}</label>
             <div className="grid grid-cols-5 gap-2">
-              {freeTables.length === 0 && <p className="col-span-5 text-sm text-gray-400 py-2">Alle tafels bezet op dit moment</p>}
+              {freeTables.length === 0 && <p className="col-span-5 text-sm text-gray-400 py-2">{rk('allTablesBusy')}</p>}
               {freeTables.map(t => (
                 <button key={t.number} onClick={() => setTableNumber(String(t.number))}
                   className={`py-2 rounded-xl border-2 text-sm font-bold transition-all ${
@@ -5723,12 +5736,12 @@ function WalkInModal({ onClose, onSave, tables, reservations, rk }: {
         </div>
         <div className="flex gap-3 p-5 pt-0">
           <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 font-medium transition-colors">
-            Annuleren
+            {rk('cancel')}
           </button>
           <button onClick={handleSubmit} disabled={saving}
             className="flex-1 py-2.5 rounded-xl bg-gray-800 text-white font-bold hover:bg-gray-900 transition-colors flex items-center justify-center gap-2 disabled:opacity-60">
             {saving ? <span className="animate-spin">⟳</span> : <UserCheck size={18}/>}
-            Inchecken
+            {rk('checkInButton')}
           </button>
         </div>
       </div>
@@ -5768,7 +5781,7 @@ function WaitlistModal({ onClose, onSave, rk }: {
             </div>
             <div>
               <h2 className="font-bold text-lg">{rk('waitlist')}</h2>
-              <p className="text-xs text-gray-400">Toevoegen aan de wachtlijst</p>
+              <p className="text-xs text-gray-400">{rk('waitlistAddSubtitle')}</p>
             </div>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-700 transition-colors">
@@ -5782,12 +5795,12 @@ function WaitlistModal({ onClose, onSave, rk }: {
               className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-purple-400 outline-none text-sm"/>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Telefoon</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">{rk('labelPhone')}</label>
             <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="0471 234 567"
               className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-purple-400 outline-none text-sm"/>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Aantal personen</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">{rk('partySizeLabel')}</label>
             <div className="flex items-center gap-3">
               <button onClick={() => setPartySize(p => Math.max(1, p-1))}
                 className="w-9 h-9 rounded-xl border border-gray-200 flex items-center justify-center font-bold text-lg hover:bg-gray-50">−</button>
@@ -5798,12 +5811,12 @@ function WaitlistModal({ onClose, onSave, rk }: {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Datum</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">{rk('labelDate')}</label>
               <input type="date" value={date} onChange={e => setDate(e.target.value)}
                 className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-purple-400 outline-none text-sm"/>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Tijdstip</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">{rk('labelTime')}</label>
               <input type="time" value={time} onChange={e => setTime(e.target.value)}
                 className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-purple-400 outline-none text-sm"/>
             </div>
@@ -5811,7 +5824,7 @@ function WaitlistModal({ onClose, onSave, rk }: {
         </div>
         <div className="flex gap-3 p-5 pt-0">
           <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 font-medium transition-colors">
-            Annuleren
+            {rk('cancel')}
           </button>
           <button onClick={handleSubmit} disabled={saving}
             className="flex-1 py-2.5 rounded-xl bg-purple-500 text-white font-bold hover:bg-purple-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-60">
@@ -5860,17 +5873,17 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
-    if (!formData.guest_first_name.trim()) newErrors.guest_first_name = 'Voornaam is verplicht'
-    if (!formData.guest_last_name.trim()) newErrors.guest_last_name = 'Achternaam is verplicht'
-    if (!formData.guest_phone.trim()) newErrors.guest_phone = 'Telefoon is verplicht'
-    if (!formData.guest_email.trim()) newErrors.guest_email = 'Email is verplicht'
-    if (!formData.reservation_date) newErrors.reservation_date = 'Datum is verplicht'
-    if (!formData.reservation_time) newErrors.reservation_time = 'Tijd is verplicht'
+    if (!formData.guest_first_name.trim()) newErrors.guest_first_name = rk('firstNameRequired')
+    if (!formData.guest_last_name.trim()) newErrors.guest_last_name = rk('lastNameRequired')
+    if (!formData.guest_phone.trim()) newErrors.guest_phone = rk('phoneRequired')
+    if (!formData.guest_email.trim()) newErrors.guest_email = rk('emailRequired')
+    if (!formData.reservation_date) newErrors.reservation_date = rk('labelDate')
+    if (!formData.reservation_time) newErrors.reservation_time = rk('labelTime')
     // Blokkeer als buiten openingstijden
     const activeShiftsV = shifts.filter(s => s.isActive)
     if (formData.reservation_time && activeShiftsV.length > 0) {
       const inShift = activeShiftsV.some(s => formData.reservation_time >= s.startTime && formData.reservation_time <= s.endTime)
-      if (!inShift) newErrors.reservation_time = 'Buiten openingsuren — kies een andere tijd'
+      if (!inShift) newErrors.reservation_time = rk('outsideHoursBooking')
     }
     if (formData.party_size < 1) newErrors.party_size = 'Min. 1 persoon'
     if (!formData.duration_minutes || formData.duration_minutes < 1) newErrors.duration_minutes = 'Duur is verplicht'
@@ -5968,7 +5981,7 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
               <CalendarDays size={24} className="text-green-500" />
               Nieuwe Reservatie
             </h2>
-            <button type="button" onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 text-gray-900" aria-label="Sluiten">
+            <button type="button" onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 text-gray-900" aria-label={rk('closeAria')}>
               <KassaResCloseButtonLabel className="text-xl" />
             </button>
           </div>
@@ -5980,14 +5993,14 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
           {/* Voornaam & Achternaam */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Voornaam {req()}</label>
+              <label className="block text-sm font-medium mb-1">{rk('labelFirstName')} {req()}</label>
               <input type="text" value={formData.guest_first_name}
                 onChange={(e) => setFormData({ ...formData, guest_first_name: e.target.value })}
                 placeholder="Jan" className={inputCls('guest_first_name')} />
               {errors.guest_first_name && <p className="text-red-500 text-xs mt-1">{errors.guest_first_name}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Achternaam {req()}</label>
+              <label className="block text-sm font-medium mb-1">{rk('labelLastName')} {req()}</label>
               <input type="text" value={formData.guest_last_name}
                 onChange={(e) => setFormData({ ...formData, guest_last_name: e.target.value })}
                 placeholder="Janssen" className={inputCls('guest_last_name')} />
@@ -5998,7 +6011,7 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
           {/* Telefoon & Email */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Telefoon {req()}</label>
+              <label className="block text-sm font-medium mb-1">{rk('labelPhone')} {req()}</label>
               <input type="tel" value={formData.guest_phone}
                 onChange={(e) => setFormData({ ...formData, guest_phone: e.target.value })}
                 placeholder="+32 ..." className={inputCls('guest_phone')} />
@@ -6016,7 +6029,7 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
           {/* Datum & Tijd */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Datum {req()}</label>
+              <label className="block text-sm font-medium mb-1">{rk('labelDate')} {req()}</label>
               <input type="date" value={formData.reservation_date}
                 onChange={(e) => setFormData({ ...formData, reservation_date: e.target.value })}
                 min={new Date().toISOString().split('T')[0]}
@@ -6024,7 +6037,7 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
               {errors.reservation_date && <p className="text-red-500 text-xs mt-1">{errors.reservation_date}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Tijd {req()}</label>
+              <label className="block text-sm font-medium mb-1">{rk('labelTime')} {req()}</label>
               <select value={formData.reservation_time}
                 onChange={(e) => setFormData({ ...formData, reservation_time: e.target.value })}
                 className={`${inputCls('reservation_time')} ${isOutsideHours ? 'border-red-500 bg-red-50': ''}`}>
@@ -6052,7 +6065,7 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
           {/* Personen & Duur */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Aantal personen {req()}</label>
+              <label className="block text-sm font-medium mb-1">{rk('partySizeLabel')} {req()}</label>
               <div className={`flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-100 border ${errors.party_size ? 'border-red-500': 'border-gray-200'}`}>
                 <button type="button"
                   onClick={() => setFormData({ ...formData, party_size: Math.max(1, formData.party_size - 1) })}
@@ -6068,7 +6081,7 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
               {errors.party_size && <p className="text-red-500 text-xs mt-1">{errors.party_size}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Duur {req()}</label>
+              <label className="block text-sm font-medium mb-1">{rk('labelDuration')} {req()}</label>
               <select value={formData.duration_minutes}
                 onChange={(e) => setFormData({ ...formData, duration_minutes: parseInt(e.target.value) })}
                 className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 focus:border-green-500 outline-none">
@@ -6085,7 +6098,7 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
 
           {/* Tafel */}
           <div>
-            <label className="block text-sm font-medium mb-1">Tafel {req()}</label>
+            <label className="block text-sm font-medium mb-1">{rk('tableLabel')} {req()}</label>
             <div className="grid grid-cols-2 gap-2">
               {/* Automatisch toewijzen knop */}
               <button
@@ -6117,12 +6130,12 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
                           : 'border-gray-200 bg-gray-50 text-gray-700 hover:border-green-300 hover:bg-green-50 cursor-pointer'
                     }`}
                   >
-                    <div className="font-bold">Tafel {table.number}</div>
+                    <div className="font-bold">{rk('tableWithNumber', { number: String(table.number) })}</div>
                     <div className="text-xs mt-0.5">
                       {table.seats} pers. &nbsp;·&nbsp;
                       {status.bezet
-                        ? <span className="text-red-500 font-semibold">Bezet t/m {status.tot}</span>
-                        : <span className="text-green-600 font-semibold">Vrij</span>
+                        ? <span className="text-red-500 font-semibold">{rk('tableBusyUntil', { time: String(status.tot ?? '') })}</span>
+                        : <span className="text-green-600 font-semibold">{rk('floorFree')}</span>
                       }
                     </div>
                     {status.bezet && status.door && (
@@ -6138,13 +6151,21 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
           <div>
             <label className="block text-sm font-medium mb-1">Gelegenheid {req()}</label>
             <div className="flex flex-wrap gap-2">
-              {['Geen', 'Verjaardag', 'Jubileum', 'Zakelijk', 'Romantisch', 'Feest'].map((occ) => (
+              {['Geen', 'Verjaardag', 'Jubileum', 'Zakelijk', 'Romantisch', 'Feest'].map((occ) => {
+                const occKey =
+                  occ === 'Geen' ? 'occasionNone'
+                  : occ === 'Verjaardag' ? 'occasionBirthday'
+                  : occ === 'Jubileum' ? 'occasionAnniversary'
+                  : occ === 'Zakelijk' ? 'occasionBusiness'
+                  : occ === 'Romantisch' ? 'occasionRomantic'
+                  : 'occasionParty'
+                return (
                 <button key={occ} type="button"
                   onClick={() => { setFormData({ ...formData, occasion: occ }); setErrors(e => ({ ...e, occasion: ''})) }}
                   className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
                     formData.occasion === occ ? 'bg-green-500 text-white': 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}>{occ}</button>
-              ))}
+                  }`}>{rk(occKey)}</button>
+              )})}
             </div>
             {errors.occasion && <p className="text-red-500 text-xs mt-1">{errors.occasion}</p>}
           </div>
@@ -6152,8 +6173,8 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
           {/* Voorschot betaald */}
           <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-200">
             <div>
-              <p className="text-sm font-semibold text-gray-800">Voorschot betaald</p>
-              <p className="text-xs text-gray-400 mt-0.5">Heeft de gast een voorschot betaald?</p>
+              <p className="text-sm font-semibold text-gray-800">{rk('depositPaidToggle')}</p>
+              <p className="text-xs text-gray-400 mt-0.5">{rk('depositPaidQuestion')}</p>
             </div>
             <button
               type="button"
@@ -6167,25 +6188,25 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
               }`} />
             </button>
             <span className={`ml-3 text-sm font-bold min-w-[2.5rem] ${formData.deposit_paid ? 'text-green-600': 'text-gray-400'}`}>
-              {formData.deposit_paid ? 'Ja': 'Nee'}
+              {formData.deposit_paid ? rk('yes'): rk('no')}
             </span>
           </div>
 
           {/* Opmerkingen — niet verplicht */}
           <div>
-            <label className="block text-sm font-medium mb-1">Opmerkingen</label>
+            <label className="block text-sm font-medium mb-1">{rk('notesTitle')}</label>
             <textarea value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              placeholder="Interne opmerkingen..." rows={2}
+              placeholder={rk('internalNotes')} rows={2}
               className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 focus:border-green-500 outline-none resize-none" />
           </div>
 
           {/* Speciale wensen — niet verplicht */}
           <div>
-            <label className="block text-sm font-medium mb-1">Speciale wensen gast</label>
+            <label className="block text-sm font-medium mb-1">{rk('specialRequestsGuest')}</label>
             <textarea value={formData.special_requests}
               onChange={(e) => setFormData({ ...formData, special_requests: e.target.value })}
-              placeholder="Allergieën, kinderstoel, rolstoel..." rows={2}
+              placeholder={rk('specialRequestsGuestHint')} rows={2}
               className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 focus:border-green-500 outline-none resize-none" />
           </div>
         </div>
@@ -6194,11 +6215,11 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
         <div className="sticky bottom-0 bg-white p-6 pt-4 border-t border-gray-200 flex gap-3">
           <button onClick={onClose}
             className="flex-1 py-3 rounded-xl bg-gray-100 font-medium hover:bg-gray-200 transition-colors">
-            Annuleren
+            {rk('cancel')}
           </button>
           <button onClick={handleSubmit}
             className="flex-1 py-3 rounded-xl bg-green-500 text-white font-medium hover:bg-green-600 transition-colors">
-            Reservatie Aanmaken
+            {rk('createReservation')}
           </button>
         </div>
       </div>
@@ -6246,6 +6267,7 @@ function ReservationDetailModal({
   const status = KASSA_STATUS_CONFIG[reservation.status]
   const [showTableSelect, setShowTableSelect] = useState(false)
   const { t } = useLanguage()
+  const { rk, statusLabel, formatDateMedium } = useReservationKassa()
 
   return (
     <div
@@ -6268,7 +6290,7 @@ function ReservationDetailModal({
             type="button"
             onClick={onClose}
             className="absolute right-2 top-2 z-[60] flex h-9 w-9 items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-900 shadow-md hover:bg-gray-50 active:bg-gray-100 touch-manipulation sm:h-10 sm:w-10"
-            aria-label="Sluiten"
+            aria-label={rk('closeAria')}
           >
             <KassaResCloseButtonLabel />
           </button>
@@ -6278,7 +6300,7 @@ function ReservationDetailModal({
               style={{ backgroundColor: status.bgColor, color: status.color }}
             >
               {status.icon}
-              {status.label}
+              {statusLabel(reservation.status)}
             </span>
             <h2 className="text-lg font-bold mt-0.5 break-words sm:text-xl">{reservation.guest_name}</h2>
           </div>
@@ -6295,7 +6317,7 @@ function ReservationDetailModal({
             <div>
               <p className="font-bold text-lg">{reservation.reservation_time}</p>
               <p className="text-sm text-gray-400">
-                {new Date(reservation.reservation_date).toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long'})}
+                {formatDateMedium(reservation.reservation_date)}
               </p>
             </div>
           </div>
@@ -6305,7 +6327,7 @@ function ReservationDetailModal({
             <div className="p-4 bg-gray-100 rounded-xl text-center">
               <Users size={24} className="mx-auto text-gray-400 mb-1" />
               <p className="text-2xl font-bold">{reservation.party_size}</p>
-              <p className="text-xs text-gray-400">personen</p>
+              <p className="text-xs text-gray-400">{rk('personsLabel')}</p>
             </div>
             <div
               className="p-4 bg-gray-100 rounded-xl text-center cursor-pointer hover:bg-gray-200 transition-colors"
@@ -6313,7 +6335,7 @@ function ReservationDetailModal({
             >
               <MapPin size={24} className="mx-auto text-gray-400 mb-1" />
               <p className="text-2xl font-bold">{reservation.table_number || '-'}</p>
-              <p className="text-xs text-gray-400">tafel (klik om te kiezen)</p>
+              <p className="text-xs text-gray-400">{rk('tableClickToChoose')}</p>
             </div>
           </div>
 
@@ -6340,13 +6362,13 @@ function ReservationDetailModal({
             <div className="flex items-center gap-2 flex-wrap">
               {guestProfile.isVip && (
                 <span className="px-2 py-1 rounded-full text-xs bg-amber-500/20 text-amber-500 flex items-center gap-1">
-                  <Star size={12} /> VIP
+                  <Star size={12} /> {rk('vipBadge')}
                 </span>
               )}
-              <span className="px-2 py-1 rounded-full text-xs bg-gray-100">{guestProfile.totalVisits} bezoeken</span>
+              <span className="px-2 py-1 rounded-full text-xs bg-gray-100">{rk('visitsBadge', { count: String(guestProfile.totalVisits) })}</span>
               {guestProfile.totalNoShows > 0 && (
                 <span className="px-2 py-1 rounded-full text-xs bg-red-500/20 text-red-400">
-                  {guestProfile.totalNoShows} no-shows
+                  {rk('noShowsBadge', { count: String(guestProfile.totalNoShows) })}
                 </span>
               )}
             </div>
@@ -6355,14 +6377,14 @@ function ReservationDetailModal({
           {/* Notes */}
           {reservation.notes && (
             <div className="p-3 bg-gray-100 rounded-xl">
-              <p className="text-xs text-gray-400 mb-1">Opmerkingen</p>
+              <p className="text-xs text-gray-400 mb-1">{rk('notesTitle')}</p>
               <p className="text-sm">{reservation.notes}</p>
             </div>
           )}
 
           {/* Special Requests — altijd zichtbaar */}
           <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl">
-            <p className="text-xs text-amber-500 font-semibold mb-1"> Speciale wensen gast</p>
+            <p className="text-xs text-amber-500 font-semibold mb-1">{rk('specialRequestsTitle')}</p>
             <p className="text-sm text-amber-900">{reservation.special_requests || '—'}</p>
           </div>
 
@@ -6385,7 +6407,7 @@ function ReservationDetailModal({
               className="w-full py-3 rounded-xl bg-black text-white font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
             >
               <CheckCircle2 size={18} />
-              Bevestigen
+              {rk('confirm')}
             </button>
           )}
 
@@ -6410,7 +6432,7 @@ function ReservationDetailModal({
                   : 'bg-green-50 border-green-200 text-green-700 hover:bg-green-100'}`}
             >
               <UserCheck size={20} />
-              Aan tafel
+              {rk('statusAtTableOption')}
             </button>
             <button
               onClick={onNoShow}
@@ -6420,7 +6442,7 @@ function ReservationDetailModal({
                   : 'bg-red-50 border-red-200 text-red-600 hover:bg-red-100'}`}
             >
               <UserX size={20} />
-              No-show
+              {rk('status_NO_SHOW')}
             </button>
             <button
               onClick={onComplete}
@@ -6440,7 +6462,7 @@ function ReservationDetailModal({
             className="w-full py-3 rounded-xl bg-[#f2f5fa] border-2 border-[#bcc8dc] text-[#2D3A52] font-bold hover:bg-[#e8eef6] transition-colors flex items-center justify-center gap-2"
           >
             <Settings size={18} />
-            Bewerken / Verplaatsen
+            {rk('editMove')}
           </button>
 
           <div className="flex gap-2">
@@ -6463,7 +6485,7 @@ function ReservationDetailModal({
         {showTableSelect && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center p-4 rounded-2xl">
             <div className="bg-white rounded-xl p-4 w-full max-w-sm">
-              <h3 className="font-bold mb-3">Kies tafel</h3>
+              <h3 className="font-bold mb-3">{rk('chooseTable')}</h3>
               <div className="grid grid-cols-4 gap-2 max-h-48 overflow-y-auto">
                 {tables.filter(t => t.seats >= reservation.party_size).map((table) => (
                   <button
@@ -6487,7 +6509,7 @@ function ReservationDetailModal({
                 onClick={() => setShowTableSelect(false)}
                 className="w-full mt-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200"
               >
-                Annuleren
+                {rk('cancel')}
               </button>
             </div>
           </div>
