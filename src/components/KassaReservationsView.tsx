@@ -915,6 +915,13 @@ export default function KassaReservationsView({
   }
 
   const floorOnlyMode = viewMode === 'floorplan' && reservationSettings.floorplanFloorOnly
+  const openFloorPlanView = () => {
+    setViewMode('floorplan')
+    setShowResCalendar(false)
+    if (!reservationSettings.floorplanFloorOnly) {
+      updateSettings({ floorplanFloorOnly: true })
+    }
+  }
   const toggleFloorOnlyMode = () => {
     updateSettings({ floorplanFloorOnly: !reservationSettings.floorplanFloorOnly })
   }
@@ -2350,7 +2357,14 @@ export default function KassaReservationsView({
               ].map((view) => (
                 <button
                   key={view.id}
-                  onClick={() => { setViewMode(view.id as ViewMode); setShowResCalendar(false) }}
+                  onClick={() => {
+                    if (view.id === 'floorplan') {
+                      openFloorPlanView()
+                    } else {
+                      setViewMode(view.id as ViewMode)
+                      setShowResCalendar(false)
+                    }
+                  }}
                   className={`relative flex min-w-[44px] flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-2 text-sm font-medium transition-colors ${
                     viewMode === view.id
                       ? 'bg-[#1877F2] text-white shadow-sm ring-1 ring-[#1877F2]/30'
@@ -2556,7 +2570,7 @@ export default function KassaReservationsView({
                     <p className="text-gray-600 font-semibold mb-1">Nog geen tafels aangemaakt</p>
                     <p className="text-sm text-gray-400 mb-4">Maak je plattegrond aan om tafels te zien</p>
                     <button
-                      onClick={() => setViewMode('floorplan')}
+                      onClick={() => openFloorPlanView()}
                       className="px-5 py-2.5 rounded-xl bg-green-500 hover:bg-green-600 text-white text-sm font-semibold transition-colors flex items-center gap-2 mx-auto"
                     >
                       <Plus size={16} />
