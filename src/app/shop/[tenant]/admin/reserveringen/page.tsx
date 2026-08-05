@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import KassaReservationsView from '@/components/KassaReservationsView'
+import { useLanguage } from '@/i18n'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
 import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
@@ -12,6 +13,7 @@ import { purgeLegacyKassaLocalStorage } from '@/lib/kassa-pos-state-client'
 
 export default function ReserveringenPage({ params }: { params: { tenant: string } }) {
   const router = useRouter()
+  const { t } = useLanguage()
   const { moduleAccess, loading: modulesLoading } = useTenantModuleFlags(params.tenant)
   const [kassaTables, setKassaTables] = useState<KassaTable[]>([])
 
@@ -67,7 +69,7 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
       tenant={params.tenant}
       kassaTables={kassaTables}
       presentation="adminPage"
-      closeButtonLabel={kassaOn ? undefined : 'Reservaties'}
+      closeButtonLabel={kassaOn ? undefined : t('reservationKassa.pageTitle')}
       allowKassaHandoff={kassaOn}
       onClose={() => {
         if (kassaOn) {

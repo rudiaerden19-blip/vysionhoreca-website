@@ -39,7 +39,11 @@ export async function loadLocaleMessages(locale: Locale): Promise<Messages> {
 
 export function translateKey(key: string, locale: Locale, catalog: Partial<Record<Locale, Messages>>): string {
   const keys = key.split('.')
-  const primary = catalog[locale] ?? catalog[defaultLocale] ?? getDefaultLocaleMessages()
+  const primary =
+    catalog[locale] ??
+    getCachedLocaleMessages(locale) ??
+    catalog[defaultLocale] ??
+    getDefaultLocaleMessages()
 
   let value: unknown = primary
   for (const k of keys) {

@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect, useLayoutEffect,
 import { Locale, defaultLocale, locales, localeNames, localeFlags } from './config'
 import {
   type Messages,
+  getCachedLocaleMessages,
   getDefaultLocaleMessages,
   loadLocaleMessages,
   translateKey,
@@ -85,6 +86,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       /* private mode */
     }
     applyDocumentLocale(newLocale)
+    const cached = getCachedLocaleMessages(newLocale)
+    if (cached) {
+      setMessageCatalog((prev) => ({ ...prev, [newLocale]: cached }))
+    }
     void loadLocaleMessages(newLocale).then((msgs) => {
       setMessageCatalog((prev) => ({ ...prev, [newLocale]: msgs }))
     })

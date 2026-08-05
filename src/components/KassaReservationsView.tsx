@@ -190,7 +190,7 @@ export default function KassaReservationsView({
     ? 'flex h-[calc(100dvh-3.5rem)] min-h-0 w-full max-w-full flex-col overflow-hidden bg-white'
     : 'fixed inset-0 z-50 flex min-h-0 flex-col overflow-hidden bg-white h-[100dvh] max-h-[100dvh]'
   const toast = useToast()
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
   const backLabel = closeButtonLabel ?? t('adminLayout.pos')
   const rk = useCallback((key: string, rep?: Record<string, string>) => {
     let out = t(`reservationKassa.${key}`)
@@ -2249,18 +2249,17 @@ export default function KassaReservationsView({
           <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
             <CalendarDays size={40} className="text-green-500" />
           </div>
-          <h2 className="text-2xl font-bold mb-3">Reservatiesysteem</h2>
+          <h2 className="text-2xl font-bold mb-3">{rk('systemTitle')}</h2>
           <p className="text-gray-500 mb-6">
-            Beheer tafelreservaties, ontvang online boekingen en houd uw bezetting bij.
-            Perfect voor restaurants, brasseries en cafés.
+            {rk('systemDescription')}
           </p>
           <button
             onClick={() => updateSettings({ isEnabled: true })}
             className="px-6 py-3 rounded-xl bg-green-500 text-white font-semibold hover:bg-green-600 transition-colors"
           >
-            Reservaties Inschakelen
+            {rk('enableReservations')}
           </button>
-          <button onClick={onClose} className="block mx-auto mt-4 text-gray-400 hover:text-gray-600 text-sm">Sluiten</button>
+          <button onClick={onClose} className="block mx-auto mt-4 text-gray-400 hover:text-gray-600 text-sm">{rk('close')}</button>
         </div>
       </div>
     )
@@ -2293,9 +2292,9 @@ export default function KassaReservationsView({
               <CalendarDays size={22} className="text-green-500 sm:h-6 sm:w-6" />
             </div>
             <div className="min-w-0">
-              <h1 className="truncate text-xl font-bold sm:text-2xl">Reservaties</h1>
+              <h1 className="truncate text-xl font-bold sm:text-2xl">{rk('pageTitle')}</h1>
               <p className="text-sm text-gray-400 sm:text-base">
-                {formatDate(selectedDate)} • {todayStats.covers} personen verwacht
+                {formatDate(selectedDate)} • {rk('coversExpected', { count: String(todayStats.covers) })}
               </p>
             </div>
           </div>
@@ -2316,22 +2315,22 @@ export default function KassaReservationsView({
                   className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-[#1877F2] px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[#166FE5] active:bg-[#1464D6] sm:gap-2 sm:px-4"
                 >
                   <UserCheck size={18} className="shrink-0" />
-                  <span className="hidden sm:inline">Walk-in</span>
+                  <span className="hidden sm:inline">{rk('walkIn')}</span>
                 </button>
                 <button
                   onClick={() => setShowWaitlistModal(true)}
                   className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-[#1877F2] px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[#166FE5] active:bg-[#1464D6] sm:gap-2 sm:px-4"
                 >
                   <Clock size={18} className="shrink-0" />
-                  <span className="hidden sm:inline">Wachtlijst</span>
+                  <span className="hidden sm:inline">{rk('waitlist')}</span>
                 </button>
                 <button
                   onClick={() => setShowNewReservationModal(true)}
                   className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-green-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-green-600 sm:gap-2 sm:px-4"
                 >
                   <Plus size={20} className="shrink-0" />
-                  <span className="inline md:hidden">Nieuw</span>
-                  <span className="hidden md:inline">Nieuwe Reservatie</span>
+                  <span className="inline md:hidden">{rk('newShort')}</span>
+                  <span className="hidden md:inline">{rk('newReservationShort')}</span>
                 </button>
               </>
             )}
@@ -2346,7 +2345,7 @@ export default function KassaReservationsView({
               onClick={() => setSelectedShift(null)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${selectedShift === null ? 'bg-black text-white': 'bg-gray-100 text-gray-500 hover:text-gray-900'}`}
             >
-              Alle shifts
+              {rk('allShifts')}
             </button>
             {reservationSettings.shifts.filter(s => s.isActive).map(shift => (
               <button
@@ -2366,12 +2365,12 @@ export default function KassaReservationsView({
             {(() => {
               const pendingCount = reservations.filter(r => r.status === 'PENDING').length
               return [
-                { id: 'reservations', label: 'Reserveringen', icon: <List size={16} />, badge: pendingCount },
-                { id: 'floorplan', label: 'Plattegrond', icon: <MapPin size={16} />, badge: 0 },
-                { id: 'timeline', label: 'Tafels', icon: <LayoutGrid size={16} />, badge: 0 },
-                { id: 'guests', label: 'Contacten', icon: <Users size={16} />, badge: 0 },
-                { id: 'stats', label: 'Rapporten', icon: <AlertCircle size={16} />, badge: 0 },
-                { id: 'settings', label: 'Instellingen', icon: <Settings size={16} />, badge: 0 },
+                { id: 'reservations', label: rk('tabReservations'), icon: <List size={16} />, badge: pendingCount },
+                { id: 'floorplan', label: rk('tabFloorPlan'), icon: <MapPin size={16} />, badge: 0 },
+                { id: 'timeline', label: rk('tabTables'), icon: <LayoutGrid size={16} />, badge: 0 },
+                { id: 'guests', label: rk('tabContacts'), icon: <Users size={16} />, badge: 0 },
+                { id: 'stats', label: rk('tabReports'), icon: <AlertCircle size={16} />, badge: 0 },
+                { id: 'settings', label: rk('tabSettings'), icon: <Settings size={16} />, badge: 0 },
               ].map((view) => (
                 <button
                   key={view.id}
@@ -2406,7 +2405,7 @@ export default function KassaReservationsView({
               <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
-                placeholder="Zoek op naam, telefoon of email..."
+                placeholder={rk('searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 rounded-xl bg-gray-100 border border-gray-200 focus:border-black outline-none"
@@ -2426,6 +2425,7 @@ export default function KassaReservationsView({
             : 'overflow-y-auto'
         }`}
         key={viewMode}
+        data-vysion-locale={locale}
       >
         {loading && (
           <div className="flex items-center justify-center py-12">
@@ -2807,7 +2807,7 @@ export default function KassaReservationsView({
                 <button onClick={() => { setSelectedFloorTable(null); setShowAddFloorTable(true) }}
                   className="flex items-center gap-2 h-11 px-5 rounded-xl bg-green-500 hover:bg-green-600 active:bg-green-700 text-white text-sm font-bold transition-colors whitespace-nowrap shadow-sm">
                   <Plus size={18} />
-                  <span className="hidden sm:inline">Tafel toevoegen</span>
+                  <span className="hidden sm:inline">{rk('addTable')}</span>
                   <span className="sm:hidden">+ Tafel</span>
                 </button>
               </div>
@@ -2819,7 +2819,7 @@ export default function KassaReservationsView({
                 {/* Lijst links — inklapbaar */}
                 <div className={`flex-shrink-0 bg-white border-r border-gray-200 flex flex-col overflow-hidden transition-all duration-300 relative ${effectiveResListCollapsed ? 'w-0': 'w-52 md:w-60 lg:w-72'}`}>
                   <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-                    <span className="font-bold text-base text-gray-800 whitespace-nowrap">Reservaties</span>
+                    <span className="font-bold text-base text-gray-800 whitespace-nowrap">{rk('pageTitle')}</span>
                     <span className="text-sm font-semibold text-gray-400 bg-gray-100 rounded-full px-2 py-0.5">{floorRes.length}</span>
                   </div>
                   <div className="flex-1 overflow-y-auto divide-y divide-gray-50">
@@ -2988,7 +2988,7 @@ export default function KassaReservationsView({
                         title="Nieuwe tafel op de plattegrond"
                       >
                         <Plus size={18} className="shrink-0" />
-                        <span className="hidden sm:inline">Tafel toevoegen</span>
+                        <span className="hidden sm:inline">{rk('addTable')}</span>
                         <span className="sm:hidden">+ Tafel</span>
                       </button>
                       <button
@@ -3203,7 +3203,7 @@ export default function KassaReservationsView({
 
                       {/* Reservaties */}
                       <div className="min-h-0 flex-1 overflow-y-auto p-3 sm:p-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)'}}>
-                        <p className="text-white/50 text-sm uppercase tracking-wider mb-3">Reservaties</p>
+                        <p className="text-white/50 text-sm uppercase tracking-wider mb-3">{rk('reservationsSection')}</p>
                         {allTableRes.length > 0 ? (
                           <div className="space-y-3">
                             {allTableRes.map(r => (
@@ -3307,7 +3307,7 @@ export default function KassaReservationsView({
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[70] p-4">
                   <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl">
                     <div className="p-5 border-b flex items-center justify-between">
-                      <h3 className="font-bold text-lg">Tafel toevoegen</h3>
+                      <h3 className="font-bold text-lg">{rk('addTable')}</h3>
                       <button onClick={() => setShowAddFloorTable(false)} className="text-gray-400 hover:text-gray-700"><X size={20} /></button>
                     </div>
                     <div className="p-5 space-y-4">
@@ -3354,7 +3354,7 @@ export default function KassaReservationsView({
                       </div>
                     </div>
                     <div className="p-4 border-t flex gap-3">
-                      <button onClick={() => setShowAddFloorTable(false)} className="flex-1 py-3 rounded-xl bg-gray-100 font-semibold">Annuleer</button>
+                      <button onClick={() => setShowAddFloorTable(false)} className="flex-1 py-3 rounded-xl bg-gray-100 font-semibold">{rk('cancel')}</button>
                       <button onClick={addFloorTable} className="flex-[2] py-3 rounded-xl bg-green-500 hover:bg-green-600 text-white font-bold transition-colors">Toevoegen</button>
                     </div>
                   </div>
@@ -4175,7 +4175,7 @@ export default function KassaReservationsView({
                     <div className="flex-shrink-0 border-t-2 border-purple-200 bg-purple-50">
                       <div className="px-5 py-2 flex items-center gap-2">
                         <Clock size={14} className="text-purple-600"/>
-                        <span className="text-xs font-bold text-purple-700 uppercase tracking-wider">Wachtlijst</span>
+                        <span className="text-xs font-bold text-purple-700 uppercase tracking-wider">{rk('waitlist')}</span>
                         <span className="text-xs text-purple-500">{wl.length} wachtend · {wl.reduce((s,r)=>s+r.party_size,0)} pers.</span>
                       </div>
                       <table className="w-full text-sm" style={{borderCollapse:'collapse'}}>
@@ -4291,7 +4291,7 @@ export default function KassaReservationsView({
         {!loading && viewMode === 'settings' && (
           <div className="max-w-2xl overflow-y-auto h-full pb-8">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold">Reservatie Instellingen</h3>
+              <h3 className="text-lg font-bold">{rk('reservationSettingsTitle')}</h3>
               <button
                 onClick={saveSettingsToSupabase}
                 className="flex items-center gap-2 px-5 py-2.5 bg-black hover:bg-gray-800 text-white font-bold rounded-xl shadow transition-colors"
@@ -4299,7 +4299,7 @@ export default function KassaReservationsView({
                  Opslaan
               </button>
             </div>
-            <h3 className="text-lg font-bold mb-4 hidden">Reservatie Instellingen</h3>
+            <h3 className="text-lg font-bold mb-4 hidden">{rk('reservationSettingsTitle')}</h3>
             <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6">
               {/* Enable toggle */}
               <div className="flex items-center justify-between">
@@ -5023,6 +5023,16 @@ interface EditReservationModalProps {
 }
 
 function EditReservationModal({ reservation, tables, reservations, shifts, bufferMinutes, onClose, onSave, onCancel }: EditReservationModalProps) {
+  const { t } = useLanguage()
+  const rk = useCallback((key: string, rep?: Record<string, string>) => {
+    let out = t(`reservationKassa.${key}`)
+    if (rep) {
+      for (const [k, v] of Object.entries(rep)) {
+        out = out.split(`{${k}}`).join(v)
+      }
+    }
+    return out
+  }, [t])
   const [form, setForm] = useState({
     guest_name: reservation.guest_name || '',
     guest_phone: reservation.guest_phone || '',
@@ -5096,7 +5106,7 @@ function EditReservationModal({ reservation, tables, reservations, shifts, buffe
         {/* Header */}
         <div className="flex items-start justify-between gap-3 px-6 py-4 border-b border-gray-100 bg-gray-50 flex-shrink-0">
           <div className="min-w-0 flex-1">
-            <h2 className="text-lg font-black text-gray-800">Reservatie bewerken</h2>
+            <h2 className="text-lg font-black text-gray-800">{rk('editReservationTitle')}</h2>
             <p className="text-sm text-gray-500 truncate">{reservation.guest_name} · {reservation.reservation_date} {reservation.reservation_time}</p>
           </div>
           <button
@@ -5203,7 +5213,7 @@ function EditReservationModal({ reservation, tables, reservations, shifts, buffe
               onChange={e => setForm({...form, status: e.target.value as Reservation['status']})}
               className={inputCls}>
               <option value="PENDING">Verwacht</option>
-              <option value="CONFIRMED">Bevestigd</option>
+              <option value="CONFIRMED">{rk('statusConfirmed')}</option>
               <option value="CHECKED_IN">Aan tafel</option>
               <option value="COMPLETED">Vertrokken</option>
               <option value="NO_SHOW">No-show</option>
@@ -5757,7 +5767,7 @@ function WaitlistModal({ onClose, onSave, rk }: {
               <Clock size={18} className="text-white"/>
             </div>
             <div>
-              <h2 className="font-bold text-lg">Wachtlijst</h2>
+              <h2 className="font-bold text-lg">{rk('waitlist')}</h2>
               <p className="text-xs text-gray-400">Toevoegen aan de wachtlijst</p>
             </div>
           </div>
