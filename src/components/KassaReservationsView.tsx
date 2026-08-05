@@ -55,6 +55,7 @@ import { getAuthHeaders, authFetch } from '@/lib/auth-headers'
 import { useLanguage } from '@/i18n'
 import { ControlledNumberInput } from '@/components/ControlledNumberInput'
 import { useReservationKassa, makeReservationKassaRk } from '@/hooks/useReservationKassa'
+import { reservationAdminPrimaryBtnRoundedClass } from '@/lib/reservation-admin-ui-colors'
 
 import type {
   FloorPlanTable,
@@ -953,6 +954,15 @@ export default function KassaReservationsView({
   }
   const toggleFloorOnlyMode = () => {
     updateSettings({ floorplanFloorOnly: !reservationSettings.floorplanFloorOnly })
+  }
+
+  const goBackToReservations = () => {
+    if (reservationSettings.floorplanFloorOnly) {
+      updateSettings({ floorplanFloorOnly: false })
+    }
+    setViewMode('reservations')
+    setShowResCalendar(false)
+    setSelectedFloorTable(null)
   }
 
   // ---- Floor plan editor helpers ----
@@ -2308,7 +2318,7 @@ export default function KassaReservationsView({
           <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
             <button
               onClick={onClose}
-              className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-[#1877F2] px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-[#166FE5] active:bg-[#1464D6] sm:gap-2"
+              className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-[#075985] px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-[#06496e] active:bg-[#053a56] sm:gap-2"
             >
               <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -2319,14 +2329,14 @@ export default function KassaReservationsView({
               <>
                 <button
                   onClick={() => setShowWalkInModal(true)}
-                  className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-[#1877F2] px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[#166FE5] active:bg-[#1464D6] sm:gap-2 sm:px-4"
+                  className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-[#075985] px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[#06496e] active:bg-[#053a56] sm:gap-2 sm:px-4"
                 >
                   <UserCheck size={18} className="shrink-0" />
                   <span className="hidden sm:inline">{rk('walkIn')}</span>
                 </button>
                 <button
                   onClick={() => setShowWaitlistModal(true)}
-                  className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-[#1877F2] px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[#166FE5] active:bg-[#1464D6] sm:gap-2 sm:px-4"
+                  className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-[#075985] px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[#06496e] active:bg-[#053a56] sm:gap-2 sm:px-4"
                 >
                   <Clock size={18} className="shrink-0" />
                   <span className="hidden sm:inline">{rk('waitlist')}</span>
@@ -2391,7 +2401,7 @@ export default function KassaReservationsView({
                   }}
                   className={`relative flex min-w-[44px] flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-2 text-sm font-medium transition-colors ${
                     viewMode === view.id
-                      ? 'bg-[#1877F2] text-white shadow-sm ring-1 ring-[#1877F2]/30'
+                      ? 'bg-[#075985] text-white shadow-sm ring-1 ring-[#075985]/30'
                       : 'bg-gray-300 text-gray-800 hover:bg-gray-400 hover:text-gray-900'
                   }`}
                 >
@@ -2750,7 +2760,7 @@ export default function KassaReservationsView({
                     onClick={() => setResFloorPlanZone(FLOOR_PLAN_ZONE_INSIDE)}
                     className={`min-h-[40px] rounded-xl px-3 text-sm font-bold transition-colors ${
                       resFloorPlanZone === FLOOR_PLAN_ZONE_INSIDE
-                        ? 'bg-[#1877F2] text-white shadow-sm'
+                        ? 'bg-[#075985] text-white shadow-sm'
                         : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                     }`}
                   >
@@ -2761,7 +2771,7 @@ export default function KassaReservationsView({
                     onClick={() => setResFloorPlanZone(FLOOR_PLAN_ZONE_TERRACE)}
                     className={`min-h-[40px] rounded-xl px-3 text-sm font-bold transition-colors ${
                       resFloorPlanZone === FLOOR_PLAN_ZONE_TERRACE
-                        ? 'bg-[#1877F2] text-white shadow-sm'
+                        ? 'bg-[#075985] text-white shadow-sm'
                         : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                     }`}
                   >
@@ -2793,7 +2803,17 @@ export default function KassaReservationsView({
                   <span className="hidden sm:inline">{rk('floorOnlyLong')}</span>
                 </button>
 
-                {/* Vergrendel-knop */}
+                {/* Terug naar reserveringen + vergrendel */}
+                <button
+                  type="button"
+                  onClick={goBackToReservations}
+                  className={`flex min-h-[44px] items-center gap-2 px-4 py-2 text-sm font-bold shadow-sm ${reservationAdminPrimaryBtnRoundedClass}`}
+                >
+                  <List size={18} className="shrink-0" />
+                  <span className="hidden sm:inline">{rk('tabReservations')}</span>
+                </button>
+
+                {/* Vergrendel-knop — ontgrendelen = tafels verschuiven */}
                 <button
                   onClick={() => {
                     const next = !tablesLocked
@@ -2808,7 +2828,7 @@ export default function KassaReservationsView({
                   title={tablesLocked ? rk('tablesLockedTitle') : rk('tablesUnlockedTitle')}
                 >
                   {tablesLocked ? <Lock size={18} /> : <LockOpen size={18} />}
-                  <span className="hidden sm:inline">{tablesLocked ? rk('unlockTablesLong') : rk('lockTables')}</span>
+                  <span className="hidden sm:inline">{tablesLocked ? rk('shiftTables') : rk('lockTables')}</span>
                 </button>
 
                 <button onClick={() => { setSelectedFloorTable(null); setShowAddFloorTable(true) }}
@@ -2970,6 +2990,17 @@ export default function KassaReservationsView({
                         type="button"
                         onClick={e => {
                           e.stopPropagation()
+                          goBackToReservations()
+                        }}
+                        className={`flex min-h-[44px] shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold shadow-lg transition-colors sm:px-4 ${reservationAdminPrimaryBtnRoundedClass}`}
+                      >
+                        <List size={18} className="shrink-0" />
+                        <span className="hidden sm:inline">{rk('tabReservations')}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={e => {
+                          e.stopPropagation()
                           const next = !tablesLocked
                           setTablesLocked(next)
                           updateSettings({ floorPlanTablesLocked: next })
@@ -2979,10 +3010,10 @@ export default function KassaReservationsView({
                             ? 'bg-red-500 text-white hover:bg-red-600 active:bg-red-700'
                             : 'bg-gray-200 text-gray-800 hover:bg-gray-300 active:bg-gray-400'
                         }`}
-                        title={tablesLocked ? 'Tafels vergrendeld — tik om te ontgrendelen': 'Tafels ontgrendeld — tik om te vergrendelen'}
+                        title={tablesLocked ? rk('tablesLockedTitle') : rk('tablesUnlockedTitle')}
                       >
                         {tablesLocked ? <Lock size={18} className="shrink-0" /> : <LockOpen size={18} className="shrink-0" />}
-                        <span className="hidden sm:inline">{tablesLocked ? rk('unlockTablesLong') : rk('lockTables')}</span>
+                        <span className="hidden sm:inline">{tablesLocked ? rk('shiftTables') : rk('lockTables')}</span>
                       </button>
                       <button
                         type="button"
@@ -3499,11 +3530,11 @@ export default function KassaReservationsView({
                   {/* Dag / Avond toggle */}
                   <div className="flex rounded-lg overflow-hidden border border-gray-200 ml-2">
                     <button onClick={() => setTimeShift('dag')}
-                      className={`px-4 py-1.5 text-sm font-bold transition-colors ${timeShift==='dag'?'bg-[#1877F2] text-white':'bg-white text-gray-500 hover:bg-gray-50'}`}>
+                      className={`px-4 py-1.5 text-sm font-bold transition-colors ${timeShift==='dag'?'bg-[#075985] text-white':'bg-white text-gray-500 hover:bg-gray-50'}`}>
                       Dag
                     </button>
                     <button onClick={() => setTimeShift('avond')}
-                      className={`px-4 py-1.5 text-sm font-bold transition-colors border-l border-gray-200 ${timeShift==='avond'?'bg-[#1877F2] text-white':'bg-white text-gray-500 hover:bg-gray-50'}`}>
+                      className={`px-4 py-1.5 text-sm font-bold transition-colors border-l border-gray-200 ${timeShift==='avond'?'bg-[#075985] text-white':'bg-white text-gray-500 hover:bg-gray-50'}`}>
                       Avond
                     </button>
                   </div>
@@ -3512,8 +3543,8 @@ export default function KassaReservationsView({
                     onClick={() => setCalOpen(o => !o)}
                     className={`ml-2 flex items-center gap-2 rounded-lg px-5 py-1.5 text-sm font-bold text-white transition-colors
                       ${calOpen
-                        ? 'bg-[#166FE5] ring-2 ring-[#1877F2]/45'
-                        : 'bg-[#1877F2] hover:bg-[#166FE5]'
+                        ? 'bg-[#06496e] ring-2 ring-[#075985]/45'
+                        : 'bg-[#075985] hover:bg-[#06496e]'
                       }`}>
                     <Calendar size={20}/>
                     <span>{rk('calendar')}</span>
@@ -3522,7 +3553,7 @@ export default function KassaReservationsView({
                   {/* Zoek knop */}
                   <button
                     onClick={() => setShowSearchPopup(true)}
-                    className="ml-2 flex items-center gap-2 rounded-lg bg-[#1877F2] px-5 py-1.5 text-sm font-bold text-white transition-colors hover:bg-[#166FE5]">
+                    className="ml-2 flex items-center gap-2 rounded-lg bg-[#075985] px-5 py-1.5 text-sm font-bold text-white transition-colors hover:bg-[#06496e]">
                     <Search size={20}/>
                     <span>{rk('searchResShort')}</span>
                   </button>
@@ -3713,7 +3744,7 @@ export default function KassaReservationsView({
               {/* === KALENDER RECHTS — inklapbaar, groot === */}
               <div className={`flex-shrink-0 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col transition-[width] duration-300 ease-in-out ${calOpen ? 'w-72': 'w-12'}`}>
                 {/* Header: inklapknop + jaar + vandaag */}
-                <div className="flex items-center gap-2 px-3 py-3 border-b border-gray-100 flex-shrink-0 bg-[#1877F2]">
+                <div className="flex items-center gap-2 px-3 py-3 border-b border-gray-100 flex-shrink-0 bg-[#075985]">
                   <button onClick={() => setCalOpen(o=>!o)}
                     className="p-1.5 rounded-lg bg-white/55 hover:bg-white/80 text-white flex-shrink-0">
                     {calOpen ? <ChevronRight size={18}/> : <ChevronLeft size={18}/>}
@@ -3758,7 +3789,7 @@ export default function KassaReservationsView({
                               return (
                                 <button key={day} onClick={()=>{ setTimelineDate(dStr); setCalMonth({year:mYear,month:mMonth}) }}
                                   className={`relative aspect-square flex items-center justify-center text-sm font-bold rounded-full transition-colors
-                                    ${isSel?'bg-[#1877F2] text-white':isTod?'bg-[#e8eef6] text-gray-900':'hover:bg-gray-100 text-gray-700'}`}>
+                                    ${isSel?'bg-[#075985] text-white':isTod?'bg-[#e8eef6] text-gray-900':'hover:bg-gray-100 text-gray-700'}`}>
                                   {day}
                                   {hasRes&&!isSel&&<span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-gray-1000"/>}
                                 </button>
@@ -4010,7 +4041,7 @@ export default function KassaReservationsView({
                     <button key={f}
                       onClick={() => { setResViewFilter(f); setShowMonthPicker(false); if (f === 'maand') { setResFilterMonth(new Date().getMonth()); setResFilterYear(new Date().getFullYear()) } if (f === 'jaar') setResFilterYear(new Date().getFullYear()) }}
                       className={`px-3 py-1.5 rounded-lg text-sm font-semibold capitalize transition-colors
-                        ${resViewFilter === f ? 'bg-[#1877F2] text-white shadow-sm': 'text-gray-500 hover:text-gray-800'}`}>
+                        ${resViewFilter === f ? 'bg-[#075985] text-white shadow-sm': 'text-gray-500 hover:text-gray-800'}`}>
                       {f.charAt(0).toUpperCase() + f.slice(1)}
                     </button>
                   ))}
@@ -4019,12 +4050,12 @@ export default function KassaReservationsView({
                 <div className="ml-auto flex gap-2">
                   <button onClick={() => { setShowResCalendar(v => !v); setShowResSearch(false) }}
                     className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-colors
-                      ${showResCalendar ? 'bg-[#166FE5] ring-2 ring-[#1877F2]/45': 'bg-[#1877F2] hover:bg-[#166FE5]'}`}>
+                      ${showResCalendar ? 'bg-[#06496e] ring-2 ring-[#075985]/45': 'bg-[#075985] hover:bg-[#06496e]'}`}>
                     <Calendar size={15}/> Kalender {showResCalendar ? <Eye size={13}/> : <EyeOff size={13}/>}
                   </button>
                   <button onClick={() => { setShowResSearch(v => !v); if (showResSearch) setResSearch('') }}
                     className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-colors
-                      ${showResSearch ? 'bg-[#166FE5] ring-2 ring-[#1877F2]/45': 'bg-[#1877F2] hover:bg-[#166FE5]'}`}>
+                      ${showResSearch ? 'bg-[#06496e] ring-2 ring-[#075985]/45': 'bg-[#075985] hover:bg-[#06496e]'}`}>
                     <Search size={15}/> Zoek reserv.
                   </button>
                 </div>

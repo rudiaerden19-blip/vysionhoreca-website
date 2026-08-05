@@ -5820,7 +5820,8 @@
     "promoGreetingSingle": "Beste {name},",
     "promoGreetingBulk": "Beste klant,",
     "durationMinutesOnly": "{m} min",
-    "durationHoursMinutes": "{h}u{mm}"
+    "durationHoursMinutes": "{h}u{mm}",
+    "shiftTables": "Verschuif tafels"
   },
   "kasboekPage": {
     "title": "Digitaal kasboek",

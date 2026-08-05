@@ -247,6 +247,7 @@ export const EXTRA = {
     promoGreetingBulk: 'Beste klant,',
     durationMinutesOnly: '{m} min',
     durationHoursMinutes: '{h}u{mm}',
+    shiftTables: 'Verschuif tafels',
   },
 }
 
@@ -494,4 +495,5 @@ EXTRA.en = {
   promoGreetingBulk: 'Dear customer,',
   durationMinutesOnly: '{m} min',
   durationHoursMinutes: '{h}h{mm}',
+  shiftTables: 'Move tables',
 }
