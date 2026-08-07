@@ -3233,7 +3233,7 @@ export default function KassaReservationsView({
                             <h3 className="text-2xl font-bold text-white sm:text-3xl">{rk('tableWithNumber', { number: String(selectedFloorTable.number) })}</h3>
                             <span className="shrink-0 rounded-full px-2.5 py-1 text-sm font-bold text-white sm:px-3 sm:text-base" style={{ backgroundColor: color }}>{label}</span>
                           </div>
-                          <p className="text-sm font-medium text-white/60 sm:text-base">{selectedFloorTable.seats} plaatsen</p>
+                          <p className="text-sm font-medium text-white/60 sm:text-base">{rk('seatsAtTable', { seats: String(selectedFloorTable.seats) })}</p>
                         </div>
                         <button
                           type="button"
