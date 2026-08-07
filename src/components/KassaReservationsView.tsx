@@ -181,6 +181,22 @@ function formatReservationDateDdMmYyyy(isoDate: string): string {
   return isoDate
 }
 
+function OnlineReservationContactIcon({ kind }: { kind: 'phone' | 'mail' }) {
+  const cls = 'inline-block h-4 w-4 shrink-0 text-gray-600'
+  if (kind === 'phone') {
+    return (
+      <svg className={cls} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+        <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.36 11.36 0 003.56.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.56 1 1 0 01-.24 1.01l-2.2 2.22z" />
+      </svg>
+    )
+  }
+  return (
+    <svg className={cls} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M20 4H4a2 2 0 00-2 2v.4l10 6.25L22 6.4V6a2 2 0 00-2-2zm2 4.8l-9.55 5.97a1 1 0 01-1.06 0L2 8.8V18a2 2 0 002 2h16a2 2 0 002-2V8.8z" />
+    </svg>
+  )
+}
+
 function mapReservationRowFromDb(row: Record<string, unknown>): Reservation {
   const rawDur = row.duration_minutes ?? (row as { durationMinutes?: unknown }).durationMinutes
   const duration_minutes = parseDurationMinutesFromRaw(rawDur, 90)
@@ -5123,14 +5139,14 @@ export default function KassaReservationsView({
                         {(r.guest_phone || r.guest_email) && (
                           <div className="mt-2 flex flex-col gap-1 text-xs text-gray-600">
                             {r.guest_phone ? (
-                              <span className="inline-flex items-center gap-1.5">
-                                <Phone size={14} className="shrink-0 text-gray-500" aria-hidden />
+                              <span className="inline-flex items-center gap-2">
+                                <OnlineReservationContactIcon kind="phone" />
                                 <span>{r.guest_phone}</span>
                               </span>
                             ) : null}
                             {r.guest_email ? (
-                              <span className="inline-flex items-center gap-1.5">
-                                <Mail size={14} className="shrink-0 text-gray-500" aria-hidden />
+                              <span className="inline-flex items-center gap-2">
+                                <OnlineReservationContactIcon kind="mail" />
                                 <span className="truncate">{r.guest_email}</span>
                               </span>
                             ) : null}
