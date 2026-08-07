@@ -3507,27 +3507,26 @@ export default function KassaReservationsView({
 
           return (
             <div className="relative flex min-h-0 flex-1 gap-3 overflow-hidden">
-              {timelinePanelsHidden && (
-                <div
-                  className="absolute right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-[35] flex flex-row flex-wrap items-center justify-end gap-2"
-                  onPointerDown={(e) => e.stopPropagation()}
-                >
-                  <button
-                    type="button"
-                    onClick={() => setTimelinePanelsHidden(false)}
-                    className="flex min-h-[44px] shrink-0 items-center gap-2 rounded-xl bg-black px-3 py-2 text-sm font-bold text-white shadow-lg transition-colors hover:bg-gray-800 active:bg-gray-900 sm:px-4"
-                    title={rk('showButtonsTitle')}
-                  >
-                    <Minimize2 size={20} className="shrink-0" />
-                    <span className="hidden sm:inline">{rk('showButtons')}</span>
-                  </button>
-                </div>
-              )}
             <div className="flex min-h-0 flex-1 gap-3 overflow-hidden min-w-0">
               {/* === TIJDLIJN LINKS — groeit/krimpt mee met kalender === */}
               <div className="flex flex-col flex-1 overflow-hidden min-w-0">
                 {/* Date nav */}
                 <div className="mb-3 flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setTimelinePanelsHidden((v) => !v)}
+                    className="flex min-h-[44px] shrink-0 items-center gap-2 rounded-xl bg-black px-3 py-2 text-sm font-bold text-white shadow-sm transition-colors hover:bg-gray-800 active:bg-gray-900 sm:px-4"
+                    title={timelinePanelsHidden ? rk('showButtonsTitle') : rk('hideButtonsTitle')}
+                  >
+                    {timelinePanelsHidden ? (
+                      <Maximize2 size={20} className="shrink-0" />
+                    ) : (
+                      <Minimize2 size={20} className="shrink-0" />
+                    )}
+                    <span className="hidden sm:inline">
+                      {timelinePanelsHidden ? rk('showButtons') : rk('hideButtons')}
+                    </span>
+                  </button>
                   <div className="flex items-center gap-2 rounded-2xl bg-[#075985] px-3 py-2 shadow-md">
                     <button
                       type="button"

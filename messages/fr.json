@@ -5609,6 +5609,8 @@
     "showPanels": "Show panels",
     "showButtons": "Afficher les boutons",
     "showButtonsTitle": "Afficher le menu, les onglets et les boutons d'action",
+    "hideButtons": "Masquer les boutons",
+    "hideButtonsTitle": "Masquer le menu, les onglets et les boutons d'action",
     "forDate": "for {date}",
     "calendar": "Calendar",
     "searchResShort": "Search",

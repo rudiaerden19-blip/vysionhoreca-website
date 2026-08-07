@@ -5545,6 +5545,8 @@
     "showPanels": "Panelen tonen",
     "showButtons": "Toon knoppen",
     "showButtonsTitle": "Toon menu, tabs en actieknoppen",
+    "hideButtons": "Verberg knoppen",
+    "hideButtonsTitle": "Verberg menu, tabs en actieknoppen",
     "forDate": "voor {date}",
     "calendar": "Kalender",
     "searchResShort": "Zoek reserv.",

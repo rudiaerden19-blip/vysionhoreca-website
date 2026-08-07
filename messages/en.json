@@ -5545,6 +5545,8 @@
     "showPanels": "Show panels",
     "showButtons": "Show buttons",
     "showButtonsTitle": "Show menu, tabs and action buttons",
+    "hideButtons": "Hide buttons",
+    "hideButtonsTitle": "Hide menu, tabs and action buttons",
     "forDate": "for {date}",
     "calendar": "Calendar",
     "searchResShort": "Search",

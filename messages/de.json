@@ -5609,6 +5609,8 @@
     "showPanels": "Show panels",
     "showButtons": "Schaltflächen anzeigen",
     "showButtonsTitle": "Menü, Tabs und Aktionsschaltflächen anzeigen",
+    "hideButtons": "Schaltflächen ausblenden",
+    "hideButtonsTitle": "Menü, Tabs und Aktionsschaltflächen ausblenden",
     "forDate": "for {date}",
     "calendar": "Calendar",
     "searchResShort": "Search",

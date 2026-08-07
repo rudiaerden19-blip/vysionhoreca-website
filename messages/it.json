@@ -5586,6 +5586,8 @@
     "showPanels": "Show panels",
     "showButtons": "Mostra pulsanti",
     "showButtonsTitle": "Mostra menu, schede e pulsanti azione",
+    "hideButtons": "Nascondi pulsanti",
+    "hideButtonsTitle": "Nascondi menu, schede e pulsanti azione",
     "forDate": "for {date}",
     "calendar": "Calendar",
     "searchResShort": "Search",
