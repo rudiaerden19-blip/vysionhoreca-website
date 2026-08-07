@@ -5,11 +5,7 @@ import Image from 'next/image'
 import { useLanguage, Locale } from '@/i18n'
 import { LocaleFlagEmoji, LocaleFlagWithCode } from '@/components/LocaleFlagEmoji'
 import SubscriptionsTermsPopup from './SubscriptionsTermsPopup'
-import {
-  VYSION_CANONICAL_ORIGIN,
-  VYSION_ORDER_ORIGIN,
-  VYSION_TABLEVYSION_ORIGIN,
-} from '@/lib/vysion-site'
+import KassaProductNavMenu from './KassaProductNavMenu'
 
 const HERO_BG = '/images/hero-header.png'
 
@@ -38,9 +34,6 @@ export default function HomeLandingHero() {
   }
 
   const pillLinks: { href: string; label: string }[] = [
-    { href: VYSION_CANONICAL_ORIGIN, label: t('nav.kassa') },
-    { href: VYSION_TABLEVYSION_ORIGIN, label: t('nav.reservations') },
-    { href: VYSION_ORDER_ORIGIN, label: t('nav.onlineOrderPlatform') },
     { href: '/#sectoren', label: t('nav.sectors') },
     { href: '/#platform', label: t('nav.services') },
     { href: '/#prijzen', label: t('nav.pricing') },
@@ -128,6 +121,11 @@ export default function HomeLandingHero() {
 
         {isMenuOpen && (
           <div className="mt-4 rounded-2xl bg-black/50 backdrop-blur-md border border-white/20 p-4 space-y-1">
+            <KassaProductNavMenu
+              linkClass="block py-3 px-3 rounded-lg text-white font-medium hover:bg-white/10 w-full"
+              layout="mobile"
+              onNavigate={() => setIsMenuOpen(false)}
+            />
             {pillLinks.map(({ href, label }) => (
               <a
                 key={href + label}
