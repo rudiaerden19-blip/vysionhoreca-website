@@ -2981,21 +2981,6 @@ export default function KassaReservationsView({
                     handleResFloorCanvasPointerUp(e)
                     void finalizeResFloorDrag(e)
                   }}
-                  onWheel={e => {
-                    if (viewMode !== 'floorplan') return
-                    e.preventDefault()
-                    const rect = canvasRef.current?.getBoundingClientRect()
-                    if (!rect) return
-                    const factor = e.deltaY < 0 ? 1.12 : 1 / 1.12
-                    setFloorViewport((vp) =>
-                      zoomReservationFloorAtPoint(
-                        vp,
-                        factor,
-                        e.clientX - rect.left,
-                        e.clientY - rect.top,
-                      ),
-                    )
-                  }}
                   onClick={() => {
                     if (floorPanMovedRef.current || floorDragMoved.current) return
                     setSelectedFloorTable(null)
