@@ -5584,6 +5584,8 @@
     "floorOnlyShort": "Floor",
     "floorOnlyLong": "Floor only",
     "showPanels": "Show panels",
+    "showButtons": "Mostra pulsanti",
+    "showButtonsTitle": "Mostra menu, schede e pulsanti azione",
     "forDate": "for {date}",
     "calendar": "Calendar",
     "searchResShort": "Search",

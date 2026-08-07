@@ -5584,6 +5584,8 @@
     "floorOnlyShort": "Floor",
     "floorOnlyLong": "Floor only",
     "showPanels": "Show panels",
+    "showButtons": "显示按钮",
+    "showButtonsTitle": "显示菜单、标签和操作按钮",
     "forDate": "for {date}",
     "calendar": "Calendar",
     "searchResShort": "Search",

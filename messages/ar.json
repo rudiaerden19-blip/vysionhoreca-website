@@ -5584,6 +5584,8 @@
     "floorOnlyShort": "Floor",
     "floorOnlyLong": "Floor only",
     "showPanels": "Show panels",
+    "showButtons": "إظهار الأزرار",
+    "showButtonsTitle": "إظهار القائمة والتبويبات وأزرار الإجراءات",
     "forDate": "for {date}",
     "calendar": "Calendar",
     "searchResShort": "Search",

@@ -5607,6 +5607,8 @@
     "floorOnlyShort": "Floor",
     "floorOnlyLong": "Floor only",
     "showPanels": "Show panels",
+    "showButtons": "Schaltflächen anzeigen",
+    "showButtonsTitle": "Menü, Tabs und Aktionsschaltflächen anzeigen",
     "forDate": "for {date}",
     "calendar": "Calendar",
     "searchResShort": "Search",

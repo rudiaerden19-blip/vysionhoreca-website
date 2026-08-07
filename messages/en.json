@@ -5543,6 +5543,8 @@
     "floorOnlyShort": "Floor",
     "floorOnlyLong": "Floor only",
     "showPanels": "Show panels",
+    "showButtons": "Show buttons",
+    "showButtonsTitle": "Show menu, tabs and action buttons",
     "forDate": "for {date}",
     "calendar": "Calendar",
     "searchResShort": "Search",

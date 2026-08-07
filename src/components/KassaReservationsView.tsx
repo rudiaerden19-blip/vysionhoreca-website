@@ -360,6 +360,8 @@ export default function KassaReservationsView({
   const [calMonth, setCalMonth] = useState(() => ({ year: new Date().getFullYear(), month: new Date().getMonth() }))
   const [timeShift, setTimeShift] = useState<'dag' | 'avond'>(() => new Date().getHours() >= 17 ? 'avond': 'dag')
   const [calOpen, setCalOpen] = useState(true)
+  /** Tafels/tijdlijn: verberg hoofdheader (tabs) voor volledig scherm; «Toon knoppen» zet terug. */
+  const [timelinePanelsHidden, setTimelinePanelsHidden] = useState(false)
   const [showSearchPopup, setShowSearchPopup] = useState(false)
   const [searchPopupQuery, setSearchPopupQuery] = useState('')
   const [searchPopupTab, setSearchPopupTab] = useState<'dag' | 'alle'>('dag')
@@ -968,7 +970,18 @@ export default function KassaReservationsView({
     setViewMode('reservations')
     setShowResCalendar(false)
     setSelectedFloorTable(null)
+    setTimelinePanelsHidden(false)
   }
+
+  const openTimelineFullPage = () => {
+    setViewMode('timeline')
+    setShowResCalendar(false)
+    setTimelinePanelsHidden(true)
+    setCalOpen(false)
+  }
+
+  const reservationChromeHidden =
+    (viewMode === 'floorplan' && floorOnlyMode) || (viewMode === 'timeline' && timelinePanelsHidden)
 
   // ---- Floor plan editor helpers ----
   const saveFloorPlan = async (updated: FloorPlanTable[]) => {
@@ -2305,7 +2318,7 @@ export default function KassaReservationsView({
       {/* Header — verborgen in plattegrond “alleen vloer” */}
       <div
         className={`flex-shrink-0 border-b border-gray-200 bg-white p-3 sm:p-4 ${
-          viewMode === 'floorplan' && floorOnlyMode ? 'hidden': ''
+          reservationChromeHidden ? 'hidden': ''
         }`}
       >
         <div className="mb-3 flex flex-col gap-3 sm:mb-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
@@ -2399,9 +2412,12 @@ export default function KassaReservationsView({
                   onClick={() => {
                     if (view.id === 'floorplan') {
                       openFloorPlanView()
+                    } else if (view.id === 'timeline') {
+                      openTimelineFullPage()
                     } else {
                       setViewMode(view.id as ViewMode)
                       setShowResCalendar(false)
+                      setTimelinePanelsHidden(false)
                     }
                   }}
                   className={`relative flex min-w-[44px] flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-2 text-sm font-medium transition-colors ${
@@ -2440,7 +2456,7 @@ export default function KassaReservationsView({
       {/* Content */}
       <div
         className={`flex-1 min-h-0 ${
-          viewMode === 'floorplan' && floorOnlyMode ? 'p-0': 'p-2 sm:p-4'
+          reservationChromeHidden ? 'p-0': 'p-2 sm:p-4'
         } ${
           viewMode === 'today' || viewMode === 'timeline' || viewMode === 'reservations' || viewMode === 'floorplan'
             ? 'flex flex-col overflow-hidden'
@@ -3485,7 +3501,24 @@ export default function KassaReservationsView({
           const todayStr = `${timelineNow.getFullYear()}-${String(timelineNow.getMonth()+1).padStart(2,'0')}-${String(timelineNow.getDate()).padStart(2,'0')}`
 
           return (
-            <div className="flex gap-3 flex-1 overflow-hidden min-w-0">
+            <div className="relative flex min-h-0 flex-1 gap-3 overflow-hidden">
+              {timelinePanelsHidden && (
+                <div
+                  className="absolute right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-[35] flex flex-row flex-wrap items-center justify-end gap-2"
+                  onPointerDown={(e) => e.stopPropagation()}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setTimelinePanelsHidden(false)}
+                    className="flex min-h-[44px] shrink-0 items-center gap-2 rounded-xl bg-black px-3 py-2 text-sm font-bold text-white shadow-lg transition-colors hover:bg-gray-800 active:bg-gray-900 sm:px-4"
+                    title={rk('showButtonsTitle')}
+                  >
+                    <Minimize2 size={20} className="shrink-0" />
+                    <span className="hidden sm:inline">{rk('showButtons')}</span>
+                  </button>
+                </div>
+              )}
+            <div className="flex min-h-0 flex-1 gap-3 overflow-hidden min-w-0">
               {/* === TIJDLIJN LINKS — groeit/krimpt mee met kalender === */}
               <div className="flex flex-col flex-1 overflow-hidden min-w-0">
                 {/* Date nav */}
@@ -3815,6 +3848,7 @@ export default function KassaReservationsView({
                   </div>
                 )}
               </div>
+            </div>
             </div>
           )
         })()}

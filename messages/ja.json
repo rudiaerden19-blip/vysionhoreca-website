@@ -5584,6 +5584,8 @@
     "floorOnlyShort": "Floor",
     "floorOnlyLong": "Floor only",
     "showPanels": "Show panels",
+    "showButtons": "ボタンを表示",
+    "showButtonsTitle": "メニュー、タブ、アクションボタンを表示",
     "forDate": "for {date}",
     "calendar": "Calendar",
     "searchResShort": "Search",
