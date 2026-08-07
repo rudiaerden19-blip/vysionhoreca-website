@@ -36,6 +36,7 @@ import {
   Calendar,
   Maximize2,
   Minimize2,
+  Globe,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
@@ -229,6 +230,10 @@ export default function KassaReservationsView({
   const [showNewReservationModal, setShowNewReservationModal] = useState(false)
   const [showWalkInModal, setShowWalkInModal] = useState(false)
   const [showWaitlistModal, setShowWaitlistModal] = useState(false)
+  const [showOnlineReservationsModal, setShowOnlineReservationsModal] = useState(false)
+  const [onlinePendingAlert, setOnlinePendingAlert] = useState(false)
+  const seenPendingReservationIdsRef = useRef<Set<string>>(new Set())
+  const pendingOnlineBaselineDoneRef = useRef(false)
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
   const [selectedShift, setSelectedShift] = useState<string | null>(null)
   const [guestProfilesDB, setGuestProfilesDB] = useState<GuestProfile[]>([])
@@ -794,6 +799,30 @@ export default function KassaReservationsView({
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tenant])
+
+  const pendingOnlineReservations = useMemo(
+    () => reservations.filter(r => r.status === 'PENDING'),
+    [reservations],
+  )
+
+  useEffect(() => {
+    if (loading) return
+    const pending = pendingOnlineReservations
+    if (!pendingOnlineBaselineDoneRef.current) {
+      pending.forEach(r => seenPendingReservationIdsRef.current.add(r.id))
+      pendingOnlineBaselineDoneRef.current = true
+      setOnlinePendingAlert(false)
+      return
+    }
+    const hasUnseen = pending.some(r => !seenPendingReservationIdsRef.current.has(r.id))
+    setOnlinePendingAlert(hasUnseen)
+  }, [loading, pendingOnlineReservations])
+
+  const openOnlineReservationsOverview = useCallback(() => {
+    pendingOnlineReservations.forEach(r => seenPendingReservationIdsRef.current.add(r.id))
+    setOnlinePendingAlert(false)
+    setShowOnlineReservationsModal(true)
+  }, [pendingOnlineReservations])
 
   // Rode tijdlijn — update elke minuut
   useEffect(() => {
@@ -2345,6 +2374,23 @@ export default function KassaReservationsView({
             </button>
             {viewMode !== 'guests' && viewMode !== 'settings' && (
               <>
+                <button
+                  type="button"
+                  onClick={openOnlineReservationsOverview}
+                  className={`flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium text-white transition-colors sm:gap-2 sm:px-4 ${
+                    onlinePendingAlert
+                      ? 'animate-pulse bg-red-600 hover:bg-red-700 active:bg-red-800'
+                      : 'bg-[#075985] hover:bg-[#06496e] active:bg-[#053a56]'
+                  }`}
+                >
+                  <Globe size={18} className="shrink-0" />
+                  <span className="hidden sm:inline">{rk('onlineReservationsBtn')}</span>
+                  {onlinePendingAlert && pendingOnlineReservations.length > 0 && (
+                    <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-white px-1 text-xs font-bold text-red-600">
+                      {pendingOnlineReservations.length}
+                    </span>
+                  )}
+                </button>
                 <button
                   onClick={() => setShowWalkInModal(true)}
                   className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-[#075985] px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[#06496e] active:bg-[#053a56] sm:gap-2 sm:px-4"
@@ -4903,6 +4949,66 @@ export default function KassaReservationsView({
           shifts={reservationSettings.shifts || []}
           bufferMinutes={reservationSettings.bufferMinutes || 0}
         />
+      )}
+
+      {showOnlineReservationsModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4">
+          <div className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white shadow-xl">
+            <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
+              <h2 className="text-lg font-bold text-gray-900">{rk('onlineReservationsModalTitle')}</h2>
+              <button
+                type="button"
+                onClick={() => setShowOnlineReservationsModal(false)}
+                className="rounded-lg p-2 text-gray-500 hover:bg-gray-100"
+                aria-label={rk('close')}
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="overflow-y-auto p-4">
+              {pendingOnlineReservations.length === 0 ? (
+                <p className="py-8 text-center text-gray-500">{rk('onlineReservationsEmpty')}</p>
+              ) : (
+                <div className="space-y-3">
+                  {pendingOnlineReservations.map(r => (
+                    <div
+                      key={r.id}
+                      className="flex flex-col gap-3 rounded-xl border-2 border-amber-200 bg-amber-50/80 p-4 sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate text-lg font-bold text-gray-900">{r.guest_name}</p>
+                        <p className="text-sm font-medium text-gray-600">
+                          {r.reservation_date} · {r.reservation_time} · {r.party_size} {rk('personsLabel')}
+                        </p>
+                        {(r.guest_phone || r.guest_email) && (
+                          <p className="mt-1 text-xs text-gray-500">
+                            {[r.guest_phone, r.guest_email].filter(Boolean).join(' · ')}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex shrink-0 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => void handleReject(r)}
+                          className="rounded-xl border-2 border-red-300 bg-red-100 px-4 py-2 text-sm font-bold text-red-700 hover:bg-red-200"
+                        >
+                          {rk('reject')}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => void handleConfirm(r)}
+                          className="rounded-xl bg-green-600 px-4 py-2 text-sm font-bold text-white hover:bg-green-500"
+                        >
+                          {rk('approve')}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Walk-in Modal */}
