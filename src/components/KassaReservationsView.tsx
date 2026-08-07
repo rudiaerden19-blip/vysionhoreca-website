@@ -174,6 +174,22 @@ async function sendReservationEmail(data: {
   } catch { /* Stille fout */ }
 }
 
+function mapReservationRowFromDb(row: Record<string, unknown>): Reservation {
+  const rawDur = row.duration_minutes ?? (row as { durationMinutes?: unknown }).durationMinutes
+  const duration_minutes = parseDurationMinutesFromRaw(rawDur, 90)
+  return {
+    ...row,
+    duration_minutes,
+    guest_name: (row.guest_name || row.customer_name || '') as string,
+    guest_phone: (row.guest_phone || row.customer_phone || '') as string,
+    guest_email: (row.guest_email || row.customer_email || '') as string,
+    reservation_date: row.reservation_date ? String(row.reservation_date).slice(0, 10) : '',
+    reservation_time: ((row.reservation_time as string) || '').substring(0, 5),
+    status: ((row.status as string) || '').toUpperCase() as ReservationStatus,
+    table_number: row.table_number != null ? String(row.table_number) : undefined,
+  } as Reservation
+}
+
 
 // ============================================================
 // MAIN COMPONENT
@@ -505,21 +521,7 @@ export default function KassaReservationsView({
     }
     const data = Array.isArray(r.data) ? r.data : []
     if (data.length >= 0) {
-      const mapped = data.map((row: Record<string, unknown>) => {
-        const rawDur = row.duration_minutes ?? (row as { durationMinutes?: unknown }).durationMinutes
-        const duration_minutes = parseDurationMinutesFromRaw(rawDur, 90)
-        return {
-          ...row,
-          duration_minutes,
-          guest_name: (row.guest_name || row.customer_name || '') as string,
-          guest_phone: (row.guest_phone || row.customer_phone || '') as string,
-          guest_email: (row.guest_email || row.customer_email || '') as string,
-          reservation_date: row.reservation_date ? String(row.reservation_date).slice(0, 10) : '',
-          reservation_time: ((row.reservation_time as string) || '').substring(0, 5),
-          status: ((row.status as string) || '').toUpperCase() as ReservationStatus,
-          table_number: row.table_number != null ? String(row.table_number) : undefined,
-        }
-      }) as Reservation[]
+      const mapped = data.map(mapReservationRowFromDb)
       mapped.sort((a, b) => {
         const d = a.reservation_date.localeCompare(b.reservation_date)
         if (d !== 0) return d
@@ -854,17 +856,73 @@ export default function KassaReservationsView({
     setOnlinePendingAlert(false)
   }, [pendingOnlineReservations, ownerAlert])
 
-  const openOnlineReservationsOverview = useCallback(() => {
-    const unseenIds =
-      usesSharedOwnerAlert && ownerAlert
-        ? new Set(ownerAlert.unseenIds)
-        : null
-    const toShow = unseenIds
-      ? pendingOnlineReservations.filter(r => unseenIds.has(r.id))
-      : pendingOnlineReservations.filter(r => !seenPendingReservationIdsRef.current.has(r.id))
-    setOnlineModalList(toShow)
+  const fetchReservationsByIds = useCallback(
+    async (ids: string[]): Promise<Reservation[]> => {
+      const unique = [...new Set(ids.filter(Boolean))]
+      if (unique.length === 0) return []
+
+      const fromState = reservations.filter(r => unique.includes(r.id))
+      const missing = unique.filter(id => !fromState.some(r => r.id === id))
+      if (missing.length === 0) return fromState
+
+      const r = await adminDb.select<Record<string, unknown>[]>('reservations', {
+        tenantSlug: tenant,
+        select: '*',
+        in: { id: missing },
+      })
+      if (!r.ok || !Array.isArray(r.data)) return fromState
+      const fetched = r.data.map(mapReservationRowFromDb)
+      return [...fromState, ...fetched]
+    },
+    [tenant, reservations],
+  )
+
+  const openOnlineReservationsOverview = useCallback(async () => {
     setShowOnlineReservationsModal(true)
-  }, [pendingOnlineReservations, ownerAlert, usesSharedOwnerAlert])
+
+    let targetIds: string[] = []
+    if (usesSharedOwnerAlert && ownerAlert && ownerAlert.unseenIds.length > 0) {
+      targetIds = ownerAlert.unseenIds
+    } else {
+      targetIds = pendingOnlineReservations
+        .filter(r => !seenPendingReservationIdsRef.current.has(r.id))
+        .map(r => r.id)
+    }
+
+    let rows: Reservation[] = []
+    if (targetIds.length > 0) {
+      rows = await fetchReservationsByIds(targetIds)
+    }
+    if (rows.length === 0) {
+      rows = pendingOnlineReservations.filter(r =>
+        targetIds.length > 0 ? targetIds.includes(r.id) : !seenPendingReservationIdsRef.current.has(r.id),
+      )
+    }
+    setOnlineModalList(rows)
+  }, [
+    pendingOnlineReservations,
+    ownerAlert,
+    usesSharedOwnerAlert,
+    fetchReservationsByIds,
+  ])
+
+  useEffect(() => {
+    if (!showOnlineReservationsModal || onlineModalList.length > 0) return
+    const ids =
+      usesSharedOwnerAlert && ownerAlert?.unseenIds.length
+        ? ownerAlert.unseenIds
+        : []
+    if (ids.length === 0) return
+    void fetchReservationsByIds(ids).then(rows => {
+      if (rows.length > 0) setOnlineModalList(rows)
+    })
+  }, [
+    showOnlineReservationsModal,
+    onlineModalList.length,
+    usesSharedOwnerAlert,
+    ownerAlert?.unseenIds,
+    fetchReservationsByIds,
+  ])
 
   useEffect(() => {
     if (!showOnlineReservationsModal) return
@@ -876,10 +934,13 @@ export default function KassaReservationsView({
   }, [showOnlineReservationsModal, closeOnlineReservationsModal])
 
   useEffect(() => {
-    if (!openOnlineReservationsOnMount || loading || openedOnlineFromUrlRef.current) return
+    if (!openOnlineReservationsOnMount || openedOnlineFromUrlRef.current) return
     openedOnlineFromUrlRef.current = true
-    openOnlineReservationsOverview()
-  }, [openOnlineReservationsOnMount, loading, openOnlineReservationsOverview])
+    void (async () => {
+      await loadReservations(true)
+      await openOnlineReservationsOverview()
+    })()
+  }, [openOnlineReservationsOnMount, openOnlineReservationsOverview])
 
   // Rode tijdlijn — update elke minuut
   useEffect(() => {
@@ -2433,7 +2494,7 @@ export default function KassaReservationsView({
               <>
                 <button
                   type="button"
-                  onClick={openOnlineReservationsOverview}
+                  onClick={() => void openOnlineReservationsOverview()}
                   className={`flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium text-white transition-colors sm:gap-2 sm:px-4 ${
                     effectiveOnlineAlert
                       ? 'animate-pulse bg-red-600 hover:bg-red-700 active:bg-red-800'
@@ -5028,10 +5089,12 @@ export default function KassaReservationsView({
               <button
                 type="button"
                 onClick={() => closeOnlineReservationsModal()}
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100"
+                className="flex h-11 min-w-[44px] shrink-0 items-center justify-center rounded-xl border-2 border-gray-300 bg-white px-3 text-gray-900 shadow-sm hover:bg-gray-50"
                 aria-label={rk('close')}
               >
-                <X size={22} strokeWidth={2.5} />
+                <span className="text-[1.65rem] font-bold leading-none" aria-hidden>
+                  ×
+                </span>
               </button>
             </div>
             <div className="min-h-0 flex-1 overflow-y-auto p-4">
