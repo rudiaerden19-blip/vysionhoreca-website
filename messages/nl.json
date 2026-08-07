@@ -5524,6 +5524,7 @@
     "editReservationTitle": "Reservatie bewerken",
     "statusConfirmed": "Bevestigd",
     "seatsAtTable": "{seats} plaatsen",
+    "tableSeatsShort": "{seats}p",
     "tableWithNumber": "Tafel {number}",
     "status_PENDING": "In afwachting",
     "status_CONFIRMED": "Bevestigd",

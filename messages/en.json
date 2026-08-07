@@ -5524,6 +5524,7 @@
     "editReservationTitle": "Edit reservation",
     "statusConfirmed": "Confirmed",
     "seatsAtTable": "{seats} seats",
+    "tableSeatsShort": "{seats}p",
     "tableWithNumber": "Table {number}",
     "status_PENDING": "Pending",
     "status_CONFIRMED": "Confirmed",

@@ -3656,7 +3656,7 @@ export default function KassaReservationsView({
                             <div style={{ width:LABEL_W, flexShrink:0 }}
                               className="border-r border-gray-200 flex flex-col items-center justify-center px-2 bg-white sticky left-0 z-10">
                               <span className="text-base font-bold text-gray-800">{tableNum}</span>
-                              {fpTable && <span className="text-xs text-gray-400">{fpTable.seats}p</span>}
+                              {fpTable && <span className="text-xs text-gray-400">{rk('tableSeatsShort', { seats: String(fpTable.seats) })}</span>}
                             </div>
                             {/* Content area — vaste breedte zodat % positionering klopt */}
                             <div style={{ width:slotW, position:'relative', flexShrink:0 }}>
