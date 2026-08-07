@@ -174,6 +174,13 @@ async function sendReservationEmail(data: {
   } catch { /* Stille fout */ }
 }
 
+/** ISO `YYYY-MM-DD` → `DD-MM-YYYY` (online popup / eigenaar). */
+function formatReservationDateDdMmYyyy(isoDate: string): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(isoDate.trim())
+  if (m) return `${m[3]}-${m[2]}-${m[1]}`
+  return isoDate
+}
+
 function mapReservationRowFromDb(row: Record<string, unknown>): Reservation {
   const rawDur = row.duration_minutes ?? (row as { durationMinutes?: unknown }).durationMinutes
   const duration_minutes = parseDurationMinutesFromRaw(rawDur, 90)
@@ -5110,12 +5117,24 @@ export default function KassaReservationsView({
                       <div className="min-w-0">
                         <p className="truncate text-lg font-bold text-gray-900">{r.guest_name}</p>
                         <p className="text-sm font-medium text-gray-600">
-                          {r.reservation_date} · {r.reservation_time} · {r.party_size} {rk('personsLabel')}
+                          {formatReservationDateDdMmYyyy(r.reservation_date)} · {r.reservation_time} ·{' '}
+                          {r.party_size} {rk('personsLabel')}
                         </p>
                         {(r.guest_phone || r.guest_email) && (
-                          <p className="mt-1 text-xs text-gray-500">
-                            {[r.guest_phone, r.guest_email].filter(Boolean).join(' · ')}
-                          </p>
+                          <div className="mt-2 flex flex-col gap-1 text-xs text-gray-600">
+                            {r.guest_phone ? (
+                              <span className="inline-flex items-center gap-1.5">
+                                <Phone size={14} className="shrink-0 text-gray-500" aria-hidden />
+                                <span>{r.guest_phone}</span>
+                              </span>
+                            ) : null}
+                            {r.guest_email ? (
+                              <span className="inline-flex items-center gap-1.5">
+                                <Mail size={14} className="shrink-0 text-gray-500" aria-hidden />
+                                <span className="truncate">{r.guest_email}</span>
+                              </span>
+                            ) : null}
+                          </div>
                         )}
                       </div>
                       <div className="flex shrink-0 gap-2">
