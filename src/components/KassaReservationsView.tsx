@@ -4819,7 +4819,7 @@ export default function KassaReservationsView({
                   <p className="text-sm text-gray-500 mt-1">
                     {rk('promoToRecipient', {
                       name: contactPromoRecipients[0].name,
-                      email: contactPromoRecipients[0].email,
+                      email: contactPromoRecipients[0].email ?? '',
                     })}
                   </p>
                 ) : (
