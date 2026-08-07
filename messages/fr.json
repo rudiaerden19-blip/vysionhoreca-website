@@ -5898,7 +5898,12 @@
     "promoGreetingSingle": "Dear {name},",
     "promoGreetingBulk": "Dear customer,",
     "durationMinutesOnly": "{m} min",
-    "durationHoursMinutes": "{h}h{mm}"
+    "durationHoursMinutes": "{h}h{mm}",
+    "shiftTables": "Déplacer les tables",
+    "validationMinParty": "Min. 1 personne",
+    "durationRequired": "La durée est obligatoire",
+    "occasionRequired": "L'occasion est obligatoire",
+    "labelOccasion": "Occasion"
   },
   "kasboekPage": {
     "title": "Livre de caisse numérique",

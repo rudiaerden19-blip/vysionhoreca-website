@@ -5875,7 +5875,12 @@
     "promoGreetingSingle": "Dear {name},",
     "promoGreetingBulk": "Dear customer,",
     "durationMinutesOnly": "{m} min",
-    "durationHoursMinutes": "{h}h{mm}"
+    "durationHoursMinutes": "{h}h{mm}",
+    "shiftTables": "移动餐桌",
+    "validationMinParty": "至少1位客人",
+    "durationRequired": "必须填写时长",
+    "occasionRequired": "必须选择场合",
+    "labelOccasion": "场合"
   },
   "kasboekPage": {
     "title": "电子现金账簿",

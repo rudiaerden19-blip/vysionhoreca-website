@@ -5835,7 +5835,11 @@
     "promoGreetingBulk": "Beste klant,",
     "durationMinutesOnly": "{m} min",
     "durationHoursMinutes": "{h}u{mm}",
-    "shiftTables": "Verschuif tafels"
+    "shiftTables": "Verschuif tafels",
+    "validationMinParty": "Min. 1 persoon",
+    "durationRequired": "Duur is verplicht",
+    "occasionRequired": "Gelegenheid is verplicht",
+    "labelOccasion": "Gelegenheid"
   },
   "kasboekPage": {
     "title": "Digitaal kasboek",

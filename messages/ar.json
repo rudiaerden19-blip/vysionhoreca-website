@@ -5875,7 +5875,12 @@
     "promoGreetingSingle": "Dear {name},",
     "promoGreetingBulk": "Dear customer,",
     "durationMinutesOnly": "{m} min",
-    "durationHoursMinutes": "{h}h{mm}"
+    "durationHoursMinutes": "{h}h{mm}",
+    "shiftTables": "تحريك الطاولات",
+    "validationMinParty": "حد أدنى ضيف واحد",
+    "durationRequired": "المدة مطلوبة",
+    "occasionRequired": "المناسبة مطلوبة",
+    "labelOccasion": "المناسبة"
   },
   "kasboekPage": {
     "title": "دفتر النقدية الرقمي",

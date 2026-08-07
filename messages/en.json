@@ -5834,7 +5834,12 @@
     "promoGreetingSingle": "Dear {name},",
     "promoGreetingBulk": "Dear customer,",
     "durationMinutesOnly": "{m} min",
-    "durationHoursMinutes": "{h}h{mm}"
+    "durationHoursMinutes": "{h}h{mm}",
+    "shiftTables": "Move tables",
+    "validationMinParty": "Min. 1 guest",
+    "durationRequired": "Duration is required",
+    "occasionRequired": "Occasion is required",
+    "labelOccasion": "Occasion"
   },
   "kasboekPage": {
     "title": "Digital cash book",

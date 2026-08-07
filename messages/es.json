@@ -5875,7 +5875,12 @@
     "promoGreetingSingle": "Dear {name},",
     "promoGreetingBulk": "Dear customer,",
     "durationMinutesOnly": "{m} min",
-    "durationHoursMinutes": "{h}h{mm}"
+    "durationHoursMinutes": "{h}h{mm}",
+    "shiftTables": "Mover mesas",
+    "validationMinParty": "Mín. 1 persona",
+    "durationRequired": "La duración es obligatoria",
+    "occasionRequired": "La ocasión es obligatoria",
+    "labelOccasion": "Ocasión"
   },
   "kasboekPage": {
     "title": "Libro de caja digital",

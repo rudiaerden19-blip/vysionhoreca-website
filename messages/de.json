@@ -5898,7 +5898,12 @@
     "promoGreetingSingle": "Dear {name},",
     "promoGreetingBulk": "Dear customer,",
     "durationMinutesOnly": "{m} min",
-    "durationHoursMinutes": "{h}h{mm}"
+    "durationHoursMinutes": "{h}h{mm}",
+    "shiftTables": "Tische verschieben",
+    "validationMinParty": "Mind. 1 Person",
+    "durationRequired": "Dauer ist erforderlich",
+    "occasionRequired": "Anlass ist erforderlich",
+    "labelOccasion": "Anlass"
   },
   "kasboekPage": {
     "title": "Digitales Kassenbuch",

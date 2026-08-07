@@ -2906,7 +2906,7 @@ export default function KassaReservationsView({
                                 onClick={() => loadReservations()}
                                 className="mt-2 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg px-3 py-1.5 font-semibold transition-colors"
                               >
-                                Opnieuw laden
+                                {rk('reload')}
                               </button>
                             </div>
                           )}
@@ -3271,7 +3271,7 @@ export default function KassaReservationsView({
                                 <div className="flex items-center justify-between">
                                   <p className="text-gray-900 font-bold text-lg">{r.guest_name}</p>
                                   <span className="text-sm font-semibold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: KASSA_STATUS_CONFIG[r.status]?.color }}>
-                                    {KASSA_STATUS_CONFIG[r.status]?.label || r.status}
+                                    {statusLabel(r.status)}
                                   </span>
                                 </div>
                                 {/* Details */}
@@ -3295,7 +3295,7 @@ export default function KassaReservationsView({
                                   )}
                                   {(r.status === 'CONFIRMED' || r.status === 'PENDING') && (
                                     <button onClick={() => handleCheckIn(r)} className="min-h-[44px] rounded-xl bg-emerald-500 active:bg-emerald-700 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-1">
-                                      <UserCheck size={15} /> Bezet
+                                      <UserCheck size={15} /> {rk('checkInButton')}
                                     </button>
                                   )}
                                   {r.status === 'CHECKED_IN' && allowKassaHandoff && (
@@ -3305,12 +3305,12 @@ export default function KassaReservationsView({
                                   )}
                                   {r.status === 'CHECKED_IN' && (
                                     <button onClick={() => handleComplete(r)} className="min-h-[44px] rounded-xl text-white text-sm font-semibold transition-colors flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(99,102,241,0.8)'}}>
-                                      <CheckCircle2 size={15} /> Vrij
+                                      <CheckCircle2 size={15} /> {rk('tableFreeBadge')}
                                     </button>
                                   )}
                                   {(r.status === 'CONFIRMED' || r.status === 'PENDING' || r.status === 'CHECKED_IN') && (
                                     <button onClick={() => handleNoShow(r)} className="min-h-[44px] rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(239,68,68,0.15)', color: '#dc2626'}}>
-                                      <UserX size={15} /> No-show
+                                      <UserX size={15} /> {rk('status_NO_SHOW')}
                                     </button>
                                   )}
                                 </div>
@@ -3318,10 +3318,10 @@ export default function KassaReservationsView({
                                 {/* Aanpassen + Verwijderen */}
                                 <div className="grid grid-cols-2 gap-1.5">
                                   <button onClick={() => setSelectedReservation(r)} className="min-h-[44px] rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(0,0,0,0.08)', color: '#374151'}}>
-                                     Aanpassen
+                                     {rk('editMove')}
                                   </button>
                                   <button onClick={() => handleDeleteReservation(r.id)} className="min-h-[44px] rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(239,68,68,0.15)', color: '#dc2626'}}>
-                                     Annulatie
+                                     {rk('cancelReservation')}
                                   </button>
                                 </div>
                               </div>
@@ -3386,11 +3386,11 @@ export default function KassaReservationsView({
                           onChange={e => setAddFloorNumber(e.target.value)}
                           onKeyDown={e => e.key === 'Enter' && void addFloorTable()}
                           className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-500 outline-none text-xl font-bold text-center"
-                          placeholder="bv. 1, 2A, Toog"
+                          placeholder={rk('tableNumberPlaceholder')}
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-600 mb-2">Aantal plaatsen</label>
+                        <label className="block text-sm font-semibold text-gray-600 mb-2">{rk('seatsLabel')}</label>
                         <div className="grid grid-cols-5 gap-2">
                           {[2, 4, 6, 8, 10].map(n => (
                             <button key={n} onClick={() => setAddFloorSeats(n)}
@@ -3401,12 +3401,16 @@ export default function KassaReservationsView({
                         </div>
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-600 mb-2">Vorm</label>
+                        <label className="block text-sm font-semibold text-gray-600 mb-2">{rk('shapeLabel')}</label>
                         <div className="grid grid-cols-3 gap-2">
-                          {([['SQUARE', '⬛ Vierkant'], ['ROUND', '⭕ Rond'], ['RECTANGLE', '▬ Rechthoek']] as const).map(([s, label]) => (
+                          {([
+                            ['SQUARE', 'shapeSquare'],
+                            ['ROUND', 'shapeRound'],
+                            ['RECTANGLE', 'shapeRectangle'],
+                          ] as const).map(([s, labelKey]) => (
                             <button key={s} onClick={() => setAddFloorShape(s)}
                               className={`py-2 rounded-xl text-xs font-bold transition-colors ${addFloorShape === s ? 'bg-green-500 text-white': 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
-                              {label}
+                              {rk(labelKey)}
                             </button>
                           ))}
                         </div>
@@ -3451,7 +3455,8 @@ export default function KassaReservationsView({
           const tableNumbers = mergedFloorPlanTablesForPicker.length > 0
             ? [...new Set(mergedFloorPlanTablesForPicker.map(t => String(t.number)))]
             : [...new Set(reservations.filter(r => r.table_number).map(r => r.table_number!))]
-          const sortedTables = tableNumbers.length > 0 ? tableNumbers : ['(geen tafel)']
+          const noTableLabel = rk('noTablePlaceholder')
+          const sortedTables = tableNumbers.length > 0 ? tableNumbers : [noTableLabel]
 
           // Filter reservations for this date
           const dayRes = reservations.filter(r => r.reservation_date === timelineDate && r.status !== 'CANCELLED')
@@ -3569,11 +3574,11 @@ export default function KassaReservationsView({
                   <div className="flex rounded-lg overflow-hidden border border-gray-200 ml-2">
                     <button onClick={() => setTimeShift('dag')}
                       className={`px-4 py-1.5 text-sm font-bold transition-colors ${timeShift==='dag'?'bg-[#075985] text-white':'bg-white text-gray-500 hover:bg-gray-50'}`}>
-                      Dag
+                      {rk('shiftDay')}
                     </button>
                     <button onClick={() => setTimeShift('avond')}
                       className={`px-4 py-1.5 text-sm font-bold transition-colors border-l border-gray-200 ${timeShift==='avond'?'bg-[#075985] text-white':'bg-white text-gray-500 hover:bg-gray-50'}`}>
-                      Avond
+                      {rk('shiftEvening')}
                     </button>
                   </div>
                   {/* Kalender toon/verberg knop */}
@@ -3595,7 +3600,7 @@ export default function KassaReservationsView({
                     <Search size={20}/>
                     <span>{rk('searchResShort')}</span>
                   </button>
-                  <span className="text-sm text-gray-400 ml-auto">{dayRes.length} res. · {dayRes.reduce((s,r)=>s+r.party_size,0)}p</span>
+                  <span className="text-sm text-gray-400 ml-auto">{rk('dayResSummary', { count: String(dayRes.length), covers: String(dayRes.reduce((s, r) => s + r.party_size, 0)) })}</span>
                 </div>
 
                 {/* Legenda statuskleuren */}
@@ -3651,7 +3656,7 @@ export default function KassaReservationsView({
 
                       {/* Rijen */}
                       {sortedTables.map((tableNum, rowIdx) => {
-                        const tableRes = dayRes.filter(r => (r.table_number||'(geen tafel)') === tableNum)
+                        const tableRes = dayRes.filter(r => (r.table_number || noTableLabel) === tableNum)
                         const sortedTableRes = [...tableRes]
                           .filter(x => x.status !== 'CANCELLED')
                           .sort((a, b) => {
@@ -4087,9 +4092,9 @@ export default function KassaReservationsView({
                   {(['dag','week','maand','jaar'] as const).map(f => (
                     <button key={f}
                       onClick={() => { setResViewFilter(f); setShowMonthPicker(false); if (f === 'maand') { setResFilterMonth(new Date().getMonth()); setResFilterYear(new Date().getFullYear()) } if (f === 'jaar') setResFilterYear(new Date().getFullYear()) }}
-                      className={`px-3 py-1.5 rounded-lg text-sm font-semibold capitalize transition-colors
+                      className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors
                         ${resViewFilter === f ? 'bg-[#075985] text-white shadow-sm': 'text-gray-500 hover:text-gray-800'}`}>
-                      {f.charAt(0).toUpperCase() + f.slice(1)}
+                      {rk({ dag: 'filterDay', week: 'filterWeek', maand: 'filterMonth', jaar: 'filterYear' }[f])}
                     </button>
                   ))}
                 </div>
@@ -4098,12 +4103,12 @@ export default function KassaReservationsView({
                   <button onClick={() => { setShowResCalendar(v => !v); setShowResSearch(false) }}
                     className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-colors
                       ${showResCalendar ? 'bg-[#06496e] ring-2 ring-[#075985]/45': 'bg-[#075985] hover:bg-[#06496e]'}`}>
-                    <Calendar size={15}/> Kalender {showResCalendar ? <Eye size={13}/> : <EyeOff size={13}/>}
+                    <Calendar size={15}/> {rk('calendar')} {showResCalendar ? <Eye size={13}/> : <EyeOff size={13}/>}
                   </button>
                   <button onClick={() => { setShowResSearch(v => !v); if (showResSearch) setResSearch('') }}
                     className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-colors
                       ${showResSearch ? 'bg-[#06496e] ring-2 ring-[#075985]/45': 'bg-[#075985] hover:bg-[#06496e]'}`}>
-                    <Search size={15}/> Zoek reserv.
+                    <Search size={15}/> {rk('searchResShort')}
                   </button>
                 </div>
               </div>
@@ -4122,7 +4127,7 @@ export default function KassaReservationsView({
                 <div className="flex flex-col items-center justify-center px-8 py-3">
                   <span className="text-2xl font-black text-gray-900">{filteredRes.length}</span>
                   <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-0.5">
-                    Reservering{filteredRes.length !== 1 ? 'en': ''}
+                    {filteredRes.length === 1 ? rk('summaryReservation') : rk('summaryReservations')}
                   </span>
                 </div>
                 <div className="flex flex-col items-center justify-center px-8 py-3">
@@ -4135,7 +4140,7 @@ export default function KassaReservationsView({
                       {grouped.length}
                     </span>
                     <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-0.5">
-                      {resViewFilter === 'week'? 'Dagen': resViewFilter === 'maand'? 'Dagen': 'Maanden'}
+                      {resViewFilter === 'jaar' ? rk('summaryMonths') : rk('summaryDays')}
                     </span>
                   </div>
                 )}
@@ -4144,7 +4149,7 @@ export default function KassaReservationsView({
                     <span className="text-2xl font-black text-gray-800">
                       {Math.round(totalPersons / filteredRes.length * 10) / 10}
                     </span>
-                    <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-0.5">Gem. groep</span>
+                    <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-0.5">{rk('avgGroupLabel')}</span>
                   </div>
                 )}
                 <div className="flex-1"/>
@@ -4153,9 +4158,9 @@ export default function KassaReservationsView({
                     {resViewFilter === 'dag' && formatDate(resDate)}
                     {resViewFilter === 'week' && `${from} – ${to}`}
                     {resViewFilter === 'maand' && `${monthName(resFilterMonth).charAt(0).toUpperCase() + monthName(resFilterMonth).slice(1)} ${resFilterYear}`}
-                    {resViewFilter === 'jaar' && `Jaar ${resFilterYear}`}
+                    {resViewFilter === 'jaar' && rk('periodYear', { year: String(resFilterYear) })}
                   </span>
-                  <span className="text-[10px] text-gray-400 uppercase tracking-wider mt-0.5">Periode</span>
+                  <span className="text-[10px] text-gray-400 uppercase tracking-wider mt-0.5">{rk('periodLabel')}</span>
                 </div>
               </div>
 
@@ -4177,7 +4182,7 @@ export default function KassaReservationsView({
                             <div className="w-4 h-4 rounded-full bg-red-500 shrink-0 animate-ping"/>
                             <div className="min-w-0">
                               <p className="font-bold text-lg md:text-xl text-gray-900 truncate">{r.guest_name}</p>
-                              <p className="text-base text-gray-600 font-medium">{r.reservation_date} · {r.reservation_time} · {r.party_size} pers.</p>
+                              <p className="text-base text-gray-600 font-medium">{r.reservation_date} · {r.reservation_time} · {r.party_size} {rk('personsLabel')}</p>
                             </div>
                           </div>
                           <div className="flex gap-3 shrink-0">
@@ -4186,19 +4191,19 @@ export default function KassaReservationsView({
                               onClick={() => handleReject(r)}
                               className="px-5 py-3 rounded-xl bg-red-100 text-red-700 text-base font-black hover:bg-red-200 transition-colors border-2 border-red-300"
                             >
-                              Weigeren
+                              {rk('reject')}
                             </button>
                             <button
                               type="button"
                               onClick={() => handleConfirm(r)}
                               className="px-5 py-3 rounded-xl bg-green-600 text-white text-base font-black hover:bg-green-500 transition-colors shadow-md"
                             >
-                               Goedkeuren
+                               {rk('approve')}
                             </button>
                           </div>
                         </div>
                       ))}
-                      {pending.length > 3 && <p className="text-sm font-bold text-amber-200 text-center">+{pending.length - 3} meer in de lijst hieronder…</p>}
+                      {pending.length > 3 && <p className="text-sm font-bold text-amber-200 text-center">{rk('pendingMoreInList', { count: String(pending.length - 3) })}</p>}
                     </div>
                   </div>
                 )
@@ -4233,7 +4238,7 @@ export default function KassaReservationsView({
                               <tr key={`hdr-${date}`}>
                                 <td colSpan={7} className="border-b border-[#dde5f0] bg-[#f2f5fa] px-5 py-2">
                                   <span className="text-xs font-bold text-gray-900 uppercase tracking-wider">{dateHeader(date)}</span>
-                                  <span className="ml-2 text-xs text-[#5c708a]">{rows.length} reserv. · {rows.reduce((s,r) => s+r.party_size,0)} pers.</span>
+                                  <span className="ml-2 text-xs text-[#5c708a]">{rk('groupResSummary', { count: String(rows.length), covers: String(rows.reduce((s, r) => s + r.party_size, 0)) })}</span>
                                 </td>
                               </tr>
                             )}
@@ -4604,7 +4609,7 @@ export default function KassaReservationsView({
 
               {/* z4 - Annuleringsbeleid */}
               <div className="border-t border-gray-100 pt-6">
-                <h4 className="font-bold mb-4"> Annuleringsbeleid</h4>
+                <h4 className="font-bold mb-4">{rk('cancellationPolicyTitle')}</h4>
                 <div className="space-y-4">
                   <div>
                     <label className="font-medium block mb-2">{rk('cancellationDeadlineLabel')}</label>
@@ -4812,13 +4817,14 @@ export default function KassaReservationsView({
                 <h3 className="text-lg font-bold text-gray-900">{rk('promoEmailModalTitle')}</h3>
                 {contactPromoRecipients.length === 1 ? (
                   <p className="text-sm text-gray-500 mt-1">
-                    Naar <span className="font-medium text-gray-800">{contactPromoRecipients[0].name}</span>
-                    {'· '}
-                    <span className="break-all">{contactPromoRecipients[0].email}</span>
+                    {rk('promoToRecipient', {
+                      name: contactPromoRecipients[0].name,
+                      email: contactPromoRecipients[0].email,
+                    })}
                   </p>
                 ) : (
                   <div className="mt-1 text-sm text-gray-500">
-                    <p className="font-medium text-gray-700">{contactPromoRecipients.length} ontvangers</p>
+                    <p className="font-medium text-gray-700">{rk('promoRecipientsCount', { count: String(contactPromoRecipients.length) })}</p>
                     <ul className="mt-1 max-h-28 overflow-y-auto rounded-lg border border-gray-100 bg-gray-50 px-2 py-1 text-xs">
                       {contactPromoRecipients.map(g => (
                         <li key={g.id} className="truncate py-0.5">
@@ -4858,7 +4864,7 @@ export default function KassaReservationsView({
               disabled={contactPromoSending}
             />
             <p className="mb-4 text-xs text-gray-400">
-              Wordt verstuurd via je e-mailinstellingen (zoals bij Marketing). “Beste klant” in het bericht wordt automatisch vervangen door de voornaam van de ontvanger.
+              {rk('promoSendHint')}
             </p>
             <div className="flex flex-wrap gap-3">
               <button
@@ -4988,12 +4994,12 @@ export default function KassaReservationsView({
               onClick={e => e.stopPropagation()}>
               {/* Zoekbalk */}
               <div className="px-4 pt-4 pb-3 border-b border-gray-100">
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Zoeken</p>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">{rk('searchLabel')}</p>
                 <div className="flex items-center gap-3 bg-gray-100 rounded-xl px-4 py-2">
                   <Search size={20} className="text-gray-400 flex-shrink-0"/>
                   <input autoFocus type="text" value={searchPopupQuery}
                     onChange={e => setSearchPopupQuery(e.target.value)}
-                    placeholder="Naam, telefoon, email, tafel..."
+                    placeholder={rk('searchPopupPlaceholder')}
                     className="flex-1 bg-transparent outline-none text-base text-gray-800 placeholder-gray-400"/>
                   {searchPopupQuery && (
                     <button onClick={() => setSearchPopupQuery('')} className="text-gray-400 hover:text-gray-600">
@@ -5386,7 +5392,7 @@ interface CalendarViewProps {
 
 function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReservation, onNewReservation }: CalendarViewProps) {
   const [calMode, setCalMode] = useState<'week' |  'day' |  'month'>('week')
-  const { rk, dateTag, formatDateLong, monthName, weekdayShort } = useReservationKassa()
+  const { rk, dateTag, formatDateLong, monthName, weekdayShort, statusLabel } = useReservationKassa()
 
   // Huidige referentiedatum (geselecteerde dag)
   const refDate = new Date(selectedDate + 'T12:00:00')
@@ -5583,7 +5589,7 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="font-bold text-gray-900 text-sm">{r.guest_name}</span>
                               {r.occasion && <span className="text-sm"></span>}
-                              {r.special_requests && <span className="text-amber-500 text-xs font-semibold"> Opmerking</span>}
+                              {r.special_requests && <span className="text-amber-500 text-xs font-semibold"> {rk('calNoteLabel')}</span>}
                             </div>
                             <div className="flex items-center gap-3 mt-0.5 flex-wrap">
                               {r.guest_phone && (
@@ -5604,7 +5610,7 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
                                 <Users size={13} />
                                 <span className="font-black text-base leading-none">{r.party_size}</span>
                               </div>
-                              <div className="text-[10px] text-gray-400 leading-none">pers.</div>
+                              <div className="text-[10px] text-gray-400 leading-none">{rk('calPersAbbr')}</div>
                             </div>
                             {r.table_number && (
                               <div className="bg-black text-white text-xs font-bold px-2 py-1 rounded-lg">
@@ -5612,7 +5618,7 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
                               </div>
                             )}
                             <div className="px-2 py-1 rounded-lg text-xs font-bold" style={{ backgroundColor: sc.bgColor, color: sc.color }}>
-                              {sc.label}
+                              {statusLabel(r.status)}
                             </div>
                           </div>
                         </div>
@@ -5686,7 +5692,7 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
                       )
                     })}
                     {dayRes.length > 3 && (
-                      <div className="text-[10px] text-gray-400 font-medium pl-1">+{dayRes.length - 3} meer</div>
+                      <div className="text-[10px] text-gray-400 font-medium pl-1">{rk('calMore', { count: String(dayRes.length - 3) })}</div>
                     )}
                   </div>
                 </div>
@@ -5876,8 +5882,8 @@ function WaitlistModal({ onClose, onSave, rk }: {
         </div>
         <div className="p-5 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Naam <span className="text-red-500">*</span></label>
-            <input value={name} onChange={e => setName(e.target.value)} placeholder="Naam gast"
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">{rk('guestNameRequired')}</label>
+            <input value={name} onChange={e => setName(e.target.value)} placeholder={rk('guestNamePlaceholder')}
               className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-purple-400 outline-none text-sm"/>
           </div>
           <div>
@@ -5971,9 +5977,9 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
       const inShift = activeShiftsV.some(s => formData.reservation_time >= s.startTime && formData.reservation_time <= s.endTime)
       if (!inShift) newErrors.reservation_time = rk('outsideHoursBooking')
     }
-    if (formData.party_size < 1) newErrors.party_size = 'Min. 1 persoon'
-    if (!formData.duration_minutes || formData.duration_minutes < 1) newErrors.duration_minutes = 'Duur is verplicht'
-    if (!formData.occasion || formData.occasion === '') newErrors.occasion = 'Gelegenheid is verplicht'
+    if (formData.party_size < 1) newErrors.party_size = rk('validationMinParty')
+    if (!formData.duration_minutes || formData.duration_minutes < 1) newErrors.duration_minutes = rk('durationRequired')
+    if (!formData.occasion || formData.occasion === '') newErrors.occasion = rk('occasionRequired')
     // Tafel: ''= automatisch toewijzen → altijd geldig
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -6158,7 +6164,7 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
                   className="w-10 h-10 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-xl font-bold hover:bg-gray-50">-</button>
                 <div className="flex-1 text-center">
                   <span className="text-2xl font-bold">{formData.party_size}</span>
-                  <span className="text-sm text-gray-400 ml-1">pers.</span>
+                  <span className="text-sm text-gray-400 ml-1">{rk('calPersAbbr')}</span>
                 </div>
                 <button type="button"
                   onClick={() => setFormData({ ...formData, party_size: Math.min(maxPartySize || 20, formData.party_size + 1) })}
@@ -6171,12 +6177,12 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
               <select value={formData.duration_minutes}
                 onChange={(e) => setFormData({ ...formData, duration_minutes: parseInt(e.target.value) })}
                 className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 focus:border-green-500 outline-none">
-                <option value={60}>1 uur</option>
-                <option value={90}>1,5 uur</option>
-                <option value={120}>2 uur</option>
-                <option value={150}>2,5 uur</option>
-                <option value={180}>3 uur</option>
-                <option value={240}>4 uur</option>
+                <option value={60}>{rk('duration1h')}</option>
+                <option value={90}>{rk('duration1h30')}</option>
+                <option value={120}>{rk('duration2h')}</option>
+                <option value={150}>{rk('duration2h30')}</option>
+                <option value={180}>{rk('duration3h')}</option>
+                <option value={240}>{rk('duration4h')}</option>
               </select>
               {errors.duration_minutes && <p className="text-red-500 text-xs mt-1">{errors.duration_minutes}</p>}
             </div>
@@ -6196,7 +6202,7 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
                     : 'border-gray-200 bg-gray-50 text-gray-500 hover:border-gray-300'
                 }`}
               >
-                 Automatisch toewijzen (vrije tafel)
+                 {rk('autoAssignTable')}
               </button>
               {/* Tafels met bezet/vrij status */}
               {tables.filter(t => t.seats >= formData.party_size).map((table) => {
@@ -6218,7 +6224,7 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
                   >
                     <div className="font-bold">{rk('tableWithNumber', { number: String(table.number) })}</div>
                     <div className="text-xs mt-0.5">
-                      {table.seats} pers. &nbsp;·&nbsp;
+                      {rk('seatsAtTable', { seats: String(table.seats) })} &nbsp;·&nbsp;
                       {status.bezet
                         ? <span className="text-red-500 font-semibold">{rk('tableBusyUntil', { time: String(status.tot ?? '') })}</span>
                         : <span className="text-green-600 font-semibold">{rk('floorFree')}</span>
@@ -6235,7 +6241,7 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
 
           {/* Gelegenheid */}
           <div>
-            <label className="block text-sm font-medium mb-1">Gelegenheid {req()}</label>
+            <label className="block text-sm font-medium mb-1">{rk('labelOccasion')} {req()}</label>
             <div className="flex flex-wrap gap-2">
               {['Geen', 'Verjaardag', 'Jubileum', 'Zakelijk', 'Romantisch', 'Feest'].map((occ) => {
                 const occKey =
@@ -6556,13 +6562,13 @@ function ReservationDetailModal({
               onClick={onDelete}
               className="flex-1 py-3 rounded-xl bg-red-50 text-red-400 font-medium hover:bg-red-100 transition-colors text-sm"
             >
-              Annulatie
+              {rk('cancelReservation')}
             </button>
             <button
               onClick={onClose}
               className="flex-1 py-3 rounded-xl bg-gray-100 font-medium hover:bg-gray-200 transition-colors"
             >
-              Sluiten
+              {rk('close')}
             </button>
           </div>
         </div>

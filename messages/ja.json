@@ -5875,7 +5875,12 @@
     "promoGreetingSingle": "Dear {name},",
     "promoGreetingBulk": "Dear customer,",
     "durationMinutesOnly": "{m} min",
-    "durationHoursMinutes": "{h}h{mm}"
+    "durationHoursMinutes": "{h}h{mm}",
+    "shiftTables": "テーブルを移動",
+    "validationMinParty": "最低1名",
+    "durationRequired": "所要時間は必須です",
+    "occasionRequired": "用途は必須です",
+    "labelOccasion": "用途"
   },
   "kasboekPage": {
     "title": "デジタル現金出納帳",
