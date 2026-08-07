@@ -5,6 +5,11 @@ export const RESERVATION_ADMIN_BLUE = '#075985'
 export const RESERVATION_ADMIN_BLUE_HOVER = '#06496e'
 export const RESERVATION_ADMIN_BLUE_ACTIVE = '#053a56'
 
+/** Grijstinten (tijdlijn-header randen, grafieken, contacten). */
+export const RESERVATION_ADMIN_GRAY = '#6b7d9e'
+export const RESERVATION_ADMIN_GRAY_BORDER = '#94a4be'
+export const RESERVATION_ADMIN_GRAY_BG = '#f2f5fa'
+
 /** Primaire blauwe actieknop (witte tekst). */
 export const reservationAdminPrimaryBtnClass =
   'bg-[#075985] hover:bg-[#06496e] active:bg-[#053a56] text-white'

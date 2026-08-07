@@ -55,7 +55,12 @@ import { getAuthHeaders, authFetch } from '@/lib/auth-headers'
 import { useLanguage } from '@/i18n'
 import { ControlledNumberInput } from '@/components/ControlledNumberInput'
 import { useReservationKassa, makeReservationKassaRk } from '@/hooks/useReservationKassa'
-import { reservationAdminPrimaryBtnRoundedClass } from '@/lib/reservation-admin-ui-colors'
+import {
+  reservationAdminPrimaryBtnRoundedClass,
+  RESERVATION_ADMIN_BLUE,
+  RESERVATION_ADMIN_GRAY,
+  RESERVATION_ADMIN_GRAY_BORDER,
+} from '@/lib/reservation-admin-ui-colors'
 
 import type {
   FloorPlanTable,
@@ -3445,23 +3450,23 @@ export default function KassaReservationsView({
             : null
 
           const statusColors: Record<string, string> = {
-            CONFIRMED: '#3b82f6',
+            CONFIRMED: RESERVATION_ADMIN_BLUE,
             CHECKED_IN: '#22c55e',
             PENDING: '#f59e0b',
-            COMPLETED: '#9ca3af',
+            COMPLETED: RESERVATION_ADMIN_GRAY,
             NO_SHOW: '#ef4444',
             WAITLIST: '#8b5cf6',
           }
 
           // Kleur per status
           const statusBlockColor = (status: string, inExtraZone: boolean) => {
-            if (inExtraZone) return '#6B7280'
+            if (inExtraZone) return RESERVATION_ADMIN_GRAY
             switch(status) {
               case 'CHECKED_IN':  return '#16a34a' // groen — aan tafel
               case 'NO_SHOW':     return '#dc2626' // rood
-              case 'COMPLETED':   return '#6B7280' // grijs — vertrokken
-              case 'CONFIRMED':   return '#3B5BDB' // blauw
-              default:            return '#3B5BDB' // blauw (PENDING etc.)
+              case 'COMPLETED':   return RESERVATION_ADMIN_GRAY // grijs — vertrokken
+              case 'CONFIRMED':   return RESERVATION_ADMIN_BLUE
+              default:            return RESERVATION_ADMIN_BLUE // PENDING etc.
             }
           }
 
@@ -3485,7 +3490,7 @@ export default function KassaReservationsView({
               <div className="flex flex-col flex-1 overflow-hidden min-w-0">
                 {/* Date nav */}
                 <div className="mb-3 flex flex-wrap items-center gap-2">
-                  <div className="flex items-center gap-2 rounded-2xl bg-green-500 px-3 py-2 shadow-md">
+                  <div className="flex items-center gap-2 rounded-2xl bg-[#075985] px-3 py-2 shadow-md">
                     <button
                       type="button"
                       onClick={() => {
@@ -3563,10 +3568,10 @@ export default function KassaReservationsView({
                 {/* Legenda statuskleuren */}
                 <div className="flex items-center gap-4 mb-2 px-1">
                   {[
-                    { color:'#3B5BDB', label: rk('timelineLegendExpected')},
+                    { color: RESERVATION_ADMIN_BLUE, label: rk('timelineLegendExpected')},
                     { color:'#16a34a', label: rk('timelineLegendAtTable')},
                     { color:'#dc2626', label: rk('status_NO_SHOW')},
-                    { color:'#6B7280', label: rk('timelineLegendDeparted')},
+                    { color: RESERVATION_ADMIN_GRAY, label: rk('timelineLegendDeparted')},
                   ].map(s => (
                     <div key={s.label} className="flex items-center gap-1.5">
                       <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: s.color }}/>
@@ -3581,20 +3586,28 @@ export default function KassaReservationsView({
                     {/* Vaste minimumbreedte — alles binnenin scrollt mee */}
                     <div style={{ minWidth: (timeSlots.length + extraSlots.length) * 80 + LABEL_W }}>
 
-                      {/* Oranje header — sticky bovenaan de scroll container */}
-                      <div className="flex sticky top-0 z-10" style={{ height:48, backgroundColor:'#000000'}}>
-                        <div style={{ width:LABEL_W, flexShrink:0 }} className="border-r border-[#6b7d9e] flex items-center justify-center sticky left-0 z-20 bg-black">
+                      {/* Tijdlijn-header — sticky bovenaan de scroll container */}
+                      <div className="flex sticky top-0 z-10" style={{ height:48, backgroundColor: RESERVATION_ADMIN_BLUE }}>
+                        <div
+                          className="border-r flex items-center justify-center sticky left-0 z-20"
+                          style={{
+                            width: LABEL_W,
+                            flexShrink: 0,
+                            borderColor: RESERVATION_ADMIN_GRAY,
+                            backgroundColor: RESERVATION_ADMIN_BLUE,
+                          }}
+                        >
                           <span className="text-sm font-bold text-white">{rk('tableLabel')}</span>
                         </div>
                         <div className="flex relative" style={{ width:(timeSlots.length+extraSlots.length)*80 }}>
                           {timeSlots.map((t,i) => (
-                            <div key={`${t}-${i}`} style={{ width:80, flexShrink:0 }} className="border-r border-[#6b7d9e] flex items-center justify-center px-0.5">
+                            <div key={`${t}-${i}`} style={{ width:80, flexShrink:0, borderColor: RESERVATION_ADMIN_GRAY }} className="border-r flex items-center justify-center px-0.5">
                               <span className="text-[11px] font-bold leading-tight text-white sm:text-xs md:text-sm">{t}</span>
                             </div>
                           ))}
                           {extraSlots.map((t,i) => (
-                            <div key={`ex-${t}-${i}`} style={{ width:80, flexShrink:0 }} className="border-r border-[#94a4be] flex items-center justify-center bg-[#6b7d9e]/70 px-0.5">
-                              <span className="text-[11px] font-bold leading-tight text-white/90 sm:text-xs md:text-sm">{t}</span>
+                            <div key={`ex-${t}-${i}`} style={{ width:80, flexShrink:0, borderColor: RESERVATION_ADMIN_GRAY_BORDER, backgroundColor: RESERVATION_ADMIN_GRAY }} className="border-r flex items-center justify-center px-0.5">
+                              <span className="text-[11px] font-bold leading-tight text-white/95 sm:text-xs md:text-sm">{t}</span>
                             </div>
                           ))}
                           {redLinePct !== null && (
@@ -3631,7 +3644,7 @@ export default function KassaReservationsView({
                                   <div key={t} style={{ width:80, flexShrink:0 }} className={`h-full border-r ${i%2===0?'border-gray-300':'border-gray-100'}`} />
                                 ))}
                                 {extraSlots.map((t) => (
-                                  <div key={`ex-${t}`} style={{ width:80, flexShrink:0 }} className="h-full border-r border-gray-200 bg-gray-100/60" />
+                                  <div key={`ex-${t}`} style={{ width:80, flexShrink:0 }} className="h-full border-r border-gray-200 bg-[#f2f5fa]" />
                                 ))}
                               </div>
                               {/* Rode lijn */}
