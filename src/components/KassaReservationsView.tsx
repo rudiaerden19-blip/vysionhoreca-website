@@ -953,12 +953,9 @@ export default function KassaReservationsView({
   const openFloorPlanView = () => {
     setViewMode('floorplan')
     setShowResCalendar(false)
-    updateSettings({ floorplanFloorOnly: false })
-  }
-  const openTablesFloorOnlyView = () => {
-    setViewMode('floorplan')
-    setShowResCalendar(false)
-    updateSettings({ floorplanFloorOnly: true })
+    if (!reservationSettings.floorplanFloorOnly) {
+      updateSettings({ floorplanFloorOnly: true })
+    }
   }
   const toggleFloorOnlyMode = () => {
     updateSettings({ floorplanFloorOnly: !reservationSettings.floorplanFloorOnly })
@@ -2396,28 +2393,19 @@ export default function KassaReservationsView({
                 { id: 'guests', label: rk('tabContacts'), icon: <Users size={16} />, badge: 0 },
                 { id: 'stats', label: rk('tabReports'), icon: <AlertCircle size={16} />, badge: 0 },
                 { id: 'settings', label: rk('tabSettings'), icon: <Settings size={16} />, badge: 0 },
-              ].map((view) => {
-                const tabActive =
-                  view.id === 'floorplan'
-                    ? viewMode === 'floorplan' && !floorOnlyMode
-                    : view.id === 'timeline'
-                      ? viewMode === 'floorplan' && floorOnlyMode
-                      : viewMode === view.id
-                return (
+              ].map((view) => (
                 <button
                   key={view.id}
                   onClick={() => {
                     if (view.id === 'floorplan') {
                       openFloorPlanView()
-                    } else if (view.id === 'timeline') {
-                      openTablesFloorOnlyView()
                     } else {
                       setViewMode(view.id as ViewMode)
                       setShowResCalendar(false)
                     }
                   }}
                   className={`relative flex min-w-[44px] flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-2 text-sm font-medium transition-colors ${
-                    tabActive
+                    viewMode === view.id
                       ? 'bg-[#075985] text-white shadow-sm ring-1 ring-[#075985]/30'
                       : 'bg-gray-300 text-gray-800 hover:bg-gray-400 hover:text-gray-900'
                   }`}
@@ -2430,12 +2418,11 @@ export default function KassaReservationsView({
                     </span>
                   )}
                 </button>
-              )
-              })
+              ))
             })()}
           </div>
 
-          {viewMode !== 'reservations' && !(viewMode === 'floorplan' && floorOnlyMode) && (
+          {viewMode !== 'timeline' && viewMode !== 'reservations' && (
             <div className="flex-shrink-0 lg:w-72 relative">
               <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
@@ -2455,7 +2442,7 @@ export default function KassaReservationsView({
         className={`flex-1 min-h-0 ${
           viewMode === 'floorplan' && floorOnlyMode ? 'p-0': 'p-2 sm:p-4'
         } ${
-          viewMode === 'today' || viewMode === 'reservations' || viewMode === 'floorplan'
+          viewMode === 'today' || viewMode === 'timeline' || viewMode === 'reservations' || viewMode === 'floorplan'
             ? 'flex flex-col overflow-hidden'
             : 'overflow-y-auto'
         }`}
