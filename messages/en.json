@@ -5,6 +5,9 @@
   },
   "nav": {
     "home": "Home",
+    "kassa": "POS",
+    "reservations": "Reservations",
+    "onlineOrderPlatform": "Online ordering platform",
     "features": "Features",
     "pricing": "Pricing",
     "about": "About Us",

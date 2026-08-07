@@ -5,6 +5,9 @@
   },
   "nav": {
     "home": "首页",
+    "kassa": "收银",
+    "reservations": "预订",
+    "onlineOrderPlatform": "在线订购平台",
     "features": "功能",
     "pricing": "价格",
     "about": "关于我们",

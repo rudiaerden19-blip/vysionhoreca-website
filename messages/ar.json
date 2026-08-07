@@ -5,6 +5,9 @@
   },
   "nav": {
     "home": "الرئيسية",
+    "kassa": "الكاشير",
+    "reservations": "الحجوزات",
+    "onlineOrderPlatform": "منصة الطلب عبر الإنترنت",
     "features": "المميزات",
     "pricing": "الأسعار",
     "about": "من نحن",

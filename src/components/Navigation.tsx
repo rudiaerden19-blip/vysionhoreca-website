@@ -3,7 +3,12 @@
 import { useState, useRef, useEffect } from 'react'
 import { useLanguage, Locale } from '@/i18n'
 import { LocaleFlagEmoji, LocaleFlagWithCode } from '@/components/LocaleFlagEmoji'
-import { VYSION_BRAND_SITE_NAME } from '@/lib/vysion-site'
+import {
+  VYSION_BRAND_SITE_NAME,
+  VYSION_CANONICAL_ORIGIN,
+  VYSION_ORDER_ORIGIN,
+  VYSION_TABLEVYSION_ORIGIN,
+} from '@/lib/vysion-site'
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -50,7 +55,9 @@ export default function Navigation() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1 ml-12">
-            <a href="/" className={navLinkClass}>{t('nav.home')}</a>
+            <a href={VYSION_CANONICAL_ORIGIN} className={navLinkClass}>{t('nav.kassa')}</a>
+            <a href={VYSION_TABLEVYSION_ORIGIN} className={navLinkClass}>{t('nav.reservations')}</a>
+            <a href={VYSION_ORDER_ORIGIN} className={navLinkClass}>{t('nav.onlineOrderPlatform')}</a>
             <a href="/#prijzen" className={navLinkClass}>{t('nav.pricing')}</a>
             <a href="/licentie" className={navLinkClass}>{t('nav.license')}</a>
             <a href="/over-ons" className={navLinkClass}>{t('nav.about')}</a>
@@ -132,7 +139,9 @@ export default function Navigation() {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-700">
             <div className="flex flex-col gap-1">
-              <a href="/" className={navLinkClassMobile}>{t('nav.home')}</a>
+              <a href={VYSION_CANONICAL_ORIGIN} className={navLinkClassMobile}>{t('nav.kassa')}</a>
+              <a href={VYSION_TABLEVYSION_ORIGIN} className={navLinkClassMobile}>{t('nav.reservations')}</a>
+              <a href={VYSION_ORDER_ORIGIN} className={navLinkClassMobile}>{t('nav.onlineOrderPlatform')}</a>
               <a href="/#prijzen" className={navLinkClassMobile}>{t('nav.pricing')}</a>
               <a href="/over-ons" className={navLinkClassMobile}>{t('nav.about')}</a>
               <a href="/support" className={navLinkClassMobile}>{t('nav.support')}</a>

@@ -5,6 +5,11 @@ import Image from 'next/image'
 import { useLanguage, Locale } from '@/i18n'
 import { LocaleFlagEmoji, LocaleFlagWithCode } from '@/components/LocaleFlagEmoji'
 import SubscriptionsTermsPopup from './SubscriptionsTermsPopup'
+import {
+  VYSION_CANONICAL_ORIGIN,
+  VYSION_ORDER_ORIGIN,
+  VYSION_TABLEVYSION_ORIGIN,
+} from '@/lib/vysion-site'
 
 const HERO_BG = '/images/hero-header.png'
 
@@ -33,7 +38,9 @@ export default function HomeLandingHero() {
   }
 
   const pillLinks: { href: string; label: string }[] = [
-    { href: '/', label: t('nav.home') },
+    { href: VYSION_CANONICAL_ORIGIN, label: t('nav.kassa') },
+    { href: VYSION_TABLEVYSION_ORIGIN, label: t('nav.reservations') },
+    { href: VYSION_ORDER_ORIGIN, label: t('nav.onlineOrderPlatform') },
     { href: '/#sectoren', label: t('nav.sectors') },
     { href: '/#platform', label: t('nav.services') },
     { href: '/#prijzen', label: t('nav.pricing') },

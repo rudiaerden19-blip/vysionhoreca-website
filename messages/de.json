@@ -5,6 +5,9 @@
   },
   "nav": {
     "home": "Startseite",
+    "kassa": "Kasse",
+    "reservations": "Reservierungen",
+    "onlineOrderPlatform": "Online-Bestellplattform",
     "features": "Funktionen",
     "pricing": "Preise",
     "about": "Über uns",

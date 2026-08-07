@@ -5,6 +5,9 @@
   },
   "nav": {
     "home": "ホーム",
+    "kassa": "レジ",
+    "reservations": "予約",
+    "onlineOrderPlatform": "オンライン注文プラットフォーム",
     "features": "機能",
     "pricing": "料金",
     "about": "会社概要",
