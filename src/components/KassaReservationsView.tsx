@@ -239,6 +239,7 @@ export default function KassaReservationsView({
   const [showWalkInModal, setShowWalkInModal] = useState(false)
   const [showWaitlistModal, setShowWaitlistModal] = useState(false)
   const [showOnlineReservationsModal, setShowOnlineReservationsModal] = useState(false)
+  const [onlineModalList, setOnlineModalList] = useState<Reservation[]>([])
   const [onlinePendingAlert, setOnlinePendingAlert] = useState(false)
   const seenPendingReservationIdsRef = useRef<Set<string>>(new Set())
   const pendingOnlineBaselineDoneRef = useRef(false)
@@ -845,12 +846,34 @@ export default function KassaReservationsView({
     ? !!ownerAlert?.hasAlert
     : onlinePendingAlert
 
-  const openOnlineReservationsOverview = useCallback(() => {
+  const closeOnlineReservationsModal = useCallback(() => {
+    setShowOnlineReservationsModal(false)
+    setOnlineModalList([])
     pendingOnlineReservations.forEach(r => seenPendingReservationIdsRef.current.add(r.id))
     ownerAlert?.acknowledge()
     setOnlinePendingAlert(false)
-    setShowOnlineReservationsModal(true)
   }, [pendingOnlineReservations, ownerAlert])
+
+  const openOnlineReservationsOverview = useCallback(() => {
+    const unseenIds =
+      usesSharedOwnerAlert && ownerAlert
+        ? new Set(ownerAlert.unseenIds)
+        : null
+    const toShow = unseenIds
+      ? pendingOnlineReservations.filter(r => unseenIds.has(r.id))
+      : pendingOnlineReservations.filter(r => !seenPendingReservationIdsRef.current.has(r.id))
+    setOnlineModalList(toShow)
+    setShowOnlineReservationsModal(true)
+  }, [pendingOnlineReservations, ownerAlert, usesSharedOwnerAlert])
+
+  useEffect(() => {
+    if (!showOnlineReservationsModal) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeOnlineReservationsModal()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [showOnlineReservationsModal, closeOnlineReservationsModal])
 
   useEffect(() => {
     if (!openOnlineReservationsOnMount || loading || openedOnlineFromUrlRef.current) return
@@ -4986,25 +5009,37 @@ export default function KassaReservationsView({
       )}
 
       {showOnlineReservationsModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4">
-          <div className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white shadow-xl">
-            <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
-              <h2 className="text-lg font-bold text-gray-900">{rk('onlineReservationsModalTitle')}</h2>
+        <div
+          className="fixed inset-0 z-[200] flex items-start justify-center bg-black/50 p-4 pt-[max(5rem,calc(3.5rem+env(safe-area-inset-top)))]"
+          role="presentation"
+          onClick={() => closeOnlineReservationsModal()}
+        >
+          <div
+            className="flex max-h-[min(85dvh,calc(100dvh-6rem))] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white shadow-xl"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="online-reservations-modal-title"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex shrink-0 items-center justify-between gap-3 border-b border-gray-200 px-5 py-4">
+              <h2 id="online-reservations-modal-title" className="text-lg font-bold text-gray-900">
+                {rk('onlineReservationsModalTitle')}
+              </h2>
               <button
                 type="button"
-                onClick={() => setShowOnlineReservationsModal(false)}
-                className="rounded-lg p-2 text-gray-500 hover:bg-gray-100"
+                onClick={() => closeOnlineReservationsModal()}
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100"
                 aria-label={rk('close')}
               >
-                <X size={20} />
+                <X size={22} strokeWidth={2.5} />
               </button>
             </div>
-            <div className="overflow-y-auto p-4">
-              {unseenOnlineReservations.length === 0 ? (
+            <div className="min-h-0 flex-1 overflow-y-auto p-4">
+              {onlineModalList.length === 0 ? (
                 <p className="py-8 text-center text-gray-500">{rk('onlineReservationsEmpty')}</p>
               ) : (
                 <div className="space-y-3">
-                  {unseenOnlineReservations.map(r => (
+                  {onlineModalList.map(r => (
                     <div
                       key={r.id}
                       className="flex flex-col gap-3 rounded-xl border-2 border-amber-200 bg-amber-50/80 p-4 sm:flex-row sm:items-center sm:justify-between"
@@ -5043,6 +5078,7 @@ export default function KassaReservationsView({
                             type="button"
                             onClick={() => {
                               seenPendingReservationIdsRef.current.add(r.id)
+                              setOnlineModalList(prev => prev.filter(x => x.id !== r.id))
                               setOnlinePendingAlert(
                                 pendingOnlineReservations.some(
                                   x => !seenPendingReservationIdsRef.current.has(x.id),
@@ -5059,6 +5095,15 @@ export default function KassaReservationsView({
                   ))}
                 </div>
               )}
+            </div>
+            <div className="flex shrink-0 justify-end border-t border-gray-200 px-5 py-4">
+              <button
+                type="button"
+                onClick={() => closeOnlineReservationsModal()}
+                className="min-h-[44px] rounded-xl bg-[#075985] px-6 py-2 text-sm font-bold text-white hover:bg-[#06496e]"
+              >
+                {rk('close')}
+              </button>
             </div>
           </div>
         </div>
