@@ -9,10 +9,12 @@ import { redirectCustomerLogoutUI } from '@/lib/session-broadcast'
 import { fetchWebshopBrowserSession, patchWebshopBrowserSession, migrateLegacyWebshopLocalStorage } from '@/lib/webshop-browser-session'
 import { useLanguage } from '@/i18n'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
+import { usePublicOnlineOrderingEnabled } from '@/hooks/usePublicOnlineOrderingEnabled'
 import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
 
 export default function AccountPage({ params }: { params: { tenant: string } }) {
   const { t, locale, localeNames } = useLanguage()
+  const onlineOrderingEnabled = usePublicOnlineOrderingEnabled(params.tenant)
   const { ask, ConfirmModal } = useAdminConfirm(t)
   const [loading, setLoading] = useState(true)
   const [customer, setCustomer] = useState<Customer | null>(null)
@@ -374,6 +376,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
             <div className="text-center py-12">
               <span className="text-5xl mb-4 block"></span>
               <p className="text-gray-500">{t('accountPage.noOrders')}</p>
+              {onlineOrderingEnabled && (
               <Link
                 href={`/shop/${params.tenant}/menu`}
                 style={{ color: primaryColor }}
@@ -381,6 +384,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
               >
                 {t('accountPage.orderNow')} →
               </Link>
+              )}
             </div>
           ) : (
             <div className="space-y-4">
@@ -423,6 +427,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
       </div>
 
       {/* Floating Order Button */}
+      {onlineOrderingEnabled && (
       <Link
         href={`/shop/${params.tenant}/menu`}
         className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-40 shadow-xl rounded-full px-8 py-4 font-bold text-white flex items-center gap-3 hover:scale-105 transition-transform"
@@ -432,6 +437,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
         <span>{t('accountPage.orderNow')}</span>
         <span className="text-xl">→</span>
       </Link>
+      )}
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (

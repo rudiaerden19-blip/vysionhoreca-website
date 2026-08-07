@@ -15,6 +15,10 @@ import {
 import { useLanguage } from '@/i18n'
 import { patchWebshopBrowserSession, migrateLegacyWebshopLocalStorage } from '@/lib/webshop-browser-session'
 import { LocaleFlagEmoji, LocaleFlagWithCode } from '@/components/LocaleFlagEmoji'
+import {
+  resolvePublicOnlineOrderingEnabled,
+  type TenantModuleFlagsPayload,
+} from '@/lib/tenant-public-online-ordering'
 
 const MarketingDemoSessionPrime = dynamic(
   () => import('@/components/MarketingDemoSessionPrime').then((mod) => ({ default: mod.MarketingDemoSessionPrime })),
@@ -169,6 +173,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   })
   const [giftCardLoading, setGiftCardLoading] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [onlineOrderingEnabled, setOnlineOrderingEnabled] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isBlocked, setIsBlocked] = useState(false)
   const [isOwner, setIsOwner] = useState(false)
@@ -506,7 +511,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         }
 
         // Laad data uit Supabase (signal: bij wegnavigeren geen lege cache / geen ruis-errors)
-        const [tenantData, hoursData, deliveryData, productsData, textsData, reviewsData, promotionsData, statusData] = await Promise.all([
+        const [tenantData, hoursData, deliveryData, productsData, textsData, reviewsData, promotionsData, statusData, moduleFlagsJson] = await Promise.all([
           getTenantSettings(params.tenant, signal),
           getOpeningHours(params.tenant, signal),
           getDeliverySettings(params.tenant, signal),
@@ -515,6 +520,9 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           getVisibleReviews(params.tenant, signal),
           getActivePromotions(params.tenant, signal),
           getShopStatus(params.tenant, signal),
+          fetch(`/api/tenant/module-flags?tenant=${encodeURIComponent(params.tenant)}`, signal ? { signal } : undefined)
+            .then((r) => (r.ok ? r.json() : null))
+            .catch(() => null) as Promise<TenantModuleFlagsPayload | null>,
         ])
 
         if (signal.aborted) return
@@ -522,6 +530,9 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         // Zet promoties en shop status
         setPromotions(promotionsData)
         setShopStatus(statusData)
+        if (!signal.aborted) {
+          setOnlineOrderingEnabled(resolvePublicOnlineOrderingEnabled(params.tenant, moduleFlagsJson))
+        }
 
         // Check of tenant bestaat - als tenantData null is, bestaat de tenant niet
         if (!tenantData) {
@@ -703,11 +714,18 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
     if (!business || !business.name) return
 
     // Document title
-    const seoTitle = business.seo_title || `${business.name} | ${business.tagline || 'Bestel Online'}`
+    const seoTitle =
+      business.seo_title ||
+      `${business.name} | ${business.tagline || (onlineOrderingEnabled ? 'Bestel Online' : t('shopPage.reserveTable'))}`
     document.title = seoTitle
 
     // Meta description
-    const seoDescription = business.seo_description || business.description || `Bestel online bij ${business.name}. ${business.tagline || ''}`
+    const seoDescription =
+      business.seo_description ||
+      business.description ||
+      (onlineOrderingEnabled
+        ? `Bestel online bij ${business.name}. ${business.tagline || ''}`
+        : `${business.name}. ${business.tagline || ''}`)
     let metaDesc = document.querySelector('meta[name="description"]')
     if (metaDesc) {
       metaDesc.setAttribute('content', seoDescription)
@@ -775,7 +793,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       updateTwitterTag('twitter:image', business.seo_og_image || business.logo_url)
     }
 
-  }, [business, params.tenant])
+  }, [business, params.tenant, onlineOrderingEnabled, t])
 
   const getDayName = () => {
     // JavaScript: 0=Sunday, 1=Monday, etc.
@@ -1113,12 +1131,12 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
             {/* Quick Info Pills */}
             <div className="flex flex-wrap gap-2 sm:gap-3 mt-4 sm:mt-6">
-              {business.pickup_enabled && (
+              {onlineOrderingEnabled && business.pickup_enabled && (
                 <span className="inline-flex items-center gap-1 sm:gap-2 bg-white/10 backdrop-blur-md text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm">
                   <span></span> <span className="hidden xs:inline">{t('shopPage.pickup')} ·</span> {business.pickup_time}
                 </span>
               )}
-              {business.delivery_enabled && (
+              {onlineOrderingEnabled && business.delivery_enabled && (
                 <span className="inline-flex items-center gap-1 sm:gap-2 bg-white/10 backdrop-blur-md text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm">
                   <span></span> <span className="hidden xs:inline">{t('shopPage.delivery')} ·</span> {business.delivery_time}
                 </span>
@@ -1132,14 +1150,14 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
             {/* CTA Buttons */}
             <div className="flex flex-wrap gap-3 mt-6 sm:mt-8">
-              {!manualOffline?.is_offline && (
+              {onlineOrderingEnabled && !manualOffline?.is_offline && (
                 <Link
                   href={`/shop/${params.tenant}/menu`}
                   style={{ backgroundColor: business.primary_color }}
                   className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-2xl text-white font-bold text-sm sm:text-base hover:opacity-90 transition-opacity shadow-lg"
                 >
                   <span></span>
-                  <span>Bestel Nu</span>
+                  <span>{t('shopPage.startYourOrder')}</span>
                 </Link>
               )}
               {business.reservations_enabled && (
@@ -1993,6 +2011,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       )}
 
       {/* CTA Section */}
+      {onlineOrderingEnabled && (
       <section style={{ background: `linear-gradient(to right, ${business.primary_color}, ${business.primary_color}cc)`}} className="py-12 sm:py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div>
@@ -2024,6 +2043,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           </div>
         </div>
       </section>
+      )}
 
       {/* Footer */}
       <footer className="bg-gray-950 text-white py-12">
@@ -2116,20 +2136,21 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
               {/* Footer */}
               <div className="p-4 border-t">
-                {manualOffline?.is_offline ? (
-                  <div className="w-full py-4 text-white/60 font-bold text-lg rounded-xl bg-gray-300 flex items-center justify-center gap-2 cursor-not-allowed">
-                     {t('shopOffline.orderingBlocked')}
-                  </div>
-                ) : (
-                  <Link href={`/shop/${params.tenant}/menu`}>
-                    <button
-                      style={{ backgroundColor: business.primary_color }}
-                      className="w-full py-4 text-white font-bold text-lg rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
-                    >
-                       {t('shopPage.orderNow')}
-                    </button>
-                  </Link>
-                )}
+                {onlineOrderingEnabled &&
+                  (manualOffline?.is_offline ? (
+                    <div className="w-full py-4 text-white/60 font-bold text-lg rounded-xl bg-gray-300 flex items-center justify-center gap-2 cursor-not-allowed">
+                      {t('shopOffline.orderingBlocked')}
+                    </div>
+                  ) : (
+                    <Link href={`/shop/${params.tenant}/menu`}>
+                      <button
+                        style={{ backgroundColor: business.primary_color }}
+                        className="w-full py-4 text-white font-bold text-lg rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                      >
+                        {t('shopPage.orderNow')}
+                      </button>
+                    </Link>
+                  ))}
                 <button
                   onClick={() => setShowPromotionsModal(false)}
                   className="w-full mt-2 py-3 text-gray-500 hover:text-gray-700 transition-colors"
@@ -2452,6 +2473,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         )}
 
       {/* Floating Order Button (Mobile) */}
+      {onlineOrderingEnabled && (
       <div className="fixed bottom-4 left-3 right-3 sm:bottom-6 sm:left-4 sm:right-4 md:hidden z-50 pb-safe">
         {manualOffline?.is_offline ? (
           <button
@@ -2473,6 +2495,8 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           </Link>
         )}
       </div>
+      )}
+
     </div>
   )
 }

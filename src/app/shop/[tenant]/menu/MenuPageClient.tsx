@@ -8,6 +8,7 @@ import { isKioskSearchParams, kioskShopHref } from '@/lib/kiosk-mode'
 import { getMenuCategories, getMenuProducts, getAllMenuProductOptionsForTenant, getTenantSettings, getActivePromotions, getExceptionalClosings, ExceptionalClosing, MenuCategory, MenuProduct, ProductOption, ProductOptionChoice, Promotion, compareMenuProductsBySortOrder } from '@/lib/admin-api'
 import { patchWebshopBrowserSession, migrateLegacyWebshopLocalStorage } from '@/lib/webshop-browser-session'
 import { useLanguage } from '@/i18n'
+import { fetchPublicOnlineOrderingEnabled } from '@/lib/tenant-public-online-ordering'
 
 interface MenuItem {
   id: string
@@ -248,6 +249,19 @@ export default function MenuPageClient({
   const [promotionsEnabled, setPromotionsEnabled] = useState(true)
   const [manualOffline, setManualOffline] = useState<{ is_offline: boolean; offline_reason: string | null; offline_message?: string | null } | null>(null)
   const menuContentRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    fetchPublicOnlineOrderingEnabled(params.tenant).then((enabled) => {
+      if (cancelled) return
+      if (!enabled) {
+        router.replace(`/shop/${params.tenant}`)
+      }
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [params.tenant, router])
   const sectionRefs = useRef<Map<string, HTMLDivElement>>(new Map())
   const isScrollingToSection = useRef(false)
   const activeCategoryRef = useRef(activeCategory)

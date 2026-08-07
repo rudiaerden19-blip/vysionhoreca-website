@@ -26,6 +26,7 @@ import {
   migrateLegacyWebshopLocalStorage,
   patchWebshopBrowserSession,
 } from '@/lib/webshop-browser-session'
+import { fetchPublicOnlineOrderingEnabled } from '@/lib/tenant-public-online-ordering'
 
 interface CartItem {
   id: string
@@ -95,6 +96,17 @@ export default function CheckoutPageClient({
   const [whatsappPhone, setWhatsappPhone] = useState<string | null>(null) // Phone from WhatsApp link
   const [businessWhatsApp, setBusinessWhatsApp] = useState<string>('') // Business WhatsApp number
   const [radiusConfirmed] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+    fetchPublicOnlineOrderingEnabled(params.tenant).then((enabled) => {
+      if (cancelled) return
+      if (!enabled) router.replace(`/shop/${params.tenant}`)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [params.tenant, router])
 
   const primaryColor = tenantSettings?.primary_color || '#FF6B35'
   

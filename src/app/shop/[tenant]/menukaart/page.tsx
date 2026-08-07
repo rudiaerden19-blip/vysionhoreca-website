@@ -5,9 +5,11 @@ import { useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { getTenantSettings, getMenuCategories, getMenuProducts, TenantSettings, MenuCategory, MenuProduct, compareMenuProductsBySortOrder } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
+import { usePublicOnlineOrderingEnabled } from '@/hooks/usePublicOnlineOrderingEnabled'
 
 export default function MenukaartPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
+  const onlineOrderingEnabled = usePublicOnlineOrderingEnabled(params.tenant)
   const searchParams = useSearchParams()
   const showPromoOnly = searchParams.get('promo') === '1'
   
@@ -188,14 +190,16 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
           <div>
             <p className="text-white/40 text-xs">{t('menuCard.poweredBy')}</p>
           </div>
-          <a 
-            href={`/shop/${params.tenant}/menu`}
-            style={{ backgroundColor: primaryColor }}
-            className="px-6 py-2 rounded-full text-white text-sm font-medium flex items-center gap-2"
-          >
-            <span></span>
-            <span>{t('menuCard.orderOnline')}</span>
-          </a>
+          {onlineOrderingEnabled && (
+            <a
+              href={`/shop/${params.tenant}/menu`}
+              style={{ backgroundColor: primaryColor }}
+              className="px-6 py-2 rounded-full text-white text-sm font-medium flex items-center gap-2"
+            >
+              <span></span>
+              <span>{t('menuCard.orderOnline')}</span>
+            </a>
+          )}
         </div>
       </footer>
     </div>
