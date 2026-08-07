@@ -4323,9 +4323,17 @@ export default function KassaReservationsView({
           <RapportenView
             reservations={reservations}
             guestProfiles={guestProfiles}
+            tenantSlug={tenant}
+            businessName={businessInfo.name}
+            businessEmail={businessInfo.email}
             rk={rk}
             monthName={monthName}
             weekdayShort={weekdayShort}
+            formatDate={formatDate}
+            formatDateLong={formatDateLong}
+            statusLabel={statusLabel}
+            notifySuccess={toast.success}
+            notifyError={toast.error}
           />
         )}
 
