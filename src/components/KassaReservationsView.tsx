@@ -104,9 +104,10 @@ import {
   type ReservationFloorViewport,
 } from '@/lib/reservation-floor-viewport'
 import {
-  isPendingOrWaitlistReservationStatus,
   triggerReservationRequestAlarmSound,
 } from '@/lib/reservation-request-alarm-loop'
+import { reservationStatusNeedsOwnerAlert } from '@/lib/reservation-owner-alert'
+import { useReservationOwnerAlert } from '@/components/ReservationOwnerAlertProvider'
 import { useReservationRequestAlarm } from '@/hooks/useReservationRequestAlarm'
 import {
   KassaSoundActivationScreen,
@@ -126,6 +127,8 @@ interface KassaReservationsViewProps {
   closeButtonLabel?: string
   /** false = geen "Start order" / naar kassa (module kassa uit). */
   allowKassaHandoff?: boolean
+  /** Admin: open «Online reservaties»-modal direct (b.v. ?online=1 in topbalk-link). */
+  openOnlineReservationsOnMount?: boolean
 }
 
 
@@ -183,8 +186,13 @@ export default function KassaReservationsView({
   presentation = 'fullscreenOverlay',
   closeButtonLabel,
   allowKassaHandoff = true,
+  openOnlineReservationsOnMount = false,
 }: KassaReservationsViewProps) {
   const isAdminPagePresentation = presentation === 'adminPage'
+  const ownerAlert = useReservationOwnerAlert()
+  const usesSharedOwnerAlert = isAdminPagePresentation && ownerAlert !== null
+  const ownerMarkUnseenRef = useRef(ownerAlert?.markUnseen)
+  ownerMarkUnseenRef.current = ownerAlert?.markUnseen
   const { soundActivated, activateSound } = useKassaSoundActivationGate(tenant)
   useReservationRequestAlarm(tenant, isAdminPagePresentation && soundActivated)
   const adminSoundUi = {
@@ -234,6 +242,7 @@ export default function KassaReservationsView({
   const [onlinePendingAlert, setOnlinePendingAlert] = useState(false)
   const seenPendingReservationIdsRef = useRef<Set<string>>(new Set())
   const pendingOnlineBaselineDoneRef = useRef(false)
+  const openedOnlineFromUrlRef = useRef(false)
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
   const [selectedShift, setSelectedShift] = useState<string | null>(null)
   const [guestProfilesDB, setGuestProfilesDB] = useState<GuestProfile[]>([])
@@ -773,8 +782,9 @@ export default function KassaReservationsView({
         schema: 'public',
         table: 'reservations',
       }, (payload) => {
-        const row = payload.new as { tenant_slug?: string; status?: string }
-        if (row.tenant_slug === tenant && isPendingOrWaitlistReservationStatus(row.status)) {
+        const row = payload.new as { tenant_slug?: string; status?: string; id?: string }
+        if (row.tenant_slug === tenant && reservationStatusNeedsOwnerAlert(row.status)) {
+          if (row.id) ownerMarkUnseenRef.current?.(row.id)
           triggerReservationRequestAlarmSound()
         }
         loadReservations(true)
@@ -787,42 +797,66 @@ export default function KassaReservationsView({
       }, () => { loadReservations(true); loadGuestProfiles() })
       .subscribe()
 
-    // Fallback polling elke 30 seconden (als real-time tijdelijk wegvalt)
+    // Fallback polling elke 3s (real-time backup; reserverings-only gebruikt ReservationOwnerAlertProvider)
     const interval = setInterval(() => {
       loadReservations(true)
       loadGuestProfiles()
-    }, 30_000)
+    }, usesSharedOwnerAlert ? 30_000 : 3_000)
 
     return () => {
       void supabase.removeChannel(channel).catch(() => {})
       clearInterval(interval)
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tenant])
+  }, [tenant, usesSharedOwnerAlert])
 
   const pendingOnlineReservations = useMemo(
-    () => reservations.filter(r => r.status === 'PENDING'),
+    () => reservations.filter(r => reservationStatusNeedsOwnerAlert(r.status)),
     [reservations],
   )
 
   useEffect(() => {
-    if (loading) return
+    if (usesSharedOwnerAlert || loading) return
     const pending = pendingOnlineReservations
+    const recentCutoffMs = Date.now() - 15 * 60 * 1000
     if (!pendingOnlineBaselineDoneRef.current) {
-      pending.forEach(r => seenPendingReservationIdsRef.current.add(r.id))
+      pending.forEach(r => {
+        const createdMs = r.created_at ? new Date(r.created_at).getTime() : 0
+        if (createdMs >= recentCutoffMs) return
+        seenPendingReservationIdsRef.current.add(r.id)
+      })
       pendingOnlineBaselineDoneRef.current = true
-      setOnlinePendingAlert(false)
+      const hasUnseen = pending.some(r => !seenPendingReservationIdsRef.current.has(r.id))
+      setOnlinePendingAlert(hasUnseen)
       return
     }
     const hasUnseen = pending.some(r => !seenPendingReservationIdsRef.current.has(r.id))
     setOnlinePendingAlert(hasUnseen)
-  }, [loading, pendingOnlineReservations])
+  }, [loading, pendingOnlineReservations, usesSharedOwnerAlert])
+
+  const unseenOnlineReservations = useMemo(() => {
+    if (usesSharedOwnerAlert && ownerAlert) {
+      const ids = new Set(ownerAlert.unseenIds)
+      return pendingOnlineReservations.filter(r => ids.has(r.id))
+    }
+    return pendingOnlineReservations.filter(r => !seenPendingReservationIdsRef.current.has(r.id))
+  }, [pendingOnlineReservations, onlinePendingAlert, usesSharedOwnerAlert, ownerAlert])
+
+  const effectiveOnlineAlert = usesSharedOwnerAlert
+    ? !!ownerAlert?.hasAlert
+    : onlinePendingAlert
 
   const openOnlineReservationsOverview = useCallback(() => {
     pendingOnlineReservations.forEach(r => seenPendingReservationIdsRef.current.add(r.id))
+    ownerAlert?.acknowledge()
     setOnlinePendingAlert(false)
     setShowOnlineReservationsModal(true)
-  }, [pendingOnlineReservations])
+  }, [pendingOnlineReservations, ownerAlert])
+
+  useEffect(() => {
+    if (!openOnlineReservationsOnMount || loading || openedOnlineFromUrlRef.current) return
+    openedOnlineFromUrlRef.current = true
+    openOnlineReservationsOverview()
+  }, [openOnlineReservationsOnMount, loading, openOnlineReservationsOverview])
 
   // Rode tijdlijn — update elke minuut
   useEffect(() => {
@@ -2378,16 +2412,16 @@ export default function KassaReservationsView({
                   type="button"
                   onClick={openOnlineReservationsOverview}
                   className={`flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium text-white transition-colors sm:gap-2 sm:px-4 ${
-                    onlinePendingAlert
+                    effectiveOnlineAlert
                       ? 'animate-pulse bg-red-600 hover:bg-red-700 active:bg-red-800'
                       : 'bg-[#075985] hover:bg-[#06496e] active:bg-[#053a56]'
                   }`}
                 >
                   <Globe size={18} className="shrink-0" />
                   <span className="hidden sm:inline">{rk('onlineReservationsBtn')}</span>
-                  {onlinePendingAlert && pendingOnlineReservations.length > 0 && (
+                  {effectiveOnlineAlert && unseenOnlineReservations.length > 0 && (
                     <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-white px-1 text-xs font-bold text-red-600">
-                      {pendingOnlineReservations.length}
+                      {unseenOnlineReservations.length}
                     </span>
                   )}
                 </button>
@@ -4966,11 +5000,11 @@ export default function KassaReservationsView({
               </button>
             </div>
             <div className="overflow-y-auto p-4">
-              {pendingOnlineReservations.length === 0 ? (
+              {unseenOnlineReservations.length === 0 ? (
                 <p className="py-8 text-center text-gray-500">{rk('onlineReservationsEmpty')}</p>
               ) : (
                 <div className="space-y-3">
-                  {pendingOnlineReservations.map(r => (
+                  {unseenOnlineReservations.map(r => (
                     <div
                       key={r.id}
                       className="flex flex-col gap-3 rounded-xl border-2 border-amber-200 bg-amber-50/80 p-4 sm:flex-row sm:items-center sm:justify-between"
@@ -4987,20 +5021,39 @@ export default function KassaReservationsView({
                         )}
                       </div>
                       <div className="flex shrink-0 gap-2">
-                        <button
-                          type="button"
-                          onClick={() => void handleReject(r)}
-                          className="rounded-xl border-2 border-red-300 bg-red-100 px-4 py-2 text-sm font-bold text-red-700 hover:bg-red-200"
-                        >
-                          {rk('reject')}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => void handleConfirm(r)}
-                          className="rounded-xl bg-green-600 px-4 py-2 text-sm font-bold text-white hover:bg-green-500"
-                        >
-                          {rk('approve')}
-                        </button>
+                        {r.status === 'PENDING' ? (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => void handleReject(r)}
+                              className="rounded-xl border-2 border-red-300 bg-red-100 px-4 py-2 text-sm font-bold text-red-700 hover:bg-red-200"
+                            >
+                              {rk('reject')}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => void handleConfirm(r)}
+                              className="rounded-xl bg-green-600 px-4 py-2 text-sm font-bold text-white hover:bg-green-500"
+                            >
+                              {rk('approve')}
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              seenPendingReservationIdsRef.current.add(r.id)
+                              setOnlinePendingAlert(
+                                pendingOnlineReservations.some(
+                                  x => !seenPendingReservationIdsRef.current.has(x.id),
+                                ),
+                              )
+                            }}
+                            className="rounded-xl bg-[#075985] px-4 py-2 text-sm font-bold text-white hover:bg-[#06496e]"
+                          >
+                            {rk('close')}
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))}

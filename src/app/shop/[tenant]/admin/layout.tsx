@@ -46,6 +46,10 @@ import {
   peekSuperadminFromBrowserCookie,
 } from '@/lib/superadmin-cookies'
 import {
+  ReservationOwnerAlertProvider,
+  useReservationOwnerAlert,
+} from '@/components/ReservationOwnerAlertProvider'
+import {
   isMarketingDemoTenantSlug,
   isPublicDemoKassaSearch,
   persistPublicDemoSessionIfNeeded,
@@ -481,14 +485,26 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
   }
 
   return (
-    <div style={{ maxWidth: '100%', overflowX: 'hidden', width: '100%'}} className="min-h-screen bg-gray-100">
-      {/* ── Zwarte topbalk (zelfde stijl als kassa). Z-index 100 — modals/dialoog: min. z-[130] zodat ze boven deze balk blijven (iPad). ── */}
-      <div
-        className="fixed top-0 left-0 right-0 z-[100] flex items-center gap-2 bg-black px-2 sm:px-3"
-        style={{ height: 56 }}
-      >
-        <div className="flex min-w-0 shrink-0 items-center gap-2">
-          <AdminHamburgerMenu tenantSlug={params.tenant} />
+    <ReservationOwnerAlertProvider
+      tenantSlug={params.tenant}
+      enabled={
+        !modulesLoading &&
+        !!moduleAccess.reservaties &&
+        isReservationsSoftwareTenant(moduleAccess, enabledModulesJson)
+      }
+    >
+      <div style={{ maxWidth: '100%', overflowX: 'hidden', width: '100%'}} className="min-h-screen bg-gray-100">
+        {/* ── Zwarte topbalk (zelfde stijl als kassa). Z-index 100 — modals/dialoog: min. z-[130] zodat ze boven deze balk blijven (iPad). ── */}
+        <div
+          className="fixed top-0 left-0 right-0 z-[100] flex items-center gap-2 bg-black px-2 sm:px-3"
+          style={{ height: 56 }}
+        >
+          <div className="flex min-w-0 shrink-0 items-center gap-2">
+            <AdminHamburgerMenu tenantSlug={params.tenant} />
+            {!modulesLoading &&
+              isReservationsSoftwareTenant(moduleAccess, enabledModulesJson) && (
+              <ReservationOnlineTopBarLink baseUrl={baseUrl} alwaysVisible />
+            )}
           {!modulesLoading &&
             (isHorecaKassaPosScreenEnabled(moduleAccess) ||
               isRetailKassaPosScreenEnabled(moduleAccess, enabledModulesJson)) && (
@@ -567,6 +583,40 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
         </div>
       </main>
     </div>
+    </ReservationOwnerAlertProvider>
+  )
+}
+
+function ReservationOnlineTopBarLink({
+  baseUrl,
+  alwaysVisible,
+}: {
+  baseUrl: string
+  alwaysVisible?: boolean
+}) {
+  const { t } = useLanguage()
+  const alert = useReservationOwnerAlert()
+  const hasAlert = !!alert?.hasAlert
+  if (!alwaysVisible && !hasAlert) return null
+
+  const href = `${baseUrl}/reserveringen${hasAlert ? '?online=1' : ''}`
+
+  return (
+    <Link
+      href={href}
+      className={`touch-manipulation flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-bold text-white transition-colors no-underline sm:gap-2 ${
+        hasAlert
+          ? 'animate-pulse bg-red-600 shadow-lg ring-2 ring-red-400/80 hover:bg-red-700'
+          : 'bg-[#075985] hover:bg-[#06496e]'
+      }`}
+    >
+      <span>{t('reservationKassa.onlineReservationsBtn')}</span>
+      {hasAlert && alert && alert.unseenCount > 0 && (
+        <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-white px-1 text-xs font-bold text-red-600">
+          {alert.unseenCount}
+        </span>
+      )}
+    </Link>
   )
 }
 

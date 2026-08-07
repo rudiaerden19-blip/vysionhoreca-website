@@ -51,6 +51,10 @@ import {
   tenantShouldPollWebshopNewOrders,
 } from '@/lib/tenant-module-runtime'
 import {
+  normalizeReservationStatus,
+  reservationStatusNeedsOwnerAlert,
+} from '@/lib/reservation-owner-alert'
+import {
   appLocaleToBcp47,
   escapeReceiptHtml,
   KASSA_PRINT_RECEIPT_STYLES,
@@ -1055,7 +1059,26 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const previousPendingReservCountRef = useRef<number | null>(null)
   const reservationAlarmLatchedRef = useRef(false)
 
-  // Gebruik playOrderNotification uit sounds.ts — zelfde geactiveerde AudioContext als alle andere knoppen
+  const [onlineReservNavBlink, setOnlineReservNavBlink] = useState(false)
+  /** Nieuwe reserveringen (via poll) nog niet via «Reserveringen» bekeken — blijft rood tot acknowledge. */
+  const unacknowledgedNewReservIdsRef = useRef<Set<string>>(new Set())
+
+  const acknowledgeOnlineReservationsNav = useCallback(() => {
+    unacknowledgedNewReservIdsRef.current.clear()
+    reservationAlarmLatchedRef.current = false
+    setOnlineReservNavBlink(false)
+    newReservAlertRef.current = null
+    setNewReservAlert(null)
+    if (typeof window !== 'undefined') {
+      ;(window as unknown as { stopReservationAlarm?: () => void }).stopReservationAlarm?.()
+    }
+  }, [])
+
+  const syncReservNavBlinkFromUnack = useCallback(() => {
+    const has = unacknowledgedNewReservIdsRef.current.size > 0
+    setOnlineReservNavBlink(has)
+    reservationAlarmLatchedRef.current = has
+  }, [])
   const stopAlarm = useRef(() => {
     if (alarmIntervalRef.current) {
       clearInterval(alarmIntervalRef.current)
@@ -1146,7 +1169,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       previousOrderIdsRef.current = []
       previousReservIdsRef.current = []
       previousPendingReservCountRef.current = null
+      unacknowledgedNewReservIdsRef.current.clear()
       reservationAlarmLatchedRef.current = false
+      setOnlineReservNavBlink(false)
       return
     }
 
@@ -1165,46 +1190,47 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               .limit(50)
           : Promise.resolve({ data: [] as { id: string; order_number?: string; total?: number; order_type?: string | null }[] })
 
-        const reservIdsPromise = pollReserv
-          ? supabase
-              .from('reservations')
-              .select('id')
-              .eq('tenant_slug', tenant)
-              .order('created_at', { ascending: false })
-              .limit(50)
-          : Promise.resolve({ data: [] as { id: string }[] })
+        const reservPollPromise = pollReserv
+          ? Promise.all([
+              adminDb.select<{ id: string; status: string | null }[]>('reservations', {
+                tenantSlug: tenant,
+                select: 'id,status,created_at',
+                order: { column: 'created_at', ascending: false },
+                limit: 50,
+              }),
+              adminDb.select<{ id: string; status: string | null }[]>('reservations', {
+                tenantSlug: tenant,
+                select: 'id,status',
+                in: { status: ['PENDING', 'WAITLIST', 'pending', 'waitlist'] },
+              }),
+            ])
+          : Promise.resolve([
+              { ok: true as const, data: [] as { id: string; status: string | null }[] },
+              { ok: true as const, data: [] as { id: string; status: string | null }[] },
+            ])
 
-        const pendingResPromise = pollReserv
-          ? supabase
-              .from('reservations')
-              .select('*', { count: 'exact', head: true })
-              .eq('tenant_slug', tenant)
-              .or('status.eq.PENDING,status.eq.pending,status.eq.WAITLIST,status.eq.waitlist')
-          : Promise.resolve({ count: 0 })
-
-        const [{ data: orders }, { data: idRows }, pendingRes] = await Promise.all([
-          ordersPromise,
-          reservIdsPromise,
-          pendingResPromise,
-        ])
+        const [{ data: orders }, reservPoll] = await Promise.all([ordersPromise, reservPollPromise])
+        const [recentReservRes, pendingRowsRes] = reservPoll
+        const idRows =
+          pollReserv && recentReservRes.ok && Array.isArray(recentReservRes.data)
+            ? recentReservRes.data
+            : []
+        const pendingRows =
+          pollReserv && pendingRowsRes.ok && Array.isArray(pendingRowsRes.data)
+            ? pendingRowsRes.data
+            : []
         const list = orders || []
         /** Alleen webshop/kiosk `new`— kassa-POS schrijft direct `confirmed`; die mogen geen oranje alarm geven. */
         const webshopNewList = list.filter((o: { order_type?: string | null }) =>
           isWebshopChannelNewOrder(o),
         )
         const reservList = idRows || []
-        const pendingAndWl = pollReserv ? (pendingRes.count ?? 0) : 0
+        const pendingAndWl = pollReserv ? pendingRows.length : 0
         if (pollReserv) setPendingReservCount(pendingAndWl)
         else setPendingReservCount(0)
 
         const prevPendingCnt = previousPendingReservCountRef.current
-        if (pollReserv && prevPendingCnt !== null && pendingAndWl > prevPendingCnt) {
-          reservationAlarmLatchedRef.current = true
-        }
         if (pollReserv) previousPendingReservCountRef.current = pendingAndWl
-        if (!pollReserv || pendingAndWl === 0) {
-          reservationAlarmLatchedRef.current = false
-        }
 
         let newReservOnes: { id: string }[] = []
 
@@ -1253,9 +1279,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           : []
         const prevReservIds = previousReservIdsRef.current
         if (pollReserv && !isFirstReservCheck) {
-          newReservOnes = reservList.filter((r: { id: string }) => !prevReservIds.includes(r.id))
+          newReservOnes = reservList.filter(
+            (r: { id: string; status?: string | null }) =>
+              !prevReservIds.includes(r.id) &&
+              reservationStatusNeedsOwnerAlert(normalizeReservationStatus(r.status)),
+          )
           if (newReservOnes.length > 0) {
-            reservationAlarmLatchedRef.current = true
+            newReservOnes.forEach((r: { id: string }) => {
+              unacknowledgedNewReservIdsRef.current.add(r.id)
+            })
+            syncReservNavBlinkFromUnack()
             startAlarm()
             try {
               if ('Notification'in window && Notification.permission === 'granted') {
@@ -1273,15 +1306,35 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             newReservAlertRef.current = alert
             setNewReservAlert(alert)
           }
+          previousReservIdsRef.current = currentReservIds
         } else if (pollReserv) {
           isFirstReservCheck = false
+          const recentCutoffMs = Date.now() - 15 * 60 * 1000
+          const baselineIds: string[] = []
+          for (const r of reservList as { id: string; status?: string | null; created_at?: string }[]) {
+            const createdMs = r.created_at ? new Date(r.created_at).getTime() : 0
+            const isRecent = createdMs >= recentCutoffMs
+            if (isRecent && reservationStatusNeedsOwnerAlert(normalizeReservationStatus(r.status))) {
+              unacknowledgedNewReservIdsRef.current.add(r.id)
+            }
+            if (!isRecent) baselineIds.push(r.id)
+          }
+          previousReservIdsRef.current = baselineIds
+          syncReservNavBlinkFromUnack()
         }
-        if (pollReserv) previousReservIdsRef.current = currentReservIds
+
+        if (pollReserv && prevPendingCnt !== null && pendingAndWl > prevPendingCnt) {
+          const newest = reservList.find((r: { status?: string | null }) =>
+            reservationStatusNeedsOwnerAlert(normalizeReservationStatus(r.status)),
+          )
+          if (newest?.id) unacknowledgedNewReservIdsRef.current.add(newest.id)
+          syncReservNavBlinkFromUnack()
+        }
 
         // ── Alarm aan/uit: alleen webshop `new`OF reservering-alarm ──
         const needOrderAlarm = pollOrders && webshopNewList.length > 0
         const needReservAlarm =
-          pollReserv && reservationAlarmLatchedRef.current && pendingAndWl > 0
+          pollReserv && unacknowledgedNewReservIdsRef.current.size > 0
         if (needOrderAlarm || needReservAlarm) {
           if (!alarmIntervalRef.current) startAlarm()
         } else {
@@ -1323,12 +1376,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       document.removeEventListener('visibilitychange', onVisibility)
       if (intervalId !== null) clearInterval(intervalId)
       previousPendingReservCountRef.current = null
+      unacknowledgedNewReservIdsRef.current.clear()
       reservationAlarmLatchedRef.current = false
+      setOnlineReservNavBlink(false)
     }
   }, [
     tenant,
     startAlarm,
     stopAlarm,
+    syncReservNavBlinkFromUnack,
     demoViewOnly,
     moduleFlagsLoading,
     effectiveAccess,
@@ -1460,6 +1516,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const [showReservations, setShowReservations] = useState(false)
   const [pendingReservCount, setPendingReservCount] = useState(0)
+
+  useEffect(() => {
+    if (showReservations) acknowledgeOnlineReservationsNav()
+  }, [showReservations, acknowledgeOnlineReservationsNav])
   const [showFloorPlan, setShowFloorPlan] = useState(false)
   const [showTablePicker, setShowTablePicker] = useState(false)
   /** Verkoop / Binnen / Terras — los van besteltype (Ter plaatse); accent alleen na tik. */
@@ -4804,17 +4864,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <button
               type="button"
               onClick={() => {
-                newReservAlertRef.current = null
-                setNewReservAlert(null)
+                acknowledgeOnlineReservationsNav()
                 setShowReservations(true)
               }}
               title={t('kassaApp.navReservations')}
-              className={`relative ${headerQuickLinkBtnClass}`}
+              className={`relative ${
+                onlineReservNavBlink
+                  ? `${kassaDarkHeaderBtnShell} animate-pulse bg-red-600 text-white shadow-lg ring-2 ring-red-400/80 hover:bg-red-700 active:bg-red-800`
+                  : headerQuickLinkBtnClass
+              }`}
             >
               <span className={KASSA_HEADER_QUICK_LINK_LABEL}>{t('kassaApp.navReservations')}</span>
-              {pendingReservCount > 0 && (
+              {(pendingReservCount > 0 || onlineReservNavBlink) && (
                 <span className="absolute -right-1 -top-1.5 flex h-7 min-w-[26px] items-center justify-center rounded-full border-2 border-white bg-red-600 px-1.5 text-sm font-black text-white shadow-lg sm:-right-2 sm:-top-2">
-                  {pendingReservCount}
+                  {pendingReservCount > 0 ? pendingReservCount : '!'}
                 </span>
               )}
             </button>
@@ -6113,12 +6176,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       )}
 
       {/* Reservatie-actie: blijft tot geen PENDING/WAITLIST meer (zelfde teller als badge) */}
-      {effectiveAccess.reservaties && pendingReservCount > 0 && !showReservations && (
+      {effectiveAccess.reservaties && (pendingReservCount > 0 || onlineReservNavBlink) && !showReservations && (
         <div
           className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex max-w-[95vw] items-center gap-4 bg-amber-500 text-white px-8 py-5 rounded-2xl shadow-2xl cursor-pointer border-4 border-amber-700"
           onClick={() => {
-            newReservAlertRef.current = null
-            setNewReservAlert(null)
+            acknowledgeOnlineReservationsNav()
             setShowReservations(true)
           }}
         >
