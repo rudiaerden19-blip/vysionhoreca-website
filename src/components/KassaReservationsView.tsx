@@ -5,7 +5,7 @@
  * Exact gekopieerd van ReservationsView (vysion-horeca) + Supabase + email
  */
 
-import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
+import { useState, useMemo, useEffect, useRef, useCallback, type ReactNode } from 'react'
 import {
   CalendarDays,
   Users,
@@ -181,19 +181,58 @@ function formatReservationDateDdMmYyyy(isoDate: string): string {
   return isoDate
 }
 
-function OnlineReservationContactIcon({ kind }: { kind: 'phone' | 'mail' }) {
-  const cls = 'inline-block h-4 w-4 shrink-0 text-gray-600'
-  if (kind === 'phone') {
-    return (
-      <svg className={cls} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-        <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.36 11.36 0 003.56.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.56 1 1 0 01-.24 1.01l-2.2 2.22z" />
-      </svg>
-    )
+function OnlineReservationRowIcon({
+  kind,
+}: {
+  kind: 'calendar' | 'clock' | 'person' | 'phone' | 'mail'
+}) {
+  const cls = 'inline-block h-[18px] w-[18px] shrink-0 text-gray-700'
+  switch (kind) {
+    case 'calendar':
+      return (
+        <svg className={cls} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+          <path d="M7 2a1 1 0 011 1v1h8V3a1 1 0 112 0v1h1a3 3 0 013 3v14a3 3 0 01-3 3H5a3 3 0 01-3-3V7a3 3 0 013-3h1V3a1 1 0 112 0v1zm13 8H4v10a1 1 0 001 1h14a1 1 0 001-1V10z" />
+        </svg>
+      )
+    case 'clock':
+      return (
+        <svg className={cls} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+          <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 5a1 1 0 00-2 0v5.17l-2.59 2.59a1 1 0 101.42 1.42l3.17-3.17A1 1 0 0013 12.58V7z" />
+        </svg>
+      )
+    case 'person':
+      return (
+        <svg className={cls} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+          <path d="M12 12a4 4 0 100-8 4 4 0 000 8zm-7 9a7 7 0 0114 0H5z" />
+        </svg>
+      )
+    case 'phone':
+      return (
+        <svg className={cls} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+          <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.36 11.36 0 003.56.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.56 1 1 0 01-.24 1.01l-2.2 2.22z" />
+        </svg>
+      )
+    default:
+      return (
+        <svg className={cls} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+          <path d="M20 4H4a2 2 0 00-2 2v.4l10 6.25L22 6.4V6a2 2 0 00-2-2zm2 4.8l-9.55 5.97a1 1 0 01-1.06 0L2 8.8V18a2 2 0 002 2h16a2 2 0 002-2V8.8z" />
+        </svg>
+      )
   }
+}
+
+function OnlineReservationModalDetailRow({
+  kind,
+  children,
+}: {
+  kind: 'calendar' | 'clock' | 'person' | 'phone' | 'mail'
+  children: ReactNode
+}) {
   return (
-    <svg className={cls} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M20 4H4a2 2 0 00-2 2v.4l10 6.25L22 6.4V6a2 2 0 00-2-2zm2 4.8l-9.55 5.97a1 1 0 01-1.06 0L2 8.8V18a2 2 0 002 2h16a2 2 0 002-2V8.8z" />
-    </svg>
+    <div className="flex items-center gap-2.5 text-sm font-medium text-gray-700">
+      <OnlineReservationRowIcon kind={kind} />
+      <span className="min-w-0">{children}</span>
+    </div>
   )
 }
 
@@ -5128,32 +5167,31 @@ export default function KassaReservationsView({
                   {onlineModalList.map(r => (
                     <div
                       key={r.id}
-                      className="flex flex-col gap-3 rounded-xl border-2 border-amber-200 bg-amber-50/80 p-4 sm:flex-row sm:items-center sm:justify-between"
+                      className="flex flex-col gap-4 rounded-xl border-2 border-amber-200 bg-amber-50/80 p-4"
                     >
-                      <div className="min-w-0">
+                      <div className="flex min-w-0 flex-col gap-2">
                         <p className="truncate text-lg font-bold text-gray-900">{r.guest_name}</p>
-                        <p className="text-sm font-medium text-gray-600">
-                          {formatReservationDateDdMmYyyy(r.reservation_date)} · {r.reservation_time} ·{' '}
+                        <OnlineReservationModalDetailRow kind="calendar">
+                          {formatReservationDateDdMmYyyy(r.reservation_date)}
+                        </OnlineReservationModalDetailRow>
+                        <OnlineReservationModalDetailRow kind="clock">
+                          {r.reservation_time}
+                        </OnlineReservationModalDetailRow>
+                        <OnlineReservationModalDetailRow kind="person">
                           {r.party_size} {rk('personsLabel')}
-                        </p>
-                        {(r.guest_phone || r.guest_email) && (
-                          <div className="mt-2 flex flex-col gap-1 text-xs text-gray-600">
-                            {r.guest_phone ? (
-                              <span className="inline-flex items-center gap-2">
-                                <OnlineReservationContactIcon kind="phone" />
-                                <span>{r.guest_phone}</span>
-                              </span>
-                            ) : null}
-                            {r.guest_email ? (
-                              <span className="inline-flex items-center gap-2">
-                                <OnlineReservationContactIcon kind="mail" />
-                                <span className="truncate">{r.guest_email}</span>
-                              </span>
-                            ) : null}
-                          </div>
-                        )}
+                        </OnlineReservationModalDetailRow>
+                        {r.guest_phone ? (
+                          <OnlineReservationModalDetailRow kind="phone">
+                            {r.guest_phone}
+                          </OnlineReservationModalDetailRow>
+                        ) : null}
+                        {r.guest_email ? (
+                          <OnlineReservationModalDetailRow kind="mail">
+                            {r.guest_email}
+                          </OnlineReservationModalDetailRow>
+                        ) : null}
                       </div>
-                      <div className="flex shrink-0 gap-2">
+                      <div className="flex flex-wrap gap-2 border-t border-amber-200/80 pt-3">
                         {r.status === 'PENDING' ? (
                           <>
                             <button
