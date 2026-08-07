@@ -619,8 +619,16 @@ function LanguageSelector() {
     const el = triggerRef.current
     if (!el) return
     const r = el.getBoundingClientRect()
-    setMenuPos({ top: r.bottom + 8, right: Math.max(8, window.innerWidth - r.right) })
-  }, [])
+    const rowPx = 40
+    const menuHeight = locales.length * rowPx + 12
+    const gap = 8
+    const margin = 8
+    let top = r.bottom + gap
+    if (top + menuHeight > window.innerHeight - margin) {
+      top = Math.max(margin, r.top - menuHeight - gap)
+    }
+    setMenuPos({ top, right: Math.max(margin, window.innerWidth - r.right) })
+  }, [locales.length])
 
   useLayoutEffect(() => {
     if (!isOpen) return
@@ -686,7 +694,7 @@ function LanguageSelector() {
               ref={menuRef}
               role="listbox"
               aria-label="Taal"
-              className="fixed z-[250] min-w-[180px] max-h-[min(20rem,calc(100dvh-4.5rem))] overflow-y-auto overscroll-contain rounded-xl border bg-white shadow-xl"
+              className="fixed z-[250] min-w-[180px] overflow-hidden rounded-xl border bg-white shadow-xl py-1"
               style={{ top: menuPos.top, right: menuPos.right }}
             >
               {locales.map((langCode) => (
@@ -699,7 +707,7 @@ function LanguageSelector() {
                     e.stopPropagation()
                     pickLocale(langCode)
                   }}
-                  className={`flex w-full touch-manipulation items-center gap-3 px-4 py-2.5 transition-colors hover:bg-gray-50 ${locale === langCode ? 'bg-blue-50 text-blue-600': 'text-gray-700'}`}
+                  className={`flex w-full touch-manipulation items-center gap-3 px-4 py-2 transition-colors hover:bg-gray-50 ${locale === langCode ? 'bg-blue-50 text-blue-600': 'text-gray-700'}`}
                 >
                   <LocaleFlagEmoji locale={langCode} className="text-lg" />
                   <span className="text-sm">{localeNames[langCode]}</span>

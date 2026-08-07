@@ -128,6 +128,7 @@ import { appendKassaCloseTipToAbsoluteLoginUrl } from '@/lib/shop-login-kassa-ti
 import { syncZReportAfterOrderSafe } from '@/lib/kassa-z-sync-safe'
 import { KassaAnalogClock } from '@/components/kassa/KassaAnalogClock'
 import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
+import { LocalePickerPortalMenu } from '@/components/LocalePickerPortalMenu'
 import { KassaRegisterSuspenseFallback } from '@/components/KassaRegisterSuspenseFallback'
 import type {
   KassaCartItem as CartItem,
@@ -1014,6 +1015,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [langOpen, setLangOpen] = useState(false)
   const [logoutSoftwareConfirmOpen, setLogoutSoftwareConfirmOpen] = useState(false)
   const langRef = useRef<HTMLDivElement>(null)
+  const langTriggerRef = useRef<HTMLButtonElement>(null)
   const handleProductClickRef = useRef<(product: MenuProduct) => Promise<void>>(async () => {})
   /** Touch/WebView: voorkom dubbele afhandeling (pointerup + synthetische click). */
   const suppressProductGridClickRef = useRef(false)
@@ -4912,6 +4914,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
           <div ref={langRef} className="relative z-[40] shrink-0">
             <button
+              ref={langTriggerRef}
               type="button"
               aria-haspopup="listbox"
               aria-expanded={langOpen}
@@ -4926,17 +4929,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <LocaleFlagEmoji locale={locale} variant="inline" className="text-sm text-white sm:text-[15px]" />
               <svg className={`size-4 shrink-0 transition-transform ${langOpen ? 'rotate-180': ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
             </button>
-            {langOpen && (
-              <div className={ui.langPanel}>
-                {locales.map(lang => (
-                  <button key={lang} type="button" onClick={() => { setLocale(lang); setLangOpen(false) }}
-                    className={`flex w-full items-center gap-2 px-4 py-2.5 text-sm transition-colors ${ui.langRowHover} ${locale === lang ? ui.langRowActive : ui.langRowInactive}`}>
-                    <LocaleFlagEmoji locale={lang} />
-                    <span>{localeNames[lang]}</span>
-                  </button>
-                ))}
-              </div>
-            )}
+            <LocalePickerPortalMenu
+              isOpen={langOpen}
+              onOpenChange={setLangOpen}
+              triggerRef={langTriggerRef}
+              panelClassName={
+                kassaAppearanceDark
+                  ? 'overflow-hidden rounded-xl border border-zinc-600 bg-[#151a21] shadow-xl py-1'
+                  : 'overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl py-1'
+              }
+              rowHoverClassName={ui.langRowHover}
+              rowActiveClassName={ui.langRowActive}
+              rowInactiveClassName={ui.langRowInactive}
+            />
           </div>
 
         <button
