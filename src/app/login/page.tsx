@@ -24,7 +24,7 @@ import { LoginKassaCloseHintModal } from '@/components/LoginKassaCloseHintModal'
 import { LOGIN_QUERY_KASSA_CLOSE_TIP } from '@/lib/shop-login-kassa-tip'
 import { isVysionMainPortalHost } from '@/lib/vysion-site'
 import { kassaPosButtonClass } from '@/lib/kassa-pos-surface'
-import { marketingHomeHrefForProductLineParam } from '@/lib/registration-product-line'
+import { marketingHomeHrefFromSearchParams } from '@/lib/registration-product-line'
 
 /** Zelfde hosts als middleware `exactMainDomains`(+ dev): sessie blijft in localStorage van dit domein. */
 function stayOnMainDomainForShopSession(hostname: string): boolean {
@@ -122,7 +122,7 @@ export default function LoginPage() {
     const p = new URLSearchParams(window.location.search)
     setShowKassaCloseHint(p.get(LOGIN_QUERY_KASSA_CLOSE_TIP) === '1')
     setMarketingHomeHref(
-      marketingHomeHrefForProductLineParam(p.get('productLine')),
+      marketingHomeHrefFromSearchParams(p),
     )
   }, [])
 

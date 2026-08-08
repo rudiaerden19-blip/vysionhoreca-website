@@ -5,6 +5,7 @@ import {
   TENANT_MODULE_IDS,
   type TenantModuleId,
 } from '@/lib/tenant-modules'
+import { VYSION_ORDER_ORIGIN } from '@/lib/vysion-site'
 
 /** Keuze bij gratis registratie — presets hieronder zijn aanpasbaar zonder UI-wijziging. */
 export const REGISTRATION_PRODUCT_LINES = [
@@ -228,6 +229,7 @@ export function registrationLineWantsReservationBootstrap(line: RegistrationProd
 
 /** Externe marketinghome per productlijn (login/registratie op platformdomein). */
 export const PRODUCT_LINE_MARKETING_HOME: Partial<Record<RegistrationProductLine, string>> = {
+  online_bestellen: VYSION_ORDER_ORIGIN,
   restaurant_reservaties: 'https://www.tablevysion.com',
 }
 
@@ -237,6 +239,11 @@ export function marketingHomeHrefForProductLineParam(productLineParam: string | 
     if (external) return external
   }
   return '/'
+}
+
+/** `?line=` of `?productLine=` op login/registratie-URL. */
+export function marketingHomeHrefFromSearchParams(params: URLSearchParams): string {
+  return marketingHomeHrefForProductLineParam(registrationProductLineFromUrlSearchParams(params))
 }
 
 /** URL `?line=` of `?productLine=` (TableVysion login-link). */

@@ -9,6 +9,8 @@ import { persistTenantSessionWithToday, internalShopPathToTenantHostPath } from 
 import { LocaleFlagEmoji, LocaleFlagWithCode } from '@/components/LocaleFlagEmoji'
 import { RegistrationProductLinePicker } from '@/components/register/RegistrationProductLinePicker'
 import {
+  marketingHomeHrefForProductLineParam,
+  marketingHomeHrefFromSearchParams,
   registrationProductLineFromUrlSearchParams,
   type RegistrationProductLine,
 } from '@/lib/registration-product-line'
@@ -34,6 +36,7 @@ export default function RegisterPage() {
   const [productLineLockedFromUrl, setProductLineLockedFromUrl] = useState(false)
   const [step, setStep] = useState<'line' |  'form'>('line')
   const langRef = useRef<HTMLDivElement>(null)
+  const [marketingHomeHref, setMarketingHomeHref] = useState('/')
 
   // Read language from URL parameter on mount
   useEffect(() => {
@@ -44,6 +47,7 @@ export default function RegisterPage() {
         setLocale(langParam)
       }
       const lineFromUrl = registrationProductLineFromUrlSearchParams(params)
+      setMarketingHomeHref(marketingHomeHrefFromSearchParams(params))
       if (lineFromUrl) {
         setProductLine(lineFromUrl)
         setProductLineLockedFromUrl(true)
@@ -78,6 +82,7 @@ export default function RegisterPage() {
 
   const handleProductLineSelect = (line: RegistrationProductLine) => {
     setProductLine(line)
+    setMarketingHomeHref(marketingHomeHrefForProductLineParam(line))
     setError('')
     if (typeof window !== 'undefined') {
       const url = new URL(window.location.href)
@@ -356,7 +361,7 @@ export default function RegisterPage() {
     <main className="min-h-screen flex flex-col bg-[#e3e3e3]">
       {/* Header */}
       <header className="p-6 flex items-center justify-between">
-        <Link href="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
+        <Link href={marketingHomeHref} className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
@@ -412,7 +417,7 @@ export default function RegisterPage() {
           {step === 'line'? (
             <div className="space-y-8">
               <div className="text-center">
-                <Link href="/">
+                <Link href={marketingHomeHref}>
                   <span className="text-3xl font-bold">
                     <span className="text-accent">Vysion</span>
                   </span>
@@ -448,7 +453,7 @@ export default function RegisterPage() {
             <>
           {/* Logo */}
           <div className="text-center mb-10">
-            <Link href="/">
+            <Link href={marketingHomeHref}>
               <span className="text-3xl font-bold">
                 <span className="text-accent">Vysion</span>
               </span>
