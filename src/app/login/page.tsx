@@ -46,6 +46,8 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [isLangOpen, setIsLangOpen] = useState(false)
   const langRef = useRef<HTMLDivElement>(null)
+  const passwordInputRef = useRef<HTMLInputElement>(null)
+  const [passwordFieldReady, setPasswordFieldReady] = useState(false)
   const [showKassaCloseHint, setShowKassaCloseHint] = useState(false)
   const [marketingHomeHref, setMarketingHomeHref] = useState('/')
 
@@ -143,8 +145,24 @@ export default function LoginPage() {
     }
   }, [setLocale, locales])
 
+  // Geen vooringevuld wachtwoord (browser-autofill): veld blijft leeg tot de gebruiker typt.
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const clearPassword = () => {
+      setPassword('')
+      const el = passwordInputRef.current
+      if (el) el.value = ''
+    }
+    clearPassword()
+    const t1 = window.setTimeout(clearPassword, 50)
+    const t2 = window.setTimeout(clearPassword, 300)
+    return () => {
+      window.clearTimeout(t1)
+      window.clearTimeout(t2)
+    }
+  }, [])
+
   // Geen programmatische e-mail/wachtwoord: alle tenants gebruiken /login; autofill alleen via browser
-  // (Chrome: instellingen → wachtwoorden / opgeslagen gegevens voor dit domein wissen indien nodig).
 
   // Sluit taalmenu (pointerdown = betrouwbaar op Windows-touch)
   useEffect(() => {
@@ -164,7 +182,9 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email || !password) return
+    const passwordValue =
+      password.trim() || passwordInputRef.current?.value.trim() || ''
+    if (!email || !passwordValue) return
     
     setIsLoading(true)
     setError('')
@@ -191,7 +211,7 @@ export default function LoginPage() {
         headers: { 'Content-Type': 'application/json'},
         body: JSON.stringify({
           email,
-          password,
+          password: passwordValue,
           ...(targetTenantSlug ? { target_tenant_slug: targetTenantSlug } : {}),
         }),
       })
@@ -315,7 +335,19 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off" method="post">
+          <form onSubmit={handleSubmit} className="relative space-y-6" autoComplete="off" method="post">
+              <div
+                aria-hidden
+                className="pointer-events-none absolute h-0 w-0 overflow-hidden opacity-0"
+              >
+                <input type="text" name="fake_username" autoComplete="username" tabIndex={-1} />
+                <input
+                  type="password"
+                  name="fake_password"
+                  autoComplete="current-password"
+                  tabIndex={-1}
+                />
+              </div>
               <div>
                 <label htmlFor="email" className="mb-2 block text-sm font-medium text-gray-800">
                   {t('login.emailAddress')} <span className="text-red-500">*</span>
@@ -340,13 +372,16 @@ export default function LoginPage() {
                   {t('login.password')} <span className="text-red-500">*</span>
                 </label>
                 <input
+                  ref={passwordInputRef}
                   id="password"
                   name="vysion_password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  autoComplete="off"
+                  autoComplete="new-password"
+                  readOnly={!passwordFieldReady}
+                  onFocus={() => setPasswordFieldReady(true)}
                   placeholder=""
                   className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition-all placeholder:text-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/25"
                 />
@@ -360,7 +395,7 @@ export default function LoginPage() {
 
               <button
                 type="submit"
-                disabled={isLoading || !email || !password}
+                disabled={isLoading || !email || !password.trim()}
                 aria-busy={isLoading}
                 className={`flex w-full touch-manipulation select-none items-center justify-center gap-2 py-4 font-semibold disabled:opacity-50 ${kassaPosButtonClass(false)}`}
               >
