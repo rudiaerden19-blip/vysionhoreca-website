@@ -16,14 +16,12 @@ import {
   isShopAdminKassaPosPath,
   isShopAdminRetailKassaPosPath,
   normalizeShopAdminPathname,
-  submenuParentAllowedForSubmenuId,
   type TenantModuleId,
 } from '@/lib/tenant-modules'
 import {
   getSubmenuIdForPathname,
   hasShopAdminPathAccess,
   isAdminSubmenuEnabled,
-  isSubmenuEnabledInTenantConfig,
   isSubmenuForcedOn,
 } from '@/lib/admin-hamburger-modules'
 import {
@@ -349,10 +347,11 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
       !isShopAdminAnyPosPath(adminPath, params.tenant) &&
       subId &&
       !isSubmenuForcedOn(subId) &&
-      !isSubmenuEnabledInTenantConfig(
+      !isAdminSubmenuEnabled(
         subId,
-        enabledModulesJson,
-        submenuParentAllowedForSubmenuId(subId, gate, moduleAccess)
+        params.tenant,
+        moduleAccess,
+        enabledModulesJson
       )
     ) {
       router.replace(
