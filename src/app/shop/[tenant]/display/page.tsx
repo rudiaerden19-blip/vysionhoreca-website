@@ -27,9 +27,16 @@ import {
   orderItemLineTotalEur,
 } from '@/lib/order-items-display'
 import {
-  KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
-  kassaPosButtonClass,
-} from '@/lib/kassa-pos-surface'
+  SHOP_DISPLAY_PAGE_SHELL,
+  SHOP_DISPLAY_HEADER,
+  SHOP_DISPLAY_BTN_MENU,
+  SHOP_DISPLAY_TAB_ACTIVE,
+  SHOP_DISPLAY_TAB_INACTIVE,
+  SHOP_DISPLAY_BTN,
+  SHOP_DISPLAY_LANG_DROPDOWN,
+  SHOP_DISPLAY_MODAL_OVERLAY,
+  SHOP_DISPLAY_MODAL_PANEL,
+} from '@/lib/shop-display-surface'
 import { KitchenStyleOrderCard } from '@/components/shop-display/KitchenStyleOrderCard'
 import { KassaIconClose } from '@/lib/kassa-ui-icons'
 
@@ -809,7 +816,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     return ` ${tx('pickup')}`
   }
 
-  const DISPLAY_POS_BTN = `${kassaPosButtonClass(false)} touch-manipulation font-semibold text-[#f0f0f0]`
+  const DISPLAY_TAB_INACTIVE = `${SHOP_DISPLAY_TAB_INACTIVE}`
 
   const activeOrders = orders.filter(o => !['completed', 'rejected'].includes(o.status.toLowerCase()))
   const completedOrders = orders.filter(o => ['completed', 'rejected'].includes(o.status.toLowerCase()))
@@ -837,7 +844,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   if (loading) {
     return (
       <div
-        className={`min-h-[100dvh] w-full min-w-0 max-w-full ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} flex items-center justify-center text-white`}
+        className={`min-h-[100dvh] w-full min-w-0 max-w-full ${SHOP_DISPLAY_PAGE_SHELL} flex items-center justify-center`}
         style={{
           paddingTop: 'env(safe-area-inset-top, 0px)',
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
@@ -855,7 +862,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
   return (
     <div
-      className={`flex min-h-0 h-[100dvh] max-h-[100dvh] w-full min-w-0 max-w-full flex-col overflow-hidden ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} text-[#f0f0f0]`}
+      className={`flex min-h-0 h-[100dvh] max-h-[100dvh] w-full min-w-0 max-w-full flex-col overflow-hidden ${SHOP_DISPLAY_PAGE_SHELL}`}
       style={{
         width: '100%',
         paddingTop: 'env(safe-area-inset-top, 0px)',
@@ -913,7 +920,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
       </AnimatePresence>
 
       {/* Header */}
-      <header className="shrink-0 bg-gray-800 border-b border-gray-700 px-4 py-3 text-white">
+      <header className={`shrink-0 px-4 py-3 ${SHOP_DISPLAY_HEADER}`}>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-2 sm:gap-3">
             {kassaEntryHref && (
@@ -930,7 +937,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             {!kassaEntryHref && adminMenuHref && (
               <Link
                 href={adminMenuHref}
-                className="flex shrink-0 items-center gap-2 rounded-xl bg-gray-700 px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-gray-600"
+                className="flex shrink-0 items-center gap-2 rounded-xl bg-gray-100 px-3 py-2 text-sm font-bold text-gray-800 transition-colors hover:bg-gray-200"
               >
                 ← {t('adminLayout.menu')}
               </Link>
@@ -942,8 +949,8 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
               
             </div>
             <div className="min-w-0">
-              <h1 className="truncate text-lg font-bold sm:text-xl text-white">{tx('title')}</h1>
-              <p className="truncate text-xs text-white/95 sm:text-sm">{business?.business_name}</p>
+              <h1 className="truncate text-lg font-bold sm:text-xl text-gray-900">{tx('title')}</h1>
+              <p className="truncate text-xs text-gray-600 sm:text-sm">{business?.business_name}</p>
             </div>
           </div>
 
@@ -951,7 +958,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             {/* Sound - ALTIJD AAN */}
             <span 
               onClick={enableSound}
-              className="px-3 py-2 bg-green-500/20 text-green-400 rounded-xl flex items-center gap-2 text-sm cursor-pointer"
+              className="px-3 py-2 bg-green-100 text-green-800 rounded-xl flex items-center gap-2 text-sm cursor-pointer"
             >
                {tx('soundEnabled')}
             </span>
@@ -969,20 +976,20 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
             {/* Stats */}
             <div className="flex gap-2">
-              <span className="px-3 py-2 bg-orange-500/20 text-orange-400 rounded-lg text-sm font-bold">
+              <span className="px-3 py-2 bg-orange-100 text-orange-800 rounded-lg text-sm font-bold">
                 {activeOrders.filter(o => o.status.toLowerCase() === 'new').length} {tx('new')}
               </span>
-              <span className="px-3 py-2 bg-blue-500/20 text-blue-400 rounded-lg text-sm font-bold">
+              <span className="px-3 py-2 bg-blue-100 text-blue-800 rounded-lg text-sm font-bold">
                 {activeOrders.filter(o => o.status.toLowerCase() === 'confirmed').length} {tx('kitchen')}
               </span>
-              <span className="px-3 py-2 bg-green-500/20 text-green-400 rounded-lg text-sm font-bold">
+              <span className="px-3 py-2 bg-emerald-100 text-emerald-800 rounded-lg text-sm font-bold">
                 {activeOrders.filter(o => o.status.toLowerCase() === 'ready').length} {tx('ready')}
               </span>
             </div>
 
             {/* Clock */}
             <div className="text-right">
-              <p className="text-2xl font-mono font-bold">
+              <p className="text-2xl font-mono font-bold text-gray-900">
                 {currentTime.toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit'})}
               </p>
             </div>
@@ -1012,10 +1019,10 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
               <button
                 type="button"
                 onClick={() => setDisplayLangOpen((o) => !o)}
-                className="inline-flex touch-manipulation items-center gap-1 rounded-xl bg-white/10 px-3 py-2 text-sm font-bold text-white hover:bg-white/20"
+                className="inline-flex touch-manipulation items-center gap-1 rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm font-bold text-gray-800 hover:bg-gray-50"
                 title={t('languageSwitcher.selectLanguage')}
               >
-                <LocaleFlagEmoji locale={locale} className="text-base text-white" />
+                <LocaleFlagEmoji locale={locale} className="text-base" />
                 <svg
                   className={`size-3.5 shrink-0 transition-transform ${displayLangOpen ? 'rotate-180': ''}`}
                   fill="none"
@@ -1026,7 +1033,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                 </svg>
               </button>
               {displayLangOpen && (
-                <div className="absolute right-0 top-full z-[130] mt-1 max-h-80 min-w-[180px] overflow-y-auto rounded-xl border border-gray-600 bg-gray-900 shadow-xl">
+                <div className={SHOP_DISPLAY_LANG_DROPDOWN}>
                   {locales.map((lang) => (
                     <button
                       key={lang}
@@ -1035,8 +1042,8 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                         setLocale(lang)
                         setDisplayLangOpen(false)
                       }}
-                      className={`flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm transition-colors hover:bg-white/10 ${
-                        locale === lang ? 'bg-white/15 font-semibold text-white': 'text-gray-100'
+                      className={`flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm transition-colors hover:bg-gray-50 ${
+                        locale === lang ? 'bg-orange-50 font-semibold text-orange-900': 'text-gray-800'
                       }`}
                     >
                       <LocaleFlagEmoji locale={lang} />
@@ -1051,30 +1058,26 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
       </header>
 
       {/* Tabs */}
-      <div className="shrink-0 border-b border-black px-4 py-2 flex gap-2 items-center">
+      <div className="shrink-0 border-b border-gray-200 bg-white px-4 py-2 flex gap-2 items-center">
         <button
           onClick={() => setActiveTab('active')}
-          className={`px-4 py-2 rounded-lg font-bold transition-colors touch-manipulation ${
-            activeTab === 'active'
-              ? `${kassaPosButtonClass(true)}`
-              : DISPLAY_POS_BTN
-          }`}
+          className={
+            activeTab === 'active' ? SHOP_DISPLAY_TAB_ACTIVE : DISPLAY_TAB_INACTIVE
+          }
         >
           {tx('active')} ({activeOrders.length})
         </button>
         <button
           onClick={() => setActiveTab('completed')}
-          className={`px-4 py-2 rounded-lg font-bold transition-colors touch-manipulation ${
-            activeTab === 'completed'
-              ? `${kassaPosButtonClass(true)}`
-              : DISPLAY_POS_BTN
-          }`}
+          className={
+            activeTab === 'completed' ? SHOP_DISPLAY_TAB_ACTIVE : DISPLAY_TAB_INACTIVE
+          }
         >
           {tx('completed')} ({completedOrders.length})
         </button>
         <button
           onClick={handleCompleteAll}
-          className={`ml-auto px-4 py-2 font-bold transition-colors touch-manipulation ${DISPLAY_POS_BTN}`}
+          className={`ml-auto font-bold touch-manipulation ${SHOP_DISPLAY_BTN}`}
         >
            Alles afronden
         </button>
@@ -1084,8 +1087,8 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
       <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-4">
         {activeTab === 'active'? (
           sortedActiveOrders.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-white/70">
-              <p className="text-2xl font-bold text-white">{tx('noActiveOrders')}</p>
+            <div className="flex flex-col items-center justify-center h-full text-gray-600">
+              <p className="text-2xl font-bold text-gray-900">{tx('noActiveOrders')}</p>
               <p className="text-lg mt-2">{tx('ordersAppearHere')}</p>
             </div>
           ) : (
@@ -1155,7 +1158,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            className={`fixed inset-0 ${SHOP_DISPLAY_MODAL_OVERLAY} flex items-center justify-center z-50 p-4`}
             onClick={() => setSelectedOrder(null)}
           >
             <motion.div
@@ -1424,14 +1427,14 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+            className={`fixed inset-0 ${SHOP_DISPLAY_MODAL_OVERLAY} flex items-center justify-center z-50 p-4`}
             onClick={() => setShowRejectModal(false)}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-gray-800 rounded-3xl max-w-lg w-full p-6"
+              className={`${SHOP_DISPLAY_MODAL_PANEL} max-w-lg w-full p-6`}
               onClick={(e) => e.stopPropagation()}
             >
               <h2 className="text-2xl font-bold mb-2 text-center">{tx('rejectOrder')}</h2>
@@ -1491,14 +1494,14 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+            className={`fixed inset-0 ${SHOP_DISPLAY_MODAL_OVERLAY} flex items-center justify-center z-50 p-4`}
             onClick={() => setShowReservationsModal(false)}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-gray-800 rounded-3xl max-w-2xl w-full max-h-[80vh] overflow-hidden"
+              className={`${SHOP_DISPLAY_MODAL_PANEL} max-w-2xl w-full max-h-[80vh] overflow-hidden`}
               onClick={(e) => e.stopPropagation()}
             >
               <div className="p-6 border-b border-gray-700 flex items-center justify-between">
