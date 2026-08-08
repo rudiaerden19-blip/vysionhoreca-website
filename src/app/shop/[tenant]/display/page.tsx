@@ -9,7 +9,7 @@ import { useLanguage } from '@/i18n'
 import Link from 'next/link'
 import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
-import { getAdminKassaEntryHref } from '@/lib/tenant-modules'
+import { getAdminKassaEntryHref, getFirstAccessibleAdminPath } from '@/lib/tenant-modules'
 import { shopDisplayOrderTypeKey, nlBrowserPrintOrderTypeBanner } from '@/lib/shop-display-order-type'
 import { 
   activateAudioForIOS,
@@ -92,6 +92,11 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     !modulesLoading && moduleAccess.kassa
       ? getAdminKassaEntryHref(params.tenant, moduleAccess, enabledModulesJson) ?? `${adminBase}/kassa`
       : null
+  const adminMenuHref =
+    !modulesLoading && !kassaEntryHref
+      ? getFirstAccessibleAdminPath(params.tenant, moduleAccess, enabledModulesJson)
+      : null
+  const showReservations = !modulesLoading && moduleAccess.reservaties
   
   // Translation helper for shopDisplay keys
   const tx = (key: string) => t(`shopDisplay.${key}`)
@@ -166,8 +171,12 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     }
   }, [params.tenant, audioActivated])
 
-  // Load pending reservations
+  // Load pending reservations (alleen tenants met reservatiemodule)
   useEffect(() => {
+    if (!showReservations) {
+      setReservations([])
+      return
+    }
     async function loadReservations() {
       const { data } = await supabase
         .from('reservations')
@@ -186,7 +195,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     // Poll every 30 seconds
     const interval = setInterval(loadReservations, 30000)
     return () => clearInterval(interval)
-  }, [params.tenant])
+  }, [params.tenant, showReservations])
 
   // Update reservation status
   async function updateReservationStatus(id: string, status: 'confirmed' |  'cancelled') {
@@ -918,6 +927,14 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                 {t('adminLayout.pos')}
               </Link>
             )}
+            {!kassaEntryHref && adminMenuHref && (
+              <Link
+                href={adminMenuHref}
+                className="flex shrink-0 items-center gap-2 rounded-xl bg-gray-700 px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-gray-600"
+              >
+                ← {t('adminLayout.menu')}
+              </Link>
+            )}
             <div
               className="h-10 w-10 shrink-0 rounded-xl flex items-center justify-center text-xl"
               style={{ backgroundColor: business?.primary_color }}
@@ -970,7 +987,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
               </p>
             </div>
 
-            {/* Reserveringen knop */}
+            {showReservations && (
             <button
               onClick={() => setShowReservationsModal(true)}
               className="px-3 py-2 bg-orange-600 hover:bg-orange-500 rounded-xl text-sm font-bold text-white relative"
@@ -982,6 +999,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                 </span>
               )}
             </button>
+            )}
 
             <Link
               href={`/keuken/${params.tenant}`}
@@ -1468,7 +1486,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
         )}
 
         {/* Reserveringen Modal */}
-        {showReservationsModal && (
+        {showReservations && showReservationsModal && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

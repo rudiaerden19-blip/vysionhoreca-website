@@ -10,7 +10,7 @@ import { useLanguage } from '@/i18n'
 import Link from 'next/link'
 import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
-import { getAdminKassaEntryHref } from '@/lib/tenant-modules'
+import { getAdminKassaEntryHref, getFirstAccessibleAdminPath } from '@/lib/tenant-modules'
 import { shopDisplayOrderTypeKey } from '@/lib/shop-display-order-type'
 import { 
   activateAudioForIOS,
@@ -76,6 +76,11 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     !modulesLoading && moduleAccess.kassa
       ? getAdminKassaEntryHref(params.tenant, moduleAccess, enabledModulesJson) ?? `${adminBase}/kassa`
       : null
+  const adminMenuHref =
+    !modulesLoading && !kassaEntryHref
+      ? getFirstAccessibleAdminPath(params.tenant, moduleAccess, enabledModulesJson)
+      : null
+  const displayHref = `/shop/${params.tenant}/display`
   
   // Translation helper for kitchenDisplay keys
   const tx = (key: string) => t(`kitchenDisplay.${key}`)
@@ -490,6 +495,11 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                 {t('adminLayout.pos')}
               </Link>
             )}
+            {!kassaEntryHref && adminMenuHref && (
+              <Link href={adminMenuHref} className={`flex shrink-0 items-center gap-2 px-3 py-2 text-sm ${KITCHEN_POS_BTN_ACCENT}`}>
+                ← {t('adminLayout.menu')}
+              </Link>
+            )}
             <div className={`flex h-10 w-10 shrink-0 items-center justify-center text-xl ${KITCHEN_POS_BTN}`}>
               
             </div>
@@ -530,6 +540,10 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
             <div className={`font-mono text-2xl font-bold tabular-nums ${KASSA_POS_SELECTED_ACCENT_TEXT}`}>
               {currentTime.toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit'})}
             </div>
+
+            <Link href={displayHref} className={`px-3 py-2 text-sm font-bold ${KITCHEN_POS_BTN_ACCENT}`}>
+              {t('adminLayout.onlineDisplay')}
+            </Link>
 
             <div className="relative z-[130]" ref={keukenLangRef}>
               <button
