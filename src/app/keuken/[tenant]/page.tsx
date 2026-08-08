@@ -13,12 +13,12 @@ import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
 import { getAdminKassaEntryHref, getFirstAccessibleAdminPath } from '@/lib/tenant-modules'
 import { shopDisplayOrderTypeKey } from '@/lib/shop-display-order-type'
 import { 
-  activateAudioForIOS,
-  prewarmAudio,
   playOrderNotification,
-  isAudioActivatedThisSession,
-  markAudioActivated
 } from '@/lib/sounds'
+import {
+  OnlineDisplaySoundActivationScreen,
+  useOnlineDisplaySoundGate,
+} from '@/components/shop-display/OnlineDisplaySoundGate'
 import { sendToVysionPrintAgent } from '@/lib/vysion-print-agent-client'
 import { fetchKitchenQueueOrders } from '@/lib/kitchen-queue-orders'
 import {
@@ -95,9 +95,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   const [loading, setLoading] = useState(true)
   const [initialLoadDone, setInitialLoadDone] = useState(false)
   const [currentTime, setCurrentTime] = useState(new Date())
-  const [soundEnabled, setSoundEnabled] = useState(true)
-  // Check if already activated this session - skip activation screen if so
-  const [audioActivated, setAudioActivated] = useState(() => isAudioActivatedThisSession(params.tenant))
+  const { soundActivated, activateSound } = useOnlineDisplaySoundGate(params.tenant)
   const [newOrderIds, setNewOrderIds] = useState<Set<string>>(new Set())
   const alertIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const printRef = useRef<HTMLDivElement>(null)
@@ -111,17 +109,10 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     return () => clearInterval(interval)
   }, [])
 
-  // Load initial data - GELUID ALTIJD AAN
   useEffect(() => {
     loadData()
-    setSoundEnabled(true)
-    
-    // Prewarm audio system bij laden (nieuwe robuuste methode)
-    if (audioActivated) {
-      prewarmAudio()
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.tenant, audioActivated])
+  }, [params.tenant])
 
   useEffect(() => {
     function handlePointerOutside(e: PointerEvent) {
@@ -133,9 +124,8 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     return () => document.removeEventListener('pointerdown', handlePointerOutside, true)
   }, [])
 
-  // Continuous alert for new orders - plays every 5 seconds
-  // KRITIEK: Altijd proberen geluid te spelen
   useEffect(() => {
+    if (!soundActivated) return
     if (newOrderIds.size > 0) {
       // Play immediately
       playOrderNotification()
@@ -156,7 +146,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
         clearInterval(alertIntervalRef.current)
       }
     }
-  }, [newOrderIds.size])
+  }, [newOrderIds.size, soundActivated])
 
   // Polling - check for orders every 3 seconds
   // Only starts AFTER initial load is complete
@@ -177,7 +167,9 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
           trulyNewOrders.forEach((order) => {
             setNewOrderIds((prev) => new Set([...prev, order.id]))
           })
-          playOrderNotification()
+          if (soundActivated) {
+            playOrderNotification()
+          }
         }
 
         setOrders(parsed)
@@ -192,7 +184,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     return () => {
       clearInterval(pollInterval)
     }
-  }, [params.tenant, initialLoadDone])
+  }, [params.tenant, initialLoadDone, soundActivated])
 
   async function loadData() {
     try {
@@ -227,9 +219,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   }
 
   function enableSound() {
-    activateAudioForIOS()
-    setSoundEnabled(true)
-    playOrderNotification()
+    activateSound()
   }
 
   async function handleAllReady() {
@@ -487,6 +477,10 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
       }}
     >
+      {!soundActivated && (
+        <OnlineDisplaySoundActivationScreen onActivate={activateSound} />
+      )}
+
       {/* Header */}
       <header className={`shrink-0 px-4 py-3 ${SHOP_DISPLAY_HEADER}`}>
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -514,9 +508,15 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
           </div>
 
           <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-4">
-            {/* Sound - ALTIJD AAN */}
-            <span onClick={enableSound} className={`flex cursor-pointer items-center gap-2 text-sm ${SHOP_DISPLAY_BTN}`}>
-               {tx('soundEnabled')}
+            <span
+              onClick={enableSound}
+              className={`flex cursor-pointer items-center gap-2 text-sm rounded-xl px-3 py-2 ${
+                soundActivated
+                  ? SHOP_DISPLAY_BTN
+                  : 'bg-amber-100 text-amber-900 ring-2 ring-amber-400'
+              }`}
+            >
+              {soundActivated ? tx('soundEnabled') : tx('soundOn')}
             </span>
 
             {/* Order count */}

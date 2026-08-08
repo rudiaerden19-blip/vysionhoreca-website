@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { getTenantSettings, updateOrderStatus, TenantSettings, approveWebshopOrder, completeWebshopOrder, isWebshopOrder } from '@/lib/admin-api'
+import { isWebshopChannelNewOrder } from '@/lib/admin-api-order-helpers'
 import { formatOrderScheduleDetail } from '@/lib/format-order-schedule'
 import { useLanguage } from '@/i18n'
 import Link from 'next/link'
@@ -12,12 +13,12 @@ import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
 import { getAdminKassaEntryHref, getFirstAccessibleAdminPath } from '@/lib/tenant-modules'
 import { shopDisplayOrderTypeKey, nlBrowserPrintOrderTypeBanner } from '@/lib/shop-display-order-type'
 import { 
-  activateAudioForIOS,
-  prewarmAudio,
   playOrderNotification,
-  isAudioActivatedThisSession,
-  markAudioActivated
 } from '@/lib/sounds'
+import {
+  OnlineDisplaySoundActivationScreen,
+  useOnlineDisplaySoundGate,
+} from '@/components/shop-display/OnlineDisplaySoundGate'
 import { sendToVysionPrintAgent } from '@/lib/vysion-print-agent-client'
 import { getAuthHeaders } from '@/lib/auth-headers'
 import { adminDineInSeatAuditLine, dineInSeatLineNl } from '@/lib/admin-order-display'
@@ -129,9 +130,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   const [loading, setLoading] = useState(true)
   const [initialLoadDone, setInitialLoadDone] = useState(false)
   const [currentTime, setCurrentTime] = useState(new Date())
-  const [soundEnabled, setSoundEnabled] = useState(true)
-  // Check if already activated this session - skip activation screen if so
-  const [audioActivated, setAudioActivated] = useState(() => isAudioActivatedThisSession(params.tenant))
+  const { soundActivated, activateSound } = useOnlineDisplaySoundGate(params.tenant)
   const [newOrderIds, setNewOrderIds] = useState<Set<string>>(new Set())
   const [activeTab, setActiveTab] = useState<'active' |  'completed'>('active')
   const [reservations, setReservations] = useState<Reservation[]>([])
@@ -167,16 +166,6 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     document.addEventListener('pointerdown', handlePointerOutside, true)
     return () => document.removeEventListener('pointerdown', handlePointerOutside, true)
   }, [])
-
-  // GELUID ALTIJD AAN bij laden + prewarm audio
-  useEffect(() => {
-    setSoundEnabled(true)
-    
-    // Prewarm audio system bij laden (nieuwe robuuste methode)
-    if (audioActivated) {
-      prewarmAudio()
-    }
-  }, [params.tenant, audioActivated])
 
   // Load pending reservations (alleen tenants met reservatiemodule)
   useEffect(() => {
@@ -226,18 +215,13 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   // Load initial data - CRITICAL: Initialize known IDs BEFORE polling starts
   useEffect(() => {
     loadData()
-    const savedSound = localStorage.getItem(`shop_display_sound_${params.tenant}`)
-    if (savedSound === 'true') {
-      setSoundEnabled(true)
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
 
 
-  // Continuous alert sound for new orders - plays every 3 seconds
+  // Continuous alert sound for new orders - alleen na geluid-unlock
   useEffect(() => {
-    // ALTIJD geluid bij nieuwe bestellingen
-    // KRITIEK: Altijd proberen geluid te spelen
+    if (!soundActivated) return
     if (newOrderIds.size > 0) {
       // Play immediately
       playOrderNotification()
@@ -258,7 +242,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
         clearInterval(alertIntervalRef.current)
       }
     }
-  }, [newOrderIds.size])
+  }, [newOrderIds.size, soundActivated])
 
   // MAIN POLLING - Check for new orders every 3 seconds
   // Only starts AFTER initial load is complete
@@ -284,7 +268,8 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
           // Find TRULY new orders (not in known set AND status is 'new')
           const trulyNewOrders = webshopOnly.filter(o => 
             !knownOrderIdsRef.current.has(o.id) && 
-            o.status.toLowerCase() === 'new'
+            o.status.toLowerCase() === 'new' &&
+            isWebshopChannelNewOrder(o)
           )
           
           // Add ALL current order IDs to known set
@@ -296,8 +281,9 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             trulyNewOrders.forEach(order => {
               setNewOrderIds(prev => new Set([...prev, order.id]))
             })
-            // ALTIJD geluid spelen bij nieuwe bestelling
-            playOrderNotification()
+            if (soundActivated) {
+              playOrderNotification()
+            }
           }
           
           setOrders(webshopOnly)
@@ -315,7 +301,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
         clearInterval(pollingIntervalRef.current)
       }
     }
-  }, [params.tenant, initialLoadDone])
+  }, [params.tenant, initialLoadDone, soundActivated])
 
   async function loadData() {
     try {
@@ -370,9 +356,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   }
 
   function enableSound() {
-    activateAudioForIOS()
-    setSoundEnabled(true)
-    playOrderNotification()
+    activateSound()
   }
 
   // EMAIL FUNCTION - BULLETPROOF with all required business info
@@ -869,6 +853,10 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
       }}
     >
+      {!soundActivated && (
+        <OnlineDisplaySoundActivationScreen onActivate={activateSound} />
+      )}
+
       {/* FULLSCREEN NEW ORDER ALERT */}
       <AnimatePresence>
         {newOrderIds.size > 0 && (
@@ -955,12 +943,16 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
           </div>
 
           <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-4">
-            {/* Sound - ALTIJD AAN */}
-            <span 
+            {/* Sound */}
+            <span
               onClick={enableSound}
-              className="px-3 py-2 bg-green-100 text-green-800 rounded-xl flex items-center gap-2 text-sm cursor-pointer"
+              className={`px-3 py-2 rounded-xl flex items-center gap-2 text-sm cursor-pointer ${
+                soundActivated
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-amber-100 text-amber-900 ring-2 ring-amber-400'
+              }`}
             >
-               {tx('soundEnabled')}
+              {soundActivated ? tx('soundEnabled') : tx('soundOn')}
             </span>
 
             {/* New order indicator */}
