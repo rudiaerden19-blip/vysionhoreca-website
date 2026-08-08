@@ -9,6 +9,9 @@ import KassaProductNavMenu from './KassaProductNavMenu'
 
 const HERO_BG = '/images/hero-header.png'
 
+/** Marketing kassa-hero: oranje accent op titel/prijs (niet platform `accent`). */
+const HERO_KASSA_ORANGE = 'text-[#FF6B35]'
+
 /** Hoogte vaste marketing-nav (~ `Navigation`h-20); inhoud niet onder de balk laten verdwijnen. */
 const NAV_TOP_OFFSET_CLASS = 'pt-20'
 
@@ -169,7 +172,7 @@ export default function HomeLandingHero() {
 
       {/* Center content */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 sm:px-6 text-center py-6 sm:py-8">
-        <h1 className="mx-auto w-full max-w-4xl text-center text-3xl sm:text-4xl md:text-5xl lg:text-[2.85rem] font-bold leading-tight tracking-tight text-accent">
+        <h1 className={`mx-auto w-full max-w-4xl text-center text-3xl sm:text-4xl md:text-5xl lg:text-[2.85rem] font-bold leading-tight tracking-tight ${HERO_KASSA_ORANGE}`}>
           {t('heroLanding.title')}
         </h1>
         <p className="mt-4 sm:mt-5 text-lg sm:text-xl md:text-2xl text-white font-semibold max-w-2xl leading-snug">
@@ -186,7 +189,7 @@ export default function HomeLandingHero() {
           <p className="text-xl sm:text-2xl md:text-[1.65rem] font-bold text-white tracking-tight text-balance leading-snug">
             {t('heroLanding.ctaModulesHeadline')}
           </p>
-          <p className="mt-2 text-base sm:text-lg font-semibold text-accent text-balance leading-snug">
+          <p className={`mt-2 text-base sm:text-lg font-semibold text-balance leading-snug ${HERO_KASSA_ORANGE}`}>
             {t('heroLanding.ctaModulesSubline')}
           </p>
           <p className="mt-1.5 text-[0.65rem] sm:text-[0.7rem] text-white/65 font-normal leading-snug max-w-md mx-auto">
@@ -197,7 +200,7 @@ export default function HomeLandingHero() {
               <span className="text-base sm:text-lg text-white/90 font-medium shrink-0">
                 {t('heroLanding.ctaModulesPricePrefix')}
               </span>
-              <span className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-accent tracking-tight tabular-nums shrink-0">
+              <span className={`text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight tabular-nums shrink-0 ${HERO_KASSA_ORANGE}`}>
                 €&nbsp;{t('heroLanding.ctaModulesPriceAmount')}
               </span>
               {t('heroLanding.ctaModulesPricePeriod') ? (
