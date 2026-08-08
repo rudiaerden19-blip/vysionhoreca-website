@@ -8,6 +8,7 @@ import {
   isHorecaKassaPosScreenEnabled,
   isRetailKassaPosScreenEnabled,
 } from '@/lib/tenant-modules'
+import { isVysionOrderTenant } from '@/lib/admin-hamburger-modules'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   DndContext, 
@@ -315,11 +316,14 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
   const { moduleAccess, enabledModulesJson } = useTenantModuleFlagsContext()
   const horecaKassaOn = isHorecaKassaPosScreenEnabled(moduleAccess)
   const retailKassaOn = isRetailKassaPosScreenEnabled(moduleAccess, enabledModulesJson)
-  const forcedCatalogMode: ProductCatalogMode | null = !horecaKassaOn
-    ? 'retail'
-    : !retailKassaOn
-      ? 'horeca'
-      : null
+  const vysionOrderTenant = isVysionOrderTenant(moduleAccess, enabledModulesJson)
+  const forcedCatalogMode: ProductCatalogMode | null = vysionOrderTenant
+    ? 'horeca'
+    : !horecaKassaOn
+      ? 'retail'
+      : !retailKassaOn
+        ? 'horeca'
+        : null
   const showCatalogSlider = horecaKassaOn && retailKassaOn
   const { ask, ConfirmModal } = useAdminConfirm(t)
   const [products, setProducts] = useState<MenuProduct[]>([])
@@ -385,7 +389,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     }
     const q = searchParams.get('mode')
     if (q === 'retail') return 'retail'
-    return horecaKassaOn ? 'horeca': 'retail'
+    return vysionOrderTenant || horecaKassaOn ? 'horeca' : 'retail'
   }
 
   // Load data on mount
