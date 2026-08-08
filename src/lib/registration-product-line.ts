@@ -1,4 +1,4 @@
-import { collectAllSubmenuIds } from '@/lib/admin-hamburger-modules'
+import { collectAllSubmenuIds, VYSION_ORDER_TENANT_FLAG } from '@/lib/admin-hamburger-modules'
 import {
   getFirstAccessibleAdminPath,
   mergeEnabledModulesFromDb,
@@ -203,6 +203,9 @@ export function buildRegistrationEnabledModulesJson(
   }
 
   raw.account = true
+  if (line === 'online_bestellen') {
+    raw[VYSION_ORDER_TENANT_FLAG] = true
+  }
   return raw
 }
 

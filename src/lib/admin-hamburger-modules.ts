@@ -53,14 +53,27 @@ export function isOnlineShopCatalogSubmenu(subId: string): boolean {
   return ONLINE_SHOP_CATALOG_SUBMENU_IDS.has(subId)
 }
 
-export function isOnlineShopOnlyTenant(
+/** In `tenants.enabled_modules` voor registratie via vysionorder.com / `line=online_bestellen`. */
+export const VYSION_ORDER_TENANT_FLAG = 'vysion_order'
+
+/** Vysion Order — shopmenu + geen kassa-POS; horeca-/retail-kassa blijft ongewijzigd. */
+export function isVysionOrderTenant(
   access: Record<TenantModuleId, boolean>,
   enabledJson: Record<string, boolean> | null
 ): boolean {
+  if (enabledJson?.[VYSION_ORDER_TENANT_FLAG] === true) return true
   return (
     !tenantHasKassaPosScreen(access, enabledJson) &&
     !!(access['online-bestellingen'] || access.online)
   )
+}
+
+/** @deprecated Gebruik `isVysionOrderTenant`. */
+export function isOnlineShopOnlyTenant(
+  access: Record<TenantModuleId, boolean>,
+  enabledJson: Record<string, boolean> | null
+): boolean {
+  return isVysionOrderTenant(access, enabledJson)
 }
 
 export type AdminHamburgerItem = {
@@ -781,14 +794,7 @@ export function isAdminSubmenuEnabled(
   moduleAccess: Record<TenantModuleId, boolean>,
   enabledJson: Record<string, boolean> | null
 ): boolean {
-  if (
-    isOnlineShopCatalogSubmenu(subId) &&
-    isOnlineShopOnlyTenant(moduleAccess, enabledJson)
-  ) {
-    if (enabledJson && hasExplicitEnabledModules(enabledJson)) {
-      if (enabledJson[subId] === false) return false
-      if (enabledJson[subId] === true) return true
-    }
+  if (isOnlineShopCatalogSubmenu(subId) && isVysionOrderTenant(moduleAccess, enabledJson)) {
     return true
   }
   if (enabledJson && hasExplicitEnabledModules(enabledJson)) {
@@ -866,6 +872,12 @@ export function hasShopAdminPathAccess(
   if (hasModuleAccessForPathname(pathname, tenantSlug, moduleAccess)) return true
   const subId = getSubmenuIdForPathname(pathname, tenantSlug, moduleAccess)
   if (!subId) return false
+  if (
+    isVysionOrderTenant(moduleAccess, enabledModulesJson) &&
+    isOnlineShopCatalogSubmenu(subId)
+  ) {
+    return true
+  }
   if (!isKassaPosSubmenuVisibleForTenant(subId, moduleAccess, enabledModulesJson)) {
     return false
   }
@@ -892,15 +904,7 @@ function moduleRowVisibleInMenu(
   effectiveAccess: Record<TenantModuleId, boolean>
 ): boolean {
   if (m.rowKey === 'shop_instellingen') {
-    if (!isOnlineShopOnlyTenant(effectiveAccess, enabledModulesJson)) return false
-    if (enabledModulesJson && hasExplicitEnabledModules(enabledModulesJson)) {
-      return m.items.some(
-        (item) =>
-          enabledModulesJson[item.id] === true ||
-          (isOnlineShopCatalogSubmenu(item.id) && enabledModulesJson[item.id] !== false)
-      )
-    }
-    return true
+    return isVysionOrderTenant(effectiveAccess, enabledModulesJson)
   }
   if (enabledModulesJson && hasExplicitEnabledModules(enabledModulesJson)) {
     return (
@@ -928,7 +932,7 @@ export function filterHamburgerModulesForAccess(
 
   return modules
     .filter((m) => {
-      if (m.rowKey === 'kassa' && isOnlineShopOnlyTenant(effectiveAccess, enabledModulesJson)) {
+      if (m.rowKey === 'kassa' && isVysionOrderTenant(effectiveAccess, enabledModulesJson)) {
         return false
       }
       return moduleRowVisibleInMenu(m, menuAccess, enabledModulesJson, effectiveAccess)
@@ -942,12 +946,8 @@ export function filterHamburgerModulesForAccess(
         if (
           m.rowKey === 'shop_instellingen' &&
           isOnlineShopCatalogSubmenu(item.id) &&
-          isOnlineShopOnlyTenant(effectiveAccess, enabledModulesJson)
+          isVysionOrderTenant(effectiveAccess, enabledModulesJson)
         ) {
-          if (enabledModulesJson && hasExplicitEnabledModules(enabledModulesJson)) {
-            if (enabledModulesJson[item.id] === false) return false
-            if (enabledModulesJson[item.id] === true) return true
-          }
           return true
         }
         if (item.href.includes('/labels') && !effectiveLabelPrinting) return false
