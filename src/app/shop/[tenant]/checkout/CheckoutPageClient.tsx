@@ -149,6 +149,7 @@ export default function CheckoutPageClient({
       await migrateLegacyWebshopLocalStorage(params.tenant)
       await loadData()
       await loadCart()
+      setLoading(false)
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
@@ -224,7 +225,7 @@ export default function CheckoutPageClient({
       }
     }
     
-    setLoading(false)
+    // loading wordt na loadCart() gezet in useEffect
   }
 
   async function loadCart() {

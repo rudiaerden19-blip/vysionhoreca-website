@@ -17,7 +17,57 @@ export type WebshopBrowserSession = {
   shop_customer_id: string | null
 }
 
-export async function fetchWebshopBrowserSession(tenantSlug: string): Promise<WebshopBrowserSession> {
+function sessionCartKey(tenantSlug: string): string {
+  return `vysion_wbs_cart_${tenantSlug}`
+}
+
+function legacyLocalCartKey(tenantSlug: string): string {
+  return `cart_${tenantSlug}`
+}
+
+function parseStoredCart(raw: string | null): WebshopStoredCartItem[] {
+  if (!raw) return []
+  try {
+    const parsed = JSON.parse(raw) as unknown
+    if (!Array.isArray(parsed)) return []
+    return parsed as WebshopStoredCartItem[]
+  } catch {
+    return []
+  }
+}
+
+/** Browser-backup als Supabase-tabel/cookie-sessie (nog) niet werkt — zelfde tab + refresh. */
+export function readWebshopCartClientBackup(tenantSlug: string): WebshopStoredCartItem[] {
+  if (typeof window === 'undefined') return []
+  try {
+    const fromSession = parseStoredCart(window.sessionStorage.getItem(sessionCartKey(tenantSlug)))
+    if (fromSession.length > 0) return fromSession
+    return parseStoredCart(window.localStorage.getItem(legacyLocalCartKey(tenantSlug)))
+  } catch {
+    return []
+  }
+}
+
+export function writeWebshopCartClientBackup(tenantSlug: string, cart: WebshopStoredCartItem[]): void {
+  if (typeof window === 'undefined') return
+  const payload = JSON.stringify(cart)
+  try {
+    window.sessionStorage.setItem(sessionCartKey(tenantSlug), payload)
+  } catch {
+    /* ignore */
+  }
+  try {
+    if (cart.length === 0) {
+      window.localStorage.removeItem(legacyLocalCartKey(tenantSlug))
+    } else {
+      window.localStorage.setItem(legacyLocalCartKey(tenantSlug), payload)
+    }
+  } catch {
+    /* ignore */
+  }
+}
+
+async function fetchWebshopBrowserSessionFromServer(tenantSlug: string): Promise<WebshopBrowserSession> {
   const empty: WebshopBrowserSession = { cart: [], whatsapp_phone: null, shop_customer_id: null }
   try {
     const res = await fetch(
@@ -41,6 +91,22 @@ export async function fetchWebshopBrowserSession(tenantSlug: string): Promise<We
   }
 }
 
+export async function fetchWebshopBrowserSession(tenantSlug: string): Promise<WebshopBrowserSession> {
+  const fromServer = await fetchWebshopBrowserSessionFromServer(tenantSlug)
+  if (fromServer.cart.length > 0) {
+    writeWebshopCartClientBackup(tenantSlug, fromServer.cart)
+    return fromServer
+  }
+
+  const backupCart = readWebshopCartClientBackup(tenantSlug)
+  if (backupCart.length > 0) {
+    void patchWebshopBrowserSession(tenantSlug, { cart: backupCart })
+    return { ...fromServer, cart: backupCart }
+  }
+
+  return fromServer
+}
+
 export async function patchWebshopBrowserSession(
   tenantSlug: string,
   patch: Partial<{
@@ -49,6 +115,10 @@ export async function patchWebshopBrowserSession(
     shop_customer_id: string | null
   }>,
 ): Promise<boolean> {
+  if ('cart' in patch && Array.isArray(patch.cart)) {
+    writeWebshopCartClientBackup(tenantSlug, patch.cart)
+  }
+
   try {
     const res = await fetch('/api/shop/browser-session', {
       method: 'PATCH',
@@ -63,10 +133,10 @@ export async function patchWebshopBrowserSession(
   }
 }
 
-/** Verwijder legacy webshop-keys (eenmalig per pageload). */
+/** Verwijder legacy webshop-keys (whatsapp/klant); mand blijft in backup tot server sync lukt. */
 export function purgeLegacyWebshopLocalStorage(tenantSlug: string): void {
   if (typeof window === 'undefined') return
-  const keys = [`cart_${tenantSlug}`, `whatsapp_phone_${tenantSlug}`, `customer_${tenantSlug}`]
+  const keys = [`whatsapp_phone_${tenantSlug}`, `customer_${tenantSlug}`]
   for (const k of keys) {
     try {
       window.localStorage.removeItem(k)
@@ -76,14 +146,14 @@ export function purgeLegacyWebshopLocalStorage(tenantSlug: string): void {
   }
 }
 
-/** Eén keer legacy localStorage → server-sessie voordat keys gewist worden. */
+/** Legacy localStorage → server-sessie + client-backup. */
 export async function migrateLegacyWebshopLocalStorage(tenantSlug: string): Promise<void> {
   if (typeof window === 'undefined') return
   let legacyCart: WebshopStoredCartItem[] | null = null
   let legacyWa: string | null = null
   let legacyCustomer: string | null = null
   try {
-    const rawCart = window.localStorage.getItem(`cart_${tenantSlug}`)
+    const rawCart = window.localStorage.getItem(legacyLocalCartKey(tenantSlug))
     if (rawCart) {
       const parsed = JSON.parse(rawCart) as unknown
       if (Array.isArray(parsed)) legacyCart = parsed as WebshopStoredCartItem[]
@@ -94,7 +164,7 @@ export async function migrateLegacyWebshopLocalStorage(tenantSlug: string): Prom
     /* ignore */
   }
 
-  const session = await fetchWebshopBrowserSession(tenantSlug)
+  const session = await fetchWebshopBrowserSessionFromServer(tenantSlug)
   const patch: Partial<{
     cart: WebshopStoredCartItem[]
     whatsapp_phone: string | null
@@ -103,6 +173,7 @@ export async function migrateLegacyWebshopLocalStorage(tenantSlug: string): Prom
 
   if (session.cart.length === 0 && legacyCart && legacyCart.length > 0) {
     patch.cart = legacyCart
+    writeWebshopCartClientBackup(tenantSlug, legacyCart)
   }
   if (!session.whatsapp_phone && legacyWa) {
     patch.whatsapp_phone = legacyWa
