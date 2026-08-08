@@ -7,8 +7,12 @@ function cookieName(tenantSlug: string): string {
   return `vysion_wbs_${tenantSlug.replace(/[^a-zA-Z0-9_-]/g, '_')}`
 }
 
-function cookiePath(tenantSlug: string): string {
-  return `/shop/${tenantSlug}`
+function cookiePath(_tenantSlug: string): string {
+  // Path moet `/` zijn: op *.ordervysion.com staat de URL op `/menu`, `/checkout` (rewrite),
+  // terwijl API-calls naar `/api/shop/browser-session` gaan. Met `/shop/{tenant}` werd de
+  // httpOnly-cookie nooit meegestuurd → checkout zag een lege mand.
+  // Cookie-naam is per tenant (`vysion_wbs_*`), dus path `/` is veilig op gedeelde hosts.
+  return '/'
 }
 
 type SessionRow = {

@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { isKioskSearchParams, kioskShopHref } from '@/lib/kiosk-mode'
 import { getMenuCategories, getMenuProducts, getAllMenuProductOptionsForTenant, getTenantSettings, getActivePromotions, getExceptionalClosings, ExceptionalClosing, MenuCategory, MenuProduct, ProductOption, ProductOptionChoice, Promotion, compareMenuProductsBySortOrder } from '@/lib/admin-api'
-import { patchWebshopBrowserSession, migrateLegacyWebshopLocalStorage } from '@/lib/webshop-browser-session'
+import { patchWebshopBrowserSession, migrateLegacyWebshopLocalStorage, fetchWebshopBrowserSession } from '@/lib/webshop-browser-session'
 import { useLanguage } from '@/i18n'
 import { fetchPublicOnlineOrderingEnabled } from '@/lib/tenant-public-online-ordering'
 
@@ -234,6 +234,7 @@ export default function MenuPageClient({
   const [activeCategory, setActiveCategory] = useState<string>('')
   const [cart, setCart] = useState<CartItem[]>([])
   const [cartOpen, setCartOpen] = useState(false)
+  const cartSessionReadyRef = useRef(false)
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null)
   const [productOptions, setProductOptions] = useState<ProductOption[]>([])
   const [selectedChoices, setSelectedChoices] = useState<Record<string, string>>({})
@@ -397,6 +398,7 @@ export default function MenuPageClient({
 
   // Mand sync naar browser-sessie (Supabase + httpOnly cookie), niet localStorage
   useEffect(() => {
+    if (!cartSessionReadyRef.current) return
     const cartForStorage = cart.map((c) => ({
       id: c.item.id,
       name: c.item.name,
@@ -411,6 +413,7 @@ export default function MenuPageClient({
   }, [cart, params.tenant])
 
   useEffect(() => {
+    cartSessionReadyRef.current = false
     async function loadData() {
       const [categoriesData, productsData, tenantData, optionsMap, promotionsData, closingsData] = await Promise.all([
         getMenuCategories(params.tenant),
@@ -480,6 +483,48 @@ export default function MenuPageClient({
         })
 
       setMenuItems(items)
+
+      void (async () => {
+        await migrateLegacyWebshopLocalStorage(params.tenant)
+        const session = await fetchWebshopBrowserSession(params.tenant)
+        if (session.cart.length > 0) {
+          const byId = new Map(items.map((i) => [i.id, i]))
+          const restored: CartItem[] = []
+          for (const row of session.cart) {
+            const menuItem = byId.get(row.id)
+            if (!menuItem) continue
+            restored.push({
+              item: {
+                ...menuItem,
+                image_url: row.image_url || menuItem.image_url,
+              },
+              quantity: row.quantity,
+              selectedOptions: (row.options || []).map((o) => ({
+                option: {
+                  tenant_slug: params.tenant,
+                  name: o.name,
+                  type: 'single' as const,
+                  required: false,
+                  sort_order: 0,
+                  is_active: true,
+                  choices: [],
+                },
+                choice: {
+                  tenant_slug: params.tenant,
+                  name: o.name,
+                  price: o.price,
+                  sort_order: 0,
+                  is_active: true,
+                },
+              })),
+              totalPrice: row.totalPrice,
+              notes: row.notes,
+            })
+          }
+          if (restored.length > 0) setCart(restored)
+        }
+        cartSessionReadyRef.current = true
+      })()
       
       // Stel de default categorie in (kiosk slaat promoties-fetch over → altijd snel naar eerste sectie)
       const promoEnabled = !lite && tenantData?.promotions_enabled !== false
@@ -1223,7 +1268,19 @@ export default function MenuPageClient({
                     type="button"
                     onClick={() => {
                       setCartOpen(false)
-                      router.push(shop('checkout'))
+                      const cartForStorage = cart.map((c) => ({
+                        id: c.item.id,
+                        name: c.item.name,
+                        price: c.item.price,
+                        quantity: c.quantity,
+                        options: c.selectedOptions.map((o) => ({ name: o.choice.name, price: o.choice.price })),
+                        totalPrice: c.totalPrice,
+                        image_url: c.item.image_url,
+                        notes: c.notes,
+                      }))
+                      void patchWebshopBrowserSession(params.tenant, { cart: cartForStorage }).finally(() => {
+                        router.push(shop('checkout'))
+                      })
                     }}
                     style={{ backgroundColor: primaryColor }}
                     className={`w-full text-white font-bold rounded-2xl transition-colors hover:opacity-90 touch-manipulation ${lite ? 'py-5 text-lg min-h-[58px]': 'py-4'}`}
