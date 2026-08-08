@@ -513,7 +513,7 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
       rowKey: 'online-schermen',
       key: 'online-bestellingen',
       icon: '',
-      label: 'Online',
+      label: 'Schermen',
       labelKey: rowLabelKey('online-schermen'),
       items: [
         {
