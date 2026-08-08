@@ -38,6 +38,8 @@ import {
   KassaIconRefresh,
   KassaIconVolume,
 } from '@/lib/kassa-ui-icons'
+import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
+import { isOnlineShopOnlyTenant } from '@/lib/admin-hamburger-modules'
 
 // Parse items from JSONB
 interface OrderItemJson {
@@ -95,6 +97,10 @@ const getPaymentMethodLabels = (t: (key: string) => string): Record<string, stri
 
 export default function BestellingenPage({ params }: { params: { tenant: string } }) {
   const { t, locale } = useLanguage()
+  const { moduleAccess, enabledModulesJson, loading: modulesLoading } = useTenantModuleFlags(params.tenant)
+  /** Vysion Order (geen kassa-POS): apart keukenscherm; geen embedded keukenmodus op bestellingen. */
+  const hideEmbeddedKitchenMode =
+    !modulesLoading && isOnlineShopOnlyTenant(moduleAccess, enabledModulesJson)
   
   // Memoized configs with translations
   const statusConfig = useMemo(() => getStatusConfig(t), [t])
@@ -127,6 +133,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
 
   const [updatingId, setUpdatingId] = useState<string | null>(null)
   const [completingAll, setCompletingAll] = useState(false)
+  const [kitchenMode, setKitchenMode] = useState(false)
   const [tenantSettings, setTenantSettings] = useState<TenantSettings | null>(null)
   const [rejectingOrder, setRejectingOrder] = useState<Order | null>(null)
   const [rejectionReason, setRejectionReason] = useState('')
@@ -911,6 +918,209 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   }
 
 
+  // Kitchen Mode - Fullscreen tablet view (horeca/kassa; niet voor puur online bestellen)
+  if (kitchenMode && !hideEmbeddedKitchenMode) {
+    return (
+      <div className="fixed inset-0 z-[130] overflow-auto bg-gray-900">
+        {/* Header */}
+        <div className="bg-gray-800 p-4 flex items-center justify-between sticky top-0 z-10">
+          <div className="flex items-center gap-4">
+            <h1 className="text-2xl font-bold text-white"> {t('ordersPage.kitchen.title')}</h1>
+            {newCount > 0 && (
+              <motion.span
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ repeat: Infinity, duration: 1 }}
+                className="bg-red-500 text-white text-xl font-bold px-4 py-2 rounded-full"
+              >
+                {newCount} {t('ordersPage.kitchen.newAlert')}
+              </motion.span>
+            )}
+          </div>
+          <div className="flex items-center gap-4">
+            <motion.button
+              type="button"
+              whileTap={{ scale: 0.98 }}
+              onClick={() => void handleCompleteAllCompletable()}
+              disabled={completableOrders.length === 0 || completingAll}
+              className="px-4 py-3 rounded-xl text-lg font-bold bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:pointer-events-none text-white"
+            >
+              {' '}
+              {completingAll
+                ? '…'
+                : completableOrders.length > 0
+                  ? `${t('ordersPage.actions.completeAll')} (${completableOrders.length})`
+                  : t('ordersPage.actions.completeAll')}
+            </motion.button>
+            <button
+              type="button"
+              className="p-4 rounded-xl bg-green-500 text-white"
+              title={t('ordersPage.soundEnabled')}
+              aria-label={t('ordersPage.soundEnabled')}
+            >
+              <KassaIconVolume className="h-7 w-7" />
+            </button>
+            <button
+              onClick={() => setKitchenMode(false)}
+              className="p-4 bg-gray-600 hover:bg-gray-500 text-white rounded-xl text-xl"
+            >
+               {t('ordersPage.kitchen.close')}
+            </button>
+          </div>
+        </div>
+
+        {/* Orders Grid */}
+        <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredOrders.map((order) => {
+            const items = parseItems(order)
+            const status = order.status?.toLowerCase() || 'new'
+            const config = statusConfig[status] || statusConfig.new
+            
+            return (
+              <motion.div
+                key={order.id}
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className={`rounded-2xl p-6 ${
+                  status === 'new' 
+                    ? 'bg-blue-500 text-white ring-4 ring-yellow-400' 
+                    : status === 'confirmed'
+                    ? 'bg-yellow-500 text-gray-900'
+                    : status === 'preparing'
+                    ? 'bg-gray-900 text-white'
+                    : status === 'ready'
+                    ? 'bg-green-500 text-white'
+                    : 'bg-gray-700 text-white'
+                }`}
+              >
+                {/* Order Header */}
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <p className="text-3xl font-black">#{order.order_number || order.id?.slice(0, 4)}</p>
+                    <p className="text-lg opacity-80">{formatTime(order.created_at)}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold">€{order.total?.toFixed(2)}</p>
+                    <p className="text-lg">
+                      {isWebshopOrder(order)
+                        ? adminWebshopChannelBadgeLabel(order, t)
+                        : adminPosChannelBadgeLabel(order, t)}
+                    </p>
+                    {(() => {
+                      const seatLine = adminDineInSeatAuditLine(order, t)
+                      return seatLine ? (
+                        <p className="text-sm font-semibold opacity-90 mt-1">{seatLine}</p>
+                      ) : null
+                    })()}
+                  </div>
+                </div>
+
+                {/* Payment Status */}
+                {order.payment_status && (
+                  <div className={`inline-block px-3 py-1 rounded-full text-sm font-bold mb-3 ${
+                    order.payment_status.toLowerCase() === 'paid'? 'bg-green-600 text-white': 'bg-yellow-600 text-white'
+                  }`}>
+                    {paymentStatusConfig[order.payment_status]?.label || order.payment_status}
+                  </div>
+                )}
+
+                {/* Customer */}
+                <div className="mb-4 p-3 bg-black/20 rounded-xl">
+                  <p className="text-xl font-bold">{order.customer_name}</p>
+                  {order.customer_phone && <p className="opacity-80">{order.customer_phone}</p>}
+                  {(order.delivery_address || order.customer_address) && (
+                    <p className="opacity-80 text-sm mt-1"> {order.delivery_address || order.customer_address}</p>
+                  )}
+                </div>
+
+                {/* Items */}
+                {items.length > 0 && (
+                  <div className="mb-4 p-3 bg-black/20 rounded-xl min-h-0">
+                    <p className="font-bold mb-2 text-lg">{t('ordersPage.kitchen.products')}:</p>
+                    <div className="max-h-[min(45vh,20rem)] overflow-y-auto overscroll-y-contain space-y-2 pr-1 [scrollbar-gutter:stable]">
+                      {items.map((item, i) => (
+                        <div key={i} className="text-base mb-1 font-medium">
+                          <div className="flex justify-between gap-2">
+                            <span className="font-semibold">
+                              {item.quantity}× {item.name || item.product_name}
+                            </span>
+                            <span className="font-bold tabular-nums shrink-0">
+                              €{((item.price || item.unit_price || 0) * item.quantity).toFixed(2)}
+                            </span>
+                          </div>
+                          {item.options && item.options.length > 0 && (
+                            <div className="text-sm opacity-90 ml-1 pl-2 border-l-2 border-white/30 mt-0.5">
+                              + {item.options.map(o => o.name).join(', ')}
+                            </div>
+                          )}
+                          {item.notes && (
+                            <div className="text-sm text-orange-200 font-bold ml-1 pl-2 mt-0.5"> {item.notes}</div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="grid grid-cols-2 gap-3">
+                  {status.toLowerCase() === 'new' && (
+                    <>
+                      <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => handleConfirmOrder(order)}
+                        disabled={updatingId === order.id || completingAll}
+                        className="p-4 bg-green-600 hover:bg-green-700 text-white rounded-xl text-xl font-bold"
+                      >
+                         {t('ordersPage.actions.approve').toUpperCase()}
+                      </motion.button>
+                      <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => {
+                          setRejectOrderError(null)
+                          setRejectingOrder(order)
+                        }}
+                        disabled={updatingId === order.id || completingAll}
+                        className="p-4 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xl font-bold"
+                      >
+                         {t('ordersPage.actions.reject').toUpperCase()}
+                      </motion.button>
+                    </>
+                  )}
+                  {!['new', 'completed', 'cancelled', 'rejected'].includes(status.toLowerCase()) && (
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleMarkOrderComplete(order)}
+                      disabled={updatingId === order.id || completingAll}
+                      className="col-span-2 p-4 bg-gray-700 hover:bg-gray-800 text-white rounded-xl text-xl font-bold"
+                    >
+                       {t('ordersPage.actions.complete').toUpperCase()}
+                    </motion.button>
+                  )}
+                  {/* Print button */}
+                  <button
+                    onClick={() => printReceipt(order)}
+                    className="col-span-2 p-3 bg-white/20 hover:bg-white/30 rounded-xl font-bold flex items-center justify-center gap-2"
+                  >
+                    <KassaIconPrint className="h-5 w-5" />
+                    {t('ordersPage.actions.printReceipt').toUpperCase()}
+                  </button>
+                </div>
+              </motion.div>
+            )
+          })}
+        </div>
+
+        {filteredOrders.length === 0 && (
+          <div className="flex flex-col items-center justify-center h-[60vh] text-white">
+            <span className="text-8xl mb-4"></span>
+            <h2 className="text-3xl font-bold">{t('ordersPage.noOrders')}</h2>
+            <p className="text-xl text-gray-400 mt-2">{t('ordersPage.waitingForOrders')}</p>
+          </div>
+        )}
+      </div>
+    )
+  }
 
   // Normal Mode
   return (
@@ -953,6 +1163,16 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                 : t('ordersPage.actions.completeAll')}
           </motion.button>
 
+          {!hideEmbeddedKitchenMode && (
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setKitchenMode(true)}
+            className="px-4 py-2 bg-gray-900 text-white rounded-xl font-medium flex items-center gap-2"
+          >
+             {t('ordersPage.kitchenMode')}
+          </motion.button>
+          )}
 
           {/* Refresh */}
           <motion.button
