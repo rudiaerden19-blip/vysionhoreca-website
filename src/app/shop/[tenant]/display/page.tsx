@@ -853,7 +853,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full"
+          className="w-16 h-16 border-4 border-accent border-t-transparent rounded-full"
         />
       </div>
     )
@@ -882,9 +882,9 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             <motion.div
               animate={{ 
                 boxShadow: [
-                  'inset 0 0 60px 30px rgba(249, 115, 22, 0.8)',
-                  'inset 0 0 100px 50px rgba(249, 115, 22, 0.4)',
-                  'inset 0 0 60px 30px rgba(249, 115, 22, 0.8)',
+                  'inset 0 0 60px 30px rgba(14, 93, 130, 0.75)',
+                  'inset 0 0 100px 50px rgba(14, 93, 130, 0.4)',
+                  'inset 0 0 60px 30px rgba(14, 93, 130, 0.75)',
                 ]
               }}
               transition={{ duration: 1, repeat: Infinity }}
@@ -895,7 +895,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             <motion.div
               animate={{ scale: [1, 1.02, 1] }}
               transition={{ duration: 0.5, repeat: Infinity }}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-orange-500 px-12 py-8 rounded-3xl shadow-2xl pointer-events-auto"
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-accent px-12 py-8 rounded-3xl shadow-2xl pointer-events-auto"
               onClick={() => {
                 // Click to dismiss and view orders
                 const firstNewOrderId = Array.from(newOrderIds)[0]
@@ -976,7 +976,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
             {/* Stats */}
             <div className="flex gap-2">
-              <span className="px-3 py-2 bg-orange-100 text-orange-800 rounded-lg text-sm font-bold">
+              <span className="px-3 py-2 bg-teal-50 text-teal-900 rounded-lg text-sm font-bold">
                 {activeOrders.filter(o => o.status.toLowerCase() === 'new').length} {tx('new')}
               </span>
               <span className="px-3 py-2 bg-blue-100 text-blue-800 rounded-lg text-sm font-bold">
@@ -997,7 +997,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             {showReservations && (
             <button
               onClick={() => setShowReservationsModal(true)}
-              className="px-3 py-2 bg-orange-600 hover:bg-orange-500 rounded-xl text-sm font-bold text-white relative"
+              className="px-3 py-2 bg-accent hover:bg-accent/90 rounded-xl text-sm font-bold text-white relative"
             >
                Reserveringen
               {reservations.length > 0 && (
@@ -1010,7 +1010,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
             <Link
               href={`/keuken/${params.tenant}`}
-              className="px-3 py-2 bg-orange-600 hover:bg-orange-500 rounded-xl text-sm font-bold text-white"
+              className="px-3 py-2 bg-accent hover:bg-accent/90 rounded-xl text-sm font-bold text-white"
             >
                {tx('kitchen')}
             </Link>
@@ -1043,7 +1043,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                         setDisplayLangOpen(false)
                       }}
                       className={`flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm transition-colors hover:bg-gray-50 ${
-                        locale === lang ? 'bg-orange-50 font-semibold text-orange-900': 'text-gray-800'
+                        locale === lang ? 'bg-teal-50 font-semibold text-accent': 'text-gray-800'
                       }`}
                     >
                       <LocaleFlagEmoji locale={lang} />

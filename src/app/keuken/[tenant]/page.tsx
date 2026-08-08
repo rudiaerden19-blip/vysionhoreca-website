@@ -471,7 +471,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="h-16 w-16 rounded-full border-4 border-orange-500 border-t-transparent"
+          className="h-16 w-16 rounded-full border-4 border-accent border-t-transparent"
         />
       </div>
     )
@@ -579,7 +579,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                         setKeukenLangOpen(false)
                       }}
                       className={`flex w-full items-center gap-2 border-b border-gray-100 px-4 py-2.5 text-left text-sm transition-colors last:border-0 hover:bg-gray-50 ${
-                        locale === lang ? 'bg-orange-50 font-semibold text-orange-900': 'text-gray-800'
+                        locale === lang ? 'bg-teal-50 font-semibold text-accent': 'text-gray-800'
                       }`}
                     >
                       <LocaleFlagEmoji locale={lang} />

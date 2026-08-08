@@ -605,7 +605,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
             <button
               onClick={addSingleClosing}
               disabled={!singleDate || savingSingle}
-              className="px-4 py-2 bg-orange-500 text-white rounded-lg text-sm font-medium hover:bg-orange-600 disabled:opacity-50 transition-colors whitespace-nowrap"
+              className="px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 disabled:opacity-50 transition-colors whitespace-nowrap"
             >
               {savingSingle ? 'Opslaan...': '+ Opslaan'}
             </button>
@@ -680,14 +680,14 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: 10 }}
-                      className="flex items-center justify-between px-4 py-3 bg-orange-50 border border-orange-200 rounded-xl"
+                      className="flex items-center justify-between px-4 py-3 bg-teal-50 border border-teal-200 rounded-xl"
                     >
                       <div className="flex items-center gap-3 flex-wrap">
-                        <span className="text-sm font-semibold text-orange-700">
+                        <span className="text-sm font-semibold text-teal-900">
                            {formatDateRange(closing)}
                         </span>
                         {closing.reason && closing.reason !== 'Gesloten' && (
-                          <span className="text-xs text-orange-500 bg-orange-100 px-2 py-0.5 rounded-full">
+                          <span className="text-xs text-accent bg-teal-100 px-2 py-0.5 rounded-full">
                             {closing.reason}
                           </span>
                         )}

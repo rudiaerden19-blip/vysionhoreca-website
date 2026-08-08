@@ -96,7 +96,7 @@ export default function PincodePage({ params }: { params: { tenant: string } }) 
   }
 
   if (hasPin === null) {
-    return <div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" /></div>
+    return <div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-4 border-accent border-t-transparent rounded-full animate-spin" /></div>
   }
 
   return (
@@ -124,7 +124,7 @@ export default function PincodePage({ params }: { params: { tenant: string } }) 
             <button
               type="button"
               onClick={() => router.replace(returnAfterSave ?? adminOverviewHref)}
-              className="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-semibold transition-colors"
+              className="w-full py-3 rounded-xl bg-accent hover:bg-accent/90 text-white font-semibold transition-colors"
             >
               Nu naar overzicht
             </button>
@@ -146,7 +146,7 @@ export default function PincodePage({ params }: { params: { tenant: string } }) 
                 value={currentPin}
                 onChange={e => { setCurrentPin(e.target.value.replace(/\D/g, '').slice(0, 4)); setError(''); setSuccess('') }}
                 placeholder="• • • •"
-                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-orange-500 outline-none text-center text-2xl tracking-widest"
+                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-accent outline-none text-center text-2xl tracking-widest"
               />
             </div>
           )}
@@ -160,7 +160,7 @@ export default function PincodePage({ params }: { params: { tenant: string } }) 
               value={pin1}
               onChange={e => { setPin1(e.target.value.replace(/\D/g, '').slice(0, 4)); setError(''); setSuccess('') }}
               placeholder="• • • •"
-              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-orange-500 outline-none text-center text-2xl tracking-widest"
+              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-accent outline-none text-center text-2xl tracking-widest"
             />
           </div>
 
@@ -173,14 +173,14 @@ export default function PincodePage({ params }: { params: { tenant: string } }) 
               value={pin2}
               onChange={e => { setPin2(e.target.value.replace(/\D/g, '').slice(0, 4)); setError(''); setSuccess('') }}
               placeholder="• • • •"
-              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-orange-500 outline-none text-center text-2xl tracking-widest"
+              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-accent outline-none text-center text-2xl tracking-widest"
             />
           </div>
 
           <button
             onClick={hasPin ? handleChange : handleSet}
             disabled={saving}
-            className="w-full py-4 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-lg transition-colors disabled:opacity-50"
+            className="w-full py-4 rounded-xl bg-accent hover:bg-accent/90 text-white font-bold text-lg transition-colors disabled:opacity-50"
           >
             {saving ? 'Opslaan...': hasPin ? 'PIN wijzigen': 'PIN instellen'}
           </button>

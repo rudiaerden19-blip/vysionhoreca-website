@@ -1175,7 +1175,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
               </div>
               <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
                 <p className="text-sm text-gray-400 mb-2">Kortingen</p>
-                <p className="text-2xl font-bold text-orange-500">{fmt(xData.discounts)}</p>
+                <p className="text-2xl font-bold text-accent">{fmt(xData.discounts)}</p>
               </div>
             </div>
 

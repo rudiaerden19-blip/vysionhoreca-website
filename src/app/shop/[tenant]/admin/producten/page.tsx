@@ -1029,7 +1029,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                             }
                             className={`rounded-xl border-2 px-4 py-2 text-sm font-semibold transition-colors ${
                               selected
-                                ? 'border-orange-500 bg-orange-50 text-orange-900'
+                                ? 'border-accent bg-teal-50 text-teal-900'
                                 : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
                             }`}
                           >
@@ -1089,7 +1089,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                                 kassa_image_zoom: parseFloat(e.target.value),
                               }))
                             }
-                            className="w-full accent-orange-500"
+                            className="w-full accent-accent"
                           />
                           <div className="flex justify-between text-xs text-gray-500">
                             <span>{Math.round(KASSA_PRODUCT_IMAGE_ZOOM_MIN * 100)}%</span>
@@ -1114,7 +1114,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                       ? []
                       : [
                           { key: 'is_popular', label: 'Populair', sub: 'Wordt gemarkeerd als bestseller', color: 'bg-blue-500'},
-                          { key: 'is_promo', label: 'Promotie', sub: 'Toon actieprijs', color: 'bg-orange-500'},
+                          { key: 'is_promo', label: 'Promotie', sub: 'Toon actieprijs', color: 'bg-accent'},
                           { key: 'print_label', label: 'Print label', sub: 'Druk sticker af bij bestelling', color: 'bg-purple-500'},
                         ]),
                   ].map(({ key, label, sub, color }) => {
@@ -1138,10 +1138,10 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
 
                   {/* Promo prijs */}
                   {formData.is_promo && !isRetailForm && (
-                    <div className="p-4 bg-orange-50 border border-orange-200 rounded-xl">
-                      <label className="block text-sm font-semibold text-orange-800 mb-2">Actieprijs</label>
+                    <div className="p-4 bg-teal-50 border border-teal-200 rounded-xl">
+                      <label className="block text-sm font-semibold text-teal-900 mb-2">Actieprijs</label>
                       <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-600 font-bold">€</span>
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-accent font-bold">€</span>
                         <input
                           type="text"
                           inputMode="decimal"
@@ -1150,12 +1150,12 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                             const raw = e.target.value
                             if (isPartialMoneyInput(raw)) setPromoPriceInputStr(raw)
                           }}
-                          className="w-full pl-10 pr-4 py-3 border-2 border-orange-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-lg font-bold"
+                          className="w-full pl-10 pr-4 py-3 border-2 border-teal-300 rounded-xl focus:ring-2 focus:ring-accent focus:border-transparent text-lg font-bold"
                           placeholder="0,00"
                         />
                       </div>
                       {(modalParsedPromoPreview || 0) > 0 && (
-                        <p className="text-sm text-orange-600 mt-2">
+                        <p className="text-sm text-accent mt-2">
                           €{modalParsedPricePreview.toFixed(2)} →{' '}
                           <strong>€{(modalParsedPromoPreview || 0).toFixed(2)}</strong>
                         </p>

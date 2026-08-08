@@ -44,7 +44,7 @@ export default function ShopAdminError({
       <div className="flex flex-wrap justify-center gap-3">
         <button
           type="button"
-          className="rounded-lg bg-orange-500 px-4 py-2 font-semibold text-white hover:bg-orange-600"
+          className="rounded-lg bg-accent px-4 py-2 font-semibold text-white hover:bg-accent/90"
           onClick={() => reset()}
         >
           {t('adminPages.errorFallback.retry')}

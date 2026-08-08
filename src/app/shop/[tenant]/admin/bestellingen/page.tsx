@@ -1054,7 +1054,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                             </div>
                           )}
                           {item.notes && (
-                            <div className="text-sm text-orange-200 font-bold ml-1 pl-2 mt-0.5"> {item.notes}</div>
+                            <div className="text-sm text-teal-200 font-bold ml-1 pl-2 mt-0.5"> {item.notes}</div>
                           )}
                         </div>
                       ))}
@@ -1402,7 +1402,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                     </div>
                     <p className="text-gray-500 mt-1">{formatTime(order.created_at)}</p>
                     {((order as any).scheduled_date || (order as any).scheduled_time) && (
-                      <p className="mt-1 text-sm font-semibold text-orange-600 bg-orange-50 px-2 py-1 rounded-lg inline-block">
+                      <p className="mt-1 text-sm font-semibold text-accent bg-teal-50 px-2 py-1 rounded-lg inline-block">
                          {(order as any).scheduled_date ? new Date((order as any).scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit', year: 'numeric'}) : ''}{(order as any).scheduled_time ? `om ${(order as any).scheduled_time}`: ''}
                       </p>
                     )}
@@ -1457,7 +1457,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                               </div>
                             )}
                             {item.notes && (
-                              <div className="text-sm text-orange-700 font-semibold mt-1 ml-1 pl-3 border-l-2 border-orange-200">
+                              <div className="text-sm text-teal-800 font-semibold mt-1 ml-1 pl-3 border-l-2 border-teal-200">
                                  {item.notes}
                               </div>
                             )}
@@ -1637,9 +1637,9 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
 
                 {/* Geplande datum/tijd — PROMINENT tonen als aanwezig */}
                 {selectedScheduleLabel && (
-                  <div className="bg-orange-50 border-2 border-orange-300 rounded-xl p-4">
-                    <p className="text-sm text-orange-600 font-semibold mb-1"> {t('shopDisplay.desiredTimeLabel')}</p>
-                    <p className="text-2xl font-black text-orange-700">{selectedScheduleLabel}</p>
+                  <div className="bg-teal-50 border-2 border-teal-300 rounded-xl p-4">
+                    <p className="text-sm text-accent font-semibold mb-1"> {t('shopDisplay.desiredTimeLabel')}</p>
+                    <p className="text-2xl font-black text-teal-900">{selectedScheduleLabel}</p>
                   </div>
                 )}
 
@@ -1685,7 +1685,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                               </div>
                             )}
                             {item.notes && (
-                              <div className="text-sm text-orange-600 font-bold ml-1 mt-2 pl-3 border-l-2 border-orange-200">
+                              <div className="text-sm text-accent font-bold ml-1 mt-2 pl-3 border-l-2 border-teal-200">
                                  {item.notes}
                               </div>
                             )}

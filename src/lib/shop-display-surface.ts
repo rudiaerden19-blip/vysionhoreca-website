@@ -1,7 +1,11 @@
 /**
- * Keuken- & shop/onlinescherm — licht admin-thema.
- * Geen import uit `kassa-pos-surface` (productie-kassa blijft donker POS).
+ * Keuken- & shop/onlinescherm + platform online UI — licht thema.
+ * Merkkleur platform online: #0E5D82 (niet tenant primary_color in de winkel).
+ * Geen import uit `kassa-pos-surface`.
  */
+
+/** Platform online (admin / schermen) — niet de klant-winkel. */
+export const PLATFORM_ONLINE_BRAND_HEX = '#0E5D82'
 
 export const SHOP_DISPLAY_PAGE_SHELL = 'bg-gray-100 text-gray-900'
 
@@ -14,13 +18,13 @@ export const SHOP_DISPLAY_BTN =
   'rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-800 shadow-sm transition-colors hover:bg-gray-50 active:bg-gray-100 touch-manipulation'
 
 export const SHOP_DISPLAY_BTN_ACCENT =
-  'rounded-xl border border-orange-500 bg-orange-500 px-3 py-2 text-sm font-bold text-white shadow-sm transition-colors hover:bg-orange-600 active:bg-orange-700 touch-manipulation'
+  'rounded-xl border border-accent bg-accent px-3 py-2 text-sm font-bold text-white shadow-sm transition-colors hover:bg-accent/90 active:bg-[#0c4f6e] touch-manipulation'
 
 export const SHOP_DISPLAY_BTN_MENU =
   'rounded-xl border border-gray-300 bg-gray-100 px-3 py-2 text-sm font-bold text-gray-800 transition-colors hover:bg-gray-200 touch-manipulation'
 
 export const SHOP_DISPLAY_TAB_ACTIVE =
-  'rounded-lg border border-orange-500 bg-orange-500 px-4 py-2 font-bold text-white shadow-sm touch-manipulation'
+  'rounded-lg border border-accent bg-accent px-4 py-2 font-bold text-white shadow-sm touch-manipulation'
 
 export const SHOP_DISPLAY_TAB_INACTIVE =
   'rounded-lg border border-gray-300 bg-white px-4 py-2 font-bold text-gray-700 hover:bg-gray-50 touch-manipulation'
@@ -59,10 +63,10 @@ export const SHOP_DISPLAY_MODAL_OVERLAY = 'bg-black/40'
 export const SHOP_DISPLAY_MODAL_PANEL =
   'rounded-2xl border border-gray-200 bg-white text-gray-900 shadow-2xl'
 
-export const SHOP_DISPLAY_ACCENT_TEXT = 'text-orange-600'
+export const SHOP_DISPLAY_ACCENT_TEXT = 'text-accent'
 
 export const SHOP_DISPLAY_NEW_CARD_RING =
-  'shadow-[0_0_0_2px_rgba(249,115,22,0.65),0_8px_24px_rgba(0,0,0,0.12)]'
+  'shadow-[0_0_0_2px_rgba(14,93,130,0.55),0_8px_24px_rgba(0,0,0,0.12)]'
 
 /** Alias voor gedeelde orderkaart (keuken + display). */
 export const KITCHEN_CARD_SHELL = SHOP_DISPLAY_CARD_SHELL
