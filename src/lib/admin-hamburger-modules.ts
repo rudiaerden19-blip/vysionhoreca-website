@@ -17,6 +17,29 @@ import {
 /** Geen submenu’s meer geforceerd — alles via Modules-pagina. */
 export const SUBMENU_IDS_ALWAYS_ON = new Set<string>()
 
+/** GKS Z-rapport en bedrijfsanalyse — alleen bij actieve kassa-POS, niet online-only. */
+export const SUBMENU_IDS_REQUIRE_KASSA_POS = new Set(['sm_rpt_z', 'sm_rpt_analyse'])
+
+export function isKassaPosOnlySubmenu(subId: string): boolean {
+  return SUBMENU_IDS_REQUIRE_KASSA_POS.has(subId)
+}
+
+function tenantHasKassaPosScreen(
+  access: Record<TenantModuleId, boolean>,
+  enabledJson: Record<string, boolean> | null
+): boolean {
+  return isHorecaKassaPosScreenEnabled(access) || isRetailKassaPosScreenEnabled(access, enabledJson)
+}
+
+export function isKassaPosSubmenuVisibleForTenant(
+  subId: string,
+  access: Record<TenantModuleId, boolean>,
+  enabledJson: Record<string, boolean> | null
+): boolean {
+  if (!isKassaPosOnlySubmenu(subId)) return true
+  return tenantHasKassaPosScreen(access, enabledJson)
+}
+
 export type AdminHamburgerItem = {
   id: string
   icon: string
@@ -692,7 +715,9 @@ export function isAdminSubmenuEnabled(
   enabledJson: Record<string, boolean> | null
 ): boolean {
   if (enabledJson && hasExplicitEnabledModules(enabledJson)) {
-    if (enabledJson[subId] === true) return true
+    if (enabledJson[subId] === true) {
+      return isKassaPosSubmenuVisibleForTenant(subId, moduleAccess, enabledJson)
+    }
     if (
       subId === 'sm_retail_product_intake' &&
       (enabledJson.sm_retail_kassa_producten === true || enabledJson['retail-kassa'] === true)
@@ -764,6 +789,9 @@ export function hasShopAdminPathAccess(
   if (hasModuleAccessForPathname(pathname, tenantSlug, moduleAccess)) return true
   const subId = getSubmenuIdForPathname(pathname, tenantSlug, moduleAccess)
   if (!subId) return false
+  if (!isKassaPosSubmenuVisibleForTenant(subId, moduleAccess, enabledModulesJson)) {
+    return false
+  }
   if (enabledModulesJson && hasExplicitEnabledModules(enabledModulesJson)) {
     if (enabledModulesJson[subId] === true) return true
     if (
@@ -814,6 +842,9 @@ export function filterHamburgerModulesForAccess(
     .map((m) => ({
       ...m,
       items: m.items.filter((item) => {
+        if (!isKassaPosSubmenuVisibleForTenant(item.id, effectiveAccess, enabledModulesJson)) {
+          return false
+        }
         if (item.href.includes('/labels') && !effectiveLabelPrinting) return false
         if (enabledModulesJson && hasExplicitEnabledModules(enabledModulesJson)) {
           if (enabledModulesJson[item.id] === true) return true

@@ -141,8 +141,6 @@ export const REGISTRATION_MODULE_PRESETS: Record<RegistrationProductLine, Preset
       'sm_web_team',
       'sm_web_site_preview',
       'sm_rpt_rapporten',
-      'sm_rpt_z',
-      'sm_rpt_analyse',
       'sm_rpt_verkoop',
       'sm_rpt_populair',
       'sm_inst_betaling',
