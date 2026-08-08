@@ -773,6 +773,7 @@
     "productLineRequired": "先に製品ラインを選択してください",
     "productLineContinue": "アカウント作成へ",
     "productLineChange": "選択を変更",
+    "trialDaysSuffix": "日間無料トライアル — オンライン注文（レジなし）",
     "productLine": {
       "horeca_kassa": {
         "title": "ホスピタリティPOS",

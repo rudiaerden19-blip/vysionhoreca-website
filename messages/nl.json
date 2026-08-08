@@ -1055,6 +1055,7 @@
     "productLineRequired": "Kies eerst een productlijn",
     "productLineContinue": "Verder met account",
     "productLineChange": "Andere keuze",
+    "trialDaysSuffix": "dagen gratis proefperiode — online bestellen, geen kassa",
     "productLine": {
       "horeca_kassa": {
         "title": "Horeca kassa",

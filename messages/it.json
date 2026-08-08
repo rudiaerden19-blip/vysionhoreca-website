@@ -773,6 +773,7 @@
     "productLineRequired": "Scegli prima una linea prodotto",
     "productLineContinue": "Continua con l'account",
     "productLineChange": "Cambia scelta",
+    "trialDaysSuffix": "giorni di prova gratuita — ordini online, senza cassa",
     "productLine": {
       "horeca_kassa": {
         "title": "Cassa horeca",

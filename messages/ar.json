@@ -773,6 +773,7 @@
     "productLineRequired": "يرجى اختيار خط المنتج أولاً",
     "productLineContinue": "متابعة إلى الحساب",
     "productLineChange": "تغيير الاختيار",
+    "trialDaysSuffix": "أيام تجربة مجانية — طلبات أونلاين بدون نقطة بيع",
     "productLine": {
       "horeca_kassa": {
         "title": "نقطة بيع المطاعم",

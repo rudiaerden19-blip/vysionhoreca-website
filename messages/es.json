@@ -773,6 +773,7 @@
     "productLineRequired": "Elija primero una línea de producto",
     "productLineContinue": "Continuar con la cuenta",
     "productLineChange": "Cambiar elección",
+    "trialDaysSuffix": "días de prueba gratis — pedidos online, sin TPV",
     "productLine": {
       "horeca_kassa": {
         "title": "TPV horeca",

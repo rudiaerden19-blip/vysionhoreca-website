@@ -11,7 +11,9 @@ import { RegistrationProductLinePicker } from '@/components/register/Registratio
 import {
   marketingHomeHrefForProductLineParam,
   marketingHomeHrefFromSearchParams,
+  registrationProductLineBrandName,
   registrationProductLineFromUrlSearchParams,
+  REGISTRATION_TRIAL_DAYS,
   type RegistrationProductLine,
 } from '@/lib/registration-product-line'
 
@@ -37,6 +39,12 @@ export default function RegisterPage() {
   const [step, setStep] = useState<'line' |  'form'>('line')
   const langRef = useRef<HTMLDivElement>(null)
   const [marketingHomeHref, setMarketingHomeHref] = useState('/')
+
+  const brandTitle = registrationProductLineBrandName(productLine)
+  const registerLoginHref =
+    productLine && productLineLockedFromUrl
+      ? `/login?lang=${locale}&line=${productLine}&productLine=${productLine}`
+      : `/login?lang=${locale}`
 
   // Read language from URL parameter on mount
   useEffect(() => {
@@ -419,7 +427,7 @@ export default function RegisterPage() {
               <div className="text-center">
                 <Link href={marketingHomeHref}>
                   <span className="text-3xl font-bold">
-                    <span className="text-accent">Vysion</span>
+                    <span className="text-accent">{brandTitle}</span>
                   </span>
                 </Link>
               </div>
@@ -443,7 +451,7 @@ export default function RegisterPage() {
               <div className="text-center">
                 <p className="text-sm text-gray-600">
                   {t('register.alreadyHaveAccount')}{' '}
-                  <Link href={`/login?lang=${locale}`} className="font-medium text-accent hover:text-accent/80 transition-colors">
+                  <Link href={registerLoginHref} className="font-medium text-accent hover:text-accent/80 transition-colors">
                     {t('register.loginLink')}
                   </Link>
                 </p>
@@ -455,7 +463,7 @@ export default function RegisterPage() {
           <div className="text-center mb-10">
             <Link href={marketingHomeHref}>
               <span className="text-3xl font-bold">
-                <span className="text-accent">Vysion</span>
+                <span className="text-accent">{brandTitle}</span>
               </span>
             </Link>
             <p className="mt-3 text-gray-800">
@@ -488,6 +496,16 @@ export default function RegisterPage() {
           </div>
           )}
 
+          {productLineLockedFromUrl && productLine === 'online_bestellen' && (
+            <div className="mb-6 rounded-xl border-2 border-accent bg-white p-4">
+              <p className="font-bold text-gray-900">{t('register.productLine.online_bestellen.title')}</p>
+              <p className="mt-1 text-sm text-gray-600">{t('register.productLine.online_bestellen.desc')}</p>
+              <p className="mt-2 text-sm font-semibold text-accent">
+                {REGISTRATION_TRIAL_DAYS} {t('register.trialDaysSuffix')}
+              </p>
+            </div>
+          )}
+
           {productLineLockedFromUrl && productLine === 'restaurant_reservaties' && (
             <div className="mb-6 rounded-xl border-2 border-accent bg-white p-4">
               <p className="font-bold text-gray-900">{t('register.productLine.restaurant_reservaties.title')}</p>
@@ -495,7 +513,7 @@ export default function RegisterPage() {
             </div>
           )}
 
-          {productLineLockedFromUrl && productLine && productLine !== 'restaurant_reservaties' && (
+          {productLineLockedFromUrl && productLine && productLine !== 'restaurant_reservaties' && productLine !== 'online_bestellen' && (
             <div className="mb-6 rounded-xl border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700">
               {t(`register.productLine.${productLine}.title`)}
             </div>
@@ -631,7 +649,7 @@ export default function RegisterPage() {
             <div className="text-center">
               <p className="text-sm text-gray-600">
                 {t('register.alreadyHaveAccount')}{' '}
-                <Link href={`/login?lang=${locale}`} className="font-medium text-accent hover:text-accent/80 transition-colors">
+                <Link href={registerLoginHref} className="font-medium text-accent hover:text-accent/80 transition-colors">
                   {t('register.loginLink')}
                 </Link>
               </p>

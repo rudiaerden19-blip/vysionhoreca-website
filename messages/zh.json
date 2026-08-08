@@ -773,6 +773,7 @@
     "productLineRequired": "请先选择产品线",
     "productLineContinue": "继续创建账户",
     "productLineChange": "更改选择",
+    "trialDaysSuffix": "天免费试用 — 在线点餐，不含收银",
     "productLine": {
       "horeca_kassa": {
         "title": "餐饮收银",

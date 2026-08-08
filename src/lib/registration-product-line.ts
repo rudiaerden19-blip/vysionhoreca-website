@@ -227,6 +227,73 @@ export function registrationLineWantsReservationBootstrap(line: RegistrationProd
   return line === 'restaurant_reservaties'
 }
 
+/** Geen lege tafelplattegrond voor puur online-bestel-registratie. */
+export function registrationLineWantsFloorPlanBootstrap(line: RegistrationProductLine): boolean {
+  return line !== 'online_bestellen'
+}
+
+export const REGISTRATION_TRIAL_DAYS = 15
+
+export type RegistrationTenantBilling = {
+  plan: 'starter'
+  subscription_status: 'trial' | 'active'
+  trial_ends_at: string | null
+  post_trial_modules_confirmed: boolean
+  subscription: {
+    plan: 'starter'
+    status: 'trial' | 'active'
+    price_monthly: number
+    trial_started_at: string | null
+    trial_ends_at: string | null
+  }
+}
+
+/** Abonnement bij aanmaken — marketinglijnen online/reserveringen starten met proefperiode. */
+export function getRegistrationTenantBilling(line: RegistrationProductLine): RegistrationTenantBilling {
+  const now = new Date()
+
+  if (line === 'online_bestellen' || line === 'restaurant_reservaties') {
+    const trialEnds = new Date(now)
+    trialEnds.setDate(trialEnds.getDate() + REGISTRATION_TRIAL_DAYS)
+    const trialEndsIso = trialEnds.toISOString()
+    const priceMonthly = line === 'online_bestellen' ? 49 : 59
+
+    return {
+      plan: 'starter',
+      subscription_status: 'trial',
+      trial_ends_at: trialEndsIso,
+      post_trial_modules_confirmed: false,
+      subscription: {
+        plan: 'starter',
+        status: 'trial',
+        price_monthly: priceMonthly,
+        trial_started_at: now.toISOString(),
+        trial_ends_at: trialEndsIso,
+      },
+    }
+  }
+
+  return {
+    plan: 'starter',
+    subscription_status: 'active',
+    trial_ends_at: null,
+    post_trial_modules_confirmed: true,
+    subscription: {
+      plan: 'starter',
+      status: 'active',
+      price_monthly: 59,
+      trial_started_at: null,
+      trial_ends_at: null,
+    },
+  }
+}
+
+export function registrationProductLineBrandName(line: RegistrationProductLine | null): string {
+  if (line === 'online_bestellen') return 'Vysion Order'
+  if (line === 'restaurant_reservaties') return 'TableVysion'
+  return 'Vysion'
+}
+
 /** Externe marketinghome per productlijn (login/registratie op platformdomein). */
 export const PRODUCT_LINE_MARKETING_HOME: Partial<Record<RegistrationProductLine, string>> = {
   online_bestellen: VYSION_ORDER_ORIGIN,

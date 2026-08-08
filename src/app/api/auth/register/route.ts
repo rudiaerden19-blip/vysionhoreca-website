@@ -18,7 +18,9 @@ import { slugifyBusinessNameForTenant } from '@/lib/register-tenant-slug'
 import {
   buildRegistrationEnabledModulesJson,
   getRegistrationPostSignupAdminPath,
+  getRegistrationTenantBilling,
   registrationLineWantsDeliveryBootstrap,
+  registrationLineWantsFloorPlanBootstrap,
   registrationLineWantsReservationBootstrap,
   type RegistrationProductLine,
 } from '@/lib/registration-product-line'
@@ -113,26 +115,24 @@ export async function POST(request: NextRequest) {
     }
 
     const passwordHash = await hashPassword(password)
+    const line = productLine as RegistrationProductLine
+    const billing = getRegistrationTenantBilling(line)
 
     // ========================================
     // 1. CREATE TENANT (main table)
     // ========================================
-    // Geen proefperiode meer — nieuwe zaak is direct 'active'. Betaling wordt
-    // door superadmin handmatig beheerd via de blokkeer-knop op `tenants.is_blocked`.
-    const enabledModules = buildRegistrationEnabledModulesJson(
-      productLine as RegistrationProductLine,
-    )
+    const enabledModules = buildRegistrationEnabledModulesJson(line)
 
     const tenantInsert = {
       name: businessName.trim(),
       slug: tenantSlug,
       email: emailLower,
       phone: phone.trim(),
-      plan: 'starter',
-      subscription_status: 'active',
-      trial_ends_at: null as string | null,
+      plan: billing.plan,
+      subscription_status: billing.subscription_status,
+      trial_ends_at: billing.trial_ends_at,
       enabled_modules: enabledModules,
-      post_trial_modules_confirmed: true,
+      post_trial_modules_confirmed: billing.post_trial_modules_confirmed,
       feature_group_orders: true,
     }
 
@@ -225,12 +225,14 @@ export async function POST(request: NextRequest) {
       // Don't fail - this is secondary
     }
 
-    if (registrationLineWantsDeliveryBootstrap(productLine as RegistrationProductLine)) {
+    if (registrationLineWantsDeliveryBootstrap(line)) {
       await ensureDeliverySettingsForTenant(supabase, tenantSlug)
     }
 
-    await ensureEmptyFloorPlanTablesForTenant(supabase, tenantSlug)
-    if (registrationLineWantsReservationBootstrap(productLine as RegistrationProductLine)) {
+    if (registrationLineWantsFloorPlanBootstrap(line)) {
+      await ensureEmptyFloorPlanTablesForTenant(supabase, tenantSlug)
+    }
+    if (registrationLineWantsReservationBootstrap(line)) {
       await ensureReservationSettingsForTenant(supabase, tenantSlug)
     }
 
@@ -241,11 +243,11 @@ export async function POST(request: NextRequest) {
       .from('subscriptions')
       .insert({
         tenant_slug: tenantSlug,
-        plan: 'starter',
-        status: 'active',
-        price_monthly: 59,
-        trial_started_at: null,
-        trial_ends_at: null,
+        plan: billing.subscription.plan,
+        status: billing.subscription.status,
+        price_monthly: billing.subscription.price_monthly,
+        trial_started_at: billing.subscription.trial_started_at,
+        trial_ends_at: billing.subscription.trial_ends_at,
       })
 
     if (subscriptionError) {
@@ -268,7 +270,7 @@ export async function POST(request: NextRequest) {
           expires_at: expiresAt.toISOString(),
         })
 
-      await sendVerificationEmail(emailLower, businessName.trim(), verificationToken)
+      await sendVerificationEmail(emailLower, businessName.trim(), verificationToken, line)
     } catch (emailError) {
       logger.warn('Failed to send verification email', { 
         requestId, 
@@ -292,10 +294,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       success: true,
       productLine,
-      postSignupAdminPath: getRegistrationPostSignupAdminPath(
-        tenantSlug,
-        productLine as RegistrationProductLine,
-      ),
+      postSignupAdminPath: getRegistrationPostSignupAdminPath(tenantSlug, line),
       tenant: {
         id: tenant.id,
         name: businessName.trim(),
@@ -318,8 +317,20 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function sendVerificationEmail(email: string, name: string, token: string) {
+async function sendVerificationEmail(
+  email: string,
+  name: string,
+  token: string,
+  productLine: RegistrationProductLine,
+) {
   const verifyUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.vysion-kassa.com'}/api/auth/verify-email?token=${token}`
+
+  const brand =
+    productLine === 'online_bestellen'
+      ? 'Vysion Order'
+      : productLine === 'restaurant_reservaties'
+        ? 'TableVysion'
+        : "Vysion kassa's"
 
   const transporter = nodemailer.createTransport({
     host: 'smtp.zoho.eu',
@@ -332,19 +343,19 @@ async function sendVerificationEmail(email: string, name: string, token: string)
   })
 
   const mailOptions = {
-    from: `"Vysion kassa's" <${process.env.ZOHO_EMAIL}>`,
+    from: `"${brand}" <${process.env.ZOHO_EMAIL}>`,
     to: email,
-    subject: "Welkom bij Vysion kassa's - Bevestig je email",
+    subject: `Welkom bij ${brand} — bevestig je e-mail`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="text-align: center; margin-bottom: 30px;">
-          <h1 style="color: #F97316; margin: 0;">Vysion</h1>
+          <h1 style="color: #F97316; margin: 0;">${brand}</h1>
         </div>
         
         <h2 style="color: #333;">Welkom ${name}!</h2>
         
         <p style="color: #555; line-height: 1.6;">
-          Bedankt voor je registratie bij Vysion kassa's!
+          Bedankt voor je registratie bij ${brand}!
         </p>
         
         <p style="color: #555; line-height: 1.6;">
@@ -384,7 +395,7 @@ async function sendVerificationEmail(email: string, name: string, token: string)
     text: `
 Welkom ${name}!
 
-Bedankt voor je registratie bij Vysion kassa's!
+Bedankt voor je registratie bij ${brand}!
 
 Klik op deze link om je emailadres te bevestigen:
 ${verifyUrl}

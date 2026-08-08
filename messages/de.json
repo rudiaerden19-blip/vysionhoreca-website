@@ -773,6 +773,7 @@
     "productLineRequired": "Bitte wählen Sie zuerst eine Produktlinie",
     "productLineContinue": "Weiter zum Konto",
     "productLineChange": "Andere Wahl",
+    "trialDaysSuffix": "Tage kostenlose Testphase — Online-Bestellung, keine Kasse",
     "productLine": {
       "horeca_kassa": {
         "title": "Gastro-Kasse",

@@ -1055,6 +1055,7 @@
     "productLineRequired": "Please choose a product line first",
     "productLineContinue": "Continue to account",
     "productLineChange": "Change choice",
+    "trialDaysSuffix": "days free trial — online ordering, no POS",
     "productLine": {
       "horeca_kassa": {
         "title": "Horeca POS",
