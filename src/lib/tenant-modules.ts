@@ -417,6 +417,18 @@ export function hasModuleAccessForPathname(
   ) {
     return true
   }
+  if (
+    (rest.startsWith('/pincode') ||
+      rest.startsWith('/categorieen') ||
+      rest.startsWith('/producten') ||
+      rest.startsWith('/opties') ||
+      rest.startsWith('/allergenen')) &&
+    (moduleAccess['online-bestellingen'] || moduleAccess.online) &&
+    !isHorecaKassaPosScreenEnabled(moduleAccess) &&
+    !isRetailKassaPosScreenEnabled(moduleAccess, null)
+  ) {
+    return true
+  }
   return false
 }
 
@@ -440,6 +452,16 @@ export function submenuParentAllowedForSubmenuId(
   }
   if (subId === 'sm_retail_loyalty') {
     return moduleAccess['retail-kassa']
+  }
+  if (
+    subId === 'sm_kassa_pincode' ||
+    subId === 'sm_kassa_categorieen' ||
+    subId === 'sm_kassa_producten' ||
+    subId === 'sm_kassa_opties' ||
+    subId === 'sm_kassa_allergenen'
+  ) {
+    if (moduleAccess.kassa) return true
+    return !!(moduleAccess['online-bestellingen'] || moduleAccess.online)
   }
   return moduleAccess[gate.module]
 }

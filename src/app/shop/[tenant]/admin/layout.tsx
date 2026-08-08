@@ -496,16 +496,16 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
       <div style={{ maxWidth: '100%', overflowX: 'hidden', width: '100%'}} className="min-h-screen bg-gray-100">
         {/* ── Zwarte topbalk (zelfde stijl als kassa). Z-index 100 — modals/dialoog: min. z-[130] zodat ze boven deze balk blijven (iPad). ── */}
         <div
-          className="fixed top-0 left-0 right-0 z-[100] flex items-center gap-2 bg-black px-2 sm:px-3"
-          style={{ height: 56 }}
+          className="fixed top-0 left-0 right-0 z-[100] grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 bg-black px-2 sm:px-3"
+          style={{ height: 56, gridTemplateColumns: 'auto 1fr auto' }}
         >
-          <div className="flex min-w-0 shrink-0 items-center gap-2">
+          <div className="flex min-w-0 items-center gap-2 justify-self-start">
             <AdminHamburgerMenu tenantSlug={params.tenant} />
             {!modulesLoading &&
               isReservationsSoftwareTenant(moduleAccess, enabledModulesJson) && (
               <ReservationOnlineTopBarLink baseUrl={baseUrl} alwaysVisible />
             )}
-          {!modulesLoading &&
+            {!modulesLoading &&
             (isHorecaKassaPosScreenEnabled(moduleAccess) ||
               isRetailKassaPosScreenEnabled(moduleAccess, enabledModulesJson)) && (
             <>
@@ -527,17 +527,16 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
               ) : null}
             </>
           )}
-        </div>
+          </div>
 
-        {/* Tenant naam midden */}
-        <div className="flex min-w-0 flex-1 items-center justify-center px-1">
+        <div className="flex min-w-0 items-center justify-center justify-self-center px-1">
           <span className="truncate text-center text-base font-bold tracking-normal !text-white sm:text-lg">
             {adminHeaderTitle}
           </span>
         </div>
 
         {/* Rechts: display knop + vergrendel + taal */}
-        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+        <div className="flex shrink-0 items-center gap-1 sm:gap-2 justify-self-end">
           {isAdminSubmenuEnabled(
             'sm_orders_display',
             params.tenant,

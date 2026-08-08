@@ -5971,6 +5971,7 @@
   "adminHamburger": {
     "rows": {
       "bestellingen": "Bestellingen",
+      "shop_instellingen": "Shop instellingen",
       "kassa": "Kassa",
       "retail-kassa": "Winkelkassa",
       "voorraad": "Voorraad",

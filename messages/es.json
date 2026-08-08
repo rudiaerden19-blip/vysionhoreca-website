@@ -6012,6 +6012,7 @@
   "adminHamburger": {
     "rows": {
       "bestellingen": "Pedidos",
+      "shop_instellingen": "Ajustes de la tienda",
       "kassa": "TPV",
       "online-platform": "Plataforma online",
       "website": "Sitio web",

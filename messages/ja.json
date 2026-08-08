@@ -6012,6 +6012,7 @@
   "adminHamburger": {
     "rows": {
       "bestellingen": "Orders",
+      "shop_instellingen": "Shop settings",
       "kassa": "POS",
       "online-platform": "Online platform",
       "website": "Website",

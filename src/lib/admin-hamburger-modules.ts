@@ -40,6 +40,29 @@ export function isKassaPosSubmenuVisibleForTenant(
   return tenantHasKassaPosScreen(access, enabledJson)
 }
 
+/** Pincode, menu & catalog — voor online shop zonder kassa-POS. */
+export const ONLINE_SHOP_CATALOG_SUBMENU_IDS = new Set([
+  'sm_kassa_pincode',
+  'sm_kassa_categorieen',
+  'sm_kassa_producten',
+  'sm_kassa_opties',
+  'sm_kassa_allergenen',
+])
+
+export function isOnlineShopCatalogSubmenu(subId: string): boolean {
+  return ONLINE_SHOP_CATALOG_SUBMENU_IDS.has(subId)
+}
+
+export function isOnlineShopOnlyTenant(
+  access: Record<TenantModuleId, boolean>,
+  enabledJson: Record<string, boolean> | null
+): boolean {
+  return (
+    !tenantHasKassaPosScreen(access, enabledJson) &&
+    !!(access['online-bestellingen'] || access.online)
+  )
+}
+
 export type AdminHamburgerItem = {
   id: string
   icon: string
@@ -111,6 +134,50 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
           label: 'Groepsbestellingen',
           labelKey: itemLabelKey('sm_orders_groepen'),
           href: `${baseUrl}/groepen`,
+        },
+      ],
+    },
+    {
+      rowKey: 'shop_instellingen',
+      key: 'online-bestellingen',
+      icon: '',
+      label: 'Shop instellingen',
+      labelKey: rowLabelKey('shop_instellingen'),
+      items: [
+        {
+          id: 'sm_kassa_pincode',
+          icon: '',
+          label: 'Pincode',
+          labelKey: itemLabelKey('sm_kassa_pincode'),
+          href: `${baseUrl}/pincode`,
+        },
+        {
+          id: 'sm_kassa_categorieen',
+          icon: '',
+          label: 'Categorieën',
+          labelKey: itemLabelKey('sm_kassa_categorieen'),
+          href: `${baseUrl}/categorieen`,
+        },
+        {
+          id: 'sm_kassa_producten',
+          icon: '',
+          label: 'Producten',
+          labelKey: itemLabelKey('sm_kassa_producten'),
+          href: `${baseUrl}/producten`,
+        },
+        {
+          id: 'sm_kassa_opties',
+          icon: '',
+          label: "Opties & Extra's",
+          labelKey: itemLabelKey('sm_kassa_opties'),
+          href: `${baseUrl}/opties`,
+        },
+        {
+          id: 'sm_kassa_allergenen',
+          icon: '',
+          label: 'Allergenen',
+          labelKey: itemLabelKey('sm_kassa_allergenen'),
+          href: `${baseUrl}/allergenen`,
         },
       ],
     },
@@ -714,6 +781,16 @@ export function isAdminSubmenuEnabled(
   moduleAccess: Record<TenantModuleId, boolean>,
   enabledJson: Record<string, boolean> | null
 ): boolean {
+  if (
+    isOnlineShopCatalogSubmenu(subId) &&
+    isOnlineShopOnlyTenant(moduleAccess, enabledJson)
+  ) {
+    if (enabledJson && hasExplicitEnabledModules(enabledJson)) {
+      if (enabledJson[subId] === false) return false
+      if (enabledJson[subId] === true) return true
+    }
+    return true
+  }
   if (enabledJson && hasExplicitEnabledModules(enabledJson)) {
     if (enabledJson[subId] === true) {
       return isKassaPosSubmenuVisibleForTenant(subId, moduleAccess, enabledJson)
@@ -811,8 +888,20 @@ export function hasShopAdminPathAccess(
 function moduleRowVisibleInMenu(
   m: AdminHamburgerModule,
   menuAccess: Record<TenantModuleId, boolean>,
-  enabledModulesJson: Record<string, boolean> | null
+  enabledModulesJson: Record<string, boolean> | null,
+  effectiveAccess: Record<TenantModuleId, boolean>
 ): boolean {
+  if (m.rowKey === 'shop_instellingen') {
+    if (!isOnlineShopOnlyTenant(effectiveAccess, enabledModulesJson)) return false
+    if (enabledModulesJson && hasExplicitEnabledModules(enabledModulesJson)) {
+      return m.items.some(
+        (item) =>
+          enabledModulesJson[item.id] === true ||
+          (isOnlineShopCatalogSubmenu(item.id) && enabledModulesJson[item.id] !== false)
+      )
+    }
+    return true
+  }
   if (enabledModulesJson && hasExplicitEnabledModules(enabledModulesJson)) {
     return (
       enabledModulesJson[m.key] === true ||
@@ -838,12 +927,28 @@ export function filterHamburgerModulesForAccess(
     : { ...effectiveAccess, account: true }
 
   return modules
-    .filter((m) => moduleRowVisibleInMenu(m, menuAccess, enabledModulesJson))
+    .filter((m) => {
+      if (m.rowKey === 'kassa' && isOnlineShopOnlyTenant(effectiveAccess, enabledModulesJson)) {
+        return false
+      }
+      return moduleRowVisibleInMenu(m, menuAccess, enabledModulesJson, effectiveAccess)
+    })
     .map((m) => ({
       ...m,
       items: m.items.filter((item) => {
         if (!isKassaPosSubmenuVisibleForTenant(item.id, effectiveAccess, enabledModulesJson)) {
           return false
+        }
+        if (
+          m.rowKey === 'shop_instellingen' &&
+          isOnlineShopCatalogSubmenu(item.id) &&
+          isOnlineShopOnlyTenant(effectiveAccess, enabledModulesJson)
+        ) {
+          if (enabledModulesJson && hasExplicitEnabledModules(enabledModulesJson)) {
+            if (enabledModulesJson[item.id] === false) return false
+            if (enabledModulesJson[item.id] === true) return true
+          }
+          return true
         }
         if (item.href.includes('/labels') && !effectiveLabelPrinting) return false
         if (enabledModulesJson && hasExplicitEnabledModules(enabledModulesJson)) {

@@ -6013,6 +6013,7 @@
   "adminHamburger": {
     "rows": {
       "bestellingen": "Ordini",
+      "shop_instellingen": "Impostazioni shop",
       "kassa": "Cassa",
       "online-platform": "Piattaforma online",
       "website": "Sito web",

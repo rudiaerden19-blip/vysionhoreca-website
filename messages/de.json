@@ -6035,6 +6035,7 @@
   "adminHamburger": {
     "rows": {
       "bestellingen": "Bestellungen",
+      "shop_instellingen": "Shop-Einstellungen",
       "kassa": "Kasse",
       "online-platform": "Online-Plattform",
       "website": "Website",
