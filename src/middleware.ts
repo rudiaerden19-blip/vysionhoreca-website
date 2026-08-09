@@ -14,6 +14,11 @@ import {
   isVysionLegacyMarketingHost,
   isVysionMainPortalHost,
 } from '@/lib/vysion-site'
+import { applySeoResponseHeaders } from '@/lib/seo-crawl'
+
+function finishSeo(res: NextResponse, pathname: string): NextResponse {
+  return applySeoResponseHeaders(res, pathname) as NextResponse
+}
 
 /**
  * Public bestanden uit /public — niet naar /shop/{tenant}/… herschrijven.
@@ -163,7 +168,7 @@ export async function middleware(request: NextRequest) {
 
   /** Superadmin: no CDN/browser cache — users were seeing stale UI zonder Modules-knop. */
   if (pathname.startsWith('/superadmin')) {
-    const res = NextResponse.next()
+    const res = finishSeo(NextResponse.next(), pathname)
     res.headers.set('Cache-Control', 'private, no-store, max-age=0, must-revalidate')
     res.headers.set('Pragma', 'no-cache')
     return res
@@ -203,7 +208,7 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(redir)
       }
     }
-    return NextResponse.next()
+    return finishSeo(NextResponse.next(), pathname)
   }
 
   // Redirect www.tenant.ordervysion.com to tenant.ordervysion.com
@@ -239,11 +244,11 @@ export async function middleware(request: NextRequest) {
 
   // Skip if no valid subdomain found
   if (!subdomain || subdomain === 'www' || subdomain.length === 0) {
-    return NextResponse.next()
+    return finishSeo(NextResponse.next(), pathname)
   }
 
   if (isTenantPublicStaticBypass(pathname)) {
-    return NextResponse.next()
+    return finishSeo(NextResponse.next(), pathname)
   }
 
   /** tenant.domein/kiosk1 → menu, URL blijft /kiosk1 */
@@ -270,7 +275,7 @@ export async function middleware(request: NextRequest) {
       url.searchParams.get('next')
     )
     if (bypass) return bypass
-    return NextResponse.next()
+    return finishSeo(NextResponse.next(), pathname)
   }
 
   if (
@@ -284,7 +289,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/keuken') ||
     pathname.startsWith('/monitoring')
   ) {
-    return NextResponse.next()
+    return finishSeo(NextResponse.next(), pathname)
   }
 
   // Rewrite to shop/[tenant] path
@@ -296,7 +301,7 @@ export async function middleware(request: NextRequest) {
     url.pathname = `/shop/${subdomain}${pathname === '/'? '' : pathname}`
   }
 
-  const res = NextResponse.rewrite(url)
+  const res = finishSeo(NextResponse.rewrite(url), pathname)
   if (hostname.includes('ordervysion.com') && subdomain === DEMO_TENANT_SLUG) {
     res.headers.set('Cache-Control', 'private, no-store, max-age=0, must-revalidate')
     res.headers.set('Pragma', 'no-cache')

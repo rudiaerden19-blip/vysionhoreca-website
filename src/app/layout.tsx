@@ -63,6 +63,21 @@ const organizationJsonLd = {
       ],
     },
     {
+      '@type': 'SoftwareApplication',
+      '@id': `${siteUrl}/#software`,
+      name: VYSION_BRAND_SITE_NAME,
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Web, Android, iOS',
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'EUR',
+        description: '14 dagen gratis proberen',
+      },
+      publisher: { '@id': `${siteUrl}/#organization`},
+      url: siteUrl,
+    },
+    {
       '@type': 'WebSite',
       '@id': `${siteUrl}/#website`,
       url: siteUrl,
