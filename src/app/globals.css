@@ -482,12 +482,6 @@ input[type="number"] {
   background-blend-mode: overlay;
 }
 
-/** Pan/zoom-plattegrond: korrel/tegel mee met camera (niet viewport-fixed). */
-.gks-floor-plan-viewport-layer.gks-menu-plate-grain,
-.gks-floor-plan-viewport-layer.gks-floor-terrace-grain {
-  background-attachment: scroll;
-}
-
 .gks-menu-vignette {
   position: relative;
   isolation: isolate;
