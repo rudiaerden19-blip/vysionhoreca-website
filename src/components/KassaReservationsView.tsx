@@ -52,6 +52,12 @@ import {
   floorPlanZoneFromRealtimePayload,
   type FloorPlanZone,
 } from '@/lib/kassa-floor-plan-zone'
+import {
+  KASSA_FLOOR_MODAL_INPUT_LIGHT,
+  KASSA_FLOOR_MODAL_TOUCH,
+  focusKassaFloorModalInput,
+  isFloorModalTextEntryFocused,
+} from '@/lib/kassa-floor-plan-modal-input'
 import { getAuthHeaders, authFetch } from '@/lib/auth-headers'
 import { useLanguage } from '@/i18n'
 import { ControlledNumberInput } from '@/components/ControlledNumberInput'
@@ -1247,7 +1253,7 @@ export default function KassaReservationsView({
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey || e.altKey) return
-      if (document.activeElement === input) return
+      if (isFloorModalTextEntryFocused()) return
       if (e.key === 'Escape') {
         e.preventDefault()
         setShowAddFloorTable(false)
@@ -3078,7 +3084,7 @@ export default function KassaReservationsView({
                   <span className="hidden sm:inline">{tablesLocked ? rk('shiftTables') : rk('lockTables')}</span>
                 </button>
 
-                <button onClick={() => { setSelectedFloorTable(null); setShowAddFloorTable(true) }}
+                <button onClick={() => { setSelectedFloorTable(null); setAddFloorNumber(''); setShowAddFloorTable(true) }}
                   className="flex items-center gap-2 h-11 px-5 rounded-xl bg-green-500 hover:bg-green-600 active:bg-green-700 text-white text-sm font-bold transition-colors whitespace-nowrap shadow-sm">
                   <Plus size={18} />
                   <span className="hidden sm:inline">{rk('addTable')}</span>
@@ -3252,6 +3258,7 @@ export default function KassaReservationsView({
                         onClick={e => {
                           e.stopPropagation()
                           setSelectedFloorTable(null)
+                          setAddFloorNumber('')
                           setShowAddFloorTable(true)
                         }}
                         className="flex min-h-[44px] shrink-0 items-center gap-2 rounded-xl bg-green-500 px-3 py-2 text-sm font-bold text-white shadow-lg transition-colors hover:bg-green-600 active:bg-green-700 sm:px-5"
@@ -3574,11 +3581,23 @@ export default function KassaReservationsView({
 
               {/* Add table modal */}
               {showAddFloorTable && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[70] p-4">
-                  <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl">
+                <div
+                  className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 p-4 touch-manipulation"
+                  data-vysion-modal-overlay
+                  role="presentation"
+                  onClick={() => setShowAddFloorTable(false)}
+                >
+                  <div
+                    className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl"
+                    role="dialog"
+                    aria-modal="true"
+                    data-add-floor-table-modal
+                    onClick={e => e.stopPropagation()}
+                    onPointerDown={e => e.stopPropagation()}
+                  >
                     <div className="p-5 border-b flex items-center justify-between">
-                      <h3 className="font-bold text-lg">{rk('addTable')}</h3>
-                      <button onClick={() => setShowAddFloorTable(false)} className="text-gray-400 hover:text-gray-700"><X size={20} /></button>
+                      <h3 className="font-bold text-lg text-gray-900">{rk('addTable')}</h3>
+                      <button type="button" onClick={() => setShowAddFloorTable(false)} className="min-h-[44px] min-w-[44px] touch-manipulation text-gray-400 hover:text-gray-700"><X size={20} /></button>
                     </div>
                     <div className="p-5 space-y-4">
                       <div>
@@ -3591,12 +3610,14 @@ export default function KassaReservationsView({
                           autoCorrect="off"
                           autoCapitalize="off"
                           spellCheck={false}
+                          data-no-capitalize="true"
                           enterKeyHint="done"
                           autoFocus
                           value={addFloorNumber}
                           onChange={e => setAddFloorNumber(e.target.value)}
+                          onPointerDown={focusKassaFloorModalInput}
                           onKeyDown={e => e.key === 'Enter' && void addFloorTable()}
-                          className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-500 outline-none text-xl font-bold text-center"
+                          className={`w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-500 outline-none text-xl font-bold text-center ${KASSA_FLOOR_MODAL_INPUT_LIGHT} ${KASSA_FLOOR_MODAL_TOUCH}`}
                           placeholder={rk('tableNumberPlaceholder')}
                         />
                       </div>
@@ -3604,8 +3625,8 @@ export default function KassaReservationsView({
                         <label className="block text-sm font-semibold text-gray-600 mb-2">{rk('seatsLabel')}</label>
                         <div className="grid grid-cols-5 gap-2">
                           {[2, 4, 6, 8, 10].map(n => (
-                            <button key={n} onClick={() => setAddFloorSeats(n)}
-                              className={`py-2 rounded-xl font-bold transition-colors ${addFloorSeats === n ? 'bg-green-500 text-white': 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+                            <button key={n} type="button" onClick={() => setAddFloorSeats(n)}
+                              className={`min-h-[44px] touch-manipulation rounded-xl py-2 font-bold transition-colors ${addFloorSeats === n ? 'bg-green-500 text-white': 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
                               {n}
                             </button>
                           ))}
@@ -3619,8 +3640,8 @@ export default function KassaReservationsView({
                             ['ROUND', 'shapeRound'],
                             ['RECTANGLE', 'shapeRectangle'],
                           ] as const).map(([s, labelKey]) => (
-                            <button key={s} onClick={() => setAddFloorShape(s)}
-                              className={`py-2 rounded-xl text-xs font-bold transition-colors ${addFloorShape === s ? 'bg-green-500 text-white': 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+                            <button key={s} type="button" onClick={() => setAddFloorShape(s)}
+                              className={`min-h-[44px] touch-manipulation rounded-xl py-2 text-xs font-bold transition-colors ${addFloorShape === s ? 'bg-green-500 text-white': 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
                               {rk(labelKey)}
                             </button>
                           ))}
@@ -3628,8 +3649,8 @@ export default function KassaReservationsView({
                       </div>
                     </div>
                     <div className="p-4 border-t flex gap-3">
-                      <button onClick={() => setShowAddFloorTable(false)} className="flex-1 py-3 rounded-xl bg-gray-100 font-semibold">{rk('cancel')}</button>
-                      <button onClick={addFloorTable} className="flex-[2] py-3 rounded-xl bg-green-500 hover:bg-green-600 text-white font-bold transition-colors">{rk('addButton')}</button>
+                      <button type="button" onClick={() => setShowAddFloorTable(false)} className="min-h-[44px] flex-1 touch-manipulation rounded-xl bg-gray-100 font-semibold">{rk('cancel')}</button>
+                      <button type="button" onClick={() => void addFloorTable()} className="min-h-[44px] flex-[2] touch-manipulation rounded-xl bg-green-500 hover:bg-green-600 text-white font-bold transition-colors">{rk('addButton')}</button>
                     </div>
                   </div>
                 </div>

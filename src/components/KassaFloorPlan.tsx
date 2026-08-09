@@ -23,24 +23,26 @@ import {
   KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
   kassaPosButtonClass,
 } from '@/lib/kassa-pos-surface'
+import {
+  KASSA_FLOOR_MODAL_INPUT_LIGHT,
+  KASSA_FLOOR_MODAL_TOUCH,
+  focusKassaFloorModalInput,
+  isFloorModalTextEntryFocused,
+} from '@/lib/kassa-floor-plan-modal-input'
 
 export type TableShape = FloorPlanTable['shape']
 export type TableStatus = FloorPlanTable['status']
 
 export type KassaTable = FloorPlanTable
 
-const FLOOR_MODAL_TOUCH =
-  'min-h-[44px] touch-manipulation [-webkit-tap-highlight-color:transparent]'
+const FLOOR_MODAL_TOUCH = KASSA_FLOOR_MODAL_TOUCH
+
+const FLOOR_MODAL_INPUT_LIGHT = KASSA_FLOOR_MODAL_INPUT_LIGHT
 
 const FLOOR_TOOLBAR_BTN = `px-3 py-2 text-sm font-semibold whitespace-nowrap ${kassaPosButtonClass(false)}`
 
-/** Witte invoer op plattegrond-modals — voorkomt kassa-dark input-styling op het hele veld. */
-const FLOOR_MODAL_INPUT_LIGHT =
-  'bg-white text-black placeholder:text-neutral-500 caret-gray-900 [color-scheme:light]'
-
 function focusFloorModalInput(e: ReactPointerEvent<HTMLInputElement>) {
-  if (e.pointerType !== 'touch' && e.pointerType !== 'pen') return
-  e.currentTarget.focus({ preventScroll: true })
+  focusKassaFloorModalInput(e)
 }
 
 const STATUS_COLORS: Record<TableStatus, string> = {
@@ -989,8 +991,7 @@ export default function KassaFloorPlan({
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey || e.altKey) return
-      const ae = document.activeElement
-      if (ae === input) return
+      if (isFloorModalTextEntryFocused()) return
       if (e.key === 'Escape') {
         e.preventDefault()
         setShowAddModal(false)
