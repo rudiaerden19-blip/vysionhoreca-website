@@ -24,14 +24,7 @@ import {
   KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
   kassaPosButtonClass,
 } from '@/lib/kassa-pos-surface'
-import { kassaFloorPlanViewportLayerClass } from '@/lib/kassa-floor-plan-surface'
-import {
-  defaultFloorViewportForDevice,
-  pinchDistance,
-  pinchZoomReservationFloor,
-  zoomReservationFloorAtPoint,
-  type ReservationFloorViewport,
-} from '@/lib/reservation-floor-viewport'
+import { zoomReservationFloorAtPoint } from '@/lib/reservation-floor-viewport'
 import {
   KASSA_FLOOR_MODAL_INPUT_LIGHT,
   KASSA_FLOOR_MODAL_TOUCH,
@@ -593,94 +586,23 @@ export default function KassaFloorPlan({
   const [stoolStatuses, setStoolStatuses] = useState<Record<string, TableStatus>>({})
 
   const [isLocked, setIsLocked] = useState(true)
-  const canvasRef = useRef<HTMLDivElement>(null)
-  const [floorViewport, setFloorViewport] = useState<ReservationFloorViewport>({
-    panX: 0,
-    panY: 0,
-    zoom: 1,
-  })
-  const floorViewportRef = useRef(floorViewport)
+  const [floorZoom, setFloorZoom] = useState(1)
+  const floorZoomRef = useRef(1)
   useEffect(() => {
-    floorViewportRef.current = floorViewport
-  }, [floorViewport])
-  const floorPanDragRef = useRef<{
-    pointerId: number
-    startX: number
-    startY: number
-    startPanX: number
-    startPanY: number
-  } | null>(null)
-  const floorPanMovedRef = useRef(false)
-  const [isPanningFloor, setIsPanningFloor] = useState(false)
-  const floorPointersRef = useRef(new Map<number, { clientX: number; clientY: number }>())
-  const floorPinchSessionRef = useRef<{
-    pointerIds: [number, number]
-    startDist: number
-    startViewport: ReservationFloorViewport
-    anchorLocalX: number
-    anchorLocalY: number
-  } | null>(null)
-
-  const applyOpeningFloorViewport = useCallback(() => {
-    const touch = typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0
-    setFloorViewport(defaultFloorViewportForDevice(touch))
-  }, [])
-
+    floorZoomRef.current = floorZoom
+  }, [floorZoom])
   useEffect(() => {
-    floorPointersRef.current.clear()
-    floorPinchSessionRef.current = null
-    applyOpeningFloorViewport()
-  }, [planZone, applyOpeningFloorViewport])
+    setFloorZoom(1)
+  }, [planZone])
 
   const stepFloorZoom = useCallback((factor: number) => {
-    const el = canvasRef.current
+    const el = innerCanvasRef.current
     if (!el) return
     const r = el.getBoundingClientRect()
-    setFloorViewport((vp) => zoomReservationFloorAtPoint(vp, factor, r.width / 2, r.height / 2))
+    setFloorZoom((z) =>
+      zoomReservationFloorAtPoint({ panX: 0, panY: 0, zoom: z }, factor, r.width / 2, r.height / 2).zoom,
+    )
   }, [])
-
-  const beginFloorPinchIfNeeded = useCallback(() => {
-    const ids = [...floorPointersRef.current.keys()]
-    if (ids.length < 2) return
-    const floor = canvasRef.current
-    if (!floor) return
-    const rect = floor.getBoundingClientRect()
-    const p1 = floorPointersRef.current.get(ids[0])!
-    const p2 = floorPointersRef.current.get(ids[1])!
-    const midX = (p1.clientX + p2.clientX) / 2 - rect.left
-    const midY = (p1.clientY + p2.clientY) / 2 - rect.top
-    floorPinchSessionRef.current = {
-      pointerIds: [ids[0], ids[1]],
-      startDist: pinchDistance(p1.clientX, p1.clientY, p2.clientX, p2.clientY),
-      startViewport: { ...floorViewportRef.current },
-      anchorLocalX: midX,
-      anchorLocalY: midY,
-    }
-  }, [])
-
-  const finalizeFloorPan = (e: React.PointerEvent) => {
-    const floor = canvasRef.current
-    if (floorPanDragRef.current && floor) {
-      try {
-        if (floor.hasPointerCapture(e.pointerId)) floor.releasePointerCapture(e.pointerId)
-      } catch {
-        /* ignore */
-      }
-    }
-    floorPanDragRef.current = null
-    setIsPanningFloor(false)
-    window.setTimeout(() => {
-      floorPanMovedRef.current = false
-    }, 0)
-  }
-
-  const floorChromeStyle = useMemo(
-    () => ({
-      cursor: isLocked ? (isPanningFloor ? 'grabbing' : 'grab') : 'default',
-      touchAction: 'none' as const,
-    }),
-    [isLocked, isPanningFloor],
-  )
   /** iPad/Safari: altijd releasePointerCapture na drag, anders blijven tikken “vast”. */
   const pointerCaptureRef = useRef<{ pointerId: number; element: HTMLElement } | null>(null)
 
@@ -698,7 +620,7 @@ export default function KassaFloorPlan({
   /** Live % tijdens slepen: max 1 React-update per frame. */
   const [dragPaint, setDragPaint] = useState<{ id: string; x: number; y: number } | null>(null)
   const pendingDragPctRef = useRef<{ x: number; y: number } | null>(null)
-  const viewportLayerRef = useRef<HTMLDivElement | null>(null)
+  const innerCanvasRef = useRef<HTMLDivElement | null>(null)
   /** Één gesture-laag: capture op canvas + hit-test (touch/desktop, alle tenants). */
   const floorGestureRef = useRef<{ pointerId: number; kind: 'table' |  'decor'; id: string } | null>(null)
   const tapStartedEmptyRef = useRef(false)
@@ -1144,7 +1066,7 @@ export default function KassaFloorPlan({
 
   /** Welke tafel/decor ligt visueel bovenaan op dit punt — DOM-stack i.p.v. per-element listeners (touch + muis, alle tenants). */
   const resolveFloorHit = useCallback((clientX: number, clientY: number): { kind: 'table' |  'decor'; id: string } | null => {
-    const root = viewportLayerRef.current
+    const root = innerCanvasRef.current
     if (!root || typeof document === 'undefined') return null
     let stack: Element[]
     try {
@@ -1170,7 +1092,7 @@ export default function KassaFloorPlan({
     const target = e.target as HTMLElement
     if (target.closest('[data-floor-ui]')) return
 
-    const canvas = canvasRef.current
+    const canvas = innerCanvasRef.current
     if (!canvas) return
 
     const rect = canvas.getBoundingClientRect()
@@ -1191,33 +1113,6 @@ export default function KassaFloorPlan({
 
     const hit = resolveFloorHit(e.clientX, e.clientY)
 
-    if (isLocked) {
-      if (hit) {
-        floorGestureRef.current = { pointerId: e.pointerId, kind: hit.kind, id: hit.id }
-        takePointerCapture(canvas, e.pointerId)
-        return
-      }
-
-      floorPointersRef.current.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY })
-      if (floorPointersRef.current.size >= 2) {
-        beginFloorPinchIfNeeded()
-        return
-      }
-      floorPanMovedRef.current = false
-      const vp = floorViewportRef.current
-      floorPanDragRef.current = {
-        pointerId: e.pointerId,
-        startX: e.clientX,
-        startY: e.clientY,
-        startPanX: vp.panX,
-        startPanY: vp.panY,
-      }
-      tapStartedEmptyRef.current = true
-      canvas.setPointerCapture(e.pointerId)
-      setIsPanningFloor(true)
-      return
-    }
-
     if (!hit) {
       tapStartedEmptyRef.current = true
       takePointerCapture(canvas, e.pointerId)
@@ -1226,6 +1121,8 @@ export default function KassaFloorPlan({
 
     floorGestureRef.current = { pointerId: e.pointerId, kind: hit.kind, id: hit.id }
     takePointerCapture(canvas, e.pointerId)
+
+    if (isLocked) return
 
     const item =
       hit.kind === 'table'? tables.find((t) => t.id === hit.id) : decors.find((d) => d.id === hit.id)
@@ -1240,9 +1137,9 @@ export default function KassaFloorPlan({
     ignoreFloorRealtimeRef.current = true
     floorPersistPausedRef.current = true
     setBodyGrabbing(true)
-    const vp = floorViewportRef.current
-    const worldPx = (e.clientX - rect.left - vp.panX) / vp.zoom
-    const worldPy = (e.clientY - rect.top - vp.panY) / vp.zoom
+    const z = floorZoomRef.current
+    const worldPx = (e.clientX - rect.left) / z
+    const worldPy = (e.clientY - rect.top) / z
     dragOffset.current = {
       x: worldPx - (item.x / 100) * rect.width,
       y: worldPy - (item.y / 100) * rect.height,
@@ -1251,48 +1148,7 @@ export default function KassaFloorPlan({
 
   const canvasPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (showAddModal || showAddBarModal) return
-
-    if (isLocked) {
-      if (floorPointersRef.current.has(e.pointerId)) {
-        floorPointersRef.current.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY })
-      }
-      const pinch = floorPinchSessionRef.current
-      if (pinch && floorPointersRef.current.size >= 2) {
-        const p1 = floorPointersRef.current.get(pinch.pointerIds[0])
-        const p2 = floorPointersRef.current.get(pinch.pointerIds[1])
-        if (p1 && p2) {
-          const dist = pinchDistance(p1.clientX, p1.clientY, p2.clientX, p2.clientY)
-          if (dist > 0 && pinch.startDist > 0) {
-            floorPanMovedRef.current = true
-            setFloorViewport(
-              pinchZoomReservationFloor(
-                {
-                  ...pinch.startViewport,
-                  anchorLocalX: pinch.anchorLocalX,
-                  anchorLocalY: pinch.anchorLocalY,
-                },
-                pinch.startDist,
-                dist,
-              ),
-            )
-          }
-        }
-        return
-      }
-      const panDrag = floorPanDragRef.current
-      if (panDrag && panDrag.pointerId === e.pointerId) {
-        const dx = e.clientX - panDrag.startX
-        const dy = e.clientY - panDrag.startY
-        if (Math.abs(dx) > 4 || Math.abs(dy) > 4) floorPanMovedRef.current = true
-        setFloorViewport({
-          ...floorViewportRef.current,
-          panX: panDrag.startPanX + dx,
-          panY: panDrag.startPanY + dy,
-        })
-      }
-      return
-    }
-
+    if (isLocked) return
     const g = floorGestureRef.current
     if (!g || g.pointerId !== e.pointerId) return
     if (!draggingId.current) return
@@ -1302,12 +1158,12 @@ export default function KassaFloorPlan({
     if (dx < 8 && dy < 8) return
     dragMoved.current = true
 
-    const c = canvasRef.current
+    const c = innerCanvasRef.current
     if (!c) return
     const r = floorRectCachedRef.current ?? c.getBoundingClientRect()
-    const vp = floorViewportRef.current
-    const worldPx = (e.clientX - r.left - vp.panX) / vp.zoom
-    const worldPy = (e.clientY - r.top - vp.panY) / vp.zoom
+    const z = floorZoomRef.current
+    const worldPx = (e.clientX - r.left) / z
+    const worldPy = (e.clientY - r.top) / z
     const x = Math.max(1, Math.min(99, ((worldPx - dragOffset.current.x) / r.width) * 100))
     const y = Math.max(1, Math.min(99, ((worldPy - dragOffset.current.y) / r.height) * 100))
     pendingDragPctRef.current = { x, y }
@@ -1315,20 +1171,10 @@ export default function KassaFloorPlan({
   }
 
   const canvasPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (isLocked) {
-      floorPointersRef.current.delete(e.pointerId)
-      if (floorPointersRef.current.size < 2) {
-        floorPinchSessionRef.current = null
-      }
-      if (floorPanDragRef.current?.pointerId === e.pointerId) {
-        finalizeFloorPan(e)
-      }
-    }
-
     const wasEmptyTap = tapStartedEmptyRef.current
     releaseCapturedPointer(e)
 
-    if (wasEmptyTap && !floorPanMovedRef.current) {
+    if (wasEmptyTap) {
       tapStartedEmptyRef.current = false
       const dx = Math.abs(e.clientX - pointerStart.current.x)
       const dy = Math.abs(e.clientY - pointerStart.current.y)
@@ -1524,22 +1370,26 @@ export default function KassaFloorPlan({
 
       {/* Floor + Sidebar */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Floor plan — pan/zoom op korrel/raster (binnen + terras) */}
+        {/* Floor plan — tegelpatroon vast; alleen tafels/decor verschuiven */}
         <div
-          ref={canvasRef}
-          className="floor-plan relative flex-1 select-none overflow-hidden bg-[#1a1a1a]"
-          style={{ ...floorSurfaceStyle, ...floorChromeStyle }}
-          onPointerDown={canvasPointerDown}
-          onPointerMove={canvasPointerMove}
-          onPointerUp={canvasPointerUp}
-          onPointerCancel={canvasPointerCancel}
+          className={`floor-plan relative flex-1 select-none overflow-hidden ${
+            planZone === FLOOR_PLAN_ZONE_TERRACE ? KASSA_FLOOR_TERRACE_GRAIN_CLASS : KASSA_POS_MENU_PLATE_SHELL_BG_CLASS
+          }`}
+          style={floorSurfaceStyle}
         >
           <div
-            ref={viewportLayerRef}
-            className={`absolute inset-0 origin-top-left ${kassaFloorPlanViewportLayerClass(planZone)}`}
+            ref={innerCanvasRef}
             style={{
-              transform: `translate(${floorViewport.panX}px, ${floorViewport.panY}px) scale(${floorViewport.zoom})`,
+              position: 'absolute',
+              inset: 0,
+              touchAction: 'manipulation',
+              transform: `scale(${floorZoom})`,
+              transformOrigin: 'top left',
             }}
+            onPointerDown={canvasPointerDown}
+            onPointerMove={canvasPointerMove}
+            onPointerUp={canvasPointerUp}
+            onPointerCancel={canvasPointerCancel}
           >
 
           {/* Decor items (achtergrond laag) */}
