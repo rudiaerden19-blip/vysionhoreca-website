@@ -3588,7 +3588,7 @@
     "floorPlanCheckoutTable": "الدفع",
     "floorPlanCheckoutStool": "الدفع {id}",
     "floorPlanDeleteTableBtn": " Remove table",
-    "floorPlanLegendLocked": " مقفل — اضغط «فتح القفل» لتحريك الطاولات",
+    "floorPlanLegendLocked": " مقفل — اضغط «تحريك الطاولات» لتحريك الطاولات",
     "floorPlanLegendEditMode": " غير مقفل — اسحب للتحريك • ↺↻ للدوران",
     "floorPlanModalAddBarTitle": " Add bar segment",
     "floorPlanModalAddBarIntro": "Enter a number for each stool at this bar.",

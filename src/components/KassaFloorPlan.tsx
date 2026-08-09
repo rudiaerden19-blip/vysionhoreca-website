@@ -18,6 +18,7 @@ import {
   type FloorPlanZone,
 } from '@/lib/kassa-floor-plan-zone'
 import { useLanguage } from '@/i18n'
+import { Lock, LockOpen } from 'lucide-react'
 import {
   KASSA_FLOOR_TERRACE_GRAIN_CLASS,
   KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
@@ -1323,10 +1324,17 @@ export default function KassaFloorPlan({
           <button
             type="button"
             onClick={() => setIsLocked(prev => !prev)}
-            title={isLocked ? t('kassaApp.floorPlanLockTitleLocked') : t('kassaApp.floorPlanLockTitleUnlocked')}
-            className={FLOOR_TOOLBAR_BTN}
+            title={
+              isLocked
+                ? t('reservationKassa.tablesLockedTitle')
+                : t('reservationKassa.tablesUnlockedTitle')
+            }
+            className={`inline-flex items-center gap-2 ${FLOOR_TOOLBAR_BTN}`}
           >
-            {isLocked ? t('kassaApp.floorPlanLocked') : t('kassaApp.floorPlanEditing')}
+            {isLocked ? <Lock size={18} className="shrink-0" /> : <LockOpen size={18} className="shrink-0" />}
+            <span className="hidden sm:inline">
+              {isLocked ? t('reservationKassa.shiftTables') : t('reservationKassa.lockTables')}
+            </span>
           </button>
           <button type="button" onClick={onClose} className={FLOOR_TOOLBAR_BTN}>
             {t('kassaApp.closeAria')}

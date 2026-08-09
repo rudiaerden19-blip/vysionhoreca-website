@@ -3588,7 +3588,7 @@
     "floorPlanCheckoutTable": "Incassa",
     "floorPlanCheckoutStool": "Incassa {id}",
     "floorPlanDeleteTableBtn": " Rimuovi tavolo",
-    "floorPlanLegendLocked": " Bloccato — tocca «Sblocca» per spostare i tavoli",
+    "floorPlanLegendLocked": " Bloccato — tocca «Sposta tavoli» per spostare i tavoli",
     "floorPlanLegendEditMode": " Sbloccato — trascina per spostare • ↺↻ per ruotare",
     "floorPlanModalAddBarTitle": " Aggiungi segmento bar",
     "floorPlanModalAddBarIntro": "Assegna un numero a ogni sgabello di questo segmento.",

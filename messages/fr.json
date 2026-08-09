@@ -3088,7 +3088,7 @@
     "floorPlanCheckoutTable": "Encaisser",
     "floorPlanCheckoutStool": "Encaisser {id}",
     "floorPlanDeleteTableBtn": " Supprimer la table",
-    "floorPlanLegendLocked": " Verrouillé — appuyez sur « Déverrouiller » pour déplacer les tables",
+    "floorPlanLegendLocked": " Verrouillé — appuyez sur « Déplacer les tables » pour déplacer les tables",
     "floorPlanLegendEditMode": " Déverrouillé — glisser pour déplacer • ↺↻ pour pivoter",
     "floorPlanModalAddBarTitle": " Ajouter un segment de bar",
     "floorPlanModalAddBarIntro": "Donnez un numéro à chaque tabouret de ce segment.",

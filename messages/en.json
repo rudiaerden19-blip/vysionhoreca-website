@@ -4121,7 +4121,7 @@
     "floorPlanCheckoutTable": "Checkout",
     "floorPlanCheckoutStool": "Checkout {id}",
     "floorPlanDeleteTableBtn": " Remove table",
-    "floorPlanLegendLocked": " Locked — tap «Unlock» to move tables",
+    "floorPlanLegendLocked": " Locked — tap «Move tables» to reposition tables",
     "floorPlanLegendEditMode": " Unlocked — drag to move • ↺↻ to rotate",
     "floorPlanModalAddBarTitle": " Add bar segment",
     "floorPlanModalAddBarIntro": "Enter a number for each stool at this bar.",

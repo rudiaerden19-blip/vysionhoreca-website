@@ -3088,7 +3088,7 @@
     "floorPlanCheckoutTable": "Zur Kasse",
     "floorPlanCheckoutStool": "Zur Kasse {id}",
     "floorPlanDeleteTableBtn": " Tisch entfernen",
-    "floorPlanLegendLocked": " Gesperrt — auf «Entsperren» tippen, um Tische zu verschieben",
+    "floorPlanLegendLocked": " Gesperrt — «Tische verschieben» tippen, um Tische zu verschieben",
     "floorPlanLegendEditMode": " Entsperrt — ziehen zum Verschieben • ↺↻ zum Drehen",
     "floorPlanModalAddBarTitle": " Barbereich hinzufügen",
     "floorPlanModalAddBarIntro": "Geben Sie jedem Hocker an dieser Bar eine Nummer.",

@@ -4121,7 +4121,7 @@
     "floorPlanCheckoutTable": "Afrekenen",
     "floorPlanCheckoutStool": "Afrekenen {id}",
     "floorPlanDeleteTableBtn": " Verwijder tafel",
-    "floorPlanLegendLocked": " Vergrendeld — klik op «Ontgrendel» om tafels te verplaatsen",
+    "floorPlanLegendLocked": " Vergrendeld — klik «Verschuif tafels» om tafels te verplaatsen",
     "floorPlanLegendEditMode": " Plan ontgrendeld — sleep om te verplaatsen • ↺↻ om te draaien",
     "floorPlanModalAddBarTitle": " Toogstuk toevoegen",
     "floorPlanModalAddBarIntro": "Geef een nummer aan elke barkruk van dit toogstuk.",

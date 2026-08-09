@@ -3588,7 +3588,7 @@
     "floorPlanCheckoutTable": "Cobrar",
     "floorPlanCheckoutStool": "Cobrar {id}",
     "floorPlanDeleteTableBtn": " Quitar mesa",
-    "floorPlanLegendLocked": " Bloqueado — pulsa «Desbloquear» para mover mesas",
+    "floorPlanLegendLocked": " Bloqueado — pulsa «Mover mesas» para mover mesas",
     "floorPlanLegendEditMode": " Desbloqueado — arrastra para mover • ↺↻ para girar",
     "floorPlanModalAddBarTitle": " Añadir tramo de barra",
     "floorPlanModalAddBarIntro": "Asigna un número a cada taburete de este tramo.",
