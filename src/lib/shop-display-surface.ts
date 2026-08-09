@@ -56,6 +56,15 @@ export type ShopDisplaySurface = {
   scrollArea: string
   langBtn: string
   adminMenuLink: string
+  /** Keuken detail-modal + trays */
+  recessTray: string
+  modalHeader: string
+  panelText: string
+  panelDivider: string
+  optionLine: string
+  itemNoteBox: string
+  noteLabel: string
+  newOrderBanner: string
 }
 
 export function getShopDisplaySurface(kassaDark: boolean): ShopDisplaySurface {
@@ -99,6 +108,15 @@ export function getShopDisplaySurface(kassaDark: boolean): ShopDisplaySurface {
         'inline-flex touch-manipulation items-center gap-1 rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm font-bold text-gray-800 hover:bg-gray-50',
       adminMenuLink:
         'flex shrink-0 items-center gap-2 rounded-xl bg-gray-100 px-3 py-2 text-sm font-bold text-gray-800 transition-colors hover:bg-gray-200',
+      recessTray: `${SHOP_DISPLAY_BTN_SHAPE} ${SHOP_DISPLAY_RECESS}`,
+      modalHeader: `${SHOP_DISPLAY_CARD_HEAD} text-gray-900`,
+      panelText: 'text-gray-900',
+      panelDivider: 'border-gray-200',
+      optionLine: `${SHOP_DISPLAY_OPTION_LINE} text-base`,
+      itemNoteBox:
+        'mt-2 rounded-lg border border-gray-200 bg-gray-50 p-2 text-base font-medium text-gray-700',
+      noteLabel: 'mb-1 text-xs font-semibold uppercase tracking-wide text-gray-500',
+      newOrderBanner: 'px-4 py-2 bg-red-500 rounded-xl font-bold text-white',
     }
   }
 
@@ -136,6 +154,15 @@ export function getShopDisplaySurface(kassaDark: boolean): ShopDisplaySurface {
     scrollArea: 'min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-4',
     langBtn: `inline-flex touch-manipulation items-center gap-1 px-3 py-2 text-sm font-bold ${KASSA_DARK_BTN}`,
     adminMenuLink: `flex shrink-0 items-center gap-2 px-3 py-2 text-sm font-bold ${KASSA_DARK_BTN}`,
+    recessTray: `${KASSA_POS_BTN_SHAPE} ${KASSA_POS_MENU_RECESS_TRAY_CLASS}`,
+    modalHeader: `${KASSA_DARK_CARD_HEAD} text-white`,
+    panelText: 'text-white',
+    panelDivider: 'border-white/10',
+    optionLine: 'mt-1 border-l-2 border-white/20 pl-3 text-base font-medium text-white/85',
+    itemNoteBox:
+      'mt-2 rounded-lg border border-white/10 bg-black/30 p-2 text-base font-medium text-white/80',
+    noteLabel: 'mb-1 text-xs font-semibold uppercase tracking-wide text-white/60',
+    newOrderBanner: `border border-red-500/60 bg-red-950/80 px-4 py-2 font-bold text-red-200 ${KASSA_POS_BTN_SHAPE}`,
   }
 }
 
