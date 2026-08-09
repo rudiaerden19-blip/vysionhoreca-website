@@ -67,11 +67,3 @@ export const SHOP_DISPLAY_ACCENT_TEXT = 'text-accent'
 
 export const SHOP_DISPLAY_NEW_CARD_RING =
   'shadow-[0_0_0_2px_rgba(14,93,130,0.55),0_8px_24px_rgba(0,0,0,0.12)]'
-
-/** Alias voor gedeelde orderkaart (keuken + display). */
-export const KITCHEN_CARD_SHELL = SHOP_DISPLAY_CARD_SHELL
-export const KITCHEN_CARD_HEAD = SHOP_DISPLAY_CARD_HEAD
-export const KITCHEN_MUTED = SHOP_DISPLAY_MUTED
-export const KITCHEN_SUBSTRIP = SHOP_DISPLAY_SUBSTRIP
-export const KITCHEN_POS_BTN = `${SHOP_DISPLAY_BTN} py-3`
-export const KITCHEN_POS_BTN_ACCENT = `${SHOP_DISPLAY_BTN_ACCENT} py-3`
