@@ -27,17 +27,8 @@ import {
   orderItemDisplayOptionLines,
   orderItemLineTotalEur,
 } from '@/lib/order-items-display'
-import {
-  SHOP_DISPLAY_PAGE_SHELL,
-  SHOP_DISPLAY_HEADER,
-  SHOP_DISPLAY_BTN_MENU,
-  SHOP_DISPLAY_TAB_ACTIVE,
-  SHOP_DISPLAY_TAB_INACTIVE,
-  SHOP_DISPLAY_BTN,
-  SHOP_DISPLAY_LANG_DROPDOWN,
-  SHOP_DISPLAY_MODAL_OVERLAY,
-  SHOP_DISPLAY_MODAL_PANEL,
-} from '@/lib/shop-display-surface'
+import { getShopDisplaySurface } from '@/lib/shop-display-surface'
+import { useKassaUiDarkSync } from '@/lib/kassa-register-ui-dark-preference'
 import { KitchenStyleOrderCard } from '@/components/shop-display/KitchenStyleOrderCard'
 import { KassaIconClose } from '@/lib/kassa-ui-icons'
 
@@ -131,6 +122,8 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   const [initialLoadDone, setInitialLoadDone] = useState(false)
   const [currentTime, setCurrentTime] = useState(new Date())
   const { soundActivated, activateSound } = useOnlineDisplaySoundGate(params.tenant)
+  const { dark: kassaDisplayDark } = useKassaUiDarkSync(params.tenant)
+  const ui = useMemo(() => getShopDisplaySurface(kassaDisplayDark), [kassaDisplayDark])
   const [newOrderIds, setNewOrderIds] = useState<Set<string>>(new Set())
   const [activeTab, setActiveTab] = useState<'active' |  'completed'>('active')
   const [reservations, setReservations] = useState<Reservation[]>([])
@@ -800,7 +793,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     return ` ${tx('pickup')}`
   }
 
-  const DISPLAY_TAB_INACTIVE = `${SHOP_DISPLAY_TAB_INACTIVE}`
+  const DISPLAY_TAB_INACTIVE = ui.tabInactive
 
   const activeOrders = orders.filter(o => !['completed', 'rejected'].includes(o.status.toLowerCase()))
   const completedOrders = orders.filter(o => ['completed', 'rejected'].includes(o.status.toLowerCase()))
@@ -828,7 +821,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   if (loading) {
     return (
       <div
-        className={`min-h-[100dvh] w-full min-w-0 max-w-full ${SHOP_DISPLAY_PAGE_SHELL} flex items-center justify-center`}
+        className={`min-h-[100dvh] w-full min-w-0 max-w-full ${ui.pageShell} flex items-center justify-center`}
         style={{
           paddingTop: 'env(safe-area-inset-top, 0px)',
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
@@ -837,7 +830,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-16 h-16 border-4 border-accent border-t-transparent rounded-full"
+          className={`w-16 h-16 border-4 ${ui.loaderRing} border-t-transparent rounded-full`}
         />
       </div>
     )
@@ -846,7 +839,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
   return (
     <div
-      className={`flex min-h-0 h-[100dvh] max-h-[100dvh] w-full min-w-0 max-w-full flex-col overflow-hidden ${SHOP_DISPLAY_PAGE_SHELL}`}
+      className={`flex min-h-0 h-[100dvh] max-h-[100dvh] w-full min-w-0 max-w-full flex-col overflow-hidden ${ui.pageShell}`}
       style={{
         width: '100%',
         paddingTop: 'env(safe-area-inset-top, 0px)',
@@ -908,7 +901,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
       </AnimatePresence>
 
       {/* Header */}
-      <header className={`shrink-0 px-4 py-3 ${SHOP_DISPLAY_HEADER}`}>
+      <header className={ui.header}>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-2 sm:gap-3">
             {kassaEntryHref && (
@@ -925,7 +918,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             {!kassaEntryHref && adminMenuHref && (
               <Link
                 href={adminMenuHref}
-                className="flex shrink-0 items-center gap-2 rounded-xl bg-gray-100 px-3 py-2 text-sm font-bold text-gray-800 transition-colors hover:bg-gray-200"
+                className={ui.adminMenuLink}
               >
                 ← {t('adminLayout.menu')}
               </Link>
@@ -937,8 +930,8 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
               
             </div>
             <div className="min-w-0">
-              <h1 className="truncate text-lg font-bold sm:text-xl text-gray-900">{tx('title')}</h1>
-              <p className="truncate text-xs text-gray-600 sm:text-sm">{business?.business_name}</p>
+              <h1 className={`truncate text-lg font-bold sm:text-xl ${ui.headerTitle}`}>{tx('title')}</h1>
+              <p className={`truncate text-xs sm:text-sm ${ui.headerSub}`}>{business?.business_name}</p>
             </div>
           </div>
 
@@ -947,9 +940,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             <span
               onClick={enableSound}
               className={`px-3 py-2 rounded-xl flex items-center gap-2 text-sm cursor-pointer ${
-                soundActivated
-                  ? 'bg-green-100 text-green-800'
-                  : 'bg-amber-100 text-amber-900 ring-2 ring-amber-400'
+                soundActivated ? ui.soundOn : ui.soundOff
               }`}
             >
               {soundActivated ? tx('soundEnabled') : tx('soundOn')}
@@ -968,20 +959,20 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
             {/* Stats */}
             <div className="flex gap-2">
-              <span className="px-3 py-2 bg-teal-50 text-teal-900 rounded-lg text-sm font-bold">
+              <span className={ui.statNew}>
                 {activeOrders.filter(o => o.status.toLowerCase() === 'new').length} {tx('new')}
               </span>
-              <span className="px-3 py-2 bg-blue-100 text-blue-800 rounded-lg text-sm font-bold">
+              <span className={ui.statKitchen}>
                 {activeOrders.filter(o => o.status.toLowerCase() === 'confirmed').length} {tx('kitchen')}
               </span>
-              <span className="px-3 py-2 bg-emerald-100 text-emerald-800 rounded-lg text-sm font-bold">
+              <span className={ui.statReady}>
                 {activeOrders.filter(o => o.status.toLowerCase() === 'ready').length} {tx('ready')}
               </span>
             </div>
 
             {/* Clock */}
             <div className="text-right">
-              <p className="text-2xl font-mono font-bold text-gray-900">
+              <p className={ui.clock}>
                 {currentTime.toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit'})}
               </p>
             </div>
@@ -1011,7 +1002,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
               <button
                 type="button"
                 onClick={() => setDisplayLangOpen((o) => !o)}
-                className="inline-flex touch-manipulation items-center gap-1 rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm font-bold text-gray-800 hover:bg-gray-50"
+                className={ui.langBtn}
                 title={t('languageSwitcher.selectLanguage')}
               >
                 <LocaleFlagEmoji locale={locale} className="text-base" />
@@ -1025,7 +1016,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                 </svg>
               </button>
               {displayLangOpen && (
-                <div className={SHOP_DISPLAY_LANG_DROPDOWN}>
+                <div className={ui.langDropdown}>
                   {locales.map((lang) => (
                     <button
                       key={lang}
@@ -1034,8 +1025,8 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                         setLocale(lang)
                         setDisplayLangOpen(false)
                       }}
-                      className={`flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm transition-colors hover:bg-gray-50 ${
-                        locale === lang ? 'bg-teal-50 font-semibold text-accent': 'text-gray-800'
+                      className={`flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm transition-colors ${
+                        locale === lang ? ui.langItemActive : ui.langItem
                       }`}
                     >
                       <LocaleFlagEmoji locale={lang} />
@@ -1050,11 +1041,11 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
       </header>
 
       {/* Tabs */}
-      <div className="shrink-0 border-b border-gray-200 bg-white px-4 py-2 flex gap-2 items-center">
+      <div className={ui.tabBar}>
         <button
           onClick={() => setActiveTab('active')}
           className={
-            activeTab === 'active' ? SHOP_DISPLAY_TAB_ACTIVE : DISPLAY_TAB_INACTIVE
+            activeTab === 'active' ? ui.tabActive : DISPLAY_TAB_INACTIVE
           }
         >
           {tx('active')} ({activeOrders.length})
@@ -1062,26 +1053,26 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
         <button
           onClick={() => setActiveTab('completed')}
           className={
-            activeTab === 'completed' ? SHOP_DISPLAY_TAB_ACTIVE : DISPLAY_TAB_INACTIVE
+            activeTab === 'completed' ? ui.tabActive : DISPLAY_TAB_INACTIVE
           }
         >
           {tx('completed')} ({completedOrders.length})
         </button>
         <button
           onClick={handleCompleteAll}
-          className={`ml-auto font-bold touch-manipulation ${SHOP_DISPLAY_BTN}`}
+          className={`ml-auto font-bold touch-manipulation ${ui.btn}`}
         >
            Alles afronden
         </button>
       </div>
 
       {/* Orders Grid — flex-1 + min-h-0: correcte scroll op iPad Safari / PWA (was 100vh) */}
-      <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-4">
+      <div className={ui.scrollArea}>
         {activeTab === 'active'? (
           sortedActiveOrders.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-gray-600">
-              <p className="text-2xl font-bold text-gray-900">{tx('noActiveOrders')}</p>
-              <p className="text-lg mt-2">{tx('ordersAppearHere')}</p>
+            <div className={`flex flex-col items-center justify-center h-full ${ui.muted}`}>
+              <p className={ui.emptyTitle}>{tx('noActiveOrders')}</p>
+              <p className={`text-lg mt-2 ${ui.emptySub}`}>{tx('ordersAppearHere')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
@@ -1091,6 +1082,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                   order={order}
                   locale={locale}
                   isNew={newOrderIds.has(order.id)}
+                  appearance={ui.cardAppearance}
                   headerStatus={displayHeaderStatus(order.status)}
                   onlineOrderLabel={tx('onlineOrder')}
                   orderTypeLabel={orderTypeLabel}
@@ -1124,7 +1116,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             {completedOrders.slice(0, 50).map((order) => (
               <div
                 key={order.id}
-                className="bg-white border border-gray-200 rounded-xl overflow-hidden cursor-pointer hover:bg-gray-50 transition-colors shadow-sm"
+                className={ui.completedCard}
                 onClick={() => setSelectedOrder(order)}
               >
                 <div className="bg-[#0f2744] text-white px-3 py-2.5 flex items-center justify-between border-b border-black/20">
@@ -1134,8 +1126,8 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                   </span>
                 </div>
                 <div className="p-3">
-                  <p className="text-sm text-gray-600">{order.customer_name}</p>
-                  <p className="text-sm text-gray-700 font-medium tabular-nums">€{order.total?.toFixed(2)}</p>
+                  <p className={ui.completedCardMuted}>{order.customer_name}</p>
+                  <p className={ui.completedCardPrice}>€{order.total?.toFixed(2)}</p>
                 </div>
               </div>
             ))}
@@ -1150,14 +1142,14 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className={`fixed inset-0 ${SHOP_DISPLAY_MODAL_OVERLAY} flex items-center justify-center z-50 p-4`}
+            className={`fixed inset-0 ${ui.modalOverlay} flex items-center justify-center z-50 p-4`}
             onClick={() => setSelectedOrder(null)}
           >
             <motion.div
               initial={{ scale: 0.96, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.96, opacity: 0 }}
-              className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-200 shadow-2xl text-gray-900"
+              className={`${ui.modalPanel} max-w-2xl w-full max-h-[90vh] overflow-y-auto`}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
@@ -1419,14 +1411,14 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className={`fixed inset-0 ${SHOP_DISPLAY_MODAL_OVERLAY} flex items-center justify-center z-50 p-4`}
+            className={`fixed inset-0 ${ui.modalOverlay} flex items-center justify-center z-50 p-4`}
             onClick={() => setShowRejectModal(false)}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className={`${SHOP_DISPLAY_MODAL_PANEL} max-w-lg w-full p-6`}
+              className={`${ui.modalPanel} max-w-lg w-full p-6`}
               onClick={(e) => e.stopPropagation()}
             >
               <h2 className="text-2xl font-bold mb-2 text-center">{tx('rejectOrder')}</h2>
@@ -1486,14 +1478,14 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className={`fixed inset-0 ${SHOP_DISPLAY_MODAL_OVERLAY} flex items-center justify-center z-50 p-4`}
+            className={`fixed inset-0 ${ui.modalOverlay} flex items-center justify-center z-50 p-4`}
             onClick={() => setShowReservationsModal(false)}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className={`${SHOP_DISPLAY_MODAL_PANEL} max-w-2xl w-full max-h-[80vh] overflow-hidden`}
+              className={`${ui.modalPanel} max-w-2xl w-full max-h-[80vh] overflow-hidden`}
               onClick={(e) => e.stopPropagation()}
             >
               <div className="p-6 border-b border-gray-700 flex items-center justify-between">
