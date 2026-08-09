@@ -61,6 +61,10 @@ import {
 import { getAuthHeaders, authFetch } from '@/lib/auth-headers'
 import { useLanguage } from '@/i18n'
 import { ControlledNumberInput } from '@/components/ControlledNumberInput'
+import {
+  KASSA_FLOOR_PLAN_VIEWPORT_LAYER_CLASS,
+  reservationFloorViewportLayerStyle,
+} from '@/lib/kassa-floor-plan-surface'
 import { useReservationKassa, makeReservationKassaRk } from '@/hooks/useReservationKassa'
 import {
   reservationAdminPrimaryBtnRoundedClass,
@@ -366,31 +370,6 @@ export default function KassaReservationsView({
   useEffect(() => {
     tablesLockedRef.current = tablesLocked
   }, [tablesLocked])
-  /** Zelfde principe als KassaFloorPlan: tegelpatroon vast op container (geen pan/zoom). */
-  const reservationFloorSurfaceStyle = useMemo(() => {
-    if (resFloorPlanZone === FLOOR_PLAN_ZONE_TERRACE) {
-      return {
-        backgroundColor: '#6b9b72',
-        backgroundPosition: '0 0',
-        backgroundImage: `
-          linear-gradient(to right, rgba(255,255,255,0.14) 0px, rgba(255,255,255,0.14) 2px, transparent 2px),
-          linear-gradient(to bottom, rgba(255,255,255,0.14) 0px, rgba(255,255,255,0.14) 2px, transparent 2px)
-        `,
-        backgroundSize: '100px 100px',
-        cursor: 'default'as const,
-        touchAction: 'none'as const,
-      }
-    }
-    return {
-      backgroundColor: '#e3e3e3',
-      backgroundPosition: '0 0',
-      backgroundImage:
-        'linear-gradient(to right, rgba(0,0,0,0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.07) 1px, transparent 1px)',
-      backgroundSize: '40px 40px',
-      cursor: 'default'as const,
-      touchAction: 'none'as const,
-    }
-  }, [resFloorPlanZone])
   const [resListCollapsed, setResListCollapsed] = useState(false)
 
   const floorDraggingId = useRef<string | null>(null)
@@ -430,6 +409,26 @@ export default function KassaReservationsView({
     anchorLocalX: number
     anchorLocalY: number
   } | null>(null)
+
+  /** Buitenste canvas: interactie; tegel/korrel zit op de viewport-laag (pan/zoom). */
+  const reservationFloorChromeStyle = useMemo(() => {
+    const base =
+      resFloorPlanZone === FLOOR_PLAN_ZONE_TERRACE
+        ? { backgroundColor: '#6b9b72' as const }
+        : { backgroundColor: '#e3e3e3' as const }
+    return {
+      ...base,
+      userSelect: 'none' as const,
+      WebkitUserSelect: 'none' as const,
+      overflow: 'hidden' as const,
+      cursor: tablesLocked ? (isPanningFloor ? 'grabbing' : 'grab') : 'default',
+      touchAction: 'none' as const,
+    }
+  }, [resFloorPlanZone, tablesLocked, isPanningFloor])
+  const reservationFloorLayerStyle = useMemo(
+    () => reservationFloorViewportLayerStyle(resFloorPlanZone),
+    [resFloorPlanZone],
+  )
 
   const applyOpeningFloorViewport = useCallback(() => {
     const touch = typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0
@@ -3197,11 +3196,7 @@ export default function KassaReservationsView({
                   className="res-floor-canvas flex-1 min-h-0 relative overflow-hidden select-none"
                   ref={canvasRef}
                   style={{
-                    ...reservationFloorSurfaceStyle,
-                    userSelect: 'none',
-                    WebkitUserSelect: 'none',
-                    overflow: 'hidden',
-                    cursor: tablesLocked ? (isPanningFloor ? 'grabbing' : 'grab') : 'default',
+                    ...reservationFloorChromeStyle,
                   }}
                   onPointerDown={handleResFloorCanvasPointerDown}
                   onPointerMove={handleResFloorPointerMove}
@@ -3280,9 +3275,10 @@ export default function KassaReservationsView({
                     </div>
                   )}
                   <div
-                    className="absolute inset-0 origin-top-left"
+                    className={`absolute inset-0 origin-top-left ${KASSA_FLOOR_PLAN_VIEWPORT_LAYER_CLASS}`}
                     style={{
                       transform: `translate(${floorViewport.panX}px, ${floorViewport.panY}px) scale(${floorViewport.zoom})`,
+                      ...reservationFloorLayerStyle,
                     }}
                   >
                   {floorPlanTablesDB.length === 0 && (
