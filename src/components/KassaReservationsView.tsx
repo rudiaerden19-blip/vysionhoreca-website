@@ -396,6 +396,22 @@ export default function KassaReservationsView({
   const floorDragTableElRef = useRef<HTMLElement | null>(null)
   const floorPendingDragPctRef = useRef<{ x: number; y: number } | null>(null)
   const floorDragStartPctRef = useRef<{ x: number; y: number } | null>(null)
+  const [tableLayerPan, setTableLayerPan] = useState({ panX: 0, panY: 0 })
+  const tableLayerPanRef = useRef(tableLayerPan)
+  useEffect(() => {
+    tableLayerPanRef.current = tableLayerPan
+  }, [tableLayerPan])
+  useEffect(() => {
+    setTableLayerPan({ panX: 0, panY: 0 })
+  }, [resFloorPlanZone])
+  const floorPanDragRef = useRef<{
+    pointerId: number
+    startX: number
+    startY: number
+    startPanX: number
+    startPanY: number
+  } | null>(null)
+  const floorPanMovedRef = useRef(false)
   /** Horizontaal scrollende tijdlijn — nodig voor correcte resize (pixels ↔ minuten) */
   const timelineGridScrollRef = useRef<HTMLDivElement>(null)
   /** Zelfde als LABEL_W in de tijdlijn-UI (kolom “Tafel”) */
@@ -1245,7 +1261,40 @@ export default function KassaReservationsView({
     toast.success(rk('tableRemoved'))
   }
 
-  /** Plattegrond: raster vast op container — alleen enkel tafel slepen na ontgrendelen. */
+  /** Slepen op lege vloer: alle tafels tegelijk (muis + touch). Enkel tafel na ontgrendelen. */
+  const handleResFloorCanvasPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.button !== 0 && e.pointerType !== 'touch') return
+    const target = e.target as HTMLElement
+    if (target.closest('[data-table-id]')) return
+    if (target.closest('[data-floor-ui]')) return
+    const floor = canvasRef.current
+    if (!floor) return
+
+    floorPanMovedRef.current = false
+    const pan = tableLayerPanRef.current
+    floorPanDragRef.current = {
+      pointerId: e.pointerId,
+      startX: e.clientX,
+      startY: e.clientY,
+      startPanX: pan.panX,
+      startPanY: pan.panY,
+    }
+    floor.setPointerCapture(e.pointerId)
+  }
+
+  const handleResFloorCanvasPointerUp = (e: React.PointerEvent) => {
+    if (floorPanDragRef.current?.pointerId !== e.pointerId) return
+    try {
+      canvasRef.current?.releasePointerCapture(e.pointerId)
+    } catch {
+      /* ignore */
+    }
+    floorPanDragRef.current = null
+    window.setTimeout(() => {
+      floorPanMovedRef.current = false
+    }, 0)
+  }
+
   const handleResTablePointerDown = (e: React.PointerEvent, table: FloorPlanTable) => {
     e.stopPropagation()
     if (tablesLockedRef.current) {
@@ -1264,14 +1313,27 @@ export default function KassaReservationsView({
     floorDragTableElRef.current = target
     floorDragStartPctRef.current = { x: table.x, y: table.y }
     floorPendingDragPctRef.current = null
+    const pan = tableLayerPanRef.current
     floorDragOffset.current = {
-      x: e.clientX - rect.left - (table.x / 100) * rect.width,
-      y: e.clientY - rect.top - (table.y / 100) * rect.height,
+      x: e.clientX - rect.left - pan.panX - (table.x / 100) * rect.width,
+      y: e.clientY - rect.top - pan.panY - (table.y / 100) * rect.height,
     }
     setIsDraggingFloor(true)
   }
 
   const handleResFloorPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const panDrag = floorPanDragRef.current
+    if (panDrag && panDrag.pointerId === e.pointerId) {
+      const dx = e.clientX - panDrag.startX
+      const dy = e.clientY - panDrag.startY
+      if (Math.abs(dx) > 4 || Math.abs(dy) > 4) floorPanMovedRef.current = true
+      setTableLayerPan({
+        panX: panDrag.startPanX + dx,
+        panY: panDrag.startPanY + dy,
+      })
+      return
+    }
+
     if (!floorDraggingId.current) return
     if (tablesLockedRef.current) return
     const dx = Math.abs(e.clientX - floorPointerStart.current.x)
@@ -1281,13 +1343,14 @@ export default function KassaReservationsView({
     const floor = canvasRef.current
     if (!floor) return
     const rect = floorRectCachedRef.current ?? floor.getBoundingClientRect()
+    const pan = tableLayerPanRef.current
     const x = Math.max(
       1,
-      Math.min(99, ((e.clientX - rect.left - floorDragOffset.current.x) / rect.width) * 100),
+      Math.min(99, ((e.clientX - rect.left - pan.panX - floorDragOffset.current.x) / rect.width) * 100),
     )
     const y = Math.max(
       1,
-      Math.min(99, ((e.clientY - rect.top - floorDragOffset.current.y) / rect.height) * 100),
+      Math.min(99, ((e.clientY - rect.top - pan.panY - floorDragOffset.current.y) / rect.height) * 100),
     )
     floorPendingDragPctRef.current = { x, y }
     const node = floorDragTableElRef.current
@@ -3024,15 +3087,18 @@ export default function KassaReservationsView({
                     WebkitUserSelect: 'none',
                     overflow: 'hidden',
                   }}
+                  onPointerDown={handleResFloorCanvasPointerDown}
                   onPointerMove={handleResFloorPointerMove}
                   onPointerUp={e => {
+                    handleResFloorCanvasPointerUp(e)
                     void finalizeResFloorDrag(e)
                   }}
                   onPointerCancel={e => {
+                    handleResFloorCanvasPointerUp(e)
                     void finalizeResFloorDrag(e)
                   }}
                   onClick={() => {
-                    if (floorDragMoved.current) return
+                    if (floorPanMovedRef.current || floorDragMoved.current) return
                     setSelectedFloorTable(null)
                   }}
                 >
@@ -3097,7 +3163,13 @@ export default function KassaReservationsView({
                       </button>
                     </div>
                   )}
-                  <div className="absolute inset-0">
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      transform: `translate(${tableLayerPan.panX}px, ${tableLayerPan.panY}px)`,
+                      touchAction: 'none',
+                    }}
+                  >
                   {floorPlanTablesDB.length === 0 && (
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       <div className="text-center bg-white/80 rounded-2xl px-10 py-8 shadow-sm">

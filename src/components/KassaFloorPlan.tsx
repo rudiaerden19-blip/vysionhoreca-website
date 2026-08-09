@@ -585,6 +585,24 @@ export default function KassaFloorPlan({
   const [stoolStatuses, setStoolStatuses] = useState<Record<string, TableStatus>>({})
 
   const [isLocked, setIsLocked] = useState(true)
+  const canvasRef = useRef<HTMLDivElement>(null)
+  /** Verschuif alle tafels tegelijk (camera) — niet in DB; achtergrond blijft vast. */
+  const [tableLayerPan, setTableLayerPan] = useState({ panX: 0, panY: 0 })
+  const tableLayerPanRef = useRef(tableLayerPan)
+  useEffect(() => {
+    tableLayerPanRef.current = tableLayerPan
+  }, [tableLayerPan])
+  useEffect(() => {
+    setTableLayerPan({ panX: 0, panY: 0 })
+  }, [planZone])
+  const floorPanDragRef = useRef<{
+    pointerId: number
+    startX: number
+    startY: number
+    startPanX: number
+    startPanY: number
+  } | null>(null)
+  const floorPanMovedRef = useRef(false)
   /** iPad/Safari: altijd releasePointerCapture na drag, anders blijven tikken “vast”. */
   const pointerCaptureRef = useRef<{ pointerId: number; element: HTMLElement } | null>(null)
 
@@ -1094,8 +1112,17 @@ export default function KassaFloorPlan({
     const hit = resolveFloorHit(e.clientX, e.clientY)
 
     if (!hit) {
+      floorPanMovedRef.current = false
+      const pan = tableLayerPanRef.current
+      floorPanDragRef.current = {
+        pointerId: e.pointerId,
+        startX: e.clientX,
+        startY: e.clientY,
+        startPanX: pan.panX,
+        startPanY: pan.panY,
+      }
       tapStartedEmptyRef.current = true
-      takePointerCapture(canvas, e.pointerId)
+      canvas.setPointerCapture(e.pointerId)
       return
     }
 
@@ -1117,14 +1144,28 @@ export default function KassaFloorPlan({
     ignoreFloorRealtimeRef.current = true
     floorPersistPausedRef.current = true
     setBodyGrabbing(true)
+    const pan = tableLayerPanRef.current
     dragOffset.current = {
-      x: e.clientX - rect.left - (item.x / 100) * rect.width,
-      y: e.clientY - rect.top - (item.y / 100) * rect.height,
+      x: e.clientX - rect.left - pan.panX - (item.x / 100) * rect.width,
+      y: e.clientY - rect.top - pan.panY - (item.y / 100) * rect.height,
     }
   }
 
   const canvasPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (showAddModal || showAddBarModal) return
+
+    const panDrag = floorPanDragRef.current
+    if (panDrag && panDrag.pointerId === e.pointerId) {
+      const dx = e.clientX - panDrag.startX
+      const dy = e.clientY - panDrag.startY
+      if (Math.abs(dx) > 4 || Math.abs(dy) > 4) floorPanMovedRef.current = true
+      setTableLayerPan({
+        panX: panDrag.startPanX + dx,
+        panY: panDrag.startPanY + dy,
+      })
+      return
+    }
+
     if (isLocked) return
     const g = floorGestureRef.current
     if (!g || g.pointerId !== e.pointerId) return
@@ -1137,29 +1178,48 @@ export default function KassaFloorPlan({
 
     const c = innerCanvasRef.current
     if (!c) return
-    const r = floorRectCachedRef.current ?? c.getBoundingClientRect()
-    const x = Math.max(1, Math.min(99, ((e.clientX - r.left - dragOffset.current.x) / r.width) * 100))
-    const y = Math.max(1, Math.min(99, ((e.clientY - r.top - dragOffset.current.y) / r.height) * 100))
+    const r = floorRectCachedRef.current ?? canvasRef.current?.getBoundingClientRect() ?? c.getBoundingClientRect()
+    const pan = tableLayerPanRef.current
+    const x = Math.max(
+      1,
+      Math.min(99, ((e.clientX - r.left - pan.panX - dragOffset.current.x) / r.width) * 100),
+    )
+    const y = Math.max(
+      1,
+      Math.min(99, ((e.clientY - r.top - pan.panY - dragOffset.current.y) / r.height) * 100),
+    )
     pendingDragPctRef.current = { x, y }
     scheduleDragPaintFromPending()
   }
 
   const canvasPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (floorPanDragRef.current?.pointerId === e.pointerId) {
+      try {
+        innerCanvasRef.current?.releasePointerCapture(e.pointerId)
+      } catch {
+        /* ignore */
+      }
+      floorPanDragRef.current = null
+    }
+
     const wasEmptyTap = tapStartedEmptyRef.current
     releaseCapturedPointer(e)
 
     if (wasEmptyTap) {
       tapStartedEmptyRef.current = false
-      const dx = Math.abs(e.clientX - pointerStart.current.x)
-      const dy = Math.abs(e.clientY - pointerStart.current.y)
-      if (dx < 8 && dy < 8) {
-        setSelected(null)
-        setSelectedDecor(null)
+      if (!floorPanMovedRef.current) {
+        const dx = Math.abs(e.clientX - pointerStart.current.x)
+        const dy = Math.abs(e.clientY - pointerStart.current.y)
+        if (dx < 8 && dy < 8) {
+          setSelected(null)
+          setSelectedDecor(null)
+        }
       }
       draggingId.current = null
       floorGestureRef.current = null
       setTimeout(() => {
         dragMoved.current = false
+        floorPanMovedRef.current = false
       }, 0)
       return
     }
@@ -1263,6 +1323,9 @@ export default function KassaFloorPlan({
   }
 
   const canvasPointerCancel = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (floorPanDragRef.current?.pointerId === e.pointerId) {
+      floorPanDragRef.current = null
+    }
     releaseCapturedPointer(e)
     tapStartedEmptyRef.current = false
     floorGestureRef.current = null
@@ -1344,8 +1407,9 @@ export default function KassaFloorPlan({
 
       {/* Floor + Sidebar */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Floor plan — tegelpatroon vast; alleen tafels/decor verschuiven */}
+        {/* Floor plan — raster/korrel vast; slepen op lege vloer = alle tafels */}
         <div
+          ref={canvasRef}
           className={`floor-plan relative flex-1 select-none overflow-hidden ${
             planZone === FLOOR_PLAN_ZONE_TERRACE ? KASSA_FLOOR_TERRACE_GRAIN_CLASS : KASSA_POS_MENU_PLATE_SHELL_BG_CLASS
           }`}
@@ -1353,7 +1417,12 @@ export default function KassaFloorPlan({
         >
           <div
             ref={innerCanvasRef}
-            style={{ position: 'absolute', inset: 0, touchAction: 'manipulation'}}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              touchAction: 'none',
+              transform: `translate(${tableLayerPan.panX}px, ${tableLayerPan.panY}px)`,
+            }}
             onPointerDown={canvasPointerDown}
             onPointerMove={canvasPointerMove}
             onPointerUp={canvasPointerUp}
