@@ -14,6 +14,8 @@ import {
 } from '@/lib/protected-tenants'
 import { clearSuperadminSessionCookies, mirrorSuperadminSessionFromCookieToLocalStorage } from '@/lib/superadmin-cookies'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
+import { isMissingPostTrialModulesColumnError } from '@/lib/supabase-post-trial-column'
+import { SuperadminProductLineBadges } from '@/components/superadmin/SuperadminProductLineBadges'
 
 interface Tenant {
   id: string
@@ -75,6 +77,12 @@ export default function SuperAdminDashboard() {
   })
   const [saving, setSaving] = useState(false)
   const [showExpiringOnly, setShowExpiringOnly] = useState(false)
+  const [tenantCoreBySlug, setTenantCoreBySlug] = useState<
+    Record<
+      string,
+      { enabled_modules: unknown; post_trial_modules_confirmed?: boolean | null }
+    >
+  >({})
 
   useEffect(() => {
     checkAuth()
@@ -119,6 +127,30 @@ export default function SuperAdminDashboard() {
 
     if (subsData) {
       setSubscriptions(subsData)
+    }
+
+    let coreRes = await supabase
+      .from('tenants')
+      .select('slug, enabled_modules, post_trial_modules_confirmed')
+    if (coreRes.error && isMissingPostTrialModulesColumnError(coreRes.error)) {
+      coreRes = await supabase.from('tenants').select('slug, enabled_modules')
+    }
+    if (coreRes.data) {
+      const map: Record<
+        string,
+        { enabled_modules: unknown; post_trial_modules_confirmed?: boolean | null }
+      > = {}
+      for (const row of coreRes.data) {
+        const slug = String((row as { slug: string }).slug)
+        map[slug] = {
+          enabled_modules: (row as { enabled_modules: unknown }).enabled_modules,
+          post_trial_modules_confirmed:
+            'post_trial_modules_confirmed' in row
+              ? (row as { post_trial_modules_confirmed?: boolean | null }).post_trial_modules_confirmed
+              : true,
+        }
+      }
+      setTenantCoreBySlug(map)
     }
 
     // Load orders for stats
@@ -574,7 +606,9 @@ export default function SuperAdminDashboard() {
         >
           <div className="p-6 border-b border-slate-700">
             <h2 className="text-xl font-bold text-white">Alle Tenants ({filteredTenants.length})</h2>
-            <p className="text-slate-400 text-sm mt-2">Modules beheer je via de oranje knop in Acties.</p>
+            <p className="text-slate-400 text-sm mt-2">
+              Kolom Software: Kassa, Reserveringen en Online (groen = aan). Detail via Modules.
+            </p>
           </div>
           
           <div className="overflow-x-auto">
@@ -584,6 +618,7 @@ export default function SuperAdminDashboard() {
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Bedrijf</th>
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Slug</th>
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Plan</th>
+                  <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Software</th>
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Status</th>
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Betaald</th>
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Aangemaakt</th>
@@ -634,6 +669,16 @@ export default function SuperAdminDashboard() {
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${getPlanColor(sub?.plan || 'none')}`}>
                           {sub?.plan || 'Geen'}
                         </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <SuperadminProductLineBadges
+                          tenantSlug={tenant.tenant_slug}
+                          enabledModulesRaw={tenantCoreBySlug[tenant.tenant_slug]?.enabled_modules ?? null}
+                          postTrialModulesConfirmed={
+                            tenantCoreBySlug[tenant.tenant_slug]?.post_trial_modules_confirmed
+                          }
+                          subscription={sub ?? null}
+                        />
                       </td>
                       <td className="px-6 py-4">
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(sub?.status || 'none')}`}>
