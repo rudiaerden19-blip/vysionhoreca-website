@@ -103,13 +103,6 @@ import {
   mapReservationSettingsFromDb,
 } from '@/components/kassa-reservations/kassa-reservations-constants'
 import {
-  defaultFloorViewportForDevice,
-  pinchDistance,
-  pinchZoomReservationFloor,
-  zoomReservationFloorAtPoint,
-  type ReservationFloorViewport,
-} from '@/lib/reservation-floor-viewport'
-import {
   triggerReservationRequestAlarmSound,
 } from '@/lib/reservation-request-alarm-loop'
 import { reservationStatusNeedsOwnerAlert } from '@/lib/reservation-owner-alert'
@@ -403,44 +396,6 @@ export default function KassaReservationsView({
   const floorDragTableElRef = useRef<HTMLElement | null>(null)
   const floorPendingDragPctRef = useRef<{ x: number; y: number } | null>(null)
   const floorDragStartPctRef = useRef<{ x: number; y: number } | null>(null)
-  /** Pan/zoom op tafellaag — achtergrond blijft vast. */
-  const [floorViewport, setFloorViewport] = useState<ReservationFloorViewport>({
-    panX: 0,
-    panY: 0,
-    zoom: 1,
-  })
-  const floorViewportRef = useRef(floorViewport)
-  useEffect(() => {
-    floorViewportRef.current = floorViewport
-  }, [floorViewport])
-  const floorPanDragRef = useRef<{
-    pointerId: number
-    startX: number
-    startY: number
-    startPanX: number
-    startPanY: number
-  } | null>(null)
-  const floorPanMovedRef = useRef(false)
-  const [isPanningFloor, setIsPanningFloor] = useState(false)
-  const floorPointersRef = useRef(new Map<number, { clientX: number; clientY: number }>())
-  const floorPinchSessionRef = useRef<{
-    pointerIds: [number, number]
-    startDist: number
-    startViewport: ReservationFloorViewport
-    anchorLocalX: number
-    anchorLocalY: number
-  } | null>(null)
-
-  const applyOpeningFloorViewport = useCallback(() => {
-    const touch = typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0
-    setFloorViewport(defaultFloorViewportForDevice(touch))
-  }, [])
-
-  useEffect(() => {
-    floorPointersRef.current.clear()
-    floorPinchSessionRef.current = null
-    applyOpeningFloorViewport()
-  }, [resFloorPlanZone, applyOpeningFloorViewport])
   /** Horizontaal scrollende tijdlijn — nodig voor correcte resize (pixels ↔ minuten) */
   const timelineGridScrollRef = useRef<HTMLDivElement>(null)
   /** Zelfde als LABEL_W in de tijdlijn-UI (kolom “Tafel”) */
@@ -1290,90 +1245,7 @@ export default function KassaReservationsView({
     toast.success(rk('tableRemoved'))
   }
 
-  const stepFloorZoom = useCallback((factor: number) => {
-    const el = canvasRef.current
-    if (!el) return
-    const r = el.getBoundingClientRect()
-    setFloorViewport((vp) => zoomReservationFloorAtPoint(vp, factor, r.width / 2, r.height / 2))
-  }, [])
-
-  const beginFloorPinchIfNeeded = () => {
-    const ids = [...floorPointersRef.current.keys()]
-    if (ids.length < 2) return
-    const floor = canvasRef.current
-    if (!floor) return
-    const rect = floor.getBoundingClientRect()
-    const p1 = floorPointersRef.current.get(ids[0])!
-    const p2 = floorPointersRef.current.get(ids[1])!
-    const midX = (p1.clientX + p2.clientX) / 2 - rect.left
-    const midY = (p1.clientY + p2.clientY) / 2 - rect.top
-    floorPanDragRef.current = null
-    setIsPanningFloor(false)
-    floorPinchSessionRef.current = {
-      pointerIds: [ids[0], ids[1]],
-      startDist: pinchDistance(p1.clientX, p1.clientY, p2.clientX, p2.clientY),
-      startViewport: { ...floorViewportRef.current },
-      anchorLocalX: midX,
-      anchorLocalY: midY,
-    }
-  }
-
-  /** Lege vloer: alle tafels tegelijk verschuiven (pan) / pinch-zoom. */
-  const handleResFloorCanvasPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (e.button !== 0 && e.pointerType !== 'touch') return
-    const target = e.target as HTMLElement
-    if (target.closest('[data-table-id]')) return
-    if (target.closest('[data-floor-ui]')) return
-    const floor = canvasRef.current
-    if (!floor) return
-
-    floorPointersRef.current.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY })
-
-    if (floorPointersRef.current.size >= 2) {
-      beginFloorPinchIfNeeded()
-      return
-    }
-
-    floorPanMovedRef.current = false
-    const vp = floorViewportRef.current
-    floorPanDragRef.current = {
-      pointerId: e.pointerId,
-      startX: e.clientX,
-      startY: e.clientY,
-      startPanX: vp.panX,
-      startPanY: vp.panY,
-    }
-    floor.setPointerCapture(e.pointerId)
-    setIsPanningFloor(true)
-  }
-
-  const handleResFloorCanvasPointerUp = (e: React.PointerEvent) => {
-    floorPointersRef.current.delete(e.pointerId)
-    if (floorPointersRef.current.size < 2) {
-      floorPinchSessionRef.current = null
-    }
-    if (floorPanDragRef.current?.pointerId === e.pointerId) {
-      finalizeResFloorPan(e)
-    }
-  }
-
-  const finalizeResFloorPan = (e: React.PointerEvent) => {
-    const floor = canvasRef.current
-    if (floorPanDragRef.current && floor) {
-      try {
-        if (floor.hasPointerCapture(e.pointerId)) floor.releasePointerCapture(e.pointerId)
-      } catch {
-        /* ignore */
-      }
-    }
-    floorPanDragRef.current = null
-    setIsPanningFloor(false)
-    window.setTimeout(() => {
-      floorPanMovedRef.current = false
-    }, 0)
-  }
-
-  /** Plattegrond: raster vast; vergrendeling blokkeert alleen enkel-tafel slepen. */
+  /** Plattegrond: raster vast op container — alleen enkel tafel slepen na ontgrendelen. */
   const handleResTablePointerDown = (e: React.PointerEvent, table: FloorPlanTable) => {
     e.stopPropagation()
     if (tablesLockedRef.current) {
@@ -1392,58 +1264,14 @@ export default function KassaReservationsView({
     floorDragTableElRef.current = target
     floorDragStartPctRef.current = { x: table.x, y: table.y }
     floorPendingDragPctRef.current = null
-    const vp = floorViewportRef.current
-    const worldPx = (e.clientX - rect.left - vp.panX) / vp.zoom
-    const worldPy = (e.clientY - rect.top - vp.panY) / vp.zoom
     floorDragOffset.current = {
-      x: worldPx - (table.x / 100) * rect.width,
-      y: worldPy - (table.y / 100) * rect.height,
+      x: e.clientX - rect.left - (table.x / 100) * rect.width,
+      y: e.clientY - rect.top - (table.y / 100) * rect.height,
     }
     setIsDraggingFloor(true)
   }
 
   const handleResFloorPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (floorPointersRef.current.has(e.pointerId)) {
-      floorPointersRef.current.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY })
-    }
-
-    const pinch = floorPinchSessionRef.current
-    if (pinch && floorPointersRef.current.size >= 2) {
-      const p1 = floorPointersRef.current.get(pinch.pointerIds[0])
-      const p2 = floorPointersRef.current.get(pinch.pointerIds[1])
-      if (p1 && p2) {
-        const dist = pinchDistance(p1.clientX, p1.clientY, p2.clientX, p2.clientY)
-        if (dist > 0 && pinch.startDist > 0) {
-          floorPanMovedRef.current = true
-          setFloorViewport(
-            pinchZoomReservationFloor(
-              {
-                ...pinch.startViewport,
-                anchorLocalX: pinch.anchorLocalX,
-                anchorLocalY: pinch.anchorLocalY,
-              },
-              pinch.startDist,
-              dist,
-            ),
-          )
-        }
-      }
-      return
-    }
-
-    const panDrag = floorPanDragRef.current
-    if (panDrag) {
-      const dx = e.clientX - panDrag.startX
-      const dy = e.clientY - panDrag.startY
-      if (Math.abs(dx) > 4 || Math.abs(dy) > 4) floorPanMovedRef.current = true
-      setFloorViewport({
-        ...floorViewportRef.current,
-        panX: panDrag.startPanX + dx,
-        panY: panDrag.startPanY + dy,
-      })
-      return
-    }
-
     if (!floorDraggingId.current) return
     if (tablesLockedRef.current) return
     const dx = Math.abs(e.clientX - floorPointerStart.current.x)
@@ -1453,16 +1281,13 @@ export default function KassaReservationsView({
     const floor = canvasRef.current
     if (!floor) return
     const rect = floorRectCachedRef.current ?? floor.getBoundingClientRect()
-    const vp = floorViewportRef.current
-    const worldPx = (e.clientX - rect.left - vp.panX) / vp.zoom
-    const worldPy = (e.clientY - rect.top - vp.panY) / vp.zoom
     const x = Math.max(
       1,
-      Math.min(99, ((worldPx - floorDragOffset.current.x) / rect.width) * 100),
+      Math.min(99, ((e.clientX - rect.left - floorDragOffset.current.x) / rect.width) * 100),
     )
     const y = Math.max(
       1,
-      Math.min(99, ((worldPy - floorDragOffset.current.y) / rect.height) * 100),
+      Math.min(99, ((e.clientY - rect.top - floorDragOffset.current.y) / rect.height) * 100),
     )
     floorPendingDragPctRef.current = { x, y }
     const node = floorDragTableElRef.current
@@ -3198,20 +3023,16 @@ export default function KassaReservationsView({
                     userSelect: 'none',
                     WebkitUserSelect: 'none',
                     overflow: 'hidden',
-                    cursor: isPanningFloor ? 'grabbing' : 'grab',
                   }}
-                  onPointerDown={handleResFloorCanvasPointerDown}
                   onPointerMove={handleResFloorPointerMove}
                   onPointerUp={e => {
-                    handleResFloorCanvasPointerUp(e)
                     void finalizeResFloorDrag(e)
                   }}
                   onPointerCancel={e => {
-                    handleResFloorCanvasPointerUp(e)
                     void finalizeResFloorDrag(e)
                   }}
                   onClick={() => {
-                    if (floorPanMovedRef.current || floorDragMoved.current) return
+                    if (floorDragMoved.current) return
                     setSelectedFloorTable(null)
                   }}
                 >
@@ -3276,12 +3097,7 @@ export default function KassaReservationsView({
                       </button>
                     </div>
                   )}
-                  <div
-                    className="absolute inset-0 origin-top-left"
-                    style={{
-                      transform: `translate(${floorViewport.panX}px, ${floorViewport.panY}px) scale(${floorViewport.zoom})`,
-                    }}
-                  >
+                  <div className="absolute inset-0">
                   {floorPlanTablesDB.length === 0 && (
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       <div className="text-center bg-white/80 rounded-2xl px-10 py-8 shadow-sm">
@@ -3353,35 +3169,6 @@ export default function KassaReservationsView({
                       </div>
                     )
                   })}
-                  </div>
-
-                  <div
-                    data-floor-ui
-                    className="absolute bottom-[max(3.75rem,calc(env(safe-area-inset-bottom,0px)+1.75rem))] left-[max(1rem,env(safe-area-inset-left))] z-[35] flex flex-col gap-2 touch-manipulation"
-                    onPointerDown={e => e.stopPropagation()}
-                  >
-                    <button
-                      type="button"
-                      aria-label={rk('zoomInAria')}
-                      onClick={e => {
-                        e.stopPropagation()
-                        stepFloorZoom(1.22)
-                      }}
-                      className="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-gray-900 shadow-lg ring-1 ring-black/10 active:bg-gray-100"
-                    >
-                      <span className="text-2xl font-bold leading-none" aria-hidden>+</span>
-                    </button>
-                    <button
-                      type="button"
-                      aria-label={rk('zoomOutAria')}
-                      onClick={e => {
-                        e.stopPropagation()
-                        stepFloorZoom(1 / 1.22)
-                      }}
-                      className="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-gray-900 shadow-lg ring-1 ring-black/10 active:bg-gray-100"
-                    >
-                      <span className="text-2xl font-bold leading-none" aria-hidden>−</span>
-                    </button>
                   </div>
 
                   {/* Datum kiezer rechtsonder — alleen bij “alleen vloer” (toolbar verborgen) */}
