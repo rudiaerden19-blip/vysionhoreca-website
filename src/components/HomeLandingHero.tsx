@@ -1,9 +1,8 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import Image from 'next/image'
-import { useLanguage, Locale } from '@/i18n'
-import { LocaleFlagEmoji, LocaleFlagWithCode } from '@/components/LocaleFlagEmoji'
+import { useLanguage } from '@/i18n'
 import SubscriptionsTermsPopup from './SubscriptionsTermsPopup'
 import KassaProductNavMenu from './KassaProductNavMenu'
 import GoogleReviewsHeroBadge from './GoogleReviewsHeroBadge'
@@ -18,24 +17,7 @@ const NAV_TOP_OFFSET_CLASS = 'pt-20'
 
 export default function HomeLandingHero() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isLangOpen, setIsLangOpen] = useState(false)
-  const langRef = useRef<HTMLDivElement>(null)
-  const { locale, setLocale, t, locales, localeNames } = useLanguage()
-
-  useEffect(() => {
-    function handlePointerOutside(event: PointerEvent) {
-      if (langRef.current && !langRef.current.contains(event.target as Node)) {
-        setIsLangOpen(false)
-      }
-    }
-    document.addEventListener('pointerdown', handlePointerOutside, true)
-    return () => document.removeEventListener('pointerdown', handlePointerOutside, true)
-  }, [])
-
-  const handleLanguageSelect = (langCode: Locale) => {
-    setLocale(langCode)
-    setIsLangOpen(false)
-  }
+  const { locale, t } = useLanguage()
 
   const pillLinks: { href: string; label: string }[] = [
     { href: '/#sectoren', label: t('nav.sectors') },
@@ -69,42 +51,6 @@ export default function HomeLandingHero() {
             >
               {t('heroLanding.demoRequest')}
             </a>
-
-            <div className="relative hidden md:block" ref={langRef}>
-              <button
-                type="button"
-                onClick={() => setIsLangOpen(!isLangOpen)}
-                className="flex items-center gap-1.5 text-white hover:text-white/90 px-2 py-2 rounded-lg hover:bg-white/10 transition-colors"
-                aria-expanded={isLangOpen}
-              >
-                <LocaleFlagWithCode locale={locale} codeClassName="text-white" />
-                <svg
-                  className={`w-4 h-4 transition-transform ${isLangOpen ? 'rotate-180': ''}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              {isLangOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-gray-900 rounded-xl shadow-home-image border border-gray-700 py-2 z-50">
-                  {locales.map((langCode) => (
-                    <button
-                      key={langCode}
-                      type="button"
-                      onClick={() => handleLanguageSelect(langCode)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors ${
-                        locale === langCode ? 'text-accent': 'text-white'
-                      }`}
-                    >
-                      <LocaleFlagEmoji locale={langCode} className="text-xl" />
-                      <span>{localeNames[langCode]}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
 
             <button
               type="button"
@@ -147,26 +93,6 @@ export default function HomeLandingHero() {
             >
               {t('heroLanding.demoRequest')}
             </a>
-            <div className="border-t border-white/20 pt-3 mt-3">
-              <p className="text-white/70 text-xs mb-2">{t('nav.language')}</p>
-              <div className="grid grid-cols-3 gap-2">
-                {locales.map((langCode) => (
-                  <button
-                    key={langCode}
-                    type="button"
-                    onClick={() => {
-                      handleLanguageSelect(langCode)
-                      setIsMenuOpen(false)
-                    }}
-        className={`py-2 rounded-lg text-sm ${
-          locale === langCode ? 'bg-accent text-white': 'bg-white/10 text-white'
-        }`}
-                  >
-                    <LocaleFlagEmoji locale={langCode} className="text-sm" /> {langCode.toUpperCase()}
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
         )}
       </header>
