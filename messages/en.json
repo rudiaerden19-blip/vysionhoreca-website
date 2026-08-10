@@ -198,7 +198,9 @@
     "ctaModulesPriceExtra": "€0 upfront — hardware and software included",
     "ctaModulesOneTimeLicense": "Or choose a one-time lifetime license for €1,499 excl. VAT",
     "readTermsLink": "Read terms & conditions",
-    "demoRequest": "Start free"
+    "demoRequest": "Start free",
+    "googleReviewsLabel": "5 stars on Google",
+    "googleReviewsAria": "Read our Google reviews"
   },
   "hero": {
     "badge1": "1 Platform",

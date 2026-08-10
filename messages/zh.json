@@ -116,7 +116,9 @@
     "ctaModulesPriceExtra": "零前期投入 — 硬件与软件均已包含",
     "ctaModulesOneTimeLicense": "或选择一次性终身许可 1,499 欧元（不含税）",
     "readTermsLink": "阅读条款",
-    "demoRequest": "免费开始"
+    "demoRequest": "免费开始",
+    "googleReviewsLabel": "Google 五星好评",
+    "googleReviewsAria": "查看我们的 Google 评价"
   },
   "hero": {
     "badge1": "1个平台",

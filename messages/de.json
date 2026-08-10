@@ -116,7 +116,9 @@
     "ctaModulesPriceExtra": "0 € Anschaffung — Hardware und Software inbegriffen",
     "ctaModulesOneTimeLicense": "Oder wählen Sie eine einmalige lebenslange Lizenz für 1.499 € zzgl. MwSt.",
     "readTermsLink": "AGB lesen",
-    "demoRequest": "Gratis starten"
+    "demoRequest": "Gratis starten",
+    "googleReviewsLabel": "5 Sterne auf Google",
+    "googleReviewsAria": "Unsere Google-Bewertungen lesen"
   },
   "hero": {
     "badge1": "1 Plattform",

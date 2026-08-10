@@ -198,7 +198,9 @@
     "ctaModulesPriceExtra": "0 euro investering — hardware en software zijn inbegrepen",
     "ctaModulesOneTimeLicense": "Of kies voor een eenmalige levenslange licentie voor €1.499 excl. BTW",
     "readTermsLink": "Lees alg. voorwaarden",
-    "demoRequest": "Start gratis"
+    "demoRequest": "Start gratis",
+    "googleReviewsLabel": "5 sterren op Google",
+    "googleReviewsAria": "Lees onze Google-reviews"
   },
   "hero": {
     "badge1": "1 Platform",

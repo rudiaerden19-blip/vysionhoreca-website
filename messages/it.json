@@ -116,7 +116,9 @@
     "ctaModulesPriceExtra": "0 € di investimento — hardware e software inclusi",
     "ctaModulesOneTimeLicense": "Oppure scegli una licenza a vita una tantum per 1.499 € IVA escl.",
     "readTermsLink": "Leggi termini e condizioni",
-    "demoRequest": "Inizia gratis"
+    "demoRequest": "Inizia gratis",
+    "googleReviewsLabel": "5 stelle su Google",
+    "googleReviewsAria": "Leggi le nostre recensioni su Google"
   },
   "hero": {
     "badge1": "1 Piattaforma",

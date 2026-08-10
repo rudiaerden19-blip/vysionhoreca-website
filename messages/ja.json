@@ -116,7 +116,9 @@
     "ctaModulesPriceExtra": "初期投資 0 円 — ハードウェア・ソフトウェア込み",
     "ctaModulesOneTimeLicense": "または、一括払いの生涯ライセンス 1,499ユーロ（税別）",
     "readTermsLink": "利用規約を読む",
-    "demoRequest": "無料で始める"
+    "demoRequest": "無料で始める",
+    "googleReviewsLabel": "Googleで5つ星",
+    "googleReviewsAria": "Googleのレビューを見る"
   },
   "hero": {
     "badge1": "1つのプラットフォーム",

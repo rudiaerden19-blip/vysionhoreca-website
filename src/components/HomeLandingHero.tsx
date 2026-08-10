@@ -6,6 +6,7 @@ import { useLanguage, Locale } from '@/i18n'
 import { LocaleFlagEmoji, LocaleFlagWithCode } from '@/components/LocaleFlagEmoji'
 import SubscriptionsTermsPopup from './SubscriptionsTermsPopup'
 import KassaProductNavMenu from './KassaProductNavMenu'
+import GoogleReviewsHeroBadge from './GoogleReviewsHeroBadge'
 
 const HERO_BG = '/images/hero-header.png'
 
@@ -172,6 +173,11 @@ export default function HomeLandingHero() {
 
       {/* Center content */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 sm:px-6 text-center py-6 sm:py-8">
+        <GoogleReviewsHeroBadge
+          label={t('heroLanding.googleReviewsLabel')}
+          ariaLabel={t('heroLanding.googleReviewsAria')}
+          className="mb-5 sm:mb-6"
+        />
         <h1 className={`mx-auto w-full max-w-4xl text-center text-3xl sm:text-4xl md:text-5xl lg:text-[2.85rem] font-bold leading-tight tracking-tight ${HERO_KASSA_ACCENT}`}>
           {t('heroLanding.title')}
         </h1>
