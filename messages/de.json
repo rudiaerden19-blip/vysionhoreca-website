@@ -5197,6 +5197,9 @@
       "body": "Unsere Plattform ist auch für Food Trucks gemacht und funktioniert zuverlässig offline. Wenn Sie abends wieder zu Hause sind und WLAN haben, aktualisiert sich Ihre komplette Plattform von selbst."
     }
   },
+  "kassaLanguagesBanner": {
+    "title": "Unsere Kassen und die komplette Software sind standardmäßig in diesen Sprachen verfügbar"
+  },
   "gratisWebsiteBanner": {
     "title": "Kostenlose Website",
     "body": "Zu Ihrem Abonnement erhalten Sie eine völlig kostenlose eigene Website — ohne Aufpreis inbegriffen. Sie können Ihre Website vollständig an Ihren Geschmack anpassen: Farben, Fotos, alles.",

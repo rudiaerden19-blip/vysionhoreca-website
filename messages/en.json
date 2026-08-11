@@ -363,6 +363,9 @@
       "body": "Our platform is built for food trucks too and works flawlessly offline. When you’re back home in the evening on Wi‑Fi, your full platform updates itself."
     }
   },
+  "kassaLanguagesBanner": {
+    "title": "Our POS systems and full software are available in these languages by default"
+  },
   "gratisWebsiteBanner": {
     "title": "Free website",
     "body": "With your subscription you receive a completely free website of your own — included at no extra cost. You can fully customize your site to your taste: colors, photos, everything.",
