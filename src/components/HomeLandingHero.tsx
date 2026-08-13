@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { useLanguage } from '@/i18n'
 import MarketingStartAndDemoButtons from '@/components/MarketingStartAndDemoButtons'
@@ -16,6 +16,117 @@ const HERO_KASSA_ACCENT = 'text-[#5EC4E8]'
 /** Hoogte vaste marketing-nav (~ `Navigation`h-20); inhoud niet onder de balk laten verdwijnen. */
 const NAV_TOP_OFFSET_CLASS = 'pt-20'
 
+const HERO_CTA_CARD_SHELL =
+  'rounded-2xl border border-white/25 bg-white/[0.07] backdrop-blur-md px-5 py-6 sm:px-8 sm:py-7 shadow-[0_12px_40px_rgba(0,0,0,0.4)] ring-1 ring-white/10'
+
+const HERO_CTA_FLIP_MS = 4000
+
+function HeroCtaFlipCard() {
+  const { t } = useLanguage()
+  const [showBack, setShowBack] = useState(false)
+  const [reduceMotion, setReduceMotion] = useState(false)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const apply = () => setReduceMotion(mq.matches)
+    apply()
+    mq.addEventListener('change', apply)
+    return () => mq.removeEventListener('change', apply)
+  }, [])
+
+  useEffect(() => {
+    if (reduceMotion) return
+    const id = window.setInterval(() => setShowBack(prev => !prev), HERO_CTA_FLIP_MS)
+    return () => window.clearInterval(id)
+  }, [reduceMotion])
+
+  const flipped = !reduceMotion && showBack
+
+  const frontLabel = `${t('heroLanding.ctaModulesHeadline')} ${t('heroLanding.ctaModulesSubline')} ${t('heroLanding.ctaModulesKassaFootnote')} ${t('heroLanding.ctaModulesPricePrefix')} €${t('heroLanding.ctaModulesPriceAmount')} ${t('heroLanding.ctaModulesPricePeriod')}. ${t('heroLanding.ctaModulesPriceNote')} ${t('heroLanding.ctaModulesPriceExtra')}. ${t('heroLanding.readTermsLink')}`
+  const backLabel = `${t('heroLanding.ctaModulesBackHeadline')} ${t('heroLanding.ctaModulesBackSubline')} ${t('heroLanding.ctaModulesBackFootnote')} ${t('heroLanding.ctaModulesBackHighlight')} ${t('heroLanding.ctaModulesBackExtra')}`
+
+  const faceBase = `${HERO_CTA_CARD_SHELL} absolute inset-0 flex flex-col justify-center text-center [backface-visibility:hidden]`
+
+  return (
+    <div
+      className="mt-8 sm:mt-10 md:mt-12 w-full max-w-lg sm:max-w-xl mx-auto [perspective:1200px]"
+      role="region"
+      aria-label={flipped ? backLabel : frontLabel}
+      aria-live={reduceMotion ? undefined : 'polite'}
+    >
+      <div
+        className={`relative min-h-[17.5rem] sm:min-h-[18.5rem] w-full transition-transform duration-700 ease-in-out [transform-style:preserve-3d] ${
+          flipped ? '[transform:rotateY(180deg)]' : ''
+        }`}
+      >
+        <div className={`${faceBase} [transform:rotateY(0deg)]`}>
+          <p className="text-xl sm:text-2xl md:text-[1.65rem] font-bold text-white tracking-tight text-balance leading-snug">
+            {t('heroLanding.ctaModulesHeadline')}
+          </p>
+          <p className={`mt-2 text-base sm:text-lg font-semibold text-balance leading-snug ${HERO_KASSA_ACCENT}`}>
+            {t('heroLanding.ctaModulesSubline')}
+          </p>
+          <p className="mt-1.5 text-[0.65rem] sm:text-[0.7rem] text-white/65 font-normal leading-snug max-w-md mx-auto">
+            {t('heroLanding.ctaModulesKassaFootnote')}
+          </p>
+          <div className="mt-4 sm:mt-5 pt-4 sm:pt-5 border-t border-white/20 w-full">
+            <div className="flex flex-wrap items-baseline justify-center gap-x-2 gap-y-1 text-white">
+              <span className="text-base sm:text-lg text-white/90 font-medium shrink-0">
+                {t('heroLanding.ctaModulesPricePrefix')}
+              </span>
+              <span className={`text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight tabular-nums shrink-0 ${HERO_KASSA_ACCENT}`}>
+                €&nbsp;{t('heroLanding.ctaModulesPriceAmount')}
+              </span>
+              {t('heroLanding.ctaModulesPricePeriod') ? (
+                <span className="text-base sm:text-lg font-semibold text-white/95 shrink-0">
+                  {t('heroLanding.ctaModulesPricePeriod')}
+                </span>
+              ) : null}
+            </div>
+            <p className="mt-2.5 sm:mt-3 text-center text-[0.7rem] sm:text-xs text-white/60 font-normal leading-snug max-w-md mx-auto">
+              {t('heroLanding.ctaModulesPriceNote')}
+            </p>
+            <p className="mt-1.5 text-center text-[0.7rem] sm:text-xs text-white/60 font-normal leading-snug max-w-md mx-auto">
+              {t('heroLanding.ctaModulesPriceExtra')}
+            </p>
+            <SubscriptionsTermsPopup
+              className="mt-3 flex justify-center"
+              labelKey="heroLanding.readTermsLink"
+              buttonClassName="inline-flex items-center justify-center rounded-lg border border-white/25 bg-white/[0.08] backdrop-blur-md px-3 py-1.5 text-[0.65rem] sm:text-[0.7rem] font-medium text-white/72 hover:text-white hover:bg-white/[0.14] hover:border-white/35 ring-1 ring-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.15)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/45 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+            />
+          </div>
+        </div>
+
+        <div className={`${faceBase} [transform:rotateY(180deg)]`}>
+          <p className="text-xl sm:text-2xl md:text-[1.65rem] font-bold text-white tracking-tight text-balance leading-snug">
+            {t('heroLanding.ctaModulesBackHeadline')}
+          </p>
+          <p className={`mt-2 text-base sm:text-lg font-semibold text-balance leading-snug ${HERO_KASSA_ACCENT}`}>
+            {t('heroLanding.ctaModulesBackSubline')}
+          </p>
+          <p className="mt-1.5 text-[0.65rem] sm:text-[0.7rem] text-white/65 font-normal leading-snug max-w-md mx-auto">
+            {t('heroLanding.ctaModulesBackFootnote')}
+          </p>
+          <div className="mt-4 sm:mt-5 pt-4 sm:pt-5 border-t border-white/20 w-full">
+            <p className={`text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-balance leading-snug ${HERO_KASSA_ACCENT}`}>
+              {t('heroLanding.ctaModulesBackHighlight')}
+            </p>
+            <p className="mt-3 sm:mt-4 text-center text-[0.7rem] sm:text-xs text-white/60 font-normal leading-snug max-w-md mx-auto">
+              {t('heroLanding.ctaModulesBackExtra')}
+            </p>
+            <a
+              href="/#platform"
+              className="mt-4 inline-flex items-center justify-center rounded-lg border border-white/25 bg-white/[0.08] backdrop-blur-md px-3 py-1.5 text-[0.65rem] sm:text-[0.7rem] font-medium text-white/72 hover:text-white hover:bg-white/[0.14] hover:border-white/35 ring-1 ring-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.15)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/45"
+            >
+              {t('heroLanding.ctaModulesBackLink')}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function HomeLandingHero() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { t } = useLanguage()
@@ -28,7 +139,7 @@ export default function HomeLandingHero() {
 
   return (
     <section
-      className={`relative ${NAV_TOP_OFFSET_CLASS} min-h-[72svh] sm:min-h-[76svh] flex flex-col text-white overflow-hidden pb-6 sm:pb-8`}
+      className={`relative ${NAV_TOP_OFFSET_CLASS} min-h-[72svh] sm:min-h-[76svh] flex flex-col text-white overflow-x-hidden pb-6 sm:pb-8`}
     >
       <div className="absolute inset-x-0 top-[-5rem] bottom-0">
         <Image
@@ -100,47 +211,7 @@ export default function HomeLandingHero() {
         <p className="mt-3 sm:mt-4 text-base sm:text-lg text-white/85 max-w-2xl leading-relaxed">
           {t('heroLanding.subtitle')}
         </p>
-        <div
-          className="mt-8 sm:mt-10 md:mt-12 w-full max-w-lg sm:max-w-xl mx-auto rounded-2xl border border-white/25 bg-white/[0.07] backdrop-blur-md px-5 py-6 sm:px-8 sm:py-7 shadow-[0_12px_40px_rgba(0,0,0,0.4)] ring-1 ring-white/10"
-          role="region"
-          aria-label={`${t('heroLanding.ctaModulesHeadline')} ${t('heroLanding.ctaModulesSubline')} ${t('heroLanding.ctaModulesKassaFootnote')} ${t('heroLanding.ctaModulesPricePrefix')} €${t('heroLanding.ctaModulesPriceAmount')} ${t('heroLanding.ctaModulesPricePeriod')}. ${t('heroLanding.ctaModulesPriceNote')} ${t('heroLanding.ctaModulesPriceExtra')}. ${t('heroLanding.readTermsLink')}`}
-        >
-          <p className="text-xl sm:text-2xl md:text-[1.65rem] font-bold text-white tracking-tight text-balance leading-snug">
-            {t('heroLanding.ctaModulesHeadline')}
-          </p>
-          <p className={`mt-2 text-base sm:text-lg font-semibold text-balance leading-snug ${HERO_KASSA_ACCENT}`}>
-            {t('heroLanding.ctaModulesSubline')}
-          </p>
-          <p className="mt-1.5 text-[0.65rem] sm:text-[0.7rem] text-white/65 font-normal leading-snug max-w-md mx-auto">
-            {t('heroLanding.ctaModulesKassaFootnote')}
-          </p>
-          <div className="mt-4 sm:mt-5 pt-4 sm:pt-5 border-t border-white/20">
-            <div className="flex flex-wrap items-baseline justify-center gap-x-2 gap-y-1 text-white">
-              <span className="text-base sm:text-lg text-white/90 font-medium shrink-0">
-                {t('heroLanding.ctaModulesPricePrefix')}
-              </span>
-              <span className={`text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight tabular-nums shrink-0 ${HERO_KASSA_ACCENT}`}>
-                €&nbsp;{t('heroLanding.ctaModulesPriceAmount')}
-              </span>
-              {t('heroLanding.ctaModulesPricePeriod') ? (
-                <span className="text-base sm:text-lg font-semibold text-white/95 shrink-0">
-                  {t('heroLanding.ctaModulesPricePeriod')}
-                </span>
-              ) : null}
-            </div>
-            <p className="mt-2.5 sm:mt-3 text-center text-[0.7rem] sm:text-xs text-white/60 font-normal leading-snug max-w-md mx-auto">
-              {t('heroLanding.ctaModulesPriceNote')}
-            </p>
-            <p className="mt-1.5 text-center text-[0.7rem] sm:text-xs text-white/60 font-normal leading-snug max-w-md mx-auto">
-              {t('heroLanding.ctaModulesPriceExtra')}
-            </p>
-            <SubscriptionsTermsPopup
-              className="mt-3 flex justify-center"
-              labelKey="heroLanding.readTermsLink"
-              buttonClassName="inline-flex items-center justify-center rounded-lg border border-white/25 bg-white/[0.08] backdrop-blur-md px-3 py-1.5 text-[0.65rem] sm:text-[0.7rem] font-medium text-white/72 hover:text-white hover:bg-white/[0.14] hover:border-white/35 ring-1 ring-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.15)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/45 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
-            />
-          </div>
-        </div>
+        <HeroCtaFlipCard />
         <p className="mt-4 sm:mt-5 w-full max-w-lg sm:max-w-xl mx-auto text-center text-xs sm:text-sm font-semibold uppercase tracking-wide text-white/90 leading-snug px-2">
           {t('heroLanding.ctaModulesOneTimeLicense')}
         </p>
