@@ -7,6 +7,7 @@ import MarketingStartAndDemoButtons from '@/components/MarketingStartAndDemoButt
 import SubscriptionsTermsPopup from './SubscriptionsTermsPopup'
 import KassaProductNavMenu from './KassaProductNavMenu'
 import GoogleReviewsHeroBadge from './GoogleReviewsHeroBadge'
+import { monthlyPriceForHardware } from '@/lib/pricing-hardware'
 
 const HERO_BG = '/images/hero-header.png'
 
@@ -24,6 +25,7 @@ const HERO_CTA_FLIP_MS = 8000
 function HeroCtaFlipCard() {
   const { t } = useLanguage()
   const [showBack, setShowBack] = useState(false)
+  const [withHardware, setWithHardware] = useState(true)
   const [reduceMotion, setReduceMotion] = useState(false)
 
   useEffect(() => {
@@ -41,8 +43,19 @@ function HeroCtaFlipCard() {
   }, [reduceMotion])
 
   const flipped = !reduceMotion && showBack
+  const monthlyPrice = monthlyPriceForHardware(withHardware)
 
-  const frontLabel = `${t('heroLanding.ctaModulesHeadline')} ${t('heroLanding.ctaModulesSubline')} ${t('heroLanding.ctaModulesKassaFootnote')} ${t('heroLanding.ctaModulesPricePrefix')} €${t('heroLanding.ctaModulesPriceAmount')} ${t('heroLanding.ctaModulesPricePeriod')}. ${t('heroLanding.ctaModulesPriceNote')} ${t('heroLanding.ctaModulesPriceExtra')}. ${t('heroLanding.readTermsLink')}`
+  const frontSubline = withHardware
+    ? t('heroLanding.ctaModulesSublineWithHardware')
+    : t('heroLanding.ctaModulesSublineNoHardware')
+  const frontPriceNote = withHardware
+    ? t('heroLanding.ctaModulesPriceNoteWithHardware')
+    : t('heroLanding.ctaModulesPriceNoteNoHardware')
+  const frontPriceExtra = withHardware
+    ? t('heroLanding.ctaModulesPriceExtraWithHardware')
+    : t('heroLanding.ctaModulesPriceExtraNoHardware')
+
+  const frontLabel = `${t('heroLanding.ctaModulesHeadline')} ${frontSubline} ${t('heroLanding.ctaModulesKassaFootnote')} ${t('heroLanding.ctaModulesPricePrefix')} €${monthlyPrice} ${t('heroLanding.ctaModulesPricePeriod')}. ${frontPriceNote} ${frontPriceExtra}. ${t('heroLanding.readTermsLink')}`
   const backLabel = `${t('heroLanding.ctaModulesBackHeadline')} ${t('heroLanding.ctaModulesBackSubline')} ${t('heroLanding.ctaModulesBackFootnote')} €${t('heroLanding.ctaModulesBackPriceAmount')} ${t('heroLanding.ctaModulesBackPricePeriod')}. ${t('heroLanding.ctaModulesBackPriceNote')}`
 
   const faceBase = `${HERO_CTA_CARD_SHELL} absolute inset-0 flex flex-col justify-center text-center [backface-visibility:hidden]`
@@ -55,7 +68,7 @@ function HeroCtaFlipCard() {
       aria-live={reduceMotion ? undefined : 'polite'}
     >
       <div
-        className={`relative min-h-[17.5rem] sm:min-h-[18.5rem] w-full transition-transform duration-700 ease-in-out [transform-style:preserve-3d] ${
+        className={`relative min-h-[19rem] sm:min-h-[20rem] w-full transition-transform duration-700 ease-in-out [transform-style:preserve-3d] ${
           flipped ? '[transform:rotateY(180deg)]' : ''
         }`}
       >
@@ -64,18 +77,46 @@ function HeroCtaFlipCard() {
             {t('heroLanding.ctaModulesHeadline')}
           </p>
           <p className={`mt-2 text-base sm:text-lg font-semibold text-balance leading-snug ${HERO_KASSA_ACCENT}`}>
-            {t('heroLanding.ctaModulesSubline')}
+            {frontSubline}
           </p>
           <p className="mt-1.5 text-[0.65rem] sm:text-[0.7rem] text-white/65 font-normal leading-snug max-w-md mx-auto">
             {t('heroLanding.ctaModulesKassaFootnote')}
           </p>
+          <div
+            className="mt-3 flex max-w-md mx-auto rounded-full border border-white/25 bg-black/25 p-0.5"
+            role="group"
+            aria-label={t('heroLanding.ctaModulesHardwareToggleAria')}
+          >
+            <button
+              type="button"
+              onClick={() => setWithHardware(false)}
+              className={`flex-1 rounded-full px-2 py-2 text-[0.65rem] sm:text-xs font-semibold transition-colors ${
+                !withHardware
+                  ? 'bg-white/95 text-gray-900 shadow-sm'
+                  : 'text-white/80 hover:text-white hover:bg-white/10'
+              }`}
+            >
+              €69 · {t('pricing.hardwareWithout')}
+            </button>
+            <button
+              type="button"
+              onClick={() => setWithHardware(true)}
+              className={`flex-1 rounded-full px-2 py-2 text-[0.65rem] sm:text-xs font-semibold transition-colors ${
+                withHardware
+                  ? 'bg-white/95 text-gray-900 shadow-sm'
+                  : 'text-white/80 hover:text-white hover:bg-white/10'
+              }`}
+            >
+              €99 · {t('pricing.hardwareWith')}
+            </button>
+          </div>
           <div className="mt-4 sm:mt-5 pt-4 sm:pt-5 border-t border-white/20 w-full">
             <div className="flex flex-wrap items-baseline justify-center gap-x-2 gap-y-1 text-white">
               <span className="text-base sm:text-lg text-white/90 font-medium shrink-0">
                 {t('heroLanding.ctaModulesPricePrefix')}
               </span>
               <span className={`text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight tabular-nums shrink-0 ${HERO_KASSA_ACCENT}`}>
-                €&nbsp;{t('heroLanding.ctaModulesPriceAmount')}
+                €&nbsp;{monthlyPrice}
               </span>
               {t('heroLanding.ctaModulesPricePeriod') ? (
                 <span className="text-base sm:text-lg font-semibold text-white/95 shrink-0">
@@ -84,10 +125,10 @@ function HeroCtaFlipCard() {
               ) : null}
             </div>
             <p className="mt-2.5 sm:mt-3 text-center text-[0.7rem] sm:text-xs text-white/60 font-normal leading-snug max-w-md mx-auto">
-              {t('heroLanding.ctaModulesPriceNote')}
+              {frontPriceNote}
             </p>
             <p className="mt-1.5 text-center text-[0.7rem] sm:text-xs text-white/60 font-normal leading-snug max-w-md mx-auto">
-              {t('heroLanding.ctaModulesPriceExtra')}
+              {frontPriceExtra}
             </p>
             <SubscriptionsTermsPopup
               className="mt-3 flex justify-center"
