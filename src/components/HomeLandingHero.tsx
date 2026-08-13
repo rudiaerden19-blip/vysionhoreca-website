@@ -18,7 +18,7 @@ const HERO_KASSA_ACCENT = 'text-[#5EC4E8]'
 const NAV_TOP_OFFSET_CLASS = 'pt-20'
 
 const HERO_CTA_CARD_SHELL =
-  'rounded-2xl border border-white/25 bg-white/[0.07] backdrop-blur-md px-5 py-6 sm:px-8 sm:py-7 shadow-[0_12px_40px_rgba(0,0,0,0.4)] ring-1 ring-white/10'
+  'rounded-2xl border border-white/25 bg-white/[0.07] backdrop-blur-md px-4 py-5 sm:px-8 sm:py-7 shadow-[0_12px_40px_rgba(0,0,0,0.4)] ring-1 ring-white/10'
 
 const HERO_CTA_FLIP_MS = 8000
 
@@ -58,7 +58,12 @@ function HeroCtaFlipCard() {
   const frontLabel = `${t('heroLanding.ctaModulesHeadline')} ${frontSubline} ${t('heroLanding.ctaModulesKassaFootnote')} ${t('heroLanding.ctaModulesPricePrefix')} €${monthlyPrice} ${t('heroLanding.ctaModulesPricePeriod')}. ${frontPriceNote} ${frontPriceExtra}. ${t('heroLanding.readTermsLink')}`
   const backLabel = `${t('heroLanding.ctaModulesBackHeadline')} ${t('heroLanding.ctaModulesBackSubline')} ${t('heroLanding.ctaModulesBackFootnote')} €${t('heroLanding.ctaModulesBackPriceAmount')} ${t('heroLanding.ctaModulesBackPricePeriod')}. ${t('heroLanding.ctaModulesBackPriceNote')}`
 
-  const faceBase = `${HERO_CTA_CARD_SHELL} absolute inset-0 flex flex-col justify-center text-center [backface-visibility:hidden]`
+  const faceBase = `${HERO_CTA_CARD_SHELL} absolute inset-0 flex flex-col justify-start text-center overflow-y-auto overscroll-contain [backface-visibility:hidden]`
+
+  const hardwareToggleBtn = (active: boolean) =>
+    `flex min-h-[3.25rem] flex-col items-center justify-center gap-0.5 rounded-xl px-1.5 py-2 text-center transition-colors ${
+      active ? 'bg-white/95 text-gray-900 shadow-sm' : 'text-white/85 hover:bg-white/10 hover:text-white'
+    }`
 
   return (
     <div
@@ -68,7 +73,7 @@ function HeroCtaFlipCard() {
       aria-live={reduceMotion ? undefined : 'polite'}
     >
       <div
-        className={`relative min-h-[19rem] sm:min-h-[20rem] w-full transition-transform duration-700 ease-in-out [transform-style:preserve-3d] ${
+        className={`relative min-h-[23.5rem] sm:min-h-[24.5rem] w-full transition-transform duration-700 ease-in-out [transform-style:preserve-3d] ${
           flipped ? '[transform:rotateY(180deg)]' : ''
         }`}
       >
@@ -83,34 +88,32 @@ function HeroCtaFlipCard() {
             {t('heroLanding.ctaModulesKassaFootnote')}
           </p>
           <div
-            className="mt-3 flex max-w-md mx-auto rounded-full border border-white/25 bg-black/25 p-0.5"
+            className="mt-3 grid w-full max-w-md grid-cols-2 gap-1.5 mx-auto rounded-xl border border-white/25 bg-black/25 p-1"
             role="group"
             aria-label={t('heroLanding.ctaModulesHardwareToggleAria')}
           >
             <button
               type="button"
               onClick={() => setWithHardware(false)}
-              className={`flex-1 rounded-full px-2 py-2 text-[0.65rem] sm:text-xs font-semibold transition-colors ${
-                !withHardware
-                  ? 'bg-white/95 text-gray-900 shadow-sm'
-                  : 'text-white/80 hover:text-white hover:bg-white/10'
-              }`}
+              className={hardwareToggleBtn(!withHardware)}
             >
-              €69 · {t('pricing.hardwareWithout')}
+              <span className="text-sm sm:text-base font-bold tabular-nums leading-none">€69</span>
+              <span className="text-[0.6rem] sm:text-[0.65rem] font-semibold leading-tight text-balance px-0.5">
+                {t('pricing.hardwareWithout')}
+              </span>
             </button>
             <button
               type="button"
               onClick={() => setWithHardware(true)}
-              className={`flex-1 rounded-full px-2 py-2 text-[0.65rem] sm:text-xs font-semibold transition-colors ${
-                withHardware
-                  ? 'bg-white/95 text-gray-900 shadow-sm'
-                  : 'text-white/80 hover:text-white hover:bg-white/10'
-              }`}
+              className={hardwareToggleBtn(withHardware)}
             >
-              €99 · {t('pricing.hardwareWith')}
+              <span className="text-sm sm:text-base font-bold tabular-nums leading-none">€99</span>
+              <span className="text-[0.6rem] sm:text-[0.65rem] font-semibold leading-tight text-balance px-0.5">
+                {t('pricing.hardwareWith')}
+              </span>
             </button>
           </div>
-          <div className="mt-4 sm:mt-5 pt-4 sm:pt-5 border-t border-white/20 w-full">
+          <div className="mt-4 sm:mt-5 flex w-full flex-1 flex-col pt-4 sm:pt-5 border-t border-white/20 pb-1">
             <div className="flex flex-wrap items-baseline justify-center gap-x-2 gap-y-1 text-white">
               <span className="text-base sm:text-lg text-white/90 font-medium shrink-0">
                 {t('heroLanding.ctaModulesPricePrefix')}
@@ -131,7 +134,7 @@ function HeroCtaFlipCard() {
               {frontPriceExtra}
             </p>
             <SubscriptionsTermsPopup
-              className="mt-3 flex justify-center"
+              className="mt-3 mb-1 flex justify-center"
               labelKey="heroLanding.readTermsLink"
               buttonClassName="inline-flex items-center justify-center rounded-lg border border-white/25 bg-white/[0.08] backdrop-blur-md px-3 py-1.5 text-[0.65rem] sm:text-[0.7rem] font-medium text-white/72 hover:text-white hover:bg-white/[0.14] hover:border-white/35 ring-1 ring-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.15)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/45 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
             />
@@ -148,7 +151,7 @@ function HeroCtaFlipCard() {
           <p className="mt-1.5 text-[0.65rem] sm:text-[0.7rem] text-white/65 font-normal leading-snug max-w-md mx-auto">
             {t('heroLanding.ctaModulesBackFootnote')}
           </p>
-          <div className="mt-4 sm:mt-5 pt-4 sm:pt-5 border-t border-white/20 w-full">
+          <div className="mt-4 sm:mt-5 flex w-full flex-1 flex-col pt-4 sm:pt-5 border-t border-white/20 pb-2">
             <div className="flex flex-wrap items-baseline justify-center gap-x-2 gap-y-1 text-white">
               {t('heroLanding.ctaModulesBackPricePrefix') ? (
                 <span className="text-base sm:text-lg text-white/90 font-medium shrink-0">
@@ -169,7 +172,7 @@ function HeroCtaFlipCard() {
             </p>
             <a
               href="/licentie"
-              className="mt-3 inline-flex items-center justify-center rounded-lg border border-white/25 bg-white/[0.08] backdrop-blur-md px-3 py-1.5 text-[0.65rem] sm:text-[0.7rem] font-medium text-white/72 hover:text-white hover:bg-white/[0.14] hover:border-white/35 ring-1 ring-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.15)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/45"
+              className="mt-3 mb-1 inline-flex items-center justify-center rounded-lg border border-white/25 bg-white/[0.08] backdrop-blur-md px-3 py-1.5 text-[0.65rem] sm:text-[0.7rem] font-medium text-white/72 hover:text-white hover:bg-white/[0.14] hover:border-white/35 ring-1 ring-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.15)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/45"
             >
               {t('heroLanding.ctaModulesBackLink')}
             </a>
