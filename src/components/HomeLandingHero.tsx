@@ -19,7 +19,7 @@ const NAV_TOP_OFFSET_CLASS = 'pt-20'
 const HERO_CTA_CARD_SHELL =
   'rounded-2xl border border-white/25 bg-white/[0.07] backdrop-blur-md px-5 py-6 sm:px-8 sm:py-7 shadow-[0_12px_40px_rgba(0,0,0,0.4)] ring-1 ring-white/10'
 
-const HERO_CTA_FLIP_MS = 5000
+const HERO_CTA_FLIP_MS = 7000
 
 function HeroCtaFlipCard() {
   const { t } = useLanguage()
