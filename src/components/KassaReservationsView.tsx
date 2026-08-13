@@ -4894,7 +4894,7 @@ export default function KassaReservationsView({
 
       {/* Promotie-e-mail vanuit contacten */}
       {contactPromoRecipients.length > 0 && (
-        <div className="fixed inset-0 z-[72] flex items-center justify-center bg-black/50 p-4 pointer-events-auto" onClick={() => !contactPromoSending && setContactPromoRecipients([])}>
+        <div className="fixed inset-0 z-[72] flex items-center justify-center bg-black/50 p-4 pointer-events-auto" data-vysion-modal-overlay onClick={() => !contactPromoSending && setContactPromoRecipients([])}>
           <div
             className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl"
             onClick={e => e.stopPropagation()}
@@ -4939,7 +4939,7 @@ export default function KassaReservationsView({
               type="text"
               value={contactPromoSubject}
               onChange={e => setContactPromoSubject(e.target.value)}
-              className="mb-4 w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-black"
+              className={`mb-4 w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-black ${KASSA_FLOOR_MODAL_INPUT_LIGHT}`}
               disabled={contactPromoSending}
             />
             <label className="block text-sm font-medium text-gray-700 mb-1">{rk('messageLabel')}</label>
@@ -4947,7 +4947,7 @@ export default function KassaReservationsView({
               value={contactPromoMessage}
               onChange={e => setContactPromoMessage(e.target.value)}
               rows={6}
-              className="mb-4 w-full resize-y rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-black"
+              className={`mb-4 w-full resize-y rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-black ${KASSA_FLOOR_MODAL_INPUT_LIGHT}`}
               disabled={contactPromoSending}
             />
             <p className="mb-4 text-xs text-gray-400">
