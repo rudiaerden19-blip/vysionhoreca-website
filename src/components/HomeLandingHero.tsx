@@ -43,7 +43,7 @@ function HeroCtaFlipCard() {
   const flipped = !reduceMotion && showBack
 
   const frontLabel = `${t('heroLanding.ctaModulesHeadline')} ${t('heroLanding.ctaModulesSubline')} ${t('heroLanding.ctaModulesKassaFootnote')} ${t('heroLanding.ctaModulesPricePrefix')} €${t('heroLanding.ctaModulesPriceAmount')} ${t('heroLanding.ctaModulesPricePeriod')}. ${t('heroLanding.ctaModulesPriceNote')} ${t('heroLanding.ctaModulesPriceExtra')}. ${t('heroLanding.readTermsLink')}`
-  const backLabel = `${t('heroLanding.ctaModulesBackHeadline')} ${t('heroLanding.ctaModulesBackSubline')} ${t('heroLanding.ctaModulesBackFootnote')} ${t('heroLanding.ctaModulesBackHighlight')} ${t('heroLanding.ctaModulesBackExtra')}`
+  const backLabel = `${t('heroLanding.ctaModulesBackHeadline')} ${t('heroLanding.ctaModulesBackSubline')} ${t('heroLanding.ctaModulesBackFootnote')} €${t('heroLanding.ctaModulesBackPriceAmount')} ${t('heroLanding.ctaModulesBackPricePeriod')}. ${t('heroLanding.ctaModulesBackPriceNote')}`
 
   const faceBase = `${HERO_CTA_CARD_SHELL} absolute inset-0 flex flex-col justify-center text-center [backface-visibility:hidden]`
 
@@ -108,15 +108,27 @@ function HeroCtaFlipCard() {
             {t('heroLanding.ctaModulesBackFootnote')}
           </p>
           <div className="mt-4 sm:mt-5 pt-4 sm:pt-5 border-t border-white/20 w-full">
-            <p className={`text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-balance leading-snug ${HERO_KASSA_ACCENT}`}>
-              {t('heroLanding.ctaModulesBackHighlight')}
-            </p>
-            <p className="mt-3 sm:mt-4 text-center text-[0.7rem] sm:text-xs text-white/60 font-normal leading-snug max-w-md mx-auto">
-              {t('heroLanding.ctaModulesBackExtra')}
+            <div className="flex flex-wrap items-baseline justify-center gap-x-2 gap-y-1 text-white">
+              {t('heroLanding.ctaModulesBackPricePrefix') ? (
+                <span className="text-base sm:text-lg text-white/90 font-medium shrink-0">
+                  {t('heroLanding.ctaModulesBackPricePrefix')}
+                </span>
+              ) : null}
+              <span className={`text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight tabular-nums shrink-0 ${HERO_KASSA_ACCENT}`}>
+                €&nbsp;{t('heroLanding.ctaModulesBackPriceAmount')}
+              </span>
+              {t('heroLanding.ctaModulesBackPricePeriod') ? (
+                <span className="text-base sm:text-lg font-semibold text-white/95 shrink-0">
+                  {t('heroLanding.ctaModulesBackPricePeriod')}
+                </span>
+              ) : null}
+            </div>
+            <p className="mt-2.5 sm:mt-3 text-center text-[0.7rem] sm:text-xs text-white/60 font-normal leading-snug max-w-md mx-auto">
+              {t('heroLanding.ctaModulesBackPriceNote')}
             </p>
             <a
-              href="/#platform"
-              className="mt-4 inline-flex items-center justify-center rounded-lg border border-white/25 bg-white/[0.08] backdrop-blur-md px-3 py-1.5 text-[0.65rem] sm:text-[0.7rem] font-medium text-white/72 hover:text-white hover:bg-white/[0.14] hover:border-white/35 ring-1 ring-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.15)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/45"
+              href="/licentie"
+              className="mt-3 inline-flex items-center justify-center rounded-lg border border-white/25 bg-white/[0.08] backdrop-blur-md px-3 py-1.5 text-[0.65rem] sm:text-[0.7rem] font-medium text-white/72 hover:text-white hover:bg-white/[0.14] hover:border-white/35 ring-1 ring-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.15)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/45"
             >
               {t('heroLanding.ctaModulesBackLink')}
             </a>
