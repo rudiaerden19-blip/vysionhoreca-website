@@ -6,6 +6,7 @@
  */
 
 import { useState, useMemo, useEffect, useRef, useCallback, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import {
   CalendarDays,
   Users,
@@ -4893,10 +4894,17 @@ export default function KassaReservationsView({
       </div>
 
       {/* Promotie-e-mail vanuit contacten */}
-      {contactPromoRecipients.length > 0 && (
-        <div className="fixed inset-0 z-[72] flex items-center justify-center bg-black/50 p-4 pointer-events-auto" data-vysion-modal-overlay onClick={() => !contactPromoSending && setContactPromoRecipients([])}>
+      {contactPromoRecipients.length > 0 &&
+        typeof document !== 'undefined' &&
+        createPortal(
+        <div
+          className="fixed inset-0 z-[72] flex items-center justify-center bg-black/50 p-4 pointer-events-auto"
+          data-vysion-modal-overlay
+          onClick={() => !contactPromoSending && setContactPromoRecipients([])}
+        >
           <div
-            className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl"
+            className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl [color-scheme:light]"
+            data-vysion-light-form
             onClick={e => e.stopPropagation()}
           >
             <div className="mb-4 flex items-start justify-between gap-2">
@@ -4973,7 +4981,8 @@ export default function KassaReservationsView({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
 
       {/* z4 - Annulering deadline modal */}

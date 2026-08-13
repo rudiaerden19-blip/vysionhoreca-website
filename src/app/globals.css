@@ -64,6 +64,31 @@ html.vysion-kassa-root body {
   touch-action: manipulation;
 }
 
+/* Modals / kassa: wit typvlak — ook bij light-kassa, OS dark mode en -webkit-autofill */
+.vysion-light-form-field,
+[data-vysion-light-form] input:not([type='checkbox']):not([type='radio']):not([type='hidden']),
+[data-vysion-light-form] textarea,
+[data-vysion-light-form] select {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  color-scheme: light !important;
+  -webkit-text-fill-color: #111827 !important;
+  caret-color: #111827;
+}
+
+.vysion-light-form-field:-webkit-autofill,
+.vysion-light-form-field:-webkit-autofill:hover,
+.vysion-light-form-field:-webkit-autofill:focus,
+[data-vysion-light-form] input:-webkit-autofill,
+[data-vysion-light-form] input:-webkit-autofill:hover,
+[data-vysion-light-form] input:-webkit-autofill:focus,
+[data-vysion-light-form] textarea:-webkit-autofill,
+[data-vysion-light-form] textarea:-webkit-autofill:hover,
+[data-vysion-light-form] textarea:-webkit-autofill:focus {
+  -webkit-text-fill-color: #111827 !important;
+  box-shadow: 0 0 0 1000px #ffffff inset !important;
+}
+
 /* Admin modals: scrollbare overlay op touch */
 [data-vysion-modal-overlay] {
   overflow-y: auto;
