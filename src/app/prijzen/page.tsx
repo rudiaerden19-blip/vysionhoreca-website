@@ -152,7 +152,7 @@ export default function PrijzenPage() {
                 )}
 
                 <ul className="space-y-3 mb-8">
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => (
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
                     <li key={i} className="flex items-start gap-3">
                       <svg
                         className="w-5 h-5 text-accent mt-0.5 flex-shrink-0"

@@ -519,8 +519,8 @@ const RETAIL_POPUP_MID = Math.ceil(RETAIL_POPUP_FEATURE_IDS.length / 2)
 const MODULES_POPUP_ORDER = [
   { plan: 'pro', i: 1 },
   { plan: 'starter', i: 1 },
-  { plan: 'pro', i: 12 },
-  { plan: 'pro', i: 9 },
+  { plan: 'pro', i: 10 },
+  { plan: 'pro', i: 7 },
   { plan: 'pro', i: 4 },
   { plan: 'starter', i: 2 },
   { plan: 'starter', i: 4 },
@@ -529,10 +529,9 @@ const MODULES_POPUP_ORDER = [
   { plan: 'starter', i: 10 },
   { plan: 'starter', i: 12 },
   { plan: 'pro', i: 3 },
+  { plan: 'pro', i: 5 },
+  { plan: 'pro', i: 9 },
   { plan: 'pro', i: 6 },
-  { plan: 'pro', i: 8 },
-  { plan: 'pro', i: 11 },
-  { plan: 'pro', i: 7 },
   { plan: 'pro', i: 2 },
   { plan: 'starter', i: 11 },
   { plan: 'starter', i: 9 },
@@ -1235,7 +1234,6 @@ function IndustrySection() {
         '/images/business-analytics-5.png',
       ],
     },
-    accounting: { images: ['/images/cost-calculator-1.png'] },
     payroll: {
       images: [
         '/images/loonadministratie-1.png',
@@ -1300,7 +1298,7 @@ function IndustrySection() {
         
         {/* Tabs */}
         <div className="flex flex-wrap gap-3 sm:gap-6 lg:gap-8 mb-12 justify-center lg:justify-start">
-          {['ordering', 'reservations', 'kassa', 'analytics', 'accounting', 'payroll', 'whatsapp'].map((tab) => (
+          {['ordering', 'reservations', 'kassa', 'analytics', 'payroll', 'whatsapp'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
