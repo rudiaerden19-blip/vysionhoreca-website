@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Navigation, Footer, CookieBanner } from '@/components'
 import HardwareBeestSection from '@/components/HardwareBeestSection'
+import { MARKETING_DEMO_SECTION_HREF } from '@/lib/marketing-demo-cta'
 import type { SectorPageContentKey } from '@/lib/sector-seo-routes'
 import { useLanguage } from '@/i18n'
 
@@ -13,7 +14,7 @@ type Props = {
 }
 
 export default function SectorSeoPage({ sectorKey, imageSrc }: Props) {
-  const { t, locale } = useLanguage()
+  const { t } = useLanguage()
   const p = `sectorPages.${sectorKey}`
 
   return (
@@ -58,10 +59,10 @@ export default function SectorSeoPage({ sectorKey, imageSrc }: Props) {
             <p>{t(`${p}.body2`)}</p>
             <div className="pt-4 text-center">
               <Link
-                href={`/registreer?lang=${locale}`}
+                href={MARKETING_DEMO_SECTION_HREF}
                 className="inline-flex items-center justify-center rounded-full bg-accent px-8 py-3.5 text-base font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90"
               >
-                {t(`${p}.cta`)}
+                {t('heroLanding.ctaStartFree')}
               </Link>
             </div>
           </div>

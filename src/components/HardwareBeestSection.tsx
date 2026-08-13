@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { MARKETING_DEMO_SECTION_HREF } from '@/lib/marketing-demo-cta'
 import { useLanguage } from '@/i18n'
 
 /** Vaste SEO-/alt-tekst zoals afgesproken voor beide productfoto's. */
@@ -21,7 +22,7 @@ const SPEC_KEYS = [
  * Mobiel: beeld boven tekst (specificaties onder de eerste CTA).
  */
 export default function HardwareBeestSection() {
-  const { t, locale } = useLanguage()
+  const { t } = useLanguage()
   const base = 'sectorPages.hardwareBeest'
 
   return (
@@ -49,10 +50,10 @@ export default function HardwareBeestSection() {
               />
             </div>
             <Link
-              href={`/registreer?lang=${locale}`}
+              href={MARKETING_DEMO_SECTION_HREF}
               className="inline-flex w-full items-center justify-center rounded-full bg-accent px-5 py-3.5 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:text-base"
             >
-              {t(`${base}.demoCta`)}
+              {t('heroLanding.ctaStartFree')}
             </Link>
           </div>
 
@@ -82,10 +83,10 @@ export default function HardwareBeestSection() {
             />
           </div>
           <Link
-            href={`/registreer?lang=${locale}`}
+            href={MARKETING_DEMO_SECTION_HREF}
             className="inline-flex w-full items-center justify-center rounded-full bg-accent px-5 py-3.5 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:text-base"
           >
-            {t(`${base}.demoCta`)}
+            {t('heroLanding.ctaStartFree')}
           </Link>
         </div>
       </div>

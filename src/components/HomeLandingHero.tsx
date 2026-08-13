@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { useLanguage } from '@/i18n'
+import { MARKETING_DEMO_SECTION_HREF } from '@/lib/marketing-demo-cta'
 import SubscriptionsTermsPopup from './SubscriptionsTermsPopup'
 import KassaProductNavMenu from './KassaProductNavMenu'
 import GoogleReviewsHeroBadge from './GoogleReviewsHeroBadge'
@@ -17,7 +18,7 @@ const NAV_TOP_OFFSET_CLASS = 'pt-20'
 
 export default function HomeLandingHero() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const { locale, t } = useLanguage()
+  const { t } = useLanguage()
 
   const pillLinks: { href: string; label: string }[] = [
     { href: '/#sectoren', label: t('nav.sectors') },
@@ -46,7 +47,7 @@ export default function HomeLandingHero() {
         <div className="flex items-start justify-end gap-4">
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <a
-              href={`/registreer?lang=${locale}`}
+              href={MARKETING_DEMO_SECTION_HREF}
               className="hidden sm:inline-flex items-center justify-center rounded-md bg-accent hover:bg-accent/90 text-white text-sm font-semibold px-4 py-2.5 shadow-home-btn transition-colors"
             >
               {t('heroLanding.demoRequest')}
@@ -87,7 +88,7 @@ export default function HomeLandingHero() {
               </a>
             ))}
             <a
-              href={`/registreer?lang=${locale}`}
+              href={MARKETING_DEMO_SECTION_HREF}
               className="block mt-2 text-center rounded-full bg-accent text-white font-semibold py-3 shadow-home-btn"
               onClick={() => setIsMenuOpen(false)}
             >

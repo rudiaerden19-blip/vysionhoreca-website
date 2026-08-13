@@ -104,7 +104,7 @@
     "title": "あらゆる業種のレジ",
     "subtitleLead": "レジのハードとソフトがサブスクに含まれます",
     "subtitle": "ホスピタリティと小売向け",
-    "ctaStartFree": "無料で始める",
+    "ctaStartFree": "デモを申し込む",
     "ctaViewDemo": "デモを見る",
     "ctaModulesHeadline": "プレミアム一式システム",
     "ctaModulesSubline": "頭金なし・設置費用なし",
@@ -116,7 +116,7 @@
     "ctaModulesPriceExtra": "初期投資 0 円 — ハードウェア・ソフトウェア込み",
     "ctaModulesOneTimeLicense": "または、一括払いの生涯ライセンス 1,499ユーロ（税別）— レジハードウェア込み",
     "readTermsLink": "利用規約を読む",
-    "demoRequest": "無料で始める",
+    "demoRequest": "デモを申し込む",
     "googleReviewsLabel": "Googleで5つ星",
     "googleReviewsAria": "Googleのレビューを見る"
   },
@@ -593,7 +593,7 @@
     "secondary": "情報を請求"
   },
   "contact": {
-    "title": "お問い合わせ",
+    "title": "デモを申し込む",
     "subtitle": "Vysion kassa'sについてご質問がありますか？私たちのチームがお待ちしています。",
     "email": "メール",
     "phone": "電話",

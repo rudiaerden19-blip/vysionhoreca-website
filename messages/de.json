@@ -104,7 +104,7 @@
     "title": "Eine Kasse für jede Branche",
     "subtitleLead": "Kassen-Hardware & Software in Ihrem Abo enthalten",
     "subtitle": "Für Gastronomie und Retail",
-    "ctaStartFree": "Kostenlos starten",
+    "ctaStartFree": "Demo anfragen",
     "ctaViewDemo": "Demo ansehen",
     "ctaModulesHeadline": "Komplettes Premium-System",
     "ctaModulesSubline": "Keine Anzahlung, keine Installationskosten",
@@ -116,7 +116,7 @@
     "ctaModulesPriceExtra": "0 € Anschaffung — Hardware und Software inbegriffen",
     "ctaModulesOneTimeLicense": "Oder wählen Sie eine einmalige lebenslange Lizenz für 1.499 € zzgl. MwSt. — Kassen-Hardware inbegriffen",
     "readTermsLink": "AGB lesen",
-    "demoRequest": "Gratis starten",
+    "demoRequest": "Demo anfragen",
     "googleReviewsLabel": "5 Sterne auf Google",
     "googleReviewsAria": "Unsere Google-Bewertungen lesen"
   },
@@ -593,7 +593,7 @@
     "secondary": "Info anfordern"
   },
   "contact": {
-    "title": "Kontaktieren Sie uns",
+    "title": "Demo anfragen",
     "subtitle": "Fragen zu Vysion kassa's? Unser Team ist bereit zu helfen.",
     "email": "E-Mail",
     "phone": "Telefon",

@@ -20,6 +20,7 @@ import type { Locale } from '@/i18n/config'
 import { PricingHardwareToggle } from '@/components/PricingHardwareToggle'
 import { monthlyPriceForHardware } from '@/lib/pricing-hardware'
 import HomeScrollOnLoad from '@/components/HomeScrollOnLoad'
+import { MARKETING_DEMO_SECTION_HREF } from '@/lib/marketing-demo-cta'
 
 const GRATIS_WEBSITE_EXAMPLE_HREF =
   'https://restaurantdekorf.ordervysion.com/shop/restaurantdekorf'
@@ -165,7 +166,7 @@ function WhyVysionSection() {
             </div>
             <div className="relative z-10 mt-[2cm] flex w-full shrink-0 flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:justify-center lg:justify-start lg:px-0">
               <a
-                href={`/registreer?lang=${locale}`}
+                href={MARKETING_DEMO_SECTION_HREF}
                 className="inline-flex min-h-[48px] w-full items-center justify-center rounded-full bg-accent px-8 py-3.5 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:min-w-[200px] sm:flex-1 lg:max-w-[220px] lg:flex-initial"
               >
                 {t('heroLanding.ctaStartFree')}
@@ -846,7 +847,7 @@ function PricingSection() {
 
         <div className="mt-12 flex flex-col items-stretch justify-center gap-3 sm:mt-14 sm:flex-row sm:items-center sm:justify-center sm:gap-4">
           <a
-            href={`/registreer?lang=${locale}`}
+            href={MARKETING_DEMO_SECTION_HREF}
             className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-accent px-8 py-3.5 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:text-base"
           >
             {t('heroLanding.ctaStartFree')}
@@ -994,10 +995,10 @@ function StopSection() {
             ))}
           </div>
           <a
-            href={`/registreer?lang=${locale}`}
+            href={MARKETING_DEMO_SECTION_HREF}
             className="inline-block bg-accent text-white px-8 sm:px-10 py-4 rounded-full font-bold text-lg hover:bg-accent/90 transition-all shadow-home-btn hover:shadow-[0_0_36px_rgba(234,88,12,0.42)] hover:scale-105"
           >
-            {t('stop.cta')}
+            {t('heroLanding.ctaStartFree')}
           </a>
         </div>
       </div>
@@ -1143,7 +1144,7 @@ function TableKioskSection() {
             </ul>
             <div className="mt-[calc(2.5rem+2cm)] flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-center sm:gap-4">
               <a
-                href={`/registreer?lang=${locale}`}
+                href={MARKETING_DEMO_SECTION_HREF}
                 className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-accent px-8 py-3.5 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:text-base"
               >
                 {t('heroLanding.ctaStartFree')}
@@ -1356,10 +1357,10 @@ function IndustrySection() {
               {t(`industry.${activeTab}.description`)}
             </p>
             <a
-              href={`/registreer?lang=${locale}`}
+              href={MARKETING_DEMO_SECTION_HREF}
               className="inline-block bg-accent text-white px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-all shadow-home-btn"
             >
-              {t('industry.tryFree')}
+              {t('heroLanding.ctaStartFree')}
             </a>
           </div>
 

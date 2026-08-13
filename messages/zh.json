@@ -104,7 +104,7 @@
     "title": "每个行业一套收银",
     "subtitleLead": "收银硬件与软件包含在您的订阅中",
     "subtitle": "适用于餐饮与零售",
-    "ctaStartFree": "免费开始",
+    "ctaStartFree": "申请演示",
     "ctaViewDemo": "查看演示",
     "ctaModulesHeadline": "完整专业系统",
     "ctaModulesSubline": "免订金，无安装费",
@@ -116,7 +116,7 @@
     "ctaModulesPriceExtra": "零前期投入 — 硬件与软件均已包含",
     "ctaModulesOneTimeLicense": "或选择一次性终身许可 1,499 欧元（不含税）— 含收银硬件",
     "readTermsLink": "阅读条款",
-    "demoRequest": "免费开始",
+    "demoRequest": "申请演示",
     "googleReviewsLabel": "Google 五星好评",
     "googleReviewsAria": "查看我们的 Google 评价"
   },
@@ -593,7 +593,7 @@
     "secondary": "获取信息"
   },
   "contact": {
-    "title": "联系我们",
+    "title": "申请演示",
     "subtitle": "关于Vysion kassa's有问题？我们的团队随时为您服务。",
     "email": "邮箱",
     "phone": "电话",

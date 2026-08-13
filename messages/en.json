@@ -186,7 +186,7 @@
     "title": "One POS for every sector",
     "subtitleLead": "POS hardware & software included in your subscription",
     "subtitle": "For hospitality and retail",
-    "ctaStartFree": "Start free",
+    "ctaStartFree": "Request a demo",
     "ctaViewDemo": "View demo",
     "ctaModulesHeadline": "Complete premium system",
     "ctaModulesSubline": "No down payment, no installation costs",
@@ -198,7 +198,7 @@
     "ctaModulesPriceExtra": "€0 upfront — hardware and software included",
     "ctaModulesOneTimeLicense": "Or choose a one-time lifetime license for €1,499 excl. VAT — POS hardware included",
     "readTermsLink": "Read terms & conditions",
-    "demoRequest": "Start free",
+    "demoRequest": "Request a demo",
     "googleReviewsLabel": "5 stars on Google",
     "googleReviewsAria": "Read our Google reviews"
   },
@@ -878,7 +878,7 @@
     "secondary": "Request info"
   },
   "contact": {
-    "title": "Get in touch",
+    "title": "Request a demo",
     "subtitle": "Questions about Vysion kassa's? Our team is ready to help.",
     "email": "Email",
     "phone": "Phone",

@@ -104,7 +104,7 @@
     "title": "Une caisse pour chaque secteur",
     "subtitleLead": "Matériel et logiciel de caisse inclus dans votre abonnement",
     "subtitle": "Pour l'horeca et le retail",
-    "ctaStartFree": "Commencer gratuitement",
+    "ctaStartFree": "Demandez une démo",
     "ctaViewDemo": "Voir la démo",
     "ctaModulesHeadline": "Système premium complet",
     "ctaModulesSubline": "Pas d’acompte, pas de frais d’installation",
@@ -116,7 +116,7 @@
     "ctaModulesPriceExtra": "0 € d’investissement — matériel et logiciel inclus",
     "ctaModulesOneTimeLicense": "Ou choisissez une licence à vie unique pour 1 499 € HT — matériel de caisse inclus",
     "readTermsLink": "Lire les conditions générales",
-    "demoRequest": "Commencer gratuitement",
+    "demoRequest": "Demandez une démo",
     "googleReviewsLabel": "5 étoiles sur Google",
     "googleReviewsAria": "Lire nos avis Google"
   },
@@ -593,7 +593,7 @@
     "secondary": "Demander des infos"
   },
   "contact": {
-    "title": "Contactez-nous",
+    "title": "Demandez une démo",
     "subtitle": "Questions sur Vysion kassa's? Notre équipe est prête à vous aider.",
     "email": "Email",
     "phone": "Téléphone",
