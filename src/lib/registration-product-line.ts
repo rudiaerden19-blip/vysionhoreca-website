@@ -88,7 +88,6 @@ export const REGISTRATION_MODULE_PRESETS: Record<RegistrationProductLine, Preset
       online: false,
       reservaties: false,
       personeel: false,
-      kosten: false,
     },
     submenusOn: [
       'sm_retail_kassa_pos',
@@ -109,7 +108,6 @@ export const REGISTRATION_MODULE_PRESETS: Record<RegistrationProductLine, Preset
       instellingen: true,
       account: true,
       rapporten: true,
-      kosten: false,
       kassa: false,
       'retail-kassa': false,
       voorraad: false,
@@ -164,7 +162,6 @@ export const REGISTRATION_MODULE_PRESETS: Record<RegistrationProductLine, Preset
       'online-bestellingen': false,
       online: false,
       personeel: false,
-      kosten: false,
       rapporten: false,
     },
     submenusOn: [

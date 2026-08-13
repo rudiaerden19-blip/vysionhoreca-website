@@ -39,7 +39,7 @@ const organizationJsonLd = {
       url: siteUrl,
       logo: `${siteUrl}/favicon.svg`,
       description:
-        'Kassa (POS), online bestelplatform en kassahardware: alles-in-één met reserveringsplatform, keukenscherm, WhatsApp-bestellen, kosten en analyse. Gratis uitproberen — België en Nederland.',
+        'Kassa (POS), online bestelplatform en kassahardware: alles-in-één met reserveringsplatform, keukenscherm, WhatsApp-bestellen en bedrijfsanalyse. Gratis uitproberen — België en Nederland.',
       address: {
         '@type': 'PostalAddress',
         streetAddress: 'Siberiëstraat 24',
@@ -99,7 +99,7 @@ export const metadata: Metadata = {
     template: `%s | ${VYSION_BRAND_SITE_NAME}`,
   },
   description:
-    'Touchscreen kassa (POS), online bestelplatform en webshop, premium kassahardware en software in één pakket. Gratis kassa 14 dagen uitproberen. Reserveringsplatform, keukenscherm, WhatsApp-bestellen, kosten en analyse. Bancontact, iDEAL. België & Nederland.',
+    'Touchscreen kassa (POS), online bestelplatform en webshop, premium kassahardware en software in één pakket. Gratis kassa 14 dagen uitproberen. Reserveringsplatform, keukenscherm, WhatsApp-bestellen, bedrijfsanalyse. Bancontact, iDEAL. België & Nederland.',
   keywords: [
     'kassa software',
     'gratis kassa',
@@ -118,7 +118,6 @@ export const metadata: Metadata = {
     'keukenscherm',
     'kitchen display',
     'WhatsApp bestellen',
-    'kostencalculator zaak',
     'urenregistratie',
     'loonadministratie',
     'bedrijfsanalyse',

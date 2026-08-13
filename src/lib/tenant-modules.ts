@@ -10,7 +10,6 @@ export const TENANT_MODULE_IDS = [
   'online',
   'reservaties',
   'personeel',
-  'kosten',
   'rapporten',
   'website',
   'account',
@@ -27,7 +26,6 @@ export const TENANT_MODULE_LABELS: Record<TenantModuleId, string> = {
   online: 'Online platform (klanten, promoties, WhatsApp, …)',
   reservaties: 'Reservaties',
   personeel: 'Personeel & uren',
-  kosten: 'Kosten berekening',
   rapporten: 'Rapporten, Z-rapport, analyse',
   website: 'Website & content (design, SEO, media, …)',
   account: 'Mijn account / abonnement',
@@ -46,7 +44,6 @@ export function getStarterEnabledModulesRecord(): Record<TenantModuleId, boolean
     account: true,
     reservaties: false,
     personeel: false,
-    kosten: false,
     rapporten: false,
   }
 }
@@ -376,7 +373,6 @@ export function getFirstAccessibleAdminPath(
     { m: 'instellingen', path: '/betaling'},
     { m: 'online', path: '/online-status'},
     { m: 'personeel', path: '/personeel'},
-    { m: 'kosten', path: '/kosten'},
     { m: 'rapporten', path: '/rapporten'},
     { m: 'website', path: '/design'},
     { m: 'account', path: '/abonnement'},
@@ -521,9 +517,6 @@ export function adminPathToModule(pathname: string, tenantSlug: string): AdminMo
     rest.startsWith('/inklokken')
   ) {
     return { kind: 'module', module: 'personeel'}
-  }
-  if (rest.startsWith('/kosten')) {
-    return { kind: 'module', module: 'kosten'}
   }
   if (
     rest.startsWith('/rapporten') ||

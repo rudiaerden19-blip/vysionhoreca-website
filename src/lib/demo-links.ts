@@ -136,7 +136,6 @@ export function demoUrlForPlatformCard(msgKey: string): string {
     case 'whatsappBestellingen':
     case 'loonadministratie':
     case 'bedrijfsanalyse':
-    case 'kostencalculator':
       return DEMO_KASSA_URL
     default:
       return DEMO_ORDER_SITE_URL

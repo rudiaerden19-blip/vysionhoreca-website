@@ -11,7 +11,6 @@ export const EIGEN_WEBSITE_CARD_IMAGE = '/images/platform/eigen-website-card.png
 export const WHATSAPP_BESTELLINGEN_CARD_IMAGE = '/images/platform/whatsapp-bestellingen-card.png'
 export const LOONADMINISTRATIE_CARD_IMAGE = '/images/platform/loonadministratie-card.png'
 export const BEDRIJFSANALYSE_CARD_IMAGE = '/images/platform/bedrijfsanalyse-card.png'
-export const KOSTENCALCULATOR_CARD_IMAGE = '/images/platform/kostencalculator-card.png'
 
 export type PlatformPageEntry = {
   slug: string
@@ -38,6 +37,5 @@ export const PLATFORM_PAGES: PlatformPageEntry[] = [
   },
   { slug: 'loonadministratie', msgKey: 'loonadministratie', cardHeaderImage: LOONADMINISTRATIE_CARD_IMAGE },
   { slug: 'bedrijfsanalyse', msgKey: 'bedrijfsanalyse', cardHeaderImage: BEDRIJFSANALYSE_CARD_IMAGE },
-  { slug: 'kostencalculator', msgKey: 'kostencalculator', cardHeaderImage: KOSTENCALCULATOR_CARD_IMAGE },
 ]
 

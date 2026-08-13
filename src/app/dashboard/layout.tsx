@@ -50,7 +50,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: menuTrans('reports'), href: 'https://frituurnolim.vercel.app/rapporten', icon: 'reports', external: true },
     { name: menuTrans('accounting'), href: 'https://frituurnolim.vercel.app/boekhouding', icon: 'reports', external: true },
     { name: menuTrans('invoices'), href: 'https://frituurnolim.vercel.app/facturen', icon: 'reports', external: true },
-    { name: menuTrans('costCalculator'), href: 'https://frituurnolim.vercel.app/kosten', icon: 'reports', external: true },
     { name: menuTrans('businessAnalysis'), href: 'https://frituurnolim.vercel.app/analyse', icon: 'analytics', external: true },
     { name: menuTrans('account'), href: 'https://frituurnolim.vercel.app/mijn-account', icon: 'settings', external: true },
     { name: menuTrans('analytics'), href: '/dashboard/analyse', icon: 'analytics', hidden: true },

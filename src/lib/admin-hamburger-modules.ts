@@ -540,36 +540,6 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
       ],
     },
     {
-      rowKey: 'kosten',
-      key: 'kosten',
-      icon: '',
-      label: 'Kosten berekening',
-      labelKey: rowLabelKey('kosten'),
-      items: [
-        {
-          id: 'sm_kosten_marge',
-          icon: '',
-          label: 'Marge Instellingen',
-          labelKey: itemLabelKey('sm_kosten_marge'),
-          href: `${baseUrl}/kosten/instellingen`,
-        },
-        {
-          id: 'sm_kosten_ingredienten',
-          icon: '',
-          label: 'Ingrediënten',
-          labelKey: itemLabelKey('sm_kosten_ingredienten'),
-          href: `${baseUrl}/kosten/ingredienten`,
-        },
-        {
-          id: 'sm_kosten_product',
-          icon: '',
-          label: 'Product Kostprijs',
-          labelKey: itemLabelKey('sm_kosten_product'),
-          href: `${baseUrl}/kosten/producten`,
-        },
-      ],
-    },
-    {
       rowKey: 'rapporten',
       key: 'rapporten',
       icon: '',
