@@ -8,7 +8,7 @@ const siteUrl = VYSION_CANONICAL_ORIGIN
 const HOME_TITLE =
   `Kassa, online bestelplatform & hardware | Gratis proberen | ${VYSION_BRAND_SITE_NAME}`
 const HOME_DESCRIPTION =
-  'Zoek je een kassa, online bestelplatform of gratis uitproberen? Vysion kassa: touchscreen POS, webshop, premium kassahardware (Intel i7). 14 dagen gratis — reserveringen, keukenscherm, WhatsApp, 9 talen. België & Nederland.'
+  'Zoek je een kassa, online bestelplatform of gratis uitproberen? Vysion kassa: touchscreen POS, webshop, premium kassahardware (Intel i9). 14 dagen gratis — reserveringen, keukenscherm, WhatsApp, 9 talen. België & Nederland.'
 
 export const metadata: Metadata = {
   title: {
