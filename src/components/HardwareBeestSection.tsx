@@ -1,8 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import Link from 'next/link'
-import { MARKETING_DEMO_SECTION_HREF } from '@/lib/marketing-demo-cta'
+import MarketingStartAndDemoButtons from '@/components/MarketingStartAndDemoButtons'
 import { useLanguage } from '@/i18n'
 
 /** Vaste SEO-/alt-tekst zoals afgesproken voor beide productfoto's. */
@@ -49,12 +48,7 @@ export default function HardwareBeestSection() {
                 sizes="(min-width: 1024px) 28rem, 100vw"
               />
             </div>
-            <Link
-              href={MARKETING_DEMO_SECTION_HREF}
-              className="inline-flex w-full items-center justify-center rounded-full bg-accent px-5 py-3.5 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:text-base"
-            >
-              {t('heroLanding.ctaStartFree')}
-            </Link>
+            <MarketingStartAndDemoButtons fullWidth />
           </div>
 
           <ul className="flex flex-1 flex-col justify-center gap-4 text-base text-gray-800 sm:text-lg">
@@ -82,12 +76,7 @@ export default function HardwareBeestSection() {
               sizes="(min-width: 640px) 36rem, 100vw"
             />
           </div>
-          <Link
-            href={MARKETING_DEMO_SECTION_HREF}
-            className="inline-flex w-full items-center justify-center rounded-full bg-accent px-5 py-3.5 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:text-base"
-          >
-            {t('heroLanding.ctaStartFree')}
-          </Link>
+          <MarketingStartAndDemoButtons fullWidth />
         </div>
       </div>
     </section>

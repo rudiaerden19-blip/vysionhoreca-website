@@ -1,10 +1,9 @@
 'use client'
 
 import Image from 'next/image'
-import Link from 'next/link'
 import { Navigation, Footer, CookieBanner } from '@/components'
 import HardwareBeestSection from '@/components/HardwareBeestSection'
-import { MARKETING_DEMO_SECTION_HREF } from '@/lib/marketing-demo-cta'
+import MarketingStartAndDemoButtons from '@/components/MarketingStartAndDemoButtons'
 import type { SectorPageContentKey } from '@/lib/sector-seo-routes'
 import { useLanguage } from '@/i18n'
 
@@ -57,13 +56,8 @@ export default function SectorSeoPage({ sectorKey, imageSrc }: Props) {
           <div className="max-w-3xl mx-auto space-y-6 text-base sm:text-lg text-gray-700 leading-relaxed">
             <p>{t(`${p}.body1`)}</p>
             <p>{t(`${p}.body2`)}</p>
-            <div className="pt-4 text-center">
-              <Link
-                href={MARKETING_DEMO_SECTION_HREF}
-                className="inline-flex items-center justify-center rounded-full bg-accent px-8 py-3.5 text-base font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90"
-              >
-                {t('heroLanding.ctaStartFree')}
-              </Link>
+            <div className="pt-4">
+              <MarketingStartAndDemoButtons />
             </div>
           </div>
         </section>

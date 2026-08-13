@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { useLanguage } from '@/i18n'
-import { MARKETING_DEMO_SECTION_HREF } from '@/lib/marketing-demo-cta'
+import MarketingStartAndDemoButtons from '@/components/MarketingStartAndDemoButtons'
 import SubscriptionsTermsPopup from './SubscriptionsTermsPopup'
 import KassaProductNavMenu from './KassaProductNavMenu'
 import GoogleReviewsHeroBadge from './GoogleReviewsHeroBadge'
@@ -45,33 +45,25 @@ export default function HomeLandingHero() {
       {/* Top bar */}
       <header className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 sm:pt-4 pb-1">
         <div className="flex items-start justify-end gap-4">
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <a
-              href={MARKETING_DEMO_SECTION_HREF}
-              className="hidden sm:inline-flex items-center justify-center rounded-md bg-accent hover:bg-accent/90 text-white text-sm font-semibold px-4 py-2.5 shadow-home-btn transition-colors"
-            >
-              {t('heroLanding.demoRequest')}
-            </a>
-
-            <button
-              type="button"
-              className="text-white p-2 rounded-lg hover:bg-white/10"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label={t('ui.ariaNavMenu')}
-            >
-              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                {isMenuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
-            </button>
-          </div>
+          <MarketingStartAndDemoButtons compact onDark />
+          <button
+            type="button"
+            className="text-white p-2 rounded-lg hover:bg-white/10 shrink-0"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label={t('ui.ariaNavMenu')}
+          >
+            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {isMenuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
         </div>
 
         {isMenuOpen && (
-          <div className="mt-4 rounded-2xl bg-black/50 backdrop-blur-md border border-white/20 p-4 space-y-1">
+          <div className="mt-4 rounded-2xl bg-black/50 backdrop-blur-md border border-white/20 p-4 space-y-1 sm:hidden">
             <KassaProductNavMenu
               linkClass="block py-3 px-3 rounded-lg text-white font-medium hover:bg-white/10 w-full"
               layout="mobile"
@@ -87,13 +79,7 @@ export default function HomeLandingHero() {
                 {label}
               </a>
             ))}
-            <a
-              href={MARKETING_DEMO_SECTION_HREF}
-              className="block mt-2 text-center rounded-full bg-accent text-white font-semibold py-3 shadow-home-btn"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              {t('heroLanding.demoRequest')}
-            </a>
+            <MarketingStartAndDemoButtons onDark fullWidth className="mt-2 pt-2 border-t border-white/20" />
           </div>
         )}
       </header>

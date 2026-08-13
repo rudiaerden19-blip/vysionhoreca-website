@@ -1,15 +1,9 @@
 'use client'
 
 import Image from 'next/image'
-import {
-  Rocket,
-} from 'lucide-react'
 import { useLanguage } from '@/i18n'
-import { MARKETING_DEMO_SECTION_HREF } from '@/lib/marketing-demo-cta'
+import MarketingStartAndDemoButtons from '@/components/MarketingStartAndDemoButtons'
 import { PLATFORM_PAGES } from '@/lib/platform-pages'
-
-const ctaIconClass =
-  'h-[1.05rem] w-[1.05rem] shrink-0 sm:h-[1.15rem] sm:w-[1.15rem] stroke-[2.25]'
 
 const cardShellClasses =
   'group flex min-h-[240px] sm:min-h-[260px] flex-col overflow-hidden rounded-2xl border border-gray-200/60 bg-[#f4f4f4] text-center shadow-home-card transition-all duration-300 hover:z-10 hover:-translate-y-0.5 hover:border-accent/55 hover:shadow-[0_12px_40px_-6px_rgba(232,90,60,0.55),0_28px_70px_-12px_rgba(232,90,60,0.42),0_0_0_1px_rgba(232,90,60,0.2),0_0_60px_8px_rgba(232,90,60,0.28)] active:z-10 active:-translate-y-0.5 active:border-accent/60 active:shadow-[0_12px_40px_-6px_rgba(232,90,60,0.6),0_28px_70px_-12px_rgba(232,90,60,0.48),0_0_0_1px_rgba(232,90,60,0.22),0_0_72px_10px_rgba(232,90,60,0.32)]'
@@ -69,15 +63,7 @@ export default function PlatformGridSection() {
           <p className="text-sm sm:text-base text-gray-600 leading-snug">
             {t('platform.gridTrustLine')}
           </p>
-          <div className="mt-[2cm] flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center sm:justify-center sm:gap-4">
-            <a
-              href={MARKETING_DEMO_SECTION_HREF}
-              className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:min-w-[200px] sm:text-base"
-            >
-              <Rocket className={ctaIconClass} aria-hidden />
-              {t('heroLanding.ctaStartFree')}
-            </a>
-          </div>
+          <MarketingStartAndDemoButtons className="mt-[2cm]" />
         </div>
       </div>
     </section>
