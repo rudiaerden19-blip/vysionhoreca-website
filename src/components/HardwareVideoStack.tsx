@@ -51,6 +51,7 @@ export const WHY_VYSION_HARDWARE_VIDEOS: HardwareVideoConfig[] = [
   {
     kind: 'image',
     src: '/images/hardware/connected-hub-kassa-screenshot.png',
+    fullSrc: '/images/hardware/connected-hub-kassa-screenshot-full.png',
     altKey: 'whyVysion.videoAltKassaUi',
   },
 ]
@@ -106,6 +107,7 @@ function HardwareImageTile({
           alt=""
           className="pointer-events-none absolute inset-0 h-full w-full object-contain object-center"
           decoding="async"
+          fetchPriority="low"
         />
         <span
           className={
@@ -120,7 +122,7 @@ function HardwareImageTile({
       {mounted && expanded
         ? createPortal(
             <div
-              className="fixed inset-0 z-[10000] flex flex-col bg-black/95"
+              className="fixed inset-0 z-[10000] flex flex-col bg-black"
               role="dialog"
               aria-modal="true"
               aria-label={label}
@@ -140,13 +142,17 @@ function HardwareImageTile({
                 <span>{t('ui.ariaClose')}</span>
               </button>
               <div
-                className="flex min-h-0 flex-1 items-center justify-center px-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-[max(4.5rem,env(safe-area-inset-top))]"
+                className="absolute inset-0 flex items-center justify-center pt-[max(3.75rem,env(safe-area-inset-top))] pb-[max(0.5rem,env(safe-area-inset-bottom))]"
                 onClick={(e) => e.stopPropagation()}
               >
                 <img
                   src={fullSrc}
                   alt={label}
-                  className="h-auto max-h-[calc(100dvh-5.5rem)] w-[min(96vw,1400px)] object-contain"
+                  width={2532}
+                  height={969}
+                  className="h-full w-full object-contain object-center"
+                  decoding="sync"
+                  fetchPriority="high"
                 />
               </div>
             </div>,
