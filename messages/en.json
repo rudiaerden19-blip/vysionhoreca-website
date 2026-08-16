@@ -954,7 +954,10 @@
     "linkAppsAria": "Vysion Apps — opens in a new tab",
     "linkHorecaAria": "Official Vysion kassa website — new tab",
     "websiteLinkLabel": "Vysion kassa — official website",
-    "linkWebvysionAria": "Web Vysion — opens in a new tab"
+    "linkWebvysionAria": "Web Vysion — opens in a new tab",
+    "linkTablevysionAria": "Table Vysion — opens in a new tab",
+    "linkVysionorderAria": "Vysion Order — opens in a new tab",
+    "linkVysiongidsAria": "Vysion Gids — opens in a new tab"
   },
   "stop": {
     "title": "STOP",

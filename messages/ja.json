@@ -642,7 +642,10 @@
     "linkAppsAria": "Vysion Apps（新しいタブ）",
     "linkHorecaAria": "Vysion kassa公式サイト（新しいタブ）",
     "websiteLinkLabel": "Vysion kassa — 公式サイト",
-    "linkWebvysionAria": "Web Vysion（新しいタブ）"
+    "linkWebvysionAria": "Web Vysion（新しいタブ）",
+    "linkTablevysionAria": "Table Vysion（新しいタブ）",
+    "linkVysionorderAria": "Vysion Order（新しいタブ）",
+    "linkVysiongidsAria": "Vysion Gids（新しいタブ）"
   },
   "stop": {
     "title": "ストップ",

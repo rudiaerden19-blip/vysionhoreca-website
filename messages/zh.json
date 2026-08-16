@@ -642,7 +642,10 @@
     "linkAppsAria": "Vysion Apps — 新标签页打开",
     "linkHorecaAria": "Vysion kassa官方网站 — 新标签页",
     "websiteLinkLabel": "Vysion kassa — 官方网站",
-    "linkWebvysionAria": "Web Vysion — 新标签页打开"
+    "linkWebvysionAria": "Web Vysion — 新标签页打开",
+    "linkTablevysionAria": "Table Vysion — 新标签页打开",
+    "linkVysionorderAria": "Vysion Order — 新标签页打开",
+    "linkVysiongidsAria": "Vysion Gids — 新标签页打开"
   },
   "stop": {
     "title": "停",

@@ -642,7 +642,10 @@
     "linkAppsAria": "Vysion Apps — s’ouvre dans un nouvel onglet",
     "linkHorecaAria": "Site officiel Vysion kassa — nouvel onglet",
     "websiteLinkLabel": "Vysion kassa — site officiel",
-    "linkWebvysionAria": "Web Vysion — nouvel onglet"
+    "linkWebvysionAria": "Web Vysion — nouvel onglet",
+    "linkTablevysionAria": "Table Vysion — nouvel onglet",
+    "linkVysionorderAria": "Vysion Order — nouvel onglet",
+    "linkVysiongidsAria": "Vysion Gids — nouvel onglet"
   },
   "stop": {
     "title": "STOP",

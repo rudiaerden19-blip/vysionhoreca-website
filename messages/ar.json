@@ -642,7 +642,10 @@
     "linkAppsAria": "Vysion Apps — يفتح في تبويب جديد",
     "linkHorecaAria": "الموقع الرسمي لـ Vysion kassa — تبويب جديد",
     "websiteLinkLabel": "Vysion kassa — الموقع الرسمي",
-    "linkWebvysionAria": "Web Vysion — يفتح في تبويب جديد"
+    "linkWebvysionAria": "Web Vysion — يفتح في تبويب جديد",
+    "linkTablevysionAria": "Table Vysion — يفتح في تبويب جديد",
+    "linkVysionorderAria": "Vysion Order — يفتح في تبويب جديد",
+    "linkVysiongidsAria": "Vysion Gids — يفتح في تبويب جديد"
   },
   "stop": {
     "title": "قف",

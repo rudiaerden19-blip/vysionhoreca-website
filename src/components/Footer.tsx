@@ -61,6 +61,33 @@ export default function Footer() {
                 >
                   www.webvysion.tech
                 </a>
+                <a
+                  href="https://www.tablevysion.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent hover:underline block"
+                  aria-label={t('footer.linkTablevysionAria')}
+                >
+                  www.tablevysion.com
+                </a>
+                <a
+                  href="https://www.vysionorder.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent hover:underline block"
+                  aria-label={t('footer.linkVysionorderAria')}
+                >
+                  www.vysionorder.com
+                </a>
+                <a
+                  href="https://www.vysiongids.be"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent hover:underline block"
+                  aria-label={t('footer.linkVysiongidsAria')}
+                >
+                  www.vysiongids.be
+                </a>
               </p>
             </div>
 
