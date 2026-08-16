@@ -50,7 +50,7 @@ export default function PlatformGridSection() {
                   <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-2.5 leading-snug px-1">
                     {t(`platform.${msgKey}.title`)}
                   </h3>
-                  <p className="text-sm sm:text-base text-gray-600 leading-relaxed line-clamp-5">
+                  <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
                     {t(`platform.${msgKey}.teaser`)}
                   </p>
                 </div>
