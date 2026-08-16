@@ -272,9 +272,11 @@ export default function HomeLandingHero() {
         <p className="mt-4 sm:mt-5 text-lg sm:text-xl md:text-2xl text-white font-semibold max-w-2xl leading-snug">
           {t('heroLanding.subtitleLead')}
         </p>
-        <p className="mt-3 sm:mt-4 text-base sm:text-lg text-white/85 max-w-2xl leading-relaxed">
-          {t('heroLanding.subtitle')}
-        </p>
+        {t('heroLanding.subtitle') ? (
+          <p className="mt-3 sm:mt-4 text-base sm:text-lg text-white/85 max-w-2xl leading-relaxed">
+            {t('heroLanding.subtitle')}
+          </p>
+        ) : null}
         <HeroCtaFlipCard />
       </div>
     </section>
