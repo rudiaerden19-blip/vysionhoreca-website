@@ -6,6 +6,9 @@ import { useLanguage } from '@/i18n'
 
 const HUB_CENTER_IMAGE = '/images/hardware/connected-hub-sunmi-center-dark.png'
 
+/** Merk-blauw (`tailwind accent`) — hub-lijnen en gloed. */
+const HUB_ACCENT = '#0E5D82'
+
 const HUB_MODULE_KEYS = [
   'kassa',
   'onlineBestelsysteem',
@@ -57,7 +60,7 @@ export default function ConnectedSystemHubSection() {
       aria-labelledby="connected-system-hub-heading"
     >
       <div className="pointer-events-none absolute inset-0" aria-hidden>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_45%,rgba(232,90,60,0.12),transparent_65%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_45%,rgba(14,93,130,0.18),transparent_65%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.03),transparent_55%)]" />
       </div>
 
@@ -99,8 +102,8 @@ export default function ConnectedSystemHubSection() {
             >
               <defs>
                 <linearGradient id="hub-tentacle" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#E85A3C" stopOpacity="0.2" />
-                  <stop offset="100%" stopColor="#E85A3C" stopOpacity="0.75" />
+                  <stop offset="0%" stopColor={HUB_ACCENT} stopOpacity="0.25" />
+                  <stop offset="100%" stopColor={HUB_ACCENT} stopOpacity="0.85" />
                 </linearGradient>
               </defs>
               {HUB_MODULE_KEYS.map((key, i) => (
@@ -117,7 +120,7 @@ export default function ConnectedSystemHubSection() {
 
             {/* Grote hub-cirkel + kassa */}
             <div className="absolute left-1/2 top-[48%] z-20 flex w-[32%] -translate-x-1/2 -translate-y-1/2 flex-col items-center">
-              <div className="relative aspect-square w-full rounded-full border border-white/[0.14] bg-[#0c0f14] p-[5%] shadow-[0_0_0_1px_rgba(232,90,60,0.22),0_20px_48px_rgba(0,0,0,0.5)] ring-1 ring-accent/20">
+              <div className="relative aspect-square w-full rounded-full border border-white/[0.14] bg-[#0c0f14] p-[5%] shadow-[0_0_0_1px_rgba(14,93,130,0.35),0_20px_48px_rgba(0,0,0,0.5)] ring-1 ring-accent/35">
                 <div className="relative h-full w-full overflow-hidden rounded-full bg-[#0c0f14]">
                   <Image
                     src={HUB_CENTER_IMAGE}
@@ -143,7 +146,7 @@ export default function ConnectedSystemHubSection() {
               return (
                 <Fragment key={key}>
                   <span
-                    className="absolute z-30 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent shadow-[0_0_12px_rgba(232,90,60,0.7)]"
+                    className="absolute z-30 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent shadow-[0_0_12px_rgba(14,93,130,0.85)]"
                     style={dot}
                     aria-hidden
                   />
@@ -163,7 +166,7 @@ export default function ConnectedSystemHubSection() {
 
         <div className="mt-12 md:hidden">
           <div className="relative mx-auto max-w-sm">
-            <div className="relative mx-auto aspect-square w-full max-w-[min(100%,280px)] rounded-full border border-white/10 bg-[#0c0f14] p-3 shadow-lg ring-1 ring-accent/20">
+            <div className="relative mx-auto aspect-square w-full max-w-[min(100%,280px)] rounded-full border border-white/10 bg-[#0c0f14] p-3 shadow-lg ring-1 ring-accent/35">
               <div className="relative h-full w-full overflow-hidden rounded-full bg-[#0c0f14]">
                 <Image
                   src={HUB_CENTER_IMAGE}
