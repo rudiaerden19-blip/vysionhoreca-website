@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { Fragment } from 'react'
 import { useLanguage } from '@/i18n'
 
-const HUB_CENTER_IMAGE = '/images/hardware/connected-hub-vysion-kassa-dark.png'
+const HUB_CENTER_IMAGE = '/images/hardware/connected-hub-vysion-kassa.jpg'
 
 /** Merk-blauw (`tailwind accent`) — hub-lijnen en gloed. */
 const HUB_ACCENT = '#0E5D82'
@@ -124,17 +124,15 @@ export default function ConnectedSystemHubSection() {
             {/* Grote hub-cirkel + kassa */}
             <div className="absolute left-1/2 top-[48%] z-20 flex w-[32%] -translate-x-1/2 -translate-y-1/2 flex-col items-center">
               <div className="relative aspect-square w-full rounded-full border border-white/[0.14] bg-[#0c0f14] p-[5%] shadow-[0_0_0_1px_rgba(14,93,130,0.35),0_20px_48px_rgba(0,0,0,0.5)] ring-1 ring-accent/35">
-                <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-full bg-[#0c0f14]">
-                  <div className="relative h-[88%] w-[88%]">
-                    <Image
-                      src={HUB_CENTER_IMAGE}
-                      alt={centerAlt}
-                      fill
-                      priority
-                      className="object-contain object-center"
-                      sizes="(min-width: 768px) 280px, 0px"
-                    />
-                  </div>
+                <div className="relative h-full w-full overflow-hidden rounded-full bg-neutral-100">
+                  <Image
+                    src={HUB_CENTER_IMAGE}
+                    alt={centerAlt}
+                    fill
+                    priority
+                    className="object-contain object-center"
+                    sizes="(min-width: 768px) 280px, 0px"
+                  />
                 </div>
               </div>
               <p className="pointer-events-none absolute -bottom-8 left-1/2 w-max -translate-x-1/2 text-sm font-semibold tracking-[0.14em] text-white/80 sm:text-base">
