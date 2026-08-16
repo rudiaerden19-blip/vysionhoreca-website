@@ -56,7 +56,8 @@ function HeroCtaFlipCard() {
     : t('heroLanding.ctaModulesPriceExtraNoHardware')
 
   const frontLabel = `${t('heroLanding.ctaModulesHeadline')} ${frontSubline} ${t('heroLanding.ctaModulesKassaFootnote')} ${t('heroLanding.ctaModulesPricePrefix')} €${monthlyPrice} ${t('heroLanding.ctaModulesPricePeriod')}. ${frontPriceNote} ${frontPriceExtra}. ${t('heroLanding.readTermsLink')}`
-  const backLabel = `${t('heroLanding.ctaModulesBackHeadline')} ${t('heroLanding.ctaModulesBackSubline')} ${t('heroLanding.ctaModulesBackFootnote')} €${t('heroLanding.ctaModulesBackPriceAmount')} ${t('heroLanding.ctaModulesBackPricePeriod')}. ${t('heroLanding.ctaModulesBackPriceNote')}`
+  const backPeriod = t('heroLanding.ctaModulesBackPricePeriod')
+  const backLabel = `${t('heroLanding.ctaModulesBackHeadline')} ${t('heroLanding.ctaModulesBackSubline')} ${t('heroLanding.ctaModulesBackFootnote')} €${t('heroLanding.ctaModulesBackPriceAmount')}${backPeriod ? ` ${backPeriod}` : ''}. ${t('heroLanding.ctaModulesBackPriceNote')}`
 
   const faceBase = `${HERO_CTA_CARD_SHELL} absolute inset-0 flex flex-col justify-start text-center overflow-y-auto overscroll-contain [backface-visibility:hidden]`
 

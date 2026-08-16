@@ -610,7 +610,9 @@ function PricingModalPriceBar({
             €{price}
             <span className="text-lg font-semibold text-accent sm:text-xl">{t('pricing.perMonth')}</span>
           </p>
-          <p className="mt-1 text-sm font-medium text-gray-600">{t('pricing.exclVat')}</p>
+          {t('pricing.exclVat') ? (
+            <p className="mt-1 text-sm font-medium text-gray-600">{t('pricing.exclVat')}</p>
+          ) : null}
         </div>
       </div>
     </div>
@@ -809,7 +811,9 @@ function PricingSection() {
           <p className="text-xl text-gray-600">
             {t('pricing.subtitle')}
           </p>
-          <p className="text-gray-600 text-sm sm:text-base mt-3 font-medium">{t('pricing.exclVat')}</p>
+          {t('pricing.exclVat') ? (
+            <p className="text-gray-600 text-sm sm:text-base mt-3 font-medium">{t('pricing.exclVat')}</p>
+          ) : null}
         </div>
 
         <div className="mx-auto flex max-w-md flex-col items-center gap-4">
