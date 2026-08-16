@@ -6,6 +6,8 @@ import { createPortal } from 'react-dom'
 import { useLanguage } from '@/i18n'
 
 export type HardwareVideoConfig = {
+  /** Standaard video; `image` = statische foto met dezelfde tegel + lightbox. */
+  kind?: 'video' | 'image'
   src: string
   altKey: string
   fullSrc?: string
@@ -46,7 +48,102 @@ export const WHY_VYSION_HARDWARE_VIDEOS: HardwareVideoConfig[] = [
     poster: '/images/vysion-kassa-platform-poster.jpg',
     altKey: 'whyVysion.videoAltKassaPlatform',
   },
+  {
+    kind: 'image',
+    src: '/images/hardware/connected-hub-kassa-screenshot.png',
+    altKey: 'whyVysion.videoAltKassaUi',
+  },
 ]
+
+function HardwareImageTile({
+  item,
+  tileClassName,
+  labelClassName,
+}: {
+  item: HardwareVideoConfig
+  tileClassName?: string
+  labelClassName?: string
+}) {
+  const { t } = useLanguage()
+  const [expanded, setExpanded] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  const fullSrc = item.fullSrc ?? item.src
+  const label = t(item.altKey)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const close = useCallback(() => setExpanded(false), [])
+
+  useEffect(() => {
+    if (!expanded) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') close()
+    }
+    document.body.style.overflow = 'hidden'
+    window.addEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = ''
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [expanded, close])
+
+  const tileClass =
+    tileClassName ??
+    'group relative w-full aspect-video overflow-hidden rounded-3xl shadow-home-photo ring-1 ring-black/[0.08] bg-[#141414] text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2'
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setExpanded(true)}
+        className={tileClass}
+        aria-label={`${label}. ${t('whyVysion.videoTapToEnlarge')}`}
+      >
+        <img
+          src={item.src}
+          alt=""
+          className="pointer-events-none absolute inset-0 h-full w-full object-contain object-center"
+          decoding="async"
+        />
+        <span
+          className={
+            labelClassName ??
+            'absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-3 pb-3 pt-8 text-center text-xs font-semibold text-white/95 sm:text-sm'
+          }
+        >
+          {t('whyVysion.videoTapToEnlarge')}
+        </span>
+      </button>
+
+      {mounted && expanded
+        ? createPortal(
+            <div
+              className="fixed inset-0 z-[300] flex flex-col bg-black"
+              role="dialog"
+              aria-modal="true"
+              aria-label={label}
+            >
+              <div className="flex shrink-0 items-center justify-end gap-2 p-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
+                <button
+                  type="button"
+                  onClick={close}
+                  className="rounded-full bg-white/15 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm hover:bg-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                >
+                  {t('ui.ariaClose')}
+                </button>
+              </div>
+              <div className="relative flex min-h-0 flex-1 items-center justify-center px-2 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+                <img src={fullSrc} alt={label} className="max-h-full max-w-full object-contain" />
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
+    </>
+  )
+}
 
 function HardwareVideoTile({
   item,
@@ -271,15 +368,24 @@ export function HardwareVideoStack({
 }) {
   return (
     <div className={stackClassName}>
-      {videos.map((item, index) => (
-        <HardwareVideoTile
-          key={item.src}
-          item={item}
-          loadImmediately={priorityFirstVideo && index === 0}
-          tileClassName={getTileClassName?.(index)}
-          labelClassName={labelClassName}
-        />
-      ))}
+      {videos.map((item, index) =>
+        item.kind === 'image' ? (
+          <HardwareImageTile
+            key={`image-${item.src}`}
+            item={item}
+            tileClassName={getTileClassName?.(index)}
+            labelClassName={labelClassName}
+          />
+        ) : (
+          <HardwareVideoTile
+            key={item.src}
+            item={item}
+            loadImmediately={priorityFirstVideo && index === 0}
+            tileClassName={getTileClassName?.(index)}
+            labelClassName={labelClassName}
+          />
+        ),
+      )}
     </div>
   )
 }
