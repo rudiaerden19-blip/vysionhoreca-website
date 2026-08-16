@@ -1,6 +1,9 @@
 'use client'
 
+import Image from 'next/image'
 import { useLanguage } from '@/i18n'
+
+const HUB_CENTER_IMAGE = '/images/hardware/connected-hub-sunmi-center.png'
 
 const HUB_MODULE_KEYS = [
   'kassa',
@@ -15,8 +18,10 @@ const HUB_MODULE_KEYS = [
 ] as const
 
 const CX = 500
-const CY = 320
-const NODE_R = 248
+const CY = 310
+const NODE_R = 268
+/** Lijnen starten aan de rand van de productfoto (viewBox-eenheden). */
+const HUB_INNER_R = 188
 
 function hubNodePosition(index: number, total: number) {
   const angle = -Math.PI / 2 + (index * 2 * Math.PI) / total
@@ -26,27 +31,29 @@ function hubNodePosition(index: number, total: number) {
   }
 }
 
-function HubComputerIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 120 120"
-      className={className}
-      aria-hidden
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <rect x="20" y="16" width="80" height="54" rx="5" fill="#0a0a0a" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5" />
-      <rect x="26" y="22" width="68" height="42" rx="2" fill="#111827" />
-      <path d="M30 48h52M30 42h36" stroke="rgba(255,255,255,0.35)" strokeWidth="1.5" strokeLinecap="round" />
-      <rect x="54" y="70" width="12" height="8" fill="#374151" />
-      <rect x="40" y="78" width="40" height="5" rx="1" fill="#1f2937" />
-    </svg>
-  )
+function lineStart(nx: number, ny: number) {
+  const dx = nx - CX
+  const dy = ny - CY
+  const len = Math.hypot(dx, dy) || 1
+  return {
+    x: CX + (dx / len) * HUB_INNER_R,
+    y: CY + (dy / len) * HUB_INNER_R,
+  }
+}
+
+function tentaclePath(nx: number, ny: number) {
+  const { x: sx, y: sy } = lineStart(nx, ny)
+  const dx = nx - sx
+  const dy = ny - sy
+  const c1x = sx + dx * 0.45 - dy * 0.06
+  const c1y = sy + dy * 0.45 + dx * 0.06
+  return `M ${sx} ${sy} Q ${c1x} ${c1y}, ${nx} ${ny}`
 }
 
 export default function ConnectedSystemHubSection() {
   const { t } = useLanguage()
   const total = HUB_MODULE_KEYS.length
+  const centerAlt = `${t('connectedSystemHub.centerLabel')} — ${t('connectedSystemHub.diagramAria')}`
 
   return (
     <section
@@ -66,99 +73,107 @@ export default function ConnectedSystemHubSection() {
           {t('connectedSystemHub.title')}
         </h2>
 
-        <div className="relative mx-auto mt-12 hidden max-w-4xl md:block lg:mt-14">
-          <svg
-            viewBox="0 0 1000 640"
-            className="h-auto w-full"
-            role="img"
-            aria-label={t('connectedSystemHub.diagramAria')}
-          >
-            <defs>
-              <linearGradient id="hub-line" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#E85A3C" stopOpacity="0.15" />
-                <stop offset="100%" stopColor="#E85A3C" stopOpacity="0.55" />
-              </linearGradient>
-            </defs>
-
-            {HUB_MODULE_KEYS.map((key, i) => {
-              const { x, y } = hubNodePosition(i, total)
-              return (
-                <line
-                  key={`line-${key}`}
-                  x1={CX}
-                  y1={CY}
-                  x2={x}
-                  y2={y}
-                  stroke="url(#hub-line)"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-              )
-            })}
-
-            <circle cx={CX} cy={CY} r="76" fill="#0c0f14" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
-            <circle cx={CX} cy={CY} r="64" fill="#141820" stroke="rgba(232,90,60,0.45)" strokeWidth="1.5" />
-            <foreignObject x={CX - 40} y={CY - 40} width="80" height="80">
-              <div className="flex h-full w-full items-center justify-center">
-                <HubComputerIcon className="h-14 w-14 opacity-90" />
-              </div>
-            </foreignObject>
-            <text
-              x={CX}
-              y={CY + 48}
-              textAnchor="middle"
-              fill="rgba(255,255,255,0.85)"
-              style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em' }}
+        {/* Desktop: foto + SVG-tentakels */}
+        <div className="relative mx-auto mt-12 hidden max-w-5xl md:block lg:mt-14">
+          <div className="relative aspect-[1000/680] w-full">
+            <svg
+              viewBox="0 0 1000 680"
+              className="absolute inset-0 h-full w-full"
+              role="img"
+              aria-label={t('connectedSystemHub.diagramAria')}
             >
-              {t('connectedSystemHub.centerLabel').toUpperCase()}
-            </text>
+              <defs>
+                <linearGradient id="hub-tentacle" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#E85A3C" stopOpacity="0.25" />
+                  <stop offset="100%" stopColor="#E85A3C" stopOpacity="0.7" />
+                </linearGradient>
+              </defs>
 
-            {HUB_MODULE_KEYS.map((key, i) => {
-              const { x, y } = hubNodePosition(i, total)
-              const label = t(`connectedSystemHub.modules.${key}`)
-              const lines = label.split('\n')
-              const lineHeight = 15
-              const boxH = lines.length * lineHeight + 16
-              const boxW = 148
-              const boxY = y + 10
-              const textStartY = boxY + 14 + lineHeight * 0.35
-              return (
-                <g key={key}>
-                  <circle cx={x} cy={y} r="3" fill="#E85A3C" fillOpacity="0.9" />
-                  <rect
-                    x={x - boxW / 2}
-                    y={boxY}
-                    width={boxW}
-                    height={boxH}
-                    rx="10"
-                    fill="#161b22"
-                    stroke="rgba(255,255,255,0.1)"
-                    strokeWidth="1"
+              {HUB_MODULE_KEYS.map((key, i) => {
+                const { x, y } = hubNodePosition(i, total)
+                return (
+                  <path
+                    key={`line-${key}`}
+                    d={tentaclePath(x, y)}
+                    fill="none"
+                    stroke="url(#hub-tentacle)"
+                    strokeWidth="1.75"
+                    strokeLinecap="round"
                   />
-                  {lines.map((line, li) => (
-                    <text
-                      key={li}
-                      x={x}
-                      y={textStartY + li * lineHeight}
-                      textAnchor="middle"
-                      fill="rgba(255,255,255,0.92)"
-                      style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.04em' }}
-                    >
-                      {line}
-                    </text>
-                  ))}
-                </g>
-              )
-            })}
-          </svg>
+                )
+              })}
+
+              {HUB_MODULE_KEYS.map((key, i) => {
+                const { x, y } = hubNodePosition(i, total)
+                const label = t(`connectedSystemHub.modules.${key}`)
+                const lines = label.split('\n')
+                const lineHeight = 15
+                const boxH = lines.length * lineHeight + 16
+                const boxW = 152
+                const boxY = y + 8
+                const textStartY = boxY + 14 + lineHeight * 0.35
+                return (
+                  <g key={key}>
+                    <circle cx={x} cy={y} r="3.5" fill="#E85A3C" fillOpacity="0.85" />
+                    <rect
+                      x={x - boxW / 2}
+                      y={boxY}
+                      width={boxW}
+                      height={boxH}
+                      rx="10"
+                      fill="#161b22"
+                      stroke="rgba(255,255,255,0.12)"
+                      strokeWidth="1"
+                    />
+                    {lines.map((line, li) => (
+                      <text
+                        key={li}
+                        x={x}
+                        y={textStartY + li * lineHeight}
+                        textAnchor="middle"
+                        fill="rgba(255,255,255,0.92)"
+                        style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.03em' }}
+                      >
+                        {line}
+                      </text>
+                    ))}
+                  </g>
+                )
+              })}
+            </svg>
+
+            <div className="pointer-events-none absolute left-1/2 top-[45.5%] z-10 w-[min(42%,420px)] -translate-x-1/2 -translate-y-1/2">
+              <div className="relative aspect-[798/757] w-full drop-shadow-[0_24px_48px_rgba(0,0,0,0.55)]">
+                <Image
+                  src={HUB_CENTER_IMAGE}
+                  alt={centerAlt}
+                  fill
+                  priority
+                  className="object-contain object-center"
+                  sizes="(min-width: 768px) 420px, 0px"
+                />
+              </div>
+              <p className="mt-3 text-center text-xs font-semibold tracking-[0.12em] text-white/75">
+                {t('connectedSystemHub.centerLabel').toUpperCase()}
+              </p>
+            </div>
+          </div>
         </div>
 
+        {/* Mobiel */}
         <div className="mt-12 md:hidden">
-          <div className="relative mx-auto flex max-w-xs flex-col items-center">
-            <div className="flex h-24 w-24 items-center justify-center rounded-full border border-white/10 bg-[#141820] ring-1 ring-accent/30">
-              <HubComputerIcon className="h-12 w-12 opacity-90" />
+          <div className="relative mx-auto max-w-sm">
+            <div className="relative aspect-[798/757] w-full max-w-[320px] mx-auto drop-shadow-[0_16px_32px_rgba(0,0,0,0.5)]">
+              <Image
+                src={HUB_CENTER_IMAGE}
+                alt={centerAlt}
+                fill
+                priority
+                className="object-contain"
+                sizes="320px"
+              />
             </div>
-            <p className="mt-3 text-xs font-semibold tracking-wide text-white/80">
+            <p className="mt-3 text-center text-sm font-semibold text-white/80">
               {t('connectedSystemHub.centerLabel')}
             </p>
           </div>
