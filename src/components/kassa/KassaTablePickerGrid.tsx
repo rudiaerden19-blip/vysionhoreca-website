@@ -82,15 +82,17 @@ export function KassaTablePickerGrid({
   )
 
   const onTilePointerDown = (tableNr: string, canDragTile: boolean, e: ReactPointerEvent) => {
-    if (!canDragTile || e.button !== 0) return
+    if (e.button !== 0) return
     clearLongPress()
     pointerIdRef.current = e.pointerId
+    if (!canDragTile) return
+    const target = e.currentTarget
     longPressTimerRef.current = setTimeout(() => {
       longPressTimerRef.current = null
       dragActiveRef.current = true
       setDragFrom(tableNr)
       try {
-        e.currentTarget.setPointerCapture(e.pointerId)
+        target.setPointerCapture(e.pointerId)
       } catch {
         /* ignore */
       }
@@ -116,15 +118,18 @@ export function KassaTablePickerGrid({
       } catch {
         /* ignore */
       }
+      pointerIdRef.current = null
       return
     }
     if (suppressClickRef.current) {
       e.preventDefault()
+      pointerIdRef.current = null
       return
     }
     if (pointerIdRef.current === e.pointerId) {
       onSelectTable(tableNr)
     }
+    pointerIdRef.current = null
   }
 
   const onTilePointerCancel = () => {
