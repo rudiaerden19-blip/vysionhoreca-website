@@ -243,7 +243,8 @@
     "premiumIncludedPrinterX40": "Epson printers",
     "premiumIncludedLade": "electric cash drawer",
     "premiumIncludedKeukenschermen": "kitchen displays",
-    "premiumIncludedHandhelds": "handhelds"
+    "premiumIncludedHandhelds": "handhelds",
+    "premiumIncludedBarcodeScanners": "barcode scanners"
   },
   "newAtVysion": {
     "title": "Build your own package",
