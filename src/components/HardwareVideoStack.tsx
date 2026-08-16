@@ -142,17 +142,22 @@ function HardwareVideoTile({
 
   useEffect(() => {
     if (!expanded) return
-    const inline = inlineRef.current
     const modal = modalRef.current
     if (!modal) return
-    if (inline && fullSrc === item.src) {
-      modal.currentTime = inline.currentTime
-    } else {
-      modal.currentTime = inline?.currentTime ?? 0
+
+    const playFromStart = () => {
+      modal.currentTime = 0
+      modal.muted = false
+      void modal.play().catch(() => {})
     }
-    modal.muted = false
-    void modal.play().catch(() => {})
-  }, [expanded, fullSrc, item.src])
+
+    if (modal.readyState >= HTMLMediaElement.HAVE_METADATA) {
+      playFromStart()
+    } else {
+      modal.addEventListener('loadedmetadata', playFromStart, { once: true })
+      return () => modal.removeEventListener('loadedmetadata', playFromStart)
+    }
+  }, [expanded, fullSrc])
 
   useEffect(() => {
     if (!expanded) return
