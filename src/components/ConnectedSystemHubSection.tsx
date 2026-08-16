@@ -26,14 +26,8 @@ function hubNodePosition(index: number, total: number) {
   }
 }
 
-function tentaclePath(nx: number, ny: number) {
-  const dx = nx - CX
-  const dy = ny - CY
-  const c1x = CX + dx * 0.35 - dy * 0.12
-  const c1y = CY + dy * 0.35 + dx * 0.12
-  const c2x = CX + dx * 0.72 + dy * 0.08
-  const c2y = CY + dy * 0.72 - dx * 0.08
-  return `M ${CX} ${CY} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${nx} ${ny}`
+function connectorPath(nx: number, ny: number) {
+  return `M ${CX} ${CY} L ${nx} ${ny}`
 }
 
 function HubComputerIcon({ className }: { className?: string }) {
@@ -45,13 +39,11 @@ function HubComputerIcon({ className }: { className?: string }) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <rect x="18" y="14" width="84" height="58" rx="6" fill="#1a1a1a" stroke="#E85A3C" strokeWidth="2.5" />
-      <rect x="24" y="20" width="72" height="46" rx="3" fill="#0d3d4a" />
-      <rect x="28" y="24" width="64" height="38" rx="2" fill="#145a6b" opacity="0.85" />
-      <path d="M32 52h56M32 46h40" stroke="#7dd3e8" strokeWidth="2" strokeLinecap="round" opacity="0.7" />
-      <rect x="52" y="72" width="16" height="10" fill="#333" />
-      <rect x="38" y="82" width="44" height="6" rx="2" fill="#2a2a2a" stroke="#444" strokeWidth="1" />
-      <circle cx="60" cy="85" r="2" fill="#E85A3C" />
+      <rect x="20" y="16" width="80" height="54" rx="5" fill="#0a0a0a" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5" />
+      <rect x="26" y="22" width="68" height="42" rx="2" fill="#111827" />
+      <path d="M30 48h52M30 42h36" stroke="rgba(255,255,255,0.35)" strokeWidth="1.5" strokeLinecap="round" />
+      <rect x="54" y="70" width="12" height="8" fill="#374151" />
+      <rect x="40" y="78" width="40" height="5" rx="1" fill="#1f2937" />
     </svg>
   )
 }
@@ -62,26 +54,23 @@ export default function ConnectedSystemHubSection() {
 
   return (
     <section
-      className="relative border-b border-gray-100 bg-gradient-to-b from-white via-[#faf8f6] to-white py-14 sm:py-16 lg:py-20"
+      className="relative overflow-hidden border-b border-white/[0.06] bg-[#0c0f14] py-16 sm:py-20 lg:py-24"
       aria-labelledby="connected-system-hub-heading"
     >
-      <div
-        className="pointer-events-none absolute inset-0 overflow-hidden opacity-40"
-        aria-hidden
-      >
-        <div className="absolute left-1/2 top-1/2 h-[min(90vw,520px)] w-[min(90vw,520px)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/[0.06] blur-3xl" />
+      <div className="pointer-events-none absolute inset-0" aria-hidden>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_45%,rgba(232,90,60,0.12),transparent_65%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.03),transparent_55%)]" />
       </div>
 
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <h2
           id="connected-system-hub-heading"
-          className="mx-auto max-w-4xl text-center text-xl font-bold uppercase tracking-[0.12em] text-gray-900 sm:text-2xl md:text-3xl lg:tracking-[0.14em]"
+          className="mx-auto max-w-4xl text-center text-2xl font-bold tracking-tight text-white sm:text-3xl md:text-4xl"
         >
           {t('connectedSystemHub.title')}
         </h2>
 
-        {/* Desktop / tablet: tentakel-diagram */}
-        <div className="relative mx-auto mt-10 hidden max-w-4xl md:block lg:mt-12">
+        <div className="relative mx-auto mt-12 hidden max-w-4xl md:block lg:mt-14">
           <svg
             viewBox="0 0 1000 640"
             className="h-auto w-full"
@@ -89,80 +78,75 @@ export default function ConnectedSystemHubSection() {
             aria-label={t('connectedSystemHub.diagramAria')}
           >
             <defs>
-              <linearGradient id="hub-tentacle" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#E85A3C" stopOpacity="0.35" />
-                <stop offset="100%" stopColor="#E85A3C" stopOpacity="0.95" />
+              <linearGradient id="hub-line" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#E85A3C" stopOpacity="0.15" />
+                <stop offset="100%" stopColor="#E85A3C" stopOpacity="0.55" />
               </linearGradient>
-              <filter id="hub-glow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="2" result="blur" />
-                <feMerge>
-                  <feMergeNode in="blur" />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
-              </filter>
             </defs>
 
             {HUB_MODULE_KEYS.map((key, i) => {
               const { x, y } = hubNodePosition(i, total)
               return (
-                <path
+                <line
                   key={`line-${key}`}
-                  d={tentaclePath(x, y)}
-                  fill="none"
-                  stroke="url(#hub-tentacle)"
-                  strokeWidth="3"
+                  x1={CX}
+                  y1={CY}
+                  x2={x}
+                  y2={y}
+                  stroke="url(#hub-line)"
+                  strokeWidth="1.5"
                   strokeLinecap="round"
-                  className="opacity-90"
                 />
               )
             })}
 
-            <circle cx={CX} cy={CY} r="72" fill="#fff" stroke="#E85A3C" strokeWidth="3" filter="url(#hub-glow)" />
-            <circle cx={CX} cy={CY} r="58" fill="#141414" />
-            <foreignObject x={CX - 44} y={CY - 44} width="88" height="88">
+            <circle cx={CX} cy={CY} r="76" fill="#0c0f14" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+            <circle cx={CX} cy={CY} r="64" fill="#141820" stroke="rgba(232,90,60,0.45)" strokeWidth="1.5" />
+            <foreignObject x={CX - 40} y={CY - 40} width="80" height="80">
               <div className="flex h-full w-full items-center justify-center">
-                <HubComputerIcon className="h-16 w-16 sm:h-[4.5rem] sm:w-[4.5rem]" />
+                <HubComputerIcon className="h-14 w-14 opacity-90" />
               </div>
             </foreignObject>
             <text
               x={CX}
-              y={CY + 52}
+              y={CY + 48}
               textAnchor="middle"
-              className="fill-accent text-[11px] font-bold uppercase tracking-wider"
-              style={{ fontSize: 11 }}
+              fill="rgba(255,255,255,0.85)"
+              style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em' }}
             >
-              {t('connectedSystemHub.centerLabel')}
+              {t('connectedSystemHub.centerLabel').toUpperCase()}
             </text>
 
             {HUB_MODULE_KEYS.map((key, i) => {
               const { x, y } = hubNodePosition(i, total)
               const label = t(`connectedSystemHub.modules.${key}`)
               const lines = label.split('\n')
-              const lineHeight = 14
-              const startY = y - ((lines.length - 1) * lineHeight) / 2
+              const lineHeight = 15
+              const boxH = lines.length * lineHeight + 16
+              const boxW = 148
+              const boxY = y + 10
+              const textStartY = boxY + 14 + lineHeight * 0.35
               return (
                 <g key={key}>
-                  <circle cx={x} cy={y} r="6" fill="#E85A3C" />
-                  <circle cx={x} cy={y} r="10" fill="#E85A3C" fillOpacity="0.2" />
+                  <circle cx={x} cy={y} r="3" fill="#E85A3C" fillOpacity="0.9" />
                   <rect
-                    x={x - 72}
-                    y={y + 14}
-                    width="144"
-                    height={lines.length * lineHeight + 12}
-                    rx="8"
-                    fill="white"
-                    stroke="#E85A3C"
-                    strokeOpacity="0.35"
+                    x={x - boxW / 2}
+                    y={boxY}
+                    width={boxW}
+                    height={boxH}
+                    rx="10"
+                    fill="#161b22"
+                    stroke="rgba(255,255,255,0.1)"
                     strokeWidth="1"
                   />
                   {lines.map((line, li) => (
                     <text
                       key={li}
                       x={x}
-                      y={startY + 26 + li * lineHeight}
+                      y={textStartY + li * lineHeight}
                       textAnchor="middle"
-                      className="fill-gray-900 font-semibold uppercase"
-                      style={{ fontSize: 10, letterSpacing: '0.06em' }}
+                      fill="rgba(255,255,255,0.92)"
+                      style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.04em' }}
                     >
                       {line}
                     </text>
@@ -173,13 +157,12 @@ export default function ConnectedSystemHubSection() {
           </svg>
         </div>
 
-        {/* Mobiel: hub + grid */}
-        <div className="mt-10 md:hidden">
+        <div className="mt-12 md:hidden">
           <div className="relative mx-auto flex max-w-xs flex-col items-center">
-            <div className="relative z-10 flex h-28 w-28 items-center justify-center rounded-full border-[3px] border-accent bg-[#141414] shadow-[0_0_40px_-8px_rgba(232,90,60,0.55)]">
-              <HubComputerIcon className="h-14 w-14" />
+            <div className="flex h-24 w-24 items-center justify-center rounded-full border border-white/10 bg-[#141820] ring-1 ring-accent/30">
+              <HubComputerIcon className="h-12 w-12 opacity-90" />
             </div>
-            <p className="mt-2 text-xs font-bold uppercase tracking-wider text-accent">
+            <p className="mt-3 text-xs font-semibold tracking-wide text-white/80">
               {t('connectedSystemHub.centerLabel')}
             </p>
           </div>
@@ -187,7 +170,7 @@ export default function ConnectedSystemHubSection() {
             {HUB_MODULE_KEYS.map((key) => (
               <li
                 key={key}
-                className="rounded-xl border border-accent/25 bg-white px-2.5 py-2.5 text-center text-[0.65rem] font-bold uppercase leading-snug tracking-wide text-gray-900 shadow-sm sm:text-xs"
+                className="rounded-xl border border-white/10 bg-[#161b22] px-2.5 py-3 text-center text-xs font-semibold leading-snug text-white/90 sm:text-sm"
               >
                 {t(`connectedSystemHub.modules.${key}`).replace(/\n/g, ' ')}
               </li>
