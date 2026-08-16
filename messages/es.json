@@ -125,7 +125,7 @@
     "ctaModulesBackPricePeriod": "",
     "ctaModulesBackPriceNote": "Inversión única — hardware de caja incluido",
     "ctaModulesBackLink": "Más sobre la licencia",
-    "ctaModulesOneTimeLicense": "O elige una licencia de por vida única por 1.499 € — hardware de caja incluido",
+    "ctaModulesOneTimeLicense": "O elige una licencia de por vida única por 1.499 €, hardware de caja incluido",
     "readTermsLink": "Ver condiciones generales",
     "demoRequest": "Solicita una demo",
     "googleReviewsLabel": "5 estrellas en Google",
@@ -4986,7 +4986,7 @@
     "title": "Nuestras cajas y paquetes de software están disponibles por defecto en estos idiomas"
   },
   "connectedSystemHub": {
-    "title": "Un solo sistema — todo conectado en tu negocio",
+    "title": "Un solo sistema, todo conectado en tu negocio",
     "subtitleQuestion": "¿Por qué pagar por separado la caja, pedidos online, reservas, personal, web y stock?",
     "subtitleVysionLine": "Con Vysion, todo desde un solo sistema y una sola pantalla.",
     "subtitlePoint1": "Sin cinco sistemas distintos.",

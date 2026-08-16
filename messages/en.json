@@ -207,7 +207,7 @@
     "ctaModulesBackPricePeriod": "",
     "ctaModulesBackPriceNote": "One-time investment — POS hardware included",
     "ctaModulesBackLink": "More about the license",
-    "ctaModulesOneTimeLicense": "Or choose a one-time lifetime license for €1,499 — POS hardware included",
+    "ctaModulesOneTimeLicense": "Or choose a one-time lifetime license for €1,499, POS hardware included",
     "readTermsLink": "Read terms & conditions",
     "demoRequest": "Request a demo",
     "googleReviewsLabel": "5 stars on Google",
@@ -386,7 +386,7 @@
     "title": "Our POS systems and software packages are available in these languages by default"
   },
   "connectedSystemHub": {
-    "title": "One system — everything connected in your business",
+    "title": "One system, everything connected in your business",
     "subtitleQuestion": "Why pay separately for your POS, online orders, reservations, staff, website and inventory?",
     "subtitleVysionLine": "With Vysion, it all runs from one system and one screen.",
     "subtitlePoint1": "No five different systems.",

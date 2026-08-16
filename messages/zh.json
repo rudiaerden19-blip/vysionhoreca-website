@@ -125,7 +125,7 @@
     "ctaModulesBackPricePeriod": "",
     "ctaModulesBackPriceNote": "一次性投资 — 含收银硬件",
     "ctaModulesBackLink": "了解终身许可",
-    "ctaModulesOneTimeLicense": "或选择一次性终身许可 1,499 欧元 — 含收银硬件",
+    "ctaModulesOneTimeLicense": "或选择一次性终身许可 1,499 欧元，含收银硬件",
     "readTermsLink": "阅读条款",
     "demoRequest": "申请演示",
     "googleReviewsLabel": "Google 五星好评",
@@ -4986,7 +4986,7 @@
     "title": "我们的收银机和软件套件默认支持以下语言"
   },
   "connectedSystemHub": {
-    "title": "一套系统 — 店内全部互联",
+    "title": "一套系统，店内全部互联",
     "subtitleQuestion": "何必分别为收银、在线订餐、预订、员工、网站和库存付费？",
     "subtitleVysionLine": "使用 Vysion，一切尽在一个系统、一块屏幕。",
     "subtitlePoint1": "无需五套不同系统。",

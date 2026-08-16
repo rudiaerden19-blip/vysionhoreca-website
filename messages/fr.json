@@ -125,7 +125,7 @@
     "ctaModulesBackPricePeriod": "",
     "ctaModulesBackPriceNote": "Investissement unique — matériel de caisse inclus",
     "ctaModulesBackLink": "En savoir plus sur la licence",
-    "ctaModulesOneTimeLicense": "Ou choisissez une licence à vie unique pour 1 499 € — matériel de caisse inclus",
+    "ctaModulesOneTimeLicense": "Ou choisissez une licence à vie unique pour 1 499 €, matériel de caisse inclus",
     "readTermsLink": "Lire les conditions générales",
     "demoRequest": "Demandez une démo",
     "googleReviewsLabel": "5 étoiles sur Google",
@@ -5009,7 +5009,7 @@
     "title": "Nos caisses et nos packs logiciels sont disponibles par défaut dans ces langues"
   },
   "connectedSystemHub": {
-    "title": "Un seul système — tout connecté dans votre établissement",
+    "title": "Un seul système, tout connecté dans votre établissement",
     "subtitleQuestion": "Pourquoi payer séparément votre caisse, vos commandes en ligne, réservations, personnel, site web et stock ?",
     "subtitleVysionLine": "Avec Vysion, tout se fait depuis un seul système et un seul écran.",
     "subtitlePoint1": "Pas cinq systèmes différents.",
