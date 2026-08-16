@@ -6340,7 +6340,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   onSelectTable={(nr) => switchToTable(nr)}
                   onTransferTable={transferOpenTableOrder}
                   t={t}
-                  ui={{ flyMenuText: ui.flyMenuText, tablePickerEmpty: ui.tablePickerEmpty }}
+                  ui={{ tablePickerEmpty: ui.tablePickerEmpty }}
                 />
               )}
             </div>
