@@ -13,6 +13,10 @@ export const WHY_VYSION_HARDWARE_VIDEOS = [
     src: '/images/epson-mseries-receipt-printers.mp4',
     altKey: 'whyVysion.videoAltEpson',
   },
+  {
+    src: '/images/elopos-video.mp4',
+    altKey: 'whyVysion.videoAltEloPOS',
+  },
 ] as const
 
 type VideoItem = (typeof WHY_VYSION_HARDWARE_VIDEOS)[number]
