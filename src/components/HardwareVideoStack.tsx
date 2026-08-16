@@ -35,6 +35,12 @@ export const WHY_VYSION_HARDWARE_VIDEOS: HardwareVideoConfig[] = [
     poster: '/images/vysion-hardware-showcase-poster.jpg',
     altKey: 'whyVysion.videoAltShowcase',
   },
+  {
+    src: '/images/vysion-kassa-platform-inline.mp4',
+    fullSrc: '/images/vysion-kassa-platform.mp4',
+    poster: '/images/vysion-kassa-platform-poster.jpg',
+    altKey: 'whyVysion.videoAltKassaPlatform',
+  },
 ]
 
 function HardwareVideoTile({
