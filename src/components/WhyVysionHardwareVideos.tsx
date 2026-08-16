@@ -15,18 +15,10 @@ type WhyVysionVideoConfig = {
 
 export const WHY_VYSION_HARDWARE_VIDEOS: WhyVysionVideoConfig[] = [
   {
-    src: '/images/sunmi-d3-pro-inline.mp4',
-    fullSrc: '/images/sunmi-d3-pro-display.mp4',
-    poster: '/images/sunmi-d3-pro-poster.jpg',
-    altKey: 'whyVysion.videoAltSunmi',
-  },
-  {
-    src: '/images/epson-mseries-receipt-printers.mp4',
-    altKey: 'whyVysion.videoAltEpson',
-  },
-  {
-    src: '/images/elopos-video.mp4',
-    altKey: 'whyVysion.videoAltEloPOS',
+    src: '/images/vysion-hardware-showcase-inline.mp4',
+    fullSrc: '/images/vysion-hardware-showcase.mp4',
+    poster: '/images/vysion-hardware-showcase-poster.jpg',
+    altKey: 'whyVysion.videoAltShowcase',
   },
 ]
 
@@ -69,7 +61,7 @@ function HardwareVideoTile({ item, eagerPreload }: { item: WhyVysionVideoConfig;
     if (inline && fullSrc === item.src) {
       modal.currentTime = inline.currentTime
     } else {
-      modal.currentTime = 0
+      modal.currentTime = inline?.currentTime ?? 0
     }
     modal.muted = false
     void modal.play().catch(() => {})
