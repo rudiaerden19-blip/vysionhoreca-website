@@ -162,7 +162,8 @@
     "premiumIncludedLade": "elektrische Kassenlade",
     "premiumIncludedKeukenschermen": "Küchendisplays",
     "premiumIncludedHandhelds": "Handhelds",
-    "premiumIncludedTafelBestelKiosk": "Tisch-Bestellkiosk"
+    "premiumIncludedTafelBestelKiosk": "Tisch-Bestellkiosk",
+    "premiumIncludedBarcodeScanners": "Barcode-Scanner"
   },
   "newAtVysion": {
     "title": "Stellen Sie Ihr Paket selbst zusammen",

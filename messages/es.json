@@ -162,7 +162,8 @@
     "premiumIncludedLade": "cajón eléctrico",
     "premiumIncludedKeukenschermen": "pantallas de cocina",
     "premiumIncludedHandhelds": "handhelds",
-    "premiumIncludedTafelBestelKiosk": "kiosk de pedidos en mesa"
+    "premiumIncludedTafelBestelKiosk": "kiosk de pedidos en mesa",
+    "premiumIncludedBarcodeScanners": "escáneres de códigos"
   },
   "newAtVysion": {
     "title": "Monta tu propio paquete",

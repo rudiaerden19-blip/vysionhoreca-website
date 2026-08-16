@@ -162,7 +162,8 @@
     "premiumIncludedLade": "电动钱箱",
     "premiumIncludedKeukenschermen": "厨房屏幕",
     "premiumIncludedHandhelds": "手持设备",
-    "premiumIncludedTafelBestelKiosk": "桌边点餐 kiosk"
+    "premiumIncludedTafelBestelKiosk": "桌边点餐 kiosk",
+    "premiumIncludedBarcodeScanners": "条码扫描器"
   },
   "newAtVysion": {
     "title": "自由组合您的套餐",

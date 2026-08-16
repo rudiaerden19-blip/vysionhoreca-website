@@ -31,6 +31,7 @@ const HARDWARE_PREMIUM_INCLUDED = [
   { src: '/images/hardware/hardware-keukenscherm.png', labelKey: 'premiumIncludedKeukenschermen' as const },
   { src: '/images/hardware/hardware-handheld.png', labelKey: 'premiumIncludedHandhelds' as const },
   { src: '/images/hardware/hardware-tafel-bestel-kiosk.png', labelKey: 'premiumIncludedTafelBestelKiosk' as const },
+  { src: '/images/hardware/hardware-barcode-scanner.png', labelKey: 'premiumIncludedBarcodeScanners' as const },
 ] as const
 
 function hardwareLabel(item: (typeof HARDWARE_ITEMS)[number] | (typeof HARDWARE_PREMIUM_INCLUDED)[number], t: (key: string) => string): string {

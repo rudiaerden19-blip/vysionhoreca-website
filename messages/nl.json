@@ -244,7 +244,8 @@
     "premiumIncludedLade": "geldlade elec",
     "premiumIncludedKeukenschermen": "keukenschermen",
     "premiumIncludedHandhelds": "handhelds",
-    "premiumIncludedTafelBestelKiosk": "tafel bestel kiosk"
+    "premiumIncludedTafelBestelKiosk": "tafel bestel kiosk",
+    "premiumIncludedBarcodeScanners": "barcode scanners"
   },
   "newAtVysion": {
     "title": "Stel zelf je pakket samen",

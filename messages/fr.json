@@ -162,7 +162,8 @@
     "premiumIncludedLade": "tiroir-caisse électrique",
     "premiumIncludedKeukenschermen": "écrans cuisine",
     "premiumIncludedHandhelds": "handhelds",
-    "premiumIncludedTafelBestelKiosk": "kiosk de commande à table"
+    "premiumIncludedTafelBestelKiosk": "kiosk de commande à table",
+    "premiumIncludedBarcodeScanners": "scanners codes-barres"
   },
   "newAtVysion": {
     "title": "Composez votre forfait vous-même",

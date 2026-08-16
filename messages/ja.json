@@ -162,7 +162,8 @@
     "premiumIncludedLade": "電動キャッシュドロア",
     "premiumIncludedKeukenschermen": "キッチン画面",
     "premiumIncludedHandhelds": "ハンドヘルド",
-    "premiumIncludedTafelBestelKiosk": "テーブル注文キオスク"
+    "premiumIncludedTafelBestelKiosk": "テーブル注文キオスク",
+    "premiumIncludedBarcodeScanners": "バーコードスキャナー"
   },
   "newAtVysion": {
     "title": "パッケージを自由に組み立て",

@@ -162,7 +162,8 @@
     "premiumIncludedLade": "cassetto elettrico",
     "premiumIncludedKeukenschermen": "schermi cucina",
     "premiumIncludedHandhelds": "handheld",
-    "premiumIncludedTafelBestelKiosk": "kiosk ordini al tavolo"
+    "premiumIncludedTafelBestelKiosk": "kiosk ordini al tavolo",
+    "premiumIncludedBarcodeScanners": "scanner barcode"
   },
   "newAtVysion": {
     "title": "Componi il tuo pacchetto",
