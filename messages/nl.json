@@ -385,6 +385,22 @@
   "kassaLanguagesBanner": {
     "title": "Onze kassa's en software pakketen zijn standaard in deze talen"
   },
+  "connectedSystemHub": {
+    "title": "1 systeem — alles verbonden in jouw zaak",
+    "centerLabel": "Vysion",
+    "diagramAria": "Diagram: één centraal systeem verbonden met kassa, bestellen, reservaties, website, personeel, voorraad, keukenschermen, rapporten en bedrijfsanalyse",
+    "modules": {
+      "kassa": "Kassa",
+      "onlineBestelsysteem": "Online\nbestelsysteem",
+      "reservatieSysteem": "Reservatie\nsysteem",
+      "website": "Website",
+      "personeel": "Personeel",
+      "voorraad": "Voorraad",
+      "keukenSchermen": "Keuken\nschermen",
+      "rapporten": "Rapporten",
+      "bedrijfsAnalyse": "Bedrijfs\nanalyse"
+    }
+  },
   "gratisWebsiteBanner": {
     "title": "Gratis website",
     "body": "Bij je abonnement ontvang je een volledig gratis eigen website, mee inbegrepen, zonder extra kosten. Je kunt je site volledig aanpassen naar jouw smaak: kleuren, foto's, alles.",

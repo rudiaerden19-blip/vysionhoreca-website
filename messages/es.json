@@ -4983,6 +4983,22 @@
   "kassaLanguagesBanner": {
     "title": "Nuestras cajas y paquetes de software están disponibles por defecto en estos idiomas"
   },
+  "connectedSystemHub": {
+    "title": "Un solo sistema — todo conectado en tu negocio",
+    "centerLabel": "Vysion",
+    "diagramAria": "Diagrama: un sistema central conectado con TPV, pedidos online, reservas, web, personal, stock, pantallas de cocina, informes y análisis de negocio",
+    "modules": {
+      "kassa": "TPV",
+      "onlineBestelsysteem": "Pedidos\nonline",
+      "reservatieSysteem": "Sistema de\nreservas",
+      "website": "Web",
+      "personeel": "Personal",
+      "voorraad": "Stock",
+      "keukenSchermen": "Pantallas\ncocina",
+      "rapporten": "Informes",
+      "bedrijfsAnalyse": "Análisis de\nnegocio"
+    }
+  },
   "gratisWebsiteBanner": {
     "title": "Sitio web gratuito",
     "body": "Con tu suscripción recibes un sitio web propio totalmente gratuito, incluido sin coste adicional. Puedes adaptar por completo tu sitio a tu gusto: colores, fotos, todo.",

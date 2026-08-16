@@ -385,6 +385,22 @@
   "kassaLanguagesBanner": {
     "title": "Our POS systems and software packages are available in these languages by default"
   },
+  "connectedSystemHub": {
+    "title": "One system — everything connected in your business",
+    "centerLabel": "Vysion",
+    "diagramAria": "Diagram: one central system connected to POS, online ordering, reservations, website, staff, inventory, kitchen screens, reports and business analytics",
+    "modules": {
+      "kassa": "POS",
+      "onlineBestelsysteem": "Online\nordering",
+      "reservatieSysteem": "Reservation\nsystem",
+      "website": "Website",
+      "personeel": "Staff",
+      "voorraad": "Inventory",
+      "keukenSchermen": "Kitchen\ndisplay",
+      "rapporten": "Reports",
+      "bedrijfsAnalyse": "Business\nanalytics"
+    }
+  },
   "gratisWebsiteBanner": {
     "title": "Free website",
     "body": "With your subscription you receive a completely free website of your own — included at no extra cost. You can fully customize your site to your taste: colors, photos, everything.",

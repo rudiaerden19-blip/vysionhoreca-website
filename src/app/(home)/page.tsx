@@ -12,6 +12,10 @@ import {
 } from '@/components'
 
 const PlatformGridSection = dynamic(() => import('@/components/PlatformGridSection'), { loading: () => null })
+const ConnectedSystemHubSection = dynamic(
+  () => import('@/components/ConnectedSystemHubSection'),
+  { loading: () => null },
+)
 const VysionBeestSection = dynamic(() => import('@/components/VysionBeestSection'), { loading: () => null })
 const HardwareSection = dynamic(() => import('@/components/HardwareSection'), { loading: () => null })
 const ContactPageSection = dynamic(() => import('@/components/ContactPageSection'), { loading: () => null })
@@ -1502,6 +1506,7 @@ export default function HomePage() {
       <Navigation />
       <HomeLandingHero />
       <WhyVysionSection />
+      <ConnectedSystemHubSection />
       <GratisWebsiteBannerSection />
       <VysionBeestSection />
       <PlatformGridSection />

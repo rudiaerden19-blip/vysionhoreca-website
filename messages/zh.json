@@ -4983,6 +4983,22 @@
   "kassaLanguagesBanner": {
     "title": "我们的收银机和软件套件默认支持以下语言"
   },
+  "connectedSystemHub": {
+    "title": "一套系统 — 店内全部互联",
+    "centerLabel": "Vysion",
+    "diagramAria": "示意图：中央系统连接收银、在线订餐、预订、网站、员工、库存、厨房屏、报表与经营分析",
+    "modules": {
+      "kassa": "收银",
+      "onlineBestelsysteem": "在线\n订餐",
+      "reservatieSysteem": "预订\n系统",
+      "website": "网站",
+      "personeel": "员工",
+      "voorraad": "库存",
+      "keukenSchermen": "厨房\n屏幕",
+      "rapporten": "报表",
+      "bedrijfsAnalyse": "经营\n分析"
+    }
+  },
   "gratisWebsiteBanner": {
     "title": "免费网站",
     "body": "订阅即享完全免费的自有网站——已包含，无需额外费用。您可以根据自己的喜好全面自定义网站：颜色、照片，一切皆可。",

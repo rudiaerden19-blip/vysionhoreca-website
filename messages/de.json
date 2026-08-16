@@ -5006,6 +5006,22 @@
   "kassaLanguagesBanner": {
     "title": "Unsere Kassen und Softwarepakete sind standardmäßig in diesen Sprachen verfügbar"
   },
+  "connectedSystemHub": {
+    "title": "Ein System — alles verbunden in Ihrem Betrieb",
+    "centerLabel": "Vysion",
+    "diagramAria": "Diagramm: ein zentrales System verbunden mit Kasse, Online-Bestellung, Reservierungen, Website, Personal, Lager, Küchenscreens, Berichten und Unternehmensanalyse",
+    "modules": {
+      "kassa": "Kasse",
+      "onlineBestelsysteem": "Online-\nBestellung",
+      "reservatieSysteem": "Reservierungs-\nsystem",
+      "website": "Website",
+      "personeel": "Personal",
+      "voorraad": "Lager",
+      "keukenSchermen": "Küchen-\nscreens",
+      "rapporten": "Berichte",
+      "bedrijfsAnalyse": "Betriebs-\nanalyse"
+    }
+  },
   "gratisWebsiteBanner": {
     "title": "Kostenlose Website",
     "body": "Zu Ihrem Abonnement erhalten Sie eine völlig kostenlose eigene Website — ohne Aufpreis inbegriffen. Sie können Ihre Website vollständig an Ihren Geschmack anpassen: Farben, Fotos, alles.",

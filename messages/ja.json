@@ -4983,6 +4983,22 @@
   "kassaLanguagesBanner": {
     "title": "当社のレジとソフトウェアパッケージは、標準で次の言語に対応しています"
   },
+  "connectedSystemHub": {
+    "title": "1つのシステム — 店舗のすべてがつながる",
+    "centerLabel": "Vysion",
+    "diagramAria": "図：中央システムとレジ、オンライン注文、予約、ウェブサイト、スタッフ、在庫、キッチン画面、レポート、経営分析の連携",
+    "modules": {
+      "kassa": "レジ",
+      "onlineBestelsysteem": "オンライン\n注文",
+      "reservatieSysteem": "予約\nシステム",
+      "website": "ウェブサイト",
+      "personeel": "スタッフ",
+      "voorraad": "在庫",
+      "keukenSchermen": "キッチン\n画面",
+      "rapporten": "レポート",
+      "bedrijfsAnalyse": "経営\n分析"
+    }
+  },
   "gratisWebsiteBanner": {
     "title": "無料のウェブサイト",
     "body": "ご契約に、追加料金なしで完全無料の独自ウェブサイトが含まれます。色や写真など、お好みに合わせてサイトを自由にカスタマイズできます。",

@@ -4983,6 +4983,22 @@
   "kassaLanguagesBanner": {
     "title": "I nostri registratori di cassa e i pacchetti software sono disponibili di default in queste lingue"
   },
+  "connectedSystemHub": {
+    "title": "Un solo sistema — tutto collegato nella tua attività",
+    "centerLabel": "Vysion",
+    "diagramAria": "Diagramma: un sistema centrale collegato a cassa, ordini online, prenotazioni, sito web, personale, magazzino, schermi cucina, report e analisi aziendale",
+    "modules": {
+      "kassa": "Cassa",
+      "onlineBestelsysteem": "Ordini\nonline",
+      "reservatieSysteem": "Sistema\nprenotazioni",
+      "website": "Sito web",
+      "personeel": "Personale",
+      "voorraad": "Magazzino",
+      "keukenSchermen": "Schermi\ncucina",
+      "rapporten": "Report",
+      "bedrijfsAnalyse": "Analisi\naziendale"
+    }
+  },
   "gratisWebsiteBanner": {
     "title": "Sito web gratuito",
     "body": "Con il tuo abbonamento ricevi un sito web tutto tuo, completamente gratuito — incluso senza costi extra. Puoi personalizzare completamente il tuo sito secondo i tuoi gusti: colori, foto, tutto.",
