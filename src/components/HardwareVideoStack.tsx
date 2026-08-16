@@ -1,7 +1,7 @@
 'use client'
 
 import { scheduleHardwareInlineLoad } from '@/lib/hardware-video-load-queue'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { useLanguage } from '@/i18n'
 
@@ -56,6 +56,78 @@ export const WHY_VYSION_HARDWARE_VIDEOS: HardwareVideoConfig[] = [
   },
 ]
 
+function useHardwareEnlargeLock(expanded: boolean, onClose: () => void) {
+  useEffect(() => {
+    if (!expanded) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    document.body.style.overflow = 'hidden'
+    window.addEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = ''
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [expanded, onClose])
+}
+
+function HardwareEnlargeModal({
+  open,
+  onClose,
+  label,
+  closeLabel,
+  children,
+}: {
+  open: boolean
+  onClose: () => void
+  label: string
+  closeLabel: string
+  children: ReactNode
+}) {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useHardwareEnlargeLock(open, onClose)
+
+  if (!mounted || !open) return null
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[10000] h-[100dvh] w-full max-w-[100vw] overflow-hidden bg-black"
+      role="dialog"
+      aria-modal="true"
+      aria-label={label}
+      onClick={onClose}
+    >
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation()
+          onClose()
+        }}
+        className="fixed right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-[10001] flex min-h-[3rem] items-center justify-center gap-2 rounded-full border-2 border-white/60 bg-white px-5 py-3 text-base font-bold text-gray-900 shadow-[0_8px_32px_rgba(0,0,0,0.5)] hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:right-5 sm:px-6"
+      >
+        <span className="text-xl leading-none" aria-hidden>
+          ×
+        </span>
+        <span>{closeLabel}</span>
+      </button>
+      <div className="absolute inset-0 size-full" onClick={(e) => e.stopPropagation()}>
+        {children}
+      </div>
+    </div>,
+    document.body,
+  )
+}
+
+/** Volledig scherm — op smalle telefoons vult brede screenshots het scherm (cover). */
+const ENLARGE_IMAGE_CLASS =
+  'size-full max-h-[100dvh] max-w-[100vw] object-cover object-center md:object-contain'
+const ENLARGE_VIDEO_CLASS = 'size-full max-h-[100dvh] max-w-[100vw] object-contain bg-black'
+
 function HardwareImageTile({
   item,
   tileClassName,
@@ -67,28 +139,10 @@ function HardwareImageTile({
 }) {
   const { t } = useLanguage()
   const [expanded, setExpanded] = useState(false)
-  const [mounted, setMounted] = useState(false)
   const fullSrc = item.fullSrc ?? item.src
   const label = t(item.altKey)
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
   const close = useCallback(() => setExpanded(false), [])
-
-  useEffect(() => {
-    if (!expanded) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') close()
-    }
-    document.body.style.overflow = 'hidden'
-    window.addEventListener('keydown', onKey)
-    return () => {
-      document.body.style.overflow = ''
-      window.removeEventListener('keydown', onKey)
-    }
-  }, [expanded, close])
 
   const tileClass =
     tileClassName ??
@@ -119,46 +173,22 @@ function HardwareImageTile({
         </span>
       </button>
 
-      {mounted && expanded
-        ? createPortal(
-            <div
-              className="fixed inset-0 z-[10000] flex flex-col bg-black"
-              role="dialog"
-              aria-modal="true"
-              aria-label={label}
-              onClick={close}
-            >
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  close()
-                }}
-                className="fixed right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-[10001] flex min-h-[3rem] min-w-[3rem] items-center justify-center gap-2 rounded-full border-2 border-white/50 bg-white px-5 py-3 text-base font-bold text-gray-900 shadow-[0_8px_32px_rgba(0,0,0,0.45)] hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black sm:right-5 sm:px-6"
-              >
-                <span className="text-xl leading-none" aria-hidden>
-                  ×
-                </span>
-                <span>{t('ui.ariaClose')}</span>
-              </button>
-              <div
-                className="absolute inset-0 flex items-center justify-center pt-[max(3.75rem,env(safe-area-inset-top))] pb-[max(0.5rem,env(safe-area-inset-bottom))]"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <img
-                  src={fullSrc}
-                  alt={label}
-                  width={2532}
-                  height={969}
-                  className="h-full w-full object-contain object-center"
-                  decoding="sync"
-                  fetchPriority="high"
-                />
-              </div>
-            </div>,
-            document.body,
-          )
-        : null}
+      <HardwareEnlargeModal
+        open={expanded}
+        onClose={close}
+        label={label}
+        closeLabel={t('ui.ariaClose')}
+      >
+        <img
+          src={fullSrc}
+          alt={label}
+          width={2532}
+          height={969}
+          className={ENLARGE_IMAGE_CLASS}
+          decoding="sync"
+          fetchPriority="high"
+        />
+      </HardwareEnlargeModal>
     </>
   )
 }
@@ -177,7 +207,6 @@ function HardwareVideoTile({
 }) {
   const { t } = useLanguage()
   const [expanded, setExpanded] = useState(false)
-  const [mounted, setMounted] = useState(false)
   const [inlineSrc, setInlineSrc] = useState<string | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const tileRef = useRef<HTMLButtonElement>(null)
@@ -191,10 +220,6 @@ function HardwareVideoTile({
     queuedRef.current = true
     scheduleHardwareInlineLoad(() => setInlineSrc(item.src))
   }, [item.src])
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   useEffect(() => {
     if (loadImmediately) requestInlineSrc()
@@ -274,19 +299,6 @@ function HardwareVideoTile({
     }
   }, [expanded, fullSrc])
 
-  useEffect(() => {
-    if (!expanded) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') close()
-    }
-    document.body.style.overflow = 'hidden'
-    window.addEventListener('keydown', onKey)
-    return () => {
-      document.body.style.overflow = ''
-      window.removeEventListener('keydown', onKey)
-    }
-  }, [expanded, close])
-
   const label = t(item.altKey)
   const tileClass =
     tileClassName ??
@@ -335,38 +347,22 @@ function HardwareVideoTile({
         </span>
       </button>
 
-      {mounted && expanded
-        ? createPortal(
-            <div
-              className="fixed inset-0 z-[300] flex flex-col bg-black"
-              role="dialog"
-              aria-modal="true"
-              aria-label={label}
-            >
-              <div className="flex shrink-0 items-center justify-end gap-2 p-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
-                <button
-                  type="button"
-                  onClick={close}
-                  className="rounded-full bg-white/15 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm hover:bg-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                >
-                  {t('ui.ariaClose')}
-                </button>
-              </div>
-              <div className="relative flex min-h-0 flex-1 items-center justify-center px-2 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-                <video
-                  ref={modalRef}
-                  src={fullSrc}
-                  loop
-                  playsInline
-                  controls
-                  preload="auto"
-                  className="max-h-full max-w-full object-contain"
-                />
-              </div>
-            </div>,
-            document.body,
-          )
-        : null}
+      <HardwareEnlargeModal
+        open={expanded}
+        onClose={close}
+        label={label}
+        closeLabel={t('ui.ariaClose')}
+      >
+        <video
+          ref={modalRef}
+          src={fullSrc}
+          loop
+          playsInline
+          controls
+          preload="auto"
+          className={ENLARGE_VIDEO_CLASS}
+        />
+      </HardwareEnlargeModal>
     </>
   )
 }
