@@ -87,6 +87,9 @@ export default function ConnectedSystemHubSection() {
           <p className="mt-5 text-base font-medium leading-relaxed text-white/90 sm:text-lg">
             {t('connectedSystemHub.subtitleClosing')}
           </p>
+          <p className="mt-4 text-base font-semibold leading-relaxed text-white sm:text-lg">
+            {t('connectedSystemHub.subtitleModulesToggle')}
+          </p>
         </div>
 
         <div
