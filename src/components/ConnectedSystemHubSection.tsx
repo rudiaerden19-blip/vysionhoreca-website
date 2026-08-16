@@ -1,7 +1,6 @@
 'use client'
 
 import Image from 'next/image'
-import { Fragment } from 'react'
 import { useLanguage } from '@/i18n'
 
 const HUB_CENTER_IMAGE = '/images/hardware/connected-hub-vysion-kassa.jpg'
@@ -24,7 +23,6 @@ const HUB_MODULE_KEYS = [
 /** Polaire layout in % van het vierkante diagram (midden = 50,50). */
 const HUB_CENTER_R = 17.5
 const HUB_NODE_R = 39.5
-const HUB_LABEL_R = 44.5
 
 function hubAngle(index: number, total: number) {
   return -Math.PI / 2 + (index * 2 * Math.PI) / total
@@ -47,6 +45,22 @@ function tentaclePathD(angle: number) {
   const px = mx - Math.sin(angle) * 1.2
   const py = my + Math.cos(angle) * 1.2
   return `M ${sx} ${sy} Q ${px} ${py}, ${ex} ${ey}`
+}
+
+function HubCenterPhoto({ alt, sizes }: { alt: string; sizes: string }) {
+  return (
+    <div className="relative h-full w-full overflow-hidden rounded-full bg-[#0c0f14]">
+      <Image
+        src={HUB_CENTER_IMAGE}
+        alt={alt}
+        fill
+        priority
+        className="object-cover object-center"
+        sizes={sizes}
+      />
+      <div className="hub-center-shimmer pointer-events-none absolute inset-0 rounded-full" aria-hidden />
+    </div>
+  )
 }
 
 export default function ConnectedSystemHubSection() {
@@ -123,17 +137,8 @@ export default function ConnectedSystemHubSection() {
 
             {/* Grote hub-cirkel + kassa */}
             <div className="absolute left-1/2 top-[48%] z-20 flex w-[32%] -translate-x-1/2 -translate-y-1/2 flex-col items-center">
-              <div className="relative aspect-square w-full rounded-full border border-white/[0.14] bg-[#0c0f14] p-[5%] shadow-[0_0_0_1px_rgba(14,93,130,0.35),0_20px_48px_rgba(0,0,0,0.5)] ring-1 ring-accent/35">
-                <div className="relative h-full w-full overflow-hidden rounded-full bg-neutral-100">
-                  <Image
-                    src={HUB_CENTER_IMAGE}
-                    alt={centerAlt}
-                    fill
-                    priority
-                    className="object-contain object-center"
-                    sizes="(min-width: 768px) 280px, 0px"
-                  />
-                </div>
+              <div className="relative aspect-square w-full rounded-full border border-white/[0.14] bg-[#0c0f14] p-[4%] shadow-[0_0_0_1px_rgba(14,93,130,0.35),0_20px_48px_rgba(0,0,0,0.5)] ring-1 ring-accent/35">
+                <HubCenterPhoto alt={centerAlt} sizes="(min-width: 768px) 280px, 0px" />
               </div>
               <p className="pointer-events-none absolute -bottom-8 left-1/2 w-max -translate-x-1/2 text-sm font-semibold tracking-[0.14em] text-white/80 sm:text-base">
                 {t('connectedSystemHub.centerLabel').toUpperCase()}
@@ -143,25 +148,29 @@ export default function ConnectedSystemHubSection() {
             {/* Module-labels — ver naar buiten */}
             {HUB_MODULE_KEYS.map((key, i) => {
               const angle = hubAngle(i, total)
-              const dot = polarPx(HUB_NODE_R, angle)
-              const labelPos = polarPx(HUB_LABEL_R, angle)
+              const node = polarPx(HUB_NODE_R, angle)
+              const spinDeg = (angle * 180) / Math.PI
               const label = t(`connectedSystemHub.modules.${key}`).replace(/\n/g, ' ')
               return (
-                <Fragment key={key}>
+                <div
+                  key={key}
+                  className="absolute z-30 flex items-center"
+                  style={{
+                    ...node,
+                    transform: `translate(-50%, -50%) rotate(${spinDeg}deg)`,
+                  }}
+                >
                   <span
-                    className="absolute z-30 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent shadow-[0_0_12px_rgba(14,93,130,0.85)]"
-                    style={dot}
+                    className="h-2.5 w-2.5 shrink-0 rounded-full bg-accent shadow-[0_0_12px_rgba(14,93,130,0.85)]"
                     aria-hidden
                   />
-                  <div
-                    className="absolute z-30 max-w-[10rem] -translate-x-1/2 -translate-y-1/2 sm:max-w-[12rem] lg:max-w-[13.5rem]"
-                    style={labelPos}
+                  <p
+                    className="ml-2.5 max-w-[9.5rem] shrink-0 rounded-xl border border-white/12 bg-[#161b22]/95 px-3 py-2 text-center text-[0.6875rem] font-semibold leading-snug text-white shadow-lg backdrop-blur-sm sm:max-w-[11rem] sm:px-3.5 sm:py-2.5 sm:text-xs lg:max-w-[12rem]"
+                    style={{ transform: `rotate(${-spinDeg}deg)` }}
                   >
-                    <p className="rounded-xl border border-white/12 bg-[#161b22]/95 px-3 py-2 text-center text-[0.6875rem] font-semibold leading-snug text-white shadow-lg backdrop-blur-sm sm:px-3.5 sm:py-2.5 sm:text-xs">
-                      {label}
-                    </p>
-                  </div>
-                </Fragment>
+                    {label}
+                  </p>
+                </div>
               )
             })}
           </div>
@@ -170,18 +179,7 @@ export default function ConnectedSystemHubSection() {
         <div className="mt-12 md:hidden">
           <div className="relative mx-auto max-w-sm">
             <div className="relative mx-auto aspect-square w-full max-w-[min(100%,280px)] rounded-full border border-white/10 bg-[#0c0f14] p-3 shadow-lg ring-1 ring-accent/35">
-              <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-full bg-[#0c0f14]">
-                <div className="relative h-[88%] w-[88%]">
-                  <Image
-                    src={HUB_CENTER_IMAGE}
-                    alt={centerAlt}
-                    fill
-                    priority
-                    className="object-contain object-center"
-                    sizes="280px"
-                  />
-                </div>
-              </div>
+              <HubCenterPhoto alt={centerAlt} sizes="280px" />
             </div>
             <p className="mt-4 text-center text-sm font-semibold tracking-wide text-white/80">
               {t('connectedSystemHub.centerLabel')}

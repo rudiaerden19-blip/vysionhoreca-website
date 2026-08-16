@@ -590,6 +590,31 @@ input[type="number"] {
   animation: retail-barcode-scan-line 2.1s ease-in-out infinite;
 }
 
+@keyframes hub-center-shimmer {
+  0% {
+    transform: translateX(-120%) skewX(-14deg);
+  }
+  100% {
+    transform: translateX(120%) skewX(-14deg);
+  }
+}
+
+.hub-center-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  opacity: 0.55;
+  background: linear-gradient(
+    105deg,
+    transparent 42%,
+    rgba(255, 255, 255, 0.1) 48%,
+    rgba(255, 255, 255, 0.22) 50%,
+    rgba(255, 255, 255, 0.1) 52%,
+    transparent 58%
+  );
+  animation: hub-center-shimmer 5.5s ease-in-out infinite;
+}
+
 .delay-100 { animation-delay: 0.1s; }
 .delay-200 { animation-delay: 0.2s; }
 .delay-300 { animation-delay: 0.3s; }
