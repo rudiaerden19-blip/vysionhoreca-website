@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { Fragment } from 'react'
 import { useLanguage } from '@/i18n'
 
-const HUB_CENTER_IMAGE = '/images/hardware/connected-hub-sunmi-center.png'
+const HUB_CENTER_IMAGE = '/images/hardware/connected-hub-sunmi-center-dark.png'
 
 const HUB_MODULE_KEYS = [
   'kassa',
@@ -19,9 +19,9 @@ const HUB_MODULE_KEYS = [
 ] as const
 
 /** Polaire layout in % van het vierkante diagram (midden = 50,50). */
-const HUB_CENTER_R = 20.5
-const HUB_NODE_R = 42
-const HUB_LABEL_R = 47.5
+const HUB_CENTER_R = 17.5
+const HUB_NODE_R = 39.5
+const HUB_LABEL_R = 44.5
 
 function hubAngle(index: number, total: number) {
   return -Math.PI / 2 + (index * 2 * Math.PI) / total
@@ -70,7 +70,7 @@ export default function ConnectedSystemHubSection() {
         </h2>
 
         <div
-          className="relative mx-auto mt-14 hidden w-full max-w-[min(100%,920px)] md:block lg:mt-16"
+          className="relative mx-auto mt-12 hidden w-full max-w-[min(100%,760px)] md:block lg:mt-14"
           role="img"
           aria-label={t('connectedSystemHub.diagramAria')}
         >
@@ -99,16 +99,16 @@ export default function ConnectedSystemHubSection() {
             </svg>
 
             {/* Grote hub-cirkel + kassa */}
-            <div className="absolute left-1/2 top-[48%] z-20 flex w-[41%] -translate-x-1/2 -translate-y-1/2 flex-col items-center">
-              <div className="relative aspect-square w-full rounded-full border border-white/[0.14] bg-[#0a0d12] p-[6%] shadow-[0_0_0_1px_rgba(232,90,60,0.25),0_24px_60px_rgba(0,0,0,0.55)] ring-1 ring-accent/20">
-                <div className="relative h-full w-full overflow-hidden rounded-full bg-[#11161c]">
+            <div className="absolute left-1/2 top-[48%] z-20 flex w-[32%] -translate-x-1/2 -translate-y-1/2 flex-col items-center">
+              <div className="relative aspect-square w-full rounded-full border border-white/[0.14] bg-[#0c0f14] p-[5%] shadow-[0_0_0_1px_rgba(232,90,60,0.22),0_20px_48px_rgba(0,0,0,0.5)] ring-1 ring-accent/20">
+                <div className="relative h-full w-full overflow-hidden rounded-full bg-[#0c0f14]">
                   <Image
                     src={HUB_CENTER_IMAGE}
                     alt={centerAlt}
                     fill
                     priority
-                    className="object-contain object-center scale-[0.92]"
-                    sizes="(min-width: 768px) 380px, 0px"
+                    className="object-contain object-center p-[4%]"
+                    sizes="(min-width: 768px) 280px, 0px"
                   />
                 </div>
               </div>
@@ -134,7 +134,7 @@ export default function ConnectedSystemHubSection() {
                     className="absolute z-30 max-w-[10rem] -translate-x-1/2 -translate-y-1/2 sm:max-w-[12rem] lg:max-w-[13.5rem]"
                     style={labelPos}
                   >
-                    <p className="rounded-xl border border-white/12 bg-[#161b22]/95 px-3.5 py-2.5 text-center text-xs font-semibold leading-snug text-white shadow-lg backdrop-blur-sm sm:px-4 sm:py-3 sm:text-sm lg:text-[0.9375rem]">
+                    <p className="rounded-xl border border-white/12 bg-[#161b22]/95 px-3 py-2 text-center text-[0.6875rem] font-semibold leading-snug text-white shadow-lg backdrop-blur-sm sm:px-3.5 sm:py-2.5 sm:text-xs">
                       {label}
                     </p>
                   </div>
@@ -146,15 +146,15 @@ export default function ConnectedSystemHubSection() {
 
         <div className="mt-12 md:hidden">
           <div className="relative mx-auto max-w-sm">
-            <div className="relative mx-auto aspect-square w-full max-w-[min(100%,340px)] rounded-full border border-white/10 bg-[#0a0d12] p-4 shadow-lg ring-1 ring-accent/20">
-              <div className="relative h-full w-full overflow-hidden rounded-full bg-[#11161c]">
+            <div className="relative mx-auto aspect-square w-full max-w-[min(100%,280px)] rounded-full border border-white/10 bg-[#0c0f14] p-3 shadow-lg ring-1 ring-accent/20">
+              <div className="relative h-full w-full overflow-hidden rounded-full bg-[#0c0f14]">
                 <Image
                   src={HUB_CENTER_IMAGE}
                   alt={centerAlt}
                   fill
                   priority
-                  className="object-contain p-3"
-                  sizes="340px"
+                  className="object-contain object-center p-[4%]"
+                  sizes="280px"
                 />
               </div>
             </div>
