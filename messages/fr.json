@@ -2784,6 +2784,8 @@
     "backToCategories": "Retour aux catégories",
     "pickTablePlaceholder": "Choisir une table…",
     "pickTableTitle": "Choisir une table",
+    "tableTransferHoldDrag": "Table ouverte : maintenez appuyé et glissez vers une autre table pour déplacer la commande",
+    "tableTransferBlockedCart": "Videz d’abord le panier sur cette table (ajouter à la table ou supprimer les lignes).",
     "noTablesYet": "Aucune table créée",
     "tableStatusFree": "Libre",
     "tableStatusOccupied": "Occupée",

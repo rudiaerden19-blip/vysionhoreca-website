@@ -131,6 +131,7 @@ import { formatKassaNumpadHeaderDate } from '@/lib/format-kassa-header-date'
 import { appendKassaCloseTipToAbsoluteLoginUrl } from '@/lib/shop-login-kassa-tip'
 import { syncZReportAfterOrderSafe } from '@/lib/kassa-z-sync-safe'
 import { KassaAnalogClock } from '@/components/kassa/KassaAnalogClock'
+import { KassaTablePickerGrid } from '@/components/kassa/KassaTablePickerGrid'
 import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
 import { LocalePickerPortalMenu } from '@/components/LocalePickerPortalMenu'
 import { KassaRegisterSuspenseFallback } from '@/components/KassaRegisterSuspenseFallback'
@@ -143,6 +144,7 @@ import type {
 } from '@/lib/kassa-cart-types'
 import { kassaReceiptTableNumber } from '@/lib/kassa-cart-types'
 import { mergeCartLinesForTable } from '@/lib/kassa-table-cart-merge'
+import { transferParkedTableOrder } from '@/lib/kassa-table-order-transfer'
 import {
   kassaSidebarShowsOrderLinePanel,
   normalizeKassaTableNumber as kassaTableDisplayNumber,
@@ -2358,6 +2360,69 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [successReceiptPrintBusy, setSuccessReceiptPrintBusy] = useState(false)
   /** Gele kop / sidebar: voorlopige bon wordt afgedrukt. */
   const [draftBonPrinting, setDraftBonPrinting] = useState(false)
+
+  /** Open tafelmand verplaatsen (long-press + sleep in tafelkiezer); raakt park/switch-mandlogica niet aan. */
+  const transferOpenTableOrder = useCallback(
+    (fromTableNr: string, toTableNr: string) => {
+      const zone = pickerBrowseZone
+      const fromTbl = kassaTableDisplayNumber(fromTableNr)
+      const toTbl = kassaTableDisplayNumber(toTableNr)
+      if (!fromTbl || !toTbl || fromTbl === toTbl) return
+
+      const fromKey = tableOrderMapKey(zone, fromTbl)
+      const toKey = tableOrderMapKey(zone, toTbl)
+      if ((tableOrdersRef.current[fromKey]?.length ?? 0) === 0) return
+
+      if (
+        kassaTableDisplayNumber(tableNumber) === fromTbl &&
+        dineInFloorZone === zone &&
+        (cartRef.current.length > 0 || cart.length > 0)
+      ) {
+        setThermalPrintBanner({
+          variant: 'error',
+          message: t('kassaApp.tableTransferBlockedCart'),
+        })
+        return
+      }
+
+      const result = transferParkedTableOrder(tableOrdersRef.current, fromKey, toKey)
+      if (!result) return
+
+      playClick()
+      cancelPersistTimer(fromKey)
+      cancelPersistTimer(toKey)
+      try {
+        removeBarBonWatermarkSlot(tenant, fromKey)
+      } catch {
+        /* storage mag transfer niet breken */
+      }
+
+      tableOrdersRef.current = result.next
+      pendingTableOrderLinesRef.current[fromKey] = []
+      pendingTableOrderLinesRef.current[toKey] = result.next[toKey] ?? []
+
+      flushSync(() => {
+        setTableOrders(result.next)
+      })
+
+      const targetLines = result.next[toKey] ?? []
+      if (targetLines.length > 0) {
+        seedBarBonWatermarkFromTableLines(tenant, toKey, targetLines)
+      }
+      updateTableStatus(fromTbl, false, zone)
+      updateTableStatus(toTbl, targetLines.length > 0, zone)
+      queueMicrotask(() => syncFloorPlanStatusesFromOpenOrders(result.next))
+      void persistOpenOrderRowToSupabase(zone, fromTbl, [])
+      void persistOpenOrderRowToSupabase(zone, toTbl, targetLines)
+
+      if (kassaTableDisplayNumber(tableNumber) === fromTbl && dineInFloorZone === zone) {
+        setTableNumber(toTbl)
+        setDineInFloorZone(zone)
+        setTableOrderLinesInSidebar(true)
+      }
+    },
+    [pickerBrowseZone, tableNumber, dineInFloorZone, cart.length, tenant, t, syncFloorPlanStatusesFromOpenOrders],
+  )
 
   const paidReceiptPrintGuardRef = useRef<{
     key: string | null
@@ -6265,81 +6330,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   {t('kassaApp.noTablesYet')}
                 </div>
               ) : (
-                <>
-                  {pickerTables.length > 0 && (
-                    <div className="grid grid-cols-3 gap-3 p-4 sm:grid-cols-4 md:grid-cols-5">
-                      {pickerTables.map((tbl) => (
-                        <button
-                          key={tbl.id}
-                          type="button"
-                          onClick={() => switchToTable(tbl.number)}
-                          className={`relative touch-manipulation rounded-xl border-2 py-4 font-bold transition-colors active:brightness-95 ${
-                            tableNumber === tbl.number && dineInFloorZone === pickerBrowseZone
-                              ? 'border-[#3C4D6B] bg-[#3C4D6B] text-white'
-                              : tbl.status === 'FREE'
-                                ? 'border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
-                                : tbl.status === 'UNPAID'
-                                  ? 'border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100'
-                                  : 'border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100'
-                          }`}
-                        >
-                          <div className="text-2xl"></div>
-                          <div className="text-lg">{tbl.number}</div>
-                          <div className="text-[11px] opacity-70">
-                            {tbl.status === 'FREE'
-                              ? t('kassaApp.tableStatusFree')
-                              : tbl.status === 'OCCUPIED'
-                                ? t('kassaApp.tableStatusOccupied')
-                                : t('kassaApp.tableStatusUnpaid')}
-                          </div>
-                          {(tableOrders[tableOrderMapKey(pickerBrowseZone, tbl.number)]?.length ?? 0) > 0 && (
-                            <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-[10px] font-bold text-white">
-                              {tableOrders[tableOrderMapKey(pickerBrowseZone, tbl.number)]!.length}
-                            </span>
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                  {pickerStools.length > 0 && (
-                    <>
-                      <div className="flex items-center gap-2 border-t border-amber-100 bg-amber-50 px-4 py-2">
-                        <span className="text-xs font-bold uppercase tracking-wider text-amber-700">
-                           {t('kassaApp.stoolsSection')}
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-3 gap-3 p-4 sm:grid-cols-4 md:grid-cols-5">
-                        {pickerStools.map((s) => (
-                          <button
-                            key={s.segmentId + s.stoolNumber}
-                            type="button"
-                            onClick={() => switchToTable(s.stoolNumber)}
-                            className={`relative touch-manipulation rounded-xl border-2 py-4 font-bold transition-colors active:brightness-95 ${
-                              tableNumber === s.stoolNumber && dineInFloorZone === pickerBrowseZone
-                                ? 'border-[#3C4D6B] bg-[#3C4D6B] text-white'
-                                : (tableOrders[tableOrderMapKey(pickerBrowseZone, s.stoolNumber)]?.length ?? 0) > 0
-                                  ? 'border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100'
-                                  : 'border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100'
-                            }`}
-                          >
-                            <div className="text-2xl"></div>
-                            <div className="text-lg">{s.stoolNumber}</div>
-                            <div className="text-[11px] opacity-70">
-                              {(tableOrders[tableOrderMapKey(pickerBrowseZone, s.stoolNumber)]?.length ?? 0) > 0
-                                ? t('kassaApp.tableStatusOccupied')
-                                : t('kassaApp.tableStatusFree')}
-                            </div>
-                            {(tableOrders[tableOrderMapKey(pickerBrowseZone, s.stoolNumber)]?.length ?? 0) > 0 && (
-                              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-[10px] font-bold text-white">
-                                {tableOrders[tableOrderMapKey(pickerBrowseZone, s.stoolNumber)]!.length}
-                              </span>
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </>
+                <KassaTablePickerGrid
+                  zone={pickerBrowseZone}
+                  tables={pickerTables}
+                  stools={pickerStools}
+                  tableOrders={tableOrders}
+                  activeTableNumber={tableNumber}
+                  activeZone={dineInFloorZone}
+                  onSelectTable={(nr) => switchToTable(nr)}
+                  onTransferTable={transferOpenTableOrder}
+                  t={t}
+                  ui={{ flyMenuText: ui.flyMenuText, tablePickerEmpty: ui.tablePickerEmpty }}
+                />
               )}
             </div>
             <div className={`flex shrink-0 gap-2 border-t p-3 ${ui.tablePickerFooterBar}`}>

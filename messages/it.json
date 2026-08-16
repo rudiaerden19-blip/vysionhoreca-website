@@ -3284,6 +3284,8 @@
     "backToCategories": "Torna alle categorie",
     "pickTablePlaceholder": "Scegli tavolo…",
     "pickTableTitle": "Scegli tavolo",
+    "tableTransferHoldDrag": "Tavolo aperto: tieni premuto e trascina su un altro tavolo per spostare l’ordine",
+    "tableTransferBlockedCart": "Svuota prima il carrello su questo tavolo (aggiungi al tavolo o rimuovi le righe).",
     "noTablesYet": "Nessun tavolo creato",
     "tableStatusFree": "Libero",
     "tableStatusOccupied": "Occupato",

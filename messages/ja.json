@@ -3284,6 +3284,8 @@
     "backToCategories": "カテゴリに戻る",
     "pickTablePlaceholder": "テーブルを選択…",
     "pickTableTitle": "テーブルを選択",
+    "tableTransferHoldDrag": "使用中テーブル：長押しして別テーブルへドラッグで注文を移動",
+    "tableTransferBlockedCart": "このテーブルのカートを先に空にしてください（テーブルに追加または行を削除）。",
     "noTablesYet": "テーブルが未作成です",
     "tableStatusFree": "空",
     "tableStatusOccupied": "使用中",

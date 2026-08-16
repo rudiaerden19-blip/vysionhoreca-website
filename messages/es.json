@@ -3284,6 +3284,8 @@
     "backToCategories": "Volver a categorías",
     "pickTablePlaceholder": "Elige mesa…",
     "pickTableTitle": "Elige mesa",
+    "tableTransferHoldDrag": "Mesa abierta: mantén pulsado y arrastra a otra mesa para mover el pedido",
+    "tableTransferBlockedCart": "Vacía primero el carrito en esta mesa (añadir a mesa o quitar líneas).",
     "noTablesYet": "Aún no hay mesas",
     "tableStatusFree": "Libre",
     "tableStatusOccupied": "Ocupada",

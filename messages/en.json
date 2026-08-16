@@ -3823,6 +3823,8 @@
     "backToCategories": "Back to categories",
     "pickTablePlaceholder": "Choose table…",
     "pickTableTitle": "Choose table",
+    "tableTransferHoldDrag": "Open table: press and hold, then drag to another table to move the order",
+    "tableTransferBlockedCart": "Clear the cart on this table first (add to table or remove lines).",
     "noTablesYet": "No tables created yet",
     "tableStatusFree": "Free",
     "tableStatusOccupied": "Occupied",

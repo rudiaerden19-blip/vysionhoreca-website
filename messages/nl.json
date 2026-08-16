@@ -3823,6 +3823,8 @@
     "backToCategories": "Terug naar categorieën",
     "pickTablePlaceholder": "Kies tafel…",
     "pickTableTitle": "Kies tafel",
+    "tableTransferHoldDrag": "Open tafel: houd ingedrukt en sleep naar een andere tafel om het bedrag te verplaatsen",
+    "tableTransferBlockedCart": "Leeg eerst de mand op deze tafel (Voeg toe aan tafel of verwijder regels).",
     "noTablesYet": "Nog geen tafels aangemaakt",
     "tableStatusFree": "Vrij",
     "tableStatusOccupied": "Bezet",
