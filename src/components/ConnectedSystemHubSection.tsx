@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { Fragment } from 'react'
 import { useLanguage } from '@/i18n'
 
 const HUB_CENTER_IMAGE = '/images/hardware/connected-hub-sunmi-center.png'
@@ -17,37 +18,32 @@ const HUB_MODULE_KEYS = [
   'bedrijfsAnalyse',
 ] as const
 
-const CX = 500
-const CY = 310
-const NODE_R = 268
-/** Lijnen starten aan de rand van de productfoto (viewBox-eenheden). */
-const HUB_INNER_R = 188
+/** Polaire layout in % van het vierkante diagram (midden = 50,50). */
+const HUB_CENTER_R = 20.5
+const HUB_NODE_R = 42
+const HUB_LABEL_R = 47.5
 
-function hubNodePosition(index: number, total: number) {
-  const angle = -Math.PI / 2 + (index * 2 * Math.PI) / total
+function hubAngle(index: number, total: number) {
+  return -Math.PI / 2 + (index * 2 * Math.PI) / total
+}
+
+function polarPx(radius: number, angle: number) {
   return {
-    x: CX + NODE_R * Math.cos(angle),
-    y: CY + NODE_R * Math.sin(angle),
+    left: `${50 + radius * Math.cos(angle)}%`,
+    top: `${50 + radius * Math.sin(angle)}%`,
   }
 }
 
-function lineStart(nx: number, ny: number) {
-  const dx = nx - CX
-  const dy = ny - CY
-  const len = Math.hypot(dx, dy) || 1
-  return {
-    x: CX + (dx / len) * HUB_INNER_R,
-    y: CY + (dy / len) * HUB_INNER_R,
-  }
-}
-
-function tentaclePath(nx: number, ny: number) {
-  const { x: sx, y: sy } = lineStart(nx, ny)
-  const dx = nx - sx
-  const dy = ny - sy
-  const c1x = sx + dx * 0.45 - dy * 0.06
-  const c1y = sy + dy * 0.45 + dx * 0.06
-  return `M ${sx} ${sy} Q ${c1x} ${c1y}, ${nx} ${ny}`
+function tentaclePathD(angle: number) {
+  const sx = 50 + HUB_CENTER_R * Math.cos(angle)
+  const sy = 50 + HUB_CENTER_R * Math.sin(angle)
+  const ex = 50 + HUB_NODE_R * Math.cos(angle)
+  const ey = 50 + HUB_NODE_R * Math.sin(angle)
+  const mx = 50 + (HUB_CENTER_R + (HUB_NODE_R - HUB_CENTER_R) * 0.55) * Math.cos(angle)
+  const my = 50 + (HUB_CENTER_R + (HUB_NODE_R - HUB_CENTER_R) * 0.55) * Math.sin(angle)
+  const px = mx - Math.sin(angle) * 1.2
+  const py = my + Math.cos(angle) * 1.2
+  return `M ${sx} ${sy} Q ${px} ${py}, ${ex} ${ey}`
 }
 
 export default function ConnectedSystemHubSection() {
@@ -65,123 +61,112 @@ export default function ConnectedSystemHubSection() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.03),transparent_55%)]" />
       </div>
 
-      <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <h2
           id="connected-system-hub-heading"
-          className="mx-auto max-w-4xl text-center text-2xl font-bold tracking-tight text-white sm:text-3xl md:text-4xl"
+          className="mx-auto max-w-4xl text-center text-2xl font-bold tracking-tight text-white sm:text-3xl md:text-4xl lg:text-[2.75rem]"
         >
           {t('connectedSystemHub.title')}
         </h2>
 
-        {/* Desktop: foto + SVG-tentakels */}
-        <div className="relative mx-auto mt-12 hidden max-w-5xl md:block lg:mt-14">
-          <div className="relative aspect-[1000/680] w-full">
+        <div
+          className="relative mx-auto mt-14 hidden w-full max-w-[min(100%,920px)] md:block lg:mt-16"
+          role="img"
+          aria-label={t('connectedSystemHub.diagramAria')}
+        >
+          <div className="relative aspect-square w-full pb-12">
             <svg
-              viewBox="0 0 1000 680"
+              viewBox="0 0 100 100"
               className="absolute inset-0 h-full w-full"
-              role="img"
-              aria-label={t('connectedSystemHub.diagramAria')}
+              aria-hidden
             >
               <defs>
                 <linearGradient id="hub-tentacle" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#E85A3C" stopOpacity="0.25" />
-                  <stop offset="100%" stopColor="#E85A3C" stopOpacity="0.7" />
+                  <stop offset="0%" stopColor="#E85A3C" stopOpacity="0.2" />
+                  <stop offset="100%" stopColor="#E85A3C" stopOpacity="0.75" />
                 </linearGradient>
               </defs>
-
-              {HUB_MODULE_KEYS.map((key, i) => {
-                const { x, y } = hubNodePosition(i, total)
-                return (
-                  <path
-                    key={`line-${key}`}
-                    d={tentaclePath(x, y)}
-                    fill="none"
-                    stroke="url(#hub-tentacle)"
-                    strokeWidth="1.75"
-                    strokeLinecap="round"
-                  />
-                )
-              })}
-
-              {HUB_MODULE_KEYS.map((key, i) => {
-                const { x, y } = hubNodePosition(i, total)
-                const label = t(`connectedSystemHub.modules.${key}`)
-                const lines = label.split('\n')
-                const lineHeight = 15
-                const boxH = lines.length * lineHeight + 16
-                const boxW = 152
-                const boxY = y + 8
-                const textStartY = boxY + 14 + lineHeight * 0.35
-                return (
-                  <g key={key}>
-                    <circle cx={x} cy={y} r="3.5" fill="#E85A3C" fillOpacity="0.85" />
-                    <rect
-                      x={x - boxW / 2}
-                      y={boxY}
-                      width={boxW}
-                      height={boxH}
-                      rx="10"
-                      fill="#161b22"
-                      stroke="rgba(255,255,255,0.12)"
-                      strokeWidth="1"
-                    />
-                    {lines.map((line, li) => (
-                      <text
-                        key={li}
-                        x={x}
-                        y={textStartY + li * lineHeight}
-                        textAnchor="middle"
-                        fill="rgba(255,255,255,0.92)"
-                        style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.03em' }}
-                      >
-                        {line}
-                      </text>
-                    ))}
-                  </g>
-                )
-              })}
+              {HUB_MODULE_KEYS.map((key, i) => (
+                <path
+                  key={`line-${key}`}
+                  d={tentaclePathD(hubAngle(i, total))}
+                  fill="none"
+                  stroke="url(#hub-tentacle)"
+                  strokeWidth="0.45"
+                  strokeLinecap="round"
+                />
+              ))}
             </svg>
 
-            <div className="pointer-events-none absolute left-1/2 top-[45.5%] z-10 w-[min(42%,420px)] -translate-x-1/2 -translate-y-1/2">
-              <div className="relative aspect-[798/757] w-full drop-shadow-[0_24px_48px_rgba(0,0,0,0.55)]">
+            {/* Grote hub-cirkel + kassa */}
+            <div className="absolute left-1/2 top-[48%] z-20 flex w-[41%] -translate-x-1/2 -translate-y-1/2 flex-col items-center">
+              <div className="relative aspect-square w-full rounded-full border border-white/[0.14] bg-[#0a0d12] p-[6%] shadow-[0_0_0_1px_rgba(232,90,60,0.25),0_24px_60px_rgba(0,0,0,0.55)] ring-1 ring-accent/20">
+                <div className="relative h-full w-full overflow-hidden rounded-full bg-[#11161c]">
+                  <Image
+                    src={HUB_CENTER_IMAGE}
+                    alt={centerAlt}
+                    fill
+                    priority
+                    className="object-contain object-center scale-[0.92]"
+                    sizes="(min-width: 768px) 380px, 0px"
+                  />
+                </div>
+              </div>
+              <p className="pointer-events-none absolute -bottom-8 left-1/2 w-max -translate-x-1/2 text-sm font-semibold tracking-[0.14em] text-white/80 sm:text-base">
+                {t('connectedSystemHub.centerLabel').toUpperCase()}
+              </p>
+            </div>
+
+            {/* Module-labels — ver naar buiten */}
+            {HUB_MODULE_KEYS.map((key, i) => {
+              const angle = hubAngle(i, total)
+              const dot = polarPx(HUB_NODE_R, angle)
+              const labelPos = polarPx(HUB_LABEL_R, angle)
+              const label = t(`connectedSystemHub.modules.${key}`).replace(/\n/g, ' ')
+              return (
+                <Fragment key={key}>
+                  <span
+                    className="absolute z-30 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent shadow-[0_0_12px_rgba(232,90,60,0.7)]"
+                    style={dot}
+                    aria-hidden
+                  />
+                  <div
+                    className="absolute z-30 max-w-[10rem] -translate-x-1/2 -translate-y-1/2 sm:max-w-[12rem] lg:max-w-[13.5rem]"
+                    style={labelPos}
+                  >
+                    <p className="rounded-xl border border-white/12 bg-[#161b22]/95 px-3.5 py-2.5 text-center text-xs font-semibold leading-snug text-white shadow-lg backdrop-blur-sm sm:px-4 sm:py-3 sm:text-sm lg:text-[0.9375rem]">
+                      {label}
+                    </p>
+                  </div>
+                </Fragment>
+              )
+            })}
+          </div>
+        </div>
+
+        <div className="mt-12 md:hidden">
+          <div className="relative mx-auto max-w-sm">
+            <div className="relative mx-auto aspect-square w-full max-w-[min(100%,340px)] rounded-full border border-white/10 bg-[#0a0d12] p-4 shadow-lg ring-1 ring-accent/20">
+              <div className="relative h-full w-full overflow-hidden rounded-full bg-[#11161c]">
                 <Image
                   src={HUB_CENTER_IMAGE}
                   alt={centerAlt}
                   fill
                   priority
-                  className="object-contain object-center"
-                  sizes="(min-width: 768px) 420px, 0px"
+                  className="object-contain p-3"
+                  sizes="340px"
                 />
               </div>
-              <p className="mt-3 text-center text-xs font-semibold tracking-[0.12em] text-white/75">
-                {t('connectedSystemHub.centerLabel').toUpperCase()}
-              </p>
             </div>
-          </div>
-        </div>
-
-        {/* Mobiel */}
-        <div className="mt-12 md:hidden">
-          <div className="relative mx-auto max-w-sm">
-            <div className="relative aspect-[798/757] w-full max-w-[320px] mx-auto drop-shadow-[0_16px_32px_rgba(0,0,0,0.5)]">
-              <Image
-                src={HUB_CENTER_IMAGE}
-                alt={centerAlt}
-                fill
-                priority
-                className="object-contain"
-                sizes="320px"
-              />
-            </div>
-            <p className="mt-3 text-center text-sm font-semibold text-white/80">
+            <p className="mt-4 text-center text-sm font-semibold tracking-wide text-white/80">
               {t('connectedSystemHub.centerLabel')}
             </p>
           </div>
-          <ul className="mt-8 grid grid-cols-2 gap-2.5 sm:gap-3">
+          <ul className="mt-10 grid grid-cols-2 gap-3">
             {HUB_MODULE_KEYS.map((key) => (
               <li
                 key={key}
-                className="rounded-xl border border-white/10 bg-[#161b22] px-2.5 py-3 text-center text-xs font-semibold leading-snug text-white/90 sm:text-sm"
+                className="rounded-xl border border-white/10 bg-[#161b22] px-3 py-3.5 text-center text-sm font-semibold leading-snug text-white/90"
               >
                 {t(`connectedSystemHub.modules.${key}`).replace(/\n/g, ' ')}
               </li>
