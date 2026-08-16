@@ -4961,7 +4961,8 @@
     },
     "inHouseSoftware": {
       "title": "Desarrollo propio",
-      "body": "Nuestro software lo desarrollan nuestros propios ingenieros en la empresa."
+      "body": "Nuestro software lo desarrollan nuestros propios ingenieros en la empresa. ¿Quiere un módulo a medida? Díganoslo — lo programamos para usted.",
+      "bodyExtra": "No somos revendedores: cada TPV Vysion lo programamos nosotros. Si la caja falla o hay un bug, no espera días — llámenos y resolvemos su problema al momento."
     },
     "posQuality": {
       "title": "Hardware premium de alta calidad",

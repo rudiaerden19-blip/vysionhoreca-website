@@ -363,7 +363,8 @@
     },
     "inHouseSoftware": {
       "title": "Built in-house",
-      "body": "Our software is developed in-house by our own engineers."
+      "body": "Our software is built in-house by our own developers. Need a custom module? Tell us — we'll build it for you.",
+      "bodyExtra": "We're not resellers: every Vysion POS is programmed by our own team. If your till goes down or you hit a bug, you don't wait days for a fix — call us and we resolve your issue right away."
     },
     "posQuality": {
       "title": "High-quality premium hardware",

@@ -363,7 +363,8 @@
     },
     "inHouseSoftware": {
       "title": "Eigen ontwikkeling",
-      "body": "Onze software wordt in eigen huis gemaakt door onze programmeurs. Wil je een eigen module erbij, laat het ons weten, wij coderen het voor jou."
+      "body": "Onze software wordt in eigen huis gemaakt door onze programmeurs. Wil je een eigen module erbij, laat het ons weten, wij coderen het voor jou.",
+      "bodyExtra": "We zijn geen resellers: al onze kassa's worden zelf geprogrammeerd. Bij kassa-uitval of een bug hoef je geen dagen te wachten op een oplossing — je belt ons en wij lossen jouw probleem direct op."
     },
     "posQuality": {
       "title": "Hoogwaardige premium hardware",

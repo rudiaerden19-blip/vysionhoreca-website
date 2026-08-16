@@ -4984,7 +4984,8 @@
     },
     "inHouseSoftware": {
       "title": "Développé en interne",
-      "body": "Notre logiciel est développé en interne par nos propres ingénieurs."
+      "body": "Notre logiciel est développé en interne par nos propres ingénieurs. Vous voulez un module sur mesure ? Dites-le-nous — nous le codons pour vous.",
+      "bodyExtra": "Nous ne sommes pas revendeurs : chaque caisse Vysion est programmée par nos équipes. En cas de panne ou de bug, pas d'attente de plusieurs jours — appelez-nous et nous résolvons votre problème immédiatement."
     },
     "posQuality": {
       "title": "Matériel premium haut de gamme",

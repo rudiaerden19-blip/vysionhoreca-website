@@ -4961,7 +4961,8 @@
     },
     "inHouseSoftware": {
       "title": "Sviluppo interno",
-      "body": "Il software è sviluppato in casa dai nostri ingegneri."
+      "body": "Il software è sviluppato in casa dai nostri ingegneri. Volete un modulo su misura? Ditecelo — lo programmiamo per voi.",
+      "bodyExtra": "Non siamo rivenditori: ogni cassa Vysion la programmiamo noi. In caso di guasto o bug non aspettate giorni — chiamateci e risolviamo subito il vostro problema."
     },
     "posQuality": {
       "title": "Hardware premium di alta qualità",

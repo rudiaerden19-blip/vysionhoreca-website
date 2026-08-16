@@ -104,10 +104,10 @@ function GratisWebsiteBannerSection() {
 function WhyVysionSection() {
   const { t, locale } = useLanguage()
   const pointKeys = [
+    'inHouseSoftware',
     'fullPlatform',
     'liveSupport',
     'rightPrice',
-    'inHouseSoftware',
     'posQuality',
     'foodtrucksOffline',
   ] as const
@@ -142,6 +142,11 @@ function WhyVysionSection() {
                   {key === 'fullPlatform'? (
                     <p className="mt-3 text-sm sm:text-base text-gray-600 leading-relaxed">
                       {t('whyVysion.fullPlatform.bodyExtra')}
+                    </p>
+                  ) : null}
+                  {key === 'inHouseSoftware'? (
+                    <p className="mt-3 text-sm sm:text-base text-gray-600 leading-relaxed">
+                      {t('whyVysion.inHouseSoftware.bodyExtra')}
                     </p>
                   ) : null}
                 </div>
