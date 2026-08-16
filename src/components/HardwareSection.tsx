@@ -14,18 +14,22 @@ const HARDWARE_PREMIUM_ORANGE_SHADOW =
   'shadow-[0_12px_40px_-6px_rgba(232,90,60,0.48),0_8px_28px_-4px_rgba(232,90,60,0.36),0_0_0_1px_rgba(232,90,60,0.18)] border-accent/35 transition-all duration-300 hover:z-10 hover:-translate-y-0.5 hover:border-accent/50 hover:shadow-[0_16px_48px_-6px_rgba(232,90,60,0.55),0_12px_36px_-4px_rgba(232,90,60,0.42),0_0_0_1px_rgba(232,90,60,0.22)] active:z-10 active:-translate-y-0.5'
 
 const HARDWARE_ITEMS = [
-  { src: '/images/hardware/hardware-7.png', model: 'vm20'},
-  { src: '/images/hardware/hardware-8.png', model: 'handpos tf741'},
-  { src: '/images/hardware/vysion-kassa-demo.png', model: 'Handhelds'},
-  { src: '/images/hardware/elo-touch-screens.png', model: 'Elo touch screens'},
-  { src: '/images/hardware/hardware-11-vt11-kiosk.png', model: 'vt 11 kiosk'},
-  { src: '/images/hardware/hardware-12-muur-kiosk-tl20.png', model: 'muur kiosk tl20'},
+  { src: '/images/hardware/hardware-8.png', model: 'handpos tf741' },
+  { src: '/images/hardware/hardware-vm20-sunmi.png', model: 'vm20' },
+  { src: '/images/hardware/vysion-kassa-demo.png', model: 'Handhelds' },
+  {
+    src: '/images/hardware/hardware-tf30-kassa.png',
+    labelKey: 'premiumIncludedTf30' as const,
+  },
+  { src: '/images/hardware/hardware-11-vt11-kiosk.png', model: 'vt 11 kiosk' },
+  {
+    src: '/images/hardware/hardware-printer-epson.png',
+    labelKey: 'premiumIncludedPrinterX40' as const,
+  },
 ] as const
 
 const HARDWARE_PREMIUM_INCLUDED = [
-  { src: '/images/hardware/hardware-premium-tf30.png', labelKey: 'premiumIncludedTf30'as const },
-  { src: '/images/hardware/hardware-premium-printer-x40.png', labelKey: 'premiumIncludedPrinterX40'as const },
-  { src: '/images/hardware/hardware-premium-lade.png', labelKey: 'premiumIncludedLade'as const },
+  { src: '/images/hardware/hardware-premium-lade.png', labelKey: 'premiumIncludedLade' as const },
 ] as const
 
 function hardwareLabel(item: (typeof HARDWARE_ITEMS)[number] | (typeof HARDWARE_PREMIUM_INCLUDED)[number], t: (key: string) => string): string {
