@@ -3284,7 +3284,7 @@
     "backToCategories": "返回分类",
     "pickTablePlaceholder": "选择桌号…",
     "pickTableTitle": "选择桌号",
-    "tableTransferHoldDrag": "已开台：长按并拖到另一桌以转移订单",
+    "tableTransferHoldDrag": "点击桌台，稍按住并拖到另一桌",
     "tableTransferBlockedCart": "请先清空此桌购物车（添加到桌台或删除行）。",
     "noTablesYet": "尚未创建桌台",
     "tableStatusFree": "空闲",

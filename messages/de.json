@@ -2784,7 +2784,7 @@
     "backToCategories": "Zurück zu Kategorien",
     "pickTablePlaceholder": "Tisch wählen…",
     "pickTableTitle": "Tisch wählen",
-    "tableTransferHoldDrag": "Offener Tisch: gedrückt halten und auf einen anderen Tisch ziehen, um die Bestellung zu verschieben",
+    "tableTransferHoldDrag": "Tisch antippen, kurz halten und auf einen anderen Tisch ziehen",
     "tableTransferBlockedCart": "Leeren Sie zuerst den Warenkorb an diesem Tisch (An Tisch hinzufügen oder Zeilen entfernen).",
     "noTablesYet": "Noch keine Tische angelegt",
     "tableStatusFree": "Frei",

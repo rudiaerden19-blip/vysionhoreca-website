@@ -3284,7 +3284,7 @@
     "backToCategories": "العودة إلى الفئات",
     "pickTablePlaceholder": "اختر طاولة…",
     "pickTableTitle": "اختر طاولة",
-    "tableTransferHoldDrag": "طاولة مفتوحة: اضغط مطولاً واسحب إلى طاولة أخرى لنقل الطلب",
+    "tableTransferHoldDrag": "اضغط على الطاولة، أبقِ إصبعك لحظة واسحب إلى طاولة أخرى",
     "tableTransferBlockedCart": "أفرغ السلة على هذه الطاولة أولاً (أضف إلى الطاولة أو احذف البنود).",
     "noTablesYet": "لم تُنشأ طاولات بعد",
     "tableStatusFree": "فارغة",
