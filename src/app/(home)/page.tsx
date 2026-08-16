@@ -101,6 +101,20 @@ function GratisWebsiteBannerSection() {
   )
 }
 
+/** Hardwarefilmpjes rechts in «Waarom Vysion» — derde entry toevoegen wanneer bestand klaar is. */
+const WHY_VYSION_HARDWARE_VIDEOS = [
+  {
+    src: '/images/sunmi-d3-pro-display.mp4',
+    altKey: 'whyVysion.videoAltSunmi',
+    aspectClass: 'aspect-[1280/592]',
+  },
+  {
+    src: '/images/epson-mseries-receipt-printers.mp4',
+    altKey: 'whyVysion.videoAltEpson',
+    aspectClass: 'aspect-video',
+  },
+] as const
+
 function WhyVysionSection() {
   const { t, locale } = useLanguage()
   const pointKeys = [
@@ -154,22 +168,27 @@ function WhyVysionSection() {
             ))}
           </ul>
 
-          <div className="order-1 lg:order-2 relative flex w-full flex-col gap-10 self-start sm:gap-12 lg:gap-14 lg:pl-6 xl:pl-10">
-            <div className="relative w-full max-w-[854px] mx-auto lg:mx-0">
-              <div className="relative aspect-[1280/592] w-full overflow-hidden rounded-3xl shadow-home-photo ring-1 ring-black/[0.08] bg-[#141414]">
-                <video
-                  src="/images/sunmi-d3-pro-display.mp4"
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  preload="auto"
-                  className="absolute inset-0 h-full w-full object-contain object-center"
-                  aria-label={t('whyVysion.imageAlt')}
-                />
-              </div>
+          <div className="order-1 lg:order-2 relative flex w-full flex-col gap-8 self-start sm:gap-10 lg:gap-12 lg:pl-6 xl:pl-10">
+            <div className="flex w-full max-w-[854px] flex-col gap-6 sm:gap-8 mx-auto lg:mx-0">
+              {WHY_VYSION_HARDWARE_VIDEOS.map((item) => (
+                <div
+                  key={item.src}
+                  className={`relative w-full overflow-hidden rounded-3xl shadow-home-photo ring-1 ring-black/[0.08] bg-[#141414] ${item.aspectClass}`}
+                >
+                  <video
+                    src={item.src}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    preload="auto"
+                    className="absolute inset-0 h-full w-full object-contain object-center"
+                    aria-label={t(item.altKey)}
+                  />
+                </div>
+              ))}
             </div>
-            <MarketingStartAndDemoButtons className="relative z-10 mt-[2cm] w-full shrink-0 lg:justify-start lg:px-0" />
+            <MarketingStartAndDemoButtons className="relative z-10 w-full shrink-0 lg:justify-start lg:px-0" />
           </div>
         </div>
       </div>
