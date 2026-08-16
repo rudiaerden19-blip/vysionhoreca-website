@@ -29,7 +29,7 @@ const HERO_CTA_FLIP_MS = 8000
 function HeroCtaFlipCard() {
   const { t } = useLanguage()
   const [showBack, setShowBack] = useState(false)
-  const [withHardware, setWithHardware] = useState(true)
+  const [withHardware, setWithHardware] = useState(false)
   const [reduceMotion, setReduceMotion] = useState(false)
 
   useEffect(() => {
