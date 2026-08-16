@@ -5008,6 +5008,12 @@
   },
   "connectedSystemHub": {
     "title": "Un seul système — tout connecté dans votre établissement",
+    "subtitleQuestion": "Pourquoi payer séparément votre caisse, vos commandes en ligne, réservations, personnel, site web et stock ?",
+    "subtitleVysionLine": "Avec Vysion, tout se fait depuis un seul système et un seul écran.",
+    "subtitlePoint1": "Pas cinq systèmes différents.",
+    "subtitlePoint2": "Pas plusieurs écrans au comptoir.",
+    "subtitlePoint3": "Pas d’abonnements séparés pour chaque application.",
+    "subtitleClosing": "Tout ce dont votre établissement a besoin, réuni sur une plateforme complète.",
     "centerLabel": "Vysion",
     "diagramAria": "Schéma : un système central relié à la caisse, commande en ligne, réservations, site web, personnel, stock, écrans cuisine, rapports et analyse d’activité",
     "modules": {

@@ -387,6 +387,12 @@
   },
   "connectedSystemHub": {
     "title": "1 systeem — alles verbonden in jouw zaak",
+    "subtitleQuestion": "Waarom apart betalen voor je kassa, online bestellingen, reservaties, personeel, website en voorraad?",
+    "subtitleVysionLine": "Met Vysion kan het allemaal vanuit één systeem en één scherm.",
+    "subtitlePoint1": "Geen 5 verschillende systemen.",
+    "subtitlePoint2": "Geen meerdere schermen op je balie.",
+    "subtitlePoint3": "Geen aparte abonnementen voor elke toepassing.",
+    "subtitleClosing": "Alles wat je zaak nodig heeft, verbonden in één compleet platform.",
     "centerLabel": "Vysion",
     "diagramAria": "Diagram: één centraal systeem verbonden met kassa, bestellen, reservaties, website, personeel, voorraad, keukenschermen, rapporten en bedrijfsanalyse",
     "modules": {

@@ -5008,6 +5008,12 @@
   },
   "connectedSystemHub": {
     "title": "Ein System — alles verbunden in Ihrem Betrieb",
+    "subtitleQuestion": "Warum extra bezahlen für Kasse, Online-Bestellungen, Reservierungen, Personal, Website und Lager?",
+    "subtitleVysionLine": "Mit Vysion läuft alles über ein System und einen Bildschirm.",
+    "subtitlePoint1": "Keine fünf verschiedenen Systeme.",
+    "subtitlePoint2": "Keine mehreren Bildschirme an der Theke.",
+    "subtitlePoint3": "Keine separaten Abos für jede Anwendung.",
+    "subtitleClosing": "Alles, was Ihr Betrieb braucht — verbunden in einer kompletten Plattform.",
     "centerLabel": "Vysion",
     "diagramAria": "Diagramm: ein zentrales System verbunden mit Kasse, Online-Bestellung, Reservierungen, Website, Personal, Lager, Küchenscreens, Berichten und Unternehmensanalyse",
     "modules": {

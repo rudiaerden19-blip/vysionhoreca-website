@@ -387,6 +387,12 @@
   },
   "connectedSystemHub": {
     "title": "One system — everything connected in your business",
+    "subtitleQuestion": "Why pay separately for your POS, online orders, reservations, staff, website and inventory?",
+    "subtitleVysionLine": "With Vysion, it all runs from one system and one screen.",
+    "subtitlePoint1": "No five different systems.",
+    "subtitlePoint2": "No multiple screens at your counter.",
+    "subtitlePoint3": "No separate subscription for every app.",
+    "subtitleClosing": "Everything your business needs, connected in one complete platform.",
     "centerLabel": "Vysion",
     "diagramAria": "Diagram: one central system connected to POS, online ordering, reservations, website, staff, inventory, kitchen screens, reports and business analytics",
     "modules": {

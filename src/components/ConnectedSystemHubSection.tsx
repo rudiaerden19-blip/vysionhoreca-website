@@ -69,8 +69,25 @@ export default function ConnectedSystemHubSection() {
           {t('connectedSystemHub.title')}
         </h2>
 
+        <div className="mx-auto mt-6 max-w-3xl text-center sm:mt-8">
+          <p className="text-base font-medium leading-relaxed text-white/90 sm:text-lg">
+            {t('connectedSystemHub.subtitleQuestion')}
+          </p>
+          <p className="mt-4 text-base leading-relaxed text-white/80 sm:text-lg">
+            {t('connectedSystemHub.subtitleVysionLine')}
+          </p>
+          <ul className="mt-4 space-y-2 text-sm leading-relaxed text-white/75 sm:text-base">
+            <li>{t('connectedSystemHub.subtitlePoint1')}</li>
+            <li>{t('connectedSystemHub.subtitlePoint2')}</li>
+            <li>{t('connectedSystemHub.subtitlePoint3')}</li>
+          </ul>
+          <p className="mt-5 text-base font-medium leading-relaxed text-white/90 sm:text-lg">
+            {t('connectedSystemHub.subtitleClosing')}
+          </p>
+        </div>
+
         <div
-          className="relative mx-auto mt-12 hidden w-full max-w-[min(100%,760px)] md:block lg:mt-14"
+          className="relative mx-auto mt-10 hidden w-full max-w-[min(100%,760px)] md:block lg:mt-12"
           role="img"
           aria-label={t('connectedSystemHub.diagramAria')}
         >

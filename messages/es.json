@@ -4985,6 +4985,12 @@
   },
   "connectedSystemHub": {
     "title": "Un solo sistema — todo conectado en tu negocio",
+    "subtitleQuestion": "¿Por qué pagar por separado la caja, pedidos online, reservas, personal, web y stock?",
+    "subtitleVysionLine": "Con Vysion, todo desde un solo sistema y una sola pantalla.",
+    "subtitlePoint1": "Sin cinco sistemas distintos.",
+    "subtitlePoint2": "Sin varias pantallas en el mostrador.",
+    "subtitlePoint3": "Sin suscripciones aparte para cada aplicación.",
+    "subtitleClosing": "Todo lo que tu negocio necesita, conectado en una plataforma completa.",
     "centerLabel": "Vysion",
     "diagramAria": "Diagrama: un sistema central conectado con TPV, pedidos online, reservas, web, personal, stock, pantallas de cocina, informes y análisis de negocio",
     "modules": {
