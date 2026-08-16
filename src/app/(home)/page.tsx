@@ -156,15 +156,15 @@ function WhyVysionSection() {
 
           <div className="order-1 lg:order-2 relative flex w-full flex-col gap-10 self-start sm:gap-12 lg:gap-14 lg:pl-6 xl:pl-10">
             <div className="relative w-full max-w-[854px] mx-auto lg:mx-0">
-              <div className="relative aspect-[427/240] w-full overflow-hidden rounded-3xl shadow-home-photo ring-1 ring-black/[0.08] bg-[#141414]">
+              <div className="relative aspect-[1280/592] w-full overflow-hidden rounded-3xl shadow-home-photo ring-1 ring-black/[0.08] bg-[#141414]">
                 <video
-                  src="/images/sunmi-d3-pro-hd.mp4"
+                  src="/images/sunmi-d3-pro-display.mp4"
                   autoPlay
                   loop
                   muted
                   playsInline
                   preload="auto"
-                  className="absolute inset-0 h-full w-full object-cover object-center"
+                  className="absolute inset-0 h-full w-full object-contain object-center"
                   aria-label={t('whyVysion.imageAlt')}
                 />
               </div>
