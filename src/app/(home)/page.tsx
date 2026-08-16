@@ -16,7 +16,6 @@ const VysionBeestSection = dynamic(() => import('@/components/VysionBeestSection
 const HardwareSection = dynamic(() => import('@/components/HardwareSection'), { loading: () => null })
 const ContactPageSection = dynamic(() => import('@/components/ContactPageSection'), { loading: () => null })
 import { useLanguage } from '@/i18n'
-import type { Locale } from '@/i18n/config'
 import { PricingHardwareToggle } from '@/components/PricingHardwareToggle'
 import { monthlyPriceForHardware } from '@/lib/pricing-hardware'
 import HomeScrollOnLoad from '@/components/HomeScrollOnLoad'
@@ -25,50 +24,6 @@ import { WhyVysionHardwareVideos } from '@/components/HardwareVideoStack'
 
 const GRATIS_WEBSITE_EXAMPLE_HREF =
   'https://restaurantdekorf.ordervysion.com/shop/restaurantdekorf'
-
-/** Volgorde op marketing: NL → FR → EN → DE → IT → ES → JA → ZH → AR */
-const KASSA_LANGUAGES_DISPLAY_ORDER: Locale[] = [
-  'nl',
-  'fr',
-  'en',
-  'de',
-  'it',
-  'es',
-  'ja',
-  'zh',
-  'ar',
-]
-
-function KassaLanguagesBannerSection() {
-  const { t, localeNames, localeFlags } = useLanguage()
-  return (
-    <section
-      className="relative py-10 sm:py-12 bg-white border-b border-gray-100"
-      aria-labelledby="kassa-languages-heading"
-    >
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2
-          id="kassa-languages-heading"
-          className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 tracking-tight mb-8 sm:mb-10 max-w-3xl mx-auto leading-snug"
-        >
-          {t('kassaLanguagesBanner.title')}
-        </h2>
-        <ul className="flex flex-wrap items-start justify-center gap-x-4 gap-y-6 sm:gap-x-6 md:gap-x-8">
-          {KASSA_LANGUAGES_DISPLAY_ORDER.map((code) => (
-            <li key={code} className="flex w-[4.5rem] sm:w-20 flex-col items-center gap-2">
-              <span className="text-3xl sm:text-4xl leading-none" role="img" aria-hidden>
-                {localeFlags[code]}
-              </span>
-              <span className="text-[11px] sm:text-xs font-semibold text-gray-700 leading-tight text-center">
-                {localeNames[code]}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
-  )
-}
 
 function GratisWebsiteBannerSection() {
   const { t } = useLanguage()
@@ -1547,7 +1502,6 @@ export default function HomePage() {
       <Navigation />
       <HomeLandingHero />
       <WhyVysionSection />
-      <KassaLanguagesBannerSection />
       <GratisWebsiteBannerSection />
       <VysionBeestSection />
       <PlatformGridSection />
