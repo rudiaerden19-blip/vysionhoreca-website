@@ -490,7 +490,7 @@ function PromoMarqueeBand() {
             {[0, 1, 2, 3].map((i) => (
               <span
                 key={`${dup}-${i}`}
-                className="text-white font-bold text-lg sm:text-xl md:text-2xl tracking-tight whitespace-nowrap drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)]"
+                className="text-white font-bold text-lg sm:text-xl md:text-2xl tracking-tight whitespace-nowrap uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)]"
               >
                 {promoText}
               </span>
