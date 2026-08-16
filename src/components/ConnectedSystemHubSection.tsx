@@ -26,10 +26,6 @@ function hubNodePosition(index: number, total: number) {
   }
 }
 
-function connectorPath(nx: number, ny: number) {
-  return `M ${CX} ${CY} L ${nx} ${ny}`
-}
-
 function HubComputerIcon({ className }: { className?: string }) {
   return (
     <svg
