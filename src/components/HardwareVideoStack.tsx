@@ -120,22 +120,34 @@ function HardwareImageTile({
       {mounted && expanded
         ? createPortal(
             <div
-              className="fixed inset-0 z-[300] flex flex-col bg-black"
+              className="fixed inset-0 z-[10000] flex flex-col bg-black/95"
               role="dialog"
               aria-modal="true"
               aria-label={label}
+              onClick={close}
             >
-              <div className="flex shrink-0 items-center justify-end gap-2 p-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
-                <button
-                  type="button"
-                  onClick={close}
-                  className="rounded-full bg-white/15 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm hover:bg-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                >
-                  {t('ui.ariaClose')}
-                </button>
-              </div>
-              <div className="relative flex min-h-0 flex-1 items-center justify-center px-2 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-                <img src={fullSrc} alt={label} className="max-h-full max-w-full object-contain" />
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  close()
+                }}
+                className="fixed right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-[10001] flex min-h-[3rem] min-w-[3rem] items-center justify-center gap-2 rounded-full border-2 border-white/50 bg-white px-5 py-3 text-base font-bold text-gray-900 shadow-[0_8px_32px_rgba(0,0,0,0.45)] hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black sm:right-5 sm:px-6"
+              >
+                <span className="text-xl leading-none" aria-hidden>
+                  ×
+                </span>
+                <span>{t('ui.ariaClose')}</span>
+              </button>
+              <div
+                className="flex min-h-0 flex-1 items-center justify-center px-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-[max(4.5rem,env(safe-area-inset-top))]"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <img
+                  src={fullSrc}
+                  alt={label}
+                  className="h-auto max-h-[calc(100dvh-5.5rem)] w-[min(96vw,1400px)] object-contain"
+                />
               </div>
             </div>,
             document.body,
