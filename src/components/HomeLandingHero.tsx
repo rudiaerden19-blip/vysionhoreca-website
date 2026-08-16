@@ -204,7 +204,7 @@ export default function HomeLandingHero() {
 
   return (
     <section
-      className={`relative ${NAV_TOP_OFFSET_CLASS} min-h-[72svh] sm:min-h-[76svh] flex flex-col text-white overflow-x-hidden pb-6 sm:pb-8`}
+      className={`relative ${NAV_TOP_OFFSET_CLASS} min-h-[72svh] sm:min-h-[76svh] flex flex-col text-white overflow-x-hidden pb-10 sm:pb-12`}
     >
       <div className="absolute inset-x-0 top-[-5rem] bottom-0">
         <Image
@@ -278,6 +278,11 @@ export default function HomeLandingHero() {
           </p>
         ) : null}
         <HeroCtaFlipCard />
+        <p
+          className={`mt-6 sm:mt-8 max-w-2xl px-2 text-center text-xl sm:text-2xl md:text-[1.65rem] font-bold leading-snug tracking-tight ${HERO_KASSA_ACCENT}`}
+        >
+          {t('heroLanding.audienceLine')}
+        </p>
       </div>
     </section>
   )
