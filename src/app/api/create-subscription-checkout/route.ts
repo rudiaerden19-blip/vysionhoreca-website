@@ -3,17 +3,21 @@ import Stripe from 'stripe'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
 import { trackError } from '@/lib/monitoring'
+import {
+  MONTHLY_PRICE_WITHOUT_HARDWARE,
+  MONTHLY_PRICE_WITH_HARDWARE,
+} from '@/lib/pricing-hardware'
 
 // Plan pricing in cents (monthly)
 const planPrices: Record<string, number> = {
-  starter: 5900,  // €59/maand
-  pro: 6900,      // €69/maand
+  starter: 5900, // €59/maand
+  pro: MONTHLY_PRICE_WITH_HARDWARE * 100, // €99/maand met hardware (default)
 }
 
-// Plan pricing in cents (yearly = monthly * 12 * 0.9)
-const planPricesYearly: Record<string, number> = {
-  starter: 63660,  // €636.60/jaar (€59 * 12 * 0.9)
-  pro: 74520,     // €745.20/jaar (€69 * 12 * 0.9)
+function proPriceCents(withHardware: boolean, yearly: boolean): number {
+  const monthly = withHardware ? MONTHLY_PRICE_WITH_HARDWARE : MONTHLY_PRICE_WITHOUT_HARDWARE
+  if (yearly) return Math.round(monthly * 12 * 0.9 * 100)
+  return monthly * 100
 }
 
 const planNames: Record<string, string> = {
@@ -35,8 +39,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { tenantSlug, planId, billing } = await request.json()
+    const { tenantSlug, planId, billing, withHardware: withHardwareRaw } = await request.json()
     const isYearly = billing === 'yearly'
+    const withHardware = withHardwareRaw !== false
 
     if (!tenantSlug || !planId) {
       return NextResponse.json(
@@ -94,9 +99,12 @@ export async function POST(request: NextRequest) {
       .eq('tenant_slug', tenantSlug)
       .single()
 
-    const price = isYearly
-      ? (planPricesYearly[planId] || planPricesYearly.starter)
-      : (planPrices[planId] || planPrices.starter)
+    const price =
+      planId === 'pro'
+        ? proPriceCents(withHardware, isYearly)
+        : isYearly
+          ? Math.round((planPrices.starter / 100) * 12 * 0.9 * 100)
+          : planPrices.starter
     const planName = planNames[planId] || planNames.starter
 
     // Initialize Stripe

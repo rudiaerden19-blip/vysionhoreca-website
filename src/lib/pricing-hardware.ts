@@ -1,5 +1,5 @@
 export const MONTHLY_PRICE_WITHOUT_HARDWARE = 69
-export const MONTHLY_PRICE_WITH_HARDWARE = 69
+export const MONTHLY_PRICE_WITH_HARDWARE = 99
 
 export function monthlyPriceForHardware(withHardware: boolean): number {
   return withHardware ? MONTHLY_PRICE_WITH_HARDWARE : MONTHLY_PRICE_WITHOUT_HARDWARE
