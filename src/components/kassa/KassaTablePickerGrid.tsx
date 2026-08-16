@@ -33,6 +33,10 @@ function lineCountFor(
   return orders[tableOrderMapKey(zone, nr)]?.length ?? 0
 }
 
+function tableNumbersEqual(a: string, b: string | number): boolean {
+  return String(a).trim() === String(b).trim()
+}
+
 export function KassaTablePickerGrid({
   zone,
   tables,
@@ -50,7 +54,6 @@ export function KassaTablePickerGrid({
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const dragActiveRef = useRef(false)
   const suppressClickRef = useRef(false)
-  const pointerIdRef = useRef<number | null>(null)
 
   const clearLongPress = useCallback(() => {
     if (longPressTimerRef.current) {
@@ -59,33 +62,39 @@ export function KassaTablePickerGrid({
     }
   }, [])
 
+  const blockClickBriefly = useCallback(() => {
+    suppressClickRef.current = true
+    window.setTimeout(() => {
+      suppressClickRef.current = false
+    }, 400)
+  }, [])
+
   const finishDrag = useCallback(
     (clientX: number, clientY: number) => {
       const from = dragFrom
       setDragFrom(null)
       setDropOver(null)
       dragActiveRef.current = false
-      pointerIdRef.current = null
       if (!from) return
       const targetEl = document.elementFromPoint(clientX, clientY)?.closest(
         '[data-kassa-table-nr]',
       ) as HTMLElement | null
       const to = targetEl?.getAttribute('data-kassa-table-nr')
       if (!to || to === from) return
-      suppressClickRef.current = true
+      blockClickBriefly()
       onTransferTable(from, to)
-      window.setTimeout(() => {
-        suppressClickRef.current = false
-      }, 120)
     },
-    [dragFrom, onTransferTable],
+    [dragFrom, onTransferTable, blockClickBriefly],
   )
 
+  const handleSelectClick = (tableNr: string) => {
+    if (suppressClickRef.current || dragActiveRef.current) return
+    onSelectTable(tableNr)
+  }
+
   const onTilePointerDown = (tableNr: string, canDragTile: boolean, e: ReactPointerEvent) => {
-    if (e.button !== 0) return
+    if (!canDragTile || e.button !== 0) return
     clearLongPress()
-    pointerIdRef.current = e.pointerId
-    if (!canDragTile) return
     const target = e.currentTarget
     longPressTimerRef.current = setTimeout(() => {
       longPressTimerRef.current = null
@@ -108,36 +117,25 @@ export function KassaTablePickerGrid({
     setDropOver(nr && nr !== dragFrom ? nr : null)
   }
 
-  const onTilePointerUp = (tableNr: string, e: ReactPointerEvent) => {
+  const onTilePointerUp = (e: ReactPointerEvent) => {
     clearLongPress()
-    if (dragActiveRef.current) {
-      e.preventDefault()
-      finishDrag(e.clientX, e.clientY)
-      try {
-        e.currentTarget.releasePointerCapture(e.pointerId)
-      } catch {
-        /* ignore */
-      }
-      pointerIdRef.current = null
-      return
+    if (!dragActiveRef.current) return
+    e.preventDefault()
+    blockClickBriefly()
+    finishDrag(e.clientX, e.clientY)
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId)
+    } catch {
+      /* ignore */
     }
-    if (suppressClickRef.current) {
-      e.preventDefault()
-      pointerIdRef.current = null
-      return
-    }
-    if (pointerIdRef.current === e.pointerId) {
-      onSelectTable(tableNr)
-    }
-    pointerIdRef.current = null
   }
 
   const onTilePointerCancel = () => {
     clearLongPress()
+    if (dragActiveRef.current) blockClickBriefly()
     setDragFrom(null)
     setDropOver(null)
     dragActiveRef.current = false
-    pointerIdRef.current = null
   }
 
   const tableTileClass = (tbl: FloorPlanTable, nr: string) => {
@@ -146,7 +144,7 @@ export function KassaTablePickerGrid({
     const base = `relative touch-manipulation rounded-xl border-2 py-4 font-bold transition-colors active:brightness-95 select-none ${
       isDrop ? 'ring-2 ring-orange-400 ring-offset-2 scale-[1.02]' : ''
     } ${isDragging ? 'opacity-60 scale-95' : ''}`
-    if (activeTableNumber === tbl.number && activeZone === zone) {
+    if (tableNumbersEqual(activeTableNumber, tbl.number) && activeZone === zone) {
       return `${base} border-[#3C4D6B] bg-[#3C4D6B] text-white`
     }
     if (tbl.status === 'FREE') {
@@ -164,7 +162,7 @@ export function KassaTablePickerGrid({
     const base = `relative touch-manipulation rounded-xl border-2 py-4 font-bold transition-colors active:brightness-95 select-none ${
       isDrop ? 'ring-2 ring-orange-400 ring-offset-2 scale-[1.02]' : ''
     } ${isDragging ? 'opacity-60 scale-95' : ''}`
-    if (activeTableNumber === stoolNr && activeZone === zone) {
+    if (tableNumbersEqual(activeTableNumber, stoolNr) && activeZone === zone) {
       return `${base} border-[#3C4D6B] bg-[#3C4D6B] text-white`
     }
     if (occupied) {
@@ -172,6 +170,16 @@ export function KassaTablePickerGrid({
     }
     return `${base} border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100`
   }
+
+  const dragPointerProps = (tableNr: string, canDragTile: boolean) =>
+    canDragTile
+      ? {
+          onPointerDown: (e: ReactPointerEvent) => onTilePointerDown(tableNr, true, e),
+          onPointerMove: onTilePointerMove,
+          onPointerUp: onTilePointerUp,
+          onPointerCancel: onTilePointerCancel,
+        }
+      : {}
 
   return (
     <>
@@ -189,10 +197,8 @@ export function KassaTablePickerGrid({
                 key={tbl.id}
                 type="button"
                 data-kassa-table-nr={nr}
-                onPointerDown={(e) => onTilePointerDown(nr, canDragTile, e)}
-                onPointerMove={onTilePointerMove}
-                onPointerUp={(e) => onTilePointerUp(nr, e)}
-                onPointerCancel={onTilePointerCancel}
+                onClick={() => handleSelectClick(nr)}
+                {...dragPointerProps(nr, canDragTile)}
                 className={tableTileClass(tbl, nr)}
               >
                 <div className="text-lg">{tbl.number}</div>
@@ -230,10 +236,8 @@ export function KassaTablePickerGrid({
                   key={s.segmentId + s.stoolNumber}
                   type="button"
                   data-kassa-table-nr={nr}
-                  onPointerDown={(e) => onTilePointerDown(nr, canDragTile, e)}
-                  onPointerMove={onTilePointerMove}
-                  onPointerUp={(e) => onTilePointerUp(nr, e)}
-                  onPointerCancel={onTilePointerCancel}
+                  onClick={() => handleSelectClick(nr)}
+                  {...dragPointerProps(nr, canDragTile)}
                   className={stoolTileClass(nr, openLines > 0)}
                 >
                   <div className="text-lg">{s.stoolNumber}</div>
