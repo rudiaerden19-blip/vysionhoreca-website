@@ -19,11 +19,15 @@ export const BEEST_HARDWARE_VIDEOS: HardwareVideoConfig[] = [
     altKey: 'whyVysion.videoAltSunmi',
   },
   {
-    src: '/images/epson-mseries-receipt-printers.mp4',
+    src: '/images/epson-mseries-receipt-printers-inline.mp4',
+    fullSrc: '/images/epson-mseries-receipt-printers.mp4',
+    poster: '/images/epson-mseries-receipt-printers-poster.jpg',
     altKey: 'whyVysion.videoAltEpson',
   },
   {
-    src: '/images/elopos-video.mp4',
+    src: '/images/elopos-video-inline.mp4',
+    fullSrc: '/images/elopos-video-display.mp4',
+    poster: '/images/elopos-video-poster.jpg',
     altKey: 'whyVysion.videoAltEloPOS',
   },
 ]
@@ -45,18 +49,19 @@ export const WHY_VYSION_HARDWARE_VIDEOS: HardwareVideoConfig[] = [
 
 function HardwareVideoTile({
   item,
-  eagerPreload,
   tileClassName,
   labelClassName,
+  fetchPriority,
 }: {
   item: HardwareVideoConfig
-  eagerPreload: boolean
   tileClassName?: string
   labelClassName?: string
+  fetchPriority?: 'high' | 'low' | 'auto'
 }) {
   const { t } = useLanguage()
   const [expanded, setExpanded] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const tileRef = useRef<HTMLButtonElement>(null)
   const inlineRef = useRef<HTMLVideoElement>(null)
   const modalRef = useRef<HTMLVideoElement>(null)
   const fullSrc = item.fullSrc ?? item.src
@@ -64,6 +69,39 @@ function HardwareVideoTile({
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  useEffect(() => {
+    const tile = tileRef.current
+    const video = inlineRef.current
+    if (!tile || !video) return
+
+    const tryPlay = () => {
+      void video.play().catch(() => {})
+    }
+
+    video.addEventListener('loadeddata', tryPlay)
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+            tryPlay()
+          } else {
+            video.load()
+          }
+        } else {
+          video.pause()
+        }
+      },
+      { rootMargin: '320px 0px', threshold: 0.01 },
+    )
+    io.observe(tile)
+
+    return () => {
+      video.removeEventListener('loadeddata', tryPlay)
+      io.disconnect()
+    }
+  }, [item.src])
 
   const close = useCallback(() => {
     const modal = modalRef.current
@@ -119,6 +157,7 @@ function HardwareVideoTile({
   return (
     <>
       <button
+        ref={tileRef}
         type="button"
         onClick={open}
         className={tileClass}
@@ -132,7 +171,9 @@ function HardwareVideoTile({
           loop
           muted
           playsInline
-          preload={eagerPreload ? 'auto' : 'metadata'}
+          preload="auto"
+          // @ts-expect-error fetchPriority is valid on video in modern browsers
+          fetchPriority={fetchPriority ?? 'auto'}
           className="pointer-events-none absolute inset-0 h-full w-full object-contain object-center"
           aria-hidden
         />
@@ -199,7 +240,7 @@ export function HardwareVideoStack({
         <HardwareVideoTile
           key={item.src}
           item={item}
-          eagerPreload={index === 0}
+          fetchPriority={index < 2 ? 'high' : 'auto'}
           tileClassName={getTileClassName?.(index)}
           labelClassName={labelClassName}
         />
