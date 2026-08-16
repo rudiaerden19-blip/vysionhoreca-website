@@ -5096,7 +5096,7 @@
     },
     "bestelplatform": {
       "title": "Plataforma de pedidos",
-      "teaser": "Los clientes piden directo con usted — sin marketplace que cobre comisión.",
+      "teaser": "Los clientes piden directo con usted, sin marketplace que cobre comisión.",
       "body": "Recogida, entrega y en sala pasan por su web con su marca. Los pedidos llegan ordenados al TPV y pantallas de cocina.\n\nGestione mejor los picos y conserve todo el margen en ventas online.",
       "heroAlt": "Smartphone pidiendo comida online en una mesa, portátil al fondo",
       "featuresTitle": "Su stack de pedidos",
@@ -5151,12 +5151,12 @@
     },
     "reservaties": {
       "title": "Reservas",
-      "teaser": "Reservas de restaurante. Sin coger el teléfono — lo configuras según tus necesidades.",
+      "teaser": "Reservas de restaurante. Sin coger el teléfono, lo configuras según tus necesidades.",
       "body": "Los clientes reservan online; usted ve quién viene y cuándo. Planifique servicio y equipo con claridad.\n\nConfirmaciones y mensajes reducen inasistencias."
     },
     "eigenWebsite": {
       "title": "Su propia web",
-      "teaser": "Web propia con su imagen: colores, fotos y textos — tal como usted quiera.",
+      "teaser": "Web propia con su imagen: colores, fotos y textos, tal como usted quiera.",
       "body": "No es una landing genérica: su logo, colores y fotos. El cliente reconoce su negocio al instante.\n\nWeb y carta desde el mismo admin que el resto de Vysion kassa's."
     },
     "whatsappBestellingen": {
@@ -5166,7 +5166,7 @@
     },
     "loonadministratie": {
       "title": "Nóminas y RR.HH.",
-      "teaser": "Horas, nóminas, fichar entrada y salida, gastos de viaje, contratos — todo bajo un mismo techo.",
+      "teaser": "Horas, nóminas, fichar entrada y salida, gastos de viaje, contratos, todo bajo un mismo techo.",
       "body": "Las horas registradas forman parte del día a día. Enlace con la planificación y evite hojas de cálculo manuales.\n\nCostes más previsibles y cierres de periodo más claros."
     },
     "bedrijfsanalyse": {

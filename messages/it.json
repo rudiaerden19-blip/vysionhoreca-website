@@ -5096,7 +5096,7 @@
     },
     "bestelplatform": {
       "title": "Piattaforma ordini",
-      "teaser": "I clienti ordinano direttamente da te — niente marketplace che trattiene commissioni.",
+      "teaser": "I clienti ordinano direttamente da te, niente marketplace che trattiene commissioni.",
       "body": "Asporto, consegna e al tavolo passano dal tuo sito con il tuo brand. Gli ordini arrivano ordinati su cassa e display cucina.\n\nGestisci meglio i picchi e tieni tutto il margine sulle vendite online.",
       "heroAlt": "Smartphone che ordina cibo online a tavola, laptop sullo sfondo",
       "featuresTitle": "Il tuo stack ordini",
@@ -5151,12 +5151,12 @@
     },
     "reservaties": {
       "title": "Prenotazioni",
-      "teaser": "Prenotazioni ristorante. Niente più telefonate — lo imposti come preferisci.",
+      "teaser": "Prenotazioni ristorante. Niente più telefonate, lo imposti come preferisci.",
       "body": "Gli ospiti prenotano online; tu vedi chi arriva e quando. Pianifica servizio e turni con chiarezza.\n\nConferme e messaggi riduono i no-show."
     },
     "eigenWebsite": {
       "title": "Il tuo sito web",
-      "teaser": "Sito in stile del tuo brand: colori, foto e testi — come lo vuoi tu.",
+      "teaser": "Sito in stile del tuo brand: colori, foto e testi, come lo vuoi tu.",
       "body": "Non una landing generica: logo, colori e foto tue. Il cliente riconosce subito l’attività.\n\nSito e menu dallo stesso admin del resto di Vysion kassa's."
     },
     "whatsappBestellingen": {
@@ -5166,7 +5166,7 @@
     },
     "loonadministratie": {
       "title": "Paghe e HR",
-      "teaser": "Ore, paghe, timbrature entrata/uscita, spese di viaggio, contratti — tutto sotto lo stesso tetto.",
+      "teaser": "Ore, paghe, timbrature entrata/uscita, spese di viaggio, contratti, tutto sotto lo stesso tetto.",
       "body": "Le ore registrate fanno parte del quotidiano. Collega la pianificazione e evita fogli di calcolo manuali.\n\nCosti più prevedibili e chiusure periodo più chiare."
     },
     "bedrijfsanalyse": {

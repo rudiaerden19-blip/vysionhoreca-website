@@ -5119,7 +5119,7 @@
     },
     "bestelplatform": {
       "title": "Plateforme de commande",
-      "teaser": "Les clients commandent directement chez vous — sans intermédiaire qui prend une commission.",
+      "teaser": "Les clients commandent directement chez vous, sans intermédiaire qui prend une commission.",
       "body": "À emporter, livraison et sur place passent par votre site à votre image. Les commandes arrivent proprement sur la caisse et les écrans cuisine.\n\nMieux gérez les pics d’activité et gardez toute la marge sur vos ventes en ligne.",
       "heroAlt": "Smartphone pour commander en ligne, table et ordinateur en arrière-plan",
       "featuresTitle": "Votre stack de commande",
@@ -5174,12 +5174,12 @@
     },
     "reservaties": {
       "title": "Réservations",
-      "teaser": "Réservations restaurant. Plus de téléphone — vous configurez tout selon vos besoins.",
+      "teaser": "Réservations restaurant. Plus de téléphone, vous configurez tout selon vos besoins.",
       "body": "Les clients réservent en ligne ; vous voyez qui arrive et quand. Planifiez service et équipe avec une vue claire.\n\nConfirmations et messages réduisent les no-shows."
     },
     "eigenWebsite": {
       "title": "Votre propre site",
-      "teaser": "Votre site aux couleurs de votre marque : photos et textes — exactement comme vous voulez.",
+      "teaser": "Votre site aux couleurs de votre marque : photos et textes, exactement comme vous voulez.",
       "body": "Pas une landing générique : votre logo, couleurs et photos. Vos clients reconnaissent tout de suite votre établissement.\n\nSite et menu depuis le même admin que le reste de Vysion kassa's."
     },
     "whatsappBestellingen": {
@@ -5189,7 +5189,7 @@
     },
     "loonadministratie": {
       "title": "Paie et RH",
-      "teaser": "Heures, paie, pointage entrée/sortie, frais de déplacement, contrats — tout sous un même toit.",
+      "teaser": "Heures, paie, pointage entrée/sortie, frais de déplacement, contrats, tout sous un même toit.",
       "body": "Les heures suivies font partie du quotidien. Liez au planning et évitez les tableurs manuels.\n\nCoûts plus prévisibles et clôture de période plus simple."
     },
     "bedrijfsanalyse": {

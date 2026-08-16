@@ -5119,7 +5119,7 @@
     },
     "bestelplatform": {
       "title": "Bestellplattform",
-      "teaser": "Gäste bestellen direkt bei Ihnen — ohne Marktplatz, der Provision nimmt.",
+      "teaser": "Gäste bestellen direkt bei Ihnen, ohne Marktplatz, der Provision nimmt.",
       "body": "Abholung, Lieferung und Vor-Ort laufen über Ihre eigene Marke. Bestellungen landen sauber auf Kasse und Küchendisplay.\n\nSie bewältigen Stoßzeiten besser und behalten die volle Marge beim Online-Umsatz.",
       "heroAlt": "Smartphone mit Online-Bestellung am Tisch, Laptop im Hintergrund",
       "featuresTitle": "Ihr Bestell-Stack",
@@ -5174,12 +5174,12 @@
     },
     "reservaties": {
       "title": "Reservierungen",
-      "teaser": "Restaurantreservierungen. Kein Telefon mehr — Sie richten alles nach Ihren Bedürfnissen ein.",
+      "teaser": "Restaurantreservierungen. Kein Telefon mehr, Sie richten alles nach Ihren Bedürfnissen ein.",
       "body": "Gäste buchen online; Sie sehen, wer wann kommt. Planen Sie Service und Personal mit klarem Überblick.\n\nBestätigungen und Nachrichten reduzieren No-Shows."
     },
     "eigenWebsite": {
       "title": "Eigene Website",
-      "teaser": "Eigene Website in Ihrem Stil: Farben, Fotos und Texte — ganz wie Sie es möchten.",
+      "teaser": "Eigene Website in Ihrem Stil: Farben, Fotos und Texte, ganz wie Sie es möchten.",
       "body": "Keine generische Zwischenseite: Ihr Logo, Farben und Fotos. Gäste erkennen Ihren Betrieb sofort.\n\nWebsite und Menü aus demselben Admin wie der Rest von Vysion kassa's."
     },
     "whatsappBestellingen": {
@@ -5189,7 +5189,7 @@
     },
     "loonadministratie": {
       "title": "Lohn & Personal",
-      "teaser": "Stunden, Lohn, Ein- und Ausstempeln, Reisekosten, Verträge — alles unter einem Dach.",
+      "teaser": "Stunden, Lohn, Ein- und Ausstempeln, Reisekosten, Verträge, alles unter einem Dach.",
       "body": "Erfasste Stunden gehören in den Alltag. Mit Planung verknüpfen und manuelle Tabellen vermeiden.\n\nKosten bleiben planbar, Periodenabschluss wird klarer."
     },
     "bedrijfsanalyse": {
@@ -5199,7 +5199,7 @@
     },
     "rapporten": {
       "title": "Berichte",
-      "teaser": "Alle Berichte täglich in Ihrem Postfach: Z-Berichte, Tagesberichte. Alles direkt an Ihren Buchhalter — ohne Aufwand.",
+      "teaser": "Alle Berichte täglich in Ihrem Postfach: Z-Berichte, Tagesberichte. Alles direkt an Ihren Buchhalter, ohne Aufwand.",
       "body": "Z-Berichte, Tagesübersichten und Auswertungen kommen automatisch per E-Mail. Weiterleitung an den Buchhalter mit einem Klick — kein manueller Export.",
       "cardHeaderAlt": "Berichte und E-Mail an Buchhalter"
     },
