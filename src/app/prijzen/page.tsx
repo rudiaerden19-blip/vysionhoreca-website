@@ -5,7 +5,11 @@ import React, { useState } from 'react'
 import { Navigation, Footer, CookieBanner } from '@/components'
 import { PricingHardwareToggle } from '@/components/PricingHardwareToggle'
 import { useLanguage } from '@/i18n'
-import { displayPrice, monthlyPriceForHardware } from '@/lib/pricing-hardware'
+import {
+  displayPrice,
+  monthlyPriceForHardware,
+  MONTHLY_PRICE_WITH_HARDWARE,
+} from '@/lib/pricing-hardware'
 
 export default function PrijzenPage() {
   const { t, locale } = useLanguage()
@@ -13,7 +17,7 @@ export default function PrijzenPage() {
   const [isYearly, setIsYearly] = useState(false)
 
   const starterMonthly = monthlyPriceForHardware(withHardware)
-  const proMonthly = 99
+  const proMonthly = MONTHLY_PRICE_WITH_HARDWARE
   const starterPrice = displayPrice(starterMonthly, isYearly)
   const proPrice = displayPrice(proMonthly, isYearly)
   const periodLabel = isYearly ? t('pricing.perYear') : t('pricing.perMonth')

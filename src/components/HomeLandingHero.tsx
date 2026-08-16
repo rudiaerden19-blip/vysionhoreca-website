@@ -7,7 +7,11 @@ import MarketingStartAndDemoButtons from '@/components/MarketingStartAndDemoButt
 import SubscriptionsTermsPopup from './SubscriptionsTermsPopup'
 import KassaProductNavMenu from './KassaProductNavMenu'
 import GoogleReviewsHeroBadge from './GoogleReviewsHeroBadge'
-import { monthlyPriceForHardware } from '@/lib/pricing-hardware'
+import {
+  monthlyPriceForHardware,
+  MONTHLY_PRICE_WITHOUT_HARDWARE,
+  MONTHLY_PRICE_WITH_HARDWARE,
+} from '@/lib/pricing-hardware'
 
 const HERO_BG = '/images/hero-header.png'
 
@@ -98,7 +102,9 @@ function HeroCtaFlipCard() {
               onClick={() => setWithHardware(false)}
               className={hardwareToggleBtn(!withHardware)}
             >
-              <span className="text-sm sm:text-base font-bold tabular-nums leading-none">€69</span>
+              <span className="text-sm sm:text-base font-bold tabular-nums leading-none">
+                €{MONTHLY_PRICE_WITHOUT_HARDWARE}
+              </span>
               <span className="text-[0.6rem] sm:text-[0.65rem] font-semibold leading-tight text-balance px-0.5">
                 {t('pricing.hardwareWithout')}
               </span>
@@ -108,7 +114,9 @@ function HeroCtaFlipCard() {
               onClick={() => setWithHardware(true)}
               className={hardwareToggleBtn(withHardware)}
             >
-              <span className="text-sm sm:text-base font-bold tabular-nums leading-none">€99</span>
+              <span className="text-sm sm:text-base font-bold tabular-nums leading-none">
+                €{MONTHLY_PRICE_WITH_HARDWARE}
+              </span>
               <span className="text-[0.6rem] sm:text-[0.65rem] font-semibold leading-tight text-balance px-0.5">
                 {t('pricing.hardwareWith')}
               </span>
