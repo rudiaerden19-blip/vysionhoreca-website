@@ -159,7 +159,9 @@
     "ctaOurRegisters": "我们的收银机",
     "premiumIncludedTf30": "Elo touchscreen",
     "premiumIncludedPrinterX40": "Epson printers",
-    "premiumIncludedLade": "电动钱箱"
+    "premiumIncludedLade": "电动钱箱",
+    "premiumIncludedKeukenschermen": "厨房屏幕",
+    "premiumIncludedHandhelds": "手持设备"
   },
   "newAtVysion": {
     "title": "自由组合您的套餐",

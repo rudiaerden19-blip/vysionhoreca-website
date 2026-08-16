@@ -241,7 +241,9 @@
     "ctaOurRegisters": "Our POS systems",
     "premiumIncludedTf30": "Elo touchscreen",
     "premiumIncludedPrinterX40": "Epson printers",
-    "premiumIncludedLade": "electric cash drawer"
+    "premiumIncludedLade": "electric cash drawer",
+    "premiumIncludedKeukenschermen": "kitchen displays",
+    "premiumIncludedHandhelds": "handhelds"
   },
   "newAtVysion": {
     "title": "Build your own package",

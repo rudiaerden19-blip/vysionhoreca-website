@@ -20,8 +20,7 @@ const HARDWARE_ITEMS = [
   },
   { src: '/images/hardware/hardware-8.png', model: 'Terra i9' },
   { src: '/images/hardware/hardware-vm20-sunmi.png', model: 'vm20' },
-  { src: '/images/hardware/vysion-kassa-demo.png', model: 'Handhelds' },
-  { src: '/images/hardware/hardware-11-vt11-kiosk.png', model: 'Barcode scanners' },
+  { src: '/images/hardware/hardware-11-vt11-kiosk.png', model: 'barcode scanners' },
   {
     src: '/images/hardware/hardware-printer-epson.png',
     labelKey: 'premiumIncludedPrinterX40' as const,
@@ -30,6 +29,8 @@ const HARDWARE_ITEMS = [
 
 const HARDWARE_PREMIUM_INCLUDED = [
   { src: '/images/hardware/hardware-premium-lade.png', labelKey: 'premiumIncludedLade' as const },
+  { src: '/images/hardware/hardware-keukenscherm.png', labelKey: 'premiumIncludedKeukenschermen' as const },
+  { src: '/images/hardware/hardware-handheld.png', labelKey: 'premiumIncludedHandhelds' as const },
 ] as const
 
 function hardwareLabel(item: (typeof HARDWARE_ITEMS)[number] | (typeof HARDWARE_PREMIUM_INCLUDED)[number], t: (key: string) => string): string {

@@ -159,7 +159,9 @@
     "ctaOurRegisters": "Nos caisses",
     "premiumIncludedTf30": "Elo touchscreen",
     "premiumIncludedPrinterX40": "Epson printers",
-    "premiumIncludedLade": "tiroir-caisse électrique"
+    "premiumIncludedLade": "tiroir-caisse électrique",
+    "premiumIncludedKeukenschermen": "écrans cuisine",
+    "premiumIncludedHandhelds": "handhelds"
   },
   "newAtVysion": {
     "title": "Composez votre forfait vous-même",

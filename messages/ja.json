@@ -159,7 +159,9 @@
     "ctaOurRegisters": "レジ端末一覧",
     "premiumIncludedTf30": "Elo touchscreen",
     "premiumIncludedPrinterX40": "Epson printers",
-    "premiumIncludedLade": "電動キャッシュドロア"
+    "premiumIncludedLade": "電動キャッシュドロア",
+    "premiumIncludedKeukenschermen": "キッチン画面",
+    "premiumIncludedHandhelds": "ハンドヘルド"
   },
   "newAtVysion": {
     "title": "パッケージを自由に組み立て",
