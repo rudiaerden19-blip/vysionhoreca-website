@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { Fragment } from 'react'
 import { useLanguage } from '@/i18n'
 
-const HUB_CENTER_IMAGE = '/images/hardware/connected-hub-sunmi-center-dark.png'
+const HUB_CENTER_IMAGE = '/images/hardware/connected-hub-hbapos-center-dark.png'
 
 /** Merk-blauw (`tailwind accent`) — hub-lijnen en gloed. */
 const HUB_ACCENT = '#0E5D82'
@@ -130,7 +130,7 @@ export default function ConnectedSystemHubSection() {
                     alt={centerAlt}
                     fill
                     priority
-                    className="object-contain object-center p-[4%]"
+                    className="object-cover object-[center_42%] scale-[1.05]"
                     sizes="(min-width: 768px) 280px, 0px"
                   />
                 </div>
@@ -176,7 +176,7 @@ export default function ConnectedSystemHubSection() {
                   alt={centerAlt}
                   fill
                   priority
-                  className="object-contain object-center p-[4%]"
+                  className="object-cover object-[center_42%] scale-[1.05]"
                   sizes="280px"
                 />
               </div>
