@@ -21,7 +21,7 @@ const HARDWARE_ITEMS = [
   { src: '/images/hardware/hardware-8.png', model: 'Terra i9' },
   { src: '/images/hardware/hardware-vm20-sunmi.png', model: 'vm20' },
   { src: '/images/hardware/vysion-kassa-demo.png', model: 'Handhelds' },
-  { src: '/images/hardware/hardware-11-vt11-kiosk.png', model: 'vt 11 kiosk' },
+  { src: '/images/hardware/hardware-11-vt11-kiosk.png', model: 'Barcode scanners' },
   {
     src: '/images/hardware/hardware-printer-epson.png',
     labelKey: 'premiumIncludedPrinterX40' as const,
