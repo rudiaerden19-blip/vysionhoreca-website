@@ -1,5 +1,6 @@
 'use client'
 
+import { scheduleHardwareInlineLoad } from '@/lib/hardware-video-load-queue'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useLanguage } from '@/i18n'
@@ -51,57 +52,74 @@ function HardwareVideoTile({
   item,
   tileClassName,
   labelClassName,
-  fetchPriority,
+  loadImmediately,
 }: {
   item: HardwareVideoConfig
   tileClassName?: string
   labelClassName?: string
-  fetchPriority?: 'high' | 'low' | 'auto'
+  /** Eerste zichtbare tegel op de pagina — start download meteen (via queue). */
+  loadImmediately?: boolean
 }) {
   const { t } = useLanguage()
   const [expanded, setExpanded] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [inlineSrc, setInlineSrc] = useState<string | null>(null)
+  const [isPlaying, setIsPlaying] = useState(false)
   const tileRef = useRef<HTMLButtonElement>(null)
   const inlineRef = useRef<HTMLVideoElement>(null)
   const modalRef = useRef<HTMLVideoElement>(null)
+  const queuedRef = useRef(false)
   const fullSrc = item.fullSrc ?? item.src
+
+  const requestInlineSrc = useCallback(() => {
+    if (queuedRef.current) return
+    queuedRef.current = true
+    scheduleHardwareInlineLoad(() => setInlineSrc(item.src))
+  }, [item.src])
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
   useEffect(() => {
+    if (loadImmediately) requestInlineSrc()
+  }, [loadImmediately, requestInlineSrc])
+
+  useEffect(() => {
+    if (loadImmediately) return
     const tile = tileRef.current
-    const video = inlineRef.current
-    if (!tile || !video) return
-
-    const tryPlay = () => {
-      void video.play().catch(() => {})
-    }
-
-    video.addEventListener('loadeddata', tryPlay)
+    if (!tile) return
 
     const io = new IntersectionObserver(
       ([entry]) => {
-        if (entry?.isIntersecting) {
-          if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-            tryPlay()
-          } else {
-            video.load()
-          }
-        } else {
-          video.pause()
-        }
+        if (entry?.isIntersecting) requestInlineSrc()
       },
-      { rootMargin: '320px 0px', threshold: 0.01 },
+      { rootMargin: '80px 0px', threshold: 0.05 },
     )
     io.observe(tile)
+    return () => io.disconnect()
+  }, [loadImmediately, requestInlineSrc])
+
+  useEffect(() => {
+    const video = inlineRef.current
+    if (!video || !inlineSrc) return
+
+    const onPlaying = () => setIsPlaying(true)
+    const onCanPlay = () => {
+      void video.play().catch(() => {})
+    }
+
+    video.addEventListener('playing', onPlaying)
+    video.addEventListener('canplay', onCanPlay)
+    if (video.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
+      onCanPlay()
+    }
 
     return () => {
-      video.removeEventListener('loadeddata', tryPlay)
-      io.disconnect()
+      video.removeEventListener('playing', onPlaying)
+      video.removeEventListener('canplay', onCanPlay)
     }
-  }, [item.src])
+  }, [inlineSrc])
 
   const close = useCallback(() => {
     const modal = modalRef.current
@@ -163,20 +181,30 @@ function HardwareVideoTile({
         className={tileClass}
         aria-label={`${label}. ${t('whyVysion.videoTapToEnlarge')}`}
       >
-        <video
-          ref={inlineRef}
-          src={item.src}
-          poster={item.poster}
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="auto"
-          // @ts-expect-error fetchPriority is valid on video in modern browsers
-          fetchPriority={fetchPriority ?? 'auto'}
-          className="pointer-events-none absolute inset-0 h-full w-full object-contain object-center"
-          aria-hidden
-        />
+        {item.poster ? (
+          <img
+            src={item.poster}
+            alt=""
+            className={`pointer-events-none absolute inset-0 h-full w-full object-contain object-center transition-opacity duration-150 ${
+              isPlaying ? 'opacity-0' : 'opacity-100'
+            }`}
+            aria-hidden
+            decoding="async"
+            fetchPriority={loadImmediately ? 'high' : 'auto'}
+          />
+        ) : null}
+        {inlineSrc ? (
+          <video
+            ref={inlineRef}
+            src={inlineSrc}
+            loop
+            muted
+            playsInline
+            preload="auto"
+            className="pointer-events-none absolute inset-0 h-full w-full object-contain object-center"
+            aria-hidden
+          />
+        ) : null}
         <span
           className={
             labelClassName ??
@@ -228,11 +256,13 @@ export function HardwareVideoStack({
   stackClassName = 'flex w-full max-w-[854px] flex-col gap-6 sm:gap-8 mx-auto lg:mx-0',
   getTileClassName,
   labelClassName,
+  priorityFirstVideo = false,
 }: {
   videos: HardwareVideoConfig[]
   stackClassName?: string
   getTileClassName?: (index: number) => string | undefined
   labelClassName?: string
+  priorityFirstVideo?: boolean
 }) {
   return (
     <div className={stackClassName}>
@@ -240,7 +270,7 @@ export function HardwareVideoStack({
         <HardwareVideoTile
           key={item.src}
           item={item}
-          fetchPriority={index < 2 ? 'high' : 'auto'}
+          loadImmediately={priorityFirstVideo && index === 0}
           tileClassName={getTileClassName?.(index)}
           labelClassName={labelClassName}
         />
@@ -250,5 +280,18 @@ export function HardwareVideoStack({
 }
 
 export function WhyVysionHardwareVideos() {
-  return <HardwareVideoStack videos={WHY_VYSION_HARDWARE_VIDEOS} />
+  useEffect(() => {
+    const href = WHY_VYSION_HARDWARE_VIDEOS[0]?.src
+    if (!href) return
+    const link = document.createElement('link')
+    link.rel = 'preload'
+    link.as = 'video'
+    link.href = href
+    document.head.appendChild(link)
+    return () => {
+      link.remove()
+    }
+  }, [])
+
+  return <HardwareVideoStack videos={WHY_VYSION_HARDWARE_VIDEOS} priorityFirstVideo />
 }
