@@ -4,9 +4,20 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useLanguage } from '@/i18n'
 
-export const WHY_VYSION_HARDWARE_VIDEOS = [
+type WhyVysionVideoConfig = {
+  /** Lightweight preview in the tile (autoplay). */
+  src: string
+  altKey: string
+  /** Full file with audio for fullscreen; defaults to `src`. */
+  fullSrc?: string
+  poster?: string
+}
+
+export const WHY_VYSION_HARDWARE_VIDEOS: WhyVysionVideoConfig[] = [
   {
-    src: '/images/sunmi-d3-pro-display.mp4',
+    src: '/images/sunmi-d3-pro-inline.mp4',
+    fullSrc: '/images/sunmi-d3-pro-display.mp4',
+    poster: '/images/sunmi-d3-pro-poster.jpg',
     altKey: 'whyVysion.videoAltSunmi',
   },
   {
@@ -17,16 +28,15 @@ export const WHY_VYSION_HARDWARE_VIDEOS = [
     src: '/images/elopos-video.mp4',
     altKey: 'whyVysion.videoAltEloPOS',
   },
-] as const
+]
 
-type VideoItem = (typeof WHY_VYSION_HARDWARE_VIDEOS)[number]
-
-function HardwareVideoTile({ item }: { item: VideoItem }) {
+function HardwareVideoTile({ item, eagerPreload }: { item: WhyVysionVideoConfig; eagerPreload: boolean }) {
   const { t } = useLanguage()
   const [expanded, setExpanded] = useState(false)
   const [mounted, setMounted] = useState(false)
   const inlineRef = useRef<HTMLVideoElement>(null)
   const modalRef = useRef<HTMLVideoElement>(null)
+  const fullSrc = item.fullSrc ?? item.src
 
   useEffect(() => {
     setMounted(true)
@@ -56,10 +66,14 @@ function HardwareVideoTile({ item }: { item: VideoItem }) {
     const inline = inlineRef.current
     const modal = modalRef.current
     if (!modal) return
-    if (inline) modal.currentTime = inline.currentTime
+    if (inline && fullSrc === item.src) {
+      modal.currentTime = inline.currentTime
+    } else {
+      modal.currentTime = 0
+    }
     modal.muted = false
     void modal.play().catch(() => {})
-  }, [expanded])
+  }, [expanded, fullSrc, item.src])
 
   useEffect(() => {
     if (!expanded) return
@@ -87,11 +101,12 @@ function HardwareVideoTile({ item }: { item: VideoItem }) {
         <video
           ref={inlineRef}
           src={item.src}
+          poster={item.poster}
           autoPlay
           loop
           muted
           playsInline
-          preload="auto"
+          preload={eagerPreload ? 'auto' : 'metadata'}
           className="pointer-events-none absolute inset-0 h-full w-full object-contain object-center"
           aria-hidden
         />
@@ -120,10 +135,11 @@ function HardwareVideoTile({ item }: { item: VideoItem }) {
               <div className="relative flex min-h-0 flex-1 items-center justify-center px-2 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
                 <video
                   ref={modalRef}
-                  src={item.src}
+                  src={fullSrc}
                   loop
                   playsInline
                   controls
+                  preload="auto"
                   className="max-h-full max-w-full object-contain"
                 />
               </div>
@@ -138,8 +154,8 @@ function HardwareVideoTile({ item }: { item: VideoItem }) {
 export function WhyVysionHardwareVideos() {
   return (
     <div className="flex w-full max-w-[854px] flex-col gap-6 sm:gap-8 mx-auto lg:mx-0">
-      {WHY_VYSION_HARDWARE_VIDEOS.map((item) => (
-        <HardwareVideoTile key={item.src} item={item} />
+      {WHY_VYSION_HARDWARE_VIDEOS.map((item, index) => (
+        <HardwareVideoTile key={item.src} item={item} eagerPreload={index === 0} />
       ))}
     </div>
   )
