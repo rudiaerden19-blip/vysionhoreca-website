@@ -5174,6 +5174,12 @@
       "teaser": "Ingresos, picos y rendimiento de producto en un solo sitio.",
       "body": "¿Qué días marcan? ¿Qué líneas aportan margen? Informes claros para ajustar carta, equipo y stock.\n\nSin acrobacias en Excel — solo los datos para decidir."
     },
+    "rapporten": {
+      "title": "Informes",
+      "teaser": "Todos los informes a diario en tu bandeja: informes Z, informes diarios. Envíalo todo directo a tu contable, sin complicaciones.",
+      "body": "Informes Z, resúmenes diarios y vistas llegan automáticamente por correo. Reenvío al contable en un clic — sin exportaciones manuales.",
+      "cardHeaderAlt": "Informes y correo al contable"
+    },
     "galleryHint": "Pulse la imagen para ampliarla. Use las flechas para navegar.",
     "galleryPrev": "Imagen anterior",
     "galleryNext": "Imagen siguiente",

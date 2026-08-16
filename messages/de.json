@@ -5197,6 +5197,12 @@
       "teaser": "Umsatz, Peaks und Produktperformance an einem Ort.",
       "body": "Welche Tage laufen stark? Welche Linien tragen Marge? Klare Berichte helfen, Menü, Personal und Bestand anzupassen.\n\nKeine Tabellenakrobatik — nur die Zahlen für Entscheidungen."
     },
+    "rapporten": {
+      "title": "Berichte",
+      "teaser": "Alle Berichte täglich in Ihrem Postfach: Z-Berichte, Tagesberichte. Alles direkt an Ihren Buchhalter — ohne Aufwand.",
+      "body": "Z-Berichte, Tagesübersichten und Auswertungen kommen automatisch per E-Mail. Weiterleitung an den Buchhalter mit einem Klick — kein manueller Export.",
+      "cardHeaderAlt": "Berichte und E-Mail an Buchhalter"
+    },
     "galleryHint": "Klicken Sie auf das Bild, um es zu vergrößern. Mit den Pfeilen blättern.",
     "galleryPrev": "Vorheriges Bild",
     "galleryNext": "Nächstes Bild",

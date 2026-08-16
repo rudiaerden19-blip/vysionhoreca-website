@@ -570,6 +570,12 @@
       "teaser": "Revenue, peaks and product performance in one place.",
       "body": "Which days run hot? Which lines drive margin? Clear reports help you adjust menu, staff and stock.\n\nNo spreadsheet gymnastics — just the numbers you need to decide."
     },
+    "rapporten": {
+      "title": "Reports",
+      "teaser": "All reports in your inbox every day: Z reports, daily reports. Send everything straight to your accountant — no hassle.",
+      "body": "Z reports, daily summaries and overviews arrive by email automatically. Forward to your accountant in one click — no manual exports.",
+      "cardHeaderAlt": "Reports and email to accountant"
+    },
     "galleryHint": "Click the image to enlarge. Use the arrows to browse.",
     "galleryPrev": "Previous image",
     "galleryNext": "Next image",

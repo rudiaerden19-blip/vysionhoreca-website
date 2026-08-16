@@ -5197,6 +5197,12 @@
       "teaser": "Chiffre d’affaires, pics et performance produits au même endroit.",
       "body": "Quels jours sont chargés ? Quelles lignes portent la marge ? Des rapports clairs pour ajuster menu, équipe et stocks.\n\nSans gymnastique tableur — les chiffres utiles pour décider."
     },
+    "rapporten": {
+      "title": "Rapports",
+      "teaser": "Tous les rapports chaque jour dans votre boîte mail : rapports Z, rapports journaliers. Envoyez tout directement à votre comptable, sans effort.",
+      "body": "Rapports Z, synthèses quotidiennes et aperçus arrivent automatiquement par e-mail. Transfert au comptable en un clic — plus d’export manuel.",
+      "cardHeaderAlt": "Rapports et e-mail au comptable"
+    },
     "galleryHint": "Cliquez sur l’image pour l’agrandir. Utilisez les flèches pour feuilleter.",
     "galleryPrev": "Image précédente",
     "galleryNext": "Image suivante",

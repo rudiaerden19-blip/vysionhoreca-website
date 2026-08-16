@@ -570,6 +570,12 @@
       "teaser": "Omzet, pieken en productprestaties in één overzicht.",
       "body": "Welke dagen lopen hard? Welke categorie drukt de marge? Met duidelijke rapporten stuur je bij op menu, personeel en voorraad.\n\nGeen spreadsheet-geweld; wél de cijfers die je nodig hebt om beslissingen te nemen."
     },
+    "rapporten": {
+      "title": "Rapporten",
+      "teaser": "Alle rapporten dagelijks in jou mailbox: Z-rapporten, dagrapporten. Stuur alles direct naar je boekhouder, zonder omkijken.",
+      "body": "Z-rapporten, dagrapporten en overzichten komen automatisch per e-mail binnen. Doorsturen naar je boekhouder kan in één klik — geen handmatig exportwerk meer.",
+      "cardHeaderAlt": "Rapporten en e-mail naar boekhouder"
+    },
     "galleryHint": "Klik op de afbeelding om te vergroten. Gebruik de pijlen links en rechts om te bladeren.",
     "galleryPrev": "Vorige afbeelding",
     "galleryNext": "Volgende afbeelding",
