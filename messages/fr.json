@@ -5199,7 +5199,7 @@
     },
     "rapporten": {
       "title": "Rapports",
-      "teaser": "Tous les rapports chaque jour dans votre boîte mail : rapports Z, rapports journaliers. Envoyez tout directement à votre comptable, sans effort.",
+      "teaser": "Rapports Z et journaliers chaque jour par mail, directement à votre comptable, sans effort.",
       "body": "Rapports Z, synthèses quotidiennes et aperçus arrivent automatiquement par e-mail. Transfert au comptable en un clic — plus d’export manuel.",
       "cardHeaderAlt": "Rapports et e-mail au comptable"
     },
