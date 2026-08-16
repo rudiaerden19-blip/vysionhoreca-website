@@ -54,6 +54,7 @@ export default function OverOnsPage() {
                 <p>{t('about.story.p1')}</p>
                 <p>{t('about.story.p2')}</p>
                 <p>{t('about.story.p3')}</p>
+                <p>{t('about.story.p4')}</p>
               </div>
             </div>
             <div className="bg-[#E3E3E3] rounded-3xl p-8 lg:p-12">
