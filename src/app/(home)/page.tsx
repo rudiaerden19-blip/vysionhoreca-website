@@ -21,7 +21,7 @@ import { PricingHardwareToggle } from '@/components/PricingHardwareToggle'
 import { monthlyPriceForHardware } from '@/lib/pricing-hardware'
 import HomeScrollOnLoad from '@/components/HomeScrollOnLoad'
 import MarketingStartAndDemoButtons from '@/components/MarketingStartAndDemoButtons'
-import { WhyVysionHardwareVideos } from '@/components/WhyVysionHardwareVideos'
+import { WhyVysionHardwareVideos } from '@/components/HardwareVideoStack'
 
 const GRATIS_WEBSITE_EXAMPLE_HREF =
   'https://restaurantdekorf.ordervysion.com/shop/restaurantdekorf'
@@ -102,7 +102,7 @@ function GratisWebsiteBannerSection() {
   )
 }
 
-/** @see WhyVysionHardwareVideos — derde filmpje daar toevoegen */
+/** @see HardwareVideoStack — showcase-video in Waarom Vysion */
 
 function WhyVysionSection() {
   const { t, locale } = useLanguage()

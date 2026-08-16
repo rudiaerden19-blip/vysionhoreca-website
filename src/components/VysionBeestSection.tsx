@@ -1,6 +1,6 @@
 'use client'
 
-import Image from 'next/image'
+import { BEEST_HARDWARE_VIDEOS, HardwareVideoStack } from '@/components/HardwareVideoStack'
 import { Fragment, useLayoutEffect, useRef, useState } from 'react'
 import { useLanguage } from '@/i18n'
 
@@ -22,18 +22,14 @@ function InlineBold({ text }: { text: string }) {
   )
 }
 
-const BEEST_IMAGES = ['/images/vysion-beest-1.png', '/images/vysion-beest-2.png', '/images/vysion-beest-3.png'] as const
-
-const BEEST_ALT_KEYS = ['vysionBeest.imageAlt1', 'vysionBeest.imageAlt2', 'vysionBeest.imageAlt3'] as const
-
 /**
  * Marketing: hardware-USP tussen gratis-websitebanner en platformgrid.
- * Drie losse productfoto’s (`vysion-beest-1..3.png`), gelijk formaat kader, onder elkaar.
+ * Drie hardwarefilmpjes (SUNMI, Epson, Elo) in plaats van productfoto’s.
  */
 export default function VysionBeestSection() {
   const { t, locale } = useLanguage()
   const textColRef = useRef<HTMLDivElement>(null)
-  /** Op lg: hoogte beeldstapel = tekstkolom, zodat de derde foto niet onder de copy uitsteekt. */
+  /** Op lg: hoogte videostapel = tekstkolom. */
   const [textColPx, setTextColPx] = useState<number | null>(null)
 
   useLayoutEffect(() => {
@@ -80,27 +76,18 @@ export default function VysionBeestSection() {
                 : undefined
             }
           >
-            <div
-              className={`flex h-full flex-col gap-3 sm:gap-4 ${lockStackToText ? 'min-h-0': ''}`}
-            >
-              {BEEST_IMAGES.map((src, i) => (
-                <div
-                  key={src}
-                  className={`relative w-full overflow-hidden rounded-xl bg-gray-50 ring-1 ring-gray-100 shadow-sm ${
-                    lockStackToText ? 'min-h-0 flex-1 basis-0': 'aspect-[5/4]'
-                  }`}
-                >
-                  <Image
-                    src={src}
-                    alt={t(BEEST_ALT_KEYS[i])}
-                    fill
-                    sizes="(min-width: 1024px) 42vw, (min-width: 640px) 90vw, 100vw"
-                    className={`object-contain object-center ${lockStackToText ? 'p-1.5 sm:p-2': 'p-3 sm:p-4'}`}
-                    priority={i === 0}
-                  />
-                </div>
-              ))}
-            </div>
+            <HardwareVideoStack
+              videos={BEEST_HARDWARE_VIDEOS}
+              stackClassName={`flex h-full w-full flex-col gap-3 sm:gap-4 ${lockStackToText ? 'min-h-0' : ''}`}
+              getTileClassName={() =>
+                [
+                  'group relative w-full overflow-hidden rounded-xl bg-[#141414] ring-1 ring-gray-100 shadow-sm text-left',
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2',
+                  lockStackToText ? 'min-h-0 flex-1 basis-0' : 'aspect-[5/4]',
+                ].join(' ')
+              }
+              labelClassName="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-2 pb-2 pt-6 text-center text-[0.65rem] font-semibold text-white/95 sm:text-xs"
+            />
           </div>
           <div ref={textColRef} className="order-1 lg:order-2 lg:min-w-0">
             <h2

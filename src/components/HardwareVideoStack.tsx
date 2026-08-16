@@ -4,16 +4,31 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useLanguage } from '@/i18n'
 
-type WhyVysionVideoConfig = {
-  /** Lightweight preview in the tile (autoplay). */
+export type HardwareVideoConfig = {
   src: string
   altKey: string
-  /** Full file with audio for fullscreen; defaults to `src`. */
   fullSrc?: string
   poster?: string
 }
 
-export const WHY_VYSION_HARDWARE_VIDEOS: WhyVysionVideoConfig[] = [
+export const BEEST_HARDWARE_VIDEOS: HardwareVideoConfig[] = [
+  {
+    src: '/images/sunmi-d3-pro-inline.mp4',
+    fullSrc: '/images/sunmi-d3-pro-display.mp4',
+    poster: '/images/sunmi-d3-pro-poster.jpg',
+    altKey: 'whyVysion.videoAltSunmi',
+  },
+  {
+    src: '/images/epson-mseries-receipt-printers.mp4',
+    altKey: 'whyVysion.videoAltEpson',
+  },
+  {
+    src: '/images/elopos-video.mp4',
+    altKey: 'whyVysion.videoAltEloPOS',
+  },
+]
+
+export const WHY_VYSION_HARDWARE_VIDEOS: HardwareVideoConfig[] = [
   {
     src: '/images/vysion-hardware-showcase-inline.mp4',
     fullSrc: '/images/vysion-hardware-showcase.mp4',
@@ -22,7 +37,17 @@ export const WHY_VYSION_HARDWARE_VIDEOS: WhyVysionVideoConfig[] = [
   },
 ]
 
-function HardwareVideoTile({ item, eagerPreload }: { item: WhyVysionVideoConfig; eagerPreload: boolean }) {
+function HardwareVideoTile({
+  item,
+  eagerPreload,
+  tileClassName,
+  labelClassName,
+}: {
+  item: HardwareVideoConfig
+  eagerPreload: boolean
+  tileClassName?: string
+  labelClassName?: string
+}) {
   const { t } = useLanguage()
   const [expanded, setExpanded] = useState(false)
   const [mounted, setMounted] = useState(false)
@@ -81,13 +106,16 @@ function HardwareVideoTile({ item, eagerPreload }: { item: WhyVysionVideoConfig;
   }, [expanded, close])
 
   const label = t(item.altKey)
+  const tileClass =
+    tileClassName ??
+    'group relative w-full aspect-video overflow-hidden rounded-3xl shadow-home-photo ring-1 ring-black/[0.08] bg-[#141414] text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2'
 
   return (
     <>
       <button
         type="button"
         onClick={open}
-        className="group relative w-full aspect-video overflow-hidden rounded-3xl shadow-home-photo ring-1 ring-black/[0.08] bg-[#141414] text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+        className={tileClass}
         aria-label={`${label}. ${t('whyVysion.videoTapToEnlarge')}`}
       >
         <video
@@ -102,7 +130,12 @@ function HardwareVideoTile({ item, eagerPreload }: { item: WhyVysionVideoConfig;
           className="pointer-events-none absolute inset-0 h-full w-full object-contain object-center"
           aria-hidden
         />
-        <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-3 pb-3 pt-8 text-center text-xs font-semibold text-white/95 sm:text-sm">
+        <span
+          className={
+            labelClassName ??
+            'absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-3 pb-3 pt-8 text-center text-xs font-semibold text-white/95 sm:text-sm'
+          }
+        >
           {t('whyVysion.videoTapToEnlarge')}
         </span>
       </button>
@@ -143,12 +176,32 @@ function HardwareVideoTile({ item, eagerPreload }: { item: WhyVysionVideoConfig;
   )
 }
 
-export function WhyVysionHardwareVideos() {
+export function HardwareVideoStack({
+  videos,
+  stackClassName = 'flex w-full max-w-[854px] flex-col gap-6 sm:gap-8 mx-auto lg:mx-0',
+  getTileClassName,
+  labelClassName,
+}: {
+  videos: HardwareVideoConfig[]
+  stackClassName?: string
+  getTileClassName?: (index: number) => string | undefined
+  labelClassName?: string
+}) {
   return (
-    <div className="flex w-full max-w-[854px] flex-col gap-6 sm:gap-8 mx-auto lg:mx-0">
-      {WHY_VYSION_HARDWARE_VIDEOS.map((item, index) => (
-        <HardwareVideoTile key={item.src} item={item} eagerPreload={index === 0} />
+    <div className={stackClassName}>
+      {videos.map((item, index) => (
+        <HardwareVideoTile
+          key={item.src}
+          item={item}
+          eagerPreload={index === 0}
+          tileClassName={getTileClassName?.(index)}
+          labelClassName={labelClassName}
+        />
       ))}
     </div>
   )
+}
+
+export function WhyVysionHardwareVideos() {
+  return <HardwareVideoStack videos={WHY_VYSION_HARDWARE_VIDEOS} />
 }
