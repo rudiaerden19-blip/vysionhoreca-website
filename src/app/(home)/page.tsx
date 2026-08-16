@@ -158,13 +158,15 @@ function WhyVysionSection() {
             <div className="relative min-h-[280px] flex-1 lg:min-h-[320px]">
               <div className="relative h-full min-h-[280px] lg:absolute lg:inset-0 lg:min-h-0">
                 <div className="relative min-h-[280px] h-full rounded-3xl overflow-hidden shadow-home-photo ring-1 ring-black/[0.08] bg-[#141414] lg:absolute lg:left-0 lg:right-0 lg:bottom-0 lg:min-h-0 lg:top-[2.5rem]">
-                  <Image
-                    src="/images/why-vysion-kiosk.png"
-                    alt={t('whyVysion.imageAlt')}
-                    fill
-                    loading="lazy"
-                    className="object-cover object-center"
-                    sizes="(min-width: 1024px) 45vw, 95vw"
+                  <video
+                    src="/images/sunmi-d3-pro.mp4"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    preload="metadata"
+                    className="absolute inset-0 h-full w-full object-cover object-center"
+                    aria-label={t('whyVysion.imageAlt')}
                   />
                 </div>
               </div>
