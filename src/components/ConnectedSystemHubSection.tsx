@@ -117,31 +117,55 @@ export default function ConnectedSystemHubSection() {
           aria-label={t('connectedSystemHub.diagramAria')}
         >
           <div className="relative aspect-square w-full pb-12">
-            <svg
-              viewBox="0 0 100 100"
-              className="absolute inset-0 h-full w-full"
+            <div
+              className="hub-orbit-ring pointer-events-none absolute inset-0 motion-reduce:animate-none"
               aria-hidden
             >
-              <defs>
-                <linearGradient id="hub-tentacle" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor={HUB_ACCENT} stopOpacity="0.25" />
-                  <stop offset="100%" stopColor={HUB_ACCENT} stopOpacity="0.85" />
-                </linearGradient>
-              </defs>
-              {HUB_MODULE_KEYS.map((key, i) => (
-                <path
-                  key={`line-${key}`}
-                  d={tentaclePathD(hubAngle(i, total))}
-                  fill="none"
-                  stroke="url(#hub-tentacle)"
-                  strokeWidth="0.45"
-                  strokeLinecap="round"
-                />
-              ))}
-            </svg>
+              <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full">
+                <defs>
+                  <linearGradient id="hub-tentacle" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor={HUB_ACCENT} stopOpacity="0.25" />
+                    <stop offset="100%" stopColor={HUB_ACCENT} stopOpacity="0.85" />
+                  </linearGradient>
+                </defs>
+                {HUB_MODULE_KEYS.map((key, i) => (
+                  <path
+                    key={`line-${key}`}
+                    d={tentaclePathD(hubAngle(i, total))}
+                    fill="none"
+                    stroke="url(#hub-tentacle)"
+                    strokeWidth="0.45"
+                    strokeLinecap="round"
+                  />
+                ))}
+              </svg>
 
-            {/* Hub midden — rechthoekig kassa-scherm */}
-            <div className="absolute left-1/2 top-[48%] z-20 w-[48%] -translate-x-1/2 -translate-y-1/2">
+              {HUB_MODULE_KEYS.map((key, i) => {
+                const angle = hubAngle(i, total)
+                const dot = polarPx(HUB_NODE_R, angle)
+                const labelPos = polarPx(HUB_LABEL_R, angle)
+                const label = t(`connectedSystemHub.modules.${key}`).replace(/\n/g, ' ')
+                return (
+                  <Fragment key={key}>
+                    <span
+                      className="absolute z-40 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent shadow-[0_0_12px_rgba(14,93,130,0.85)]"
+                      style={dot}
+                    />
+                    <div
+                      className="hub-orbit-label-counter pointer-events-auto absolute z-30 max-w-[9.5rem] motion-reduce:animate-none sm:max-w-[11rem] lg:max-w-[12rem]"
+                      style={labelPos}
+                    >
+                      <p className="rounded-xl border border-white/12 bg-[#161b22]/95 px-3 py-2 text-center text-[0.6875rem] font-semibold leading-snug text-white shadow-lg backdrop-blur-sm sm:px-3.5 sm:py-2.5 sm:text-xs">
+                        {label}
+                      </p>
+                    </div>
+                  </Fragment>
+                )
+              })}
+            </div>
+
+            {/* Hub midden — vast, draait niet mee */}
+            <div className="absolute left-1/2 top-[48%] z-30 w-[48%] -translate-x-1/2 -translate-y-1/2">
               <div
                 className="relative w-full rounded-2xl border border-white/[0.14] bg-[#0c0f14] p-1.5 shadow-[0_0_0_1px_rgba(14,93,130,0.35),0_20px_48px_rgba(0,0,0,0.5)] ring-1 ring-accent/35"
                 style={{ aspectRatio: String(HUB_CENTER_ASPECT) }}
@@ -152,31 +176,6 @@ export default function ConnectedSystemHubSection() {
                 {t('connectedSystemHub.centerLabel').toUpperCase()}
               </p>
             </div>
-
-            {/* Bolletje op lijn-einde, label ernaast naar buiten */}
-            {HUB_MODULE_KEYS.map((key, i) => {
-              const angle = hubAngle(i, total)
-              const dot = polarPx(HUB_NODE_R, angle)
-              const labelPos = polarPx(HUB_LABEL_R, angle)
-              const label = t(`connectedSystemHub.modules.${key}`).replace(/\n/g, ' ')
-              return (
-                <Fragment key={key}>
-                  <span
-                    className="absolute z-40 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent shadow-[0_0_12px_rgba(14,93,130,0.85)]"
-                    style={dot}
-                    aria-hidden
-                  />
-                  <div
-                    className="absolute z-30 max-w-[9.5rem] -translate-x-1/2 -translate-y-1/2 sm:max-w-[11rem] lg:max-w-[12rem]"
-                    style={labelPos}
-                  >
-                    <p className="rounded-xl border border-white/12 bg-[#161b22]/95 px-3 py-2 text-center text-[0.6875rem] font-semibold leading-snug text-white shadow-lg backdrop-blur-sm sm:px-3.5 sm:py-2.5 sm:text-xs">
-                      {label}
-                    </p>
-                  </div>
-                </Fragment>
-              )
-            })}
           </div>
         </div>
 

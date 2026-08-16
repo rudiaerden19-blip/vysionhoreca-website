@@ -615,6 +615,44 @@ input[type="number"] {
   animation: hub-center-shimmer 5.5s ease-in-out infinite;
 }
 
+@keyframes hub-orbit-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes hub-orbit-label-counter {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(-360deg);
+  }
+}
+
+.hub-orbit-ring {
+  animation: hub-orbit-spin 140s linear infinite;
+  transform-origin: 50% 48%;
+}
+
+.hub-orbit-label-counter {
+  animation: hub-orbit-label-counter 140s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hub-orbit-ring,
+  .hub-orbit-label-counter {
+    animation: none;
+  }
+
+  .hub-orbit-label-counter {
+    transform: translate(-50%, -50%);
+  }
+}
+
 .delay-100 { animation-delay: 0.1s; }
 .delay-200 { animation-delay: 0.2s; }
 .delay-300 { animation-delay: 0.3s; }
