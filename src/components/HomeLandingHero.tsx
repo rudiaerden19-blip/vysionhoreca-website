@@ -221,7 +221,6 @@ export default function HomeLandingHero() {
       {/* Top bar */}
       <header className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 sm:pt-4 pb-1">
         <div className="flex items-start justify-end gap-4">
-          <MarketingStartAndDemoButtons compact onDark />
           <button
             type="button"
             className="text-white p-2 rounded-lg hover:bg-white/10 shrink-0"
