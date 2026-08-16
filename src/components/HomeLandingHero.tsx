@@ -276,9 +276,6 @@ export default function HomeLandingHero() {
           {t('heroLanding.subtitle')}
         </p>
         <HeroCtaFlipCard />
-        <p className="mt-4 sm:mt-5 w-full max-w-lg sm:max-w-xl mx-auto text-center text-xs sm:text-sm font-semibold uppercase tracking-wide text-white/90 leading-snug px-2">
-          {t('heroLanding.ctaModulesOneTimeLicense')}
-        </p>
       </div>
     </section>
   )
