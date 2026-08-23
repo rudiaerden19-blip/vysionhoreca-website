@@ -4779,6 +4779,8 @@
     "reply": "回复",
     "visibleTooltip": "可见 - 点击隐藏",
     "hiddenTooltip": "已隐藏 - 点击显示",
+    "approveLabel": "通过",
+    "hideLabel": "隐藏",
     "today": "今天",
     "yesterday": "昨天",
     "daysAgo": "天前",

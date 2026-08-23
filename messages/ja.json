@@ -4779,6 +4779,8 @@
     "reply": "返信",
     "visibleTooltip": "表示中 - クリックして非表示",
     "hiddenTooltip": "非表示 - クリックして表示",
+    "approveLabel": "承認",
+    "hideLabel": "非表示",
     "today": "今日",
     "yesterday": "昨日",
     "daysAgo": "日前",

@@ -5078,6 +5078,8 @@
     "reply": "Reageren",
     "visibleTooltip": "Zichtbaar - Klik om te verbergen",
     "hiddenTooltip": "Verborgen - Klik om te tonen",
+    "approveLabel": "Goedkeuren",
+    "hideLabel": "Verbergen",
     "today": "Vandaag",
     "yesterday": "Gisteren",
     "daysAgo": "dagen geleden",

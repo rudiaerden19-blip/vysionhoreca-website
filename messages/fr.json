@@ -4802,6 +4802,8 @@
     "reply": "Répondre",
     "visibleTooltip": "Visible - Cliquer pour masquer",
     "hiddenTooltip": "Masqué - Cliquer pour afficher",
+    "approveLabel": "Approuver",
+    "hideLabel": "Masquer",
     "today": "Aujourd'hui",
     "yesterday": "Hier",
     "daysAgo": "jours",

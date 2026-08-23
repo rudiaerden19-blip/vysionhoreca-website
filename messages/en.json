@@ -5078,6 +5078,8 @@
     "reply": "Reply",
     "visibleTooltip": "Visible - Click to hide",
     "hiddenTooltip": "Hidden - Click to show",
+    "approveLabel": "Approve",
+    "hideLabel": "Hide",
     "today": "Today",
     "yesterday": "Yesterday",
     "daysAgo": "days ago",

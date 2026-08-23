@@ -282,20 +282,29 @@ function HardwareVideoTile({
 
   useEffect(() => {
     if (!expanded) return
-    const modal = modalRef.current
-    if (!modal) return
+    let cancelled = false
 
     const playFromStart = () => {
+      const modal = modalRef.current
+      if (!modal || cancelled) return
       modal.currentTime = 0
       modal.muted = false
       void modal.play().catch(() => {})
     }
 
-    if (modal.readyState >= HTMLMediaElement.HAVE_METADATA) {
-      playFromStart()
-    } else {
-      modal.addEventListener('loadedmetadata', playFromStart, { once: true })
-      return () => modal.removeEventListener('loadedmetadata', playFromStart)
+    const id = requestAnimationFrame(() => {
+      const modal = modalRef.current
+      if (!modal) return
+      if (modal.readyState >= HTMLMediaElement.HAVE_METADATA) {
+        playFromStart()
+      } else {
+        modal.addEventListener('loadedmetadata', playFromStart, { once: true })
+      }
+    })
+
+    return () => {
+      cancelled = true
+      cancelAnimationFrame(id)
     }
   }, [expanded, fullSrc])
 

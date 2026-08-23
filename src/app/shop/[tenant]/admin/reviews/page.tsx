@@ -194,42 +194,51 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, x: -100 }}
                 transition={{ delay: index * 0.05 }}
-                className={`bg-white rounded-2xl p-6 shadow-sm ${!review.is_visible ? 'opacity-60': ''}`}
+                className={`bg-white rounded-2xl p-6 shadow-sm ${!review.is_visible ? 'ring-1 ring-gray-200': ''}`}
               >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between mb-4">
+                  <div className="flex min-w-0 items-center gap-4">
+                    <div className="w-12 h-12 shrink-0 bg-blue-100 rounded-full flex items-center justify-center">
                       <span className="text-blue-600 font-bold text-lg">{review.customer_name[0]?.toUpperCase()}</span>
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
                         <p className="font-semibold text-gray-900">{review.customer_name}</p>
                         {review.is_verified && (
-                          <span className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded-full"> {t('reviewsPage.verified')}</span>
+                          <span className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded-full">{t('reviewsPage.verified')}</span>
+                        )}
+                        {!review.is_visible && (
+                          <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full">{t('marketingReviews.hidden')}</span>
                         )}
                       </div>
                       <p className="text-sm text-gray-500">{formatDate(review.created_at)}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex" aria-hidden>
                       {[1,2,3,4,5].map(s => (
-                        <span key={s} className={`text-lg ${s <= review.rating ? 'text-yellow-400': 'text-gray-200'}`}></span>
+                        <span key={s} className={`text-lg leading-none ${s <= review.rating ? 'text-yellow-400': 'text-gray-200'}`}>★</span>
                       ))}
                     </div>
                     <button
+                      type="button"
                       onClick={() => handleToggleVisible(review.id!, review.is_visible)}
-                      className={`p-2 rounded-xl transition-colors ${review.is_visible ? 'bg-green-100 text-green-600 hover:bg-green-200': 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
+                      className={`rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${
+                        review.is_visible
+                          ? 'bg-green-100 text-green-800 hover:bg-green-200'
+                          : 'bg-gray-900 text-white hover:bg-black'
+                      }`}
                       title={review.is_visible ? t('reviewsPage.visibleTooltip') : t('reviewsPage.hiddenTooltip')}
                     >
-                      {review.is_visible ? '' : ''}
+                      {review.is_visible ? t('reviewsPage.hideLabel') : t('reviewsPage.approveLabel')}
                     </button>
                     <button
+                      type="button"
                       onClick={() => handleDelete(review.id!)}
-                      className="p-2 rounded-xl text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors"
+                      className="rounded-xl px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50"
                       title={t('common.delete')}
                     >
-                      
+                      {t('common.delete')}
                     </button>
                   </div>
                 </div>

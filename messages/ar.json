@@ -4779,6 +4779,8 @@
     "reply": "رد",
     "visibleTooltip": "مرئي - انقر للإخفاء",
     "hiddenTooltip": "مخفي - انقر للإظهار",
+    "approveLabel": "موافقة",
+    "hideLabel": "إخفاء",
     "today": "اليوم",
     "yesterday": "أمس",
     "daysAgo": "أيام",
