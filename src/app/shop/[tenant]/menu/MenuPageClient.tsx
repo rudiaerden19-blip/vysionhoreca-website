@@ -154,14 +154,6 @@ const MenuProductCard = memo(function MenuProductCard({
           )}
         </div>
 
-        <div className={`absolute inset-x-0 bottom-0 z-[5] px-3 ${lite ? 'pb-2': 'pb-2.5'}`}>
-          <h3
-            className={`font-bold text-black leading-snug line-clamp-2 ${lite ? 'text-lg': 'text-base sm:text-lg'}`}
-          >
-            {item.name}
-          </h3>
-        </div>
-
         {!item.is_available && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
             <span className="bg-red-500 text-white font-bold px-4 py-2 rounded-full">{t('menuPage.soldOut')}</span>
@@ -170,6 +162,11 @@ const MenuProductCard = memo(function MenuProductCard({
       </div>
 
       <div className={lite ? 'p-4 pb-3': 'p-3 sm:p-4'}>
+        <h3
+          className={`font-bold ${theme.text} leading-snug line-clamp-2 mb-2 ${lite ? 'text-lg' : 'text-base sm:text-lg'}`}
+        >
+          {item.name}
+        </h3>
         {item.description && (
           <p className={`${theme.textLight} text-xs sm:text-sm mb-3 line-clamp-2 leading-relaxed`}>{item.description}</p>
         )}
